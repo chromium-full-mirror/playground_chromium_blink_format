@@ -142,9 +142,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
                  marginHeight:(int)height;
 
 - (WebCoreBridge*)openNewWindowWithURL:(NSURL*)URL;
-- (BOOL)areToolbarsVisisble;
+- (BOOL)areToolbarsVisible;
 - (void)setToolbarsVisible:(BOOL)visible;
-- (BOOL)isStatusBarVisisble;
+- (BOOL)isStatusBarVisible;
 - (void)setStatusBarVisible:(BOOL)visible;
 - (BOOL)areScrollbarsVisible;
 - (void)setScrollbarsVisible:(BOOL)visible;

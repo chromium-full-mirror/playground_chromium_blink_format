@@ -113,8 +113,10 @@ CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
 }
 
 CSSImportRuleImpl::~CSSImportRuleImpl() {
-  if (m_lstMedia)
+  if (m_lstMedia) {
+    m_lstMedia->setParent(0);
     m_lstMedia->deref();
+  }
   if (m_styleSheet)
     m_styleSheet->deref();
   if (m_cachedSheet)
