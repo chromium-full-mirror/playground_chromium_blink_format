@@ -50,6 +50,7 @@ class Qt {
     NoPen,
     SolidLine,
     DotLine,
+    DashLine,
   };
 
   enum BrushStyle {
@@ -84,7 +85,14 @@ class Qt {
     Key_Down = 0x1015,
   };
 
+  enum RasterOp {  // raster op mode
+    CopyROP,
+    OrROP,
+    XorROP,
+  };
+
   static const QColor& black;
+  static const QColor& white;
   static const QColor& darkGray;
 
   static const QCursor& sizeAllCursor;
