@@ -96,10 +96,12 @@ void RenderLayer::updateLayerPosition() {
 
   setPos(x, y);
 
-  if (m_object->overflowWidth() > m_object->width())
-    setWidth(m_object->overflowWidth());
-  if (m_object->overflowHeight() > m_object->height())
-    setHeight(m_object->overflowHeight());
+  if (!m_object->style()->hidesOverflow()) {
+    if (m_object->overflowWidth() > m_object->width())
+      setWidth(m_object->overflowWidth());
+    if (m_object->overflowHeight() > m_object->height())
+      setHeight(m_object->overflowHeight());
+  }
 }
 
 RenderLayer* RenderLayer::enclosingPositionedAncestor() {
@@ -240,6 +242,10 @@ void RenderLayer::convertToLayerCoords(RenderLayer* ancestorLayer,
 
   x += xPos();
   y += yPos();
+}
+
+void RenderLayer::scrollOffset(int& x, int& y) {
+  // FIXME: Implement for overflow:auto/scroll
 }
 
 void RenderLayer::paint(QPainter* p,

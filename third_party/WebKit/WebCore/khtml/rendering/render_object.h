@@ -131,7 +131,7 @@ class RenderObject : public CachedObjectClient {
   }
   virtual QRect getClipRect(int tx, int ty) { return QRect(0, 0, 0, 0); }
   bool hasClip() { return isPositioned() && style()->hasClip(); }
-  bool hasOverflowClip() { return style()->overflow() == OHIDDEN; }
+  bool hasOverflowClip() { return style()->hidesOverflow(); }
 
   virtual int getBaselineOfFirstLineBox() {
     return -1;
@@ -493,7 +493,8 @@ class RenderObject : public CachedObjectClient {
   virtual short width() const { return 0; }
   virtual int height() const { return 0; }
 
-  // The height of a block when you include overflow spillage out of the bottom
+  // The height of a block when you include normal flow overflow spillage out of
+  // the bottom
   // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
   // inside
   // it would have an overflow height of borderTop() + paddingTop() + 100px.
@@ -501,6 +502,15 @@ class RenderObject : public CachedObjectClient {
   virtual int overflowWidth() const { return width(); }
   virtual void setOverflowHeight(int) {}
   virtual void setOverflowWidth(int) {}
+
+  // Gives the effective overflow width/height once you factor in the object's
+  // overflow style.
+  int effectiveHeight() const {
+    return style()->hidesOverflow() ? height() : overflowHeight();
+  }
+  int effectiveWidth() const {
+    return style()->hidesOverflow() ? width() : overflowWidth();
+  }
 
   // IE extensions. Used to calculate offsetWidth/Height.  Overridden by inlines
   // (render_flow)
@@ -650,9 +660,13 @@ class RenderObject : public CachedObjectClient {
                          int& /*_y*/,
                          int& /*height*/);
 
-  virtual int lowestPosition() const { return 0; }
+  virtual int lowestPosition(bool includeOverflowInterior = true) const {
+    return 0;
+  }
 
-  virtual int rightmostPosition() const { return 0; }
+  virtual int rightmostPosition(bool includeOverflowInterior = true) const {
+    return 0;
+  }
 
   // recursively invalidate current layout
   // unused: void invalidateLayout();

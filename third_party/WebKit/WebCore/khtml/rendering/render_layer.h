@@ -98,6 +98,8 @@ class RenderLayer {
     m_y = yPos;
   }
 
+  void scrollOffset(int& x, int& y);
+
   void updateLayerPosition();
 
   // Gets the nearest enclosing positioned ancestor layer (also includes

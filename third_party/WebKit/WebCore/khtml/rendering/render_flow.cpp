@@ -278,15 +278,17 @@ void RenderFlow::repaint(bool immediate) {
     if (firstLineBox() && firstLineBox()->topOverflow() < 0) {
       int ow = style() ? style()->outlineWidth() : 0;
       repaintRectangle(-ow, -ow + firstLineBox()->topOverflow(),
-                       overflowWidth() + ow * 2, overflowHeight() + ow * 2,
+                       effectiveWidth() + ow * 2, effectiveHeight() + ow * 2,
                        immediate);
     } else
       return RenderBox::repaint();
   }
 }
 
-int RenderFlow::lowestPosition() const {
-  int bottom = RenderBox::lowestPosition();
+int RenderFlow::lowestPosition(bool includeOverflowInterior) const {
+  int bottom = RenderBox::lowestPosition(includeOverflowInterior);
+  if (!includeOverflowInterior && style()->hidesOverflow())
+    return bottom;
 
   // FIXME: It's not OK to look only at the last non-floating
   // non-positioned child (e.g., negative margins, or a child that itself has
@@ -300,7 +302,7 @@ int RenderFlow::lowestPosition() const {
     for (RenderObject* c = lastChild(); c; c = c->previousSibling()) {
       if (!c->isFloatingOrPositioned() &&
           (!checkOverhangsOnly || c->overhangingContents())) {
-        int lp = c->yPos() + c->lowestPosition();
+        int lp = c->yPos() + c->lowestPosition(false);
         bottom = QMAX(bottom, lp);
         break;
       }
@@ -310,8 +312,10 @@ int RenderFlow::lowestPosition() const {
   return bottom;
 }
 
-int RenderFlow::rightmostPosition() const {
-  int right = RenderBox::rightmostPosition();
+int RenderFlow::rightmostPosition(bool includeOverflowInterior) const {
+  int right = RenderBox::rightmostPosition(includeOverflowInterior);
+  if (!includeOverflowInterior && style()->hidesOverflow())
+    return right;
 
   // FIXME: We want to switch over to using overflow,
   // but we tried it and it didn't work, so there must be some issues with
@@ -319,7 +323,7 @@ int RenderFlow::rightmostPosition() const {
   // still need to be worked out.
   for (RenderObject* c = firstChild(); c; c = c->nextSibling()) {
     if (!c->isFloatingOrPositioned()) {
-      int rp = c->xPos() + c->rightmostPosition();
+      int rp = c->xPos() + c->rightmostPosition(false);
       right = QMAX(right, rp);
     }
   }

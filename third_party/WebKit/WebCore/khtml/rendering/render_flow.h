@@ -88,8 +88,8 @@ class RenderFlow : public RenderBox {
 
   virtual void repaint(bool immediate = false);
 
-  virtual int lowestPosition() const;
-  virtual int rightmostPosition() const;
+  virtual int lowestPosition(bool includeOverflowInterior = true) const;
+  virtual int rightmostPosition(bool includeOverflowInterior = true) const;
 
  protected:
   // An inline can be split with blocks occurring in between the inline content.
