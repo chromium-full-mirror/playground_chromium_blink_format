@@ -1887,28 +1887,29 @@ bool HTMLTokenizer::processingData() const {
 bool HTMLTokenizer::continueProcessing(int& processedCount,
                                        const QTime& startTime,
                                        const KWQUIEventTime& eventTime) {
+  return true;
+  /* Hurt PLT, so comment this out for now until we figure something out.
   // FIXME: For now, we don't bother trying to break out of the middle of an
-  // executing script.
+  executing script.
   // We don't want to be checking elapsed time with every character, so we only
-  // check after we've
+  check after we've
   // processed a certain number of characters.
-  if (!loadingExtScript && !m_executingScript &&
-      processedCount > TOKENIZER_CHUNK_SIZE) {
-    processedCount = 0;
-    if (eventTime.uiEventPending() ||
-        startTime.elapsed() > TOKENIZER_TIME_DELAY ||
-        !parser->doc()->haveStylesheetsLoaded() ||
-        (parser->doc()->ownerElement() &&
-         parser->doc()->ownerElement()->getDocument()->parsing())) {
-      // Schedule the timer to keep processing as soon as possible.
-      if (!timerId)
-        timerId = startTimer(0);
-      return false;
-    }
+  if (!loadingExtScript && !m_executingScript && processedCount >
+  TOKENIZER_CHUNK_SIZE) {
+      processedCount = 0;
+      if (eventTime.uiEventPending() || startTime.elapsed() >
+  TOKENIZER_TIME_DELAY || !parser->doc()->haveStylesheetsLoaded() ||
+          (parser->doc()->ownerElement() &&
+  parser->doc()->ownerElement()->getDocument()->parsing())) {
+          // Schedule the timer to keep processing as soon as possible.
+          if (!timerId)
+              timerId = startTimer(0);
+          return false;
+      }
   }
 
   processedCount++;
-  return true;
+  return true;*/
 }
 
 void HTMLTokenizer::timerEvent(QTimerEvent* e) {
