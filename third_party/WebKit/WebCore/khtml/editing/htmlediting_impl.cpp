@@ -157,7 +157,8 @@ static Position leadingWhitespacePosition(const Position& pos) {
 
   Selection selection(pos);
   Position prev = pos.previousCharacterPosition();
-  if (prev != pos && prev.node()->inSameContainingEditableBlock(pos.node()) &&
+  if (prev != pos &&
+      prev.node()->inSameContainingBlockFlowElement(pos.node()) &&
       prev.node()->isTextNode()) {
     DOMString string = static_cast<TextImpl*>(prev.node())->data();
     if (isWS(string[prev.offset()]))
@@ -175,7 +176,7 @@ static Position trailingWhitespacePosition(const Position& pos) {
     if (pos.offset() >= (long)textNode->length()) {
       Position next = pos.nextCharacterPosition();
       if (next != pos &&
-          next.node()->inSameContainingEditableBlock(pos.node()) &&
+          next.node()->inSameContainingBlockFlowElement(pos.node()) &&
           next.node()->isTextNode()) {
         DOMString string = static_cast<TextImpl*>(next.node())->data();
         if (isWS(string[0]))
@@ -1391,11 +1392,11 @@ void DeleteSelectionCommandImpl::doApply() {
 
   unsigned long startRenderedOffset = downstreamStart.renderedOffset();
 
-  bool startAtStartOfRootEditableBlock =
+  bool startAtStartOfRootEditableElement =
       startRenderedOffset == 0 &&
-      downstreamStart.inFirstEditableInRootEditableBlock();
+      downstreamStart.inFirstEditableInRootEditableElement();
   bool startAtStartOfBlock =
-      startAtStartOfRootEditableBlock ||
+      startAtStartOfRootEditableElement ||
       (startRenderedOffset == 0 &&
        downstreamStart.inFirstEditableInContainingEditableBlock());
   bool endAtEndOfBlock = downstreamEnd.isLastRenderedPositionInEditableBlock();
@@ -1408,14 +1409,15 @@ void DeleteSelectionCommandImpl::doApply() {
       startCompletelySelected ? "YES" : "NO");
   LOG(Editing, "at start block:      %s", startAtStartOfBlock ? "YES" : "NO");
   LOG(Editing, "at start root block: %s",
-      startAtStartOfRootEditableBlock ? "YES" : "NO");
+      startAtStartOfRootEditableElement ? "YES" : "NO");
   LOG(Editing, "at end block:        %s", endAtEndOfBlock ? "YES" : "NO");
   LOG(Editing, "only whitespace:     %s", onlyWhitespace ? "YES" : "NO");
 
   // Start is not completely selected
   if (startAtStartOfBlock) {
     LOG(Editing, "ending position case 1");
-    endingPosition = Position(downstreamStart.node()->containingBlock(), 1);
+    endingPosition =
+        Position(downstreamStart.node()->enclosingBlockFlowElement(), 1);
     adjustEndingPositionDownstream = true;
   } else if (!startCompletelySelected) {
     LOG(Editing, "ending position case 2");
@@ -1615,7 +1617,7 @@ void InputNewlineCommandImpl::doApply() {
 
   if (atEndOfBlock) {
     LOG(Editing, "input newline case 1");
-    NodeImpl* cb = pos.node()->containingBlock();
+    NodeImpl* cb = pos.node()->enclosingBlockFlowElement();
     appendNode(cb, breakNode);
 
     // Insert an "extra" BR at the end of the block. This makes the "real" BR we
@@ -2272,12 +2274,13 @@ int RemoveNodeAndPruneCommandImpl::commandID() const {
 }
 
 void RemoveNodeAndPruneCommandImpl::doApply() {
-  NodeImpl* editableBlock = m_removeChild->containingBlock();
+  NodeImpl* editableBlock = m_removeChild->enclosingBlockFlowElement();
   NodeImpl* pruneNode = m_removeChild;
   NodeImpl* node = pruneNode->traversePreviousNode();
   removeNode(pruneNode);
   while (1) {
-    if (editableBlock != node->containingBlock() || !shouldPruneNode(node))
+    if (editableBlock != node->enclosingBlockFlowElement() ||
+        !shouldPruneNode(node))
       break;
     pruneNode = node;
     node = node->traversePreviousNode();
@@ -2483,7 +2486,7 @@ void TypingCommandImpl::issueCommandForDeleteKey() {
 
   if (selectionToDelete.state() == Selection::CARET) {
     Position pos(selectionToDelete.start());
-    if (pos.inFirstEditableInRootEditableBlock() &&
+    if (pos.inFirstEditableInRootEditableElement() &&
         pos.offset() <= pos.node()->caretMinOffset()) {
       // we're at the start of a root editable block...do nothing
       return;
