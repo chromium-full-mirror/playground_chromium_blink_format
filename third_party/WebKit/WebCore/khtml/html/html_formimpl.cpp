@@ -1968,7 +1968,7 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
   // must dispatch a DOMActivate event - a click event will not do the job.
   if ((evt->id() == EventImpl::DOMACTIVATE_EVENT) &&
       (m_type == IMAGE || m_type == SUBMIT || m_type == RESET)) {
-    if (!m_form || !m_render)
+    if (!m_form)
       return;
 
     if (m_type == RESET) {
