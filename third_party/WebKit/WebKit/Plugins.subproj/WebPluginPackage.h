@@ -10,8 +10,12 @@
 
 #import <WebKit/WebBasePluginPackage.h>
 
+@protocol WebPluginViewFactory;
+
 @interface WebPluginPackage : WebBasePluginPackage {
   NSBundle* bundle;
 }
+
+- (Class)viewFactory;
 
 @end
