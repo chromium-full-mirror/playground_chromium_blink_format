@@ -88,7 +88,6 @@ class XMLTokenizer;
 
 namespace KJS {
 class DOMDocument;
-class JSEventListener;
 class Selection;
 class SelectionFunc;
 class Window;
@@ -156,7 +155,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   friend class KJS::SelectionFunc;
   friend class KJS::Window;
   friend class KJS::WindowFunc;
-  friend class KJS::JSEventListener;
   friend class KJS::DOMDocument;
   friend class KJSProxy;
   friend class KHTMLPartBrowserExtension;

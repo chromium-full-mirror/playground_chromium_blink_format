@@ -43,6 +43,7 @@ class BarInfo;
 class History;
 class FrameArray;
 class JSEventListener;
+class JSUnprotectedEventListener;
 class JSLazyEventListener;
 
 class Screen : public ObjectImp {
@@ -130,6 +131,8 @@ class Window : public ObjectImp {
   BarInfo* statusbar(ExecState* exec) const;
   BarInfo* toolbar(ExecState* exec) const;
   JSEventListener* getJSEventListener(const Value& val, bool html = false);
+  JSUnprotectedEventListener* getJSUnprotectedEventListener(const Value& val,
+                                                            bool html = false);
   JSLazyEventListener* getJSLazyEventListener(const QString& code,
                                               DOM::NodeImpl* node,
                                               int lineno = 0);
@@ -140,6 +143,7 @@ class Window : public ObjectImp {
   void setCurrentEvent(DOM::Event* evt);
 
   QPtrDict<JSEventListener> jsEventListeners;
+  QPtrDict<JSUnprotectedEventListener> jsUnprotectedEventListeners;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {

@@ -36,18 +36,44 @@ namespace KJS {
 class Window;
 class Clipboard;
 
-class JSEventListener : public DOM::EventListener {
+class JSAbstractEventListener : public DOM::EventListener {
  public:
-  JSEventListener(Object _listener, const Object& _win, bool _html = false);
-  virtual ~JSEventListener();
+  JSAbstractEventListener(bool _html = false);
+  virtual ~JSAbstractEventListener();
   virtual void handleEvent(DOM::Event& evt, bool isWindowEvent);
   virtual DOM::DOMString eventListenerType();
-  virtual Object listenerObj() const;
+  virtual Object listenerObj() const = 0;
+  virtual Object windowObj() const = 0;
   ObjectImp* listenerObjImp() const { return listenerObj().imp(); }
 
  protected:
-  mutable ProtectedObject listener;
   bool html;
+};
+
+class JSUnprotectedEventListener : public JSAbstractEventListener {
+ public:
+  JSUnprotectedEventListener(Object _listener,
+                             const Object& _win,
+                             bool _html = false);
+  virtual ~JSUnprotectedEventListener();
+  virtual Object listenerObj() const;
+  virtual Object windowObj() const;
+  void mark();
+
+ protected:
+  Object listener;
+  Object win;
+};
+
+class JSEventListener : public JSAbstractEventListener {
+ public:
+  JSEventListener(Object _listener, const Object& _win, bool _html = false);
+  virtual ~JSEventListener();
+  virtual Object listenerObj() const;
+  virtual Object windowObj() const;
+
+ protected:
+  mutable ProtectedObject listener;
   ProtectedObject win;
 };
 

@@ -1311,6 +1311,25 @@ JSEventListener* Window::getJSEventListener(const Value& val, bool html) {
   return new JSEventListener(Object(listenerObject), Object(this), html);
 }
 
+JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(
+    const Value& val,
+    bool html) {
+  // This function is so hot that it's worth coding it directly with imps.
+  if (val.type() != ObjectType)
+    return 0;
+  ObjectImp* listenerObject = static_cast<ObjectImp*>(val.imp());
+
+  JSUnprotectedEventListener* existingListener =
+      jsUnprotectedEventListeners[listenerObject];
+  if (existingListener)
+    return existingListener;
+
+  // Note that the JSUnprotectedEventListener constructor adds it to
+  // our jsUnprotectedEventListeners list
+  return new JSUnprotectedEventListener(Object(listenerObject), Object(this),
+                                        html);
+}
+
 JSLazyEventListener* Window::getJSLazyEventListener(const QString& code,
                                                     DOM::NodeImpl* node,
                                                     int lineNumber) {

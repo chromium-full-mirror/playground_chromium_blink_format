@@ -40,33 +40,18 @@ using DOM::NodeImpl;
 
 // -------------------------------------------------------------------------
 
-JSEventListener::JSEventListener(Object _listener,
-                                 const Object& _win,
-                                 bool _html) {
-  listener = _listener;
-  // fprintf(stderr,"JSEventListener::JSEventListener this=%p
-  // listener=%p\n",this,listener.imp());
-  html = _html;
-  win = _win;
-  if (_listener.imp()) {
-    static_cast<Window*>(win.imp())->jsEventListeners.insert(_listener.imp(),
-                                                             this);
-  }
-}
+JSAbstractEventListener::JSAbstractEventListener(bool _html) : html(_html) {}
 
-JSEventListener::~JSEventListener() {
-  if (listener.imp()) {
-    static_cast<Window*>(win.imp())->jsEventListeners.remove(listener.imp());
-  }
-  // fprintf(stderr,"JSEventListener::~JSEventListener this=%p
-  // listener=%p\n",this,listener.imp());
-}
+JSAbstractEventListener::~JSAbstractEventListener() {}
 
-void JSEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
+void JSAbstractEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
 #ifdef KJS_DEBUGGER
   if (KJSDebugWin::instance() && KJSDebugWin::instance()->inSession())
     return;
 #endif
+  Object listener = listenerObj();
+  Object win = windowObj();
+
   KHTMLPart* part = static_cast<Window*>(win.imp())->part();
   KJSProxy* proxy = 0;
   if (part)
@@ -139,16 +124,77 @@ void JSEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
   }
 }
 
-DOM::DOMString JSEventListener::eventListenerType() {
+DOM::DOMString JSAbstractEventListener::eventListenerType() {
   if (html)
     return "_khtml_HTMLEventListener";
   else
     return "_khtml_JSEventListener";
 }
 
+// -------------------------------------------------------------------------
+
+JSUnprotectedEventListener::JSUnprotectedEventListener(Object _listener,
+                                                       const Object& _win,
+                                                       bool _html)
+    : JSAbstractEventListener(_html), listener(_listener), win(_win) {
+  if (_listener.imp()) {
+    static_cast<Window*>(win.imp())->jsUnprotectedEventListeners.insert(
+        _listener.imp(), this);
+  }
+}
+
+JSUnprotectedEventListener::~JSUnprotectedEventListener() {
+  if (listener.imp()) {
+    static_cast<Window*>(win.imp())->jsUnprotectedEventListeners.remove(
+        listener.imp());
+  }
+}
+
+Object JSUnprotectedEventListener::listenerObj() const {
+  return listener;
+}
+
+Object JSUnprotectedEventListener::windowObj() const {
+  return win;
+}
+
+void JSUnprotectedEventListener::mark() {
+  ObjectImp* listenerImp = listener.imp();
+  if (listenerImp && !listenerImp->marked())
+    listenerImp->mark();
+}
+
+// -------------------------------------------------------------------------
+
+JSEventListener::JSEventListener(Object _listener,
+                                 const Object& _win,
+                                 bool _html)
+    : JSAbstractEventListener(_html), listener(_listener), win(_win) {
+  // fprintf(stderr,"JSEventListener::JSEventListener this=%p
+  // listener=%p\n",this,listener.imp());
+  if (_listener.imp()) {
+    static_cast<Window*>(win.imp())->jsEventListeners.insert(_listener.imp(),
+                                                             this);
+  }
+}
+
+JSEventListener::~JSEventListener() {
+  if (listener.imp()) {
+    static_cast<Window*>(win.imp())->jsEventListeners.remove(listener.imp());
+  }
+  // fprintf(stderr,"JSEventListener::~JSEventListener this=%p
+  // listener=%p\n",this,listener.imp());
+}
+
 Object JSEventListener::listenerObj() const {
   return listener;
 }
+
+Object JSEventListener::windowObj() const {
+  return win;
+}
+
+// -------------------------------------------------------------------------
 
 JSLazyEventListener::JSLazyEventListener(QString _code,
                                          const Object& _win,
