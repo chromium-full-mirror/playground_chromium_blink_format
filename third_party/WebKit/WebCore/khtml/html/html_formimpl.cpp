@@ -975,7 +975,9 @@ void HTMLInputElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     case ATTR_WIDTH:
       // ignore this attribute,  do _not_ add
-      // a CSS_PROP_WIDTH here!
+      // a CSS_PROP_WIDTH here (we will honor this attribute for input
+      // type=image
+      // in the attach call)!
       // webdesigner are stupid - and IE/NS behave the same ( Dirk )
       break;
     case ATTR_HEIGHT:
@@ -1068,9 +1070,21 @@ void HTMLInputElementImpl::attach() {
       case SUBMIT:
         m_render = new (arena) RenderSubmitButton(this);
         break;
-      case IMAGE:
+      case IMAGE: {
+        DOMString width = getAttribute(ATTR_WIDTH);
+        if (!width.isEmpty()) {
+          printf("Added prop.\n");
+          addCSSLength(CSS_PROP_WIDTH, width);
+        }
         m_render = new (arena) RenderImageButton(this);
-        break;
+        m_render->setStyle(
+            getDocument()->styleSelector()->styleForElement(this));
+        parentNode()->renderer()->addChild(m_render, nextRenderer());
+        m_render->updateFromElement();
+        NodeBaseImpl::attach();
+        _style->deref();
+        return;
+      }
       case RESET:
         m_render = new (arena) RenderResetButton(this);
         break;
