@@ -931,7 +931,7 @@ class RenderStyle {
              (_box_direction == other._box_direction) &&
              (_visuallyOrdered == other._visuallyOrdered) &&
              (_htmlHacks == other._htmlHacks) &&
-             (_should_correct_text_color == other._should_correct_text_color);
+             (_force_backgrounds_to_white == other._force_backgrounds_to_white);
     }
 
     bool operator!=(const InheritedFlags& other) const {
@@ -955,7 +955,7 @@ class RenderStyle {
     // non CSS2 inherited
     bool _visuallyOrdered : 1;
     bool _htmlHacks : 1;
-    bool _should_correct_text_color : 1;
+    bool _force_backgrounds_to_white : 1;
   } inherited_flags;
 
   // don't inherit
@@ -1049,7 +1049,7 @@ class RenderStyle {
     inherited_flags._visuallyOrdered = false;
     inherited_flags._htmlHacks = false;
     inherited_flags._box_direction = initialBoxDirection();
-    inherited_flags._should_correct_text_color = false;
+    inherited_flags._force_backgrounds_to_white = false;
 
     noninherited_flags._effectiveDisplay = noninherited_flags._originalDisplay =
         initialDisplay();
@@ -1600,11 +1600,11 @@ class RenderStyle {
   void setCursor(ECursor c) { inherited_flags._cursor_style = c; }
   void setCursorImage(CachedImage* v) { SET_VAR(inherited, cursor_image, v) }
 
-  bool shouldCorrectTextColor() const {
-    return inherited_flags._should_correct_text_color;
+  bool forceBackgroundsToWhite() const {
+    return inherited_flags._force_backgrounds_to_white;
   }
-  void setShouldCorrectTextColor(bool b = true) {
-    inherited_flags._should_correct_text_color = b;
+  void setForceBackgroundsToWhite(bool b = true) {
+    inherited_flags._force_backgrounds_to_white = b;
   }
 
   bool htmlHacks() const { return inherited_flags._htmlHacks; }
