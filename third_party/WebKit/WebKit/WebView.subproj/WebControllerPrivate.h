@@ -12,6 +12,7 @@
 @interface WebControllerPrivate : NSObject {
  @public
   WebFrame* mainFrame;
+
   id<WebWindowContext> windowContext;
   id<WebResourceProgressHandler> resourceProgressHandler;
   id<WebResourceProgressHandler> downloadProgressHandler;
@@ -19,11 +20,15 @@
   id<WebContextMenuHandler> defaultContextMenuHandler;
   id<WebControllerPolicyHandler> policyHandler;
   id<WebLocationChangeHandler> locationChangeHandler;
+
   WebBackForwardList* backForwardList;
-  float textSizeMultiplier;
   BOOL useBackForwardList;
+
+  float textSizeMultiplier;
+
   NSString* applicationNameForUserAgent;
   NSString* userAgentOverride;
+  NSLock* userAgentLock;
 }
 @end
 
