@@ -189,7 +189,7 @@ void RenderFlow::paintLineBoxBackgroundBorder(QPainter* p,
     int yPos = _ty + firstLineBox()->yPos();
     int h = lastLineBox()->yPos() + lastLineBox()->height() -
             firstLineBox()->yPos();
-    if ((yPos > _y + _h) || (yPos + h < _y))
+    if ((yPos >= _y + _h) || (yPos + h <= _y))
       return;
 
     // See if our boxes intersect with the dirty rect.  If so, then we paint
@@ -201,7 +201,7 @@ void RenderFlow::paintLineBoxBackgroundBorder(QPainter* p,
          curr = curr->nextLineBox()) {
       yPos = _ty + curr->yPos();
       h = curr->height();
-      if ((yPos <= _y + _h) && (yPos + h >= _y))
+      if ((yPos < _y + _h) && (yPos + h > _y))
         curr->paintBackgroundAndBorder(p, _x, _y, _w, _h, _tx, _ty,
                                        xOffsetWithinLineBoxes);
       xOffsetWithinLineBoxes += curr->width();
@@ -233,7 +233,7 @@ void RenderFlow::paintLineBoxDecorations(QPainter* p,
     ;
     int h = lastLineBox()->yPos() + lastLineBox()->height() -
             firstLineBox()->yPos();
-    if ((yPos > _y + _h) || (yPos + h < _y))
+    if ((yPos >= _y + _h) || (yPos + h <= _y))
       return;
 
     // See if our boxes intersect with the dirty rect.  If so, then we paint
@@ -244,7 +244,7 @@ void RenderFlow::paintLineBoxDecorations(QPainter* p,
          curr = curr->nextLineBox()) {
       yPos = _ty + curr->yPos();
       h = curr->height();
-      if ((yPos <= _y + _h) && (yPos + h >= _y))
+      if ((yPos < _y + _h) && (yPos + h > _y))
         curr->paintDecorations(p, _x, _y, _w, _h, _tx, _ty);
     }
   }

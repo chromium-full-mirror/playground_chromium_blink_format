@@ -72,8 +72,7 @@ void RenderReplaced::paint(QPainter* p,
   // Early exit if the element touches the edges.
   if ((_tx >= _x + _w) || (_tx + m_width <= _x))
     return;
-
-  if ((_tx >= _x + _w) || (_tx + m_width <= _x))
+  if ((_ty >= _y + _h) || (_ty + m_height <= _y))
     return;
 
   if (shouldPaintBackgroundOrBorder() && paintAction != PaintActionOutline)

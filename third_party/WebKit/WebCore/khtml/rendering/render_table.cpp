@@ -430,9 +430,9 @@ void RenderTable::paint(QPainter* p,
                 << ")" << endl;
 #endif
   if (!overhangingContents() && !isRelPositioned() && !isPositioned()) {
-    if ((_ty > _y + _h) || (_ty + height() < _y))
+    if ((_ty >= _y + _h) || (_ty + height() <= _y))
       return;
-    if ((_tx > _x + _w) || (_tx + width() < _x))
+    if ((_tx >= _x + _w) || (_tx + width() <= _x))
       return;
   }
 
