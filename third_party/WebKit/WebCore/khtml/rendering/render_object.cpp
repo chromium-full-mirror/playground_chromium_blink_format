@@ -346,6 +346,8 @@ RenderObject* RenderObject::offsetParent() const {
   return curr;
 }
 
+void RenderObject::markAllDescendantsWithFloatsForLayout() {}
+
 void RenderObject::setLayouted(bool b) {
   m_layouted = b;
   if (b) {
@@ -910,14 +912,16 @@ void RenderObject::setStyle(RenderStyle* style) {
     // having an outline to not having an outline.
     repaint();
 
-  if (isFloating() || isPositioned()) {
-    // For changes in float or position, we need to conceivably remove ourselves
-    // from the special objects list.
-    bool floatOrPos = style->isFloating() || style->position() == ABSOLUTE ||
-                      style->position() == FIXED;
-    if (!floatOrPos)
-      removeFromSpecialObjects();
-  }
+  if (isFloating() && !style->isFloating())
+    // For changes in float styles, we need to conceivably remove ourselves
+    // from the floating objects list.
+    removeFromObjectLists();
+  else if (isPositioned() &&
+           (style->position() != ABSOLUTE && style->position() != FIXED))
+    // For changes in positioning styles, we need to conceivably remove
+    // ourselves
+    // from the positioned objects list.
+    removeFromObjectLists();
 
   // qDebug("new style, diff=%d", d);
   // reset style flags
@@ -1099,12 +1103,20 @@ void RenderObject::invalidateLayout()
 }
 #endif
 
-void RenderObject::removeFromSpecialObjects() {
-  if (isPositioned() || isFloating()) {
+void RenderObject::removeFromObjectLists() {
+  if (isFloating()) {
     RenderObject* p;
     for (p = parent(); p; p = p->parent()) {
       if (p->isRenderBlock())
-        static_cast<RenderBlock*>(p)->removeSpecialObject(this);
+        static_cast<RenderBlock*>(p)->removeFloatingObject(this);
+    }
+  }
+
+  if (isPositioned()) {
+    RenderObject* p;
+    for (p = parent(); p; p = p->parent()) {
+      if (p->isRenderBlock())
+        static_cast<RenderBlock*>(p)->removePositionedObject(this);
     }
   }
 }
@@ -1302,7 +1314,7 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
           info.setURLElement(p->element());
           break;
         }
-        if (!isSpecial())
+        if (!isFloatingOrPositioned())
           break;
         p = p->parent();
       }

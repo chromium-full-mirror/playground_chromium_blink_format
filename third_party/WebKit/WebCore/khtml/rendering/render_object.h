@@ -254,6 +254,7 @@ class RenderObject : public CachedObjectClient {
 
   void setOverhangingContents(bool p = true);
 
+  virtual void markAllDescendantsWithFloatsForLayout();
   void setLayouted(bool b = true);
 
   void setMinMaxKnown(bool b = true) {
@@ -622,9 +623,10 @@ class RenderObject : public CachedObjectClient {
 
   virtual bool isHidden() const { return isFloating() || isPositioned(); }
 
-  // Special objects are objects that are neither really inline nor blocklevel
-  bool isSpecial() const { return (isFloating() || isPositioned()); };
-  virtual bool containsSpecial() { return false; }
+  bool isFloatingOrPositioned() const {
+    return (isFloating() || isPositioned());
+  };
+  virtual bool containsFloats() { return false; }
   virtual bool hasOverhangingFloats() { return false; }
 
   // positioning of inline childs (bidi)
@@ -654,7 +656,7 @@ class RenderObject : public CachedObjectClient {
   // unused: void invalidateLayout();
 
   virtual void calcVerticalMargins() {}
-  void removeFromSpecialObjects();
+  void removeFromObjectLists();
 
   virtual void detach(RenderArena* renderArena);
 
@@ -677,7 +679,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual QRect viewRect() const;
   void remove() {
-    removeFromSpecialObjects();
+    removeFromObjectLists();
 
     if (parent())
       // have parent, take care of the tree integrity
