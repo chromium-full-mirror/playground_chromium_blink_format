@@ -53,13 +53,9 @@ class InterpreterImp;
  */
 class Context {
  public:
-  Context(ContextImp*);
-  Context(const Context& c);
-  Context& operator=(const Context& c);
-  virtual ~Context();
+  Context(ContextImp* i) : rep(i) {}
 
-  bool isNull() const;
-  ContextImp* imp() const;
+  ContextImp* imp() const { return rep; }
 
   /**
    * Returns the scope chain for this execution context. This is used for
@@ -68,7 +64,7 @@ class Context {
    *
    * @return The execution context's scope chain
    */
-  const ScopeChain scopeChain() const;
+  const ScopeChain& scopeChain() const;
 
   /**
    * Returns the variable object for the execution context. This contains a
@@ -382,7 +378,7 @@ class ExecState {
    *
    * @return The current execution state context
    */
-  const Context context() const { return _context; }
+  Context context() const { return _context; }
 
   void setException(const Value& e) { _exception = e; }
   void clearException() { _exception = Value(); }

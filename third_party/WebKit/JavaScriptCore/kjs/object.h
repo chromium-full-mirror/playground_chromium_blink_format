@@ -323,7 +323,7 @@ class Object : public Value {
    * @param exec The current execution state
    * @return The function's scope
    */
-  const ScopeChain scope() const;
+  const ScopeChain& scope() const;
   void setScope(const ScopeChain& s);
 
   /**
@@ -577,8 +577,8 @@ class ObjectImp : public ValueImp {
    *
    * @see Object::scope()
    */
-  const ScopeChain scope() const;
-  void setScope(const ScopeChain& s);
+  const ScopeChain& scope() const { return _scope; }
+  void setScope(const ScopeChain& s) { _scope = s; }
 
   ReferenceList propList(ExecState* exec, bool recursive = true);
 
@@ -614,7 +614,7 @@ class ObjectImp : public ValueImp {
   const HashEntry* findPropertyHashEntry(const Identifier& propertyName) const;
   ValueImp* _proto;
   ValueImp* _internalValue;
-  NoRefScopeChain _scope;
+  ScopeChain _scope;
 };
 
 /**
@@ -753,7 +753,7 @@ inline Boolean Object::hasInstance(ExecState* exec, const Value& value) {
   return imp()->hasInstance(exec, value);
 }
 
-inline const ScopeChain Object::scope() const {
+inline const ScopeChain& Object::scope() const {
   return imp()->scope();
 }
 

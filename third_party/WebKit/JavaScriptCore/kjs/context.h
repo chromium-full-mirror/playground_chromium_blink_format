@@ -42,7 +42,7 @@ class ContextImp {
              const List* args = 0);
   ~ContextImp();
 
-  const ScopeChain scopeChain() const { return scope; }
+  const ScopeChain& scopeChain() const { return scope; }
   Object variableObject() const { return variable; }
   void setVariableObject(const Object& v) { variable = v; }
   Object thisValue() const { return thisVal; }

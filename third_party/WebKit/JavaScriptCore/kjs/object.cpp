@@ -342,14 +342,6 @@ Boolean ObjectImp::hasInstance(ExecState* /*exec*/, const Value& /*value*/) {
   return Boolean(false);
 }
 
-const ScopeChain ObjectImp::scope() const {
-  return _scope;
-}
-
-void ObjectImp::setScope(const ScopeChain& s) {
-  _scope = s;
-}
-
 ReferenceList ObjectImp::propList(ExecState* exec, bool recursive) {
   ReferenceList list;
   if (_proto && _proto->dispatchType() == ObjectType && recursive)
