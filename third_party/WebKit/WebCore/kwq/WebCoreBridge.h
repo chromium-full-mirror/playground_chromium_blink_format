@@ -71,6 +71,8 @@ extern NSString* WebCoreElementLinkTargetFrameKey;
 extern NSString* WebCoreElementLinkLabelKey;
 extern NSString* WebCoreElementLinkTitleKey;
 
+typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
+
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
 // to be implemented by library clients, for example WebKit. The objects are
@@ -144,7 +146,7 @@ enum FrameBorderStyle {
 
 - (BOOL)isFrameSet;
 
-- (void)reapplyStyles;
+- (void)reapplyStylesForDeviceType:(WebCoreDeviceType)deviceType;
 - (void)forceLayout;
 - (BOOL)needsLayout;
 - (void)adjustFrames:(NSRect)rect;

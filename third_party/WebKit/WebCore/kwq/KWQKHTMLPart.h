@@ -212,9 +212,11 @@ class KWQKHTMLPart : public KHTMLPart {
   NSString* matchLabelsAgainstElement(NSArray* labels,
                                       DOM::ElementImpl* element);
 
-  void setSettings(KHTMLSettings* s);
+  void setSettings(KHTMLSettings*);
 
   KWQWindowWidget* topLevelWidget();
+
+  void setMediaType(const QString&);
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
