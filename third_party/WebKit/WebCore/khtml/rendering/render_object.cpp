@@ -1087,8 +1087,8 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   int ty = _ty + yPos();
 
   inside |= (style()->visibility() != HIDDEN &&
-             ((_y >= ty) && (_y < ty + height()) && (_x >= tx) &&
-              (_x < tx + width()))) ||
+             ((_y >= ty) && (_y < ty + overflowHeight()) && (_x >= tx) &&
+              (_x < tx + overflowWidth()))) ||
             isBody() || isHtml();
 
   // ### table should have its own, more performant method

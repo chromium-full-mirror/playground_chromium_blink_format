@@ -57,6 +57,7 @@ RenderFlow::RenderFlow(DOM::NodeImpl* node) : RenderBox(node) {
       m_maxBottomNegMargin = 0;
   m_topMarginQuirk = m_bottomMarginQuirk = false;
   m_overflowHeight = 0;
+  m_overflowWidth = 0;
 
   m_continuation = 0;
 }
@@ -242,6 +243,7 @@ void RenderFlow::layout() {
   int oldWidth = m_width;
 
   calcWidth();
+  m_overflowWidth = m_width;
 
   bool relayoutChildren = false;
   if (oldWidth != m_width)
@@ -360,8 +362,10 @@ void RenderFlow::layout() {
   }
 
   // overflow:hidden will just clip, so we don't have overflow.
-  if (style()->overflow() == OHIDDEN)
+  if (style()->overflow() == OHIDDEN) {
     m_overflowHeight = m_height;
+    m_overflowWidth = m_width;
+  }
 
   if (isTableCell()) {
     // Table cells need to grow to accommodate both overhanging floats and
@@ -402,6 +406,10 @@ void RenderFlow::layout() {
       m_maxTopNegMargin = m_maxBottomNegMargin;
     m_maxBottomNegMargin = m_maxBottomPosMargin = 0;
   }
+
+  // Always ensure our overflow width is at least as large as our width.
+  if (m_overflowWidth < m_width)
+    m_overflowWidth = m_width;
 
   setLayouted();
 }
@@ -774,6 +782,12 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
       addOverHangingFloats(static_cast<RenderFlow*>(child), -child->xPos(),
                            -child->yPos(), true);
     }
+
+    // See if this child has made our overflow need to grow.
+    // XXXdwh Work with left overflow as well as right overflow.
+    int rightChildPos = child->overflowWidth() + child->xPos();
+    if (rightChildPos > m_overflowWidth)
+      m_overflowWidth = rightChildPos;
 
     child = child->nextSibling();
   }
