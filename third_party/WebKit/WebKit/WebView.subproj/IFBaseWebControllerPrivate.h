@@ -2,9 +2,12 @@
     IFWebController.mm
         Copyright 2001, Apple, Inc. All rights reserved.
 */
+
 #import <WebKit/IFBaseWebController.h>
-#import <WebKit/IFWebDataSource.h>
-#import <WebKit/IFWebFrame.h>
+
+@class IFError;
+@class IFLoadProgress;
+@class IFWebFrame;
 
 @interface IFBaseWebControllerPrivate : NSObject {
   IFWebFrame* mainFrame;

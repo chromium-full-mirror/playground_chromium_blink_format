@@ -13,21 +13,21 @@ typedef enum {
   IF_LOAD_TYPE_SCRIPT = 3,
   IF_LOAD_TYPE_HTML = 4,
   IF_LOAD_TYPE_PLUGIN = 5
-} IF_LOAD_TYPE;
+} IFLoadType;
 
 @interface IFLoadProgress : NSObject {
   int bytesSoFar;   // 0 if this is the start of load
   int totalToLoad;  // -1 if this is not known.
                     // bytesSoFar == totalLoaded when complete
-  IF_LOAD_TYPE type;
+  IFLoadType type;
 }
 
 - (id)initWithBytesSoFar:(int)bytes
              totalToLoad:(int)total
-                    type:(IF_LOAD_TYPE)loadType;
+                    type:(IFLoadType)loadType;
 
 - (int)bytesSoFar;
 - (int)totalToLoad;
-- (IF_LOAD_TYPE)type;
+- (IFLoadType)type;
 
 @end

@@ -4,10 +4,8 @@
 
         Public header file.
 */
-#import <Cocoa/Cocoa.h>
 
-#import <WebKit/IFWebController.h>
-#import <WebKit/IFWebFrame.h>
+#import <Cocoa/Cocoa.h>
 
 /*
     =============================================================================
@@ -17,13 +15,18 @@
     =============================================================================
    */
 
+@class IFWebFrame;
+@protocol IFWebController;
+
 #ifdef TENTATIVE_API
 @class IFLoader;
 #endif
 
+@class IFWebDataSourcePrivate;
+
 @interface IFWebDataSource : NSObject {
  @private
-  id _dataSourcePrivate;
+  IFWebDataSourcePrivate* _dataSourcePrivate;
 }
 
 // Returns nil if object cannot be initialized due to a malformed URL (RFC
@@ -43,9 +46,6 @@
 // Returns nil if this data source represents the main document.  Otherwise
 // returns the parent data source.
 - (IFWebDataSource*)parent;
-
-// Set the frame that represents this data source.
-//- (void)setFrame: (IFWebFrame *)f;
 
 // Return the frame that represents this data source.
 - (IFWebFrame*)frame;

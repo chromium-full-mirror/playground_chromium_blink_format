@@ -4,11 +4,8 @@
 
         Public header file.
 */
-#import <Cocoa/Cocoa.h>
 
-#import <WebKit/IFLoadProgress.h>
-#import <WebKit/IFLocationChangeHandler.h>
-#import <WebKit/IFDownloadHandler.h>
+#import <Cocoa/Cocoa.h>
 
 /*
    =============================================================================
@@ -32,9 +29,13 @@
    =============================================================================
 */
 
-@class IFWebDataSource;
+@class IFDownloadHandler;
 @class IFError;
+@class IFLoadProgress;
+@class IFWebDataSource;
 @class IFWebFrame;
+
+@protocol IFLocationChangeHandler;
 
 /*
    =============================================================================
@@ -47,6 +48,7 @@
 
    =============================================================================
 */
+
 @protocol IFResourceProgressHandler
 
 /*
@@ -67,6 +69,7 @@
 @end
 
 @protocol IFDownloadProgressHandler
+
 // Called when progress of a download has been made
 - (void)receivedProgress:(IFLoadProgress*)progress
       forDownloadHandler:(IFDownloadHandler*)downloadHandler;
@@ -110,6 +113,7 @@
 
    =============================================================================
 */
+
 @protocol IFWebController<IFResourceProgressHandler,
                           IFDownloadProgressHandler,
                           IFScriptContextHandler>

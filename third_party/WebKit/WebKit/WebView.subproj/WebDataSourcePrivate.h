@@ -7,17 +7,14 @@
    _dataSourcePrivate in
         NSWebPageDataSource.
 */
-#import <Cocoa/Cocoa.h>
 
-#import <WebFoundation/WebFoundation.h>
-
-#import <WebKit/IFLocationChangeHandler.h>
 #import <WebKit/IFWebDataSource.h>
 
-// includes from kde
-#include <khtmlview.h>
+class KHTMLPart;
 
+@class IFURLHandle;
 @class IFMainURLHandleClient;
+@protocol IFLocationChangeHandler;
 
 @interface IFWebDataSourcePrivate : NSObject {
   IFWebDataSource* parent;

@@ -5,15 +5,18 @@
 
         Public header file.
 */
-#import <Cocoa/Cocoa.h>
 
-#import <WebKit/IFWebController.h>
+#import <Foundation/Foundation.h>
 
+@class IFError;
 @class IFWebDataSource;
+@protocol IFWebController;
+
+@class IFWebFramePrivate;
 
 @interface IFWebFrame : NSObject {
  @private
-  id _framePrivate;
+  IFWebFramePrivate* _framePrivate;
 }
 
 - initWithName:(NSString*)name

@@ -3,22 +3,19 @@
         Copyright 2002, Apple, Inc. All rights reserved.
 */
 
-#import <AppKit/AppKit.h>
-#import <WCPlugin.h>
-#import <qwidget.h>
+#import <Cocoa/Cocoa.h>
 #import <npapi.h>
-#import <WebFoundation/WebFoundation.h>
-#import <IFWebView.h>
-#import <IFBaseWebController.h>
-#import <IFPluginNullEventSender.h>
+
+@class IFPluginNullEventSender;
+@class IFWebDataSource;
+@class WCPlugin;
+@protocol IFWebController;
 
 @interface IFPluginView : NSView {
   WCPlugin* plugin;
   IFPluginNullEventSender* eventSender;
 
-  IFBaseWebController* webController;
-  IFWebView* webView;
-  IFWebFrame* webFrame;
+  id<IFWebController> webController;
   IFWebDataSource* webDataSource;
 
   NPP instance;
@@ -76,7 +73,6 @@
 - (void)keyUp:(NSEvent*)theEvent;
 - (void)stop;
 - (void)start;
-- (void)dealloc;
 
 // plug-in to browser calls
 - (NPError)getURLNotify:(const char*)url

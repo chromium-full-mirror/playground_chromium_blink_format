@@ -4,7 +4,6 @@
 
         Public header file.
 */
-#import <Cocoa/Cocoa.h>
 
 #import <WebKit/IFPreferences.h>
 

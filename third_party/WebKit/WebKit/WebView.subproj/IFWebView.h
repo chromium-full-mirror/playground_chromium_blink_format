@@ -4,10 +4,8 @@
 
         Public header file.
 */
-#import <Cocoa/Cocoa.h>
 
-#import <WebKit/IFWebDataSource.h>
-#import <WebKit/IFWebController.h>
+#import <Cocoa/Cocoa.h>
 
 /*
    =============================================================================
@@ -47,8 +45,8 @@
             and terminate when either a loadingCancelled or loadingStopped is
    received.
 
-        2.  After the controller receives it's first receivedDataForLocation:
-   the contents of
+        2.  After the controller receives its first receivedDataForLocation: the
+   contents of
             the view will be cleared and layout may begin.
 
         3.  Upon subsequent receipt of receivedDataForLocation: messages the
@@ -93,9 +91,15 @@
         the selected text.
 
 */
+
+@class IFWebDataSource;
+@protocol IFWebController;
+
+@class IFWebViewPrivate;
+
 @interface IFWebView : NSView {
  @private
-  id _viewPrivate;
+  IFWebViewPrivate* _viewPrivate;
 }
 
 - initWithFrame:(NSRect)frame;
@@ -106,14 +110,12 @@
 - (id<IFWebViewDelegate>)delegate;
 #endif
 
-// Set and get the controller.  Note that the controller is not retained.
-// Perhaps setController: should be private?
+// Note that the controller is not retained.
 - (id<IFWebController>)controller;
 
-// This method is typically called by the view's controller when
+// These methods is typically called by the view's controller when
 // the data source is changed.
 - (void)dataSourceChanged:(IFWebDataSource*)dataSource;
-
 - (void)provisionalDataSourceChanged:(IFWebDataSource*)dataSource;
 
 - (void)setNeedsLayout:(bool)flag;

@@ -3,7 +3,6 @@
         Copyright 2002, Apple, Inc. All rights reserved.
 */
 
-#import <Foundation/Foundation.h>
 #import <WebKit/IFMIMEHandler.h>
 
 @interface IFContentHandler : NSObject {
