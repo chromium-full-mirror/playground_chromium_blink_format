@@ -2682,11 +2682,11 @@ void DeleteSelectionCommand::handleGeneralDelete() {
   // not delete the
   // start block, otherwise delete the start block.
   // A similar case is provided to cover selections starting in BR elements.
-  if (startOffset == 1 && m_startNode->id() == ID_BR) {
+  if (startOffset == 1 && m_startNode && m_startNode->id() == ID_BR) {
     setStartNode(m_startNode->traverseNextNode());
     startOffset = 0;
   }
-  if (m_startBlock != m_endBlock && startOffset == 0 &&
+  if (m_startBlock != m_endBlock && startOffset == 0 && m_startNode &&
       m_startNode->id() == ID_BR && endAtEndOfBlock) {
     // Don't delete the BR element
     setStartNode(m_startNode->traverseNextNode());
@@ -2718,6 +2718,9 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     setStartNode(m_startNode->traverseNextNode());
     startOffset = 0;
   }
+
+  if (!m_startNode)
+    return;
 
   if (m_startNode == m_downstreamEnd.node()) {
     // The selection to delete is all in one node.
