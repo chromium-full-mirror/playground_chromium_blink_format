@@ -49,4 +49,6 @@
 // Handle an event just like an NSWindow would.
 - (void)sendSuperEvent:(NSEvent*)inEvent;
 
+- (void)relinquishFocus;
+
 @end
