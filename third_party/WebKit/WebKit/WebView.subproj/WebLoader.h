@@ -34,10 +34,11 @@
   BOOL cancelledFlag;
   BOOL reachedTerminalState;
   BOOL defersCallbacks;
+  BOOL waitingToDeliverResource;
   WebResourceDelegateImplementationCache implementations;
   NSURL* originalURL;
-  WebResource* resource;
   NSMutableData* resourceData;
+  WebResource* resource;
 }
 
 - (BOOL)loadWithRequest:(NSURLRequest*)request;
@@ -62,6 +63,19 @@
 - (NSURLResponse*)response;
 
 - (NSData*)resourceData;
+
+// Connection-less callbacks allow us to send callbacks using data attained from
+// a WebResource instead of an NSURLConnection.
+- (NSURLRequest*)willSendRequest:(NSURLRequest*)newRequest
+                redirectResponse:(NSURLResponse*)redirectResponse;
+- (void)didReceiveAuthenticationChallenge:
+    (NSURLAuthenticationChallenge*)challenge;
+- (void)didCancelAuthenticationChallenge:
+    (NSURLAuthenticationChallenge*)challenge;
+- (void)didReceiveResponse:(NSURLResponse*)r;
+- (void)didReceiveData:(NSData*)data lengthReceived:(long long)lengthReceived;
+- (void)didFinishLoading;
+- (void)didFailWithError:(NSError*)error;
 
 @end
 
