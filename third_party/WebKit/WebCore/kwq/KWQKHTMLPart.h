@@ -43,13 +43,15 @@ class SavedProperties;
 #ifdef __OBJC__
 @class NSAttributedString;
 @class NSEvent;
+@class NSResponder;
 @class NSView;
 @class WebCoreBridge;
 #else
 class NSAttributedString;
+class NSEvent;
+class NSResponder;
 class NSView;
 class WebCoreBridge;
-class NSEvent;
 #endif
 
 enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
@@ -214,6 +216,7 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _sendingEventToSubview;
 
   static NSEvent* _currentEvent;
+  static NSResponder* _firstResponderAtMouseDownTime;
 
   static QPtrList<KWQKHTMLPart>& mutableInstances();
 
