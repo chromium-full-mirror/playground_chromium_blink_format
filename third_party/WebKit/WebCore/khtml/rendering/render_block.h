@@ -146,6 +146,8 @@ class RenderBlock : public RenderFlow {
   void computeHorizontalPositionsForLine(RootInlineBox* lineBox,
                                          BidiState& bidi);
   void computeVerticalPositionsForLine(RootInlineBox* lineBox);
+  void deleteEllipsisLineBoxes();
+  void checkLinesForTextOverflow();
   // end bidi.cpp functions
 
   virtual void paint(PaintInfo& i, int tx, int ty);

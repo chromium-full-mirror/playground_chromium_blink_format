@@ -245,8 +245,6 @@ class RenderText : public RenderObject {
     return style()->marginRight().minWidth(0);
   }
 
-  virtual int rightmostPosition() const;
-
   virtual QRect getAbsoluteRepaintRect();
 
   const QFontMetrics& metrics(bool firstLine) const;
@@ -260,6 +258,8 @@ class RenderText : public RenderObject {
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }
 
   virtual InlineBox* inlineBox(long offset);
+
+  void clearTextOverflowTruncation();
 
 #if APPLE_CHANGES
   int widthFromCache(const Font*, int start, int len) const;

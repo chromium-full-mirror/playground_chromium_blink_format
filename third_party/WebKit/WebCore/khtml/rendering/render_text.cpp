@@ -586,13 +586,6 @@ void RenderText::posOfChar(int chr, int& x, int& y) {
   }
 }
 
-int RenderText::rightmostPosition() const {
-  if (style()->whiteSpace() != NORMAL)
-    return maxWidth();
-
-  return 0;
-}
-
 static int simpleDifferenceBetweenColors(QColor c1, QColor c2) {
   // a distance could be computed by squaring the differences between
   // components, but
@@ -1527,6 +1520,8 @@ InlineBox* RenderText::inlineBox(long offset) {
 
   return 0;
 }
+
+void RenderText::clearTextOverflowTruncation() {}
 
 RenderTextFragment::RenderTextFragment(DOM::NodeImpl* _node,
                                        DOM::DOMStringImpl* _str,
