@@ -37,5 +37,5 @@
 - (void)stopAnimation;
 - (void)tileInRect:(NSRect)r fromPoint:(NSPoint)p;
 - (BOOL)isNull;
-
+- (id<WebCoreImageRenderer>)retainOrCopyIfNeeded;
 @end

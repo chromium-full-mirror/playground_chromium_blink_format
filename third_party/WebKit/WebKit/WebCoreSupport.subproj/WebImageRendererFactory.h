@@ -15,5 +15,7 @@
 
 + (void)createSharedFactory;
 + (WebImageRendererFactory*)sharedFactory;
+- (id<WebCoreImageRenderer>)imageRendererWithData:(NSData*)data
+                                         MIMEType:(NSString*)MIMEType;
 
 @end
