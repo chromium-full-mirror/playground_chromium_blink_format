@@ -32,6 +32,7 @@
 
 #include "value.h"
 #include "types.h"
+#include "reference_list.h"
 
 namespace KJS {
 
@@ -40,6 +41,7 @@ class PropertyMap;
 class HashTable;
 class HashEntry;
 class ListImp;
+class ReferenceList;
 
 // ECMA 262-3 8.6.1
 // Attributes (only applicable to the Object type)
@@ -334,7 +336,7 @@ class Object : public Value {
    * included in the list.
    * @return A List of References to properties of the object.
    **/
-  List propList(ExecState* exec, bool recursive = true);
+  ReferenceList propList(ExecState* exec, bool recursive = true);
 
   /**
    * Returns the internal value of the object. This is used for objects such
@@ -567,7 +569,7 @@ class ObjectImp : public ValueImp {
   const List scope() const;
   void setScope(const List& s);
 
-  List propList(ExecState* exec, bool recursive = true);
+  ReferenceList propList(ExecState* exec, bool recursive = true);
 
   Value internalValue() const;
   void setInternalValue(const Value& v);
@@ -732,7 +734,7 @@ inline void Object::setScope(const List& s) {
   imp()->setScope(s);
 }
 
-inline List Object::propList(ExecState* exec, bool recursive) {
+inline ReferenceList Object::propList(ExecState* exec, bool recursive) {
   return imp()->propList(exec, recursive);
 }
 

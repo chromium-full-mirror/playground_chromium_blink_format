@@ -76,6 +76,7 @@ class Node {
   Node();
   virtual ~Node();
   virtual Value evaluate(ExecState* exec) = 0;
+  virtual Reference evaluateReference(ExecState* exec);
   UString toString() const;
   virtual void streamTo(SourceStream& s) const = 0;
   virtual void processVarDecls(ExecState* /*exec*/) {}
@@ -195,6 +196,7 @@ class ResolveNode : public Node {
  public:
   ResolveNode(const UString* s) : ident(*s) {}
   Value evaluate(ExecState* exec);
+  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -301,6 +303,7 @@ class AccessorNode1 : public Node {
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
+  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
@@ -314,6 +317,7 @@ class AccessorNode2 : public Node {
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
+  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
