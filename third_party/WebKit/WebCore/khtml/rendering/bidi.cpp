@@ -749,8 +749,8 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
           textWidth = kMin(
               textWidth, availableWidth - totWidth + style->borderLeftWidth());
         }
-        r->box->setWidth(textWidth);
       }
+      r->box->setWidth(textWidth);
     } else if (!r->obj->isInlineFlow()) {
       r->obj->calcWidth();
       r->box->setWidth(r->obj->width());
