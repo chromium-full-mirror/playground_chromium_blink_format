@@ -98,6 +98,8 @@ class Window : public ObjectImp {
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool hasProperty(ExecState* exec,
+                           const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
