@@ -2125,7 +2125,6 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
   if (styleChange.cssStyle().length() > 0) {
     ElementImpl* styleElement = createStyleSpanElement(document());
     styleElement->setAttribute(ATTR_STYLE, styleChange.cssStyle());
-    styleElement->setAttribute(ATTR_CLASS, styleSpanClassString());
     insertNodeBefore(styleElement, startNode);
     surroundNodeRangeWithElement(startNode, endNode, styleElement);
   }
@@ -4079,9 +4078,11 @@ void RemoveNodePreservingChildrenCommand::doApply() {
 // ReplaceSelectionCommand
 
 ReplacementFragment::ReplacementFragment(DocumentImpl* document,
-                                         DocumentFragmentImpl* fragment)
+                                         DocumentFragmentImpl* fragment,
+                                         bool matchStyle)
     : m_document(document),
       m_fragment(fragment),
+      m_matchStyle(matchStyle),
       m_hasInterchangeNewline(false),
       m_hasMoreThanOneBlock(false) {
   if (!m_document)
@@ -4138,7 +4139,9 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
     removeNode(nodeToDelete);
 
   // Prepare this fragment to merge styles correctly into the destination.
-  computeStylesAndRemoveUnrendered();
+  if (!m_matchStyle) {
+    computeStylesAndRemoveUnrendered();
+  }
   removeStyleNodes();
 
   int blockCount = realBlockCount;
@@ -4375,14 +4378,16 @@ void ReplacementFragment::removeBlockquoteColorsIfNeeded(
 ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
                                                  DocumentFragmentImpl* fragment,
                                                  bool selectReplacement,
-                                                 bool smartReplace)
+                                                 bool smartReplace,
+                                                 bool matchStyle)
     : CompositeEditCommand(document),
-      m_fragment(document, fragment),
+      m_fragment(document, fragment, matchStyle),
       m_firstNodeInserted(0),
       m_lastNodeInserted(0),
       m_lastTopNodeInserted(0),
       m_selectReplacement(selectReplacement),
-      m_smartReplace(smartReplace) {}
+      m_smartReplace(smartReplace),
+      m_matchStyle(matchStyle) {}
 
 ReplaceSelectionCommand::~ReplaceSelectionCommand() {
   if (m_firstNodeInserted)
@@ -4457,12 +4462,16 @@ void ReplaceSelectionCommand::doApply() {
 
   // calculate the start and end of the resulting selection
   selection = endingSelection();
-  if (startAtStartOfBlock && startBlock->inDocument()) {
-    startPos = Position(startBlock, 0);
-  } else if (startAtEndOfBlock) {
-    startPos = selection.start().downstream(StayInBlock);
+  if (m_matchStyle) {
+    startPos = selection.start();
   } else {
-    startPos = selection.start().upstream(upstreamStayInBlock);
+    if (startAtStartOfBlock && startBlock->inDocument()) {
+      startPos = Position(startBlock, 0);
+    } else if (startAtEndOfBlock) {
+      startPos = selection.start().downstream(StayInBlock);
+    } else {
+      startPos = selection.start().upstream(upstreamStayInBlock);
+    }
   }
   endPos = selection.end().downstream();
 
@@ -4617,7 +4626,9 @@ void ReplaceSelectionCommand::doApply() {
       insertParagraphSeparator();
       endPos = endingSelection().end().downstream();
     }
-    applyStyleToInsertedNodes();
+    if (!m_matchStyle) {
+      applyStyleToInsertedNodes();
+    }
     completeHTMLReplacement(startPos, endPos);
   } else {
     if (m_lastNodeInserted && m_lastNodeInserted->id() == ID_BR &&
@@ -4671,7 +4682,9 @@ void ReplaceSelectionCommand::doApply() {
       }
     }
 
-    applyStyleToInsertedNodes();
+    if (!m_matchStyle) {
+      applyStyleToInsertedNodes();
+    }
 
     completeHTMLReplacement();
   }

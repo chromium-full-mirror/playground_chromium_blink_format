@@ -404,7 +404,8 @@ typedef enum {
 
 - (void)replaceSelectionWithFragment:(DOMDocumentFragment*)fragment
                    selectReplacement:(BOOL)selectReplacement
-                        smartReplace:(BOOL)smartReplace;
+                        smartReplace:(BOOL)smartReplace
+                          matchStyle:(BOOL)matchStyle;
 - (void)replaceSelectionWithNode:(DOMNode*)node
                selectReplacement:(BOOL)selectReplacement
                     smartReplace:(BOOL)smartReplace;
