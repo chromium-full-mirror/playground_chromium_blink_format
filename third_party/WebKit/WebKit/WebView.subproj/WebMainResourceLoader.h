@@ -32,6 +32,8 @@
   NSMutableData* resourceData;
   WebResourceRequest* request;
   WebResourceResponse* response;
+
+  id identifier;
 }
 
 - initWithDataSource:(WebDataSource*)dataSource;
