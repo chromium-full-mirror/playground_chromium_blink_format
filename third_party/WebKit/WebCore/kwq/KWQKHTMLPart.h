@@ -165,6 +165,11 @@ class KWQKHTMLPart : public KHTMLPart {
 
   static void widgetWillReleaseView(NSView*);
 
+  static void setCurrentEvent(NSEvent* event) { _currentEvent = event; }
+  static NSEvent* currentEvent() { return _currentEvent; }
+
+  void clearTimers();
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
@@ -192,6 +197,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _ownsView;
 
   NSView* _mouseDownView;
+
+  static NSEvent* _currentEvent;
 
   static QPtrList<KWQKHTMLPart>& mutableInstances();
 
