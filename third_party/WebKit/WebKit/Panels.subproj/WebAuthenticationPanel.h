@@ -19,7 +19,7 @@
   BOOL usingSheet;
   id callback;
   SEL selector;
-  WebAuthenticationRequest* request;
+  NSURLAuthenticationChallenge* challenge;
 }
 
 - (id)initWithCallback:(id)cb selector:(SEL)sel;
@@ -30,9 +30,9 @@
 
 - (BOOL)loadNib;
 
-- (void)runAsModalDialogWithRequest:(WebAuthenticationRequest*)req;
+- (void)runAsModalDialogWithChallenge:(NSURLAuthenticationChallenge*)chall;
 - (void)runAsSheetOnWindow:(NSWindow*)window
-               withRequest:(WebAuthenticationRequest*)req;
+             withChallenge:(NSURLAuthenticationChallenge*)chall;
 
 - (void)sheetDidEnd:(NSWindow*)sheet
          returnCode:(int)returnCode
