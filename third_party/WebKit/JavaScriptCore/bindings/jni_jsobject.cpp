@@ -429,7 +429,9 @@ jobject JSObject::call(jstring methodName, jobjectArray args) const {
 
   // Lookup the function object.
   ExecState* exec = _root->interpreter()->globalExec();
+  Interpreter::lock();
   Value func = _imp->get(exec, Identifier(JavaString(methodName).ustring()));
+  Interpreter::unlock();
   if (func.isNull() || func.type() == UndefinedType) {
     // Maybe throw an exception here?
     return 0;
@@ -439,7 +441,9 @@ jobject JSObject::call(jstring methodName, jobjectArray args) const {
   ObjectImp* funcImp = static_cast<ObjectImp*>(func.imp());
   Object thisObj = Object(const_cast<ObjectImp*>(_imp));
   List argList = listFromJArray(args);
+  Interpreter::lock();
   Value result = funcImp->call(exec, thisObj, argList);
+  Interpreter::unlock();
 
   // Convert and return the result of the function call.
   return convertValueToJObject(result);
@@ -449,9 +453,11 @@ jobject JSObject::eval(jstring script) const {
   JS_LOG("script = %s\n", JavaString(script).characters());
 
   Object thisObj = Object(const_cast<ObjectImp*>(_imp));
+  Interpreter::lock();
   KJS::Value result = _root->interpreter()
                           ->evaluate(JavaString(script).ustring(), thisObj)
                           .value();
+  Interpreter::unlock();
   return convertValueToJObject(result);
 }
 
@@ -460,9 +466,9 @@ jobject JSObject::getMember(jstring memberName) const {
 
   ExecState* exec = _root->interpreter()->globalExec();
 
-  _root->interpreter()->lock();
+  Interpreter::lock();
   Value result = _imp->get(exec, Identifier(JavaString(memberName).ustring()));
-  _root->interpreter()->unlock();
+  Interpreter::unlock();
 
   return convertValueToJObject(result);
 }
@@ -471,24 +477,28 @@ void JSObject::setMember(jstring memberName, jobject value) const {
   JS_LOG("memberName = %s, value = %p\n", JavaString(memberName).characters(),
          value);
   ExecState* exec = _root->interpreter()->globalExec();
+  Interpreter::lock();
   _imp->put(exec, Identifier(JavaString(memberName).ustring()),
             convertJObjectToValue(value));
+  Interpreter::unlock();
 }
 
 void JSObject::removeMember(jstring memberName) const {
   JS_LOG("memberName = %s\n", JavaString(memberName).characters());
 
   ExecState* exec = _root->interpreter()->globalExec();
+  Interpreter::lock();
   _imp->deleteProperty(exec, Identifier(JavaString(memberName).ustring()));
+  Interpreter::unlock();
 }
 
 jobject JSObject::getSlot(jint index) const {
   JS_LOG("index = %d\n", index);
 
   ExecState* exec = _root->interpreter()->globalExec();
-  _root->interpreter()->lock();
+  Interpreter::lock();
   Value result = _imp->get(exec, (unsigned)index);
-  _root->interpreter()->unlock();
+  Interpreter::unlock();
 
   return convertValueToJObject(result);
 }
@@ -497,7 +507,9 @@ void JSObject::setSlot(jint index, jobject value) const {
   JS_LOG("index = %d, value = %p\n", index, value);
 
   ExecState* exec = _root->interpreter()->globalExec();
+  Interpreter::lock();
   _imp->put(exec, (unsigned)index, convertJObjectToValue(value));
+  Interpreter::unlock();
 }
 
 jstring JSObject::toString() const {
@@ -653,10 +665,10 @@ KJS::Value JSObject::convertJObjectToValue(jobject theObject) const {
     return KJS::Object(const_cast<KJS::ObjectImp*>(imp));
   }
 
-  _root->interpreter()->lock();
+  Interpreter::lock();
   KJS::RuntimeObjectImp* newImp =
       new KJS::RuntimeObjectImp(new Bindings::JavaInstance(theObject));
-  _root->interpreter()->unlock();
+  Interpreter::unlock();
 
   return KJS::Object(newImp);
 }
