@@ -86,8 +86,8 @@ class AutoTableLayout : public TableLayout {
 
   struct Layout {
     Layout()
-        : minWidth(1),
-          maxWidth(1),
+        : minWidth(0),
+          maxWidth(0),
           effMinWidth(0),
           effMaxWidth(0),
           calcWidth(0) {}
