@@ -26,6 +26,10 @@
 #ifndef QOBJECT_H_
 #define QOBJECT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
 
 #include "qnamespace.h"
@@ -83,7 +87,6 @@ class QObject : public Qt {
   // constructors, copy constructors, and destructors ------------------------
 
   QObject(QObject* parent = 0, const char* name = 0);
-
   virtual ~QObject();
 
   // member functions --------------------------------------------------------
@@ -113,6 +116,7 @@ class QObject : public Qt {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QObject(const QObject&);
   QObject& operator=(const QObject&);
 

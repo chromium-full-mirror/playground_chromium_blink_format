@@ -26,6 +26,10 @@
 #ifndef KWQCOLLECTION_H_
 #define KWQCOLLECTION_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 // class QCollection ===========================================================
 
 class QCollection {
@@ -42,8 +46,7 @@ class QCollection {
   // constructors, copy constructors, and destructors ------------------------
 
   QCollection();
-
-  ~QCollection();
+  virtual ~QCollection();
 
   // member functions --------------------------------------------------------
 
@@ -61,9 +64,17 @@ class QCollection {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QCollection(const QCollection&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QCollection& operator=(const QCollection&);
+#endif
 
 };  // class QCollection
     // ========================================================

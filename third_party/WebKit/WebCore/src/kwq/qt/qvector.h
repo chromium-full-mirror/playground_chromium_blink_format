@@ -26,6 +26,10 @@
 #ifndef QVECTOR_H_
 #define QVECTOR_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
 #include <KWQCollection.h>
 
@@ -46,21 +50,19 @@ class QGVector : public QCollection {
   // constructors, copy constructors, and destructors ------------------------
 
   QGVector();
-
-  virtual ~QGVector();
+  QGVector(const QGVector&);
+  ~QGVector();
 
   // member functions --------------------------------------------------------
+
   // operators ---------------------------------------------------------------
+
+  QGVector& operator=(const QGVector&);
 
   // protected
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
-
- private:
-  // no copying or assignment
-  QGVector(const QGVector&);
-  QGVector& operator=(const QGVector&);
 
 };  // class QGVector
     // ===========================================================
@@ -80,7 +82,6 @@ class QVector : public QGVector {
   QVector();
   QVector(uint);
   QVector(const QVector&);
-
   ~QVector();
 
   // member functions --------------------------------------------------------

@@ -26,6 +26,10 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qevent.h>
 
 class QPainter;
@@ -49,7 +53,10 @@ class Event {
 
   Event(const char*);
 
-  virtual ~Event();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~Event() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -60,9 +67,17 @@ class Event {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   Event(const Event&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   Event& operator=(const Event&);
+#endif
 
 };  // class Event
     // ==============================================================

@@ -26,6 +26,10 @@
 #ifndef QTEXTCODEC_H_
 #define QTEXTCODEC_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qstring.h"
 #include "qcstring.h"
 
@@ -33,14 +37,17 @@
 
 class QTextDecoder {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QTextDecoder();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QTextDecoder() {}
+#endif
 
   virtual ~QTextDecoder();
 
@@ -56,9 +63,17 @@ class QTextDecoder {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QTextDecoder(const QTextDecoder&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QTextDecoder& operator=(const QTextDecoder&);
+#endif
 
 };  // class QTextDecoder
     // =======================================================
@@ -77,9 +92,12 @@ class QTextCodec {
   static QTextCodec* codecForName(const char*, int accuracy = 0);
   static QTextCodec* codecForLocale();
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QTextCodec();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QTextCodec() {}
+#endif
 
   virtual ~QTextCodec();
 
@@ -102,9 +120,17 @@ class QTextCodec {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QTextCodec(const QTextCodec&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QTextCodec& operator=(const QTextCodec&);
+#endif
 
 };  // class QTextCodec
     // =========================================================

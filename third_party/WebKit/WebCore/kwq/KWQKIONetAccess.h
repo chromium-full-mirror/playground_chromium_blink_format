@@ -26,6 +26,10 @@
 #ifndef NETACCESS_H_
 #define NETACCESS_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qvaluelist.h>
 #include <kurl.h>
 
@@ -39,17 +43,23 @@ typedef QValueList<UDSAtom> UDSEntry;
 
 class UDSAtom {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  UDSAtom();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  UDSAtom() {}
+#endif
 
-  ~UDSAtom();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~UDSAtom() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -60,9 +70,17 @@ class UDSAtom {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   UDSAtom(const UDSAtom&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   UDSAtom& operator=(const UDSAtom&);
+#endif
 
 };  // class UDSAtom
     // ============================================================
@@ -83,11 +101,17 @@ class NetAccess {
   static bool download(const KURL&, QString&);
   static void removeTempFile(const QString&);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  NetAccess();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  NetAccess() {}
+#endif
 
-  ~NetAccess();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~NetAccess() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -98,9 +122,17 @@ class NetAccess {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   NetAccess(const NetAccess&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   NetAccess& operator=(const NetAccess&);
+#endif
 
 };  // class NetAccess
     // ==========================================================

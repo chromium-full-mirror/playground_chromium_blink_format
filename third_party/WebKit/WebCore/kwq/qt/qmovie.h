@@ -26,6 +26,10 @@
 #ifndef QMOVIE_H_
 #define QMOVIE_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qobject.h"
 #include "qasyncio.h"
 #include "qpixmap.h"
@@ -50,7 +54,6 @@ class QMovie {
   QMovie();
   QMovie(QDataSource*, int bufsize = 1024);
   QMovie(const QMovie&);
-
   ~QMovie();
 
   // member functions --------------------------------------------------------

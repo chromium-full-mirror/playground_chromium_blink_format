@@ -26,6 +26,10 @@
 #ifndef QXML_H_
 #define QXML_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 class QString;
 
 // class QXmlAttributes ========================================================
@@ -41,7 +45,6 @@ class QXmlAttributes {
 
   QXmlAttributes();
   QXmlAttributes(const QXmlAttributes&);
-
   virtual ~QXmlAttributes();
 
   // member functions --------------------------------------------------------
@@ -76,7 +79,6 @@ class QXmlInputSource {
   // constructors, copy constructors, and destructors ------------------------
 
   QXmlInputSource();
-
   virtual ~QXmlInputSource();
 
   // member functions --------------------------------------------------------
@@ -91,28 +93,297 @@ class QXmlInputSource {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QXmlInputSource(const QXmlInputSource&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QXmlInputSource& operator=(const QXmlInputSource&);
+#endif
 
 };  // class QXmlInputSource
+    // ====================================================
+
+// class QXmlDTDHandler ========================================================
+
+class QXmlDTDHandler {
+ public:
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QXmlDTDHandler() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlDTDHandler() {}
+#endif
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlDTDHandler(const QXmlDTDHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlDTDHandler& operator=(const QXmlDTDHandler&);
+#endif
+
+};  // class QXmlDTDHandler
     // =====================================================
 
-class QXmlDTDHandler {};
+// class QXmlDeclHandler
+// ========================================================
 
-class QXmlDeclHandler {};
+class QXmlDeclHandler {
+ public:
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-class QXmlErrorHandler {};
+// constructors, copy constructors, and destructors ------------------------
 
-class QXmlLexicalHandler {};
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QXmlDeclHandler() {}
+#endif
 
-class QXmlContentHandler {};
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlDeclHandler() {}
+#endif
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlDeclHandler(const QXmlDeclHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlDeclHandler& operator=(const QXmlDeclHandler&);
+#endif
+
+};  // class QXmlDeclHandler
+    // =====================================================
+
+// class QXmlErrorHandler
+// ========================================================
+
+class QXmlErrorHandler {
+ public:
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QXmlErrorHandler() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlErrorHandler() {}
+#endif
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlErrorHandler(const QXmlErrorHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlErrorHandler& operator=(const QXmlErrorHandler&);
+#endif
+
+};  // class QXmlErrorHandler
+    // =====================================================
+
+// class QXmlLexicalHandler
+// ========================================================
+
+class QXmlLexicalHandler {
+ public:
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QXmlLexicalHandler() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlLexicalHandler() {}
+#endif
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlLexicalHandler(const QXmlLexicalHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlLexicalHandler& operator=(const QXmlLexicalHandler&);
+#endif
+
+};  // class QXmlLexicalHandler
+    // =====================================================
+
+// class QXmlContentHandler
+// ========================================================
+
+class QXmlContentHandler {
+ public:
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QXmlContentHandler() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlContentHandler() {}
+#endif
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlContentHandler(const QXmlContentHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlContentHandler& operator=(const QXmlContentHandler&);
+#endif
+
+};  // class QXmlContentHandler
+    // =====================================================
+
+// class QXmlDefaultHandler ====================================================
 
 class QXmlDefaultHandler : public QXmlContentHandler,
                            public QXmlLexicalHandler,
                            public QXmlErrorHandler,
                            public QXmlDeclHandler,
-                           public QXmlDTDHandler {};
+                           public QXmlDTDHandler {
+ public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QXmlDefaultHandler() {}
+  virtual ~QXmlDefaultHandler();
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QXmlDefaultHandler(const QXmlDefaultHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QXmlDefaultHandler& operator=(const QXmlDefaultHandler&);
+#endif
+
+};  // class QXmlDefaultHandler
+    // =====================================================
 
 // class QXmlSimpleReader ======================================================
 
@@ -125,8 +396,7 @@ class QXmlSimpleReader {
   // constructors, copy constructors, and destructors ------------------------
 
   QXmlSimpleReader();
-
-  ~QXmlSimpleReader();
+  virtual ~QXmlSimpleReader();
 
   // member functions --------------------------------------------------------
 
@@ -145,9 +415,17 @@ class QXmlSimpleReader {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QXmlSimpleReader(const QXmlSimpleReader&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QXmlSimpleReader& operator=(const QXmlSimpleReader&);
+#endif
 
 };  // class QXmlSimpleReader
     // ===================================================
@@ -165,7 +443,10 @@ class QXmlParseException {
 
   QXmlParseException();
 
-  ~QXmlParseException();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QXmlParseException() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -181,9 +462,17 @@ class QXmlParseException {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QXmlParseException(const QXmlParseException&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QXmlParseException& operator=(const QXmlParseException&);
+#endif
 
 };  // class QXmlParseException
     // =================================================

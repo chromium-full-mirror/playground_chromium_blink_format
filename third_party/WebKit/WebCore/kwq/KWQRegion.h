@@ -26,6 +26,10 @@
 #ifndef QREGION_H_
 #define QREGION_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qpoint.h"
 #include "qimage.h"
 #include "qrect.h"
@@ -50,7 +54,6 @@ class QRegion {
   QRegion(int, int, int, int, RegionType = Rectangle);
   QRegion(const QPointArray&);
   QRegion(const QRegion&);
-
   ~QRegion();
 
   // member functions --------------------------------------------------------

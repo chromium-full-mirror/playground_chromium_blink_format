@@ -26,7 +26,12 @@
 #ifndef QINPUTDIALOG_H_
 #define QINPUTDIALOG_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qstring.h"
+#include "qlabel.h"
 #include "qwidget.h"
 
 // class QInputDialog ==========================================================
@@ -46,10 +51,14 @@ class QInputDialog {
                          QWidget* parent = 0,
                          const char* name = 0);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
   QInputDialog() {}
+#endif
 
+  QInputDialog(const QString& label);
   ~QInputDialog() {}
 
   // member functions --------------------------------------------------------
@@ -62,6 +71,7 @@ class QInputDialog {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QInputDialog(const QInputDialog&);
   QInputDialog& operator=(const QInputDialog&);
 

@@ -26,6 +26,10 @@
 #ifndef KWQLISTBOX_H_
 #define KWQLISTBOX_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qscrollview.h>
 #include <qstring.h>
 
@@ -49,7 +53,6 @@ class QListBox : public QScrollView {
   // constructors, copy constructors, and destructors ------------------------
 
   QListBox();
-
   ~QListBox();
 
   // member functions --------------------------------------------------------
@@ -73,6 +76,7 @@ class QListBox : public QScrollView {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QListBox(const QListBox&);
   QListBox& operator=(const QListBox&);
 
@@ -92,8 +96,7 @@ class QListBoxItem {
   // constructors, copy constructors, and destructors ------------------------
 
   QListBoxItem();
-
-  ~QListBoxItem();
+  virtual ~QListBoxItem();
 
   // member functions --------------------------------------------------------
 
@@ -113,6 +116,7 @@ class QListBoxItem {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QListBoxItem(const QListBoxItem&);
   QListBoxItem& operator=(const QListBoxItem&);
 
@@ -132,7 +136,6 @@ class QListBoxText : public QListBoxItem {
   // constructors, copy constructors, and destructors ------------------------
 
   QListBoxText(const QString& text = QString::null);
-
   ~QListBoxText();
 
   // member functions --------------------------------------------------------
@@ -145,6 +148,7 @@ class QListBoxText : public QListBoxItem {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QListBoxText(const QListBoxText&);
   QListBoxText& operator=(const QListBoxText&);
 

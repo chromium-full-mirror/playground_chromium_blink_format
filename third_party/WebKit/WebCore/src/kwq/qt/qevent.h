@@ -26,6 +26,10 @@
 #ifndef QEVENT_H_
 #define QEVENT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qnamespace.h"
 #include "qregion.h"
 #include "qpoint.h"
@@ -49,12 +53,16 @@ class QEvent : public Qt {
     KeyPress,
   };
 
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
-  // constructors, copy constructors, and destructors ------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QEvent() {}
+#endif
 
   QEvent(Type);
-
   virtual ~QEvent();
 
   // member functions --------------------------------------------------------
@@ -69,9 +77,17 @@ class QEvent : public Qt {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QEvent(const QEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QEvent& operator=(const QEvent&);
+#endif
 
 };  // class QEvent
     // =============================================================
@@ -80,16 +96,24 @@ class QEvent : public Qt {
 
 class QMouseEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QMouseEvent() {}
+#endif
 
   QMouseEvent(Type type, const QPoint& pos, int button, int state);
 
-  virtual ~QMouseEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QMouseEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -109,9 +133,17 @@ class QMouseEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QMouseEvent(const QMouseEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QMouseEvent& operator=(const QMouseEvent&);
+#endif
 
 };  // class QMouseEvent
     // ========================================================
@@ -120,16 +152,21 @@ class QMouseEvent : public QEvent {
 
 class QTimerEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QTimerEvent() {}
+#endif
 
   QTimerEvent(int timerId);
 
-  virtual ~QTimerEvent();
+  ~QTimerEvent();
 
   // member functions --------------------------------------------------------
 
@@ -143,9 +180,17 @@ class QTimerEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QTimerEvent(const QTimerEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QTimerEvent& operator=(const QTimerEvent&);
+#endif
 
 };  // class QTimerEvent
     // ========================================================
@@ -154,16 +199,23 @@ class QTimerEvent : public QEvent {
 
 class QKeyEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
-  // constructors, copy constructors, and destructors ------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QKeyEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QKeyEvent() {}
+#endif
+
   QKeyEvent(Type, Key, int, int);
 
-  virtual ~QKeyEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QKeyEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -179,9 +231,17 @@ class QKeyEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QKeyEvent(const QKeyEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QKeyEvent& operator=(const QKeyEvent&);
+#endif
 
 };  // class QKeyEvent
     // ==========================================================
@@ -190,16 +250,24 @@ class QKeyEvent : public QEvent {
 
 class QFocusEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QFocusEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QFocusEvent() {}
+#endif
 
-  virtual ~QFocusEvent();
+  QFocusEvent(Type);
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QFocusEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -210,9 +278,17 @@ class QFocusEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QFocusEvent(const QFocusEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QFocusEvent& operator=(const QFocusEvent&);
+#endif
 
 };  // class QFocusEvent
     // ========================================================
@@ -221,16 +297,22 @@ class QFocusEvent : public QEvent {
 
 class QHideEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QHideEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QHideEvent() {}
+#endif
 
-  virtual ~QHideEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QHideEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -241,9 +323,17 @@ class QHideEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QHideEvent(const QHideEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QHideEvent& operator=(const QHideEvent&);
+#endif
 
 };  // class QHideEvent
     // =========================================================
@@ -252,16 +342,22 @@ class QHideEvent : public QEvent {
 
 class QResizeEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QResizeEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QResizeEvent() {}
+#endif
 
-  virtual ~QResizeEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QResizeEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -272,9 +368,17 @@ class QResizeEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QResizeEvent(const QResizeEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QResizeEvent& operator=(const QResizeEvent&);
+#endif
 
 };  // class QResizeEvent
     // =======================================================
@@ -283,16 +387,22 @@ class QResizeEvent : public QEvent {
 
 class QShowEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QShowEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QShowEvent() {}
+#endif
 
-  virtual ~QShowEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QShowEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -303,9 +413,17 @@ class QShowEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QShowEvent(const QShowEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QShowEvent& operator=(const QShowEvent&);
+#endif
 
 };  // class QShowEvent
     // =========================================================
@@ -314,16 +432,22 @@ class QShowEvent : public QEvent {
 
 class QWheelEvent : public QEvent {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QWheelEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QWheelEvent() {}
+#endif
 
-  virtual ~QWheelEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QWheelEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -334,9 +458,17 @@ class QWheelEvent : public QEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QWheelEvent(const QWheelEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QWheelEvent& operator=(const QWheelEvent&);
+#endif
 
 };  // class QWheelEvent
     // ========================================================

@@ -26,6 +26,12 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <qobject.h>
+
 #include "job.h"
 #include "jobclasses.h"
 
@@ -33,7 +39,7 @@ namespace KIO {
 
 // class Scheduler =============================================================
 
-class Scheduler {
+class Scheduler : public QObject {
  public:
   // structs -----------------------------------------------------------------
   // typedefs ----------------------------------------------------------------
@@ -44,9 +50,12 @@ class Scheduler {
 
   static void scheduleJob(SimpleJob* job);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  Scheduler();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  Scheduler() {}
+#endif
 
   ~Scheduler();
 
@@ -59,9 +68,17 @@ class Scheduler {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   Scheduler(const Scheduler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   Scheduler& operator=(const Scheduler&);
+#endif
 
 };  // class Scheduler
     // ==========================================================

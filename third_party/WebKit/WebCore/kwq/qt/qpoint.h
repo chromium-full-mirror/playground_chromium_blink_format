@@ -26,7 +26,13 @@
 #ifndef QPOINT_H_
 #define QPOINT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
+
+#include "qarray.h"
 
 // class QPoint ================================================================
 
@@ -43,7 +49,10 @@ class QPoint {
   QPoint(int, int);
   QPoint(const QPoint&);
 
-  ~QPoint();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QPoint() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -69,7 +78,7 @@ class QPoint {
 
 // class QPointArray ===========================================================
 
-class QPointArray {
+class QPointArray : public QArray<QPoint> {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -78,8 +87,8 @@ class QPointArray {
   // constructors, copy constructors, and destructors ------------------------
 
   QPointArray(int);
+  QPointArray(const QPointArray&);
   QPointArray(int, const QCOORD*);
-
   ~QPointArray();
 
   // member functions --------------------------------------------------------
@@ -89,15 +98,12 @@ class QPointArray {
 
   // operators ---------------------------------------------------------------
 
+  QPointArray& operator=(const QPointArray&);
+
   // protected
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
-
- private:
-  // no copying or assignment
-  QPointArray(const QPointArray&);
-  QPointArray& operator=(const QPointArray&);
 
 };  // class QPointArray
     // ========================================================

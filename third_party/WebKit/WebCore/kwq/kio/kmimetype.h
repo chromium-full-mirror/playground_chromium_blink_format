@@ -26,6 +26,10 @@
 #ifndef KMIMETYPE_H_
 #define KMIMETYPE_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <kdecore/kglobal.h>
 
 #include <kdecore/kurl.h>
@@ -46,10 +50,8 @@ class KSharedPtr {
   // constructors, copy constructors, and destructors ------------------------
 
   KSharedPtr();
-
   KSharedPtr(const KSharedPtr&);
-
-  virtual ~KSharedPtr();
+  ~KSharedPtr();
 
   // member functions --------------------------------------------------------
 
@@ -82,11 +84,14 @@ class KMimeType {
 
   static Ptr findByURL(const KURL&, mode_t = 0, bool = false, bool = false);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  KMimeType();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  KMimeType() {}
+#endif
 
-  ~KMimeType();
+  virtual ~KMimeType();
 
   // member functions --------------------------------------------------------
 
@@ -100,9 +105,17 @@ class KMimeType {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KMimeType(const KMimeType&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KMimeType& operator=(const KMimeType&);
+#endif
 
 };  // class KMimeType
     // ==========================================================

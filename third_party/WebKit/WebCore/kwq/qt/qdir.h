@@ -26,6 +26,10 @@
 #ifndef QDIR_H_
 #define QDIR_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qstring.h"
 #include "qstringlist.h"
 #include "qfile.h"
@@ -40,10 +44,10 @@ class QDir {
   // static member functions -------------------------------------------------
 
   // constructors, copy constructors, and destructors ------------------------
+
   QDir();
   QDir(const QString&);
   QDir(const QDir&);
-
   virtual ~QDir();
 
   // member functions --------------------------------------------------------
@@ -56,14 +60,12 @@ class QDir {
 
   // operators ---------------------------------------------------------------
 
+  QDir& operator=(const QDir&);
+
   // protected
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
-
- private:
-  // no assignment
-  QDir& operator=(const QDir&);
 
 };  // class QDir
     // ===============================================================

@@ -26,6 +26,10 @@
 #ifndef QAPPLICATION_H_
 #define QAPPLICATION_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qwidget.h"
 #include "qpalette.h"
 #include "qsize.h"
@@ -48,9 +52,14 @@ class QApplication {
   static void restoreOverrideCursor();
   static bool sendEvent(QObject*, QEvent*);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QApplication();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QApplication() {}
+#endif
+
+  QApplication(int& argc, char** argv);
   virtual ~QApplication();
 
   // member functions --------------------------------------------------------
@@ -64,6 +73,7 @@ class QApplication {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QApplication(const QApplication&);
   QApplication& operator=(const QApplication&);
 

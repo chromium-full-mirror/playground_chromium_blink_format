@@ -26,6 +26,10 @@
 #ifndef KWQSTYLE_H_
 #define KWQSTYLE_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qobject.h>
 #include <qsize.h>
 
@@ -41,8 +45,7 @@ class QStyle : public QObject {
   // constructors, copy constructors, and destructors ------------------------
 
   QStyle();
-
-  ~QStyle();
+  virtual ~QStyle();
 
   // member functions --------------------------------------------------------
 
@@ -58,7 +61,7 @@ class QStyle : public QObject {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QStyle(const QStyle&);
   QStyle& operator=(const QStyle&);
 

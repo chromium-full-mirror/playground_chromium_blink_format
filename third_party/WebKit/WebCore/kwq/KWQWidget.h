@@ -26,6 +26,10 @@
 #ifndef QWIDGET_H_
 #define QWIDGET_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qobject.h"
 #include "qpaintdevice.h"
 #include "qpainter.h"
@@ -58,8 +62,7 @@ class QWidget : public QObject, public QPaintDevice {
   // constructors, copy constructors, and destructors ------------------------
 
   QWidget(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
-
-  virtual ~QWidget();
+  ~QWidget();
 
   // member functions --------------------------------------------------------
 
@@ -121,6 +124,7 @@ class QWidget : public QObject, public QPaintDevice {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QWidget(const QWidget&);
   QWidget& operator=(const QWidget&);
 

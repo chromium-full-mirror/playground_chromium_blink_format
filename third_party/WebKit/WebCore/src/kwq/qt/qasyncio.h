@@ -26,6 +26,10 @@
 #ifndef QASYNCIO_H_
 #define QASYNCIO_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
 
 // class QAsyncIO ==============================================================
@@ -33,13 +37,17 @@
 class QAsyncIO {
   // Note : all class members in protected scope
  protected:
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  QAsyncIO(){};
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QAsyncIO() {}
+#endif
+
   virtual ~QAsyncIO();
 
   // member functions --------------------------------------------------------
@@ -52,9 +60,17 @@ class QAsyncIO {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QAsyncIO(const QAsyncIO&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QAsyncIO& operator=(const QAsyncIO&);
+#endif
 
 };  // class QAsyncIO
     // ===========================================================
@@ -63,14 +79,21 @@ class QAsyncIO {
 
 class QDataSource : public QAsyncIO {
  public:
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
   QDataSource() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
   ~QDataSource() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -85,9 +108,17 @@ class QDataSource : public QAsyncIO {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QDataSource(const QDataSource&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QDataSource& operator=(const QDataSource&);
+#endif
 
 };  // end class QDataSource
     // ====================================================
@@ -96,14 +127,21 @@ class QDataSource : public QAsyncIO {
 
 class QDataSink : public QAsyncIO {
  public:
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
   QDataSink() {}
+#endif
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
   ~QDataSink() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -117,9 +155,17 @@ class QDataSink : public QAsyncIO {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QDataSink(const QDataSink&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QDataSink& operator=(const QDataSink&);
+#endif
 
 };  // class QDataSink
     // ==========================================================

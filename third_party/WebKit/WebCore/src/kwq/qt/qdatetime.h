@@ -26,6 +26,10 @@
 #ifndef QDATETIME_H_
 #define QDATETIME_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 // class QTime =================================================================
 
 class QTime {
@@ -38,9 +42,11 @@ class QTime {
 
   QTime();
   QTime(int, int);
-  QTime(const QTime&);
 
-  ~QTime();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QTime() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -59,6 +65,13 @@ class QTime {
   // private
   // ---------------------------------------------------------------------
 
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QTime(const QTime&);
+#endif
+
 };  // class QTime
     // ==============================================================
 
@@ -75,10 +88,12 @@ class QDate {
 
   QDate(int y, int m, int d);
 
-  QDate(const QDate&);
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QDate() {}
+#endif
 
   // member functions --------------------------------------------------------
-
   // operators ---------------------------------------------------------------
 
   QDate& operator=(const QDate&);
@@ -87,6 +102,13 @@ class QDate {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QDate(const QDate&);
+#endif
 
 };  // class QDate
     // ==============================================================
@@ -105,8 +127,12 @@ class QDateTime {
 
   QDateTime();
   QDateTime(QDate date, QTime time);
-
   QDateTime(const QDateTime&);
+
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QDateTime() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -115,7 +141,11 @@ class QDateTime {
 
   // operators ---------------------------------------------------------------
 
-  QDateTime& operator=(const QDateTime&);
+  // this is not declared in the code, although assignment of this type
+  // is used in the code... i guess a pointer copy is what they want
+  //
+  // QDateTime &operator=(const QDateTime &);
+  //
 
   // protected
   // -------------------------------------------------------------------

@@ -26,6 +26,10 @@
 #ifndef QLINEEDIT_H_
 #define QLINEEDIT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qwidget.h"
 #include "qevent.h"
 #include "qstring.h"
@@ -72,6 +76,7 @@ class QLineEdit : public QWidget {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QLineEdit(const QLineEdit&);
   QLineEdit& operator=(const QLineEdit&);
 

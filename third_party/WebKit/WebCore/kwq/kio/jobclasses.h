@@ -26,6 +26,10 @@
 #ifndef JOBCLASSES_H_
 #define JOBCLASSES_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qobject.h>
 #include <qstring.h>
 
@@ -35,14 +39,17 @@ namespace KIO {
 
 class Job : public QObject {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
-  // constructors, copy constructors, and destructors ------------------------
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  Job();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  Job() {}
+#endif
 
   virtual ~Job();
 
@@ -61,9 +68,17 @@ class Job : public QObject {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   Job(const Job&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   Job& operator=(const Job&);
+#endif
 
 };  // class Job
     // ================================================================
@@ -72,17 +87,20 @@ class Job : public QObject {
 
 class SimpleJob : public KIO::Job {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  SimpleJob();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  SimpleJob() {}
+#endif
 
-  virtual ~SimpleJob();
+  ~SimpleJob();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -93,9 +111,17 @@ class SimpleJob : public KIO::Job {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   SimpleJob(const SimpleJob&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   SimpleJob& operator=(const SimpleJob&);
+#endif
 
 };  // class SimpleJob
     // ==========================================================
@@ -104,17 +130,23 @@ class SimpleJob : public KIO::Job {
 
 class TransferJob : public SimpleJob {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  TransferJob();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  TransferJob() {}
+#endif
 
-  virtual ~TransferJob();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~TransferJob() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -129,9 +161,17 @@ class TransferJob : public SimpleJob {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   TransferJob(const TransferJob&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   TransferJob& operator=(const TransferJob&);
+#endif
 
 };  // class TransferJob
     // ========================================================

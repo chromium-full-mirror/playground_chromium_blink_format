@@ -26,6 +26,10 @@
 #ifndef QMAP_H_
 #define QMAP_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
 
 // class QMapIterator ==========================================================
@@ -41,9 +45,12 @@ class QMapIterator {
   // constructors, copy constructors, and destructors ------------------------
 
   QMapIterator();
-  QMapIterator(const QMapIterator<K, T>& it);
+  QMapIterator(const QMapIterator<K, T>&);
 
-  ~QMapIterator();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QMapIterator() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -58,6 +65,12 @@ class QMapIterator {
   T& operator*();
   const T& operator*() const;
   QMapIterator<K, T>& operator++();
+
+  // this is not declared in the code, although assignment of this type
+  // is used in the code... i guess a pointer copy is what they want
+  //
+  // QMapIterator<K,T> &operator=(const QMapIterator<K,T> &);
+  //
 
   // protected
   // -------------------------------------------------------------------
@@ -98,6 +111,12 @@ class QMapConstIterator {
   const T& operator*() const;
   QMapConstIterator<K, T>& operator++();
 
+  // this is not declared in the code, although assignment of this type
+  // is used in the code... i guess a pointer copy is what they want
+  //
+  // QMapConstIterator<K,T> &operator=(const QMapConstIterator<K,T> &);
+  //
+
   // protected
   // -------------------------------------------------------------------
   // private
@@ -123,7 +142,6 @@ class QMap {
 
   QMap();
   QMap(const QMap<K, T>&);
-
   ~QMap();
 
   // member functions --------------------------------------------------------

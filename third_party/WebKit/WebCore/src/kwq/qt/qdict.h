@@ -26,6 +26,10 @@
 #ifndef QDICT_H_
 #define QDICT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQCollection.h>
 #include "qstring.h"
 
@@ -42,9 +46,7 @@ class QDict : public QCollection {
   // constructors, copy constructors, and destructors ------------------------
 
   QDict(int size = 17, bool caseSensitive = TRUE);
-
   QDict(const QDict<T>&);
-
   ~QDict();
 
   // member functions --------------------------------------------------------
@@ -71,15 +73,19 @@ class QDict : public QCollection {
 template <class T>
 class QDictIterator {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QDictIterator() {}
+#endif
 
   QDictIterator(const QDict<T>&);
-
   ~QDictIterator();
 
   // member functions --------------------------------------------------------
@@ -98,9 +104,17 @@ class QDictIterator {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QDictIterator(const QDictIterator&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QDictIterator& operator=(const QDictIterator&);
+#endif
 
 };  // class QDictIterator
     // ======================================================

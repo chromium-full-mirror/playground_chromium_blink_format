@@ -26,6 +26,10 @@
 #ifndef KWQFRAME_H_
 #define KWQFRAME_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qwidget.h>
 
 // class QFrame ================================================================
@@ -48,6 +52,11 @@ class QFrame : public QWidget {
   QFrame();
   QFrame(QWidget* parent);
 
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QFrame() {}
+#endif
+
   // member functions --------------------------------------------------------
 
   virtual void setFrameStyle(int);
@@ -62,6 +71,7 @@ class QFrame : public QWidget {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QFrame(const QFrame&);
   QFrame& operator=(const QFrame&);
 

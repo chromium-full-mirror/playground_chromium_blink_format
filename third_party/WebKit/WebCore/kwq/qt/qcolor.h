@@ -26,6 +26,10 @@
 #ifndef QCOLOR_H_
 #define QCOLOR_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qnamespace.h"
 #include "qstring.h"
 
@@ -47,7 +51,10 @@ class QColor {
   QColor(const char*);
   QColor(const QColor&);
 
-  ~QColor();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QColor() {}
+#endif
 
   // member functions --------------------------------------------------------
 

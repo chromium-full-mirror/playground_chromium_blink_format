@@ -26,6 +26,10 @@
 #ifndef QFILE_H_
 #define QFILE_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qstring.h"
 
 // class QFile =================================================================
@@ -41,7 +45,6 @@ class QFile {
 
   QFile();
   QFile(const QString&);
-
   ~QFile();
 
   // member functions --------------------------------------------------------
@@ -62,6 +65,7 @@ class QFile {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QFile(const QFile&);
   QFile& operator=(const QFile&);
 

@@ -26,6 +26,10 @@
 #ifndef QPAINTER_H_
 #define QPAINTER_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qnamespace.h"
 #include "qpaintdevice.h"
 #include "qcolor.h"
@@ -52,7 +56,10 @@ class QWMatrix {
 
   QWMatrix();
 
-  ~QWMatrix();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~QWMatrix() {}
+#endif
 
   // member functions --------------------------------------------------------
 
@@ -64,6 +71,19 @@ class QWMatrix {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
+  QWMatrix(const QWMatrix&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
+  QWMatrix& operator=(const QWMatrix&);
+#endif
 
 };  // class QWMatrix
     // ===========================================================
@@ -81,7 +101,6 @@ class QPainter : public Qt {
 
   QPainter();
   QPainter(const QPaintDevice*);
-
   ~QPainter();
 
   // member functions --------------------------------------------------------
@@ -143,6 +162,7 @@ class QPainter : public Qt {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QPainter(const QPainter&);
   QPainter& operator=(const QPainter&);
 

@@ -26,6 +26,10 @@
 #ifndef QPTRDICT_H_
 #define QPTRDICT_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <KWQDef.h>
 #include <KWQCollection.h>
 
@@ -43,7 +47,6 @@ class QPtrDict : public QCollection {
 
   QPtrDict(int size = 17);
   QPtrDict(const QPtrDict<T>&);
-
   ~QPtrDict();
 
   // member functions --------------------------------------------------------
@@ -74,16 +77,20 @@ class QPtrDict : public QCollection {
 template <class T>
 class QPtrDictIterator {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  QPtrDictIterator() {}
+#endif
 
   QPtrDictIterator(const QPtrDict<T>&);
-
-  ~QPtrDictIterator();
+  ~QPtrDictIterator() {}
 
   // member functions --------------------------------------------------------
 
@@ -100,9 +107,17 @@ class QPtrDictIterator {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QPtrDictIterator(const QPtrDictIterator&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QPtrDictIterator& operator=(const QPtrDictIterator&);
+#endif
 
 };  // class QPtrDictIterator
     // ===================================================

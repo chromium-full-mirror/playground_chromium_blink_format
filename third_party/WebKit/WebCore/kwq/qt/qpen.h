@@ -26,6 +26,10 @@
 #ifndef QPEN_H_
 #define QPEN_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qnamespace.h"
 #include "qcolor.h"
 
@@ -43,7 +47,6 @@ class QPen : public Qt {
   QPen();
   QPen(const QColor& color, uint width = 0, PenStyle style = SolidLine);
   QPen(const QPen&);
-
   ~QPen();
 
   // member functions --------------------------------------------------------

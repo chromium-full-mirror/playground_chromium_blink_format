@@ -26,6 +26,10 @@
 #ifndef QFONTINFO_H_
 #define QFONTINFO_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "qfont.h"
 
 // class QFontInfo =============================================================
@@ -41,7 +45,6 @@ class QFontInfo {
 
   QFontInfo(const QFont&);
   QFontInfo(const QFontInfo&);
-
   ~QFontInfo();
 
   // member functions --------------------------------------------------------

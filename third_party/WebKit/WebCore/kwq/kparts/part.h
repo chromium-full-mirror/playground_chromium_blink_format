@@ -26,6 +26,10 @@
 #ifndef PART_H_
 #define PART_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <kurl.h>
 #include <qobject.h>
 #include <qvariant.h>
@@ -57,8 +61,7 @@ class Part : public QObject {
   // constructors, copy constructors, and destructors ------------------------
 
   Part();
-
-  ~Part();
+  virtual ~Part();
 
   // member functions --------------------------------------------------------
 
@@ -73,9 +76,17 @@ class Part : public QObject {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   Part(const Part&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   Part& operator=(const Part&);
+#endif
 
 };  // class Part
     // ===============================================================
@@ -93,8 +104,7 @@ class ReadOnlyPart : public Part {
   // constructors, copy constructors, and destructors ------------------------
 
   ReadOnlyPart();
-
-  ~ReadOnlyPart();
+  virtual ~ReadOnlyPart();
 
   // member functions --------------------------------------------------------
 
@@ -108,9 +118,17 @@ class ReadOnlyPart : public Part {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   ReadOnlyPart(const ReadOnlyPart&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   ReadOnlyPart& operator=(const ReadOnlyPart&);
+#endif
 
 };  // class ReadOnlyPart
     // =======================================================
@@ -119,17 +137,23 @@ class ReadOnlyPart : public Part {
 
 class GUIActivateEvent {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+// structs -----------------------------------------------------------------
+// typedefs ----------------------------------------------------------------
+// enums -------------------------------------------------------------------
+// constants ---------------------------------------------------------------
+// static member functions -------------------------------------------------
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  GUIActivateEvent();
+// add no-arg constructor
+#ifdef _KWQ_PEDANTIC_
+  GUIActivateEvent() {}
+#endif
 
-  ~GUIActivateEvent();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~GUIActivateEvent() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -140,9 +164,17 @@ class GUIActivateEvent {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   GUIActivateEvent(const GUIActivateEvent&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   GUIActivateEvent& operator=(const GUIActivateEvent&);
+#endif
 
 };  // class GUIActivateEvent
     // ===================================================

@@ -26,6 +26,10 @@
 #ifndef KWQBUTTON_H_
 #define KWQBUTTON_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <qwidget.h>
 #include <qstring.h>
 
@@ -43,7 +47,6 @@ class QButton : public QWidget {
 
   QButton();
   QButton(QWidget*);
-
   ~QButton();
 
   // member functions --------------------------------------------------------
@@ -60,6 +63,7 @@ class QButton : public QWidget {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QButton(const QButton&);
   QButton& operator=(const QButton&);
 

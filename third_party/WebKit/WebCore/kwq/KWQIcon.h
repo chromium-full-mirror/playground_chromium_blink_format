@@ -26,6 +26,10 @@
 #ifndef KWQICON_H_
 #define KWQICON_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 // class KIcon =================================================================
 
 class KIcon {
@@ -44,7 +48,10 @@ class KIcon {
 
   KIcon();
 
-  ~KIcon();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KIcon() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -55,9 +62,17 @@ class KIcon {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KIcon(const KIcon&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KIcon& operator=(const KIcon&);
+#endif
 
 };  // class KIcon
     // ==============================================================
