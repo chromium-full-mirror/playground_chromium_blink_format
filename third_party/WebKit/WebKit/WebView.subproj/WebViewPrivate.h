@@ -63,6 +63,8 @@ typedef struct _WebResourceDelegateImplementationCache {
 
   NSWindow* hostWindow;
 
+  int programmaticFocusCount;
+
   WebResourceDelegateImplementationCache resourceLoadDelegateImplementations;
 }
 @end
@@ -212,6 +214,10 @@ backforward list.
 + (BOOL)_canHandleRequest:(NSURLRequest*)request;
 
 + (NSString*)_decodeData:(NSData*)data;
+
+- (void)_pushPerformingProgrammaticFocus;
+- (void)_popPerformingProgrammaticFocus;
+- (BOOL)_isPerformingProgrammaticFocus;
 
 @end
 
