@@ -52,3 +52,9 @@ typedef struct CharacterWidthIterator CharacterWidthIterator;
 - (id)initWithFont:(NSFont*)font usingPrinterFont:(BOOL)usingPrinterFont;
 
 @end
+
+@interface WebTextRenderer (WebPrivate)
+
++ (void)_setAlwaysUseATSU:(BOOL)f;
+
+@end

@@ -275,6 +275,7 @@ backforward list.
 - (void)_didChangeValueForKey:(NSString*)key;
 
 - (void)_reloadForPluginChanges;
++ (void)_setAlwaysUseATSU:(BOOL)f;
 @end
 
 @interface _WebSafeForwarder : NSObject {
