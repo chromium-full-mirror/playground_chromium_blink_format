@@ -232,6 +232,7 @@ class KHTMLView : public QScrollView {
 
  private:
   void resetCursor();
+  void invalidateClick();
 
   void scheduleRelayout();
   void unscheduleRelayout();
