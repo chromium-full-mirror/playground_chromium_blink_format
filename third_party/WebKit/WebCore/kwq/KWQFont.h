@@ -31,6 +31,7 @@
 #endif
 
 class QString;
+class QPainter;
 
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
 #define Fixed MacFixed
@@ -45,8 +46,6 @@ class QString;
 // class QFont =================================================================
 
 class QFont {
-  friend class QPainter;
-
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -88,8 +87,17 @@ class QFont {
 #endif
 #endif
 
-// protected -------------------------------------------------------------------
-// private ---------------------------------------------------------------------
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  NSFont* getFont();
+#else
+  void* getFont();
+#endif
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+ private:
 #ifdef _KWQ_
   void _initialize();
   void _initializeWithFont(const QFont*);
@@ -100,8 +108,14 @@ class QFont {
 
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
   NSFont* font;
+  NSString* _family;
+  int _trait;
+  float _size;
 #else
   void* font;
+  void* _family;
+  int _trait;
+  float _size;
 #endif
 
 #endif
