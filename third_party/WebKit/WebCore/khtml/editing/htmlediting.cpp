@@ -827,8 +827,7 @@ void CompositeEditCommand::deleteInsignificantText(const Position& start,
   if (start.isNull() || end.isNull())
     return;
 
-  if (RangeImpl::compareBoundaryPoints(start.node(), start.offset(), end.node(),
-                                       end.offset()) >= 0)
+  if (RangeImpl::compareBoundaryPoints(start, end) >= 0)
     return;
 
   NodeImpl* node = start.node();
@@ -1155,8 +1154,7 @@ void ApplyStyleCommand::removeBlockStyle(CSSStyleDeclarationImpl* style,
   ASSERT(end.isNotNull());
   ASSERT(start.node()->inDocument());
   ASSERT(end.node()->inDocument());
-  ASSERT(RangeImpl::compareBoundaryPoints(start.node(), start.offset(),
-                                          end.node(), end.offset()) <= 0);
+  ASSERT(RangeImpl::compareBoundaryPoints(start, end) <= 0);
 }
 
 void ApplyStyleCommand::removeInlineStyle(CSSStyleDeclarationImpl* style,
@@ -1166,8 +1164,7 @@ void ApplyStyleCommand::removeInlineStyle(CSSStyleDeclarationImpl* style,
   ASSERT(end.isNotNull());
   ASSERT(start.node()->inDocument());
   ASSERT(end.node()->inDocument());
-  ASSERT(RangeImpl::compareBoundaryPoints(start.node(), start.offset(),
-                                          end.node(), end.offset()) <= 0);
+  ASSERT(RangeImpl::compareBoundaryPoints(start, end) <= 0);
 
   NodeImpl* node = start.node();
   while (node) {
@@ -1193,8 +1190,7 @@ bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
   Position pos = Position(node, node->childNodeCount()).upstream();
   return RangeImpl::compareBoundaryPoints(node, 0, start.node(),
                                           start.offset()) >= 0 &&
-         RangeImpl::compareBoundaryPoints(pos.node(), pos.offset(), end.node(),
-                                          end.offset()) <= 0;
+         RangeImpl::compareBoundaryPoints(pos, end) <= 0;
 }
 
 //------------------------------------------------------------------------------------------
@@ -1489,9 +1485,8 @@ void DeleteSelectionCommand::initializePositionData() {
   if (isFirstVisiblePositionOnLine(visibleEnd)) {
     Position previousLineStart =
         previousLinePosition(visibleEnd, DOWNSTREAM, 0).deepEquivalent();
-    if (RangeImpl::compareBoundaryPoints(
-            previousLineStart.node(), previousLineStart.offset(),
-            m_downstreamStart.node(), m_downstreamStart.offset()) >= 0)
+    if (RangeImpl::compareBoundaryPoints(previousLineStart,
+                                         m_downstreamStart) >= 0)
       m_mergeBlocksAfterDelete = false;
   }
 

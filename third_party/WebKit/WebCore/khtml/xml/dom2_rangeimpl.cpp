@@ -31,6 +31,7 @@
 #include "html/html_elementimpl.h"
 #include "misc/htmltags.h"
 #include "editing/visible_text.h"
+#include "xml/dom_position.h"
 
 #include "render_block.h"
 
@@ -383,6 +384,10 @@ short RangeImpl::compareBoundaryPoints(NodeImpl* containerA,
     return -1;  // A is before B
   else
     return 1;  // A is after B
+}
+
+short RangeImpl::compareBoundaryPoints(const Position& a, const Position& b) {
+  return compareBoundaryPoints(a.node(), a.offset(), b.node(), b.offset());
 }
 
 bool RangeImpl::boundaryPointsValid() const {
