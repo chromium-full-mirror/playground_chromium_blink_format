@@ -114,9 +114,6 @@ class RenderTable : public RenderBlock {
 
   virtual void calcWidth();
 
-  virtual int borderTopExtra();
-  virtual int borderBottomExtra();
-
 #ifndef NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
@@ -372,8 +369,8 @@ class RenderTableCell : public RenderBlock {
 
   virtual short baselinePosition(bool = false) const;
 
-  virtual int borderTopExtra() { return _topExtra; }
-  virtual int borderBottomExtra() { return _bottomExtra; }
+  virtual int borderTopExtra() const { return _topExtra; }
+  virtual int borderBottomExtra() const { return _bottomExtra; }
 
   RenderTable* table() const {
     return static_cast<RenderTable*>(parent()->parent()->parent());

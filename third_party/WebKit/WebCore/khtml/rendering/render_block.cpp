@@ -107,8 +107,8 @@ RenderBlock::RenderBlock(DOM::NodeImpl* node) : RenderFlow(node) {
   m_maxTopPosMargin = m_maxTopNegMargin = m_maxBottomPosMargin =
       m_maxBottomNegMargin = 0;
   m_topMarginQuirk = m_bottomMarginQuirk = false;
-  m_overflowHeight = 0;
-  m_overflowWidth = 0;
+  m_overflowHeight = m_overflowWidth = 0;
+  m_overflowLeft = m_overflowTop = 0;
 }
 
 RenderBlock::~RenderBlock() {
@@ -365,6 +365,31 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   }
 }
 
+int RenderBlock::overflowHeight(bool includeInterior) const {
+  return (!includeInterior && hasOverflowClip()) ? m_height : m_overflowHeight;
+}
+
+int RenderBlock::overflowWidth(bool includeInterior) const {
+  return (!includeInterior && hasOverflowClip()) ? m_width : m_overflowWidth;
+}
+int RenderBlock::overflowLeft(bool includeInterior) const {
+  return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowLeft;
+}
+
+int RenderBlock::overflowTop(bool includeInterior) const {
+  return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowTop;
+}
+
+QRect RenderBlock::overflowRect(bool includeInterior) const {
+  if (!includeInterior && hasOverflowClip())
+    return borderBox();
+  int l = overflowLeft(includeInterior);
+  int t = kMin(overflowTop(includeInterior), -borderTopExtra());
+  return QRect(
+      l, t, m_overflowWidth - 2 * l,
+      m_overflowHeight + borderTopExtra() + borderBottomExtra() - 2 * t);
+}
+
 bool RenderBlock::isSelfCollapsingBlock() const {
   // We are not self-collapsing if we
   // (a) have a non-zero height according to layout (an optimization to avoid
@@ -549,10 +574,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   // Always ensure our overflow width/height are at least as large as our
   // width/height.
-  if (m_overflowWidth < m_width)
-    m_overflowWidth = m_width;
-  if (m_overflowHeight < m_height)
-    m_overflowHeight = m_height;
+  m_overflowWidth = kMax(m_overflowWidth, m_width);
+  m_overflowHeight = kMax(m_overflowHeight, m_height);
 
   // Update our scroll information if we're overflow:auto/scroll/hidden now that
   // we know if
@@ -1173,6 +1196,11 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // Now place the child in the correct horizontal position
     determineHorizontalPosition(child);
 
+    // Update our top overflow in case the child spills out the top of the
+    // block.
+    m_overflowTop =
+        kMin(m_overflowTop, child->yPos() - child->overflowTop(false));
+
     // Update our height now that the child has been placed in the correct
     // position.
     m_height += child->height();
@@ -1192,11 +1220,11 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
                            -child->yPos(), true);
 
     // See if this child has made our overflow need to grow.
-    // FIXME: Work with left overflow as well as right overflow.
     int rightChildPos =
         child->xPos() + kMax(child->overflowWidth(false), child->width());
-    if (rightChildPos > m_overflowWidth)
-      m_overflowWidth = rightChildPos;
+    m_overflowWidth = kMax(rightChildPos, m_overflowWidth);
+    m_overflowLeft =
+        kMin(child->xPos() - child->overflowLeft(false), m_overflowLeft);
 
     // Insert our compact into the block margin if we have one.
     insertCompactIfNeeded(child, compactInfo);
@@ -1308,27 +1336,21 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
   _ty += m_y;
 
   // Check if we need to do anything at all.
-  // FIXME: This check is limited to only the y-coordinates when it could check
-  // x as well.
-  // Compacts keep us from being strict about x-direction at the moment.
   if (!isInlineFlow() && !isRoot()) {
-    int h = m_overflowHeight;
-    int yPos = _ty;
-    if (m_floatingObjects && floatBottom() > h)
-      h = floatBottom();
-
-    // FIXME: This is a pretty feeble check that doesn't really work in
-    // practice, since top overflow
-    // is not propagated. Sanity check the first line
-    // to see if it extended a little above our box. Overflow out the bottom is
-    // already handled via
-    // overflowHeight(), so we don't need to check that.
-    if (m_firstLineBox && m_firstLineBox->topOverflow() < 0)
-      yPos += m_firstLineBox->topOverflow();
-
-    int os = 2 * maximalOutlineSize(i.phase);
-    if ((yPos >= i.r.y() + i.r.height() + os) || (_ty + h <= i.r.y() - os))
-      return;
+    QRect overflowBox = overflowRect(false);
+    overflowBox.inflate(maximalOutlineSize(i.phase));
+    overflowBox.setX(overflowBox.x() + _tx);
+    overflowBox.setY(overflowBox.y() + _ty);
+    bool intersectsOverflowBox = overflowBox.intersects(i.r);
+    if (!intersectsOverflowBox) {
+      // Check floats next.
+      QRect floatBox = floatRect();
+      floatBox.inflate(maximalOutlineSize(i.phase));
+      floatBox.setX(overflowBox.x() + _tx);
+      floatBox.setY(overflowBox.y() + _ty);
+      if (!floatBox.intersects(i.r))
+        return;
+    }
   }
 
   return paintObject(i, _tx, _ty);
@@ -2213,6 +2235,43 @@ int RenderBlock::floatBottom() const {
   return bottom;
 }
 
+QRect RenderBlock::floatRect() const {
+  QRect result(borderBox());
+  if (!m_floatingObjects)
+    return result;
+  FloatingObject* r;
+  QPtrListIterator<FloatingObject> it(*m_floatingObjects);
+  for (; (r = it.current()); ++it) {
+    if (!r->noPaint && !r->node->layer()) {
+      // Check this float.
+      int bottomDelta = kMax(0, r->startY + r->node->marginTop() +
+                                    r->node->overflowHeight(false) -
+                                    (result.y() + result.height()));
+      if (bottomDelta)
+        result.setHeight(result.height() + bottomDelta);
+      int rightDelta = kMax(0, r->left + r->node->marginLeft() +
+                                   r->node->overflowWidth(false) -
+                                   (result.x() + result.width()));
+      if (rightDelta)
+        result.setWidth(result.width() + rightDelta);
+
+      // Now check left and top
+      int topDelta = kMin(0, r->startY + r->node->marginTop() - result.y());
+      if (topDelta < 0) {
+        result.setY(result.y() + topDelta);
+        result.setHeight(result.height() - 2 * topDelta);
+      }
+      int leftDelta = kMin(0, r->left + r->node->marginLeft() - result.x());
+      if (topDelta < 0) {
+        result.setX(result.x() + leftDelta);
+        result.setHeight(result.width() - 2 * leftDelta);
+      }
+    }
+  }
+
+  return result;
+}
+
 int RenderBlock::lowestPosition(bool includeOverflowInterior,
                                 bool includeSelf) const {
   int bottom = RenderFlow::lowestPosition(includeOverflowInterior, includeSelf);
@@ -2239,10 +2298,7 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      // Use the layer's position, since it has been corrected for crazy
-      // relpositioned inline
-      // edge cases.
-      int lp = r->layer()->yPos() + r->lowestPosition(false);
+      int lp = r->yPos() + r->lowestPosition(false);
       bottom = kMax(bottom, lp);
     }
   }
@@ -2280,10 +2336,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      // Use the layer's position, since it has been corrected for crazy
-      // relpositioned inline
-      // edge cases.
-      int rp = r->layer()->xPos() + r->rightmostPosition(false);
+      int rp = r->xPos() + r->rightmostPosition(false);
       right = kMax(right, rp);
     }
   }
@@ -2323,10 +2376,7 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      // Use the layer's position, since it has been corrected for crazy
-      // relpositioned inline
-      // edge cases.
-      int lp = r->layer()->xPos() + r->leftmostPosition(false);
+      int lp = r->xPos() + r->leftmostPosition(false);
       left = kMin(left, lp);
     }
   }
@@ -2588,24 +2638,23 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
   bool inlineFlow = isInlineFlow();
 
   int tx = _tx + m_x;
-  int ty = _ty + m_y;
+  int ty = _ty + m_y + borderTopExtra();
 
   if (!inlineFlow && !isRoot()) {
-    // Check if we need to do anything at all with this block.
-    // FIXME: This check is limited to only the y-coordinates when it could
-    // check x as well.
-    // Compacts keep us from being strict about x-coordinates at the moment.
-    int h = m_overflowHeight;
-    if (m_floatingObjects && floatBottom() > h)
-      h = floatBottom();
-    if (isTableCell())
-      h = kMax(height() + borderTopExtra() + borderBottomExtra(), h);
-    if ((ty > _y) || (ty + h <= _y))
-      return false;
+    // Check if we need to do anything at all.
+    QRect overflowBox = overflowRect(false);
+    overflowBox.setX(overflowBox.x() + tx);
+    overflowBox.setY(overflowBox.y() + ty);
+    bool insideOverflowBox = overflowBox.contains(_x, _y);
+    if (!insideOverflowBox) {
+      // Check floats next.
+      QRect floatBox = floatRect();
+      floatBox.setX(overflowBox.x() + tx);
+      floatBox.setY(overflowBox.y() + ty);
+      if (!floatBox.contains(_x, _y))
+        return false;
+    }
   }
-
-  if (isTableCell())
-    ty += borderTopExtra();
 
   // See if we're inside the scrollbar (if we're overflow:scroll/auto).
   if (isPointInScrollbar(_x, _y, tx, ty)) {

@@ -144,6 +144,8 @@ class InlineBox {
 
   virtual int topOverflow() { return yPos(); }
   virtual int bottomOverflow() { return yPos() + height(); }
+  virtual int leftOverflow() { return xPos(); }
+  virtual int rightOverflow() { return xPos() + width(); }
 
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
@@ -325,7 +327,7 @@ class InlineFlowBox : public InlineRunBox {
   void determineSpacingForFlowBoxes(bool lastLine, RenderObject* endObject);
   int getFlowSpacingWidth();
   bool onEndChain(RenderObject* endObject);
-  int placeBoxesHorizontally(int x);
+  int placeBoxesHorizontally(int x, int& leftPosition, int& rightPosition);
   void verticallyAlignBoxes(int& heightOfBlock);
   void computeLogicalBoxHeights(int& maxPositionTop,
                                 int& maxPositionBottom,
@@ -344,7 +346,7 @@ class InlineFlowBox : public InlineRunBox {
                             int& bottomPosition);
   void shrinkBoxesWithNoTextChildren(int topPosition, int bottomPosition);
 
-  virtual void setOverflowPositions(int top, int bottom) {}
+  virtual void setVerticalOverflowPositions(int top, int bottom) {}
 
   void removeChild(InlineBox* child);
 
@@ -372,6 +374,8 @@ class RootInlineBox : public InlineFlowBox {
       : InlineFlowBox(obj),
         m_topOverflow(0),
         m_bottomOverflow(0),
+        m_leftOverflow(0),
+        m_rightOverflow(0),
         m_lineBreakObj(0),
         m_lineBreakPos(0),
         m_blockHeight(0),
@@ -394,11 +398,16 @@ class RootInlineBox : public InlineFlowBox {
   virtual bool isRootInlineBox() { return true; }
   virtual int topOverflow() { return m_topOverflow; }
   virtual int bottomOverflow() { return m_bottomOverflow; }
-  virtual void setOverflowPositions(int top, int bottom) {
+  virtual int leftOverflow() { return m_leftOverflow; }
+  virtual int rightOverflow() { return m_rightOverflow; }
+  virtual void setVerticalOverflowPositions(int top, int bottom) {
     m_topOverflow = top;
     m_bottomOverflow = bottom;
   }
-
+  void setHorizontalOverflowPositions(int left, int right) {
+    m_leftOverflow = left;
+    m_rightOverflow = right;
+  }
   void setLineBreakInfo(RenderObject* obj, uint breakPos) {
     m_lineBreakObj = obj;
     m_lineBreakPos = breakPos;
@@ -477,6 +486,8 @@ class RootInlineBox : public InlineFlowBox {
   // below our line (e.g., a child whose font has a huge descent).
   int m_topOverflow;
   int m_bottomOverflow;
+  int m_leftOverflow;
+  int m_rightOverflow;
 
   // Where this line ended.  The exact object and the position within that
   // object are stored so that

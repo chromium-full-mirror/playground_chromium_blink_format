@@ -64,13 +64,11 @@ class RenderBlock : public RenderFlow {
   // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
   // inside
   // it would have an overflow height of borderTop() + paddingTop() + 100px.
-  virtual int overflowHeight(bool includeInterior = true) const {
-    return (!includeInterior && hasOverflowClip()) ? m_height
-                                                   : m_overflowHeight;
-  }
-  virtual int overflowWidth(bool includeInterior = true) const {
-    return (!includeInterior && hasOverflowClip()) ? m_width : m_overflowWidth;
-  }
+  virtual int overflowHeight(bool includeInterior = true) const;
+  virtual int overflowWidth(bool includeInterior = true) const;
+  virtual int overflowLeft(bool includeInterior = true) const;
+  virtual int overflowTop(bool includeInterior = true) const;
+  virtual QRect overflowRect(bool includeInterior = true) const;
   virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
   virtual void setOverflowWidth(int w) { m_overflowWidth = w; }
 
@@ -183,6 +181,7 @@ class RenderBlock : public RenderFlow {
   int floatBottom() const;
   inline int leftBottom();
   inline int rightBottom();
+  virtual QRect floatRect() const;
 
   virtual int lineWidth(int y) const;
   virtual int lowestPosition(bool includeOverflowInterior = true,
@@ -566,6 +565,12 @@ class RenderBlock : public RenderFlow {
   // XXX Generalize to work with top and left as well.
   int m_overflowHeight;
   int m_overflowWidth;
+
+  // Left and top overflow.  Does not affect scrolling dimensions, but we do at
+  // least use it
+  // when dirty rect checking and hit testing.
+  int m_overflowLeft;
+  int m_overflowTop;
 };
 
 };  // namespace

@@ -355,6 +355,7 @@ void RenderTable::layout() {
     repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
 
   m_overflowHeight = kMax(m_overflowHeight, m_height);
+  m_overflowWidth = kMax(m_overflowWidth, m_width);
 
   setNeedsLayout(false);
 }
@@ -374,9 +375,6 @@ void RenderTable::setCellWidths() {
 }
 
 void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
-  if (needsLayout())
-    return;
-
   _tx += xPos();
   _ty += yPos();
 
@@ -444,8 +442,16 @@ void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
 
 void RenderTable::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   int w = width();
-  int h = height() + borderTopExtra() + borderBottomExtra();
-  _ty -= borderTopExtra();
+  int h = height();
+
+  // Account for the caption.
+  if (tCaption) {
+    int captionHeight =
+        (tCaption->height() + tCaption->marginBottom() + tCaption->marginTop());
+    h -= captionHeight;
+    if (tCaption->style()->captionSide() != CAPBOTTOM)
+      _ty += captionHeight;
+  }
 
   int my = kMax(_ty, i.r.y());
   int mh;
@@ -483,22 +489,6 @@ void RenderTable::calcMinMaxWidth() {
                 << ")::calcMinMaxWidth() min = " << m_minWidth
                 << " max = " << m_maxWidth << endl;
 #endif
-}
-
-int RenderTable::borderTopExtra() {
-  if (tCaption && tCaption->style()->captionSide() != CAPBOTTOM)
-    return -(tCaption->height() + tCaption->marginBottom() +
-             tCaption->marginTop());
-  else
-    return 0;
-}
-
-int RenderTable::borderBottomExtra() {
-  if (tCaption && tCaption->style()->captionSide() == CAPBOTTOM)
-    return -(tCaption->height() + tCaption->marginBottom() +
-             tCaption->marginTop());
-  else
-    return 0;
 }
 
 void RenderTable::splitColumn(int pos, int firstSpan) {
