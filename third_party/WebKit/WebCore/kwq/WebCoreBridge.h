@@ -291,6 +291,8 @@ enum FrameBorderStyle {
 
 - (int)getObjectCacheSize;
 
+- (BOOL)frameRequiredForMIMEType:(NSString*)mimeType;
+
 - (void)loadEmptyDocumentSynchronously;
 
 - (NSString*)MIMETypeForPath:(NSString*)path;
