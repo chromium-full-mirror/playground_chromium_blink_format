@@ -149,6 +149,9 @@
 - (void)setResourceProgressHandler:(id<IFResourceProgressHandler>)handler;
 - (id<IFResourceProgressHandler>)resourceProgressHandler;
 
+- (void)setDownloadProgressHandler:(id<IFResourceProgressHandler>)handler;
+- (id<IFResourceProgressHandler>)downloadProgressHandler;
+
 + (IFURLPolicy)defaultURLPolicyForURL:(NSURL*)url;
 
 - (void)setPolicyHandler:(id<IFWebControllerPolicyHandler>)handler;
