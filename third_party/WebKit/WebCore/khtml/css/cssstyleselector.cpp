@@ -531,6 +531,8 @@ static int total = 0;
 const int siblingThreshold = 10;
 
 NodeImpl* CSSStyleSelector::locateCousinList(ElementImpl* parent) {
+  // FIXME: Investigate the difference between elementsCanShareStyle and a
+  // pointer compare of renderstyles.
   if (parent && parent->renderer() && !parent->inlineStyleDecl() &&
       !parent->hasID()) {
     DOM::NodeImpl* n;
@@ -540,23 +542,27 @@ NodeImpl* CSSStyleSelector::locateCousinList(ElementImpl* parent) {
     int subcount = 0;
     while (n) {
       if (n->renderer() &&
-          n->renderer()->style() == parent->renderer()->style())
+          /*elementsCanShareStyle(static_cast<ElementImpl*>(n), parent)) //*/ n
+                  ->renderer()
+                  ->style() == parent->renderer()->style())
         return n->lastChild();
       if (subcount++ == siblingThreshold)
         return 0;
-      for (n = n->previousSibling(); n && !n->isElementNode();
-           n = n->previousSibling())
-        ;
+      n = n->previousSibling();  // for (n = n->previousSibling(); n &&
+                                 // !n->isElementNode(); n =
+                                 // n->previousSibling());
     }
     if (!n && parent->parentNode() && parent->parentNode()->isElementNode())
       n = locateCousinList(static_cast<ElementImpl*>(parent->parentNode()));
     while (n) {
       if (n->renderer() &&
-          n->renderer()->style() == parent->renderer()->style())
+          /*elementsCanShareStyle(static_cast<ElementImpl*>(n), parent)) //*/ n
+                  ->renderer()
+                  ->style() == parent->renderer()->style())
         return n->lastChild();
       if (subcount++ == siblingThreshold)
         return 0;
-      for (n = parent->previousSibling(); n && !n->isElementNode();
+      for (n = n->previousSibling(); n && !n->isElementNode();
            n = n->previousSibling())
         ;
     }
@@ -600,14 +606,8 @@ bool CSSStyleSelector::elementsCanShareStyle(ElementImpl* e1, ElementImpl* e2) {
               (pseudoState == e1->renderer()->style()->pseudoState());
         }
 
-        if (anchorsMatch) {
-#ifdef STYLE_SHARING_STATS
-          fraction++;
-          total++;
-          printf("Sharing %d out of %d\n", fraction, total);
-#endif
+        if (anchorsMatch)
           return true;
-        }
       }
     }
   }
@@ -644,10 +644,6 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
         ;
     }
   }
-#ifdef STYLE_SHARING_STATS
-  total++;
-  printf("Sharing %d out of %d\n", fraction, total);
-#endif
   return 0;
 }
 
@@ -666,6 +662,11 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e,
   initElementAndPseudoState(e);
   if (allowSharing) {
     style = locateSharedStyle();
+#ifdef STYLE_SHARING_STATS
+    fraction += style != 0;
+    total++;
+    printf("Sharing %d out of %d\n", fraction, total);
+#endif
     if (style)
       return style;
   }
