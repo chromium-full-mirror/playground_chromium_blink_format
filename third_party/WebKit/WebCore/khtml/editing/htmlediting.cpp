@@ -1607,8 +1607,10 @@ bool DeleteSelectionCommand::handleSpecialCaseBRDelete() {
   // block ended.
   bool downstreamEndIsBR = m_downstreamEnd.node()->id() == ID_BR;
   Position upstreamFromBR = m_downstreamEnd.upstream();
+  Position downstreamFromStart = m_downstreamStart.downstream();
   bool startIsBRAfterBlock =
       downstreamEndIsBR &&
+      downstreamFromStart.node() == m_downstreamEnd.node() &&
       m_downstreamEnd.node()->enclosingBlockFlowElement() !=
           upstreamFromBR.node()->enclosingBlockFlowElement();
   if (startIsBRAfterBlock) {
