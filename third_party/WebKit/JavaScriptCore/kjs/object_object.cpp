@@ -39,11 +39,13 @@ ObjectPrototypeImp::ObjectPrototypeImp(ExecState* exec,
     : ObjectImp()  // [[Prototype]] is Null()
 {
   Value protect(this);
-  put(exec, "toString", Object(new ObjectProtoFuncImp(
-                            exec, funcProto, ObjectProtoFuncImp::ToString, 0)),
+  put(exec, toStringPropertyName,
+      Object(new ObjectProtoFuncImp(exec, funcProto,
+                                    ObjectProtoFuncImp::ToString, 0)),
       DontEnum);
-  put(exec, "valueOf", Object(new ObjectProtoFuncImp(
-                           exec, funcProto, ObjectProtoFuncImp::ValueOf, 0)),
+  put(exec, valueOfPropertyName,
+      Object(new ObjectProtoFuncImp(exec, funcProto,
+                                    ObjectProtoFuncImp::ValueOf, 0)),
       DontEnum);
 }
 
@@ -56,7 +58,7 @@ ObjectProtoFuncImp::ObjectProtoFuncImp(ExecState* exec,
                                        int len)
     : InternalFunctionImp(funcProto), id(i) {
   Value protect(this);
-  put(exec, "length", Number(len), DontDelete | ReadOnly | DontEnum);
+  put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
 }
 
 bool ObjectProtoFuncImp::implementsCall() const {
@@ -83,10 +85,11 @@ ObjectObjectImp::ObjectObjectImp(ExecState* exec,
     : InternalFunctionImp(funcProto) {
   Value protect(this);
   // ECMA 15.2.3.1
-  put(exec, "prototype", Object(objProto), DontEnum | DontDelete | ReadOnly);
+  put(exec, prototypePropertyName, Object(objProto),
+      DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  put(exec, "length", Number(1), ReadOnly | DontDelete | DontEnum);
+  put(exec, lengthPropertyName, Number(1), ReadOnly | DontDelete | DontEnum);
 }
 
 bool ObjectObjectImp::implementsConstruct() const {

@@ -42,8 +42,8 @@ ErrorPrototypeImp::ErrorPrototypeImp(ExecState* exec,
 
   put(exec, "name", String("Error"), DontEnum);
   put(exec, "message", String("Unknown error"), DontEnum);
-  put(exec, "toString", Object(new ErrorProtoFuncImp(exec, funcProto)),
-      DontEnum);
+  put(exec, toStringPropertyName,
+      Object(new ErrorProtoFuncImp(exec, funcProto)), DontEnum);
 }
 
 // ------------------------------ ErrorProtoFuncImp ----------------------------
@@ -52,7 +52,7 @@ ErrorProtoFuncImp::ErrorProtoFuncImp(ExecState* exec,
                                      FunctionPrototypeImp* funcProto)
     : InternalFunctionImp(funcProto) {
   Value protect(this);
-  put(exec, "length", Number(0), DontDelete | ReadOnly | DontEnum);
+  put(exec, lengthPropertyName, Number(0), DontDelete | ReadOnly | DontEnum);
 }
 
 bool ErrorProtoFuncImp::implementsCall() const {
@@ -86,7 +86,8 @@ ErrorObjectImp::ErrorObjectImp(ExecState* exec,
     : InternalFunctionImp(funcProto) {
   Value protect(this);
   // ECMA 15.11.3.1 Error.prototype
-  put(exec, "prototype", Object(errorProto), DontEnum | DontDelete | ReadOnly);
+  put(exec, prototypePropertyName, Object(errorProto),
+      DontEnum | DontDelete | ReadOnly);
   // put(exec, "name", String(n));
 }
 
@@ -145,9 +146,9 @@ NativeErrorImp::NativeErrorImp(ExecState* exec,
   Value protect(this);
   proto = static_cast<ObjectImp*>(prot.imp());
 
-  put(exec, "length", Number(1),
+  put(exec, lengthPropertyName, Number(1),
       DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
-  put(exec, "prototype", prot);
+  put(exec, prototypePropertyName, prot);
 }
 
 bool NativeErrorImp::implementsConstruct() const {

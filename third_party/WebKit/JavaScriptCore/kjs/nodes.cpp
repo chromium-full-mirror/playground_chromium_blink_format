@@ -114,8 +114,6 @@ Value Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
 // ------------------------------ StatementNode --------------------------------
 StatementNode::StatementNode() : l0(-1), l1(-1), sid(-1), breakPoint(false) {}
 
-StatementNode::~StatementNode() {}
-
 void StatementNode::setLoc(int line0, int line1, int sourceId) {
   l0 = line0;
   l1 = line1;
@@ -211,8 +209,6 @@ Value ResolveNode::evaluate(ExecState* exec) {
 
 // ------------------------------ GroupNode ------------------------------------
 
-GroupNode::~GroupNode() {}
-
 void GroupNode::ref() {
   Node::ref();
   if (group)
@@ -231,8 +227,6 @@ Value GroupNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ ElisionNode ----------------------------------
-
-ElisionNode::~ElisionNode() {}
 
 void ElisionNode::ref() {
   Node::ref();
@@ -255,8 +249,6 @@ Value ElisionNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ ElementNode ----------------------------------
-
-ElementNode::~ElementNode() {}
 
 void ElementNode::ref() {
   Node::ref();
@@ -290,7 +282,7 @@ Value ElementNode::evaluate(ExecState* exec) {
     array = Object(static_cast<ObjectImp*>(list->evaluate(exec).imp()));
     KJS_CHECKEXCEPTIONVALUE
     val = node->evaluate(exec).getValue(exec);
-    length = array.get(exec, "length").toInt32(exec);
+    length = array.get(exec, lengthPropertyName).toInt32(exec);
   } else {
     Value newArr =
         exec->interpreter()->builtinArray().construct(exec, List::empty());
@@ -299,14 +291,12 @@ Value ElementNode::evaluate(ExecState* exec) {
     KJS_CHECKEXCEPTIONVALUE
   }
 
-  array.put(exec, UString::from(elisionLen + length), val);
+  array.put(exec, elisionLen + length, val);
 
   return array;
 }
 
 // ------------------------------ ArrayNode ------------------------------------
-
-ArrayNode::~ArrayNode() {}
 
 void ArrayNode::ref() {
   Node::ref();
@@ -334,7 +324,7 @@ Value ArrayNode::evaluate(ExecState* exec) {
   if (element) {
     array = Object(static_cast<ObjectImp*>(element->evaluate(exec).imp()));
     KJS_CHECKEXCEPTIONVALUE
-    length = opt ? array.get(exec, "length").toInt32(exec) : 0;
+    length = opt ? array.get(exec, lengthPropertyName).toInt32(exec) : 0;
   } else {
     Value newArr =
         exec->interpreter()->builtinArray().construct(exec, List::empty());
@@ -343,15 +333,13 @@ Value ArrayNode::evaluate(ExecState* exec) {
   }
 
   if (opt)
-    array.put(exec, "length", Number(elisionLen + length),
+    array.put(exec, lengthPropertyName, Number(elisionLen + length),
               DontEnum | DontDelete);
 
   return array;
 }
 
 // ------------------------------ ObjectLiteralNode ----------------------------
-
-ObjectLiteralNode::~ObjectLiteralNode() {}
 
 void ObjectLiteralNode::ref() {
   Node::ref();
@@ -374,8 +362,6 @@ Value ObjectLiteralNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ PropertyValueNode ----------------------------
-
-PropertyValueNode::~PropertyValueNode() {}
 
 void PropertyValueNode::ref() {
   Node::ref();
@@ -435,8 +421,6 @@ Value PropertyNode::evaluate(ExecState* /*exec*/) {
 
 // ------------------------------ AccessorNode1 --------------------------------
 
-AccessorNode1::~AccessorNode1() {}
-
 void AccessorNode1::ref() {
   Node::ref();
   if (expr1)
@@ -462,13 +446,14 @@ Value AccessorNode1::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
   Value v2 = e2.getValue(exec);
   Object o = v1.toObject(exec);
+  unsigned i;
+  if (v2.toUInt32(i))
+    return Reference(o, i);
   String s = v2.toString(exec);
   return Reference(o, s.value());
 }
 
 // ------------------------------ AccessorNode2 --------------------------------
-
-AccessorNode2::~AccessorNode2() {}
 
 void AccessorNode2::ref() {
   Node::ref();
@@ -497,8 +482,6 @@ ArgumentListNode::ArgumentListNode(Node* e) : list(0L), expr(e) {}
 
 ArgumentListNode::ArgumentListNode(ArgumentListNode* l, Node* e)
     : list(l), expr(e) {}
-
-ArgumentListNode::~ArgumentListNode() {}
 
 void ArgumentListNode::ref() {
   Node::ref();
@@ -542,8 +525,6 @@ List ArgumentListNode::evaluateList(ExecState* exec) {
 
 ArgumentsNode::ArgumentsNode(ArgumentListNode* l) : list(l) {}
 
-ArgumentsNode::~ArgumentsNode() {}
-
 void ArgumentsNode::ref() {
   Node::ref();
   if (list)
@@ -572,8 +553,6 @@ List ArgumentsNode::evaluateList(ExecState* exec) {
 // ------------------------------ NewExprNode ----------------------------------
 
 // ECMA 11.2.2
-
-NewExprNode::~NewExprNode() {}
 
 void NewExprNode::ref() {
   Node::ref();
@@ -618,8 +597,6 @@ Value NewExprNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ FunctionCallNode -----------------------------
-
-FunctionCallNode::~FunctionCallNode() {}
 
 void FunctionCallNode::ref() {
   Node::ref();
@@ -708,8 +685,6 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
 
 // ------------------------------ PostfixNode ----------------------------------
 
-PostfixNode::~PostfixNode() {}
-
 void PostfixNode::ref() {
   Node::ref();
   if (expr)
@@ -739,8 +714,6 @@ Value PostfixNode::evaluate(ExecState* exec) {
 
 // ------------------------------ DeleteNode -----------------------------------
 
-DeleteNode::~DeleteNode() {}
-
 void DeleteNode::ref() {
   Node::ref();
   if (expr)
@@ -757,27 +730,10 @@ bool DeleteNode::deref() {
 Value DeleteNode::evaluate(ExecState* exec) {
   Value e = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  if (e.type() != ReferenceType)
-    return Boolean(true);
-  Value b = e.getBase(exec);
-  UString n = e.getPropertyName(exec);
-
-  // The spec doesn't mention what to do if the base is null... just return true
-  if (b.type() != ObjectType) {
-    assert(b.type() == NullType);
-    return Boolean(true);
-  }
-
-  Object o = Object(static_cast<ObjectImp*>(b.imp()));
-
-  bool ret = o.deleteProperty(exec, n);
-
-  return Boolean(ret);
+  return Boolean(e.deleteValue(exec));
 }
 
 // ------------------------------ VoidNode -------------------------------------
-
-VoidNode::~VoidNode() {}
 
 void VoidNode::ref() {
   Node::ref();
@@ -801,8 +757,6 @@ Value VoidNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ TypeOfNode -----------------------------------
-
-TypeOfNode::~TypeOfNode() {}
 
 void TypeOfNode::ref() {
   Node::ref();
@@ -857,8 +811,6 @@ Value TypeOfNode::evaluate(ExecState* exec) {
 
 // ------------------------------ PrefixNode -----------------------------------
 
-PrefixNode::~PrefixNode() {}
-
 void PrefixNode::ref() {
   Node::ref();
   if (expr)
@@ -888,8 +840,6 @@ Value PrefixNode::evaluate(ExecState* exec) {
 
 // ------------------------------ UnaryPlusNode --------------------------------
 
-UnaryPlusNode::~UnaryPlusNode() {}
-
 void UnaryPlusNode::ref() {
   Node::ref();
   if (expr)
@@ -912,8 +862,6 @@ Value UnaryPlusNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ NegateNode -----------------------------------
-
-NegateNode::~NegateNode() {}
 
 void NegateNode::ref() {
   Node::ref();
@@ -941,8 +889,6 @@ Value NegateNode::evaluate(ExecState* exec) {
 
 // ------------------------------ BitwiseNotNode -------------------------------
 
-BitwiseNotNode::~BitwiseNotNode() {}
-
 void BitwiseNotNode::ref() {
   Node::ref();
   if (expr)
@@ -967,8 +913,6 @@ Value BitwiseNotNode::evaluate(ExecState* exec) {
 
 // ------------------------------ LogicalNotNode -------------------------------
 
-LogicalNotNode::~LogicalNotNode() {}
-
 void LogicalNotNode::ref() {
   Node::ref();
   if (expr)
@@ -992,8 +936,6 @@ Value LogicalNotNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ MultNode -------------------------------------
-
-MultNode::~MultNode() {}
 
 void MultNode::ref() {
   Node::ref();
@@ -1026,8 +968,6 @@ Value MultNode::evaluate(ExecState* exec) {
 
 // ------------------------------ AddNode --------------------------------------
 
-AddNode::~AddNode() {}
-
 void AddNode::ref() {
   Node::ref();
   if (term1)
@@ -1058,8 +998,6 @@ Value AddNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ ShiftNode ------------------------------------
-
-ShiftNode::~ShiftNode() {}
 
 void ShiftNode::ref() {
   Node::ref();
@@ -1108,8 +1046,6 @@ Value ShiftNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ RelationalNode -------------------------------
-
-RelationalNode::~RelationalNode() {}
 
 void RelationalNode::ref() {
   Node::ref();
@@ -1183,8 +1119,6 @@ Value RelationalNode::evaluate(ExecState* exec) {
 
 // ------------------------------ EqualNode ------------------------------------
 
-EqualNode::~EqualNode() {}
-
 void EqualNode::ref() {
   Node::ref();
   if (expr1)
@@ -1225,8 +1159,6 @@ Value EqualNode::evaluate(ExecState* exec) {
 
 // ------------------------------ BitOperNode ----------------------------------
 
-BitOperNode::~BitOperNode() {}
-
 void BitOperNode::ref() {
   Node::ref();
   if (expr1)
@@ -1266,8 +1198,6 @@ Value BitOperNode::evaluate(ExecState* exec) {
 
 // ------------------------------ BinaryLogicalNode ----------------------------
 
-BinaryLogicalNode::~BinaryLogicalNode() {}
-
 void BinaryLogicalNode::ref() {
   Node::ref();
   if (expr1)
@@ -1301,8 +1231,6 @@ Value BinaryLogicalNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ ConditionalNode ------------------------------
-
-ConditionalNode::~ConditionalNode() {}
 
 void ConditionalNode::ref() {
   Node::ref();
@@ -1341,8 +1269,6 @@ Value ConditionalNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ AssignNode -----------------------------------
-
-AssignNode::~AssignNode() {}
 
 void AssignNode::ref() {
   Node::ref();
@@ -1429,8 +1355,6 @@ Value AssignNode::evaluate(ExecState* exec) {
 
 // ------------------------------ CommaNode ------------------------------------
 
-CommaNode::~CommaNode() {}
-
 void CommaNode::ref() {
   Node::ref();
   if (expr1)
@@ -1459,8 +1383,6 @@ Value CommaNode::evaluate(ExecState* exec) {
 }
 
 // ------------------------------ StatListNode ---------------------------------
-
-StatListNode::~StatListNode() {}
 
 void StatListNode::ref() {
   Node::ref();
@@ -1518,8 +1440,6 @@ void StatListNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ AssignExprNode -------------------------------
 
-AssignExprNode::~AssignExprNode() {}
-
 void AssignExprNode::ref() {
   Node::ref();
   if (expr)
@@ -1541,8 +1461,6 @@ Value AssignExprNode::evaluate(ExecState* exec) {
 
 VarDeclNode::VarDeclNode(const UString* id, AssignExprNode* in)
     : ident(*id), init(in) {}
-
-VarDeclNode::~VarDeclNode() {}
 
 void VarDeclNode::ref() {
   Node::ref();
@@ -1589,8 +1507,6 @@ void VarDeclNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ VarDeclListNode ------------------------------
 
-VarDeclListNode::~VarDeclListNode() {}
-
 void VarDeclListNode::ref() {
   Node::ref();
   if (list)
@@ -1629,8 +1545,6 @@ void VarDeclListNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ VarStatementNode -----------------------------
 
-VarStatementNode::~VarStatementNode() {}
-
 void VarStatementNode::ref() {
   Node::ref();
   if (list)
@@ -1658,8 +1572,6 @@ void VarStatementNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ BlockNode ------------------------------------
-
-BlockNode::~BlockNode() {}
 
 void BlockNode::ref() {
   Node::ref();
@@ -1697,8 +1609,6 @@ Completion EmptyStatementNode::execute(ExecState* /*exec*/) {
 
 // ------------------------------ ExprStatementNode ----------------------------
 
-ExprStatementNode::~ExprStatementNode() {}
-
 void ExprStatementNode::ref() {
   Node::ref();
   if (expr)
@@ -1723,8 +1633,6 @@ Completion ExprStatementNode::execute(ExecState* exec) {
 }
 
 // ------------------------------ IfNode ---------------------------------------
-
-IfNode::~IfNode() {}
 
 void IfNode::ref() {
   Node::ref();
@@ -1776,8 +1684,6 @@ void IfNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ DoWhileNode ----------------------------------
 
-DoWhileNode::~DoWhileNode() {}
-
 void DoWhileNode::ref() {
   Node::ref();
   if (statement)
@@ -1826,8 +1732,6 @@ void DoWhileNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ WhileNode ------------------------------------
-
-WhileNode::~WhileNode() {}
 
 void WhileNode::ref() {
   Node::ref();
@@ -1884,8 +1788,6 @@ void WhileNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ ForNode --------------------------------------
-
-ForNode::~ForNode() {}
 
 void ForNode::ref() {
   Node::ref();
@@ -1971,8 +1873,6 @@ ForInNode::ForInNode(const UString* i,
   varDecl = new VarDeclNode(&ident, init);
   lexpr = new ResolveNode(&ident);
 }
-
-ForInNode::~ForInNode() {}
 
 void ForInNode::ref() {
   Node::ref();
@@ -2087,8 +1987,6 @@ Completion BreakNode::execute(ExecState* exec) {
 
 // ------------------------------ ReturnNode -----------------------------------
 
-ReturnNode::~ReturnNode() {}
-
 void ReturnNode::ref() {
   Node::ref();
   if (value)
@@ -2116,8 +2014,6 @@ Completion ReturnNode::execute(ExecState* exec) {
 }
 
 // ------------------------------ WithNode -------------------------------------
-
-WithNode::~WithNode() {}
 
 void WithNode::ref() {
   Node::ref();
@@ -2156,8 +2052,6 @@ void WithNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ CaseClauseNode -------------------------------
-
-CaseClauseNode::~CaseClauseNode() {}
 
 void CaseClauseNode::ref() {
   Node::ref();
@@ -2199,8 +2093,6 @@ void CaseClauseNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ ClauseListNode -------------------------------
 
-ClauseListNode::~ClauseListNode() {}
-
 void ClauseListNode::ref() {
   Node::ref();
   if (cl)
@@ -2241,8 +2133,6 @@ void ClauseListNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ CaseBlockNode --------------------------------
-
-CaseBlockNode::~CaseBlockNode() {}
 
 void CaseBlockNode::ref() {
   Node::ref();
@@ -2342,8 +2232,6 @@ void CaseBlockNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ SwitchNode -----------------------------------
 
-SwitchNode::~SwitchNode() {}
-
 void SwitchNode::ref() {
   Node::ref();
   if (expr)
@@ -2381,8 +2269,6 @@ void SwitchNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ LabelNode ------------------------------------
 
-LabelNode::~LabelNode() {}
-
 void LabelNode::ref() {
   Node::ref();
   if (statement)
@@ -2418,8 +2304,6 @@ void LabelNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ ThrowNode ------------------------------------
 
-ThrowNode::~ThrowNode() {}
-
 void ThrowNode::ref() {
   Node::ref();
   if (expr)
@@ -2447,8 +2331,6 @@ Completion ThrowNode::execute(ExecState* exec) {
 }
 
 // ------------------------------ CatchNode ------------------------------------
-
-CatchNode::~CatchNode() {}
 
 void CatchNode::ref() {
   Node::ref();
@@ -2489,8 +2371,6 @@ void CatchNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ FinallyNode ----------------------------------
 
-FinallyNode::~FinallyNode() {}
-
 void FinallyNode::ref() {
   Node::ref();
   if (block)
@@ -2513,8 +2393,6 @@ void FinallyNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ TryNode --------------------------------------
-
-TryNode::~TryNode() {}
 
 void TryNode::ref() {
   Node::ref();
@@ -2572,8 +2450,6 @@ void TryNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ ParameterNode --------------------------------
 
-ParameterNode::~ParameterNode() {}
-
 void ParameterNode::ref() {
   Node::ref();
   if (next)
@@ -2606,10 +2482,6 @@ Value ParameterNode::evaluate(ExecState* /*exec*/) {
 FunctionBodyNode::FunctionBodyNode(SourceElementsNode* s) : source(s) {
   setLoc(-1, -1, -1);
   // fprintf(stderr,"FunctionBodyNode::FunctionBodyNode %p\n",this);
-}
-
-FunctionBodyNode::~FunctionBodyNode() {
-  // fprintf(stderr,"FunctionBodyNode::~FunctionBodyNode %p\n",this);
 }
 
 void FunctionBodyNode::ref() {
@@ -2651,8 +2523,6 @@ void FunctionBodyNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ FuncDeclNode ---------------------------------
 
-FuncDeclNode::~FuncDeclNode() {}
-
 void FuncDeclNode::ref() {
   Node::ref();
   if (param)
@@ -2681,13 +2551,14 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
   //  exec->interpreter()->builtinObject().construct(exec,List::empty());
   List empty;
   Value proto = exec->interpreter()->builtinObject().construct(exec, empty);
-  func.put(exec, "prototype", proto, Internal | DontDelete);
+  func.put(exec, prototypePropertyName, proto, Internal | DontDelete);
 
   int plen = 0;
   for (ParameterNode *p = param; p != 0L; p = p->nextParam(), plen++)
     fimp->addParameter(p->ident());
 
-  func.put(exec, "length", Number(plen), ReadOnly | DontDelete | DontEnum);
+  func.put(exec, lengthPropertyName, Number(plen),
+           ReadOnly | DontDelete | DontEnum);
 
   exec->context().imp()->variableObject().put(exec, ident, func);
 
@@ -2705,8 +2576,6 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
 }
 
 // ------------------------------ FuncExprNode ---------------------------------
-
-FuncExprNode::~FuncExprNode() {}
 
 void FuncExprNode::ref() {
   Node::ref();
@@ -2731,19 +2600,18 @@ Value FuncExprNode::evaluate(ExecState* exec) {
   Value ret(fimp);
   List empty;
   Value proto = exec->interpreter()->builtinObject().construct(exec, empty);
-  fimp->put(exec, "prototype", proto, Internal | DontDelete);
+  fimp->put(exec, prototypePropertyName, proto, Internal | DontDelete);
 
   int plen = 0;
   for (ParameterNode *p = param; p != 0L; p = p->nextParam(), plen++)
     fimp->addParameter(p->ident());
-  fimp->put(exec, "length", Number(plen), ReadOnly | DontDelete | DontEnum);
+  fimp->put(exec, lengthPropertyName, Number(plen),
+            ReadOnly | DontDelete | DontEnum);
 
   return ret;
 }
 
 // ------------------------------ SourceElementNode ----------------------------
-
-SourceElementNode::~SourceElementNode() {}
 
 void SourceElementNode::ref() {
   Node::ref();
@@ -2781,8 +2649,6 @@ void SourceElementNode::processVarDecls(ExecState* exec) {
 }
 
 // ------------------------------ SourceElementsNode ---------------------------
-
-SourceElementsNode::~SourceElementsNode() {}
 
 void SourceElementsNode::ref() {
   Node::ref();
@@ -2837,8 +2703,4 @@ void SourceElementsNode::processVarDecls(ExecState* exec) {
 
 ProgramNode::ProgramNode(SourceElementsNode* s) : FunctionBodyNode(s) {
   // fprintf(stderr,"ProgramNode::ProgramNode %p\n",this);
-}
-
-ProgramNode::~ProgramNode() {
-  // fprintf(stderr,"ProgramNode::~ProgramNode %p\n",this);
 }

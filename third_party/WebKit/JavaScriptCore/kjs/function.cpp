@@ -265,7 +265,7 @@ bool DeclaredFunctionImp::implementsConstruct() const {
 // ECMA 13.2.2 [[Construct]]
 Object DeclaredFunctionImp::construct(ExecState* exec, const List& args) {
   Object proto;
-  Value p = get(exec, "prototype");
+  Value p = get(exec, prototypePropertyName);
   if (p.type() == ObjectType)
     proto = Object(static_cast<ObjectImp*>(p.imp()));
   else
@@ -302,11 +302,11 @@ ArgumentsImp::ArgumentsImp(ExecState* exec, FunctionImp* func, const List& args)
     : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
   Value protect(this);
   put(exec, "callee", Object(func), DontEnum);
-  put(exec, "length", Number(args.size()), DontEnum);
+  put(exec, lengthPropertyName, Number(args.size()), DontEnum);
   if (!args.isEmpty()) {
     ListIterator arg = args.begin();
     for (int i = 0; arg != args.end(); arg++, i++) {
-      put(exec, UString::from(i), *arg, DontEnum);
+      put(exec, i, *arg, DontEnum);
     }
   }
 }
@@ -335,7 +335,7 @@ GlobalFuncImp::GlobalFuncImp(ExecState* exec,
                              int len)
     : InternalFunctionImp(funcProto), id(i) {
   Value protect(this);
-  put(exec, "length", Number(len), DontDelete | ReadOnly | DontEnum);
+  put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
 }
 
 CodeType GlobalFuncImp::codeType() const {

@@ -32,6 +32,7 @@ class SourceStream {
 
   UString toString() const { return str; }
   SourceStream& operator<<(const KJS::UString&);
+  SourceStream& operator<<(char);
   SourceStream& operator<<(Format f);
   SourceStream& operator<<(const Node*);
 
@@ -42,6 +43,11 @@ class SourceStream {
 };
 
 using namespace KJS;
+
+SourceStream& SourceStream::operator<<(char c) {
+  str += UString(c);
+  return *this;
+}
 
 SourceStream& SourceStream::operator<<(const KJS::UString& s) {
   str += s;
