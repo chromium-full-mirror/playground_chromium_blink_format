@@ -465,6 +465,9 @@ bool RenderImage::isHeightSpecified() const {
 short RenderImage::calcReplacedWidth() const {
   // If height is specified and not width, preserve aspect ratio.
   if (isHeightSpecified() && !isWidthSpecified()) {
+    if (intrinsicHeight() == 0) {
+      return 0;
+    }
     return calcReplacedHeight() * intrinsicWidth() / intrinsicHeight();
   }
   return RenderReplaced::calcReplacedWidth();
@@ -473,6 +476,9 @@ short RenderImage::calcReplacedWidth() const {
 int RenderImage::calcReplacedHeight() const {
   // If width is specified and not height, preserve aspect ratio.
   if (isWidthSpecified() && !isHeightSpecified()) {
+    if (intrinsicWidth() == 0) {
+      return 0;
+    }
     return calcReplacedWidth() * intrinsicHeight() / intrinsicWidth();
   }
   return RenderReplaced::calcReplacedHeight();
