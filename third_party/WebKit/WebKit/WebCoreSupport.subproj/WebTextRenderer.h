@@ -10,6 +10,10 @@ typedef struct WidthEntry WidthEntry;
 typedef struct GlyphMap GlyphMap;
 typedef struct GlyphEntry GlyphEntry;
 typedef struct UnicodeGlyphMap UnicodeGlyphMap;
+typedef struct SubstituteFontWidthMap SubstituteFontWidthMap;
+
+/// Should be more than enough for normal usage.
+#define NUM_SUBSTITUTE_FONT_MAPS 10
 
 @interface WebTextRenderer : NSObject<WebCoreTextRenderer> {
   int ascent;
@@ -28,6 +32,10 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
   float ceiledSpaceWidth;
   float roundedSpaceWidth;
   float adjustedSpaceWidth;
+
+  int numSubstituteFontWidthMaps;
+  int maxSubstituteFontWidthMaps;
+  SubstituteFontWidthMap* substituteFontWidthMaps;
 
  @private
   BOOL usingPrinterFont;
