@@ -38,6 +38,11 @@
 #include "render_block.h"
 #include "render_flexbox.h"
 
+#if APPLE_CHANGES
+// For accessibility
+#include "KWQAccObjectCache.h"
+#endif
+
 #include <assert.h>
 using namespace DOM;
 using namespace khtml;
@@ -130,7 +135,7 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_relPositioned(false),
       m_paintBackground(false),
 
-      m_isAnonymous(false),
+      m_isAnonymous(node == node->getDocument()),
       m_recalcMinMax(false),
       m_isText(false),
       m_inline(true),
@@ -977,7 +982,7 @@ QString RenderObject::information() const {
     ts << "ci ";
   if (isFloating())
     ts << "fl ";
-  if (isAnonymousBox())
+  if (isAnonymous())
     ts << "an ";
   if (isRelPositioned())
     ts << "rp ";
@@ -1035,8 +1040,8 @@ void RenderObject::printTree(int indent) const {
 }
 
 void RenderObject::dump(QTextStream* stream, QString ind) const {
-  if (isAnonymousBox()) {
-    *stream << " anonymousBox";
+  if (isAnonymous()) {
+    *stream << " anonymous";
   }
   if (isFloating()) {
     *stream << " floating";
@@ -1092,9 +1097,9 @@ RenderBlock* RenderObject::createAnonymousBlock() {
   newStyle->inheritFrom(m_style);
   newStyle->setDisplay(BLOCK);
 
-  RenderBlock* newBox = new (renderArena()) RenderBlock(0 /* anonymous box */);
+  RenderBlock* newBox =
+      new (renderArena()) RenderBlock(document() /* anonymous box */);
   newBox->setStyle(newStyle);
-  newBox->setIsAnonymousBox(true);
   return newBox;
 }
 
@@ -1393,22 +1398,27 @@ void RenderObject::removeFromObjectLists() {
   }
 }
 
-DOM::DocumentImpl* RenderObject::document() const {
-  DOM::NodeImpl* elt = element();
-  RenderObject* current = parent();
-  while (!elt && current) {
-    elt = current->element();
-    current = current->parent();
-  }
-  return elt ? elt->getDocument() : 0;
-}
-
 RenderArena* RenderObject::renderArena() const {
   DOM::DocumentImpl* doc = document();
   return doc ? doc->renderArena() : 0;
 }
 
-void RenderObject::detach(RenderArena* renderArena) {
+void RenderObject::remove() {
+#if APPLE_CHANGES
+  // Delete our accessibility object if we have one.
+  KWQAccObjectCache* cache = document()->getExistingAccObjectCache();
+  if (cache)
+    cache->detach(this);
+#endif
+
+  removeFromObjectLists();
+
+  if (parent())
+    // have parent, take care of the tree integrity
+    parent()->removeChild(this);
+}
+
+void RenderObject::detach() {
 #ifndef INCREMENTAL_REPAINTING
   // If we're an overflow:hidden object that currently needs layout, we need
   // to make sure the view isn't holding on to us.
@@ -1421,10 +1431,8 @@ void RenderObject::detach(RenderArena* renderArena) {
 
   remove();
 
-  m_next = m_previous = 0;
-
   // by default no refcounting
-  arenaDelete(renderArena, this);
+  arenaDelete(document()->renderArena(), this);
 }
 
 void RenderObject::arenaDelete(RenderArena* arena, void* base) {

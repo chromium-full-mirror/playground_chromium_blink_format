@@ -30,6 +30,7 @@
 #include "render_text.h"
 #include "render_image.h"
 #include "render_canvas.h"
+#include "xml/dom_docimpl.h"
 
 #include <kdebug.h>
 #include <assert.h>
@@ -43,21 +44,21 @@ RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderObject(node) {
 
 RenderContainer::~RenderContainer() {}
 
-void RenderContainer::detach(RenderArena* renderArena) {
+void RenderContainer::detach() {
   if (continuation())
-    continuation()->detach(renderArena);
+    continuation()->detach();
 
   RenderObject* next;
   for (RenderObject* n = m_first; n; n = next) {
     n->removeFromObjectLists();
     n->setParent(0);
     next = n->nextSibling();
-    n->detach(renderArena);
+    n->detach();
   }
   m_first = 0;
   m_last = 0;
 
-  RenderObject::detach(renderArena);
+  RenderObject::detach();
 }
 
 bool RenderContainer::canHaveChildren() const {
@@ -128,16 +129,15 @@ void RenderContainer::addChild(RenderObject* newChild,
     RenderTable* table;
     if (!beforeChild)
       beforeChild = lastChild();
-    if (beforeChild && beforeChild->isAnonymousBox() && beforeChild->isTable())
+    if (beforeChild && beforeChild->isAnonymous() && beforeChild->isTable())
       table = static_cast<RenderTable*>(beforeChild);
     else {
       // kdDebug( 6040 ) << "creating anonymous table" << endl;
-      table = new (renderArena()) RenderTable(0 /* is anonymous */);
+      table = new (renderArena()) RenderTable(document() /* is anonymous */);
       RenderStyle* newStyle = new RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(TABLE);
       table->setStyle(newStyle);
-      table->setIsAnonymousBox(true);
       addChild(table, beforeChild);
     }
     table->addChild(newChild);
@@ -317,17 +317,18 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
   for (ContentData* contentData = pseudo->contentData(); contentData;
        contentData = contentData->_nextContent) {
     if (!pseudoContainer)
-      pseudoContainer =
-          RenderFlow::createFlow(0, pseudo, renderArena()); /* anonymous box */
+      pseudoContainer = RenderFlow::createAnonymousFlow(
+          document(), pseudo); /* anonymous box */
 
     if (contentData->contentType() == CONTENT_TEXT) {
-      RenderText* t = new (renderArena())
-          RenderText(0 /*anonymous object */, contentData->contentText());
+      RenderText* t = new (renderArena()) RenderText(
+          document() /*anonymous object */, contentData->contentText());
       t->setStyle(pseudo);
       pseudoContainer->addChild(t);
       t->close();
     } else if (contentData->contentType() == CONTENT_OBJECT) {
-      RenderImage* img = new (renderArena()) RenderImage(0);
+      RenderImage* img =
+          new (renderArena()) RenderImage(document()); /* Anonymous object */
       RenderStyle* style = new RenderStyle();
       style->inheritFrom(pseudo);
       img->setStyle(style);
@@ -378,8 +379,7 @@ void RenderContainer::insertChildNode(RenderObject* child,
   }
 
   KHTMLAssert(!child->parent());
-  while (beforeChild->parent() != this &&
-         beforeChild->parent()->isAnonymousBox())
+  while (beforeChild->parent() != this && beforeChild->parent()->isAnonymous())
     beforeChild = beforeChild->parent();
   KHTMLAssert(beforeChild->parent() == this);
 
@@ -424,7 +424,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
   while (child) {
     RenderObject* next = child->nextSibling();
 
-    if (child->isRenderBlock() && child->isAnonymousBox() &&
+    if (child->isRenderBlock() && child->isAnonymous() &&
         !child->continuation() && !child->childrenInline() &&
         !child->isTableCell()) {
       RenderObject* firstAnChild = child->firstChild();
@@ -459,7 +459,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
         c->m_first = 0;
         c->m_next = 0;
       }
-      child->detach(renderArena());
+      child->detach();
     }
     child = next;
   }

@@ -128,7 +128,7 @@ RenderWidget::RenderWidget(DOM::NodeImpl* node)
   ref();
 }
 
-void RenderWidget::detach(RenderArena* renderArena) {
+void RenderWidget::detach() {
   remove();
 
   if (m_widget) {
@@ -139,9 +139,9 @@ void RenderWidget::detach(RenderArena* renderArena) {
     m_widget->setMouseTracking(false);
   }
 
-  m_node = 0;
-
-  deref(renderArena);
+  RenderArena* arena = renderArena();
+  setNode(0);
+  deref(arena);
 }
 
 RenderWidget::~RenderWidget() {

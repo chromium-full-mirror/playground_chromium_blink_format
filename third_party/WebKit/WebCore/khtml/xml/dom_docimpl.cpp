@@ -69,6 +69,10 @@
 
 #include <kio/job.h>
 
+#if APPLE_CHANGES
+#include "KWQAccObjectCache.h"
+#endif
+
 using namespace DOM;
 using namespace khtml;
 
@@ -251,6 +255,10 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_view = v;
   m_renderArena = 0;
 
+#if APPLE_CHANGES
+  m_accCache = 0;
+#endif
+
   if (v) {
     m_docLoader = new DocLoader(v->part(), this);
     setPaintDevice(m_view);
@@ -353,6 +361,13 @@ DocumentImpl::~DocumentImpl() {
     delete m_renderArena;
     m_renderArena = 0;
   }
+
+#if APPLE_CHANGES
+  if (m_accCache) {
+    delete m_accCache;
+    m_accCache = 0;
+  }
+#endif
 
   if (m_decoder) {
     m_decoder->deref();
@@ -1065,7 +1080,7 @@ void DocumentImpl::detach() {
   NodeBaseImpl::detach();
 
   if (render)
-    render->detach(m_renderArena);
+    render->detach();
 
   if (m_paintDevice == m_view)
     setPaintDevice(0);
@@ -1076,6 +1091,14 @@ void DocumentImpl::detach() {
     m_renderArena = 0;
   }
 }
+
+#if APPLE_CHANGES
+KWQAccObjectCache* DocumentImpl::getOrCreateAccObjectCache() {
+  if (!m_accCache)
+    m_accCache = new KWQAccObjectCache;
+  return m_accCache;
+}
+#endif
 
 void DocumentImpl::setVisuallyOrdered() {
   visuallyOrdered = true;

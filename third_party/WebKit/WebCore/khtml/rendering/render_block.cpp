@@ -74,12 +74,11 @@ void RenderBlock::setStyle(RenderStyle* _style) {
   // non inherited properties
   RenderObject* child = firstChild();
   while (child != 0) {
-    if (child->isAnonymousBox()) {
+    if (child->isAnonymous()) {
       RenderStyle* newStyle = new RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(BLOCK);
       child->setStyle(newStyle);
-      child->setIsAnonymousBox(true);
     }
     child = child->nextSibling();
   }
@@ -121,8 +120,8 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       pseudoStyle->setPosition(
           STATIC);  // CSS2 says first-letter can't be positioned.
 
-      RenderObject* firstLetter = RenderFlow::createFlow(
-          0, pseudoStyle, renderArena());  // anonymous box
+      RenderObject* firstLetter = RenderFlow::createAnonymousFlow(
+          document(), pseudoStyle);  // anonymous box
       firstLetterContainer->addChild(firstLetter,
                                      firstLetterContainer->firstChild());
 
@@ -139,7 +138,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
         newTextChild->setText(oldText->substring(length, oldText->l - length));
 
         RenderText* letter = new (renderArena())
-            RenderText(newTextChild->element(), oldText->substring(0, length));
+            RenderText(newTextChild->node(), oldText->substring(0, length));
         RenderStyle* newStyle = new RenderStyle();
         newStyle->inheritFrom(pseudoStyle);
         letter->setStyle(newStyle);
@@ -156,7 +155,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
   // just insert the child into the anonymous block box instead of here.
   if (beforeChild && beforeChild->parent() != this) {
     KHTMLAssert(beforeChild->parent());
-    KHTMLAssert(beforeChild->parent()->isAnonymousBox());
+    KHTMLAssert(beforeChild->parent()->isAnonymous());
 
     if (newChild->isInline()) {
       beforeChild->parent()->addChild(newChild, beforeChild);
@@ -191,7 +190,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
 
     if (beforeChild && beforeChild->parent() != this) {
       beforeChild = beforeChild->parent();
-      KHTMLAssert(beforeChild->isAnonymousBox());
+      KHTMLAssert(beforeChild->isAnonymous());
       KHTMLAssert(beforeChild->parent() == this);
     }
   } else if (!m_childrenInline && !newChild->isFloatingOrPositioned()) {
@@ -204,13 +203,13 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
     if (newChild->isInline()) {
       if (beforeChild) {
         if (beforeChild->previousSibling() &&
-            beforeChild->previousSibling()->isAnonymousBox()) {
+            beforeChild->previousSibling()->isAnonymous()) {
           beforeChild->previousSibling()->addChild(newChild);
           newChild->setNeedsLayoutAndMinMaxRecalc();
           return;
         }
       } else {
-        if (m_last && m_last->isAnonymousBox()) {
+        if (m_last && m_last->isAnonymous()) {
           m_last->addChild(newChild);
           newChild->setNeedsLayoutAndMinMaxRecalc();
           return;
@@ -230,7 +229,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       // then it needs to be closed.
       // ### get rid of the closing thing altogether this will only work during
       // initial parsing
-      if (lastChild() && lastChild()->isAnonymousBox()) {
+      if (lastChild() && lastChild()->isAnonymous()) {
         lastChild()->close();
       }
     }
@@ -329,8 +328,8 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   RenderObject* next = oldChild->nextSibling();
   bool mergedBlocks = false;
   if (!isInline() && !oldChild->isInline() && !oldChild->continuation() &&
-      prev && prev->isAnonymousBox() && prev->childrenInline() && next &&
-      next->isAnonymousBox() && next->childrenInline()) {
+      prev && prev->isAnonymous() && prev->childrenInline() && next &&
+      next->isAnonymous() && next->childrenInline()) {
     // Take all the children out of the |next| block and put them in
     // the |prev| block.
     RenderObject* o = next->firstChild();
@@ -343,7 +342,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     prev->setNeedsLayoutAndMinMaxRecalc();
 
     // Nuke the now-empty block.
-    next->detach(renderArena());
+    next->detach();
 
     mergedBlocks = true;
   }
@@ -366,7 +365,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     }
 
     // Nuke the now-empty block.
-    anonBlock->detach(renderArena());
+    anonBlock->detach();
   }
 }
 
@@ -463,8 +462,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     relayoutChildren = true;
 
 //     kdDebug( 6040 ) << floatingObjects << "," << oldWidth << ","
-//                     << m_width << ","<< needsLayout() << "," <<
-//                     isAnonymousBox() << ","
+//                     << m_width << ","<< needsLayout() << "," << isAnonymous()
+//                     << ","
 //                     << overhangingContents() << "," << isPositioned() <<
 //                     endl;
 
@@ -799,7 +798,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       RenderObject* curr = next;
       while (curr && curr->isFloatingOrPositioned())
         curr = curr->nextSibling();
-      if (curr && curr->isRenderBlock() && !curr->isAnonymousBox() &&
+      if (curr && curr->isRenderBlock() && !curr->isAnonymous() &&
           !curr->isCompact() && !curr->isRunIn()) {
         curr->calcWidth();  // So that horizontal margins are correct.
         // Need to compute margins for the child as though it is a block.
@@ -844,7 +843,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       while (curr && curr->isFloatingOrPositioned())
         curr = curr->nextSibling();
       if (curr &&
-          (curr->isRenderBlock() && !curr->isAnonymousBox() &&
+          (curr->isRenderBlock() && !curr->isAnonymous() &&
            curr->childrenInline() && !curr->isCompact() && !curr->isRunIn())) {
         // The block acts like an inline, so just null out its
         // position.
@@ -1396,7 +1395,7 @@ void RenderBlock::paintObject(QPainter* p,
 
 #ifdef BOX_DEBUG
   if (style() && style()->visibility() == VISIBLE) {
-    if (isAnonymousBox())
+    if (isAnonymous())
       outlineBox(p, _tx, _ty, "green");
     if (isFloating())
       outlineBox(p, _tx, _ty, "yellow");
@@ -2653,7 +2652,7 @@ const char* RenderBlock::renderName() const {
     return "RenderBlock (floating)";
   if (isPositioned())
     return "RenderBlock (positioned)";
-  if (isAnonymousBox())
+  if (isAnonymous())
     return "RenderBlock (anonymous)";
   if (isRelPositioned())
     return "RenderBlock (relative positioned)";

@@ -113,13 +113,15 @@ RenderBox::~RenderBox() {
   // endl;
 }
 
-void RenderBox::detach(RenderArena* renderArena) {
+void RenderBox::detach() {
   RenderLayer* layer = m_layer;
 
-  RenderContainer::detach(renderArena);
+  RenderArena* arena = renderArena();
+
+  RenderContainer::detach();
 
   if (layer)
-    layer->detach(renderArena);
+    layer->detach(arena);
 }
 
 short RenderBox::contentWidth() const {

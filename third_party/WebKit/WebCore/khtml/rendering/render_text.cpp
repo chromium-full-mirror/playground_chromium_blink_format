@@ -359,20 +359,19 @@ RenderText::~RenderText() {
     str->deref();
 }
 
-void RenderText::detach(RenderArena* renderArena) {
-  deleteRuns(renderArena);
-  RenderObject::detach(renderArena);
+void RenderText::detach() {
+  deleteRuns();
+  RenderObject::detach();
 }
 
-void RenderText::deleteRuns(RenderArena* arena) {
+void RenderText::deleteRuns() {
   // this is a slight variant of QArray::clear().
   // We don't delete the array itself here because its
   // likely to be used in the same size later again, saves
   // us resize() calls
   unsigned int len = m_lines.size();
   if (len) {
-    if (!arena)
-      arena = renderArena();
+    RenderArena* arena = renderArena();
     for (unsigned int i = 0; i < len; i++) {
       InlineTextBox* s = m_lines.at(i);
       if (s)
