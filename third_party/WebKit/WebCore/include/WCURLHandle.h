@@ -23,6 +23,10 @@
 
 @end
 
+@protocol WCHTTPURLHandle
+- (NSString*)responseHeaderForKey:(NSString*)key;
+@end
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
