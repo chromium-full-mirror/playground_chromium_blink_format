@@ -33,7 +33,7 @@
 + (int)objectCount;
 + (int)noGCAllowedObjectCount;
 + (int)referencedObjectCount;
-+ (NSSet*)liveObjectClasses;
++ (NSSet*)rootObjectClasses;
 
 + (void)garbageCollect;
 

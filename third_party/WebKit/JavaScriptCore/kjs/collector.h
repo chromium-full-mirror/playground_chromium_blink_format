@@ -23,12 +23,6 @@
 #ifndef _KJSCOLLECTOR_H_
 #define _KJSCOLLECTOR_H_
 
-#if APPLE_CHANGES
-#if !defined(__OBJC__) && !defined(_COLLECTOR)
-typedef void* CFSetRef;
-#endif
-#endif
-
 #define KJS_MEM_LIMIT 500000
 
 namespace KJS {
@@ -71,7 +65,7 @@ class Collector {
   static int numInterpreters();
   static int numGCNotAllowedObjects();
   static int numReferencedObjects();
-  static CFSetRef liveObjectClasses();
+  static const void* rootObjectClasses();  // actually returns CFSetRef
 #endif
  private:
   static bool memoryFull;
