@@ -4022,7 +4022,9 @@ void ReplaceSelectionCommand::doApply() {
     // Empty document. Merge neither start nor end.
     mergeStart = mergeEnd = false;
   } else {
-    mergeStart = !isStartOfParagraph(visibleStart);
+    mergeStart = !isStartOfParagraph(visibleStart) ||
+                 (!m_fragment.hasInterchangeNewline() &&
+                  !m_fragment.hasMoreThanOneBlock());
     mergeEnd = !m_fragment.hasInterchangeNewline() &&
                m_fragment.hasMoreThanOneBlock() &&
                !isEndOfParagraph(visibleEnd);
