@@ -139,9 +139,7 @@ typedef enum {
    requested but failed.
     @param frame The frame in which the policy could not be implemented.
 */
-- (void)unableToImplementPolicy:(WebPolicyAction)policy
-                          error:(WebError*)error
-                         forURL:(NSURL*)URL
-                        inFrame:(WebFrame*)frame;
+- (void)unableToImplementPolicyWithError:(WebError*)error
+                                 inFrame:(WebFrame*)frame;
 
 @end
