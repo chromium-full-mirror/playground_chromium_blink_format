@@ -56,15 +56,6 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
   instance = i;
 }
 
-RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i,
-                                   const Value& fb,
-                                   bool oi)
-    : ObjectImp((ObjectImp*)0) {
-  ownsInstance = oi;
-  instance = i;
-  fallback = fb;
-}
-
 Value RuntimeObjectImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
   Value result = Undefined();
@@ -86,11 +77,6 @@ Value RuntimeObjectImp::get(ExecState* exec,
           aClass->methodsNamed(propertyName.ascii(), instance);
       if (methodList.length() > 0) {
         result = Object(new RuntimeMethodImp(exec, propertyName, methodList));
-      } else if (!fallback.isNull() && fallback.type() == ObjectType) {
-        ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-        imp->setForwardingScriptMessage(true);
-        result = imp->get(exec, propertyName);
-        imp->setForwardingScriptMessage(false);
       }
     }
 
@@ -117,25 +103,7 @@ void RuntimeObjectImp::put(ExecState* exec,
   if (aField) {
     getInternalInstance()->setValueOfField(exec, aField, value);
   } else {
-    bool domHasProperty = false;
-    if (!fallback.isNull() && fallback.type() == ObjectType) {
-      ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-      imp->setForwardingScriptMessage(true);
-      domHasProperty = imp->hasProperty(exec, propertyName);
-      imp->setForwardingScriptMessage(false);
-    }
-
-    // If the DOM has the property, give it a crack first (even if it
-    // read-only).
-    if (domHasProperty ||
-        !getInternalInstance()->supportsSetValueOfUndefinedField()) {
-      ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-      imp->setForwardingScriptMessage(true);
-      imp->put(exec, propertyName, value, attr);
-      imp->setForwardingScriptMessage(false);
-    }
-    // Now let the runtime object attempt to handle the undefined field.
-    else if (getInternalInstance()->supportsSetValueOfUndefinedField()) {
+    if (getInternalInstance()->supportsSetValueOfUndefinedField()) {
       getInternalInstance()->setValueOfUndefinedField(exec, propertyName,
                                                       value);
     }
@@ -157,13 +125,6 @@ bool RuntimeObjectImp::canPut(ExecState* exec,
 
   if (aField)
     return true;
-
-  if (!fallback.isNull() && fallback.type() == ObjectType) {
-    ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-    imp->setForwardingScriptMessage(true);
-    result = imp->canPut(exec, propertyName);
-    imp->setForwardingScriptMessage(false);
-  }
 
   return result;
 }
@@ -189,13 +150,6 @@ bool RuntimeObjectImp::hasProperty(ExecState* exec,
   if (methodList.length() > 0)
     return true;
 
-  if (!fallback.isNull() && fallback.type() == ObjectType) {
-    ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-    imp->setForwardingScriptMessage(true);
-    result = imp->hasProperty(exec, propertyName);
-    imp->setForwardingScriptMessage(false);
-  }
-
   return result;
 }
 
@@ -210,14 +164,7 @@ Value RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
 
   instance->begin();
 
-  if (!fallback.isNull() && fallback.type() == ObjectType) {
-    ObjectImp* imp = static_cast<ObjectImp*>(fallback.imp());
-    imp->setForwardingScriptMessage(true);
-    result = imp->defaultValue(exec, hint);
-    imp->setForwardingScriptMessage(false);
-  } else {
-    result = getInternalInstance()->defaultValue(hint);
-  }
+  result = getInternalInstance()->defaultValue(hint);
 
   instance->end();
 
