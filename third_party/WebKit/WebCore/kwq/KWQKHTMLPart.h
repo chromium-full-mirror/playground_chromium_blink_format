@@ -155,6 +155,7 @@ class KWQKHTMLPart : public KHTMLPart {
   using KHTMLPart::xmlDocImpl;
   khtml::RenderObject* renderer();
   void forceLayout();
+  void forceLayoutForPageWidth(float pageWidth);
   void paint(QPainter*, const QRect&);
   void paintSelectionOnly(QPainter* p, const QRect& rect);
 

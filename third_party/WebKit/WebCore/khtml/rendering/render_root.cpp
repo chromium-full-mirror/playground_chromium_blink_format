@@ -143,8 +143,16 @@ void RenderRoot::layout() {
 
   RenderBlock::layout();
 
+#ifdef APPLE_CHANGES
+  // always do the resizeContents, since we need the view to change size for
+  // Cocoa builtin
+  // pagination to work
+  m_view->resizeContents(docWidth(), docHeight());
+  if (!m_printingMode) {
+#else
   if (!m_printingMode) {
     m_view->resizeContents(docWidth(), docHeight());
+#endif
     setWidth(m_viewportWidth = m_view->visibleWidth());
     setHeight(m_viewportHeight = m_view->visibleHeight());
   }
