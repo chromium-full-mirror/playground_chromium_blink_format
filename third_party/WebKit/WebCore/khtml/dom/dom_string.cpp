@@ -26,7 +26,15 @@
 using namespace DOM;
 
 DOMString::DOMString(const QChar* str, uint len) {
-  impl = new DOMStringImpl(str, len);
+  if (!str) {
+    impl = 0;
+    return;
+  }
+
+  if (len == 0)
+    impl = DOMStringImpl::empty();
+  else
+    impl = new DOMStringImpl(str, len);
   impl->ref();
 }
 
@@ -36,7 +44,10 @@ DOMString::DOMString(const QString& str) {
     return;
   }
 
-  impl = new DOMStringImpl(str.unicode(), str.length());
+  if (str.isEmpty())
+    impl = DOMStringImpl::empty();
+  else
+    impl = new DOMStringImpl(str.unicode(), str.length());
   impl->ref();
 }
 
@@ -46,7 +57,11 @@ DOMString::DOMString(const char* str) {
     return;
   }
 
-  impl = new DOMStringImpl(str);
+  int l = strlen(str);
+  if (l == 0)
+    impl = DOMStringImpl::empty();
+  else
+    impl = new DOMStringImpl(str, l);
   impl->ref();
 }
 
