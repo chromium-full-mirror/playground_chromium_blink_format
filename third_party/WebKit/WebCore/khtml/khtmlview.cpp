@@ -331,6 +331,8 @@ void KHTMLView::resizeEvent(QResizeEvent* e) {
   KApplication::sendPostedEvents(viewport(), QEvent::Paint);
 }
 
+#ifndef APPLE_CHANGES
+
 // this is to get rid of a compiler virtual overload mismatch warning. do not
 // remove
 void KHTMLView::drawContents(QPainter*) {}
@@ -368,6 +370,8 @@ void KHTMLView::drawContents(QPainter* p, int ex, int ey, int ew, int eh) {
   khtml::DrawContentsEvent event(p, ex, ey, ew, eh);
   QApplication::sendEvent(m_part, &event);
 }
+
+#endif  // !APPLE_CHANGES
 
 void KHTMLView::setMarginWidth(int w) {
   // make it update the rendering area when set
@@ -1000,6 +1004,7 @@ QString KHTMLView::mediaType() const {
 }
 
 #ifndef APPLE_CHANGES
+
 void KHTMLView::print() {
   if (!m_part->xmlDocImpl())
     return;
@@ -1107,7 +1112,6 @@ void KHTMLView::print() {
   }
   delete printer;
 }
-#endif  // !APPLE_CHANGES
 
 void KHTMLView::slotPaletteChanged() {
   if (!m_part->xmlDocImpl())
@@ -1156,6 +1160,8 @@ void KHTMLView::paint(QPainter* p, const QRect& rc, int yOff, bool* more) {
   root->setPrintingMode(false);
   m_part->xmlDocImpl()->setPaintDevice(this);
 }
+
+#endif  // !APPLE_CHANGES
 
 void KHTMLView::useSlowRepaints() {
   kdDebug(0) << "slow repaints requested" << endl;

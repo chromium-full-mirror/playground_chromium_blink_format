@@ -431,6 +431,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     setLayouted(false);
   }
 
+#ifndef APPLE_CHANGES
   if (m_resizing || evt->id() == EventImpl::MOUSEUP_EVENT) {
     QPainter paint(root()->view());
     paint.setPen(Qt::gray);
@@ -453,6 +454,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     }
     m_oldpos = p;
   }
+#endif
 
   return res;
 }

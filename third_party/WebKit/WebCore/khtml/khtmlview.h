@@ -152,17 +152,19 @@ class KHTMLView : public QScrollView {
 
 #ifdef APPLE_CHANGES
  public:
-#endif /* APPLE_CHANGES */
+#endif
   virtual void resizeEvent(QResizeEvent* event);
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
   virtual bool focusNextPrevChild(bool next);
+#ifndef APPLE_CHANGES
   virtual void drawContents(QPainter* p,
                             int clipx,
                             int clipy,
                             int clipw,
                             int cliph);
   virtual void drawContents(QPainter*);
+#endif
 
   virtual void viewportMousePressEvent(QMouseEvent*);
   virtual void focusOutEvent(QFocusEvent*);
@@ -195,6 +197,7 @@ class KHTMLView : public QScrollView {
 
   void scheduleRepaint(int x, int y, int w, int h);
 
+#ifndef APPLE_CHANGES
   /**
    * Paints the HTML document to a QPainter.
    * The document will be scaled to match the width of
@@ -204,6 +207,7 @@ class KHTMLView : public QScrollView {
    * beyond the rc or false if everything below yOff was painted.
    **/
   void paint(QPainter* p, const QRect& rc, int yOff = 0, bool* more = 0);
+#endif
 
   /**
    * Get/set the CSS Media Type.

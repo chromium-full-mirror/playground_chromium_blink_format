@@ -96,4 +96,5 @@
 - (void)_addError:(IFError*)error forResource:(NSString*)resourceDescription;
 + (NSMutableDictionary*)_repTypes;
 + (BOOL)_canShowMIMEType:(NSString*)MIMEType;
+- (void)_removeFromFrame;
 @end

@@ -1493,11 +1493,15 @@ void KHTMLPart::end() {
 #endif
 }
 
+#ifndef APPLE_CHANGES
+
 void KHTMLPart::paint(QPainter* p, const QRect& rc, int yOff, bool* more) {
   if (!d->m_view)
     return;
   d->m_view->paint(p, rc, yOff, more);
 }
+
+#endif
 
 void KHTMLPart::stopAnimations() {
 #ifndef APPLE_CHANGES

@@ -80,4 +80,10 @@ class QPixmap : public QPaintDevice, public Qt {
   friend class QPainter;
 };
 
+class QWMatrix {
+ public:
+  QWMatrix() {}
+  QWMatrix& scale(double, double) { return *this; }
+};
+
 #endif

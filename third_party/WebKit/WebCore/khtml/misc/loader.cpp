@@ -494,6 +494,9 @@ void CachedImage::deref(CachedObjectClient* c) {
 #define BGMINHEIGHT 32
 
 const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
+#ifdef APPLE_CHANGES
+  return pixmap();
+#else
   static QRgb bgTransparant = qRgba(0, 0, 0, 0xFF);
   if ((bgColor != bgTransparant) && (bgColor != newc.rgb())) {
     delete bg;
@@ -530,7 +533,6 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
       if (isvalid)
         p.fillRect(0, 0, w, r.height(), newc);
       p.drawTiledPixmap(0, 0, w, r.height(), pix);
-#ifndef APPLE_CHANGES
       if (!isvalid && pix.mask()) {
         // unfortunately our anti-transparency trick doesn't work here
         // we need to create a mask.
@@ -540,7 +542,6 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
         bg->setMask(newmask);
         bgColor = bgTransparant;
       } else
-#endif
         bgColor = newc.rgb();
       pix = *bg;
     }
@@ -551,7 +552,6 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
       if (isvalid)
         p.fillRect(0, 0, w, h, newc);
       p.drawTiledPixmap(0, 0, w, h, pix);
-#ifndef APPLE_CHANGES
       if (!isvalid && pix.mask()) {
         // unfortunately our anti-transparency trick doesn't work here
         // we need to create a mask.
@@ -561,13 +561,13 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
         bg->setMask(newmask);
         bgColor = bgTransparant;
       } else
-#endif
         bgColor = newc.rgb();
     }
     return *bg;
   }
 
   return r;
+#endif
 }
 
 const QPixmap& CachedImage::pixmap() const {

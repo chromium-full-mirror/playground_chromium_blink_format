@@ -11,7 +11,7 @@
 @interface IFCache : NSObject {
 }
 
-+ (NSArray*)getStatistics;
++ (NSArray*)statistics;
 + (void)empty;
 + (void)setDisabled:(BOOL)disabled;
 
