@@ -181,6 +181,7 @@ class KWQKHTMLPart : public KHTMLPart {
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
+  virtual void khtmlMouseMoveEvent(khtml::MouseMoveEvent*);
   virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent*);
 
   static int buttonForCurrentEvent();
