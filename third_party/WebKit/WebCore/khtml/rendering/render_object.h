@@ -70,7 +70,9 @@ class RenderArena;
  */
 
 typedef enum {
-  PaintActionBackground = 0,
+  PaintActionElementBackground = 0,
+  PaintActionChildBackground,
+  PaintActionChildBackgrounds,
   PaintActionFloat,
   PaintActionForeground,
   PaintActionSelection
@@ -415,6 +417,7 @@ class RenderObject : public CachedObjectClient {
   // and overURL for the given position
   // if readonly == false, it will recalc hover styles accordingly
   class NodeInfo {
+    friend class RenderLayer;
     friend class RenderImage;
     friend class RenderText;
     friend class RenderInline;

@@ -206,8 +206,10 @@ void RenderRoot::paintObject(QPainter* p,
                 << ")" << endl;
 #endif
   // 1. paint background, borders etc
-  if (paintAction == PaintActionBackground)
+  if (paintAction == PaintActionElementBackground) {
     paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
+    return;
+  }
 
   // 2. paint contents
   RenderObject* child = firstChild();
