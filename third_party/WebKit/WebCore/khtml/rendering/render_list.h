@@ -102,7 +102,6 @@ class RenderListItem : public RenderFlow {
   long value() const { return m_marker->m_value; }
   void setValue(long v) { predefVal = v; }
   void calcListValue();
-  bool checkChildren() const;
 
   virtual void paint(QPainter* p,
                      int x,
