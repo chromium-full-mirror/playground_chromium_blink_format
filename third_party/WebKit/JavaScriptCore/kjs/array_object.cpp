@@ -101,7 +101,7 @@ void ArrayInstanceImp::put(ExecState* exec,
                            const Value& value,
                            int attr) {
   if (propertyName == lengthPropertyName) {
-    setLength(value.toUInt32(exec));
+    setLength(value.toUInt32(exec), exec);
     return;
   }
 
@@ -109,7 +109,7 @@ void ArrayInstanceImp::put(ExecState* exec,
   unsigned index = propertyName.toULong(&ok);
   if (ok) {
     if (length <= index)
-      setLength(index + 1);
+      setLength(index + 1, exec);
     if (index < storageLength) {
       storage[index] = value.imp();
       return;
@@ -124,7 +124,7 @@ void ArrayInstanceImp::put(ExecState* exec,
                            const Value& value,
                            int attr) {
   if (length <= index)
-    setLength(index + 1);
+    setLength(index + 1, exec);
   if (index < storageLength) {
     storage[index] = value.imp();
     return;
@@ -169,7 +169,7 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec,
     return false;
 
   bool ok;
-  unsigned index = propertyName.toULong(&ok);
+  uint32_t index = propertyName.toUInt32(&ok);
   if (ok) {
     if (index >= length)
       return true;
@@ -193,24 +193,41 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec, unsigned index) {
   return ObjectImp::deleteProperty(exec, Identifier::from(index));
 }
 
-void ArrayInstanceImp::setLength(unsigned newLength) {
-  if (newLength <= sparseArrayCutoff || newLength == length + 1) {
-    if (newLength < storageLength) {
-      memset(storage + newLength, 0,
-             sizeof(ValueImp*) * (storageLength - newLength));
-    }
-    if (newLength > capacity) {
-      unsigned newCapacity = (newLength * 3 + 1) / 2;
-      storage = (ValueImp**)realloc(storage, newCapacity * sizeof(ValueImp*));
-      memset(storage + capacity, 0,
-             sizeof(ValueImp*) * (newCapacity - capacity));
-      capacity = newCapacity;
-    }
-    storageLength = newLength;
+void ArrayInstanceImp::resizeStorage(unsigned newLength) {
+  if (newLength < storageLength) {
+    memset(storage + newLength, 0,
+           sizeof(ValueImp*) * (storageLength - newLength));
+  }
+  if (newLength > capacity) {
+    unsigned newCapacity = (newLength * 3 + 1) / 2;
+    storage = (ValueImp**)realloc(storage, newCapacity * sizeof(ValueImp*));
+    memset(storage + capacity, 0, sizeof(ValueImp*) * (newCapacity - capacity));
+    capacity = newCapacity;
+  }
+  storageLength = newLength;
+}
+
+void ArrayInstanceImp::setLength(unsigned newLength, ExecState* exec) {
+  if (newLength <= MAX(sparseArrayCutoff, storageLength) ||
+      newLength == length + 1) {
+    resizeStorage(newLength);
   }
 
-  // FIXME: Need to remove items from the property map when making a sparse
-  // list shorter.
+  if (newLength < length) {
+    ReferenceList sparseProperties;
+
+    _prop.addSparseArrayPropertiesToReferenceList(sparseProperties,
+                                                  Object(this));
+
+    ReferenceListIterator it = sparseProperties.begin();
+    while (it != sparseProperties.end()) {
+      Reference ref = it++;
+      bool ok;
+      if (ref.getPropertyName(exec).toULong(&ok) > newLength) {
+        ref.deleteValue(exec);
+      }
+    }
+  }
 
   length = newLength;
 }
@@ -234,7 +251,7 @@ static int compareByStringForQSort(const void* a, const void* b) {
 }
 
 void ArrayInstanceImp::sort(ExecState* exec) {
-  int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd();
+  int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd(exec);
 
   execForCompareByStringForQSort = exec;
   qsort(storage, lengthNotIncludingUndefined, sizeof(ValueImp*),
@@ -272,7 +289,7 @@ static int compareWithCompareFunctionForQSort(const void* a, const void* b) {
 }
 
 void ArrayInstanceImp::sort(ExecState* exec, Object& compareFunction) {
-  int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd();
+  int lengthNotIncludingUndefined = pushUndefinedObjectsToEnd(exec);
 
   CompareWithCompareFunctionArguments args(exec, compareFunction.imp());
   compareWithCompareFunctionArguments = &args;
@@ -281,7 +298,7 @@ void ArrayInstanceImp::sort(ExecState* exec, Object& compareFunction) {
   compareWithCompareFunctionArguments = 0;
 }
 
-unsigned ArrayInstanceImp::pushUndefinedObjectsToEnd() {
+unsigned ArrayInstanceImp::pushUndefinedObjectsToEnd(ExecState* exec) {
   ValueImp* undefined = UndefinedImp::staticUndefined;
 
   unsigned o = 0;
@@ -295,9 +312,23 @@ unsigned ArrayInstanceImp::pushUndefinedObjectsToEnd() {
     }
   }
 
-  // FIXME: Get sparse items down here.
+  ReferenceList sparseProperties;
+  _prop.addSparseArrayPropertiesToReferenceList(sparseProperties, Object(this));
+  unsigned newLength = o + sparseProperties.length();
 
-  if (o != storageLength)
+  if (newLength > storageLength) {
+    resizeStorage(newLength);
+  }
+
+  ReferenceListIterator it = sparseProperties.begin();
+  while (it != sparseProperties.end()) {
+    Reference ref = it++;
+    storage[o] = ref.getValue(exec).imp();
+    ObjectImp::deleteProperty(exec, ref.getPropertyName(exec));
+    o++;
+  }
+
+  if (newLength != storageLength)
     memset(storage + o, 0, sizeof(ValueImp*) * (storageLength - o));
 
   return o;

@@ -71,6 +71,8 @@ class PropertyMap {
 
   void mark() const;
   void addEnumerablesToReferenceList(ReferenceList&, const Object&) const;
+  void addSparseArrayPropertiesToReferenceList(ReferenceList&,
+                                               const Object&) const;
 
   void save(SavedProperties&) const;
   void restore(const SavedProperties& p);
