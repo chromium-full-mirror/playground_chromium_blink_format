@@ -8,7 +8,7 @@
 #import "WebDatabase.h"
 
 @interface WebFileDatabase : WebDatabase {
-  struct WebLRUFileList* lru;
+  struct NSLRUFileList* lru;
   NSMutableArray* ops;
   NSMutableDictionary* setCache;
   NSMutableSet* removeCache;
