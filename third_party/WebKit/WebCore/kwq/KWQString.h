@@ -319,7 +319,6 @@ class QString {
   static QString fromLatin1(const char*, int len);
   static QString fromUtf8(const char*);
   static QString fromUtf8(const char*, int len);
-  static QString fromStringWithEncoding(const char*, int, CFStringEncoding);
   static QString fromCFString(CFStringRef);
   static QString fromNSString(NSString*);
 
@@ -446,6 +445,7 @@ class QString {
 
   void setBufferFromCFString(CFStringRef);
 
+  QString& append(const QChar*, uint length);
   QString& prepend(const QChar*, uint length);
   QString& insert(uint position, const QChar*, uint length);
 
@@ -460,8 +460,6 @@ class QString {
   void deref();
   QChar* forceUnicode();
   void setLength(uint);
-
-  QCString convertToQCString(CFStringEncoding) const;
 
   KWQStringData** dataHandle;
   KWQStringData internalData;

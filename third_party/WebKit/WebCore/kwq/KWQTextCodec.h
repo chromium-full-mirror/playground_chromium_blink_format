@@ -37,7 +37,7 @@ class QTextCodec {
   static QTextCodec* codecForName(const char*);
   static QTextCodec* codecForLocale();
 
-  QTextCodec(CFStringEncoding e) : encoding(e) {}
+  QTextCodec(CFStringEncoding e) : _encoding(e) {}
 
   const char* name() const;
   int mibEnum() const;
@@ -48,21 +48,16 @@ class QTextCodec {
 
   QString toUnicode(const char*, int) const;
   QString toUnicode(const QByteArray&, int) const;
-  QString toUnicode(const char*) const;
+
+  CFStringEncoding encoding() const { return _encoding; }
 
  private:
-  CFStringEncoding encoding;
+  CFStringEncoding _encoding;
 };
 
 class QTextDecoder {
  public:
-  QTextDecoder(const QTextCodec* c) : textCodec(*c) {}
-  QString toUnicode(const char* chs, int len) {
-    return textCodec.toUnicode(chs, len);
-  }
-
- private:
-  QTextCodec textCodec;
+  virtual QString toUnicode(const char*, int) = 0;
 };
 
 #endif

@@ -525,12 +525,14 @@ found:
   QString out;
 
 #if APPLE_CHANGES
-  // We don't need to special-case unicode like this, and doing so
-  // will drop the buffer which is really bad!
   if (!buffer.isEmpty()) {
+    out = m_decoder->toUnicode(buffer.latin1(), buffer.length());
+    buffer.truncate(0);
+  } else {
+    out = m_decoder->toUnicode(data, len);
+  }
 #else
   if (!buffer.isEmpty() && enc != "ISO-10646-UCS-2") {
-#endif
     out = m_decoder->toUnicode(buffer.latin1(), buffer.length());
     buffer = "";
   } else {
@@ -547,9 +549,6 @@ found:
       }
     }
     out = m_decoder->toUnicode(data, len);
-#if APPLE_CHANGES
-  }  // need to balance braces for benefit of ChangeLog script
-#else
   }
 #endif
 
