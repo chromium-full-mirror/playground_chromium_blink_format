@@ -1147,8 +1147,7 @@ NodeImpl* NodeBaseImpl::insertBefore(NodeImpl* newChild,
     child = nextChild;
   }
 
-  // ### set style in case it's attached
-  setChanged(true);
+  getDocument()->setDocumentChanged(true);
   dispatchSubtreeModifiedEvent();
   return newChild;
 }
@@ -1227,7 +1226,7 @@ NodeImpl* NodeBaseImpl::replaceChild(NodeImpl* newChild,
   }
 
   // ### set style in case it's attached
-  setChanged(true);
+  getDocument()->setDocumentChanged(true);
   dispatchSubtreeModifiedEvent();
   return oldChild;
 }
@@ -1284,7 +1283,7 @@ NodeImpl* NodeBaseImpl::removeChild(NodeImpl* oldChild, int& exceptioncode) {
   oldChild->setNextSibling(0);
   oldChild->setParent(0);
 
-  setChanged(true);
+  getDocument()->setDocumentChanged(true);
 
   // Dispatch post-removal mutation events
   dispatchSubtreeModifiedEvent();
@@ -1377,7 +1376,7 @@ NodeImpl* NodeBaseImpl::appendChild(NodeImpl* newChild, int& exceptioncode) {
     child = nextChild;
   }
 
-  setChanged(true);
+  getDocument()->setDocumentChanged(true);
   // ### set style in case it's attached
   dispatchSubtreeModifiedEvent();
   return newChild;

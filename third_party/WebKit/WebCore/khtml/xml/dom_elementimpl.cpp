@@ -306,6 +306,8 @@ void ElementImpl::attach() {
 void ElementImpl::recalcStyle(StyleChange change) {
   // ### should go away and be done in renderobject
   RenderStyle* _style = m_render ? m_render->style() : 0;
+  bool hasParentRenderer = parent() ? parent()->renderer() : false;
+
 #if 0
     const char* debug;
     switch(change) {
@@ -320,7 +322,7 @@ void ElementImpl::recalcStyle(StyleChange change) {
     }
     qDebug("recalcStyle(%d: %s)[%p: %s]", change, debug, this, tagName().string().latin1());
 #endif
-  if (change >= Inherit || changed()) {
+  if (hasParentRenderer && (change >= Inherit || changed())) {
     EDisplay oldDisplay = _style ? _style->display() : NONE;
 
     RenderStyle* newStyle =
