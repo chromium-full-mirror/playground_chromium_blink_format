@@ -374,7 +374,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (int)getObjectCacheSize;
 
-- (BOOL)frameRequiredForMIMEType:(NSString*)mimeType;
+- (BOOL)frameRequiredForMIMEType:(NSString*)MIMEType URL:(NSURL*)URL;
 
 - (void)loadEmptyDocumentSynchronously;
 
