@@ -207,11 +207,11 @@ void InlineTextBox::paintSelection(const Font* f,
   // behavior;
   //    the selection never extends on the first line); and
   // 4. The last leaf renderer on the previous line is selected.
-  RenderObject* prevLineLastLeaf =
-      root()->prevRootBox() ? root()->prevRootBox()->lastLeafChild()->object()
-                            : 0;
+  RenderObject* prevLineLastLeaf = 0;
+  if (root()->prevRootBox() && root()->prevRootBox()->lastLeafChild())
+    prevLineLastLeaf = root()->prevRootBox()->lastLeafChild()->object();
   if (startPos <= m_start && root()->firstLeafChild() == this &&
-      root()->prevRootBox() && prevLineLastLeaf &&
+      prevLineLastLeaf &&
       prevLineLastLeaf->selectionState() != RenderObject::SelectionNone)
     minX = kMax(cb->leftOffset(y), cb->leftOffset(root()->blockHeight()));
 
