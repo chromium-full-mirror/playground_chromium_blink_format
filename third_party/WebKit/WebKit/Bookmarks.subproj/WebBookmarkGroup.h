@@ -27,7 +27,6 @@
 @interface WebBookmarkGroup : NSObject {
   NSString* _file;
   WebBookmark* _topBookmark;
-  NSMutableDictionary* _bookmarksByID;
   BOOL _loading;
 }
 
@@ -38,8 +37,6 @@
 - (WebBookmark*)topBookmark;
 
 // modifying contents
-- (void)removeBookmark:(WebBookmark*)bookmark;
-
 - (WebBookmark*)insertNewBookmarkAtIndex:(unsigned)index
                               ofBookmark:(WebBookmark*)parent
                                withTitle:(NSString*)newTitle
