@@ -13,6 +13,7 @@
   int loadStatus;
   NSColor* patternColor;
   int patternColorLoadStatus;
+  BOOL animationFinished;
 }
 
 + (void)stopAnimationsInView:(NSView*)aView;
