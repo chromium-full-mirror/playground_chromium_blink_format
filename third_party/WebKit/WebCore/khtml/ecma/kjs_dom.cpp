@@ -497,7 +497,7 @@ DOMNodeList::~DOMNodeList() {
 // and 'item'
 // ## this breaks "for (..in..)" though.
 bool DOMNodeList::hasProperty(ExecState* exec, const Identifier& p) const {
-  if (p == "length" || p == "item")
+  if (p == lengthPropertyName || p == "item")
     return true;
   return ObjectImp::hasProperty(exec, p);
 }
@@ -508,7 +508,7 @@ Value DOMNodeList::tryGet(ExecState* exec, const Identifier& p) const {
 #endif
   Value result;
 
-  if (p == "length")
+  if (p == lengthPropertyName)
     result = Number(list.length());
   else if (p == "item") {
     // No need for a complete hashtable for a single func, but we still want
@@ -574,7 +574,7 @@ Value DOMNodeList::tryCall(ExecState* exec, Object&, const List& args) {
 DOMNodeListFunc::DOMNodeListFunc(ExecState* exec, int i, int len)
     : DOMFunction(), id(i) {
   Value protect(this);
-  put(exec, "length", Number(len), DontDelete | ReadOnly | DontEnum);
+  put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
 }
 
 // Not a prototype class currently, but should probably be converted to one
@@ -1186,13 +1186,13 @@ DOMNamedNodeMap::~DOMNamedNodeMap() {
 // We have to implement hasProperty since we don't use a hashtable for 'length'
 // ## this breaks "for (..in..)" though.
 bool DOMNamedNodeMap::hasProperty(ExecState* exec, const Identifier& p) const {
-  if (p == "length")
+  if (p == lengthPropertyName)
     return true;
   return DOMObject::hasProperty(exec, p);
 }
 
 Value DOMNamedNodeMap::tryGet(ExecState* exec, const Identifier& p) const {
-  if (p == "length")
+  if (p == lengthPropertyName)
     return Number(map.length());
 
   // array index ?
@@ -1613,7 +1613,7 @@ DOMNamedNodesCollection::DOMNamedNodesCollection(
 
 Value DOMNamedNodesCollection::tryGet(ExecState* exec,
                                       const Identifier& propertyName) const {
-  if (propertyName == "length")
+  if (propertyName == lengthPropertyName)
     return Number(m_nodes.count());
   // index?
   bool ok;

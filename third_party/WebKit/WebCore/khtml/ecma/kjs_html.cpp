@@ -215,7 +215,7 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
             << "KJS::HTMLDocument document.scripts called - not implemented"
             << endl;
         Object obj(new ObjectImp());
-        obj.put(exec, "length", Number(0));
+        obj.put(exec, lengthPropertyName, Number(0));
         return obj;
       }
       case All:
@@ -2121,7 +2121,7 @@ List KJS::HTMLElement::eventHandlerScope(ExecState* exec) const {
 HTMLElementFunction::HTMLElementFunction(ExecState* exec, int i, int len)
     : DOMFunction(), id(i) {
   Value protect(this);
-  put(exec, "length", Number(len), DontDelete | ReadOnly | DontEnum);
+  put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
 }
 
 Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
@@ -2527,7 +2527,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           Object coll = Object::dynamicCast(
               getSelectHTMLCollection(exec, select.options(), select));
           if (!coll.isNull())
-            coll.put(exec, "length", value);
+            coll.put(exec, lengthPropertyName, value);
           return;
         }
         // read-only: form
@@ -3699,7 +3699,7 @@ HTMLCollection::~HTMLCollection() {
 // ## this breaks "for (..in..)" though.
 bool KJS::HTMLCollection::hasProperty(ExecState* exec,
                                       const Identifier& p) const {
-  if (p == "selectedIndex" || p == "length")
+  if (p == "selectedIndex" || p == lengthPropertyName)
     return true;
   return DOMObject::hasProperty(exec, p);
 }
@@ -3709,7 +3709,7 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
 #ifdef KJS_VERBOSE
   kdDebug() << "KJS::HTMLCollection::tryGet " << propertyName.ascii() << endl;
 #endif
-  if (propertyName == "length")
+  if (propertyName == lengthPropertyName)
     return Number(collection.length());
   else if (propertyName == "selectedIndex" &&
            collection.item(0).elementId() == ID_OPTION) {
@@ -3905,7 +3905,7 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
     return;
   }
   // resize ?
-  else if (propertyName == "length") {
+  else if (propertyName == lengthPropertyName) {
     long newLen = value.toInteger(exec);
     long diff = element.length() - newLen;
 
@@ -3965,7 +3965,7 @@ OptionConstructorImp::OptionConstructorImp(ExecState* exec,
 
   // no. of arguments for constructor
   // ## is 4 correct ? 0 to 4, it seems to be
-  put(exec, "length", Number(4), ReadOnly | DontDelete | DontEnum);
+  put(exec, lengthPropertyName, Number(4), ReadOnly | DontDelete | DontEnum);
 }
 
 bool OptionConstructorImp::implementsConstruct() const {

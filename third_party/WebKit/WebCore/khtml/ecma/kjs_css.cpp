@@ -30,7 +30,7 @@
 using namespace KJS;
 #include <kdebug.h>
 
-static QString jsNameToProp(const UString& p) {
+static QString jsNameToProp(const Identifier& p) {
   QString prop = p.qstring();
   int i = prop.length();
   while (--i) {
@@ -329,7 +329,7 @@ Value DOMStyleSheetList::tryGet(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "DOMStyleSheetList::tryGet " << p.qstring() << endl;
 #endif
-  if (p == "length")
+  if (p == lengthPropertyName)
     return Number(styleSheetList.length());
   else if (p == "item")
     return lookupOrCreateFunction<DOMStyleSheetListFunc>(
@@ -439,7 +439,7 @@ DOMMediaList::~DOMMediaList() {
 Value DOMMediaList::tryGet(ExecState* exec, const Identifier& p) const {
   if (p == "mediaText")
     return getString(mediaList.mediaText());
-  else if (p == "length")
+  else if (p == lengthPropertyName)
     return Number(mediaList.length());
 
   bool ok;
@@ -574,7 +574,7 @@ DOMCSSRuleList::~DOMCSSRuleList() {
 
 Value DOMCSSRuleList::tryGet(ExecState* exec, const Identifier& p) const {
   Value result;
-  if (p == "length")
+  if (p == lengthPropertyName)
     return Number(cssRuleList.length());
   else if (p == "item")
     return lookupOrCreateFunction<DOMCSSRuleListFunc>(
@@ -1161,7 +1161,7 @@ Value DOMCSSValueList::tryGet(ExecState* exec, const Identifier& p) const {
   Value result;
   DOM::CSSValueList valueList = static_cast<DOM::CSSValueList>(cssValue);
 
-  if (p == "length")
+  if (p == lengthPropertyName)
     return Number(valueList.length());
   else if (p == "item")
     return lookupOrCreateFunction<DOMCSSValueListFunc>(
