@@ -114,9 +114,9 @@ extern NSString*
    added.  May be nil.
     @result Returns an initialized WebView.
 */
-- initWithFrame:(NSRect)frame
-        frameName:(NSString*)frameName
-        groupName:(NSString*)groupName;
+- (id)initWithFrame:(NSRect)frame
+          frameName:(NSString*)frameName
+          groupName:(NSString*)groupName;
 
 /*!
     @method setUIDelegate:
@@ -205,7 +205,7 @@ extern NSString*
 - (WebBackForwardList*)backForwardList;
 
 /*!
-    @method setUseBackForwardList:
+    @method setMaintainsBackForwardList:
     @abstract Enable or disable the use of a backforward list for this webView.
     @param flag Turns use of the back forward list on or off
 */

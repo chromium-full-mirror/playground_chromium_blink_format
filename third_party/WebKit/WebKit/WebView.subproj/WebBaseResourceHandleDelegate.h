@@ -40,8 +40,8 @@
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;
 
-- resourceLoadDelegate;
-- downloadDelegate;
+- (id)resourceLoadDelegate;
+- (id)downloadDelegate;
 
 - (void)cancel;
 - (void)cancelWithError:(NSError*)error;
@@ -51,7 +51,7 @@
 
 - (NSError*)cancelledError;
 
-- (void)setIdentifier:ident;
+- (void)setIdentifier:(id)ident;
 
 - (void)useCredential:(NSURLCredential*)credential
     forAuthenticationChallenge:(WebAuthenticationChallenge*)challenge;

@@ -165,12 +165,12 @@ backforward list.
 - (WebCoreSettings*)_settings;
 - (void)_updateWebCoreSettingsFromPreferences:(WebPreferences*)prefs;
 
-- _frameLoadDelegateForwarder;
-- _resourceLoadDelegateForwarder;
+- (id)_frameLoadDelegateForwarder;
+- (id)_resourceLoadDelegateForwarder;
 - (void)_cacheResourceLoadDelegateImplementations;
 - (WebResourceDelegateImplementationCache)_resourceLoadDelegateImplementations;
-- _policyDelegateForwarder;
-- _UIDelegateForwarder;
+- (id)_policyDelegateForwarder;
+- (id)_UIDelegateForwarder;
 
 - (void)_closeWindow;
 
@@ -184,6 +184,8 @@ backforward list.
   id defaultTarget;
   Class templateClass;
 }
-- initWithTarget:t defaultTarget:dt templateClass:(Class)aClass;
-+ safeForwarderWithTarget:t defaultTarget:dt templateClass:(Class)aClass;
+- (id)initWithTarget:(id)t defaultTarget:(id)dt templateClass:(Class)aClass;
++ (id)safeForwarderWithTarget:(id)t
+                defaultTarget:(id)dt
+                templateClass:(Class)aClass;
 @end

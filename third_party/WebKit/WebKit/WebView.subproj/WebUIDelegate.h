@@ -9,13 +9,13 @@
 #import <WebFoundation/NSURLRequest.h>
 
 /*!
-@enum WebMenuItemTag
- @discussion Each menu item in the default menu items array passed in
- contextMenuItemsForElement:defaultMenuItems: has its tag set to one of the
-WebMenuItemTags.
- When iterating through the default menu items array, use the tag to
-differentiate between them.
- */
+    @enum WebMenuItemTag
+    @discussion Each menu item in the default menu items array passed in
+    contextMenuItemsForElement:defaultMenuItems: has its tag set to one of the
+   WebMenuItemTags.
+    When iterating through the default menu items array, use the tag to
+   differentiate between them.
+*/
 
 enum {
   WebMenuItemTagOpenLinkInNewWindow = 1,
@@ -149,7 +149,7 @@ enum {
 - (void)webView:(WebView*)sender setStatusText:(NSString*)text;
 
 /*!
-    @method statusText
+    @method webViewStatusText
     @abstract Get the currently displayed status text.
     @param sender The WebView sending the delegate method.
     @result The status text
@@ -232,7 +232,7 @@ enum {
 - (void)webView:(WebView*)sender setFrame:(NSRect)frame;
 
 /*!
-    @method webViewFrame
+    @method webViewFrame:
     @param sender The WebView sending the delegate method.
     @abstract REturn the window's frame rect
     @discussion

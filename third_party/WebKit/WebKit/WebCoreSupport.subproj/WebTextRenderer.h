@@ -35,7 +35,7 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
 
 + (BOOL)shouldBufferTextDrawing;
 
-- initWithFont:(NSFont*)font usingPrinterFont:(BOOL)usingPrinterFont;
+- (id)initWithFont:(NSFont*)font usingPrinterFont:(BOOL)usingPrinterFont;
 
 - (float)_floatWidthForCharacters:(const UniChar*)characters
                      stringLength:(unsigned)stringLength

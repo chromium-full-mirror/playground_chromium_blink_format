@@ -69,13 +69,14 @@
 */
 @protocol WebDocumentSearching<NSObject>
 /*!
-    @method searchFor:direction:caseSensitive:
+    @method searchFor:direction:caseSensitive:wrap:
     @abstract Searches a document view for a string and highlights the string if
    it is found.
     @param string The string to search for.
     @param forward YES to search forward, NO to seach backwards.
     @param caseFlag YES to for case-sensitive search, NO for case-insensitive
    search.
+    @param wrapFlag YES to wrap around, NO to avoid wrapping.
     @result YES if found, NO if not found.
 */
 - (BOOL)searchFor:(NSString*)string

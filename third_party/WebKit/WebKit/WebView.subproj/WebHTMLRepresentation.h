@@ -1,8 +1,6 @@
 /*
         WebHTMLRepresentation.h
         Copyright 2002, Apple, Inc. All rights reserved.
-
-        Public header file.
 */
 
 #import <Foundation/Foundation.h>

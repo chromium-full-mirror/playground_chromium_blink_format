@@ -14,7 +14,7 @@
   NSString* source;
 }
 
-- initWithWebFrameView:(WebFrameView*)view;
+- (id)initWithWebFrameView:(WebFrameView*)view;
 
 - (NSArray*)children;
 - (NSString*)name;

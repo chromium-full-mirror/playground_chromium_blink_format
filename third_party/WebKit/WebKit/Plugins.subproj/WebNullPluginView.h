@@ -12,6 +12,6 @@
   NSError* error;
 }
 
-- initWithFrame:(NSRect)frame error:(NSError*)pluginError;
+- (id)initWithFrame:(NSRect)frame error:(NSError*)pluginError;
 
 @end

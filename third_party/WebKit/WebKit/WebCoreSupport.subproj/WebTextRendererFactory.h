@@ -21,7 +21,6 @@
 - (NSFont*)cachedFontFromFamily:(NSString*)family
                          traits:(NSFontTraitMask)traits
                            size:(float)size;
-- init;
 
 - (WebTextRenderer*)rendererWithFont:(NSFont*)font
                     usingPrinterFont:(BOOL)usingPrinterFont;

@@ -121,7 +121,8 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 @interface NSObject (WebPolicyDelegate)
 
 /*!
-   @method decidePolicyForNavigationAction:request:frame:decisionListener:
+   @method
+   webView:decidePolicyForNavigationAction:request:frame:decisionListener:
    @abstract This method is called to decide what to do with a proposed
    navigation.
    @param actionInformation Dictionary that describes the action that triggered
@@ -140,7 +141,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 
 /*!
      @method
-   decidePolicyForNewWindowAction:request:newFrameName:decisionListener:
+   webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:
      @discussion This method is called to decide what to do with an targetted
    nagivation that would open a new window.
      @param actionInformation Dictionary that describes the action that
@@ -167,7 +168,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
                   decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
-    @method decidePolicyForMIMEType:request:frame:
+    @method webView:decidePolicyForMIMEType:request:frame:
     @discussion Returns the policy for content which has been partially loaded.
     Sent after webView:didStartProvisionalLoadForFrame: is sent on the
    WebFrameLoadDelegate.
@@ -183,7 +184,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
            decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
-    @method unableToImplementPolicy:error:forURL:inFrame:
+    @method webView:unableToImplementPolicy:error:forURL:inFrame:
     @discussion Called when a WebPolicy could not be implemented. It is up to
    the client to display appropriate feedback.
     @param policy The policy that could not be implemented.

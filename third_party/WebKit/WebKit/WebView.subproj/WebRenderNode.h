@@ -17,7 +17,7 @@
   NSPoint absolutePosition;
 }
 
-- initWithWebFrameView:(WebFrameView*)view;
+- (id)initWithWebFrameView:(WebFrameView*)view;
 
 - (NSArray*)children;
 

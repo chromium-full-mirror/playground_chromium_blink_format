@@ -15,7 +15,7 @@
   CGSize* bufferedAdvances;
   CGGlyph* bufferedGlyphs;
 }
-- initWithFont:(NSFont*)font color:(NSColor*)color;
+- (id)initWithFont:(NSFont*)font color:(NSColor*)color;
 - (void)addGlyphs:(CGGlyph*)newGlyphs
          advances:(CGSize*)newAdvances
             count:(int)count
