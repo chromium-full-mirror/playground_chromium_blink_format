@@ -771,6 +771,10 @@ void HTMLGenericFormElementImpl::onChange() {
   dispatchHTMLEvent(EventImpl::CHANGE_EVENT, true, false);
 }
 
+bool HTMLGenericFormElementImpl::disabled() const {
+  return m_disabled;
+}
+
 void HTMLGenericFormElementImpl::setDisabled(bool _disabled) {
   if (m_disabled != _disabled) {
     m_disabled = _disabled;

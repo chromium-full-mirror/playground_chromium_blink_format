@@ -553,7 +553,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   // get a KHTML_CLICK_EVENT or
   // KHTML_DBLCLICK_EVENT), not the standard DOM "click" event that could be
   // sent from js code.
-  if (!evt->defaultPrevented())
+  if (!evt->defaultPrevented() && !disabled())
     if (evt->id() == EventImpl::KHTML_CLICK_EVENT)
       dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 1);
     else if (evt->id() == EventImpl::KHTML_DBLCLICK_EVENT)
@@ -742,6 +742,9 @@ bool NodeImpl::dispatchKeyEvent(QKeyEvent* key) {
 
 void NodeImpl::handleLocalEvents(EventImpl* evt, bool useCapture) {
   if (!m_regdListeners)
+    return;
+
+  if (disabled() && evt->isMouseEvent())
     return;
 
   QPtrList<RegisteredEventListener> listenersCopy = *m_regdListeners;
@@ -1015,6 +1018,10 @@ void NodeImpl::removedFromDocument() {
 }
 
 void NodeImpl::childrenChanged() {}
+
+bool NodeImpl::disabled() const {
+  return false;
+}
 
 bool NodeImpl::isReadOnly() {
   // Entity & Entity Reference nodes and their descendants are read-only

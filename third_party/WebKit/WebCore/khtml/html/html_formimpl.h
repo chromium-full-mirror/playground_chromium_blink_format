@@ -143,7 +143,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   void onSelect();
   void onChange();
 
-  bool disabled() const { return m_disabled; }
+  virtual bool disabled() const;
   void setDisabled(bool _disabled);
 
   virtual bool isSelectable() const;
