@@ -26,4 +26,14 @@
 #ifndef QLIST_H_
 #define QLIST_H_
 
+#include <kwq.h>
+
+template <class T>
+class QList {
+ public:
+  uint count() const;
+  T* at(uint);
+  void append(const T*);
+};
+
 #endif
