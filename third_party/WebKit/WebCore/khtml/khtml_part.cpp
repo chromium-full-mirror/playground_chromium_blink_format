@@ -2974,7 +2974,8 @@ void KHTMLPart::updateActions() {
 bool KHTMLPart::requestFrame(khtml::RenderPart* frame,
                              const QString& url,
                              const QString& frameName,
-                             const QStringList& params,
+                             const QStringList& paramNames,
+                             const QStringList& paramValues,
                              bool isIFrame) {
   //  kdDebug( 6050 ) << "childRequest( ..., " << url << ", " << frameName << "
   //  )" << endl;
@@ -2990,7 +2991,8 @@ bool KHTMLPart::requestFrame(khtml::RenderPart* frame,
   (*it).m_type =
       isIFrame ? khtml::ChildFrame::IFrame : khtml::ChildFrame::Frame;
   (*it).m_frame = frame;
-  (*it).m_params = params;
+  (*it).m_paramValues = paramNames;
+  (*it).m_paramNames = paramValues;
 
   // Support for <frame src="javascript:string">
   if (url.find(QString::fromLatin1("javascript:"), 0, false) == 0) {
@@ -3017,12 +3019,14 @@ QString KHTMLPart::requestFrameName() {
 bool KHTMLPart::requestObject(khtml::RenderPart* frame,
                               const QString& url,
                               const QString& serviceType,
-                              const QStringList& params) {
+                              const QStringList& paramNames,
+                              const QStringList& paramValues) {
   khtml::ChildFrame child;
   QValueList<khtml::ChildFrame>::Iterator it = d->m_objects.append(child);
   (*it).m_frame = frame;
   (*it).m_type = khtml::ChildFrame::Object;
-  (*it).m_params = params;
+  (*it).m_paramNames = paramNames;
+  (*it).m_paramValues = paramValues;
 
   KURL completedURL;
   if (!url.isEmpty())

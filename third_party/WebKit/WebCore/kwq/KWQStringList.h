@@ -48,7 +48,7 @@ class QStringList : public QValueList<QString> {
 
   QString pop_front();
 
-  NSArray* getNSArray();
+  NSArray* getNSArray() const;
 };
 
 #endif

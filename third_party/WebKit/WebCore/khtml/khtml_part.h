@@ -1286,7 +1286,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool requestFrame(khtml::RenderPart* frame,
                     const QString& url,
                     const QString& frameName,
-                    const QStringList& args = QStringList(),
+                    const QStringList& paramNames = QStringList(),
+                    const QStringList& paramValues = QStringList(),
                     bool isIFrame = false);
 
   /**
@@ -1301,7 +1302,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool requestObject(khtml::RenderPart* frame,
                      const QString& url,
                      const QString& serviceType,
-                     const QStringList& args = QStringList());
+                     const QStringList& paramNames = QStringList(),
+                     const QStringList& paramValues = QStringList());
 
   bool requestObject(khtml::ChildFrame* child,
                      const KURL& url,

@@ -85,7 +85,8 @@ struct ChildFrame {
   bool m_bPreloaded;
   KURL m_workingURL;
   Type m_type;
-  QStringList m_params;
+  QStringList m_paramNames;
+  QStringList m_paramValues;
   bool m_bNotify;
 };
 
