@@ -1086,6 +1086,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       else
         return Null();
     case Window::Open: {
+      printf("window.open\n");
       KConfig* config = new KConfig("konquerorrc");
       config->setGroup("Java/JavaScript Settings");
       int policy = config->readUnsignedNumEntry(

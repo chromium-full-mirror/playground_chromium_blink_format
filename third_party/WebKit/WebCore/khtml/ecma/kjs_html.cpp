@@ -67,7 +67,7 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
     case HTMLDocument::Open:
       // For compatibility with other browsers, pass open calls with parameters
       // to the window.
-      if (args.size() != 0) {
+      if (args.size() > 1) {
         KHTMLView* view = static_cast<DOM::DocumentImpl*>(doc.handle())->view();
         if (view) {
           KHTMLPart* part = view->part();
