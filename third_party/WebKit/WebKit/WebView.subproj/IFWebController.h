@@ -120,7 +120,7 @@
 - (BOOL)locationWillChangeTo:(NSURL*)url forFrame:(IFWebFrame*)frame;
 
 - (void)locationChangeStartedForFrame:(IFWebFrame*)frame
-                initiatedByMouseEvent:(BOOL)flag;
+                 initiatedByUserEvent:(BOOL)flag;
 
 - (void)locationChangeCommittedForFrame:(IFWebFrame*)frame;
 
