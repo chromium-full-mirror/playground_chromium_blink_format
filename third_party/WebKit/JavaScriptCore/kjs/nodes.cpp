@@ -288,6 +288,10 @@ Value GroupNode::evaluate(ExecState* exec) {
   return group->evaluate(exec);
 }
 
+Reference GroupNode::evaluateReference(ExecState* exec) {
+  return group->evaluateReference(exec);
+}
+
 // ------------------------------ ElementNode ----------------------------------
 
 void ElementNode::ref() {

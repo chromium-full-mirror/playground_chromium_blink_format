@@ -133,6 +133,7 @@ class Lexer {
   static void globalClear();
 #endif
 
+  bool sawError() const { return error; }
   void doneParsing();
 
  private:
@@ -148,6 +149,7 @@ class Lexer {
 #ifndef KJS_PURE_ECMA
   int bol;  // begin of line
 #endif
+  bool error;
 
   // current and following unicode characters
   unsigned short current, next1, next2, next3;

@@ -181,7 +181,7 @@ Value MathFuncImp::call(ExecState* exec,
           result = NaN;
           break;
         }
-        if (val > result)
+        if (val > result || (val == 0 && result == 0 && !signbit(val)))
           result = val;
       }
       break;
@@ -195,7 +195,7 @@ Value MathFuncImp::call(ExecState* exec,
           result = NaN;
           break;
         }
-        if (val < result)
+        if (val < result || (val == 0 && result == 0 && signbit(val)))
           result = val;
       }
       break;
@@ -232,7 +232,10 @@ Value MathFuncImp::call(ExecState* exec,
       result = result / RAND_MAX;
       break;
     case MathObjectImp::Round:
-      result = ::floor(arg + 0.5);
+      if (signbit(arg) && arg >= -0.5)
+        result = -0.0;
+      else
+        result = ::floor(arg + 0.5);
       break;
     case MathObjectImp::Sin:
       result = ::sin(arg);

@@ -40,6 +40,8 @@ using namespace KJS;
 FunctionPrototypeImp::FunctionPrototypeImp(ExecState* exec)
     : InternalFunctionImp(0) {
   Value protect(this);
+  putDirect(lengthPropertyName, NumberImp::zero(),
+            DontDelete | ReadOnly | DontEnum);
   putDirect(
       toStringPropertyName,
       new FunctionProtoFuncImp(exec, this, FunctionProtoFuncImp::ToString, 0),

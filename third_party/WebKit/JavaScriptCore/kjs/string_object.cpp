@@ -114,9 +114,9 @@ const ClassInfo StringPrototypeImp::info = {"String", &StringInstanceImp::info,
   concat		StringProtoFuncImp::Concat	DontEnum|Function
 1
   indexOf		StringProtoFuncImp::IndexOf	DontEnum|Function
-2
+1
   lastIndexOf		StringProtoFuncImp::LastIndexOf	DontEnum|Function
-2
+1
   match			StringProtoFuncImp::Match	DontEnum|Function
 1
   replace		StringProtoFuncImp::Replace	DontEnum|Function

@@ -670,7 +670,7 @@ Object DateObjectImp::construct(ExecState* exec, const List& args) {
 #ifdef KJS_VERBOSE
   fprintf(stderr, "DateObjectImp::construct - %d args\n", numArgs);
 #endif
-  Value value;
+  double value;
 
   if (numArgs == 0) {  // new Date() ECMA 15.9.3.3
 #if HAVE_SYS_TIMEB_H
@@ -689,14 +689,14 @@ Object DateObjectImp::construct(ExecState* exec, const List& args) {
     double utc =
         floor((double)tv.tv_sec * 1000.0 + (double)tv.tv_usec / 1000.0);
 #endif
-    value = Number(utc);
+    value = utc;
   } else if (numArgs == 1) {
     UString s = args[0].toString(exec);
     double d = s.toDouble();
     if (isNaN(d))
       value = parseDate(s);
     else
-      value = Number(d);
+      value = d;
   } else {
     struct tm t;
     memset(&t, 0, sizeof(t));
@@ -706,7 +706,7 @@ Object DateObjectImp::construct(ExecState* exec, const List& args) {
         (numArgs >= 5 && isNaN(args[4].toNumber(exec))) ||
         (numArgs >= 6 && isNaN(args[5].toNumber(exec))) ||
         (numArgs >= 7 && isNaN(args[6].toNumber(exec)))) {
-      value = Number(NaN);
+      value = NaN;
     } else {
       int year = args[0].toInt32(exec);
       t.tm_year = (year >= 0 && year <= 99) ? year : year - 1900;
@@ -719,15 +719,15 @@ Object DateObjectImp::construct(ExecState* exec, const List& args) {
       int ms = (numArgs >= 7) ? args[6].toInt32(exec) : 0;
       time_t mktimeResult = mktime(&t);
       if (mktimeResult == invalidDate)
-        value = Number(NaN);
+        value = NaN;
       else
-        value = Number(mktimeResult * 1000.0 + ms);
+        value = mktimeResult * 1000.0 + ms;
     }
   }
 
   Object proto = exec->lexicalInterpreter()->builtinDatePrototype();
   Object ret(new DateInstanceImp(proto.imp()));
-  ret.setInternalValue(timeClip(value));
+  ret.setInternalValue(Number(timeClip(value)));
   return ret;
 }
 
@@ -774,7 +774,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
                               Object& /*thisObj*/,
                               const List& args) {
   if (id == Parse) {
-    return parseDate(args[0].toString(exec));
+    return Number(parseDate(args[0].toString(exec)));
   } else {  // UTC
     struct tm t;
     memset(&t, 0, sizeof(t));
@@ -804,7 +804,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
 
 // -----------------------------------------------------------------------------
 
-Value KJS::parseDate(const UString& u) {
+double KJS::parseDate(const UString& u) {
 #ifdef KJS_VERBOSE
   fprintf(stderr, "KJS::parseDate %s\n", u.ascii());
 #endif
@@ -815,9 +815,9 @@ Value KJS::parseDate(const UString& u) {
     fprintf(stderr, "KRFCDate_parseDate returned seconds=%d\n", seconds);
 #endif
     if (seconds == invalidDate)
-      return Number(NaN);
+      return NaN;
     else
-      return Number(seconds * 1000.0);
+      return seconds * 1000.0;
   } else {
     // Found 12/31/2099 on some website -> obviously MM/DD/YYYY
     int month = u.substr(0, firstSlash).toULong();
@@ -828,7 +828,7 @@ Value KJS::parseDate(const UString& u) {
       fprintf(stderr,
               "KJS::parseDate parsing for this format isn't implemented\n%s",
               u.ascii());
-      return Number(NaN);
+      return NaN;
     }
     int day = u.substr(firstSlash + 1, secondSlash - firstSlash - 1).toULong();
     int year = u.substr(secondSlash + 1).toULong();
@@ -847,9 +847,9 @@ Value KJS::parseDate(const UString& u) {
 #if !APPLE_CHANGES
       fprintf(stderr, "KJS::parseDate mktime returned -1.\n%s", u.ascii());
 #endif
-      return Number(NaN);
+      return NaN;
     } else
-      return Number(seconds * 1000.0);
+      return seconds * 1000.0;
   }
 }
 
@@ -1170,7 +1170,11 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
   return result;
 }
 
-Value KJS::timeClip(const Value& t) {
-  /* TODO */
-  return t;
+double KJS::timeClip(double t) {
+  if (!isfinite(t))
+    return NaN;
+  double at = fabs(t);
+  if (at > 8.64E15)
+    return NaN;
+  return copysign(floor(at), t);
 }
