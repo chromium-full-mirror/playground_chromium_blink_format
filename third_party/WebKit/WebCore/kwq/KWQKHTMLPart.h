@@ -253,7 +253,7 @@ class KWQKHTMLPart : public KHTMLPart {
   bool lastEventIsMouseUp();
 
   void dragSourceMovedTo(const QPoint& loc);
-  void dragSourceEndedAt(const QPoint& loc);
+  void dragSourceEndedAt(const QPoint& loc, NSDragOperation operation);
 
   bool mayCut();
   bool mayCopy();
