@@ -87,6 +87,12 @@ extern NSString* WebCorePageCacheStateKey;
 
 typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
+typedef enum {
+  WebSelectionStateNone,
+  WebSelectionStateCaret,
+  WebSelectionStateRange,
+} WebSelectionState;
+
 typedef enum { WebSelectByMoving, WebSelectByExtending } WebSelectionAlteration;
 
 typedef enum {
@@ -250,8 +256,7 @@ typedef enum {
                endOffset:(int)endOffset;
 
 - (BOOL)isSelectionEditable;
-
-- (BOOL)haveSelection;
+- (WebSelectionState)selectionState;
 
 - (NSAttributedString*)selectedAttributedString;
 - (NSString*)selectedString;

@@ -2207,6 +2207,9 @@ int TypingCommandImpl::commandID() const {
 }
 
 void TypingCommandImpl::doApply() {
+  if (endingSelection().state() == Selection::NONE)
+    return;
+
   switch (m_commandType) {
     case TypingCommand::DeleteKey:
       deleteKeyPressed();
