@@ -878,6 +878,9 @@ class RenderStyle : public Shared<RenderStyle> {
   void addToTextDecorationsInEffect(int v) {
     inherited_flags._text_decorations |= v;
   }
+  void setTextDecorationsInEffect(int v) {
+    inherited_flags._text_decorations = v;
+  }
   void setTextDecoration(int v) { SET_VAR(visual, textDecoration, v); }
   void setDirection(EDirection v) { inherited_flags._direction = v; }
   void setLineHeight(Length v) { SET_VAR(inherited, line_height, v) }
