@@ -57,7 +57,7 @@ class RenderContainer : public RenderObject {
   void setLastChild(RenderObject* last) { m_last = last; }
 
  protected:
-  void insertPseudoChild(RenderStyle::PseudoId type, RenderObject* child);
+  void updatePseudoChild(RenderStyle::PseudoId type, RenderObject* child);
 
   RenderObject* m_first;
   RenderObject* m_last;
