@@ -15,10 +15,10 @@
 /*!
     @class WebHTMLView
 */
-@interface WebHTMLView : NSView<WebDocumentView,
-                                WebDocumentDragSettings,
-                                WebDocumentSearching,
-                                WebDocumentTextEncoding> {
+@interface WebHTMLView : NSClipView<WebDocumentView,
+                                    WebDocumentDragSettings,
+                                    WebDocumentSearching,
+                                    WebDocumentTextEncoding> {
  @private
   WebHTMLViewPrivate* _private;
 }
