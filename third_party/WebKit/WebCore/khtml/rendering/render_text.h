@@ -43,6 +43,9 @@ class Position;
 // Define a constant for soft hyphen's unicode value.
 #define SOFT_HYPHEN 173
 
+const int cNoTruncation = -1;
+const int cFullTruncation = -2;
+
 namespace khtml {
 class RenderText;
 class RenderStyle;
@@ -54,6 +57,7 @@ class InlineTextBox : public InlineRunBox {
     m_len = 0;
     m_reversed = false;
     m_toAdd = 0;
+    m_truncation = cNoTruncation;
   }
 
   InlineTextBox* nextTextBox() const {
@@ -74,6 +78,8 @@ class InlineTextBox : public InlineRunBox {
   virtual void deleteLine(RenderArena* arena);
   virtual void extractLine();
   virtual void attachLine();
+
+  void clearTruncation() { m_truncation = cNoTruncation; }
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
@@ -126,6 +132,11 @@ class InlineTextBox : public InlineRunBox {
 
   int m_start;
   unsigned short m_len;
+
+  int m_truncation;  // Where to truncate when text overflow is applied.  We use
+                     // special constants to
+  // denote no truncation (the whole run paints) and full truncation (nothing
+  // paints at all).
 
   bool m_reversed : 1;
   int m_toAdd : 14;  // for justified text
