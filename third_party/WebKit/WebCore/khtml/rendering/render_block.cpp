@@ -620,9 +620,13 @@ RenderObject* RenderBlock::handleSpecialChild(RenderObject* child,
                                               const MarginInfo& marginInfo,
                                               CompactInfo& compactInfo,
                                               bool& handled) {
-  // Handle floating/positioned children first.
-  RenderObject* next =
-      handleFloatingOrPositionedChild(child, marginInfo, handled);
+  // Handle positioned children first.
+  RenderObject* next = handlePositionedChild(child, marginInfo, handled);
+  if (handled)
+    return next;
+
+  // Handle floating children next.
+  next = handleFloatingChild(child, marginInfo, handled);
   if (handled)
     return next;
 
@@ -636,10 +640,9 @@ RenderObject* RenderBlock::handleSpecialChild(RenderObject* child,
   return handleRunInChild(child, handled);
 }
 
-RenderObject* RenderBlock::handleFloatingOrPositionedChild(
-    RenderObject* child,
-    const MarginInfo& marginInfo,
-    bool& handled) {
+RenderObject* RenderBlock::handlePositionedChild(RenderObject* child,
+                                                 const MarginInfo& marginInfo,
+                                                 bool& handled) {
   if (child->isPositioned()) {
     handled = true;
     child->containingBlock()->insertPositionedObject(child);
@@ -647,6 +650,12 @@ RenderObject* RenderBlock::handleFloatingOrPositionedChild(
     return child->nextSibling();
   }
 
+  return 0;
+}
+
+RenderObject* RenderBlock::handleFloatingChild(RenderObject* child,
+                                               const MarginInfo& marginInfo,
+                                               bool& handled) {
   if (child->isFloating()) {
     handled = true;
     insertFloatingObject(child);
@@ -689,7 +698,6 @@ RenderObject* RenderBlock::handleCompactChild(RenderObject* child,
         // The compact will fit in the margin.
         handled = true;
         compactInfo.set(child, curr);
-        child->setInline(true);
         child->setPos(
             0, 0);  // This position will be updated to reflect the compact's
                     // desired position and the line box for the compact will

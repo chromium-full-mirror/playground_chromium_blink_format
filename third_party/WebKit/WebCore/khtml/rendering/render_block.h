@@ -513,9 +513,12 @@ class RenderBlock : public RenderFlow {
                                    const MarginInfo& marginInfo,
                                    CompactInfo& compactInfo,
                                    bool& handled);
-  RenderObject* handleFloatingOrPositionedChild(RenderObject* child,
-                                                const MarginInfo& marginInfo,
-                                                bool& handled);
+  RenderObject* handleFloatingChild(RenderObject* child,
+                                    const MarginInfo& marginInfo,
+                                    bool& handled);
+  RenderObject* handlePositionedChild(RenderObject* child,
+                                      const MarginInfo& marginInfo,
+                                      bool& handled);
   RenderObject* handleCompactChild(RenderObject* child,
                                    CompactInfo& compactInfo,
                                    bool& handled);
