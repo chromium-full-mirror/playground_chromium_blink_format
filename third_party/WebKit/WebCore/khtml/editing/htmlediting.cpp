@@ -4814,11 +4814,7 @@ void ReplaceSelectionCommand::doApply() {
     } else {
       NodeImpl* node =
           document()->createEditingTextNode(nonBreakingSpaceString());
-      insertNodeAfter(node, m_lastNodeInserted);
-      if (!m_firstNodeInserted)
-        m_firstNodeInserted = node;
-      m_lastNodeInserted = node;
-      m_lastTopNodeInserted = node;
+      insertNodeAfterAndUpdateNodesInserted(node, m_lastNodeInserted);
       insertionPos = Position(node, 1);
     }
   }
@@ -4830,7 +4826,7 @@ void ReplaceSelectionCommand::doApply() {
     } else {
       NodeImpl* node =
           document()->createEditingTextNode(nonBreakingSpaceString());
-      insertNodeBefore(node, m_firstNodeInserted);
+      insertNodeBeforeAndUpdateNodesInserted(node, m_firstNodeInserted);
     }
   }
 
