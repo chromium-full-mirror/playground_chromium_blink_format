@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 
 @class WebDataSource;
+@class WebError;
 @class WebResourceHandle;
 @class WebResourceRequest;
 @class WebResourceResponse;
@@ -14,8 +15,10 @@
 @protocol WebResourceLoadDelegate;
 
 @interface WebBaseResourceHandleDelegate : NSObject<WebResourceHandleDelegate> {
-  WebResourceHandle* handle;
+ @protected
   WebDataSource* dataSource;
+ @private
+  WebResourceHandle* handle;
   WebResourceRequest* request;
   WebResourceResponse* response;
   id identifier;
@@ -35,8 +38,14 @@
 - (id<WebResourceLoadDelegate>)resourceLoadDelegate;
 - (id<WebResourceLoadDelegate>)downloadDelegate;
 - (void)setIsDownload:(BOOL)f;
+
 - (void)cancel;
+- (void)cancelQuietly;
 
 - (void)setDefersCallbacks:(BOOL)defers;
+
+- (WebError*)cancelledError;
+
+- (void)notifyDelegatesOfInterruptionByPolicyChange;
 
 @end
