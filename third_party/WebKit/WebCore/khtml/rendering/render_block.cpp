@@ -2992,8 +2992,9 @@ void RenderBlock::updateFirstLetter() {
     // first-letter has
     // no text-transform or a different text-transform applied to it.
     DOMStringImpl* oldText = textObj->originalString();
+    KHTMLAssert(oldText);
 
-    if (oldText->l >= 1) {
+    if (oldText && oldText->l >= 1) {
       unsigned int length = 0;
       while (length < oldText->l && ((oldText->s + length)->isSpace() ||
                                      (oldText->s + length)->isPunct()))
