@@ -282,7 +282,8 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
 KHTMLPart::~KHTMLPart() {
 // kdDebug(6050) << "KHTMLPart::~KHTMLPart " << this << endl;
 #ifdef APPLE_CHANGES
-  killTimers();
+  killTimer(d->m_redirectionTimer);
+  d->m_redirectionTimer = 0;
 #endif
 #ifndef APPLE_CHANGES
   if (d->m_findDialog)

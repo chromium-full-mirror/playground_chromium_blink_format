@@ -1166,7 +1166,10 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   void setView(KHTMLView* view);
 
-  void slotData(NSString*, const char* bytes, int length);
+  void slotData(NSString*,
+                const char* bytes,
+                int length,
+                bool complete = false);
 
   void setBaseURL(const KURL&);
 
