@@ -26,4 +26,6 @@
 #ifndef QREGEXP_H_
 #define QREGEXP_H_
 
+class QRegExp {};
+
 #endif

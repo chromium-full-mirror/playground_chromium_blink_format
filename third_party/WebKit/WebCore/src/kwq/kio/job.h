@@ -26,4 +26,10 @@
 #ifndef JOB_H_
 #define JOB_H_
 
+// added to help in compilation of khtml/khtml_part.h:867
+namespace KIO {
+
+class Job {};
+}
+
 #endif
