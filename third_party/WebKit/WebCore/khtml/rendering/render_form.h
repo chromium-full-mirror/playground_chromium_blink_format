@@ -237,6 +237,7 @@ class RenderLineEdit : public RenderFormElement {
   void select();
 #ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
+  short baselinePosition(bool f) const;
 #endif /* APPLE_CHANGES */
 
   KLineEdit* widget() const { return static_cast<KLineEdit*>(m_widget); }
@@ -345,6 +346,10 @@ class RenderSelect : public RenderFormElement {
   RenderSelect(DOM::HTMLSelectElementImpl* element);
 
   virtual const char* renderName() const { return "RenderSelect"; }
+
+#ifdef APPLE_CHANGES
+  short baselinePosition(bool f) const;
+#endif
 
   virtual void calcMinMaxWidth();
   virtual void layout();

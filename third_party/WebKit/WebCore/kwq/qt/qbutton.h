@@ -35,6 +35,8 @@ class QButton : public QWidget {
 
   virtual void setText(const QString&);
   QString text() const;
+
+  QSize sizeHint() const;
 };
 
 #endif

@@ -50,6 +50,8 @@ class QLineEdit : public QWidget {
   void selectAll();
   bool edited() const;
   void setEdited(bool);
+
+  void setFont(const QFont& font);
 };
 
 #endif
