@@ -532,15 +532,10 @@ class RenderBlock : public RenderFlow {
                            int oldTopPosMargin,
                            int oldTopNegMargin);
   void insertCompactIfNeeded(RenderObject* child, CompactInfo& compactInfo);
-  int estimateVerticalPosition(RenderObject* child,
-                               const MarginInfo& info,
-                               RenderObject* prevBlock);
+  int estimateVerticalPosition(RenderObject* child, const MarginInfo& info);
   void determineHorizontalPosition(RenderObject* child);
   void handleBottomOfBlock(int top, int bottom, MarginInfo& marginInfo);
   void setCollapsedBottomMargin(const MarginInfo& marginInfo);
-  bool adjustChildIfOverhangingFloatsExist(RenderObject* child,
-                                           MarginInfo& marginInfo,
-                                           int& yPosEstimate);
   // End helper functions and structs used by layoutBlockChildren.
 
  protected:
