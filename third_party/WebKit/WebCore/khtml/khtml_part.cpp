@@ -1321,9 +1321,6 @@ void KHTMLPart::slotFinished(KIO::Job* job) {
 }
 
 void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
-#ifdef APPLE_CHANGES
-  impl->begin(url, xOffset, xOffset);
-#else
   clear();
   d->m_bCleared = false;
   d->m_cacheId = 0;
@@ -1351,6 +1348,12 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   m_url = url;
   KURL baseurl;
 
+#ifdef APPLE_CHANGES
+  // We don't need KDE chained URI handling or window caption setting
+  if (!m_url.isEmpty()) {
+    baseurl = m_url;
+  }
+#else
   if (!m_url.isEmpty()) {
     KURL::List lst = KURL::split(m_url);
     if (!lst.isEmpty())
@@ -1362,6 +1365,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
     emit setWindowCaption(title.url());
   } else
     emit setWindowCaption(i18n("no title", "* Unknown *"));
+#endif
 
   // ### not sure if XHTML documents served as text/xml should use DocumentImpl
   // or HTMLDocumentImpl
@@ -1380,8 +1384,10 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_doc->docLoader()->setShowAnimations(
       KHTMLFactory::defaultHTMLSettings()->showAnimations());
 
+#ifndef APPLE_CHANGES
   d->m_paUseStylesheet->setItems(QStringList());
   d->m_paUseStylesheet->setEnabled(false);
+#endif
 
   setAutoloadImages(KHTMLFactory::defaultHTMLSettings()->autoLoadImages());
   QString userStyleSheet =
@@ -1389,17 +1395,20 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
 
+#ifndef APPLE_CHANGES
   d->m_doc->setRestoreState(args.docState);
+#endif
   d->m_doc->open();
   // clear widget
   d->m_view->resizeContents(0, 0);
   connect(d->m_doc, SIGNAL(finishedParsing()), this,
           SLOT(slotFinishedParsing()));
 
+#ifndef APPLE_CHANGES
   emit d->m_extension->enableAction("print", true);
+#endif
 
   d->m_doc->setParsing(true);
-#endif  // APPLE_CHANGES
 }
 
 void KHTMLPart::write(const char* str, int len) {
