@@ -129,4 +129,6 @@ class QPtrDictIterator {
 };  // class QPtrDictIterator
     // ===================================================
 
+#endif  // _KWQ_COMPLETE_
+
 #endif

@@ -114,4 +114,6 @@ class QVector : public QGVector {
 };  // class QVector
     // ============================================================
 
+#endif  // _KWQ_COMPLETE_
+
 #endif
