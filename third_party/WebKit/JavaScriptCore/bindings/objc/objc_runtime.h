@@ -192,6 +192,9 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
 
   virtual Value defaultValue(ExecState* exec, Type hint) const;
 
+  virtual Type type() const;
+  virtual bool toBoolean(ExecState* exec) const;
+
  private:
   static const ClassInfo info;
 
