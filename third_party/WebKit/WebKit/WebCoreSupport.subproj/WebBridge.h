@@ -17,4 +17,6 @@
 - (void)receivedData:(NSData*)data withDataSource:(WebDataSource*)dataSource;
 - (void)setDataSource:(WebDataSource*)ds;
 
+- (WebDataSource*)dataSource;
+
 @end
