@@ -21,13 +21,11 @@ types that WebKit handles internally including plug-in types.
 At some point, IFMIMEDatabase might interact with the defaults to provide for
 customization.
 
-Types that WebKit can/will handle internally (thanks to AppKit):
+Types that WebKit can handle internally:
 
 Text types:
 text/html
 text/plain
-text/richtext
-application/rtf
 
 Image types (taken from [NSImage imageFileTypes]):
 image/pict
@@ -63,12 +61,5 @@ at IFMIMEHandler.h) which means that the file should be downloaded.
 */
 
 - (IFMIMEHandler*)MIMEHandlerForMIMEType:(NSString*)mimeType;
-
-/*
-If a mime type is not available, MIMEHandlerForURL determines a IFMIMEHandler
-based on the URL's extension. This may require interaction with Launch Services.
-*/
-
-- (IFMIMEHandler*)MIMEHandlerForURL:(NSURL*)url;
 
 @end

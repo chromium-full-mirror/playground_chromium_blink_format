@@ -14,15 +14,16 @@ handler and the handler's name (ie plugin's name or application's name).
 */
 
 typedef enum {
+  IFMIMEHANDLERTYPE_NIL = 0,
   IFMIMEHANDLERTYPE_HTML = 1,         // WebKit handled html
   IFMIMEHANDLERTYPE_IMAGE = 2,        // WebKit handled image
   IFMIMEHANDLERTYPE_TEXT = 3,         // WebKit handled text
-  IFMIMEHANDLERTYPE_PLUG_IN = 4,      // Plug-in handled file
+  IFMIMEHANDLERTYPE_PLUGIN = 4,       // Plug-in handled file
   IFMIMEHANDLERTYPE_APPLICATION = 5,  // Application handled file
 } IFMIMEHandlerType;
 
 @interface IFMIMEHandler : NSObject {
-  NSString *MIMEType, *MIMESupertype, *MIMESubtype, *handlerName;
+  NSString *MIMEType, *handlerName;
   IFMIMEHandlerType handlerType;
 }
 
@@ -38,8 +39,6 @@ IFMIMEHandler's for types that other application handle. I hope not though.
 
 // Accessor methods
 - (NSString*)MIMEType;
-- (NSString*)MIMESupertype;
-- (NSString*)MIMESubtype;
 - (NSString*)handlerName;
 - (IFMIMEHandlerType)handlerType;
 
