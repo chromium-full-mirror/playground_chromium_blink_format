@@ -30,6 +30,7 @@
 #include "dom/html_document.h"
 #include "dom/dom2_range.h"
 #include "dom/dom_misc.h"
+#include "editing/htmlediting.h"
 
 #include <kparts/part.h>
 #include <kparts/browserextension.h>
@@ -63,6 +64,7 @@ class EventListener;
 }
 
 using DOM::TristateFlag;
+using khtml::EditCommandPtr;
 
 namespace khtml {
 class CachedObject;
@@ -81,7 +83,7 @@ class RenderPart;
 class RenderPartObject;
 class RenderWidget;
 class XMLTokenizer;
-}
+};
 
 namespace KJS {
 class Window;
@@ -646,19 +648,9 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool isEditingAtCaret() const;
 
   /**
-   * Applies the give edit command.
+   * Applies the given edit command.
    */
-  void applyCommand(khtml::EditCommand*);
-
-#if APPLE_CHANGES
-  /**
-   * Performs an undo or redo of the most previous edit
-   * by examining the undo and redo command list and
-   * matching the top item against the cookie passed in.
-   * A hack, but it helps us to hook into Cocoa undo/redo.
-   */
-  void undoRedoEditing(int cookie);
-#endif
+  void applyCommand(const khtml::EditCommandPtr&);
 
   /**
    * Performs an undo of the edit.

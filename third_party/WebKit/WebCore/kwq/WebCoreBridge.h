@@ -274,7 +274,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (NSString*)reconstructedSource;
 
-- (void)undoRedoEditing:(id)object;
+- (void)undoEditing:(id)arg;
+- (void)redoEditing:(id)arg;
 
 @end
 
@@ -458,7 +459,9 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (jobject)pollForAppletInView:(NSView*)view;
 
-- (void)registerCommandForUndo:(int)cookie;
+- (void)registerCommandForUndo;
+- (void)registerCommandForRedo;
+- (void)clearUndoRedoOperations;
 
 @end
 
