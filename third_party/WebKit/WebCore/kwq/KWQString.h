@@ -30,8 +30,8 @@
 #include <string.h>
 
 #include "qcstring.h"
+#include "qregexp.h"
 
-class QRegExp;
 class QString;
 
 class QChar {
@@ -46,11 +46,13 @@ class QChar {
   bool isDigit() const;
   bool isSpace() const;
   bool isLetterOrNumber() const;
+  friend inline int operator==(QChar, char);
   friend inline int operator==(QChar, QChar);
   friend inline int operator!=(QChar, QChar);
   friend inline int operator!=(char, QChar);
   friend inline int operator!=(QChar, char);
   operator char() const;
+  ushort unicode() const;
 
   static const QChar null;
 
@@ -80,6 +82,8 @@ class QChar {
 
 class QString {
  public:
+  static QString fromLatin1(const char*, int len = -1);
+
   QString();
   QString(const QChar*, uint);
   QString(const char* s);
@@ -95,10 +99,15 @@ class QString {
   QString simplifyWhiteSpace() const;
   bool isEmpty() const;
   int contains(const char*) const;
-  int find(char c, int index) const;
-  int find(const char* s, int index, bool b = 0) const;
-  int find(const QRegExp& regexp, int index, bool b = 0) const;
-  int findRev(char c) const;
+  int find(char c, int index = 0) const;
+  int find(const char* s, int index = 0, bool b = 0) const;
+  int find(const QRegExp& regexp, int index = 0, bool b = 0) const;
+  int findRev(char c, int index = 0) const;
+  int findRev(const char* s, int index = 0) const;
+  QString left(uint len) const;
+  QString& remove(uint index, uint len);
+  QString& replace(const QRegExp&, const QString&);
+  void truncate(uint pos);
 
   QString arg(const QString& a, int fieldwidth = 0) const;
 
@@ -111,10 +120,11 @@ class QString {
   const char* ascii() const;
   // FIXME: is there a standard parameter type for overloaded operators?
   QChar operator[](int) const;
-  QString& operator+(QChar c);
-  QString& operator+(const QString& s);
-  QString& operator+=(QChar c);
-  QString& operator+=(const QString& s);
+  QString& operator+(QChar);
+  QString& operator+(const QString&);
+  QString& operator+=(char);
+  QString& operator+=(QChar);
+  QString& operator+=(const QString&);
 
   QString& append(const char*);
   QString& append(const QString&);

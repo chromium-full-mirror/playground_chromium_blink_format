@@ -32,7 +32,7 @@
 // added to help in compilation of khtml/khtml_part.h:867
 namespace KIO {
 class Job;
-}
+}  // namespace KIO
 
 // forward declaration hack to help in compilation of khtml/khtml_part.h:166
 class QWidget;
@@ -51,6 +51,7 @@ class ReadOnlyPart : public Part {};
 
 // hack to help in compilation of khtml/khtml_part.h:785
 class GUIActivateEvent {};
-};
+
+}  // namespace KParts
 
 #endif

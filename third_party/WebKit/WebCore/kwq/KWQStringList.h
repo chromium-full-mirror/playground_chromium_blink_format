@@ -29,6 +29,12 @@
 #include "qstring.h"
 #include "qvaluelist.h"
 
-class QStringList : public QValueList<QString> {};
+class QStringList : public QValueList<QString> {
+ public:
+  static QStringList split(const QChar& sep,
+                           const QString& str,
+                           bool allowEmptyEntries = FALSE);
+  QString join(const QString& sepx) const;
+};
 
 #endif
