@@ -21,7 +21,29 @@
 
 #include "identifier.h"
 
+#define DUMP_STATISTICS 0
+
 namespace KJS {
+
+#if DUMP_STATISTICS
+
+static int numProbes;
+static int numCollisions;
+
+struct IdentifierStatisticsExitLogger {
+  ~IdentifierStatisticsExitLogger();
+};
+
+static IdentifierStatisticsExitLogger logger;
+
+IdentifierStatisticsExitLogger::~IdentifierStatisticsExitLogger() {
+  printf("\nKJS::Identifier statistics\n\n");
+  printf("%d probes\n", numProbes);
+  printf("%d collisions (%.1f%%)\n", numCollisions,
+         100.0 * numCollisions / numProbes);
+}
+
+#endif
 
 Identifier Identifier::null;
 
@@ -88,6 +110,10 @@ UString::Rep* Identifier::add(const char* c) {
   unsigned hash = UString::Rep::computeHash(c);
 
   int i = hash & _tableSizeMask;
+#if DUMP_STATISTICS
+  ++numProbes;
+  numCollisions += _table[i] && !equal(_table[i], c);
+#endif
   while (UString::Rep* key = _table[i]) {
     if (equal(key, c))
       return key;
@@ -124,6 +150,10 @@ UString::Rep* Identifier::add(const UChar* s, int length) {
   unsigned hash = UString::Rep::computeHash(s, length);
 
   int i = hash & _tableSizeMask;
+#if DUMP_STATISTICS
+  ++numProbes;
+  numCollisions += _table[i] && !equal(_table[i], s, length);
+#endif
   while (UString::Rep* key = _table[i]) {
     if (equal(key, s, length))
       return key;
@@ -162,6 +192,10 @@ UString::Rep* Identifier::add(UString::Rep* r) {
   unsigned hash = r->hash();
 
   int i = hash & _tableSizeMask;
+#if DUMP_STATISTICS
+  ++numProbes;
+  numCollisions += _table[i] && !equal(_table[i], r);
+#endif
   while (UString::Rep* key = _table[i]) {
     if (equal(key, r))
       return key;
@@ -183,6 +217,10 @@ inline void Identifier::insert(UString::Rep* key) {
   unsigned hash = key->hash();
 
   int i = hash & _tableSizeMask;
+#if DUMP_STATISTICS
+  ++numProbes;
+  numCollisions += _table[i] != 0;
+#endif
   while (_table[i])
     i = (i + 1) & _tableSizeMask;
 
@@ -195,6 +233,10 @@ void Identifier::remove(UString::Rep* r) {
   UString::Rep* key;
 
   int i = hash & _tableSizeMask;
+#if DUMP_STATISTICS
+  ++numProbes;
+  numCollisions += _table[i] && equal(_table[i], r);
+#endif
   while ((key = _table[i])) {
     if (equal(key, r))
       break;

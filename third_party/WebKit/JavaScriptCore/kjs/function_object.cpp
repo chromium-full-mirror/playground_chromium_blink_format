@@ -163,9 +163,7 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
       else
         callThis = thisArg.toObject(exec);
 
-      List callArgs = args.copy();
-      callArgs.removeFirst();
-      result = func.call(exec, callThis, callArgs);
+      result = func.call(exec, callThis, args.copyTail());
     } break;
   }
 

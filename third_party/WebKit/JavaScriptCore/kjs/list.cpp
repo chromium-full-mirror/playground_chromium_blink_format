@@ -36,6 +36,44 @@
 #include "error_object.h"
 #include "nodes.h"
 
+#define DUMP_STATISTICS 0
+
+#if DUMP_STATISTICS
+
+static int numLists;
+static int numListsHighWaterMark;
+
+static int listSizeHighWaterMark;
+
+static int numListsDestroyed;
+static int numListsBiggerThan[17];
+
+static int numNodesAllocated;
+static int numNodesWouldNeedToBeCopied;
+
+struct ListStatisticsExitLogger {
+  ~ListStatisticsExitLogger();
+};
+
+static ListStatisticsExitLogger logger;
+
+ListStatisticsExitLogger::~ListStatisticsExitLogger() {
+  printf("\nKJS::List statistics:\n\n");
+  printf("%d lists were allocated\n", numLists);
+  printf("%d lists was the high water mark\n", numListsHighWaterMark);
+  printf("largest list had %d elements\n\n", listSizeHighWaterMark);
+  printf("%d nodes were allocated\n", numNodesAllocated);
+  printf("%d node copies would have been necessary if lists didn't share\n\n",
+         numNodesWouldNeedToBeCopied);
+  for (int i = 0; i < 17; i++) {
+    printf("%.1f%% of the lists (%d) had more than %d element%s\n",
+           100.0 * numListsBiggerThan[i] / numListsDestroyed,
+           numListsBiggerThan[i], i, i == 1 ? "" : "s");
+  }
+}
+
+#endif
+
 namespace KJS {
 
 struct ListNode {
@@ -48,9 +86,23 @@ struct ListNode {
 };
 
 struct ListHookNode : public ListNode {
-  ListHookNode() : ListNode(0, this, this), listRefCount(1), nodesRefCount(1) {}
+  ListHookNode()
+      : ListNode(0, this, this),
+        listRefCount(1),
+        nodesRefCount(1)
+#if DUMP_STATISTICS
+        ,
+        sizeHighWaterMark(0)
+#endif
+  {
+  }
+
   int listRefCount;
   int nodesRefCount;
+
+#if DUMP_STATISTICS
+  int sizeHighWaterMark;
+#endif
 };
 
 // ------------------------------ ListIterator ---------------------------------
@@ -87,9 +139,20 @@ Value ListIterator::operator--(int) {
 
 // ------------------------------ List -----------------------------------------
 
-List::List() : hook(new ListHookNode) {}
+List::List() : hook(new ListHookNode) {
+#if DUMP_STATISTICS
+  if (++numLists > numListsHighWaterMark)
+    numListsHighWaterMark = numLists;
+#endif
+}
 
 List::List(const List& l) : hook(l.hook) {
+#if DUMP_STATISTICS
+  if (++numLists > numListsHighWaterMark)
+    numListsHighWaterMark = numLists;
+  numNodesWouldNeedToBeCopied += size();
+#endif
+
   ++hook->listRefCount;
   if (hook->nodesRefCount++ == 0)
     refAll();
@@ -101,22 +164,24 @@ List& List::operator=(const List& l) {
 }
 
 List::~List() {
+#if DUMP_STATISTICS
+  --numLists;
+#endif
+
   if (--hook->nodesRefCount == 0)
     derefAll();
 
   if (--hook->listRefCount == 0) {
+#if DUMP_STATISTICS
+    ++numListsDestroyed;
+    for (int i = 0; i < 17; i++)
+      if (hook->sizeHighWaterMark > i)
+        ++numListsBiggerThan[i];
+#endif
+
     assert(hook->nodesRefCount == 0);
     clearInternal();
     delete hook;
-  }
-}
-
-void List::mark() {
-  ListNode* n = hook->next;
-  while (n != hook) {
-    if (!n->member->marked())
-      n->member->mark();
-    n = n->next;
   }
 }
 
@@ -126,6 +191,16 @@ void List::append(const Value& val) {
     n->member->ref();
   hook->prev->next = n;
   hook->prev = n;
+
+#if DUMP_STATISTICS
+  ++numNodesAllocated;
+  int s = size();
+  if (s > hook->sizeHighWaterMark) {
+    hook->sizeHighWaterMark = s;
+    if (s > listSizeHighWaterMark)
+      listSizeHighWaterMark = s;
+  }
+#endif
 }
 
 void List::append(ValueImp* val) {
@@ -134,15 +209,40 @@ void List::append(ValueImp* val) {
     val->ref();
   hook->prev->next = n;
   hook->prev = n;
+
+#if DUMP_STATISTICS
+  ++numNodesAllocated;
+  int s = size();
+  if (s > hook->sizeHighWaterMark) {
+    hook->sizeHighWaterMark = s;
+    if (s > listSizeHighWaterMark)
+      listSizeHighWaterMark = s;
+  }
+#endif
 }
 
-void List::prepend(const Value& val) {
-  ListNode* n = new ListNode(val, hook, hook->next);
+#if 0
+
+void List::prepend(const Value& val)
+{
+  ListNode *n = new ListNode(val, hook, hook->next);
   if (hook->nodesRefCount)
     n->member->ref();
   hook->next->prev = n;
   hook->next = n;
+
+#if DUMP_STATISTICS
+  ++numNodesAllocated;
+  int s = size();
+  if (s > hook->sizeHighWaterMark) {
+    hook->sizeHighWaterMark = s;
+    if (s > listSizeHighWaterMark)
+     listSizeHighWaterMark = s;
+  }
+#endif
 }
+
+#endif
 
 void List::prepend(ValueImp* val) {
   ListNode* n = new ListNode(val, hook, hook->next);
@@ -150,6 +250,16 @@ void List::prepend(ValueImp* val) {
     val->ref();
   hook->next->prev = n;
   hook->next = n;
+
+#if DUMP_STATISTICS
+  ++numNodesAllocated;
+  int s = size();
+  if (s > hook->sizeHighWaterMark) {
+    hook->sizeHighWaterMark = s;
+    if (s > listSizeHighWaterMark)
+      listSizeHighWaterMark = s;
+  }
+#endif
 }
 
 void List::prependList(const List& lst) {
@@ -165,19 +275,25 @@ void List::removeFirst() {
   erase(hook->next);
 }
 
-void List::removeLast() {
+#if 0
+
+void List::removeLast()
+{
   erase(hook->prev);
 }
 
-void List::remove(const Value& val) {
+void List::remove(const Value &val)
+{
   if (val.isNull())
     return;
-  for (ListNode* n = hook->next; n != hook; n = n->next)
+  for (ListNode *n = hook->next; n != hook; n = n->next)
     if (n->member == val.imp()) {
       erase(n);
       return;
     }
 }
+
+#endif
 
 void List::clear() {
   if (hook->nodesRefCount)
