@@ -82,6 +82,8 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   // In case of multiple items named the same way
   NodeImpl* nextNamedItem(const DOMString& name) const;
 
+  virtual QValueList<Node> namedItems(const DOMString& name) const;
+
   struct CollectionInfo {
     CollectionInfo()
         : version(0), current(0), position(0), length(0), haslength(false) {}
@@ -93,13 +95,12 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   };
 
  protected:
-  virtual unsigned long calcLength(NodeImpl* current) const;
-  virtual NodeImpl* getItem(NodeImpl* current, int index, int& pos) const;
-  virtual NodeImpl* getNamedItem(NodeImpl* current,
-                                 int attr_id,
-                                 const DOMString& name,
-                                 bool caseSensitive = true) const;
-  virtual NodeImpl* nextNamedItemInternal(const DOMString& name) const;
+  virtual NodeImpl* traverseNextItem(NodeImpl* start) const;
+  bool checkForNameMatch(NodeImpl* node,
+                         bool checkName,
+                         const DOMString& name,
+                         bool caseSensitive) const;
+  virtual unsigned long calcLength() const;
   virtual void resetCollectionInfo() const;
   // the base node, the collection refers to
   NodeImpl* base;
@@ -130,8 +131,13 @@ class HTMLFormCollectionImpl : public HTMLCollectionImpl {
   virtual NodeImpl* firstItem() const;
   virtual NodeImpl* nextItem() const;
 
+  NodeImpl* namedItem(const DOMString& name, bool caseSensitive = true) const;
+  NodeImpl* nextNamedItem(const DOMString& name) const;
+
+  virtual QValueList<Node> namedItems(const DOMString& name) const;
+
  protected:
-  virtual unsigned long calcLength(NodeImpl* current) const;
+  virtual unsigned long calcLength() const;
   virtual NodeImpl* getNamedItem(NodeImpl* current,
                                  int attr_id,
                                  const DOMString& name,
