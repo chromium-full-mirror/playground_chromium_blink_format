@@ -470,7 +470,14 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
   }
 }
 
+static bool debuggingRenderTreeFlag = false;
+
+bool debuggingRenderTree() {
+  return debuggingRenderTreeFlag;
+}
+
 QString externalRepresentation(RenderObject* o) {
+  debuggingRenderTreeFlag = true;
   JSEditor::setSupportsPasteCommand(true);
 
   QString s;
