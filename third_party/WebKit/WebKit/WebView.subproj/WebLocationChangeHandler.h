@@ -75,7 +75,7 @@ typedef enum {
 // Implementations typically call haveContentPolicy:forLocationChangeHandler:
 // immediately, although
 // may call it later after showing a user dialog.
-- (void)requestContentPolicyForContentMIMEType:(NSString*)type;
+- (void)requestContentPolicyForMIMEType:(NSString*)type;
 
 // We may have different errors that cause the the policy to be
 // un-implementable, i.e.
