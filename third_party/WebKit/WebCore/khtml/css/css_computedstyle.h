@@ -65,6 +65,8 @@ class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl {
   CSSStyleDeclarationImpl* copyInheritableProperties() const;
   void diff(CSSStyleDeclarationImpl*) const;
 
+  CSSValueImpl* getPositionOffsetValue(int propertyID) const;
+
  private:
   CSSProperty property(int id) const;
 
