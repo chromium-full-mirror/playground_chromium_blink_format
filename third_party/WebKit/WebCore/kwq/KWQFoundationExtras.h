@@ -54,7 +54,9 @@ static inline void KWQRelease(id obj) {
 // be scanned for GC, like a C++ object.
 
 static inline id KWQRetainNSRelease(id obj) {
-  return [KWQRetain(obj) release];
+  KWQRetain(obj);
+  [obj release];
+  return obj;
 }
 
 // Definitions for GC-specific methods for Panther.
