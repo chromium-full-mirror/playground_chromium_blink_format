@@ -43,6 +43,7 @@ class RenderObject;
 
 namespace KJS {
 class SavedProperties;
+class SavedBuiltins;
 class ScheduledAction;
 }
 
@@ -123,6 +124,10 @@ class KWQKHTMLPart : public KHTMLPart {
   void saveLocationProperties(KJS::SavedProperties* locationProperties);
   void restoreWindowProperties(KJS::SavedProperties* windowProperties);
   void restoreLocationProperties(KJS::SavedProperties* locationProperties);
+  void saveInterpreterBuiltins(KJS::SavedBuiltins& interpreterBuiltins);
+  void restoreInterpreterBuiltins(
+      const KJS::SavedBuiltins& interpreterBuiltins);
+
   void openURLFromPageCache(KWQPageState* state);
 
   void saveDocumentState();
