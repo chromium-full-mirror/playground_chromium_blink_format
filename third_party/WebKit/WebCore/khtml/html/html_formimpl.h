@@ -83,11 +83,9 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   void radioClicked(HTMLGenericFormElementImpl* caller);
 
-  void registerFormElement(khtml::RenderFormElement*);
-  void removeFormElement(khtml::RenderFormElement*);
-
   void registerFormElement(HTMLGenericFormElementImpl*);
   void removeFormElement(HTMLGenericFormElementImpl*);
+  void makeFormElementDormant(HTMLGenericFormElementImpl*);
 
   bool prepareSubmit();
   void submit(bool activateSubmitButton);
@@ -109,6 +107,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   friend class HTMLFormCollectionImpl;
 
   QPtrList<HTMLGenericFormElementImpl> formElements;
+  QPtrList<HTMLGenericFormElementImpl> dormantFormElements;
   DOMString m_url;
   DOMString m_target;
   DOMString m_enctype;
@@ -145,6 +144,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void attach();
+  virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
   virtual void reset() {}
@@ -195,6 +195,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   bool m_disabled, m_readOnly;
 
   bool m_inited : 1;
+  bool m_dormant : 1;
 };
 
 // -------------------------------------------------------------------------
