@@ -596,11 +596,16 @@ CSSMutableStyleDeclarationImpl* CSSStyleDeclarationImpl::copyPropertiesInSet(
 
 void CSSMutableStyleDeclarationImpl::removePropertiesInSet(const int* set,
                                                            unsigned length) {
+  bool changed = false;
   for (unsigned i = 0; i < length; i++) {
     CSSValueImpl* value = getPropertyCSSValue(set[i]);
-    if (value)
+    if (value) {
       m_values.remove(CSSProperty(set[i], value, false));
+      changed = true;
+    }
   }
+  if (changed)
+    setChanged();
 }
 
 CSSMutableStyleDeclarationImpl* CSSMutableStyleDeclarationImpl::makeMutable() {
