@@ -156,6 +156,7 @@ class RenderFlow : public RenderBox {
   void layoutSpecialObjects(bool relayoutChildren);
 
  public:
+  int nearestFloatBottom(int height) const;
   int floatBottom() const;
   inline int leftBottom();
   inline int rightBottom();
