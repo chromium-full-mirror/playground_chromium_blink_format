@@ -210,7 +210,7 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
 
   RenderStyle* pseudo = child->style()->getPseudoStyle(type);
 
-  if (pseudo) {
+  if (pseudo && pseudo->display() != NONE) {
     if (pseudo->contentType() == CONTENT_TEXT) {
       RenderObject* po = new (renderArena()) RenderFlow(0 /* anonymous box */);
       po->setParent(this);  // Set the parent now, so setStyle will be able to
