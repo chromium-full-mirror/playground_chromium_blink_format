@@ -464,7 +464,7 @@ class RenderBlock : public RenderFlow {
     void setAtBottomOfBlock(bool b) { m_atBottomOfBlock = b; }
     void clearMargin() { m_posMargin = m_negMargin = 0; }
     void setSelfCollapsingBlockClearedFloat(bool b) {
-      m_selfCollapsingBlockClearedFloat = false;
+      m_selfCollapsingBlockClearedFloat = b;
     }
     void setTopQuirk(bool b) { m_topQuirk = b; }
     void setBottomQuirk(bool b) { m_bottomQuirk = b; }
