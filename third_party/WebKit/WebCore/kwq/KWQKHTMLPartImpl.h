@@ -150,8 +150,6 @@ class KWQKHTMLPartImpl : public QObject {
   DOM::NodeImpl* selectionStart() const;
   DOM::NodeImpl* selectionEnd() const;
 
-  void didAddWidget(QWidget*);
-
  private:
   void setPolicyBaseURL(const DOM::DOMString&);
 
