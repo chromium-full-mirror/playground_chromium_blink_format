@@ -603,6 +603,8 @@ class Context2D : public DOMObject {
     AddLineToPoint,
     AddQuadraticCurveToPoint,
     AddBezierCurveToPoint,
+    AddArcToPoint,
+    AddRect,
     ClearRect,
     FillRect,
     StrokeRect,
