@@ -10,11 +10,8 @@
 @protocol WebDocumentDragSettings;
 @protocol WebDocumentText;
 
-@interface WebTextView : WebSearchableTextView<WebDocumentView,
-                                               WebDocumentDragSettings,
-                                               WebDocumentText> {
-  BOOL canDragFrom;
-  BOOL canDragTo;
+@interface WebTextView
+    : WebSearchableTextView<WebDocumentView, WebDocumentText> {
 }
 
 - (void)setFixedWidthFont;
