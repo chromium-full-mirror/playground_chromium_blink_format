@@ -193,7 +193,7 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case Title:
         return getString(doc.title());
       case Referrer:
-        return getString(doc.referrer());
+        return doc.referrer().isNull() ? String() : getString(doc.referrer());
       case Domain:
         return String(doc.domain());
       case URL:
