@@ -4442,7 +4442,12 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
   Context2D* contextObject = static_cast<KJS::Context2D*>(thisObj.imp());
   khtml::RenderCanvasImage* renderer = static_cast<khtml::RenderCanvasImage*>(
       contextObject->_element->renderer());
+  if (!renderer)
+    return Undefined();
+
   CGContextRef drawingContext = renderer->drawingContext();
+  if (!drawingContext)
+    return Undefined();
 
   switch (id) {
     case Context2D::Save: {
