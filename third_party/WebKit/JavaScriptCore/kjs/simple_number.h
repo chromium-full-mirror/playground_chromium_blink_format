@@ -35,6 +35,7 @@ class SimpleNumber {
     tag = 1,
     shift = 2,
     mask = (1 << shift) - 1,
+    sign = 1 << 31,
     max = (1 << (31 - shift)) - 1,
     min = -max - 1
   };
@@ -43,7 +44,7 @@ class SimpleNumber {
     return ((int)imp & mask) == tag;
   }
   static inline int value(const ValueImp* imp) {
-    return ((int)imp >> shift) | (((int)imp & min) ? ~max : 0);
+    return ((int)imp >> shift) | (((int)imp & sign) ? ~max : 0);
   }
 
   static inline bool fits(int i) { return i <= max && i >= min; }
