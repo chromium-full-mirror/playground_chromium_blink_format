@@ -10,6 +10,8 @@
 
 @interface IFNullPluginView : NSImageView {
   BOOL errorSent;
+  NSString* mimeType;
+  NSURL* pluginPage;
 }
 
 - initWithFrame:(NSRect)frame

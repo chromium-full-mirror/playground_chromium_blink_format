@@ -144,4 +144,7 @@
 // an IFWebView.
 - (IFWebFrame*)frameForView:(NSView*)aView;
 
+// Called when a plug-in for a certain mime type is not installed
+- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)url;
+
 @end
