@@ -51,11 +51,13 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 #endif
 
+@class DOMCSSStyleDeclaration;
 @class DOMDocument;
 @class DOMElement;
 @class DOMHTMLImageElement;
 @class DOMNode;
 @class DOMRange;
+@class WebArchive;
 @class WebCoreSettings;
 
 @protocol WebCoreDOMTreeCopier;
@@ -245,9 +247,6 @@ typedef enum {
 - (BOOL)isSelectionEditable;
 - (BOOL)moveCaretToPoint:(NSPoint)point;
 
-- (void)pasteMarkupString:(NSString*)markupString;
-
-- (void)deleteSelection;
 - (BOOL)haveSelection;
 
 - (NSAttributedString*)selectedAttributedString;
@@ -312,9 +311,15 @@ typedef enum {
 - (void)alterCurrentSelection:(WebSelectionAlteration)alteration
                     direction:(WebSelectionDirection)direction
                   granularity:(WebSelectionGranularity)granularity;
-- (void)insertText:(NSString*)text;
-- (void)insertNewline;
+- (void)replaceSelectionWithText:(NSString*)text;
+- (void)replaceSelectionWithNode:(DOMNode*)node;
+- (void)replaceSelectionWithMarkupString:(NSString*)markupString;
+- (void)replaceSelectionWithWebArchive:(WebArchive*)archive;
+- (void)replaceSelectionWithNewline;
+- (void)deleteSelection;
 - (void)deleteKeyPressed;
+- (void)applyStyle:(DOMCSSStyleDeclaration*)style
+    toElementsInDOMRange:(DOMRange*)range;
 
 @end
 

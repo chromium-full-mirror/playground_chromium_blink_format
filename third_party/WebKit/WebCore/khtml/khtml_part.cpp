@@ -2516,11 +2516,6 @@ void KHTMLPart::clearSelection() {
   notifySelectionChanged();
 }
 
-void KHTMLPart::deleteSelection() {
-  EditCommand cmd(DeleteSelectionCommand(d->m_doc));
-  cmd.apply();
-}
-
 void KHTMLPart::invalidateSelection() {
   clearCaretRectIfNeeded();
   setFocusNodeIfNeeded(d->m_selection);
@@ -5129,11 +5124,6 @@ void KHTMLPart::reappliedEditing(EditCommand& cmd) {
   KWQ(this)->registerCommandForUndo(cmd);
 #endif
   d->m_lastEditCommand = EditCommand::emptyCommand();
-}
-
-void KHTMLPart::pasteMarkupString(const QString& markupString) {
-  EditCommand cmd(PasteMarkupCommand(d->m_doc, DOMString(markupString)));
-  cmd.apply();
 }
 
 #if !APPLE_CHANGES

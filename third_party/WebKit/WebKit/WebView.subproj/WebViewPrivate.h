@@ -94,8 +94,8 @@ extern NSString* _WebMainFrameURLKey;
   void* observationInfo;
 
   NSArray* draggedTypes;
-
   BOOL drawsBackground;
+  BOOL editable;
 }
 @end
 
@@ -345,6 +345,40 @@ typedef enum {
   WebViewInsertActionDropped,
 } WebViewInsertAction;
 
+@interface WebView (WebViewCSS)
+- (DOMCSSStyleDeclaration*)computedStyleForElement:(DOMElement*)element
+                                     pseudoElement:(NSString*)pseudoElement;
+@end
+
+@interface WebView (WebViewEditing)
+- (void)setSelectedDOMRange:(DOMRange*)range;
+- (DOMRange*)selectedDOMRange;
+- (void)setEditable:(BOOL)flag;
+- (BOOL)isEditable;
+- (void)setTypingStyle:(DOMCSSStyleDeclaration*)style;
+- (DOMCSSStyleDeclaration*)typingStyle;
+- (void)setSmartInsertDeleteEnabled:(BOOL)flag;
+- (BOOL)smartInsertDeleteEnabled;
+- (void)setContinuousSpellCheckingEnabled:(BOOL)flag;
+- (BOOL)isContinuousSpellCheckingEnabled;
+- (int)spellCheckerDocumentTag;
+- (NSUndoManager*)undoManager;
+- (void)setEditingDelegate:(id)delegate;
+- (id)editingDelegate;
+@end
+
+@interface WebView (WebViewUndoableEditing)
+- (void)insertNode:(DOMNode*)node replacingDOMRange:(DOMRange*)range;
+- (void)insertText:(NSString*)text replacingDOMRange:(DOMRange*)range;
+- (void)insertMarkupString:(NSString*)markupString
+         replacingDOMRange:(DOMRange*)range;
+- (void)insertWebArchive:(WebArchive*)webArchive
+       replacingDOMRange:(DOMRange*)range;
+- (void)deleteDOMRange:(DOMRange*)range;
+- (void)applyStyle:(DOMCSSStyleDeclaration*)style
+    toElementsInDOMRange:(DOMRange*)range;
+@end
+
 extern NSString* const WebViewDidBeginEditingNotification;
 extern NSString* const WebViewDidChangeNotification;
 extern NSString* const WebViewDidEndEditingNotification;
@@ -365,7 +399,8 @@ extern NSString* const WebViewDidChangeSelectionNotification;
 - (BOOL)webView:(WebView*)webView shouldDeleteDOMRange:(DOMRange*)range;
 - (BOOL)webView:(WebView*)webView
     shouldChangeSelectedDOMRange:(DOMRange*)currentRange
-                      toDOMRange:(DOMRange*)proposedRange;
+                      toDOMRange:(DOMRange*)proposedRange
+                  stillSelecting:(BOOL)flag;
 - (BOOL)webView:(WebView*)webView
         shouldApplyStyle:(DOMCSSStyleDeclaration*)style
     toElementsInDOMRange:(DOMRange*)range;
@@ -381,15 +416,6 @@ extern NSString* const WebViewDidChangeSelectionNotification;
 - (NSUndoManager*)undoManagerForWebView:(WebView*)webView;
 @end
 
-@interface WebView (WebEditingExtras)
-- (WebBridge*)_bridgeForCurrentSelection;
-- (void)setSelectedDOMRange:(DOMRange*)range;
-- (DOMRange*)selectedDOMRange;
-- (void)setEditingDelegate:(id)delegate;
-- (id)editingDelegate;
-- (void)editingKeyDown:(NSEvent*)event;
-@end
-
-@interface WebView (WebViewUndoableEditing)
-- (void)insertText:(NSString*)text replacingDOMRange:(DOMRange*)range;
+@interface WebView (WebViewEditingExtras)
+- (void)_editingKeyDown:(NSEvent*)event;
 @end
