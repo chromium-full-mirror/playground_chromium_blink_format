@@ -39,16 +39,17 @@ class QPoint {
 
   int manhattanLength() const;
 
-  friend inline QPoint operator+(const QPoint&, const QPoint&);
-  friend inline QPoint operator-(const QPoint&, const QPoint&);
+  friend QPoint operator+(const QPoint&, const QPoint&);
+  friend QPoint operator-(const QPoint&, const QPoint&);
 };
 
 // FIXME: QPointArray here to workaround bug in khtml/html/html_imageimpl.cpp
 class QPointArray {
  public:
   QPointArray(int);
+  QPointArray(int, const QCOORD*);
   void setPoint(uint, int, int);
-  bool setPoints(int nPoints, int firstx, int firsty, ...);
+  bool setPoints(int, int, int, ...);
 };
 
 #endif
