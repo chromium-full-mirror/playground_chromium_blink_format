@@ -822,6 +822,10 @@ void DeleteSelectionCommandImpl::doApply() {
   deleteCollapsibleWhitespace(m_selectionToDelete);
   Selection selection = endingSelection();
 
+  if (selection.state() != Selection::RANGE)
+    // after collapsing whitespace, selection is not a range...no work to do
+    return;
+
   Position endingPosition;
   bool adjustEndingPositionDownstream = false;
 
