@@ -69,7 +69,6 @@ class RenderFlow : public RenderBox {
   virtual void setChildrenInline(bool b) { m_childrenInline = b; }
 
   virtual bool isRendered() const { return true; }
-  virtual void setBlockBidi() { m_blockBidi = true; }
 
   virtual RenderFlow* continuation() const { return m_continuation; }
   void setContinuation(RenderFlow* c) { m_continuation = c; }
@@ -245,8 +244,7 @@ class RenderFlow : public RenderBox {
  private:
   bool m_childrenInline : 1;
   bool m_pre : 1;
-  bool firstLine : 1;  // used in inline layouting
-  bool m_blockBidi : 1;
+  bool firstLine : 1;        // used in inline layouting
   EClear m_clearStatus : 2;  // used during layuting of paragraphs
 
   short m_maxTopPosMargin;

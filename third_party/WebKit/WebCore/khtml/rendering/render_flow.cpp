@@ -48,7 +48,6 @@ RenderFlow::RenderFlow(DOM::NodeImpl* node) : RenderBox(node) {
   m_childrenInline = true;
   m_pre = false;
   firstLine = false;
-  m_blockBidi = false;
   m_clearStatus = CNONE;
 
   specialObjects = 0;
@@ -342,9 +341,7 @@ void RenderFlow::layout() {
 
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
   if (childrenInline()) {
-    // ### make bidi resumeable so that we can get rid of this ugly hack
-    if (!m_blockBidi)
-      layoutInlineChildren(relayoutChildren);
+    layoutInlineChildren(relayoutChildren);
   } else
     layoutBlockChildren(relayoutChildren);
 
@@ -1813,9 +1810,6 @@ void RenderFlow::calcMinMaxWidth() {
 }
 
 void RenderFlow::close() {
-  // ### get rid of me
-  m_blockBidi = false;
-
   if (lastChild() && lastChild()->isAnonymousBox()) {
     lastChild()->close();
   }
@@ -2069,12 +2063,6 @@ void RenderFlow::addChildToFlow(RenderObject* newChild,
   setLayouted(false);
 
   bool madeBoxesNonInline = FALSE;
-
-  if (newChild->isPositioned()) {
-    m_blockBidi = false;
-  }
-  if (m_blockBidi)
-    newChild->setBlockBidi();
 
   RenderStyle* pseudoStyle = 0;
   if (!isInline() && (!firstChild() || firstChild() == beforeChild) &&
@@ -2400,8 +2388,6 @@ bool RenderFlow::nodeAtPoint(NodeInfo& info,
 #ifndef NDEBUG
 void RenderFlow::printTree(int indent) const {
   RenderBox::printTree(indent);
-
-  //     KHTMLAssert(!m_blockBidi);
 
   if (specialObjects) {
     QPtrListIterator<SpecialObject> it(*specialObjects);

@@ -225,7 +225,7 @@ long HTMLImageElementImpl::width() const {
     return getAttribute(ATTR_WIDTH).toInt();
 
   // ### make a unified call for this
-  if (changed()) {
+  if (changed() || !m_render->layouted()) {
     getDocument()->updateRendering();
     if (getDocument()->view())
       getDocument()->view()->layout();
@@ -239,7 +239,7 @@ long HTMLImageElementImpl::height() const {
     return getAttribute(ATTR_HEIGHT).toInt();
 
   // ### make a unified call for this
-  if (changed()) {
+  if (changed() || !m_render->layouted()) {
     getDocument()->updateRendering();
     if (getDocument()->view())
       getDocument()->view()->layout();
