@@ -580,14 +580,14 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
       Object resObj = Object::dynamicCast(
           exec->interpreter()->builtinArray().construct(exec, List::empty()));
       result = resObj;
-      int begin = args[0].toUInt32(exec);
+      int begin = args[0].toInteger(exec);
       if (begin < 0)
         begin = maxInt(begin + length, 0);
       else
         begin = minInt(begin, length);
       int end = length;
       if (args[1].type() != UndefinedType) {
-        end = args[1].toUInt32(exec);
+        end = args[1].toInteger(exec);
         if (end < 0)
           end = maxInt(end + length, 0);
         else
@@ -595,14 +595,14 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
       }
 
       // printf( "Slicing from %d to %d \n", begin, end );
-      for (unsigned int k = 0; k < (unsigned int)end - begin; k++) {
-        if (thisObj.hasProperty(exec, k + begin)) {
-          Value obj = thisObj.get(exec, k + begin);
-          resObj.put(exec, k, obj);
+      int n = 0;
+      for (int k = begin; k < end; k++, n++) {
+        if (thisObj.hasProperty(exec, k)) {
+          Value obj = thisObj.get(exec, k);
+          resObj.put(exec, n, obj);
         }
       }
-      resObj.put(exec, lengthPropertyName, Number(end - begin),
-                 DontEnum | DontDelete);
+      resObj.put(exec, lengthPropertyName, Number(n), DontEnum | DontDelete);
       break;
     }
     case Sort: {
