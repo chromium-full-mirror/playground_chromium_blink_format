@@ -382,6 +382,7 @@ enum EMarqueeDirection {
 class StyleMarqueeData : public Shared<StyleMarqueeData> {
  public:
   StyleMarqueeData();
+  StyleMarqueeData(const StyleMarqueeData& o);
 
   bool operator==(const StyleMarqueeData& o) const;
   bool operator!=(const StyleMarqueeData& o) const { return !(*this == o); }
