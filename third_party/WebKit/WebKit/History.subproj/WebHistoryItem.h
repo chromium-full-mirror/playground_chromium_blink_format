@@ -27,6 +27,9 @@
             image:(NSImage*)image
           comment:(NSString*)comment;
 
+- (NSDictionary*)dictionaryRepresentation;
+- (id)initFromDictionaryRepresentation:(NSDictionary*)dict;
+
 - (NSURL*)url;
 - (NSString*)title;
 - (NSImage*)image;
