@@ -2161,27 +2161,6 @@ void KHTMLPart::setOnlyLocalReferences(bool enable) {
   d->m_onlyLocalReferences = enable;
 }
 
-void KHTMLPart::setEditMode(TristateFlag flag) {
-  d->m_inEditMode = flag;
-}
-
-TristateFlag KHTMLPart::editMode() const {
-  if (d->m_inEditMode != FlagNone)
-    return d->m_inEditMode == FlagEnabled ? FlagEnabled : FlagDisabled;
-
-  KHTMLPart* part = parentPart();
-  while (part) {
-    if (part->d->m_inEditMode != FlagNone)
-      return part->d->m_inEditMode == FlagEnabled ? FlagEnabled : FlagDisabled;
-    part = part->parentPart();
-  }
-  return FlagNone;
-}
-
-bool KHTMLPart::inEditMode() const {
-  return editMode() == FlagEnabled;
-}
-
 #if !APPLE_CHANGES
 
 void KHTMLPart::findTextBegin(NodeImpl* startNode, int startPos) {
@@ -4671,7 +4650,7 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
       d->m_selection.state() == Selection::RANGE &&
       d->m_textElement == Selection::CHARACTER) {
     Selection selection;
-    if (isEditingAtNode(d->m_selection.base().node()))
+    if (d->m_selection.base().node()->isContentEditable())
       selection.moveTo(d->m_selection.base().node()->positionForCoordinates(
           event->x(), event->y()));
     setSelection(selection);
@@ -4875,13 +4854,6 @@ void KHTMLPart::selectAll() {
   Selection selection(Position(first, 0),
                       Position(last, last->nodeValue().length()));
   setSelection(selection);
-}
-
-bool KHTMLPart::isEditingAtNode(const NodeImpl* node) const {
-  if (inEditMode())
-    return true;
-
-  return node && node->isContentEditable();
 }
 
 EditCommand KHTMLPart::lastEditCommand() {

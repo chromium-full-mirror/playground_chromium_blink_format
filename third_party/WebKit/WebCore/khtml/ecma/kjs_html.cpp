@@ -126,7 +126,7 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
 const ClassInfo KJS::HTMLDocument::info = {"HTMLDocument", &DOMDocument::info,
                                            &HTMLDocumentTable, 0};
 /* Source for HTMLDocumentTable. Use "make hashtables" to regenerate.
-@begin HTMLDocumentTable 32
+@begin HTMLDocumentTable 30
   title			HTMLDocument::Title		DontDelete
   referrer		HTMLDocument::Referrer		DontDelete|ReadOnly
   domain		HTMLDocument::Domain		DontDelete
@@ -165,7 +165,6 @@ wouldn't,
   height		HTMLDocument::Height		DontDelete|ReadOnly
   width			HTMLDocument::Width		DontDelete|ReadOnly
   dir			HTMLDocument::Dir		DontDelete
-  designMode            HTMLDocument::DesignMode        DontDelete
 #potentially obsolete array properties
 # layers
 # plugins
@@ -259,8 +258,6 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case ReleaseEvents:
         return lookupOrCreateFunction<HTMLDocFunction>(
             exec, propertyName, this, entry->value, entry->params, entry->attr);
-      case DesignMode:
-        return String(doc.designMode());
     }
   }
   // Look for overrides
@@ -451,9 +448,6 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
       break;
     case Dir:
       body.setDir(value.toString(exec).string());
-      break;
-    case DesignMode:
-      doc.setDesignMode(value.toString(exec).string());
       break;
     default:
       kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
