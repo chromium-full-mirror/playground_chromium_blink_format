@@ -4721,7 +4721,8 @@ void ReplaceSelectionCommand::doApply() {
     VisiblePosition visiblePos = VisiblePosition(startPos, VP_DEFAULT_AFFINITY);
     assert(visiblePos.isNotNull());
     addLeadingSpace =
-        startPos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY).isNull() &&
+        startPos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY, true)
+            .isNull() &&
         !isFirstVisiblePositionOnLine(visiblePos);
     if (addLeadingSpace) {
       QChar previousChar = visiblePos.previous().character();
@@ -4731,7 +4732,8 @@ void ReplaceSelectionCommand::doApply() {
       }
     }
     addTrailingSpace =
-        startPos.trailingWhitespacePosition(VP_DEFAULT_AFFINITY).isNull() &&
+        startPos.trailingWhitespacePosition(VP_DEFAULT_AFFINITY, true)
+            .isNull() &&
         !isLastVisiblePositionOnLine(visiblePos);
     if (addTrailingSpace) {
       QChar thisChar = visiblePos.character();
