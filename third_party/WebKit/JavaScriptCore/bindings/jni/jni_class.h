@@ -29,6 +29,7 @@
 
 #include <JavaVM/jni.h>
 
+#include <runtime.h>
 #include <jni_runtime.h>
 
 #include <runtime.h>
@@ -56,7 +57,7 @@ class JavaClass : public Class {
     free((void*)_name);
     CFRelease(_fields);
     CFRelease(_methods);
-    delete _constructors;
+    delete[] _constructors;
   }
 
   ~JavaClass() { _commonDelete(); }

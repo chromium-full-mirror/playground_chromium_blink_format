@@ -30,6 +30,8 @@
 
 namespace Bindings {
 
+class Instance;
+
 // For now just use Java style type descriptors.
 typedef const char* RuntimeType;
 
@@ -54,7 +56,7 @@ class Field {
   virtual const char* name() const = 0;
   virtual RuntimeType type() const = 0;
 
-  virtual KJS::Value value() const = 0;
+  virtual KJS::Value valueFromInstance(const Instance* instance) const = 0;
 
   virtual ~Field(){};
 };
@@ -94,7 +96,7 @@ class Instance {
 
   virtual Class* getClass() const = 0;
 
-  virtual KJS::Value getValueOfField(const Field* aField) const = 0;
+  virtual KJS::Value getValueOfField(const Field* aField) const;
 
   virtual ~Instance(){};
 };

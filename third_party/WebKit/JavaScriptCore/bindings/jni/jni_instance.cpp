@@ -23,8 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <jni_utility.h>
-#include <jni_runtime.h>
+#include <jni_class.h>
 #include <jni_instance.h>
+#include <jni_runtime.h>
 
 using namespace Bindings;
 
@@ -41,6 +42,6 @@ JavaInstance::JavaInstance(const JavaInstance& other) : Instance() {
   _instance->ref();
 };
 
-KJS::Value JavaInstance::getValueOfField(const Field* aField) const {
-  return KJS::Value(0);
+Class* JavaInstance::getClass() const {
+  return JavaClass::classForInstance(_instance->_instance);
 }
