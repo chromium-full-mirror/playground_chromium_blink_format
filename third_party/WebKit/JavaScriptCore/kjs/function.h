@@ -107,7 +107,8 @@ class ArgumentsImp : public ObjectImp {
 class ActivationImp : public ObjectImp {
  public:
   ActivationImp(ExecState* exec, FunctionImp* f, const List& args);
-  ~ActivationImp();
+
+  Object argumentsObject() { return Object(arguments); }
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

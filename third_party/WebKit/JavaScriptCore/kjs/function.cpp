@@ -332,11 +332,8 @@ ActivationImp::ActivationImp(ExecState* exec, FunctionImp* f, const List& args)
     : _function(f) {
   Value protect(this);
   arguments = new ArgumentsImp(exec, f, args);
-  put(exec, argumentsPropertyName, Object(arguments), Internal | DontDelete);
-}
-
-ActivationImp::~ActivationImp() {
   arguments->setGcAllowed();
+  put(exec, argumentsPropertyName, Object(arguments), Internal | DontDelete);
 }
 
 // ------------------------------ GlobalFunc -----------------------------------
