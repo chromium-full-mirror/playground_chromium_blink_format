@@ -40,8 +40,15 @@ class QButton : public QWidget {
 
   virtual void clicked();
 
+  // QWidget overrides
+  virtual void setFont(const QFont&);
+
  private:
   KWQSignal m_clicked;
 };
+
+#ifdef __OBJC__
+NSControlSize KWQNSControlSizeForFont(const QFont&);
+#endif
 
 #endif

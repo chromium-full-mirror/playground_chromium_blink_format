@@ -43,6 +43,8 @@ class QCheckBox : public QButton {
   virtual void clicked();
 
  private:
+  const int* dimensions() const;
+
   KWQSignal m_stateChanged;
 };
 
