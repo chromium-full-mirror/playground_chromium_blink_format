@@ -2241,9 +2241,11 @@ void InsertParagraphSeparatorCommand::doApply() {
     return;
 
   // Build up list of ancestors in between the start node and the start block.
-  for (NodeImpl* n = startNode->parentNode(); n && n != startBlock;
-       n = n->parentNode())
-    ancestors.prepend(n);
+  if (startNode != startBlock) {
+    for (NodeImpl* n = startNode->parentNode(); n && n != startBlock;
+         n = n->parentNode())
+      ancestors.prepend(n);
+  }
 
   // Make new block to represent the newline.
   // If the start block is the body, just make a P tag, otherwise, make a
@@ -2295,14 +2297,16 @@ void InsertParagraphSeparatorCommand::doApply() {
     }
 
     // Move the start node and the siblings of the start node.
-    NodeImpl* n = startNode;
-    if (n->id() == ID_BR)
-      n = n->nextSibling();
-    while (n && n != addedBlock) {
-      NodeImpl* next = n->nextSibling();
-      removeNode(n);
-      appendNode(n, parent);
-      n = next;
+    if (startNode != startBlock) {
+      NodeImpl* n = startNode;
+      if (n->id() == ID_BR)
+        n = n->nextSibling();
+      while (n && n != addedBlock) {
+        NodeImpl* next = n->nextSibling();
+        removeNode(n);
+        appendNode(n, parent);
+        n = next;
+      }
     }
 
     // Move everything after the start node.
@@ -2372,9 +2376,11 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
 
   // Build up list of ancestors in between the start node and the top
   // blockquote.
-  for (NodeImpl* n = startNode->parentNode(); n && n != topBlockquote;
-       n = n->parentNode())
-    ancestors.prepend(n);
+  if (startNode != topBlockquote) {
+    for (NodeImpl* n = startNode->parentNode(); n && n != topBlockquote;
+         n = n->parentNode())
+      ancestors.prepend(n);
+  }
 
   // Insert a break after the top blockquote.
   int exceptionCode = 0;
@@ -2423,15 +2429,18 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
     }
 
     // Move the start node and the siblings of the start node.
-    NodeImpl* n = startNode;
-    bool startIsBR = n->id() == ID_BR;
-    if (startIsBR)
-      n = n->nextSibling();
-    while (n) {
-      NodeImpl* next = n->nextSibling();
-      removeNode(n);
-      appendNode(n, parent);
-      n = next;
+    bool startIsBR = false;
+    if (startNode != topBlockquote) {
+      NodeImpl* n = startNode;
+      bool startIsBR = n->id() == ID_BR;
+      if (startIsBR)
+        n = n->nextSibling();
+      while (n) {
+        NodeImpl* next = n->nextSibling();
+        removeNode(n);
+        appendNode(n, parent);
+        n = next;
+      }
     }
 
     // Move everything after the start node.
