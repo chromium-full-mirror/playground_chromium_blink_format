@@ -109,13 +109,14 @@ class RenderBox : public RenderContainer {
   virtual void calcHeight();
 
   int calcWidthUsing(WidthType widthType, int cw, LengthType& lengthType);
+  int calcHeightUsing(const Length& height);
   int calcReplacedWidthUsing(WidthType widthType) const;
   int calcReplacedHeightUsing(HeightType heightType) const;
 
   virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
 
-  int calcPercentageHeight();
+  int calcPercentageHeight(const Length& height);
 
   virtual int availableHeight() const;
   int availableHeightUsing(const Length& h) const;
