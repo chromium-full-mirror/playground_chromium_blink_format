@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QSTYLE_H_
-#define QSTYLE_H_
+#ifndef KWQSTYLE_H_
+#define KWQSTYLE_H_
 
 #include <qobject.h>
 #include <qsize.h>

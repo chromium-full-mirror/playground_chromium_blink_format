@@ -23,43 +23,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QLISTBOX_H_
-#define QLISTBOX_H_
+#ifndef KWQDATASTREAM_H_
+#define KWQDATASTREAM_H_
 
-#include "qscrollview.h"
+#include "qarray.h"
 #include "qstring.h"
+#include "qcstring.h"
 
-class QListBoxItem;
-class QListBoxText;
+#define IO_ReadOnly 0x0001   // readable device
+#define IO_WriteOnly 0x0002  // writable device
+#define IO_ReadWrite 0x0003  // read+write device
+#define IO_Append 0x0004     // append
+#define IO_Truncate 0x0008   // truncate device
+#define IO_Translate 0x0010  // translate CR+LF
+#define IO_ModeMask 0x00ff
 
-class QListBox : public QScrollView {
+class QDataStream {
  public:
-  enum SelectionMode { Single, Multi, Extended, NoSelection };
+  QDataStream(QByteArray, int mode);
+  virtual ~QDataStream();
 
-  uint count() const;
-  void clear();
-  virtual void setSelectionMode(SelectionMode);
-  QListBoxItem* firstItem() const;
-  int currentItem() const;
-  void insertItem(const QString&, int index = -1);
-  void insertItem(const QListBoxItem*, int index = -1);
-  void setSelected(int, bool);
-  bool isSelected(int);
-};
-
-class QListBoxItem {
- public:
-  void setSelectable(bool);
-  QListBox* listBox() const;
-  virtual int width(const QListBox*) const;
-  virtual int height(const QListBox*) const;
-  QListBoxItem* next() const;
-  QListBoxItem* prev() const;
-};
-
-class QListBoxText : public QListBoxItem {
- public:
-  QListBoxText(const QString& text = QString::null);
+  QDataStream& operator<<(long int);
+  QDataStream& operator<<(const char*);
+  QDataStream& operator<<(const QString&);
+  QDataStream& operator<<(const QCString&);
+  QDataStream& operator>>(const QString&);
 };
 
 #endif

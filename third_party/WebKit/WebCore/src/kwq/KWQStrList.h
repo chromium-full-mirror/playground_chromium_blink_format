@@ -23,17 +23,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QSTYLE_H_
-#define QSTYLE_H_
+#ifndef KWQSTRLIST_H_
+#define KWQSTRLIST_H_
 
-#include <qobject.h>
-#include <qsize.h>
+#include <qstring.h>
+#include <qlist.h>
 
-class QStyle : public QObject {
+class QStrList : public QList<char> {
  public:
-  GUIStyle guiStyle() const;
-  virtual QSize indicatorSize() const = 0;
-  virtual QSize exclusiveIndicatorSize() const = 0;
 };
 
 #endif
