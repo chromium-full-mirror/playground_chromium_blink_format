@@ -238,6 +238,9 @@ const AtomicString& ElementImpl::getAttributeNS(
 void ElementImpl::setAttribute(NodeImpl::Id id,
                                DOMStringImpl* value,
                                int& exceptioncode) {
+  if (inDocument())
+    getDocument()->incDOMTreeVersion();
+
   // allocate attributemap if necessary
   AttributeImpl* old = attributes(false)->getAttributeItem(id);
 
@@ -267,6 +270,9 @@ AttributeImpl* ElementImpl::createAttribute(NodeImpl::Id id,
 }
 
 void ElementImpl::setAttributeMap(NamedAttrMapImpl* list) {
+  if (inDocument())
+    getDocument()->incDOMTreeVersion();
+
   // If setting the whole map changes the id attribute, we need to
   // call updateId.
 
