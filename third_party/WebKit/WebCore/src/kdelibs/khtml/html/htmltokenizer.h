@@ -73,7 +73,7 @@ class CachedScript;
 class Token {
  public:
   Token() {
-    id = 0;
+    _id = 0;
     complexText = false;
     attrs = 0;
     text = 0;
@@ -97,7 +97,7 @@ class Token {
       attrs->deref();
       attrs = 0;
     }
-    id = 0;
+    _id = 0;
     complexText = false;
     if (text) {
       text->deref();
@@ -105,7 +105,7 @@ class Token {
     }
   }
   DOM::NamedAttrMapImpl* attrs;
-  ushort id;
+  ushort _id;
   DOMStringImpl* text;
   bool complexText;
 };
