@@ -315,6 +315,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void didTellBridgeAboutLoad(const QString& urlString);
   bool haveToldBridgeAboutLoad(const QString& urlString);
 
+  KJS::Bindings::Instance* getEmbedInstanceForView(NSView* aView);
   KJS::Bindings::Instance* getAppletInstanceForView(NSView* aView);
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();

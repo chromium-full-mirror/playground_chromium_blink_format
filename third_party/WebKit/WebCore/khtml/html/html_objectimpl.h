@@ -71,7 +71,9 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   khtml::VAlign valign;
 
  private:
+#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* appletInstance;
+#endif
 };
 
 // -------------------------------------------------------------------------
@@ -95,9 +97,18 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
+#if APPLE_CHANGES
+  KJS::Bindings::Instance* getEmbedInstance() const;
+#endif
+
   QString url;
   QString pluginPage;
   QString serviceType;
+
+#if APPLE_CHANGES
+ private:
+  mutable KJS::Bindings::Instance* embedInstance;
+#endif
 };
 
 // -------------------------------------------------------------------------

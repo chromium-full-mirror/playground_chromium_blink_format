@@ -61,6 +61,7 @@ class HTMLDocument : public DOMDocument {
     Cookie,
     Images,
     Applets,
+    Embeds,
     Links,
     Forms,
     Anchors,
