@@ -1,5 +1,5 @@
-/* C++ code produced by gperf version 2.7.2 */
-/* Command-line: gperf -CEot -L C++ -k '*' -N findDoctypeEntry -F
+/* ANSI-C code produced by gperf version 2.7.2 */
+/* Command-line: gperf -CEot -L ANSI-C -k '*' -N findDoctypeEntry -F
  * ,PubIDInfo::eAlmostStandards,PubIDInfo::eAlmostStandards doctypes.gperf  */
 struct PubIDInfo {
   enum eMode { eQuirks, eQuirks3, eAlmostStandards };
@@ -10,17 +10,15 @@ struct PubIDInfo {
 };
 /* maximum key range = 566, duplicates = 0 */
 
-class Perfect_Hash {
- private:
-  static inline unsigned int hash(const char* str, unsigned int len);
-
- public:
-  static const struct PubIDInfo* findDoctypeEntry(const char* str,
-                                                  unsigned int len);
-};
-
-inline unsigned int Perfect_Hash::hash(register const char* str,
-                                       register unsigned int len) {
+#ifdef __GNUC__
+__inline
+#else
+#ifdef __cplusplus
+inline
+#endif
+#endif
+    static unsigned int
+    hash(register const char* str, register unsigned int len) {
   static const unsigned short asso_values[] = {
       570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570,
       570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570, 570,
@@ -209,9 +207,11 @@ inline unsigned int Perfect_Hash::hash(register const char* str,
   return hval;
 }
 
-const struct PubIDInfo* Perfect_Hash::findDoctypeEntry(
-    register const char* str,
-    register unsigned int len) {
+#ifdef __GNUC__
+__inline
+#endif
+    const struct PubIDInfo*
+    findDoctypeEntry(register const char* str, register unsigned int len) {
   enum {
     TOTAL_KEYWORDS = 76,
     MIN_WORD_LENGTH = 4,
