@@ -142,16 +142,11 @@ bool KJS::HTMLDocument::hasProperty(ExecState* exec,
 #ifdef KJS_VERBOSE
 // kdDebug(6070) << "KJS::HTMLDocument::hasProperty " << p.qstring() << endl;
 #endif
-  if ((!static_cast<DOM::HTMLDocument>(node)
-            .images()
-            .namedItem(p.string())
-            .isNull()) ||
-      (!static_cast<DOM::HTMLDocument>(node)
-            .forms()
-            .namedItem(p.string())
-            .isNull()))
-    return true;
-  return DOMDocument::hasProperty(exec, p);
+  DOM::HTMLDocumentImpl* docImpl =
+      static_cast<DOM::HTMLDocumentImpl*>(node.handle());
+
+  return (DOMDocument::hasProperty(exec, p) ||
+          docImpl->haveNamedImageOrForm(p.qstring()));
 }
 
 Value KJS::HTMLDocument::tryGet(ExecState* exec,
@@ -260,6 +255,13 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
   // kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() <<
   // " not found, returning element" << endl;
   // image and form elements with the name p will be looked up last
+
+  DOM::HTMLDocumentImpl* docImpl =
+      static_cast<DOM::HTMLDocumentImpl*>(node.handle());
+  if (!docImpl->haveNamedImageOrForm(propertyName.qstring())) {
+    return Undefined();
+  }
+
   DOM::HTMLCollection coll = doc.images();
   DOM::HTMLCollection coll2 = doc.forms();
   DOM::HTMLElement element = coll.namedItem(propertyName.string());

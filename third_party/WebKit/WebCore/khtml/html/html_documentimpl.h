@@ -43,6 +43,8 @@ class HTMLElementImpl;
 class DOMString;
 class CSSStyleSheetImpl;
 class HTMLMapElementImpl;
+class HTMLImageElementImpl;
+class HTMLFormElementImpl;
 
 class HTMLDocumentImpl : public DOM::DocumentImpl,
                          public khtml::CachedObjectClient {
@@ -79,6 +81,10 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   virtual void determineParseMode(const QString& str);
   virtual void close();
 
+  void addNamedImageOrForm(const QString& name);
+  void removeNamedImageOrForm(const QString& name);
+  bool haveNamedImageOrForm(const QString& name);
+
  protected:
   HTMLElementImpl* bodyElement;
   HTMLElementImpl* htmlElement;
@@ -95,6 +101,9 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
  private:
   mutable DOMString m_domain;
   QTime m_startTime;
+  // we actually store ints inside the pointer value itself; would use void *
+  // but that makes the template unhappy.
+  QDict<char> namedImageAndFormCounts;
 
 #if APPLE_CHANGES
   DOMString m_policyBaseURL;

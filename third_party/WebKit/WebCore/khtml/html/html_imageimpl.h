@@ -44,6 +44,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
 
   virtual void attach();
+  virtual void detach();
 
   long width() const;
   long height() const;
@@ -58,6 +59,8 @@ class HTMLImageElementImpl : public HTMLElementImpl {
  protected:
   DOMString usemap;
   bool ismap;
+  QString oldIdAttr;
+  QString oldNameAttr;
 };
 
 //------------------------------------------------------------------
