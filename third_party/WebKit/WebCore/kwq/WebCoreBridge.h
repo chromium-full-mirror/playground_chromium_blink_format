@@ -343,7 +343,8 @@ typedef enum {
 - (NSRect)firstRectForDOMRange:(DOMRange*)range;
 
 - (void)setSelectedDOMRange:(DOMRange*)range
-                   affinity:(NSSelectionAffinity)selectionAffinity;
+                   affinity:(NSSelectionAffinity)selectionAffinity
+                closeTyping:(BOOL)closeTyping;
 - (DOMRange*)selectedDOMRange;
 - (NSSelectionAffinity)selectionAffinity;
 
