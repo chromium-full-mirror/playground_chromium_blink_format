@@ -2587,8 +2587,8 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
                               HitTestAction hitTestAction) {
   bool inlineFlow = isInlineFlow();
 
-  int tx = _tx + xPos();
-  int ty = _ty + yPos();
+  int tx = _tx + m_x;
+  int ty = _ty + m_y;
 
   if (!inlineFlow && !isRoot()) {
     // Check if we need to do anything at all with this block.
