@@ -182,6 +182,16 @@ KHTMLSelection EditCommandImpl::currentSelection() const {
   return m_document->part()->selection();
 }
 
+void EditCommandImpl::setStartingSelection(const KHTMLSelection& s) {
+  m_startingSelection = s;
+  moveToStartingSelection();
+}
+
+void EditCommandImpl::setEndingSelection(const KHTMLSelection& s) {
+  m_endingSelection = s;
+  moveToEndingSelection();
+}
+
 void EditCommandImpl::moveToStartingSelection() {
   ASSERT(m_document);
   ASSERT(m_document->part());
@@ -760,7 +770,6 @@ void InputTextCommandImpl::coalesce(const DOMString& text) {
   ASSERT(state() == Applied);
   execute(text);
   m_text += text;
-  moveToEndingSelection();
 }
 
 void InputTextCommandImpl::deleteCharacter() {
@@ -780,7 +789,6 @@ void InputTextCommandImpl::deleteCharacter() {
     ASSERT(exceptionCode == 0);
     selection = KHTMLSelection(textNode, offset);
     setEndingSelection(selection);
-    moveToEndingSelection();
     m_text = m_text.string().left(m_text.length() - 1);
   }
 }
@@ -799,7 +807,6 @@ void InputTextCommandImpl::execute(const DOMString& text) {
   selection = KHTMLSelection(selection.startNode(),
                              selection.startOffset() + text.length());
   setEndingSelection(selection);
-  moveToEndingSelection();
 }
 
 //------------------------------------------------------------------------------------------
