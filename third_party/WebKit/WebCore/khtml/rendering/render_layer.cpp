@@ -93,6 +93,12 @@ RenderLayer::~RenderLayer() {
 }
 
 void RenderLayer::updateLayerPosition() {
+  // The canvas is sized to the docWidth/Height over in RenderCanvas::layout, so
+  // we
+  // don't need to ever update our layer position here.
+  if (renderer()->isCanvas())
+    return;
+
   int x = m_object->xPos();
   int y = m_object->yPos();
 

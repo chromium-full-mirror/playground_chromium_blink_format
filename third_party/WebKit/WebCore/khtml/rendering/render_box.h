@@ -77,16 +77,8 @@ class RenderBox : public RenderContainer {
   virtual short marginLeft() const { return m_marginLeft; }
   virtual short marginRight() const { return m_marginRight; }
 
-  virtual void setWidth(int width) {
-    m_width = width;
-    if (m_layer)
-      m_layer->setWidth(width);
-  }
-  virtual void setHeight(int height) {
-    m_height = height;
-    if (m_layer)
-      m_layer->setHeight(height);
-  }
+  virtual void setWidth(int width) { m_width = width; }
+  virtual void setHeight(int height) { m_height = height; }
 
   // This method is now public so that centered objects like tables that are
   // shifted right by left-aligned floats can recompute their left and
@@ -139,6 +131,9 @@ class RenderBox : public RenderContainer {
                                        int height,
                                        int bleft,
                                        int bright);
+
+  virtual void setStaticX(short staticX);
+  virtual void setStaticY(int staticY);
 
  protected:
   virtual void paintBoxDecorations(QPainter* p,
@@ -199,6 +194,11 @@ class RenderBox : public RenderContainer {
    * ( = the width of the element with line breaking disabled)
    */
   short m_maxWidth;
+
+  // Cached normal flow values for absolute positioned elements with static
+  // left/top values.
+  short m_staticX;
+  int m_staticY;
 
   // A pointer to our layer if we have one.  Currently only positioned elements
   // and floaters have layers.

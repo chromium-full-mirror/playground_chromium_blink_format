@@ -162,7 +162,7 @@ class RenderText : public RenderObject {
   DOM::DOMString data() const { return str; }
   DOM::DOMStringImpl* string() const { return str; }
 
-  virtual InlineBox* createInlineBox();
+  virtual InlineBox* createInlineBox(bool);
 
   virtual void layout() { assert(false); }
 
