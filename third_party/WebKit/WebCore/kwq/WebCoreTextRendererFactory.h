@@ -31,6 +31,7 @@
 }
 
 + (WebCoreTextRendererFactory*)sharedFactory;
+- (BOOL)isFontFixedPitch:(NSFont*)font;
 - (id<WebCoreTextRenderer>)rendererWithFont:(NSFont*)font;
 - (NSFont*)fontWithFamilies:(NSString**)families
                      traits:(NSFontTraitMask)traits

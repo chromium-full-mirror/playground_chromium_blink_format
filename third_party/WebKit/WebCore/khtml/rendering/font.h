@@ -129,6 +129,7 @@ class Font {
                             int len,
                             int toAdd,
                             float* buffer) const;
+  bool isFixedPitch() const;
 #endif
   int width(QChar* str, int slen, int pos, int len) const;
   int width(QChar* str, int slen, int pos) const;
