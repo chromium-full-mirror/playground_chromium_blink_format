@@ -8,9 +8,6 @@
 - (void)_updateDrawsBackground;
 - (void)_setInternalLoadDelegate:(id)internalLoadDelegate;
 - (id)_internalLoadDelegate;
-- (void)_sendResourceLoadDelegateMessagesForURL:(NSURL*)URL
-                                       response:(NSURLResponse*)response
-                                         length:(unsigned)length;
 
 @end
 

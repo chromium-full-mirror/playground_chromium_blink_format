@@ -520,8 +520,8 @@ typedef enum {
                                     customHeaders:(NSDictionary*)customHeaders
                                          postData:(NSArray*)data;
 - (void)objectLoadedFromCacheWithURL:(NSURL*)URL
-                            response:(NSURLResponse*)response
-                                data:(NSData*)data;
+                            response:(id)response
+                                size:(unsigned)bytes;
 
 - (NSData*)syncLoadResourceWithURL:(NSURL*)URL
                      customHeaders:(NSDictionary*)requestHeaders
