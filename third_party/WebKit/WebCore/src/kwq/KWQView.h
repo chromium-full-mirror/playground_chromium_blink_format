@@ -7,3 +7,9 @@ class QWidget;
 }
 - initWithFrame:(NSRect)r widget:(QWidget*)w;
 @end
+
+@interface KWQNSButton : NSButton {
+  QWidget* widget;
+}
+- initWithFrame:(NSRect)r widget:(QWidget*)w;
+@end
