@@ -1,8 +1,6 @@
 /*
     WebHistoryItem.h
     Copyright 2001, 2002, Apple, Inc. All rights reserved.
-
-    FIXME  Strip down this API.
 */
 
 #import <Cocoa/Cocoa.h>
@@ -11,7 +9,7 @@
     @class WebHistoryItem
 */
 @interface WebHistoryItem : NSObject {
-  NSURL* _URL;
+  NSString* _URLString;
   NSString* _target;
   NSString* _parent;
   NSString* _title;
@@ -26,7 +24,6 @@
 
 + (WebHistoryItem*)entryWithURL:(NSURL*)URL;
 
-- (id)init;
 - (id)initWithURL:(NSURL*)URL title:(NSString*)title;
 - (id)initWithURL:(NSURL*)URL
            target:(NSString*)target
@@ -43,6 +40,9 @@
 - (NSString*)displayTitle;
 - (NSImage*)icon;
 - (NSCalendarDate*)lastVisitedDate;
+- (NSPoint)scrollPoint;
+- (NSArray*)documentState;
+- (NSString*)anchor;
 
 - (void)setURL:(NSURL*)URL;
 - (void)setTarget:(NSString*)target;
@@ -52,11 +52,6 @@
 - (void)setLastVisitedDate:(NSCalendarDate*)date;
 - (void)setScrollPoint:(NSPoint)p;
 - (void)setDocumentState:(NSArray*)state;
-- (NSArray*)documentState;
-- (NSPoint)scrollPoint;
-- (unsigned)hash;
-- (BOOL)isEqual:(id)anObject;
-- (NSString*)anchor;
 - (void)setAnchor:(NSString*)anchor;
 
 @end
