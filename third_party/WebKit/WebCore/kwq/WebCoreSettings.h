@@ -39,6 +39,7 @@ class KHTMLSettings;
   NSString* cursiveFontFamily;
   NSString* fantasyFontFamily;
   float minimumFontSize;
+  float minimumLogicalFontSize;
   float defaultFontSize;
   float defaultFixedFontSize;
   BOOL JavaEnabled;
@@ -73,6 +74,9 @@ class KHTMLSettings;
 
 - (void)setMinimumFontSize:(float)size;
 - (float)minimumFontSize;
+
+- (void)setMinimumLogicalFontSize:(float)size;
+- (float)minimumLogicalFontSize;
 
 - (void)setDefaultFontSize:(float)size;
 - (float)defaultFontSize;
