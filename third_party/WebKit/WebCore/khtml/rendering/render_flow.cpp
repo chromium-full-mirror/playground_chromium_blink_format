@@ -61,6 +61,9 @@ RenderFlow::RenderFlow(DOM::NodeImpl* node) : RenderBox(node) {
   m_clearStatus = CNONE;
 
   specialObjects = 0;
+
+  m_maxTopPosMargin = m_maxTopNegMargin = m_maxBottomPosMargin =
+      m_maxBottomNegMargin = 0;
 }
 
 void RenderFlow::setStyle(RenderStyle* _style) {
@@ -275,6 +278,16 @@ void RenderFlow::layout() {
   m_height = 0;
   m_clearStatus = CNONE;
 
+  // Start out by setting our margin values to our current margin.
+  if (m_marginTop > 0)
+    m_maxTopPosMargin = m_marginTop;
+  else
+    m_maxTopNegMargin = m_marginTop;
+  if (m_marginBottom > 0)
+    m_maxBottomPosMargin = m_marginBottom;
+  else
+    m_maxBottomNegMargin = m_marginBottom;
+
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
   if (childrenInline()) {
     // ### make bidi resumeable so that we can get rid of this ugly hack
@@ -350,6 +363,9 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
   if (style()->direction() == RTL) {
     xPos = marginLeft() + m_width - paddingRight() - borderRight();
   }
+
+  bool canCollapseWithChildren =
+      !isPositioned() && !isFloating() && !isTableCell();
 
   RenderObject* child = firstChild();
   RenderFlow* prevFlow = 0;
