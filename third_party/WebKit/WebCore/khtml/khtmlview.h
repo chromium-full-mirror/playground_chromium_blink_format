@@ -54,6 +54,8 @@ class RenderLineEdit;
 void applyRule(RenderStyle* style, DOM::CSSProperty* prop, DOM::ElementImpl* e);
 };
 
+#include "khtml_part.h"
+
 class KHTMLPart;
 class KHTMLViewPrivate;
 
