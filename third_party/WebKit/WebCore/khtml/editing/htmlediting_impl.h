@@ -55,6 +55,16 @@ class TreeWalkerImpl;
 namespace khtml {
 
 //------------------------------------------------------------------------------------------
+// StyleChange
+
+struct StyleChange {
+  StyleChange() : applyBold(false), applyItalic(false) {}
+  DOM::DOMString cssStyle;
+  bool applyBold;
+  bool applyItalic;
+};
+
+//------------------------------------------------------------------------------------------
 // EditCommandImpl
 
 class EditCommandImpl : public SharedCommandImpl {
@@ -148,7 +158,7 @@ class CompositeEditCommandImpl : public EditCommandImpl {
                         const DOM::DOMString&);
   void splitTextNode(DOM::TextImpl* text, long offset);
 
-  DOM::ElementImpl* createTypingStyleElement() const;
+  DOM::ElementImpl* applyTypingStyle(DOM::NodeImpl*) const;
 
   QValueList<EditCommand> m_cmds;
 };
@@ -192,13 +202,6 @@ class ApplyStyleCommandImpl : public CompositeEditCommandImpl {
   virtual void doApply();
 
   DOM::CSSStyleDeclarationImpl* style() const { return m_style; }
-
-  struct StyleChange {
-    StyleChange() : applyBold(false), applyItalic(false) {}
-    DOM::DOMString cssStyle;
-    bool applyBold : 1;
-    bool applyItalic : 1;
-  };
 
  private:
   // style-removal helpers

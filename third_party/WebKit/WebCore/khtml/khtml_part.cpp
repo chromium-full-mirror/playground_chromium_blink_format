@@ -2403,10 +2403,10 @@ void KHTMLPart::selectionLayoutChanged() {
 void KHTMLPart::notifySelectionChanged(bool closeTyping) {
   selectionLayoutChanged();
 
-  if (closeTyping) {
+  if (closeTyping)
     TypingCommand::closeTyping(lastEditCommand());
-    clearTypingStyle();
-  }
+
+  clearTypingStyle();
 
   emitSelectionChanged();
 
