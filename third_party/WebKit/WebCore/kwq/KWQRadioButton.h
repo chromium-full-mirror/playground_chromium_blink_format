@@ -34,6 +34,10 @@ class QRadioButton : public QButton {
 
   void setChecked(bool);
   bool isChecked() const;
+
+  QSize sizeHint() const;
+  QRect frameGeometry() const;
+  void setFrameGeometry(const QRect&);
 };
 
 #endif

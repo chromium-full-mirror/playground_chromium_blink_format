@@ -36,6 +36,10 @@
 
 #include <kurl.h>
 
+#if APPLE_CHANGES
+#include <KWQSignal.h>
+#endif
+
 class QPaintDevice;
 class QPaintDeviceMetrics;
 class KHTMLView;
@@ -430,6 +434,11 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
  signals:
   void finishedParsing();
+
+#if APPLE_CHANGES
+ public:
+  KWQSignal m_finishedParsing;
+#endif
 
  protected:
   khtml::CSSStyleSelector* m_styleSelector;

@@ -226,7 +226,12 @@ QPtrList<DocumentImpl>* DocumentImpl::changedDocuments = 0;
 
 // KHTMLView might be 0
 DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
-    : NodeBaseImpl(new DocumentPtr()) {
+    : NodeBaseImpl(new DocumentPtr())
+#if APPLE_CHANGES
+      ,
+      m_finishedParsing(this, SIGNAL(finishedParsing()))
+#endif
+{
   document->doc = this;
 
   m_paintDeviceMetrics = 0;

@@ -306,9 +306,6 @@ void RenderTable::addColumns(int num) {
 
   int newCols = totalCols + num;
   // resize the col structs to the number of columns
-  // The memsets that used to be here are unnecessary, since entries
-  // are nulled out when a vector is grown (according to the Qt docs)
-  // -dwh
   columnPos.resize(newCols + 1);
   memset(columnPos.data() + totalCols + 1, 0, num * sizeof(int));
   colMaxWidth.resize(newCols);
@@ -437,11 +434,17 @@ void RenderTable::addColInfo(RenderTableCell* cell, bool allowRecalc) {
   int _minSize = cell->minWidth();
   int _maxSize = cell->maxWidth();
 
-  if (collapseBorders) {
-    int bw = cell->borderLeft() + cell->borderRight();
-    _minSize -= bw;
-    _maxSize -= bw;
-  }
+#if 0
+    // We do need to implement "collapse borders", but just doing this
+    // fudge on the calculation of the column widths is not enough to do so.
+    // This alone simply makes borders draw incorrectly.
+    if (collapseBorders)
+    {
+        int bw = cell->borderLeft() + cell->borderRight();
+        _minSize -= bw;
+        _maxSize -= bw;
+    }
+#endif
 
   Length _width = cell->style()->width();
   addColInfo(_startCol, _colSpan, _minSize, _maxSize, _width, cell,

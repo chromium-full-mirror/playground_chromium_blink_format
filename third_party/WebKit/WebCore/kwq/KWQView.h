@@ -31,24 +31,24 @@ class QWidget;
   QWidget* widget;
   bool isFlipped;
 }
-- initWithFrame:(NSRect)r widget:(QWidget*)w;
+- initWithWidget:(QWidget*)w;
 - (void)setIsFlipped:(bool)flag;
 @end
 
 @interface KWQNSButton : NSButton {
   QWidget* widget;
 }
-- initWithFrame:(NSRect)r widget:(QWidget*)w;
+- initWithWidget:(QWidget*)w;
 @end
 
 @interface KWQNSComboBox : NSPopUpButton {
   QWidget* widget;
 }
-- initWithFrame:(NSRect)r widget:(QWidget*)w;
+- initWithWidget:(QWidget*)w;
 @end
 
 @interface KWQNSScrollView : NSScrollView {
   QWidget* widget;
 }
-- initWithFrame:(NSRect)r widget:(QWidget*)w;
+- initWithWidget:(QWidget*)w;
 @end
