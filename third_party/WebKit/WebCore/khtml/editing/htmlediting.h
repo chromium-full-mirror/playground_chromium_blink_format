@@ -386,6 +386,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                          bool mergeBlocksAfterDelete = true);
 
   virtual void doApply();
+  virtual HTMLEditAction editingAction() const;
 
  private:
   virtual bool preservesTypingStyle() const;
@@ -572,6 +573,7 @@ class MoveSelectionCommand : public CompositeEditCommand {
   virtual ~MoveSelectionCommand();
 
   virtual void doApply();
+  virtual HTMLEditAction editingAction() const;
 
  private:
   DOM::DocumentFragmentImpl* m_fragment;
@@ -744,6 +746,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   virtual ~ReplaceSelectionCommand();
 
   virtual void doApply();
+  virtual HTMLEditAction editingAction() const;
 
  private:
   void completeHTMLReplacement(const DOM::Position&, const DOM::Position&);
