@@ -313,6 +313,11 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString altText() const;
 
+#if APPLE_CHANGES
+ private:
+  void simulateButtonClickForEvent(EventImpl* evt);
+#endif
+
  protected:
   DOMString m_value;
   int xPos;
