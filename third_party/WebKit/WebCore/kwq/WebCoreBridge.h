@@ -414,6 +414,10 @@ typedef enum {
                 beforeString:(NSString**)beforeString
                  afterString:(NSString**)afterString;
 - (BOOL)canDeleteRange:(DOMRange*)range;
+- (void)selectNSRange:(NSRange)range;
+- (NSRange)selectedNSRange;
+- (NSRange)markedTextNSRange;
+- (DOMRange*)convertToObjCDOMRange:(NSRange)range;
 
 - (DOMDocumentFragment*)documentFragmentWithMarkupString:(NSString*)markupString
                                            baseURLString:

@@ -73,6 +73,13 @@ class TextIterator {
 
   DOM::Range range() const;
 
+  static long TextIterator::rangeLength(const DOM::Range& r);
+  static void TextIterator::setRangeFromLocationAndLength(
+      const DOM::Range& range,
+      DOM::Range& resultRange,
+      long rangeLocation,
+      long rangeLength);
+
  private:
   void exitNode();
   bool handleTextNode();
