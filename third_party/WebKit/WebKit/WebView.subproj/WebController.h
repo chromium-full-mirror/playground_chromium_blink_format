@@ -142,7 +142,8 @@
 typedef enum {
   IF_LOAD_TYPE_CSS = 1,
   IF_LOAD_TYPE_IMAGE = 2,
-  IF_LOAD_TYPE_SCRIPT = 3
+  IF_LOAD_TYPE_SCRIPT = 3,
+  IF_LOAD_TYPE_HTML = 4
 } IF_LOAD_TYPE;
 
 @interface IFLoadProgress : NSObject {
@@ -272,5 +273,11 @@ typedef enum {
 // the
 // specifics of creating and initializaing a view of the appropriate class.
 - (IFWebFrame *)createFrameNamed: (NSString *)fname for: (IFWebDataSource *)child inParent: (IFWebDataSource *)parent;
+
+- (IFWebFrame*)mainFrame;
+
+// Return the frame associated with the data source.  Traverses the
+// frame tree to find the data source.
+- (IFWebFrame*)frameForDataSource:(IFWebDataSource*)dataSource;
 
 @end
