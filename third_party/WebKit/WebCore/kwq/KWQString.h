@@ -458,6 +458,7 @@ class QString {
 
   void setBufferFromCFString(CFStringRef);
 
+  QString& append(const char*, uint length);
   QString& append(const QChar*, uint length);
   QString& prepend(const QChar*, uint length);
   QString& insert(uint position, const QChar*, uint length);
