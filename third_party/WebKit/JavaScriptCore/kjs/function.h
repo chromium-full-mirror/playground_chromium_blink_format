@@ -40,6 +40,15 @@ class FunctionImp : public InternalFunctionImp {
   FunctionImp(ExecState* exec, const Identifier& n = Identifier::null);
   virtual ~FunctionImp();
 
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  virtual bool hasProperty(ExecState* exec,
+                           const Identifier& propertyName) const;
+  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+
   virtual void mark();
 
   virtual bool implementsCall() const;
@@ -100,12 +109,13 @@ class ActivationImp : public ObjectImp {
   ActivationImp(ExecState* exec, FunctionImp* f, const List& args);
   ~ActivationImp();
 
-  Object argumentsObject() { return Object(arguments); }
-
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
+  FunctionImp* function() const { return _function; }
+
  private:
+  FunctionImp* _function;
   ObjectImp* arguments;
 };
 
