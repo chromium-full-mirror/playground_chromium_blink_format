@@ -1423,7 +1423,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
 void HTMLTokenizer::addPending() {
   if (select && !script) {
     *dest++ = ' ';
-  } else if (textarea) {
+  } else if (textarea || script) {
     switch (pending) {
       case LFPending:
         *dest++ = '\n';
