@@ -142,6 +142,7 @@ KHTMLPart::KHTMLPart(QWidget* parentWidget,
   setInstance(KHTMLFactory::instance(),
               prof == BrowserViewGUI && !parentPart());
 #ifdef APPLE_CHANGES
+  // The widget is made outside this class in our case.
   init(0, prof);
 #else
   init(new KHTMLView(this, parentWidget, widgetname), prof);
@@ -1781,6 +1782,7 @@ bool KHTMLPart::setEncoding(const QString& name, bool override) {
   d->m_encoding = name;
   d->m_haveEncoding = override;
 
+#ifndef APPLE_CHANGES
   if (!m_url.isEmpty()) {
     // reload document
     closeURL();
@@ -1788,6 +1790,7 @@ bool KHTMLPart::setEncoding(const QString& name, bool override) {
     m_url = 0;
     openURL(url);
   }
+#endif
 
   return true;
 }
