@@ -28,13 +28,13 @@
 
 #define KWQ_BLOCK_NS_EXCEPTIONS NS_DURING
 
-#define KWQ_UNBLOCK_NS_EXCEPTIONS                                    \
-  NS_HANDLER                                                         \
-  if (ASSERT_DISABLED) {                                             \
-    NSLog(@"Uncaught exception - %@\n", localException);             \
-  } else {                                                           \
-    ASSERT_WITH_MESSAGE(@"Uncaught exception - %@", localException); \
-  }                                                                  \
+#define KWQ_UNBLOCK_NS_EXCEPTIONS                                      \
+  NS_HANDLER                                                           \
+  if (ASSERT_DISABLED) {                                               \
+    NSLog(@"Uncaught exception - %@\n", localException);               \
+  } else {                                                             \
+    ASSERT_WITH_MESSAGE(0, "Uncaught exception - %@", localException); \
+  }                                                                    \
   NS_ENDHANDLER
 
 #define KWQ_UNBLOCK_RETURN_VALUE(val, type) NS_VALUERETURN(val, type)
