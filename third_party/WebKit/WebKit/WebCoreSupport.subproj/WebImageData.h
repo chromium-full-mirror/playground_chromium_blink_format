@@ -40,6 +40,12 @@
 - (void)drawImageAtIndex:(size_t)index
                   inRect:(CGRect)ir
                 fromRect:(CGRect)fr
+            adjustedSize:(CGSize)size
+      compositeOperation:(CGCompositeOperation)op
+                 context:(CGContextRef)aContext;
+- (void)drawImageAtIndex:(size_t)index
+                  inRect:(CGRect)ir
+                fromRect:(CGRect)fr
       compositeOperation:(CGCompositeOperation)op
                  context:(CGContextRef)aContext;
 - (void)tileInRect:(CGRect)rect
