@@ -95,7 +95,7 @@ class KWQKHTMLPartImpl : public QObject {
   bool openedByJS();
   void setOpenedByJS(bool _openedByJS);
 
-  void close();
+  void scheduleClose();
 
   void unfocusWindow();
 
