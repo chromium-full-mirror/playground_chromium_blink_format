@@ -38,7 +38,7 @@ class RuntimeObjectImp : public ObjectImp {
 
   ~RuntimeObjectImp();
 
-  RuntimeObjectImp(Bindings::Instance* i);
+  RuntimeObjectImp(Bindings::Instance* i, bool ownsInstance = true);
 
   const ClassInfo* classInfo() const;
 
@@ -66,6 +66,7 @@ class RuntimeObjectImp : public ObjectImp {
 
   ClassInfo _classInfo;
   Bindings::Instance* instance;
+  bool ownsInstance;
 };
 
 };  // namespace

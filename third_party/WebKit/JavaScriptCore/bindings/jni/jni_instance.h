@@ -29,10 +29,7 @@
 
 #include <JavaVM/jni.h>
 
-#include <runtime.h>
-
-#include <jni_instance.h>
-#include <jni_utility.h>
+#include <JavaScriptCore/runtime.h>
 
 namespace Bindings {
 
@@ -42,28 +39,15 @@ class JObjectWrapper {
   friend class JavaInstance;
 
  protected:
-  JObjectWrapper(jobject instance) : _ref(1) {
-    // Cache the JNIEnv used to get the global ref for this java instanace.
-    // It'll be used to delete the reference.
-    _env = getJNIEnv();
-
-    _instance = _env->NewGlobalRef(instance);
-    _env->DeleteLocalRef(instance);
-
-    if (_instance == NULL) {
-      fprintf(stderr, "%s:  could not get GlobalRef for %p\n",
-              __PRETTY_FUNCTION__, instance);
-    }
-  }
-
-  ~JObjectWrapper() { _env->DeleteGlobalRef(_instance); }
-
+  JObjectWrapper(jobject instance);
   void ref() { _ref++; }
   void deref() {
     _ref--;
     if (_ref == 0)
       delete this;
   }
+
+  ~JObjectWrapper() { _env->DeleteGlobalRef(_instance); }
 
   jobject _instance;
 
