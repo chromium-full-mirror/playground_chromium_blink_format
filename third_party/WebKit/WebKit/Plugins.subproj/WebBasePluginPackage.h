@@ -24,7 +24,7 @@
   NSString* path;
   NSString* pluginDescription;
 
-  NSBundle* nsBundle;
+  NSBundle* bundle;
 
   NSDictionary* MIMEToDescription;
   NSDictionary* MIMEToExtensions;
