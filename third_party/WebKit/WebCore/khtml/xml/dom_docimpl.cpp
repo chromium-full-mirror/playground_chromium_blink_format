@@ -1827,13 +1827,15 @@ void DocumentImpl::recalcStyleSelector() {
     } else if (n->id() == ID_LINK || n->id() == ID_STYLE) {
       ElementImpl* e = static_cast<ElementImpl*>(n);
       QString title = e->getAttribute(ATTR_TITLE).string();
+      bool enabledViaScript = false;
       if (n->id() == ID_LINK) {
         // <LINK> element
         HTMLLinkElementImpl* l = static_cast<HTMLLinkElementImpl*>(n);
-        if (l->isLoading())
+        if (l->isLoading() || l->isDisabled())
           continue;
         if (!l->sheet())
           title = QString::null;
+        enabledViaScript = l->isEnabledViaScript();
       }
 
       // Get the current preferred styleset.  This is the
@@ -1848,7 +1850,7 @@ void DocumentImpl::recalcStyleSelector() {
       // Check to see if this sheet belongs to a styleset
       // (thus making it PREFERRED or ALTERNATE rather than
       // PERSISTENT).
-      if (!title.isEmpty()) {
+      if (!enabledViaScript && !title.isEmpty()) {
         // Yes, we have a title.
         if (sheetUsed.isEmpty()) {
           // No preferred set has been established.  If
@@ -1874,6 +1876,7 @@ void DocumentImpl::recalcStyleSelector() {
       // are treated as style declarations)
       sheet = static_cast<HTMLBodyElementImpl*>(n)->sheet();
     }
+
     if (sheet) {
       sheet->ref();
       m_styleSheets->styleSheets.append(sheet);

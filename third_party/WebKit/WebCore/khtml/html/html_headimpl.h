@@ -86,7 +86,9 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   bool isLoading() const;
   void sheetLoaded();
 
-  bool isAlternate() const { return m_alternate; }
+  bool isAlternate() const { return m_disabledState == 0 && m_alternate; }
+  bool isDisabled() const { return m_disabledState == 2; }
+  bool isEnabledViaScript() const { return m_disabledState == 1; }
 
  protected:
   khtml::CachedCSSStyleSheet* m_cachedSheet;
@@ -95,6 +97,7 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   DOMString m_type;
   QString m_media;
   DOMString m_rel;
+  int m_disabledState;  // 0=unset(default), 1=enabled via script, 2=disabled
   bool m_loading;
   bool m_alternate;
   QString m_data;  // needed for temporarily storing the loaded style sheet data

@@ -104,6 +104,7 @@ HTMLLinkElementImpl::HTMLLinkElementImpl(DocumentPtr* doc)
   m_loading = false;
   m_cachedSheet = 0;
   m_alternate = false;
+  m_disabledState = 0;
 }
 
 HTMLLinkElementImpl::~HTMLLinkElementImpl() {
@@ -136,9 +137,13 @@ void HTMLLinkElementImpl::parseAttribute(AttributeImpl* attr) {
       m_media = attr->value().string().lower();
       process();
       break;
-    case ATTR_DISABLED:
-      // ###
+    case ATTR_DISABLED: {
+      int oldDisabledState = m_disabledState;
+      m_disabledState = (attr->val() != 0) ? 2 : 1;
+      if (oldDisabledState != m_disabledState)
+        process();
       break;
+    }
     default:
       HTMLElementImpl::parseAttribute(attr);
   }
@@ -171,8 +176,9 @@ void HTMLLinkElementImpl::process() {
   // Stylesheet
   // This was buggy and would incorrectly match <link rel="alternate">, which
   // has a different specified meaning. -dwh
-  if (type.contains("text/css") || rel == "stylesheet" ||
-      (rel.contains("alternate") && rel.contains("stylesheet"))) {
+  if (m_disabledState != 2 &&
+      (type.contains("text/css") || rel == "stylesheet" ||
+       (rel.contains("alternate") && rel.contains("stylesheet")))) {
     // no need to load style sheets which aren't for the screen output
     // ### there may be in some situations e.g. for an editor or script to
     // manipulate
