@@ -67,7 +67,8 @@ KJS::Value JavaArray::convertJObjectToArray(KJS::ExecState* exec,
       new RuntimeArrayImp(new JavaArray((jobject)anObject, type)));
 }
 
-KJS::Value JavaField::valueFromInstance(const Instance* i) const {
+KJS::Value JavaField::valueFromInstance(KJS::ExecState* exec,
+                                        const Instance* i) const {
   const JavaInstance* instance = static_cast<const JavaInstance*>(i);
   jobject jinstance = instance->javaInstance();
   jobject fieldJInstance = _field->javaInstance();
@@ -384,7 +385,7 @@ void JavaArray::setValueAt(KJS::ExecState* exec,
     free((void*)javaClassName);
 }
 
-KJS::Value JavaArray::valueAt(unsigned int index) const {
+KJS::Value JavaArray::valueAt(KJS::ExecState* exec, unsigned int index) const {
   JNIEnv* env = getJNIEnv();
   JNIType arrayType = JNITypeFromPrimitiveType(_type[1]);
   switch (arrayType) {

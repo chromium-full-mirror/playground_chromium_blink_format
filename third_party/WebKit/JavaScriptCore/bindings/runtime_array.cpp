@@ -50,7 +50,7 @@ Value RuntimeArrayImp::get(ExecState* exec,
   if (ok) {
     if (index >= getLength())
       return Undefined();
-    return getConcreteArray()->valueAt(index);
+    return getConcreteArray()->valueAt(exec, index);
   }
 
   return ObjectImp::get(exec, propertyName);
@@ -59,7 +59,7 @@ Value RuntimeArrayImp::get(ExecState* exec,
 Value RuntimeArrayImp::get(ExecState* exec, unsigned index) const {
   if (index >= getLength())
     return Undefined();
-  return getConcreteArray()->valueAt(index);
+  return getConcreteArray()->valueAt(exec, index);
 }
 
 void RuntimeArrayImp::put(ExecState* exec,

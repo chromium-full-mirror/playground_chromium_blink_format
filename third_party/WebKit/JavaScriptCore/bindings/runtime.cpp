@@ -75,8 +75,9 @@ MethodList& MethodList::operator=(const MethodList& other) {
   return *this;
 }
 
-Value Instance::getValueOfField(const Field* aField) const {
-  return aField->valueFromInstance(this);
+Value Instance::getValueOfField(KJS::ExecState* exec,
+                                const Field* aField) const {
+  return aField->valueFromInstance(exec, this);
 }
 
 void Instance::setValueOfField(KJS::ExecState* exec,
