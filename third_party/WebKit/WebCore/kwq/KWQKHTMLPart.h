@@ -305,6 +305,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void issueCopyCommand();
   void issuePasteCommand();
 
+  void bindObject(void* object, QString name);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
