@@ -166,12 +166,13 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void addMetaData(const QString& key, const QString& value);
 
+  void mouseDown(NSEvent*);
+  void mouseDragged(NSEvent*);
+  void mouseUp(NSEvent*);
+  void mouseMoved(NSEvent*);
   bool keyEvent(NSEvent*);
 
   static void widgetWillReleaseView(NSView*);
-
-  static void setCurrentEvent(NSEvent* event) { _currentEvent = event; }
-  static NSEvent* currentEvent() { return _currentEvent; }
 
   void clearTimers();
 
@@ -182,8 +183,11 @@ class KWQKHTMLPart : public KHTMLPart {
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
   virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent*);
 
-  bool handleMouseDownEventForWidget(khtml::MouseEvent*);
-  bool handleMouseDownEventForWidget(khtml::RenderWidget*);
+  static int buttonForCurrentEvent();
+  static int stateForCurrentEvent();
+
+  bool passWidgetMouseDownEventToWidget(khtml::MouseEvent*);
+  bool passWidgetMouseDownEventToWidget(khtml::RenderWidget*);
 
   void setPolicyBaseURL(const DOM::DOMString&);
 
@@ -206,6 +210,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   NSView* _mouseDownView;
   bool _mouseDownWasInSubframe;
+  bool _sendingEventToSubview;
 
   static NSEvent* _currentEvent;
 

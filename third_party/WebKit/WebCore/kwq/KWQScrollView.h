@@ -76,6 +76,8 @@ class QScrollView : public QFrame {
 
   void ensureVisible(int, int);
   void ensureVisible(int, int, int, int);
+
+  NSView* getDocumentView();
 };
 
 #endif
