@@ -200,7 +200,13 @@ RenderButton::RenderButton(HTMLGenericFormElementImpl* element)
     : RenderFormElement(element) {}
 
 short RenderButton::baselinePosition(bool f) const {
+#if APPLE_CHANGES
+  // We put the bottoms of buttons on the baseline,
+  // This looks better than trying to line up the button text's baseline.
+  return height() + marginTop();
+#else
   return RenderWidget::baselinePosition(f) - 2;
+#endif
 }
 
 // -------------------------------------------------------------------------------
@@ -214,13 +220,6 @@ RenderCheckBox::RenderCheckBox(HTMLInputElementImpl* element)
   connect(b, SIGNAL(stateChanged(int)), this, SLOT(slotStateChanged(int)));
   connect(b, SIGNAL(clicked()), this, SLOT(slotClicked()));
 }
-
-#ifdef APPLE_CHANGES
-// Override to deal with our widget.
-short RenderCheckBox::baselinePosition(bool f) const {
-  return RenderWidget::baselinePosition(f) - 9;
-}
-#endif
 
 void RenderCheckBox::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
@@ -262,13 +261,6 @@ RenderRadioButton::RenderRadioButton(HTMLInputElementImpl* element)
   setQWidget(b);
   connect(b, SIGNAL(clicked()), this, SLOT(slotClicked()));
 }
-
-#ifdef APPLE_CHANGES
-// Override to deal with our widget.
-short RenderRadioButton::baselinePosition(bool f) const {
-  return RenderWidget::baselinePosition(f) - 10;
-}
-#endif
 
 void RenderRadioButton::updateFromElement() {
   widget()->setChecked(element()->checked());
@@ -372,9 +364,7 @@ QString RenderSubmitButton::defaultLabel() {
 
 short RenderSubmitButton::baselinePosition(bool f) const {
 #ifdef APPLE_CHANGES
-  // We  put the bottoms of buttons on the baseline,
-  // This looks better than trying to line up the button text's baseline.
-  return height() + marginTop();
+  return RenderButton::baselinePosition(f);
 #else
   return RenderFormElement::baselinePosition(f);
 #endif
@@ -977,18 +967,6 @@ void RenderSelect::slotSelected(int index) {
 
   element()->onChange();
 }
-
-#ifdef APPLE_CHANGES
-void RenderSelect::performAction(Actions action) {
-  if (action == ACTION_LISTBOX_CLICKED)
-    slotSelectionChanged();
-  else if (action == ACTION_COMBOBOX_CLICKED) {
-    ComboBoxWidget* combo = static_cast<ComboBoxWidget*>(m_widget);
-
-    slotSelected(combo->indexOfCurrentItem());
-  }
-}
-#endif /* APPLE_CHANGES */
 
 void RenderSelect::slotSelectionChanged() {
   if (m_ignoreSelectEvents)

@@ -28,6 +28,7 @@
 
 #include <qscrollview.h>
 #include <qstring.h>
+#include <KWQSignal.h>
 
 class QListBoxItem;
 class QListBoxText;
@@ -55,9 +56,15 @@ class QListBox : public QScrollView {
   void setSelected(int, bool);
   bool isSelected(int);
 
+  void clicked() { m_clicked.call(); }
+  void selectionChanged() { m_selectionChanged.call(); }
+
  private:
   QListBoxItem* head;
   bool m_insertingItems;
+
+  KWQSignal m_clicked;
+  KWQSignal m_selectionChanged;
 };
 
 class QListBoxItem {
