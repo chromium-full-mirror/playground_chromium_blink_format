@@ -30,7 +30,8 @@
 
 using namespace khtml;
 
-RenderInline::RenderInline(DOM::NodeImpl* node) : RenderFlow(node) {}
+RenderInline::RenderInline(DOM::NodeImpl* node)
+    : RenderFlow(node), m_isContinuation(false) {}
 
 RenderInline::~RenderInline() {}
 
