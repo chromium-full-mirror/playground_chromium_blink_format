@@ -302,7 +302,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void registerCommandForUndo(const khtml::EditCommand&);
   void registerCommandForRedo(const khtml::EditCommand&);
   void clearUndoRedoOperations();
-  void editingKeyEvent();
+  bool interceptEditingKeyEvent();
   void issueUndoCommand();
   void issueRedoCommand();
   void issueCutCommand();

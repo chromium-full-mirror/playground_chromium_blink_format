@@ -344,7 +344,7 @@ backforward list.
 @end
 
 @interface WebView (WebViewEditingExtras)
-- (void)_editingKeyDown:(NSEvent*)event;
+- (BOOL)_interceptEditingKeyEvent:(NSEvent*)event;
 - (DOMDocument*)DOMDocument;
 @end
 
