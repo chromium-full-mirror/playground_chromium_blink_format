@@ -41,6 +41,7 @@ class RenderInline : public RenderFlow {
   };
 
   virtual bool isRenderInline() const { return true; }
+  virtual bool childrenInline() const { return true; }
 
   virtual void addChildToFlow(RenderObject* newChild,
                               RenderObject* beforeChild);
