@@ -467,12 +467,12 @@ class Range {
    * @internal
    * not part of the DOM
    */
+  Range(RangeImpl* i);
   RangeImpl* handle() const;
   bool isNull() const;
 
  protected:
   RangeImpl* impl;
-  Range(RangeImpl* i);
 
  private:
   void throwException(int exceptioncode) const;

@@ -92,15 +92,14 @@ typedef enum {
   WebSelectForward,
   WebSelectBackward,
   WebSelectRight,
-  WebSelectLeft,
-  WebSelectUp,
-  WebSelectDown,
+  WebSelectLeft
 } WebSelectionDirection;
 
 typedef enum {
   WebSelectByCharacter,
   WebSelectByWord,
-  WebSelectByLine
+  WebSelectByLine,
+  WebSelectByParagraph
 } WebSelectionGranularity;
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
@@ -257,6 +256,8 @@ typedef enum {
 - (NSAttributedString*)selectedAttributedString;
 - (NSString*)selectedString;
 
+- (NSString*)stringForRange:(DOMRange*)range;
+
 - (NSString*)markupStringFromNode:(DOMNode*)node nodes:(NSArray**)nodes;
 - (NSString*)markupStringFromRange:(DOMRange*)range nodes:(NSArray**)nodes;
 
@@ -308,6 +309,9 @@ typedef enum {
 
 - (void)undoEditing:(id)arg;
 - (void)redoEditing:(id)arg;
+
+- (DOMRange*)selectedDOMRangeWithGranularity:
+    (WebSelectionGranularity)granularity;
 - (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                    direction:(WebSelectionDirection)direction
                                  granularity:
@@ -330,9 +334,9 @@ typedef enum {
                        selectReplacement:(BOOL)selectReplacement;
 - (void)replaceSelectionWithText:(NSString*)text
                selectReplacement:(BOOL)selectReplacement;
-- (void)replaceSelectionWithNewline;
 
 - (void)insertText:(NSString*)text;
+- (void)insertNewline;
 
 - (void)setSelectionToDragCaret;
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment;

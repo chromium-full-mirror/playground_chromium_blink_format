@@ -44,20 +44,20 @@
 #include "xml/dom_textimpl.h"
 
 #if APPLE_CHANGES
-#include <KWQAssertions.h>
-#include <KWQTextUtilities.h>
-#include <CoreServices/CoreServices.h>
-
-#define EDIT_DEBUG 0
+#include "KWQAssertions.h"
+#else
+#define ASSERT(assertion) assert(assertion)
 #endif
 
+#define EDIT_DEBUG 0
+
+using khtml::findWordBoundary;
 using khtml::InlineTextBox;
 using khtml::RenderObject;
 using khtml::RenderText;
 
 namespace DOM {
 
-#if APPLE_CHANGES
 static bool firstRunAt(RenderObject* renderNode,
                        int y,
                        NodeImpl*& startNode,
@@ -69,7 +69,6 @@ static bool lastRunAt(RenderObject* renderNode,
 static bool startAndEndLineNodesIncludingNode(NodeImpl* node,
                                               int offset,
                                               Selection& selection);
-#endif
 
 static inline Position& emptyPosition() {
   static Position EmptyPosition = Position();
@@ -204,22 +203,37 @@ bool Selection::modify(EAlter alter,
           m_modifyBiasSet = true;
           assignBaseAndExtent(start(), end());
         }
-        if (granularity == CHARACTER)
-          pos = extent().nextCharacterPosition();
-        else if (granularity == WORD)
-          pos = extent().nextWordPosition();
+        switch (granularity) {
+          case CHARACTER:
+            pos = extent().nextCharacterPosition();
+            break;
+          case WORD:
+            pos = extent().nextWordPosition();
+            break;
+          case LINE:
+            pos = extent().nextLinePosition(
+                xPosForVerticalArrowNavigation(EXTENT));
+            break;
+          case PARAGRAPH:
+            // not implemented
+            break;
+        }
       } else {
         m_modifyBiasSet = false;
-        if (state() == RANGE) {
-          if (granularity == CHARACTER)
-            pos = end();
-          else if (granularity == WORD)
+        switch (granularity) {
+          case CHARACTER:
+            pos = (state() == RANGE) ? end() : extent().nextCharacterPosition();
+            break;
+          case WORD:
             pos = extent().nextWordPosition();
-        } else {
-          if (granularity == CHARACTER)
-            pos = extent().nextCharacterPosition();
-          else if (granularity == WORD)
-            pos = extent().nextWordPosition();
+            break;
+          case LINE:
+            pos = end().nextLinePosition(
+                xPosForVerticalArrowNavigation(END, state() == RANGE));
+            break;
+          case PARAGRAPH:
+            // not implemented
+            break;
         }
       }
       break;
@@ -231,50 +245,39 @@ bool Selection::modify(EAlter alter,
           m_modifyBiasSet = true;
           assignBaseAndExtent(end(), start());
         }
-        if (granularity == CHARACTER)
-          pos = extent().previousCharacterPosition();
-        else if (granularity == WORD)
-          pos = extent().previousWordPosition();
-      } else {
-        m_modifyBiasSet = false;
-        if (state() == RANGE) {
-          if (granularity == CHARACTER)
-            pos = start();
-          else if (granularity == WORD)
-            pos = extent().previousWordPosition();
-        } else {
-          if (granularity == CHARACTER)
+        switch (granularity) {
+          case CHARACTER:
             pos = extent().previousCharacterPosition();
-          else if (granularity == WORD)
+            break;
+          case WORD:
             pos = extent().previousWordPosition();
+            break;
+          case LINE:
+            pos = extent().previousLinePosition(
+                xPosForVerticalArrowNavigation(EXTENT));
+            break;
+          case PARAGRAPH:
+            // not implemented
+            break;
         }
-      }
-      break;
-    case UP:
-      if (alter == EXTEND) {
-        if (!m_modifyBiasSet) {
-          m_modifyBiasSet = true;
-          assignBaseAndExtent(end(), start());
-        }
-        pos = extent().previousLinePosition(
-            xPosForVerticalArrowNavigation(EXTENT));
       } else {
         m_modifyBiasSet = false;
-        pos = start().previousLinePosition(
-            xPosForVerticalArrowNavigation(START, state() == RANGE));
-      }
-      break;
-    case DOWN:
-      if (alter == EXTEND) {
-        if (!m_modifyBiasSet) {
-          m_modifyBiasSet = true;
-          assignBaseAndExtent(start(), end());
+        switch (granularity) {
+          case CHARACTER:
+            pos = (state() == RANGE) ? start()
+                                     : extent().previousCharacterPosition();
+            break;
+          case WORD:
+            pos = extent().previousWordPosition();
+            break;
+          case LINE:
+            pos = start().previousLinePosition(
+                xPosForVerticalArrowNavigation(START, state() == RANGE));
+            break;
+          case PARAGRAPH:
+            // not implemented
+            break;
         }
-        pos = extent().nextLinePosition(xPosForVerticalArrowNavigation(EXTENT));
-      } else {
-        m_modifyBiasSet = false;
-        pos = end().nextLinePosition(
-            xPosForVerticalArrowNavigation(END, state() == RANGE));
       }
       break;
   }
@@ -542,13 +545,7 @@ void Selection::validate(ETextGranularity granularity) {
       m_baseIsStart = false;
   }
 
-// calculate the correct start and end positions
-#if !APPLE_CHANGES
-  if (m_baseIsStart)
-    assignStartAndEnd(base(), extent());
-  else
-    assignStartAndEnd(extent(), base());
-#else
+  // calculate the correct start and end positions
   if (granularity == CHARACTER) {
     if (m_baseIsStart)
       assignStartAndEnd(base(), extent());
@@ -565,8 +562,8 @@ void Selection::validate(ETextGranularity granularity) {
       DOMString t = base().node()->nodeValue();
       QChar* chars = t.unicode();
       uint len = t.length();
-      KWQFindWordBoundary(chars, len, base().offset(), &baseStartOffset,
-                          &baseEndOffset);
+      findWordBoundary(chars, len, base().offset(), &baseStartOffset,
+                       &baseEndOffset);
     }
     if (extent().notEmpty() &&
         (extent().node()->nodeType() == Node::TEXT_NODE ||
@@ -574,8 +571,8 @@ void Selection::validate(ETextGranularity granularity) {
       DOMString t = extent().node()->nodeValue();
       QChar* chars = t.unicode();
       uint len = t.length();
-      KWQFindWordBoundary(chars, len, extent().offset(), &extentStartOffset,
-                          &extentEndOffset);
+      findWordBoundary(chars, len, extent().offset(), &extentStartOffset,
+                       &extentEndOffset);
     }
     if (m_baseIsStart) {
       assignStart(Position(base().node(), baseStartOffset));
@@ -617,7 +614,6 @@ void Selection::validate(ETextGranularity granularity) {
       assignEnd(baseSelection.end());
     }
   }
-#endif  // APPLE_CHANGES
 
   // adjust the state
   if (start().isEmpty() && end().isEmpty())
@@ -712,8 +708,6 @@ bool Selection::nodeIsBeforeNode(NodeImpl* n1, NodeImpl* n2) const {
   }
   return result;
 }
-
-#if APPLE_CHANGES
 
 static bool firstRunAt(RenderObject* renderNode,
                        int y,
@@ -985,7 +979,5 @@ void Selection::debugPosition() const {
 
   fprintf(stderr, "================================\n");
 }
-
-#endif
 
 }  // namespace DOM
