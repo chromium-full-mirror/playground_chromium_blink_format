@@ -94,6 +94,7 @@ void TextSlave::paintSelection(const Font* f,
 }
 
 void TextSlave::paintDecoration(QPainter* pt,
+                                const Font* f,
                                 RenderText* p,
                                 int _tx,
                                 int _ty,
@@ -113,8 +114,18 @@ void TextSlave::paintDecoration(QPainter* pt,
 
 #if APPLE_CHANGES
   // Use a special function for underlines to get the positioning exactly right.
-  if (deco & UNDERLINE)
-    pt->drawUnderlineForText(_tx, _ty + m_baseline, p->str->s + m_start, m_len);
+  if (deco & UNDERLINE) {
+    f->drawLineForText(pt, _tx, _ty, p->str->s, p->str->l, m_start, m_len,
+                       m_toAdd, m_baseline,
+                       m_reversed ? QPainter::RTL : QPainter::LTR);
+  }
+  if (deco & OVERLINE)
+    f->drawLineForText(pt, _tx, _ty, p->str->s, p->str->l, m_start, m_len,
+                       m_toAdd, 0, m_reversed ? QPainter::RTL : QPainter::LTR);
+  if (deco & LINE_THROUGH)
+    f->drawLineForText(pt, _tx, _ty, p->str->s, p->str->l, m_start, m_len,
+                       m_toAdd, 2 * m_baseline / 3,
+                       m_reversed ? QPainter::RTL : QPainter::LTR);
 #else
   int underlineOffset = (pt->fontMetrics().height() + m_baseline) / 2;
   if (underlineOffset <= m_baseline)
@@ -124,12 +135,12 @@ void TextSlave::paintDecoration(QPainter* pt,
     pt->drawLine(_tx, _ty + underlineOffset, _tx + width,
                  _ty + underlineOffset);
   }
-#endif
   if (deco & OVERLINE)
     pt->drawLine(_tx, _ty, _tx + width, _ty);
   if (deco & LINE_THROUGH)
     pt->drawLine(_tx, _ty + 2 * m_baseline / 3, _tx + width,
                  _ty + 2 * m_baseline / 3);
+#endif
   // NO! Do NOT add BLINK! It is the most annouing feature of Netscape, and IE
   // has a reason not to
   // support it. Lars
@@ -694,7 +705,7 @@ void RenderText::paintObject(QPainter* p,
 
           if (d != TDNONE) {
             p->setPen(_style->textDecorationColor());
-            s->paintDecoration(p, this, tx, ty, d, si == 0,
+            s->paintDecoration(p, font, this, tx, ty, d, si == 0,
                                si == (int)m_lines.count() - 1);
           }
 

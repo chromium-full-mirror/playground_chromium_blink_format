@@ -63,9 +63,17 @@
             letterSpacing:(int)letterSpacing
               wordSpacing:(int)wordSpacing
              fontFamilies:(NSString**)families;
-- (void)drawUnderlineForCharacters:(const UniChar*)characters
-                      stringLength:(unsigned)length
-                           atPoint:(NSPoint)point
-                         withColor:(NSColor*)color;
+- (void)drawLineForCharacters:(const UniChar*)characters
+                 stringLength:(unsigned)length
+        fromCharacterPosition:(int)from
+          toCharacterPosition:(int)to
+                      atPoint:(NSPoint)point
+                      yOffset:(float)yOffset
+                  withPadding:(int)padding
+                    withColor:(NSColor*)color
+                  rightToLeft:(BOOL)rtl
+                letterSpacing:(int)letterSpacing
+                  wordSpacing:(int)wordSpacing
+                 fontFamilies:(NSString**)families;
 
 @end

@@ -74,6 +74,16 @@ class TextSlave {
   void* operator new(size_t sz) throw();
 
  public:
+#ifdef APPLE_CHANGES
+  void paintDecoration(QPainter* pt,
+                       const Font*,
+                       RenderText* p,
+                       int _tx,
+                       int _ty,
+                       int decoration,
+                       bool begin,
+                       bool end);
+#else
   void paintDecoration(QPainter* pt,
                        RenderText* p,
                        int _tx,
@@ -81,6 +91,7 @@ class TextSlave {
                        int decoration,
                        bool begin,
                        bool end);
+#endif
   void paintBoxDecorations(QPainter* p,
                            RenderStyle* style,
                            RenderText* parent,
