@@ -68,6 +68,7 @@ class SavedProperty {
  public:
   Identifier key;
   Value value;
+  int attributes;
 };
 
 SavedProperties::SavedProperties() : _count(0), _properties(0) {}
@@ -468,6 +469,7 @@ void PropertyMap::save(SavedProperties& p) const {
         // if (_table->entries[i].key) {
         prop->key = Identifier(_table->entries[i].key);
         prop->value = Value(_table->entries[i].value);
+        prop->attributes = _table->entries[i].attributes;
         ++prop;
       }
     }
@@ -476,7 +478,8 @@ void PropertyMap::save(SavedProperties& p) const {
 
 void PropertyMap::restore(const SavedProperties& p) {
   for (int i = 0; i != p._count; ++i) {
-    put(p._properties[i].key, p._properties[i].value.imp(), 0);
+    put(p._properties[i].key, p._properties[i].value.imp(),
+        p._properties[i].attributes);
   }
 }
 
