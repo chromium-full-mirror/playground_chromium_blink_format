@@ -27,6 +27,8 @@
 #include <npruntime.h>
 #include <c_utility.h>
 
+#include <JavaScriptCore/npruntime_impl.h>
+
 static Boolean stringIdentifierEqual(const void* value1, const void* value2) {
   return strcmp((const char*)value1, (const char*)value2) == 0;
 }
@@ -85,7 +87,7 @@ static CFMutableDictionaryRef getIntIdentifierDictionary() {
   return intIdentifierDictionary;
 }
 
-NPIdentifier NPN_GetStringIdentifier(const NPUTF8* name) {
+NPIdentifier _NPN_GetStringIdentifier(const NPUTF8* name) {
   assert(name);
 
   if (name) {
@@ -111,9 +113,9 @@ NPIdentifier NPN_GetStringIdentifier(const NPUTF8* name) {
   return 0;
 }
 
-void NPN_GetStringIdentifiers(const NPUTF8** names,
-                              int32_t nameCount,
-                              NPIdentifier* identifiers) {
+void _NPN_GetStringIdentifiers(const NPUTF8** names,
+                               int32_t nameCount,
+                               NPIdentifier* identifiers) {
   assert(names);
   assert(identifiers);
 
@@ -121,12 +123,12 @@ void NPN_GetStringIdentifiers(const NPUTF8** names,
     int i;
 
     for (i = 0; i < nameCount; i++) {
-      identifiers[i] = NPN_GetStringIdentifier(names[i]);
+      identifiers[i] = _NPN_GetStringIdentifier(names[i]);
     }
   }
 }
 
-NPIdentifier NPN_GetIntIdentifier(int32_t intid) {
+NPIdentifier _NPN_GetIntIdentifier(int32_t intid) {
   PrivateIdentifier* identifier = 0;
 
   identifier = (PrivateIdentifier*)CFDictionaryGetValue(
@@ -143,17 +145,22 @@ NPIdentifier NPN_GetIntIdentifier(int32_t intid) {
   return (NPIdentifier)identifier;
 }
 
-bool NPN_IdentifierIsString(NPIdentifier identifier) {
+bool _NPN_IdentifierIsString(NPIdentifier identifier) {
   PrivateIdentifier* i = (PrivateIdentifier*)identifier;
   return i->isString;
 }
 
-NPUTF8* NPN_UTF8FromIdentifier(NPIdentifier identifier) {
+NPUTF8* _NPN_UTF8FromIdentifier(NPIdentifier identifier) {
   PrivateIdentifier* i = (PrivateIdentifier*)identifier;
   if (!i->isString)
     return NULL;
 
   return (NPUTF8*)i->value.string;
+}
+
+int32_t _NPN_IntFromIdentifier(NPIdentifier identifier) {
+  // FIXME: Implement!
+  return 0;
 }
 
 NPBool NPN_VariantIsVoid(const NPVariant* variant) {
@@ -282,7 +289,7 @@ void NPN_InitializeVariantWithStringCopy(NPVariant* variant,
 
 void NPN_InitializeVariantWithObject(NPVariant* variant, NPObject* value) {
   variant->type = NPVariantType_Object;
-  variant->value.objectValue = NPN_RetainObject(value);
+  variant->value.objectValue = _NPN_RetainObject(value);
 }
 
 void NPN_InitializeVariantWithVariant(NPVariant* destination,
@@ -324,11 +331,11 @@ void NPN_InitializeVariantWithVariant(NPVariant* destination,
   }
 }
 
-void NPN_ReleaseVariantValue(NPVariant* variant) {
+void _NPN_ReleaseVariantValue(NPVariant* variant) {
   assert(variant);
 
   if (variant->type == NPVariantType_Object) {
-    NPN_ReleaseObject(variant->value.objectValue);
+    _NPN_ReleaseObject(variant->value.objectValue);
     variant->value.objectValue = 0;
   } else if (variant->type == NPVariantType_String) {
     free((void*)variant->value.stringValue.UTF8Characters);
@@ -339,7 +346,7 @@ void NPN_ReleaseVariantValue(NPVariant* variant) {
   variant->type = NPVariantType_Void;
 }
 
-NPObject* NPN_CreateObject(NPP npp, NPClass* aClass) {
+NPObject* _NPN_CreateObject(NPP npp, NPClass* aClass) {
   assert(aClass);
 
   if (aClass) {
@@ -359,7 +366,7 @@ NPObject* NPN_CreateObject(NPP npp, NPClass* aClass) {
   return 0;
 }
 
-NPObject* NPN_RetainObject(NPObject* obj) {
+NPObject* _NPN_RetainObject(NPObject* obj) {
   assert(obj);
 
   if (obj)
@@ -368,7 +375,7 @@ NPObject* NPN_RetainObject(NPObject* obj) {
   return obj;
 }
 
-void NPN_ReleaseObject(NPObject* obj) {
+void _NPN_ReleaseObject(NPObject* obj) {
   assert(obj);
   assert(obj->referenceCount >= 1);
 
@@ -384,9 +391,9 @@ void NPN_ReleaseObject(NPObject* obj) {
   }
 }
 
-void NPN_SetExceptionWithUTF8(NPObject* obj,
-                              const NPUTF8* message,
-                              int32_t length) {
+void _NPN_SetExceptionWithUTF8(NPObject* obj,
+                               const NPUTF8* message,
+                               int32_t length) {
   assert(obj);
   assert(message);
 
@@ -394,10 +401,10 @@ void NPN_SetExceptionWithUTF8(NPObject* obj,
     NPString string;
     string.UTF8Characters = message;
     string.UTF8Length = length;
-    NPN_SetException(obj, &string);
+    _NPN_SetException(obj, &string);
   }
 }
 
-void NPN_SetException(NPObject* obj, NPString* message) {
+void _NPN_SetException(NPObject* obj, NPString* message) {
   // FIX ME.  Need to implement.
 }

@@ -28,6 +28,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <npruntime.h>
+#include <npruntime_impl.h>
 
 #include <runtime.h>
 #include <ustring.h>
@@ -50,7 +51,7 @@ class CField : public Field {
                                   const KJS::Value& aValue) const;
 
   virtual const char* name() const {
-    return NPN_UTF8FromIdentifier(_fieldIdentifier);
+    return _NPN_UTF8FromIdentifier(_fieldIdentifier);
   }
   virtual RuntimeType type() const { return ""; }
 
@@ -65,7 +66,7 @@ class CMethod : public Method {
   CMethod(NPIdentifier ident) : Method(), _methodIdentifier(ident){};
 
   virtual const char* name() const {
-    return NPN_UTF8FromIdentifier(_methodIdentifier);
+    return _NPN_UTF8FromIdentifier(_methodIdentifier);
   };
 
   virtual long numParameters() const { return 0; };
