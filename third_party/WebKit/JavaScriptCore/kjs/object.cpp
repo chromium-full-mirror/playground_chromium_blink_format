@@ -44,15 +44,15 @@
 #endif
 
 #ifdef JAVASCRIPT_CALL_TRACING
-static bool traceJavaScript = false;
+static bool _traceJavaScript = false;
 
 extern "C" {
 void setTraceJavaScript(bool f) {
-  traceJavaScript = f;
+  _traceJavaScript = f;
 }
 
 static bool traceJavaScript() {
-  return traceJavaScript;
+  return _traceJavaScript;
 }
 }
 #endif
@@ -74,7 +74,7 @@ Value Object::call(ExecState* exec, Object& thisObj, const List& args) {
 
 #ifdef JAVASCRIPT_CALL_TRACING
   static bool tracing = false;
-  if (javaScriptTrace() && !tracing) {
+  if (traceJavaScript() && !tracing) {
     tracing = true;
     for (int i = 0; i < depth; i++)
       putchar(' ');
@@ -104,7 +104,7 @@ Value Object::call(ExecState* exec, Object& thisObj, const List& args) {
 #endif
 
 #ifdef JAVASCRIPT_CALL_TRACING
-  if (javaScriptTrace() && !tracing) {
+  if (traceJavaScript() && !tracing) {
     tracing = true;
     for (int i = 0; i < depth; i++)
       putchar(' ');
