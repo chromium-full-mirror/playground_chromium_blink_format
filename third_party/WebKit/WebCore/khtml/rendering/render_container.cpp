@@ -370,7 +370,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
   }
 
   KHTMLAssert(!child->parent());
-  while (beforeChild->parent() != this && beforeChild->parent()->isAnonymous())
+  while (beforeChild->parent() != this &&
+         beforeChild->parent()->isAnonymousBlock())
     beforeChild = beforeChild->parent();
   KHTMLAssert(beforeChild->parent() == this);
 
@@ -416,7 +417,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
   while (child) {
     RenderObject* next = child->nextSibling();
 
-    if (child->isRenderBlock() && child->isAnonymous() &&
+    if (child->isRenderBlock() && child->isAnonymousBlock() &&
         !child->continuation() && !child->childrenInline() &&
         !child->isTableCell()) {
       RenderObject* firstAnChild = child->firstChild();

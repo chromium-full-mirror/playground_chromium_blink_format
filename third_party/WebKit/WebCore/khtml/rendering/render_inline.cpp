@@ -207,7 +207,7 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
   RenderBlock* pre = 0;
   RenderBlock* block = containingBlock();
   bool madeNewBeforeBlock = false;
-  if (block->isAnonymous()) {
+  if (block->isAnonymousBlock()) {
     // We can reuse this block and make it the preBlock of the next
     // continuation.
     pre = block;
@@ -527,7 +527,7 @@ const char* RenderInline::renderName() const {
   if (isRelPositioned())
     return "RenderInline (relative positioned)";
   if (isAnonymous())
-    return "RenderInline (anonymous)";
+    return "RenderInline (generated)";
   return "RenderInline";
 }
 
