@@ -1399,12 +1399,11 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
   NodeImpl* lastStyledNode = 0;
   for (NodeImpl* node = start.node(); node != beyondEnd;
        node = node->traverseNextNode()) {
-    // Only work on fully selected nodes.
-    if (!nodeFullySelected(node, start, end))
-      continue;
-
     HTMLElementImpl* elem = 0;
     if (node->isHTMLElement()) {
+      // Only work on fully selected nodes.
+      if (!nodeFullySelected(node, start, end))
+        continue;
       elem = static_cast<HTMLElementImpl*>(node);
     } else if (node->isTextNode() && node->parentNode() != lastStyledNode) {
       // Last styled node was not parent node of this text node, but we wish to
@@ -1884,6 +1883,7 @@ bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
                                           const Position& start,
                                           const Position& end) const {
   ASSERT(node);
+  ASSERT(node->isElementNode());
 
   Position pos = Position(node, node->childNodeCount()).upstream();
   return RangeImpl::compareBoundaryPoints(node, 0, start.node(),
@@ -1895,6 +1895,7 @@ bool ApplyStyleCommand::nodeFullyUnselected(NodeImpl* node,
                                             const Position& start,
                                             const Position& end) const {
   ASSERT(node);
+  ASSERT(node->isElementNode());
 
   Position pos = Position(node, node->childNodeCount()).upstream();
   bool isFullyBeforeStart = RangeImpl::compareBoundaryPoints(pos, start) < 0;
