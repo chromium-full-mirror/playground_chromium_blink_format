@@ -50,6 +50,7 @@ class QFontMetrics {
   int width(QChar) const;
   int width(char) const;
   int width(const QString&, int len = -1) const;
+  int charWidth(QString& s, int pos) const;
   int width(const QChar*, int len) const;
 
   QRect boundingRect(const QString&, int len = -1) const;
