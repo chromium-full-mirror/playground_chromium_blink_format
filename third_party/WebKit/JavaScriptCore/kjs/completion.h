@@ -45,7 +45,7 @@ enum ComplType { Normal, Break, Continue, ReturnValue, Throw };
  *
  * @short Handle for a Completion type.
  */
-class Completion : private Value {
+class Completion {
  public:
   Completion(ComplType c = Normal,
              const Value& v = Value(),
