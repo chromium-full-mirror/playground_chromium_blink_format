@@ -157,7 +157,7 @@ extern NSString* WebCorePageCacheStateKey;
            loadType:(WebFrameLoadType)loadType
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
-               form:(id<WebDOMElement>)form
+               form:(NSObject<WebDOMElement>*)form
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
@@ -166,7 +166,7 @@ extern NSString* WebCorePageCacheStateKey;
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
-                form:(id<WebDOMElement>)form
+                form:(NSObject<WebDOMElement>*)form
           formValues:(NSDictionary*)values;
 
 - (void)_loadRequest:(NSURLRequest*)request inFrameNamed:(NSString*)frameName;

@@ -263,7 +263,7 @@ enum FrameBorderStyle {
              reload:(BOOL)reload
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
-               form:(id<WebDOMElement>)form
+               form:(NSObject<WebDOMElement>*)form
          formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSString*)URL
            referrer:(NSString*)referrer
@@ -271,7 +271,7 @@ enum FrameBorderStyle {
                data:(NSData*)data
         contentType:(NSString*)contentType
     triggeringEvent:(NSEvent*)event
-               form:(id<WebDOMElement>)form
+               form:(NSObject<WebDOMElement>*)form
          formValues:(NSDictionary*)values;
 
 - (WebCoreBridge*)createWindowWithURL:(NSString*)URL frameName:(NSString*)name;
