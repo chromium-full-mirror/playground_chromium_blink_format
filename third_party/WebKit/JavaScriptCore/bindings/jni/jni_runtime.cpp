@@ -190,6 +190,8 @@ JavaConstructor::JavaConstructor(JNIEnv* env, jobject aConstructor) {
     jstring parameterName = (jstring)callJNIObjectMethod(
         aParameter, "getName", "()Ljava/lang/String;");
     _parameters[i] = JavaParameter(env, parameterName);
+    env->DeleteLocalRef(aParameter);
+    env->DeleteLocalRef(parameterName);
   }
 }
 
@@ -201,11 +203,14 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
                                                         "()Ljava/lang/String;");
   _returnType = JavaString(env, returnTypeName);
   _JNIReturnType = JNITypeFromClassName(_returnType.UTF8String());
+  env->DeleteLocalRef(returnType);
+  env->DeleteLocalRef(returnTypeName);
 
   // Get method name
   jstring methodName =
       (jstring)callJNIObjectMethod(aMethod, "getName", "()Ljava/lang/String;");
   _name = JavaString(env, methodName);
+  env->DeleteLocalRef(methodName);
 
   // Get parameters
   jarray jparameters = (jarray)callJNIObjectMethod(aMethod, "getParameterTypes",
@@ -220,7 +225,10 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
     jstring parameterName = (jstring)callJNIObjectMethod(
         aParameter, "getName", "()Ljava/lang/String;");
     _parameters[i] = JavaParameter(env, parameterName);
+    env->DeleteLocalRef(aParameter);
+    env->DeleteLocalRef(parameterName);
   }
+  env->DeleteLocalRef(jparameters);
 
   // Created lazily.
   _signature = 0;

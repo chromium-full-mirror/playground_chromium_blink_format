@@ -47,6 +47,7 @@ void JavaClass::_commonInit(jobject aClass) {
         CFStringCreateWithCString(NULL, aField->name(), kCFStringEncodingASCII);
     CFDictionaryAddValue((CFMutableDictionaryRef)_fields, fieldName, aField);
     CFRelease(fieldName);
+    env->DeleteLocalRef(aJField);
   }
 
   // Get the methods
@@ -62,6 +63,7 @@ void JavaClass::_commonInit(jobject aClass) {
                                                        kCFStringEncodingASCII);
     CFDictionaryAddValue((CFMutableDictionaryRef)_methods, methodName, aMethod);
     CFRelease(methodName);
+    env->DeleteLocalRef(aJMethod);
   }
 
   // Get the constructors
@@ -73,6 +75,7 @@ void JavaClass::_commonInit(jobject aClass) {
     jobject aConstructor =
         env->GetObjectArrayElement((jobjectArray)constructors, i);
     _constructors[i] = JavaConstructor(env, aConstructor);
+    env->DeleteLocalRef(aConstructor);
   }
 }
 
@@ -90,6 +93,8 @@ JavaClass::JavaClass(const char* className) {
   }
 
   _commonInit(aClass);
+
+  env->DeleteLocalRef(aClass);
 }
 
 JavaClass::JavaClass(jobject aClass) {

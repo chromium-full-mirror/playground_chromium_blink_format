@@ -58,6 +58,8 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
 
 Value RuntimeObjectImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
+  instance->begin();
+
   // See if the instance have a field with the specified name.
   Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
   if (aField) {
@@ -69,8 +71,11 @@ Value RuntimeObjectImp::get(ExecState* exec,
   // that method.
   Method* aMethod = instance->getClass()->methodNamed(propertyName.ascii());
   if (aMethod) {
+    instance->end();
     return Object(new RuntimeMethodImp(exec, propertyName, aMethod));
   }
+
+  instance->end();
 
   return Undefined();
 }
@@ -79,26 +84,42 @@ void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
                            const Value& value,
                            int attr) {
+  instance->begin();
+
   // Set the value of the property.
   Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
   if (aField) {
     getInternalInstance()->setValueOfField(exec, aField, value);
   }
+
+  instance->end();
 }
 
 bool RuntimeObjectImp::canPut(ExecState* exec,
                               const Identifier& propertyName) const {
+  instance->begin();
+
   Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+
+  instance->end();
+
   return aField ? true : false;
 }
 
 bool RuntimeObjectImp::hasProperty(ExecState* exec,
                                    const Identifier& propertyName) const {
+  instance->begin();
+
   Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
-  if (aField)
+  if (aField) {
+    instance->end();
     return true;
+  }
 
   Method* aMethod = instance->getClass()->methodNamed(propertyName.ascii());
+
+  instance->end();
+
   if (aMethod)
     return true;
 
@@ -112,7 +133,13 @@ bool RuntimeObjectImp::deleteProperty(ExecState* exec,
 }
 
 Value RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
-  return getInternalInstance()->defaultValue(hint);
+  instance->begin();
+
+  Value aValue = getInternalInstance()->defaultValue(hint);
+
+  instance->end();
+
+  return aValue;
 }
 
 void RuntimeObjectImp::_initializeClassInfoFromInstance() {

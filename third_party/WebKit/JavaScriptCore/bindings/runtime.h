@@ -99,6 +99,12 @@ class Instance {
   static Instance* createBindingForLanguageInstance(BindingLanguage language,
                                                     void* instance);
 
+  // These functions are called before and after the main entry points into
+  // the native implementations.  They can be used to establish and cleanup
+  // any needed state.
+  virtual void begin(){};
+  virtual void end(){};
+
   virtual Class* getClass() const = 0;
 
   virtual KJS::Value getValueOfField(const Field* aField) const;
