@@ -173,6 +173,11 @@ static DOMString& blockPlaceholderClassString() {
   return blockPlaceholderClassString;
 }
 
+static void derefNodesInList(QPtrList<NodeImpl>& list) {
+  for (QPtrListIterator<NodeImpl> it(list); it.current(); ++it)
+    it.current()->deref();
+}
+
 static void debugPosition(const char* prefix, const Position& pos) {
   if (!prefix)
     prefix = "";
@@ -2141,9 +2146,11 @@ void InsertNodeBeforeCommand::doUnapply() {
 
 InsertParagraphSeparatorCommand::InsertParagraphSeparatorCommand(
     DocumentImpl* document)
-    : CompositeEditCommand(document) {
-  ancestors.setAutoDelete(true);
-  clonedNodes.setAutoDelete(true);
+    : CompositeEditCommand(document) {}
+
+InsertParagraphSeparatorCommand::~InsertParagraphSeparatorCommand() {
+  derefNodesInList(ancestors);
+  derefNodesInList(clonedNodes);
 }
 
 void InsertParagraphSeparatorCommand::doApply() {
@@ -2267,13 +2274,12 @@ void InsertParagraphSeparatorCommand::doApply() {
 
 InsertParagraphSeparatorInQuotedContentCommand::
     InsertParagraphSeparatorInQuotedContentCommand(DocumentImpl* document)
-    : CompositeEditCommand(document) {
-  ancestors.setAutoDelete(true);
-  clonedNodes.setAutoDelete(true);
-}
+    : CompositeEditCommand(document) {}
 
 InsertParagraphSeparatorInQuotedContentCommand::
     ~InsertParagraphSeparatorInQuotedContentCommand() {
+  derefNodesInList(ancestors);
+  derefNodesInList(clonedNodes);
   if (m_breakNode)
     m_breakNode->deref();
 }
