@@ -273,6 +273,8 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isMouseFocusable() const;
 
   virtual bool isInline() const;
+  QString startMarkup(const DOM::RangeImpl* range) const;
+  QString endMarkup(void) const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool onlyIncludeChildren = false,
                            bool includeSiblings = false,

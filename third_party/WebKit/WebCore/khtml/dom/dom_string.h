@@ -123,9 +123,10 @@ class DOMString {
   operator NSString*() const;
 #endif
 
- private:
+#ifndef NDEBUG
   // For debugging only, leaks memory.
   const char* ascii() const;
+#endif
 
  protected:
   DOMStringImpl* impl;
