@@ -59,8 +59,9 @@ class RuntimeArrayImp : public ArrayInstanceImp {
 
   Bindings::Array* getConcreteArray() const { return _array; }
 
- private:
   static const ClassInfo info;
+
+ private:
   Bindings::Array* _array;
 };
 

@@ -416,9 +416,6 @@ KJS::Value JSObject::convertJObjectToValue(jobject theObject) const {
   jstring className = (jstring)callJNIObjectMethod(classOfInstance, "getName",
                                                    "()Ljava/lang/String;");
 
-  JS_LOG("converting instance of class %s\n",
-         Bindings::JavaString(className).UTF8String());
-
   if (strcmp(Bindings::JavaString(className).UTF8String(),
              "netscape.javascript.JSObject") == 0) {
     // Pull the nativeJSObject value from the Java instance.  This is a
@@ -453,8 +450,13 @@ KJS::List JSObject::listFromJArray(jobjectArray jArray) const {
 
   for (i = 0; i < numObjects; i++) {
     jobject anObject = env->GetObjectArrayElement((jobjectArray)jArray, i);
-    aList.append(convertJObjectToValue(anObject));
-    env->DeleteLocalRef(anObject);
+    if (anObject) {
+      aList.append(convertJObjectToValue(anObject));
+      env->DeleteLocalRef(anObject);
+    } else {
+      env->ExceptionDescribe();
+      env->ExceptionClear();
+    }
   }
   return aList;
 }
