@@ -5578,7 +5578,19 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
     styleElement->appendChild(text, exceptionCode);
     assert(exceptionCode == 0);
 
-    elem->appendChild(styleElement, exceptionCode);
+    if (elem->renderer() && elem->renderer()->canHaveChildren()) {
+      elem->appendChild(styleElement, exceptionCode);
+    } else {
+      NodeImpl* parent = elem->parent();
+      NodeImpl* next = elem->nextSibling();
+
+      if (next) {
+        parent->insertBefore(styleElement, next, exceptionCode);
+      } else {
+        parent->appendChild(styleElement, exceptionCode);
+      }
+    }
+
     assert(exceptionCode == 0);
 
     nodeToRemove = styleElement;
