@@ -725,6 +725,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void preloadScript(const QString& url, const QString& script);
 
+  bool isPointSelected(int x, int y);
+
   /**
    * @internal
    */

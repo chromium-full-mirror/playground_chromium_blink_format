@@ -62,11 +62,11 @@ extern NSString* WebCoreElementImageAltStringKey;
 extern NSString* WebCoreElementImageKey;
 extern NSString* WebCoreElementImageLocationKey;
 extern NSString* WebCoreElementImageURLKey;
+extern NSString* WebCoreElementIsSelectedTextKey;
 extern NSString* WebCoreElementLinkURLKey;
 extern NSString* WebCoreElementLinkTargetFrameKey;
 extern NSString* WebCoreElementLinkLabelKey;
 extern NSString* WebCoreElementLinkTitleKey;
-extern NSString* WebCoreElementStringKey;
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
@@ -301,7 +301,7 @@ enum FrameBorderStyle {
 
 - (void)handleMouseDragged:(NSEvent*)event;
 - (void)handleAutoscrollForMouseDragged:(NSEvent*)event;
-- (BOOL)mayStartDragWithMouseDown:(NSEvent*)event;
+- (BOOL)mayStartDragWithMouseDragged:(NSEvent*)event;
 
 @end
 

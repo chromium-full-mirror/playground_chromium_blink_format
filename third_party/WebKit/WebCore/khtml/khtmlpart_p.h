@@ -312,6 +312,7 @@ class KHTMLPartPrivate {
   long m_initialSelectionEndOffset;
   bool m_selectionInitiatedWithDoubleClick : 1;
   bool m_selectionInitiatedWithTripleClick : 1;
+  bool m_mouseMovedSinceLastMousePress;
 #endif
   DOM::Node m_selectionStart;
   long m_startOffset;

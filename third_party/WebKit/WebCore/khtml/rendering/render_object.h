@@ -398,12 +398,12 @@ class RenderObject : public CachedObjectClient {
     bool m_active;
   };
 
-  virtual FindSelectionResult checkSelectionPoint(
-      const khtml::MouseEvent* event,
-      int _tx,
-      int _ty,
-      DOM::NodeImpl*&,
-      int& offset);
+  virtual FindSelectionResult checkSelectionPoint(int _x,
+                                                  int _y,
+                                                  int _tx,
+                                                  int _ty,
+                                                  DOM::NodeImpl*&,
+                                                  int& offset);
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
                            int y,
