@@ -66,14 +66,28 @@ ArrayInstanceImp::~ArrayInstanceImp() {
   free(storage);
 }
 
+// Rule from ECMA 15.2 about what an array index is.
+// Must exactly match string form of an unsigned integer, and be less than 2^32
+// - 1.
+
+const unsigned maxUInt32 = 0xFFFFFFFFU;
+const unsigned notArrayIndex = maxUInt32;
+
+unsigned getArrayIndex(const Identifier& propertyName) {
+  bool ok;
+  unsigned index = propertyName.toStrictUInt32(&ok);
+  if (!ok || index >= maxUInt32)
+    return notArrayIndex;
+  return index;
+}
+
 Value ArrayInstanceImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return Number(length);
 
-  bool ok;
-  unsigned index = propertyName.toULong(&ok);
-  if (ok) {
+  unsigned index = getArrayIndex(propertyName);
+  if (index != notArrayIndex) {
     if (index >= length)
       return Undefined();
     if (index < storageLength) {
@@ -106,9 +120,8 @@ void ArrayInstanceImp::put(ExecState* exec,
     return;
   }
 
-  bool ok;
-  unsigned index = propertyName.toULong(&ok);
-  if (ok) {
+  unsigned index = getArrayIndex(propertyName);
+  if (index != notArrayIndex) {
     put(exec, index, value, attr);
     return;
   }
@@ -142,9 +155,8 @@ bool ArrayInstanceImp::hasProperty(ExecState* exec,
   if (propertyName == lengthPropertyName)
     return true;
 
-  bool ok;
-  unsigned index = propertyName.toULong(&ok);
-  if (ok) {
+  unsigned index = getArrayIndex(propertyName);
+  if (index != notArrayIndex) {
     if (index >= length)
       return false;
     if (index < storageLength) {
@@ -248,8 +260,8 @@ void ArrayInstanceImp::setLength(unsigned newLength, ExecState* exec) {
     ReferenceListIterator it = sparseProperties.begin();
     while (it != sparseProperties.end()) {
       Reference ref = it++;
-      bool ok;
-      if (ref.getPropertyName(exec).toULong(&ok) > newLength) {
+      unsigned index = getArrayIndex(ref.getPropertyName(exec));
+      if (index != notArrayIndex && index > newLength) {
         ref.deleteValue(exec);
       }
     }

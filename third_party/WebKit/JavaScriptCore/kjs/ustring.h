@@ -172,7 +172,7 @@ inline UChar::UChar(const UCharReference& c) : uc(c.unicode()) {}
  */
 class CString {
  public:
-  CString() : data(0L) {}
+  CString() : data(0) {}
   CString(const char* c);
   CString(const CString&);
 
@@ -392,9 +392,10 @@ class UString {
    * Attempts an conversion to an unsigned long integer. ok will be set
    * according to the success.
    */
-  unsigned long toULong(bool* ok = 0L) const;
+  unsigned long toULong(bool* ok = 0) const;
 
-  uint32_t toUInt32(bool* ok = 0L) const;
+  uint32_t toUInt32(bool* ok = 0) const;
+  uint32_t toStrictUInt32(bool* ok = 0) const;
 
   /**
    * @return Position of first occurrence of f starting at position pos.
