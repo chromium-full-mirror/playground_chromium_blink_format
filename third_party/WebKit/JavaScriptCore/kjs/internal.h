@@ -160,8 +160,9 @@ class ListImp : public ValueImp {
   friend class ListIterator;
   friend class List;
   friend class InterpreterImp;
+  friend class ObjectImp;
 
- public:
+ private:
   ListImp();
   ~ListImp();
 
