@@ -6,6 +6,7 @@
 int main() {
   QDict<int> d0;
   QDict<int> d1;
+  QDict<int> d2;
 
   int v1 = 1;
   int v2 = 2;
@@ -28,6 +29,14 @@ int main() {
 
   cout << "d0 is empty: " << d0.isEmpty() << endl;
   cout << "d1 is empty: " << d1.isEmpty() << endl;
+
+  cout << "d1 count: " << d1.count() << endl;
+
+  d2 = d1;
+  cout << "d2 = d1: " << d2 << endl;
+
+  d1.clear();
+  cout << "d1 cleared: " << d1 << endl;
 
   return 0;
 }
