@@ -327,6 +327,10 @@ void HTMLFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       setLocation(khtml::parseURL(attr->value()));
       break;
     case ATTR_ID:
+      // Important to call through to base for ATTR_ID so the hasID bit gets
+      // set.
+      HTMLElementImpl::parseHTMLAttribute(attr);
+    // fall through
     case ATTR_NAME:
       name = attr->value();
       // FIXME: If we are already attached, this doesn't actually change the
@@ -334,11 +338,11 @@ void HTMLFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       // FIXME: If we are already attached, this doesn't check for frame name
       // conflicts and generate a unique frame name.
       break;
-    case ATTR_FRAMEBORDER: {
+    case ATTR_FRAMEBORDER:
       frameBorder = attr->value().toInt();
       frameBorderSet = !attr->isNull();
       // FIXME: If we are already attached, this has no effect.
-    } break;
+      break;
     case ATTR_MARGINWIDTH:
       marginWidth = attr->value().toInt();
       // FIXME: If we are already attached, this has no effect.
