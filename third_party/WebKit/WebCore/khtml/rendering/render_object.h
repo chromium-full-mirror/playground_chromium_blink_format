@@ -574,7 +574,7 @@ class RenderObject : public CachedObjectClient {
     return s;
   }
 
-  void getTextDecorationColors(int& decorations,
+  void getTextDecorationColors(int decorations,
                                QColor& underline,
                                QColor& overline,
                                QColor& linethrough,
