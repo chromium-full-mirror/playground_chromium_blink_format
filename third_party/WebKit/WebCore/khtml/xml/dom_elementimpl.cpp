@@ -209,8 +209,6 @@ void ElementImpl::setAttribute(NodeImpl::Id id,
     return;
   }
 
-  printf("setAttribute %s\n", (char*)value);
-
   if (old && !value)
     namedAttrMap->removeAttribute(id);
   else if (!old && value)
