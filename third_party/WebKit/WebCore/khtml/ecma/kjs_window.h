@@ -105,6 +105,8 @@ class Window : public ObjectImp {
   void clearTimeout(int timerId);
 #ifdef APPLE_CHANGES
   bool hasTimeouts();
+  QMap<int, ScheduledAction*>* pauseTimeouts(const void* key);
+  void resumeTimeouts(QMap<int, ScheduledAction*>* sa, const void* key);
 #endif
   void scheduleClose();
   bool isSafeScript(ExecState* exec) const;
@@ -253,6 +255,9 @@ class WindowQObject : public QObject {
   void clearTimeout(int timerId, bool delAction = true);
 #ifdef APPLE_CHANGES
   bool hasTimeouts();
+  QMap<int, ScheduledAction*>* WindowQObject::pauseTimeouts(const void* key);
+  void WindowQObject::resumeTimeouts(QMap<int, ScheduledAction*>* sa,
+                                     const void* key);
 #endif
 
  public slots:
