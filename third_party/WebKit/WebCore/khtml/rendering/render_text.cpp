@@ -52,14 +52,14 @@ void TextSlave::printSelection(const Font* f,
     startPos = 0;
 
   p->save();
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Macintosh-style text highlighting is to draw with a particular background
   // color, not invert.
   QColor textColor = style->color();
   QColor c = QPainter::selectedTextBackgroundColor();
   if (textColor == c)
     c = QColor(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
-  p->setPen(textColor);
+  p->setPen(c);  // Don't draw text at all!
 #else
   QColor c = style->color();
   p->setPen(QColor(0xff - c.red(), 0xff - c.green(), 0xff - c.blue()));
@@ -92,7 +92,7 @@ void TextSlave::printDecoration(QPainter* pt,
   if (end)
     width -= p->paddingRight() + p->borderRight();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Use a special function for underlines to get the positioning exactly right.
   if (deco & UNDERLINE)
     pt->drawUnderlineForText(_tx, _ty + m_baseline, p->str->s + m_start, m_len);
@@ -192,7 +192,7 @@ FindSelectionResult TextSlave::checkSelectionPoint(int _x,
     return m_reversed ? SelectionPointAfterInLine : SelectionPointBeforeInLine;
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Floating point version needed for best results with Mac OS X text.
   float delta = _x - (_tx + m_x);
   float widths[m_len];
@@ -598,100 +598,135 @@ void RenderText::printObject(QPainter* p,
 
     const Font* font = &style()->htmlFont();
 
-    // run until we find one that is outside the range, then we
-    // know we can stop
-    do {
-      s = m_lines[si];
+#if APPLE_CHANGES
+    // Do one pass for the selection, then another for the rest.
+    bool haveSelection =
+        startPos != endPos && !isPrinting && selectionState() != SelectionNone;
+    int startLine = si;
+    for (int pass = 0; pass < (haveSelection ? 2 : 1); pass++) {
+      si = startLine;
 
-      if (isPrinting) {
-        int lh = lineHeight(false) + paddingBottom() + borderBottom();
-        if (ty + s->m_y < y) {
-          // This has been printed already we suppose.
-          continue;
-        }
-
-        if (ty + lh + s->m_y > y + h) {
-          RenderRoot* rootObj = root();
-          if (ty + s->m_y < rootObj->truncatedAt())
-            rootObj->setTruncatedAt(ty + s->m_y);
-          // Let's stop here.
-          break;
-        }
-      }
-
-      RenderStyle* _style =
-          pseudoStyle && s->m_firstLine ? pseudoStyle : style();
-
-      if (_style->font() != p->font()) {
-        p->setFont(_style->font());
-        font = &_style->htmlFont();
-      }
-
-      if ((hasSpecialObjects() && (parent()->isInline() || pseudoStyle)) &&
-          (!pseudoStyle || s->m_firstLine))
-        s->printBoxDecorations(p, _style, this, tx, ty, si == 0,
-                               si == (int)m_lines.count() - 1);
-
-      if (_style->color() != p->pen().color())
-        p->setPen(_style->color());
-
-      if (s->m_len > 0)
-        font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline, str->s,
-                       str->l, s->m_start, s->m_len, s->m_toAdd,
-                       s->m_reversed ? QPainter::RTL : QPainter::LTR);
-
-      if (d != TDNONE) {
-        p->setPen(_style->textDecorationColor());
-        s->printDecoration(p, this, tx, ty, d, si == 0,
-                           si == (int)m_lines.count() - 1);
-      }
-
-      if (!isPrinting && (selectionState() != SelectionNone)) {
-        int offset = s->m_start;
-        int sPos = QMAX(startPos - offset, 0);
-        int ePos = QMIN(endPos - offset, s->m_len);
-        // kdDebug(6040) << this << " printSelection with startPos=" << sPos <<
-        // " endPos=" << ePos << endl;
-        if (sPos < ePos)
-          s->printSelection(font, this, p, _style, tx, ty, sPos, ePos);
-      }
-      if (renderOutline) {
-        if (outlinebox_y == s->m_y) {
-          if (minx > s->m_x)
-            minx = s->m_x;
-          int newmaxx = s->m_x + s->m_width;
-          // if (parent()->isInline() && si==0) newmaxx-=paddingLeft();
-          if (parent()->isInline() && si == int(m_lines.count()) - 1)
-            newmaxx -= paddingRight();
-          if (maxx < newmaxx)
-            maxx = newmaxx;
-        } else {
-          QRect* curLine =
-              new QRect(minx, outlinebox_y, maxx - minx, m_lineHeight);
-          linerects.append(curLine);
-
-          outlinebox_y = s->m_y;
-          minx = s->m_x;
-          maxx = s->m_x + s->m_width;
-          // if (parent()->isInline() && si==0) maxx-=paddingLeft();
-          if (parent()->isInline() && si == int(m_lines.count()) - 1)
-            maxx -= paddingRight();
-        }
-      }
-#ifdef BIDI_DEBUG
-      {
-        int h = lineHeight(false) + paddingTop() + paddingBottom() +
-                borderTop() + borderBottom();
-        QColor c2 = QColor("#0000ff");
-        drawBorder(p, tx, ty, tx + 1, ty + h, RenderObject::BSLeft, c2, c2,
-                   SOLID, 1, 1);
-        drawBorder(p, tx + s->m_width, ty, tx + s->m_width + 1, ty + h,
-                   RenderObject::BSRight, c2, c2, SOLID, 1, 1);
-      }
+      bool drawDecorations = !haveSelection || pass == 0;
+      bool drawSelectionBackground = haveSelection && pass == 0;
+      bool drawText = !haveSelection || pass == 1;
 #endif
 
-    } while (++si < (int)m_lines.count() &&
-             m_lines[si]->checkVerticalPoint(y - ow, ty, h, m_lineHeight));
+      // run until we find one that is outside the range, then we
+      // know we can stop
+      do {
+        s = m_lines[si];
+
+        if (isPrinting) {
+          int lh = lineHeight(false) + paddingBottom() + borderBottom();
+          if (ty + s->m_y < y) {
+            // This has been printed already we suppose.
+            continue;
+          }
+
+          if (ty + lh + s->m_y > y + h) {
+            RenderRoot* rootObj = root();
+            if (ty + s->m_y < rootObj->truncatedAt())
+              rootObj->setTruncatedAt(ty + s->m_y);
+            // Let's stop here.
+            break;
+          }
+        }
+
+        RenderStyle* _style =
+            pseudoStyle && s->m_firstLine ? pseudoStyle : style();
+
+        if (_style->font() != p->font()) {
+          p->setFont(_style->font());
+          font = &_style->htmlFont();
+        }
+
+#if APPLE_CHANGES
+        if (drawDecorations)
+#endif
+          if ((hasSpecialObjects() && (parent()->isInline() || pseudoStyle)) &&
+              (!pseudoStyle || s->m_firstLine))
+            s->printBoxDecorations(p, _style, this, tx, ty, si == 0,
+                                   si == (int)m_lines.count() - 1);
+
+#if APPLE_CHANGES
+        if (drawText) {
+#endif
+
+          if (_style->color() != p->pen().color())
+            p->setPen(_style->color());
+
+          if (s->m_len > 0)
+            font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline, str->s,
+                           str->l, s->m_start, s->m_len, s->m_toAdd,
+                           s->m_reversed ? QPainter::RTL : QPainter::LTR);
+
+          if (d != TDNONE) {
+            p->setPen(_style->textDecorationColor());
+            s->printDecoration(p, this, tx, ty, d, si == 0,
+                               si == (int)m_lines.count() - 1);
+          }
+
+#if APPLE_CHANGES
+        }  // drawText
+#endif
+
+#if APPLE_CHANGES
+        if (drawSelectionBackground)
+#endif
+          if (!isPrinting && (selectionState() != SelectionNone)) {
+            int offset = s->m_start;
+            int sPos = QMAX(startPos - offset, 0);
+            int ePos = QMIN(endPos - offset, s->m_len);
+            // kdDebug(6040) << this << " printSelection with startPos=" << sPos
+            // << " endPos=" << ePos << endl;
+            if (sPos < ePos)
+              s->printSelection(font, this, p, _style, tx, ty, sPos, ePos);
+          }
+
+#if APPLE_CHANGES
+        if (drawText)
+#endif
+          if (renderOutline) {
+            if (outlinebox_y == s->m_y) {
+              if (minx > s->m_x)
+                minx = s->m_x;
+              int newmaxx = s->m_x + s->m_width;
+              // if (parent()->isInline() && si==0) newmaxx-=paddingLeft();
+              if (parent()->isInline() && si == int(m_lines.count()) - 1)
+                newmaxx -= paddingRight();
+              if (maxx < newmaxx)
+                maxx = newmaxx;
+            } else {
+              QRect* curLine =
+                  new QRect(minx, outlinebox_y, maxx - minx, m_lineHeight);
+              linerects.append(curLine);
+
+              outlinebox_y = s->m_y;
+              minx = s->m_x;
+              maxx = s->m_x + s->m_width;
+              // if (parent()->isInline() && si==0) maxx-=paddingLeft();
+              if (parent()->isInline() && si == int(m_lines.count()) - 1)
+                maxx -= paddingRight();
+            }
+          }
+#ifdef BIDI_DEBUG
+        {
+          int h = lineHeight(false) + paddingTop() + paddingBottom() +
+                  borderTop() + borderBottom();
+          QColor c2 = QColor("#0000ff");
+          drawBorder(p, tx, ty, tx + 1, ty + h, RenderObject::BSLeft, c2, c2,
+                     SOLID, 1, 1);
+          drawBorder(p, tx + s->m_width, ty, tx + s->m_width + 1, ty + h,
+                     RenderObject::BSRight, c2, c2, SOLID, 1, 1);
+        }
+#endif
+
+      } while (++si < (int)m_lines.count() &&
+               m_lines[si]->checkVerticalPoint(y - ow, ty, h, m_lineHeight));
+
+#if APPLE_CHANGES
+    }  // end of for loop
+#endif
 
     if (renderOutline) {
       linerects.append(
@@ -821,7 +856,7 @@ const QFont& RenderText::font() {
 }
 
 void RenderText::setText(DOMStringImpl* text, bool force) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (!text)
     return;
 #endif
