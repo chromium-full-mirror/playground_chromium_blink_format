@@ -25,6 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "DOMCSS.h"
 #import "DOMHTML.h"
 
 @class DOMCSSStyleDeclaration;
@@ -59,4 +60,8 @@
 - (void)setType:(NSString*)type;
 - (long)width;
 - (void)setWidth:(long)width;
+@end
+
+@interface DOMRGBColor (DOMRGBColorExtensions)
+- (DOMCSSPrimitiveValue*)alpha;
 @end
