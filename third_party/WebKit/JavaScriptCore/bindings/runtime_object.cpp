@@ -36,6 +36,7 @@
 #include <assert.h>
 
 using namespace KJS;
+using namespace Bindings;
 
 const ClassInfo* RuntimeObjectImp::classInfo() const {
   return &_classInfo;
@@ -48,6 +49,10 @@ RuntimeObjectImp::RuntimeObjectImp(ObjectImp* proto) : ObjectImp(proto) {
   _classInfo.propHashTable = 0;
 }
 
+RuntimeObjectImp::~RuntimeObjectImp() {
+  delete instance;
+}
+
 RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i)
     : ObjectImp((ObjectImp*)0) {
   instance = i;
@@ -56,9 +61,17 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i)
 
 Value RuntimeObjectImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
-  printf("%s: NOT YET IMPLEMENTED %p: propertyName %s\n", __PRETTY_FUNCTION__,
+  printf("%s: NOT FULLY IMPLEMENTED %p: propertyName %s\n", __PRETTY_FUNCTION__,
          instance, propertyName.ascii());
   // Get the value of the RuntimeObject's property.
+
+  Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+  if (aField) {
+    instance->getValueOfField(aField);
+    printf("%s: found field = %p, type = %s\n", __PRETTY_FUNCTION__, aField,
+           aField->type());
+  }
+
   return Undefined();
 }
 

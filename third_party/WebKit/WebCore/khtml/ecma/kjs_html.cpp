@@ -1217,10 +1217,13 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
     case ID_APPLET: {
       DOM::HTMLAppletElementImpl* appletElement =
           static_cast<DOM::HTMLAppletElementImpl*>(element.handle());
-      RuntimeObjectImp valueForApplet(appletElement->getAppletInstance());
-      printf("%s:  ID_APPLET %p, propertyName %s\n", __PRETTY_FUNCTION__,
-             appletElement->getAppletInstance(), propertyName.ascii());
-      return valueForApplet.get(exec, propertyName);
+
+      if (appletElement->getAppletInstance()) {
+        RuntimeObjectImp valueForApplet(appletElement->getAppletInstance());
+        printf("%s:  ID_APPLET %p, propertyName %s\n", __PRETTY_FUNCTION__,
+               appletElement->getAppletInstance(), propertyName.ascii());
+        return valueForApplet.get(exec, propertyName);
+      }
     } break;
     default:
       break;

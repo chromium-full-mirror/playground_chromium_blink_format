@@ -40,3 +40,7 @@ JavaInstance::JavaInstance(const JavaInstance& other) : Instance() {
   _instance = other._instance;
   _instance->ref();
 };
+
+KJS::Value JavaInstance::getValueOfField(const Field* aField) const {
+  return KJS::Value(0);
+}

@@ -62,6 +62,7 @@ class KJavaAppletWidget : public QWidget {
   void setParameter(const QString&, const QString&);
 
   void showApplet();
+  void showApplet(int width, int height);
 
  private:
   KJavaApplet _applet;
