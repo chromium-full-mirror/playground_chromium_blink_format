@@ -98,7 +98,7 @@
 
 // Set and get the controller.  Note that the controller is not retained.
 // Perhaps setController: should be private?
-- (void)setController:(id<WKWebController>)controller;
+//- (void)setController: (id <WKWebController>)controller;
 - (id<WKWebController>)controller;
 
 // This method should not be public until we have a more completely
