@@ -26,6 +26,5 @@
 #import <Foundation/Foundation.h>
 
 @interface WebCoreEncodings : NSObject
-+ (NSString*)charsetNameForEncoding:(CFStringEncoding)encoding;
-+ (CFStringEncoding)encodingForCharsetName:(NSString*)charsetName;
++ (NSString*)decodeData:(NSData*)encoding;
 @end

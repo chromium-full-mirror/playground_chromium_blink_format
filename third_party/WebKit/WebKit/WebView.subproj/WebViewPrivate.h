@@ -211,6 +211,8 @@ backforward list.
 */
 + (BOOL)_canHandleRequest:(NSURLRequest*)request;
 
++ (NSString*)_decodeData:(NSData*)data;
+
 @end
 
 @interface _WebSafeForwarder : NSObject {
