@@ -51,6 +51,7 @@ class KWQWindowWidget;
 
 namespace khtml {
 class RenderObject;
+struct DashboardRegionValue;
 }
 
 namespace KJS {
@@ -366,6 +367,9 @@ class KWQKHTMLPart : public KHTMLPart {
   bool canGoBackOrForward(int distance) const;
 
   void didFirstLayout();
+
+  void dashboardRegionsChanged(
+      const QValueList<khtml::DashboardRegionValue>& regions);
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);

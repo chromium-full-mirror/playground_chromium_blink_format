@@ -2360,12 +2360,12 @@ bool DocumentImpl::acceptsEditingFocus(NodeImpl* node) {
   return part()->shouldBeginEditing(range);
 }
 
-QValueList<DashboardRegionValue> DocumentImpl::dashboardRegions() const {
+const QValueList<DashboardRegionValue>& DocumentImpl::dashboardRegions() const {
   return m_dashboardRegions;
 }
 
 void DocumentImpl::setDashboardRegions(
-    QValueList<DashboardRegionValue>& regions) {
+    const QValueList<DashboardRegionValue>& regions) {
   m_dashboardRegions = regions;
 }
 

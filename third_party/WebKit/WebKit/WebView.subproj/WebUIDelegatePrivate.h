@@ -18,4 +18,9 @@
 - (void)webView:(WebView*)sender drawFooterInRect:(NSRect)rect;
 - (void)webView:(WebView*)webView addMessageToConsole:(NSDictionary*)message;
 
+// regions is an dictionary whose keys are regions label and values are arrays
+// of WebDashboardRegions.
+- (void)webView:(WebView*)webView
+    dashboardRegionsChanged:(NSDictionary*)regions;
+
 @end

@@ -607,6 +607,8 @@ typedef enum {
 
 - (void)didFirstLayout;
 
+- (void)dashboardRegionsChanged:(NSDictionary*)regions;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all

@@ -771,8 +771,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
   void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
-  QValueList<khtml::DashboardRegionValue> dashboardRegions() const;
-  void setDashboardRegions(QValueList<khtml::DashboardRegionValue>& regions);
+  const QValueList<khtml::DashboardRegionValue>& dashboardRegions() const;
+  void setDashboardRegions(
+      const QValueList<khtml::DashboardRegionValue>& regions);
 
  private:
   JSEditor* jsEditor();

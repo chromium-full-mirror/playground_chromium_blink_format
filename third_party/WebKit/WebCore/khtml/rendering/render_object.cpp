@@ -2196,6 +2196,11 @@ void RenderObject::addDashboardRegions(
 
 void RenderObject::collectDashboardRegions(
     QValueList<DashboardRegionValue>& regions) {
+  // RenderTexts don't have their own style, they just use their parent's style,
+  // so we don't want to include them.
+  if (isText())
+    return;
+
   addDashboardRegions(regions);
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling()) {
     curr->collectDashboardRegions(regions);
