@@ -179,7 +179,7 @@ Value DOMCSSStyleDeclaration::tryGet(ExecState* exec,
 void DOMCSSStyleDeclaration::tryPut(ExecState* exec,
                                     const Identifier& propertyName,
                                     const Value& value,
-                                    int) {
+                                    int attr) {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "DOMCSSStyleDeclaration::tryPut " << propertyName.qstring()
                 << endl;
@@ -189,17 +189,21 @@ void DOMCSSStyleDeclaration::tryPut(ExecState* exec,
   } else {
     bool pixelOrPos;
     QString prop = cssPropertyName(propertyName, &pixelOrPos);
-    QString propvalue = value.toString(exec).qstring();
-    if (pixelOrPos)
-      propvalue += "px";
+    if (prop.isAllASCII() && DOM::getPropertyID(prop.ascii(), prop.length())) {
+      QString propvalue = value.toString(exec).qstring();
+      if (pixelOrPos)
+        propvalue += "px";
 #ifdef KJS_VERBOSE
-    kdDebug(6070) << "DOMCSSStyleDeclaration: prop=" << prop
-                  << " propvalue=" << propvalue << endl;
+      kdDebug(6070) << "DOMCSSStyleDeclaration: prop=" << prop
+                    << " propvalue=" << propvalue << endl;
 #endif
-    styleDecl.removeProperty(prop);
-    if (!propvalue.isEmpty())
-      styleDecl.setProperty(prop, DOM::DOMString(propvalue),
-                            "");  // ### is "" ok for priority?
+      styleDecl.removeProperty(prop);
+      if (!propvalue.isEmpty())
+        styleDecl.setProperty(prop, DOM::DOMString(propvalue),
+                              "");  // ### is "" ok for priority?
+    } else {
+      DOMObject::tryPut(exec, propertyName, value, attr);
+    }
   }
 }
 
