@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KLINEEDIT_H_
@@ -31,13 +31,13 @@
 #include <kcompletionbox.h>
 
 class KLineEdit : public QLineEdit, public KCompletionBase {
-public:
-    KLineEdit(QWidget *parent) { }
+ public:
+  KLineEdit(QWidget* parent) {}
 
-    void setContextMenuEnabled(bool showMenu) { }
-    KCompletionBox *completionBox(bool create) { return 0; }
-    
-    int frameWidth() const { return 2; }
+  void setContextMenuEnabled(bool showMenu) {}
+  KCompletionBox* completionBox(bool create) { return 0; }
+
+  int frameWidth() const { return 2; }
 };
 
 #endif

@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KMESSAGEBOX_H_
@@ -30,29 +30,37 @@
 #include <qstring.h>
 
 class KMessageBox {
-public:
-    enum { Ok = 1, Cancel = 2, Yes = 3, No = 4, Continue = 5 };
+ public:
+  enum { Ok = 1, Cancel = 2, Yes = 3, No = 4, Continue = 5 };
 
-    static void information(QWidget *, const QString &information, 
-        const QString &, const char *);
-   
-    static void error(QWidget *, const QString &, 
-        const QString &caption=QString::null, bool notify=true);
-   
-    static int warningYesNo(QWidget *, const QString &, 
-        const QString &caption=QString::null, 
-        const QString &buttonYes=QString::null, 
-        const QString &buttonNo=QString::null, 
-        bool notify=true);
-   
-    static int questionYesNo(QWidget *, const QString &, 
-        const QString &caption=QString::null, 
-        const QString &buttonYes=QString::null, 
-        const QString &buttonNo=QString::null,
-        const QString &dontAskAgainName=QString::null);
-   
-    static void sorry(QWidget *, const QString &, 
-        const QString &caption=QString::null, bool notify=true);
+  static void information(QWidget*,
+                          const QString& information,
+                          const QString&,
+                          const char*);
+
+  static void error(QWidget*,
+                    const QString&,
+                    const QString& caption = QString::null,
+                    bool notify = true);
+
+  static int warningYesNo(QWidget*,
+                          const QString&,
+                          const QString& caption = QString::null,
+                          const QString& buttonYes = QString::null,
+                          const QString& buttonNo = QString::null,
+                          bool notify = true);
+
+  static int questionYesNo(QWidget*,
+                           const QString&,
+                           const QString& caption = QString::null,
+                           const QString& buttonYes = QString::null,
+                           const QString& buttonNo = QString::null,
+                           const QString& dontAskAgainName = QString::null);
+
+  static void sorry(QWidget*,
+                    const QString&,
+                    const QString& caption = QString::null,
+                    bool notify = true);
 };
 
 #endif

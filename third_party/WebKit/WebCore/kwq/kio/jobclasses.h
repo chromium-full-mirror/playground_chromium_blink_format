@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef JOBCLASSES_H_
@@ -34,10 +34,10 @@
 
 #ifdef __OBJC__
 @protocol WebCoreResourceHandle;
-typedef id <WebCoreResourceHandle> WebCoreResourceHandlePtr;
+typedef id<WebCoreResourceHandle> WebCoreResourceHandlePtr;
 #else
 class WebCoreResourceHandle;
-typedef WebCoreResourceHandle *WebCoreResourceHandlePtr;
+typedef WebCoreResourceHandle* WebCoreResourceHandlePtr;
 #endif
 
 namespace KIO {
@@ -45,36 +45,38 @@ namespace KIO {
 class TransferJobPrivate;
 
 class Job : public QObject {
-public:
-    virtual int error() const = 0;
-    virtual QString errorText() const = 0;
-    virtual void kill() = 0;
+ public:
+  virtual int error() const = 0;
+  virtual QString errorText() const = 0;
+  virtual void kill() = 0;
 };
 
 class TransferJob : public Job {
-public:
-    TransferJob(const KURL &, bool reload = false, bool showProgressInfo = true);
-    TransferJob(const KURL &, const QByteArray &postData, bool showProgressInfo = true);
-    ~TransferJob();
+ public:
+  TransferJob(const KURL&, bool reload = false, bool showProgressInfo = true);
+  TransferJob(const KURL&,
+              const QByteArray& postData,
+              bool showProgressInfo = true);
+  ~TransferJob();
 
-    int error() const;
-    void setError(int);
-    QString errorText() const;
-    bool isErrorPage() const;
-    QString queryMetaData(const QString &key) const;
-    void addMetaData(const QString &key, const QString &value);
-    void addMetaData(const QMap<QString, QString> &value);
-    void kill();
+  int error() const;
+  void setError(int);
+  QString errorText() const;
+  bool isErrorPage() const;
+  QString queryMetaData(const QString& key) const;
+  void addMetaData(const QString& key, const QString& value);
+  void addMetaData(const QMap<QString, QString>& value);
+  void kill();
 
-    void setHandle(WebCoreResourceHandlePtr);
-    WebCoreResourceHandlePtr handle() const;
-    
-    KURL url() const;
+  void setHandle(WebCoreResourceHandlePtr);
+  WebCoreResourceHandlePtr handle() const;
 
-private:
-    TransferJobPrivate *d;
+  KURL url() const;
+
+ private:
+  TransferJobPrivate* d;
 };
 
-} // namespace KIO
+}  // namespace KIO
 
 #endif

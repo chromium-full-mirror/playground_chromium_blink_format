@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KCURSOR_H_
@@ -29,24 +29,22 @@
 #include <qcursor.h>
 
 class KCursor {
-public:
+ public:
+  static void setAutoHideCursor(QWidget* w, bool enable);
 
-    static void setAutoHideCursor(QWidget *w, bool enable);
-
-    static QCursor arrowCursor();
-    static QCursor crossCursor();
-    static QCursor handCursor();
-    static QCursor sizeAllCursor();
-    static QCursor sizeHorCursor();
-    static QCursor sizeVerCursor();
-    static QCursor sizeBDiagCursor();
-    static QCursor sizeFDiagCursor();
-    static QCursor ibeamCursor();
-    static QCursor waitCursor();
-    static QCursor whatsThisCursor();
-
+  static QCursor arrowCursor();
+  static QCursor crossCursor();
+  static QCursor handCursor();
+  static QCursor sizeAllCursor();
+  static QCursor sizeHorCursor();
+  static QCursor sizeVerCursor();
+  static QCursor sizeBDiagCursor();
+  static QCursor sizeFDiagCursor();
+  static QCursor ibeamCursor();
+  static QCursor waitCursor();
+  static QCursor whatsThisCursor();
 };
 
-extern const QCursor &waitCursor;
+extern const QCursor& waitCursor;
 
 #endif

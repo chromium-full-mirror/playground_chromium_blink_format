@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef JOB_H_
@@ -34,14 +34,20 @@
 
 namespace KIO {
 
-void http_update_cache(const KURL &, bool, time_t);
+void http_update_cache(const KURL&, bool, time_t);
 
-inline TransferJob *get(const KURL &url, bool reload = false, bool showProgressInfo = true)
-    { return new TransferJob(url, reload, showProgressInfo); }
+inline TransferJob* get(const KURL& url,
+                        bool reload = false,
+                        bool showProgressInfo = true) {
+  return new TransferJob(url, reload, showProgressInfo);
+}
 
-inline TransferJob *http_post(const KURL& url, const QByteArray &postData, bool showProgressInfo = true)
-    { return new TransferJob(url, postData, showProgressInfo); }
+inline TransferJob* http_post(const KURL& url,
+                              const QByteArray& postData,
+                              bool showProgressInfo = true) {
+  return new TransferJob(url, postData, showProgressInfo);
+}
 
-} // namespace KIO
+}  // namespace KIO
 
 #endif

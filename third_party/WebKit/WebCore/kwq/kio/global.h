@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KIO_GLOBAL_H_
@@ -31,18 +31,13 @@
 
 namespace KIO {
 
-    enum CacheControl
-    {
-        CC_Cache,
-        CC_Verify,
-        CC_Refresh,
-        CC_Reload
-    };
-    
-    typedef QMap<QString, QString> MetaData;
-    
-    inline QString getCacheControlString(CacheControl) { return QString::null; }
+enum CacheControl { CC_Cache, CC_Verify, CC_Refresh, CC_Reload };
 
+typedef QMap<QString, QString> MetaData;
+
+inline QString getCacheControlString(CacheControl) {
+  return QString::null;
+}
 }
 
 #endif /* KIO_GLOBAL_H_ */

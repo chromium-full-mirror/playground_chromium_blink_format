@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KIMAGEIO_H_
@@ -29,11 +29,11 @@
 #include <qstringlist.h>
 
 class KImageIO {
-public:
-    enum Mode { Reading };
+ public:
+  enum Mode { Reading };
 
-    static void registerFormats() { }
-    static QStringList mimeTypes(Mode) { return QStringList(); }
+  static void registerFormats() {}
+  static QStringList mimeTypes(Mode) { return QStringList(); }
 };
 
 #endif

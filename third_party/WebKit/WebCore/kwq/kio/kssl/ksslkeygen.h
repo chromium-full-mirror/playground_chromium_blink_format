@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KSSLKEYGEN_H_
@@ -28,19 +28,17 @@
 
 #include <qstringlist.h>
 
-class QDialog
-{
-public:
-    enum DialogCode { Accepted, Rejected };
+class QDialog {
+ public:
+  enum DialogCode { Accepted, Rejected };
 };
 
-class KSSLKeyGen
-{
-public:
-    static QStringList supportedKeySizes() { return QStringList(); }
-    KSSLKeyGen(QWidget *, const char *, bool) { }
-    void setKeySize(int) { }
-    int exec() { return QDialog::Rejected; }
+class KSSLKeyGen {
+ public:
+  static QStringList supportedKeySizes() { return QStringList(); }
+  KSSLKeyGen(QWidget*, const char*, bool) {}
+  void setKeySize(int) {}
+  int exec() { return QDialog::Rejected; }
 };
 
 #endif

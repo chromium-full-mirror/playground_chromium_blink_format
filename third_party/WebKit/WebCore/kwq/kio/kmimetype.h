@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifndef KMIMETYPE_H_
@@ -32,27 +32,28 @@
 #include <sys/types.h>
 #include <qstring.h>
 
-template<class T> class KSharedPtr {
-public:
-    KSharedPtr() { object = 0; }
-    T *operator->() { return object; }
+template <class T>
+class KSharedPtr {
+ public:
+  KSharedPtr() { object = 0; }
+  T* operator->() { return object; }
 
-private:
-    T *object;
+ private:
+  T* object;
 };
 
 class KMimeType {
-public:
-    typedef KSharedPtr<KMimeType> Ptr;
+ public:
+  typedef KSharedPtr<KMimeType> Ptr;
 
-    static Ptr findByURL(const KURL &, mode_t=0, bool=false, bool=false);
-    static Ptr mimeType(QString serviceType);
-    static QString defaultMimeType();
+  static Ptr findByURL(const KURL&, mode_t = 0, bool = false, bool = false);
+  static Ptr mimeType(QString serviceType);
+  static QString defaultMimeType();
 
-    ~KMimeType();
+  ~KMimeType();
 
-    QString name() const;
-    QString comment() const;
+  QString name() const;
+  QString comment() const;
 };
 
 #endif
