@@ -49,9 +49,9 @@ ArrayInstanceImp::ArrayInstanceImp(const Object& proto, const List& list)
     : ObjectImp(proto),
       length(list.size()),
       capacity(length),
-      storage(length ? new (ValueImp*)[length] : 0) {
+      storage(length ? (ValueImp**)malloc(sizeof(ValueImp*) * length) : 0) {
   ListIterator it = list.begin();
-  const unsigned l = length;
+  unsigned l = length;
   for (unsigned i = 0; i < l; ++i) {
     storage[i] = (it++).imp();
   }
@@ -69,18 +69,20 @@ Value ArrayInstanceImp::get(ExecState* exec,
   bool ok;
   unsigned index = propertyName.toULong(&ok);
   if (ok) {
-    if (index >= length || storage[index] == NULL)
+    if (index >= length)
       return Undefined();
-    return Value(storage[index]);
+    ValueImp* v = storage[index];
+    return v ? Value(v) : Undefined();
   }
 
   return ObjectImp::get(exec, propertyName);
 }
 
 Value ArrayInstanceImp::get(ExecState* exec, unsigned index) const {
-  if (index >= length || storage[index] == NULL)
+  if (index >= length)
     return Undefined();
-  return Value(storage[index]);
+  ValueImp* v = storage[index];
+  return v ? Value(v) : Undefined();
 }
 
 // Special implementation of [[Put]] - see ECMA 15.4.5.1
@@ -122,7 +124,8 @@ bool ArrayInstanceImp::hasProperty(ExecState* exec,
   if (ok) {
     if (index >= length)
       return false;
-    return storage[index] != NULL && storage[index]->type() != UndefinedType;
+    ValueImp* v = storage[index];
+    return v && v != UndefinedImp::staticUndefined;
   }
 
   return ObjectImp::hasProperty(exec, propertyName);
@@ -131,7 +134,8 @@ bool ArrayInstanceImp::hasProperty(ExecState* exec,
 bool ArrayInstanceImp::hasProperty(ExecState* exec, unsigned index) const {
   if (index >= length)
     return false;
-  return storage[index] != NULL && storage[index]->type() != UndefinedType;
+  ValueImp* v = storage[index];
+  return v && v != UndefinedImp::staticUndefined;
 }
 
 bool ArrayInstanceImp::deleteProperty(ExecState* exec,
@@ -144,7 +148,7 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec,
   if (ok) {
     if (index >= length)
       return true;
-    storage[index] = NULL;
+    storage[index] = 0;
     return true;
   }
 
@@ -154,7 +158,7 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec,
 bool ArrayInstanceImp::deleteProperty(ExecState* exec, unsigned index) {
   if (index >= length)
     return true;
-  storage[index] = NULL;
+  storage[index] = 0;
   return true;
 }
 
@@ -173,10 +177,10 @@ void ArrayInstanceImp::setLength(unsigned newLength) {
 
 void ArrayInstanceImp::mark() {
   ObjectImp::mark();
-  const unsigned l = length;
+  unsigned l = length;
   for (unsigned i = 0; i < l; ++i) {
     ValueImp* imp = storage[i];
-    if (imp != NULL && !imp->marked())
+    if (imp && !imp->marked())
       imp->mark();
   }
 }
