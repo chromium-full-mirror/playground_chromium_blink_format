@@ -293,11 +293,6 @@ bool VisiblePosition::isCandidate(const Position& pos) {
           pos.offset() <= box->m_start + box->m_len) {
         // return true if in a text node
         return true;
-      } else if (pos.offset() < box->m_start) {
-        // The offset we're looking for is before this node
-        // this means the offset must be in content that is
-        // not rendered. Return false.
-        return false;
       }
     }
   }
