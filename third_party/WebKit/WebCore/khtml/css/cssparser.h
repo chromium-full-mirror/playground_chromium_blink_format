@@ -46,11 +46,7 @@ struct ParseString {
 
 struct Value;
 class ValueList;
-
-struct Function {
-  ParseString name;
-  ValueList* args;
-};
+struct Function;
 
 struct Value {
   int id;
@@ -88,6 +84,13 @@ class ValueList {
   int numValues;
   int maxValues;
   int currentValue;
+};
+
+struct Function {
+  ParseString name;
+  ValueList* args;
+
+  ~Function() { delete args; }
 };
 
 class CSSParser {
