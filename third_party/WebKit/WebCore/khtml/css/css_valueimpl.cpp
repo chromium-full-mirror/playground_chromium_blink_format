@@ -76,7 +76,8 @@ CSSMutableStyleDeclarationImpl::CSSMutableStyleDeclarationImpl(
 CSSMutableStyleDeclarationImpl::CSSMutableStyleDeclarationImpl(
     CSSRuleImpl* parent,
     const CSSProperty* const* properties,
-    int numProperties) {
+    int numProperties)
+    : CSSStyleDeclarationImpl(parent), m_node(0) {
   for (int i = 0; i < numProperties; ++i)
     m_values.append(*properties[i]);
   // FIXME: This allows duplicate properties.

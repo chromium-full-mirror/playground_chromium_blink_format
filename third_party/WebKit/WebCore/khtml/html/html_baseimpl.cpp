@@ -53,6 +53,7 @@ HTMLBodyElementImpl::HTMLBodyElementImpl(DocumentPtr* doc)
 
 HTMLBodyElementImpl::~HTMLBodyElementImpl() {
   if (m_linkDecl) {
+    m_linkDecl->setNode(0);
     m_linkDecl->setParent(0);
     m_linkDecl->deref();
   }
