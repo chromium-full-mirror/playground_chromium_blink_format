@@ -322,6 +322,16 @@ DOMString Range::toHTML() {
   return impl->toHTML();
 }
 
+DocumentFragment Range::createContextualFragment(DOMString& html) {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  int exceptioncode = 0;
+  DocumentFragmentImpl* r = impl->createContextualFragment(html, exceptioncode);
+  throwException(exceptioncode);
+  return r;
+}
+
 void Range::detach() {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);

@@ -59,7 +59,8 @@ class DOMRange : public DOMObject {
     SurroundContents,
     CloneRange,
     ToString,
-    Detach
+    Detach,
+    CreateContextualFragment
   };
   DOM::Range toRange() const { return range; }
 

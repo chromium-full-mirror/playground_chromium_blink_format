@@ -292,10 +292,11 @@ end:
   return text;
 }
 
-bool HTMLElementImpl::setInnerHTML(const DOMString& html) {
+DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
+    const DOMString& html) {
   // the following is in accordance with the definition as used by IE
   if (endTag[id()] == FORBIDDEN)
-    return false;
+    return NULL;
   // IE disallows innerHTML on inline elements. I don't see why we should have
   // this restriction, as our
   // dhtml engine can cope with it. Lars
@@ -313,12 +314,12 @@ bool HTMLElementImpl::setInnerHTML(const DOMString& html) {
     case ID_THEAD:
     case ID_TITLE:
     case ID_TR:
-      return false;
+      return NULL;
     default:
       break;
   }
   if (!getDocument()->isHTMLDocument())
-    return false;
+    return NULL;
 
   DocumentFragmentImpl* fragment = new DocumentFragmentImpl(docPtr());
   HTMLTokenizer* tok = new HTMLTokenizer(docPtr(), fragment);
@@ -326,6 +327,15 @@ bool HTMLElementImpl::setInnerHTML(const DOMString& html) {
   tok->write(html.string(), true);
   tok->end();
   delete tok;
+
+  return fragment;
+}
+
+bool HTMLElementImpl::setInnerHTML(const DOMString& html) {
+  DocumentFragmentImpl* fragment = createContextualFragment(html);
+  if (fragment == NULL) {
+    return false;
+  }
 
   removeChildren();
   int ec = 0;
