@@ -450,6 +450,7 @@ class InsertLineBreakCommand : public CompositeEditCommand {
   virtual void doApply();
 
  private:
+  virtual bool preservesTypingStyle() const;
   void insertNodeAfterPosition(DOM::NodeImpl* node, const DOM::Position& pos);
   void insertNodeBeforePosition(DOM::NodeImpl* node, const DOM::Position& pos);
 };
@@ -466,9 +467,14 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
 
  private:
   DOM::ElementImpl* createParagraphElement();
+  void setFullTypingStyleBeforeInsertion(const DOM::Position&);
+  void calculateAndSetTypingStyleAfterInsertion();
+
+  virtual bool preservesTypingStyle() const;
 
   QPtrList<DOM::NodeImpl> ancestors;
   QPtrList<DOM::NodeImpl> clonedNodes;
+  DOM::CSSMutableStyleDeclarationImpl* m_fullTypingStyle;
 };
 
 //------------------------------------------------------------------------------------------
