@@ -903,17 +903,13 @@ void RenderLayer::updateHoverActiveState(RenderObject::NodeInfo& info) {
   DOM::NodeImpl* oldHoverNode = doc ? doc->hoverNode() : 0;
   DOM::NodeImpl* newHoverNode = info.innerNode();
 
-  if (oldHoverNode == newHoverNode &&
-      (!oldHoverNode || oldHoverNode->active() == info.active()))
-    return;
-
   // Update our current hover node.
-  info.innerNode()->getDocument()->setHoverNode(newHoverNode);
+  if (doc)
+    doc->setHoverNode(newHoverNode);
 
   // We have two different objects.  Fetch their renderers.
   RenderObject* oldHoverObj = oldHoverNode ? oldHoverNode->renderer() : 0;
-  RenderObject* newHoverObj =
-      info.innerNode() ? info.innerNode()->renderer() : 0;
+  RenderObject* newHoverObj = newHoverNode ? newHoverNode->renderer() : 0;
 
   // Locate the common ancestor render object for the two renderers.
   RenderObject* ancestor = commonAncestor(oldHoverObj, newHoverObj);
