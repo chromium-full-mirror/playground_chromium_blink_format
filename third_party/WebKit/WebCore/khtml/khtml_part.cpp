@@ -5320,6 +5320,12 @@ void KHTMLPart::pasteFromPasteboard() {
 #endif
 }
 
+void KHTMLPart::pasteAndMatchStyle() {
+#if APPLE_CHANGES
+  KWQ(this)->issuePasteAndMatchStyleCommand();
+#endif
+}
+
 void KHTMLPart::redo() {
 #if APPLE_CHANGES
   KWQ(this)->issueRedoCommand();
