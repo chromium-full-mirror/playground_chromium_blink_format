@@ -3137,8 +3137,8 @@ DocumentImpl::InheritedBool DocumentImpl::getDesignMode() const {
   return m_designMode;
 }
 
-bool DocumentImpl::inDesignMode() {
-  for (DocumentImpl* d = this; d; d = d->parentDocument()) {
+bool DocumentImpl::inDesignMode() const {
+  for (const DocumentImpl* d = this; d; d = d->parentDocument()) {
     if (d->m_designMode != inherit)
       return d->m_designMode;
   }

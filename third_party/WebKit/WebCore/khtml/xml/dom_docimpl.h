@@ -614,12 +614,12 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   /**
    * designMode support
-  */
+   */
   enum InheritedBool { off = false, on = true, inherit };
 
   void setDesignMode(InheritedBool value);
   InheritedBool getDesignMode() const;
-  bool inDesignMode();
+  bool inDesignMode() const;
   DocumentImpl* parentDocument() const;
 
 #ifdef KHTML_XSLT
