@@ -108,12 +108,10 @@ class CachedObject {
     m_expireDate = _expireDate;
     m_deleted = false;
     m_expireDateChanged = false;
+    m_nextInLRUList = 0;
+    m_prevInLRUList = 0;
   }
-  virtual ~CachedObject() {
-    if (m_deleted)
-      abort();
-    m_deleted = true;
-  }
+  virtual ~CachedObject();
 
   virtual void data(QBuffer& buffer, bool eof) = 0;
   virtual void error(int err, const char* text) = 0;
@@ -121,12 +119,11 @@ class CachedObject {
   const DOM::DOMString& url() const { return m_url; }
   Type type() const { return m_type; }
 
-  virtual void ref(CachedObjectClient* consumer) = 0;
-  virtual void deref(CachedObjectClient* consumer) = 0;
+  virtual void ref(CachedObjectClient* consumer);
+  virtual void deref(CachedObjectClient* consumer);
 
   int count() const { return m_clients.count(); }
 
-  void setStatus(Status s) { m_status = s; }
   Status status() const { return m_status; }
 
   int size() const { return m_size; }
@@ -180,6 +177,13 @@ class CachedObject {
   bool m_deleted : 1;
   bool m_loading : 1;
   bool m_expireDateChanged : 1;
+
+ private:
+  bool allowInLRUList() { return canDelete() && status() != Persistent; }
+
+  CachedObject* m_nextInLRUList;
+  CachedObject* m_prevInLRUList;
+  friend class Cache;
 };
 
 /**
@@ -517,7 +521,6 @@ class Cache {
 
   static QPixmap* nullPixmap;
   static QPixmap* brokenPixmap;
-  static int cacheSize;
 
   static void removeCacheEntry(CachedObject* object);
 
@@ -541,24 +544,11 @@ class Cache {
   static void setCacheDisabled(bool);
 #endif
 
- protected:
-  /*
-   * @internal
-   */
-  class LRUList : public QStringList {
-   public:
-    /**
-     * implements the LRU list
-     * The least recently used item is at the beginning of the list.
-     */
-    void touch(const QString& url) {
-      remove(url);
-      prepend(url);
-    }
-  };
+  static void insertInLRUList(CachedObject*);
+  static void removeFromLRUList(CachedObject*);
 
+ protected:
   static QDict<CachedObject>* cache;
-  static LRUList* lru;
   static QPtrList<DocLoader>* docloader;
 
   static int maxSize;
@@ -567,6 +557,16 @@ class Cache {
   static Loader* m_loader;
 
   static unsigned long s_ulRefCnt;
+
+  static void moveToHeadOfLRUList(CachedObject*);
+
+  static CachedObject* m_headOfLRUList;
+  static CachedObject* m_tailOfLRUList;
+  static int m_totalSizeOfLRUList;
+
+  static CachedObject* m_headOfUncacheableList;
+
+  static int m_countOfLRUAndUncacheableLists;
 };
 };
 

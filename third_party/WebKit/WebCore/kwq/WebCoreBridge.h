@@ -174,7 +174,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
                                    withURL:(NSURL*)URL;
 - (void)reportError:(WebError*)error;
 - (void)objectLoadedFromCache:(NSURL*)URL size:(unsigned)bytes;
-- (BOOL)dataSourceIsReloading;
+- (BOOL)isReloading;
 
 - (void)reportClientRedirectTo:(NSURL*)URL
                          delay:(NSTimeInterval)seconds
