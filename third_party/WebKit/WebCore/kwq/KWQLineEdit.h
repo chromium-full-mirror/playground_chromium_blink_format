@@ -57,6 +57,7 @@ class QLineEdit : public QWidget {
   QSize sizeForCharacterWidth(int numCharacters) const;
   QRect frameGeometry() const;
   void setFrameGeometry(const QRect&);
+  int baselinePosition() const;
 
   void returnPressed() { m_returnPressed.call(); }
   void textChanged() { m_textChanged.call(text()); }
