@@ -27,6 +27,7 @@
 #define QLIST_H_
 
 #include <kwq.h>
+#include "qcollection.h"
 
 template <class T>
 class QList {
@@ -37,10 +38,12 @@ class QList {
   T* at(uint);
   void append(const T*);
   void setAutoDelete(bool);
+  bool remove(const T* d);
   bool removeLast();
   T* first();
   T* next();
   T* last();
+  void clear();
   bool isEmpty() const;
   bool removeRef(const T*);
 };
@@ -52,6 +55,7 @@ class QListIterator {
   T* toLast();
   T* current() const;
   T* operator--();
+  T* operator++();
 };
 
 #endif

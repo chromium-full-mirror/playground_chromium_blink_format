@@ -26,6 +26,10 @@
 #ifndef QREGEXP_H_
 #define QREGEXP_H_
 
-class QRegExp {};
+class QRegExp {
+ public:
+  QRegExp(const QString&);
+  QRegExp(const QRegExp&);
+};
 
 #endif

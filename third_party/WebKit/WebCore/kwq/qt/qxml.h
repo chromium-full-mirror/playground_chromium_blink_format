@@ -30,4 +30,6 @@ class QXmlDefaultHandler {};
 
 class QXmlAttributes {};
 
+class QXmlParseException {};
+
 #endif
