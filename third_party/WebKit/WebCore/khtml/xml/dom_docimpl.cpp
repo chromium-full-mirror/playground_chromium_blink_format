@@ -1273,6 +1273,7 @@ void DocumentImpl::open() {
 
   clear();
   m_tokenizer = createTokenizer();
+  setParsing(true);
   connect(m_tokenizer, SIGNAL(finishedParsing()), this,
           SIGNAL(finishedParsing()));
 
