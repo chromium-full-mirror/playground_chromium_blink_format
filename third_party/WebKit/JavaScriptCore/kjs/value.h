@@ -119,6 +119,9 @@ class ValueImp {
    */
   void setGcAllowed();
 
+  // Will crash if called on a simple number.
+  void setGcAllowedFast() { _flags |= VI_GCALLOWED; }
+
   int toInteger(ExecState* exec) const;
   int toInt32(ExecState* exec) const;
   unsigned int toUInt32(ExecState* exec) const;

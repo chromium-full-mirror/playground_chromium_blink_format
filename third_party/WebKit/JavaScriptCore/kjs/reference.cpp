@@ -36,6 +36,15 @@ Reference::Reference(const Object& b, unsigned p)
       baseIsValue(false),
       propertyNameIsNumber(true) {}
 
+Reference::Reference(ObjectImp* b, const Identifier& p)
+    : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
+
+Reference::Reference(ObjectImp* b, unsigned p)
+    : base(b),
+      propertyNameAsNumber(p),
+      baseIsValue(false),
+      propertyNameIsNumber(true) {}
+
 Reference::Reference(const Null& b, const Identifier& p)
     : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
 

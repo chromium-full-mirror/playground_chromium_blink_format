@@ -199,6 +199,26 @@ Object StringImp::toObject(ExecState* exec) const {
 
 // ------------------------------ NumberImp ------------------------------------
 
+NumberImp* NumberImp::staticNaN;
+
+ValueImp* NumberImp::create(int i) {
+  if (SimpleNumber::fits(i))
+    return SimpleNumber::make(i);
+  NumberImp* imp = new NumberImp(static_cast<double>(i));
+  imp->setGcAllowedFast();
+  return imp;
+}
+
+ValueImp* NumberImp::create(double d) {
+  if (SimpleNumber::fits(d))
+    return SimpleNumber::make((int)d);
+  if (isNaN(d))
+    return staticNaN;
+  NumberImp* imp = new NumberImp(d);
+  imp->setGcAllowedFast();
+  return imp;
+}
+
 Value NumberImp::toPrimitive(ExecState*, Type) const {
   return Number((NumberImp*)this);
 }
@@ -417,6 +437,8 @@ void InterpreterImp::globalInit() {
   BooleanImp::staticTrue->ref();
   BooleanImp::staticFalse = new BooleanImp(false);
   BooleanImp::staticFalse->ref();
+  NumberImp::staticNaN = new NumberImp(NaN);
+  NumberImp::staticNaN->ref();
 }
 
 void InterpreterImp::globalClear() {
@@ -433,6 +455,9 @@ void InterpreterImp::globalClear() {
   BooleanImp::staticFalse->deref();
   BooleanImp::staticFalse->setGcAllowed();
   BooleanImp::staticFalse = 0L;
+  NumberImp::staticNaN->deref();
+  NumberImp::staticNaN->setGcAllowed();
+  NumberImp::staticNaN = 0;
 }
 
 InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob) {
@@ -794,7 +819,7 @@ void InterpreterImp::setDebugger(Debugger* d) {
 const ClassInfo InternalFunctionImp::info = {"Function", 0, 0, 0};
 
 InternalFunctionImp::InternalFunctionImp(FunctionPrototypeImp* funcProto)
-    : ObjectImp(Object(funcProto)) {}
+    : ObjectImp(funcProto) {}
 
 bool InternalFunctionImp::implementsHasInstance() const {
   return true;

@@ -375,6 +375,7 @@ class ObjectImp : public ValueImp {
    * @param proto The prototype
    */
   ObjectImp(const Object& proto);
+  ObjectImp(ObjectImp* proto);
 
   /**
    * Creates a new ObjectImp with a prototype of Null()
@@ -579,6 +580,7 @@ class ObjectImp : public ValueImp {
 
   Value internalValue() const;
   void setInternalValue(const Value& v);
+  void setInternalValue(ValueImp* v);
 
   Value toPrimitive(ExecState* exec,
                     Type preferredType = UnspecifiedType) const;
@@ -587,7 +589,16 @@ class ObjectImp : public ValueImp {
   UString toString(ExecState* exec) const;
   Object toObject(ExecState* exec) const;
 
-  ValueImp* getDirect(const Identifier& propertyName) const;
+  // This get method only looks at the property map.
+  // A bit like hasProperty(recursive=false), this doesn't go to the prototype.
+  // This is used e.g. by lookupOrCreateFunction (to cache a function, we don't
+  // want
+  // to look up in the prototype, it might already exist there)
+  ValueImp* getDirect(const Identifier& propertyName) const {
+    return _prop.get(propertyName);
+  }
+  void putDirect(const Identifier& propertyName, ValueImp* value, int attr = 0);
+  void putDirect(const Identifier& propertyName, int value, int attr = 0);
 
  private:
   const HashEntry* findPropertyHashEntry(const Identifier& propertyName) const;

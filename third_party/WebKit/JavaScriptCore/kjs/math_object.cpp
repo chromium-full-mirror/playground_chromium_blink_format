@@ -75,7 +75,7 @@ const ClassInfo MathObjectImp::info = {"Math", 0, &mathTable, 0};
 */
 
 MathObjectImp::MathObjectImp(ExecState* /*exec*/, ObjectPrototypeImp* objProto)
-    : ObjectImp(Object(objProto)) {}
+    : ObjectImp(objProto) {}
 
 // ECMA 15.8
 Value MathObjectImp::get(ExecState* exec,
@@ -127,7 +127,7 @@ MathFuncImp::MathFuncImp(ExecState* exec, int i, int l)
           exec->interpreter()->builtinFunctionPrototype().imp())),
       id(i) {
   Value protect(this);
-  put(exec, lengthPropertyName, Number(l), DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, l, DontDelete | ReadOnly | DontEnum);
 }
 
 bool MathFuncImp::implementsCall() const {

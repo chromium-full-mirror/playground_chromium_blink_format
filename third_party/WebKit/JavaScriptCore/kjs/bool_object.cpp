@@ -35,8 +35,7 @@ using namespace KJS;
 
 const ClassInfo BooleanInstanceImp::info = {"Boolean", 0, 0, 0};
 
-BooleanInstanceImp::BooleanInstanceImp(const Object& proto)
-    : ObjectImp(proto) {}
+BooleanInstanceImp::BooleanInstanceImp(ObjectImp* proto) : ObjectImp(proto) {}
 
 // ------------------------------ BooleanPrototypeImp --------------------------
 
@@ -45,17 +44,17 @@ BooleanInstanceImp::BooleanInstanceImp(const Object& proto)
 BooleanPrototypeImp::BooleanPrototypeImp(ExecState* exec,
                                          ObjectPrototypeImp* objectProto,
                                          FunctionPrototypeImp* funcProto)
-    : BooleanInstanceImp(Object(objectProto)) {
+    : BooleanInstanceImp(objectProto) {
   Value protect(this);
   // The constructor will be added later by InterpreterImp::InterpreterImp()
 
-  put(exec, toStringPropertyName,
-      Object(new BooleanProtoFuncImp(exec, funcProto,
-                                     BooleanProtoFuncImp::ToString, 0)),
-      DontEnum);
-  put(exec, valueOfPropertyName,
-      Object(new BooleanProtoFuncImp(exec, funcProto,
-                                     BooleanProtoFuncImp::ValueOf, 0)),
+  putDirect(toStringPropertyName,
+            new BooleanProtoFuncImp(exec, funcProto,
+                                    BooleanProtoFuncImp::ToString, 0),
+            DontEnum);
+  putDirect(
+      valueOfPropertyName,
+      new BooleanProtoFuncImp(exec, funcProto, BooleanProtoFuncImp::ValueOf, 0),
       DontEnum);
   setInternalValue(Boolean(false));
 }
@@ -68,7 +67,7 @@ BooleanProtoFuncImp::BooleanProtoFuncImp(ExecState* exec,
                                          int len)
     : InternalFunctionImp(funcProto), id(i) {
   Value protect(this);
-  put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
 bool BooleanProtoFuncImp::implementsCall() const {
@@ -104,11 +103,12 @@ BooleanObjectImp::BooleanObjectImp(ExecState* exec,
                                    BooleanPrototypeImp* booleanProto)
     : InternalFunctionImp(funcProto) {
   Value protect(this);
-  put(exec, prototypePropertyName, Object(booleanProto),
-      DontEnum | DontDelete | ReadOnly);
+  putDirect(prototypePropertyName, booleanProto,
+            DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  put(exec, lengthPropertyName, Number(1), ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, NumberImp::one(),
+            ReadOnly | DontDelete | DontEnum);
 }
 
 bool BooleanObjectImp::implementsConstruct() const {
@@ -117,8 +117,8 @@ bool BooleanObjectImp::implementsConstruct() const {
 
 // ECMA 15.6.2
 Object BooleanObjectImp::construct(ExecState* exec, const List& args) {
-  Object proto = exec->interpreter()->builtinBooleanPrototype();
-  Object obj(new BooleanInstanceImp(proto));
+  Object obj(new BooleanInstanceImp(
+      exec->interpreter()->builtinBooleanPrototype().imp()));
 
   Boolean b;
   if (args.size() > 0)

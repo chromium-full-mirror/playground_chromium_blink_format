@@ -183,8 +183,8 @@ bool ValueImp::dispatchToUInt32(unsigned& result) const {
 
 Value::Value(ValueImp* v) {
   rep = v;
-  if (rep) {
-    rep->ref();
+  if (v) {
+    v->ref();
     // fprintf(stderr, "Value::Value(%p) imp=%p ref=%d\n", this, rep,
     // rep->refcount);
     v->setGcAllowed();
@@ -264,7 +264,7 @@ Boolean Boolean::dynamicCast(const Value& v) {
 
 // ------------------------------ String ---------------------------------------
 
-String::String(const UString& s) : Value(new StringImp(UString(s))) {}
+String::String(const UString& s) : Value(new StringImp(s)) {}
 
 UString String::value() const {
   assert(rep);
@@ -289,8 +289,9 @@ Number::Number(unsigned int u)
                                   : new NumberImp(static_cast<double>(u))) {}
 
 Number::Number(double d)
-    : Value(SimpleNumber::fits(d) ? SimpleNumber::make((long)d)
-                                  : new NumberImp(d)) {}
+    : Value(SimpleNumber::fits(d)
+                ? SimpleNumber::make((long)d)
+                : (KJS::isNaN(d) ? NumberImp::staticNaN : new NumberImp(d))) {}
 
 Number::Number(long int l)
     : Value(SimpleNumber::fits(l) ? SimpleNumber::make(l)
@@ -315,13 +316,17 @@ double Number::value() const {
 }
 
 int Number::intValue() const {
-  return int(value());
+  if (SimpleNumber::is(rep))
+    return SimpleNumber::value(rep);
+  return (int)((NumberImp*)rep)->value();
 }
 
 bool Number::isNaN() const {
-  return KJS::isNaN(value());
+  return rep == NumberImp::staticNaN;
 }
 
 bool Number::isInf() const {
-  return KJS::isInf(value());
+  if (SimpleNumber::is(rep))
+    return false;
+  return KJS::isInf(((NumberImp*)rep)->value());
 }
