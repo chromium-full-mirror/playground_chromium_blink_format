@@ -1119,7 +1119,9 @@ void RenderText::calcMinMaxWidth() {
       continue;
 
     int wordlen = 0;
-    while (i + wordlen < len && !(isBreakable(str->s, i + wordlen, str->l)))
+    while (i + wordlen < len && str->s[i + wordlen] != '\n' &&
+           str->s[i + wordlen] != ' ' &&
+           (wordlen == 0 || !isBreakable(str->s, i + wordlen, str->l)))
       wordlen++;
 
     if (wordlen) {
@@ -1131,8 +1133,15 @@ void RenderText::calcMinMaxWidth() {
       currMinWidth += w;
       currMaxWidth += w;
 
-      // Add in wordspacing to our maxwidth, but not if this is the last word.
-      if (wordSpacing &&
+      bool isBreakableCharSpace =
+          (i + wordlen < len) ? ((!isPre && str->s[i + wordlen] == '\n') ||
+                                 str->s[i + wordlen] == ' ')
+                              : false;
+
+      // Add in wordspacing to our maxwidth, but not if this is the last word on
+      // a line or the
+      // last word in the run.
+      if (wordSpacing && isBreakableCharSpace &&
           !containsOnlyWhitespace(i + wordlen, len - (i + wordlen)))
         currMaxWidth += wordSpacing;
 
@@ -1157,7 +1166,8 @@ void RenderText::calcMinMaxWidth() {
         m_minWidth = currMinWidth;
       currMinWidth = 0;
 
-      if (str->s[i] == '\n' && isPre) {
+      if (isNewline)  // Only set if isPre was true and we saw a newline.
+      {
         if (currMaxWidth > m_maxWidth)
           m_maxWidth = currMaxWidth;
         currMaxWidth = 0;
