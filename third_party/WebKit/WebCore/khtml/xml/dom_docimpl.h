@@ -482,6 +482,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void addCheckedRadioButton(HTMLInputElementImpl*);
   void removeCheckedRadioButton(HTMLInputElementImpl*);
 
+  // Returns the owning element in the parent document.
+  // Returns 0 if this is the top level document.
+  ElementImpl* ownerElement();
+
  signals:
   void finishedParsing();
 
