@@ -86,7 +86,12 @@ class RenderLayer {
   bool hasAutoZIndex() { return renderer()->style()->hasAutoZIndex(); }
   int zIndex() { return renderer()->style()->zIndex(); }
 
-  void paint(QPainter* p, int x, int y, int w, int h, int tx, int ty);
+  // The two main functions that use the layer system.  The paint method
+  // paints the layers that intersect the damage rect from back to
+  // front.  The nodeAtPoint method looks for mouse events by walking
+  // layers that intersect the point from front to back.
+  void paint(QPainter* p, int x, int y, int w, int h);
+  bool nodeAtPoint(RenderObject::NodeInfo& info, int x, int y);
 
  public:
   // Z-Index Implementation Notes
@@ -198,7 +203,8 @@ class RenderLayer {
   // +-------> L(L6)
   //
   RenderZTreeNode* constructZTree(const QRect& damageRect,
-                                  RenderLayer* rootLayer);
+                                  RenderLayer* rootLayer,
+                                  bool eventProcessing = false);
 
   // Once the z-tree has been constructed, we call constructLayerList
   // to produce a flattened layer list for rendering/event handling.

@@ -368,8 +368,6 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
   if (inside && element()) {
     int tx = _tx + m_x;
     int ty = _ty + m_y;
-    if (isRelPositioned())
-      relativePositionOffset(tx, ty);
 
     HTMLImageElementImpl* i =
         element()->id() == ID_IMG

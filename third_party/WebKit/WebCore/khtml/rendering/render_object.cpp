@@ -886,8 +886,6 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
                                int _ty) {
   int tx = _tx + xPos();
   int ty = _ty + yPos();
-  if (isRelPositioned())
-    static_cast<RenderBox*>(this)->relativePositionOffset(tx, ty);
 
   bool inside = (style()->visibility() != HIDDEN &&
                  ((_y >= ty) && (_y < ty + height()) && (_x >= tx) &&
@@ -900,7 +898,7 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
       isTableSection() || inside || mouseInside()) {
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling())
-      if (!child->isPositioned() &&
+      if (!child->layer() &&
           child->nodeAtPoint(info, _x, _y, _tx + xPos(), _ty + yPos()))
         inside = true;
   }
