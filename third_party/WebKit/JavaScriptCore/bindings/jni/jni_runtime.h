@@ -30,6 +30,7 @@
 #include <jni_utility.h>
 #include <jni_instance.h>
 #include <runtime.h>
+#include <ustring.h>
 
 namespace KJS {
 class Value;
@@ -39,41 +40,62 @@ namespace Bindings {
 
 class JavaString {
  public:
-  JavaString() : _characters(0){};
+  JavaString() : _characters(0), _uchars(0), _size(0){};
 
-  JavaString(JNIEnv* e, jstring s) {
+  void _commonInit(JNIEnv* e, jstring s) {
+    // We could be more efficient:  only create
+    // _characters from _uchars on demand.
+    _size = e->GetStringLength(s);
     const char* c = getCharactersFromJStringInEnv(e, s);
     _characters = strdup(c);
     releaseCharactersForJStringInEnv(e, s, c);
+    const jchar* uc = getUCharactersFromJStringInEnv(e, s);
+    _uchars = (jchar*)malloc(sizeof(jchar) * _size);
+    memcpy(_uchars, uc, _size * sizeof(jchar));
+    releaseUCharactersForJStringInEnv(e, s, uc);
   }
 
-  JavaString(jstring s) {
-    JNIEnv* e = getJNIEnv();
-    const char* c = getCharactersFromJStringInEnv(e, s);
-    _characters = strdup(c);
-    releaseCharactersForJStringInEnv(e, s, c);
-  }
-
-  ~JavaString() { free((void*)_characters); }
-
-  JavaString(const JavaString& other) {
+  void _commonCopy(const JavaString& other) {
+    _size = other._size;
     _characters = strdup(other._characters);
+    _uchars = (jchar*)malloc(sizeof(jchar) * _size);
+    memcpy(_uchars, other._uchars, _size * sizeof(jchar));
   }
+
+  void _commonDelete() {
+    free((void*)_characters);
+    free((void*)_uchars);
+  }
+
+  JavaString(JNIEnv* e, jstring s) { _commonInit(e, s); }
+
+  JavaString(jstring s) { _commonInit(getJNIEnv(), s); }
+
+  ~JavaString() { _commonDelete(); }
+
+  JavaString(const JavaString& other) { _commonCopy(other); }
 
   JavaString& operator=(const JavaString& other) {
     if (this == &other)
       return *this;
 
-    free((void*)_characters);
-    _characters = strdup(other._characters);
+    _commonDelete();
+    _commonCopy(other);
 
     return *this;
   }
 
   const char* characters() const { return _characters; }
+  const jchar* uchars() const { return _uchars; }
+  int length() const { return _size; }
+  KJS::UString ustring() const {
+    return KJS::UString((const KJS::UChar*)uchars(), length());
+  }
 
  private:
   const char* _characters;
+  jchar* _uchars;
+  int _size;
 };
 
 class JavaParameter : public Parameter {
