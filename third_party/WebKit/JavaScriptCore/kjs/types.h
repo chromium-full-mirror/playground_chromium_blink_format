@@ -203,6 +203,8 @@ class List {
   bool m_needsMarking;
 };
 
+typedef List ArgumentList;
+
 };  // namespace
 
 #endif  // _KJS_TYPES_H_
