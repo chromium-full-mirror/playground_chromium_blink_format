@@ -3100,9 +3100,7 @@ int getHeightForLineCount(RenderBlock* block,
       }
       if (normalFlowChildWithoutLines && l == 0)
         return normalFlowChildWithoutLines->yPos() +
-               normalFlowChildWithoutLines->height() +
-               (includeBottom ? (block->borderBottom() + block->paddingBottom())
-                              : 0);
+               normalFlowChildWithoutLines->height();
     }
   }
 
