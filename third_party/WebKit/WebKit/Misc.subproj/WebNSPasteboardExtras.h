@@ -24,5 +24,9 @@ extern NSString* WebURLNamePboardType;
 - (NSURL*)_web_bestURL;
 
 - (void)_web_writeURL:(NSURL*)URL andTitle:(NSString*)title withOwner:(id)owner;
+- (void)_web_writeURL:(NSURL*)URL
+             andTitle:(NSString*)title
+            withOwner:(id)owner
+                types:(NSArray*)types;
 
 @end
