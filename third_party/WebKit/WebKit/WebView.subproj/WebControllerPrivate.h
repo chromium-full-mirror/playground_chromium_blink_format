@@ -56,6 +56,7 @@
 - (void)_mainReceivedError:(WebError*)error
             fromDataSource:(WebDataSource*)dataSource;
 + (NSString*)_MIMETypeForFile:(NSString*)path;
++ (NSArray*)_supportedImageMIMETypes;
 - (void)_downloadURL:(NSURL*)URL;
 - (void)_downloadURL:(NSURL*)URL toPath:(NSString*)path;
 
