@@ -708,7 +708,7 @@ void ApplyStyleCommandImpl::doApply() {
           // the current group.
           if (node == end.node() ||
               runStart->parentNode() != next->parentNode() ||
-              next->isHTMLElement() ||
+              (next->isHTMLElement() && next->id() != ID_BR) ||
               (next->renderer() && !next->renderer()->isInline()))
             break;
           node = next;
