@@ -10,7 +10,11 @@
 
 @interface IFCache : NSObject {
 }
+
 + (NSArray*)getStatistics;
 + (void)empty;
 + (void)setDisabled:(BOOL)disabled;
+
++ (int)javaScriptObjectsCount;
++ (void)garbageCollectJavaScriptObjects;
 @end
