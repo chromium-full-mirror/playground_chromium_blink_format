@@ -161,6 +161,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (void)setUsesInactiveTextBackgroundColor:(BOOL)uses;
 - (BOOL)usesInactiveTextBackgroundColor;
 
+- (void)setShowsFirstResponder:(BOOL)flag;
+
 - (void)mouseDown:(NSEvent*)event;
 - (void)mouseUp:(NSEvent*)event;
 - (void)mouseMoved:(NSEvent*)event;

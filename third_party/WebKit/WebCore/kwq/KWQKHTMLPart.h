@@ -248,6 +248,9 @@ class KWQKHTMLPart : public KHTMLPart {
     return _usesInactiveTextBackgroundColor;
   }
 
+  void setShowsFirstResponder(bool flag);
+  bool showsFirstResponder() const { return _showsFirstResponder; }
+
   // Convenience, to avoid repeating the code to dig down to get this.
   QChar backslashAsCurrencySymbol() const;
 
@@ -307,6 +310,7 @@ class KWQKHTMLPart : public KHTMLPart {
   KWQWindowWidget* _windowWidget;
 
   bool _usesInactiveTextBackgroundColor;
+  bool _showsFirstResponder;
 
   friend class KHTMLPart;
 };
