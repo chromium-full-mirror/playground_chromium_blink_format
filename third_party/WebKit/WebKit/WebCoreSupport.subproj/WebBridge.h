@@ -15,6 +15,7 @@
 @interface WebBridge : WebCoreBridge<WebCoreBridge> {
   WebFrame* _frame;
   BOOL _doingClientRedirect;
+  BOOL _inNextKeyViewOutsideWebFrameViews;
 }
 
 - (id)initWithWebFrame:(WebFrame*)webFrame;
@@ -23,5 +24,6 @@
 - (void)receivedData:(NSData*)data withDataSource:(WebDataSource*)dataSource;
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebOpenPanelResultListener>)resultListener;
+- (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 @end
