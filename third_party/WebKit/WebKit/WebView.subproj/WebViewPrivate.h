@@ -338,6 +338,7 @@ backforward list.
 
 @interface WebView (WebViewEditingExtras)
 - (void)_editingKeyDown:(NSEvent*)event;
+- (DOMDocument*)DOMDocument;
 @end
 
 @interface WebView (JavaScriptBinding)
