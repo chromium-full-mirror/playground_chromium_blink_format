@@ -112,12 +112,22 @@
 /*****************************************************************************
   QRegion member functions
  *****************************************************************************/
+QRegion::QRegion(const QRect& r, RegionType type) {
+  fprintf(stderr, "WARNING %s:%s:%d (NOT YET IMPLEMENTED)\n", __FILE__,
+          __FUNCTION__, __LINE__);
+}
+
 QRegion::QRegion(const QPointArray& a, bool winding) {
   fprintf(stderr, "WARNING %s:%s:%d (NOT YET IMPLEMENTED)\n", __FILE__,
           __FUNCTION__, __LINE__);
 }
 
 QRegion::QRegion() {
+  fprintf(stderr, "WARNING %s:%s:%d (NOT YET IMPLEMENTED)\n", __FILE__,
+          __FUNCTION__, __LINE__);
+}
+
+QRegion::QRegion(const QRegion&) {
   fprintf(stderr, "WARNING %s:%s:%d (NOT YET IMPLEMENTED)\n", __FILE__,
           __FUNCTION__, __LINE__);
 }
@@ -401,6 +411,11 @@ QRegion& QRegion::operator-=(const QRegion& r) {
 */
 QRegion& QRegion::operator^=(const QRegion& r) {
   return *this = *this ^ r;
+}
+
+QRegion& QRegion::operator=(const QRegion& r) {
+  fprintf(stderr, "WARNING %s:%s:%d (NOT YET IMPLEMENTED)\n", __FILE__,
+          __FUNCTION__, __LINE__);
 }
 
 bool QRegion::operator==(const QRegion& r) const {
