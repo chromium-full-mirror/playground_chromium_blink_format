@@ -1142,6 +1142,10 @@ HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
   xPos = 0;
   yPos = 0;
 
+#if APPLE_CHANGES
+  m_maxResults = 0;
+#endif
+
   if (m_form)
     m_autocomplete = f->autoComplete();
 }
