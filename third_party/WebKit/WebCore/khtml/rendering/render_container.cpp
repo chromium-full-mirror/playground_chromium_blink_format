@@ -492,7 +492,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
 }
 
 Position RenderContainer::positionForCoordinates(int _x, int _y) {
-  // no children...return this render object's element, if there isn't one, and
+  // no children...return this render object's element, if there is one, and
   // offset 0
   if (!firstChild())
     return Position(element(), 0);
