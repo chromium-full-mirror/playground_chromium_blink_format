@@ -272,6 +272,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       m_secureForms(0),
       m_decoder(0),
       m_createRenderers(true),
+      m_designMode(inherit),
       m_hasDashboardRegions(false),
       m_dashboardRegionsDirty(false)
 #endif
@@ -3124,6 +3125,32 @@ void DocumentImpl::setTransformSourceDocument(DocumentImpl* doc) {
   m_transformSourceDocument = doc;
   if (doc)
     doc->ref();
+}
+
+void DocumentImpl::setDesignMode(InheritedBool value) {
+  m_designMode = value;
+}
+
+DocumentImpl::InheritedBool DocumentImpl::getDesignMode() const {
+  return m_designMode;
+}
+
+bool DocumentImpl::inDesignMode() {
+  for (DocumentImpl* d = this; d; d = d->parentDocument()) {
+    if (d->m_designMode != inherit)
+      return d->m_designMode;
+  }
+  return false;
+}
+
+DocumentImpl* DocumentImpl::parentDocument() const {
+  KHTMLPart* childPart = part();
+  if (!childPart)
+    return 0;
+  KHTMLPart* parent = childPart->parentPart();
+  if (!parent)
+    return 0;
+  return parent->xmlDocImpl();
 }
 
 #endif
