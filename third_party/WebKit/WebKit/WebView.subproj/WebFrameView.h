@@ -29,9 +29,9 @@
 - (id)initWithFrame:(NSRect)frame;
 
 /*!
-    @method controller
-    @abstract Returns the WebController associated with this WebFrameView
-    @result The WebFrameView's controller
+    @method webFrame
+    @abstract Returns the WebFrame associated with this WebFrameView
+    @result The WebFrameView's frame.
 */
 - (WebFrame*)webFrame;
 
@@ -41,7 +41,7 @@
     @result The scrolling view used by the WebFrameView to display its document
    view
 */
-- (NSScrollView*)frameScrollView;
+- (NSScrollView*)scrollView;
 
 /*!
     @method documentView

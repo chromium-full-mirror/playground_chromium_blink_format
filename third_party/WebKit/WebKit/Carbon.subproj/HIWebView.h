@@ -56,10 +56,10 @@ extern OSStatus HIWebFrameViewCreate(HIViewRef* outControl);
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
-extern WebController* HIWebFrameViewGetController(HIViewRef inView);
+extern WebView* HIWebFrameViewGetController(HIViewRef inView);
 
-extern WebController* WebControllerCreateWithHIView(HIViewRef inView,
-                                                    CFStringRef inName);
+extern WebView* WebControllerCreateWithHIView(HIViewRef inView,
+                                              CFStringRef inName);
 
 #ifdef __cplusplus
 }

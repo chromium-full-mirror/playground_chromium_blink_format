@@ -5,11 +5,11 @@
 #import <WebKit/WebView.h>
 
 @class WebDynamicScrollBarsView;
-@class WebController;
+@class WebView;
 
 @interface WebFrameViewPrivate : NSObject {
  @public
-  WebController* controller;
+  WebView* controller;
   WebDynamicScrollBarsView* frameScrollView;
 
   // These margin values are used to temporarily hold
@@ -24,11 +24,11 @@
 @end
 
 @interface WebFrameView (WebPrivate)
-- (WebController*)_controller;
+- (WebView*)_controller;
 - (void)_setDocumentView:(NSView<WebDocumentView>*)view;
 - (NSView<WebDocumentView>*)_makeDocumentViewForDataSource:
     (WebDataSource*)dataSource;
-- (void)_setController:(WebController*)controller;
+- (void)_setController:(WebView*)controller;
 - (int)_marginWidth;
 - (int)_marginHeight;
 - (void)_setMarginWidth:(int)w;

@@ -9,7 +9,6 @@
 #import <WebKit/WebDocument.h>
 
 @class WebDataSource;
-@class WebController;
 @class WebHTMLViewPrivate;
 
 /*!

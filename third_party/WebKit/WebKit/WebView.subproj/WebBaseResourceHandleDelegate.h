@@ -5,7 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class WebController;
+@class WebView;
 @class WebDataSource;
 @class WebError;
 @class WebResource;
@@ -20,7 +20,7 @@
   WebResource* resource;
   WebRequest* request;
  @private
-  WebController* controller;
+  WebView* controller;
   WebResponse* response;
   id identifier;
   id resourceLoadDelegate;

@@ -7,11 +7,11 @@
 
 #import <npapi.h>
 
-@class WebController;
 @class WebDataSource;
 @class WebFrame;
 @class WebNetscapePluginPackage;
 @class WebNetscapePluginNullEventSender;
+@class WebView;
 
 @interface WebBaseNetscapePluginView : NSView {
   WebNetscapePluginPackage* plugin;
@@ -61,7 +61,7 @@
 
 - (WebFrame*)webFrame;
 - (WebDataSource*)dataSource;
-- (WebController*)controller;
+- (WebView*)controller;
 
 - (NPP)pluginPointer;
 

@@ -1,5 +1,5 @@
 /*
-        WebControllerPolicyDelegate.h
+        WebPolicyDelegate.h
         Copyright 2002, Apple, Inc. All rights reserved.
 
         Public header file.
@@ -7,7 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class WebController;
+@class WebView;
 @class WebError;
 @class WebFrame;
 @class WebPolicyPrivate;
@@ -122,7 +122,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    @discussion This method will be called before loading starts, and
    on every redirect.
 */
-- (void)controller:(WebController*)c
+- (void)webView:(WebView*)webView
     decideNavigationPolicyForAction:(NSDictionary*)actionInformation
                          andRequest:(WebRequest*)request
                             inFrame:(WebFrame*)frame
@@ -151,7 +151,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
      will be called with a WebNavigationType of WebNavigationTypeOther
      in its action. This is to avoid possible confusion about the modifiers.
 */
-- (void)controller:(WebController*)c
+- (void)webView:(WebView*)webView
     decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
                         andRequest:(WebRequest*)request
                       newFrameName:(NSString*)frameName
@@ -166,7 +166,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     @param frame The frame which is loading the URL.
     @param listener The object to call when the decision is made
 */
-- (void)controller:(WebController*)c
+- (void)webView:(WebView*)webView
     decideContentPolicyForMIMEType:(NSString*)type
                         andRequest:(WebRequest*)request
                            inFrame:(WebFrame*)frame
@@ -182,7 +182,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    requested but failed.
     @param frame The frame in which the policy could not be implemented.
 */
-- (void)controller:(WebController*)c
+- (void)webView:(WebView*)webView
     unableToImplementPolicyWithError:(WebError*)error
                              inFrame:(WebFrame*)frame;
 
