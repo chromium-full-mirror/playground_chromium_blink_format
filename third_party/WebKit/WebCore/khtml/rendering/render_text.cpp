@@ -966,7 +966,7 @@ void RenderText::trimmedMinMaxWidth(short& beginMinW,
   hasBreakableChar = m_hasBreakableChar;
   hasBreak = m_hasBreak;
 
-  if (stripFrontSpaces && str->s[0].direction() == QChar::DirWS) {
+  if (stripFrontSpaces && str->s[0].unicode() == ' ') {
     const Font* f = htmlFont(false);
     QChar space[1];
     space[0] = ' ';
@@ -1047,7 +1047,7 @@ void RenderText::calcMinMaxWidth() {
     }
 
     bool previousCharacterIsSpace = isSpace;
-    isSpace = str->s[i].direction() == QChar::DirWS;
+    isSpace = str->s[i].unicode() == ' ';
 
     if ((isSpace || isNewline) && i == 0)
       m_hasBeginWS = true;
@@ -1130,7 +1130,7 @@ bool RenderText::containsOnlyWhitespace(unsigned int from,
   unsigned int currPos;
   for (currPos = from;
        currPos < from + len &&
-       (str->s[currPos] == '\n' || str->s[currPos].direction() == QChar::DirWS);
+       (str->s[currPos] == '\n' || str->s[currPos].unicode() == ' ');
        currPos++)
     ;
   return currPos >= (from + len);

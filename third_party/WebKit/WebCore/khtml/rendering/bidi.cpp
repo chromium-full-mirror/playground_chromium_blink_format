@@ -343,7 +343,7 @@ static void addRun(BidiRun* bidiRun) {
   if (bidiRun->obj && bidiRun->obj->isText()) {
     RenderText* text = static_cast<RenderText*>(bidiRun->obj);
     for (int i = bidiRun->start; i < bidiRun->stop; i++)
-      if (text->text()[i].direction() == QChar::DirWS)
+      if (text->text()[i].unicode() == ' ')
         numSpaces++;
   }
 }
@@ -714,8 +714,7 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
         // get the number of spaces in the run
         int spaces = 0;
         for (int i = r->start; i < r->stop; i++)
-          if (static_cast<RenderText*>(r->obj)->text()[i].direction() ==
-              QChar::DirWS)
+          if (static_cast<RenderText*>(r->obj)->text()[i].unicode() == ' ')
             spaces++;
 
         KHTMLAssert(spaces <= numSpaces);
@@ -1664,7 +1663,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
         }
 
         bool previousCharacterIsSpace = currentCharacterIsSpace;
-        currentCharacterIsSpace = (str[pos].direction() == QChar::DirWS);
+        currentCharacterIsSpace = (str[pos].unicode() == ' ');
 
         if (isPre || !currentCharacterIsSpace)
           isLineEmpty = false;
