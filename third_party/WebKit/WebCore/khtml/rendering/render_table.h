@@ -359,9 +359,6 @@ class RenderTableCell : public RenderBlock {
   void setCellTopExtra(int p) { _topExtra = p; }
   void setCellBottomExtra(int p) { _bottomExtra = p; }
 
-  int getCellPercentageHeight() const;
-  void setCellPercentageHeight(int h);
-
   virtual void paint(PaintInfo& i, int tx, int ty);
 
   void paintCollapsedBorder(QPainter* p, int x, int y, int w, int h);

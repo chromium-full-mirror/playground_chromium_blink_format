@@ -1037,8 +1037,8 @@ int RenderBox::calcPercentageHeight(const Length& height) {
   // ourselves
   // be a percentage of the cell's current content height.
   if (cb->isTableCell()) {
-    result = static_cast<RenderTableCell*>(cb)->getCellPercentageHeight();
-    if (result == 0)
+    result = cb->overrideSize();
+    if (result == -1)
       return -1;
     // It is necessary to use the border-box to match WinIE's broken
     // box model.  This is essential for sizing inside
@@ -1162,9 +1162,7 @@ int RenderBox::availableHeightUsing(const Length& h) const {
   // new
   // height, and then when we lay out again we'll use the calculation below.
   if (isTableCell() && (h.isVariable() || h.isPercent())) {
-    const RenderTableCell* tableCell =
-        static_cast<const RenderTableCell*>(this);
-    return tableCell->getCellPercentageHeight() -
+    return overrideSize() -
            (borderLeft() + borderRight() + paddingLeft() + paddingRight());
   }
 
