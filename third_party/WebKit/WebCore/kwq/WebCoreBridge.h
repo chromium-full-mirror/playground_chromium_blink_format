@@ -317,6 +317,7 @@ typedef enum {
 
 - (DOMRange*)rangeByExpandingSelectionWithGranularity:
     (WebSelectionGranularity)granularity;
+- (DOMRange*)rangeOfCharactersAroundCaret;
 - (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                    direction:(WebSelectionDirection)direction
                                  granularity:
