@@ -21,7 +21,7 @@
   NSMutableDictionary* siteURLToIconURL;
   NSMutableDictionary* futureSiteURLToRetainCount;
   NSMutableDictionary* hostToSiteURLs;
-  NSMutableDictionary* hostToBuiltInIcons;
+  NSMutableDictionary* pathToBuiltInIcons;
   NSMutableDictionary* hostToBuiltInIconPath;
 
   NSMutableSet* iconsOnDiskWithURLs;
