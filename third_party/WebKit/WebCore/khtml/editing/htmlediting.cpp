@@ -2768,6 +2768,14 @@ void InsertParagraphSeparatorCommand::doApply() {
       ancestors.prepend(n);
   }
 
+  // Make sure we do not cause a rendered space to become unrendered.
+  Position leadingWhitespace = pos.leadingWhitespacePosition();
+  if (leadingWhitespace.isNotNull()) {
+    TextImpl* textNode = static_cast<TextImpl*>(leadingWhitespace.node());
+    replaceTextInNode(textNode, leadingWhitespace.offset(), 1,
+                      nonBreakingSpaceString());
+  }
+
   // Split at pos if in the middle of a text node.
   if (startNode->isTextNode()) {
     TextImpl* textNode = static_cast<TextImpl*>(startNode);
