@@ -1039,9 +1039,15 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   void startAutoScroll();
   void stopAutoScroll();
+#ifdef APPLE_CHANGES
+  void overURL(const QString& url,
+               const QString& target,
+               int modifierState = 0);
+#else
   void overURL(const QString& url,
                const QString& target,
                bool shiftPressed = false);
+#endif
 
   /**
    * @internal
