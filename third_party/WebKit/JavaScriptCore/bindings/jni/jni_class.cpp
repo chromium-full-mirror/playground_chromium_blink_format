@@ -177,7 +177,9 @@ MethodList JavaClass::methodsNamed(const char* name) const {
   MethodList* methodList =
       (MethodList*)CFDictionaryGetValue(_methods, methodName);
   CFRelease(methodName);
-  return *methodList;
+  if (methodList)
+    return *methodList;
+  return MethodList();
 }
 
 Field* JavaClass::fieldNamed(const char* name) const {
