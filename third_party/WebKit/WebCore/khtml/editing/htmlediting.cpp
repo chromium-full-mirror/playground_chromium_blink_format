@@ -186,10 +186,10 @@ CompositeEditCommandImpl* CompositeEditCommand::impl() const {
 // AppendNodeCommand
 
 AppendNodeCommand::AppendNodeCommand(DocumentImpl* document,
-                                     NodeImpl* parentNode,
-                                     NodeImpl* appendChild)
+                                     NodeImpl* appendChild,
+                                     NodeImpl* parentNode)
     : EditCommand(
-          new AppendNodeCommandImpl(document, parentNode, appendChild)) {}
+          new AppendNodeCommandImpl(document, appendChild, parentNode)) {}
 
 AppendNodeCommand::~AppendNodeCommand() {}
 
@@ -197,14 +197,14 @@ AppendNodeCommandImpl* AppendNodeCommand::impl() const {
   return static_cast<AppendNodeCommandImpl*>(get());
 }
 
-NodeImpl* AppendNodeCommand::parentNode() const {
-  IF_IMPL_NULL_RETURN_ARG(0);
-  return impl()->parentNode();
-}
-
 NodeImpl* AppendNodeCommand::appendChild() const {
   IF_IMPL_NULL_RETURN_ARG(0);
   return impl()->appendChild();
+}
+
+NodeImpl* AppendNodeCommand::parentNode() const {
+  IF_IMPL_NULL_RETURN_ARG(0);
+  return impl()->parentNode();
 }
 
 //------------------------------------------------------------------------------------------
