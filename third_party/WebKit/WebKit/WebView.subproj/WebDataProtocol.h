@@ -12,6 +12,7 @@
 
 @interface WebDataProtocol : NSURLProtocol {
 }
++ (BOOL)_webIsDataProtocolURL:(NSURL*)URL;
 @end
 
 @interface NSURLRequest (WebDataRequest)
