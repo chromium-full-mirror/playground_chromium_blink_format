@@ -2391,6 +2391,7 @@ void KHTMLPart::selectionLayoutChanged() {
 
 void KHTMLPart::notifySelectionChanged(bool closeTyping) {
   selectionLayoutChanged();
+  clearTypingStyle();
 
   if (closeTyping)
     TypingCommand::closeTyping(lastEditCommand());
@@ -4930,6 +4931,23 @@ void KHTMLPart::reappliedEditing(EditCommand& cmd) {
   KWQ(this)->respondToChangedContents();
 #endif
   d->m_lastEditCommand = EditCommand::emptyCommand();
+}
+
+CSSStyleDeclarationImpl* KHTMLPart::typingStyle() const {
+  return d->m_typingStyle;
+}
+
+void KHTMLPart::setTypingStyle(CSSStyleDeclarationImpl* style) {
+  CSSStyleDeclarationImpl* old = d->m_typingStyle;
+  d->m_typingStyle = style;
+  if (d->m_typingStyle)
+    d->m_typingStyle->ref();
+  if (old)
+    old->deref();
+}
+
+void KHTMLPart::clearTypingStyle() {
+  setTypingStyle(0);
 }
 
 #if !APPLE_CHANGES

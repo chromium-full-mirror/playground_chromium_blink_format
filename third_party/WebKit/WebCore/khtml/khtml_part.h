@@ -45,6 +45,7 @@ class KHTMLSettings;
 class KJavaAppletContext;
 
 namespace DOM {
+class CSSStyleDeclarationImpl;
 class DocumentImpl;
 class EventListener;
 class HTMLAnchorElementImpl;
@@ -694,6 +695,21 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Called when editing has been reapplied.
    */
   void reappliedEditing(khtml::EditCommand&);
+
+  /**
+   * Returns the typing style for the document.
+   */
+  DOM::CSSStyleDeclarationImpl* typingStyle() const;
+
+  /**
+   * Sets the typing style for the document.
+   */
+  void setTypingStyle(DOM::CSSStyleDeclarationImpl*);
+
+  /**
+   * Clears the typing style for the document.
+   */
+  void clearTypingStyle();
 
   /**
    * Convenience method to show the document's view.
