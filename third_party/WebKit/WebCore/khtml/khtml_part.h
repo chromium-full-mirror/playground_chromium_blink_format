@@ -217,6 +217,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   virtual bool openURL(const KURL& url);
 
+  void didExplicitOpen();
+
   /**
    * Stops loading the document and kill all data requests (for images, etc.)
    */
@@ -481,6 +483,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Call this after your last call to @ref write().
    */
   virtual void end();
+
+  void endIfNotLoading();
 
   /**
    * Similar to end, but called to abort a load rather than cleanly end.

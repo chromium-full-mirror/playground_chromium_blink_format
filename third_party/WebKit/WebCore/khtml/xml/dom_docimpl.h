@@ -327,9 +327,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void updateSelection();
 
   void open();
-  void openInternal();
+  void implicitOpen();
   void close();
-  void closeInternal(bool checkTokenizer);
+  void implicitClose();
   void write(const DOMString& text);
   void write(const QString& text);
   void writeln(const DOMString& text);

@@ -568,6 +568,7 @@ bool KHTMLPart::openURL(const KURL& url)
           SLOT(slotRedirection(KIO::Job*, const KURL&)));
 
   d->m_bComplete = false;
+  d->m_bLoadingMainResource = true;
   d->m_bLoadEventEmitted = false;
 
   // delete old status bar msg's from kjs (if it _was_ activated on last URL)
@@ -616,6 +617,11 @@ bool KHTMLPart::openURL(const KURL& url)
   return true;
 }
 
+void KHTMLPart::didExplicitOpen() {
+  d->m_bComplete = false;
+  d->m_bLoadEventEmitted = false;
+}
+
 bool KHTMLPart::closeURL() {
   if (d->m_job) {
     KHTMLPageCache::self()->cancelEntry(d->m_cacheId);
@@ -636,6 +642,7 @@ bool KHTMLPart::closeURL() {
 
   d->m_bComplete =
       true;  // to avoid emitting completed() in slotFinishedParsing() (David)
+  d->m_bLoadingMainResource = false;
   d->m_bLoadEventEmitted = true;      // don't want that one either
   d->m_cachePolicy = KIO::CC_Verify;  // Why here?
 
@@ -1494,6 +1501,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_cacheId = 0;
   d->m_bComplete = false;
   d->m_bLoadEventEmitted = false;
+  d->m_bLoadingMainResource = true;
 
   if (url.isValid()) {
 #if APPLE_CHANGES
@@ -1597,8 +1605,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_doc->setRestoreState(args.docState);
 #endif
 
-  d->m_doc->openInternal();
-  d->m_doc->setParsing(true);
+  d->m_doc->implicitOpen();
   // clear widget
   if (d->m_view)
     d->m_view->resizeContents(0, 0);
@@ -1608,8 +1615,6 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 #if !APPLE_CHANGES
   emit d->m_extension->enableAction("print", true);
 #endif
-
-  d->m_doc->setParsing(true);
 }
 
 void KHTMLPart::write(const char* str, int len) {
@@ -1682,6 +1687,14 @@ void KHTMLPart::write(const QString& str) {
 }
 
 void KHTMLPart::end() {
+  d->m_bLoadingMainResource = false;
+  endIfNotLoading();
+}
+
+void KHTMLPart::endIfNotLoading() {
+  if (d->m_bLoadingMainResource)
+    return;
+
   // make sure nothing's left in there...
   if (d->m_decoder)
     write(d->m_decoder->flush());
@@ -1760,8 +1773,6 @@ void KHTMLPart::gotoAnchor() {
 
 void KHTMLPart::slotFinishedParsing() {
   d->m_doc->setParsing(false);
-  disconnect(d->m_doc, SIGNAL(finishedParsing()), this,
-             SLOT(slotFinishedParsing()));
 
   if (!d->m_view)
     return;  // We are probably being destructed.
@@ -1978,7 +1989,7 @@ void KHTMLPart::checkEmitLoadEvent() {
   d->m_bLoadEventEmitted = true;
   d->m_bUnloadEventEmitted = false;
   if (d->m_doc)
-    d->m_doc->close();
+    d->m_doc->implicitClose();
 }
 
 const KHTMLSettings* KHTMLPart::settings() const {
