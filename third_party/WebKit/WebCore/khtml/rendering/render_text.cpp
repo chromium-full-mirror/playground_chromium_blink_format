@@ -1087,6 +1087,7 @@ void RenderText::calcMinMaxWidth() {
   bool isSpace = false;
   bool isPre = style()->whiteSpace() == PRE;
   bool firstWord = true;
+  bool firstLine = true;
   for (int i = 0; i < len; i++) {
     const QChar c = str->s[i];
 
@@ -1158,8 +1159,9 @@ void RenderText::calcMinMaxWidth() {
       i += wordlen - 1;
     } else {
       // Nowrap can never be broken, so don't bother setting the
-      // breakable character boolean.
-      if (style()->whiteSpace() != NOWRAP)
+      // breakable character boolean. Pre can only be broken if we encounter a
+      // newline.
+      if (style()->whiteSpace() == NORMAL || isNewline)
         m_hasBreakableChar = true;
 
       if (currMinWidth > m_minWidth)
@@ -1168,6 +1170,11 @@ void RenderText::calcMinMaxWidth() {
 
       if (isNewline)  // Only set if isPre was true and we saw a newline.
       {
+        if (firstLine) {
+          firstLine = false;
+          m_beginMinWidth = currMaxWidth;
+        }
+
         if (currMaxWidth > m_maxWidth)
           m_maxWidth = currMaxWidth;
         currMaxWidth = 0;
@@ -1182,8 +1189,14 @@ void RenderText::calcMinMaxWidth() {
   if (currMaxWidth > m_maxWidth)
     m_maxWidth = currMaxWidth;
 
-  if (style()->whiteSpace() == NOWRAP)
+  if (style()->whiteSpace() != NORMAL)
     m_minWidth = m_maxWidth;
+
+  if (isPre) {
+    if (firstLine)
+      m_beginMinWidth = m_maxWidth;
+    m_endMinWidth = currMaxWidth;
+  }
 
   setMinMaxKnown();
   // kdDebug( 6040 ) << "Text::calcMinMaxWidth(): min = " << m_minWidth << " max
