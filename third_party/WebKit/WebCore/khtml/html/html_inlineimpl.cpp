@@ -51,9 +51,8 @@ HTMLAnchorElementImpl::HTMLAnchorElementImpl(DocumentPtr* doc)
 HTMLAnchorElementImpl::~HTMLAnchorElementImpl() {}
 
 bool HTMLAnchorElementImpl::isSelectable() const {
-  return m_hasAnchor && m_render &&
-         (m_render->width() > 0 && m_render->height() > 0) &&
-         m_render->style() && m_render->style()->visibility() == VISIBLE;
+  return m_hasAnchor && m_render && m_render->style() &&
+         m_render->style()->visibility() == VISIBLE;
 }
 
 NodeImpl::Id HTMLAnchorElementImpl::id() const {

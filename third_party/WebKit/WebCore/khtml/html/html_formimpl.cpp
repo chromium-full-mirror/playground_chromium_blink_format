@@ -791,7 +791,7 @@ void HTMLGenericFormElementImpl::recalcStyle(StyleChange ch) {
 }
 
 bool HTMLGenericFormElementImpl::isSelectable() const {
-  if (!m_render || m_render->width() == 0 || m_render->height() == 0 ||
+  if (!m_render ||
       (m_render->style() && m_render->style()->visibility() != VISIBLE))
     return false;
   if (m_render->isWidget()) {
