@@ -29,11 +29,14 @@
   NSString* applicationNameForUserAgent;
   NSString* userAgentOverride;
   NSLock* userAgentLock;
+
+  BOOL defersCallbacks;
 }
 @end
 
 @interface WebController (WebPrivate)
 ;
+
 - (id<WebContextMenuHandler>)_defaultContextMenuHandler;
 - (void)_receivedProgress:(WebLoadProgress*)progress
         forResourceHandle:(WebResourceHandle*)resourceHandle
@@ -55,4 +58,8 @@
 - (void)_didStopLoading:(NSURL*)URL;
 + (NSString*)_MIMETypeForFile:(NSString*)path;
 - (void)_downloadURL:(NSURL*)URL toPath:(NSString*)path;
+
+- (BOOL)_defersCallbacks;
+- (void)_setDefersCallbacks:(BOOL)defers;
+
 @end
