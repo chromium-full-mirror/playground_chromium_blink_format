@@ -233,6 +233,16 @@ void CharacterDataImpl::checkCharDataOperation(const unsigned long offset,
   }
 }
 
+long CharacterDataImpl::caretMinOffset() const {
+  RenderText* r = static_cast<RenderText*>(renderer());
+  return r && r->isText() ? r->caretMinOffset() : 0;
+}
+
+long CharacterDataImpl::caretMaxOffset() const {
+  RenderText* r = static_cast<RenderText*>(renderer());
+  return r && r->isText() ? r->caretMaxOffset() : (long)length();
+}
+
 #ifndef NDEBUG
 void CharacterDataImpl::dump(QTextStream* stream, QString ind) const {
   *stream << " str=\"" << DOMString(str).string().ascii() << "\"";

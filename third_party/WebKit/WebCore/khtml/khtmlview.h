@@ -59,6 +59,7 @@ class RenderPart;
 class RenderPartObject;
 class RenderWidget;
 class CSSStyleSelector;
+class InlineBox;
 void applyRule(DOM::CSSProperty* prop);
 };
 
@@ -189,6 +190,7 @@ class KHTMLView : public QScrollView {
 #endif
 
   virtual void viewportMousePressEvent(QMouseEvent*);
+  virtual void focusInEvent(QFocusEvent*);
   virtual void focusOutEvent(QFocusEvent*);
   virtual void viewportMouseDoubleClickEvent(QMouseEvent*);
   virtual void viewportMouseMoveEvent(QMouseEvent*);

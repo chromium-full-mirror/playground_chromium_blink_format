@@ -39,6 +39,7 @@
 class KHTMLPartPrivate;
 class KHTMLPartBrowserExtension;
 class KJSProxy;
+class KHTMLSelection;
 class KHTMLView;
 class KHTMLSettings;
 class KJavaAppletContext;
@@ -576,8 +577,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   int zoomFactor() const;
 
   /**
-   * Returns the text the user has marked.
-   */
+     * Returns the text the user has marked.
+     */
   virtual QString selectedText() const;
 
   /**
@@ -609,6 +610,17 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Marks all text in the document as selected.
    */
   void selectAll();
+
+  /**
+   * Returns the caret.
+   */
+  KHTMLSelection& getKHTMLSelection() const;
+
+  /**
+   * Returns whether editing is enabled at the current caret
+   * position.
+   */
+  bool isEditingAtCaret() const;
 
   /**
    * Convenience method to show the document's view.
@@ -1160,6 +1172,20 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void receivedFirstData();
 
   void replaceContentsWithScriptResult(const KURL& url);
+
+  void checkSelectionPoint(khtml::MouseEvent* event,
+                           DOM::NodeImpl*& node,
+                           int& offset);
+
+  bool handleMouseMoveEventDrag(khtml::MouseMoveEvent* event);
+  bool handleMouseMoveEventOver(khtml::MouseMoveEvent* event);
+  void handleMouseMoveEventSelection(khtml::MouseMoveEvent* event);
+
+#if APPLE_CHANGES
+  void handleMousePressEventSingleClick(khtml::MousePressEvent* event);
+  void handleMousePressEventDoubleClick(khtml::MousePressEvent* event);
+  void handleMousePressEventTripleClick(khtml::MousePressEvent* event);
+#endif
 
   KHTMLPartPrivate* d;
   friend class KHTMLPartPrivate;

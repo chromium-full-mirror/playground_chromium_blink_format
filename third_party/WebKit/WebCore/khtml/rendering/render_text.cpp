@@ -181,6 +181,14 @@ void InlineTextBox::paintDecoration(QPainter* pt,
 }
 #endif
 
+long InlineTextBox::caretMinOffset() const {
+  return m_start;
+}
+
+long InlineTextBox::caretMaxOffset() const {
+  return m_start + m_len;
+}
+
 #define LOCAL_WIDTH_BUF_SIZE 1024
 
 FindSelectionResult InlineTextBox::checkSelectionPoint(int _x,
@@ -523,7 +531,12 @@ FindSelectionResult RenderText::checkSelectionPointIgnoringContinuations(
   return SelectionPointAfter;
 }
 
-void RenderText::cursorPos(int offset, int& _x, int& _y, int& height) {
+void RenderText::caretPos(int offset,
+                          bool override,
+                          int& _x,
+                          int& _y,
+                          int& width,
+                          int& height) {
   if (!m_lines.count()) {
     _x = _y = height = -1;
     return;
@@ -537,9 +550,11 @@ void RenderText::cursorPos(int offset, int& _x, int& _y, int& height) {
   const QFontMetrics& fm = metrics(s->m_firstLine);
   QString tekst(str->s + s->m_start, s->m_len);
   _x = s->m_x + (fm.boundingRect(tekst, pos)).right();
-  if (pos)
-    _x += fm.rightBearing(*(str->s + s->m_start + pos - 1));
-
+#if 0
+  // EDIT FIXME
+  if(pos)
+      _x += fm.rightBearing( *(str->s + s->m_start + pos - 1 ) );
+#endif
   int absx, absy;
   absolutePosition(absx, absy);
   _x += absx;
@@ -1282,7 +1297,7 @@ void RenderText::setText(DOMStringImpl* text, bool force) {
   KHTMLAssert(!isBR() || (str->l == 1 && (*str->s) == '\n'));
   KHTMLAssert(!str->l || str->s);
 
-  setNeedsLayout(true);
+  setNeedsLayoutAndMinMaxRecalc();
 
 #ifdef BIDI_DEBUG
   QConstString cstr(str->s, str->l);
@@ -1420,6 +1435,57 @@ const QFontMetrics& RenderText::metrics(bool firstLine) const {
 
 const Font* RenderText::htmlFont(bool firstLine) const {
   return &style(firstLine)->htmlFont();
+}
+
+long RenderText::caretMinOffset() const {
+  if (!m_lines.count())
+    return 0;
+  // EDIT FIXME: it is *not* guaranteed that the first run contains the lowest
+  // offset
+  // Either make this a linear search (slow),
+  // or maintain an index (needs much mem),
+  // or calculate and store it in bidi.cpp (needs calculation even if not
+  // needed)
+  return m_lines[0]->m_start;
+}
+
+long RenderText::caretMaxOffset() const {
+  int count = m_lines.count();
+  if (!count)
+    return str->l;
+  // EDIT FIXME: it is *not* guaranteed that the last run contains the highest
+  // offset
+  // Either make this a linear search (slow),
+  // or maintain an index (needs much mem),
+  // or calculate and store it in bidi.cpp (needs calculation even if not
+  // needed)
+  return m_lines[count - 1]->m_start + m_lines[count - 1]->m_len;
+}
+
+bool RenderText::precedesLineBreak() const {
+  RenderObject* r = nextRenderer();
+  while (r) {
+    if (r->isBR() || r->isRenderBlock())
+      return true;
+    if (r->isText() || r->isReplaced())
+      return false;
+    r = r->nextRenderer();
+  }
+
+  return false;
+}
+
+bool RenderText::followsLineBreak() const {
+  RenderObject* r = previousRenderer();
+  while (r) {
+    if (r->isBR() || r->isRenderBlock())
+      return true;
+    if (r->isText() || r->isReplaced())
+      return false;
+    r = r->previousRenderer();
+  }
+
+  return false;
 }
 
 RenderTextFragment::RenderTextFragment(DOM::NodeImpl* _node,

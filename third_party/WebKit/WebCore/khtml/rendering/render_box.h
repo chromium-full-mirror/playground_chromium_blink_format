@@ -122,6 +122,13 @@ class RenderBox : public RenderContainer {
 
   virtual RenderLayer* layer() const { return m_layer; }
 
+  virtual void caretPos(int offset,
+                        bool override,
+                        int& _x,
+                        int& _y,
+                        int& width,
+                        int& height);
+
   virtual void paintBackgroundExtended(QPainter* p,
                                        const QColor& c,
                                        CachedImage* bg,

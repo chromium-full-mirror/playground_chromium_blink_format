@@ -43,10 +43,13 @@
 #include "decoder.h"
 #endif
 
+#include "htmlediting.h"
+
 class QPaintDevice;
 class QPaintDeviceMetrics;
 class KHTMLView;
 class KHTMLPart;
+class KHTMLSelection;
 class Tokenizer;
 class XMLHandler;
 class RenderArena;
@@ -60,6 +63,7 @@ class CSSStyleSelector;
 class DocLoader;
 class CSSStyleSelectorList;
 class RenderImage;
+class EditCommand;
 }
 
 #ifndef KHTML_NO_XBL
@@ -261,9 +265,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
                                        bool entityReferenceExpansion,
                                        int& exceptioncode);
 
-  TreeWalkerImpl* createTreeWalker(Node root,
+  TreeWalkerImpl* createTreeWalker(const Node& root,
                                    unsigned long whatToShow,
-                                   NodeFilter& filter,
+                                   const NodeFilter& filter,
                                    bool entityReferenceExpansion);
 
   virtual void recalcStyle(StyleChange = NoChange);
@@ -287,6 +291,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setVisuallyOrdered();
 
   void setSelection(NodeImpl* s, int sp, NodeImpl* e, int ep);
+  void setSelection(KHTMLSelection&);
   void clearSelection();
 
   void open();

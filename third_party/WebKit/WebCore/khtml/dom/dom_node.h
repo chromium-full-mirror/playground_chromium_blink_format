@@ -865,7 +865,6 @@ class Node {
   unsigned long index() const;
   QString toHTML();
   void applyChanges();
-  void getCursor(int offset, int& _x, int& _y, int& height);
   /**
    * not part of the DOM.
    * @returns the exact coordinates and size of this element.

@@ -66,6 +66,9 @@ class RenderReplaced : public RenderBox {
 
   virtual bool canHaveChildren() const;
 
+  virtual long caretMinOffset() const;
+  virtual long caretMaxOffset() const;
+
  private:
   short m_intrinsicWidth;
   short m_intrinsicHeight;

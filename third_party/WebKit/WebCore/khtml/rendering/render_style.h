@@ -472,6 +472,11 @@ struct BindingURI {
 };
 #endif
 
+//------------------------------------------------
+// CSS3 User Modify Properties
+
+enum EUserModify { READ_ONLY, READ_WRITE };
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -502,7 +507,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
 // This struct is for rarely used inherited CSS3 properties.  By grouping them
 // together,
 // we save space, and only allocate this object when someone actually uses
-// a non-inherited CSS3 property.
+// an inherited CSS3 property.
 class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
  public:
   StyleCSS3InheritedData();
@@ -517,6 +522,7 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
 
   ShadowData*
       textShadow;  // Our text shadow information for shadowed text drawing.
+  EUserModify userModify : 2;  // Flag used for editing state
 
  private:
   StyleCSS3InheritedData& operator=(const StyleCSS3InheritedData&);
@@ -1135,6 +1141,7 @@ class RenderStyle : public Shared<RenderStyle> {
   EMarqueeDirection marqueeDirection() {
     return css3NonInheritedData->marquee->direction;
   }
+  EUserModify userModify() const { return css3InheritedData->userModify; }
   // End CSS3 Getters
 
   // attribute setter methods
@@ -1401,6 +1408,9 @@ class RenderStyle : public Shared<RenderStyle> {
   void setMarqueeLoopCount(int i) {
     SET_VAR(css3NonInheritedData.access()->marquee, loops, i);
   }
+  void setUserModify(EUserModify u) {
+    SET_VAR(css3InheritedData, userModify, u);
+  }
   // End CSS3 Setters
 
   QPalette palette() const { return visual->palette; }
@@ -1491,6 +1501,7 @@ class RenderStyle : public Shared<RenderStyle> {
   static Length initialMarqueeIncrement() { return Length(6, Fixed); }
   static EMarqueeBehavior initialMarqueeBehavior() { return MSCROLL; }
   static EMarqueeDirection initialMarqueeDirection() { return MAUTO; }
+  static EUserModify initialUserModify() { return READ_ONLY; }
 };
 
 }  // namespace

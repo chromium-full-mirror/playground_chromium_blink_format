@@ -226,6 +226,8 @@ class ElementImpl : public NodeBaseImpl {
 
   virtual DOMString toString() const;
 
+  virtual void defaultEventHandler(EventImpl* evt);
+
 #ifndef NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
