@@ -251,15 +251,13 @@ VisiblePosition Selection::modifyExtendingRightForward(
       pos = nextWordPosition(pos);
       break;
     case PARAGRAPH:
-      pos = nextParagraphPosition(pos, m_affinity,
-                                  xPosForVerticalArrowNavigation(EXTENT));
+      pos = nextParagraphPosition(pos, xPosForVerticalArrowNavigation(EXTENT));
       break;
     case LINE:
-      pos = nextLinePosition(pos, m_affinity,
-                             xPosForVerticalArrowNavigation(EXTENT));
+      pos = nextLinePosition(pos, xPosForVerticalArrowNavigation(EXTENT));
       break;
     case LINE_BOUNDARY:
-      pos = endOfLine(VisiblePosition(m_end, m_affinity), UPSTREAM);
+      pos = endOfLine(VisiblePosition(m_end, m_affinity));
       break;
     case PARAGRAPH_BOUNDARY:
       pos = endOfParagraph(VisiblePosition(m_end, m_affinity));
@@ -287,41 +285,22 @@ VisiblePosition Selection::modifyMovingRightForward(
       break;
     case PARAGRAPH:
       pos =
-          nextParagraphPosition(VisiblePosition(m_end, m_affinity), m_affinity,
+          nextParagraphPosition(VisiblePosition(m_end, m_affinity),
                                 xPosForVerticalArrowNavigation(END, isRange()));
       break;
     case LINE: {
-      // This somewhat complicated code is needed to handle the case where there
-      // is a
-      // whole line selected (like when the user clicks at the start of a line
-      // and hits shift+down-arrow),
-      // and then hits an (unshifted) down arrow. Since the whole-line selection
-      // considers its
-      // ending point to be the start of the next line, it may be necessary to
-      // juggle the
-      // position to use as the VisiblePosition to pass to nextLinePosition().
-      // If this juggling
-      // is not done, you can wind up skipping a line. See these two bugs for
-      // more information:
-      // <rdar://problem/3875618> REGRESSION (Mail): Hitting down arrow with
-      // full line selected skips line (br case)
-      // <rdar://problem/3875641> REGRESSION (Mail): Hitting down arrow with
-      // full line selected skips line (div case)
-      if (isCaret()) {
-        pos = VisiblePosition(m_end, m_affinity);
-      } else if (isRange()) {
-        Position p(m_end.upstream());
-        if (p.node()->id() == ID_BR)
-          pos = VisiblePosition(Position(p.node(), 0), UPSTREAM);
-        else
-          pos = VisiblePosition(p, UPSTREAM);
-      }
-      pos = nextLinePosition(pos, m_affinity,
-                             xPosForVerticalArrowNavigation(END, isRange()));
+      // down-arrowing from a range selection that ends at the start of a line
+      // needs
+      // to leave the selection at that line start (no need to call
+      // nextLinePosition!)
+      pos = VisiblePosition(m_end, m_affinity);
+      if (!isRange() || !isStartOfLine(pos))
+        pos = nextLinePosition(pos,
+                               xPosForVerticalArrowNavigation(END, isRange()));
       break;
     }
     case LINE_BOUNDARY:
-      pos = endOfLine(VisiblePosition(m_end, m_affinity), UPSTREAM);
+      pos = endOfLine(VisiblePosition(m_end, m_affinity));
       break;
     case PARAGRAPH_BOUNDARY:
       pos = endOfParagraph(VisiblePosition(m_end, m_affinity));
@@ -344,15 +323,14 @@ VisiblePosition Selection::modifyExtendingLeftBackward(
       pos = previousWordPosition(pos);
       break;
     case PARAGRAPH:
-      pos = previousParagraphPosition(pos, m_affinity,
+      pos = previousParagraphPosition(pos,
                                       xPosForVerticalArrowNavigation(EXTENT));
       break;
     case LINE:
-      pos = previousLinePosition(pos, m_affinity,
-                                 xPosForVerticalArrowNavigation(EXTENT));
+      pos = previousLinePosition(pos, xPosForVerticalArrowNavigation(EXTENT));
       break;
     case LINE_BOUNDARY:
-      pos = startOfLine(VisiblePosition(m_start, m_affinity), DOWNSTREAM);
+      pos = startOfLine(VisiblePosition(m_start, m_affinity));
       break;
     case PARAGRAPH_BOUNDARY:
       pos = startOfParagraph(VisiblePosition(m_start, m_affinity));
@@ -379,16 +357,16 @@ VisiblePosition Selection::modifyMovingLeftBackward(
       break;
     case PARAGRAPH:
       pos = previousParagraphPosition(
-          VisiblePosition(m_start, m_affinity), m_affinity,
+          VisiblePosition(m_start, m_affinity),
           xPosForVerticalArrowNavigation(START, isRange()));
       break;
     case LINE:
       pos = previousLinePosition(
-          VisiblePosition(m_start, m_affinity), m_affinity,
+          VisiblePosition(m_start, m_affinity),
           xPosForVerticalArrowNavigation(START, isRange()));
       break;
     case LINE_BOUNDARY:
-      pos = startOfLine(VisiblePosition(m_start, m_affinity), DOWNSTREAM);
+      pos = startOfLine(VisiblePosition(m_start, m_affinity));
       break;
     case PARAGRAPH_BOUNDARY:
       pos = startOfParagraph(VisiblePosition(m_start, m_affinity));
@@ -465,6 +443,7 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
   if (up)
     verticalDistance = -verticalDistance;
 
+  // can dump this UPSTREAM when we have m_extentAffinity
   m_affinity = UPSTREAM;
   setModifyBias(alter, up ? BACKWARD : FORWARD);
 
@@ -491,7 +470,7 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
   VisiblePosition result;
   VisiblePosition next;
   for (VisiblePosition p = pos;; p = next) {
-    next = (up ? previousLinePosition : nextLinePosition)(p, m_affinity, xPos);
+    next = (up ? previousLinePosition : nextLinePosition)(p, xPos);
     if (next.isNull() || next == p)
       break;
     int nextY;
@@ -901,14 +880,13 @@ void Selection::validate(ETextGranularity granularity) {
                                 : VisiblePosition(m_base, m_affinity);
       EWordSide side = RightWordIfOnBoundary;
       if (isEndOfDocument(start) ||
-          (isEndOfLine(start, m_affinity) &&
-           !isStartOfLine(start, m_affinity) && !isEndOfParagraph(start)))
+          (isEndOfLine(start) && !isStartOfLine(start) &&
+           !isEndOfParagraph(start)))
         side = LeftWordIfOnBoundary;
       m_start = startOfWord(start, side).deepEquivalent();
       side = RightWordIfOnBoundary;
       if (isEndOfDocument(end) ||
-          (isEndOfLine(end, m_affinity) && !isStartOfLine(end, m_affinity) &&
-           !isEndOfParagraph(end)))
+          (isEndOfLine(end) && !isStartOfLine(end) && !isEndOfParagraph(end)))
         side = LeftWordIfOnBoundary;
       m_end = endOfWord(end, side).deepEquivalent();
 
@@ -917,23 +895,22 @@ void Selection::validate(ETextGranularity granularity) {
     case LINE:
     case LINE_BOUNDARY:
       if (m_baseIsStart) {
-        m_start = startOfLine(VisiblePosition(m_base, m_affinity), m_affinity)
-                      .deepEquivalent();
-        m_end = endOfLine(VisiblePosition(m_extent, m_affinity), m_affinity,
-                          IncludeLineBreak)
-                    .deepEquivalent();
+        m_start =
+            startOfLine(VisiblePosition(m_base, m_affinity)).deepEquivalent();
+        m_end =
+            endOfLine(VisiblePosition(m_extent, m_affinity), IncludeLineBreak)
+                .deepEquivalent();
       } else {
-        m_start = startOfLine(VisiblePosition(m_extent, m_affinity), m_affinity)
-                      .deepEquivalent();
-        m_end = endOfLine(VisiblePosition(m_base, m_affinity), m_affinity,
-                          IncludeLineBreak)
+        m_start =
+            startOfLine(VisiblePosition(m_extent, m_affinity)).deepEquivalent();
+        m_end = endOfLine(VisiblePosition(m_base, m_affinity), IncludeLineBreak)
                     .deepEquivalent();
       }
       break;
     case PARAGRAPH:
       if (m_baseIsStart) {
         VisiblePosition pos(m_base, m_affinity);
-        if (isStartOfLine(pos, m_affinity) && isEndOfDocument(pos))
+        if (isStartOfLine(pos) && isEndOfDocument(pos))
           pos = pos.previous();
         m_start = startOfParagraph(pos).deepEquivalent();
         m_end = endOfParagraph(VisiblePosition(m_extent, m_affinity),

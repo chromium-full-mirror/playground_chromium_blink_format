@@ -58,8 +58,8 @@ class Position {
   ElementImpl* element() const;
   CSSComputedStyleDeclarationImpl* computedStyle() const;
 
-  Position leadingWhitespacePosition() const;
-  Position trailingWhitespacePosition() const;
+  Position leadingWhitespacePosition(khtml::EAffinity affinity) const;
+  Position trailingWhitespacePosition(khtml::EAffinity affinity) const;
 
   // These functions only consider leaf nodes, and if stayInBlock is true,
   // blocks.
@@ -95,8 +95,8 @@ class Position {
 
   bool inRenderedText() const;
 
-  Position previousCharacterPosition() const;
-  Position nextCharacterPosition() const;
+  Position previousCharacterPosition(khtml::EAffinity affinity) const;
+  Position nextCharacterPosition(khtml::EAffinity affinity) const;
 
   NodeImpl* m_node;
   long m_offset;

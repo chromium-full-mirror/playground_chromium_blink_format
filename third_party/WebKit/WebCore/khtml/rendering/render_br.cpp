@@ -94,10 +94,8 @@ unsigned long RenderBR::caretMaxRenderedOffset() const {
   return 1;
 }
 
-Position RenderBR::positionForCoordinates(int _x, int _y, EAffinity* affinity) {
-  if (affinity)
-    *affinity = DOWNSTREAM;
-  return Position(element(), 0);
+VisiblePosition RenderBR::positionForCoordinates(int _x, int _y) {
+  return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
 QRect RenderBR::caretRect(int offset,

@@ -2816,14 +2816,9 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
   return Position(node, offset);
 }
 
-Position RenderBlock::positionForCoordinates(int _x,
-                                             int _y,
-                                             EAffinity* affinity) {
-  if (affinity)
-    *affinity = DOWNSTREAM;
-
+VisiblePosition RenderBlock::positionForCoordinates(int _x, int _y) {
   if (isTable())
-    return RenderFlow::positionForCoordinates(_x, _y, affinity);
+    return RenderFlow::positionForCoordinates(_x, _y);
 
   int absx, absy;
   absolutePosition(absx, absy);
@@ -2833,19 +2828,22 @@ Position RenderBlock::positionForCoordinates(int _x,
 
   if (_y < top)
     // y coordinate is above block
-    return positionForRenderer(firstLeafChild(), true);
+    return VisiblePosition(positionForRenderer(firstLeafChild(), true),
+                           DOWNSTREAM);
 
   if (_y >= bottom)
     // y coordinate is below block
-    return positionForRenderer(lastLeafChild(), false);
+    return VisiblePosition(positionForRenderer(lastLeafChild(), false),
+                           DOWNSTREAM);
 
   if (childrenInline()) {
     if (!firstRootBox())
-      return Position(element(), 0);
+      return VisiblePosition(element(), 0, DOWNSTREAM);
 
     if (_y >= top && _y < absy + firstRootBox()->topOverflow())
       // y coordinate is above first root line box
-      return positionForBox(firstRootBox()->firstLeafChild(), true);
+      return VisiblePosition(
+          positionForBox(firstRootBox()->firstLeafChild(), true), DOWNSTREAM);
 
     // look for the closest line box in the root box which is at the passed-in y
     // coordinate
@@ -2863,16 +2861,17 @@ Position RenderBlock::positionForCoordinates(int _x,
         if (closestBox) {
           // pass the box a y position that is inside it
           return closestBox->object()->positionForCoordinates(
-              _x, absy + closestBox->m_y, affinity);
+              _x, absy + closestBox->m_y);
         }
       }
     }
 
     if (lastRootBox())
       // y coordinate is below last root line box
-      return positionForBox(lastRootBox()->lastLeafChild(), false);
+      return VisiblePosition(
+          positionForBox(lastRootBox()->lastLeafChild(), false), DOWNSTREAM);
 
-    return Position(element(), 0);
+    return VisiblePosition(element(), 0, DOWNSTREAM);
   }
 
   // see if any child blocks exist at this y coordinate
@@ -2889,16 +2888,16 @@ Position RenderBlock::positionForCoordinates(int _x,
     else
       bottom = top + contentHeight();
     if (_y >= top && _y < bottom) {
-      return renderer->positionForCoordinates(_x, _y, affinity);
+      return renderer->positionForCoordinates(_x, _y);
     }
   }
 
   // pass along to the first child
   if (firstChild())
-    return firstChild()->positionForCoordinates(_x, _y, affinity);
+    return firstChild()->positionForCoordinates(_x, _y);
 
   // still no luck...return this render object's element and offset 0
-  return Position(element(), 0);
+  return VisiblePosition(element(), 0, DOWNSTREAM);
 }
 
 void RenderBlock::calcMinMaxWidth() {

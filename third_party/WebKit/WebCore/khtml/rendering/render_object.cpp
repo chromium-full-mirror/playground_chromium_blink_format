@@ -1690,7 +1690,9 @@ bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) {
   }
 }
 
-QRect RenderObject::caretRect(int, EAffinity, int* extraWidthToEndOfLine) {
+QRect RenderObject::caretRect(int offset,
+                              EAffinity affinity,
+                              int* extraWidthToEndOfLine) {
   if (extraWidthToEndOfLine)
     *extraWidthToEndOfLine = 0;
 
@@ -1874,13 +1876,8 @@ void RenderObject::arenaDelete(RenderArena* arena, void* base) {
   arena->free(*(size_t*)base, base);
 }
 
-Position RenderObject::positionForCoordinates(int x,
-                                              int y,
-                                              EAffinity* affinity) {
-  if (affinity)
-    *affinity = UPSTREAM;
-
-  return Position(element(), caretMinOffset());
+VisiblePosition RenderObject::positionForCoordinates(int x, int y) {
+  return VisiblePosition(element(), caretMinOffset(), DOWNSTREAM);
 }
 
 bool RenderObject::mouseInside() const {

@@ -130,15 +130,10 @@ unsigned long RenderReplaced::caretMaxRenderedOffset() const {
   return 1;
 }
 
-Position RenderReplaced::positionForCoordinates(int _x,
-                                                int _y,
-                                                EAffinity* affinity) {
-  if (affinity)
-    *affinity = UPSTREAM;
-
+VisiblePosition RenderReplaced::positionForCoordinates(int _x, int _y) {
   InlineBox* box = inlineBoxWrapper();
   if (!box)
-    return Position(element(), 0);
+    return VisiblePosition(element(), 0, DOWNSTREAM);
 
   RootInlineBox* root = box->root();
 
@@ -150,21 +145,21 @@ Position RenderReplaced::positionForCoordinates(int _x,
                                    : absy + root->bottomOverflow();
 
   if (_y < top)
-    return Position(element(), caretMinOffset());  // coordinates are above
+    return VisiblePosition(element(), caretMinOffset(),
+                           DOWNSTREAM);  // coordinates are above
 
   if (_y >= bottom)
-    return Position(element(), caretMaxOffset());  // coordinates are below
+    return VisiblePosition(element(), caretMaxOffset(),
+                           DOWNSTREAM);  // coordinates are below
 
   if (element()) {
-    if (_x <= absx + xPos() + (width() / 2)) {
-      if (affinity)
-        *affinity = DOWNSTREAM;
-      return Position(element(), 0);
-    }
-    return Position(element(), 1);
+    if (_x <= absx + xPos() + (width() / 2))
+      return VisiblePosition(element(), 0, DOWNSTREAM);
+
+    return VisiblePosition(element(), 1, DOWNSTREAM);
   }
 
-  return RenderBox::positionForCoordinates(_x, _y, affinity);
+  return RenderBox::positionForCoordinates(_x, _y);
 }
 
 QRect RenderReplaced::selectionRect() {

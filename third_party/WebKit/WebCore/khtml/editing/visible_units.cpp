@@ -259,8 +259,7 @@ VisiblePosition nextWordPosition(const VisiblePosition& c) {
 
 // ---------
 
-static RootInlineBox* rootBoxForLine(const VisiblePosition& c,
-                                     EAffinity affinity) {
+static RootInlineBox* rootBoxForLine(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
   NodeImpl* node = p.node();
   if (!node)
@@ -270,15 +269,15 @@ static RootInlineBox* rootBoxForLine(const VisiblePosition& c,
   if (!renderer)
     return 0;
 
-  InlineBox* box = renderer->inlineBox(p.offset(), affinity);
+  InlineBox* box = renderer->inlineBox(p.offset(), c.affinity());
   if (!box)
     return 0;
 
   return box->root();
 }
 
-VisiblePosition startOfLine(const VisiblePosition& c, EAffinity affinity) {
-  RootInlineBox* rootBox = rootBoxForLine(c, affinity);
+VisiblePosition startOfLine(const VisiblePosition& c) {
+  RootInlineBox* rootBox = rootBoxForLine(c);
   if (!rootBox)
     return VisiblePosition();
 
@@ -299,16 +298,15 @@ VisiblePosition startOfLine(const VisiblePosition& c, EAffinity affinity) {
     InlineTextBox* startTextBox = static_cast<InlineTextBox*>(startBox);
     startOffset = startTextBox->m_start;
   }
-  return VisiblePosition(startNode, startOffset, affinity);
+  return VisiblePosition(startNode, startOffset, DOWNSTREAM);
 }
 
 VisiblePosition endOfLine(const VisiblePosition& c,
-                          EAffinity affinity,
                           EIncludeLineBreak includeLineBreak) {
   // FIXME: Need to implement the "include line break" version.
   assert(includeLineBreak == DoNotIncludeLineBreak);
 
-  RootInlineBox* rootBox = rootBoxForLine(c, affinity);
+  RootInlineBox* rootBox = rootBoxForLine(c);
   if (!rootBox)
     return VisiblePosition();
 
@@ -331,29 +329,32 @@ VisiblePosition endOfLine(const VisiblePosition& c,
     InlineTextBox* endTextBox = static_cast<InlineTextBox*>(endBox);
     endOffset = endTextBox->m_start + endTextBox->m_len;
   }
-  return VisiblePosition(endNode, endOffset, affinity);
+
+  // generate VisiblePosition with correct affinity
+  VisiblePosition result = VisiblePosition(endNode, endOffset, DOWNSTREAM);
+  VisiblePosition temp = result;
+  temp.setAffinity(UPSTREAM);
+  if (visiblePositionsOnDifferentLines(temp, result))
+    result.setAffinity(UPSTREAM);
+
+  return result;
 }
 
-bool inSameLine(const VisiblePosition& a,
-                EAffinity aa,
-                const VisiblePosition& b,
-                EAffinity ab) {
-  return a.isNotNull() && startOfLine(a, aa) == startOfLine(b, ab);
+bool inSameLine(const VisiblePosition& a, const VisiblePosition& b) {
+  return a.isNotNull() && startOfLine(a) == startOfLine(b);
 }
 
-bool isStartOfLine(const VisiblePosition& p, EAffinity affinity) {
-  return p.isNotNull() && p == startOfLine(p, affinity);
+bool isStartOfLine(const VisiblePosition& p) {
+  return p.isNotNull() && p == startOfLine(p);
 }
 
-bool isEndOfLine(const VisiblePosition& p, EAffinity affinity) {
-  return p.isNotNull() && p == endOfLine(p, affinity, DoNotIncludeLineBreak);
+bool isEndOfLine(const VisiblePosition& p) {
+  return p.isNotNull() && p == endOfLine(p, DoNotIncludeLineBreak);
 }
 
-VisiblePosition previousLinePosition(const VisiblePosition& c,
-                                     EAffinity affinity,
-                                     int x) {
-  Position p =
-      affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
+VisiblePosition previousLinePosition(const VisiblePosition& c, int x) {
+  Position p = c.affinity() == UPSTREAM ? c.deepEquivalent()
+                                        : c.downstreamDeepEquivalent();
   NodeImpl* node = p.node();
   if (!node)
     return VisiblePosition();
@@ -364,7 +365,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& c,
 
   RenderBlock* containingBlock = 0;
   RootInlineBox* root = 0;
-  InlineBox* box = renderer->inlineBox(p.offset(), affinity);
+  InlineBox* box = renderer->inlineBox(p.offset(), c.affinity());
   if (box) {
     root = box->root()->prevRootBox();
     if (root)
@@ -404,10 +405,7 @@ VisiblePosition previousLinePosition(const VisiblePosition& c,
     int absx, absy;
     containingBlock->absolutePosition(absx, absy);
     RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
-    EAffinity posAffinity;
-    Position pos = renderer->positionForCoordinates(
-        x, absy + root->topOverflow(), &posAffinity);
-    return VisiblePosition(pos, posAffinity);
+    return renderer->positionForCoordinates(x, absy + root->topOverflow());
   }
 
   // Could not find a previous line. This means we must already be on the first
@@ -417,11 +415,9 @@ VisiblePosition previousLinePosition(const VisiblePosition& c,
   return VisiblePosition(node->rootEditableElement(), 0, DOWNSTREAM);
 }
 
-VisiblePosition nextLinePosition(const VisiblePosition& c,
-                                 EAffinity affinity,
-                                 int x) {
-  Position p =
-      affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
+VisiblePosition nextLinePosition(const VisiblePosition& c, int x) {
+  Position p = c.affinity() == UPSTREAM ? c.deepEquivalent()
+                                        : c.downstreamDeepEquivalent();
   NodeImpl* node = p.node();
   if (!node)
     return VisiblePosition();
@@ -432,7 +428,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& c,
 
   RenderBlock* containingBlock = 0;
   RootInlineBox* root = 0;
-  InlineBox* box = renderer->inlineBox(p.offset(), affinity);
+  InlineBox* box = renderer->inlineBox(p.offset(), c.affinity());
   if (box) {
     root = box->root()->nextRootBox();
     if (root)
@@ -472,10 +468,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& c,
     int absx, absy;
     containingBlock->absolutePosition(absx, absy);
     RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
-    EAffinity posAffinity;
-    Position pos = renderer->positionForCoordinates(
-        x, absy + root->topOverflow(), &posAffinity);
-    return VisiblePosition(pos, posAffinity);
+    return renderer->positionForCoordinates(x, absy + root->topOverflow());
   }
 
   // Could not find a next line. This means we must already be on the last line.
@@ -483,7 +476,7 @@ VisiblePosition nextLinePosition(const VisiblePosition& c,
   // to the end of the line we're on.
   ElementImpl* rootElement = node->rootEditableElement();
   return VisiblePosition(
-      rootElement, rootElement ? rootElement->childNodeCount() : 0, affinity);
+      rootElement, rootElement ? rootElement->childNodeCount() : 0, DOWNSTREAM);
 }
 
 // ---------
@@ -514,9 +507,7 @@ static unsigned previousSentencePositionBoundary(const QChar* characters,
   return nextSentenceFromIndex(characters, length, length, false);
 }
 
-VisiblePosition previousSentencePosition(const VisiblePosition& c,
-                                         EAffinity,
-                                         int x) {
+VisiblePosition previousSentencePosition(const VisiblePosition& c, int x) {
   return previousBoundary(c, previousSentencePositionBoundary);
 }
 
@@ -525,9 +516,7 @@ static unsigned nextSentencePositionBoundary(const QChar* characters,
   return nextSentenceFromIndex(characters, length, 0, true);
 }
 
-VisiblePosition nextSentencePosition(const VisiblePosition& c,
-                                     EAffinity,
-                                     int x) {
+VisiblePosition nextSentencePosition(const VisiblePosition& c, int x) {
   return nextBoundary(c, nextSentencePositionBoundary);
 }
 
@@ -645,12 +634,10 @@ bool isEndOfParagraph(const VisiblePosition& pos) {
   return pos.isNotNull() && pos == endOfParagraph(pos, DoNotIncludeLineBreak);
 }
 
-VisiblePosition previousParagraphPosition(const VisiblePosition& p,
-                                          EAffinity a,
-                                          int x) {
+VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = previousLinePosition(pos, a, x);
+    VisiblePosition n = previousLinePosition(pos, x);
     if (n.isNull() || n == pos) {
       return p;
     }
@@ -659,12 +646,10 @@ VisiblePosition previousParagraphPosition(const VisiblePosition& p,
   return pos;
 }
 
-VisiblePosition nextParagraphPosition(const VisiblePosition& p,
-                                      EAffinity a,
-                                      int x) {
+VisiblePosition nextParagraphPosition(const VisiblePosition& p, int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = nextLinePosition(pos, a, x);
+    VisiblePosition n = nextLinePosition(pos, x);
     if (n.isNull() || n == pos) {
       return p;
     }

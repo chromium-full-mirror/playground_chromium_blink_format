@@ -36,6 +36,7 @@
 #include "rendering/render_style.h"
 #include "khtml_events.h"
 #include "xml/dom_docimpl.h"
+#include "visible_position.h"
 
 #include "KWQScrollBar.h"
 
@@ -605,7 +606,7 @@ class RenderObject : public CachedObjectClient {
                            HitTestAction hitTestAction);
   void setInnerNode(NodeInfo& info);
 
-  virtual DOM::Position positionForCoordinates(int x, int y, EAffinity* = 0);
+  virtual VisiblePosition positionForCoordinates(int x, int y);
 
   virtual void dirtyLinesFromChangedChild(RenderObject* child,
                                           bool adding = true);
