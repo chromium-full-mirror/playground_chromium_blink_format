@@ -70,10 +70,8 @@ using khtml::RemoveNodeCommand;
 using khtml::RemoveNodeCommandImpl;
 using khtml::RemoveNodeAndPruneCommand;
 using khtml::RemoveNodeAndPruneCommandImpl;
-using khtml::PasteHTMLCommand;
-using khtml::PasteHTMLCommandImpl;
-using khtml::PasteImageCommand;
-using khtml::PasteImageCommandImpl;
+using khtml::PasteMarkupCommand;
+using khtml::PasteMarkupCommandImpl;
 using khtml::SplitTextNodeCommand;
 using khtml::SplitTextNodeCommandImpl;
 using khtml::TypingCommand;
@@ -443,34 +441,22 @@ TextImpl* JoinTextNodesCommand::secondNode() const {
 }
 
 //------------------------------------------------------------------------------------------
-// PasteHTMLCommand
+// PasteMarkupCommand
 
-PasteHTMLCommand::PasteHTMLCommand(DocumentImpl* document,
-                                   const DOMString& HTMLString)
-    : CompositeEditCommand(new PasteHTMLCommandImpl(document, HTMLString)) {}
-
-PasteHTMLCommand::~PasteHTMLCommand() {}
-
-PasteHTMLCommandImpl* PasteHTMLCommand::impl() const {
-  return static_cast<PasteHTMLCommandImpl*>(get());
+PasteMarkupCommand::PasteMarkupCommand(DocumentImpl* document,
+                                       const DOMString& markupString)
+    : CompositeEditCommand(new PasteMarkupCommandImpl(document, markupString)) {
 }
 
-DOMString PasteHTMLCommand::HTMLString() const {
+PasteMarkupCommand::~PasteMarkupCommand() {}
+
+PasteMarkupCommandImpl* PasteMarkupCommand::impl() const {
+  return static_cast<PasteMarkupCommandImpl*>(get());
+}
+
+DOMString PasteMarkupCommand::markupString() const {
   IF_IMPL_NULL_RETURN_ARG(DOMString());
-  return impl()->HTMLString();
-}
-
-//------------------------------------------------------------------------------------------
-// PasteImageCommand
-
-PasteImageCommand::PasteImageCommand(DocumentImpl* document,
-                                     const DOMString& src)
-    : CompositeEditCommand(new PasteImageCommandImpl(document, src)) {}
-
-PasteImageCommand::~PasteImageCommand() {}
-
-PasteImageCommandImpl* PasteImageCommand::impl() const {
-  return static_cast<PasteImageCommandImpl*>(get());
+  return impl()->markupString();
 }
 
 //------------------------------------------------------------------------------------------

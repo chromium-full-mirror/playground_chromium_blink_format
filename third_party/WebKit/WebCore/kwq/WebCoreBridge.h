@@ -246,7 +246,6 @@ typedef enum {
 - (BOOL)moveCaretToPoint:(NSPoint)point;
 
 - (void)pasteMarkupString:(NSString*)markupString;
-- (void)pasteImageWithURL:(NSURL*)URL;
 
 - (void)deleteSelection;
 - (BOOL)haveSelection;
