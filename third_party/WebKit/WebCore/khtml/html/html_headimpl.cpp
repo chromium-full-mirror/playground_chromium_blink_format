@@ -171,7 +171,7 @@ void HTMLLinkElementImpl::process() {
 
   // Stylesheet
   // This was buggy and would incorrectly match <link rel="alternate">, which
-  // has a different specified meaning.
+  // has a different specified meaning. -dwh
   if (type.contains("text/css") || rel == "stylesheet" ||
       (rel.contains("alternate") && rel.contains("stylesheet"))) {
     // no need to load style sheets which aren't for the screen output
@@ -331,7 +331,10 @@ NodeImpl::Id HTMLStyleElementImpl::id() const {
 void HTMLStyleElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
+      m_type = attr->value();
+      break;
     case ATTR_MEDIA:
+      m_media = attr->value().string().lower();
       break;
     default:
       HTMLElementImpl::parseAttribute(attr);
@@ -340,12 +343,14 @@ void HTMLStyleElementImpl::parseAttribute(AttributeImpl* attr) {
 
 void HTMLStyleElementImpl::insertedIntoDocument() {
   HTMLElementImpl::insertedIntoDocument();
-  getDocument()->updateStyleSelector();
+  if (m_sheet)
+    getDocument()->updateStyleSelector();
 }
 
 void HTMLStyleElementImpl::removedFromDocument() {
   HTMLElementImpl::removedFromDocument();
-  getDocument()->updateStyleSelector();
+  if (m_sheet)
+    getDocument()->updateStyleSelector();
 }
 
 void HTMLStyleElementImpl::childrenChanged() {
@@ -358,12 +363,20 @@ void HTMLStyleElementImpl::childrenChanged() {
       text += c->nodeValue();
   }
 
-  if (m_sheet)
+  if (m_sheet) {
     m_sheet->deref();
-  m_sheet = new CSSStyleSheetImpl(this);
-  m_sheet->ref();
-  m_sheet->parseString(text,
-                       (getDocument()->parseMode() == DocumentImpl::Strict));
+    m_sheet = 0;
+  }
+
+  if ((m_type.isEmpty() || m_type == "text/css")  // Type must be empty or CSS
+      && (m_media.isNull() || m_media.contains("screen") ||
+          m_media.contains("all") || m_media.contains("print"))) {
+    m_sheet = new CSSStyleSheetImpl(this);
+    m_sheet->ref();
+    m_sheet->parseString(text,
+                         (getDocument()->parseMode() == DocumentImpl::Strict));
+  }
+
   getDocument()->updateStyleSelector();
 }
 
@@ -374,7 +387,8 @@ bool HTMLStyleElementImpl::isLoading() const {
 }
 
 void HTMLStyleElementImpl::sheetLoaded() {
-  getDocument()->updateStyleSelector();
+  if (m_sheet)
+    getDocument()->updateStyleSelector();
 }
 
 // -------------------------------------------------------------------------
