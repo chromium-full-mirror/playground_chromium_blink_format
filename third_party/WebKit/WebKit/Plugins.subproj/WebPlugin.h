@@ -72,11 +72,11 @@
     @discussion objectForWebScript is used to expose a plug-in's scripting
    interface.  The
     methods of the object are exposed to the script environment.  See the
-   WebScriptMethods
+   WebScripting
     informal protocol for more details.
     @result Returns the object that exposes the plug-in's interface.  The class
    of this
-    object can implement methods from the WebScriptMethods informal protocol.
+    object can implement methods from the WebScripting informal protocol.
 */
 - (id)objectForWebScript;
 
