@@ -638,6 +638,7 @@ class StatListNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  friend class CaseClauseNode;
   StatementNode* statement;
   StatListNode* list;
 };
@@ -857,7 +858,7 @@ class WithNode : public StatementNode {
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(Node* e, StatListNode* l) : expr(e), list(l) {}
+  CaseClauseNode(Node* e, StatListNode* l) : expr(e), list(l) { reverseList(); }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -866,6 +867,7 @@ class CaseClauseNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseList();
   Node* expr;
   StatListNode* list;
 };
@@ -873,9 +875,9 @@ class CaseClauseNode : public Node {
 class ClauseListNode : public Node {
  public:
   ClauseListNode(CaseClauseNode* c) : cl(c), nx(0L) {}
+  ClauseListNode(ClauseListNode* n, CaseClauseNode* c) : cl(c), nx(n) {}
   virtual void ref();
   virtual bool deref();
-  ClauseListNode* append(CaseClauseNode* c);
   Value evaluate(ExecState* exec);
   CaseClauseNode* clause() const { return cl; }
   ClauseListNode* next() const { return nx; }
@@ -883,6 +885,7 @@ class ClauseListNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  friend class CaseBlockNode;
   CaseClauseNode* cl;
   ClauseListNode* nx;
 };
@@ -890,7 +893,9 @@ class ClauseListNode : public Node {
 class CaseBlockNode : public Node {
  public:
   CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2)
-      : list1(l1), def(d), list2(l2) {}
+      : list1(l1), def(d), list2(l2) {
+    reverseLists();
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -899,6 +904,7 @@ class CaseBlockNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseLists();
   ClauseListNode* list1;
   CaseClauseNode* def;
   ClauseListNode* list2;
@@ -991,7 +997,7 @@ class TryNode : public StatementNode {
 class ParameterNode : public Node {
  public:
   ParameterNode(const Identifier& i) : id(i), next(0L) {}
-  ParameterNode* append(const Identifier& i);
+  ParameterNode(ParameterNode* list, const Identifier& i) : id(i), next(list) {}
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -1000,6 +1006,8 @@ class ParameterNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  friend class FuncDeclNode;
+  friend class FuncExprNode;
   Identifier id;
   ParameterNode* next;
 };
@@ -1014,7 +1022,9 @@ class FunctionBodyNode : public BlockNode {
 class FuncDeclNode : public StatementNode {
  public:
   FuncDeclNode(const Identifier& i, ParameterNode* p, FunctionBodyNode* b)
-      : ident(i), param(p), body(b) {}
+      : ident(i), param(p), body(b) {
+    reverseParameterList();
+  }
   virtual void ref();
   virtual bool deref();
   Completion execute(ExecState* /*exec*/) { /* empty */
@@ -1024,6 +1034,7 @@ class FuncDeclNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseParameterList();
   Identifier ident;
   ParameterNode* param;
   FunctionBodyNode* body;
@@ -1031,13 +1042,16 @@ class FuncDeclNode : public StatementNode {
 
 class FuncExprNode : public Node {
  public:
-  FuncExprNode(ParameterNode* p, FunctionBodyNode* b) : param(p), body(b) {}
+  FuncExprNode(ParameterNode* p, FunctionBodyNode* b) : param(p), body(b) {
+    reverseParameterList();
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseParameterList();
   ParameterNode* param;
   FunctionBodyNode* body;
 };
