@@ -280,6 +280,7 @@ char* signedPublicKeyAndChallengeString(unsigned keySize,
     ERROR("***Error decoding subject public key info\n");
     goto errOut;
   }
+
   pkc->challenge.Data = (uint8*)challenge;
   pkc->challenge.Length = strlen(challenge);
   perr = coder.encodeItem(pkc, PublicKeyAndChallengeTemplate, encodedPkc);
@@ -348,7 +349,7 @@ errOut:
 * Per-cert processing, called for each cert we extract from the
  * incoming blob.
  */
-bool addCertificateToKeyChainFromData(const unsigned char* certData,
+bool addCertificateToKeychainFromData(const unsigned char* certData,
                                       unsigned certDataLen,
                                       unsigned certNum) {
   CSSM_DATA cert = {certDataLen, (uint8*)certData};
@@ -386,15 +387,8 @@ bool addCertificateToKeyChainFromData(const unsigned char* certData,
   return true;
 }
 
-bool addCertificateToKeyChainFromFile(const char* path) {
+bool addCertificatesToKeychainFromData(const void* bytes, unsigned length) {
   bool result = false;
-
-  /* read inFile */
-  unsigned char* inFile = NULL;
-  unsigned inFileLen = 0;
-  if (readFile(path, &inFile, &inFileLen)) {
-    return false;
-  }
 
   /* DER-decode, first as NetscapeCertSequence */
   SecNssCoder coder;
@@ -402,11 +396,14 @@ bool addCertificateToKeyChainFromFile(const char* path) {
 
   memset(&certSeq, 0, sizeof(certSeq));
   PRErrorCode perr =
-      coder.decode(inFile, inFileLen, NetscapeCertSequenceTemplate, &certSeq);
+      coder.decode(bytes, length, NetscapeCertSequenceTemplate, &certSeq);
   if (perr == 0) {
-    /*
-     * Probably should verify (contentType == netscape-cert-sequence)
-     */
+    if (memcmp(certSeq.contentType.Data, CSSMOID_PKCS7_SignedData.Data,
+               certSeq.contentType.Length) == 0) {
+      // FIXME: <rdar://problem/3506645>: decode PKCS7 encoded certificates
+      // downloaded from Verisign
+      return false;
+    }
     /*
      * Last cert is a root, which we do NOT want to add
      * to the user's keychain.
@@ -414,7 +411,7 @@ bool addCertificateToKeyChainFromFile(const char* path) {
     unsigned numCerts = nssArraySize((const void**)certSeq.certs) - 1;
     for (unsigned i = 0; i < numCerts; i++) {
       CSSM_DATA* cert = certSeq.certs[i];
-      result = addCertificateToKeyChainFromData(cert->Data, cert->Length, i);
+      result = addCertificateToKeychainFromData(cert->Data, cert->Length, i);
       if (!result) {
         break;
       }
@@ -425,10 +422,8 @@ bool addCertificateToKeyChainFromFile(const char* path) {
      * a cert. FIXME: Netscape spec says the blob might also be PKCS7
      * format, which we're not handling here.
      */
-    result = addCertificateToKeyChainFromData(inFile, inFileLen, 0);
+    result = addCertificateToKeychainFromData(bytes, length, 0);
   }
 
-  /* this was mallocd by readFile() */
-  free(inFile);
   return result;
 }
