@@ -333,6 +333,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
+  virtual void detach();
   virtual bool appendFormData(FormDataList&, bool);
 
   virtual bool isSuccessfulSubmitButton() const;
@@ -628,6 +629,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
+  virtual void detach();
   virtual bool appendFormData(FormDataList&, bool);
   virtual void reset();
   DOMString value();
