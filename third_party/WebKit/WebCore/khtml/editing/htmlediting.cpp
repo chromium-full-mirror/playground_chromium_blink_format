@@ -1495,7 +1495,7 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   computedStyle->deref();
 }
 
-bool DeleteSelectionCommand::canPerformSpecialCaseAllContentDelete() {
+bool DeleteSelectionCommand::handleSpecialCaseAllContentDelete() {
   Position start = m_downstreamStart;
   Position end = m_upstreamEnd;
 
@@ -1518,7 +1518,7 @@ bool DeleteSelectionCommand::canPerformSpecialCaseAllContentDelete() {
   return false;
 }
 
-bool DeleteSelectionCommand::canPerformSpecialCaseBRDelete() {
+bool DeleteSelectionCommand::handleSpecialCaseBRDelete() {
   // Check for special-case where the selection contains only a BR on a line by
   // itself after another BR.
   bool upstreamStartIsBR = m_startNode->id() == ID_BR;
@@ -1556,7 +1556,7 @@ bool DeleteSelectionCommand::canPerformSpecialCaseBRDelete() {
   return false;
 }
 
-void DeleteSelectionCommand::performGeneralDelete() {
+void DeleteSelectionCommand::handleGeneralDelete() {
   int startOffset = m_upstreamStart.offset();
 
   if (startOffset >= m_startNode->caretMaxOffset()) {
@@ -1871,9 +1871,9 @@ void DeleteSelectionCommand::doApply() {
 
   saveTypingStyleState();
 
-  if (!canPerformSpecialCaseAllContentDelete())
-    if (!canPerformSpecialCaseBRDelete())
-      performGeneralDelete();
+  if (!handleSpecialCaseAllContentDelete())
+    if (!handleSpecialCaseBRDelete())
+      handleGeneralDelete();
 
   // Do block merge if start and end of selection are in different blocks.
   moveNodesAfterNode();
