@@ -273,7 +273,7 @@ Position Position::nextCharacterPosition() const {
   return *this;
 }
 
-Position Position::previousWordPosition() const {
+Position Position::previousWordBoundary() const {
   if (isEmpty())
     return Position();
 
@@ -299,7 +299,7 @@ Position Position::previousWordPosition() const {
   return *this;
 }
 
-Position Position::nextWordPosition() const {
+Position Position::nextWordBoundary() const {
   if (isEmpty())
     return Position();
 
@@ -323,6 +323,18 @@ Position Position::nextWordPosition() const {
   }
 
   return *this;
+}
+
+Position Position::previousWordPosition() const {
+  // FIXME - need an implementation that skips to starts of words, not each
+  // boundary
+  return previousWordBoundary();
+}
+
+Position Position::nextWordPosition() const {
+  // FIXME - need an implementation that skips to ends of words, not each
+  // boundary
+  return nextWordBoundary();
 }
 
 Position Position::previousLinePosition(int x) const {

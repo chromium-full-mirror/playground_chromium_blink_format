@@ -232,6 +232,7 @@ typedef enum {
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
 - (void)jumpToSelection;
+- (NSString*)advanceToNextMisspelling;
 
 - (void)setTextSizeMultiplier:(float)multiplier;
 
@@ -572,6 +573,8 @@ typedef enum {
 - (NSString*)overrideMediaType;
 
 - (void)windowObjectCleared;
+
+- (int)spellCheckerDocumentTag;
 
 @end
 
