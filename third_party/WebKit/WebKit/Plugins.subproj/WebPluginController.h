@@ -22,7 +22,7 @@
 
 - initWithWebFrame:(WebFrame*)theFrame;
 - (void)addPluginView:(NSView<WebPlugin>*)view;
-- (void)didAddSubview:(NSView<WebPlugin>*)view;
-- (void)stopAllPlugins;
+- (void)didAddPluginView:(NSView<WebPlugin>*)view;
+- (void)destroyAllPlugins;
 
 @end
