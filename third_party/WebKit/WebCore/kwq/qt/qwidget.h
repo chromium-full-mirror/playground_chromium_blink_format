@@ -86,6 +86,8 @@ class QWidget : public QObject, public QPaintDevice {
   void move(int, int);
   void move(const QPoint&);
 
+  virtual void paint(){};
+
   virtual QRect frameGeometry() const;
   virtual void setFrameGeometry(const QRect&);
 

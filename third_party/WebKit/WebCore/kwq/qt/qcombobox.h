@@ -49,6 +49,8 @@ class QComboBox : public QWidget {
   QListBox* listBox() const { return 0; }
   void popup() {}
 
+  virtual void paint();
+
   QSize sizeHint() const;
   QRect frameGeometry() const;
   void setFrameGeometry(const QRect&);
