@@ -155,34 +155,36 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   // that a positioned child got yanked).  We also repaint, so that the area
   // exposed when the child
   // disappears gets repainted properly.
-  oldChild->setNeedsLayoutAndMinMaxRecalc();
+  if (document()->renderer()) {
+    oldChild->setNeedsLayoutAndMinMaxRecalc();
 #ifdef INCREMENTAL_REPAINTING
-  oldChild->repaint();
+    oldChild->repaint();
 #endif
 
-  // Keep our layer hierarchy updated.
-  oldChild->removeLayers(enclosingLayer());
+    // Keep our layer hierarchy updated.
+    oldChild->removeLayers(enclosingLayer());
 
-  // if oldChild is the start or end of the selection, then clear the selection
-  // to
-  // avoid problems of invalid pointers
+    // if oldChild is the start or end of the selection, then clear the
+    // selection to
+    // avoid problems of invalid pointers
 
-  // ### This is not the "proper" solution... ideally the selection should be
-  // maintained
-  // based on DOM Nodes and a Range, which gets adjusted appropriately when
-  // nodes are
-  // deleted/inserted near etc. But this at least prevents crashes caused when
-  // the start
-  // or end of the selection is deleted and then accessed when the user next
-  // selects
-  // something.
+    // ### This is not the "proper" solution... ideally the selection should be
+    // maintained
+    // based on DOM Nodes and a Range, which gets adjusted appropriately when
+    // nodes are
+    // deleted/inserted near etc. But this at least prevents crashes caused when
+    // the start
+    // or end of the selection is deleted and then accessed when the user next
+    // selects
+    // something.
 
-  if (oldChild->isSelectionBorder()) {
-    RenderObject* root = oldChild;
-    while (root && root->parent())
-      root = root->parent();
-    if (root->isCanvas()) {
-      static_cast<RenderCanvas*>(root)->clearSelection();
+    if (oldChild->isSelectionBorder()) {
+      RenderObject* root = oldChild;
+      while (root && root->parent())
+        root = root->parent();
+      if (root->isCanvas()) {
+        static_cast<RenderCanvas*>(root)->clearSelection();
+      }
     }
   }
 
