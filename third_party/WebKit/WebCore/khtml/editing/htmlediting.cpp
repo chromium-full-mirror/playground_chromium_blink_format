@@ -2859,7 +2859,7 @@ void InsertParagraphSeparatorCommand::doApply() {
 
 InsertParagraphSeparatorInQuotedContentCommand::
     InsertParagraphSeparatorInQuotedContentCommand(DocumentImpl* document)
-    : CompositeEditCommand(document) {}
+    : CompositeEditCommand(document), m_breakNode(0) {}
 
 InsertParagraphSeparatorInQuotedContentCommand::
     ~InsertParagraphSeparatorInQuotedContentCommand() {
