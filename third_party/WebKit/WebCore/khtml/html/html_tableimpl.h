@@ -144,6 +144,8 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
 
   virtual Id id() const;
 
+  virtual NodeImpl* addChild(NodeImpl* child);
+
   HTMLElementImpl* insertRow(long index);
   void deleteRow(long index);
 
