@@ -128,8 +128,6 @@ class CSSStyleSelector : public StyleSelector {
                                      DOM::ElementImpl* e,
                                      RenderStyle* parentStyle = 0);
 
-  QValueList<int> fontSizes() const { return m_fontSizes; }
-
   bool strictParsing;
   struct Encodedurl {
     QString host;  // also contains protocol
@@ -137,7 +135,19 @@ class CSSStyleSelector : public StyleSelector {
     QString file;
   } encodedurl;
 
-  void computeFontSizes(QPaintDeviceMetrics* paintDeviceMetrics);
+  // Given a CSS keyword in the range (xx-small to -khtml-xxx-large), this
+  // function will return
+  // the correct font size scaled relative to the user's default (medium).
+  float fontSizeForKeyword(int keyword, bool quirksMode) const;
+
+  // When the CSS keyword "larger" is used, this function will attempt to match
+  // within the keyword
+  // table, and failing that, will simply multiply by 1.2.
+  float largerFontSize(float size, bool quirksMode) const;
+
+  // Like the previous function, but for the keyword "smaller".
+  float smallerFontSize(float size, bool quirksMode) const;
+
   void setFontSize(FontDef& fontDef, float size);
   float getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
                                          float specifiedSize);
@@ -227,10 +237,6 @@ class CSSStyleSelector : public StyleSelector {
   KHTMLPart* part;
   const KHTMLSettings* settings;
   QPaintDeviceMetrics* paintDeviceMetrics;
-  QValueList<int> m_fontSizes;
-  float m_fixedScaleFactor;  // Used when converting from proportional to fixed
-                             // and vice
-                             // versa.
   bool fontDirty;
   bool isXMLDoc;
 

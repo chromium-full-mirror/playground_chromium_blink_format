@@ -208,18 +208,23 @@ void RenderFormElement::slotClicked() {
 #if APPLE_CHANGES
 
 void RenderFormElement::addIntrinsicMarginsIfAllowed(RenderStyle* _style) {
+  // Cut out the intrinsic margins completely if we end up using mini controls.
+  if (_style->font().pixelSize() < 11)
+    return;
+
+  int m = intrinsicMargin();
   if (_style->width().isVariable()) {
     if (_style->marginLeft().quirk)
-      _style->setMarginLeft(Length(intrinsicMargin(), Fixed));
+      _style->setMarginLeft(Length(m, Fixed));
     if (_style->marginRight().quirk)
-      _style->setMarginRight(Length(intrinsicMargin(), Fixed));
+      _style->setMarginRight(Length(m, Fixed));
   }
 
   if (_style->height().isVariable()) {
     if (_style->marginTop().quirk)
-      _style->setMarginTop(Length(intrinsicMargin(), Fixed));
+      _style->setMarginTop(Length(m, Fixed));
     if (_style->marginBottom().quirk)
-      _style->setMarginBottom(Length(intrinsicMargin(), Fixed));
+      _style->setMarginBottom(Length(m, Fixed));
   }
 }
 
@@ -1044,6 +1049,11 @@ void RenderSelect::updateFromElement() {
             QString(text.implementation()->s, text.implementation()->l);
         label.replace('\\', backslashAsCurrencySymbol());
 
+        // In WinIE, an optgroup can't start or end with whitespace (other than
+        // the indent
+        // we give it).  We match this behavior.
+        label = label.stripWhiteSpace();
+
         if (m_useListBox) {
 #if APPLE_CHANGES
           static_cast<KListBox*>(m_widget)->insertGroupLabel(label, listIndex);
@@ -1064,6 +1074,10 @@ void RenderSelect::updateFromElement() {
         QString itemText =
             QString(text.implementation()->s, text.implementation()->l);
         itemText.replace('\\', backslashAsCurrencySymbol());
+
+        // In WinIE, an option can't start or end with whitespace.  We match
+        // this behavior.
+        itemText = itemText.stripWhiteSpace();
 
         if (m_useListBox)
           static_cast<KListBox*>(m_widget)->insertItem(itemText, listIndex);
