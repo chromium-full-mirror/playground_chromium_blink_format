@@ -25,6 +25,7 @@
 #include <c_instance.h>
 #include <c_utility.h>
 #include <internal.h>
+#include <npruntime_priv.h>
 #include <runtime.h>
 #include <runtime_object.h>
 #include <runtime_root.h>
@@ -109,26 +110,26 @@ void convertValueToNPVariant(KJS::ExecState* exec,
 Value convertNPVariantToValue(KJS::ExecState* exec, const NPVariant* variant) {
   NPVariantType type = variant->type;
 
-  if (type == NPVariantBoolType) {
+  if (type == NPVariantType_Bool) {
     NPBool aBool;
     if (NPN_VariantToBool(variant, &aBool))
       return KJS::Boolean(aBool);
     return KJS::Boolean(false);
-  } else if (type == NPVariantNullType) {
+  } else if (type == NPVariantType_Null) {
     return Null();
-  } else if (type == NPVariantUndefinedType) {
+  } else if (type == NPVariantType_Void) {
     return Undefined();
-  } else if (type == NPVariantInt32Type) {
+  } else if (type == NPVariantType_Int32) {
     int32_t anInt;
     if (NPN_VariantToInt32(variant, &anInt))
       return Number(anInt);
     return Number(0);
-  } else if (type == NPVariantDoubleType) {
+  } else if (type == NPVariantType_Double) {
     double aDouble;
     if (NPN_VariantToDouble(variant, &aDouble))
       return Number(aDouble);
     return Number(0);
-  } else if (type == NPVariantStringType) {
+  } else if (type == NPVariantType_String) {
     NPUTF16* stringValue;
     unsigned int UTF16Length;
     convertNPStringToUTF16(
@@ -137,7 +138,7 @@ Value convertNPVariantToValue(KJS::ExecState* exec, const NPVariant* variant) {
     String resultString(UString((const UChar*)stringValue, UTF16Length));
     free(stringValue);
     return resultString;
-  } else if (type == NPVariantObjectType) {
+  } else if (type == NPVariantType_Object) {
     NPObject* obj = variant->value.objectValue;
 
     if (obj->_class == NPScriptObjectClass) {

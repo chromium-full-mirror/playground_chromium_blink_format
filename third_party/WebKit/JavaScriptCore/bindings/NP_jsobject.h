@@ -43,7 +43,8 @@ typedef struct {
   KJS::Bindings::RootObject* root;
 } JavaScriptObject;
 
-NPObject* _NPN_CreateScriptObject(KJS::ObjectImp* imp,
+NPObject* _NPN_CreateScriptObject(NPP npp,
+                                  KJS::ObjectImp* imp,
                                   KJS::Bindings::RootObject* root);
 
 #ifdef __cplusplus
