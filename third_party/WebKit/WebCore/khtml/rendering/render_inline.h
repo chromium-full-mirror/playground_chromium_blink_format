@@ -97,6 +97,8 @@ class RenderInline : public RenderFlow {
   virtual int offsetLeft() const;
   virtual int offsetTop() const;
 
+  void absoluteRects(QPtrList<QRect>& rects, int _tx, int _ty);
+
 #ifdef APPLE_CHANGES
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
   void paintFocusRing(QPainter* p, int tx, int ty);

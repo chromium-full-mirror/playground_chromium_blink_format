@@ -177,6 +177,8 @@ class RenderText : public RenderObject {
                            HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
 
+  virtual void absoluteRects(QPtrList<QRect>& rects, int _tx, int _ty);
+
   // Return before, after (offset set to max), or inside the text, at @p offset
   virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
       int _x,
