@@ -66,7 +66,7 @@ class KHTMLSettings {
 
   const QValueList<int>& fontSizes() const;
 
-  bool changeCursor();
+  bool changeCursor() const;
 
   bool isFormCompletionEnabled() const;
   int maxFormCompletionItems() const;
