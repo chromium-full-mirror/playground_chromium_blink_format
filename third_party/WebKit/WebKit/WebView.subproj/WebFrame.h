@@ -16,6 +16,9 @@
 
 /*!
     @class WebFrame
+    @discussion Every web page is represented by at least one WebFrame.  A
+   WebFrame
+    has a WebView and a WebDataSource.
 */
 @interface WebFrame : NSObject {
  @private
@@ -24,10 +27,12 @@
 
 /*!
     @method initWithName:webView:provisionalDataSource:controller:
-    @param name
-    @param view
-    @param dataSource
-    @param controller
+    @abstract The designated initializer of WebFrame.
+    @param name The name of the frame.
+    @param view The view for the frame.
+    @param dataSource The dataSource for the frame.
+    @param controller The controller that manages the frame.
+    @result Returns an initialized WebFrame.
 */
 - initWithName:(NSString*)name
                   webView:(WebView*)view
@@ -36,6 +41,7 @@
 
 /*!
     @method name
+    @result The frame name.
 */
 - (NSString*)name;
 
@@ -47,6 +53,7 @@
 
 /*!
     @method controller
+    @result Returns the controller of this frame.
 */
 - (WebController*)controller;
 
@@ -58,6 +65,7 @@
 
 /*!
     @method webView
+    @result The WebView for this frame.
 */
 - (WebView*)webView;
 
@@ -67,9 +75,10 @@
     considered 'provisional' until it has been loaded, and at least
     ~some~ data has been received.
 
-    Will return NO and not set the provisional data source if the controller
-    disallows by returning a WebURLPolicyIgnore.
     @param dataSource
+    @result Returns NO and will not set the provisional data source if the
+   controller
+    disallows by returning a WebURLPolicyIgnore.
 */
 - (BOOL)setProvisionalDataSource:(WebDataSource*)dataSource;
 
@@ -77,6 +86,7 @@
     @method dataSource
     @discussion Returns the committed data source.  Will return nil if the
     provisional data source hasn't yet been loaded.
+    @result The datasource for this frame.
 */
 - (WebDataSource*)dataSource;
 
@@ -86,6 +96,7 @@
    source will
     return nil if no data source has been set on the frame, or the data source
     has successfully transitioned to the committed data source.
+    @result The provisional datasource of this frame.
 */
 - (WebDataSource*)provisionalDataSource;
 
@@ -120,7 +131,8 @@
     frameNamed returns self for _parent and _top if the receiver it is the
    mainFrame.
     nil is returned if a frame with the given name is not found.
-    @param name
+    @param name The name of the frame to find.
+    @result The frame matching the provided name.
 */
 - (WebFrame*)frameNamed:(NSString*)name;
 
