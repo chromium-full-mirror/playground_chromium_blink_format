@@ -72,8 +72,7 @@ class KURL {
   QString ref() const;
   bool hasRef() const;
 
-  QString htmlRef() const;
-  QString encodedHtmlRef() const;
+  QString encodedHtmlRef() const { return ref(); }
 
   void setProtocol(const QString&);
   void setHost(const QString&);
@@ -81,7 +80,7 @@ class KURL {
   void setUser(const QString&);
   void setPass(const QString&);
   void setPath(const QString&);
-  void setQuery(const QString&, int encoding_hint = 0);
+  void setQuery(const QString&);
   void setRef(const QString&);
 
   QString prettyURL() const;
@@ -89,7 +88,7 @@ class KURL {
   NSURL* getNSURL() const;
   NSData* getNSData() const;
 
-  static QString decode_string(const QString&);
+  static QString decode_string(const QString&, const QTextCodec* = 0);
   static QString encode_string(const QString&);
 
   friend bool operator==(const KURL&, const KURL&);

@@ -396,7 +396,9 @@ class QString {
   bool isAllASCII() const;
   bool isAllLatin1() const;
   bool hasFastLatin1() const;
-  void copyLatin1(char* latin1) const;
+  void copyLatin1(char* buffer,
+                  uint position = 0,
+                  uint length = 0xffffffff) const;
   QCString utf8() const {
     int length;
     return utf8(length);

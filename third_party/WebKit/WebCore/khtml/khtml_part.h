@@ -1256,6 +1256,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool handleMouseMoveEventOver(khtml::MouseMoveEvent* event);
   void handleMouseMoveEventSelection(khtml::MouseMoveEvent* event);
 
+  /**
+   * @internal Extracts anchor and tries both encoded and decoded form.
+   */
+  void gotoAnchor();
+
 #if APPLE_CHANGES
   void handleMousePressEventSingleClick(khtml::MousePressEvent* event);
   void handleMousePressEventDoubleClick(khtml::MousePressEvent* event);
