@@ -43,12 +43,7 @@ ArrayInstanceImp::ArrayInstanceImp(const Object& proto, unsigned initialLength)
     : ObjectImp(proto),
       length(initialLength),
       capacity(length),
-      storage(length ? new (ValueImp*)[length] : 0) {
-  unsigned l = length;
-  for (unsigned i = 0; i < l; ++i) {
-    storage[i] = Undefined().imp();
-  }
-}
+      storage(length ? (ValueImp**)calloc(length, sizeof(ValueImp*)) : 0) {}
 
 ArrayInstanceImp::ArrayInstanceImp(const Object& proto, const List& list)
     : ObjectImp(proto),
@@ -63,7 +58,7 @@ ArrayInstanceImp::ArrayInstanceImp(const Object& proto, const List& list)
 }
 
 ArrayInstanceImp::~ArrayInstanceImp() {
-  delete[] storage;
+  free(storage);
 }
 
 Value ArrayInstanceImp::get(ExecState* exec,
@@ -74,7 +69,7 @@ Value ArrayInstanceImp::get(ExecState* exec,
   bool ok;
   unsigned index = propertyName.toULong(&ok);
   if (ok) {
-    if (index >= length)
+    if (index >= length || storage[index] == NULL)
       return Undefined();
     return Value(storage[index]);
   }
@@ -83,7 +78,7 @@ Value ArrayInstanceImp::get(ExecState* exec,
 }
 
 Value ArrayInstanceImp::get(ExecState* exec, unsigned index) const {
-  if (index >= length)
+  if (index >= length || storage[index] == NULL)
     return Undefined();
   return Value(storage[index]);
 }
@@ -127,7 +122,7 @@ bool ArrayInstanceImp::hasProperty(ExecState* exec,
   if (ok) {
     if (index >= length)
       return false;
-    return storage[index]->type() != UndefinedType;
+    return storage[index] != NULL && storage[index]->type() != UndefinedType;
   }
 
   return ObjectImp::hasProperty(exec, propertyName);
@@ -136,7 +131,7 @@ bool ArrayInstanceImp::hasProperty(ExecState* exec,
 bool ArrayInstanceImp::hasProperty(ExecState* exec, unsigned index) const {
   if (index >= length)
     return false;
-  return storage[index]->type() != UndefinedType;
+  return storage[index] != NULL && storage[index]->type() != UndefinedType;
 }
 
 bool ArrayInstanceImp::deleteProperty(ExecState* exec,
@@ -149,7 +144,7 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec,
   if (ok) {
     if (index >= length)
       return true;
-    storage[index] = Undefined().imp();
+    storage[index] = NULL;
     return true;
   }
 
@@ -159,26 +154,18 @@ bool ArrayInstanceImp::deleteProperty(ExecState* exec,
 bool ArrayInstanceImp::deleteProperty(ExecState* exec, unsigned index) {
   if (index >= length)
     return true;
-  storage[index] = Undefined().imp();
+  storage[index] = NULL;
   return true;
 }
 
 void ArrayInstanceImp::setLength(unsigned newLength) {
   if (newLength < length) {
-    const unsigned l = length;
-    for (unsigned i = newLength; i < l; ++i)
-      storage[i] = Undefined().imp();
+    memset(storage + newLength, 0, sizeof(ValueImp*) * (length - newLength));
   }
   if (newLength > capacity) {
     unsigned newCapacity = (newLength * 3 + 1) / 2;
-    ValueImp** newStorage = new (ValueImp*)[newCapacity];
-    const unsigned l = length;
-    for (unsigned i = 0; i < l; ++i)
-      newStorage[i] = storage[i];
-    for (unsigned i = l; i < newLength; i++)
-      newStorage[i] = Undefined().imp();
-    delete[] storage;
-    storage = newStorage;
+    storage = (ValueImp**)realloc(storage, newCapacity * sizeof(ValueImp*));
+    memset(storage + capacity, 0, sizeof(ValueImp*) * (newCapacity - capacity));
     capacity = newCapacity;
   }
   length = newLength;
@@ -189,7 +176,7 @@ void ArrayInstanceImp::mark() {
   const unsigned l = length;
   for (unsigned i = 0; i < l; ++i) {
     ValueImp* imp = storage[i];
-    if (!imp->marked())
+    if (imp != NULL && !imp->marked())
       imp->mark();
   }
 }
