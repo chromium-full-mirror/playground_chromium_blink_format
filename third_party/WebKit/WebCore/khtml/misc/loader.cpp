@@ -935,6 +935,12 @@ CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
+#ifdef APPLE_CHANGES
+  if (KWQCheckIfReloading(this)) {
+    setCachePolicy(KIO::CC_Reload);
+  }
+#endif
+
   bool reload = needReload(fullURL);
 
 #ifdef APPLE_CHANGES
@@ -953,6 +959,12 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
+#ifdef APPLE_CHANGES
+  if (KWQCheckIfReloading(this)) {
+    setCachePolicy(KIO::CC_Reload);
+  }
+#endif
+
   bool reload = needReload(fullURL);
 
 #ifdef APPLE_CHANGES
@@ -970,6 +982,12 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
   KURL fullURL = m_doc->completeURL(url.string());
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
+
+#ifdef APPLE_CHANGES
+  if (KWQCheckIfReloading(this)) {
+    setCachePolicy(KIO::CC_Reload);
+  }
+#endif
 
   bool reload = needReload(fullURL);
 
