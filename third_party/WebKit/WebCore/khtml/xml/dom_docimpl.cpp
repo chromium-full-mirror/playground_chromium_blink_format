@@ -589,11 +589,11 @@ ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
 void DocumentImpl::setTitle(DOMString _title) {
   m_title = _title;
 
-  if (!view() || !view()->part())
+  if (!part())
     return;
 
 #if APPLE_CHANGES
-  KWQ(view()->part())->setTitle(_title);
+  KWQ(part())->setTitle(_title);
 #else
   QString titleStr = m_title.string();
   for (int i = 0; i < titleStr.length(); ++i)
@@ -601,7 +601,7 @@ void DocumentImpl::setTitle(DOMString _title) {
       titleStr[i] = ' ';
   titleStr = titleStr.stripWhiteSpace();
   titleStr.compose();
-  if (!view()->part()->parentPart()) {
+  if (!part()->parentPart()) {
     if (titleStr.isNull() || titleStr.isEmpty()) {
       // empty title... set window caption as the URL
       KURL url = m_url;
@@ -610,8 +610,7 @@ void DocumentImpl::setTitle(DOMString _title) {
       titleStr = url.url();
     }
 
-    emit view()->part()->setWindowCaption(
-        KStringHandler::csqueeze(titleStr, 128));
+    emit part()->setWindowCaption(KStringHandler::csqueeze(titleStr, 128));
   }
 #endif
 }
@@ -912,6 +911,10 @@ QStringList DocumentImpl::docState() {
     s.append(it.current()->state());
 
   return s;
+}
+
+KHTMLPart* DocumentImpl::part() const {
+  return m_view ? m_view->part() : 0;
 }
 
 RangeImpl* DocumentImpl::createRange() {
@@ -1223,9 +1226,8 @@ void DocumentImpl::close() {
   bool doload = !parsing() && m_tokenizer && !m_processingLoadEvent;
 
   bool wasNotRedirecting =
-      !view() ||
-      view()->part()->d->m_scheduledRedirection == noRedirectionScheduled ||
-      view()->part()->d->m_scheduledRedirection == historyNavigationScheduled;
+      !part() || part()->d->m_scheduledRedirection == noRedirectionScheduled ||
+      part()->d->m_scheduledRedirection == historyNavigationScheduled;
 
   m_processingLoadEvent = true;
   if (body() && doload) {
@@ -1629,7 +1631,7 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
                                     const DOMString& content) {
   assert(!equiv.isNull() && !content.isNull());
 
-  KHTMLView* v = getDocument()->view();
+  KHTMLPart* part = getDocument()->part();
 
   if (strcasecmp(equiv, "default-style") == 0) {
     // The preferred style set has been overridden as per section
@@ -1638,11 +1640,10 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
     // For more info, see the test at:
     // http://www.hixie.ch/tests/evil/css/import/main/preferred.html
     // -dwh
-    v->part()->d->m_sheetUsed = content.string();
+    part->d->m_sheetUsed = content.string();
     m_preferredStylesheetSet = content;
     updateStyleSelector();
-  } else if (strcasecmp(equiv, "refresh") == 0 &&
-             v->part()->metaRefreshEnabled()) {
+  } else if (strcasecmp(equiv, "refresh") == 0 && part->metaRefreshEnabled()) {
     // get delay and url
     QString str = content.string().stripWhiteSpace();
     int pos = str.find(QRegExp("[;,]"));
@@ -1656,12 +1657,11 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
       delay = str.toInt(&ok);
 #if APPLE_CHANGES
       // We want a new history item if the refresh timeout > 1 second
-      if (ok)
-        v->part()->scheduleRedirection(delay, v->part()->url().url(),
-                                       delay <= 1);
+      if (ok && part)
+        part->scheduleRedirection(delay, part->url().url(), delay <= 1);
 #else
-      if (ok)
-        v->part()->scheduleRedirection(delay, v->part()->url().url());
+      if (ok && part)
+        part->scheduleRedirection(delay, part->url().url());
 #endif
     } else {
       double delay = 0;
@@ -1678,25 +1678,24 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
       if (str.length() && str[0] == '=')
         str = str.mid(1).stripWhiteSpace();
       str = parseURL(DOMString(str)).string();
-      if (ok)
+      if (ok && part)
 #if APPLE_CHANGES
         // We want a new history item if the refresh timeout > 1 second
-        v->part()->scheduleRedirection(delay, getDocument()->completeURL(str),
-                                       delay <= 1);
+        part->scheduleRedirection(delay, getDocument()->completeURL(str),
+                                  delay <= 1);
 #else
-        v->part()->scheduleRedirection(delay, getDocument()->completeURL(str));
+        part->scheduleRedirection(delay, getDocument()->completeURL(str));
 #endif
     }
   } else if (strcasecmp(equiv, "expires") == 0) {
     QString str = content.string().stripWhiteSpace();
     time_t expire_date = str.toLong();
-    KURL url = v->part()->url();
     if (m_docLoader)
       m_docLoader->setExpireDate(expire_date);
   } else if (strcasecmp(equiv, "pragma") == 0 ||
-             strcasecmp(equiv, "cache-control") == 0) {
+             strcasecmp(equiv, "cache-control") == 0 && part) {
     QString str = content.string().lower().stripWhiteSpace();
-    KURL url = v->part()->url();
+    KURL url = part->url();
     if ((str == "no-cache") && url.protocol().startsWith("http")) {
       KIO::http_update_cache(url, true, 0);
     }

@@ -764,6 +764,8 @@ class Document : public Node {
    */
   KHTMLView* view() const;
 
+  KHTMLPart* part() const;
+
   /**
    * Introduced in DOM Level 2
    * This method is from the DocumentCSS interface

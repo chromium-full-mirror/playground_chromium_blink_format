@@ -460,6 +460,8 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
                              bool tempEvent) {
   evt->setTarget(this);
 
+  KHTMLPart* part = document->document()->part();
+
   // Since event handling code could cause this object to be deleted, grab a
   // reference to the view now
   KHTMLView* view = document->document()->view();
@@ -468,18 +470,13 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
 
   bool ret = dispatchGenericEvent(evt, exceptioncode);
 
-// If tempEvent is true, this means that the DOM implementation will not be
-// storing a reference to the event, i.e.
-// there is no way to retrieve it from javascript if a script does not already
-// have a reference to it in a variable.
-// So there is no need for the interpreter to keep the event in it's cache
-#if APPLE_CHANGES
-  if (tempEvent && view && view->part() && view->part()->jScript())
-    view->part()->jScript()->finishedWithEvent(evt);
-#else
-  if (tempEvent && view && view->part()->jScript())
-    view->part()->jScript()->finishedWithEvent(evt);
-#endif
+  // If tempEvent is true, this means that the DOM implementation will not be
+  // storing a reference to the event, i.e.
+  // there is no way to retrieve it from javascript if a script does not already
+  // have a reference to it in a variable.
+  // So there is no need for the interpreter to keep the event in it's cache
+  if (tempEvent && part && part->jScript())
+    part->jScript()->finishedWithEvent(evt);
 
   if (view)
     view->deref();

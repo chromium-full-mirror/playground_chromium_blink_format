@@ -73,22 +73,19 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
       // For compatibility with other browsers, pass open calls with parameters
       // to the window.
       if (args.size() > 1) {
-        KHTMLView* view = static_cast<DOM::DocumentImpl*>(doc.handle())->view();
-        if (view) {
-          KHTMLPart* part = view->part();
-          if (part) {
-            Window* window = Window::retrieveWindow(part);
-            if (window) {
-              Object functionObject =
-                  Object::dynamicCast(window->get(exec, "open"));
-              if (functionObject.isNull() || !functionObject.implementsCall()) {
-                Object exception = Error::create(exec, TypeError);
-                exec->setException(exception);
-                return exception;
-              }
-              Object windowObject(window);
-              return functionObject.call(exec, windowObject, args);
+        KHTMLPart* part = static_cast<DOM::DocumentImpl*>(doc.handle())->part();
+        if (part) {
+          Window* window = Window::retrieveWindow(part);
+          if (window) {
+            Object functionObject =
+                Object::dynamicCast(window->get(exec, "open"));
+            if (functionObject.isNull() || !functionObject.implementsCall()) {
+              Object exception = Error::create(exec, TypeError);
+              exec->setException(exception);
+              return exception;
             }
+            Object windowObject(window);
+            return functionObject.call(exec, windowObject, args);
           }
         }
         return Undefined();
@@ -207,8 +204,6 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case Body:
         return getDOMNode(exec, doc.body());
       case Location:
-        Q_ASSERT(view);
-        Q_ASSERT(view->part());
         if (view && view->part()) {
           Window* win = Window::retrieveWindow(view->part());
           if (win)
@@ -379,10 +374,8 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
       doc.setCookie(value.toString(exec).string());
       break;
     case Location: {
-      KHTMLView* view = static_cast<DOM::DocumentImpl*>(doc.handle())->view();
-      Q_ASSERT(view);
-      if (view) {
-        KHTMLPart* part = view->part();
+      KHTMLPart* part = static_cast<DOM::DocumentImpl*>(doc.handle())->part();
+      if (part) {
         QString str = value.toString(exec).qstring();
 
         // When assinging location, IE and Mozilla both resolve the URL
@@ -1207,8 +1200,8 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
       DOM::DocumentImpl* doc =
           static_cast<DOM::HTMLFrameElementImpl*>(element.handle())
               ->contentDocument();
-      if (doc && doc->view()) {
-        KHTMLPart* part = doc->view()->part();
+      if (doc) {
+        KHTMLPart* part = doc->part();
         if (part) {
           Object globalObject = Object::dynamicCast(Window::retrieve(part));
           // Calling hasProperty on a Window object doesn't work, it always says
@@ -4326,8 +4319,8 @@ void Image::putValue(ExecState* exec,
 }
 
 void Image::notifyFinished(khtml::CachedObject*) {
-  if (onLoadListener) {
-    DOM::Event ev = doc->view()->part()->document().createEvent("HTMLEvents");
+  if (onLoadListener && doc->part()) {
+    DOM::Event ev = doc->part()->document().createEvent("HTMLEvents");
     ev.initEvent("load", true, true);
     onLoadListener->handleEvent(ev, true);
   }

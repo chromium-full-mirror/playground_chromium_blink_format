@@ -772,8 +772,8 @@ Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
       return getStringOrNull(doc.selectedStylesheetSet());
     case ReadyState: {
       DOM::DocumentImpl* docimpl = node.handle()->getDocument();
-      if (docimpl && docimpl->view()) {
-        KHTMLPart* part = docimpl->view()->part();
+      if (docimpl) {
+        KHTMLPart* part = docimpl->part();
         if (part) {
           if (part->d->m_bComplete)
             return String("complete");
@@ -1432,9 +1432,8 @@ bool KJS::checkNodeSecurity(ExecState* exec, const DOM::Node& n) {
 
   // Check to see if the currently executing interpreter is allowed to access
   // the specified node
-  KHTMLView* view = n.handle()->getDocument()->view();
-  Window* win =
-      view && view->part() ? Window::retrieveWindow(view->part()) : 0L;
+  KHTMLPart* part = n.handle()->getDocument()->part();
+  Window* win = part ? Window::retrieveWindow(part) : 0L;
   if (!win || !win->isSafeScript(exec))
     return false;
   return true;
