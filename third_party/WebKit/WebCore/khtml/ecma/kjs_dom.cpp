@@ -706,7 +706,6 @@ DontDelete|Function 2
   createRange        DOMDocument::CreateRange DontDelete|Function 0
   createNodeIterator DOMDocument::CreateNodeIterator DontDelete|Function 3
   createTreeWalker   DOMDocument::CreateTreeWalker DontDelete|Function 4
-  defaultView        DOMDocument::DefaultView DontDelete|Function 0
   createEvent        DOMDocument::CreateEvent DontDelete|Function 1
   getOverrideStyle   DOMDocument::GetOverrideStyle DontDelete|Function 2
 @end
@@ -730,6 +729,7 @@ const ClassInfo DOMDocument::info = {"Document", &DOMNode::info,
 DontDelete|ReadOnly
   selectedStylesheetSet  DOMDocument::SelectedStylesheetSet    DontDelete
   readyState      DOMDocument::ReadyState DontDelete|ReadOnly
+  defaultView        DOMDocument::DefaultView DontDelete|ReadOnly
 @end
 */
 
@@ -786,6 +786,8 @@ Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
       }
       return Undefined();
     }
+    case DOMDocument::DefaultView:  // DOM2
+      return getDOMAbstractView(exec, doc.defaultView());
     default:
       kdWarning() << "DOMDocument::getValueProperty unhandled token " << token
                   << endl;
@@ -909,8 +911,6 @@ Value DOMDocumentProtoFunc::tryCall(ExecState* exec,
             exec, doc.getOverrideStyle(static_cast<DOM::Element>(arg0),
                                        args[1].toString(exec).string()));
     }
-    case DOMDocument::DefaultView:  // DOM2
-      return getDOMAbstractView(exec, doc.defaultView());
     default:
       break;
   }

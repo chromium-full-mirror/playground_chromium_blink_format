@@ -967,7 +967,8 @@ class RenderStyle {
   const BorderValue& borderBottom() const { return surround->border.bottom; }
 
   unsigned short borderLeftWidth() const {
-    if (surround->border.left.style == BNONE)
+    if (surround->border.left.style == BNONE ||
+        surround->border.left.style == BHIDDEN)
       return 0;
     return surround->border.left.width;
   }
@@ -977,7 +978,8 @@ class RenderStyle {
     return surround->border.left.isTransparent();
   }
   unsigned short borderRightWidth() const {
-    if (surround->border.right.style == BNONE)
+    if (surround->border.right.style == BNONE ||
+        surround->border.right.style == BHIDDEN)
       return 0;
     return surround->border.right.width;
   }
@@ -989,7 +991,8 @@ class RenderStyle {
     return surround->border.right.isTransparent();
   }
   unsigned short borderTopWidth() const {
-    if (surround->border.top.style == BNONE)
+    if (surround->border.top.style == BNONE ||
+        surround->border.top.style == BHIDDEN)
       return 0;
     return surround->border.top.width;
   }
@@ -999,7 +1002,8 @@ class RenderStyle {
     return surround->border.top.isTransparent();
   }
   unsigned short borderBottomWidth() const {
-    if (surround->border.bottom.style == BNONE)
+    if (surround->border.bottom.style == BNONE ||
+        surround->border.bottom.style == BHIDDEN)
       return 0;
     return surround->border.bottom.width;
   }
@@ -1017,7 +1021,8 @@ class RenderStyle {
     return outlineWidth() + outlineOffset();
   }
   unsigned short outlineWidth() const {
-    if (background->outline.style == BNONE)
+    if (background->outline.style == BNONE ||
+        background->outline.style == BHIDDEN)
       return 0;
     return background->outline.width;
   }
@@ -1135,7 +1140,8 @@ class RenderStyle {
   BindingURI* bindingURIs() const { return css3NonInheritedData->bindingURI; }
 #endif
   int outlineOffset() const {
-    if (background->outline.style == BNONE)
+    if (background->outline.style == BNONE ||
+        background->outline.style == BHIDDEN)
       return 0;
     return background->outline._offset;
   }

@@ -243,8 +243,9 @@ Value DOMCSSStyleDeclarationProtoFunc::tryCall(ExecState* exec,
 
 Value KJS::getDOMCSSStyleDeclaration(ExecState* exec,
                                      DOM::CSSStyleDeclaration s) {
-  return cacheDOMObject<DOM::CSSStyleDeclaration, KJS::DOMCSSStyleDeclaration>(
-      exec, s);
+  return Value(
+      cacheDOMObject<DOM::CSSStyleDeclaration, KJS::DOMCSSStyleDeclaration>(
+          exec, s));
 }
 
 // -------------------------------------------------------------------------
