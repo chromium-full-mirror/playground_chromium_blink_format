@@ -62,7 +62,7 @@ class PropertyMap {
 
   typedef PropertyMapHashTableEntry Entry;
 
-  int _tableSizeHashMask;
+  int _tableSizeMask;
   int _tableSize;
   Entry* _table;
   int _keyCount;
