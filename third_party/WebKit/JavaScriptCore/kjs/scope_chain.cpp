@@ -44,6 +44,15 @@ void ScopeChain::push(ObjectImp* o) {
   _node = new ScopeChainNode(_node, o);
 }
 
+void ScopeChain::push(const ScopeChain& c) {
+  ScopeChainNode** tail = &_node;
+  for (ScopeChainNode* n = c._node; n; n = n->next) {
+    ScopeChainNode* newNode = new ScopeChainNode(*tail, n->object);
+    *tail = newNode;
+    tail = &newNode->next;
+  }
+}
+
 void ScopeChain::pop() {
   ScopeChainNode* oldNode = _node;
   assert(oldNode);
