@@ -1255,6 +1255,23 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
             select.options().item(
                 u));  // not specified by DOM(?) but supported in netscape/IE
     } break;
+    case ID_FRAMESET: {
+      DOM::Node frame = element.children().namedItem(propertyName.string());
+      if (!frame.isNull() && frame.elementId() == ID_FRAME) {
+        DOM::DocumentImpl* doc =
+            static_cast<DOM::HTMLFrameElementImpl*>(frame.handle())
+                ->contentDocument();
+        if (doc) {
+          KHTMLPart* part = doc->part();
+          if (part) {
+            Window* window = Window::retrieveWindow(part);
+            if (window) {
+              return Value(window);
+            }
+          }
+        }
+      }
+    } break;
     case ID_FRAME:
     case ID_IFRAME: {
       DOM::DocumentImpl* doc =
