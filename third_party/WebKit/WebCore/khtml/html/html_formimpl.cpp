@@ -87,6 +87,17 @@ NodeImpl::Id HTMLFormElementImpl::id() const {
   return ID_FORM;
 }
 
+#if APPLE_CHANGES
+bool HTMLFormElementImpl::formWouldHaveSecureSubmission(DOMString url) {
+  if (url.isNull()) {
+    return false;
+  } else {
+    QString fullUrl = getDocument()->completeURL(url.string());
+    return strncmp(fullUrl.latin1(), "https:", 6) == 0;
+  }
+}
+#endif
+
 void HTMLFormElementImpl::attach() {
   HTMLElementImpl::attach();
 
@@ -95,6 +106,14 @@ void HTMLFormElementImpl::attach() {
     document->addNamedImageOrForm(oldNameAttr);
     document->addNamedImageOrForm(oldIdAttr);
   }
+
+#if APPLE_CHANGES
+  // note we don't deal with calling secureFormRemoved() on detach, because the
+  // timing
+  // was such that it cleared our state too early
+  if (formWouldHaveSecureSubmission(m_url))
+    getDocument()->secureFormAdded();
+#endif
 }
 
 void HTMLFormElementImpl::detach() {
@@ -485,8 +504,22 @@ void HTMLFormElementImpl::reset() {
 void HTMLFormElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ACTION:
+#if APPLE_CHANGES
+    {
+      bool oldURLWasSecure = formWouldHaveSecureSubmission(m_url);
+#endif
       m_url = khtml::parseURL(attr->value());
-      break;
+#if APPLE_CHANGES
+      bool newURLIsSecure = formWouldHaveSecureSubmission(m_url);
+
+      if (m_attached && (oldURLWasSecure != newURLIsSecure))
+        if (newURLIsSecure)
+          getDocument()->secureFormAdded();
+        else
+          getDocument()->secureFormRemoved();
+    }
+#endif
+    break;
     case ATTR_TARGET:
       m_target = attr->value();
       break;
@@ -1006,6 +1039,8 @@ DOMString HTMLInputElementImpl::type() const {
 }
 
 QString HTMLInputElementImpl::state() {
+  assert(m_type != PASSWORD);  // should never save/restore password fields
+
   QString state = HTMLGenericFormElementImpl::state();
   switch (m_type) {
     case CHECKBOX:
@@ -1018,6 +1053,8 @@ QString HTMLInputElementImpl::state() {
 }
 
 void HTMLInputElementImpl::restoreState(QStringList& states) {
+  assert(m_type != PASSWORD);  // should never save/restore password fields
+
   QString state = HTMLGenericFormElementImpl::findMatchingState(states);
   if (state.isNull())
     return;
@@ -1249,6 +1286,14 @@ void HTMLInputElementImpl::attach() {
 
   HTMLGenericFormElementImpl::attach();
   _style->deref();
+
+#if APPLE_CHANGES
+  // note we don't deal with calling passwordFieldRemoved() on detach, because
+  // the timing
+  // was such that it cleared our state too early
+  if (m_type == PASSWORD)
+    getDocument()->passwordFieldAdded();
+#endif
 }
 
 DOMString HTMLInputElementImpl::altText() const {
