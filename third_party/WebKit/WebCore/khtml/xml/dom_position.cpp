@@ -44,6 +44,7 @@
 #include "rendering/render_line.h"
 #include "rendering/render_style.h"
 #include "rendering/render_text.h"
+#include "editing/visible_text.h"
 
 #if APPLE_CHANGES
 #include "KWQAssertions.h"
@@ -56,6 +57,7 @@
 using khtml::EAffinity;
 using khtml::InlineBox;
 using khtml::InlineTextBox;
+using khtml::isCollapsibleWhitespace;
 using khtml::RenderBlock;
 using khtml::RenderFlow;
 using khtml::RenderObject;
@@ -609,14 +611,9 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
   return true;
 }
 
-static inline bool isWS(const QChar& c, bool treatNBSPAsWhiteSpace) {
-  const char nonBreakingSpace = 0xA0;
-  return (c.isSpace() && c != nonBreakingSpace) ||
-         (treatNBSPAsWhiteSpace && c == nonBreakingSpace);
-}
-
-Position Position::leadingWhitespacePosition(EAffinity affinity,
-                                             bool treatNBSPAsWhiteSpace) const {
+Position Position::leadingWhitespacePosition(
+    EAffinity affinity,
+    bool considerNonCollapsibleWhitespace) const {
   if (isNull())
     return Position();
 
@@ -627,7 +624,9 @@ Position Position::leadingWhitespacePosition(EAffinity affinity,
   if (prev != *this && prev.node()->inSameContainingBlockFlowElement(node()) &&
       prev.node()->isTextNode()) {
     DOMString string = static_cast<TextImpl*>(prev.node())->data();
-    if (isWS(string[prev.offset()], treatNBSPAsWhiteSpace))
+    const QChar& c = string[prev.offset()];
+    if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
+                                         : c.isSpace())
       return prev;
   }
 
@@ -636,7 +635,7 @@ Position Position::leadingWhitespacePosition(EAffinity affinity,
 
 Position Position::trailingWhitespacePosition(
     EAffinity affinity,
-    bool treatNBSPAsWhiteSpace) const {
+    bool considerNonCollapsibleWhitespace) const {
   if (isNull())
     return Position();
 
@@ -644,7 +643,9 @@ Position Position::trailingWhitespacePosition(
     TextImpl* textNode = static_cast<TextImpl*>(node());
     if (offset() < (long)textNode->length()) {
       DOMString string = static_cast<TextImpl*>(node())->data();
-      if (isWS(string[offset()], treatNBSPAsWhiteSpace))
+      const QChar& c = string[offset()];
+      if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
+                                           : c.isSpace())
         return *this;
       return Position();
     }
@@ -657,7 +658,9 @@ Position Position::trailingWhitespacePosition(
   if (next != *this && next.node()->inSameContainingBlockFlowElement(node()) &&
       next.node()->isTextNode()) {
     DOMString string = static_cast<TextImpl*>(next.node())->data();
-    if (isWS(string[0], treatNBSPAsWhiteSpace))
+    const QChar& c = string[0];
+    if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
+                                         : c.isSpace())
       return next;
   }
 
