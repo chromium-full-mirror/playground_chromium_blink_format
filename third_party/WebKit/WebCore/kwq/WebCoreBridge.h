@@ -54,6 +54,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class DOMDocument;
 @class DOMNode;
 @class DOMElement;
+@class DOMRange;
 @class WebCoreSettings;
 
 @protocol WebCoreDOMTreeCopier;
@@ -224,17 +225,19 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (BOOL)isSelectionEditable;
 - (BOOL)moveCaretToPoint:(NSPoint)point;
 
-- (void)pasteHTMLString:(NSString*)HTMLString;
+- (void)pasteMarkupString:(NSString*)markupString;
 - (void)pasteImageWithURL:(NSURL*)URL;
 
 - (void)deleteSelection;
 - (BOOL)haveSelection;
 
 - (NSAttributedString*)selectedAttributedString;
-- (NSString*)selectedHTMLString:(NSArray**)subresourceURLStrings;
 - (NSString*)selectedString;
 
-- (NSString*)HTMLString:(NSArray**)subresourceURLStrings;
+- (NSString*)markupStringFromNode:(DOMNode*)node
+            subresourceURLStrings:(NSArray**)subresourceURLStrings;
+- (NSString*)markupStringFromRange:(DOMRange*)range
+             subresourceURLStrings:(NSArray**)subresourceURLStrings;
 
 - (void)selectAll;
 - (void)deselectAll;
@@ -248,6 +251,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (int)selectionStartOffset;
 - (DOMNode*)selectionEnd;
 - (int)selectionEndOffset;
+- (DOMRange*)selectedRange;
 
 - (NSAttributedString*)attributedStringFrom:(DOMNode*)startNode
                                 startOffset:(int)startOffset

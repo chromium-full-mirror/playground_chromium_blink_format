@@ -119,7 +119,7 @@ extern NSString* WebPageCacheDocumentViewKey;
 @interface WebFrame (WebPrivate)
 
 // API Considerations:
-- (void)loadPropertyList:(id)HTMLPropertyList;
+- (void)loadWebArchive:(NSData*)webArchive;
 
 // unreachableURL represents a URL that couldn't be loaded; the HTML string acts
 // as an error page for that URL

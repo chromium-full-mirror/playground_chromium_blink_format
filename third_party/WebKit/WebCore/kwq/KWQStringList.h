@@ -29,6 +29,12 @@
 #include "KWQString.h"
 #include "KWQValueList.h"
 
+#ifdef __OBJC__
+@class NSArray;
+#else
+class NSArray;
+#endif
+
 class QStringList : public QValueList<QString> {
  public:
   static QStringList split(const QString&,
@@ -41,6 +47,8 @@ class QStringList : public QValueList<QString> {
   QString join(const QString&) const;
 
   QString pop_front();
+
+  NSArray* getNSArray();
 };
 
 #endif

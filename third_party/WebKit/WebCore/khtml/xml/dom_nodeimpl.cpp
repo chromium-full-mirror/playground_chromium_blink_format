@@ -321,7 +321,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(
       me += (parentID == ID_SCRIPT || parentID == ID_TEXTAREA)
                 ? str.string()
                 : escapeHTML(str.string());
-    } else {
+    } else if (nodeType() != Node::DOCUMENT_NODE) {
       // If I am an element, not a text
       me += QChar('<') + nodeName().string();
       if (nodeType() == Node::ELEMENT_NODE) {
