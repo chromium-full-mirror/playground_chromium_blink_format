@@ -717,10 +717,16 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       if (length.value < 0)
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
       if (length.isPercent()) {
-        float computedSize = style->htmlFont().getFontDef().computedSize;
+        // This is imperfect, because it doesn't include the zoom factor and the
+        // real computation
+        // for how high to be in pixels does include things like minimum font
+        // size and the zoom factor.
+        // On the other hand, since font-size doesn't include the zoom factor,
+        // we really can't do
+        // that here either.
+        float fontSize = style->htmlFont().getFontDef().specifiedSize;
         return new CSSPrimitiveValueImpl(
-            (int)(length.length() * computedSize) / 100,
-            CSSPrimitiveValue::CSS_PX);
+            (int)(length.length() * fontSize) / 100, CSSPrimitiveValue::CSS_PX);
       } else {
         return new CSSPrimitiveValueImpl(length.length(),
                                          CSSPrimitiveValue::CSS_PX);
