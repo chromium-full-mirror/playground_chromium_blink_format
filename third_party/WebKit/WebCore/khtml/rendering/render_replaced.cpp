@@ -311,7 +311,8 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
     return true;
 
   RenderArena* arena = ref();
-  element()->ref();
+  DOM::NodeImpl* elem = element();
+  elem->ref();
 
   bool filtered = false;
 
@@ -328,11 +329,11 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       if (QFocusEvent::reason() != QFocusEvent::Popup) {
         // kdDebug(6000) << "RenderWidget::eventFilter captures FocusOut" <<
         // endl;
-        element()->dispatchHTMLEvent(EventImpl::BLUR_EVENT, false, false);
-        //             if (  element()->isEditable() ) {
+        elem->dispatchHTMLEvent(EventImpl::BLUR_EVENT, false, false);
+        //             if (  elem->isEditable() ) {
         //                 KHTMLPartBrowserExtension *ext =
         //                 static_cast<KHTMLPartBrowserExtension *>(
-        //                 element()->view->part()->browserExtension() );
+        //                 elem->view->part()->browserExtension() );
         //                 if ( ext )  ext->editableWidgetBlurred( m_widget );
         //             }
         handleFocusOut();
@@ -340,11 +341,11 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       break;
     case QEvent::FocusIn:
       // kdDebug(6000) << "RenderWidget::eventFilter captures FocusIn" << endl;
-      element()->getDocument()->setFocusNode(element());
+      elem->getDocument()->setFocusNode(elem);
       //         if ( isEditable() ) {
       //             KHTMLPartBrowserExtension *ext =
       //             static_cast<KHTMLPartBrowserExtension *>(
-      //             element()->view->part()->browserExtension() );
+      //             elem->view->part()->browserExtension() );
       //             if ( ext )  ext->editableWidgetFocused( m_widget );
       //         }
       break;
@@ -361,7 +362,7 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       //         QMouseEvent
       //         e2(e->type(),QPoint(absX,absY)+_e->pos(),_e->button(),_e->state());
 
-      //         element()->dispatchMouseEvent(&e2,EventImpl::MOUSEUP_EVENT,m_clickCount);
+      //         elem->dispatchMouseEvent(&e2,EventImpl::MOUSEUP_EVENT,m_clickCount);
 
       //         if((m_mousePos - e2.pos()).manhattanLength() <=
       //         QApplication::startDragDistance()) {
@@ -370,16 +371,16 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       //             // and released in the "same screen location"
       //             // As people usually can't click on the same pixel, we're a
       //             bit tolerant here
-      //             element()->dispatchMouseEvent(&e2,EventImpl::CLICK_EVENT,m_clickCount);
+      //             elem->dispatchMouseEvent(&e2,EventImpl::CLICK_EVENT,m_clickCount);
       //         }
 
       //         if(!isRenderButton()) {
       //             // ### DOMActivate is also dispatched for thigs like
       //             selects & textareas -
       //             // not sure if this is correct
-      //             element()->dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT,m_isDoubleClick
+      //             elem->dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT,m_isDoubleClick
       //             ? 2 : 1);
-      //             element()->dispatchMouseEvent(&e2, m_isDoubleClick ?
+      //             elem->dispatchMouseEvent(&e2, m_isDoubleClick ?
       //             EventImpl::KHTML_DBLCLICK_EVENT :
       //             EventImpl::KHTML_CLICK_EVENT, m_clickCount);
       //             m_isDoubleClick = false;
@@ -402,13 +403,13 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       //         QMouseEvent* _e = static_cast<QMouseEvent*>(e);
       //         QMouseEvent
       //         e2(e->type(),QPoint(absX,absY)+_e->pos(),_e->button(),_e->state());
-      //         element()->dispatchMouseEvent(&e2);
+      //         elem->dispatchMouseEvent(&e2);
       //         // ### change cursor like in KHTMLView?
       //     }
       break;
     case QEvent::KeyPress:
     case QEvent::KeyRelease: {
-      if (!element()->dispatchKeyEvent(static_cast<QKeyEvent*>(e)))
+      if (!elem->dispatchKeyEvent(static_cast<QKeyEvent*>(e)))
         filtered = true;
       break;
     }
@@ -416,7 +417,7 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
       break;
   };
 
-  element()->deref();
+  elem->deref();
 
   // stop processing if the widget gets deleted, but continue in all other cases
   if (hasOneRef())

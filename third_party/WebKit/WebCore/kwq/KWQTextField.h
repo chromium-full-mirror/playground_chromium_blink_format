@@ -41,8 +41,8 @@ class QLineEdit;
   BOOL inDrawingMachinery;
 }
 
-- initWithQLineEdit:(QLineEdit*)widget;
-
+- (id)initWithQLineEdit:(QLineEdit*)widget;
+- (void)invalidate;
 - (void)setPasswordMode:(BOOL)flag;
 - (BOOL)passwordMode;
 - (void)setMaximumLength:(int)len;
