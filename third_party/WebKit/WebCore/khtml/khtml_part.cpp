@@ -5002,6 +5002,9 @@ CSSStyleDeclarationImpl* KHTMLPart::typingStyle() const {
 }
 
 void KHTMLPart::setTypingStyle(CSSStyleDeclarationImpl* style) {
+  if (d->m_typingStyle == style)
+    return;
+
   CSSStyleDeclarationImpl* old = d->m_typingStyle;
   d->m_typingStyle = style;
   if (d->m_typingStyle)
@@ -5259,14 +5262,29 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style) {
       // do nothing
       break;
     case Selection::CARET: {
+      // Calculate the current typing style.
       if (typingStyle()) {
         typingStyle()->merge(style);
         style = typingStyle();
       }
-      CSSComputedStyleDeclarationImpl diff(
+      style->ref();
+      CSSComputedStyleDeclarationImpl computedStyle(
           selection().start().upstream(StayInBlock).node());
-      diff.diff(style);
+      computedStyle.diff(style);
+
+      // Handle block styles, substracting these from the typing style.
+      CSSStyleDeclarationImpl* blockStyle = style->copyBlockProperties();
+      blockStyle->ref();
+      blockStyle->diff(style);
+      if (xmlDocImpl() && blockStyle->length() > 0) {
+        EditCommandPtr cmd(new ApplyStyleCommand(xmlDocImpl(), blockStyle));
+        cmd.apply();
+      }
+      blockStyle->deref();
+
+      // Set the remaining style as the typing style.
       setTypingStyle(style);
+      style->deref();
       break;
     }
     case Selection::RANGE:
