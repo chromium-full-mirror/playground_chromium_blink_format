@@ -210,7 +210,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
    */
   virtual bool isSelectable() const { return false; };
 
-  bool isInline() const;
+  virtual bool isInline() const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool start = false) const;
 
