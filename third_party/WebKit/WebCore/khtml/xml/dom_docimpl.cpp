@@ -1173,8 +1173,6 @@ void DocumentImpl::detach() {
   m_imageLoadEventDispatchSoonList.clear();
   m_imageLoadEventDispatchingList.clear();
 
-  removeAllEventListenersFromAllNodes();
-
   NodeBaseImpl::detach();
 
   if (render)
