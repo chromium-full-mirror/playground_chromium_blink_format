@@ -593,7 +593,6 @@ void RenderText::paintObject(QPainter* p,
                              int tx,
                              int ty,
                              PaintAction paintAction) {
-  int ow = style()->outlineWidth();
   RenderStyle* pseudoStyle = style(true);
   if (pseudoStyle == style())
     pseudoStyle = 0;
@@ -822,7 +821,7 @@ void RenderText::paintObject(QPainter* p,
 #endif
 
       } while (++si < (int)m_lines.count() &&
-               m_lines[si]->checkVerticalPoint(y - ow, ty, h));
+               m_lines[si]->checkVerticalPoint(y, ty, h));
 
 #if APPLE_CHANGES
     }  // end of for loop

@@ -197,6 +197,13 @@ class BorderValue {
   }
 };
 
+class OutlineValue : public BorderValue {
+ public:
+  OutlineValue() { offset = 0; }
+
+  int offset;
+};
+
 enum EBorderPrecedence {
   BOFF,
   BTABLE,
@@ -362,7 +369,7 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
 
   Length x_position;
   Length y_position;
-  BorderValue outline;
+  OutlineValue outline;
 };
 
 //------------------------------------------------
@@ -952,6 +959,9 @@ class RenderStyle : public Shared<RenderStyle> {
     return surround->border.bottom.isTransparent();
   }
 
+  unsigned short outlineSize() const {
+    return outlineWidth() + outlineOffset();
+  }
   unsigned short outlineWidth() const {
     if (background->outline.style == BNONE)
       return 0;
@@ -1067,6 +1077,11 @@ class RenderStyle : public Shared<RenderStyle> {
   }
 
   // CSS3 Getter Methods
+  int outlineOffset() const {
+    if (background->outline.style == BNONE)
+      return 0;
+    return background->outline.offset;
+  }
   ShadowData* textShadow() const { return css3InheritedData->textShadow; }
   float opacity() { return css3NonInheritedData->opacity; }
   EBoxAlignment boxAlign() { return css3NonInheritedData->flexibleBox->align; }
@@ -1299,6 +1314,9 @@ class RenderStyle : public Shared<RenderStyle> {
   }
 
   // CSS3 Setters
+  void setOutlineOffset(unsigned short v) {
+    SET_VAR(background, outline.offset, v)
+  }
   void setTextShadow(ShadowData* val, bool add = false);
   void setOpacity(float f) { SET_VAR(css3NonInheritedData, opacity, f); }
   void setBoxAlign(EBoxAlignment a) {

@@ -260,7 +260,7 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
         left = curr->xPos();
 
     // Now invalidate a rectangle.
-    int ow = style() ? style()->outlineWidth() : 0;
+    int ow = style() ? style()->outlineSize() : 0;
     if (isCompact())
       left -= m_x;
 #ifdef INCREMENTAL_REPAINTING
@@ -270,14 +270,7 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
     if (style()->position() == RELATIVE)
       relativePositionOffset(left, top);
 #endif
-    int eow = ow;
-#ifdef APPLE_CHANGES
-    // Fudge a little to make sure we don't leave artifacts.
-    // We need to do better at this.
-    if (ow && style()->outlineStyle() == APPLEAQUA)
-      eow += 2;
-#endif
-    QRect r(-eow + left, -eow + top, width() + eow * 2, height() + eow * 2);
+    QRect r(-ow + left, -ow + top, width() + ow * 2, height() + ow * 2);
     containingBlock()->computeAbsoluteRepaintRect(r);
     if (ow) {
       for (RenderObject* curr = firstChild(); curr;
@@ -297,7 +290,7 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
     return r;
   } else {
     if (firstLineBox() && firstLineBox()->topOverflow() < 0) {
-      int ow = style() ? style()->outlineWidth() : 0;
+      int ow = style() ? style()->outlineSize() : 0;
       QRect r(-ow, -ow + firstLineBox()->topOverflow(),
               overflowWidth(false) + ow * 2,
               overflowHeight(false) + ow * 2 - firstLineBox()->topOverflow());
