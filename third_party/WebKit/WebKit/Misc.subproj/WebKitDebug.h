@@ -11,6 +11,7 @@
 #define WEBKIT_ASSERT(expr) ((void)0)
 #define WEBKIT_ASSERT_VALID_ARG(arg, expr) ((void)0)
 #define WEBKIT_ASSERT_NOT_NIL(arg) ((void)0)
+#define WEBKIT_ASSERT_NOT_REACHED() ((void)0)
 
 #else
 
@@ -130,6 +131,9 @@ void WebKitLog(unsigned int level,
 
 #define WEBKITDEBUG(format...) \
   WEBKITDEBUGLEVEL(WEBKIT_LOG_GENERIC_DEBUG, format)
+
+#define WEBKIT_ASSERT_NOT_REACHED() \
+  WEBKIT_ASSERTION_FAILURE("reached unreachable code")
 
 #ifdef WEB_MALLOC_TESTING
 #ifdef __cplusplus
