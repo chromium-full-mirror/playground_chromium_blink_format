@@ -667,8 +667,8 @@ void RenderText::print(QPainter* p,
                        int h,
                        int tx,
                        int ty) {
-  if (!isVisible())
-    return;
+  // if ( !isVisible() )
+  //    return;
 
   int s = m_lines.count() - 1;
   if (s < 0)
