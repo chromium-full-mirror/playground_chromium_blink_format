@@ -152,7 +152,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   DOMImplementationImpl* implementation() const;
   ElementImpl* documentElement() const;
-  virtual ElementImpl* createElement(const DOMString& tagName);
+  virtual ElementImpl* createElement(const DOMString& tagName,
+                                     int& exceptioncode);
   DocumentFragmentImpl* createDocumentFragment();
   TextImpl* createTextNode(const DOMString& data);
   CommentImpl* createComment(const DOMString& data);
@@ -164,7 +165,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   EntityReferenceImpl* createEntityReference(const DOMString& name);
   NodeImpl* importNode(NodeImpl* importedNode, bool deep, int& exceptioncode);
   virtual ElementImpl* createElementNS(const DOMString& _namespaceURI,
-                                       const DOMString& _qualifiedName);
+                                       const DOMString& _qualifiedName,
+                                       int& exceptioncode);
   ElementImpl* getElementById(const DOMString& elementId) const;
 
   // Actually part of HTMLDocument, but used for giving XML documents a window
@@ -181,7 +183,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
 
-  virtual ElementImpl* createHTMLElement(const DOMString& tagName);
+  virtual ElementImpl* createHTMLElement(const DOMString& tagName,
+                                         int& exceptioncode);
 
   khtml::CSSStyleSelector* styleSelector() { return m_styleSelector; }
 
