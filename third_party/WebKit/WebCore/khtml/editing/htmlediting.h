@@ -736,6 +736,24 @@ class RemoveNodePreservingChildrenCommand : public CompositeEditCommand {
 //------------------------------------------------------------------------------------------
 // ReplaceSelectionCommand
 
+// --- NodeDesiredStyle helper class
+
+class NodeDesiredStyle {
+ public:
+  NodeDesiredStyle(DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*);
+  NodeDesiredStyle(const NodeDesiredStyle&);
+  ~NodeDesiredStyle();
+
+  DOM::NodeImpl* node() const { return m_node; }
+  DOM::CSSMutableStyleDeclarationImpl* style() const { return m_style; }
+
+  NodeDesiredStyle& operator=(const NodeDesiredStyle&);
+
+ private:
+  DOM::NodeImpl* m_node;
+  DOM::CSSMutableStyleDeclarationImpl* m_style;
+};
+
 // --- ReplacementFragment helper class
 
 class ReplacementFragment {
@@ -753,10 +771,7 @@ class ReplacementFragment {
 
   DOM::NodeImpl* mergeStartNode() const;
 
-  const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&
-  desiredStyles() {
-    return m_styles;
-  }
+  const QValueList<NodeDesiredStyle>& desiredStyles() { return m_styles; }
 
   void pruneEmptyNodes();
 
@@ -792,7 +807,7 @@ class ReplacementFragment {
   EFragmentType m_type;
   DOM::DocumentImpl* m_document;
   DOM::DocumentFragmentImpl* m_fragment;
-  QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*> m_styles;
+  QValueList<NodeDesiredStyle> m_styles;
   bool m_matchStyle;
   bool m_hasInterchangeNewline;
   bool m_hasMoreThanOneBlock;
@@ -822,8 +837,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                                               DOM::NodeImpl* refChild);
 
   void updateNodesInserted(DOM::NodeImpl*);
-  void fixupNodeStyles(
-      const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
+  void fixupNodeStyles(const QValueList<NodeDesiredStyle>&);
 
   ReplacementFragment m_fragment;
   DOM::NodeImpl* m_firstNodeInserted;
@@ -835,11 +849,8 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   bool m_matchStyle;
 };
 
-void mapDesiredStyleForNode(
-    DOM::NodeImpl*,
-    QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
-void derefNodesAndStylesInMap(
-    const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
+void computeAndStoreNodeDesiredStyle(DOM::NodeImpl*,
+                                     QValueList<NodeDesiredStyle>&);
 
 //------------------------------------------------------------------------------------------
 // SetNodeAttributeCommand
