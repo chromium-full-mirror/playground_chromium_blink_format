@@ -162,6 +162,7 @@ class RenderLayer {
     ~RenderZTreeNode() {
       delete next;
       delete child;
+      delete layerElement;
     }
 
     void constructLayerList(QPtrVector<RenderLayerElement>* mergeTmpBuffer,
