@@ -166,6 +166,8 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
   virtual Id id() const;
 
+  virtual NodeImpl* addChild(NodeImpl* child);
+
   long rowIndex() const;
   long sectionRowIndex() const;
 
