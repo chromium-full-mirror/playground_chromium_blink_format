@@ -31,14 +31,15 @@
 
 using namespace khtml;
 
-RenderHtml::RenderHtml(DOM::HTMLElementImpl* node) : RenderFlow(node) {
+RenderHtml::RenderHtml(DOM::HTMLElementImpl* node) : RenderBlock(node) {
   m_layer = new (node->getDocument()->renderArena()) RenderLayer(this);
 }
 
 RenderHtml::~RenderHtml() {}
 
 void RenderHtml::setStyle(RenderStyle* style) {
-  RenderFlow::setStyle(style);
+  style->setDisplay(BLOCK);  // Don't allow RenderHTML to be inline.
+  RenderBlock::setStyle(style);
   setShouldPaintBackgroundOrBorder(true);
 }
 
@@ -122,7 +123,7 @@ void RenderHtml::repaint(bool immediate) {
 }
 
 void RenderHtml::layout() {
-  RenderFlow::layout();
+  RenderBlock::layout();
 
   // kdDebug(0) << renderName() << " height = " << m_height << endl;
   int lp = lowestPosition();

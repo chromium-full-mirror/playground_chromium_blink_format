@@ -31,7 +31,7 @@
 #include <qptrvector.h>
 
 #include "render_box.h"
-#include "render_flow.h"
+#include "render_block.h"
 #include "render_style.h"
 #include "misc/khtmllayout.h"
 
@@ -48,7 +48,7 @@ class RenderTableCell;
 class RenderTableCol;
 class TableLayout;
 
-class RenderTable : public RenderFlow {
+class RenderTable : public RenderBlock {
  public:
   enum Rules {
     None = 0x00,
@@ -77,7 +77,6 @@ class RenderTable : public RenderFlow {
 
   virtual void setStyle(RenderStyle* style);
 
-  virtual bool isRendered() const { return true; }
   virtual bool isTable() const { return true; }
 
   int getColumnPos(int col) const { return columnPos[col]; }
@@ -178,7 +177,7 @@ class RenderTable : public RenderFlow {
   friend class AutoTableLayout;
   friend class FixedTableLayout;
 
-  RenderFlow* tCaption;
+  RenderBlock* tCaption;
   RenderTableSection* head;
   RenderTableSection* foot;
   RenderTableSection* firstBody;
@@ -308,7 +307,7 @@ class RenderTableRow : public RenderContainer {
 
 // -------------------------------------------------------------------------
 
-class RenderTableCell : public RenderFlow {
+class RenderTableCell : public RenderBlock {
  public:
   RenderTableCell(DOM::NodeImpl* node);
 

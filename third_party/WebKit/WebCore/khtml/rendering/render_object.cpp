@@ -34,6 +34,8 @@
 #include <qpainter.h>
 #include "khtmlview.h"
 #include "render_arena.h"
+#include "render_inline.h"
+#include "render_block.h"
 
 #include <assert.h>
 using namespace DOM;
@@ -78,8 +80,10 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
       // a display of inline, make an inline-table.
       else if (node->id() == ID_TABLE && node->getDocument()->inQuirksMode())
         o = new (arena) RenderTable(node);
+      else if (style->display() == INLINE)
+        o = new (arena) RenderInline(node);
       else
-        o = new (arena) RenderFlow(node);
+        o = new (arena) RenderBlock(node);
       break;
     case LIST_ITEM:
       o = new (arena) RenderListItem(node);
@@ -109,7 +113,7 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
       o = new (arena) RenderTableCell(node);
       break;
     case TABLE_CAPTION:
-      o = new (arena) RenderFlow(node);
+      o = new (arena) RenderBlock(node);
       break;
   }
   if (o)
@@ -359,10 +363,12 @@ void RenderObject::setLayouted(bool b) {
   }
 }
 
-RenderObject* RenderObject::containingBlock() const {
-  if (isTableCell()) {
+RenderBlock* RenderObject::containingBlock() const {
+  if (isTableCell())
     return static_cast<const RenderTableCell*>(this)->table();
-  }
+  else if (isRoot())
+    return 0;  // Ensures termination so you can walk up a containingBlock()
+               // chain.
 
   RenderObject* o = parent();
   if (m_style->position() == FIXED) {
@@ -373,25 +379,13 @@ RenderObject* RenderObject::containingBlock() const {
            !o->isRoot())
       o = o->parent();
   } else {
-    while (o && o->isInline())
+    while (o && (o->isInline() || o->isTableRow() || o->isTableSection() ||
+                 o->isTableCol()))
       o = o->parent();
   }
-  // this is just to make sure we return a valid element.
-  // the case below should never happen...
-  if (!o) {
-    if (!isRoot()) {
-#ifndef NDEBUG
-      kdDebug(6040) << this << ": " << renderName()
-                    << "(RenderObject): No containingBlock!" << endl;
-      const RenderObject* p = this;
-      while (p->parent())
-        p = p->parent();
-      p->printTree();
-#endif
-    }
-    return const_cast<RenderObject*>(this);
-  } else
-    return o;
+
+  KHTMLAssert(o && o->isRenderBlock());
+  return static_cast<RenderBlock*>(o);
 }
 
 short RenderObject::containingBlockWidth() const {
@@ -955,7 +949,7 @@ void RenderObject::setOverhangingContents(bool p) {
   RenderObject* cb = containingBlock();
   if (p) {
     m_overhangingContents = true;
-    if (cb != this)
+    if (cb)
       cb->setOverhangingContents();
   } else {
     RenderObject* n;
@@ -970,7 +964,7 @@ void RenderObject::setOverhangingContents(bool p) {
       return;
     else {
       m_overhangingContents = false;
-      if (cb != this)
+      if (cb)
         cb->setOverhangingContents(false);
     }
   }
@@ -1072,8 +1066,8 @@ void RenderObject::removeFromSpecialObjects() {
   if (isPositioned() || isFloating()) {
     RenderObject* p;
     for (p = parent(); p; p = p->parent()) {
-      if (p->isFlow())
-        static_cast<RenderFlow*>(p)->removeSpecialObject(this);
+      if (p->isRenderBlock())
+        static_cast<RenderBlock*>(p)->removeSpecialObject(this);
     }
   }
 }

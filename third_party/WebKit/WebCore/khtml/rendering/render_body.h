@@ -22,7 +22,7 @@
 #ifndef RENDER_BODY
 #define RENDER_BODY
 
-#include "rendering/render_flow.h"
+#include "render_block.h"
 
 namespace DOM {
 class HTMLBodyElementImpl;
@@ -30,7 +30,7 @@ class HTMLBodyElementImpl;
 
 namespace khtml {
 
-class RenderBody : public RenderFlow {
+class RenderBody : public RenderBlock {
  public:
   RenderBody(DOM::HTMLBodyElementImpl* node);
   virtual ~RenderBody();

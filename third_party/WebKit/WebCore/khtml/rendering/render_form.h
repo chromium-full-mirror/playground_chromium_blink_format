@@ -69,7 +69,6 @@ class RenderFormElement : public khtml::RenderWidget {
 
   virtual const char* renderName() const { return "RenderForm"; }
 
-  virtual bool isRendered() const { return true; }
   virtual bool isFormElement() const { return true; }
 
 #if APPLE_CHANGES

@@ -22,7 +22,7 @@
  */
 #include "bidi.h"
 #include "break_lines.h"
-#include "render_flow.h"
+#include "render_block.h"
 #include "render_text.h"
 #include "render_arena.h"
 #include "xml/dom_docimpl.h"
@@ -396,11 +396,11 @@ static void embed(QChar::Direction d) {
 }
 
 // collects one line of the paragraph and transforms it to visual order
-void RenderFlow::bidiReorderLine(const BidiIterator& start,
-                                 const BidiIterator& end) {
+void RenderBlock::bidiReorderLine(const BidiIterator& start,
+                                  const BidiIterator& end) {
   if (start == end) {
     if (start.current() == '\n') {
-      m_height += lineHeight(firstLine);
+      m_height += lineHeight(m_firstLine);
     }
     return;
   }
@@ -891,11 +891,11 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
   int maxDescent = 0;
   r = runs.first();
   while (r) {
-    r->height = r->obj->lineHeight(firstLine);
-    r->baseline = r->obj->baselinePosition(firstLine);
+    r->height = r->obj->lineHeight(m_firstLine);
+    r->baseline = r->obj->baselinePosition(m_firstLine);
     // 	if ( r->baseline > r->height )
     // 	    r->baseline = r->height;
-    r->vertical = r->obj->verticalPositionHint(firstLine);
+    r->vertical = r->obj->verticalPositionHint(m_firstLine);
     // kdDebug(6041) << "object="<< r->obj << " height="<<r->height<<"
     // baseline="<< r->baseline << " vertical=" << r->vertical <<endl;
     // int ascent;
@@ -964,7 +964,7 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
 #endif
     if (r->obj->isText())
       r->width = static_cast<RenderText*>(r->obj)->width(
-          r->start, r->stop - r->start, firstLine);
+          r->start, r->stop - r->start, m_firstLine);
     else {
       r->obj->calcWidth();
       r->width = r->obj->width() + r->obj->marginLeft() + r->obj->marginRight();
@@ -1026,7 +1026,7 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
       }
     }
     r->obj->position(x, r->vertical, r->start, r->stop - r->start, r->width,
-                     r->level % 2, firstLine, spaceAdd);
+                     r->level % 2, m_firstLine, spaceAdd);
     x += r->width + spaceAdd;
     r = runs.next();
   }
@@ -1050,7 +1050,7 @@ static void deleteMidpoints(RenderArena* arena,
   midpoints->clear();
 }
 
-void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
+void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   m_overflowHeight = 0;
 
   invalidateVerticalPositions();
@@ -1081,8 +1081,7 @@ void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
         if (!o->layouted())
           o->layout();
         if (o->isPositioned())
-          static_cast<RenderFlow*>(o->containingBlock())
-              ->insertSpecialObject(o);
+          o->containingBlock()->insertSpecialObject(o);
       } else if (o->isText())
         static_cast<RenderText*>(o)->deleteSlaves();
       o = Bidinext(this, o);
@@ -1105,7 +1104,7 @@ void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
     adjustEmbeddding = false;
     BidiIterator end(this);
 
-    firstLine = true;
+    m_firstLine = true;
 
     if (!smidpoints) {
       smidpoints = new QPtrList<BidiIterator>;
@@ -1135,7 +1134,7 @@ void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
 
         newLine();
       }
-      firstLine = false;
+      m_firstLine = false;
       deleteMidpoints(renderArena(), smidpoints);
     }
     startEmbed->deref();
@@ -1162,8 +1161,8 @@ void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
   // kdDebug(6040) << "height = " << m_height <<endl;
 }
 
-BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
-                                           QPtrList<BidiIterator>& midpoints) {
+BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
+                                            QPtrList<BidiIterator>& midpoints) {
   int width = lineWidth(m_height);
   int w = 0;
   int tmpW = 0;
@@ -1197,8 +1196,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
             width = lineWidth(m_height);
           }
         } else if (o->isPositioned()) {
-          static_cast<RenderFlow*>(o->containingBlock())
-              ->insertSpecialObject(o);
+          o->containingBlock()->insertSpecialObject(o);
         }
       }
 
@@ -1272,7 +1270,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
           width = lineWidth(m_height);
         }
       } else if (o->isPositioned()) {
-        static_cast<RenderFlow*>(o->containingBlock())->insertSpecialObject(o);
+        o->containingBlock()->insertSpecialObject(o);
       }
     } else if (o->isReplaced()) {
       if (o->style()->whiteSpace() != NOWRAP ||
@@ -1325,7 +1323,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       int len = strlen - pos;
       QChar* str = t->text();
 
-      const Font* f = t->htmlFont(firstLine);
+      const Font* f = t->htmlFont(m_firstLine);
       // proportional font, needs a bit more work.
       int lastSpace = pos;
       bool isPre = o->style()->whiteSpace() == PRE;

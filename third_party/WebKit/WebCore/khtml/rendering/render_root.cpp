@@ -36,7 +36,7 @@ using namespace khtml;
 //#define SPEED_DEBUG
 
 RenderRoot::RenderRoot(DOM::NodeImpl* node, KHTMLView* view)
-    : RenderFlow(node) {
+    : RenderBlock(node) {
   // init RenderObject attributes
   setInline(false);
 
@@ -102,7 +102,7 @@ void RenderRoot::calcWidth() {
 void RenderRoot::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-  RenderFlow::calcMinMaxWidth();
+  RenderBlock::calcMinMaxWidth();
 
   m_maxWidth = m_minWidth;
 
@@ -141,7 +141,7 @@ void RenderRoot::layout() {
     m_height = m_rootHeight;
   }
 
-  RenderFlow::layout();
+  RenderBlock::layout();
 
   if (!m_printingMode) {
     m_view->resizeContents(docWidth(), docHeight());
@@ -193,7 +193,7 @@ void RenderRoot::paintObject(QPainter* p,
                              int _ty,
                              PaintAction paintAction) {
 #ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderFlow) " << this
+  kdDebug(6040) << renderName() << "(RenderRoot) " << this
                 << " ::paintObject() w/h = (" << width() << "/" << height()
                 << ")" << endl;
 #endif

@@ -24,7 +24,7 @@
 #ifndef RENDER_LIST_H
 #define RENDER_LIST_H
 
-#include "render_flow.h"
+#include "render_block.h"
 
 // ### list-style-position, list-style-image is still missing
 
@@ -88,7 +88,7 @@ class RenderListMarker : public RenderBox {
   RenderListItem* m_listItem;
 };
 
-class RenderListItem : public RenderFlow {
+class RenderListItem : public RenderBlock {
  public:
   RenderListItem(DOM::NodeImpl*);
   virtual ~RenderListItem();

@@ -173,8 +173,6 @@ class RenderText : public RenderObject {
 
   virtual void setStyle(RenderStyle* style);
 
-  virtual bool isRendered() const { return true; }
-
   virtual void paint(QPainter*,
                      int x,
                      int y,

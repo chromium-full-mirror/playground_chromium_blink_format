@@ -42,7 +42,6 @@ class RenderImage : public RenderReplaced {
 
   virtual const char* renderName() const { return "RenderImage"; }
 
-  virtual bool isRendered() const { return true; }
   virtual bool isImage() const { return true; }
 
   virtual void paintObject(QPainter* p,

@@ -86,6 +86,7 @@ class EventImpl;
 
 namespace khtml {
 class RenderFlow;
+class RenderBlock;
 class RenderStyle;
 class RenderTable;
 class CachedObject;
@@ -175,10 +176,10 @@ class RenderObject : public CachedObjectClient {
   RenderArena* renderArena() const;
 
   // some helper functions...
+  virtual bool isRenderBlock() const { return false; }
+  virtual bool isRenderInline() const { return false; }
   virtual bool childrenInline() const { return false; }
   virtual void setChildrenInline(bool b){};
-  virtual bool isRendered() const { return false; }
-  virtual bool isFlow() const { return false; }
   virtual RenderFlow* continuation() const { return 0; }
 
   virtual bool isListItem() const { return false; }
@@ -419,7 +420,7 @@ class RenderObject : public CachedObjectClient {
   virtual void setStyle(RenderStyle* style);
 
   // returns the containing block level element for this element.
-  RenderObject* containingBlock() const;
+  RenderBlock* containingBlock() const;
 
   // return just the width of the containing block
   virtual short containingBlockWidth() const;
