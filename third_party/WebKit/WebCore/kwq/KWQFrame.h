@@ -36,7 +36,11 @@ class QFrame : public QWidget {
   QFrame(QWidget* parent);
 
   virtual void setFrameStyle(int);
+  int frameStyle();
   int frameWidth() const;
+
+ private:
+  int _frameStyle;
 };
 
 #endif

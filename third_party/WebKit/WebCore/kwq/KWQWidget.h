@@ -134,6 +134,14 @@ class QWidget : public QObject, public QPaintDevice {
   NSView* getView() const;
   void setView(NSView* aView);
 
+  void displayRect(int x, int y, int w, int h);
+  void lockDrawingFocus();
+  void unlockDrawingFocus();
+  void enableFlushDrawing();
+  void disableFlushDrawing();
+  void flushDrawing();
+  void setDrawingAlpha(float alpha);
+
   virtual void endEditing();
 
  protected:
