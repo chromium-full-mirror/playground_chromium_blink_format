@@ -93,6 +93,7 @@ JavaClass::JavaClass(const char* className) {
 }
 
 JavaClass::JavaClass(jobject aClass) {
+  _name = 0;
   _commonInit(aClass);
 }
 
@@ -120,6 +121,11 @@ JavaClass* JavaClass::classForName(const char* name) {
   return aClass;
 }
 
+void JavaClass::setClassName(const char* n) {
+  free((void*)_name);
+  _name = strdup(n);
+}
+
 JavaClass* JavaClass::classForInstance(jobject instance) {
   _createClassesByNameIfNecessary();
 
@@ -136,6 +142,7 @@ JavaClass* JavaClass::classForInstance(jobject instance) {
       (JavaClass*)CFDictionaryGetValue(classesByName, stringName);
   if (aClass == NULL) {
     aClass = new JavaClass(classOfInstance);
+    aClass->setClassName(classNameC);
     CFDictionaryAddValue(classesByName, stringName, aClass);
   }
   CFRelease(stringName);

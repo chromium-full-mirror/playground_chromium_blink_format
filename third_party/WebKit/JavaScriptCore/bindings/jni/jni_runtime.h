@@ -39,49 +39,43 @@ namespace Bindings {
 
 class JavaString {
  public:
-  JavaString() : _env(0), _characters(0), _jString(0){};
+  JavaString() : _characters(0){};
 
-  JavaString(JNIEnv* e, jstring s) : _env(e), _jString(s) {
-    _characters = getCharactersFromJStringInEnv(_env, s);
+  JavaString(JNIEnv* e, jstring s) {
+    const char* c = getCharactersFromJStringInEnv(e, s);
+    _characters = strdup(c);
+    releaseCharactersForJStringInEnv(e, s, c);
   }
 
-  ~JavaString() {
-    releaseCharactersForJStringInEnv(_env, _jString, _characters);
-  }
+  ~JavaString() { free((void*)_characters); }
 
-  JavaString(const JavaString& other)
-      : _env(other._env), _jString(other._jString) {
-    _characters = getCharactersFromJStringInEnv(_env, _jString);
+  JavaString(const JavaString& other) {
+    _characters = strdup(other._characters);
   }
 
   JavaString& operator=(const JavaString& other) {
     if (this == &other)
       return *this;
 
-    releaseCharactersForJStringInEnv(_env, _jString, _characters);
-
-    _env = other._env;
-    _jString = other._jString;
-    _characters = getCharactersFromJStringInEnv(_env, _jString);
+    free((void*)_characters);
+    _characters = strdup(other._characters);
 
     return *this;
   }
 
-  const char* characters() { return _characters; }
+  const char* characters() const { return _characters; }
 
  private:
-  JNIEnv* _env;
   const char* _characters;
-  jstring _jString;
 };
 
 class JavaParameter : public Parameter {
  public:
-  JavaParameter() : _type(0), _JNIType(invalid_type){};
+  JavaParameter() : _JNIType(invalid_type){};
 
   JavaParameter(JNIEnv* env, jstring type);
 
-  ~JavaParameter() { delete _type; };
+  ~JavaParameter(){};
 
   JavaParameter(const JavaParameter& other) : Parameter() {
     _type = other._type;
@@ -92,20 +86,18 @@ class JavaParameter : public Parameter {
     if (this == &other)
       return *this;
 
-    delete _type;
-
     _type = other._type;
     _JNIType = other._JNIType;
 
     return *this;
   }
 
-  virtual RuntimeType type() const { return _type->characters(); }
+  virtual RuntimeType type() const { return _type.characters(); }
 
   JNIType getJNIType() const { return _JNIType; }
 
  private:
-  JavaString* _type;
+  JavaString _type;
   JNIType _JNIType;
 };
 
@@ -152,13 +144,9 @@ class JavaConstructor : public Constructor {
 
 class JavaField : public Field {
  public:
-  JavaField() : _name(0), _type(0), _field(0){};
+  JavaField() : _field(0){};
   JavaField(JNIEnv* env, jobject aField);
-  ~JavaField() {
-    delete _name;
-    delete _type;
-    delete _field;
-  };
+  ~JavaField() { delete _field; };
 
   JavaField(const JavaField& other)
       : Field(), _name(other._name), _type(other._type), _field(other._field){};
@@ -167,8 +155,6 @@ class JavaField : public Field {
     if (this == &other)
       return *this;
 
-    delete _name;
-    delete _type;
     delete _field;
 
     _name = other._name;
@@ -180,25 +166,23 @@ class JavaField : public Field {
 
   virtual KJS::Value valueFromInstance(const Instance* instance) const;
 
-  virtual const char* name() const { return _name->characters(); }
-  virtual RuntimeType type() const { return _type->characters(); }
+  virtual const char* name() const { return _name.characters(); }
+  virtual RuntimeType type() const { return _type.characters(); }
 
  private:
-  JavaString* _name;
-  JavaString* _type;
+  JavaString _name;
+  JavaString _type;
   JNIType _primitiveType;
   JavaInstance* _field;
 };
 
 class JavaMethod : public Method {
  public:
-  JavaMethod() : Method(), _name(0), _signature(0), _returnType(0){};
+  JavaMethod() : Method(), _signature(0){};
 
   JavaMethod(JNIEnv* env, jobject aMethod);
 
   void _commonDelete() {
-    delete _name;
-    delete _returnType;
     delete _signature;
     delete[] _parameters;
   };
@@ -231,8 +215,8 @@ class JavaMethod : public Method {
   };
 
   virtual KJS::Value value() const { return KJS::Value(0); }
-  virtual const char* name() const { return _name->characters(); };
-  virtual RuntimeType returnType() const { return _returnType->characters(); };
+  virtual const char* name() const { return _name.characters(); };
+  virtual RuntimeType returnType() const { return _returnType.characters(); };
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
   virtual long numParameters() const { return _numParameters; };
 
@@ -242,9 +226,9 @@ class JavaMethod : public Method {
  private:
   JavaParameter* _parameters;
   long _numParameters;
-  JavaString* _name;
+  JavaString _name;
   mutable KJS::UString* _signature;
-  JavaString* _returnType;
+  JavaString _returnType;
   JNIType _JNIReturnType;
 };
 }

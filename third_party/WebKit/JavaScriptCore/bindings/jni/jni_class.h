@@ -101,6 +101,8 @@ class JavaClass : public Class {
 
   virtual long numConstructors() const { return _numConstructors; };
 
+  void setClassName(const char* n);
+
  private:
   const char* _name;
   CFDictionaryRef _fields;

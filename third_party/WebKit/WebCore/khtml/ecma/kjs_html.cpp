@@ -50,10 +50,6 @@
 
 #include <kdebug.h>
 
-#if APPLE_CHANGES
-#include <JavaScriptCore/runtime_object.h>
-#endif
-
 using namespace KJS;
 
 IMPLEMENT_PROTOFUNC(HTMLDocFunction)
@@ -293,9 +289,20 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
   if (DOMDocument::hasProperty(exec, propertyName))
     return DOMDocument::tryGet(exec, propertyName);
 
-  // kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() <<
-  // " not found, returning element" << endl;
-  // image and form elements with the name p will be looked up last
+// kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() << "
+// not found, returning element" << endl;
+// image and form elements with the name p will be looked up last
+
+#if APPLE_CHANGES
+  // Look for named applets.
+  // FIXME:  Factor code that creates RuntimeObjectImp for applet.  It's also
+  // located in applets[0].
+  DOM::HTMLCollection applets = doc.applets();
+  DOM::HTMLElement anApplet = applets.namedItem(propertyName.string());
+  if (!anApplet.isNull()) {
+    return getRuntimeObject(exec, anApplet);
+  }
+#endif
 
   DOM::HTMLDocumentImpl* docImpl =
       static_cast<DOM::HTMLDocumentImpl*>(node.handle());
@@ -1214,17 +1221,11 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
         }
       }
     } break;
+#if APPLE_CHANGES
     case ID_APPLET: {
-      DOM::HTMLAppletElementImpl* appletElement =
-          static_cast<DOM::HTMLAppletElementImpl*>(element.handle());
-
-      if (appletElement->getAppletInstance()) {
-        // The instance is owned by the applet element.
-        RuntimeObjectImp valueForApplet(appletElement->getAppletInstance(),
-                                        false);
-        return valueForApplet.get(exec, propertyName);
-      }
+      return getRuntimeObject(exec, element);
     } break;
+#endif
     default:
       break;
   }
@@ -3969,16 +3970,7 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
 
 #if APPLE_CHANGES
       if (node.handle()->id() == ID_APPLET) {
-        DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
-        DOM::HTMLAppletElementImpl* appletElement =
-            static_cast<DOM::HTMLAppletElementImpl*>(element.handle());
-
-        if (appletElement->getAppletInstance()) {
-          // The instance is owned by the applet element.
-          RuntimeObjectImp* appletImp =
-              new RuntimeObjectImp(appletElement->getAppletInstance(), false);
-          return Value(appletImp);
-        }
+        return getRuntimeObject(exec, node);
       }
 #endif
       return getDOMNode(exec, node);
