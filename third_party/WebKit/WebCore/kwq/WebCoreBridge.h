@@ -58,6 +58,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 #define WebCoreElementImageURL @"WebElementImageURL"
 #define WebCoreElementString @"WebElementString"
 #define WebCoreElementImage @"WebElementImage"
+#define WebCoreElementImageLocation @"WebElementImageLocation"
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
