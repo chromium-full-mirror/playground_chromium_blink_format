@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KWQPlugin_H_
-#define KWQPlugin_H_
+#ifndef WKPluginWidget_H_
+#define WKPluginWidget_H_
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -36,10 +36,10 @@
 #import <WKPluginView.h>
 #import <WKPlugin.h>
 
-// class KWQPlugin
+// class WKPluginWidget
 // ===============================================================
 
-class KWQPlugin : public QWidget {
+class WKPluginWidget : public QWidget {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -48,12 +48,11 @@ class KWQPlugin : public QWidget {
 
   // constructors, copy constructors, and destructors ------------------------
 
-  KWQPlugin(QWidget* parent = 0,
-            WKPlugin* plugin = nil,
-            const QString& url = 0,
-            const QString& serviceType = 0,
-            const QStringList& args = 0);
-  ~KWQPlugin();
+  WKPluginWidget(QWidget* parent = 0,
+                 const QString& url = 0,
+                 const QString& serviceType = 0,
+                 const QStringList& args = 0);
+  ~WKPluginWidget();
 
   // member functions --------------------------------------------------------
 
@@ -65,10 +64,10 @@ class KWQPlugin : public QWidget {
   // ---------------------------------------------------------------------
 
  private:
-  KWQPlugin(const KWQPlugin&);
-  KWQPlugin& operator=(const KWQPlugin&);
+  WKPluginWidget(const WKPluginWidget&);
+  WKPluginWidget& operator=(const WKPluginWidget&);
 
-};  // class KWQPlugin
+};  // class WKPluginWidget
     // ============================================================
 
 #endif
