@@ -4,6 +4,7 @@
  */
 #import <Cocoa/Cocoa.h>
 
+#import <WebKit/WebBackForwardList.h>
 #import <WebKit/WebHistoryItem.h>
 
 @interface WebHistoryItem (WebPrivate)
@@ -60,4 +61,10 @@
 - (void)setAlwaysAttemptToUsePageCache:(BOOL)flag;
 - (BOOL)alwaysAttemptToUsePageCache;
 
+@end
+
+@interface WebBackForwardList (WebPrivate)
+- (void)_clearPageCache;
+- (void)_setUsesPageCache:(BOOL)f;
+- (BOOL)_usesPageCache;
 @end
