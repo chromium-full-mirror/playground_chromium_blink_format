@@ -1318,4 +1318,9 @@ void KHTMLParser::finished() {
   // too, not just the HTML case.
   if (doc() && !doc()->firstChild())
     insertNode(new HTMLHtmlElementImpl(document));
+
+  // This ensures that "current" is not left pointing to a node when the
+  // document is destroyed.
+  freeBlock();
+  current = 0;
 }

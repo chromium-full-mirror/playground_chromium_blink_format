@@ -347,6 +347,10 @@ class HTMLTokenizer : public Tokenizer, public khtml::CachedObjectClient {
   KHTMLParser* parser;
 
   KHTMLView* view;
+
+#ifndef NDEBUG
+  bool inWrite;
+#endif
 };
 
 #if APPLE_CHANGES
