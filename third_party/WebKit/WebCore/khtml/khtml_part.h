@@ -71,6 +71,7 @@ struct ChildFrame;
 class MouseEvent;
 class MousePressEvent;
 class MouseDoubleClickEvent;
+class MouseTripleClickEvent;
 class MouseMoveEvent;
 class MouseReleaseEvent;
 class DrawContentsEvent;
@@ -783,6 +784,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Eventhandler for the khtml::MouseDoubleClickEvent.
    */
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
+
+#ifdef APPLE_CHANGES
+  virtual void khtmlMouseTripleClickEvent(khtml::MouseTripleClickEvent*);
+#endif
+
   /**
    * Eventhandler for the khtml::MouseDoubleMoveEvent.
    */

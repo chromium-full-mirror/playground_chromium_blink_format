@@ -441,6 +441,7 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
                                 DOM::NodeImpl::MousePress);
   m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
+#ifndef APPLE_CHANGES
   if (d->clickCount > 0 &&
       QPoint(d->clickX - xm, d->clickY - ym).manhattanLength() <=
           QApplication::startDragDistance())
@@ -450,6 +451,9 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
     d->clickX = xm;
     d->clickY = ym;
   }
+#else
+  d->clickCount = _mouse->clickCount();
+#endif
 
   bool swallowEvent = dispatchMouseEvent(
       EventImpl::MOUSEDOWN_EVENT, mev.innerNode.handle(), true, d->clickCount,
@@ -466,6 +470,8 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
   }
 }
 
+void KHTMLView::viewportMouseTripleClickEvent(QMouseEvent* _mouse) {}
+
 void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
   if (!m_part->xmlDocImpl())
     return;
@@ -481,6 +487,7 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
                                 DOM::NodeImpl::MouseDblClick);
   m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
+#ifndef APPLE_CHANGES
   // We do the same thing as viewportMousePressEvent() here, since the DOM does
   // not treat
   // single and double-click events as separate (only the detail, i.e. number of
@@ -496,6 +503,9 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
     d->clickX = xm;
     d->clickY = ym;
   }
+#else
+  d->clickCount = _mouse->clickCount();
+#endif
   bool swallowEvent = dispatchMouseEvent(
       EventImpl::MOUSEDOWN_EVENT, mev.innerNode.handle(), true, d->clickCount,
       _mouse, true, DOM::NodeImpl::MouseDblClick);
@@ -639,9 +649,11 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
       EventImpl::MOUSEUP_EVENT, mev.innerNode.handle(), true, d->clickCount,
       _mouse, false, DOM::NodeImpl::MouseRelease);
 
+#ifndef APPLE_CHANGES
   if (d->clickCount > 0 &&
       QPoint(d->clickX - xm, d->clickY - ym).manhattanLength() <=
           QApplication::startDragDistance())
+#endif
     dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.handle(), true,
                        d->clickCount, _mouse, true,
                        DOM::NodeImpl::MouseRelease);

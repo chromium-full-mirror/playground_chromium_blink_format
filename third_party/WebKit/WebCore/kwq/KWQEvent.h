@@ -67,6 +67,11 @@ class QMouseEvent : public QEvent {
   QMouseEvent(Type type, const QPoint& pos, int button, int state);
   QMouseEvent(Type type,
               const QPoint& pos,
+              int button,
+              int state,
+              int clickCount);
+  QMouseEvent(Type type,
+              const QPoint& pos,
               const QPoint& global,
               int button,
               int state);
@@ -79,11 +84,13 @@ class QMouseEvent : public QEvent {
   ButtonState button() { return _button; }
   ButtonState state() { return _state; }
   ButtonState stateAfter();
+  int clickCount() { return _clickCount; }
 
  private:
   QPoint _position;
   ButtonState _button;
   ButtonState _state;
+  int _clickCount;
 };
 
 class QTimerEvent : public QEvent {
