@@ -409,7 +409,6 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void initializePositionData();
   void saveTypingStyleState();
   void insertPlaceholderForAncestorBlockContent();
-  bool handleSpecialCaseAllContentDelete();
   bool handleSpecialCaseBRDelete();
   void handleGeneralDelete();
   void fixupWhitespace();
