@@ -300,6 +300,7 @@ enum FrameBorderStyle {
                       lockHistory:(BOOL)lockHistory;
 - (void)reportClientRedirectCancelled;
 
+- (void)focusWindow;
 - (void)unfocusWindow;
 
 - (NSView*)nextKeyViewOutsideWebFrameViews;
