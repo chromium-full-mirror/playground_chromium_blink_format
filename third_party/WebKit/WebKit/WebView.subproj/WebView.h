@@ -69,19 +69,6 @@
 
 @end
 
-@protocol IFDownloadProgressHandler
-
-// Called when progress of a download has been made
-- (void)receivedProgress:(IFLoadProgress*)progress
-      forDownloadHandler:(IFDownloadHandler*)downloadHandler;
-
-// Called when the download has had an error
-- (void)receivedError:(IFError*)error
-    forDownloadHandler:(IFDownloadHandler*)downloadHandler
-       partialProgress:(IFLoadProgress*)progress;
-
-@end
-
 /*
    =============================================================================
 
@@ -122,9 +109,7 @@ typedef enum {
   IFURLPolicyIgnore
 } IFURLPolicy;
 
-@protocol IFWebController<IFResourceProgressHandler,
-                          IFDownloadProgressHandler,
-                          IFScriptContextHandler>
+@protocol IFWebController<IFResourceProgressHandler, IFScriptContextHandler>
 
 // Called when a data source needs to create a frame.  This method encapsulates
 // the
