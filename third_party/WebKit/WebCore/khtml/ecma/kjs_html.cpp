@@ -90,6 +90,10 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
     case HTMLDocument::GetElementsByName:
       return getDOMNodeList(exec,
                             doc.getElementsByName(v.toString(exec).string()));
+    case HTMLDocument::CaptureEvents:
+    case HTMLDocument::ReleaseEvents:
+      // Do nothing for now. These are NS-specific legacy calls.
+      break;
   }
 
   return Undefined();
@@ -119,6 +123,8 @@ const ClassInfo KJS::HTMLDocument::info = {"HTMLDocument", &DOMDocument::info,
   write			HTMLDocument::Write		DontDelete|Function 1
   writeln		HTMLDocument::WriteLn		DontDelete|Function 1
   getElementsByName	HTMLDocument::GetElementsByName	DontDelete|Function 1
+  captureEvents		HTMLDocument::CaptureEvents	DontDelete|Function 0
+  releaseEvents		HTMLDocument::ReleaseEvents	DontDelete|Function 0
   bgColor		HTMLDocument::BgColor		DontDelete
   fgColor		HTMLDocument::FgColor		DontDelete
   alinkColor		HTMLDocument::AlinkColor	DontDelete
@@ -218,6 +224,8 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case Write:
       case WriteLn:
       case GetElementsByName:
+      case CaptureEvents:
+      case ReleaseEvents:
         return lookupOrCreateFunction<HTMLDocFunction>(
             exec, propertyName, this, entry->value, entry->params, entry->attr);
     }

@@ -181,6 +181,7 @@ class Window : public ObjectImp {
     SetInterval,
     ClearInterval,
     CaptureEvents,
+    ReleaseEvents,
     AddEventListener,
     RemoveEventListener,
     Onabort,

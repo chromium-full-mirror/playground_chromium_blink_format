@@ -71,6 +71,8 @@ class HTMLDocument : public DOMDocument {
     Write,
     WriteLn,
     GetElementsByName,
+    CaptureEvents,
+    ReleaseEvents,
     BgColor,
     FgColor,
     AlinkColor,
