@@ -98,8 +98,10 @@ using namespace DOM;
 #endif
 
 using khtml::Decoder;
+using khtml::DeleteTextCommand;
 using khtml::EditCommand;
 using khtml::InlineTextBox;
+using khtml::PasteHTMLCommand;
 using khtml::RenderObject;
 using khtml::RenderText;
 using khtml::Tokenizer;
@@ -2483,6 +2485,11 @@ void KHTMLPart::setSelection(const KHTMLSelection& s) {
 void KHTMLPart::clearSelection() {
   d->m_selection = KHTMLSelection();
   notifySelectionChanged();
+}
+
+void KHTMLPart::deleteSelection() {
+  DeleteTextCommand* cmd = new DeleteTextCommand(d->m_doc);
+  applyCommand(cmd);
 }
 
 void KHTMLPart::invalidateSelection() {
@@ -5088,6 +5095,11 @@ void KHTMLPart::redoEditing() {
 #if APPLE_CHANGES
   KWQ(this)->registerCommandForUndo(cmd->cookie());
 #endif
+}
+
+void KHTMLPart::pasteHTMLString(const QString& HTMLString) {
+  PasteHTMLCommand* cmd = new PasteHTMLCommand(d->m_doc, DOMString(HTMLString));
+  applyCommand(cmd);
 }
 
 #if !APPLE_CHANGES

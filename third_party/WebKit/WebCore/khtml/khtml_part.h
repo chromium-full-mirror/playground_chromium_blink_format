@@ -600,6 +600,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void clearSelection();
 
   /**
+      * Deletes the nodes of the current selection.
+   */
+  void deleteSelection();
+
+  /**
    * Invalidates the current selection.
    */
   void invalidateSelection();
@@ -664,6 +669,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Performs a redo of the edit.
    */
   void redoEditing();
+
+  /**
+   * Pastes an HTML string at the current caret position.
+   */
+  void pasteHTMLString(const QString& HTMLString);
 
   /**
    * Convenience method to show the document's view.
