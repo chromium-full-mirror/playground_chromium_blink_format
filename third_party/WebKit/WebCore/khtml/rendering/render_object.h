@@ -95,6 +95,7 @@ class RenderText;
 class RenderFrameSet;
 class RenderLayer;
 class InlineBox;
+class InlineFlowBox;
 
 /**
  * Base Class for all rendering tree objects.
@@ -131,6 +132,13 @@ class RenderObject : public CachedObjectClient {
   virtual QRect getClipRect(int tx, int ty) { return QRect(0, 0, 0, 0); }
   bool hasClip() { return isPositioned() && style()->hasClip(); }
   bool hasOverflowClip() { return style()->overflow() == OHIDDEN; }
+
+  virtual int getBaselineOfFirstLineBox() {
+    return -1;
+  }  // Tables and blocks implement this.
+  virtual InlineFlowBox* getFirstLineBox() {
+    return 0;
+  }  // Tables and blocks implement this.
 
   // RenderObject tree manipulation
   //////////////////////////////////////////
@@ -179,7 +187,9 @@ class RenderObject : public CachedObjectClient {
   // some helper functions...
   virtual bool isRenderBlock() const { return false; }
   virtual bool isRenderInline() const { return false; }
-  virtual bool isInlineFlow() const { return isRenderInline() || isRunIn(); }
+  virtual bool isInlineFlow() const {
+    return isInline() && !isReplaced() && (isRenderInline() || isRenderBlock());
+  }
   virtual bool childrenInline() const { return false; }
   virtual void setChildrenInline(bool b){};
   virtual RenderFlow* continuation() const { return 0; }

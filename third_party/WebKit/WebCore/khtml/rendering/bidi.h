@@ -100,6 +100,8 @@ struct BidiRun {
   // explicit + implicit levels here
   uchar level;
 
+  bool compact : 1;
+
   BidiRun* nextRun;
 };
 
