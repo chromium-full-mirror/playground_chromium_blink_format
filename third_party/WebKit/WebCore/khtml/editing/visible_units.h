@@ -63,6 +63,8 @@ VisiblePosition previousParagraphPosition(const VisiblePosition&,
                                           int x);
 VisiblePosition nextParagraphPosition(const VisiblePosition&, EAffinity, int x);
 bool inSameParagraph(const VisiblePosition&, const VisiblePosition&);
+bool isStartOfParagraph(const VisiblePosition&);
+bool isEndOfParagraph(const VisiblePosition&);
 
 }  // namespace DOM
 
