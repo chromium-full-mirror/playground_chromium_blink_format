@@ -35,7 +35,7 @@ void setPrintPainter(QPainter* printer) {
   printpainter = printer;
 }
 
-void findWordBoundary(QChar* chars,
+void findWordBoundary(const QChar* chars,
                       int len,
                       int position,
                       int* start,
@@ -47,7 +47,7 @@ void findWordBoundary(QChar* chars,
 #endif
 }
 
-int nextWordFromIndex(QChar* chars, int len, int position, bool forward) {
+int nextWordFromIndex(const QChar* chars, int len, int position, bool forward) {
 #if APPLE_CHANGES
   return KWQFindNextWordFromIndex(chars, len, position, forward);
 #else

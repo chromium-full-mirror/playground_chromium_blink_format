@@ -52,30 +52,55 @@ class Selection {
     WORD,
     LINE,
     PARAGRAPH,
-    DOCUMENT,
     LINE_BOUNDARY,
-    PARAGRAPH_BOUNDARY
+    PARAGRAPH_BOUNDARY,
+    DOCUMENT_BOUNDARY
   };
 
   Selection();
   Selection(const Range&);
+  Selection(const CaretPosition&);
+  Selection(const CaretPosition&, const CaretPosition&);
   Selection(const Position&);
   Selection(const Position&, const Position&);
   Selection(const Selection&);
+
+  Selection& operator=(const Selection& o);
+  Selection& operator=(const Range& r) {
+    moveTo(r);
+    return *this;
+  }
+  Selection& operator=(const CaretPosition& r) {
+    moveTo(r);
+    return *this;
+  }
+  Selection& operator=(const Position& r) {
+    moveTo(r);
+    return *this;
+  }
+
+  void moveTo(const Range&);
+  void moveTo(const CaretPosition&);
+  void moveTo(const CaretPosition&, const CaretPosition&);
+  void moveTo(const Position&);
+  void moveTo(const Position&, const Position&);
+  void moveTo(const Selection&);
 
   EState state() const { return m_state; }
   EAffinity affinity() const { return m_affinity; }
   void setAffinity(EAffinity);
 
-  void moveTo(const Range&);
-  void moveTo(const Selection&);
-  void moveTo(const Position&);
-  void moveTo(const Position&, const Position&);
   bool modify(EAlter, EDirection, ETextGranularity);
+  bool modify(EAlter, int verticalDistance);
   bool expandUsingGranularity(ETextGranularity);
   void clear();
 
-  bool moveToRenderedContent();
+  void setBase(const CaretPosition&);
+  void setExtent(const CaretPosition&);
+  void setBaseAndExtent(const CaretPosition& base, const CaretPosition& extent);
+  void setStart(const CaretPosition&);
+  void setEnd(const CaretPosition&);
+  void setStartAndEnd(const CaretPosition& start, const CaretPosition& end);
 
   void setBase(const Position& pos);
   void setExtent(const Position& pos);
@@ -95,9 +120,11 @@ class Selection {
   }
   Position rangeEnd() const { return m_end.equivalentRangeCompliantPosition(); }
 
-  QRect getRepaintRect() const;
+  QRect caretRect() const;
   void setNeedsLayout(bool flag = true);
+
   void clearModifyBias() { m_modifyBiasSet = false; }
+  void setModifyBias(EAlter, EDirection);
 
   bool isEmpty() const { return state() == NONE; }
   bool notEmpty() const { return !isEmpty(); }
@@ -105,16 +132,6 @@ class Selection {
 
   void debugPosition() const;
   void debugRenderer(khtml::RenderObject* r, bool selected) const;
-
-  Selection& operator=(const Selection& o);
-  Selection& operator=(const Range& r) {
-    moveTo(r);
-    return *this;
-  }
-  Selection& operator=(const Position& r) {
-    moveTo(r);
-    return *this;
-  }
 
   friend class KHTMLPart;
 
@@ -148,8 +165,8 @@ class Selection {
   void layoutCaret();
   void needsCaretRepaint();
   void paintCaret(QPainter* p, const QRect& rect);
+  QRect caretRepaintRect() const;
 
-  static bool nodeIsBeforeNode(NodeImpl* n1, NodeImpl* n2);
   int xPosForVerticalArrowNavigation(EPositionType, bool recalc = false) const;
 
   Position m_base;    // base position for the selection

@@ -105,9 +105,9 @@ typedef enum {
   WebSelectByWord,
   WebSelectByLine,
   WebSelectByParagraph,
-  WebSelectByDocument,
   WebSelectToLineBoundary,
-  WebSelectToParagraphBoundary
+  WebSelectToParagraphBoundary,
+  WebSelectToDocumentBoundary
 } WebSelectionGranularity;
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
@@ -239,6 +239,7 @@ typedef enum {
              wrap:(BOOL)wrapFlag;
 - (void)jumpToSelection;
 - (NSString*)advanceToNextMisspelling;
+- (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
 
 - (void)setTextSizeMultiplier:(float)multiplier;
 
@@ -325,6 +326,10 @@ typedef enum {
 - (void)alterCurrentSelection:(WebSelectionAlteration)alteration
                     direction:(WebSelectionDirection)direction
                   granularity:(WebSelectionGranularity)granularity;
+- (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
+                            verticalDistance:(float)distance;
+- (void)alterCurrentSelection:(WebSelectionAlteration)alteration
+             verticalDistance:(float)distance;
 - (WebSelectionGranularity)selectionGranularity;
 
 - (DOMDocumentFragment*)documentFragmentWithMarkupString:(NSString*)markupString

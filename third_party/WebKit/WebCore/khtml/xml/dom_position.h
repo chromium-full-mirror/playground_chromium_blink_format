@@ -29,7 +29,6 @@
 namespace DOM {
 
 class CSSComputedStyleDeclarationImpl;
-class CSSStyleDeclarationImpl;
 class ElementImpl;
 class NodeImpl;
 
@@ -48,32 +47,16 @@ class Position {
   Position(const Position&);
   ~Position();
 
+  Position& operator=(const Position& o);
+
   NodeImpl* node() const { return m_node; }
   long offset() const { return m_offset; }
 
   ElementImpl* element() const;
   CSSComputedStyleDeclarationImpl* computedStyle() const;
 
-  long renderedOffset() const;
-
   bool isEmpty() const { return m_node == 0; }
   bool notEmpty() const { return m_node != 0; }
-
-  Position equivalentLeafPosition() const;
-
-  Position previousRenderedEditablePosition() const;
-  Position nextRenderedEditablePosition() const;
-
-  Position previousCharacterPosition() const;
-  Position nextCharacterPosition() const;
-
-  // suitable for moving by word in the UI
-  Position previousWordPosition() const;
-  Position nextWordPosition() const;
-
-  // next word boundary - stops between words, so not right for moving by word
-  Position previousWordBoundary() const;
-  Position nextWordBoundary() const;
 
   Position previousLinePosition(int x) const;
   Position nextLinePosition(int x) const;
@@ -103,14 +86,11 @@ class Position {
   Position equivalentDeepPosition() const;
   Position closestRenderedPosition(EAffinity) const;
   bool inRenderedContent() const;
-  bool inRenderedText() const;
   bool isRenderedCharacter() const;
   bool rendersInDifferentPosition(const Position& pos) const;
   bool isFirstRenderedPositionOnLine() const;
   bool isLastRenderedPositionOnLine() const;
   bool inFirstEditableInRootEditableElement() const;
-
-  Position& operator=(const Position& o);
 
   void debugPosition(const char* msg = "") const;
 
@@ -119,6 +99,13 @@ class Position {
 #endif
 
  private:
+  long renderedOffset() const;
+
+  bool inRenderedText() const;
+
+  Position previousCharacterPosition() const;
+  Position nextCharacterPosition() const;
+
   NodeImpl* m_node;
   long m_offset;
 };

@@ -129,7 +129,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void scrollToAnchor(const KURL&);
   void jumpToSelection();
-  QString advanceToNextMisspelling();
+  QString advanceToNextMisspelling(bool startBeforeSelection = false);
 
   void setEncoding(const QString& encoding, bool userChosen);
   void addData(const char* bytes, int length);

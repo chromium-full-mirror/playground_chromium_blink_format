@@ -28,11 +28,14 @@
 
 class QChar;
 
-void KWQFindWordBoundary(QChar* chars,
+void KWQFindWordBoundary(const QChar* chars,
                          int len,
                          int position,
                          int* start,
                          int* end);
-int KWQFindNextWordFromIndex(QChar* chars, int len, int position, bool forward);
+int KWQFindNextWordFromIndex(const QChar* chars,
+                             int len,
+                             int position,
+                             bool forward);
 
 #endif
