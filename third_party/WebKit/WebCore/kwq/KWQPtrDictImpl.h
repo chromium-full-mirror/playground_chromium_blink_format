@@ -30,7 +30,7 @@
 
 #include <stddef.h>
 
-#include <CoreFoundation/CFDictionary.h>
+struct CFDictionaryKeyCallBacks;
 
 class KWQPtrDictPrivate;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,19 +26,12 @@
 #ifndef KWQ_DICT_IMPL_H
 #define KWQ_DICT_IMPL_H
 
-#include <config.h>
-#include <KWQDef.h>
-#include <qstring.h>
-
-#ifndef USING_BORROWED_QDICT
-
 #include <KWQPtrDictImpl.h>
+#include <qstring.h>
 
 class KWQDictImpl : public KWQPtrDictImpl {
  public:
   KWQDictImpl(int size, bool caseSensitive, void (*deleteFunc)(void*));
-  KWQDictImpl(const KWQDictImpl& di);
-  // ~KWQDictImpl();
 
   void insert(const QString& key, const void* value);
   bool remove(const QString& key, bool deleteItems);
@@ -47,12 +40,9 @@ class KWQDictImpl : public KWQPtrDictImpl {
 
 class KWQDictIteratorImpl : public KWQPtrDictIteratorImpl {
  public:
-  KWQDictIteratorImpl(const KWQDictImpl& di);
-  // ~KWQDictIteratorImpl();
+  KWQDictIteratorImpl(const KWQDictImpl& di) : KWQPtrDictIteratorImpl(di) {}
 
   QString currentStringKey() const;
 };
-
-#endif
 
 #endif
