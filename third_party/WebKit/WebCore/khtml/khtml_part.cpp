@@ -3667,8 +3667,6 @@ void KHTMLPart::restoreState(QDataStream& stream) {
   }
 }
 
-#endif
-
 void KHTMLPart::show() {
   if (d->m_view)
     d->m_view->show();
@@ -3678,6 +3676,8 @@ void KHTMLPart::hide() {
   if (d->m_view)
     d->m_view->hide();
 }
+
+#endif  // APPLE_CHANGES
 
 DOM::Node KHTMLPart::nodeUnderMouse() const {
   return d->m_view->nodeUnderMouse();
