@@ -8,9 +8,9 @@
 #import <Foundation/Foundation.h>
 
 #import <WebFoundation/NSURLRequest.h>
-#import <WebFoundation/WebProtocol.h>
+#import <WebFoundation/NSURLProtocol.h>
 
-@interface WebDataProtocol : WebProtocol {
+@interface WebDataProtocol : NSURLProtocol {
 }
 @end
 
