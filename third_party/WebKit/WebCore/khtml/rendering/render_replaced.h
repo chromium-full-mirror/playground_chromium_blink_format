@@ -75,7 +75,7 @@ class RenderReplaced : public RenderBox {
 
 class RenderWidget : public QObject,
                      public RenderReplaced,
-                     public khtml::Shared<RenderWidget> {
+                     private khtml::Shared<RenderWidget> {
   Q_OBJECT
  public:
   RenderWidget(DOM::NodeImpl* node);
@@ -100,7 +100,11 @@ class RenderWidget : public QObject,
   QWidget* widget() const { return m_widget; }
   KHTMLView* view() const { return m_view; }
 
-  void arenaDeref(RenderArena* arena);
+  RenderArena* ref() {
+    _ref++;
+    return renderArena();
+  }
+  void deref(RenderArena* arena);
 
  public slots:
   void slotWidgetDestructed();
@@ -112,9 +116,6 @@ class RenderWidget : public QObject,
 
   QWidget* m_widget;
   KHTMLView* m_view;
-
- private:
-  using khtml::Shared<RenderWidget>::deref;
 };
 };
 

@@ -83,7 +83,6 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
   virtual void init();
   virtual void attach();
-  virtual void detach();
 
   bool noResize() { return noresize; }
   void setLocation(const DOMString& str);
@@ -102,7 +101,6 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
  protected:
   DOMString url;
   DOMString name;
-  KHTMLView* parentWidget;
 
   int marginWidth;
   int marginHeight;

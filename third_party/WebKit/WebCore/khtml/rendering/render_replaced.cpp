@@ -141,7 +141,7 @@ void RenderWidget::detach(RenderArena* renderArena) {
     m_widget->setMouseTracking(false);
   }
 
-  arenaDeref(renderArena);
+  deref(renderArena);
 }
 
 RenderWidget::~RenderWidget() {
@@ -159,12 +159,11 @@ void RenderWidget::resizeWidget(QWidget* widget, int w, int h) {
 #endif
 
   if (widget->width() != w || widget->height() != h) {
-    RenderArena* arena = renderArena();
-    ref();
+    RenderArena* arena = ref();
     element()->ref();
     widget->resize(w, h);
     element()->deref();
-    arenaDeref(arena);
+    deref(arena);
   }
 }
 
@@ -304,8 +303,7 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
   if (!element())
     return true;
 
-  RenderArena* arena = renderArena();
-  ref();
+  RenderArena* arena = ref();
   element()->ref();
 
   bool filtered = false;
@@ -416,12 +414,12 @@ bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
   // stop processing if the widget gets deleted, but continue in all other cases
   if (hasOneRef())
     filtered = true;
-  arenaDeref(arena);
+  deref(arena);
 
   return filtered;
 }
 
-void RenderWidget::arenaDeref(RenderArena* arena) {
+void RenderWidget::deref(RenderArena* arena) {
   if (_ref)
     _ref--;
   if (!_ref)
