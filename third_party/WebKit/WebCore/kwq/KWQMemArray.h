@@ -37,6 +37,7 @@ class QArray {
   T* data() const;
 
   uint size() const;
+  uint count() const;
   bool resize(uint size);
   QArray<T>& duplicate(const T*, int);
 

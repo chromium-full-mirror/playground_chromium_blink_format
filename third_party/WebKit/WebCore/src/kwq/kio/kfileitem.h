@@ -26,4 +26,15 @@
 #ifndef KFILEITEM_H_
 #define KFILEITEM_H_
 
+#include <netaccess.h>
+
+class KFileItem {
+ public:
+  KFileItem(const KIO::UDSEntry&,
+            const KURL&,
+            bool foo = false,
+            bool bar = false);
+  bool isDir() const;
+};
+
 #endif
