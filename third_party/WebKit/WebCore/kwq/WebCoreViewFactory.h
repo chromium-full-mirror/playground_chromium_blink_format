@@ -76,7 +76,7 @@
 - (float)baseline;
 - (void)setVisualFrame:(NSRect)rect;
 - (NSRect)visualFrame;
-- (NSSize)bestVisualFrameSize;
+- (NSSize)bestVisualFrameSizeForCharacterCount:(int)count;
 @end
 
 extern NSString* WebCoreFileButtonFilenameChanged;
