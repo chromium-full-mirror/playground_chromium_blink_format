@@ -497,7 +497,7 @@ void RenderLayer::scrollToOffset(int x,
 
   // Just schedule a full repaint of our object.
   if (repaint)
-    m_object->repaint(true);
+    m_object->repaint();
 
   if (updateScrollbars) {
     if (m_hBar)
@@ -538,6 +538,9 @@ void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
     m_scrollMediator->connect(m_hBar, SIGNAL(valueChanged(int)),
                               SLOT(slotValueChanged(int)));
   } else if (!hasScrollbar && m_hBar) {
+    QScrollView* scrollView = m_object->element()->getDocument()->view();
+    scrollView->removeChild(m_hBar);
+
     m_scrollMediator->disconnect(m_hBar, SIGNAL(valueChanged(int)),
                                  m_scrollMediator, SLOT(slotValueChanged(int)));
     delete m_hBar;
@@ -555,6 +558,9 @@ void RenderLayer::setHasVerticalScrollbar(bool hasScrollbar) {
     m_scrollMediator->connect(m_vBar, SIGNAL(valueChanged(int)),
                               SLOT(slotValueChanged(int)));
   } else if (!hasScrollbar && m_vBar) {
+    QScrollView* scrollView = m_object->element()->getDocument()->view();
+    scrollView->removeChild(m_vBar);
+
     m_scrollMediator->disconnect(m_vBar, SIGNAL(valueChanged(int)),
                                  m_scrollMediator, SLOT(slotValueChanged(int)));
     delete m_vBar;
@@ -691,8 +697,6 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         static_cast<RenderBlock*>(m_object)->layoutBlock(true);
       else
         m_object->layout();
-
-      return;
     }
   }
 
