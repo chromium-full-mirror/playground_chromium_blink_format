@@ -25,8 +25,6 @@
 
   id<WebDocumentRepresentation> representation;
 
-  WebDataSource* parent;
-
   WebController* controller;
 
   // The original URL as requested during initialization.
@@ -37,9 +35,6 @@
 
   // The original URL we may have been redirected to.
   NSURL* finalURL;
-
-  // Child frames of this frame.
-  NSMutableDictionary* frames;
 
   // Client for main resource, and corresponding handle.
   WebMainResourceClient* mainClient;
@@ -87,7 +82,6 @@
 - (Class)_representationClass;
 - (void)_setRepresentation:(id<WebDocumentRepresentation>)representation;
 - (void)_setController:(WebController*)controller;
-- (void)_setParent:(WebDataSource*)p;
 - (void)_startLoading;
 - (void)_stopLoading;
 - (BOOL)_isStopping;
@@ -124,14 +118,5 @@
 - (void)_receivedData:(NSData*)data;
 
 - (void)_defersCallbacksChanged;
-
-/*!
-    @method addFrame:
-    @discussion Add a child frame.  This should only be called by the data
-   source's controller
-    as a result of a createFrame:inParent:.
-    // [Should this be private?]
-*/
-- (void)addFrame:(WebFrame*)frame;
 
 @end
