@@ -25,14 +25,14 @@
 #include "object.h"
 #include "reference_list.h"
 
-#define DO_CONSISTENCY_CHECK 0
+#define DO_CONSISTENCY_CHECK 1
 
 // At the time I added this switch, the optimization still gave a 1.5%
 // performance boost so I couldn't remove it.
 #define USE_SINGLE_ENTRY 1
 
 #if !DO_CONSISTENCY_CHECK
-#define check() ((void)0)
+#define checkConsistency() ((void)0)
 #endif
 
 namespace KJS {
@@ -130,7 +130,7 @@ ValueImp* PropertyMap::get(const Identifier& name) const {
 }
 
 void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
-  check();
+  checkConsistency();
 
   UString::Rep* rep = name._ustring.rep;
 
@@ -148,7 +148,7 @@ void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
       _singleEntry.value = value;
       _singleEntry.attributes = attributes;
       _keyCount = 1;
-      check();
+      checkConsistency();
       return;
     }
   }
@@ -175,7 +175,7 @@ void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
   _table[i].attributes = attributes;
   ++_keyCount;
 
-  check();
+  checkConsistency();
 }
 
 inline void PropertyMap::insert(UString::Rep* key,
@@ -191,7 +191,7 @@ inline void PropertyMap::insert(UString::Rep* key,
 }
 
 void PropertyMap::expand() {
-  check();
+  checkConsistency();
 
   int oldTableSize = _tableSize;
   Entry* oldTable = _table;
@@ -216,11 +216,11 @@ void PropertyMap::expand() {
 
   free(oldTable);
 
-  check();
+  checkConsistency();
 }
 
 void PropertyMap::remove(const Identifier& name) {
-  check();
+  checkConsistency();
 
   UString::Rep* rep = name._ustring.rep;
 
@@ -233,7 +233,7 @@ void PropertyMap::remove(const Identifier& name) {
       key->deref();
       _singleEntry.key = 0;
       _keyCount = 0;
-      check();
+      checkConsistency();
     }
 #endif
     return;
@@ -264,7 +264,7 @@ void PropertyMap::remove(const Identifier& name) {
     insert(key, _table[i].value, _table[i].attributes);
   }
 
-  check();
+  checkConsistency();
 }
 
 void PropertyMap::mark() const {
@@ -339,7 +339,7 @@ void PropertyMap::restore(const SavedProperties& p) {
 
 #if DO_CONSISTENCY_CHECK
 
-void PropertyMap::check() {
+void PropertyMap::checkConsistency() {
   int count = 0;
   for (int j = 0; j != _tableSize; ++j) {
     UString::Rep* rep = _table[j].key;

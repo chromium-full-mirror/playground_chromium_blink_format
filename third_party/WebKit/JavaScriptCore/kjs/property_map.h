@@ -80,7 +80,7 @@ class PropertyMap {
 
   void insert(UString::Rep*, ValueImp* value, int attributes);
 
-  void check();
+  void checkConsistency();
 
   typedef PropertyMapHashTableEntry Entry;
 
