@@ -237,6 +237,29 @@ void ScriptInterpreter::forgetDOMObjectsForDocument(
   }
 }
 
+void ScriptInterpreter::updateDOMObjectDocument(void* objectHandle,
+                                                DOM::DocumentImpl* oldDoc,
+                                                DOM::DocumentImpl* newDoc) {
+  InterpreterImp* first = InterpreterImp::firstInterpreter();
+  if (first) {
+    InterpreterImp* scr = first;
+    do {
+      if (scr->interpreter()->rtti() == 1) {
+        ScriptInterpreter* interp =
+            static_cast<ScriptInterpreter*>(scr->interpreter());
+
+        DOMObject* cachedObject =
+            interp->getDOMObjectForDocument(oldDoc, objectHandle);
+        if (cachedObject) {
+          interp->putDOMObjectForDocument(newDoc, objectHandle, cachedObject);
+        }
+      }
+
+      scr = scr->nextInterpreter();
+    } while (scr != first);
+  }
+}
+
 bool ScriptInterpreter::wasRunByUserGesture() const {
   if (m_evt) {
     int id = m_evt->handle()->id();
