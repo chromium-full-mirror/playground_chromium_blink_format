@@ -256,7 +256,7 @@ enum FrameBorderStyle {
 - (NSView*)viewForPluginWithURL:(NSURL*)URL
                      attributes:(NSArray*)attributesArray
                         baseURL:(NSURL*)baseURL
-                    serviceType:(NSString*)serviceType;
+                       MIMEType:(NSString*)MIMEType;
 - (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
                            attributes:(NSDictionary*)attributes
                               baseURL:(NSURL*)baseURL;

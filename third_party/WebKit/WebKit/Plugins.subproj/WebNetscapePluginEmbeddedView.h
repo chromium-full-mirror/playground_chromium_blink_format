@@ -15,7 +15,7 @@
              plugin:(WebNetscapePluginPackage*)plugin
                 URL:(NSURL*)URL
             baseURL:(NSURL*)baseURL
-               mime:(NSString*)mimeType
+           MIMEType:(NSString*)MIME
          attributes:(NSDictionary*)attributes;
 
 @end

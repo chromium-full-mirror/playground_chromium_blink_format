@@ -7,12 +7,12 @@
 
 @interface WebNullPluginView : NSImageView {
   BOOL didSendError;
-  NSString* mimeType;
-  NSURL* pluginPage;
+  NSString* MIMEType;
+  NSURL* pluginPageURL;
 }
 
 - initWithFrame:(NSRect)frame
-         mimeType:(NSString*)mime
+         MIMEType:(NSString*)mime
        attributes:(NSDictionary*)attributes;
 
 @end
