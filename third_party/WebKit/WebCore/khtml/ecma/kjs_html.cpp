@@ -1399,7 +1399,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           // Update the document's layout before we compute these attributes.
           DOM::DocumentImpl* docimpl = node.handle()->getDocument();
           if (docimpl) {
-            docimpl->updateLayout();
+            docimpl->updateLayoutIgnorePendingStylesheets();
           }
           switch (token) {
             case BodyScrollLeft:
@@ -1811,10 +1811,15 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return Number(anchor.tabIndex());
         case AnchorTarget:
           return String(anchor.target());
-        case AnchorText:
-          return String(anchor.innerText());
         case AnchorType:
           return String(anchor.type());
+        case AnchorText: {
+          DOM::DocumentImpl* docimpl = node.handle()->getDocument();
+          if (docimpl) {
+            docimpl->updateLayoutIgnorePendingStylesheets();
+          }
+        }
+          return String(anchor.innerText());
       }
     } break;
     case ID_IMG: {
@@ -1829,7 +1834,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ImageBorder:
           return Number(image.border());
         case ImageHeight:
-          return Number(image.height());
+          return Number(static_cast<DOM::HTMLImageElementImpl*>(image.handle())
+                            ->height(true));
         case ImageHspace:
           return Number(image.hspace());
         case ImageIsMap:
@@ -1843,7 +1849,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ImageVspace:
           return Number(image.vspace());
         case ImageWidth:
-          return Number(image.width());
+          return Number(static_cast<DOM::HTMLImageElementImpl*>(image.handle())
+                            ->width(true));
         case ImageX:
           return Number(image.x());
         case ImageY:
@@ -2241,7 +2248,12 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       return String(element.className());
     case ElementInnerHTML:
       return String(element.innerHTML());
-    case ElementInnerText:
+    case ElementInnerText: {
+      DOM::DocumentImpl* docimpl = node.handle()->getDocument();
+      if (docimpl) {
+        docimpl->updateLayoutIgnorePendingStylesheets();
+      }
+    }
       return String(element.innerText());
     case ElementOuterHTML:
       return String(element.outerHTML());
@@ -2785,7 +2797,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
             // Update the document's layout before we compute these attributes.
             DOM::DocumentImpl* docimpl = body.handle()->getDocument();
             if (docimpl)
-              docimpl->updateLayout();
+              docimpl->updateLayoutIgnorePendingStylesheets();
             if (token == BodyScrollLeft)
               sview->setContentsPos(value.toInt32(exec), sview->contentsY());
             else

@@ -295,7 +295,7 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
       // attributes.
       DOM::DocumentImpl* docimpl = node.handle()->getDocument();
       if (docimpl) {
-        docimpl->updateLayout();
+        docimpl->updateLayoutIgnorePendingStylesheets();
       }
 
       khtml::RenderObject* rend = node.handle()->renderer();
