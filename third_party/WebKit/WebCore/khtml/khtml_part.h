@@ -1139,6 +1139,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
  public:
   void setTitle(const DOM::DOMString&);
   void detachView();
+  void setStatusBarText(const QString&);
 
   KWQKHTMLPartImpl* impl;
   friend class KWQKHTMLPartImpl;

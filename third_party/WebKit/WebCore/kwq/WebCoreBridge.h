@@ -110,6 +110,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
     (NSString*)name;  // searches entire hierarchy starting with mainFrame
 
 - (void)setTitle:(NSString*)title;
+- (void)setStatusText:(NSString*)status;
 
 - (BOOL)createChildFrameNamed:(NSString*)frameName
                       withURL:(NSURL*)URL

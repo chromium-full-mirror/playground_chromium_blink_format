@@ -2140,6 +2140,7 @@ void KHTMLPart::overURL(const QString& url,
     d->m_kjsStatusBarText = QString::null;
     return;
   }
+#endif
 
   emit onURL(url);
 
@@ -2149,16 +2150,26 @@ void KHTMLPart::overURL(const QString& url,
   }
 
   if (url.find(QString::fromLatin1("javascript:"), 0, false) != -1) {
+#ifdef APPLE_CHANGES
+    // FIXME: how to localize?
+    emit setStatusBarText(
+        "Run script " +
+        url.mid(url.find("javascript:", 0, false) + strlen("javascript:")));
+#else
     emit setStatusBarText(url.mid(url.find("javascript:", 0, false)));
+#endif
     return;
   }
 
   KURL u = completeURL(url);
 
+#ifndef APPLE_CHANGES
   // special case for <a href="">
   if (url.isEmpty())
     u.setFileName(url);
+#endif
 
+#ifndef APPLE_CHANGES
   QString com;
 
   KMimeType::Ptr typ = KMimeType::findByURL(u);
@@ -2170,7 +2181,9 @@ void KHTMLPart::overURL(const QString& url,
     emit setStatusBarText(u.prettyURL());
     return;
   }
+#endif
 
+#ifndef APPLE_CHANGES
   if (u.isLocalFile()) {
     // TODO : use KIO::stat() and create a KFileItem out of its result,
     // to use KFileItem::statusBarText()
@@ -2230,19 +2243,42 @@ void KHTMLPart::overURL(const QString& url,
     }
     emit setStatusBarText(text);
   } else {
+#endif
     QString extra;
     if (target == QString::fromLatin1("_blank")) {
-      extra = i18n(" (In new window)");
+#ifdef APPLE_CHANGES
+      extra = " in new window";
+#else
+    extra = i18n(" (In new window)");
+#endif
     } else if (!target.isEmpty() && (target != QString::fromLatin1("_top")) &&
                (target != QString::fromLatin1("_self")) &&
                (target != QString::fromLatin1("_parent"))) {
-      extra = i18n(" (In other frame)");
+#ifdef APPLE_CHANGES
+      // FIXME: how to localize
+      if (frameExists(target)) {
+        // FIXME: It would be good if we could tell the difference between
+        // an existing frame in the same window vs. one in another window
+        // so we could say "in other window" in that case.
+        extra = " in other frame";
+      } else {
+        extra = " in new window";
+      }
+#else
+    extra = i18n(" (In other frame)");
+#endif
     }
 
     if (u.protocol() == QString::fromLatin1("mailto")) {
       QString
           mailtoMsg /* = QString::fromLatin1("<img src=%1>").arg(locate("icon", QString::fromLatin1("locolor/16x16/actions/mail_send.png")))*/;
-      mailtoMsg += i18n("Email to: ") + KURL::decode_string(u.path());
+#ifdef APPLE_CHANGES
+      // FIXME: how to localize this?
+      // FIXME: addressbook integration? probably not worth it...
+      mailtoMsg += i18n("Send email to ") + KURL::decode_string(u.path());
+#else
+    mailtoMsg += i18n("Email to: ") + KURL::decode_string(u.path());
+#endif
       QStringList queries = QStringList::split('&', u.query().mid(1));
       for (QStringList::Iterator it = queries.begin(); it != queries.end();
            ++it)
@@ -2279,9 +2315,19 @@ void KHTMLPart::overURL(const QString& url,
         }
       }
 #endif
-    emit setStatusBarText(u.prettyURL() + extra);
+#ifdef APPLE_CHANGES
+    // FIXME: needs localization
+    if (extra.isEmpty()) {
+      emit setStatusBarText("Link to " + u.prettyURL() + extra);
+    } else {
+      emit setStatusBarText("Open " + u.prettyURL() + extra);
+    }
+#else
+  emit setStatusBarText(u.prettyURL() + extra);
+#endif
+#ifndef APPLE_CHANGES
   }
-#endif  // APPLE_CHANGES
+#endif
 }
 
 void KHTMLPart::urlSelected(const QString& url,
@@ -4575,6 +4621,10 @@ void KHTMLPart::nodeActivated(const DOM::Node& aNode) {}
 
 void KHTMLPart::setTitle(const DOMString& title) {
   impl->setTitle(title);
+}
+
+void KHTMLPart::setStatusBarText(const QString& status) {
+  impl->setStatusBarText(status);
 }
 
 void KHTMLPart::detachView() {
