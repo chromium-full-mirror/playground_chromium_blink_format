@@ -78,6 +78,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   virtual bool openURL(const KURL&);
   virtual bool closeURL();
+  void didNotOpenURL(const QString&);
 
   void openURLRequest(const KURL&, const KParts::URLArgs&);
   void submitForm(const KURL&, const KParts::URLArgs&);
@@ -238,7 +239,7 @@ class KWQKHTMLPart : public KHTMLPart {
   static NSEvent* _currentEvent;
   static NSResponder* _firstResponderAtMouseDownTime;
 
-  bool _formSubmittedFlag;
+  QString _submittedFormURL;
 
   NSMutableDictionary* _formValues;
 
