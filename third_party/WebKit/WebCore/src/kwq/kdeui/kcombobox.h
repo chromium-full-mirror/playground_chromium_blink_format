@@ -50,7 +50,12 @@ class KComboBox : public QComboBox, public KCompletionBase {
   KComboBox(bool rw, QWidget* parent = 0, const char* name = 0);
   virtual ~KComboBox();
 
-  // member functions --------------------------------------------------------
+// member functions --------------------------------------------------------
+#ifdef APPLE_CHANGES
+  void doneLoading();
+  void setSize(int size);
+#endif
+
   // operators ---------------------------------------------------------------
 
   // protected
