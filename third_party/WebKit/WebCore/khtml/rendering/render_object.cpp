@@ -1342,7 +1342,7 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
       (childrenInline() && firstChild() && firstChild()->isCompact())) {
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling())
-      if (!child->layer() &&
+      if (!child->layer() && !child->isFloating() &&
           child->nodeAtPoint(info, _x, _y, _tx + xPos(), _ty + yPos()))
         inside = true;
   }

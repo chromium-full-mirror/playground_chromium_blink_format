@@ -356,7 +356,8 @@ bool RenderInline::nodeAtPoint(NodeInfo& info,
   // Always check our kids.
   for (RenderObject* child = lastChild(); child;
        child = child->previousSibling())
-    if (!child->layer() && child->nodeAtPoint(info, _x, _y, _tx, _ty))
+    if (!child->layer() && !child->isFloating() &&
+        child->nodeAtPoint(info, _x, _y, _tx, _ty))
       inside = true;
 
   // Check our line boxes if we're still not inside.
