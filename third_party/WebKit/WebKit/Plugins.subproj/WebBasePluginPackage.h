@@ -19,8 +19,6 @@
   NSString* path;
   NSString* filename;
   NSString* pluginDescription;
-
-  BOOL isLoaded;
 }
 
 + (WebBasePluginPackage*)pluginWithPath:(NSString*)pluginPath;
@@ -34,9 +32,5 @@
 - (NSDictionary*)extensionToMIMEDictionary;
 - (NSDictionary*)MIMEToExtensionsDictionary;
 - (NSDictionary*)MIMEToDescriptionDictionary;
-
-- (BOOL)load;
-- (void)unload;
-- (BOOL)isLoaded;
 
 @end

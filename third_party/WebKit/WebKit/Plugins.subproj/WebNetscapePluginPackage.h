@@ -13,6 +13,7 @@
 @interface WebNetscapePluginPackage : WebBasePluginPackage {
   BOOL isBundle;
   BOOL isCFM;
+  BOOL isLoaded;
 
   NPPluginFuncs pluginFuncs;
   NPNetscapeFuncs browserFuncs;
@@ -41,6 +42,9 @@
   NPP_SetValueProcPtr NPP_SetValue;
   NPP_ShutdownProcPtr NPP_Shutdown;
 }
+
+- (BOOL)load;
+- (void)unload;
 
 - (NPP_NewProcPtr)NPP_New;
 - (NPP_DestroyProcPtr)NPP_Destroy;
