@@ -52,7 +52,8 @@ DOMString HTMLBaseElement::href() const {
   if (!impl)
     return DOMString();
   DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
-  s = ownerDocument().completeURL(s);
+  if (!s.isNull())
+    s = ownerDocument().completeURL(s);
   return s;
 }
 
@@ -122,7 +123,8 @@ DOMString HTMLLinkElement::href() const {
   if (!impl)
     return DOMString();
   DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
-  s = ownerDocument().completeURL(s);
+  if (!s.isNull())
+    s = ownerDocument().completeURL(s);
   return s;
 }
 
@@ -347,7 +349,8 @@ DOMString HTMLScriptElement::src() const {
   if (!impl)
     return DOMString();
   DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_SRC);
-  s = ownerDocument().completeURL(s);
+  if (!s.isNull())
+    s = ownerDocument().completeURL(s);
   return s;
 }
 
