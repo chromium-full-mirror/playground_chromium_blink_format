@@ -263,9 +263,10 @@ void RenderCanvas::repaintViewRectangle(const QRect& ur, bool immediate) {
       r.setY(r.y() - m_view->contentsY());
 
       RenderObject* obj = elt->renderer();
-      int frameOffset = (m_view->frameStyle() != QFrame::NoFrame) ? 2 : 0;
-      r.setX(r.x() + obj->borderLeft() + obj->paddingLeft() + frameOffset);
-      r.setY(r.y() + obj->borderTop() + obj->paddingTop() + frameOffset);
+      int yFrameOffset = (m_view->frameStyle() != QFrame::NoFrame) ? 2 : 0;
+      int xFrameOffset = (m_view->frameStyle() != QFrame::NoFrame) ? 1 : 0;
+      r.setX(r.x() + obj->borderLeft() + obj->paddingLeft() + xFrameOffset);
+      r.setY(r.y() + obj->borderTop() + obj->paddingTop() + yFrameOffset);
       obj->repaintRectangle(r, immediate);
     }
   }
