@@ -291,6 +291,7 @@ class RenderTableRow : public RenderContainer {
   virtual void position(int, int, int, int, int, bool, bool, int) {}
 
   virtual void layout();
+  virtual void repaint(bool immediate = false);
 
   RenderTable* table() const {
     return static_cast<RenderTable*>(parent()->parent());
