@@ -31,7 +31,6 @@
 }
 
 + (WebCoreTextRendererFactory*)sharedFactory;
-- init;
 - (id<WebCoreTextRenderer>)rendererWithFamily:(NSString*)family
                                        traits:(NSFontTraitMask)traits
                                          size:(float)size;
