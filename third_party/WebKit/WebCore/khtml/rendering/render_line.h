@@ -116,7 +116,6 @@ class InlineBox {
   virtual InlineBox* lastLeafChild();
   InlineBox* nextLeafChild();
   InlineBox* prevLeafChild();
-  InlineBox* closestLeafChildForXPos(int _x, int _tx);
 
   RenderObject* object() const { return m_object; }
 
@@ -242,7 +241,6 @@ class InlineFlowBox : public InlineRunBox {
   virtual InlineBox* lastLeafChild();
   InlineBox* firstLeafChildAfterBox(InlineBox* start = 0);
   InlineBox* lastLeafChildBeforeBox(InlineBox* start = 0);
-  InlineBox* closestChildForXPos(int _x, int _tx);
 
   virtual void setConstructed() {
     InlineBox::setConstructed();
@@ -477,6 +475,8 @@ class RootInlineBox : public InlineFlowBox {
 
   int selectionTop();
   int selectionHeight() { return kMax(0, m_bottomOverflow - selectionTop()); }
+
+  InlineBox* closestLeafChildForXPos(int _x, int _tx);
 
  protected:
   // Normally we are only as tall as the style on our block dictates, but we
