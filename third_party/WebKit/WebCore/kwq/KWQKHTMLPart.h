@@ -255,6 +255,9 @@ class KWQKHTMLPart : public KHTMLPart {
   void dragSourceMovedTo(const QPoint& loc);
   void dragSourceEndedAt(const QPoint& loc);
 
+  bool mayCut();
+  bool mayCopy();
+  bool mayPaste();
   bool tryCut();
   bool tryCopy();
   bool tryPaste();

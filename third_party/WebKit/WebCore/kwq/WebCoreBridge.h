@@ -361,6 +361,9 @@ typedef enum {
 - (void)dragSourceEndedAt:(NSPoint)windowLoc
                 operation:(NSDragOperation)operation;
 
+- (BOOL)mayDHTMLCut;
+- (BOOL)mayDHTMLCopy;
+- (BOOL)mayDHTMLPaste;
 - (BOOL)tryDHTMLCut;
 - (BOOL)tryDHTMLCopy;
 - (BOOL)tryDHTMLPaste;
