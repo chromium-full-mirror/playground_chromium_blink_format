@@ -248,6 +248,8 @@ void RenderListItem::printObject(QPainter* p,
                                  int _ty) {
   // ### this should scale with the font size in the body... possible?
   // m_marker->printIcon(p, _tx, _ty);
+  if (m_marker)
+    m_marker->printObject(p, _x, _y, _w, _h, _tx, _ty);
   RenderFlow::printObject(p, _x, _y, _w, _h, _tx, _ty);
 }
 
