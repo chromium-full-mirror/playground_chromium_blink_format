@@ -67,6 +67,8 @@ using namespace DOM;
 #include <qintcache.h>
 #include <stdlib.h>
 
+// #define STYLE_SHARING_STATS 1
+
 #define HANDLE_INHERIT(prop, Prop)         \
   if (isInherit) {                         \
     style->set##Prop(parentStyle->prop()); \
@@ -581,9 +583,9 @@ bool CSSStyleSelector::canShareStyleWithElement(NodeImpl* n) {
             QColor linkColor = element->getDocument()->linkColor();
             QColor visitedColor = element->getDocument()->visitedLinkColor();
             if (pseudoState == PseudoUnknown)
-              checkPseudoState(
-                  s, s->renderer()->style()->pseudoState() != PseudoAnyLink ||
-                         linkColor != visitedColor);
+              checkPseudoState(element, s->renderer()->style()->pseudoState() !=
+                                                PseudoAnyLink ||
+                                            linkColor != visitedColor);
             anchorsMatch =
                 (pseudoState == s->renderer()->style()->pseudoState());
           }
@@ -591,6 +593,7 @@ bool CSSStyleSelector::canShareStyleWithElement(NodeImpl* n) {
           if (anchorsMatch) {
 #ifdef STYLE_SHARING_STATS
             fraction++;
+            total++;
             printf("Sharing %d out of %d\n", fraction, total);
 #endif
             return true;
@@ -634,6 +637,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
     }
   }
 #ifdef STYLE_SHARING_STATS
+  total++;
   printf("Sharing %d out of %d\n", fraction, total);
 #endif
   return 0;
