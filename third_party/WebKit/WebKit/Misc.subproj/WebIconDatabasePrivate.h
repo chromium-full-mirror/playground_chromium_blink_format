@@ -24,6 +24,7 @@
   NSMutableSet* iconsOnDiskWithURLs;
   NSMutableSet* iconsToEraseWithURLs;
   NSMutableSet* iconsToSaveWithURLs;
+  NSMutableSet* iconURLsWithNoIcons;
 
   int cleanupCount;
 
@@ -40,6 +41,7 @@
 
 // Called by WebIconLoader after loading an icon.
 - (void)_setIcon:(NSImage*)icon forIconURL:(NSString*)iconURL;
+- (void)_setHaveNoIconForIconURL:(NSString*)iconURL;
 
 // Called by WebDataSource to bind a web site URL to a icon URL and icon image.
 - (void)_setIconURL:(NSString*)iconURL forURL:(NSString*)URL;
