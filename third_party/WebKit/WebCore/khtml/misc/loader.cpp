@@ -150,6 +150,11 @@ void CachedObject::deref(CachedObjectClient* c) {
     Cache::insertInLRUList(this);
 }
 
+void CachedObject::setSize(int size) {
+  Cache::adjustSize(this, size - m_size);
+  m_size = size;
+}
+
 // -------------------------------------------------------------------------------------------
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
@@ -172,11 +177,14 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
                                          const QString& stylesheet_data)
-    : CachedObject(url, CSSStyleSheet, KIO::CC_Verify, 0) {
+    : CachedObject(url,
+                   CSSStyleSheet,
+                   KIO::CC_Verify,
+                   0,
+                   stylesheet_data.length()) {
   m_loading = false;
   m_status = Persistent;
   m_codec = 0;
-  m_size = stylesheet_data.length();
   m_sheet = DOMString(stylesheet_data);
 }
 
@@ -200,8 +208,8 @@ void CachedCSSStyleSheet::data(QBuffer& buffer, bool eof) {
   if (!eof)
     return;
   buffer.close();
-  m_size = buffer.buffer().size();
-  QString data = m_codec->toUnicode(buffer.buffer().data(), m_size);
+  setSize(buffer.buffer().size());
+  QString data = m_codec->toUnicode(buffer.buffer().data(), size());
   m_sheet = DOMString(data);
   m_loading = false;
 
@@ -250,11 +258,10 @@ CachedScript::CachedScript(DocLoader* dl,
 }
 
 CachedScript::CachedScript(const DOMString& url, const QString& script_data)
-    : CachedObject(url, Script, KIO::CC_Verify, 0) {
+    : CachedObject(url, Script, KIO::CC_Verify, 0, script_data.length()) {
   m_loading = false;
   m_status = Persistent;
   m_codec = 0;
-  m_size = script_data.length();
   m_script = DOMString(script_data);
 }
 
@@ -278,8 +285,8 @@ void CachedScript::data(QBuffer& buffer, bool eof) {
   if (!eof)
     return;
   buffer.close();
-  m_size = buffer.buffer().size();
-  QString data = m_codec->toUnicode(buffer.buffer().data(), m_size);
+  setSize(buffer.buffer().size());
+  QString data = m_codec->toUnicode(buffer.buffer().data(), size());
   m_script = DOMString(data);
   m_loading = false;
   checkNotify();
@@ -483,7 +490,6 @@ CachedImage::CachedImage(DocLoader* dl,
   monochrome = false;
   formatType = 0;
   m_status = Unknown;
-  m_size = 0;
   imgSource = 0;
 #if !APPLE_CHANGES
   setAccept(acceptHeader);
@@ -792,7 +798,7 @@ void CachedImage::clear() {
 #if !APPLE_CHANGES
   typeChecked = false;
 #endif
-  m_size = 0;
+  setSize(0);
 
   // No need to delete imageSource - QMovie does it for us
   imgSource = 0;
@@ -848,7 +854,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
     }
 
     QSize s = pixmap_size();
-    m_size = s.width() * s.height() * 2;
+    setSize(s.width() * s.height() * 2);
   }
 #else   // APPLE_CHANGES
   bool canDraw = false;
@@ -879,7 +885,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
       do_notify(*p, p->rect());
     }
     QSize s = pixmap_size();
-    m_size = s.width() * s.height() * 2;
+    setSize(s.width() * s.height() * 2);
   }
 #endif  // APPLE_CHANGES
 }
@@ -1610,6 +1616,43 @@ void Cache::flush(bool force) {
 #endif
 }
 
+#if 0
+
+void Cache::checkLRUAndUncacheableListIntegrity()
+{
+    int count = 0;
+    
+    {
+        int size = 0;
+        CachedObject *prev = 0;
+        for (CachedObject *o = m_headOfLRUList; o; o = o->m_nextInLRUList) {
+            ASSERT(o->allowInLRUList());
+            ASSERT(o->status() != CachedObject::Uncacheable);
+            ASSERT(o->m_prevInLRUList == prev);
+            size += o->size();
+            prev = o;
+            ++count;
+        }
+        ASSERT(m_tailOfLRUList == prev);
+        ASSERT(m_totalSizeOfLRUList == size);
+    }
+    
+    {
+        CachedObject *prev = 0;
+        for (CachedObject *o = m_headOfUncacheableList; o; o = o->m_nextInLRUList) {
+            ASSERT(o->allowInLRUList());
+            ASSERT(o->status() == CachedObject::Uncacheable);
+            ASSERT(o->m_prevInLRUList == prev);
+            prev = o;
+            ++count;
+        }
+    }
+    
+    ASSERT(m_countOfLRUAndUncacheableLists == count);
+}
+
+#endif
+
 void Cache::setSize(int bytes) {
   maxSize = bytes;
   // may be we need to clear parts of the cache
@@ -1735,6 +1778,19 @@ void Cache::insertInLRUList(CachedObject* object) {
 
   if (!uncacheable)
     m_totalSizeOfLRUList += object->size();
+}
+
+void Cache::adjustSize(CachedObject* object, int delta) {
+  if (object->m_nextInLRUList == 0 && object->m_prevInLRUList == 0 &&
+      m_headOfLRUList != object) {
+    return;
+  }
+
+  if (object->status() == CachedObject::Uncacheable) {
+    return;
+  }
+
+  m_totalSizeOfLRUList += delta;
 }
 
 // --------------------------------------
