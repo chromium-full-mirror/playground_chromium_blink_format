@@ -402,6 +402,9 @@ void HTMLStyleElementImpl::childrenChanged() {
   }
 
   if (m_sheet) {
+    if (static_cast<CSSStyleSheetImpl*>(m_sheet)->isLoading())
+      getDocument()
+          ->stylesheetLoaded();  // Remove ourselves from the sheet list.
     m_sheet->deref();
     m_sheet = 0;
   }
