@@ -283,3 +283,7 @@ backforward list.
                 defaultTarget:(id)dt
                 templateClass:(Class)aClass;
 @end
+
+@interface NSObject (WebFrameLoadDelegatePrivate)
+- (void)webView:(WebView*)sender didFirstLayoutInFrame:(WebFrame*)frame;
+@end
