@@ -1261,7 +1261,8 @@ void RenderObject::computeAbsoluteRepaintRect(QRect& r, bool f) {
     return parent()->computeAbsoluteRepaintRect(r, f);
 }
 
-void RenderObject::dirtyLinesFromChangedChild(RenderObject* child) {}
+void RenderObject::dirtyLinesFromChangedChild(RenderObject* child,
+                                              bool adding) {}
 
 #ifndef NDEBUG
 
