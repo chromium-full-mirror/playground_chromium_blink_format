@@ -403,7 +403,7 @@ Value GlobalFuncImp::call(ExecState* exec,
         if (progNode->deref())
           delete progNode;
         if (c.complType() == ReturnValue)
-          return c;
+          return c.value();
         // ### setException() on throw?
         else if (c.complType() == Normal) {
           if (c.isValueCompletion())
@@ -411,7 +411,7 @@ Value GlobalFuncImp::call(ExecState* exec,
           else
             return Undefined();
         } else {
-          return c;
+          return Undefined();
         }
       }
       break;
