@@ -316,11 +316,17 @@ void RenderInline::paintObject(QPainter* p,
 
   paintLineBoxDecorations(p, _x, _y, _w, _h, _tx, _ty, paintAction);
   if (style()->visibility() == VISIBLE && paintAction == PaintActionOutline) {
-    QRect r(_x, _y, _w, _h);
-    paintOutline(p, _tx, _ty, r, r, r);
+#if APPLE_CHANGES
+    EBorderStyle os = style()->outlineStyle();
+    if (os == APPLEAQUA)
+      paintFocusRing(p, _tx, _ty);
+    else
+#endif
+      paintOutlines(p, _tx, _ty);
   }
 }
 
+#if APPLE_CHANGES
 void RenderInline::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
     p->addFocusRingRect(_tx + curr->xPos(), _ty + curr->yPos(), curr->width(),
@@ -336,6 +342,38 @@ void RenderInline::addFocusRingRects(QPainter* p, int _tx, int _ty) {
     continuation()->addFocusRingRects(
         p, _tx - containingBlock()->xPos() + continuation()->xPos(),
         _ty - containingBlock()->yPos() + continuation()->yPos());
+}
+
+void RenderInline::paintFocusRing(QPainter* p, int tx, int ty) {
+  int ow = style()->outlineWidth();
+  if (ow == 0 ||
+      m_isContinuation)  // Continuations get painted by the original inline.
+    return;
+
+  QColor oc = style()->outlineColor();
+  if (!oc.isValid())
+    oc = style()->color();
+
+  p->initFocusRing(ow, oc);
+  addFocusRingRects(p, tx, ty);
+  p->drawFocusRing();
+  p->clearFocusRing();
+}
+#endif
+
+void RenderInline::paintOutlines(QPainter* p, int _tx, int _ty) {
+  QPtrList<QRect> rects;
+  rects.setAutoDelete(true);
+
+  rects.append(new QRect());
+  for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
+    rects.append(
+        new QRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
+  }
+  rects.append(new QRect());
+
+  for (unsigned int i = 1; i < rects.count() - 1; i++)
+    paintOutline(p, _tx, _ty, *rects.at(i - 1), *rects.at(i), *rects.at(i + 1));
 }
 
 void RenderInline::paintOutline(QPainter* p,
@@ -358,16 +396,6 @@ void RenderInline::paintOutline(QPainter* p,
   int l = tx + thisline.left();
   int b = ty + thisline.bottom() + 1;
   int r = tx + thisline.right() + 1;
-
-#ifdef APPLE_CHANGES
-  if (os == APPLEAQUA) {
-    p->initFocusRing(ow, oc);
-    addFocusRingRects(p, tx, ty);
-    p->drawFocusRing();
-    p->clearFocusRing();
-    return;
-  }
-#endif
 
   // left edge
   drawBorder(p, l - ow,
