@@ -151,6 +151,10 @@ class Window : public ObjectImp {
     Scrollbars,
     Scroll,
     ScrollBy,
+#ifdef APPLE_CHANGES
+    ScreenTop,
+    ScreenLeft,
+#endif
     ScrollTo,
     MoveBy,
     MoveTo,
@@ -198,7 +202,6 @@ class Window : public ObjectImp {
     Onsubmit,
     Onunload
   };
-
  protected:
   Value getListener(ExecState* exec, int eventId) const;
   void setListener(ExecState* exec, int eventId, Value func);
