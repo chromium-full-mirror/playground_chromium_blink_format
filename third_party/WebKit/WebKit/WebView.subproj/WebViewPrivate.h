@@ -8,6 +8,7 @@
 
 @class WebError;
 @class WebFrame;
+@protocol WebFormDelegate;
 
 typedef enum { Safari, MacIE, WinIE } UserAgentStringType;
 enum { NumUserAgentStringTypes = WinIE + 1 };
@@ -22,6 +23,7 @@ enum { NumUserAgentStringTypes = WinIE + 1 };
   id<WebContextMenuDelegate> contextMenuDelegate;
   id<WebControllerPolicyDelegate> policyDelegate;
   id<WebLocationChangeDelegate> locationChangeDelegate;
+  id<WebFormDelegate> formDelegate;
 
   id<WebContextMenuDelegate> defaultContextMenuDelegate;
 
@@ -78,5 +80,9 @@ enum { NumUserAgentStringTypes = WinIE + 1 };
 
 - (void)_mouseDidMoveOverElement:(NSDictionary*)dictionary
                    modifierFlags:(unsigned)modifierFlags;
+
+// May well become public
+- (void)_setFormDelegate:(id<WebFormDelegate>)delegate;
+- (id<WebFormDelegate>)_formDelegate;
 
 @end
