@@ -51,6 +51,9 @@ class QTextEdit;
 
 - (void)setFont:(NSFont*)font;
 
+- (void)setTextColor:(NSColor*)color;
+- (void)setBackgroundColor:(NSColor*)color;
+
 - (void)setText:(NSString*)text;
 - (NSString*)text;
 - (NSString*)textWithHardLineBreaks;
