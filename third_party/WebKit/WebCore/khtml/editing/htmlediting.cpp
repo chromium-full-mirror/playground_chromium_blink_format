@@ -1652,7 +1652,8 @@ void DeleteSelectionCommand::initializePositionData() {
   // to be done.
   //
   VisiblePosition visibleEnd(end);
-  if (isFirstVisiblePositionOnLine(visibleEnd)) {
+  if (isFirstVisiblePositionInParagraph(visibleEnd) ||
+      isLastVisiblePositionInParagraph(visibleEnd)) {
     Position previousLineStart =
         previousLinePosition(visibleEnd, DOWNSTREAM, 0).deepEquivalent();
     if (previousLineStart.isNull() ||
@@ -1929,10 +1930,11 @@ void DeleteSelectionCommand::fixupWhitespace() {
 
 // This function moves nodes in the block containing startNode to dstBlock,
 // starting
-// from startNode and proceeding to the end of the block. Nodes in the block
+// from startNode and proceeding to the end of the paragraph. Nodes in the block
 // containing
 // startNode that appear in document order before startNode are not moved.
-// This function is an important helper for deleting selections that cross block
+// This function is an important helper for deleting selections that cross
+// paragraph
 // boundaries.
 void DeleteSelectionCommand::moveNodesAfterNode() {
   if (!m_mergeBlocksAfterDelete)
@@ -1973,11 +1975,21 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
     NodeImpl* moveNode = node;
     node = node->nextSibling();
     removeNode(moveNode);
+    if (moveNode->id() == ID_BR && !moveNode->renderer()) {
+      // Just remove this node, and don't put it back.
+      // If the BR was not rendered (since it was at the end of a block, for
+      // instance),
+      // putting it back in the document might make it appear, and that is not
+      // desirable.
+      break;
+    }
     if (refNode == rootNode)
       insertNodeAt(moveNode, refNode, 0);
     else
       insertNodeAfter(moveNode, refNode);
     refNode = moveNode;
+    if (moveNode->id() == ID_BR)
+      break;
   }
 
   // If the startBlock no longer has any kids, we may need to deal with adding a
@@ -2000,6 +2012,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
   document()->updateLayout();
   if (!startBlock->renderer() || !startBlock->renderer()->firstChild()) {
     removeNode(startBlock);
+    document()->updateLayout();
     if (refNode->renderer() && refNode->renderer()->inlineBox() &&
         refNode->renderer()->inlineBox()->nextOnLineExists()) {
       insertNodeAfter(createBreakElement(document()), refNode);

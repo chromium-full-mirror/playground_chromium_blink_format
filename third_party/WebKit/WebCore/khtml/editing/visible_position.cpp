@@ -514,6 +514,14 @@ bool isFirstVisiblePositionOnLine(const VisiblePosition& pos) {
   return previous.isNull() || visiblePositionsOnDifferentLines(pos, previous);
 }
 
+bool isFirstVisiblePositionInParagraph(const VisiblePosition& pos) {
+  if (pos.isNull())
+    return false;
+
+  return pos.deepEquivalent().upstream(StayInBlock).node()->id() == ID_BR ||
+         isFirstVisiblePositionInBlock(pos);
+}
+
 bool isFirstVisiblePositionInBlock(const VisiblePosition& pos) {
   if (pos.isNull())
     return false;
@@ -538,6 +546,14 @@ bool isLastVisiblePositionOnLine(const VisiblePosition& pos) {
 
   VisiblePosition next = pos.next();
   return next.isNull() || visiblePositionsOnDifferentLines(pos, next);
+}
+
+bool isLastVisiblePositionInParagraph(const VisiblePosition& pos) {
+  if (pos.isNull())
+    return false;
+
+  return pos.deepEquivalent().downstream(StayInBlock).node()->id() == ID_BR ||
+         isLastVisiblePositionInBlock(pos);
 }
 
 bool isLastVisiblePositionInBlock(const VisiblePosition& pos) {
