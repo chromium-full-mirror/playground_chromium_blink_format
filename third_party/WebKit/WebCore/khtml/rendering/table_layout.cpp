@@ -529,21 +529,30 @@ static bool shouldScaleColumns(RenderTable* table) {
   // A special case.  If this table is not fixed width and contained inside
   // a cell, then don't bloat the maxwidth by examining percentage growth.
   bool scale = true;
-  Length tw = table->style()->width();
-  if ((tw.isVariable() || tw.isPercent()) && !table->isPositioned()) {
-    RenderBlock* cb = table->containingBlock();
-    while (cb && !cb->isRoot() && !cb->isTableCell() &&
-           cb->style()->width().isVariable() && !cb->isFloatingOrPositioned())
-      cb = cb->containingBlock();
+  while (table) {
+    Length tw = table->style()->width();
+    if ((tw.isVariable() || tw.isPercent()) && !table->isPositioned()) {
+      RenderBlock* cb = table->containingBlock();
+      while (cb && !cb->isRoot() && !cb->isTableCell() &&
+             cb->style()->width().isVariable() && !cb->isPositioned())
+        cb = cb->containingBlock();
 
-    if (cb && cb->isTableCell() && (cb->style()->width().isVariable() ||
-                                    cb->style()->width().isPercent())) {
-      // The cell must be variable or percent.  The enclosing table *must* be
-      // auto.
-      RenderTableCell* cell = static_cast<RenderTableCell*>(cb);
-      if (cell->table()->style()->width().isVariable())
-        scale = false;
-    }
+      table = 0;
+      if (cb && cb->isTableCell() && (cb->style()->width().isVariable() ||
+                                      cb->style()->width().isPercent())) {
+        if (tw.isPercent())
+          scale = false;
+        else {
+          RenderTableCell* cell = static_cast<RenderTableCell*>(cb);
+          if (cell->colSpan() > 1 ||
+              cell->table()->style()->width().isVariable())
+            scale = false;
+          else
+            table = cell->table();
+        }
+      }
+    } else
+      table = 0;
   }
   return scale;
 }
@@ -754,12 +763,14 @@ int AutoTableLayout::calcEffectiveWidth() {
                lastCol - 1, cMinWidth, minWidth);
 #endif
         int maxw = maxWidth;
+        int minw = minWidth;
         for (unsigned int pos = col; maxw > 0 && pos < lastCol; pos++) {
           if (layoutStruct[pos].width.type == Fixed && haveVariable &&
               fixedWidth <= cMinWidth) {
             int w = QMAX(layoutStruct[pos].effMinWidth,
                          layoutStruct[pos].width.value);
             fixedWidth -= layoutStruct[pos].width.value;
+            minw -= layoutStruct[pos].effMinWidth;
 #ifdef DEBUG_LAYOUT
             qDebug("   col %d: min=%d, effMin=%d, new=%d", pos,
                    layoutStruct[pos].effMinWidth, layoutStruct[pos].effMinWidth,
@@ -771,17 +782,21 @@ int AutoTableLayout::calcEffectiveWidth() {
           }
         }
 
-        for (unsigned int pos = col; maxw > 0 && pos < lastCol; pos++) {
+        for (unsigned int pos = col;
+             maxw > 0 && pos < lastCol && minWidth < cMinWidth; pos++) {
           if (!(layoutStruct[pos].width.type == Fixed && haveVariable &&
                 fixedWidth <= cMinWidth)) {
             int w = QMAX(layoutStruct[pos].effMinWidth,
                          cMinWidth * layoutStruct[pos].effMaxWidth / maxw);
+            w = QMIN(layoutStruct[pos].effMinWidth + (cMinWidth - minw), w);
+
 #ifdef DEBUG_LAYOUT
             qDebug("   col %d: min=%d, effMin=%d, new=%d", pos,
                    layoutStruct[pos].effMinWidth, layoutStruct[pos].effMinWidth,
                    w);
 #endif
             maxw -= layoutStruct[pos].effMaxWidth;
+            minw -= layoutStruct[pos].effMinWidth;
             cMinWidth -= w;
             layoutStruct[pos].effMinWidth = w;
           }
