@@ -2693,8 +2693,9 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
           l = Length(MinIntrinsic);
           apply = true;
         }
-      } else if (id != CSS_PROP_MAX_WIDTH && primitiveValue &&
-                 primitiveValue->getIdent() == CSS_VAL_AUTO) {
+      }
+      if (id != CSS_PROP_MAX_WIDTH && primitiveValue &&
+          primitiveValue->getIdent() == CSS_VAL_AUTO) {
         // kdDebug( 6080 ) << "found value=auto" << endl;
         apply = true;
       }
