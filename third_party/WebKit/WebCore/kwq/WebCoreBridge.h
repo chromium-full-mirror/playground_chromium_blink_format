@@ -194,11 +194,6 @@ typedef enum {
                 (float)printWidthScaleFactor
                                           printHeight:(float)printHeight;
 
-- (void)setUsesInactiveTextBackgroundColor:(BOOL)uses;
-- (BOOL)usesInactiveTextBackgroundColor;
-
-- (void)setShowsFirstResponder:(BOOL)flag;
-
 - (void)setActivationEventNumber:(int)num;
 - (void)mouseDown:(NSEvent*)event;
 - (void)mouseUp:(NSEvent*)event;
@@ -258,6 +253,8 @@ typedef enum {
 
 - (NSAttributedString*)selectedAttributedString;
 - (NSString*)selectedString;
+
+- (void)setDisplaysWithFocusAttributes:(BOOL)flag;
 
 - (NSString*)stringForRange:(DOMRange*)range;
 
@@ -340,8 +337,6 @@ typedef enum {
 
 - (void)insertText:(NSString*)text;
 - (void)insertNewline;
-
-- (void)setCaretVisible:(BOOL)flag;
 
 - (void)setSelectionToDragCaret;
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment;

@@ -300,15 +300,10 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void setMediaType(const QString&);
 
-  void setUsesInactiveTextBackgroundColor(bool u) {
-    _usesInactiveTextBackgroundColor = u;
+  void setDisplaysWithFocusAttributes(bool flag);
+  bool displaysWithFocusAttributes() const {
+    return _displaysWithFocusAttributes;
   }
-  bool usesInactiveTextBackgroundColor() const {
-    return _usesInactiveTextBackgroundColor;
-  }
-
-  void setShowsFirstResponder(bool flag);
-  bool showsFirstResponder() const { return _showsFirstResponder; }
 
   // Convenience, to avoid repeating the code to dig down to get this.
   QChar backslashAsCurrencySymbol() const;
@@ -411,8 +406,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   KWQWindowWidget* _windowWidget;
 
-  bool _usesInactiveTextBackgroundColor;
-  bool _showsFirstResponder;
+  bool _displaysWithFocusAttributes;
   mutable bool _drawSelectionOnly;
   bool _haveUndoRedoOperations;
 

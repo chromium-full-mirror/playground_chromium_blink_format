@@ -161,7 +161,7 @@ class KHTMLPartPrivate {
     m_onlyLocalReferences = false;
 
     m_caretBlinkTimer = 0;
-    m_caretVisible = true;
+    m_caretVisible = false;
     m_caretBlinks = true;
     m_caretPaint = true;
 
