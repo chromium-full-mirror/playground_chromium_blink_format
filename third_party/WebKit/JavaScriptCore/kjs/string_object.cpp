@@ -369,7 +369,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
               continue;
             }
             // Assume number part is one char exactly
-            unsigned long pos = rstr.substr(i + 1, 1).toULong(&ok);
+            unsigned long pos = rstr.substr(i + 1, 1).toULong(
+                &ok, false /* tolerate empty string */);
             if (ok && pos <= (unsigned)reg->subPatterns()) {
               rstr = rstr.substr(0, i) +
                      u.substr((*ovector)[2 * pos],
