@@ -38,6 +38,9 @@ class DocumentImpl;
 class CSSStyleSheetImpl;
 class StyleSheetImpl;
 class DOMString;
+#ifdef APPLE_CHANGES
+class ProcessingInstruction;
+#endif
 
 class EntityImpl : public NodeBaseImpl {
  public:
@@ -154,6 +157,10 @@ class ProcessingInstructionImpl : public NodeBaseImpl,
   virtual void setStyleSheet(const DOM::DOMString& url,
                              const DOM::DOMString& sheet);
   virtual void setStyleSheet(CSSStyleSheetImpl* sheet);
+
+#ifdef APPLE_CHANGES
+  static ProcessingInstruction createInstance(ProcessingInstructionImpl* impl);
+#endif
 
  protected:
   DOMStringImpl* m_target;

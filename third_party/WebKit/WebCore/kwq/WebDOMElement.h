@@ -9,7 +9,7 @@
 @protocol WebDOMNode;
 @protocol WebDOMNodeList;
 
-@protocol WebDOMAttr<NSObject>
+@protocol WebDOMAttr<WebDOMNode>
 
 - (NSString*)name;
 
@@ -23,7 +23,7 @@
 
 @end
 
-@protocol WebDOMCharacterData<NSObject>
+@protocol WebDOMCharacterData<WebDOMNode>
 
 - (NSString*)data;
 
