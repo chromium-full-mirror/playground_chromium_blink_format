@@ -151,6 +151,10 @@ class TextImpl : public CharacterDataImpl {
   static Text createInstance(TextImpl* impl);
 #endif
 
+#ifndef NDEBUG
+  virtual void formatForDebugger(char* buffer, unsigned length) const;
+#endif
+
  protected:
   virtual TextImpl* createNew(DOMStringImpl* _str);
 };

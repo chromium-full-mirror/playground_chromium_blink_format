@@ -483,6 +483,10 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   virtual DOMString toString() const = 0;
 
+#ifndef NDEBUG
+  virtual void formatForDebugger(char* buffer, unsigned length) const;
+#endif
+
  private:  // members
   DocumentPtr* document;
   NodeImpl* m_previous;

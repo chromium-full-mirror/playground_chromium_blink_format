@@ -82,6 +82,10 @@ class Position {
 
   void debugPosition(const char* msg = "") const;
 
+#ifndef NDEBUG
+  void formatForDebugger(char* buffer, unsigned length) const;
+#endif
+
  private:
   NodeImpl* m_node;
   long m_offset;
