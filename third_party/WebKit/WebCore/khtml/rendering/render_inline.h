@@ -45,13 +45,13 @@ class RenderInline : public RenderFlow {
 
   virtual void addChildToFlow(RenderObject* newChild,
                               RenderObject* beforeChild);
-  void splitInlines(RenderFlow* fromBlock,
-                    RenderFlow* toBlock,
-                    RenderFlow* middleBlock,
+  void splitInlines(RenderBlock* fromBlock,
+                    RenderBlock* toBlock,
+                    RenderBlock* middleBlock,
                     RenderObject* beforeChild,
                     RenderFlow* oldCont);
   void splitFlow(RenderObject* beforeChild,
-                 RenderFlow* newBlockBox,
+                 RenderBlock* newBlockBox,
                  RenderObject* newChild,
                  RenderFlow* oldCont);
 

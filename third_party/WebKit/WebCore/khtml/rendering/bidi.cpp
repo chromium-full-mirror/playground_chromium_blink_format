@@ -196,7 +196,7 @@ BidiIterator::BidiIterator() {
   pos = 0;
 }
 
-BidiIterator::BidiIterator(RenderFlow* _par) {
+BidiIterator::BidiIterator(RenderBlock* _par) {
   par = _par;
   obj = first(par);
   pos = 0;
@@ -208,7 +208,7 @@ BidiIterator::BidiIterator(const BidiIterator& it) {
   pos = it.pos;
 }
 
-BidiIterator::BidiIterator(RenderFlow* _par, RenderObject* _obj, int _pos) {
+BidiIterator::BidiIterator(RenderBlock* _par, RenderObject* _obj, int _pos) {
   par = _par;
   obj = _obj;
   pos = _pos;
@@ -1156,7 +1156,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 #if BIDI_DEBUG > 1
   kdDebug(6041) << " ------- bidi end " << this << " -------" << endl;
 #endif
-  // kdDebug() << "RenderFlow::layoutInlineChildren time used " << qt.elapsed()
+  // kdDebug() << "RenderBlock::layoutInlineChildren time used " << qt.elapsed()
   // << endl;
   // kdDebug(6040) << "height = " << m_height <<endl;
 }
@@ -1383,7 +1383,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               m_height = fb;
               width = newLineWidth;
 #ifdef DEBUG_LINEBREAKS
-              kdDebug() << "RenderFlow::findNextLineBreak new position at "
+              kdDebug() << "RenderBlock::findNextLineBreak new position at "
                         << m_height << " newWidth " << width << endl;
 #endif
             }
@@ -1477,7 +1477,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         m_height = fb;
         width = newLineWidth;
 #ifdef DEBUG_LINEBREAKS
-        kdDebug() << "RenderFlow::findNextLineBreak new position at "
+        kdDebug() << "RenderBlock::findNextLineBreak new position at "
                   << m_height << " newWidth " << width << endl;
 #endif
       }

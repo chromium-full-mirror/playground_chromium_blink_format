@@ -28,7 +28,7 @@
 class RenderArena;
 
 namespace khtml {
-class RenderFlow;
+class RenderBlock;
 class RenderObject;
 
 class BidiContext {
@@ -100,8 +100,8 @@ struct BidiRun {
 class BidiIterator {
  public:
   BidiIterator();
-  BidiIterator(RenderFlow* par);
-  BidiIterator(RenderFlow* par, RenderObject* _obj, int _pos = 0);
+  BidiIterator(RenderBlock* par);
+  BidiIterator(RenderBlock* par, RenderObject* _obj, int _pos = 0);
 
   BidiIterator(const BidiIterator& it);
   BidiIterator& operator=(const BidiIterator& it);
@@ -127,7 +127,7 @@ class BidiIterator {
   void* operator new(size_t sz) throw();
 
  public:
-  RenderFlow* par;
+  RenderBlock* par;
   RenderObject* obj;
   unsigned int pos;
 };

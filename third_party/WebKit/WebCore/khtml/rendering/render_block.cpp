@@ -199,7 +199,7 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       newStyle->inheritFrom(style());
       newStyle->setDisplay(BLOCK);
 
-      RenderFlow* newBox =
+      RenderBlock* newBox =
           new (renderArena()) RenderBlock(0 /* anonymous box */);
       newBox->setStyle(newStyle);
       newBox->setIsAnonymousBox(true);
@@ -402,7 +402,7 @@ void RenderBlock::layout() {
 //                     endl;
 
 #ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderFlow) " << this
+  kdDebug(6040) << renderName() << "(RenderBlock) " << this
                 << " ::layout() width=" << m_width
                 << ", layouted=" << layouted() << endl;
   if (containingBlock() == static_cast<RenderObject*>(this))
@@ -606,7 +606,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   bool strictMode =
       isAnonymousBox() ? true : (!element()->getDocument()->inQuirksMode());
 
-  // kdDebug() << "RenderFlow::layoutBlockChildren " << prevMargin << endl;
+  // kdDebug() << "RenderBlock::layoutBlockChildren " << prevMargin << endl;
 
   // take care in case we inherited floats
   if (child && floatBottom() > m_height)
@@ -631,8 +631,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (child->isPositioned()) {
       static_cast<RenderBlock*>(child->containingBlock())
           ->insertSpecialObject(child);
-      // kdDebug() << "RenderFlow::layoutBlockChildren inserting positioned into
-      // " << child->containingBlock()->renderName() << endl;
+      // kdDebug() << "RenderBlock::layoutBlockChildren inserting positioned
+      // into " << child->containingBlock()->renderName() << endl;
 
       child = child->nextSibling();
       continue;
@@ -654,7 +654,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       if (prevFlow)
         m_height -= prevFlow->collapsedMarginBottom();
 
-      // kdDebug() << "RenderFlow::layoutBlockChildren inserting float at "<<
+      // kdDebug() << "RenderBlock::layoutBlockChildren inserting float at "<<
       // m_height <<" prevMargin="<<prevMargin << endl;
       child = child->nextSibling();
       continue;
@@ -1539,10 +1539,10 @@ void RenderBlock::clearFloats() {
     if (!prev)
       return;
   }
-  // kdDebug() << "RenderFlow::clearFloats found previous "<< (void *)this << "
+  // kdDebug() << "RenderBlock::clearFloats found previous "<< (void *)this << "
   // prev=" << (void *)prev<< endl;
 
-  // add overhanging special objects from the previous RenderFlow
+  // add overhanging special objects from the previous RenderBlock
   if (!prev->isRenderBlock())
     return;
   RenderBlock* flow = static_cast<RenderBlock*>(prev);

@@ -370,7 +370,6 @@ class RenderObject : public CachedObjectClient {
   // if readonly == false, it will recalc hover styles accordingly
   class NodeInfo {
     friend class RenderImage;
-    friend class RenderFlow;
     friend class RenderText;
     friend class RenderObject;
     friend class RenderFrameSet;

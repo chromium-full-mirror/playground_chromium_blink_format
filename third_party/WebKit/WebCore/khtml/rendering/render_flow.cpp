@@ -43,12 +43,14 @@
 using namespace DOM;
 using namespace khtml;
 
-RenderObject* RenderFlow::createFlow(DOM::NodeImpl* node,
-                                     RenderStyle* style,
-                                     RenderArena* arena) {
-  RenderObject* result = (style->display() == INLINE)
-                             ? (RenderObject*)(new (arena) RenderInline(node))
-                             : (RenderObject*)(new (arena) RenderBlock(node));
+RenderFlow* RenderFlow::createFlow(DOM::NodeImpl* node,
+                                   RenderStyle* style,
+                                   RenderArena* arena) {
+  RenderFlow* result;
+  if (style->display() == INLINE)
+    result = new (arena) RenderInline(node);
+  else
+    result = new (arena) RenderBlock(node);
   result->setStyle(style);
   return result;
 }
