@@ -92,6 +92,15 @@ extern NSString*
 + (BOOL)canShowMIMEType:(NSString*)MIMEType;
 
 /*!
+     @method canShowMIMETypeAsHTML:
+     @abstract Checks if the the MIME type is a type that the WebKit will
+   interpret as HTML.
+     @param MIMEType The MIME type to check.
+     @result YES if the MIMEtype in an HTML type.
+*/
++ (BOOL)canShowMIMETypeAsHTML:(NSString*)MIMEType;
+
+/*!
     @method initWithFrame:frameName:groupName:
     @abstract The designated initializer for WebView.
     @discussion Initialize a WebView with the supplied parameters. This method
