@@ -68,10 +68,15 @@ using namespace khtml;
 class HTMLStackElem {
  public:
   HTMLStackElem(int _id, int _level, DOM::NodeImpl* _node, HTMLStackElem* _next)
-      : id(_id), level(_level), node(_node), next(_next) {}
+      : id(_id),
+        level(_level),
+        strayTableContent(false),
+        node(_node),
+        next(_next) {}
 
   int id;
   int level;
+  bool strayTableContent;
   NodeImpl* node;
   HTMLStackElem* next;
 };
@@ -161,6 +166,7 @@ void KHTMLParser::reset() {
   haveFrameSet = false;
   haveContent = false;
   inSelect = false;
+  inStrayTableContent = false;
 
   form = 0;
   map = 0;
@@ -288,6 +294,11 @@ void KHTMLParser::parseToken(Token* t) {
   }
 }
 
+static bool isTableRelatedTag(int id) {
+  return (id == ID_TR || id == ID_TD || id == ID_TABLE || id == ID_TBODY ||
+          id == ID_TFOOT || id == ID_THEAD || id == ID_TH);
+}
+
 bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
   int id = n->id();
 
@@ -354,6 +365,17 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
 
     // switch according to the element to insert
     switch (id) {
+      case ID_TR:
+      case ID_TH:
+      case ID_TD:
+        if (inStrayTableContent) {
+          // pop out to the nearest enclosing table-related tag.
+          while (!isTableRelatedTag(current->id()))
+            popOneBlock();
+          inStrayTableContent = false;
+          return insertNode(n);
+        }
+        break;
       case ID_COMMENT:
         break;
       case ID_HEAD:
@@ -627,6 +649,8 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
                   endTag[id] != DOM::FORBIDDEN) {
                 pushBlock(id, tagPriority[id]);
                 current = n;
+                inStrayTableContent = true;
+                blockStack->strayTableContent = true;
               }
               return true;
             }
@@ -1207,6 +1231,9 @@ void KHTMLParser::popOneBlock() {
 
   blockStack = Elem->next;
   current = Elem->node;
+
+  if (Elem->strayTableContent)
+    inStrayTableContent = false;
 
   delete Elem;
 }
