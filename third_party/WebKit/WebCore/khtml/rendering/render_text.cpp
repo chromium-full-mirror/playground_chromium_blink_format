@@ -1247,6 +1247,8 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
   RootInlineBox* firstRootBox = 0;
   RootInlineBox* lastRootBox = 0;
 
+  bool dirtiedLines = false;
+
   // Dirty all text boxes that include characters in between offset and
   // offset+len.
   for (InlineTextBox* curr = firstTextBox(); curr; curr = curr->nextTextBox()) {
@@ -1258,17 +1260,28 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
     if (curr->start() > end) {
       curr->offsetRun(delta);
       RootInlineBox* root = curr->root();
-      if (!firstRootBox)
+      if (!firstRootBox) {
         firstRootBox = root;
+        if (!dirtiedLines) {  // The affected area was in between two runs. Go
+                              // ahead and mark the root box of the run after
+                              // the affected area as dirty.
+          firstRootBox->markDirty();
+          dirtiedLines = true;
+        }
+      }
       lastRootBox = root;
-    } else if (curr->end() >= offset && curr->end() <= end)
+    } else if (curr->end() >= offset && curr->end() <= end) {
       curr->dirtyLineBoxes();  // Text run overlaps with the left end of the
                                // affected range.
-    else if (curr->start() <= offset && curr->end() >= end)
+      dirtiedLines = true;
+    } else if (curr->start() <= offset && curr->end() >= end) {
       curr->dirtyLineBoxes();  // Text run subsumes the affected range.
-    else if (curr->start() <= end && curr->end() >= end)
+      dirtiedLines = true;
+    } else if (curr->start() <= end && curr->end() >= end) {
       curr->dirtyLineBoxes();  // Text run overlaps with right end of the
                                // affected range.
+      dirtiedLines = true;
+    }
   }
 
   // Now we have to walk all of the clean lines and adjust their cached line
@@ -1287,7 +1300,7 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
       curr->setLineBreakPos(curr->lineBreakPos() + delta);
   }
 
-  m_linesDirty = true;
+  m_linesDirty = dirtiedLines;
   setText(text, force);
 }
 
