@@ -12,6 +12,26 @@
     a clicked element.
 */
 
+/*!
+    @enum WebMenuItemTag
+    @discussion Each menu item in the default menu items array passed in
+    contextMenuItemsForElement:defaultMenuItems: has its tag set to one of the
+   WebMenuItemTags.
+    When iterating through the default menu items array, use the tag to
+   differentiate between them.
+*/
+
+enum {
+  WebMenuItemTagOpenLinkInNewWindow = 1,
+  WebMenuItemTagDownloadLinkToDisk,
+  WebMenuItemTagCopyLinkToClipboard,
+  WebMenuItemTagOpenImageInNewWindow,
+  WebMenuItemTagDownloadImageToDisk,
+  WebMenuItemTagCopyImageToClipboard,
+  WebMenuItemTagOpenFrameInNewWindow,
+  WebMenuItemTagCopy
+};
+
 @protocol WebContextMenuDelegate<NSObject>
 
 /*!
@@ -21,6 +41,6 @@
     for the dictionary representation of the clicked element.
 */
 - (NSArray*)contextMenuItemsForElement:(NSDictionary*)element
-                      defaultMenuItems:(NSArray*)menuItems;
+                      defaultMenuItems:(NSArray*)defaultMenuItems;
 
 @end
