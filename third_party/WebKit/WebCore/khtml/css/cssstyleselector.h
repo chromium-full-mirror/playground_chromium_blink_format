@@ -106,7 +106,8 @@ class CSSStyleSelector : public StyleSelector {
   void initElementAndPseudoState(DOM::ElementImpl* e);
   void initForStyleResolve(DOM::ElementImpl* e, RenderStyle* parentStyle);
   RenderStyle* styleForElement(DOM::ElementImpl* e,
-                               RenderStyle* parentStyle = 0);
+                               RenderStyle* parentStyle = 0,
+                               bool allowSharing = true);
   RenderStyle* pseudoStyleForElement(RenderStyle::PseudoId pseudoStyle,
                                      DOM::ElementImpl* e,
                                      RenderStyle* parentStyle = 0);
