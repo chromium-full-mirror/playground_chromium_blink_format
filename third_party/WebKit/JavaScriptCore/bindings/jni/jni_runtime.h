@@ -77,16 +77,15 @@ class JavaString {
 
 class JavaParameter : public Parameter {
  public:
-  JavaParameter() : _type(0){};
+  JavaParameter() : _type(0), _JNIType(invalid_type){};
 
-  JavaParameter(JNIEnv* env, jstring type) {
-    _type = new JavaString(env, type);
-  };
+  JavaParameter(JNIEnv* env, jstring type);
 
   ~JavaParameter() { delete _type; };
 
   JavaParameter(const JavaParameter& other) : Parameter() {
     _type = other._type;
+    _JNIType = other._JNIType;
   };
 
   JavaParameter& operator=(const JavaParameter& other) {
@@ -96,14 +95,18 @@ class JavaParameter : public Parameter {
     delete _type;
 
     _type = other._type;
+    _JNIType = other._JNIType;
 
     return *this;
   }
 
   virtual RuntimeType type() const { return _type->characters(); }
 
+  JNIType getJNIType() const { return _JNIType; }
+
  private:
   JavaString* _type;
+  JNIType _JNIType;
 };
 
 class JavaConstructor : public Constructor {

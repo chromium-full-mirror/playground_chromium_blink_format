@@ -66,8 +66,8 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
 
 Value RuntimeObjectImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
-  printf("%s: NOT FULLY IMPLEMENTED %p: propertyName %s\n", __PRETTY_FUNCTION__,
-         instance, propertyName.ascii());
+  printf("%s: %p: propertyName %s\n", __PRETTY_FUNCTION__, instance,
+         propertyName.ascii());
   // Get the value of the RuntimeObject's property.
 
   Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
@@ -86,6 +86,9 @@ Value RuntimeObjectImp::get(ExecState* exec,
            aMethod);
     return Object(new RuntimeMethodImp(exec, propertyName, aMethod));
   }
+
+  printf("%s: %p: unable to find propertyName %s\n", __PRETTY_FUNCTION__,
+         instance, propertyName.ascii());
 
   return Undefined();
 }

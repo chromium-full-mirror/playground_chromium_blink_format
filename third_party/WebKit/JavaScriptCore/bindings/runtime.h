@@ -98,7 +98,8 @@ class Instance {
 
   virtual KJS::Value getValueOfField(const Field* aField) const;
 
-  virtual KJS::Value invokeMethod(const Method* method,
+  virtual KJS::Value invokeMethod(KJS::ExecState* exec,
+                                  const Method* method,
                                   const KJS::List& args) = 0;
 
   virtual ~Instance(){};

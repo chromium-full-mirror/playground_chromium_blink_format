@@ -34,6 +34,11 @@
 using namespace KJS;
 using namespace Bindings;
 
+JavaParameter::JavaParameter(JNIEnv* env, jstring type) {
+  _type = new JavaString(env, type);
+  _JNIType = primitiveTypeFromClassName(_type->characters());
+};
+
 JavaField::JavaField(JNIEnv* env, jobject aField) {
   // Get field type
   jobject fieldType =
@@ -140,6 +145,9 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   jstring methodName =
       (jstring)callJNIObjectMethod(aMethod, "getName", "()Ljava/lang/String;");
   _name = new JavaString(env, methodName);
+
+  // Created lazily.
+  _signature = 0;
 }
 
 const char* JavaMethod::signature() const {
@@ -148,6 +156,9 @@ const char* JavaMethod::signature() const {
 
     _signature = new UString("(");
     for (i = 0; i < _numParameters; i++) {
+      JavaParameter* aParameter = static_cast<JavaParameter*>(parameterAt(i));
+      _signature->append(signatureFromPrimitiveType(aParameter->getJNIType()));
+      // FIXME!  Add class description for object types.
     }
     _signature->append(")");
 
