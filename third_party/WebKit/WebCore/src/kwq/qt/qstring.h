@@ -79,25 +79,30 @@ class QChar {
 
   enum Direction {
     // NOTE: alphabetical order
-    DirAL,
-    DirAN,
-    DirB,
-    DirBN,
-    DirCS,
+    // DirAL, DirAN, DirB, DirBN, DirCS, DirEN, DirES, DirET, DirL, DirLRE,
+    // DirLRO, DirNSM, DirON, DirPDF, DirR, DirRLE, DirRLO, DirS, DirWS
+    //
+    // Until we understand the implications better, I say we go with the qt
+    // ordering here
+    DirL,
+    DirR,
     DirEN,
     DirES,
     DirET,
-    DirL,
+    DirAN,
+    DirCS,
+    DirB,
+    DirS,
+    DirWS,
+    DirON,
     DirLRE,
     DirLRO,
-    DirNSM,
-    DirON,
-    DirPDF,
-    DirR,
+    DirAL,
     DirRLE,
     DirRLO,
-    DirS,
-    DirWS
+    DirPDF,
+    DirNSM,
+    DirBN
   };
 
   // constants ---------------------------------------------------------------
