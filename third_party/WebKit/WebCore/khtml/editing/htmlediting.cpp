@@ -1479,7 +1479,7 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
   CSSComputedStyleDeclarationImpl* computedStyle =
-      m_downstreamStart.computedStyle();
+      m_selectionToDelete.start().computedStyle();
   computedStyle->ref();
   m_typingStyle = computedStyle->copyInheritableProperties();
   m_typingStyle->ref();
