@@ -708,8 +708,12 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
             (child->isReplaced() && (child->style()->width().isPercent() ||
                                      child->style()->height().isPercent())) ||
             (child->style()->height().isVariable() && child->isBlockFlow() &&
-             !child->needsLayout()))
+             !child->needsLayout())) {
           child->setChildNeedsLayout(true);
+
+          // Dirty all the positioned objects.
+          static_cast<RenderBlock*>(child)->markPositionedObjectsForLayout();
+        }
         child->layoutIfNeeded();
         if (child->style()->height().isVariable() && child->isBlockFlow())
           maxLineCount =
@@ -736,6 +740,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
             m_flexingChildren = true;
             child->layoutIfNeeded();
             m_flexingChildren = false;
+            child->style()->setBoxFlexedHeight(-1);
           }
         }
         child = iterator.next();
