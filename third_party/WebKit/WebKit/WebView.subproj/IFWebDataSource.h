@@ -162,7 +162,6 @@
 // Cancels any pending loads.  A data source is conceptually only ever loading
 // one document at a time, although one document may have many related
 // resources.  stopLoading will stop all loads related to the data source.
-// Returns NO if the data source is not currently loading.
 - (void)stopLoading;
 
 // Returns YES if there are any pending loads.
