@@ -258,7 +258,8 @@ static QString escapeHTML(const QString& in) {
 }
 
 QString NodeImpl::startMarkup(const DOM::RangeImpl* range) const {
-  if (nodeType() == Node::TEXT_NODE) {
+  unsigned short type = nodeType();
+  if (type == Node::TEXT_NODE) {
     DOMString str = nodeValue().copy();
     if (range) {
       int exceptionCode;
@@ -273,9 +274,9 @@ QString NodeImpl::startMarkup(const DOM::RangeImpl* range) const {
     bool dontEscape = (parentID == ID_SCRIPT || parentID == ID_TEXTAREA ||
                        parentID == ID_STYLE);
     return dontEscape ? str.string() : escapeHTML(str.string());
-  } else {
+  } else if (type != Node::DOCUMENT_NODE) {
     QString markup = QChar('<') + nodeName().string();
-    if (nodeType() == Node::ELEMENT_NODE) {
+    if (type == Node::ELEMENT_NODE) {
       const ElementImpl* el = static_cast<const ElementImpl*>(this);
       NamedAttrMapImpl* attrs = el->attributes();
       unsigned long length = attrs->length();
@@ -288,6 +289,7 @@ QString NodeImpl::startMarkup(const DOM::RangeImpl* range) const {
     markup += isHTMLElement() ? ">" : "/>";
     return markup;
   }
+  return "";
 }
 
 QString NodeImpl::endMarkup(void) const {
