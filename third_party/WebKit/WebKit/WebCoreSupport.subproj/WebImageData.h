@@ -14,6 +14,7 @@
   size_t imagesSize;
   CGImageRef* images;
   size_t imagePropertiesSize;
+  CFDictionaryRef fileProperties;
   CFDictionaryRef* imageProperties;
   CGImageSourceRef imageSource;
 
