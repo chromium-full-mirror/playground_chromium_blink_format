@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KMIMETYPE_H_
@@ -38,91 +38,91 @@
 
 // class KSharedPtr ============================================================
 
-template <class T>
-class KSharedPtr {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+template<class T> class KSharedPtr {
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-  KSharedPtr() { object = 0; }
-  KSharedPtr(const KSharedPtr&) { object = 0; }
-  ~KSharedPtr() {}
+    // constructors, copy constructors, and destructors ------------------------
 
-  // member functions --------------------------------------------------------
+    KSharedPtr() { object = 0; }
+    KSharedPtr(const KSharedPtr &) {object = 0;}
+    ~KSharedPtr() {}
 
-  // operators ---------------------------------------------------------------
+    // member functions --------------------------------------------------------
 
-  KSharedPtr& operator=(const KSharedPtr&) {}
-  T* operator->() { return object; }
+    // operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
- private:
-  T* object;
+    KSharedPtr &operator=(const KSharedPtr &) {}
+    T *operator->() { return object; }
 
-};  // class KSharedPtr
-    // =========================================================
+
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
+private:
+    T *object;
+    
+
+}; // class KSharedPtr =========================================================
+
 
 // class KMimeType =============================================================
 
 class KMimeType {
- public:
-  // structs -----------------------------------------------------------------
+public:
 
-  // typedefs ----------------------------------------------------------------
+    // structs -----------------------------------------------------------------
 
-  typedef KSharedPtr<KMimeType> Ptr;
+    // typedefs ----------------------------------------------------------------
 
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+    typedef KSharedPtr<KMimeType> Ptr;
 
-  static Ptr findByURL(const KURL&, mode_t = 0, bool = false, bool = false);
-  static Ptr mimeType(QString serviceType);
-  static QString defaultMimeType();
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
+    static Ptr findByURL(const KURL &, mode_t=0, bool=false, bool=false);
+    static Ptr mimeType(QString serviceType);
+    static QString defaultMimeType();
+    
+    // constructors, copy constructors, and destructors ------------------------
 
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  KMimeType() {}
+    KMimeType() {}
 #endif
 
-  virtual ~KMimeType();
+    virtual ~KMimeType();
 
-  // member functions --------------------------------------------------------
+    // member functions --------------------------------------------------------
 
-  QString name() const;
-  QString comment() const;
+    QString name() const;
+    QString comment() const;
 
-  // operators ---------------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
- private:
+private:
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KMimeType(const KMimeType&);
+    KMimeType(const KMimeType &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KMimeType& operator=(const KMimeType&);
+    KMimeType &operator=(const KMimeType &);
 #endif
 
-};  // class KMimeType
-    // ==========================================================
+}; // class KMimeType ==========================================================
+
 
 #endif

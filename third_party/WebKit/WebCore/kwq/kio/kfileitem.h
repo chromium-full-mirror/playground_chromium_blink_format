@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KFILEITEM_H_
@@ -35,47 +35,44 @@
 // class KFileItem =============================================================
 
 class KFileItem {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-  KFileItem(const KIO::UDSEntry&,
-            const KURL&,
-            bool foo = false,
-            bool bar = false);
+    // constructors, copy constructors, and destructors ------------------------
 
-  virtual ~KFileItem();
+    KFileItem(const KIO::UDSEntry &, const KURL &, bool foo=false, 
+        bool bar=false);
 
-  // member functions --------------------------------------------------------
+    virtual ~KFileItem();
 
-  bool isDir() const;
+    // member functions --------------------------------------------------------
 
-  // operators ---------------------------------------------------------------
+    bool isDir() const;
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
- private:
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
+
+private:
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KFileItem(const KFileItem&);
+    KFileItem(const KFileItem &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KFileItem& operator=(const KFileItem&);
+    KFileItem &operator=(const KFileItem &);
 #endif
 
-};  // class KFileItem
-    // ==========================================================
+}; // class KFileItem ==========================================================
 
 #endif

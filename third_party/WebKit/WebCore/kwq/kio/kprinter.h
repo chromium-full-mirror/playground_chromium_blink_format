@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KPRINTER_H_
@@ -36,19 +36,20 @@
 #include <qsize.h>
 #include <qprinter.h>
 
-// NOTE: I stuck this file here rather than create a whole new
+// NOTE: I stuck this file here rather than create a whole new 
 // kdeprint directory
 
 class KPrinter : public QPaintDevice {
- public:
-  KPrinter(QPrinter::PrinterMode m = QPrinter::ScreenResolution);
+public:
+    KPrinter(QPrinter::PrinterMode m = QPrinter::ScreenResolution);
 
-  bool setup(QWidget* parent = 0);
-  bool newPage();
-  void setDocName(const QString&);
-  void setCreator(const QString&);
-  void setFullPage(bool);
-  QSize margins() const;
+    bool setup(QWidget *parent=0);
+    bool newPage();
+    void setDocName(const QString &);
+    void setCreator(const QString &);
+    void setFullPage(bool);
+    QSize margins() const;
 };
 
 #endif
+

@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KIMAGEIO_H_
@@ -35,55 +35,54 @@
 // class KImageIO ==============================================================
 
 class KImageIO {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
+public:
 
-  // enums -------------------------------------------------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
 
-  enum Mode { Reading, Writing };
+    // enums -------------------------------------------------------------------
 
-  // constants ---------------------------------------------------------------
+    enum Mode { Reading, Writing };
 
-  // static member functions -------------------------------------------------
+    // constants ---------------------------------------------------------------
 
-  static void registerFormats();
-  static QStringList mimeTypes(Mode mode = Writing);
+    // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
+    static void registerFormats();
+    static QStringList mimeTypes(Mode mode=Writing);
 
+    // constructors, copy constructors, and destructors ------------------------
+    
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  KImageIO() {}
+    KImageIO() {}
 #endif
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~KImageIO() {}
+    ~KImageIO() {}
 #endif
+        
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+private:
 
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KImageIO(const KImageIO&);
+    KImageIO(const KImageIO &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KImageIO& operator=(const KImageIO&);
+    KImageIO &operator=(const KImageIO &);
 #endif
 
-};  // class KImageIO
-    // ===========================================================
+}; // class KImageIO ===========================================================
 
 #endif

@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KPROTOCOLMANAGER_H_
@@ -35,53 +35,52 @@ class QString;
 // class KProtocolManager ======================================================
 
 class KProtocolManager {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
+public:
 
-  // static member functions -------------------------------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
 
-  static bool useProxy();
-  static QString httpProxy();
-  static QString userAgentForHost(const QString&);
-  static QString proxyFor(const QString&);
+    // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
+    static bool useProxy();
+    static QString httpProxy();
+    static QString userAgentForHost( const QString& );
+    static QString proxyFor(const QString &);
 
+    // constructors, copy constructors, and destructors ------------------------
+    
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  KProtocolManager() {}
+    KProtocolManager() {}
 #endif
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~KProtocolManager() {}
+    ~KProtocolManager() {}
 #endif
+    
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+private:
 
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KProtocolManager(const KProtocolManager&);
+    KProtocolManager(const KProtocolManager &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KProtocolManager& operator=(const KProtocolManager&);
+    KProtocolManager &operator=(const KProtocolManager &);
 #endif
 
-};  // class KProtocolManager
-    // ===================================================
+}; // class KProtocolManager ===================================================
 
 #endif

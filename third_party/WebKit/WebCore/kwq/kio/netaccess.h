@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef NETACCESS_H_
@@ -39,91 +39,91 @@ class UDSAtom;
 
 typedef QValueList<UDSAtom> UDSEntry;
 
+
 // class UDSAtom ===============================================================
 
 class UDSAtom {
- public:
-// structs -----------------------------------------------------------------
-// typedefs ----------------------------------------------------------------
-// enums -------------------------------------------------------------------
-// constants ---------------------------------------------------------------
-// static member functions -------------------------------------------------
+public:
 
-// constructors, copy constructors, and destructors ------------------------
-
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
+    
+    // constructors, copy constructors, and destructors ------------------------
+    
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  UDSAtom() {}
+    UDSAtom() {}
 #endif
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~UDSAtom() {}
+    ~UDSAtom() {}
 #endif
+        
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+}; // class UDSAtom ============================================================
 
-};  // class UDSAtom
-    // ============================================================
 
 // class NetAccess =============================================================
 
 class NetAccess {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
+public:
 
-  // static member functions -------------------------------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
 
-  static bool stat(const KURL&, KIO::UDSEntry&);
-  static QString lastErrorString();
-  static bool download(const KURL&, QString&);
-  static void removeTempFile(const QString&);
+    // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
+    static bool stat(const KURL &, KIO::UDSEntry &);
+    static QString lastErrorString();
+    static bool download(const KURL &, QString &);
+    static void removeTempFile(const QString &);
 
+    // constructors, copy constructors, and destructors ------------------------
+    
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  NetAccess() {}
+    NetAccess() {}
 #endif
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~NetAccess() {}
+    ~NetAccess() {}
 #endif
+        
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+private:
 
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  NetAccess(const NetAccess&);
+    NetAccess(const NetAccess &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  NetAccess& operator=(const NetAccess&);
+    NetAccess &operator=(const NetAccess &);
 #endif
 
-};  // class NetAccess
-    // ==========================================================
+}; // class NetAccess ==========================================================
 
-}  // namespace KIO
+
+} // namespace KIO
 
 #endif
