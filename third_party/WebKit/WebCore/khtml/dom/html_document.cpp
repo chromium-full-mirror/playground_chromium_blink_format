@@ -33,6 +33,7 @@
 #include "dom/html_form.h"
 #include "html/html_imageimpl.h"
 #include "html/html_formimpl.h"
+#include "dom/dom_exception.h"
 
 using namespace DOM;
 
@@ -134,8 +135,11 @@ HTMLElement HTMLDocument::body() const {
 void HTMLDocument::setBody(const HTMLElement& _body) {
   if (!impl)
     return;
+  int exceptioncode = 0;
   ((HTMLDocumentImpl*)impl)
-      ->setBody(static_cast<HTMLElementImpl*>(_body.handle()));
+      ->setBody(static_cast<HTMLElementImpl*>(_body.handle()), exceptioncode);
+  if (exceptioncode)
+    throw DOMException(exceptioncode);
   return;
 }
 
