@@ -13,7 +13,7 @@
 
 /*!
     @protocol WebLocationChangeDelegate
-    @discussion A controller's WebLocationChangeDelegate track changes it's
+    @discussion A controller's WebLocationChangeDelegate track changes its
    frame's location.
 */
 @protocol WebLocationChangeDelegate<NSObject>

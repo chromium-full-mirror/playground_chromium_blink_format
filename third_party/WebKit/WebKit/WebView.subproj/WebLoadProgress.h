@@ -19,11 +19,6 @@
 }
 
 /*!
-    @method init
-*/
-- (id)init;
-
-/*!
     @method initWithBytesSoFar:totalToLoad:
     @param bytes
     @param total
