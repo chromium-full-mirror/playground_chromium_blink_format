@@ -15,6 +15,14 @@
   ([NSString stringWithFormat:@"%@/%@", NSHomeDirectory(), \
                               @"Library/Preferences/Explorer/Favorites.html"])
 
+#define NetscapeAndMozillaDefaultProfilePath               \
+  ([NSString stringWithFormat:@"%@/%@", NSHomeDirectory(), \
+                              @"Library/Mozilla/Profiles/default"])
+
+#define NetscapeAndMozillaRandomDirExt (@".slt")
+
+#define NetscapeAndMozillaBookmarkFileName (@"bookmarks.html")
+
 @interface WebBookmarkImporter : NSObject {
   WebBookmark* topBookmark;
   WebError* error;
