@@ -425,6 +425,9 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
 void DocumentImpl::setTitle(DOMString _title) {
   m_title = _title;
 
+#ifdef APPLE_CHANGES
+  view()->part()->setTitle(_title);
+#else
   QString titleStr = m_title.string();
   titleStr.compose();
   if (!view()->part()->parentPart()) {
@@ -439,6 +442,7 @@ void DocumentImpl::setTitle(DOMString _title) {
     emit view()->part()->setWindowCaption(
         KStringHandler::csqueeze(titleStr, 128));
   }
+#endif
 }
 
 DOMString DocumentImpl::nodeName() const {
