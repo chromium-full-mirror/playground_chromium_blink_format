@@ -39,7 +39,6 @@
 
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
 #import <WCURICacheData.h>
-#include <WCPluginWidget.h>
 #endif
 
 class KHTMLSettings;
@@ -636,7 +635,7 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
 #ifdef _KWQ_
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
   IFWebDataSource* dataSource;
-  WCPluginWidget* pluginWidget;
+  QValueList<QString> plugins;
 #else
   void* dataSource;
 #endif
