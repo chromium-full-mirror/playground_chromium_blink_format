@@ -13,7 +13,7 @@
 @protocol WebPlugin;
 @protocol WebPluginContainer;
 
-@interface WebPluginController : NSObject<WebPluginContainer> {
+@interface WebPluginController : NSObject {
   WebHTMLView* _HTMLView;
   NSMutableArray* _views;
   BOOL _started;
@@ -21,7 +21,7 @@
 
 - (id)initWithHTMLView:(WebHTMLView*)HTMLView;
 
-- (void)addPlugin:(NSView<WebPlugin>*)view;
+- (void)addPlugin:(NSView*)view;
 
 - (void)startAllPlugins;
 - (void)stopAllPlugins;
