@@ -129,11 +129,13 @@ typedef enum {
 
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
+           referrer:(NSString*)referrer
            loadType:(WebFrameLoadType)loadType
     triggeringEvent:(NSEvent*)event
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
+            referrer:(NSString*)referrer
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event

@@ -231,10 +231,12 @@ enum FrameBorderStyle {
 - (NSString*)generateFrameName;
 
 - (void)loadURL:(NSString*)URL
+           referrer:(NSString*)referrer
              reload:(BOOL)reload
     triggeringEvent:(NSEvent*)event
          formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSString*)URL
+           referrer:(NSString*)referrer
                data:(NSData*)data
         contentType:(NSString*)contentType
     triggeringEvent:(NSEvent*)event
