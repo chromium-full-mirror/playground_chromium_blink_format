@@ -221,11 +221,13 @@ void RenderBox::paintRootBoxDecorations(QPainter* p,
   //    kdDebug(0) << "width = " << w <<endl;
 
   int rw, rh;
-  if (canvas()->view())
+  if (canvas()->view()) {
     rw = canvas()->view()->contentsWidth();
-  else
+    rh = canvas()->view()->contentsHeight();
+  } else {
     rw = canvas()->width();
-  rh = canvas()->height();
+    rh = canvas()->height();
+  }
 
   //    kdDebug(0) << "rw = " << rw <<endl;
 
