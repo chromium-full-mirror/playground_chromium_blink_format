@@ -77,6 +77,8 @@
 - (void)setIsPDF:(BOOL)f;
 - (BOOL)isPDF;
 
+- (void)resetAnimation;
+
 @end
 
 #endif

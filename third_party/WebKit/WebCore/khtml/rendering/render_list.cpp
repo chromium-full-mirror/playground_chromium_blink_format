@@ -430,7 +430,8 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
     xoff += haveImage ? cMarkerPadding : (m_width - bulletWidth);
 
   if (m_listImage && !m_listImage->isErrorImage()) {
-    p->drawPixmap(QPoint(_tx + xoff, _ty), m_listImage->pixmap());
+    m_listPixmap = m_listImage->pixmap();
+    p->drawPixmap(QPoint(_tx + xoff, _ty), m_listPixmap);
     return;
   }
 

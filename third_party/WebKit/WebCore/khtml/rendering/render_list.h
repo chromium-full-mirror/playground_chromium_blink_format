@@ -75,6 +75,7 @@ class RenderListMarker : public RenderBox {
 
   QString m_item;
   CachedImage* m_listImage;
+  QPixmap m_listPixmap;
   long m_value;
   RenderListItem* m_listItem;
 };

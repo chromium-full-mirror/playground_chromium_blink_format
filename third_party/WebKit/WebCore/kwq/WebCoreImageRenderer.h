@@ -47,4 +47,5 @@
 - (void)decreaseUseCount;
 - (void)flushRasterCache;
 - (CGImageRef)imageRef;
+- (void)resetAnimation;
 @end
