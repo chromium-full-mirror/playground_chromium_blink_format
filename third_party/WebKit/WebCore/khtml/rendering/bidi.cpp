@@ -1680,8 +1680,6 @@ QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
                             repaintRect.y());
   }
 
-  setLinesAppended(false);
-
   if (!firstLineBox() && element() && element()->isContentEditable() &&
       element()->rootEditableElement() == element())
     m_height += lineHeight(true);
@@ -1768,7 +1766,7 @@ RootInlineBox* RenderBlock::determineEndPosition(RootInlineBox* startLine,
                                                  BidiIterator& cleanLineStart,
                                                  int& yPos) {
   RootInlineBox* last = 0;
-  if (m_linesAppended || !startLine)
+  if (!startLine)
     last = 0;
   else {
     for (RootInlineBox* curr = startLine->nextRootBox(); curr;
