@@ -60,7 +60,7 @@ class Part : public QObject {
     customEvent((QCustomEvent*)event);
     return true;
   }
-  virtual void customEvent(QCustomEvent*) {}
+  virtual void customEvent(QCustomEvent*);
 
  private:
   QWidget* _widget;
@@ -78,7 +78,7 @@ class ReadOnlyPart : public Part {
   void setParent(QObject* parent) { _parent = parent; }
   QObject* parent() const { return _parent; }
 
-  void setName(const QString& name) { _name = name; }
+  virtual void setName(const QString& name);
   QString name() { return _name; }
 
   void setXMLFile(const char*) {}

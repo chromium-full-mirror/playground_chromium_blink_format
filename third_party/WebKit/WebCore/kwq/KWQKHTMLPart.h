@@ -255,6 +255,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   WebCoreKeyboardUIMode keyboardUIMode() const;
 
+  void setName(const QString& name);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
