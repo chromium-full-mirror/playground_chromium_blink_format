@@ -438,7 +438,7 @@ void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
   // backgrounds.
   if (paintAction == PaintActionChildBackgrounds)
     paintAction = PaintActionChildBackground;
-  PaintInfo paintInfo(i.p, i.r, paintAction);
+  PaintInfo paintInfo(i.p, i.r, paintAction, paintingRootForChildren(i));
 
   for (RenderObject* child = firstChild(); child; child = child->nextSibling())
     if (child->isTableSection() || child == tCaption)

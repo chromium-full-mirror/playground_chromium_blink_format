@@ -201,7 +201,6 @@ class KWQKHTMLPart : public KHTMLPart {
   void sendResizeEvent();
   void sendScrollEvent();
   void paint(QPainter*, const QRect&);
-  void paintSelectionOnly(QPainter* p, const QRect& rect);
 
   void adjustPageHeight(float* newBottom,
                         float oldTop,
@@ -225,6 +224,9 @@ class KWQKHTMLPart : public KHTMLPart {
   int selectionEndOffset() const;
 
   QRect selectionRect() const;
+  NSRect visibleSelectionRect() const;
+  NSImage* selectionImage() const;
+  NSImage* elementImage(DOM::Node node, NSRect* imageRect) const;
 
   NSFont* fontForCurrentPosition() const;
 
@@ -364,6 +366,8 @@ class KWQKHTMLPart : public KHTMLPart {
                             NSPoint* dragLoc,
                             unsigned* op) const;
 
+  NSImage* KWQKHTMLPart::imageFromRect(NSRect rect) const;
+
   WebCoreBridge* _bridge;
 
   KWQSignal _started;
@@ -392,6 +396,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   bool _usesInactiveTextBackgroundColor;
   bool _showsFirstResponder;
+  mutable bool _drawSelectionOnly;
 
   QDict<char> urlsBridgeKnowsAbout;
 
@@ -407,6 +412,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _dragSrcIsLink;
   bool _dragSrcIsImage;
   bool _dragSrcInSelection;
+
+  mutable DOM::Node _elementToDraw;
 };
 
 inline KWQKHTMLPart* KWQ(KHTMLPart* part) {

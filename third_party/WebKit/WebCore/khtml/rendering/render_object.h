@@ -122,6 +122,7 @@ class RenderObject : public CachedObjectClient {
   virtual ~RenderObject();
 
   RenderObject* parent() const { return m_parent; }
+  bool hasAncestor(const RenderObject* obj) const;
 
   RenderObject* previousSibling() const { return m_previous; }
   RenderObject* nextSibling() const { return m_next; }
@@ -206,6 +207,9 @@ class RenderObject : public CachedObjectClient {
   void setNextSibling(RenderObject* next) { m_next = next; }
   void setParent(RenderObject* parent) { m_parent = parent; }
   //////////////////////////////////////////
+
+  QRect absoluteBoundingBoxRect();
+  void addAbsoluteRectForLayer(QRect& result);
 
  public:
   virtual const char* renderName() const { return "RenderObject"; }
@@ -403,11 +407,16 @@ class RenderObject : public CachedObjectClient {
    * (tx|ty) is the calculated position of the parent
    */
   struct PaintInfo {
-    PaintInfo(QPainter* _p, const QRect& _r, PaintAction _phase)
-        : p(_p), r(_r), phase(_phase) {}
+    PaintInfo(QPainter* _p,
+              const QRect& _r,
+              PaintAction _phase,
+              RenderObject* _paintingRoot)
+        : p(_p), r(_r), phase(_phase), paintingRoot(_paintingRoot) {}
     QPainter* p;
     QRect r;
     PaintAction phase;
+    RenderObject*
+        paintingRoot;  // used to draw just one element and its visual kids
   };
   virtual void paint(PaintInfo& i, int tx, int ty);
   void paintBorder(QPainter* p,
@@ -698,6 +707,9 @@ class RenderObject : public CachedObjectClient {
 
   virtual void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
 
+  // the rect that will be painted if this object is passed as the paintingRoot
+  QRect paintingRootRect();
+
 #if APPLE_CHANGES
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
 #endif
@@ -889,6 +901,14 @@ class RenderObject : public CachedObjectClient {
   virtual void removeLeftoverAnonymousBoxes();
 
   void arenaDelete(RenderArena* arena);
+
+  RenderObject* paintingRootForChildren(PaintInfo& i) const {
+    // if we're the painting root, kids draw normally, and see root of 0
+    return (!i.paintingRoot || i.paintingRoot == this) ? 0 : i.paintingRoot;
+  }
+  bool shouldPaintWithinRoot(PaintInfo& i) const {
+    return !i.paintingRoot || i.paintingRoot == this;
+  }
 
  private:
   RenderStyle* m_style;

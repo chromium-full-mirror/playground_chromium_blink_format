@@ -1371,7 +1371,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   // backgrounds.
   if (paintAction == PaintActionChildBackgrounds)
     paintAction = PaintActionChildBackground;
-  PaintInfo paintInfo(i.p, i.r, paintAction);
+  PaintInfo paintInfo(i.p, i.r, paintAction, paintingRootForChildren(i));
 
   paintLineBoxBackgroundBorder(paintInfo, _tx, _ty);
 
@@ -1464,7 +1464,8 @@ void RenderBlock::paintFloats(PaintInfo& i,
     // Only paint the object if our noPaint flag isn't set.
     if (!r->noPaint && !r->node->layer()) {
       PaintInfo info(i.p, i.r, paintSelection ? PaintActionSelection
-                                              : PaintActionElementBackground);
+                                              : PaintActionElementBackground,
+                     i.paintingRoot);
       int tx = _tx + r->left - r->node->xPos() + r->node->marginLeft();
       int ty = _ty + r->startY - r->node->yPos() + r->node->marginTop();
       r->node->paint(info, tx, ty);

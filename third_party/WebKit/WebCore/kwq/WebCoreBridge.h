@@ -119,7 +119,6 @@ typedef enum {
   KWQKHTMLPart* _part;
   KHTMLRenderPart* _renderPart;
   RenderArena* _renderPartArena;
-  BOOL _drawSelectionOnly;
   BOOL _shouldCreateRenderers;
 }
 
