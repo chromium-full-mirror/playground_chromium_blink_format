@@ -365,7 +365,10 @@ class StyleVisualData : public Shared<StyleVisualData> {
   bool operator==(const StyleVisualData& o) const {
     return (clip == o.clip && hasClip == o.hasClip && colspan == o.colspan &&
             counter_increment == o.counter_increment &&
-            counter_reset == o.counter_reset && palette == o.palette &&
+            counter_reset == o.counter_reset &&
+#if !APPLE_CHANGES
+            palette == o.palette &&
+#endif
             textDecoration == o.textDecoration);
   }
   bool operator!=(const StyleVisualData& o) const { return !(*this == o); }
@@ -379,7 +382,9 @@ class StyleVisualData : public Shared<StyleVisualData> {
   short counter_increment;  // ok, so these are not visual mode spesific
   short counter_reset;  // can't go to inherited, since these are not inherited
 
+#if !APPLE_CHANGES
   QPalette palette;  // widget styling with IE attributes
+#endif
 };
 
 //------------------------------------------------
@@ -1587,6 +1592,7 @@ class RenderStyle {
   }
 #endif
 
+#if !APPLE_CHANGES
   QPalette palette() const { return visual->palette; }
   void setPaletteColor(QPalette::ColorGroup g,
                        QColorGroup::ColorRole r,
@@ -1596,6 +1602,7 @@ class RenderStyle {
     const_cast<StyleVisualData*>(visual.get())->palette =
         QApplication::palette();
   }
+#endif
 
   ContentData* contentData() { return content; }
   bool contentDataEquivalent(RenderStyle* otherStyle);

@@ -77,8 +77,13 @@ StyleVisualData::StyleVisualData()
       textDecoration(RenderStyle::initialTextDecoration()),
       colspan(1),
       counter_increment(0),
-      counter_reset(0),
-      palette(QApplication::palette()) {}
+      counter_reset(0)
+#if !APPLE_CHANGES
+      ,
+      palette(QApplication::palette())
+#endif
+{
+}
 
 StyleVisualData::~StyleVisualData() {}
 
@@ -89,8 +94,13 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       textDecoration(o.textDecoration),
       colspan(o.colspan),
       counter_increment(o.counter_increment),
-      counter_reset(o.counter_reset),
-      palette(o.palette) {}
+      counter_reset(o.counter_reset)
+#if !APPLE_CHANGES
+      ,
+      palette(o.palette)
+#endif
+{
+}
 
 StyleBackgroundData::StyleBackgroundData()
     : image(RenderStyle::initialBackgroundImage()) {}
@@ -703,8 +713,11 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       css3InheritedData->userModify != other->css3InheritedData->userModify ||
       css3NonInheritedData->userSelect !=
           other->css3NonInheritedData->userSelect ||
-      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag ||
-      !(visual->palette == other->visual->palette))
+      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag
+#if !APPLE_CHANGES
+      || !(visual->palette == other->visual->palette)
+#endif
+          )
     return Repaint;
 
   return Equal;
@@ -721,11 +734,15 @@ void RenderStyle::cleanup() {
   //    SharedData::counter = 0;
 }
 
+#if !APPLE_CHANGES
+
 void RenderStyle::setPaletteColor(QPalette::ColorGroup g,
                                   QColorGroup::ColorRole r,
                                   const QColor& c) {
   visual.access()->palette.setColor(g, r, c);
 }
+
+#endif
 
 void RenderStyle::setClip(Length top,
                           Length right,
