@@ -28,7 +28,7 @@
    change
     from the data source object.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     locationChangeStartedForDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -37,7 +37,7 @@
     @param dataSource The data source for which the redirect occurred
     @discussion You can find the new URL from the data source object.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     serverRedirectedForDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -52,7 +52,7 @@
     page fails to load completely.
 
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     locationChangeCommittedForDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -63,7 +63,7 @@
     @discussion The title may update during loading; clients should be prepared
    for this.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     receivedPageTitle:(NSString*)title
         forDataSource:(WebDataSource*)dataSource;
 
@@ -77,7 +77,7 @@
     default or stored image and changing on a refresh.
 
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     receivedPageIcon:(NSImage*)image
        forDataSource:(WebDataSource*)dataSource;
 
@@ -91,7 +91,7 @@
     @discussion This callback will only be received when all
     subresources are done loading.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     locationChangeDone:(WebError*)error
          forDataSource:(WebDataSource*)dataSource;
 
@@ -105,7 +105,7 @@
    source
     and the document representation that it contains.
  */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     willCloseLocationForDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -118,7 +118,7 @@
     that is already displayed. You can find the new URL from the data source
    object.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     locationChangedWithinPageForDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -134,7 +134,7 @@
     going while a client redirect is pending. A client redirect might
     be cancelled before it fires - see clientRedirectCancelledForFrame.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     clientWillRedirectTo:(NSURL*)URL
                    delay:(NSTimeInterval)seconds
                 fireDate:(NSDate*)date
@@ -148,7 +148,7 @@
     @discussion A client redirect can be cancelled if the frame
     changes locations before the timeout.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     clientRedirectCancelledForFrame:(WebFrame*)frame;
 
 @end

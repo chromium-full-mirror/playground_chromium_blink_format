@@ -45,7 +45,7 @@
    callback.
     The identifier will be retained.
 */
-- webView:(WebView*)webView
+- webView:(WebView*)sender
     identifierForInitialRequest:(WebRequest*)request
                  fromDataSource:(WebDataSource*)dataSource;
 
@@ -64,7 +64,7 @@
    although typically
     will be request.
 */
-- (WebRequest*)webView:(WebView*)webView
+- (WebRequest*)webView:(WebView*)sender
               resource:identifier
        willSendRequest:(WebRequest*)request
         fromDataSource:(WebDataSource*)dataSource;
@@ -80,7 +80,7 @@
     @param response The response for the request.
     @param dataSource The dataSource that initiated the load.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
               resource:identifier
     didReceiveResponse:(WebResponse*)response
         fromDataSource:(WebDataSource*)dataSource;
@@ -96,7 +96,7 @@
    amount, just the new amount received.
     @param dataSource The dataSource that initiated the load.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
                    resource:identifier
     didReceiveContentLength:(unsigned)length
              fromDataSource:(WebDataSource*)dataSource;
@@ -110,7 +110,7 @@
     multiple call backs.
     @param dataSource The dataSource that initiated the load.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
                           resource:identifier
     didFinishLoadingFromDataSource:(WebDataSource*)dataSource;
 
@@ -125,7 +125,7 @@
     @param error The error associated with this load.
     @param dataSource The dataSource that initiated the load.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
                    resource:identifier
     didFailLoadingWithError:(WebError*)error
              fromDataSource:(WebDataSource*)dataSource;
@@ -138,7 +138,7 @@
      @param error The plug-in error.
      @param dataSource The dataSource that contains the plug-in.
 */
-- (void)webView:(WebView*)webView
+- (void)webView:(WebView*)sender
     pluginFailedWithError:(WebPluginError*)error
                dataSource:(WebDataSource*)dataSource;
 
