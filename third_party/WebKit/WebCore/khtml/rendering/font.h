@@ -102,7 +102,7 @@ class Font {
                 int to = -1,
                 QColor bg = QColor()) const;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   float floatWidth(QChar* str, int slen, int pos, int len) const;
   void floatCharacterWidths(QChar* str,
                             int slen,

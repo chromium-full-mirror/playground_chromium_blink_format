@@ -230,7 +230,7 @@ class NamedNodeMap {
   friend class Node;
   friend class DocumentType;
   friend class NodeImpl;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class NamedNodeMapImpl;
 #endif
 };
@@ -892,7 +892,7 @@ class NodeList {
   friend class Node;
   friend class Document;
   friend class HTMLDocument;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class NodeListImpl;
 #endif
 

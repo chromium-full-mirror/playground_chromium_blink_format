@@ -176,7 +176,7 @@ QByteArray HTMLFormElementImpl::formData(bool& ok) {
   QCString enc_string = "";  // used for non-multipart data
 
 // find out the QTextcodec to use
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   QString origStr = m_acceptcharset.string();
   QChar space(' ');
   QChar strChars[origStr.length()];
@@ -218,7 +218,7 @@ QByteArray HTMLFormElementImpl::formData(bool& ok) {
   if (codec->mibEnum() == 11)
     codec = QTextCodec::codecForMib(85);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   QString encCharset = codec->name();
   QChar encChars[encCharset.length()];
   for (unsigned int i = 0; i < encCharset.length(); i++)
@@ -304,7 +304,7 @@ QByteArray HTMLFormElementImpl::formData(bool& ok) {
     }
   }
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if (fileUploads.count()) {
     int result = KMessageBox::warningContinueCancelList(
         0, i18n("You're about to transfer the following files from "
@@ -1507,14 +1507,14 @@ void HTMLSelectElementImpl::setValue(DOMStringImpl* /*value*/) {
 }
 
 QString HTMLSelectElementImpl::state() {
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   QString state;
 #endif /* APPLE_CHANGES not defined */
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
 
   int l = items.count();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   QChar stateChars[l];
 
   for (int i = 0; i < l; i++)
@@ -1541,7 +1541,7 @@ void HTMLSelectElementImpl::restoreState(const QString& _state) {
   QString state = _state;
   if (!state.isEmpty() && !state.contains('X') && !m_multiple) {
     qWarning("should not happen in restoreState!");
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 // Invalid access to string's internal buffer.  Should never get here
 // anyway.
 // state[0] = 'X';

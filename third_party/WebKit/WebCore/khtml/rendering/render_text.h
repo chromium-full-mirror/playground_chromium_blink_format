@@ -238,7 +238,7 @@ class RenderText : public RenderObject {
     return static_cast<DOM::TextImpl*>(RenderObject::element());
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   TextSlave* findTextSlave(int offset, int& pos);
   TextSlaveArray textSlaves() { return m_lines; }
 #endif
@@ -251,7 +251,7 @@ class RenderText : public RenderObject {
                         const QRect& thisLine,
                         const QRect& nextLine);
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   TextSlave* findTextSlave(int offset, int& pos);
 
 #endif

@@ -392,7 +392,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
    */
   virtual void childrenChanged();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static Node nodeInstance(NodeImpl* impl);
 #endif
 
@@ -503,7 +503,7 @@ class NodeListImpl : public khtml::Shared<NodeListImpl> {
 
 // Other methods (not part of DOM)
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static NodeList createInstance(NodeListImpl* impl);
 #endif
  protected:
@@ -596,7 +596,7 @@ class NamedNodeMapImpl : public khtml::Shared<NamedNodeMapImpl> {
                              bool readonly) = 0;
   virtual bool isReadOnly() { return false; }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static NamedNodeMap createInstance(NamedNodeMapImpl* impl);
 #endif
 };

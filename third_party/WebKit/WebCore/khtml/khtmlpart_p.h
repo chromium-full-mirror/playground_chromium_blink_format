@@ -58,7 +58,7 @@ struct ChildFrame {
     m_bNotify = false;
   }
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   ~ChildFrame() {
     if (m_run)
       m_run->abort();
@@ -74,7 +74,7 @@ struct ChildFrame {
   bool m_bCompleted;
   QString m_name;
   KParts::URLArgs m_args;
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   QGuardedPtr<KHTMLRun> m_run;
 #endif
   bool m_bPreloaded;
@@ -127,7 +127,7 @@ class KHTMLPartPrivate {
     m_javaContext = 0;
 #endif
     m_cacheId = 0;
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
     m_frameNameId = 1;
 #endif
 
@@ -219,7 +219,7 @@ class KHTMLPartPrivate {
   bool m_metaRefreshEnabled : 1;
   bool m_bPluginsOverride : 1;
   bool m_restored : 1;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Made this static so frame names are globally unique and unsigned
   // so overflow is handled more gracefully.
   static unsigned m_frameNameId;
@@ -310,7 +310,7 @@ class KHTMLPartPrivate {
   DOM::Node m_mousePressNode;  // node under the mouse when the mouse was
                                // pressed (set in the mouse handler)
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   DOM::Node m_initialSelectionStart;
   long m_initialSelectionStartOffset;
   DOM::Node m_initialSelectionEnd;

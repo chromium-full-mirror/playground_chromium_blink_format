@@ -52,7 +52,7 @@ class Decoder {
   QTextDecoder* m_decoder;  // only used for utf16
   QCString enc;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   QString buffer;
 #else
   QCString buffer;

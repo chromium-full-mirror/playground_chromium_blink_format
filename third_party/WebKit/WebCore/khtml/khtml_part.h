@@ -34,7 +34,7 @@
 
 #include <qregexp.h>
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 #include "KWQKHTMLPart.h"
 #endif
 
@@ -210,7 +210,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   virtual bool closeURL();
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   /**
    * is called when a certain error situation (i.e. connection timed out)
    * occured.
@@ -611,7 +611,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   KParts::PartManager* partManager();
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   /**
    * Saves the KHTMLPart's complete state (including child frame
    * objects) to the provided @ref QDataStream.
@@ -797,7 +797,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   virtual void khtmlDrawContentsEvent(khtml::DrawContentsEvent*);
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   /**
    * Internal reimplementation of KParts::Part::guiActivateEvent .
    */
@@ -815,7 +815,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                            const QString& _target,
                            KParts::URLArgs args = KParts::URLArgs());
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   /**
    * This method is called when a new embedded object (include html frames) is
    * to be created.
@@ -901,7 +901,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @internal
    */
   void slotDebugRenderTree();
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   /**
    * @internal
    */
@@ -1130,7 +1130,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   KHTMLPartPrivate* d;
   friend class KHTMLPartPrivate;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
  public:
   KWQKHTMLPart* kwq;
   friend class KWQKHTMLPart;

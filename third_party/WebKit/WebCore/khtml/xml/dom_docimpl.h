@@ -62,7 +62,7 @@ class DocumentFragmentImpl;
 class DocumentImpl;
 class DocumentType;
 class DocumentTypeImpl;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 class DOMImplementation;
 #endif
 class ElementImpl;
@@ -120,7 +120,7 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
   // objects
   static DOMImplementationImpl* instance();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static DOMImplementation createInstance(DOMImplementationImpl* impl);
 #endif
 
@@ -562,7 +562,7 @@ class DocumentTypeImpl : public NodeImpl {
   DOMImplementationImpl* implementation() const { return m_implementation; }
   void copyFrom(const DocumentTypeImpl&);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static DocumentType createInstance(DocumentTypeImpl* impl);
 #endif
 

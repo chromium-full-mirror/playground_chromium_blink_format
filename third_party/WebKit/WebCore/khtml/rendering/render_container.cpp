@@ -94,7 +94,7 @@ void RenderContainer::addChild(RenderObject* newChild,
         // kdDebug( 6040 ) << "adding cell" << endl;
         if (!isTableRow())
           needsTable = true;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         // I'm not 100% sure this is the best way to fix this, but without this
         // change we recurse infinitely when trying to render the CSS2 test
         // page:

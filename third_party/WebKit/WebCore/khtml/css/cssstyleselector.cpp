@@ -245,7 +245,7 @@ void CSSStyleSelector::computeFontSizesFor(
     int zoomFactor,
     QValueList<int>& fontSizes,
     bool isFixed) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // We don't want to scale the settings by the dpi.
   const float toPix = 1;
 #else

@@ -65,7 +65,7 @@ class PluginBase : public ObjectImp {
 
   static QPtrList<PluginInfo>* plugins;
   static QPtrList<MimeClassInfo>* mimes;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   static void ref();
   static void unref();
 #endif
@@ -98,7 +98,7 @@ const ClassInfo MimeTypes::info = {"MimeTypeArray", 0, 0, 0};
 
 class Plugin : public ObjectImp {
  public:
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   Plugin(ExecState* exec, PluginBase::PluginInfo* info)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
     m_info = info;
@@ -122,7 +122,7 @@ const ClassInfo Plugin::info = {"Plugin", 0, 0, 0};
 
 class MimeType : public ObjectImp {
  public:
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   MimeType(ExecState* exec, PluginBase::MimeClassInfo* info)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
     m_info = info;
@@ -212,13 +212,13 @@ Value Navigator::getValueProperty(ExecState* exec, int token) const {
         // kdDebug() << "appName -> Mozilla" << endl;
         return String("Gecko");
       }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       return Undefined();
 #else
       return String("Konqueror/khtml");
 #endif
     case Vendor:
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       return Undefined();
 #else
       return String("KDE");
@@ -245,7 +245,7 @@ Value Navigator::getValueProperty(ExecState* exec, int token) const {
     case _MimeTypes:
       return Value(new MimeTypes(exec));
     case CookieEnabled:
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       return Boolean(KWQKCookieJar::cookieEnabled());
 #else
       return Boolean(true);  /// ##### FIXME
@@ -337,7 +337,7 @@ PluginBase::~PluginBase() {
   }
 }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 
 void PluginBase::ref() {
   m_refCount++;

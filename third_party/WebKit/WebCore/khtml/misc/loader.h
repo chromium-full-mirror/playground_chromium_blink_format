@@ -105,7 +105,7 @@ class CachedObject {
     m_free = false;
     m_cachePolicy = _cachePolicy;
     m_request = 0;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     m_response = 0;
 #endif
     m_expireDate = _expireDate;
@@ -149,7 +149,7 @@ class CachedObject {
 
   void setRequest(Request* _request);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   void* response() { return m_response; }
   void setResponse(void* response);
 #endif
@@ -175,7 +175,7 @@ class CachedObject {
   DOM::DOMString m_url;
   QString m_accept;
   Request* m_request;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   void* m_response;
 #endif
   Type m_type;
@@ -330,7 +330,7 @@ class CachedImage : public QObject, public CachedObject {
 
   friend class Cache;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
  public:
   int dataSize() const { return m_dataSize; }
 
@@ -424,7 +424,7 @@ class Loader : public QObject {
 
  protected slots:
   void slotFinished(KIO::Job*);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   void slotData(KIO::Job*, const char* data, int size);
   void receivedResponse(KIO::Job*, void* response);
 #else
@@ -535,7 +535,7 @@ class Cache {
 
   static void removeCacheEntry(CachedObject* object);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   struct TypeStatistic {
     int count;
     int size;

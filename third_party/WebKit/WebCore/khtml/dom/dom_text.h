@@ -47,7 +47,7 @@ class CharacterDataImpl;
  *
  */
 class CharacterData : public Node {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class CharacterDataImpl;
 #endif
 
@@ -267,7 +267,7 @@ class TextImpl;
  */
 class Text : public CharacterData {
   friend class Document;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class TextImpl;
 #endif
  public:

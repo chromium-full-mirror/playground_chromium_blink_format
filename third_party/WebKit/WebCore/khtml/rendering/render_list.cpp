@@ -126,7 +126,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
 
   RenderStyle* newStyle = new RenderStyle();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   newStyle->ref();
 #endif
 
@@ -147,7 +147,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
     m_marker->setStyle(newStyle);
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   newStyle->deref();
 #endif
 }
@@ -370,7 +370,7 @@ void RenderListMarker::printObject(QPainter* p,
       return;
     default:
       if (m_item != QString::null) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         // Text should be drawn on the baseline, so we add in the ascent of the
         // font.
         // For some inexplicable reason, this works in Konqueror.  I'm not sure

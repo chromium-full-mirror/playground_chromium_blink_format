@@ -86,7 +86,7 @@ void RenderBody::repaint() {
 void RenderBody::layout() {
   RenderFlow::layout();
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if (!scrollbarsStyled) {
     if (root()->view()) {
       root()->view()->horizontalScrollBar()->setPalette(style()->palette());

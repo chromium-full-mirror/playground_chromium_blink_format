@@ -285,13 +285,13 @@ void Decoder::setEncoding(const char* _encoding, bool force) {
 #endif
   if (enc.isNull() || enc.isEmpty())
     return;
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if (enc == "visual")  // hebrew visually ordered
     enc = "iso8859-8";
 #endif
   bool b;
   m_codec = KGlobal::charsets()->codecForName(enc, b);
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if (m_codec->mibEnum() == 11) {
     // iso8859-8 (visually ordered)
     m_codec = QTextCodec::codecForName("iso8859-8-i");
@@ -344,7 +344,7 @@ QString Decoder::decode(const char* data, int len) {
           i--;
         }
       }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       QString appendString(data, len);
       buffer += appendString;
 #else
@@ -354,7 +354,7 @@ QString Decoder::decode(const char* data, int len) {
 // the following tags are allowed in <head>:
 // SCRIPT|STYLE|META|LINK|OBJECT|TITLE|BASE
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       const char* ptr = buffer.latin1();
       const char* pEnd = ptr + buffer.length();
       while (ptr != pEnd)
@@ -467,7 +467,7 @@ QString Decoder::decode(const char* data, int len) {
       return QString::null;
     }
   }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   else {
     QString appendString(data, len);
     buffer += appendString;
@@ -524,7 +524,7 @@ found:
   }
   QString out;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // We don't need to special-case unicode like this, and doing so
   // will drop the buffer which is really bad!
   if (!buffer.isEmpty()) {
@@ -547,7 +547,7 @@ found:
       }
     }
     out = m_decoder->toUnicode(data, len);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   }  // need to balance braces for benefit of ChangeLog script
 #else
   }

@@ -185,7 +185,7 @@ void HTMLLinkElementImpl::process() {
   KHTMLPart* part = getDocument()->view() ? getDocument()->view()->part() : 0;
 
 // IE extension: location of small icon for locationbar / bookmarks
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (part && rel == "shortcut icon" && !m_url.isEmpty() && !part->parentPart())
     part->browserExtension()->setIconURL(KURL(m_url.string()));
 
@@ -437,7 +437,7 @@ NodeImpl::Id HTMLTitleElementImpl::id() const {
 
 void HTMLTitleElementImpl::insertedIntoDocument() {
   HTMLElementImpl::insertedIntoDocument();
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Only allow title to be set by first <title> encountered.
   if (getDocument()->title().isEmpty())
     getDocument()->setTitle(m_title);
@@ -462,7 +462,7 @@ void HTMLTitleElementImpl::childrenChanged() {
         (c->nodeType() == Node::CDATA_SECTION_NODE))
       m_title += c->nodeValue();
   }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Only allow title to be set by first <title> encountered.
   if (inDocument() && getDocument()->title().isEmpty())
 #else

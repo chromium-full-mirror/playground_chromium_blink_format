@@ -65,7 +65,7 @@
 using namespace khtml;
 using namespace DOM;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 static bool cacheDisabled;
 #endif
 
@@ -301,7 +301,7 @@ void CachedScript::error(int /*err*/, const char* /*text*/) {
 
 // ------------------------------------------------------------------------------------------
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
 
 namespace khtml {
 
@@ -460,12 +460,12 @@ CachedImage::CachedImage(DocLoader* dl,
                          time_t _expireDate)
     : QObject(),
       CachedObject(url, Image, _cachePolicy, _expireDate)
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       ,
       m_dataSize(0)
 #endif
 {
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   static const QString& acceptHeader =
       KGlobal::staticQString(buildAcceptHeader());
 #endif
@@ -475,7 +475,7 @@ CachedImage::CachedImage(DocLoader* dl,
   pixPart = 0;
   bg = 0;
   bgColor = qRgba(0, 0, 0, 0xFF);
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   typeChecked = false;
 #endif
   isFullyTransparent = false;
@@ -485,7 +485,7 @@ CachedImage::CachedImage(DocLoader* dl,
   m_status = Unknown;
   m_size = 0;
   imgSource = 0;
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   setAccept(acceptHeader);
 #endif
   m_showAnimations = dl->showAnimations();
@@ -529,7 +529,7 @@ void CachedImage::deref(CachedObjectClient* c) {
 #define BGMINHEIGHT 32
 
 const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   return pixmap();
 #else
   static QRgb bgTransparant = qRgba(0, 0, 0, 0xFF);
@@ -609,7 +609,7 @@ const QPixmap& CachedImage::pixmap() const {
   if (errorOccured)
     return *Cache::brokenPixmap;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (p)
     return *p;
 #else
@@ -649,7 +649,7 @@ void CachedImage::do_notify(const QPixmap& p, const QRect& r) {
     c->setPixmap(p, r, this);
 }
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
 
 void CachedImage::movieUpdated(const QRect& r) {
 #ifdef CACHE_DEBUG
@@ -752,7 +752,7 @@ void CachedImage::movieResize(const QSize& /*s*/) {
 void CachedImage::setShowAnimations(
     KHTMLSettings::KAnimationAdvice showAnimations) {
   m_showAnimations = showAnimations;
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if ((m_showAnimations == KHTMLSettings::KAnimationDisabled) && imgSource) {
     imgSource->cleanBuffer();
     delete p;
@@ -767,7 +767,7 @@ void CachedImage::setShowAnimations(
 #endif
 }
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
 
 void CachedImage::deleteMovie() {
   delete m;
@@ -789,7 +789,7 @@ void CachedImage::clear() {
 
   formatType = 0;
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   typeChecked = false;
 #endif
   m_size = 0;
@@ -804,7 +804,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
                 << _buffer.buffer().size() << ", eof=" << eof << endl;
 #endif
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   if (!typeChecked) {
     formatType = QImageDecoder::formatName(
         (const uchar*)_buffer.buffer().data(), _buffer.size());
@@ -890,7 +890,7 @@ void CachedImage::error(int /*err*/, const char* /*text*/) {
 #endif
 
   clear();
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   typeChecked = true;
 #endif
   errorOccured = true;
@@ -920,7 +920,7 @@ DocLoader::DocLoader(KHTMLPart* part, DocumentImpl* doc) {
   m_part = part;
   m_doc = doc;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   Cache::init();
 #endif
   Cache::docloader->append(this);
@@ -964,7 +964,7 @@ CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
   }
@@ -972,7 +972,7 @@ CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
 
   bool reload = needReload(fullURL);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   CachedImage* cachedObject =
       Cache::requestImage(this, url, reload, m_expireDate);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -988,7 +988,7 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
   }
@@ -996,7 +996,7 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
 
   bool reload = needReload(fullURL);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   CachedCSSStyleSheet* cachedObject =
       Cache::requestStyleSheet(this, url, reload, m_expireDate, charset);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -1012,7 +1012,7 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
   if (m_part && m_part->onlyLocalReferences() && fullURL.protocol() != "file")
     return 0;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (KWQCheckIfReloading(this)) {
     setCachePolicy(KIO::CC_Reload);
   }
@@ -1020,7 +1020,7 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
 
   bool reload = needReload(fullURL);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   CachedScript* cachedObject =
       Cache::requestScript(this, url, reload, m_expireDate, charset);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -1090,7 +1090,7 @@ void Loader::load(DocLoader* dl, CachedObject* object, bool incremental) {
   Request* req = new Request(dl, object, incremental);
   m_requestsPending.append(req);
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   emit requestStarted(req->m_docLoader, req->object);
 #endif
 
@@ -1134,7 +1134,7 @@ void Loader::servePendingRequests() {
   connect(job, SIGNAL(data(KIO::Job*, const QByteArray&)),
           SLOT(slotData(KIO::Job*, const QByteArray&)));
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   if (KWQServeRequest(this, req, job))
     m_requestsLoading.insert(job, req);
 #else
@@ -1162,7 +1162,7 @@ void Loader::slotFinished(KIO::Job* job) {
     r->object->data(r->m_buffer, true);
     emit requestDone(r->m_docLoader, r->object);
     time_t expireDate = j->queryMetaData("expire-date").toLong();
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
     kdDebug(6060) << "Loader::slotFinished, url = " << j->url().url()
                   << " expires " << ctime(&expireDate) << endl;
 #endif
@@ -1189,7 +1189,7 @@ void Loader::receivedResponse(KIO::Job* job, void* response) {
 }
 #endif
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 void Loader::slotData(KIO::Job* job, const char* data, int size)
 #else
 void Loader::slotData(KIO::Job* job, const QByteArray& data)
@@ -1204,7 +1204,7 @@ void Loader::slotData(KIO::Job* job, const QByteArray& data)
   if (!r->m_buffer.isOpen())
     r->m_buffer.open(IO_WriteOnly);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   r->m_buffer.writeBlock(data, size);
 #else
   r->m_buffer.writeBlock(data.data(), data.size());
@@ -1306,7 +1306,7 @@ void Cache::init() {
     nullPixmap = new QPixmap;
 
   if (!brokenPixmap)
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     brokenPixmap = new QPixmap;
 #else
     //        brokenPixmap = new
@@ -1355,7 +1355,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
     cachePolicy = KIO::CC_Verify;
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 // Checking if the URL is malformed is lots of extra work for little benefit.
 #else
   if (kurl.isMalformed()) {
@@ -1376,14 +1376,14 @@ CachedImage* Cache::requestImage(DocLoader* dl,
     CachedImage* im = new CachedImage(dl, kurl.url(), cachePolicy, _expireDate);
     if (dl && dl->autoloadImages())
       Cache::loader()->load(dl, im, true);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (cacheDisabled)
       im->setFree(true);
     else {
 #endif
       cache->insert(kurl.url(), im);
       moveToHeadOfLRUList(im);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     }
 #endif
     o = im;
@@ -1410,7 +1410,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
   moveToHeadOfLRUList(o);
   if (dl) {
     dl->m_docObjects.remove(o);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (!cacheDisabled)
 #endif
       dl->m_docObjects.append(o);
@@ -1434,7 +1434,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
     cachePolicy = KIO::CC_Verify;
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 // Checking if the URL is malformed is lots of extra work for little benefit.
 #else
   if (kurl.isMalformed()) {
@@ -1450,14 +1450,14 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
 #endif
     CachedCSSStyleSheet* sheet = new CachedCSSStyleSheet(
         dl, kurl.url(), cachePolicy, _expireDate, charset);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (cacheDisabled)
       sheet->setFree(true);
     else {
 #endif
       cache->insert(kurl.url(), sheet);
       moveToHeadOfLRUList(sheet);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     }
 #endif
     o = sheet;
@@ -1483,7 +1483,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
   moveToHeadOfLRUList(o);
   if (dl) {
     dl->m_docObjects.remove(o);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (!cacheDisabled)
 #endif
       dl->m_docObjects.append(o);
@@ -1518,7 +1518,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
     cachePolicy = KIO::CC_Verify;
   }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 // Checking if the URL is malformed is lots of extra work for little benefit.
 #else
   if (kurl.isMalformed()) {
@@ -1534,14 +1534,14 @@ CachedScript* Cache::requestScript(DocLoader* dl,
 #endif
     CachedScript* script =
         new CachedScript(dl, kurl.url(), cachePolicy, _expireDate, charset);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (cacheDisabled)
       script->setFree(true);
     else {
 #endif
       cache->insert(kurl.url(), script);
       moveToHeadOfLRUList(script);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     }
 #endif
     o = script;
@@ -1567,7 +1567,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
   moveToHeadOfLRUList(o);
   if (dl) {
     dl->m_docObjects.remove(o);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (!cacheDisabled)
 #endif
       dl->m_docObjects.append(o);
@@ -1747,7 +1747,7 @@ void CachedObjectClient::notifyFinished(CachedObject* /*finishedObj*/) {}
 
 #include "loader.moc"
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 
 Cache::Statistics Cache::getStatistics() {
   Statistics stats;

@@ -81,7 +81,7 @@ class KHTMLView : public QScrollView {
   friend class khtml::RenderWidget;
   friend class khtml::CSSStyleSelector;
   friend void khtml::applyRule(DOM::CSSProperty* prop);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class KWQKHTMLPart;
 #endif
 
@@ -150,14 +150,14 @@ class KHTMLView : public QScrollView {
  protected:
   void clear();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
  public:
 #endif
   virtual void resizeEvent(QResizeEvent* event);
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
   virtual bool focusNextPrevChild(bool next);
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   virtual void drawContents(QPainter* p,
                             int clipx,
                             int clipy,
@@ -174,7 +174,7 @@ class KHTMLView : public QScrollView {
 #ifndef QT_NO_WHEELEVENT
   virtual void viewportWheelEvent(QWheelEvent*);
 #endif
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   virtual void dragEnterEvent(QDragEnterEvent*);
   virtual void dropEvent(QDropEvent*);
 #endif

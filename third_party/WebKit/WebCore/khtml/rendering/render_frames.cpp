@@ -434,7 +434,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
   }
 
   if (m_resizing || evt->id() == EventImpl::MOUSEUP_EVENT) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     KHTMLView* v = root()->view();
     QPainter paint;
 
@@ -446,7 +446,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     paint.setPen(Qt::gray);
     paint.setBrush(Qt::gray);
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
     paint.setRasterOp(Qt::XorROP);
 #endif
     QRect r(xPos(), yPos(), width(), height());
@@ -455,14 +455,14 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     int p = m_resizing ? (m_vSplit > -1 ? _x : _y) : -1;
     if (m_vSplit > -1) {
       if (m_oldpos >= 0)
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         v->updateContents(m_oldpos + sw / 2 - rBord, r.y(), 2 * rBord,
                           r.height(), true);
 #else
         paint.drawRect(m_oldpos + sw / 2 - rBord, r.y(), 2 * rBord, r.height());
 #endif
       if (p >= 0) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         paint.setPen(Qt::NoPen);
         paint.setBrush(Qt::gray);
         v->setDrawingAlpha((float)0.25);
@@ -474,14 +474,14 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
       }
     } else {
       if (m_oldpos >= 0)
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         v->updateContents(r.x(), m_oldpos + sw / 2 - rBord, r.width(),
                           2 * rBord, true);
 #else
         paint.drawRect(r.x(), m_oldpos + sw / 2 - rBord, r.width(), 2 * rBord);
 #endif
       if (p >= 0) {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
         paint.setPen(Qt::NoPen);
         paint.setBrush(Qt::gray);
         v->setDrawingAlpha((float)0.25);
@@ -494,7 +494,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     }
     m_oldpos = p;
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     v->unlockDrawingFocus();
     v->enableFlushDrawing();
 #endif
@@ -600,7 +600,7 @@ void RenderFrame::slotViewCleared() {
         !((static_cast<HTMLFrameSetElementImpl*>(element()->parentNode()))
               ->frameBorder()))
       view->setFrameStyle(QFrame::NoFrame);
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     // Qt creates QScrollView w/ a default style of QFrame::StyledPanel |
     // QFrame::Sunken.
     else
@@ -738,7 +738,7 @@ void RenderPartObject::updateWidget() {
 #endif
         return;
       }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
       // Fix for 2894742
       // The EMBED attributes must override the PARAM attributes.
       // This mimics IE's behavior.
@@ -947,7 +947,7 @@ void RenderPartObject::layout() {
   KHTMLAssert(!layouted());
   KHTMLAssert(minMaxKnown());
 
-#ifndef APPLE_CHANGES
+#if !APPLE_CHANGES
   short m_oldwidth = m_width;
   int m_oldheight = m_height;
 #endif

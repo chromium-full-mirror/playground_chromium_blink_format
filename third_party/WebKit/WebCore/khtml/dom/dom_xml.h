@@ -254,7 +254,7 @@ class Notation : public Node {
  */
 class ProcessingInstruction : public Node {
   friend class Document;
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   friend class ProcessingInstructionImpl;
 #endif
  public:
