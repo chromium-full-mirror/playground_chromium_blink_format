@@ -817,8 +817,9 @@ int RenderFlow::lowestPosition() const {
   int bottom = RenderBox::lowestPosition();
   // kdDebug(0) << renderName() << "("<<this<<") lowest = " << bottom << endl;
   int lp = 0;
+  RenderObject* last = 0;
   if (!m_childrenInline) {
-    RenderObject* last = lastChild();
+    last = lastChild();
     while (last && (last->isPositioned() || last->isFloating()))
       last = last->previousSibling();
     if (last)
@@ -851,7 +852,7 @@ int RenderFlow::lowestPosition() const {
   if (overhangingContents()) {
     RenderObject* child = firstChild();
     while (child) {
-      if (child->overhangingContents()) {
+      if (child != last && child->overhangingContents()) {
         int lp = child->yPos() + child->lowestPosition();
         if (lp > bottom)
           bottom = lp;
@@ -895,7 +896,8 @@ int RenderFlow::rightmostPosition() const {
   if (overhangingContents()) {
     RenderObject* child = firstChild();
     while (child) {
-      if (child->overhangingContents()) {
+      if ((child->isPositioned() || child->isFloating()) &&
+          child->overhangingContents()) {
         int r = child->xPos() + child->rightmostPosition();
         if (r > right)
           right = r;
