@@ -136,7 +136,7 @@ class KWQKHTMLPartImpl : public QObject {
 
   void redirectionTimerStartedOrStopped();
 
-  static NSString* referrer(const KParts::URLArgs&);
+  QString referrer() const;
 
   static const QPtrList<KWQKHTMLPartImpl>& instances() {
     return mutableInstances();
