@@ -614,10 +614,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
 #ifdef KHTML_XSLT
   void applyXSLTransform(ProcessingInstructionImpl* pi);
-  void setTransformSource(const QString& xmlSource) {
-    m_transformSource = xmlSource;
-  }
-  const QString& transformSource() { return m_transformSource; }
+  void setTransformSource(void* doc) { m_transformSource = doc; }
+  const void* transformSource() { return m_transformSource; }
   DocumentImpl* transformSourceDocument() { return m_transformSourceDocument; }
   void setTransformSourceDocument(DocumentImpl* doc);
 #endif
@@ -731,7 +729,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_overMinimumLayoutThreshold;
 
 #ifdef KHTML_XSLT
-  QString m_transformSource;
+  void* m_transformSource;
   DocumentImpl* m_transformSourceDocument;
 #endif
 

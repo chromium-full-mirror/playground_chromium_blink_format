@@ -40,9 +40,7 @@ class DocumentImpl;
 class XSLTProcessorImpl {
  public:
   // Constructors
-  XSLTProcessorImpl(XSLStyleSheetImpl* stylesheet,
-                    DocumentImpl* source,
-                    bool embedded = false);
+  XSLTProcessorImpl(XSLStyleSheetImpl* stylesheet, DocumentImpl* source);
   ~XSLTProcessorImpl();
 
   // Method for transforming a source document into a result document.
@@ -59,7 +57,6 @@ class XSLTProcessorImpl {
   XSLStyleSheetImpl* m_stylesheet;
   QString m_resultOutput;
   DocumentImpl* m_sourceDocument;
-  bool m_embedded;
 };
 }
 #endif

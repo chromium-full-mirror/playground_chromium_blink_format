@@ -258,6 +258,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
 #endif
 #ifdef KHTML_XSLT
       ,
+      m_transformSource(NULL),
       m_transformSourceDocument(0)
 #endif
 #if APPLE_CHANGES
@@ -398,6 +399,7 @@ DocumentImpl::~DocumentImpl() {
   }
 
 #ifdef KHTML_XSLT
+  xmlFreeDoc((xmlDocPtr)m_transformSource);
   if (m_transformSourceDocument)
     m_transformSourceDocument->deref();
 #endif
@@ -3052,7 +3054,7 @@ void DocumentImpl::shiftMarkers(NodeImpl* node, ulong startOffset, long delta) {
 void DocumentImpl::applyXSLTransform(ProcessingInstructionImpl* pi) {
   // Ref ourselves to keep from being destroyed.
   XSLTProcessorImpl processor(static_cast<XSLStyleSheetImpl*>(pi->sheet()),
-                              this, !pi->localHref().isEmpty());
+                              this);
   DocumentImpl* result = processor.transformDocument(this);
   if (result)
     // Cache the source document.
