@@ -9,6 +9,8 @@
 @interface NSURL (WebNSURLExtras)
 
 + (NSURL*)_web_URLWithUserTypedString:(NSString*)string;
++ (NSURL*)_web_URLWithUserTypedString:(NSString*)string
+                        relativeToURL:(NSURL*)URL;
 
 + (NSURL*)_web_URLWithDataAsString:(NSString*)string;
 + (NSURL*)_web_URLWithDataAsString:(NSString*)string
