@@ -49,7 +49,6 @@ class QPaintDevice;
 class QPaintDeviceMetrics;
 class KHTMLView;
 class KHTMLPart;
-class KHTMLSelection;
 class RenderArena;
 
 #if APPLE_CHANGES
@@ -101,6 +100,7 @@ class NodeListImpl;
 class ProcessingInstructionImpl;
 class RangeImpl;
 class RegisteredEventListener;
+class Selection;
 class StyleSheetImpl;
 class StyleSheetListImpl;
 class TextImpl;

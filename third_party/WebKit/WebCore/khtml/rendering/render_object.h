@@ -89,11 +89,11 @@ typedef enum {
 
 namespace DOM {
 class HTMLAreaElementImpl;
-class DOMPosition;
 class DOMString;
 class DocumentImpl;
 class ElementImpl;
 class EventImpl;
+class Position;
 };
 
 namespace khtml {
@@ -562,7 +562,7 @@ class RenderObject : public CachedObjectClient {
                            HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
 
-  virtual DOM::DOMPosition positionForCoordinates(int x, int y);
+  virtual DOM::Position positionForCoordinates(int x, int y);
 
   virtual void dirtyLinesFromChangedChild(RenderObject* child);
 

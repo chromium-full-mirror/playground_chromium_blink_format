@@ -34,12 +34,12 @@
 #include "xml/dom_nodeimpl.h"
 #include "xml/dom_docimpl.h"
 #include "xml/dom_position.h"
+#include "xml/dom_selection.h"
 #include "html/html_formimpl.h"
 #include "render_block.h"
 
 #include "khtmlview.h"
 #include "khtml_part.h"
-#include "khtml_selection.h"
 #include "htmltags.h"
 
 using namespace DOM;
@@ -1409,7 +1409,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
       then paint the caret.
   */
   if (paintAction == PaintActionForeground) {
-    const KHTMLSelection& s = document()->part()->selection();
+    const Selection& s = document()->part()->selection();
     NodeImpl* baseNode = s.baseNode();
     RenderObject* renderer = baseNode ? baseNode->renderer() : 0;
     if (renderer && renderer->containingBlock() == this &&
@@ -2159,35 +2159,34 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
   return inBox;
 }
 
-DOMPosition RenderBlock::positionForBox(InlineBox* box, bool start) const {
+Position RenderBlock::positionForBox(InlineBox* box, bool start) const {
   if (!box)
-    return DOMPosition();
+    return Position();
 
   if (!box->object()->element())
-    return DOMPosition(element(), start ? caretMinOffset() : caretMaxOffset());
+    return Position(element(), start ? caretMinOffset() : caretMaxOffset());
 
   if (!box->isInlineTextBox())
-    return DOMPosition(box->object()->element(),
-                       start ? box->object()->caretMinOffset()
-                             : box->object()->caretMaxOffset());
+    return Position(box->object()->element(),
+                    start ? box->object()->caretMinOffset()
+                          : box->object()->caretMaxOffset());
 
   InlineTextBox* textBox = static_cast<InlineTextBox*>(box);
-  return DOMPosition(
-      box->object()->element(),
-      start ? textBox->start() : textBox->start() + textBox->len());
+  return Position(box->object()->element(),
+                  start ? textBox->start() : textBox->start() + textBox->len());
 }
 
-DOMPosition RenderBlock::positionForRenderer(RenderObject* renderer,
-                                             bool start) const {
+Position RenderBlock::positionForRenderer(RenderObject* renderer,
+                                          bool start) const {
   if (!renderer)
-    return DOMPosition();
+    return Position();
 
   NodeImpl* node = renderer->element() ? renderer->element() : element();
   long offset = start ? node->caretMinOffset() : node->caretMaxOffset();
-  return DOMPosition(node, offset);
+  return Position(node, offset);
 }
 
-DOMPosition RenderBlock::positionForCoordinates(int _x, int _y) {
+Position RenderBlock::positionForCoordinates(int _x, int _y) {
   if (isTable())
     return RenderFlow::positionForCoordinates(_x, _y);
 
@@ -2207,7 +2206,7 @@ DOMPosition RenderBlock::positionForCoordinates(int _x, int _y) {
 
   if (childrenInline()) {
     if (!firstRootBox())
-      return DOMPosition(element(), 0);
+      return Position(element(), 0);
 
     if (_y >= top && _y < absy + firstRootBox()->topOverflow())
       // y coordinates is above first root line box
@@ -2234,7 +2233,7 @@ DOMPosition RenderBlock::positionForCoordinates(int _x, int _y) {
           return closestBox->object()->positionForCoordinates(_x, _y);
       }
     }
-    return DOMPosition(element(), 0);
+    return Position(element(), 0);
   }
 
   // see if any child blocks exist at this y coordinate
@@ -2262,7 +2261,7 @@ DOMPosition RenderBlock::positionForCoordinates(int _x, int _y) {
 
   // still no luck...return this render object's element, if there isn't one,
   // and offset 0
-  return DOMPosition(element(), 0);
+  return Position(element(), 0);
 }
 
 void RenderBlock::calcMinMaxWidth() {

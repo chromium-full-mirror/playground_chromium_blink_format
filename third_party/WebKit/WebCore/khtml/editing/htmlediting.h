@@ -27,17 +27,16 @@
 #define __htmlediting_h__
 
 #include "dom_position.h"
+#include "dom_selection.h"
 #include "dom_string.h"
-#include "khtml_selection.h"
 #include "shared.h"
-
-class KHTMLSelection;
 
 namespace DOM {
 class DocumentImpl;
-class DOMPosition;
 class DOMString;
 class NodeImpl;
+class Position;
+class Selection;
 class TextImpl;
 };
 
@@ -100,11 +99,11 @@ class SharedCommandImpl : public Shared<SharedCommandImpl> {
 
   virtual DOM::DocumentImpl* const document() const = 0;
 
-  virtual KHTMLSelection startingSelection() const = 0;
-  virtual KHTMLSelection endingSelection() const = 0;
+  virtual DOM::Selection startingSelection() const = 0;
+  virtual DOM::Selection endingSelection() const = 0;
 
-  virtual void setStartingSelection(const KHTMLSelection& s) = 0;
-  virtual void setEndingSelection(const KHTMLSelection& s) = 0;
+  virtual void setStartingSelection(const DOM::Selection& s) = 0;
+  virtual void setEndingSelection(const DOM::Selection& s) = 0;
 
   virtual void moveToStartingSelection() = 0;
   virtual void moveToEndingSelection() = 0;
@@ -134,11 +133,11 @@ class EditCommand : public SharedPtr<SharedCommandImpl> {
 
   DOM::DocumentImpl* const document() const;
 
-  KHTMLSelection startingSelection() const;
-  KHTMLSelection endingSelection() const;
+  DOM::Selection startingSelection() const;
+  DOM::Selection endingSelection() const;
 
-  void setStartingSelection(const KHTMLSelection& s);
-  void setEndingSelection(const KHTMLSelection& s);
+  void setStartingSelection(const DOM::Selection& s);
+  void setEndingSelection(const DOM::Selection& s);
 
   void moveToStartingSelection();
   void moveToEndingSelection();
@@ -191,7 +190,7 @@ class DeleteCollapsibleWhitespaceCommand : public CompositeEditCommand {
  public:
   DeleteCollapsibleWhitespaceCommand(DOM::DocumentImpl* document);
   DeleteCollapsibleWhitespaceCommand(DOM::DocumentImpl* document,
-                                     const KHTMLSelection& selection);
+                                     const DOM::Selection& selection);
 
   virtual ~DeleteCollapsibleWhitespaceCommand();
 
@@ -206,7 +205,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
  public:
   DeleteSelectionCommand(DOM::DocumentImpl* document);
   DeleteSelectionCommand(DOM::DocumentImpl* document,
-                         const KHTMLSelection& selection);
+                         const DOM::Selection& selection);
   virtual ~DeleteSelectionCommand();
 
  private:

@@ -57,7 +57,7 @@ khtml::MouseEvent::~MouseEvent() {
 }
 
 long khtml::MouseEvent::offset() const {
-  DOMPosition pos;
+  Position pos;
   if (innerNode().handle()) {
     // FIXME: Shouldn't be necessary to skip text nodes.
     DOM::Node inner = innerNode();

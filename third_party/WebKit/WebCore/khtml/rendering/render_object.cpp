@@ -1725,8 +1725,8 @@ void RenderObject::arenaDelete(RenderArena* arena) {
   arenaDelete(arena, dynamic_cast<void*>(this));
 }
 
-DOMPosition RenderObject::positionForCoordinates(int x, int y) {
-  return DOMPosition(element(), caretMinOffset());
+Position RenderObject::positionForCoordinates(int x, int y) {
+  return Position(element(), caretMinOffset());
 }
 
 bool RenderObject::mouseInside() const {

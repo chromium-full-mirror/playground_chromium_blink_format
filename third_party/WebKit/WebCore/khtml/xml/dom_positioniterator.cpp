@@ -29,8 +29,8 @@
 
 namespace DOM {
 
-DOMPosition EditIterator::peekPrevious() const {
-  DOMPosition pos = m_current;
+Position EditIterator::peekPrevious() const {
+  Position pos = m_current;
 
   if (pos.isEmpty())
     return pos;
@@ -38,16 +38,16 @@ DOMPosition EditIterator::peekPrevious() const {
   if (pos.offset() <= 0) {
     NodeImpl* prevNode = pos.node()->previousEditable();
     if (prevNode)
-      pos = DOMPosition(prevNode, prevNode->maxOffset());
+      pos = Position(prevNode, prevNode->maxOffset());
   } else {
-    pos = DOMPosition(pos.node(), pos.offset() - 1);
+    pos = Position(pos.node(), pos.offset() - 1);
   }
 
   return pos;
 }
 
-DOMPosition EditIterator::peekNext() const {
-  DOMPosition pos = m_current;
+Position EditIterator::peekNext() const {
+  Position pos = m_current;
 
   if (pos.isEmpty())
     return pos;
@@ -55,9 +55,9 @@ DOMPosition EditIterator::peekNext() const {
   if (pos.offset() >= pos.node()->maxOffset()) {
     NodeImpl* nextNode = pos.node()->nextEditable();
     if (nextNode)
-      pos = DOMPosition(nextNode, 0);
+      pos = Position(nextNode, 0);
   } else {
-    pos = DOMPosition(pos.node(), pos.offset() + 1);
+    pos = Position(pos.node(), pos.offset() + 1);
   }
 
   return pos;

@@ -50,7 +50,6 @@ class RenderStyle;
 
 namespace DOM {
 
-class DOMPosition;
 class NodeListImpl;
 class NamedNodeMapImpl;
 class DocumentImpl;
@@ -59,6 +58,7 @@ class Range;
 class RangeImpl;
 class RegisteredEventListener;
 class EventImpl;
+class Position;
 
 // The namespace used for XHTML elements
 #define XHTML_NAMESPACE "http://www.w3.org/1999/xhtml"
@@ -180,7 +180,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool inSameRootEditableBlock(NodeImpl*);
   bool inSameContainingEditableBlock(NodeImpl*);
 
-  DOMPosition positionForCoordinates(int x, int y);
+  Position positionForCoordinates(int x, int y);
 
   // used by the parser. Doesn't do as many error checkings as
   // appendChild(), and returns the node into which will be parsed next.
