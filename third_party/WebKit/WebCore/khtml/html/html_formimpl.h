@@ -227,9 +227,12 @@ class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLFieldSetElementImpl();
 
   virtual Id id() const;
-  DOMString type() const;
-
   virtual void attach();
+
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
+
+  virtual DOMString type() const;
 };
 
 // -------------------------------------------------------------------------
@@ -356,7 +359,11 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLLegendElementImpl();
 
   virtual Id id() const;
-  DOMString type() const;
+  virtual void attach();
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
+
+  virtual DOMString type() const;
 };
 
 // -------------------------------------------------------------------------

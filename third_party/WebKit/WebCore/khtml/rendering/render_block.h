@@ -108,6 +108,9 @@ class RenderBlock : public RenderFlow {
   void insertPositionedObject(RenderObject* o);
   void removePositionedObject(RenderObject* o);
 
+  // Called to lay out the legend for a fieldset.
+  virtual RenderObject* layoutLegend(bool relayoutChildren) { return 0; };
+
   // the implementation of the following functions is in bidi.cpp
   void bidiReorderLine(const BidiIterator& start, const BidiIterator& end);
   BidiIterator findNextLineBreak(BidiIterator& start);

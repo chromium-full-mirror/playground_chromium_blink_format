@@ -570,14 +570,19 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 #endif
 
   int xPos = borderLeft() + paddingLeft();
-  int toAdd = borderBottom() + paddingBottom();
-
-  m_height = borderTop() + paddingTop();
-  int minHeight = m_height + toAdd;
-  m_overflowHeight = m_height;
-
   if (style()->direction() == RTL)
     xPos = m_width - paddingRight() - borderRight();
+
+  int toAdd = borderBottom() + paddingBottom();
+  m_height = borderTop() + paddingTop();
+
+  // Fieldsets need to find their legend and position it inside the border of
+  // the object.
+  // The legend then gets skipped during normal layout.
+  RenderObject* legend = layoutLegend(relayoutChildren);
+
+  int minHeight = m_height + toAdd;
+  m_overflowHeight = m_height;
 
   RenderObject* child = firstChild();
   RenderBlock* prevFlow = 0;
@@ -659,6 +664,12 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   //     t.start();
 
   while (child != 0) {
+    if (legend == child) {
+      child = child->nextSibling();
+      continue;  // Skip the legend, since it has already been positioned up in
+                 // the fieldset's border.
+    }
+
     // make sure we relayout children if we need it.
     if (relayoutChildren || floatBottom() > m_y ||
         (child->isReplaced() && (child->style()->width().isPercent() ||
@@ -992,7 +1003,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
         }
       }
     } else {
-      chPos -= child->width() + child->marginLeft() + child->marginRight();
+      chPos -= child->width() + child->marginRight();
       if (child->style()->hidesOverflow() ||
           ((style()->htmlHacks() || child->isTable()) &&
            child->style()->flowAroundFloats()))

@@ -27,7 +27,7 @@
 
 #include "rendering/render_replaced.h"
 #include "rendering/render_image.h"
-#include "rendering/render_flow.h"
+#include "rendering/render_block.h"
 #include "html/html_formimpl.h"
 
 class QWidget;
@@ -277,11 +277,26 @@ class LineEditWidget : public KLineEdit {
 
 // -------------------------------------------------------------------------
 
-class RenderFieldset : public RenderFormElement {
+class RenderFieldset : public RenderBlock {
  public:
   RenderFieldset(DOM::HTMLGenericFormElementImpl* element);
 
   virtual const char* renderName() const { return "RenderFieldSet"; }
+
+  virtual RenderObject* layoutLegend(bool relayoutChildren);
+
+ protected:
+  virtual void
+  paintBoxDecorations(QPainter* p, int, int _y, int, int _h, int _tx, int _ty);
+  void paintBorderMinusLegend(QPainter* p,
+                              int _tx,
+                              int _ty,
+                              int w,
+                              int h,
+                              const RenderStyle* style,
+                              int lx,
+                              int lw);
+  RenderObject* findLegend();
 };
 
 // -------------------------------------------------------------------------
@@ -333,7 +348,7 @@ class RenderLabel : public RenderFormElement {
 
 // -------------------------------------------------------------------------
 
-class RenderLegend : public RenderFormElement {
+class RenderLegend : public RenderBlock {
  public:
   RenderLegend(DOM::HTMLGenericFormElementImpl* element);
 

@@ -2811,7 +2811,9 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
             size = (fontSizes[6] * 5) / 3;
             break;
           case CSS_VAL_LARGER:
-            // ### use the next bigger standardSize!!!
+            // FIXME: Larger/smaller should actually apply a scale to the
+            // logical size.  It 		// should not simply be transforming the
+            // current size.
             size = oldSize * 1.2;
             break;
           case CSS_VAL_SMALLER:
@@ -2826,7 +2828,16 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         // Since the UA default can vary depending on the font family (e.g.,
         // monospace could be 11pt
         // but serif could be 20pt), we don't set our size specified bit.
-        fontDef.sizeSpecified = false;
+        if (primitiveValue->getIdent() != CSS_VAL_LARGER &&
+            primitiveValue->getIdent() != CSS_VAL_SMALLER) {
+          // FIXME: Technically this should be logical too and apply a scale
+          // to logical sizes when no explicit size is specified,
+          // but until the above simplistic 1.2 mult/division calculation is
+          // improved, we have to ignore these cases.
+          fontDef.sizeSpecified = false;
+          fontDef.logicalSize = primitiveValue->getIdent() - CSS_VAL_XX_SMALL;
+        } else
+          fontDef.sizeSpecified = true;
 
       } else {
         fontDef.sizeSpecified = true;
@@ -3331,17 +3342,24 @@ void CSSStyleSelector::checkForGenericFamilyChange(RenderStyle* aStyle,
 
   // We know the parent is monospace or the child is monospace, and that font
   // size was unspecified.  We want to alter our font size to use the correct
-  // "medium" font for our family.
-  float size = 0;
+  // logicalSize font for our family.
   int minFontSize = settings->minFontSize();
-  size = (childFont.genericFamily == FontDef::eMonospace) ? m_fixedFontSizes[3]
-                                                          : m_fontSizes[3];
-  int isize = (int)size;
-  if (isize < minFontSize)
-    isize = minFontSize;
+  const QValueList<int>& fontSizes =
+      (childFont.genericFamily == FontDef::eMonospace) ? m_fixedFontSizes
+                                                       : m_fontSizes;
+  int size = 0;
+  if (childFont.logicalSize < 0 ||
+      childFont.logicalSize > 7)  // Should never happen; I'm being paranoid.
+    size = fontSizes[3];
+  if (childFont.logicalSize == 7)  // KONQ_XX_LARGE
+    size = (fontSizes[6] * 5) / 3;
+  else
+    size = fontSizes[childFont.logicalSize];
+  if (size < minFontSize)
+    size = minFontSize;
 
   FontDef newFontDef(childFont);
-  newFontDef.size = isize;
+  newFontDef.size = size;
   aStyle->setFontDef(newFontDef);
 }
 

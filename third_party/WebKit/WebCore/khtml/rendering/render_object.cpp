@@ -456,6 +456,12 @@ int RenderObject::containingBlockHeight() const {
   return containingBlock()->contentHeight();
 }
 
+bool RenderObject::sizesToMaxWidth() const {
+  return isFloating() || isCompact() ||
+         (element() &&
+          (element()->id() == ID_BUTTON || element()->id() == ID_LEGEND));
+}
+
 void RenderObject::drawBorder(QPainter* p,
                               int x1,
                               int y1,

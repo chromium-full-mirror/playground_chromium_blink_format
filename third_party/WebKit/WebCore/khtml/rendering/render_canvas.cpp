@@ -244,10 +244,11 @@ void RenderCanvas::paintBoxDecorations(QPainter* p,
                                        int _h,
                                        int _tx,
                                        int _ty) {
-  if (firstChild() || !view())
+  if ((firstChild() && firstChild()->style()->visibility() == VISIBLE) ||
+      !view())
     return;
 
-  p->fillRect(_tx, _ty, _w, _h,
+  p->fillRect(_x, _y, _w, _h,
               view()->palette().active().color(QColorGroup::Base));
 }
 
