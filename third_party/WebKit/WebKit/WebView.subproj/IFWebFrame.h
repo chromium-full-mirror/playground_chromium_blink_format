@@ -10,7 +10,6 @@
 
 @class IFError;
 @class IFWebDataSource;
-@class IFWebView;
 @protocol IFWebController;
 
 @class IFWebFramePrivate;
@@ -29,8 +28,8 @@
 - (void)setController:(id<IFWebController>)controller;
 - (id<IFWebController>)controller;
 
-- (void)setView:(IFWebView*)view;
-- (IFWebView*)view;
+- (void)setView:(id)view;
+- (id)view;
 
 /*
     Sets the frame's data source.  Note that the data source will be
