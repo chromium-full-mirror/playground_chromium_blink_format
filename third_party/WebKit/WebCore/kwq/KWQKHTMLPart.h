@@ -243,7 +243,7 @@ class KWQKHTMLPart : public KHTMLPart {
                              NSRect* elementRect) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
-  void markMisspellingsInSelection(const DOM::Selection& selection);
+  void markMisspellingsInSelection(const khtml::Selection& selection);
   void updateSpellChecking();
 
   NSFileWrapper* fileWrapperForElement(DOM::ElementImpl*);

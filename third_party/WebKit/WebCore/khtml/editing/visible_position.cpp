@@ -37,79 +37,80 @@
 #define LOG(channel, formatAndArgs...) ((void)0)
 #endif
 
-using khtml::InlineTextBox;
-using khtml::RenderObject;
-using khtml::RenderText;
-using khtml::VISIBLE;
+using DOM::CharacterDataImpl;
+using DOM::offsetInCharacters;
+using DOM::Position;
+using DOM::Range;
+using DOM::RangeImpl;
 
-namespace DOM {
+namespace khtml {
 
-CaretPosition::CaretPosition(NodeImpl* node, long offset) {
+VisiblePosition::VisiblePosition(NodeImpl* node, long offset) {
   init(Position(node, offset));
 }
 
-CaretPosition::CaretPosition(const Position& pos) {
+VisiblePosition::VisiblePosition(const Position& pos) {
   init(pos);
 }
 
-void CaretPosition::init(const Position& pos) {
+void VisiblePosition::init(const Position& pos) {
   Position deepPos = deepEquivalent(pos);
 
   if (isCandidate(deepPos)) {
     m_deepPosition = deepPos;
-    Position previous = previousCaretPosition(deepPos);
+    Position previous = previousVisiblePosition(deepPos);
     if (previous.isNotNull()) {
-      Position next = nextCaretPosition(previous);
+      Position next = nextVisiblePosition(previous);
       if (next.isNotNull())
         m_deepPosition = next;
     }
   } else {
-    Position next = nextCaretPosition(deepPos);
+    Position next = nextVisiblePosition(deepPos);
     if (next.isNotNull()) {
       m_deepPosition = next;
     } else {
-      Position previous = previousCaretPosition(deepPos);
+      Position previous = previousVisiblePosition(deepPos);
       if (previous.isNotNull())
         m_deepPosition = previous;
     }
   }
 }
 
-bool CaretPosition::isLastInBlock() const {
+bool VisiblePosition::isLastInBlock() const {
   if (isNull())
     return false;
 
-  CaretPosition n = next();
+  VisiblePosition n = next();
   return n.isNull() ||
          (n.deepEquivalent().node()->enclosingBlockFlowElement() !=
           m_deepPosition.node()->enclosingBlockFlowElement());
 }
 
-CaretPosition CaretPosition::next() const {
-  CaretPosition result;
-  result.m_deepPosition = nextCaretPosition(m_deepPosition);
+VisiblePosition VisiblePosition::next() const {
+  VisiblePosition result;
+  result.m_deepPosition = nextVisiblePosition(m_deepPosition);
   return result;
 }
 
-CaretPosition CaretPosition::previous() const {
-  CaretPosition result;
-  result.m_deepPosition = previousCaretPosition(m_deepPosition);
+VisiblePosition VisiblePosition::previous() const {
+  VisiblePosition result;
+  result.m_deepPosition = previousVisiblePosition(m_deepPosition);
   return result;
 }
 
-Position CaretPosition::previousCaretPosition(const Position& pos) {
+Position VisiblePosition::previousVisiblePosition(const Position& pos) {
   if (pos.isNull() || atStart(pos))
     return Position();
 
   Position test = deepEquivalent(pos);
-  bool acceptAnyCaretPosition =
+  bool acceptAnyVisiblePosition =
       !isCandidate(test) || pos.isFirstRenderedPositionOnLine();
 
   Position current = test;
   while (!atStart(current)) {
     current = previousPosition(current);
-    if (isCandidate(current) &&
-        (acceptAnyCaretPosition || current.rendersInDifferentPosition(test))) {
+    if (isCandidate(current) && (acceptAnyVisiblePosition ||
+                                 current.rendersInDifferentPosition(test))) {
       return current;
     }
   }
@@ -117,19 +118,19 @@ Position CaretPosition::previousCaretPosition(const Position& pos) {
   return Position();
 }
 
-Position CaretPosition::nextCaretPosition(const Position& pos) {
+Position VisiblePosition::nextVisiblePosition(const Position& pos) {
   if (pos.isNull() || atEnd(pos))
     return Position();
 
   Position test = deepEquivalent(pos);
-  bool acceptAnyCaretPosition =
+  bool acceptAnyVisiblePosition =
       !isCandidate(test) || pos.isLastRenderedPositionOnLine();
 
   Position current = test;
   while (!atEnd(current)) {
     current = nextPosition(current);
-    if (isCandidate(current) &&
-        (acceptAnyCaretPosition || current.rendersInDifferentPosition(test))) {
+    if (isCandidate(current) && (acceptAnyVisiblePosition ||
+                                 current.rendersInDifferentPosition(test))) {
       return current;
     }
   }
@@ -137,7 +138,7 @@ Position CaretPosition::nextCaretPosition(const Position& pos) {
   return Position();
 }
 
-Position CaretPosition::previousPosition(const Position& pos) {
+Position VisiblePosition::previousPosition(const Position& pos) {
   if (pos.isNull())
     return pos;
 
@@ -154,7 +155,7 @@ Position CaretPosition::previousPosition(const Position& pos) {
   return result;
 }
 
-Position CaretPosition::nextPosition(const Position& pos) {
+Position VisiblePosition::nextPosition(const Position& pos) {
   if (pos.isNull())
     return pos;
 
@@ -171,14 +172,14 @@ Position CaretPosition::nextPosition(const Position& pos) {
   return result;
 }
 
-bool CaretPosition::atStart(const Position& pos) {
+bool VisiblePosition::atStart(const Position& pos) {
   if (pos.isNull())
     return true;
 
   return pos.offset() <= 0 && pos.node()->previousLeafNode() == 0;
 }
 
-bool CaretPosition::atEnd(const Position& pos) {
+bool VisiblePosition::atEnd(const Position& pos) {
   if (pos.isNull())
     return true;
 
@@ -186,7 +187,7 @@ bool CaretPosition::atEnd(const Position& pos) {
          pos.node()->nextLeafNode() == 0;
 }
 
-bool CaretPosition::isCandidate(const Position& pos) {
+bool VisiblePosition::isCandidate(const Position& pos) {
   if (pos.isNull())
     return false;
 
@@ -230,7 +231,7 @@ bool CaretPosition::isCandidate(const Position& pos) {
   return false;
 }
 
-Position CaretPosition::deepEquivalent(const Position& pos) {
+Position VisiblePosition::deepEquivalent(const Position& pos) {
   NodeImpl* node = pos.node();
   long offset = pos.offset();
 
@@ -273,7 +274,7 @@ Position CaretPosition::deepEquivalent(const Position& pos) {
   return Position(node, 0);
 }
 
-Position CaretPosition::rangeCompliantEquivalent(const Position& pos) {
+Position VisiblePosition::rangeCompliantEquivalent(const Position& pos) {
   NodeImpl* node = pos.node();
   if (!node)
     return Position();
@@ -288,19 +289,19 @@ Position CaretPosition::rangeCompliantEquivalent(const Position& pos) {
   return Position(node, kMax(0L, kMin(offset, maxOffset(node))));
 }
 
-long CaretPosition::maxOffset(const NodeImpl* node) {
+long VisiblePosition::maxOffset(const NodeImpl* node) {
   return offsetInCharacters(node->nodeType())
              ? (long)static_cast<const CharacterDataImpl*>(node)->length()
              : (long)node->childNodeCount();
 }
 
-bool CaretPosition::isAtomicNode(const NodeImpl* node) {
+bool VisiblePosition::isAtomicNode(const NodeImpl* node) {
   return node && (!node->hasChildNodes() ||
                   (node->id() == ID_OBJECT && node->renderer() &&
                    node->renderer()->isReplaced()));
 }
 
-void CaretPosition::debugPosition(const char* msg) const {
+void VisiblePosition::debugPosition(const char* msg) const {
   if (isNull())
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
@@ -310,26 +311,26 @@ void CaretPosition::debugPosition(const char* msg) const {
 }
 
 #ifndef NDEBUG
-void CaretPosition::formatForDebugger(char* buffer, unsigned length) const {
+void VisiblePosition::formatForDebugger(char* buffer, unsigned length) const {
   m_deepPosition.formatForDebugger(buffer, length);
 }
 #endif
 
-Range makeRange(const CaretPosition& start, const CaretPosition& end) {
+Range makeRange(const VisiblePosition& start, const VisiblePosition& end) {
   Position s = start.position();
   Position e = end.position();
   return Range(s.node(), s.offset(), e.node(), e.offset());
 }
 
-CaretPosition start(const Range& r) {
-  return CaretPosition(r.startContainer().handle(), r.startOffset());
+VisiblePosition startVisiblePosition(const Range& r) {
+  return VisiblePosition(r.startContainer().handle(), r.startOffset());
 }
 
-CaretPosition end(const Range& r) {
-  return CaretPosition(r.endContainer().handle(), r.endOffset());
+VisiblePosition endVisiblePosition(const Range& r) {
+  return VisiblePosition(r.endContainer().handle(), r.endOffset());
 }
 
-bool setStart(Range& r, const CaretPosition& c) {
+bool setStart(Range& r, const VisiblePosition& c) {
   RangeImpl* ri = r.handle();
   if (!ri)
     return false;
@@ -339,7 +340,7 @@ bool setStart(Range& r, const CaretPosition& c) {
   return code == 0;
 }
 
-bool setEnd(Range& r, const CaretPosition& c) {
+bool setEnd(Range& r, const VisiblePosition& c) {
   RangeImpl* ri = r.handle();
   if (!ri)
     return false;

@@ -28,37 +28,30 @@
 
 #include <qrect.h>
 #include "xml/dom_position.h"
+#include "text_granularity.h"
 
 class KHTMLPart;
 class QPainter;
 
 namespace khtml {
+
 class RenderObject;
-}
-
-namespace DOM {
-
-class CaretPosition;
+class VisiblePosition;
 
 class Selection {
  public:
   enum EState { NONE, CARET, RANGE };
   enum EAlter { MOVE, EXTEND };
   enum EDirection { FORWARD, BACKWARD, RIGHT, LEFT };
-  enum ETextGranularity {
-    CHARACTER,
-    WORD,
-    LINE,
-    PARAGRAPH,
-    LINE_BOUNDARY,
-    PARAGRAPH_BOUNDARY,
-    DOCUMENT_BOUNDARY
-  };
+
+  typedef DOM::EAffinity EAffinity;
+  typedef DOM::Range Range;
+  typedef DOM::Position Position;
 
   Selection();
   Selection(const Range&);
-  Selection(const CaretPosition&);
-  Selection(const CaretPosition&, const CaretPosition&);
+  Selection(const VisiblePosition&);
+  Selection(const VisiblePosition&, const VisiblePosition&);
   Selection(const Position&);
   Selection(const Position&, const Position&);
   Selection(const Selection&);
@@ -68,7 +61,7 @@ class Selection {
     moveTo(r);
     return *this;
   }
-  Selection& operator=(const CaretPosition& r) {
+  Selection& operator=(const VisiblePosition& r) {
     moveTo(r);
     return *this;
   }
@@ -78,8 +71,8 @@ class Selection {
   }
 
   void moveTo(const Range&);
-  void moveTo(const CaretPosition&);
-  void moveTo(const CaretPosition&, const CaretPosition&);
+  void moveTo(const VisiblePosition&);
+  void moveTo(const VisiblePosition&, const VisiblePosition&);
   void moveTo(const Position&);
   void moveTo(const Position&, const Position&);
   void moveTo(const Selection&);
@@ -93,9 +86,10 @@ class Selection {
   bool expandUsingGranularity(ETextGranularity);
   void clear();
 
-  void setBase(const CaretPosition&);
-  void setExtent(const CaretPosition&);
-  void setBaseAndExtent(const CaretPosition& base, const CaretPosition& extent);
+  void setBase(const VisiblePosition&);
+  void setExtent(const VisiblePosition&);
+  void setBaseAndExtent(const VisiblePosition& base,
+                        const VisiblePosition& extent);
 
   void setBase(const Position& pos);
   void setExtent(const Position& pos);
@@ -134,10 +128,10 @@ class Selection {
   void init();
   void validate(ETextGranularity granularity = CHARACTER);
 
-  CaretPosition modifyExtendingRightForward(ETextGranularity);
-  CaretPosition modifyMovingRightForward(ETextGranularity);
-  CaretPosition modifyExtendingLeftBackward(ETextGranularity);
-  CaretPosition modifyMovingLeftBackward(ETextGranularity);
+  VisiblePosition modifyExtendingRightForward(ETextGranularity);
+  VisiblePosition modifyMovingRightForward(ETextGranularity);
+  VisiblePosition modifyExtendingLeftBackward(ETextGranularity);
+  VisiblePosition modifyMovingLeftBackward(ETextGranularity);
 
   void layoutCaret();
   void needsCaretRepaint();
