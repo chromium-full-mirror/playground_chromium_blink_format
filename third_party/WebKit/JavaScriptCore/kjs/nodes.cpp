@@ -67,14 +67,13 @@ using namespace KJS;
   if (Collector::outOfMemory()) \
     return Undefined();  // will be picked up by KJS_CHECKEXCEPTION
 
-#define KJS_CHECKEXCEPTIONREFERENCE                       \
-  if (exec->hadException())                               \
-    return ConstReference(UndefinedImp::staticUndefined); \
-  ;                                                       \
-  if (Collector::outOfMemory())                           \
-    return ConstReference(                                \
-        UndefinedImp::staticUndefined);  // will be picked up by
-                                         // KJS_CHECKEXCEPTION
+#define KJS_CHECKEXCEPTIONREFERENCE                    \
+  if (exec->hadException())                            \
+    return Reference::makeValueReference(Undefined()); \
+  ;                                                    \
+  if (Collector::outOfMemory())                        \
+    return Reference::makeValueReference(              \
+        Undefined());  // will be picked up by KJS_CHECKEXCEPTION
 
 #define KJS_CHECKEXCEPTIONLIST  \
   if (exec->hadException())     \
@@ -106,7 +105,7 @@ Node::~Node() {
 Reference Node::evaluateReference(ExecState* exec) {
   Value v = evaluate(exec);
   KJS_CHECKEXCEPTIONREFERENCE
-  return ConstReference(v.imp());
+  return Reference::makeValueReference(v);
 }
 
 #ifdef KJS_DEBUG_MEM
