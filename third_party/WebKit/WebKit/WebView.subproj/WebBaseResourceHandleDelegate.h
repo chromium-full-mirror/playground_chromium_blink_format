@@ -30,7 +30,7 @@
   BOOL defersCallbacks;
 }
 
-- (void)loadWithRequest:(WebResourceRequest*)request;
+- (BOOL)loadWithRequest:(WebResourceRequest*)request;
 
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;
