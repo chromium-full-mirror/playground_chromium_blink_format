@@ -83,7 +83,7 @@ class KHTMLParser {
   void reset();
 
   bool skipMode() const { return (discard_until != 0); }
-  bool noSpaces() const { return (!_inline || !inBody); }
+  bool noSpaces() const { return (!m_inline || !inBody); }
   bool selectMode() const { return inSelect; }
 
   DOM::HTMLDocumentImpl* doc() const {
@@ -102,7 +102,7 @@ class KHTMLParser {
 
   void processCloseTag(khtml::Token*);
 
-  bool insertNode(DOM::NodeImpl* n);
+  bool insertNode(DOM::NodeImpl* n, bool flat = false);
 
   /*
    * The currently active element (the one new elements will be added to)
@@ -153,9 +153,8 @@ class KHTMLParser {
   bool inBody;
   bool haveContent;
   bool haveFrameSet;
-  bool _inline;
+  bool m_inline;
   bool end;
-  bool flat;
   bool haveKonqBlock;
   bool inSelect;
 

@@ -47,12 +47,12 @@ using namespace DOM;
 using namespace khtml;
 
 void AttributeImpl::allocateImpl(ElementImpl* e) {
-  _impl = new AttrImpl(e, this);
+  _impl = new AttrImpl(e, e->docPtr(), this);
   _impl->ref();
 }
 
-AttrImpl::AttrImpl(ElementImpl* element, AttributeImpl* a)
-    : NodeBaseImpl(element->docPtr()), m_element(element), m_attribute(a) {
+AttrImpl::AttrImpl(ElementImpl* element, DocumentPtr* docPtr, AttributeImpl* a)
+    : NodeBaseImpl(docPtr), m_element(element), m_attribute(a) {
   assert(!m_attribute->_impl);
   m_attribute->_impl = this;
   m_attribute->ref();
@@ -119,7 +119,7 @@ void AttrImpl::setNodeValue(const DOMString& v, int& exceptioncode) {
 }
 
 NodeImpl* AttrImpl::cloneNode(bool /*deep*/) {
-  return new AttrImpl(0,
+  return new AttrImpl(0, docPtr(),
                       new AttributeImpl(m_attribute->id(), m_attribute->val()));
 }
 

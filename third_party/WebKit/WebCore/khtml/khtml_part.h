@@ -34,16 +34,16 @@
 
 #include <qregexp.h>
 
+#ifdef APPLE_CHANGES
+#include <KWQKHTMLPartImpl.h>
+#endif
+
 class KHTMLPartPrivate;
 class KHTMLPartBrowserExtension;
 class KJSProxy;
 class KHTMLView;
 class KHTMLSettings;
 class KJavaAppletContext;
-
-#ifdef APPLE_CHANGES
-class KWQKHTMLPartImpl;
-#endif
 
 namespace DOM {
 class HTMLDocument;
@@ -1143,9 +1143,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
 #ifdef APPLE_CHANGES
  public:
-  bool isFrameSet();
-  void setTitle(const DOM::DOMString&);
-  void detachView();
   void setStatusBarText(const QString&);
   KWQKHTMLPartImpl* impl;
   friend class KWQKHTMLPartImpl;

@@ -65,9 +65,7 @@ using namespace DOM;
 #include <qintcache.h>
 #include <stdlib.h>
 
-#ifdef APPLE_CHANGES
 namespace khtml {
-#endif
 
 CSSStyleSelectorList* CSSStyleSelector::defaultStyle = 0;
 CSSStyleSelectorList* CSSStyleSelector::defaultPrintStyle = 0;
@@ -98,11 +96,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
   settings = view ? view->part()->settings() : 0;
   if (!defaultStyle)
     loadDefaultStyle(settings);
-#if APPLE_CHANGES
   m_medium = view ? view->mediaType() : QString("all");
-#else
-  m_medium = view ? view->mediaType() : "all";
-#endif
 
   selectors = 0;
   selectorCache = 0;
@@ -274,11 +268,7 @@ static inline void bubbleSort(CSSOrderedProperty** b, CSSOrderedProperty** e) {
     bool swapped = FALSE;
     CSSOrderedProperty** y = e + 1;
     CSSOrderedProperty** x = e;
-#ifdef APPLE_CHANGES
     CSSOrderedProperty** swappedPos = 0;  // quiet gcc warning
-#else
-    CSSOrderedProperty** swappedPos;
-#endif
     do {
       if (!((**(--x)) < (**(--y)))) {
         swapped = TRUE;
@@ -2630,11 +2620,7 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
           if (!val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
             return;
           QString face = static_cast<FontFamilyValueImpl*>(val)->fontName();
-#ifdef APPLE_CHANGES
           if (!face.isEmpty()) {
-#else
-          if (!face.isNull() || face.isEmpty()) {
-#endif
             if (face == "serif") {
               face = settings->serifFontName();
             } else if (face == "sans-serif") {
@@ -2654,11 +2640,7 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
                 fontDirty = true;
             }
             return;
-#ifdef APPLE_CHANGES
-          }  // make prepare-ChangeLog happy
-#else
           }
-#endif
         }
         break;
       }
@@ -2838,6 +2820,4 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
   }
 }
 
-#ifdef APPLE_CHANGES
 }  // namespace khtml
-#endif

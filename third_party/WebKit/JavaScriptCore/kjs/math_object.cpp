@@ -136,13 +136,8 @@ bool MathFuncImp::implementsCall() const {
 Value MathFuncImp::call(ExecState* exec,
                         Object& /*thisObj*/,
                         const List& args) {
-  Value v = args[0];
-  Number n = v.toNumber(exec);
-  double arg = n.value();
-
-  Value v2 = args[1];
-  Number n2 = v2.toNumber(exec);
-  double arg2 = n2.value();
+  double arg = args[0].toNumber(exec);
+  double arg2 = args[1].toNumber(exec);
   double result;
 
   switch (id) {
@@ -234,7 +229,7 @@ Value MathFuncImp::call(ExecState* exec,
     case MathObjectImp::Round:
       if (isNaN(arg))
         result = arg;
-      if (isInf(arg) || isInf(-arg))
+      else if (isInf(arg) || isInf(-arg))
         result = arg;
       else if (arg == -0.5)
         result = 0;

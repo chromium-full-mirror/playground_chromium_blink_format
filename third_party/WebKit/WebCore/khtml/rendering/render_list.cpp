@@ -20,7 +20,9 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #include "render_list.h"
+#include "rendering/render_root.h"
 
 #include <qpainter.h>
 
@@ -293,9 +295,9 @@ void RenderListMarker::print(QPainter* p,
 
 void RenderListMarker::printObject(QPainter* p,
                                    int,
+                                   int _y,
                                    int,
-                                   int,
-                                   int,
+                                   int _h,
                                    int _tx,
                                    int _ty) {
   if (style()->visibility() != VISIBLE)
@@ -309,11 +311,28 @@ void RenderListMarker::printObject(QPainter* p,
   const QFontMetrics fm = p->fontMetrics();
 #ifdef APPLE_CHANGES
   // Why does khtml draw such large dots, squares, circle, etc for list items?
-  // These seem much bigger than competing browsers.  I've reduced the size.
+  // These seem much bigger than competing browsers. This change reduces the
+  // size.
+  // FIXME: Does this change cause positioning problems?
   int offset = fm.ascent() / 3;
-#else  /* APPLE_CHANGES not defined */
+#else
   int offset = fm.ascent() * 2 / 3;
-#endif /* APPLE_CHANGES not defined */
+#endif
+
+  bool isPrinting = (p->device()->devType() == QInternal::Printer);
+  if (isPrinting) {
+    if (_ty < _y) {
+      // This has been printed already we suppose.
+      return;
+    }
+    if (_ty + m_height + paddingBottom() + borderBottom() >= _y + _h) {
+      RenderRoot* rootObj = root();
+      if (_ty < rootObj->truncatedAt())
+        rootObj->setTruncatedAt(_ty);
+      // Let's print this on the next page.
+      return;
+    }
+  }
 
   int xoff = 0;
   int yoff = fm.ascent() - offset;

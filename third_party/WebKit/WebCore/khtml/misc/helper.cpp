@@ -65,19 +65,11 @@ static const colorMap cmap[] = {{"black", "#000000"},
                                 {0, 0}};
 
 struct uiColors {
-#ifdef APPLE_CHANGES
   const char* name;
   const char* configGroup;
   const char* configEntry;
   QPalette::ColorGroup group;
   QColorGroup::ColorRole role;
-#else
-  const char* const name;
-  const char* const configGroup;
-  const char* const configEntry;
-  const QPalette::ColorGroup group;
-  const QColorGroup::ColorRole role;
-#endif
 };
 
 const char* const wmgroup = "WM";

@@ -4028,13 +4028,7 @@ void Image::tryPut(ExecState* exec,
     src = str.value();
     if (img)
       img->deref(this);
-#ifndef APPLE_CHANGES
-    img = static_cast<DOM::DocumentImpl*>(doc.handle())
-              ->docLoader()
-              ->requestImage(src.string());
-#else
     img = doc ? doc->docLoader()->requestImage(src.string()) : 0;
-#endif
     if (img)
       img->ref(this);
   } else {
@@ -4042,12 +4036,8 @@ void Image::tryPut(ExecState* exec,
   }
 }
 
-#ifdef APPLE_CHANGES
-
 Image::Image(const DOM::Document& d)
     : doc(static_cast<DOM::DocumentImpl*>(d.handle())), img(0) {}
-
-#endif
 
 Image::~Image() {
   if (img)

@@ -39,13 +39,14 @@ class CSSStyle;
 class KHTMLView;
 
 #ifndef NDEBUG
-#define KHTMLAssert(x)            \
-  if (!(x)) {                     \
-    const RenderObject* o = this; \
-    while (o->parent())           \
-      o = o->parent();            \
-    o->printTree();               \
-    assert(false);                \
+#define KHTMLAssert(x)                 \
+  if (!(x)) {                          \
+    const RenderObject* o = this;      \
+    while (o->parent())                \
+      o = o->parent();                 \
+    o->printTree();                    \
+    qDebug(" this object = %p", this); \
+    assert(false);                     \
   }
 #else
 #define KHTMLAssert(x)
@@ -236,7 +237,7 @@ class RenderObject : public CachedObjectClient {
   virtual short baselinePosition(bool firstLine) const;
 
   /*
-   * Print the object and it's children, clipped by (x|y|w|h).
+   * Print the object and its children, clipped by (x|y|w|h).
    * (tx|ty) is the calculated position of the parent
    */
   virtual void print(QPainter* p, int x, int y, int w, int h, int tx, int ty);
@@ -291,7 +292,7 @@ class RenderObject : public CachedObjectClient {
 
   /*
    * This function should cause the Element to calculate its
-   * width and height and the layout of it's content
+   * width and height and the layout of its content
    *
    * when the Element calls setLayouted(true), layout() is no
    * longer called during relayouts, as long as there is no
@@ -506,6 +507,8 @@ class RenderObject : public CachedObjectClient {
 
   void invalidateVerticalPositions();
   short getVerticalPosition(bool firstLine) const;
+
+  virtual void removeLeftoverAnonymousBoxes();
 
  private:
   RenderStyle* m_style;

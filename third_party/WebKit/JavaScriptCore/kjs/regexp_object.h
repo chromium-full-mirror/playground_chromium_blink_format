@@ -68,8 +68,8 @@ class RegExpImp : public ObjectImp {
 class RegExpObjectImp : public InternalFunctionImp {
  public:
   RegExpObjectImp(ExecState* exec,
-                  RegExpPrototypeImp* regProto,
-                  FunctionPrototypeImp* funcProto);
+                  FunctionPrototypeImp* funcProto,
+                  RegExpPrototypeImp* regProto);
   virtual ~RegExpObjectImp();
   virtual bool implementsConstruct() const;
   virtual Object construct(ExecState* exec, const List& args);
@@ -79,7 +79,7 @@ class RegExpObjectImp : public InternalFunctionImp {
   Value get(ExecState* exec, const UString& p) const;
   int** registerRegexp(const RegExp* re, const UString& s);
   void setSubPatterns(int num) { lastNrSubPatterns = num; }
-  Value arrayOfMatches(ExecState* exec, const UString& result) const;
+  Object arrayOfMatches(ExecState* exec, const UString& result) const;
 
  private:
   UString lastString;

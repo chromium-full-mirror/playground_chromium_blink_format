@@ -27,16 +27,16 @@
 
 using namespace KJS;
 
-RegExp::RegExp(const UString& p, int f) : pattern(p), flags(f) {
+RegExp::RegExp(const UString& p, int f) : pattern(p), flgs(f) {
 #ifdef HAVE_PCREPOSIX
   int pcreflags = 0;
   const char* perrormsg;
   int errorOffset;
 
-  if (flags & IgnoreCase)
+  if (flgs & IgnoreCase)
     pcreflags |= PCRE_CASELESS;
 
-  if (flags & Multiline)
+  if (flgs & Multiline)
     pcreflags |= PCRE_MULTILINE;
 
   pcregex = pcre_compile(p.ascii(), pcreflags, &perrormsg, &errorOffset, NULL);

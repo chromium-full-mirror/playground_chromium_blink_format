@@ -44,6 +44,7 @@ class RegExp {
   enum { None = 0, Global = 1, IgnoreCase = 2, Multiline = 4 };
   RegExp(const UString& p, int f = None);
   ~RegExp();
+  int flags() const { return flgs; }
   UString match(const UString& s,
                 int i = -1,
                 int* pos = 0L,
@@ -55,7 +56,7 @@ class RegExp {
 
  private:
   const UString& pattern;
-  int flags;
+  int flgs;
 
 #ifndef HAVE_PCREPOSIX
   regex_t preg;

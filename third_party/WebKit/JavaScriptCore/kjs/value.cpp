@@ -39,7 +39,7 @@
 
 using namespace KJS;
 
-// ------------------------------ ValueImp -------------------------------------
+// ----------------------------- ValueImp -------------------------------------
 
 #if APPLE_CHANGES
 ValueImp::ValueImp() : refcount(0) {
@@ -335,7 +335,7 @@ Undefined Undefined::dynamicCast(const Value& v) {
   if (v.isNull() || v.type() != UndefinedType)
     return Undefined(0);
 
-  return Undefined(static_cast<UndefinedImp*>(v.imp()));
+  return Undefined();
 }
 
 // ------------------------------ Null -----------------------------------------
@@ -357,7 +357,7 @@ Null Null::dynamicCast(const Value& v) {
   if (v.isNull() || v.type() != NullType)
     return Null(0);
 
-  return Null(static_cast<NullImp*>(v.imp()));
+  return Null();
 }
 
 // ------------------------------ Boolean --------------------------------------
@@ -452,14 +452,13 @@ double Number::value() const {
 }
 
 int Number::intValue() const {
-  assert(rep);
-  return (int)((NumberImp*)rep)->value();
+  return int(value());
 }
 
 bool Number::isNaN() const {
-  return KJS::isNaN(((NumberImp*)rep)->value());
+  return KJS::isNaN(value());
 }
 
 bool Number::isInf() const {
-  return KJS::isInf(((NumberImp*)rep)->value());
+  return KJS::isInf(value());
 }

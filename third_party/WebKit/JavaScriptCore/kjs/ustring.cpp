@@ -309,6 +309,13 @@ char* UString::ascii() const {
   return statBuffer;
 }
 
+#ifdef KJS_DEBUG_MEM
+void UString::globalClear() {
+  delete[] statBuffer;
+  statBuffer = 0L;
+}
+#endif
+
 UString& UString::operator=(const char* c) {
 #ifdef APPLE_CHANGES
   int l = c ? strlen(c) : 0;

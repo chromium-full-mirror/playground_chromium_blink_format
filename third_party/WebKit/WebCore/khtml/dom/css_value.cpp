@@ -25,10 +25,7 @@
 
 #include "css/css_valueimpl.h"
 
-using namespace DOM;
-#ifdef APPLE_CHANGES
 namespace DOM {
-#endif
 
 CSSStyleDeclaration::CSSStyleDeclaration() {
   impl = 0;
@@ -544,6 +541,4 @@ bool Rect::isNull() const {
   return (impl == 0);
 }
 
-#ifdef APPLE_CHANGES
 }  // namespace DOM
-#endif

@@ -67,9 +67,9 @@ const ClassInfo StringPrototypeImp::info = {"String", &StringInstanceImp::info,
   search		StringProtoFuncImp::Search	DontEnum|Function
 1
   slice			StringProtoFuncImp::Slice	DontEnum|Function
-0
+2
   split			StringProtoFuncImp::Split	DontEnum|Function
-1
+2
   substr		StringProtoFuncImp::Substr	DontEnum|Function
 2
   substring		StringProtoFuncImp::Substring	DontEnum|Function
@@ -222,9 +222,10 @@ Value StringProtoFuncImp::call(ExecState* exec,
     case Match:
     case Search: {
       u = s;
-      RegExp* reg = 0;
+      RegExp *reg, *tmpReg = 0;
+      RegExpImp* imp = 0;
       if (a0.isA(ObjectType) && a0.toObject(exec).inherits(&RegExpImp::info)) {
-        RegExpImp* imp = static_cast<RegExpImp*>(a0.toObject(exec).imp());
+        imp = static_cast<RegExpImp*>(a0.toObject(exec).imp());
         reg = imp->regExp();
       } else { /*
                 *  ECMA 15.5.4.12 String.prototype.search (regexp)
@@ -233,24 +234,42 @@ Value StringProtoFuncImp::call(ExecState* exec,
                 *  replaced with the result of the expression new
                 * RegExp(regexp).
                 */
-        reg = new RegExp(a0.toString(exec), RegExp::None);
+        reg = tmpReg = new RegExp(a0.toString(exec), RegExp::None);
       }
       RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
           exec->interpreter()->builtinRegExp().imp());
       int** ovector = regExpObj->registerRegexp(reg, u);
       UString mstr = reg->match(u, -1, &pos, ovector);
-      regExpObj->setSubPatterns(reg->subPatterns());
-      if (a0.isA(StringType))
-        delete reg;
       if (id == Search) {
         result = Number(pos);
-        break;
+      } else {
+        // Exec
+        if ((reg->flags() & RegExp::Global) == 0) {
+          // case without 'g' flag is handled like RegExp.prototype.exec
+          if (mstr.isNull())
+            return Null();  // no match
+          regExpObj->setSubPatterns(reg->subPatterns());
+          result = regExpObj->arrayOfMatches(exec, mstr);
+        } else {
+          // return array of matches
+          List list;
+          int lastIndex = 0;
+          while (pos >= 0) {
+            list.append(String(mstr));
+            lastIndex = pos;
+            pos += mstr.isEmpty() ? 1 : mstr.size();
+            delete[] * ovector;
+            mstr = reg->match(u, pos, &pos, ovector);
+          }
+          if (imp)
+            imp->put(exec, "lastIndex", Number(lastIndex),
+                     DontDelete | DontEnum);
+          result = exec->interpreter()->builtinArray().construct(exec, list);
+        }
       }
-      if (mstr.isNull())
-        result = Null();
-      else
-        result = regExpObj->arrayOfMatches(exec, mstr);
-    } break;
+      delete tmpReg;
+      break;
+    }
     case Replace:
       u = s;
       if (a0.type() == ObjectType &&
@@ -358,12 +377,14 @@ Value StringProtoFuncImp::call(ExecState* exec,
           res.put(exec, "length", Number(0));
           break;
         }
-        int* ovector;
-        int mpos;
         pos = 0;
-        while (1) {
+        while (pos < u.size()) {
           // TODO: back references
+          int mpos;
+          int* ovector = 0L;
           UString mstr = reg.match(u, pos, &mpos, &ovector);
+          delete[] ovector;
+          ovector = 0L;
           if (mpos < 0)
             break;
           pos = mpos + (mstr.isEmpty() ? 1 : mstr.size());
@@ -373,7 +394,6 @@ Value StringProtoFuncImp::call(ExecState* exec,
             i++;
           }
         }
-        delete[] ovector;
       } else if (a0.type() != UndefinedType) {
         u2 = a0.toString(exec);
         if (u2.isEmpty()) {

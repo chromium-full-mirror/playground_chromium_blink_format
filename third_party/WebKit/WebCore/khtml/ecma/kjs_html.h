@@ -30,9 +30,7 @@
 #include "ecma/kjs_binding.h"
 #include "ecma/kjs_dom.h"
 
-#ifdef APPLE_CHANGES
 #include <qguardedptr.h>
-#endif
 
 class HTMLElement;
 
@@ -524,11 +522,7 @@ class ImageConstructorImp : public ObjectImp {
 
 class Image : public DOMObject, public khtml::CachedObjectClient {
  public:
-#ifndef APPLE_CHANGES
-  Image(const DOM::Document& d) : doc(d), img(0) {}
-#else
   Image(const DOM::Document& d);
-#endif
   ~Image();
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
@@ -543,11 +537,7 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
 
  private:
   UString src;
-#ifndef APPLE_CHANGES
-  DOM::Document doc;
-#else
   QGuardedPtr<DOM::DocumentImpl> doc;
-#endif
   khtml::CachedImage* img;
 };
 

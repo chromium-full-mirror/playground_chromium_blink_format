@@ -154,10 +154,6 @@ void HTMLFormElementImpl::i18nData() {
       "When you send a password unencrypted to the Internet, "
       "it might be possible for others to capture it as plain text.\n"
       "Do you want to continue?");
-  QString foo4 = i18n(
-      "You're about to transfer the following files from "
-      "your local computer to the Internet.\n"
-      "Do you really want to continue?");
   QString foo5 = i18n(
       "Your data submission is redirected to "
       "an insecure site. The data is sent unencrypted.\n"
@@ -167,7 +163,7 @@ void HTMLFormElementImpl::i18nData() {
       "data by using <a href=\"javascript:go(0);\">Reload</a>");
 }
 
-QByteArray HTMLFormElementImpl::formData() {
+QByteArray HTMLFormElementImpl::formData(bool& ok) {
 #ifdef FORMS_DEBUG
   kdDebug(6030) << "form: formData()" << endl;
 #endif
@@ -232,6 +228,8 @@ QByteArray HTMLFormElementImpl::formData() {
         m_encCharset[i].latin1() == ' ' ? QChar('-') : m_encCharset[i].lower();
 #endif /* APPLE_CHANGES not defined */
 
+  QStringList fileUploads;
+
   for (QPtrListIterator<HTMLGenericFormElementImpl> it(formElements);
        it.current(); ++it) {
     HTMLGenericFormElementImpl* current = it.current();
@@ -272,6 +270,8 @@ QByteArray HTMLFormElementImpl::formData() {
                   HTMLInputElementImpl::FILE) {
             QString path =
                 static_cast<HTMLInputElementImpl*>(current)->value().string();
+            if (path.length())
+              fileUploads << path;
             QString onlyfilename = path.mid(path.findRev('/') + 1);
 
             hstr += ("; filename=\"" + onlyfilename + "\"").ascii();
@@ -299,6 +299,22 @@ QByteArray HTMLFormElementImpl::formData() {
       }
     }
   }
+
+#ifndef APPLE_CHANGES
+  if (fileUploads.count()) {
+    int result = KMessageBox::warningContinueCancelList(
+        0, i18n("You're about to transfer the following files from "
+                "your local computer to the Internet.\n"
+                "Do you really want to continue?"),
+        fileUploads);
+
+    if (result == KMessageBox::Cancel) {
+      ok = false;
+      return QByteArray();
+    }
+  }
+#endif
+
   if (m_multipart)
     enc_string = ("--" + m_boundary.string() + "--\r\n").ascii();
 
@@ -306,6 +322,7 @@ QByteArray HTMLFormElementImpl::formData() {
   form_data.resize(form_data.size() + enc_string.length());
   memcpy(form_data.data() + old_size, enc_string.data(), enc_string.length());
 
+  ok = true;
   return form_data;
 }
 
@@ -376,19 +393,17 @@ void HTMLFormElementImpl::submit() {
     }
   }
 
-  QByteArray form_data = formData();
-  if (m_post) {
-    view->part()->submitForm(
-        "post", m_url.string(), form_data, m_target.string(),
-        enctype().string(),
-        //                                   m_encCharset.isEmpty() ?
-        //                                   enctype().string()
-        //                                   : QString(enctype().string() + ";
-        //                                   charset=" + m_encCharset),
-        boundary().string());
-  } else {
-    view->part()->submitForm("get", m_url.string(), form_data,
-                             m_target.string());
+  bool ok;
+  QByteArray form_data = formData(ok);
+  if (ok) {
+    if (m_post) {
+      view->part()->submitForm("post", m_url.string(), form_data,
+                               m_target.string(), enctype().string(),
+                               boundary().string());
+    } else {
+      view->part()->submitForm("get", m_url.string(), form_data,
+                               m_target.string());
+    }
   }
 
   m_doingsubmit = m_insubmit = false;
@@ -513,9 +528,13 @@ void HTMLGenericFormElementImpl::parseAttribute(AttributeImpl* attr) {
     case ATTR_DISABLED:
       setDisabled(attr->val() != 0);
       break;
-    case ATTR_READONLY:
+    case ATTR_READONLY: {
+      bool m_oldreadOnly = m_readOnly;
       m_readOnly = attr->val() != 0;
+      if (m_oldreadOnly != m_readOnly)
+        setChanged();
       break;
+    }
     default:
       HTMLElementImpl::parseAttribute(attr);
   }
@@ -581,8 +600,7 @@ void HTMLGenericFormElementImpl::onChange() {
 void HTMLGenericFormElementImpl::setDisabled(bool _disabled) {
   if (m_disabled != _disabled) {
     m_disabled = _disabled;
-    if (m_render && m_render->isWidget() && m_render->layouted())
-      static_cast<RenderWidget*>(m_render)->widget()->setEnabled(!m_disabled);
+    setChanged();
   }
 }
 
@@ -994,7 +1012,8 @@ void HTMLInputElementImpl::init() {
     case IMAGE:
       break;
   };
-  m_value = getAttribute(ATTR_VALUE);
+  if (m_type != FILE)
+    m_value = getAttribute(ATTR_VALUE);
   if ((uint)m_type <= ISINDEX && !m_value.isEmpty()) {
     QString value = m_value.string();
     // remove newline stuff..
@@ -1233,14 +1252,11 @@ DOMString HTMLInputElementImpl::value() const {
 }
 
 void HTMLInputElementImpl::setValue(DOMString val) {
-  switch (m_type) {
-    case FILE:
-      // sorry, can't change this!
-      break;
-    default:
-      m_value = (val.isNull() ? DOMString("") : val);
-      setChanged();
-  }
+  if (m_type == FILE)
+    return;
+
+  m_value = (val.isNull() ? DOMString("") : val);
+  setChanged();
 }
 
 void HTMLInputElementImpl::blur() {

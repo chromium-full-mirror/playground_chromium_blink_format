@@ -562,6 +562,8 @@ QString RenderObject::information() const {
     ts << "rmm ";
   if (mouseInside())
     ts << "mi ";
+  if (style() && style()->zIndex())
+    ts << "zI: " << style()->zIndex();
   if (element() && element()->active())
     ts << "act ";
   if (element() && element()->hasAnchor())
@@ -895,7 +897,7 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   bool inner = !info.innerNode();
 
   // ### table should have its own, more performant method
-  if (isPositioned() || isInline() || isRoot() || isTableRow() ||
+  if (overhangingContents() || isInline() || isRoot() || isTableRow() ||
       isTableSection() || inside || mouseInside()) {
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling())
@@ -1095,3 +1097,5 @@ void RenderObject::scheduleRelayout() {
   if (view)
     view->scheduleRelayout();
 }
+
+void RenderObject::removeLeftoverAnonymousBoxes() {}

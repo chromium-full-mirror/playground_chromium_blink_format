@@ -638,8 +638,8 @@ CSSImageValueImpl::~CSSImageValueImpl() {
 
 FontFamilyValueImpl::FontFamilyValueImpl(const QString& string)
     : CSSPrimitiveValueImpl(DOMString(string), CSSPrimitiveValue::CSS_STRING) {
-  static QRegExp parenReg = QRegExp(" \\(.*\\)$");
-  static QRegExp braceReg = QRegExp(" \\[.*\\]$");
+  static const QRegExp parenReg(" \\(.*\\)$");
+  static const QRegExp braceReg(" \\[.*\\]$");
 
 #ifdef APPLE_CHANGES
   parsedFontName = string;

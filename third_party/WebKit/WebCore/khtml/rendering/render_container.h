@@ -47,6 +47,8 @@ class RenderContainer : public RenderObject {
   virtual void layout();
   virtual void calcMinMaxWidth() { setMinMaxKnown(true); }
 
+  virtual void removeLeftoverAnonymousBoxes();
+
  private:
   void setFirstChild(RenderObject* first) { m_first = first; }
   void setLastChild(RenderObject* last) { m_last = last; }

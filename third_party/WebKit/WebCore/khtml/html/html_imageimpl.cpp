@@ -379,7 +379,7 @@ QRegion HTMLAreaElementImpl::getRegion(int width_, int height_) const {
   // what the HTML author tried to tell us.
 
   // a Poly needs at least 3 points (6 coords), so this is correct
-  if ((shape == Poly || shape == Unknown) && m_coordsLen > 4) {
+  if ((shape == Poly || shape == Unknown) && m_coordsLen > 5) {
     // make sure its even
     int len = m_coordsLen >> 1;
     QPointArray points(len);
@@ -400,8 +400,10 @@ QRegion HTMLAreaElementImpl::getRegion(int width_, int height_) const {
     int x1 = m_coords[2].minWidth(width_);
     int y1 = m_coords[3].minWidth(height_);
     region = QRegion(x0, y0, x1 - x0, y1 - y0);
-  } else
+  } else if (shape == Default)
     region = QRegion(0, 0, width_, height_);
+  // else
+  // return null region
 
   return region;
 }

@@ -49,6 +49,8 @@ class QPainter : public Qt {
   QPainter();
   ~QPainter();
 
+  QPaintDevice* device() const { return 0; }
+
   const QFont& font() const;
   void setFont(const QFont&);
   QFontMetrics fontMetrics() const;

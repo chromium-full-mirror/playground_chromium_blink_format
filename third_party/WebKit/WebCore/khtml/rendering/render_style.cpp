@@ -186,8 +186,7 @@ RenderStyle::~RenderStyle() {
     prev->pseudoStyle = 0;
     prev->deref();
   }
-  if (content)
-    delete content;
+  delete content;
 }
 
 bool RenderStyle::operator==(const RenderStyle& o) const {

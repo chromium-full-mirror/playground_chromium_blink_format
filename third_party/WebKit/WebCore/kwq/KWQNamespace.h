@@ -69,11 +69,6 @@ class Qt {
     SolidPattern,
   };
 
-  enum GUIStyle {
-    MacStyle,
-    WindowsStyle,
-  };
-
   enum Key {
     Key_Escape = 0x1000,
     Key_Tab = 0x1001,

@@ -407,7 +407,12 @@ class UString {
    * Static instance of a null string.
    */
   static UString null;
-
+#ifdef KJS_DEBUG_MEM
+  /**
+   * Clear statically allocated resources.
+   */
+  static void globalClear();
+#endif
  private:
   void attach(Rep* r);
   void detach();

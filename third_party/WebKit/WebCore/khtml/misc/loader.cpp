@@ -644,7 +644,11 @@ void CachedImage::movieStatus(int status) {
     const QImage& im = m->frameImage();
     monochrome =
         ((im.depth() <= 8) && (im.numColors() - int(im.hasAlphaBuffer()) <= 2));
-    if (im.width() < 5 && im.height() < 5 &&
+    for (int i = 0; monochrome && i < im.numColors(); ++i)
+      if (im.colorTable()[i] != qRgb(0xff, 0xff, 0xff) &&
+          im.colorTable()[i] != qRgb(0x00, 0x00, 0x00))
+        monochrome = false;
+    if ((im.width() < 5 || im.height() < 5) &&
         im.hasAlphaBuffer())  // only evaluate for small images
     {
       QImage am = im.createAlphaMask();
@@ -811,10 +815,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
     QSize s = pixmap_size();
     m_size = s.width() * s.height() * 2;
   }
-#endif  // !APPLE_CHANGES
-
-#ifdef APPLE_CHANGES
-
+#else   // APPLE_CHANGES
   bool canDraw = false;
   if (!eof) {
     // If we didn't get all the data for the image we will always
@@ -932,7 +933,7 @@ CachedImage* DocLoader::requestImage(const DOM::DOMString& url) {
 
   bool reload = needReload(fullURL);
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
   CachedImage* cachedObject =
       Cache::requestImage(this, url, reload, m_expireDate);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -950,7 +951,7 @@ CachedCSSStyleSheet* DocLoader::requestStyleSheet(const DOM::DOMString& url,
 
   bool reload = needReload(fullURL);
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
   CachedCSSStyleSheet* cachedObject =
       Cache::requestStyleSheet(this, url, reload, m_expireDate, charset);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -968,7 +969,7 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
 
   bool reload = needReload(fullURL);
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
   CachedScript* cachedObject =
       Cache::requestScript(this, url, reload, m_expireDate, charset);
   KWQCheckCacheObjectStatus(this, cachedObject);
@@ -1544,7 +1545,7 @@ void Cache::flush(bool force) {
     --it;  // Update iterator, we might delete the current entry later on.
     CachedObject* o = cache->find(url);
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
     if (!o) {
       continue;
     }
