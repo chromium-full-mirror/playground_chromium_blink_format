@@ -898,6 +898,9 @@ class RenderObject : public CachedObjectClient {
   // Whether or not a block has selected children.
   virtual bool hasSelectedChildren() const { return false; }
 
+  // Whether or not a selection can be attempted on this object.
+  bool canSelect() const;
+
   // Whether or not a selection can be attempted on this object.  Should only be
   // called right before actually beginning a selection,
   // since it fires the selectstart DOM event.
