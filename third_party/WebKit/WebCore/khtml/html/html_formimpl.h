@@ -544,6 +544,8 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
 
   HTMLSelectElementImpl* getSelect() const;
 
+  virtual void childrenChanged();
+
  protected:
   DOMString m_value;
   bool m_selected;
