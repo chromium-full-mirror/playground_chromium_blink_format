@@ -110,7 +110,7 @@ class KHTMLViewPrivate {
     formCompletions = 0;
 #endif
     layoutTimerId = 0;
-    allDataReceivedWhenTimerSet = false;
+    delayedLayout = false;
     mousePressed = false;
 #ifndef QT_NO_TOOLTIP
     tooltip = 0;
@@ -177,7 +177,7 @@ class KHTMLViewPrivate {
     isDoubleClick = false;
     scrollingSelf = false;
     layoutTimerId = 0;
-    allDataReceivedWhenTimerSet = false;
+    delayedLayout = false;
     mousePressed = false;
     doFullRepaint = true;
     layoutSchedulingEnabled = true;
@@ -223,7 +223,7 @@ class KHTMLViewPrivate {
   int prevMouseX, prevMouseY;
   bool scrollingSelf;
   int layoutTimerId;
-  bool allDataReceivedWhenTimerSet;
+  bool delayedLayout;
 
   bool layoutSchedulingEnabled;
   bool layoutSuppressed;
@@ -380,6 +380,14 @@ void KHTMLView::clear() {
   m_part->clearSelection();
 
   d->reset();
+
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+  if (d->layoutTimerId && m_part->xmlDocImpl() &&
+      !m_part->xmlDocImpl()->ownerElement())
+    printf("Killing the layout timer from a clear at %d\n",
+           m_part->xmlDocImpl()->elapsedTime());
+#endif
+
   killTimers();
   emit cleared();
 
@@ -561,7 +569,7 @@ void KHTMLView::layout() {
   d->layoutSchedulingEnabled = false;
   killTimer(d->layoutTimerId);
   d->layoutTimerId = 0;
-  d->allDataReceivedWhenTimerSet = false;
+  d->delayedLayout = false;
 
   if (!m_part) {
     // FIXME: Do we need to set _width here?
@@ -2043,42 +2051,59 @@ void KHTMLView::repaintRectangle(const QRect& r, bool immediate) {
 }
 
 void KHTMLView::timerEvent(QTimerEvent* e) {
-  if (e->timerId() == d->layoutTimerId)
+  if (e->timerId() == d->layoutTimerId) {
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+    if (m_part->xmlDocImpl() && !m_part->xmlDocImpl()->ownerElement())
+      printf("Layout timer fired at %d\n", m_part->xmlDocImpl()->elapsedTime());
+#endif
     layout();
+  }
 }
 
 void KHTMLView::scheduleRelayout() {
   if (!d->layoutSchedulingEnabled)
     return;
 
-  if (d->layoutTimerId ||
-      (m_part->xmlDocImpl() && !m_part->xmlDocImpl()->shouldScheduleLayout()))
+  if (!m_part->xmlDocImpl() || !m_part->xmlDocImpl()->shouldScheduleLayout())
     return;
 
-  d->allDataReceivedWhenTimerSet =
-      m_part->xmlDocImpl() && !m_part->xmlDocImpl()->allDataReceived();
+  int delay = m_part->xmlDocImpl()->minimumLayoutDelay();
+  if (d->layoutTimerId && d->delayedLayout && !delay)
+    unscheduleRelayout();
+  if (d->layoutTimerId)
+    return;
+
+  d->delayedLayout = delay != 0;
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!m_part->xmlDocImpl()->ownerElement())
-    printf("Scheduling layout for %d\n",
-           m_part->xmlDocImpl()->minimumLayoutDelay());
+    printf("Scheduling layout for %d\n", delay);
 #endif
 
-  d->layoutTimerId = startTimer(
-      m_part->xmlDocImpl() ? m_part->xmlDocImpl()->minimumLayoutDelay() : 0);
+  d->layoutTimerId = startTimer(delay);
+}
+
+bool KHTMLView::layoutPending() {
+  return d->layoutTimerId;
 }
 
 bool KHTMLView::haveDelayedLayoutScheduled() {
-  return d->layoutTimerId && d->allDataReceivedWhenTimerSet;
+  return d->layoutTimerId && d->delayedLayout;
 }
 
 void KHTMLView::unscheduleRelayout() {
   if (!d->layoutTimerId)
     return;
 
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+  if (m_part->xmlDocImpl() && !m_part->xmlDocImpl()->ownerElement())
+    printf("Layout timer unscheduled at %d\n",
+           m_part->xmlDocImpl()->elapsedTime());
+#endif
+
   killTimer(d->layoutTimerId);
   d->layoutTimerId = 0;
-  d->allDataReceivedWhenTimerSet = false;
+  d->delayedLayout = false;
 }
 
 bool KHTMLView::isTransparent() const {

@@ -351,6 +351,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   // The timer for continued processing.
   int timerId;
+  bool allowYield;
 
   bool includesCommentsInDOM;
 

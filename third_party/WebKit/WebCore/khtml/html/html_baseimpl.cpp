@@ -211,6 +211,8 @@ void HTMLBodyElementImpl::insertedIntoDocument() {
     s.sprintf("%d", w->marginHeight());
     setAttribute(ATTR_MARGINHEIGHT, s);
   }
+
+  w->scheduleRelayout();
 }
 
 bool HTMLBodyElementImpl::isURLAttribute(AttributeImpl* attr) const {
