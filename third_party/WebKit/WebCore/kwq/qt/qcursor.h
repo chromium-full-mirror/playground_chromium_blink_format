@@ -33,6 +33,10 @@
 #include <qpixmap.h>
 #include <qpoint.h>
 
+#ifdef __OBJC__
+#import <AppKit/AppKit.h>
+#endif
+
 // class QCursor ===============================================================
 
 class QCursor {
@@ -49,6 +53,9 @@ class QCursor {
   QCursor();
   QCursor(const QPixmap& pixmap, int hotX = 1, int hotY = 1);
   QCursor(const QCursor&);
+#ifdef __OBJC__
+  QCursor(NSCursor*);
+#endif
   ~QCursor();
 
   // member functions --------------------------------------------------------
@@ -63,7 +70,10 @@ class QCursor {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
-
+ private:
+#ifdef __OBJC__
+  NSCursor* cursor;
+#endif
 };  // class QCursor
     // ============================================================
 
