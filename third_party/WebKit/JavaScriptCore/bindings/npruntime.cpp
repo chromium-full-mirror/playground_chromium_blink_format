@@ -24,7 +24,7 @@
  */
 #include <CoreFoundation/CoreFoundation.h>
 
-#include <NP_runtime.h>
+#include <npruntime.h>
 
 static Boolean identifierEqual(const void* value1, const void* value2) {
   return strcmp((const char*)value1, (const char*)value2) == 0;

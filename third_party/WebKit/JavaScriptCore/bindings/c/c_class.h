@@ -28,7 +28,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <runtime.h>
-#include <NP_runtime.h>
+#include <npruntime.h>
 #include <c_runtime.h>
 
 namespace KJS {
