@@ -81,8 +81,6 @@ class KWQKHTMLPartImpl : public QObject {
 
   bool gotoBaseAnchor();
 
-  void setBaseURL(const KURL&);
-
   void setTitle(const DOM::DOMString&);
   void setStatusBarText(const QString& status);
 
@@ -134,8 +132,6 @@ class KWQKHTMLPartImpl : public QObject {
   WebCoreBridge* bridge;
 
   int m_redirectionTimer;
-
-  KURL m_baseURL;
 
   friend class KHTMLPart;
 };
