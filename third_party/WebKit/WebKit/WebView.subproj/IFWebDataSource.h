@@ -16,6 +16,7 @@
    */
 
 @class IFWebFrame;
+@class IFURLHandle;
 @protocol IFWebController;
 
 #ifdef TENTATIVE_API
@@ -32,6 +33,7 @@
 // Returns nil if object cannot be initialized due to a malformed URL (RFC
 // 1808).
 - initWithURL:(NSURL*)inputURL;
+- initWithHandle:(IFURLHandle*)theHandle;
 
 #ifdef TENTATIVE_API
 - initWithData:(NSData*)data;
