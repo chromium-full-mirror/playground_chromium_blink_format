@@ -373,9 +373,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   QGuardedPtr<KHTMLView> view;
 
-#ifndef NDEBUG
   bool inWrite;
-#endif
 };
 }
 
