@@ -1031,15 +1031,16 @@ void ApplyStyleCommandImpl::applyUsingFragment() {
 DeleteCollapsibleWhitespaceCommandImpl::DeleteCollapsibleWhitespaceCommandImpl(
     DocumentImpl* document)
     : CompositeEditCommandImpl(document),
-      m_selectionToCollapse(endingSelection()),
-      m_charactersDeleted(0) {}
+      m_charactersDeleted(0),
+      m_hasSelectionToCollapse(false) {}
 
 DeleteCollapsibleWhitespaceCommandImpl::DeleteCollapsibleWhitespaceCommandImpl(
     DocumentImpl* document,
     const Selection& selection)
     : CompositeEditCommandImpl(document),
+      m_charactersDeleted(0),
       m_selectionToCollapse(selection),
-      m_charactersDeleted(0) {}
+      m_hasSelectionToCollapse(true) {}
 
 DeleteCollapsibleWhitespaceCommandImpl::
     ~DeleteCollapsibleWhitespaceCommandImpl() {}
@@ -1173,6 +1174,11 @@ Position DeleteCollapsibleWhitespaceCommandImpl::deleteWhitespace(
 }
 
 void DeleteCollapsibleWhitespaceCommandImpl::doApply() {
+  // If selection has not been set to a custom selection when the command was
+  // created,
+  // use the current ending selection.
+  if (!m_hasSelectionToCollapse)
+    m_selectionToCollapse = endingSelection();
   int state = m_selectionToCollapse.state();
   if (state == Selection::CARET) {
     Position endPosition = deleteWhitespace(m_selectionToCollapse.start());
@@ -1197,16 +1203,14 @@ void DeleteCollapsibleWhitespaceCommandImpl::doApply() {
 // DeleteSelectionCommandImpl
 
 DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(DocumentImpl* document)
-    : CompositeEditCommandImpl(document) {
-  m_selectionToDelete = endingSelection();
-}
+    : CompositeEditCommandImpl(document), m_hasSelectionToDelete(false) {}
 
 DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(
     DocumentImpl* document,
     const Selection& selection)
-    : CompositeEditCommandImpl(document) {
-  m_selectionToDelete = selection;
-}
+    : CompositeEditCommandImpl(document),
+      m_selectionToDelete(selection),
+      m_hasSelectionToDelete(true) {}
 
 DeleteSelectionCommandImpl::~DeleteSelectionCommandImpl() {}
 
@@ -1279,6 +1283,12 @@ bool DeleteSelectionCommandImpl::containsOnlyWhitespace(const Position& start,
 }
 
 void DeleteSelectionCommandImpl::doApply() {
+  // If selection has not been set to a custom selection when the command was
+  // created,
+  // use the current ending selection.
+  if (!m_hasSelectionToDelete)
+    m_selectionToDelete = endingSelection();
+
   if (m_selectionToDelete.state() != Selection::RANGE)
     return;
 
