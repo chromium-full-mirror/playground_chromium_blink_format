@@ -7,9 +7,9 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSError;
 @class WebView;
 @class WebDataSource;
-@class WebError;
 @class WebFrame;
 
 /*!
@@ -99,7 +99,7 @@
     subresources are done loading.
 */
 - (void)webView:(WebView*)sender
-    locationChangeDone:(WebError*)error
+    locationChangeDone:(NSError*)error
          forDataSource:(WebDataSource*)dataSource;
 
 /*!

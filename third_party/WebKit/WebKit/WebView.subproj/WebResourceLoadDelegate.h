@@ -140,7 +140,7 @@
 */
 - (void)webView:(WebView*)sender
                    resource:identifier
-    didFailLoadingWithError:(WebError*)error
+    didFailLoadingWithError:(NSError*)error
              fromDataSource:(WebDataSource*)dataSource;
 
 /*!

@@ -6,8 +6,8 @@
 #import <WebKit/WebView.h>
 #import <WebKit/WebFramePrivate.h>
 
+@class NSError;
 @class WebBackForwardList;
-@class WebError;
 @class WebFrame;
 @class WebPreferences;
 @class WebCoreSettings;
@@ -120,12 +120,12 @@ typedef struct _WebResourceDelegateImplementationCache {
                allowsScrolling:(BOOL)allowsScrolling;
 
 - (void)_finishedLoadingResourceFromDataSource:(WebDataSource*)dataSource;
-- (void)_receivedError:(WebError*)error
+- (void)_receivedError:(NSError*)error
         fromDataSource:(WebDataSource*)dataSource;
 - (void)_mainReceivedBytesSoFar:(unsigned)bytesSoFar
                  fromDataSource:(WebDataSource*)dataSource
                        complete:(BOOL)isComplete;
-- (void)_mainReceivedError:(WebError*)error
+- (void)_mainReceivedError:(NSError*)error
             fromDataSource:(WebDataSource*)dataSource
                   complete:(BOOL)isComplete;
 + (NSString*)_MIMETypeForFile:(NSString*)path;

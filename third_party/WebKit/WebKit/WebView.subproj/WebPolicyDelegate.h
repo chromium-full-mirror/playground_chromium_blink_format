@@ -7,12 +7,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class WebView;
-@class WebError;
-@class WebFrame;
-@class WebPolicyPrivate;
+@class NSError;
 @class NSURLResponse;
 @class NSURLRequest;
+@class WebView;
+@class WebFrame;
+@class WebPolicyPrivate;
 
 /*!
   @enum WebNavigationType
@@ -193,7 +193,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     @param frame The frame in which the policy could not be implemented.
 */
 - (void)webView:(WebView*)webView
-    unableToImplementPolicyWithError:(WebError*)error
+    unableToImplementPolicyWithError:(NSError*)error
                                frame:(WebFrame*)frame;
 
 @end

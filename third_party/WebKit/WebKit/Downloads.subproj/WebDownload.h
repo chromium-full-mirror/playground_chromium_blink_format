@@ -7,8 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSError;
 @class WebDownloadPrivate;
-@class WebError;
 @class NSURLRequest;
 @class NSURLResponse;
 
@@ -180,7 +180,7 @@
     @param error The error caused the download to fail.
 */
 - (void)download:(WebDownload*)download
-    didFailDownloadingWithError:(WebError*)error;
+    didFailDownloadingWithError:(NSError*)error;
 
 @end
 
