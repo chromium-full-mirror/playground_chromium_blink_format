@@ -111,6 +111,7 @@ class KHTMLViewPrivate {
     tp = 0;
     delete paintBuffer;
     paintBuffer = 0;
+
 #endif /* APPLE_CHANGES not defined */
     if (underMouse)
       underMouse->deref();
@@ -249,6 +250,7 @@ KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
 KHTMLView::~KHTMLView() {
   if (m_part) {
 #ifdef APPLE_CHANGES
+    killTimers();
     m_part->deref();
 #endif
 
@@ -1533,7 +1535,20 @@ void KHTMLView::timerEvent(QTimerEvent* e) {
 
   //        kdDebug() << "scheduled repaint "<< d->repaintTimerId  << endl;
   killTimer(d->repaintTimerId);
+
+#ifdef APPLE_CHANGES
+  //    if (_lockFocus()){
+  //        QPainter p(this);
+  //
+  //        drawContents (&p, d->updateRect.x(), d->updateRect.y(),
+  //        d->updateRect.width(), d->updateRect.height());
+  //
+  //        _unlockFocus();
+  //    }
+  _displayRect(d->updateRect);
+#else
   updateContents(d->updateRect);
+#endif
 
   d->repaintTimerId = 0;
 }
