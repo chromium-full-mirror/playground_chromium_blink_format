@@ -40,7 +40,8 @@
                         baseURL:(NSURL*)baseURL;
 - (NSArray*)pluginsInfo;  // array of id <WebCorePluginInfo>
 
-- (NSView*)viewForJavaAppletWithArguments:(NSDictionary*)arguments;
+- (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
+                         andArguments:(NSDictionary*)arguments;
 
 @end
 
