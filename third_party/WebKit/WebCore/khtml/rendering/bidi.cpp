@@ -1630,8 +1630,10 @@ QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 
   setLinesAppended(false);
 
-  if (!firstLineBox() && element() && element()->isContentEditable())
+  if (!firstLineBox() && element() && element()->isContentEditable() &&
+      element()->rootEditableElement() == element()) {
     m_height += lineHeight(true);
+  }
 
   return repaintRect;
 
