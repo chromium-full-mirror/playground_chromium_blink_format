@@ -26,9 +26,6 @@ extern NSString* WebElementImageKey;           // NSImage of the image element
 extern NSString* WebElementImageRectKey;   // NSValue of an NSRect, the rect of
                                            // the image element
 extern NSString* WebElementImageURLKey;    // NSURL of the image element
-extern NSString* WebElementIsEditableKey;  // NSNumber of BOOL indicating
-                                           // whether the element is editable or
-                                           // not
 extern NSString* WebElementIsSelectedKey;  // NSNumber of BOOL indicating
                                            // whether the element is selected or
                                            // not

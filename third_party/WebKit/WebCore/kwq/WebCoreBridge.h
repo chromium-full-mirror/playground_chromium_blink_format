@@ -72,7 +72,6 @@ extern NSString* WebCoreElementImageAltStringKey;
 extern NSString* WebCoreElementImageKey;
 extern NSString* WebCoreElementImageRectKey;
 extern NSString* WebCoreElementImageURLKey;
-extern NSString* WebCoreElementIsEditableKey;
 extern NSString* WebCoreElementIsSelectedKey;
 extern NSString* WebCoreElementLinkURLKey;
 extern NSString* WebCoreElementLinkTargetFrameKey;
@@ -213,6 +212,8 @@ typedef enum {
 - (NSString*)renderTreeAsExternalRepresentation;
 
 - (NSDictionary*)elementAtPoint:(NSPoint)point;
+- (NSURL*)URLWithRelativeString:(NSString*)string;
+
 - (DOMElement*)elementWithName:(NSString*)name inForm:(DOMElement*)form;
 - (DOMElement*)elementForView:(NSView*)view;
 - (BOOL)elementDoesAutoComplete:(DOMElement*)element;
@@ -263,8 +264,6 @@ typedef enum {
 - (NSRect)selectionRect;
 - (NSRect)visibleSelectionRect;
 - (NSImage*)selectionImage;
-
-- (NSImage*)imageForImageElement:(DOMHTMLImageElement*)element;
 
 - (DOMNode*)selectionStart;
 - (int)selectionStartOffset;
