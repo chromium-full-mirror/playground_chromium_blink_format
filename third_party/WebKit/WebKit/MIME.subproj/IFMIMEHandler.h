@@ -33,7 +33,7 @@ IFMIMEHandler's for types that other application handle. I hope not though.
 */
 
 - initWithMIMEType:(NSString*)MIME
-         handlerType:(IFMIMEHandlerType*)hType
+         handlerType:(IFMIMEHandlerType)hType
          handlerName:(NSString*)handler;
 
 // Accessor methods
