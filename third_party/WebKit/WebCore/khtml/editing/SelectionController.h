@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,10 +56,10 @@ class Selection {
   enum EAffinity { UPSTREAM = 0, DOWNSTREAM = 1 };
 
   Selection();
+  Selection(const Range&);
   Selection(const Position&);
   Selection(const Position&, const Position&);
   Selection(const Selection&);
-  ~Selection() {}
 
   EState state() const { return m_state; }
   EAffinity affinity() const { return m_affinity; }
@@ -99,6 +99,14 @@ class Selection {
   void debugRenderer(khtml::RenderObject* r, bool selected) const;
 
   Selection& operator=(const Selection& o);
+  Selection& operator=(const Range& r) {
+    moveTo(r);
+    return *this;
+  }
+  Selection& operator=(const Position& r) {
+    moveTo(r);
+    return *this;
+  }
 
   friend bool operator==(const Selection& a, const Selection& b);
   friend bool operator!=(const Selection& a, const Selection& b);

@@ -5,7 +5,7 @@
  * (C) 2000 Gunnstein Lye (gunnstein@netcom.no)
  * (C) 2000 Frederik Holljen (frederik.holljen@hig.no)
  * (C) 2001 Peter Kelly (pmk@post.com)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,11 +23,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #include "dom/dom_exception.h"
+
 #include "xml/dom_docimpl.h"
 #include "xml/dom2_rangeimpl.h"
 
-using namespace DOM;
+namespace DOM {
 
 Range::Range() {
   // a range can't exist by itself - it must be associated with a document
@@ -368,4 +370,11 @@ void Range::throwException(int exceptioncode) const {
         exceptioncode - RangeException::_EXCEPTION_OFFSET));
   else
     throw DOMException(exceptioncode);
+}
+
+bool operator==(const Range& a, const Range& b) {
+  return a.startContainer() == b.startContainer() &&
+         a.endContainer() == b.endContainer() &&
+         a.startOffset() == b.startOffset() && a.endOffset() == b.endOffset();
+}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -83,6 +83,15 @@ Selection::Selection() {
 Selection::Selection(const Position& pos) {
   init();
   assignBaseAndExtent(pos, pos);
+  validate();
+}
+
+Selection::Selection(const Range& r) {
+  const Position start(r.startContainer().handle(), r.startOffset());
+  const Position end(r.endContainer().handle(), r.endOffset());
+
+  init();
+  assignBaseAndExtent(start, end);
   validate();
 }
 

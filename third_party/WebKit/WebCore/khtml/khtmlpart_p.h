@@ -9,7 +9,7 @@
  *                     2000-2001 Simon Hausmann <hausmann@kde.org>
  *                     2000-2001 Dirk Mueller <mueller@kde.org>
  *                     2000 Stefan Schimanski <1Stein@gmx.de>
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -130,10 +130,10 @@ class KHTMLPartPrivate {
     m_bDnd = true;
 #if !APPLE_CHANGES
     m_linkCursor = KCursor::handCursor();
-#endif
     m_loadedObjects = 0;
     m_totalObjectCount = 0;
     m_jobPercent = 0;
+#endif
     m_haveEncoding = false;
     m_activeFrame = 0L;
 #if !APPLE_CHANGES
@@ -321,8 +321,10 @@ class KHTMLPartPrivate {
 
   int m_zoomFactor;
 
+#if !APPLE_CHANGES
   int m_findPos;
   DOM::NodeImpl* m_findNode;
+#endif
 
   QString m_strSelectedURL;
   QString m_strSelectedURLTarget;
@@ -347,8 +349,10 @@ class KHTMLPartPrivate {
   DOM::Selection::ETextGranularity m_textElement;
   bool m_mouseMovedSinceLastMousePress : 1;
 #endif
+#if !APPLE_CHANGES
   QString m_overURL;
   QString m_overURLTarget;
+#endif
 
   DOM::Selection m_selection;
   int m_caretBlinkTimer;
@@ -376,14 +380,12 @@ class KHTMLPartPrivate {
 
 #if !APPLE_CHANGES
   QCursor m_linkCursor;
-#endif
   QTimer m_scrollTimer;
 
   unsigned long m_loadedObjects;
   unsigned long m_totalObjectCount;
   unsigned int m_jobPercent;
 
-#if !APPLE_CHANGES
   KHTMLFind* m_findDialog;
 
   struct findState {
