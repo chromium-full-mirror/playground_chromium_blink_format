@@ -13,5 +13,4 @@
 
 @interface IFBaseWebController (IFPrivate)
 ;
-- (void)_checkLoadCompleteForDataSource:(IFWebDataSource*)dataSource;
 @end
