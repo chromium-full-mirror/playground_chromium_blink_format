@@ -154,6 +154,8 @@ class Window : public ObjectImp {
     ScreenTop,
     ScreenLeft,
     ScrollTo,
+    ScrollX,
+    ScrollY,
     MoveBy,
     MoveTo,
     ResizeBy,
