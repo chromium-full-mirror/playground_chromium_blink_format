@@ -447,7 +447,6 @@ bool KHTMLPart::openURL(const KURL& url)
 
       d->m_bComplete = true;
       d->m_doc->setParsing(false);
-      d->m_doc->setLoading(false);
 
       kdDebug(6050) << "completed..." << endl;
       emit completed();
@@ -563,7 +562,6 @@ bool KHTMLPart::closeURL() {
     kdDebug(6050) << " was still parsing... calling end " << endl;
     slotFinishedParsing();
     d->m_doc->setParsing(false);
-    d->m_doc->setLoading(false);
   }
 
   if (!d->m_workingURL.isEmpty()) {
@@ -1431,7 +1429,6 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 #endif
 
   d->m_doc->setParsing(true);
-  d->m_doc->setLoading(true);
 }
 
 void KHTMLPart::write(const char* str, int len) {
@@ -1650,7 +1647,6 @@ void KHTMLPart::checkCompleted() {
   // OK, completed.
   // Now do what should be done when we are really completed.
   d->m_bComplete = true;
-  d->m_doc->setLoading(false);
 
   checkEmitLoadEvent();  // if we didn't do it before
 
@@ -1706,8 +1702,7 @@ void KHTMLPart::checkCompleted() {
 }
 
 void KHTMLPart::checkEmitLoadEvent() {
-  if (d->m_bLoadEventEmitted || !d->m_doc || d->m_doc->parsing() ||
-      d->m_doc->loading())
+  if (d->m_bLoadEventEmitted || !d->m_doc || d->m_doc->parsing())
     return;
 
   ConstFrameIt it = d->m_frames.begin();
@@ -2828,10 +2823,6 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
     assert(((void*)child->m_part) != 0);
 
     if (child->m_type != khtml::ChildFrame::Object) {
-      d->m_bComplete = false;
-      d->m_bLoadEventEmitted = false;
-      d->m_doc->setLoading(true);
-
       connect(part, SIGNAL(started(KIO::Job*)), this,
               SLOT(slotChildStarted(KIO::Job*)));
       connect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
@@ -3271,7 +3262,7 @@ void KHTMLPart::slotChildStarted(KIO::Job* job) {
       emit d->m_extension->openURLNotify();
     }
 #endif
-
+    d->m_bComplete = false;
     emit started(job);
   }
 }
