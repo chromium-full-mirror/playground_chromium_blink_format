@@ -38,4 +38,5 @@
 - (void)_setRenderFramePart:(void*)p;
 - (void*)_renderFramePart;
 - (void)_setDataSource:(IFWebDataSource*)d;
+- (void)_transitionProvisionalToCommitted;
 @end

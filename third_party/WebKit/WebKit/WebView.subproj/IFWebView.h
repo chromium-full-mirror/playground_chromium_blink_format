@@ -114,6 +114,8 @@
 // the data source is changed.
 - (void)dataSourceChanged:(IFWebDataSource*)dataSource;
 
+- (void)provisionalDataSourceChanged:(IFWebDataSource*)dataSource;
+
 - (void)setNeedsLayout:(bool)flag;
 
 // This method should not be public until we have a more completely

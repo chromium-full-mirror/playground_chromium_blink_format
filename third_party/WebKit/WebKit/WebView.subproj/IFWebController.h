@@ -119,8 +119,7 @@
 // handshake.
 - (BOOL)locationWillChangeTo:(NSURL*)url forFrame:(IFWebFrame*)frame;
 
-- (void)locationChangeStartedForFrame:(IFWebFrame*)frame
-                 initiatedByUserEvent:(BOOL)flag;
+- (void)locationChangeStartedForFrame:(IFWebFrame*)frame;
 
 - (void)locationChangeCommittedForFrame:(IFWebFrame*)frame;
 

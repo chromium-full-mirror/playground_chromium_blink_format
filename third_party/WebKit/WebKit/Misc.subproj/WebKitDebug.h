@@ -89,32 +89,36 @@ void WebKitLogAtLevel(unsigned int level, NSString* format, ...);
  * Assertion macros
  */
 
-#define WEBKIT_ASSERT(expr)                                             \
-  do {                                                                  \
-    if (!(expr)) {                                                      \
-      NSString* reason =                                                \
-          [NSString stringWithFormat:@"assertion failed: '%s'", #expr]; \
-      [[NSException exceptionWithName:NSGenericException                \
-                               reason:reason                            \
-                             userInfo:nil] raise];                      \
-    }                                                                   \
+#define WEBKIT_ASSERT(expr)                                                    \
+  do {                                                                         \
+    if (!(expr)) {                                                             \
+      NSString* reason =                                                       \
+          [NSString stringWithFormat:@"assertion failed(%s:%d %s): '%s'",      \
+                                     __FILE__, __LINE__, __FUNCTION__, #expr]; \
+      [[NSException exceptionWithName:NSGenericException                       \
+                               reason:reason                                   \
+                             userInfo:nil] raise];                             \
+    }                                                                          \
   } while (0)
 
-#define WEBKIT_ASSERT_VALID_ARG(arg, expr)                                    \
-  do {                                                                        \
-    if (!(expr)) {                                                            \
-      NSString* reason =                                                      \
-          [NSString stringWithFormat:@"'%s' fails check: '%s'", #arg, #expr]; \
-      [[NSException exceptionWithName:NSInvalidArgumentException              \
-                               reason:reason                                  \
-                             userInfo:nil] raise];                            \
-    }                                                                         \
+#define WEBKIT_ASSERT_VALID_ARG(arg, expr)                                  \
+  do {                                                                      \
+    if (!(expr)) {                                                          \
+      NSString* reason = [NSString                                          \
+          stringWithFormat:@"(%s:%d %s): '%s' fails check: '%s'", __FILE__, \
+                           __LINE__, __FUNCTION__, #arg, #expr];            \
+      [[NSException exceptionWithName:NSInvalidArgumentException            \
+                               reason:reason                                \
+                             userInfo:nil] raise];                          \
+    }                                                                       \
   } while (0)
 
 #define WEBKIT_ASSERT_NOT_NIL(arg)                                         \
   do {                                                                     \
     if ((arg) == nil) {                                                    \
-      NSString* reason = [NSString stringWithFormat:@"'%s' is nil", #arg]; \
+      NSString* reason =                                                   \
+          [NSString stringWithFormat:@"(%s:%d %s): '%s' is nil", __FILE__, \
+                                     __LINE__, __FUNCTION__, #arg];        \
       [[NSException exceptionWithName:NSInvalidArgumentException           \
                                reason:reason                               \
                              userInfo:nil] raise];                         \
