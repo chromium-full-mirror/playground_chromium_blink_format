@@ -625,8 +625,8 @@ Position Position::leadingWhitespacePosition(
       prev.node()->isTextNode()) {
     DOMString string = static_cast<TextImpl*>(prev.node())->data();
     const QChar& c = string[prev.offset()];
-    if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
-                                         : c.isSpace())
+    if (considerNonCollapsibleWhitespace ? (c.isSpace() || c.unicode() == 0xa0)
+                                         : isCollapsibleWhitespace(c))
       return prev;
   }
 
@@ -644,8 +644,9 @@ Position Position::trailingWhitespacePosition(
     if (offset() < (long)textNode->length()) {
       DOMString string = static_cast<TextImpl*>(node())->data();
       const QChar& c = string[offset()];
-      if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
-                                           : c.isSpace())
+      if (considerNonCollapsibleWhitespace
+              ? (c.isSpace() || c.unicode() == 0xa0)
+              : isCollapsibleWhitespace(c))
         return *this;
       return Position();
     }
@@ -659,8 +660,8 @@ Position Position::trailingWhitespacePosition(
       next.node()->isTextNode()) {
     DOMString string = static_cast<TextImpl*>(next.node())->data();
     const QChar& c = string[0];
-    if (considerNonCollapsibleWhitespace ? isCollapsibleWhitespace(c)
-                                         : c.isSpace())
+    if (considerNonCollapsibleWhitespace ? (c.isSpace() || c.unicode() == 0xa0)
+                                         : isCollapsibleWhitespace(c))
       return next;
   }
 
