@@ -86,6 +86,10 @@ jboolean callJNIBooleanMethod(jobject obj,
                               const char* name,
                               const char* sig,
                               ...);
+jboolean callJNIStaticBooleanMethod(jclass cls,
+                                    const char* name,
+                                    const char* sig,
+                                    ...);
 jbyte callJNIByteMethod(jobject obj, const char* name, const char* sig, ...);
 jchar callJNICharMethod(jobject obj, const char* name, const char* sig, ...);
 jshort callJNIShortMethod(jobject obj, const char* name, const char* sig, ...);

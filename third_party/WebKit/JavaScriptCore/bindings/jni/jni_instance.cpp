@@ -156,12 +156,11 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
   if (execContext && execContext->nativeHandle()) {
     jobject obj = _instance->_instance;
     Value exceptionDescription;
-    bool isStatic =
-        false;  // FIXME, need to get meta data from Java about static methods
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
-    handled = dispatchJNICall(execContext->nativeHandle(), obj, isStatic,
-                              jMethod->JNIReturnType(), jMethod->methodID(obj),
-                              jArgs, result, callingURL, exceptionDescription);
+    handled =
+        dispatchJNICall(execContext->nativeHandle(), obj, jMethod->isStatic(),
+                        jMethod->JNIReturnType(), jMethod->methodID(obj), jArgs,
+                        result, callingURL, exceptionDescription);
     if (!exceptionDescription.isNull()) {
       Object error = Error::create(
           exec, GeneralError,

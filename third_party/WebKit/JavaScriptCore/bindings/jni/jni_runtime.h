@@ -226,6 +226,8 @@ class JavaMethod : public Method {
 
   jmethodID methodID(jobject obj) const;
 
+  bool isStatic() const { return _isStatic; }
+
  private:
   JavaParameter* _parameters;
   long _numParameters;
@@ -234,6 +236,7 @@ class JavaMethod : public Method {
   JavaString _returnType;
   JNIType _JNIReturnType;
   mutable jmethodID _methodID;
+  bool _isStatic;
 };
 
 class JavaArray : public Array {
