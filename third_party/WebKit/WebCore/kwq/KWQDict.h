@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qdict.h>
+#else
+
 #include <_qcollection.h>
 #include "qstring.h"
 
@@ -119,5 +125,7 @@ class QDictIterator {
 
 };  // class QDictIterator
     // ======================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif
