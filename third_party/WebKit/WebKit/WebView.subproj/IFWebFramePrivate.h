@@ -65,6 +65,7 @@ typedef enum {
 @end
 
 @interface IFWebFrame (IFPrivate)
+- (void)_parentDataSourceWillBeDeallocated;
 - (void)_setController:(IFWebController*)controller;
 - (void)_setRenderFramePart:(khtml::RenderPart*)p;
 - (khtml::RenderPart*)_renderFramePart;
