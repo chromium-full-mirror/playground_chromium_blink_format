@@ -241,6 +241,7 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc)
   m_localHref = 0;
   m_sheet = 0;
   m_cachedSheet = 0;
+  m_loading = false;
 }
 
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc,
@@ -351,6 +352,8 @@ void ProcessingInstructionImpl::checkStyleSheet() {
       } else {
         // ### some validation on the URL?
         // ### FIXME charset
+        m_loading = true;
+        getDocument()->addPendingSheet();
         if (m_cachedSheet)
           m_cachedSheet->deref(this);
         m_cachedSheet = getDocument()->docLoader()->requestStyleSheet(
@@ -366,6 +369,19 @@ StyleSheetImpl* ProcessingInstructionImpl::sheet() const {
   return m_sheet;
 }
 
+bool ProcessingInstructionImpl::isLoading() const {
+  if (m_loading)
+    return true;
+  if (!m_sheet)
+    return false;
+  return static_cast<CSSStyleSheetImpl*>(m_sheet)->isLoading();
+}
+
+void ProcessingInstructionImpl::sheetLoaded() {
+  if (!isLoading())
+    getDocument()->stylesheetLoaded();
+}
+
 void ProcessingInstructionImpl::setStyleSheet(const DOM::DOMString& url,
                                               const DOM::DOMString& sheet) {
   if (m_sheet)
@@ -377,7 +393,11 @@ void ProcessingInstructionImpl::setStyleSheet(const DOM::DOMString& url,
     m_cachedSheet->deref(this);
   m_cachedSheet = 0;
 
-  getDocument()->updateStyleSelector();
+  m_loading = false;
+
+  // Tell the doc about the sheet.
+  if (!isLoading() && m_sheet)
+    getDocument()->stylesheetLoaded();
 }
 
 void ProcessingInstructionImpl::setStyleSheet(CSSStyleSheetImpl* sheet) {

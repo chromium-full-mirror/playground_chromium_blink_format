@@ -157,6 +157,8 @@ class ProcessingInstructionImpl : public NodeBaseImpl,
   virtual void setStyleSheet(const DOM::DOMString& url,
                              const DOM::DOMString& sheet);
   virtual void setStyleSheet(CSSStyleSheetImpl* sheet);
+  bool isLoading() const;
+  void sheetLoaded();
 
 #if APPLE_CHANGES
   static ProcessingInstruction createInstance(ProcessingInstructionImpl* impl);
@@ -168,6 +170,7 @@ class ProcessingInstructionImpl : public NodeBaseImpl,
   DOMStringImpl* m_localHref;
   khtml::CachedCSSStyleSheet* m_cachedSheet;
   CSSStyleSheetImpl* m_sheet;
+  bool m_loading;
 };
 
 class XMLAttributeReader : public QXmlDefaultHandler {
