@@ -9,7 +9,7 @@
 #import <WebKit/npapi.h>
 
 @class WebNetscapePluginPackage;
-@class WebResourceResponse;
+@class WebResponse;
 
 @interface WebBaseNetscapePluginStream : WebBaseResourceHandleDelegate {
   NSURL* URL;
@@ -30,7 +30,7 @@
 }
 
 - (void)setPluginPointer:(NPP)pluginPointer;
-- (void)setResponse:(WebResourceResponse*)theReponse;
+- (void)setResponse:(WebResponse*)theReponse;
 - (void)receivedData:(NSData*)data;
 - (void)receivedError:(NPReason)reason;
 - (void)finishedLoadingWithData:(NSData*)data;

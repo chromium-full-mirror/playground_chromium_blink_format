@@ -6,8 +6,8 @@
 */
 @class WebDataSource;
 @class WebPluginError;
-@class WebResourceResponse;
-@class WebResourceRequest;
+@class WebResponse;
+@class WebRequest;
 
 /*!
     @protocol  WebResourceLoadDelegate
@@ -41,7 +41,7 @@
    callback.
     The identifier will be retained.
 */
-- identifierForInitialRequest:(WebResourceRequest*)request
+- identifierForInitialRequest:(WebRequest*)request
                  fromDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -58,9 +58,9 @@
    although typically
     will be request.
 */
-- (WebResourceRequest*)resource:identifier
-                willSendRequest:(WebResourceRequest*)request
-                 fromDataSource:(WebDataSource*)dataSource;
+- (WebRequest*)resource:identifier
+        willSendRequest:(WebRequest*)request
+         fromDataSource:(WebDataSource*)dataSource;
 
 /*!
     @method resource:didReceiveResponse:fromDataSource:
@@ -73,7 +73,7 @@
     @param dataSource The dataSource that initiated the load.
 */
 - (void)resource:identifier
-    didReceiveResponse:(WebResourceResponse*)response
+    didReceiveResponse:(WebResponse*)response
         fromDataSource:(WebDataSource*)dataSource;
 
 /*!

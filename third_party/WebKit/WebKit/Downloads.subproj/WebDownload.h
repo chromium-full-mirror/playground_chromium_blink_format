@@ -10,8 +10,8 @@
 @class WebDownload;
 @class WebDownloadPrivate;
 @class WebError;
-@class WebResourceRequest;
-@class WebResourceResponse;
+@class WebRequest;
+@class WebResponse;
 
 /*!
     @protocol WebDownloadDecisionListener
@@ -65,8 +65,8 @@
     @result The request to be used; either the request parameter or a
    replacement.
 */
-- (WebResourceRequest*)download:(WebDownload*)download
-                willSendRequest:(WebResourceRequest*)request;
+- (WebRequest*)download:(WebDownload*)download
+        willSendRequest:(WebRequest*)request;
 
 /*!
     @method download:didReceiveResponse:
@@ -77,7 +77,7 @@
     @param response The WebResourceResponse object for the given download.
 */
 - (void)download:(WebDownload*)download
-    didReceiveResponse:(WebResourceResponse*)response;
+    didReceiveResponse:(WebResponse*)response;
 
 /*!
     @method download:decidePathWithListener:suggestedFilename:
@@ -153,7 +153,7 @@
     @param request The request to download. Must not be nil.
     @param delegate The delegate of the download. Must not be nil.
 */
-- initWithRequest:(WebResourceRequest*)request
+- initWithRequest:(WebRequest*)request
            delegate:(id<WebDownloadDelegate>)delegate;
 
 /*!

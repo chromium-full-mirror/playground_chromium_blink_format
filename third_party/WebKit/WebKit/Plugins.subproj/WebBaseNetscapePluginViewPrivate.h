@@ -5,11 +5,11 @@
 
 #import <WebBaseNetscapePluginView.h>
 
-@class WebResourceRequest;
+@class WebRequest;
 
 @interface WebBaseNetscapePluginView (WebNPPCallbacks)
 
-- (NPError)loadRequest:(WebResourceRequest*)request
+- (NPError)loadRequest:(WebRequest*)request
               inTarget:(NSString*)target
         withNotifyData:(void*)notifyData;
 - (NPError)getURLNotify:(const char*)URL

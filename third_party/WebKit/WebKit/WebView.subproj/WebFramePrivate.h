@@ -13,7 +13,7 @@
 @class WebFrameBridge;
 @class WebHistoryItem;
 @class WebView;
-@class WebResourceRequest;
+@class WebRequest;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -67,7 +67,7 @@ typedef enum {
   WebPolicyDecisionListener* listener;
   // state we'll need to continue after waiting for the policy delegate's
   // decision
-  WebResourceRequest* policyRequest;
+  WebRequest* policyRequest;
   id policyTarget;
   SEL policySelector;
   NSDictionary* policyFormValues;
@@ -117,10 +117,9 @@ typedef enum {
 - (void)_setLoadType:(WebFrameLoadType)loadType;
 - (WebFrameLoadType)_loadType;
 
-- (void)_addExtraFieldsToRequest:(WebResourceRequest*)request
-               alwaysFromRequest:(BOOL)f;
+- (void)_addExtraFieldsToRequest:(WebRequest*)request alwaysFromRequest:(BOOL)f;
 
-- (void)_checkNavigationPolicyForRequest:(WebResourceRequest*)request
+- (void)_checkNavigationPolicyForRequest:(WebRequest*)request
                               dataSource:(WebDataSource*)dataSource
                               formValues:(NSDictionary*)values
                                  andCall:(id)target
@@ -171,8 +170,7 @@ typedef enum {
            withLoadType:(WebFrameLoadType)type
              formValues:(NSDictionary*)values;
 
-- (void)_downloadRequest:(WebResourceRequest*)request
-             toDirectory:(NSString*)directory;
+- (void)_downloadRequest:(WebRequest*)request toDirectory:(NSString*)directory;
 
 - (void)_setJustOpenedForTargetedLink:(BOOL)justOpened;
 
