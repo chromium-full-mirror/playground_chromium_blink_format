@@ -44,6 +44,10 @@
 
 #include <kdebug.h>
 
+#if APPLE_CHANGES
+#include "KWQFileButton.h"
+#endif
+
 using namespace khtml;
 
 RenderFormElement::RenderFormElement(HTMLGenericFormElementImpl* element)
@@ -522,6 +526,12 @@ RenderFieldset::RenderFieldset(HTMLGenericFormElementImpl* element)
 
 RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
     : RenderFormElement(element) {
+#if APPLE_CHANGES
+  KWQFileButton* w = new KWQFileButton;
+  connect(w, SIGNAL(textChanged(const QString&)), this,
+          SLOT(slotTextChanged(const QString&)));
+  setQWidget(w);
+#else
   QHBox* w = new QHBox(view()->viewport());
 
   m_edit = new LineEditWidget(w);
@@ -539,11 +549,16 @@ RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
 
   setQWidget(w);
   m_haveFocus = false;
+#endif
 }
 
 void RenderFileButton::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
+#if APPLE_CHANGES
+  // Let the widget tell us how big it wants to be.
+  QSize s(widget()->sizeHint());
+#else
   const QFontMetrics& fm = style()->fontMetrics();
   QSize s;
   int size = element()->size();
@@ -554,6 +569,7 @@ void RenderFileButton::calcMinMaxWidth() {
   s = QSize(w + 2 + 2 * m_edit->frameWidth(),
             QMAX(h, 14) + 2 + 2 * m_edit->frameWidth())
           .expandedTo(QApplication::globalStrut());
+#endif
 
   setIntrinsicWidth(s.width());
   setIntrinsicHeight(s.height());
@@ -578,6 +594,10 @@ void RenderFileButton::slotClicked() {
 }
 
 void RenderFileButton::updateFromElement() {
+#if APPLE_CHANGES
+  static_cast<KWQFileButton*>(widget())->setFilename(
+      element()->value().string());
+#else
   m_edit->blockSignals(true);
   m_edit->setText(element()->value().string());
   m_edit->blockSignals(false);
@@ -586,6 +606,7 @@ void RenderFileButton::updateFromElement() {
     ml = 1024;
   m_edit->setMaxLength(ml);
   m_edit->setEdited(false);
+#endif
 
   RenderFormElement::updateFromElement();
 }
@@ -600,7 +621,9 @@ void RenderFileButton::slotTextChanged(const QString& string) {
 }
 
 void RenderFileButton::select() {
+#if !APPLE_CHANGES
   m_edit->selectAll();
+#endif
 }
 
 // -------------------------------------------------------------------------
