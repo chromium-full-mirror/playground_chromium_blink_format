@@ -2590,7 +2590,6 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
     clonedBlockquote->ref();
     clonedNodes.append(clonedBlockquote);
     insertNodeAfter(clonedBlockquote, m_breakNode);
-    insertBlockPlaceholderIfNeeded(clonedBlockquote);
 
     // Make clones of ancestors in between the start node and the top
     // blockquote.
@@ -2642,6 +2641,9 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
       }
       leftParent = leftParent->parentNode();
     }
+
+    // Make sure the cloned block quote renders.
+    insertBlockPlaceholderIfNeeded(clonedBlockquote);
   }
 
   // Put the selection right before the break.
