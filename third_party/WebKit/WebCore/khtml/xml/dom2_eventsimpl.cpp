@@ -284,6 +284,8 @@ DOMString EventImpl::idToType(EventImpl::EventId id) {
       return "keydown";
     case KEYUP_EVENT:
       return "keyup";
+    case KEYPRESS_EVENT:
+      return "keypress";
     case TEXTINPUT_EVENT:
       return "textInput";
     // khtml extensions
@@ -295,8 +297,6 @@ DOMString EventImpl::idToType(EventImpl::EventId id) {
       return "khtml_dragdrop";
     case KHTML_ERROR_EVENT:
       return "khtml_error";
-    case KHTML_KEYPRESS_EVENT:
-      return "khtml_keypress";
     case KHTML_MOVE_EVENT:
       return "khtml_move";
     case KHTML_ORIGCLICK_MOUSEUP_EVENT:
@@ -496,14 +496,13 @@ KeyboardEventImpl::KeyboardEventImpl() {
 }
 
 KeyboardEventImpl::KeyboardEventImpl(QKeyEvent* key, AbstractViewImpl* view)
-    : UIEventImpl(
-          key->type() == QEvent::KeyRelease
-              ? KEYUP_EVENT
-              : key->isAutoRepeat() ? KHTML_KEYPRESS_EVENT : KEYDOWN_EVENT,
-          true,
-          true,
-          view,
-          0) {
+    : UIEventImpl(key->type() == QEvent::KeyRelease
+                      ? KEYUP_EVENT
+                      : key->isAutoRepeat() ? KEYPRESS_EVENT : KEYDOWN_EVENT,
+                  true,
+                  true,
+                  view,
+                  0) {
 #if APPLE_CHANGES
   m_keyEvent = new QKeyEvent(*key);
 #else
