@@ -325,7 +325,6 @@ typedef enum {
 - (void)ensureCaretVisible;
 
 - (WebScriptObject*)windowScriptObject;
-- (void)bindObject:(id)object withName:(NSString*)name;
 
 @end
 

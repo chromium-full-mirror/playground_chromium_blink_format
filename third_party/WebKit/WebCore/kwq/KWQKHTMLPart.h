@@ -317,7 +317,6 @@ class KWQKHTMLPart : public KHTMLPart {
   KJS::Bindings::RootObject* bindingRootObject();
 
   WebScriptObject* windowScriptObject();
-  void bindObject(void* object, QString name);
 
   void partClearedInBegin();
 
