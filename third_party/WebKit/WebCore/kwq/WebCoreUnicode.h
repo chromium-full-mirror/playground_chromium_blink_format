@@ -55,14 +55,13 @@ typedef enum {
   Letter_Modifier,   //   Lm
   Letter_Other,      //   Lo
 
-  Punctuation_Connector,                //   Pc
-  Punctuation_Dash,                     //   Pd
-  Punctuation_Dask = Punctuation_Dash,  // oops
-  Punctuation_Open,                     //   Ps
-  Punctuation_Close,                    //   Pe
-  Punctuation_InitialQuote,             //   Pi
-  Punctuation_FinalQuote,               //   Pf
-  Punctuation_Other,                    //   Po
+  Punctuation_Connector,     //   Pc
+  Punctuation_Dash,          //   Pd
+  Punctuation_Open,          //   Ps
+  Punctuation_Close,         //   Pe
+  Punctuation_InitialQuote,  //   Pi
+  Punctuation_FinalQuote,    //   Pf
+  Punctuation_Other,         //   Po
 
   Symbol_Math,      //   Sm
   Symbol_Currency,  //   Sc
