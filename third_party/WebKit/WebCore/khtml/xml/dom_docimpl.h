@@ -34,6 +34,7 @@
 #include <qobject.h>
 #include <qdict.h>
 #include <qmap.h>
+#include <qdatetime.h>
 
 #include <kurl.h>
 
@@ -278,7 +279,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void clearSelection();
 
   void open();
-  virtual void close();
+  void close();
   void closeInternal(bool checkTokenizer);
   void write(const DOMString& text);
   void write(const QString& text);
@@ -512,6 +513,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void addElementById(const DOMString& elementId, ElementImpl* element);
   void removeElementById(const DOMString& elementId, ElementImpl* element);
 
+  HTMLElementImpl* body();
+
  signals:
   void finishedParsing();
 
@@ -602,6 +605,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   int m_imageLoadEventTimer;
 
   NodeImpl* m_cssTarget;
+
+  bool m_processingLoadEvent;
+  QTime m_startTime;
 
 #if APPLE_CHANGES
  public:
