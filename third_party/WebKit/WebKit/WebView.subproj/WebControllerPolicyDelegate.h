@@ -118,77 +118,6 @@ typedef enum {
 } WebContentAction;
 
 /*!
-    @class WebPolicy
-    Base class that describes the action that should take place when the
-   WebControllerPolicyDelegate
-    is asked for the policy for a URL, file, clicked URL or loaded content.
-*/
-@interface WebPolicy : NSObject {
- @private
-  WebPolicyPrivate* _private;
-}
-
-/*!
-    @method policyAction
-    @abstract The policy action of the WebPolicy.
-*/
-- (WebPolicyAction)policyAction;
-
-@end
-
-/*!
-    @class WebURLPolicy
-    Describes the action for a URL that WebKit has been asked to load.
-*/
-@interface WebURLPolicy : WebPolicy
-/*!
-    @method webPolicyWithURLAction:
-    @abstract WebURLPolicy constructor.
-    @param action The policy action of the WebURLPolicy.
-*/
-+ webPolicyWithURLAction:(WebURLAction)action;
-@end
-
-/*!
-    @class WebFileURLPolicy
-    Describes the action for a file that WebKit has been asked to load.
-*/
-@interface WebFileURLPolicy : WebPolicy
-/*!
-    @method webPolicyWithFileAction:
-    @abstract WebFileURLPolicy constructor
-    @param action The policy action of the WebFileURLPolicy.
-*/
-+ webPolicyWithFileAction:(WebFileAction)action;
-@end
-
-/*!
-    @class WebContentPolicy
-    Describes the action for content which has been partially loaded.
-*/
-@interface WebContentPolicy : WebPolicy
-/*!
-    @method webPolicyWithContentAction:
-    @abstract WebContentPolicy constructor
-    @param action The policy action of the WebContentPolicy.
-*/
-+ webPolicyWithContentAction:(WebContentAction)action;
-@end
-
-/*!
-    @class WebClickPolicy
-    Describes the action for content which has been partially loaded.
-*/
-@interface WebClickPolicy : WebPolicy
-/*!
-    @method webPolicyWithClickAction:
-    @abstract WebClickPolicy constructor
-    @param action The policy action of the WebClickPolicy.
-*/
-+ webPolicyWithClickAction:(WebClickAction)action;
-@end
-
-/*!
     @protocol WebControllerPolicyDelegate
     @discussion While loading a URL, WebKit asks the WebControllerPolicyDelegate
    for
@@ -212,9 +141,9 @@ typedef enum {
      @param modifierFlags The modifier flags as described in NSEvent.h.
      @result The WebClickPolicy for WebKit to implement
 */
-- (WebClickPolicy*)clickPolicyForAction:(NSDictionary*)actionInformation
-                             andRequest:(WebResourceRequest*)request
-                                inFrame:(WebFrame*)frame;
+- (WebClickAction)clickPolicyForAction:(NSDictionary*)actionInformation
+                            andRequest:(WebResourceRequest*)request
+                               inFrame:(WebFrame*)frame;
 
 /*!
     @method URLPolicyForURL:inFrame:
@@ -228,8 +157,8 @@ typedef enum {
     @param URL The URL that WebKit has been asked to load.
     @param frame The frame which will load the URL.
 */
-- (WebURLPolicy*)URLPolicyForRequest:(WebResourceRequest*)request
-                             inFrame:(WebFrame*)frame;
+- (WebURLAction)URLPolicyForRequest:(WebResourceRequest*)request
+                            inFrame:(WebFrame*)frame;
 
 /*!
      @method fileURLPolicyForMIMEType:inFrame:isDirectory:
@@ -241,9 +170,9 @@ typedef enum {
      @param request WebResourceRequest to be used to load the item
      @param frame The frame which will load the file.
 */
-- (WebFileURLPolicy*)fileURLPolicyForMIMEType:(NSString*)type
-                                   andRequest:(WebResourceRequest*)request
-                                      inFrame:(WebFrame*)frame;
+- (WebFileAction)fileURLPolicyForMIMEType:(NSString*)type
+                               andRequest:(WebResourceRequest*)request
+                                  inFrame:(WebFrame*)frame;
 
 /*!
     @method contentPolicyForResponse:andRequest:inFrame:withContentPolicy:
@@ -253,9 +182,9 @@ typedef enum {
     @param request A WebResourceRequest for the partially loaded content.
     @param frame The frame which is loading the URL.
 */
-- (WebContentPolicy*)contentPolicyForResponse:(WebResourceResponse*)response
-                                   andRequest:(WebResourceRequest*)request
-                                      inFrame:(WebFrame*)frame;
+- (WebContentAction)contentPolicyForResponse:(WebResourceResponse*)response
+                                  andRequest:(WebResourceRequest*)request
+                                     inFrame:(WebFrame*)frame;
 
 /*!
     @method saveFilenameForResponse:andRequest:
@@ -274,7 +203,7 @@ typedef enum {
     @param error The error that caused the policy to not be implemented.
     @param frame The frame in the which the policy could not be implemented.
 */
-- (void)unableToImplementPolicy:(WebPolicy*)policy
+- (void)unableToImplementPolicy:(WebPolicyAction)policy
                           error:(WebError*)error
                          forURL:(NSURL*)URL
                         inFrame:(WebFrame*)frame;

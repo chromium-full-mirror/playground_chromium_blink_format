@@ -7,7 +7,6 @@
 #import <Foundation/Foundation.h>
 
 @class WebController;
-@class WebURLPolicy;
 
 /*!
     @class WebDefaultPolicyDelegate
@@ -26,7 +25,7 @@
     @param Request use this request to determine an appropriate policy
     @result The WebURLPolicy to use for the request.
 */
-+ (WebURLPolicy*)defaultURLPolicyForRequest:(WebResourceRequest*)request;
++ (WebURLAction)defaultURLPolicyForRequest:(WebResourceRequest*)request;
 
 /*!
     @method initWithWebController:
