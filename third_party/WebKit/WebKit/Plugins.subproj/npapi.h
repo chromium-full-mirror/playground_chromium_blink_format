@@ -192,10 +192,10 @@ typedef uint32 (*NPN_MemFlushProcPtr)(uint32 size);
 typedef void (*NPN_ReloadPluginsProcPtr)(NPBool reloadPages);
 typedef NPError (*NPN_GetValueProcPtr)(NPP instance,
                                        NPNVariable variable,
-                                       void* ret_alue);
+                                       void* ret_value);
 typedef NPError (*NPN_SetValueProcPtr)(NPP instance,
                                        NPPVariable variable,
-                                       void* ret_alue);
+                                       void* value);
 typedef void (*NPN_InvalidateRectProcPtr)(NPP instance, NPRect* rect);
 typedef void (*NPN_InvalidateRegionProcPtr)(NPP instance, NPRegion region);
 typedef void (*NPN_ForceRedrawProcPtr)(NPP instance);
@@ -231,8 +231,8 @@ typedef NPError (*NPP_DestroyStreamProcPtr)(NPP instance,
 typedef void (*NPP_StreamAsFileProcPtr)(NPP instance,
                                         NPStream* stream,
                                         const char* fname);
-typedef int16 (*NPP_WriteReadyProcPtr)(NPP instance, NPStream* stream);
-typedef int16 (*NPP_WriteProcPtr)(NPP instance,
+typedef int32 (*NPP_WriteReadyProcPtr)(NPP instance, NPStream* stream);
+typedef int32 (*NPP_WriteProcPtr)(NPP instance,
                                   NPStream* stream,
                                   int32 offset,
                                   int32 len,
@@ -245,10 +245,10 @@ typedef void (*NPP_URLNotifyProcPtr)(NPP instance,
                                      void* notifyData);
 typedef NPError (*NPP_GetValueProcPtr)(NPP instance,
                                        NPPVariable variable,
-                                       void* ret_alue);
+                                       void* ret_value);
 typedef NPError (*NPP_SetValueProcPtr)(NPP instance,
                                        NPNVariable variable,
-                                       void* ret_alue);
+                                       void* value);
 typedef void (*NPP_ShutdownProcPtr)(void);
 typedef void* JRIGlobalRef;  // not using this right now
 
