@@ -354,6 +354,7 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc, KHTMLView* _view) {
   m_executingScript = 0;
   loadingExtScript = false;
   onHold = false;
+  attrNamePresent = false;
 
   reset();
 }
@@ -1062,6 +1063,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               tag = SearchValue;
               *dest++ = 0;
               attrName = QString::null;
+              attrNamePresent = false;
             } else
               tag = AttributeName;
 
@@ -1087,9 +1089,13 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               unsigned int a;
               cBuffer[cBufferPos] = '\0';
               a = khtml::getAttrID(cBuffer, cBufferPos);
-              if (!a)
+              if (a)
+                attrNamePresent = true;
+              else {
                 attrName = QString::fromLatin1(
                     QCString(cBuffer, cBufferPos + 1).data());
+                attrNamePresent = !attrName.isEmpty();
+              }
 
               dest = buffer;
               *dest++ = a;
@@ -1115,6 +1121,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
           cBuffer[cBufferPos] = '\0';
           attrName =
               QString::fromLatin1(QCString(cBuffer, cBufferPos + 1).data());
+          attrNamePresent = !attrName.isEmpty();
           dest = buffer;
           *dest++ = 0;
           tag = SearchEqual;
@@ -1140,6 +1147,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               tag = SearchValue;
               *dest++ = 0;
               attrName = QString::null;
+              attrNamePresent = false;
             } else {
               DOMString v("");
               currToken.addAttribute(parser->docPtr()->document(), buffer,
@@ -1181,6 +1189,27 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
           checkBuffer();
 
           curchar = src->unicode();
+          if (curchar == '>' && !attrNamePresent) {
+            // Handle a case like <img '>.  Just go ahead and be willing
+            // to close the whole tag.  Don't consume the character and
+            // just go back into SearchEnd while ignoring the whole
+            // value.
+            // FIXME: Note that this is actually not a very good solution. It's
+            // an interim hack and doesn't handle the general case of
+            // unmatched quotes among attributes that have names. -dwh
+            while (dest > buffer + 1 &&
+                   (*(dest - 1) == '\n' || *(dest - 1) == '\r'))
+              dest--;  // remove trailing newlines
+            DOMString v(buffer + 1, dest - buffer - 1);
+            attrName.setUnicode(buffer + 1, dest - buffer - 1);
+            currToken.addAttribute(parser->docPtr()->document(), buffer,
+                                   attrName, v);
+            tag = SearchAttribute;
+            dest = buffer;
+            tquote = NoQuote;
+            break;
+          }
+
           if (curchar <= '\'' && !src.escaped()) {
             // ### attributes like '&{blaa....};' are supposed to be treated as
             // jscript.
@@ -1195,6 +1224,8 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
                      (*(dest - 1) == '\n' || *(dest - 1) == '\r'))
                 dest--;  // remove trailing newlines
               DOMString v(buffer + 1, dest - buffer - 1);
+              if (!attrNamePresent)
+                attrName.setUnicode(buffer + 1, dest - buffer - 1);
               currToken.addAttribute(parser->docPtr()->document(), buffer,
                                      attrName, v);
 
