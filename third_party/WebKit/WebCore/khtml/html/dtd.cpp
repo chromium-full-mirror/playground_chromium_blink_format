@@ -323,9 +323,8 @@ static const ushort tag_list_9[] = {ID_TH, ID_TD, ID_COMMENT, 0};
 
 static const ushort tag_list_10[] = {ID_FRAMESET, ID_FRAME, ID_COMMENT, 0};
 
-static const ushort tag_list_11[] = {ID_TEXT,  ID_SCRIPT,  ID_STYLE,
-                                     ID_META,  ID_LINK,    ID_OBJECT,
-                                     ID_EMBED, ID_COMMENT, 0};
+static const ushort tag_list_11[] = {ID_TEXT, ID_SCRIPT,  ID_STYLE, ID_META,
+                                     ID_LINK, ID_COMMENT, 0};
 
 bool check_array(ushort child, const ushort* tagList) {
   int i = 0;
