@@ -332,15 +332,16 @@ Position Position::previousLinePosition(int x) const {
   if (!node()->renderer())
     return *this;
 
-  InlineBox* box = node()->renderer()->inlineBox(offset());
-  if (!box)
-    return *this;
-
   RenderBlock* containingBlock = 0;
-  RootInlineBox* root = box->root()->prevRootBox();
-  if (root) {
-    containingBlock = node()->renderer()->containingBlock();
-  } else {
+  RootInlineBox* root = 0;
+  InlineBox* box = node()->renderer()->inlineBox(offset());
+  if (box) {
+    root = box->root()->prevRootBox();
+    if (root)
+      containingBlock = node()->renderer()->containingBlock();
+  }
+
+  if (!root) {
     // This containing editable block does not have a previous line.
     // Need to move back to previous containing editable block in this root
     // editable
@@ -349,17 +350,23 @@ Position Position::previousLinePosition(int x) const {
     NodeImpl* n = node()->previousEditable();
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->previousEditable();
-    if (n) {
-      while (n && !Position(n, n->caretMaxOffset()).inRenderedContent())
-        n = n->previousEditable();
-      if (n && n->inSameRootEditableElement(node())) {
+    while (n) {
+      if (!n->inSameRootEditableElement(node()))
+        break;
+      Position pos(n, n->caretMaxOffset());
+      if (pos.inRenderedContent()) {
         ASSERT(n->renderer());
         box = n->renderer()->inlineBox(n->caretMaxOffset());
-        ASSERT(box);
-        // previous root line box found
-        root = box->root();
-        containingBlock = n->renderer()->containingBlock();
+        if (box) {
+          // previous root line box found
+          root = box->root();
+          containingBlock = n->renderer()->containingBlock();
+          break;
+        } else {
+          return pos;
+        }
       }
+      n = n->previousEditable();
     }
   }
 
@@ -380,15 +387,16 @@ Position Position::nextLinePosition(int x) const {
   if (!node()->renderer())
     return *this;
 
-  InlineBox* box = node()->renderer()->inlineBox(offset());
-  if (!box)
-    return *this;
-
   RenderBlock* containingBlock = 0;
-  RootInlineBox* root = box->root()->nextRootBox();
-  if (root) {
-    containingBlock = node()->renderer()->containingBlock();
-  } else {
+  RootInlineBox* root = 0;
+  InlineBox* box = node()->renderer()->inlineBox(offset());
+  if (box) {
+    root = box->root()->nextRootBox();
+    if (root)
+      containingBlock = node()->renderer()->containingBlock();
+  }
+
+  if (!root) {
     // This containing editable block does not have a next line.
     // Need to move forward to next containing editable block in this root
     // editable
@@ -397,17 +405,23 @@ Position Position::nextLinePosition(int x) const {
     NodeImpl* n = node()->nextEditable();
     while (n && startBlock == n->enclosingBlockFlowElement())
       n = n->nextEditable();
-    if (n) {
-      while (n && !Position(n, n->caretMinOffset()).inRenderedContent())
-        n = n->nextEditable();
-      if (n && n->inSameRootEditableElement(node())) {
+    while (n) {
+      if (!n->inSameRootEditableElement(node()))
+        break;
+      Position pos(n, n->caretMinOffset());
+      if (pos.inRenderedContent()) {
         ASSERT(n->renderer());
         box = n->renderer()->inlineBox(n->caretMinOffset());
-        ASSERT(box);
-        // previous root line box found
-        root = box->root();
-        containingBlock = n->renderer()->containingBlock();
+        if (box) {
+          // next root line box found
+          root = box->root();
+          containingBlock = n->renderer()->containingBlock();
+          break;
+        } else {
+          return pos;
+        }
       }
+      n = n->nextEditable();
     }
   }
 
