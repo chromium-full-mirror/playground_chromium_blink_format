@@ -38,12 +38,13 @@ class QButton : public QWidget {
   virtual void setText(const QString&);
   QString text() const;
 
+  void setWritingDirection(QPainter::TextDirection);
+
   virtual void clicked();
   virtual void simulateClick();
 
   // QWidget overrides
   virtual void setFont(const QFont&);
-
   virtual FocusPolicy focusPolicy() const;
 
  private:

@@ -64,6 +64,8 @@ class QTextEdit : public QScrollView {
 
   void setTabStopWidth(int);
 
+  void setWritingDirection(QPainter::TextDirection);
+
   void selectAll();
 
   QSize sizeWithColumnsAndRows(int numColumns, int numRows) const;

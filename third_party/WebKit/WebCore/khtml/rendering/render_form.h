@@ -96,10 +96,9 @@ class RenderFormElement : public khtml::RenderWidget {
   void addIntrinsicMarginsIfAllowed(RenderStyle* _style);
   virtual bool canHaveIntrinsicMargins() const { return false; }
   int intrinsicMargin() const { return 2; }
-
-  virtual void setStyle(RenderStyle* _style);
 #endif
 
+  virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
 
   virtual void layout();
@@ -197,6 +196,9 @@ class RenderSubmitButton : public RenderButton {
   virtual void calcMinMaxWidth();
   virtual void updateFromElement();
   virtual short baselinePosition(bool, bool) const;
+#if APPLE_CHANGES
+  virtual void setStyle(RenderStyle*);
+#endif
 
  private:
   QString rawText();
@@ -246,6 +248,7 @@ class RenderLineEdit : public RenderFormElement {
 
   virtual const char* renderName() const { return "RenderLineEdit"; }
   virtual void updateFromElement();
+  virtual void setStyle(RenderStyle*);
 
   void select();
 
@@ -323,7 +326,9 @@ class RenderFileButton : public RenderFormElement {
     return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
   }
 
+#if !APPLE_CHANGES
   KLineEdit* lineEdit() const { return m_edit; }
+#endif
 
  public slots:
   virtual void slotClicked();
@@ -331,14 +336,14 @@ class RenderFileButton : public RenderFormElement {
   virtual void slotTextChanged(const QString& string);
 
  protected:
-  virtual void handleFocusOut();
-
   virtual bool isEditable() const { return true; }
 
-  bool m_clicked;
-  bool m_haveFocus;
+#if !APPLE_CHANGES
+  virtual void handleFocusOut();
+
   KLineEdit* m_edit;
   QPushButton* m_button;
+#endif
 };
 
 // -------------------------------------------------------------------------
@@ -399,6 +404,9 @@ class RenderSelect : public RenderFormElement {
     m_selectionChanged = _selectionChanged;
   }
   virtual void updateFromElement();
+#if APPLE_CHANGES
+  virtual void setStyle(RenderStyle*);
+#endif
 
   void updateSelection();
 
@@ -409,6 +417,9 @@ class RenderSelect : public RenderFormElement {
  protected:
   KListBox* createListBox();
   ComboBoxWidget* createComboBox();
+#if APPLE_CHANGES
+  void setWidgetWritingDirection();
+#endif
 
   unsigned m_size;
   bool m_multiple;
@@ -445,6 +456,7 @@ class RenderTextArea : public RenderFormElement {
   virtual void calcMinMaxWidth();
   virtual void close();
   virtual void updateFromElement();
+  virtual void setStyle(RenderStyle*);
 
   virtual bool isTextArea() const { return true; }
 
