@@ -327,7 +327,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   virtual bool isReadOnly();
   virtual bool childTypeAllowed(unsigned short /*type*/) { return false; }
-  virtual unsigned long childNodeCount();
+  virtual unsigned long childNodeCount() const;
   virtual NodeImpl* childNode(unsigned long index);
 
   /**
@@ -546,6 +546,7 @@ class NodeBaseImpl : public NodeImpl {
   virtual NodeImpl* addChild(NodeImpl* newChild);
   virtual void attach();
   virtual void detach();
+  virtual long maxOffset() const;
 
   virtual NodeListImpl* getElementsByTagNameNS(DOMStringImpl* namespaceURI,
                                                DOMStringImpl* localName);
@@ -556,7 +557,7 @@ class NodeBaseImpl : public NodeImpl {
 
   virtual void setFocus(bool = true);
   virtual void setActive(bool = true);
-  virtual unsigned long childNodeCount();
+  virtual unsigned long childNodeCount() const;
   virtual NodeImpl* childNode(unsigned long index);
 
   virtual void insertedIntoDocument();
