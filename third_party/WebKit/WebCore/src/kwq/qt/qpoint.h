@@ -30,6 +30,8 @@
 #include <config.h>
 #endif
 
+#include <iostream>
+
 #include <KWQDef.h>
 
 #include "qarray.h"
@@ -84,15 +86,15 @@ class QPoint {
   QPoint& operator/=(int);
   QPoint& operator/=(double);
 
-  friend inline bool operator==(const QPoint&, const QPoint&);
-  friend inline bool operator!=(const QPoint&, const QPoint&);
-  friend inline QPoint operator*(const QPoint&, int);
-  friend inline QPoint operator*(int, const QPoint&);
-  friend inline QPoint operator*(const QPoint&, double);
-  friend inline QPoint operator*(double, const QPoint&);
-  friend inline QPoint operator-(const QPoint&);
-  friend inline QPoint operator/(const QPoint&, int);
-  friend inline QPoint operator/(const QPoint&, double);
+  friend bool operator==(const QPoint&, const QPoint&);
+  friend bool operator!=(const QPoint&, const QPoint&);
+  friend QPoint operator*(const QPoint&, int);
+  friend QPoint operator*(int, const QPoint&);
+  friend QPoint operator*(const QPoint&, double);
+  friend QPoint operator*(double, const QPoint&);
+  friend QPoint operator-(const QPoint&);
+  friend QPoint operator/(const QPoint&, int);
+  friend QPoint operator/(const QPoint&, double);
 #endif
 
   // protected
@@ -130,6 +132,10 @@ class QPointArray : public QArray<QPoint> {
   // operators ---------------------------------------------------------------
 
   QPointArray& operator=(const QPointArray&);
+
+#ifdef _KWQ_IOSTREAM_
+  friend ostream& operator<<(ostream&, const QPoint&);
+#endif
 
   // protected
   // -------------------------------------------------------------------

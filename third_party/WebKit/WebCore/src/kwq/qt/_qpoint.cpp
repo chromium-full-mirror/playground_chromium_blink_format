@@ -18,7 +18,7 @@
 
 // -------------------------------------------------------------------------
 
-#include <qpoint.h>
+#include "qpoint.h"
 
 // for abs()
 #include <stdlib.h>
@@ -31,6 +31,11 @@ QPoint::QPoint() {
 QPoint::QPoint(int xpos, int ypos) {
   xx = (QCOORD)xpos;
   yy = (QCOORD)ypos;
+}
+
+QPoint::QPoint(const QPoint& other) {
+  xx = other.xx;
+  yy = other.yy;
 }
 
 int QPoint::x() const {
@@ -52,6 +57,13 @@ QPoint operator-(const QPoint& p1, const QPoint& p2) {
 int QPoint::manhattanLength() const {
   return abs(xx) + abs(yy);
 }
+
+#ifdef _KWQ_IOSTREAM_
+ostream& operator<<(ostream& o, const QPoint& p) {
+  return o << "QPoint: [x: " << (Q_INT32)p.xx << "; h: " << (Q_INT32)p.yy
+           << ']';
+}
+#endif
 
 // KWQ_COMPLETE implementations ------------------------------------------
 
