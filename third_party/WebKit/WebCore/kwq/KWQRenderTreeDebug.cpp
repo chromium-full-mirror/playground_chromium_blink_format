@@ -167,7 +167,7 @@ static void write(QTextStream& ts,
 
   ts << "layer";
 
-  QRect r(l.xPos(), l.yPos(), l.width(), l.height());
+  QRect r(e.absBounds);
 
   ts << " " << r;
 
