@@ -30,7 +30,11 @@
 #include <config.h>
 #endif
 
-#ifndef USING_BORROWED_QSTRINGLIST
+#ifdef USING_BORROWED_QSTRLIST
+
+#include <_qstrlist.h>
+
+#else
 
 #include <qstring.h>
 #include <qlist.h>
@@ -65,6 +69,6 @@ class QStrList : public QList<char> {
 };  // class QStrList
     // ===========================================================
 
-#endif  // USING_BORROWED_QSTRINGLIST
+#endif  // USING_BORROWED_QSTRLIST
 
 #endif

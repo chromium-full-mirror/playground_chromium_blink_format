@@ -38,8 +38,9 @@
 
 #include <KWQDef.h>
 
-#include "qarray.h"
-#include "qstring.h"
+#include <qarray.h>
+#include <qstring.h>
+#include <qiodevice.h>
 
 // class QBuffer ===============================================================
 
@@ -77,6 +78,9 @@ class QBuffer {
   QBuffer(const QBuffer&);
   QBuffer& operator=(const QBuffer&);
 
+  bool opened;
+  QByteArray ba;
+  uint pos;
 };  // class QBuffer
     // ============================================================
 

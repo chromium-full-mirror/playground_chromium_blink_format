@@ -15,9 +15,9 @@
 
 // KWQ hacks ---------------------------------------------------------------
 
-#ifndef USING_BORROWED_QARRAY
-#define USING_BORROWED_QARRAY
-#endif
+#include <config.h>
+
+#ifdef USING_BORROWED_QARRAY
 
 #include <KWQDef.h>
 
@@ -100,5 +100,7 @@ inline char* QGArray::at(uint index) const {
 #endif
   return &shd->data[index];
 }
+
+#endif
 
 #endif
