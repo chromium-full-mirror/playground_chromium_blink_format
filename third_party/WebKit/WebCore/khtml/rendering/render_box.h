@@ -150,6 +150,8 @@ class RenderBox : public RenderObject {
 
   virtual void setStaticX(int staticX);
   virtual void setStaticY(int staticY);
+  virtual int staticX() const { return m_staticX; }
+  virtual int staticY() const { return m_staticY; }
 
  protected:
   virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);

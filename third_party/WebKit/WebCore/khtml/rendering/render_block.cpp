@@ -2232,7 +2232,10 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      int lp = r->yPos() + r->lowestPosition(false);
+      // Use the layer's position, since it has been corrected for crazy
+      // relpositioned inline
+      // edge cases.
+      int lp = r->layer()->yPos() + r->lowestPosition(false);
       bottom = kMax(bottom, lp);
     }
   }
@@ -2270,7 +2273,10 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      int rp = r->xPos() + r->rightmostPosition(false);
+      // Use the layer's position, since it has been corrected for crazy
+      // relpositioned inline
+      // edge cases.
+      int rp = r->layer()->xPos() + r->rightmostPosition(false);
       right = kMax(right, rp);
     }
   }
@@ -2310,7 +2316,10 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     RenderObject* r;
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
-      int lp = r->xPos() + r->leftmostPosition(false);
+      // Use the layer's position, since it has been corrected for crazy
+      // relpositioned inline
+      // edge cases.
+      int lp = r->layer()->xPos() + r->leftmostPosition(false);
       left = kMin(left, lp);
     }
   }

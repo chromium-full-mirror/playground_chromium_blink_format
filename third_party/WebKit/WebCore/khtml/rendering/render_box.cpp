@@ -610,8 +610,7 @@ void RenderBox::dirtyLineBoxes(bool fullLayout, bool) {
 void RenderBox::position(InlineBox* box, int from, int len, bool reverse) {
   if (isPositioned()) {
     // Cache the x position only if we were an INLINE type originally.
-    bool wasInline = style()->originalDisplay() == INLINE ||
-                     style()->originalDisplay() == INLINE_TABLE;
+    bool wasInline = style()->isOriginalDisplayInlineType();
     if (wasInline && hasStaticX()) {
       // The value is cached in the xPos of the box.  We only need this value if
       // our object was inline originally, since otherwise it would have ended

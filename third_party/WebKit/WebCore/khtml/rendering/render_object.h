@@ -198,6 +198,8 @@ class RenderObject : public CachedObjectClient {
   bool hasStaticY() const;
   virtual void setStaticX(int staticX){};
   virtual void setStaticY(int staticY){};
+  virtual int staticX() const { return 0; }
+  virtual int staticY() const { return 0; }
 
   // RenderObject tree manipulation
   //////////////////////////////////////////

@@ -53,7 +53,6 @@ XSLTProcessorImpl::~XSLTProcessorImpl() {
     m_sourceDocument->deref();
 }
 
-#ifdef NOT_YET_READY
 static XSLStyleSheetImpl* globalSheet = 0;
 static xmlDocPtr stylesheetLoadFunc(const xmlChar* uri,
                                     xmlDictPtr dict,
@@ -69,7 +68,6 @@ static xmlDocPtr stylesheetLoadFunc(const xmlChar* uri,
   return globalSheet->locateStylesheetSubResource(
       ((xsltStylesheetPtr)ctxt)->doc, uri);
 }
-#endif
 
 DocumentImpl* XSLTProcessorImpl::transformDocument(DocumentImpl* doc) {
   // FIXME: Right now we assume |doc| is unparsed, but if it has been parsed we
@@ -80,17 +78,13 @@ DocumentImpl* XSLTProcessorImpl::transformDocument(DocumentImpl* doc) {
   if (!m_stylesheet || !m_stylesheet->document())
     return 0;
 
-#ifdef NOT_YET_READY
   globalSheet = m_stylesheet;
   xsltSetLoaderFunc(stylesheetLoadFunc);
-#endif
 
   xsltStylesheetPtr sheet = m_stylesheet->compileStyleSheet();
 
-#ifdef NOT_YET_READY
   globalSheet = 0;
   xsltSetLoaderFunc(0);
-#endif
 
   if (!sheet)
     return 0;
