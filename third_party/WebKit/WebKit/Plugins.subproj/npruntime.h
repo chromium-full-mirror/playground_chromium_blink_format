@@ -269,7 +269,7 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier);
 typedef NPObject* (*NPAllocateFunctionPtr)(NPP npp, NPClass* aClass);
 typedef void (*NPDeallocateFunctionPtr)(NPObject* obj);
 typedef void (*NPInvalidateFunctionPtr)(NPObject* obj);
-typedef bool (*NPHasMethodFunctionPtr)(NPClass* theClass, NPIdentifier name);
+typedef bool (*NPHasMethodFunctionPtr)(NPObject* obj, NPIdentifier name);
 typedef bool (*NPInvokeFunctionPtr)(NPObject* obj,
                                     NPIdentifier name,
                                     const NPVariant* args,
@@ -279,7 +279,7 @@ typedef bool (*NPInvokeDefaultFunctionPtr)(NPObject* npobj,
                                            const NPVariant* args,
                                            uint32_t argCount,
                                            NPVariant* result);
-typedef bool (*NPHasPropertyFunctionPtr)(NPClass* theClass, NPIdentifier name);
+typedef bool (*NPHasPropertyFunctionPtr)(NPObject* obj, NPIdentifier name);
 typedef bool (*NPGetPropertyFunctionPtr)(NPObject* obj,
                                          NPIdentifier name,
                                          NPVariant* result);
