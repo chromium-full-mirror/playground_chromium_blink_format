@@ -561,12 +561,12 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
       case MoveTo:
       case ResizeBy:
       case ResizeTo:
+        return lookupOrCreateFunction<WindowFunc>(exec, p, this, entry->value,
+                                                  entry->params, entry->attr);
       case CaptureEvents:
       case ReleaseEvents:
       case AddEventListener:
       case RemoveEventListener:
-        return lookupOrCreateFunction<WindowFunc>(exec, p, this, entry->value,
-                                                  entry->params, entry->attr);
       case SetTimeout:
       case ClearTimeout:
       case SetInterval:
@@ -1366,6 +1366,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       }
       return Undefined();
     case Window::SetTimeout:
+      if (!window->isSafeScript(exec))
+        return Undefined();
       if (args.size() == 2 && v.isA(StringType)) {
         int i = args[1].toInt32(exec);
         int r = (const_cast<Window*>(window))
@@ -1387,6 +1389,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       } else
         return Undefined();
     case Window::SetInterval:
+      if (!window->isSafeScript(exec))
+        return Undefined();
       if (args.size() >= 2 && v.isA(StringType)) {
         int i = args[1].toInt32(exec);
         int r = (const_cast<Window*>(window))
@@ -1409,6 +1413,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
         return Undefined();
     case Window::ClearTimeout:
     case Window::ClearInterval:
+      if (!window->isSafeScript(exec))
+        return Undefined();
       (const_cast<Window*>(window))->clearTimeout(v.toInt32(exec));
       return Undefined();
     case Window::Focus:
@@ -1463,9 +1469,16 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       return Undefined();
     case Window::CaptureEvents:
     case Window::ReleaseEvents:
+      // If anyone implements these, they need the safescript security check.
+      if (!window->isSafeScript(exec))
+        return Undefined();
+
       // Do nothing for now. These are NS-specific legacy calls.
       break;
     case Window::AddEventListener: {
+      if (!window->isSafeScript(exec))
+        return Undefined();
+
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       DOM::Document doc = part->document();
@@ -1479,6 +1492,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       return Undefined();
     }
     case Window::RemoveEventListener: {
+      if (!window->isSafeScript(exec))
+        return Undefined();
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       DOM::Document doc = part->document();

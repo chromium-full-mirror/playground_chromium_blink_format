@@ -1729,7 +1729,7 @@ void KHTMLPart::checkEmitLoadEvent() {
           kdDebug() << "KHTMLPart::checkCompleted setting frame domain to "
                     << domain.string() << endl;
           static_cast<HTMLDocumentImpl*>(htmlFrame->d->m_doc)
-              ->setDomain(domain, true);
+              ->setDomain(domain);
         }
       }
     }

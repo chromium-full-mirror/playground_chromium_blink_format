@@ -1770,7 +1770,9 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ObjectCodeType:
           return getString(object.codeType());
         case ObjectContentDocument:
-          return getDOMNode(exec, object.contentDocument());
+          return checkNodeSecurity(exec, object.contentDocument())
+                     ? getDOMNode(exec, object.contentDocument())
+                     : Undefined();
         case ObjectData:
           return getString(object.data());
         case ObjectDeclare:
@@ -2054,7 +2056,9 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       DOM::HTMLFrameElement frameElement = element;
       switch (token) {
         case FrameContentDocument:
-          return getDOMNode(exec, frameElement.contentDocument());
+          return checkNodeSecurity(exec, frameElement.contentDocument())
+                     ? getDOMNode(exec, frameElement.contentDocument())
+                     : Undefined();
         case FrameFrameBorder:
           return getString(frameElement.frameBorder());
         case FrameLongDesc:
@@ -2082,7 +2086,9 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         // ### security check ?
         case IFrameDocument:  // non-standard, mapped to contentDocument
         case IFrameContentDocument:
-          return getDOMNode(exec, iFrame.contentDocument());
+          return checkNodeSecurity(exec, iFrame.contentDocument())
+                     ? getDOMNode(exec, iFrame.contentDocument())
+                     : Undefined();
         case IFrameFrameBorder:
           return getString(iFrame.frameBorder());
         case IFrameHeight:
