@@ -53,7 +53,7 @@ static const int InheritableProperties[] = {
     CSS_PROP_FONT_FAMILY,     CSS_PROP_FONT_SIZE,      CSS_PROP_FONT_STYLE,
     CSS_PROP_FONT_VARIANT,    CSS_PROP_FONT_WEIGHT,    CSS_PROP_LETTER_SPACING,
     CSS_PROP_LINE_HEIGHT,     CSS_PROP_TEXT_ALIGN,     CSS_PROP_TEXT_INDENT,
-    CSS_PROP_WHITE_SPACE,     CSS_PROP_WORD_SPACING,
+    CSS_PROP_TEXT_TRANSFORM,  CSS_PROP_WHITE_SPACE,    CSS_PROP_WORD_SPACING,
 };
 
 static CSSValueImpl* valueForLength(const Length& length) {
@@ -171,6 +171,12 @@ void CSSComputedStyleDeclarationImpl::setCssText(const DOMString&) {
   ERROR("CSSComputedStyleDeclarationImpl is a read-only object");
 }
 
+// Display integers in integer format instead of "1.0".
+static QString numberAsString(double n) {
+  long i = static_cast<long>(n);
+  return i == n ? QString::number(i) : QString::number(n);
+}
+
 CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
     int propertyID) const {
   // Make sure our layout is up to date before we allow a query on these
@@ -206,9 +212,9 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         case khtml::NO_REPEAT:
           return new CSSPrimitiveValueImpl("no-repeat",
                                            CSSPrimitiveValue::CSS_STRING);
-        default:
-          ASSERT_NOT_REACHED();
       }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_BACKGROUND_ATTACHMENT:
       if (m_renderer->style()->backgroundAttachment())
         return new CSSPrimitiveValueImpl("scroll",
@@ -220,15 +226,15 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       DOMString string;
       Length length(m_renderer->style()->backgroundXPosition());
       if (length.isPercent())
-        string = QString::number(length.length()) + "%";
+        string = numberAsString(length.length()) + "%";
       else
-        string = QString::number(length.minWidth(m_renderer->contentWidth()));
+        string = numberAsString(length.minWidth(m_renderer->contentWidth()));
       string += " ";
       length = m_renderer->style()->backgroundYPosition();
       if (length.isPercent())
-        string += QString::number(length.length()) + "%";
+        string += numberAsString(length.length()) + "%";
       else
-        string += QString::number(length.minWidth(m_renderer->contentWidth()));
+        string += numberAsString(length.minWidth(m_renderer->contentWidth()));
       return new CSSPrimitiveValueImpl(string, CSSPrimitiveValue::CSS_STRING);
     }
     case CSS_PROP_BACKGROUND_POSITION_X:
@@ -249,9 +255,9 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
                                          CSSPrimitiveValue::CSS_STRING);
     case CSS_PROP_BORDER_SPACING: {
       QString string(
-          QString::number(m_renderer->style()->horizontalBorderSpacing()) +
-          "px " +
-          QString::number(m_renderer->style()->verticalBorderSpacing()) + "px");
+          numberAsString(m_renderer->style()->horizontalBorderSpacing()) +
+          "px " + numberAsString(m_renderer->style()->verticalBorderSpacing()) +
+          "px");
       return new CSSPrimitiveValueImpl(string, CSSPrimitiveValue::CSS_STRING);
     }
     case CSS_PROP__KHTML_BORDER_HORIZONTAL_SPACING:
@@ -413,13 +419,13 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         case khtml::NONE:
           return new CSSPrimitiveValueImpl("none",
                                            CSSPrimitiveValue::CSS_STRING);
-        default:
-          ASSERT_NOT_REACHED();
       }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_EMPTY_CELLS:
       // FIXME: unimplemented
       break;
-    case CSS_PROP_FLOAT: {
+    case CSS_PROP_FLOAT:
       switch (m_renderer->style()->floating()) {
         case khtml::FNONE:
           return new CSSPrimitiveValueImpl("none",
@@ -431,7 +437,8 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
           return new CSSPrimitiveValueImpl("right",
                                            CSSPrimitiveValue::CSS_STRING);
       }
-    }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_FONT_FAMILY: {
       FontDef def = m_renderer->style()->htmlFont().getFontDef();
       return new CSSPrimitiveValueImpl(def.firstFamily().family().domString(),
@@ -571,7 +578,7 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
     case CSS_PROP_OUTLINE_WIDTH:
       // FIXME: unimplemented
       break;
-    case CSS_PROP_OVERFLOW: {
+    case CSS_PROP_OVERFLOW:
       switch (m_renderer->style()->overflow()) {
         case khtml::OVISIBLE:
           return new CSSPrimitiveValueImpl("visible",
@@ -592,7 +599,8 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
           return new CSSPrimitiveValueImpl("overlay",
                                            CSSPrimitiveValue::CSS_STRING);
       }
-    }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_PADDING_TOP:
       return valueForLength(m_renderer->style()->paddingTop());
     case CSS_PROP_PADDING_RIGHT:
@@ -663,14 +671,28 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       // FIXME: unimplemented
       break;
     case CSS_PROP_TEXT_TRANSFORM:
-      // FIXME: unimplemented
-      break;
+      switch (m_renderer->style()->textTransform()) {
+        case khtml::CAPITALIZE:
+          return new CSSPrimitiveValueImpl("capitalize",
+                                           CSSPrimitiveValue::CSS_STRING);
+        case khtml::UPPERCASE:
+          return new CSSPrimitiveValueImpl("uppercase",
+                                           CSSPrimitiveValue::CSS_STRING);
+        case khtml::LOWERCASE:
+          return new CSSPrimitiveValueImpl("lowercase",
+                                           CSSPrimitiveValue::CSS_STRING);
+        case khtml::TTNONE:
+          return new CSSPrimitiveValueImpl("none",
+                                           CSSPrimitiveValue::CSS_STRING);
+      }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_TOP:
       return getPositionOffsetValue(CSS_PROP_TOP);
     case CSS_PROP_UNICODE_BIDI:
       // FIXME: unimplemented
       break;
-    case CSS_PROP_VERTICAL_ALIGN: {
+    case CSS_PROP_VERTICAL_ALIGN:
       switch (m_renderer->style()->verticalAlign()) {
         case khtml::BASELINE:
           return new CSSPrimitiveValueImpl("baseline",
@@ -702,11 +724,12 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         case khtml::LENGTH:
           return valueForLength(m_renderer->style()->verticalAlignLength());
       }
-    }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_VISIBILITY:
       // FIXME: unimplemented
       break;
-    case CSS_PROP_WHITE_SPACE: {
+    case CSS_PROP_WHITE_SPACE:
       switch (m_renderer->style()->whiteSpace()) {
         case khtml::NORMAL:
           return new CSSPrimitiveValueImpl("normal",
@@ -721,7 +744,8 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
           return new CSSPrimitiveValueImpl("-khtml-nowrap",
                                            CSSPrimitiveValue::CSS_STRING);
       }
-    }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_WIDOWS:
       // FIXME: unimplemented
       break;
@@ -801,8 +825,6 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
 #endif
     case CSS_PROP__KHTML_FLOW_MODE:
       // FIXME: unimplemented
-      break;
-    default:
       break;
   }
   ERROR("unimplemented propertyID: %d", propertyID);
