@@ -1856,11 +1856,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
     removeNode(startBlock);
     if (refNode->renderer() && refNode->renderer()->inlineBox() &&
         refNode->renderer()->inlineBox()->nextOnLineExists()) {
-      int exceptionCode = 0;
-      ElementImpl* breakNode =
-          document()->createHTMLElement("BR", exceptionCode);
-      ASSERT(exceptionCode == 0);
-      insertNodeAfter(breakNode, refNode);
+      insertNodeAfter(createBreakElement(document()), refNode);
     }
   }
 }
@@ -2081,10 +2077,7 @@ void InsertLineBreakCommand::doApply() {
   deleteSelection();
   Selection selection = endingSelection();
 
-  int exceptionCode = 0;
-  ElementImpl* breakNode = document()->createHTMLElement("BR", exceptionCode);
-  ASSERT(exceptionCode == 0);
-
+  ElementImpl* breakNode = createBreakElement(document());
   NodeImpl* nodeToInsert = breakNode;
 
   // Handle the case where there is a typing style.
@@ -2124,9 +2117,7 @@ void InsertLineBreakCommand::doApply() {
         setEndingSelection(Position(next, 0));
       } else if (!document()->inStrictMode()) {
         // Insert an "extra" BR at the end of the block.
-        ElementImpl* extraBreakNode =
-            document()->createHTMLElement("br", exceptionCode);
-        ASSERT(exceptionCode == 0);
+        ElementImpl* extraBreakNode = createBreakElement(document());
         insertNodeAfter(extraBreakNode, nodeToInsert);
         setEndingSelection(Position(extraBreakNode, 0));
       }
@@ -2150,6 +2141,7 @@ void InsertLineBreakCommand::doApply() {
     ASSERT(pos.node()->isTextNode());
 
     // Do the split
+    int exceptionCode = 0;
     TextImpl* textNode = static_cast<TextImpl*>(pos.node());
     TextImpl* textBeforeNode = document()->createTextNode(
         textNode->substringData(0, selection.start().offset(), exceptionCode));
@@ -2333,20 +2325,14 @@ void InsertParagraphSeparatorCommand::doApply() {
   // then this <br> will collapse away when we add a block after it. Add an
   // extra <br>.
   if (!document()->inStrictMode()) {
-    int exceptionCode = 0;
     if (pos.node()->id() == ID_BR) {
-      NodeImpl* extraBreak = document()->createHTMLElement("br", exceptionCode);
-      ASSERT(exceptionCode == 0);
+      NodeImpl* extraBreak = createBreakElement(document());
       insertNodeAfter(extraBreak, pos.node());
       pos = Position(extraBreak, 0);
     } else {
       Position upstreamPos = pos.upstream(StayInBlock);
-      if (upstreamPos.node()->id() == ID_BR) {
-        NodeImpl* extraBreak =
-            document()->createHTMLElement("br", exceptionCode);
-        ASSERT(exceptionCode == 0);
-        insertNodeAfter(extraBreak, upstreamPos.node());
-      }
+      if (upstreamPos.node()->id() == ID_BR)
+        insertNodeAfter(createBreakElement(document()), upstreamPos.node());
       // leave pos where it is
     }
   }
@@ -2484,7 +2470,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
 
   // Insert a break after the top blockquote.
   int exceptionCode = 0;
-  m_breakNode = document()->createHTMLElement("BR", exceptionCode);
+  m_breakNode = createBreakElement(document());
   m_breakNode->ref();
   ASSERT(exceptionCode == 0);
   insertNodeAfter(m_breakNode, topBlockquote);
@@ -2549,7 +2535,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
     if (!startIsBR) {
       if (!leftParent)
         leftParent = topBlockquote;
-      ElementImpl* b = document()->createHTMLElement("BR", exceptionCode);
+      ElementImpl* b = createBreakElement(document());
       b->ref();
       clonedNodes.append(b);
       ASSERT(exceptionCode == 0);
@@ -3631,11 +3617,7 @@ void ReplaceSelectionCommand::doApply() {
                                  next->enclosingBlockFlowElement();
         if (!hasTrailingBR) {
           // Insert an "extra" BR at the end of the block.
-          int exceptionCode = 0;
-          ElementImpl* extraBreakNode =
-              document()->createHTMLElement("br", exceptionCode);
-          ASSERT(exceptionCode == 0);
-          insertNodeBefore(extraBreakNode, lastNodeInserted);
+          insertNodeBefore(createBreakElement(document()), lastNodeInserted);
         }
       }
     }
@@ -4126,6 +4108,13 @@ ElementImpl* createBlockPlaceholderElement(DocumentImpl* document) {
   ElementImpl* breakNode = document->createHTMLElement("br", exceptionCode);
   ASSERT(exceptionCode == 0);
   breakNode->setAttribute(ATTR_CLASS, blockPlaceholderClassString());
+  return breakNode;
+}
+
+ElementImpl* createBreakElement(DocumentImpl* document) {
+  int exceptionCode = 0;
+  ElementImpl* breakNode = document->createHTMLElement("br", exceptionCode);
+  ASSERT(exceptionCode == 0);
   return breakNode;
 }
 
