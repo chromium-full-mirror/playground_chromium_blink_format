@@ -127,6 +127,10 @@ class CSSParser {
   bool parseFont(bool important);
   CSSValueListImpl* parseFontFamily();
   CSSPrimitiveValueImpl* parseColor();
+  CSSPrimitiveValueImpl* parseColorFromValue(Value* val);
+
+  // CSS3 Parsing Routines (for properties specific to CSS3)
+  bool parseShadow(int propId, bool important);
 
   int yyparse(void);
 

@@ -524,7 +524,9 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
   double factor = 1.;
   switch (type) {
     case CSSPrimitiveValue::CSS_EMS:
-      factor = style->htmlFont().getFontDef().specifiedSize;
+      factor = (selector && applyZoomFactor)
+                   ? style->htmlFont().getFontDef().computedSize
+                   : style->htmlFont().getFontDef().specifiedSize;
       break;
     case CSSPrimitiveValue::CSS_EXS:
       // FIXME: We have a bug right now where the zoom will be applied multiple
@@ -564,15 +566,7 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
       return -1;
   }
 
-  float result = getFloatValue(type) * factor;
-  // FIXME: Will need to do this for EX units eventually as well, once they're
-  // patched
-  // to use specifiedSize and not a computed font size above.
-  // Need to adjust for the zoom and for the minimum font size.
-  if (type == CSSPrimitiveValue::CSS_EMS && selector && applyZoomFactor)
-    selector->getComputedSizeFromSpecifiedSize(
-        style->htmlFont().getFontDef().isAbsoluteSize, result);
-  return result;
+  return getFloatValue(type) * factor;
 }
 
 void CSSPrimitiveValueImpl::setFloatValue(unsigned short unitType,
@@ -862,4 +856,18 @@ FontValueImpl::~FontValueImpl() {
   delete size;
   delete lineHeight;
   delete family;
+}
+
+// Used for text-shadow and box-shadow
+ShadowValueImpl::ShadowValueImpl(CSSPrimitiveValueImpl* _x,
+                                 CSSPrimitiveValueImpl* _y,
+                                 CSSPrimitiveValueImpl* _blur,
+                                 CSSPrimitiveValueImpl* _color)
+    : x(_x), y(_y), blur(_blur), color(_color) {}
+
+ShadowValueImpl::~ShadowValueImpl() {
+  delete x;
+  delete y;
+  delete blur;
+  delete color;
 }

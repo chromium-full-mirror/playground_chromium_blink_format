@@ -83,7 +83,6 @@ StyleVisualData::StyleVisualData()
       colspan(1),
       counter_increment(0),
       counter_reset(0),
-      opacity(1.0f),
       palette(QApplication::palette()) {}
 
 StyleVisualData::~StyleVisualData() {}
@@ -96,7 +95,6 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       colspan(o.colspan),
       counter_increment(o.counter_increment),
       counter_reset(o.counter_reset),
-      opacity(o.opacity),
       palette(o.palette) {}
 
 StyleBackgroundData::StyleBackgroundData() : image(0) {}
@@ -144,6 +142,41 @@ bool StyleFlexibleBoxData::operator==(const StyleFlexibleBoxData& o) const {
          flexed_height == o.flexed_height;
 }
 
+StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
+    : Shared<StyleCSS3NonInheritedData>(), opacity(1.0f) {}
+
+StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
+    const StyleCSS3NonInheritedData& o)
+    : Shared<StyleCSS3NonInheritedData>(),
+      opacity(o.opacity),
+      flexibleBox(o.flexibleBox) {}
+
+bool StyleCSS3NonInheritedData::operator==(
+    const StyleCSS3NonInheritedData& o) const {
+  return opacity == o.opacity && flexibleBox == o.flexibleBox;
+}
+
+StyleCSS3InheritedData::StyleCSS3InheritedData()
+    : Shared<StyleCSS3InheritedData>(), textShadow(0) {}
+
+StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
+    : Shared<StyleCSS3InheritedData>() {
+  textShadow = o.textShadow ? new ShadowData(*o.textShadow) : 0;
+}
+
+bool StyleCSS3InheritedData::operator==(const StyleCSS3InheritedData& o) const {
+  return shadowDataEquivalent(o);
+}
+
+bool StyleCSS3InheritedData::shadowDataEquivalent(
+    const StyleCSS3InheritedData& o) const {
+  if (!textShadow && o.textShadow || textShadow && !o.textShadow)
+    return false;
+  if (textShadow && o.textShadow && (*textShadow != *o.textShadow))
+    return false;
+  return true;
+}
+
 StyleInheritedData::StyleInheritedData()
     : indent(Fixed),
       line_height(-100, Percent),
@@ -183,7 +216,8 @@ RenderStyle::RenderStyle() {
   visual = _default->visual;
   background = _default->background;
   surround = _default->surround;
-  flexible_box = _default->flexible_box;
+  css3NonInheritedData = _default->css3NonInheritedData;
+  css3InheritedData = _default->css3InheritedData;
 
   inherited = _default->inherited;
 
@@ -200,8 +234,9 @@ RenderStyle::RenderStyle(bool) {
   visual.init();
   background.init();
   surround.init();
-  flexible_box.init();
-
+  css3NonInheritedData.init();
+  css3NonInheritedData.access()->flexibleBox.init();
+  css3InheritedData.init();
   inherited.init();
 
   pseudoStyle = 0;
@@ -216,12 +251,14 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       visual(o.visual),
       background(o.background),
       surround(o.surround),
-      flexible_box(o.flexible_box),
+      css3NonInheritedData(o.css3NonInheritedData),
+      css3InheritedData(o.css3InheritedData),
       inherited(o.inherited),
       pseudoStyle(0),
       content(o.content) {}
 
 void RenderStyle::inheritFrom(const RenderStyle* inheritParent) {
+  css3InheritedData = inheritParent->css3InheritedData;
   inherited = inheritParent->inherited;
   inherited_flags = inheritParent->inherited_flags;
 }
@@ -247,8 +284,9 @@ bool RenderStyle::operator==(const RenderStyle& o) const {
   return (inherited_flags == o.inherited_flags &&
           noninherited_flags == o.noninherited_flags && box == o.box &&
           visual == o.visual && background == o.background &&
-          surround == o.surround && flexible_box == o.flexible_box &&
-          inherited == o.inherited);
+          surround == o.surround &&
+          css3NonInheritedData == o.css3NonInheritedData &&
+          css3InheritedData == o.css3InheritedData && inherited == o.inherited);
 }
 
 bool RenderStyle::isStyleAvailable() const {
@@ -300,8 +338,9 @@ void RenderStyle::removePseudoStyle(PseudoId pid) {
 }
 
 bool RenderStyle::inheritedNotEqual(RenderStyle* other) const {
-  return (inherited_flags != other->inherited_flags ||
-          inherited != other->inherited);
+  return inherited_flags != other->inherited_flags ||
+         inherited != other->inherited ||
+         css3InheritedData != other->css3InheritedData;
 }
 
 /*
@@ -339,7 +378,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   if (*box.get() != *other->box.get() ||
       *surround.get() != *other->surround.get() ||
-      *flexible_box.get() != *other->flexible_box.get() ||
+      *css3NonInheritedData->flexibleBox.get() !=
+          *other->css3NonInheritedData->flexibleBox.get() ||
       !(inherited->indent == other->inherited->indent) ||
       !(inherited->line_height == other->inherited->line_height) ||
       !(inherited->style_image == other->inherited->style_image) ||
@@ -440,7 +480,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(visual->clip == other->visual->clip) ||
       visual->hasClip != other->visual->hasClip ||
       visual->textDecoration != other->visual->textDecoration ||
-      visual->opacity != other->visual->opacity ||
+      css3NonInheritedData->opacity != other->css3NonInheritedData->opacity ||
+      !css3InheritedData->shadowDataEquivalent(
+          *other->css3InheritedData.get()) ||
       !(visual->palette == other->visual->palette))
     return Visible;
 
@@ -586,4 +628,31 @@ void ContentData::clearContent() {
       _content.text = 0;
     default:;
   }
+}
+
+void RenderStyle::setTextShadow(ShadowData* val, bool add) {
+  StyleCSS3InheritedData* css3Data = css3InheritedData.access();
+  if (!add) {
+    delete css3Data->textShadow;
+    css3Data->textShadow = val;
+    return;
+  }
+
+  ShadowData* last = css3Data->textShadow;
+  while (last->next)
+    last = last->next;
+  last->next = val;
+}
+
+ShadowData::ShadowData(const ShadowData& o)
+    : x(o.x), y(o.y), blur(o.blur), color(o.color) {
+  next = o.next ? new ShadowData(*o.next) : 0;
+}
+
+bool ShadowData::operator==(const ShadowData& o) const {
+  if ((next && !o.next) || (!next && o.next) ||
+      (next && o.next && *next != *o.next))
+    return false;
+
+  return x == o.x && y == o.y && blur == o.blur && color == o.color;
 }
