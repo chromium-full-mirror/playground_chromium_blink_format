@@ -31,6 +31,12 @@
 #include "KWQPointArray.h"
 #include "KWQString.h"
 
+#ifdef __OBJC__
+@class NSEvent;
+#else
+class NSEvent;
+#endif
+
 class QEvent : public Qt {
  public:
   enum Type {
@@ -57,9 +63,6 @@ class QEvent : public Qt {
   Type type() const { return _type; }
 
  private:
-  QEvent(const QEvent&);
-  QEvent& operator=(const QEvent&);
-
   Type _type;
 };
 
@@ -106,16 +109,10 @@ class QTimerEvent : public QEvent {
 
 class QKeyEvent : public QEvent {
  public:
-  QKeyEvent(Type type,
-            int key,
-            int ascii,
-            int buttonState,
-            const QString& text = QString::null,
-            const QString& unmodifiedText = QString::null,
-            bool autoRepeat = FALSE,
-            ushort countVal = 1);
+  QKeyEvent(NSEvent*, Type, int buttonState, bool autoRepeat);
 
   int key() const;
+  int WindowsKeyCode() const { return _WindowsKeyCode; }
   ButtonState state() const;
   void accept();
   void ignore();
@@ -137,6 +134,7 @@ class QKeyEvent : public QEvent {
   bool _autoRepeat;
   int _count;
   bool _isAccepted;
+  int _WindowsKeyCode;
 };
 
 class QFocusEvent : public QEvent {
