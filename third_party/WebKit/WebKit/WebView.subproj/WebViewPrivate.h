@@ -99,6 +99,8 @@ extern NSString* _WebMainFrameURLKey;
   NSArray* draggedTypes;
   BOOL drawsBackground;
   BOOL editable;
+
+  NSString* mediaStyle;
 }
 @end
 
