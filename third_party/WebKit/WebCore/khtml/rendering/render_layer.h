@@ -70,6 +70,7 @@ class RenderLayer {
     m_x = xPos;
     m_y = yPos;
   }
+  void updateLayerPosition();
 
   void convertToLayerCoords(RenderLayer* ancestorLayer, int& x, int& y);
 

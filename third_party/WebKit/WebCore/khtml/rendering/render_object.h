@@ -68,6 +68,7 @@ class CachedObject;
 class RenderRoot;
 class RenderText;
 class RenderFrameSet;
+class RenderLayer;
 
 /**
  * Base Class for all rendering tree objects.
@@ -84,6 +85,12 @@ class RenderObject : public CachedObjectClient {
 
   virtual RenderObject* firstChild() const { return 0; }
   virtual RenderObject* lastChild() const { return 0; }
+
+  virtual RenderLayer* layer() const { return 0; }
+  virtual RenderLayer* enclosingLayer() { return 0; }
+  virtual bool hasChildLayers() const { return false; }
+  virtual void setHasChildLayers(bool hasLayers) {}
+  virtual void positionChildLayers() {}
 
   // RenderObject tree manipulation
   //////////////////////////////////////////
@@ -197,6 +204,7 @@ class RenderObject : public CachedObjectClient {
       root->scheduleRelayout();
     }
   }
+
   // hack to block inline layouts during parsing
   // evil, evil. I didn't do it. <tm>
   virtual void setBlockBidi() {}
