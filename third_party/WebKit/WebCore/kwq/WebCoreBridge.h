@@ -125,6 +125,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (BOOL)searchFor:(NSString*)string
         direction:(BOOL)forward
     caseSensitive:(BOOL)caseFlag;
+- (void)jumpToSelection;
 
 @end
 

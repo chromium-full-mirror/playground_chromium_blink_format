@@ -125,6 +125,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   bool isFrameSet();
 
+  void jumpToSelection();
+
   void overURL(const QString& url, const QString& target, int modifierState);
 
  private:
