@@ -330,14 +330,6 @@ class QString {
   friend bool operator==(const QString&, const char*);
   friend bool operator==(const char*, const QString&);
 
-  friend bool operator!=(const QString&, const QString&);
-  friend bool operator!=(const QString&, const char*);
-  friend bool operator!=(const char*, const QString&);
-
-  friend QString operator+(const QString&, const QString&);
-  friend QString operator+(const QString&, const char*);
-  friend QString operator+(const char*, const QString&);
-
   friend class QConstString;
   friend class QGDict;
 
@@ -356,7 +348,11 @@ bool operator!=(const char*, const QString&);
 
 QString operator+(const QString&, const QString&);
 QString operator+(const QString&, const char*);
+QString operator+(const QString&, QChar);
+QString operator+(const QString&, char);
 QString operator+(const char*, const QString&);
+QString operator+(QChar, const QString&);
+QString operator+(char, const QString&);
 
 // class QConstString ==========================================================
 
