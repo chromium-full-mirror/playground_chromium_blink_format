@@ -523,8 +523,12 @@ void RenderTable::addColInfo(int _startCol,
     }
   }
 
+#ifndef APPLE_CHANGES
+  // I've uncovered a second bug.  Until I can figure this out,
+  // I have to keep this commented out.  -dwh
   if (recalc)
     recalcColInfo(col);
+#endif
 
   if (changed)
     setMinMaxKnown(false);
