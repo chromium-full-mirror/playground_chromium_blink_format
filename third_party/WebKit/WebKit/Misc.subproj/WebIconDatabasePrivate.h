@@ -41,6 +41,8 @@
 
 @interface WebIconDatabase (WebPrivate)
 
+- (BOOL)_isEnabled;
+
 // Called by WebIconLoader after loading an icon.
 - (void)_setIcon:(NSImage*)icon forIconURL:(NSString*)iconURL;
 - (void)_setHaveNoIconForIconURL:(NSString*)iconURL;
