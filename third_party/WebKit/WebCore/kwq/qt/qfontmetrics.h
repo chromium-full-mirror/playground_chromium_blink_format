@@ -37,6 +37,7 @@ class QFontMetrics {
   QFontMetrics();
   QFontMetrics(const QFont&);
 
+  int ascent() const;
   int height() const;
   int width() const;
   int width(char) const;
