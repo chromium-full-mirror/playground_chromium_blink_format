@@ -7,6 +7,7 @@
 */
 
 #import <WebKit/WebFrame.h>
+#import <WebKit/WebControllerPolicyDelegate.h>
 
 @class WebBridge;
 @class WebFrameBridge;
@@ -97,6 +98,9 @@ typedef enum {
 - (void)_goToItem:(WebHistoryItem*)item
     withFrameLoadType:(WebFrameLoadType)type;
 
+- (NSDictionary*)_actionInformationForNavigationType:
+                     (WebNavigationType)navigationType
+                                               event:(NSEvent*)event;
 - (BOOL)_continueAfterClickPolicyForEvent:(NSEvent*)event
                                   request:(WebResourceRequest*)request;
 - (void)_loadURL:(NSURL*)URL
