@@ -34,11 +34,9 @@
 #include "xml/dom_docimpl.h"
 
 using DOM::DocumentImpl;
-using DOM::DOWNSTREAM;
 using DOM::NodeImpl;
 using DOM::Position;
 using DOM::Range;
-using DOM::UPSTREAM;
 
 namespace khtml {
 
@@ -114,7 +112,7 @@ static VisiblePosition previousWordBoundary(
   // Use DOWNSTREAM here so that we don't jump past words at the start of lines.
   // <rdar://problem/3765519> REGRESSION (Mail): word movement goes too far
   // upstream at start of line
-  return pos.equivalentDeepPosition().closestRenderedPosition(DOWNSTREAM);
+  return VisiblePosition(pos).deepEquivalent();
 }
 
 static VisiblePosition nextWordBoundary(const VisiblePosition& c,
@@ -177,7 +175,7 @@ static VisiblePosition nextWordBoundary(const VisiblePosition& c,
     pos = Position(charIt.range().endContainer().handle(),
                    charIt.range().endOffset());
   }
-  return pos.equivalentDeepPosition().closestRenderedPosition(UPSTREAM);
+  return VisiblePosition(pos, UPSTREAM).deepEquivalent();
 }
 
 static unsigned startWordBoundary(const QChar* characters, unsigned length) {
