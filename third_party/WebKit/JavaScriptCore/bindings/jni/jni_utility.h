@@ -75,6 +75,8 @@ jvalue getJNIField(jobject obj,
                    const char* name,
                    const char* signature);
 
+jmethodID getMethodID(jobject obj, const char* name, const char* sig);
+
 jobject callJNIObjectMethod(jobject obj,
                             const char* name,
                             const char* sig,
@@ -135,6 +137,17 @@ jdouble callJNIDoubleMethodA(jobject obj,
                              const char* name,
                              const char* sig,
                              jvalue* args);
+
+jobject callJNIObjectMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+void callJNIVoidMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jboolean callJNIBooleanMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jbyte callJNIByteMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jchar callJNICharMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jshort callJNIShortMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jint callJNIIntMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jlong callJNILongMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jfloat callJNIFloatMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
+jdouble callJNIDoubleMethodIDA(jobject obj, jmethodID methodID, jvalue* args);
 
 JavaVM* getJavaVM();
 JNIEnv* getJNIEnv();

@@ -51,7 +51,7 @@ class JObjectWrapper {
       delete this;
   }
 
-  ~JObjectWrapper() { _env->DeleteGlobalRef(_instance); }
+  ~JObjectWrapper();
 
   jobject _instance;
 
@@ -79,6 +79,9 @@ class JavaInstance : public Instance {
     _instance->ref();
     _oldInstance->deref();
 
+    // Classes are kept around forever.
+    _class = other._class;
+
     return *this;
   };
 
@@ -97,6 +100,7 @@ class JavaInstance : public Instance {
 
  private:
   JObjectWrapper* _instance;
+  mutable JavaClass* _class;
 };
 
 }  // namespace Bindings
