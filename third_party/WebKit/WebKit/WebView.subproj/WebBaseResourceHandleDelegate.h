@@ -15,6 +15,7 @@
 @class NSURLRequest;
 @class NSURLResponse;
 @class WebDataSource;
+@class WebResource;
 @class WebView;
 
 @interface WebBaseResourceHandleDelegate : NSObject {
@@ -34,6 +35,9 @@
   BOOL reachedTerminalState;
   BOOL defersCallbacks;
   WebResourceDelegateImplementationCache implementations;
+  NSURL* originalURL;
+  WebResource* resource;
+  NSMutableData* resourceData;
 }
 
 - (BOOL)loadWithRequest:(NSURLRequest*)request;
@@ -56,6 +60,8 @@
 
 - (void)releaseResources;
 - (NSURLResponse*)response;
+
+- (NSData*)resourceData;
 
 @end
 
