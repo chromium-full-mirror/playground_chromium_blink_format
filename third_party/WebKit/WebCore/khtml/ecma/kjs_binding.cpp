@@ -142,10 +142,27 @@ Value DOMFunction::call(ExecState* exec, Object& thisObj, const List& args) {
   return val;
 }
 
+static QPtrDict<DOMObject>* staticDomObjects = 0;
+QPtrDict<QPtrDict<DOMObject>>* staticDomObjectsPerDocument = 0;
+
+QPtrDict<DOMObject>& ScriptInterpreter::domObjects() {
+  if (!staticDomObjects) {
+    staticDomObjects = new QPtrDict<DOMObject>(1021);
+  }
+  return *staticDomObjects;
+}
+
+QPtrDict<QPtrDict<DOMObject>>& ScriptInterpreter::domObjectsPerDocument() {
+  if (!staticDomObjects) {
+    staticDomObjectsPerDocument = new QPtrDict<QPtrDict<DOMObject>>();
+    staticDomObjectsPerDocument->setAutoDelete(true);
+  }
+  return *staticDomObjectsPerDocument;
+}
+
 ScriptInterpreter::ScriptInterpreter(const Object& global, KHTMLPart* part)
     : Interpreter(global),
       m_part(part),
-      m_domObjects(1021),
       m_evt(0L),
       m_inlineCode(false),
       m_timerCallback(false) {
@@ -153,7 +170,6 @@ ScriptInterpreter::ScriptInterpreter(const Object& global, KHTMLPart* part)
   kdDebug(6070) << "ScriptInterpreter::ScriptInterpreter " << this
                 << " for part=" << m_part << endl;
 #endif
-  m_domObjectsPerDocument.setAutoDelete(true);
 }
 
 ScriptInterpreter::~ScriptInterpreter() {
@@ -164,23 +180,14 @@ ScriptInterpreter::~ScriptInterpreter() {
 }
 
 void ScriptInterpreter::forgetDOMObject(void* objectHandle) {
-  InterpreterImp* first = InterpreterImp::firstInterpreter();
-  if (first) {
-    InterpreterImp* scr = first;
-    do {
-      if (scr->interpreter()->rtti() == 1)
-        static_cast<ScriptInterpreter*>(scr->interpreter())
-            ->deleteDOMObject(objectHandle);
-      scr = scr->nextInterpreter();
-    } while (scr != first);
-  }
+  deleteDOMObject(objectHandle);
 }
 
 DOMObject* ScriptInterpreter::getDOMObjectForDocument(
     DOM::DocumentImpl* documentHandle,
-    void* objectHandle) const {
+    void* objectHandle) {
   QPtrDict<DOMObject>* documentDict =
-      (QPtrDict<DOMObject>*)m_domObjectsPerDocument[documentHandle];
+      (QPtrDict<DOMObject>*)domObjectsPerDocument()[documentHandle];
   if (documentDict) {
     return (*documentDict)[objectHandle];
   }
@@ -193,10 +200,10 @@ void ScriptInterpreter::putDOMObjectForDocument(
     void* objectHandle,
     DOMObject* obj) {
   QPtrDict<DOMObject>* documentDict =
-      (QPtrDict<DOMObject>*)m_domObjectsPerDocument[documentHandle];
+      (QPtrDict<DOMObject>*)domObjectsPerDocument()[documentHandle];
   if (!documentDict) {
     documentDict = new QPtrDict<DOMObject>();
-    m_domObjectsPerDocument.insert(documentHandle, documentDict);
+    domObjectsPerDocument().insert(documentHandle, documentDict);
   }
 
   documentDict->insert(objectHandle, obj);
@@ -204,11 +211,11 @@ void ScriptInterpreter::putDOMObjectForDocument(
 
 bool ScriptInterpreter::deleteDOMObjectsForDocument(
     DOM::DocumentImpl* documentHandle) {
-  return m_domObjectsPerDocument.remove(documentHandle);
+  return domObjectsPerDocument().remove(documentHandle);
 }
 
 void ScriptInterpreter::mark() {
-  QPtrDictIterator<QPtrDict<DOMObject>> dictIterator(m_domObjectsPerDocument);
+  QPtrDictIterator<QPtrDict<DOMObject>> dictIterator(domObjectsPerDocument());
 
   QPtrDict<DOMObject>* objectDict;
   while ((objectDict = dictIterator.current())) {
@@ -227,38 +234,15 @@ void ScriptInterpreter::mark() {
 
 void ScriptInterpreter::forgetDOMObjectsForDocument(
     DOM::DocumentImpl* documentHandle) {
-  InterpreterImp* first = InterpreterImp::firstInterpreter();
-  if (first) {
-    InterpreterImp* scr = first;
-    do {
-      if (scr->interpreter()->rtti() == 1)
-        static_cast<ScriptInterpreter*>(scr->interpreter())
-            ->deleteDOMObjectsForDocument(documentHandle);
-      scr = scr->nextInterpreter();
-    } while (scr != first);
-  }
+  deleteDOMObjectsForDocument(documentHandle);
 }
 
 void ScriptInterpreter::updateDOMObjectDocument(void* objectHandle,
                                                 DOM::DocumentImpl* oldDoc,
                                                 DOM::DocumentImpl* newDoc) {
-  InterpreterImp* first = InterpreterImp::firstInterpreter();
-  if (first) {
-    InterpreterImp* scr = first;
-    do {
-      if (scr->interpreter()->rtti() == 1) {
-        ScriptInterpreter* interp =
-            static_cast<ScriptInterpreter*>(scr->interpreter());
-
-        DOMObject* cachedObject =
-            interp->getDOMObjectForDocument(oldDoc, objectHandle);
-        if (cachedObject) {
-          interp->putDOMObjectForDocument(newDoc, objectHandle, cachedObject);
-        }
-      }
-
-      scr = scr->nextInterpreter();
-    } while (scr != first);
+  DOMObject* cachedObject = getDOMObjectForDocument(oldDoc, objectHandle);
+  if (cachedObject) {
+    putDOMObjectForDocument(newDoc, objectHandle, cachedObject);
   }
 }
 
