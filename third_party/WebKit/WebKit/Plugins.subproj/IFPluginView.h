@@ -1,20 +1,18 @@
-//
-//  WKPluginView.h
-//
-//
-//  Created by Chris Blumenberg on Thu Dec 13 2001.
-//  Copyright (c) 2001 __MyCompanyName__. All rights reserved.
-//
+/*
+    IFPluginView.h
+        Copyright 2002, Apple, Inc. All rights reserved.
+*/
 
 #import <AppKit/AppKit.h>
+#import <IFCarbonWindowView.h>
+#import <WCPlugin.h>
 #include <qwidget.h>
-#import <WKPlugin.h>
-#include "npapi.h"
+#include <npapi.h>
 #include <WCURLHandle.h>
 
 typedef NPStream* NPS;
 
-@interface WKPluginViewNullEventSender : NSObject {
+@interface IFPluginViewNullEventSender : NSObject {
   NPP instance;
   NPP_HandleEventProcPtr NPP_HandleEvent;
 }
@@ -25,10 +23,10 @@ typedef NPStream* NPS;
 - (void)stop;
 @end
 
-@interface WKPluginView : NSQuickDrawView {
+@interface IFPluginView : IFCarbonWindowView {
   QWidget* widget;
-  WKPlugin* plugin;
-  WKPluginViewNullEventSender* eventSender;
+  WCPlugin* plugin;
+  IFPluginViewNullEventSender* eventSender;
 
   NPP instance;
   NPP_t instanceStruct;
@@ -64,7 +62,7 @@ typedef NPStream* NPS;
 
 - initWithFrame:(NSRect)r
            widget:(QWidget*)w
-           plugin:(WKPlugin*)plug
+           plugin:(WCPlugin*)plug
               url:(NSString*)location
              mime:(NSString*)mime
         arguments:(NSDictionary*)arguments;
@@ -114,4 +112,4 @@ typedef NPStream* NPS;
 
 @end
 
-NSString* rootName(void);
+NSString* startupVolumeName(void);
