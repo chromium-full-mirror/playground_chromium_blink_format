@@ -792,10 +792,6 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
     case ID_FRAMESET:
     case ID_HEAD:
     case ID_STYLE:
-    case ID_TABLE:
-    case ID_TBODY:
-    case ID_TFOOT:
-    case ID_THEAD:
     case ID_TITLE:
       return NULL;
     default:
