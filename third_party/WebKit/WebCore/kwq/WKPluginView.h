@@ -10,25 +10,27 @@
 #include <qwidget.h>
 #import <WKPlugin.h>
 #include "npapi.h"
-#include "kwqdebug.h"
 
 typedef NPStream* NPS;
 
 @interface WKPluginView : NSQuickDrawView {
   QWidget* widget;
-  bool isFlipped;
+  WKPlugin* plugin;
+
   NPP instance;
   NPP_t instanceStruct;
   NPStream streamStruct;
   NPS stream;
-  int32 streamOffset;
-  NSString *url, *mime;
-  WKPlugin* plugin;
-  bool transferred;
   NPWindow window;
   NP_Port nPort;
+
+  int32 streamOffset;
   uint16 transferMode;
   char **cAttributes, **cValues;
+  bool isFlipped, transferred, hidden;
+
+  NSString *url, *mime;
+  NSTrackingRectTag trackingTag;
 
   NPP_NewProcPtr NPP_New;
   NPP_DestroyProcPtr NPP_Destroy;
@@ -53,14 +55,18 @@ typedef NPStream* NPS;
              mime:(NSString*)mime
         arguments:(NSDictionary*)arguments;
 - (void)drawRect:(NSRect)rect;
+- (void)setWindow:(NSRect)rect;
 - (BOOL)acceptsFirstResponder;
+- (BOOL)becomeFirstResponder;
+- (BOOL)resignFirstResponder;
+- (void)sendActivateEvent;
+- (void)sendUpdateEvent;
 - (void)sendNullEvents;
 - (void)mouseDown:(NSEvent*)theEvent;
 - (void)mouseUp:(NSEvent*)theEvent;
 - (void)mouseDragged:(NSEvent*)theEvent;
 - (void)mouseEntered:(NSEvent*)theEvent;
 - (void)mouseExited:(NSEvent*)theEvent;
-- (void)mouseMoved:(NSEvent*)theEvent;
 - (void)keyDown:(NSEvent*)theEvent;
 - (void)keyUp:(NSEvent*)theEvent;
 - (void)dealloc;
