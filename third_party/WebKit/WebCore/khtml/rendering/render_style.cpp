@@ -520,7 +520,13 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   // inherited attributes
   //     DataRef<StyleInheritedData> inherited;
 
-  if (*box.get() != *other->box.get() ||
+  if (box->width != other->box->width ||
+      box->min_width != other->box->min_width ||
+      box->max_width != other->box->max_width ||
+      box->height != other->box->height ||
+      box->min_height != other->box->min_height ||
+      box->max_height != other->box->max_height ||
+      box->vertical_align != other->box->vertical_align ||
       !(surround->margin == other->surround->margin) ||
       !(surround->padding == other->surround->padding) ||
       css3NonInheritedData->marginTopCollapse !=
@@ -558,7 +564,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       visual->counter_reset != other->visual->counter_reset ||
       css3NonInheritedData->textOverflow !=
           other->css3NonInheritedData->textOverflow)
-    return CbLayout;
+    return Layout;
 
   // changes causing Layout changes:
 
@@ -581,7 +587,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
           other->inherited_flags._caption_side) ||
         !(noninherited_flags._table_layout ==
           other->noninherited_flags._table_layout))
-      return CbLayout;
+      return Layout;
   }
 
   // only for lists:
@@ -627,21 +633,39 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       borderRightWidth() != other->borderRightWidth())
     return Layout;
 
+#if APPLE_CHANGES
+  // If regions change trigger a relayout to re-calc regions.
+  if (!(css3NonInheritedData->m_dashboardRegions ==
+        other->css3NonInheritedData->m_dashboardRegions))
+    return Layout;
+#endif
+
   // Make sure these left/top/right/bottom checks stay below all layout checks
   // and above
   // all visible checks.
-  if (other->position() != STATIC &&
-      !(surround->offset == other->surround->offset)) {
-    // FIXME: would like to do this at some point, but will need a new hint that
-    // indicates
-    // descendants need to be repainted too.
-    //   if (other->position() == RELATIVE)
-    //       return Visible;
-    //   else
-    return Layout;
+  if (other->position() != STATIC) {
+    if (!(surround->offset == other->surround->offset)) {
+      // FIXME: We will need to do a bit of work in RenderObject/Box::setStyle
+      // before we
+      // can stop doing a layout when relative positioned objects move.  In
+      // particular, we'll need
+      // to update scrolling positions and figure out how to do a repaint
+      // properly of the updated layer.
+      // if (other->position() == RELATIVE)
+      //    return RepaintLayer;
+      // else
+      return Layout;
+    } else if (box->z_index != other->box->z_index ||
+               box->z_auto != other->box->z_auto ||
+               !(visual->clip == other->visual->clip) ||
+               visual->hasClip != other->visual->hasClip)
+      return RepaintLayer;
   }
 
-  // Visible:
+  if (css3NonInheritedData->opacity != other->css3NonInheritedData->opacity)
+    return RepaintLayer;
+
+  // Repaint:
   // 	EVisibility _visibility : 2;
   //     EOverflow _overflow : 4 ;
   //     EBackgroundRepeat _bg_repeat : 2;
@@ -661,10 +685,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         other->inherited_flags._should_correct_text_color) ||
       !(surround->border == other->surround->border) ||
       *background.get() != *other->background.get() ||
-      !(visual->clip == other->visual->clip) ||
-      visual->hasClip != other->visual->hasClip ||
       visual->textDecoration != other->visual->textDecoration ||
-      css3NonInheritedData->opacity != other->css3NonInheritedData->opacity ||
       !css3InheritedData->shadowDataEquivalent(
           *other->css3InheritedData.get()) ||
       css3InheritedData->userModify != other->css3InheritedData->userModify ||
@@ -672,14 +693,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
           other->css3NonInheritedData->userSelect ||
       css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag ||
       !(visual->palette == other->visual->palette))
-    return Visible;
-
-#if APPLE_CHANGES
-  // If regions change trigger a relayout to re-calc regions.
-  if (!(css3NonInheritedData->m_dashboardRegions ==
-        other->css3NonInheritedData->m_dashboardRegions))
-    return Layout;
-#endif
+    return Repaint;
 
   return Equal;
 }
