@@ -126,10 +126,10 @@ void RenderFlow::print(QPainter* p,
     if (specialObjects && floatBottom() > h)
       h = floatBottom();
     if ((_ty > _y + _h) || (_ty + h < _y)) {
-// kdDebug( 6040 ) << "cut!" << endl;
-#ifndef APPLE_CHANGES
+      // kdDebug( 6040 ) << "cut!" << endl;
+      //#ifndef APPLE_CHANGES
       return;
-#endif /* APPLE_CHANGES not defined */
+      //#endif /* APPLE_CHANGES not defined */
     }
   }
 
@@ -279,10 +279,10 @@ void RenderFlow::layout() {
 
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
   if (childrenInline()) {
-// ### make bidi resumeable so that we can get rid of this ugly hack
-#ifndef APPLE_CHANGES
+    // ### make bidi resumeable so that we can get rid of this ugly hack
+    //#ifndef APPLE_CHANGES
     if (!m_blockBidi)
-#endif
+      //#endif
       layoutInlineChildren();
   } else
     layoutBlockChildren(relayoutChildren);

@@ -211,10 +211,10 @@ class QKeyEvent : public QEvent {
   QKeyEvent() {}
 #endif
 
-  QKeyEvent(Type,
-            int,
-            int,
-            int,
+  QKeyEvent(Type type,
+            int key,
+            int ascii,
+            int buttonState,
             const QString& textVal = QString::null,
             bool autoRepeat = FALSE,
             ushort countVal = 1);

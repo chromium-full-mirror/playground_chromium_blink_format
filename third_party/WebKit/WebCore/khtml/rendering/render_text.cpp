@@ -668,10 +668,10 @@ void RenderText::print(QPainter* p,
                        int h,
                        int tx,
                        int ty) {
-#ifndef APPLE_CHANGES
+  //#ifndef APPLE_CHANGES
   if (style()->visibility() != VISIBLE)
     return;
-#endif /* APPLE_CHANGES not defined */
+  //#endif /* APPLE_CHANGES not defined */
 
   int s = m_lines.count() - 1;
   if (s < 0)
