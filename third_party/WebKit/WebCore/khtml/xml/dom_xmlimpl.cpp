@@ -426,7 +426,7 @@ void ProcessingInstructionImpl::setStyleSheet(const DOM::DOMString& url,
                                               const DOM::DOMString& sheet) {
   if (m_sheet)
     m_sheet->deref();
-  m_sheet = new CSSStyleSheetImpl(getDocument(), url);
+  m_sheet = new CSSStyleSheetImpl(this, url);
   m_sheet->ref();
   m_sheet->parseString(sheet);
   if (m_cachedSheet)
