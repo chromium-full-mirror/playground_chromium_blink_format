@@ -310,7 +310,6 @@ class FontFamilyValueImpl : public CSSPrimitiveValueImpl {
   const QString& fontName() const { return parsedFontName; }
   int genericFamilyType() const { return _genericFamilyType; }
 
- protected:
   QString parsedFontName;
 
  private:
