@@ -14,4 +14,7 @@
 - (void)_bookmarkDidChange:(IFBookmark*)bookmark;
 - (void)_bookmarkChildrenDidChange:(IFBookmark*)bookmark;
 
+- (void)_removedBookmark:(IFBookmark*)bookmark;
+- (void)_addedBookmark:(IFBookmark*)bookmark;
+
 @end

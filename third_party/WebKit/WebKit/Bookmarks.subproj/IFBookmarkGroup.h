@@ -26,6 +26,7 @@
 @interface IFBookmarkGroup : NSObject {
   NSString* _file;
   IFBookmark* _topBookmark;
+  NSMutableDictionary* _bookmarksByID;
   BOOL _loading;
 }
 
@@ -34,6 +35,7 @@
 
 // examining contents
 - (IFBookmark*)topBookmark;
+- (IFBookmark*)bookmarkForIdentifier:(NSString*)identifier;
 
 // modifying contents
 - (void)removeBookmark:(IFBookmark*)bookmark;
