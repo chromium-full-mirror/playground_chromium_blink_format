@@ -25,6 +25,7 @@
   int GIFExtensionBufferLength;
 
   NSString* MIMEType;
+  BOOL isNull;
 }
 
 - (id)initWithMIMEType:(NSString*)MIME;

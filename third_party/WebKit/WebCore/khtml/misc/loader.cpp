@@ -910,11 +910,12 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   if (canDraw || eof) {
     if (p->isNull()) {
       errorOccured = true;
-      do_notify(pixmap(), QRect(0, 0, 16, 16));  // load "broken image" icon
-    } else {
-      // May schedule a redraw.
+      QPixmap ep = pixmap();
+      do_notify(ep, ep.rect());
+      Cache::removeCacheEntry(this);
+    } else
       do_notify(*p, p->rect());
-    }
+
     QSize s = pixmap_size();
     setSize(s.width() * s.height() * 2);
   }
@@ -1376,11 +1377,8 @@ void Cache::init() {
 
   if (!brokenPixmap)
 #if APPLE_CHANGES
-    brokenPixmap = new QPixmap;
+    brokenPixmap = KWQLoadPixmap("missing_image");
 #else
-    //        brokenPixmap = new
-    //        QPixmap(KHTMLFactory::instance()->iconLoader()->loadIcon("file_broken",
-    //        KIcon::FileSystem, 16, KIcon::DisabledState));
     brokenPixmap = new QPixmap(KHTMLFactory::instance()->iconLoader()->loadIcon(
         "file_broken", KIcon::Desktop, 16, KIcon::DisabledState));
 #endif

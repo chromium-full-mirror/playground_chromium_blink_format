@@ -37,6 +37,7 @@
                                             length:(unsigned)length
                                           MIMEType:(NSString*)MIMEType;
 - (id<WebCoreImageRenderer>)imageRendererWithSize:(NSSize)size;
+- (id<WebCoreImageRenderer>)imageRendererWithName:(NSString*)name;
 - (NSArray*)supportedMIMETypes;
 
 @end
