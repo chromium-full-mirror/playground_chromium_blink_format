@@ -602,7 +602,8 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
 
             NodeImpl* parentparent = parent->parentNode();
 
-            if ((node->id() == ID_TR &&
+            if (n->isTextNode() ||
+                (node->id() == ID_TR &&
                  (parent->id() == ID_THEAD || parent->id() == ID_TBODY ||
                   parent->id() == ID_TFOOT) &&
                  parentparent->id() == ID_TABLE) ||
@@ -610,7 +611,9 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
                  (node->id() == ID_THEAD || node->id() == ID_TBODY ||
                   node->id() == ID_TFOOT) &&
                  parent->id() == ID_TABLE)) {
-              node = (node->id() == ID_TR) ? parentparent : parent;
+              node = (node->id() == ID_TABLE)
+                         ? node
+                         : ((node->id() == ID_TR) ? parentparent : parent);
               NodeImpl* parent = node->parentNode();
               int exceptioncode = 0;
               parent->insertBefore(n, node, exceptioncode);
@@ -619,6 +622,11 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
                 kdDebug(6035) << "adding content before table failed!" << endl;
 #endif
                 break;
+              }
+              if (n->isElementNode() && tagPriority[id] != 0 && !flat &&
+                  endTag[id] != DOM::FORBIDDEN) {
+                pushBlock(id, tagPriority[id]);
+                current = n;
               }
               return true;
             }
