@@ -7,6 +7,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import <WebKit/WKWebController.h>
+#import <WebKit/WKWebCache.h>
 
 /*
    =============================================================================
@@ -57,6 +58,12 @@
         Removed all mentions of resolved URLs, because browsers don't
         actuall treat DNS aliases specially.
 
+        Moved search API to WKWebView.
+
+        Moved WKPreferences to a new file, WKPreferences.h.  We are still
+  discussing
+        this item and it will not make it into the white paper.
+
         Minor naming changes.
 
    =============================================================================
@@ -64,7 +71,7 @@
 
 #ifdef READY_FOR_PRIMETIME
 
-@interface WKWebDataSource : NSObject {
+@interface WKWebDataSource : NSObject<WKWebDataSource> {
  @private
   id _dataSourcePrivate;
 }
@@ -161,13 +168,6 @@
 - (void)setUserStyleSheet:(NSURL*)url;
 - (void)setUserStyleSheet:(NSString*)sheet;
 
-// Searching, to support find in clients.  regular expressions?
-- (WKSearchState*)beginSearch;
-- (NSString*)searchFor:(NSString*)string
-             direction:(BOOL)forward
-         caseSensitive:(BOOL) case
-                 state:(WKSearchState*)state;
-
 // a.k.a shortcut icons,
 // http://msdn.microsoft.com/workshop/Author/dhtml/howto/ShortcutIcon.asp.
 // This method may be moved to a category to prevent unnecessary linkage to the
@@ -180,51 +180,6 @@
 
 // Returns nil or the page title.
 - (NSString*)pageTitle;
-
-@end
-
-/*
-   =============================================================================
-
-    This class provides a cover for URL-based preference items.
-*/
-@interface WKPreferences
-+ getPreferencesForURL:(NSURL*)url;
-
-// Encoding that will be used in none specified on page? or in header?
-+ setEncoding:(NSString*)encoding;
-+ (NSString*)encoding;
-
-// Javascript preferences
-- (void)setJScriptEnabled:(BOOL)flag;
-- (BOOL)jScriptEnabled;
-
-// Java preferences
-- (void)setJavaEnabled:(BOOL)flag;
-- (BOOL)javaEnabled;
-
-// Document refreshes allowed
-- setRefreshEnabled:(BOOL)flag;
-- (BOOL)refreshEnabled;
-
-// Plugins
-- (void)setPluginsEnabled:(BOOL)flag;
-- (BOOL)pluginsEnabled;
-
-// Should images be loaded.
-- (void)setAutoloadImages:(BOOL)flag;
-- (BOOL)autoloadImages;
-
-/*
-    Specify whether only local references ( stylesheets, images, scripts,
-   subdocuments )
-    should be loaded. ( default false - everything is loaded, if the more
-   specific
-    options allow )
-    This is carried over from KDE.
-*/
-- (void)setOnlyLocalReferences:(BOOL)flag;
-- (BOOL)onlyLocalReferences;
 
 @end
 

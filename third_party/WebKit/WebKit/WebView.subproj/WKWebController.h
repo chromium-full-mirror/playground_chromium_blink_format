@@ -112,9 +112,15 @@
 
         Removed inputURL:resolvedTo: methods, per discussion with Don.
 
+        Remove WKContextMenuHandler for want of a better way to describe the
+        not-yet-existing WKDOMNode.  We can't think of any initial clients that
+  want
+        to override the default behavior anyway.  Put it in WKGrabBag.h for now.
 */
 
 /*
+   =============================================================================
+
     WKWebController implements all the behavior that ties together WKWebView
     and WKWebDataSource.  See each inherited protocol for a more complete
     description.
@@ -125,7 +131,7 @@
 */
 @protocol WKWebController<WKLoadHandler,
                           WKScriptContextHandler,
-                          WKCredentialsHandler,
+                          WKAuthenticationHandler,
                           WKLocationChangeHandler>
 @end
 
@@ -164,7 +170,7 @@
     WKWebViewDelegates implement protocols that modify the behavior of
     WKWebViews.  A WKWebView does not require a delegate.
 */
-@protocol WKWebViewDelegate<WKContextMenuHandler>
+@protocol WKWebViewDelegate < ? >
 @end
 
 /*
@@ -270,18 +276,6 @@
       partialProgress:(WKLoadProgress*)progress
        fromDataSource:(WKWebDataSource*)dataSource;
 
-@end
-
-/*
-   =============================================================================
-*/
-@protocol WKContextMenuHandler
-// Returns the array of menu items for this node that will be displayed in the
-// context menu.
-// Typically this would be implemented by returning the results of WKWebView
-// defaultContextMenuItemsForNode:
-// after making any desired changes or additions.
-- (NSArray*)contextMenuItemsForNode:(WKDOMNode*);
 @end
 
 /*
