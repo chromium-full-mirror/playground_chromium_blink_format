@@ -8,7 +8,13 @@
 
 #import <Quartz/Quartz.h>
 
-@interface WebPDFView : PDFView<WebDocumentView>
+@class WebDataSource;
+
+@interface WebPDFView : PDFView<WebDocumentView> {
+  WebDataSource* dataSource;
+  NSString* path;
+  BOOL written;
+}
 @end
 
 #endif  // MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_3
