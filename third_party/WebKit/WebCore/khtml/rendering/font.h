@@ -128,6 +128,7 @@ class Font {
 
   void update(QPaintDeviceMetrics* devMetrics) const;
 
+#if !APPLE_CHANGES
   void drawText(QPainter* p,
                 int x,
                 int y,
@@ -141,7 +142,20 @@ class Font {
                 int to = -1,
                 QColor bg = QColor()) const;
 
-#if APPLE_CHANGES
+#else
+  void drawText(QPainter* p,
+                int x,
+                int y,
+                QChar* str,
+                int slen,
+                int pos,
+                int len,
+                int width,
+                QPainter::TextDirection d,
+                bool visuallyOrdered = false,
+                int from = -1,
+                int to = -1,
+                QColor bg = QColor()) const;
   float floatWidth(QChar* str, int slen, int pos, int len) const;
   void floatCharacterWidths(QChar* str,
                             int slen,
@@ -166,6 +180,7 @@ class Font {
                             int len,
                             int width,
                             QPainter::TextDirection d,
+                            bool visuallyOrdered = false,
                             int from = -1,
                             int to = -1,
                             QColor bg = QColor()) const;

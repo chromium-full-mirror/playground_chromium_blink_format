@@ -49,12 +49,13 @@ void Font::drawHighlightForText(QPainter* p,
                                 int len,
                                 int toAdd,
                                 QPainter::TextDirection d,
+                                bool visuallyOrdered,
                                 int from,
                                 int to,
                                 QColor bg) const {
   p->drawHighlightForText(x, y, str + pos, std::min(slen - pos, len), from, to,
-                          toAdd, bg, d, letterSpacing, wordSpacing,
-                          fontDef.smallCaps);
+                          toAdd, bg, d, visuallyOrdered, letterSpacing,
+                          wordSpacing, fontDef.smallCaps);
 }
 #endif
 
@@ -67,12 +68,14 @@ void Font::drawText(QPainter* p,
                     int len,
                     int toAdd,
                     QPainter::TextDirection d,
+                    bool visuallyOrdered,
                     int from,
                     int to,
                     QColor bg) const {
 #if APPLE_CHANGES
   p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg,
-              d, letterSpacing, wordSpacing, fontDef.smallCaps);
+              d, visuallyOrdered, letterSpacing, wordSpacing,
+              fontDef.smallCaps);
 #else
   QString qstr = QConstString(str, slen).string();
 

@@ -112,6 +112,7 @@ class QPainter : public Qt {
                             int toAdd,
                             const QColor& backgroundColor,
                             QPainter::TextDirection d,
+                            bool visuallyOrdered,
                             int letterSpacing,
                             int wordSpacing,
                             bool smallCaps);
@@ -124,6 +125,7 @@ class QPainter : public Qt {
                 int toAdd,
                 const QColor& backgroundColor,
                 QPainter::TextDirection d,
+                bool visuallyOrdered,
                 int letterSpacing,
                 int wordSpacing,
                 bool smallCaps);
