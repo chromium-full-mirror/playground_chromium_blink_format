@@ -51,8 +51,9 @@
                   atPoint:(NSPoint)point
             withTextColor:(NSColor*)textColor
           backgroundColor:(NSColor*)backgroundColor;
-- (void)drawUnderlineForString:(NSString*)string
-                       atPoint:(NSPoint)point
-                     withColor:(NSColor*)color;
+- (void)drawUnderlineForCharacters:(const UniChar*)characters
+                      stringLength:(unsigned)length
+                           atPoint:(NSPoint)point
+                         withColor:(NSColor*)color;
 
 @end

@@ -39,8 +39,6 @@ class KHTMLSettings {
     KAnimationEnabled
   };
 
-  KHTMLSettings();
-
   void init() {}
 
   // Font settings
@@ -61,9 +59,6 @@ class KHTMLSettings {
   int minFontSize() const;
   int mediumFontSize() const;
 
-  QFont::CharSet script() const;
-  void setScript(QFont::CharSet c);
-
   bool changeCursor() const;
 
   bool isFormCompletionEnabled() const;
@@ -81,9 +76,6 @@ class KHTMLSettings {
   bool isPluginsEnabled(const QString& host) const;
 
   QString userStyleSheet() const;
-
- private:
-  QFont::CharSet m_charSet;
 };
 
 #endif

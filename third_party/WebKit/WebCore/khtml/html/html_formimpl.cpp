@@ -639,7 +639,7 @@ void HTMLGenericFormElementImpl::defaultEventHandler(EventImpl* evt) {
     // Report focus in/out changes to the browser extension (editable widgets
     // only)
     KHTMLView* view = getDocument()->view();
-    if (evt->id() == EventImpl::DOMFOCUSIN_EVENT && isEditable() &&
+    if (evt->id() == EventImpl::DOMFOCUSIN_EVENT && isEditable() && m_render &&
         m_render->isWidget()) {
       KHTMLPartBrowserExtension* ext = static_cast<KHTMLPartBrowserExtension*>(
           view->part()->browserExtension());
