@@ -13,6 +13,7 @@
   int loadStatus;
   NSColor* patternColor;
   int patternColorLoadStatus;
+  int repetitionsComplete;
   BOOL animationFinished;
 }
 
