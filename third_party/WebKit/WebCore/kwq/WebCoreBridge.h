@@ -217,6 +217,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (void)selectAll;
 - (void)deselectAll;
+- (void)deselectText;
 
 - (NSRect)selectionRect;
 - (NSRect)visibleSelectionRect;
