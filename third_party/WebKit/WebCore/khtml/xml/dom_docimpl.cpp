@@ -2399,14 +2399,14 @@ EventListener* DocumentImpl::createHTMLEventListener(QString code) {
   }
 }
 
-void DocumentImpl::dispatchImageLoadEventSoon(RenderImage* image) {
+void DocumentImpl::dispatchImageLoadEventSoon(HTMLImageLoader* image) {
   m_imageLoadEventDispatchSoonList.append(image);
   if (!m_imageLoadEventTimer) {
     m_imageLoadEventTimer = startTimer(0);
   }
 }
 
-void DocumentImpl::removeImage(RenderImage* image) {
+void DocumentImpl::removeImage(HTMLImageLoader* image) {
   // Remove instances of this image from both lists.
   // Use loops because we allow multiple instances to get into the lists.
   while (m_imageLoadEventDispatchSoonList.removeRef(image)) {
@@ -2427,14 +2427,14 @@ void DocumentImpl::dispatchImageLoadEventsNow() {
 
   m_imageLoadEventDispatchingList = m_imageLoadEventDispatchSoonList;
   m_imageLoadEventDispatchSoonList.clear();
-  for (QPtrListIterator<RenderImage> it(m_imageLoadEventDispatchingList);
+  for (QPtrListIterator<HTMLImageLoader> it(m_imageLoadEventDispatchingList);
        it.current();) {
-    RenderImage* image = it.current();
+    HTMLImageLoader* image = it.current();
     // Must advance iterator *before* dispatching call.
     // Otherwise, it might be advanced automatically if dispatching the call had
     // a side effect
-    // of destroying the current RenderImage, and then we would advance past the
-    // *next* item,
+    // of destroying the current HTMLImageLoader, and then we would advance past
+    // the *next* item,
     // missing one altogether.
     ++it;
     image->dispatchLoadEvent();

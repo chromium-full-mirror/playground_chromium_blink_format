@@ -65,10 +65,10 @@ class RenderImage : public RenderReplaced {
 
   // hook to keep RendeObject::m_inline() up to date
   virtual void setStyle(RenderStyle* style);
-  virtual void updateFromElement();
+  void updateAltText();
 
-  virtual void notifyFinished(CachedObject* finishedObj);
-  void dispatchLoadEvent();
+  void setImage(CachedImage* image);
+  CachedImage* getImage() const { return image; }
 
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
@@ -80,8 +80,6 @@ class RenderImage : public RenderReplaced {
 
   virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
-
-  virtual void detach();
 
   // Called to set generated content images (e.g., :before/:after generated
   // images).
@@ -115,7 +113,6 @@ class RenderImage : public RenderReplaced {
 
   CachedImage* image;
   bool berrorPic : 1;
-  bool loadEventSent : 1;
   SelectionState m_selectionState : 3;
 };
 

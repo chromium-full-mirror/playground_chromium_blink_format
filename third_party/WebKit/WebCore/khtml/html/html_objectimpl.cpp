@@ -336,7 +336,7 @@ bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
 // -------------------------------------------------------------------------
 
 HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {
+    : HTMLElementImpl(doc), m_imageLoader(this) {
   needWidgetUpdate = false;
 }
 
@@ -441,12 +441,18 @@ RenderObject* HTMLObjectElementImpl::createRenderer(RenderArena* arena,
   return new (arena) RenderPartObject(this);
 }
 
+void HTMLObjectElementImpl::removedFromDocument() {
+  m_imageLoader.removedFromDocument();
+}
+
 void HTMLObjectElementImpl::attach() {
   HTMLElementImpl::attach();
 
   if (m_render) {
     if (canRenderImageType(serviceType)) {
-      m_render->updateFromElement();
+      m_imageLoader.updateFromElement();
+      RenderImage* imageObj = static_cast<RenderImage*>(renderer());
+      imageObj->setImage(m_imageLoader.image());
     } else {
       // If we are already cleared, then it means that we were attach()-ed
       // previously

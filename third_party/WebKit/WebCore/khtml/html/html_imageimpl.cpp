@@ -50,10 +50,82 @@
 using namespace DOM;
 using namespace khtml;
 
+HTMLImageLoader::HTMLImageLoader(ElementImpl* elt)
+    : m_element(elt), m_image(0), m_firedLoad(true), m_imageComplete(true) {}
+
+HTMLImageLoader::~HTMLImageLoader() {
+  if (m_image)
+    m_image->deref(this);
+}
+
+void HTMLImageLoader::updateFromElement() {
+  // If we're not making renderers for the page, then don't load images.  We
+  // don't want to slow
+  // down the raw HTML parsing case by loading images we don't intend to
+  // display.
+  if (!element()->getDocument()->renderer())
+    return;
+
+  AtomicString attr;
+  if (element()->id() == ID_OBJECT)
+    attr = element()->getAttribute(ATTR_DATA);
+  else
+    attr = element()->getAttribute(ATTR_SRC);
+
+  // Treat a lack of src or empty string for src as no image at all.
+  CachedImage* newImage = 0;
+  if (!attr.isEmpty())
+    newImage = element()->getDocument()->docLoader()->requestImage(
+        khtml::parseURL(attr));
+
+  if (newImage != m_image) {
+    m_firedLoad = false;
+    m_imageComplete = false;
+    CachedImage* oldImage = m_image;
+    m_image = newImage;
+    if (m_image)
+      m_image->ref(this);
+    if (oldImage)
+      oldImage->deref(this);
+  }
+}
+
+void HTMLImageLoader::removedFromDocument() {
+  if (m_image) {
+    m_image->deref(this);
+    m_image = 0;
+    m_element->getDocument()->removeImage(this);
+  }
+
+  m_firedLoad = true;
+  m_imageComplete = true;
+}
+
+void HTMLImageLoader::dispatchLoadEvent() {
+  if (!m_firedLoad) {
+    m_firedLoad = true;
+    if (m_image->isErrorImage())
+      element()->dispatchHTMLEvent(EventImpl::ERROR_EVENT, false, false);
+    else
+      element()->dispatchHTMLEvent(EventImpl::LOAD_EVENT, false, false);
+  }
+}
+
+void HTMLImageLoader::notifyFinished(CachedObject* image) {
+  m_imageComplete = true;
+  DocumentImpl* document = element()->getDocument();
+  if (document)
+    document->dispatchImageLoadEventSoon(this);
+  if (element()->renderer()) {
+    RenderImage* imageObj = static_cast<RenderImage*>(element()->renderer());
+    imageObj->setImage(m_image);
+  }
+}
+
 // -------------------------------------------------------------------------
 
 HTMLImageElementImpl::HTMLImageElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {
+    : HTMLElementImpl(doc), m_imageLoader(this) {
   ismap = false;
 }
 
@@ -89,9 +161,11 @@ bool HTMLImageElementImpl::mapToEntry(NodeImpl::Id attr,
 void HTMLImageElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALT:
-    case ATTR_SRC:
       if (m_render)
-        m_render->updateFromElement();
+        static_cast<RenderImage*>(m_render)->updateAltText();
+      break;
+    case ATTR_SRC:
+      m_imageLoader.updateFromElement();
       break;
     case ATTR_WIDTH:
       addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
@@ -175,11 +249,8 @@ void HTMLImageElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       oldIdAttr = newIdAttr;
     }
 #if APPLE_CHANGES
-    case ATTR_COMPOSITE: {
+    case ATTR_COMPOSITE:
       _compositeOperator = attr->value().string();
-      if (m_render)
-        m_render->updateFromElement();
-    }
 #endif
     // fall through
     default:
@@ -215,8 +286,10 @@ RenderObject* HTMLImageElementImpl::createRenderer(RenderArena* arena,
 
 void HTMLImageElementImpl::attach() {
   HTMLElementImpl::attach();
-  if (m_render) {
-    m_render->updateFromElement();
+
+  if (renderer()) {
+    RenderImage* imageObj = static_cast<RenderImage*>(renderer());
+    imageObj->setImage(m_imageLoader.image());
   }
 
   if (getDocument()->isHTMLDocument()) {
@@ -234,6 +307,10 @@ void HTMLImageElementImpl::detach() {
   }
 
   HTMLElementImpl::detach();
+}
+
+void HTMLImageElementImpl::removedFromDocument() {
+  m_imageLoader.removedFromDocument();
 }
 
 long HTMLImageElementImpl::width() const {
@@ -284,10 +361,8 @@ long HTMLImageElementImpl::height() const {
 
 QImage HTMLImageElementImpl::currentImage() const {
   RenderImage* r = static_cast<RenderImage*>(renderer());
-
   if (r)
     return r->pixmap().convertToImage();
-
   return QImage();
 }
 
