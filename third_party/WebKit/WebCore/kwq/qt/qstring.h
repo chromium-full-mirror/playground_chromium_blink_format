@@ -454,7 +454,7 @@ class QString {
 
   operator const char*() const;
 
-  QChar operator[](int) const;
+  const QChar operator[](int) const;
 
   QString& operator+=(const QString&);
   QString& operator+=(QChar);
@@ -512,6 +512,19 @@ class QString {
 
   friend class QConstString;
   friend class QGDict;
+
+#ifdef _KWQ_
+  void _copyInternalString();
+#endif
+
+#ifdef KWQ_STRING_DEBUG
+  // Added for debugging purposes.  Compiler should optimize.
+  void _cf_release(CFStringRef) const;
+  void _cf_retain(CFStringRef) const;
+#else
+#define _cf_release(s) CFRelease(s)
+#define _cf_retain(s) CFRetain(s)
+#endif
 
 };  // class QString
     // ============================================================

@@ -60,6 +60,11 @@ struct QUrlPrivate {
 */
 
 static void slashify(QString& s, bool allowMultiple = TRUE) {
+#ifdef _KWQ_
+  fprintf(stderr,
+          "UNSAFE API, should not be called.  This entire class will not be "
+          "used when KURL is finished.\n");
+#else
   bool justHadSlash = FALSE;
   for (int i = 0; i < (int)s.length(); i++) {
     if (!allowMultiple && justHadSlash && (s[i] == '/' || s[i] == '\\')) {
@@ -74,6 +79,7 @@ static void slashify(QString& s, bool allowMultiple = TRUE) {
     else
       justHadSlash = FALSE;
   }
+#endif
 }
 
 // NOT REVISED
@@ -996,6 +1002,11 @@ QString QUrl::dirPath() const {
 */
 
 void QUrl::encode(QString& url) {
+#ifdef _KWQ_
+  fprintf(stderr,
+          "UNSAFE API, should not be called.  This entire class will not be "
+          "used when KURL is finished.\n");
+#else
   int oldlen = url.length();
 
   if (!oldlen)
@@ -1024,8 +1035,10 @@ void QUrl::encode(QString& url) {
   }
 
   url = newUrl;
+#endif
 }
 
+#ifndef _KWQ_
 static ushort hex_to_int(ushort c) {
   if (c >= 'A' && c <= 'F')
     return c - 'A' + 10;
@@ -1035,12 +1048,18 @@ static ushort hex_to_int(ushort c) {
     return c - '0';
   return 0;
 }
+#endif
 
 /*!
   Decodes the string \a url.
 */
 
 void QUrl::decode(QString& url) {
+#ifdef _KWQ_
+  fprintf(stderr,
+          "UNSAFE API, should not be called.  This entire class will not be "
+          "used when KURL is finished.\n");
+#else
   int oldlen = url.length();
   if (!oldlen)
     return;
@@ -1060,6 +1079,7 @@ void QUrl::decode(QString& url) {
   }
 
   url = newUrl;
+#endif
 }
 
 /*!  Composes a string of the URL and returns it. If \a encodedPath is

@@ -32,6 +32,7 @@ namespace DOM {
  * Other objects should overload deleteMe() to fit their needs. The default
  * implementation deletes the object if the ref count drops to 0.
  */
+
 class DomShared {
  public:
   DomShared() : _ref(0) {}
@@ -41,6 +42,7 @@ class DomShared {
    */
   virtual bool deleteMe();
 
+#ifndef _KWQ_
   void ref() { _ref++; }
   void deref() {
     if (_ref)
@@ -48,6 +50,13 @@ class DomShared {
     if (!_ref && deleteMe())
       delete this;
   }
+#else
+  static void* instanceToCheck;
+
+  void ref();
+  void deref();
+#endif
+
   // ###  KDE 3.0: add const
   bool hasOneRef() { return _ref == 1; }
   unsigned int refCount() const { return _ref; }

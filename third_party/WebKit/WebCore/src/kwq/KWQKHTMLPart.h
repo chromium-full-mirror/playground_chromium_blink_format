@@ -46,6 +46,10 @@ class KJavaAppletContext;
 class KJSProxy;
 class KHTMLPartPrivate;
 
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+@class WKWebDataSource;
+#endif
+
 namespace DOM {
 class HTMLDocument;
 class HTMLDocumentImpl;
@@ -55,6 +59,7 @@ class Node;
 
 namespace khtml {
 class RenderPart;
+struct ChildFrame;
 };
 
 extern "C" {
@@ -581,6 +586,7 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
                      const QString& url,
                      const QString& serviceType,
                      const QStringList& args = QStringList());
+
   void nodeActivated(const DOM::Node&);
   QVariant executeScheduledScript();
   void stopAutoScroll();
@@ -608,10 +614,29 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   // associated sub-URIs have loaded
   void checkCompleted();
 
+#ifdef _KWQ_
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  // Not retained.
+  void setDataSource(WKWebDataSource* d) { dataSource = d; }
+  WKWebDataSource* getDataSource() { return dataSource; }
+#else
+  void setDataSource(void* d) { dataSource = d; }
+  void* getDataSource() { return dataSource; }
+#endif
+#endif
+
  private:
   KHTMLPartPrivate* d;
   // DUBIOUS, why are impls being referenced?
   DOM::HTMLDocumentImpl* docImpl() const;
+
+#ifdef _KWQ_
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  WKWebDataSource* dataSource;
+#else
+  void* dataSource;
+#endif
+#endif
 };
 
 #endif
