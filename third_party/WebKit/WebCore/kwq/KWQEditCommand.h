@@ -23,14 +23,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "htmlediting.h"
-#include "htmlediting.h"
-
-@interface KWQEditCommand : NSObject {
-  khtml::EditCommand* m_impl;
+namespace khtml {
+class EditCommand;
 }
 
-+ (KWQEditCommand*)commandWithEditCommandImpl:(khtml::EditCommand*)impl;
-- (khtml::EditCommand*)impl;
+@interface KWQEditCommand : NSObject {
+  khtml::EditCommand* m_command;
+}
+
++ (KWQEditCommand*)commandWithEditCommand:(khtml::EditCommand*)command;
+- (khtml::EditCommand*)command;
 
 @end

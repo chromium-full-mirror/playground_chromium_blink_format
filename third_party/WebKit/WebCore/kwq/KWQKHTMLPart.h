@@ -54,6 +54,7 @@ class HTMLTableCellElementImpl;
 
 namespace khtml {
 class RenderObject;
+class RenderStyle;
 class VisiblePosition;
 struct DashboardRegionValue;
 }
@@ -74,6 +75,7 @@ typedef DOMElement ObjCDOMElement;
 @class NSArray;
 @class NSAttributedString;
 @class NSColor;
+@class NSDictionary;
 @class NSEvent;
 @class NSFileWrapper;
 @class NSFont;
@@ -94,6 +96,7 @@ class KWQPageState;
 class NSArray;
 class NSAttributedString;
 class NSColor;
+class NSDictionary;
 class NSEvent;
 class NSFileWrapper;
 class NSFont;
@@ -245,6 +248,8 @@ class KWQKHTMLPart : public KHTMLPart {
                              NSRect* elementRect) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
+  NSDictionary* fontAttributesForSelectionStart() const;
+
   void markMisspellingsInAdjacentWords(const khtml::VisiblePosition&);
   void markMisspellings(const khtml::Selection&);
 
@@ -406,6 +411,9 @@ class KWQKHTMLPart : public KHTMLPart {
   NSImage* imageFromRect(NSRect rect) const;
 
   void freeClipboard();
+
+  khtml::RenderStyle* styleForSelectionStart(
+      DOM::NodeImpl*& nodeToRemove) const;
 
   WebCoreBridge* _bridge;
 
