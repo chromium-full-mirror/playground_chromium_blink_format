@@ -339,6 +339,7 @@ class QString {
   QString(const QByteArray&);
   QString(const QChar*, uint);
   QString(const char*);
+  QString(const char*, int len);
 
   QString(const QString&);
 
