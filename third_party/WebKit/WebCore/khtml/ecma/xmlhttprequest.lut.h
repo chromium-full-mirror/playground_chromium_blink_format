@@ -5,7 +5,8 @@ namespace KJS {
 
 const struct HashEntry XMLHttpRequestProtoTableEntries[] = {
     {"open", XMLHttpRequest::Open, DontDelete | Function, 5, 0},
-    {0, 0, 0, 0, 0},
+    {"overrideMimeType", XMLHttpRequest::OverrideMIMEType,
+     DontDelete | Function, 1, 0},
     {"getResponseHeader", XMLHttpRequest::GetResponseHeader,
      DontDelete | Function, 1, 0},
     {"setRequestHeader", XMLHttpRequest::SetRequestHeader,

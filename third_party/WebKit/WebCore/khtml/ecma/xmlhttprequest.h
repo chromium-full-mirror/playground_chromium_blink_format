@@ -77,7 +77,8 @@ class XMLHttpRequest : public DOMObject {
     GetResponseHeader,
     Open,
     Send,
-    SetRequestHeader
+    SetRequestHeader,
+    OverrideMIMEType
   };
 
  private:
@@ -129,6 +130,7 @@ class XMLHttpRequest : public DOMObject {
   khtml::Decoder* decoder;
   QString encoding;
   QString responseHeaders;
+  QString MIMETypeOverride;
 
   QString response;
   mutable bool createdDocument;
