@@ -103,7 +103,7 @@ class Marquee : public QObject {
   void setEnd(int end) { m_end = end; }
 
   void start();
-  void stop();
+  void suspend();
 
   void updateMarqueeStyle();
   void updateMarqueePosition();
@@ -118,6 +118,7 @@ class Marquee : public QObject {
   int m_speed;
   int m_unfurlPos;
   bool m_reset;
+  bool m_suspended;
   EWhiteSpace m_whiteSpace : 2;
   EMarqueeDirection m_direction : 4;
 };
@@ -148,7 +149,7 @@ class RenderLayer {
   void styleChanged();
 
   Marquee* marquee() const { return m_marquee; }
-  void stopMarquees();
+  void suspendMarquees();
 
 #if APPLE_CHANGES
   bool isTransparent();
