@@ -1714,7 +1714,9 @@ void RenderBlock::addOverHangingFloats(RenderBlock* flow,
   kdDebug(6040) << (void*)this << ": adding overhanging floats xoff=" << xoff
                 << "  offset=" << offset << " child=" << child << endl;
 #endif
-  if (!flow->m_specialObjects || (child && flow->layer()))
+
+  // Prevent floats from being added to the root by <html>.
+  if (!flow->m_specialObjects || (child && flow->isHtml()))
     return;
 
   // we have overhanging floats
@@ -1729,7 +1731,8 @@ void RenderBlock::addOverHangingFloats(RenderBlock* flow,
     if ((int)r->type <= (int)SpecialObject::FloatRight &&
         ((!child && r->endY > offset) ||
          (child && flow->yPos() + r->endY > height()))) {
-      if (child)
+      if (child && (flow->enclosingLayer() == enclosingLayer()))
+        // Set noPaint to true only if we didn't cross layers.
         r->noPaint = true;
 
       SpecialObject* f = 0;
@@ -1760,7 +1763,10 @@ void RenderBlock::addOverHangingFloats(RenderBlock* flow,
         if (!child) {
           special->left -= marginLeft();
           special->noPaint = true;
-        }
+        } else
+          // Only paint if |flow| isn't.
+          special->noPaint = !r->noPaint;
+
         special->width = r->width;
         special->node = r->node;
         m_specialObjects->append(special);

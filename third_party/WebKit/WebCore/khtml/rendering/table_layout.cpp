@@ -878,21 +878,7 @@ void AutoTableLayout::layout() {
     }
   }
 
-  // then allocate width to fixed cols
-  if (available > 0) {
-    for (int i = 0; i < nEffCols; ++i) {
-      Length& width = layoutStruct[i].effWidth;
-      if (width.type == Fixed && width.value > layoutStruct[i].calcWidth) {
-        available += layoutStruct[i].calcWidth - width.value;
-        layoutStruct[i].calcWidth = width.value;
-      }
-    }
-  }
-#ifdef DEBUG_LAYOUT
-  qDebug("fixed satisfied: available is %d", available);
-#endif
-
-  // then allocate width to percent cols
+  // allocate width to percent cols
   if (available > 0 && havePercent) {
     for (int i = 0; i < nEffCols; i++) {
       Length& width = layoutStruct[i].effWidth;
@@ -924,6 +910,20 @@ void AutoTableLayout::layout() {
   }
 #ifdef DEBUG_LAYOUT
   qDebug("percent satisfied: available is %d", available);
+#endif
+
+  // then allocate width to fixed cols
+  if (available > 0) {
+    for (int i = 0; i < nEffCols; ++i) {
+      Length& width = layoutStruct[i].effWidth;
+      if (width.type == Fixed && width.value > layoutStruct[i].calcWidth) {
+        available += layoutStruct[i].calcWidth - width.value;
+        layoutStruct[i].calcWidth = width.value;
+      }
+    }
+  }
+#ifdef DEBUG_LAYOUT
+  qDebug("fixed satisfied: available is %d", available);
 #endif
 
   // now satisfy relative
@@ -959,24 +959,6 @@ void AutoTableLayout::layout() {
   qDebug("variable satisfied: available is %d", available);
 #endif
 
-  // spread over fixed colums
-  if (available > 0 && numFixed) {
-    // still have some width to spread, distribute to fixed columns
-    for (int i = 0; i < nEffCols; i++) {
-      Length& width = layoutStruct[i].effWidth;
-      if (width.isFixed()) {
-        int w = available * layoutStruct[i].effMaxWidth / totalFixed;
-        available -= w;
-        totalFixed -= layoutStruct[i].effMaxWidth;
-        layoutStruct[i].calcWidth += w;
-      }
-    }
-  }
-
-#ifdef DEBUG_LAYOUT
-  qDebug("after fixed distribution: available=%d", available);
-#endif
-
   // spread over percent colums
   if (available > 0 && hasPercent && totalPercent < 100) {
     // still have some width to spread, distribute weighted to percent columns
@@ -995,6 +977,24 @@ void AutoTableLayout::layout() {
 
 #ifdef DEBUG_LAYOUT
   qDebug("after percent distribution: available=%d", available);
+#endif
+
+  // spread over fixed colums
+  if (available > 0 && numFixed) {
+    // still have some width to spread, distribute to fixed columns
+    for (int i = 0; i < nEffCols; i++) {
+      Length& width = layoutStruct[i].effWidth;
+      if (width.isFixed()) {
+        int w = available * layoutStruct[i].effMaxWidth / totalFixed;
+        available -= w;
+        totalFixed -= layoutStruct[i].effMaxWidth;
+        layoutStruct[i].calcWidth += w;
+      }
+    }
+  }
+
+#ifdef DEBUG_LAYOUT
+  qDebug("after fixed distribution: available=%d", available);
 #endif
 
   // spread over the rest
@@ -1018,17 +1018,102 @@ void AutoTableLayout::layout() {
   // this seems to produce to the pixel exaxt results with IE. Wonder is some of
   // this also holds for width distributing.
   if (available < 0) {
-    int mw = 0;
-    for (int i = nEffCols - 1; i >= 0; i--)
-      mw += layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
-    for (int i = nEffCols - 1; i >= 0 && mw > 0; i--) {
-      int minMaxDiff = layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
-      int reduce = available * minMaxDiff / mw;
-      layoutStruct[i].calcWidth += reduce;
-      available -= reduce;
-      mw -= minMaxDiff;
-      if (available >= 0)
-        break;
+    // Need to reduce cells with the following prioritization:
+    // (1) Variable
+    // (2) Relative
+    // (3) Fixed
+    // (4) Percent
+    // This is basically the reverse of how we grew the cells.
+    if (available < 0) {
+      int mw = 0;
+      for (int i = nEffCols - 1; i >= 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isVariable())
+          mw += layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+      }
+
+      for (int i = nEffCols - 1; i >= 0 && mw > 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isVariable()) {
+          int minMaxDiff =
+              layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+          int reduce = available * minMaxDiff / mw;
+          layoutStruct[i].calcWidth += reduce;
+          available -= reduce;
+          mw -= minMaxDiff;
+          if (available >= 0)
+            break;
+        }
+      }
+    }
+
+    if (available < 0) {
+      int mw = 0;
+      for (int i = nEffCols - 1; i >= 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isRelative())
+          mw += layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+      }
+
+      for (int i = nEffCols - 1; i >= 0 && mw > 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isRelative()) {
+          int minMaxDiff =
+              layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+          int reduce = available * minMaxDiff / mw;
+          layoutStruct[i].calcWidth += reduce;
+          available -= reduce;
+          mw -= minMaxDiff;
+          if (available >= 0)
+            break;
+        }
+      }
+    }
+
+    if (available < 0) {
+      int mw = 0;
+      for (int i = nEffCols - 1; i >= 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isFixed())
+          mw += layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+      }
+
+      for (int i = nEffCols - 1; i >= 0 && mw > 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isFixed()) {
+          int minMaxDiff =
+              layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+          int reduce = available * minMaxDiff / mw;
+          layoutStruct[i].calcWidth += reduce;
+          available -= reduce;
+          mw -= minMaxDiff;
+          if (available >= 0)
+            break;
+        }
+      }
+    }
+
+    if (available < 0) {
+      int mw = 0;
+      for (int i = nEffCols - 1; i >= 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isPercent())
+          mw += layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+      }
+
+      for (int i = nEffCols - 1; i >= 0 && mw > 0; i--) {
+        Length& width = layoutStruct[i].effWidth;
+        if (width.isPercent()) {
+          int minMaxDiff =
+              layoutStruct[i].calcWidth - layoutStruct[i].effMinWidth;
+          int reduce = available * minMaxDiff / mw;
+          layoutStruct[i].calcWidth += reduce;
+          available -= reduce;
+          mw -= minMaxDiff;
+          if (available >= 0)
+            break;
+        }
+      }
     }
   }
 
