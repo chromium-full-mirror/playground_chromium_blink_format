@@ -9,6 +9,7 @@
 
 @class WebDataSource;
 @class WebResourceHandle;
+@class WebResourceRequest;
 @class WebNetscapePluginView;
 
 @protocol WebDocumentRepresentation;
@@ -26,6 +27,7 @@
 
   BOOL isFirstChunk;
 
+  WebResourceRequest* request;
   WebResourceHandle* resource;
   NSMutableData* resourceData;
 
