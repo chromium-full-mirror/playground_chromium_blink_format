@@ -56,7 +56,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual void parseAttribute(AttributeImpl*);
-  virtual void init();
+  virtual void insertedIntoDocument();
   virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -83,7 +83,6 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual void parseAttribute(AttributeImpl*);
-  virtual void init();
   virtual void attach();
   virtual void detach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -135,7 +134,6 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual void parseAttribute(AttributeImpl*);
-  virtual void init();
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,

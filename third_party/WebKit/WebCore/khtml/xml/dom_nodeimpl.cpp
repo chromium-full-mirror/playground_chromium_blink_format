@@ -928,8 +928,6 @@ void NodeImpl::dump(QTextStream* stream, QString ind) const {
 }
 #endif
 
-void NodeImpl::init() {}
-
 void NodeImpl::closeRenderer() {
   // It's important that we close the renderer, even if it hasn't been
   // created yet. This happens even more because of the FOUC fixes we did

@@ -104,7 +104,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   DOMString m_enctype;
   DOMString m_boundary;
   DOMString m_acceptcharset;
-  QString m_encCharset;
   bool m_post : 1;
   bool m_multipart : 1;
   bool m_autocomplete : 1;
@@ -185,6 +184,8 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   DOMStringImpl* m_name;
   HTMLFormElementImpl* m_form;
   bool m_disabled, m_readOnly;
+
+  bool m_inited : 1;
 };
 
 // -------------------------------------------------------------------------
@@ -286,7 +287,6 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void setName(const DOMString& name);
 
-  virtual void init();
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -412,7 +412,6 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void parseAttribute(AttributeImpl* attr);
 
-  virtual void init();
   virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -548,7 +547,6 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void select();
 
   virtual void parseAttribute(AttributeImpl* attr);
-  virtual void init();
   virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);

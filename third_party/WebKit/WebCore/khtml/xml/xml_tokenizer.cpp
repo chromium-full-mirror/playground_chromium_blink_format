@@ -87,11 +87,8 @@ bool XMLHandler::startElement(const QString& namespaceURI,
       return false;
   }
   if (m_currentNode->addChild(newElement)) {
-    if (m_view && !newElement->attached()) {
-      newElement->init();
-      if (!newElement->attached())
-        newElement->attach();
-    }
+    if (m_view && !newElement->attached())
+      newElement->attach();
     m_currentNode = newElement;
     return true;
   } else {
@@ -126,11 +123,8 @@ bool XMLHandler::startCDATA() {
 
   NodeImpl* newNode = m_doc->document()->createCDATASection("");
   if (m_currentNode->addChild(newNode)) {
-    if (m_view && !newNode->attached()) {
-      newNode->init();
-      if (!newNode->attached())
-        newNode->attach();
-    }
+    if (m_view && !newNode->attached())
+      newNode->attach();
     m_currentNode = newNode;
     return true;
   } else {
@@ -215,11 +209,8 @@ bool XMLHandler::enterText() {
 }
 
 void XMLHandler::exitText() {
-  if (m_view && m_currentNode && !m_currentNode->attached()) {
-    m_currentNode->init();
-    if (!m_currentNode->attached())
-      m_currentNode->attach();
-  }
+  if (m_view && m_currentNode && !m_currentNode->attached())
+    m_currentNode->attach();
 
   NodeImpl* par = m_currentNode->parentNode();
   if (par != 0)
