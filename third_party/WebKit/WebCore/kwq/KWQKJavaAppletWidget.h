@@ -59,6 +59,8 @@ class KJavaAppletWidget : public QWidget {
   KJavaAppletWidget(KJavaAppletContext*, QWidget*);
   ~KJavaAppletWidget();
 
+  void processArguments(const QMap<QString, QString>&);
+
   KJavaApplet* applet() { return &m_applet; }
 
   void setBaseURL(const QString&);
