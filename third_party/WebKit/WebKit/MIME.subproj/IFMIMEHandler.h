@@ -8,10 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-/*
-IFMIMEHandler is a simple data type object holding the MIME type, the type of
-handler and the handler's name (ie plugin's name or application's name).
-*/
+// FIXME: This code should be replaced by the MIME type DB 2927855
 
 typedef enum {
   IFMIMEHANDLERTYPE_NIL = 0,
@@ -22,28 +19,9 @@ typedef enum {
   IFMIMEHANDLERTYPE_APPLICATION = 5,  // Application handled file
 } IFMIMEHandlerType;
 
-@interface IFMIMEHandler : NSObject {
-  NSString *MIMEType, *handlerName;
-  IFMIMEHandlerType handlerType;
-}
+@interface IFMIMEHandler : NSObject
 
-/*
-initWithMIMEType gets called by [IFMIMEDatabase sharedMIMEDatabase] for at least
-every mime type that WebKit handles. We, at some point, might want to store
-IFMIMEHandler's for types that other application handle. I hope not though.
-*/
-
-+ (void)saveFileWithPath:(NSString*)path andData:(NSData*)data;
-+ (void)saveAndOpenFileWithPath:(NSString*)path andData:(NSData*)data;
-+ (NSArray*)showableMIMETypes;
-
-- initWithMIMEType:(NSString*)MIME
-         handlerType:(IFMIMEHandlerType)hType
-         handlerName:(NSString*)handler;
-
-// Accessor methods
-- (NSString*)MIMEType;
-- (NSString*)handlerName;
-- (IFMIMEHandlerType)handlerType;
++ (IFMIMEHandlerType)MIMEHandlerTypeForMIMEType:(NSString*)MIMEType;
++ (BOOL)canShowMIMEType:(NSString*)MIMEType;
 
 @end
