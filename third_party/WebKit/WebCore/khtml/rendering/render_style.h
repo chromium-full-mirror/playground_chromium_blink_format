@@ -280,8 +280,6 @@ class StyleSurroundData : public Shared<StyleSurroundData> {
   LengthBox margin;
   LengthBox padding;
   BorderData border;
-  EMarginCollapse marginTopCollapse : 2;
-  EMarginCollapse marginBottomCollapse : 2;
 };
 
 //------------------------------------------------
@@ -527,6 +525,8 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   EUserSelect userSelect : 2;  // Whether or not the element is selectable.
   bool textOverflow : 1;       // Whether or not lines that spill out should be
                                // truncated with "..."
+  EMarginCollapse marginTopCollapse : 2;
+  EMarginCollapse marginBottomCollapse : 2;
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1211,10 +1211,10 @@ class RenderStyle {
   EUserSelect userSelect() const { return css3NonInheritedData->userSelect; }
   bool textOverflow() const { return css3NonInheritedData->textOverflow; }
   EMarginCollapse marginTopCollapse() const {
-    return surround->marginTopCollapse;
+    return css3NonInheritedData->marginTopCollapse;
   }
   EMarginCollapse marginBottomCollapse() const {
-    return surround->marginBottomCollapse;
+    return css3NonInheritedData->marginBottomCollapse;
   }
 // End CSS3 Getters
 
@@ -1496,10 +1496,10 @@ class RenderStyle {
     SET_VAR(css3NonInheritedData, textOverflow, b);
   }
   void setMarginTopCollapse(EMarginCollapse c) {
-    SET_VAR(surround, marginTopCollapse, c);
+    SET_VAR(css3NonInheritedData, marginTopCollapse, c);
   }
   void setMarginBottomCollapse(EMarginCollapse c) {
-    SET_VAR(surround, marginBottomCollapse, c);
+    SET_VAR(css3NonInheritedData, marginBottomCollapse, c);
   }
 // End CSS3 Setters
 

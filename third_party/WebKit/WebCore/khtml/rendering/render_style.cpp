@@ -34,25 +34,18 @@ using namespace khtml;
 using DOM::DOMStringImpl;
 using DOM::DOMString;
 
-StyleSurroundData::StyleSurroundData()
-    : margin(Fixed),
-      padding(Variable),
-      marginTopCollapse(MCOLLAPSE),
-      marginBottomCollapse(MCOLLAPSE) {}
+StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Variable) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
     : Shared<StyleSurroundData>(),
       offset(o.offset),
       margin(o.margin),
       padding(o.padding),
-      border(o.border),
-      marginTopCollapse(o.marginTopCollapse),
-      marginBottomCollapse(o.marginBottomCollapse) {}
+      border(o.border) {}
 
 bool StyleSurroundData::operator==(const StyleSurroundData& o) const {
   return offset == o.offset && margin == o.margin && padding == o.padding &&
-         border == o.border && marginTopCollapse == o.marginTopCollapse &&
-         marginBottomCollapse == o.marginBottomCollapse;
+         border == o.border;
 }
 
 StyleBoxData::StyleBoxData() : z_index(0), z_auto(true) {
@@ -172,7 +165,9 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
       opacity(RenderStyle::initialOpacity()),
       userDrag(RenderStyle::initialUserDrag()),
       userSelect(RenderStyle::initialUserSelect()),
-      textOverflow(RenderStyle::initialTextOverflow())
+      textOverflow(RenderStyle::initialTextOverflow()),
+      marginTopCollapse(MCOLLAPSE),
+      marginBottomCollapse(MCOLLAPSE)
 #ifndef KHTML_NO_XBL
       ,
       bindingURI(0)
@@ -191,7 +186,9 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
       marquee(o.marquee),
       userDrag(o.userDrag),
       userSelect(o.userSelect),
-      textOverflow(o.textOverflow) {
+      textOverflow(o.textOverflow),
+      marginTopCollapse(o.marginTopCollapse),
+      marginBottomCollapse(o.marginBottomCollapse) {
 #ifndef KHTML_NO_XBL
   bindingURI = o.bindingURI ? o.bindingURI->copy() : 0;
 #endif
@@ -220,7 +217,9 @@ bool StyleCSS3NonInheritedData::operator==(
     const StyleCSS3NonInheritedData& o) const {
   return opacity == o.opacity && flexibleBox == o.flexibleBox &&
          marquee == o.marquee && userDrag == o.userDrag &&
-         userSelect == o.userSelect && textOverflow == o.textOverflow
+         userSelect == o.userSelect && textOverflow == o.textOverflow &&
+         marginTopCollapse == o.marginTopCollapse &&
+         marginBottomCollapse == o.marginBottomCollapse
 #ifndef KHTML_NO_XBL
          && bindingsEquivalent(o)
 #endif
@@ -524,8 +523,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   if (*box.get() != *other->box.get() ||
       !(surround->margin == other->surround->margin) ||
       !(surround->padding == other->surround->padding) ||
-      surround->marginTopCollapse != other->surround->marginTopCollapse ||
-      surround->marginBottomCollapse != other->surround->marginBottomCollapse ||
+      css3NonInheritedData->marginTopCollapse !=
+          other->css3NonInheritedData->marginTopCollapse ||
+      css3NonInheritedData->marginBottomCollapse !=
+          other->css3NonInheritedData->marginBottomCollapse ||
       *css3NonInheritedData->flexibleBox.get() !=
           *other->css3NonInheritedData->flexibleBox.get() ||
 #if APPLE_CHANGES
