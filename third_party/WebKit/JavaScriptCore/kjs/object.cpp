@@ -64,6 +64,7 @@ ObjectImp::ObjectImp(const Object& proto)
       _scope(0) {
   // fprintf(stderr,"ObjectImp::ObjectImp %p\n",(void*)this);
   _scope = ListImp::empty();
+  _scope->setGcAllowed();
   _prop = new PropertyMap();
 }
 
