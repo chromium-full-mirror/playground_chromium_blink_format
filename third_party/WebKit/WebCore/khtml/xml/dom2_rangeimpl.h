@@ -95,6 +95,10 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
 
   bool readOnly() { return false; }
 
+#if APPLE_CHANGES
+  static Range createInstance(RangeImpl* impl);
+#endif
+
  protected:
   DocumentPtr* m_ownerDocument;
   NodeImpl* m_startContainer;

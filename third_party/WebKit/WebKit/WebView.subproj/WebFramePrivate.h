@@ -19,7 +19,7 @@
 @class WebPolicyDecisionListener;
 @class WebView;
 
-@protocol WebDOMElement;
+@protocol DOMElement;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -169,7 +169,7 @@ extern NSString* WebPageCacheDocumentViewKey;
            loadType:(WebFrameLoadType)loadType
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
-               form:(NSObject<WebDOMElement>*)form
+               form:(NSObject<DOMElement>*)form
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
@@ -178,7 +178,7 @@ extern NSString* WebPageCacheDocumentViewKey;
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
-                form:(NSObject<WebDOMElement>*)form
+                form:(NSObject<DOMElement>*)form
           formValues:(NSDictionary*)values;
 
 - (void)_loadRequest:(NSURLRequest*)request inFrameNamed:(NSString*)frameName;
@@ -242,5 +242,7 @@ extern NSString* WebPageCacheDocumentViewKey;
 - (NSColor*)_bodyBackgroundColor;
 
 - (void)_reloadForPluginChanges;
+
+- (NSUndoManager*)undoManager;
 
 @end
