@@ -1245,7 +1245,11 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
     : CompositeEditCommand(document),
       m_hasSelectionToDelete(false),
       m_smartDelete(smartDelete),
-      m_mergeBlocksAfterDelete(mergeBlocksAfterDelete) {}
+      m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
+      m_startBlock(0),
+      m_endBlock(0),
+      m_startNode(0),
+      m_typingStyle(0) {}
 
 DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
                                                const Selection& selection,
@@ -1255,7 +1259,11 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
       m_mergeBlocksAfterDelete(mergeBlocksAfterDelete),
-      m_selectionToDelete(selection) {}
+      m_selectionToDelete(selection),
+      m_startBlock(0),
+      m_endBlock(0),
+      m_startNode(0),
+      m_typingStyle(0) {}
 
 void DeleteSelectionCommand::initializePositionData() {
   Position start = startPositionForDelete();
@@ -1327,7 +1335,45 @@ void DeleteSelectionCommand::saveTypingStyleState() {
   computedStyle->deref();
 }
 
-void DeleteSelectionCommand::performDelete() {
+bool DeleteSelectionCommand::canPerformSpecialCaseBRDelete() {
+  // Check for special-case where the selection contains only a BR on a line by
+  // itself after another BR.
+  bool upstreamStartIsBR = m_startNode->id() == ID_BR;
+  bool downstreamStartIsBR = m_downstreamStart.node()->id() == ID_BR;
+  bool isBROnLineByItself = upstreamStartIsBR && downstreamStartIsBR &&
+                            m_downstreamStart.node() == m_upstreamEnd.node();
+  if (isBROnLineByItself) {
+    removeNode(m_downstreamStart.node());
+    m_endingPosition = m_upstreamStart;
+    m_mergeBlocksAfterDelete = false;
+    return true;
+  }
+
+  // Check for special-case where the selection contains only a BR right after a
+  // block ended.
+  bool downstreamEndIsBR = m_downstreamEnd.node()->id() == ID_BR;
+  Position upstreamUpstreamStart = m_upstreamStart.upstream();
+  bool startIsBRAfterBlock =
+      downstreamEndIsBR &&
+      m_downstreamEnd.node()->enclosingBlockFlowElement() !=
+          upstreamUpstreamStart.node()->enclosingBlockFlowElement();
+  if (startIsBRAfterBlock) {
+    removeNode(m_downstreamEnd.node());
+    m_endingPosition = upstreamUpstreamStart;
+    m_mergeBlocksAfterDelete = false;
+    return true;
+  }
+
+  // Not a special-case delete per se, but we can detect that the merging of
+  // content between blocks
+  // should not be done.
+  if (upstreamStartIsBR && downstreamStartIsBR)
+    m_mergeBlocksAfterDelete = false;
+
+  return false;
+}
+
+void DeleteSelectionCommand::performGeneralDelete() {
   int startOffset = m_upstreamStart.offset();
   if (startOffset >= m_startNode->caretMaxOffset()) {
     if (m_startNode->isTextNode()) {
@@ -1340,6 +1386,7 @@ void DeleteSelectionCommand::performDelete() {
     // shift the start node to the next
     NodeImpl* old = m_startNode;
     m_startNode = old->traverseNextNode();
+    m_startNode->ref();
     old->deref();
     startOffset = 0;
   }
@@ -1453,9 +1500,17 @@ void DeleteSelectionCommand::fixupWhitespace() {
 // startNode that appear in document order before startNode are not moved.
 // This function is an important helper for deleting selections that cross block
 // boundaries.
-void DeleteSelectionCommand::moveNodesAfterNode(NodeImpl* startNode,
-                                                NodeImpl* dstNode) {
-  if (!startNode || !dstNode)
+void DeleteSelectionCommand::moveNodesAfterNode() {
+  if (!m_mergeBlocksAfterDelete)
+    return;
+
+  if (m_endBlock == m_startBlock)
+    return;
+
+  NodeImpl* startNode = m_downstreamEnd.node();
+  NodeImpl* dstNode = m_upstreamStart.node();
+
+  if (!startNode->inDocument() || !dstNode->inDocument())
     return;
 
   NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
@@ -1579,13 +1634,13 @@ void DeleteSelectionCommand::clearTransientState() {
     m_endBlock->deref();
     m_endBlock = 0;
   }
-  if (m_typingStyle) {
-    m_typingStyle->deref();
-    m_endBlock = 0;
-  }
   if (m_startNode) {
     m_startNode->deref();
     m_startNode = 0;
+  }
+  if (m_typingStyle) {
+    m_typingStyle->deref();
+    m_typingStyle = 0;
   }
 }
 
@@ -1616,14 +1671,12 @@ void DeleteSelectionCommand::doApply() {
   deleteInsignificantTextDownstream(m_trailingWhitespace);
 
   saveTypingStyleState();
-  performDelete();
+
+  if (!canPerformSpecialCaseBRDelete())
+    performGeneralDelete();
 
   // Do block merge if start and end of selection are in different blocks.
-  if (m_mergeBlocksAfterDelete && m_endBlock != m_startBlock &&
-      m_downstreamEnd.node()->inDocument()) {
-    LOG(Editing, "merging content from end block");
-    moveNodesAfterNode(m_downstreamEnd.node(), m_upstreamStart.node());
-  }
+  moveNodesAfterNode();
 
   calculateEndingPosition();
   fixupWhitespace();
