@@ -31,7 +31,7 @@
 #endif
 
 #include <KWQDef.h>
-#include <KWQCollection.h>
+#include <_qcollection.h>
 
 // class QPtrDict ==============================================================
 
@@ -51,6 +51,7 @@ class QPtrDict : public QCollection {
 
   // member functions --------------------------------------------------------
 
+  void clear();
   uint count() const;
   T* at(uint);
   T* take(void*);

@@ -31,7 +31,7 @@
 #endif
 
 #include <KWQDef.h>
-#include <KWQCollection.h>
+#include <_qcollection.h>
 
 typedef void* Item;
 
@@ -86,6 +86,7 @@ class QVector : public QGVector {
 
   // member functions --------------------------------------------------------
 
+  void clear();
   bool isEmpty() const;
   uint count() const;
   uint size() const;
