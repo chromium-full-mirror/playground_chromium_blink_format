@@ -5,9 +5,15 @@
 */
 #import <Cocoa/Cocoa.h>
 
+#import <WebKit/NSWebPageDataSource.h>
+
 @interface NSWebPageView : NSView {
  @private
   id _viewPrivate;
 }
+
+- initWithFrame:(NSRect)frame dataSource:(NSWebPageDataSource*)dataSource;
+
+- (NSWebPageDataSource*)dataSource;
 
 @end
