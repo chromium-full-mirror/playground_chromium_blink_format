@@ -1113,11 +1113,11 @@ void RenderBox::calcAbsoluteVertical() {
   //    printf("v: h=%d, t=%d, b=%d, mt=%d, mb=%d, m_y=%d\n",h,t,b,mt,mb,m_y);
 }
 
-int RenderBox::lowestPosition(bool checkScroll) const {
+int RenderBox::lowestPosition(bool includeOverflowInterior) const {
   return m_height + marginBottom();
 }
 
-int RenderBox::rightmostPosition(bool checkScroll) const {
+int RenderBox::rightmostPosition(bool includeOverflowInterior) const {
   return m_width;
 }
 
