@@ -27,14 +27,21 @@
 
 @protocol WebCoreImageRenderer;
 
-@interface WebCoreImageRendererFactory : NSObject {
-}
-
-+ (WebCoreImageRendererFactory*)sharedFactory;
+@protocol WebCoreImageRendererFactory
 
 - (id<WebCoreImageRenderer>)imageRenderer;
 - (id<WebCoreImageRenderer>)imageRendererWithBytes:(const void*)bytes
                                             length:(unsigned)length;
-- (id<WebCoreImageRenderer>)imageRendererWithSize:(NSSize)s;
+- (id<WebCoreImageRenderer>)imageRendererWithSize:(NSSize)size;
 
+@end
+
+@interface WebCoreImageRendererFactory : NSObject {
+}
+
++ (WebCoreImageRendererFactory*)sharedFactory;
+@end
+
+@interface WebCoreImageRendererFactory (
+    SubclassResponsibility)<WebCoreImageRendererFactory>
 @end
