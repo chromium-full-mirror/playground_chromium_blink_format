@@ -526,7 +526,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       // table-footer-group | table-row |
       // table-column-group | table-column | table-cell | table-caption | box |
       // inline-box | none | inherit
-      if ((id >= CSS_VAL_INLINE && id <= CSS_VAL_INLINE_BOX) ||
+      if ((id >= CSS_VAL_INLINE && id <= CSS_VAL__KHTML_INLINE_BOX) ||
           id == CSS_VAL_NONE)
         valid_primitive = true;
       break;
