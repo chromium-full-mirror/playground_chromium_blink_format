@@ -397,9 +397,6 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
         return String(UString(m_part->jsStatusBarText()));
       case Document:
         if (isSafeScript(exec)) {
-#if APPLE_CHANGES
-// FIXME: need to figure out and emulate point of this code.
-#else
           if (m_part->document().isNull()) {
             kdDebug(6070)
                 << "Document.write: adding <HTML><BODY> to create document"
@@ -408,7 +405,6 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
             m_part->write("<HTML><BODY>");
             m_part->end();
           }
-#endif
           Value val = getDOMNode(exec, m_part->document());
           return val;
         } else
@@ -912,6 +908,10 @@ void Window::scheduleClose() {
 #endif
 }
 
+static bool shouldLoadAsEmptyDocument(const KURL& url) {
+  return url.protocol().lower() == "about" || url.isEmpty();
+}
+
 bool Window::isSafeScript(ExecState* exec) const {
   if (m_part.isNull()) {  // part deleted ? can't grant access
     kdDebug(6070) << "Window::isSafeScript: accessing deleted part !" << endl;
@@ -930,6 +930,13 @@ bool Window::isSafeScript(ExecState* exec) const {
   if (m_part->document().isNull())
     return true;  // allow to access a window that was just created (e.g. with
                   // window.open("about:blank"))
+
+  if (activePart == m_part->opener() &&
+      shouldLoadAsEmptyDocument(
+          KURL(m_part->document().completeURL("").string()))) {
+    return true;  // allow access from the window opened this one if it
+                  // made an initially empty document.
+  }
 
   DOM::HTMLDocument thisDocument = m_part->htmlDocument();
   if (thisDocument.isNull()) {
@@ -1252,10 +1259,12 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           // (this Window=%p)",part,win,window);
           khtmlpart->setOpener(part);
           khtmlpart->setOpenedByJS(true);
-          if (khtmlpart->document().isNull()) {
 #if APPLE_CHANGES
-// FIXME: need to figure out and emulate point of this code.
+// We don't need this because accessing document from
+// JavaScript will do the work below on demand, and having
+// this in adds an extra entry to the back/forward list.
 #else
+          if (khtmlpart->document().isNull()) {
             khtmlpart->begin();
             khtmlpart->write("<HTML><BODY>");
             khtmlpart->end();
@@ -1265,8 +1274,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
               khtmlpart->docImpl()->setDomain(part->docImpl()->domain(), true);
               khtmlpart->docImpl()->setBaseURL(part->docImpl()->baseURL());
             }
-#endif
           }
+#endif
           uargs.serviceType = QString::null;
           if (uargs.frameName == "_blank")
             uargs.frameName = QString::null;
