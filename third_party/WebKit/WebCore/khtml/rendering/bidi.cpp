@@ -62,6 +62,7 @@ static uint sCurrMidpoint = 0;
 static bool betweenMidpoints = false;
 
 static bool isLineEmpty = true;
+static bool previousLineBrokeAtBR = true;
 static QChar::Direction dir;
 static bool adjustEmbeddding = false;
 static bool emptyRun = true;
@@ -1236,6 +1237,7 @@ static void buildCompactRuns(RenderObject* compactObj) {
 
     betweenMidpoints = false;
     isLineEmpty = true;
+    previousLineBrokeAtBR = true;
 
     end = compactBlock->findNextLineBreak(start);
     if (!isLineEmpty)
@@ -1322,6 +1324,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
     sCurrMidpoint = 0;
     sCompactFirstBidiRun = sCompactLastBidiRun = 0;
     sCompactBidiRunCount = 0;
+
+    previousLineBrokeAtBR = true;
 
     while (!end.atEnd()) {
       start = end;
@@ -1483,6 +1487,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
   RenderObject* last = o;
   int pos = start.pos;
 
+  bool prevLineBrokeCleanly = previousLineBrokeAtBR;
+  previousLineBrokeAtBR = false;
+
   while (o) {
 #ifdef DEBUG_LINEBREAKS
     kdDebug(6041) << "new object " << o << " width = " << w
@@ -1495,9 +1502,13 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
 
         // A <br> always breaks a line, so don't let the line be collapsed
         // away. Also, the space at the end of a line with a <br> does not
-        // get collapsed away. -dwh
-        isLineEmpty = false;
+        // get collapsed away.  It only does this if the previous line broke
+        // cleanly.  Otherwise the <br> has no effect on whether the line is
+        // empty or not.
+        if (prevLineBrokeCleanly)
+          isLineEmpty = false;
         trailingSpaceObject = 0;
+        previousLineBrokeAtBR = true;
 
         // check the clear status
         EClear clear = o->style()->clear();
