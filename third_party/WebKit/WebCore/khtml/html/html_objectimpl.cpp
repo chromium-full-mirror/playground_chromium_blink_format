@@ -329,8 +329,7 @@ void HTMLEmbedElementImpl::attach() {
   }
 }
 
-bool HTMLEmbedElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_SRC;
 }
 
@@ -483,8 +482,7 @@ void HTMLObjectElementImpl::recalcStyle(StyleChange ch) {
   HTMLElementImpl::recalcStyle(ch);
 }
 
-bool HTMLObjectElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLObjectElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return (attr->id() == ATTR_DATA ||
           (attr->id() == ATTR_USEMAP && attr->value().domString()[0] != '#'));
 }
@@ -515,8 +513,7 @@ void HTMLParamElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   }
 }
 
-bool HTMLParamElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLParamElementImpl::isURLAttribute(AttributeImpl* attr) const {
   if (attr->id() == ATTR_VALUE) {
     AttributeImpl* attr = attributes()->getAttributeItem(ATTR_NAME);
     if (attr) {

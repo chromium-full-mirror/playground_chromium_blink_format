@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class WebMainResourcePrivate;
 @class WebResourcePrivate;
 
 @interface WebResource : NSObject {
@@ -17,11 +18,13 @@
 - (id)initWithData:(NSData*)data
                  URL:(NSURL*)URL
             MIMEType:(NSString*)MIMEType
-    textEncodingName:(NSString*)textEncodingName;
+    textEncodingName:(NSString*)textEncodingName
+           frameName:(NSString*)frameName;
 
 - (NSData*)data;
 - (NSURL*)URL;
 - (NSString*)MIMEType;
 - (NSString*)textEncodingName;
+- (NSString*)frameName;
 
 @end

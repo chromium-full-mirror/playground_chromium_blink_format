@@ -63,7 +63,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 
   void createLinkDecl();
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
  protected:
   CSSStyleDeclarationImpl* m_linkDecl;
@@ -97,7 +97,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   DocumentImpl* contentDocument() const;
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
 #if APPLE_CHANGES
   QScrollView::ScrollBarMode scrollingMode() const { return scrolling; }
@@ -209,7 +209,7 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
                                               khtml::RenderStyle*);
   virtual void recalcStyle(StyleChange ch);
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
  protected:
   virtual void openURL();

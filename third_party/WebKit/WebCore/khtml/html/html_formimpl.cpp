@@ -1919,8 +1919,7 @@ bool HTMLInputElementImpl::isEditable() {
           (m_type == ISINDEX) || (m_type == FILE));
 }
 
-bool HTMLInputElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLInputElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return (attr->id() == ATTR_SRC);
 }
 

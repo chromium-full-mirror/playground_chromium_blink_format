@@ -110,6 +110,7 @@
   WebFrame* webFrame;
 
   NSMutableDictionary* subresources;
+  NSMutableDictionary* pendingSubframeArchives;
 }
 
 @end
@@ -124,8 +125,13 @@
 
 // Other private methods
 - (NSFileWrapper*)_fileWrapperForURL:(NSURL*)URL;
+
+- (WebArchive*)_archive;
 - (WebArchive*)_archiveWithMarkupString:(NSString*)markupString
-                  subresourceURLStrings:(NSArray*)subresourceURLStrings;
+                                  nodes:(NSArray*)nodes;
+- (void)_setPendingSubframeArchives:(NSArray*)subframeArchives;
+- (WebArchive*)_archiveForFrameName:(NSString*)frameName;
+
 - (void)_replaceSelectionWithMarkupString:(NSString*)markupString
                                   baseURL:(NSURL*)baseURL;
 - (BOOL)_replaceSelectionWithWebArchive:(WebArchive*)archive;

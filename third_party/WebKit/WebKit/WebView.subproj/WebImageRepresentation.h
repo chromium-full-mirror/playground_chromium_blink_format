@@ -6,15 +6,15 @@
 #import <Cocoa/Cocoa.h>
 
 @class WebArchive;
+@class WebDataSource;
 @class WebImageRenderer;
 
 @protocol WebDocumentRepresentation;
 
 @interface WebImageRepresentation : NSObject<WebDocumentRepresentation> {
+  WebDataSource* dataSource;
   WebImageRenderer* image;
-  NSString* filename;
-  NSData* data;
-  NSURL* URL;
+  BOOL doneLoading;
 }
 - (WebImageRenderer*)image;
 - (NSString*)filename;

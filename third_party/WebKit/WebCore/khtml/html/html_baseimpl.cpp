@@ -208,7 +208,7 @@ void HTMLBodyElementImpl::insertedIntoDocument() {
   }
 }
 
-bool HTMLBodyElementImpl::isSubresourceURLAttribute(AttributeImpl* attr) const {
+bool HTMLBodyElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_BACKGROUND;
 }
 
@@ -485,8 +485,7 @@ DocumentImpl* HTMLFrameElementImpl::contentDocument() const {
   return 0;
 }
 
-bool HTMLFrameElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLFrameElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_SRC;
 }
 
@@ -737,7 +736,6 @@ void HTMLIFrameElementImpl::openURL() {
   setChanged();
 }
 
-bool HTMLIFrameElementImpl::isSubresourceURLAttribute(
-    AttributeImpl* attr) const {
+bool HTMLIFrameElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_SRC;
 }

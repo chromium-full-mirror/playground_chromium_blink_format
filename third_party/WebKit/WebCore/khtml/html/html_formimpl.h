@@ -341,7 +341,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString altText() const;
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
 #if APPLE_CHANGES
   long maxResults() const { return m_maxResults; }

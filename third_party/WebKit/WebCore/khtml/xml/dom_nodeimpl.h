@@ -202,7 +202,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   //                 the lower 16 bit identify the local part of the
   //                 qualified element name.
   virtual Id id() const { return 0; };
-
+#if APPLE_CHANGES
+  Id identifier() const;
+#endif
   enum MouseEventType {
     MousePress,
     MouseRelease,
@@ -268,10 +270,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isInline() const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool start = false) const;
-  QString recursive_toHTMLWithOptions(
-      bool start = false,
-      const DOM::RangeImpl* range = NULL,
-      QStringList* subresourceURLs = NULL) const;
+  QString recursive_toHTMLWithOptions(bool start = false,
+                                      const DOM::RangeImpl* range = NULL,
+                                      QPtrList<NodeImpl>* nodes = NULL) const;
   void recursive_completeURLs(QString baseURL);
 
   virtual bool isContentEditable() const;

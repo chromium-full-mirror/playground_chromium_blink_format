@@ -871,7 +871,7 @@ DOMString RangeImpl::toString(int& exceptioncode) {
   return text;
 }
 
-DOMString RangeImpl::toHTMLWithOptions(QStringList* subresourceURLs) {
+DOMString RangeImpl::toHTMLWithOptions(QPtrList<NodeImpl>* nodes) {
   // Find the common containing block node of the start and end nodes.
   RenderBlock* startBlock = m_startContainer->renderer()->containingBlock();
   RenderBlock* endBlock = m_endContainer->renderer()->containingBlock();
@@ -894,8 +894,7 @@ DOMString RangeImpl::toHTMLWithOptions(QStringList* subresourceURLs) {
     startBlock = startBlock->containingBlock();
   }
 
-  return commonBlockNode->recursive_toHTMLWithOptions(true, this,
-                                                      subresourceURLs);
+  return commonBlockNode->recursive_toHTMLWithOptions(true, this, nodes);
 }
 
 DOMString RangeImpl::toHTML() {

@@ -261,10 +261,9 @@ static QString escapeHTML(const QString& in) {
   return s;
 }
 
-QString NodeImpl::recursive_toHTMLWithOptions(
-    bool start,
-    const DOM::RangeImpl* range,
-    QStringList* subresourceURLs) const {
+QString NodeImpl::recursive_toHTMLWithOptions(bool start,
+                                              const DOM::RangeImpl* range,
+                                              QPtrList<NodeImpl>* nodes) const {
   QString me = "";
 
   int exceptionCode;
@@ -308,6 +307,9 @@ QString NodeImpl::recursive_toHTMLWithOptions(
   }
 
   if (isNodeIncluded) {
+    if (nodes) {
+      nodes->append(this);
+    }
     // Copy who I am into the me string
     if (nodeType() == Node::TEXT_NODE) {
       DOMString str = nodeValue().copy();
@@ -328,7 +330,6 @@ QString NodeImpl::recursive_toHTMLWithOptions(
       me += QChar('<') + nodeName().string();
       if (nodeType() == Node::ELEMENT_NODE) {
         const ElementImpl* el = static_cast<const ElementImpl*>(this);
-
         NamedAttrMapImpl* attrs = el->attributes();
         unsigned long length = attrs->length();
         for (unsigned int i = 0; i < length; i++) {
@@ -336,13 +337,6 @@ QString NodeImpl::recursive_toHTMLWithOptions(
           DOMString value = attr->value();
           me += " " + getDocument()->attrName(attr->id()).string() + "=\"" +
                 value.string() + "\"";
-          if (subresourceURLs && el->isSubresourceURLAttribute(attr)) {
-            QString URL =
-                getDocument()->completeURL(khtml::parseURL(value).string());
-            if (!subresourceURLs->contains(URL)) {
-              subresourceURLs->append(URL);
-            }
-          }
         }
       }
       me += isHTMLElement() ? ">" : "/>";
@@ -352,7 +346,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(
   if (!isHTMLElement() || endTag[ident] != FORBIDDEN) {
     // print firstChild
     if ((n = firstChild())) {
-      me += n->recursive_toHTMLWithOptions(false, range, subresourceURLs);
+      me += n->recursive_toHTMLWithOptions(false, range, nodes);
     }
     // Print my ending tag
     if (isNodeIncluded && nodeType() != Node::TEXT_NODE) {
@@ -361,7 +355,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(
   }
   // print next sibling
   if ((n = nextSibling())) {
-    me += n->recursive_toHTMLWithOptions(false, range, subresourceURLs);
+    me += n->recursive_toHTMLWithOptions(false, range, nodes);
   }
 
   return me;
@@ -1410,6 +1404,12 @@ bool NodeImpl::inSameRootEditableBlock(NodeImpl* n) {
 bool NodeImpl::inSameContainingEditableBlock(NodeImpl* n) {
   return n ? containingEditableBlock() == n->containingEditableBlock() : false;
 }
+
+#if APPLE_CHANGES
+NodeImpl::Id NodeImpl::identifier() const {
+  return id();
+}
+#endif
 
 DOMPosition NodeImpl::positionForCoordinates(int x, int y) {
   if (renderer())

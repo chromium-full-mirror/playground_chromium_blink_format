@@ -92,7 +92,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
   QString url;
   QString pluginPage;
@@ -125,7 +125,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   DocumentImpl* contentDocument() const;
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
   QString serviceType;
   QString url;
@@ -150,7 +150,7 @@ class HTMLParamElementImpl : public HTMLElementImpl {
   QString name() const { return m_name.string(); }
   QString value() const { return m_value.string(); }
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
  protected:
   AtomicString m_name;
