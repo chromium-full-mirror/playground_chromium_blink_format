@@ -385,7 +385,7 @@ void RenderText::deleteSlaves() {
   // us resize() calls
   unsigned int len = m_lines.size();
   if (len) {
-    RenderArena* arena = element()->getDocument()->renderArena();
+    RenderArena* arena = renderArena();
     for (unsigned int i = 0; i < len; i++) {
       TextSlave* s = m_lines.at(i);
       if (s)
@@ -1076,7 +1076,7 @@ void RenderText::position(int x,
                        //<< metrics(false).ascent() << endl;
 #endif
 
-  TextSlave* s = new (element()->getDocument()->renderArena())
+  TextSlave* s = new (renderArena())
       TextSlave(x, y, from, len, baselinePosition(firstLine), width + spaceAdd,
                 reverse, spaceAdd, firstLine);
 
