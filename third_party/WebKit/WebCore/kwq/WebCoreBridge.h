@@ -27,7 +27,7 @@
 
 #ifdef __cplusplus
 
-class KHTMLPart;
+class KWQKHTMLPart;
 class KHTMLView;
 
 namespace khtml {
@@ -39,7 +39,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 #else
 
-@class KHTMLPart;
+@class KWQKHTMLPart;
 @class KHTMLView;
 @class KHTMLRenderPart;
 
@@ -86,7 +86,7 @@ enum FrameBorderStyle {
 };
 
 @interface WebCoreBridge : NSObject {
-  KHTMLPart* _part;
+  KWQKHTMLPart* _part;
   KHTMLRenderPart* _renderPart;
 }
 
@@ -96,7 +96,7 @@ enum FrameBorderStyle {
 - (void)setName:(NSString*)name;
 - (NSString*)name;
 
-- (KHTMLPart*)part;
+- (KWQKHTMLPart*)part;
 
 - (void)setParent:(WebCoreBridge*)parent;
 
