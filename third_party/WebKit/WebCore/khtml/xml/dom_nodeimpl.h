@@ -275,7 +275,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isMouseFocusable() const;
 
   virtual bool isInline() const;
-  QString startMarkup(const DOM::RangeImpl* range) const;
+  QString startMarkup(const RangeImpl* range) const;
   QString endMarkup(void) const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool onlyIncludeChildren = false,
@@ -318,7 +318,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
                           int overrideId = 0,
                           int overrideDetail = 0);
   bool dispatchUIEvent(int _id, int detail = 0);
-  bool dispatchSubtreeModifiedEvent();
+  bool dispatchSubtreeModifiedEvent(bool childrenChanged = true);
   bool dispatchKeyEvent(QKeyEvent* key);
 
   void handleLocalEvents(EventImpl* evt, bool useCapture);
@@ -488,7 +488,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
    * Notifies the node that it's list of children have changed (either by adding
    * or removing child nodes), or a child
    * node that is of the type CDATA_SECTION_NODE, TEXT_NODE or COMMENT_NODE has
-   * changed it's value.
+   * changed its value.
    */
   virtual void childrenChanged();
 
