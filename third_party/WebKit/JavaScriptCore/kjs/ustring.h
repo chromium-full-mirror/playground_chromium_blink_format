@@ -437,6 +437,7 @@ inline UString operator+(const UString& s1, const UString& s2) {
 }
 
 int compare(const UString&, const UString&);
+int hash(const UString&, int hashTableSize);
 
 };  // namespace
 
