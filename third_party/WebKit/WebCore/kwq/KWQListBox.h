@@ -61,7 +61,11 @@ class QListBox : public QScrollView {
   QListBox();
   ~QListBox();
 
-  // member functions --------------------------------------------------------
+// member functions --------------------------------------------------------
+
+#ifdef _KWQ_
+  int scrollBarWidth() const;
+#endif
 
   uint count() const;
   void clear();
@@ -87,12 +91,6 @@ class QListBox : public QScrollView {
   QListBox& operator=(const QListBox&);
 
   QListBoxItem* head;
-#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
-  NSMatrix* matrix;
-#else
-  void* matrix;
-#endif
-
 };  // class QListBox
     // ===========================================================
 
@@ -125,12 +123,6 @@ class QListBoxItem {
 
   // operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
-
- private:
   // no copying or assignment
   // note that these are "standard" (no pendantic stuff needed)
   QListBoxItem(const QListBoxItem&);
@@ -139,11 +131,11 @@ class QListBoxItem {
   QString text;
   QListBoxItem *previousItem, *nextItem;
   QListBox* box;
-#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
-  NSButtonCell* cell;
-#else
-  void* cell;
-#endif
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
 
 };  // class QListBoxItem
     // =======================================================

@@ -293,6 +293,7 @@ void RenderFormElement::performAction(QObject::Actions action) {
 }
 
 void RenderFormElement::slotClicked() {
+  // fprintf (stdout, "RenderFormElement::slotClicked():\n");
   if (isRenderButton()) {
     QMouseEvent e2(QEvent::MouseButtonRelease, m_mousePos, m_button, m_state);
 
@@ -368,6 +369,19 @@ void RenderCheckBox::layout() {
   RenderButton::layout();
 }
 
+#ifdef _KWQ_
+void RenderCheckBox::performAction(QObject::Actions action) {
+  QCheckBox* cb = static_cast<QCheckBox*>(m_widget);
+
+  // fprintf (stdout, "RenderCheckBox::performAction():  %d\n", action);
+  if (action == QObject::ACTION_CHECKBOX_CLICKED)
+    slotStateChanged(cb->isChecked() ? 2 : 0);
+}
+#endif
+
+// From the Qt documentation:
+// state is 2 if the button is on, 1 if it is in the "no change" state or 0 if
+// the button is off.
 void RenderCheckBox::slotStateChanged(int state) {
   m_element->setAttribute(ATTR_CHECKED, state == 2 ? "" : 0);
 }
@@ -390,6 +404,8 @@ void RenderRadioButton::setChecked(bool checked) {
 }
 
 void RenderRadioButton::slotClicked() {
+  // fprintf (stdout, "RenderRadioButton::slotClicked():\n");
+
   m_element->setAttribute(ATTR_CHECKED, "");
 
   // emit mouseClick event etc
@@ -969,8 +985,13 @@ void RenderSelect::layout() {
     if (size < 1)
       size = QMIN(static_cast<KListBox*>(m_widget)->count(), 10);
 
+#ifdef _KWQ_
+    width += w->scrollBarWidth();
+    height = size * height;
+#else
     width += 2 * w->frameWidth() + w->verticalScrollBar()->sizeHint().width();
     height = size * height + 2 * w->frameWidth();
+#endif
 
     setIntrinsicWidth(width);
     setIntrinsicHeight(height);
@@ -1049,6 +1070,17 @@ void RenderSelect::slotSelected(int index) {
   }
 
   static_cast<HTMLSelectElementImpl*>(m_element)->onChange();
+}
+
+void RenderSelect::performAction(QObject::Actions action) {
+  // fprintf (stdout, "RenderSelect::performAction():  %d\n", action);
+  if (action == QObject::ACTION_LISTBOX_CLICKED)
+    slotSelectionChanged();
+  else if (action == QObject::ACTION_COMBOBOX_CLICKED) {
+    ComboBoxWidget* combo = static_cast<ComboBoxWidget*>(m_widget);
+
+    slotSelected(combo->indexOfCurrentItem());
+  }
 }
 
 void RenderSelect::slotSelectionChanged() {
@@ -1244,6 +1276,15 @@ QString RenderTextArea::text() {
     txt = w->text();
 
   return txt;
+}
+
+void RenderTextArea::performAction(QObject::Actions action) {
+  // TextAreaWidget *edit = static_cast<TextAreaWidget*>(m_widget);
+
+  // fprintf (stdout, "RenderTextArea::performAction():  %d text value = %s\n",
+  // action, edit->text().latin1());
+  if (action == QObject::ACTION_TEXT_AREA_END_EDITING)
+    slotTextChanged();
 }
 
 void RenderTextArea::slotTextChanged() {
