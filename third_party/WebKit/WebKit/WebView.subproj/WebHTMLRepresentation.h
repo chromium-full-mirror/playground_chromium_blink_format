@@ -8,11 +8,13 @@
 #import <Foundation/Foundation.h>
 
 @class WebHTMLRepresentationPrivate;
+@class NSView;
 
 @protocol WebDocumentRepresentation;
 @protocol WebDocumentSourceRepresentation;
 @protocol WebDOMDocument;
 @protocol WebDOMNode;
+@protocol WebDOMElement;
 
 /*!
     @class WebHTMLRepresentation
@@ -53,5 +55,9 @@
                                 startOffset:(int)startOffset
                                          to:(id<WebDOMNode>)endNode
                                   endOffset:(int)endOffset;
+
+- (id<WebDOMElement>)elementForView:(NSView*)view;
+- (BOOL)elementDoesAutoComplete:(id<WebDOMElement>)element;
+- (BOOL)elementIsInLoginForm:(id<WebDOMElement>)element;
 
 @end

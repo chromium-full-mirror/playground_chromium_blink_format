@@ -47,3 +47,9 @@ bool isImage(DOM::NodeImpl* node) {
 
   return false;
 }
+
+// here because calling id() from ObjC runs into probs with id being a reserved
+// word
+NodeImpl::Id idFromNode(DOM::NodeImpl* node) {
+  return node->id();
+}
