@@ -256,6 +256,7 @@ typedef enum {
 - (NSAttributedString*)selectedAttributedString;
 - (NSString*)selectedString;
 
+- (void)setSelectionFromNone;
 - (void)setDisplaysWithFocusAttributes:(BOOL)flag;
 
 - (NSString*)stringForRange:(DOMRange*)range;

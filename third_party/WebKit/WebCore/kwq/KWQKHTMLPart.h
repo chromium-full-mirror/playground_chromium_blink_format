@@ -313,10 +313,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void setMediaType(const QString&);
 
+  void setSelectionFromNone();
   void setDisplaysWithFocusAttributes(bool flag);
-  bool displaysWithFocusAttributes() const {
-    return _displaysWithFocusAttributes;
-  }
+  bool displaysWithFocusAttributes() const;
 
   // Convenience, to avoid repeating the code to dig down to get this.
   QChar backslashAsCurrencySymbol() const;
@@ -428,7 +427,6 @@ class KWQKHTMLPart : public KHTMLPart {
 
   KWQWindowWidget* _windowWidget;
 
-  bool _displaysWithFocusAttributes;
   mutable bool _drawSelectionOnly;
   bool _haveUndoRedoOperations;
 
