@@ -139,11 +139,13 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
     m_parent = 0;
     hasInlinedDecl = false;
     strictParsing = true;
+    sawDescendantRule = false;
   }
   StyleBaseImpl(StyleBaseImpl* p) {
     m_parent = p;
     hasInlinedDecl = false;
     strictParsing = (m_parent ? m_parent->useStrictParsing() : true);
+    sawDescendantRule = false;
   }
 
   virtual ~StyleBaseImpl() {}
@@ -266,6 +268,7 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
  protected:
   bool hasInlinedDecl : 1;
   bool strictParsing : 1;
+  bool sawDescendantRule : 1;
 };
 
 // a style class which has a list of children (StyleSheets for example)

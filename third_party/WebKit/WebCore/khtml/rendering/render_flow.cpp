@@ -71,11 +71,6 @@ void RenderFlow::setStyle(RenderStyle* _style) {
   if (isPositioned())
     setInline(false);
 
-  if (!isTableCell() &&
-      (isPositioned() || isRelPositioned() || style()->overflow() == OHIDDEN) &&
-      !m_layer)
-    m_layer = new (renderArena()) RenderLayer(this);
-
   if (isFloating() || style()->display() != INLINE)
     setInline(false);
 
@@ -531,12 +526,6 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
         (child->isReplaced() && (child->style()->width().isPercent() ||
                                  child->style()->height().isPercent())))
       child->setLayouted(false);
-    if (child->style()->flowAroundFloats() && !child->isFloating() &&
-        style()->width().isFixed() && child->minWidth() > lineWidth(m_height)) {
-      m_height = QMAX(m_height, floatBottom());
-      shouldCollapseChild = false;
-      clearOccurred = true;
-    }
 
     //         kdDebug( 6040 ) << "   " << child->renderName() << " loop " <<
     //         child << ", " << child->isInline() << ", " << child->layouted()
@@ -574,6 +563,17 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
       // m_height <<" prevMargin="<<prevMargin << endl;
       child = child->nextSibling();
       continue;
+    }
+
+    // Note this occurs after the test for positioning and floating above, since
+    // we want to ensure that we don't artificially increase our height because
+    // of
+    // a positioned or floating child.
+    if (child->style()->flowAroundFloats() && !child->isFloating() &&
+        style()->width().isFixed() && child->minWidth() > lineWidth(m_height)) {
+      m_height = QMAX(m_height, floatBottom());
+      shouldCollapseChild = false;
+      clearOccurred = true;
     }
 
     child->calcVerticalMargins();

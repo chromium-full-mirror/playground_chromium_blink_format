@@ -106,6 +106,11 @@ class RenderFlow : public RenderBox {
   void
   paintFloats(QPainter* p, int _x, int _y, int _w, int _h, int _tx, int _ty);
 
+  virtual bool requiresLayer() {
+    return !isTableCell() && (isPositioned() || isRelPositioned() ||
+                              style()->overflow() == OHIDDEN);
+  }
+
   virtual void layout();
 
   virtual void close();

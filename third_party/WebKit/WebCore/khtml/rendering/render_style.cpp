@@ -283,8 +283,6 @@ bool RenderStyle::inheritedNotEqual(RenderStyle* other) const {
   worst case result causing a relayout of the containing block.
 */
 RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
-  Diff d = Equal;
-
   // we anyway assume they are the same
   // 	EDisplay _display : 5;
 
@@ -304,21 +302,19 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   if (*box.get() != *other->box.get() ||
       *visual.get() != *other->visual.get() ||
-      *surround.get() != *other->surround.get())
-    d = CbLayout;
-
-  if (d == CbLayout)
-    return d;
-
-  if (!(inherited->indent == other->inherited->indent) ||
+      *surround.get() != *other->surround.get() ||
+      !(inherited->indent == other->inherited->indent) ||
       !(inherited->line_height == other->inherited->line_height) ||
       !(inherited->style_image == other->inherited->style_image) ||
       !(inherited->cursor_image == other->inherited->cursor_image) ||
       !(inherited->font == other->inherited->font) ||
-      !(inherited->border_spacing == other->inherited->border_spacing))
-    d = CbLayout;
-  if (d == CbLayout)
-    return d;
+      !(inherited->border_spacing == other->inherited->border_spacing) ||
+      !(inherited_flags._visuallyOrdered ==
+        other->inherited_flags._visuallyOrdered) ||
+      !(inherited_flags._htmlHacks == other->inherited_flags._htmlHacks) ||
+      !(noninherited_flags._position == other->noninherited_flags._position) ||
+      !(noninherited_flags._floating == other->noninherited_flags._floating))
+    return CbLayout;
 
   // changes causing Layout changes:
 
@@ -340,12 +336,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         !(inherited_flags._caption_side ==
           other->inherited_flags._caption_side) ||
         !(noninherited_flags._table_layout ==
-          other->noninherited_flags._table_layout) ||
-        !(noninherited_flags._position ==
-          other->noninherited_flags._position) ||
-        !(noninherited_flags._floating == other->noninherited_flags._floating))
-
-      d = CbLayout;
+          other->noninherited_flags._table_layout))
+      return CbLayout;
   }
 
   // only for lists:
@@ -356,11 +348,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
           other->inherited_flags._list_style_type) ||
         !(inherited_flags._list_style_position ==
           other->inherited_flags._list_style_position))
-      d = Layout;
+      return Layout;
   }
-
-  if (d == Layout)
-    return d;
 
   // ### These could be better optimised
   // 	ETextAlign _text_align : 3;
@@ -377,23 +366,15 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(inherited_flags._font_variant ==
         other->inherited_flags._font_variant) ||
       !(noninherited_flags._clear == other->noninherited_flags._clear))
-    d = Layout;
+    return Layout;
 
   // only for inline:
   //     EVerticalAlign _vertical_align : 4;
 
-  if (!(noninherited_flags._display == INLINE)) {
-    if (!(noninherited_flags._vertical_align ==
-          other->noninherited_flags._vertical_align))
-      d = Layout;
-  }
-
-  if (d == Layout)
-    return d;
-
-  if (inherited->color != other->inherited->color ||
-      inherited->decoration_color != other->inherited->decoration_color)
-    d = Visible;
+  if (!(noninherited_flags._display == INLINE) &&
+      !(noninherited_flags._vertical_align ==
+        other->noninherited_flags._vertical_align))
+    return Layout;
 
   // Visible:
   // 	EVisibility _visibility : 2;
@@ -402,7 +383,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   //     bool _bg_attachment : 1;
   // 	int _text_decoration : 4;
   //     DataRef<StyleBackgroundData> background;
-  if (!(inherited_flags._visibility == other->inherited_flags._visibility) ||
+  if (inherited->color != other->inherited->color ||
+      inherited->decoration_color != other->inherited->decoration_color ||
+      !(inherited_flags._visibility == other->inherited_flags._visibility) ||
       !(noninherited_flags._overflow == other->noninherited_flags._overflow) ||
       !(noninherited_flags._bg_repeat ==
         other->noninherited_flags._bg_repeat) ||
@@ -411,11 +394,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(inherited_flags._text_decoration ==
         other->inherited_flags._text_decoration) ||
       *background.get() != *other->background.get())
-    d = Visible;
+    return Visible;
 
-  // Position:
-
-  return d;
+  return Equal;
 }
 
 RenderStyle* RenderStyle::_default = 0;

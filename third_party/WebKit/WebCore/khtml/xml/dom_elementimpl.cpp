@@ -326,23 +326,15 @@ void ElementImpl::recalcStyle(StyleChange change) {
   if (change >= Inherit || changed()) {
     EDisplay oldDisplay = _style ? _style->display() : NONE;
 
-    int dynamicState = StyleSelector::None;
-    if (m_render && m_render->mouseInside())
-      dynamicState |= StyleSelector::Hover;
-    if (m_focused)
-      dynamicState |= StyleSelector::Focus;
-    if (m_active)
-      dynamicState |= StyleSelector::Active;
-
     RenderStyle* newStyle =
-        getDocument()->styleSelector()->styleForElement(this, dynamicState);
+        getDocument()->styleSelector()->styleForElement(this);
     newStyle->ref();
     StyleChange ch = diff(_style, newStyle);
     if (ch != NoChange) {
       if (oldDisplay != newStyle->display()) {
         if (attached())
           detach();
-        // ### uuhm, suboptimal. style gets calculated again
+        // ### Suboptimal. Style gets calculated again.
         attach();
         // attach recalulates the style for all children. No need to do it
         // twice.
@@ -359,8 +351,12 @@ void ElementImpl::recalcStyle(StyleChange change) {
     }
     newStyle->deref();
 
-    if (change != Force)
-      change = ch;
+    if (change != Force) {
+      if (getDocument()->usesDescendantRules())
+        change = Force;
+      else
+        change = ch;
+    }
   }
 
   NodeImpl* n;

@@ -215,6 +215,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   void recalcStyleSelector();
 
+  bool usesDescendantRules() { return m_usesDescendantRules; }
+  void setUsesDescendantRules(bool b) { m_usesDescendantRules = b; }
+
   QString nextState();
 
   // Query all registered elements for their state
@@ -537,6 +540,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_docChanged;
   bool m_styleSelectorDirty;
   bool m_inStyleRecalc;
+  bool m_usesDescendantRules;
 
   DOMString m_title;
 

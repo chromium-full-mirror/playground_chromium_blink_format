@@ -304,7 +304,7 @@ static inline void bubbleSort(CSSOrderedProperty** b, CSSOrderedProperty** e) {
   }
 }
 
-RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
+RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e) {
   if (!e->getDocument()->haveStylesheetsLoaded()) {
     if (!styleNotYetAvailable) {
       styleNotYetAvailable = new RenderStyle();
@@ -315,8 +315,6 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   }
 
   // set some variables we will need
-  dynamicState = state;
-  usedDynamicStates = StyleSelector::None;
   ::encodedurl = &encodedurl;
   pseudoState = PseudoUnknown;
 
@@ -329,6 +327,12 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   part = view->part();
   settings = part->settings();
   paintDeviceMetrics = element->getDocument()->paintDeviceMetrics();
+
+  style = new RenderStyle();
+  if (parentStyle)
+    style->inheritFrom(parentStyle);
+  else
+    parentStyle = style;
 
   unsigned int numPropsToApply = 0;
   unsigned int numPseudoProps = 0;
@@ -392,12 +396,6 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
 
   bubbleSort(propsToApply, propsToApply + numPropsToApply - 1);
   bubbleSort(pseudoProps, pseudoProps + numPseudoProps - 1);
-
-  RenderStyle* style = new RenderStyle();
-  if (parentStyle)
-    style->inheritFrom(parentStyle);
-  else
-    parentStyle = style;
 
   // This member will be set to true if a rule specifies a font size
   // explicitly.  If they do this, then we don't need to check for a shift
@@ -469,11 +467,6 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
     }
   }
 
-  if (usedDynamicStates & StyleSelector::Hover)
-    style->setHasHover();
-  if (usedDynamicStates & StyleSelector::Active)
-    style->setHasActive();
-
   return style;
 }
 
@@ -538,7 +531,7 @@ static bool subject;
 
 void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
   dynamicPseudo = RenderStyle::NOPSEUDO;
-  selectorDynamicState = StyleSelector::None;
+
   NodeImpl* n = e;
 
   selectorCache[selIndex].state = Invalid;
@@ -550,6 +543,7 @@ void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
   // hack. We can't allow :hover, as it would trigger a complete relayout with
   // every mouse event.
   bool single = false;
+  bool affectedByHover = style->affectedByHoverRules();
   if (sel->tag == -1)
     single = true;
 
@@ -614,12 +608,13 @@ void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
     }
     relation = sel->relation;
   }
+
   // disallow *:hover
-  if (single && selectorDynamicState & StyleSelector::Hover)
+  if (single && !affectedByHover && style->affectedByHoverRules()) {
+    style->setAffectedByHoverRules(false);
     return;
-  usedDynamicStates |= selectorDynamicState;
-  if ((selectorDynamicState & dynamicState) != selectorDynamicState)
-    return;
+  }
+
   if (dynamicPseudo != RenderStyle::NOPSEUDO) {
     selectorCache[selIndex].state = AppliesPseudo;
     selectors[selIndex]->pseudoId = dynamicPseudo;
@@ -830,20 +825,30 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
           return true;
         break;
       case CSSSelector::PseudoHover:
-        selectorDynamicState |= StyleSelector::Hover;
-        // dynamic pseudos have to be sorted out in checkSelector, so we if it
-        // could in some state apply
-        // to the element.
-        return true;
+        if (element == e)
+          style->setAffectedByHoverRules(true);
+        if (e->renderer()) {
+          if (element != e)
+            e->renderer()->style()->setAffectedByHoverRules(true);
+          if (e->renderer()->mouseInside())
+            return true;
+        }
+        break;
       case CSSSelector::PseudoFocus:
-        selectorDynamicState |= StyleSelector::Focus;
-        return true;
+        if (e && e->focused()) {
+          return true;
+        }
+        break;
       case CSSSelector::PseudoActive:
         if (pseudoState == PseudoUnknown)
           checkPseudoState(e);
         if (pseudoState != PseudoNone) {
-          selectorDynamicState |= StyleSelector::Active;
-          return true;
+          if (element == e)
+            style->setAffectedByActiveRules(true);
+          else if (e->renderer())
+            e->renderer()->style()->setAffectedByActiveRules(true);
+          if (e->active())
+            return true;
         }
         break;
       case CSSSelector::PseudoBefore:
