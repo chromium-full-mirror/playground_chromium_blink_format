@@ -48,6 +48,9 @@ class QObject {
   bool inherits(const char*) const;
   static bool connect(const QObject*, const char*, const QObject*, const char*);
   bool connect(const QObject*, const char*, const char*) const;
+  int startTimer(int);
+  void killTimer(int);
+  void killTimers();
 };
 
 #endif
