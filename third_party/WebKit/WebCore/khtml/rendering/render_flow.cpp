@@ -393,6 +393,10 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
   // These flags track the previous maximal positive and negative margins.
   int prevPosMargin = maxTopMargin(true);
   int prevNegMargin = maxTopMargin(false);
+  int clearOccurred = false;
+
+  int oldPosMargin = prevPosMargin;
+  int oldNegMargin = prevNegMargin;
 
   // kdDebug() << "RenderFlow::layoutBlockChildren " << prevMargin << endl;
 
@@ -413,6 +417,7 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
         style()->width().isFixed() && child->minWidth() > lineWidth(m_height)) {
       m_height = QMAX(m_height, floatBottom());
       shouldCollapseChild = false;
+      clearOccurred = true;
     }
 
     //         kdDebug( 6040 ) << "   " << child->renderName() << " loop " <<
@@ -443,9 +448,6 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
 
     child->calcVerticalMargins();
 
-    if (checkClear(child))
-      shouldCollapseChild = false;  // ### should only be 0
-
     // kdDebug(0) << "margin = " << margin << " yPos = " << m_height << endl;
 
     if (prevFlow) {
@@ -466,7 +468,7 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
       int posTop = child->maxTopMargin(true);
       int negTop = child->maxTopMargin(false);
 
-      if (canCollapseWithChildren && topMarginContributor) {
+      if (canCollapseWithChildren && topMarginContributor && !clearOccurred) {
         // This child is collapsing with the top of the
         // block.  If it has larger margin values, then we need to update
         // our own maximal values.
@@ -504,12 +506,35 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
           m_height += collapsedMargin;
           ypos = m_height;
         }
-        topMarginContributor = false;
         prevPosMargin = child->maxBottomMargin(true);
         prevNegMargin = child->maxBottomMargin(false);
       }
       child->setPos(child->xPos(), ypos);
     }
+
+    // Now check for clear.
+    if (checkClear(child)) {
+      // The child needs to be lowered.  Move the child so that it just clears
+      // the float.
+      child->setPos(child->xPos(), m_height);
+      clearOccurred = true;
+
+      if (topMarginContributor) {
+        // We can no longer collapse with the top of the block since a clear
+        // occurred.  The empty blocks collapse into the cleared block.
+        // XXX This isn't quite correct.  Need clarification for what to do
+        // if the height the cleared block is offset by is smaller than the
+        // margins involved. -dwh
+        m_maxTopPosMargin = oldPosMargin;
+        m_maxTopNegMargin = oldNegMargin;
+      }
+    }
+
+    // Reset the top margin contributor to false if we encountered
+    // a non-empty child.  This has to be done after checking for clear,
+    // so that margins can be reset if a clear occurred.
+    if (topMarginContributor && !child->isSelfCollapsingBlock())
+      topMarginContributor = false;
 
     int chPos = xPos + child->marginLeft();
 
@@ -625,9 +650,12 @@ bool RenderFlow::checkClear(RenderObject* child) {
       bottom = floatBottom();
       break;
   }
-  if (m_height < bottom)
+
+  if (m_height < bottom) {
     m_height = bottom;
-  return true;
+    return true;
+  }
+  return false;
 }
 
 void RenderFlow::insertSpecialObject(RenderObject* o) {
@@ -1517,6 +1545,7 @@ void RenderFlow::addChild(RenderObject* newChild, RenderObject* beforeChild) {
         static_cast<RenderFlow*>(anonBox)->makeChildrenNonInline(beforeChild);
         madeBoxesNonInline = true;
       }
+
       beforeChild = beforeChild->parent();
 
       RenderObject* child;
@@ -1553,6 +1582,7 @@ void RenderFlow::addChild(RenderObject* newChild, RenderObject* beforeChild) {
       makeChildrenNonInline(beforeChild);
       madeBoxesNonInline = true;
     }
+
     if (beforeChild) {
       if (beforeChild->parent() != this) {
         beforeChild = beforeChild->parent();
