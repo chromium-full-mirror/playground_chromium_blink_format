@@ -2639,15 +2639,13 @@ int RenderBlock::getClearDelta(RenderObject* child) {
   // FIXME: Note that the remaining space checks aren't quite accurate, since
   // you should be able to clear only some floats (the minimum # needed
   // to fit) and not all (we should be using nearestFloatBottom and looping).
+  // Do not allow tables to wrap in quirks or even in almost strict mode
+  // (ebay on the PLT, finance.yahoo.com in the real world, versiontracker.com
+  // forces even almost strict mode not to work)
   int result = clearSet ? kMax(0, bottom - child->yPos()) : 0;
   if (!result && child->avoidsFloats() && child->style()->width().isFixed() &&
       child->minWidth() > lineWidth(child->yPos()) &&
-      child->minWidth() <= contentWidth() &&
-      (!style()->htmlHacks() || !child->isTable()))  // Do not allow tables to
-                                                     // wrap in quirks mode
-                                                     // (ebay on the PLT,
-                                                     // finance.yahoo.com in the
-                                                     // real world)
+      child->minWidth() <= contentWidth() && document()->inStrictMode())
     result = kMax(0, floatBottom() - child->yPos());
   return result;
 }
