@@ -58,7 +58,12 @@ class RenderFrameSet : public RenderBox {
   bool canResize(int _x, int _y);
   void setResizing(bool e);
 
-  bool nodeAtPoint(NodeInfo& info, int x, int y, int tx, int ty);
+  bool nodeAtPoint(NodeInfo& info,
+                   int x,
+                   int y,
+                   int tx,
+                   int ty,
+                   bool inside = false);
 
   DOM::HTMLFrameSetElementImpl* element() const {
     return static_cast<DOM::HTMLFrameSetElementImpl*>(RenderObject::element());

@@ -30,6 +30,8 @@
 namespace khtml {
 class CachedObject;
 
+enum WidthType { Width, MinWidth, MaxWidth };
+
 class RenderBox : public RenderContainer {
   // combines ElemImpl & PosElImpl (all rendering objects are positioned)
   // should contain all border and padding handling
@@ -118,6 +120,8 @@ class RenderBox : public RenderContainer {
 
   virtual void calcWidth();
   virtual void calcHeight();
+
+  int calcWidthUsing(WidthType widthType, int cw, LengthType& lengthType);
 
   virtual short calcReplacedWidth(bool* ieHack = 0) const;
   virtual int calcReplacedHeight() const;

@@ -389,7 +389,12 @@ class RenderObject : public CachedObjectClient {
                                                   int _ty,
                                                   DOM::NodeImpl*&,
                                                   int& offset);
-  virtual bool nodeAtPoint(NodeInfo& info, int x, int y, int tx, int ty);
+  virtual bool nodeAtPoint(NodeInfo& info,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
+                           bool inside = false);
 
   // set the style of the object.
   virtual void setStyle(RenderStyle* style);

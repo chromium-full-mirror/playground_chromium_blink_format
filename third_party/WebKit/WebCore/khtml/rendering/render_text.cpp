@@ -423,7 +423,8 @@ bool RenderText::nodeAtPoint(NodeInfo& /*info*/,
                              int _x,
                              int _y,
                              int _tx,
-                             int _ty) {
+                             int _ty,
+                             bool inside) {
   assert(parent());
 
   _tx -= paddingLeft() + borderLeft();
@@ -432,7 +433,6 @@ bool RenderText::nodeAtPoint(NodeInfo& /*info*/,
   int height = m_lineHeight + borderTop() + paddingTop() + borderBottom() +
                paddingBottom();
 
-  bool inside = false;
   TextSlave* s = m_lines.count() ? m_lines[0] : 0;
   int si = 0;
   while (s) {

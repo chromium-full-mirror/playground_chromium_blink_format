@@ -1028,15 +1028,15 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
                                int _x,
                                int _y,
                                int _tx,
-                               int _ty) {
+                               int _ty,
+                               bool inside) {
   int tx = _tx + xPos();
   int ty = _ty + yPos();
 
-  bool inside = (style()->visibility() != HIDDEN &&
-                 ((_y >= ty) && (_y < ty + height()) && (_x >= tx) &&
-                  (_x < tx + width()))) ||
-                isBody() || isHtml();
-  bool inner = !info.innerNode();
+  inside |= (style()->visibility() != HIDDEN &&
+             ((_y >= ty) && (_y < ty + height()) && (_x >= tx) &&
+              (_x < tx + width()))) ||
+            isBody() || isHtml();
 
   // ### table should have its own, more performant method
   if (overhangingContents() || isInline() || isRoot() || isTableRow() ||
@@ -1072,16 +1072,17 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   if (!info.readonly()) {
     // lets see if we need a new style
     bool oldinside = mouseInside();
-    setMouseInside(inside && inner);
-    if (element()) {
-      bool oldactive = element()->active();
-      if (oldactive !=
-          (inside && info.active() && element() == info.innerNode()))
-        element()->setActive(inside && info.active() &&
-                             element() == info.innerNode());
-      if (((oldinside != mouseInside()) && style()->hasHover()) ||
-          ((oldactive != element()->active()) && style()->hasActive()))
-        element()->setChanged();
+    setMouseInside(inside);
+    DOM::NodeImpl* elt =
+        (!isInline() && continuation()) ? continuation()->element() : element();
+    RenderObject* obj = (!isInline() && continuation()) ? continuation() : this;
+    if (elt) {
+      bool oldactive = elt->active();
+      if (oldactive != (inside && info.active() && elt == info.innerNode()))
+        elt->setActive(inside && info.active() && elt == info.innerNode());
+      if (((oldinside != mouseInside()) && obj->style()->hasHover()) ||
+          ((oldactive != elt->active()) && obj->style()->hasActive()))
+        elt->setChanged();
     }
   }
 

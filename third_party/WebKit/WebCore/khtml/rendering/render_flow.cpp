@@ -682,6 +682,7 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
           bottomChildQuirk = child->isBottomMarginQuirk();
         }
       }
+
       child->setPos(child->xPos(), ypos);
       if (ypos != yPosEstimate) {
         // Our guess was wrong. Make the child lay itself out again.
@@ -774,8 +775,6 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
     child = child->nextSibling();
   }
 
-  // XXX This check is unconvincing. Needs to be a reliable way to test for auto
-  // height. -dwh
   bool autoHeight =
       style()->height().isVariable() && style()->height().value == 0;
 
@@ -2334,8 +2333,12 @@ void RenderFlow::removeChild(RenderObject* oldChild) {
   }
 }
 
-bool RenderFlow::nodeAtPoint(NodeInfo& info, int _x, int _y, int _tx, int _ty) {
-  bool inBox = false;
+bool RenderFlow::nodeAtPoint(NodeInfo& info,
+                             int _x,
+                             int _y,
+                             int _tx,
+                             int _ty,
+                             bool inBox) {
   if (specialObjects) {
     int stx = _tx + xPos();
     int sty = _ty + yPos();
@@ -2353,7 +2356,7 @@ bool RenderFlow::nodeAtPoint(NodeInfo& info, int _x, int _y, int _tx, int _ty) {
             sty + o->startY + o->node->marginTop() - o->node->yPos());
   }
 
-  inBox |= RenderBox::nodeAtPoint(info, _x, _y, _tx, _ty);
+  inBox |= RenderBox::nodeAtPoint(info, _x, _y, _tx, _ty, inBox);
   return inBox;
 }
 

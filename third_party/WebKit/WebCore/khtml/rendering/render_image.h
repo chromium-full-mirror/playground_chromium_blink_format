@@ -70,7 +70,12 @@ class RenderImage : public RenderReplaced {
 
   virtual void notifyFinished(CachedObject* finishedObj);
 
-  virtual bool nodeAtPoint(NodeInfo& info, int x, int y, int tx, int ty);
+  virtual bool nodeAtPoint(NodeInfo& info,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
+                           bool inside = false);
 
  private:
   /*
