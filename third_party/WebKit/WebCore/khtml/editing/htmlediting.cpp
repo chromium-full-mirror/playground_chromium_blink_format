@@ -999,7 +999,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
       ASSERT(paragraphStart.node()->isAncestor(
           paragraphEnd.node()->enclosingBlockFlowElement()));
       return;
-    } else if (visibleParagraphEnd.next().isNull()) {
+    } else if (isEndOfDocument(visibleParagraphEnd)) {
       // At the end of the document. We can bail here as well.
       return;
     }
@@ -1363,7 +1363,7 @@ void ApplyStyleCommand::applyInlineStyle(
   // selection
   // and prevent us from adding redundant ones, as described in:
   // <rdar://problem/3724344> Bolding and unbolding creates extraneous tags
-  removeInlineStyle(style, start.upstream(), end);
+  removeInlineStyle(style, start.upstream(StayInBlock), end);
 
   if (splitStart || splitEnd) {
     cleanUpEmptyStyleSpans(start, end);
@@ -1700,7 +1700,8 @@ void ApplyStyleCommand::removeInlineStyle(CSSMutableStyleDeclarationImpl* style,
       style->getPropertyCSSValue(CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT);
 
   if (textDecorationSpecialProperty) {
-    pushDownTextDecorationStyleAtBoundaries(start.downstream(), end.upstream());
+    pushDownTextDecorationStyleAtBoundaries(start.downstream(StayInBlock),
+                                            end.upstream(StayInBlock));
     style = style->copy();
     style->setProperty(
         CSS_PROP_TEXT_DECORATION, textDecorationSpecialProperty->cssText(),
@@ -2428,7 +2429,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     //
     NodeImpl* old = m_startNode;
     VisiblePosition visibleEnd = VisiblePosition(m_downstreamEnd);
-    if (visibleEnd.next().isNull() &&
+    if (isEndOfDocument(visibleEnd) &&
         !isFirstVisiblePositionOnLine(visibleEnd)) {
       m_startNode = m_startBlock->firstChild();
     } else {
@@ -4395,8 +4396,12 @@ void ReplaceSelectionCommand::doApply() {
     } else if (!mergeEnd && !insertionNodeIsBody && isProbablyBlock(refNode) &&
                isEndOfParagraph(visiblePos))
       insertNodeAfter(refNode, insertionPos.node());
-    else
+    else {
       insertNodeAt(refNode, insertionPos.node(), insertionPos.offset());
+      if (insertionPos.node() == endPos.node() &&
+          insertionPos.offset() <= endPos.offset())
+        endPos = Position(endPos.node(), endPos.offset() + 1);
+    }
     if (!firstNodeInserted)
       firstNodeInserted = refNode;
     if (!lastNodeInsertedInMergeEnd)
@@ -4410,8 +4415,15 @@ void ReplaceSelectionCommand::doApply() {
       node = next;
     }
     document()->updateLayout();
-    insertionPos =
-        Position(lastNodeInserted, lastNodeInserted->caretMaxOffset());
+    if (lastNodeInserted->isTextNode())
+      insertionPos =
+          Position(lastNodeInserted, lastNodeInserted->caretMaxOffset());
+    else if (lastNodeInserted->childNodeCount() > 0)
+      insertionPos =
+          Position(lastNodeInserted, lastNodeInserted->childNodeCount());
+    else
+      insertionPos = Position(lastNodeInserted->parentNode(),
+                              lastNodeInserted->nodeIndex() + 1);
   }
 
   // Handle "smart replace" whitespace
@@ -4447,17 +4459,16 @@ void ReplaceSelectionCommand::doApply() {
 
   // Handle trailing newline
   if (m_fragment.hasInterchangeNewline()) {
-    if ((startBlock == endBlock) &&
-        (VisiblePosition(lastNodeInserted, lastNodeInserted->caretMaxOffset())
-             .next()
-             .isNull())) {
+    if (startBlock == endBlock &&
+        isEndOfDocument(VisiblePosition(insertionPos))) {
       setEndingSelection(insertionPos);
       insertParagraphSeparator();
       endPos = endingSelection().end().downstream();
     }
     completeHTMLReplacement(startPos, endPos);
   } else {
-    if (lastNodeInserted->id() == ID_BR && !document()->inStrictMode()) {
+    if (lastNodeInserted && lastNodeInserted->id() == ID_BR &&
+        !document()->inStrictMode()) {
       document()->updateLayout();
       VisiblePosition pos(Position(lastNodeInserted, 0));
       if (isLastVisiblePositionInBlock(pos)) {
@@ -4926,7 +4937,7 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
   } else {
     Selection selection = part->selection();
     if (selection.isCaret() &&
-        VisiblePosition(selection.start()).next().isNull()) {
+        isEndOfDocument(VisiblePosition(selection.start()))) {
       // do nothing for a delete key at the start of an editable element.
     } else {
       TypingCommand* typingCommand =
