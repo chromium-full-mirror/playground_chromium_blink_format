@@ -119,7 +119,7 @@ class Window : public ObjectImp {
   // Set the current "event" object
   void setCurrentEvent(DOM::Event* evt);
 
-  QPtrList<JSEventListener> jsEventListeners;
+  QPtrDict<JSEventListener> jsEventListeners;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
