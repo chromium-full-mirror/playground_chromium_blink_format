@@ -102,6 +102,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
  protected:
   bool isURLAllowed(const DOMString&) const;
+  virtual void openURL();
 
   DOMString url;
   DOMString name;
@@ -201,9 +202,11 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
   virtual void recalcStyle(StyleChange ch);
 
  protected:
+  virtual void openURL();
+
   bool needWidgetUpdate;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

@@ -256,27 +256,29 @@ void HTMLFrameElementImpl::updateForNewURL() {
     return;
   }
 
-  DOMString relativeURL = url;
-  if (relativeURL.isEmpty()) {
-    relativeURL = "about:blank";
-  }
-
-  if (!isURLAllowed(relativeURL)) {
+  if (!isURLAllowed(url)) {
     return;
   }
 
+  openURL();
+}
+
+void HTMLFrameElementImpl::openURL() {
   KHTMLView* w = getDocument()->view();
   if (!w) {
     return;
   }
 
+  DOMString relativeURL = url;
+  if (relativeURL.isEmpty()) {
+    relativeURL = "about:blank";
+  }
+
   // Load the frame contents.
   KHTMLPart* part = w->part();
   KHTMLPart* framePart = part->findFrame(name.string());
-  KURL kurl = getDocument()->completeURL(relativeURL.string());
-
   if (framePart) {
-    framePart->openURL(kurl);
+    framePart->openURL(getDocument()->completeURL(relativeURL.string()));
   } else {
     part->requestFrame(static_cast<RenderFrame*>(m_render),
                        relativeURL.string(), name.string());
@@ -286,8 +288,7 @@ void HTMLFrameElementImpl::updateForNewURL() {
 void HTMLFrameElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SRC:
-      url = khtml::parseURL(attr->val());
-      updateForNewURL();
+      setLocation(khtml::parseURL(attr->val()));
       break;
     case ATTR_ID:
     case ATTR_NAME:
@@ -414,6 +415,8 @@ void HTMLFrameElementImpl::detach() {
 }
 
 void HTMLFrameElementImpl::setLocation(const DOMString& str) {
+  if (url == str)
+    return;
   url = str;
   updateForNewURL();
 }
@@ -627,10 +630,6 @@ void HTMLIFrameElementImpl::parseAttribute(AttributeImpl* attr) {
     case ATTR_HEIGHT:
       addCSSLength(CSS_PROP_HEIGHT, attr->value());
       break;
-    case ATTR_SRC:
-      needWidgetUpdate = true;  // ### do this for scrolling, margins etc?
-      HTMLFrameElementImpl::parseAttribute(attr);
-      break;
     case ATTR_ALIGN:
       addHTMLAlignment(attr->value());
       break;
@@ -672,4 +671,9 @@ void HTMLIFrameElementImpl::recalcStyle(StyleChange ch) {
     needWidgetUpdate = false;
   }
   HTMLElementImpl::recalcStyle(ch);
+}
+
+void HTMLIFrameElementImpl::openURL() {
+  needWidgetUpdate = true;
+  setChanged();
 }
