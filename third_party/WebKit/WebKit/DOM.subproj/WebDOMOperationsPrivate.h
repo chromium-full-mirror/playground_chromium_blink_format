@@ -20,5 +20,6 @@
 @end
 
 @interface DOMDocument (WebDOMDocumentOperationsPrivate)
+- (DOMRange*)_createRangeWithNode:(DOMNode*)node;
 - (DOMRange*)_documentRange;
 @end
