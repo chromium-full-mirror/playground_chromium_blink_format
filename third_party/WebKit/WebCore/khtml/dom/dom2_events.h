@@ -314,6 +314,12 @@ class UIEvent : public Event {
   long detail() const;
 
   /**
+   * Non-standard extension to support IE-style keyCode event property.
+   *
+   */
+  int keyCode() const;
+
+  /**
    * The initUIEvent method is used to initialize the value of a UIEvent
    * created through the DocumentEvent interface. This method may only be
    * called before the UIEvent has been dispatched via the dispatchEvent
