@@ -29,7 +29,6 @@
 
   NSString* applicationNameForUserAgent;
   NSString* userAgentOverride;
-  NSLock* userAgentLock;
 
   BOOL defersCallbacks;
 
