@@ -3288,6 +3288,9 @@ khtml::ChildFrame* KHTMLPart::frame(const QObject* obj) {
 }
 
 KHTMLPart* KHTMLPart::findFrame(const QString& f) {
+#ifdef APPLE_CHANGES
+  return impl->findFrame(f);
+#else
 #if 0
   kdDebug() << "KHTMLPart::findFrame '" << f << "'" << endl;
   FrameIt it2 = d->m_frames.begin();
@@ -3316,6 +3319,7 @@ KHTMLPart* KHTMLPart::findFrame(const QString& f) {
       return 0L;
     }
   }
+#endif  // APPLE_CHANGES
 }
 
 #ifndef APPLE_CHANGES
@@ -3340,6 +3344,9 @@ KParts::ReadOnlyPart* KHTMLPart::currentFrame() const {
 #endif  // APPLE_CHANGES
 
 bool KHTMLPart::frameExists(const QString& frameName) {
+#ifdef APPLE_CHANGES
+  return impl->frameExists(frameName);
+#else
   ConstFrameIt it = d->m_frames.find(frameName);
   if (it == d->m_frames.end())
     return false;
@@ -3348,6 +3355,7 @@ bool KHTMLPart::frameExists(const QString& frameName) {
   // set. Otherwise we might find our preloaded-selve.
   // This happens when we restore the frameset.
   return (!(*it).m_frame.isNull());
+#endif
 }
 
 KHTMLPart* KHTMLPart::parentPart() {
@@ -3807,6 +3815,9 @@ QStringList KHTMLPart::frameNames() const {
 }
 
 QPtrList<KParts::ReadOnlyPart> KHTMLPart::frames() const {
+#ifdef APPLE_CHANGES
+  return impl->frames();
+#else
   QPtrList<KParts::ReadOnlyPart> res;
 
   ConstFrameIt it = d->m_frames.begin();
@@ -3816,6 +3827,7 @@ QPtrList<KParts::ReadOnlyPart> KHTMLPart::frames() const {
       res.append((*it).m_part);
 
   return res;
+#endif
 }
 
 #ifndef APPLE_CHANGES
