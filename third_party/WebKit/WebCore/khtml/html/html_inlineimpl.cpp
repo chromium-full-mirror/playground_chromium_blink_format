@@ -135,7 +135,7 @@ void HTMLAnchorElementImpl::defaultEventHandler(EventImpl* evt) {
       if (k->qKeyEvent()) {
         k->qKeyEvent()->accept();
         evt->setDefaultHandled();
-        click();
+        click(false);
         return;
       }
     }
@@ -221,8 +221,10 @@ void HTMLAnchorElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   }
 }
 
-void HTMLAnchorElementImpl::accessKeyAction() {
-  click();
+void HTMLAnchorElementImpl::accessKeyAction(bool sendToAnyElement) {
+  // send the mouse button events iff the
+  // caller specified sendToAnyElement
+  click(sendToAnyElement);
 }
 
 bool HTMLAnchorElementImpl::isURLAttribute(AttributeImpl* attr) const {

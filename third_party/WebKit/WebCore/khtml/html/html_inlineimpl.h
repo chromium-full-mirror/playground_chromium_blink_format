@@ -43,7 +43,7 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
   virtual Id id() const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
-  virtual void accessKeyAction();
+  virtual void accessKeyAction(bool fullAction);
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
  protected:

@@ -226,8 +226,8 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isActivatedSubmit() const;
   virtual void setActivatedSubmit(bool flag);
 
-  virtual void click();
-  virtual void accessKeyAction();
+  virtual void click(bool sendMouseEvents);
+  virtual void accessKeyAction(bool sendToAnyElement);
 
  protected:
   DOMString m_value;
@@ -322,8 +322,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   void select();
 
-  virtual void click();
-  virtual void accessKeyAction();
+  virtual void click(bool sendMouseEvents);
+  virtual void accessKeyAction(bool sendToAnyElement);
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
@@ -396,7 +396,7 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
 
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
-  virtual void accessKeyAction();
+  virtual void accessKeyAction(bool sendToAnyElement);
 
   /**
    * the form element this label is associated to.
@@ -502,7 +502,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   virtual void defaultEventHandler(EventImpl* evt);
 #endif
 
-  virtual void accessKeyAction();
+  virtual void accessKeyAction(bool sendToAnyElement);
 
  private:
   void recalcListItems();
@@ -647,7 +647,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool isEditable();
 
-  virtual void accessKeyAction();
+  virtual void accessKeyAction(bool sendToAnyElement);
 
  protected:
   int m_rows;

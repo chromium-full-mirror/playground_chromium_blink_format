@@ -197,7 +197,7 @@ void HTMLFormElementImpl::submitClick() {
           static_cast<HTMLInputElementImpl*>(formElements[i]);
       if (element->isSuccessfulSubmitButton() && element->renderer()) {
         submitFound = true;
-        element->click();
+        element->click(false);
         break;
       }
     }
@@ -1158,20 +1158,22 @@ bool HTMLButtonElementImpl::appendFormData(FormDataList& encoding,
   return true;
 }
 
-void HTMLButtonElementImpl::click() {
+void HTMLButtonElementImpl::click(bool sendMouseEvents) {
 #if APPLE_CHANGES
   QWidget* widget;
   if (renderer() &&
       (widget = static_cast<RenderWidget*>(renderer())->widget())) {
     // using this method gives us nice Cocoa user interface feedback
-    static_cast<QButton*>(widget)->click();
+    static_cast<QButton*>(widget)->click(sendMouseEvents);
   } else
 #endif
-    HTMLGenericFormElementImpl::click();
+    HTMLGenericFormElementImpl::click(sendMouseEvents);
 }
 
-void HTMLButtonElementImpl::accessKeyAction() {
-  click();
+void HTMLButtonElementImpl::accessKeyAction(bool sendToAnyElement) {
+  // send the mouse button events iff the
+  // caller specified sendToAnyElement
+  click(sendToAnyElement);
 }
 
 // -------------------------------------------------------------------------
@@ -1398,7 +1400,7 @@ void HTMLInputElementImpl::select() {
   }
 }
 
-void HTMLInputElementImpl::click() {
+void HTMLInputElementImpl::click(bool sendMouseEvents) {
   switch (inputType()) {
     case HIDDEN:
       // a no-op for this type
@@ -1414,21 +1416,21 @@ void HTMLInputElementImpl::click() {
       if (renderer() &&
           (widget = static_cast<RenderWidget*>(renderer())->widget())) {
         // using this method gives us nice Cocoa user interface feedback
-        static_cast<QButton*>(widget)->click();
+        static_cast<QButton*>(widget)->click(sendMouseEvents);
         break;
       }
     }
 #endif
-      HTMLGenericFormElementImpl::click();
+      HTMLGenericFormElementImpl::click(sendMouseEvents);
       break;
     case FILE:
 #if APPLE_CHANGES
       if (renderer()) {
-        static_cast<RenderFileButton*>(renderer())->click();
+        static_cast<RenderFileButton*>(renderer())->click(sendMouseEvents);
         break;
       }
 #endif
-      HTMLGenericFormElementImpl::click();
+      HTMLGenericFormElementImpl::click(sendMouseEvents);
       break;
     case IMAGE:
     case ISINDEX:
@@ -1438,12 +1440,12 @@ void HTMLInputElementImpl::click() {
     case RANGE:
 #endif
     case TEXT:
-      HTMLGenericFormElementImpl::click();
+      HTMLGenericFormElementImpl::click(sendMouseEvents);
       break;
   }
 }
 
-void HTMLInputElementImpl::accessKeyAction() {
+void HTMLInputElementImpl::accessKeyAction(bool sendToAnyElement) {
   switch (inputType()) {
     case HIDDEN:
       // a no-op for this type
@@ -1466,9 +1468,12 @@ void HTMLInputElementImpl::accessKeyAction() {
 #if APPLE_CHANGES
     case RANGE:
 #endif
-      // focus and click
+      // focus
       focus();
-      click();
+
+      // send the mouse button events iff the
+      // caller specified sendToAnyElement
+      click(sendToAnyElement);
       break;
   }
 }
@@ -2072,7 +2077,7 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
         // The AppKit already does this for spacebar for some, but not all, of
         // them.
         if (key == "U+000020" || key == "Enter") {
-          click();
+          click(false);
           evt->setDefaultHandled();
         }
         break;
@@ -2157,10 +2162,10 @@ ElementImpl* HTMLLabelElementImpl::formElement() {
   return getDocument()->getElementById(formElementId);
 }
 
-void HTMLLabelElementImpl::accessKeyAction() {
+void HTMLLabelElementImpl::accessKeyAction(bool sendToAnyElement) {
   ElementImpl* element = formElement();
   if (element)
-    element->accessKeyAction();
+    element->accessKeyAction(sendToAnyElement);
 }
 
 // -------------------------------------------------------------------------
@@ -2643,7 +2648,7 @@ void HTMLSelectElementImpl::defaultEventHandler(EventImpl* evt) {
 
 #endif  // APPLE_CHANGES
 
-void HTMLSelectElementImpl::accessKeyAction() {
+void HTMLSelectElementImpl::accessKeyAction(bool sendToAnyElement) {
   focus();
 }
 
@@ -3095,7 +3100,7 @@ bool HTMLTextAreaElementImpl::isEditable() {
   return true;
 }
 
-void HTMLTextAreaElementImpl::accessKeyAction() {
+void HTMLTextAreaElementImpl::accessKeyAction(bool sendToAnyElement) {
   focus();
 }
 

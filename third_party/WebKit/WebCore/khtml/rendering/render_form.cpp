@@ -948,8 +948,8 @@ void RenderFileButton::select() {
 
 #if APPLE_CHANGES
 
-void RenderFileButton::click() {
-  static_cast<KWQFileButton*>(widget())->click();
+void RenderFileButton::click(bool sendMouseEvents) {
+  static_cast<KWQFileButton*>(widget())->click(sendMouseEvents);
 }
 
 #endif
