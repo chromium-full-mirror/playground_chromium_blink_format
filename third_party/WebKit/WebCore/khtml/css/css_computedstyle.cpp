@@ -104,6 +104,7 @@ static const int computedProperties[] = {
     CSS_PROP_LEFT,
     CSS_PROP_LETTER_SPACING,
     CSS_PROP__KHTML_LINE_BREAK,
+    CSS_PROP__APPLE_LINE_CLAMP,
     CSS_PROP_LINE_HEIGHT,
     CSS_PROP_LIST_STYLE_IMAGE,
     CSS_PROP_LIST_STYLE_POSITION,
@@ -161,15 +162,19 @@ const unsigned numComputedProperties =
 // It is the intersection of the list of inherited CSS properties and the
 // properties for which we have a computed implementation in this file.
 static const int inheritableProperties[] = {
-    CSS_PROP_BORDER_COLLAPSE, CSS_PROP_BORDER_SPACING, CSS_PROP_COLOR,
-    CSS_PROP_FONT_FAMILY,     CSS_PROP_FONT_SIZE,      CSS_PROP_FONT_STYLE,
-    CSS_PROP_FONT_VARIANT,    CSS_PROP_FONT_WEIGHT,    CSS_PROP_LETTER_SPACING,
-    CSS_PROP_LINE_HEIGHT,     CSS_PROP_TEXT_ALIGN,
+    CSS_PROP_BORDER_COLLAPSE, CSS_PROP_BORDER_SPACING,
+    CSS_PROP_COLOR,           CSS_PROP_FONT_FAMILY,
+    CSS_PROP_FONT_SIZE,       CSS_PROP_FONT_STYLE,
+    CSS_PROP_FONT_VARIANT,    CSS_PROP_FONT_WEIGHT,
+    CSS_PROP_LETTER_SPACING,  CSS_PROP_LINE_HEIGHT,
+    CSS_PROP_TEXT_ALIGN,
     CSS_PROP_TEXT_DECORATION,  // this is not inheritable, yet we do want to
                                // consider it for typing style (name change
                                // needed? redesign?)
-    CSS_PROP_TEXT_INDENT,     CSS_PROP_TEXT_TRANSFORM, CSS_PROP_ORPHANS,
-    CSS_PROP_WHITE_SPACE,     CSS_PROP_WIDOWS,         CSS_PROP_WORD_SPACING,
+    CSS_PROP_TEXT_INDENT,     CSS_PROP__APPLE_TEXT_SIZE_ADJUST,
+    CSS_PROP_TEXT_TRANSFORM,  CSS_PROP_ORPHANS,
+    CSS_PROP_WHITE_SPACE,     CSS_PROP_WIDOWS,
+    CSS_PROP_WORD_SPACING,
 };
 
 const unsigned numInheritableProperties =
@@ -704,6 +709,9 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
       return new CSSPrimitiveValueImpl(style->letterSpacing(),
                                        CSSPrimitiveValue::CSS_PX);
+    case CSS_PROP__APPLE_LINE_CLAMP:
+      return new CSSPrimitiveValueImpl(style->lineClamp(),
+                                       CSSPrimitiveValue::CSS_PERCENTAGE);
     case CSS_PROP_LINE_HEIGHT: {
       Length length(style->lineHeight());
       if (length.value < 0)
@@ -990,6 +998,11 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
       return valueForLength(style->textIndent());
     case CSS_PROP_TEXT_SHADOW:
       return valueForShadow(style->textShadow());
+    case CSS_PROP__APPLE_TEXT_SIZE_ADJUST:
+      if (style->textSizeAdjust())
+        return new CSSPrimitiveValueImpl(CSS_VAL_AUTO);
+      else
+        return new CSSPrimitiveValueImpl(CSS_VAL_NONE);
     case CSS_PROP_TEXT_TRANSFORM:
       switch (style->textTransform()) {
         case khtml::CAPITALIZE:
