@@ -26,16 +26,29 @@
 #ifndef QFONTMETRICS_H_
 #define QFONTMETRICS_H_
 
-class QRect;
-class QChar;
-class QFont;
-class QSize;
-class QString;
+#include "qrect.h"
+#include "qsize.h"
+#include "qstring.h"
+#include "qfont.h"
+
+// class QFontMetrics ==========================================================
 
 class QFontMetrics {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
   QFontMetrics();
   QFontMetrics(const QFont&);
+  QFontMetrics(const QFontMetrics&);
+
+  ~QFontMetrics();
+
+  // member functions --------------------------------------------------------
 
   int ascent() const;
   int height() const;
@@ -45,14 +58,25 @@ class QFontMetrics {
   int descent() const;
   QRect boundingRect(const QString&, int len = -1) const;
   QRect boundingRect(QChar) const;
-  QSize size(int flags,
-             const QString& str,
+  QSize size(int,
+             const QString&,
              int len = -1,
              int tabstops = 0,
              int* tabarray = 0,
              char** intern = 0) const;
   int rightBearing(QChar) const;
   int leftBearing(QChar) const;
-};
+
+  // operators ---------------------------------------------------------------
+
+  QFontMetrics& operator=(const QFontMetrics&);
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QFontMetrics
+    // =======================================================
 
 #endif

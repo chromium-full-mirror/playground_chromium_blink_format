@@ -63,25 +63,57 @@ class QTimer;
 class QImage;
 class QVariant;
 
+// class QObject ===============================================================
+
 class QObject : public Qt {
  public:
-  QObject(QObject* parent = 0, const char* name = 0);
-  const char* name() const;
-  virtual void setName(const char*);
-  QVariant property(const char* name) const;
-  bool inherits(const char*) const;
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
   static bool connect(const QObject*, const char*, const QObject*, const char*);
-  bool connect(const QObject*, const char*, const char*) const;
+
   static bool disconnect(const QObject*,
                          const char*,
                          const QObject*,
                          const char*);
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QObject(QObject* parent = 0, const char* name = 0);
+
+  // member functions --------------------------------------------------------
+
+  const char* name() const;
+  virtual void setName(const char*);
+
+  QVariant property(const char* name) const;
+  bool inherits(const char*) const;
+  bool connect(const QObject*, const char*, const char*) const;
+
   int startTimer(int);
   void killTimer(int);
   void killTimers();
+
   void installEventFilter(const QObject*);
   void removeEventFilter(const QObject*);
+
   void blockSignals(bool);
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  QObject(const QObject&);
+  QObject& operator=(const QObject&);
+
+};  // class QObject
+    // ============================================================
 
 #endif

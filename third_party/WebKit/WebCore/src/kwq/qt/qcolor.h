@@ -28,18 +28,32 @@
 
 #include "qstring.h"
 
+// class QColor ================================================================
+
 class QColor {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
   QColor();
   QColor(int, int, int);
   QColor(const char*);
+  QColor(const QColor&);
+
+  // member functions --------------------------------------------------------
 
   QString name() const;
   void setNamedColor(const QString&);
+
+  bool isValid() const;
+
   int red() const;
   int green() const;
   int blue() const;
-  bool isValid() const;
   void setRgb(int, int, int);
   void setRgb(int);
 
@@ -48,9 +62,18 @@ class QColor {
   QColor light(int f = 150) const;
   QColor dark(int f = 200) const;
 
+  // operators ---------------------------------------------------------------
+
   QColor& operator=(const QColor&);
   bool operator==(const QColor& x) const;
   bool operator!=(const QColor& x) const;
-};
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QColor
+    // =============================================================
 
 #endif

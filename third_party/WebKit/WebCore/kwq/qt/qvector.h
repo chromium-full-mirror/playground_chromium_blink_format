@@ -31,16 +31,57 @@
 
 typedef void* Item;
 
+// class QGVector ==============================================================
+
 class QGVector : public QCollection {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+
+  // static member functions -------------------------------------------------
+
   virtual int compareItems(Item, Item);
-};
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QGVector();
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  QGVector(const QGVector&);
+  QGVector& operator=(const QGVector&);
+
+};  // class QGVector
+    // ===========================================================
+
+// class QVector ===============================================================
 
 template <class T>
 class QVector : public QGVector {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
   QVector();
   QVector(uint);
+  QVector(const QVector&);
+
+  ~QVector();
+
+  // member functions --------------------------------------------------------
 
   bool isEmpty() const;
   uint count() const;
@@ -50,7 +91,17 @@ class QVector : public QGVector {
   bool insert(uint, const T*);
   T* at(int) const;
 
+  // operators ---------------------------------------------------------------
+
   T* operator[](int) const;
-};
+  QVector& operator=(const QVector&);
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QVector
+    // ============================================================
 
 #endif

@@ -39,15 +39,52 @@
 class QFont;
 class QPixmap;
 
+// class QWMatrix ==============================================================
+
 class QWMatrix {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QWMatrix();
+
+  ~QWMatrix();
+
+  // member functions --------------------------------------------------------
+
   QWMatrix& scale(double, double);
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QWMatrix
+    // ===========================================================
+
+// class QPainter ==============================================================
 
 class QPainter : public Qt {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
   QPainter();
   QPainter(const QPaintDevice*);
+
+  ~QPainter();
+
+  // member functions --------------------------------------------------------
 
   const QFont& font() const;
   void setFont(const QFont&);
@@ -64,7 +101,6 @@ class QPainter : public Qt {
   void restore();
 
   void drawRect(int, int, int, int);
-  void fillRect(int, int, int, int, const QBrush&);
   void drawLine(int, int, int, int);
   void drawEllipse(int, int, int, int);
   void drawArc(int, int, int, int, int, int);
@@ -88,6 +124,7 @@ class QPainter : public Qt {
                 int len = -1,
                 QRect* br = 0,
                 char** internal = 0);
+  void fillRect(int, int, int, int, const QBrush&);
 
   void setClipping(bool);
   void setClipRegion(const QRegion&);
@@ -95,6 +132,22 @@ class QPainter : public Qt {
   bool hasClipping() const;
   RasterOp rasterOp() const;
   void setRasterOp(RasterOp);
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  QPainter(const QPainter&);
+  QPainter& operator=(const QPainter&);
+
+};  // end class QPainter
+
+// =============================================================================
 
 #endif

@@ -28,8 +28,12 @@
 
 class QColor;
 
+// class QColorGroup ===========================================================
+
 class QColorGroup {
  public:
+  // typedefs ----------------------------------------------------------------
+
   enum ColorRole {
     Foreground,
     Shadow,
@@ -44,8 +48,21 @@ class QColorGroup {
     Text
   };
 
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+  // constructors, copy constructors, and destructors ------------------------
+
+  QColorGroup();
+  QColorGroup(const QColorGroup&);
+
+  ~QColorGroup();
+
+  // member functions --------------------------------------------------------
+
   const QColor& color(ColorRole) const;
   void setColor(ColorRole, const QColor&);
+
   const QColor& foreground() const;
   const QColor& shadow() const;
   const QColor& light() const;
@@ -56,11 +73,40 @@ class QColorGroup {
   const QColor& button() const;
   const QColor& text() const;
   const QColor& background() const;
-};
+
+  // operators ---------------------------------------------------------------
+
+  QColorGroup& operator=(const QColorGroup&);
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QColorGroup
+    // ========================================================
+
+// class QPalette ==============================================================
 
 class QPalette {
  public:
+  // typedefs ----------------------------------------------------------------
+
+  // enums -------------------------------------------------------------------
+
   enum ColorGroup { Active, Inactive, Disabled };
+
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QPalette();
+  QPalette(const QPalette&);
+
+  ~QPalette();
+
+  // member functions --------------------------------------------------------
 
   void setColor(ColorGroup, QColorGroup::ColorRole role, const QColor& color);
 
@@ -68,6 +114,15 @@ class QPalette {
   const QColorGroup& inactive() const;
   const QColorGroup& disabled() const;
   const QColorGroup& normal() const;
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QPalette
+    // ===========================================================
 
 #endif

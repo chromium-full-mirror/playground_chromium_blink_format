@@ -28,17 +28,39 @@
 
 #include "qobject.h"
 
+// class QGuardedPtr ===========================================================
+
 template <class T>
-class QGuardedPtr {
+class QGuardedPtr : public QObject {
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
   QGuardedPtr();
   QGuardedPtr(T* o);
-  QGuardedPtr(const QGuardedPtr<T>& p);
+  QGuardedPtr(const QGuardedPtr<T>&);
+
+  ~QGuardedPtr();
+
+  // member functions --------------------------------------------------------
 
   bool isNull() const;
 
+  // operators ---------------------------------------------------------------
+
   operator T*() const;
   T* operator->() const;
-};
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QGuardedPtr
+    // ========================================================
 
 #endif

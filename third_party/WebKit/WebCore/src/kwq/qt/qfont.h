@@ -28,10 +28,30 @@
 
 class QString;
 
+// class QFont =================================================================
+
 class QFont {
+  friend class QPainter;
+
  public:
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+
   enum CharSet { Latin1, Unicode };
   enum Weight { Normal = 50, Bold = 63 };
+
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  QFont();
+
+  QFont(const QFont&);
+
+  ~QFont();
+
+  // member functions --------------------------------------------------------
 
   int pixelSize() const;
   QString family() const;
@@ -42,11 +62,19 @@ class QFont {
   bool setItalic(bool);
   bool italic() const;
   bool bold() const;
+
+  // operators ---------------------------------------------------------------
+
+  QFont& operator=(const QFont&);
   bool operator==(const QFont& x) const;
   bool operator!=(const QFont& x) const;
 
- private:
-  friend class QPainter;
-};
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+};  // class QFont
+    // ==============================================================
 
 #endif
