@@ -168,7 +168,9 @@ void RenderLayer::convertToLayerCoords(RenderLayer* ancestorLayer,
 
 void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
   // Create the z-tree of layers that should be displayed.
-  RenderLayer::RenderZTreeNode* node = constructZTree(QRect(x, y, w, h), this);
+  QRect damageRect = QRect(x, y, w, h);
+  RenderLayer::RenderZTreeNode* node =
+      constructZTree(damageRect, damageRect, this);
   if (!node)
     return;
 
@@ -251,7 +253,6 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
       }
     }
 
-    // Paint the layer.
     elt->layer->renderer()->paint(
         p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
         elt->absBounds.y() - elt->layer->renderer()->yPos(), BACKGROUND_PHASE);
@@ -271,8 +272,9 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
 
 bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
   bool inside = false;
+  QRect damageRect = QRect(x, y, 0, 0);
   RenderLayer::RenderZTreeNode* node =
-      constructZTree(QRect(x, y, 0, 0), this, true);
+      constructZTree(damageRect, damageRect, this, true);
   if (!node)
     return false;
 
@@ -306,7 +308,8 @@ bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
 }
 
 RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
-    QRect damageRect,
+    QRect overflowClipRect,
+    QRect posClipRect,
     RenderLayer* rootLayer,
     bool eventProcessing) {
   // The arena we use for allocating our temporary ztree elements.
@@ -325,9 +328,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // damage rect and avoid repainting the layer if it falls outside that rect.
   // An exception to this rule is the root layer, which always paints (hence the
   // m_parent null check below).
-  if (!m_object->isPositioned())
-    updateLayerPosition();  // For relpositioned layers or non-positioned
-                            // layers,
+  updateLayerPosition();  // For relpositioned layers or non-positioned layers,
   // we need to keep in sync, since we may have shifted relative
   // to our parent layer.
 
@@ -338,23 +339,35 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
 
   returnNode = new (renderArena) RenderZTreeNode(this);
 
+  // Positioned elements are clipped according to the posClipRect.  All other
+  // layers are clipped according to the overflowClipRect.
+  QRect clipRectToApply =
+      m_object->isPositioned() ? posClipRect : overflowClipRect;
+  QRect damageRect = eventProcessing
+                         ? clipRectToApply
+                         : clipRectToApply.intersect(QRect(
+                               x, y, m_object->width(), m_object->height()));
+
   // If we establish a clip rect, then we want to intersect that rect
   // with the damage rect to form a new damage rect.
   bool clipOriginator = false;
-  QRect clipRect = damageRect;
-  if (m_object->style()->overflow() == OHIDDEN ||
-      m_object->style()->hasClip()) {
-    clipOriginator = true;
-    QRect backgroundRect(x, y, m_object->width(), m_object->height());
-    clipRect = m_object->getClipRect(x, y);
-    if ((eventProcessing &&
-         !backgroundRect.contains(damageRect.x(), damageRect.y())) ||
-        (!eventProcessing && !backgroundRect.intersects(damageRect)))
-      return 0;  // We don't overlap at all.
 
-    if (!eventProcessing) {
-      damageRect = damageRect.intersect(backgroundRect);
-      clipRect = damageRect.intersect(clipRect);
+  // Update the clip rects that will be passed to children layers.
+  if (m_object->hasOverflowClip() || m_object->hasClip()) {
+    // This layer establishes a clip of some kind.
+    clipOriginator = true;
+    if (m_object->hasOverflowClip()) {
+      QRect newOverflowClip = m_object->getOverflowClipRect(x, y);
+      overflowClipRect = newOverflowClip.intersect(overflowClipRect);
+      clipRectToApply = clipRectToApply.intersect(newOverflowClip);
+    }
+    if (m_object->hasClip()) {
+      QRect newPosClip = m_object->getClipRect(x, y);
+      if (m_object->hasOverflowClip())
+        newPosClip = newPosClip.intersect(m_object->getOverflowClipRect(x, y));
+      posClipRect = newPosClip.intersect(posClipRect);
+      overflowClipRect = overflowClipRect.intersect(posClipRect);
+      clipRectToApply = clipRectToApply.intersect(newPosClip);
     }
   }
 
@@ -365,8 +378,8 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     if (child->zIndex() < 0)
       continue;  // Ignore negative z-indices in this first pass.
 
-    RenderZTreeNode* childNode =
-        child->constructZTree(clipRect, rootLayer, eventProcessing);
+    RenderZTreeNode* childNode = child->constructZTree(
+        overflowClipRect, posClipRect, rootLayer, eventProcessing);
     if (childNode) {
       // Put the new node into the tree at the front of the parent's list.
       if (lastChildNode)
@@ -389,7 +402,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
        layerBounds.contains(damageRect.x(), damageRect.y())) ||
       (!eventProcessing && layerBounds.intersects(damageRect))) {
     RenderLayerElement* layerElt = new (renderArena) RenderLayerElement(
-        this, layerBounds, damageRect, clipRect, clipOriginator, x, y);
+        this, layerBounds, damageRect, clipRectToApply, clipOriginator, x, y);
     if (returnNode->child) {
       RenderZTreeNode* leaf = new (renderArena) RenderZTreeNode(layerElt);
       leaf->next = returnNode->child;
@@ -409,8 +422,8 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     if (child->zIndex() >= 0)
       continue;  // Ignore non-negative z-indices in this second pass.
 
-    RenderZTreeNode* childNode =
-        child->constructZTree(clipRect, rootLayer, eventProcessing);
+    RenderZTreeNode* childNode = child->constructZTree(
+        overflowClipRect, posClipRect, rootLayer, eventProcessing);
     if (childNode) {
       // Deal with the case where all our children views had negative z-indices.
       // Demote our leaf node and make a new interior node that can hold these

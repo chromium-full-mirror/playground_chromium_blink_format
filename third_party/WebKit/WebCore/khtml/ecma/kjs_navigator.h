@@ -44,6 +44,7 @@ class Navigator : public ObjectImp {
     _Plugins,
     _MimeTypes,
     Product,
+    ProductSub,
     Vendor,
     CookieEnabled,
     JavaEnabled

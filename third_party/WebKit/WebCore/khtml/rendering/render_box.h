@@ -157,6 +157,7 @@ class RenderBox : public RenderContainer {
   void calcAbsoluteHorizontal();
   void calcAbsoluteVertical();
 
+  virtual QRect getOverflowClipRect(int tx, int ty);
   virtual QRect getClipRect(int tx, int ty);
 
   // the actual height of the contents + borders + padding
