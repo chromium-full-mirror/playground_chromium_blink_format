@@ -47,7 +47,8 @@ class KWQFileButton : public QWidget {
   void setFrameGeometry(const QRect&);
   int baselinePosition(int height) const;
 
-  void filenameChanged();
+  void filenameChanged(const QString&);
+  void focusChanged(bool);
   void clicked();
 
  private:
