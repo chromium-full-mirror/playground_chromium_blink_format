@@ -468,7 +468,7 @@ class NodeBaseImpl : public NodeImpl {
   // check for being (grand-..)father:
   bool checkNoOwner(NodeImpl* other, int& exceptioncode);
 
- protected:
+  // protected:
   NodeImpl* _first;
   NodeImpl* _last;
 
