@@ -47,6 +47,8 @@
   double loadingStartedTime;
 
   bool primaryLoadComplete;
+
+  bool stopping;
 }
 
 - init;
@@ -61,6 +63,7 @@
 - (void)_startLoading:(BOOL)forceRefresh;
 
 - (void)_stopLoading;
+- (BOOL)_isStopping;
 - (void)_recursiveStopLoading;
 - (void)_addURLHandle:(IFURLHandle*)handle;
 - (void)_removeURLHandle:(IFURLHandle*)handle;
