@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -114,6 +114,14 @@ static void printBorderStyle(QTextStream& ts,
   ts << " ";
 }
 
+static QString getTagName(NodeImpl* n) {
+  if (n->isDocumentNode())
+    return "";
+  if (n->id() <= ID_LAST_TAG)
+    return getTagName(n->id()).string();
+  return n->nodeName().string();
+}
+
 static QTextStream& operator<<(QTextStream& ts, const RenderObject& o) {
   ts << o.renderName();
 
@@ -122,7 +130,7 @@ static QTextStream& operator<<(QTextStream& ts, const RenderObject& o) {
   }
 
   if (o.element()) {
-    QString tagName(getTagName(o.element()->id()).string());
+    QString tagName = getTagName(o.element());
     if (!tagName.isEmpty()) {
       ts << " {" << tagName << "}";
     }
@@ -380,7 +388,7 @@ static QString nodePositionRelativeToRoot(NodeImpl* node, NodeImpl* root) {
   while (1) {
     NodeImpl* p = n->parentNode();
     if (!p || n == root) {
-      result += " of root {" + getTagName(n->id()).string() + "}";
+      result += " of root {" + getTagName(n) + "}";
       break;
     }
     if (n != node)
@@ -389,8 +397,7 @@ static QString nodePositionRelativeToRoot(NodeImpl* node, NodeImpl* root) {
     for (NodeImpl* search = p->firstChild(); search != n;
          search = search->nextSibling())
       count++;
-    result += "child " + QString::number(count) + " {" +
-              getTagName(n->id()).string() + "}";
+    result += "child " + QString::number(count) + " {" + getTagName(n) + "}";
     n = p;
   }
 
@@ -417,8 +424,8 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
   Position startPosition = selection.start();
   Position endPosition = selection.end();
 
-  QString startNodeTagName(getTagName(startPosition.node()->id()).string());
-  QString endNodeTagName(getTagName(endPosition.node()->id()).string());
+  QString startNodeTagName(getTagName(startPosition.node()));
+  QString endNodeTagName(getTagName(endPosition.node()));
 
   NodeImpl* rootNode = doc->getElementById("root");
 
