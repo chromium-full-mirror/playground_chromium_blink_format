@@ -106,15 +106,7 @@ struct BidiRun {
 };
 
 // an iterator which goes through a BidiParagraph
-class BidiIterator {
- public:
-  BidiIterator();
-  BidiIterator(RenderBlock* par);
-  BidiIterator(RenderBlock* par, RenderObject* _obj, int _pos = 0);
-
-  BidiIterator(const BidiIterator& it);
-  BidiIterator& operator=(const BidiIterator& it);
-
+struct BidiIterator {
   void operator++();
 
   bool atEnd() const;
@@ -122,21 +114,15 @@ class BidiIterator {
   const QChar& current() const;
   QChar::Direction direction() const;
 
- public:
   RenderBlock* par;
   RenderObject* obj;
   unsigned int pos;
 };
 
 struct BidiStatus {
-  BidiStatus() {
-    eor = QChar::DirON;
-    lastStrong = QChar::DirON;
-    last = QChar::DirON;
-  }
-  QChar::Direction eor : 5;
-  QChar::Direction lastStrong : 5;
-  QChar::Direction last : 5;
+  QChar::Direction eor;
+  QChar::Direction lastStrong;
+  QChar::Direction last;
 };
 };
 

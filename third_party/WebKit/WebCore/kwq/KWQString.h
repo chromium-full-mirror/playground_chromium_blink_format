@@ -66,7 +66,9 @@ class QChar {
     DirBN
   };
 
-  static const QChar null;
+  static const char null = 0;  // not a QChar as in Qt (can't have static
+                               // constructor), but close enough to be
+                               // compatible in most cases
 
   QChar();
   QChar(char);
@@ -312,7 +314,9 @@ struct KWQStringData {
 
 class QString {
  public:
-  static const QString null;
+  static const char* const null = 0;  // not a QString as in Qt (can't have
+                                      // static constructor), but close enough
+                                      // to be compatible in most cases
 
   QString();
   QString(QChar);

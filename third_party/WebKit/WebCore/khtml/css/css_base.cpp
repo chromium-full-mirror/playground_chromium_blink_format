@@ -232,7 +232,7 @@ void CSSSelector::extractPseudoType() const {
     }
   }
 
-  value = QString::null;
+  value = DOMString();
 }
 
 bool CSSSelector::operator==(const CSSSelector& other) {
