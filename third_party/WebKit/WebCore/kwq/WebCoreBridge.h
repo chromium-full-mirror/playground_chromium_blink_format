@@ -230,6 +230,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 @protocol WebCoreRenderTreeCopier<NSObject>
 - (NSObject*)nodeWithName:(NSString*)name
+                 position:(NSPoint)p
                      rect:(NSRect)rect
                      view:(NSView*)view
                  children:(NSArray*)children;
