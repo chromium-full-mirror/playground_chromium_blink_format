@@ -99,9 +99,10 @@ using namespace DOM;
 
 using khtml::Decoder;
 using khtml::EditCommand;
+using khtml::InlineTextBox;
 using khtml::RenderObject;
 using khtml::RenderText;
-using khtml::InlineTextBox;
+using khtml::Tokenizer;
 
 using KParts::BrowserInterface;
 

@@ -75,6 +75,8 @@ class KWQValueListImpl {
                           bool (*equalFunc)(const KWQValueListNodeImpl*,
                                             const KWQValueListNodeImpl*)) const;
 
+  KWQValueListIteratorImpl insert(const KWQValueListIteratorImpl& iterator,
+                                  KWQValueListNodeImpl* node);
   KWQValueListIteratorImpl removeIterator(KWQValueListIteratorImpl& iterator);
   KWQValueListIteratorImpl fromLast();
 
@@ -89,6 +91,7 @@ class KWQValueListImpl {
 
   KWQValueListIteratorImpl begin() const;
   KWQValueListIteratorImpl end() const;
+  KWQValueListIteratorImpl fromLast() const;
 
   KWQValueListNodeImpl* nodeAt(uint index);
   KWQValueListNodeImpl* nodeAt(uint index) const;

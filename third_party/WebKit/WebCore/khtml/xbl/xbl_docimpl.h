@@ -18,7 +18,7 @@ class XBLDocumentImpl : public DOM::DocumentImpl {
   XBLDocumentImpl();
   ~XBLDocumentImpl();
 
-  virtual XMLHandler* createTokenHandler();
+  virtual khtml::XMLHandler* createTokenHandler();
 
   void setPrototypeBinding(const DOM::DOMString& id,
                            XBLPrototypeBinding* binding);

@@ -144,6 +144,9 @@ class QValueList {
     return impl.containsEqualNodes(&node, nodesEqual);
   }
 
+  Iterator insert(Iterator iter, const T& val) {
+    return impl.insert(iter.impl, new QValueListNode<T>(val));
+  }
   Iterator remove(Iterator iter) { return impl.removeIterator(iter.impl); }
   Iterator fromLast() { return impl.fromLast(); }
 
@@ -157,6 +160,7 @@ class QValueList {
 
   ConstIterator begin() const { return impl.begin(); }
   ConstIterator end() const { return impl.end(); }
+  ConstIterator fromLast() const { return impl.fromLast(); }
 
   T& operator[](uint index) {
     return ((QValueListNode<T>*)impl.nodeAt(index))->value;
