@@ -1235,11 +1235,7 @@ void DocumentImpl::updateSelection() {
 }
 
 Tokenizer* DocumentImpl::createTokenizer() {
-  return new XMLTokenizer(docPtr(), m_view);
-}
-
-XMLHandler* DocumentImpl::createTokenHandler() {
-  return new XMLHandler(docPtr(), m_view);
+  return newXMLTokenizer(docPtr(), m_view);
 }
 
 void DocumentImpl::setPaintDevice(QPaintDevice* dev) {
@@ -1262,7 +1258,6 @@ void DocumentImpl::open() {
   m_tokenizer = createTokenizer();
   connect(m_tokenizer, SIGNAL(finishedParsing()), this,
           SIGNAL(finishedParsing()));
-  m_tokenizer->begin();
 
   if (m_view && m_view->part()->jScript()) {
     m_view->part()->jScript()->setSourceFile(m_url, "");  // fixme

@@ -350,7 +350,6 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   CSSStyleSheetImpl* elementSheet();
   virtual khtml::Tokenizer* createTokenizer();
   khtml::Tokenizer* tokenizer() { return m_tokenizer; }
-  virtual khtml::XMLHandler* createTokenHandler();
 
   QPaintDeviceMetrics* paintDeviceMetrics() { return m_paintDeviceMetrics; }
   QPaintDevice* paintDevice() const { return m_paintDevice; }
