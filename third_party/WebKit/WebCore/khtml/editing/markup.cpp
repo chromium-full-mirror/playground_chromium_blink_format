@@ -55,6 +55,18 @@ using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
 
+#if APPLE_CHANGES
+#include "KWQAssertions.h"
+#include "KWQLogging.h"
+#else
+#define ASSERT(assertion) ((void)0)
+#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs...) ((void)0)
+#define ASSERT_NOT_REACHED() ((void)0)
+#define LOG(channel, formatAndArgs...) ((void)0)
+#define ERROR(formatAndArgs...) ((void)0)
+#define ASSERT(assertion) assert(assertion)
+#endif
+
 namespace khtml {
 
 static QString escapeHTML(const QString& in) {
@@ -250,7 +262,7 @@ static QString markup(const NodeImpl* startNode,
                       bool includeSiblings,
                       QPtrList<NodeImpl>* nodes) {
   // Doesn't make sense to only include children and include siblings.
-  assert(!(onlyIncludeChildren && includeSiblings));
+  ASSERT(!(onlyIncludeChildren && includeSiblings));
   QString me = "";
   for (const NodeImpl* current = startNode; current != NULL;
        current = includeSiblings ? current->nextSibling() : NULL) {
@@ -299,8 +311,9 @@ QString createMarkup(const RangeImpl* range,
   if (!range || range->isDetached())
     return QString();
 
-  int exceptionCode;
+  int exceptionCode = 0;
   NodeImpl* commonAncestor = range->commonAncestorContainer(exceptionCode);
+  ASSERT(exceptionCode == 0);
   NodeImpl* commonAncestorBlock = 0;
   if (commonAncestor != 0) {
     commonAncestorBlock = commonAncestor->enclosingBlockFlowElement();
@@ -384,10 +397,19 @@ QString createMarkup(const RangeImpl* range,
     }
   }
 
+  NodeImpl* rangeStartNode = range->startNode();
+  int rangeStartOffset = range->startOffset(exceptionCode);
+  ASSERT(exceptionCode == 0);
+
   // Add ancestors up to the common ancestor block so inline ancestors such as
   // FONT and B are part of the markup.
   for (NodeImpl* ancestor = lastClosed->parentNode(); ancestor;
        ancestor = ancestor->parentNode()) {
+    if (RangeImpl::compareBoundaryPoints(ancestor, 0, rangeStartNode,
+                                         rangeStartOffset) >= 0) {
+      // we have already added markup for this node
+      continue;
+    }
     bool breakAtEnd = false;
     if (commonAncestorBlock == ancestor) {
       NodeImpl::Id id = ancestor->id();
@@ -447,7 +469,7 @@ DocumentFragmentImpl* createFragmentFromMarkup(DocumentImpl* document,
       static_cast<HTMLElementImpl*>(document->documentElement());
 
   DocumentFragmentImpl* fragment = element->createContextualFragment(markup);
-  assert(fragment);
+  ASSERT(fragment);
 
   if (!baseURL.isEmpty() && baseURL != document->baseURL())
     completeURLs(fragment, baseURL);
@@ -459,7 +481,7 @@ QString createMarkup(const DOM::NodeImpl* node,
                      EChildrenOnly includeChildren,
                      QPtrList<DOM::NodeImpl>* nodes,
                      EAnnotateForInterchange annotate) {
-  assert(annotate == DoNotAnnotateForInterchange);  // annotation not yet
+  ASSERT(annotate == DoNotAnnotateForInterchange);  // annotation not yet
                                                     // implemented for this code
                                                     // path
   return markup(node, includeChildren, false, nodes);
@@ -525,7 +547,7 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
       if (s.isEmpty() && list.isEmpty()) {
         // For last line, use the "magic BR" rather than a P.
         element = document->createHTMLElement("br", exceptionCode);
-        assert(exceptionCode == 0);
+        ASSERT(exceptionCode == 0);
         element->ref();
         element->setAttribute(ATTR_CLASS, AppleInterchangeNewline);
       } else {
@@ -535,14 +557,14 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
           paragraphContents = createBlockPlaceholderElement(document);
         } else {
           paragraphContents = document->createTextNode(s);
-          assert(exceptionCode == 0);
+          ASSERT(exceptionCode == 0);
         }
         element->ref();
         element->appendChild(paragraphContents, exceptionCode);
-        assert(exceptionCode == 0);
+        ASSERT(exceptionCode == 0);
       }
       fragment->appendChild(element, exceptionCode);
-      assert(exceptionCode == 0);
+      ASSERT(exceptionCode == 0);
       element->deref();
     }
   }
