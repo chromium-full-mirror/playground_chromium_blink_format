@@ -94,10 +94,11 @@ Identifier identiferFromNPIdentifier(NP_Identifier ident) {
   return identifier;
 }
 
-NP_Object* NP_Call(NP_JavaScriptObject* o,
-                   NP_Identifier ident,
-                   NP_Object** args,
-                   unsigned argCount) {
+void NP_Call(NP_JavaScriptObject* o,
+             NP_Identifier ident,
+             NP_Object** args,
+             unsigned argCount,
+             NP_JavaScriptResultInterface resultCallback) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   // Lookup the function object.
@@ -106,9 +107,12 @@ NP_Object* NP_Call(NP_JavaScriptObject* o,
 
   Value func = obj->imp->get(exec, identiferFromNPIdentifier(ident));
   Interpreter::unlock();
-  if (func.isNull() || func.type() == UndefinedType) {
-    // Maybe throw an exception here?
-    return 0;
+  if (func.isNull()) {
+    resultCallback(NP_GetNull());
+    return;
+  } else if (func.type() == UndefinedType) {
+    resultCallback(NP_GetUndefined());
+    return;
   }
 
   // Call the function object.
@@ -120,10 +124,14 @@ NP_Object* NP_Call(NP_JavaScriptObject* o,
   Interpreter::unlock();
 
   // Convert and return the result of the function call.
-  return convertValueToNPValueType(exec, result);
+  NP_Object* npresult = convertValueToNPValueType(exec, result);
+
+  resultCallback(npresult);
 }
 
-NP_Object* NP_Evaluate(NP_JavaScriptObject* o, NP_String* s) {
+void NP_Evaluate(NP_JavaScriptObject* o,
+                 NP_String* s,
+                 NP_JavaScriptResultInterface resultCallback) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
@@ -136,17 +144,25 @@ NP_Object* NP_Evaluate(NP_JavaScriptObject* o, NP_String* s) {
                           .value();
   Interpreter::unlock();
   free(script);
-  return convertValueToNPValueType(exec, result);
+
+  NP_Object* npresult = convertValueToNPValueType(exec, result);
+
+  resultCallback(npresult);
 }
 
-NP_Object* NP_GetProperty(NP_JavaScriptObject* o, NP_Identifier propertyName) {
+void NP_GetProperty(NP_JavaScriptObject* o,
+                    NP_Identifier propertyName,
+                    NP_JavaScriptResultInterface resultCallback) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
   Interpreter::lock();
   Value result = obj->imp->get(exec, identiferFromNPIdentifier(propertyName));
   Interpreter::unlock();
-  return convertValueToNPValueType(exec, result);
+
+  NP_Object* npresult = convertValueToNPValueType(exec, result);
+
+  resultCallback(npresult);
 }
 
 void NP_SetProperty(NP_JavaScriptObject* o,
@@ -170,7 +186,8 @@ void NP_RemoveProperty(NP_JavaScriptObject* o, NP_Identifier propertyName) {
   Interpreter::unlock();
 }
 
-NP_String* NP_ToString(NP_JavaScriptObject* o) {
+void NP_ToString(NP_JavaScriptObject* o,
+                 NP_JavaScriptResultInterface resultCallback) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   Interpreter::lock();
@@ -182,10 +199,12 @@ NP_String* NP_ToString(NP_JavaScriptObject* o) {
 
   Interpreter::unlock();
 
-  return value;
+  resultCallback(value);
 }
 
-NP_Object* NP_GetPropertyAtIndex(NP_JavaScriptObject* o, int32_t index) {
+void NP_GetPropertyAtIndex(NP_JavaScriptObject* o,
+                           int32_t index,
+                           NP_JavaScriptResultInterface resultCallback) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
@@ -193,7 +212,9 @@ NP_Object* NP_GetPropertyAtIndex(NP_JavaScriptObject* o, int32_t index) {
   Value result = obj->imp->get(exec, (unsigned)index);
   Interpreter::unlock();
 
-  return convertValueToNPValueType(exec, result);
+  NP_Object* npresult = convertValueToNPValueType(exec, result);
+
+  resultCallback(npresult);
 }
 
 void NP_SetPropertyAtIndex(NP_JavaScriptObject* o,

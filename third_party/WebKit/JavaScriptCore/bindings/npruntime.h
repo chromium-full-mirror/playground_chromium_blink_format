@@ -234,15 +234,15 @@ void NP_Evaluate(NP_JavaScriptObject* obj,
                  NP_JavaScriptResultInterface result);
 void NP_GetProperty(NP_JavaScriptObject* obj,
                     NP_Identifier propertyName,
-                    NP_JavaScriptResultInterface);
+                    NP_JavaScriptResultInterface result);
 void NP_SetProperty(NP_JavaScriptObject* obj,
                     NP_Identifier propertyName,
                     NP_Object* value);
 void NP_RemoveProperty(NP_JavaScriptObject* obj, NP_Identifier propertyName);
-void NP_ToString(NP_JavaScriptObject* obj, NP_JavaScriptResultInterface);
+void NP_ToString(NP_JavaScriptObject* obj, NP_JavaScriptResultInterface result);
 void NP_GetPropertyAtIndex(NP_JavaScriptObject* obj,
                            int32_t index,
-                           NP_JavaScriptResultInterface);
+                           NP_JavaScriptResultInterface result);
 void NP_SetPropertyAtIndex(NP_JavaScriptObject* obj,
                            unsigned index,
                            NP_Object* value);
