@@ -2078,6 +2078,7 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     case CSS_PROP_LETTER_SPACING:
     case CSS_PROP_WORD_SPACING: {
       int width = 0;
+
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -2094,6 +2095,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
           default:
             return;
         }
+      } else if (primitiveValue &&
+                 primitiveValue->getIdent() == CSS_VAL_NORMAL) {
+        width = 0;
       } else {
         if (!primitiveValue)
           return;
