@@ -296,6 +296,8 @@ class HTMLElement : public DOMElement {
     ImageHeight,
     ImageLongDesc,
     ImageSrc,
+    ImageX,
+    ImageY,
     ObjectHspace,
     ObjectHeight,
     ObjectAlign,

@@ -355,6 +355,13 @@ class HTMLImageElement : public HTMLElement {
    * see @ref width
    */
   void setWidth(long);
+
+  /**
+   * Non-standard extensions to match Mozilla/Gecko.  Not part of the real
+   * ImgElement DOM.
+   */
+  long x() const;
+  long y() const;
 };
 
 // --------------------------------------------------------------------------
