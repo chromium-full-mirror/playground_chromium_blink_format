@@ -78,6 +78,7 @@ class KHTMLSettings {
   const QString& encoding() const { return _encoding; }
 
   const QString& userStyleSheet() const { return _userStyleSheetLocation; }
+  bool shouldPrintBackgrounds() const { return _shouldPrintBackgrounds; }
 
   void setStdFontName(const QString& s) { _stdFontName = s; }
   void setFixedFontName(const QString& s) { _fixedFontName = s; }
@@ -101,6 +102,7 @@ class KHTMLSettings {
   void setEncoding(const QString& s) { _encoding = s; }
 
   void setUserStyleSheet(const QString& s) { _userStyleSheetLocation = s; }
+  void setShouldPrintBackgrounds(bool f) { _shouldPrintBackgrounds = f; }
 
  private:
   QString _stdFontName;
@@ -120,6 +122,7 @@ class KHTMLSettings {
   uint _pluginsEnabled : 1;
   uint _JavaScriptEnabled : 1;
   uint _JavaScriptCanOpenWindowsAutomatically : 1;
+  uint _shouldPrintBackgrounds : 1;
 };
 
 #endif

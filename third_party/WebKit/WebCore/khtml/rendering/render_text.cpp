@@ -87,6 +87,9 @@ void TextRun::paintSelection(const Font* f,
   // color, not invert.
   QColor textColor = style->color();
   QColor c = p->selectedTextBackgroundColor();
+
+  // if text color and selection background color are identical, invert
+  // background color.
   if (textColor == c)
     c = QColor(0xff - c.red(), 0xff - c.green(), 0xff - c.blue());
 
@@ -561,6 +564,34 @@ int RenderText::rightmostPosition() const {
   return 0;
 }
 
+static int simpleDifferenceBetweenColors(QColor c1, QColor c2) {
+  // a distance could be computed by squaring the differences between
+  // components, but
+  // this is faster and so far seems good enough for our purposes.
+  return abs(c1.red() - c2.red()) + abs(c1.green() - c2.green()) +
+         abs(c1.blue() - c2.blue());
+}
+
+static QColor correctedTextColor(QColor textColor, QColor backgroundColor) {
+  // Adjust the text color if it is too close to the background color,
+  // by darkening or lightening it to move it further away.
+
+  int d = simpleDifferenceBetweenColors(textColor, backgroundColor);
+  // semi-arbitrarily chose 255 value here after a few tests;
+  if (d > 255) {
+    return textColor;
+  }
+
+  int distanceFromWhite = simpleDifferenceBetweenColors(textColor, Qt::white);
+  int distanceFromBlack = simpleDifferenceBetweenColors(textColor, Qt::black);
+
+  if (distanceFromWhite < distanceFromBlack) {
+    return textColor.dark();
+  }
+
+  return textColor.light();
+}
+
 void RenderText::paintObject(QPainter* p,
                              int /*x*/,
                              int y,
@@ -668,8 +699,14 @@ void RenderText::paintObject(QPainter* p,
         if (drawText) {
 #endif
 
-          if (_style->color() != p->pen().color())
-            p->setPen(_style->color());
+          QColor textColor = _style->color();
+          if (_style->shouldCorrectTextColor()) {
+            textColor =
+                correctedTextColor(textColor, _style->backgroundColor());
+          }
+
+          if (textColor != p->pen().color())
+            p->setPen(textColor);
 
 #if APPLE_CHANGES
           // Set a text shadow if we have one.
