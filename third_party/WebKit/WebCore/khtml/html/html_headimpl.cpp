@@ -174,8 +174,10 @@ void HTMLLinkElementImpl::process() {
 #endif
 
   // Stylesheet
+  // This was buggy and would incorrectly match <link rel="alternate">, which
+  // has a different specified meaning.
   if (type.contains("text/css") || rel == "stylesheet" ||
-      rel.contains("alternate")) {
+      (rel.contains("alternate") && rel.contains("stylesheet"))) {
     // no need to load style sheets which aren't for the screen output
     // ### there may be in some situations e.g. for an editor or script to
     // manipulate
