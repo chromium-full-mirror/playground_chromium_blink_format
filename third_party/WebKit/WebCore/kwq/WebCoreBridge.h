@@ -338,6 +338,10 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (id<WebCoreResourceHandle>)startLoadingResource:
                                  (id<WebCoreResourceLoader>)loader
                                           withURL:(NSURL*)URL;
+- (id<WebCoreResourceHandle>)startLoadingResource:
+                                 (id<WebCoreResourceLoader>)loader
+                                          withURL:(NSURL*)URL
+                                         postData:(NSData*)data;
 - (void)objectLoadedFromCacheWithURL:(NSURL*)URL
                             response:(id)response
                                 size:(unsigned)bytes;
