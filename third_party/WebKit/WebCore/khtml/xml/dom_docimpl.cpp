@@ -300,7 +300,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_usesDescendantRules = false;
 
   m_styleSelector = new CSSStyleSelector(this, m_usersheet, m_styleSheets,
-                                         m_url, !inQuirksMode());
+                                         m_url, !inCompatMode());
   m_windowEventListeners.setAutoDelete(true);
   m_pendingStylesheets = 0;
 
@@ -919,7 +919,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     // settings->charset() << endl;
     _style->setFontDef(fontDef);
     _style->htmlFont().update(paintDeviceMetrics());
-    if (inQuirksMode())
+    if (inCompatMode())
       _style->setHtmlHacks(true);  // enable html specific rendering tricks
 
     StyleChange ch = diff(_style, oldStyle);
@@ -1974,7 +1974,7 @@ void DocumentImpl::recalcStyleSelector() {
   if (m_view && m_view->mediaType() == "print")
     usersheet += m_printSheet;
   m_styleSelector = new CSSStyleSelector(this, usersheet, m_styleSheets, m_url,
-                                         !inQuirksMode());
+                                         !inCompatMode());
 
   m_styleSelectorDirty = false;
 }

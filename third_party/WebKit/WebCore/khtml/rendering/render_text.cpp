@@ -769,16 +769,10 @@ void RenderText::paintObject(QPainter* p,
             }
           }
 
-          if (d != TDNONE && paintAction == PaintActionForeground) {
-            RenderObject* curr = this;
-            while (curr && !curr->element())
-              curr = curr->container();
-            bool quirksMode =
-                (curr && curr->element()->getDocument()->inQuirksMode());
-            if (quirksMode) {
-              p->setPen(_style->color());
-              s->paintDecoration(p, tx, ty, d);
-            }
+          if (d != TDNONE && paintAction == PaintActionForeground &&
+              style()->htmlHacks()) {
+            p->setPen(_style->color());
+            s->paintDecoration(p, tx, ty, d);
           }
 
 #if APPLE_CHANGES

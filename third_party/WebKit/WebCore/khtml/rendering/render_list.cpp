@@ -200,8 +200,7 @@ static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
     if (currChild->isTable() || !currChild->isRenderBlock())
       break;
 
-    if (currChild->element() &&
-        (currChild->element()->getDocument()->inQuirksMode()) &&
+    if (currChild->style()->htmlHacks() && currChild->element() &&
         (currChild->element()->id() == ID_UL ||
          currChild->element()->id() == ID_OL))
       break;
