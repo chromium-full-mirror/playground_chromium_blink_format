@@ -611,6 +611,7 @@ class NodeListImpl : public khtml::Shared<NodeListImpl> {
   // DOM methods & attributes for NodeList
   virtual unsigned long length() const = 0;
   virtual NodeImpl* item(unsigned long index) const = 0;
+  virtual NodeImpl* itemById(const DOMString& elementId) const;
 
   // Other methods (not part of DOM)
 

@@ -934,6 +934,8 @@ class NodeList {
    * @internal
    * not part of the DOM
    */
+  Node itemById(const DOMString& elementId) const;
+
   NodeListImpl* handle() const;
   bool isNull() const;
 

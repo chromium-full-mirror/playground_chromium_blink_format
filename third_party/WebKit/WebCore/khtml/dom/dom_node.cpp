@@ -466,6 +466,12 @@ unsigned long NodeList::length() const {
   return impl->length();
 }
 
+Node NodeList::itemById(const DOMString& elementId) const {
+  if (!impl)
+    return 0;
+  return impl->itemById(elementId);
+}
+
 NodeListImpl* NodeList::handle() const {
   return impl;
 }
