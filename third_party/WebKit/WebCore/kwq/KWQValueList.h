@@ -232,7 +232,7 @@ class QValueList {
     // =========================================================
 
 template <class T>
-inline ostream& operator<<(ostream& o, const QValueList<T>& p) {
+inline std::ostream& operator<<(std::ostream& o, const QValueList<T>& p) {
   o << "QValueList: [size: " << (Q_UINT32)p.count() << "; items: ";
   QValueListConstIterator<T> it = p.begin();
   while (it != p.end()) {

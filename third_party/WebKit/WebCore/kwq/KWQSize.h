@@ -80,7 +80,7 @@ class QSize {
   friend bool operator!=(const QSize&, const QSize&);
 
 #ifdef _KWQ_IOSTREAM_
-  friend ostream& operator<<(ostream&, const QSize&);
+  friend std::ostream& operator<<(std::ostream&, const QSize&);
 #endif
 
   // protected

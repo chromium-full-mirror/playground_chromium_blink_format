@@ -60,7 +60,7 @@ class QDict : public QPtrCollection {
 
   QDict(int size = 17, bool caseSensitive = TRUE)
       : impl(size, caseSensitive, QDict::deleteFunc) {}
-  QDict(const QDict<T>& d) : impl(d.impl) {}
+  QDict(const QDict<T>& d) : QPtrCollection(d), impl(d.impl) {}
   virtual ~QDict() { impl.clear(del_item); }
 
   // member functions --------------------------------------------------------

@@ -14,9 +14,7 @@
 @interface IFPluginView : NSView {
   WCPlugin* plugin;
   IFPluginNullEventSender* eventSender;
-
-  char *cMime, **cAttributes, **cValues;
-  uint argsCount;
+  NSDictionary* arguments;
 
   id<IFWebController> webController;
   IFWebDataSource* webDataSource;
@@ -26,7 +24,7 @@
   NP_Port nPort;
   NPP_t instanceStruct;
 
-  BOOL isFlipped, transferred, isHidden, stopped, WKFullMode;
+  BOOL isFlipped, transferred, isHidden, stopped;
 
   NSString *URL, *mime;
   NSURL* baseURL;

@@ -52,7 +52,7 @@ class QPtrVector : public QPtrCollection {
 
   QPtrVector() : impl(deleteFunc) {}
   QPtrVector(uint size) : impl(size, deleteFunc) {}
-  QPtrVector(const QPtrVector<T>& v) : impl(v.impl) {}
+  QPtrVector(const QPtrVector<T>& v) : QPtrCollection(v), impl(v.impl) {}
   ~QPtrVector() {
     if (del_item) {
       impl.clear(del_item);
@@ -90,7 +90,7 @@ class QPtrVector : public QPtrCollection {
     // ============================================================
 
 template <class T>
-inline ostream& operator<<(ostream& stream, const QPtrVector<T>& v) {
+inline std::ostream& operator<<(std::ostream& stream, const QPtrVector<T>& v) {
   uint i = 0;
   uint count = v.count();
 

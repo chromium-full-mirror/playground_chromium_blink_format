@@ -37,6 +37,10 @@
 
 @protocol IFWebController
 - (IFWebFrame *)createFrameNamed: (NSString *)name for: (IFWebDataSource *)dataSource inParent: (IFWebDataSource *)dataSource inScrollView: (BOOL)inScrollView;
+- (IFWebFrame*)frameNamed:(NSString*)name;
+@end
+
+@interface IFBaseWebController
 - (void)_receivedProgress:(IFLoadProgress*)progress
               forResource:(NSString*)resourceDescription
            fromDataSource:(IFWebDataSource*)dataSource;
@@ -44,7 +48,13 @@
            forResource:(NSString*)resourceDescription
        partialProgress:(IFLoadProgress*)progress
         fromDataSource:(IFWebDataSource*)dataSource;
-- (IFWebFrame*)mainFrame;
+- (void)_mainReceivedProgress:(IFLoadProgress*)progress
+                  forResource:(NSString*)resourceDescription
+               fromDataSource:(IFWebDataSource*)dataSource;
+- (void)_mainReceivedError:(IFError*)error
+               forResource:(NSString*)resourceDescription
+           partialProgress:(IFLoadProgress*)progress
+            fromDataSource:(IFWebDataSource*)dataSource;
 @end
 
 @protocol IFLocationChangeHandler
@@ -66,6 +76,7 @@
 - (KHTMLPart*)_part;
 - (void)_setTitle:(NSString*)title;
 - (void)_setFinalURL:(NSURL*)url;
+- (id<IFLocationChangeHandler>)_locationChangeHandler;
 @end
 
 // This should not be allowed here.  data source should not reference view

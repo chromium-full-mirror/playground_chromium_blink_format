@@ -81,7 +81,7 @@ class WCPluginWidget : public QWidget {
 };  // class WCPluginWidget
     // ============================================================
 
-void* WCIFPluginMakeFunction();
-void* WCIFNullPluginMakeFunction();
+WCIFPluginMakeFunc WCIFPluginMakeFunction();
+WCIFNullPluginMakeFunc WCIFNullPluginMakeFunction();
 
 #endif
