@@ -426,6 +426,8 @@ class RenderTableCell : public RenderBlock {
                            int ty,
                            PaintAction paintAction);
 
+  virtual QRect getAbsoluteRepaintRect();
+
  protected:
   virtual void paintBoxDecorations(QPainter* p,
                                    int _x,
