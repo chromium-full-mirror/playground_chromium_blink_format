@@ -132,6 +132,7 @@ class SimplifiedBackwardsTextIterator {
                      DOM::NodeImpl* Node,
                      long startOffset,
                      long endOffset);
+  void emitNewlineForBROrText();
 
   // Current position, not necessarily of the text being returned, but position
   // as we walk through the DOM tree.
