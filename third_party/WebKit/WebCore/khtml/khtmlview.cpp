@@ -252,6 +252,9 @@ KHTMLView::~KHTMLView() {
   }
   delete d;
   d = 0;
+#ifdef APPLE_CHANGES
+  m_part = 0;
+#endif
 }
 
 void KHTMLView::init() {
