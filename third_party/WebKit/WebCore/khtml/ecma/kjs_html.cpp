@@ -4462,6 +4462,10 @@ static bool isImagePattern(const Value& value) {
   return false;
 }
 
+extern "C" {
+extern void CGContextReplacePathWithStrokedPath(CGContextRef c);
+}
+
 Value KJS::Context2DFunction::tryCall(ExecState* exec,
                                       Object& thisObj,
                                       const List& args) {
