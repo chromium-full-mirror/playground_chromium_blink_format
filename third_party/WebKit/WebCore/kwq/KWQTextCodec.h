@@ -66,7 +66,7 @@ class QTextCodec {
   // static member functions -------------------------------------------------
 
   static QTextCodec* codecForMib(int);
-  static QTextCodec* codecForName(const char*);
+  static QTextCodec* codecForName(const char*, int accuracy = 0);
   static QTextCodec* codecForLocale();
 
   // constructors, copy constructors, and destructors ------------------------
