@@ -73,7 +73,16 @@ class QPen : public Qt {
   // private
   // ---------------------------------------------------------------------
  private:
-  QPenPrivate* d;
+  QPen copy() const;
+  void detach();
+  void init(const QColor&, uint, uint);
+
+  struct QPenData : public QShared {
+    PenStyle style;
+    uint width;
+    QColor color;
+    Q_UINT16 linest;
+  } * data;
 
 };  // class QPen
     // ===============================================================

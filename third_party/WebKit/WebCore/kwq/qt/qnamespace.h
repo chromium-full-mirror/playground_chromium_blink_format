@@ -80,6 +80,9 @@ class Qt {
     SolidLine,
     DotLine,
     DashLine,
+    DashDotLine,
+    DashDotDotLine,
+    MPenStyle = 0x0f
   };
 
   enum BrushStyle {

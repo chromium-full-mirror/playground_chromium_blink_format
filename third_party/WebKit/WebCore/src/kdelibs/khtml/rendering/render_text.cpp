@@ -130,6 +130,11 @@ void TextSlave::printDecoration(QPainter* pt,
   if (underlineOffset <= m_baseline)
     underlineOffset = m_baseline + 1;
 
+  // FIXME: [kocienda]
+  // This hack gets the underline in a better place but we should be
+  // doing something better.
+  underlineOffset += 2;
+
   if (deco & UNDERLINE)
     pt->drawLine(_tx, _ty + underlineOffset, _tx + width,
                  _ty + underlineOffset);

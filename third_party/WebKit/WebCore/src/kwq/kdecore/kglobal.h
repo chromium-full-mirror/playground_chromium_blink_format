@@ -84,6 +84,11 @@ class KGlobal {
   // ---------------------------------------------------------------------
 
  private:
+  static KWQStaticStringDict* _stringDict;
+  static KInstance* _instance;
+  static KLocale* _locale;
+  static KCharsets* _charsets;
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
