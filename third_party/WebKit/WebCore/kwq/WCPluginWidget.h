@@ -61,7 +61,8 @@ class WCPluginWidget : public QWidget {
 
   WCPluginWidget(const QString& url = 0,
                  const QString& serviceType = 0,
-                 const QStringList& args = QStringList());
+                 const QStringList& args = QStringList(),
+                 const QString& baseURL = 0);
   ~WCPluginWidget();
 
   // member functions --------------------------------------------------------
