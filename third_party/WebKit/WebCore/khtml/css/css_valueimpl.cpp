@@ -478,9 +478,8 @@ void CSSPrimitiveValueImpl::cleanup() {
 }
 
 int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
-                                         QPaintDeviceMetrics* devMetrics,
-                                         khtml::CSSStyleSelector* selector) {
-  double result = computeLengthFloat(style, devMetrics, selector);
+                                         QPaintDeviceMetrics* devMetrics) {
+  double result = computeLengthFloat(style, devMetrics);
 #if APPLE_CHANGES
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -494,9 +493,8 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
 
 int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
                                          QPaintDeviceMetrics* devMetrics,
-                                         khtml::CSSStyleSelector* selector,
                                          double multiplier) {
-  double result = multiplier * computeLengthFloat(style, devMetrics, selector);
+  double result = multiplier * computeLengthFloat(style, devMetrics);
 #if APPLE_CHANGES
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -511,7 +509,6 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
 double CSSPrimitiveValueImpl::computeLengthFloat(
     khtml::RenderStyle* style,
     QPaintDeviceMetrics* devMetrics,
-    khtml::CSSStyleSelector* selector,
     bool applyZoomFactor) {
   unsigned short type = primitiveType();
 
@@ -524,9 +521,8 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
   double factor = 1.;
   switch (type) {
     case CSSPrimitiveValue::CSS_EMS:
-      factor = (selector && applyZoomFactor)
-                   ? style->htmlFont().getFontDef().computedSize
-                   : style->htmlFont().getFontDef().specifiedSize;
+      factor = applyZoomFactor ? style->htmlFont().getFontDef().computedSize
+                               : style->htmlFont().getFontDef().specifiedSize;
       break;
     case CSSPrimitiveValue::CSS_EXS:
       // FIXME: We have a bug right now where the zoom will be applied multiple

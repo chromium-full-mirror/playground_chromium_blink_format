@@ -35,7 +35,6 @@
 namespace khtml {
 class RenderStyle;
 class CachedImage;
-class CSSStyleSelector;
 }
 
 namespace DOM {
@@ -182,16 +181,12 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
    * this,
    * and some tool to calibrate.
    */
+  int computeLength(khtml::RenderStyle* style, QPaintDeviceMetrics* devMetrics);
   int computeLength(khtml::RenderStyle* style,
                     QPaintDeviceMetrics* devMetrics,
-                    khtml::CSSStyleSelector* selector);
-  int computeLength(khtml::RenderStyle* style,
-                    QPaintDeviceMetrics* devMetrics,
-                    khtml::CSSStyleSelector* selector,
                     double multiplier);
   double computeLengthFloat(khtml::RenderStyle* style,
                             QPaintDeviceMetrics* devMetrics,
-                            khtml::CSSStyleSelector* selector,
                             bool applyZoomFactor = true);
 
   // use with care!!!
