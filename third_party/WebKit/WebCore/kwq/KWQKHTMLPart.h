@@ -370,6 +370,7 @@ class KWQKHTMLPart : public KHTMLPart {
   friend class KHTMLPart;
 
   QPtrList<KJS::Bindings::RootObject> rootObjects;
+  WebScriptObject* _windowScriptObject;
 };
 
 inline KWQKHTMLPart* KWQ(KHTMLPart* part) {

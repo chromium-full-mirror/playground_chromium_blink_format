@@ -1437,7 +1437,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 
   clear();
 
-#if APPLE_CHANGE
+#if APPLE_CHANGES
   KWQ(this)->partClearedInBegin();
 #endif
 
