@@ -873,6 +873,11 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
     if (e && (e->id() == ID_FRAME || e->id() == ID_FRAMESET))
       style->setPosition(STATIC);
 
+    // Table headers with a text-align of auto will change the text-align to
+    // center.
+    if (e && e->id() == ID_TH && style->textAlign() == TAAUTO)
+      style->setTextAlign(CENTER);
+
     // Mutate the display to BLOCK or TABLE for certain cases, e.g., if someone
     // attempts to
     // position or float an inline, compact, or run-in.  Cache the original
