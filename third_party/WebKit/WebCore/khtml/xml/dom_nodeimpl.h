@@ -294,6 +294,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   void removeHTMLEventListener(int id);
   void setHTMLEventListener(int id, EventListener* listener);
   EventListener* getHTMLEventListener(int id);
+  void removeAllEventListeners();
 
   bool dispatchEvent(EventImpl* evt,
                      int& exceptioncode,

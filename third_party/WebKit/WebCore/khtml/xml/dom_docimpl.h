@@ -750,6 +750,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   DOMString m_policyBaseURL;
 
+  QPtrDict<NodeImpl> m_disconnectedNodesWithEventListeners;
+
 #if APPLE_CHANGES
  public:
   KWQSignal m_finishedParsing;
@@ -782,7 +784,14 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setDashboardRegions(
       const QValueList<khtml::DashboardRegionValue>& regions);
 
+  void removeAllEventListenersFromAllNodes();
+
+  void registerDisconnectedNodeWithEventListeners(NodeImpl* node);
+  void unregisterDisconnectedNodeWithEventListeners(NodeImpl* node);
+
  private:
+  void removeAllDisconnectedNodeEventListeners();
+
   JSEditor* jsEditor();
 
   JSEditor* m_jsEditor;
