@@ -285,8 +285,6 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
 
     // Nuke the now-empty block.
     next->detach();
-
-    mergedBlocks = true;
   }
 
   RenderFlow::removeChild(oldChild);
