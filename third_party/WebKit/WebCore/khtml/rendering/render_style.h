@@ -452,6 +452,26 @@ struct ShadowData {
   ShadowData* next;
 };
 
+#ifndef KHTML_NO_XBL
+struct BindingURI {
+  BindingURI(DOM::DOMStringImpl*);
+  ~BindingURI();
+
+  BindingURI* copy();
+
+  bool operator==(const BindingURI& o) const;
+  bool operator!=(const BindingURI& o) const { return !(*this == o); }
+
+  BindingURI* next() { return m_next; }
+  void setNext(BindingURI* n) { m_next = n; }
+
+  DOM::DOMStringImpl* uri() { return m_uri; }
+
+  BindingURI* m_next;
+  DOM::DOMStringImpl* m_uri;
+};
+#endif
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -459,8 +479,12 @@ struct ShadowData {
 class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
  public:
   StyleCSS3NonInheritedData();
-  ~StyleCSS3NonInheritedData() {}
+  ~StyleCSS3NonInheritedData();
   StyleCSS3NonInheritedData(const StyleCSS3NonInheritedData& o);
+
+#ifndef KHTML_NO_XBL
+  bool bindingsEquivalent(const StyleCSS3NonInheritedData& o) const;
+#endif
 
   bool operator==(const StyleCSS3NonInheritedData& o) const;
   bool operator!=(const StyleCSS3NonInheritedData& o) const {
@@ -470,6 +494,9 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   float opacity;  // Whether or not we're transparent.
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
+#ifndef KHTML_NO_XBL
+  BindingURI* bindingURI;  // The XBL binding URI list.
+#endif
 };
 
 // This struct is for rarely used inherited CSS3 properties.  By grouping them
@@ -1073,7 +1100,10 @@ class RenderStyle : public Shared<RenderStyle> {
     return noninherited_flags._page_break_after;
   }
 
-  // CSS3 Getter Methods
+// CSS3 Getter Methods
+#ifndef KHTML_NO_XBL
+  BindingURI* bindingURIs() const { return css3NonInheritedData->bindingURI; }
+#endif
   int outlineOffset() const {
     if (background->outline.style == BNONE)
       return 0;
@@ -1293,7 +1323,10 @@ class RenderStyle : public Shared<RenderStyle> {
   void setHtmlHacks(bool b = true) { inherited_flags._htmlHacks = b; }
 
   bool hasAutoZIndex() { return box->z_auto; }
-  void setHasAutoZIndex() { SET_VAR(box, z_auto, true) }
+  void setHasAutoZIndex() {
+    SET_VAR(box, z_auto, true);
+    SET_VAR(box, z_index, 0)
+  }
   int zIndex() const { return box->z_index; }
   void setZIndex(int v) {
     SET_VAR(box, z_auto, false);
@@ -1312,7 +1345,17 @@ class RenderStyle : public Shared<RenderStyle> {
     noninherited_flags._page_break_after = b;
   }
 
-  // CSS3 Setters
+// CSS3 Setters
+#ifndef KHTML_NO_XBL
+  void deleteBindingURIs() {
+    delete css3NonInheritedData->bindingURI;
+    SET_VAR(css3NonInheritedData, bindingURI, 0);
+  }
+  void inheritBindingURIs(BindingURI* other) {
+    SET_VAR(css3NonInheritedData, bindingURI, other->copy());
+  }
+  void addBindingURI(DOM::DOMStringImpl* uri);
+#endif
   void setOutlineOffset(unsigned short v) {
     SET_VAR(background, outline._offset, v)
   }

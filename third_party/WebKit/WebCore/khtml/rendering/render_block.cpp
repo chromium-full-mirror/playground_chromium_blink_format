@@ -684,9 +684,11 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
           child->setStaticX(borderRight() + paddingRight());
       }
       if (child->hasStaticY()) {
-        int yPosEstimate =
-            m_height +
-            (!topMarginContributor ? (prevPosMargin - prevNegMargin) : 0);
+        int marginOffset =
+            (!topMarginContributor || !canCollapseTopWithChildren)
+                ? (prevPosMargin - prevNegMargin)
+                : 0;
+        int yPosEstimate = m_height + marginOffset;
         child->setStaticY(yPosEstimate);
       }
       child = child->nextSibling();
@@ -1146,7 +1148,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   if (m_overflowHeight < m_height)
     m_overflowHeight = m_height;
 
-  if (canCollapseBottomWithChildren && !topMarginContributor) {
+  if (canCollapseBottomWithChildren &&
+      (!topMarginContributor || !canCollapseTopWithChildren)) {
     // Update our max pos/neg bottom margins, since we collapsed our bottom
     // margins
     // with our children.

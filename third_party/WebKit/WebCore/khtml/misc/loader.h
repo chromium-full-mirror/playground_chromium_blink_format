@@ -97,7 +97,14 @@ struct LRUList {
  */
 class CachedObject {
  public:
-  enum Type { Image, CSSStyleSheet, Script };
+  enum Type {
+    Image,
+    CSSStyleSheet,
+    Script,
+#ifndef KHTML_NO_XBL
+    XBL
+#endif
+  };
 
   enum Status {
     NotCached,   // this URL is not cached
@@ -370,6 +377,33 @@ class CachedImage : public QObject, public CachedObject {
 #endif
 };
 
+#ifndef KHTML_NO_XBL
+class CachedXBLDocument : public CachedObject {
+ public:
+  CachedXBLDocument(DocLoader* dl,
+                    const DOM::DOMString& url,
+                    KIO::CacheControl cachePolicy,
+                    time_t _expireDate);
+  virtual ~CachedXBLDocument();
+
+  XBL::XBLDocumentImpl* document() const { return m_document; }
+
+  virtual void ref(CachedObjectClient* consumer);
+  virtual void deref(CachedObjectClient* consumer);
+
+  virtual void data(QBuffer& buffer, bool eof);
+  virtual void error(int err, const char* text);
+
+  virtual bool schedule() const { return true; }
+
+  void checkNotify();
+
+ protected:
+  XBL::XBLDocumentImpl* m_document;
+  QTextCodec* m_codec;
+};
+#endif
+
 /**
  * @internal
  *
@@ -385,6 +419,7 @@ class DocLoader {
                                          const QString& charset);
   CachedScript* requestScript(const DOM::DOMString& url,
                               const QString& charset);
+  CachedXBLDocument* requestXBLDocument(const DOM::DOMString& url);
 
   bool autoloadImages() const { return m_bautoloadImages; }
   KIO::CacheControl cachePolicy() const { return m_cachePolicy; }
@@ -514,6 +549,14 @@ class Cache {
       time_t _expireDate = 0,
       const QString& charset = QString::null);
 
+#ifndef KHTML_NO_XBL
+  // Ask the cache for an XBL document.
+  static CachedXBLDocument* requestXBLDocument(DocLoader* l,
+                                               const DOM::DOMString& url,
+                                               bool reload = false,
+                                               time_t _expireDate = 0);
+#endif
+
   /**
    * Pre-loads a stylesheet into the cache.
    */
@@ -582,6 +625,9 @@ class Cache {
     TypeStatistic movies;
     TypeStatistic styleSheets;
     TypeStatistic scripts;
+#ifndef KHTML_NO_XBL
+    TypeStatistic xblDocs;
+#endif
     TypeStatistic other;
   };
 

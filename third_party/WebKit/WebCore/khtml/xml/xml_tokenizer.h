@@ -96,13 +96,16 @@ class XMLHandler : public QXmlDefaultHandler {
 
   QString errorString();
 
+  bool error(const QXmlParseException& exception);
   bool fatalError(const QXmlParseException& exception);
+  bool warning(const QXmlParseException& exception);
 
-  unsigned long errorLine;
-  unsigned long errorCol;
+  int errorLine;
+  int errorCol;
 
- private:
+ protected:
   QString errorProt;
+  int m_errorCount;
   DOM::DocumentPtr* m_doc;
   KHTMLView* m_view;
   DOM::NodeImpl* m_currentNode;

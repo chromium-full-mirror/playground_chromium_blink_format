@@ -48,6 +48,7 @@ class QPaintDeviceMetrics;
 class KHTMLView;
 class KHTMLPart;
 class Tokenizer;
+class XMLHandler;
 class RenderArena;
 
 #if APPLE_CHANGES
@@ -61,8 +62,13 @@ class CSSStyleSelectorList;
 class RenderImage;
 }
 
-namespace DOM {
+#ifndef KHTML_NO_XBL
+namespace XBL {
+class XBLBindingManager;
+}
+#endif
 
+namespace DOM {
 class AbstractViewImpl;
 class AttrImpl;
 class CDATASectionImpl;
@@ -320,6 +326,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   CSSStyleSheetImpl* elementSheet();
   virtual Tokenizer* createTokenizer();
   Tokenizer* tokenizer() { return m_tokenizer; }
+  virtual XMLHandler* createTokenHandler();
 
   QPaintDeviceMetrics* paintDeviceMetrics() { return m_paintDeviceMetrics; }
   QPaintDevice* paintDevice() const { return m_paintDevice; }
@@ -522,6 +529,11 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   DOMString toString() const;
 
+#ifndef KHTML_NO_XBL
+  // XBL methods
+  XBL::XBLBindingManager* bindingManager() const { return m_bindingManager; }
+#endif
+
  signals:
   void finishedParsing();
 
@@ -615,6 +627,12 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   bool m_processingLoadEvent;
   QTime m_startTime;
+
+#ifndef KHTML_NO_XBL
+  XBL::XBLBindingManager* m_bindingManager;  // The access point through which
+                                             // documents and elements
+                                             // communicate with XBL.
+#endif
 
 #if APPLE_CHANGES
  public:

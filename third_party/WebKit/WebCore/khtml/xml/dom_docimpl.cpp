@@ -72,6 +72,11 @@
 
 #include <kio/job.h>
 
+#ifndef KHTML_NO_XBL
+#include "xbl/xbl_binding_manager.h"
+using XBL::XBLBindingManager;
+#endif
+
 #if APPLE_CHANGES
 #include "KWQAccObjectCache.h"
 #endif
@@ -232,6 +237,10 @@ QPtrList<DocumentImpl>* DocumentImpl::changedDocuments = 0;
 DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
     : NodeBaseImpl(new DocumentPtr()),
       m_imageLoadEventTimer(0)
+#ifndef KHTML_NO_XBL
+      ,
+      m_bindingManager(new XBLBindingManager(this))
+#endif
 #if APPLE_CHANGES
       ,
       m_finishedParsing(this, SIGNAL(finishedParsing())),
@@ -277,7 +286,8 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_doctype->ref();
 
   m_implementation = _implementation;
-  m_implementation->ref();
+  if (m_implementation)
+    m_implementation->ref();
   pMode = Strict;
   hMode = XHtml;
   m_textColor = Qt::black;
@@ -338,7 +348,8 @@ DocumentImpl::~DocumentImpl() {
     m_elemSheet->deref();
   if (m_doctype)
     m_doctype->deref();
-  m_implementation->deref();
+  if (m_implementation)
+    m_implementation->deref();
   delete m_paintDeviceMetrics;
 
   if (m_elementNames) {
@@ -366,6 +377,10 @@ DocumentImpl::~DocumentImpl() {
     delete m_renderArena;
     m_renderArena = 0;
   }
+
+#ifndef KHTML_NO_XBL
+  delete m_bindingManager;
+#endif
 
 #if APPLE_CHANGES
   if (m_accCache) {
@@ -1174,6 +1189,10 @@ void DocumentImpl::clearSelection() {
 
 Tokenizer* DocumentImpl::createTokenizer() {
   return new XMLTokenizer(docPtr(), m_view);
+}
+
+XMLHandler* DocumentImpl::createTokenHandler() {
+  return new XMLHandler(docPtr(), m_view);
 }
 
 void DocumentImpl::setPaintDevice(QPaintDevice* dev) {
@@ -2661,7 +2680,8 @@ DocumentTypeImpl::DocumentTypeImpl(DOMImplementationImpl* implementation,
       m_qualifiedName(qualifiedName),
       m_publicId(publicId),
       m_systemId(systemId) {
-  m_implementation->ref();
+  if (m_implementation)
+    m_implementation->ref();
 
   m_entities = 0;
   m_notations = 0;
@@ -2671,7 +2691,8 @@ DocumentTypeImpl::DocumentTypeImpl(DOMImplementationImpl* implementation,
 }
 
 DocumentTypeImpl::~DocumentTypeImpl() {
-  m_implementation->deref();
+  if (m_implementation)
+    m_implementation->deref();
   if (m_entities)
     m_entities->deref();
   if (m_notations)
