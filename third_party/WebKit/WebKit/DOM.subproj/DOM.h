@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Foundation/Foundation.h>
+
 //=========================================================================
 //=========================================================================
 //=========================================================================
@@ -71,28 +73,26 @@ enum DOMErrorCode {
 
 extern NSString* const DOMErrorDomain;
 
-@class NSError;
-@class NSString;
-
-@class DOMNode;
+@class DOMAttr;
+@class DOMCDATASection;
+@class DOMComment;
+@class DOMDocument;
+@class DOMDocumentType;
+@class DOMElement;
+@class DOMEntityReference;
 @class DOMNamedNodeMap;
 @class DOMNodeList;
-@class DOMDocumentFragment;
-@class DOMDocument;
-@class DOMCharacterData;
-@class DOMAttr;
-@class DOMElement;
-@class DOMText;
-@class DOMComment;
-@class DOMCDATASection;
-@class DOMDocumentType;
-@class DOMNotation;
-@class DOMEntity;
-@class DOMEntityReference;
 @class DOMProcessingInstruction;
-@class DOMRange;
+@class DOMText;
 
-@interface DOMNode : NSObject<NSCopying>
+typedef struct DOMObjectInternal DOMObjectInternal;
+
+@interface DOMObject : NSObject<NSCopying> {
+  DOMObjectInternal* _internal;
+}
+@end
+
+@interface DOMNode : DOMObject
 - (NSString*)nodeName;
 - (NSString*)nodeValue;
 - (void)setNodeValue:(NSString*)string error:(NSError**)error;
@@ -125,7 +125,7 @@ extern NSString* const DOMErrorDomain;
 - (NSString*)HTMLString;
 @end
 
-@interface DOMNamedNodeMap : NSObject<NSCopying>
+@interface DOMNamedNodeMap : DOMObject
 - (DOMNode*)getNamedItem:(NSString*)name;
 - (DOMNode*)setNamedItem:(DOMNode*)arg error:(NSError**)error;
 - (DOMNode*)removeNamedItem:(NSString*)name error:(NSError**)error;
@@ -138,12 +138,12 @@ extern NSString* const DOMErrorDomain;
                         error:(NSError**)error;
 @end
 
-@interface DOMNodeList : NSObject<NSCopying>
+@interface DOMNodeList : DOMObject
 - (DOMNode*)item:(unsigned long)index;
 - (unsigned long)length;
 @end
 
-@interface DOMImplementation : NSObject<NSCopying>
+@interface DOMImplementation : DOMObject
 - (BOOL)hasFeature:(NSString*)feature:(NSString*)version;
 - (DOMDocumentType*)createDocumentType:(NSString*)
                          qualifiedName:(NSString*)
@@ -283,7 +283,7 @@ enum DOMCompareHow {
   DOMCompareEndToStart = 3,
 };
 
-@interface DOMRange : NSObject
+@interface DOMRange : DOMObject
 - (DOMNode*)startContainer:(NSError**)error;
 - (long)startOffset:(NSError**)error;
 - (DOMNode*)endContainer:(NSError**)error;
