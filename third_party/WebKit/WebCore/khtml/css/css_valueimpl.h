@@ -179,10 +179,6 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
 
   float computeLengthFloat(khtml::RenderStyle* style,
                            QPaintDeviceMetrics* devMetrics);
-#ifdef APPLE_CHANGES
-  float computePointFloat(khtml::RenderStyle* style,
-                          QPaintDeviceMetrics* devMetrics);
-#endif
 
   // use with care!!!
   void setPrimitiveType(unsigned short type) { m_type = type; }

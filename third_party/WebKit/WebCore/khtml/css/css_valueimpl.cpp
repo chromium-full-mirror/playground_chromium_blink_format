@@ -377,8 +377,8 @@ float CSSPrimitiveValueImpl::computeLengthFloat(
   float dpiY = 72.;  // fallback
   if (devMetrics)
     dpiY = devMetrics->logicalDpiY();
-  if (!khtml::printpainter && dpiY < 72)
-    dpiY = 72.;
+  if (!khtml::printpainter && dpiY < 96)
+    dpiY = 96.;
 
   float factor = 1.;
   switch (type) {
@@ -418,56 +418,6 @@ float CSSPrimitiveValueImpl::computeLengthFloat(
   }
   return getFloatValue(type) * factor;
 }
-
-#ifdef APPLE_CHANGES
-// Compute point equivalent size for each unit type.  OS X fonts are all
-// specified in
-// device independent point size, so don't apply DPI corrections.
-float CSSPrimitiveValueImpl::computePointFloat(
-    khtml::RenderStyle* style,
-    QPaintDeviceMetrics* devMetrics) {
-  unsigned short type = primitiveType();
-
-  float dpiY = 72.;  // fallback
-  if (devMetrics)
-    dpiY = devMetrics->logicalDpiY();
-  if (!khtml::printpainter && dpiY < 72)
-    dpiY = 72.;
-
-  float factor = 1.;
-  switch (type) {
-    case CSSPrimitiveValue::CSS_EMS:
-      factor = style->font().pixelSize();
-      break;
-    case CSSPrimitiveValue::CSS_EXS: {
-      QFontMetrics fm = style->fontMetrics();
-      factor = fm.xHeight();
-      break;
-    }
-    case CSSPrimitiveValue::CSS_PX:
-      factor = 72. / dpiY;
-      break;
-    case CSSPrimitiveValue::CSS_CM:
-      factor = 72. / 2.54;  //(2.54 cm/in)
-      break;
-    case CSSPrimitiveValue::CSS_MM:
-      factor = 72. / 25.4;  //(25.4 cm/in)
-      break;
-    case CSSPrimitiveValue::CSS_IN:
-      factor = 72.;
-      break;
-    case CSSPrimitiveValue::CSS_PT:
-      break;
-    case CSSPrimitiveValue::CSS_PC:
-      // 1 pc == 12 pt
-      factor = 12.;
-      break;
-    default:
-      return -1;
-  }
-  return getFloatValue(type) * factor;
-}
-#endif
 
 void CSSPrimitiveValueImpl::setFloatValue(unsigned short unitType,
                                           float floatValue,

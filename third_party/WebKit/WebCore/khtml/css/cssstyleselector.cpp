@@ -2499,16 +2499,8 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         int type = primitiveValue->primitiveType();
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG) {
-#if !APPLE_CHANGES
           size = primitiveValue->computeLengthFloat(parentStyle,
                                                     paintDeviceMetrics);
-#else
-          // OS X will always provide device independent font size, so we don't
-          // want to adjust
-          // the device independent sizes.
-          size = primitiveValue->computePointFloat(parentStyle,
-                                                   paintDeviceMetrics);
-#endif
           if (!khtml::printpainter && element && element->getDocument()->view())
             size *=
                 element->getDocument()->view()->part()->zoomFactor() / 100.0;
