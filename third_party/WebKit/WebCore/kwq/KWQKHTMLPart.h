@@ -340,8 +340,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   DOM::DocumentFragmentImpl* documentFragmentWithText(NSString* text);
 
-  void registerCommandForUndo(const khtml::EditCommand&);
-  void registerCommandForRedo(const khtml::EditCommand&);
+  void registerCommandForUndo(const khtml::EditCommandPtr&);
+  void registerCommandForRedo(const khtml::EditCommandPtr&);
   void clearUndoRedoOperations();
   void issueUndoCommand();
   void issueRedoCommand();
