@@ -407,6 +407,8 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
    */
   virtual void childrenChanged();
 
+  virtual DOMString toString() const = 0;
+
  private:  // members
   DocumentPtr* document;
   NodeImpl* m_previous;

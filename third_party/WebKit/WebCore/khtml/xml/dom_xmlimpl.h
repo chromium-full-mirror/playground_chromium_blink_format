@@ -68,6 +68,8 @@ class EntityImpl : public NodeBaseImpl {
 
   virtual bool childTypeAllowed(unsigned short type);
 
+  virtual DOMString toString() const;
+
  protected:
   DOMStringImpl* m_publicId;
   DOMStringImpl* m_systemId;
@@ -90,6 +92,8 @@ class EntityReferenceImpl : public NodeBaseImpl {
   // Other methods (not part of DOM)
 
   virtual bool childTypeAllowed(unsigned short type);
+
+  virtual DOMString toString() const;
 
  protected:
   DOMStringImpl* m_entityName;
@@ -159,6 +163,8 @@ class ProcessingInstructionImpl : public NodeBaseImpl,
   virtual void setStyleSheet(CSSStyleSheetImpl* sheet);
   bool isLoading() const;
   void sheetLoaded();
+
+  virtual DOMString toString() const;
 
 #if APPLE_CHANGES
   static ProcessingInstruction createInstance(ProcessingInstructionImpl* impl);

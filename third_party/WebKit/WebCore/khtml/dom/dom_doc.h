@@ -788,6 +788,8 @@ class Document : public Node {
    */
   DOMString completeURL(const DOMString& url);
 
+  DOMString toString() const;
+
  protected:
   Document(DocumentImpl* i);
 

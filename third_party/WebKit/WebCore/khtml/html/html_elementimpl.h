@@ -70,6 +70,8 @@ class HTMLElementImpl : public ElementImpl {
   virtual bool isGenericFormElement() const { return false; }
 #endif
 
+  virtual DOMString toString() const;
+
  protected:
   // for IMG, OBJECT and APPLET
   void addHTMLAlignment(DOMString alignment);

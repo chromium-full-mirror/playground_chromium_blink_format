@@ -106,6 +106,8 @@ class CommentImpl : public CharacterDataImpl {
 
   virtual Id id() const;
   virtual bool childTypeAllowed(unsigned short type);
+
+  virtual DOMString toString() const;
 };
 
 // ----------------------------------------------------------------------------
@@ -136,6 +138,8 @@ class TextImpl : public CharacterDataImpl {
   virtual void recalcStyle(StyleChange = NoChange);
   virtual bool childTypeAllowed(unsigned short type);
 
+  virtual DOMString toString() const;
+
 #if APPLE_CHANGES
   static Text createInstance(TextImpl* impl);
 #endif
@@ -161,6 +165,8 @@ class CDATASectionImpl : public TextImpl {
   // Other methods (not part of DOM)
 
   virtual bool childTypeAllowed(unsigned short type);
+
+  virtual DOMString toString() const;
 
  protected:
   virtual TextImpl* createNew(DOMStringImpl* _str);
