@@ -16,6 +16,7 @@
 @protocol IFDocumentRepresentation;
 
 @interface IFWebDataSourcePrivate : NSObject {
+ @public
   NSData* resourceData;
 
   id<IFDocumentRepresentation> representation;
