@@ -1255,7 +1255,7 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
       m_selectionToDelete(selection),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
-      m_mergeBlocksAfterDelete(m_mergeBlocksAfterDelete) {}
+      m_mergeBlocksAfterDelete(mergeBlocksAfterDelete) {}
 
 // This function moves nodes in the block containing startNode to dstBlock,
 // starting
