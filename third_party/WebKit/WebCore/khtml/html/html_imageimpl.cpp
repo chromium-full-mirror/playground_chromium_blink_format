@@ -296,8 +296,8 @@ HTMLMapElementImpl::HTMLMapElementImpl(DocumentPtr* doc)
     : HTMLElementImpl(doc) {}
 
 HTMLMapElementImpl::~HTMLMapElementImpl() {
-  if (getDocument() && getDocument()->isHTMLDocument())
-    static_cast<HTMLDocumentImpl*>(getDocument())->mapMap.remove(name);
+  if (getDocument())
+    getDocument()->removeImageMap(this);
 }
 
 NodeImpl::Id HTMLMapElementImpl::id() const {
@@ -346,21 +346,13 @@ void HTMLMapElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       if (getDocument()->htmlMode() != DocumentImpl::XHtml)
         break;
     // fall through
-    case ATTR_NAME: {
-      DOMString s = attr->value();
-      if (*s.unicode() == '#')
-        name = QString(s.unicode() + 1, s.length() - 1);
-      else
-        name = s.string();
-      // ### make this work for XML documents, e.g. in case of <html:map...>
-      if (getDocument()->isHTMLDocument()) {
-        QMap<QString, HTMLMapElementImpl*>& mapMap =
-            static_cast<HTMLDocumentImpl*>(getDocument())->mapMap;
-        if (!mapMap.contains(name))
-          mapMap.insert(name, this);
-      }
+    case ATTR_NAME:
+      getDocument()->removeImageMap(this);
+      name = attr->value();
+      if (name.length() != 0 && name[0] == '#')
+        name.remove(0, 1);
+      getDocument()->addImageMap(this);
       break;
-    }
     default:
       HTMLElementImpl::parseHTMLAttribute(attr);
   }

@@ -92,6 +92,7 @@ class EventListener;
 class GenericRONamedNodeMapImpl;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
+class HTMLMapElementImpl;
 class NodeFilter;
 class NodeFilterImpl;
 class NodeIteratorImpl;
@@ -538,6 +539,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void addElementById(const DOMString& elementId, ElementImpl* element);
   void removeElementById(const DOMString& elementId, ElementImpl* element);
 
+  void addImageMap(HTMLMapElementImpl*);
+  void removeImageMap(HTMLMapElementImpl*);
+  HTMLMapElementImpl* getImageMap(const DOMString& URL) const;
+
   HTMLElementImpl* body();
 
   DOMString toString() const;
@@ -650,6 +655,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
                                              // documents and elements
                                              // communicate with XBL.
 #endif
+
+  QMap<QString, HTMLMapElementImpl*> m_imageMapsByName;
 
 #if APPLE_CHANGES
  public:

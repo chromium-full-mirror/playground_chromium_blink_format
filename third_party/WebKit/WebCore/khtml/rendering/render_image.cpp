@@ -550,9 +550,7 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
             ? static_cast<HTMLImageElementImpl*>(element())
             : 0;
     HTMLMapElementImpl* map;
-    if (i && i->getDocument()->isHTMLDocument() &&
-        (map = static_cast<HTMLDocumentImpl*>(i->getDocument())
-                   ->getMap(i->imageMap()))) {
+    if (i && (map = i->getDocument()->getImageMap(i->imageMap()))) {
       // we're a client side image map
       inside = map->mapMouseEvent(_x - tx, _y - ty, contentWidth(),
                                   contentHeight(), info);
