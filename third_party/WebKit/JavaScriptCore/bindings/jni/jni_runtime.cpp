@@ -57,9 +57,9 @@ JavaField::JavaField(JNIEnv* env, jobject aField) {
   _field = new JavaInstance(aField);
 }
 
-KJS::Value convertJObjectToArray(KJS::ExecState* exec,
-                                 jobject anObject,
-                                 const char* type) {
+KJS::Value JavaArray::convertJObjectToArray(KJS::ExecState* exec,
+                                            jobject anObject,
+                                            const char* type) {
   if (type[0] != '[')
     return Undefined();
 
@@ -80,7 +80,7 @@ KJS::Value JavaField::valueFromInstance(const Instance* i) const {
 
       const char* arrayType = type();
       if (arrayType[0] == '[') {
-        return convertJObjectToArray(0, anObject, arrayType);
+        return JavaArray::convertJObjectToArray(0, anObject, arrayType);
       } else {
         return KJS::Object(
             new RuntimeObjectImp(new JavaInstance((jobject)anObject)));
@@ -268,10 +268,15 @@ const char* JavaMethod::signature() const {
     }
     _signature->append(")");
 
-    _signature->append(signatureFromPrimitiveType(_JNIReturnType));
-    if (_JNIReturnType == object_type) {
-      appendClassName(_signature, _returnType.UTF8String());
-      _signature->append(";");
+    const char* returnType = _returnType.UTF8String();
+    if (returnType[0] == '[') {
+      appendClassName(_signature, returnType);
+    } else {
+      _signature->append(signatureFromPrimitiveType(_JNIReturnType));
+      if (_JNIReturnType == object_type) {
+        appendClassName(_signature, returnType);
+        _signature->append(";");
+      }
     }
   }
 
@@ -390,7 +395,7 @@ KJS::Value JavaArray::valueAt(unsigned int index) const {
 
       // Nested array?
       if (_type[1] == '[') {
-        return convertJObjectToArray(0, anObject, _type + 1);
+        return JavaArray::convertJObjectToArray(0, anObject, _type + 1);
       }
       // or array of other object type?
       return KJS::Object(

@@ -93,7 +93,7 @@ class JavaClass : public Class {
 
   virtual const char* name() const { return _name; };
 
-  virtual Method* methodNamed(const char* name) const;
+  virtual MethodList* methodsNamed(const char* name) const;
 
   virtual Field* fieldNamed(const char* name) const;
 

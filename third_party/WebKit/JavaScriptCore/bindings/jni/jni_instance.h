@@ -92,7 +92,7 @@ class JavaInstance : public Instance {
   virtual KJS::Value defaultValue(KJS::Type hint) const;
 
   virtual KJS::Value invokeMethod(KJS::ExecState* exec,
-                                  const Method* method,
+                                  const MethodList* method,
                                   const KJS::List& args);
 
   jobject javaInstance() const { return _instance->_instance; }

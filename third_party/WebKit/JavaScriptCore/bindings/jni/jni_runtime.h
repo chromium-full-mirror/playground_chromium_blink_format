@@ -300,6 +300,10 @@ class JavaArray : public Array {
 
   jobject javaArray() const { return _array->_instance; }
 
+  static KJS::Value convertJObjectToArray(KJS::ExecState* exec,
+                                          jobject anObject,
+                                          const char* type);
+
  private:
   JObjectWrapper* _array;
   unsigned int _length;
