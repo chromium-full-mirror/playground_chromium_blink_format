@@ -261,6 +261,8 @@ enum FrameBorderStyle {
                            attributes:(NSDictionary*)attributes
                               baseURL:(NSURL*)baseURL;
 
+- (void)didAddSubview:(NSView*)view;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all

@@ -56,8 +56,9 @@
 - (NSString*)name;
 - (NSString*)filename;
 - (NSString*)pluginDescription;
-- (NSDictionary*)MIMEToExtensionsDictionary;
-- (NSDictionary*)MIMEToDescriptionDictionary;
+- (NSEnumerator*)MIMETypeEnumerator;
+- (NSString*)descriptionForMIMEType:(NSString*)MIMEType;
+- (NSArray*)extensionsForMIMEType:(NSString*)MIMEType;
 @end
 
 @protocol WebCoreFileButton<NSObject>

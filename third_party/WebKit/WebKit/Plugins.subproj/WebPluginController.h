@@ -24,4 +24,6 @@
 
 - (void)addPluginView:(NSView<WebPlugin>*)view;
 
+- (void)didAddSubview:(NSView<WebPlugin>*)view;
+
 @end
