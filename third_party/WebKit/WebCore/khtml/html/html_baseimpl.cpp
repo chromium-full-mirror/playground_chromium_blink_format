@@ -282,7 +282,6 @@ void HTMLFrameElementImpl::init() {
 void HTMLFrameElementImpl::attach() {
   assert(!attached());
   assert(parentNode());
-  assert(parentNode()->renderer());
 
   // ignore display: none for this element!
   KHTMLView* w = getDocument()->view();
@@ -297,7 +296,7 @@ void HTMLFrameElementImpl::attach() {
       break;
     }
 
-  if (!selfreference) {
+  if (!selfreference && parentNode()->renderer()) {
     m_render = new (getDocument()->renderArena()) RenderFrame(this);
     m_render->setStyle(getDocument()->styleSelector()->styleForElement(this));
     parentNode()->renderer()->addChild(m_render, nextRenderer());
