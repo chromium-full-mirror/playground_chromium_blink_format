@@ -149,6 +149,13 @@ class Font {
                             int toAdd,
                             float* buffer) const;
   bool isFixedPitch() const;
+  int checkSelectionPoint(QChar* s,
+                          int slen,
+                          int pos,
+                          int len,
+                          int toAdd,
+                          int x,
+                          bool reversed) const;
 #endif
   int width(QChar* str, int slen, int pos, int len) const;
   int width(QChar* str, int slen, int pos) const;

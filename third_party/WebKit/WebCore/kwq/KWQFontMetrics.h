@@ -73,6 +73,16 @@ class QFontMetrics {
                              int letterSpacing,
                              int wordSpacing,
                              bool smallCaps) const;
+  int checkSelectionPoint(QChar* s,
+                          int slen,
+                          int pos,
+                          int len,
+                          int toAdd,
+                          int letterSpacing,
+                          int wordSpacing,
+                          bool smallCaps,
+                          int x,
+                          bool reversed) const;
 
   QRect boundingRect(const QString&, int len = -1) const;
   QRect boundingRect(int, int, int, int, int, const QString&) const;
