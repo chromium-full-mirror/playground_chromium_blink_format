@@ -1,20 +1,19 @@
-//
-//  WebSubresourceClient.h
-//  WebKit
-//
-//  Created by Darin Adler on Sat Jun 15 2002.
-//  Copyright (c) 2002 Apple Computer, Inc. All rights reserved.
-//
+/*
+    WebSubresourceClient.h
+    Copyright (c) 2002, Apple Computer, Inc. All rights reserved.
+*/
+#import <Foundation/Foundation.h>
 
-#import <WebFoundation/WebResourceHandleDelegate.h>
+#import <WebKit/WebBaseResourceHandleDelegate.h>
 
 @class WebDataSource;
 @class WebResourceResponse;
+
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
 
 @interface WebSubresourceClient
-    : NSObject<WebResourceHandleDelegate, WebCoreResourceHandle> {
+    : WebBaseResourceHandleDelegate<WebCoreResourceHandle> {
   id<WebCoreResourceLoader> loader;
   WebDataSource* dataSource;
   NSURL* currentURL;
