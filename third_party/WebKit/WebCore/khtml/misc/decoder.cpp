@@ -287,9 +287,10 @@ void Decoder::setEncoding(const char* _encoding, EncodingType type) {
     return;
 
 #if APPLE_CHANGES
-  QTextCodec* codec = (type == EncodingFromMetaTag)
-                          ? QTextCodec::codecForNameEightBitOnly(enc)
-                          : QTextCodec::codecForName(enc);
+  QTextCodec* codec =
+      (type == EncodingFromMetaTag || type == EncodingFromXMLHeader)
+          ? QTextCodec::codecForNameEightBitOnly(enc)
+          : QTextCodec::codecForName(enc);
   if (codec) {
     enc = codec->name();
     visualRTL = codec->usesVisualOrdering();
