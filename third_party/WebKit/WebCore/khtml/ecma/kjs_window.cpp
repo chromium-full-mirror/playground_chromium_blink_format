@@ -34,7 +34,7 @@
 #include <qstyle.h>
 
 #if APPLE_CHANGES
-#include <KWQLogging.h>
+#include "KWQLogging.h"
 #define _COLLECTOR
 #endif
 #include <kjs/collector.h>
@@ -871,7 +871,7 @@ void Window::scheduleClose() {
   kdDebug(6070) << "Window::scheduleClose window.close() " << m_part << endl;
   Q_ASSERT(winq);
 #if APPLE_CHANGES
-  m_part->impl->scheduleClose();
+  m_part->kwq->scheduleClose();
 #else
   QTimer::singleShot(0, winq, SLOT(timeoutClose()));
 #endif
@@ -1006,7 +1006,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
     case Window::Alert:
       part->xmlDocImpl()->updateRendering();
 #if APPLE_CHANGES
-      part->impl->runJavaScriptAlert(str);
+      part->kwq->runJavaScriptAlert(str);
 #else
       KMessageBox::error(widget, QStyleSheet::convertFromPlainText(str),
                          "JavaScript");
@@ -1015,7 +1015,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
     case Window::Confirm:
       part->xmlDocImpl()->updateRendering();
 #if APPLE_CHANGES
-      return Boolean(part->impl->runJavaScriptConfirm(str));
+      return Boolean(part->kwq->runJavaScriptConfirm(str));
 #else
       return Boolean(
           (KMessageBox::warningYesNo(
@@ -1026,7 +1026,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       part->xmlDocImpl()->updateRendering();
       bool ok;
 #if APPLE_CHANGES
-      ok = part->impl->runJavaScriptPrompt(
+      ok = part->kwq->runJavaScriptPrompt(
           str,
           args.size() >= 2 ? args[1].toString(exec).qstring() : QString::null,
           str2);
@@ -1368,7 +1368,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       return Undefined();
     case Window::Blur:
 #if APPLE_CHANGES
-      part->impl->unfocusWindow();
+      part->kwq->unfocusWindow();
 #else
 // TODO
 #endif

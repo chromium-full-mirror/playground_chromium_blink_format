@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <KWQKHTMLPartImpl.h>
+#include <KWQKHTMLPart.h>
 
 #include <html_documentimpl.h>
 #include <html_elementimpl.h>
@@ -34,7 +34,7 @@ using DOM::DocumentImpl;
 using DOM::HTMLDocumentImpl;
 using DOM::NodeImpl;
 
-bool KWQKHTMLPartImpl::isFrameSet() {
+bool KWQKHTMLPart::isFrameSet() {
   DocumentImpl* document = d->m_doc;
   if (!document->isHTMLDocument())
     return false;
@@ -42,15 +42,15 @@ bool KWQKHTMLPartImpl::isFrameSet() {
   return body && body->renderer() && body->id() == ID_FRAMESET;
 }
 
-int KWQKHTMLPartImpl::selectionStartOffset() const {
+int KWQKHTMLPart::selectionStartOffset() const {
   return d->m_startOffset;
 }
-int KWQKHTMLPartImpl::selectionEndOffset() const {
+int KWQKHTMLPart::selectionEndOffset() const {
   return d->m_endOffset;
 }
-DOM::NodeImpl* KWQKHTMLPartImpl::selectionStart() const {
+DOM::NodeImpl* KWQKHTMLPart::selectionStart() const {
   return d->m_selectionStart.handle();
 }
-DOM::NodeImpl* KWQKHTMLPartImpl::selectionEnd() const {
+DOM::NodeImpl* KWQKHTMLPart::selectionEnd() const {
   return d->m_selectionEnd.handle();
 }
