@@ -1723,11 +1723,6 @@ void HTMLInputElementImpl::attach() {
 #endif
 }
 
-void HTMLInputElementImpl::detach() {
-  HTMLGenericFormElementImpl::detach();
-  m_valueMatchesRenderer = false;
-}
-
 DOMString HTMLInputElementImpl::altText() const {
   // http://www.w3.org/TR/1998/REC-html40-19980424/appendix/notes.html#altgen
   // also heavily discussed by Hixie on bugzilla
@@ -3097,11 +3092,6 @@ bool HTMLTextAreaElementImpl::isEditable() {
 
 void HTMLTextAreaElementImpl::accessKeyAction() {
   focus();
-}
-
-void HTMLTextAreaElementImpl::detach() {
-  HTMLGenericFormElementImpl::detach();
-  m_valueMatchesRenderer = false;
 }
 
 // -------------------------------------------------------------------------
