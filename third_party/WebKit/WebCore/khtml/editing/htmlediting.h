@@ -348,9 +348,8 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   virtual bool preservesTypingStyle() const;
 
   void initializePositionData();
-  DOM::Position startPositionForDelete() const;
-  DOM::Position endPositionForDelete() const;
   void saveTypingStyleState();
+  bool canPerformSpecialCaseAllContentDelete();
   bool canPerformSpecialCaseBRDelete();
   void performGeneralDelete();
   void fixupWhitespace();
