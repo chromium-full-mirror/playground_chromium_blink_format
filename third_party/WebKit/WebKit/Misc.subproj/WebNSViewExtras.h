@@ -8,6 +8,7 @@
 #define WebDragImageAlpha 0.75
 
 @class WebFrameView;
+@class WebImageRenderer;
 
 @interface NSView (WebExtras)
 
@@ -46,11 +47,9 @@
 
 // Resizes and applies alpha to image, extends pboard and sets drag origins for
 // dragging promised image files.
-- (void)_web_dragPromisedImage:(NSImage*)image
+- (void)_web_dragPromisedImage:(WebImageRenderer*)image
                           rect:(NSRect)rect
                            URL:(NSURL*)URL
-                      fileType:(NSString*)fileType
                          title:(NSString*)title
                          event:(NSEvent*)event;
-
 @end

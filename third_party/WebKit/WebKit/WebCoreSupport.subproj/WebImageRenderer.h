@@ -32,4 +32,6 @@
 - (id)initWithData:(NSData*)data MIMEType:(NSString*)MIME;
 + (void)stopAnimationsInView:(NSView*)aView;
 
+- (NSString*)MIMEType;
+
 @end
