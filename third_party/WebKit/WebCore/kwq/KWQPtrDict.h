@@ -78,6 +78,8 @@ class QPtrDictIterator {
   T* current() const { return (T*)impl.current(); }
   void* currentKey() const { return impl.currentKey(); }
 
+  T* toFirst() { return (T*)(impl.toFirst()); }
+
   T* operator++() { return (T*)++impl; }
 
  private:

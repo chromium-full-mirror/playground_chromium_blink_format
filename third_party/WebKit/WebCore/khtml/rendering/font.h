@@ -174,8 +174,6 @@ class Font {
                           bool includePartialGlyphs) const;
   void drawHighlightForText(QPainter* p,
                             int x,
-                            int minX,
-                            int maxX,
                             int y,
                             int h,
                             QChar* str,
