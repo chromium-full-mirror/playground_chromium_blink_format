@@ -67,7 +67,7 @@ void RenderHtml::printBoxDecorations(QPainter* p,
   QColor c = style()->backgroundColor();
   CachedImage* bg = style()->backgroundImage();
 
-  if (firstChild()) {
+  if (!c.isValid() && !bg && firstChild()) {
     if (!c.isValid())
       c = firstChild()->style()->backgroundColor();
     if (!bg)

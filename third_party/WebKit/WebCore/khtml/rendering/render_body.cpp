@@ -52,11 +52,13 @@ void RenderBody::printBoxDecorations(QPainter* p,
                                      int _ty) {
   // kdDebug( 6040 ) << renderName() << "::printDecorations()" << endl;
   QColor c;
-  if (parent()->style()->backgroundColor().isValid())
-    c = style()->backgroundColor();
   CachedImage* bg = 0;
-  if (parent()->style()->backgroundImage())
+
+  if (parent()->style()->backgroundColor().isValid() ||
+      parent()->style()->backgroundImage()) {
+    c = style()->backgroundColor();
     bg = style()->backgroundImage();
+  }
 
   int w = width();
   int h = height() + borderTopExtra() + borderBottomExtra();
