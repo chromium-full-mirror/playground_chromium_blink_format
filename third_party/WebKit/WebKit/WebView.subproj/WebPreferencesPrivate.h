@@ -23,6 +23,9 @@
 
 + (void)_setIBCreatorID:(NSString*)string;
 
+- (void)setHistoryIsFrozen:(BOOL)newValue;
+- (BOOL)historyIsFrozen;
+
 - (void)setTabsToLinks:(BOOL)flag;
 - (BOOL)tabsToLinks;
 
