@@ -122,9 +122,11 @@ class XMLHttpRequest : public DOMObject {
 
   khtml::Decoder* decoder;
   QString encoding;
-  QString response;
-
   QString responseHeaders;
+
+  QString response;
+  mutable bool createdDocument;
+  mutable DOM::Document responseXML;
 };
 
 class XMLHttpRequestQObject : public QObject {

@@ -49,6 +49,7 @@
 #include "kjs_css.h"
 #include "kjs_events.h"
 #include "xmlhttprequest.h"
+#include "xmlserializer.h"
 
 #include "khtmlview.h"
 #include "khtml_part.h"
@@ -232,6 +233,7 @@ const ClassInfo Window::info = {"Window", 0, &WindowTable, 0};
   Image		Window::Image		DontDelete|ReadOnly
   Option	Window::Option		DontDelete|ReadOnly
   XMLHttpRequest	Window::XMLHttpRequest	DontDelete|ReadOnly
+  XMLSerializer	Window::XMLSerializer	DontDelete|ReadOnly
   alert		Window::Alert		DontDelete|Function 1
   confirm	Window::Confirm		DontDelete|Function 1
   prompt	Window::Prompt		DontDelete|Function 2
@@ -558,6 +560,8 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
       case XMLHttpRequest:
         return Value(
             new XMLHttpRequestConstructorImp(exec, m_part->document()));
+      case XMLSerializer:
+        return Value(new XMLSerializerConstructorImp(exec));
       case Alert:
       case Confirm:
       case Prompt:

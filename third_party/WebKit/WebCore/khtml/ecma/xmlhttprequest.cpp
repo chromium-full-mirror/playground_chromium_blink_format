@@ -23,6 +23,7 @@
 #include "kjs_window.h"
 #include "kjs_events.h"
 
+#include "dom/dom_doc.h"
 #include "dom/dom_exception.h"
 #include "dom/dom_string.h"
 #include "misc/loader.h"
@@ -130,14 +131,44 @@ Value XMLHttpRequest::tryGet(ExecState* exec,
       exec, propertyName, &XMLHttpRequestTable, this);
 }
 
-Value XMLHttpRequest::getValueProperty(ExecState*, int token) const {
+Value XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case ReadyState:
       return Number(state);
     case ResponseText:
       return getStringOrNull(DOM::DOMString(response));
     case ResponseXML:
-      return Undefined();
+      if (state != Completed) {
+        return Undefined();
+      }
+      if (!createdDocument) {
+        QString mimeType = "text/xml";
+
+        Value header = getResponseHeader("Content-Type");
+        if (header.type() != UndefinedType) {
+          mimeType = QStringList::split(";", header.toString(exec).qstring())[0]
+                         .stripWhiteSpace();
+        }
+
+        if (mimeType == "text/xml" || mimeType == "application/xml" ||
+            mimeType == "application/xhtml+xml") {
+          responseXML = DOM::Document(doc->implementation()->createDocument());
+        } else {
+          responseXML =
+              DOM::Document(doc->implementation()->createHTMLDocument());
+        }
+
+        DOM::DocumentImpl* docImpl =
+            static_cast<DOM::DocumentImpl*>(responseXML.handle());
+
+        docImpl->open();
+        docImpl->write(response);
+        docImpl->finishParsing();
+        docImpl->close();
+        createdDocument = true;
+      }
+
+      return getDOMNode(exec, responseXML);
     case Status:
       return getStatus();
     case StatusText:
@@ -201,7 +232,8 @@ XMLHttpRequest::XMLHttpRequest(ExecState* exec, const DOM::Document& d)
       state(Uninitialized),
       onReadyStateChangeListener(0),
       onLoadListener(0),
-      decoder(0) {}
+      decoder(0),
+      createdDocument(false) {}
 
 XMLHttpRequest::~XMLHttpRequest() {
   if (decoder) {
