@@ -610,11 +610,11 @@ void RenderListMarker::calcWidth() {
   RenderBox::calcWidth();
 }
 
-short RenderListMarker::lineHeight(bool b) const {
+short RenderListMarker::lineHeight(bool, bool) const {
   return height();
 }
 
-short RenderListMarker::baselinePosition(bool b) const {
+short RenderListMarker::baselinePosition(bool, bool) const {
   return height();
 }
 

@@ -69,8 +69,8 @@ class RenderListMarker : public RenderBox {
 
   virtual void calcWidth();
 
-  virtual short lineHeight(bool b) const;
-  virtual short baselinePosition(bool b) const;
+  virtual short lineHeight(bool b, bool isRootLineBox = false) const;
+  virtual short baselinePosition(bool b, bool isRootLineBox = false) const;
 
   virtual bool isListMarker() const { return true; }
 

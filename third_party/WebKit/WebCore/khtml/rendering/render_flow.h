@@ -67,7 +67,8 @@ class RenderFlow : public RenderBox {
   InlineFlowBox* firstLineBox() const { return m_firstLineBox; }
   InlineFlowBox* lastLineBox() const { return m_lastLineBox; }
 
-  virtual InlineBox* createInlineBox(bool makePlaceHolderBox);
+  virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
+                                     bool isRootLineBox);
 
   void paintLineBoxBackgroundBorder(QPainter* p,
                                     int _x,

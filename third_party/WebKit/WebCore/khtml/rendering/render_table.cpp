@@ -101,22 +101,6 @@ void RenderTable::setStyle(RenderStyle* _style) {
   }
 }
 
-short RenderTable::lineHeight(bool b) const {
-  // Inline tables are replaced elements. Otherwise, just pass off to
-  // the base class.
-  if (isReplaced())
-    return height() + marginTop() + marginBottom();
-  return RenderBlock::lineHeight(b);
-}
-
-short RenderTable::baselinePosition(bool b) const {
-  // Inline tables are replaced elements. Otherwise, just pass off to
-  // the base class.
-  if (isReplaced())
-    return height() + marginTop() + marginBottom();
-  return RenderBlock::baselinePosition(b);
-}
-
 void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
 #ifdef DEBUG_LAYOUT
   kdDebug(6040) << renderName() << "(Table)::addChild( " << child->renderName()

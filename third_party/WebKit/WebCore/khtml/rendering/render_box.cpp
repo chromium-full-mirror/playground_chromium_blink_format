@@ -709,7 +709,8 @@ void RenderBox::calcWidth() {
     bool inVerticalBox =
         parent()->isFlexibleBox() && parent()->style()->boxOrient() == VERTICAL;
     bool stretching = parent()->style()->boxAlign() == BSTRETCH;
-    bool treatAsReplaced = isReplaced() && (!inVerticalBox || !stretching);
+    bool treatAsReplaced = isReplaced() && !isInlineBlockOrInlineTable() &&
+                           (!inVerticalBox || !stretching);
     Length w;
     if (treatAsReplaced)
       w = Length(calcReplacedWidth(), Fixed);
@@ -733,7 +734,7 @@ void RenderBox::calcWidth() {
     m_marginLeft = 0;
     m_marginRight = 0;
 
-    if (isInline()) {
+    if (isInline() && !isInlineBlockOrInlineTable()) {
       // just calculate margins
       m_marginLeft = ml.minWidth(cw);
       m_marginRight = mr.minWidth(cw);
@@ -892,7 +893,8 @@ void RenderBox::calcHeight() {
       h = Length(style()->boxFlexedHeight() - borderTop() - borderBottom() -
                      paddingTop() - paddingBottom(),
                  Fixed);
-    else if (isReplaced() && (!inHorizontalBox || !stretching)) {
+    else if (isReplaced() && !isInlineBlockOrInlineTable() &&
+             (!inHorizontalBox || !stretching)) {
       h = Length(calcReplacedHeight(), Fixed);
     } else
       h = style()->height();

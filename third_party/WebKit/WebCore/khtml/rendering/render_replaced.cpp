@@ -100,11 +100,11 @@ void RenderReplaced::calcMinMaxWidth() {
   setMinMaxKnown();
 }
 
-short RenderReplaced::lineHeight(bool) const {
+short RenderReplaced::lineHeight(bool, bool) const {
   return height() + marginTop() + marginBottom();
 }
 
-short RenderReplaced::baselinePosition(bool) const {
+short RenderReplaced::baselinePosition(bool, bool) const {
   return height() + marginTop() + marginBottom();
 }
 
