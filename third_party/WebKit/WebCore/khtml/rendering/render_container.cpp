@@ -321,7 +321,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
     RenderObject* next = child->nextSibling();
 
     if (child->isFlow() && child->isAnonymousBox() && !child->continuation() &&
-        !child->childrenInline()) {
+        !child->childrenInline() && !child->isTableCell()) {
       RenderObject* firstAnChild = child->firstChild();
       RenderObject* lastAnChild = child->lastChild();
       if (firstAnChild) {
