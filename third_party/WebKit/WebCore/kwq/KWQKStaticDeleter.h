@@ -52,7 +52,7 @@ class KStaticDeleter {
 
   // member functions --------------------------------------------------------
 
-  T* setObject(T*, bool isArray = false);
+  T* setObject(T*, bool isArray = false) {}
 
   // operators ---------------------------------------------------------------
 
