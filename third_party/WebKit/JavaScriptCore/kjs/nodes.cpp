@@ -130,6 +130,42 @@ Value Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
   return err;
 }
 
+Value Node::throwError(ExecState* exec,
+                       ErrorType e,
+                       const char* msg,
+                       Value v,
+                       Node* expr) {
+  char* vStr = strdup(v.toString(exec).ascii());
+  char* exprStr = strdup(expr->toString().ascii());
+
+  int length = strlen(msg) - 4 /* two %s */ + strlen(vStr) + strlen(exprStr) +
+               1 /* null terminator */;
+  char* str = new char[length];
+  sprintf(str, msg, vStr, exprStr);
+  free(vStr);
+  free(exprStr);
+
+  Value result = throwError(exec, e, str);
+  delete[] str;
+
+  return result;
+}
+
+Value Node::throwError(ExecState* exec,
+                       ErrorType e,
+                       const char* msg,
+                       Identifier label) {
+  const char* l = label.ascii();
+  int length = strlen(msg) - 2 /* %s */ + strlen(l) + 1 /* null terminator */;
+  char* message = new char[length];
+  sprintf(message, msg, l);
+
+  Value result = throwError(exec, e, message);
+  delete[] message;
+
+  return result;
+}
+
 // ------------------------------ StatementNode --------------------------------
 StatementNode::StatementNode() : l0(-1), l1(-1), sid(-1), breakPoint(false) {}
 
@@ -602,13 +638,18 @@ Value NewExprNode::evaluate(ExecState* exec) {
   }
 
   if (v.type() != ObjectType) {
-    return throwError(exec, TypeError, "Value used with new is not object.");
+    return throwError(exec, TypeError,
+                      "Value %s (result of expression %s) is not an object. "
+                      "Cannot be used with new.",
+                      v, expr);
   }
 
   Object constr = Object(static_cast<ObjectImp*>(v.imp()));
   if (!constr.implementsConstruct()) {
     return throwError(exec, TypeError,
-                      "Value asked to construct is not a constructor.");
+                      "Value %s (result of expression %s) is not a "
+                      "constructor. Cannot be used with new.",
+                      v, expr);
   }
 
   Value res = constr.construct(exec, argList);
@@ -646,30 +687,27 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
   Value v = ref.getValue(exec);
 
   if (v.type() != ObjectType) {
-#ifndef NDEBUG
-    printInfo(exec, "WARNING: Failed function call attempt on", v, line);
-#endif
-    return throwError(exec, TypeError,
-                      "Value is not object. Cannot be called.");
+    return throwError(
+        exec, TypeError,
+        "Value %s (result of expression %s) is not object. Cannot be called.",
+        v, expr);
   }
 
   Object func = Object(static_cast<ObjectImp*>(v.imp()));
 
   if (!func.implementsCall()) {
-#ifndef NDEBUG
-    printInfo(exec, "Failed function call attempt on", v, line);
-#endif
-    return throwError(exec, TypeError, "Object does not allow calls.");
+    return throwError(
+        exec, TypeError,
+        "Object %s (result of expression %s) does not allow calls.", v, expr);
   }
 
 #if KJS_MAX_STACK > 0
   static int depth = 0;  // sum of all concurrent interpreters
   if (++depth > KJS_MAX_STACK) {
-#ifndef NDEBUG
-    printInfo(exec, "Exceeded maximum function call depth", v, line);
-#endif
     return throwError(exec, RangeError,
-                      "Exceeded maximum function call depth.");
+                      "Exceeded maximum function call depth calling %s (result "
+                      "of expression %s).",
+                      v, expr);
   }
 #endif
 
@@ -1096,13 +1134,18 @@ Value RelationalNode::evaluate(ExecState* exec) {
   } else if (oper == OpIn) {
     // Is all of this OK for host objects?
     if (v2.type() != ObjectType)
-      return throwError(exec, TypeError, "Used IN expression with non-object.");
+      return throwError(exec, TypeError,
+                        "Value %s (result of expression %s) is not an object. "
+                        "Cannot be used with IN expression.",
+                        v2, expr2);
     Object o2(static_cast<ObjectImp*>(v2.imp()));
     b = o2.hasProperty(exec, Identifier(v1.toString(exec)));
   } else {
     if (v2.type() != ObjectType)
       return throwError(exec, TypeError,
-                        "Used instanceof operator on non-object.");
+                        "Value %s (result of expression %s) is not an object. "
+                        "Cannot be used with instanceof operator.",
+                        v2, expr2);
 
     Object o2(static_cast<ObjectImp*>(v2.imp()));
     if (!o2.implementsHasInstance()) {
@@ -1986,10 +2029,11 @@ Completion ContinueNode::execute(ExecState* exec) {
 
   Value dummy;
   return exec->context().imp()->seenLabels()->contains(ident)
-             ? Completion(Continue, dummy, ident)
-             : Completion(Throw,
-                          throwError(exec, SyntaxError,
-                                     "Label not found in containing block"));
+             ? Completion(Break, dummy, ident)
+             : Completion(Throw, throwError(exec, SyntaxError,
+                                            "Label %s not found in containing "
+                                            "block. Can't continue.",
+                                            ident));
 }
 
 // ------------------------------ BreakNode ------------------------------------
@@ -2001,9 +2045,12 @@ Completion BreakNode::execute(ExecState* exec) {
   Value dummy;
   return exec->context().imp()->seenLabels()->contains(ident)
              ? Completion(Break, dummy, ident)
-             : Completion(Throw,
-                          throwError(exec, SyntaxError,
-                                     "Label not found in containing block"));
+             : Completion(
+                   Throw,
+                   throwError(
+                       exec, SyntaxError,
+                       "Label %s not found in containing block. Can't break.",
+                       ident));
 }
 
 // ------------------------------ ReturnNode -----------------------------------
@@ -2327,8 +2374,8 @@ Completion LabelNode::execute(ExecState* exec) {
   Completion e;
 
   if (!exec->context().imp()->seenLabels()->push(label)) {
-    return Completion(Throw,
-                      throwError(exec, SyntaxError, "Duplicated label found"));
+    return Completion(Throw, throwError(exec, SyntaxError,
+                                        "Duplicated label %s found.", label));
   };
   e = statement->execute(exec);
   exec->context().imp()->seenLabels()->pop();

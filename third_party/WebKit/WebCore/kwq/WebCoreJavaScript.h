@@ -37,4 +37,7 @@
 
 + (void)garbageCollect;
 
++ (BOOL)shouldPrintExceptions;
++ (void)setShouldPrintExceptions:(BOOL)print;
+
 @end

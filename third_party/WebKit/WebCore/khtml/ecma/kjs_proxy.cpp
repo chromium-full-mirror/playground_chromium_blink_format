@@ -120,7 +120,7 @@ QVariant KJSProxyImpl::evaluate(QString filename,
                                    : getDOMNode(m_script->globalExec(), n);
 
   UString code(str);
-  Completion comp = m_script->evaluate(code, thisNode);
+  Completion comp = m_script->evaluate(code, thisNode, filename);
   bool success =
       (comp.complType() == Normal) || (comp.complType() == ReturnValue);
 
