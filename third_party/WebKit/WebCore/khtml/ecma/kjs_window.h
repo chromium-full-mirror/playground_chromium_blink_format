@@ -180,6 +180,7 @@ class Window : public ObjectImp {
     Confirm,
     Prompt,
     Open,
+    Print,
     SetTimeout,
     ClearTimeout,
     Focus,
