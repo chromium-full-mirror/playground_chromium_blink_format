@@ -59,43 +59,12 @@ using khtml::RootInlineBox;
 
 namespace DOM {
 
-static InlineBox* inlineBoxForRenderer(RenderObject* renderer, long offset) {
-  if (!renderer)
-    return 0;
-
-  if (renderer->isBR() && static_cast<RenderText*>(renderer)->firstTextBox())
-    return static_cast<RenderText*>(renderer)->firstTextBox();
-
-  if (renderer->isText()) {
-    RenderText* textRenderer = static_cast<khtml::RenderText*>(renderer);
-    if (textRenderer->isBR() && textRenderer->firstTextBox())
-      return textRenderer->firstTextBox();
-
-    for (InlineTextBox* box = textRenderer->firstTextBox(); box;
-         box = box->nextTextBox()) {
-      if (offset >= box->m_start && offset <= box->m_start + box->m_len) {
-        return box;
-      } else if (offset < box->m_start) {
-        // The offset we're looking for is before this node
-        // this means the offset must be in content that is
-        // not rendered.
-        return box->prevTextBox() ? box->prevTextBox()
-                                  : textRenderer->firstTextBox();
-      }
-    }
-  } else {
-    return renderer->inlineBoxWrapper();
-  }
-
-  return 0;
-}
-
 static bool renderersOnDifferentLine(RenderObject* r1,
                                      long o1,
                                      RenderObject* r2,
                                      long o2) {
-  InlineBox* b1 = inlineBoxForRenderer(r1, o1);
-  InlineBox* b2 = inlineBoxForRenderer(r2, o2);
+  InlineBox* b1 = r1 ? r1->inlineBox(o1) : 0;
+  InlineBox* b2 = r2 ? r2->inlineBox(o2) : 0;
   return (b1 && b2 && b1->root() != b2->root());
 }
 
@@ -104,7 +73,9 @@ static NodeImpl* nextRenderedEditable(NodeImpl* node) {
     node = node->nextEditable();
     if (!node)
       return 0;
-    if (inlineBoxForRenderer(node->renderer(), 0))
+    if (!node->renderer())
+      continue;
+    if (node->renderer()->inlineBox(0))
       return node;
   }
   return 0;
@@ -115,7 +86,9 @@ static NodeImpl* previousRenderedEditable(NodeImpl* node) {
     node = node->previousEditable();
     if (!node)
       return 0;
-    if (inlineBoxForRenderer(node->renderer(), 0))
+    if (!node->renderer())
+      continue;
+    if (node->renderer()->inlineBox(0))
       return node;
   }
   return 0;
@@ -350,7 +323,7 @@ Position Position::previousLinePosition(int x) const {
   if (!node()->renderer())
     return *this;
 
-  InlineBox* box = inlineBoxForRenderer(node()->renderer(), offset());
+  InlineBox* box = node()->renderer()->inlineBox(offset());
   if (!box)
     return *this;
 
@@ -371,7 +344,8 @@ Position Position::previousLinePosition(int x) const {
       while (n && !Position(n, n->caretMaxOffset()).inRenderedContent())
         n = n->previousEditable();
       if (n && n->inSameRootEditableBlock(node())) {
-        box = inlineBoxForRenderer(n->renderer(), n->caretMaxOffset());
+        ASSERT(n->renderer());
+        box = n->renderer()->inlineBox(n->caretMaxOffset());
         ASSERT(box);
         // previous root line box found
         root = box->root();
@@ -397,7 +371,7 @@ Position Position::nextLinePosition(int x) const {
   if (!node()->renderer())
     return *this;
 
-  InlineBox* box = inlineBoxForRenderer(node()->renderer(), offset());
+  InlineBox* box = node()->renderer()->inlineBox(offset());
   if (!box)
     return *this;
 
@@ -418,7 +392,8 @@ Position Position::nextLinePosition(int x) const {
       while (n && !Position(n, n->caretMinOffset()).inRenderedContent())
         n = n->nextEditable();
       if (n && n->inSameRootEditableBlock(node())) {
-        box = inlineBoxForRenderer(n->renderer(), n->caretMinOffset());
+        ASSERT(n->renderer());
+        box = n->renderer()->inlineBox(n->caretMinOffset());
         ASSERT(box);
         // previous root line box found
         root = box->root();
@@ -688,10 +663,10 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
           ? "YES"
           : "NO");
   LOG(Editing, "renderer:               %p [%p]\n", renderer,
-      inlineBoxForRenderer(renderer, offset()));
+      renderer ? renderer->inlineBox(offset()) : 0);
   LOG(Editing, "thisRenderedOffset:         %d\n", thisRenderedOffset);
   LOG(Editing, "posRenderer:            %p [%p]\n", posRenderer,
-      inlineBoxForRenderer(posRenderer, pos.offset()));
+      posRenderer ? posRenderer->inlineBox(offset()) : 0);
   LOG(Editing, "posRenderedOffset:      %d\n", posRenderedOffset);
   LOG(Editing, "node min/max:           %d:%d\n", node()->caretMinOffset(),
       node()->caretMaxRenderedOffset());
@@ -701,8 +676,8 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
       "----------------------------------------------------------------------"
       "\n");
 
-  InlineBox* b1 = inlineBoxForRenderer(renderer, offset());
-  InlineBox* b2 = inlineBoxForRenderer(posRenderer, pos.offset());
+  InlineBox* b1 = renderer ? renderer->inlineBox(offset()) : 0;
+  InlineBox* b2 = posRenderer ? posRenderer->inlineBox(pos.offset()) : 0;
 
   if (!b1 || !b2) {
     return false;

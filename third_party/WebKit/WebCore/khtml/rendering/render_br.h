@@ -79,6 +79,8 @@ class RenderBR : public RenderText {
                         int& _w,
                         int& _h);
 
+  virtual InlineBox* inlineBox(long offset);
+
  private:
   int m_x;
   int m_y;

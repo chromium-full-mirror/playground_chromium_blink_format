@@ -389,6 +389,8 @@ class RenderObject : public CachedObjectClient {
   virtual void setInlineBoxWrapper(InlineBox* b);
   void deleteLineBoxWrapper();
 
+  virtual InlineBox* inlineBox(long offset);
+
   // for discussion of lineHeight see CSS2 spec
   virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
   // for the vertical-align property of inline elements
