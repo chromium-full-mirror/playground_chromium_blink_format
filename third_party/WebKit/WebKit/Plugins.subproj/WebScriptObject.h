@@ -69,7 +69,7 @@
    the
     other direction.
 */
-@interface NSObject (WebScriptMethods)
+@interface NSObject (WebScripting)
 
 /*!
     @method webScriptNameForSelector:
