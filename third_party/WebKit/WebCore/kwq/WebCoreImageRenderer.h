@@ -36,11 +36,13 @@
 - (void)drawImageInRect:(NSRect)ir fromRect:(NSRect)fr;
 - (void)drawImageInRect:(NSRect)ir
                fromRect:(NSRect)fr
-      compositeOperator:(NSCompositingOperation)compsiteOperator;
+      compositeOperator:(NSCompositingOperation)compsiteOperator
+                context:(CGContextRef)context;
 - (void)stopAnimation;
-- (void)tileInRect:(NSRect)r fromPoint:(NSPoint)p;
+- (void)tileInRect:(NSRect)r fromPoint:(NSPoint)p context:(CGContextRef)context;
 - (BOOL)isNull;
 - (id<WebCoreImageRenderer>)retainOrCopyIfNeeded;
 - (void)increaseUseCount;
 - (void)decreaseUseCount;
+- (void)flushRasterCache;
 @end

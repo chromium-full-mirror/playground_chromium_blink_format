@@ -99,8 +99,25 @@ class QPainter : public Qt {
                   int sh = -1,
                   int compositeOperator = -1,
                   CGContextRef context = 0);
-  void
-  drawTiledPixmap(int, int, int, int, const QPixmap&, int sx = 0, int sy = 0);
+  void drawPixmap(int x,
+                  int y,
+                  int w,
+                  int h,
+                  const QPixmap&,
+                  int sx = 0,
+                  int sy = 0,
+                  int sw = -1,
+                  int sh = -1,
+                  int compositeOperator = -1,
+                  CGContextRef context = 0);
+  void drawTiledPixmap(int,
+                       int,
+                       int,
+                       int,
+                       const QPixmap&,
+                       int sx = 0,
+                       int sy = 0,
+                       CGContextRef context = 0);
 
   void addClip(const QRect&);
 
@@ -161,6 +178,10 @@ class QPainter : public Qt {
   void setDrawsFocusRing(bool flag) { _drawsFocusRing = flag; }
 
   CGContextRef currentContext();
+
+  static int getCompositeOperation(CGContextRef context);
+  static void setCompositeOperation(CGContextRef context, QString operation);
+  static void setCompositeOperation(CGContextRef context, int operation);
 
  private:
   // no copying or assignment

@@ -86,6 +86,8 @@ class QPixmap : public QPaintDevice, public Qt {
   void increaseUseCount() const;
   void decreaseUseCount() const;
 
+  void flushRasterCache();
+
  private:
   WebCoreImageRendererPtr imageRenderer;
 
