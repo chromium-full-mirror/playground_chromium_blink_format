@@ -848,9 +848,10 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         }
         break;
       case CSSSelector::PseudoActive:
-        if (pseudoState == PseudoUnknown)
-          checkPseudoState(e);
-        if (pseudoState != PseudoNone) {
+        // If we're in quirks mode, then :active should never match anchors with
+        // no
+        // href.
+        if (strictParsing || e->id() != ID_A || e->hasAnchor()) {
           if (element == e)
             style->setAffectedByActiveRules(true);
           else if (e->renderer())
