@@ -1409,6 +1409,9 @@ Completion StatListNode::execute(ExecState* exec) {
     return Completion(Throw, ex);
   }
 
+  if (c.complType() != Normal)
+    return c;
+
   Value v = c.value();
 
   for (StatListNode* n = list; n; n = n->list) {
