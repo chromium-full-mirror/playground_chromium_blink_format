@@ -47,8 +47,6 @@ class Job;
 class TransferJob;
 };
 
-#ifndef APPLE_CHANGES
-
 namespace khtml {
 struct ChildFrame {
   enum Type { Frame, IFrame, Object };
@@ -60,10 +58,12 @@ struct ChildFrame {
     m_bNotify = false;
   }
 
+#ifndef APPLE_CHANGES
   ~ChildFrame() {
     if (m_run)
       m_run->abort();
   }
+#endif
 
   QGuardedPtr<khtml::RenderPart> m_frame;
   QGuardedPtr<KParts::ReadOnlyPart> m_part;
@@ -74,7 +74,9 @@ struct ChildFrame {
   bool m_bCompleted;
   QString m_name;
   KParts::URLArgs m_args;
+#ifndef APPLE_CHANGES
   QGuardedPtr<KHTMLRun> m_run;
+#endif
   bool m_bPreloaded;
   KURL m_workingURL;
   Type m_type;
@@ -90,8 +92,6 @@ class FrameList : public QValueList<khtml::ChildFrame> {
 
 typedef FrameList::ConstIterator ConstFrameIt;
 typedef FrameList::Iterator FrameIt;
-
-#endif  // APPLE_CHANGES
 
 static int khtml_part_dcop_counter = 0;
 
@@ -153,7 +153,6 @@ class KHTMLPartPrivate {
 
     m_bPendingChildRedirection = false;
 
-#ifndef APPLE_CHANGES
     // inherit settings from parent
     if (parent && parent->inherits("KHTMLPart")) {
       KHTMLPart* part = static_cast<KHTMLPart*>(parent);
@@ -170,7 +169,6 @@ class KHTMLPartPrivate {
         m_zoomFactor = part->d->m_zoomFactor;
       }
     }
-#endif
 
     m_focusNodeNumber = -1;
     m_focusNodeRestored = false;
@@ -192,10 +190,8 @@ class KHTMLPartPrivate {
 #endif
   }
 
-#ifndef APPLE_CHANGES
   FrameList m_frames;
   QValueList<khtml::ChildFrame> m_objects;
-#endif
 
   QGuardedPtr<KHTMLView> m_view;
   KHTMLPartBrowserExtension* m_extension;

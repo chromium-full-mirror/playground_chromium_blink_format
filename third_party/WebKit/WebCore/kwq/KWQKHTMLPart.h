@@ -40,6 +40,7 @@ class URLArgs;
 
 namespace DOM {
 class DOMString;
+class DocumentImpl;
 }
 
 namespace khtml {
@@ -79,8 +80,6 @@ class KWQKHTMLPartImpl : public QObject {
   KHTMLPart* findFrame(const QString& frameName);
   QPtrList<KParts::ReadOnlyPart> frames() const;
 
-  KHTMLPart* parentPart();
-
   void urlSelected(const QString& url,
                    int button,
                    int state,
@@ -116,9 +115,17 @@ class KWQKHTMLPartImpl : public QObject {
 
   void overURL(const QString& url, const QString& target, int modifierState);
 
-  void redirectionTimerStartedOrStopped();
-
   void layout();
+
+  // Incoming calls, used by the bridge.
+
+  DOM::DocumentImpl* getDocument();
+  khtml::RenderObject* getRenderer();
+
+  // Used internally, but need to be public because they are used by non-member
+  // functions.
+
+  void redirectionTimerStartedOrStopped();
 
  private:
   KHTMLPart* part;

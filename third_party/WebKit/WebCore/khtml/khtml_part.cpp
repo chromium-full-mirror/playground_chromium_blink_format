@@ -963,10 +963,10 @@ void KHTMLPart::clear() {
       }
     }
   }
+#endif
 
   d->m_frames.clear();
   d->m_objects.clear();
-#endif
 
 #ifndef Q_WS_QWS
   delete d->m_javaContext;
@@ -1607,14 +1607,12 @@ void KHTMLPart::checkCompleted() {
     d->m_focusNodeRestored = true;
   }
 
-#ifndef APPLE_CHANGES
   // Any frame that hasn't completed yet ?
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_bCompleted)
       return;
-#endif
 
   // Are we still parsing - or have we done the completed stuff already ?
   if (d->m_bComplete || (d->m_doc && d->m_doc->parsing()))
@@ -1683,7 +1681,6 @@ void KHTMLPart::checkEmitLoadEvent() {
   if (d->m_bLoadEventEmitted || !d->m_doc || d->m_doc->parsing())
     return;
 
-#ifndef APPLE_CHANGES
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
@@ -1710,7 +1707,6 @@ void KHTMLPart::checkEmitLoadEvent() {
       }
     }
   }
-#endif
 
   d->m_bLoadEventEmitted = true;
   if (d->m_doc)
@@ -3388,14 +3384,10 @@ bool KHTMLPart::frameExists(const QString& frameName) {
 }
 
 KHTMLPart* KHTMLPart::parentPart() {
-#ifdef APPLE_CHANGES
-  return impl->parentPart();
-#else
   if (!parent() || !parent()->inherits("KHTMLPart"))
     return 0L;
 
   return (KHTMLPart*)parent();
-#endif
 }
 
 #ifndef APPLE_CHANGES
@@ -3731,7 +3723,6 @@ void KHTMLPart::slotDecZoom() {
 }
 
 void KHTMLPart::setZoomFactor(int percent) {
-#ifndef APPLE_CHANGES
   if (percent < minZoom)
     percent = minZoom;
   if (percent > maxZoom)
@@ -3759,7 +3750,6 @@ void KHTMLPart::setZoomFactor(int percent) {
 
   d->m_paDecZoomFactor->setEnabled(d->m_zoomFactor > minZoom);
   d->m_paIncZoomFactor->setEnabled(d->m_zoomFactor < maxZoom);
-#endif
 }
 
 void KHTMLPart::setJSStatusBarText(const QString& text) {
