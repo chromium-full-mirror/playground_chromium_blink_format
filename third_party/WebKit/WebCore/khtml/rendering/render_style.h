@@ -1198,7 +1198,8 @@ class RenderStyle : public Shared<RenderStyle> {
   bool setFontDef(const khtml::FontDef& v) {
     // bah, this doesn't compare pointers. broken! (Dirk)
     if (!(inherited->font.fontDef == v)) {
-      inherited.access()->font = Font(v);
+      inherited.access()->font =
+          Font(v, inherited->font.letterSpacing, inherited->font.wordSpacing);
       return true;
     }
     return false;
