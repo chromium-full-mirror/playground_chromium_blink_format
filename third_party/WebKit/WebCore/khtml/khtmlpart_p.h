@@ -125,7 +125,9 @@ class KHTMLPartPrivate {
     m_bDnd = true;
     m_startOffset = m_endOffset = 0;
     m_startBeforeEnd = true;
+#if !APPLE_CHANGES
     m_linkCursor = KCursor::handCursor();
+#endif
     m_loadedObjects = 0;
     m_totalObjectCount = 0;
     m_jobPercent = 0;
@@ -358,7 +360,9 @@ class KHTMLPartPrivate {
   QPoint m_dragLastPos;
 #endif
 
+#if !APPLE_CHANGES
   QCursor m_linkCursor;
+#endif
   QTimer m_scrollTimer;
 
   unsigned long m_loadedObjects;
