@@ -143,9 +143,9 @@ KHTMLParser::~KHTMLParser() {
   kdDebug() << "TIME: parsing time was = " << qt.elapsed() << endl;
 #endif
 
-  setCurrent(0);
-
   freeBlock();
+
+  setCurrent(0);
 
   document->deref();
 
@@ -177,9 +177,9 @@ void KHTMLParser::reset() {
 }
 
 void KHTMLParser::setCurrent(DOM::NodeImpl* newCurrent) {
-  if (newCurrent)
+  if (newCurrent && newCurrent != document->document())
     newCurrent->ref();
-  if (current)
+  if (current && current != document->document())
     current->deref();
   current = newCurrent;
 }
