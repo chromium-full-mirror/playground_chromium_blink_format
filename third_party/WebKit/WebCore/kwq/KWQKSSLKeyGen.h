@@ -27,6 +27,7 @@
 #define KSSLKEYGEN_H_
 
 #include "KWQStringList.h"
+#include "QWidget.h"
 
 class QDialog {
  public:
@@ -35,7 +36,7 @@ class QDialog {
 
 class KSSLKeyGen {
  public:
-  static QStringList supportedKeySizes() { return QStringList(); }
+  static QStringList supportedKeySizes();
   KSSLKeyGen(QWidget*, const char*, bool) {}
   void setKeySize(int) {}
   int exec() { return QDialog::Rejected; }
