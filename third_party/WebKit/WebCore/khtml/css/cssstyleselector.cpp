@@ -3694,6 +3694,9 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         case CSS_VAL_ALTERNATE:
           style->setMarqueeBehavior(MALTERNATE);
           break;
+        case CSS_VAL_UNFURL:
+          style->setMarqueeBehavior(MUNFURL);
+          break;
       }
       break;
     }
