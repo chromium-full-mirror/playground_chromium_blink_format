@@ -417,7 +417,7 @@ class QString {
   QString& setNum(ulong);
   QString& setNum(double);
 
-  QString& sprintf(const char*, ...);
+  QString& sprintf(const char*, ...) __attribute__((format(printf, 2, 3)));
 
   QString& prepend(const QString&);
   QString& append(const QString&);
@@ -457,12 +457,12 @@ class QString {
   void forceUnicode();
   void setLength(uint);
 
-  struct QStringData* data() const;
+  QStringData* data() const;
 
   QCString convertToQCString(CFStringEncoding) const;
 
-  struct QStringData** dataHandle;
-  struct QStringData internalData;
+  QStringData** dataHandle;
+  QStringData internalData;
 
   static QStringData* shared_null;
   static QStringData* makeSharedNull();
@@ -485,7 +485,7 @@ QString operator+(const char*, const QString&);
 QString operator+(QChar, const QString&);
 QString operator+(char, const QString&);
 
-inline struct QStringData* QString::data() const {
+inline QStringData* QString::data() const {
   return *dataHandle;
 }
 
