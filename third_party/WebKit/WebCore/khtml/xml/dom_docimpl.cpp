@@ -290,6 +290,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_namespaceURIs[0] = new DOMStringImpl(xhtml.unicode(), xhtml.length());
   m_namespaceURIs[0]->ref();
   m_focusNode = 0;
+  m_hoverNode = 0;
   m_defaultView = new AbstractViewImpl(this);
   m_defaultView->ref();
   m_listenerTypes = 0;
@@ -342,8 +343,11 @@ DocumentImpl::~DocumentImpl() {
   delete[] m_namespaceURIs;
   m_defaultView->deref();
   m_styleSheets->deref();
+
   if (m_focusNode)
     m_focusNode->deref();
+  if (m_hoverNode)
+    m_hoverNode->deref();
 
   if (m_renderArena) {
     delete m_renderArena;
@@ -1993,6 +1997,16 @@ void DocumentImpl::recalcStyleSelector() {
                                          !inCompatMode());
 
   m_styleSelectorDirty = false;
+}
+
+void DocumentImpl::setHoverNode(NodeImpl* newHoverNode) {
+  if (m_hoverNode != newHoverNode) {
+    if (m_hoverNode)
+      m_hoverNode->deref();
+    m_hoverNode = newHoverNode;
+    if (m_hoverNode)
+      m_hoverNode->ref();
+  }
 }
 
 void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {

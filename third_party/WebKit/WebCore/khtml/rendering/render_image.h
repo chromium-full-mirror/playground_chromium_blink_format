@@ -75,6 +75,7 @@ class RenderImage : public RenderReplaced {
                            int y,
                            int tx,
                            int ty,
+                           HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
 
   virtual short calcReplacedWidth() const;

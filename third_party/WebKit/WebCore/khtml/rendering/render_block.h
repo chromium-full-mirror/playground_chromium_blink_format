@@ -200,6 +200,7 @@ class RenderBlock : public RenderFlow {
                            int y,
                            int tx,
                            int ty,
+                           HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
 
   bool isPointInScrollbar(int x, int y, int tx, int ty);

@@ -63,6 +63,7 @@ class RenderFrameSet : public RenderBox {
                    int y,
                    int tx,
                    int ty,
+                   HitTestAction hitTestAction = HitTestAll,
                    bool inside = false);
 
   DOM::HTMLFrameSetElementImpl* element() const {

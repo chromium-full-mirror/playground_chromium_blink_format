@@ -80,7 +80,8 @@ class RenderInline : public RenderFlow {
                            int _y,
                            int _tx,
                            int _ty,
-                           bool inside);
+                           HitTestAction hitTestAction = HitTestAll,
+                           bool inside = false);
 
   virtual void calcMinMaxWidth();
 

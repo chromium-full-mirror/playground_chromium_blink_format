@@ -405,6 +405,7 @@ bool RenderText::nodeAtPoint(NodeInfo& info,
                              int _y,
                              int _tx,
                              int _ty,
+                             HitTestAction hitTestAction,
                              bool inside) {
   assert(parent());
 
@@ -419,8 +420,6 @@ bool RenderText::nodeAtPoint(NodeInfo& info,
 
     s = si < (int)m_lines.count() - 1 ? m_lines[++si] : 0;
   }
-
-  setMouseInside(inside);
 
   if (inside && element()) {
     if (info.innerNode() && info.innerNode()->renderer() &&

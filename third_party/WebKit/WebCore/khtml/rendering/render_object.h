@@ -78,10 +78,17 @@ typedef enum {
   PaintActionSelection
 } PaintAction;
 
+typedef enum {
+  HitTestAll = 0,
+  HitTestSelfOnly = 1,
+  HitTestChildrenOnly = 2
+} HitTestAction;
+
 namespace DOM {
 class HTMLAreaElementImpl;
 class DOMString;
 class NodeImpl;
+class DocumentImpl;
 class ElementImpl;
 class EventImpl;
 };
@@ -267,6 +274,7 @@ class RenderObject : public CachedObjectClient {
 
   // don't even think about making this method virtual!
   DOM::NodeImpl* element() const { return m_node; }
+  DOM::DocumentImpl* document() const;
 
   /**
     * returns the object containing this one. can be different from parent for
@@ -497,8 +505,8 @@ class RenderObject : public CachedObjectClient {
                            int y,
                            int tx,
                            int ty,
+                           HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
-  void setHoverAndActive(NodeInfo& info, bool oldinside, bool inside);
 
   // set the style of the object.
   virtual void setStyle(RenderStyle* style);

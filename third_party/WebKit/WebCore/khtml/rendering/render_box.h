@@ -171,9 +171,6 @@ class RenderBox : public RenderContainer {
   virtual QRect getOverflowClipRect(int tx, int ty);
   virtual QRect getClipRect(int tx, int ty);
 
-  // Called to correct the z-index after the style has been changed.
-  void adjustZIndex();
-
   // the actual height of the contents + borders + padding
   int m_height;
 

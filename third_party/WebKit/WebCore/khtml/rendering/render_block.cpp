@@ -1966,12 +1966,13 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
                               int _y,
                               int _tx,
                               int _ty,
+                              HitTestAction hitTestAction,
                               bool inBox) {
   bool inScrollbar = isPointInScrollbar(_x, _y, _tx + xPos(), _ty + yPos());
-  if (inScrollbar)
+  if (inScrollbar && hitTestAction != HitTestChildrenOnly)
     inBox = true;
 
-  if (m_floatingObjects && !inScrollbar) {
+  if (hitTestAction != HitTestSelfOnly && m_floatingObjects && !inScrollbar) {
     int stx = _tx + xPos();
     int sty = _ty + yPos();
     if (style()->hidesOverflow() && m_layer)
@@ -1990,7 +1991,8 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
             sty + o->startY + o->node->marginTop() - o->node->yPos());
   }
 
-  inBox |= RenderFlow::nodeAtPoint(info, _x, _y, _tx, _ty, inBox);
+  inBox |=
+      RenderFlow::nodeAtPoint(info, _x, _y, _tx, _ty, hitTestAction, inBox);
   return inBox;
 }
 

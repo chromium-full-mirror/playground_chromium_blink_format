@@ -388,16 +388,20 @@ bool RenderInline::nodeAtPoint(NodeInfo& info,
                                int _y,
                                int _tx,
                                int _ty,
+                               HitTestAction hitTestAction,
                                bool inside) {
-  // Always check our kids.
-  for (RenderObject* child = lastChild(); child;
-       child = child->previousSibling())
-    if (!child->layer() && !child->isFloating() &&
-        child->nodeAtPoint(info, _x, _y, _tx, _ty))
-      inside = true;
+  // Check our kids if our HitTestAction says to.
+  if (hitTestAction != HitTestSelfOnly) {
+    for (RenderObject* child = lastChild(); child;
+         child = child->previousSibling())
+      if (!child->layer() && !child->isFloating() &&
+          child->nodeAtPoint(info, _x, _y, _tx, _ty))
+        inside = true;
+  }
 
   // Check our line boxes if we're still not inside.
-  if (!inside && style()->visibility() != HIDDEN) {
+  if (hitTestAction != HitTestChildrenOnly && !inside &&
+      style()->visibility() != HIDDEN) {
     // See if we're inside one of our line boxes.
     for (InlineRunBox* curr = firstLineBox(); curr;
          curr = curr->nextLineBox()) {
@@ -426,29 +430,6 @@ bool RenderInline::nodeAtPoint(NodeInfo& info,
 
     if (!info.innerNonSharedNode())
       info.setInnerNonSharedNode(element());
-
-    if (!info.URLElement()) {
-      RenderObject* p = this;
-      while (p) {
-        if (p->element() && p->element()->hasAnchor()) {
-          info.setURLElement(p->element());
-          break;
-        }
-        if (!isFloatingOrPositioned())
-          break;
-        p = p->parent();
-      }
-    }
-  }
-
-  if (!info.readonly()) {
-    // lets see if we need a new style
-    bool oldinside = mouseInside();
-    setMouseInside(inside);
-
-    setHoverAndActive(info, oldinside, inside);
-    if (!isInline() && continuation())
-      continuation()->setHoverAndActive(info, oldinside, inside);
   }
 
   return inside;
