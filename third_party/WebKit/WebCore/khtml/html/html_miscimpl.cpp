@@ -94,6 +94,8 @@ void HTMLCollectionImpl::resetCollectionInfo() const {
 }
 
 NodeImpl* HTMLCollectionImpl::traverseNextItem(NodeImpl* current) const {
+  assert(current);
+
   current = current->traverseNextNode(base);
 
   while (current) {
@@ -228,7 +230,7 @@ NodeImpl* HTMLCollectionImpl::item(unsigned long index) const {
       return 0;
   }
   NodeImpl* node = info->current;
-  for (unsigned pos = info->position; pos < index; pos++) {
+  for (unsigned pos = info->position; node && pos < index; pos++) {
     node = traverseNextItem(node);
   }
   info->current = node;
