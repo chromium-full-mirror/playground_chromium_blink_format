@@ -12,8 +12,8 @@
 
 @protocol WebDocumentRepresentation;
 
-@interface WebPluginStream : NSObject<WebDocumentRepresentation> {
-  WebPluginView* view;
+@interface WebNetscapePluginStream : NSObject<WebDocumentRepresentation> {
+  WebNetscapePluginView* view;
   NSURL* URL;
   NPP instance;
   uint16 transferMode;

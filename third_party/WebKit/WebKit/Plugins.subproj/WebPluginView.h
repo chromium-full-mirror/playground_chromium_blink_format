@@ -9,14 +9,14 @@
 #import <Cocoa/Cocoa.h>
 #import <npapi.h>
 
-@class WebPluginNullEventSender;
+@class WebNetscapePluginNullEventSender;
 @class WebDataSource;
-@class WebPlugin;
+@class WebNetscapePlugin;
 @class WebController;
 @protocol WebDocumentView;
 
-@interface WebPluginView : NSView<WebDocumentView> {
-  WebPluginNullEventSender* eventSender;
+@interface WebNetscapePluginView : NSView<WebDocumentView> {
+  WebNetscapePluginNullEventSender* eventSender;
   unsigned argsCount;
   char **cAttributes, **cValues;
 
@@ -53,7 +53,7 @@
 }
 
 - (id)initWithFrame:(NSRect)r
-             plugin:(WebPlugin*)plugin
+             plugin:(WebNetscapePlugin*)plugin
                 URL:(NSURL*)URL
             baseURL:(NSURL*)baseURL
                mime:(NSString*)mimeType
