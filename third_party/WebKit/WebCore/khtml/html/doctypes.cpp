@@ -213,7 +213,7 @@ __inline
     const struct PubIDInfo*
     findDoctypeEntry(register const char* str, register unsigned int len) {
   enum {
-    TOTAL_KEYWORDS = 76,
+    TOTAL_KEYWORDS = 77,
     MIN_WORD_LENGTH = 4,
     MAX_WORD_LENGTH = 80,
     MIN_HASH_VALUE = 4,
@@ -354,7 +354,7 @@ __inline
        PubIDInfo::eQuirks3},
       {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
       {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
-      {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
+      {"-//w30//dtd w3 html 2.0//en", PubIDInfo::eQuirks3, PubIDInfo::eQuirks3},
       {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
       {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
       {"", PubIDInfo::eAlmostStandards, PubIDInfo::eAlmostStandards},
