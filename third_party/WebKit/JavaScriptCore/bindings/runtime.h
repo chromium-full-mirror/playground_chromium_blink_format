@@ -131,10 +131,16 @@ class Instance {
   static KJSDidExecuteFunctionPtr didExecuteFunction();
 
   static Instance* createBindingForLanguageInstance(BindingLanguage language,
-                                                    void* instance);
-
+                                                    void* nativeInstance,
+                                                    const RootObject* r = 0);
+  static void* createLanguageInstanceForValue(ExecState* exec,
+                                              BindingLanguage language,
+                                              const Object& value,
+                                              const RootObject* origin,
+                                              const RootObject* current);
   static Object createRuntimeObject(BindingLanguage language,
-                                    void* myInterface);
+                                    void* nativeInstance,
+                                    const RootObject* r = 0);
 
   Instance() : _executionContext(0){};
 

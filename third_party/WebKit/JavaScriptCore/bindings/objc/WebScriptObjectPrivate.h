@@ -30,6 +30,7 @@ originExecutionContext:(const KJS::Bindings::RootObject*)originExecutionContext
                     (const KJS::Bindings::RootObject*)executionContext;
 - (void)_initializeScriptDOMNodeImp;
 - (KJS::ObjectImp*)_imp;
+- (void)_setExecutionContext:(const KJS::Bindings::RootObject*)context;
 - (const KJS::Bindings::RootObject*)_executionContext;
 - (void)_setOriginExecutionContext:
     (const KJS::Bindings::RootObject*)originExecutionContext;

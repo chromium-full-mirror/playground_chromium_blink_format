@@ -132,8 +132,8 @@ KJS::Value JavaField::valueFromInstance(KJS::ExecState* exec,
         jsresult = JavaArray::convertJObjectToArray(
             exec, anObject, arrayType, instance->executionContext());
       } else {
-        jsresult = KJS::Object(new RuntimeObjectImp(
-            new JavaInstance((jobject)anObject, instance->executionContext())));
+        jsresult = Instance::createRuntimeObject(
+            Instance::JavaLanguage, anObject, instance->executionContext());
       }
     } break;
 
@@ -494,8 +494,8 @@ KJS::Value JavaArray::valueAt(KJS::ExecState* exec, unsigned int index) const {
                                                 executionContext());
       }
       // or array of other object type?
-      return KJS::Object(new RuntimeObjectImp(
-          new JavaInstance((jobject)anObject, executionContext())));
+      return Instance::createRuntimeObject(Instance::JavaLanguage, anObject,
+                                           executionContext());
     }
 
     case boolean_type: {
