@@ -198,6 +198,10 @@ class HTMLElement : public Element {
    */
   void addCSSProperty(const DOMString& property, const DOMString& value);
 
+  bool isContentEditable() const;
+  DOMString contentEditable() const;
+  void setContentEditable(const DOMString& enabled);
+
  protected:
   /*
    * @internal

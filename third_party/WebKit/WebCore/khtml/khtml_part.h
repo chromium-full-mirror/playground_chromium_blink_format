@@ -29,6 +29,7 @@
 
 #include "dom/html_document.h"
 #include "dom/dom2_range.h"
+#include "dom/dom_misc.h"
 
 #include <kparts/part.h>
 #include <kparts/browserextension.h>
@@ -59,6 +60,8 @@ class Node;
 class HTMLEventListener;
 class EventListener;
 };
+
+using DOM::TristateFlag;
 
 namespace khtml {
 class DocLoader;
@@ -91,7 +94,7 @@ class PartManager;
  * This class is khtml's main class. It features an almost complete
  * web browser, and html renderer.
  *
- * The easiest way to use this class (if you just want to display a an HTML
+ * The easiest way to use this class (if you just want to display an HTML
  * page at some URL) is the following:
  *
  * <pre>
@@ -357,9 +360,13 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setOnlyLocalReferences(bool enable);
 
   /**
-   * Returnd whether references should be loaded ( default false )
+   * Returns whether references should be loaded ( default false )
    **/
   bool onlyLocalReferences() const;
+
+  void setEditMode(TristateFlag enable);
+  TristateFlag editMode() const;
+  bool inEditMode() const;
 
 #ifndef KDE_NO_COMPAT
   void enableJScript(bool e) { setJScriptEnabled(e); }
@@ -660,7 +667,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    *
    *  Returns 0L otherwise.
    */
-  KHTMLPart* parentPart();
+  KHTMLPart* parentPart() const;
 
   /**
    * Returns a list of names of all frame (including iframe) objects of

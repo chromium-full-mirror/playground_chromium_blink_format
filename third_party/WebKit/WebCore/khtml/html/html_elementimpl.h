@@ -60,6 +60,10 @@ class HTMLElementImpl : public ElementImpl {
 
   virtual DOMString namespaceURI() const;
 
+  virtual bool isContentEditable() const;
+  virtual DOMString contentEditable() const;
+  virtual void setContentEditable(const DOMString& enabled);
+
 #if APPLE_CHANGES
   virtual bool isGenericFormElement() const { return false; }
 #endif
@@ -67,6 +71,11 @@ class HTMLElementImpl : public ElementImpl {
  protected:
   // for IMG, OBJECT and APPLET
   void addHTMLAlignment(DOMString alignment);
+
+ private:
+  // FIXME: When the property for editing has been determined in CSS3, use that
+  // instead of this member variable.
+  TristateFlag m_contentEditable;
 };
 
 class HTMLGenericElementImpl : public HTMLElementImpl {

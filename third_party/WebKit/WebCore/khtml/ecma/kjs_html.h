@@ -82,7 +82,8 @@ class HTMLDocument : public DOMDocument {
     LastModified,
     Height,
     Width,
-    Dir
+    Dir,
+    DesignMode
   };
   DOM::Document toDocument() const { return static_cast<DOM::Document>(node); }
 };
@@ -455,7 +456,9 @@ class HTMLElement : public DOMElement {
     ElementClassName,
     ElementInnerText,
     ElementDocument,
-    ElementChildren
+    ElementChildren,
+    ElementContentEditable,
+    ElementIsContentEditable
   };
 
   DOM::HTMLElement toElement() const {
