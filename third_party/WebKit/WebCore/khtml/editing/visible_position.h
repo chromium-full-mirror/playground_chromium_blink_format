@@ -53,9 +53,8 @@ class VisiblePosition {
                   long offset,
                   EAffinity,
                   EInitHint initHint = INIT_DOWN);
-  explicit VisiblePosition(const Position&,
-                           EAffinity,
-                           EInitHint initHint = INIT_DOWN);
+  VisiblePosition(const Position&, EAffinity, EInitHint initHint = INIT_DOWN);
+  VisiblePosition(const VisiblePosition&);
 
   void clear() { m_deepPosition.clear(); }
 
@@ -73,6 +72,12 @@ class VisiblePosition {
   Position downstreamDeepEquivalent() const;
 
   friend bool operator==(const VisiblePosition& a, const VisiblePosition& b);
+  friend bool operator!=(const VisiblePosition& a, const VisiblePosition& b);
+
+  friend bool isEqualIgnoringAffinity(const VisiblePosition& a,
+                                      const VisiblePosition& b);
+  friend bool isNotEqualIgnoringAffinity(const VisiblePosition& a,
+                                         const VisiblePosition& b);
 
   // next() and previous() will increment/decrement by a character cluster.
   VisiblePosition next() const;
@@ -131,6 +136,8 @@ VisiblePosition startVisiblePosition(const DOM::Range&, EAffinity);
 VisiblePosition startVisiblePosition(const DOM::RangeImpl*, EAffinity);
 VisiblePosition endVisiblePosition(const DOM::Range&, EAffinity);
 VisiblePosition endVisiblePosition(const DOM::RangeImpl*, EAffinity);
+
+void setAffinityUsingLinePosition(VisiblePosition&);
 
 bool visiblePositionsOnDifferentLines(const VisiblePosition&,
                                       const VisiblePosition&);

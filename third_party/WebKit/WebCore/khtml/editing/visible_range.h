@@ -64,8 +64,7 @@ class VisibleRange {
   bool isNull() const { return m_start.isNull(); }
   bool isCollapsed() const { return m_start == m_end; }
 
-  friend inline bool operator==(const VisiblePosition& a,
-                                const VisiblePosition& b);
+  friend inline bool operator==(const VisibleRange& a, const VisibleRange& b);
 
  private:
   VisiblePosition m_start;
