@@ -196,6 +196,8 @@ class CompositeEditCommand : public EditCommand {
   //
   void appendNode(DOM::NodeImpl* appendChild, DOM::NodeImpl* parentNode);
   void applyCommandToComposite(EditCommandPtr&);
+  void applyStyle(DOM::CSSStyleDeclarationImpl* style,
+                  EditAction editingAction = EditActionChangeAttributes);
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
@@ -236,7 +238,8 @@ class CompositeEditCommand : public EditCommand {
                                const DOM::Position& end);
   void deleteInsignificantTextDownstream(const DOM::Position&);
 
-  void insertBlockPlaceholderIfNeeded(DOM::NodeImpl*);
+  void insertBlockPlaceholder(DOM::NodeImpl*);
+  bool insertBlockPlaceholderIfNeeded(DOM::NodeImpl*);
   bool removeBlockPlaceholderIfNeeded(DOM::NodeImpl*);
 
   void moveParagraphContentsToNewBlockIfNecessary(const DOM::Position&);
@@ -380,7 +383,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void fixupWhitespace();
   void moveNodesAfterNode();
   void calculateEndingPosition();
-  void calculateTypingStyleAfterDelete();
+  void calculateTypingStyleAfterDelete(bool insertedPlaceholder);
   void clearTransientState();
 
   bool m_hasSelectionToDelete;
@@ -476,14 +479,14 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
 
  private:
   DOM::ElementImpl* createParagraphElement();
-  void setFullTypingStyleBeforeInsertion(const DOM::Position&);
-  void calculateAndSetTypingStyleAfterInsertion();
+  void calculateStyleBeforeInsertion(const DOM::Position&);
+  void applyStyleAfterInsertion();
 
   virtual bool preservesTypingStyle() const;
 
   QPtrList<DOM::NodeImpl> ancestors;
   QPtrList<DOM::NodeImpl> clonedNodes;
-  DOM::CSSMutableStyleDeclarationImpl* m_fullTypingStyle;
+  DOM::CSSMutableStyleDeclarationImpl* m_style;
 };
 
 //------------------------------------------------------------------------------------------
