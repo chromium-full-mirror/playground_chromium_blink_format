@@ -2710,9 +2710,13 @@ void HTMLTextAreaElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWS:
       m_rows = !attr->isNull() ? attr->value().toInt() : 3;
+      if (renderer())
+        renderer()->setNeedsLayoutAndMinMaxRecalc();
       break;
     case ATTR_COLS:
       m_cols = !attr->isNull() ? attr->value().toInt() : 60;
+      if (renderer())
+        renderer()->setNeedsLayoutAndMinMaxRecalc();
       break;
     case ATTR_WRAP:
       // virtual / physical is Netscape extension of HTML 3.0, now deprecated
@@ -2727,6 +2731,8 @@ void HTMLTextAreaElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
         m_wrap = ta_Physical;
       else if (strcasecmp(attr->value(), "off") == 0)
         m_wrap = ta_NoWrap;
+      if (renderer())
+        renderer()->setNeedsLayoutAndMinMaxRecalc();
       break;
     case ATTR_ACCESSKEY:
       // ignore for the moment
