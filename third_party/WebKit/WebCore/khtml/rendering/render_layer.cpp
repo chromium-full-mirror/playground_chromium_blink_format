@@ -1411,9 +1411,7 @@ void Marquee::start() {
   if (m_timerId || m_layer->renderer()->style()->marqueeIncrement().value == 0)
     return;
 
-  m_stopped = false;
-
-  if (!m_suspended) {
+  if (!m_suspended && !m_stopped) {
     if (isUnfurlMarquee()) {
       bool forward = direction() == MDOWN || direction() == MRIGHT;
       bool isReversed =
@@ -1426,8 +1424,10 @@ void Marquee::start() {
       else
         m_layer->scrollToOffset(0, m_start, false, false);
     }
-  } else
+  } else {
     m_suspended = false;
+    m_stopped = false;
+  }
 
   m_timerId = startTimer(speed());
 }
