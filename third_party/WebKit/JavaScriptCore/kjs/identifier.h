@@ -56,6 +56,7 @@ class Identifier {
   uint32_t toStrictUInt32(bool* ok) const {
     return _ustring.toStrictUInt32(ok);
   }
+  unsigned toArrayIndex(bool* ok) const { return _ustring.toArrayIndex(ok); }
   double toDouble() const { return _ustring.toDouble(); }
 
   static const Identifier& null();

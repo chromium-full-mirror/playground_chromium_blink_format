@@ -51,6 +51,18 @@ Value StringInstanceImp::get(ExecState* exec,
                              const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return Number(internalValue().toString(exec).size());
+
+  bool ok;
+  const unsigned index = propertyName.toArrayIndex(&ok);
+  if (ok) {
+    const UString s = internalValue().toString(exec);
+    const unsigned length = s.size();
+    if (index >= length)
+      return Undefined();
+    const UChar c = s[index];
+    return String(UString(&c, 1));
+  }
+
   return ObjectImp::get(exec, propertyName);
 }
 
@@ -67,6 +79,15 @@ bool StringInstanceImp::hasProperty(ExecState* exec,
                                     const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return true;
+
+  bool ok;
+  const unsigned index = propertyName.toArrayIndex(&ok);
+  if (ok) {
+    const unsigned length = internalValue().toString(exec).size();
+    if (index < length)
+      return true;
+  }
+
   return ObjectImp::hasProperty(exec, propertyName);
 }
 
