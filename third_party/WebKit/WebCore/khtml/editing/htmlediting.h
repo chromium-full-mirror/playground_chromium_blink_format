@@ -231,8 +231,6 @@ class CompositeEditCommand : public EditCommand {
                         const DOM::DOMString&);
   void splitTextNode(DOM::TextImpl* text, long offset);
 
-  DOM::NodeImpl* applyTypingStyle(DOM::NodeImpl*) const;
-
   void deleteInsignificantText(DOM::TextImpl*, int start, int end);
   void deleteInsignificantText(const DOM::Position& start,
                                const DOM::Position& end);
