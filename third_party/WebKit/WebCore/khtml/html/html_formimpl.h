@@ -333,6 +333,8 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString type() const;
 
+  virtual void recalcStyle(StyleChange);
+
   long selectedIndex() const;
   void setSelectedIndex(long index);
 
