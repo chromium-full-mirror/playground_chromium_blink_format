@@ -39,6 +39,8 @@
 using DOM::DocumentImpl;
 using namespace khtml;
 
+const int cMarkerPadding = 7;
+
 static QString toRoman(int number, bool upper) {
   QString roman;
   QChar ldigits[] = {'i', 'v', 'x', 'l', 'c', 'd', 'm'};
@@ -274,24 +276,18 @@ QRect RenderListItem::getAbsoluteRepaintRect() {
     // This can be a sloppy and imprecise offset as long as it's always too big.
     int pixHeight = style()->htmlFont().getFontDef().computedPixelSize();
     int offset = pixHeight * 2 / 3;
+    bool haveImage =
+        m_marker->listImage() && !m_marker->listImage()->isErrorImage();
+    if (haveImage)
+      offset = m_marker->listImage()->pixmap().width();
+    int bulletWidth = offset / 2;
+    if (offset % 2)
+      bulletWidth++;
     int xoff = 0;
     if (style()->direction() == LTR)
-      xoff = -7 - offset;
+      xoff = -cMarkerPadding - offset;
     else
-      xoff = offset;
-
-    if (m_marker->listImage() && !m_marker->listImage()->isErrorImage()) {
-      // For OUTSIDE bullets shrink back to only a 0.3em margin. 0.67 em is too
-      // much.  This brings the margin back to MacIE/Gecko/WinIE levels.
-      // For LTR don't forget to add in the width of the image to the offset as
-      // well (you are moving the image left, so you have to also add in the
-      // width
-      // of the image's border box as well). -dwh
-      if (style()->direction() == LTR)
-        xoff -= m_marker->listImage()->pixmap().width() - pixHeight * 1 / 3;
-      else
-        xoff -= pixHeight * 1 / 3;
-    }
+      xoff = cMarkerPadding + (haveImage ? 0 : (offset - bulletWidth));
 
     if (xoff < 0) {
       result.setX(result.x() + xoff);
@@ -357,7 +353,6 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   QPainter* p = i.p;
   p->setFont(style()->font());
   const QFontMetrics fm = p->fontMetrics();
-  int offset = fm.ascent() * 2 / 3;
 
   // The marker needs to adjust its tx, for the case where it's an outside
   // marker.
@@ -412,28 +407,26 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
     }
   }
 
+  int offset = fm.ascent() * 2 / 3;
+  bool haveImage = m_listImage && !m_listImage->isErrorImage();
+  if (haveImage)
+    offset = m_listImage->pixmap().width();
+
   int xoff = 0;
   int yoff = fm.ascent() - offset;
 
-  if (!isInside())
+  int bulletWidth = offset / 2;
+  if (offset % 2)
+    bulletWidth++;
+  if (!isInside()) {
     if (listItem->style()->direction() == LTR)
-      xoff = -7 - offset;
+      xoff = -cMarkerPadding - offset;
     else
-      xoff = offset;
+      xoff = cMarkerPadding + (haveImage ? 0 : (offset - bulletWidth));
+  } else if (style()->direction() == RTL)
+    xoff += haveImage ? cMarkerPadding : (m_width - bulletWidth);
 
   if (m_listImage && !m_listImage->isErrorImage()) {
-    // For OUTSIDE bullets shrink back to only a 0.3em margin. 0.67 em is too
-    // much.  This brings the margin back to MacIE/Gecko/WinIE levels.
-    // For LTR don't forget to add in the width of the image to the offset as
-    // well (you are moving the image left, so you have to also add in the width
-    // of the image's border box as well). -dwh
-    if (!isInside()) {
-      if (style()->direction() == LTR)
-        xoff -= m_listImage->pixmap().width() - fm.ascent() * 1 / 3;
-      else
-        xoff -= fm.ascent() * 1 / 3;
-    }
-
     p->drawPixmap(QPoint(_tx + xoff, _ty), m_listImage->pixmap());
     return;
   }
@@ -449,18 +442,17 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
   switch (style()->listStyleType()) {
     case DISC:
       p->setBrush(color);
-      p->drawEllipse(_tx + xoff, _ty + (3 * yoff) / 2, (offset >> 1) + 1,
-                     (offset >> 1) + 1);
+      p->drawEllipse(_tx + xoff, _ty + (3 * yoff) / 2, bulletWidth,
+                     bulletWidth);
       return;
     case CIRCLE:
       p->setBrush(Qt::NoBrush);
-      p->drawEllipse(_tx + xoff, _ty + (3 * yoff) / 2, (offset >> 1) + 1,
-                     (offset >> 1) + 1);
+      p->drawEllipse(_tx + xoff, _ty + (3 * yoff) / 2, bulletWidth,
+                     bulletWidth);
       return;
     case SQUARE:
       p->setBrush(color);
-      p->drawRect(_tx + xoff, _ty + (3 * yoff) / 2, (offset >> 1) + 1,
-                  (offset >> 1) + 1);
+      p->drawRect(_tx + xoff, _ty + (3 * yoff) / 2, bulletWidth, bulletWidth);
       return;
     case LNONE:
       return;
@@ -476,18 +468,33 @@ void RenderListMarker::paint(PaintInfo& i, int _tx, int _ty) {
 #else
 //_ty += fm.ascent() - fm.height()/2 + 1;
 #endif
+
         if (isInside()) {
-          if (style()->direction() == LTR)
+          if (style()->direction() == LTR) {
             p->drawText(_tx, _ty, 0, 0, Qt::AlignLeft | Qt::DontClip, m_item);
-          else
-            p->drawText(_tx, _ty, 0, 0, Qt::AlignRight | Qt::DontClip, m_item);
-        } else {
-          if (style()->direction() == LTR)
-            p->drawText(_tx - offset / 2, _ty, 0, 0,
-                        Qt::AlignRight | Qt::DontClip, m_item);
-          else
-            p->drawText(_tx + offset / 2, _ty, 0, 0,
+            p->drawText(_tx + fm.width(m_item), _ty, 0, 0,
+                        Qt::AlignLeft | Qt::DontClip,
+                        QString::fromLatin1(". "));
+          } else {
+            const QString& punct(QString::fromLatin1(" ."));
+            p->drawText(_tx, _ty, 0, 0, Qt::AlignLeft | Qt::DontClip, punct);
+            p->drawText(_tx + fm.width(punct), _ty, 0, 0,
                         Qt::AlignLeft | Qt::DontClip, m_item);
+          }
+        } else {
+          if (style()->direction() == LTR) {
+            const QString& punct(QString::fromLatin1(". "));
+            p->drawText(_tx - offset / 2, _ty, 0, 0,
+                        Qt::AlignRight | Qt::DontClip, punct);
+            p->drawText(_tx - offset / 2 - fm.width(punct), _ty, 0, 0,
+                        Qt::AlignRight | Qt::DontClip, m_item);
+          } else {
+            const QString& punct(QString::fromLatin1(" ."));
+            p->drawText(_tx + offset / 2, _ty, 0, 0,
+                        Qt::AlignLeft | Qt::DontClip, punct);
+            p->drawText(_tx + offset / 2 + fm.width(punct), _ty, 0, 0,
+                        Qt::AlignLeft | Qt::DontClip, m_item);
+          }
         }
       }
   }
@@ -523,7 +530,7 @@ void RenderListMarker::calcMinMaxWidth() {
 
   if (m_listImage) {
     if (isInside())
-      m_width = m_listImage->pixmap().width() + 5;
+      m_width = m_listImage->pixmap().width() + cMarkerPadding;
     m_height = m_listImage->pixmap().height();
     m_minWidth = m_maxWidth = m_width;
     setMinMaxKnown();
@@ -540,9 +547,8 @@ void RenderListMarker::calcMinMaxWidth() {
     case DISC:
     case CIRCLE:
     case SQUARE:
-      if (isInside()) {
-        m_width = m_height;  // fm.ascent();
-      }
+      if (isInside())
+        m_width = m_height;
       goto end;
     case ARMENIAN:
     case GEORGIAN:
@@ -591,10 +597,8 @@ void RenderListMarker::calcMinMaxWidth() {
       break;
   }
 
-  m_item += QString::fromLatin1(". ");
-
   if (isInside())
-    m_width = fm.width(m_item);
+    m_width = fm.width(m_item) + fm.width(QString::fromLatin1(". "));
 
 end:
 
@@ -609,10 +613,16 @@ void RenderListMarker::calcWidth() {
 }
 
 short RenderListMarker::lineHeight(bool, bool) const {
+  if (!m_listImage)
+    return m_listItem->lineHeight(false, true);
   return height();
 }
 
 short RenderListMarker::baselinePosition(bool, bool) const {
+  if (!m_listImage) {
+    const QFontMetrics& fm = style()->fontMetrics();
+    return fm.ascent() + (lineHeight(false) - fm.height()) / 2;
+  }
   return height();
 }
 
