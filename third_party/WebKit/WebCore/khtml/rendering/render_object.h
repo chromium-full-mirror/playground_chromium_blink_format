@@ -851,6 +851,9 @@ class RenderObject : public CachedObjectClient {
   virtual long caretMinOffset() const { return 0; }
   virtual long caretMaxOffset() const { return 0; }
 
+  bool precedesLineBreak() const;
+  bool followsLineBreak() const;
+
   virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
 
  protected:
