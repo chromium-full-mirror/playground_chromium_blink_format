@@ -149,11 +149,6 @@ typedef enum {
 */
 - (NSString*)path;
 
-/*!
-    @method URL
-    @abstract The URL of the WebPolicy.
-*/
-- (NSURL*)URL;
 @end
 
 /*!
@@ -208,13 +203,10 @@ typedef enum {
     @method webPolicyWithClickAction:andPath:
     @abstract WebClickPolicy constructor
     @param action The policy action of the WebClickPolicy.
-    @param URL
     @param thePath Path to where the file should be saved. Only applicable for
     WebClickPolicySave and WebClickPolicySaveAndOpenExternally WebClickActions.
 */
-+ webPolicyWithClickAction:(WebClickAction)action
-                         URL:(NSURL*)URL
-                     andPath:(NSString*)thePath;
++ webPolicyWithClickAction:(WebClickAction)action andPath:(NSString*)thePath;
 @end
 
 /*!
