@@ -251,6 +251,13 @@ KHTMLView::~KHTMLView() {
   d = 0;
 }
 
+void KHTMLView::clearPart() {
+  if (m_part) {
+    m_part->deref();
+    m_part = 0;
+  }
+}
+
 void KHTMLView::init() {
 #if !APPLE_CHANGES
   if (!d->paintBuffer)
@@ -1478,14 +1485,16 @@ void KHTMLView::timerEvent(QTimerEvent* e) {
     DOM::DocumentImpl* document = m_part->xmlDocImpl();
     khtml::RenderRoot* root =
         static_cast<khtml::RenderRoot*>(document->renderer());
-    if (!root->layouted()) {
-      killTimer(d->repaintTimerId);
-      d->repaintTimerId = 0;
-      // qDebug("not layouted, delaying repaint");
-      scheduleRelayout();
-      return;
+    if (root) {
+      if (!root->layouted()) {
+        killTimer(d->repaintTimerId);
+        d->repaintTimerId = 0;
+        // qDebug("not layouted, delaying repaint");
+        scheduleRelayout();
+        return;
+      }
+      resizeContents(root->docWidth(), root->docHeight());
     }
-    resizeContents(root->docWidth(), root->docHeight());
   }
   setStaticBackground(d->useSlowRepaints);
 

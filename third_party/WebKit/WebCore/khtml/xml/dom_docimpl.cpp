@@ -990,6 +990,10 @@ void DocumentImpl::attach() {
   m_render = render;
 }
 
+void DocumentImpl::restoreRenderer(RenderObject* render) {
+  m_render = render;
+}
+
 void DocumentImpl::detach() {
 #if APPLE_CHANGES
   if (!m_inPageCache) {
@@ -1012,10 +1016,9 @@ void DocumentImpl::detach() {
       m_renderArena = 0;
     }
 #if APPLE_CHANGES
+  } else {
+    m_render = 0;
   }
-// else {
-//    printf ("not detaching document\n");
-//}
 #endif
 }
 
