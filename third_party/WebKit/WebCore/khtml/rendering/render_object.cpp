@@ -1048,15 +1048,15 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
         inside = true;
   }
 
-  if (inside && element()) {
-    if (!info.innerNode())
+  if (inside) {
+    if (!info.innerNode() && element())
       info.setInnerNode(element());
 
-    if (!info.innerNonSharedNode())
+    if (!info.innerNonSharedNode() && element())
       info.setInnerNonSharedNode(element());
 
     if (!info.URLElement()) {
-      RenderObject* p = this;
+      RenderObject* p = (!isInline() && continuation()) ? continuation() : this;
       while (p) {
         if (p->element() && p->element()->hasAnchor()) {
           info.setURLElement(p->element());
