@@ -26,18 +26,21 @@
 #import <WebCore/DOMViews.h>
 
 @class DOMEvent;
-@class DOMEventListener;
 
 extern NSString* const DOMEventException;
 
 enum DOMEventExceptionCode { DOM_UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 
-@interface DOMEventTarget : DOMObject
+@protocol DOMEventListener<NSObject>
+- (void)handleEvent:(DOMEvent*)event;
+@end
+
+@protocol DOMEventTarget<NSObject>
 - (void)addEventListener:(NSString*)
-                    type:(DOMEventListener*)
+                    type:(id<DOMEventListener>)
                 listener:(BOOL)useCapture;
 - (void)removeEventListener:(NSString*)
-                       type:(DOMEventListener*)
+                       type:(id<DOMEventListener>)
                    listener:(BOOL)useCapture;
 - (BOOL)dispatchEvent:(DOMEvent*)event;
 @end
@@ -46,8 +49,8 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
 
 @interface DOMEvent : DOMObject
 - (NSString*)type;
-- (DOMEventTarget*)target;
-- (DOMEventTarget*)currentTarget;
+- (id<DOMEventTarget>)target;
+- (id<DOMEventTarget>)currentTarget;
 - (unsigned short)eventPhase;
 - (BOOL)bubbles;
 - (BOOL)cancelable;
@@ -83,7 +86,7 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
 - (BOOL)altKey;
 - (BOOL)metaKey;
 - (unsigned short)button;
-- (DOMEventTarget*)relatedTarget;
+- (id<DOMEventTarget>)relatedTarget;
 - (void)initMouseEvent:(NSString*)
                typeArg:(BOOL)
           canBubbleArg:(BOOL)
@@ -98,7 +101,7 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
              altKeyArg:(BOOL)
            shiftKeyArg:(BOOL)
             metaKeyArg:(unsigned short)
-             buttonArg:(DOMEventTarget*)relatedTargetArg;
+             buttonArg:(id<DOMEventTarget>)relatedTargetArg;
 @end
 
 enum { DOM_MODIFICATION = 1, DOM_ADDITION = 2, DOM_REMOVAL = 3 };
