@@ -2398,7 +2398,7 @@ void KHTMLPart::notifySelectionChanged(bool closeTyping) {
   emitSelectionChanged();
 
 #if APPLE_CHANGES
-  KWQ(this)->postDidChangeSelectionNotification();
+  KWQ(this)->respondToChangedSelection();
 #endif
 }
 
@@ -4910,7 +4910,7 @@ void KHTMLPart::appliedEditing(EditCommand& cmd) {
     d->m_lastEditCommand = cmd;
   }
 #if APPLE_CHANGES
-  KWQ(this)->postDidChangeNotification();
+  KWQ(this)->respondToChangedContents();
 #endif
 }
 
@@ -4918,7 +4918,7 @@ void KHTMLPart::unappliedEditing(EditCommand& cmd) {
   setSelection(cmd.startingSelection());
 #if APPLE_CHANGES
   KWQ(this)->registerCommandForRedo(cmd);
-  KWQ(this)->postDidChangeNotification();
+  KWQ(this)->respondToChangedContents();
 #endif
   d->m_lastEditCommand = EditCommand::emptyCommand();
 }
@@ -4927,7 +4927,7 @@ void KHTMLPart::reappliedEditing(EditCommand& cmd) {
   setSelection(cmd.endingSelection());
 #if APPLE_CHANGES
   KWQ(this)->registerCommandForUndo(cmd);
-  KWQ(this)->postDidChangeNotification();
+  KWQ(this)->respondToChangedContents();
 #endif
   d->m_lastEditCommand = EditCommand::emptyCommand();
 }

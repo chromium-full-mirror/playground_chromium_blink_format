@@ -6,6 +6,7 @@
 #import <WebKit/WebView.h>
 #import <WebKit/WebFramePrivate.h>
 
+@class DOMCSSStyleDeclaration;
 @class NSError;
 @class WebBackForwardList;
 @class WebFrame;
@@ -98,6 +99,8 @@ extern NSString* _WebMainFrameURLKey;
   NSString* mediaStyle;
 
   NSView<WebDocumentDragging>* draggingDocumentView;
+
+  DOMCSSStyleDeclaration* typingStyle;
 }
 @end
 
