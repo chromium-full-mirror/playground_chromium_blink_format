@@ -1376,10 +1376,9 @@ short RenderText::width() const {
   return w;
 }
 
-void RenderText::repaint(bool immediate) {
+QRect RenderText::getAbsoluteRepaintRect() {
   RenderObject* cb = containingBlock();
-  if (cb != this)
-    cb->repaint(immediate);
+  return cb->getAbsoluteRepaintRect();
 }
 
 bool RenderText::isFixedWidthFont() const {
