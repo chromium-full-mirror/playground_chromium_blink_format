@@ -1475,7 +1475,13 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
           lBreak.pos = pos;
         }
       }
-      goto end;
+
+      // |width| may have been adjusted because we got shoved down past a float
+      // (thus
+      // giving us more room), so we need to retest, and only jump to
+      // the end label if we still don't fit on the line. -dwh
+      if (w + tmpW > width + 1)
+        goto end;
     }
 
     last = o;
