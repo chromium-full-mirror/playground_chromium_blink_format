@@ -368,9 +368,12 @@ void XMLHttpRequest::send(const QString& _body) {
                                       job, finalURL, headers);
     job = 0;
     processSyncLoadResults(data, finalURL, headers);
+
     return;
   }
 #endif
+
+  gcProtect(this);
 
   qObject->connect(job, SIGNAL(result(KIO::Job*)),
                    SLOT(slotFinished(KIO::Job*)));
@@ -401,6 +404,8 @@ void XMLHttpRequest::abort() {
     decoder = 0;
   }
   aborted = true;
+
+  gcUnprotect(this);
 }
 
 void XMLHttpRequest::setRequestHeader(const QString& name,
@@ -545,6 +550,8 @@ void XMLHttpRequest::slotFinished(KIO::Job*) {
     decoder->deref();
     decoder = 0;
   }
+
+  gcUnprotect(this);
 }
 
 void XMLHttpRequest::slotRedirection(KIO::Job*, const KURL& url) {
@@ -605,21 +612,24 @@ Value XMLHttpRequestProtoFunc::tryCall(ExecState* exec,
   XMLHttpRequest* request = static_cast<XMLHttpRequest*>(thisObj.imp());
 
   switch (id) {
-    case XMLHttpRequest::Abort:
+    case XMLHttpRequest::Abort: {
       request->abort();
       return Undefined();
-    case XMLHttpRequest::GetAllResponseHeaders:
+    }
+    case XMLHttpRequest::GetAllResponseHeaders: {
       if (args.size() != 0) {
         return Undefined();
       }
 
       return request->getAllResponseHeaders();
-    case XMLHttpRequest::GetResponseHeader:
+    }
+    case XMLHttpRequest::GetResponseHeader: {
       if (args.size() != 1) {
         return Undefined();
       }
 
       return request->getResponseHeader(args[0].toString(exec).qstring());
+    }
     case XMLHttpRequest::Open: {
       if (args.size() < 2 || args.size() > 5) {
         return Undefined();
@@ -689,7 +699,7 @@ Value XMLHttpRequestProtoFunc::tryCall(ExecState* exec,
 
       return Undefined();
     }
-    case XMLHttpRequest::SetRequestHeader:
+    case XMLHttpRequest::SetRequestHeader: {
       if (args.size() != 2) {
         return Undefined();
       }
@@ -698,12 +708,14 @@ Value XMLHttpRequestProtoFunc::tryCall(ExecState* exec,
                                 args[1].toString(exec).qstring());
 
       return Undefined();
-    case XMLHttpRequest::OverrideMIMEType:
+    }
+    case XMLHttpRequest::OverrideMIMEType: {
       if (args.size() != 1) {
         return Undefined();
       }
       request->MIMETypeOverride = args[0].toString(exec).qstring();
       return Undefined();
+    }
   }
 
   return Undefined();
