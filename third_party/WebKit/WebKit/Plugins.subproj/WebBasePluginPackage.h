@@ -26,6 +26,7 @@
 
 - (BOOL)load;
 - (void)unload;
+- (BOOL)isLoaded;
 
 - (NSString*)name;
 - (NSString*)path;
