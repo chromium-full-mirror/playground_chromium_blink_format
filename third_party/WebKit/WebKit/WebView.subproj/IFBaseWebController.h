@@ -3,6 +3,7 @@
         Copyright 2001, 2002 Apple, Inc. All rights reserved.
 */
 #import <WebKit/WKWebController.h>
+#import <WebKit/WKWebFrame.h>
 
 /*
 */
@@ -10,6 +11,8 @@
  @private
   id _controllerPrivate;
 }
+
+- init;
 
 - initWithView:(WKWebView*)view dataSource:(WKWebDataSource*)dataSource;
 
@@ -30,10 +33,6 @@
 - (void)setMainDataSource:(WKWebDataSource*)dataSource;
 - (WKWebDataSource*)mainDataSource;
 
-- (void)createViewForDataSource:(WKWebDataSource*)dataSource
-                   inFrameNamed:(NSString*)name;
-
-- (void)createViewForDataSource:(WKWebDataSource*)dataSource
-                       inIFrame:(id)iFrameIdentifier;
+- (void)addFrame:(WKWebFrame*)childFrame toParent:(WKWebDataSource*)parent;
 
 @end
