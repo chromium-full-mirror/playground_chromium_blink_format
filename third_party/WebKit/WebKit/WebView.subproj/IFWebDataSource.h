@@ -43,7 +43,7 @@
 
 #ifdef TENTATIVE_API
 - initWithData:(NSData*)data;
-- initWithString:(NSString*)string;
+- initNSURL _IF_URLWithString:(NSString*)string;
 - initWithLoader:(IFLoader*)loader;
 #endif
 
