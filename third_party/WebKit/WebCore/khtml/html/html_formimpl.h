@@ -215,6 +215,9 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isActivatedSubmit() const;
   virtual void setActivatedSubmit(bool flag);
 
+  virtual void click();
+  virtual void accessKeyAction();
+
  protected:
   DOMString m_value;
   QString m_currValue;
@@ -297,6 +300,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   void select();
 
   virtual void click();
+  virtual void accessKeyAction();
 
   virtual void parseAttribute(AttributeImpl* attr);
 
@@ -449,6 +453,8 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   virtual void defaultEventHandler(EventImpl* evt);
 #endif
 
+  virtual void accessKeyAction();
+
  private:
   void recalcListItems();
 
@@ -575,6 +581,8 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void focus();
 
   virtual bool isEditable();
+
+  virtual void accessKeyAction();
 
  protected:
   int m_rows;
