@@ -943,8 +943,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
   // ### should be done by the rendering tree itself,
   // this way is rather crude and CPU intensive
   if (changed()) {
-    renderer()->setLayouted(false);
-    renderer()->setMinMaxKnown(false);
+    renderer()->setNeedsLayoutAndMinMaxRecalc();
     renderer()->layout();
     renderer()->repaint();
   }
@@ -1851,10 +1850,8 @@ void DocumentImpl::updateStyleSelector() {
 
     m_styleSelectorDirty = true;
 #endif
-  if (renderer()) {
-    renderer()->setLayouted(false);
-    renderer()->setMinMaxKnown(false);
-  }
+  if (renderer())
+    renderer()->setNeedsLayoutAndMinMaxRecalc();
 }
 
 QStringList DocumentImpl::availableStyleSheets() const {

@@ -143,8 +143,7 @@ void RenderContainer::addChild(RenderObject* newChild,
     // just add it...
     insertChildNode(newChild, beforeChild);
   }
-  newChild->setLayouted(false);
-  newChild->setMinMaxKnown(false);
+  newChild->setNeedsLayoutAndMinMaxRecalc();
 }
 
 RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
@@ -191,15 +190,14 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   oldChild->setNextSibling(0);
   oldChild->setParent(0);
 
-  setMinMaxKnown(false);
-  setLayouted(false);
+  setNeedsLayoutAndMinMaxRecalc();
 
   return oldChild;
 }
 
 void RenderContainer::removeChild(RenderObject* oldChild) {
   removeChildNode(oldChild);
-  setLayouted(false);
+  setNeedsLayout(true);
 }
 
 void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
@@ -282,8 +280,7 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
   RenderLayer* layer = enclosingLayer();
   newChild->addLayers(layer, newChild);
 
-  newChild->setMinMaxKnown(false);
-  newChild->setLayouted(false);
+  newChild->setNeedsLayoutAndMinMaxRecalc();
 }
 
 void RenderContainer::insertChildNode(RenderObject* child,
@@ -315,21 +312,19 @@ void RenderContainer::insertChildNode(RenderObject* child,
   RenderLayer* layer = enclosingLayer();
   child->addLayers(layer, child);
 
-  child->setMinMaxKnown(false);
-  child->setLayouted(false);
+  child->setNeedsLayoutAndMinMaxRecalc();
 }
 
 void RenderContainer::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   RenderObject* child = firstChild();
   while (child) {
-    if (!child->layouted())
-      child->layout();
+    child->layoutIfNeeded();
     child = child->nextSibling();
   }
-  setLayouted();
+  setNeedsLayout(false);
 }
 
 void RenderContainer::removeLeftoverAnonymousBoxes() {

@@ -235,7 +235,7 @@ class RenderObject : public CachedObjectClient {
     return m_replaced;
   }  // a "replaced" element (see CSS)
   bool shouldPaintBackgroundOrBorder() const { return m_paintBackground; }
-  bool layouted() const { return m_layouted; }
+  bool needsLayout() const { return m_needsLayout; }
   bool minMaxKnown() const { return m_minMaxKnown; }
   bool overhangingContents() const { return m_overhangingContents; }
   bool hasFirstLine() const { return m_hasFirstLine; }
@@ -256,7 +256,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
-  void setLayouted(bool b = true);
+  void setNeedsLayout(bool b);
 
   void setMinMaxKnown(bool b = true) {
     m_minMaxKnown = b;
@@ -270,6 +270,12 @@ class RenderObject : public CachedObjectClient {
       }
     }
   }
+
+  void setNeedsLayoutAndMinMaxRecalc() {
+    setMinMaxKnown(false);
+    setNeedsLayout(true);
+  }
+
   void setPositioned(bool b = true) { m_positioned = b; }
   void setRelPositioned(bool b = true) { m_relPositioned = b; }
   void setFloating(bool b = true) { m_floating = b; }
@@ -382,13 +388,19 @@ class RenderObject : public CachedObjectClient {
    * This function should cause the Element to calculate its
    * width and height and the layout of its content
    *
-   * when the Element calls setLayouted(true), layout() is no
+   * when the Element calls setNeedsLayout(false), layout() is no
    * longer called during relayouts, as long as there is no
-   * style sheet change. When that occurs, isLayouted will be
-   * set to false and the Element receives layout() calls
+   * style sheet change. When that occurs, m_needsLayout will be
+   * set to true and the Element receives layout() calls
    * again.
    */
   virtual void layout() = 0;
+
+  /* This function performs a layout only if one is needed. */
+  void layoutIfNeeded() {
+    if (needsLayout())
+      layout();
+  }
 
   // used for element state updates that can not be fixed with a
   // repaint and do not need a relayout
@@ -725,7 +737,7 @@ class RenderObject : public CachedObjectClient {
 
   short m_verticalPosition;
 
-  bool m_layouted : 1;
+  bool m_needsLayout : 1;
   bool m_unused : 1;
   bool m_minMaxKnown : 1;
   bool m_floating : 1;

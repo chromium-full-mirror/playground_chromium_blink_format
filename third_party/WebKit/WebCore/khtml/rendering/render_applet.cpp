@@ -85,7 +85,7 @@ int RenderApplet::intrinsicHeight() const {
 void RenderApplet::layout() {
   // kdDebug(6100) << "RenderApplet::layout" << endl;
 
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   calcWidth();
@@ -124,7 +124,7 @@ void RenderApplet::layout() {
     tmp->showApplet();
   }
 
-  setLayouted();
+  setNeedsLayout(false);
 }
 
 void RenderApplet::processArguments(const QMap<QString, QString>& args) {
@@ -180,7 +180,7 @@ int RenderEmptyApplet::intrinsicHeight() const {
 }
 
 void RenderEmptyApplet::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   calcWidth();
@@ -195,6 +195,6 @@ void RenderEmptyApplet::layout() {
             paddingBottom());
   }
 
-  setLayouted();
+  setNeedsLayout(false);
 }
 #endif

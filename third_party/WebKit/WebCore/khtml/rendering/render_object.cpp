@@ -131,7 +131,7 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_previous(0),
       m_next(0),
       m_verticalPosition(PositionUndefined),
-      m_layouted(false),
+      m_needsLayout(true),
       m_unused(false),
       m_minMaxKnown(false),
       m_floating(false),
@@ -374,9 +374,9 @@ short RenderObject::scrollHeight() const {
 
 void RenderObject::markAllDescendantsWithFloatsForLayout(RenderObject*) {}
 
-void RenderObject::setLayouted(bool b) {
-  m_layouted = b;
-  if (b) {
+void RenderObject::setNeedsLayout(bool b) {
+  m_needsLayout = b;
+  if (!b) {
     RenderLayer* l = layer();
     if (l) {
       l->setWidth(width());
@@ -388,7 +388,7 @@ void RenderObject::setLayouted(bool b) {
     RenderObject* root = this;
 
     // If an attempt is made to
-    // setLayouted(false) an object inside a clipped (overflow:hidden) object,
+    // setNeedsLayout(true) an object inside a clipped (overflow:hidden) object,
     // we
     // have to make sure to repaint only the clipped rectangle.
     // We do this by passing an argument to scheduleRelayout.  This hint really
@@ -399,7 +399,7 @@ void RenderObject::setLayouted(bool b) {
 
     while (o) {
       root = o;
-      o->m_layouted = false;
+      o->m_needsLayout = true;
       if (o->style()->hidesOverflow() && !clippedObj)
         clippedObj = o;
       o = o->container();
@@ -845,8 +845,8 @@ QString RenderObject::information() const {
     ts << "ps ";
   if (overhangingContents())
     ts << "oc ";
-  if (layouted())
-    ts << "lt ";
+  if (needsLayout())
+    ts << "nl ";
   if (m_recalcMinMax)
     ts << "rmm ";
   if (mouseInside())
@@ -919,8 +919,8 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
   if (shouldPaintBackgroundOrBorder()) {
     *stream << " paintBackground";
   }
-  if (layouted()) {
-    *stream << " layouted";
+  if (needsLayout()) {
+    *stream << " needsLayout";
   }
   if (minMaxKnown()) {
     *stream << " minMaxKnown";
@@ -1040,8 +1040,7 @@ void RenderObject::setStyle(RenderStyle* style) {
 
   if (d >= RenderStyle::Position && m_parent) {
     // qDebug("triggering relayout");
-    setMinMaxKnown(false);
-    setLayouted(false);
+    setNeedsLayoutAndMinMaxRecalc();
   } else if (m_parent && !isText()) {
     // qDebug("triggering repaint");
     repaint();
@@ -1176,8 +1175,8 @@ RenderObject* RenderObject::container() const {
 void RenderObject::invalidateLayout()
 {
     kdDebug() << "RenderObject::invalidateLayout " << renderName() << endl;
-    setLayouted(false);
-    if (m_parent && m_parent->layouted())
+    setNeedsLayout(true);
+    if (m_parent && !m_parent->needsLayout())
         m_parent->invalidateLayout();
 }
 #endif
@@ -1218,7 +1217,7 @@ RenderArena* RenderObject::renderArena() const {
 void RenderObject::detach(RenderArena* renderArena) {
   // If we're an overflow:hidden object that currently needs layout, we need
   // to make sure the view isn't holding on to us.
-  if (!layouted() && style()->hidesOverflow()) {
+  if (needsLayout() && style()->hidesOverflow()) {
     RenderRoot* r = root();
     if (r && r->view()->layoutObject() == this)
       r->view()->unscheduleRelayout();

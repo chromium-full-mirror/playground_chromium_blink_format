@@ -447,7 +447,7 @@ void RenderLayer::checkScrollbarsAfterLayout() {
     setHasHorizontalScrollbar(needHorizontalBar);
     setHasVerticalScrollbar(needVerticalBar);
 
-    m_object->setLayouted(false);
+    m_object->setNeedsLayout(true);
     if (m_object->isRenderBlock())
       static_cast<RenderBlock*>(m_object)->layoutBlock(true);
     else

@@ -116,7 +116,7 @@ void RenderRoot::layout() {
     m_minWidth = m_width;
 
   for (RenderObject* c = firstChild(); c; c = c->nextSibling())
-    c->setLayouted(false);
+    c->setNeedsLayout(true);
 
 #ifdef SPEED_DEBUG
   QTime qt;
@@ -168,7 +168,7 @@ void RenderRoot::layout() {
   layer()->setHeight(m_height);
   layer()->setWidth(m_width);
 
-  setLayouted();
+  setNeedsLayout(false);
 }
 
 bool RenderRoot::absolutePosition(int& xPos, int& yPos, bool f) {
@@ -282,7 +282,7 @@ void RenderRoot::repaint(bool immediate) {
     if (immediate) {
       m_view->resizeContents(docWidth(), docHeight());
       m_view->unscheduleRepaint();
-      if (!layouted()) {
+      if (needsLayout()) {
         m_view->scheduleRelayout();
         return;
       }
@@ -296,7 +296,7 @@ void RenderRoot::repaint(bool immediate) {
 }
 
 void RenderRoot::close() {
-  setLayouted(false);
+  setNeedsLayout(true);
   if (m_view) {
     m_view->layout();
   }

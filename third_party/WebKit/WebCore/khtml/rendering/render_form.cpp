@@ -146,7 +146,7 @@ void RenderFormElement::updateFromElement() {
 }
 
 void RenderFormElement::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   // minimum height
@@ -162,7 +162,7 @@ void RenderFormElement::layout() {
                      paddingRight());
 
   if (!style()->width().isPercent())
-    setLayouted();
+    setNeedsLayout(false);
 }
 
 void RenderFormElement::slotClicked() {
@@ -336,10 +336,8 @@ void RenderSubmitButton::updateFromElement() {
   QString oldText = static_cast<QPushButton*>(m_widget)->text();
   QString newText = rawText();
   static_cast<QPushButton*>(m_widget)->setText(newText);
-  if (oldText != newText) {
-    setMinMaxKnown(false);
-    setLayouted(false);
-  }
+  if (oldText != newText)
+    setNeedsLayoutAndMinMaxRecalc();
   RenderFormElement::updateFromElement();
 }
 
@@ -800,8 +798,7 @@ void RenderSelect::updateFromElement() {
     if (m_useListBox)
       static_cast<KListBox*>(m_widget)->endBatchInsert();
 #endif
-    setMinMaxKnown(false);
-    setLayouted(false);
+    setNeedsLayoutAndMinMaxRecalc();
     m_optionsChanged = false;
   }
 
@@ -834,17 +831,15 @@ void RenderSelect::calcMinMaxWidth() {
 
   // ### ugly HACK FIXME!!!
   setMinMaxKnown();
-  if (!layouted())
-    layout();
-  setLayouted(false);
-  setMinMaxKnown(false);
+  layoutIfNeeded();
+  setNeedsLayoutAndMinMaxRecalc();
   // ### end FIXME
 
   RenderFormElement::calcMinMaxWidth();
 }
 
 void RenderSelect::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   // ### maintain selection properly between type/size changes, and work
@@ -894,7 +889,7 @@ void RenderSelect::layout() {
   }
 
   /// uuh, ignore the following line..
-  setLayouted(false);
+  setNeedsLayout(true);
   RenderFormElement::layout();
 
   // and now disable the widget in case there is no <option> given

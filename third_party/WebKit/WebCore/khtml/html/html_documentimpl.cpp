@@ -372,8 +372,7 @@ void HTMLDocumentImpl::close() {
 
     // Always do a layout/repaint after loading.
     if (renderer()) {
-      if (!renderer()->layouted())
-        renderer()->layout();
+      renderer()->layoutIfNeeded();
       renderer()->repaint();
     }
   }

@@ -411,8 +411,7 @@ QRect RenderBox::getClipRect(int tx, int ty) {
 }
 
 void RenderBox::close() {
-  setMinMaxKnown(false);
-  setLayouted(false);
+  setNeedsLayoutAndMinMaxRecalc();
 }
 
 short RenderBox::containingBlockWidth() const {

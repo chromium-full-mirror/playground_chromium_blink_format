@@ -182,8 +182,7 @@ void RenderTable::addChild(RenderObject* child, RenderObject* beforeChild) {
         }
       }
       o->addChild(child);
-      child->setLayouted(false);
-      child->setMinMaxKnown(false);
+      child->setNeedsLayoutAndMinMaxRecalc();
       return;
   }
   RenderContainer::addChild(child, beforeChild);
@@ -225,12 +224,12 @@ void RenderTable::calcWidth() {
 }
 
 void RenderTable::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
   KHTMLAssert(!needSectionRecalc);
 
   // kdDebug( 6040 ) << renderName() << "(Table)"<< this << " ::layout0()
-  // width=" << width() << ", layouted=" << layouted() << endl;
+  // width=" << width() << ", needsLayout=" << needsLayout() << endl;
 
   m_height = 0;
   initMaxMarginValues();
@@ -258,7 +257,7 @@ void RenderTable::layout() {
 
   RenderObject* child = firstChild();
   while (child) {
-    if (!child->layouted() &&
+    if (child->needsLayout() &&
         !(child->element() && child->element()->id() == ID_FORM))
       child->layout();
     if (child->isTableSection()) {
@@ -364,7 +363,7 @@ void RenderTable::layout() {
   // ### only pass true if width or height changed.
   layoutPositionedObjects(true);
 
-  setLayouted();
+  setNeedsLayout(false);
 }
 
 void RenderTable::setCellWidths() {
@@ -389,7 +388,7 @@ void RenderTable::paint(QPainter* p,
                         int _tx,
                         int _ty,
                         PaintAction paintAction) {
-  if (!layouted())
+  if (needsLayout())
     return;
 
   _tx += xPos();
@@ -452,8 +451,7 @@ void RenderTable::calcMinMaxWidth() {
 
 void RenderTable::close() {
   //    kdDebug( 6040 ) << "RenderTable::close()" << endl;
-  setLayouted(false);
-  setMinMaxKnown(false);
+  setNeedsLayoutAndMinMaxRecalc();
 }
 
 int RenderTable::borderTopExtra() {
@@ -508,8 +506,7 @@ void RenderTable::splitColumn(int pos, int firstSpan) {
     child = child->nextSibling();
   }
   columnPos.resize(numEffCols() + 1);
-  setMinMaxKnown(false);
-  setLayouted(false);
+  setNeedsLayoutAndMinMaxRecalc();
 }
 
 void RenderTable::appendColumn(int span) {
@@ -537,8 +534,7 @@ void RenderTable::appendColumn(int span) {
     child = child->nextSibling();
   }
   columnPos.resize(numEffCols() + 1);
-  setMinMaxKnown(false);
-  setLayouted(false);
+  setNeedsLayoutAndMinMaxRecalc();
 }
 
 RenderTableCol* RenderTable::colElement(int col) {
@@ -580,7 +576,7 @@ void RenderTable::recalcSections() {
       case TABLE_CAPTION:
         if (!tCaption) {
           tCaption = static_cast<RenderBlock*>(child);
-          tCaption->setLayouted(false);
+          tCaption->setNeedsLayout(true);
         }
         break;
       case TABLE_COLUMN:
@@ -620,7 +616,7 @@ void RenderTable::recalcSections() {
     child = child->nextSibling();
   }
   needSectionRecalc = false;
-  setLayouted(false);
+  setNeedsLayout(true);
 }
 
 RenderObject* RenderTable::removeChildNode(RenderObject* child) {
@@ -759,8 +755,7 @@ void RenderTableSection::addChild(RenderObject* child,
       }
     }
     row->addChild(child);
-    child->setLayouted(false);
-    child->setMinMaxKnown(false);
+    child->setNeedsLayoutAndMinMaxRecalc();
     return;
   }
 
@@ -930,7 +925,7 @@ void RenderTableSection::setCellWidths() {
 #endif
       int oldWidth = cell->width();
       if (w != oldWidth) {
-        cell->setLayouted(false);
+        cell->setNeedsLayout(true);
         cell->setWidth(w);
       }
     }
@@ -1110,15 +1105,14 @@ int RenderTableSection::layoutRows(int toAdd) {
       RenderObject* o = cell->firstChild();
       while (o) {
         if (o->style()->height().isPercent()) {
-          o->setLayouted(false);
+          o->setNeedsLayout(true);
           cellChildrenFlex = true;
         }
         o = o->nextSibling();
       }
       if (cellChildrenFlex) {
         cell->setCellPercentageHeight(rHeight);
-        if (!cell->layouted())
-          cell->layout();
+        cell->layoutIfNeeded();
 
         // Alignment within a cell is based off the calculated
         // height, which becomes irrelevant once the cell has
@@ -1262,7 +1256,7 @@ void RenderTableSection::recalcCells() {
     row = row->nextSibling();
   }
   needCellRecalc = false;
-  setLayouted(false);
+  setNeedsLayout(true);
 }
 
 void RenderTableSection::clearGrid() {
@@ -1349,8 +1343,7 @@ void RenderTableRow::addChild(RenderObject* child, RenderObject* beforeChild) {
       addChild(cell, beforeChild);
     }
     cell->addChild(child);
-    child->setLayouted(false);
-    child->setMinMaxKnown(false);
+    child->setNeedsLayoutAndMinMaxRecalc();
     return;
   } else
     cell = static_cast<RenderTableCell*>(child);
@@ -1377,12 +1370,12 @@ void RenderTableRow::dump(QTextStream* stream, QString ind) const {
 #endif
 
 void RenderTableRow::layout() {
-  KHTMLAssert(!layouted());
+  KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
   RenderObject* child = firstChild();
   while (child) {
-    if (child->isTableCell() && !child->layouted()) {
+    if (child->isTableCell() && child->needsLayout()) {
       RenderTableCell* cell = static_cast<RenderTableCell*>(child);
       cell->calcVerticalMargins();
       cell->layout();
@@ -1391,7 +1384,7 @@ void RenderTableRow::layout() {
     }
     child = child->nextSibling();
   }
-  setLayouted();
+  setNeedsLayout(false);
 }
 
 void RenderTableRow::repaint(bool immediate) {
@@ -1554,7 +1547,7 @@ void RenderTableCell::paint(QPainter* p,
                 << " _y/_h=" << _y << "/" << _h << endl;
 #endif
 
-  if (!layouted())
+  if (needsLayout())
     return;
 
   _tx += m_x;
