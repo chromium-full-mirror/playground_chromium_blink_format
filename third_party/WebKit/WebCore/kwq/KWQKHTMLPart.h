@@ -165,8 +165,6 @@ class KWQKHTMLPart : public KHTMLPart {
   void mouseMoved(NSEvent*);
   bool keyEvent(NSEvent*);
 
-  static void widgetWillReleaseView(NSView*);
-
   void clearTimers();
   static void clearTimers(KHTMLView*);
 
@@ -191,6 +189,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool passWidgetMouseDownEventToWidget(khtml::RenderWidget*);
 
   void setPolicyBaseURL(const DOM::DOMString&);
+
+  NSView* mouseDownViewIfStillGood();
 
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
 
