@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,17 +20,15 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <qpaintdevice.h>
-#include <kwqdebug.h>
 
-#include <Cocoa/Cocoa.h>
+#include <qwidget.h>
+#include <qmap.h>
+#include <qstring.h>
 
-
-QPaintDevice::~QPaintDevice()
-{
-    // This space intentionally left blank.
-}
-
-
+class KJavaAppletWidget : public QWidget {
+ public:
+  KJavaAppletWidget(const QMap<QString, QString>& args);
+  void showApplet() {}
+};

@@ -25,7 +25,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol WebCoreImageRenderer
+@protocol WebCoreImageRenderer<NSObject, NSCopying>
 
 - (NSSize)size;
 - (void)resize:(NSSize)s;

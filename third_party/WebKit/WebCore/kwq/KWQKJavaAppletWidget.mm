@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,14 +20,17 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef QLAYOUT_H_
-#define QLAYOUT_H_
+#import <java/kjavaappletwidget.h>
+#import <WebCoreViewFactory.h>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#endif
+KJavaAppletWidget::KJavaAppletWidget(const QMap<QString, QString> &args)
+{
+    NSMutableDictionary *argsDictionary = [NSMutableDictionary dictionaryWithCapacity:args.count()];
+    for (QMap<QString, QString>::ConstIterator it = args.begin(); it != args.end(); ++it) {
+        [argsDictionary setObject:it.data().getNSString() forKey:it.key().getNSString()];
+    }
+    setView([[WebCoreViewFactory sharedFactory] viewForJavaAppletWithArguments:argsDictionary]);
+}

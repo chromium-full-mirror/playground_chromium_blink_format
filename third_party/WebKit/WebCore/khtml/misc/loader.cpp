@@ -275,6 +275,8 @@ void CachedScript::error(int /*err*/, const char* /*text*/) {
 
 // ------------------------------------------------------------------------------------------
 
+#ifndef APPLE_CHANGES
+
 namespace khtml {
 
 class ImageSource : public QDataSource {
@@ -405,6 +407,8 @@ void ImageSource::cleanBuffer() {
   }
 }
 
+#endif  // APPLE_CHANGES
+
 static QString buildAcceptHeader() {
   QString result = KImageIO::mimeTypes(KImageIO::Reading).join(", ");
   if (result.right(2) == ", ")
@@ -521,6 +525,7 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
       if (isvalid)
         p.fillRect(0, 0, w, r.height(), newc);
       p.drawTiledPixmap(0, 0, w, r.height(), pix);
+#ifndef APPLE_CHANGES
       if (!isvalid && pix.mask()) {
         // unfortunately our anti-transparency trick doesn't work here
         // we need to create a mask.
@@ -530,6 +535,7 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
         bg->setMask(newmask);
         bgColor = bgTransparant;
       } else
+#endif
         bgColor = newc.rgb();
       pix = *bg;
     }
@@ -540,6 +546,7 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
       if (isvalid)
         p.fillRect(0, 0, w, h, newc);
       p.drawTiledPixmap(0, 0, w, h, pix);
+#ifndef APPLE_CHANGES
       if (!isvalid && pix.mask()) {
         // unfortunately our anti-transparency trick doesn't work here
         // we need to create a mask.
@@ -549,6 +556,7 @@ const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
         bg->setMask(newmask);
         bgColor = bgTransparant;
       } else
+#endif
         bgColor = newc.rgb();
     }
     return *bg;
@@ -600,6 +608,8 @@ void CachedImage::do_notify(const QPixmap& p, const QRect& r) {
   }
 }
 
+#ifndef APPLE_CHANGES
+
 void CachedImage::movieUpdated(const QRect& r) {
 #ifdef CACHE_DEBUG
   qDebug("movie updated %d/%d/%d/%d, pixmap size %d/%d", r.x(), r.y(),
@@ -626,10 +636,8 @@ void CachedImage::movieStatus(int status) {
   // QMovie::frameImage if we're after QMovie::EndOfMovie
   if (status == QMovie::EndOfFrame) {
     const QImage& im = m->frameImage();
-#ifndef APPLE_CHANGES
     monochrome =
         ((im.depth() <= 8) && (im.numColors() - int(im.hasAlphaBuffer()) <= 2));
-#endif
     if (im.width() < 5 && im.height() < 5 &&
         im.hasAlphaBuffer())  // only evaluate for small images
     {
@@ -670,7 +678,6 @@ void CachedImage::movieStatus(int status) {
     {
       setShowAnimations(KHTMLSettings::KAnimationDisabled);
 
-#ifndef APPLE_CHANGES
       // monochrome alphamasked images are usually about 10000 times
       // faster to draw, so this is worth the hack
       if (p && monochrome && p->depth() > 1) {
@@ -683,7 +690,6 @@ void CachedImage::movieStatus(int status) {
         p = pix;
         monochrome = false;
       }
-#endif
     }
 
     CachedObjectClient* c;
@@ -706,9 +712,12 @@ void CachedImage::movieResize(const QSize& /*s*/) {
   //    do_notify(m->framePixmap(), QRect());
 }
 
+#endif  // APPLE_CHANGES
+
 void CachedImage::setShowAnimations(
     KHTMLSettings::KAnimationAdvice showAnimations) {
   m_showAnimations = showAnimations;
+#ifndef APPLE_CHANGES
   if ((m_showAnimations == KHTMLSettings::KAnimationDisabled) && imgSource) {
     imgSource->cleanBuffer();
     delete p;
@@ -719,12 +728,17 @@ void CachedImage::setShowAnimations(
     QTimer::singleShot(0, this, SLOT(deleteMovie()));
     imgSource = 0;
   }
+#endif
 }
+
+#ifndef APPLE_CHANGES
 
 void CachedImage::deleteMovie() {
   delete m;
   m = 0;
 }
+
+#endif  // APPLE_CHANGES
 
 void CachedImage::clear() {
   delete m;
@@ -758,6 +772,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
 #endif
     typeChecked = true;
 
+#ifndef APPLE_CHANGES
     if (formatType)  // movie format exists
     {
       imgSource = new ImageSource(_buffer.buffer());
@@ -766,12 +781,15 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
       m->connectStatus(this, SLOT(movieStatus(int)));
       m->connectResize(this, SLOT(movieResize(const QSize&)));
     }
+#endif
   }
 
+#ifndef APPLE_CHANGES
   if (imgSource) {
     imgSource->setEOF(eof);
     imgSource->maybeReady();
   }
+#endif
 
   if (eof) {
     // QMovie currently doesn't support all kinds of image formats

@@ -38,9 +38,6 @@
 #include "misc/htmltags.h"
 #include "html/html_objectimpl.h"
 
-#ifdef APPLE_CHANGES
-#include <WCJavaAppletWidget.h>
-#endif /* APPLE_CHANGES */
 using namespace khtml;
 using namespace DOM;
 
@@ -50,7 +47,7 @@ RenderApplet::RenderApplet(HTMLElementImpl* applet, QMap<QString, QString> args)
   setInline(true);
 
 #ifdef APPLE_CHANGES
-  // FIXME:MERGE Is this needed any more?
+  // FIXME: Can we find a way to do this in layout below instead of here?
   for (NodeImpl* child = element()->firstChild(); child;
        child = child->nextSibling()) {
     if (child->id() == ID_PARAM) {
@@ -58,8 +55,7 @@ RenderApplet::RenderApplet(HTMLElementImpl* applet, QMap<QString, QString> args)
       args.insert(p->name(), p->value());
     }
   }
-  setQWidget(IFJavaAppletWidgetCreate(args));
-#else  /* APPLE_CHANGES not defined */
+#endif  // APPLE_CHANGES
   KJavaAppletContext* context = 0;
   KHTMLView* _view = applet->getDocument()->view();
   if (_view) {
@@ -68,11 +64,14 @@ RenderApplet::RenderApplet(HTMLElementImpl* applet, QMap<QString, QString> args)
   }
 
   if (context) {
-    // kdDebug(6100) << "RenderApplet::RenderApplet, setting QWidget" << endl;
+// kdDebug(6100) << "RenderApplet::RenderApplet, setting QWidget" << endl;
+#ifdef APPLE_CHANGES
+    setQWidget(new KJavaAppletWidget(args));
+#else
     setQWidget(new KJavaAppletWidget(context, _view->viewport()));
     processArguments(args);
+#endif
   }
-#endif /* APPLE_CHANGES not defined */
 }
 
 RenderApplet::~RenderApplet() {}
@@ -104,13 +103,9 @@ void RenderApplet::layout() {
   calcWidth();
   calcHeight();
 
-#ifdef APPLE_CHANGES
-  m_widget->resize(
-      m_width - marginLeft() - marginRight() - paddingLeft() - paddingRight(),
-      m_height - marginTop() - marginBottom() - paddingTop() - paddingBottom());
-#else  /* APPLE_CHANGES not defined */
   KJavaAppletWidget* tmp = static_cast<KJavaAppletWidget*>(m_widget);
   if (tmp) {
+#ifndef APPLE_CHANGES
     NodeImpl* child = element()->firstChild();
 
     while (child) {
@@ -121,6 +116,7 @@ void RenderApplet::layout() {
       }
       child = child->nextSibling();
     }
+#endif
     // kdDebug(6100) << "setting applet widget to size: " << m_width << ", " <<
     // m_height << endl;
     m_widget->resize(
@@ -129,10 +125,11 @@ void RenderApplet::layout() {
             paddingBottom());
     tmp->showApplet();
   }
-#endif /* APPLE_CHANGES not defined */
 
   setLayouted();
 }
+
+#ifndef APPLE_CHANGES
 
 void RenderApplet::processArguments(QMap<QString, QString> args) {
   KJavaAppletWidget* w = static_cast<KJavaAppletWidget*>(m_widget);
@@ -154,6 +151,8 @@ void RenderApplet::processArguments(QMap<QString, QString> args) {
       applet->setArchives(args[QString::fromLatin1("archive")]);
   }
 }
+
+#endif  // APPLE_CHANGES
 
 RenderEmptyApplet::RenderEmptyApplet(DOM::NodeImpl* node) : RenderWidget(node) {
   // init RenderObject attributes
