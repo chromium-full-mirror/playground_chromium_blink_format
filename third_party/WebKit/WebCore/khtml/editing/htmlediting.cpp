@@ -2295,7 +2295,9 @@ void InsertParagraphSeparatorCommand::doApply() {
   if (upstreamInDifferentBlock || isFirstInBlock) {
     LOG(Editing, "insert paragraph separator: first in block case");
     pos = pos.downstream(StayInBlock);
-    insertNodeBefore(blockToInsert, startBlockIsRoot ? pos.node() : startBlock);
+    NodeImpl* refNode =
+        isFirstInBlock && !startBlockIsRoot ? startBlock : pos.node();
+    insertNodeBefore(blockToInsert, refNode);
     insertBlockPlaceholderIfNeeded(blockToInsert);
     setEndingSelection(pos);
     return;
@@ -2309,7 +2311,9 @@ void InsertParagraphSeparatorCommand::doApply() {
       pos.downstream(DoNotStayInBlock).node()->enclosingBlockFlowElement();
   if (downstreamInDifferentBlock || isLastInBlock) {
     LOG(Editing, "insert paragraph separator: last in block case");
-    insertNodeAfter(blockToInsert, startBlockIsRoot ? pos.node() : startBlock);
+    NodeImpl* refNode =
+        isLastInBlock && !startBlockIsRoot ? startBlock : pos.node();
+    insertNodeAfter(blockToInsert, refNode);
     insertBlockPlaceholderIfNeeded(blockToInsert);
     setEndingSelection(Position(blockToInsert, 0));
     return;
