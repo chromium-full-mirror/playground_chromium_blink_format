@@ -29,14 +29,14 @@
 
 namespace DOM {
 
-Position EditIterator::peekPrevious() const {
+Position PositionIterator::peekPrevious() const {
   Position pos = m_current;
 
   if (pos.isEmpty())
     return pos;
 
   if (pos.offset() <= 0) {
-    NodeImpl* prevNode = pos.node()->previousEditable();
+    NodeImpl* prevNode = pos.node()->previousLeafNode();
     if (prevNode)
       pos = Position(prevNode, prevNode->maxOffset());
   } else {
@@ -46,14 +46,14 @@ Position EditIterator::peekPrevious() const {
   return pos;
 }
 
-Position EditIterator::peekNext() const {
+Position PositionIterator::peekNext() const {
   Position pos = m_current;
 
   if (pos.isEmpty())
     return pos;
 
   if (pos.offset() >= pos.node()->maxOffset()) {
-    NodeImpl* nextNode = pos.node()->nextEditable();
+    NodeImpl* nextNode = pos.node()->nextLeafNode();
     if (nextNode)
       pos = Position(nextNode, 0);
   } else {
@@ -63,19 +63,19 @@ Position EditIterator::peekNext() const {
   return pos;
 }
 
-bool EditIterator::atStart() const {
+bool PositionIterator::atStart() const {
   if (m_current.isEmpty())
     return true;
 
-  return m_current.offset() == 0 && m_current.node()->previousEditable() == 0;
+  return m_current.offset() == 0 && m_current.node()->previousLeafNode() == 0;
 }
 
-bool EditIterator::atEnd() const {
+bool PositionIterator::atEnd() const {
   if (m_current.isEmpty())
     return true;
 
   return m_current.offset() == m_current.node()->maxOffset() &&
-         m_current.node()->nextEditable() == 0;
+         m_current.node()->nextLeafNode() == 0;
 }
 
 }  // namespace DOM

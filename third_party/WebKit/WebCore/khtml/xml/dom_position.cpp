@@ -226,7 +226,7 @@ Position Position::previousCharacterPosition() const {
     return Position();
 
   NodeImpl* fromRootEditableBlock = node()->rootEditableBlock();
-  EditIterator it(*this);
+  PositionIterator it(*this);
 
   bool atStartOfLine = isFirstRenderedPositionOnLine();
 
@@ -251,7 +251,7 @@ Position Position::nextCharacterPosition() const {
     return Position();
 
   NodeImpl* fromRootEditableBlock = node()->rootEditableBlock();
-  EditIterator it(*this);
+  PositionIterator it(*this);
 
   bool atEndOfLine = isLastRenderedPositionOnLine();
 
@@ -276,7 +276,7 @@ Position Position::previousWordPosition() const {
     return Position();
 
   Position pos = *this;
-  for (EditIterator it(*this); !it.atStart(); it.previous()) {
+  for (PositionIterator it(*this); !it.atStart(); it.previous()) {
     if (it.current().node()->nodeType() == Node::TEXT_NODE ||
         it.current().node()->nodeType() == Node::CDATA_SECTION_NODE) {
       DOMString t = it.current().node()->nodeValue();
@@ -302,7 +302,7 @@ Position Position::nextWordPosition() const {
     return Position();
 
   Position pos = *this;
-  for (EditIterator it(*this); !it.atEnd(); it.next()) {
+  for (PositionIterator it(*this); !it.atEnd(); it.next()) {
     if (it.current().node()->nodeType() == Node::TEXT_NODE ||
         it.current().node()->nodeType() == Node::CDATA_SECTION_NODE) {
       DOMString t = it.current().node()->nodeValue();
@@ -343,9 +343,9 @@ Position Position::previousLinePosition(int x) const {
     // Need to move back to previous containing editable block in this root
     // editable
     // block and find the last root line box in that block.
-    NodeImpl* startBlock = node()->containingEditableBlock();
+    NodeImpl* startBlock = node()->containingBlock();
     NodeImpl* n = node()->previousEditable();
-    while (n && startBlock == n->containingEditableBlock())
+    while (n && startBlock == n->containingBlock())
       n = n->previousEditable();
     if (n) {
       while (n && !Position(n, n->caretMaxOffset()).inRenderedContent())
@@ -391,9 +391,9 @@ Position Position::nextLinePosition(int x) const {
     // Need to move forward to next containing editable block in this root
     // editable
     // block and find the first root line box in that block.
-    NodeImpl* startBlock = node()->containingEditableBlock();
+    NodeImpl* startBlock = node()->containingBlock();
     NodeImpl* n = node()->nextEditable();
-    while (n && startBlock == n->containingEditableBlock())
+    while (n && startBlock == n->containingBlock())
       n = n->nextEditable();
     if (n) {
       while (n && !Position(n, n->caretMinOffset()).inRenderedContent())
@@ -423,14 +423,12 @@ Position Position::equivalentUpstreamPosition() const {
   if (!node())
     return Position();
 
-  NodeImpl* block = node()->containingEditableBlock();
+  NodeImpl* block = node()->containingBlock();
 
-  EditIterator it(*this);
+  PositionIterator it(*this);
   for (; !it.atStart(); it.previous()) {
-    if (block != it.current().node()->containingEditableBlock())
-      return it.next();
-
-    if (!node()->isContentEditable())
+    NodeImpl* currentBlock = it.current().node()->containingBlock();
+    if (block != currentBlock)
       return it.next();
 
     RenderObject* renderer = it.current().node()->renderer();
@@ -473,15 +471,13 @@ Position Position::equivalentDownstreamPosition() const {
   if (!node())
     return Position();
 
-  NodeImpl* block = node()->containingEditableBlock();
+  NodeImpl* block = node()->containingBlock();
 
-  EditIterator it(*this);
+  PositionIterator it(*this);
   for (; !it.atEnd(); it.next()) {
-    if (block != it.current().node()->containingEditableBlock())
+    NodeImpl* currentBlock = it.current().node()->containingBlock();
+    if (block != currentBlock)
       return it.previous();
-
-    if (!node()->isContentEditable())
-      return it.next();
 
     RenderObject* renderer = it.current().node()->renderer();
     if (!renderer)
@@ -589,7 +585,7 @@ bool Position::inRenderedContent() const {
   } else if (offset() >= renderer->caretMinOffset() &&
              offset() <= renderer->caretMaxOffset()) {
     // don't return containing editable blocks unless they are empty
-    if (node()->containingEditableBlock() == node() && node()->firstChild())
+    if (node()->containingBlock() == node() && node()->firstChild())
       return false;
     return true;
   }
@@ -628,8 +624,7 @@ bool Position::rendersOnSameLine(const Position& pos) const {
   if (node() == pos.node() && offset() == pos.offset())
     return true;
 
-  if (node()->containingEditableBlock() !=
-      pos.node()->containingEditableBlock())
+  if (node()->containingBlock() != pos.node()->containingBlock())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -683,8 +678,7 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
   if (pos.node()->id() == ID_BR && inRenderedContent())
     return true;
 
-  if (node()->containingEditableBlock() !=
-      pos.node()->containingEditableBlock())
+  if (node()->containingBlock() != pos.node()->containingBlock())
     return true;
 
   if (node()->isTextNode() && !inRenderedText())
@@ -755,7 +749,7 @@ bool Position::isFirstRenderedPositionOnLine() const {
     return false;
 
   Position pos(node(), offset());
-  EditIterator it(pos);
+  PositionIterator it(pos);
   while (!it.atStart()) {
     it.previous();
     if (it.current().inRenderedContent())
@@ -782,7 +776,7 @@ bool Position::isLastRenderedPositionOnLine() const {
     return true;
 
   Position pos(node(), offset());
-  EditIterator it(pos);
+  PositionIterator it(pos);
   while (!it.atEnd()) {
     it.next();
     if (it.current().inRenderedContent())
@@ -809,7 +803,7 @@ bool Position::isLastRenderedPositionInEditableBlock() const {
     return false;
 
   Position pos(node(), offset());
-  EditIterator it(pos);
+  PositionIterator it(pos);
   while (!it.atEnd()) {
     it.next();
     if (!it.current().node()->inSameContainingEditableBlock(node()))
@@ -824,7 +818,7 @@ bool Position::inFirstEditableInRootEditableBlock() const {
   if (isEmpty() || !inRenderedContent())
     return false;
 
-  EditIterator it(node(), offset());
+  PositionIterator it(*this);
   while (!it.atStart()) {
     if (it.previous().inRenderedContent())
       return false;
@@ -837,7 +831,7 @@ bool Position::inLastEditableInRootEditableBlock() const {
   if (isEmpty() || !inRenderedContent())
     return false;
 
-  EditIterator it(node(), offset());
+  PositionIterator it(*this);
   while (!it.atEnd()) {
     if (it.next().inRenderedContent())
       return false;
@@ -850,14 +844,14 @@ bool Position::inFirstEditableInContainingEditableBlock() const {
   if (isEmpty() || !inRenderedContent())
     return false;
 
-  NodeImpl* block = node()->containingEditableBlock();
+  NodeImpl* block = node()->containingBlock();
 
-  EditIterator it(node(), offset());
+  PositionIterator it(*this);
   while (!it.atStart()) {
     it.previous();
     if (!it.current().inRenderedContent())
       continue;
-    return block != it.current().node()->containingEditableBlock();
+    return block != it.current().node()->containingBlock();
   }
 
   return true;
@@ -867,14 +861,14 @@ bool Position::inLastEditableInContainingEditableBlock() const {
   if (isEmpty() || !inRenderedContent())
     return false;
 
-  NodeImpl* block = node()->containingEditableBlock();
+  NodeImpl* block = node()->containingBlock();
 
-  EditIterator it(node(), offset());
+  PositionIterator it(*this);
   while (!it.atEnd()) {
     it.next();
     if (!it.current().inRenderedContent())
       continue;
-    return block != it.current().node()->containingEditableBlock();
+    return block != it.current().node()->containingBlock();
   }
 
   return true;

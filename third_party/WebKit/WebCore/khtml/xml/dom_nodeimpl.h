@@ -174,7 +174,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   NodeImpl* previousLeafNode() const;
 
   bool isEditableBlock() const;
-  NodeImpl* containingEditableBlock() const;
+  NodeImpl* containingBlock() const;
   NodeImpl* rootEditableBlock() const;
 
   bool inSameRootEditableBlock(NodeImpl*);
