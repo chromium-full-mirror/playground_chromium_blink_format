@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,8 +27,7 @@
 
 @protocol WebCoreTextRenderer;
 
-@interface WebCoreTextRendererFactory : NSObject {
-}
+@interface WebCoreTextRendererFactory : NSObject
 
 + (WebCoreTextRendererFactory*)sharedFactory;
 
@@ -38,5 +37,7 @@
 - (BOOL)isFontFixedPitch:(NSFont*)font;
 - (id<WebCoreTextRenderer>)rendererWithFont:(NSFont*)font
                            usingPrinterFont:(BOOL)usingPrinterFont;
+
+- (void)clearCaches;
 
 @end
