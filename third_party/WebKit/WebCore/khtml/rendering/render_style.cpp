@@ -162,6 +162,9 @@ bool StyleFlexibleBoxData::operator==(const StyleFlexibleBoxData& o) const {
 
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
     : Shared<StyleCSS3NonInheritedData>(),
+#if APPLE_CHANGES
+      lineClamp(RenderStyle::initialLineClamp()),
+#endif
       opacity(RenderStyle::initialOpacity())
 #ifndef KHTML_NO_XBL
       ,
@@ -173,6 +176,9 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
     const StyleCSS3NonInheritedData& o)
     : Shared<StyleCSS3NonInheritedData>(),
+#if APPLE_CHANGES
+      lineClamp(o.lineClamp),
+#endif
       opacity(o.opacity),
       flexibleBox(o.flexibleBox),
       marquee(o.marquee) {
@@ -206,6 +212,9 @@ bool StyleCSS3NonInheritedData::operator==(
          marquee == o.marquee
 #ifndef KHTML_NO_XBL
          && bindingsEquivalent(o)
+#endif
+#if APPLE_CHANGES
+         && lineClamp == o.lineClamp
 #endif
       ;
 }
@@ -489,6 +498,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(surround->padding == other->surround->padding) ||
       *css3NonInheritedData->flexibleBox.get() !=
           *other->css3NonInheritedData->flexibleBox.get() ||
+#if APPLE_CHANGES
+      (css3NonInheritedData->lineClamp !=
+       other->css3NonInheritedData->lineClamp) ||
+#endif
       !(inherited->indent == other->inherited->indent) ||
       !(inherited->line_height == other->inherited->line_height) ||
       !(inherited->style_image == other->inherited->style_image) ||

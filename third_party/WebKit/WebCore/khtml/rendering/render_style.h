@@ -498,6 +498,10 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
     return !(*this == o);
   }
 
+#if APPLE_CHANGES
+  int lineClamp;  // An Apple extension.  Not really CSS3 but not worth making a
+                  // new struct over.
+#endif
   float opacity;  // Whether or not we're transparent.
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
@@ -1167,7 +1171,12 @@ class RenderStyle {
     return css3NonInheritedData->marquee->direction;
   }
   EUserModify userModify() const { return css3InheritedData->userModify; }
-  // End CSS3 Getters
+// End CSS3 Getters
+
+#if APPLE_CHANGES
+  // Apple-specific property getter methods
+  int lineClamp() { return css3NonInheritedData->lineClamp; }
+#endif
 
   // attribute setter methods
 
@@ -1436,7 +1445,12 @@ class RenderStyle {
   void setUserModify(EUserModify u) {
     SET_VAR(css3InheritedData, userModify, u);
   }
-  // End CSS3 Setters
+// End CSS3 Setters
+
+#if APPLE_CHANGES
+  // Apple-specific property setters
+  void setLineClamp(int c) { SET_VAR(css3NonInheritedData, lineClamp, c); }
+#endif
 
   QPalette palette() const { return visual->palette; }
   void setPaletteColor(QPalette::ColorGroup g,
@@ -1530,6 +1544,10 @@ class RenderStyle {
   static EMarqueeBehavior initialMarqueeBehavior() { return MSCROLL; }
   static EMarqueeDirection initialMarqueeDirection() { return MAUTO; }
   static EUserModify initialUserModify() { return READ_ONLY; }
+#if APPLE_CHANGES
+  // Keep these at the end.
+  static int initialLineClamp() { return -1; }
+#endif
 };
 
 }  // namespace
