@@ -140,15 +140,20 @@ class QChar {
   friend int operator!=(QChar, char);
   friend int operator!=(char, QChar);
 
-  // data members ------------------------------------------------------------
-
-  // NOTE: this is NOT private:
-  UniChar c;
-
   // protected
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+  // data members ------------------------------------------------------------
+
+  UniChar c;
+
+  // friends -----------------------------------------------------------------
+
+  friend class QString;
+  friend class QConstString;
 
 };  // class QChar
     // ==============================================================
@@ -208,17 +213,21 @@ class QString {
   QChar at(uint) const;
 #endif
 
-  bool startsWith(const QString&) const;
   int compare(const QString&) const;
-  int contains(const char*, bool cs = TRUE) const;
-  int contains(char) const;
 
-  int find(char, int index = 0, bool cs = TRUE) const;
-  int find(QChar, int index = 0, bool cs = TRUE) const;
-  int find(const QString&, int index = 0, bool cs = TRUE) const;
-  int find(const QRegExp&, int index = 0, bool cs = TRUE) const;
-  int findRev(char, int index = 0, bool cs = TRUE) const;
-  int findRev(const char*, int index = 0, bool cs = TRUE) const;
+  bool startsWith(const QString&) const;
+
+  int find(QChar, int) const;
+  int find(char, int index = 0) const;
+  int find(const QString&, int index = 0) const;
+  int find(const char*, int index = 0, bool cs = TRUE) const;
+  int find(const QRegExp&, int index = 0) const;
+
+  int findRev(char, int index = 0) const;
+  int findRev(const char*, int index = 0) const;
+
+  int contains(char) const;
+  int contains(const char*, bool cs = TRUE) const;
 
 #ifdef USING_BORROWED_KURL
   ushort toUShort() const;
@@ -275,18 +284,44 @@ class QString {
   QString& operator+=(QChar);
   QString& operator+=(char);
 
-  // data members ------------------------------------------------------------
-
-  // NOTE: this is NOT private:
-  CFMutableStringRef s;
-  mutable void* cache;
-  enum CacheType { CacheInvalid, CacheUnicode, CacheLatin1 };
-  mutable CacheType cacheType;
-
   // protected
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+  // private enums -----------------------------------------------------------
+
+  enum CacheType { CacheInvalid, CacheUnicode, CacheLatin1 };
+
+  // private member functions ------------------------------------------------
+
+  QCString convertToQCString(CFStringEncoding) const;
+
+  void flushCache() const;
+
+  // data members ------------------------------------------------------------
+
+  CFMutableStringRef s;
+  mutable void* cache;
+  mutable CacheType cacheType;
+
+  // friends -----------------------------------------------------------------
+
+  friend bool operator==(const QString&, const QString&);
+  friend bool operator==(const QString&, const char*);
+  friend bool operator==(const char*, const QString&);
+
+  friend bool operator!=(const QString&, const QString&);
+  friend bool operator!=(const QString&, const char*);
+  friend bool operator!=(const char*, const QString&);
+
+  friend QString operator+(const QString&, const QString&);
+  friend QString operator+(const QString&, const char*);
+  friend QString operator+(const char*, const QString&);
+
+  friend class QConstString;
+  friend class QGDict;
 
 };  // class QString
     // ============================================================
@@ -307,7 +342,7 @@ QString operator+(const char*, const QString&);
 
 // class QConstString ==========================================================
 
-class QConstString : /* NOTE: this is NOT private */ QString {
+class QConstString : private QString {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -330,14 +365,13 @@ class QConstString : /* NOTE: this is NOT private */ QString {
 
   const QString& string() const;
 
-  // operators ---------------------------------------------------------------
+// operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
- private:
+// private:
+
 // assignment operators ----------------------------------------------------
 
 // private declaration prevents assignment
