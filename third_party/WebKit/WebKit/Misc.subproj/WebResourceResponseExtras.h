@@ -25,6 +25,7 @@
     In mose cases, this method appends the proper file extension based on the
    MIME type.
     This method always returns a valid filename.
+    @result A suggested filename to use if saving the resource to disk.
 */
 - (NSString*)suggestedFilenameForSaving;
 

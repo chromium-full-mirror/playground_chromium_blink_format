@@ -46,7 +46,7 @@
 
 /*!
     @method setController:
-    @param controller
+    @param controller The controller to assign to this frame.
 */
 - (void)setController:(WebController*)controller;
 
@@ -58,7 +58,7 @@
 
 /*!
     @method setWebView:
-    @param view
+    @param view The view to assign to this frame.
 */
 - (void)setWebView:(WebView*)view;
 
@@ -70,6 +70,7 @@
 
 /*!
     @method loadRequest:
+    @param request The web request to load.
 */
 - (void)loadRequest:(WebResourceRequest*)request;
 
@@ -85,7 +86,7 @@
     @method provisionalDataSource
     @discussion Will return the provisional data source.  The provisional data
    source will
-    return nil if no data source has been set on the frame, or the data source
+    be nil if no data source has been set on the frame, or the data source
     has successfully transitioned to the committed data source.
     @result The provisional datasource of this frame.
 */
@@ -109,7 +110,7 @@
    returns self
     for _self and _current, the parent frame for _parent and the main frame for
    _top.
-    findFrameNamed returns self for _parent and _top if the receiver it is the
+    findFrameNamed returns self for _parent and _top if the receiver is the
    mainFrame.
     findFrameNamed first searches from the current frame to all descending
    frames then the
