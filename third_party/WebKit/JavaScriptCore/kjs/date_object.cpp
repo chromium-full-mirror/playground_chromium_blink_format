@@ -115,7 +115,7 @@ static struct tm* tmUsingCF(time_t clock, CFTimeZoneRef timeZone) {
 
 static CFTimeZoneRef UTCTimeZone() {
   static CFTimeZoneRef zone =
-      CFTimeZoneCreateWithName(NULL, CFSTR("UTC"), TRUE);
+      CFTimeZoneCreateWithTimeIntervalFromGMT(NULL, 0.0);
   return zone;
 }
 
