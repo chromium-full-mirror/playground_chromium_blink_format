@@ -35,6 +35,8 @@
 class QPainter;
 template <class type>
 class QPtrList;
+template <class type>
+class QPtrDict;
 class KHTMLView;
 class RenderArena;
 class QRect;
@@ -496,6 +498,11 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual void formatForDebugger(char* buffer, unsigned length) const;
 #endif
 
+  void registerNodeList(NodeListImpl* list);
+  void unregisterNodeList(NodeListImpl* list);
+  void notifyNodeListsSubtreeModified();
+  void notifyLocalNodeListsSubtreeModified();
+
  private:  // members
   DocumentPtr* document;
   NodeImpl* m_previous;
@@ -504,6 +511,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
  protected:
   khtml::RenderObject* m_render;
   QPtrList<RegisteredEventListener>* m_regdListeners;
+  QPtrDict<NodeListImpl>* m_nodeLists;
 
   unsigned short m_tabIndex : 15;
   bool m_hasTabIndex : 1;
@@ -597,28 +605,34 @@ class NodeImpl;
 
 class NodeListImpl : public khtml::Shared<NodeListImpl> {
  public:
-  virtual ~NodeListImpl() {}
+  NodeListImpl(NodeImpl* _rootNode);
+  virtual ~NodeListImpl();
 
   // DOM methods & attributes for NodeList
-  virtual unsigned long length() const;
-  virtual NodeImpl* item(unsigned long index) const;
+  virtual unsigned long length() const = 0;
+  virtual NodeImpl* item(unsigned long index) const = 0;
 
-// Other methods (not part of DOM)
+  // Other methods (not part of DOM)
+
+  void rootNodeSubtreeModified();
 
 #if APPLE_CHANGES
   static NodeList createInstance(NodeListImpl* impl);
 #endif
  protected:
   // helper functions for searching all ElementImpls in a tree
-  unsigned long recursiveLength(NodeImpl* start) const;
-  NodeImpl* recursiveItem(NodeImpl* start, unsigned long& offset) const;
+  unsigned long recursiveLength(NodeImpl* start = 0) const;
+  NodeImpl* recursiveItem(unsigned long& offset, NodeImpl* start = 0) const;
   virtual bool nodeMatches(NodeImpl* testNode) const = 0;
+
+  NodeImpl* rootNode;
+  mutable int cachedLength;
+  mutable bool isCacheValid;
 };
 
 class ChildNodeListImpl : public NodeListImpl {
  public:
   ChildNodeListImpl(NodeImpl* n);
-  virtual ~ChildNodeListImpl();
 
   // DOM methods overridden from  parent classes
 
@@ -627,8 +641,6 @@ class ChildNodeListImpl : public NodeListImpl {
 
  protected:
   virtual bool nodeMatches(NodeImpl* testNode) const;
-
-  NodeImpl* refNode;
 };
 
 /**
@@ -637,7 +649,6 @@ class ChildNodeListImpl : public NodeListImpl {
 class TagNodeListImpl : public NodeListImpl {
  public:
   TagNodeListImpl(NodeImpl* n, NodeImpl::Id tagId, NodeImpl::Id tagIdMask);
-  virtual ~TagNodeListImpl();
 
   // DOM methods overridden from  parent classes
 
@@ -649,7 +660,6 @@ class TagNodeListImpl : public NodeListImpl {
  protected:
   virtual bool nodeMatches(NodeImpl* testNode) const;
 
-  NodeImpl* refNode;
   NodeImpl::Id m_id;
   NodeImpl::Id m_idMask;
 };
@@ -660,7 +670,6 @@ class TagNodeListImpl : public NodeListImpl {
 class NameNodeListImpl : public NodeListImpl {
  public:
   NameNodeListImpl(NodeImpl* doc, const DOMString& t);
-  virtual ~NameNodeListImpl();
 
   // DOM methods overridden from  parent classes
 
@@ -672,7 +681,6 @@ class NameNodeListImpl : public NodeListImpl {
  protected:
   virtual bool nodeMatches(NodeImpl* testNode) const;
 
-  NodeImpl* refNode;
   DOMString nodeName;
 };
 
