@@ -606,7 +606,7 @@ void KHTMLView::layout() {
 
 // Now update the positions of all layers.
 #ifdef INCREMENTAL_REPAINTING
-  layer->updateLayerPositions(layer, d->doFullRepaint);
+  layer->updateLayerPositions(d->doFullRepaint);
 #else
   layer->updateLayerPositions();
 #endif

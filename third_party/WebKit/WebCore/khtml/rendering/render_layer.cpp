@@ -121,9 +121,7 @@ void RenderLayer::computeRepaintRects() {
 #endif
 
 #ifdef INCREMENTAL_REPAINTING
-void RenderLayer::updateLayerPositions(RenderLayer* rootLayer,
-                                       bool doFullRepaint,
-                                       bool checkForRepaint)
+void RenderLayer::updateLayerPositions(bool doFullRepaint, bool checkForRepaint)
 #else
 void RenderLayer::updateLayerPositions()
 #endif
@@ -144,7 +142,7 @@ void RenderLayer::updateLayerPositions()
     // Need to position the scrollbars.
     int x = 0;
     int y = 0;
-    convertToLayerCoords(rootLayer, x, y);
+    convertToLayerCoords(root(), x, y);
     QRect layerBounds = QRect(x, y, width(), height());
     positionScrollbars(layerBounds);
   }
@@ -156,7 +154,7 @@ void RenderLayer::updateLayerPositions()
 
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
 #ifdef INCREMENTAL_REPAINTING
-    child->updateLayerPositions(rootLayer, doFullRepaint, checkForRepaint);
+    child->updateLayerPositions(doFullRepaint, checkForRepaint);
 #else
     child->updateLayerPositions();
 #endif
@@ -456,7 +454,11 @@ void RenderLayer::scrollToOffset(int x,
   m_scrollX = x;
   m_scrollY = y;
 
-// FIXME: Fire the onscroll DOM event.
+  // FIXME: Fire the onscroll DOM event.
+
+  // Update the positions of our child layers.
+  for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
+    child->updateLayerPositions();
 
 #if APPLE_CHANGES
   // Move our widgets.
