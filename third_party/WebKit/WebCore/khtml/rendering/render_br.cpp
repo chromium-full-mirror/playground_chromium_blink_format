@@ -136,7 +136,9 @@ QRect RenderBR::selectionRect() {
   int selectionHeight = root->bottomOverflow() - selectionTop;
   int selectionLeft = xPos();
   RenderObject* prevLineLastLeaf =
-      root->prevRootBox() ? root->prevRootBox()->lastLeafChild()->object() : 0;
+      (root->prevRootBox() && root->prevRootBox()->lastLeafChild())
+          ? root->prevRootBox()->lastLeafChild()->object()
+          : 0;
   if (root->firstLeafChild() == firstTextBox() && root->prevRootBox() &&
       prevLineLastLeaf &&
       prevLineLastLeaf->selectionState() != RenderObject::SelectionNone)
