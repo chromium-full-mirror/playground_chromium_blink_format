@@ -6,7 +6,6 @@
 #import <WebKit/WebController.h>
 
 @class WebError;
-@class WebLoadProgress;
 @class WebFrame;
 
 @interface WebControllerPrivate : NSObject {
@@ -14,8 +13,8 @@
   WebFrame* mainFrame;
 
   id<WebWindowOperationsDelegate> windowContext;
-  id<WebResourceProgressDelegate> resourceProgressDelegate;
-  id<WebResourceProgressDelegate> downloadProgressDelegate;
+  id<WebResourceLoadDelegate> resourceProgressDelegate;
+  id<WebResourceLoadDelegate> downloadProgressDelegate;
   id<WebContextMenuDelegate> contextMenuDelegate;
   id<WebContextMenuDelegate> defaultContextMenuDelegate;
   id<WebControllerPolicyDelegate> policyDelegate;
@@ -47,21 +46,19 @@
 - (WebFrame *)createFrameNamed: (NSString *)fname for: (WebDataSource *)child inParent: (WebDataSource *)parent allowsScrolling: (BOOL)allowsScrolling;
 
 - (id<WebContextMenuDelegate>)_defaultContextMenuDelegate;
-- (void)_receivedProgress:(WebLoadProgress*)progress
-        forResourceHandle:(WebResourceHandle*)resourceHandle
-           fromDataSource:(WebDataSource*)dataSource
-                 complete:(BOOL)isComplete;
+- (void)_receivedProgressForResourceHandle:(WebResourceHandle*)resourceHandle
+                            fromDataSource:(WebDataSource*)dataSource
+                                  complete:(BOOL)isComplete;
 - (void)_receivedError:(WebError*)error
      forResourceHandle:(WebResourceHandle*)resourceHandle
-       partialProgress:(WebLoadProgress*)progress
         fromDataSource:(WebDataSource*)dataSource;
-- (void)_mainReceivedProgress:(WebLoadProgress*)progress
-            forResourceHandle:(WebResourceHandle*)resourceHandle
-               fromDataSource:(WebDataSource*)dataSource
-                     complete:(BOOL)isComplete;
+- (void)_mainReceivedProgressForResourceHandle:
+            (WebResourceHandle*)resourceHandle
+                                    bytesSoFar:(unsigned)bytesSoFar
+                                fromDataSource:(WebDataSource*)dataSource
+                                      complete:(BOOL)isComplete;
 - (void)_mainReceivedError:(WebError*)error
          forResourceHandle:(WebResourceHandle*)resourceHandle
-           partialProgress:(WebLoadProgress*)progress
             fromDataSource:(WebDataSource*)dataSource;
 - (void)_didStartLoading:(NSURL*)URL;
 - (void)_didStopLoading:(NSURL*)URL;
