@@ -396,21 +396,24 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
 }
 
 void RenderImage::updateFromElement() {
-#if APPLE_CHANGES
-  // Treat a lack of src or empty string for src as no image at all, not the
-  // page itself
+  DOMString attr;
+  // Support images in OBJECT tags.
+  if (element()->id() == ID_OBJECT) {
+    attr = element()->getAttribute(ATTR_DATA);
+  } else {
+    attr = element()->getAttribute(ATTR_SRC);
+  }
+
+  // Treat a lack of src orempty string for src as no image at all, not the page
+  // itself
   // loaded as an image.
-  DOMString attr = element()->getAttribute(ATTR_SRC);
   CachedImage* new_image;
-  if (attr.isEmpty())
+  if (attr.isEmpty()) {
     new_image = NULL;
-  else
+  } else {
     new_image = element()->getDocument()->docLoader()->requestImage(
         khtml::parseURL(attr));
-#else
-  CachedImage* new_image = element()->getDocument()->docLoader()->requestImage(
-      khtml::parseURL(element()->getAttribute(ATTR_SRC)));
-#endif
+  }
 
   if (new_image && new_image != image &&
       (!style() || !style()->contentObject())) {
