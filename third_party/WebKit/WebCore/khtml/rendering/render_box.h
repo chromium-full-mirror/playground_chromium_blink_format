@@ -24,7 +24,7 @@
 #ifndef RENDER_BOX_H
 #define RENDER_BOX_H
 
-#include "render_container.h"
+#include "render_object.h"
 #include "misc/loader.h"
 #include "render_layer.h"
 
@@ -34,7 +34,7 @@ class CachedObject;
 enum WidthType { Width, MinWidth, MaxWidth };
 enum HeightType { Height, MinHeight, MaxHeight };
 
-class RenderBox : public RenderContainer {
+class RenderBox : public RenderObject {
   // combines ElemImpl & PosElImpl (all rendering objects are positioned)
   // should contain all border and padding handling
 

@@ -44,7 +44,7 @@
 using DOM::Position;
 using namespace khtml;
 
-RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderObject(node) {
+RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderBox(node) {
   m_first = 0;
   m_last = 0;
 }
@@ -66,7 +66,7 @@ void RenderContainer::detach() {
   m_first = 0;
   m_last = 0;
 
-  RenderObject::detach();
+  RenderBox::detach();
 }
 
 bool RenderContainer::canHaveChildren() const {

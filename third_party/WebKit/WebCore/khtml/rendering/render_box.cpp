@@ -47,7 +47,7 @@ using namespace khtml;
 
 #define TABLECELLMARGIN -0x4000
 
-RenderBox::RenderBox(DOM::NodeImpl* node) : RenderContainer(node) {
+RenderBox::RenderBox(DOM::NodeImpl* node) : RenderObject(node) {
   m_minWidth = -1;
   m_maxWidth = -1;
   m_overrideSize = -1;
@@ -136,7 +136,7 @@ void RenderBox::detach() {
     m_inlineBoxWrapper = 0;
   }
 
-  RenderContainer::detach();
+  RenderObject::detach();
 
   if (layer)
     layer->detach(arena);

@@ -818,7 +818,8 @@ void RenderTable::dump(QTextStream* stream, QString ind) const {
 
 // --------------------------------------------------------------------------
 
-RenderTableSection::RenderTableSection(DOM::NodeImpl* node) : RenderBox(node) {
+RenderTableSection::RenderTableSection(DOM::NodeImpl* node)
+    : RenderContainer(node) {
   // init RenderObject attributes
   setInline(false);  // our object is not Inline
   gridRows = 0;
@@ -837,7 +838,7 @@ void RenderTableSection::detach() {
   if (table())
     table()->setNeedSectionRecalc();
 
-  RenderBox::detach();
+  RenderContainer::detach();
 }
 
 void RenderTableSection::setStyle(RenderStyle* _style) {
@@ -848,7 +849,7 @@ void RenderTableSection::setStyle(RenderStyle* _style) {
            _style->display() != TABLE_HEADER_GROUP)
     _style->setDisplay(TABLE_ROW_GROUP);
 
-  RenderBox::setStyle(_style);
+  RenderContainer::setStyle(_style);
 }
 
 void RenderTableSection::addChild(RenderObject* child,

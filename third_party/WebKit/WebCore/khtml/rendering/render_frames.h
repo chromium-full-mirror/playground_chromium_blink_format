@@ -23,6 +23,7 @@
 #ifndef __render_frames_h__
 #define __render_frames_h__
 
+#include "render_container.h"
 #include "rendering/render_replaced.h"
 #include "xml/dom_nodeimpl.h"
 #include "html/html_baseimpl.h"
@@ -37,7 +38,7 @@ class MouseEventImpl;
 namespace khtml {
 struct ChildFrame;
 
-class RenderFrameSet : public RenderBox {
+class RenderFrameSet : public RenderContainer {
   friend class DOM::HTMLFrameSetElementImpl;
 
  public:
@@ -92,7 +93,7 @@ class RenderFrameSet : public RenderBox {
   bool m_clientresizing;
 };
 
-class RenderPart : public khtml::RenderWidget {
+class RenderPart : public RenderWidget {
   Q_OBJECT
  public:
   RenderPart(DOM::HTMLElementImpl* node);
@@ -131,7 +132,7 @@ class RenderPart : public khtml::RenderWidget {
   virtual void slotViewCleared();
 };
 
-class RenderFrame : public khtml::RenderPart {
+class RenderFrame : public RenderPart {
   Q_OBJECT
  public:
   RenderFrame(DOM::HTMLFrameElementImpl* frame);
@@ -147,7 +148,7 @@ class RenderFrame : public khtml::RenderPart {
 };
 
 // I can hardly call the class RenderObject ;-)
-class RenderPartObject : public khtml::RenderPart {
+class RenderPartObject : public RenderPart {
   Q_OBJECT
  public:
   RenderPartObject(DOM::HTMLElementImpl*);

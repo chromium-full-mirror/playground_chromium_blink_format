@@ -190,7 +190,7 @@ void RenderFlow::detach() {
   }
 
   deleteLineBoxes();
-  RenderBox::detach();
+  RenderContainer::detach();
 }
 
 void RenderFlow::dirtyLinesFromChangedChild(RenderObject* child, bool adding) {
@@ -274,7 +274,7 @@ short RenderFlow::lineHeight(bool firstLine, bool isRootLineBox) const {
 
 void RenderFlow::dirtyLineBoxes(bool fullLayout, bool isRootLineBox) {
   if (!isRootLineBox && isReplaced())
-    return RenderBox::dirtyLineBoxes(isRootLineBox);
+    return RenderContainer::dirtyLineBoxes(isRootLineBox);
 
   if (fullLayout)
     deleteLineBoxes();
@@ -289,7 +289,7 @@ InlineBox* RenderFlow::createInlineBox(bool makePlaceHolderBox,
                                        bool isOnlyRun) {
   if (!isRootLineBox &&
       (isReplaced() || makePlaceHolderBox))  // Inline tables and inline blocks
-    return RenderBox::createInlineBox(
+    return RenderContainer::createInlineBox(
         false, isRootLineBox);  // (or positioned element placeholders).
 
   InlineFlowBox* flowBox = 0;
@@ -422,12 +422,13 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
     }
   }
 
-  return RenderBox::getAbsoluteRepaintRect();
+  return RenderContainer::getAbsoluteRepaintRect();
 }
 
 int RenderFlow::lowestPosition(bool includeOverflowInterior,
                                bool includeSelf) const {
-  int bottom = RenderBox::lowestPosition(includeOverflowInterior, includeSelf);
+  int bottom =
+      RenderContainer::lowestPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && hasOverflowClip())
     return bottom;
 
@@ -451,7 +452,7 @@ int RenderFlow::lowestPosition(bool includeOverflowInterior,
 int RenderFlow::rightmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
   int right =
-      RenderBox::rightmostPosition(includeOverflowInterior, includeSelf);
+      RenderContainer::rightmostPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && hasOverflowClip())
     return right;
 
@@ -474,7 +475,8 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
 
 int RenderFlow::leftmostPosition(bool includeOverflowInterior,
                                  bool includeSelf) const {
-  int left = RenderBox::leftmostPosition(includeOverflowInterior, includeSelf);
+  int left =
+      RenderContainer::leftmostPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && hasOverflowClip())
     return left;
 
@@ -503,7 +505,7 @@ void RenderFlow::caretPos(int offset,
                           int& height) {
   if (firstChild() || style()->display() == INLINE) {
     // Do the normal calculation
-    RenderBox::caretPos(offset, override, _x, _y, width, height);
+    RenderContainer::caretPos(offset, override, _x, _y, width, height);
     return;
   }
 
