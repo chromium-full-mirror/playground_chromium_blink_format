@@ -343,10 +343,8 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // layers are clipped according to the overflowClipRect.
   QRect clipRectToApply =
       m_object->isPositioned() ? posClipRect : overflowClipRect;
-  QRect damageRect = eventProcessing
-                         ? clipRectToApply
-                         : clipRectToApply.intersect(QRect(
-                               x, y, m_object->width(), m_object->height()));
+  QRect damageRect = eventProcessing ? clipRectToApply
+                                     : clipRectToApply.intersect(layerBounds);
 
   // If we establish a clip rect, then we want to intersect that rect
   // with the damage rect to form a new damage rect.
