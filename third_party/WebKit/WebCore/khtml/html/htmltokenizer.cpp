@@ -98,8 +98,7 @@ static const char titleEnd[] = "</title";
 // handle this in the text codec.
 
 // To cover non-entity text, I think this function would need to be called
-// in more places. There seem to be many places that set *dest without
-// calling fixUpChar.
+// in more places. There seem to be many places that don't call fixUpChar.
 
 inline void fixUpChar(QChar& c) {
   switch (c.unicode()) {
@@ -560,7 +559,9 @@ void HTMLTokenizer::parseSpecial(DOMStringIt& src) {
       parseEntity(src, scriptCodeDest, true);
       scriptCodeSize = scriptCodeDest - scriptCode;
     } else {
-      scriptCode[scriptCodeSize++] = *src;
+      scriptCode[scriptCodeSize] = *src;
+      fixUpChar(scriptCode[scriptCodeSize]);
+      ++scriptCodeSize;
       ++src;
     }
   }
@@ -755,7 +756,9 @@ void HTMLTokenizer::parseText(DOMStringIt& src) {
       *dest++ = '\n';
       ++src;
     } else {
-      *dest++ = *src;
+      *dest = *src;
+      fixUpChar(*dest);
+      ++dest;
       ++src;
     }
   }
@@ -1180,7 +1183,9 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               break;
             }
           }
-          *dest++ = *src;
+          *dest = *src;
+          fixUpChar(*dest);
+          ++dest;
           ++src;
         }
         break;
@@ -1212,7 +1217,9 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
             }
           }
 
-          *dest++ = *src;
+          *dest = *src;
+          fixUpChar(*dest);
+          ++dest;
           ++src;
         }
         break;
