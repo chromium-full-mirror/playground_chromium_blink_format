@@ -287,6 +287,8 @@ class RenderFieldset : public RenderBlock {
 
   virtual RenderObject* layoutLegend(bool relayoutChildren);
 
+  virtual void setStyle(RenderStyle* _style);
+
  protected:
   virtual void
   paintBoxDecorations(QPainter* p, int, int _y, int, int _h, int _tx, int _ty);
