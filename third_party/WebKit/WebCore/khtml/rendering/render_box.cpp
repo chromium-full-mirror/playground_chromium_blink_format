@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -213,9 +213,15 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   // iframes/frames with
   // no background in the child document should show the parent's background.
   if ((!c.isValid() || qAlpha(c.rgb()) == 0) && canvas()->view()) {
+    bool isTransparent;
     DOM::NodeImpl* elt = element()->getDocument()->ownerElement();
-    if (canBeTransparent && elt &&
-        elt->id() != ID_FRAME)  // Frames are never transparent.
+    if (elt)
+      isTransparent = canBeTransparent &&
+                      elt->id() != ID_FRAME;  // Frames are never transparent.
+    else
+      isTransparent = canvas()->view()->isTransparent();
+
+    if (isTransparent)
       canvas()
           ->view()
           ->useSlowRepaints();  // The parent must show behind the child.
@@ -330,7 +336,8 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
     // If we have an alpha and we are painting the root element, go ahead and
     // blend with our default
     // background color (typically white).
-    if (qAlpha(c.rgb()) < 0xFF && isRoot())
+    if (qAlpha(c.rgb()) < 0xFF && isRoot() &&
+        !canvas()->view()->isTransparent())
       p->fillRect(
           _tx, clipy, w, cliph,
           canvas()->view()->palette().active().color(QColorGroup::Base));
