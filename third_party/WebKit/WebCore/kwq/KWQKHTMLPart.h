@@ -35,6 +35,7 @@
 #import "WebCoreKeyboardAccess.h"
 
 #include <CoreFoundation/CoreFoundation.h>
+#include "KWQDict.h"
 
 class KHTMLPartPrivate;
 class KWQWindowWidget;
@@ -83,6 +84,8 @@ class KWQKHTMLPart : public KHTMLPart {
  public:
   KWQKHTMLPart();
   ~KWQKHTMLPart();
+
+  void clear();
 
   void setBridge(WebCoreBridge* p);
   WebCoreBridge* bridge() const { return _bridge; }
@@ -263,6 +266,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void setName(const QString& name);
 
+  void didTellBridgeAboutLoad(const QString& urlString);
+  bool haveToldBridgeAboutLoad(const QString& urlString);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
@@ -314,6 +320,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   bool _usesInactiveTextBackgroundColor;
   bool _showsFirstResponder;
+
+  QDict<char> urlsBridgeKnowsAbout;
 
   friend class KHTMLPart;
 };
