@@ -63,6 +63,8 @@ class SimpleNumber {
   static inline ValueImp* make(long i) {
     return (ValueImp*)((i << shift) | tag);
   }
+
+  static double negZero;
 };
 }
 
