@@ -2422,6 +2422,13 @@ void DocumentImpl::setDashboardRegions(
 
 #endif
 
+static QWidget* widgetForNode(NodeImpl* focusNode) {
+  RenderObject* renderer = focusNode->renderer();
+  if (!renderer || !renderer->isWidget())
+    return 0;
+  return static_cast<RenderWidget*>(renderer)->widget();
+}
+
 bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   // Make sure newFocusNode is actually in this document
   if (newFocusNode && (newFocusNode->getDocument() != this))
@@ -2509,17 +2516,19 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
     // eww, I suck. set the qt focus correctly
     // ### find a better place in the code for this
     if (getDocument()->view()) {
-      if (!m_focusNode->renderer() || !m_focusNode->renderer()->isWidget())
-        getDocument()->view()->setFocus();
-      else if (static_cast<RenderWidget*>(m_focusNode->renderer())->widget()) {
+      QWidget* focusWidget = widgetForNode(m_focusNode);
+      if (focusWidget) {
         // Make sure a widget has the right size before giving it focus.
         // Otherwise, we are testing edge cases of the QWidget code.
         // Specifically, in WebCore this does not work well for text fields.
         getDocument()->updateLayout();
-        static_cast<RenderWidget*>(m_focusNode->renderer())
-            ->widget()
-            ->setFocus();
+        // Re-get the widget in case updating the layout changed things.
+        focusWidget = widgetForNode(m_focusNode);
       }
+      if (focusWidget)
+        focusWidget->setFocus();
+      else
+        getDocument()->view()->setFocus();
     }
   }
 
