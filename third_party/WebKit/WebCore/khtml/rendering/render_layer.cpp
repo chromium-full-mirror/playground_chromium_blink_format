@@ -294,7 +294,8 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // block elements, since inline non-replaced elements have a width of 0 (and
   // thus the layer does too).  We also exclude the root from this test, since
   // the HTML can be much taller than the root (because of scrolling).
-  if (!m_parent || (renderer()->isInline() && !renderer()->isReplaced()) ||
+  if (renderer()->isRoot() || renderer()->isHtml() || renderer()->isBody() ||
+      (renderer()->isInline() && !renderer()->isReplaced()) ||
       (eventProcessing && layerBounds.contains(x, y)) ||
       (!eventProcessing && layerBounds.intersects(damageRect))) {
     RenderLayerElement* layerElt =
