@@ -10,11 +10,14 @@
 
 @class WebHTMLView;
 @class WebPluginPackage;
+@class WebBridge;
+@class WebView;
 
 @interface WebPluginController : NSObject {
   NSView* _documentView;
   NSMutableArray* _views;
   BOOL _started;
+  NSMutableSet* _checksInProgress;
 }
 
 + (NSView*)plugInViewWithArguments:(NSDictionary*)arguments
@@ -28,5 +31,8 @@
 - (void)startAllPlugins;
 - (void)stopAllPlugins;
 - (void)destroyAllPlugins;
+
+- (WebBridge*)bridge;
+- (WebView*)webView;
 
 @end

@@ -9,6 +9,10 @@
 @class WebHistoryItem;
 
 typedef enum {
+  WebNavigationTypePlugInRequest = WebNavigationTypeOther + 1
+} WebExtraNavigationType;
+
+typedef enum {
   WebPolicyUse,
   WebPolicyDownload,
   WebPolicyIgnore,
