@@ -184,10 +184,6 @@ class HTMLHtmlElementImpl : public HTMLElementImpl {
   ~HTMLHtmlElementImpl();
 
   virtual Id id() const;
-  virtual void attach();
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
 };
 
 // -------------------------------------------------------------------------

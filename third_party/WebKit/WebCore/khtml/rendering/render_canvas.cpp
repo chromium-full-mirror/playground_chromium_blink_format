@@ -19,7 +19,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include "rendering/render_root.h"
+#include "rendering/render_canvas.h"
 #include "render_layer.h"
 #include "xml/dom_docimpl.h"
 
@@ -35,7 +35,7 @@ using namespace khtml;
 //#define BOX_DEBUG
 //#define SPEED_DEBUG
 
-RenderRoot::RenderRoot(DOM::NodeImpl* node, KHTMLView* view)
+RenderCanvas::RenderCanvas(DOM::NodeImpl* node, KHTMLView* view)
     : RenderBlock(node) {
   // init RenderObject attributes
   setInline(false);
@@ -66,9 +66,9 @@ RenderRoot::RenderRoot(DOM::NodeImpl* node, KHTMLView* view)
   m_layer = new (node->getDocument()->renderArena()) RenderLayer(this);
 }
 
-RenderRoot::~RenderRoot() {}
+RenderCanvas::~RenderCanvas() {}
 
-void RenderRoot::calcHeight() {
+void RenderCanvas::calcHeight() {
   if (!m_printingMode && m_view) {
     m_height = m_view->visibleHeight();
   } else if (!m_view) {
@@ -76,7 +76,7 @@ void RenderRoot::calcHeight() {
   }
 }
 
-void RenderRoot::calcWidth() {
+void RenderCanvas::calcWidth() {
   // the width gets set by KHTMLView::print when printing to a printer.
   if (m_printingMode || !m_view) {
     m_width = m_rootWidth;
@@ -99,7 +99,7 @@ void RenderRoot::calcWidth() {
     m_marginRight = 0;
 }
 
-void RenderRoot::calcMinMaxWidth() {
+void RenderCanvas::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
   RenderBlock::calcMinMaxWidth();
@@ -111,7 +111,7 @@ void RenderRoot::calcMinMaxWidth() {
 
 //#define SPEED_DEBUG
 
-void RenderRoot::layout() {
+void RenderCanvas::layout() {
   if (m_printingMode)
     m_minWidth = m_width;
 
@@ -125,12 +125,12 @@ void RenderRoot::layout() {
   if (recalcMinMax())
     recalcMinMaxWidths();
 #ifdef SPEED_DEBUG
-  kdDebug() << "RenderRoot::calcMinMax time used=" << qt.elapsed() << endl;
+  kdDebug() << "RenderCanvas::calcMinMax time used=" << qt.elapsed() << endl;
   qt.start();
 #endif
 
 #ifdef SPEED_DEBUG
-  kdDebug() << "RenderRoot::layout time used=" << qt.elapsed() << endl;
+  kdDebug() << "RenderCanvas::layout time used=" << qt.elapsed() << endl;
   qt.start();
 #endif
   if (!m_printingMode) {
@@ -162,7 +162,7 @@ void RenderRoot::layout() {
   layoutPositionedObjects(true);
 
 #ifdef SPEED_DEBUG
-  kdDebug() << "RenderRoot::end time used=" << qt.elapsed() << endl;
+  kdDebug() << "RenderCanvas::end time used=" << qt.elapsed() << endl;
 #endif
 
   layer()->setHeight(m_height);
@@ -171,7 +171,7 @@ void RenderRoot::layout() {
   setNeedsLayout(false);
 }
 
-bool RenderRoot::absolutePosition(int& xPos, int& yPos, bool f) {
+bool RenderCanvas::absolutePosition(int& xPos, int& yPos, bool f) {
   if (f && m_view) {
     xPos = m_view->contentsX();
     yPos = m_view->contentsY();
@@ -181,27 +181,27 @@ bool RenderRoot::absolutePosition(int& xPos, int& yPos, bool f) {
   return true;
 }
 
-void RenderRoot::paint(QPainter* p,
-                       int _x,
-                       int _y,
-                       int _w,
-                       int _h,
-                       int _tx,
-                       int _ty,
-                       PaintAction paintAction) {
+void RenderCanvas::paint(QPainter* p,
+                         int _x,
+                         int _y,
+                         int _w,
+                         int _h,
+                         int _tx,
+                         int _ty,
+                         PaintAction paintAction) {
   paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
 }
 
-void RenderRoot::paintObject(QPainter* p,
-                             int _x,
-                             int _y,
-                             int _w,
-                             int _h,
-                             int _tx,
-                             int _ty,
-                             PaintAction paintAction) {
+void RenderCanvas::paintObject(QPainter* p,
+                               int _x,
+                               int _y,
+                               int _w,
+                               int _h,
+                               int _tx,
+                               int _ty,
+                               PaintAction paintAction) {
 #ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderRoot) " << this
+  kdDebug(6040) << renderName() << "(RenderCanvas) " << this
                 << " ::paintObject() w/h = (" << width() << "/" << height()
                 << ")" << endl;
 #endif
@@ -234,31 +234,12 @@ void RenderRoot::paintObject(QPainter* p,
 #endif
 }
 
-void RenderRoot::paintBoxDecorations(QPainter* p,
-                                     int x,
-                                     int y,
-                                     int w,
-                                     int h,
-                                     int tx,
-                                     int ty) {
-  // For now, this function is only used when we don't have an
-  // HTML object inside us, for plain XML for example. Eventually,
-  // we probably want to remove RenderHtml::paintBoxDecorations,
-  // and do all the work here instead.
-
-  if ((firstChild() && firstChild()->isHtml()) || !view()) {
-    return;
-  }
-
-  p->fillRect(x, y, w, h, view()->palette().active().color(QColorGroup::Base));
-}
-
-void RenderRoot::repaintRectangle(int x,
-                                  int y,
-                                  int w,
-                                  int h,
-                                  bool immediate,
-                                  bool f) {
+void RenderCanvas::repaintRectangle(int x,
+                                    int y,
+                                    int w,
+                                    int h,
+                                    bool immediate,
+                                    bool f) {
   if (m_printingMode)
     return;
   //    kdDebug( 6040 ) << "updating views contents (" << x << "/" << y << ") ("
@@ -279,7 +260,7 @@ void RenderRoot::repaintRectangle(int x,
       m_view->scheduleRepaint(x, y, w, h);
 }
 
-void RenderRoot::repaint(bool immediate) {
+void RenderCanvas::repaint(bool immediate) {
   if (m_view && !m_printingMode) {
     if (immediate) {
       m_view->resizeContents(docWidth(), docHeight());
@@ -297,7 +278,7 @@ void RenderRoot::repaint(bool immediate) {
   }
 }
 
-void RenderRoot::close() {
+void RenderCanvas::close() {
   setNeedsLayout(true);
   if (m_view) {
     m_view->layout();
@@ -319,12 +300,13 @@ static QRect enclosingPositionedRect(RenderObject* n) {
   return rect;
 }
 
-QRect RenderRoot::selectionRect() const {
+QRect RenderCanvas::selectionRect() const {
   RenderObject* r = m_selectionStart;
   if (!r)
     return QRect();
 
   QRect selectionRect = enclosingPositionedRect(r);
+
   while (r && r != m_selectionEnd) {
     RenderObject* n;
     if (!(n = r->firstChild())) {
@@ -345,19 +327,19 @@ QRect RenderRoot::selectionRect() const {
   return selectionRect;
 }
 
-void RenderRoot::setSelection(RenderObject* s,
-                              int sp,
-                              RenderObject* e,
-                              int ep) {
+void RenderCanvas::setSelection(RenderObject* s,
+                                int sp,
+                                RenderObject* e,
+                                int ep) {
   // Check we got valid renderobjects. www.msnbc.com and clicking around, to
   // find the case where this happened.
   if (!s || !e) {
-    kdWarning(6040) << "RenderRoot::setSelection() called with start=" << s
+    kdWarning(6040) << "RenderCanvas::setSelection() called with start=" << s
                     << " end=" << e << endl;
     return;
   }
-// kdDebug( 6040 ) << "RenderRoot::setSelection(" << s << "," << sp << "," << e
-// << "," << ep << ")" << endl;
+// kdDebug( 6040 ) << "RenderCanvas::setSelection(" << s << "," << sp << "," <<
+// e << "," << ep << ")" << endl;
 
 #if APPLE_CHANGES
   // Cut out early if the selection hasn't changed.
@@ -540,9 +522,9 @@ void RenderRoot::setSelection(RenderObject* s,
 }
 
 #if APPLE_CHANGES
-void RenderRoot::clearSelection(bool doRepaint)
+void RenderCanvas::clearSelection(bool doRepaint)
 #else
-void RenderRoot::clearSelection()
+void RenderCanvas::clearSelection()
 #endif
 {
   // update selection status of all objects between m_selectionStart and
@@ -586,12 +568,12 @@ void RenderRoot::clearSelection()
   m_selectionEndPos = -1;
 }
 
-void RenderRoot::selectionStartEnd(int& spos, int& epos) {
+void RenderCanvas::selectionStartEnd(int& spos, int& epos) {
   spos = m_selectionStartPos;
   epos = m_selectionEndPos;
 }
 
-QRect RenderRoot::viewRect() const {
+QRect RenderCanvas::viewRect() const {
   if (m_printingMode)
     return QRect(0, 0, m_width, m_height);
   else if (m_view)
@@ -601,7 +583,7 @@ QRect RenderRoot::viewRect() const {
     return QRect(0, 0, m_rootWidth, m_rootHeight);
 }
 
-int RenderRoot::docHeight() const {
+int RenderCanvas::docHeight() const {
   int h;
   if (m_printingMode || !m_view)
     h = m_height;
@@ -625,7 +607,7 @@ int RenderRoot::docHeight() const {
   return h;
 }
 
-int RenderRoot::docWidth() const {
+int RenderCanvas::docWidth() const {
   int w;
   if (m_printingMode || !m_view)
     w = m_width;
@@ -648,7 +630,7 @@ int RenderRoot::docWidth() const {
 // The idea here is to take into account what object is moving the pagination
 // point, and
 // thus choose the best place to chop it.
-void RenderRoot::setBestTruncatedAt(int y, RenderObject* forRenderer) {
+void RenderCanvas::setBestTruncatedAt(int y, RenderObject* forRenderer) {
   // prefer the widest object who tries to move the pagination point
   int width = forRenderer->width();
   if (width > m_truncatorWidth) {

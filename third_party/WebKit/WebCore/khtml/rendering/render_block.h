@@ -200,8 +200,9 @@ class RenderBlock : public RenderFlow {
 
   // overrides RenderObject
   virtual bool requiresLayer() {
-    return !isTableCell() &&
-           (isPositioned() || isRelPositioned() || style()->hidesOverflow());
+    return isRoot() ||
+           (!isTableCell() &&
+            (isPositioned() || isRelPositioned() || style()->hidesOverflow()));
   }
 
 #ifndef NDEBUG

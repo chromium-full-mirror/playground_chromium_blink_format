@@ -23,7 +23,7 @@
  */
 
 #include "render_list.h"
-#include "rendering/render_root.h"
+#include "rendering/render_canvas.h"
 
 #include "xml/dom_docimpl.h"
 #include "misc/htmltags.h"
@@ -403,7 +403,7 @@ void RenderListMarker::paintObject(QPainter* p,
       return;
     }
     if (_ty + m_height + paddingBottom() + borderBottom() >= _y + _h) {
-      RenderRoot* rootObj = root();
+      RenderCanvas* rootObj = canvas();
       if (_ty < rootObj->truncatedAt())
 #if APPLE_CHANGES
         rootObj->setBestTruncatedAt(_ty, this);

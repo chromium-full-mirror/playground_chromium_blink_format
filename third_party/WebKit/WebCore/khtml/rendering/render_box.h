@@ -148,6 +148,14 @@ class RenderBox : public RenderContainer {
                                    int _h,
                                    int _tx,
                                    int _ty);
+  void paintRootBoxDecorations(QPainter* p,
+                               int,
+                               int _y,
+                               int,
+                               int _h,
+                               int _tx,
+                               int _ty);
+
   void paintBackground(QPainter* p,
                        const QColor& c,
                        CachedImage* bg,

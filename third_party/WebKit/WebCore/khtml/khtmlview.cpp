@@ -32,7 +32,7 @@
 #include "html/html_inlineimpl.h"
 #include "html/html_formimpl.h"
 #include "rendering/render_object.h"
-#include "rendering/render_root.h"
+#include "rendering/render_canvas.h"
 #include "rendering/render_style.h"
 #include "rendering/render_replaced.h"
 #include "xml/dom2_eventsimpl.h"
@@ -392,8 +392,8 @@ void KHTMLView::layout() {
   if (m_part->xmlDocImpl()) {
     DOM::DocumentImpl* document = m_part->xmlDocImpl();
 
-    khtml::RenderRoot* root =
-        static_cast<khtml::RenderRoot*>(document->renderer());
+    khtml::RenderCanvas* root =
+        static_cast<khtml::RenderCanvas*>(document->renderer());
     if (!root)
       return;
 
@@ -1081,8 +1081,8 @@ QString KHTMLView::mediaType() const {
 void KHTMLView::print() {
   if (!m_part->xmlDocImpl())
     return;
-  khtml::RenderRoot* root =
-      static_cast<khtml::RenderRoot*>(m_part->xmlDocImpl()->renderer());
+  khtml::RenderCanvas* root =
+      static_cast<khtml::RenderCanvas*>(m_part->xmlDocImpl()->renderer());
   if (!root)
     return;
 
@@ -1196,8 +1196,8 @@ void KHTMLView::slotPaletteChanged() {
   DOM::DocumentImpl* document = m_part->xmlDocImpl();
   if (!document->isHTMLDocument())
     return;
-  khtml::RenderRoot* root =
-      static_cast<khtml::RenderRoot*>(document->renderer());
+  khtml::RenderCanvas* root =
+      static_cast<khtml::RenderCanvas*>(document->renderer());
   if (!root)
     return;
   root->style()->resetPalette();
@@ -1211,8 +1211,8 @@ void KHTMLView::slotPaletteChanged() {
 void KHTMLView::paint(QPainter* p, const QRect& rc, int yOff, bool* more) {
   if (!m_part->xmlDocImpl())
     return;
-  khtml::RenderRoot* root =
-      static_cast<khtml::RenderRoot*>(m_part->xmlDocImpl()->renderer());
+  khtml::RenderCanvas* root =
+      static_cast<khtml::RenderCanvas*>(m_part->xmlDocImpl()->renderer());
   if (!root)
     return;
 
@@ -1545,8 +1545,8 @@ void KHTMLView::timerEvent(QTimerEvent* e) {
 
   if (m_part->xmlDocImpl()) {
     DOM::DocumentImpl* document = m_part->xmlDocImpl();
-    khtml::RenderRoot* root =
-        static_cast<khtml::RenderRoot*>(document->renderer());
+    khtml::RenderCanvas* root =
+        static_cast<khtml::RenderCanvas*>(document->renderer());
     if (root) {
       // Do not allow a full layout if we had a clip object set.
       if (root->needsLayout() && !m_layoutObject) {
