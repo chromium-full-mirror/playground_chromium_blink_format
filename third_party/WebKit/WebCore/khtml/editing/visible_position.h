@@ -52,8 +52,7 @@ class VisiblePosition {
   Position position() const { return rangeCompliantEquivalent(m_deepPosition); }
   Position deepEquivalent() const { return m_deepPosition; }
 
-  friend inline bool operator==(const VisiblePosition& a,
-                                const VisiblePosition& b);
+  friend bool operator==(const VisiblePosition& a, const VisiblePosition& b);
 
   VisiblePosition next() const;
   VisiblePosition previous() const;
@@ -107,6 +106,6 @@ VisiblePosition startVisiblePosition(const DOM::RangeImpl*);
 VisiblePosition endVisiblePosition(const DOM::Range&);
 VisiblePosition endVisiblePosition(const DOM::RangeImpl*);
 
-}  // namespace DOM
+}  // namespace khtml
 
 #endif  // KHTML_EDITING_VISIBLE_POSITION_H
