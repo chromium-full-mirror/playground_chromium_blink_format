@@ -56,7 +56,6 @@ class KWQPlugin : public QWidget {
   ~KWQPlugin();
 
   // member functions --------------------------------------------------------
-  void* getPort();
 
   // operators ---------------------------------------------------------------
 

@@ -102,6 +102,13 @@ typedef struct NP_Port {
 } NP_Port;
 
 /*
+ *  Non-standard event types that can be passed to HandleEvent
+ */
+#define getFocusEvent (osEvt + 16)
+#define loseFocusEvent (osEvt + 17)
+#define adjustCursorEvent (osEvt + 18)
+
+/*
  * List of variable names for which NPP_GetValue shall be implemented
  */
 typedef enum {
