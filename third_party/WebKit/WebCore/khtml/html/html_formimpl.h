@@ -307,6 +307,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   DOMString value() const;
   void setValue(const DOMString&);
 
+  DOMString valueWithDefault() const;
+
   void setValueFromRenderer(const DOMString&);
   bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
   void setValueMatchesRenderer() { m_valueMatchesRenderer = true; }
