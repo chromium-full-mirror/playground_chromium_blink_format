@@ -54,7 +54,8 @@
                  fromDataSource:(WebDataSource*)dataSource
                        complete:(BOOL)isComplete;
 - (void)_mainReceivedError:(WebError*)error
-            fromDataSource:(WebDataSource*)dataSource;
+            fromDataSource:(WebDataSource*)dataSource
+                  complete:(BOOL)isComplete;
 + (NSString*)_MIMETypeForFile:(NSString*)path;
 + (NSArray*)_supportedImageMIMETypes;
 - (void)_downloadURL:(NSURL*)URL;
