@@ -86,14 +86,13 @@ class Token {
   void addAttribute(DOM::DocumentImpl* doc,
                     QChar* buffer,
                     const QString& attrName,
-                    const DOM::DOMString& v) {
+                    const DOM::AtomicString& v) {
     DOM::AttributeImpl* a = 0;
     if (buffer->unicode())
-      a = new DOM::AttributeImpl(buffer->unicode(), v.implementation());
+      a = new DOM::AttributeImpl(buffer->unicode(), v);
     else if (!attrName.isEmpty() && attrName != "/")
       a = new DOM::AttributeImpl(
-          doc->attrId(0, DOM::DOMString(attrName).implementation(), false),
-          v.implementation());
+          doc->attrId(0, DOM::DOMString(attrName).implementation(), false), v);
 
     if (a) {
       if (!attrs) {

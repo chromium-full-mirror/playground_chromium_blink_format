@@ -79,7 +79,7 @@ void HTMLOListElementImpl::parseAttribute(AttributeImpl* attr) {
         addCSSProperty(CSS_PROP_LIST_STYLE_TYPE, CSS_VAL_DECIMAL);
       break;
     case ATTR_START:
-      _start = attr->val() ? attr->val()->toInt() : 1;
+      _start = !attr->isNull() ? attr->value().toInt() : 1;
     default:
       HTMLUListElementImpl::parseAttribute(attr);
   }
@@ -95,7 +95,7 @@ void HTMLLIElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_VALUE:
       isValued = true;
-      requestedValue = attr->val() ? attr->val()->toInt() : 0;
+      requestedValue = !attr->isNull() ? attr->value().toInt() : 0;
 
       if (m_render && m_render->isListItem()) {
         RenderListItem* list = static_cast<RenderListItem*>(m_render);

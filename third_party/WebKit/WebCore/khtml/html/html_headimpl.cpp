@@ -181,7 +181,7 @@ void HTMLLinkElementImpl::parseAttribute(AttributeImpl* attr) {
       process();
       break;
     case ATTR_DISABLED:
-      setDisabledState(attr->val() != 0);
+      setDisabledState(!attr->isNull());
       break;
     default:
       HTMLElementImpl::parseAttribute(attr);
@@ -371,7 +371,7 @@ NodeImpl::Id HTMLStyleElementImpl::id() const {
 void HTMLStyleElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
-      m_type = attr->value().lower();
+      m_type = attr->value().domString().lower();
       break;
     case ATTR_MEDIA:
       m_media = attr->value().string().lower();

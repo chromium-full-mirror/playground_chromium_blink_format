@@ -489,8 +489,8 @@ class HTMLKeygenElementImpl : public HTMLSelectElementImpl {
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
  protected:
-  DOMString m_challenge;
-  DOMString m_keyType;
+  AtomicString m_challenge;
+  AtomicString m_keyType;
 };
 
 // -------------------------------------------------------------------------

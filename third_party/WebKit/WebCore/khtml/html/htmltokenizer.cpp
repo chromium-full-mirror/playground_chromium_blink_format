@@ -1191,9 +1191,8 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               attrName = QString::null;
               attrNamePresent = false;
             } else {
-              DOMString v("");
               currToken.addAttribute(parser->docPtr()->document(), buffer,
-                                     attrName, v);
+                                     attrName, emptyAtom);
               dest = buffer;
               tag = SearchAttribute;
             }
@@ -1242,7 +1241,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
             while (dest > buffer + 1 &&
                    (*(dest - 1) == '\n' || *(dest - 1) == '\r'))
               dest--;  // remove trailing newlines
-            DOMString v(buffer + 1, dest - buffer - 1);
+            AtomicString v(buffer + 1, dest - buffer - 1);
             attrName.setUnicode(buffer + 1, dest - buffer - 1);
             currToken.addAttribute(parser->docPtr()->document(), buffer,
                                    attrName, v);
@@ -1265,7 +1264,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
               while (dest > buffer + 1 &&
                      (*(dest - 1) == '\n' || *(dest - 1) == '\r'))
                 dest--;  // remove trailing newlines
-              DOMString v(buffer + 1, dest - buffer - 1);
+              AtomicString v(buffer + 1, dest - buffer - 1);
               if (!attrNamePresent)
                 attrName.setUnicode(buffer + 1, dest - buffer - 1);
               currToken.addAttribute(parser->docPtr()->document(), buffer,
@@ -1303,7 +1302,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
             // no quotes. Every space means end of value
             // '/' does not delimit in IE!
             if (curchar <= ' ' || curchar == '>') {
-              DOMString v(buffer + 1, dest - buffer - 1);
+              AtomicString v(buffer + 1, dest - buffer - 1);
               currToken.addAttribute(parser->docPtr()->document(), buffer,
                                      attrName, v);
               dest = buffer;

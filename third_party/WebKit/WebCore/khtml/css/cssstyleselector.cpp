@@ -727,11 +727,11 @@ static void cleanpath(QString& path) {
 }
 
 static void checkPseudoState(DOM::ElementImpl* e) {
-  if (e->id() != ID_A) {
+  if (!e->hasAnchor()) {
     pseudoState = PseudoNone;
     return;
   }
-  DOMString attr = e->getAttribute(ATTR_HREF);
+  const AtomicString& attr = e->getAttribute(ATTR_HREF);
   if (attr.isNull()) {
     pseudoState = PseudoNone;
     return;
@@ -899,19 +899,21 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
   }
 
   if (sel->attr) {
-    if (sel->match == CSSSelector::Class && e->hasClass())
-      return e->matchesCSSClass(sel->value, strictParsing);
+    if (sel->match == CSSSelector::Class)
+      return e->hasClass() && e->matchesCSSClass(sel->value, strictParsing);
+    else if (sel->match == CSSSelector::Id) {
+      if (!e->hasID())
+        return false;
+      const AtomicString& value = e->getAttribute(sel->attr);
+      return !((strictParsing && sel->value != value) ||
+               (!strictParsing && !equalsIgnoreCase(sel->value, value)));
+    }
 
-    DOMString value = e->getAttribute(sel->attr);
+    const AtomicString& value = e->getAttribute(sel->attr);
     if (value.isNull())
       return false;  // attribute is not set
 
     switch (sel->match) {
-      case CSSSelector::Id:
-        if ((strictParsing && sel->value != value) ||
-            (!strictParsing && !equalsIgnoreCase(sel->value, value)))
-          return false;
-        break;
       case CSSSelector::Exact:
         if ((isXMLDoc && sel->value != value) ||
             (!isXMLDoc && !equalsIgnoreCase(sel->value, value)))
@@ -935,7 +937,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
           return false;
 
         QString str = value.string();
-        QString selStr = sel->value.qstring();
+        QString selStr = sel->value.string();
         int startSearchAt = 0;
         while (true) {
           int foundPos = str.find(selStr, startSearchAt, isXMLDoc);
@@ -956,7 +958,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::Contain: {
         // kdDebug( 6080 ) << "checking for contains match" << endl;
         QString str = value.string();
-        QString selStr = sel->value.qstring();
+        QString selStr = sel->value.string();
         int pos = str.find(selStr, 0, isXMLDoc);
         if (pos == -1)
           return false;
@@ -965,7 +967,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::Begin: {
         // kdDebug( 6080 ) << "checking for beginswith match" << endl;
         QString str = value.string();
-        QString selStr = sel->value.qstring();
+        QString selStr = sel->value.string();
         int pos = str.find(selStr, 0, isXMLDoc);
         if (pos != 0)
           return false;
@@ -974,7 +976,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::End: {
         // kdDebug( 6080 ) << "checking for endswith match" << endl;
         QString str = value.string();
-        QString selStr = sel->value.qstring();
+        QString selStr = sel->value.string();
         if (isXMLDoc && !str.endsWith(selStr))
           return false;
         if (!isXMLDoc) {
@@ -987,7 +989,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::Hyphen: {
         // kdDebug( 6080 ) << "checking for hyphen match" << endl;
         QString str = value.string();
-        QString selStr = sel->value.qstring();
+        QString selStr = sel->value.string();
         if (str.length() < selStr.length())
           return false;
         // Check if str begins with selStr:
@@ -998,10 +1000,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
           return false;
         break;
       }
-      case CSSSelector::Pseudo:
-      case CSSSelector::None:
-      case CSSSelector::Class:
-      case CSSSelector::Set:
+      default:
         break;
     }
   }
@@ -3098,7 +3097,6 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         FontDef fontDef = style->htmlFont().fontDef;
         CSSValueListImpl* list = static_cast<CSSValueListImpl*>(value);
         int len = list->length();
-        QString family;
         KWQFontFamily& firstFamily = fontDef.firstFamily();
         KWQFontFamily* currFamily = 0;
 

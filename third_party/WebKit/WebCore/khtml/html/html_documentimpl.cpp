@@ -124,6 +124,10 @@ HTMLDocumentImpl::HTMLDocumentImpl(DOMImplementationImpl* _implementation,
 
 HTMLDocumentImpl::~HTMLDocumentImpl() {}
 
+ElementImpl* HTMLDocumentImpl::documentElement() const {
+  return static_cast<ElementImpl*>(_first);
+}
+
 DOMString HTMLDocumentImpl::referrer() const {
   if (part())
 #if APPLE_CHANGES

@@ -24,6 +24,7 @@
 #define HTML_ELEMENTIMPL_H
 
 #include "xml/dom_elementimpl.h"
+#include "dom_atomicstringlist.h"
 
 namespace DOM {
 
@@ -66,7 +67,7 @@ class HTMLElementImpl : public ElementImpl {
 
   void addCSSLength(
       int id,
-      const DOMString& value);  // value will be parsed by the CSS parser
+      const DOMString& value);  // FIXME: value will be parsed by the CSS parser
   void addCSSProperty(
       int id,
       const DOMString& value);  // value will be parsed by the CSS parser
@@ -102,7 +103,7 @@ class HTMLElementImpl : public ElementImpl {
 
  protected:
   // for IMG, OBJECT and APPLET
-  void addHTMLAlignment(DOMString alignment);
+  void addHTMLAlignment(const DOMString& alignment);
 };
 
 class HTMLGenericElementImpl : public HTMLElementImpl {

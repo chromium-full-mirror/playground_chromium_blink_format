@@ -172,6 +172,7 @@ KHTMLPart::KHTMLPart(KHTMLView* view,
 #endif  // APPLE_CHANGES
 
 void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
+  AtomicString::init();
   if (prof == DefaultGUI)
     setXMLFile("khtml.rc");
   else if (prof == BrowserViewGUI)
