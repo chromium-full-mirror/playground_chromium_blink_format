@@ -761,6 +761,11 @@ void RenderPartObject::updateWidget() {
 #endif
       return;
     }
+    // Avoid infinite recursion. If the plug-in's URL is the same as the part's
+    // URL, infinite frames may be created.
+    if (!url.isEmpty() && url == part->baseURL()) {
+      return;
+    }
 
     // Turn the attributes of either the EMBED tag or OBJECT tag into an array.
     NamedAttrMapImpl* attributes = embedOrObject->attributes();
@@ -789,6 +794,11 @@ void RenderPartObject::updateWidget() {
 #endif
       return;
     }
+    // Avoid infinite recursion. If the plug-in's URL is the same as the part's
+    // URL, infinite frames may be created.
+    if (!url.isEmpty() && url == part->baseURL()) {
+      return;
+    }
     // add all attributes set on the embed object
     NamedAttrMapImpl* a = o->attributes();
     if (a) {
@@ -803,8 +813,13 @@ void RenderPartObject::updateWidget() {
     assert(element()->id() == ID_IFRAME);
     HTMLIFrameElementImpl* o = static_cast<HTMLIFrameElementImpl*>(element());
     url = o->url.string();
-    if (url.isEmpty())
+    if (url.isEmpty()) {
       url = "about:blank";
+    } else if (url == part->baseURL()) {
+      // Avoid infinite recursion. If the frame's URL is the same as the part's
+      // URL, infinite frames may be created.
+      return;
+    }
     KHTMLView* v = static_cast<KHTMLView*>(m_view);
     bool requestSucceeded = v->part()->requestFrame(this, url, o->name.string(),
                                                     QStringList(), true);
