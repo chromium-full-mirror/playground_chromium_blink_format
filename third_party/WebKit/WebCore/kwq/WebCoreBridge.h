@@ -316,6 +316,8 @@ typedef enum {
 - (void)setSelectionFromNone;
 - (void)setDisplaysWithFocusAttributes:(BOOL)flag;
 
+- (void)setWindowHasFocus:(BOOL)flag;
+
 - (NSString*)stringForRange:(DOMRange*)range;
 
 - (NSString*)markupStringFromNode:(DOMNode*)node nodes:(NSArray**)nodes;
