@@ -80,10 +80,6 @@ class KWQKHTMLPartImpl : public QObject {
   void setTitle(const DOM::DOMString&);
   void setStatusBarText(const QString& status);
 
-  bool frameExists(const QString& frameName);
-  KHTMLPart* findFrame(const QString& frameName);
-  QPtrList<KParts::ReadOnlyPart> frames() const;
-
   void urlSelected(const KURL& url,
                    int button,
                    int state,
@@ -137,6 +133,10 @@ class KWQKHTMLPartImpl : public QObject {
 
   static NSString* referrer(const KParts::URLArgs&);
 
+  static const QPtrList<KWQKHTMLPartImpl>& instances() {
+    return mutableInstances();
+  }
+
  private:
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
 
@@ -149,6 +149,8 @@ class KWQKHTMLPartImpl : public QObject {
   KHTMLPartPrivate* d;
 
   WebCoreBridge* _bridge;
+
+  static QPtrList<KWQKHTMLPartImpl>& mutableInstances();
 
   friend class KHTMLPart;
 };
