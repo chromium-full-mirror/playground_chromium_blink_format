@@ -185,6 +185,9 @@ class EditCommand : public Shared<EditCommand> {
   };
   void setTypingStyle(DOM::CSSMutableStyleDeclarationImpl*);
 
+  DOM::CSSMutableStyleDeclarationImpl* styleAtPosition(
+      const DOM::Position& pos);
+
   virtual bool isInsertTextCommand() const;
   virtual bool isTypingCommand() const;
 
@@ -808,8 +811,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   virtual EditAction editingAction() const;
 
  private:
-  void completeHTMLReplacement(const DOM::Position&, const DOM::Position&);
-  void completeHTMLReplacement();
+  void completeHTMLReplacement(const DOM::Position& lastPositionToSelect);
 
   void insertNodeAfterAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
                                              DOM::NodeImpl* refChild);
@@ -827,6 +829,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   DOM::NodeImpl* m_firstNodeInserted;
   DOM::NodeImpl* m_lastNodeInserted;
   DOM::NodeImpl* m_lastTopNodeInserted;
+  DOM::CSSMutableStyleDeclarationImpl* m_insertionStyle;
   bool m_selectReplacement;
   bool m_smartReplace;
   bool m_matchStyle;
