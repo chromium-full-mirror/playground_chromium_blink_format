@@ -256,7 +256,6 @@ class RenderBlock : public RenderFlow {
 
  protected:
   void newLine();
-  void removeChildrenFromLineBoxes();
 
  private:
   DOM::Position positionForBox(InlineBox* box, bool start = true) const;
