@@ -330,6 +330,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
 
   m_processingLoadEvent = false;
   m_startTime.restart();
+  m_overMinimumLayoutThreshold = false;
 }
 
 DocumentImpl::~DocumentImpl() {
@@ -1300,7 +1301,7 @@ void DocumentImpl::close() {
       view()->part()->d->m_delayRedirect == 0;
 
   if (doload && wasNotRedirecting && isRedirectingSoon &&
-      m_startTime.elapsed() < 1000) {
+      m_startTime.elapsed() < cLayoutTimerDelay) {
     // Just bail out. During the onload we were shifted to another page.
     // i-Bench does this. When this happens don't bother painting or laying out.
     delete m_tokenizer;
@@ -1352,14 +1353,31 @@ void DocumentImpl::closeInternal(bool checkTokenizer) {
 void DocumentImpl::setParsing(bool b) {
   if (m_bParsing != b) {
     m_bParsing = b;
-#if 0
-    // Remove optimization until we figure out a way to avoid breaking our ibench cheat.
-        if (!b && haveStylesheetsLoaded() && 
-            (!ownerElement() || (ownerElement()->renderer() && !ownerElement()->renderer()->needsLayout())) && 
-            renderer() && renderer()->needsLayout())
-            updateLayout();
-#endif
+    if (!b && haveStylesheetsLoaded() && !minimumLayoutDelay() &&
+        (!ownerElement() || (ownerElement()->renderer() &&
+                             !ownerElement()->renderer()->needsLayout())) &&
+        renderer() && renderer()->needsLayout())
+      updateLayout();
   }
+}
+
+bool DocumentImpl::shouldScheduleLayout() {
+  return renderer() && haveStylesheetsLoaded() &&
+         (!m_tokenizer || m_overMinimumLayoutThreshold ||
+          m_startTime.elapsed() > cLayoutScheduleThreshold);
+}
+
+int DocumentImpl::minimumLayoutDelay() {
+  if (!parsing() && m_overMinimumLayoutThreshold)
+    return 0;
+
+  int elapsed = m_startTime.elapsed();
+  m_overMinimumLayoutThreshold = elapsed > cLayoutScheduleThreshold;
+
+  if (parsing())  // Always want the nearest multiple of the timer delay.
+    return cLayoutTimerDelay - elapsed % cLayoutTimerDelay;
+  // We'll want to schedule the timer to fire at the minimum layout threshold.
+  return kMax(0, cLayoutScheduleThreshold - elapsed);
 }
 
 void DocumentImpl::write(const DOMString& text) {
