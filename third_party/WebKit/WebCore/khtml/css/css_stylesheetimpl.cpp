@@ -99,12 +99,12 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(CSSStyleSheetImpl* parentSheet,
                                      DOMString href)
     : StyleSheetImpl(parentSheet, href) {
   m_lstChildren = new QPtrList<StyleBaseImpl>;
-  m_doc = 0;
+  m_doc = parentSheet ? parentSheet->doc() : 0;
   m_implicit = false;
   m_namespaces = 0;
 }
 
-CSSStyleSheetImpl::CSSStyleSheetImpl(DOM::NodeImpl* parentNode,
+CSSStyleSheetImpl::CSSStyleSheetImpl(NodeImpl* parentNode,
                                      DOMString href,
                                      bool _implicit)
     : StyleSheetImpl(parentNode, href) {

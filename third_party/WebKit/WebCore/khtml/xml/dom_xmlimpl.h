@@ -172,9 +172,12 @@ class ProcessingInstructionImpl : public NodeBaseImpl,
   DOMStringImpl* m_target;
   DOMStringImpl* m_data;
   DOMStringImpl* m_localHref;
-  khtml::CachedCSSStyleSheet* m_cachedSheet;
-  CSSStyleSheetImpl* m_sheet;
+  khtml::CachedObject* m_cachedSheet;
+  StyleSheetImpl* m_sheet;
   bool m_loading;
+#ifdef KHTML_XSLT
+  bool m_isXSL;
+#endif
 };
 
 };  // namespace

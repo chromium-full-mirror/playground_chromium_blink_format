@@ -73,6 +73,8 @@ class StyleSheetImpl : public StyleListImpl {
   MediaListImpl* media() const { return m_media; }
   void setMedia(MediaListImpl* media);
 
+  virtual bool isLoading() { return false; }
+
  protected:
   DOM::NodeImpl* m_parentNode;
   DOM::DOMString m_strHref;
@@ -117,7 +119,7 @@ class CSSStyleSheetImpl : public StyleSheetImpl {
 
   virtual bool parseString(const DOMString& string, bool strict = true);
 
-  bool isLoading();
+  virtual bool isLoading();
 
   virtual void checkLoaded();
   khtml::DocLoader* docLoader();

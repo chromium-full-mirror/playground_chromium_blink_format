@@ -1229,7 +1229,7 @@ CachedScript* DocLoader::requestScript(const DOM::DOMString& url,
 #endif
 }
 
-#ifndef KHTML_NO_XBL
+#ifdef KHTML_XSLT
 CachedXSLStyleSheet* DocLoader::requestXSLStyleSheet(
     const DOM::DOMString& url) {
   KURL fullURL = m_doc->completeURL(url.string());
