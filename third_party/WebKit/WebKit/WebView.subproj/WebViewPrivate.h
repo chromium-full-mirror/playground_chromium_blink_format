@@ -243,9 +243,6 @@ backforward list.
       withPasteboardTypes:(NSArray*)types
              toPasteboard:(NSPasteboard*)pasteboard;
 
-- (void)_setWebKitDragRespondsToDragging:(BOOL)flag;
-- (BOOL)_webKitDragRespondsToDragging;
-
 @end
 
 @interface WebView (WebViewPrintingPrivate)
