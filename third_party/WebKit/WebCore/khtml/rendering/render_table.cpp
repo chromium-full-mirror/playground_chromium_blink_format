@@ -492,19 +492,19 @@ void RenderTable::addColInfo(int _startCol,
 
     changed = true;
   } else {
-    if (_minSize != col->min) {
+    if (_minSize > col->min) {
       if (allowRecalc && col->minCell == _cell) {
         recalc = true;
-      } else if (_minSize < col->min) {
+      } else {
         col->min = _minSize;
         col->minCell = _cell;
         changed = true;
       }
     }
-    if (_maxSize != col->max) {
+    if (_maxSize > col->max) {
       if (allowRecalc && col->maxCell == _cell) {
         recalc = true;
-      } else if (_maxSize > col->max) {
+      } else {
         col->max = _maxSize;
         col->maxCell = _cell;
         changed = true;
