@@ -12,6 +12,7 @@
 @class WebBridge;
 @class WebController;
 @class WebFrame;
+@class WebPluginController;
 
 @interface WebHTMLViewPrivate : NSObject {
  @public
@@ -32,6 +33,8 @@
   NSURL* draggingImageURL;
 
   NSSize lastLayoutSize;
+
+  WebPluginController* pluginController;
 }
 @end
 
@@ -65,5 +68,7 @@
 - (void)_handleMouseDragged:(NSEvent*)event;
 - (void)_handleAutoscrollForMouseDragged:(NSEvent*)event;
 - (BOOL)_mayStartDragWithMouseDragged:(NSEvent*)event;
+
+- (WebPluginController*)_pluginController;
 
 @end
