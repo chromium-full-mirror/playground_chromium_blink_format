@@ -1983,7 +1983,7 @@ void KHTMLPart::scheduleRedirection(double delay,
   }
 }
 
-bool KHTMLPart::isImmediateRedirectPending() {
+bool KHTMLPart::isImmediateRedirectPending() const {
   return d->m_scheduledRedirection != noRedirectionScheduled &&
          d->m_delayRedirect == 0;
 }
