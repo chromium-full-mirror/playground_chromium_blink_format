@@ -1143,6 +1143,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
 #ifdef APPLE_CHANGES
  public:
+  bool isFrameSet();
   void setTitle(const DOM::DOMString&);
   void detachView();
   void setStatusBarText(const QString&);

@@ -96,6 +96,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (NSString*)selectedText;
 - (void)selectAll;
 
+- (BOOL)isFrameSet;
+
 - (void)reapplyStyles;
 - (void)forceLayout;
 - (void)adjustFrames:(NSRect)rect;

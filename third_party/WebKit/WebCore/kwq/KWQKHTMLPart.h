@@ -100,6 +100,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   void unfocusWindow();
 
+  bool isFrameSet();
+
  private:
   KHTMLPart* part;
   KHTMLPartPrivate* d;
