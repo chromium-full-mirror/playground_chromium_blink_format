@@ -5583,8 +5583,10 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   int exceptionCode = 0;
 
   if (d->m_typingStyle) {
-    styleElement = xmlDocImpl()->createHTMLElement("SPAN", exceptionCode);
+    styleElement = xmlDocImpl()->createHTMLElement("span", exceptionCode);
     assert(exceptionCode == 0);
+
+    styleElement->ref();
 
     styleElement->setAttribute(ATTR_STYLE,
                                d->m_typingStyle->cssText().implementation(),
@@ -5607,8 +5609,9 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
         parent->appendChild(styleElement, exceptionCode);
       }
     }
-
     assert(exceptionCode == 0);
+
+    styleElement->deref();
 
     nodeToRemove = styleElement;
   }
