@@ -447,7 +447,8 @@ void RenderObject::drawBorder(QPainter* p,
     case DASHED:
       if (style == DASHED)
         p->setPen(QPen(c, width == 1 ? 0 : width, Qt::DashLine));
-      {
+
+      if (width > 0)
         switch (s) {
           case BSBottom:
           case BSTop:
@@ -458,7 +459,7 @@ void RenderObject::drawBorder(QPainter* p,
             p->drawLine((x1 + x2) / 2, y1, (x1 + x2) / 2, y2);
             break;
         }
-      }
+
       break;
 
     case DOUBLE: {
