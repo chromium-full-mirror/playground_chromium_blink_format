@@ -51,16 +51,6 @@ class RenderContainer : public RenderObject {
 
   virtual void removeLeftoverAnonymousBoxes();
 
-  virtual RenderLayer* enclosingLayer() {
-    RenderObject* curr = this;
-    while (curr) {
-      if (curr->layer())
-        return curr->layer();
-      curr = curr->parent();
-    }
-    return 0;
-  }
-
  private:
   void setFirstChild(RenderObject* first) { m_first = first; }
   void setLastChild(RenderObject* last) { m_last = last; }

@@ -143,8 +143,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   KHTMLAssert(oldChild->parent() == this);
 
   // Keep our layer hierarchy updated.
-  if (oldChild->layer())
-    enclosingLayer()->removeChild(oldChild->layer());
+  oldChild->removeLayers(enclosingLayer());
 
   // if oldChild is the start or end of the selection, then clear the selection
   // to
@@ -248,8 +247,7 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
   setLastChild(newChild);
 
   // Keep our layer hierarchy updated.
-  if (newChild->layer())
-    enclosingLayer()->addChild(newChild->layer());
+  newChild->appendLayers(enclosingLayer());
 
   newChild->setMinMaxKnown(false);
   newChild->setLayouted(false);
@@ -282,9 +280,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
 
   // Keep our layer hierarchy updated.
   // XXX Need this to do an insertion and really find the right place to
-  // put the new layer. -dwh
-  if (child->layer())
-    enclosingLayer()->addChild(child->layer());
+  // put the new layer. Not a big deal though. -dwh
+  child->appendLayers(enclosingLayer());
 
   child->setMinMaxKnown(false);
   child->setLayouted(false);
