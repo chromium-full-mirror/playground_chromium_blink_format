@@ -54,6 +54,7 @@
                 source:(id)source
                 offset:(NSPoint*)dragImageOffset;
 
-- (BOOL)firstResponderIsSelfOrDescendantView;
+- (BOOL)_web_firstResponderIsSelfOrDescendantView;
+- (BOOL)_web_firstResponderCausesFocusDisplay;
 
 @end
