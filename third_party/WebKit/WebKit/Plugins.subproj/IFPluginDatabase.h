@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,28 +23,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import <IFPlugin.h>
 
-@protocol IFTextRenderer<NSObject>
+@interface IFPluginDatabase : NSObject {
+  NSArray* plugins;
+}
 
-- (int)widthForString:(NSString*)string;
-- (int)ascent;
-- (int)descent;
-- (int)lineSpacing;
-
-- (void)drawString:(NSString*)string
-           atPoint:(NSPoint)point
-         withColor:(NSColor*)color;
-- (void)drawUnderlineForString:(NSString*)string
-                       atPoint:(NSPoint)point
-                     withColor:(NSColor*)color;
-
-- (void)drawString:(NSString*)string
-            inRect:(NSRect)rect
-         withColor:(NSColor*)color
-    paragraphStyle:(NSParagraphStyle*)style;
-
-// A way to bypass NSString for speed.
-- (int)widthForCharacters:(const UniChar*)characters length:(unsigned)length;
++ (IFPluginDatabase*)installedPlugins;
+- (IFPlugin*)getPluginForMimeType:(NSString*)mimeType;
+- (IFPlugin*)getPluginForExtension:(NSString*)extension;
+- (IFPlugin*)getPluginForFilename:(NSString*)filename;
+- (NSArray*)allHandledMIMETypes;
+- (NSArray*)plugins;
 
 @end
+
+NSArray* pluginLocations(void);
+NSArray* findPlugins(void);

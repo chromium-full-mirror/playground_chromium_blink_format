@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,21 +23,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import <WCPlugin.h>
+#import <Cocoa/Cocoa.h>
 
-@interface WCPluginDatabase : NSObject {
-  NSArray* plugins;
+@class NSArray;
+@class NSString;
+@class NSView;
+
+typedef NSView* (*IFPluginViewCreationFunction)();
+void IFSetPluginViewCreationFunction(IFPluginViewCreationFunction);
+
+@interface WebCoreViewFactory : NSObject {
 }
 
-+ (WCPluginDatabase*)installedPlugins;
-- (WCPlugin*)getPluginForMimeType:(NSString*)mimeType;
-- (WCPlugin*)getPluginForExtension:(NSString*)extension;
-- (WCPlugin*)getPluginForFilename:(NSString*)filename;
-- (NSArray*)allHandledMIMETypes;
-- (NSArray*)plugins;
++ (WebCoreViewFactory*)sharedFactory;
+- init;
+
+- (NSView*)viewForPluginWithURL:(NSString*)url
+                    serviceType:(NSString*)serviceType
+                      arguments:(NSArray*)arguments
+                        baseURL:(NSString*)baseURL;
+- (NSArray*)pluginsInfo;  // array of id <WebCorePluginInfo>
+
+- (NSView*)viewForJavaAppletWithArguments:(NSDictionary*)arguments;
 
 @end
 
-NSArray* pluginLocations(void);
-NSArray* findPlugins(void);
+@protocol WebCorePluginInfo<NSObject>
+
+- (NSString*)name;
+- (NSString*)filename;
+- (NSString*)pluginDescription;
+- (NSArray*)mimeTypes;  // array of NSArrays with 3 parts of MIME type in each
+
+@end

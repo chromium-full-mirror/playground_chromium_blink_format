@@ -8,11 +8,11 @@
 
 @class IFPluginNullEventSender;
 @class IFWebDataSource;
-@class WCPlugin;
+@class IFPlugin;
 @protocol IFWebController;
 
 @interface IFPluginView : NSView {
-  WCPlugin* plugin;
+  IFPlugin* plugin;
   IFPluginNullEventSender* eventSender;
   unsigned argsCount;
   char **cAttributes, **cValues;
@@ -48,7 +48,7 @@
 }
 
 - initWithFrame:(NSRect)r
-           plugin:(WCPlugin*)plug
+           plugin:(IFPlugin*)plug
               url:(NSString*)location
              mime:(NSString*)mime
         arguments:(NSDictionary*)arguments

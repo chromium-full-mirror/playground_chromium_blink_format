@@ -25,15 +25,26 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol IFTextRenderer;
+@protocol WebCoreTextRenderer<NSObject>
 
-@interface IFTextRendererFactory : NSObject {
-}
+- (int)widthForString:(NSString*)string;
+- (int)ascent;
+- (int)descent;
+- (int)lineSpacing;
 
-+ (IFTextRendererFactory*)sharedFactory;
-- init;
-- (id<IFTextRenderer>)rendererWithFamily:(NSString*)family
-                                  traits:(NSFontTraitMask)traits
-                                    size:(float)size;
+- (void)drawString:(NSString*)string
+           atPoint:(NSPoint)point
+         withColor:(NSColor*)color;
+- (void)drawUnderlineForString:(NSString*)string
+                       atPoint:(NSPoint)point
+                     withColor:(NSColor*)color;
+
+- (void)drawString:(NSString*)string
+            inRect:(NSRect)rect
+         withColor:(NSColor*)color
+    paragraphStyle:(NSParagraphStyle*)style;
+
+// A way to bypass NSString for speed.
+- (int)widthForCharacters:(const UniChar*)characters length:(unsigned)length;
 
 @end

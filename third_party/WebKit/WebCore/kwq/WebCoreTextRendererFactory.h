@@ -20,34 +20,20 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "IFTextRendererFactory.h"
-#import <kwqdebug.h>
+#import <Cocoa/Cocoa.h>
 
-@implementation IFTextRendererFactory
+@protocol WebCoreTextRenderer;
 
-static IFTextRendererFactory *sharedFactory;
-
-+ (IFTextRendererFactory *)sharedFactory
-{
-    return sharedFactory;
+@interface WebCoreTextRendererFactory : NSObject {
 }
 
-- init
-{
-    [super init];
-    
-    KWQ_ASSERT(!sharedFactory);
-    sharedFactory = [self retain];
-    
-    return self;
-}
-
-- (id <IFTextRenderer>)rendererWithFamily:(NSString *)family traits:(NSFontTraitMask)traits size:(float)size
-{
-    return nil;
-}
++ (WebCoreTextRendererFactory*)sharedFactory;
+- init;
+- (id<WebCoreTextRenderer>)rendererWithFamily:(NSString*)family
+                                       traits:(NSFontTraitMask)traits
+                                         size:(float)size;
 
 @end
