@@ -247,6 +247,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (void)adjustViewSize;
 
++ (void)updateAllViews;
+
 @end
 
 // The WebCoreBridge protocol contains methods for use by the WebCore side of

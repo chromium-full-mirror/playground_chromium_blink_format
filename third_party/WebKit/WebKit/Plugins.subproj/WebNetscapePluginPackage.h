@@ -41,6 +41,7 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
   NPP_GetValueProcPtr NPP_GetValue;
   NPP_SetValueProcPtr NPP_SetValue;
   NPP_ShutdownProcPtr NPP_Shutdown;
+  NPP_GetJavaClassProcPtr NPP_GetJavaClass;
 
   BP_CreatePluginMIMETypesPreferencesFuncPtr
       BP_CreatePluginMIMETypesPreferences;
