@@ -105,6 +105,9 @@ class CachedObject {
     m_free = false;
     m_cachePolicy = _cachePolicy;
     m_request = 0;
+#ifdef APPLE_CHANGES
+    m_response = 0;
+#endif
     m_expireDate = _expireDate;
     m_deleted = false;
     m_expireDateChanged = false;
@@ -146,6 +149,10 @@ class CachedObject {
 
   void setRequest(Request* _request);
 
+#ifdef APPLE_CHANGES
+  void* response() { return m_response; }
+  void setResponse(void* response);
+#endif
   bool canDelete() const { return (m_clients.count() == 0 && !m_request); }
 
   void setExpireDate(time_t _expireDate, bool changeHttpCache);
@@ -168,6 +175,9 @@ class CachedObject {
   DOM::DOMString m_url;
   QString m_accept;
   Request* m_request;
+#ifdef APPLE_CHANGES
+  void* m_response;
+#endif
   Type m_type;
   Status m_status;
   int m_size;
@@ -416,6 +426,7 @@ class Loader : public QObject {
   void slotFinished(KIO::Job*);
 #ifdef APPLE_CHANGES
   void slotData(KIO::Job*, const char* data, int size);
+  void receivedResponse(KIO::Job*, void* response);
 #else
   void slotData(KIO::Job*, const QByteArray&);
 #endif

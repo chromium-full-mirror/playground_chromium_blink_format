@@ -191,7 +191,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
                                           withURL:(NSURL*)URL
                                          referrer:(NSString*)referrer;
 - (void)reportBadURL:(NSString*)badURL;
-- (void)objectLoadedFromCache:(NSURL*)URL size:(unsigned)bytes;
+- (void)objectLoadedFromCache:(NSURL*)URL
+                     response:response
+                         size:(unsigned)bytes;
 - (BOOL)isReloading;
 
 - (void)reportClientRedirectTo:(NSURL*)URL
