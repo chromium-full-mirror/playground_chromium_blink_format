@@ -369,7 +369,7 @@ QString RenderSubmitButton::rawText() {
   QString value = element()->value().isEmpty() ? defaultLabel()
                                                : element()->value().string();
   value = value.stripWhiteSpace();
-  value.replace('\\', backslashAsCurrencySymbol());
+  value.replace(QChar('\\'), backslashAsCurrencySymbol());
 #if APPLE_CHANGES
   return value;
 #else
@@ -648,7 +648,7 @@ void RenderLineEdit::updateFromElement() {
   // that we use in slotTextChanged to update element()->m_value
   QString widgetText = w->text();
   QString newText = element()->value().string();
-  newText.replace('\\', backslashAsCurrencySymbol());
+  newText.replace(QChar('\\'), backslashAsCurrencySymbol());
 
   if (newText != widgetText) {
     w->blockSignals(true);
@@ -691,7 +691,7 @@ void RenderLineEdit::slotTextChanged(const QString& string) {
   // empties a textfield, but should always force an empty textfield to use the
   // empty string.
   QString newText = string.isNull() ? "" : string;
-  newText.replace(backslashAsCurrencySymbol(), '\\');
+  newText.replace(backslashAsCurrencySymbol(), QChar('\\'));
   element()->m_value = newText;
 
   // Fire the "input" DOM event.
@@ -1122,7 +1122,7 @@ void RenderSelect::updateFromElement() {
     for (listIndex = 0; listIndex < int(listItems.size()); listIndex++) {
       if (listItems[listIndex]->id() == ID_OPTGROUP) {
         QString label = listItems[listIndex]->getAttribute(ATTR_LABEL).string();
-        label.replace('\\', backslashAsCurrencySymbol());
+        label.replace(QChar('\\'), backslashAsCurrencySymbol());
 
         // In WinIE, an optgroup can't start or end with whitespace (other than
         // the indent
@@ -1147,7 +1147,7 @@ void RenderSelect::updateFromElement() {
             static_cast<HTMLOptionElementImpl*>(listItems[listIndex])
                 ->text()
                 .string();
-        itemText.replace('\\', backslashAsCurrencySymbol());
+        itemText.replace(QChar('\\'), backslashAsCurrencySymbol());
 
         // In WinIE, leading and trailing whitespace is ignored in options. We
         // match this behavior.
@@ -1404,28 +1404,11 @@ void RenderSelect::updateSelection() {
 
 // -------------------------------------------------------------------------
 
-TextAreaWidget::TextAreaWidget(int wrap, QWidget* parent) : KTextEdit(parent) {
-  if (wrap != DOM::HTMLTextAreaElementImpl::ta_NoWrap) {
-    setWordWrap(QTextEdit::WidgetWidth);
 #if !APPLE_CHANGES
-    setHScrollBarMode(AlwaysOff);
-    setVScrollBarMode(AlwaysOn);
-#endif
-  } else {
-    setWordWrap(QTextEdit::NoWrap);
-#if !APPLE_CHANGES
-    setHScrollBarMode(Auto);
-    setVScrollBarMode(Auto);
-#endif
-  }
-  KCursor::setAutoHideCursor(viewport(), true);
-  setTextFormat(QTextEdit::PlainText);
-  setAutoMask(true);
-  setMouseTracking(true);
-}
+
+TextAreaWidget::TextAreaWidget(QWidget* parent) : KTextEdit(parent) {}
 
 bool TextAreaWidget::event(QEvent* e) {
-#if !APPLE_CHANGES
   if (e->type() == QEvent::AccelAvailable && isReadOnly()) {
     QKeyEvent* ke = (QKeyEvent*)e;
     if (ke->state() & ControlButton) {
@@ -1442,15 +1425,33 @@ bool TextAreaWidget::event(QEvent* e) {
       }
     }
   }
-#endif
   return KTextEdit::event(e);
 }
+
+#endif
 
 // -------------------------------------------------------------------------
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
     : RenderFormElement(element) {
-  TextAreaWidget* edit = new TextAreaWidget(element->wrap(), view());
+#if APPLE_CHANGES
+  QTextEdit* edit = new KTextEdit(view());
+#else
+  QTextEdit* edit = new TextAreaWidget(view());
+#endif
+
+  if (element->wrap() != HTMLTextAreaElementImpl::ta_NoWrap)
+    edit->setWordWrap(QTextEdit::WidgetWidth);
+  else
+    edit->setWordWrap(QTextEdit::NoWrap);
+
+#if !APPLE_CHANGES
+  KCursor::setAutoHideCursor(edit->viewport(), true);
+  edit->setTextFormat(QTextEdit::PlainText);
+  edit->setAutoMask(true);
+  edit->setMouseTracking(true);
+#endif
+
   setQWidget(edit);
 
   connect(edit, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
@@ -1466,8 +1467,7 @@ void RenderTextArea::detach() {
 }
 
 void RenderTextArea::handleFocusOut() {
-  TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
-  if (w && element() && element()->m_dirtyvalue) {
+  if (m_widget && element() && element()->m_dirtyvalue) {
     element()->m_value = text();
     element()->m_dirtyvalue = false;
     element()->onChange();
@@ -1477,7 +1477,7 @@ void RenderTextArea::handleFocusOut() {
 void RenderTextArea::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-  TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
+  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 #if APPLE_CHANGES
   QSize size(w->sizeWithColumnsAndRows(QMAX(element()->cols(), 1),
                                        QMAX(element()->rows(), 1)));
@@ -1501,16 +1501,41 @@ void RenderTextArea::calcMinMaxWidth() {
 void RenderTextArea::setStyle(RenderStyle* s) {
   RenderFormElement::setStyle(s);
 
-  TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
+  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
   w->setAlignment(textAlignment());
 #if APPLE_CHANGES
   w->setWritingDirection(style()->direction() == RTL ? QPainter::RTL
                                                      : QPainter::LTR);
 #endif
+
+  QScrollView::ScrollBarMode scrollMode = QScrollView::Auto;
+  switch (style()->overflow()) {
+    case OAUTO:
+    case OMARQUEE:  // makes no sense, map to auto
+    case OOVERLAY:  // not implemented for text, map to auto
+    case OVISIBLE:
+      break;
+    case OHIDDEN:
+      scrollMode = QScrollView::AlwaysOff;
+      break;
+    case OSCROLL:
+      scrollMode = QScrollView::AlwaysOn;
+      break;
+  }
+  QScrollView::ScrollBarMode horizontalScrollMode = scrollMode;
+  if (element()->wrap() != HTMLTextAreaElementImpl::ta_NoWrap)
+    horizontalScrollMode = QScrollView::AlwaysOff;
+
+#if APPLE_CHANGES
+  w->setScrollBarModes(horizontalScrollMode, scrollMode);
+#else
+  w->setHScrollBarMode(horizontalScrollMode);
+  w->setVScrollBarMode(scrollMode);
+#endif
 }
 
 void RenderTextArea::updateFromElement() {
-  TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
+  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
   w->setReadOnly(element()->readOnly());
 #if APPLE_CHANGES
   w->setDisabled(element()->disabled());
@@ -1523,7 +1548,7 @@ void RenderTextArea::updateFromElement() {
   // that we use in slotTextChanged to update element()->m_value
   QString widgetText = text();
   QString text = element()->value().string();
-  text.replace('\\', backslashAsCurrencySymbol());
+  text.replace(QChar('\\'), backslashAsCurrencySymbol());
   if (widgetText != text) {
     w->blockSignals(true);
     int line, col;
@@ -1539,9 +1564,9 @@ void RenderTextArea::updateFromElement() {
 
 QString RenderTextArea::text() {
   QString txt;
-  TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
+  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
-  if (element()->wrap() == DOM::HTMLTextAreaElementImpl::ta_Physical) {
+  if (element()->wrap() == HTMLTextAreaElementImpl::ta_Physical) {
 #if APPLE_CHANGES
     txt = w->textWithHardLineBreaks();
 #else
@@ -1565,7 +1590,7 @@ QString RenderTextArea::text() {
   } else
     txt = w->text();
 
-  txt.replace(backslashAsCurrencySymbol(), '\\');
+  txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
   return txt;
 }
 
@@ -1574,7 +1599,7 @@ void RenderTextArea::slotTextChanged() {
 }
 
 void RenderTextArea::select() {
-  static_cast<TextAreaWidget*>(m_widget)->selectAll();
+  static_cast<QTextEdit*>(m_widget)->selectAll();
 }
 
 // ---------------------------------------------------------------------------
