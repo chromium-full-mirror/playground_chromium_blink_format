@@ -256,6 +256,9 @@ backforward list.
 - (void)_setDashboardBehavior:(WebDashboardBehavior)behavior to:(BOOL)flag;
 - (BOOL)_dashboardBehavior:(WebDashboardBehavior)behavior;
 
++ (void)_setShouldUseFontSmoothing:(BOOL)f;
++ (BOOL)_shouldUseFontSmoothing;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
