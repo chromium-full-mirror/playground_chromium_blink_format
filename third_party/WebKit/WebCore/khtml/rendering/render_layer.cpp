@@ -67,18 +67,14 @@ void RenderLayer::updateLayerPosition() {
   setPos(x, y);
 }
 
-RenderLayer* RenderLayer::enclosingAncestor() {
-  RenderObject* o = m_object->parent();
-  if (m_object->isPositioned()) {
-    if (m_object->style()->position() == FIXED) {
-      while (o && o->style()->position() == STATIC && !o->isHtml() &&
-             !o->isRoot())
-        o = o->parent();
-    } else
-      o = m_object->containingBlock();
-  }
+RenderLayer* RenderLayer::enclosingPositionedAncestor() {
+  RenderLayer* curr = parent();
+  for (; curr && !curr->m_object->isRoot() && !curr->m_object->isHtml() &&
+         !curr->m_object->isPositioned() && !curr->m_object->isRelPositioned();
+       curr = curr->parent())
+    ;
 
-  return o->enclosingLayer();
+  return curr;
 }
 
 void RenderLayer::addChild(RenderLayer* child) {
@@ -117,10 +113,9 @@ RenderLayer* RenderLayer::removeChild(RenderLayer* oldChild) {
 void RenderLayer::convertToLayerCoords(RenderLayer* ancestorLayer,
                                        int& x,
                                        int& y) {
-  x = xPos();
-  y = yPos();
   if (ancestorLayer == this)
     return;
+
   if (m_object->style()->position() == FIXED) {
     // Add in the offset of the view.  We can obtain this by calling
     // absolutePosition() on the RenderRoot.
@@ -130,11 +125,20 @@ void RenderLayer::convertToLayerCoords(RenderLayer* ancestorLayer,
     y += yOff;
     return;
   }
-  for (RenderLayer* current = parent(); current && current != ancestorLayer;
-       current = current->parent()) {
-    x += current->xPos();
-    y += current->yPos();
-  }
+
+  RenderLayer* parentLayer;
+  if (m_object->style()->position() == ABSOLUTE)
+    parentLayer = enclosingPositionedAncestor();
+  else
+    parentLayer = parent();
+
+  if (!parentLayer)
+    return;
+
+  parentLayer->convertToLayerCoords(ancestorLayer, x, y);
+
+  x += xPos();
+  y += yPos();
 }
 
 void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
@@ -148,6 +152,9 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
   constructLayerList(node, &layerList);
 
   // Walk the list and paint each layer, adding in the appropriate offset.
+  QRect paintRect(x, y, w, h);
+  QRect currRect(paintRect);
+
   uint count = layerList.count();
   for (uint i = 0; i < count; i++) {
     RenderLayer::RenderLayerElement* elt = layerList.at(i);
@@ -161,10 +168,35 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
     // printf("Painting layer at %d %d\n", elt->absBounds.x(),
     // elt->absBounds.y());
 
+    if (elt->clipRect != currRect) {
+      if (currRect != paintRect)
+        p->restore();  // Pop the clip.
+      currRect = elt->clipRect;
+      if (currRect != paintRect) {
+        QRect clippedRect = p->xForm(currRect);
+#if APPLE_CHANGES
+        p->save();
+        p->addClip(clippedRect);
+#else
+        QRegion creg(cr);
+        QRegion old = p->clipRegion();
+        if (!old.isNull())
+          creg = old.intersect(creg);
+
+        p->save();
+        p->setClipRegion(creg);
+#endif
+      }
+    }
+
     elt->layer->renderer()->print(
         p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
         elt->absBounds.y() - elt->layer->renderer()->yPos());
   }
+
+  if (currRect != paintRect)
+    p->restore();  // Pop the clip.
+
   delete node;
 }
 
@@ -205,7 +237,7 @@ bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
 }
 
 RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
-    const QRect& damageRect,
+    QRect damageRect,
     RenderLayer* rootLayer,
     bool eventProcessing) {
   // This variable stores the result we will hand back.
@@ -221,11 +253,22 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // damage rect and avoid repainting the layer if it falls outside that rect.
   // An exception to this rule is the root layer, which always paints (hence the
   // m_parent null check below).
-  int x, y;
+  int x = 0;
+  int y = 0;
   convertToLayerCoords(rootLayer, x, y);
   QRect layerBounds(x, y, width(), height());
 
   returnNode = new RenderLayer::RenderZTreeNode(this);
+
+  // If we establish a clip rect, then we want to intersect that rect
+  // with the damage rect to form a new damage rect.
+  if (m_object->style()->overflow() == OHIDDEN ||
+      m_object->style()->hasClip()) {
+    QRect clipRect = m_object->getClipRect(x, y);
+    if (!clipRect.intersects(damageRect))
+      return 0;  // We don't overlap at all.
+    damageRect = damageRect.intersect(clipRect);
+  }
 
   // Walk our list of child layers looking only for those layers that have a
   // non-negative z-index (a z-index >= 0).
@@ -255,7 +298,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
       (eventProcessing && layerBounds.contains(x, y)) ||
       (!eventProcessing && layerBounds.intersects(damageRect))) {
     RenderLayerElement* layerElt =
-        new RenderLayerElement(this, layerBounds, x, y);
+        new RenderLayerElement(this, layerBounds, damageRect, x, y);
     if (returnNode->child) {
       RenderZTreeNode* leaf = new RenderZTreeNode(layerElt);
       leaf->next = returnNode->child;

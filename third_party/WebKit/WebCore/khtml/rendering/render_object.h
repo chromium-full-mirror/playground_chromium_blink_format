@@ -92,6 +92,8 @@ class RenderObject : public CachedObjectClient {
   virtual void setHasChildLayers(bool hasLayers) {}
   virtual void positionChildLayers() {}
 
+  virtual QRect getClipRect(int tx, int ty) { return QRect(0, 0, 0, 0); }
+
   // RenderObject tree manipulation
   //////////////////////////////////////////
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);

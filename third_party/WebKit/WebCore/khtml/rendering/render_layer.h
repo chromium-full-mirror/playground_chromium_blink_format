@@ -79,7 +79,9 @@ class RenderLayer {
 
   void updateLayerPosition();
 
-  RenderLayer* enclosingAncestor();
+  // Gets the nearest enclosing positioned ancestor layer (also includes
+  // the <html> layer and the root layer).
+  RenderLayer* enclosingPositionedAncestor();
 
   void convertToLayerCoords(RenderLayer* ancestorLayer, int& x, int& y);
 
@@ -118,16 +120,22 @@ class RenderLayer {
   struct RenderLayerElement {
     RenderLayer* layer;
     QRect
-        absBounds;  // Our bounds in absolute coordinates relative to the root.
-    int zindex;     // Temporary z-index used for processing and sorting.
-    bool zauto;     // Whether or not we are using auto z-indexing.
+        absBounds;   // Our bounds in absolute coordinates relative to the root.
+    QRect clipRect;  // Our clip rect.
+    int zindex;      // Temporary z-index used for processing and sorting.
+    bool zauto;      // Whether or not we are using auto z-indexing.
     int x;  // The coords relative to the layer that will be using this list
             // to paint.
     int y;
 
-    RenderLayerElement(RenderLayer* l, const QRect& rect, int xpos, int ypos)
+    RenderLayerElement(RenderLayer* l,
+                       const QRect& rect,
+                       const QRect& clip,
+                       int xpos,
+                       int ypos)
         : layer(l),
           absBounds(rect),
+          clipRect(clip),
           zindex(l->zIndex()),
           zauto(l->hasAutoZIndex()),
           x(xpos),
@@ -202,7 +210,7 @@ class RenderLayer {
   // +-------> L(L5)
   // +-------> L(L6)
   //
-  RenderZTreeNode* constructZTree(const QRect& damageRect,
+  RenderZTreeNode* constructZTree(QRect damageRect,
                                   RenderLayer* rootLayer,
                                   bool eventProcessing = false);
 

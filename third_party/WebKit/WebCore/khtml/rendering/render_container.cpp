@@ -136,7 +136,7 @@ void RenderContainer::addChild(RenderObject* newChild,
 
   // Keep our layer hierarchy updated.
   if (newChild->layer()) {
-    newChild->layer()->enclosingAncestor()->addChild(newChild->layer());
+    enclosingLayer()->addChild(newChild->layer());
     if (!newChild->isPositioned())
       setHasChildLayers(true);
   }
@@ -147,7 +147,7 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
 
   // Keep our layer hierarchy updated.
   if (oldChild->layer())
-    oldChild->layer()->enclosingAncestor()->removeChild(oldChild->layer());
+    enclosingLayer()->removeChild(oldChild->layer());
 
   // if oldChild is the start or end of the selection, then clear the selection
   // to
