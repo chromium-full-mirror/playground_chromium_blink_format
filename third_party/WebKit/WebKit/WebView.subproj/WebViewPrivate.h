@@ -86,6 +86,8 @@ extern NSString* _WebMainFrameURLKey;
   NSMutableDictionary* progressItems;
 
   void* observationInfo;
+
+  NSArray* draggedTypes;
 }
 @end
 
@@ -281,7 +283,6 @@ backforward list.
 + (void)_setAlwaysUseATSU:(BOOL)f;
 
 - (NSCachedURLResponse*)_cachedResponseForURL:(NSURL*)URL;
-- (NSFileWrapper*)_fileWrapperForURL:(NSURL*)URL;
 
 @end
 
