@@ -132,8 +132,6 @@ class QWidget : public QObject, public QPaintDevice {
 
   virtual void paint(void*);
 
-  void _displayRect(QRect rect);
-
   NSView* getView() const;
   void setView(NSView* aView);
 

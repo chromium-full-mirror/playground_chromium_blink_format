@@ -20,7 +20,8 @@
 ;
 - (void)_receivedProgress:(IFLoadProgress*)progress
         forResourceHandle:(IFURLHandle*)resourceHandle
-           fromDataSource:(IFWebDataSource*)dataSource;
+           fromDataSource:(IFWebDataSource*)dataSource
+                 complete:(BOOL)isComplete;
 - (void)_receivedError:(IFError*)error
      forResourceHandle:(IFURLHandle*)resourceHandle
        partialProgress:(IFLoadProgress*)progress
