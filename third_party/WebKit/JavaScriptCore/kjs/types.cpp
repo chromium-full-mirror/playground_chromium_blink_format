@@ -156,6 +156,7 @@ bool ListIterator::operator!=(const ListIterator& it) const {
 
 List::List(bool needsMarking) : m_needsMarking(needsMarking) {
   imp = m_needsMarking ? ListImp::empty() : new ListImp();
+  imp->setGcAllowed();
 
   if (!m_needsMarking) {
     imp->ref();
@@ -172,6 +173,7 @@ List::List(const List& l) : m_needsMarking(false) {
 
 List::List(ListImp* p_imp) : m_needsMarking(false) {
   imp = p_imp;
+  imp->setGcAllowed();
 
   if (!m_needsMarking) {
     imp->ref();
