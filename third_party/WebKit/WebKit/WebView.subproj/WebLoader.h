@@ -25,7 +25,6 @@
   id identifier;
   id resourceLoadDelegate;
   id downloadDelegate;
-  NSURL* currentURL;
   BOOL reachedTerminalState;
   BOOL defersCallbacks;
   WebResourceDelegateImplementationCache implementations;
