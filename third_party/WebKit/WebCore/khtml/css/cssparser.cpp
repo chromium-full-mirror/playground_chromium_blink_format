@@ -763,9 +763,10 @@ bool CSSParser::parseValue(int propId, bool important) {
       // text |
       // wait | help ] ] | inherit
       // MSIE 5 compatibility :/
-      if (!strict && id == CSS_VAL_HAND)
+      if (!strict && id == CSS_VAL_HAND) {
+        id = CSS_VAL_POINTER;
         valid_primitive = true;
-      else if (id >= CSS_VAL_AUTO && id <= CSS_VAL_HELP)
+      } else if (id >= CSS_VAL_AUTO && id <= CSS_VAL_HELP)
         valid_primitive = true;
       break;
 
