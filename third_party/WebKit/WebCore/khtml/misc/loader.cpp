@@ -1458,7 +1458,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 
   o->setExpireDate(_expireDate, true);
 
-  if (!o->type() == CachedObject::Image) {
+  if (o->type() != CachedObject::Image) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache::Internal Error in requestImage url=" << kurl.url()
                   << "!" << endl;
@@ -1532,7 +1532,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
 
   o->setExpireDate(_expireDate, true);
 
-  if (!o->type() == CachedObject::CSSStyleSheet) {
+  if (o->type() != CachedObject::CSSStyleSheet) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache::Internal Error in requestStyleSheet url="
                   << kurl.url() << "!" << endl;

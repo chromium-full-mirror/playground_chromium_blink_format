@@ -76,7 +76,7 @@ void RenderFlow::setStyle(RenderStyle* _style) {
       !m_layer)
     m_layer = new (renderArena()) RenderLayer(this);
 
-  if (isFloating() || !style()->display() == INLINE)
+  if (isFloating() || style()->display() != INLINE)
     setInline(false);
 
   if (isInline() && !m_childrenInline)
