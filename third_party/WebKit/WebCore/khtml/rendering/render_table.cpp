@@ -544,7 +544,7 @@ void RenderTable::splitColumn(int pos, int firstSpan) {
   while (child) {
     if (child->isTableSection()) {
       RenderTableSection* section = static_cast<RenderTableSection*>(child);
-      int size = section->grid.size();
+      int size = section->numRows();
       int row = 0;
       if (section->cCol > pos)
         section->cCol++;
@@ -579,7 +579,7 @@ void RenderTable::appendColumn(int span) {
   while (child) {
     if (child->isTableSection()) {
       RenderTableSection* section = static_cast<RenderTableSection*>(child);
-      int size = section->grid.size();
+      int size = section->numRows();
       int row = 0;
       while (row < size) {
         section->grid[row].row->resize(newSize);
@@ -846,6 +846,7 @@ void RenderTable::dump(QTextStream* stream, QString ind) const {
 RenderTableSection::RenderTableSection(DOM::NodeImpl* node) : RenderBox(node) {
   // init RenderObject attributes
   setInline(false);  // our object is not Inline
+  gridRows = 0;
   cCol = 0;
   cRow = -1;
   needCellRecalc = false;
@@ -938,10 +939,13 @@ void RenderTableSection::addChild(RenderObject* child,
 }
 
 void RenderTableSection::ensureRows(int numRows) {
-  int nRows = grid.size();
-  int nCols = table()->numEffCols();
+  int nRows = gridRows;
   if (numRows > nRows) {
-    grid.resize(numRows);
+    if (numRows > static_cast<int>(grid.size()))
+      grid.resize(numRows * 2 + 1);
+
+    gridRows = numRows;
+    int nCols = table()->numEffCols();
     for (int r = nRows; r < numRows; r++) {
       grid[r].row = new Row(nCols);
       grid[r].row->fill(0);
@@ -1062,7 +1066,7 @@ void RenderTableSection::setCellWidths() {
 #endif
   QMemArray<int>& columnPos = table()->columnPos;
 
-  int rows = grid.size();
+  int rows = gridRows;
   for (int i = 0; i < rows; i++) {
     Row& row = *grid[i].row;
     int cols = row.size();
@@ -1097,7 +1101,7 @@ void RenderTableSection::calcRowHeight() {
   int indx;
   RenderTableCell* cell;
 
-  int totalRows = grid.size();
+  int totalRows = gridRows;
   int spacing = table()->vBorderSpacing();
 
   rowPos.resize(totalRows + 1);
@@ -1118,7 +1122,7 @@ void RenderTableSection::calcRowHeight() {
 
     Row* row = grid[r].row;
     int totalCols = row->size();
-    int totalRows = grid.size();
+    int totalRows = gridRows;
 
     for (int c = 0; c < totalCols; c++) {
       cell = cellAt(r, c);
@@ -1186,7 +1190,7 @@ void RenderTableSection::calcRowHeight() {
 int RenderTableSection::layoutRows(int toAdd) {
   int rHeight;
   int rindx;
-  int totalRows = grid.size();
+  int totalRows = gridRows;
   int hspacing = table()->hBorderSpacing();
   int vspacing = table()->vBorderSpacing();
 
@@ -1379,7 +1383,7 @@ int RenderTableSection::layoutRows(int toAdd) {
 }
 
 void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
-  unsigned int totalRows = grid.size();
+  unsigned int totalRows = gridRows;
   unsigned int totalCols = table()->columns.size();
 
   tx += m_x;
@@ -1451,7 +1455,7 @@ void RenderTableSection::recalcCells() {
   cCol = 0;
   cRow = -1;
   clearGrid();
-  grid.resize(0);
+  gridRows = 0;
 
   RenderObject* row = firstChild();
   while (row) {
@@ -1471,7 +1475,7 @@ void RenderTableSection::recalcCells() {
 }
 
 void RenderTableSection::clearGrid() {
-  int rows = grid.size();
+  int rows = gridRows;
   while (rows--) {
     delete grid[rows].row;
   }
