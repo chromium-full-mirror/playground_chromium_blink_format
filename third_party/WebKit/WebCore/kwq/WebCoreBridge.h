@@ -166,8 +166,11 @@ enum FrameBorderStyle {
 
 - (NSDictionary*)elementAtPoint:(NSPoint)point;
 - (id<WebDOMElement>)elementForView:(NSView*)view;
-- (BOOL)elementIsInLoginForm:(id<WebDOMElement>)element;
+- (BOOL)formIsLoginForm:(id<WebDOMElement>)element;
 - (BOOL)elementDoesAutoComplete:(id<WebDOMElement>)element;
+- (id<WebDOMElement>)formForElement:(id<WebDOMElement>)element;
+- (id<WebDOMElement>)currentForm;
+- (NSArray*)controlsInForm:(id<WebDOMElement>)form;
 
 - (BOOL)searchFor:(NSString*)string
         direction:(BOOL)forward
@@ -234,12 +237,14 @@ enum FrameBorderStyle {
            referrer:(NSString*)referrer
              reload:(BOOL)reload
     triggeringEvent:(NSEvent*)event
+               form:(id<WebDOMElement>)form
          formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSString*)URL
            referrer:(NSString*)referrer
                data:(NSData*)data
         contentType:(NSString*)contentType
     triggeringEvent:(NSEvent*)event
+               form:(id<WebDOMElement>)form
          formValues:(NSDictionary*)values;
 
 - (WebCoreBridge*)createWindowWithURL:(NSString*)URL frameName:(NSString*)name;

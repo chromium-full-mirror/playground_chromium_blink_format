@@ -14,6 +14,8 @@
 @class WebHistoryItem;
 @class WebView;
 @class WebRequest;
+@class WebFormState;
+@protocol WebDOMElement;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -70,7 +72,7 @@ typedef enum {
   WebRequest* policyRequest;
   id policyTarget;
   SEL policySelector;
-  NSDictionary* policyFormValues;
+  WebFormState* policyFormState;
 
   BOOL justOpenedForTargetedLink;
   BOOL quickRedirectComing;
@@ -102,6 +104,7 @@ typedef enum {
 - (WebFrame*)_descendantFrameNamed:(NSString*)name;
 - (void)_controllerWillBeDeallocated;
 - (void)_detachFromParent;
+- (void)_closeOldDataSources;
 - (void)_setController:(WebController*)controller;
 - (void)_setDataSource:(WebDataSource*)d;
 - (void)_transitionToCommitted:(NSDictionary*)pageCache;
@@ -121,7 +124,7 @@ typedef enum {
 
 - (void)_checkNavigationPolicyForRequest:(WebRequest*)request
                               dataSource:(WebDataSource*)dataSource
-                              formValues:(NSDictionary*)values
+                               formState:(WebFormState*)formState
                                  andCall:(id)target
                             withSelector:(SEL)selector;
 
@@ -132,6 +135,7 @@ typedef enum {
            referrer:(NSString*)referrer
            loadType:(WebFrameLoadType)loadType
     triggeringEvent:(NSEvent*)event
+               form:(id<WebDOMElement>)form
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
@@ -139,6 +143,7 @@ typedef enum {
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
+                form:(id<WebDOMElement>)form
           formValues:(NSDictionary*)values;
 
 - (void)_clientRedirectedTo:(NSURL*)URL
@@ -170,7 +175,7 @@ typedef enum {
 
 - (void)_loadDataSource:(WebDataSource*)dataSource
            withLoadType:(WebFrameLoadType)type
-             formValues:(NSDictionary*)values;
+              formState:(WebFormState*)formState;
 
 - (void)_downloadRequest:(WebRequest*)request toDirectory:(NSString*)directory;
 

@@ -8,6 +8,7 @@
 #import <AppKit/AppKit.h>
 
 @class WebFrame;
+@protocol WebDOMElement;
 
 /*!
     @protocol  WebFormDelegate
@@ -50,7 +51,9 @@
                 inFrame:(WebFrame*)frame;
 
 // Sent when a form is just about to be submitted (before the load is started)
-- (void)frame:(WebFrame*)frame willSubmitFormWithValues:(NSDictionary*)values;
+- (void)frame:(WebFrame*)frame
+    willSubmitForm:(id<WebDOMElement>)form
+        withValues:(NSDictionary*)values;
 @end
 
 /*!
