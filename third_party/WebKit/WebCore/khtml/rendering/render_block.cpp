@@ -467,8 +467,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   // Expand our intrinsic height to encompass floats.
   if (hasOverhangingFloats() &&
-      (isFloatingOrPositioned() || style()->hidesOverflow() ||
-       (parent() && parent()->isFlexibleBox())))
+      (isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
+       style()->hidesOverflow() || (parent() && parent()->isFlexibleBox())))
     m_height = floatBottom() + borderBottom() + paddingBottom();
 
   int oldHeight = m_height;
@@ -579,7 +579,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   // value when it comes time to check against the bottom border/padding.
   bool canCollapseWithChildren = !isCanvas() && !isRoot() && !isPositioned() &&
                                  !isFloating() && !isTableCell() &&
-                                 !style()->hidesOverflow();
+                                 !style()->hidesOverflow() &&
+                                 !isInlineBlockOrInlineTable();
   bool canCollapseTopWithChildren = canCollapseWithChildren && (m_height == 0);
 
   // If any height other than auto is specified in CSS, then we don't collapse
@@ -733,8 +734,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       RenderObject* curr = next;
       while (curr && curr->isFloatingOrPositioned())
         curr = curr->nextSibling();
-      if (curr && curr->isRenderBlock() && !curr->isAnonymous() &&
-          !curr->isCompact() && !curr->isRunIn()) {
+      if (curr && curr->isRenderBlock() && !curr->isCompact() &&
+          !curr->isRunIn()) {
         curr->calcWidth();  // So that horizontal margins are correct.
         // Need to compute margins for the child as though it is a block.
         child->style()->setDisplay(BLOCK);
@@ -777,9 +778,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       RenderObject* curr = child->nextSibling();
       while (curr && curr->isFloatingOrPositioned())
         curr = curr->nextSibling();
-      if (curr &&
-          (curr->isRenderBlock() && !curr->isAnonymous() &&
-           curr->childrenInline() && !curr->isCompact() && !curr->isRunIn())) {
+      if (curr && (curr->isRenderBlock() && curr->childrenInline() &&
+                   !curr->isCompact() && !curr->isRunIn())) {
         // The block acts like an inline, so just null out its
         // position.
         child->setInline(true);
