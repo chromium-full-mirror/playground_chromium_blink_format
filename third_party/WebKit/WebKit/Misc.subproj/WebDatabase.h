@@ -27,8 +27,8 @@
 
 @interface WebDatabase (WebDatabaseManagement)
 
-- (BOOL)open;
-- (BOOL)close;
+- (void)open;
+- (void)close;
 - (void)sync;
 
 - (NSString*)path;
