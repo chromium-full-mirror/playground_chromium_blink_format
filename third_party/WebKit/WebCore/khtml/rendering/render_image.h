@@ -87,6 +87,8 @@ class RenderImage : public RenderReplaced {
   // images).
   void setContentObject(CachedObject* co);
 
+  virtual bool isDisplayingError() const { return berrorPic; }
+
  private:
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
