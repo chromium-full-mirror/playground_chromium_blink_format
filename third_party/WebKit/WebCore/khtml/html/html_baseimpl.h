@@ -110,6 +110,9 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   bool frameBorder : 1;
   bool frameBorderSet : 1;
   bool noresize : 1;
+
+ private:
+  void updateForNewURL();
 };
 
 // -------------------------------------------------------------------------
