@@ -63,7 +63,6 @@ class ReferenceImp;
 class List;
 class ListImp;
 class Completion;
-class CompletionImp;
 class ExecState;
 
 /**
@@ -77,8 +76,7 @@ enum Type {
   StringType = 4,
   NumberType = 5,
   ObjectType = 6,
-  ListType = 8,
-  CompletionType = 9
+  ListType = 8
 };
 
 /**
@@ -193,8 +191,8 @@ class Value {
 
   /**
    * Returns the type of value. This is one of UndefinedType, NullType,
-   * BooleanType, StringType NumberType, ObjectType, ReferenceType,
-   * ListType or CompletionType.
+   * BooleanType, StringType NumberType, ObjectType or
+   * ListType.
    *
    * @return The type of value
    */
