@@ -40,13 +40,9 @@ class QTextEdit : public QScrollView {
 
   QTextEdit(QWidget* parent);
 
+  QString text() const;
   void setText(const QString&);
-  QString text(int);
-  QString text();
-
-  int paragraphs() const;
-  int paragraphLength(int) const;
-  int lineOfChar(int, int);
+  QString textWithHardLineBreaks() const;
 
   WrapStyle wordWrap() const;
   void setWordWrap(WrapStyle);
@@ -62,7 +58,7 @@ class QTextEdit : public QScrollView {
   int verticalScrollBarWidth() const;
   int horizontalScrollBarHeight() const;
 
-  void textChanged() { m_textChanged.call(); }
+  void textChanged() { _textChanged.call(); }
 
   FocusPolicy focusPolicy() const;
 
@@ -71,8 +67,8 @@ class QTextEdit : public QScrollView {
   void clicked();
 
  private:
-  KWQSignal m_clicked;
-  KWQSignal m_textChanged;
+  KWQSignal _clicked;
+  KWQSignal _textChanged;
 };
 
 #endif /* QTEXTEDIT_H_ */
