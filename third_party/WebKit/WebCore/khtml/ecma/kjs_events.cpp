@@ -282,7 +282,7 @@ Value KJS::getEventConstructor(ExecState* exec) {
 
 const ClassInfo DOMEvent::info = {"Event", 0, &DOMEventTable, 0};
 /*
-@begin DOMEventTable 7
+@begin DOMEventTable 12
   type		DOMEvent::Type		DontDelete|ReadOnly
   target	DOMEvent::Target	DontDelete|ReadOnly
   currentTarget	DOMEvent::CurrentTarget	DontDelete|ReadOnly
@@ -293,6 +293,8 @@ const ClassInfo DOMEvent::info = {"Event", 0, &DOMEventTable, 0};
   timeStamp	DOMEvent::TimeStamp	DontDelete|ReadOnly
   returnValue   DOMEvent::ReturnValue   DontDelete
   cancelBubble  DOMEvent::CancelBubble  DontDelete
+  dataTransfer	DOMMouseEvent::DataTransfer DontDelete|ReadOnly
+  clipboardData  DOMEvent::ClipboardData  DontDelete|ReadOnly
 @end
 @begin DOMEventProtoTable 3
   stopPropagation 	DOMEvent::StopPropagation	DontDelete|Function 0
@@ -305,10 +307,17 @@ IMPLEMENT_PROTOFUNC(DOMEventProtoFunc)
 IMPLEMENT_PROTOTYPE(DOMEventProto, DOMEventProtoFunc)
 
 DOMEvent::DOMEvent(ExecState* exec, DOM::Event e)
-    : DOMObject(DOMEventProto::self(exec)), event(e) {}
+    : DOMObject(DOMEventProto::self(exec)), event(e), clipboard(0) {}
 
 DOMEvent::~DOMEvent() {
   ScriptInterpreter::forgetDOMObject(event.handle());
+}
+
+// pass marks through to JS objects we hold during garbage collection
+void DOMMouseEvent::mark() {
+  ObjectImp::mark();
+  if (clipboard && !clipboard->marked())
+    clipboard->mark();
 }
 
 Value DOMEvent::tryGet(ExecState* exec, const Identifier& p) const {
@@ -340,6 +349,32 @@ Value DOMEvent::getValueProperty(ExecState* exec, int token) const {
       return Boolean(event.cancelable());
     case TimeStamp:
       return Number((long unsigned int)event.timeStamp());  // ### long long ?
+    case ClipboardData: {
+      DOM::EventImpl* ei = event.handle();
+      if (ei->isClipboardEvent()) {
+        DOM::ClipboardEventImpl* impl =
+            static_cast<DOM::ClipboardEventImpl*>(event.handle());
+        if (!clipboard) {
+          clipboard = new Clipboard(exec, impl->clipboard());
+        }
+        return Object(clipboard);
+      } else {
+        return Undefined();
+      }
+    }
+    case DataTransfer: {
+      DOM::EventImpl* ei = event.handle();
+      if (ei->isDragEvent()) {
+        DOM::MouseEventImpl* impl =
+            static_cast<DOM::MouseEventImpl*>(event.handle());
+        if (!clipboard) {
+          clipboard = new Clipboard(exec, impl->clipboard());
+        }
+        return Object(clipboard);
+      } else {
+        return Undefined();
+      }
+    }
     default:
       kdWarning() << "Unhandled token in DOMEvent::getValueProperty : " << token
                   << endl;
@@ -543,7 +578,7 @@ const ClassInfo DOMMouseEvent::info = {"MouseEvent", &DOMUIEvent::info,
                                        &DOMMouseEventTable, 0};
 
 /*
-@begin DOMMouseEventTable 17
+@begin DOMMouseEventTable 16
   screenX	DOMMouseEvent::ScreenX	DontDelete|ReadOnly
   screenY	DOMMouseEvent::ScreenY	DontDelete|ReadOnly
   clientX	DOMMouseEvent::ClientX	DontDelete|ReadOnly
@@ -560,7 +595,6 @@ const ClassInfo DOMMouseEvent::info = {"MouseEvent", &DOMUIEvent::info,
   relatedTarget	DOMMouseEvent::RelatedTarget DontDelete|ReadOnly
   fromElement	DOMMouseEvent::FromElement DontDelete|ReadOnly
   toElement	DOMMouseEvent::ToElement	DontDelete|ReadOnly
-  dataTransfer	DOMMouseEvent::DataTransfer DontDelete|ReadOnly
 @end
 @begin DOMMouseEventProtoTable 1
   initMouseEvent	DOMMouseEvent::InitMouseEvent	DontDelete|Function 15
@@ -573,13 +607,6 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMMouseEventProto,
                                 DOMUIEventProto)
 
 DOMMouseEvent::~DOMMouseEvent() {}
-
-// pass marks through to JS objects we hold during garbage collection
-void DOMMouseEvent::mark() {
-  ObjectImp::mark();
-  if (clipboard && !clipboard->marked())
-    clipboard->mark();
-}
 
 Value DOMMouseEvent::tryGet(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
@@ -653,25 +680,6 @@ Value DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
     case RelatedTarget:
       return getDOMNode(exec,
                         static_cast<DOM::MouseEvent>(event).relatedTarget());
-    case DataTransfer: {
-      DOM::MouseEventImpl* impl =
-          static_cast<DOM::MouseEventImpl*>(event.handle());
-      EventImpl::EventId eventId = impl->id();
-      if (eventId == EventImpl::DRAGENTER_EVENT ||
-          eventId == EventImpl::DRAGOVER_EVENT ||
-          eventId == EventImpl::DRAGLEAVE_EVENT ||
-          eventId == EventImpl::DROP_EVENT ||
-          eventId == EventImpl::DRAGSTART_EVENT ||
-          eventId == EventImpl::DRAG_EVENT ||
-          eventId == EventImpl::DRAGEND_EVENT) {
-        if (!clipboard) {
-          clipboard = new Clipboard(exec, impl->clipboard());
-        }
-        return Object(clipboard);
-      } else {
-        return Undefined();
-      }
-    }
     default:
       kdWarning() << "Unhandled token in DOMMouseEvent::getValueProperty : "
                   << token << endl;

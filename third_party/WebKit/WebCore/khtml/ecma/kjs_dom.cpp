@@ -89,7 +89,7 @@ bool DOMNode::toBoolean(ExecState*) const {
 }
 
 /* Source for DOMNodeTable. Use "make hashtables" to regenerate.
-@begin DOMNodeTable 60
+@begin DOMNodeTable 66
   nodeName	DOMNode::NodeName	DontDelete|ReadOnly
   nodeValue	DOMNode::NodeValue	DontDelete
   nodeType	DOMNode::NodeType	DontDelete|ReadOnly
@@ -113,6 +113,12 @@ bool DOMNode::toBoolean(ExecState*) const {
   onclick	DOMNode::OnClick		DontDelete
   oncontextmenu	DOMNode::OnContextMenu		DontDelete
   ondblclick	DOMNode::OnDblClick		DontDelete
+  onbeforecut	DOMNode::OnBeforeCut		DontDelete
+  oncut         DOMNode::OnCut                  DontDelete
+  onbeforecopy	DOMNode::OnBeforeCopy		DontDelete
+  oncopy	DOMNode::OnCopy                 DontDelete
+  onbeforepaste	DOMNode::OnBeforePaste		DontDelete
+  onpaste	DOMNode::OnPaste		DontDelete
   ondrag	DOMNode::OnDrag			DontDelete
   ondragdrop	DOMNode::OnDragDrop		DontDelete
   ondragend	DOMNode::OnDragEnd		DontDelete
@@ -233,6 +239,18 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
       return getListener(DOM::EventImpl::MOUSEOVER_EVENT);
     case OnMouseUp:
       return getListener(DOM::EventImpl::MOUSEUP_EVENT);
+    case OnBeforeCut:
+      return getListener(DOM::EventImpl::BEFORECUT_EVENT);
+    case OnCut:
+      return getListener(DOM::EventImpl::CUT_EVENT);
+    case OnBeforeCopy:
+      return getListener(DOM::EventImpl::BEFORECOPY_EVENT);
+    case OnCopy:
+      return getListener(DOM::EventImpl::COPY_EVENT);
+    case OnBeforePaste:
+      return getListener(DOM::EventImpl::BEFOREPASTE_EVENT);
+    case OnPaste:
+      return getListener(DOM::EventImpl::PASTE_EVENT);
     case OnDragEnter:
       return getListener(DOM::EventImpl::DRAGENTER_EVENT);
     case OnDragOver:
@@ -400,6 +418,24 @@ void DOMNode::putValue(ExecState* exec,
       break;
     case OnMouseUp:
       setListener(exec, DOM::EventImpl::MOUSEUP_EVENT, value);
+      break;
+    case OnBeforeCut:
+      setListener(exec, DOM::EventImpl::BEFORECUT_EVENT, value);
+      break;
+    case OnCut:
+      setListener(exec, DOM::EventImpl::CUT_EVENT, value);
+      break;
+    case OnBeforeCopy:
+      setListener(exec, DOM::EventImpl::BEFORECOPY_EVENT, value);
+      break;
+    case OnCopy:
+      setListener(exec, DOM::EventImpl::COPY_EVENT, value);
+      break;
+    case OnBeforePaste:
+      setListener(exec, DOM::EventImpl::BEFOREPASTE_EVENT, value);
+      break;
+    case OnPaste:
+      setListener(exec, DOM::EventImpl::PASTE_EVENT, value);
       break;
     case OnDragEnter:
       setListener(exec, DOM::EventImpl::DRAGENTER_EVENT, value);

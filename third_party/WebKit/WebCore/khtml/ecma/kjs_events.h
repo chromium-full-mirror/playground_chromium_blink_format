@@ -106,12 +106,15 @@ class DOMEvent : public DOMObject {
     // MS IE equivalents
     SrcElement,
     ReturnValue,
-    CancelBubble
+    CancelBubble,
+    ClipboardData,
+    DataTransfer
   };
   DOM::Event toEvent() const { return event; }
 
  protected:
   DOM::Event event;
+  mutable Clipboard* clipboard;
 };
 
 Value getDOMEvent(ExecState* exec, DOM::Event e);
@@ -160,8 +163,7 @@ class DOMUIEvent : public DOMEvent {
 
 class DOMMouseEvent : public DOMUIEvent {
  public:
-  DOMMouseEvent(ExecState* exec, DOM::MouseEvent me)
-      : DOMUIEvent(exec, me), clipboard(0) {}
+  DOMMouseEvent(ExecState* exec, DOM::MouseEvent me) : DOMUIEvent(exec, me) {}
   ~DOMMouseEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -186,15 +188,11 @@ class DOMMouseEvent : public DOMUIEvent {
     RelatedTarget,
     FromElement,
     ToElement,
-    DataTransfer,
     InitMouseEvent
   };
   DOM::MouseEvent toMouseEvent() const {
     return static_cast<DOM::MouseEvent>(event);
   }
-
- protected:
-  mutable Clipboard* clipboard;
 };
 
 class DOMKeyboardEvent : public DOMUIEvent {
