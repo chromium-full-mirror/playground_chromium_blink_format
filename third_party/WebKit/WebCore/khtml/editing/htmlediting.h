@@ -755,7 +755,7 @@ class ReplacementFragment {
   static bool isInterchangeNewlineNode(const DOM::NodeImpl*);
   static bool isInterchangeConvertedSpaceSpan(const DOM::NodeImpl*);
 
-  void computeStylesForNodes();
+  void computeStylesAndRemoveUnrendered();
   void removeStyleNodes();
 
   // A couple simple DOM helpers
@@ -773,6 +773,7 @@ class ReplacementFragment {
 };
 
 // free-floating helper functions
+bool isNodeRendered(const DOM::NodeImpl*);
 bool isProbablyBlock(const DOM::NodeImpl*);
 
 class ReplaceSelectionCommand : public CompositeEditCommand {
