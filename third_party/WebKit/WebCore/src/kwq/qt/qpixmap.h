@@ -87,8 +87,6 @@ class QPixmap : public QPaintDevice, public Qt {
 
   QPixmap& operator=(const QPixmap&);
 
-// protected -------------------------------------------------------------------
-// private ---------------------------------------------------------------------
 #ifdef _KWQ_
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
   NSImage* nsimage;
