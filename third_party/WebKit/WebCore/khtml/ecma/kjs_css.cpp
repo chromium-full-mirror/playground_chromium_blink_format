@@ -235,7 +235,7 @@ Value DOMCSSStyleDeclarationProtoFunc::tryCall(ExecState* exec,
                             args[2].toString(exec).string());
       return Undefined();
     case DOMCSSStyleDeclaration::Item:
-      return getStringOrNull(styleDecl.item(args[0].toInteger(exec)));
+      return getStringOrNull(styleDecl.item(args[0].toInt32(exec)));
     default:
       return Undefined();
   }
@@ -421,7 +421,7 @@ Value DOMStyleSheetListFunc::tryCall(ExecState* exec,
   DOM::StyleSheetList styleSheetList =
       static_cast<DOMStyleSheetList*>(thisObj.imp())->toStyleSheetList();
   if (id == DOMStyleSheetList::Item)
-    return getDOMStyleSheet(exec, styleSheetList.item(args[0].toInteger(exec)));
+    return getDOMStyleSheet(exec, styleSheetList.item(args[0].toInt32(exec)));
   return Undefined();
 }
 
@@ -491,7 +491,7 @@ Value KJS::DOMMediaListProtoFunc::tryCall(ExecState* exec,
       static_cast<DOMMediaList*>(thisObj.imp())->toMediaList();
   switch (id) {
     case DOMMediaList::Item:
-      return getStringOrNull(mediaList.item(args[0].toInteger(exec)));
+      return getStringOrNull(mediaList.item(args[0].toInt32(exec)));
     case DOMMediaList::DeleteMedium:
       mediaList.deleteMedium(args[0].toString(exec).string());
       return Undefined();
@@ -559,10 +559,10 @@ Value DOMCSSStyleSheetProtoFunc::tryCall(ExecState* exec,
     case DOMCSSStyleSheet::InsertRule:
       result = Number(
           styleSheet.insertRule(args[0].toString(exec).string(),
-                                (long unsigned int)args[1].toInteger(exec)));
+                                (long unsigned int)args[1].toInt32(exec)));
       break;
     case DOMCSSStyleSheet::DeleteRule:
-      styleSheet.deleteRule(args[0].toInteger(exec));
+      styleSheet.deleteRule(args[0].toInt32(exec));
       break;
     default:
       result = Undefined();
@@ -615,7 +615,7 @@ Value DOMCSSRuleListFunc::tryCall(ExecState* exec,
       static_cast<DOMCSSRuleList*>(thisObj.imp())->toCSSRuleList();
   switch (id) {
     case DOMCSSRuleList::Item:
-      return getDOMCSSRule(exec, cssRuleList.item(args[0].toInteger(exec)));
+      return getDOMCSSRule(exec, cssRuleList.item(args[0].toInt32(exec)));
     default:
       return Undefined();
   }
@@ -843,9 +843,9 @@ Value DOMCSSRuleFunc::tryCall(ExecState* exec,
     DOM::CSSMediaRule rule = static_cast<DOM::CSSMediaRule>(cssRule);
     if (id == DOMCSSRule::Media_InsertRule)
       return Number(rule.insertRule(args[0].toString(exec).string(),
-                                    args[1].toInteger(exec)));
+                                    args[1].toInt32(exec)));
     else if (id == DOMCSSRule::Media_DeleteRule)
-      rule.deleteRule(args[0].toInteger(exec));
+      rule.deleteRule(args[0].toInt32(exec));
   }
 
   return Undefined();
@@ -1057,12 +1057,12 @@ Value DOMCSSPrimitiveValueProtoFunc::tryCall(ExecState* exec,
       static_cast<DOMCSSPrimitiveValue*>(thisObj.imp())->toCSSPrimitiveValue();
   switch (id) {
     case DOMCSSPrimitiveValue::SetFloatValue:
-      val.setFloatValue(args[0].toInteger(exec), args[1].toNumber(exec));
+      val.setFloatValue(args[0].toInt32(exec), args[1].toNumber(exec));
       return Undefined();
     case DOMCSSPrimitiveValue::GetFloatValue:
-      return Number(val.getFloatValue(args[0].toInteger(exec)));
+      return Number(val.getFloatValue(args[0].toInt32(exec)));
     case DOMCSSPrimitiveValue::SetStringValue:
-      val.setStringValue(args[0].toInteger(exec),
+      val.setStringValue(args[0].toInt32(exec),
                          args[1].toString(exec).string());
       return Undefined();
     case DOMCSSPrimitiveValue::GetStringValue:
@@ -1205,7 +1205,7 @@ Value DOMCSSValueListFunc::tryCall(ExecState* exec,
       static_cast<DOMCSSValueList*>(thisObj.imp())->toValueList();
   switch (id) {
     case DOMCSSValueList::Item:
-      return getDOMCSSValue(exec, valueList.item(args[0].toInteger(exec)));
+      return getDOMCSSValue(exec, valueList.item(args[0].toInt32(exec)));
     default:
       return Undefined();
   }

@@ -2446,9 +2446,9 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
         table.deleteCaption();
         return Undefined();
       } else if (id == KJS::HTMLElement::TableInsertRow)
-        return getDOMNode(exec, table.insertRow(args[0].toInteger(exec)));
+        return getDOMNode(exec, table.insertRow(args[0].toInt32(exec)));
       else if (id == KJS::HTMLElement::TableDeleteRow) {
-        table.deleteRow(args[0].toInteger(exec));
+        table.deleteRow(args[0].toInt32(exec));
         return Undefined();
       }
     } break;
@@ -2457,19 +2457,18 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
     case ID_TFOOT: {
       DOM::HTMLTableSectionElement tableSection = element;
       if (id == KJS::HTMLElement::TableSectionInsertRow)
-        return getDOMNode(exec,
-                          tableSection.insertRow(args[0].toInteger(exec)));
+        return getDOMNode(exec, tableSection.insertRow(args[0].toInt32(exec)));
       else if (id == KJS::HTMLElement::TableSectionDeleteRow) {
-        tableSection.deleteRow(args[0].toInteger(exec));
+        tableSection.deleteRow(args[0].toInt32(exec));
         return Undefined();
       }
     } break;
     case ID_TR: {
       DOM::HTMLTableRowElement tableRow = element;
       if (id == KJS::HTMLElement::TableRowInsertCell)
-        return getDOMNode(exec, tableRow.insertCell(args[0].toInteger(exec)));
+        return getDOMNode(exec, tableRow.insertCell(args[0].toInt32(exec)));
       else if (id == KJS::HTMLElement::TableRowDeleteCell) {
-        tableRow.deleteCell(args[0].toInteger(exec));
+        tableRow.deleteCell(args[0].toInt32(exec));
         return Undefined();
       }
     }
@@ -2730,9 +2729,9 @@ void KJS::HTMLElement::putValue(ExecState* exec,
             if (docimpl)
               docimpl->updateLayout();
             if (token == BodyScrollLeft)
-              sview->setContentsPos(value.toInteger(exec), sview->contentsY());
+              sview->setContentsPos(value.toInt32(exec), sview->contentsY());
             else
-              sview->setContentsPos(sview->contentsX(), value.toInteger(exec));
+              sview->setContentsPos(sview->contentsX(), value.toInt32(exec));
           }
           return;
         }
@@ -2774,7 +2773,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       switch (token) {
         // read-only: type
         case SelectSelectedIndex: {
-          select.setSelectedIndex(value.toInteger(exec));
+          select.setSelectedIndex(value.toInt32(exec));
           return;
         }
         case SelectValue: {
@@ -2804,11 +2803,11 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case SelectSize: {
-          select.setSize(value.toInteger(exec));
+          select.setSize(value.toInt32(exec));
           return;
         }
         case SelectTabIndex: {
-          select.setTabIndex(value.toInteger(exec));
+          select.setTabIndex(value.toInt32(exec));
           return;
         }
       }
@@ -2911,7 +2910,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case InputMaxLength: {
-          input.setMaxLength(value.toInteger(exec));
+          input.setMaxLength(value.toInt32(exec));
           return;
         }
         case InputName: {
@@ -2931,7 +2930,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case InputTabIndex: {
-          input.setTabIndex(value.toInteger(exec));
+          input.setTabIndex(value.toInt32(exec));
           return;
         }
         case InputType: {
@@ -2961,7 +2960,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case TextAreaCols: {
-          textarea.setCols(value.toInteger(exec));
+          textarea.setCols(value.toInt32(exec));
           return;
         }
         case TextAreaDisabled: {
@@ -2977,11 +2976,11 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case TextAreaRows: {
-          textarea.setRows(value.toInteger(exec));
+          textarea.setRows(value.toInt32(exec));
           return;
         }
         case TextAreaTabIndex: {
-          textarea.setTabIndex(value.toInteger(exec));
+          textarea.setTabIndex(value.toInt32(exec));
           return;
         }
         // read-only: type
@@ -3008,7 +3007,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case ButtonTabIndex: {
-          button.setTabIndex(value.toInteger(exec));
+          button.setTabIndex(value.toInt32(exec));
           return;
         }
         // read-only: type
@@ -3072,7 +3071,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case OListStart: {
-          oList.setStart(value.toInteger(exec));
+          oList.setStart(value.toInt32(exec));
           return;
         }
         case OListType: {
@@ -3116,7 +3115,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case LIValue: {
-          li.setValue(value.toInteger(exec));
+          li.setValue(value.toInt32(exec));
           return;
         }
       }
@@ -3175,7 +3174,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       DOM::HTMLPreElement pre = element;
       switch (token) {
         case PreWidth: {
-          pre.setWidth(value.toInteger(exec));
+          pre.setWidth(value.toInt32(exec));
           return;
         }
       }
@@ -3298,7 +3297,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case AnchorTabIndex: {
-          anchor.setTabIndex(value.toInteger(exec));
+          anchor.setTabIndex(value.toInt32(exec));
           return;
         }
         case AnchorTarget: {
@@ -3327,15 +3326,15 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case ImageBorder: {
-          image.setBorder(value.toInteger(exec));
+          image.setBorder(value.toInt32(exec));
           return;
         }
         case ImageHeight: {
-          image.setHeight(value.toInteger(exec));
+          image.setHeight(value.toInt32(exec));
           return;
         }
         case ImageHspace: {
-          image.setHspace(value.toInteger(exec));
+          image.setHspace(value.toInt32(exec));
           return;
         }
         case ImageIsMap: {
@@ -3355,11 +3354,11 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case ImageVspace: {
-          image.setVspace(value.toInteger(exec));
+          image.setVspace(value.toInt32(exec));
           return;
         }
         case ImageWidth: {
-          image.setWidth(value.toInteger(exec));
+          image.setWidth(value.toInt32(exec));
           return;
         }
       }
@@ -3418,7 +3417,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case ObjectTabIndex: {
-          object.setTabIndex(value.toInteger(exec));
+          object.setTabIndex(value.toInt32(exec));
           return;
         }
         case ObjectType: {
@@ -3547,7 +3546,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case AreaTabIndex: {
-          area.setTabIndex(value.toInteger(exec));
+          area.setTabIndex(value.toInt32(exec));
           return;
         }
         case AreaTarget: {
@@ -3669,7 +3668,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case TableColSpan: {
-          tableCol.setSpan(value.toInteger(exec));
+          tableCol.setSpan(value.toInt32(exec));
           return;
         }
         case TableColVAlign: {
@@ -3764,7 +3763,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case TableCellColSpan: {
-          tableCell.setColSpan(value.toInteger(exec));
+          tableCell.setColSpan(value.toInt32(exec));
           return;
         }
         case TableCellHeaders: {
@@ -3780,7 +3779,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case TableCellRowSpan: {
-          tableCell.setRowSpan(value.toInteger(exec));
+          tableCell.setRowSpan(value.toInt32(exec));
           return;
         }
         case TableCellScope: {
@@ -4174,7 +4173,7 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
                 << propertyName.qstring() << endl;
 #endif
   if (propertyName == "selectedIndex") {
-    element.setSelectedIndex(value.toInteger(exec));
+    element.setSelectedIndex(value.toInt32(exec));
     return;
   }
   // resize ?

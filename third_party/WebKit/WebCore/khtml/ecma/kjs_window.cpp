@@ -1295,10 +1295,12 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 bool ok;
                 double d = val.toDouble(&ok);
                 if (d != 0 || ok) {
+#if !APPLE_CHANGES
                   d += 2 *
                            qApp->style().pixelMetric(
                                QStyle::PM_DefaultFrameWidth) +
                        2;
+#endif
                   if (d > screen.height())  // should actually check workspace
                     d = screen.height();
                   if (d < 100)
@@ -1312,10 +1314,12 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 bool ok;
                 double d = val.toDouble(&ok);
                 if (d != 0 || ok) {
+#if !APPLE_CHANGES
                   d += 2 *
                            qApp->style().pixelMetric(
                                QStyle::PM_DefaultFrameWidth) +
                        2;
+#endif
                   if (d > screen.width())  // should actually check workspace
                     d = screen.width();
                   if (d < 100)
@@ -2186,11 +2190,6 @@ Value HistoryFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
   }
   History* history = static_cast<History*>(thisObj.imp());
 
-  Value v = args[0];
-  Number n;
-  if (!v.isNull())
-    n = v.toInteger(exec);
-
   int steps;
   switch (id) {
     case History::Back:
@@ -2200,7 +2199,7 @@ Value HistoryFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       steps = 1;
       break;
     case History::Go:
-      steps = n.intValue();
+      steps = args[0].toInt32(exec);
       break;
     default:
       return Undefined();

@@ -519,7 +519,7 @@ Value DOMUIEventProtoFunc::tryCall(ExecState* exec,
       DOM::AbstractView v = toAbstractView(args[3]);
       static_cast<DOM::UIEvent>(uiEvent).initUIEvent(
           args[0].toString(exec).string(), args[1].toBoolean(exec),
-          args[2].toBoolean(exec), v, args[4].toInteger(exec));
+          args[2].toBoolean(exec), v, args[4].toInt32(exec));
     }
       return Undefined();
   }
@@ -657,16 +657,16 @@ Value DOMMouseEventProtoFunc::tryCall(ExecState* exec,
                                 args[1].toBoolean(exec),   // canBubbleArg
                                 args[2].toBoolean(exec),   // cancelableArg
                                 toAbstractView(args[3]),   // viewArg
-                                args[4].toInteger(exec),   // detailArg
-                                args[5].toInteger(exec),   // screenXArg
-                                args[6].toInteger(exec),   // screenYArg
-                                args[7].toInteger(exec),   // clientXArg
-                                args[8].toInteger(exec),   // clientYArg
+                                args[4].toInt32(exec),     // detailArg
+                                args[5].toInt32(exec),     // screenXArg
+                                args[6].toInt32(exec),     // screenYArg
+                                args[7].toInt32(exec),     // clientXArg
+                                args[8].toInt32(exec),     // clientYArg
                                 args[9].toBoolean(exec),   // ctrlKeyArg
                                 args[10].toBoolean(exec),  // altKeyArg
                                 args[11].toBoolean(exec),  // shiftKeyArg
                                 args[12].toBoolean(exec),  // metaKeyArg
-                                args[13].toInteger(exec),  // buttonArg
+                                args[13].toInt32(exec),    // buttonArg
                                 toNode(args[14]));         // relatedTargetArg
       return Undefined();
   }
@@ -753,7 +753,7 @@ Value DOMKeyboardEventProtoFunc::tryCall(ExecState* exec,
                               args[2].toBoolean(exec),          // cancelableArg
                               toAbstractView(args[3]),          // viewArg
                               args[4].toString(exec).string(),  // keyIdentifier
-                              args[5].toInteger(exec),    // keyLocationArg
+                              args[5].toInt32(exec),      // keyLocationArg
                               args[6].toBoolean(exec),    // ctrlKeyArg
                               args[7].toBoolean(exec),    // altKeyArg
                               args[8].toBoolean(exec),    // shiftKeyArg
@@ -862,7 +862,7 @@ Value DOMMutationEventProtoFunc::tryCall(ExecState* exec,
           args[4].toString(exec).string(),  // prevValueArg
           args[5].toString(exec).string(),  // newValueArg
           args[6].toString(exec).string(),  // attrNameArg
-          args[7].toInteger(exec));         // attrChangeArg
+          args[7].toInt32(exec));           // attrChangeArg
       return Undefined();
   }
   return Undefined();
