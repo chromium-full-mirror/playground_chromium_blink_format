@@ -90,7 +90,9 @@ class EventImpl : public khtml::Shared<EventImpl> {
     KHTML_ERROR_EVENT,
     KEYPRESS_EVENT,
     KHTML_MOVE_EVENT,
-    KHTML_ORIGCLICK_MOUSEUP_EVENT
+    KHTML_ORIGCLICK_MOUSEUP_EVENT,
+    // XMLHttpRequest events
+    KHTML_READYSTATECHANGE_EVENT
   };
 
   EventImpl();
