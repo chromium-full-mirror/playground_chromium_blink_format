@@ -21,7 +21,6 @@
 - (WebDataSource*)dataSource;
 
 - (void)loadURL:(NSURL*)URL
-     attributes:(NSDictionary*)attributes
           flags:(unsigned)flags
      withParent:(WebDataSource*)parent;
 

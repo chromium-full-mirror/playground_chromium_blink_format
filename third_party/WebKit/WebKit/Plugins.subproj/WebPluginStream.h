@@ -20,7 +20,6 @@
   int32 offset;
   NPStream npStream;
   NSString* path;
-  NSDictionary* attributes;
 
   void* notifyData;
 
@@ -41,10 +40,6 @@
 - initWithURL:(NSURL*)theURL
     pluginPointer:(NPP)thePluginPointer
        notifyData:(void*)theNotifyData;
-- initWithURL:(NSURL*)theURL
-    pluginPointer:(NPP)thePluginPointer
-       notifyData:(void*)theNotifyData
-       attributes:(NSDictionary*)theAttributes;
 
 - (void)startLoad;
 - (void)stop;
