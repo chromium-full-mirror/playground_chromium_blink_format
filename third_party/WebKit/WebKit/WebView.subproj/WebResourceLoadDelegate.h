@@ -6,7 +6,7 @@
 */
 @class WebView;
 @class WebDataSource;
-@class WebPluginError;
+@class WebPlugInError;
 @class WebResponse;
 @class NSURLRequest;
 
@@ -146,7 +146,7 @@
      @param dataSource The dataSource that contains the plug-in.
 */
 - (void)webView:(WebView*)sender
-    pluginFailedWithError:(WebPluginError*)error
+    plugInFailedWithError:(WebPlugInError*)error
                dataSource:(WebDataSource*)dataSource;
 
 @end
