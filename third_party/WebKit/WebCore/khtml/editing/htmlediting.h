@@ -208,6 +208,7 @@ class CompositeEditCommand : public EditCommand {
                           long offset,
                           const DOM::DOMString& text);
   void joinTextNodes(DOM::TextImpl* text1, DOM::TextImpl* text2);
+  void rebalanceWhitespace();
   void removeCSSProperty(DOM::CSSStyleDeclarationImpl*, int property);
   void removeFullySelectedNode(DOM::NodeImpl*);
   void removeNodeAttribute(DOM::ElementImpl*, int attribute);
@@ -535,6 +536,29 @@ class MoveSelectionCommand : public CompositeEditCommand {
   DOM::DocumentFragmentImpl* m_fragment;
   DOM::Position m_position;
   bool m_smartMove;
+};
+
+//------------------------------------------------------------------------------------------
+// RebalanceWhitespaceCommand
+
+class RebalanceWhitespaceCommand : public EditCommand {
+ public:
+  RebalanceWhitespaceCommand(DOM::DocumentImpl*, const DOM::Position&);
+  virtual ~RebalanceWhitespaceCommand();
+
+  virtual void doApply();
+  virtual void doUnapply();
+
+ private:
+  enum { InvalidOffset = -1 };
+
+  virtual bool preservesTypingStyle() const;
+
+  DOM::DOMString m_beforeString;
+  DOM::DOMString m_afterString;
+  DOM::Position m_position;
+  long m_upstreamOffset;
+  long m_downstreamOffset;
 };
 
 //------------------------------------------------------------------------------------------
