@@ -227,6 +227,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (BOOL)moveCaretToPoint:(NSPoint)point;
 
 - (void)pasteHTMLString:(NSString*)HTMLString;
+- (void)pasteImageWithURL:(NSURL*)URL;
+
 - (void)deleteSelection;
 
 - (BOOL)haveSelection;
