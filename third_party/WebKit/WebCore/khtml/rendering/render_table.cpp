@@ -234,6 +234,7 @@ void RenderTable::layout() {
   // width=" << width() << ", layouted=" << layouted() << endl;
 
   m_height = 0;
+  initMaxMarginValues();
 
   // int oldWidth = m_width;
   calcWidth();
