@@ -413,6 +413,7 @@ typedef enum {
               replacingRange:(DOMRange*)charRangeToReplace
                 beforeString:(NSString**)beforeString
                  afterString:(NSString**)afterString;
+- (BOOL)canDeleteRange:(DOMRange*)range;
 
 - (DOMDocumentFragment*)documentFragmentWithMarkupString:(NSString*)markupString
                                            baseURLString:
