@@ -66,6 +66,8 @@ class QLineEdit : public QWidget {
 
   void clicked();
 
+  virtual bool checksDescendantsForFocus() const;
+
  private:
   KWQSignal m_returnPressed;
   KWQSignal m_textChanged;

@@ -68,6 +68,9 @@ class QListBox : public QScrollView {
   void clicked() { _clicked.call(); }
   void selectionChanged() { _selectionChanged.call(); }
 
+  virtual FocusPolicy focusPolicy() const;
+  virtual bool checksDescendantsForFocus() const;
+
  private:
   void insertItem(NSObject*, unsigned index);
 

@@ -99,6 +99,7 @@ class QWidget : public QObject, public QPaintDevice {
   bool hasFocus() const;
   void setFocus();
   void clearFocus();
+  virtual bool checksDescendantsForFocus() const;
 
   virtual FocusPolicy focusPolicy() const;
   void setFocusPolicy(FocusPolicy){};

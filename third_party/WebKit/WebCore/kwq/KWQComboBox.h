@@ -58,6 +58,8 @@ class QComboBox : public QWidget {
 
   void itemSelected();
 
+  virtual FocusPolicy focusPolicy() const;
+
  private:
   bool updateCurrentItem() const;
   const int* dimensions() const;
