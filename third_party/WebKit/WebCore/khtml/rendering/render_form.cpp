@@ -64,7 +64,7 @@ RenderFormElement::RenderFormElement(HTMLGenericFormElementImpl* element)
 RenderFormElement::~RenderFormElement() {}
 
 short RenderFormElement::baselinePosition(bool f) const {
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   return marginTop() + widget()->baselinePosition();
 #else
   return RenderWidget::baselinePosition(f) - 2 -
@@ -220,7 +220,7 @@ RenderCheckBox::RenderCheckBox(HTMLInputElementImpl* element)
 void RenderCheckBox::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   QSize s(widget()->sizeHint());
 #else
@@ -274,7 +274,7 @@ void RenderRadioButton::slotClicked() {
 void RenderRadioButton::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   QSize s(widget()->sizeHint());
 #else
@@ -303,6 +303,9 @@ QString RenderSubmitButton::rawText() {
   QString value = element()->value().isEmpty() ? defaultLabel()
                                                : element()->value().string();
   value = value.stripWhiteSpace();
+#if APPLE_CHANGES
+  return value;
+#else
   QString raw;
   for (unsigned int i = 0; i < value.length(); i++) {
     raw += value[i];
@@ -310,12 +313,13 @@ QString RenderSubmitButton::rawText() {
       raw += '&';
   }
   return raw;
+#endif
 }
 
 void RenderSubmitButton::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   QSize s(widget()->sizeHint());
   setIntrinsicWidth(s.width());
@@ -463,7 +467,7 @@ void RenderLineEdit::handleFocusOut() {
 void RenderLineEdit::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   int size = element()->size();
   QSize s(widget()->sizeForCharacterWidth(size > 0 ? size : 17));
@@ -745,7 +749,7 @@ void RenderSelect::updateFromElement() {
     else
       static_cast<KComboBox*>(m_widget)->clear();
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (m_useListBox)
       static_cast<KListBox*>(m_widget)->beginBatchInsert();
 #endif
@@ -784,7 +788,7 @@ void RenderSelect::updateFromElement() {
         KHTMLAssert(false);
       m_selectionChanged = true;
     }
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     if (m_useListBox)
       static_cast<KListBox*>(m_widget)->endBatchInsert();
 #endif
@@ -803,7 +807,7 @@ void RenderSelect::updateFromElement() {
   RenderFormElement::updateFromElement();
 }
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
 // Override to deal with our widget.
 short RenderSelect::baselinePosition(bool f) const {
   if (!m_useListBox) {
@@ -861,7 +865,7 @@ void RenderSelect::layout() {
     if (size < 1)
       size = QMIN(static_cast<KListBox*>(m_widget)->count(), 10);
 
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
     width += w->scrollBarWidth();
     height = size * height;
     // NSBrowser has problems drawing scrollbar correctly when its size is too
@@ -1085,7 +1089,7 @@ void RenderTextArea::calcMinMaxWidth() {
   TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);
   const QFontMetrics& m = style()->fontMetrics();
   w->setTabStopWidth(8 * m.width(" "));
-#ifdef APPLE_CHANGES
+#if APPLE_CHANGES
   QSize size(
       QMAX(element()->cols(), 1) * m.width('x') + w->frameWidth() +
           w->verticalScrollBarWidth(),
