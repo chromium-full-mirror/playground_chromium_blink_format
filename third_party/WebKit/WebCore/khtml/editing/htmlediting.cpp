@@ -345,6 +345,8 @@ EditCommand::EditCommand(DocumentImpl* document)
   m_document->ref();
   m_startingSelection = m_document->part()->selection();
   m_endingSelection = m_startingSelection;
+
+  m_document->part()->setSelection(Selection(), false, true);
 }
 
 EditCommand::~EditCommand() {
@@ -359,15 +361,9 @@ void EditCommand::apply() {
   ASSERT(m_document->part());
   ASSERT(state() == NotApplied);
 
-  bool topLevel = !isCompositeStep();
-
   KHTMLPart* part = m_document->part();
 
-#if APPLE_CHANGES
-  if (topLevel) {
-    KWQ(part)->markMisspellingsInSelection(part->selection());
-  }
-#endif
+  ASSERT(part->selection().isNone());
 
   doApply();
 
@@ -379,7 +375,7 @@ void EditCommand::apply() {
   if (!preservesTypingStyle())
     setTypingStyle(0);
 
-  if (topLevel) {
+  if (!isCompositeStep()) {
     document()->updateLayout();
     EditCommandPtr cmd(this);
     part->appliedEditing(cmd);
@@ -395,11 +391,10 @@ void EditCommand::unapply() {
 
   KHTMLPart* part = m_document->part();
 
-#if APPLE_CHANGES
   if (topLevel) {
-    KWQ(part)->markMisspellingsInSelection(part->selection());
+    part->setSelection(Selection(), false, true);
   }
-#endif
+  ASSERT(part->selection().isNone());
 
   doUnapply();
 
@@ -421,11 +416,10 @@ void EditCommand::reapply() {
 
   KHTMLPart* part = m_document->part();
 
-#if APPLE_CHANGES
   if (topLevel) {
-    KWQ(part)->markMisspellingsInSelection(part->selection());
+    part->setSelection(Selection(), false, true);
   }
-#endif
+  ASSERT(part->selection().isNone());
 
   doReapply();
 
@@ -467,10 +461,6 @@ void EditCommand::setTypingStyle(CSSStyleDeclarationImpl* style) {
   // improvement
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent.get())
     cmd->assignTypingStyle(style);
-}
-
-void EditCommand::markMisspellingsInSelection(const Selection& s) {
-  KWQ(document()->part())->markMisspellingsInSelection(s);
 }
 
 bool EditCommand::preservesTypingStyle() const {
@@ -2042,11 +2032,6 @@ void ReplaceSelectionCommand::doApply() {
       text += " ";
     }
     inputText(text, m_selectReplacement);
-    if (!m_selectReplacement) {
-      // Mark misspellings in the inserted content.
-      markMisspellingsInSelection(
-          Selection(upstreamStart, endingSelection().extent()));
-    }
   } else {
     // HTML fragment paste.
 
@@ -2097,7 +2082,6 @@ void ReplaceSelectionCommand::doApply() {
       // inserted content.
       selection = Selection(Position(lastLeaf, lastLeaf->caretMaxOffset()));
       setEndingSelection(selection);
-      markMisspellingsInSelection(replacementSelection);
     }
   }
 }
@@ -2511,7 +2495,7 @@ void TypingCommand::markMisspellingsAfterTyping() {
     VisiblePosition p1 = startOfWord(previous, LeftWordIfOnBoundary);
     VisiblePosition p2 = startOfWord(start, LeftWordIfOnBoundary);
     if (p1 != p2)
-      markMisspellingsInSelection(Selection(p1, start));
+      KWQ(document()->part())->markMisspellingsInAdjacentWords(p1);
   }
 }
 

@@ -54,6 +54,7 @@ class HTMLTableCellElementImpl;
 
 namespace khtml {
 class RenderObject;
+class VisiblePosition;
 struct DashboardRegionValue;
 }
 
@@ -243,8 +244,8 @@ class KWQKHTMLPart : public KHTMLPart {
                              NSRect* elementRect) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
-  void markMisspellingsInSelection(const khtml::Selection& selection);
-  void updateSpellChecking();
+  void markMisspellingsInAdjacentWords(const khtml::VisiblePosition&);
+  void markMisspellings(const khtml::Selection&);
 
   NSFileWrapper* fileWrapperForElement(DOM::ElementImpl*);
   NSAttributedString* attributedString(DOM::NodeImpl* startNode,
@@ -348,7 +349,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void issueCutCommand();
   void issueCopyCommand();
   void issuePasteCommand();
-  void respondToChangedSelection();
+  void respondToChangedSelection(const khtml::Selection& oldSelection,
+                                 bool closeTyping);
   void respondToChangedContents();
   bool isContentEditable() const;
   bool shouldBeginEditing(const DOM::Range&) const;

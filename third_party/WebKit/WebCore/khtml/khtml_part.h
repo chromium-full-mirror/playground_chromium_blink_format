@@ -613,7 +613,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void setSelection(const khtml::Selection&,
                     bool closeTyping = true,
-                    bool unmarkOldSelection = true);
+                    bool keepTypingStyle = false);
 
   /**
    * Returns a mark, to be used as emacs uses it.
@@ -1229,11 +1229,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @internal
    */
   void selectionLayoutChanged();
-
-  /**
-   * @internal
-   */
-  void notifySelectionChanged(bool closeTyping = true);
 
   /**
    * @internal

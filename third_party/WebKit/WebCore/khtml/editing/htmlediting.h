@@ -140,8 +140,6 @@ class EditCommand : public Shared<EditCommand> {
   DOM::CSSStyleDeclarationImpl* typingStyle() const { return m_typingStyle; };
   void setTypingStyle(DOM::CSSStyleDeclarationImpl*);
 
-  void markMisspellingsInSelection(const khtml::Selection& s);
-
   virtual bool isInputTextCommand() const;
   virtual bool isTypingCommand() const;
 
