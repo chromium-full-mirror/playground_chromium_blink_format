@@ -33,13 +33,8 @@
 
 - (NSSize)size;
 - (void)resize:(NSSize)s;
-- (void)beginAnimationInView:(NSView*)view
-                      inRect:(NSRect)ir
-                    fromRect:(NSRect)fr;
+- (void)beginAnimationInRect:(NSRect)ir fromRect:(NSRect)fr;
 - (void)stopAnimation;
-- (void)drawInRect:(NSRect)dstRect
-          fromRect:(NSRect)srcRect
-         operation:(NSCompositingOperation)op
-          fraction:(float)delta;
+- (void)tileInRect:(NSRect)r fromPoint:(NSPoint)p;
 
 @end

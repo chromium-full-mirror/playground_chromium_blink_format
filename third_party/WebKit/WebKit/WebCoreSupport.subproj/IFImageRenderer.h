@@ -13,14 +13,9 @@
   int lastStatus;
   unsigned lastLength;
   BOOL lastReturn;
+  NSColor* patternColor;
 }
+
 + (void)stopAnimationsInView:(NSView*)aView;
-- (BOOL)incrementalLoadWithBytes:(const void*)bytes
-                          length:(unsigned)length
-                        complete:(BOOL)isComplete;
-- (void)beginAnimationInView:(NSView*)view
-                      inRect:(NSRect)ir
-                    fromRect:(NSRect)fr;
-- (void)stopAnimation;
-- (NSView*)frameView;
+
 @end
