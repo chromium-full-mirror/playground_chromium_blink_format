@@ -55,6 +55,7 @@ struct PropertyMapHashTableEntry {
   UString::Rep* key;
   ValueImp* value;
   int attributes;
+  int index;
 };
 
 class PropertyMap {
@@ -81,7 +82,7 @@ class PropertyMap {
   static bool keysMatch(const UString::Rep*, const UString::Rep*);
   void expand();
 
-  void insert(UString::Rep*, ValueImp* value, int attributes);
+  void insert(UString::Rep*, ValueImp* value, int attributes, int index);
 
   void checkConsistency();
 
