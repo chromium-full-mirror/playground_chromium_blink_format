@@ -47,6 +47,10 @@ class NSString;
 
 class QWMatrix;
 
+namespace khtml {
+class CachedImageCallback;
+}
+
 bool canRenderImageType(const QString& type);
 QPixmap* KWQLoadPixmap(const char* name);
 
@@ -78,7 +82,9 @@ class QPixmap : public QPaintDevice, public Qt {
 
   QPixmap& operator=(const QPixmap&);
 
-  bool receivedData(const QByteArray& bytes, bool isComplete);
+  bool receivedData(const QByteArray& bytes,
+                    bool isComplete,
+                    khtml::CachedImageCallback* decoderCallback);
   void stopAnimations();
 
   WebCoreImageRendererPtr image() { return imageRenderer; };
@@ -89,6 +95,8 @@ class QPixmap : public QPaintDevice, public Qt {
   void flushRasterCache();
 
   CGImageRef imageRef();
+
+  static bool shouldUseThreadedDecoding();
 
  private:
   WebCoreImageRendererPtr imageRenderer;

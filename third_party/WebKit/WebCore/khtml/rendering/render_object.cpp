@@ -2320,7 +2320,8 @@ void RenderObject::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {
   // into RenderObject.
 
   if (image && image->pixmap_size() == image->valid_rect().size() && parent()) {
-    if (element() && (element()->id() == ID_HTML || element()->id() == ID_BODY))
+    if (canvas() && element() &&
+        (element()->id() == ID_HTML || element()->id() == ID_BODY))
       canvas()->repaint();  // repaint the entire canvas since the background
                             // gets propagated up
     else

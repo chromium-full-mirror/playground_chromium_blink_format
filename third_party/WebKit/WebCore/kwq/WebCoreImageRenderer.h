@@ -29,7 +29,8 @@
 
 - (BOOL)incrementalLoadWithBytes:(const void*)bytes
                           length:(unsigned)length
-                        complete:(BOOL)isComplete;
+                        complete:(BOOL)isComplete
+                        callback:(id)c;
 
 - (NSSize)size;
 - (void)resize:(NSSize)s;

@@ -50,6 +50,8 @@
 }
 
 + (WebCoreImageRendererFactory*)sharedFactory;
++ (BOOL)shouldUseThreadedDecoding;
++ (void)setShouldUseThreadedDecoding:(BOOL)flag;
 @end
 
 @interface WebCoreImageRendererFactory (
