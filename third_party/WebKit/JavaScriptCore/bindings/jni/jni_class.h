@@ -102,6 +102,9 @@ class JavaClass : public Class {
   virtual long numConstructors() const { return _numConstructors; };
 
   void setClassName(const char* n);
+  bool isNumberClass() const;
+  bool isBooleanClass() const;
+  bool isStringClass() const;
 
  private:
   const char* _name;
