@@ -496,6 +496,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
 #ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;
+
+  void displayNode(const char* prefix);
+  void displayTree();
 #endif
 
   void registerNodeList(NodeListImpl* list);
