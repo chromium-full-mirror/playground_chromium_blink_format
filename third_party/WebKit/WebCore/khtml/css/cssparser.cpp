@@ -3190,7 +3190,8 @@ bool CSSSelector::operator==(const CSSSelector& other) {
   while (sel1 && sel2) {
     if (sel1->tag != sel2->tag || sel1->attr != sel2->attr ||
         sel1->relation != sel2->relation || sel1->match != sel2->match ||
-        sel1->nonCSSHint != sel2->nonCSSHint || sel1->value != sel2->value)
+        sel1->nonCSSHint != sel2->nonCSSHint || sel1->value != sel2->value ||
+        sel1->_pseudoType != sel2->_pseudoType)
       return false;
     sel1 = sel1->tagHistory;
     sel2 = sel2->tagHistory;
