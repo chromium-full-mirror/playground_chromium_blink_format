@@ -213,6 +213,9 @@ class ElementImpl : public NodeBaseImpl {
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
 
+#ifdef APPLE_CHANGES
+  static Element createInstance(ElementImpl* impl);
+#endif
  protected:
   void createAttributeMap() const;
   void createDecl();

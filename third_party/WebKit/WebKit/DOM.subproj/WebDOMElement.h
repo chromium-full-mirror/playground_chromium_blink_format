@@ -80,7 +80,7 @@
 
 - (void)removeAttribute:(NSString*)name;
 
-- (id<WebDOMAttr>)getAttributeNodeNamed:(NSString*)name;
+- (id<WebDOMAttr>)getAttributeNode:(NSString*)name;
 
 - (id<WebDOMAttr>)setAttributeNode:(id<WebDOMAttr>)newAttr;
 

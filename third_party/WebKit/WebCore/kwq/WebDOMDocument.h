@@ -80,10 +80,8 @@
 
 - (id<WebDOMAttr>)createAttribute:(NSString*)name;
 
-/*
-- (id<WebDOMAttr>)createAttributeNS:(NSString *)namespaceURI :(NSString
-*)qualifiedName;
-*/
+- (id<WebDOMAttr>)createAttributeNS:(NSString*)
+                       namespaceURI:(NSString*)qualifiedName;
 
 - (id<WebDOMEntityReference>)createEntityReference:(NSString*)name;
 

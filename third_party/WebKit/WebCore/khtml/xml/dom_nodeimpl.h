@@ -498,8 +498,11 @@ class NodeListImpl : public khtml::Shared<NodeListImpl> {
   virtual unsigned long length() const;
   virtual NodeImpl* item(unsigned long index) const;
 
-  // Other methods (not part of DOM)
+// Other methods (not part of DOM)
 
+#ifdef APPLE_CHANGES
+  static NodeList createInstance(NodeListImpl* impl);
+#endif
  protected:
   // helper functions for searching all ElementImpls in a tree
   unsigned long recursiveLength(NodeImpl* start) const;
