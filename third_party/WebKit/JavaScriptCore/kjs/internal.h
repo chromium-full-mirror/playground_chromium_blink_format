@@ -204,7 +204,9 @@ enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
  */
 class Parser {
  public:
-  static ProgramNode* parse(const UChar* code,
+  static ProgramNode* parse(const UString& sourceURL,
+                            int startingLineNumber,
+                            const UChar* code,
                             unsigned int length,
                             int* sourceId = 0,
                             int* errLine = 0,
@@ -277,7 +279,10 @@ class InterpreterImp {
 
   ExecState* globalExec() { return globExec; }
   bool checkSyntax(const UString& code);
-  Completion evaluate(const UString& code, const Value& thisV);
+  Completion evaluate(const UString& code,
+                      const Value& thisV,
+                      const UString& sourceURL,
+                      int startingLineNumber);
   Debugger* debugger() const { return dbg; }
   void setDebugger(Debugger* d);
 

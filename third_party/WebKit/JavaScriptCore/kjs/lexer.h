@@ -37,10 +37,14 @@ class Lexer {
   ~Lexer();
   static Lexer* curr();
 
-  void setCode(const UChar* c, unsigned int len);
+  void setCode(const UString& sourceURL,
+               int startingLineNumber,
+               const UChar* c,
+               unsigned int len);
   int lex();
 
   int lineNo() const { return yylineno + 1; }
+  UString sourceURL() const { return m_sourceURL; }
 
   bool prevTerminator() const { return terminator; }
 
@@ -75,6 +79,7 @@ class Lexer {
 
  private:
   int yylineno;
+  UString m_sourceURL;
   bool done;
   char* buffer8;
   UChar* buffer16;

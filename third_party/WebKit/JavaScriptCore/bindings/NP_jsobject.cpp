@@ -116,7 +116,8 @@ void NPN_Evaluate(NPScriptObject* o,
                          &UTF16Length);  // requires free() of returned memory.
   KJS::Value result =
       obj->root->interpreter()
-          ->evaluate(UString((const UChar*)scriptString, UTF16Length))
+          ->evaluate(UString(), 0,
+                     UString((const UChar*)scriptString, UTF16Length))
           .value();
   Interpreter::unlock();
 

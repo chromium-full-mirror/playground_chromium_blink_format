@@ -1261,8 +1261,9 @@ void DocumentImpl::open() {
           SIGNAL(finishedParsing()));
   m_tokenizer->begin();
 
-  if (m_view && m_view->part()->jScript())
-    m_view->part()->jScript()->setSourceFile(m_url, "");
+  if (m_view && m_view->part()->jScript()) {
+    m_view->part()->jScript()->setSourceFile(m_url, "");  // fixme
+  }
 }
 
 HTMLElementImpl* DocumentImpl::body() {

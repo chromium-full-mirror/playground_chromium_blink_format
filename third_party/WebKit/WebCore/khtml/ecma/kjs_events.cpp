@@ -126,11 +126,15 @@ void JSEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
                           .ascii();
       int lineNumber =
           exec->exception().toObject(exec).get(exec, "line").toInt32(exec);
+      UString sourceURL = exec->exception()
+                              .toObject(exec)
+                              .get(exec, "sourceURL")
+                              .toString(exec);
       KJS::Interpreter::unlock();
       if (Interpreter::shouldPrintExceptions()) {
         printf("(event handler):%s\n", message);
       }
-      KWQ(part)->addMessageToConsole(message, lineNumber);
+      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL.qstring());
       exec->clearException();
     }
 #else

@@ -112,6 +112,7 @@ class Node {
                    const char* msg,
                    Identifier label);
   int line;
+  UString sourceURL;
   unsigned int refcount;
   virtual int sourceId() const { return -1; }
 
