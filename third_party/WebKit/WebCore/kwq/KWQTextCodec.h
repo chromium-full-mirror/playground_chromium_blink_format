@@ -43,6 +43,7 @@ class QTextCodec {
 
   const char* name() const;
   bool usesVisualOrdering() const { return _flags & VisualOrdering; }
+  bool isJapanese() const { return _flags & IsJapanese; }
 
   QTextDecoder* makeDecoder() const;
 
