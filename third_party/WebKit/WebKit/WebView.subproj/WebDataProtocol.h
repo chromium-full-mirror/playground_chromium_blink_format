@@ -28,6 +28,7 @@
 - (NSString*)_webDataRequestEncoding;
 - (NSString*)_webDataRequestMIMEType;
 - (NSMutableURLRequest*)_webDataRequestExternalRequest;
+- (void)_webDataRequestSanitize;
 @end
 
 @interface NSMutableURLRequest (WebDataRequest)
