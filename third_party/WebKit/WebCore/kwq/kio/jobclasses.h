@@ -30,6 +30,7 @@
 #include <config.h>
 #endif
 
+#include <kurl.h>
 #include <qobject.h>
 #include <qstring.h>
 
@@ -58,7 +59,7 @@ class Job : public QObject {
   int error();
   const QString& errorText();
   QString errorString();
-  virtual void kill(bool quietly = true);
+  virtual void kill(bool quietly = TRUE);
 
   // operators ---------------------------------------------------------------
 
@@ -130,13 +131,15 @@ class SimpleJob : public KIO::Job {
 
 class TransferJob : public SimpleJob {
  public:
-// structs -----------------------------------------------------------------
-// typedefs ----------------------------------------------------------------
-// enums -------------------------------------------------------------------
-// constants ---------------------------------------------------------------
-// static member functions -------------------------------------------------
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
+  // constructors, copy constructors, and destructors ------------------------
+
+  TransferJob(const KURL&, bool reload = false, bool showProgressInfo = true);
 
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
@@ -152,6 +155,7 @@ class TransferJob : public SimpleJob {
 
   bool isErrorPage() const;
   void addMetaData(const QString& key, const QString& value);
+  void kill(bool quietly = TRUE);
 
   // operators ---------------------------------------------------------------
 
@@ -161,6 +165,12 @@ class TransferJob : public SimpleJob {
   // ---------------------------------------------------------------------
 
  private:
+  KURL _url;
+  bool _reload;
+  bool _showProgressInfo;
+
+  void doLoad();
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_

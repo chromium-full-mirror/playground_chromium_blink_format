@@ -30,9 +30,11 @@
 #include <config.h>
 #endif
 
-#include "qnamespace.h"
-#include "qpalette.h"
-#include "qwidget.h"
+#include <qnamespace.h>
+#include <qpalette.h>
+#include <qwidget.h>
+#include <qrect.h>
+#include <qsize.h>
 
 // class QToolTip ==============================================================
 
@@ -56,6 +58,9 @@ class QToolTip : public Qt {
 #endif
 
   // member functions --------------------------------------------------------
+
+  void tip(const QRect&, const QString&);
+
   // operators ---------------------------------------------------------------
 
   // protected

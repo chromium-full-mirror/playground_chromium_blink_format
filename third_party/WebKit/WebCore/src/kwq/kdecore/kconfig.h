@@ -60,6 +60,13 @@ class KConfigBase {
 
   void setGroup(const QString& pGroup);
 
+  void writeEntry(const QString& pKey,
+                  const QStringList& rValue,
+                  char sep = ',',
+                  bool bPersistent = true,
+                  bool bGlobal = false,
+                  bool bNLS = false);
+
   QString readEntry(const char* pKey,
                     const QString& aDefault = QString::null) const;
 
@@ -71,6 +78,8 @@ class KConfigBase {
   bool readBoolEntry(const char* pKey, bool nDefault = 0) const;
 
   QColor readColorEntry(const char* pKey, const QColor* pDefault = 0L) const;
+
+  QStringList readListEntry(const QString& pKey, char sep = ',') const;
 
   // operators ---------------------------------------------------------------
 
