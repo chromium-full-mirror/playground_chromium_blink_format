@@ -1102,6 +1102,17 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   }
 
   if (inside) {
+    if (info.innerNode() && info.innerNode()->renderer() &&
+        !info.innerNode()->renderer()->isInline() && element() && isInline()) {
+      // Within the same layer, inlines are ALWAYS fully above blocks.  Change
+      // inner node.
+      info.setInnerNode(element());
+
+      // Clear everything else.
+      info.setInnerNonSharedNode(0);
+      info.setURLElement(0);
+    }
+
     if (!info.innerNode() && element())
       info.setInnerNode(element());
 
