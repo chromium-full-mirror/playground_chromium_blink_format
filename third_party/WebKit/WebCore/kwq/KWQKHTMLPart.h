@@ -238,6 +238,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   QRect selectionRect() const;
   NSRect visibleSelectionRect() const;
+  void centerSelectionInVisibleArea() const;
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(DOM::Node node,
                              NSRect* imageRect,
