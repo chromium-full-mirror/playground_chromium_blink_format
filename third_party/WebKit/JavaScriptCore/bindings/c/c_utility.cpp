@@ -98,7 +98,7 @@ void convertValueToNPVariant(KJS::ExecState* exec,
     NPN_InitializeVariantAsNull(result);
   } else if (type == ObjectType) {
     KJS::ObjectImp* objectImp = static_cast<KJS::ObjectImp*>(value.imp());
-    if (strcmp(objectImp->classInfo()->className, "RuntimeObject") == 0) {
+    if (objectImp->classInfo() == &KJS::RuntimeObjectImp::info) {
       KJS::RuntimeObjectImp* imp =
           static_cast<KJS::RuntimeObjectImp*>(value.imp());
       CInstance* instance = static_cast<CInstance*>(imp->getInternalInstance());
