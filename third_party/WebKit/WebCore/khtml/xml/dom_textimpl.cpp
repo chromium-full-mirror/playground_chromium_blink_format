@@ -387,7 +387,8 @@ bool TextImpl::rendererIsNeeded(RenderStyle* style) {
 
   RenderObject* par = parentNode()->renderer();
 
-  if (par->isTable() || par->isTableRow() || par->isTableSection()) {
+  if (par->isTable() || par->isTableRow() || par->isTableSection() ||
+      par->isTableCol()) {
     return false;
   }
 
