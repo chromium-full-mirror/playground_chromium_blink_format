@@ -3865,7 +3865,7 @@ void KHTMLPart::reparseConfiguration() {
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
   else
-    setUserStyleSheet(KURL(QString::null));
+    setUserStyleSheet(QString::null);
 
   QApplication::setOverrideCursor(waitCursor);
   if (d->m_doc)
