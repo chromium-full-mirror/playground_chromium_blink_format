@@ -577,11 +577,23 @@ bool RenderPart::partLoadingErrorNotify(khtml::ChildFrame*,
 }
 
 short RenderPart::intrinsicWidth() const {
+// KDE may need a non-zero width here, although this will mess up pages (e.g.,
+// thinker.org).
+#if APPLE_CHANGES
+  return 0;
+#else
   return 300;
+#endif
 }
 
 int RenderPart::intrinsicHeight() const {
+// KDE may need a non-zero height here, although this will mess up pages (e.g.,
+// thinker.org).
+#if APPLE_CHANGES
+  return 0;
+#else
   return 200;
+#endif
 }
 
 void RenderPart::slotViewCleared() {}
