@@ -68,8 +68,6 @@ class QLineEdit : public QWidget {
 
   void clicked();
 
-  bool hasMarkedText();
-
   virtual bool checksDescendantsForFocus() const;
 
  private:
