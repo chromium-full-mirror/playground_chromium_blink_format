@@ -72,7 +72,11 @@ class ObjcMethod : public Method {
   ObjcMethod() : Method(), _objcClass(0), _selector(0){};
 
   ObjcMethod(struct objc_class* aClass, const char* _selector);
-  ~ObjcMethod(){};
+  ~ObjcMethod() {
+    if (_javaScriptName)
+      ;
+    CFRelease(_javaScriptName);
+  };
 
   ObjcMethod(const ObjcMethod& other) : Method() {
     _objcClass = other._objcClass;
@@ -95,9 +99,17 @@ class ObjcMethod : public Method {
 
   NSMethodSignature* getMethodSignature() const;
 
+  bool isFallbackMethod() const {
+    return strcmp(_selector,
+                  "invokeUndefinedMethodFromWebScript:withArguments:") == 0;
+  }
+  void setJavaScriptName(CFStringRef n);
+  CFStringRef javaScriptName() const { return _javaScriptName; }
+
  private:
   struct objc_class* _objcClass;
   const char* _selector;
+  CFStringRef _javaScriptName;
 };
 
 class ObjcArray : public Array {
