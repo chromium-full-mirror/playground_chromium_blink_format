@@ -110,6 +110,7 @@ extern void WebCoreInitializeEmptyTextGeometry(WebCoreTextGeometry* geometry);
                         color:(NSColor*)color
                     thickness:(float)thickness;
 - (void)drawLineForMisspelling:(NSPoint)point withWidth:(int)width;
+- (int)misspellingLineThickness;
 
 // selection point check
 - (int)pointToOffset:(const WebCoreTextRun*)run
