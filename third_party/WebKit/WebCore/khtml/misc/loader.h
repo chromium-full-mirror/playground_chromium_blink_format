@@ -103,22 +103,10 @@ class CachedObject {
     Uncacheable  // to big to be cached,
   };             // will be destroyed as soon as possible
 
-#ifdef APPLE_CHANGES
-  CachedObject(const DocLoader* loader,
-               const DOM::DOMString& url,
-               Type type,
-               KIO::CacheControl _cachePolicy,
-               time_t _expireDate)
-#else
   CachedObject(const DOM::DOMString& url,
                Type type,
                KIO::CacheControl _cachePolicy,
-               time_t _expireDate)
-#endif
-  {
-#ifdef APPLE_CHANGES
-    m_loader = loader;
-#endif
+               time_t _expireDate) {
     m_url = url;
     m_type = type;
     m_status = Pending;
@@ -185,14 +173,8 @@ class CachedObject {
   // e.g. "text/*"
   QString accept() const { return m_accept; }
   void setAccept(const QString& _accept) { m_accept = _accept; }
-#ifdef APPLE_CHANGES
-  const DocLoader* loader() { return m_loader; }
-#endif
 
  protected:
-#ifdef APPLE_CHANGES
-  const DocLoader* m_loader;
-#endif
   QPtrList<CachedObjectClient> m_clients;
 
   DOM::DOMString m_url;

@@ -36,7 +36,6 @@ class TransferJob;
 class KWQLoaderImpl {
  public:
   KWQLoaderImpl(khtml::Loader*);
-  ~KWQLoaderImpl();
 
   void setClient(khtml::Request*);
   void serveRequest(khtml::Request*, KIO::TransferJob*);

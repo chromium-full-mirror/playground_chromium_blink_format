@@ -7,9 +7,6 @@
 
 @class IFError;
 @class IFWebDataSource;
-@class IFWebCoreBridge;
-
-class KHTMLPart;
 
 @protocol IFDocumentRepresentation;
 

@@ -122,12 +122,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          KIO::CacheControl _cachePolicy,
                                          time_t _expireDate,
                                          const QString& charset)
-#ifdef APPLE_CHANGES
-    : CachedObject(dl, url, CSSStyleSheet, _cachePolicy, _expireDate)
-#else
-    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate)
-#endif
-{
+    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate) {
   // It's css we want.
   setAccept(QString::fromLatin1("text/css"));
   // load the file
@@ -142,12 +137,7 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(const DOMString& url,
                                          const QString& stylesheet_data)
-#ifdef APPLE_CHANGES
-    : CachedObject(0, url, CSSStyleSheet, KIO::CC_Verify, 0)
-#else
-    : CachedObject(url, CSSStyleSheet, KIO::CC_Verify, 0)
-#endif
-{
+    : CachedObject(url, CSSStyleSheet, KIO::CC_Verify, 0) {
   m_loading = false;
   m_status = Persistent;
   m_codec = 0;
@@ -211,12 +201,7 @@ CachedScript::CachedScript(DocLoader* dl,
                            KIO::CacheControl _cachePolicy,
                            time_t _expireDate,
                            const QString& charset)
-#ifdef APPLE_CHANGES
-    : CachedObject(dl, url, Script, _cachePolicy, _expireDate)
-#else
-    : CachedObject(url, Script, _cachePolicy, _expireDate)
-#endif
-{
+    : CachedObject(url, Script, _cachePolicy, _expireDate) {
   // It's javascript we want.
   // But some websites think their scripts are <some wrong mimetype here>
   // and refuse to serve them if we only accept application/x-javascript.
@@ -232,12 +217,7 @@ CachedScript::CachedScript(DocLoader* dl,
 }
 
 CachedScript::CachedScript(const DOMString& url, const QString& script_data)
-#ifdef APPLE_CHANGES
-    : CachedObject(0, url, Script, KIO::CC_Verify, 0)
-#else
-    : CachedObject(url, Script, KIO::CC_Verify, 0)
-#endif
-{
+    : CachedObject(url, Script, KIO::CC_Verify, 0) {
   m_loading = false;
   m_status = Persistent;
   m_codec = 0;
@@ -447,13 +427,7 @@ CachedImage::CachedImage(DocLoader* dl,
                          const DOMString& url,
                          KIO::CacheControl _cachePolicy,
                          time_t _expireDate)
-#ifdef APPLE_CHANGES
-    : CachedObject(dl, url, Image, _cachePolicy, _expireDate)
-#else
-    : QObject(),
-      CachedObject(url, Image, _cachePolicy, _expireDate)
-#endif
-{
+    : QObject(), CachedObject(url, Image, _cachePolicy, _expireDate) {
 #ifndef APPLE_CHANGES
   static const QString& acceptHeader =
       KGlobal::staticQString(buildAcceptHeader());
