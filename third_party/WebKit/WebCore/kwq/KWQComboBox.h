@@ -63,6 +63,7 @@ class QComboBox : public QWidget {
 
   void setWritingDirection(QPainter::TextDirection);
 
+  virtual void populate();
   void populateMenu();
 
  private:
