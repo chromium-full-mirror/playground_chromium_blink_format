@@ -37,6 +37,7 @@
 @class IFLoadProgress;
 @class IFWebDataSource;
 @class IFWebFrame;
+@protocol IFWebController;
 
 /*
    =============================================================================
@@ -88,10 +89,9 @@
 
 // Need API for things like window size and position, window ids,
 // screen goemetry.  Essentially all the 'view' items that are
-// accessible from Javascript.
 
 // FIXME: not strictly a scripting issue
-- (void)openNewWindowWithURL:(NSURL*)url;
+- (id<IFWebController>)openNewWindowWithURL:(NSURL*)url;
 @end
 
 /*

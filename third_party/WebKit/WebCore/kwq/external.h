@@ -27,6 +27,7 @@
 #define __EXTERNAL_H_
 
 #import <WebFoundation/WebFoundation.h>
+#include <misc/loader.h>
 
 class KHTMLPart;
 class QWidget;
@@ -45,7 +46,8 @@ class Loader;
 @protocol IFWebController
 - (IFWebFrame *)createFrameNamed: (NSString *)name for: (IFWebDataSource *)dataSource inParent: (IFWebDataSource *)dataSource inScrollView: (BOOL)inScrollView;
 - (IFWebFrame*)frameNamed:(NSString*)name;
-- (void)openNewWindowWithURL:(NSURL*)url;
+- (IFWebFrame*)mainFrame;
+- (id<IFWebController>)openNewWindowWithURL:(NSURL*)url;
 @end
 
 @interface IFBaseWebController
@@ -101,6 +103,7 @@ class Loader;
 - initWithName:(NSString*)n view:v dataSource:(IFWebDataSource*)d;
 - view;
 - (IFWebDataSource*)dataSource;
+- (IFWebDataSource*)provisionalDataSource;
 - (void)setProvisionalDataSource:(IFWebDataSource*)ds;
 - (void)_setRenderFramePart:(void*)p;
 - (void*)_renderFramePart;

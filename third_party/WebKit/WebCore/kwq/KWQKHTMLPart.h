@@ -38,6 +38,7 @@ class KWQKHTMLPartImpl : public QObject {
 
   void setView(KHTMLView* view);
 
+  bool openURLInFrame(const KURL&, const KParts::URLArgs&);
   void openURL(const KURL&);
   void begin(const KURL&, int xOffset, int yOffset);
   void write(const char* str, int len);
