@@ -140,7 +140,7 @@ class RenderFlow : public RenderBox {
   virtual void newLine();
 
   void layoutBlockChildren(bool relayoutChildren);
-  void layoutInlineChildren();
+  void layoutInlineChildren(bool relayoutChildren);
   void layoutSpecialObjects(bool relayoutChildren);
 
  public:

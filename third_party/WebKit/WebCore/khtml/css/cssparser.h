@@ -186,6 +186,7 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
                       bool important,
                       bool nonCSSHint,
                       QPtrList<CSSProperty>* propList);
+  bool isHexadecimal(const QChar& c);
   QPtrList<QChar> splitShorthandProperties(const QChar* curP,
                                            const QChar* endP);
   bool parseBackgroundPosition(const QChar* curP,

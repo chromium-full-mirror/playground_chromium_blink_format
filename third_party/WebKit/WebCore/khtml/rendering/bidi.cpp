@@ -1023,7 +1023,7 @@ static void deleteMidpoints(RenderArena* arena,
   }
 }
 
-void RenderFlow::layoutInlineChildren() {
+void RenderFlow::layoutInlineChildren(bool relayoutChildren) {
   m_overflowHeight = 0;
 
   invalidateVerticalPositions();
@@ -1050,8 +1050,8 @@ void RenderFlow::layoutInlineChildren() {
     while (o) {
       if (o->isReplaced() || o->isFloating() || o->isPositioned()) {
         // kdDebug(6041) << "layouting replaced or floating child" << endl;
-        if (o->isReplaced() && (o->style()->width().isPercent() ||
-                                o->style()->height().isPercent()))
+        if (relayoutChildren || o->style()->width().isPercent() ||
+            o->style()->height().isPercent())
           o->setLayouted(false);
         if (!o->layouted())
           o->layout();
