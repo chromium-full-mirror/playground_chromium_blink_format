@@ -250,6 +250,7 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
     d->m_paSelectAll->setShortcut(KShortcut());  // avoid clashes
 #endif
 
+#if !APPLE_CHANGES
   // set the default java(script) flags according to the current host.
   d->m_bJScriptEnabled =
       KHTMLFactory::defaultHTMLSettings()->isJavaScriptEnabled();
@@ -258,6 +259,10 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_bJavaEnabled = KHTMLFactory::defaultHTMLSettings()->isJavaEnabled();
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled();
+#else
+// The java, javascript, and plugin settings will be set after the settings
+// have been initialized.
+#endif
 
 #if !APPLE_CHANGES
   connect(this, SIGNAL(completed()), this, SLOT(updateActions()));
@@ -359,7 +364,8 @@ bool KHTMLPart::restoreURL(const KURL& url) {
   d->m_bLoadEventEmitted = false;
   d->m_workingURL = url;
 
-  // set the java(script) flags according to the current host.
+// set the java(script) flags according to the current host.
+#if !APPLE_CHANGES
   d->m_bJScriptEnabled =
       KHTMLFactory::defaultHTMLSettings()->isJavaScriptEnabled(url.host());
   d->m_bJScriptDebugEnabled =
@@ -368,6 +374,12 @@ bool KHTMLPart::restoreURL(const KURL& url) {
       KHTMLFactory::defaultHTMLSettings()->isJavaEnabled(url.host());
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled(url.host());
+#else
+  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled(url.host());
+  d->m_bJScriptDebugEnabled = d->m_settings->isJavaScriptDebugEnabled();
+  d->m_bJavaEnabled = d->m_settings->isJavaEnabled(url.host());
+  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled(url.host());
+#endif
 
   m_url = url;
 
@@ -501,13 +513,19 @@ bool KHTMLPart::openURL(const KURL& url)
     d->m_kjsDefaultStatusBarText = QString::null;
   }
 
-  // set the javascript flags according to the current url
+// set the javascript flags according to the current url
+#if !APPLE_CHANGES
   d->m_bJScriptDebugEnabled =
       KHTMLFactory::defaultHTMLSettings()->isJavaScriptDebugEnabled();
   d->m_bJavaEnabled =
       KHTMLFactory::defaultHTMLSettings()->isJavaEnabled(url.host());
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled(url.host());
+#else
+  d->m_bJScriptDebugEnabled = d->m_settings->isJavaScriptDebugEnabled();
+  d->m_bJavaEnabled = d->m_settings->isJavaEnabled(url.host());
+  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled(url.host());
+#endif
 
   // initializing m_url to the new url breaks relative links when opening such a
   // link after this call and _before_ begin() is called (when the first
@@ -1343,10 +1361,14 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 
   clear();
 
-  // Only do this after clearing the part, so that JavaScript can
-  // clean up properly if it was on for the last load.
+// Only do this after clearing the part, so that JavaScript can
+// clean up properly if it was on for the last load.
+#if !APPLE_CHANGES
   d->m_bJScriptEnabled =
       KHTMLFactory::defaultHTMLSettings()->isJavaScriptEnabled(url.host());
+#else
+  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled(url.host());
+#endif
 
   d->m_bCleared = false;
   d->m_cacheId = 0;
@@ -1412,8 +1434,12 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   // We prefer m_baseURL over m_url because m_url changes when we are
   // about to load a new page.
   d->m_doc->setBaseURL(baseurl.url());
+#if !APPLE_CHANGES
   d->m_doc->docLoader()->setShowAnimations(
       KHTMLFactory::defaultHTMLSettings()->showAnimations());
+#else
+  d->m_doc->docLoader()->setShowAnimations(d->m_settings->showAnimations());
+#endif
 
 #if APPLE_CHANGES
   KWQ(this)->updatePolicyBaseURL();
@@ -1424,9 +1450,15 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_paUseStylesheet->setEnabled(false);
 #endif
 
+#if !APPLE_CHANGES
   setAutoloadImages(KHTMLFactory::defaultHTMLSettings()->autoLoadImages());
   QString userStyleSheet =
       KHTMLFactory::defaultHTMLSettings()->userStyleSheet();
+#else
+  setAutoloadImages(d->m_settings->autoLoadImages());
+  QString userStyleSheet = d->m_settings->userStyleSheet();
+#endif
+
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
 
@@ -3857,9 +3889,7 @@ void KHTMLPart::slotLoadImages() {
 #endif
 
 void KHTMLPart::reparseConfiguration() {
-  KHTMLSettings* settings = KHTMLFactory::defaultHTMLSettings();
-  settings->init();
-
+#if !APPLE_CHANGES
   setAutoloadImages(settings->autoLoadImages());
   if (d->m_doc)
     d->m_doc->docLoader()->setShowAnimations(settings->showAnimations());
@@ -3873,6 +3903,18 @@ void KHTMLPart::reparseConfiguration() {
 
   QString userStyleSheet =
       KHTMLFactory::defaultHTMLSettings()->userStyleSheet();
+#else
+  setAutoloadImages(d->m_settings->autoLoadImages());
+  if (d->m_doc)
+    d->m_doc->docLoader()->setShowAnimations(d->m_settings->showAnimations());
+
+  d->m_bJScriptEnabled = d->m_settings->isJavaScriptEnabled(m_url.host());
+  d->m_bJScriptDebugEnabled = d->m_settings->isJavaScriptDebugEnabled();
+  d->m_bJavaEnabled = d->m_settings->isJavaEnabled(m_url.host());
+  d->m_bPluginsEnabled = d->m_settings->isPluginsEnabled(m_url.host());
+
+  QString userStyleSheet = d->m_settings->userStyleSheet();
+#endif
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
   else
