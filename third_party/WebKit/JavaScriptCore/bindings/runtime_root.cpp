@@ -182,6 +182,9 @@ void KJS::Bindings::addNativeReference(const Bindings::RootObject* root,
 }
 
 void KJS::Bindings::removeNativeReference(ObjectImp* imp) {
+  if (!imp)
+    return;
+
   CFMutableDictionaryRef referencesDictionary = findReferenceDictionary(imp);
 
   if (referencesDictionary) {
