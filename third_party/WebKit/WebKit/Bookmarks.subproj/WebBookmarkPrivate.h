@@ -12,7 +12,6 @@
 #define WebBookmarkTypeKey @"WebBookmarkType"
 #define WebBookmarkTypeLeafValue @"WebBookmarkTypeLeaf"
 #define WebBookmarkTypeListValue @"WebBookmarkTypeList"
-#define WebBookmarkTypeSeparatorValue @"WebBookmarkTypeSeparator"
 
 @interface WebBookmark (WebPrivate)
 
