@@ -157,6 +157,8 @@ class CSSStyleSelector : public StyleSelector {
   CSSStyleSelectorList* userStyle;
   DOM::CSSStyleSheetImpl* userSheet;
 
+  static RenderStyle* displayNoneStyle;
+
  private:
   void init();
 
