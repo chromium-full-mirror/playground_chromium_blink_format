@@ -100,6 +100,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)restoreDocumentState;
 - (void)end;
 
+- (NSURL*)URL;
+
 - (void)installInFrame:(NSView*)view;
 - (void)removeFromFrame;
 
@@ -231,8 +233,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)unfocusWindow;
 
 - (BOOL)modifierTrackingEnabled;
-
-- (void)addBackForwardItemWithURL:(NSURL*)URL anchor:(NSString*)anchor;
 
 - (NSView*)nextKeyViewOutsideWebViews;
 - (NSView*)previousKeyViewOutsideWebViews;

@@ -28,13 +28,9 @@
   WebController* controller;
 
   // The original URL as requested during initialization.
-  NSURL* inputURL;
   WebResourceRequest* originalRequest;
   WebResourceRequest* request;
   WebResourceResponse* response;
-
-  // The original URL we may have been redirected to.
-  NSURL* finalURL;
 
   // Client for main resource, and corresponding handle.
   WebMainResourceClient* mainClient;
