@@ -50,6 +50,7 @@ class QScrollView : public QFrame {
   void scrollBy(int dx, int dy);
 
   void setContentsPos(int x, int y);
+  void setContentsPosRecursive(int, int);
 
   virtual void setVScrollBarMode(ScrollBarMode vMode);
   virtual void setHScrollBarMode(ScrollBarMode hMode);
