@@ -226,6 +226,10 @@ long HTMLImageElementImpl::width() const {
     docimpl->updateLayout();
   }
 
+  if (!m_render) {
+    return 0;
+  }
+
   return m_render->contentWidth();
 }
 
@@ -243,6 +247,10 @@ long HTMLImageElementImpl::height() const {
   DOM::DocumentImpl* docimpl = getDocument();
   if (docimpl) {
     docimpl->updateLayout();
+  }
+
+  if (!m_render) {
+    return 0;
   }
 
   return m_render->contentHeight();
