@@ -1,8 +1,6 @@
 /*
         WebFormDelegate.h
         Copyright 2003, Apple Computer, Inc.
-
-        Public header file.
 */
 
 #import <AppKit/AppKit.h>
@@ -57,6 +55,10 @@
                textView:(NSTextView*)textView
     doCommandBySelector:(SEL)commandSelector
                 inFrame:(WebFrame*)frame;
+- (BOOL)control:(NSControl*)control
+             textView:(NSTextView*)textView
+    shouldHandleEvent:(NSEvent*)event
+              inFrame:(WebFrame*)frame;
 
 // Sent when a form is just about to be submitted (before the load is started)
 // listener must be sent continue when the delegate is done.

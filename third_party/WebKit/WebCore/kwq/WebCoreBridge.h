@@ -599,6 +599,9 @@ typedef enum {
 - (BOOL)control:(NSControl*)control
                textView:(NSTextView*)textView
     doCommandBySelector:(SEL)commandSelector;
+- (BOOL)control:(NSControl*)control
+             textView:(NSTextView*)textView
+    shouldHandleEvent:(NSEvent*)event;
 
 - (NSView<WebCoreFileButton>*)fileButtonWithDelegate:
     (id<WebCoreFileButtonDelegate>)delegate;
