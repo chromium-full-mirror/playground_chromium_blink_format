@@ -1400,7 +1400,7 @@ static Length convertToLength(CSSPrimitiveValueImpl* primitiveValue,
                               bool* ok = 0) {
   Length l;
   if (!primitiveValue) {
-    if (*ok)
+    if (ok)
       *ok = false;
   } else {
     int type = primitiveValue->primitiveType();
@@ -1878,7 +1878,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
-        fontDef.smallCaps = parentStyle->htmlFont().fontDef.weight;
+        fontDef.smallCaps = parentStyle->htmlFont().fontDef.smallCaps;
       } else {
         if (!primitiveValue)
           return;
