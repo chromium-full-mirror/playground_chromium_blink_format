@@ -49,11 +49,9 @@ class Part : public QObject {
   QWidget* widget() const { return m_widget; }
   void setWidget(QWidget* widget) { m_widget = widget; }
 
-  void ref() { m_ref++; }
+  void ref() { ++m_ref; }
   void deref() {
-    if (m_ref)
-      m_ref--;
-    if (!m_ref)
+    if (!--m_ref)
       delete this;
   }
 

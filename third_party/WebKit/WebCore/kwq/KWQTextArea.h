@@ -35,14 +35,12 @@ class QWidget;
 - initWithFrame:(NSRect)r widget:(QWidget*)w;
 
 // The following methods corresponds to methods required by KDE.
-- (void)setWordWrap:(BOOL)f;
+- (void)setWordWrap:(BOOL)wrap;
 - (BOOL)wordWrap;
-- (BOOL)isReadOnly;
-- (void)setReadOnly:(BOOL)flag;
 - (void)setText:(NSString*)s;
 - (NSString*)text;
-- (NSString*)textForLine:(int)line;
 - (int)numLines;
+- (NSString*)textForLine:(int)line;
 - (void)selectAll;
 - (void)setEditable:(BOOL)flag;
 - (BOOL)isEditable;
