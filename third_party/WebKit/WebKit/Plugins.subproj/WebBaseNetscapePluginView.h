@@ -31,6 +31,7 @@
 
   BOOL isStarted;
   BOOL inSetWindow;
+  BOOL suspendKeyUpEvents;
 
   int32 specifiedHeight;
   int32 specifiedWidth;
