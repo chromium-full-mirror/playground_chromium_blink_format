@@ -8,7 +8,7 @@
 #import <WCPlugin.h>
 #include <qwidget.h>
 #include <npapi.h>
-#include <WCURLHandle.h>
+#import <WebFoundation/WebFoundation.h>
 
 typedef struct _StreamData {
   uint16 transferMode;
@@ -44,7 +44,7 @@ typedef struct _StreamData {
 
   NSString *URL, *mime;
   NSTrackingRectTag trackingTag;
-  NSMutableArray* filesToErase;
+  NSMutableArray *filesToErase, *activeURLHandles;
 
   NPP_NewProcPtr NPP_New;
   NPP_DestroyProcPtr NPP_Destroy;
