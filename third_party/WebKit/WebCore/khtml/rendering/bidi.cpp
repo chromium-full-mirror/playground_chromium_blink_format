@@ -1393,10 +1393,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             goto end;
           }
 
-          lBreak.obj = o;
-          lBreak.pos = pos;
-
           if (*(str + pos) == '\n' && isPre) {
+            lBreak.obj = o;
+            lBreak.pos = pos;
+
 #ifdef DEBUG_LINEBREAKS
             kdDebug(6041) << "forced break sol: " << start.obj << " "
                           << start.pos << "   end: " << lBreak.obj << " "
@@ -1405,8 +1405,13 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             return lBreak;
           }
 
-          w += tmpW;
-          tmpW = 0;
+          if (o->style()->whiteSpace() == NORMAL) {
+            w += tmpW;
+            tmpW = 0;
+            lBreak.obj = o;
+            lBreak.pos = pos;
+          }
+
           lastSpace = pos;
 
           if (applyWordSpacing)
@@ -1462,7 +1467,40 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
     } else
       KHTMLAssert(false);
 
-    if (w + tmpW > width + 1 && o->style()->whiteSpace() == NORMAL) {
+    RenderObject* next = Bidinext(start.par, o);
+    bool isNormal = o->style()->whiteSpace() == NORMAL;
+    bool checkForBreak = isNormal;
+    if (next && o->isText() && next->isText() && !next->isBR()) {
+      if (isNormal || (next->style()->whiteSpace() == NORMAL)) {
+        if (currentCharacterIsSpace)
+          checkForBreak = true;
+        else {
+          RenderText* nextText = static_cast<RenderText*>(next);
+          int strlen = nextText->stringLength();
+          QChar* str = nextText->text();
+          if (strlen &&
+              ((str[0].direction() == QChar::DirWS) ||
+               (next->style()->whiteSpace() != PRE && str[0] == '\n')))
+            // If the next item on the line is text, and if we did not end with
+            // a space, then the next text run continues our word (and so it
+            // needs to
+            // keep adding to |tmpW|.  Just update and continue.
+            checkForBreak = true;
+          else
+            checkForBreak = false;
+
+          bool canPlaceOnLine = (w + tmpW <= width + 1) || !isNormal;
+          if (canPlaceOnLine && checkForBreak) {
+            w += tmpW;
+            tmpW = 0;
+            lBreak.obj = next;
+            lBreak.pos = 0;
+          }
+        }
+      }
+    }
+
+    if (checkForBreak && (w + tmpW > width + 1)) {
       // kdDebug() << " too wide w=" << w << " tmpW = " << tmpW << " width = "
       // << width << endl;
       // kdDebug() << "start=" << start.obj << " current=" << o << endl;
@@ -1482,23 +1520,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 #endif
       }
 
-      if (!w && w + tmpW > width + 1 &&
-          (o != start.obj || (unsigned)pos != start.pos)) {
-        // getting below floats wasn't enough...
-        // kdDebug() << "still too wide w=" << w << " tmpW = " << tmpW << "
-        // width = " << width << endl;
-        lBreak.obj = o;
-        if (last != o) {
-          // kdDebug() << " using last " << last << endl;
-          lBreak.pos = 0;
-        } else if (unsigned(pos) >= o->length()) {
-          lBreak.obj = Bidinext(start.par, o);
-          lBreak.pos = 0;
-        } else {
-          lBreak.pos = pos;
-        }
-      }
-
       // |width| may have been adjusted because we got shoved down past a float
       // (thus
       // giving us more room), so we need to retest, and only jump to
@@ -1508,7 +1529,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
     }
 
     last = o;
-    o = Bidinext(start.par, o);
+    o = next;
 
     if (!last->isSpecial() && last->isReplaced() &&
         last->style()->whiteSpace() != NOWRAP) {
@@ -1518,6 +1539,12 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       lBreak.obj = o;
       lBreak.pos = 0;
     }
+
+    // Clear out our character space bool, since inline <pre>s don't collapse
+    // whitespace
+    // with adjacent inline normal/nowrap spans.
+    if (last->style()->whiteSpace() == PRE)
+      currentCharacterIsSpace = false;
 
     pos = 0;
   }

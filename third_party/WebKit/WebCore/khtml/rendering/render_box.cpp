@@ -67,6 +67,8 @@ void RenderBox::setStyle(RenderStyle* _style) {
   // _style->backgroundYPosition().isVariable())
   // style()->setBackgroundYPosition(Length(50, Percent));
 
+  setInline(style()->display() == INLINE);
+
   switch (_style->position()) {
     case ABSOLUTE:
     case FIXED:
@@ -603,7 +605,7 @@ int RenderBox::calcWidthUsing(WidthType widthType,
     if (cw)
       width = cw - marginLeft - marginRight;
 
-    if (isFloating()) {
+    if (isFloating() || isCompact()) {
       if (width < m_minWidth)
         width = m_minWidth;
       if (width > m_maxWidth)

@@ -59,6 +59,8 @@ class RenderBox : public RenderContainer {
 
   virtual short minWidth() const { return m_minWidth; }
   virtual short maxWidth() const { return m_maxWidth; }
+  virtual void setMaxWidth(short s) { m_maxWidth = s; }
+  virtual void setMinWidth(short s) { m_minWidth = s; }
 
   virtual short contentWidth() const;
   virtual int contentHeight() const;

@@ -58,8 +58,9 @@ RenderBlock::~RenderBlock() {
 }
 
 void RenderBlock::setStyle(RenderStyle* _style) {
-  setInline(false);
   RenderFlow::setStyle(_style);
+  setInline(false);
+
   m_pre = false;
   if (_style->whiteSpace() == PRE)
     m_pre = true;
@@ -77,6 +78,10 @@ void RenderBlock::setStyle(RenderStyle* _style) {
     }
     child = child->nextSibling();
   }
+
+  // Update pseudos for :before and :after now.
+  insertPseudoChild(RenderStyle::BEFORE, firstChild());
+  insertPseudoChild(RenderStyle::AFTER, lastChild());
 }
 
 void RenderBlock::addChildToFlow(RenderObject* newChild,
@@ -86,18 +91,30 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
   bool madeBoxesNonInline = FALSE;
 
   RenderStyle* pseudoStyle = 0;
-  if ((!firstChild() || firstChild() == beforeChild) && newChild->isText()) {
-    RenderText* newTextChild = static_cast<RenderText*>(newChild);
-    // kdDebug( 6040 ) << "first letter" << endl;
+  if ((!firstChild() || firstChild() == beforeChild) &&
+      (newChild->isInline() || newChild->isText()) &&
+      (pseudoStyle = style()->getPseudoStyle(RenderStyle::FIRST_LETTER))) {
+    // Drill into inlines looking for our first text child.
+    RenderObject* textChild = newChild;
+    while (textChild && !textChild->isText())
+      textChild = textChild->firstChild();
 
-    if ((pseudoStyle = style()->getPseudoStyle(RenderStyle::FIRST_LETTER))) {
+    if (textChild) {
+      RenderObject* firstLetterContainer = textChild->parent();
+      if (!firstLetterContainer)
+        firstLetterContainer = this;
+
+      RenderText* newTextChild = static_cast<RenderText*>(textChild);
+      // kdDebug( 6040 ) << "first letter" << endl;
+
       pseudoStyle->setDisplay(INLINE);
       pseudoStyle->setPosition(
           STATIC);  // CSS2 says first-letter can't be positioned.
 
       RenderObject* firstLetter = RenderFlow::createFlow(
           0, pseudoStyle, renderArena());  // anonymous box
-      addChild(firstLetter);
+      firstLetterContainer->addChild(firstLetter,
+                                     firstLetterContainer->firstChild());
 
       DOMStringImpl* oldText = newTextChild->string();
 
@@ -121,8 +138,6 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       firstLetter->close();
     }
   }
-
-  insertPseudoChild(RenderStyle::BEFORE, newChild, beforeChild);
 
   // If the requested beforeChild is not one of our children, then this is most
   // likely because
@@ -228,7 +243,6 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
 
   newChild->setLayouted(false);
   newChild->setMinMaxKnown(false);
-  insertPseudoChild(RenderStyle::AFTER, newChild, beforeChild);
 
   if (madeBoxesNonInline)
     removeLeftoverAnonymousBoxes();
@@ -260,6 +274,7 @@ static void getInlineRun(RenderObject* start,
     return;  // No more inline children to be found.
 
   inlineRunStart = inlineRunEnd = curr;
+
   curr = curr->nextSibling();
   while (curr && curr->isInline() && (curr != stop)) {
     inlineRunEnd = curr;
@@ -552,6 +567,19 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   RenderObject* child = firstChild();
   RenderBlock* prevFlow = 0;
 
+  // A compact child that needs to be collapsed into the margin of the following
+  // block.
+  RenderObject* compactChild = 0;
+  // The block with the open margin that the compact child is going to place
+  // itself within.
+  RenderObject* blockForCompactChild = 0;
+  // For compact children that don't fit, we lay them out as though they are
+  // blocks.  This
+  // boolean allows us to temporarily treat a compact like a block and lets us
+  // know we need
+  // to turn the block back into a compact when we're done laying out.
+  bool treatCompactAsBlock = false;
+
   // Whether or not we can collapse our own margins with our children.  We don't
   // do this
   // if we had any border/padding (obviously), if we're the root or HTML
@@ -658,6 +686,72 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       // m_height <<" prevMargin="<<prevMargin << endl;
       child = child->nextSibling();
       continue;
+    }
+
+    // See if we have a compact element.  If we do, then try to tuck the compact
+    // element into the margin space of the next block.
+    // FIXME: We only deal with one compact at a time.  It is unclear what
+    // should be
+    // done if multiple contiguous compacts are encountered.  For now we assume
+    // that
+    // compact A followed by another compact B should simply be treated as block
+    // A.
+    if (child->isCompact() && !compactChild) {
+      // Get the next non-positioned/non-floating RenderBlock.
+      RenderObject* next = child->nextSibling();
+      RenderObject* curr = next;
+      while (curr && curr->isSpecial())
+        curr = curr->nextSibling();
+      if (curr && !curr->isCompact() && !curr->isRunIn()) {
+        curr->calcWidth();  // So that horizontal margins are correct.
+        // Need to compute margins for the child as though it is a block.
+        child->style()->setDisplay(BLOCK);
+        child->calcWidth();
+        child->style()->setDisplay(COMPACT);
+        int childMargins = child->marginLeft() + child->marginRight();
+        int margin = style()->direction() == LTR ? curr->marginLeft()
+                                                 : curr->marginRight();
+        if (margin < (childMargins + child->minWidth())) {
+          // It won't fit. Kill the "compact" boolean and just treat
+          // the child like a normal block. This is only temporary.
+          child->style()->setDisplay(BLOCK);
+          treatCompactAsBlock = true;
+        } else {
+          // Cap our maxwidth at the margin's value.
+          if (child->maxWidth() + childMargins > margin)
+            child->setMaxWidth(margin - childMargins);
+          blockForCompactChild = curr;
+          compactChild = child;
+          child = child->nextSibling();
+          continue;
+        }
+      }
+    }
+
+    // See if we have a run-in element with inline children.  If the
+    // children aren't inline, then just treat the run-in as a normal
+    // block.
+    if (child->isRunIn() && (child->childrenInline() || child->isReplaced())) {
+      // Get the next non-positioned/non-floating RenderBlock.
+      RenderObject* curr = child->nextSibling();
+      while (curr && curr->isSpecial())
+        curr = curr->nextSibling();
+      if (curr && (curr->isRenderBlock() && curr->childrenInline() &&
+                   !curr->isCompact() && !curr->isRunIn())) {
+        // The block acts like an inline, so just null out its
+        // position.
+        child->setInline(true);
+        child->setPos(0, 0);
+
+        // Remove the child.
+        RenderObject* next = child->nextSibling();
+        removeChildNode(child);
+
+        // Now insert the child under |curr|.
+        curr->insertChildNode(child, curr->firstChild());
+        child = next;
+        continue;
+      }
     }
 
     // Note this occurs after the test for positioning and floating above, since
@@ -885,6 +979,44 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (rightChildPos > m_overflowWidth)
       m_overflowWidth = rightChildPos;
 
+    if (child == blockForCompactChild) {
+      blockForCompactChild = 0;
+      if (compactChild) {
+        // We have a compact child to squeeze in.
+        // FIXME: Align the compact box vertically such that the baseline of its
+        // first line box and the baseline of the block child's first line box
+        // are aligned.
+        int compactXPos = xPos + compactChild->marginLeft();
+        if (style()->direction() == RTL) {
+          compactChild
+              ->calcWidth();  // have to do this because of the capped maxwidth
+          compactXPos = width() - borderRight() - paddingRight() -
+                        marginRight() - compactChild->width() -
+                        compactChild->marginRight();
+        }
+        compactChild->setPos(compactXPos, child->yPos());
+        if (!compactChild->layouted())
+          compactChild->layout();
+
+        // FIXME: Is this right? Do we grow the block to accommodate the compact
+        // child?
+        // It seems like we could be smart and keep looking for blocks that
+        // leave space
+        // for us.  For now just grow the block.
+        if (compactChild->yPos() + compactChild->height() > m_height)
+          m_height = compactChild->yPos() + compactChild->height();
+
+        compactChild = 0;
+      }
+    }
+
+    // We did a layout as though the compact child was a block.  Set it back to
+    // compact now.
+    if (treatCompactAsBlock) {
+      child->style()->setDisplay(COMPACT);
+      treatCompactAsBlock = false;
+    }
+
     child = child->nextSibling();
   }
 
@@ -1004,9 +1136,12 @@ void RenderBlock::paintObject(QPainter* p,
 //    ::paintObject() w/h = (" << width() << "/" << height() << ")" << endl;
 #endif
 
+  // If we're a repositioned run-in, don't paint background/borders.
+  bool inlineRunIn = (isRunIn() && isInline());
+
   // 1. paint background, borders etc
-  if (paintAction == PaintActionBackground && shouldPaintBackgroundOrBorder() &&
-      style()->visibility() == VISIBLE)
+  if (!inlineRunIn && paintAction == PaintActionBackground &&
+      shouldPaintBackgroundOrBorder() && style()->visibility() == VISIBLE)
     paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
 
   // 2. paint contents
@@ -1018,12 +1153,13 @@ void RenderBlock::paintObject(QPainter* p,
   }
 
   // 3. paint floats.
-  if (paintAction == PaintActionFloat || paintAction == PaintActionSelection)
+  if (!inlineRunIn &&
+      (paintAction == PaintActionFloat || paintAction == PaintActionSelection))
     paintFloats(p, _x, _y, _w, _h, _tx, _ty,
                 paintAction == PaintActionSelection);
 
-  if (paintAction == PaintActionBackground && !childrenInline() &&
-      style()->outlineWidth())
+  if (!inlineRunIn && paintAction == PaintActionBackground &&
+      !childrenInline() && style()->outlineWidth())
     paintOutline(p, _tx, _ty, width(), height(), style());
 
 #ifdef BOX_DEBUG
@@ -1505,8 +1641,7 @@ void RenderBlock::clearFloats() {
   // pass fAF's unless they contain overhanging stuff
   bool parentHasFloats = false;
   while (prev) {
-    if (!(prev->isRenderBlock() && prev->isRenderInline()) ||
-        prev->isFloating() ||
+    if (!prev->isRenderBlock() || prev->isFloating() ||
         (prev->style()->flowAroundFloats() &&
          // A <table> or <ul> can have a height of 0, so its ypos may be the
          // same
