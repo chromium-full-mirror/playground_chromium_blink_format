@@ -148,6 +148,9 @@ class CSSStyleSelector : public StyleSelector {
      current generic font family has changed. -dwh */
   void checkForGenericFamilyChange(RenderStyle* aStyle,
                                    RenderStyle* aParentStyle);
+#if APPLE_CHANGES
+  void checkForTextSizeAdjust();
+#endif
 
   void adjustRenderStyle(RenderStyle* style, DOM::ElementImpl* e);
 

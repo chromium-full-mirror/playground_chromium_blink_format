@@ -224,12 +224,23 @@ bool StyleCSS3NonInheritedData::operator==(
 }
 
 StyleCSS3InheritedData::StyleCSS3InheritedData()
-    : Shared<StyleCSS3InheritedData>(), textShadow(0), userModify(READ_ONLY) {}
+    : Shared<StyleCSS3InheritedData>(),
+      textShadow(0),
+      userModify(READ_ONLY)
+#if APPLE_CHANGES
+      ,
+      textSizeAdjust(RenderStyle::initialTextSizeAdjust())
+#endif
+{
+}
 
 StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
     : Shared<StyleCSS3InheritedData>() {
   textShadow = o.textShadow ? new ShadowData(*o.textShadow) : 0;
   userModify = o.userModify;
+#if APPLE_CHANGES
+  textSizeAdjust = o.textSizeAdjust;
+#endif
 }
 
 StyleCSS3InheritedData::~StyleCSS3InheritedData() {
@@ -237,7 +248,11 @@ StyleCSS3InheritedData::~StyleCSS3InheritedData() {
 }
 
 bool StyleCSS3InheritedData::operator==(const StyleCSS3InheritedData& o) const {
-  return (userModify == o.userModify) && shadowDataEquivalent(o);
+  return (userModify == o.userModify) && shadowDataEquivalent(o)
+#if APPLE_CHANGES
+         && (textSizeAdjust == o.textSizeAdjust)
+#endif
+      ;
 }
 
 bool StyleCSS3InheritedData::shadowDataEquivalent(
@@ -507,6 +522,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 #if APPLE_CHANGES
       (css3NonInheritedData->lineClamp !=
        other->css3NonInheritedData->lineClamp) ||
+      (css3InheritedData->textSizeAdjust !=
+       other->css3InheritedData->textSizeAdjust) ||
 #endif
       !(inherited->indent == other->inherited->indent) ||
       !(inherited->line_height == other->inherited->line_height) ||
