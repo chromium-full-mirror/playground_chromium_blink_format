@@ -155,7 +155,7 @@ class HTMLStyleElementImpl : public HTMLElementImpl {
   void sheetLoaded();
 
  protected:
-  StyleSheetImpl* m_sheet;
+  CSSStyleSheetImpl* m_sheet;
   bool m_loading;
   DOMString m_type;
   QString m_media;
