@@ -943,6 +943,13 @@ void RenderObject::setStyle(RenderStyle* style) {
     // from the positioned objects list.
     removeFromObjectLists();
 
+  bool affectsParentBlock =
+      (m_style && isFloatingOrPositioned() &&
+       (!style->isFloating() && style->position() != ABSOLUTE &&
+        style->position() != FIXED) &&
+       parent() && !parent()->isInline() && parent()->isRenderBlock() &&
+       !parent()->isTable());
+
   // qDebug("new style, diff=%d", d);
   // reset style flags
   m_floating = false;
@@ -978,6 +985,33 @@ void RenderObject::setStyle(RenderStyle* style) {
   setShouldPaintBackgroundOrBorder(m_style->backgroundColor().isValid() ||
                                    m_style->hasBorder() || nb);
   m_hasFirstLine = (style->getPseudoStyle(RenderStyle::FIRST_LINE) != 0);
+
+  if (affectsParentBlock) {
+    // We have gone from not affecting the inline status of the parent block to
+    // suddenly
+    // having an impact.  See if there is a mismatch between the parent block's
+    // childrenInline() state and our state.
+    setInline(style->display() ==
+                  INLINE ||  // style->display() == INLINE_BLOCK ||
+              style->display() == INLINE_TABLE);
+    if (isInline() != parent()->childrenInline()) {
+      if (!isInline())
+        static_cast<RenderBlock*>(parent())->makeChildrenNonInline();
+      else {
+        // An anonymous block must be made to wrap this inline.
+        RenderStyle* newStyle = new RenderStyle();
+        newStyle->inheritFrom(m_style);
+        newStyle->setDisplay(BLOCK);
+
+        RenderBlock* box =
+            new (renderArena()) RenderBlock(0 /* anonymous box */);
+        box->setStyle(newStyle);
+        box->setIsAnonymousBox(true);
+        parent()->insertChildNode(box, this);
+        box->appendChildNode(parent()->removeChildNode(this));
+      }
+    }
+  }
 
   if (d >= RenderStyle::Position && m_parent) {
     // qDebug("triggering relayout");
