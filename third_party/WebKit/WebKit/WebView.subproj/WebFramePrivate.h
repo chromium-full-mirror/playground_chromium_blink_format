@@ -127,10 +127,6 @@ typedef enum {
 
 - (void)_invalidatePendingPolicyDecisionCallingDefaultAction:(BOOL)call;
 
-- (NSDictionary*)_actionInformationForNavigationType:
-                     (WebNavigationType)navigationType
-                                               event:(NSEvent*)event
-                                         originalURL:(NSURL*)URL;
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
             loadType:(WebFrameLoadType)loadType
@@ -147,9 +143,6 @@ typedef enum {
                    fireDate:(NSDate*)date;
 - (void)_clientRedirectCancelled;
 
-- (void)_saveScrollPositionToItem:(WebHistoryItem*)item;
-- (void)_restoreScrollPosition;
-- (void)_scrollToTop;
 - (void)_textSizeMultiplierChanged;
 
 - (void)_defersCallbacksChanged;
@@ -162,8 +155,10 @@ typedef enum {
 
 - (WebPluginController*)_pluginController;
 
-- (WebHistoryItem*)_createItemTreeWithTargetFrame:(WebFrame*)targetFrame
-                                  clippedAtTarget:(BOOL)doClip;
+- (NSDictionary*)_actionInformationForNavigationType:
+                     (WebNavigationType)navigationType
+                                               event:(NSEvent*)event
+                                         originalURL:(NSURL*)URL;
 
 - (WebHistoryItem*)_itemForSavingDocState;
 - (WebHistoryItem*)_itemForRestoringDocState;
