@@ -43,6 +43,7 @@ using namespace KJS;
 
 // ----------------------------- ValueImp -------------------------------------
 
+#if !USE_CONSERVATIVE_GC
 ValueImp::ValueImp()
     : refcount(0),
       // Tell the garbage collector that this memory block corresponds to a real
@@ -54,6 +55,7 @@ ValueImp::ValueImp()
 ValueImp::~ValueImp() {
   // fprintf(stderr,"ValueImp::~ValueImp %p\n",(void*)this);
 }
+#endif
 
 #if TEST_CONSERVATIVE_GC
 static bool conservativeMark = false;
@@ -65,7 +67,9 @@ void ValueImp::useConservativeMark(bool use) {
 
 void ValueImp::mark() {
 // fprintf(stderr,"ValueImp::mark %p\n",(void*)this);
-#if TEST_CONSERVATIVE_GC
+#if USE_CONSERVATIVE_GC
+  _marked = true;
+#elif TEST_CONSERVATIVE_GC
   if (conservativeMark) {
     _flags |= VI_CONSERVATIVE_MARKED;
   } else {
@@ -81,7 +85,9 @@ void ValueImp::mark() {
 
 bool ValueImp::marked() const {
 // Simple numbers are always considered marked.
-#if TEST_CONSERVATIVE_GC
+#if USE_CONSERVATIVE_GC
+  return SimpleNumber::is(this) || _marked;
+#elif TEST_CONSERVATIVE_GC
   if (conservativeMark) {
     return SimpleNumber::is(this) || (_flags & VI_CONSERVATIVE_MARKED);
   } else {
@@ -92,6 +98,7 @@ bool ValueImp::marked() const {
 #endif
 }
 
+#if !USE_CONSERVATIVE_GC
 void ValueImp::setGcAllowed() {
   // fprintf(stderr,"ValueImp::setGcAllowed %p\n",(void*)this);
   // simple numbers are never seen by the collector so setting this
@@ -99,6 +106,7 @@ void ValueImp::setGcAllowed() {
   if (!SimpleNumber::is(this))
     _flags |= VI_GCALLOWED;
 }
+#endif
 
 void* ValueImp::operator new(size_t s) {
   return Collector::allocate(s);
@@ -222,6 +230,8 @@ bool ValueImp::dispatchToUInt32(uint32_t& result) const {
 
 // ------------------------------ Value ----------------------------------------
 
+#if !USE_CONSERVATIVE_GC
+
 Value::Value(ValueImp* v) {
   rep = v;
 #if DEBUG_COLLECTOR
@@ -271,6 +281,7 @@ Value& Value::operator=(const Value& v) {
   }
   return *this;
 }
+#endif
 
 // ------------------------------ Undefined ------------------------------------
 

@@ -112,7 +112,9 @@ void* Collector::allocate(size_t s) {
     heap.usedOversizeCells++;
     heap.numLiveObjects++;
 
+#if !USE_CONSERVATIVE_GC
     ((ValueImp*)(newCell))->_flags = 0;
+#endif
     return newCell;
   }
 
@@ -161,13 +163,16 @@ void* Collector::allocate(size_t s) {
   targetBlock->usedCells++;
   heap.numLiveObjects++;
 
+#if !USE_CONSERVATIVE_GC
   ((ValueImp*)(newCell))->_flags = 0;
+#endif
   return (void*)(newCell);
 }
 
-#if TEST_CONSERVATIVE_GC
+#if TEST_CONSERVATIVE_GC || USE_CONSERVATIVE_GC
 
-#define IS_POINTER_ALIGNED(p) (((int)(p) & (sizeof(char*) - 1)) == 0)
+// cells are 8-byte aligned
+#define IS_POINTER_ALIGNED(p) (((int)(p)&7) == 0)
 
 void Collector::markStackObjectsConservatively(void* start, void* end) {
   assert(((char*)end - (char*)start) < 0x1000000);
@@ -179,7 +184,7 @@ void Collector::markStackObjectsConservatively(void* start, void* end) {
 
   while (p != e) {
     char* x = *p++;
-    if (IS_POINTER_ALIGNED(x)) {
+    if (IS_POINTER_ALIGNED(x) && x) {
       bool good = false;
       for (int block = 0; block < heap.usedBlocks; block++) {
         size_t offset = x - (char*)heap.blocks[block];
@@ -241,7 +246,9 @@ bool Collector::collect() {
   // CONSERVATIVE MARK: mark the root set using conservative GC bit (will
   // compare later)
   ValueImp::useConservativeMark(true);
+#endif
 
+#if USE_CONSERVATIVE_GC || TEST_CONSERVATIVE_GC
   if (InterpreterImp::s_hook) {
     InterpreterImp* scr = InterpreterImp::s_hook;
     do {
@@ -253,10 +260,13 @@ bool Collector::collect() {
 
   markStackObjectsConservatively();
   markProtectedObjects();
+#endif
 
+#if TEST_CONSERVATIVE_GC
   ValueImp::useConservativeMark(false);
 #endif
 
+#if !USE_CONSERVATIVE_GC
   // MARK: first mark all referenced objects recursively
   // starting out from the set of root objects
   if (InterpreterImp::s_hook) {
@@ -302,6 +312,7 @@ bool Collector::collect() {
       imp->mark();
     }
   }
+#endif
 
   // SWEEP: delete everything with a zero refcount (garbage) and unmark
   // everything else
@@ -321,8 +332,13 @@ bool Collector::collect() {
       ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
 
       if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0) {
+#if USE_CONSERVATIVE_GC
+        if (!imp->_marked)
+#else
         if (!imp->refcount &&
-            imp->_flags == (ValueImp::VI_GCALLOWED | ValueImp::VI_CREATED)) {
+            imp->_flags == (ValueImp::VI_GCALLOWED | ValueImp::VI_CREATED))
+#endif
+        {
           // fprintf( stderr, "Collector::deleting ValueImp %p (%s)\n",
           // (void*)imp, typeid(*imp).name());
           // emulate destructing part of 'operator delete()'
@@ -337,7 +353,9 @@ bool Collector::collect() {
           curBlock->freeList = (CollectorCell*)imp;
 
         } else {
-#if TEST_CONSERVATIVE_GC
+#if USE_CONSERVATIVE_GC
+          imp->_marked = 0;
+#elif TEST_CONSERVATIVE_GC
           imp->_flags &=
               ~(ValueImp::VI_MARKED | ValueImp::VI_CONSERVATIVE_MARKED);
 #else
@@ -380,8 +398,13 @@ bool Collector::collect() {
   while (cell < heap.usedOversizeCells) {
     ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
 
+#if USE_CONSERVATIVE_GC
+    if (!imp->_marked) {
+#else
     if (!imp->refcount &&
         imp->_flags == (ValueImp::VI_GCALLOWED | ValueImp::VI_CREATED)) {
+#endif
+
       imp->~ValueImp();
 #if DEBUG_COLLECTOR
       heap.oversizeCells[cell]->u.freeCell.zeroIfFree = 0;
@@ -404,7 +427,13 @@ bool Collector::collect() {
       }
 
     } else {
-      imp->_flags &= ~ValueImp::VI_MARKED;
+#if USE_CONSERVATIVE_GC
+      imp->_marked = 0;
+#elif TEST_CONSERVATIVE_GC
+      imp->_flags &= ~(ValueImp::VI_MARKED | ValueImp::VI_CONSERVATIVE_MARKED);
+#else
+    imp->_flags &= ~ValueImp::VI_MARKED;
+#endif
       cell++;
     }
   }
@@ -440,6 +469,7 @@ int Collector::numInterpreters() {
 
 int Collector::numGCNotAllowedObjects() {
   int count = 0;
+#if !USE_CONSERVATIVE_GC
   for (int block = 0; block < heap.usedBlocks; block++) {
     CollectorBlock* curBlock = heap.blocks[block];
 
@@ -459,12 +489,24 @@ int Collector::numGCNotAllowedObjects() {
       ++count;
     }
   }
+#endif
 
   return count;
 }
 
 int Collector::numReferencedObjects() {
   int count = 0;
+
+#if USE_CONSERVATIVE_GC
+  for (int i = 0; i < ProtectedValues::_tableSize; i++) {
+    ValueImp* val = ProtectedValues::_table[i].key;
+    if (val) {
+      ++count;
+    }
+  }
+
+#else
+
   for (int block = 0; block < heap.usedBlocks; block++) {
     CollectorBlock* curBlock = heap.blocks[block];
 
@@ -484,6 +526,7 @@ int Collector::numReferencedObjects() {
       ++count;
     }
   }
+#endif
 
   return count;
 }
@@ -491,6 +534,23 @@ int Collector::numReferencedObjects() {
 const void* Collector::rootObjectClasses() {
   CFMutableSetRef classes = CFSetCreateMutable(NULL, 0, &kCFTypeSetCallBacks);
 
+#if USE_CONSERVATIVE_GC
+  for (int i = 0; i < ProtectedValues::_tableSize; i++) {
+    ValueImp* val = ProtectedValues::_table[i].key;
+    if (val) {
+      const char* mangled_name = typeid(*val).name();
+      int status;
+      char* demangled_name =
+          __cxxabiv1::__cxa_demangle(mangled_name, NULL, NULL, &status);
+
+      CFStringRef className = CFStringCreateWithCString(NULL, demangled_name,
+                                                        kCFStringEncodingASCII);
+      free(demangled_name);
+      CFSetAddValue(classes, className);
+      CFRelease(className);
+    }
+  }
+#else
   for (int block = 0; block < heap.usedBlocks; block++) {
     CollectorBlock* curBlock = heap.blocks[block];
     for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
@@ -528,6 +588,7 @@ const void* Collector::rootObjectClasses() {
       CFRelease(className);
     }
   }
+#endif
 
   return classes;
 }

@@ -187,7 +187,7 @@ void JSLazyEventListener::parseCode() const {
       KJS::Object constr = interpreter->builtinFunction();
       KJS::List args;
 
-      static KJS::String eventString("event");
+      static ProtectedValue eventString = KJS::String("event");
 
       args.append(eventString);
       args.append(KJS::String(code));
