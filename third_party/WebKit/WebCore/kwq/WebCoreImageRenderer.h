@@ -27,6 +27,10 @@
 
 @protocol WebCoreImageRenderer<NSObject, NSCopying>
 
+- (BOOL)incrementalLoadWithBytes:(const void*)bytes
+                          length:(unsigned)length
+                        complete:(BOOL)isComplete;
+
 - (NSSize)size;
 - (void)resize:(NSSize)s;
 - (void)beginAnimationInView:(NSView*)view

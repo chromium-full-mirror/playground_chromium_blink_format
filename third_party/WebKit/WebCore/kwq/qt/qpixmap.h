@@ -71,6 +71,7 @@ class QPixmap : public QPaintDevice, public Qt {
   QPixmap& operator=(const QPixmap&);
 
   WebCoreImageRendererPtr getImageRenderer() const { return imageRenderer; }
+  bool receivedData(const QByteArray& bytes, bool isComplete);
 
  private:
   WebCoreImageRendererPtr imageRenderer;
