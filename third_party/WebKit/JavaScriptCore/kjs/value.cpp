@@ -184,7 +184,7 @@ Value::Value(ValueImp* v) {
   rep = v;
 #if DEBUG_COLLECTOR
   assert(!(rep && !SimpleNumber::is(rep) && *((uint32_t*)rep) == 0));
-  assert(!(rep && !SimpleNumber::is(rep) && rep->_flags & VI_MARKED));
+  assert(!(rep && !SimpleNumber::is(rep) && rep->_flags & ValueImp::VI_MARKED));
 #endif
   if (v) {
     v->ref();
@@ -198,7 +198,7 @@ Value::Value(const Value& v) {
   rep = v.imp();
 #if DEBUG_COLLECTOR
   assert(!(rep && !SimpleNumber::is(rep) && *((uint32_t*)rep) == 0));
-  assert(!(rep && !SimpleNumber::is(rep) && rep->_flags & VI_MARKED));
+  assert(!(rep && !SimpleNumber::is(rep) && rep->_flags & ValueImp::VI_MARKED));
 #endif
   if (rep) {
     rep->ref();
