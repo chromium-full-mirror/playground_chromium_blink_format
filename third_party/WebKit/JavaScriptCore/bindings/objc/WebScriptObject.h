@@ -143,10 +143,11 @@
 /*!
     @method finalizeForWebScript
     @discussion finalizeForScript is called on objects exposed to the script
-    environment just before the script environment is reset.  After calls to
-    finalizeForScript the object will no longer be referenced by the script
+    environment just before the script environment releases the object.  After
+   calls to
+    finalizeForWebScript the object will no longer be referenced by the script
    environment.
-    Further any references to WebScriptObjects made by the exposed object will
+    Further, any references to WebScriptObjects made by the exposed object will
     be invalid and have undefined consequences.
 */
 - (void)finalizeForWebScript;
