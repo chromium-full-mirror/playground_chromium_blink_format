@@ -1308,6 +1308,16 @@ void DocumentImpl::open() {
   if (parsing())
     return;
 
+  openInternal();
+
+  // This is work that we should probably do in clear(), but we can't have it
+  // happen when openInternal() is called unless we reorganize KHTMLPart code.
+  setURL(QString());
+  DocumentImpl* parent = parentDocument();
+  setBaseURL(parent ? parent->baseURL() : QString());
+}
+
+void DocumentImpl::openInternal() {
   if (m_tokenizer)
     close();
 
