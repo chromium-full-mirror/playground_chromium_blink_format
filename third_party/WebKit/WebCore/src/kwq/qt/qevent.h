@@ -89,6 +89,8 @@ class QMouseEvent : public QEvent {
 
   QMouseEvent(Type type, const QPoint& pos, int button, int state);
 
+  virtual ~QMouseEvent();
+
   // member functions --------------------------------------------------------
 
   int x();
@@ -127,6 +129,8 @@ class QTimerEvent : public QEvent {
 
   QTimerEvent(int timerId);
 
+  virtual ~QTimerEvent();
+
   // member functions --------------------------------------------------------
 
   int timerId() const;
@@ -158,6 +162,8 @@ class QKeyEvent : public QEvent {
 
   QKeyEvent();
   QKeyEvent(Type, Key, int, int);
+
+  virtual ~QKeyEvent();
 
   // member functions --------------------------------------------------------
 
@@ -193,6 +199,8 @@ class QFocusEvent : public QEvent {
 
   QFocusEvent();
 
+  virtual ~QFocusEvent();
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -221,6 +229,8 @@ class QHideEvent : public QEvent {
   // constructors, copy constructors, and destructors ------------------------
 
   QHideEvent();
+
+  virtual ~QHideEvent();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -251,6 +261,8 @@ class QResizeEvent : public QEvent {
 
   QResizeEvent();
 
+  virtual ~QResizeEvent();
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -280,6 +292,8 @@ class QShowEvent : public QEvent {
 
   QShowEvent();
 
+  virtual ~QShowEvent();
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -308,6 +322,8 @@ class QWheelEvent : public QEvent {
   // constructors, copy constructors, and destructors ------------------------
 
   QWheelEvent();
+
+  virtual ~QWheelEvent();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------

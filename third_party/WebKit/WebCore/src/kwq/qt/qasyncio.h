@@ -39,6 +39,7 @@ class QAsyncIO {
 
   // constructors, copy constructors, and destructors ------------------------
 
+  QAsyncIO(){};
   virtual ~QAsyncIO();
 
   // member functions --------------------------------------------------------
@@ -50,6 +51,11 @@ class QAsyncIO {
   // private
   // ---------------------------------------------------------------------
 
+ private:
+  // no copying or assignment
+  QAsyncIO(const QAsyncIO&);
+  QAsyncIO& operator=(const QAsyncIO&);
+
 };  // class QAsyncIO
     // ===========================================================
 
@@ -60,7 +66,11 @@ class QDataSource : public QAsyncIO {
   // enums -------------------------------------------------------------------
   // constants ---------------------------------------------------------------
   // static member functions -------------------------------------------------
+
   // constructors, copy constructors, and destructors ------------------------
+
+  QDataSource() {}
+  ~QDataSource() {}
 
   // member functions --------------------------------------------------------
 
@@ -74,6 +84,11 @@ class QDataSource : public QAsyncIO {
   // private
   // ---------------------------------------------------------------------
 
+ private:
+  // no copying or assignment
+  QDataSource(const QDataSource&);
+  QDataSource& operator=(const QDataSource&);
+
 };  // end class QDataSource
     // ====================================================
 
@@ -84,7 +99,11 @@ class QDataSink : public QAsyncIO {
   // enums -------------------------------------------------------------------
   // constants ---------------------------------------------------------------
   // static member functions -------------------------------------------------
+
   // constructors, copy constructors, and destructors ------------------------
+
+  QDataSink() {}
+  ~QDataSink() {}
 
   // member functions --------------------------------------------------------
 
@@ -96,6 +115,11 @@ class QDataSink : public QAsyncIO {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  QDataSink(const QDataSink&);
+  QDataSink& operator=(const QDataSink&);
 
 };  // class QDataSink
     // ==========================================================

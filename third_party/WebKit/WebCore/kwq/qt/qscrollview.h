@@ -47,6 +47,7 @@ class QScrollView : public QFrame {
   // constructors, copy constructors, and destructors ------------------------
 
   QScrollView();
+
   virtual ~QScrollView();
 
   // member functions --------------------------------------------------------

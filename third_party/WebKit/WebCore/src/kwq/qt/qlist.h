@@ -43,6 +43,8 @@ class QList : public QCollection {
   QList();
   QList(const QList<T>&);
 
+  virtual ~QList();
+
   // member functions --------------------------------------------------------
 
   bool isEmpty() const;
@@ -99,6 +101,8 @@ class QListIterator {
   // constructors, copy constructors, and destructors ------------------------
 
   QListIterator(const QList<T>&);
+
+  ~QListIterator();
 
   // member functions --------------------------------------------------------
 

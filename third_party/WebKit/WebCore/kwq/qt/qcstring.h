@@ -53,6 +53,8 @@ class QCString : public QByteArray {
   QCString(const char*, uint);
   QCString(const QCString&);
 
+  ~QCString();
+
   // member functions --------------------------------------------------------
 
   bool isEmpty() const;

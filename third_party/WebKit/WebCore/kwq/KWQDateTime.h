@@ -40,6 +40,8 @@ class QTime {
   QTime(int, int);
   QTime(const QTime&);
 
+  ~QTime();
+
   // member functions --------------------------------------------------------
 
   bool isNull() const;

@@ -79,6 +79,8 @@ class QChar {
   QChar(uint);
   QChar(int);
 
+  ~QChar() {}
+
   // member functions --------------------------------------------------------
 
   QChar lower() const;
@@ -255,6 +257,9 @@ class QConstString {
   // constructors, copy constructors, and destructors ------------------------
 
   QConstString(QChar*, uint);
+  QConstString(const QConstString&);
+
+  ~QConstString();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -263,6 +268,10 @@ class QConstString {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+  // no assignment
+  QConstString& operator=(const QConstString&);
 
 };  // class QConstString
     // =======================================================

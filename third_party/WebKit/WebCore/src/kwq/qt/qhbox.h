@@ -43,6 +43,8 @@ class QHBox : public QFrame {
   QHBox();
   QHBox(QWidget*);
 
+  ~QHBox();
+
   // member functions --------------------------------------------------------
 
   bool setStretchFactor(QWidget*, int stretch);

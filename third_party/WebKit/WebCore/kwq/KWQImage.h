@@ -40,6 +40,8 @@ class QImage {
   QImage();
   QImage(const QImage&);
 
+  ~QImage();
+
   // member functions --------------------------------------------------------
 
   int width() const;

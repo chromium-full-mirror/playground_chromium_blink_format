@@ -49,6 +49,7 @@ class QValueListIterator {
 
   // operators ---------------------------------------------------------------
 
+  QValueListIterator& operator=(const QValueListIterator&);
   bool operator==(const QValueListIterator<T>&);
   bool operator!=(const QValueListIterator<T>&);
   T& operator*();
@@ -86,6 +87,7 @@ class QValueListConstIterator {
 
   // operators ---------------------------------------------------------------
 
+  QValueListConstIterator& operator=(const QValueListConstIterator&);
   bool operator==(const QValueListConstIterator<T>&);
   bool operator!=(const QValueListConstIterator<T>&);
   T& operator*();

@@ -60,6 +60,9 @@ class QGuardedPtr : public QObject {
   // private
   // ---------------------------------------------------------------------
 
+ private:
+  QGuardedPtr& operator=(const QGuardedPtr&);
+
 };  // class QGuardedPtr
     // ========================================================
 

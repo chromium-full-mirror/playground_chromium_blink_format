@@ -47,6 +47,8 @@ class QGVector : public QCollection {
 
   QGVector();
 
+  virtual ~QGVector();
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 

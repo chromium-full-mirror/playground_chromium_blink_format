@@ -43,6 +43,8 @@ class QFontDatabase {
 
   QFontDatabase();
 
+  ~QFontDatabase();
+
   // member functions --------------------------------------------------------
 
   QFont font(const QString,

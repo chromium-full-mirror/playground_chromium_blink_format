@@ -43,6 +43,8 @@ class QMapIterator {
   QMapIterator();
   QMapIterator(const QMapIterator<K, T>& it);
 
+  ~QMapIterator();
+
   // member functions --------------------------------------------------------
 
   const K& key() const;
@@ -80,6 +82,8 @@ class QMapConstIterator {
   QMapConstIterator();
   QMapConstIterator(const QMapConstIterator<K, T>&);
   QMapConstIterator(const QMapIterator<K, T>&);
+
+  ~QMapConstIterator();
 
   // member functions --------------------------------------------------------
 
