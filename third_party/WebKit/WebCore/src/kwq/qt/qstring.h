@@ -343,6 +343,13 @@ class QString {
   static QString fromCFMutableString(CFMutableStringRef);
   static QString fromCFString(CFStringRef);
 
+  static QString gstring_toQString(CFMutableStringRef* ref,
+                                   UniChar* uchars,
+                                   int len);
+  static CFMutableStringRef gstring_toCFString(CFMutableStringRef* ref,
+                                               UniChar* uchars,
+                                               int len);
+
   // constructors, copy constructors, and destructors ------------------------
 
   QString();
