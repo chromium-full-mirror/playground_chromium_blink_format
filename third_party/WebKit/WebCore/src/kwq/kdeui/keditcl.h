@@ -93,7 +93,7 @@ class QMultiLineEdit : public QTableView {
  public:
   // structs -----------------------------------------------------------------
 
-  enum WordWrap { NoWrap, WidgetWidth, FixedPixelWidth, FixedColumnWidth };
+  enum WordWrap { NoWrap, WidgetWidth };
 
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
