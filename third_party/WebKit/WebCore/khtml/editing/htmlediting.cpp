@@ -4137,6 +4137,10 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
   if (nodeToDelete)
     removeNode(nodeToDelete);
 
+  // Prepare this fragment to merge styles correctly into the destination.
+  computeStylesAndRemoveUnrendered();
+  removeStyleNodes();
+
   int blockCount = realBlockCount;
   firstChild = m_fragment->firstChild();
   lastChild = m_fragment->lastChild();
@@ -4147,10 +4151,6 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
 
   if (blockCount > 1)
     m_hasMoreThanOneBlock = true;
-
-  // Prepare this fragment to merge styles correctly into the destination.
-  computeStylesAndRemoveUnrendered();
-  removeStyleNodes();
 }
 
 ReplacementFragment::~ReplacementFragment() {
@@ -4338,6 +4338,11 @@ void ReplacementFragment::removeStyleNodes() {
         node->id() == ID_SUB || node->id() == ID_SUP || node->id() == ID_TT ||
         node->id() == ID_U || isStyleSpan(node)) {
       removeNodePreservingChildren(node);
+    } else if (node->isHTMLElement()) {
+      HTMLElementImpl* elem = static_cast<HTMLElementImpl*>(node);
+      CSSMutableStyleDeclarationImpl* inlineStyleDecl = elem->inlineStyleDecl();
+      if (inlineStyleDecl)
+        inlineStyleDecl->clear();
     }
     node = next;
   }
@@ -4354,11 +4359,15 @@ void ReplacementFragment::removeBlockquoteColorsIfNeeded(
         Position(blockquote, 0).computedStyle();
     if (blockquoteStyle->getPropertyValue(CSS_PROP_COLOR) ==
         style->getPropertyValue(CSS_PROP_COLOR)) {
-      // Don't remove altogether. Set to the document's color.
-      CSSComputedStyleDeclarationImpl* documentStyle =
-          Position(node->getDocument()->documentElement(), 0).computedStyle();
-      DOMString documentColor = documentStyle->getPropertyValue(CSS_PROP_COLOR);
-      style->setProperty(CSS_PROP_COLOR, documentColor, false, false);
+      // This is not quite right.
+      // The speculation now is that we want to set the color here to a
+      // pseudo-color that would
+      // make the content take on the color of the nearest-enclosing blockquote
+      // (if any) after
+      // being pasted in. However, this is not entirely clear, and requires more
+      // study.
+      // For now, just remove the blockquoted color.
+      style->removeProperty(CSS_PROP_COLOR);
     }
   }
 }
@@ -4409,6 +4418,16 @@ void ReplaceSelectionCommand::doApply() {
     mergeStart = !isStartOfParagraph(visibleStart) ||
                  (!m_fragment.hasInterchangeNewline() &&
                   !m_fragment.hasMoreThanOneBlock());
+
+    // This is a workaround for this bug:
+    // <rdar://problem/4013642> REGRESSION (Mail): Copied quoted word does not
+    // paste as a quote if pasted at the start of a line
+    // We need more powerful logic in this whole mergeStart code for this case
+    // to come out right without
+    // breaking other cases.
+    if (isStartOfParagraph(visibleStart) &&
+        isMailBlockquote(m_fragment.firstChild()))
+      mergeStart = false;
   }
 
   // decide whether to later append nodes to the end
@@ -4598,6 +4617,7 @@ void ReplaceSelectionCommand::doApply() {
       insertParagraphSeparator();
       endPos = endingSelection().end().downstream();
     }
+    applyStyleToInsertedNodes();
     completeHTMLReplacement(startPos, endPos);
   } else {
     if (m_lastNodeInserted && m_lastNodeInserted->id() == ID_BR &&
