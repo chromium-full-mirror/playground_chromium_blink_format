@@ -58,6 +58,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class DOMNode;
 @class DOMRange;
 @class WebCoreSettings;
+@class WebScriptObject;
 
 @protocol WebCoreDOMTreeCopier;
 @protocol WebCoreRenderTreeCopier;
@@ -323,6 +324,7 @@ typedef enum {
 - (void)applyStyle:(DOMCSSStyleDeclaration*)style;
 - (void)ensureCaretVisible;
 
+- (WebScriptObject*)windowScriptObject;
 - (void)bindObject:(id)object withName:(NSString*)name;
 
 @end
@@ -523,6 +525,8 @@ typedef enum {
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 
 - (NSString*)overrideMediaType;
+
+- (void)windowObjectCleared;
 
 @end
 
