@@ -56,6 +56,8 @@ RenderImage::RenderImage(NodeImpl* _node) : RenderReplaced(_node) {
 
   setIntrinsicWidth(0);
   setIntrinsicHeight(0);
+  if (element())
+    updateAltText();
 }
 
 RenderImage::~RenderImage() {
@@ -97,12 +99,11 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
   bool iwchanged = false;
 
   if (o->isErrorImage()) {
-    int iw = p.width() + 8;
-    int ih = p.height() + 8;
+    int iw = p.width() + 4;
+    int ih = p.height() + 4;
 
     // we have an alt and the user meant it (its not a text we invented)
-    if (element() && !alt.isEmpty() &&
-        !element()->getAttribute(ATTR_ALT).isNull()) {
+    if (!alt.isEmpty()) {
       const QFontMetrics& fm = style()->fontMetrics();
       QRect br = fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto | Qt::WordBreak,
                                  alt.string());
@@ -287,10 +288,8 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
 
       bool errorPictureDrawn = false;
       int imageX = 0, imageY = 0;
-      int usableWidth =
-          cWidth - leftBorder - borderRight() - leftPad - paddingRight();
-      int usableHeight =
-          cHeight - topBorder - borderBottom() - topPad - paddingBottom();
+      int usableWidth = cWidth;
+      int usableHeight = cHeight;
 
       if (berrorPic && !pix.isNull() && (usableWidth >= pix.width()) &&
           (usableHeight >= pix.height())) {
@@ -321,7 +320,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         // and only if it fits above the error image.
         int textWidth = fm.width(text, text.length());
         if (errorPictureDrawn) {
-          if (usableWidth > textWidth && fm.height() <= imageY)
+          if (usableWidth >= textWidth && fm.height() <= imageY)
             p->drawText(ax, ay + ascent, 0 /* ignored */, 0 /* ignored */,
                         Qt::WordBreak /* not supported */, text);
         } else if (usableWidth >= textWidth && cHeight >= fm.height())
@@ -645,9 +644,10 @@ bool RenderImage::isHeightSpecified() const {
 int RenderImage::calcReplacedWidth() const {
   // If height is specified and not width, preserve aspect ratio.
   if (isHeightSpecified() && !isWidthSpecified()) {
-    if (intrinsicHeight() == 0) {
+    if (intrinsicHeight() == 0)
       return 0;
-    }
+    if (!image || image->isErrorImage())
+      return intrinsicWidth();  // Don't bother scaling.
     return calcReplacedHeight() * intrinsicWidth() / intrinsicHeight();
   }
   return RenderReplaced::calcReplacedWidth();
@@ -656,9 +656,10 @@ int RenderImage::calcReplacedWidth() const {
 int RenderImage::calcReplacedHeight() const {
   // If width is specified and not height, preserve aspect ratio.
   if (isWidthSpecified() && !isHeightSpecified()) {
-    if (intrinsicWidth() == 0) {
+    if (intrinsicWidth() == 0)
       return 0;
-    }
+    if (!image || image->isErrorImage())
+      return intrinsicHeight();  // Don't bother scaling.
     return calcReplacedWidth() * intrinsicHeight() / intrinsicWidth();
   }
   return RenderReplaced::calcReplacedHeight();
