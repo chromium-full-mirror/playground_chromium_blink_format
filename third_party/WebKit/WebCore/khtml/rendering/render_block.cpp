@@ -203,7 +203,7 @@ static void getInlineRun(RenderObject* start,
 
   // Start by skipping as many non-inlines as we can.
   RenderObject* curr = start;
-  while (curr && !curr->isInline())
+  while (curr && !(curr->isInline() || curr->isFloatingOrPositioned()))
     curr = curr->nextSibling();
 
   if (!curr)
@@ -212,7 +212,8 @@ static void getInlineRun(RenderObject* start,
   inlineRunStart = inlineRunEnd = curr;
 
   curr = curr->nextSibling();
-  while (curr && curr->isInline() && (curr != stop)) {
+  while (curr && (curr->isInline() || curr->isFloatingOrPositioned()) &&
+         (curr != stop)) {
     inlineRunEnd = curr;
     curr = curr->nextSibling();
   }
