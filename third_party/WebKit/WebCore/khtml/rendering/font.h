@@ -38,11 +38,30 @@ class CSSStyleSelector;
 class FontDef {
  public:
   FontDef()
-      : size(0), italic(false), smallCaps(false), weight(50), hasNbsp(true) {}
+      : size(0),
+        italic(false),
+        smallCaps(false),
+        weight(50),
+        genericFamily(0),
+        hasNbsp(true) {}
   bool operator==(const FontDef& other) const {
     return (family == other.family && size == other.size &&
             italic == other.italic && smallCaps == other.smallCaps &&
             weight == other.weight);
+  }
+
+  enum GenericFamilyType {
+    eNone,
+    eStandard,
+    eSerif,
+    eSansSerif,
+    eMonospace,
+    eCursive,
+    eFantasy
+  };
+
+  void setGenericFamily(unsigned int aGenericFamily) {
+    genericFamily = aGenericFamily;
   }
 
   QString family;
@@ -50,6 +69,7 @@ class FontDef {
   bool italic : 1;
   bool smallCaps : 1;
   unsigned int weight : 8;
+  unsigned int genericFamily : 3;
   mutable bool hasNbsp : 1;
 };
 

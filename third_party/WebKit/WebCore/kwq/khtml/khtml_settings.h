@@ -58,6 +58,7 @@ class KHTMLSettings {
 
   int minFontSize() const;
   int mediumFontSize() const;
+  int mediumFixedFontSize() const;
 
   bool changeCursor() const;
 

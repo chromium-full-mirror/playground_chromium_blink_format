@@ -34,6 +34,7 @@
   NSString* fantasyFontFamily;
   float minimumFontSize;
   float defaultFontSize;
+  float fixedFontSize;
   BOOL JavaEnabled;
   BOOL pluginsEnabled;
   BOOL JavaScriptEnabled;
@@ -65,6 +66,9 @@
 
 - (void)setDefaultFontSize:(float)size;
 - (float)defaultFontSize;
+
+- (void)setFixedFontSize:(float)size;
+- (float)fixedFontSize;
 
 - (void)setJavaEnabled:(BOOL)enabled;
 - (BOOL)JavaEnabled;
