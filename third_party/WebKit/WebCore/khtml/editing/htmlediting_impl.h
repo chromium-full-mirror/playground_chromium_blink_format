@@ -148,8 +148,9 @@ class CompositeEditCommandImpl : public EditCommandImpl {
   void appendNode(DOM::NodeImpl* appendChild, DOM::NodeImpl* parentNode);
   void applyCommandToComposite(EditCommand&);
   void deleteKeyPressed();
-  void deleteSelection();
-  void deleteSelection(const DOM::Selection& selection);
+  void deleteSelection(bool smartDelete = false);
+  void deleteSelection(const DOM::Selection& selection,
+                       bool smartDelete = false);
   void deleteText(DOM::TextImpl* node, long offset, long count);
   void inputText(const DOM::DOMString& text, bool selectInsertedText = false);
   void insertNodeAfter(DOM::NodeImpl* insertChild, DOM::NodeImpl* refChild);
@@ -416,7 +417,8 @@ class MoveSelectionCommandImpl : public CompositeEditCommandImpl {
  public:
   MoveSelectionCommandImpl(DOM::DocumentImpl* document,
                            DOM::DocumentFragmentImpl* fragment,
-                           DOM::Position& position);
+                           DOM::Position& position,
+                           bool smartMove = false);
   virtual ~MoveSelectionCommandImpl();
 
   virtual void doApply();
@@ -424,6 +426,7 @@ class MoveSelectionCommandImpl : public CompositeEditCommandImpl {
  private:
   DOM::DocumentFragmentImpl* m_fragment;
   DOM::Position m_position;
+  bool m_smartMove;
 };
 
 //------------------------------------------------------------------------------------------

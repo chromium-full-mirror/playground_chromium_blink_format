@@ -394,9 +394,12 @@ ReplaceSelectionCommandImpl* ReplaceSelectionCommand::impl() const {
 
 MoveSelectionCommand::MoveSelectionCommand(DocumentImpl* document,
                                            DOM::DocumentFragmentImpl* fragment,
-                                           DOM::Position& position)
-    : CompositeEditCommand(
-          new MoveSelectionCommandImpl(document, fragment, position)) {}
+                                           DOM::Position& position,
+                                           bool smartMove)
+    : CompositeEditCommand(new MoveSelectionCommandImpl(document,
+                                                        fragment,
+                                                        position,
+                                                        smartMove)) {}
 
 MoveSelectionCommandImpl* MoveSelectionCommand::impl() const {
   return static_cast<MoveSelectionCommandImpl*>(get());

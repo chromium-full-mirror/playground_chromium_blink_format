@@ -509,16 +509,17 @@ void CompositeEditCommandImpl::replaceText(TextImpl* node,
   applyCommandToComposite(insertCommand);
 }
 
-void CompositeEditCommandImpl::deleteSelection() {
+void CompositeEditCommandImpl::deleteSelection(bool smartDelete) {
   if (endingSelection().isRange()) {
-    DeleteSelectionCommand cmd(document());
+    DeleteSelectionCommand cmd(document(), smartDelete);
     applyCommandToComposite(cmd);
   }
 }
 
-void CompositeEditCommandImpl::deleteSelection(const Selection& selection) {
+void CompositeEditCommandImpl::deleteSelection(const Selection& selection,
+                                               bool smartDelete) {
   if (selection.isRange()) {
-    DeleteSelectionCommand cmd(document(), selection);
+    DeleteSelectionCommand cmd(document(), selection, smartDelete);
     applyCommandToComposite(cmd);
   }
 }
@@ -1986,10 +1987,12 @@ void ReplaceSelectionCommandImpl::doApply() {
 MoveSelectionCommandImpl::MoveSelectionCommandImpl(
     DocumentImpl* document,
     DOM::DocumentFragmentImpl* fragment,
-    DOM::Position& position)
+    DOM::Position& position,
+    bool smartMove)
     : CompositeEditCommandImpl(document),
       m_fragment(fragment),
-      m_position(position) {
+      m_position(position),
+      m_smartMove(smartMove) {
   ASSERT(m_fragment);
   m_fragment->ref();
 }
@@ -2018,10 +2021,10 @@ void MoveSelectionCommandImpl::doApply() {
     }
   }
 
-  deleteSelection();
+  deleteSelection(m_smartMove);
 
   setEndingSelection(Position(positionNode, positionOffset));
-  ReplaceSelectionCommand cmd(document(), m_fragment, true);
+  ReplaceSelectionCommand cmd(document(), m_fragment, true, m_smartMove);
   applyCommandToComposite(cmd);
 }
 
