@@ -38,6 +38,8 @@
 #ifndef QFILEINFO_H
 #define QFILEINFO_H
 
+#ifdef USING_BORROWED_QFILEINFO
+
 #ifndef QT_H
 #include "qfile.h"
 #include "qdatetime.h"
@@ -136,5 +138,7 @@ class Q_EXPORT QFileInfo  // file information class
 inline bool QFileInfo::caching() const {
   return cache;
 }
+
+#endif USING_BORROWED_QFILEINFO
 
 #endif  // QFILEINFO_H
