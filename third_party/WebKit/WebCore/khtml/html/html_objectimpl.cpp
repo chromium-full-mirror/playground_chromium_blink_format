@@ -122,11 +122,6 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 #endif
 }
 
-void HTMLAppletElementImpl::attach() {
-  createRendererIfNeeded();
-  NodeBaseImpl::attach();
-}
-
 bool HTMLAppletElementImpl::getMember(const QString& name,
                                       JType& type,
                                       QString& val) {
@@ -253,11 +248,10 @@ void HTMLEmbedElementImpl::attach() {
     addCSSLength(CSS_PROP_HEIGHT, "0");
   }
 
-  createRendererIfNeeded();
+  HTMLElementImpl::attach();
   if (m_render) {
     static_cast<RenderPartObject*>(m_render)->updateWidget();
   }
-  NodeBaseImpl::attach();
 }
 
 // -------------------------------------------------------------------------
@@ -356,7 +350,8 @@ RenderObject* HTMLObjectElementImpl::createRenderer(RenderArena* arena,
 }
 
 void HTMLObjectElementImpl::attach() {
-  createRendererIfNeeded();
+  HTMLElementImpl::attach();
+
   if (m_render) {
     if (canRenderImageType(serviceType)) {
       m_render->updateFromElement();
@@ -370,8 +365,6 @@ void HTMLObjectElementImpl::attach() {
       needWidgetUpdate = false;
     }
   }
-
-  NodeBaseImpl::attach();
 
   // ### do this when we are actually finished loading instead
   if (m_render)

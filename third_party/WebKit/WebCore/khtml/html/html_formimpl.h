@@ -207,7 +207,6 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual Id id() const;
   DOMString type() const;
 
-  virtual void attach();
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
@@ -233,7 +232,6 @@ class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLFieldSetElementImpl();
 
   virtual Id id() const;
-  virtual void attach();
 
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -367,7 +365,6 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLLegendElementImpl();
 
   virtual Id id() const;
-  virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 
@@ -427,7 +424,6 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void parseAttribute(AttributeImpl* attr);
 
-  virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
@@ -566,7 +562,6 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void select();
 
   virtual void parseAttribute(AttributeImpl* attr);
-  virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);

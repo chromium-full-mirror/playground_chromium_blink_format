@@ -61,7 +61,6 @@ class HTMLBRElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
   virtual void parseAttribute(AttributeImpl* attr);
-  virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 };

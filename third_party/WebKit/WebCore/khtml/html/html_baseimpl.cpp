@@ -367,8 +367,7 @@ void HTMLFrameElementImpl::attach() {
     node = static_cast<HTMLElementImpl*>(node->parentNode());
   }
 
-  createRendererIfNeeded();
-  NodeBaseImpl::attach();
+  HTMLElementImpl::attach();
 
   if (!m_render)
     return;
@@ -541,8 +540,7 @@ void HTMLFrameSetElementImpl::attach() {
     node = static_cast<HTMLElementImpl*>(node->parentNode());
   }
 
-  createRendererIfNeeded();
-  NodeBaseImpl::attach();
+  HTMLElementImpl::attach();
 }
 
 void HTMLFrameSetElementImpl::defaultEventHandler(EventImpl* evt) {
@@ -642,8 +640,7 @@ RenderObject* HTMLIFrameElementImpl::createRenderer(RenderArena* arena,
 }
 
 void HTMLIFrameElementImpl::attach() {
-  createRendererIfNeeded();
-  NodeBaseImpl::attach();
+  HTMLElementImpl::attach();
 
   if (m_render) {
     // we need a unique name for every frame in the frameset. Hope that's unique
