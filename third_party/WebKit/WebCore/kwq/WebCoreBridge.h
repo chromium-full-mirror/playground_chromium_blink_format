@@ -92,8 +92,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 - (void)scrollToBaseAnchor;
 
-- (NSString*)documentTextFromDOM;
-
 - (void)createKHTMLViewWithNSView:(NSView*)view
                             width:(int)width
                            height:(int)height
