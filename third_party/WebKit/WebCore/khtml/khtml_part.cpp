@@ -4312,12 +4312,17 @@ void KHTMLPart::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
           event->x(), event->y(),
           event->absX() - innerNode.handle()->renderer()->xPos(),
           event->absY() - innerNode.handle()->renderer()->yPos(), node, offset);
-      //        if (d->m_selectionEnd.handle() &&
-      //        d->m_selectionEnd.handle()->renderer())
-      //          kdDebug( 6000 ) << "setting end of selection to " <<
-      //          d->m_selectionEnd.handle()->renderer() << "/"
-      //                          << d->m_endOffset << endl;
+//        if (d->m_selectionEnd.handle() &&
+//        d->m_selectionEnd.handle()->renderer())
+//          kdDebug( 6000 ) << "setting end of selection to " <<
+//          d->m_selectionEnd.handle()->renderer() << "/"
+//                          << d->m_endOffset << endl;
 
+#ifdef APPLE_CHANGES
+      // Don't modify the selection if we're not on a node.
+      if (node == 0)
+        return;
+#endif
       // we have to get to know if end is before start or not...
       DOM::Node n = d->m_selectionStart;
       d->m_startBeforeEnd = false;
