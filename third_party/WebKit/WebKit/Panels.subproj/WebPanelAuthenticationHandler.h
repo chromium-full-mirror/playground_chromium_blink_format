@@ -12,6 +12,7 @@
 @interface WebPanelAuthenticationHandler : NSObject {
   NSMutableDictionary* windowToPanel;
   NSMutableDictionary* challengeToWindow;
+  NSMutableDictionary* windowToChallengeQueue;
 }
 
 + (id)sharedHandler;
