@@ -771,7 +771,8 @@ DOMString HTMLElementImpl::outerText() const {
 }
 
 DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
-    const DOMString& html) {
+    const DOMString& html,
+    bool includeCommentsInDOM) {
   // the following is in accordance with the definition as used by IE
   if (endTag[id()] == FORBIDDEN)
     return NULL;
@@ -796,7 +797,7 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
   DocumentFragmentImpl* fragment = new DocumentFragmentImpl(docPtr());
   fragment->ref();
   {
-    HTMLTokenizer tok(docPtr(), fragment);
+    HTMLTokenizer tok(docPtr(), fragment, includeCommentsInDOM);
     tok.write(html.string(), true);
     tok.finish();
   }

@@ -124,8 +124,12 @@ class Token {
 
 class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
  public:
-  HTMLTokenizer(DOM::DocumentPtr*, KHTMLView* = 0);
-  HTMLTokenizer(DOM::DocumentPtr*, DOM::DocumentFragmentImpl* frag);
+  HTMLTokenizer(DOM::DocumentPtr*,
+                KHTMLView* = 0,
+                bool includesComments = false);
+  HTMLTokenizer(DOM::DocumentPtr*,
+                DOM::DocumentFragmentImpl* frag,
+                bool includesComments = false);
   virtual ~HTMLTokenizer();
 
   virtual void write(const TokenizerString& str, bool appendData);
@@ -337,6 +341,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // line number at which the current <script> started
   int scriptStartLineno;
   int tagStartLineno;
+
+  bool includesCommentsInDOM;
 
 // This buffer can hold arbitrarily long user-defined attribute names, such as
 // in EMBED tags.

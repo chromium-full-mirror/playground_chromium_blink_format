@@ -185,7 +185,9 @@ class HTMLElementImpl : public ElementImpl {
   DOMString outerHTML() const;
   DOMString innerText() const;
   DOMString outerText() const;
-  DocumentFragmentImpl* createContextualFragment(const DOMString& html);
+  DocumentFragmentImpl* createContextualFragment(
+      const DOMString& html,
+      bool includeCommentsInDOM = false);
   bool setInnerHTML(const DOMString& html);
   bool setOuterHTML(const DOMString& html);
   bool setInnerText(const DOMString& text);

@@ -105,8 +105,12 @@ class HTMLStackElem {
  *    element or ignore the tag.
  *
  */
-KHTMLParser::KHTMLParser(KHTMLView* _parent, DocumentPtr* doc)
-    : current(0), currentIsReferenced(false) {
+KHTMLParser::KHTMLParser(KHTMLView* _parent,
+                         DocumentPtr* doc,
+                         bool includesComments)
+    : current(0),
+      currentIsReferenced(false),
+      includesCommentsInDOM(includesComments) {
 // kdDebug( 6035 ) << "parser constructor" << endl;
 #if SPEED_DEBUG > 0
   qt.start();
@@ -124,8 +128,12 @@ KHTMLParser::KHTMLParser(KHTMLView* _parent, DocumentPtr* doc)
   reset();
 }
 
-KHTMLParser::KHTMLParser(DOM::DocumentFragmentImpl* i, DocumentPtr* doc)
-    : current(0), currentIsReferenced(false) {
+KHTMLParser::KHTMLParser(DOM::DocumentFragmentImpl* i,
+                         DocumentPtr* doc,
+                         bool includesComments)
+    : current(0),
+      currentIsReferenced(false),
+      includesCommentsInDOM(includesComments) {
   HTMLWidget = 0;
   document = doc;
   document->ref();
@@ -1113,9 +1121,8 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
       n = new TextImpl(document, t->text);
       break;
     case ID_COMMENT:
-#ifdef COMMENTS_IN_DOM
-      n = new CommentImpl(document, t->text);
-#endif
+      if (includesCommentsInDOM)
+        n = new CommentImpl(document, t->text);
       break;
     default:
       kdDebug(6035) << "Unknown tag " << t->id << "!" << endl;

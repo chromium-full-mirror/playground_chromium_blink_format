@@ -69,8 +69,10 @@ class KHTMLParser;
  */
 class KHTMLParser {
  public:
-  KHTMLParser(KHTMLView* w, DOM::DocumentPtr* i);
-  KHTMLParser(DOM::DocumentFragmentImpl* frag, DOM::DocumentPtr* doc);
+  KHTMLParser(KHTMLView* w, DOM::DocumentPtr* i, bool includesComments = false);
+  KHTMLParser(DOM::DocumentFragmentImpl* frag,
+              DOM::DocumentPtr* doc,
+              bool includesComments = false);
   virtual ~KHTMLParser();
 
   /**
@@ -183,6 +185,8 @@ class KHTMLParser {
 
   bool headLoaded;
   int inStrayTableContent;
+
+  bool includesCommentsInDOM;
 
 #if SPEED_DEBUG > 0
   QTime qt;
