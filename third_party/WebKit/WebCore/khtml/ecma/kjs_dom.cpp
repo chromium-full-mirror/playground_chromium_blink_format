@@ -244,10 +244,10 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
           return rend ? static_cast<Value>(Number(rend->yPos()))
                       : Value(Undefined());
         case OffsetWidth:
-          return rend ? static_cast<Value>(Number(rend->width()))
+          return rend ? static_cast<Value>(Number(rend->offsetWidth()))
                       : Value(Undefined());
         case OffsetHeight:
-          return rend ? static_cast<Value>(Number(rend->height()))
+          return rend ? static_cast<Value>(Number(rend->offsetHeight()))
                       : Value(Undefined());
         case OffsetParent:
           return getDOMNode(exec,
