@@ -132,6 +132,8 @@ class KHTMLParser {
   void handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem);
   void reopenResidualStyleTags(HTMLStackElem* elem, bool inMalformedTable);
 
+  bool allowNestedRedundantTag(int _id);
+
   ushort* forbiddenTag;
 
   /*
