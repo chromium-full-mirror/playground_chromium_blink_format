@@ -521,9 +521,9 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
           map->addChild(n);
 #if SPEED_DEBUG < 2
           if (!n->attached() && HTMLWidget) {
+            n->init();
             if (!n->attached())
-              n->init();
-            n->attach();
+              n->attach();
           }
 #endif
           handled = true;
