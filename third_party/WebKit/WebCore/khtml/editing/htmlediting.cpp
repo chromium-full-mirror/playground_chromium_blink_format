@@ -1056,10 +1056,21 @@ void CompositeEditCommand::insertBlockPlaceholder(NodeImpl* node) {
 
   ASSERT(node->renderer() && node->renderer()->isBlockFlow());
 
+  insertNodeAt(createBlockPlaceholderElement(document()), node, 0);
+}
+
+void CompositeEditCommand::appendBlockPlaceholder(NodeImpl* node) {
+  if (!node)
+    return;
+
+  ASSERT(node->renderer() && node->renderer()->isBlockFlow());
+
   appendNode(createBlockPlaceholderElement(document()), node);
 }
 
-bool CompositeEditCommand::insertBlockPlaceholderIfNeeded(NodeImpl* node) {
+bool CompositeEditCommand::addBlockPlaceholderIfNeeded(
+    NodeImpl* node,
+    bool forceInsertIfNonEmpty) {
   if (!node)
     return false;
 
@@ -1069,14 +1080,24 @@ bool CompositeEditCommand::insertBlockPlaceholderIfNeeded(NodeImpl* node) {
   if (!renderer || !renderer->isBlockFlow())
     return false;
 
-  if (renderer->height() > 0)
-    return false;
+  // append the placeholder to make sure it follows
+  // any unrendered blocks
+  if (renderer->height() == 0) {
+    appendBlockPlaceholder(node);
+    return true;
+  }
 
-  insertBlockPlaceholder(node);
-  return true;
+  // when forcing a blank paragraph in a non-empty block, tho,
+  // we want to insert the placeholder at the front of that block
+  if (forceInsertIfNonEmpty) {
+    insertBlockPlaceholder(node);
+    return true;
+  }
+
+  return false;
 }
 
-bool CompositeEditCommand::removeBlockPlaceholderIfNeeded(NodeImpl* node) {
+bool CompositeEditCommand::removeBlockPlaceholder(NodeImpl* node) {
   NodeImpl* placeholder = findBlockPlaceholder(node);
   if (placeholder) {
     removeNode(placeholder);
@@ -2541,7 +2562,7 @@ void DeleteSelectionCommand::insertPlaceholderForAncestorBlockContent() {
         afterDownstreamBlock != upstreamBlock) {
       NodeImpl* block = createDefaultParagraphElement(document());
       insertNodeBefore(block, m_upstreamStart.node());
-      insertBlockPlaceholderIfNeeded(block);
+      addBlockPlaceholderIfNeeded(block);
       m_endingPosition = Position(block, 0);
     }
   }
@@ -2805,7 +2826,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
 
   // Now that we are about to add content, check to see if a placeholder element
   // can be removed.
-  removeBlockPlaceholderIfNeeded(startBlock);
+  removeBlockPlaceholder(startBlock);
 
   // Move the subtree containing node
   NodeImpl* node = startNode->enclosingInlineElement();
@@ -2992,6 +3013,13 @@ void DeleteSelectionCommand::doApply() {
     return;
   }
 
+  // if all we are deleting is complete paragraph(s), we need to make
+  // sure a blank paragraph remains when we are done
+  bool forceBlankParagraph =
+      isStartOfParagraph(
+          VisiblePosition(m_upstreamStart, VP_DEFAULT_AFFINITY)) &&
+      isEndOfParagraph(VisiblePosition(m_downstreamEnd, VP_DEFAULT_AFFINITY));
+
   // Delete any text that may hinder our ability to fixup whitespace after the
   // detele
   deleteInsignificantTextDownstream(m_trailingWhitespace);
@@ -3008,11 +3036,18 @@ void DeleteSelectionCommand::doApply() {
   calculateEndingPosition();
   fixupWhitespace();
 
-  // If the delete emptied a block, add in a placeholder so the block does not
-  // seem to disappear.
-  bool insertedPlaceholder =
-      insertBlockPlaceholderIfNeeded(m_endingPosition.node());
-  calculateTypingStyleAfterDelete(insertedPlaceholder);
+  // if the m_endingPosition is already a blank paragraph, there is
+  // no need to force a new one
+  if (forceBlankParagraph && isStartOfParagraph(VisiblePosition(
+                                 m_endingPosition, VP_DEFAULT_AFFINITY)) &&
+      isEndOfParagraph(
+          VisiblePosition(m_endingPosition, VP_DEFAULT_AFFINITY))) {
+    forceBlankParagraph = false;
+  }
+
+  bool addedBlockPlaceHolder =
+      addBlockPlaceholderIfNeeded(m_endingPosition.node(), forceBlankParagraph);
+  calculateTypingStyleAfterDelete(addedBlockPlaceHolder);
   debugPosition("endingPosition   ", m_endingPosition);
   setEndingSelection(Selection(m_endingPosition, affinity));
   clearTransientState();
@@ -3375,12 +3410,12 @@ void InsertParagraphSeparatorCommand::doApply() {
     if (startBlockIsRoot) {
       NodeImpl* extraBlock = createParagraphElement();
       appendNode(extraBlock, startBlock);
-      insertBlockPlaceholder(extraBlock);
+      appendBlockPlaceholder(extraBlock);
       appendNode(blockToInsert, startBlock);
     } else {
       insertNodeAfter(blockToInsert, startBlock);
     }
-    insertBlockPlaceholder(blockToInsert);
+    appendBlockPlaceholder(blockToInsert);
     setEndingSelection(Position(blockToInsert, 0), DOWNSTREAM);
     applyStyleAfterInsertion();
     return;
@@ -3398,7 +3433,7 @@ void InsertParagraphSeparatorCommand::doApply() {
     NodeImpl* refNode =
         isFirstInBlock && !startBlockIsRoot ? startBlock : pos.node();
     insertNodeBefore(blockToInsert, refNode);
-    insertBlockPlaceholder(blockToInsert);
+    appendBlockPlaceholder(blockToInsert);
     setEndingSelection(Position(blockToInsert, 0), DOWNSTREAM);
     applyStyleAfterInsertion();
     setEndingSelection(pos, DOWNSTREAM);
@@ -3413,7 +3448,7 @@ void InsertParagraphSeparatorCommand::doApply() {
       appendNode(blockToInsert, startBlock);
     else
       insertNodeAfter(blockToInsert, startBlock);
-    insertBlockPlaceholder(blockToInsert);
+    appendBlockPlaceholder(blockToInsert);
     setEndingSelection(Position(blockToInsert, 0), DOWNSTREAM);
     applyStyleAfterInsertion();
     return;
@@ -3492,7 +3527,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   // So, we need the placeholder to "hold the first line open".
   if (startBlock !=
       pos.downstream(DoNotStayInBlock).node()->enclosingBlockFlowElement())
-    insertBlockPlaceholder(blockToInsert);
+    appendBlockPlaceholder(blockToInsert);
 
   // Move the start node and the siblings of the start node.
   if (startNode != startBlock) {
@@ -3680,7 +3715,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
     }
 
     // Make sure the cloned block quote renders.
-    insertBlockPlaceholderIfNeeded(clonedBlockquote);
+    addBlockPlaceholderIfNeeded(clonedBlockquote);
   }
 
   // Put the selection right before the break.
@@ -3761,7 +3796,7 @@ void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
 
   // Now that we are about to add content, check to see if a placeholder element
   // can be removed.
-  removeBlockPlaceholderIfNeeded(textNode->enclosingBlockFlowElement());
+  removeBlockPlaceholder(textNode->enclosingBlockFlowElement());
 
   // These are temporary implementations for inserting adjoining spaces
   // into a document. We are working on a CSS-related whitespace solution
