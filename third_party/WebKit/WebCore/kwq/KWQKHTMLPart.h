@@ -66,7 +66,7 @@ class KWQKHTMLPartImpl : public QObject {
   void setView(KHTMLView* view);
   KHTMLView* getView() const;
 
-  bool openURLInFrame(const KURL&, const KParts::URLArgs&);
+  void openURLRequest(const KURL&, const KParts::URLArgs&);
 
   void slotData(NSString*,
                 bool forceEncoding,
@@ -85,7 +85,7 @@ class KWQKHTMLPartImpl : public QObject {
                    int button,
                    int state,
                    const QString& _target,
-                   KParts::URLArgs);
+                   const KParts::URLArgs&);
   bool requestFrame(khtml::RenderPart* frame,
                     const QString& url,
                     const QString& frameName,
@@ -126,6 +126,8 @@ class KWQKHTMLPartImpl : public QObject {
   void redirectionTimerStartedOrStopped();
 
  private:
+  WebCoreBridge* getBridgeForFrameName(const QString& frameName);
+
   KHTMLPart* part;
   KHTMLPartPrivate* d;
 
