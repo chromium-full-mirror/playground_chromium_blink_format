@@ -423,6 +423,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   virtual bool isKHTMLPart() const;
 
+  void registerCommandForUndoOrRedo(const khtml::EditCommandPtr& cmd,
+                                    bool isRedo);
+
   WebCoreBridge* _bridge;
 
   KWQSignal _started;

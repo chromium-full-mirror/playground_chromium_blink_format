@@ -124,6 +124,40 @@ typedef enum {
   WebScrollWheel
 } WebScrollGranularity;
 
+typedef enum {
+  WebUndoActionUnspecified,
+  WebUndoActionSetColor,
+  WebUndoActionSetBackgroundColor,
+  WebUndoActionTurnOffKerning,
+  WebUndoActionTightenKerning,
+  WebUndoActionLoosenKerning,
+  WebUndoActionUseStandardKerning,
+  WebUndoActionTurnOffLigatures,
+  WebUndoActionUseStandardLigatures,
+  WebUndoActionUseAllLigatures,
+  WebUndoActionRaiseBaseline,
+  WebUndoActionLowerBaseline,
+  WebUndoActionSetTraditionalCharacterShape,
+  WebUndoActionSetFont,
+  WebUndoActionChangeAttributes,
+  WebUndoActionAlignLeft,
+  WebUndoActionAlignRight,
+  WebUndoActionCenter,
+  WebUndoActionJustify,
+  WebUndoActionSetWritingDirection,
+  WebUndoActionSubscript,
+  WebUndoActionSuperscript,
+  WebUndoActionUnderline,
+  WebUndoActionOutline,
+  WebUndoActionUnscript,
+  WebUndoActionDrag,
+  WebUndoActionCut,
+  WebUndoActionPaste,
+  WebUndoActionPasteFont,
+  WebUndoActionPasteRuler,
+  WebUndoActionTyping,
+} WebUndoAction;
+
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
 // to be implemented by library clients, for example WebKit. The objects are
@@ -632,6 +666,7 @@ typedef enum {
 - (jobject)pollForAppletInView:(NSView*)view;
 
 - (NSUndoManager*)undoManager;
+- (NSString*)nameForUndoAction:(WebUndoAction)undoAction;
 - (void)issueCutCommand;
 - (void)issueCopyCommand;
 - (void)issuePasteCommand;

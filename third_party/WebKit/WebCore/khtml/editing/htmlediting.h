@@ -41,6 +41,40 @@ class HTMLElementImpl;
 class TextImpl;
 }
 
+typedef enum {
+  HTMLEditActionUnspecified,
+  HTMLEditActionSetColor,
+  HTMLEditActionSetBackgroundColor,
+  HTMLEditActionTurnOffKerning,
+  HTMLEditActionTightenKerning,
+  HTMLEditActionLoosenKerning,
+  HTMLEditActionUseStandardKerning,
+  HTMLEditActionTurnOffLigatures,
+  HTMLEditActionUseStandardLigatures,
+  HTMLEditActionUseAllLigatures,
+  HTMLEditActionRaiseBaseline,
+  HTMLEditActionLowerBaseline,
+  HTMLEditActionSetTraditionalCharacterShape,
+  HTMLEditActionSetFont,
+  HTMLEditActionChangeAttributes,
+  HTMLEditActionAlignLeft,
+  HTMLEditActionAlignRight,
+  HTMLEditActionCenter,
+  HTMLEditActionJustify,
+  HTMLEditActionSetWritingDirection,
+  HTMLEditActionSubscript,
+  HTMLEditActionSuperscript,
+  HTMLEditActionUnderline,
+  HTMLEditActionOutline,
+  HTMLEditActionUnscript,
+  HTMLEditActionDrag,
+  HTMLEditActionCut,
+  HTMLEditActionPaste,
+  HTMLEditActionPasteFont,
+  HTMLEditActionPasteRuler,
+  HTMLEditActionTyping,
+} HTMLEditAction;
+
 namespace khtml {
 
 class EditCommand;
@@ -64,6 +98,8 @@ class EditCommandPtr : public SharedPtr<EditCommand> {
   void apply() const;
   void unapply() const;
   void reapply() const;
+
+  HTMLEditAction editingAction() const;
 
   DOM::DocumentImpl* const document() const;
 
@@ -137,6 +173,8 @@ class EditCommand : public Shared<EditCommand> {
   virtual void doApply() = 0;
   virtual void doUnapply() = 0;
   virtual void doReapply();  // calls doApply()
+
+  virtual HTMLEditAction editingAction() const;
 
   virtual DOM::DocumentImpl* const document() const { return m_document; }
 
@@ -790,6 +828,7 @@ class TypingCommand : public CompositeEditCommand {
   static void closeTyping(const EditCommandPtr&);
 
   virtual void doApply();
+  virtual HTMLEditAction editingAction() const;
 
   bool openForMoreTyping() const { return m_openForMoreTyping; }
   void closeTyping() { m_openForMoreTyping = false; }
