@@ -114,6 +114,13 @@ class RenderTable : public RenderBlock {
                      int tx,
                      int ty,
                      PaintAction paintAction);
+  virtual void paintBoxDecorations(QPainter* p,
+                                   int _x,
+                                   int _y,
+                                   int _w,
+                                   int _h,
+                                   int _tx,
+                                   int _ty);
   virtual void layout();
   virtual void calcMinMaxWidth();
   virtual void close();
