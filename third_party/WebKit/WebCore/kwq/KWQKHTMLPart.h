@@ -66,8 +66,6 @@ class KWQKHTMLPartImpl : public QObject {
   KHTMLView* getView() const;
 
   bool openURLInFrame(const KURL&, const KParts::URLArgs&);
-  void openURL(const KURL&);
-  void write(const char* str, int len);
   void end();
 
   void slotData(NSString*,
