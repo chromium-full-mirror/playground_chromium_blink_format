@@ -421,8 +421,13 @@ class StyleMarqueeData : public Shared<StyleMarqueeData> {
 // This struct holds information about flex group transitions for the
 // box-flex-group-transition property.
 struct FlexGroupTransitionData {
+  FlexGroupTransitionData() : autoValue(true), group1(0), group2(0), next(0) {}
   FlexGroupTransitionData(unsigned int _group1, unsigned int _group2, Length _l)
-      : group1(_group1), group2(_group2), length(_l), next(0) {}
+      : autoValue(false),
+        group1(_group1),
+        group2(_group2),
+        length(_l),
+        next(0) {}
   FlexGroupTransitionData(const FlexGroupTransitionData& o);
 
   ~FlexGroupTransitionData() { delete next; }
@@ -432,6 +437,9 @@ struct FlexGroupTransitionData {
     return !(*this == o);
   }
 
+  bool isAuto() const { return autoValue; }
+
+  bool autoValue;
   unsigned int group1;
   unsigned int group2;
   Length length;

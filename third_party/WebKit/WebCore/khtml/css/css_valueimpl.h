@@ -378,6 +378,7 @@ class ShadowValueImpl : public CSSValueImpl {
 // Used by box-flex-group-transition
 class FlexGroupTransitionValueImpl : public CSSValueImpl {
  public:
+  FlexGroupTransitionValueImpl();
   FlexGroupTransitionValueImpl(unsigned int _group1,
                                unsigned int _group2,
                                CSSPrimitiveValueImpl* _length);
@@ -387,6 +388,9 @@ class FlexGroupTransitionValueImpl : public CSSValueImpl {
 
   virtual DOM::DOMString cssText() const;
 
+  bool isAuto() const { return autoValue; }
+
+  bool autoValue;
   unsigned int group1;
   unsigned int group2;
   CSSPrimitiveValueImpl* length;
