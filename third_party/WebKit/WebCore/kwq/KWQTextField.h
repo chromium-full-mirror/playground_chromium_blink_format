@@ -25,21 +25,20 @@
 
 #import <Cocoa/Cocoa.h>
 
-class QWidget;
-
+class QLineEdit;
 @class KWQTextFieldFormatter;
 
 #define FOCUS_BORDER_SIZE 3
 
 @interface KWQNSTextField : NSTextField {
  @private
+  QLineEdit* widget;
   NSTextField* secureField;
-  QWidget* widget;
   KWQTextFieldFormatter* formatter;
   BOOL edited;
 }
 
-- initWithWidget:(QWidget*)widget;
+- initWithQLineEdit:(QLineEdit*)widget;
 
 - (void)setPasswordMode:(BOOL)flag;
 - (BOOL)passwordMode;

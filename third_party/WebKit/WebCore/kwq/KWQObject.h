@@ -92,9 +92,9 @@ class QObject : public Qt {
   void killTimers();
   virtual void timerEvent(QTimerEvent*);
 
-  void installEventFilter(const QObject*);
-  void removeEventFilter(const QObject*);
-  bool eventFilter(QObject* o, QEvent* e);
+  void installEventFilter(const QObject* o) { m_eventFilterObject = o; }
+  void removeEventFilter(const QObject*) { m_eventFilterObject = 0; }
+  const QObject* eventFilterObject() const { return m_eventFilterObject; }
 
   void blockSignals(bool b) { m_signalsBlocked = b; }
 
@@ -112,6 +112,8 @@ class QObject : public Qt {
   QPtrList<QObject> guardedPtrDummyList;
   mutable KWQSignal* m_signalListHead;
   bool m_signalsBlocked;
+
+  const QObject* m_eventFilterObject;
 
   static const QObject* m_sender;
 

@@ -758,12 +758,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void nodeActivated(const DOM::Node&);
 
-#ifdef APPLE_CHANGES
-  void completed();
-  void completed(bool);
-  void started(KIO::Job*);
-#endif
-
  protected:
   /**
    * returns a KURL object for the given url. Use when
@@ -1143,9 +1137,13 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
 #ifdef APPLE_CHANGES
  public:
-  void setStatusBarText(const QString&);
   KWQKHTMLPartImpl* impl;
   friend class KWQKHTMLPartImpl;
+
+  void completed();
+  void completed(bool);
+  void setStatusBarText(const QString&);
+  void started(KIO::Job*);
 #endif
 };
 
