@@ -85,7 +85,8 @@ void RenderTable::setStyle(RenderStyle* _style) {
   setInline(style()->display() == INLINE_TABLE && !isPositioned());
   setReplaced(style()->display() == INLINE_TABLE);
 
-  spacing = style()->borderSpacing();
+  // In the collapsed border model, there is no cell spacing.
+  spacing = collapseBorders() ? 0 : style()->borderSpacing();
   columnPos[0] = spacing;
 
   if (!tableLayout || style()->tableLayout() != oldTableLayout) {
@@ -277,7 +278,9 @@ void RenderTable::layout() {
         tCaption->height() + tCaption->marginTop() + tCaption->marginBottom();
   }
 
-  m_height += borderTop() + paddingTop();
+  m_height += borderTop();
+  if (!collapseBorders())
+    m_height += paddingTop();
 
   int oldHeight = m_height;
   calcHeight();
@@ -334,7 +337,10 @@ void RenderTable::layout() {
       firstBody->layoutRows(th - calculatedHeight);
     }
   }
-  int bl = borderLeft() + paddingLeft();
+
+  int bl = borderLeft();
+  if (!collapseBorders())
+    bl += paddingLeft();
 
   // position the table sections
   if (head) {
@@ -354,7 +360,9 @@ void RenderTable::layout() {
     m_height += foot->height();
   }
 
-  m_height += paddingBottom() + borderBottom();
+  m_height += borderBottom();
+  if (!collapseBorders())
+    m_height += paddingBottom();
 
   if (tCaption && tCaption->style()->captionSide() == CAPBOTTOM) {
     tCaption->setPos(tCaption->marginLeft(), m_height);
