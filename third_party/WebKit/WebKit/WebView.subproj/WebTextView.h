@@ -4,14 +4,13 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import "WebSearchableTextView.h"
 
 @protocol WebDocumentLoading;
 @protocol WebDocumentDragSettings;
-@protocol WebDocumentSearching;
 
-@interface WebTextView : NSTextView<WebDocumentLoading,
-                                    WebDocumentDragSettings,
-                                    WebDocumentSearching> {
+@interface WebTextView
+    : WebSearchableTextView<WebDocumentLoading, WebDocumentDragSettings> {
   BOOL canDragFrom;
   BOOL canDragTo;
 }
