@@ -456,7 +456,7 @@ class QString {
   void detach();
   void detachInternal();
   void deref();
-  void forceUnicode();
+  QChar* forceUnicode();
   void setLength(uint);
 
   QStringData* data() const;
