@@ -236,7 +236,18 @@ void RenderBox::paintBackground(QPainter* p,
       EBackgroundRepeat bgr = sptr->backgroundRepeat();
       if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && w > pixw) {
         cw = pixw;
-        cx = _tx + sptr->backgroundXPosition().minWidth(pw - pixw);
+        int xPosition = sptr->backgroundXPosition().minWidth(pw - pixw);
+        if (xPosition >= 0)
+          cx = _tx + xPosition;
+        else {
+          cx = _tx;
+          if (pixw == 0)
+            sx = 0;
+          else {
+            sx = -xPosition;
+            cw += xPosition;
+          }
+        }
       } else {
         cw = w - vpab;
         cx = _tx;
@@ -252,7 +263,18 @@ void RenderBox::paintBackground(QPainter* p,
 
       if ((bgr == NO_REPEAT || bgr == REPEAT_X) && h > pixh) {
         ch = pixh;
-        cy = _ty + sptr->backgroundYPosition().minWidth(ph - pixh);
+        int yPosition = sptr->backgroundYPosition().minWidth(ph - pixh);
+        if (yPosition >= 0)
+          cy = _ty + yPosition;
+        else {
+          cy = _ty;
+          if (pixh == 0)
+            sy = 0;
+          else {
+            sy = -yPosition;
+            ch += yPosition;
+          }
+        }
       } else {
         ch = h - hpab;
         cy = _ty;

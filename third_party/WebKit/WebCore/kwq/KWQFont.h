@@ -39,7 +39,10 @@ class NSString;
 class QFontFamily {
  public:
   QFontFamily();
-  ~QFontFamily() { delete _next; }
+  ~QFontFamily() {
+    if (_next)
+      _next->deref();
+  }
 
   QFontFamily(const QFontFamily& other);
   QFontFamily& operator=(const QFontFamily& other);
@@ -51,16 +54,27 @@ class QFontFamily {
 
   QFontFamily* next() { return _next; }
   void appendFamily(QFontFamily* family) {
-    delete _next;
+    if (_next)
+      _next->deref();
     _next = family;
+    if (_next)
+      _next->ref();
   }
 
   bool operator==(const QFontFamily& compareFontFamily) const;
   bool operator!=(const QFontFamily& x) const { return !(*this == x); }
 
+  void ref() { _refCnt++; };
+  void deref() {
+    _refCnt--;
+    if (_refCnt == 0)
+      delete this;
+  };
+
  private:
   NSString* _family;
   QFontFamily* _next;
+  int _refCnt;
 };
 
 class QFont {
