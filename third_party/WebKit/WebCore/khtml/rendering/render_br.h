@@ -48,7 +48,6 @@ class RenderBR : public RenderText {
   virtual unsigned int width(unsigned int, unsigned int, bool) const {
     return 0;
   }
-  virtual short width() const { return RenderText::width(); }
 
   virtual int height() const { return 0; }
 
@@ -59,6 +58,15 @@ class RenderBR : public RenderText {
 
   virtual bool isBR() const { return true; }
   virtual void cursorPos(int offset, int& _x, int& _y, int& height);
+
+  virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
+      int _x,
+      int _y,
+      int _tx,
+      int _ty,
+      DOM::NodeImpl*& node,
+      int& offset);
 };
-};
+}
+
 #endif
