@@ -166,6 +166,7 @@ class QString {
 
   static QString number(long, int base = 10);
   static QString fromLatin1(const char*, int len = -1);
+  static QString fromLocal8Bit(const char*, int len = -1);
 
   // constructors, copy constructors, and destructors ------------------------
 
@@ -189,6 +190,8 @@ class QString {
 
   // member functions --------------------------------------------------------
 
+  QString copy() const;
+
   bool isNull() const;
   bool isEmpty() const;
   uint length() const;
@@ -196,6 +199,7 @@ class QString {
 
   int toInt() const;
   int toInt(bool*, int base = 10) const;
+  ushort toUShort() const;
   uint toUInt(bool* ok = 0, int base = 10) const;
   long toLong(bool* ok = 0, int base = 10) const;
   float toFloat(bool* b = 0) const;
@@ -207,15 +211,19 @@ class QString {
   int contains(const char*, bool cs = TRUE) const;
   int contains(char) const;
 
-  int find(char, int index = 0) const;
-  int find(const char*, int index = 0, bool b = 0) const;
-  int find(const QString&, int index = 0, bool b = 0) const;
-  int find(const QRegExp&, int index = 0, bool b = 0) const;
-  int findRev(char, int index = 0) const;
-  int findRev(const char*, int index = 0) const;
+  QChar at(uint) const;
+
+  int find(char, int index = 0, bool cs = TRUE) const;
+  int find(QChar, int index = 0, bool cs = TRUE) const;
+  int find(const QString&, int index = 0, bool cs = TRUE) const;
+  int find(const QRegExp&, int index = 0, bool cs = TRUE) const;
+  int findRev(char, int index = 0, bool cs = TRUE) const;
+  int findRev(const char*, int index = 0, bool cs = TRUE) const;
 
   QString& remove(uint, uint);
   QString& replace(const QRegExp&, const QString&);
+  QString& insert(uint, const QString&);
+  QString& insert(uint, QChar);
   QString& insert(uint, char);
   void truncate(uint pos);
   void fill(QChar, int len = -1);
@@ -226,6 +234,8 @@ class QString {
   QString left(uint) const;
   QString right(uint) const;
   QString mid(int, int len = 0xffffffff) const;
+
+  int compare(const QString&) const;
 
   const char* latin1() const;
   const char* ascii() const;
