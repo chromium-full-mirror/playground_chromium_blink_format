@@ -54,6 +54,8 @@ class QLineEdit;
 - (void)setBaseWritingDirection:(NSWritingDirection)direction;
 - (NSWritingDirection)baseWritingDirection;
 
+- (NSString*)string;
+
 @end
 
 @interface KWQTextField : NSTextField<KWQWidgetHolder> {
