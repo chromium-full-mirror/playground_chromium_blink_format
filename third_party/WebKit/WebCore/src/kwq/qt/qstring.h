@@ -133,6 +133,7 @@ class QChar {
   bool isNumber() const;
   bool isLetterOrNumber() const;
   bool isPunct() const;
+  int digitValue() const;
   QChar lower() const;
   QChar upper() const;
   Direction direction() const;

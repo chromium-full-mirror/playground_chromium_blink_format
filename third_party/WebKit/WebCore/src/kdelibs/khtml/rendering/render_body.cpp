@@ -90,8 +90,8 @@ void RenderBody::layout() {
 
   if (!scrollbarsStyled) {
     if (root()->view()) {
-      root()->view()->horizontalScrollBar()->setPalette(style()->palette());
-      root()->view()->verticalScrollBar()->setPalette(style()->palette());
+      // root()->view()->horizontalScrollBar()->setPalette(style()->palette());
+      // root()->view()->verticalScrollBar()->setPalette(style()->palette());
     }
     scrollbarsStyled = true;
   }
