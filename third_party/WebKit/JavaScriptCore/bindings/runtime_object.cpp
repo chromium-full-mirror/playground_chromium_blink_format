@@ -58,30 +58,36 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
 
 Value RuntimeObjectImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
+  Value result = Undefined();
+
   instance->begin();
 
   Class* aClass = instance->getClass();
 
   if (aClass) {
     // See if the instance have a field with the specified name.
-    Field* aField = aClass->fieldNamed(propertyName.ascii());
+    Field* aField = aClass->fieldNamed(propertyName.ascii(), instance);
     if (aField) {
-      return instance->getValueOfField(exec, aField);
+      result = instance->getValueOfField(exec, aField);
+    } else {
+      // Now check if a method with specified name exists, if so return a
+      // function object for
+      // that method.
+      MethodList methodList = aClass->methodsNamed(propertyName.ascii());
+      if (methodList.length() > 0) {
+        result = Object(new RuntimeMethodImp(exec, propertyName, methodList));
+      }
     }
 
-    // Now check if a method with specified name exists, if so return a function
-    // object for
-    // that method.
-    MethodList methodList = aClass->methodsNamed(propertyName.ascii());
-    if (methodList.length() > 0) {
-      instance->end();
-      return Object(new RuntimeMethodImp(exec, propertyName, methodList));
+    if (result.type() == UndefinedType) {
+      // Try a fallback object.
+      result = aClass->fallbackObject(exec, instance, propertyName);
     }
   }
 
   instance->end();
 
-  return Undefined();
+  return result;
 }
 
 void RuntimeObjectImp::put(ExecState* exec,
@@ -91,9 +97,12 @@ void RuntimeObjectImp::put(ExecState* exec,
   instance->begin();
 
   // Set the value of the property.
-  Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+  Field* aField =
+      instance->getClass()->fieldNamed(propertyName.ascii(), instance);
   if (aField) {
     getInternalInstance()->setValueOfField(exec, aField, value);
+  } else {
+    getInternalInstance()->setValueOfUndefinedField(exec, propertyName, value);
   }
 
   instance->end();
@@ -103,7 +112,8 @@ bool RuntimeObjectImp::canPut(ExecState* exec,
                               const Identifier& propertyName) const {
   instance->begin();
 
-  Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+  Field* aField =
+      instance->getClass()->fieldNamed(propertyName.ascii(), instance);
 
   instance->end();
 
@@ -114,7 +124,8 @@ bool RuntimeObjectImp::hasProperty(ExecState* exec,
                                    const Identifier& propertyName) const {
   instance->begin();
 
-  Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+  Field* aField =
+      instance->getClass()->fieldNamed(propertyName.ascii(), instance);
   if (aField) {
     instance->end();
     return true;

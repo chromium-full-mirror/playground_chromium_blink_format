@@ -37,19 +37,46 @@ class Value;
 
 namespace Bindings {
 
+class ObjcInstance;
+
 class ObjcField : public Field {
  public:
   ObjcField(Ivar ivar);
 
-  ~ObjcField(){};
+  ObjcField(CFStringRef name);
 
-  ObjcField(const ObjcField& other) : Field() { _ivar = other._ivar; };
+  ~ObjcField() {
+    if (_name)
+      CFRelease(_name);
+  };
+
+  ObjcField(const ObjcField& other) : Field() {
+    _ivar = other._ivar;
+
+    if (other._name != _name) {
+      if (_name)
+        CFRelease(_name);
+      if (other._name)
+        _name = (CFStringRef)CFRetain(other._name);
+      else
+        _name = 0;
+    }
+  };
 
   ObjcField& operator=(const ObjcField& other) {
     if (this == &other)
       return *this;
 
     _ivar = other._ivar;
+
+    if (other._name != _name) {
+      if (_name)
+        CFRelease(_name);
+      if (other._name)
+        _name = (CFStringRef)CFRetain(other._name);
+      else
+        _name = 0;
+    }
 
     return *this;
   };
@@ -65,6 +92,7 @@ class ObjcField : public Field {
 
  private:
   Ivar _ivar;
+  CFStringRef _name;
 };
 
 class ObjcMethod : public Method {
@@ -135,6 +163,40 @@ class ObjcArray : public Array {
 
  private:
   ObjectStructPtr _array;
+};
+
+class FallbackObjectImp : public KJS::ObjectImp {
+ public:
+  FallbackObjectImp(ObjectImp* proto);
+
+  FallbackObjectImp(ObjcInstance* i, const KJS::Identifier propertyName);
+
+  const ClassInfo* classInfo() const { return &info; }
+
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+
+  virtual bool canPut(ExecState* exec, const Identifier& propertyName) const;
+
+  virtual bool implementsCall() const;
+  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+
+  virtual bool hasProperty(ExecState* exec,
+                           const Identifier& propertyName) const;
+
+  virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+
+  virtual Value defaultValue(ExecState* exec, Type hint) const;
+
+ private:
+  static const ClassInfo info;
+
+  ObjcInstance* _instance;
+  KJS::Identifier _item;
 };
 
 }  // namespace Bindings
