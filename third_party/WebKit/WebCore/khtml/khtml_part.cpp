@@ -1116,12 +1116,6 @@ bool KHTMLPart::openFile() {
   return true;
 }
 
-DOM::HTMLDocumentImpl* KHTMLPart::docImpl() const {
-  if (d && d->m_doc && d->m_doc->isHTMLDocument())
-    return static_cast<HTMLDocumentImpl*>(d->m_doc);
-  return 0;
-}
-
 DOM::DocumentImpl* KHTMLPart::xmlDocImpl() const {
   if (d)
     return d->m_doc;

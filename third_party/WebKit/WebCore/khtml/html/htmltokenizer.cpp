@@ -2141,7 +2141,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
   }
 }
 
-bool HTMLTokenizer::isWaitingForScripts() {
+bool HTMLTokenizer::isWaitingForScripts() const {
   return loadingExtScript;
 }
 
@@ -2152,8 +2152,6 @@ void HTMLTokenizer::setSrc(const TokenizerString& source) {
 }
 
 void HTMLTokenizer::setOnHold(bool _onHold) {
-  if (onHold == _onHold)
-    return;
   onHold = _onHold;
 }
 }
