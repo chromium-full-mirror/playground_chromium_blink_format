@@ -24,13 +24,6 @@
 
     ...
 
-    or
-
-    ...
-
-    WKWebView *view = [[WKWebView alloc] initWithFrame: myFrame url: url];
-    [[[view controller] dataSource] startLoading];
-
 
     What is the behaviour of the view after it has been initialized and
     startLoading: is called?
@@ -105,22 +98,23 @@
   id _viewPrivate;
 }
 
-#ifdef READY_FOR_PRIMETIME
-
 - initWithFrame:(NSRect)frame;
 
-// Convenience method.  initWithFrame:url: will create a controller and data
-// source.
-- initWithFrame:(NSRect)frame url:(NSURL*)url;
-
+#ifdef TENTATIVE_API
 // Set and get the delegate.
 - (void)setDelegate:(id<WKWebViewDelegate>)delegate;
 - (id<WKWebViewDelegate>)delegate;
+#endif
 
 // Set and get the controller.  Note that the controller is not retained.
 // Perhaps setController: should be private?
-//- (void)setController: (id <WKWebController>)controller;
 - (id<WKWebController>)controller;
+
+// This method is typically called by the view's controller when
+// the data source is changed.
+- (void)dataSourceChanged;
+
+- (void)setNeedsLayout:(bool)flag;
 
 // This method should not be public until we have a more completely
 // understood way to subclass WKWebView.
@@ -133,9 +127,9 @@
 - (void)setFontSizes:(NSArray*)sizes;
 - (NSArray*)fontSizes;
 - (void)resetFontSizes;
-- (void)setStandardFont:(NSSFont*)font;
+- (void)setStandardFont:(NSFont*)font;
 - (NSFont*)standardFont;
-- (void)setFixedFont:(NSSFont*)font;
+- (void)setFixedFont:(NSFont*)font;
 - (NSFont*)fixedFont;
 
 // Drag and drop links and images.  Others?
@@ -146,24 +140,24 @@
 
 // Returns an array of built-in context menu items for this node.
 // Generally called by WKContextMenuHandlers from contextMenuItemsForNode:
+#ifdef TENTATIVE_API
 - (NSArray*)defaultContextMenuItemsForNode:(WKDOMNode*);
+#endif
 - (void)setContextMenusEnabled:(BOOL)flag;
 - (BOOL)contextMenusEnabled;
 
 // Remove the selection.
-- deselectText;
+- (void)deselectText;
 
 // Search from the end of the currently selected location, or from the beginning
 // of the document if nothing
 // is selected.
 - (void)searchFor:(NSString*)string
         direction:(BOOL)forward
-    caseSensitive:(BOOL) case
+    caseSensitive:(BOOL)caseFlag;
 
-    // Get an attributed string that represents the current selection.
-    -(NSAttributedString*)selectedText;
-
-#endif
+// Get an attributed string that represents the current selection.
+- (NSAttributedString*)selectedText;
 
 @end
 

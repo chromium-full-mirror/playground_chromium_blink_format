@@ -119,56 +119,11 @@
         WKAuthenticationHandler to use interfaces instead of structs..
 */
 
-/*
-   =============================================================================
+@class WKWebDataSource;
+@class WKError;
+@class WKWebView;
 
-    Is WKConcreteWebController the right name?  The name fits with the
-    scheme used by Foundation, although Foundation's concrete classes
-    typically aren't public.
-*/
-#ifndef NEW_WEBKIT_API
-@interface WKDefaultWebController : NSObject
-@end
-#else
-@interface WKDefaultWebController : NSObject<WKWebController>
-
-- initWithView:(WKWebView*)dataSource:(WKWebDataSource*)dataSource;
-
-- setDirectsAllLinksToSystemBrowser:(BOOL)flag -
-                                    (BOOL)directsAllLinksToSystemBrowser;
-
-- (void)setView:(WKWebView*)view andDataSource:(WKWebDataSource*)dataSource;
-- (WKWebView*)viewForDataSource:(WKWebDataSource*)dataSource;
-- (WKWebDataSource*)dataSourceForView:(WKWebVew*)view
-
-                                      - (WKWebView*)mainView;
-- (WKWebDataSource*)mainDataSource;
-
-- (void)createViewForDataSource:(WKWebDataSource*)dataSource
-                   inFrameNamed:(NSString*)name;
-
-- (void)createViewForDataSource:(WKWebDataSource*)dataSource
-                       inIFrame:(id)iFrameIdentifier;
-
-@end
-
-/*
-   =============================================================================
-
-    WKWebController implements all the behavior that ties together WKWebView
-    and WKWebDataSource.  See each inherited protocol for a more complete
-    description.
-
-    [Don and I both agree that all these little protocols are useful to cleanly
-     describe snippets of behavior, but do we explicity reference them anywhere,
-     or do we just use the umbrella protocol?]
-*/
-@protocol WKWebController<WKLoadHandler,
-                          WKScriptContextHandler,
-                          WKAuthenticationHandler,
-                          WKLocationChangeHandler>
-@end
-
+#ifdef TENTATIVE_API
 /*
    =============================================================================
 
@@ -206,6 +161,7 @@
 - (void)serverRedirectTo:(NSURL*)url;
 
 @end
+#endif
 
 /*
    =============================================================================
@@ -245,10 +201,12 @@
     indication.  Should we use a struct?
 */
 @interface WKLoadProgress {
-  int bytesSoFar;      // 0 if this is the start of load
-  int totalToLoad;     // -1 if this is not known.
-                       // bytesSoFar == totalLoaded when complete
+  int bytesSoFar;   // 0 if this is the start of load
+  int totalToLoad;  // -1 if this is not known.
+                    // bytesSoFar == totalLoaded when complete
+#ifdef TENTATIVE_API
   WK_LOAD_TYPES type;  // load types, either image, css, jscript, or html
+#endif
 }
 @end
 
@@ -306,13 +264,14 @@
   // location has failed; useful to be able to show a
   // different dialog based on count
 }
+@end
 
 @protocol WKAuthenticationHandler
 // Can we make this work without blocking the UI, or do we need to make it
 // explicitly async
 // somehow?
-- (WKSimpleAuthenticationResult)authenticate:
-    (WKSimpleAuthenticationRequest)request;
+- (WKSimpleAuthenticationResult*)authenticate:
+    (WKSimpleAuthenticationRequest*)request;
 
 // do we need anything for fancier authentication schemes like kerberos or
 // GSSAPI?
@@ -353,8 +312,16 @@
 /*
    =============================================================================
 
-*/
-@protocol WKFrame
-@end
+    WKWebController implements all the behavior that ties together WKWebView
+    and WKWebDataSource.  See each inherited protocol for a more complete
+    description.
 
-#endif
+    [Don and I both agree that all these little protocols are useful to cleanly
+     describe snippets of behavior, but do we explicity reference them anywhere,
+     or do we just use the umbrella protocol?]
+*/
+@protocol WKWebController<WKLoadHandler,
+                          WKScriptContextHandler,
+                          WKAuthenticationHandler,
+                          WKLocationChangeHandler>
+@end

@@ -7,8 +7,27 @@
    _dataSourcePrivate in
         NSWebPageDataSource.
 */
+#import <Cocoa/Cocoa.h>
 
-@interface NSWebPageDataSourcePrivate : NSObject {
+#import <WebKit/WKWebDataSource.h>
+
+// includes from kde
+#include <khtmlview.h>
+
+@interface WKWebDataSourcePrivate : NSObject {
+  WKWebDataSource* parent;
+  NSArray* children;
+  id<WKWebController> controller;
+  NSURL* inputURL;
+  KHTMLPart* part;
 }
 
+- init;
+- (void)dealloc;
+
+@end
+
+@interface WKWebDataSource (WKPrivate)
+- (void)_setController:(id<WKWebController>)controller;
+- (KHTMLPart*)_part;
 @end
