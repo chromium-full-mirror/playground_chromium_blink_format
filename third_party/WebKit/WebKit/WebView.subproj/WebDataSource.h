@@ -30,15 +30,6 @@
 }
 
 /*!
-    @method initWithURL:
-    @discussion Returns nil if object cannot be initialized due to a malformed
-   URL (RFC 1808).
-    @param URL The URL to use in creating a datasource.
-    @result Returns an initialized WebDataSource.
-*/
-- initWithURL:(NSURL*)URL;
-
-/*!
     @method initWithRequest:
     @abstract The designated initializer for WebDataSource.
     @param request The request to use in creating a datasource.
@@ -141,12 +132,6 @@
     // FIXME move to WebHTMLRepresentation
 */
 - (NSString*)pageTitle;
-
-/*!
-    @method frameName
-    @result The name of frame that contains this datasource.
-*/
-- (NSString*)frameName;
 
 /*!
     @method fileExtension
