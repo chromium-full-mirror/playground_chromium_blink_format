@@ -1129,6 +1129,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                          const DOM::Node& n,
                          const QString& script);
 
+  void cancelRedirection();
+
   KJSProxy* jScript();
 
   KHTMLPart* opener();
