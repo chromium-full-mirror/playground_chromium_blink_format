@@ -805,7 +805,14 @@ void RenderPartObject::updateWidget() {
     if (url.isEmpty())
       url = "about:blank";
     KHTMLView* v = static_cast<KHTMLView*>(m_view);
-    v->part()->requestFrame(this, url, o->name.string(), QStringList(), true);
+    bool requestSucceeded = v->part()->requestFrame(this, url, o->name.string(),
+                                                    QStringList(), true);
+    if (requestSucceeded && url == "about:blank") {
+      KHTMLPart* newPart = v->part()->findFrame(o->name.string());
+      if (newPart && newPart->xmlDocImpl()) {
+        newPart->xmlDocImpl()->setBaseURL(v->part()->baseURL().url());
+      }
+    }
   }
 }
 
