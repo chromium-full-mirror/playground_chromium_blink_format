@@ -75,7 +75,7 @@ void RenderReplaced::paint(QPainter* p,
   if ((_tx >= _x + _w) || (_tx + m_width <= _x))
     return;
 
-  if (shouldPaintBackgroundOrBorder())
+  if (shouldPaintBackgroundOrBorder() && paintAction != PaintActionOutline)
     paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
 
   paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
