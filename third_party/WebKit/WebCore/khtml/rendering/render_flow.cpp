@@ -1531,7 +1531,6 @@ void RenderFlow::calcInlineMinMaxWidth() {
         // min and max and continue.
         if (!hasBreakableChar) {
           inlineMin += childMin;
-          inlineMax += childMax;
         } else {
           // We have a breakable character.  Now we need to know if
           // we start and end with whitespace.
@@ -1559,9 +1558,17 @@ void RenderFlow::calcInlineMinMaxWidth() {
               m_minWidth = inlineMin;
             inlineMin = endMin;
           }
-
-          inlineMax += childMax;
         }
+
+        if (hasBreak) {
+          inlineMax += beginMax;
+          if (m_maxWidth < inlineMax)
+            m_maxWidth = inlineMax;
+          if (m_maxWidth < childMax)
+            m_maxWidth = childMax;
+          inlineMax = endMax;
+        } else
+          inlineMax += childMax;
       }
     } else {
       if (m_minWidth < inlineMin)

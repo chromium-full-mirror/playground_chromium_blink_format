@@ -820,8 +820,7 @@ void RenderText::trimmedMinMaxWidth(short& beginMinW,
   endMinW = m_endMinWidth;
 
   hasBreakableChar = m_hasBreakableChar;
-  hasBreak = false;  // XXXdwh will need to make this work eventually.
-                     // m_hasBreak;
+  hasBreak = m_hasBreak;
 
   if (len == 0)
     return;
@@ -843,8 +842,28 @@ void RenderText::trimmedMinMaxWidth(short& beginMinW,
 
   // Compute our max widths by scanning the string for newlines.
   if (hasBreak) {
-    // XXXdwh this will only be an issue for white-space: pre inlines and
-    // not for the <pre> element itself.
+    const Font* f = htmlFont(false);
+    bool firstLine = true;
+    beginMaxW = endMaxW = maxW;
+    for (int i = 0; i < len; i++) {
+      int linelen = 0;
+      while (i + linelen < len && str->s[i + linelen] != '\n')
+        linelen++;
+
+      if (linelen) {
+        endMaxW = f->width(str->s, str->l, i, linelen);
+        if (firstLine) {
+          firstLine = false;
+          beginMaxW = endMaxW;
+        }
+        i += linelen;
+        if (i == len - 1)
+          endMaxW = 0;
+      } else if (firstLine) {
+        beginMaxW = 0;
+        firstLine = false;
+      }
+    }
   }
 }
 
@@ -870,21 +889,23 @@ void RenderText::calcMinMaxWidth() {
   bool isPre = style()->whiteSpace() == PRE;
   bool firstWord = true;
   for (int i = 0; i < len; i++) {
+    bool isNewline = false;
     // XXXdwh Wrong in the first stage.  Will stop mutating newlines
     // in a second stage.
     if (str->s[i] == '\n') {
-      if (isPre)
+      if (isPre) {
         m_hasBreak = true;
-      else
+        isNewline = true;
+      } else
         str->s[i] = ' ';
     }
 
     bool oldSpace = isSpace;
     isSpace = str->s[i].direction() == QChar::DirWS;
 
-    if (isSpace && i == 0)
+    if ((isSpace || isNewline) && i == 0)
       m_hasBeginWS = true;
-    if (isSpace && i == len - 1)
+    if ((isSpace || isNewline) && i == len - 1)
       m_hasEndWS = true;
 
     if (!ignoringSpaces && !isPre && oldSpace && isSpace)
