@@ -377,6 +377,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (int)historyLength;
 - (void)goBackOrForward:(int)distance;
+- (BOOL)canGoBackOrForward:(int)distance;
 
 - (void)controlTextDidBeginEditing:(NSNotification*)obj;
 - (void)controlTextDidEndEditing:(NSNotification*)obj;

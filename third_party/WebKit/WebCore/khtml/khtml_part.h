@@ -391,7 +391,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Schedules a history navigation operation (go forward, go back, etc.).
    * This is used for JavaScript-triggered location changes.
    */
-  void scheduleHistoryNavigation(int steps);
+  virtual void scheduleHistoryNavigation(int steps);
 
   /**
    * Clears the widget and prepares it for new content.

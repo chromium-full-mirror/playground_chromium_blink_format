@@ -94,6 +94,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void openURLRequest(const KURL&, const KParts::URLArgs&);
   void submitForm(const KURL&, const KParts::URLArgs&);
 
+  void scheduleHistoryNavigation(int steps);
+
   void scrollToAnchor(const KURL&);
   void jumpToSelection();
 
