@@ -143,7 +143,6 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
 
       m_replaced(false),
       m_mouseInside(false),
-      m_hasFirstLine(false),
       m_isSelectionBorder(false) {}
 
 RenderObject::~RenderObject() {
@@ -316,6 +315,12 @@ bool RenderObject::requiresLayer() {
   return isRoot() || isPositioned() || isRelPositioned() ||
          style()->opacity() < 1.0f;
 }
+
+RenderBlock* RenderObject::firstLineBlock() const {
+  return 0;
+}
+
+void RenderObject::updateFirstLetter() {}
 
 int RenderObject::offsetLeft() const {
   int x = xPos();
@@ -1106,9 +1111,6 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
   if (overhangingContents()) {
     *stream << " overhangingContents";
   }
-  if (hasFirstLine()) {
-    *stream << " hasFirstLine";
-  }
   *stream << endl;
 
   RenderObject* child = firstChild();
@@ -1249,7 +1251,6 @@ void RenderObject::setStyle(RenderStyle* style) {
 
   setShouldPaintBackgroundOrBorder(m_style->backgroundColor().isValid() ||
                                    m_style->hasBorder() || nb);
-  m_hasFirstLine = getPseudoStyle(RenderStyle::FIRST_LINE);
 
   if (affectsParentBlock)
     handleDynamicFloatPositionChange();
@@ -1741,6 +1742,9 @@ void RenderObject::recalcMinMaxWidths() {
                 << endl;
 #endif
 
+  if (m_recalcMinMax)
+    updateFirstLetter();
+
   RenderObject* child = firstChild();
   while (child) {
     // gcc sucks. if anybody knows a trick to get rid of the
@@ -1803,10 +1807,21 @@ InlineBox* RenderObject::createInlineBox(bool, bool isRootLineBox) {
 
 RenderStyle* RenderObject::style(bool firstLine) const {
   RenderStyle* s = m_style;
-  if (firstLine && hasFirstLine()) {
-    RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::FIRST_LINE);
-    if (pseudoStyle)
-      s = pseudoStyle;
+  if (firstLine) {
+    const RenderObject* obj = isText() ? parent() : this;
+    if (obj->isBlockFlow()) {
+      RenderBlock* firstLineBlock = obj->firstLineBlock();
+      if (firstLineBlock)
+        s = firstLineBlock->getPseudoStyle(RenderStyle::FIRST_LINE, style());
+    } else if (!obj->isAnonymous() && obj->isInlineFlow()) {
+      RenderStyle* parentStyle = obj->parent()->style(true);
+      if (parentStyle != obj->parent()->style()) {
+        // A first-line style is in effect. We need to cache a first-line style
+        // for ourselves.
+        style()->setHasPseudoStyle(RenderStyle::FIRST_LINE_INHERITED);
+        s = obj->getPseudoStyle(RenderStyle::FIRST_LINE_INHERITED, parentStyle);
+      }
+    }
   }
   return s;
 }
@@ -1816,17 +1831,28 @@ RenderStyle* RenderObject::getPseudoStyle(RenderStyle::PseudoId pseudo,
   if (!style()->hasPseudoStyle(pseudo))
     return 0;
 
+  if (!parentStyle)
+    parentStyle = style();
+
+  RenderStyle* result = style()->getPseudoStyle(pseudo);
+  if (result)
+    return result;
+
   DOM::NodeImpl* node = element();
   if (isText())
     node = element()->parentNode();
   if (!node)
     return 0;
 
-  if (!parentStyle)
-    parentStyle = style();
-
-  return document()->styleSelector()->pseudoStyleForElement(
-      pseudo, static_cast<DOM::ElementImpl*>(node), parentStyle);
+  if (pseudo == RenderStyle::FIRST_LINE_INHERITED)
+    result = document()->styleSelector()->styleForElement(
+        static_cast<DOM::ElementImpl*>(node), parentStyle);
+  else
+    result = document()->styleSelector()->pseudoStyleForElement(
+        pseudo, static_cast<DOM::ElementImpl*>(node), parentStyle);
+  if (result)
+    style()->addPseudoStyle(result);
+  return result;
 }
 
 void RenderObject::getTextDecorationColors(int decorations,

@@ -118,6 +118,9 @@ class RenderTable : public RenderBlock {
   virtual void calcMinMaxWidth();
   virtual void close();
 
+  virtual RenderBlock* firstLineBlock() const;
+  virtual void updateFirstLetter();
+
   virtual void setCellWidths();
 
   virtual void calcWidth();

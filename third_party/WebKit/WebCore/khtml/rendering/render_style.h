@@ -627,7 +627,8 @@ class RenderStyle : public Shared<RenderStyle> {
     FIRST_LETTER,
     BEFORE,
     AFTER,
-    SELECTION
+    SELECTION,
+    FIRST_LINE_INHERITED
   };
 
  protected:
@@ -718,7 +719,7 @@ class RenderStyle : public Shared<RenderStyle> {
     PseudoId _styleType : 3;
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
-    int _pseudoBits : 5;
+    int _pseudoBits : 6;
     EUnicodeBidi _unicodeBidi : 2;
   } noninherited_flags;
 

@@ -155,6 +155,12 @@ class RenderObject : public CachedObjectClient {
     return 0;
   }  // Tables and blocks implement this.
 
+  // Obtains the nearest enclosing block (including this block) that contributes
+  // a first-line style to our inline
+  // children.
+  virtual RenderBlock* firstLineBlock() const;
+  virtual void updateFirstLetter();
+
   // Called when an object that was floating or positioned becomes a normal flow
   // object
   // again.  We have to make sure the render tree updates as needed to
@@ -279,7 +285,6 @@ class RenderObject : public CachedObjectClient {
   bool normalChildNeedsLayout() const { return m_normalChildNeedsLayout; }
   bool minMaxKnown() const { return m_minMaxKnown; }
   bool overhangingContents() const { return m_overhangingContents; }
-  bool hasFirstLine() const { return m_hasFirstLine; }
   bool isSelectionBorder() const { return m_isSelectionBorder; }
   bool recalcMinMax() const { return m_recalcMinMax; }
 
@@ -849,7 +854,6 @@ class RenderObject : public CachedObjectClient {
   bool m_inline : 1;
   bool m_replaced : 1;
   bool m_mouseInside : 1;
-  bool m_hasFirstLine : 1;
   bool m_isSelectionBorder : 1;
 
   void arenaDelete(RenderArena* arena, void* objectBase);

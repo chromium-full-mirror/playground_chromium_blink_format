@@ -303,7 +303,8 @@ enum EPseudoBit {
   AFTER_BIT = 0x2,
   FIRST_LINE_BIT = 0x4,
   FIRST_LETTER_BIT = 0x8,
-  SELECTION_BIT = 0x10
+  SELECTION_BIT = 0x10,
+  FIRST_LINE_INHERITED_BIT = 0x20
 };
 
 static int pseudoBit(RenderStyle::PseudoId pseudo) {
@@ -318,6 +319,8 @@ static int pseudoBit(RenderStyle::PseudoId pseudo) {
       return FIRST_LETTER_BIT;
     case RenderStyle::SELECTION:
       return SELECTION_BIT;
+    case RenderStyle::FIRST_LINE_INHERITED:
+      return FIRST_LINE_INHERITED_BIT;
     default:
       return NO_BIT;
   }
