@@ -1250,7 +1250,7 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
                                    bool force) {
   uint oldLen = str ? str->l : 0;
   uint newLen = text ? text->l : 0;
-  uint delta = newLen - oldLen;
+  int delta = newLen - oldLen;
   uint end = len ? offset + len - 1 : offset;
 
   RootInlineBox* firstRootBox = 0;
@@ -1305,7 +1305,8 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
   }
   for (RootInlineBox* curr = firstRootBox; curr && curr != lastRootBox;
        curr = curr->nextRootBox()) {
-    if (curr->lineBreakObj() == this && curr->lineBreakPos() >= end)
+    if (!curr->isDirty() && curr->lineBreakObj() == this &&
+        curr->lineBreakPos() > end)
       curr->setLineBreakPos(curr->lineBreakPos() + delta);
   }
 
