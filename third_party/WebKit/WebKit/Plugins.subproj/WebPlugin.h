@@ -28,15 +28,29 @@
 #import <WebCore/WebCoreViewFactory.h>
 
 @interface WebNetscapePlugin : NSObject<WebCorePluginInfo> {
-  NSMutableArray* mimeTypes;
-  NSString *name, *path, *filename, *pluginDescription;
-  BOOL isLoaded, isBundle, isCFM;
+  NSMutableDictionary* MIMEToExtensions;
+  NSMutableDictionary* extensionToMIME;
+  NSMutableDictionary* MIMEToDescription;
+
+  NSString* name;
+  NSString* path;
+  NSString* filename;
+  NSString* pluginDescription;
+
+  BOOL isLoaded;
+  BOOL isBundle;
+  BOOL isCFM;
+
   NPPluginFuncs pluginFuncs;
   NPNetscapeFuncs browserFuncs;
+
   uint16 pluginSize;
   uint16 pluginVersion;
+
   CFBundleRef bundle;
+
   CFragConnectionID connID;
+
   SInt16 resourceRef;
 
   NPP_NewProcPtr NPP_New;
@@ -58,10 +72,10 @@
 - initWithPath:(NSString*)pluginPath;
 - (BOOL)load;
 - (void)unload;
-- (NSString*)mimeTypeForExtension:(NSString*)extension;
 - (NSString*)path;
 - (BOOL)isLoaded;
 - (NSString*)description;
+- (NSDictionary*)extensionToMIMEDictionary;
 
 - (NPP_NewProcPtr)NPP_New;
 - (NPP_DestroyProcPtr)NPP_Destroy;
