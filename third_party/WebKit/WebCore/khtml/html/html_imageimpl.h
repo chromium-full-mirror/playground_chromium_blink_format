@@ -44,6 +44,8 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
 
   virtual void attach();
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual void detach();
 
   long width() const;

@@ -38,6 +38,7 @@ class QPainter;
 template <class type>
 class QPtrList;
 class KHTMLView;
+class RenderArena;
 class QRect;
 class QMouseEvent;
 class QKeyEvent;
@@ -45,8 +46,8 @@ class QTextStream;
 class QStringList;
 
 namespace khtml {
-class RenderStyle;
 class RenderObject;
+class RenderStyle;
 };
 
 namespace DOM {
@@ -333,6 +334,12 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   void closeRenderer();
 
+  void createRendererIfNeeded();
+  virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
+
   // -----------------------------------------------------------------------------
   // Methods for maintaining the state of the element between history navigation
 
@@ -404,10 +411,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
    * changed it's value.
    */
   virtual void childrenChanged();
-
-#if APPLE_CHANGES
-  static Node nodeInstance(NodeImpl* impl);
-#endif
 
  private:  // members
   DocumentPtr* document;

@@ -129,6 +129,7 @@ class RenderObject : public CachedObjectClient {
 
   // RenderObject tree manipulation
   //////////////////////////////////////////
+  virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject* oldChild);
 

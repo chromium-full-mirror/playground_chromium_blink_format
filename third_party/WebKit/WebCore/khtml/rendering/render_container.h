@@ -37,6 +37,7 @@ class RenderContainer : public RenderObject {
   RenderObject* firstChild() const { return m_first; }
   RenderObject* lastChild() const { return m_last; }
 
+  virtual bool canHaveChildren() const;
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject* oldChild);
 

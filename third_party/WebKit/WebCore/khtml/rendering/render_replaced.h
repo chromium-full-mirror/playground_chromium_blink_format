@@ -68,6 +68,8 @@ class RenderReplaced : public RenderBox {
                         bool firstLine,
                         int);
 
+  virtual bool canHaveChildren() const;
+
  private:
   short m_intrinsicWidth;
   short m_intrinsicHeight;

@@ -58,6 +58,8 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
   virtual void init();
   virtual void attach();
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
 
   CSSStyleSheetImpl* sheet() const { return m_styleSheet; }
 
@@ -83,6 +85,9 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
   virtual void init();
   virtual void attach();
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
 
   bool noResize() { return noresize; }
   void setLocation(const DOMString& str);
@@ -131,6 +136,9 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
   virtual void parseAttribute(AttributeImpl*);
   virtual void init();
   virtual void attach();
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
 
   virtual void defaultEventHandler(EventImpl* evt);
 
@@ -178,6 +186,9 @@ class HTMLHtmlElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
   virtual void attach();
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
 };
 
 // -------------------------------------------------------------------------
@@ -192,6 +203,9 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
 
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void attach();
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual void recalcStyle(StyleChange ch);
 
  protected:

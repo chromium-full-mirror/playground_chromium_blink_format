@@ -289,6 +289,9 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void init();
   virtual void attach();
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
   virtual bool isSuccessfulSubmitButton() const;
@@ -407,6 +410,8 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void init();
   virtual void attach();
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
   // get the actual listbox index of the optionIndexth option
@@ -541,6 +546,8 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void init();
   virtual void attach();
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
   virtual void reset();
   DOMString value();

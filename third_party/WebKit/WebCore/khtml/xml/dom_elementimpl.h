@@ -194,6 +194,9 @@ class ElementImpl : public NodeBaseImpl {
   virtual QString state() { return QString::null; }
 
   virtual void attach();
+  virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
   virtual void recalcStyle(StyleChange = NoChange);
 
   virtual void mouseEventHandler(MouseEvent* /*ev*/, bool /*inside*/){};
