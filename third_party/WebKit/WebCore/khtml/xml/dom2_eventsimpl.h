@@ -79,8 +79,8 @@ class EventImpl : public khtml::Shared<EventImpl> {
     SCROLL_EVENT,
     CONTEXTMENU_EVENT,
     // Keyboard events
-    KHTML_KEYDOWN_EVENT,
-    KHTML_KEYUP_EVENT,
+    KEYDOWN_EVENT,
+    KEYUP_EVENT,
     // Text events
     TEXTINPUT_EVENT,
     // khtml events (not part of DOM)
