@@ -60,7 +60,6 @@ extern NSString*
     </p>
     <pre>
     WebController *webController;
-    WebDataSource *dataSource;
     WebFrame *mainFrame;
 
     webController  = [[WebController alloc] initWithView: webView
