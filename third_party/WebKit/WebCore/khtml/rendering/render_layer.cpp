@@ -48,6 +48,7 @@
 #include "render_canvas.h"
 #include "render_arena.h"
 #include "xml/dom_docimpl.h"
+#include "xml/dom2_eventsimpl.h"
 #include "misc/htmltags.h"
 #include "html/html_blockimpl.h"
 
@@ -448,8 +449,6 @@ void RenderLayer::scrollToOffset(int x,
   m_scrollX = x;
   m_scrollY = y;
 
-  // FIXME: Fire the onscroll DOM event.
-
   // Update the positions of our child layers.
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
     child->updateLayerPositions();
@@ -458,6 +457,9 @@ void RenderLayer::scrollToOffset(int x,
   // Move our widgets.
   m_object->updateWidgetPositions();
 #endif
+
+  // Fire the scroll DOM event.
+  m_object->element()->dispatchHTMLEvent(EventImpl::SCROLL_EVENT, true, false);
 
   // Just schedule a full repaint of our object.
   if (repaint)

@@ -428,6 +428,11 @@ void HTMLElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           EventImpl::KEYUP_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
+    case ATTR_ONSCROLL:
+      setHTMLEventListener(
+          EventImpl::SCROLL_EVENT,
+          getDocument()->createHTMLEventListener(attr->value().string()));
+      break;
     // other misc attributes
     default:
 #ifdef UNSUPPORTED_ATTR

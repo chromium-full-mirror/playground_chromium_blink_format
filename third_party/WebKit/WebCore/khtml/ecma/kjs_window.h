@@ -215,6 +215,7 @@ class Window : public ObjectImp {
     Onmove,
     Onreset,
     Onresize,
+    Onscroll,
     Onsearch,
     Onselect,
     Onsubmit,
