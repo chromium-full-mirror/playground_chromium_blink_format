@@ -1580,6 +1580,7 @@ RenderSlider::RenderSlider(HTMLInputElementImpl* element)
   setQWidget(slider);
   connect(slider, SIGNAL(sliderValueChanged()), this,
           SLOT(slotSliderValueChanged()));
+  connect(slider, SIGNAL(clicked()), this, SLOT(slotClicked()));
 }
 
 void RenderSlider::calcMinMaxWidth() {
@@ -1641,6 +1642,11 @@ void RenderSlider::slotSliderValueChanged() {
 
   // Fire the "input" DOM event.
   element()->dispatchHTMLEvent(EventImpl::INPUT_EVENT, true, false);
+}
+
+void RenderSlider::slotClicked() {
+  // emit mouseClick event etc
+  RenderFormElement::slotClicked();
 }
 
 #endif

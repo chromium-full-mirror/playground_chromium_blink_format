@@ -510,6 +510,7 @@ class RenderSlider : public RenderFormElement {
 
  protected slots:
   void slotSliderValueChanged();
+  void slotClicked();
 };
 #endif
 
