@@ -32,12 +32,18 @@ namespace khtml {
  */
 class Decoder {
  public:
+  enum EncodingType {
+    DefaultEncoding,
+    AutoDetectedEncoding,
+    EncodingFromMetaTag,
+    EncodingFromHTTPHeader,
+    UserChosenEncoding
+  };
+
   Decoder();
   ~Decoder();
 
-  void setEncoding(const char* encoding,
-                   bool force = false,
-                   bool eightBitOnly = false);
+  void setEncoding(const char* encoding, EncodingType type);
   const char* encoding() const;
 
   QString decode(const char* data, int len);
@@ -53,16 +59,17 @@ class Decoder {
   QTextCodec* m_codec;
   QTextDecoder* m_decoder;  // only used for utf16
   QCString enc;
+  EncodingType m_type;
 
 #if APPLE_CHANGES
   QString buffer;
 #else
   QCString buffer;
 #endif
+
   bool body;
   bool beginning;
   bool visualRTL;
-  bool haveEncoding;
 };
 };
 #endif
