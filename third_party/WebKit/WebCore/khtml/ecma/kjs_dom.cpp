@@ -115,6 +115,7 @@ bool DOMNode::toBoolean(ExecState*) const {
   ondragdrop	DOMNode::OnDragDrop		DontDelete
   onerror	DOMNode::OnError		DontDelete
   onfocus	DOMNode::OnFocus       		DontDelete
+  oninput       DOMNode::OnInput                DontDelete
   onkeydown	DOMNode::OnKeyDown		DontDelete
   onkeypress	DOMNode::OnKeyPress		DontDelete
   onkeyup	DOMNode::OnKeyUp		DontDelete
@@ -204,6 +205,8 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
       return getListener(DOM::EventImpl::KHTML_ERROR_EVENT);
     case OnFocus:
       return getListener(DOM::EventImpl::FOCUS_EVENT);
+    case OnInput:
+      return getListener(DOM::EventImpl::INPUT_EVENT);
     case OnKeyDown:
       return getListener(DOM::EventImpl::KEYDOWN_EVENT);
     case OnKeyPress:
@@ -345,6 +348,9 @@ void DOMNode::putValue(ExecState* exec,
       break;
     case OnFocus:
       setListener(exec, DOM::EventImpl::FOCUS_EVENT, value);
+      break;
+    case OnInput:
+      setListener(exec, DOM::EventImpl::INPUT_EVENT, value);
       break;
     case OnKeyDown:
       setListener(exec, DOM::EventImpl::KEYDOWN_EVENT, value);

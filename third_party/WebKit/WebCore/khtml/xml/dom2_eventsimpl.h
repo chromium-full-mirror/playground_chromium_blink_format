@@ -81,6 +81,7 @@ class EventImpl : public khtml::Shared<EventImpl> {
 #if APPLE_CHANGES
     SEARCH_EVENT,
 #endif
+    INPUT_EVENT,
     // Keyboard events
     KEYDOWN_EVENT,
     KEYUP_EVENT,

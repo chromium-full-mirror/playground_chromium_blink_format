@@ -1182,8 +1182,12 @@ void HTMLInputElementImpl::setType(const DOMString& t) {
     newType = BUTTON;
   else if (strcasecmp(t, "khtml_isindex") == 0)
     newType = ISINDEX;
+#if APPLE_CHANGES
   else if (strcasecmp(t, "search") == 0)
     newType = SEARCH;
+  else if (strcasecmp(t, "range") == 0)
+    newType = RANGE;
+#endif
   else
     newType = TEXT;
 
@@ -1226,8 +1230,12 @@ DOMString HTMLInputElementImpl::type() const {
       return "image";
     case BUTTON:
       return "button";
+#if APPLE_CHANGES
     case SEARCH:
       return "search";
+    case RANGE:
+      return "range";
+#endif
     default:
       return "";
   }
@@ -1310,7 +1318,10 @@ void HTMLInputElementImpl::click() {
     case IMAGE:
     case ISINDEX:
     case PASSWORD:
+#if APPLE_CHANGES
     case SEARCH:
+    case RANGE:
+#endif
     case TEXT:
       HTMLGenericFormElementImpl::click();
       break;
@@ -1324,7 +1335,9 @@ void HTMLInputElementImpl::accessKeyAction() {
       break;
     case TEXT:
     case PASSWORD:
+#if APPLE_CHANGES
     case SEARCH:
+#endif
     case ISINDEX:
       focus();
       break;
@@ -1335,6 +1348,9 @@ void HTMLInputElementImpl::accessKeyAction() {
     case IMAGE:
     case BUTTON:
     case FILE:
+#if APPLE_CHANGES
+    case RANGE:
+#endif
       // focus and click
       focus();
       click();
@@ -1434,9 +1450,14 @@ void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           EventImpl::CHANGE_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
+    case ATTR_ONINPUT:
+      setHTMLEventListener(
+          EventImpl::INPUT_EVENT,
+          getDocument()->createHTMLEventListener(attr->value().string()));
+      break;
 #if APPLE_CHANGES
-    // Search field attributes all just cause updateFromElement to be called
-    // through style
+    // Search field and slider attributes all just cause updateFromElement to be
+    // called through style
     // recalcing.
     case ATTR_ONSEARCH:
       setHTMLEventListener(
@@ -1449,6 +1470,9 @@ void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_AUTOSAVE:
     case ATTR_INCREMENTAL:
     case ATTR_PLACEHOLDER:
+    case ATTR_MIN:
+    case ATTR_MAX:
+    case ATTR_PRECISION:
       setChanged();
       break;
 #endif
@@ -1461,7 +1485,10 @@ bool HTMLInputElementImpl::rendererIsNeeded(RenderStyle* style) {
   switch (m_type) {
     case TEXT:
     case PASSWORD:
+#if APPLE_CHANGES
     case SEARCH:
+    case RANGE:
+#endif
     case ISINDEX:
     case CHECKBOX:
     case RADIO:
@@ -1483,7 +1510,9 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
   switch (m_type) {
     case TEXT:
     case PASSWORD:
+#if APPLE_CHANGES
     case SEARCH:
+#endif
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
     case CHECKBOX:
@@ -1500,6 +1529,10 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
       return new (arena) RenderFileButton(this);
     case BUTTON:
       return new (arena) RenderPushButton(this);
+#if APPLE_CHANGES
+    case RANGE:
+      return new (arena) RenderSlider(this);
+#endif
     case HIDDEN:
       break;
   }
@@ -1606,7 +1639,10 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
   switch (m_type) {
     case HIDDEN:
     case TEXT:
+#if APPLE_CHANGES
     case SEARCH:
+    case RANGE:
+#endif
     case PASSWORD:
       // always successful
       encoding += fixUpfromUnicode(codec, value().string());

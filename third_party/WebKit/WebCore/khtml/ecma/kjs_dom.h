@@ -96,6 +96,7 @@ class DOMNode : public DOMObject {
     OnDragDrop,
     OnError,
     OnFocus,
+    OnInput,
     OnKeyDown,
     OnKeyPress,
     OnKeyUp,

@@ -461,6 +461,9 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         case khtml::OMARQUEE:
           return new CSSPrimitiveValueImpl("marquee",
                                            CSSPrimitiveValue::CSS_STRING);
+        case khtml::OOVERLAY:
+          return new CSSPrimitiveValueImpl("overlay",
+                                           CSSPrimitiveValue::CSS_STRING);
       }
     }
     case CSS_PROP_PADDING_TOP:

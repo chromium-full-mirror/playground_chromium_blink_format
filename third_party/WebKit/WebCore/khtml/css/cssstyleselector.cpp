@@ -1970,6 +1970,9 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
         case CSS_VAL_MARQUEE:
           o = OMARQUEE;
           break;
+        case CSS_VAL_OVERLAY:
+          o = OOVERLAY;
+          break;
         default:
           return;
       }
