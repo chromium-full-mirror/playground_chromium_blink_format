@@ -14,6 +14,7 @@
 @class WebFrame;
 @class WebResourceHandle;
 @class WebResourceRequest;
+@class WebResourceResponse;
 
 @protocol WebDocumentRepresentation;
 
@@ -134,6 +135,12 @@
 - (WebResourceRequest*)request;
 
 /*!
+    @method response
+    @result returns the WebResourceResponse for the data source.
+*/
+- (WebResourceResponse*)response;
+
+/*!
     @method URL
     @discussion The value of URL will change if a redirect occurs.
     To monitor change in the URL, override the <WebLocationChangeHandler>
@@ -195,12 +202,6 @@
     @result The content policy used by this datasource.
 */
 - (WebContentPolicy*)contentPolicy;
-
-/*!
-    @method contentType
-    @result returns the MIME type for the data source.
-*/
-- (NSString*)contentType;
 
 /*!
     @method fileType
