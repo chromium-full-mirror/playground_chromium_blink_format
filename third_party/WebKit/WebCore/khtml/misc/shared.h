@@ -25,6 +25,10 @@ class Shared {
   //    static int counter;
  protected:
   unsigned int _ref;
+
+ private:
+  Shared(const Shared&);
+  Shared& operator=(const Shared&);
 };
 
 template <class type>
@@ -64,6 +68,10 @@ class TreeShared {
 
  protected:
   type* m_parent;
+
+ private:
+  TreeShared(const TreeShared&);
+  TreeShared& operator=(const TreeShared&);
 };
 
 template <class T>
@@ -123,7 +131,6 @@ SharedPtr<T>& SharedPtr<T>::operator=(const SharedPtr<T>& o) {
     if (m_ptr)
       m_ptr->ref();
   }
-
   return *this;
 }
 

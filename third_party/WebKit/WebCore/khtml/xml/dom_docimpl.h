@@ -792,7 +792,6 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 class DocumentFragmentImpl : public NodeBaseImpl {
  public:
   DocumentFragmentImpl(DocumentPtr* doc);
-  DocumentFragmentImpl(const DocumentFragmentImpl& other);
 
   // DOM methods overridden from  parent classes
   virtual DOMString nodeName() const;

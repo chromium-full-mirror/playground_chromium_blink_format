@@ -53,7 +53,8 @@ class Selection {
     LINE,
     PARAGRAPH,
     DOCUMENT,
-    LINE_BOUNDARY
+    LINE_BOUNDARY,
+    PARAGRAPH_BOUNDARY
   };
 
   Selection();
@@ -114,9 +115,6 @@ class Selection {
     moveTo(r);
     return *this;
   }
-
-  friend bool operator==(const Selection& a, const Selection& b);
-  friend bool operator!=(const Selection& a, const Selection& b);
 
   friend class KHTMLPart;
 

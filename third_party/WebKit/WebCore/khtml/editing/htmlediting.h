@@ -69,95 +69,40 @@ class SplitTextNodeCommandImpl;
 class TypingCommandImpl;
 
 //------------------------------------------------------------------------------------------
-// Constants
-
-enum ECommandID {
-  EditCommandID,  // leave the base class first, others in alpha order
-  AppendNodeCommandID,
-  ApplyStyleCommandID,
-  CompositeEditCommandID,
-  DeleteSelectionCommandID,
-  DeleteTextCommandID,
-  InputNewlineCommandID,
-  InputTextCommandID,
-  InsertNodeBeforeCommandID,
-  InsertTextCommandID,
-  JoinTextNodesCommandID,
-  MoveSelectionCommandID,
-  ReplaceSelectionCommandID,
-  RemoveCSSPropertyCommandID,
-  RemoveNodeAttributeCommandID,
-  RemoveNodeCommandID,
-  RemoveNodePreservingChildrenCommandID,
-  SetNodeAttributeCommandID,
-  SplitTextNodeCommandID,
-  TypingCommandID,
-};
-
-//------------------------------------------------------------------------------------------
-// SharedCommandImpl
-
-class SharedCommandImpl : public Shared<SharedCommandImpl> {
- public:
-  SharedCommandImpl() {}
-  virtual ~SharedCommandImpl() {}
-
-  virtual int commandID() const = 0;
-  virtual bool isCompositeStep() const = 0;
-
-  virtual void apply() = 0;
-  virtual void unapply() = 0;
-  virtual void reapply() = 0;
-
-  virtual DOM::DocumentImpl* const document() const = 0;
-
-  virtual DOM::Selection startingSelection() const = 0;
-  virtual DOM::Selection endingSelection() const = 0;
-
-  virtual void setStartingSelection(const DOM::Selection& s) = 0;
-  virtual void setEndingSelection(const DOM::Selection& s) = 0;
-
-  virtual DOM::CSSStyleDeclarationImpl* typingStyle() const = 0;
-  virtual void setTypingStyle(DOM::CSSStyleDeclarationImpl*) = 0;
-
-  virtual EditCommand parent() const = 0;
-  virtual void setParent(const EditCommand&) = 0;
-};
-
-//------------------------------------------------------------------------------------------
 // EditCommand
 
-class EditCommand : public SharedPtr<SharedCommandImpl> {
+class EditCommand : public SharedPtr<EditCommandImpl> {
  public:
   EditCommand();
   EditCommand(EditCommandImpl*);
   EditCommand(const EditCommand&);
-  virtual ~EditCommand();
+  ~EditCommand();
 
-  int commandID() const;
+  EditCommand& operator=(const EditCommand&);
+
   bool isCompositeStep() const;
-  bool isNull() const;
-  bool notNull() const;
 
-  void apply();
-  void unapply();
-  void reapply();
+  void apply() const;
+  void unapply() const;
+  void reapply() const;
 
   DOM::DocumentImpl* const document() const;
 
   DOM::Selection startingSelection() const;
   DOM::Selection endingSelection() const;
 
-  void setStartingSelection(const DOM::Selection& s);
-  void setEndingSelection(const DOM::Selection& s);
+  void setStartingSelection(const DOM::Selection& s) const;
+  void setEndingSelection(const DOM::Selection& s) const;
 
   DOM::CSSStyleDeclarationImpl* typingStyle() const;
-  void setTypingStyle(DOM::CSSStyleDeclarationImpl*);
+  void setTypingStyle(DOM::CSSStyleDeclarationImpl*) const;
 
   EditCommand parent() const;
-  void setParent(const EditCommand&);
+  void setParent(const EditCommand&) const;
 
-  EditCommandImpl* handle() const;
+  bool isInputTextCommand() const;
+  bool isInputNewlineCommand() const;
+  bool isTypingCommand() const;
 
   static EditCommand& emptyCommand();
 };
@@ -166,14 +111,11 @@ class EditCommand : public SharedPtr<SharedCommandImpl> {
 // CompositeEditCommand
 
 class CompositeEditCommand : public EditCommand {
- public:
-  CompositeEditCommand();
+ protected:
   CompositeEditCommand(CompositeEditCommandImpl*);
-  CompositeEditCommand(const CompositeEditCommand&);
-  virtual ~CompositeEditCommand();
 
  private:
-  inline CompositeEditCommandImpl* impl() const;
+  CompositeEditCommandImpl* impl() const;
 };
 
 //==========================================================================================
@@ -186,13 +128,12 @@ class AppendNodeCommand : public EditCommand {
   AppendNodeCommand(DOM::DocumentImpl*,
                     DOM::NodeImpl* appendChild,
                     DOM::NodeImpl* parentNode);
-  virtual ~AppendNodeCommand();
 
   DOM::NodeImpl* appendChild() const;
   DOM::NodeImpl* parentNode() const;
 
  private:
-  inline AppendNodeCommandImpl* impl() const;
+  AppendNodeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -201,12 +142,11 @@ class AppendNodeCommand : public EditCommand {
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
   ApplyStyleCommand(DOM::DocumentImpl*, DOM::CSSStyleDeclarationImpl*);
-  virtual ~ApplyStyleCommand();
 
   DOM::CSSStyleDeclarationImpl* style() const;
 
  private:
-  inline ApplyStyleCommandImpl* impl() const;
+  ApplyStyleCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -217,10 +157,9 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   DeleteSelectionCommand(DOM::DocumentImpl* document);
   DeleteSelectionCommand(DOM::DocumentImpl* document,
                          const DOM::Selection& selection);
-  virtual ~DeleteSelectionCommand();
 
  private:
-  inline DeleteSelectionCommandImpl* impl() const;
+  DeleteSelectionCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -232,15 +171,13 @@ class DeleteTextCommand : public EditCommand {
                     DOM::TextImpl*,
                     long offset,
                     long count);
-  DeleteTextCommand(const DeleteTextCommand&);
-  virtual ~DeleteTextCommand();
 
   DOM::TextImpl* node() const;
   long offset() const;
   long count() const;
 
  private:
-  inline DeleteTextCommandImpl* impl() const;
+  DeleteTextCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -249,10 +186,9 @@ class DeleteTextCommand : public EditCommand {
 class InputNewlineCommand : public CompositeEditCommand {
  public:
   InputNewlineCommand(DOM::DocumentImpl* document);
-  virtual ~InputNewlineCommand();
 
  private:
-  inline InputNewlineCommandImpl* impl() const;
+  InputNewlineCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -261,15 +197,14 @@ class InputNewlineCommand : public CompositeEditCommand {
 class InputTextCommand : public CompositeEditCommand {
  public:
   InputTextCommand(DOM::DocumentImpl* document);
-  virtual ~InputTextCommand();
 
   void deleteCharacter();
-  void input(const DOM::DOMString& text);
+  void input(const DOM::DOMString& text, bool selectInsertedText = false);
 
   unsigned long charactersAdded() const;
 
  private:
-  inline InputTextCommandImpl* impl() const;
+  InputTextCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -277,18 +212,15 @@ class InputTextCommand : public CompositeEditCommand {
 
 class InsertNodeBeforeCommand : public EditCommand {
  public:
-  InsertNodeBeforeCommand();
   InsertNodeBeforeCommand(DOM::DocumentImpl*,
                           DOM::NodeImpl* insertChild,
                           DOM::NodeImpl* refChild);
-  InsertNodeBeforeCommand(const InsertNodeBeforeCommand&);
-  virtual ~InsertNodeBeforeCommand();
 
   DOM::NodeImpl* insertChild() const;
   DOM::NodeImpl* refChild() const;
 
  private:
-  inline InsertNodeBeforeCommandImpl* impl() const;
+  InsertNodeBeforeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -300,14 +232,13 @@ class InsertTextCommand : public EditCommand {
                     DOM::TextImpl*,
                     long,
                     const DOM::DOMString&);
-  virtual ~InsertTextCommand();
 
   DOM::TextImpl* node() const;
   long offset() const;
   DOM::DOMString text() const;
 
  private:
-  inline InsertTextCommandImpl* impl() const;
+  InsertTextCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -316,13 +247,12 @@ class InsertTextCommand : public EditCommand {
 class JoinTextNodesCommand : public EditCommand {
  public:
   JoinTextNodesCommand(DOM::DocumentImpl*, DOM::TextImpl*, DOM::TextImpl*);
-  virtual ~JoinTextNodesCommand();
 
   DOM::TextImpl* firstNode() const;
   DOM::TextImpl* secondNode() const;
 
  private:
-  inline JoinTextNodesCommandImpl* impl() const;
+  JoinTextNodesCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -333,10 +263,9 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   ReplaceSelectionCommand(DOM::DocumentImpl* document,
                           DOM::DocumentFragmentImpl* fragment,
                           bool selectReplacement = true);
-  virtual ~ReplaceSelectionCommand();
 
  private:
-  inline ReplaceSelectionCommandImpl* impl() const;
+  ReplaceSelectionCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -347,10 +276,9 @@ class MoveSelectionCommand : public CompositeEditCommand {
   MoveSelectionCommand(DOM::DocumentImpl* document,
                        DOM::DocumentFragmentImpl* fragment,
                        DOM::Position& position);
-  virtual ~MoveSelectionCommand();
 
  private:
-  inline MoveSelectionCommandImpl* impl() const;
+  MoveSelectionCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -361,13 +289,12 @@ class RemoveCSSPropertyCommand : public EditCommand {
   RemoveCSSPropertyCommand(DOM::DocumentImpl*,
                            DOM::CSSStyleDeclarationImpl*,
                            int property);
-  virtual ~RemoveCSSPropertyCommand();
 
   DOM::CSSStyleDeclarationImpl* styleDeclaration() const;
   int property() const;
 
  private:
-  inline RemoveCSSPropertyCommandImpl* impl() const;
+  RemoveCSSPropertyCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -378,13 +305,12 @@ class RemoveNodeAttributeCommand : public EditCommand {
   RemoveNodeAttributeCommand(DOM::DocumentImpl*,
                              DOM::ElementImpl*,
                              DOM::NodeImpl::Id attribute);
-  virtual ~RemoveNodeAttributeCommand();
 
   DOM::ElementImpl* element() const;
   DOM::NodeImpl::Id attribute() const;
 
  private:
-  inline RemoveNodeAttributeCommandImpl* impl() const;
+  RemoveNodeAttributeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -393,12 +319,11 @@ class RemoveNodeAttributeCommand : public EditCommand {
 class RemoveNodeCommand : public EditCommand {
  public:
   RemoveNodeCommand(DOM::DocumentImpl*, DOM::NodeImpl* node);
-  virtual ~RemoveNodeCommand();
 
   DOM::NodeImpl* node() const;
 
  private:
-  inline RemoveNodeCommandImpl* impl() const;
+  RemoveNodeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -408,12 +333,11 @@ class RemoveNodePreservingChildrenCommand : public CompositeEditCommand {
  public:
   RemoveNodePreservingChildrenCommand(DOM::DocumentImpl* document,
                                       DOM::NodeImpl* node);
-  virtual ~RemoveNodePreservingChildrenCommand();
 
   DOM::NodeImpl* node() const;
 
  private:
-  inline RemoveNodePreservingChildrenCommandImpl* impl() const;
+  RemoveNodePreservingChildrenCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -425,14 +349,13 @@ class SetNodeAttributeCommand : public EditCommand {
                           DOM::ElementImpl*,
                           DOM::NodeImpl::Id attribute,
                           const DOM::DOMString& value);
-  virtual ~SetNodeAttributeCommand();
 
   DOM::ElementImpl* element() const;
   DOM::NodeImpl::Id attribute() const;
   DOM::DOMString value() const;
 
  private:
-  inline SetNodeAttributeCommandImpl* impl() const;
+  SetNodeAttributeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -441,13 +364,12 @@ class SetNodeAttributeCommand : public EditCommand {
 class SplitTextNodeCommand : public EditCommand {
  public:
   SplitTextNodeCommand(DOM::DocumentImpl*, DOM::TextImpl*, long);
-  virtual ~SplitTextNodeCommand();
 
   DOM::TextImpl* node() const;
   long offset() const;
 
  private:
-  inline SplitTextNodeCommandImpl* impl() const;
+  SplitTextNodeCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -457,29 +379,29 @@ class TypingCommand : public CompositeEditCommand {
  public:
   static void deleteKeyPressed(DOM::DocumentImpl* document);
   static void insertText(DOM::DocumentImpl* document,
-                         const DOM::DOMString& text);
+                         const DOM::DOMString& text,
+                         bool selectInsertedText = false);
   static void insertNewline(DOM::DocumentImpl* document);
   static bool isOpenForMoreTypingCommand(const EditCommand&);
-  static void closeTyping(EditCommand);
+  static void closeTyping(const EditCommand&);
 
   bool openForMoreTyping() const;
-  void closeTyping();
+  void closeTyping() const;
 
   enum ETypingCommand { DeleteKey, InsertText, InsertNewline };
 
  private:
   TypingCommand(DOM::DocumentImpl* document,
                 ETypingCommand,
-                const DOM::DOMString& text = "");
-  TypingCommand(TypingCommand*);
-  TypingCommand(const TypingCommand&);
-  virtual ~TypingCommand();
+                const DOM::DOMString& text = "",
+                bool selectInsertedText = false);
 
-  void deleteKeyPressed();
-  void insertText(const DOM::DOMString& text);
-  void insertNewline();
+  void deleteKeyPressed() const;
+  void insertText(const DOM::DOMString& text,
+                  bool selectInsertedText = false) const;
+  void insertNewline() const;
 
-  inline TypingCommandImpl* impl() const;
+  TypingCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------

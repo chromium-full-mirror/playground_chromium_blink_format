@@ -39,11 +39,15 @@ class NodeImpl;
 // NSSelectionAffinityDownstream = 1
 enum EAffinity { UPSTREAM = 0, DOWNSTREAM = 1 };
 
-static const bool StayInBlock = true;
+enum EStayInBlock { DoNotStayInBlock = false, StayInBlock = true };
+enum EIncludeLineBreak {
+  DoNotIncludeLineBreak = false,
+  IncludeLineBreak = true
+};
 
 class Position {
  public:
-  Position() : m_node(0), m_offset(0){};
+  Position() : m_node(0), m_offset(0) {}
   Position(NodeImpl* node, long offset);
   Position(const Position&);
   ~Position();
@@ -60,20 +64,27 @@ class Position {
   bool notEmpty() const { return m_node != 0; }
 
   Position equivalentLeafPosition() const;
+
   Position previousRenderedEditablePosition() const;
   Position nextRenderedEditablePosition() const;
+
   Position previousCharacterPosition() const;
   Position nextCharacterPosition() const;
 
   // suitable for moving by word in the UI
   Position previousWordPosition() const;
   Position nextWordPosition() const;
+
+  // next word boundary - stops between words, so not right for moving by word
+  Position previousWordBoundary() const;
+  Position nextWordBoundary() const;
+
   Position previousLinePosition(int x) const;
   Position nextLinePosition(int x) const;
 
-  // next word boundary - would be too tedious to use in UI
-  Position previousWordBoundary() const;
-  Position nextWordBoundary() const;
+  Position startParagraphBoundary() const;
+  Position endParagraphBoundary(
+      EIncludeLineBreak includeLineBreak = DoNotIncludeLineBreak) const;
 
   Position leadingWhitespacePosition() const;
   Position trailingWhitespacePosition() const;
@@ -92,8 +103,8 @@ class Position {
   // position
   // except that it is the latest position for earliest position in the above
   // description.
-  Position upstream(bool stayInBlock = false) const;
-  Position downstream(bool stayInBlock = false) const;
+  Position upstream(EStayInBlock stayInBlock = DoNotStayInBlock) const;
+  Position downstream(EStayInBlock stayInBlock = DoNotStayInBlock) const;
 
   Position equivalentRangeCompliantPosition() const;
   Position equivalentShallowPosition() const;
@@ -104,7 +115,6 @@ class Position {
   bool inRenderedContent() const;
   bool inRenderedText() const;
   bool isRenderedCharacter() const;
-  bool rendersOnSameLine(const Position& pos) const;
   bool rendersInDifferentPosition(const Position& pos) const;
   bool isFirstRenderedPositionOnLine() const;
   bool isLastRenderedPositionOnLine() const;
@@ -115,9 +125,6 @@ class Position {
   bool inLastEditableInContainingEditableBlock() const;
 
   Position& operator=(const Position& o);
-
-  friend bool operator==(const Position& a, const Position& b);
-  friend bool operator!=(const Position& a, const Position& b);
 
   void debugPosition(const char* msg = "") const;
 
