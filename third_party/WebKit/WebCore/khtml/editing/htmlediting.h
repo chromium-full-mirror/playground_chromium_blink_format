@@ -203,6 +203,7 @@ class CompositeEditCommand : public EditCommand {
                     DOM::NodeImpl* refChild,
                     long offset);
   void insertNodeBefore(DOM::NodeImpl* insertChild, DOM::NodeImpl* refChild);
+  void insertParagraphSeparator();
   void insertTextIntoNode(DOM::TextImpl* node,
                           long offset,
                           const DOM::DOMString& text);
