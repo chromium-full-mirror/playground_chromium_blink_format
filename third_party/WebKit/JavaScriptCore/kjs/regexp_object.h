@@ -33,6 +33,8 @@ class RegExpPrototypeImp : public ObjectImp {
   RegExpPrototypeImp(ExecState* exec,
                      ObjectPrototypeImp* objProto,
                      FunctionPrototypeImp* funcProto);
+  virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
 };
 
 class RegExpProtoFuncImp : public InternalFunctionImp {
