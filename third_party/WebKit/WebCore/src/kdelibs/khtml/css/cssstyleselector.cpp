@@ -2493,9 +2493,8 @@ void khtml::applyRule(khtml::RenderStyle* style,
               static_cast<CSSPrimitiveValueImpl*>(item);
           if (!val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
             return;
-          // FIXME:MERGE removed optimization to avoid allocating QString here
           QString face = static_cast<FontFamilyValueImpl*>(val)->fontName();
-          if (!face.isNull() || face.isEmpty()) {
+          if (!face.isEmpty()) {
             const KHTMLSettings* s =
                 e->getDocument()->view()->part()->settings();
             if (face == "serif") {
