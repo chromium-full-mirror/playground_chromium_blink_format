@@ -48,6 +48,7 @@
                           widths:(float*)buffer
                    letterSpacing:(int)letterSpacing
                      wordSpacing:(int)wordSpacing
+                       smallCaps:(BOOL)smallCaps
                     fontFamilies:(NSString**)families;
 
 // drawing
@@ -62,6 +63,7 @@
               rightToLeft:(BOOL)rtl
             letterSpacing:(int)letterSpacing
               wordSpacing:(int)wordSpacing
+                smallCaps:(BOOL)smallCaps
              fontFamilies:(NSString**)families;
 - (void)drawLineForCharacters:(NSPoint)point
                       yOffset:(float)yOffset

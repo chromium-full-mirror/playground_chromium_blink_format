@@ -113,7 +113,8 @@ class QPainter : public Qt {
                 const QColor& backgroundColor,
                 QPainter::TextDirection d,
                 int letterSpacing,
-                int wordSpacing);
+                int wordSpacing,
+                bool smallCaps);
   void drawLineForText(int x, int y, int yOffset, int width);
   static QColor selectedTextBackgroundColor();
 

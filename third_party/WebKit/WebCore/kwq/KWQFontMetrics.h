@@ -62,7 +62,8 @@ class QFontMetrics {
                    int pos,
                    int len,
                    int letterSpacing,
-                   int wordSpacing) const;
+                   int wordSpacing,
+                   bool smallCaps) const;
   float floatCharacterWidths(const QChar*,
                              int slen,
                              int pos,
@@ -70,7 +71,8 @@ class QFontMetrics {
                              int toAdd,
                              float* buffer,
                              int letterSpacing,
-                             int wordSpacing) const;
+                             int wordSpacing,
+                             bool smallCaps) const;
 
   QRect boundingRect(const QString&, int len = -1) const;
   QRect boundingRect(int, int, int, int, int, const QString&) const;
