@@ -227,8 +227,12 @@ class GroupNode : public Node {
 
 class ElementNode : public Node {
  public:
-  ElementNode(int e, Node* n) : list(0L), elision(e), node(n) {}
-  ElementNode(ElementNode* l, int e, Node* n) : list(l), elision(e), node(n) {}
+  // list pointer is tail of a circular list, cracked in the ArrayNode ctor
+  ElementNode(int e, Node* n) : list(this), elision(e), node(n) {}
+  ElementNode(ElementNode* l, int e, Node* n)
+      : list(l->list), elision(e), node(n) {
+    l->list = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -243,12 +247,13 @@ class ElementNode : public Node {
 
 class ArrayNode : public Node {
  public:
-  ArrayNode(int e) : element(0L), elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) : element(ele), elision(0), opt(false) {
-    reverseElementList();
+  ArrayNode(int e) : element(0), elision(e), opt(true) {}
+  ArrayNode(ElementNode* ele) : element(ele->list), elision(0), opt(false) {
+    ele->list = 0;
   }
-  ArrayNode(int eli, ElementNode* ele) : element(ele), elision(eli), opt(true) {
-    reverseElementList();
+  ArrayNode(int eli, ElementNode* ele)
+      : element(ele->list), elision(eli), opt(true) {
+    ele->list = 0;
   }
   virtual void ref();
   virtual bool deref();
@@ -256,29 +261,21 @@ class ArrayNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseElementList();
   ElementNode* element;
   int elision;
   bool opt;
 };
 
-class ObjectLiteralNode : public Node {
- public:
-  ObjectLiteralNode(PropertyValueNode* l) : list(l) { reverseList(); }
-  virtual void ref();
-  virtual bool deref();
-  Value evaluate(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
-
- private:
-  void reverseList();
-  PropertyValueNode* list;
-};
-
 class PropertyValueNode : public Node {
  public:
-  PropertyValueNode(PropertyNode* n, Node* a, PropertyValueNode* l = 0L)
-      : name(n), assign(a), list(l) {}
+  // list pointer is tail of a circular list, cracked in the ObjectLiteralNode
+  // ctor
+  PropertyValueNode(PropertyNode* n, Node* a)
+      : name(n), assign(a), list(this) {}
+  PropertyValueNode(PropertyNode* n, Node* a, PropertyValueNode* l)
+      : name(n), assign(a), list(l->list) {
+    l->list = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -288,6 +285,19 @@ class PropertyValueNode : public Node {
   friend class ObjectLiteralNode;
   PropertyNode* name;
   Node* assign;
+  PropertyValueNode* list;
+};
+
+class ObjectLiteralNode : public Node {
+ public:
+  ObjectLiteralNode() : list(0) {}
+  ObjectLiteralNode(PropertyValueNode* l) : list(l->list) { l->list = 0; }
+  virtual void ref();
+  virtual bool deref();
+  Value evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
   PropertyValueNode* list;
 };
 
@@ -333,8 +343,11 @@ class AccessorNode2 : public Node {
 
 class ArgumentListNode : public Node {
  public:
-  ArgumentListNode(Node* e);
-  ArgumentListNode(ArgumentListNode* l, Node* e);
+  // list pointer is tail of a circular list, cracked in the ArgumentsNode ctor
+  ArgumentListNode(Node* e) : list(this), expr(e) {}
+  ArgumentListNode(ArgumentListNode* l, Node* e) : list(l->list), expr(e) {
+    l->list = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -349,7 +362,8 @@ class ArgumentListNode : public Node {
 
 class ArgumentsNode : public Node {
  public:
-  ArgumentsNode(ArgumentListNode* l) : list(l) { reverseList(); }
+  ArgumentsNode() : list(0) {}
+  ArgumentsNode(ArgumentListNode* l) : list(l->list) { l->list = 0; }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -357,13 +371,12 @@ class ArgumentsNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseList();
   ArgumentListNode* list;
 };
 
 class NewExprNode : public Node {
  public:
-  NewExprNode(Node* e) : expr(e), args(0L) {}
+  NewExprNode(Node* e) : expr(e), args(0) {}
   NewExprNode(Node* e, ArgumentsNode* a) : expr(e), args(a) {}
   virtual void ref();
   virtual bool deref();
@@ -638,8 +651,9 @@ class CommaNode : public Node {
 
 class StatListNode : public StatementNode {
  public:
-  StatListNode(StatementNode* s) : statement(s), list(0L) {}
-  StatListNode(StatListNode* l, StatementNode* s) : statement(s), list(l) {}
+  // list pointer is tail of a circular list, cracked in the CaseClauseNode ctor
+  StatListNode(StatementNode* s);
+  StatListNode(StatListNode* l, StatementNode* s);
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -680,8 +694,12 @@ class VarDeclNode : public Node {
 
 class VarDeclListNode : public Node {
  public:
-  VarDeclListNode(VarDeclNode* v) : list(0L), var(v) {}
-  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : list(l), var(v) {}
+  // list pointer is tail of a circular list, cracked in the
+  // ForNode/VarStatementNode ctor
+  VarDeclListNode(VarDeclNode* v) : list(this), var(v) {}
+  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : list(l->list), var(v) {
+    l->list = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -697,7 +715,7 @@ class VarDeclListNode : public Node {
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclListNode* l) : list(l) { reverseList(); }
+  VarStatementNode(VarDeclListNode* l) : list(l->list) { l->list = 0; }
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -705,13 +723,12 @@ class VarStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseList();
   VarDeclListNode* list;
 };
 
 class BlockNode : public StatementNode {
  public:
-  BlockNode(SourceElementsNode* s) : source(s) { reverseList(); }
+  BlockNode(SourceElementsNode* s);
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -719,7 +736,6 @@ class BlockNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  void reverseList();
   SourceElementsNode* source;
 };
 
@@ -790,7 +806,9 @@ class ForNode : public StatementNode {
   ForNode(Node* e1, Node* e2, Node* e3, StatementNode* s)
       : expr1(e1), expr2(e2), expr3(e3), statement(s) {}
   ForNode(VarDeclListNode* e1, Node* e2, Node* e3, StatementNode* s)
-      : expr1(reverseList(e1)), expr2(e2), expr3(e3), statement(s) {}
+      : expr1(e1->list), expr2(e2), expr3(e3), statement(s) {
+    e1->list = 0;
+  }
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -798,7 +816,6 @@ class ForNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  static VarDeclListNode* reverseList(VarDeclListNode*);
   Node *expr1, *expr2, *expr3;
   StatementNode* statement;
 };
@@ -871,7 +888,10 @@ class WithNode : public StatementNode {
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(Node* e, StatListNode* l) : expr(e), list(l) { reverseList(); }
+  CaseClauseNode(Node* e) : expr(e), list(0) {}
+  CaseClauseNode(Node* e, StatListNode* l) : expr(e), list(l->list) {
+    l->list = 0;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -880,15 +900,17 @@ class CaseClauseNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseList();
   Node* expr;
   StatListNode* list;
 };
 
 class ClauseListNode : public Node {
  public:
-  ClauseListNode(CaseClauseNode* c) : cl(c), nx(0L) {}
-  ClauseListNode(ClauseListNode* n, CaseClauseNode* c) : cl(c), nx(n) {}
+  // list pointer is tail of a circular list, cracked in the CaseBlockNode ctor
+  ClauseListNode(CaseClauseNode* c) : cl(c), nx(this) {}
+  ClauseListNode(ClauseListNode* n, CaseClauseNode* c) : cl(c), nx(n->nx) {
+    n->nx = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -905,10 +927,7 @@ class ClauseListNode : public Node {
 
 class CaseBlockNode : public Node {
  public:
-  CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2)
-      : list1(l1), def(d), list2(l2) {
-    reverseLists();
-  }
+  CaseBlockNode(ClauseListNode* l1, CaseClauseNode* d, ClauseListNode* l2);
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -917,7 +936,6 @@ class CaseBlockNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseLists();
   ClauseListNode* list1;
   CaseClauseNode* def;
   ClauseListNode* list2;
@@ -993,8 +1011,10 @@ class FinallyNode : public StatementNode {
 
 class TryNode : public StatementNode {
  public:
-  TryNode(StatementNode* b, Node* c = 0L, Node* f = 0L)
-      : block(b), _catch((CatchNode*)c), _final((FinallyNode*)f) {}
+  TryNode(StatementNode* b, CatchNode* c) : block(b), _catch(c), _final(0) {}
+  TryNode(StatementNode* b, FinallyNode* f) : block(b), _catch(0), _final(f) {}
+  TryNode(StatementNode* b, CatchNode* c, FinallyNode* f)
+      : block(b), _catch(c), _final(f) {}
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -1009,8 +1029,13 @@ class TryNode : public StatementNode {
 
 class ParameterNode : public Node {
  public:
-  ParameterNode(const Identifier& i) : id(i), next(0L) {}
-  ParameterNode(ParameterNode* list, const Identifier& i) : id(i), next(list) {}
+  // list pointer is tail of a circular list, cracked in the
+  // FuncDeclNode/FuncExprNode ctor
+  ParameterNode(const Identifier& i) : id(i), next(this) {}
+  ParameterNode(ParameterNode* list, const Identifier& i)
+      : id(i), next(list->next) {
+    list->next = this;
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -1034,9 +1059,11 @@ class FunctionBodyNode : public BlockNode {
 
 class FuncDeclNode : public StatementNode {
  public:
+  FuncDeclNode(const Identifier& i, FunctionBodyNode* b)
+      : ident(i), param(0), body(b) {}
   FuncDeclNode(const Identifier& i, ParameterNode* p, FunctionBodyNode* b)
-      : ident(i), param(p), body(b) {
-    reverseParameterList();
+      : ident(i), param(p->next), body(b) {
+    p->next = 0;
   }
   virtual void ref();
   virtual bool deref();
@@ -1047,7 +1074,6 @@ class FuncDeclNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseParameterList();
   Identifier ident;
   ParameterNode* param;
   FunctionBodyNode* body;
@@ -1055,8 +1081,10 @@ class FuncDeclNode : public StatementNode {
 
 class FuncExprNode : public Node {
  public:
-  FuncExprNode(ParameterNode* p, FunctionBodyNode* b) : param(p), body(b) {
-    reverseParameterList();
+  FuncExprNode(FunctionBodyNode* b) : param(0), body(b) {}
+  FuncExprNode(ParameterNode* p, FunctionBodyNode* b)
+      : param(p->next), body(b) {
+    p->next = 0;
   }
   virtual void ref();
   virtual bool deref();
@@ -1064,7 +1092,6 @@ class FuncExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  void reverseParameterList();
   ParameterNode* param;
   FunctionBodyNode* body;
 };
@@ -1072,14 +1099,10 @@ class FuncExprNode : public Node {
 // A linked list of source element nodes
 class SourceElementsNode : public StatementNode {
  public:
-  SourceElementsNode(StatementNode* s1) {
-    element = s1;
-    elements = 0L;
-  }
-  SourceElementsNode(SourceElementsNode* s1, StatementNode* s2) {
-    elements = s1;
-    element = s2;
-  }
+  // list pointer is tail of a circular list, cracked in the BlockNode (or
+  // subclass) ctor
+  SourceElementsNode(StatementNode* s1);
+  SourceElementsNode(SourceElementsNode* s1, StatementNode* s2);
   virtual void ref();
   virtual bool deref();
   Completion execute(ExecState* exec);
