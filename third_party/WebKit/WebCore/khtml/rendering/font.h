@@ -44,6 +44,7 @@ class FontDef {
         weight(50),
         genericFamily(0),
         hasNbsp(true) {}
+
   bool operator==(const FontDef& other) const {
     return (family == other.family && size == other.size &&
             italic == other.italic && smallCaps == other.smallCaps &&
@@ -64,7 +65,9 @@ class FontDef {
     genericFamily = aGenericFamily;
   }
 
-  QString family;
+  QFontFamily& firstFamily() { return family; }
+
+  QFontFamily family;
   short int size;
   bool italic : 1;
   bool smallCaps : 1;

@@ -2677,6 +2677,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         CSSValueListImpl* list = static_cast<CSSValueListImpl*>(value);
         int len = list->length();
         QString family;
+        QFontFamily& firstFamily = fontDef.firstFamily();
+        QFontFamily* currFamily = 0;
+
         for (int i = 0; i < len; i++) {
           CSSValueImpl* item = list->item(i);
           if (!item->isPrimitiveValue())
@@ -2711,12 +2714,21 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
             }
 
             if (!face.isEmpty()) {
-              fontDef.family = face;
+              if (!currFamily) {
+                // Filling in the first family.
+                firstFamily.setFamily(face);
+                currFamily = &firstFamily;
+              } else {
+                QFontFamily* newFamily = new QFontFamily;
+                newFamily->setFamily(face);
+                currFamily->appendFamily(newFamily);
+                currFamily = newFamily;
+              }
+
               if (style->setFontDef(fontDef)) {
                 fontDirty = true;
               }
             }
-            return;
           }
         }
         break;
