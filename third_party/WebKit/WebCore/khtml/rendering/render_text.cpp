@@ -327,7 +327,7 @@ RenderText::~RenderText() {
 void RenderText::detach() {
   if (!documentBeingDestroyed()) {
     for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
-      box->parent()->removeChild(box);
+      box->remove();
   }
   deleteTextBoxes();
   RenderObject::detach();
@@ -1288,7 +1288,7 @@ void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
   if (len == 0 || isBR()) {
     // We want the box to be destroyed.  This is a <br>, and we don't
     // need <br>s to be included.
-    s->parent()->removeChild(s);
+    s->remove();
     s->detach(renderArena());
     m_firstTextBox = m_lastTextBox = 0;
     return;

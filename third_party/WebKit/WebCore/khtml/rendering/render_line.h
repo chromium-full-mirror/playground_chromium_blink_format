@@ -77,6 +77,8 @@ class InlineBox {
   void setFirstLineStyleBit(bool f) { m_firstLine = f; }
   bool isFirstLineStyle() const { return m_firstLine; }
 
+  void remove();
+
   InlineBox* nextOnLine() const { return m_next; }
   InlineBox* prevOnLine() const { return m_prev; }
   void setNextOnLine(InlineBox* next) { m_next = next; }
