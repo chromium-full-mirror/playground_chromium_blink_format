@@ -105,7 +105,8 @@ enum FrameBorderStyle {
 
 - (void)openURL:(NSString*)URL
           reload:(BOOL)reload
-         headers:(NSDictionary*)headers
+     contentType:(NSString*)contentType
+         refresh:(NSString*)refresh
     lastModified:(NSDate*)lastModified
        pageCache:(NSDictionary*)pageCache;
 - (void)addData:(NSData*)data withEncoding:(NSString*)encoding;
