@@ -95,6 +95,7 @@ class RenderImage : public RenderReplaced {
  private:
   bool isWidthSpecified() const;
   bool isHeightSpecified() const;
+  QColor selectionTintColor(QPainter* p) const;
 
   /*
    * Pointer to the image

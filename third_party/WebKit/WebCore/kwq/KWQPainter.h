@@ -134,8 +134,6 @@ class QPainter : public Qt {
     _usesInactiveTextBackgroundColor = u;
   }
 
-  QColor selectedImageTintColor() const;
-
   bool paintingDisabled() const;
   void setPaintingDisabled(bool);
 

@@ -203,6 +203,19 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
   }
 }
 
+#if APPLE_CHANGES
+QColor RenderImage::selectionTintColor(QPainter* p) const {
+  QColor color;
+  RenderStyle* pseudoStyle = getPseudoStyle(RenderStyle::SELECTION);
+  if (pseudoStyle && pseudoStyle->backgroundColor().isValid()) {
+    color = pseudoStyle->backgroundColor();
+  } else {
+    color = p->selectedTextBackgroundColor();
+  }
+  return QColor(qRgba(color.red(), color.green(), color.blue(), 160));
+}
+#endif
+
 void RenderImage::paintObject(QPainter* p,
                               int /*_x*/,
                               int /*_y*/,
@@ -382,7 +395,7 @@ void RenderImage::paintObject(QPainter* p,
       if (drawSelectionTint) {
         p->fillRect(_tx + leftBorder + leftPad, _ty + topBorder + topPad,
                     tintSize.width(), tintSize.height(),
-                    QBrush(p->selectedImageTintColor()));
+                    QBrush(selectionTintColor(p)));
       }
 #endif
     } else {
@@ -415,7 +428,7 @@ void RenderImage::paintObject(QPainter* p,
 #if APPLE_CHANGES
       if (drawSelectionTint) {
         p->fillRect(offs.x() + rect.x(), offs.y() + rect.y(), rect.width(),
-                    rect.height(), QBrush(p->selectedImageTintColor()));
+                    rect.height(), QBrush(selectionTintColor(p)));
       }
 #endif
     }
