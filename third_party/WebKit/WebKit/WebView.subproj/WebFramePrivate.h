@@ -68,6 +68,7 @@ typedef enum {
   WebHistoryItem*
       previousItem;  // BF item for previous content, see _itemForSavingDocState
   BOOL instantRedirectComing;
+  BOOL shortRedirectComing;
 
   WebPolicyDecisionListener* listener;
   WebResourceRequest* policyRequest;
