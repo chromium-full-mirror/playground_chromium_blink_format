@@ -516,7 +516,8 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
                         const DOMString& URL,
                         bool important = false);
 
-  void parseProperty(const DOMString& propertyString);
+  // The following parses an entire new style declaration.
+  void parseDeclaration(const DOMString& styleDeclaration);
 
   // Besides adding the properties, this also removes any existing properties
   // with these IDs.
