@@ -54,7 +54,11 @@
 
   BOOL stopping;
 
-  NSString *pageTitle, *downloadPath, *encoding, *contentType;
+  NSString* pageTitle;
+
+  NSString* encoding;
+
+  NSString* contentType;
 
   // Errors associated with resources.
   NSMutableDictionary* errors;
@@ -62,7 +66,7 @@
   // Error associated with main document.
   WebError* mainDocumentError;
 
-  WebContentPolicy contentPolicy;
+  WebContentPolicy* contentPolicy;
 
   BOOL loading;  // self and controller are retained while loading
 
@@ -98,8 +102,7 @@
 - (void)_setTitle:(NSString*)title;
 - (void)_setFinalURL:(NSURL*)url;
 - (id<WebLocationChangeHandler>)_locationChangeHandler;
-- (void)_setDownloadPath:(NSString*)path;
-- (void)_setContentPolicy:(WebContentPolicy)policy;
+- (void)_setContentPolicy:(WebContentPolicy*)policy;
 - (void)_setContentType:(NSString*)type;
 - (void)_setEncoding:(NSString*)encoding;
 - (void)_layoutChildren;
