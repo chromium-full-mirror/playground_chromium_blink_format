@@ -614,7 +614,9 @@ class SplitTextNodeCommandImpl : public EditCommandImpl {
 
 class TypingCommandImpl : public CompositeEditCommandImpl {
  public:
-  TypingCommandImpl(DOM::DocumentImpl* document);
+  TypingCommandImpl(DOM::DocumentImpl* document,
+                    TypingCommand::ETypingCommand,
+                    const DOM::DOMString&);
   virtual ~TypingCommandImpl();
 
   virtual int commandID() const;
@@ -633,6 +635,8 @@ class TypingCommandImpl : public CompositeEditCommandImpl {
   void removeCommand(const EditCommand&);
   void typingAddedToOpenCommand();
 
+  TypingCommand::ETypingCommand m_commandType;
+  DOM::DOMString m_textToInsert;
   bool m_openForMoreTyping;
 };
 

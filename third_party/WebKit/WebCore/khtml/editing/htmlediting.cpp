@@ -628,8 +628,11 @@ long SplitTextNodeCommand::offset() const {
 //------------------------------------------------------------------------------------------
 // TypingCommand
 
-TypingCommand::TypingCommand(DocumentImpl* document)
-    : CompositeEditCommand(new TypingCommandImpl(document)) {}
+TypingCommand::TypingCommand(DocumentImpl* document,
+                             ETypingCommand commandType,
+                             const DOM::DOMString& textToInsert)
+    : CompositeEditCommand(
+          new TypingCommandImpl(document, commandType, textToInsert)) {}
 
 TypingCommand::~TypingCommand() {}
 
@@ -647,9 +650,8 @@ void TypingCommand::insertText(DocumentImpl* document, const DOMString& text) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand&>(lastEditCommand).insertText(text);
   } else {
-    TypingCommand typingCommand(document);
+    TypingCommand typingCommand(document, InsertText, text);
     typingCommand.apply();
-    static_cast<TypingCommand&>(typingCommand).insertText(text);
   }
 }
 
@@ -663,9 +665,8 @@ void TypingCommand::insertNewline(DocumentImpl* document) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand&>(lastEditCommand).insertNewline();
   } else {
-    TypingCommand typingCommand(document);
+    TypingCommand typingCommand(document, InsertNewline);
     typingCommand.apply();
-    static_cast<TypingCommand&>(typingCommand).insertNewline();
   }
 }
 
@@ -679,9 +680,8 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand&>(lastEditCommand).deleteKeyPressed();
   } else {
-    TypingCommand typingCommand(document);
+    TypingCommand typingCommand(document, DeleteKey);
     typingCommand.apply();
-    static_cast<TypingCommand&>(typingCommand).deleteKeyPressed();
   }
 }
 
@@ -707,17 +707,17 @@ bool TypingCommand::openForMoreTyping() const {
 
 void TypingCommand::insertText(const DOMString& text) {
   IF_IMPL_NULL_RETURN;
-  return impl()->insertText(text);
+  impl()->insertText(text);
 }
 
 void TypingCommand::insertNewline() {
   IF_IMPL_NULL_RETURN;
-  return impl()->insertNewline();
+  impl()->insertNewline();
 }
 
 void TypingCommand::deleteKeyPressed() {
   IF_IMPL_NULL_RETURN;
-  return impl()->deleteKeyPressed();
+  impl()->deleteKeyPressed();
 }
 
 }  // namespace khtml

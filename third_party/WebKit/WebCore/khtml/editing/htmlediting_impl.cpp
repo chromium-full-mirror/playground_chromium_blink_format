@@ -2342,8 +2342,13 @@ void SplitTextNodeCommandImpl::doUnapply() {
 //------------------------------------------------------------------------------------------
 // TypingCommandImpl
 
-TypingCommandImpl::TypingCommandImpl(DocumentImpl* document)
-    : CompositeEditCommandImpl(document), m_openForMoreTyping(true) {}
+TypingCommandImpl::TypingCommandImpl(DocumentImpl* document,
+                                     TypingCommand::ETypingCommand commandType,
+                                     const DOM::DOMString& textToInsert)
+    : CompositeEditCommandImpl(document),
+      m_commandType(commandType),
+      m_textToInsert(textToInsert),
+      m_openForMoreTyping(true) {}
 
 TypingCommandImpl::~TypingCommandImpl() {}
 
@@ -2351,7 +2356,19 @@ int TypingCommandImpl::commandID() const {
   return TypingCommandID;
 }
 
-void TypingCommandImpl::doApply() {}
+void TypingCommandImpl::doApply() {
+  switch (m_commandType) {
+    case TypingCommand::DeleteKey:
+      deleteKeyPressed();
+      break;
+    case TypingCommand::InsertText:
+      insertText(m_textToInsert);
+      break;
+    case TypingCommand::InsertNewline:
+      insertNewline();
+      break;
+  }
+}
 
 void TypingCommandImpl::typingAddedToOpenCommand() {
   ASSERT(document());

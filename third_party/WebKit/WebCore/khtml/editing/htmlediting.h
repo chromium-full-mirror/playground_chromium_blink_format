@@ -495,8 +495,12 @@ class TypingCommand : public CompositeEditCommand {
   bool openForMoreTyping() const;
   void closeTyping();
 
+  enum ETypingCommand { DeleteKey, InsertText, InsertNewline };
+
  private:
-  TypingCommand(DOM::DocumentImpl* document);
+  TypingCommand(DOM::DocumentImpl* document,
+                ETypingCommand,
+                const DOM::DOMString& text = "");
   TypingCommand(TypingCommand*);
   TypingCommand(const TypingCommand&);
   virtual ~TypingCommand();
