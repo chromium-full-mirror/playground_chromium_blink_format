@@ -638,10 +638,12 @@ void RenderFrame::slotViewCleared() {
     // QFrame::Sunken.
     else
       view->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+
+#else
+    view->setHScrollBarMode(element()->scrolling);
+    view->setVScrollBarMode(element()->scrolling);
 #endif
 
-    view->setVScrollBarMode(element()->scrolling);
-    view->setHScrollBarMode(element()->scrolling);
     if (view->inherits("KHTMLView")) {
 #ifdef DEBUG_LAYOUT
       kdDebug(6031) << "frame is a KHTMLview!" << endl;
@@ -950,8 +952,12 @@ void RenderPartObject::slotViewCleared() {
       marginh = frame->marginHeight;
     }
     view->setFrameStyle(frameStyle);
+
+#if !APPLE_CHANGES
     view->setVScrollBarMode(scroll);
     view->setHScrollBarMode(scroll);
+#endif
+
     if (view->inherits("KHTMLView")) {
 #ifdef DEBUG_LAYOUT
       kdDebug(6031) << "frame is a KHTMLview!" << endl;

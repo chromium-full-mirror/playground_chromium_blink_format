@@ -1229,12 +1229,16 @@ void RenderSelect::updateSelection() {
 TextAreaWidget::TextAreaWidget(int wrap, QWidget* parent) : KTextEdit(parent) {
   if (wrap != DOM::HTMLTextAreaElementImpl::ta_NoWrap) {
     setWordWrap(QTextEdit::WidgetWidth);
+#if !APPLE_CHANGES
     setHScrollBarMode(AlwaysOff);
     setVScrollBarMode(AlwaysOn);
+#endif
   } else {
     setWordWrap(QTextEdit::NoWrap);
+#if !APPLE_CHANGES
     setHScrollBarMode(Auto);
     setVScrollBarMode(Auto);
+#endif
   }
   KCursor::setAutoHideCursor(viewport(), true);
   setTextFormat(QTextEdit::PlainText);

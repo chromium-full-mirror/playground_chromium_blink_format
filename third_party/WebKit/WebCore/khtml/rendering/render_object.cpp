@@ -904,27 +904,19 @@ void RenderObject::paint(QPainter* p,
 }
 
 void RenderObject::repaint(bool immediate) {
-  RenderObject* c = canvas();
-  if (!c || !c->isCanvas())
-    return;
-  RenderCanvas* canvasObj = static_cast<RenderCanvas*>(c);
-  if (canvasObj->printingMode())
+  RenderCanvas* c = canvas();
+  if (c->printingMode())
     return;  // Don't repaint if we're printing.
-
-  canvasObj->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
+  c->repaintViewRectangle(getAbsoluteRepaintRect(), immediate);
 }
 
 void RenderObject::repaintRectangle(const QRect& r, bool immediate) {
-  RenderObject* c = canvas();
-  if (!c || !c->isCanvas())
-    return;
-  RenderCanvas* canvasObj = static_cast<RenderCanvas*>(c);
-  if (canvasObj->printingMode())
+  RenderCanvas* c = canvas();
+  if (c->printingMode())
     return;  // Don't repaint if we're printing.
-
   QRect absRect(r);
   computeAbsoluteRepaintRect(absRect);
-  canvasObj->repaintViewRectangle(absRect, immediate);
+  c->repaintViewRectangle(absRect, immediate);
 }
 
 #ifdef INCREMENTAL_REPAINTING

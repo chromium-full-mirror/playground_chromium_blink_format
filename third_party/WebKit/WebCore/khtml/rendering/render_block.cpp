@@ -370,6 +370,15 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   }
 }
 
+bool RenderBlock::requiresLayer() {
+  // FIXME: The bogus table cell check is only here until we figure out how to
+  // position
+  // table cells properly when they have layers.
+  // Note that we also restrict overflow to blocks for now.
+  return !isTableCell() && (RenderObject::requiresLayer() ||
+                            (style()->hidesOverflow() && !isBody()));
+}
+
 bool RenderBlock::isSelfCollapsingBlock() const {
   // We are not self-collapsing if we
   // (a) have a non-zero height according to layout (an optimization to avoid

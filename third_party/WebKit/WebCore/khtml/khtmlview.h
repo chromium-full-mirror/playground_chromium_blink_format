@@ -137,6 +137,9 @@ class KHTMLView : public QScrollView {
    */
   virtual void setHScrollBarMode(ScrollBarMode mode);
 
+  // Sets both horizontal and vertical modes.
+  virtual void setScrollBarsMode(ScrollBarMode mode);
+
   /**
    * Prints the HTML document.
    */
@@ -146,6 +149,12 @@ class KHTMLView : public QScrollView {
    * ensure the display is up to date
    */
   void layout();
+
+  bool inLayout() const;
+
+#if APPLE_CHANGES
+  void resetScrollBars();
+#endif
 
  signals:
   void cleared();
@@ -196,6 +205,7 @@ class KHTMLView : public QScrollView {
   QWidget* topLevelWidget() const;
   QPoint mapToGlobal(const QPoint&) const;
   void adjustViewSize();
+  void initScrollBars();
 #endif
 
   void ref() { ++_refCount; }
@@ -267,6 +277,10 @@ class KHTMLView : public QScrollView {
                           int mouseEventType);
 
   void complete();
+
+  void applyBodyScrollQuirk(khtml::RenderObject* o,
+                            ScrollBarMode& hMode,
+                            ScrollBarMode& vMode);
 
 #ifndef INCREMENTAL_REPAINTING
   // Returns the clipped object we will repaint when we perform our scheduled
