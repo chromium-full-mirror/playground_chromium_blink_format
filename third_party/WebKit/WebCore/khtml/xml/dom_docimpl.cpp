@@ -2426,6 +2426,8 @@ void DocumentImpl::setDashboardRegions(
 #endif
 
 static QWidget* widgetForNode(NodeImpl* focusNode) {
+  if (!focusNode)
+    return 0;
   RenderObject* renderer = focusNode->renderer();
   if (!renderer || !renderer->isWidget())
     return 0;
