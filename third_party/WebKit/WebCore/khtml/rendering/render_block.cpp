@@ -1569,15 +1569,18 @@ void RenderBlock::positionNewFloats() {
     int oldChildX = o->xPos();
     int oldChildY = o->yPos();
 
+    if (o->style()->clear() & CLEFT)
+      y = kMax(leftBottom(), y);
+    if (o->style()->clear() & CRIGHT)
+      y = kMax(rightBottom(), y);
+
     if (o->style()->floating() == FLEFT) {
-      if (o->style()->clear() & CLEFT)
-        y = QMAX(leftBottom(), y);
       int heightRemainingLeft = 1;
       int heightRemainingRight = 1;
       int fx = leftRelOffset(y, lo, false, &heightRemainingLeft);
       while (rightRelOffset(y, ro, false, &heightRemainingRight) - fx <
              fwidth) {
-        y += QMIN(heightRemainingLeft, heightRemainingRight);
+        y += kMin(heightRemainingLeft, heightRemainingRight);
         fx = leftRelOffset(y, lo, false, &heightRemainingLeft);
       }
       if (fx < 0)
@@ -1587,13 +1590,11 @@ void RenderBlock::positionNewFloats() {
       // o->marginLeft()  << "/" << y + o->marginTop() << ") fx=" << fx << endl;
       o->setPos(fx + o->marginLeft(), y + o->marginTop());
     } else {
-      if (o->style()->clear() & CRIGHT)
-        y = QMAX(rightBottom(), y);
       int heightRemainingLeft = 1;
       int heightRemainingRight = 1;
       int fx = rightRelOffset(y, ro, false, &heightRemainingRight);
       while (fx - leftRelOffset(y, lo, false, &heightRemainingLeft) < fwidth) {
-        y += QMIN(heightRemainingLeft, heightRemainingRight);
+        y += kMin(heightRemainingLeft, heightRemainingRight);
         fx = rightRelOffset(y, ro, false, &heightRemainingRight);
       }
       if (fx < f->width)
