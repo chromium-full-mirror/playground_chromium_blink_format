@@ -514,7 +514,7 @@ class QString {
   friend class QGDict;
 
 #ifdef _KWQ_
-  void _copyInternalString();
+  void _copyIfNeededInternalString();
 #endif
 
 #ifdef KWQ_STRING_DEBUG
