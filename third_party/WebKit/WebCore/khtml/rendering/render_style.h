@@ -416,7 +416,7 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
 // Inherited attributes.
 //
 
-enum EWhiteSpace { NORMAL, PRE, NOWRAP, KONQ_NOWRAP };
+enum EWhiteSpace { NORMAL, PRE, NOWRAP, KHTML_NOWRAP };
 
 enum ETextAlign {
   TAAUTO,
@@ -424,9 +424,9 @@ enum ETextAlign {
   RIGHT,
   CENTER,
   JUSTIFY,
-  KONQ_LEFT,
-  KONQ_RIGHT,
-  KONQ_CENTER
+  KHTML_LEFT,
+  KHTML_RIGHT,
+  KHTML_CENTER
 };
 
 enum ETextTransform { CAPITALIZE, UPPERCASE, LOWERCASE, TTNONE };

@@ -26,9 +26,9 @@
 #define MEDIA_SYM 269
 #define FONT_FACE_SYM 270
 #define CHARSET_SYM 271
-#define KONQ_RULE_SYM 272
-#define KONQ_DECLS_SYM 273
-#define KONQ_VALUE_SYM 274
+#define KHTML_RULE_SYM 272
+#define KHTML_DECLS_SYM 273
+#define KHTML_VALUE_SYM 274
 #define IMPORTANT_SYM 275
 #define QEMS 276
 #define EMS 277
@@ -284,9 +284,9 @@ static const char* const yytname[] = {"$",
                                       "MEDIA_SYM",
                                       "FONT_FACE_SYM",
                                       "CHARSET_SYM",
-                                      "KONQ_RULE_SYM",
-                                      "KONQ_DECLS_SYM",
-                                      "KONQ_VALUE_SYM",
+                                      "KHTML_RULE_SYM",
+                                      "KHTML_DECLS_SYM",
+                                      "KHTML_VALUE_SYM",
                                       "IMPORTANT_SYM",
                                       "QEMS",
                                       "EMS",
@@ -325,9 +325,9 @@ static const char* const yytname[] = {"$",
                                       "'#'",
                                       "'@'",
                                       "stylesheet",
-                                      "konq_rule",
-                                      "konq_decls",
-                                      "konq_value",
+                                      "khtml_rule",
+                                      "khtml_decls",
+                                      "khtml_value",
                                       "maybe_space",
                                       "maybe_sgml",
                                       "maybe_charset",

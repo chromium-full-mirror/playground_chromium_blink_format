@@ -2106,8 +2106,8 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
 
       EWhiteSpace s;
       switch (primitiveValue->getIdent()) {
-        case CSS_VAL__KONQ_NOWRAP:
-          s = KONQ_NOWRAP;
+        case CSS_VAL__KHTML_NOWRAP:
+          s = KHTML_NOWRAP;
           break;
         case CSS_VAL_NOWRAP:
           s = NOWRAP;
@@ -2244,7 +2244,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           return;
         int ident = primitiveValue->getIdent();
         if (ident) {
-          if (ident == CSS_VAL__KONQ_TEXT)
+          if (ident == CSS_VAL__KHTML_TEXT)
             col = element->getDocument()->textColor();
           else if (ident == CSS_VAL_TRANSPARENT) {
             col = QColor();
@@ -2738,7 +2738,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           case CSS_VAL_SUPER:
             align = SUPER;
             break;
-          case CSS_VAL__KONQ_BASELINE_MIDDLE:
+          case CSS_VAL__KHTML_BASELINE_MIDDLE:
             align = BASELINE_MIDDLE;
             break;
           default:
@@ -2802,7 +2802,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           case CSS_VAL_XX_LARGE:
             size = m_fontSizes[6];
             break;
-          case CSS_VAL__KONQ_XXX_LARGE:
+          case CSS_VAL__KHTML_XXX_LARGE:
             size = (m_fontSizes[6] * 5) / 3;
             break;
           case CSS_VAL_LARGER:
@@ -2950,7 +2950,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         return;
       if (primitiveValue->getIdent())
         style->setTextAlign(
-            (ETextAlign)(primitiveValue->getIdent() - CSS_VAL__KONQ_AUTO));
+            (ETextAlign)(primitiveValue->getIdent() - CSS_VAL__KHTML_AUTO));
       return;
     }
 
@@ -3058,7 +3058,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
             face = static_cast<FontFamilyValueImpl*>(val)->fontName();
           else if (val->primitiveType() == CSSPrimitiveValue::CSS_IDENT) {
             switch (val->getIdent()) {
-              case CSS_VAL__KONQ_BODY:
+              case CSS_VAL__KHTML_BODY:
                 face = settings->stdFontName();
                 break;
               case CSS_VAL_SERIF:
@@ -3156,7 +3156,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         style->setTextDecoration(t);
         break;
       }
-    case CSS_PROP__KONQ_FLOW_MODE:
+    case CSS_PROP__KHTML_FLOW_MODE:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3167,7 +3167,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         return;
       if (primitiveValue->getIdent()) {
         style->setFlowAroundFloats(primitiveValue->getIdent() ==
-                                   CSS_VAL__KONQ_AROUND_FLOATS);
+                                   CSS_VAL__KHTML_AROUND_FLOATS);
         return;
       }
       break;
@@ -3338,7 +3338,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
 
       return;
     }
-    case CSS_PROP_OPACITY:
+    case CSS_PROP__KHTML_OPACITY:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3353,7 +3353,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           QMIN(1.0f, QMAX(0, primitiveValue->getFloatValue(
                                  CSSPrimitiveValue::CSS_NUMBER))));
       return;
-    case CSS_PROP_BOX_ALIGN:
+    case CSS_PROP__KHTML_BOX_ALIGN:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3382,7 +3382,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           return;
       }
       return;
-    case CSS_PROP_BOX_DIRECTION:
+    case CSS_PROP__KHTML_BOX_DIRECTION:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3396,7 +3396,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       else
         style->setBoxDirection(BREVERSE);
       return;
-    case CSS_PROP_BOX_LINES:
+    case CSS_PROP__KHTML_BOX_LINES:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3410,7 +3410,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       else
         style->setBoxLines(MULTIPLE);
       return;
-    case CSS_PROP_BOX_ORIENT:
+    case CSS_PROP__KHTML_BOX_ORIENT:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3425,7 +3425,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       else
         style->setBoxOrient(VERTICAL);
       return;
-    case CSS_PROP_BOX_PACK:
+    case CSS_PROP__KHTML_BOX_PACK:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3451,7 +3451,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           return;
       }
       return;
-    case CSS_PROP_BOX_FLEX:
+    case CSS_PROP__KHTML_BOX_FLEX:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3464,7 +3464,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       style->setBoxFlex(
           primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER));
       return;
-    case CSS_PROP_BOX_FLEX_GROUP:
+    case CSS_PROP__KHTML_BOX_FLEX_GROUP:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
@@ -3477,7 +3477,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       style->setBoxFlexGroup((unsigned int)(primitiveValue->getFloatValue(
           CSSPrimitiveValue::CSS_NUMBER)));
       return;
-    case CSS_PROP_BOX_ORDINAL_GROUP:
+    case CSS_PROP__KHTML_BOX_ORDINAL_GROUP:
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
