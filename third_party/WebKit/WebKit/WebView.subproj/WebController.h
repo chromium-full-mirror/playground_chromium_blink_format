@@ -8,6 +8,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class WebBackForwardList;
+@class WebHistoryItem;
 @class WebController;
 @class WebControllerPrivate;
 @class WebDataSource;
@@ -265,7 +266,7 @@ extern NSString* WebElementFrameKey;
 
 /*!
     @method goBack
-    @abstract Go back to the last URL in the backforward list.
+    @abstract Go back to the previous URL in the backforward list.
     @result Returns YES if able to go back in the backforward list, NO
    otherwise.
 */
@@ -278,6 +279,13 @@ extern NSString* WebElementFrameKey;
    otherwise.
 */
 - (BOOL)goForward;
+
+/*!
+    @method goBackOrForwardToItem:
+    @abstract Go back or forward to an item in the backforward list.
+    @result Returns YES if able to go to the item, NO otherwise.
+*/
+- (BOOL)goBackOrForwardToItem:(WebHistoryItem*)item;
 
 /*!
     @method setTextSizeMultiplier:
