@@ -1087,6 +1087,10 @@ DontDelete|Function 1
   getElementsByTagNameNS DOMElement::GetElementsByTagNameNS
 DontDelete|Function 2
   hasAttributeNS	DOMElement::HasAttributeNS	DontDelete|Function 2
+# extension for Safari RSS
+  scrollByLines         DOMElement::ScrollByLines       DontDelete|Function 1
+  scrollByPages         DOMElement::ScrollByPages       DontDelete|Function 1
+
 @end
 */
 DEFINE_PROTOTYPE("DOMElement", DOMElementProto)
@@ -1213,6 +1217,27 @@ Value DOMElementProtoFunc::tryCall(ExecState* exec,
     case DOMElement::HasAttributeNS:  // DOM2
       return Boolean(element.hasAttributeNS(args[0].toString(exec).string(),
                                             args[1].toString(exec).string()));
+    case DOMElement::ScrollByLines:
+    case DOMElement::ScrollByPages: {
+      DOM::DocumentImpl* docimpl = node.handle()->getDocument();
+      if (docimpl) {
+        docimpl->updateLayoutIgnorePendingStylesheets();
+      }
+      khtml::RenderObject* rend =
+          node.handle() ? node.handle()->renderer() : 0L;
+      if (rend && rend->hasOverflowClip()) {
+        KWQScrollDirection direction = KWQScrollDown;
+        int multiplier = args[0].toInt32(exec);
+        if (multiplier < 0) {
+          direction = KWQScrollUp;
+          multiplier = -multiplier;
+        }
+        KWQScrollGranularity granularity =
+            id == DOMElement::ScrollByLines ? KWQScrollLine : KWQScrollPage;
+        rend->layer()->scroll(direction, granularity, multiplier);
+      }
+      return Undefined();
+    }
     default:
       return Undefined();
   }

@@ -259,7 +259,8 @@ const struct HashEntry DOMElementProtoTableEntries[] = {
     {"removeAttribute", DOMElement::RemoveAttribute, DontDelete | Function, 1,
      &DOMElementProtoTableEntries[17]},
     {"setAttribute", DOMElement::SetAttribute, DontDelete | Function, 2, 0},
-    {"hasAttribute", DOMElement::HasAttribute, DontDelete | Function, 1, 0},
+    {"hasAttribute", DOMElement::HasAttribute, DontDelete | Function, 1,
+     &DOMElementProtoTableEntries[19]},
     {"getElementsByTagNameNS", DOMElement::GetElementsByTagNameNS,
      DontDelete | Function, 2, 0},
     {0, 0, 0, 0, 0},
@@ -277,9 +278,11 @@ const struct HashEntry DOMElementProtoTableEntries[] = {
     {"setAttributeNode", DOMElement::SetAttributeNode, DontDelete | Function, 2,
      0},
     {"setAttributeNodeNS", DOMElement::SetAttributeNodeNS,
-     DontDelete | Function, 1, 0}};
+     DontDelete | Function, 1, &DOMElementProtoTableEntries[20]},
+    {"scrollByLines", DOMElement::ScrollByLines, DontDelete | Function, 1, 0},
+    {"scrollByPages", DOMElement::ScrollByPages, DontDelete | Function, 1, 0}};
 
-const struct HashTable DOMElementProtoTable = {2, 19,
+const struct HashTable DOMElementProtoTable = {2, 21,
                                                DOMElementProtoTableEntries, 17};
 
 }  // namespace

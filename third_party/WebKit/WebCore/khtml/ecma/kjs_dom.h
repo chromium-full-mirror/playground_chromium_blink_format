@@ -277,7 +277,9 @@ class DOMElement : public DOMNode {
     SetAttributeNodeNS,
     GetElementsByTagNameNS,
     HasAttribute,
-    HasAttributeNS
+    HasAttributeNS,
+    ScrollByLines,
+    ScrollByPages
   };
 };
 
