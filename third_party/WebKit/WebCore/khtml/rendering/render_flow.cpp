@@ -501,6 +501,7 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
 
   bool topChildQuirk = false;
   bool bottomChildQuirk = false;
+  bool determinedTopQuirk = false;
 
   bool strictMode =
       isAnonymousBox()
@@ -606,6 +607,8 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
       // See if the top margin is quirky. We only care if this child has
       // margins that will collapse with us.
       bool topQuirk = child->isTopMarginQuirk();
+      if (child->continuation())
+        topQuirk = false;
 
       if (canCollapseWithChildren && topMarginContributor && !clearOccurred) {
         // This child is collapsing with the top of the
@@ -623,13 +626,17 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
         // collapse it away, even if the margin is smaller (www.webreference.com
         // has an example of this, a <dt> with 0.8em author-specified inside
         // a <dl> inside a <td>.
-        if (!topQuirk && (posTop - negTop))
+        if (!determinedTopQuirk && !topQuirk && (posTop - negTop)) {
           m_topMarginQuirk = false;
+          determinedTopQuirk = true;
+        }
 
-        if (topQuirk && marginTop() == 0)
+        if (!determinedTopQuirk && topQuirk && marginTop() == 0)
           // We have no top margin and our top child has a quirky margin.
           // We will pick up this quirky margin and pass it through.
           // This deals with the <td><div><p> case.
+          // Don't do this for a block that split two inlines though.  You do
+          // still apply margins in this case.
           m_topMarginQuirk = true;
       }
 
@@ -673,8 +680,12 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
             child->marginBottom())
           prevPosMargin = prevNegMargin = 0;
 
-        if (prevPosMargin - prevNegMargin)
+        if (prevPosMargin - prevNegMargin) {
           bottomChildQuirk = child->isBottomMarginQuirk();
+          if (child->continuation())  // We split an inline. Don't apply the
+                                      // quirk in this case.
+            bottomChildQuirk = false;
+        }
       }
       child->setPos(child->xPos(), ypos);
       if (ypos != yPosEstimate) {
