@@ -1184,7 +1184,9 @@ void HTMLInputElementImpl::parseAttribute(AttributeImpl* attr) {
         setChanged();     // at the default value right now.
       break;
     case ATTR_CHECKED:
+      removeCheckedRadioButtonFromDocument();
       m_defaultChecked = attr->val();
+      addCheckedRadioButtonToDocument();
       if (m_useDefaultChecked)  // We only need to setChanged if the form is
                                 // looking
         setChanged();           // at the default checked state right now.
@@ -1551,8 +1553,10 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
 
 void HTMLInputElementImpl::reset() {
   setValue(DOMString());
+  removeCheckedRadioButtonFromDocument();
   m_useDefaultChecked = true;
   m_checked = m_defaultChecked;
+  addCheckedRadioButtonToDocument();
 }
 
 void HTMLInputElementImpl::setChecked(bool _checked) {
