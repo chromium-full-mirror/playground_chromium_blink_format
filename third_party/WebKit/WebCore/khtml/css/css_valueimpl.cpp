@@ -262,6 +262,11 @@ DOMString CSSMutableStyleDeclarationImpl::removeProperty(int propertyID,
   return value;
 }
 
+void CSSMutableStyleDeclarationImpl::clear() {
+  m_values.clear();
+  setChanged();
+}
+
 void CSSMutableStyleDeclarationImpl::setChanged() {
   if (m_node) {
     m_node->setChanged();
@@ -494,6 +499,11 @@ CSSMutableStyleDeclarationImpl::copyBlockProperties() const {
       BlockProperties, sizeof(BlockProperties) / sizeof(BlockProperties[0]));
 }
 
+void CSSMutableStyleDeclarationImpl::removeBlockProperties() {
+  removePropertiesInSet(BlockProperties,
+                        sizeof(BlockProperties) / sizeof(BlockProperties[0]));
+}
+
 CSSMutableStyleDeclarationImpl* CSSStyleDeclarationImpl::copyPropertiesInSet(
     const int* set,
     unsigned length) const {
@@ -504,6 +514,15 @@ CSSMutableStyleDeclarationImpl* CSSStyleDeclarationImpl::copyPropertiesInSet(
       list.append(CSSProperty(set[i], value, false));
   }
   return new CSSMutableStyleDeclarationImpl(0, list);
+}
+
+void CSSMutableStyleDeclarationImpl::removePropertiesInSet(const int* set,
+                                                           unsigned length) {
+  for (unsigned i = 0; i < length; i++) {
+    CSSValueImpl* value = getPropertyCSSValue(set[i]);
+    if (value)
+      m_values.remove(CSSProperty(set[i], value, false));
+  }
 }
 
 CSSMutableStyleDeclarationImpl* CSSMutableStyleDeclarationImpl::makeMutable() {
@@ -1191,5 +1210,10 @@ DOMString CSSProperty::cssText() const {
   return getPropertyName(m_id) + DOMString(": ") + m_value->cssText() +
          (m_bImportant ? DOMString(" !important") : DOMString()) +
          DOMString("; ");
+}
+
+bool operator==(const CSSProperty& a, const CSSProperty& b) {
+  return a.m_id == b.m_id && a.m_bImportant == b.m_bImportant &&
+         a.m_value == b.m_value;
 }
 }

@@ -28,6 +28,7 @@
 
 #include "dom_nodeimpl.h"
 #include "editing/edit_actions.h"
+#include "qmap.h"
 #include "qptrlist.h"
 #include "qvaluelist.h"
 #include "selection.h"
@@ -722,7 +723,7 @@ class RemoveNodePreservingChildrenCommand : public CompositeEditCommand {
 
 class ReplacementFragment {
  public:
-  ReplacementFragment(DOM::DocumentFragmentImpl* fragment);
+  ReplacementFragment(DOM::DocumentImpl*, DOM::DocumentFragmentImpl*);
   ~ReplacementFragment();
 
   enum EFragmentType { EmptyFragment, SingleTextNodeFragment, TreeFragment };
@@ -732,6 +733,8 @@ class ReplacementFragment {
   DOM::NodeImpl* lastChild() const;
 
   DOM::NodeImpl* mergeStartNode() const;
+
+  DOM::CSSMutableStyleDeclarationImpl* styleForNode(DOM::NodeImpl* node);
 
   void pruneEmptyNodes();
 
@@ -751,14 +754,19 @@ class ReplacementFragment {
   static bool isInterchangeNewlineNode(const DOM::NodeImpl*);
   static bool isInterchangeConvertedSpaceSpan(const DOM::NodeImpl*);
 
+  void computeStylesForNodes();
+  void removeStyleNodes();
+
   // A couple simple DOM helpers
   DOM::NodeImpl* enclosingBlock(DOM::NodeImpl*) const;
   void removeNode(DOM::NodeImpl*);
+  void removeNodePreservingChildren(DOM::NodeImpl*);
   void insertNodeBefore(DOM::NodeImpl* node, DOM::NodeImpl* refNode);
 
   EFragmentType m_type;
-  DOM::CSSMutableStyleDeclarationImpl* m_defaultStyle;
+  DOM::DocumentImpl* m_document;
   DOM::DocumentFragmentImpl* m_fragment;
+  QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*> m_styles;
   bool m_hasInterchangeNewline;
   bool m_hasMoreThanOneBlock;
 };
@@ -790,6 +798,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                                               DOM::NodeImpl* refChild);
 
   void updateNodesInserted(DOM::NodeImpl*);
+  void applyStyleToInsertedNodes();
 
   ReplacementFragment m_fragment;
   DOM::NodeImpl* m_firstNodeInserted;

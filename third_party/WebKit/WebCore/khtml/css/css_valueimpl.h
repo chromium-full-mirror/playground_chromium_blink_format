@@ -431,6 +431,8 @@ class CSSProperty {
   int m_id;
   bool m_bImportant;
 
+  friend bool operator==(const CSSProperty&, const CSSProperty&);
+
  protected:
   CSSValueImpl* m_value;
 };
@@ -500,6 +502,8 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
     return removeProperty(propertyID, notifyChanged, exceptionCode);
   }
 
+  void clear();
+
   void setChanged();
 
   // setLengthProperty treats integers as pixels! (Needed for conversion of HTML
@@ -525,6 +529,8 @@ class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
   void addParsedProperties(const CSSProperty* const*, int numProperties);
 
   CSSMutableStyleDeclarationImpl* copyBlockProperties() const;
+  void removeBlockProperties();
+  void removePropertiesInSet(const int* set, unsigned length);
 
   void merge(CSSMutableStyleDeclarationImpl*,
              bool argOverridesOnConflict = true);
