@@ -8,16 +8,19 @@
 
 #import <WebCore/WebCoreBridge.h>
 
-#import <WebKit/WebDataSource.h>
-#import <WebKit/WebUIDelegate.h>
+@class WebDataSource;
+@class WebFrame;
+@protocol WebOpenPanelResultListener;
 
 @interface WebBridge : WebCoreBridge<WebCoreBridge> {
-  WebFrame* frame;
+  WebFrame* _frame;
   BOOL _doingClientRedirect;
 }
 
+- (id)initWithWebFrame:(WebFrame*)webFrame;
+- (void)close;
+
 - (void)receivedData:(NSData*)data withDataSource:(WebDataSource*)dataSource;
-- (void)setWebFrame:(WebFrame*)webFrame;
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebOpenPanelResultListener>)resultListener;
 

@@ -59,7 +59,7 @@
 
 - (WebFrame*)webFrame;
 - (WebDataSource*)dataSource;
-- (WebView*)controller;
+- (WebView*)webView;
 - (NSWindow*)currentWindow;
 
 - (NPP)pluginPointer;

@@ -11,7 +11,7 @@
 @interface WebKitStatistics : NSObject {
 }
 
-+ (int)controllerCount;
++ (int)webViewCount;
 
 + (int)frameCount;
 + (int)dataSourceCount;
