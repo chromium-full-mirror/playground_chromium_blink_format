@@ -131,6 +131,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)setTitle:(NSString*)title;
 - (void)setStatusText:(NSString*)status;
 
+- (void)loadIcon:(NSURL*)url;
+
 - (BOOL)createChildFrameNamed:(NSString*)frameName
                       withURL:(NSURL*)URL
                    renderPart:(KHTMLRenderPart*)renderPart

@@ -62,7 +62,7 @@ class KWQKHTMLPartImpl : public QObject {
 
   void setTitle(const DOM::DOMString&);
   void setStatusBarText(const QString& status);
-
+  void loadIcon(const KURL& url);
   QString documentSource() const;
 
   bool frameExists(const QString& frameName);
