@@ -492,8 +492,7 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
 
       // See if the top margin is quirky. We only care if this child has
       // margins that will collapse with us.
-      bool topQuirk =
-          (posTop - negTop) != 0 ? child->isTopMarginQuirk() : false;
+      bool topQuirk = child->isTopMarginQuirk();
 
       if (canCollapseWithChildren && topMarginContributor && !clearOccurred) {
         // This child is collapsing with the top of the
@@ -509,11 +508,11 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
         // collapse it away, even if the margin is smaller (www.webreference.com
         // has an example of this, a <dt> with 0.8em author-specified inside
         // a <dl> inside a <td>.
-        if (!topQuirk)
+        if (!topQuirk && (posTop - negTop))
           m_topMarginQuirk = false;
       }
 
-      if (isTableCell() && topMarginContributor)
+      if (isTableCell() && topMarginContributor && (posTop - negTop))
         topChildQuirk = topQuirk;
 
       int ypos = m_height;
@@ -552,9 +551,8 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
         if (child->style()->display() == INLINE)
           prevPosMargin = prevNegMargin = 0;
 
-        bottomChildQuirk = (prevPosMargin - prevNegMargin) != 0
-                               ? child->isBottomMarginQuirk()
-                               : false;
+        if (prevPosMargin - prevNegMargin)
+          bottomChildQuirk = child->isBottomMarginQuirk();
       }
       child->setPos(child->xPos(), ypos);
     }
