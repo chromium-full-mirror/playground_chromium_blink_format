@@ -998,7 +998,7 @@ void RenderObject::removeFromSpecialObjects() {
   }
 }
 
-RenderArena* RenderObject::renderArena() {
+RenderArena* RenderObject::renderArena() const {
   DOM::NodeImpl* elt = element();
   RenderObject* current = parent();
   while (!elt && current) {

@@ -162,7 +162,7 @@ class RenderObject : public CachedObjectClient {
   void* operator new(size_t sz) throw();
 
  public:
-  RenderArena* renderArena();
+  RenderArena* renderArena() const;
 
   // some helper functions...
   virtual bool childrenInline() const { return false; }
