@@ -61,7 +61,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     or the content policy delegate. If there are no more policy
     decisions to be made, the resource will be displayed inline if
     possible. If there is no view available to display the resource
-    inline, then unableToImplementPolicyWithError:inFrame: will be
+    inline, then unableToImplementPolicyWithError:frame: will be
     called with an appropriate error.
 
     <p>If a new window is going to be created for this navigation as a
@@ -102,11 +102,11 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     the URL represents. Typically, the policy handler methods are called in this
    order:
 
-    decideNewWindowPolicyForAction:andRequest:newFrameName:decisionListener: (at
+    decidePolicyForNewWindowAction:request:newFrameName:decisionListener: (at
    most once)<BR>
-    decideNavigationPolicyForAction:inFrame::decisionListener: (zero or more
-   times)<BR>
-    decideContentPolicyForMIMEType:andRequest:inFrame: (zero or more times)<BR>
+    decidePolicyForNavigationAction:request:frame:decisionListener: (zero or
+   more times)<BR>
+    decidePolicyForMIMEType:request:frame: (zero or more times)<BR>
 
     New window policy is always checked. Navigation policy is checked
     for the initial load and every redirect unless blocked by an
@@ -122,7 +122,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 @interface NSObject (WebPolicyDelegate)
 
 /*!
-   @method decideNavigationPolicyForAction:andRequest:inFrame:decisionListener:
+   @method decidePolicyForNavigationAction:request:frame:decisionListener:
    @abstract This method is called to decide what to do with a proposed
    navigation.
    @param actionInformation Dictionary that describes the action that triggered
@@ -134,14 +134,14 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    on every redirect.
 */
 - (void)webView:(WebView*)webView
-    decideNavigationPolicyForAction:(NSDictionary*)actionInformation
-                         andRequest:(NSURLRequest*)request
-                            inFrame:(WebFrame*)frame
+    decidePolicyForNavigationAction:(NSDictionary*)actionInformation
+                            request:(NSURLRequest*)request
+                              frame:(WebFrame*)frame
                    decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
      @method
-   decideNewWindowPolicyForAction:andRequest:newFrameName:decisionListener:
+   decidePolicyForNewWindowAction:request:newFrameName:decisionListener:
      @discussion This method is called to decide what to do with an targetted
    nagivation that would open a new window.
      @param actionInformation Dictionary that describes the action that
@@ -157,19 +157,18 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    way.
 
      <p>If this method picks a policy of Use, the new window will be
-     opened, and
-   decideNavigationPolicyForAction:andRequest:inFrame:decisionListner:
+     opened, and decidePolicyForNavigationAction:request:frame:decisionListner:
      will be called with a WebNavigationType of WebNavigationTypeOther
      in its action. This is to avoid possible confusion about the modifiers.
 */
 - (void)webView:(WebView*)webView
-    decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
-                        andRequest:(NSURLRequest*)request
+    decidePolicyForNewWindowAction:(NSDictionary*)actionInformation
+                           request:(NSURLRequest*)request
                       newFrameName:(NSString*)frameName
                   decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
-    @method decideContentPolicyForMIMEType:andRequest:inFrame:
+    @method decidePolicyForMIMEType:request:frame:
     @discussion Returns the policy for content which has been partially loaded.
    Sent after locationChangeStarted.
     @param type MIME type for the resource.
@@ -178,10 +177,10 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     @param listener The object to call when the decision is made
 */
 - (void)webView:(WebView*)webView
-    decideContentPolicyForMIMEType:(NSString*)type
-                        andRequest:(NSURLRequest*)request
-                           inFrame:(WebFrame*)frame
-                  decisionListener:(id<WebPolicyDecisionListener>)listener;
+    decidePolicyForMIMEType:(NSString*)type
+                    request:(NSURLRequest*)request
+                      frame:(WebFrame*)frame
+           decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
     @method unableToImplementPolicy:error:forURL:inFrame:
@@ -195,6 +194,6 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 */
 - (void)webView:(WebView*)webView
     unableToImplementPolicyWithError:(WebError*)error
-                             inFrame:(WebFrame*)frame;
+                               frame:(WebFrame*)frame;
 
 @end
