@@ -69,7 +69,6 @@ const double NaN = *(const double*)NaN_Bytes;
 const double Inf = *(const double*)Inf_Bytes;
 };
 
-#if APPLE_CHANGES
 static pthread_once_t interpreterLockOnce = PTHREAD_ONCE_INIT;
 static pthread_mutex_t interpreterLock;
 
@@ -90,8 +89,6 @@ static inline void lockInterpreter() {
 static inline void unlockInterpreter() {
   pthread_mutex_unlock(&interpreterLock);
 }
-
-#endif
 
 // ------------------------------ UndefinedImp ---------------------------------
 
@@ -467,12 +464,10 @@ void InterpreterImp::globalClear() {
 
 InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
     : _context(0) {
-// add this interpreter to the global chain
-// as a root set for garbage collection
-#if APPLE_CHANGES
+  // add this interpreter to the global chain
+  // as a root set for garbage collection
   lockInterpreter();
   m_interpreter = interp;
-#endif
   if (s_hook) {
     prev = s_hook;
     next = s_hook->next;
@@ -483,13 +478,8 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
     s_hook = next = prev = this;
     globalInit();
   }
-#if APPLE_CHANGES
   unlockInterpreter();
-#endif
 
-#if !APPLE_CHANGES
-  m_interpreter = interp;
-#endif
   global = glob;
   globExec = new ExecState(m_interpreter, 0);
   dbg = 0;
@@ -499,6 +489,14 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
   initGlobalObject();
 
   recursion = 0;
+}
+
+void InterpreterImp::lock() {
+  lockInterpreter();
+}
+
+void InterpreterImp::unlock() {
+  unlockInterpreter();
 }
 
 void InterpreterImp::initGlobalObject() {

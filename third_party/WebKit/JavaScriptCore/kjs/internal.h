@@ -227,6 +227,8 @@ class InterpreterImp {
   Interpreter* interpreter() const { return m_interpreter; }
 
   void initGlobalObject();
+  static void lock();
+  static void unlock();
 
   void mark();
 
