@@ -26,40 +26,31 @@
 #ifndef KWQFILEBUTTON_H
 #define KWQFILEBUTTON_H
 
-#include <qpushbutton.h>
+#include <qwidget.h>
 
 #ifdef __OBJC__
 @class KWQFileButtonAdapter;
-@class NSImage;
-@class NSString;
 #else
 class KWQFileButtonAdapter;
-class NSImage;
-class NSString;
 #endif
 
-class KWQFileButton : public QPushButton {
+class KWQFileButton : public QWidget {
  public:
   KWQFileButton();
   ~KWQFileButton();
 
   void setFilename(const QString&);
-  QString filename() const { return _filename; }
 
   QSize sizeHint() const;
   QRect frameGeometry() const;
   void setFrameGeometry(const QRect&);
   int baselinePosition() const;
 
- private:
-  virtual void clicked();
-  virtual void paint(QPainter*, const QRect&);
+  void filenameChanged();
 
+ private:
   KWQSignal _textChanged;
-  QString _filename;
   KWQFileButtonAdapter* _adapter;
-  NSImage* _icon;
-  NSString* _label;
 };
 
 #endif
