@@ -1164,11 +1164,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * @internal
    */
-  void notifyDragCaretChanged();
-
-  /**
-   * @internal
-   */
   void emitSelectionChanged();
 
   /**
