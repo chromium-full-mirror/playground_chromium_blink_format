@@ -560,7 +560,7 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum { Src, Complete, OnLoad };
+  enum { Src, Complete, OnLoad, Width, Height };
 
   khtml::CachedImage* image() { return img; }
 
