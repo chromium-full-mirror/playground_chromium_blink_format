@@ -14,8 +14,6 @@
 @class WebNetscapePluginNullEventSender;
 
 @interface WebBaseNetscapePluginView : NSView {
-  WebNetscapePluginNullEventSender* eventSender;
-
   WebNetscapePluginPackage* plugin;
 
   int mode;
@@ -38,6 +36,7 @@
   NSTrackingRectTag trackingTag;
   NSMutableArray* streams;
   NSMutableDictionary* streamNotifications;
+  NSTimer* nullEventTimer;
 
   NPP_NewProcPtr NPP_New;
   NPP_DestroyProcPtr NPP_Destroy;
