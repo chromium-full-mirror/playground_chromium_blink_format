@@ -30,6 +30,9 @@
   BOOL animationFinished;
 
   NSLock* decodeLock;
+
+  id _PDFDoc;
+  BOOL isPDF;
 }
 
 - (size_t)numberOfImages;
@@ -64,6 +67,9 @@
 - (CFDictionaryRef)propertiesAtIndex:(size_t)index;
 
 - (void)decodeData:(CFDataRef)data isComplete:(BOOL)f callback:(id)c;
+
+- (void)setIsPDF:(BOOL)f;
+- (BOOL)isPDF;
 
 @end
 
