@@ -624,7 +624,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Controls the visibility of the selection.
    */
-  void setSelectionVisible(bool flag = true);
+  void setCaretVisible(bool flag = true);
 
   /**
    * Paints the caret.
