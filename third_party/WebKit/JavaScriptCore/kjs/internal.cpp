@@ -1065,9 +1065,6 @@ void KJS::printInfo(ExecState* exec,
       case ListType:
         name = "List";
         break;
-      case CompletionType:
-        name = "Completion";
-        break;
       default:
         break;
     }
