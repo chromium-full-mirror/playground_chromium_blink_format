@@ -2799,8 +2799,10 @@ bool KHTMLPart::requestObject(khtml::RenderPart* frame,
                               const QString& url,
                               const QString& serviceType,
                               const QStringList& params) {
+#if !APPLE_CHANGES
   if (url.isEmpty())
     return false;
+#endif
   khtml::ChildFrame child;
   QValueList<khtml::ChildFrame>::Iterator it = d->m_objects.append(child);
   (*it).m_frame = frame;
