@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// USING_BORROWED_QBUFFER ======================================================
+
+#ifdef USING_BORROWED_QBUFFER
+#include <_qbuffer.h>
+#else
+
 #include <KWQDef.h>
 
 #include "qarray.h"
@@ -73,5 +79,7 @@ class QBuffer {
 
 };  // class QBuffer
     // ============================================================
+
+#endif  // USING_BORROWED_QBUFFER
 
 #endif
