@@ -50,28 +50,21 @@ NP_Object* NP_CreateObject(NP_Class* aClass) {
 }
 
 NP_Object* NP_RetainObject(NP_Object* obj) {
-  if (obj->_class->retain != NULL)
-    return obj->_class->retain(obj);
-
   obj->referenceCount++;
 
   return obj;
 }
 
 void NP_ReleaseObject(NP_Object* obj) {
-  if (obj->_class->release != NULL)
-    obj->_class->release(obj);
-  else {
-    assert(obj->referenceCount >= 1);
+  assert(obj->referenceCount >= 1);
 
-    obj->referenceCount--;
+  obj->referenceCount--;
 
-    if (obj->referenceCount == 0) {
-      if (obj->_class->destroy)
-        obj->_class->destroy(obj);
-      else
-        free(obj);
-    }
+  if (obj->referenceCount == 0) {
+    if (obj->_class->destroy)
+      obj->_class->destroy(obj);
+    else
+      free(obj);
   }
 }
 
