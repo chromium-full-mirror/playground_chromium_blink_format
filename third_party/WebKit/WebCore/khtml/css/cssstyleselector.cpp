@@ -578,105 +578,6 @@ unsigned int CSSStyleSelector::addInlineDeclarations(
 
 static bool subject;
 
-void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
-  dynamicPseudo = RenderStyle::NOPSEUDO;
-
-  NodeImpl* n = e;
-
-  selectorCache[selIndex].state = Invalid;
-  CSSSelector* sel = selectors[selIndex];
-
-  // we have the subject part of the selector
-  subject = true;
-
-  // hack. We can't allow :hover, as it would trigger a complete relayout with
-  // every mouse event.
-  bool single = false;
-  bool affectedByHover = style->affectedByHoverRules();
-  if (sel->tag == -1)
-    single = true;
-
-  // first selector has to match
-  if (!checkOneSelector(sel, e))
-    return;
-
-  // check the subselectors
-  CSSSelector::Relation relation = sel->relation;
-  while ((sel = sel->tagHistory)) {
-    single = false;
-    if (!n->isElementNode())
-      return;
-    switch (relation) {
-      case CSSSelector::Descendant: {
-        bool found = false;
-        while (!found) {
-          subject = false;
-          n = n->parentNode();
-          if (!n || !n->isElementNode())
-            return;
-          ElementImpl* elem = static_cast<ElementImpl*>(n);
-          if (checkOneSelector(sel, elem))
-            found = true;
-        }
-        break;
-      }
-      case CSSSelector::Child: {
-        subject = false;
-        n = n->parentNode();
-        if (!strictParsing)
-          while (n && n->implicitNode())
-            n = n->parentNode();
-        if (!n || !n->isElementNode())
-          return;
-        ElementImpl* elem = static_cast<ElementImpl*>(n);
-        if (!checkOneSelector(sel, elem))
-          return;
-        break;
-      }
-      case CSSSelector::Sibling: {
-        subject = false;
-        n = n->previousSibling();
-        while (n && !n->isElementNode())
-          n = n->previousSibling();
-        if (!n)
-          return;
-        ElementImpl* elem = static_cast<ElementImpl*>(n);
-        if (!checkOneSelector(sel, elem))
-          return;
-        break;
-      }
-      case CSSSelector::SubSelector: {
-        // kdDebug() << "CSSOrderedRule::checkSelector" << endl;
-        ElementImpl* elem = static_cast<ElementImpl*>(n);
-        // a selector is invalid if something follows :first-xxx
-        if (dynamicPseudo != RenderStyle::NOPSEUDO) {
-          return;
-        }
-        if (!checkOneSelector(sel, elem))
-          return;
-        // kdDebug() << "CSSOrderedRule::checkSelector: passed" << endl;
-        break;
-      }
-    }
-    relation = sel->relation;
-  }
-
-  // disallow *:hover
-  if (single && !affectedByHover && style->affectedByHoverRules()) {
-    style->setAffectedByHoverRules(false);
-    return;
-  }
-
-  if (dynamicPseudo != RenderStyle::NOPSEUDO) {
-    selectorCache[selIndex].state = AppliesPseudo;
-    selectors[selIndex]->pseudoId = dynamicPseudo;
-  } else
-    selectorCache[selIndex].state = Applies;
-  // qDebug( "selector %d applies", selIndex );
-  // selectors[ selIndex ]->print();
-  return;
-}
-
 // modified version of the one in kurl.cpp
 static void cleanpath(QString& path) {
   int pos;
@@ -738,6 +639,121 @@ static void checkPseudoState(DOM::ElementImpl* e) {
   // completeURL( attr.string() );
   pseudoState =
       KHTMLFactory::vLinks()->contains(u) ? PseudoVisited : PseudoLink;
+}
+
+void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
+  dynamicPseudo = RenderStyle::NOPSEUDO;
+
+  NodeImpl* n = e;
+
+  selectorCache[selIndex].state = Invalid;
+  CSSSelector* sel = selectors[selIndex];
+
+  // we have the subject part of the selector
+  subject = true;
+
+  // We track whether or not the rule contains only :hover and :active in a
+  // simple selector. If
+  // so, we can't allow that to apply to every element on the page.  We assume
+  // the author intended
+  // to apply the rules only to links.
+  bool onlyHoverActive = (sel->match == CSSSelector::Pseudo &&
+                          (sel->pseudoType() == CSSSelector::PseudoHover ||
+                           sel->pseudoType() == CSSSelector::PseudoActive));
+  bool affectedByHover = style->affectedByHoverRules();
+  bool affectedByActive = style->affectedByActiveRules();
+
+  // first selector has to match
+  if (!checkOneSelector(sel, e))
+    return;
+
+  // check the subselectors
+  CSSSelector::Relation relation = sel->relation;
+  while ((sel = sel->tagHistory)) {
+    if (!n->isElementNode())
+      return;
+    switch (relation) {
+      case CSSSelector::Descendant: {
+        bool found = false;
+        while (!found) {
+          subject = false;
+          n = n->parentNode();
+          if (!n || !n->isElementNode())
+            return;
+          ElementImpl* elem = static_cast<ElementImpl*>(n);
+          if (checkOneSelector(sel, elem))
+            found = true;
+        }
+        break;
+      }
+      case CSSSelector::Child: {
+        subject = false;
+        n = n->parentNode();
+        if (!strictParsing)
+          while (n && n->implicitNode())
+            n = n->parentNode();
+        if (!n || !n->isElementNode())
+          return;
+        ElementImpl* elem = static_cast<ElementImpl*>(n);
+        if (!checkOneSelector(sel, elem))
+          return;
+        break;
+      }
+      case CSSSelector::Sibling: {
+        subject = false;
+        n = n->previousSibling();
+        while (n && !n->isElementNode())
+          n = n->previousSibling();
+        if (!n)
+          return;
+        ElementImpl* elem = static_cast<ElementImpl*>(n);
+        if (!checkOneSelector(sel, elem))
+          return;
+        break;
+      }
+      case CSSSelector::SubSelector: {
+        if (onlyHoverActive)
+          onlyHoverActive = (sel->match == CSSSelector::Pseudo &&
+                             (sel->pseudoType() == CSSSelector::PseudoHover ||
+                              sel->pseudoType() == CSSSelector::PseudoActive));
+
+        // kdDebug() << "CSSOrderedRule::checkSelector" << endl;
+        ElementImpl* elem = static_cast<ElementImpl*>(n);
+        // a selector is invalid if something follows :first-xxx
+        if (dynamicPseudo != RenderStyle::NOPSEUDO) {
+          return;
+        }
+        if (!checkOneSelector(sel, elem))
+          return;
+        // kdDebug() << "CSSOrderedRule::checkSelector: passed" << endl;
+        break;
+      }
+    }
+    relation = sel->relation;
+  }
+
+  // disallow *:hover, *:active, and *:hover:active except for links
+  if (onlyHoverActive && subject) {
+    if (pseudoState == PseudoUnknown)
+      checkPseudoState(e);
+
+    if (pseudoState == PseudoNone) {
+      if (!affectedByHover && style->affectedByHoverRules())
+        style->setAffectedByHoverRules(false);
+      if (!affectedByActive && style->affectedByActiveRules())
+        style->setAffectedByActiveRules(false);
+      return;
+    }
+  }
+
+  if (dynamicPseudo != RenderStyle::NOPSEUDO) {
+    selectorCache[selIndex].state = AppliesPseudo;
+    selectors[selIndex]->pseudoId = dynamicPseudo;
+  } else
+    selectorCache[selIndex].state = Applies;
+  // qDebug( "selector %d applies", selIndex );
+  // selectors[ selIndex ]->print();
+  return;
 }
 
 bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
