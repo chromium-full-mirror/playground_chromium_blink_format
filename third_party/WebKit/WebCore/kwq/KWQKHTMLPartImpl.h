@@ -102,6 +102,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   bool isFrameSet();
 
+  void overURL(const QString& url, const QString& target, int modifierState);
+
  private:
   KHTMLPart* part;
   KHTMLPartPrivate* d;

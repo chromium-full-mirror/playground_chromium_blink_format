@@ -2144,14 +2144,15 @@ void KHTMLPart::overURL(const QString& url,
                         bool shiftPressed)
 #endif
 {
-#ifndef APPLE_CHANGES
+#ifdef APPLE_CHANGES
+  impl->overURL(url, target, modifierState);
+#else
   if (!d->m_kjsStatusBarText.isEmpty() && !shiftPressed) {
     emit onURL(url);
     emit setStatusBarText(d->m_kjsStatusBarText);
     d->m_kjsStatusBarText = QString::null;
     return;
   }
-#endif
 
   emit onURL(url);
 
@@ -2161,26 +2162,16 @@ void KHTMLPart::overURL(const QString& url,
   }
 
   if (url.find(QString::fromLatin1("javascript:"), 0, false) != -1) {
-#ifdef APPLE_CHANGES
-    // FIXME: how to localize?
-    emit setStatusBarText(
-        "Run script " +
-        url.mid(url.find("javascript:", 0, false) + strlen("javascript:")));
-#else
     emit setStatusBarText(url.mid(url.find("javascript:", 0, false)));
-#endif
     return;
   }
 
   KURL u = completeURL(url);
 
-#ifndef APPLE_CHANGES
   // special case for <a href="">
   if (url.isEmpty())
     u.setFileName(url);
-#endif
 
-#ifndef APPLE_CHANGES
   QString com;
 
   KMimeType::Ptr typ = KMimeType::findByURL(u);
@@ -2192,9 +2183,7 @@ void KHTMLPart::overURL(const QString& url,
     emit setStatusBarText(u.prettyURL());
     return;
   }
-#endif
 
-#ifndef APPLE_CHANGES
   if (u.isLocalFile()) {
     // TODO : use KIO::stat() and create a KFileItem out of its result,
     // to use KFileItem::statusBarText()
@@ -2254,47 +2243,19 @@ void KHTMLPart::overURL(const QString& url,
     }
     emit setStatusBarText(text);
   } else {
-#endif
     QString extra;
-#ifdef APPLE_CHANGES
-    QString prefix = "Go to ";
-#endif
     if (target == QString::fromLatin1("_blank")) {
-#ifdef APPLE_CHANGES
-      extra = " in new window";
-      prefix = "Open ";
-#else
-    extra = i18n(" (In new window)");
-#endif
+      extra = i18n(" (In new window)");
     } else if (!target.isEmpty() && (target != QString::fromLatin1("_top")) &&
                (target != QString::fromLatin1("_self")) &&
                (target != QString::fromLatin1("_parent"))) {
-#ifdef APPLE_CHANGES
-      // FIXME: how to localize
-      if (frameExists(target)) {
-        // FIXME: It would be good if we could tell the difference between
-        // an existing frame in the same window vs. one in another window
-        // so we could say "in other window" in that case.
-        extra = " in other frame";
-      } else {
-        extra = " in new window";
-        prefix = "Open ";
-      }
-#else
-    extra = i18n(" (In other frame)");
-#endif
+      extra = i18n(" (In other frame)");
     }
 
     if (u.protocol() == QString::fromLatin1("mailto")) {
       QString
           mailtoMsg /* = QString::fromLatin1("<img src=%1>").arg(locate("icon", QString::fromLatin1("locolor/16x16/actions/mail_send.png")))*/;
-#ifdef APPLE_CHANGES
-      // FIXME: how to localize this?
-      // FIXME: addressbook integration? probably not worth it...
-      mailtoMsg += i18n("Send email to ") + KURL::decode_string(u.path());
-#else
-    mailtoMsg += i18n("Email to: ") + KURL::decode_string(u.path());
-#endif
+      mailtoMsg += i18n("Email to: ") + KURL::decode_string(u.path());
       QStringList queries = QStringList::split('&', u.query().mid(1));
       for (QStringList::Iterator it = queries.begin(); it != queries.end();
            ++it)
@@ -2331,31 +2292,7 @@ void KHTMLPart::overURL(const QString& url,
         }
       }
 #endif
-#ifdef APPLE_CHANGES
-// FIXME: needs localization
-
-#if FLAGS_CHANGE_FIXED
-    // FIXME: it would be nice to change the text based on currently
-    // pressed modifiers, but we can't do that until we can detect
-    // modifier state changes, which requires a fix to 2981619
-    if (modifierState & MetaButton) {
-      prefix = "Open ";
-      if (modifierState & ShiftButton) {
-        extra = " in new window, behind current window";
-      } else {
-        extra = " in new window";
-      }
-    } else if (modifierState & AltButton) {
-      prefix = "Download ";
-      extra = "";
-    }
-#endif
-
-    emit setStatusBarText(prefix + u.prettyURL() + extra);
-#else
-  emit setStatusBarText(u.prettyURL() + extra);
-#endif
-#ifndef APPLE_CHANGES
+    emit setStatusBarText(u.prettyURL() + extra);
   }
 #endif
 }
