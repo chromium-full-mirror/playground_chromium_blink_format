@@ -499,8 +499,10 @@ void RenderTable::addColInfo(int _startCol,
       }
     }
   }
+#ifndef APPLE_CHANGES
   if (recalc)
     recalcColInfo(col);
+#endif
   if (changed)
     setMinMaxKnown(false);
 
