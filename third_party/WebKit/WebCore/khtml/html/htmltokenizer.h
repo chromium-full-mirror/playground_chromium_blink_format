@@ -176,6 +176,8 @@ class HTMLTokenizer : public Tokenizer, public khtml::CachedObjectClient {
   // from CachedObjectClient
   void notifyFinished(khtml::CachedObject* finishedObj);
 
+  virtual bool isWaitingForScripts();
+
  protected:
   // Internal buffers
   ///////////////////

@@ -131,6 +131,7 @@ class Tokenizer : public QObject {
   virtual void end() = 0;
   virtual void finish() = 0;
   virtual void setOnHold(bool /*_onHold*/) {}
+  virtual bool isWaitingForScripts() = 0;
 
  signals:
   void finishedParsing();
@@ -155,6 +156,8 @@ class XMLTokenizer : public Tokenizer, public khtml::CachedObjectClient {
 
   // from CachedObjectClient
   void notifyFinished(khtml::CachedObject* finishedObj);
+
+  virtual bool isWaitingForScripts();
 
  protected:
   DOM::DocumentPtr* m_doc;

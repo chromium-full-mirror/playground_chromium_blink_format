@@ -501,4 +501,8 @@ void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
   }
 }
 
+bool XMLTokenizer::isWaitingForScripts() {
+  return m_cachedScript != 0;
+}
+
 #include "xml_tokenizer.moc"

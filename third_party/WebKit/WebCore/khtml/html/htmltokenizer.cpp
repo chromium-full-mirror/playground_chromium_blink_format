@@ -1909,6 +1909,10 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
   }
 }
 
+bool HTMLTokenizer::isWaitingForScripts() {
+  return loadingExtScript;
+}
+
 void HTMLTokenizer::setSrc(const QString& source) {
   lineno += src.lineCount();
   _src = source;
