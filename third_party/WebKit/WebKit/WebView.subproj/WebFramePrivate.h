@@ -7,7 +7,7 @@
 */
 
 #import <WebKit/WebFrame.h>
-#import <WebKit/WebControllerPolicyDelegate.h>
+#import <WebKit/WebControllerPolicyDelegatePrivate.h>
 
 @class WebBridge;
 @class WebFrameBridge;
@@ -15,6 +15,7 @@
 @class WebView;
 @class WebRequest;
 @class WebFormState;
+@class WebPolicyDecisionListener;
 @protocol WebDOMElement;
 
 typedef enum {
@@ -175,7 +176,6 @@ typedef enum {
 - (void)_addChild:(WebFrame*)child;
 
 - (NSString*)_generateFrameName;
-
 - (NSDictionary*)_actionInformationForNavigationType:
                      (WebNavigationType)navigationType
                                                event:(NSEvent*)event

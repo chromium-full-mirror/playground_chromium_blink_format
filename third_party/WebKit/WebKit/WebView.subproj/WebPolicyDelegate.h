@@ -42,26 +42,54 @@ extern NSString* WebActionModifierFlagsKey;   // NSNumber (unsigned)
 extern NSString* WebActionOriginalURLKey;     // NSURL
 
 /*!
-    @enum WebPolicyAction
-    @abstract Potential actions to take when loading a URL
-    @constant WebPolicyUse Have WebKit use the resource.
-    @constant WebPolicySave Save the resource to disk.
-    @constant WebPolicyIgnore Do nothing with the resource.
+    @protocol WebPolicyDecisionListener
+    @discussion This protocol is used to call back with the results of a
+    policy decision. This provides the ability to make these decisions
+    asyncrhonously, which means the decision can be made by prompting
+    with a sheet, for example.
 */
-typedef enum {
-  WebPolicyUse,
-  WebPolicySave,
-  WebPolicyIgnore,
-} WebPolicyAction;
 
-@class WebPolicyDecisionListenerPrivate;
+@protocol WebPolicyDecisionListener<NSObject>
 
-@interface WebPolicyDecisionListener : NSObject {
- @private
-  WebPolicyDecisionListenerPrivate* _private;
-}
+/*!
+    @method use
+    @abstract Use the resource
+    @discussion If there remain more policy decisions to be made, then
+    the next policy delegate method gets to decide. This will be
+    either the next navigation policy delegate if there is a redirect,
+    or the content policy delegate. If there are no more policy
+    decisions to be made, the resource will be displayed inline if
+    possible. If there is no view available to display the resource
+    inline, then unableToImplementPolicyWithError:inFrame: will be
+    called with an appropriate error.
 
-- (void)usePolicy:(WebPolicyAction)policy;
+    <p>If a new window is going to be created for this navigation as a
+    result of frame targetting, then it will be created once you call
+    this method.
+*/
+- (void)use;
+
+/*!
+    @method download
+    @abstract Download the resource instead of displaying it.
+    @discussion This method is more than just a convenience because it
+    allows an in-progress navigation to be converted to a download
+    based on content type, without having to stop and restart the
+    load.
+*/
+- (void)download;
+
+/*!
+    @method ignore
+    @abstract Do nothing (but the client may choose to handle the request
+   itself)
+    @discussion A policy of ignore prevents WebKit from doing anything
+    further with the load, however, the client is still free to handle
+    the request in some other way, such as opening a new window,
+    opening a new window behind the current one, opening the URL in an
+    external app, revealing the location in Finder if a file URL, etc.
+*/
+- (void)ignore;
 
 @end
 
@@ -78,7 +106,7 @@ typedef enum {
    most once)<BR>
     decideNavigationPolicyForAction:inFrame::decisionListener: (one or more
    times)<BR>
-    contentPolicyForMIMEType:andRequest:inFrame: (at most once)<BR>
+    decideContentPolicyForMIMEType:andRequest:inFrame: (at most once)<BR>
 */
 @interface NSObject (WebPolicyDelegate)
 
@@ -97,7 +125,7 @@ typedef enum {
 - (void)decideNavigationPolicyForAction:(NSDictionary*)actionInformation
                              andRequest:(WebRequest*)request
                                 inFrame:(WebFrame*)frame
-                       decisionListener:(WebPolicyDecisionListener*)listener;
+                       decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
      @method
@@ -125,19 +153,21 @@ typedef enum {
 - (void)decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
                             andRequest:(WebRequest*)request
                           newFrameName:(NSString*)frameName
-                      decisionListener:(WebPolicyDecisionListener*)listener;
+                      decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
-    @method contentPolicyForMIMEType:andRequest:inFrame:
+    @method decideContentPolicyForMIMEType:andRequest:inFrame:
     @discussion Returns the policy for content which has been partially loaded.
    Sent after locationChangeStarted.
     @param type MIME type for the resource.
     @param request A WebResourceRequest for the partially loaded content.
     @param frame The frame which is loading the URL.
+    @param listener The object to call when the decision is made
 */
-- (WebPolicyAction)contentPolicyForMIMEType:(NSString*)type
-                                 andRequest:(WebRequest*)request
-                                    inFrame:(WebFrame*)frame;
+- (void)decideContentPolicyForMIMEType:(NSString*)type
+                            andRequest:(WebRequest*)request
+                               inFrame:(WebFrame*)frame
+                      decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
     @method unableToImplementPolicy:error:forURL:inFrame:
