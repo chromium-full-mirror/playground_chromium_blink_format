@@ -40,7 +40,7 @@ CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc) : NodeImpl(doc) {
 
 CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc, const DOMString& _text)
     : NodeImpl(doc) {
-  str = _text.impl;
+  str = _text.impl ? _text.impl : new DOMStringImpl(0, 0);
   str->ref();
 }
 
