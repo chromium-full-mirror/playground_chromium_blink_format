@@ -193,6 +193,8 @@ static QString startMarkup(const NodeImpl* node,
           style->ref();
           defaultStyle->diff(style);
           if (style->length() > 0) {
+            // FIXME: Handle case where style->cssText() has illegal characters
+            // in it, like "
             QString openTag = QString("<span class=\"") + AppleStyleSpanClass +
                               "\" style=\"" + style->cssText().string() + "\">";
             markup = openTag + markup + "</span>";
@@ -230,6 +232,8 @@ static QString startMarkup(const NodeImpl* node,
         NamedAttrMapImpl* attrs = el->attributes();
         unsigned long length = attrs->length();
         if (length == 0 && additionalStyle.length() > 0) {
+          // FIXME: Handle case where additionalStyle has illegal characters in
+          // it, like "
           markup += " " + node->getDocument()->attrName(ATTR_STYLE).string() +
                     "=\"" + additionalStyle.string() + "\"";
         } else {
@@ -238,6 +242,8 @@ static QString startMarkup(const NodeImpl* node,
             DOMString value = attr->value();
             if (attr->id() == ATTR_STYLE && additionalStyle.length() > 0)
               value += "; " + additionalStyle;
+            // FIXME: Handle case where value has illegal characters in it, like
+            // "
             markup += " " + node->getDocument()->attrName(attr->id()).string() +
                       "=\"" + value.string() + "\"";
           }
@@ -460,6 +466,7 @@ QString createMarkup(const RangeImpl* range,
   }
 
   // add in the "default style" for this markup
+  // FIXME: Handle case where value has illegal characters in it, like "
   QString openTag = QString("<span class=\"") + AppleStyleSpanClass +
                     "\" style=\"" + defaultStyle->cssText().string() + "\">";
   markups.prepend(openTag);
