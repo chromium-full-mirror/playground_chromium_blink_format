@@ -124,15 +124,15 @@
 
 // Set needsToApplyStyles if you change anything that might impact styles, like
 // font preferences.
-- (void)setNeedsToApplyStyles:(bool)flag
+- (void)setNeedsToApplyStyles:(bool)flag;
 
-                              // Reapplies style information to the document.
-                              // This should not be called directly,
-                              // instead call setNeedsToApplyStyles:.
-                              - (void)reapplyStyles
+// Reapplies style information to the document.  This should not be called
+// directly,
+// instead call setNeedsToApplyStyles:.
+- (void)reapplyStyles;
 
-                              // Stop animating animated GIFs, etc.
-                              - (void)stopAnimations;
+// Stop animating animated GIFs, etc.
+- (void)stopAnimations;
 
 // Drag and drop links and images.  Others?
 - (void)setCanDragFrom:(BOOL)flag;
