@@ -2381,8 +2381,9 @@ RenderObject* InlineMinMaxIterator::next() {
     if (!result)
       break;
 
-    if (result->isText() || result->isBR() || result->isFloating() ||
-        result->isReplaced() || result->isInlineFlow())
+    if (!result->isPositioned() &&
+        (result->isText() || result->isBR() || result->isFloating() ||
+         result->isReplaced() || result->isInlineFlow()))
       break;
 
     current = result;
