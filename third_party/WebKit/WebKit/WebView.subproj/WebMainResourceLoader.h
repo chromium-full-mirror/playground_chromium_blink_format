@@ -13,15 +13,12 @@
 @class IFWebDataSource;
 @protocol IFURLHandleClient;
 
-class KHTMLPart;
-
 @interface IFMainURLHandleClient : NSObject<IFURLHandleClient> {
   NSURL* url;
   id dataSource;
-  KHTMLPart* part;
   BOOL processedBufferedData;
-  BOOL examinedInitialData;
   BOOL isFirstChunk;
+  IFDownloadHandler* downloadHandler;
 }
 - initWithDataSource:(IFWebDataSource*)ds;
 
