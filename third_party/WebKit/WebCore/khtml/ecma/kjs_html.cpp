@@ -4955,7 +4955,9 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       QString compositeOperator = args[5].toString(exec).qstring().lower();
       QPixmap pixmap = i->image()->pixmap();
       QPainter p;
-      p.drawPixmap(x, y, pixmap, 0, 0, w, h, 1, drawingContext);
+      p.drawPixmap(x, y, pixmap, 0, 0, w, h,
+                   QPainter::compositeOperatorFromString(compositeOperator),
+                   drawingContext);
 
       if (contextObject->_needsFlushRasterCache)
         pixmap.flushRasterCache();
@@ -4964,7 +4966,7 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       break;
     }
     case Context2D::DrawImageFromRect: {
-      if (args.size() != 6) {
+      if (args.size() != 10) {
         Object err = Error::create(exec, SyntaxError);
         exec->setException(err);
         return err;
@@ -4987,7 +4989,10 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       QString compositeOperator = args[9].toString(exec).qstring().lower();
       QPixmap pixmap = i->image()->pixmap();
       QPainter p;
-      p.drawPixmap(dx, dy, dw, dh, pixmap, sx, sy, sw, sh, 1, drawingContext);
+
+      p.drawPixmap(dx, dy, dw, dh, pixmap, sx, sy, sw, sh,
+                   QPainter::compositeOperatorFromString(compositeOperator),
+                   drawingContext);
 
       if (contextObject->_needsFlushRasterCache)
         pixmap.flushRasterCache();
@@ -5003,6 +5008,16 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       }
       float a = (float)args[0].toNumber(exec);
       CGContextSetAlpha(drawingContext, a);
+      break;
+    }
+    case Context2D::SetCompositeOperation: {
+      if (args.size() != 1) {
+        Object err = Error::create(exec, SyntaxError);
+        exec->setException(err);
+        return err;
+      }
+      QString compositeOperator = args[0].toString(exec).qstring().lower();
+      QPainter::setCompositeOperation(drawingContext, compositeOperator);
       break;
     }
   }
@@ -5047,6 +5062,8 @@ DontDelete|Function 6
   setShadow                Context2D::SetShadow DontDelete|Function 3
   clearShadow              Context2D::ClearShadow DontDelete|Function 0
   setAlpha                 Context2D::SetAlpha DontDelete|Function 1
+  setCompositeOperation    Context2D::SetCompositeOperation
+DontDelete|Function 1
 @end
 */
 

@@ -616,7 +616,8 @@ class Context2D : public DOMObject {
     DrawImageFromRect,
     SetShadow,
     ClearShadow,
-    SetAlpha
+    SetAlpha,
+    SetCompositeOperation
   };
 
   DOM::HTMLElementImpl* _element;

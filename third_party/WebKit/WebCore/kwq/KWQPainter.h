@@ -179,6 +179,7 @@ class QPainter : public Qt {
 
   CGContextRef currentContext();
 
+  static int compositeOperatorFromString(QString aString);
   static int getCompositeOperation(CGContextRef context);
   static void setCompositeOperation(CGContextRef context, QString operation);
   static void setCompositeOperation(CGContextRef context, int operation);
