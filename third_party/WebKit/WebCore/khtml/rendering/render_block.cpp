@@ -74,7 +74,8 @@ void RenderBlock::setStyle(RenderStyle* _style) {
   // non inherited properties
   RenderObject* child = firstChild();
   while (child != 0) {
-    if (child->isAnonymous()) {
+    if (child->isAnonymous() &&
+        child->style()->styleType() == RenderStyle::NOPSEUDO) {
       RenderStyle* newStyle = new RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(BLOCK);
