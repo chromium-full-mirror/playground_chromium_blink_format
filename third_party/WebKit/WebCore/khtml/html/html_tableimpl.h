@@ -72,6 +72,8 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
+  virtual void attach();
+
   HTMLTableCaptionElementImpl* caption() const { return tCaption; }
   NodeImpl* setCaption(HTMLTableCaptionElementImpl*);
 

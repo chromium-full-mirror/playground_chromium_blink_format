@@ -194,9 +194,7 @@ class RenderObject : public CachedObjectClient {
         root = o;
         o = o->m_parent;
       }
-#ifndef APPLE_CHANGES
       root->scheduleRelayout();
-#endif
     }
   }
   // hack to block inline layouts during parsing
