@@ -609,6 +609,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
   void select();
 
+  virtual void childrenChanged();
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);

@@ -2774,6 +2774,10 @@ void HTMLTextAreaElementImpl::select() {
   onSelect();
 }
 
+void HTMLTextAreaElementImpl::childrenChanged() {
+  setValue(defaultValue());
+}
+
 void HTMLTextAreaElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWS:
