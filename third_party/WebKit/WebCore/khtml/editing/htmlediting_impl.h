@@ -202,8 +202,6 @@ class DeleteSelectionCommandImpl : public CompositeEditCommandImpl {
 
  private:
   void deleteDownstreamWS(const DOM::DOMPosition& start);
-  bool containsOnlyWhitespace(const DOM::DOMPosition& start,
-                              const DOM::DOMPosition& end);
   void joinTextNodesWithSameStyle();
 
   KHTMLSelection m_selectionToDelete;
