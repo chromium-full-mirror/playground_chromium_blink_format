@@ -86,7 +86,7 @@ class QWidget : public QObject, public QPaintDevice {
   void move(int, int);
   void move(const QPoint&);
 
-  virtual void paint(){};
+  virtual void paint();
 
   virtual QRect frameGeometry() const;
   virtual void setFrameGeometry(const QRect&);
@@ -148,7 +148,6 @@ class QWidget : public QObject, public QPaintDevice {
   void unlockDrawingFocus();
   void enableFlushDrawing();
   void disableFlushDrawing();
-  void flushDrawing();
   void setDrawingAlpha(float alpha);
 
  private:

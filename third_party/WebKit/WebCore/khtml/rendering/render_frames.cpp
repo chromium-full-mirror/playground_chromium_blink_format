@@ -501,7 +501,6 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
 #ifdef APPLE_CHANGES
     v->unlockDrawingFocus();
     v->enableFlushDrawing();
-    v->flushDrawing();
 #endif
   }
 
