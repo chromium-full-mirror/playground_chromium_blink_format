@@ -75,7 +75,8 @@ void RenderBlock::setStyle(RenderStyle* _style) {
   RenderObject* child = firstChild();
   while (child != 0) {
     if (child->isAnonymous() &&
-        child->style()->styleType() == RenderStyle::NOPSEUDO) {
+        child->style()->styleType() == RenderStyle::NOPSEUDO &&
+        !child->isListMarker()) {
       RenderStyle* newStyle = new RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(BLOCK);
