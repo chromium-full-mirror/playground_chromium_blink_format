@@ -268,8 +268,12 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled();
 #else
-// The java, javascript, and plugin settings will be set after the settings
-// have been initialized.
+  // The java, javascript, and plugin settings will be set after the settings
+  // have been initialized.
+  d->m_bJScriptEnabled = true;
+  d->m_bJScriptDebugEnabled = true;
+  d->m_bJavaEnabled = true;
+  d->m_bPluginsEnabled = true;
 #endif
 
 #if !APPLE_CHANGES
@@ -406,6 +410,13 @@ bool KHTMLPart::openURL(const KURL& url)
 #endif
 {
   kdDebug(6050) << "KHTMLPart(" << this << ")::openURL " << url.url() << endl;
+
+  if (d->m_scheduledRedirection == redirectionDuringLoad) {
+    // We're about to get a redirect that happened before the document was
+    // created.  This can happen when one frame may change the location of a
+    // sibling.
+    return false;
+  }
 
   cancelRedirection();
 
@@ -681,8 +692,9 @@ KJSProxy* kjs_html_init(KHTMLPart* khtmlpart);
 #endif
 
 KJSProxy* KHTMLPart::jScript() {
-  if (!jScriptEnabled())
+  if (!jScriptEnabled()) {
     return 0;
+  }
 
   if (!d->m_jscript) {
 #ifndef DIRECT_LINKAGE_TO_ECMA
@@ -1861,11 +1873,17 @@ void KHTMLPart::scheduleRedirection(double delay,
     return;
   if (d->m_scheduledRedirection == noRedirectionScheduled ||
       delay < d->m_delayRedirect) {
-    d->m_scheduledRedirection = redirectionScheduled;
+    if (d->m_doc == 0) {
+      // Handle a location change of a page with no document as a special case.
+      // This may happens when a frame changes the location of another frame.
+      d->m_scheduledRedirection = redirectionDuringLoad;
+    } else
+      d->m_scheduledRedirection = redirectionScheduled;
     d->m_delayRedirect = delay;
     d->m_redirectURL = url;
     d->m_redirectLockHistory = doLockHistory;
     d->m_redirectUserGesture = userGesture;
+
     if (d->m_bComplete) {
       d->m_redirectionTimer.stop();
       d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
@@ -3552,6 +3570,7 @@ KHTMLPart* KHTMLPart::findFrame(const QString& f) {
   for (; it2 != end; ++it2 )
       kdDebug() << "  - having frame '" << (*it2).m_name << "'" << endl;
 #endif
+
   // ### http://www.w3.org/TR/html4/appendix/notes.html#notes-frames
   ConstFrameIt it = d->m_frames.find(f);
   if (it == d->m_frames.end()) {
