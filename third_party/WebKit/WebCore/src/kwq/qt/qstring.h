@@ -32,9 +32,8 @@
 
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
 // These macros are TEMPORARY hacks to convert between NSString and QString.
-// They
-// should be replaced with correct implementations.  They should only be used
-// for immutable strings.
+// They should be replaced with correct implementations.  They should only be
+// used for immutable strings.
 #define QSTRING_TO_NSSTRING(aString) \
   [NSString stringWithCString:aString.latin1()]
 #define QSTRING_TO_NSSTRING_LENGTH(aString, l) \
@@ -48,7 +47,6 @@
 
 #else
 
-// FIXME: this clever hack may need to be moved into KWQDef.h or elsewhere
 #define Fixed MacFixed
 #define Rect MacRect
 #define Boolean MacBoolean
