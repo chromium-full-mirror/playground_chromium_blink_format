@@ -279,6 +279,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_styleSheets->ref();
   m_inDocument = true;
   m_styleSelectorDirty = false;
+  m_inStyleRecalc = false;
 
   m_styleSelector = new CSSStyleSelector(this, m_usersheet, m_styleSheets,
                                          m_url, pMode == Strict);
@@ -847,6 +848,11 @@ void DocumentImpl::recalcStyle(StyleChange change) {
   //     qDebug("recalcStyle(%p)", this);
   //     QTime qt;
   //     qt.start();
+  if (m_inStyleRecalc)
+    return;  // Guard against re-entrancy. -dwh
+
+  m_inStyleRecalc = true;
+
   if (!m_render)
     goto bail_out;
 
@@ -911,6 +917,8 @@ bail_out:
   setChanged(false);
   setHasChangedChild(false);
   setDocumentChanged(false);
+
+  m_inStyleRecalc = false;
 }
 
 void DocumentImpl::updateRendering() {
