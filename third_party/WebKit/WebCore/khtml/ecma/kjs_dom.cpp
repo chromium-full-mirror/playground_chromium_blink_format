@@ -998,6 +998,7 @@ Value DOMDocumentProtoFunc::tryCall(ExecState* exec,
         }
         return domValue;
       }
+      return getDOMNode(exec, node);
     }
 #else
       return getDOMNode(exec,
