@@ -27,15 +27,10 @@
 #ifndef __khtml_part_h__
 #define __khtml_part_h__
 
-#include "dom/html_document.h"
-#include "dom/dom2_range.h"
-#include "dom/dom_misc.h"
-#include "editing/htmlediting.h"
+#include "editing/selection.h"  // only for text granularity -- should fix this to reduce dependencies
 
 #include <kparts/part.h>
 #include <kparts/browserextension.h>
-
-#include <qregexp.h>
 
 class KHTMLPartPrivate;
 class KHTMLPartBrowserExtension;
@@ -47,6 +42,8 @@ class KJavaAppletContext;
 namespace DOM {
 class CSSComputedStyleDeclarationImpl;
 class CSSStyleDeclarationImpl;
+class DOMString;
+class Document;
 class DocumentImpl;
 class EventListener;
 class HTMLAnchorElementImpl;
@@ -84,16 +81,16 @@ class RenderPart;
 class RenderPartObject;
 class RenderWidget;
 class XMLTokenizer;
-};
+}
 
 namespace KJS {
+class DOMDocument;
+class JSEventListener;
 class Selection;
 class SelectionFunc;
 class Window;
 class WindowFunc;
-class JSEventListener;
-class DOMDocument;
-};
+}
 
 namespace KParts {
 class PartManager;
