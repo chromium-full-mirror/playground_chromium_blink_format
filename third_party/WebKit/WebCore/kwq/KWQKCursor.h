@@ -45,6 +45,4 @@ class KCursor {
   static QCursor whatsThisCursor();
 };
 
-extern const QCursor& waitCursor;
-
 #endif
