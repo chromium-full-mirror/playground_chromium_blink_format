@@ -76,7 +76,7 @@ bool FunctionImp::implementsCall() const {
 }
 
 Value FunctionImp::call(ExecState* exec, Object& thisObj, const List& args) {
-  Object globalObj = exec->interpreter()->globalObject();
+  Object& globalObj = exec->interpreter()->globalObject();
 
   Debugger* dbg = exec->interpreter()->imp()->debugger();
   int sid = -1;
@@ -359,10 +359,10 @@ Value GlobalFuncImp::call(ExecState* exec,
         progNode->ref();
 
         // enter a new execution context
-        Object glob(exec->interpreter()->globalObject());
         Object thisVal(Object::dynamicCast(exec->context().thisValue()));
-        ContextImp* ctx = new ContextImp(glob, exec, thisVal, EvalCode,
-                                         exec->context().imp());
+        ContextImp* ctx =
+            new ContextImp(exec->interpreter()->globalObject(), exec, thisVal,
+                           EvalCode, exec->context().imp());
 
         ExecState* newExec = new ExecState(exec->interpreter(), ctx);
         newExec->setException(exec->exception());  // could be null

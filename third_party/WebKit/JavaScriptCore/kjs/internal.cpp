@@ -167,7 +167,7 @@ UString BooleanImp::toString(ExecState* /*exec*/) const {
 
 Object BooleanImp::toObject(ExecState* exec) const {
   List args;
-  args.append(Boolean(const_cast<BooleanImp*>(this)));
+  args.append(const_cast<BooleanImp*>(this));
   return Object::dynamicCast(
       exec->interpreter()->builtinBoolean().construct(exec, args));
 }
@@ -192,7 +192,7 @@ UString StringImp::toString(ExecState* /*exec*/) const {
 
 Object StringImp::toObject(ExecState* exec) const {
   List args;
-  args.append(Value(const_cast<StringImp*>(this)));
+  args.append(const_cast<StringImp*>(this));
   return Object::dynamicCast(
       exec->interpreter()->builtinString().construct(exec, args));
 }
@@ -217,7 +217,7 @@ UString NumberImp::toString(ExecState*) const {
 
 Object NumberImp::toObject(ExecState* exec) const {
   List args;
-  args.append(Number(const_cast<NumberImp*>(this)));
+  args.append(const_cast<NumberImp*>(this));
   return Object::dynamicCast(
       exec->interpreter()->builtinNumber().construct(exec, args));
 }
@@ -743,7 +743,7 @@ Completion InterpreterImp::evaluate(const UString& code, const Value& thisV) {
   recursion++;
   progNode->ref();
 
-  Object globalObj = globalObject();
+  Object& globalObj = globalObject();
   Object thisObj = globalObject();
 
   if (!thisV.isNull()) {
