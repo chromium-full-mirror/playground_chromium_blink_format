@@ -22,6 +22,7 @@
 #include "property_map.h"
 
 #include "object.h"
+#include "protect.h"
 #include "reference_list.h"
 
 #define DEBUG_PROPERTIES 0
@@ -85,7 +86,7 @@ struct PropertyMapHashTable {
 class SavedProperty {
  public:
   Identifier key;
-  Value value;
+  ProtectedValue value;
   int attributes;
 };
 

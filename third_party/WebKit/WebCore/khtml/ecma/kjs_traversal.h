@@ -124,7 +124,7 @@ class JSNodeFilter : public DOM::CustomNodeFilter {
   virtual short acceptNode(const DOM::Node& n);
 
  protected:
-  Object filter;
+  ProtectedObject filter;
 };
 
 };  // namespace

@@ -40,9 +40,9 @@ class JSEventListener : public DOM::EventListener {
   ObjectImp* listenerObjImp() const { return listenerObj().imp(); }
 
  protected:
-  mutable Object listener;
+  mutable ProtectedObject listener;
   bool html;
-  Object win;
+  ProtectedObject win;
 };
 
 class JSLazyEventListener : public JSEventListener {
