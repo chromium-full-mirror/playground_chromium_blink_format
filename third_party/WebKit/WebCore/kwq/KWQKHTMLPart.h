@@ -161,9 +161,17 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void addMetaData(const QString& key, const QString& value);
 
-  bool keyEvent(NSEvent* event);
+  bool keyEvent(NSEvent*);
+
+  static void widgetWillReleaseView(NSView*);
 
  private:
+  virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
+  virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
+  virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent*);
+
+  bool handleMouseDownEventForWidget(khtml::MouseEvent*);
+
   void setPolicyBaseURL(const DOM::DOMString&);
 
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
@@ -182,6 +190,8 @@ class KWQKHTMLPart : public KHTMLPart {
   KWQSignal _completedWithBool;
 
   bool _ownsView;
+
+  NSView* _mouseDownView;
 
   static QPtrList<KWQKHTMLPart>& mutableInstances();
 
