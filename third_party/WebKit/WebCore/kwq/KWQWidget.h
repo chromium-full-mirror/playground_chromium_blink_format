@@ -157,7 +157,6 @@ class QWidget : public QObject, public QPaintDevice {
   void sendConsumedMouseUp();
 
   void setIsSelected(bool isSelected);
-  bool isSelected();
 
  private:
   KWQWidgetPrivate* data;
