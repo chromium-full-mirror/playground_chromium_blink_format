@@ -199,9 +199,17 @@ Value Navigator::getValueProperty(ExecState* exec, int token) const {
       // We assume the string is something like Mozilla/version (properties)
       return String(userAgent.mid(userAgent.find('/') + 1));
     case Product:
+#ifdef APPLE_CHANGES
+      return Undefined();
+#else
       return String("Konqueror/khtml");
+#endif
     case Vendor:
+#ifdef APPLE_CHANGES
+      return Undefined();
+#else
       return String("KDE");
+#endif
     case Language:
       return String(KGlobal::locale()->language() == "C"
                         ? QString::fromLatin1("en")
