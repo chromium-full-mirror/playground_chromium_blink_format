@@ -22,6 +22,7 @@
   NSEvent* firstMouseDownEvent;
 
   NSURL* draggingImageURL;
+  unsigned int dragSourceActionMask;
 
   NSSize lastLayoutSize;
   NSSize lastLayoutFrameSize;
@@ -46,4 +47,5 @@
 
 @interface WebHTMLView (WebInternal)
 - (void)_updateFontPanel;
+- (unsigned int)_delegateDragSourceActionMask;
 @end
