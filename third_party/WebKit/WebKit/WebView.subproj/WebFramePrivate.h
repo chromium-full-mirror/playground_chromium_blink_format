@@ -70,6 +70,7 @@ typedef enum {
   // state we'll need to continue after waiting for the policy delegate's
   // decision
   WebRequest* policyRequest;
+  NSString* policyFrameName;
   id policyTarget;
   SEL policySelector;
   WebFormState* policyFormState;
@@ -124,6 +125,13 @@ typedef enum {
 
 - (void)_addExtraFieldsToRequest:(WebRequest*)request alwaysFromRequest:(BOOL)f;
 
+- (void)_checkNewWindowPolicyForRequest:(WebRequest*)request
+                                 action:(NSDictionary*)action
+                              frameName:(NSString*)frameName
+                              formState:(WebFormState*)formState
+                                andCall:(id)target
+                           withSelector:(SEL)selector;
+
 - (void)_checkNavigationPolicyForRequest:(WebRequest*)request
                               dataSource:(WebDataSource*)dataSource
                                formState:(WebFormState*)formState
@@ -136,17 +144,21 @@ typedef enum {
 - (void)_loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
            loadType:(WebFrameLoadType)loadType
+             target:(NSString*)target
     triggeringEvent:(NSEvent*)event
                form:(id<WebDOMElement>)form
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
             referrer:(NSString*)referrer
+              target:(NSString*)target
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
                 form:(id<WebDOMElement>)form
           formValues:(NSDictionary*)values;
+
+- (void)_loadRequest:(WebRequest*)request inFrameNamed:(NSString*)frameName;
 
 - (void)_clientRedirectedTo:(NSURL*)URL
                       delay:(NSTimeInterval)seconds

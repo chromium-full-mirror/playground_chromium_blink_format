@@ -232,8 +232,7 @@ enum FrameBorderStyle {
 
 - (NSArray*)childFrames;  // WebCoreBridge objects
 - (WebCoreBridge*)mainFrame;
-- (WebCoreBridge*)findFramedNamed:(NSString*)name;
-- (WebCoreBridge*)findOrCreateFrameNamed:(NSString*)name;
+- (WebCoreBridge*)findFrameNamed:(NSString*)name;
 /* Creates a name for an frame unnamed in the HTML.  It should produce
  * repeatable results for loads of the same frameset. */
 - (NSString*)generateFrameName;
@@ -241,11 +240,13 @@ enum FrameBorderStyle {
 - (void)loadURL:(NSString*)URL
            referrer:(NSString*)referrer
              reload:(BOOL)reload
+             target:(NSString*)target
     triggeringEvent:(NSEvent*)event
                form:(id<WebDOMElement>)form
          formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSString*)URL
            referrer:(NSString*)referrer
+             target:(NSString*)target
                data:(NSData*)data
         contentType:(NSString*)contentType
     triggeringEvent:(NSEvent*)event
