@@ -109,12 +109,8 @@ void ArrayInstanceImp::put(ExecState* exec,
   bool ok;
   unsigned index = propertyName.toULong(&ok);
   if (ok) {
-    if (length <= index)
-      setLength(index + 1, exec);
-    if (index < storageLength) {
-      storage[index] = value.imp();
-      return;
-    }
+    put(exec, index, value, attr);
+    return;
   }
 
   ObjectImp::put(exec, propertyName, value, attr);
@@ -124,13 +120,20 @@ void ArrayInstanceImp::put(ExecState* exec,
                            unsigned index,
                            const Value& value,
                            int attr) {
-  if (length <= index)
-    setLength(index + 1, exec);
+  if (index < sparseArrayCutoff && index >= storageLength) {
+    resizeStorage(index + 1);
+  }
+
+  if (index >= length) {
+    length = index + 1;
+  }
+
   if (index < storageLength) {
     storage[index] = value.imp();
     return;
   }
 
+  assert(index >= sparseArrayCutoff);
   ObjectImp::put(exec, Identifier::from(index), value, attr);
 }
 
@@ -215,7 +218,15 @@ void ArrayInstanceImp::resizeStorage(unsigned newLength) {
            sizeof(ValueImp*) * (storageLength - newLength));
   }
   if (newLength > capacity) {
-    unsigned newCapacity = (newLength * 3 + 1) / 2;
+    unsigned newCapacity;
+    if (newLength > sparseArrayCutoff) {
+      newCapacity = newLength;
+    } else {
+      newCapacity = (newLength * 3 + 1) / 2;
+      if (newCapacity > sparseArrayCutoff) {
+        newCapacity = sparseArrayCutoff;
+      }
+    }
     storage = (ValueImp**)realloc(storage, newCapacity * sizeof(ValueImp*));
     memset(storage + capacity, 0, sizeof(ValueImp*) * (newCapacity - capacity));
     capacity = newCapacity;
@@ -224,8 +235,7 @@ void ArrayInstanceImp::resizeStorage(unsigned newLength) {
 }
 
 void ArrayInstanceImp::setLength(unsigned newLength, ExecState* exec) {
-  if (newLength <= MAX(sparseArrayCutoff, storageLength) ||
-      newLength == length + 1) {
+  if (newLength <= storageLength) {
     resizeStorage(newLength);
   }
 
