@@ -27,7 +27,12 @@
 #define QVALUELIST_H_
 
 template <class T>
-class QValueListIterator {};
+class QValueListIterator {
+ public:
+  QValueListIterator operator++();
+  bool operator!=(const QValueListIterator<T>& it);
+  T& operator*();
+};
 
 template <class T>
 class QValueList {
@@ -40,6 +45,7 @@ class QValueList {
   const T& first() const;
   const T& last() const;
   Iterator begin();
+  Iterator end();
   T& operator[](uint i);
 };
 
