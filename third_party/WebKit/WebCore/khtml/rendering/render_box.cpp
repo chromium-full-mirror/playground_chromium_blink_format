@@ -675,7 +675,8 @@ void RenderBox::calcWidth() {
         if (m_width > maxW) {
           m_width = maxW;
           widthType = maxWidthType;
-        } else if (m_width < minW) {
+        }
+        if (m_width < minW) {
           m_width = minW;
           widthType = minWidthType;
         }
