@@ -403,7 +403,11 @@ void RenderListMarker::paintObject(QPainter* p,
     if (_ty + m_height + paddingBottom() + borderBottom() >= _y + _h) {
       RenderRoot* rootObj = root();
       if (_ty < rootObj->truncatedAt())
+#if APPLE_CHANGES
+        rootObj->setBestTruncatedAt(_ty, this);
+#else
         rootObj->setTruncatedAt(_ty);
+#endif
       // Let's print this on the next page.
       return;
     }

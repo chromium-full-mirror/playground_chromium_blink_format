@@ -52,7 +52,7 @@ class QPixmap : public QPaintDevice, public Qt {
   QPixmap(const QByteArray&);
   QPixmap(int, int);
   QPixmap(const QPixmap&);
-  ~QPixmap();
+  virtual ~QPixmap();
 
   bool isNull() const;
 
