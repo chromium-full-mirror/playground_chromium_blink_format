@@ -245,12 +245,12 @@ typedef enum {
      a file URL. This allows clients to special-case WebKit's behavior for file
    URLs.
      @param type MIME type for the file.
+     @param request WebResourceRequest to be used to load the item
      @param frame The frame which will load the file.
-     @param isDirectory YES if the file is a directory.
 */
 - (WebFileURLPolicy*)fileURLPolicyForMIMEType:(NSString*)type
-                                      inFrame:(WebFrame*)frame
-                                  isDirectory:(BOOL)isDirectory;
+                                   andRequest:(WebResourceRequest*)request
+                                      inFrame:(WebFrame*)frame;
 
 /*!
     @method contentPolicyForResponse:andRequest:inFrame:withContentPolicy:
