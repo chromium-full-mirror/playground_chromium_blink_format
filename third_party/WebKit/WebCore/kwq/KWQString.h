@@ -244,10 +244,7 @@ class QString {
   bool isNull() const;
   bool isEmpty() const;
 
-  // NOTE: at is useful to keep as implementation of operator[]
-  //#ifdef USING_BORROWED_KURL
   QChar at(uint) const;
-  //#endif
 
   int compare(const QString&) const;
 

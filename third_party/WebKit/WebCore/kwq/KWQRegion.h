@@ -66,6 +66,9 @@ class QRegion {
 
   // enums -------------------------------------------------------------------
   // constants ---------------------------------------------------------------
+
+  static const QRegion null;
+
   // static member functions -------------------------------------------------
 
   // constructors, copy constructors, and destructors ------------------------

@@ -2087,8 +2087,9 @@ void khtml::applyRule(khtml::RenderStyle* style,
       float toPix = 1.;  // fallback
       if (!khtml::printpainter)
         toPix = paintDeviceMetrics->logicalDpiY() / 72.;
-      if (!khtml::printpainter && toPix < 96. / 72.)
-        toPix = 96. / 72.;
+      // FIXME: SCREEN_RESOLUTION hack good enough to keep?
+      if (!khtml::printpainter && toPix < SCREEN_RESOLUTION / 72)
+        toPix = SCREEN_RESOLUTION / 72;
 
       QValueList<int> standardSizes =
           e->ownerDocument()->view()->part()->fontSizes();
