@@ -407,12 +407,19 @@ class RenderObject : public CachedObjectClient {
     bool m_active;
   };
 
-  virtual FindSelectionResult checkSelectionPoint(int _x,
-                                                  int _y,
-                                                  int _tx,
-                                                  int _ty,
-                                                  DOM::NodeImpl*&,
-                                                  int& offset);
+  FindSelectionResult checkSelectionPoint(int x,
+                                          int y,
+                                          int tx,
+                                          int ty,
+                                          DOM::NodeImpl*&,
+                                          int& offset);
+  virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
+      int x,
+      int y,
+      int tx,
+      int ty,
+      DOM::NodeImpl*&,
+      int& offset);
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
                            int y,

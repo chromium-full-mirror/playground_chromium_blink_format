@@ -535,12 +535,13 @@ bool RenderText::nodeAtPoint(NodeInfo& info,
   return inside;
 }
 
-FindSelectionResult RenderText::checkSelectionPoint(int _x,
-                                                    int _y,
-                                                    int _tx,
-                                                    int _ty,
-                                                    DOM::NodeImpl*& node,
-                                                    int& offset) {
+FindSelectionResult RenderText::checkSelectionPointIgnoringContinuations(
+    int _x,
+    int _y,
+    int _tx,
+    int _ty,
+    DOM::NodeImpl*& node,
+    int& offset) {
   //     kdDebug(6040) << "RenderText::checkSelectionPoint " << this << " _x="
   //     << _x << " _y=" << _y
   //                   << " _tx=" << _tx << " _ty=" << _ty << endl;
