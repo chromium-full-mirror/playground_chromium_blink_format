@@ -89,6 +89,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
                            marginHeight:(int)mh;
 
 - (NSString*)selectedText;
+- (void)selectAll;
 
 @end
 
