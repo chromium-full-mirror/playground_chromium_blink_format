@@ -518,7 +518,9 @@ void RenderLayer::scrollToOffset(int x,
 
   // Update dashboard regions, scrolling may change the clip of a
   // particular region.
-  renderer()->canvas()->view()->updateDashboardRegions();
+  RenderCanvas* canvas = renderer()->canvas();
+  if (canvas)
+    canvas->view()->updateDashboardRegions();
 #endif
 
   // Fire the scroll DOM event.
