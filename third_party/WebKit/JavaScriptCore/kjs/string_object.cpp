@@ -324,7 +324,10 @@ Value StringProtoFuncImp::call(ExecState* exec,
           List list;
           int lastIndex = 0;
           while (pos >= 0) {
-            list.append(String(mstr));
+            if (mstr.isNull())
+              list.append(UndefinedImp::staticUndefined);
+            else
+              list.append(String(mstr));
             lastIndex = pos;
             pos += mstr.isEmpty() ? 1 : mstr.size();
             delete[] * ovector;
@@ -452,7 +455,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
       result = res;
       u = s;
       i = p0 = 0;
-      d = a1.toInteger(exec);
+      uint32_t limit =
+          a1.type() == UndefinedType ? 0xFFFFFFFFU : a1.toUInt32(exec);
       if (a0.type() == ObjectType &&
           Object::dynamicCast(a0).inherits(&RegExpImp::info)) {
         Object obj0 = Object::dynamicCast(a0);
@@ -463,7 +467,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
           break;
         }
         pos = 0;
-        while (pos < u.size()) {
+        while (static_cast<uint32_t>(i) != limit && pos < u.size()) {
           // TODO: back references
           int mpos;
           int* ovector = 0L;
@@ -479,7 +483,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
             i++;
           }
         }
-      } else if (a0.type() != UndefinedType) {
+      } else {
         u2 = a0.toString(exec);
         if (u2.isEmpty()) {
           if (u.isEmpty()) {
@@ -487,14 +491,12 @@ Value StringProtoFuncImp::call(ExecState* exec,
             put(exec, lengthPropertyName, Number(0));
             break;
           } else {
-            while (!(i == d) &&
-                   i < u.size() - 1)  // !(i == d) returns true for NaN
+            while (static_cast<uint32_t>(i) != limit && i < u.size() - 1)
               res.put(exec, i++, String(u.substr(p0++, 1)));
           }
         } else {
-          while (!(i == d) &&
-                 (pos = u.find(u2, p0)) >=
-                     0) {  // !(i == d) returns true for NaN
+          while (static_cast<uint32_t>(i) != limit &&
+                 (pos = u.find(u2, p0)) >= 0) {
             res.put(exec, i, String(u.substr(p0, pos - p0)));
             p0 = pos + u2.size();
             i++;
@@ -502,7 +504,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
         }
       }
       // add remaining string, if any
-      if (!(i == d))  // !(i == d) returns true for NaN
+      if (static_cast<uint32_t>(i) != limit)
         res.put(exec, i++, String(u.substr(p0)));
       res.put(exec, lengthPropertyName, Number(i));
     } break;
@@ -563,37 +565,37 @@ Value StringProtoFuncImp::call(ExecState* exec,
       break;
 #ifndef KJS_PURE_ECMA
     case Big:
-      result = String("<BIG>" + s + "</BIG>");
+      result = String("<big>" + s + "</big>");
       break;
     case Small:
-      result = String("<SMALL>" + s + "</SMALL>");
+      result = String("<small>" + s + "</small>");
       break;
     case Blink:
-      result = String("<BLINK>" + s + "</BLINK>");
+      result = String("<blink>" + s + "</blink>");
       break;
     case Bold:
-      result = String("<B>" + s + "</B>");
+      result = String("<b>" + s + "</b>");
       break;
     case Fixed:
-      result = String("<TT>" + s + "</TT>");
+      result = String("<tt>" + s + "</tt>");
       break;
     case Italics:
-      result = String("<I>" + s + "</I>");
+      result = String("<i>" + s + "</i>");
       break;
     case Strike:
-      result = String("<STRIKE>" + s + "</STRIKE>");
+      result = String("<strike>" + s + "</strike>");
       break;
     case Sub:
-      result = String("<SUB>" + s + "</SUB>");
+      result = String("<sub>" + s + "</sub>");
       break;
     case Sup:
-      result = String("<SUP>" + s + "</SUP>");
+      result = String("<sup>" + s + "</sup>");
       break;
     case Fontcolor:
-      result = String("<FONT COLOR=" + a0.toString(exec) + ">" + s + "</FONT>");
+      result = String("<font color=" + a0.toString(exec) + ">" + s + "</font>");
       break;
     case Fontsize:
-      result = String("<FONT SIZE=" + a0.toString(exec) + ">" + s + "</FONT>");
+      result = String("<font size=" + a0.toString(exec) + ">" + s + "</font>");
       break;
     case Anchor:
       result = String("<a name=" + a0.toString(exec) + ">" + s + "</a>");

@@ -112,7 +112,7 @@ Value RegExpProtoFuncImp::call(ExecState* exec,
         if (id == Test)
           return Boolean(false);
         else
-          Null();
+          return Null();
       }
       RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
           exec->lexicalInterpreter()->builtinRegExp().imp());
@@ -204,9 +204,14 @@ Object RegExpObjectImp::arrayOfMatches(ExecState* exec,
   list.append(String(result));
   if (lastOvector)
     for (uint i = 1; i < lastNrSubPatterns + 1; ++i) {
-      UString substring = lastString.substr(
-          lastOvector[2 * i], lastOvector[2 * i + 1] - lastOvector[2 * i]);
-      list.append(String(substring));
+      int start = lastOvector[2 * i];
+      if (start == -1)
+        list.append(UndefinedImp::staticUndefined);
+      else {
+        UString substring =
+            lastString.substr(start, lastOvector[2 * i + 1] - start);
+        list.append(String(substring));
+      }
     }
   Object arr = exec->lexicalInterpreter()->builtinArray().construct(exec, list);
   arr.put(exec, "index", Number(lastOvector[0]));
@@ -263,13 +268,16 @@ Object RegExpObjectImp::construct(ExecState* exec, const List& args) {
   // TODO: throw a syntax error on invalid flags
 
   dat->putDirect("global",
-                 global ? BooleanImp::staticTrue : BooleanImp::staticFalse);
+                 global ? BooleanImp::staticTrue : BooleanImp::staticFalse,
+                 DontDelete | ReadOnly | DontEnum);
   dat->putDirect("ignoreCase",
-                 ignoreCase ? BooleanImp::staticTrue : BooleanImp::staticFalse);
+                 ignoreCase ? BooleanImp::staticTrue : BooleanImp::staticFalse,
+                 DontDelete | ReadOnly | DontEnum);
   dat->putDirect("multiline",
-                 multiline ? BooleanImp::staticTrue : BooleanImp::staticFalse);
+                 multiline ? BooleanImp::staticTrue : BooleanImp::staticFalse,
+                 DontDelete | ReadOnly | DontEnum);
 
-  dat->putDirect("source", new StringImp(p));
+  dat->putDirect("source", new StringImp(p), DontDelete | ReadOnly | DontEnum);
   dat->putDirect("lastIndex", NumberImp::zero(), DontDelete | DontEnum);
 
   int reflags = RegExp::None;
