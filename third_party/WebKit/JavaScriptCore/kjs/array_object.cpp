@@ -273,8 +273,15 @@ static ExecState* execForCompareByStringForQSort;
 
 static int compareByStringForQSort(const void* a, const void* b) {
   ExecState* exec = execForCompareByStringForQSort;
-  return compare(Value(*(ValueImp**)a).toString(exec),
-                 Value(*(ValueImp**)b).toString(exec));
+  ValueImp* va = *(ValueImp**)a;
+  ValueImp* vb = *(ValueImp**)b;
+  if (va->dispatchType() == UndefinedType) {
+    return vb->dispatchType() == UndefinedType ? 0 : 1;
+  }
+  if (vb->dispatchType() == UndefinedType) {
+    return -1;
+  }
+  return compare(va->dispatchToString(exec), vb->dispatchToString(exec));
 }
 
 void ArrayInstanceImp::sort(ExecState* exec) {
@@ -307,12 +314,23 @@ static int compareWithCompareFunctionForQSort(const void* a, const void* b) {
   CompareWithCompareFunctionArguments* args =
       compareWithCompareFunctionArguments;
 
+  ValueImp* va = *(ValueImp**)a;
+  ValueImp* vb = *(ValueImp**)b;
+  if (va->dispatchType() == UndefinedType) {
+    return vb->dispatchType() == UndefinedType ? 0 : 1;
+  }
+  if (vb->dispatchType() == UndefinedType) {
+    return -1;
+  }
+
   args->arguments.clear();
-  args->arguments.append(*(ValueImp**)a);
-  args->arguments.append(*(ValueImp**)b);
-  return args->compareFunction
-      ->call(args->exec, args->globalObject, args->arguments)
-      .toInt32(args->exec);
+  args->arguments.append(va);
+  args->arguments.append(vb);
+  double compareResult =
+      args->compareFunction
+          ->call(args->exec, args->globalObject, args->arguments)
+          .toNumber(args->exec);
+  return compareResult < 0 ? -1 : compareResult > 0 ? 1 : 0;
 }
 
 void ArrayInstanceImp::sort(ExecState* exec, Object& compareFunction) {
@@ -624,9 +642,10 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
         Value minObj = iObj;
         for (unsigned int j = i + 1; j < length; ++j) {
           Value jObj = thisObj.get(exec, j);
-          int cmp;
+          double cmp;
           if (jObj.type() == UndefinedType) {
-            cmp = 1;
+            cmp = 1;  // don't check minObj because there's no need to
+                      // differentiate == (0) from > (1)
           } else if (minObj.type() == UndefinedType) {
             cmp = -1;
           } else if (useSortFunction) {
@@ -635,7 +654,7 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
             l.append(minObj);
             cmp =
                 sortFunction.call(exec, exec->interpreter()->globalObject(), l)
-                    .toInt32(exec);
+                    .toNumber(exec);
           } else {
             cmp = (jObj.toString(exec) < minObj.toString(exec)) ? -1 : 1;
           }
