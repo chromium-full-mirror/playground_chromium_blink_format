@@ -9,6 +9,8 @@
 #import <WebKit/WKWebController.h>
 
 /*
+   =============================================================================
+
     A WKWebDataSource represents all the state associated
     with a web page.  It is typicallly initialized with a URL, but
     may also be initialized with an NSString or NSData that hold
@@ -20,6 +22,19 @@
     id <WKWebController>myController = [[MyControllerClass alloc] init];
     [myController setDataSource: dataSource];
 
+   Changes:
+
+   2001-12-12
+
+    After group discussion we decided to classify API as :
+        Tier 1:  Needed by our browser (or Sherlock).
+        Tier 2:  Nedded by Apple internal clients (Mail, Help, PB, other TBD).
+        Tier 3:  Third party software vendors.
+
+    Added finalURL and isRedirected.
+
+
+   =============================================================================
 */
 
 #ifdef READY_FOR_PRIMETIME
@@ -41,8 +56,7 @@
 
 // Set the controller for this data source.  NOTE:  The controller is not
 // retained by the
-// data source.
-// Perhaps setController: should be private?
+// data source.  Perhaps setController: should be private?
 - (void)setController:(id<WKWebController>)controller;
 - (id<WKWebController>)controller;
 
@@ -50,12 +64,20 @@
 - (NSURL*)inputURL;
 
 // The inputURL may resolve to a different URL as a result of
-// either a client side refresh <META HTTP-EQUIV="refresh" ...> or
-// a DNS redirect.  Both of these implicit actions should not
-// require a new data source.  The resolvedURL is the URL that is
-// ultimately used to fetch page data.
-// [We need more brain cells applied to this issue.]
+// a DNS redirect.  May return nil if the URL has not yet been
+// resolved.  <WKLocationChangedHandler> includes a message
+// that is sent after the URL has been resolved.
 - (NSURL*)resolvedURL;
+
+// finalURL returns the URL that was actually used.  The final URL
+// may be different than the resolvedURL if the server redirects.
+// <WKLocationChangedHandler> includes a message that is sent after
+// the URL has been resolved.
+- (NSURL*)finalURL;
+
+// Returns true if the resolvedURL has been redirected by the server,
+// i.e. resolvedURL != finalURL.
+- (BOOL)isRedirected;
 
 // Start actually getting (if initialized with a URL) and parsing data. If the
 // data source
@@ -113,6 +135,8 @@
 @end
 
 /*
+   =============================================================================
+
     This class provides a cover for URL-based preference items.
 */
 @interface WKPreferences

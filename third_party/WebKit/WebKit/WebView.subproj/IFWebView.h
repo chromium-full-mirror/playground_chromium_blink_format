@@ -11,6 +11,8 @@
 
 #ifdef READY_FOR_PRIMETIME
 /*
+   =============================================================================
+
     Typical usage of a WKWebView.
 
     NSURL *url = [NSURL URLWithString: @"http://www.apple.com"];
@@ -77,6 +79,7 @@
    indicators at
             this point.
 
+    =============================================================================
 */
 @interface WKWebView : NSView {
  @private
@@ -136,7 +139,7 @@
 - (void)setSelectedRange:(NSRange)aRange;
 - (NSRange)selectedRange;
 
-// MCJ thinks we need high level find API on view.
+// Maciej thinks we need high level find API on view.
 
 @end
 
