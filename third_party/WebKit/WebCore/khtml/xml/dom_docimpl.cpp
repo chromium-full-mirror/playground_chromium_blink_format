@@ -998,6 +998,10 @@ void DocumentImpl::setVisuallyOrdered() {
 }
 
 void DocumentImpl::setSelection(NodeImpl* s, int sp, NodeImpl* e, int ep) {
+#if APPLE_CHANGES
+  // With Macintosh UI, you can't have both a selection and a focused node.
+  setFocusNode(0);
+#endif
   if (m_render)
     static_cast<RenderRoot*>(m_render)->setSelection(s->renderer(), sp,
                                                      e->renderer(), ep);
@@ -1045,10 +1049,8 @@ void DocumentImpl::close() {
   delete m_tokenizer;
   m_tokenizer = 0;
 
-#ifndef APPLE_CHANGES
   if (m_view)
     m_view->part()->checkEmitLoadEvent();
-#endif
 }
 
 void DocumentImpl::write(const DOMString& text) {
@@ -1907,6 +1909,11 @@ void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
     m_focusNode = newFocusNode;
     // Remove focus from the existing focus node (if any)
     if (oldFocusNode) {
+      // This goes hand in hand with the Qt focus setting below.
+      if (!m_focusNode && getDocument()->view()) {
+        getDocument()->view()->setFocus();
+      }
+
       if (oldFocusNode->active())
         oldFocusNode->setActive(false);
 
@@ -1940,6 +1947,10 @@ void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
               ->widget()
               ->setFocus();
       }
+#if APPLE_CHANGES
+      // With Macintosh UI, you can't have both a selection and a focused node.
+      clearSelection();
+#endif
     }
 
     updateRendering();

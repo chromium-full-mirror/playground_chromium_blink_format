@@ -151,8 +151,6 @@ class QWidget : public QObject, public QPaintDevice {
   void flushDrawing();
   void setDrawingAlpha(float alpha);
 
-  virtual void endEditing();
-
  private:
   QWidgetPrivate* data;
 };
