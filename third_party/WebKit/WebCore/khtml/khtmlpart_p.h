@@ -96,6 +96,12 @@ typedef FrameList::Iterator FrameIt;
 
 static int khtml_part_dcop_counter = 0;
 
+enum RedirectionScheduled {
+  noRedirectionScheduled,
+  redirectionScheduled,
+  historyNavigationScheduled
+};
+
 class KHTMLPartPrivate {
  public:
   KHTMLPartPrivate(QObject* parent) {
@@ -109,8 +115,8 @@ class KHTMLPartPrivate {
     m_bLoadEventEmitted = true;
     m_bUnloadEventEmitted = true;
     m_cachePolicy = KIO::CC_Verify;
-    m_manager = 0L;
 #if !APPLE_CHANGES
+    m_manager = 0L;
     m_settings = new KHTMLSettings(*KHTMLFactory::defaultHTMLSettings());
 #endif
     m_bClearing = false;
@@ -125,8 +131,10 @@ class KHTMLPartPrivate {
     m_jobPercent = 0;
     m_haveEncoding = false;
     m_activeFrame = 0L;
+#if !APPLE_CHANGES
     m_findDialog = 0;
     m_ssl_in_use = false;
+#endif
 #ifndef Q_WS_QWS
     m_javaContext = 0;
 #endif
@@ -151,6 +159,7 @@ class KHTMLPartPrivate {
 
     m_bFirstData = true;
     m_submitForm = 0;
+    m_scheduledRedirection = noRedirectionScheduled;
     m_delayRedirect = 0;
 
     m_bPendingChildRedirection = false;
@@ -165,8 +174,10 @@ class KHTMLPartPrivate {
         m_bJavaOverride = part->d->m_bJavaOverride;
         m_bPluginsForce = part->d->m_bPluginsForce;
         m_bPluginsOverride = part->d->m_bPluginsOverride;
-        // Same for SSL settings
+// Same for SSL settings
+#if !APPLE_CHANGES
         m_ssl_in_use = part->d->m_ssl_in_use;
+#endif
         m_onlyLocalReferences = part->d->m_onlyLocalReferences;
         m_zoomFactor = part->d->m_zoomFactor;
       }
@@ -239,6 +250,7 @@ class KHTMLPartPrivate {
   QString m_kjsDefaultStatusBarText;
   QString m_lastModified;
 
+#if !APPLE_CHANGES
   // QStrings for SSL metadata
   // Note: When adding new variables don't forget to update
   // ::saveState()/::restoreState()!
@@ -246,6 +258,7 @@ class KHTMLPartPrivate {
   QString m_ssl_peer_certificate, m_ssl_peer_chain, m_ssl_peer_ip, m_ssl_cipher,
       m_ssl_cipher_desc, m_ssl_cipher_version, m_ssl_cipher_used_bits,
       m_ssl_cipher_bits, m_ssl_cert_state;
+#endif
 
   bool m_bComplete : 1;
   bool m_bLoadEventEmitted : 1;
@@ -260,9 +273,13 @@ class KHTMLPartPrivate {
   KIO::CacheControl m_cachePolicy;
   QTimer m_redirectionTimer;
   QTime m_parsetime;
+
+  RedirectionScheduled m_scheduledRedirection;
   double m_delayRedirect;
   QString m_redirectURL;
+  int m_scheduledHistoryNavigationSteps;
 
+#if !APPLE_CHANGES
   KAction* m_paViewDocument;
   KAction* m_paViewFrame;
   KAction* m_paSaveBackground;
@@ -284,6 +301,7 @@ class KHTMLPartPrivate {
 
   QString m_popupMenuXML;
   KHTMLPart::GUIProfile m_guiProfile;
+#endif
 
   int m_zoomFactor;
 
@@ -316,7 +334,7 @@ class KHTMLPartPrivate {
   long m_initialSelectionEndOffset;
   bool m_selectionInitiatedWithDoubleClick : 1;
   bool m_selectionInitiatedWithTripleClick : 1;
-  bool m_mouseMovedSinceLastMousePress;
+  bool m_mouseMovedSinceLastMousePress : 1;
 #endif
   DOM::Node m_selectionStart;
   long m_startOffset;
@@ -347,6 +365,7 @@ class KHTMLPartPrivate {
   unsigned long m_totalObjectCount;
   unsigned int m_jobPercent;
 
+#if !APPLE_CHANGES
   KHTMLFind* m_findDialog;
 
   struct findState {
@@ -360,6 +379,7 @@ class KHTMLPartPrivate {
   };
 
   findState m_lastFindState;
+#endif
 
   // QGuardedPtr<KParts::Part> m_activeFrame;
   KParts::Part* m_activeFrame;

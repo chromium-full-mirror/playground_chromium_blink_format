@@ -98,6 +98,8 @@ using namespace DOM;
 using khtml::RenderText;
 using khtml::TextRunArray;
 
+using KParts::BrowserInterface;
+
 namespace khtml {
 class PartStyleSheetLoader : public CachedObjectClient {
  public:
@@ -177,14 +179,16 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_view = view;
   setWidget(d->m_view);
 
+#if !APPLE_CHANGES
   d->m_guiProfile = prof;
+#endif
   d->m_extension = new KHTMLPartBrowserExtension(this);
   d->m_hostExtension = new KHTMLPartBrowserHostExtension(this);
 
   d->m_bSecurityInQuestion = false;
-  d->m_paLoadImages = 0;
   d->m_bMousePressed = false;
 #if !APPLE_CHANGES
+  d->m_paLoadImages = 0;
   d->m_paViewDocument = new KAction(i18n("View Document Source"), 0, this,
                                     SLOT(slotViewDocumentSource()),
                                     actionCollection(), "viewDocumentSource");
@@ -475,10 +479,13 @@ bool KHTMLPart::openURL(const KURL& url)
     closeURL();
   }
 
+#if !APPLE_CHANGES
   args.metaData().insert("main_frame_request",
                          parentPart() == 0 ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_was_in_use", d->m_ssl_in_use ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_activate_warnings", "TRUE");
+#endif
+
   if (d->m_restored)
     d->m_cachePolicy = KIO::CC_Cache;
   else if (args.reload)
@@ -782,16 +789,16 @@ KJavaAppletContext* KHTMLPart::javaContext() {
 KJavaAppletContext* KHTMLPart::createJavaContext() {
 #ifndef Q_WS_QWS
   if (!d->m_javaContext) {
-#if !APPLE_CHANGES
-    d->m_javaContext = new KJavaAppletContext(d->m_dcopobject);
-#else
+#if APPLE_CHANGES
     d->m_javaContext = new KJavaAppletContext(d->m_dcopobject, this);
-#endif
+#else
+    d->m_javaContext = new KJavaAppletContext(d->m_dcopobject);
     connect(d->m_javaContext, SIGNAL(showStatus(const QString&)), this,
             SIGNAL(setStatusBarText(const QString&)));
     connect(d->m_javaContext,
             SIGNAL(showDocument(const QString&, const QString&)), this,
             SLOT(slotShowDocument(const QString&, const QString&)));
+#endif
   }
 
   return d->m_javaContext;
@@ -989,6 +996,7 @@ void KHTMLPart::clear() {
   d->m_javaContext = 0;
 #endif
 
+  d->m_scheduledRedirection = noRedirectionScheduled;
   d->m_delayRedirect = 0;
   d->m_redirectURL = QString::null;
   d->m_redirectLockHistory = true;
@@ -1723,7 +1731,7 @@ void KHTMLPart::checkCompleted() {
   }  // if (d->m_view)
 #endif
 
-  if (!d->m_redirectURL.isEmpty()) {
+  if (d->m_scheduledRedirection != noRedirectionScheduled) {
     // Do not start redirection for frames here! That action is
     // deferred until the parent emits a completed signal.
     if (parentPart() == 0)
@@ -1835,7 +1843,9 @@ void KHTMLPart::scheduleRedirection(double delay,
                 << " url=" << url << endl;
   if (delay < 0 || delay > INT_MAX / 1000)
     return;
-  if (d->m_redirectURL.isEmpty() || delay < d->m_delayRedirect) {
+  if (d->m_scheduledRedirection == noRedirectionScheduled ||
+      delay < d->m_delayRedirect) {
+    d->m_scheduledRedirection = redirectionScheduled;
     d->m_delayRedirect = delay;
     d->m_redirectURL = url;
     d->m_redirectLockHistory = doLockHistory;
@@ -1846,8 +1856,41 @@ void KHTMLPart::scheduleRedirection(double delay,
   }
 }
 
+void KHTMLPart::scheduleHistoryNavigation(int steps) {
+  d->m_scheduledRedirection = historyNavigationScheduled;
+  d->m_delayRedirect = 0;
+  d->m_redirectURL = QString::null;
+  d->m_scheduledHistoryNavigationSteps = steps;
+  if (d->m_bComplete) {
+    d->m_redirectionTimer.stop();
+    d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
+  }
+}
+
 void KHTMLPart::slotRedirect() {
+  if (d->m_scheduledRedirection == historyNavigationScheduled) {
+    d->m_scheduledRedirection = noRedirectionScheduled;
+
+    // Special case for go(0) from a frame -> reload only the frame
+    // go(i!=0) from a frame navigates into the history of the frame only,
+    // in both IE and NS (but not in Mozilla).... we can't easily do that
+    // in Konqueror...
+    if (d->m_scheduledHistoryNavigationSteps ==
+        0)  // add && parentPart() to get only frames, but doesn't matter
+      openURL(url());  /// ## need args.reload=true?
+    else {
+      if (d->m_extension) {
+        BrowserInterface* interface = d->m_extension->browserInterface();
+        if (interface)
+          interface->callMethod("goHistory(int)",
+                                d->m_scheduledHistoryNavigationSteps);
+      }
+    }
+    return;
+  }
+
   QString u = d->m_redirectURL;
+  d->m_scheduledRedirection = noRedirectionScheduled;
   d->m_delayRedirect = 0;
   d->m_redirectURL = QString::null;
   if (u.find(QString::fromLatin1("javascript:"), 0, false) == 0) {
@@ -2432,10 +2475,12 @@ void KHTMLPart::urlSelected(const QString& url,
     args.metaData()["cache"] = "refresh";
   }
 
+#if !APPLE_CHANGES
   args.metaData().insert("main_frame_request",
                          parentPart() == 0 ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_was_in_use", d->m_ssl_in_use ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_activate_warnings", "TRUE");
+#endif
 
 #if APPLE_CHANGES
   args.metaData()["referrer"] = d->m_referrer;
@@ -2784,11 +2829,13 @@ bool KHTMLPart::requestObject(khtml::ChildFrame* child,
       !child->m_args.metaData().contains("referrer"))
     child->m_args.metaData()["referrer"] = d->m_referrer;
 
+#if !APPLE_CHANGES
   child->m_args.metaData().insert("main_frame_request",
                                   parentPart() == 0 ? "TRUE" : "FALSE");
   child->m_args.metaData().insert("ssl_was_in_use",
                                   d->m_ssl_in_use ? "TRUE" : "FALSE");
   child->m_args.metaData().insert("ssl_activate_warnings", "TRUE");
+#endif
 
   // We want a KHTMLPart if the HTML says <frame src=""> or <frame
   // src="about:blank">
@@ -3178,10 +3225,12 @@ void KHTMLPart::submitForm(const char* action,
   if (!d->m_referrer.isEmpty())
     args.metaData()["referrer"] = d->m_referrer;
 
+#if !APPLE_CHANGES
   args.metaData().insert("main_frame_request",
                          parentPart() == 0 ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_was_in_use", d->m_ssl_in_use ? "TRUE" : "FALSE");
   args.metaData().insert("ssl_activate_warnings", "TRUE");
+#endif
   args.frameName = _target.isEmpty() ? d->m_doc->baseTarget() : _target;
 
   // Handle mailto: forms
@@ -3299,7 +3348,8 @@ void KHTMLPart::popupMenu(const QString& linkUrl) {
 #endif
 
 void KHTMLPart::slotParentCompleted() {
-  if (!d->m_redirectURL.isEmpty() && !d->m_redirectionTimer.isActive()) {
+  if (d->m_scheduledRedirection != noRedirectionScheduled &&
+      !d->m_redirectionTimer.isActive()) {
     // kdDebug(6050) << this << ": Child redirection -> " << d->m_redirectURL <<
     // endl;
     d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
@@ -3845,8 +3895,10 @@ void KHTMLPart::setZoomFactor(int percent) {
       static_cast<KHTMLPart*>(p)->setZoomFactor(d->m_zoomFactor);
     }
 
+#if !APPLE_CHANGES
   d->m_paDecZoomFactor->setEnabled(d->m_zoomFactor > minZoom);
   d->m_paIncZoomFactor->setEnabled(d->m_zoomFactor < maxZoom);
+#endif
 }
 
 void KHTMLPart::setJSStatusBarText(const QString& text) {
