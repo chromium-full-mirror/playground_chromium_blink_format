@@ -332,6 +332,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
+  DOM::DocumentFragmentImpl* documentFragmentWithText(NSString* text);
+
   void registerCommandForUndo(const khtml::EditCommand&);
   void registerCommandForRedo(const khtml::EditCommand&);
   void clearUndoRedoOperations();
