@@ -113,7 +113,7 @@ void Lexer::setCode(const UString& sourceURL,
                     int startingLineNumber,
                     const UChar* c,
                     unsigned int len) {
-  yylineno = 1;
+  yylineno = 1 + startingLineNumber;
   m_sourceURL = sourceURL;
   restrKeyword = false;
   delimited = false;

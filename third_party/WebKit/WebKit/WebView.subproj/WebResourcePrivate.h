@@ -19,5 +19,6 @@
 - (NSFileWrapper*)_fileWrapperRepresentation;
 - (id)_propertyListRepresentation;
 - (NSURLResponse*)_response;
+- (NSString*)_stringValue;
 
 @end
