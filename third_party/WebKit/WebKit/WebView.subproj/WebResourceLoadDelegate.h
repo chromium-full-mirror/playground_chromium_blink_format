@@ -8,7 +8,7 @@
 @class WebDataSource;
 @class NSURLResponse;
 @class NSURLRequest;
-@class NSURLConnectionAuthenticationChallenge;
+@class WebAuthenticationChallenge;
 
 /*!
     @category  WebResourceLoadDelegate
@@ -89,8 +89,7 @@
 */
 - (void)webView:(WebView*)sender
                              resource:(id)identifier
-    didReceiveAuthenticationChallenge:
-        (NSURLConnectionAuthenticationChallenge*)challenge
+    didReceiveAuthenticationChallenge:(WebAuthenticationChallenge*)challenge
                        fromDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -100,8 +99,7 @@
 */
 - (void)webView:(WebView*)sender
                             resource:(id)identifier
-    didCancelAuthenticationChallenge:
-        (NSURLConnectionAuthenticationChallenge*)challenge
+    didCancelAuthenticationChallenge:(WebAuthenticationChallenge*)challenge
                       fromDataSource:(WebDataSource*)dataSource;
 
 /*!
