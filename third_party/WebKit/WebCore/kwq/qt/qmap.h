@@ -57,8 +57,8 @@ class QMapNode : private KWQMapNodeImpl {
   QMapNode(const QMapNode<K, V>& node);
 
   ~QMapNode() {
-    delete left();
-    delete right();
+    delete (QMapNode<K, V>*)left();
+    delete (QMapNode<K, V>*)right();
   }
 
   K key;
