@@ -45,6 +45,7 @@ class KProtocolManager {
 
   static bool useProxy();
   static QString httpProxy();
+  static QString userAgentForHost(const QString&);
 
 // constructors, copy constructors, and destructors ------------------------
 
