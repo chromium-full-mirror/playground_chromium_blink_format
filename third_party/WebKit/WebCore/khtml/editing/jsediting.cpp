@@ -42,36 +42,21 @@
 #define ERROR(formatAndArgs...) ((void)0)
 #endif
 
-#define NoExec (0)
-#define NoEnabled (0)
-#define NoIndeterm (0)
-#define NoState (0)
-#define NoSupported (0)
-#define NoValue (0)
-
 using khtml::TypingCommand;
 
 namespace DOM {
 
 class DocumentImpl;
 
-static bool execCommandNotImplemented() {
-  ERROR("unimplemented");
-  return false;
-}
-
-static bool queryBoolNotImplemented() {
-  ERROR("unimplemented");
-  return false;
-}
-
-static DOMString queryValueNotImplemented() {
-  ERROR("unimplemented");
-  return DOMString();
-}
+const JSEditor::execCommandFn NoExec = 0;
+const JSEditor::queryBoolFn NoEnabled = 0;
+const JSEditor::queryBoolFn NoIndeterm = 0;
+const JSEditor::queryBoolFn NoState = 0;
+const JSEditor::queryBoolFn NoSupported = 0;
+const JSEditor::queryValueFn NoValue = 0;
 
 QDict<JSEditor::CommandIdentifier>& JSEditor::commandDict() {
-  static QDict<JSEditor::CommandIdentifier> dict;
+  static QDict<CommandIdentifier> dict;
   return dict;
 }
 
@@ -465,7 +450,7 @@ bool JSEditor::execCommand(const DOMString& command,
                            const DOMString& value) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->execFn)
-    return execCommandNotImplemented();
+    return false;
 
   ASSERT(document());
   document()->updateLayout();
@@ -475,7 +460,7 @@ bool JSEditor::execCommand(const DOMString& command,
 bool JSEditor::queryCommandEnabled(const DOMString& command) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->enabledFn)
-    return queryBoolNotImplemented();
+    return false;
 
   ASSERT(document());
   document()->updateLayout();
@@ -485,7 +470,7 @@ bool JSEditor::queryCommandEnabled(const DOMString& command) {
 bool JSEditor::queryCommandIndeterm(const DOMString& command) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->indetermFn)
-    return queryBoolNotImplemented();
+    return false;
 
   ASSERT(document());
   document()->updateLayout();
@@ -495,7 +480,7 @@ bool JSEditor::queryCommandIndeterm(const DOMString& command) {
 bool JSEditor::queryCommandState(const DOMString& command) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->stateFn)
-    return queryBoolNotImplemented();
+    return false;
 
   ASSERT(document());
   document()->updateLayout();
@@ -505,7 +490,7 @@ bool JSEditor::queryCommandState(const DOMString& command) {
 bool JSEditor::queryCommandSupported(const DOMString& command) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->supportedFn)
-    return queryBoolNotImplemented();
+    return false;
 
   ASSERT(document());
   document()->updateLayout();
@@ -515,7 +500,7 @@ bool JSEditor::queryCommandSupported(const DOMString& command) {
 DOMString JSEditor::queryCommandValue(const DOMString& command) {
   CommandIdentifier* cmd = commandIdentifier(command);
   if (!cmd || !cmd->valueFn)
-    return queryValueNotImplemented();
+    return DOMString();
 
   ASSERT(document());
   document()->updateLayout();

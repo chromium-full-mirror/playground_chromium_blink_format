@@ -44,7 +44,7 @@ class JSEditor {
   typedef bool (JSEditor::*execCommandFn)(bool userInterface,
                                           const DOMString& value);
   typedef bool (JSEditor::*queryBoolFn)();
-  typedef DOM::DOMString (JSEditor::*queryValueFn)();
+  typedef DOMString (JSEditor::*queryValueFn)();
 
   struct CommandIdentifier {
     CommandIdentifier() {}
@@ -61,7 +61,7 @@ class JSEditor {
           supportedFn(supported),
           valueFn(value) {}
 
-    JSEditor::execCommandFn execFn;
+    execCommandFn execFn;
     queryBoolFn enabledFn;
     queryBoolFn indetermFn;
     queryBoolFn stateFn;
@@ -76,7 +76,7 @@ class JSEditor {
   bool queryCommandIndeterm(const DOMString& command);
   bool queryCommandState(const DOMString& command);
   bool queryCommandSupported(const DOMString& command);
-  DOM::DOMString queryCommandValue(const DOMString& command);
+  DOMString queryCommandValue(const DOMString& command);
 
  private:
   JSEditor(const JSEditor&);
@@ -100,7 +100,7 @@ class JSEditor {
   // queryCommandSupported implementations
   bool commandSupported();
 
-  QDict<JSEditor::CommandIdentifier>& commandDict();
+  QDict<CommandIdentifier>& commandDict();
   DocumentImpl* document() { return m_doc; }
   KHTMLPart* part() { return document()->part(); }
   CommandIdentifier* commandIdentifier(const DOMString& command);
