@@ -12,7 +12,7 @@
 @class WebFrame;
 @class WebPolicyPrivate;
 @class WebResponse;
-@class WebRequest;
+@class NSURLRequest;
 
 /*!
   @enum WebNavigationType
@@ -124,7 +124,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 */
 - (void)webView:(WebView*)webView
     decideNavigationPolicyForAction:(NSDictionary*)actionInformation
-                         andRequest:(WebRequest*)request
+                         andRequest:(NSURLRequest*)request
                             inFrame:(WebFrame*)frame
                    decisionListener:(id<WebPolicyDecisionListener>)listener;
 
@@ -153,7 +153,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 */
 - (void)webView:(WebView*)webView
     decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
-                        andRequest:(WebRequest*)request
+                        andRequest:(NSURLRequest*)request
                       newFrameName:(NSString*)frameName
                   decisionListener:(id<WebPolicyDecisionListener>)listener;
 
@@ -168,7 +168,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
 */
 - (void)webView:(WebView*)webView
     decideContentPolicyForMIMEType:(NSString*)type
-                        andRequest:(WebRequest*)request
+                        andRequest:(NSURLRequest*)request
                            inFrame:(WebFrame*)frame
                   decisionListener:(id<WebPolicyDecisionListener>)listener;
 

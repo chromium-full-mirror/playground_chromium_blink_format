@@ -8,7 +8,7 @@
 @class WebDataSource;
 @class WebPluginError;
 @class WebResponse;
-@class WebRequest;
+@class NSURLRequest;
 
 /*!
     @category  WebResourceLoadDelegate
@@ -46,7 +46,7 @@
     The identifier will be retained.
 */
 - webView:(WebView*)sender
-    identifierForInitialRequest:(WebRequest*)request
+    identifierForInitialRequest:(NSURLRequest*)request
                  fromDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -64,10 +64,10 @@
    although typically
     will be request.
 */
-- (WebRequest*)webView:(WebView*)sender
-              resource:identifier
-       willSendRequest:(WebRequest*)request
-        fromDataSource:(WebDataSource*)dataSource;
+- (NSURLRequest*)webView:(WebView*)sender
+                resource:identifier
+         willSendRequest:(NSURLRequest*)request
+          fromDataSource:(WebDataSource*)dataSource;
 
 /*!
     @method resource:didReceiveResponse:fromDataSource:
