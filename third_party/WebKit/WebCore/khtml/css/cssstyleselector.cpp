@@ -494,6 +494,10 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e) {
        style->floating() != FNONE))
     style->setDisplay(BLOCK);
 
+  // Finally update our text decorations in effect.
+  style->addToTextDecorationsInEffect(style->textDecoration());
+
+  // Now return the style.
   return style;
 }
 
@@ -3009,9 +3013,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         if (value->cssValueType() == CSSValue::CSS_INHERIT) {
           if (!parentNode)
             return;
-          style->addToTextDecorationsInEffect(
-              parentStyle->textDecorationsInEffect());
-          style->setTextDecoration(parentStyle->textDecorationsInEffect());
+          style->setTextDecoration(parentStyle->textDecoration());
           return;
         }
         int t = TDNONE;
@@ -3049,7 +3051,6 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           }
         }
 
-        style->addToTextDecorationsInEffect(t);
         style->setTextDecoration(t);
         break;
       }
