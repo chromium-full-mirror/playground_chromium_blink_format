@@ -341,9 +341,9 @@ void RenderFlow::layout() {
       !isPositioned() && !isFloating() && !isTableCell();
 
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
-  if (childrenInline()) {
+  if (childrenInline())
     layoutInlineChildren(relayoutChildren);
-  } else
+  else
     layoutBlockChildren(relayoutChildren);
 
   int oldHeight = m_height;
@@ -1960,6 +1960,7 @@ void RenderFlow::splitInlines(RenderFlow* fromBlock,
 
 void RenderFlow::splitFlow(RenderObject* beforeChild,
                            RenderFlow* newBlockBox,
+                           RenderObject* newChild,
                            RenderFlow* oldCont) {
   RenderObject* block = containingBlock();
   RenderFlow* pre = 0;
@@ -1997,6 +1998,18 @@ void RenderFlow::splitFlow(RenderObject* beforeChild,
   }
 
   splitInlines(pre, post, newBlockBox, beforeChild, oldCont);
+
+  // We already know the newBlockBox isn't going to contain inline kids, so
+  // avoid wasting
+  // time in makeChildrenNonInline by just setting this explicitly up front.
+  newBlockBox->setChildrenInline(false);
+
+  // We don't just call addChild, since it would pass things off to the
+  // continuation, so we call addChildToFlow explicitly instead.  We delayed
+  // adding the newChild until now so that the |newBlockBox| would be fully
+  // connected, thus allowing newChild access to a renderArena should it need
+  // to wrap itself in additional boxes (e.g., table construction).
+  newBlockBox->addChildToFlow(newChild, 0);
 
   // XXXdwh is any of this even necessary? I don't think it is.
   pre->close();
@@ -2158,10 +2171,9 @@ void RenderFlow::addChildToFlow(RenderObject* newChild,
           new (renderArena()) RenderFlow(0 /* anonymous box */);
       newBox->setStyle(newStyle);
       newBox->setIsAnonymousBox(true);
-      newBox->addChild(newChild);
       RenderFlow* oldContinuation = continuation();
       setContinuation(newBox);
-      splitFlow(beforeChild, newBox, oldContinuation);
+      splitFlow(beforeChild, newBox, newChild, oldContinuation);
       return;
     } else {
       // This is a block with inline content. Wrap the inline content in

@@ -82,6 +82,7 @@ class RenderFlow : public RenderBox {
                     RenderFlow* oldCont);
   void splitFlow(RenderObject* beforeChild,
                  RenderFlow* newBlockBox,
+                 RenderObject* newChild,
                  RenderFlow* oldCont);
   void addChildWithContinuation(RenderObject* newChild,
                                 RenderObject* beforeChild);

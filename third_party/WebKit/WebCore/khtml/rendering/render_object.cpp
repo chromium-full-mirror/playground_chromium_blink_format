@@ -67,6 +67,12 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
       if (style->display() == BLOCK && node->id() == ID_TD &&
           node->getDocument()->parseMode() != DocumentImpl::Strict)
         o = new (arena) RenderTableCell(node);
+      // In quirks mode if <table> has a display of block, make a table. If it
+      // has
+      // a display of inline, make an inline-table.
+      else if (node->id() == ID_TABLE &&
+               node->getDocument()->parseMode() != DocumentImpl::Strict)
+        o = new (arena) RenderTable(node);
       else
         o = new (arena) RenderFlow(node);
       break;
@@ -79,7 +85,6 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
       break;
     case TABLE:
     case INLINE_TABLE:
-      // ### set inline/block right
       // kdDebug( 6040 ) << "creating RenderTable" << endl;
       o = new (arena) RenderTable(node);
       break;
