@@ -371,6 +371,7 @@ class RenderBlock : public RenderFlow {
       width = 0;
       noPaint = false;
     }
+
     RenderObject* node;
     int startY;
     int endY;
