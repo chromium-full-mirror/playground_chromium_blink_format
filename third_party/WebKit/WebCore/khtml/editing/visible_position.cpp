@@ -28,6 +28,7 @@
 #include "misc/htmltags.h"
 #include "rendering/render_text.h"
 #include "xml/dom2_rangeimpl.h"
+#include "xml/dom_textimpl.h"
 
 #if APPLE_CHANGES
 #include "KWQAssertions.h"
@@ -43,6 +44,7 @@ using DOM::Position;
 using DOM::Range;
 using DOM::RangeImpl;
 using DOM::StayInBlock;
+using DOM::TextImpl;
 
 namespace khtml {
 
@@ -378,6 +380,20 @@ bool VisiblePosition::isAtomicNode(const NodeImpl* node) {
   return node && (!node->hasChildNodes() ||
                   (node->id() == ID_OBJECT && node->renderer() &&
                    node->renderer()->isReplaced()));
+}
+
+QChar VisiblePosition::character() const {
+  Position pos = position();
+  NodeImpl* node = pos.node();
+  if (!node || !node->isTextNode()) {
+    return QChar();
+  }
+  TextImpl* textNode = static_cast<TextImpl*>(pos.node());
+  long offset = pos.offset();
+  if ((unsigned)offset >= textNode->length()) {
+    return QChar();
+  }
+  return textNode->data()[offset];
 }
 
 void VisiblePosition::debugPosition(const char* msg) const {
