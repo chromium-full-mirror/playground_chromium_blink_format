@@ -115,7 +115,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
                   marginWidth:(int)width
                  marginHeight:(int)height;
 
-- (void)openNewWindowWithURL:(NSURL*)URL;
+- (WebCoreBridge*)openNewWindowWithURL:(NSURL*)URL;
 
 - (IFURLHandle*)startLoadingResource:(id<WebCoreResourceLoader>)loader
                              withURL:(NSURL*)URL;
