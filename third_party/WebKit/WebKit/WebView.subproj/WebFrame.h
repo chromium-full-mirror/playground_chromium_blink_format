@@ -34,9 +34,9 @@
     @param controller The controller that manages the frame.
     @result Returns an initialized WebFrame.
 */
-- initWithName:(NSString*)name
-         webView:(WebView*)view
-      controller:(WebController*)controller;
+- (id)initWithName:(NSString*)name
+           webView:(WebView*)view
+        controller:(WebController*)controller;
 
 /*!
     @method name

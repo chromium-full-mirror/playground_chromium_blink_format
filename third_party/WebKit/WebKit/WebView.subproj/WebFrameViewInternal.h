@@ -10,6 +10,7 @@
 #import <WebKit/WebView.h>
 
 @class WebDynamicScrollBarsView;
+@class WebController;
 
 @interface WebViewPrivate : NSObject {
  @public
@@ -28,6 +29,7 @@
 @end
 
 @interface WebView (WebPrivate)
+- (WebController*)_controller;
 - (void)_setDocumentView:(NSView<WebDocumentView>*)view;
 - (NSView<WebDocumentView>*)_makeDocumentViewForDataSource:
     (WebDataSource*)dataSource;
