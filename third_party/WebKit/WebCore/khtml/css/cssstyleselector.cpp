@@ -64,6 +64,10 @@ using namespace DOM;
 #include <qpaintdevicemetrics.h>
 #include <qintcache.h>
 
+#ifdef APPLE_CHANGES
+namespace khtml {
+#endif
+
 CSSStyleSelectorList* CSSStyleSelector::defaultStyle = 0;
 CSSStyleSelectorList* CSSStyleSelector::defaultPrintStyle = 0;
 CSSStyleSheetImpl* CSSStyleSelector::defaultSheet = 0;
@@ -2756,3 +2760,7 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
       return;
   }
 }
+
+#ifdef APPLE_CHANGES
+}  // namespace khtml
+#endif
