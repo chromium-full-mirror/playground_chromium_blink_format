@@ -122,7 +122,7 @@ void RenderContainer::addChild(RenderObject* newChild,
       table = static_cast<RenderTable*>(beforeChild);
     else {
       // kdDebug( 6040 ) << "creating anonymous table" << endl;
-      table = new RenderTable(0 /* is anonymous */);
+      table = new (renderArena()) RenderTable(0 /* is anonymous */);
       RenderStyle* newStyle = new RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(TABLE);
@@ -205,13 +205,13 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
 
   if (pseudo) {
     if (pseudo->contentType() == CONTENT_TEXT) {
-      RenderObject* po = new RenderFlow(0 /* anonymous box */);
+      RenderObject* po = new (renderArena()) RenderFlow(0 /* anonymous box */);
       po->setStyle(pseudo);
 
       addChild(po, beforeChild);
 
-      RenderText* t =
-          new RenderText(0 /*anonymous object */, pseudo->contentText());
+      RenderText* t = new (renderArena())
+          RenderText(0 /*anonymous object */, pseudo->contentText());
       t->setStyle(pseudo);
 
       //            kdDebug() << DOM::DOMString(pseudo->contentText()).string()
@@ -222,7 +222,7 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
       t->close();
       po->close();
     } else if (pseudo->contentType() == CONTENT_OBJECT) {
-      RenderObject* po = new RenderImage(0);
+      RenderObject* po = new (renderArena()) RenderImage(0);
       po->setStyle(pseudo);
       addChild(po, beforeChild);
       po->close();
