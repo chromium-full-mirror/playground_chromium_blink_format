@@ -4675,7 +4675,7 @@ void ReplaceSelectionCommand::doApply() {
       startAtEndOfBlock) {
     // empty editable subtree, need to mergeStart so that fragment ends up
     // inside the editable subtree rather than just before it
-    mergeStart = true;
+    mergeStart = false;
   } else {
     // merge if current selection starts inside a paragraph, or there is only
     // one block and no interchange newline to add
@@ -4855,12 +4855,13 @@ void ReplaceSelectionCommand::doApply() {
     NodeImpl* refNode = m_fragment.firstChild();
     NodeImpl* node = refNode ? refNode->nextSibling() : 0;
     NodeImpl* insertionBlock = insertionPos.node()->enclosingBlockFlowElement();
-    bool insertionBlockIsBody = insertionBlock->id() == ID_BODY;
+    bool insertionBlockIsRoot =
+        insertionBlock == insertionBlock->rootEditableElement();
     VisiblePosition visiblePos(insertionPos, DOWNSTREAM);
-    if (!insertionBlockIsBody && isProbablyBlock(refNode) &&
+    if (!insertionBlockIsRoot && isProbablyBlock(refNode) &&
         isFirstVisiblePositionInBlock(visiblePos))
       insertNodeBeforeAndUpdateNodesInserted(refNode, insertionBlock);
-    else if (!insertionBlockIsBody && isProbablyBlock(refNode) &&
+    else if (!insertionBlockIsRoot && isProbablyBlock(refNode) &&
              isLastVisiblePositionInBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
     } else if (mergeStart && !isProbablyBlock(refNode)) {
