@@ -113,9 +113,15 @@ class Class {
   virtual ~Class(){};
 };
 
+typedef void (*KJSDidExecuteFunctionPtr)(KJS::ExecState* exec,
+                                         KJS::ObjectImp* rootObject);
+
 class Instance {
  public:
   typedef enum { JavaLanguage, ObjectiveCLanguage, CLanguage } BindingLanguage;
+
+  static void setDidExecuteFunction(KJSDidExecuteFunctionPtr func);
+  static KJSDidExecuteFunctionPtr didExecuteFunction();
 
   static Instance* createBindingForLanguageInstance(BindingLanguage language,
                                                     void* instance);
