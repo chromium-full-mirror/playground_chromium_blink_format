@@ -63,10 +63,6 @@ class FunctionImp : public InternalFunctionImp {
  private:
   void processParameters(ExecState* exec, const List&);
   virtual void processVarDecls(ExecState* exec);
-
-  void pushArgs(ExecState* exec, const Object& args);
-  void popArgs(ExecState* exec);
-  ListImp* argStack;
 };
 
 class DeclaredFunctionImp : public FunctionImp {
