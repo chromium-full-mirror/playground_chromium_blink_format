@@ -43,6 +43,7 @@
 - (NSLayoutManager*)layoutManagerForString:(NSString*)string;
 - (void)setColor:(NSColor*)color;
 - (void)setFont:(NSFont*)aFont;
+- (NSDictionary*)attributes;
 @end
 
 @interface KWQLayoutFragment : NSObject {
