@@ -101,7 +101,7 @@ class Window : public ObjectImp {
                    const Value& value,
                    int attr = None);
   virtual bool toBoolean(ExecState* exec) const;
-  int installTimeout(const Identifier& handler, int t, bool singleShot);
+  int installTimeout(const UString& handler, int t, bool singleShot);
   void clearTimeout(int timerId);
 #ifdef APPLE_CHANGES
   bool hasTimeouts();
@@ -234,7 +234,7 @@ class Window : public ObjectImp {
 class ScheduledAction {
  public:
   ScheduledAction(Object _func, List _args, bool _singleShot);
-  ScheduledAction(QString _code, bool _singleShot);
+  ScheduledAction(const QString& _code, bool _singleShot);
   ~ScheduledAction();
   void execute(Window* window);
 
@@ -250,7 +250,7 @@ class WindowQObject : public QObject {
  public:
   WindowQObject(Window* w);
   ~WindowQObject();
-  int installTimeout(const Identifier& handler, int t, bool singleShot);
+  int installTimeout(const UString& handler, int t, bool singleShot);
   int installTimeout(const Value& func, List args, int t, bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
 #ifdef APPLE_CHANGES
