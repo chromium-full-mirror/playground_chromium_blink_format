@@ -271,7 +271,9 @@ class RenderLayer {
   RenderZTreeNode* constructZTree(QRect overflowClipRect,
                                   QRect clipRect,
                                   RenderLayer* rootLayer,
-                                  bool eventProcessing = false);
+                                  bool eventProcessing = false,
+                                  int x = 0,
+                                  int y = 0);
 
   // Once the z-tree has been constructed, we call constructLayerList
   // to produce a flattened layer list for rendering/event handling.

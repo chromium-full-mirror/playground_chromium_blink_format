@@ -306,9 +306,9 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
 
 bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
   bool inside = false;
-  QRect damageRect = QRect(x, y, 0, 0);
+  QRect damageRect(m_x, m_y, m_width, m_height);
   RenderLayer::RenderZTreeNode* node =
-      constructZTree(damageRect, damageRect, this, true);
+      constructZTree(damageRect, damageRect, this, true, x, y);
   if (!node)
     return false;
 
@@ -345,7 +345,9 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     QRect overflowClipRect,
     QRect posClipRect,
     RenderLayer* rootLayer,
-    bool eventProcessing) {
+    bool eventProcessing,
+    int xMousePos,
+    int yMousePos) {
   // The arena we use for allocating our temporary ztree elements.
   RenderArena* renderArena = renderer()->renderArena();
 
@@ -377,8 +379,11 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // layers are clipped according to the overflowClipRect.
   QRect clipRectToApply =
       m_object->isPositioned() ? posClipRect : overflowClipRect;
-  QRect damageRect = eventProcessing ? clipRectToApply
-                                     : clipRectToApply.intersect(layerBounds);
+  QRect damageRect = clipRectToApply.intersect(layerBounds);
+
+  // Clip applies to *us* as well, so go ahead and update the damageRect.
+  if (m_object->hasClip())
+    damageRect = damageRect.intersect(m_object->getClipRect(x, y));
 
   // If we establish a clip rect, then we want to intersect that rect
   // with the damage rect to form a new damage rect.
@@ -410,8 +415,9 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     if (child->zIndex() < 0)
       continue;  // Ignore negative z-indices in this first pass.
 
-    RenderZTreeNode* childNode = child->constructZTree(
-        overflowClipRect, posClipRect, rootLayer, eventProcessing);
+    RenderZTreeNode* childNode =
+        child->constructZTree(overflowClipRect, posClipRect, rootLayer,
+                              eventProcessing, xMousePos, yMousePos);
     if (childNode) {
       // Put the new node into the tree at the front of the parent's list.
       if (lastChildNode)
@@ -430,8 +436,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   if (renderer()->isRoot() || renderer()->isHtml() || renderer()->isBody() ||
       renderer()->hasOverhangingFloats() ||
       (renderer()->isInline() && !renderer()->isReplaced()) ||
-      (eventProcessing &&
-       layerBounds.contains(damageRect.x(), damageRect.y())) ||
+      (eventProcessing && damageRect.contains(xMousePos, yMousePos)) ||
       (!eventProcessing && layerBounds.intersects(damageRect))) {
     RenderLayerElement* layerElt = new (renderArena) RenderLayerElement(
         this, layerBounds, damageRect, clipRectToApply, clipOriginator, x, y);
@@ -454,8 +459,9 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     if (child->zIndex() >= 0)
       continue;  // Ignore non-negative z-indices in this second pass.
 
-    RenderZTreeNode* childNode = child->constructZTree(
-        overflowClipRect, posClipRect, rootLayer, eventProcessing);
+    RenderZTreeNode* childNode =
+        child->constructZTree(overflowClipRect, posClipRect, rootLayer,
+                              eventProcessing, xMousePos, yMousePos);
     if (childNode) {
       // Deal with the case where all our children views had negative z-indices.
       // Demote our leaf node and make a new interior node that can hold these
