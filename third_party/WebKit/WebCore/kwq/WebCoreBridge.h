@@ -340,8 +340,10 @@ typedef enum {
 - (void)setMarkDOMRange:(DOMRange*)range;
 - (DOMRange*)markDOMRange;
 
-// spelling-checking "marked text"
-- (void)setMarkedTextDOMRange:(DOMRange*)range;
+// international text input "marked text"
+- (void)setMarkedTextDOMRange:(DOMRange*)range
+             customAttributes:(NSArray*)attributes
+                       ranges:(NSArray*)ranges;
 - (DOMRange*)markedTextDOMRange;
 
 - (NSAttributedString*)attributedStringFrom:(DOMNode*)startNode
