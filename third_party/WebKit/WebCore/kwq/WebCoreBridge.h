@@ -103,12 +103,17 @@ enum FrameBorderStyle {
 - (void)openURL:(NSString*)URL
           reload:(BOOL)reload
          headers:(NSDictionary*)headers
-    lastModified:(NSDate*)lastModified;
+    lastModified:(NSDate*)lastModified
+       pageCache:(NSDictionary*)pageCache;
 - (void)addData:(NSData*)data withEncoding:(NSString*)encoding;
 - (void)addData:(NSData*)data withOverrideEncoding:(NSString*)encoding;
 - (void)closeURL;
 - (void)saveDocumentState;
 - (void)restoreDocumentState;
+
+- (BOOL)canCachePage;
+- (BOOL)saveDocumentToPageCache;
+
 - (void)end;
 
 - (NSString*)URL;
@@ -273,6 +278,8 @@ enum FrameBorderStyle {
 - (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
                            attributes:(NSDictionary*)attributes
                               baseURL:(NSString*)baseURL;
+
+- (BOOL)saveDocumentToPageCache:documentInfo;
 
 @end
 

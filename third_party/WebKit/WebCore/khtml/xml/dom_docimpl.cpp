@@ -231,7 +231,8 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
     : NodeBaseImpl(new DocumentPtr())
 #if APPLE_CHANGES
       ,
-      m_finishedParsing(this, SIGNAL(finishedParsing()))
+      m_finishedParsing(this, SIGNAL(finishedParsing())),
+      m_inPageCache(0)
 #endif
 {
   document->doc = this;
@@ -986,20 +987,26 @@ void DocumentImpl::attach() {
 }
 
 void DocumentImpl::detach() {
-  RenderObject* render = m_render;
+#if APPLE_CHANGES
+  if (!m_inPageCache) {
+#endif
+    RenderObject* render = m_render;
 
-  // indicate destruction mode,  i.e. attached() but m_render == 0
-  m_render = 0;
+    // indicate destruction mode,  i.e. attached() but m_render == 0
+    m_render = 0;
 
-  NodeBaseImpl::detach();
+    NodeBaseImpl::detach();
 
-  if (render)
-    render->detach(m_renderArena);
+    if (render)
+      render->detach(m_renderArena);
 
-  m_view = 0;
+    m_view = 0;
 
-  delete m_renderArena;
-  m_renderArena = 0;
+    delete m_renderArena;
+    m_renderArena = 0;
+#if APPLE_CHANGES
+  }
+#endif
 }
 
 void DocumentImpl::setVisuallyOrdered() {
@@ -2156,5 +2163,15 @@ NodeImpl* DocumentTypeImpl::cloneNode(bool /*deep*/) {
   // so we do not support it...
   return 0;
 }
+
+#if APPLE_CHANGES
+bool DocumentImpl::inPageCache() {
+  return m_inPageCache;
+}
+
+void DocumentImpl::setInPageCache(bool flag) {
+  m_inPageCache = flag;
+}
+#endif
 
 #include "dom_docimpl.moc"

@@ -70,6 +70,13 @@ class SavedProperty {
   Value value;
 };
 
+SavedProperties::SavedProperties() : _count(0), _properties(0) {}
+
+SavedProperties::~SavedProperties() {
+  if (_properties)
+    delete _properties;
+}
+
 // Algorithm concepts from Algorithms in C++, Sedgewick.
 
 PropertyMap::PropertyMap() : _table(0) {}

@@ -102,6 +102,9 @@ class Window : public ObjectImp {
   virtual bool toBoolean(ExecState* exec) const;
   int installTimeout(const Identifier& handler, int t, bool singleShot);
   void clearTimeout(int timerId);
+#ifdef APPLE_CHANGES
+  bool hasTimeouts();
+#endif
   void scheduleClose();
   bool isSafeScript(ExecState* exec) const;
   Location* location() const;
@@ -244,6 +247,10 @@ class WindowQObject : public QObject {
   int installTimeout(const Identifier& handler, int t, bool singleShot);
   int installTimeout(const Value& func, List args, int t, bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
+#ifdef APPLE_CHANGES
+  bool hasTimeouts();
+#endif
+
  public slots:
   void timeoutClose();
  protected slots:
