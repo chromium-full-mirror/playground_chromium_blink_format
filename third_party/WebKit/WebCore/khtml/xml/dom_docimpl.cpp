@@ -3127,6 +3127,8 @@ void DocumentImpl::setTransformSourceDocument(DocumentImpl* doc) {
     doc->ref();
 }
 
+#endif
+
 void DocumentImpl::setDesignMode(InheritedBool value) {
   m_designMode = value;
 }
@@ -3152,8 +3154,6 @@ DocumentImpl* DocumentImpl::parentDocument() const {
     return 0;
   return parent->xmlDocImpl();
 }
-
-#endif
 
 // ----------------------------------------------------------------------------
 
