@@ -124,6 +124,7 @@ class CompositeEditCommandImpl : public EditCommandImpl {
   void splitTextNode(DOM::TextImpl* text, long offset);
   void joinTextNodes(DOM::TextImpl* text1, DOM::TextImpl* text2);
   void insertText(DOM::TextImpl* node, long offset, const DOM::DOMString& text);
+  void inputText(const DOM::DOMString& text);
   void deleteText(DOM::TextImpl* node, long offset, long count);
   void replaceText(DOM::TextImpl* node,
                    long offset,
