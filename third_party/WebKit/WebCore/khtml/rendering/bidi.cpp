@@ -1347,17 +1347,18 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           sBidiRunCount += sCompactBidiRunCount;
         }
 
-        InlineFlowBox* lineBox = constructLine(start, end);
-        if (!lineBox)
-          return;
+        if (sBidiRunCount) {
+          InlineFlowBox* lineBox = constructLine(start, end);
+          if (lineBox) {
+            // Now we position all of our text runs horizontally.
+            computeHorizontalPositionsForLine(lineBox, context);
 
-        // Now we position all of our text runs horizontally.
-        computeHorizontalPositionsForLine(lineBox, context);
+            // Now position our text runs vertically.
+            computeVerticalPositionsForLine(lineBox);
 
-        // Now position our text runs vertically.
-        computeVerticalPositionsForLine(lineBox);
-
-        deleteBidiRuns(renderArena());
+            deleteBidiRuns(renderArena());
+          }
+        }
 
         if (end == start ||
             (end.obj && end.obj->isBR() && !start.obj->isBR())) {
