@@ -611,9 +611,7 @@ void RenderLayer::paint(QPainter* p,
     // printf("Painting layer at %d %d\n", elt->absBounds.x(),
     // elt->absBounds.y());
 
-    // This is called to update our transparency state.
-    updateTransparentState(p, elt->layer, currentTransparentLayer);
-
+    bool updatedTransparentState = false;
     if (elt->clipOriginator) {
       // We originated a clip (we're either positioned or an element with
       // overflow: hidden).  We need to paint our background and border, subject
@@ -621,6 +619,10 @@ void RenderLayer::paint(QPainter* p,
       if (elt->backgroundClipRect != currRect) {
         if (currRect != paintRect)
           p->restore();  // Pop the clip.
+
+        // This is called to update our transparency state.
+        updateTransparentState(p, elt->layer, currentTransparentLayer);
+        updatedTransparentState = true;
 
         currRect = elt->backgroundClipRect;
 
@@ -663,6 +665,12 @@ void RenderLayer::paint(QPainter* p,
       if (currRect != paintRect)
         p->restore();  // Pop the clip.
 
+      if (!updatedTransparentState) {
+        // This is called to update our transparency state.
+        updateTransparentState(p, elt->layer, currentTransparentLayer);
+        updatedTransparentState = true;
+      }
+
       currRect = elt->clipRect;
       if (currRect != paintRect) {
         // Now apply the clip rect.
@@ -680,6 +688,12 @@ void RenderLayer::paint(QPainter* p,
         p->setClipRegion(creg);
 #endif
       }
+    }
+
+    if (!updatedTransparentState) {
+      // This is called to update our transparency state.
+      updateTransparentState(p, elt->layer, currentTransparentLayer);
+      updatedTransparentState = true;
     }
 
     if (currRect.isEmpty())
