@@ -35,6 +35,10 @@
 #import "WebCoreKeyboardAccess.h"
 
 #include <CoreFoundation/CoreFoundation.h>
+
+#include <JavaVM/jni.h>
+#include <JavaScriptCore/runtime.h>
+
 #include "KWQDict.h"
 
 class KHTMLPartPrivate;
@@ -274,6 +278,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void didTellBridgeAboutLoad(const QString& urlString);
   bool haveToldBridgeAboutLoad(const QString& urlString);
   void print();
+
+  Bindings::Instance* getAppletInstanceForView(NSView* aView);
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);

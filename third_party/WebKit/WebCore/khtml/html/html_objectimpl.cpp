@@ -46,15 +46,23 @@
 #include "java/kjavaappletcontext.h"
 #endif
 
+#if APPLE_CHANGES
+#include "KWQKHTMLPart.h"
+#endif
+
 using namespace DOM;
 using namespace khtml;
 
 // -------------------------------------------------------------------------
 
 HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {}
+    : HTMLElementImpl(doc) {
+  appletInstance = 0;
+}
 
-HTMLAppletElementImpl::~HTMLAppletElementImpl() {}
+HTMLAppletElementImpl::~HTMLAppletElementImpl() {
+  delete appletInstance;
+}
 
 NodeImpl::Id HTMLAppletElementImpl::id() const {
   return ID_APPLET;
@@ -161,11 +169,21 @@ bool HTMLAppletElementImpl::callMember(const QString& name,
 
 #if APPLE_CHANGES
 Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
+  if (appletInstance)
+    return appletInstance;
+
   // Actually get instance point for corresponding jobject and create
   // a Instance with it.
-  printf("%s: NOT YET IMPLEMENTED return fake reference\n",
-         __PRETTY_FUNCTION__);
-  return (Bindings::Instance*)0xfeadface;
+  if (renderer()) {
+    RenderApplet* r = static_cast<RenderApplet*>(m_render);
+
+    if (r->widget()) {
+      void* _view = r->widget()->getView();
+      KHTMLView* w = getDocument()->view();
+      appletInstance = KWQ(w->part())->getAppletInstanceForView((NSView*)_view);
+    }
+  }
+  return appletInstance;
 }
 #endif
 
