@@ -50,7 +50,7 @@ void Font::drawText(QPainter* p,
                     int to,
                     QColor bg) const {
 #ifdef APPLE_CHANGES
-  p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, bg);
+  p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg);
 #else
   QString qstr = QConstString(str, slen).string();
 

@@ -25,6 +25,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+#ifndef ROUND_TO_INT
+#define ROUND_TO_INT(x) (unsigned int)((x) + .5)
+#endif
+
 @protocol WebCoreTextRenderer<NSObject>
 
 // vertical metrics
@@ -34,15 +38,12 @@
 - (float)xHeight;
 
 // horizontal metrics
-- (int)widthForString:(NSString*)string;
-- (int)widthForCharacters:(const UniChar*)characters length:(unsigned)length;
-- (float)floatWidthForCharacters:(const UniChar*)characters
-                    stringLength:(unsigned)stringLength
+- (float)floatWidthForCharacters:(const unichar*)characters
+                    stringLength:(unsigned)length
            fromCharacterPosition:(int)pos
-              numberOfCharacters:(int)len;
-- (float)floatWidthForCharacters:(const UniChar*)characters
-                    stringLength:(unsigned)stringLength
-               characterPosition:(int)pos;
+              numberOfCharacters:(int)len
+                   applyRounding:(BOOL)applyRounding
+         attemptFontSubstitution:(BOOL)attemptFontSubstitution;
 
 // drawing
 - (void)drawCharacters:(const UniChar*)characters
@@ -50,6 +51,7 @@
     fromCharacterPosition:(int)from
       toCharacterPosition:(int)to
                   atPoint:(NSPoint)point
+              withPadding:(int)padding
             withTextColor:(NSColor*)textColor
           backgroundColor:(NSColor*)backgroundColor;
 - (void)drawUnderlineForCharacters:(const UniChar*)characters
