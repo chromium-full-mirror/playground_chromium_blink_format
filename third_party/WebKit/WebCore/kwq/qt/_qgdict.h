@@ -40,6 +40,8 @@
 
 // KWQ hacks ---------------------------------------------------------------
 
+#include <config.h>
+
 #ifndef USING_BORROWED_QDICT
 #define USING_BORROWED_QDICT
 #endif
