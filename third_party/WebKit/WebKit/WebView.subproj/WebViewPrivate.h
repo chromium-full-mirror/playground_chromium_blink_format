@@ -182,6 +182,8 @@ backforward list.
 - _policyDelegateForwarder;
 - _contextMenuDelegateForwarder;
 - _windowOperationsDelegateForwarder;
+
+- (void)_registerDraggedTypes;
 @end
 
 @interface _WebSafeForwarder : NSObject {
