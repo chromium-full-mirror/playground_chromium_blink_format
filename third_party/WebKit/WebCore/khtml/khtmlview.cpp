@@ -163,6 +163,7 @@ class KHTMLViewPrivate {
     doFullRepaint = true;
     layoutSchedulingEnabled = true;
     layoutSuppressed = false;
+    layoutCount = 0;
 #if APPLE_CHANGES
     firstLayout = true;
 #endif
@@ -204,6 +205,8 @@ class KHTMLViewPrivate {
 
   bool layoutSchedulingEnabled;
   bool layoutSuppressed;
+  int layoutCount;
+
 #if APPLE_CHANGES
   bool firstLayout;
   bool needToInitScrollBars;
@@ -508,6 +511,10 @@ bool KHTMLView::inLayout() const {
   return d->layoutSuppressed;
 }
 
+int KHTMLView::layoutCount() const {
+  return d->layoutCount;
+}
+
 bool KHTMLView::needsFullRepaint() const {
   return d->doFullRepaint;
 }
@@ -656,6 +663,8 @@ void KHTMLView::layout() {
       r->m_object->repaintRectangle(r->m_repaintRect);
     d->repaintRects->clear();
   }
+
+  d->layoutCount++;
 
   if (root->needsLayout()) {
     // qDebug("needs layout, delaying repaint");
