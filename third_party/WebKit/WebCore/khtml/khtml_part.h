@@ -913,13 +913,14 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void nodeActivated(const DOM::Node&);
 
- protected:
+ public:
   /**
    * returns a KURL object for the given url. Use when
    * you know what you're doing.
    */
   KURL completeURL(const QString& url);
 
+ protected:
   /**
    * presents a detailed error message to the user.
    * @p errorCode kio error code, eg KIO::ERR_SERVER_TIMEOUT.
