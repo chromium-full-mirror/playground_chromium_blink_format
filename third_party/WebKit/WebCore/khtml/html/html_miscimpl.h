@@ -85,7 +85,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
 
   struct CollectionInfo {
     CollectionInfo()
-        : version(0), current(0), position(0), length(0), hasLength(false) {}
+        : version(0), current(0), position(0), length(0), haslength(false) {}
     unsigned int version;
     NodeImpl* current;
     unsigned int position;
