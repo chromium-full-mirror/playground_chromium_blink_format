@@ -36,6 +36,8 @@ class RenderObject;
   id m_data;
 }
 
+- (id)initWithRenderer:(khtml::RenderObject*)renderer;
+
 - (long)x;
 - (long)y;
 - (long)width;
