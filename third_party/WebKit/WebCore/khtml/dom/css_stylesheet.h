@@ -29,6 +29,7 @@
 
 #include <dom/dom_string.h>
 #include <dom/dom_node.h>
+#include <dom/dom_misc.h>
 
 namespace DOM {
 

@@ -79,9 +79,13 @@ enum Source {
 class StyleSelector {
  public:
   StyleSelector(){};
-  virtual ~StyleSelector(){};
 
-  virtual RenderStyle* styleForElement(DOM::ElementImpl* e, int = None) = 0;
+  /* as noone has implemented a second style selector up to now comment out
+     the virtual methods until then, so the class has no vptr.
+  */
+  // 	virtual ~StyleSelector() {};
+  // 	virtual RenderStyle *styleForElement(DOM::ElementImpl *e, int = None) =
+  // 0;
 
   enum State { None = 0x00, Hover = 0x01, Focus = 0x02, Active = 0x04 };
 };
@@ -109,14 +113,14 @@ class CSSStyleSelector : public StyleSelector {
    */
   CSSStyleSelector(DOM::CSSStyleSheetImpl* sheet);
 
-  virtual ~CSSStyleSelector();
+  ~CSSStyleSelector();
 
   void addSheet(DOM::CSSStyleSheetImpl* sheet);
 
   static void loadDefaultStyle(const KHTMLSettings* s = 0);
   static void clear();
 
-  virtual RenderStyle* styleForElement(DOM::ElementImpl* e, int state = None);
+  RenderStyle* styleForElement(DOM::ElementImpl* e, int state = None);
 
   QValueList<int> fontSizes() const { return m_fontSizes; }
 
@@ -143,8 +147,8 @@ class CSSStyleSelector : public StyleSelector {
   void buildLists();
   void clearLists();
 
-  void addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
-                             CSSOrderedPropertyList* list);
+  unsigned int addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
+                                     unsigned int numProps);
 
   static DOM::CSSStyleSheetImpl* defaultSheet;
   static CSSStyleSelectorList* defaultStyle;
@@ -185,6 +189,10 @@ class CSSStyleSelector : public StyleSelector {
   CSSOrderedProperty** properties;
   QMemArray<CSSOrderedProperty> inlineProps;
   QString m_medium;
+  CSSOrderedProperty** propsToApply;
+  CSSOrderedProperty** pseudoProps;
+  unsigned int propsToApplySize;
+  unsigned int pseudoPropsSize;
 
   int dynamicState;
   RenderStyle::PseudoId dynamicPseudo;
@@ -229,6 +237,16 @@ class CSSOrderedProperty {
         selector(_selector),
         position(_position) {
     priority = (!first << 30) | (source << 24) | specificity;
+  }
+
+  bool operator<(const CSSOrderedProperty& other) const {
+    if (priority < other.priority)
+      return true;
+    if (priority > other.priority)
+      return false;
+    if (position < other.position)
+      return true;
+    return false;
   }
 
   DOM::CSSProperty* prop;

@@ -60,12 +60,13 @@ Event::~Event() {
 }
 
 Event& Event::operator=(const Event& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
-
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
@@ -158,6 +159,8 @@ DOMString Event::eventModuleName() {
 
 // -----------------------------------------------------------------------------
 
+#ifndef SAVE_SPACE
+
 EventException::EventException(unsigned short _code) {
   code = _code;
 }
@@ -170,6 +173,8 @@ EventException& EventException::operator=(const EventException& other) {
   code = other.code;
   return *this;
 }
+
+#endif
 
 // -----------------------------------------------------------------------------
 
@@ -191,9 +196,11 @@ UIEvent& UIEvent::operator=(const UIEvent& other) {
 UIEvent& UIEvent::operator=(const Event& other) {
   Event e;
   e = other;
-  if (!e.isNull() && !e.handle()->isUIEvent())
+  if (!e.isNull() && !e.handle()->isUIEvent()) {
+    if (impl)
+      impl->deref();
     impl = 0;
-  else
+  } else
     Event::operator=(other);
   return *this;
 }
@@ -246,9 +253,11 @@ MouseEvent& MouseEvent::operator=(const MouseEvent& other) {
 MouseEvent& MouseEvent::operator=(const Event& other) {
   Event e;
   e = other;
-  if (!e.isNull() && !e.handle()->isMouseEvent())
+  if (!e.isNull() && !e.handle()->isMouseEvent()) {
+    if (impl)
+      impl->deref();
     impl = 0;
-  else
+  } else
     UIEvent::operator=(other);
   return *this;
 }
@@ -369,9 +378,11 @@ MutationEvent& MutationEvent::operator=(const MutationEvent& other) {
 MutationEvent& MutationEvent::operator=(const Event& other) {
   Event e;
   e = other;
-  if (!e.isNull() && !e.handle()->isMutationEvent())
+  if (!e.isNull() && !e.handle()->isMutationEvent()) {
+    if (impl)
+      impl->deref();
     impl = 0;
-  else
+  } else
     Event::operator=(other);
   return *this;
 }

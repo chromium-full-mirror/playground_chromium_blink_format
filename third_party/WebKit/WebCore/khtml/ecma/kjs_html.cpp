@@ -177,7 +177,7 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case Referrer:
         return getString(doc.referrer());
       case Domain:
-        return getString(doc.domain());
+        return String(doc.domain());
       case URL:
         return getString(doc.URL());
       case Body:
@@ -1252,7 +1252,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case FormMethod:
           return getString(form.method());
         case FormTarget:
-          return getString(form.target());
+          return String(form.target());
       }
     } break;
     case ID_SELECT: {
@@ -1650,7 +1650,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ImageLongDesc:
           return getString(image.longDesc());
         case ImageSrc:
-          return getString(image.src());
+          return String(image.src());
         case ImageUseMap:
           return getString(image.useMap());
         case ImageVspace:
@@ -1977,6 +1977,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case FrameScrolling:
           return getString(frameElement.scrolling());
         case FrameSrc:
+        case FrameLocation:
           return getString(frameElement.src());
       }
     } break;
@@ -3878,8 +3879,12 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
   kdDebug(6070) << "KJS::HTMLSelectCollection::tryPut "
                 << propertyName.qstring() << endl;
 #endif
+  if (propertyName == "selectedIndex") {
+    element.setSelectedIndex(value.toInteger(exec));
+    return;
+  }
   // resize ?
-  if (propertyName == "length") {
+  else if (propertyName == "length") {
     long newLen = value.toInteger(exec);
     long diff = element.length() - newLen;
 

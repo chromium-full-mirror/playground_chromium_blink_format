@@ -75,7 +75,7 @@ const struct HashEntry dateTableEntries[] = {
     {0, 0, 0, 0, 0},
     {"getUTCSeconds", -DateProtoFuncImp::GetSeconds, DontEnum | Function, 0, 0},
     {"getHours", DateProtoFuncImp::GetHours, DontEnum | Function, 0, 0},
-    {"toUTCString", -DateProtoFuncImp::ToString, DontEnum | Function, 0,
+    {"toUTCString", DateProtoFuncImp::ToUTCString, DontEnum | Function, 0,
      &dateTableEntries[62]},
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},

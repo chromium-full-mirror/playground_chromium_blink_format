@@ -59,7 +59,8 @@ class History : public ObjectImp {
   friend class HistoryFunc;
 
  public:
-  History(KHTMLPart* p) : part(p) {}
+  History(ExecState* exec, KHTMLPart* p)
+      : ObjectImp(exec->interpreter()->builtinObjectPrototype()), part(p) {}
   virtual Value get(ExecState* exec, const UString& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -72,7 +73,8 @@ class History : public ObjectImp {
 
 class FrameArray : public ObjectImp {
  public:
-  FrameArray(KHTMLPart* p) : part(p) {}
+  FrameArray(ExecState* exec, KHTMLPart* p)
+      : ObjectImp(exec->interpreter()->builtinObjectPrototype()), part(p) {}
   virtual Value get(ExecState* exec, const UString& propertyName) const;
 
  private:
@@ -258,7 +260,13 @@ Window::get
 IMPLEMENT_PROTOFUNC(WindowFunc)
 
 Window::Window(KHTMLPart* p)
-    : m_part(p), screen(0), history(0), frames(0), loc(0), m_evt(0) {
+    : ObjectImp(/*no proto*/),
+      m_part(p),
+      screen(0),
+      history(0),
+      frames(0),
+      loc(0),
+      m_evt(0) {
   winq = new WindowQObject(this);
   // kdDebug(6070) << "Window::Window this=" << this << " part=" << m_part << "
   // " << m_part->name() << endl;
@@ -407,10 +415,10 @@ Value Window::get(ExecState* exec, const UString& p) const {
         return getEventConstructor(exec);
       case Frames:
         return Value(frames ? frames : (const_cast<Window*>(this)->frames =
-                                            new FrameArray(m_part)));
+                                            new FrameArray(exec, m_part)));
       case _History:
         return Value(history ? history : (const_cast<Window*>(this)->history =
-                                              new History(m_part)));
+                                              new History(exec, m_part)));
 
       case Event:
         if (m_evt)
@@ -659,8 +667,8 @@ Value Window::get(ExecState* exec, const UString& p) const {
       Value ret = parentObject.get(exec, p);
       if (ret.type() != UndefinedType) {
 #ifdef KJS_VERBOSE
-        kdDebug() << "Window::get property " << p.qstring()
-                  << " found in parent part" << endl;
+        kdDebug(6070) << "Window::get property " << p.qstring()
+                      << " found in parent part" << endl;
 #endif
         return ret;
       }
@@ -708,11 +716,15 @@ void Window::put(ExecState* exec,
         return;
       }
       case _Location: {
-        QString str = value.toString(exec).qstring();
         KHTMLPart* p = Window::retrieveActive(exec)->m_part;
-        if (p)
-          m_part->scheduleRedirection(
-              0, p->htmlDocument().completeURL(str).string());
+        if (p) {
+          QString dstUrl = p->htmlDocument()
+                               .completeURL(value.toString(exec).string())
+                               .string();
+          if (dstUrl.find("javascript:", 0, false) || isSafeScript(exec))
+            m_part->scheduleRedirection(0, dstUrl,
+                                        false /*don't lock history*/);
+        }
         return;
       }
       case Onabort:
@@ -874,6 +886,7 @@ bool Window::isSafeScript(ExecState* exec) const {
   // domain:" << thisDomain.string() << endl;
   if (actDomain == thisDomain)
     return true;
+
   kdWarning(6070) << "Javascript: access denied for current frame '"
                   << actDomain.string() << "' to frame '" << thisDomain.string()
                   << "'" << endl;
@@ -1106,13 +1119,13 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
         if (uargs.frameName == "_top") {
           while (part->parentPart())
             part = part->parentPart();
-          part->scheduleRedirection(0, url.url());
+          part->scheduleRedirection(0, url.url(), false /*don't lock history*/);
           return Window::retrieve(part);
         }
         if (uargs.frameName == "_parent") {
           if (part->parentPart())
             part = part->parentPart();
-          part->scheduleRedirection(0, url.url());
+          part->scheduleRedirection(0, url.url(), false /*don't lock history*/);
           return Window::retrieve(part);
         }
         uargs.serviceType = "text/html";
@@ -1249,11 +1262,12 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       } else
         return Undefined();
     case Window::SetInterval:
-      if (args.size() == 2 && v.isA(StringType)) {
+      if (args.size() >= 2 && v.isA(StringType)) {
         int i = args[1].toInt32(exec);
         int r = (const_cast<Window*>(window))->installTimeout(s, i, false);
         return Number(r);
-      } else if (args.size() >= 2 && Object::dynamicCast(v).implementsCall()) {
+      } else if (args.size() >= 2 && !Object::dynamicCast(v).isNull() &&
+                 Object::dynamicCast(v).implementsCall()) {
         Value func = args[0];
         int i = args[1].toInt32(exec);
 #if 0
@@ -1294,11 +1308,11 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
       if (!part->openedByJS()) {
         // To conform to the SPEC, we only ask if the window
         // has more than one entry in the history (NS does that too).
-        History history(part);
+        History history(exec, part);
         if (history.get(exec, "length").toInt32(exec) <= 1 ||
             KMessageBox::questionYesNo(
-                window->part()->widget(), i18n("Close window ?"),
-                i18n("Confirmation required")) == KMessageBox::Yes)
+                window->part()->widget(), i18n("Close window?"),
+                i18n("Confirmation Required")) == KMessageBox::Yes)
           (const_cast<Window*>(window))->scheduleClose();
       } else {
         (const_cast<Window*>(window))->scheduleClose();
@@ -1651,7 +1665,7 @@ void Location::put(ExecState* exec,
     return;
   }
 
-  m_part->scheduleRedirection(0, url.url());
+  m_part->scheduleRedirection(0, url.url(), false /*don't lock history*/);
 }
 
 Value Location::toPrimitive(ExecState* exec, Type) const {
@@ -1681,12 +1695,13 @@ Value LocationFunc::tryCall(ExecState* exec,
         QString str = args[0].toString(exec).qstring();
         KHTMLPart* p = Window::retrieveActive(exec)->part();
         if (p)
-          part->scheduleRedirection(
-              0, p->htmlDocument().completeURL(str).string());
+          part->scheduleRedirection(0,
+                                    p->htmlDocument().completeURL(str).string(),
+                                    true /*lock history*/);
         break;
       }
       case Location::Reload:
-        part->scheduleRedirection(0, part->url().url());
+        part->scheduleRedirection(0, part->url().url(), true /*lock history*/);
         break;
       case Location::ToString:
         return String(location->toString(exec));

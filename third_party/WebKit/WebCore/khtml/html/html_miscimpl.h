@@ -24,6 +24,7 @@
 #define HTML_MISCIMPL_H
 
 #include "html_elementimpl.h"
+#include "misc/shared.h"
 
 namespace DOM {
 
@@ -42,7 +43,7 @@ class HTMLBaseFontElementImpl : public HTMLElementImpl {
 
 // -------------------------------------------------------------------------
 
-class HTMLCollectionImpl : public DomShared {
+class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   friend class DOM::HTMLCollection;
 
  public:

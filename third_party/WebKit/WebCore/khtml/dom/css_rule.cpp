@@ -41,11 +41,13 @@ CSSRule::CSSRule(CSSRuleImpl* i) {
 }
 
 CSSRule& CSSRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
@@ -92,6 +94,15 @@ bool CSSRule::isNull() const {
   return (impl == 0);
 }
 
+void CSSRule::assignOther(const CSSRule& other, RuleType thisType) {
+  if (other.type() != thisType) {
+    if (impl)
+      impl->deref();
+    impl = 0;
+  } else
+    CSSRule::operator=(other);
+}
+
 // ----------------------------------------------------------
 
 CSSCharsetRule::CSSCharsetRule() : CSSRule() {}
@@ -111,15 +122,7 @@ CSSCharsetRule& CSSCharsetRule::operator=(const CSSCharsetRule& other) {
 }
 
 CSSCharsetRule& CSSCharsetRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::CHARSET_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::CHARSET_RULE);
   return *this;
 }
 
@@ -155,15 +158,7 @@ CSSFontFaceRule& CSSFontFaceRule::operator=(const CSSFontFaceRule& other) {
 }
 
 CSSFontFaceRule& CSSFontFaceRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::FONT_FACE_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::FONT_FACE_RULE);
   return *this;
 }
 
@@ -194,15 +189,7 @@ CSSImportRule& CSSImportRule::operator=(const CSSImportRule& other) {
 }
 
 CSSImportRule& CSSImportRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::IMPORT_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::IMPORT_RULE);
   return *this;
 }
 
@@ -245,15 +232,7 @@ CSSMediaRule& CSSMediaRule::operator=(const CSSMediaRule& other) {
 }
 
 CSSMediaRule& CSSMediaRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::MEDIA_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::MEDIA_RULE);
   return *this;
 }
 
@@ -302,15 +281,7 @@ CSSPageRule& CSSPageRule::operator=(const CSSPageRule& other) {
 }
 
 CSSPageRule& CSSPageRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::PAGE_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::PAGE_RULE);
   return *this;
 }
 
@@ -351,15 +322,7 @@ CSSStyleRule& CSSStyleRule::operator=(const CSSStyleRule& other) {
 }
 
 CSSStyleRule& CSSStyleRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::STYLE_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::STYLE_RULE);
   return *this;
 }
 
@@ -400,15 +363,7 @@ CSSUnknownRule& CSSUnknownRule::operator=(const CSSUnknownRule& other) {
 }
 
 CSSUnknownRule& CSSUnknownRule::operator=(const CSSRule& other) {
-  if (impl)
-    impl->deref();
-  if (other.type() != CSSRule::UNKNOWN_RULE) {
-    impl = 0;
-    return *this;
-  }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  assignOther(other, CSSRule::UNKNOWN_RULE);
   return *this;
 }
 
@@ -445,11 +400,13 @@ CSSRuleList::CSSRuleList(StyleListImpl* lst) {
 }
 
 CSSRuleList& CSSRuleList::operator=(const CSSRuleList& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 

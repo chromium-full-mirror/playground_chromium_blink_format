@@ -213,7 +213,7 @@ inline Value lookupGetFunction(ExecState* exec,
   fprintf(stderr,
           "Function bit not set! Shouldn't happen in lookupGetFunction!\n");
   return Undefined();
-};
+}
 
 /**
  * Simplified version of lookupGet in case there are no functions, only

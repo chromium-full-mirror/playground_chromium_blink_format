@@ -169,6 +169,9 @@ class RenderText : public RenderObject {
 
   unsigned int length() const { return str->l; }
   QChar* text() const { return str->s; }
+  unsigned int stringLength() const {
+    return str->l;
+  }  // non virtual implementation of length()
   virtual void position(int x,
                         int y,
                         int from,

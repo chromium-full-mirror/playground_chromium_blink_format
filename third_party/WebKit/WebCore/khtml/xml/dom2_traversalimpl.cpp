@@ -274,7 +274,8 @@ TreeWalkerImpl::TreeWalkerImpl() {
   m_expandEntityReferences = true;
 }
 
-TreeWalkerImpl::TreeWalkerImpl(const TreeWalkerImpl& other) : DomShared() {
+TreeWalkerImpl::TreeWalkerImpl(const TreeWalkerImpl& other)
+    : khtml::Shared<TreeWalkerImpl>() {
   m_expandEntityReferences = other.m_expandEntityReferences;
   m_filter = other.m_filter;
   m_whatToShow = other.m_whatToShow;

@@ -134,7 +134,7 @@ QVariant KJSProxyImpl::evaluate(QString filename,
   else {
     if (comp.complType() == Throw) {
       UString msg = comp.value().toString(m_script->globalExec());
-      kdWarning(6070) << "Script throwed exception: " << msg.qstring() << endl;
+      kdWarning(6070) << "Script threw exception: " << msg.qstring() << endl;
     }
     return QVariant();
   }

@@ -48,11 +48,13 @@ CSSStyleDeclaration::CSSStyleDeclaration(CSSStyleDeclarationImpl* i) {
 
 CSSStyleDeclaration& CSSStyleDeclaration::operator=(
     const CSSStyleDeclaration& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
@@ -169,11 +171,13 @@ CSSValue::CSSValue(CSSValueImpl* i) {
 }
 
 CSSValue& CSSValue::operator=(const CSSValue& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
@@ -234,24 +238,29 @@ CSSValueList::CSSValueList(const CSSValue& other) {
 CSSValueList::CSSValueList(CSSValueListImpl* impl) : CSSValue(impl) {}
 
 CSSValueList& CSSValueList::operator=(const CSSValueList& other) {
-  if (impl)
-    impl->deref();
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.handle();
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
 CSSValueList& CSSValueList::operator=(const CSSValue& other) {
-  if (impl)
-    impl->deref();
-  if (!other.isNull() && !other.isCSSValueList()) {
-    impl = 0;
-    return *this;
+  CSSValueImpl* ohandle = other.handle();
+  if (impl != ohandle) {
+    if (impl)
+      impl->deref();
+    if (!other.isNull() && !other.isCSSValueList()) {
+      impl = 0;
+    } else {
+      impl = ohandle;
+      if (impl)
+        impl->ref();
+    }
   }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
   return *this;
 }
 
@@ -274,13 +283,7 @@ CSSValue CSSValueList::item(unsigned long index) {
 CSSPrimitiveValue::CSSPrimitiveValue() : CSSValue() {}
 
 CSSPrimitiveValue::CSSPrimitiveValue(const CSSPrimitiveValue& other)
-    : CSSValue(other) {
-  if (impl)
-    impl->deref();
-  impl = other.handle();
-  if (impl)
-    impl->ref();
-}
+    : CSSValue(other) {}
 
 CSSPrimitiveValue::CSSPrimitiveValue(const CSSValue& other) : CSSValue(other) {
   impl = 0;
@@ -292,24 +295,29 @@ CSSPrimitiveValue::CSSPrimitiveValue(CSSPrimitiveValueImpl* impl)
 
 CSSPrimitiveValue& CSSPrimitiveValue::operator=(
     const CSSPrimitiveValue& other) {
-  if (impl)
-    impl->deref();
-  impl = other.handle();
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.handle();
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
 CSSPrimitiveValue& CSSPrimitiveValue::operator=(const CSSValue& other) {
-  if (impl)
-    impl->deref();
-  if (!other.isNull() && !other.isCSSPrimitiveValue()) {
-    impl = 0;
-    return *this;
+  CSSValueImpl* ohandle = other.handle();
+  if (impl != ohandle) {
+    if (impl)
+      impl->deref();
+    if (!other.isNull() && !other.isCSSPrimitiveValue()) {
+      impl = 0;
+    } else {
+      impl = ohandle;
+      if (impl)
+        impl->ref();
+    }
   }
-  impl = other.handle();
-  if (impl)
-    impl->ref();
   return *this;
 }
 
@@ -389,11 +397,13 @@ Counter::Counter(const Counter& /*other*/) {
 }
 
 Counter& Counter::operator=(const Counter& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 
@@ -487,11 +497,13 @@ Rect::Rect(RectImpl* i) {
 }
 
 Rect& Rect::operator=(const Rect& other) {
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 

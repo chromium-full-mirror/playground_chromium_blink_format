@@ -42,11 +42,7 @@ HTMLButtonElement::HTMLButtonElement(HTMLButtonElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLButtonElement& HTMLButtonElement::operator=(const Node& other) {
-  if (other.elementId() != ID_BUTTON) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_BUTTON);
   return *this;
 }
 
@@ -138,11 +134,7 @@ HTMLFieldSetElement::HTMLFieldSetElement(HTMLFieldSetElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLFieldSetElement& HTMLFieldSetElement::operator=(const Node& other) {
-  if (other.elementId() != ID_FIELDSET) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_FIELDSET);
   return *this;
 }
 
@@ -171,11 +163,7 @@ HTMLFormElement::HTMLFormElement(HTMLFormElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLFormElement& HTMLFormElement::operator=(const Node& other) {
-  if (other.elementId() != ID_FORM) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_FORM);
   return *this;
 }
 
@@ -285,11 +273,7 @@ HTMLInputElement::HTMLInputElement(HTMLInputElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLInputElement& HTMLInputElement::operator=(const Node& other) {
-  if (other.elementId() != ID_INPUT) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_INPUT);
   return *this;
 }
 
@@ -535,11 +519,7 @@ HTMLLabelElement::HTMLLabelElement(HTMLLabelElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLLabelElement& HTMLLabelElement::operator=(const Node& other) {
-  if (other.elementId() != ID_LABEL) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_LABEL);
   return *this;
 }
 
@@ -592,11 +572,7 @@ HTMLLegendElement::HTMLLegendElement(HTMLLegendElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLLegendElement& HTMLLegendElement::operator=(const Node& other) {
-  if (other.elementId() != ID_LEGEND) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_LEGEND);
   return *this;
 }
 
@@ -647,11 +623,7 @@ HTMLOptGroupElement::HTMLOptGroupElement(HTMLOptGroupElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLOptGroupElement& HTMLOptGroupElement::operator=(const Node& other) {
-  if (other.elementId() != ID_OPTGROUP) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_OPTGROUP);
   return *this;
 }
 
@@ -697,11 +669,7 @@ HTMLSelectElement::HTMLSelectElement(HTMLSelectElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLSelectElement& HTMLSelectElement::operator=(const Node& other) {
-  if (other.elementId() != ID_SELECT) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_SELECT);
   return *this;
 }
 
@@ -852,11 +820,7 @@ HTMLTextAreaElement::HTMLTextAreaElement(HTMLTextAreaElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTextAreaElement& HTMLTextAreaElement::operator=(const Node& other) {
-  if (other.elementId() != ID_TEXTAREA) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_TEXTAREA);
   return *this;
 }
 
@@ -1012,11 +976,7 @@ HTMLOptionElement::HTMLOptionElement(HTMLOptionElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLOptionElement& HTMLOptionElement::operator=(const Node& other) {
-  if (other.elementId() != ID_OPTION) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_OPTION);
   return *this;
 }
 
@@ -1119,11 +1079,7 @@ HTMLIsIndexElement::HTMLIsIndexElement(HTMLIsIndexElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLIsIndexElement& HTMLIsIndexElement::operator=(const Node& other) {
-  if (other.elementId() != ID_ISINDEX) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_ISINDEX);
   return *this;
 }
 

@@ -39,19 +39,15 @@ enum HAlign { HDefault, Left, HCenter, Right, HNone = 0 };
 /*
  * %multiLength and %Length
  */
-enum LengthType {
-  Undefined = 0,
-  Variable = 1,
-  Relative,
-  Percent,
-  Fixed,
-  Static
-};
+enum LengthType { Variable = 0, Relative, Percent, Fixed, Static };
 struct Length {
-  Length() : value(0), type(Variable) {}
-  Length(LengthType t) : value(0), type(t) {}
+  Length() { *((Q_UINT32*)this) = 0; }
+  Length(LengthType t) {
+    type = t;
+    value = 0;
+  }
   Length(int v, LengthType t) : value(v), type(t) {}
-  Length(const Length& l) : value(l.value), type(l.type) {}
+  Length(const Length& o) { *((Q_UINT32*)this) = *((Q_UINT32*)&o); }
 
   Length& operator=(const Length& o) {
     *((Q_UINT32*)this) = *((Q_UINT32*)&o);
@@ -73,7 +69,6 @@ struct Length {
         return value;
       case Percent:
         return maxWidth * value / 100;
-      case Undefined:
       case Variable:
         return maxWidth;
       default:
@@ -89,13 +84,11 @@ struct Length {
         return value;
       case Percent:
         return maxWidth * value / 100;
-      case Undefined:
       case Variable:
       default:
         return 0;
     }
   }
-  bool isUndefined() const { return (type == Undefined); }
   bool isVariable() const { return (type == Variable); }
   bool isRelative() const { return (type == Relative); }
   bool isPercent() const { return (type == Percent); }

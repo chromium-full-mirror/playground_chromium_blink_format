@@ -36,11 +36,7 @@ HTMLBaseFontElement::HTMLBaseFontElement(HTMLBaseFontElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLBaseFontElement& HTMLBaseFontElement::operator=(const Node& other) {
-  if (other.elementId() != ID_BASEFONT) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_BASEFONT);
   return *this;
 }
 
@@ -101,13 +97,13 @@ HTMLCollection::HTMLCollection(NodeImpl* base, int type) {
 }
 
 HTMLCollection& HTMLCollection::operator=(const HTMLCollection& other) {
-  if (impl == other.impl)
-    return *this;
-  if (impl)
-    impl->deref();
-  impl = other.impl;
-  if (impl)
-    impl->ref();
+  if (impl != other.impl) {
+    if (impl)
+      impl->deref();
+    impl = other.impl;
+    if (impl)
+      impl->ref();
+  }
   return *this;
 }
 

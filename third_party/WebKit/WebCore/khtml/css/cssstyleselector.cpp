@@ -63,6 +63,7 @@ using namespace DOM;
 #include <assert.h>
 #include <qpaintdevicemetrics.h>
 #include <qintcache.h>
+#include <stdlib.h>
 
 #ifdef APPLE_CHANGES
 namespace khtml {
@@ -115,7 +116,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
                      view ? view->part()->zoomFactor() : 100);
 
   if (!userStyleSheet.isEmpty()) {
-    userSheet = new DOM::CSSStyleSheetImpl((DOM::CSSStyleSheetImpl*)0);
+    userSheet = new DOM::CSSStyleSheetImpl(doc);
     userSheet->parseString(DOMString(userStyleSheet));
 
     userStyle = new CSSStyleSelectorList();
@@ -173,6 +174,11 @@ void CSSStyleSelector::init() {
   element = 0;
   settings = 0;
   paintDeviceMetrics = 0;
+  propsToApply =
+      (CSSOrderedProperty**)malloc(128 * sizeof(CSSOrderedProperty*));
+  pseudoProps = (CSSOrderedProperty**)malloc(128 * sizeof(CSSOrderedProperty*));
+  propsToApplySize = 128;
+  pseudoPropsSize = 128;
 }
 
 CSSStyleSelector::~CSSStyleSelector() {
@@ -180,6 +186,8 @@ CSSStyleSelector::~CSSStyleSelector() {
   delete authorStyle;
   delete userStyle;
   delete userSheet;
+  free(propsToApply);
+  free(pseudoProps);
 }
 
 void CSSStyleSelector::addSheet(CSSStyleSheetImpl* sheet) {
@@ -258,6 +266,27 @@ void CSSStyleSelector::computeFontSizes(QPaintDeviceMetrics* paintDeviceMetrics,
 
 #undef MAXFONTSIZES
 
+static inline void bubbleSort(CSSOrderedProperty** b, CSSOrderedProperty** e) {
+  while (b < e) {
+    bool swapped = FALSE;
+    CSSOrderedProperty** y = e + 1;
+    CSSOrderedProperty** x = e;
+    CSSOrderedProperty** swappedPos;
+    do {
+      if (!((**(--x)) < (**(--y)))) {
+        swapped = TRUE;
+        swappedPos = x;
+        CSSOrderedProperty* tmp = *y;
+        *y = *x;
+        *x = tmp;
+      }
+    } while (x != b);
+    if (!swapped)
+      break;
+    b = swappedPos + 1;
+  }
+}
+
 RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   // set some variables we will need
   dynamicState = state;
@@ -275,8 +304,8 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   settings = part->settings();
   paintDeviceMetrics = element->getDocument()->paintDeviceMetrics();
 
-  CSSOrderedPropertyList* propsToApply = new CSSOrderedPropertyList;
-  CSSOrderedPropertyList* pseudoProps = new CSSOrderedPropertyList;
+  unsigned int numPropsToApply = 0;
+  unsigned int numPseudoProps = 0;
 
   // try to sort out most style rules as early as possible.
   // ### implement CSS3 namespace support
@@ -297,15 +326,26 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
         // qDebug("adding property" );
         for (unsigned int p = 0; p < selectorCache[i].props_size; p += 2)
           for (unsigned int j = 0;
-               j < (unsigned int)selectorCache[i].props[p + 1]; ++j)
-            static_cast<QPtrList<CSSOrderedProperty>*>(propsToApply)
-                ->append(properties[selectorCache[i].props[p] + j]);
+               j < (unsigned int)selectorCache[i].props[p + 1]; ++j) {
+            if (numPropsToApply >= propsToApplySize) {
+              propsToApplySize *= 2;
+              propsToApply = (CSSOrderedProperty**)realloc(
+                  propsToApply, propsToApplySize * sizeof(CSSOrderedProperty*));
+            }
+            propsToApply[numPropsToApply++] =
+                properties[selectorCache[i].props[p] + j];
+          }
       } else if (selectorCache[i].state == AppliesPseudo) {
         for (unsigned int p = 0; p < selectorCache[i].props_size; p += 2)
           for (unsigned int j = 0;
                j < (unsigned int)selectorCache[i].props[p + 1]; ++j) {
-            static_cast<QPtrList<CSSOrderedProperty>*>(pseudoProps)
-                ->append(properties[selectorCache[i].props[p] + j]);
+            if (numPseudoProps >= pseudoPropsSize) {
+              pseudoPropsSize *= 2;
+              pseudoProps = (CSSOrderedProperty**)realloc(
+                  pseudoProps, pseudoPropsSize * sizeof(CSSOrderedProperty*));
+            }
+            pseudoProps[numPseudoProps++] =
+                properties[selectorCache[i].props[p] + j];
             properties[selectorCache[i].props[p] + j]->pseudoId =
                 (RenderStyle::PseudoId)selectors[i]->pseudoId;
           }
@@ -313,6 +353,7 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
     } else
       selectorCache[i].state = Invalid;
   }
+
   // qDebug( "styleForElement( %s )", e->tagName().string().latin1() );
   // qDebug( "%d selectors, %d checked,  %d match,  %d properties ( of %d )",
   // selectors_size, schecked, smatch, propsToApply->count(), properties_size );
@@ -321,10 +362,10 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   // count as author rules, and come before all other style sheets, see hack in
   // append()
   if (e->m_styleDecls)
-    addInlineDeclarations(e->m_styleDecls, propsToApply);
+    numPropsToApply = addInlineDeclarations(e->m_styleDecls, numPropsToApply);
 
-  propsToApply->sort();
-  pseudoProps->sort();
+  bubbleSort(propsToApply, propsToApply + numPropsToApply - 1);
+  bubbleSort(pseudoProps, pseudoProps + numPseudoProps - 1);
 
   RenderStyle* style = new RenderStyle();
   if (parentStyle)
@@ -339,29 +380,27 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   if (part) {
     fontDirty = false;
 
-    if (propsToApply->count()) {
+    if (numPropsToApply) {
       CSSStyleSelector::style = style;
-      for (CSSOrderedProperty* ordprop = propsToApply->first(); ordprop;
-           ordprop = propsToApply->next()) {
-        if (fontDirty && ordprop->priority >= (1 << 30)) {
+      for (unsigned int i = 0; i < numPropsToApply; ++i) {
+        if (fontDirty && propsToApply[i]->priority >= (1 << 30)) {
           // we are past the font properties, time to update to the
           // correct font
           CSSStyleSelector::style->htmlFont().update(paintDeviceMetrics);
           fontDirty = false;
         }
-        applyRule(ordprop->prop);
+        applyRule(propsToApply[i]->prop);
       }
       if (fontDirty)
         CSSStyleSelector::style->htmlFont().update(paintDeviceMetrics);
     }
 
-    if (pseudoProps->count() != 0) {
+    if (numPseudoProps) {
       fontDirty = false;
       // qDebug("%d applying %d pseudo props", e->cssTagId(),
       // pseudoProps->count() );
-      CSSOrderedProperty* ordprop = pseudoProps->first();
-      while (ordprop) {
-        if (fontDirty && ordprop->priority >= (1 << 30)) {
+      for (unsigned int i = 0; i < numPseudoProps; ++i) {
+        if (fontDirty && pseudoProps[i]->priority >= (1 << 30)) {
           // we are past the font properties, time to update to the
           // correct font
           // We have to do this for all pseudo styles
@@ -374,19 +413,18 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
         }
 
         RenderStyle* pseudoStyle;
-        pseudoStyle = style->getPseudoStyle(ordprop->pseudoId);
+        pseudoStyle = style->getPseudoStyle(pseudoProps[i]->pseudoId);
         if (!pseudoStyle) {
-          pseudoStyle = style->addPseudoStyle(ordprop->pseudoId);
+          pseudoStyle = style->addPseudoStyle(pseudoProps[i]->pseudoId);
           if (pseudoStyle)
             pseudoStyle->inheritFrom(style);
         }
 
         CSSStyleSelector::style = pseudoStyle;
         if (pseudoStyle)
-          applyRule(ordprop->prop);
-
-        ordprop = pseudoProps->next();
+          applyRule(pseudoProps[i]->prop);
       }
+
       if (fontDirty) {
         RenderStyle* pseudoStyle = style->pseudoStyle;
         while (pseudoStyle) {
@@ -402,21 +440,24 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   if (usedDynamicStates & StyleSelector::Active)
     style->setHasActive();
 
-  delete propsToApply;
-  delete pseudoProps;
-
   return style;
 }
 
-void CSSStyleSelector::addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
-                                             CSSOrderedPropertyList* list) {
+unsigned int CSSStyleSelector::addInlineDeclarations(
+    DOM::CSSStyleDeclarationImpl* decl,
+    unsigned int numProps) {
   QPtrList<CSSProperty>* values = decl->values();
   if (!values)
-    return;
+    return numProps;
   int len = values->count();
 
   if (inlineProps.size() < (uint)len)
     inlineProps.resize(len + 1);
+  if (numProps + len >= propsToApplySize) {
+    propsToApplySize += propsToApplySize;
+    propsToApply = (CSSOrderedProperty**)realloc(
+        propsToApply, propsToApplySize * sizeof(CSSOrderedProperty*));
+  }
 
   CSSOrderedProperty* array = (CSSOrderedProperty*)inlineProps.data();
   for (int i = 0; i < len; i++) {
@@ -438,6 +479,7 @@ void CSSStyleSelector::addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
       case CSS_PROP_FONT:
       case CSS_PROP_COLOR:
       case CSS_PROP_BACKGROUND_IMAGE:
+      case CSS_PROP_DISPLAY:
         // these have to be applied first, because other properties use the
         // computed
         // values of these porperties.
@@ -453,9 +495,9 @@ void CSSStyleSelector::addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
     array->selector = 0;
     array->position = i;
     array->priority = (!first << 30) | (source << 24);
-    static_cast<QPtrList<CSSOrderedProperty>*>(list)->append(array);
-    array++;
+    propsToApply[numProps++] = array++;
   }
+  return numProps;
 }
 
 static bool subject;
@@ -1040,6 +1082,7 @@ void CSSOrderedPropertyList::append(DOM::CSSStyleDeclarationImpl* decl,
       case CSS_PROP_FONT:
       case CSS_PROP_COLOR:
       case CSS_PROP_BACKGROUND_IMAGE:
+      case CSS_PROP_DISPLAY:
         // these have to be applied first, because other properties use the
         // computed
         // values of these porperties.
@@ -1178,32 +1221,34 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     case CSS_PROP_BORDER_BOTTOM_STYLE:
     case CSS_PROP_BORDER_LEFT_STYLE:
     case CSS_PROP_OUTLINE_STYLE: {
+      EBorderStyle s;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
         switch (prop->m_id) {
           case CSS_PROP_BORDER_TOP_STYLE:
-            style->setBorderTopStyle(parentStyle->borderTopStyle());
-            return;
+            s = parentStyle->borderTopStyle();
+            break;
           case CSS_PROP_BORDER_RIGHT_STYLE:
-            style->setBorderRightStyle(parentStyle->borderRightStyle());
-            return;
+            s = parentStyle->borderRightStyle();
+            break;
           case CSS_PROP_BORDER_BOTTOM_STYLE:
-            style->setBorderBottomStyle(parentStyle->borderBottomStyle());
-            return;
+            s = parentStyle->borderBottomStyle();
+            break;
           case CSS_PROP_BORDER_LEFT_STYLE:
-            style->setBorderLeftStyle(parentStyle->borderLeftStyle());
-            return;
+            s = parentStyle->borderLeftStyle();
+            break;
           case CSS_PROP_OUTLINE_STYLE:
-            style->setOutlineStyle(parentStyle->outlineStyle());
+            s = parentStyle->outlineStyle();
+            break;
+          default:
             return;
         }
+      } else {
+        if (!primitiveValue)
+          return;
+        s = (EBorderStyle)(primitiveValue->getIdent() - CSS_VAL_NONE);
       }
-      if (!primitiveValue)
-        return;
-      EBorderStyle s =
-          (EBorderStyle)(primitiveValue->getIdent() - CSS_VAL_NONE);
-
       switch (prop->m_id) {
         case CSS_PROP_BORDER_TOP_STYLE:
           style->setBorderTopStyle(s);
@@ -1712,13 +1757,14 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         if (!parentNode)
           return;
         style->setCursor(parentStyle->cursor());
+        style->setCursorImage(parentStyle->cursorImage());
         return;
       } else if (primitiveValue) {
         if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_URI) {
           CSSImageValueImpl* image =
               static_cast<CSSImageValueImpl*>(primitiveValue);
-          kdDebug(6080) << "setting cursor image to "
-                        << image->cssText().string() << endl;
+          // kdDebug( 6080 ) << "setting cursor image to " <<
+          // image->cssText().string() << endl;
           style->setCursorImage(image->image());
         } else {
           style->setCursor(
@@ -1756,38 +1802,37 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         switch (prop->m_id) {
           case CSS_PROP_BACKGROUND_COLOR:
-            style->setBackgroundColor(parentStyle->backgroundColor());
+            col = parentStyle->backgroundColor();
             break;
           case CSS_PROP_BORDER_TOP_COLOR:
-            style->setBorderTopColor(parentStyle->borderTopColor());
+            col = parentStyle->borderTopColor();
             break;
           case CSS_PROP_BORDER_RIGHT_COLOR:
-            style->setBorderRightColor(parentStyle->borderRightColor());
+            col = parentStyle->borderRightColor();
             break;
           case CSS_PROP_BORDER_BOTTOM_COLOR:
-            style->setBorderBottomColor(parentStyle->borderBottomColor());
+            col = parentStyle->borderBottomColor();
             break;
           case CSS_PROP_BORDER_LEFT_COLOR:
-            style->setBorderLeftColor(parentStyle->borderLeftColor());
+            col = parentStyle->borderLeftColor();
             break;
           case CSS_PROP_COLOR:
-            style->setColor(parentStyle->color());
+            col = parentStyle->color();
             break;
           case CSS_PROP_OUTLINE_COLOR:
-            style->setOutlineColor(parentStyle->outlineColor());
+            col = parentStyle->outlineColor();
             break;
           default:
-            // ###
-            break;
+            return;
         }
-        return;
+      } else {
+        if (!primitiveValue)
+          return;
+        if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)
+          col = primitiveValue->getRGBColorValue()->color();
+        else
+          return;
       }
-      if (!primitiveValue)
-        return;
-      if (primitiveValue->primitiveType() == CSSPrimitiveValue::CSS_RGBCOLOR)
-        col = primitiveValue->getRGBColorValue()->color();
-      else
-        return;
       // kdDebug( 6080 ) << "applying color " << col.isValid() << endl;
       switch (prop->m_id) {
         case CSS_PROP_BACKGROUND_COLOR:
@@ -1855,17 +1900,17 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     } break;
     // uri || inherit
     case CSS_PROP_BACKGROUND_IMAGE: {
+      khtml::CachedImage* image = 0;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
-        style->setBackgroundImage(parentStyle->backgroundImage());
-        break;
+        image = parentStyle->backgroundImage();
+      } else {
+        if (!primitiveValue)
+          return;
+        image = static_cast<CSSImageValueImpl*>(primitiveValue)->image();
       }
-      if (!primitiveValue)
-        return;
-      CSSImageValueImpl* image =
-          static_cast<CSSImageValueImpl*>(primitiveValue);
-      style->setBackgroundImage(image->image());
+      style->setBackgroundImage(image);
       // kdDebug( 6080 ) << "setting image in style to " << image->image() <<
       // endl;
       break;
@@ -1874,18 +1919,19 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     //     case CSS_PROP_CUE_BEFORE:
     //         break;
     case CSS_PROP_LIST_STYLE_IMAGE: {
+      khtml::CachedImage* image = 0;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
-        style->setListStyleImage(parentStyle->listStyleImage());
-        break;
+        image = parentStyle->listStyleImage();
+      } else {
+        if (!primitiveValue)
+          return;
+        image = static_cast<CSSImageValueImpl*>(primitiveValue)->image();
       }
-      if (!primitiveValue)
-        return;
-      CSSImageValueImpl* image =
-          static_cast<CSSImageValueImpl*>(primitiveValue);
-      style->setListStyleImage(image->image());
-      kdDebug(6080) << "setting image in list to " << image->image() << endl;
+      style->setListStyleImage(image);
+      // kdDebug( 6080 ) << "setting image in list to " << image->image() <<
+      // endl;
       break;
     }
 
@@ -1895,47 +1941,47 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     case CSS_PROP_BORDER_BOTTOM_WIDTH:
     case CSS_PROP_BORDER_LEFT_WIDTH:
     case CSS_PROP_OUTLINE_WIDTH: {
+      short width = 3;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         switch (prop->m_id) {
           case CSS_PROP_BORDER_TOP_WIDTH:
-            style->setBorderTopWidth(parentStyle->borderTopWidth());
+            width = parentStyle->borderTopWidth();
             break;
           case CSS_PROP_BORDER_RIGHT_WIDTH:
-            style->setBorderRightWidth(parentStyle->borderRightWidth());
+            width = parentStyle->borderRightWidth();
             break;
           case CSS_PROP_BORDER_BOTTOM_WIDTH:
-            style->setBorderBottomWidth(parentStyle->borderBottomWidth());
+            width = parentStyle->borderBottomWidth();
             break;
           case CSS_PROP_BORDER_LEFT_WIDTH:
-            style->setBorderLeftWidth(parentStyle->borderLeftWidth());
+            width = parentStyle->borderLeftWidth();
             break;
           case CSS_PROP_OUTLINE_WIDTH:
-            style->setOutlineWidth(parentStyle->outlineWidth());
+            width = parentStyle->outlineWidth();
             break;
           default:
-            // ###
-            break;
+            return;
         }
         return;
-      }
-      if (!primitiveValue)
-        break;
-      short width = 3;  // medium is default value
-      switch (primitiveValue->getIdent()) {
-        case CSS_VAL_THIN:
-          width = 1;
+      } else {
+        if (!primitiveValue)
           break;
-        case CSS_VAL_MEDIUM:
-          width = 3;
-          break;
-        case CSS_VAL_THICK:
-          width = 5;
-          break;
-        case CSS_VAL_INVALID:
-          width = primitiveValue->computeLength(style, paintDeviceMetrics);
-          break;
-        default:
-          return;
+        switch (primitiveValue->getIdent()) {
+          case CSS_VAL_THIN:
+            width = 1;
+            break;
+          case CSS_VAL_MEDIUM:
+            width = 3;
+            break;
+          case CSS_VAL_THICK:
+            width = 5;
+            break;
+          case CSS_VAL_INVALID:
+            width = primitiveValue->computeLength(style, paintDeviceMetrics);
+            break;
+          default:
+            return;
+        }
       }
       if (width < 0)
         return;
@@ -1964,30 +2010,28 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     case CSS_PROP_MARKER_OFFSET:
     case CSS_PROP_LETTER_SPACING:
     case CSS_PROP_WORD_SPACING: {
+      int width = 0;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
         switch (prop->m_id) {
           case CSS_PROP_MARKER_OFFSET:
             // ###
-            break;
+            return;
           case CSS_PROP_LETTER_SPACING:
-            style->setLetterSpacing(parentStyle->letterSpacing());
+            width = parentStyle->letterSpacing();
             break;
           case CSS_PROP_WORD_SPACING:
-            style->setWordSpacing(parentStyle->wordSpacing());
+            width = parentStyle->wordSpacing();
             break;
           default:
-            // ###
-            break;
+            return;
         }
-        return;
+      } else {
+        if (!primitiveValue)
+          return;
+        width = primitiveValue->computeLength(style, paintDeviceMetrics);
       }
-      if (!primitiveValue)
-        return;
-      int width = primitiveValue->computeLength(style, paintDeviceMetrics);
-      // reason : letter or word spacing may be negative.
-      //      if( width < 0 ) return;
       switch (prop->m_id) {
         case CSS_PROP_LETTER_SPACING:
           style->setLetterSpacing(width);
@@ -1998,8 +2042,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         // ### needs the definitions in renderstyle
         case CSS_PROP_MARKER_OFFSET:
         default:
-          return;
+          break;
       }
+      return;
     }
 
     // length, percent
@@ -2041,54 +2086,55 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         if (value->cssValueType() == CSSValue::CSS_INHERIT) {
           if (!parentNode)
             return;
+          apply = true;
           switch (prop->m_id) {
             case CSS_PROP_MAX_WIDTH:
-              style->setMaxWidth(parentStyle->maxWidth());
+              l = parentStyle->maxWidth();
               break;
             case CSS_PROP_BOTTOM:
-              style->setBottom(parentStyle->bottom());
+              l = parentStyle->bottom();
               break;
             case CSS_PROP_TOP:
-              style->setTop(parentStyle->top());
+              l = parentStyle->top();
               break;
             case CSS_PROP_LEFT:
-              style->setLeft(parentStyle->left());
+              l = parentStyle->left();
               break;
             case CSS_PROP_RIGHT:
-              style->setRight(parentStyle->right());
+              l = parentStyle->right();
               break;
             case CSS_PROP_WIDTH:
-              style->setWidth(parentStyle->width());
+              l = parentStyle->width();
               break;
             case CSS_PROP_MIN_WIDTH:
-              style->setMinWidth(parentStyle->minWidth());
+              l = parentStyle->minWidth();
               break;
             case CSS_PROP_PADDING_TOP:
-              style->setPaddingTop(parentStyle->paddingTop());
+              l = parentStyle->paddingTop();
               break;
             case CSS_PROP_PADDING_RIGHT:
-              style->setPaddingRight(parentStyle->paddingRight());
+              l = parentStyle->paddingRight();
               break;
             case CSS_PROP_PADDING_BOTTOM:
-              style->setPaddingBottom(parentStyle->paddingBottom());
+              l = parentStyle->paddingBottom();
               break;
             case CSS_PROP_PADDING_LEFT:
-              style->setPaddingLeft(parentStyle->paddingLeft());
+              l = parentStyle->paddingLeft();
               break;
             case CSS_PROP_MARGIN_TOP:
-              style->setMarginTop(parentStyle->marginTop());
+              l = parentStyle->marginTop();
               break;
             case CSS_PROP_MARGIN_RIGHT:
-              style->setMarginRight(parentStyle->marginRight());
+              l = parentStyle->marginRight();
               break;
             case CSS_PROP_MARGIN_BOTTOM:
-              style->setMarginBottom(parentStyle->marginBottom());
+              l = parentStyle->marginBottom();
               break;
             case CSS_PROP_MARGIN_LEFT:
-              style->setMarginLeft(parentStyle->marginLeft());
+              l = parentStyle->marginLeft();
               break;
             case CSS_PROP_TEXT_INDENT:
-              style->setTextIndent(parentStyle->textIndent());
+              l = parentStyle->textIndent();
               break;
             default:
               return;
@@ -2159,8 +2205,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
             style->setTextIndent(l);
             break;
           default:
-            return;
+            break;
         }
+        return;
       }
 
     case CSS_PROP_MAX_HEIGHT:
@@ -2176,15 +2223,16 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
+        apply = true;
         switch (prop->m_id) {
           case CSS_PROP_MAX_HEIGHT:
-            style->setMaxHeight(parentStyle->maxHeight());
+            l = parentStyle->maxHeight();
             break;
           case CSS_PROP_HEIGHT:
-            style->setHeight(parentStyle->height());
+            l = parentStyle->height();
             break;
           case CSS_PROP_MIN_HEIGHT:
-            style->setMinHeight(parentStyle->minHeight());
+            l = parentStyle->minHeight();
             break;
           default:
             return;
@@ -2390,51 +2438,53 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     //     case CSS_PROP_WIDOWS:
     break;
     case CSS_PROP_Z_INDEX: {
+      int z_index = 0;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
-        style->setZIndex(parentStyle->zIndex());
-        return;
+        z_index = parentStyle->zIndex();
+      } else {
+        if (!primitiveValue ||
+            primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
+          return;
+        z_index =
+            (int)primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER);
       }
-      if (!primitiveValue ||
-          primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
-        return;
-      style->setZIndex(
-          (int)primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER));
+      style->setZIndex(z_index);
       return;
     }
 
     // length, percent, number
     case CSS_PROP_LINE_HEIGHT: {
+      Length lineHeight;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
           return;
-        style->setLineHeight(parentStyle->lineHeight());
-        return;
+        lineHeight = parentStyle->lineHeight();
+      } else {
+        if (!primitiveValue)
+          return;
+        int type = primitiveValue->primitiveType();
+        if (primitiveValue->getIdent() == CSS_VAL_NORMAL)
+          lineHeight = Length(-100, Percent);
+        else if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
+                 type < CSSPrimitiveValue::CSS_DEG)
+          lineHeight = Length(
+              primitiveValue->computeLength(style, paintDeviceMetrics), Fixed);
+        else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
+          lineHeight = Length((style->font().pixelSize() *
+                               int(primitiveValue->getFloatValue(
+                                   CSSPrimitiveValue::CSS_PERCENTAGE))) /
+                                  100,
+                              Fixed);
+        else if (type == CSSPrimitiveValue::CSS_NUMBER)
+          lineHeight = Length(
+              int(primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER) *
+                  100),
+              Percent);
+        else
+          return;
       }
-      Length lineHeight;
-      if (!primitiveValue)
-        return;
-      int type = primitiveValue->primitiveType();
-      if (primitiveValue->getIdent() == CSS_VAL_NORMAL)
-        lineHeight = Length(-100, Percent);
-      else if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
-               type < CSSPrimitiveValue::CSS_DEG)
-        lineHeight = Length(
-            primitiveValue->computeLength(style, paintDeviceMetrics), Fixed);
-      else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
-        lineHeight = Length((style->font().pixelSize() *
-                             int(primitiveValue->getFloatValue(
-                                 CSSPrimitiveValue::CSS_PERCENTAGE))) /
-                                100,
-                            Fixed);
-      else if (type == CSSPrimitiveValue::CSS_NUMBER)
-        lineHeight = Length(
-            int(primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER) *
-                100),
-            Percent);
-      else
-        return;
       style->setLineHeight(lineHeight);
       return;
     }
@@ -2493,10 +2543,7 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
       // 	qDebug("setting clip right to %d", right.value );
       // 	qDebug("setting clip bottom to %d", bottom.value );
       // 	qDebug("setting clip left to %d", left.value );
-      style->setClipTop(top);
-      style->setClipRight(right);
-      style->setClipBottom(bottom);
-      style->setClipLeft(left);
+      style->setClip(top, right, bottom, left);
 
       style->setJsClipMode(
           (!strictParsing && prop->m_id == CSS_PROP__KONQ_JS_CLIP) ? true
@@ -2581,7 +2628,11 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
                 fontDirty = true;
             }
             return;
+#ifdef APPLE_CHANGES
+          }  // make prepare-ChangeLog happy
+#else
           }
+#endif
         }
         break;
       }

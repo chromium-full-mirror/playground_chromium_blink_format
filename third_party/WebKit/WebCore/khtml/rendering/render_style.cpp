@@ -28,41 +28,31 @@
 
 using namespace khtml;
 
-StyleSurroundData::StyleSurroundData() {
-  margin.left = Length(0, Fixed);
-  margin.right = Length(0, Fixed);
-  margin.top = Length(0, Fixed);
-  margin.bottom = Length(0, Fixed);
-  padding.left = Length(0, Fixed);
-  padding.right = Length(0, Fixed);
-  padding.top = Length(0, Fixed);
-  padding.bottom = Length(0, Fixed);
-}
+StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Fixed) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
-    : SharedData() {
-  offset = o.offset;
-  margin = o.margin;
-  padding = o.padding;
-  border = o.border;
-}
+    : Shared<StyleSurroundData>(),
+      offset(o.offset),
+      margin(o.margin),
+      padding(o.padding),
+      border(o.border) {}
 
 bool StyleSurroundData::operator==(const StyleSurroundData& o) const {
   return offset == o.offset && margin == o.margin && padding == o.padding &&
          border == o.border;
 }
 
-StyleBoxData::StyleBoxData() {}
+StyleBoxData::StyleBoxData() : z_index(ZAUTO) {}
 
-StyleBoxData::StyleBoxData(const StyleBoxData& o) : SharedData() {
-  width = o.width;
-  height = o.height;
-  min_width = o.min_width;
-  max_width = o.max_width;
-  min_height = o.min_height;
-  max_height = o.max_height;
-  z_index = o.z_index;
-}
+StyleBoxData::StyleBoxData(const StyleBoxData& o)
+    : Shared<StyleBoxData>(),
+      width(o.width),
+      height(o.height),
+      min_width(o.min_width),
+      max_width(o.max_width),
+      min_height(o.min_height),
+      max_height(o.max_height),
+      z_index(o.z_index) {}
 
 bool StyleBoxData::operator==(const StyleBoxData& o) const {
   return width == o.width && height == o.height && min_width == o.min_width &&
@@ -70,56 +60,68 @@ bool StyleBoxData::operator==(const StyleBoxData& o) const {
          max_height == o.max_height && z_index == o.z_index;
 }
 
-StyleVisualData::StyleVisualData() {
-  colspan = 1;
-  palette = QApplication::palette();
-  counter_increment = counter_reset = 0;
-}
+StyleVisualData::StyleVisualData()
+    : colspan(1),
+      counter_increment(0),
+      counter_reset(0),
+      palette(QApplication::palette()) {}
 
 StyleVisualData::~StyleVisualData() {}
 
-StyleVisualData::StyleVisualData(const StyleVisualData& o) : SharedData() {
-  clip = o.clip;
-  colspan = o.colspan;
-  counter_increment = o.counter_increment;
-  counter_reset = o.counter_reset;
-  palette = o.palette;
+StyleVisualData::StyleVisualData(const StyleVisualData& o)
+    : Shared<StyleVisualData>(),
+      clip(o.clip),
+      colspan(o.colspan),
+      counter_increment(o.counter_increment),
+      counter_reset(o.counter_reset),
+      palette(o.palette) {}
+
+StyleBackgroundData::StyleBackgroundData() : image(0) {}
+
+StyleBackgroundData::StyleBackgroundData(const StyleBackgroundData& o)
+    : Shared<StyleBackgroundData>(),
+      color(o.color),
+      image(o.image),
+      x_position(o.x_position),
+      y_position(o.y_position),
+      outline(o.outline) {}
+
+bool StyleBackgroundData::operator==(const StyleBackgroundData& o) const {
+  return color == o.color && image == o.image && x_position == o.x_position &&
+         y_position == o.y_position && outline == o.outline;
 }
 
-void RenderStyle::setBitDefaults() {
-  inherited_flags._border_collapse = true;
-  inherited_flags._empty_cells = SHOW;
-  inherited_flags._caption_side = CAPTOP;
-  inherited_flags._list_style_type = DISC;
-  inherited_flags._list_style_position = OUTSIDE;
-  inherited_flags._visibility = VISIBLE;
-  inherited_flags._text_align = TAAUTO;
-  inherited_flags._text_transform = TTNONE;
-  inherited_flags._direction = LTR;
-  inherited_flags._white_space = NORMAL;
-  inherited_flags._text_decoration = TDNONE;
-  inherited_flags._cursor_style = CURSOR_AUTO;
-  inherited_flags._font_variant = FVNORMAL;
-  inherited_flags._visuallyOrdered = false;
-  inherited_flags._htmlHacks = false;
-  inherited_flags._unused = 0;
+StyleInheritedData::StyleInheritedData()
+    : indent(Fixed),
+      line_height(-100, Percent),
+      style_image(0),
+      cursor_image(0),
+      font(),
+      color(Qt::black),
+      decoration_color(Qt::black),
+      border_spacing(0) {}
 
-  noninherited_flags._display = INLINE;
+StyleInheritedData::~StyleInheritedData() {}
 
-  noninherited_flags._overflow = OVISIBLE;
-  noninherited_flags._vertical_align = BASELINE;
-  noninherited_flags._clear = CNONE;
-  noninherited_flags._table_layout = TAUTO;
-  noninherited_flags._bg_repeat = REPEAT;
-  noninherited_flags._bg_attachment = SCROLL;
-  noninherited_flags._position = STATIC;
-  noninherited_flags._floating = FNONE;
-  noninherited_flags._flowAroundFloats = false;
-  noninherited_flags._styleType = NOPSEUDO;
-  noninherited_flags._hasHover = false;
-  noninherited_flags._hasActive = false;
-  noninherited_flags._jsClipMode = false;
-  noninherited_flags._unicodeBidi = UBNormal;
+StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
+    : Shared<StyleInheritedData>(),
+      indent(o.indent),
+      line_height(o.line_height),
+      style_image(o.style_image),
+      cursor_image(o.cursor_image),
+      font(o.font),
+      color(o.color),
+      decoration_color(o.decoration_color),
+      border_spacing(o.border_spacing) {}
+
+bool StyleInheritedData::operator==(const StyleInheritedData& o) const {
+  return indent == o.indent && line_height == o.line_height &&
+         border_spacing == o.border_spacing && style_image == o.style_image &&
+         cursor_image == o.cursor_image && font == o.font && color == o.color &&
+         decoration_color == o.decoration_color;
+
+  // doesn't work because structs are not packed
+  // return memcmp(this, &o, sizeof(*this))==0;
 }
 
 RenderStyle::RenderStyle() {
@@ -137,36 +139,34 @@ RenderStyle::RenderStyle() {
   setBitDefaults();
 
   pseudoStyle = 0;
+  content = 0;
 }
 
 RenderStyle::RenderStyle(bool) {
   setBitDefaults();
 
   box.init();
-  box.access()->setDefaultValues();
   visual.init();
   background.init();
   surround.init();
 
   inherited.init();
-  inherited.access()->setDefaultValues();
 
   pseudoStyle = 0;
+  content = 0;
 }
 
-RenderStyle::RenderStyle(const RenderStyle& other) : DOM::DomShared() {
-  inherited_flags = other.inherited_flags;
-  noninherited_flags = other.noninherited_flags;
-
-  box = other.box;
-  visual = other.visual;
-  background = other.background;
-  surround = other.surround;
-
-  inherited = other.inherited;
-
-  pseudoStyle = 0;
-}
+RenderStyle::RenderStyle(const RenderStyle& o)
+    : Shared<RenderStyle>(),
+      inherited_flags(o.inherited_flags),
+      noninherited_flags(o.noninherited_flags),
+      box(o.box),
+      visual(o.visual),
+      background(o.background),
+      surround(o.surround),
+      inherited(o.inherited),
+      pseudoStyle(0),
+      content(o.content) {}
 
 void RenderStyle::inheritFrom(const RenderStyle* inheritParent) {
   inherited = inheritParent->inherited;
@@ -186,43 +186,38 @@ RenderStyle::~RenderStyle() {
     prev->pseudoStyle = 0;
     prev->deref();
   }
+  if (content)
+    delete content;
 }
 
 bool RenderStyle::operator==(const RenderStyle& o) const {
   // compare everything except the pseudoStyle pointer
   return (inherited_flags == o.inherited_flags &&
-          noninherited_flags == o.noninherited_flags &&
-          *box.get() == *o.box.get() && *visual.get() == *o.visual.get() &&
-          *background.get() == *o.background.get() &&
-          *surround.get() == *o.surround.get() &&
-          *inherited.get() == *o.inherited.get());
+          noninherited_flags == o.noninherited_flags && box == o.box &&
+          visual == o.visual && background == o.background &&
+          surround == o.surround && inherited == o.inherited);
 }
 
 RenderStyle* RenderStyle::getPseudoStyle(PseudoId pid) {
-  if (!(noninherited_flags._styleType == NOPSEUDO))
-    return 0;
+  RenderStyle* ps = 0;
+  if (noninherited_flags._styleType == NOPSEUDO) {
+    ps = pseudoStyle;
+    while (ps) {
+      if (ps->noninherited_flags._styleType == pid)
+        break;
 
-  RenderStyle* ps = pseudoStyle;
-
-  while (ps) {
-    if (ps->noninherited_flags._styleType == pid)
-      return ps;
-
-    ps = ps->pseudoStyle;
+      ps = ps->pseudoStyle;
+    }
   }
-
-  return 0;
+  return ps;
 }
 
 RenderStyle* RenderStyle::addPseudoStyle(PseudoId pid) {
   RenderStyle* ps = getPseudoStyle(pid);
 
   if (!ps) {
-    if (pid == BEFORE || pid == AFTER)
-      ps = new RenderPseudoElementStyle();
-    else
-      ps = new RenderStyle(
-          *this);  // use the real copy constructor to get an identical copy
+    ps = new RenderStyle(
+        *this);  // use the real copy constructor to get an identical copy
     ps->ref();
     ps->noninherited_flags._styleType = pid;
     ps->pseudoStyle = pseudoStyle;
@@ -250,7 +245,7 @@ void RenderStyle::removePseudoStyle(PseudoId pid) {
 
 bool RenderStyle::inheritedNotEqual(RenderStyle* other) const {
   return (inherited_flags != other->inherited_flags ||
-          *inherited.get() != *other->inherited.get());
+          inherited != other->inherited);
 }
 
 /*
@@ -404,51 +399,49 @@ void RenderStyle::cleanup() {
   //    SharedData::counter = 0;
 }
 
-RenderPseudoElementStyle::RenderPseudoElementStyle() : RenderStyle() {
-  _contentType = CONTENT_NONE;
-}
-
-RenderPseudoElementStyle::RenderPseudoElementStyle(bool b) : RenderStyle(b) {
-  _contentType = CONTENT_NONE;
-}
-RenderPseudoElementStyle::RenderPseudoElementStyle(const RenderStyle& r)
-    : RenderStyle(r) {
-  _contentType = CONTENT_NONE;
-}
-
-RenderPseudoElementStyle::~RenderPseudoElementStyle() {
-  clearContent();
-}
-
-void RenderPseudoElementStyle::setContent(CachedObject* o) {
-  clearContent();
+void RenderStyle::setContent(CachedObject* o) {
+  if (!content)
+    content = new ContentData;
+  else
+    content->clearContent();
   //    o->ref();
-  _content.object = o;
-  _contentType = CONTENT_OBJECT;
+  content->_content.object = o;
+  content->_contentType = CONTENT_OBJECT;
 }
 
-void RenderPseudoElementStyle::setContent(DOM::DOMStringImpl* s) {
+void RenderStyle::setPaletteColor(QPalette::ColorGroup g,
+                                  QColorGroup::ColorRole r,
+                                  const QColor& c) {
+  visual.access()->palette.setColor(g, r, c);
+}
+
+void RenderStyle::setClip(Length top,
+                          Length right,
+                          Length bottom,
+                          Length left) {
+  StyleVisualData* data = visual.access();
+  data->clip.top = top;
+  data->clip.right = right;
+  data->clip.bottom = bottom;
+  data->clip.left = left;
+}
+
+void RenderStyle::setContent(DOM::DOMStringImpl* s) {
+  if (!content)
+    content = new ContentData;
+  else
+    content->clearContent();
+
+  content->_content.text = s;
+  content->_content.text->ref();
+  content->_contentType = CONTENT_TEXT;
+}
+
+ContentData::~ContentData() {
   clearContent();
-  _content.text = s;
-  _content.text->ref();
-  _contentType = CONTENT_TEXT;
 }
 
-DOM::DOMStringImpl* RenderPseudoElementStyle::contentText() {
-  if (_contentType == CONTENT_TEXT)
-    return _content.text;
-  else
-    return 0;
-}
-
-CachedObject* RenderPseudoElementStyle::contentObject() {
-  if (_contentType == CONTENT_OBJECT)
-    return _content.object;
-  else
-    return 0;
-}
-
-void RenderPseudoElementStyle::clearContent() {
+void ContentData::clearContent() {
   switch (_contentType) {
     case CONTENT_OBJECT:
       //            _content.object->deref();

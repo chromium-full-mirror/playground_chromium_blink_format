@@ -356,124 +356,140 @@ Value GlobalFuncImp::call(ExecState* exec,
       "abcdefghijklmnopqrstuvwxyz"
       "0123456789@*_+-./";
 
-  if (id == Eval) {  // eval()
-    Value x = args[0];
-    if (x.type() != StringType)
-      return x;
-    else {
-      UString s = x.toString(exec);
+  switch (id) {
+    case Eval: {  // eval()
+      Value x = args[0];
+      if (x.type() != StringType)
+        return x;
+      else {
+        UString s = x.toString(exec);
 
-      int sid;
-      int errLine;
-      UString errMsg;
-      ProgramNode* progNode =
-          Parser::parse(s.data(), s.size(), &sid, &errLine, &errMsg);
+        int sid;
+        int errLine;
+        UString errMsg;
+        ProgramNode* progNode =
+            Parser::parse(s.data(), s.size(), &sid, &errLine, &errMsg);
 
-      // no program node means a syntax occurred
-      if (!progNode) {
-        Object err = Error::create(exec, SyntaxError, errMsg.ascii(), errLine);
-        err.put(exec, "sid", Number(sid));
-        exec->setException(err);
-        return err;
+        // no program node means a syntax occurred
+        if (!progNode) {
+          Object err =
+              Error::create(exec, SyntaxError, errMsg.ascii(), errLine);
+          err.put(exec, "sid", Number(sid));
+          exec->setException(err);
+          return err;
+        }
+
+        progNode->ref();
+
+        // enter a new execution context
+        Object glob(exec->interpreter()->globalObject());
+        Object thisVal(Object::dynamicCast(exec->context().thisValue()));
+        ContextImp* ctx = new ContextImp(glob, exec, thisVal, EvalCode,
+                                         exec->context().imp());
+
+        ExecState* newExec = new ExecState(exec->interpreter(), ctx);
+        newExec->setException(exec->exception());  // could be null
+
+        // execute the code
+        Completion c = progNode->execute(newExec);
+
+        // if an exception occured, propogate it back to the previous execution
+        // object
+        if (newExec->hadException())
+          exec->setException(newExec->exception());
+        delete newExec;
+        delete ctx;
+
+        if (progNode->deref())
+          delete progNode;
+        if (c.complType() == ReturnValue)
+          return c;
+        // ### setException() on throw?
+        else if (c.complType() == Normal) {
+          if (c.isValueCompletion())
+            return c.value();
+          else
+            return Undefined();
+        } else {
+          return c;
+        }
       }
-
-      progNode->ref();
-
-      // enter a new execution context
-      Object glob(exec->interpreter()->globalObject());
-      Object thisVal(Object::dynamicCast(exec->context().thisValue()));
-      ContextImp* ctx =
-          new ContextImp(glob, exec, thisVal, EvalCode, exec->context().imp());
-
-      ExecState* newExec = new ExecState(exec->interpreter(), ctx);
-      newExec->setException(exec->exception());  // could be null
-
-      // execute the code
-      Completion c = progNode->execute(newExec);
-
-      // if an exception occured, propogate it back to the previous execution
-      // object
-      if (newExec->hadException())
-        exec->setException(newExec->exception());
-      delete newExec;
-      delete ctx;
-
-      if (progNode->deref())
-        delete progNode;
-      if (c.complType() == ReturnValue)
-        return c;
-      // ### setException() on throw?
-      else if (c.complType() == Normal) {
-        if (c.isValueCompletion())
-          return c.value();
-        else
-          return Undefined();
-      } else
-        return c;
+      break;
     }
-  } else if (id == ParseInt) {
-    String str = args[0].toString(exec);
-    int radix = args[1].toInt32(exec);
-    if (radix == 0)
-      radix = 10;
-    else if (radix < 2 || radix > 36) {
-      res = Number(NaN);
-      return res;
-    }
-    /* TODO: use radix */
-    // Can't use toULong(), we want to accept floating point values too
-    double value = str.value().toDouble(true /*tolerant*/);
-    if (isNaN(value))
-      res = Number(NaN);
-    else
-      res = Number(static_cast<long>(value));  // remove floating-point part
-  } else if (id == ParseFloat) {
-    String str = args[0].toString(exec);
-    res = Number(str.value().toDouble(true /*tolerant*/));
-  } else if (id == IsNaN) {
-    res = Boolean(isNaN(args[0].toNumber(exec)));
-  } else if (id == IsFinite) {
-    Number n = args[0].toNumber(exec);
-    res = Boolean(!n.isNaN() && !n.isInf());
-  } else if (id == Escape) {
-    UString r = "", s, str = args[0].toString(exec);
-    const UChar* c = str.data();
-    for (int k = 0; k < str.size(); k++, c++) {
-      int u = c->unicode();
-      if (u > 255) {
-        char tmp[7];
-        sprintf(tmp, "%%u%04X", u);
-        s = UString(tmp);
-      } else if (strchr(non_escape, (char)u)) {
-        s = UString(c, 1);
-      } else {
-        char tmp[4];
-        sprintf(tmp, "%%%02X", u);
-        s = UString(tmp);
+    case ParseInt: {
+      String str = args[0].toString(exec);
+      int radix = args[1].toInt32(exec);
+      if (radix == 0)
+        radix = 10;
+      else if (radix < 2 || radix > 36) {
+        res = Number(NaN);
+        return res;
       }
-      r += s;
+      /* TODO: use radix */
+      // Can't use toULong(), we want to accept floating point values too
+      double value = str.value().toDouble(true /*tolerant*/);
+      if (isNaN(value))
+        res = Number(NaN);
+      else
+        res = Number(static_cast<long>(value));  // remove floating-point part
+      break;
     }
-    res = String(r);
-  } else if (id == UnEscape) {
-    UString s, str = args[0].toString(exec);
-    int k = 0, len = str.size();
-    while (k < len) {
-      const UChar* c = str.data() + k;
-      UChar u;
-      if (*c == UChar('%') && k <= len - 6 && *(c + 1) == UChar('u')) {
-        u = Lexer::convertUnicode((c + 2)->unicode(), (c + 3)->unicode(),
-                                  (c + 4)->unicode(), (c + 5)->unicode());
-        c = &u;
-        k += 5;
-      } else if (*c == UChar('%') && k <= len - 3) {
-        u = UChar(Lexer::convertHex((c + 1)->unicode(), (c + 2)->unicode()));
-        c = &u;
-        k += 2;
+    case ParseFloat: {
+      String str = args[0].toString(exec);
+      res = Number(str.value().toDouble(true /*tolerant*/));
+      break;
+    }
+    case IsNaN:
+      res = Boolean(isNaN(args[0].toNumber(exec)));
+      break;
+    case IsFinite: {
+      Number n = args[0].toNumber(exec);
+      res = Boolean(!n.isNaN() && !n.isInf());
+      break;
+    }
+    case Escape: {
+      UString r = "", s, str = args[0].toString(exec);
+      const UChar* c = str.data();
+      for (int k = 0; k < str.size(); k++, c++) {
+        int u = c->unicode();
+        if (u > 255) {
+          char tmp[7];
+          sprintf(tmp, "%%u%04X", u);
+          s = UString(tmp);
+        } else if (strchr(non_escape, (char)u)) {
+          s = UString(c, 1);
+        } else {
+          char tmp[4];
+          sprintf(tmp, "%%%02X", u);
+          s = UString(tmp);
+        }
+        r += s;
       }
-      k++;
-      s += UString(c, 1);
+      res = String(r);
+      break;
     }
-    res = String(s);
+    case UnEscape: {
+      UString s, str = args[0].toString(exec);
+      int k = 0, len = str.size();
+      while (k < len) {
+        const UChar* c = str.data() + k;
+        UChar u;
+        if (*c == UChar('%') && k <= len - 6 && *(c + 1) == UChar('u')) {
+          u = Lexer::convertUnicode((c + 2)->unicode(), (c + 3)->unicode(),
+                                    (c + 4)->unicode(), (c + 5)->unicode());
+          c = &u;
+          k += 5;
+        } else if (*c == UChar('%') && k <= len - 3) {
+          u = UChar(Lexer::convertHex((c + 1)->unicode(), (c + 2)->unicode()));
+          c = &u;
+          k += 2;
+        }
+        k++;
+        s += UString(c, 1);
+      }
+      res = String(s);
+      break;
+    }
   }
 
   return res;

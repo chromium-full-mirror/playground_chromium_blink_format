@@ -36,23 +36,8 @@ namespace DOM {
 using khtml::Fixed;
 #endif
 
-#define QT_ALLOC_QCHAR_VEC(N) (QChar*)new char[sizeof(QChar) * (N)]
-#define QT_DELETE_QCHAR_VEC(P) delete[]((char*)(P))
-
-DOMStringImpl::DOMStringImpl(const QChar* str, uint len) {
-  if (str && len) {
-    s = QT_ALLOC_QCHAR_VEC(len);
-    memcpy(s, str, len * sizeof(QChar));
-    l = len;
-  } else {
-    s = QT_ALLOC_QCHAR_VEC(1);  // crash protection
-    s[0] = QChar::null;
-    l = 0;
-  }
-}
-
 DOMStringImpl::DOMStringImpl(const char* str) {
-  if (str) {
+  if (str && *str) {
     l = strlen(str);
     s = QT_ALLOC_QCHAR_VEC(l);
     int i = l;
@@ -61,20 +46,9 @@ DOMStringImpl::DOMStringImpl(const char* str) {
       *ptr++ = *str++;
   } else {
     s = QT_ALLOC_QCHAR_VEC(1);  // crash protection
-    s[0] = QChar::null;
+    s[0] = 0x0;                 // == QChar::null;
     l = 0;
   }
-}
-
-DOMStringImpl::DOMStringImpl(const QChar& ch) {
-  s = QT_ALLOC_QCHAR_VEC(1);
-  s[0] = ch;
-  l = 1;
-}
-
-DOMStringImpl::~DOMStringImpl() {
-  if (s)
-    QT_DELETE_QCHAR_VEC(s);
 }
 
 void DOMStringImpl::append(DOMStringImpl* str) {
@@ -188,10 +162,7 @@ static Length parseLength(QChar* s, unsigned int l) {
   if (ok) {
     return Length(v, Fixed);
   }
-  if (l == 4 && QConstString(s, l).string().contains("auto", false))
-    return Length(0, Variable);
-
-  return Length(0, Undefined);
+  return Length(0, Variable);
 }
 
 Length DOMStringImpl::toLength() const {

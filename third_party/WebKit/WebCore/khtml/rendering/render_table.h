@@ -167,7 +167,7 @@ class RenderTable : public RenderFlow {
       start = 0;
       min = 0;
       max = 0;
-      type = khtml::Undefined;
+      type = khtml::Variable;
       value = 0;
       minCell = 0;
       maxCell = 0;
@@ -459,7 +459,6 @@ class RenderTableCol : public RenderContainer {
 
   long span() const { return _span; }
   void setSpan(long s) { _span = s; }
-  khtml::Length width();
 
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 

@@ -895,8 +895,8 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   bool inner = !info.innerNode();
 
   // ### table should have its own, more performant method
-  if (isInline() || isRoot() || isTableRow() || isTableSection() || inside ||
-      mouseInside()) {
+  if (isPositioned() || isInline() || isRoot() || isTableRow() ||
+      isTableSection() || inside || mouseInside()) {
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling())
       if (!child->isPositioned() &&

@@ -462,20 +462,11 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
 
   // kdDebug( 6000 ) << "\nmousePressEvent: x=" << xm << ", y=" << ym << endl;
 
-  // Make this frame the active one
-  // ### need some visual indication for the active frame.
-  /* ### use PartManager (Simon)
-     if ( _isFrame && !_isSelected )
-     {
-      kdDebug( 6000 ) << "activating frame!" << endl;
-      topView()->setFrameSelected(this);
-  }*/
-
   d->isDoubleClick = false;
 
   DOM::NodeImpl::MouseEvent mev(_mouse->stateAfter(),
                                 DOM::NodeImpl::MousePress);
-  m_part->xmlDocImpl()->prepareMouseEvent(xm, ym, &mev);
+  m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
   if (d->clickCount > 0 &&
       QPoint(d->clickX - xm, d->clickY - ym).manhattanLength() <=
@@ -515,7 +506,7 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 
   DOM::NodeImpl::MouseEvent mev(_mouse->stateAfter(),
                                 DOM::NodeImpl::MouseDblClick);
-  m_part->xmlDocImpl()->prepareMouseEvent(xm, ym, &mev);
+  m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
   // We do the same thing as viewportMousePressEvent() here, since the DOM does
   // not treat
@@ -558,7 +549,7 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
 
   DOM::NodeImpl::MouseEvent mev(_mouse->stateAfter(), DOM::NodeImpl::MouseMove);
-  m_part->xmlDocImpl()->prepareMouseEvent(xm, ym, &mev);
+  m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
   bool swallowEvent =
       dispatchMouseEvent(EventImpl::MOUSEMOVE_EVENT, mev.innerNode.handle(),
                          false, 0, _mouse, true, DOM::NodeImpl::MouseMove);
@@ -669,7 +660,7 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
 
   DOM::NodeImpl::MouseEvent mev(_mouse->stateAfter(),
                                 DOM::NodeImpl::MouseRelease);
-  m_part->xmlDocImpl()->prepareMouseEvent(xm, ym, &mev);
+  m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
   bool swallowEvent = dispatchMouseEvent(
       EventImpl::MOUSEUP_EVENT, mev.innerNode.handle(), true, d->clickCount,
@@ -802,32 +793,31 @@ void KHTMLView::keyReleaseEvent(QKeyEvent* _ke) {
 }
 
 void KHTMLView::contentsContextMenuEvent(QContextMenuEvent* _ce) {
-  if (!m_part->xmlDocImpl())
-    return;
-  int xm = _ce->x();
-  int ym = _ce->y();
+// ### what kind of c*** is that ?
+#if 0
+    if (!m_part->xmlDocImpl()) return;
+    int xm = _ce->x();
+    int ym = _ce->y();
 
-  DOM::NodeImpl::MouseEvent mev(
-      _ce->state(), DOM::NodeImpl::MouseMove);  // ### not a mouse event!
-  m_part->xmlDocImpl()->prepareMouseEvent(xm, ym, &mev);
+    DOM::NodeImpl::MouseEvent mev( _ce->state(), DOM::NodeImpl::MouseMove ); // ### not a mouse event!
+    m_part->xmlDocImpl()->prepareMouseEvent( xm, ym, &mev );
 
-  NodeImpl* targetNode = mev.innerNode.handle();
-  if (targetNode && targetNode->renderer() &&
-      targetNode->renderer()->isWidget()) {
-    int absx = 0;
-    int absy = 0;
-    targetNode->renderer()->absolutePosition(absx, absy);
-    QPoint pos(xm - absx, ym - absy);
+    NodeImpl *targetNode = mev.innerNode.handle();
+    if (targetNode && targetNode->renderer() && targetNode->renderer()->isWidget()) {
+        int absx = 0;
+        int absy = 0;
+        targetNode->renderer()->absolutePosition(absx,absy);
+        QPoint pos(xm-absx,ym-absy);
 
 #ifndef APPLE_CHANGES
-    QWidget* w = static_cast<RenderWidget*>(targetNode->renderer())->widget();
+        QWidget *w = static_cast<RenderWidget*>(targetNode->renderer())->widget();
 #endif
-    QContextMenuEvent cme(_ce->reason(), pos, _ce->globalPos(), _ce->state());
-    // ### what kind of c*** is that ?
-    //        setIgnoreEvents(true);
-    //        QApplication::sendEvent(w,&cme);
-    //        setIgnoreEvents(false);
-  }
+        QContextMenuEvent cme(_ce->reason(),pos,_ce->globalPos(),_ce->state());
+        setIgnoreEvents(true);
+        QApplication::sendEvent(w,&cme);
+        setIgnoreEvents(false);
+    }
+#endif
 }
 
 bool KHTMLView::focusNextPrevChild(bool next) {
@@ -1310,17 +1300,17 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
 
   // mouseout/mouseover
   if (setUnder && (d->prevMouseX != clientX || d->prevMouseY != clientY)) {
+    // ### this code sucks. we should save the oldUnder instead of calculating
+    // it again. calculating is expensive! (Dirk)
     NodeImpl* oldUnder = 0;
-
     if (d->prevMouseX >= 0 && d->prevMouseY >= 0) {
       NodeImpl::MouseEvent mev(
           _mouse->stateAfter(),
           static_cast<NodeImpl::MouseEventType>(mouseEventType));
-      m_part->xmlDocImpl()->prepareMouseEvent(d->prevMouseX, d->prevMouseY,
-                                              &mev);
+      m_part->xmlDocImpl()->prepareMouseEvent(true, d->prevMouseX,
+                                              d->prevMouseY, &mev);
       oldUnder = mev.innerNode.handle();
     }
-
     if (oldUnder != targetNode) {
       // send mouseout event to the old node
       if (oldUnder) {

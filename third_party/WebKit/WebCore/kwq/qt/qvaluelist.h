@@ -156,11 +156,11 @@ class QValueList {
   const T& operator[](uint index) const {
     return ((const QValueListNode<T>*)impl.nodeAt(index))->value;
   }
-  QValueList<T>& operator+=(const T& value) {
+  QValueList& operator+=(const T& value) {
     impl.appendNode(new QValueListNode<T>(value));
     return *this;
   }
-  QValueList<T>& operator<<(const T& value) {
+  QValueList& operator<<(const T& value) {
     impl.appendNode(new QValueListNode<T>(value));
     return *this;
   }

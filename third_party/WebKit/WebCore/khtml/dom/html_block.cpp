@@ -37,11 +37,7 @@ HTMLBlockquoteElement::HTMLBlockquoteElement(HTMLBlockquoteElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLBlockquoteElement& HTMLBlockquoteElement::operator=(const Node& other) {
-  if (other.elementId() != ID_BLOCKQUOTE) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_BLOCKQUOTE);
   return *this;
 }
 
@@ -74,11 +70,7 @@ HTMLDivElement::HTMLDivElement(const HTMLDivElement& other)
 HTMLDivElement::HTMLDivElement(HTMLDivElementImpl* impl) : HTMLElement(impl) {}
 
 HTMLDivElement& HTMLDivElement::operator=(const Node& other) {
-  if (other.elementId() != ID_DIV) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_DIV);
   return *this;
 }
 
@@ -109,11 +101,7 @@ HTMLHRElement::HTMLHRElement(const HTMLHRElement& other) : HTMLElement(other) {}
 HTMLHRElement::HTMLHRElement(HTMLHRElementImpl* impl) : HTMLElement(impl) {}
 
 HTMLHRElement& HTMLHRElement::operator=(const Node& other) {
-  if (other.elementId() != ID_HR) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_HR);
   return *this;
 }
 
@@ -186,10 +174,12 @@ HTMLHeadingElement& HTMLHeadingElement::operator=(const Node& other) {
   if (other.elementId() != ID_H1 || other.elementId() != ID_H2 ||
       other.elementId() != ID_H3 || other.elementId() != ID_H4 ||
       other.elementId() != ID_H5 || other.elementId() != ID_H6) {
+    if (impl)
+      impl->deref();
     impl = 0;
-    return *this;
+  } else {
+    Node::operator=(other);
   }
-  Node::operator=(other);
   return *this;
 }
 
@@ -223,11 +213,7 @@ HTMLParagraphElement::HTMLParagraphElement(HTMLParagraphElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLParagraphElement& HTMLParagraphElement::operator=(const Node& other) {
-  if (other.elementId() != ID_P) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_P);
   return *this;
 }
 
@@ -260,11 +246,7 @@ HTMLPreElement::HTMLPreElement(const HTMLPreElement& other)
 HTMLPreElement::HTMLPreElement(HTMLPreElementImpl* impl) : HTMLElement(impl) {}
 
 HTMLPreElement& HTMLPreElement::operator=(const Node& other) {
-  if (other.elementId() != ID_PRE) {
-    impl = 0;
-    return *this;
-  }
-  Node::operator=(other);
+  assignOther(other, ID_PRE);
   return *this;
 }
 

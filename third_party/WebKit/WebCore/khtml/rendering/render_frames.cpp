@@ -27,6 +27,7 @@
 #include "rendering/render_root.h"
 #include "html/html_baseimpl.h"
 #include "html/html_objectimpl.h"
+#include "html/htmltokenizer.h"
 #include "misc/htmlattrs.h"
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom_docimpl.h"
@@ -758,14 +759,13 @@ bool RenderPartObject::partLoadingErrorNotify(khtml::ChildFrame* childFrame,
   // Dissociate ourselves from the current event loop (to prevent crashes
   // due to the message box staying up)
   QTimer::singleShot(0, this, SLOT(slotPartLoadingErrorNotify()));
-  /*
-   // The proper fix, but this doesn't work well yet (msg box keeps appearing)
-  Tokenizer *tokenizer = static_cast<DOM::DocumentImpl
-  *>(part->document().handle())->tokenizer();
-  if (tokenizer) tokenizer->setOnHold( true );
+  Tokenizer* tokenizer =
+      static_cast<DOM::DocumentImpl*>(part->document().handle())->tokenizer();
+  if (tokenizer)
+    tokenizer->setOnHold(true);
   slotPartLoadingErrorNotify();
-  if (tokenizer) tokenizer->setOnHold( false );
-  */
+  if (tokenizer)
+    tokenizer->setOnHold(false);
   return false;
 }
 
@@ -846,14 +846,15 @@ void RenderPartObject::layout() {
   KHTMLAssert(!layouted());
   KHTMLAssert(minMaxKnown());
 
+#ifndef APPLE_CHANGES
   short m_oldwidth = m_width;
   int m_oldheight = m_height;
+#endif
 
   calcWidth();
   calcHeight();
 
-  if (m_width != m_oldwidth || m_height != m_oldheight)
-    RenderPart::layout();
+  RenderPart::layout();
 
   setLayouted();
 }

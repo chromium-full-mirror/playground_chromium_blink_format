@@ -38,7 +38,7 @@ namespace khtml {
 
 class RenderApplet : public RenderWidget {
  public:
-  RenderApplet(DOM::HTMLElementImpl* node, QMap<QString, QString> args);
+  RenderApplet(DOM::HTMLElementImpl* node, const QMap<QString, QString>& args);
   virtual ~RenderApplet();
 
   virtual const char* renderName() const { return "RenderApplet"; }
@@ -46,13 +46,14 @@ class RenderApplet : public RenderWidget {
   virtual void layout();
   virtual short intrinsicWidth() const;
   virtual int intrinsicHeight() const;
+  virtual bool isApplet() const { return true; }
 
   DOM::HTMLElementImpl* element() const {
     return static_cast<DOM::HTMLElementImpl*>(RenderObject::element());
   }
 
  private:
-  void processArguments(QMap<QString, QString> args);
+  void processArguments(const QMap<QString, QString>& args);
 };
 
 class RenderEmptyApplet : public RenderWidget {

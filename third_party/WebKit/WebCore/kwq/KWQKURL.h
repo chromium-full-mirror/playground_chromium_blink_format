@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,30 +36,17 @@
 typedef void NSURL;
 #endif
 
-// class KURL ==================================================================
-
 class KURL {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
-
-  static QString decode_string(const QString& urlString);
-  static void clearCaches();
-
-  // constructors, copy constructors, and destructors ------------------------
-
   KURL();
   KURL(const char*, int encoding_hint = 0);
   KURL(const KURL&, const QString&);
   KURL(const QString&, int encoding_hint = 0);
+
   KURL(const KURL&);
 
   ~KURL();
-
-  // member functions --------------------------------------------------------
+  KURL& operator=(const KURL&);
 
   bool isEmpty() const;
   bool isMalformed() const;
@@ -88,14 +75,10 @@ class KURL {
 
   NSURL* getNSURL() const;
 
-  // operators ---------------------------------------------------------------
+  static QString decode_string(const QString& urlString);
+  static void clearCaches();
 
-  KURL& operator=(const KURL&);
-
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+  friend bool operator==(const KURL&, const KURL&);
 
  private:
   void swap(KURL& other);
@@ -109,7 +92,6 @@ class KURL {
 
   mutable KWQRefPtr<KWQKURLPrivate> d;
   QString urlString;
-};  // class KURL
-    // ===============================================================
+};
 
 #endif
