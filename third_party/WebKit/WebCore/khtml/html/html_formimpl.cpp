@@ -1194,6 +1194,16 @@ void HTMLInputElementImpl::attach() {
   assert(!m_render);
   assert(parentNode());
 
+  // We had to wait until the attach call to do this, because we don't yet know
+  // our type in parseAttribute.  This also has to be done *before* we do
+  // styleForElement, or the width info will not get used.  This fixes
+  // spinner.com on the PLT -dwh.
+  if (m_type == IMAGE && parentNode()->renderer()) {
+    DOMString width = getAttribute(ATTR_WIDTH);
+    if (!width.isEmpty())
+      addCSSLength(CSS_PROP_WIDTH, width);
+  }
+
   RenderStyle* _style = getDocument()->styleSelector()->styleForElement(this);
   _style->ref();
   if (parentNode()->renderer() && _style->display() != NONE) {
@@ -1214,10 +1224,6 @@ void HTMLInputElementImpl::attach() {
         m_render = new (arena) RenderSubmitButton(this);
         break;
       case IMAGE: {
-        DOMString width = getAttribute(ATTR_WIDTH);
-        if (!width.isEmpty()) {
-          addCSSLength(CSS_PROP_WIDTH, width);
-        }
         m_render = new (arena) RenderImageButton(this);
         m_render->setStyle(_style);
         parentNode()->renderer()->addChild(m_render, nextRenderer());
