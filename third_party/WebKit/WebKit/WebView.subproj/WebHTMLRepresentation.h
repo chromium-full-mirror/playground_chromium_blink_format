@@ -7,8 +7,10 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol WebDocumentRepresentation;
 @class WebHTMLRepresentationPrivate;
+
+@protocol WebDocumentRepresentation;
+@protocol WebDOMDocument;
 
 /*!
     @class WebHTMLRepresentation
@@ -22,6 +24,12 @@
     @abstract Get the actual source of the document.
 */
 - (NSString*)documentSource;
+
+/*!
+    @method DOMDocument
+    @abstract return the DOM document for this data source.
+*/
+- (id<WebDOMDocument>)DOMDocument;
 
 /*!
     @method documentSource
