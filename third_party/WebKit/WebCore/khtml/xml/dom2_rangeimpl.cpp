@@ -1312,6 +1312,14 @@ bool RangeImpl::containedByReadOnly() const {
   return false;
 }
 
+Position RangeImpl::startPosition() const {
+  return Position(m_startContainer, m_startOffset);
+}
+
+Position RangeImpl::endPosition() const {
+  return Position(m_endContainer, m_endOffset);
+}
+
 NodeImpl* RangeImpl::startNode() const {
   if (!m_startContainer)
     return 0;

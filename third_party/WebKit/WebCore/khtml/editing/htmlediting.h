@@ -783,7 +783,12 @@ class ReplacementFragment {
   bool isTreeFragment() const { return m_type == TreeFragment; }
 
   bool hasMoreThanOneBlock() const { return m_hasMoreThanOneBlock; }
-  bool hasInterchangeNewline() const { return m_hasInterchangeNewline; }
+  bool hasInterchangeNewlineAtStart() const {
+    return m_hasInterchangeNewlineAtStart;
+  }
+  bool hasInterchangeNewlineAtEnd() const {
+    return m_hasInterchangeNewlineAtEnd;
+  }
 
  private:
   // no copy construction or assignment
@@ -811,7 +816,8 @@ class ReplacementFragment {
   DOM::DocumentFragmentImpl* m_fragment;
   QValueList<NodeDesiredStyle> m_styles;
   bool m_matchStyle;
-  bool m_hasInterchangeNewline;
+  bool m_hasInterchangeNewlineAtStart;
+  bool m_hasInterchangeNewlineAtEnd;
   bool m_hasMoreThanOneBlock;
 };
 
@@ -840,6 +846,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
   void updateNodesInserted(DOM::NodeImpl*);
   void fixupNodeStyles(const QValueList<NodeDesiredStyle>&);
+  void removeLinePlaceholderIfNeeded(DOM::NodeImpl*);
 
   ReplacementFragment m_fragment;
   DOM::NodeImpl* m_firstNodeInserted;

@@ -99,6 +99,9 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   enum ActionType { DELETE_CONTENTS, EXTRACT_CONTENTS, CLONE_CONTENTS };
   DocumentFragmentImpl* processContents(ActionType action, int& exceptioncode);
 
+  Position startPosition() const;
+  Position endPosition() const;
+
   NodeImpl* startNode() const;
   NodeImpl* pastEndNode() const;
 
