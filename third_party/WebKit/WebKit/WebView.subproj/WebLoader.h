@@ -24,15 +24,19 @@
   NSURL* currentURL;
   BOOL isDownload;
   BOOL reachedTerminalState;
+  BOOL defersCallbacks;
 }
 
-- (WebResourceHandle*)handle;
+- (void)loadWithRequest:(WebResourceRequest*)request;
 
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;
+
 - (id<WebResourceLoadDelegate>)resourceLoadDelegate;
 - (id<WebResourceLoadDelegate>)downloadDelegate;
 - (void)setIsDownload:(BOOL)f;
 - (void)cancel;
+
+- (void)setDefersCallbacks:(BOOL)defers;
 
 @end

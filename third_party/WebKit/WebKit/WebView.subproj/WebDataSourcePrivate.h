@@ -32,9 +32,8 @@
   WebResourceRequest* request;
   WebResourceResponse* response;
 
-  // Client for main resource, and corresponding handle.
+  // Client for main resource.
   WebMainResourceClient* mainClient;
-  WebResourceHandle* mainHandle;
 
   // Clients for other resources.
   NSMutableArray* subresourceClients;
