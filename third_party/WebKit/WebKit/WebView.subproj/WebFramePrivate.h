@@ -174,4 +174,7 @@ typedef enum {
 
 - (void)_setJustOpenedForTargetedLink:(BOOL)justOpened;
 
+- (BOOL)_canCachePage;
+- (void)_purgePageCache;
+
 @end

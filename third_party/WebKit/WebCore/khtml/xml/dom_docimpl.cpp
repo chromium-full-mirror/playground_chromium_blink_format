@@ -329,7 +329,10 @@ DocumentImpl::~DocumentImpl() {
   if (m_focusNode)
     m_focusNode->deref();
 
-  delete m_renderArena;
+  if (m_renderArena) {
+    delete m_renderArena;
+    m_renderArena = 0;
+  }
 }
 
 DocumentTypeImpl* DocumentImpl::doctype() const {
@@ -990,6 +993,7 @@ void DocumentImpl::attach() {
 void DocumentImpl::detach() {
 #if APPLE_CHANGES
   if (!m_inPageCache) {
+// printf ("detaching document\n");
 #endif
     RenderObject* render = m_render;
 
@@ -1003,10 +1007,15 @@ void DocumentImpl::detach() {
 
     m_view = 0;
 
-    delete m_renderArena;
-    m_renderArena = 0;
+    if (m_renderArena) {
+      delete m_renderArena;
+      m_renderArena = 0;
+    }
 #if APPLE_CHANGES
   }
+// else {
+//    printf ("not detaching document\n");
+//}
 #endif
 }
 
