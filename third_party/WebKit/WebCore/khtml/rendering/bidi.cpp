@@ -815,7 +815,6 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
   BidiRun* r = runs.first();
 
   while (r) {
-    // printf("level = %d\n", r->level);
     if (r->level > levelHigh)
       levelHigh = r->level;
     if (r->level < levelLow)
@@ -1208,8 +1207,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       adjustEmbeddding = false;
     }
   }
-  if (start.atEnd())
+  if (start.atEnd()) {
     return start;
+  }
 
   // This variable is used only if whitespace isn't set to PRE, and it tells us
   // whether
@@ -1221,7 +1221,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
   // this to detect when we encounter a second space so we know we have to
   // terminate
   // a run.
-  bool sawSpace = false;
+  bool currentCharacterIsSpace = false;
   RenderObject* trailingSpaceObject = 0;
 
   // The pos of the last whitespace char we saw, not to be confused with the
@@ -1292,7 +1292,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       }
       isLineEmpty = false;
       ignoringSpaces = false;
-      sawSpace = false;
+      currentCharacterIsSpace = false;
       lastSpacePos = 0;
       trailingSpaceObject = 0;
 
@@ -1311,7 +1311,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
             (static_cast<RenderText*>(next)->text()[0].direction() ==
                  QChar::DirWS ||
              static_cast<RenderText*>(next)->text()[0] == '\n')) {
-          sawSpace = true;
+          currentCharacterIsSpace = true;
           ignoringSpaces = true;
           BidiIterator* endMid = new (o->renderArena()) BidiIterator();
           endMid->obj = o;
@@ -1336,40 +1336,43 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       while (len) {
         // XXXdwh This is wrong. Still mutating the DOM
         // string for newlines... will fix in second stage.
-        if (!isPre && str[pos] == '\n')
+        if (!isPre && str[pos] == '\n') {
           str[pos] = ' ';
+        }
 
-        bool oldSawSpace = sawSpace;
-        sawSpace = (str[pos].direction() == QChar::DirWS);
+        bool previousCharacterIsSpace = currentCharacterIsSpace;
+        currentCharacterIsSpace = (str[pos].direction() == QChar::DirWS);
 
-        if (isPre || !sawSpace)
+        if (isPre || !currentCharacterIsSpace)
           isLineEmpty = false;
 
         bool applyWordSpacing = false;
         if ((isPre && str[pos] == '\n') ||
             (!isPre && isBreakable(str, pos, strlen))) {
           if (ignoringSpaces) {
-            if (!sawSpace) {
+            if (!currentCharacterIsSpace) {
               // Stop ignoring spaces and begin at this
               // new point.
               BidiIterator* startMid = new (o->renderArena()) BidiIterator();
               startMid->obj = o;
               startMid->pos = pos;
               midpoints.append(startMid);
+              ignoringSpaces = false;
             } else {
               // Just keep ignoring these spaces.
               pos++;
               len--;
               continue;
             }
-          } else {
-            if (sawSpace && !oldSawSpace)
-              lastSpacePos = pos;
-            tmpW += t->width(lastSpace, pos - lastSpace, f);
-            applyWordSpacing =
-                (wordSpacing && sawSpace && !oldSawSpace &&
-                 t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
           }
+
+          if (currentCharacterIsSpace && !previousCharacterIsSpace)
+            lastSpacePos = pos;
+          tmpW += t->width(lastSpace, pos - lastSpace, f);
+          applyWordSpacing =
+              (wordSpacing && currentCharacterIsSpace &&
+               !previousCharacterIsSpace &&
+               t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
 
 #ifdef DEBUG_LINEBREAKS
           kdDebug(6041) << "found space at " << pos << " in string '"
@@ -1389,8 +1392,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
             }
           }
 
-          if (w + tmpW > width && o->style()->whiteSpace() == NORMAL)
+          if (w + tmpW > width && o->style()->whiteSpace() == NORMAL) {
             goto end;
+          }
 
           lBreak.obj = o;
           lBreak.pos = pos;
@@ -1415,8 +1419,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
             // If we encounter a newline, or if we encounter a
             // second space, we need to go ahead and break up this
             // run and enter a mode where we start collapsing spaces.
-            if (sawSpace && oldSawSpace)
+            if (currentCharacterIsSpace && previousCharacterIsSpace) {
               ignoringSpaces = true;
+            }
 
             if (ignoringSpaces) {
               // We just entered a mode where we are ignoring
@@ -1445,9 +1450,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
           midpoints.append(startMid);
         }
 
-        if (!isPre && sawSpace && !ignoringSpaces)
+        if (!isPre && currentCharacterIsSpace && !ignoringSpaces)
           trailingSpaceObject = o;
-        else if (isPre || !sawSpace)
+        else if (isPre || !currentCharacterIsSpace)
           trailingSpaceObject = 0;
 
         pos++;
@@ -1465,7 +1470,8 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       // << width << endl;
       // kdDebug() << "start=" << start.obj << " current=" << o << endl;
       // if we have floats, try to get below them.
-      if (sawSpace && !ignoringSpaces && o->style()->whiteSpace() != PRE)
+      if (currentCharacterIsSpace && !ignoringSpaces &&
+          o->style()->whiteSpace() != PRE)
         trailingSpaceObject = 0;
 
       int fb = nearestFloatBottom(m_height);
@@ -1529,6 +1535,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
   }
 
 end:
+
   int determinedWidth = w + tmpW;
   if (lBreak == start && !lBreak.obj->isBR()) {
     // we just add as much as possible

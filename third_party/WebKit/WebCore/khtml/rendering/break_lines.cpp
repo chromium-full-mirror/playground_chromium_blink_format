@@ -88,6 +88,10 @@ bool isBreakable(const QChar* s, int pos, int len)
   const QChar* c = s + pos;
   unsigned short ch = c->unicode();
 
+  if (ch == '\n') {
+    return true;
+  }
+
   if (ch > 0x7f) {
     status =
         UCCreateTextBreakLocator(NULL, 0, kUCTextBreakLineMask, &breakLocator);
@@ -96,13 +100,12 @@ bool isBreakable(const QChar* s, int pos, int len)
                                    (const UniChar*)s, len, pos, &end);
     }
     // If carbon fails, fail back on simple white space detection.
-    if (findStatus == 0)
+    if (findStatus == 0) {
       return ((int)end == pos) ? true : false;
+    }
   }
-  // What about hypenation?  We will correctly handle japanese hyphenation
-  // above, but
-  // not here.
-  return c->direction() == QChar::DirWS || ch == '\n';
+  // What about hypenation?
+  return c->direction() == QChar::DirWS;
 #endif
 }
 };
