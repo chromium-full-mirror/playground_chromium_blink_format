@@ -23,8 +23,24 @@
 
 #include "helper.h"
 
+#if APPLE_CHANGES
+#include "KWQTextUtilities.h"
+#endif
+
 QPainter* khtml::printpainter = 0;
 
 void khtml::setPrintPainter(QPainter* printer) {
   printpainter = printer;
+}
+
+void khtml::findWordBoundary(QChar* chars,
+                             int len,
+                             int position,
+                             int* start,
+                             int* end) {
+#if APPLE_CHANGES
+  KWQFindWordBoundary(chars, len, position, start, end);
+#else
+// KDE implementation
+#endif
 }

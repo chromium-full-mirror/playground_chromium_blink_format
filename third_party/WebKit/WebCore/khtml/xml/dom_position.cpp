@@ -25,7 +25,9 @@
 
 #include "dom_position.h"
 
+#include "helper.h"
 #include "htmltags.h"
+#include "qstring.h"
 #include "rendering/render_block.h"
 #include "rendering/render_line.h"
 #include "rendering/render_object.h"
@@ -45,6 +47,7 @@ using DOM::NodeImpl;
 using khtml::InlineBox;
 using khtml::InlineFlowBox;
 using khtml::InlineTextBox;
+using khtml::RenderBlock;
 using khtml::RenderObject;
 using khtml::RenderText;
 using khtml::RootInlineBox;
@@ -288,6 +291,58 @@ DOMPosition DOMPosition::nextCharacterPosition() const {
   return *this;
 }
 
+DOMPosition DOMPosition::previousWordPosition() const {
+  if (isEmpty())
+    return DOMPosition();
+
+  DOMPosition pos = *this;
+  for (EditIterator it(*this); !it.atStart(); it.previous()) {
+    if (it.current().node()->nodeType() == Node::TEXT_NODE ||
+        it.current().node()->nodeType() == Node::CDATA_SECTION_NODE) {
+      DOMString t = it.current().node()->nodeValue();
+      QChar* chars = t.unicode();
+      uint len = t.length();
+      int start, end;
+      khtml::findWordBoundary(chars, len, it.current().offset(), &start, &end);
+      pos = DOMPosition(it.current().node(), start);
+    } else {
+      pos = DOMPosition(it.current().node(),
+                        it.current().node()->caretMinOffset());
+    }
+    if (pos != *this)
+      return pos;
+    it.setPosition(pos);
+  }
+
+  return *this;
+}
+
+DOMPosition DOMPosition::nextWordPosition() const {
+  if (isEmpty())
+    return DOMPosition();
+
+  DOMPosition pos = *this;
+  for (EditIterator it(*this); !it.atEnd(); it.next()) {
+    if (it.current().node()->nodeType() == Node::TEXT_NODE ||
+        it.current().node()->nodeType() == Node::CDATA_SECTION_NODE) {
+      DOMString t = it.current().node()->nodeValue();
+      QChar* chars = t.unicode();
+      uint len = t.length();
+      int start, end;
+      khtml::findWordBoundary(chars, len, it.current().offset(), &start, &end);
+      pos = DOMPosition(it.current().node(), end);
+    } else {
+      pos = DOMPosition(it.current().node(),
+                        it.current().node()->caretMaxOffset());
+    }
+    if (pos != *this)
+      return pos;
+    it.setPosition(pos);
+  }
+
+  return *this;
+}
+
 DOMPosition DOMPosition::previousLinePosition(int x) const {
   if (!node())
     return DOMPosition();
@@ -299,10 +354,10 @@ DOMPosition DOMPosition::previousLinePosition(int x) const {
   if (!box)
     return *this;
 
-  NodeImpl* previousLineNode = 0;
+  RenderBlock* containingBlock = 0;
   RootInlineBox* root = box->root()->prevRootBox();
   if (root) {
-    previousLineNode = node();
+    containingBlock = node()->renderer()->containingBlock();
   } else {
     // This containing editable block does not have a previous line.
     // Need to move back to previous containing editable block in this root
@@ -320,28 +375,19 @@ DOMPosition DOMPosition::previousLinePosition(int x) const {
         ASSERT(box);
         // previous root line box found
         root = box->root();
-        previousLineNode = n;
+        containingBlock = n->renderer()->containingBlock();
       }
     }
   }
 
-  if (!root)
-    return *this;
-  ASSERT(previousLineNode);
+  if (root) {
+    int absx, absy;
+    containingBlock->absolutePosition(absx, absy);
+    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    return renderer->positionForCoordinates(x, absy + root->topOverflow());
+  }
 
-  int absx, absy;
-  previousLineNode->renderer()->containingBlock()->absolutePosition(absx, absy);
-  int y = absy + root->topOverflow() +
-          ((root->bottomOverflow() - root->topOverflow()) / 2);
-
-  RenderObject::NodeInfo nodeInfo(true, true);
-  previousLineNode->getDocument()->renderer()->layer()->nodeAtPoint(nodeInfo, x,
-                                                                    y);
-
-  if (!nodeInfo.innerNode() || !nodeInfo.innerNode()->renderer())
-    return *this;
-
-  return nodeInfo.innerNode()->renderer()->positionForCoordinates(x, y);
+  return *this;
 }
 
 DOMPosition DOMPosition::nextLinePosition(int x) const {
@@ -355,10 +401,10 @@ DOMPosition DOMPosition::nextLinePosition(int x) const {
   if (!box)
     return *this;
 
-  NodeImpl* nextLineNode = 0;
+  RenderBlock* containingBlock = 0;
   RootInlineBox* root = box->root()->nextRootBox();
   if (root) {
-    nextLineNode = node();
+    containingBlock = node()->renderer()->containingBlock();
   } else {
     // This containing editable block does not have a next line.
     // Need to move forward to next containing editable block in this root
@@ -376,26 +422,19 @@ DOMPosition DOMPosition::nextLinePosition(int x) const {
         ASSERT(box);
         // previous root line box found
         root = box->root();
-        nextLineNode = n;
+        containingBlock = n->renderer()->containingBlock();
       }
     }
   }
 
-  if (!root)
-    return *this;
-  ASSERT(nextLineNode);
+  if (root) {
+    int absx, absy;
+    containingBlock->absolutePosition(absx, absy);
+    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    return renderer->positionForCoordinates(x, absy + root->topOverflow());
+  }
 
-  int absx, absy;
-  nextLineNode->renderer()->containingBlock()->absolutePosition(absx, absy);
-  int y = absy + root->topOverflow() +
-          ((root->bottomOverflow() - root->topOverflow()) / 2);
-
-  RenderObject::NodeInfo nodeInfo(true, true);
-  nextLineNode->getDocument()->renderer()->layer()->nodeAtPoint(nodeInfo, x, y);
-  if (!nodeInfo.innerNode() || !nodeInfo.innerNode()->renderer())
-    return *this;
-
-  return nodeInfo.innerNode()->renderer()->positionForCoordinates(x, y);
+  return *this;
 }
 
 DOMPosition DOMPosition::equivalentUpstreamPosition() const {

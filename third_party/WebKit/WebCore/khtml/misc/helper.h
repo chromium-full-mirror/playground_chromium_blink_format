@@ -22,8 +22,10 @@
 #ifndef html_helper_h
 #define html_helper_h
 
-#include <qcolor.h>
 class QPainter;
+class QChar;
+
+#include <qcolor.h>
 #include <qfontmetrics.h>
 #include <qfont.h>
 
@@ -46,6 +48,12 @@ enum FindSelectionResult {
   SelectionPointBeforeInLine,
   SelectionPointAfterInLine
 };
+
+void findWordBoundary(QChar* chars,
+                      int len,
+                      int position,
+                      int* start,
+                      int* end);
 };
 
 #endif
