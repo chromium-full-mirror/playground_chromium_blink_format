@@ -112,6 +112,8 @@ enum FrameBorderStyle {
 
 - (void)setParent:(WebCoreBridge*)parent;
 
+- (void)provisionalLoadStarted;
+
 - (void)openURL:(NSURL*)URL
           reload:(BOOL)reload
      contentType:(NSString*)contentType
