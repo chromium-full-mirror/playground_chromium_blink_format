@@ -15,7 +15,6 @@
                                    IFDocumentSearching> {
   BOOL canDragFrom;
   BOOL canDragTo;
-  BOOL isRTF;
 }
 
 - (void)provisionalDataSourceChanged:(IFWebDataSource*)dataSource;
