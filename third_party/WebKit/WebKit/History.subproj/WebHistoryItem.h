@@ -5,11 +5,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class NSURL;
+
 /*!
     @class WebHistoryItem
 */
 @interface WebHistoryItem : NSObject {
   NSString* _URLString;
+  NSString* _originalURLString;
   NSString* _target;
   NSString* _parent;
   NSString* _title;
@@ -38,6 +41,7 @@
 
 - (NSURL*)URL;
 - (NSString*)URLString;
+- (NSString*)originalURLString;
 - (NSString*)target;
 - (NSString*)parent;
 - (NSString*)title;
@@ -50,6 +54,7 @@
 - (NSString*)anchor;
 
 - (void)setURL:(NSURL*)URL;
+- (void)setOriginalURLString:(NSString*)URL;
 - (void)setTarget:(NSString*)target;
 - (void)setParent:(NSString*)parent;
 - (void)setTitle:(NSString*)title;
