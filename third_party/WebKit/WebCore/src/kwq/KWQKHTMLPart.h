@@ -604,6 +604,10 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
 #endif
 #endif
 
+  // this function checks to see whether a base URI and all its
+  // associated sub-URIs have loaded
+  void checkCompleted();
+
  private:
   KHTMLPartPrivate* d;
   // DUBIOUS, why are impls being referenced?
