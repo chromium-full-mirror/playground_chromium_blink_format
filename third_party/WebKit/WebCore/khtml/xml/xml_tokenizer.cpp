@@ -643,6 +643,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
       doc->createTextNode(
           "Below is a rendering of the page up to the first error."),
       exceptioncode);
+#ifdef KHTML_XSLT
   if (doc->transformSourceDocument()) {
     ElementImpl* par =
         doc->createElementNS(XHTML_NAMESPACE, "p", exceptioncode);
@@ -654,6 +655,7 @@ void XMLTokenizer::insertErrorMessageBlock() {
                             "are from the transformed result."),
         exceptioncode);
   }
+#endif
   root->insertBefore(reportDiv, root->firstChild(), exceptioncode);
 
   doc->updateRendering();
