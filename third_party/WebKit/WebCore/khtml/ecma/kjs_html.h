@@ -557,6 +557,8 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
   static const ClassInfo info;
   enum { Src, Complete, OnLoad };
 
+  khtml::CachedImage* image() { return img; }
+
  private:
   UString src;
   QGuardedPtr<DOM::DocumentImpl> doc;
@@ -603,7 +605,10 @@ class Context2D : public DOMObject {
     AddBezierCurveToPoint,
     ClearRect,
     DrawImage,
-    DrawImageFromRect
+    DrawImageFromRect,
+    SetShadow,
+    SetShadowWithColor,
+    ClearShadow
   };
 
   DOM::HTMLElementImpl* _element;
