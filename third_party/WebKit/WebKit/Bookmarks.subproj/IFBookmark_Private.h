@@ -17,5 +17,6 @@
 - (void)_setParent:(IFBookmark*)parent;
 - (void)_setGroup:(IFBookmarkGroup*)group;
 - (void)_insertChild:(IFBookmark*)bookmark atIndex:(unsigned)index;
+- (void)_removeChild:(IFBookmark*)bookmark;
 
 @end
