@@ -245,6 +245,7 @@ void RenderRoot::repaintRectangle(int x, int y, int w, int h, bool f) {
 
   if (ur.intersects(vr))
     if (m_view)
+      // m_view->updateContents(ur);
       m_view->scheduleRepaint(x, y, w, h);
 }
 
