@@ -33,11 +33,11 @@
 #include <runtime_object.h>
 
 using namespace KJS;
-using namespace Bindings;
+using namespace KJS::Bindings;
 
 JavaParameter::JavaParameter(JNIEnv* env, jstring type) {
   _type = JavaString(env, type);
-  _JNIType = JNITypeFromClassName(_type.characters());
+  _JNIType = JNITypeFromClassName(_type.UTF8String());
 };
 
 JavaField::JavaField(JNIEnv* env, jobject aField) {
@@ -47,7 +47,7 @@ JavaField::JavaField(JNIEnv* env, jobject aField) {
   jstring fieldTypeName = (jstring)callJNIObjectMethod(fieldType, "getName",
                                                        "()Ljava/lang/String;");
   _type = JavaString(env, fieldTypeName);
-  _JNIType = JNITypeFromClassName(_type.characters());
+  _JNIType = JNITypeFromClassName(_type.UTF8String());
 
   // Get field name
   jstring fieldName =
@@ -200,7 +200,7 @@ JavaMethod::JavaMethod(JNIEnv* env, jobject aMethod) {
   jstring returnTypeName = (jstring)callJNIObjectMethod(returnType, "getName",
                                                         "()Ljava/lang/String;");
   _returnType = JavaString(env, returnTypeName);
-  _JNIReturnType = JNITypeFromClassName(_returnType.characters());
+  _JNIReturnType = JNITypeFromClassName(_returnType.UTF8String());
 
   // Get method name
   jstring methodName =
@@ -261,7 +261,7 @@ const char* JavaMethod::signature() const {
 
     _signature->append(signatureFromPrimitiveType(_JNIReturnType));
     if (_JNIReturnType == object_type) {
-      appendClassName(_signature, _returnType.characters());
+      appendClassName(_signature, _returnType.UTF8String());
       _signature->append(";");
     }
   }

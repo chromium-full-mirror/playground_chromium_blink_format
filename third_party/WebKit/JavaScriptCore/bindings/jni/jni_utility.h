@@ -44,9 +44,10 @@ typedef enum {
   double_type
 } JNIType;
 
+namespace KJS {
+
 namespace Bindings {
 class JavaParameter;
-}
 
 const char* getCharactersFromJString(jstring aJString);
 void releaseCharactersForJString(jstring aJString, const char* s);
@@ -137,5 +138,9 @@ jdouble callJNIDoubleMethodA(jobject obj,
 
 JavaVM* getJavaVM();
 JNIEnv* getJNIEnv();
+
+}  // namespace Bindings
+
+}  // namespace KJS
 
 #endif

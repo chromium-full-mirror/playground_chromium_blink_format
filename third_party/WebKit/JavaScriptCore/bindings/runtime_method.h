@@ -50,6 +50,7 @@ class RuntimeMethodImp : public FunctionImp {
  private:
   Bindings::Method* method;
 };
-};
+
+}  // namespace KJS
 
 #endif

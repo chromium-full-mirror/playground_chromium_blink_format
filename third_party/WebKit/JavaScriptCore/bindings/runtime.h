@@ -28,6 +28,8 @@
 #include "list.h"
 #include "value.h"
 
+namespace KJS {
+
 namespace Bindings {
 
 class Instance;
@@ -128,6 +130,9 @@ class Array {
 };
 
 const char* signatureForParameters(const KJS::List& aList);
-};
+
+}  // namespace Bindings
+
+}  // namespace KJS
 
 #endif

@@ -34,6 +34,8 @@
 
 #include <runtime.h>
 
+namespace KJS {
+
 namespace Bindings {
 
 class JavaClass : public Class {
@@ -113,5 +115,9 @@ class JavaClass : public Class {
   JavaConstructor* _constructors;
   long _numConstructors;
 };
-}
+
+}  // namespace Bindings
+
+}  // namespace KJS
+
 #endif

@@ -34,7 +34,6 @@
 
 namespace KJS {
 class Value;
-}
 
 namespace Bindings {
 
@@ -44,7 +43,8 @@ class JavaString {
 
   void _commonInit(JNIEnv* e, jstring s) {
     // We could be more efficient:  only create
-    // _characters from _uchars on demand.
+    // _characters from _uchars on demand.  Maybe just
+    // use a UString?
     _size = e->GetStringLength(s);
     const char* c = getCharactersFromJStringInEnv(e, s);
     _characters = strdup(c);
@@ -85,7 +85,7 @@ class JavaString {
     return *this;
   }
 
-  const char* characters() const { return _characters; }
+  const char* UTF8String() const { return _characters; }
   const jchar* uchars() const { return _uchars; }
   int length() const { return _size; }
   KJS::UString ustring() const {
@@ -121,7 +121,7 @@ class JavaParameter : public Parameter {
     return *this;
   }
 
-  virtual RuntimeType type() const { return _type.characters(); }
+  virtual RuntimeType type() const { return _type.UTF8String(); }
 
   JNIType getJNIType() const { return _JNIType; }
 
@@ -198,8 +198,8 @@ class JavaField : public Field {
                                   const Instance* instance,
                                   const KJS::Value& aValue) const;
 
-  virtual const char* name() const { return _name.characters(); }
-  virtual RuntimeType type() const { return _type.characters(); }
+  virtual const char* name() const { return _name.UTF8String(); }
+  virtual RuntimeType type() const { return _type.UTF8String(); }
 
   JNIType getJNIType() const { return _JNIType; }
 
@@ -249,8 +249,8 @@ class JavaMethod : public Method {
   };
 
   virtual KJS::Value value() const { return KJS::Value(0); }
-  virtual const char* name() const { return _name.characters(); };
-  virtual RuntimeType returnType() const { return _returnType.characters(); };
+  virtual const char* name() const { return _name.UTF8String(); };
+  virtual RuntimeType returnType() const { return _returnType.UTF8String(); };
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
   virtual long numParameters() const { return _numParameters; };
 
@@ -302,6 +302,9 @@ class JavaArray : public Array {
   unsigned int _length;
   const char* _type;
 };
-}
+
+}  // namespace Bindings
+
+}  // namespace KJS
 
 #endif
