@@ -28,6 +28,7 @@
 #include "dom/html_table.h"
 #include "dom/html_object.h"
 #include "dom/dom_exception.h"
+#include "xml/dom2_eventsimpl.h"
 
 // ### HACK
 #include "html/html_baseimpl.h"
@@ -40,6 +41,7 @@
 #include "ecma/kjs_html.h"
 #include "ecma/kjs_window.h"
 #include "ecma/kjs_html.lut.h"
+#include "kjs_events.h"
 
 #include "misc/htmltags.h"
 
@@ -4179,6 +4181,7 @@ const ClassInfo KJS::Image::info = {"Image", 0, &ImageTable, 0};
 @begin ImageTable 3
   src		Image::Src		DontDelete
   complete	Image::Complete		DontDelete|ReadOnly
+  onload        Image::OnLoad           DontDelete
 @end
 */
 
@@ -4193,6 +4196,12 @@ Value Image::getValueProperty(ExecState*, int token) const {
       return String(src);
     case Complete:
       return Boolean(!img || img->status() >= khtml::CachedObject::Persistent);
+    case OnLoad:
+      if (onLoadListener) {
+        return onLoadListener->listenerObj();
+      } else {
+        return Null();
+      }
     default:
       kdWarning() << "Image::getValueProperty unhandled token " << token
                   << endl;
@@ -4204,22 +4213,46 @@ void Image::tryPut(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
                    int attr) {
-  // Not worth using the hashtable
-  if (propertyName == "src") {
-    String str = value.toString(exec);
-    src = str.value();
-    if (img)
-      img->deref(this);
-    img = doc ? doc->docLoader()->requestImage(src.string()) : 0;
-    if (img)
-      img->ref(this);
-  } else {
-    DOMObject::tryPut(exec, propertyName, value, attr);
+  DOMObjectLookupPut<Image, DOMObject>(exec, propertyName, value, attr,
+                                       &ImageTable, this);
+}
+
+void Image::putValue(ExecState* exec,
+                     int token,
+                     const Value& value,
+                     int /*attr*/) {
+  switch (token) {
+    case Src: {
+      String str = value.toString(exec);
+      src = str.value();
+      if (img)
+        img->deref(this);
+      img = doc ? doc->docLoader()->requestImage(src.string()) : 0;
+      if (img)
+        img->ref(this);
+      break;
+    }
+    case OnLoad:
+      onLoadListener =
+          Window::retrieveActive(exec)->getJSEventListener(value, true);
+      break;
+    default:
+      kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
+  }
+}
+
+void Image::notifyFinished(khtml::CachedObject*) {
+  if (onLoadListener) {
+    DOM::Event ev = doc->view()->part()->document().createEvent("HTMLEvents");
+    ev.initEvent("load", true, true);
+    onLoadListener->handleEvent(ev, true);
   }
 }
 
 Image::Image(const DOM::Document& d)
-    : doc(static_cast<DOM::DocumentImpl*>(d.handle())), img(0) {}
+    : doc(static_cast<DOM::DocumentImpl*>(d.handle())),
+      img(0),
+      onLoadListener(0) {}
 
 Image::~Image() {
   if (img)

@@ -540,15 +540,18 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
                       const Identifier& propertyName,
                       const Value& value,
                       int attr = None);
+  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  void notifyFinished(khtml::CachedObject*);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum { Src, Complete };
+  enum { Src, Complete, OnLoad };
 
  private:
   UString src;
   QGuardedPtr<DOM::DocumentImpl> doc;
   khtml::CachedImage* img;
+  JSEventListener* onLoadListener;
 };
 
 Value getHTMLCollection(ExecState* exec, const DOM::HTMLCollection& c);
