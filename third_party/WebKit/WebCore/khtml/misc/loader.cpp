@@ -963,8 +963,8 @@ CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
                                      time_t _expireDate)
     : CachedObject(url, XBL, _cachePolicy, _expireDate), m_document(0) {
   // It's XML we want.
-  setAccept(
-      QString::fromLatin1("text/xml, application/xml, application/xml+xhtml"));
+  setAccept(QString::fromLatin1(
+      "text/xml, application/xml, application/xml+xhtml, text/xsl"));
 
   // Load the file
   Cache::loader()->load(dl, this, false);
