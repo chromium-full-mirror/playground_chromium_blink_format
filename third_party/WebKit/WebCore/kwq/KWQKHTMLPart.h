@@ -52,6 +52,8 @@ class NSEvent;
 
 enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
 
+using khtml::RenderObject;
+
 class KWQKHTMLPart : public KHTMLPart {
  public:
   KWQKHTMLPart();
@@ -102,6 +104,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void restoreWindowProperties(KJS::SavedProperties* windowProperties);
   void restoreLocationProperties(KJS::SavedProperties* locationProperties);
   void openURLFromPageCache(DOM::DocumentImpl* doc,
+                            RenderObject* renderer,
                             KURL* url,
                             KJS::SavedProperties* windowProperties,
                             KJS::SavedProperties* locationProperties);
