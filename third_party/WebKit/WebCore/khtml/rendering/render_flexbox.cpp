@@ -215,6 +215,7 @@ void RenderFlexibleBox::calcMinMaxWidth() {
 
   if (style()->width().isFixed() && style()->width().value > 0)
     m_minWidth = m_maxWidth = short(style()->width().value);
+  // FIXME: also compare with min/max width CSS properties...
 
   int toAdd = borderLeft() + borderRight() + paddingLeft() + paddingRight();
   m_minWidth += toAdd;
