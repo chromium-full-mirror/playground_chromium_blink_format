@@ -332,6 +332,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString altText() const;
 
+  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+
  protected:
   DOMString m_value;
   int xPos;

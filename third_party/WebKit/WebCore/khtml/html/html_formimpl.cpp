@@ -1851,6 +1851,11 @@ bool HTMLInputElementImpl::isEditable() {
           (m_type == FILE));
 }
 
+bool HTMLInputElementImpl::isSubresourceURLAttribute(
+    AttributeImpl* attr) const {
+  return (attr->id() == ATTR_SRC);
+}
+
 // -------------------------------------------------------------------------
 
 HTMLLabelElementImpl::HTMLLabelElementImpl(DocumentPtr* doc)
