@@ -118,6 +118,8 @@ typedef enum {
 - (void)_setLoadType:(WebFrameLoadType)loadType;
 - (WebFrameLoadType)_loadType;
 
+- (void)_addExtraFieldsToRequest:(WebResourceRequest*)request;
+
 - (void)_checkNavigationPolicyForRequest:(WebResourceRequest*)request
                               dataSource:(WebDataSource*)dataSource
                                  andCall:(id)target
@@ -127,7 +129,8 @@ typedef enum {
 
 - (NSDictionary*)_actionInformationForNavigationType:
                      (WebNavigationType)navigationType
-                                               event:(NSEvent*)event;
+                                               event:(NSEvent*)event
+                                         originalURL:(NSURL*)URL;
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
             loadType:(WebFrameLoadType)loadType
