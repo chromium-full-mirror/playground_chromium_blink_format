@@ -57,5 +57,6 @@
 - (void)_restoreSubviews;
 
 - (BOOL)_insideAnotherHTMLView;
+- (void)_updateMouseoverWithEvent:(NSEvent*)event;
 
 @end
