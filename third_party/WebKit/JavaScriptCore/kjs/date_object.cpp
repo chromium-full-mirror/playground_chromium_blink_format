@@ -66,6 +66,7 @@
 
 #define gmtime(x) gmtimeUsingCF(x)
 #define localtime(x) localtimeUsingCF(x)
+#define mktime(x) mktimeUsingCF(x)
 
 struct tm* tmUsingCF(time_t tv, CFTimeZoneRef timeZone) {
   static struct tm result;
@@ -107,6 +108,24 @@ struct tm* localtimeUsingCF(const time_t* tv) {
   CFTimeZoneRef timeZone = CFTimeZoneCopyDefault();
   struct tm* result = tmUsingCF(*tv, timeZone);
   CFRelease(timeZone);
+  return result;
+}
+
+time_t mktimeUsingCF(struct tm* tm) {
+  CFTimeZoneRef timeZone = CFTimeZoneCopyDefault();
+
+  CFGregorianDate date;
+  date.second = tm->tm_sec;
+  date.minute = tm->tm_min;
+  date.hour = tm->tm_hour;
+  date.day = tm->tm_mday;
+  date.month = tm->tm_mon + 1;
+  date.year = tm->tm_year + 1900;
+
+  CFAbsoluteTime absoluteTime = CFGregorianDateGetAbsoluteTime(date, timeZone);
+
+  time_t result = (time_t)(absoluteTime + kCFAbsoluteTimeIntervalSince1970);
+
   return result;
 }
 
