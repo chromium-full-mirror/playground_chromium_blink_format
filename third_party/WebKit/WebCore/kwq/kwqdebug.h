@@ -96,13 +96,15 @@ void KWQLog(unsigned int level,
 #import <sys/time.h>
 #import <sys/resource.h>
 
-#define KWQ_ASSERTION_FAILURE                                              \
-  do {                                                                     \
-    struct rlimit _rlimit = {RLIM_INFINITY, RLIM_INFINITY};                \
-    setrlimit(RLIMIT_CORE, &_rlimit);                                      \
-    fprintf(stderr, "assertion failure at %s:%d %s\n", __FILE__, __LINE__, \
-            __PRETTY_FUNCTION__);                                          \
-    raise(SIGQUIT);                                                        \
+#define KWQ_ASSERTION_FAILURE                                \
+  do {                                                       \
+    struct rlimit _rlimit = {RLIM_INFINITY, RLIM_INFINITY};  \
+    setrlimit(RLIMIT_CORE, &_rlimit);                        \
+    fprintf(stderr,                                          \
+            "=================\nASSERTION FAILURE at %s:%d " \
+            "%s\n=================\n",                       \
+            __FILE__, __LINE__, __PRETTY_FUNCTION__);        \
+    raise(SIGQUIT);                                          \
   } while (0)
 
 #define KWQ_ASSERT(expr)     \
