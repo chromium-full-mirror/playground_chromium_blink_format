@@ -18,7 +18,6 @@
  *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  *  Boston, MA 02111-1307, USA.
  *
- *  $Id$
  */
 
 #ifdef HAVE_CONFIG_H
@@ -60,7 +59,7 @@ int kjsyylex() {
 }
 
 Lexer::Lexer()
-    : yylineno(0),
+    : yylineno(1),
       size8(128),
       size16(128),
       restrKeyword(false),
@@ -97,7 +96,7 @@ Lexer* Lexer::curr() {
 }
 
 void Lexer::setCode(const UChar* c, unsigned int len) {
-  yylineno = 0;
+  yylineno = 1;
   restrKeyword = false;
   delimited = false;
   eatNextIdentifier = false;
@@ -127,6 +126,14 @@ void Lexer::shift(unsigned int p) {
     next2 = next3;
     next3 = (pos + 3 < length) ? code[pos + 3].unicode() : 0;
   }
+}
+
+// called on each new line
+void Lexer::nextLine() {
+  yylineno++;
+#ifndef KJS_PURE_ECMA
+  bol = true;
+#endif
 }
 
 void Lexer::setDone(State s) {
@@ -182,10 +189,7 @@ int Lexer::lex() {
           } else
             setDone(Eof);
         } else if (isLineTerminator()) {
-          yylineno++;
-#ifndef KJS_PURE_ECMA
-          bol = true;
-#endif
+          nextLine();
           terminator = true;
           if (restrKeyword) {
             token = ';';
@@ -208,11 +212,11 @@ int Lexer::lex() {
           state = InDecimal;
 #ifndef KJS_PURE_ECMA
           // <!-- marks the beginning of a line comment (for www usage)
-        } else if (bol && current == '<' && next1 == '!' && next2 == '-' &&
+        } else if (current == '<' && next1 == '!' && next2 == '-' &&
                    next3 == '-') {
           shift(3);
           state = InSingleLineComment;
-          // same of -->
+          // same for -->
         } else if (bol && current == '-' && next1 == '-' && next2 == '>') {
           shift(2);
           state = InSingleLineComment;
@@ -222,7 +226,7 @@ int Lexer::lex() {
           if (token != -1) {
             setDone(Other);
           } else {
-            //	  cerr << "encountered unknown character" << endl;
+            //      cerr << "encountered unknown character" << endl;
             setDone(Bad);
           }
         }
@@ -297,11 +301,8 @@ int Lexer::lex() {
         break;
       case InSingleLineComment:
         if (isLineTerminator()) {
-          yylineno++;
+          nextLine();
           terminator = true;
-#ifndef KJS_PURE_ECMA
-          bol = true;
-#endif
           if (restrKeyword) {
             token = ';';
             setDone(Other);
@@ -315,7 +316,7 @@ int Lexer::lex() {
         if (current == 0) {
           setDone(Bad);
         } else if (isLineTerminator()) {
-          yylineno++;
+          nextLine();
         } else if (current == '*' && next1 == '/') {
           state = Start;
           shift(1);

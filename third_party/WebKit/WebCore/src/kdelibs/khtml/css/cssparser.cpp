@@ -753,24 +753,19 @@ static const QChar* getNext(const QChar* curP, const QChar* endP, bool& last) {
   last = false;
   const QChar* nextP = curP;
   bool ignoreSpace = false;
-  while (nextP <= endP) {
+  while (nextP < endP) {
     if (*nextP == '(') {
       ignoreSpace = true;
     } else if (*nextP == ')') {
       ignoreSpace = false;
     }
-    if (*nextP == ' ' && !ignoreSpace) {
-      if (nextP == endP) {
-        last = true;
-      }
+    if (*nextP == ' ' && !ignoreSpace)
+      return nextP;
+    if (*nextP == ';')
       break;
-    }
-    if (*nextP == ';' || nextP == endP) {
-      last = true;
-      break;
-    }
     nextP++;
   }
+  last = true;
   return nextP;
 }
 // ------------------- begin font property ---------------------
@@ -1386,7 +1381,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         {
           if (cssval) {
             int id = cssval->id;
-            if (id >= CSS_VAL_LEFT && id <= CSS_VAL__KONQ_CENTER) {
+            if (id >= CSS_VAL__KONQ_AUTO && id <= CSS_VAL__KONQ_CENTER) {
               parsedValue = new CSSPrimitiveValueImpl(id);
               break;
             }
@@ -1650,7 +1645,10 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
           if (str.left(4).lower() == "url(") {
             DOMString value(curP, endP - curP);
             value = khtml::parseURL(value);
-            parsedValue = new CSSImageValueImpl(value, this);
+            if (!value.isEmpty())
+              parsedValue = new CSSImageValueImpl(
+                  DOMString(KURL(baseURL().string(), value.string()).url()),
+                  this);
 #ifdef CSS_DEBUG
             kdDebug(6080) << "image, url=" << value.string()
                           << " base=" << baseURL().string() << endl;
@@ -1900,36 +1898,34 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
       case CSS_PROP_TEXT_DECORATION:
         // none | [ underline || overline || line-through || blink ] | inherit
         {
-          if (cssval) {
-            if (cssval->id == CSS_VAL_NONE) {
-              parsedValue = new CSSPrimitiveValueImpl(cssval->id);
+          if (cssval && cssval->id == CSS_VAL_NONE) {
+            parsedValue = new CSSPrimitiveValueImpl(cssval->id);
+          } else {
+            CSSValueListImpl* list = new CSSValueListImpl;
+            value.simplifyWhiteSpace();
+            // kdDebug( 6080 ) << "text-decoration: '" << value << "'" << endl;
+            int pos = 0, pos2;
+            while (1) {
+              pos2 = value.find(' ', pos);
+              QString decoration = value.mid(pos, pos2 - pos);
+              decoration = decoration.stripWhiteSpace();
+              // kdDebug( 6080 ) << "found decoration '" << decoration << "'" <<
+              // endl;
+              const struct css_value* cssval =
+                  findValue(decoration.lower().ascii(), decoration.length());
+              if (cssval) {
+                list->append(new CSSPrimitiveValueImpl(cssval->id));
+              }
+              pos = pos2 + 1;
+              if (pos2 == -1)
+                break;
+            }
+            // kdDebug( 6080 ) << "got " << list->length() << "d decorations" <<
+            // endl;
+            if (list->length()) {
+              parsedValue = list;
             } else {
-              CSSValueListImpl* list = new CSSValueListImpl;
-              value.simplifyWhiteSpace();
-              // kdDebug( 6080 ) << "text-decoration: '" << str << "'" << endl;
-              int pos = 0, pos2;
-              while (1) {
-                pos2 = value.find(' ', pos);
-                QString decoration = value.mid(pos, pos2 - pos);
-                decoration = decoration.stripWhiteSpace();
-                // kdDebug( 6080 ) << "found decoration '" << decoration << "'"
-                // << endl;
-                const struct css_value* cssval =
-                    findValue(decoration.lower().ascii(), decoration.length());
-                if (cssval) {
-                  list->append(new CSSPrimitiveValueImpl(cssval->id));
-                }
-                pos = pos2 + 1;
-                if (pos2 == -1)
-                  break;
-              }
-              // kdDebug( 6080 ) << "got " << list->length() << "d decorations"
-              // << endl;
-              if (list->length()) {
-                parsedValue = list;
-              } else {
-                delete list;
-              }
+              delete list;
             }
           }
           break;
@@ -2128,7 +2124,8 @@ bool StyleBaseImpl::parseAuralValue(const QChar* curP,
         DOMString value(curP, endP - curP);
         value = khtml::parseURL(value);
         parsedValue =
-            new CSSPrimitiveValueImpl(value, CSSPrimitiveValue::CSS_URI);
+            new CSSPrimitiveValueImpl(DOMString(KURL(baseURL(), value).url()),
+                                      CSSPrimitiveValue::CSS_URI);
       }
       break;
     }
@@ -2257,10 +2254,11 @@ void StyleBaseImpl::setParsedValue(int propId,
 
   m_propList->append(prop);
 #ifdef CSS_DEBUG
-  kdDebug(6080) << "added property: " << getPropertyName(propId).string()
-                << ", value: " << parsedValue->cssText().string()
-                << " important: " << prop->m_bImportant
-                << " nonCSS: " << prop->nonCSSHint << endl;
+  kdDebug(6080)
+      << "added property: " << getPropertyName(propId).string()
+      // non implemented yet << ", value: " << parsedValue->cssText().string()
+      << " important: " << prop->m_bImportant << " nonCSS: " << prop->nonCSSHint
+      << endl;
 #endif
 }
 
@@ -2280,8 +2278,8 @@ bool StyleBaseImpl::parseShortHand(const QChar* curP,
     fnd[i] = false;
 
 #ifdef CSS_DEBUG
-  kdDebug(6080) << "PSH: parsing \"" << QString(curP, endP - curP) << "\""
-                << endl;
+  kdDebug(6080) << "PSH: parsing \"" << QString(curP, endP - curP)
+                << "\" num=" << num << endl;
 #endif
 
   for (int j = 0; j < num; ++j) {
@@ -2292,6 +2290,8 @@ bool StyleBaseImpl::parseShortHand(const QChar* curP,
     for (int propIndex = 0; propIndex < num; ++propIndex) {
       if (!fnd[propIndex]) {
         // We have to tread this seperately
+        // kdDebug(6080) << "LOOKING FOR: " <<
+        // getPropertyName(properties[propIndex]).string() << endl;
         bool found = false;
         if (!isLast && properties[propIndex] == CSS_PROP_BACKGROUND_POSITION)
           found = parseBackgroundPosition(curP, nextP, endP);
@@ -2358,7 +2358,7 @@ bool StyleBaseImpl::parseBackgroundPosition(const QChar* curP,
 
     // kdDebug(6080) << "BKCGR: Single: \"" << QString(curP, nextP - curP) <<
     // "\"" << endl;
-    found = parseValue(curP, bckgrNextP, CSS_PROP_BACKGROUND_POSITION);
+    found = parseValue(curP, nextP, CSS_PROP_BACKGROUND_POSITION);
   } else {
     // Moving on
     nextP = bckgrNextP;
@@ -2372,12 +2372,7 @@ CSSValueImpl* StyleBaseImpl::parseContent(const QChar* curP,
   CSSValueListImpl* values = new CSSValueListImpl();
 
   QPtrList<QChar> list = splitContent(curP, endP);
-#if APPLE_CHANGES
-  for (unsigned n = 0; n < list.count(); n += 2)
-#else
-  for (int n = 0; n < list.count(); n += 2)
-#endif
-  {
+  for (uint n = 0; n < list.count(); n += 2) {
     QString str(list.at(n), list.at(n + 1) - list.at(n));
     CSSValueImpl* parsedValue = 0;
 
@@ -2385,7 +2380,8 @@ CSSValueImpl* StyleBaseImpl::parseContent(const QChar* curP,
       // url
       DOMString value(curP, endP - curP);
       value = khtml::parseURL(value);
-      parsedValue = new CSSImageValueImpl(value, this);
+      parsedValue = new CSSImageValueImpl(
+          DOMString(KURL(baseURL().string(), value.string()).url()), this);
 #ifdef CSS_DEBUG
       kdDebug(6080) << "content, url=" << value.string()
                     << " base=" << baseURL().string() << endl;
@@ -2809,7 +2805,8 @@ CSSRuleImpl* StyleBaseImpl::parseRule(const QChar*& curP, const QChar* endP) {
   kdDebug(6080) << "parse rule: current = " << curP->latin1() << endl;
 #endif
 
-  if (*curP == '@') {
+  if (*curP == '@' && curP != endP &&
+      ((curP + 1)->isLetter() || (curP + 1)->unicode() > 0xa0)) {
     rule = parseAtRule(curP, endP);
   } else {
     rule = parseStyleRule(curP, endP);
@@ -2849,14 +2846,15 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
   // ### use DOMString here to avoid coversions
   QString processed;
 
-  bool sq = false;         // Within single quote
-  bool dq = false;         // Within double quote
-  bool bracket = false;    // Within brackets, e.g. url(ThisIsStupid)
-  bool comment = false;    // Within comment
-  bool firstChar = false;  // Beginning of comment either /* or */
-  bool space = true;       // Last token was space
-  int curlyBracket = 0;    // Within curlyBrackets -> lower
-  hasInlinedDecl = false;  // reset the inlined decl. flag
+  bool sq = false;                  // Within single quote
+  bool dq = false;                  // Within double quote
+  bool bracket = false;             // Within brackets, e.g. url(ThisIsStupid)
+  bool comment = false;             // Within comment
+  bool skipgarbage = !justOneRule;  // skip <!-- and ---> only in specifc places
+  bool firstChar = false;           // Beginning of comment either /* or */
+  bool space = true;                // Last token was space
+  int curlyBracket = 0;             // Within curlyBrackets -> lower
+  hasInlinedDecl = false;           // reset the inlined decl. flag
 
   const QChar* ch = str.unicode();
   const QChar* last = ch + str.length();
@@ -2868,32 +2866,18 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
   kdDebug(6080) << "Length: " << orgLength << endl;
 #endif
 
-  if (!(justOneRule)) {
-    /* Remove start of SGML Comment which hides CSS from 3.0 Browsers */
-    while ((ch < last) && (ch->isSpace())) {
-      ++ch;
-    }
-    if ((*ch == '<') && ((ch + 4) < last) && (*(ch + 1) == '!') &&
-        (*(ch + 2) == '-') && (*(ch + 3) == '-')) {
-      ch = ch + 4;  // skip '<!--'
-    }
-
-    /* Remove end of SGML Comment which hides CSS from 3.0 Browsers */
-    while ((last > ch) && ((last - 1)->isSpace())) {
-      --last;
-    }
-    if ((*(last - 1) == '>') && ((last - 3) > ch) && (*(last - 2) == '-') &&
-        (*(last - 3) == '-')) {
-      last = last - 3;  // skip '-->'
-    }
-  }
-
   while (ch < last) {
+    //       qDebug("current: *%s*, sq=%d dq=%d b=%d c=%d fC=%d space=%d cB=%d
+    //       sg=%d",
+    //              QConstString(ch, kMin(last-ch, 10)).string().latin1(), sq,
+    //              dq, bracket, comment, firstChar, space, curlyBracket,
+    //              skipgarbage);
     if (!comment && !sq && *ch == '"') {
       dq = !dq;
       processed += *ch;
-      space = false;
+      space = skipgarbage = false;
     } else if (!comment && !dq && *ch == '\'') {
+      skipgarbage = sq;
       sq = !sq;
       processed += *ch;
       space = false;
@@ -2901,28 +2885,38 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
       bracket = true;
       processed += *ch;
       space = true;  // Explictly true
+      skipgarbage = false;
     } else if (!comment && !dq && !sq && *ch == ')') {
       bracket = false;
       processed += *ch;
       processed += QChar(' ');  // Adding a space after this token
       space = true;
+      skipgarbage = false;
     } else if (!comment && !dq && !sq && *ch == '{') {
       ++curlyBracket;
       processed += *ch;
       space = true;  // Explictly true
+      skipgarbage = true;
     } else if (!comment && !dq && !sq && *ch == '}') {
       --curlyBracket;
       processed += *ch;
       processed += QChar(' ');  // Adding a space after this token
       space = true;
+      skipgarbage = true;
+    } else if (!comment && skipgarbage && !dq && !sq && (*ch == '-') &&
+               ((ch + 2) < last) /* SGML Comment */
+               && (*(ch + 1) == '-') && (*(ch + 2) == '>')) {
+      ch += 2;  // skip -->
+    } else if (!comment && skipgarbage && !dq && !sq && (*ch == '<') &&
+               ((ch + 3) < last) /* SGML Comment */
+               && (*(ch + 1) == '!') && (*(ch + 2) == '-') &&
+               (*(ch + 3) == '-')) {
+      ch += 3;  // skip <!--
     } else if (comment) {
       if (firstChar && *ch == '/') {
         comment = false;
         firstChar = false;
-      } else if ((*ch == '-') && ((ch + 2) < last) /* SGML Comment */
-                 && (*(ch + 1) == '-') && (*(ch + 2) == '>')) {
-        ch = ch + 2;  // skip '->'
-        comment = false;
+        skipgarbage = true;
       } else {
         firstChar = (*ch == '*');
       }
@@ -2943,19 +2937,18 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
         firstChar = false;
       } else if (*ch == '/') {
         firstChar = true;  // Slash added only if next is not '*'
-      } else if ((*ch == '<') && ((ch + 3) < last) /* SGML Comment */
-                 && (*(ch + 1) == '!') && (*(ch + 2) == '-') &&
-                 (*(ch + 3) == '-')) {
-        ch = ch + 3;  // skip '<!--'
-        comment = true;
       } else if (*ch == ',' || *ch == ';') {
         processed += *ch;
         processed += QChar(' ');  // Adding a space after these tokens
         space = true;
+        skipgarbage = true;
       } else {
+        if (!ch->isSpace())
+          skipgarbage = false;
         goto addChar;
       }
     } else {
+      skipgarbage = ch->isSpace();
       goto addChar;
     }
   end:
@@ -2976,7 +2969,7 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
 
 addChar:
   if (!sq && !dq && !bracket) {
-    if (!(space && ch->isSpace())) {  // Don't add more then one space
+    if (!(space && ch->isSpace())) {  // Don't add more than one space
       if (ch->isSpace()) {
         processed += QChar(' ');  // Normalize whitespace
       } else {
@@ -3014,8 +3007,9 @@ StyleListImpl::~StyleListImpl() {
 
 void CSSSelector::print(void) {
   kdDebug(6080) << "[Selector: tag = " << tag << ", attr = \"" << attr
-                << "\", value = \"" << value.string().latin1()
-                << "\" relation = " << (int)relation << endl;
+                << "\", match = \"" << match << "\" value = \""
+                << value.string().latin1() << "\" relation = " << (int)relation
+                << endl;
   if (tagHistory)
     tagHistory->print();
 }
@@ -3065,6 +3059,85 @@ bool CSSSelector::operator==(const CSSSelector& other) {
   if (sel1 || sel2)
     return false;
   return true;
+}
+
+DOMString CSSSelector::selectorText() const {
+  DOMString str;
+  const CSSSelector* cs = this;
+  if (cs->tag == -1 && cs->attr == ATTR_ID && cs->match == CSSSelector::Exact) {
+    str = "#";
+    str += cs->value;
+  } else if (cs->tag == -1 && cs->attr == ATTR_CLASS &&
+             cs->match == CSSSelector::List) {
+    str = ".";
+    str += cs->value;
+  } else if (cs->tag == -1 && cs->match == CSSSelector::Pseudo) {
+    str = ":";
+    str += cs->value;
+  } else {
+    if (cs->tag == -1)
+      str = "*";
+    else
+      str = getTagName(cs->tag);
+    if (cs->attr == ATTR_ID && cs->match == CSSSelector::Exact) {
+      str += "#";
+      str += cs->value;
+    } else if (cs->attr == ATTR_CLASS && cs->match == CSSSelector::List) {
+      str += ".";
+      str += cs->value;
+    } else if (cs->match == CSSSelector::Pseudo) {
+      str += ":";
+      str += cs->value;
+    }
+    // optional attribute
+    if (cs->attr) {
+      DOMString attrName = getAttrName(cs->attr);
+      str += "[";
+      str += attrName;
+      switch (cs->match) {
+        case CSSSelector::Exact:
+          str += "=";
+          break;
+        case CSSSelector::Set:
+          str += " ";  /// ## correct?
+          break;
+        case CSSSelector::List:
+          str += "~=";
+          break;
+        case CSSSelector::Hyphen:
+          str += "|=";
+          break;
+        case CSSSelector::Begin:
+          str += "^=";
+          break;
+        case CSSSelector::End:
+          str += "$=";
+          break;
+        case CSSSelector::Contain:
+          str += "*=";
+          break;
+        default:
+          kdWarning(6080)
+              << "Unhandled case in CSSStyleRuleImpl::selectorText : match="
+              << cs->match << endl;
+      }
+      str += "\"";
+      str += cs->value;
+      str += "\"]";
+    }
+  }
+  if (cs->tagHistory) {
+    DOMString tagHistoryText = cs->tagHistory->selectorText();
+    if (cs->relation == Sibling)
+      str = tagHistoryText + " + " + str;
+    else if (cs->relation == Child)
+      str = tagHistoryText + " > " + str;
+    else if (cs->relation == SubSelector)
+      str += tagHistoryText;  // the ":" is provided by selectorText()
+    else                      // Descendant
+      str = tagHistoryText + " " + str;
+  }
+  return str;
 }
 
 // ----------------------------------------------------------------------------

@@ -19,7 +19,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 
 #ifndef _DOM_EventsImpl_h_
@@ -454,7 +453,7 @@ class KeyEventImpl : public UIEventImpl {
    *  pad was used to generate the key event the value is true,
    *  otherwise the value is false.
    */
-  bool numPad() const;
+  bool numPad() const { return m_numPad; }
 
   /**
    *outputString of type DOMString
@@ -474,7 +473,7 @@ class KeyEventImpl : public UIEventImpl {
    *  representation or no virtual code is available the value is
    *  DOM_VK_UNDEFINED.
    */
-  unsigned long virtKeyVal() const;
+  unsigned long virtKeyVal() const { return m_virtKeyVal; }
 
   QKeyEvent* qKeyEvent;
 

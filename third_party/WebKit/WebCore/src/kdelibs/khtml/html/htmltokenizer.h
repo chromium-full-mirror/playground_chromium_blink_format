@@ -24,7 +24,6 @@
 //----------------------------------------------------------------------------
 //
 // KDE HTML Widget -- Tokenizers
-// $Id$
 
 #ifndef HTMLTOKENIZER_H
 #define HTMLTOKENIZER_H
@@ -71,6 +70,7 @@ class Token {
     id = 0;
     attrs = 0;
     text = 0;
+    flat = false;
     // qDebug("new token, creating %08lx", attrs);
   }
   ~Token() {
@@ -109,10 +109,12 @@ class Token {
       text->deref();
       text = 0;
     }
+    flat = false;
   }
   DOM::NamedAttrMapImpl* attrs;
-  ushort id;
   DOMStringImpl* text;
+  ushort id;
+  bool flat;
 };
 };
 

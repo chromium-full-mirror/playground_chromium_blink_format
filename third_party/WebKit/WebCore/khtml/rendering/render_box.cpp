@@ -19,7 +19,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 // -------------------------------------------------------------------------
 //#define DEBUG_LAYOUT
@@ -158,9 +157,8 @@ void RenderBox::printBoxDecorations(QPainter* p,
   else
     mh = QMIN(_h, h);
 
-  if (!root()->printingMode())
-    printBackground(p, style()->backgroundColor(), style()->backgroundImage(),
-                    my, mh, _tx, _ty, w, h);
+  printBackground(p, style()->backgroundColor(), style()->backgroundImage(), my,
+                  mh, _tx, _ty, w, h);
 
   if (style()->hasBorder())
     printBorder(p, _tx, _ty, w, h, style());
@@ -254,8 +252,7 @@ void RenderBox::printBackground(QPainter* p,
       }
 
       QRect fix(cx, cy, cw, ch);
-      QRect ele(_tx + borderLeft() + paddingLeft(),
-                _ty + borderTop() + paddingTop(), w - vpab, h - hpab);
+      QRect ele(_tx + borderLeft(), _ty + borderTop(), w - vpab, h - hpab);
       QRect b = fix.intersect(ele);
       sx += b.x() - cx;
       sy += b.y() - cy;
@@ -361,7 +358,7 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
   }
 }
 
-void RenderBox::position(int x, int y, int, int, int, bool, bool) {
+void RenderBox::position(int x, int y, int, int, int, bool, bool, int) {
   m_x = x + marginLeft();
   m_y = y;
   // ### paddings
@@ -568,8 +565,7 @@ short RenderBox::calcReplacedWidth(bool* ieHack) const {
   Length w = style()->width();
   short width;
   if (ieHack)
-    *ieHack =
-        style()->height().isPercent() || (w.isVariable() || w.isPercent());
+    *ieHack = style()->height().isPercent() || w.isPercent();
 
   switch (w.type) {
     case Variable: {
@@ -584,9 +580,7 @@ short RenderBox::calcReplacedWidth(bool* ieHack) const {
       break;
     }
     case Percent: {
-#ifndef APPLE_CHANGES
-      RenderObject* p = parent();
-#endif /* not APPLE_CHANGES */
+      // RenderObject* p = parent();
       int cw = containingBlockWidth();
       if (cw)
         width = w.minWidth(cw);

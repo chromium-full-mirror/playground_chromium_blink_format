@@ -18,7 +18,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #include "helper.h"
 #include <khtmllayout.h>
@@ -122,10 +121,10 @@ struct HTMLColors {
 
     // Item(s) selected in a control.
     map["highlight"] =
-        globalConfig->readColorEntry("background", &cg.background()).light(110);
+        globalConfig->readColorEntry("selectBackground", &cg.highlight());
     // Text of item(s) selected in a control.
     map["highlighttext"] =
-        globalConfig->readColorEntry("foreground", &cg.background());
+        globalConfig->readColorEntry("selectForeground", &cg.highlightedText());
 
     // Background color of multiple document interface.
     map["appworkspace"] =

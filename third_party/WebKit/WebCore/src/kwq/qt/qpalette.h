@@ -53,7 +53,9 @@ class QColorGroup {
     ButtonText = 7,
     Button = 8,
     Background = 9,
-    Text = 10
+    Text = 10,
+    Highlight = 11,
+    HighlightedText = 12
   };
 
   // enums -------------------------------------------------------------------
@@ -82,6 +84,8 @@ class QColorGroup {
   const QColor& button() const;
   const QColor& text() const;
   const QColor& background() const;
+  const QColor& highlight() const;
+  const QColor& highlightedText() const;
 
   // operators ---------------------------------------------------------------
 

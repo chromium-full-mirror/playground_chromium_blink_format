@@ -39,6 +39,8 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
+class QDesktopWidget;
+
 // class QApplication ==========================================================
 
 class QApplication : public QObject {
@@ -50,7 +52,7 @@ class QApplication : public QObject {
   // static member functions -------------------------------------------------
 
   static QPalette palette(const QWidget* p = 0);
-  static QWidget* desktop();
+  static QDesktopWidget* desktop();
   static int startDragDistance();
   static QSize globalStrut();
   static void setOverrideCursor(const QCursor&);
@@ -76,6 +78,7 @@ class QApplication : public QObject {
   // member functions --------------------------------------------------------
 
   QWidget* focusWidget() const;
+  QStyle& style() const;
 
   // operators ---------------------------------------------------------------
 
@@ -105,5 +108,13 @@ class QApplication : public QObject {
     // =======================================================
 
 extern QApplication* qApp;
+
+class QDesktopWidget : public QWidget {
+ public:
+  int screenNumber(QWidget*) const;
+  QRect screenGeometry(int screenNumber);
+  int width() const;
+  int height() const;
+};
 
 #endif

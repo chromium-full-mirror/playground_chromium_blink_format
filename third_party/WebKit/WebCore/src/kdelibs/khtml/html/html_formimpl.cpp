@@ -20,7 +20,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 
 #undef FORMS_DEBUG
@@ -165,7 +164,7 @@ void HTMLFormElementImpl::i18nData() {
       "Do you want to continue?");
   QString foo6 = i18n(
       "The page contents expired. You can repost the form"
-      "data by using <a href=\"javascript:go(0);\">Reload</b>");
+      "data by using <a href=\"javascript:go(0);\">Reload</a>");
 }
 
 QByteArray HTMLFormElementImpl::formData() {
@@ -213,6 +212,11 @@ QByteArray HTMLFormElementImpl::formData() {
 
   if (!codec)
     codec = QTextCodec::codecForLocale();
+
+  // we need to map visual hebrew to logical hebrew, as the web
+  // server alsways expects responses in logical ordering
+  if (codec->mibEnum() == 11)
+    codec = QTextCodec::codecForMib(85);
 
 #ifdef APPLE_CHANGES
   QString encCharset = codec->name();
@@ -602,32 +606,14 @@ void HTMLGenericFormElementImpl::recalcStyle(StyleChange ch) {
 }
 
 bool HTMLGenericFormElementImpl::isSelectable() const {
-  return !m_disabled && HTMLElementImpl::isSelectable();
+  return m_render && m_render->isWidget() &&
+         static_cast<RenderWidget*>(m_render)->widget() &&
+         static_cast<RenderWidget*>(m_render)->widget()->focusPolicy() >=
+             QWidget::TabFocus;
 }
 
 void HTMLGenericFormElementImpl::defaultEventHandler(EventImpl* evt) {
   if (evt->target() == this) {
-    if (evt->id() == EventImpl::MOUSEDOWN_EVENT ||
-        evt->id() == EventImpl::KHTML_KEYDOWN_EVENT) {
-      setActive();
-    } else if (evt->id() == EventImpl::MOUSEUP_EVENT ||
-               evt->id() == EventImpl::KHTML_KEYUP_EVENT) {
-      if (m_active) {
-        setActive(false);
-        setFocus();
-      } else
-        setActive(false);
-    }
-
-    if (evt->id() == EventImpl::KHTML_KEYDOWN_EVENT ||
-        evt->id() == EventImpl::KHTML_KEYUP_EVENT) {
-      KeyEventImpl* k = static_cast<KeyEventImpl*>(evt);
-      if (k->keyVal() == QChar('\n').unicode() && m_render &&
-          m_render->isWidget() && k->qKeyEvent)
-        QApplication::sendEvent(static_cast<RenderWidget*>(m_render)->widget(),
-                                k->qKeyEvent);
-    }
-
     // Report focus in/out changes to the browser extension (editable widgets
     // only)
     KHTMLView* view = getDocument()->view();
@@ -639,6 +625,28 @@ void HTMLGenericFormElementImpl::defaultEventHandler(EventImpl* evt) {
       if (ext)
         ext->editableWidgetFocused(widget);
     }
+    if (evt->id() == EventImpl::MOUSEDOWN_EVENT ||
+        evt->id() == EventImpl::KHTML_KEYDOWN_EVENT) {
+      setActive();
+    } else if (evt->id() == EventImpl::MOUSEUP_EVENT ||
+               evt->id() == EventImpl::KHTML_KEYUP_EVENT) {
+      if (m_active) {
+        setActive(false);
+        setFocus();
+      } else {
+        setActive(false);
+      }
+    }
+
+    if (evt->id() == EventImpl::KHTML_KEYDOWN_EVENT ||
+        evt->id() == EventImpl::KHTML_KEYUP_EVENT) {
+      KeyEventImpl* k = static_cast<KeyEventImpl*>(evt);
+      if (k->keyVal() == QChar('\n').unicode() && m_render &&
+          m_render->isWidget() && k->qKeyEvent)
+        QApplication::sendEvent(static_cast<RenderWidget*>(m_render)->widget(),
+                                k->qKeyEvent);
+    }
+
     if (evt->id() == EventImpl::DOMFOCUSOUT_EVENT && isEditable() &&
         m_render->isWidget()) {
       KHTMLPartBrowserExtension* ext = static_cast<KHTMLPartBrowserExtension*>(
@@ -714,6 +722,9 @@ void HTMLButtonElementImpl::parseAttribute(AttributeImpl* attr) {
 void HTMLButtonElementImpl::attach() {
   // skip the generic handler
   HTMLElementImpl::attach();
+  // doesn't work yet in the renderer ### fixme
+  //     if (renderer())
+  //         renderer()->setReplaced(true);
 }
 
 void HTMLButtonElementImpl::defaultEventHandler(EventImpl* evt) {
@@ -778,7 +789,10 @@ HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
     m_autocomplete = f->autoComplete();
 }
 
-HTMLInputElementImpl::~HTMLInputElementImpl() {}
+HTMLInputElementImpl::~HTMLInputElementImpl() {
+  if (getDocument())
+    getDocument()->deregisterMaintainsState(this);
+}
 
 NodeImpl::Id HTMLInputElementImpl::id() const {
   return ID_INPUT;
@@ -976,6 +990,15 @@ void HTMLInputElementImpl::init() {
       break;
   };
   m_value = getAttribute(ATTR_VALUE);
+  if ((uint)m_type <= ISINDEX && !m_value.isEmpty()) {
+    QString value = m_value.string();
+    // remove newline stuff..
+    QString nvalue;
+    for (unsigned int i = 0; i < value.length(); ++i)
+      if (value[i] >= ' ')
+        nvalue += value[i];
+    m_value = nvalue;
+  }
   m_checked = (getAttribute(ATTR_CHECKED) != 0);
 }
 
@@ -1331,9 +1354,15 @@ HTMLSelectElementImpl::HTMLSelectElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(doc, f) {
   m_multiple = false;
+  m_recalcListItems = false;
   // 0 means invalid (i.e. not set)
   m_size = 0;
   m_minwidth = 0;
+}
+
+HTMLSelectElementImpl::~HTMLSelectElementImpl() {
+  if (getDocument())
+    getDocument()->deregisterMaintainsState(this);
 }
 
 NodeImpl::Id HTMLSelectElementImpl::id() const {
@@ -1346,31 +1375,27 @@ DOMString HTMLSelectElementImpl::type() const {
 
 long HTMLSelectElementImpl::selectedIndex() const {
   uint i;
-  bool hasOption = false;
-  for (i = 0; i < m_listItems.size(); i++) {
-    if (m_listItems[i]->id() == ID_OPTION)
-      hasOption = true;
-
-    if (m_listItems[i]->id() == ID_OPTION &&
-        static_cast<HTMLOptionElementImpl*>(m_listItems[i])->selected())
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  for (i = 0; i < items.size(); i++) {
+    if (items[i]->id() == ID_OPTION &&
+        static_cast<HTMLOptionElementImpl*>(items[i])->selected())
       return listToOptionIndex(int(i));  // selectedIndex is the *first*
                                          // selected item; there may be others
   }
-  return hasOption ? 0 : -1;
+  return -1;
 }
 
 void HTMLSelectElementImpl::setSelectedIndex(long index) {
   // deselect all other options and select only the new one
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   int listIndex;
-  for (listIndex = 0; listIndex < int(m_listItems.size()); listIndex++) {
-    if (m_listItems[listIndex]->id() == ID_OPTION)
-      static_cast<HTMLOptionElementImpl*>(m_listItems[listIndex])
-          ->setSelected(false);
+  for (listIndex = 0; listIndex < int(items.size()); listIndex++) {
+    if (items[listIndex]->id() == ID_OPTION)
+      static_cast<HTMLOptionElementImpl*>(items[listIndex])->setSelected(false);
   }
   listIndex = optionToListIndex(index);
   if (listIndex >= 0)
-    static_cast<HTMLOptionElementImpl*>(m_listItems[listIndex])
-        ->setSelected(true);
+    static_cast<HTMLOptionElementImpl*>(items[listIndex])->setSelected(true);
 
   setChanged(true);
 }
@@ -1378,8 +1403,9 @@ void HTMLSelectElementImpl::setSelectedIndex(long index) {
 long HTMLSelectElementImpl::length() const {
   int len = 0;
   uint i;
-  for (i = 0; i < m_listItems.size(); i++) {
-    if (m_listItems[i]->id() == ID_OPTION)
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  for (i = 0; i < items.size(); i++) {
+    if (items[i]->id() == ID_OPTION)
       len++;
   }
   return len;
@@ -1393,19 +1419,20 @@ void HTMLSelectElementImpl::add(const HTMLElement& element,
   int exceptioncode = 0;
   insertBefore(element.handle(), before.handle(), exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
 }
 
 void HTMLSelectElementImpl::remove(long index) {
   int exceptioncode = 0;
   int listIndex = optionToListIndex(index);
 
-  if (listIndex < 0 || index >= int(m_listItems.size()))
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  if (listIndex < 0 || index >= int(items.size()))
     return;  // ### what should we do ? remove the last item?
 
-  removeChild(m_listItems[listIndex], exceptioncode);
+  removeChild(items[listIndex], exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
 }
 
 void HTMLSelectElementImpl::blur() {
@@ -1419,10 +1446,11 @@ void HTMLSelectElementImpl::focus() {
 
 DOMString HTMLSelectElementImpl::value() {
   uint i;
-  for (i = 0; i < m_listItems.size(); i++) {
-    if (m_listItems[i]->id() == ID_OPTION &&
-        static_cast<HTMLOptionElementImpl*>(m_listItems[i])->selected())
-      return static_cast<HTMLOptionElementImpl*>(m_listItems[i])->value();
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  for (i = 0; i < items.size(); i++) {
+    if (items[i]->id() == ID_OPTION &&
+        static_cast<HTMLOptionElementImpl*>(items[i])->selected())
+      return static_cast<HTMLOptionElementImpl*>(items[i])->value();
   }
   return DOMString();
 }
@@ -1495,7 +1523,7 @@ NodeImpl* HTMLSelectElementImpl::insertBefore(NodeImpl* newChild,
   NodeImpl* result = HTMLGenericFormElementImpl::insertBefore(
       newChild, refChild, exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
   return result;
 }
 
@@ -1505,7 +1533,7 @@ NodeImpl* HTMLSelectElementImpl::replaceChild(NodeImpl* newChild,
   NodeImpl* result = HTMLGenericFormElementImpl::replaceChild(
       newChild, oldChild, exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
   return result;
 }
 
@@ -1514,7 +1542,7 @@ NodeImpl* HTMLSelectElementImpl::removeChild(NodeImpl* oldChild,
   NodeImpl* result =
       HTMLGenericFormElementImpl::removeChild(oldChild, exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
   return result;
 }
 
@@ -1523,9 +1551,14 @@ NodeImpl* HTMLSelectElementImpl::appendChild(NodeImpl* newChild,
   NodeImpl* result =
       HTMLGenericFormElementImpl::appendChild(newChild, exceptioncode);
   if (!exceptioncode)
-    recalcListItems();
+    setRecalcListItems();
   setChanged(true);
   return result;
+}
+
+NodeImpl* HTMLSelectElementImpl::addChild(NodeImpl* newChild) {
+  setRecalcListItems();
+  return HTMLGenericFormElementImpl::addChild(newChild);
 }
 
 void HTMLSelectElementImpl::parseAttribute(AttributeImpl* attr) {
@@ -1566,10 +1599,6 @@ void HTMLSelectElementImpl::init() {
   HTMLGenericFormElementImpl::init();
 
   addCSSProperty(CSS_PROP_COLOR, "text");
-
-  if (m_listItems.isEmpty())  // ###
-    recalcListItems();  // useful if we already have contents (e.g. setInnerHTML
-                        // instead of normal parsing)
 }
 
 void HTMLSelectElementImpl::attach() {
@@ -1593,12 +1622,13 @@ bool HTMLSelectElementImpl::encoding(const QTextCodec* codec,
                                      bool) {
   bool successful = false;
   QCString enc_name = fixUpfromUnicode(codec, name().string());
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
 
   uint i;
-  for (i = 0; i < m_listItems.size(); i++) {
-    if (m_listItems[i]->id() == ID_OPTION) {
+  for (i = 0; i < items.size(); i++) {
+    if (items[i]->id() == ID_OPTION) {
       HTMLOptionElementImpl* option =
-          static_cast<HTMLOptionElementImpl*>(m_listItems[i]);
+          static_cast<HTMLOptionElementImpl*>(items[i]);
       if (option->selected()) {
         encoded_values += enc_name;
         encoded_values += fixUpfromUnicode(codec, option->value().string());
@@ -1611,10 +1641,10 @@ bool HTMLSelectElementImpl::encoding(const QTextCodec* codec,
   // in any case. otherwise we have no consistency with the DOM interface.
   // FIXME!
   // we return the first one if it was a combobox select
-  if (!successful && !m_multiple && m_size <= 1 && m_listItems.size() &&
-      (m_listItems[0]->id() == ID_OPTION)) {
+  if (!successful && !m_multiple && m_size <= 1 && items.size() &&
+      (items[0]->id() == ID_OPTION)) {
     HTMLOptionElementImpl* option =
-        static_cast<HTMLOptionElementImpl*>(m_listItems[0]);
+        static_cast<HTMLOptionElementImpl*>(items[0]);
     encoded_values += enc_name;
     if (option->value().isNull())
       encoded_values +=
@@ -1628,14 +1658,15 @@ bool HTMLSelectElementImpl::encoding(const QTextCodec* codec,
 }
 
 int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
-  if (optionIndex < 0 || optionIndex >= int(m_listItems.size()))
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  if (optionIndex < 0 || optionIndex >= int(items.size()))
     return -1;
 
   int listIndex = 0;
   int optionIndex2 = 0;
-  for (; optionIndex2 < int(m_listItems.size()) && optionIndex2 <= optionIndex;
+  for (; optionIndex2 < int(items.size()) && optionIndex2 <= optionIndex;
        listIndex++) {  // not a typo!
-    if (m_listItems[listIndex]->id() == ID_OPTION)
+    if (items[listIndex]->id() == ID_OPTION)
       optionIndex2++;
   }
   listIndex--;
@@ -1643,15 +1674,16 @@ int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
 }
 
 int HTMLSelectElementImpl::listToOptionIndex(int listIndex) const {
-  if (listIndex < 0 || listIndex >= int(m_listItems.size()) ||
-      m_listItems[listIndex]->id() != ID_OPTION)
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
+  if (listIndex < 0 || listIndex >= int(items.size()) ||
+      items[listIndex]->id() != ID_OPTION)
     return -1;
 
   int optionIndex = 0;  // actual index of option not counting OPTGROUP entries
                         // that may be in list
   int i;
   for (i = 0; i < listIndex; i++)
-    if (m_listItems[i]->id() == ID_OPTION)
+    if (items[i]->id() == ID_OPTION)
       optionIndex++;
   return optionIndex;
 }
@@ -1689,17 +1721,29 @@ void HTMLSelectElementImpl::recalcListItems() {
       }
     }
   }
+  m_recalcListItems = false;
+}
+
+void HTMLSelectElementImpl::childrenChanged() {
+  setRecalcListItems();
+
+  HTMLGenericFormElementImpl::childrenChanged();
+}
+
+void HTMLSelectElementImpl::setRecalcListItems() {
+  m_recalcListItems = true;
   if (m_render)
-    static_cast<RenderSelect*>(m_render)->setOptionsChanged(true);
-  setChanged(true);
+    static_cast<khtml::RenderSelect*>(m_render)->setOptionsChanged(true);
+  setChanged();
 }
 
 void HTMLSelectElementImpl::reset() {
+  QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   uint i;
-  for (i = 0; i < m_listItems.size(); i++) {
-    if (m_listItems[i]->id() == ID_OPTION) {
+  for (i = 0; i < items.size(); i++) {
+    if (items[i]->id() == ID_OPTION) {
       HTMLOptionElementImpl* option =
-          static_cast<HTMLOptionElementImpl*>(m_listItems[i]);
+          static_cast<HTMLOptionElementImpl*>(items[i]);
       bool selected = (!option->getAttribute(ATTR_SELECTED).isNull());
       option->setSelected(selected);
     }
@@ -1714,17 +1758,17 @@ void HTMLSelectElementImpl::notifyOptionSelected(
     bool selected) {
   if (selected && !m_multiple) {
     // deselect all other options
+    QMemArray<HTMLGenericFormElementImpl*> items = listItems();
     uint i;
-    for (i = 0; i < m_listItems.size(); i++) {
-      if (m_listItems[i]->id() == ID_OPTION && m_listItems[i] != selectedOption)
-        static_cast<HTMLOptionElementImpl*>(m_listItems[i])->m_selected = false;
+    for (i = 0; i < items.size(); i++) {
+      if (items[i]->id() == ID_OPTION)
+        static_cast<HTMLOptionElementImpl*>(items[i])->m_selected =
+            (items[i] == selectedOption);
     }
   }
-  if (m_render && m_render->layouted()) {
+  if (m_render)
     static_cast<RenderSelect*>(m_render)->setSelectionChanged(true);
-    if (m_render->layouted())
-      static_cast<RenderSelect*>(m_render)->updateSelection();
-  }
+
   setChanged(true);
 }
 
@@ -1833,6 +1877,12 @@ NodeImpl* HTMLOptGroupElementImpl::appendChild(NodeImpl* newChild,
   return result;
 }
 
+NodeImpl* HTMLOptGroupElementImpl::addChild(NodeImpl* newChild) {
+  recalcSelectOptions();
+
+  return HTMLGenericFormElementImpl::addChild(newChild);
+}
+
 void HTMLOptGroupElementImpl::parseAttribute(AttributeImpl* attr) {
   HTMLGenericFormElementImpl::parseAttribute(attr);
   recalcSelectOptions();
@@ -1843,13 +1893,7 @@ void HTMLOptGroupElementImpl::recalcSelectOptions() {
   while (select && select->id() != ID_SELECT)
     select = select->parentNode();
   if (select)
-    static_cast<HTMLSelectElementImpl*>(select)->recalcListItems();
-}
-
-void HTMLOptGroupElementImpl::setChanged(bool b) {
-  HTMLGenericFormElementImpl::setChanged(b);
-  if (b)
-    recalcSelectOptions();
+    static_cast<HTMLSelectElementImpl*>(select)->setRecalcListItems();
 }
 
 // -------------------------------------------------------------------------
@@ -1933,7 +1977,6 @@ void HTMLOptionElementImpl::setValue(DOMStringImpl* value) {
 void HTMLOptionElementImpl::setSelected(bool _selected) {
   if (m_selected == _selected)
     return;
-
   m_selected = _selected;
   HTMLSelectElementImpl* select = getSelect();
   if (select)
@@ -1947,13 +1990,6 @@ HTMLSelectElementImpl* HTMLOptionElementImpl::getSelect() const {
   return static_cast<HTMLSelectElementImpl*>(select);
 }
 
-void HTMLOptionElementImpl::setChanged(bool b) {
-  HTMLGenericFormElementImpl::setChanged(b);
-  HTMLSelectElementImpl* s;
-  if (b && (s = getSelect()))
-    s->recalcListItems();
-}
-
 // -------------------------------------------------------------------------
 
 HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentPtr* doc,
@@ -1965,6 +2001,11 @@ HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentPtr* doc,
   m_cols = 20;
   m_wrap = ta_Virtual;
   m_dirtyvalue = true;
+}
+
+HTMLTextAreaElementImpl::~HTMLTextAreaElementImpl() {
+  if (getDocument())
+    getDocument()->deregisterMaintainsState(this);
 }
 
 NodeImpl::Id HTMLTextAreaElementImpl::id() const {
@@ -1981,8 +2022,9 @@ QString HTMLTextAreaElementImpl::state() {
 }
 
 void HTMLTextAreaElementImpl::restoreState(const QString& state) {
-  m_value = state.left(state.length() - 1);
-  setChanged(true);
+  setDefaultValue(state.left(state.length() - 1));
+  // the close() in the rendertree will take care of transferring defaultvalue
+  // to 'value'
 }
 
 void HTMLTextAreaElementImpl::select() {

@@ -355,6 +355,8 @@ class InterpreterImp {
   Object globalObject() const { return global; }
   Interpreter* interpreter() const { return m_interpreter; }
 
+  void initGlobalObject();
+
   void mark();
 
   ExecState* globalExec() { return globExec; }

@@ -30,7 +30,7 @@
 #include <config.h>
 #endif
 
-class QString;
+#include <qt/qstringlist.h>
 
 QString i18n(const char* text);
 
@@ -52,6 +52,7 @@ class KLocale {
   // member functions --------------------------------------------------------
 
   QString language() const;
+  QStringList languageList() const;
 
   // operators ---------------------------------------------------------------
 

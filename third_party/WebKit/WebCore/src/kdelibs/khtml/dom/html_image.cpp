@@ -18,7 +18,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 // --------------------------------------------------------------------------
 
@@ -227,8 +226,7 @@ void HTMLImageElement::setBorder(long value) {
 long HTMLImageElement::height() const {
   if (!impl)
     return 0;
-  // ### return actual value
-  return ((ElementImpl*)impl)->getAttribute(ATTR_HEIGHT).toInt();
+  return static_cast<HTMLImageElementImpl*>(impl)->height();
 }
 
 void HTMLImageElement::setHeight(long value) {
@@ -316,8 +314,7 @@ void HTMLImageElement::setVspace(long value) {
 long HTMLImageElement::width() const {
   if (!impl)
     return 0;
-  // ### return actual width
-  return ((ElementImpl*)impl)->getAttribute(ATTR_WIDTH).toInt();
+  return static_cast<HTMLImageElementImpl*>(impl)->width();
 }
 
 void HTMLImageElement::setWidth(long value) {

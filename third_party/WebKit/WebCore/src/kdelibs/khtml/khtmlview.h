@@ -33,6 +33,7 @@ class QRect;
 
 namespace DOM {
 class HTMLDocumentImpl;
+class DocumentImpl;
 class ElementImpl;
 class HTMLElementImpl;
 class HTMLTitleElementImpl;
@@ -52,9 +53,7 @@ class RenderLineEdit;
 class RenderPartObject;
 class RenderWidget;
 class CSSStyleSelector;
-void applyRule(khtml::RenderStyle* style,
-               DOM::CSSProperty* prop,
-               DOM::ElementImpl* e);
+void applyRule(DOM::CSSProperty* prop);
 };
 
 #ifdef APPLE_CHANGES
@@ -76,6 +75,7 @@ class KHTMLView : public QScrollView {
   friend class DOM::HTMLGenericFormElementImpl;
   friend class DOM::HTMLFormElementImpl;
   friend class DOM::HTMLAnchorElementImpl;
+  friend class DOM::DocumentImpl;
   friend class KHTMLPart;
   friend class khtml::RenderRoot;
   friend class khtml::RenderObject;
@@ -83,9 +83,7 @@ class KHTMLView : public QScrollView {
   friend class khtml::RenderPartObject;
   friend class khtml::RenderWidget;
   friend class khtml::CSSStyleSelector;
-  friend void khtml::applyRule(khtml::RenderStyle* style,
-                               DOM::CSSProperty* prop,
-                               DOM::ElementImpl* e);
+  friend void khtml::applyRule(DOM::CSSProperty* prop);
 
  public:
   /**
@@ -137,16 +135,6 @@ class KHTMLView : public QScrollView {
   virtual void setHScrollBarMode(ScrollBarMode mode);
 
   /**
-   * Overrides the scrollbar mode.
-   */
-  void forceHScrollBarMode(ScrollBarMode mode);
-
-  /**
-   * Overrides the scrollbar mode.
-   */
-  void forceVScrollBarMode(ScrollBarMode mode);
-
-  /**
    * Prints the HTML document.
    */
   void print();
@@ -183,6 +171,10 @@ class KHTMLView : public QScrollView {
   virtual void viewportMouseReleaseEvent(QMouseEvent*);
 #ifndef QT_NO_WHEELEVENT
   virtual void viewportWheelEvent(QWheelEvent*);
+#endif
+#ifndef APPLE_CHANGES
+  virtual void dragEnterEvent(QDragEnterEvent*);
+  virtual void dropEvent(QDropEvent*);
 #endif
 
   void keyPressEvent(QKeyEvent* _ke);
@@ -250,9 +242,6 @@ class KHTMLView : public QScrollView {
                           QMouseEvent* _mouse,
                           bool setUnder,
                           int mouseEventType);
-
-  void setIgnoreEvents(bool ignore);
-  bool ignoreEvents();
 
   void complete();
 

@@ -20,7 +20,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 
 #ifndef KHTMLFONT_H
@@ -38,7 +37,8 @@ class CSSStyleSelector;
 
 class FontDef {
  public:
-  FontDef() : size(0), italic(false), smallCaps(false), weight(50) {}
+  FontDef()
+      : size(0), italic(false), smallCaps(false), weight(50), hasNbsp(true) {}
   bool operator==(const FontDef& other) const {
     return (family == other.family && size == other.size &&
             italic == other.italic && smallCaps == other.smallCaps &&
@@ -50,6 +50,7 @@ class FontDef {
   bool italic : 1;
   bool smallCaps : 1;
   unsigned int weight : 8;
+  mutable bool hasNbsp : 1;
 };
 
 class Font {

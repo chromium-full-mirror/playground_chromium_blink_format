@@ -158,8 +158,8 @@ void HTMLLinkElementImpl::process() {
     part->browserExtension()->setIconURL(KURL(m_url.string()));
 
   // Stylesheet
-  if ((type.contains("text/css") || rel == "stylesheet") &&
-      !rel.contains("alternate")) {
+  if (type.contains("text/css") || rel == "stylesheet" ||
+      rel.contains("alternate")) {
     // no need to load style sheets which aren't for the screen output
     // ### there may be in some situations e.g. for an editor or script to
     // manipulate

@@ -44,9 +44,7 @@ class DOMCSSStyleDeclaration : public DOMObject {
                       const UString& propertyName,
                       const Value& value,
                       int attr = None);
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& propertyName,
-                           bool recursive = true) const;
+  virtual bool hasProperty(ExecState* exec, const UString& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
@@ -326,6 +324,7 @@ class DOMRGBColor : public DOMObject {
   DOMRGBColor(DOM::RGBColor c) : rgbColor(c) {}
   ~DOMRGBColor();
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -342,6 +341,7 @@ class DOMRect : public DOMObject {
   DOMRect(ExecState*, DOM::Rect r) : rect(r) {}
   ~DOMRect();
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -358,6 +358,7 @@ class DOMCounter : public DOMObject {
   DOMCounter(ExecState*, DOM::Counter c) : counter(c) {}
   ~DOMCounter();
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

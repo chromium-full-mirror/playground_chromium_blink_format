@@ -166,9 +166,7 @@ class Object : public Value {
    * @param propertyName The name of the property to check for
    * @return true if the object has the property, otherwise false
    */
-  bool hasProperty(ExecState* exec,
-                   const UString& propertyName,
-                   bool recursive = true) const;
+  bool hasProperty(ExecState* exec, const UString& propertyName) const;
 
   /**
    * Removes the specified property from the object.
@@ -492,9 +490,7 @@ class ObjectImp : public ValueImp {
    *
    * @see Object::hasProperty()
    */
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& propertyName,
-                           bool recursive = true) const;
+  virtual bool hasProperty(ExecState* exec, const UString& propertyName) const;
 
   /**
    * Implementation of the [[Delete]] internal property (implemented by all

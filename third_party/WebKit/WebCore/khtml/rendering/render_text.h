@@ -19,13 +19,13 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #ifndef RENDERTEXT_H
 #define RENDERTEXT_H
 
 #include "dom/dom_string.h"
 #include "xml/dom_stringimpl.h"
+#include "xml/dom_textimpl.h"
 #include "rendering/render_object.h"
 
 #include <qptrvector.h>
@@ -42,23 +42,23 @@ class TextSlave {
  public:
   TextSlave(int x,
             int y,
-            QChar* text,
+            int start,
             int len,
             int baseline,
             int width,
             bool reversed = false,
+            int toAdd = 0,
             bool firstLine = false) {
     m_x = x;
     m_y = y;
-    m_text = text;
+    m_start = start;
     m_len = len;
     m_baseline = baseline;
     m_width = width;
     m_reversed = reversed;
     m_firstLine = firstLine;
+    m_toAdd = toAdd;
   }
-  ~TextSlave();
-  void print(QPainter* pt, int _tx, int _ty);
   void printDecoration(QPainter* pt,
                        RenderText* p,
                        int _tx,
@@ -73,7 +73,9 @@ class TextSlave {
                            int _ty,
                            bool begin,
                            bool end);
-  void printSelection(QPainter* p,
+  void printSelection(const Font* f,
+                      RenderText* text,
+                      QPainter* p,
                       RenderStyle* style,
                       int tx,
                       int ty,
@@ -85,7 +87,8 @@ class TextSlave {
                                           int _y,
                                           int _tx,
                                           int _ty,
-                                          const QFontMetrics* fm,
+                                          const Font* f,
+                                          RenderText* text,
                                           int& offset,
                                           short lineheight);
 
@@ -100,22 +103,16 @@ class TextSlave {
     return true;
   }
 
-  QChar* m_text;
+  int m_start;
   int m_y;
   unsigned short m_len;
   short m_x;
   unsigned short m_baseline;
   unsigned short m_width;
 
-  // If m_reversed is true, this is right to left text.
-  // In this case, m_text will point to a QChar array which holds the already
-  // reversed string, and the slave has to delete this string by itself.
-  // If false, m_text points into the render text's own QChar array,
-  // and in this case it's allowed to do substractions between m_texts of
-  // different slaves.
   bool m_reversed : 1;
   bool m_firstLine : 1;
-
+  int m_toAdd : 14;  // for justified text
  private:
   // this is just for QVector::bsearch. Don't use it otherwise
   TextSlave(int _x, int _y) {
@@ -178,11 +175,12 @@ class RenderText : public RenderObject {
                         int len,
                         int width,
                         bool reverse,
-                        bool firstLine);
+                        bool firstLine,
+                        int spaceAdd);
 
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
-                             const QFontMetrics* fm) const;
+                             const Font* f) const;
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
                              bool firstLine = false) const;
@@ -212,7 +210,7 @@ class RenderText : public RenderObject {
 
   bool isFixedWidthFont() const;
 
-  void setText(DOM::DOMStringImpl* text);
+  void setText(DOM::DOMStringImpl* text, bool force = false);
 
   virtual SelectionState selectionState() const { return m_selectionState; }
   virtual void setSelectionState(SelectionState s) { m_selectionState = s; }
@@ -231,6 +229,11 @@ class RenderText : public RenderObject {
 
   bool hasBreakableChar() const { return m_hasBreakableChar; }
   const QFontMetrics& metrics(bool firstLine) const;
+  const Font* htmlFont(bool firstLine) const;
+
+  DOM::TextImpl* element() const {
+    return static_cast<DOM::TextImpl*>(RenderObject::element());
+  }
 
  protected:
   void printTextOutline(QPainter* p,

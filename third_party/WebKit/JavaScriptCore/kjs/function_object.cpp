@@ -86,7 +86,6 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
   switch (id) {
     case ToString: {
       // ### also make this work for internal functions
-      // ### return the text of the function body (see 15.3.4.2)
       if (thisObj.isNull() || !thisObj.inherits(&InternalFunctionImp::info)) {
 #ifndef NDEBUG
         fprintf(stderr,
@@ -96,8 +95,13 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
         exec->setException(err);
         return err;
       }
-      if (thisObj.inherits(&FunctionImp::info) &&
-          !static_cast<FunctionImp*>(thisObj.imp())->name().isNull()) {
+      if (thisObj.inherits(&DeclaredFunctionImp::info)) {
+        DeclaredFunctionImp* fi =
+            static_cast<DeclaredFunctionImp*>(thisObj.imp());
+        return String("function " + fi->name() + "(" + fi->parameterString() +
+                      ") " + fi->body->toString());
+      } else if (thisObj.inherits(&FunctionImp::info) &&
+                 !static_cast<FunctionImp*>(thisObj.imp())->name().isNull()) {
         result =
             String("function " +
                    static_cast<FunctionImp*>(thisObj.imp())->name() + "()");
@@ -129,7 +133,7 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
             Object::dynamicCast(argArray).inherits(&ArgumentsImp::info)) {
           Object argArrayObj = Object::dynamicCast(argArray);
           unsigned int length = argArrayObj.get(exec, "length").toUInt32(exec);
-          for (uint i = 0; i < length; i++)
+          for (unsigned int i = 0; i < length; i++)
             applyArgs.append(argArrayObj.get(exec, UString::from(i)));
         } else {
           Object err = Error::create(exec, TypeError);

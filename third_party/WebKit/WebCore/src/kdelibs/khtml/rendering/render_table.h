@@ -22,7 +22,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #ifndef RENDER_TABLE_H
 #define RENDER_TABLE_H
@@ -126,7 +125,8 @@ class RenderTable : public RenderFlow {
                         int len,
                         int width,
                         bool reverse,
-                        bool firstLine);
+                        bool firstLine,
+                        int);
 
   virtual void calcWidth();
 
@@ -289,7 +289,7 @@ class RenderTableSection : public RenderContainer {
   virtual bool isTableSection() const { return true; }
 
   virtual short lineHeight(bool) const { return 0; }
-  virtual void position(int, int, int, int, int, bool, bool) {}
+  virtual void position(int, int, int, int, int, bool, bool, int) {}
 
   virtual void setTable(RenderTable* t) { table = t; }
 
@@ -323,7 +323,7 @@ class RenderTableRow : public RenderContainer {
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 
   virtual short lineHeight(bool) const { return 0; }
-  virtual void position(int, int, int, int, int, bool, bool) {}
+  virtual void position(int, int, int, int, int, bool, bool, int) {}
 
   virtual void close();
 
@@ -464,7 +464,7 @@ class RenderTableCol : public RenderContainer {
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 
   virtual short lineHeight(bool) const { return 0; }
-  virtual void position(int, int, int, int, int, bool, bool) {}
+  virtual void position(int, int, int, int, int, bool, bool, int) {}
   virtual void layout() {}
 
   virtual void setTable(RenderTable* t) { table = t; }

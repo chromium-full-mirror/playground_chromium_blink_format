@@ -276,8 +276,11 @@ class QKeyEvent : public QEvent {
 
 class QFocusEvent : public QEvent {
  public:
-// typedefs ----------------------------------------------------------------
-// enums -------------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+
+  enum Reason { Mouse, Tab, ActiveWindow, Popup, Shortcut, Other };
+
 // constants ---------------------------------------------------------------
 // static member functions -------------------------------------------------
 
@@ -296,6 +299,9 @@ class QFocusEvent : public QEvent {
 #endif
 
   // member functions --------------------------------------------------------
+
+  static Reason reason();
+
   // operators ---------------------------------------------------------------
 
   // protected

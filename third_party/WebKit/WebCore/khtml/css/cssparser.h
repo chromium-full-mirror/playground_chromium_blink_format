@@ -19,7 +19,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #ifndef _CSS_cssparser_h_
 #define _CSS_cssparser_h_
@@ -63,7 +62,15 @@ class CSSSelector {
       delete tagHistory;
   }
 
+  /**
+   * Print debug output for this selector
+   */
   void print(void);
+
+  /**
+   * Re-create selector text from selector's data
+   */
+  DOMString selectorText() const;
 
   // checks if the 2 selectors (including sub selectors) agree.
   bool operator==(const CSSSelector& other);
@@ -101,12 +108,12 @@ class CSSSelector {
 // a style class which has a parent (almost all have)
 class StyleBaseImpl : public DomShared {
  public:
-  StyleBaseImpl() {
+  StyleBaseImpl() : DOM::DomShared() {
     m_parent = 0;
     hasInlinedDecl = false;
     strictParsing = true;
   }
-  StyleBaseImpl(StyleBaseImpl* p) {
+  StyleBaseImpl(StyleBaseImpl* p) : DOM::DomShared() {
     m_parent = p;
     hasInlinedDecl = false;
     strictParsing = true;

@@ -18,7 +18,6 @@
  *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  *  Boston, MA 02111-1307, USA.
  *
- *  $Id$
  */
 
 #ifndef _KJSLEXER_H_
@@ -93,6 +92,7 @@ class Lexer {
   void setDone(State s);
   unsigned int pos;
   void shift(unsigned int p);
+  void nextLine();
   int lookupKeyword(const char*);
 
   bool isWhiteSpace() const;

@@ -18,7 +18,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #ifndef render_replaced_h
 #define render_replaced_h
@@ -61,7 +60,8 @@ class RenderReplaced : public RenderBox {
                         int len,
                         int width,
                         bool reverse,
-                        bool firstLine);
+                        bool firstLine,
+                        int);
 
  private:
   short m_intrinsicWidth;
@@ -86,11 +86,6 @@ class RenderWidget : public QObject,
   virtual void detach();
   virtual void layout();
 
-  virtual bool eventFilter(QObject* o, QEvent* e);
-
-  virtual void handleDOMEvent(DOM::EventImpl* evt);
-
-  bool sendWidgetEvent(QEvent* event);
   QWidget* widget() const { return m_widget; }
   KHTMLView* view() const { return m_view; }
 
@@ -98,13 +93,10 @@ class RenderWidget : public QObject,
   void slotWidgetDestructed();
 
  protected:
+  bool eventFilter(QObject* /*o*/, QEvent* e);
   void setQWidget(QWidget* widget);
   QWidget* m_widget;
   KHTMLView* m_view;
-
-  bool m_paintingSelf : 1;
-  bool m_ignorePaintEvents : 1;
-  bool m_widgetShown : 1;
 };
 };
 

@@ -20,7 +20,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 #ifndef RENDER_FORM_H
 #define RENDER_FORM_H
@@ -173,7 +172,11 @@ class RenderSubmitButton : public RenderButton {
   virtual QString defaultLabel();
 
   virtual void calcMinMaxWidth();
+  virtual void updateFromElement();
   virtual short baselinePosition(bool) const;
+
+ private:
+  QString rawText();
 };
 
 // -------------------------------------------------------------------------
@@ -331,7 +334,6 @@ class RenderSelect : public RenderFormElement {
 
   virtual void calcMinMaxWidth();
   virtual void layout();
-  virtual void close();
 
   void setOptionsChanged(bool _optionsChanged);
 

@@ -166,6 +166,7 @@ class QPainter : public Qt {
                 QRect* br = 0,
                 char** internal = 0);
   void drawText(int, int, const QString&, int, TextDirection);
+  void drawText(int, int, const QString&, int, int, TextDirection);
 
   void fillRect(int, int, int, int, const QBrush&);
   void drawConvexPolygon(const QPointArray&);

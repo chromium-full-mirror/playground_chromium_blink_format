@@ -43,6 +43,9 @@
 using namespace DOM;
 using namespace khtml;
 
+const Q_UINT32 NodeImpl::IdNSMask = 0xffff0000;
+const Q_UINT32 NodeImpl::IdLocalMask = 0x0000ffff;
+
 NodeImpl::NodeImpl(DocumentPtr* doc)
     : document(doc),
       m_parent(0),
@@ -521,6 +524,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   if (evt->bubbles()) {
     // now we call all default event handlers (this is not part of DOM - it is
     // internal to khtml)
+
     it.toLast();
     for (; it.current() && !evt->propagationStopped() &&
            !evt->defaultPrevented() && !evt->defaultHandled();
@@ -534,10 +538,11 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   // get a KHTML_CLICK_EVENT or
   // KHTML_DBLCLICK_EVENT), not the standard DOM "click" event that could be
   // sent from js code.
-  if (evt->id() == EventImpl::KHTML_CLICK_EVENT)
-    dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 1);
-  else if (evt->id() == EventImpl::KHTML_DBLCLICK_EVENT)
-    dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 2);
+  if (!evt->defaultPrevented())
+    if (evt->id() == EventImpl::KHTML_CLICK_EVENT)
+      dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 1);
+    else if (evt->id() == EventImpl::KHTML_DBLCLICK_EVENT)
+      dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 2);
 
   // copy this over into a local variable, as the following deref() calls might
   // cause this to be deleted.
@@ -656,10 +661,9 @@ bool NodeImpl::dispatchMouseEvent(QMouseEvent* _mouse,
 }
 
 bool NodeImpl::dispatchUIEvent(int _id, int detail) {
-  if (_id != EventImpl::DOMFOCUSIN_EVENT &&
-      _id != EventImpl::DOMFOCUSOUT_EVENT &&
-      _id != EventImpl::DOMACTIVATE_EVENT)
-    return false;  // shouldn't happen
+  assert(!((_id != EventImpl::DOMFOCUSIN_EVENT &&
+            _id != EventImpl::DOMFOCUSOUT_EVENT &&
+            _id != EventImpl::DOMACTIVATE_EVENT)));
 
   bool cancelable = false;
   if (_id == EventImpl::DOMACTIVATE_EVENT)
@@ -715,13 +719,7 @@ void NodeImpl::handleLocalEvents(EventImpl* evt, bool useCapture) {
   }
 }
 
-void NodeImpl::defaultEventHandler(EventImpl* evt) {
-  // Perform any special rendering updates as necessary for the event, e.g.
-  // passing appropriate QEvents to form
-  // controls
-  if (m_render)
-    m_render->handleDOMEvent(evt);
-}
+void NodeImpl::defaultEventHandler(EventImpl* evt) {}
 
 unsigned long NodeImpl::childNodeCount() {
   return 0;
@@ -1049,6 +1047,9 @@ NodeImpl* NodeBaseImpl::insertBefore(NodeImpl* newChild,
   NodeImpl* child = isFragment ? newChild->firstChild() : newChild;
 
   NodeImpl* prev = refChild->previousSibling();
+  if (prev == newChild || refChild == newChild)  // nothing to do
+    return newChild;
+
   while (child) {
     nextChild = isFragment ? child->nextSibling() : 0;
 
@@ -1091,6 +1092,9 @@ NodeImpl* NodeBaseImpl::replaceChild(NodeImpl* newChild,
                                      NodeImpl* oldChild,
                                      int& exceptioncode) {
   exceptioncode = 0;
+
+  if (oldChild == newChild)  // nothing to do
+    return oldChild;
 
   // Make sure adding the new child is ok
   checkAddChild(newChild, exceptioncode);
@@ -1247,6 +1251,9 @@ NodeImpl* NodeBaseImpl::appendChild(NodeImpl* newChild, int& exceptioncode) {
   checkAddChild(newChild, exceptioncode);
   if (exceptioncode)
     return 0;
+
+  if (newChild == _last)  // nothing to do
+    return newChild;
 
   bool isFragment = newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE;
 

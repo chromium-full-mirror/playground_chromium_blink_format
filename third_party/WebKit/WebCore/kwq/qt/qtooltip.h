@@ -52,10 +52,8 @@ class QToolTip : public Qt {
 
   QToolTip(QWidget*);
 
-// add no-op destructor
-#ifdef _KWQ_PEDANTIC_
-  ~QToolTip() {}
-#endif
+  // add no-op destructor
+  virtual ~QToolTip() {}
 
   // member functions --------------------------------------------------------
 
@@ -65,21 +63,20 @@ class QToolTip : public Qt {
 
   // protected
   // -------------------------------------------------------------------
+
+  virtual void maybeTip(const QPoint&) = 0;
+
   // private
   // ---------------------------------------------------------------------
 
  private:
-// add copy constructor
-// this private declaration prevents copying
-#ifdef _KWQ_PEDANTIC_
+  // add copy constructor
+  // this private declaration prevents copying
   QToolTip(const QToolTip&);
-#endif
 
-// add assignment operator
-// this private declaration prevents assignment
-#ifdef _KWQ_PEDANTIC_
+  // add assignment operator
+  // this private declaration prevents assignment
   QToolTip& operator=(const QToolTip&);
-#endif
 
 };  // class QToolTip
     // ===========================================================

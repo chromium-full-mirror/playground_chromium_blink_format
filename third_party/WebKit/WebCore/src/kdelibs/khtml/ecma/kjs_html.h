@@ -30,7 +30,6 @@
 #include "ecma/kjs_binding.h"
 #include "ecma/kjs_dom.h"
 
-class KHTMLPart;
 class HTMLElement;
 
 namespace KJS {
@@ -44,9 +43,7 @@ class HTMLDocument : public DOMDocument {
                       const Value& value,
                       int attr = None);
   void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& propertyName,
-                           bool recursive = true) const;
+  virtual bool hasProperty(ExecState* exec, const UString& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
@@ -62,6 +59,7 @@ class HTMLDocument : public DOMDocument {
     Links,
     Forms,
     Anchors,
+    Scripts,
     All,
     Clear,
     Open,
@@ -92,9 +90,7 @@ class HTMLElement : public DOMElement {
                       const Value& value,
                       int attr = None);
   void putValue(ExecState* exec, int token, const Value& value, int);
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& propertyName,
-                           bool recursive = true) const;
+  virtual bool hasProperty(ExecState* exec, const UString& propertyName) const;
   virtual UString toString(ExecState* exec) const;
   virtual List eventHandlerScope(ExecState* exec) const;
   virtual const ClassInfo* classInfo() const;
@@ -471,9 +467,7 @@ class HTMLCollection : public DOMObject {
   virtual Value tryCall(ExecState* exec, Object& thisObj, const List& args);
   virtual bool implementsCall() const { return true; }
   virtual bool toBoolean(ExecState*) const { return true; }
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& p,
-                           bool recursive) const;
+  virtual bool hasProperty(ExecState* exec, const UString& p) const;
   enum { Item, NamedItem, Tags };
   Value getNamedItems(ExecState* exec, const UString& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }

@@ -31,7 +31,6 @@
 /**
  * @short Communicates with a KJAS server to display and control Java applets.
  *
- * @version $Id$
  * @author Richard J. Moore, rich@kde.org
  */
 

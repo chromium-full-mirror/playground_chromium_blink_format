@@ -142,14 +142,14 @@ class CachedObject {
 
   int size() const { return m_size; }
 
-  /*
+  /**
    * computes the status of an object after loading.
    * the result depends on the objects size and the size of the cache
    * also updates the expire date on the cache entry file
    */
   void finish();
 
-  /*
+  /**
    * Called by the cache if the object has been removed from the cache dict
    * while still being referenced. This means the object should kill itself
    * if its reference counter drops down to zero.
@@ -166,7 +166,7 @@ class CachedObject {
 
   virtual bool schedule() const { return false; }
 
-  /*
+  /**
    * List of acceptable mimetypes seperated by ",". A mimetype may contain a
    * wildcard.
    */
@@ -517,13 +517,19 @@ class Cache {
    * cached objects (like stylesheets) take up in memory is not exaclty known.
    */
   static void setSize(int bytes);
-  /** returns the size of the cache */
+  /**
+   * returns the size of the cache
+   */
   static int size() { return maxSize; };
 
-  /** prints some statistics to stdout */
+  /**
+   * prints some statistics to stdout
+   */
   static void statistics();
 
-  /** clean up cache */
+  /**
+   * clean up cache
+   */
   static void flush(bool force = false);
 
   /**

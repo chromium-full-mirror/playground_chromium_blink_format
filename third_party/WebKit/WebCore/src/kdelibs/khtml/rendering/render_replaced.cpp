@@ -30,10 +30,12 @@
 #include <qevent.h>
 #include <qapplication.h>
 
+#include "khtml_ext.h"
 #include "khtmlview.h"
 #include "xml/dom2_eventsimpl.h"
 #include "khtml_part.h"
 #include "xml/dom_docimpl.h"  // ### remove dependency
+#include <kdebug.h>
 
 using namespace khtml;
 using namespace DOM;
@@ -110,7 +112,7 @@ short RenderReplaced::baselinePosition(bool) const {
   return height() + marginTop() + marginBottom();
 }
 
-void RenderReplaced::position(int x, int y, int, int, int, bool, bool) {
+void RenderReplaced::position(int x, int y, int, int, int, bool, bool, int) {
   m_x = x + marginLeft();
   m_y = y + marginTop();
 }
@@ -122,9 +124,6 @@ RenderWidget::RenderWidget(DOM::NodeImpl* node) : RenderReplaced(node) {
   // a replaced element doesn't support being anonymous
   assert(node);
   m_view = node->getDocument()->view();
-  m_paintingSelf = false;
-  m_ignorePaintEvents = false;
-  m_widgetShown = false;
 
   // this is no real reference counting, its just there
   // to make sure that we're not deleted while we're recursed
@@ -140,7 +139,7 @@ void RenderWidget::detach() {
       m_view->removeChild(m_widget);
 
 #ifndef APPLE_CHANGES
-    // References the widget here is not safe.
+    // Referencing the widget here is not safe.
     m_widget->removeEventFilter(this);
     m_widget->setMouseTracking(false);
 #endif
@@ -152,6 +151,14 @@ RenderWidget::~RenderWidget() {
   KHTMLAssert(refCount() <= 0);
 
   delete m_widget;
+}
+
+static void resizeWidget(QWidget* widget, int w, int h) {
+  // ugly hack to limit the maximum size of the widget (as X11 has problems if
+  // it's bigger)
+  h = QMIN(h, 3072);
+  w = QMIN(w, 2000);
+  widget->resize(w, h);
 }
 
 void RenderWidget::setQWidget(QWidget* widget) {
@@ -171,24 +178,29 @@ void RenderWidget::setQWidget(QWidget* widget) {
       // if we're already layouted, apply the calculated space to the
       // widget immediately
       if (layouted()) {
-        m_widget->resize(m_width - borderLeft() - borderRight() -
-                             paddingLeft() - paddingRight(),
-                         m_height - borderLeft() - borderRight() -
-                             paddingLeft() - paddingRight());
+        // ugly hack to limit the maximum size of the widget (as X11 has
+        // problems if it's bigger)
+        resizeWidget(m_widget, m_width - borderLeft() - borderRight() -
+                                   paddingLeft() - paddingRight(),
+                     m_height - borderLeft() - borderRight() - paddingLeft() -
+                         paddingRight());
       } else
         setPos(xPos(), -500000);
     }
+    m_view->addChild(m_widget, -500000, 0);
   }
 }
 
 void RenderWidget::layout() {
   KHTMLAssert(!layouted());
   KHTMLAssert(minMaxKnown());
-  if (m_widget)
-    m_widget->resize(
-        m_width - borderLeft() - borderRight() - paddingLeft() - paddingRight(),
-        m_height - borderLeft() - borderRight() - paddingLeft() -
-            paddingRight());
+  if (m_widget) {
+    resizeWidget(m_widget, m_width - borderLeft() - borderRight() -
+                               paddingLeft() - paddingRight(),
+                 m_height - borderLeft() - borderRight() - paddingLeft() -
+                     paddingRight());
+  }
+
   setLayouted();
 }
 
@@ -202,7 +214,6 @@ void RenderWidget::setStyle(RenderStyle* _style) {
     m_widget->setFont(style()->font());
     if (style()->visibility() != VISIBLE) {
       m_widget->hide();
-      m_widgetShown = false;
     }
   }
 
@@ -210,7 +221,7 @@ void RenderWidget::setStyle(RenderStyle* _style) {
   setSpecialObjects(false);
 }
 
-void RenderWidget::printObject(QPainter* p,
+void RenderWidget::printObject(QPainter* /*p*/,
                                int,
                                int,
                                int,
@@ -222,7 +233,6 @@ void RenderWidget::printObject(QPainter* p,
 
   if (style()->visibility() != VISIBLE) {
     m_widget->hide();
-    m_widgetShown = false;
     return;
   }
 
@@ -230,189 +240,163 @@ void RenderWidget::printObject(QPainter* p,
   if (isRelPositioned())
     relativePositionOffset(_tx, _ty);
 
-  // Although the widget is a child of our KHTMLView, it is not displayed
-  // directly in the view area. Instead, it is
-  // first drawn onto a pixmap which is then drawn onto the rendering area. This
-  // is to that form controls and other
-  // widgets can be drawn as part of the normal rendering process, and the
-  // z-index of other objects can be properly
-  // taken into account.
+  int xPos = _tx + borderLeft() + paddingLeft();
+  int yPos = _ty + borderTop() + paddingTop();
 
-  //    if (!m_widgetShown) {
-  //	m_widgetShown = true;
-  m_view->addChild(m_widget, _tx + borderLeft() + paddingLeft(),
-                   _ty + borderTop() + paddingTop());
-  m_widget->show();
-  //    }
+  int childw = m_widget->width();
+  int childh = m_widget->height();
+  if ((childw == 2000 || childh == 3072) && m_widget->inherits("KHTMLView")) {
+    KHTMLView* vw = static_cast<KHTMLView*>(m_widget);
+    int cy = m_view->contentsY();
+    int ch = m_view->visibleHeight();
 
-  /*
-      m_view->setIgnoreEvents(true);
-      QWidget *prevFocusWidget = qApp->focusWidget();
-      DocumentImpl *doc = m_view->part()->xmlDocImpl();
-      if (doc->focusNode() && doc->focusNode()->renderer() == this)// ### use
-     RenderObject flag
-          m_widget->setFocus();
+    int childx = m_view->childX(m_widget);
+    int childy = m_view->childY(m_widget);
 
-      m_paintingSelf = true;
-      QPixmap widgetPixmap = QPixmap::grabWidget(m_widget);
-      m_paintingSelf = false;
+    int xNew = xPos;
+    int yNew = childy;
 
-      if (prevFocusWidget)
-          prevFocusWidget->setFocus();
-      m_view->setIgnoreEvents(false);
-
-      p->drawPixmap(_tx+borderLeft()+paddingLeft(),
-     _ty+borderTop()+paddingTop(), widgetPixmap);
-  */
-}
-
-bool RenderWidget::eventFilter(QObject* o, QEvent* e) {
-  /*
-  //    if (e->type() == QEvent::ShowWindowRequest)
-  //	return true;
-
-      if ((e->type() == QEvent::Paint) && m_paintingSelf)
-          return false;
-
-      if (e->type() == QEvent::Paint) {
-          if (!m_paintingSelf && !m_ignorePaintEvents) {
-              int xpos = 0;
-              int ypos = 0;
-              absolutePosition(xpos,ypos);
-              m_view->updateContents(xpos,ypos,width(),height());
-          }
-          return true;
+    // 	qDebug("cy=%d, ch=%d, childy=%d, childh=%d", cy, ch, childy, childh );
+    if (childh == 3072) {
+      if (cy + ch > childy + childh) {
+        yNew = cy + (ch - childh) / 2;
+      } else if (cy < childy) {
+        yNew = cy + (ch - childh) / 2;
       }
-  */
-  return QObject::eventFilter(o, e);
+      // 	    qDebug("calculated yNew=%d", yNew);
+    }
+    yNew = QMIN(yNew, yPos + m_height - childh);
+    yNew = QMAX(yNew, yPos);
+    if (yNew != childy || xNew != childx) {
+      if (vw->contentsHeight() < yNew - yPos + childh)
+        vw->resizeContents(vw->contentsWidth(), yNew - yPos + childh);
+      vw->setContentsPos(xNew - xPos, yNew - yPos);
+    }
+    xPos = xNew;
+    yPos = yNew;
+  }
+  m_view->addChild(m_widget, xPos, yPos);
+  m_widget->show();
 }
 
-void RenderWidget::handleDOMEvent(EventImpl* evt) {
-  // Since the widget is stored outside of the normal viewing area and doesn't
-  // receive the events directly (the
-  // events are recevied by our KHTMLView), we have to pass the events on to the
-  // widget. Doing this also ensures that
-  // widgets only receive events if the event occurs over part of the widget
-  // that is visible, e.g. if there is an
-  // object with a higher z-index partially obscuring the widget and the user
-  // clicks on it, the widget won't get the
-  // event
+bool RenderWidget::eventFilter(QObject* /*o*/, QEvent* e) {
+  if (!element())
+    return true;
 
-  if (!m_widget)
-    return;
+  ref();
+  element()->ref();
 
-  bool doRepaint = false;
+  bool filtered = false;
 
-  if (evt->isMouseEvent()) {
-    MouseEventImpl* mev = static_cast<MouseEventImpl*>(evt);
+  // kdDebug() << "RenderWidget::eventFilter type=" << e->type() << endl;
+  switch (e->type()) {
+    case QEvent::FocusOut:
+      // static const char* const r[] = {"Mouse", "Tab", "Backtab",
+      // "ActiveWindow", "Popup", "Shortcut", "Other" };
+      // kdDebug() << "RenderFormElement::eventFilter FocusOut widget=" <<
+      // m_widget << " reason:" << r[QFocusEvent::reason()] << endl;
+      // Don't count popup as a valid reason for losing the focus
+      // (example: opening the options of a select combobox shouldn't emit
+      // onblur)
+      if (QFocusEvent::reason() != QFocusEvent::Popup) {
+        // kdDebug(6000) << "RenderWidget::eventFilter captures FocusOut" <<
+        // endl;
+        element()->dispatchHTMLEvent(EventImpl::BLUR_EVENT, false, false);
+        //             if (  element()->isEditable() ) {
+        //                 KHTMLPartBrowserExtension *ext =
+        //                 static_cast<KHTMLPartBrowserExtension *>(
+        //                 element()->view->part()->browserExtension() );
+        //                 if ( ext )  ext->editableWidgetBlurred( m_widget );
+        //             }
+        //             handleFocusOut();
+      }
+      break;
+    case QEvent::FocusIn:
+      // kdDebug(6000) << "RenderWidget::eventFilter captures FocusIn" << endl;
+      element()->getDocument()->setFocusNode(element());
+      //         if ( isEditable() ) {
+      //             KHTMLPartBrowserExtension *ext =
+      //             static_cast<KHTMLPartBrowserExtension *>(
+      //             element()->view->part()->browserExtension() );
+      //             if ( ext )  ext->editableWidgetFocused( m_widget );
+      //         }
+      break;
+    case QEvent::MouseButtonPress:
+      //       handleMousePressed(static_cast<QMouseEvent*>(e));
+      break;
+    case QEvent::MouseButtonRelease:
+      //    {
+      //         int absX, absY;
+      //         absolutePosition(absX,absY);
+      //         QMouseEvent* _e = static_cast<QMouseEvent*>(e);
+      //         m_button = _e->button();
+      //         m_state  = _e->state();
+      //         QMouseEvent
+      //         e2(e->type(),QPoint(absX,absY)+_e->pos(),_e->button(),_e->state());
 
-    // Work out event type
-    QEvent::Type qtype = QEvent::None;
-    if (mev->id() == EventImpl::MOUSEDOWN_EVENT)
-      qtype = QEvent::MouseButtonPress;
-    else if (mev->id() == EventImpl::MOUSEUP_EVENT)
-      qtype = QEvent::MouseButtonRelease;
-    else if (mev->id() == EventImpl::MOUSEMOVE_EVENT)
-      qtype = QEvent::MouseMove;
-    else if (mev->id() == EventImpl::MOUSEOVER_EVENT)
-      qtype = QEvent::Enter;
-    else if (mev->id() == EventImpl::MOUSEOUT_EVENT)
-      qtype = QEvent::Leave;
-    else if (mev->id() == EventImpl::KHTML_ORIGCLICK_MOUSEUP_EVENT)
-      qtype = QEvent::MouseButtonRelease;
+      //         element()->dispatchMouseEvent(&e2,EventImpl::MOUSEUP_EVENT,m_clickCount);
 
-    // Work out button
-    int button;
-    if (mev->button() == 2)
-      button = Qt::RightButton;
-    else if (mev->button() == 1)
-      button = Qt::MidButton;
-    else
-      button = Qt::LeftButton;
+      //         if((m_mousePos - e2.pos()).manhattanLength() <=
+      //         QApplication::startDragDistance()) {
+      //             // DOM2 Events section 1.6.2 says that a click is if the
+      //             mouse was pressed
+      //             // and released in the "same screen location"
+      //             // As people usually can't click on the same pixel, we're a
+      //             bit tolerant here
+      //             element()->dispatchMouseEvent(&e2,EventImpl::CLICK_EVENT,m_clickCount);
+      //         }
 
-    // Work out key modifier state
-    int state = 0;
-    if (mev->ctrlKey())
-      state |= Qt::ControlButton;
-    if (mev->altKey())
-      state |= Qt::AltButton;
-    if (mev->shiftKey())
-      state |= Qt::ShiftButton;
-    // ### meta key ?
-
-    // Get local & global positions for the mouse event
-    int xpos = 0;
-    int ypos = 0;
-    absolutePosition(xpos, ypos);
-    QPoint pos(mev->clientX() - xpos, mev->clientY() - ypos);
-    QPoint globalPos(mev->screenX(), mev->screenY());
-
-    // Create the event
-    QEvent* event = 0;
-    if (qtype == QEvent::MouseButtonPress ||
-        qtype == QEvent::MouseButtonRelease || qtype == QEvent::MouseMove)
-      event = new QMouseEvent(qtype, pos, globalPos, button, state);
-    else if (qtype == QEvent::Enter || qtype == QEvent::Leave)
-      event = new QEvent(qtype);
-
-    // Send the actual event to the widget
-    if (event) {
-      if (sendWidgetEvent(event))
-        doRepaint = true;
-      delete event;
+      //         if(!isRenderButton()) {
+      //             // ### DOMActivate is also dispatched for thigs like
+      //             selects & textareas -
+      //             // not sure if this is correct
+      //             element()->dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT,m_isDoubleClick
+      //             ? 2 : 1);
+      //             element()->dispatchMouseEvent(&e2, m_isDoubleClick ?
+      //             EventImpl::KHTML_DBLCLICK_EVENT :
+      //             EventImpl::KHTML_CLICK_EVENT, m_clickCount);
+      //             m_isDoubleClick = false;
+      //         }
+      //         else
+      //             // save position for slotClicked - see below -
+      //             m_mousePos = e2.pos();
+      //     }
+      break;
+    case QEvent::MouseButtonDblClick:
+      //     {
+      //         m_isDoubleClick = true;
+      //         handleMousePressed(static_cast<QMouseEvent*>(e));
+      //     }
+      break;
+    case QEvent::MouseMove:
+      //     {
+      //         int absX, absY;
+      //         absolutePosition(absX,absY);
+      //         QMouseEvent* _e = static_cast<QMouseEvent*>(e);
+      //         QMouseEvent
+      //         e2(e->type(),QPoint(absX,absY)+_e->pos(),_e->button(),_e->state());
+      //         element()->dispatchMouseEvent(&e2);
+      //         // ### change cursor like in KHTMLView?
+      //     }
+      break;
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease: {
+      if (!element()->dispatchKeyEvent(static_cast<QKeyEvent*>(e)))
+        filtered = true;
+      break;
     }
-  } else if (evt->id() == EventImpl::DOMFOCUSIN_EVENT) {
-    QFocusEvent focusEvent(QEvent::FocusIn);
+    default:
+      break;
+  };
 
-    m_widget->setFocusProxy(m_view);
-    m_view->setFocus();
+  element()->deref();
 
-    sendWidgetEvent(&focusEvent);
-    doRepaint = true;
-  } else if (evt->id() == EventImpl::DOMFOCUSOUT_EVENT) {
-    QFocusEvent focusEvent(QEvent::FocusOut);
+  // stop processing if the widget gets deleted, but continue in all other cases
+  if (hasOneRef())
+    filtered = true;
+  deref();
 
-    m_widget->setFocusProxy(0);
-
-    sendWidgetEvent(&focusEvent);
-    doRepaint = true;
-  } else if (evt->id() == EventImpl::KHTML_KEYDOWN_EVENT ||
-             evt->id() == EventImpl::KHTML_KEYUP_EVENT) {
-    KeyEventImpl* keyEvent = static_cast<KeyEventImpl*>(evt);
-
-    if (sendWidgetEvent(keyEvent->qKeyEvent)) {
-      keyEvent->qKeyEvent->accept();
-      doRepaint = true;
-    }
-  }
-
-  if (doRepaint) {
-    int xpos = 0;
-    int ypos = 0;
-    absolutePosition(xpos, ypos);
-    m_view->updateContents(xpos, ypos, width(), height());
-  }
-
-  evt->setDefaultHandled();
-}
-
-bool RenderWidget::sendWidgetEvent(QEvent* event) {
-  m_view->setIgnoreEvents(true);
-  m_ignorePaintEvents = true;
-  QWidget* prevFocusWidget = qApp->focusWidget();
-  DocumentImpl* doc = m_view->part()->xmlDocImpl();
-  if (doc->focusNode() &&
-      doc->focusNode()->renderer() == this)  // ### use RenderObject flag
-    m_widget->setFocus();
-
-  bool eventHandled = QApplication::sendEvent(m_widget, event);
-
-  if (prevFocusWidget)
-    prevFocusWidget->setFocus();
-  m_ignorePaintEvents = false;
-  m_view->setIgnoreEvents(false);
-
-  return eventHandled;
+  return filtered;
 }
 
 #include "render_replaced.moc"

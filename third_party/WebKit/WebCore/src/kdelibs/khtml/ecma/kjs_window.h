@@ -80,7 +80,7 @@ class Window : public ObjectImp {
    * for the specified part p this will be returned in order to have unique
    * bindings.
    */
-  static Object retrieve(KHTMLPart* p);
+  static Value retrieve(KHTMLPart* p);
   /**
    * Returns the Window object for a given HTML part
    */
@@ -93,9 +93,7 @@ class Window : public ObjectImp {
   static Window* retrieveActive(ExecState* exec);
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& p,
-                           bool recursive = true) const;
+  virtual bool hasProperty(ExecState* exec, const UString& p) const;
   virtual Value get(ExecState* exec, const UString& propertyName) const;
   virtual void put(ExecState* exec,
                    const UString& propertyName,
@@ -128,6 +126,7 @@ class Window : public ObjectImp {
     Range,
     NodeFilter,
     DOMException,
+    CSSRule,
     Frames,
     _History,
     Event,
@@ -138,6 +137,7 @@ class Window : public ObjectImp {
     Name,
     _Navigator,
     _Konqueror,
+    ClientInformation,
     OffscreenBuffering,
     Opener,
     OuterHeight,
@@ -295,9 +295,7 @@ class Konqueror : public ObjectImp {
  public:
   Konqueror(KHTMLPart* p) : part(p) {}
   virtual Value get(ExecState* exec, const UString& propertyName) const;
-  virtual bool hasProperty(ExecState* exec,
-                           const UString& p,
-                           bool recursive) const;
+  virtual bool hasProperty(ExecState* exec, const UString& p) const;
   virtual UString toString(ExecState* exec) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

@@ -45,6 +45,7 @@ class Navigator : public ObjectImp {
     _MimeTypes,
     Product,
     Vendor,
+    CookieEnabled,
     JavaEnabled
   };
   KHTMLPart* part() const { return m_part; }

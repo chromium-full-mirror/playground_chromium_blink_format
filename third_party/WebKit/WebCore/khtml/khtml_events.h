@@ -33,8 +33,8 @@ class MouseEvent : public KParts::Event {
              int x,
              int y,
              const DOM::DOMString& url,
-             const DOM::Node& innerNode,
-             long /*offset UNUSED REMOVE 3.0*/ = 0);
+             const DOM::DOMString& target,
+             const DOM::Node& innerNode);
   virtual ~MouseEvent();
 
   QMouseEvent* qmouseEvent() const { return m_qmouseEvent; }
@@ -44,6 +44,7 @@ class MouseEvent : public KParts::Event {
   int absY() const { return m_nodeAbsY; }
 
   DOM::DOMString url() const { return m_url; }
+  DOM::DOMString target() const { return m_target; }
   DOM::Node innerNode() const { return m_innerNode; }
 
   // return the offset of innerNode
@@ -55,6 +56,7 @@ class MouseEvent : public KParts::Event {
   int m_y;
   int m_nodeAbsX, m_nodeAbsY;
   DOM::DOMString m_url;
+  DOM::DOMString m_target;
   DOM::Node m_innerNode;
   class MouseEventPrivate;
   MouseEventPrivate* d;
@@ -66,9 +68,15 @@ class MousePressEvent : public MouseEvent {
                   int x,
                   int y,
                   const DOM::DOMString& url,
-                  const DOM::Node& innerNode,
-                  long = 0)
-      : MouseEvent(s_strMousePressEvent, mouseEvent, x, y, url, innerNode) {}
+                  const DOM::DOMString& target,
+                  const DOM::Node& innerNode)
+      : MouseEvent(s_strMousePressEvent,
+                   mouseEvent,
+                   x,
+                   y,
+                   url,
+                   target,
+                   innerNode) {}
 
   static bool test(const QEvent* event) {
     return KParts::Event::test(event, s_strMousePressEvent);
@@ -84,13 +92,14 @@ class MouseDoubleClickEvent : public MouseEvent {
                         int x,
                         int y,
                         const DOM::DOMString& url,
-                        const DOM::Node& innerNode,
-                        long = 0)
+                        const DOM::DOMString& target,
+                        const DOM::Node& innerNode)
       : MouseEvent(s_strMouseDoubleClickEvent,
                    mouseEvent,
                    x,
                    y,
                    url,
+                   target,
                    innerNode) {}
 
   static bool test(const QEvent* event) {
@@ -107,9 +116,15 @@ class MouseMoveEvent : public MouseEvent {
                  int x,
                  int y,
                  const DOM::DOMString& url,
-                 const DOM::Node& innerNode,
-                 long = 0)
-      : MouseEvent(s_strMouseMoveEvent, mouseEvent, x, y, url, innerNode) {}
+                 const DOM::DOMString& target,
+                 const DOM::Node& innerNode)
+      : MouseEvent(s_strMouseMoveEvent,
+                   mouseEvent,
+                   x,
+                   y,
+                   url,
+                   target,
+                   innerNode) {}
 
   static bool test(const QEvent* event) {
     return KParts::Event::test(event, s_strMouseMoveEvent);
@@ -125,9 +140,16 @@ class MouseReleaseEvent : public MouseEvent {
                     int x,
                     int y,
                     const DOM::DOMString& url,
+                    const DOM::DOMString& target,
                     const DOM::Node& innerNode,
                     long = 0)
-      : MouseEvent(s_strMouseReleaseEvent, mouseEvent, x, y, url, innerNode) {}
+      : MouseEvent(s_strMouseReleaseEvent,
+                   mouseEvent,
+                   x,
+                   y,
+                   url,
+                   target,
+                   innerNode) {}
 
   static bool test(const QEvent* event) {
     return KParts::Event::test(event, s_strMouseReleaseEvent);

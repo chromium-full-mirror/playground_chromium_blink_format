@@ -20,7 +20,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
- * $Id$
  */
 //#define DEBUG_LAYOUT
 
@@ -353,7 +352,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     // bool resizePossible = true;
 
     // check if we're over a horizontal or vertical boundary
-    int pos = m_gridLayout[1][0];
+    int pos = m_gridLayout[1][0] + xPos();
     for (int c = 1; c < element()->totalCols(); c++) {
       if (_x >= pos && _x <= pos + element()->border()) {
         if (m_vSplitVar && m_vSplitVar[c - 1] == true)
@@ -367,7 +366,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
       pos += m_gridLayout[1][c] + element()->border();
     }
 
-    pos = m_gridLayout[0][0];
+    pos = m_gridLayout[0][0] + yPos();
     for (int r = 1; r < element()->totalRows(); r++) {
       if (_y >= pos && _y <= pos + element()->border()) {
         if (m_hSplitVar && m_hSplitVar[r - 1] == true)
@@ -423,7 +422,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
 #endif
       int delta = m_hSplitPos - _y;
       m_gridDelta[0][m_hSplit] -= delta;
-      m_gridDelta[1][m_hSplit + 1] += delta;
+      m_gridDelta[0][m_hSplit + 1] += delta;
     }
 
     // this just schedules the relayout
@@ -439,8 +438,8 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     QRect r(xPos(), yPos(), width(), height());
     const int rBord = 3;
     int sw = element()->border();
-    int p = m_resizing ? (m_hSplit ? _x : _y) : -1;
-    if (m_hSplit) {
+    int p = m_resizing ? (m_vSplit > -1 ? _x : _y) : -1;
+    if (m_vSplit > -1) {
       if (m_oldpos >= 0)
         paint.drawRect(m_oldpos + sw / 2 - rBord, r.y(), 2 * rBord, r.height());
       if (p >= 0)

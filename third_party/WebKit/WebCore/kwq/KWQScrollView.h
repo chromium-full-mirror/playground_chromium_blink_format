@@ -71,6 +71,8 @@ class QScrollView : public QFrame {
 
   virtual void addChild(QWidget* child, int x = 0, int y = 0);
   void removeChild(QWidget* child);
+  int childX(QWidget* child);
+  int childY(QWidget* child);
 
   virtual void resizeContents(int w, int h);
   void updateContents(int x, int y, int w, int h);
