@@ -387,6 +387,7 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
 }
 
 void RenderImage::updateFromElement() {
+#ifdef APPLE_CHANGES
   // Treat a lack of src or empty string for src as no image at all, not the
   // page itself
   // loaded as an image.
@@ -397,14 +398,18 @@ void RenderImage::updateFromElement() {
   else
     new_image = element()->getDocument()->docLoader()->requestImage(
         khtml::parseURL(attr));
+#else
+  CachedImage* new_image = element()->getDocument()->docLoader()->requestImage(
+      khtml::parseURL(element()->getAttribute(ATTR_SRC)));
+#endif
 
   if (new_image && new_image != image &&
       (!style() || !style()->contentObject())) {
     loadEventSent = false;
-    new_image->ref(this);
     if (image)
       image->deref(this);
     image = new_image;
+    image->ref(this);
     berrorPic = image->isErrorImage();
   }
 
