@@ -16,7 +16,7 @@
 + (int)frameCount;
 + (int)dataSourceCount;
 + (int)viewCount;
-
++ (int)HTMLRepresentationCount;
 + (int)bridgeCount;
 
 @end
