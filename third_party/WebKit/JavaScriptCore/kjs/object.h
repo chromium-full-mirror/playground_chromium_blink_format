@@ -580,7 +580,7 @@ class ObjectImp : public ValueImp {
   const ScopeChain& scope() const { return _scope; }
   void setScope(const ScopeChain& s) { _scope = s; }
 
-  virtual ReferenceList propList(ExecState* exec, bool recursive = true);
+  ReferenceList propList(ExecState* exec, bool recursive = true);
 
   Value internalValue() const;
   void setInternalValue(const Value& v);
