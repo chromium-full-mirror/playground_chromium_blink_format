@@ -148,6 +148,8 @@ class HTMLElement : public DOMElement {
     BodyLink,
     BodyALink,
     BodyBgColor,
+    BodyScrollLeft,
+    BodyScrollTop,
     BodyScrollHeight,
     BodyScrollWidth,
     FormAction,
