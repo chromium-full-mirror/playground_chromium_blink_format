@@ -1,7 +1,7 @@
 /**
  * This file is part of the DOM implementation for KDE.
  *
- * (C) 1999 Lars Knoll (knoll@kde.org)
+ * (C) 1999-2003 Lars Knoll (knoll@kde.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,6 +18,7 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *
+ * $Id$
  */
 
 //#define CSS_STYLESHEET_DEBUG
@@ -73,36 +74,12 @@ StyleSheetImpl::~StyleSheetImpl() {
   }
 }
 
-bool StyleSheetImpl::disabled() const {
-  return m_disabled;
-}
-
-void StyleSheetImpl::setDisabled(bool disabled) {
-  m_disabled = disabled;
-}
-
-NodeImpl* StyleSheetImpl::ownerNode() const {
-  return m_parentNode;
-}
-
 StyleSheetImpl* StyleSheetImpl::parentStyleSheet() const {
   if (!m_parent)
     return 0;
   if (m_parent->isStyleSheet())
     return static_cast<StyleSheetImpl*>(m_parent);
   return 0;
-}
-
-DOMString StyleSheetImpl::href() const {
-  return m_strHref;
-}
-
-DOMString StyleSheetImpl::title() const {
-  return m_strTitle;
-}
-
-MediaListImpl* StyleSheetImpl::media() const {
-  return m_media;
 }
 
 void StyleSheetImpl::setMedia(MediaListImpl* media) {
@@ -156,6 +133,7 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(DOM::NodeImpl* parentNode,
 CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
                                      CSSStyleSheetImpl* orig)
     : StyleSheetImpl(ownerRule, orig->m_strHref) {
+  // m_lstChildren is deleted in StyleListImpl
   m_lstChildren = new QPtrList<StyleBaseImpl>;
   StyleBaseImpl* rule;
   for (rule = orig->m_lstChildren->first(); rule != 0;
@@ -167,20 +145,12 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
   m_implicit = false;
 }
 
-CSSStyleSheetImpl::~CSSStyleSheetImpl() {
-  // m_lstChildren is deleted in StyleListImpl
-}
-
 CSSRuleImpl* CSSStyleSheetImpl::ownerRule() const {
   if (!m_parent)
     return 0;
   if (m_parent->isRule())
     return static_cast<CSSRuleImpl*>(m_parent);
   return 0;
-}
-
-CSSRuleList CSSStyleSheetImpl::cssRules() {
-  return this;
 }
 
 unsigned long CSSStyleSheetImpl::insertRule(const DOMString& rule,
@@ -191,10 +161,8 @@ unsigned long CSSStyleSheetImpl::insertRule(const DOMString& rule,
     exceptioncode = DOMException::INDEX_SIZE_ERR;
     return 0;
   }
-  const QString preprocessed = preprocess(rule.string());
-  const QChar* curP = preprocessed.unicode();
-  const QChar* endP = preprocessed.unicode() + preprocessed.length();
-  CSSRuleImpl* r = parseRule(curP, endP);
+  CSSParser p(strictParsing);
+  CSSRuleImpl* r = p.parseRule(rule);
 
   if (!r) {
     exceptioncode = CSSException::SYNTAX_ERR + CSSException::_EXCEPTION_OFFSET;
@@ -208,6 +176,10 @@ unsigned long CSSStyleSheetImpl::insertRule(const DOMString& rule,
   return index;
 }
 
+CSSRuleList CSSStyleSheetImpl::cssRules() {
+  return this;
+}
+
 void CSSStyleSheetImpl::deleteRule(unsigned long index, int& exceptioncode) {
   exceptioncode = 0;
   StyleBaseImpl* b = m_lstChildren->take(index);
@@ -219,30 +191,14 @@ void CSSStyleSheetImpl::deleteRule(unsigned long index, int& exceptioncode) {
 }
 
 bool CSSStyleSheetImpl::parseString(const DOMString& string, bool strict) {
-  strictParsing = strict;
-  const QString preprocessed = preprocess(string.string());
-
 #ifdef CSS_STYLESHEET_DEBUG
   kdDebug(6080) << "parsing sheet, len=" << string.length() << ", sheet is "
                 << string.string() << endl;
 #endif
 
-  const QChar* curP = preprocessed.unicode();
-  const QChar* endP = preprocessed.unicode() + preprocessed.length();
-
-#ifdef CSS_STYLESHEET_DEBUG
-  kdDebug(6080) << "preprocessed sheet, len=" << preprocessed.length()
-                << ", sheet is " << preprocessed << endl;
-#endif
-
-  while (curP && (curP < endP)) {
-    CSSRuleImpl* rule = parseRule(curP, endP);
-    if (rule) {
-      m_lstChildren->append(rule);
-      rule->setParent(this);
-      //           rule->init();
-    }
-  }
+  strictParsing = strict;
+  CSSParser p(strict);
+  p.parseSheet(this, string);
   return true;
 }
 
@@ -292,9 +248,7 @@ khtml::DocLoader* CSSStyleSheetImpl::docLoader() {
   return m_doc->docLoader();
 }
 
-// ---------------------------------------------------------------------------------------------
-
-StyleSheetListImpl::StyleSheetListImpl() {}
+// ---------------------------------------------------------------------------
 
 StyleSheetListImpl::~StyleSheetListImpl() {
   for (QPtrListIterator<StyleSheetImpl> it(styleSheets); it.current(); ++it)
@@ -341,24 +295,16 @@ StyleSheetImpl* StyleSheetListImpl::item(unsigned long index) {
 
 // --------------------------------------------------------------------------------------------
 
-MediaListImpl::MediaListImpl(CSSStyleSheetImpl* parentSheet)
-    : StyleBaseImpl(parentSheet) {}
-
 MediaListImpl::MediaListImpl(CSSStyleSheetImpl* parentSheet,
                              const DOMString& media)
     : StyleBaseImpl(parentSheet) {
   setMediaText(media);
 }
 
-MediaListImpl::MediaListImpl(CSSRuleImpl* parentRule)
-    : StyleBaseImpl(parentRule) {}
-
 MediaListImpl::MediaListImpl(CSSRuleImpl* parentRule, const DOMString& media)
     : StyleBaseImpl(parentRule) {
   setMediaText(media);
 }
-
-MediaListImpl::~MediaListImpl() {}
 
 bool MediaListImpl::contains(const DOMString& medium) const {
   return m_lstMedia.count() == 0 || m_lstMedia.contains(medium) ||
@@ -377,14 +323,6 @@ CSSRuleImpl* MediaListImpl::parentRule() const {
   return 0;
 }
 
-unsigned long MediaListImpl::length() const {
-  return m_lstMedia.count();
-}
-
-DOMString MediaListImpl::item(unsigned long index) const {
-  return m_lstMedia[index];
-}
-
 void MediaListImpl::deleteMedium(const DOMString& oldMedium) {
   for (QValueList<DOMString>::Iterator it = m_lstMedia.begin();
        it != m_lstMedia.end(); ++it) {
@@ -393,10 +331,6 @@ void MediaListImpl::deleteMedium(const DOMString& oldMedium) {
       return;
     }
   }
-}
-
-void MediaListImpl::appendMedium(const DOMString& newMedium) {
-  m_lstMedia.append(newMedium);
 }
 
 DOM::DOMString MediaListImpl::mediaText() const {

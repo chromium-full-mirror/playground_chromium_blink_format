@@ -323,8 +323,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setParsing(bool b) { m_bParsing = b; }
   bool parsing() const { return m_bParsing; }
 
-  void setTextColor(DOMString color) { m_textColor = color; }
-  DOMString textColor() const { return m_textColor; }
+  void setTextColor(QColor color) { m_textColor = color; }
+  QColor textColor() const { return m_textColor; }
 
   // internal
   NodeImpl* findElement(Id id);
@@ -366,6 +366,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   QStringList availableStyleSheets() const;
   NodeImpl* focusNode() const { return m_focusNode; }
   void setFocusNode(NodeImpl* newFocusNode);
+
+  // Updates for :target (CSS3 selector).
+  void setCSSTarget(NodeImpl* n);
+  NodeImpl* getCSSTarget();
 
   bool isDocumentChanged() { return m_docChanged; }
   virtual void setDocumentChanged(bool);
@@ -499,7 +503,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   ParseMode pMode;
   HTMLMode hMode;
 
-  DOMString m_textColor;
+  QColor m_textColor;
   NodeImpl* m_focusNode;
 
   // ### replace me with something more efficient
@@ -542,6 +546,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   QPtrList<khtml::RenderImage> m_imageLoadEventDispatchSoonList;
   QPtrList<khtml::RenderImage> m_imageLoadEventDispatchingList;
   int m_imageLoadEventTimer;
+
+  NodeImpl* m_cssTarget;
 
 #if APPLE_CHANGES
  public:

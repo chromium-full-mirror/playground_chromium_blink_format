@@ -49,6 +49,7 @@ class HTMLElementImpl : public ElementImpl {
   void addCSSLength(int id, const DOMString& value);
   void addCSSProperty(int id, const DOMString& value);
   void addCSSProperty(int id, int value);
+  void addHTMLColor(int id, const DOMString& c);
   void removeCSSProperty(int id);
 
   DOMString innerHTML() const;

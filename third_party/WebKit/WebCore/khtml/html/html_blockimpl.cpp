@@ -62,8 +62,9 @@ void HTMLDivElementImpl::parseAttribute(AttributeImpl* attr) {
       DOMString v = attr->value();
       if (strcasecmp(attr->value(), "middle") == 0 ||
           strcasecmp(attr->value(), "center") == 0)
-        v = "-konq-center";
-      addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, CSS_VAL__KONQ_CENTER);
+      else
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
       break;
     }
     default:
@@ -125,7 +126,7 @@ void HTMLHRElementImpl::attach() {
       addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
       addCSSProperty(CSS_PROP_BORDER_TOP_WIDTH, DOMString("0"));
       addCSSLength(CSS_PROP_BORDER_BOTTOM_WIDTH, DOMString(si));
-      addCSSProperty(CSS_PROP_BORDER_COLOR, color);
+      addHTMLColor(CSS_PROP_BORDER_COLOR, color);
     } else {
       if (_s > 1 && getAttribute(ATTR_NOSHADE).isNull()) {
         addCSSProperty(CSS_PROP_BORDER_BOTTOM_WIDTH, n);
@@ -166,8 +167,9 @@ void HTMLParagraphElementImpl::parseAttribute(AttributeImpl* attr) {
       DOMString v = attr->value();
       if (strcasecmp(attr->value(), "middle") == 0 ||
           strcasecmp(attr->value(), "center") == 0)
-        v = "-konq-center";
-      addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, CSS_VAL__KONQ_CENTER);
+      else
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
       break;
     }
     default:

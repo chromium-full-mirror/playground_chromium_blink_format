@@ -404,13 +404,13 @@ void HTMLTableElementImpl::parseAttribute(AttributeImpl* attr) {
     }
     case ATTR_BGCOLOR:
       if (!attr->value().isEmpty())
-        addCSSProperty(CSS_PROP_BACKGROUND_COLOR, attr->value());
+        addHTMLColor(CSS_PROP_BACKGROUND_COLOR, attr->value());
       else
         removeCSSProperty(CSS_PROP_BACKGROUND_COLOR);
       break;
     case ATTR_BORDERCOLOR:
       if (!attr->value().isEmpty()) {
-        addCSSProperty(CSS_PROP_BORDER_COLOR, attr->value());
+        addHTMLColor(CSS_PROP_BORDER_COLOR, attr->value());
         addCSSProperty(CSS_PROP_BORDER_TOP_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
@@ -517,8 +517,8 @@ void HTMLTableElementImpl::attach() {
     // are propagated into tables.
     if (getDocument()->inQuirksMode()) {
       addCSSProperty(CSS_PROP_FONT_SIZE, CSS_VAL_MEDIUM);
-      addCSSProperty(CSS_PROP_COLOR, getDocument()->textColor());
-      addCSSProperty(CSS_PROP_FONT_FAMILY, "konq_body");
+      addCSSProperty(CSS_PROP_COLOR, CSS_VAL__KONQ_TEXT);
+      addCSSProperty(CSS_PROP_FONT_FAMILY, CSS_VAL__KONQ_BODY);
     }
 
     if (!m_noBorder) {
@@ -541,7 +541,7 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_BGCOLOR:
       if (attr->val())
-        addCSSProperty(CSS_PROP_BACKGROUND_COLOR, attr->value());
+        addHTMLColor(CSS_PROP_BACKGROUND_COLOR, attr->value());
       else
         removeCSSProperty(CSS_PROP_BACKGROUND_COLOR);
       break;
@@ -556,7 +556,7 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
     }
     case ATTR_BORDERCOLOR: {
       if (!attr->value().isEmpty()) {
-        addCSSProperty(CSS_PROP_BORDER_COLOR, attr->value());
+        addHTMLColor(CSS_PROP_BORDER_COLOR, attr->value());
         addCSSProperty(CSS_PROP_BORDER_TOP_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
@@ -575,8 +575,9 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
       DOMString v = attr->value();
       if (strcasecmp(attr->value(), "middle") == 0 ||
           strcasecmp(attr->value(), "center") == 0)
-        v = "-konq-center";
-      addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, CSS_VAL__KONQ_CENTER);
+      else
+        addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
       break;
     }
     case ATTR_HEIGHT:
@@ -821,7 +822,7 @@ void HTMLTableCellElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     case ATTR_NOWRAP:
       if (attr->val() != 0)
-        addCSSProperty(CSS_PROP_WHITE_SPACE, "-konq-nowrap");
+        addCSSProperty(CSS_PROP_WHITE_SPACE, CSS_VAL__KONQ_NOWRAP);
       else
         removeCSSProperty(CSS_PROP_WHITE_SPACE);
       break;
