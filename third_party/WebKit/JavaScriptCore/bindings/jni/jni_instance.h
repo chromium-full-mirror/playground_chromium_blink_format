@@ -62,7 +62,7 @@ class JObjectWrapper {
 
 class JavaInstance : public Instance {
  public:
-  JavaInstance(jobject instance);
+  JavaInstance(jobject instance, const RootObject* r);
 
   ~JavaInstance();
 
@@ -95,6 +95,9 @@ class JavaInstance : public Instance {
                                   const MethodList& method,
                                   const KJS::List& args);
 
+  virtual void setExecutionContext(RootObject* r);
+  virtual const RootObject* executionContext() const;
+
   jobject javaInstance() const { return _instance->_instance; }
 
   KJS::Value stringValue() const;
@@ -104,6 +107,7 @@ class JavaInstance : public Instance {
  private:
   JObjectWrapper* _instance;
   mutable JavaClass* _class;
+  const RootObject* _root;
 };
 
 }  // namespace Bindings

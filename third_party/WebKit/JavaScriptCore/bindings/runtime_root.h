@@ -93,6 +93,8 @@ class RootObject {
 
   static void dispatchToJavaScriptThread(JSObjectCallContext* context);
 
+  const void* nativeHandle() const { return _nativeHandle; }
+
  private:
   const void* _nativeHandle;
   KJS::ObjectImp* _imp;
