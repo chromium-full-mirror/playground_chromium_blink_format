@@ -158,6 +158,9 @@ enum FrameBorderStyle {
                      bottom:(float)oldBottom
                       limit:(float)bottomLimit;
 
+- (void)setUsesInactiveTextBackgroundColor:(BOOL)uses;
+- (BOOL)usesInactiveTextBackgroundColor;
+
 - (void)mouseDown:(NSEvent*)event;
 - (void)mouseUp:(NSEvent*)event;
 - (void)mouseMoved:(NSEvent*)event;
