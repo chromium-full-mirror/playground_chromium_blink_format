@@ -163,6 +163,11 @@ class DOMDocument : public DOMNode {
   DOMDocument(Object proto, DOM::Document d);
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
+  virtual void tryPut(ExecState* exec,
+                      const UString& propertyName,
+                      const Value& value,
+                      int attr = None);
+  void putValue(ExecState* exec, int token, const Value& value, int attr);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
@@ -190,6 +195,8 @@ class DOMDocument : public DOMNode {
     DefaultView,
     CreateEvent,
     StyleSheets,
+    PreferredStylesheetSet,
+    SelectedStylesheetSet,
     GetOverrideStyle,
     ReadyState
   };

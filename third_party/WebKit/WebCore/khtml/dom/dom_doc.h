@@ -744,6 +744,14 @@ class Document : public Node {
    */
   StyleSheetList styleSheets() const;
 
+  /* Newly proposed CSS3 mechanism for selecting alternate
+     stylesheets using the DOM. May be subject to change as
+     spec matures. - dwh
+  */
+  DOMString preferredStylesheetSet();
+  DOMString selectedStylesheetSet();
+  void setSelectedStylesheetSet(const DOMString& aString);
+
   /**
    * @return The KHTML view widget of this document.
    */
