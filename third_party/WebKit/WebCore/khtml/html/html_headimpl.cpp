@@ -437,7 +437,13 @@ NodeImpl::Id HTMLTitleElementImpl::id() const {
 
 void HTMLTitleElementImpl::insertedIntoDocument() {
   HTMLElementImpl::insertedIntoDocument();
+#ifdef APPLE_CHANGES
+  // Only allow title to be set by first <title> encountered.
+  if (getDocument()->title().isEmpty())
+    getDocument()->setTitle(m_title);
+#else
   getDocument()->setTitle(m_title);
+#endif
 }
 
 void HTMLTitleElementImpl::removedFromDocument() {
@@ -456,6 +462,11 @@ void HTMLTitleElementImpl::childrenChanged() {
         (c->nodeType() == Node::CDATA_SECTION_NODE))
       m_title += c->nodeValue();
   }
-  if (inDocument())
+#ifdef APPLE_CHANGES
+  // Only allow title to be set by first <title> encountered.
+  if (inDocument() && getDocument()->title().isEmpty())
+#else
+  if (inDocument()))
+#endif
     getDocument()->setTitle(m_title);
 }
