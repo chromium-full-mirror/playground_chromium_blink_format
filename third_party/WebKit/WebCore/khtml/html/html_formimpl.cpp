@@ -1284,7 +1284,8 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
 
 void HTMLInputElementImpl::attach() {
   if (!m_inited) {
-    setType(getAttribute(ATTR_TYPE));
+    if (!m_haveType)
+      setType(getAttribute(ATTR_TYPE));
 
     if (m_type != FILE)
       m_value = getAttribute(ATTR_VALUE);
