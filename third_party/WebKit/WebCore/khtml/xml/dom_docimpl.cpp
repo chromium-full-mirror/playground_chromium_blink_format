@@ -513,6 +513,9 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
 void DocumentImpl::setTitle(DOMString _title) {
   m_title = _title;
 
+  if (!view() || !view()->part())
+    return;
+
 #if APPLE_CHANGES
   KWQ(view()->part())->setTitle(_title);
 #else
