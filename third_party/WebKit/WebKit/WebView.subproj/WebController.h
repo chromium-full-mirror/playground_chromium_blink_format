@@ -112,6 +112,12 @@
 
 @end
 
+#define WebContextLinkURL @"WebContextLinkURL"
+#define WebContextImageURL @"WebContextImageURL"
+#define WebContextString @"WebContextString"
+#define WebContextImage @"WebContextImage"
+#define WebContextFrame @"WebContextFrame"
+
 #ifdef READY_FOR_PRIME_TIME
 /*
    =============================================================================
