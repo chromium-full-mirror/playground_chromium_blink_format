@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
@@ -23,10 +23,9 @@
 #ifndef _CSS_css_ruleimpl_h_
 #define _CSS_css_ruleimpl_h_
 
-#include <dom_string.h>
-//#include <css_stylesheetimpl.h>
-#include <css_rule.h>
-#include "cssparser.h"
+#include "dom/dom_string.h"
+#include "dom/css_rule.h"
+#include "css/cssparser.h"
 #include "misc/loader_client.h"
 
 namespace khtml {
@@ -41,9 +40,7 @@ class CSSStyleSheetImpl;
 class CSSStyleDeclarationImpl;
 class MediaListImpl;
 
-// @media needs a list...
-// ### I'd prefer having CSSRuleImpl derived from StyleBaseImpl only, though.
-class CSSRuleImpl : public StyleListImpl {
+class CSSRuleImpl : public StyleBaseImpl {
  public:
   CSSRuleImpl(StyleBaseImpl* parent);
 
@@ -57,6 +54,7 @@ class CSSRuleImpl : public StyleListImpl {
 
   DOM::DOMString cssText() const;
   void setCssText(DOM::DOMString str);
+  virtual void init() {}
 
  protected:
   CSSRule::RuleType m_type;
@@ -95,7 +93,7 @@ class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
  public:
   CSSImportRuleImpl(StyleBaseImpl* parent,
                     const DOM::DOMString& href,
-                    MediaListImpl* media = 0);
+                    const DOM::DOMString& media);
 
   virtual ~CSSImportRuleImpl();
 
@@ -110,6 +108,7 @@ class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
                              const DOM::DOMString& sheet);
 
   bool isLoading();
+  virtual void init();
 
  protected:
   DOMString m_strHref;
@@ -125,11 +124,15 @@ class CSSRuleList;
 class CSSMediaRuleImpl : public CSSRuleImpl {
  public:
   CSSMediaRuleImpl(StyleBaseImpl* parent);
+  CSSMediaRuleImpl(StyleBaseImpl* parent,
+                   const QChar*& curP,
+                   const QChar* endP,
+                   const DOM::DOMString& media);
 
   virtual ~CSSMediaRuleImpl();
 
   MediaListImpl* media() const;
-  CSSRuleList cssRules();
+  CSSRuleListImpl* cssRules();
   unsigned long insertRule(const DOM::DOMString& rule, unsigned long index);
   void deleteRule(unsigned long index);
 
@@ -137,6 +140,10 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
 
  protected:
   MediaListImpl* m_lstMedia;
+  CSSRuleListImpl* m_lstCSSRules;
+
+  /* Not part of the DOM */
+  unsigned long appendRule(CSSRuleImpl* rule);
 };
 
 class CSSPageRuleImpl : public CSSRuleImpl {
@@ -171,17 +178,17 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
 
   virtual bool parseString(const DOMString& string, bool = false);
 
-  void setSelector(QList<CSSSelector>* selector);
+  void setSelector(QPtrList<CSSSelector>* selector);
   void setDeclaration(CSSStyleDeclarationImpl* style);
 
-  QList<CSSSelector>* selector() { return m_selector; }
+  QPtrList<CSSSelector>* selector() { return m_selector; }
   CSSStyleDeclarationImpl* declaration() { return m_style; }
 
   void setNonCSSHints();
 
  protected:
   CSSStyleDeclarationImpl* m_style;
-  QList<CSSSelector>* m_selector;
+  QPtrList<CSSSelector>* m_selector;
 };
 
 class CSSUnknownRuleImpl : public CSSRuleImpl {
@@ -194,12 +201,19 @@ class CSSUnknownRuleImpl : public CSSRuleImpl {
 };
 
 class CSSRuleListImpl : public DomShared {
-  // ### implement this!
  public:
-  CSSRuleListImpl() {}
+  CSSRuleListImpl();
+  ~CSSRuleListImpl();
 
-  unsigned long length() const { return 0; }
-  CSSRuleImpl* item(unsigned long /*index*/) { return 0; }
+  unsigned long length() const;
+  CSSRuleImpl* item(unsigned long index);
+
+  /* not part of the DOM */
+  unsigned long insertRule(CSSRuleImpl* rule, unsigned long index);
+  void deleteRule(unsigned long index);
+
+ protected:
+  QPtrList<CSSRuleImpl> m_lstCSSRules;
 };
 
 };  // namespace

@@ -94,7 +94,7 @@ class QPoint {
 
 // class QPointArray ===========================================================
 
-class QPointArray : public QArray<QPoint> {
+class QPointArray : public QMemArray<QPoint> {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -104,7 +104,7 @@ class QPointArray : public QArray<QPoint> {
 
   QPointArray() {}
   ~QPointArray() {}
-  QPointArray(int size) : QArray<QPoint>(size){};
+  QPointArray(int size) : QMemArray<QPoint>(size){};
 
   QPointArray(const QPointArray&);
   QPointArray(int, const QCOORD*);

@@ -52,6 +52,7 @@ class QWidget;
   NSSecureTextField* secureField;
   QWidget* widget;
   KWQNSTextFieldFormatter* formatter;
+  bool edited;
 }
 
 - initWithFrame:(NSRect)r widget:(QWidget*)w;
@@ -60,5 +61,7 @@ class QWidget;
 - (bool)passwordMode;
 - (void)setMaximumLength:(int)len;
 - (int)maximumLength;
+- (bool)edited;
+- (void)setEdited:(bool)ed;
 
 @end

@@ -21,11 +21,10 @@
  * $Id$
  */
 
-#include "dom_exception.h"
-#include "dom_string.h"
+#include "dom/dom_exception.h"
+#include "dom/dom_text.h"
+#include "xml/dom_textimpl.h"
 
-#include "dom_text.h"
-#include "dom_textimpl.h"
 using namespace DOM;
 
 CharacterData::CharacterData() : Node() {}
@@ -33,8 +32,10 @@ CharacterData::CharacterData() : Node() {}
 CharacterData::CharacterData(const CharacterData& other) : Node(other) {}
 
 CharacterData& CharacterData::operator=(const Node& other) {
-  if (other.nodeType() != CDATA_SECTION_NODE && other.nodeType() != TEXT_NODE &&
-      other.nodeType() != COMMENT_NODE) {
+  NodeImpl* ohandle = other.handle();
+  if (!ohandle || (ohandle->nodeType() != CDATA_SECTION_NODE &&
+                   ohandle->nodeType() != TEXT_NODE &&
+                   ohandle->nodeType() != COMMENT_NODE)) {
     impl = 0;
     return *this;
   }
@@ -56,8 +57,14 @@ DOMString CharacterData::data() const {
 }
 
 void CharacterData::setData(const DOMString& str) {
-  if (impl)
-    ((CharacterDataImpl*)impl)->setData(str);
+  if (!impl)
+    return;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  ((CharacterDataImpl*)impl)->setData(str, exceptioncode);
+  if (exceptioncode)
+    throw DOMException(exceptioncode);
+  return;
 }
 
 unsigned long CharacterData::length() const {
@@ -68,35 +75,46 @@ unsigned long CharacterData::length() const {
 
 DOMString CharacterData::substringData(const unsigned long offset,
                                        const unsigned long count) {
-  int exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-  DOMString str;
-  if (impl)
-    str =
-        ((CharacterDataImpl*)impl)->substringData(offset, count, exceptioncode);
+  if (!impl)
+    return DOMString();  // ### enable throw
+                         // DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  DOMString str =
+      ((CharacterDataImpl*)impl)->substringData(offset, count, exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
   return str;
 }
 
 void CharacterData::appendData(const DOMString& arg) {
-  if (impl)
-    ((CharacterDataImpl*)impl)->appendData(arg);
+  if (!impl)
+    return;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  ((CharacterDataImpl*)impl)->appendData(arg, exceptioncode);
+  if (exceptioncode)
+    throw DOMException(exceptioncode);
 }
 
 void CharacterData::insertData(const unsigned long offset,
                                const DOMString& arg) {
-  int exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-  if (impl)
-    ((CharacterDataImpl*)impl)->insertData(offset, arg, exceptioncode);
+  if (!impl)
+    return;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  ((CharacterDataImpl*)impl)->insertData(offset, arg, exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
 }
 
 void CharacterData::deleteData(const unsigned long offset,
                                const unsigned long count) {
-  int exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-  if (impl)
-    ((CharacterDataImpl*)impl)->deleteData(offset, count, exceptioncode);
+  if (!impl)
+    return;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  ((CharacterDataImpl*)impl)->deleteData(offset, count, exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
 }
@@ -104,9 +122,11 @@ void CharacterData::deleteData(const unsigned long offset,
 void CharacterData::replaceData(const unsigned long offset,
                                 const unsigned long count,
                                 const DOMString& arg) {
-  int exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-  if (impl)
-    ((CharacterDataImpl*)impl)->replaceData(offset, count, arg, exceptioncode);
+  if (!impl)
+    return;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  ((CharacterDataImpl*)impl)->replaceData(offset, count, arg, exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
 }
@@ -120,7 +140,8 @@ Comment::Comment() : CharacterData() {}
 Comment::Comment(const Comment& other) : CharacterData(other) {}
 
 Comment& Comment::operator=(const Node& other) {
-  if (other.nodeType() != COMMENT_NODE) {
+  NodeImpl* ohandle = other.handle();
+  if (!ohandle || ohandle->nodeType() != COMMENT_NODE) {
     impl = 0;
     return *this;
   }
@@ -144,7 +165,9 @@ Text::Text() {}
 Text::Text(const Text& other) : CharacterData(other) {}
 
 Text& Text::operator=(const Node& other) {
-  if (other.nodeType() != TEXT_NODE && other.nodeType() != CDATA_SECTION_NODE) {
+  NodeImpl* ohandle = other.handle();
+  if (!ohandle || (ohandle->nodeType() != TEXT_NODE &&
+                   ohandle->nodeType() != CDATA_SECTION_NODE)) {
     impl = 0;
     return *this;
   }
@@ -160,10 +183,12 @@ Text& Text::operator=(const Text& other) {
 Text::~Text() {}
 
 Text Text::splitText(const unsigned long offset) {
-  int exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-  TextImpl* newText = 0;
-  if (impl)
-    newText = static_cast<TextImpl*>(impl)->splitText(offset, exceptioncode);
+  if (!impl)
+    return 0;  // ### enable throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  int exceptioncode = 0;
+  TextImpl* newText =
+      static_cast<TextImpl*>(impl)->splitText(offset, exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
   return newText;

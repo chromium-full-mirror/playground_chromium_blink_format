@@ -100,6 +100,7 @@ class QPainter : public Qt {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
+  typedef enum { RTL, LTR } TextDirection;
   // constants ---------------------------------------------------------------
   // static member functions -------------------------------------------------
 
@@ -164,7 +165,10 @@ class QPainter : public Qt {
                 int len = -1,
                 QRect* br = 0,
                 char** internal = 0);
+  void drawText(int, int, const QString&, int, TextDirection);
+
   void fillRect(int, int, int, int, const QBrush&);
+  void drawConvexPolygon(const QPointArray&);
 
   void setClipping(bool);
   void setClipRegion(const QRegion&);

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the html renderer for KDE.
  *
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
@@ -23,19 +23,17 @@
 #ifndef RENDER_BODY
 #define RENDER_BODY
 
-#include "render_flow.h"
+#include "rendering/render_flow.h"
 
 namespace DOM {
 class HTMLBodyElementImpl;
 }
 
-class QScrollView;
-
 namespace khtml {
 
 class RenderBody : public RenderFlow {
  public:
-  RenderBody(DOM::HTMLBodyElementImpl* view);
+  RenderBody(DOM::HTMLBodyElementImpl* node);
   virtual ~RenderBody();
 
   virtual bool isBody() const { return true; }
@@ -55,8 +53,8 @@ class RenderBody : public RenderFlow {
                                    int _h,
                                    int _tx,
                                    int _ty);
-  DOM::HTMLBodyElementImpl* m_element;
   bool scrollbarsStyled;
 };
-};
+
+};  // end namespace
 #endif

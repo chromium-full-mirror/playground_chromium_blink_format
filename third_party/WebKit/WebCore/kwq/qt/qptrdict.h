@@ -47,7 +47,7 @@ class QPtrDictIterator;
 // class QPtrDict ==============================================================
 
 template <class T>
-class QPtrDict : public QCollection {
+class QPtrDict : public QPtrCollection {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -73,7 +73,7 @@ class QPtrDict : public QCollection {
 
   QPtrDict<T>& operator=(const QPtrDict<T>& pd) {
     impl.assign(pd.impl, del_item);
-    QCollection::operator=(pd);
+    QPtrCollection::operator=(pd);
     return *this;
   }
   T* operator[](void* key) const { return (T*)impl.find(key); }

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the CSS implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -23,23 +23,24 @@
 #ifndef _CSS_cssstyleselector_h_
 #define _CSS_cssstyleselector_h_
 
-#include <qlist.h>
+#include <qptrlist.h>
 
 #include "rendering/render_style.h"
 #include "dom/dom_string.h"
 
 class KHTMLSettings;
+class KHTMLView;
+class KURL;
 
 namespace DOM {
 class ElementImpl;
-class DocumentImpl;
-class HTMLDocumentImpl;
 class StyleSheetImpl;
 class CSSStyleRuleImpl;
 class CSSStyleSheetImpl;
 class CSSSelector;
 class CSSStyleDeclarationImpl;
 class CSSProperty;
+class StyleSheetListImpl;
 }
 
 namespace khtml {
@@ -101,15 +102,19 @@ class CSSStyleSelector : public StyleSelector {
    * Also takes into account special cases for HTML documents,
    * including the defaultStyle (which is html only)
    */
-  CSSStyleSelector(DOM::DocumentImpl* doc);
+  CSSStyleSelector(KHTMLView* view,
+                   QString userStyleSheet,
+                   DOM::StyleSheetListImpl* styleSheets,
+                   const KURL& url,
+                   bool _strictParsing);
   /**
    * same as above but for a single stylesheet.
    */
-  CSSStyleSelector(DOM::StyleSheetImpl* sheet);
+  CSSStyleSelector(DOM::CSSStyleSheetImpl* sheet);
 
   virtual ~CSSStyleSelector();
 
-  void addSheet(DOM::StyleSheetImpl* sheet);
+  void addSheet(DOM::CSSStyleSheetImpl* sheet);
 
   static void loadDefaultStyle(const KHTMLSettings* s = 0);
   static void clear();
@@ -141,12 +146,25 @@ class CSSStyleSelector : public StyleSelector {
 
   static DOM::CSSStyleSheetImpl* defaultSheet;
   static CSSStyleSelectorList* defaultStyle;
+  static CSSStyleSelectorList* defaultPrintStyle;
   CSSStyleSelectorList* authorStyle;
   CSSStyleSelectorList* userStyle;
   DOM::CSSStyleSheetImpl* userSheet;
 
  public:  // we need to make the enum public for SelectorCache
   enum SelectorState { Unknown = 0, Applies, AppliesPseudo, Invalid };
+
+  enum SelectorMedia {
+    MediaAural = 1,
+    MediaBraille,
+    MediaEmboss,
+    MediaHandheld,
+    MediaPrint,
+    MediaProjection,
+    MediaScreen,
+    MediaTTY,
+    MediaTV
+  };
 
  protected:
   struct SelectorCache {
@@ -160,7 +178,8 @@ class CSSStyleSelector : public StyleSelector {
   SelectorCache* selectorCache;
   unsigned int properties_size;
   CSSOrderedProperty** properties;
-  QArray<CSSOrderedProperty> inlineProps;
+  QMemArray<CSSOrderedProperty> inlineProps;
+  QString m_medium;
 };
 
 /*
@@ -200,9 +219,9 @@ class CSSOrderedProperty {
  * This is the list we will collect all properties we need to apply in.
  * It will get sorted once before applying.
  */
-class CSSOrderedPropertyList : public QList<CSSOrderedProperty> {
+class CSSOrderedPropertyList : public QPtrList<CSSOrderedProperty> {
  public:
-  virtual int compareItems(QCollection::Item i1, QCollection::Item i2);
+  virtual int compareItems(QPtrCollection::Item i1, QPtrCollection::Item i2);
   void append(DOM::CSSStyleDeclarationImpl* decl,
               uint selector,
               uint specificity,
@@ -220,14 +239,15 @@ class CSSOrderedRule {
   int index;
 };
 
-class CSSStyleSelectorList : public QList<CSSOrderedRule> {
+class CSSStyleSelectorList : public QPtrList<CSSOrderedRule> {
  public:
   CSSStyleSelectorList();
   virtual ~CSSStyleSelectorList();
 
-  void append(DOM::StyleSheetImpl* sheet);
+  void append(DOM::CSSStyleSheetImpl* sheet,
+              const DOM::DOMString& medium = "screen");
 
-  void collect(QList<DOM::CSSSelector>* selectorList,
+  void collect(QPtrList<DOM::CSSSelector>* selectorList,
                CSSOrderedPropertyList* propList,
                Source regular,
                Source important);

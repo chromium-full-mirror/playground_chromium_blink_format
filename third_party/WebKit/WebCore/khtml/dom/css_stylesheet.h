@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
@@ -375,8 +375,6 @@ class MediaList {
    *
    * NO_MODIFICATION_ALLOWED_ERR: Raised if this media list is readonly.
    */
-  // BIC: remove me!
-  DOM::DOMString mediaText();
   DOM::DOMString mediaText() const;
 
   /**
@@ -388,7 +386,7 @@ class MediaList {
    * The number of media in the list. The range of valid media is 0 to length-1
    * inclusive.
    */
-  unsigned long length();
+  unsigned long length() const;
 
   /**
    * Returns the indexth in the list. If index is greater than or equal to
@@ -399,7 +397,7 @@ class MediaList {
    * @return The medium at the indexth position in the MediaList, or null if
    * that is not a valid index.
    */
-  DOM::DOMString item(unsigned long index);
+  DOM::DOMString item(unsigned long index) const;
 
   /**
    * Deletes the medium indicated by oldMedium from the list.

@@ -59,7 +59,8 @@ class Qt {
   };
 
   enum AlignmentFlags {
-    AlignLeft = 0x0001,  // text alignment
+    AlignAuto = 0x0000,  // text alignment
+    AlignLeft = 0x0001,
     AlignRight = 0x0002,
     AlignHCenter = 0x0004,
     AlignTop = 0x0008,
@@ -275,6 +276,8 @@ class Qt {
   static const QCursor& sizeAllCursor;
   static const QCursor& splitHCursor;
   static const QCursor& splitVCursor;
+  static const QCursor& sizeHorCursor;
+  static const QCursor& sizeVerCursor;
 
   // static member functions -------------------------------------------------
   // constructors, copy constructors, and destructors ------------------------

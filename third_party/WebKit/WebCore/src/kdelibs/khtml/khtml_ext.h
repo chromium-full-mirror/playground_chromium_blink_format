@@ -6,6 +6,7 @@
 #include <qguardedptr.h>
 
 #include <kaction.h>
+#include <kio/global.h>
 
 /**
  * This is the BrowserExtension for a @ref KHTMLPart document. Please see the
@@ -63,7 +64,7 @@ class KHTMLPartBrowserHostExtension : public KParts::BrowserHostExtension {
 
   virtual QStringList frameNames() const;
 
-  virtual const QList<KParts::ReadOnlyPart> frames() const;
+  virtual const QPtrList<KParts::ReadOnlyPart> frames() const;
 
   virtual bool openURLInFrame(const KURL& url, const KParts::URLArgs& urlArgs);
 
@@ -84,10 +85,15 @@ class KHTMLPopupGUIClient : public QObject, public KXMLGUIClient {
   static void saveURL(QWidget* parent,
                       const QString& caption,
                       const KURL& url,
+                      const QMap<QString, QString>& metaData = KIO::MetaData(),
                       const QString& filter = QString::null,
                       long cacheId = 0,
                       const QString& suggestedFilename = QString::null);
 
+  static void saveURL(const KURL& url,
+                      const KURL& destination,
+                      const QMap<QString, QString>& metaData = KIO::MetaData(),
+                      long cacheId = 0);
  private slots:
   void slotSaveLinkAs();
   void slotSaveImageAs();
@@ -119,6 +125,8 @@ class KHTMLFontSizeAction : public KAction {
 
  private slots:
   void slotActivated(int);
+ protected slots:
+  void slotActivated() { KAction::slotActivated(); }
 
  private:
   QPopupMenu* m_popup;

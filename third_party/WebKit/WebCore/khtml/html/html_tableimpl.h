@@ -27,7 +27,7 @@
 #ifndef HTML_TABLEIMPL_H
 #define HTML_TABLEIMPL_H
 
-#include "html_elementimpl.h"
+#include "html/html_elementimpl.h"
 
 namespace DOM {
 
@@ -71,8 +71,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   HTMLTableElementImpl(DocumentPtr* doc);
   ~HTMLTableElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   HTMLTableCaptionElementImpl* caption() const { return tCaption; }
   NodeImpl* setCaption(HTMLTableCaptionElementImpl*);
@@ -82,6 +81,8 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   HTMLTableSectionElementImpl* tFoot() const { return foot; }
   NodeImpl* setTFoot(HTMLTableSectionElementImpl*);
+
+  NodeImpl* setTBody(HTMLTableSectionElementImpl*);
 
   HTMLElementImpl* createTHead();
   void deleteTHead();
@@ -94,9 +95,9 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   // overrides
   virtual NodeImpl* addChild(NodeImpl* child);
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
-  virtual void attach();
+  virtual void init();
 
  protected:
   HTMLTableSectionElementImpl* head;
@@ -109,6 +110,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   bool incremental : 1;
   bool m_noBorder : 1;
+  bool m_solid : 1;
   friend class HTMLTableCellElementImpl;
 };
 
@@ -118,11 +120,13 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
 
 {
  public:
-  HTMLTablePartElementImpl(DocumentPtr* doc) : HTMLElementImpl(doc) {}
+  HTMLTablePartElementImpl(DocumentPtr* doc)
+      : HTMLElementImpl(doc), m_solid(false) {}
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
-  void attach();
+ protected:
+  bool m_solid : 1;
 };
 
 // -------------------------------------------------------------------------
@@ -133,8 +137,7 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
 
   ~HTMLTableSectionElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   HTMLElementImpl* insertRow(long index);
   void deleteRow(long index);
@@ -154,8 +157,7 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
   ~HTMLTableRowElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   long rowIndex() const;
   long sectionRowIndex() const;
@@ -172,11 +174,7 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
  public:
   HTMLTableCellElementImpl(DocumentPtr* doc, int tagId);
-
   ~HTMLTableCellElementImpl();
-
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const { return _id; }
 
   // ### FIX these two...
   long cellIndex() const { return 0; }
@@ -186,18 +184,23 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
   int row() const { return _row; }
   void setRow(int r) { _row = r; }
 
-  // overrides
-  virtual void parseAttribute(AttrImpl* attr);
-  virtual void attach();
+  int colSpan() const { return cSpan; }
+  int rowSpan() const { return rSpan; }
+  bool noWrap() const { return m_nowrap; }
+
+  virtual Id id() const { return _id; }
+  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void init();
 
  protected:
   int _row;
   int _col;
   int rSpan;
   int cSpan;
-  bool nWrap;
   int _id;
   int rowHeight;
+
+  bool m_nowrap : 1;
 };
 
 // -------------------------------------------------------------------------
@@ -208,15 +211,16 @@ class HTMLTableColElementImpl : public HTMLElementImpl {
 
   ~HTMLTableColElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   void setTable(HTMLTableElementImpl* t) { table = t; }
 
   virtual NodeImpl* addChild(NodeImpl* child);
 
   // overrides
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
+
+  int span() const { return _span; }
 
  protected:
   // could be ID_COL or ID_COLGROUP ... The DOM is not quite clear on
@@ -235,10 +239,9 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
 
   ~HTMLTableCaptionElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 };
 
 };  // namespace

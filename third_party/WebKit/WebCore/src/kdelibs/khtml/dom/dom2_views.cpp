@@ -21,22 +21,11 @@
  * $Id$
  */
 
-/*
-#include "dom2_views.h"
-#include "dom2_viewsimpl.h"
-#include "dom_doc.h"
-#include "dom_exception.h"
-*/
-
-#include "dom2_views.h"
-#include "dom_node.h"
-#include "dom_exception.h"
-#include "dom2_viewsimpl.h"
-#include "dom_doc.h"
-#include "dom2_traversal.h"
-#include "dom2_traversalimpl.h"
-#include "dom_element.h"
-#include "dom_elementimpl.h"
+#include "dom/dom2_views.h"
+#include "dom/dom_exception.h"
+#include "dom/dom_doc.h"
+#include "xml/dom_elementimpl.h"
+#include "xml/dom2_viewsimpl.h"
 
 using namespace DOM;
 

@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
@@ -16,6 +17,8 @@
  *  along with this library; see the file COPYING.LIB.  If not, write to
  *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  *  Boston, MA 02111-1307, USA.
+ *
+ *  $Id$
  */
 
 #ifdef HAVE_CONFIG_H
@@ -34,6 +37,7 @@
 
 #include "ustring.h"
 #include "operations.h"
+#include <math.h>
 
 namespace KJS {
 extern const double NaN;
@@ -111,29 +115,21 @@ UString::Rep UString::Rep::null = {0, 0, 1};
 UString UString::null;
 static char* statBuffer = 0L;
 
-UChar::UChar(const UCharReference& c)
-#ifdef KJS_SWAPPED_CHAR
-    : lo(c.low()),
-      hi(c.high())
-#else
-    : hi(c.high()),
-      lo(c.low())
-#endif
-{
-}
+UChar::UChar(const UCharReference& c) : uc(c.unicode()) {}
 
 UChar UChar::toLower() const {
-  if (islower(lo) && hi == 0)
+  // ### properly supprot unicode tolower
+  if (uc >= 256 || islower(uc))
     return *this;
 
-  return UChar(0, tolower(lo));
+  return UChar(tolower(uc));
 }
 
 UChar UChar::toUpper() const {
-  if (isupper(lo) && hi == 0)
+  if (uc >= 256 || isupper(uc))
     return *this;
 
-  return UChar(0, toupper(lo));
+  return UChar(toupper(uc));
 }
 
 UCharReference& UCharReference::operator=(UChar c) {
@@ -214,7 +210,25 @@ UString UString::from(unsigned int u) {
 
 UString UString::from(double d) {
   char buf[40];
-  sprintf(buf, "%.16g", d);  // does the right thing
+
+  if (d == -0)
+    strcpy(buf, "0");
+  else if (KJS::isNaN(d))
+    strcpy(buf, "NaN");
+  else if (KJS::isPosInf(d))
+    strcpy(buf, "Infinity");
+  else if (KJS::isNegInf(d))
+    strcpy(buf, "-Infinity");
+  else
+    sprintf(buf, "%.16g", d);  // does the right thing
+
+  // ECMA 3rd ed. 9.8.1 9 e: "with no leading zeros"
+  int buflen = strlen(buf);
+  if (buflen >= 4 && buf[buflen - 4] == 'e' && buf[buflen - 2] == '0') {
+    buf[buflen - 2] = buf[buflen - 1];
+    buf[buflen - 1] = 0;
+  }
+
   return UString(buf);
 }
 
@@ -239,7 +253,7 @@ char* UString::ascii() const {
 
   statBuffer = new char[size() + 1];
   for (int i = 0; i < size(); i++)
-    statBuffer[i] = data()[i].lo;
+    statBuffer[i] = data()[i].low();
   statBuffer[size()] = '\0';
 
   return statBuffer;
@@ -250,7 +264,7 @@ UString& UString::operator=(const char* c) {
   int l = c ? strlen(c) : 0;
   UChar* d = new UChar[l];
   for (int i = 0; i < l; i++)
-    d[i].lo = c[i];
+    d[i].uc = c[i];
   rep = Rep::create(d, l);
 
   return *this;
@@ -271,7 +285,7 @@ UString& UString::operator+=(const UString& s) {
 bool UString::is8Bit() const {
   const UChar* u = data();
   for (int i = 0; i < size(); i++, u++)
-    if (u->hi)
+    if (u->uc > 0xFF)
       return false;
 
   return true;
@@ -289,7 +303,7 @@ UCharReference UString::operator[](int pos) {
   return UCharReference(this, pos);
 }
 
-double UString::toDouble() const {
+double UString::toDouble(bool tolerant) const {
   double d;
 
   if (!is8Bit())
@@ -322,7 +336,7 @@ double UString::toDouble() const {
     // regular number ?
     char* end;
     d = strtod(c, &end);
-    if (d != 0.0 || end != c) {
+    if ((d != 0.0 || end != c) && d != HUGE_VAL && d != -HUGE_VAL) {
       c = end;
     } else {
       // infinity ?
@@ -343,7 +357,8 @@ double UString::toDouble() const {
   // allow trailing white space
   while (isspace(*c))
     c++;
-  if (*c != '\0')
+  // don't allow anything after - unless tolerant=true
+  if (!tolerant && *c != '\0')
     d = NaN;
 
   return d;
@@ -434,10 +449,6 @@ void UString::release() {
   }
 }
 
-bool KJS::operator==(const UChar& c1, const UChar& c2) {
-  return ((c1.lo == c2.lo) & (c1.hi == c2.hi));
-}
-
 bool KJS::operator==(const UString& s1, const UString& s2) {
   if (s1.rep->len != s2.rep->len)
     return false;
@@ -454,17 +465,13 @@ bool KJS::operator==(const UString& s1, const char* s2) {
 
   const UChar* u = s1.data();
   while (*s2) {
-    if (u->lo != *s2 || u->hi != 0)
+    if (u->uc != *s2)
       return false;
     s2++;
     u++;
   }
 
   return true;
-}
-
-bool KJS::operator==(const char* s1, const UString& s2) {
-  return operator==(s2, s1);
 }
 
 bool KJS::operator<(const UString& s1, const UString& s2) {

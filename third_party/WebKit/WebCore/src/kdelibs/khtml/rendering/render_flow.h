@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -42,7 +42,7 @@ namespace khtml {
  */
 class RenderFlow : public RenderBox {
  public:
-  RenderFlow();
+  RenderFlow(DOM::NodeImpl* node);
 
   virtual ~RenderFlow();
 
@@ -53,10 +53,9 @@ class RenderFlow : public RenderBox {
   virtual bool isFlow() const { return true; }
   virtual bool childrenInline() const { return m_childrenInline; }
   virtual bool isRendered() const { return true; }
+  virtual void setBlockBidi() { m_blockBidi = true; }
 
-  bool haveAnonymousBox() const { return m_haveAnonymous; }
-  void setHaveAnonymousBox(bool b = true) { m_haveAnonymous = b; }
-  void makeChildrenNonInline();
+  void makeChildrenNonInline(RenderObject* box2Start = 0);
 
   // overrides RenderObject
 
@@ -72,8 +71,6 @@ class RenderFlow : public RenderBox {
 
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
 
-  virtual void specialHandler(RenderObject* /*special*/);
-
   virtual unsigned short lineWidth(int y) const;
 
   virtual int lowestPosition() const;
@@ -87,16 +84,19 @@ class RenderFlow : public RenderBox {
   int leftRelOffset(int y, int fixedOffset, int* heightRemaining = 0) const;
   int leftOffset(int y) const { return leftRelOffset(y, leftOffset()); }
 
-  virtual bool containsPoint(int _x, int _y, int _tx, int _ty);
-
+#ifndef NDEBUG
   virtual void printTree(int indent = 0) const;
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
+
+  virtual bool nodeAtPoint(NodeInfo& info, int x, int y, int tx, int ty);
 
  protected:
   virtual void newLine();
 
-  void layoutBlockChildren();
+  void layoutBlockChildren(bool relayoutChildren);
   void layoutInlineChildren();
-  void layoutSpecialObjects();
+  void layoutSpecialObjects(bool relayoutChildren);
 
  public:
   int floatBottom() const;
@@ -104,11 +104,11 @@ class RenderFlow : public RenderBox {
   inline int rightBottom();
   bool checkClear(RenderObject* child);
 
+  void insertSpecialObject(RenderObject* o);
+
   // from BiDiParagraph
   virtual void closeParagraph() { positionNewFloats(); }
 
-  void insertFloat(RenderObject* child);
-  void insertPositioned(RenderObject* child);
   void removeSpecialObject(RenderObject* o);
   // called from lineWidth, to position the floats added in the last line.
   void positionNewFloats();
@@ -124,39 +124,30 @@ class RenderFlow : public RenderBox {
                             bool child = false);
 
   // implementation of the following functions is in bidi.cpp
-  void appendRun(QList<BidiRun>& runs,
-                 BidiIterator& sor,
-                 BidiIterator& eor,
-                 BidiContext* context,
-                 QChar::Direction dir);
-  BidiContext* bidiReorderLine(BidiStatus&,
-                               const BidiIterator& start,
-                               const BidiIterator& end,
-                               BidiContext* startEmbed);
-  BidiIterator findNextLineBreak(const BidiIterator& start);
-
- public:
-  RenderObject* first();
-  RenderObject* next(RenderObject* current);
-  RenderObject* nextObject(RenderObject* current);
+  void bidiReorderLine(const BidiIterator& start, const BidiIterator& end);
+  BidiIterator findNextLineBreak(BidiIterator& start);
 
  protected:
   struct SpecialObject {
-    SpecialObject() {
-      count = 0;
-      noPaint = false;
-      startY = 0;
-      endY = 0;
-    }
     enum Type { FloatLeft, FloatRight, Positioned };
 
+    SpecialObject(Type _type) {
+      node = 0;
+      startY = 0;
+      endY = 0;
+      type = _type;
+      left = 0;
+      width = 0;
+      count = 0;
+      noPaint = false;
+    }
     RenderObject* node;
     int startY;
     int endY;
-    Type type;  // left or right aligned
     short left;
     short width;
     short count;
+    Type type;  // left or right aligned
     bool noPaint;
 
     bool operator==(const SpecialObject&) const { return false; }
@@ -171,9 +162,9 @@ class RenderFlow : public RenderBox {
 
  private:
   bool m_childrenInline : 1;
-  bool m_haveAnonymous : 1;
   bool m_pre : 1;
-  bool firstLine : 1;        // used in inline layouting
+  bool firstLine : 1;  // used in inline layouting
+  bool m_blockBidi : 1;
   EClear m_clearStatus : 2;  // used during layuting of paragraphs
 };
 

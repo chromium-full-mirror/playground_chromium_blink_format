@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -26,9 +26,10 @@
 #ifndef HTML_BASEIMPL_H
 #define HTML_BASEIMPL_H
 
-#include "dtd.h"
-#include "html_elementimpl.h"
-#include "khtmllayout.h"
+#include "html/dtd.h"
+#include "html/html_elementimpl.h"
+#include "misc/khtmllayout.h"
+
 #include <qscrollview.h>
 
 class KHTMLView;
@@ -43,30 +44,27 @@ namespace DOM {
 
 class DOMString;
 class CSSStyleSheetImpl;
+class HTMLFrameElement;
+
+// -------------------------------------------------------------------------
 
 class HTMLBodyElementImpl : public HTMLElementImpl {
  public:
   HTMLBodyElementImpl(DocumentPtr* doc);
   ~HTMLBodyElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl*);
-  void attach();
-
-  virtual bool prepareMouseEvent(int _x,
-                                 int _y,
-                                 int _tx,
-                                 int _ty,
-                                 MouseEvent* ev);
+  virtual void parseAttribute(AttributeImpl*);
+  virtual void init();
+  virtual void attach();
 
   CSSStyleSheetImpl* sheet() const { return m_styleSheet; }
 
  protected:
   CSSStyleSheetImpl* m_styleSheet;
-  DOMString bgImage;
-  DOMString bgColor;
+  bool m_bgSet;
+  bool m_fgSet;
 };
 
 // -------------------------------------------------------------------------
@@ -80,22 +78,24 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   ~HTMLFrameElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl*);
+  virtual void parseAttribute(AttributeImpl*);
+  virtual void init();
   virtual void attach();
   virtual void detach();
 
   bool noResize() { return noresize; }
+  void setLocation(const DOMString& str);
 
   virtual bool isSelectable() const;
   virtual void setFocus(bool);
 
+  DocumentImpl* contentDocument() const;
+
  protected:
   DOMString url;
   DOMString name;
-  KHTMLView* view;
   KHTMLView* parentWidget;
 
   int marginWidth;
@@ -117,25 +117,13 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
   ~HTMLFrameSetElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl*);
+  virtual void parseAttribute(AttributeImpl*);
+  virtual void init();
   virtual void attach();
 
-  virtual bool prepareMouseEvent(int _x,
-                                 int _y,
-                                 int _tx,
-                                 int _ty,
-                                 MouseEvent* ev);
   virtual void defaultEventHandler(EventImpl* evt);
-
-  virtual khtml::FindSelectionResult findSelectionNode(int _x,
-                                                       int _y,
-                                                       int _tx,
-                                                       int _ty,
-                                                       DOM::Node& node,
-                                                       int& offset);
 
   bool frameBorder() { return frameborder; }
   bool noResize() { return noresize; }
@@ -145,13 +133,11 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
   int border() const { return m_border; }
   virtual void detach();
 
- protected:
-  // returns true if layout needs to be redone
-  bool verifyLayout();
+  virtual void recalcStyle(StyleChange ch);
 
-  QList<khtml::Length>* m_rows;
-  QList<khtml::Length>* m_cols;
-  KHTMLView* view;
+ protected:
+  khtml::Length* m_rows;
+  khtml::Length* m_cols;
 
   int m_totalRows;
   int m_totalCols;
@@ -171,8 +157,7 @@ class HTMLHeadElementImpl : public HTMLElementImpl {
 
   ~HTMLHeadElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 };
 
 // -------------------------------------------------------------------------
@@ -180,12 +165,9 @@ class HTMLHeadElementImpl : public HTMLElementImpl {
 class HTMLHtmlElementImpl : public HTMLElementImpl {
  public:
   HTMLHtmlElementImpl(DocumentPtr* doc);
-
   ~HTMLHtmlElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
-
+  virtual Id id() const;
   virtual void attach();
 };
 
@@ -197,14 +179,11 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
 
   ~HTMLIFrameElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
   virtual void attach();
-  virtual void applyChanges(bool = true, bool = true);
-
-  DOM::DocumentImpl* frameDocument() const;
+  virtual void recalcStyle(StyleChange ch);
 
  protected:
   bool needWidgetUpdate;

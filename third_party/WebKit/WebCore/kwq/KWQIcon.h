@@ -39,7 +39,15 @@ class KIcon {
 
   // enums -------------------------------------------------------------------
 
-  enum Context { Any, Action, Application, Device, FileSystem, MimeType };
+  enum Context {
+    Any,
+    Action,
+    Application,
+    Device,
+    FileSystem,
+    MimeType,
+    Desktop
+  };
   enum States { DefaultState, ActiveState, DisabledState, LastState };
 
   // constants ---------------------------------------------------------------

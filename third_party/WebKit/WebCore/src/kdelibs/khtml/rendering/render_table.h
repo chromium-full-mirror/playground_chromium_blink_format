@@ -28,8 +28,7 @@
 #define RENDER_TABLE_H
 
 #include <qcolor.h>
-#include <qvector.h>
-#include <qdatetime.h>
+#include <qptrvector.h>
 
 #include "render_box.h"
 #include "render_flow.h"
@@ -71,7 +70,7 @@ class RenderTable : public RenderFlow {
     Box = 0x0f
   };
 
-  RenderTable();
+  RenderTable(DOM::NodeImpl* node);
   ~RenderTable();
 
   virtual const char* renderName() const { return "RenderTable"; }
@@ -97,7 +96,7 @@ class RenderTable : public RenderFlow {
   void startRow();
   void addCell(RenderTableCell* cell);
   void endTable();
-  void addColInfo(RenderTableCell* cell);
+  void addColInfo(RenderTableCell* cell, bool recalc = true);
   void addColInfo(RenderTableCol* colel);
 
   void addColInfo(int _startCol,
@@ -105,7 +104,8 @@ class RenderTable : public RenderFlow {
                   int _minSize,
                   int _maxSize,
                   khtml::Length _width,
-                  RenderTableCell* _cell);
+                  RenderTableCell* _cell,
+                  bool recalc = true);
 
   void recalcColInfos();
 
@@ -115,8 +115,6 @@ class RenderTable : public RenderFlow {
   virtual void layout();
   virtual void calcMinMaxWidth();
   virtual void close();
-
-  virtual void updateSize();
 
   virtual void setCellWidths();
 
@@ -138,6 +136,10 @@ class RenderTable : public RenderFlow {
   void closeRow();
   void setNeedsCellsRecalc();
   void recalcCells();
+
+#ifndef NDEBUG
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
 
  public:
   /*
@@ -161,14 +163,16 @@ class RenderTable : public RenderFlow {
    */
   struct ColInfo {
     ColInfo() {
+      span = 0;
+      start = 0;
       min = 0;
       max = 0;
       type = khtml::Undefined;
       value = 0;
       minCell = 0;
       maxCell = 0;
+      widthCell = 0;
     }
-    void update();
 
     int span;
     int start;
@@ -178,10 +182,12 @@ class RenderTable : public RenderFlow {
     RenderTableCell* maxCell;
     khtml::LengthType type;
     int value;
-    int percentage;
+    RenderTableCell* widthCell;
   };
 
  protected:
+  void recalcColInfo(ColInfo* col);
+
   // This function calculates the actual widths of the columns
   void calcColWidth();
 
@@ -196,16 +202,16 @@ class RenderTable : public RenderFlow {
 
   RenderTableCell*** cells;
 
-  class ColInfoLine : public QVector<ColInfo> {
+  class ColInfoLine : public QPtrVector<ColInfo> {
    public:
-    ColInfoLine() : QVector<ColInfo>() { setAutoDelete(true); }
-    ColInfoLine(int i) : QVector<ColInfo>(i) { setAutoDelete(true); }
-    ColInfoLine(const QVector<ColInfo>& v) : QVector<ColInfo>(v) {
+    ColInfoLine() : QPtrVector<ColInfo>() { setAutoDelete(true); }
+    ColInfoLine(int i) : QPtrVector<ColInfo>(i) { setAutoDelete(true); }
+    ColInfoLine(const QPtrVector<ColInfo>& v) : QPtrVector<ColInfo>(v) {
       setAutoDelete(true);
     }
   };
 
-  QVector<ColInfoLine> colInfos;
+  QPtrVector<ColInfoLine> colInfos;
 
   void calcColMinMax();
   void calcSingleColMinMax(int c, ColInfo* col);
@@ -231,16 +237,14 @@ class RenderTable : public RenderFlow {
 
   int maxColSpan;
 
-  QArray<int> columnPos;
-  QArray<int> colMaxWidth;
-  QArray<int> colMinWidth;
-  QArray<khtml::LengthType> colType;
-  QArray<int> colValue;
-  QArray<int> rowHeights;
-  QArray<int> rowBaselines;
-  QArray<int> actColWidth;
-
-  unsigned int totalColInfos;
+  QMemArray<int> columnPos;
+  QMemArray<int> colMaxWidth;
+  QMemArray<int> colMinWidth;
+  QMemArray<khtml::LengthType> colType;
+  QMemArray<int> colValue;
+  QMemArray<int> rowHeights;
+  QMemArray<int> rowBaselines;
+  QMemArray<int> actColWidth;
   unsigned int col;
   unsigned int totalCols;
   unsigned int row;
@@ -257,22 +261,23 @@ class RenderTable : public RenderFlow {
 
   Frame frame;
   Rules rules;
-  QTime updateTimer;
 
   RenderTableCol* _oldColElem;
   int _currentCol;  // keeps track of current col for col/colgroup stuff
   int spacing;
-  short _lastParentWidth;
-  bool incremental;
-  bool collapseBorders;
-  bool needsCellsRecalc;
+  short _lastParentWidth : 16;
+  bool incremental : 1;
+  bool collapseBorders : 1;
+  bool colWidthKnown : 1;
+  bool needsCellsRecalc : 1;
+  bool hasPercent : 1;
 };
 
 // -------------------------------------------------------------------------
 
 class RenderTableSection : public RenderContainer {
  public:
-  RenderTableSection();
+  RenderTableSection(DOM::NodeImpl* node);
   ~RenderTableSection();
 
   virtual const char* renderName() const { return "RenderTableSection"; }
@@ -283,13 +288,14 @@ class RenderTableSection : public RenderContainer {
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
   virtual bool isTableSection() const { return true; }
 
-  // from BiDiObject, just define to be empty
-  virtual unsigned int width(int, int) const { return 0; }
-  virtual int lineHeight(bool) const { return 0; }
+  virtual short lineHeight(bool) const { return 0; }
   virtual void position(int, int, int, int, int, bool, bool) {}
-  virtual void layout() {}
 
   virtual void setTable(RenderTable* t) { table = t; }
+
+#ifndef NDEBUG
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
 
  protected:
   RenderTable* table;
@@ -300,7 +306,7 @@ class RenderTableSection : public RenderContainer {
 
 class RenderTableRow : public RenderContainer {
  public:
-  RenderTableRow();
+  RenderTableRow(DOM::NodeImpl* node);
   ~RenderTableRow();
 
   virtual const char* renderName() const { return "RenderTableRow"; }
@@ -316,17 +322,20 @@ class RenderTableRow : public RenderContainer {
   // overrides
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 
-  // from BiDiObject, just define to be empty
-  virtual unsigned int width(int, int) const { return 0; }
-  virtual int lineHeight(bool) const { return 0; }
+  virtual short lineHeight(bool) const { return 0; }
   virtual void position(int, int, int, int, int, bool, bool) {}
-  virtual void layout() {}
 
   virtual void close();
 
   virtual void repaint();
 
+  virtual void layout();
+
   virtual void setTable(RenderTable* t) { table = t; }
+
+#ifndef NDEBUG
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
 
  protected:
   RenderTable* table;
@@ -340,7 +349,7 @@ class RenderTableRow : public RenderContainer {
 
 class RenderTableCell : public RenderFlow {
  public:
-  RenderTableCell();
+  RenderTableCell(DOM::NodeImpl* node);
   ~RenderTableCell();
 
   virtual const char* renderName() const { return "RenderTableCell"; }
@@ -359,9 +368,9 @@ class RenderTableCell : public RenderFlow {
   bool noWrap() const { return nWrap; }
   void setNoWrap(bool nw) { nWrap = nw; }
 
-  int col() { return _col; }
+  int col() const { return _col; }
   void setCol(int col) { _col = col; }
-  int row() { return _row; }
+  int row() const { return _row; }
   void setRow(int r) { _row = r; }
 
   khtml::LengthType colType();
@@ -369,8 +378,11 @@ class RenderTableCell : public RenderFlow {
   // overrides
   virtual void calcMinMaxWidth();
   virtual void calcWidth();
+  virtual void setWidth(int width);
   virtual void setStyle(RenderStyle* style);
   virtual void repaint();
+
+  virtual void updateFromElement();
 
   void setRowHeight(int h) { rowHeight = h; }
 
@@ -384,7 +396,6 @@ class RenderTableCell : public RenderFlow {
 
   virtual void print(QPainter* p, int x, int y, int w, int h, int tx, int ty);
 
-  virtual void updateSize();
   virtual void close();
 
   // lie position to outside observers
@@ -394,6 +405,16 @@ class RenderTableCell : public RenderFlow {
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
 
   virtual short baselinePosition(bool = false) const;
+
+#ifndef NDEBUG
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
+
+  bool widthChanged() {
+    bool retval = m_widthChanged;
+    m_widthChanged = false;
+    return retval;
+  }
 
  protected:
   RenderTable* m_table;
@@ -414,8 +435,8 @@ class RenderTableCell : public RenderFlow {
   int rowHeight;
   int _topExtra;
   int _bottomExtra;
-  bool nWrap;
-  bool _implicitCell : 1;
+  bool nWrap : 1;
+  bool m_widthChanged : 1;
 
   virtual int borderTopExtra() { return _topExtra; }
   virtual int borderBottomExtra() { return _bottomExtra; }
@@ -427,7 +448,7 @@ class RenderTableCell : public RenderFlow {
 
 class RenderTableCol : public RenderContainer {
  public:
-  RenderTableCol();
+  RenderTableCol(DOM::NodeImpl* node);
   ~RenderTableCol();
 
   virtual const char* renderName() const { return "RenderTableCol"; }
@@ -442,12 +463,17 @@ class RenderTableCol : public RenderContainer {
 
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
 
-  virtual unsigned int width(int, int) const { return 0; }
-  virtual int lineHeight(bool) const { return 0; }
+  virtual short lineHeight(bool) const { return 0; }
   virtual void position(int, int, int, int, int, bool, bool) {}
   virtual void layout() {}
 
   virtual void setTable(RenderTable* t) { table = t; }
+
+  virtual void updateFromElement();
+
+#ifndef NDEBUG
+  virtual void dump(QTextStream* stream, QString ind = "") const;
+#endif
 
  protected:
   RenderTable* table;
@@ -465,7 +491,7 @@ class RenderTableCol : public RenderContainer {
 
 class RenderTableCaption : public RenderFlow {
  public:
-  RenderTableCaption();
+  RenderTableCaption(DOM::NodeImpl*);
   ~RenderTableCaption();
 
   virtual const char* renderName() const { return "RenderTableCaption"; }

@@ -24,39 +24,24 @@
 // -------------------------------------------------------------------------
 //#define DEBUG_LAYOUT
 
-#include "dom_string.h"
-
 #include <qpainter.h>
-#include <qfontmetrics.h>
-#include <qstack.h>
 
-#include "dom_node.h"
-#include "dom_textimpl.h"
-#include "dom_stringimpl.h"
-#include "dom_exception.h"
+#include "rendering/render_box.h"
+#include "rendering/render_replaced.h"
+#include "rendering/render_root.h"
+#include "misc/htmlhashes.h"
+#include "xml/dom_nodeimpl.h"
 
-#include "misc/helper.h"
-#include "htmlhashes.h"
-#include "khtmlview.h"
-
-#include "render_box.h"
-#include "render_style.h"
-#include "render_object.h"
-#include "render_text.h"
-#include "render_replaced.h"
-#include "render_root.h"
-
+#include <khtmlview.h>
 #include <kdebug.h>
 #include <assert.h>
-
-#include "misc/loader.h"
 
 using namespace DOM;
 using namespace khtml;
 
 #define TABLECELLMARGIN -0x4000
 
-RenderBox::RenderBox() : RenderContainer() {
+RenderBox::RenderBox(DOM::NodeImpl* node) : RenderContainer(node) {
   m_minWidth = -1;
   m_maxWidth = -1;
   m_width = m_height = 0;
@@ -118,26 +103,6 @@ int RenderBox::contentHeight() const {
 void RenderBox::setPos(int xPos, int yPos) {
   m_x = xPos;
   m_y = yPos;
-#if 1
-  if (m_x != xPos || m_y != yPos) {
-    bool cw = containsWidget();
-    if (!cw && parent() && parent()->containsWidget())
-      cw = true;
-
-    if (cw) {
-      int x, y;
-      absolutePosition(x, y);
-
-      // propagate position change to childs
-      for (RenderObject* child = firstChild(); child;
-           child = child->nextSibling()) {
-        if (child->isWidget())
-          static_cast<RenderWidget*>(child)->placeWidget(x + child->xPos(),
-                                                         y + child->yPos());
-      }
-    }
-  }
-#endif
 }
 
 short RenderBox::width() const {
@@ -168,10 +133,7 @@ void RenderBox::print(QPainter* p,
   }
 }
 
-void RenderBox::setPixmap(const QPixmap&,
-                          const QRect&,
-                          CachedImage* image,
-                          bool*) {
+void RenderBox::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {
   if (image && image->pixmap_size() == image->valid_rect().size() && parent())
     repaint();  // repaint bg when it finished loading
 }
@@ -323,7 +285,7 @@ void RenderBox::outlineBox(QPainter* p, int _tx, int _ty, const char* color) {
   p->drawRect(_tx, _ty, m_width, m_height);
 }
 
-void RenderBox::calcClip(QPainter* p, int tx, int ty, const QRegion& old) {
+void RenderBox::calcClip(QPainter* p, int tx, int ty) {
   int bl = borderLeft(), bt = borderTop(), bb = borderBottom(),
       br = borderRight();
   int clipx = tx + bl;
@@ -337,7 +299,11 @@ void RenderBox::calcClip(QPainter* p, int tx, int ty, const QRegion& old) {
     clipw -= c;
   }
   if (!style()->clipRight().isVariable()) {
-    clipw -= style()->clipRight().width(m_width - bl - br);
+    int w = style()->clipRight().width(m_width - bl - br);
+    if (style()->jsClipMode())
+      clipw = w + tx + bl;
+    else
+      clipw -= w;
   }
   if (!style()->clipTop().isVariable()) {
     int c = style()->clipTop().width(m_height - bt - bb);
@@ -345,29 +311,29 @@ void RenderBox::calcClip(QPainter* p, int tx, int ty, const QRegion& old) {
     cliph -= c;
   }
   if (!style()->clipBottom().isVariable()) {
-    cliph -= style()->clipBottom().width(m_height - bt - bb);
+    int h = style()->clipBottom().width(m_height - bt - bb);
+    if (style()->jsClipMode())
+      cliph = h + ty + bt;
+    else
+      cliph -= h;
   }
-  //    kdDebug( 6040 ) << "setting
-  //    clip("<<clipx<<","<<clipy<<","<<clipw<<","<<cliph<<")"<<endl;
+  // kdDebug( 6040 ) << "setting
+  // clip("<<clipx<<","<<clipy<<","<<clipw<<","<<cliph<<")"<<endl;
 
   QRect cr(clipx, clipy, clipw, cliph);
   cr = p->xForm(cr);
   QRegion creg(cr);
+  QRegion old = p->clipRegion();
   if (!old.isNull())
     creg = old.intersect(creg);
+
+  p->save();
   p->setClipRegion(creg);
 }
 
 void RenderBox::close() {
-  setParsing(false);
-  calcWidth();
-  calcHeight();
-  calcMinMaxWidth();
-  if (containingBlockWidth() < m_minWidth && parent())
-    containingBlock()->updateSize();
-  else if (!isInline() || isReplaced()) {
-    layout();
-  }
+  setMinMaxKnown(false);
+  setLayouted(false);
 }
 
 short RenderBox::containingBlockWidth() const {
@@ -392,77 +358,6 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
   } else {
     xPos = yPos = 0;
     return false;
-  }
-}
-
-void RenderBox::updateSize() {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderBox) " << this << " ::updateSize()"
-                << endl;
-#endif
-
-  int oldMin = m_minWidth;
-  int oldMax = m_maxWidth;
-  setMinMaxKnown(false);
-  calcMinMaxWidth();
-
-  if ((isInline() || isFloating() || containsSpecial()) && parent()) {
-    if (!isInline())
-      setLayouted(false);
-    parent()->updateSize();
-    return;
-  }
-
-  if (m_minWidth > containingBlockWidth() || m_minWidth != oldMin ||
-      m_maxWidth != oldMax || isReplaced()) {
-    setLayouted(false);
-    if (containingBlock() != this)
-      containingBlock()->updateSize();
-  } else
-    updateHeight();
-}
-
-void RenderBox::updateHeight() {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName() << "(RenderBox) " << this << " ::updateHeight()"
-                << endl;
-#endif
-
-  RenderObject* cb = containingBlock();
-  if (parsing()) {
-    if (layouted()) {
-      setLayouted(false);
-      if (cb != this)
-        cb->updateHeight();
-    } else {
-      RenderRoot* rt = root();
-      if (rt)
-        rt->updateHeight();
-    }
-    return;
-  }
-
-  if (!isInline() || isReplaced()) {
-    int oldHeight = m_height;
-    setLayouted(false);
-
-    bool overhanging = hasOverhangingFloats();
-
-    layout();
-
-    overhanging |= hasOverhangingFloats();
-
-    if (overhanging) {
-      if (nextSibling())
-        nextSibling()->setLayouted(false);
-      if (cb != this)
-        cb->updateHeight();
-    } else if (m_height != oldHeight) {
-      if (cb != this)
-        cb->updateHeight();
-    } else {
-      cb->repaint();
-    }
   }
 }
 
@@ -518,8 +413,7 @@ void RenderBox::calcWidth() {
   } else {
     Length w;
     if (isReplaced())
-      w = Length(static_cast<RenderReplaced*>(this)->calcReplacedWidth(),
-                 Fixed);
+      w = Length(calcReplacedWidth(), Fixed);
     else
       w = style()->width();
 
@@ -564,7 +458,6 @@ void RenderBox::calcWidth() {
       //              m_marginLeft <<"," <<  m_marginRight << endl;
 
       if (isFloating()) {
-        calcMinMaxWidth();
         if (m_width < m_minWidth)
           m_width = m_minWidth;
         if (m_width > m_maxWidth)
@@ -605,7 +498,7 @@ void RenderBox::calcHorizontalMargins(const Length& ml,
     m_marginRight = mr.minWidth(cw);
   } else {
     if ((ml.type == Variable && mr.type == Variable) ||
-        (ml.type != Variable &&
+        (!(ml.type == Variable) &&
          containingBlock()->style()->textAlign() == KONQ_CENTER)) {
       m_marginLeft = (cw - m_width) / 2;
       if (m_marginLeft < 0)
@@ -639,8 +532,7 @@ void RenderBox::calcHeight() {
   else {
     Length h;
     if (isReplaced())
-      h = Length(static_cast<RenderReplaced*>(this)->calcReplacedHeight(),
-                 Fixed);
+      h = Length(calcReplacedHeight(), Fixed);
     else
       h = style()->height();
 
@@ -662,16 +554,97 @@ void RenderBox::calcHeight() {
                paddingBottom();
       }
       if (fh != -1) {
-        // containsPositioned needs a less misleading name
-        if (fh < m_height && !containsPositioned() &&
-            style()->overflow() == OVISIBLE) {
-          setContainsPositioned(true);
-        }
+        if (fh < m_height && !overhangingContents() &&
+            style()->overflow() == OVISIBLE)
+          setOverhangingContents();
 
         m_height = fh;
       }
     }
   }
+}
+
+short RenderBox::calcReplacedWidth(bool* ieHack) const {
+  Length w = style()->width();
+  short width;
+  if (ieHack)
+    *ieHack =
+        style()->height().isPercent() || (w.isVariable() || w.isPercent());
+
+  switch (w.type) {
+    case Variable: {
+      Length h = style()->height();
+      int ih = intrinsicHeight();
+      if (ih > 0 && (h.isPercent() || h.isFixed()))
+        width = ((h.isPercent() ? calcReplacedHeight() : h.value) *
+                 intrinsicWidth()) /
+                ih;
+      else
+        width = intrinsicWidth();
+      break;
+    }
+    case Percent: {
+#ifndef APPLE_CHANGES
+      RenderObject* p = parent();
+#endif /* not APPLE_CHANGES */
+      int cw = containingBlockWidth();
+      if (cw)
+        width = w.minWidth(cw);
+      else
+        width = intrinsicWidth();
+      break;
+    }
+    case Fixed:
+      width = w.value;
+      break;
+    default:
+      width = intrinsicWidth();
+      break;
+  };
+
+  return width;
+}
+
+int RenderBox::calcReplacedHeight() const {
+  Length h = style()->height();
+  short height;
+  switch (h.type) {
+    case Variable: {
+      Length w = style()->width();
+      int iw = intrinsicWidth();
+      if (iw > 0 && (w.isFixed() || w.isPercent()))
+        height = ((w.isPercent() ? calcReplacedWidth() : w.value) *
+                  intrinsicHeight()) /
+                 iw;
+      else
+        height = intrinsicHeight();
+    } break;
+    case Percent: {
+      RenderObject* p = parent();
+      while (p && !p->isTableCell())
+        p = p->parent();
+      bool doIEHack = !p;
+      RenderObject* cb = containingBlock();
+      if (!cb->isTableCell() && doIEHack)
+        height = h.minWidth(cb->root()->view()->visibleHeight());
+      else {
+        if (!doIEHack)
+          cb = cb->containingBlock();
+
+        if (cb->style()->height().isFixed())
+          height = h.minWidth(cb->style()->height().value);
+        else
+          height = intrinsicHeight();
+      }
+    } break;
+    case Fixed:
+      height = h.value;
+      break;
+    default:
+      height = intrinsicHeight();
+  };
+
+  return height;
 }
 
 void RenderBox::calcVerticalMargins() {

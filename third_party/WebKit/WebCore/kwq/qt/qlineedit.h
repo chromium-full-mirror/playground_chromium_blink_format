@@ -67,6 +67,8 @@ class QLineEdit : public QWidget {
   int cursorPosition() const;
   int maxLength() const;
   void selectAll();
+  bool edited() const;
+  void setEdited(bool);
 
   // operators ---------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
@@ -34,7 +34,7 @@ namespace khtml {
 
 class RenderBR : public RenderText {
  public:
-  RenderBR();
+  RenderBR(DOM::NodeImpl* node);
   virtual ~RenderBR();
 
   virtual const char* renderName() const { return "RenderBR"; }
@@ -51,6 +51,7 @@ class RenderBR : public RenderText {
   virtual unsigned int width(unsigned int, unsigned int, bool) const {
     return 0;
   }
+  virtual short width() const { return RenderText::width(); }
 
   virtual int height() const { return 0; }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the html renderer for KDE.
  *
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
@@ -25,13 +25,18 @@
 
 #include "render_flow.h"
 
+namespace DOM {
+
+class HTMLElementImpl;
+}
+
 class QScrollView;
 
 namespace khtml {
 
 class RenderHtml : public RenderFlow {
  public:
-  RenderHtml();
+  RenderHtml(DOM::HTMLElementImpl* node);
   virtual ~RenderHtml();
 
   virtual const char* renderName() const { return "RenderHtml"; }

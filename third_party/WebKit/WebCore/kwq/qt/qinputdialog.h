@@ -33,6 +33,7 @@
 #include "qstring.h"
 #include "qlabel.h"
 #include "qwidget.h"
+#include "qlineedit.h"
 
 // class QInputDialog ==========================================================
 
@@ -46,6 +47,7 @@ class QInputDialog {
 
   static QString getText(const QString&,
                          const QString&,
+                         QLineEdit::EchoMode,
                          const QString& text = QString::null,
                          bool* ok = 0,
                          QWidget* parent = 0,

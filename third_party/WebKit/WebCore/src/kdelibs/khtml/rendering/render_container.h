@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the html renderer for KDE.
  *
  * Copyright (C) 2001 Antti Koivisto (koivisto@kde.org)
@@ -32,7 +32,7 @@ namespace khtml {
  */
 class RenderContainer : public RenderObject {
  public:
-  RenderContainer();
+  RenderContainer(DOM::NodeImpl* node);
   virtual ~RenderContainer();
 
   RenderObject* firstChild() const { return m_first; }
@@ -45,11 +45,18 @@ class RenderContainer : public RenderObject {
   virtual void appendChildNode(RenderObject* child);
   virtual void insertChildNode(RenderObject* child, RenderObject* before);
 
+  virtual void layout();
+  virtual void calcMinMaxWidth() { setMinMaxKnown(true); }
+
  private:
   void setFirstChild(RenderObject* first) { m_first = first; }
   void setLastChild(RenderObject* last) { m_last = last; }
 
  protected:
+  void insertPseudoChild(RenderStyle::PseudoId type,
+                         RenderObject* child,
+                         RenderObject* before);
+
   RenderObject* m_first;
   RenderObject* m_last;
 };

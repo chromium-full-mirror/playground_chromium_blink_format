@@ -33,7 +33,13 @@ void setNamedColor(QColor& color, const QString& name);
 
 extern QPainter* printpainter;
 void setPrintPainter(QPainter* printer);
-QFontMetrics fontMetrics(const QFont& f);
+
+// enumerator for findSelectionNode
+enum FindSelectionResult {
+  SelectionPointBefore,
+  SelectionPointAfter,
+  SelectionPointInside
+};
 };
 
 #endif

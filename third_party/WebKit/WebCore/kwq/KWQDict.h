@@ -49,7 +49,7 @@ class QDictIterator;
 // class QDict =================================================================
 
 template <class T>
-class QDict : public QCollection {
+class QDict : public QPtrCollection {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -77,7 +77,7 @@ class QDict : public QCollection {
 
   QDict<T>& operator=(const QDict<T>& d) {
     impl.assign(d.impl, del_item);
-    QCollection::operator=(d);
+    QPtrCollection::operator=(d);
     return *this;
   }
 

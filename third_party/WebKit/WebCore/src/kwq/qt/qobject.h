@@ -132,6 +132,7 @@ class QObject : public Qt {
 
   void installEventFilter(const QObject*);
   void removeEventFilter(const QObject*);
+  bool eventFilter(QObject* o, QEvent* e);
 
   void blockSignals(bool);
 

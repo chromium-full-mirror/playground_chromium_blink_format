@@ -42,6 +42,9 @@ class QEvent : public Qt {
   // enums -------------------------------------------------------------------
 
   enum Type {
+    None,
+    Enter,
+    Leave,
     Timer,
     MouseButtonPress,
     MouseButtonRelease,
@@ -51,6 +54,7 @@ class QEvent : public Qt {
     FocusOut,
     AccelAvailable,
     KeyPress,
+    KeyRelease,
     Paint,
   };
 
@@ -110,6 +114,11 @@ class QMouseEvent : public QEvent {
 #endif
 
   QMouseEvent(Type type, const QPoint& pos, int button, int state);
+  QMouseEvent(Type type,
+              const QPoint& pos,
+              const QPoint& global,
+              int button,
+              int state);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
@@ -215,7 +224,13 @@ class QKeyEvent : public QEvent {
   QKeyEvent() {}
 #endif
 
-  QKeyEvent(Type, Key, int, int);
+  QKeyEvent(Type,
+            int,
+            int,
+            int,
+            const QString& textVal = QString::null,
+            bool autoRepeat = FALSE,
+            ushort countVal = 1);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
@@ -228,6 +243,11 @@ class QKeyEvent : public QEvent {
   ButtonState state() const;
   void accept();
   void ignore();
+  bool isAutoRepeat() const;
+  bool isAccepted() const;
+  int count() const;
+  QString text() const;
+  int ascii() const;
 
   // operators ---------------------------------------------------------------
 
@@ -528,7 +548,27 @@ class QCustomEvent : public QEvent {
 #ifdef _KWQ_PEDANTIC_
   QCustomEvent& operator=(const QCustomEvent&);
 #endif
+};
 
-};  // class QWheelEvent
+// class QContextMenuEvent
+// ========================================================
+
+class QContextMenuEvent : public QEvent {
+ public:
+  QContextMenuEvent(int, const QPoint&, const QPoint&, Qt::ButtonState);
+
+  int x() const;
+  int y() const;
+  ButtonState state() const;
+  int reason() const;
+  QPoint globalPos() const;
+
+ private:
+  int m_reason;
+  QPoint m_pos;
+  QPoint m_globalPos;
+  ButtonState m_state;
+};  // class QContextMenuEvent
     // ========================================================
+
 #endif

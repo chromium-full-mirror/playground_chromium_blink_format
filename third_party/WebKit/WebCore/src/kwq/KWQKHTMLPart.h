@@ -37,6 +37,8 @@
 
 #include <kjs_proxy.h>
 
+#include <rendering/render_frames.h>
+
 class KHTMLSettings;
 class KJavaAppletContext;
 class KJSProxy;
@@ -54,8 +56,7 @@ class Node;
 };
 
 namespace khtml {
-class RenderPart;
-struct ChildFrame;
+class ChildFrame {};
 };
 
 extern "C" {
@@ -511,6 +512,17 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   void setJSDefaultStatusBarText(const QString& text);
 
   /**
+   * Referrer used for links in this page.
+   */
+  QString referrer() const;
+
+  /**
+   * Last-modified date (in raw string format), if received in the [HTTP]
+   * headers.
+   */
+  QString lastModified() const;
+
+  /**
    * Called by KJS.
    * Returns the StatusBarText assigned
    * via window.status
@@ -529,13 +541,18 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   // of existing references.
 
   // This should be private.
-  const KHTMLSettings* settings() const;
+  KHTMLSettings* settings();
+
+  QVariant executeScript(QString filename,
+                         int baseLine,
+                         const DOM::Node& n,
+                         const QString& script);
 
   // This should be private.
   KJSProxy* jScript();
 
   // This should be private.
-  KURL completeURL(const QString& url, const QString& target = QString::null);
+  KURL completeURL(const QString& url);
 
   // This should be private.
 
@@ -551,7 +568,7 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   KHTMLPart* opener();
   KHTMLPart* parentPart();
   DOM::DocumentImpl* xmlDocImpl() const;
-  const QList<KParts::ReadOnlyPart> frames() const;
+  const QPtrList<KParts::ReadOnlyPart> frames() const;
   KHTMLPart* findFrame(const QString& f);
   void setOpener(KHTMLPart* _opener);
   bool openedByJS();
@@ -578,10 +595,15 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
       int button = 0,
       int state = 0,
       const QString& _target = QString::null);  // ### KDE 3.0: make private
+
   bool requestObject(khtml::RenderPart* frame,
                      const QString& url,
                      const QString& serviceType,
                      const QStringList& args = QStringList());
+
+  bool requestObject(khtml::ChildFrame* frame,
+                     const KURL& url,
+                     const KParts::URLArgs& args = KParts::URLArgs());
 
   void nodeActivated(const DOM::Node&);
   QVariant executeScheduledScript();

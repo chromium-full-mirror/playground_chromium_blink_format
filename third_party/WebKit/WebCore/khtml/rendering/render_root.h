@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the HTML widget for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -25,8 +25,6 @@
 
 #include "render_flow.h"
 
-#include <qdatetime.h>
-
 class KHTMLView;
 class QScrollView;
 
@@ -34,7 +32,7 @@ namespace khtml {
 
 class RenderRoot : public RenderFlow {
  public:
-  RenderRoot(KHTMLView* view);
+  RenderRoot(DOM::NodeImpl* node, KHTMLView* view);
   virtual ~RenderRoot();
 
   virtual const char* renderName() const { return "RenderRoot"; }
@@ -46,8 +44,6 @@ class RenderRoot : public RenderFlow {
   virtual void calcWidth();
   virtual void calcMinMaxWidth();
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
-  virtual void updateSize();
-  virtual void updateHeight();
   virtual void close();
 
   int docHeight() const;
@@ -63,6 +59,8 @@ class RenderRoot : public RenderFlow {
 
   virtual void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
   virtual void clearSelection();
+  virtual RenderObject* selectionStart() const { return m_selectionStart; }
+  virtual RenderObject* selectionEnd() const { return m_selectionEnd; }
 
   void setPrintingMode(bool print) { m_printingMode = print; }
   bool printingMode() const { return m_printingMode; }
@@ -77,18 +75,13 @@ class RenderRoot : public RenderFlow {
 
   KHTMLView* m_view;
 
-  QTime updateTimer;
-
-  RenderObject* selectionStart;
-  RenderObject* selectionEnd;
-  int selectionStartPos;
-  int selectionEndPos;
+  RenderObject* m_selectionStart;
+  RenderObject* m_selectionEnd;
+  int m_selectionStartPos;
+  int m_selectionEndPos;
 
   int m_rootWidth;
   int m_rootHeight;
-
-  int oldLayoutTime;
-  int timeout;
 
   // used to ignore viewport width when printing to the printer
   bool m_printingMode;

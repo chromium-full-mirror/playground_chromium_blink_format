@@ -25,13 +25,13 @@
 #ifndef HTML_FORMIMPL_H
 #define HTML_FORMIMPL_H
 
-#include "html_elementimpl.h"
-#include "html_element.h"
+#include "html/html_elementimpl.h"
+#include "dom/html_element.h"
 
 #include <qvaluelist.h>
-#include <qlist.h>
+#include <qptrlist.h>
 #include <qcstring.h>
-#include <qarray.h>
+#include <qmemarray.h>
 
 class KHTMLView;
 class QTextCodec;
@@ -41,6 +41,8 @@ class RenderFormElement;
 class RenderTextArea;
 class RenderSelect;
 class RenderLineEdit;
+class RenderRadioButton;
+class RenderFileButton;
 
 typedef QValueList<QCString> encodingList;
 }
@@ -52,13 +54,14 @@ class DOMString;
 class HTMLGenericFormElementImpl;
 class HTMLOptionElementImpl;
 
+// -------------------------------------------------------------------------
+
 class HTMLFormElementImpl : public HTMLElementImpl {
  public:
   HTMLFormElementImpl(DocumentPtr* doc);
   virtual ~HTMLFormElementImpl();
 
-  virtual const DOMString nodeName() const { return "FORM"; }
-  virtual ushort id() const;
+  virtual Id id() const;
 
   long length() const;
 
@@ -72,10 +75,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   bool autoComplete() const { return m_autocomplete; }
 
-  virtual void parseAttribute(AttrImpl* attr);
-
-  virtual void attach();
-  virtual void detach();
+  virtual void parseAttribute(AttributeImpl* attr);
 
   void radioClicked(HTMLGenericFormElementImpl* caller);
 
@@ -84,12 +84,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   void registerFormElement(HTMLGenericFormElementImpl*);
   void removeFormElement(HTMLGenericFormElementImpl*);
-
-  /*
-   * state() and restoreState() are complimentary functions.
-   */
-  virtual QString state() { return QString::null; }
-  virtual void restoreState(const QString&){};
 
   bool prepareSubmit();
   void submit();
@@ -100,14 +94,13 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   friend class HTMLFormElement;
   friend class HTMLFormCollectionImpl;
 
-  QList<HTMLGenericFormElementImpl> formElements;
+  QPtrList<HTMLGenericFormElementImpl> formElements;
   DOMString m_url;
   DOMString m_target;
   DOMString m_enctype;
   DOMString m_boundary;
   DOMString m_acceptcharset;
   QString m_encCharset;
-  KHTMLView* view;
   bool m_post : 1;
   bool m_multipart : 1;
   bool m_autocomplete : 1;
@@ -123,26 +116,20 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   friend class khtml::RenderFormElement;
 
  public:
-  HTMLGenericFormElementImpl(DocumentPtr* doc);
-  HTMLGenericFormElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLGenericFormElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   virtual ~HTMLGenericFormElementImpl();
 
   HTMLFormElementImpl* form() { return m_form; }
 
-  virtual void parseAttribute(AttrImpl* attr);
-
+  virtual void parseAttribute(AttributeImpl* attr);
   virtual void attach();
-  virtual void detach();
-
   virtual void reset() {}
 
-  void onBlur();
-  void onFocus();
   void onSelect();
   void onChange();
 
   bool disabled() const { return m_disabled; }
-  void setDisabled(bool _disabled) { m_disabled = _disabled; }
+  void setDisabled(bool _disabled);
 
   virtual bool isSelectable() const;
   virtual bool isEnumeratable() const { return false; }
@@ -150,27 +137,30 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   bool readOnly() const { return m_readOnly; }
   void setReadOnly(bool _readOnly) { m_readOnly = _readOnly; }
 
-  const DOMString& name() const { return _name; }
-  void setForm(HTMLFormElementImpl* f) { m_form = f; }
+  virtual void recalcStyle(StyleChange);
+
+  DOMString name() const;
+  void setName(const DOMString& name);
 
   /*
    * override in derived classes to get the encoded name=value pair
    * for submitting
-   * return true for a successful control (see 17.13.2)
+   * return true for a successful control (see HTML4-17.13.2)
    */
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool) {
     return false;
   }
 
-  virtual void setFocus(bool);
   virtual void setParent(NodeImpl* parent);
+
+  virtual void defaultEventHandler(EventImpl* evt);
+  virtual bool isEditable();
 
  protected:
   HTMLFormElementImpl* getForm() const;
 
-  DOMString _name;
+  DOMStringImpl* m_name;
   HTMLFormElementImpl* m_form;
-  KHTMLView* view;
   bool m_disabled, m_readOnly;
 };
 
@@ -178,24 +168,18 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
 class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
  public:
-  HTMLButtonElementImpl(DocumentPtr* doc);
-  HTMLButtonElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLButtonElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
   virtual ~HTMLButtonElementImpl();
 
   enum typeEnum { SUBMIT, RESET, BUTTON };
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   DOMString type() const;
-
-  void parseAttribute(AttrImpl* attr);
-
   virtual void attach();
-
+  virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
-
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
  protected:
@@ -211,19 +195,19 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
 
 class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
  public:
-  HTMLFieldSetElementImpl(DocumentPtr* doc);
-  HTMLFieldSetElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLFieldSetElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
   virtual ~HTMLFieldSetElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 };
 
 // -------------------------------------------------------------------------
 
 class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   friend class khtml::RenderLineEdit;
+  friend class khtml::RenderRadioButton;
+  friend class khtml::RenderFileButton;
 
  public:
   enum typeEnum {
@@ -240,12 +224,10 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
     ISINDEX
   };
 
-  HTMLInputElementImpl(DocumentPtr* doc);
-  HTMLInputElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLInputElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   virtual ~HTMLInputElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
 
@@ -256,23 +238,25 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   long maxLength() const { return m_maxLen; }
   int size() const { return m_size; }
   DOMString type() const;
+  void setType(const DOMString& t);
 
   DOMString value() const;
   void setValue(DOMString val);
 
-  DOMString filename() const { return m_filename; }
-  void setFilename(DOMString _filename) { m_filename = _filename; }
+  void blur();
+  void focus();
 
+  virtual bool maintainsState() { return true; }
   virtual QString state();
   virtual void restoreState(const QString&);
 
   void select();
   void click();
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
+  virtual void init();
   virtual void attach();
-
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
   typeEnum inputType() const { return m_type; }
@@ -283,12 +267,12 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   int clickY() const { return yPos; }
 
   virtual void defaultEventHandler(EventImpl* evt);
+  virtual bool isEditable();
+
+  DOMString altText() const;
 
  protected:
   DOMString m_value;
-  DOMString m_filename;
-  DOMString m_src;
-  DOMString m_defaultValue;
   int xPos;
   short m_maxLen;
   short m_size;
@@ -296,15 +280,10 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   typeEnum m_type : 4;
   bool m_clicked : 1;
-  bool m_defaultChecked : 1;
   bool m_checked : 1;
   bool m_haveType : 1;
-  bool m_firstAttach : 1;
   bool m_activeSubmit : 1;
   bool m_autocomplete : 1;
-
- private:
-  void init();
 };
 
 // -------------------------------------------------------------------------
@@ -314,10 +293,9 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
   HTMLLabelElementImpl(DocumentPtr* doc);
   virtual ~HTMLLabelElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
   /**
    * the form element this label is associated to.
@@ -332,23 +310,19 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
 
 class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
  public:
-  HTMLLegendElementImpl(DocumentPtr* doc);
-  HTMLLegendElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLLegendElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   virtual ~HTMLLegendElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 };
 
 // -------------------------------------------------------------------------
 
 class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
  public:
-  HTMLSelectElementImpl(DocumentPtr* doc);
-  HTMLSelectElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLSelectElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
-  virtual const DOMString nodeName() const { return "SELECT"; }
-  virtual ushort id() const;
+  virtual Id id() const;
 
   DOMString type() const;
 
@@ -359,16 +333,21 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   long length() const;
 
+  long minWidth() const { return m_minwidth; }
+
   long size() const { return m_size; }
 
   bool multiple() const { return m_multiple; }
 
   void add(const HTMLElement& element, const HTMLElement& before);
   void remove(long index);
+  void blur();
+  void focus();
 
   DOMString value();
   void setValue(DOMStringImpl* value);
 
+  virtual bool maintainsState() { return true; }
   virtual QString state();
   virtual void restoreState(const QString&);
 
@@ -381,8 +360,9 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   virtual NodeImpl* removeChild(NodeImpl* oldChild, int& exceptioncode);
   virtual NodeImpl* appendChild(NodeImpl* newChild, int& exceptioncode);
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
+  virtual void init();
   virtual void attach();
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
 
@@ -391,27 +371,48 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   // reverse of optionToListIndex - get optionIndex from listboxIndex
   int listToOptionIndex(int listIndex) const;
   void recalcListItems();
-  QArray<HTMLGenericFormElementImpl*> listItems() const { return m_listItems; }
+  QMemArray<HTMLGenericFormElementImpl*> listItems() const {
+    return m_listItems;
+  }
   virtual void reset();
   void notifyOptionSelected(HTMLOptionElementImpl* selectedOption,
                             bool selected);
 
  protected:
-  QArray<HTMLGenericFormElementImpl*> m_listItems;
+  QMemArray<HTMLGenericFormElementImpl*> m_listItems;
+  short m_minwidth;
   short m_size : 15;
   bool m_multiple : 1;
 };
 
 // -------------------------------------------------------------------------
 
+class HTMLKeygenElementImpl : public HTMLSelectElementImpl {
+ public:
+  HTMLKeygenElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
+
+  virtual Id id() const;
+
+  DOMString type() const;
+
+  long selectedIndex() const;
+  void setSelectedIndex(long index);
+
+  // ### this is just a rough guess
+  virtual bool isEnumeratable() const { return false; }
+
+  virtual void parseAttribute(AttributeImpl* attr);
+  virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
+};
+
+// -------------------------------------------------------------------------
+
 class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
  public:
-  HTMLOptGroupElementImpl(DocumentPtr* doc);
-  HTMLOptGroupElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLOptGroupElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   virtual ~HTMLOptGroupElementImpl();
 
-  virtual const DOMString nodeName() const { return "OPTGROUP"; }
-  virtual ushort id() const;
+  virtual Id id() const;
 
   virtual NodeImpl* insertBefore(NodeImpl* newChild,
                                  NodeImpl* refChild,
@@ -421,7 +422,7 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
                                  int& exceptioncode);
   virtual NodeImpl* removeChild(NodeImpl* oldChild, int& exceptioncode);
   virtual NodeImpl* appendChild(NodeImpl* newChild, int& exceptioncode);
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
   void recalcSelectOptions();
   virtual void setChanged(bool);
 };
@@ -430,25 +431,25 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
 
 class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   friend class khtml::RenderSelect;
+  friend class DOM::HTMLSelectElementImpl;
 
  public:
-  HTMLOptionElementImpl(DocumentPtr* doc);
-  HTMLOptionElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLOptionElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  DOMString text();
+  DOMString text() const;
 
   long index() const;
   void setIndex(long);
-  virtual void parseAttribute(AttrImpl* attr);
-  DOMString value() const { return m_value; }
+  virtual void parseAttribute(AttributeImpl* attr);
+  DOMString value() const;
+  void setValue(DOMStringImpl* value);
 
   bool selected() const { return m_selected; }
   void setSelected(bool _selected);
 
-  HTMLSelectElementImpl* getSelect();
+  HTMLSelectElementImpl* getSelect() const;
 
   virtual void setChanged(bool);
 
@@ -465,11 +466,9 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
  public:
   enum WrapMethod { ta_NoWrap, ta_Virtual, ta_Physical };
 
-  HTMLTextAreaElementImpl(DocumentPtr* doc);
-  HTMLTextAreaElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
+  HTMLTextAreaElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
-  virtual const DOMString nodeName() const { return "TEXTAREA"; }
-  virtual ushort id() const;
+  virtual Id id() const;
 
   long cols() const { return m_cols; }
 
@@ -481,12 +480,14 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString type() const;
 
+  virtual bool maintainsState() { return true; }
   virtual QString state();
   virtual void restoreState(const QString&);
 
   void select();
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void init();
   virtual void attach();
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
   virtual void reset();
@@ -494,6 +495,10 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void setValue(DOMString _value);
   DOMString defaultValue();
   void setDefaultValue(DOMString _defaultValue);
+  void blur();
+  void focus();
+
+  virtual bool isEditable();
 
  protected:
   int m_rows;
@@ -507,16 +512,11 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
 class HTMLIsIndexElementImpl : public HTMLInputElementImpl {
  public:
-  HTMLIsIndexElementImpl(DocumentPtr* doc);
-  HTMLIsIndexElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f);
-
+  HTMLIsIndexElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   ~HTMLIsIndexElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
-
-  virtual void parseAttribute(AttrImpl* attr);
-  virtual void attach();
+  virtual Id id() const;
+  virtual void parseAttribute(AttributeImpl* attr);
 
  protected:
   DOMString m_prompt;

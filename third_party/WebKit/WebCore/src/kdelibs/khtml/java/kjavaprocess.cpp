@@ -6,6 +6,7 @@
 #include <qtextstream.h>
 #include <qmap.h>
 #include <unistd.h>
+#include <qptrlist.h>
 
 class KJavaProcessPrivate {
   friend class KJavaProcess;
@@ -16,7 +17,7 @@ class KJavaProcessPrivate {
   QString mainClass;
   QString extraArgs;
   QString classArgs;
-  QList<QByteArray> BufferList;
+  QPtrList<QByteArray> BufferList;
   QMap<QString, QString> systemProps;
 };
 
@@ -224,14 +225,14 @@ bool KJavaProcess::invokeJVM() {
   if (d->classArgs != QString::null)
     *javaProcess << d->classArgs;
 
-  QStrList* args = javaProcess->args();
-  QString str_args;
-  for (char* it = args->first(); it; it = args->next()) {
-    str_args += it;
-    str_args += ' ';
-  }
+#ifndef APPLE_CHANGES
   kdDebug(6100) << "Invoking JVM now...with arguments = " << endl;
-  kdDebug(6100) << str_args << endl;
+  QString argStr;
+  QTextOStream stream(&argStr);
+  QValueList<QCString> args = javaProcess->args();
+  qCopy(args.begin(), args.end(), QTextOStreamIterator<QCString>(stream, " "));
+  kdDebug(6100) << argStr << endl;
+#endif
 
   KProcess::Communication flags = (KProcess::Communication)(
       KProcess::Stdin | KProcess::Stdout | KProcess::NoRead);

@@ -49,29 +49,20 @@ enum LengthType {
   Static
 };
 struct Length {
-  Length() {
-    value = 0;
-    type = Variable;
-  }
-  Length(LengthType t) {
-    value = 0;
-    type = t;
-  }
-  Length(int v, LengthType t) {
-    value = v;
-    type = t;
-  }
-  Length(const Length& l) {
-    value = l.value;
-    type = l.type;
-  }
+  Length() : value(0), type(Variable) {}
+  Length(LengthType t) : value(0), type(t) {}
+  Length(int v, LengthType t) : value(v), type(t) {}
+  Length(const Length& l) : value(l.value), type(l.type) {}
 
+  Length& operator=(const Length& o) {
+    *((Q_UINT32*)this) = *((Q_UINT32*)&o);
+    return *this;
+  }
   bool operator==(const Length& o) const {
-    return type == o.type && value == o.value;
+    return *((Q_UINT32*)this) == *((Q_UINT32*)&o);
   }
-
   bool operator!=(const Length& o) const {
-    return type != o.type || value != o.value;
+    return *((Q_UINT32*)this) != *((Q_UINT32*)&o);
   }
 
   /*
@@ -111,6 +102,7 @@ struct Length {
   bool isPercent() const { return (type == Percent); }
   bool isFixed() const { return (type == Fixed); }
   bool isStatic() const { return (type == Static); }
+
   int value : 29;
   LengthType type : 3;
 };

@@ -17,16 +17,19 @@
  * along with this library; see the file COPYING.LIB.  If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * $Id$
  */
-#include "render_root.h"
+#include "rendering/render_root.h"
 
 #include "khtmlview.h"
 #include <kdebug.h>
+
 using namespace khtml;
 
-RenderRoot::RenderRoot(KHTMLView* view) : RenderFlow() {
+//#define BOX_DEBUG
+//#define SPEED_DEBUG
+
+RenderRoot::RenderRoot(DOM::NodeImpl* node, KHTMLView* view)
+    : RenderFlow(node) {
   // init RenderObject attributes
   setInline(false);
 
@@ -46,13 +49,10 @@ RenderRoot::RenderRoot(KHTMLView* view) : RenderFlow() {
 
   m_printingMode = false;
 
-  selectionStart = 0;
-  selectionEnd = 0;
-  selectionStartPos = -1;
-  selectionEndPos = -1;
-  oldLayoutTime = 0;
-  timeout = 800;
-  setParsing();
+  m_selectionStart = 0;
+  m_selectionEnd = 0;
+  m_selectionStartPos = -1;
+  m_selectionEndPos = -1;
 }
 
 RenderRoot::~RenderRoot() {}
@@ -81,9 +81,13 @@ void RenderRoot::calcWidth() {
 }
 
 void RenderRoot::calcMinMaxWidth() {
+  KHTMLAssert(!minMaxKnown());
+
   RenderFlow::calcMinMaxWidth();
 
   m_maxWidth = m_minWidth;
+
+  setMinMaxKnown();
 }
 
 //#define SPEED_DEBUG
@@ -93,20 +97,22 @@ void RenderRoot::layout() {
   if (m_printingMode)
     m_minWidth = m_width;
 
+  if (firstChild()) {
+    firstChild()->setLayouted(false);
+  }
+
 #ifdef SPEED_DEBUG
   QTime qt;
   qt.start();
 #endif
-  calcMinMaxWidth();
+  if (recalcMinMax())
+    recalcMinMaxWidths();
 #ifdef SPEED_DEBUG
   kdDebug() << "RenderRoot::calcMinMax time used=" << qt.elapsed() << endl;
   // this fixes frameset resizing
   qt.start();
 #endif
 
-  if (firstChild()) {
-    firstChild()->setLayouted(false);
-  }
   RenderFlow::layout();
 #ifdef SPEED_DEBUG
   kdDebug() << "RenderRoot::layout time used=" << qt.elapsed() << endl;
@@ -125,11 +131,14 @@ void RenderRoot::layout() {
     m_width = m_rootWidth;
   }
 
-  layoutSpecialObjects();
+  // ### we could maybe do the call below better and only pass true if the
+  // docsize changed.
+  layoutSpecialObjects(true);
 #ifdef SPEED_DEBUG
   kdDebug() << "RenderRoot::end time used=" << qt.elapsed() << endl;
 #endif
 
+  setLayouted();
   // kdDebug(0) << "root: height = " << m_height << endl;
 }
 
@@ -194,7 +203,7 @@ void RenderRoot::printObject(QPainter* p,
 
   if (specialObjects) {
     SpecialObject* r;
-    QListIterator<SpecialObject> it(*specialObjects);
+    QPtrListIterator<SpecialObject> it(*specialObjects);
     for (; (r = it.current()); ++it) {
       if (r->node->containingBlock() == this) {
         RenderObject* o = r->node;
@@ -211,6 +220,8 @@ void RenderRoot::printObject(QPainter* p,
 }
 
 void RenderRoot::repaintRectangle(int x, int y, int w, int h, bool f) {
+  if (m_printingMode)
+    return;
   //    kdDebug( 6040 ) << "updating views contents (" << x << "/" << y << ") ("
   //    << w << "/" << h << ")" << endl;
 
@@ -224,87 +235,19 @@ void RenderRoot::repaintRectangle(int x, int y, int w, int h, bool f) {
 
   if (ur.intersects(vr))
     if (m_view)
-      m_view->updateContents(x, y, w, h);
+      m_view->scheduleRepaint(x, y, w, h);
 }
 
 void RenderRoot::repaint() {
-  if (m_view)
-    m_view->updateContents(0, 0, docWidth(), docHeight());
-}
-
-void RenderRoot::updateSize() {
-  // kdDebug( 6040 ) << renderName() << "(RenderRoot)::updateSize()" << endl;
-  setMinMaxKnown(false);
-  calcMinMaxWidth();
-
-  updateHeight();
-}
-
-void RenderRoot::updateHeight() {
-  if (!m_view)
-    return;
-
-  // kdDebug( 6040 ) << renderName() << "(RenderRoot)::updateHeight() timer=" <<
-  // updateTimer.elapsed() << endl;
-  // int oldMin = m_minWidth;
-  setLayouted(false);
-
-  if (parsing()) {
-    if (!updateTimer.isNull() && updateTimer.elapsed() < timeout)
-      return;
-    else
-      updateTimer.start();
-  }
-
-  int oldHeight = docHeight();
-
-  m_view->layout(true);
-
-  // kdDebug(0) << "root layout, time used=" << updateTimer.elapsed() << endl;
-
-  int h = docHeight();
-  int w = docWidth();
-  if (h != oldHeight || h < m_view->visibleHeight()) {
-    if (h < m_view->visibleHeight())
-      h = m_view->visibleHeight();
-    m_view->resizeContents(w, h);
-  }
-  m_view->repaintContents(0, 0, w, h, FALSE);  // sync repaint!
-
-  if (parsing()) {
-    // This gets slower over time. Yes, its intended.
-    oldLayoutTime = updateTimer.elapsed();
-    timeout += oldLayoutTime / 2;
-    if (2 * docHeight() > 3 * m_view->visibleHeight())
-      timeout = QMAX(2000, timeout);
-
-    timeout = QMIN(2000 + 8 * oldLayoutTime, timeout);
-
-    updateTimer.start();
-  } else
-    oldLayoutTime = 0;
+  if (m_view && !m_printingMode)
+    m_view->scheduleRepaint(0, 0, docWidth(), docHeight());
 }
 
 void RenderRoot::close() {
-  RenderObject* o = this;
-  while (o) {
-    if (!o->parsing())
-      break;
-    o->setParsing(false);
-    RenderObject* no;
-    if (!(no = o->firstChild()))
-      if (!(no = o->nextSibling())) {
-        no = o->parent();
-        while (no && !no->nextSibling())
-          no = no->parent();
-        if (no)
-          no = no->nextSibling();
-      }
-    o = no;
+  setLayouted(false);
+  if (m_view) {
+    m_view->layout();
   }
-  updateSize();
-  if (m_view)
-    m_view->layout(true);
   // printTree();
 }
 
@@ -329,15 +272,26 @@ void RenderRoot::setSelection(RenderObject* s,
   while (e->lastChild())
     e = e->lastChild();
 
-  selectionStart = s;
-  selectionEnd = e;
-  selectionStartPos = sp;
-  selectionEndPos = ep;
+  // set selection start
+  if (m_selectionStart)
+    m_selectionStart->setIsSelectionBorder(false);
+  m_selectionStart = s;
+  if (m_selectionStart)
+    m_selectionStart->setIsSelectionBorder(true);
+  m_selectionStartPos = sp;
 
+  // set selection end
+  if (m_selectionEnd)
+    m_selectionEnd->setIsSelectionBorder(false);
+  m_selectionEnd = e;
+  if (m_selectionEnd)
+    m_selectionEnd->setIsSelectionBorder(true);
+  m_selectionEndPos = ep;
+
+  // update selection status of all objects between m_selectionStart and
+  // m_selectionEnd
   RenderObject* o = s;
   while (o && o != e) {
-    if (o->selectionState() != SelectionInside)
-      o->repaint();
     o->setSelectionState(SelectionInside);
     //      kdDebug( 6040 ) << "setting selected " << o << ", " << o->isText()
     //      << endl;
@@ -356,12 +310,14 @@ void RenderRoot::setSelection(RenderObject* s,
   e->setSelectionState(SelectionEnd);
   if (s == e)
     s->setSelectionState(SelectionBoth);
-  e->repaint();
+  repaint();
 }
 
 void RenderRoot::clearSelection() {
-  RenderObject* o = selectionStart;
-  while (o && o != selectionEnd) {
+  // update selection status of all objects between m_selectionStart and
+  // m_selectionEnd
+  RenderObject* o = m_selectionStart;
+  while (o && o != m_selectionEnd) {
     if (o->selectionState() != SelectionNone)
       o->repaint();
     o->setSelectionState(SelectionNone);
@@ -376,15 +332,26 @@ void RenderRoot::clearSelection() {
       }
     o = no;
   }
-  if (selectionEnd) {
-    selectionEnd->setSelectionState(SelectionNone);
-    selectionEnd->repaint();
+  if (m_selectionEnd) {
+    m_selectionEnd->setSelectionState(SelectionNone);
+    m_selectionEnd->repaint();
   }
+
+  // set selection start & end to 0
+  if (m_selectionStart)
+    m_selectionStart->setIsSelectionBorder(false);
+  m_selectionStart = 0;
+  m_selectionStartPos = -1;
+
+  if (m_selectionEnd)
+    m_selectionEnd->setIsSelectionBorder(false);
+  m_selectionEnd = 0;
+  m_selectionEndPos = -1;
 }
 
 void RenderRoot::selectionStartEnd(int& spos, int& epos) {
-  spos = selectionStartPos;
-  epos = selectionEndPos;
+  spos = m_selectionStartPos;
+  epos = m_selectionEndPos;
 }
 
 QRect RenderRoot::viewRect() const {
@@ -426,7 +393,7 @@ int RenderRoot::docWidth() const {
   RenderObject* fc = firstChild();
   if (fc) {
     int dw = fc->width() + fc->marginLeft() + fc->marginRight();
-    int rightmostPos = firstChild()->rightmostPosition();
+    int rightmostPos = fc->rightmostPosition();
     if (rightmostPos > dw)
       dw = rightmostPos;
     if (dw > w)

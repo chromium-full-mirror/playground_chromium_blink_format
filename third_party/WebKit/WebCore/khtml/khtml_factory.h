@@ -22,7 +22,7 @@
 
 #include <kparts/factory.h>
 #include <kparts/historyprovider.h>
-#include <qlist.h>
+#include <qptrlist.h>
 #include <kurl.h>
 
 class KInstance;
@@ -47,7 +47,7 @@ class KHTMLFactory : public KParts::Factory {
   static void registerPart(KHTMLPart* part);
   static void deregisterPart(KHTMLPart* part);
 
-  static QList<KHTMLPart>* partList() { return s_parts; }
+  static QPtrList<KHTMLPart>* partList() { return s_parts; }
 
   static KInstance* instance();
 
@@ -68,7 +68,7 @@ class KHTMLFactory : public KParts::Factory {
   static KInstance* s_instance;
   static KAboutData* s_about;
   static KHTMLSettings* s_settings;
-  static QList<KHTMLPart>* s_parts;
+  static QPtrList<KHTMLPart>* s_parts;
 };
 
 #endif

@@ -54,6 +54,7 @@ class QRadioButton : public QButton {
   // member functions --------------------------------------------------------
 
   void setChecked(bool);
+  bool isChecked();
 
   // operators ---------------------------------------------------------------
 

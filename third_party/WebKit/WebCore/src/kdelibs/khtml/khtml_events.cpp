@@ -18,14 +18,12 @@
 */
 
 #include "khtml_events.h"
+#include "rendering/render_object.h"
 #include "xml/dom_nodeimpl.h"
 
 using namespace khtml;
 
-class khtml::MouseEvent::MouseEventPrivate {
- public:
-  int nodeAbsX, nodeAbsY;
-};
+class khtml::MouseEvent::MouseEventPrivate {};
 
 khtml::MouseEvent::MouseEvent(const char* name,
                               QMouseEvent* qmouseEvent,
@@ -40,39 +38,25 @@ khtml::MouseEvent::MouseEvent(const char* name,
       m_y(y),
       m_url(url),
       m_innerNode(innerNode) {
-  d = new MouseEventPrivate();
+  d = 0;
+  if (innerNode.handle() && innerNode.handle()->renderer())
+    innerNode.handle()->renderer()->absolutePosition(m_nodeAbsX, m_nodeAbsY);
 }
 
 khtml::MouseEvent::~MouseEvent() {
   delete d;
 }
 
-int khtml::MouseEvent::nodeAbsX() const {
-  return d->nodeAbsX;
-}
-
-int khtml::MouseEvent::nodeAbsY() const {
-  return d->nodeAbsY;
-}
-
-void khtml::MouseEvent::setNodePos(int x, int y) {
-  d->nodeAbsX = x;
-  d->nodeAbsY = y;
-}
-
-// ### remove
-bool khtml::MouseEvent::isURLHandlingEnabled() const {
-  return false;
-}
-
-// ### remove
-void khtml::MouseEvent::setURLHandlingEnabled(bool) {}
-
 long khtml::MouseEvent::offset() const {
   int offset = 0;
-  DOM::Node tempNode = 0;
-  innerNode().handle()->findSelectionNode(x(), y(), nodeAbsX(), nodeAbsY(),
-                                          tempNode, offset);
+  DOM::NodeImpl* tempNode = 0;
+  int absX, absY;
+  absX = absY = 0;
+  if (innerNode().handle()->renderer()) {
+    innerNode().handle()->renderer()->absolutePosition(absX, absY);
+    innerNode().handle()->renderer()->checkSelectionPoint(x(), y(), absX, absY,
+                                                          tempNode, offset);
+  }
   return offset;
 }
 

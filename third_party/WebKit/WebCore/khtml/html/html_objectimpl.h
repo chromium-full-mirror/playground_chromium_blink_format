@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -43,21 +43,12 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
   ~HTMLAppletElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* token);
-
+  virtual void parseAttribute(AttributeImpl* token);
   virtual void attach();
-  virtual void detach();
 
  protected:
-  DOMStringImpl* codeBase;
-  DOMStringImpl* name;
-  DOMStringImpl* code;
-  DOMStringImpl* archive;
-
-  KHTMLView* view;
   khtml::VAlign valign;
 };
 
@@ -69,19 +60,16 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   ~HTMLEmbedElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* attr);
+  virtual void parseAttribute(AttributeImpl* attr);
 
   virtual void attach();
-  virtual void detach();
 
   QString url;
   QString pluginPage;
   QString serviceType;
   bool hidden;
-  QStringList param;
 };
 
 // -------------------------------------------------------------------------
@@ -92,17 +80,18 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   ~HTMLObjectElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
   HTMLFormElementImpl* form() const;
 
-  virtual void parseAttribute(AttrImpl* token);
+  virtual void parseAttribute(AttributeImpl* token);
 
   virtual void attach();
   virtual void detach();
 
-  virtual void applyChanges(bool = true, bool = true);
+  virtual void recalcStyle(StyleChange ch);
+
+  DocumentImpl* contentDocument() const;
 
   QString serviceType;
   QString url;
@@ -120,10 +109,9 @@ class HTMLParamElementImpl : public HTMLElementImpl {
 
   ~HTMLParamElementImpl();
 
-  virtual const DOMString nodeName() const;
-  virtual ushort id() const;
+  virtual Id id() const;
 
-  virtual void parseAttribute(AttrImpl* token);
+  virtual void parseAttribute(AttributeImpl* token);
 
   QString name() const {
     if (!m_name)

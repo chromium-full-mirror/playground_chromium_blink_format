@@ -87,6 +87,8 @@ class QColorGroup {
 
   QColorGroup& operator=(const QColorGroup&);
 
+  bool operator==(const QColorGroup&);
+
   // protected
   // -------------------------------------------------------------------
   // private
@@ -132,6 +134,8 @@ class QPalette {
   // operators ---------------------------------------------------------------
 
   QPalette& operator=(const QPalette&);
+
+  bool operator==(const QPalette&) const;
 
   // protected
   // -------------------------------------------------------------------

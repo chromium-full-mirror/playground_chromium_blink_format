@@ -53,6 +53,8 @@ class QCursor {
 
   // member functions --------------------------------------------------------
 
+  int handle();
+
   // operators ---------------------------------------------------------------
 
   QCursor& operator=(const QCursor&);

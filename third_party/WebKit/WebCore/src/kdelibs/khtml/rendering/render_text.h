@@ -24,13 +24,11 @@
 #ifndef RENDERTEXT_H
 #define RENDERTEXT_H
 
-#include <qvector.h>
-#include <qarray.h>
+#include "dom/dom_string.h"
+#include "xml/dom_stringimpl.h"
+#include "rendering/render_object.h"
 
-#include "dom_string.h"
-#include "dom_stringimpl.h"
-#include "render_object.h"
-
+#include <qptrvector.h>
 #include <assert.h>
 
 class QPainter;
@@ -60,7 +58,7 @@ class TextSlave {
     m_firstLine = firstLine;
   }
   ~TextSlave();
-  void print(QPainter* p, int _tx, int _ty);
+  void print(QPainter* pt, int _tx, int _ty);
   void printDecoration(QPainter* pt,
                        RenderText* p,
                        int _tx,
@@ -82,16 +80,14 @@ class TextSlave {
                       int startPos,
                       int endPos);
 
-  bool checkPoint(int _x, int _y, int _tx, int _ty, int height);
-
   // Return before, after (offset set to max), or inside the text, at @p offset
   FindSelectionResult checkSelectionPoint(int _x,
                                           int _y,
                                           int _tx,
                                           int _ty,
-                                          QFontMetrics* fm,
+                                          const QFontMetrics* fm,
                                           int& offset,
-                                          int lineheight);
+                                          short lineheight);
 
   /**
    * if this textslave was rendered @ref _ty pixels below the upper edge
@@ -130,9 +126,7 @@ class TextSlave {
   friend class RenderText;
 };
 
-class TextSlaveArray
-    : public QVector<TextSlave>  // ### change this to QArray for Qt 3.0
-{
+class TextSlaveArray : public QPtrVector<TextSlave> {
  public:
   TextSlaveArray();
 
@@ -143,8 +137,10 @@ class TextSlaveArray
 };
 
 class RenderText : public RenderObject {
+  friend class TextSlave;
+
  public:
-  RenderText(DOM::DOMStringImpl* _str);
+  RenderText(DOM::NodeImpl* node, DOM::DOMStringImpl* _str);
   virtual ~RenderText();
 
   virtual const char* renderName() const { return "RenderText"; }
@@ -164,13 +160,14 @@ class RenderText : public RenderObject {
 
   virtual void layout() { assert(false); }
 
-  bool checkPoint(int _x, int _y, int _tx, int _ty);
+  virtual bool nodeAtPoint(NodeInfo& info, int x, int y, int tx, int ty);
 
   // Return before, after (offset set to max), or inside the text, at @p offset
   virtual FindSelectionResult checkSelectionPoint(int _x,
                                                   int _y,
                                                   int _tx,
                                                   int _ty,
+                                                  DOM::NodeImpl*& node,
                                                   int& offset);
 
   unsigned int length() const { return str->l; }
@@ -185,7 +182,7 @@ class RenderText : public RenderObject {
 
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
-                             QFontMetrics* fm) const;
+                             const QFontMetrics* fm) const;
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
                              bool firstLine = false) const;
@@ -193,7 +190,7 @@ class RenderText : public RenderObject {
   virtual int height() const;
 
   // height of the contents (without paddings, margins and borders)
-  virtual int lineHeight(bool firstLine) const;
+  virtual short lineHeight(bool firstLine) const;
   virtual short baselinePosition(bool firstLine) const;
 
   // overrides
@@ -228,24 +225,36 @@ class RenderText : public RenderObject {
     return style()->marginRight().minWidth(0);
   }
 
+  virtual int rightmostPosition() const;
+
   virtual void repaint();
 
   bool hasBreakableChar() const { return m_hasBreakableChar; }
-  QFontMetrics metrics(bool firstLine) const;
+  const QFontMetrics& metrics(bool firstLine) const;
 
  protected:
+  void printTextOutline(QPainter* p,
+                        int tx,
+                        int ty,
+                        const QRect& prevLine,
+                        const QRect& thisLine,
+                        const QRect& nextLine);
+
   TextSlave* findTextSlave(int offset, int& pos);
+
+ protected:  // members
   TextSlaveArray m_lines;
-  QFontMetrics* fm;
   DOM::DOMStringImpl* str;  //
 
-  int m_lineHeight;
+  short m_lineHeight;
   short m_minWidth;
   short m_maxWidth;
 
   SelectionState m_selectionState : 3;
   bool m_hasReturn : 1;
   bool m_hasBreakableChar : 1;
+
+  // 19 bits left
 };
 };
 #endif

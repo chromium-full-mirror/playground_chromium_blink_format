@@ -19,14 +19,12 @@
  * along with this library; see the file COPYING.LIB.  If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * $Id$
  */
-#include "html_objectimpl.h"
+#include "html/html_objectimpl.h"
 
 #include "khtml_part.h"
-#include "dom_string.h"
-#include "htmlhashes.h"
+#include "dom/dom_string.h"
+#include "misc/htmlhashes.h"
 #include "khtmlview.h"
 #include <qstring.h>
 #include <qmap.h>
@@ -47,53 +45,23 @@ using namespace khtml;
 // -------------------------------------------------------------------------
 
 HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {
-  codeBase = 0;
-  code = 0;
-  name = 0;
-  archive = 0;
-}
+    : HTMLElementImpl(doc) {}
 
-HTMLAppletElementImpl::~HTMLAppletElementImpl() {
-  if (codeBase)
-    codeBase->deref();
-  if (code)
-    code->deref();
-  if (name)
-    name->deref();
-  if (archive)
-    archive->deref();
-}
+HTMLAppletElementImpl::~HTMLAppletElementImpl() {}
 
-const DOMString HTMLAppletElementImpl::nodeName() const {
-  return "APPLET";
-}
-
-ushort HTMLAppletElementImpl::id() const {
+NodeImpl::Id HTMLAppletElementImpl::id() const {
   return ID_APPLET;
 }
 
-void HTMLAppletElementImpl::parseAttribute(AttrImpl* attr) {
-  switch (attr->attrId) {
+void HTMLAppletElementImpl::parseAttribute(AttributeImpl* attr) {
+  switch (attr->id()) {
     case ATTR_CODEBASE:
-      codeBase = attr->val();
-      codeBase->ref();
-      break;
     case ATTR_ARCHIVE:
-      archive = attr->val();
-      archive->ref();
-      break;
     case ATTR_CODE:
-      code = attr->val();
-      code->ref();
-      break;
     case ATTR_OBJECT:
-      break;
     case ATTR_ALT:
-      break;
+    case ATTR_ID:
     case ATTR_NAME:
-      name = attr->val();
-      name->ref();
       break;
     case ATTR_WIDTH:
       addCSSLength(CSS_PROP_WIDTH, attr->value());
@@ -110,48 +78,45 @@ void HTMLAppletElementImpl::parseAttribute(AttrImpl* attr) {
 }
 
 void HTMLAppletElementImpl::attach() {
-  setStyle(ownerDocument()->styleSelector()->styleForElement(this));
-  if (!code)
+  if (!parentNode()->renderer() || getAttribute(ATTR_CODE).isNull()) {
+    NodeBaseImpl::attach();
     return;
-
-  khtml::RenderObject* r = _parent->renderer();
-  RenderWidget* f = 0;
-
-  if (r && m_style->display() != NONE) {
-    view = ownerDocument()->view();
-
-    if (view->part()->javaEnabled()) {
-      QMap<QString, QString> args;
-
-      args.insert("code", QString(code->s, code->l));
-      if (codeBase)
-        args.insert("codeBase", QString(codeBase->s, codeBase->l));
-      if (name)
-        args.insert("name", QString(name->s, name->l));
-      if (archive)
-        args.insert("archive", QString(archive->s, archive->l));
-
-      if (!view->part()->baseURL().isEmpty())
-        args.insert("baseURL", view->part()->baseURL().url());
-      else
-        args.insert("baseURL", view->part()->url().url());
-
-      f = new RenderApplet(view, args, this);
-    } else
-      f = new RenderEmptyApplet(view);
   }
 
-  if (f) {
-    m_render = f;
-    m_render->setStyle(m_style);
-    r->addChild(m_render, nextRenderer());
-  }
-  HTMLElementImpl::attach();
-}
+  KHTMLView* view = getDocument()->view();
 
-void HTMLAppletElementImpl::detach() {
-  view = 0;
-  HTMLElementImpl::detach();
+#ifndef Q_WS_QWS  // FIXME(E)? I don't think this is possible with Qt
+                  // Embedded...
+  if (view->part()->javaEnabled()) {
+    QMap<QString, QString> args;
+
+    args.insert("code", getAttribute(ATTR_CODE).string());
+    DOMString codeBase = getAttribute(ATTR_CODEBASE);
+    if (!codeBase.isNull())
+      args.insert("codeBase", codeBase.string());
+    DOMString name = getDocument()->htmlMode() != DocumentImpl::XHtml
+                         ? getAttribute(ATTR_NAME)
+                         : getAttribute(ATTR_ID);
+    if (!name.isNull())
+      args.insert("name", name.string());
+    DOMString archive = getAttribute(ATTR_ARCHIVE);
+    if (!archive.isNull())
+      args.insert("archive", archive.string());
+
+    args.insert("baseURL", getDocument()->baseURL());
+    m_render = new RenderApplet(this, args);
+  } else
+    // ### remove me. we should never show an empty applet, instead
+    // render the alternative content given by the webpage
+    m_render = new RenderEmptyApplet(this);
+#endif
+
+  if (m_render) {
+    m_render->setStyle(getDocument()->styleSelector()->styleForElement(this));
+    parentNode()->renderer()->addChild(m_render, nextRenderer());
+  }
+
+  NodeBaseImpl::attach();
 }
 
 // -------------------------------------------------------------------------
@@ -161,29 +126,16 @@ HTMLEmbedElementImpl::HTMLEmbedElementImpl(DocumentPtr* doc)
 
 HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {}
 
-const DOMString HTMLEmbedElementImpl::nodeName() const {
-  return "EMBED";
-}
-
-ushort HTMLEmbedElementImpl::id() const {
+NodeImpl::Id HTMLEmbedElementImpl::id() const {
   return ID_EMBED;
 }
 
-void HTMLEmbedElementImpl::parseAttribute(AttrImpl* attr) {
+void HTMLEmbedElementImpl::parseAttribute(AttributeImpl* attr) {
   DOM::DOMStringImpl* stringImpl = attr->val();
   QString val = QConstString(stringImpl->s, stringImpl->l).string();
 
-// export parameter
-#ifdef APPLE_CHANGES
-  // Need to make a deep copy here or "+" operator will attempt to modify
-  // QConstString attribute name
-  QString attrStr = attr->name().string().copy() + "=\"" + val + "\"";
-#else  /* APPLE_CHANGES not defined */
-  QString attrStr = attr->name().string() + "=\"" + val + "\"";
-#endif /* APPLE_CHANGES not defined */
-  param.append(attrStr);
   int pos;
-  switch (attr->attrId) {
+  switch (attr->id()) {
     case ATTR_TYPE:
       serviceType = val.lower();
       pos = serviceType.find(";");
@@ -241,30 +193,24 @@ void HTMLEmbedElementImpl::parseAttribute(AttrImpl* attr) {
 }
 
 void HTMLEmbedElementImpl::attach() {
-  KHTMLView* w = ownerDocument()->view();
-  setStyle(ownerDocument()->styleSelector()->styleForElement(this));
-  khtml::RenderObject* r = _parent->renderer();
-  RenderPartObject* p = 0;
-  if (r && m_style->display() != NONE) {
+  assert(!attached());
+  assert(!m_render);
+
+  if (parentNode()->renderer()) {
+    KHTMLView* w = getDocument()->view();
     if (w->part()->pluginsEnabled()) {
-      if (_parent->id() != ID_OBJECT) {
-        p = new RenderPartObject(w, this);
-        m_render = p;
-        m_render->setStyle(m_style);
-        r->addChild(m_render, nextRenderer());
-      } else
-        r->setStyle(m_style);
+      if (parentNode()->id() != ID_OBJECT)
+        m_render = new RenderPartObject(this);
+    }
+
+    if (m_render) {
+      m_render->setStyle(getDocument()->styleSelector()->styleForElement(this));
+      parentNode()->renderer()->addChild(m_render, nextRenderer());
+      static_cast<RenderPartObject*>(m_render)->updateWidget();
     }
   }
 
-  HTMLElementImpl::attach();
-
-  if (p)
-    p->updateWidget();
-}
-
-void HTMLEmbedElementImpl::detach() {
-  HTMLElementImpl::detach();
+  NodeBaseImpl::attach();
 }
 
 // -------------------------------------------------------------------------
@@ -276,11 +222,7 @@ HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentPtr* doc)
 
 HTMLObjectElementImpl::~HTMLObjectElementImpl() {}
 
-const DOMString HTMLObjectElementImpl::nodeName() const {
-  return "OBJECT";
-}
-
-ushort HTMLObjectElementImpl::id() const {
+NodeImpl::Id HTMLObjectElementImpl::id() const {
   return ID_OBJECT;
 }
 
@@ -288,11 +230,11 @@ HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
   return 0;
 }
 
-void HTMLObjectElementImpl::parseAttribute(AttrImpl* attr) {
+void HTMLObjectElementImpl::parseAttribute(AttributeImpl* attr) {
   DOM::DOMStringImpl* stringImpl = attr->val();
   QString val = QConstString(stringImpl->s, stringImpl->l).string();
   int pos;
-  switch (attr->attrId) {
+  switch (attr->id()) {
     case ATTR_TYPE:
       serviceType = val.lower();
       pos = serviceType.find(";");
@@ -317,51 +259,59 @@ void HTMLObjectElementImpl::parseAttribute(AttrImpl* attr) {
     case ATTR_ONLOAD:  // ### support load/unload on object elements
       setHTMLEventListener(
           EventImpl::LOAD_EVENT,
-          ownerDocument()->createHTMLEventListener(attr->value().string()));
+          getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     case ATTR_ONUNLOAD:
       setHTMLEventListener(
           EventImpl::UNLOAD_EVENT,
-          ownerDocument()->createHTMLEventListener(attr->value().string()));
+          getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
       HTMLElementImpl::parseAttribute(attr);
   }
 }
 
-void HTMLObjectElementImpl::attach() {
-  KHTMLView* w = ownerDocument()->view();
-  setStyle(ownerDocument()->styleSelector()->styleForElement(this));
+DocumentImpl* HTMLObjectElementImpl::contentDocument() const {
+  // ###
+  return 0;
+}
 
-  khtml::RenderObject* r = _parent->renderer();
-  if (r && m_style->display() != NONE) {
-    if (w->part()->pluginsEnabled()) {
-      RenderPartObject* p = new RenderPartObject(w, this);
-      m_render = p;
-      m_render->setStyle(m_style);
-      r->addChild(m_render, nextRenderer());
-    }
+void HTMLObjectElementImpl::attach() {
+  assert(!attached());
+  assert(!m_render);
+
+  KHTMLView* w = getDocument()->view();
+  if (w->part()->pluginsEnabled() && parentNode()->renderer()) {
+    needWidgetUpdate = false;
+    m_render = new RenderPartObject(this);
+    m_render->setStyle(getDocument()->styleSelector()->styleForElement(this));
+    parentNode()->renderer()->addChild(m_render, nextRenderer());
   }
 
-  HTMLElementImpl::attach();
+  NodeBaseImpl::attach();
 
   // ### do this when we are actually finished loading instead
   dispatchHTMLEvent(EventImpl::LOAD_EVENT, false, false);
 }
 
 void HTMLObjectElementImpl::detach() {
+// FIXME:MERGE do we need this unload event?
+#ifndef APPLE_CHANGES
+  if (attached())
+    // ### do this when we are actualy removed from document instead
+    dispatchHTMLEvent(EventImpl::UNLOAD_EVENT, false, false);
+#endif
+
   HTMLElementImpl::detach();
-  // ### do this when we are actualy removed from document instead
-  dispatchHTMLEvent(EventImpl::UNLOAD_EVENT, false, false);
 }
 
-void HTMLObjectElementImpl::applyChanges(bool top, bool force) {
+void HTMLObjectElementImpl::recalcStyle(StyleChange ch) {
   if (needWidgetUpdate) {
     if (m_render && strcmp(m_render->renderName(), "RenderPartObject") == 0)
       static_cast<RenderPartObject*>(m_render)->updateWidget();
     needWidgetUpdate = false;
   }
-  HTMLElementImpl::applyChanges(top, force);
+  HTMLElementImpl::recalcStyle(ch);
 }
 
 // -------------------------------------------------------------------------
@@ -379,23 +329,25 @@ HTMLParamElementImpl::~HTMLParamElementImpl() {
     m_value->deref();
 }
 
-const DOMString HTMLParamElementImpl::nodeName() const {
-  return "PARAM";
-}
-
-ushort HTMLParamElementImpl::id() const {
+NodeImpl::Id HTMLParamElementImpl::id() const {
   return ID_PARAM;
 }
 
-void HTMLParamElementImpl::parseAttribute(AttrImpl* attr) {
-  switch (attr->attrId) {
+void HTMLParamElementImpl::parseAttribute(AttributeImpl* attr) {
+  switch (attr->id()) {
+    case ATTR_ID:
+      if (getDocument()->htmlMode() != DocumentImpl::XHtml)
+        break;
+    // fall through
     case ATTR_NAME:
       m_name = attr->val();
-      m_name->ref();
+      if (m_name)
+        m_name->ref();
       break;
     case ATTR_VALUE:
       m_value = attr->val();
-      m_value->ref();
+      if (m_value)
+        m_value->ref();
       break;
   }
 }

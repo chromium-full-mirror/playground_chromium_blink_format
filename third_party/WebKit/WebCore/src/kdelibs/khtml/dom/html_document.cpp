@@ -21,37 +21,28 @@
  * $Id$
  */
 // --------------------------------------------------------------------------
-#include <dcopclient.h>
-#include <kapp.h>
-#include <kdebug.h>
 
 #include "html_document.h"
 
-#include "dom_node.h"
-#include "dom_element.h"
-#include "dom_doc.h"
-#include "dom_string.h"
-#include "dom_textimpl.h"
-#include "html_misc.h"
-#include "html_element.h"
-#include "html_documentimpl.h"
-#include "html_elementimpl.h"
-#include "html_miscimpl.h"
-#include "htmlhashes.h"
-#include "khtmlview.h"
+#include "dom/html_misc.h"
+#include "xml/dom_textimpl.h"
+#include "html/html_documentimpl.h"
+#include "html/html_miscimpl.h"
+#include "misc/htmlhashes.h"
+
 using namespace DOM;
 
 HTMLDocument::HTMLDocument()
     : Document(false)  // create the impl here
 {
-  impl = new HTMLDocumentImpl();
+  impl = DOMImplementationImpl::instance()->createHTMLDocument();
   impl->ref();
 }
 
 HTMLDocument::HTMLDocument(KHTMLView* parent)
     : Document(false)  // create the impl here
 {
-  impl = new HTMLDocumentImpl(parent);
+  impl = DOMImplementationImpl::instance()->createHTMLDocument(parent);
   impl->ref();
 }
 
@@ -64,8 +55,7 @@ HTMLDocument& HTMLDocument::operator=(const Node& other) {
     impl = 0;
     return *this;
   }
-  Document d;
-  d = other;
+  Document d(other);
   if (!d.isHTMLDocument())
     impl = 0;
   else
@@ -83,17 +73,7 @@ HTMLDocument::~HTMLDocument() {}
 DOMString HTMLDocument::title() const {
   if (!impl)
     return DOMString();
-
-  NodeImpl* e = static_cast<HTMLDocumentImpl*>(impl)->findElement(ID_TITLE);
-  if (!e)
-    return DOMString();
-
-  NodeImpl* t = e->firstChild();
-  if (!t)
-    return DOMString();
-
-  // ### join all text nodes within <TITLE>
-  return static_cast<TextImpl*>(t)->data();
+  return static_cast<HTMLDocumentImpl*>(impl)->title();
 }
 
 void HTMLDocument::setTitle(const DOMString& /*value*/) {
@@ -106,10 +86,22 @@ DOMString HTMLDocument::referrer() const {
   return ((HTMLDocumentImpl*)impl)->referrer();
 }
 
+DOMString HTMLDocument::completeURL(const DOMString& str) const {
+  if (!impl)
+    return str;
+  return ((HTMLDocumentImpl*)impl)->completeURL(str.string());
+}
+
 DOMString HTMLDocument::domain() const {
   if (!impl)
     return DOMString();
   return ((HTMLDocumentImpl*)impl)->domain();
+}
+
+DOMString HTMLDocument::lastModified() const {
+  if (!impl)
+    return DOMString();
+  return ((HTMLDocumentImpl*)impl)->lastModified();
 }
 
 DOMString HTMLDocument::URL() const {
@@ -175,27 +167,9 @@ DOMString HTMLDocument::cookie() const {
           __FUNCTION__);
   return DOMString("");
 #else  /* APPLE_CHANGES not defined */
-  QCString replyType;
-  QByteArray params, reply;
-  QDataStream stream(params, IO_WriteOnly);
-  stream << URL().string();
-  if (!kapp->dcopClient()->call("kcookiejar", "kcookiejar",
-                                "findDOMCookies(QString)", params, replyType,
-                                reply)) {
-    kdWarning(6010) << "Can't communicate with cookiejar!" << endl;
+  if (!impl)
     return DOMString();
-  }
-
-  QDataStream stream2(reply, IO_ReadOnly);
-  if (replyType != "QString") {
-    kdError(6010) << "DCOP function findDOMCookies(...) returns " << replyType
-                  << ", expected QString" << endl;
-    return DOMString();
-  }
-
-  QString result;
-  stream2 >> result;
-  return DOMString(result);
+  return ((HTMLDocumentImpl*)impl)->cookie();
 #endif /* APPLE_CHANGES not defined */
 }
 
@@ -203,19 +177,10 @@ void HTMLDocument::setCookie(const DOMString& value) {
 #ifdef APPLE_CHANGES
   fprintf(stderr, "ERROR %s:%d  %s (NOT YET IMPLEMENTED)\n", __FILE__, __LINE__,
           __FUNCTION__);
-#else  /* APPLE_CHANGES not defined */
-  long windowId = view()->winId();
-  QByteArray params;
-  QDataStream stream(params, IO_WriteOnly);
-  QString fake_header("Set-Cookie: ");
-  fake_header.append(value.string());
-  fake_header.append("\n");
-  stream << URL().string() << fake_header.utf8() << windowId;
-  if (!kapp->dcopClient()->send("kcookiejar", "kcookiejar",
-                                "addCookies(QString,QCString,long int)",
-                                params)) {
-    kdWarning(6010) << "Can't communicate with cookiejar!" << endl;
-  }
+#else /* APPLE_CHANGES not defined */
+  if (impl)
+    ((HTMLDocumentImpl*)impl)->setCookie(value);
+
 #endif /* APPLE_CHANGES not defined */
 }
 
@@ -234,24 +199,13 @@ void HTMLDocument::write(const DOMString& text) {
     ((HTMLDocumentImpl*)impl)->write(text);
 }
 
-void HTMLDocument::write(const QString& text) {
-  if (impl)
-    ((HTMLDocumentImpl*)impl)->write(text);
-}
-
 void HTMLDocument::writeln(const DOMString& text) {
   if (impl)
     ((HTMLDocumentImpl*)impl)->writeln(text);
 }
 
-Element HTMLDocument::getElementById(const DOMString& elementId) {
-  if (!impl)
-    return 0;
-  return ((HTMLDocumentImpl*)impl)->getElementById(elementId);
-}
-
 NodeList HTMLDocument::getElementsByName(const DOMString& elementName) {
   if (!impl)
     return 0;
-  return ((HTMLDocumentImpl*)impl)->getElementsByName(elementName);
+  return new NameNodeListImpl(impl, elementName);
 }

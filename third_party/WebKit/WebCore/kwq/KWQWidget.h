@@ -66,6 +66,12 @@ class QWidget : public QObject, public QPaintDevice {
 
   // enums -------------------------------------------------------------------
 
+  enum WidgetFlags {
+    WResizeNoErase = 1,
+    WRepaintNoErase = 1 << 1,
+    WPaintUnclipped = 1 << 2
+  };
+
   enum FocusPolicy {
     NoFocus = 0,
     TabFocus = 0x1,
@@ -105,6 +111,8 @@ class QWidget : public QObject, public QPaintDevice {
   void move(int, int);
   virtual void move(const QPoint&);
 
+  QRect frameGeometry() const;
+
   QWidget* topLevelWidget() const;
 
   QPoint mapToGlobal(const QPoint&) const;
@@ -130,6 +138,8 @@ class QWidget : public QObject, public QPaintDevice {
   virtual QSize minimumSizeHint() const;
   bool isVisible() const;
   virtual void setCursor(const QCursor&);
+  QCursor cursor();
+  void unsetCursor();
   bool event(QEvent*);
   bool focusNextPrevChild(bool);
   bool hasMouseTracking() const;

@@ -36,12 +36,12 @@
 #include <_qsortedlist.h>
 #else
 
-#include "qlist.h"
+#include "qptrlist.h"
 
 // class QSortedList ===========================================================
 
 template <class T>
-class QSortedList : public QList<T> {
+class QSortedList : public QPtrList<T> {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -50,8 +50,8 @@ class QSortedList : public QList<T> {
 
   // constructors, copy constructors, and destructors ------------------------
 
-  QSortedList() : QList<T>() {}
-  QSortedList(const QSortedList<T>& sl) : QList<T>(sl) {}
+  QSortedList() : QPtrList<T>() {}
+  QSortedList(const QSortedList<T>& sl) : QPtrList<T>(sl) {}
   ~QSortedList() {}
 
   // Member functions --------------------------------------------------------
@@ -59,7 +59,7 @@ class QSortedList : public QList<T> {
   // operators ---------------------------------------------------------------
 
   QSortedList<T>& operator=(const QSortedList<T>& sl) {
-    QList<T>::operator=(sl);
+    QPtrList<T>::operator=(sl);
     return *this;
   }
 

@@ -66,6 +66,8 @@ class QComboBox : public QWidget {
   bool eventFilter(QObject* object, QEvent* event);
   void insertItem(const QString& text, int index = -1);
   void clear();
+  int currentItem() const;
+
 #ifdef _KWQ_
   int indexOfCurrentItem();
 #endif

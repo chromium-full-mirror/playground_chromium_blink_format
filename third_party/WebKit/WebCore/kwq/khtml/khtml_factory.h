@@ -51,7 +51,7 @@ class KHTMLFactory : public KParts::Factory {
   }
 
  private:
-  static QList<KHTMLPart>* s_parts;
+  static QPtrList<KHTMLPart>* s_parts;
 };
 
 #endif

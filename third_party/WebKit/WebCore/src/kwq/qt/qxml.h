@@ -53,6 +53,7 @@ class QXmlAttributes {
   int length() const;
   QString localName(int index) const;
   QString value(int index) const;
+  QString uri(int index) const;
 
   // operators ---------------------------------------------------------------
 

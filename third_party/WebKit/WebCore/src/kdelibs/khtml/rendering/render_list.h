@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -29,9 +29,12 @@
 // ### list-style-position, list-style-image is still missing
 
 namespace khtml {
+
+class RenderListItem;
+
 /* used to render the lists marker.
-   This class always has to be a direct child of a RenderListItem!
- */
+     This class always has to be a direct child of a RenderListItem!
+*/
 class RenderListMarker : public RenderBox {
  public:
   RenderListMarker();
@@ -52,21 +55,21 @@ class RenderListMarker : public RenderBox {
 
   virtual short verticalPositionHint(bool firstLine) const;
 
-  virtual void setPixmap(const QPixmap&,
-                         const QRect&,
-                         CachedImage*,
-                         bool* manualUpdate);
+  virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
 
   virtual void calcWidth();
 
-  QString item;
-  long int val;
-  CachedImage* listImage;
+ protected:
+  friend class RenderListItem;
+
+  QString m_item;
+  CachedImage* m_listImage;
+  long m_value;
 };
 
 class RenderListItem : public RenderFlow {
  public:
-  RenderListItem();
+  RenderListItem(DOM::NodeImpl*);
   virtual ~RenderListItem();
 
   virtual const char* renderName() const { return "RenderListItem"; }
@@ -78,7 +81,7 @@ class RenderListItem : public RenderFlow {
     return (specialObjects != 0 && specialObjects->count() > 1);
   }
 
-  long value() const { return m_marker->val; }
+  long value() const { return m_marker->m_value; }
   void setValue(long v) { predefVal = v; }
   void calcListValue();
   bool checkChildren() const;

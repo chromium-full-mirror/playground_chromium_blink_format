@@ -20,18 +20,16 @@
  *
  * $Id$
  */
-#include "dom_stringimpl.h"
-#include "css_stylesheet.h"
-#include "css_stylesheetimpl.h"
-#include "css_rule.h"
-
-#include "dom_node.h"
-#include "dom_exception.h"
-
-#include "misc/htmlhashes.h"
-#include "html/html_headimpl.h"
-#include "xml/dom_docimpl.h"
+#include "dom/dom_exception.h"
+#include "dom/css_rule.h"
 #include "dom/dom_doc.h"
+
+#include "xml/dom_docimpl.h"
+
+#include "html/html_headimpl.h"
+
+#include "css/css_stylesheetimpl.h"
+#include "misc/htmlhashes.h"
 
 #include <stdio.h>
 
@@ -273,12 +271,6 @@ MediaList::~MediaList() {
     impl->deref();
 }
 
-DOM::DOMString MediaList::mediaText() {
-  if (!impl)
-    return DOMString();
-  return static_cast<MediaListImpl*>(impl)->mediaText();
-}
-
 DOM::DOMString MediaList::mediaText() const {
   if (!impl)
     return DOMString();
@@ -290,13 +282,13 @@ void MediaList::setMediaText(const DOM::DOMString& value) {
     static_cast<MediaListImpl*>(impl)->setMediaText(value);
 }
 
-unsigned long MediaList::length() {
+unsigned long MediaList::length() const {
   if (!impl)
     return 0;
   return ((MediaListImpl*)impl)->length();
 }
 
-DOM::DOMString MediaList::item(unsigned long index) {
+DOM::DOMString MediaList::item(unsigned long index) const {
   if (!impl)
     return DOMString();
   return ((MediaListImpl*)impl)->item(index);
@@ -304,12 +296,12 @@ DOM::DOMString MediaList::item(unsigned long index) {
 
 void MediaList::deleteMedium(const DOM::DOMString& oldMedium) {
   if (impl)
-    ((MediaListImpl*)impl)->del(oldMedium);
+    ((MediaListImpl*)impl)->deleteMedium(oldMedium);
 }
 
 void MediaList::appendMedium(const DOM::DOMString& newMedium) {
   if (impl)
-    ((MediaListImpl*)impl)->append(newMedium);
+    ((MediaListImpl*)impl)->appendMedium(newMedium);
 }
 
 MediaListImpl* MediaList::handle() const {

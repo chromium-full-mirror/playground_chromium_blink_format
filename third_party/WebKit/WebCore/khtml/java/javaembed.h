@@ -28,6 +28,7 @@
 
 #include <qwidget.h>
 
+#ifndef Q_WS_QWS  // FIXME(E)? I don't think this is possible with Qt Embedded.
 class KJavaEmbedPrivate;
 class KJavaEmbed : public QWidget {
   Q_OBJECT
@@ -75,4 +76,5 @@ class KJavaEmbed : public QWidget {
   KJavaEmbedPrivate* d;
 };
 
+#endif
 #endif

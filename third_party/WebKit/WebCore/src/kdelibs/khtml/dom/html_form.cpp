@@ -22,15 +22,17 @@
  */
 // --------------------------------------------------------------------------
 
-#include "html_form.h"
-#include "html_formimpl.h"
-#include "dom_string.h"
-#include "html_miscimpl.h"
-#include "dom_exception.h"
-#include "dom_docimpl.h"
-using namespace DOM;
+#include "dom/html_form.h"
+#include "dom/dom_exception.h"
+#include "dom/dom_doc.h"
 
-#include "htmlhashes.h"
+#include "html/html_formimpl.h"
+#include "html/html_miscimpl.h"
+
+#include "xml/dom_docimpl.h"
+#include "misc/htmlhashes.h"
+
+using namespace DOM;
 
 HTMLButtonElement::HTMLButtonElement() : HTMLElement() {}
 
@@ -317,9 +319,8 @@ bool HTMLInputElement::defaultChecked() const {
 }
 
 void HTMLInputElement::setDefaultChecked(bool _defaultChecked) {
-  if (impl) {
+  if (impl)
     ((ElementImpl*)impl)->setAttribute(ATTR_CHECKED, _defaultChecked ? "" : 0);
-  }
 }
 
 HTMLFormElement HTMLInputElement::form() const {
@@ -411,12 +412,12 @@ void HTMLInputElement::setMaxLength(long _maxLength) {
 DOMString HTMLInputElement::name() const {
   if (!impl)
     return DOMString();
-  return static_cast<ElementImpl*>(impl)->getAttribute(ATTR_NAME);
+  return static_cast<HTMLInputElementImpl* const>(impl)->name();
 }
 
 void HTMLInputElement::setName(const DOMString& value) {
   if (impl)
-    static_cast<ElementImpl*>(impl)->setAttribute(ATTR_NAME, value);
+    static_cast<HTMLInputElementImpl*>(impl)->setName(value);
 }
 
 bool HTMLInputElement::readOnly() const {
@@ -445,7 +446,12 @@ void HTMLInputElement::setSize(const DOMString& value) {
 DOMString HTMLInputElement::src() const {
   if (!impl)
     return DOMString();
-  return static_cast<ElementImpl*>(impl)->getAttribute(ATTR_SRC);
+  DOMString s = static_cast<ElementImpl*>(impl)->getAttribute(ATTR_SRC);
+  // ### not sure if we're supposed to do the completion
+  if (!s.isEmpty())
+    s = ownerDocument().completeURL(s);
+
+  return s;
 }
 
 void HTMLInputElement::setSrc(const DOMString& value) {
@@ -471,6 +477,12 @@ DOMString HTMLInputElement::type() const {
   return ((HTMLInputElementImpl*)impl)->type();
 }
 
+void HTMLInputElement::setType(const DOMString& _type) {
+  if (!impl)
+    return;
+  static_cast<HTMLInputElementImpl*>(impl)->setType(_type);
+}
+
 DOMString HTMLInputElement::useMap() const {
   if (!impl)
     return DOMString();
@@ -494,14 +506,13 @@ void HTMLInputElement::setValue(const DOMString& value) {
 }
 
 void HTMLInputElement::blur() {
-  if (impl && impl->ownerDocument() &&
-      impl->ownerDocument()->focusNode() == impl)
-    impl->ownerDocument()->setFocusNode(0);
+  if (impl)
+    ((HTMLInputElementImpl*)impl)->blur();
 }
 
 void HTMLInputElement::focus() {
-  if (impl && impl->ownerDocument())
-    impl->ownerDocument()->setFocusNode(static_cast<ElementImpl*>(impl));
+  if (impl)
+    ((HTMLInputElementImpl*)impl)->focus();
 }
 
 void HTMLInputElement::select() {
@@ -777,12 +788,12 @@ void HTMLSelectElement::setMultiple(bool _multiple) {
 DOMString HTMLSelectElement::name() const {
   if (!impl)
     return DOMString();
-  return static_cast<ElementImpl*>(impl)->getAttribute(ATTR_NAME);
+  return static_cast<HTMLSelectElementImpl* const>(impl)->name();
 }
 
 void HTMLSelectElement::setName(const DOMString& value) {
   if (impl)
-    static_cast<ElementImpl*>(impl)->setAttribute(ATTR_NAME, value);
+    static_cast<HTMLSelectElementImpl*>(impl)->setName(value);
 }
 
 long HTMLSelectElement::size() const {
@@ -822,14 +833,13 @@ void HTMLSelectElement::remove(long index) {
 }
 
 void HTMLSelectElement::blur() {
-  if (impl && impl->ownerDocument() &&
-      impl->ownerDocument()->focusNode() == impl)
-    impl->ownerDocument()->setFocusNode(0);
+  if (impl)
+    ((HTMLSelectElementImpl*)impl)->blur();
 }
 
 void HTMLSelectElement::focus() {
-  if (impl && impl->ownerDocument())
-    impl->ownerDocument()->setFocusNode(static_cast<ElementImpl*>(impl));
+  if (impl)
+    ((HTMLSelectElementImpl*)impl)->focus();
 }
 
 // --------------------------------------------------------------------------
@@ -915,12 +925,12 @@ void HTMLTextAreaElement::setDisabled(bool _disabled) {
 DOMString HTMLTextAreaElement::name() const {
   if (!impl)
     return DOMString();
-  return static_cast<ElementImpl*>(impl)->getAttribute(ATTR_NAME);
+  return static_cast<HTMLTextAreaElementImpl* const>(impl)->name();
 }
 
 void HTMLTextAreaElement::setName(const DOMString& value) {
   if (impl)
-    static_cast<ElementImpl*>(impl)->setAttribute(ATTR_NAME, value);
+    static_cast<HTMLTextAreaElementImpl*>(impl)->setName(value);
 }
 
 bool HTMLTextAreaElement::readOnly() const {
@@ -978,14 +988,13 @@ void HTMLTextAreaElement::setValue(const DOMString& value) {
 }
 
 void HTMLTextAreaElement::blur() {
-  if (impl && impl->ownerDocument() &&
-      impl->ownerDocument()->focusNode() == impl)
-    impl->ownerDocument()->setFocusNode(0);
+  if (impl)
+    ((HTMLTextAreaElementImpl*)impl)->blur();
 }
 
 void HTMLTextAreaElement::focus() {
-  if (impl && impl->ownerDocument())
-    impl->ownerDocument()->setFocusNode(static_cast<ElementImpl*>(impl));
+  if (impl)
+    ((HTMLTextAreaElementImpl*)impl)->focus();
 }
 
 void HTMLTextAreaElement::select() {
@@ -1092,12 +1101,12 @@ void HTMLOptionElement::setSelected(bool _selected) {
 DOMString HTMLOptionElement::value() const {
   if (!impl)
     return DOMString();
-  return static_cast<ElementImpl*>(impl)->getAttribute(ATTR_VALUE);
+  return static_cast<HTMLOptionElementImpl*>(impl)->value();
 }
 
 void HTMLOptionElement::setValue(const DOMString& value) {
   if (impl)
-    static_cast<ElementImpl*>(impl)->setAttribute(ATTR_VALUE, value);
+    static_cast<HTMLOptionElementImpl*>(impl)->setValue(value.implementation());
 }
 
 // -----------------------------------------------------------------------------

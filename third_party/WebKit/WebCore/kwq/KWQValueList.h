@@ -170,7 +170,7 @@ class QValueList {
     QValueListNode<T> node(val);
     impl.removeEqualNodes(&node, nodesEqual);
   }
-  uint contains(const T& val) {
+  uint contains(const T& val) const {
     QValueListNode<T> node(val);
     return impl.containsEqualNodes(&node, nodesEqual);
   }
@@ -221,7 +221,8 @@ class QValueList {
   static void deleteNode(KWQValueListNodeImpl* node) {
     delete (QValueListNode<T>*)node;
   }
-  static bool nodesEqual(KWQValueListNodeImpl* a, KWQValueListNodeImpl* b) {
+  static bool nodesEqual(const KWQValueListNodeImpl* a,
+                         const KWQValueListNodeImpl* b) {
     return ((QValueListNode<T>*)a)->value == ((QValueListNode<T>*)b)->value;
   }
   static KWQValueListNodeImpl* copyNode(KWQValueListNodeImpl* node) {

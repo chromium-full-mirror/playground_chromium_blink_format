@@ -21,11 +21,9 @@
  * $Id$
  */
 
-#include "dom2_events.h"
-#include "dom2_views.h"
-#include "dom2_eventsimpl.h"
-#include "dom_string.h"
-#include "dom_exception.h"
+#include "dom/dom2_views.h"
+#include "dom/dom_exception.h"
+#include "xml/dom2_eventsimpl.h"
 
 using namespace DOM;
 

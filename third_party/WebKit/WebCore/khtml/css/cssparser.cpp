@@ -1,8 +1,10 @@
-/**
+/*
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *               1999 Waldo Bastian (bastian@kde.org)
+ *               2001 Andreas Schlapbach (schlpbch@iam.unibe.ch)
+ *               2001 Dirk Mueller (mueller@kde.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -18,8 +20,6 @@
  * along with this library; see the file COPYING.LIB.  If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- *
- * $Id$
  */
 
 //#define CSS_DEBUG
@@ -28,25 +28,29 @@
 
 #include <assert.h>
 
-#include "css_stylesheetimpl.h"
-#include "css_stylesheet.h"
-#include "css_rule.h"
-#include "css_ruleimpl.h"
-#include "css_valueimpl.h"
-#include "csshelper.h"
+#include "css/css_stylesheetimpl.h"
+#include "css/css_ruleimpl.h"
+#include "css/css_valueimpl.h"
+#include "css/csshelper.h"
 
-#include "dom_string.h"
+#include "dom/css_stylesheet.h"
+#include "dom/css_rule.h"
+#include "dom/dom_string.h"
+#include "dom/dom_exception.h"
+
 #include "xml/dom_nodeimpl.h"
 #include "html/html_documentimpl.h"
-#include "dom_exception.h"
+#include "khtml_part.h"
+#include "khtmlview.h"
+
 using namespace DOM;
 
 #include <kdebug.h>
 #include <kglobal.h>
 #include <kglobalsettings.h>  // For system fonts
-#include <kapp.h>
+#include <kapplication.h>
 
-#include "htmlhashes.h"
+#include "misc/htmlhashes.h"
 #include "misc/helper.h"
 
 //
@@ -57,6 +61,10 @@ using namespace DOM;
 // (and including) CSS_PROP_TOTAL-1
 #include "cssproperties.c"
 #include "cssvalues.c"
+
+static QPtrList<CSSProperty>* m_propList = 0;
+static bool m_bImportant = FALSE;
+static bool m_bnonCSSHint = FALSE;
 
 int DOM::getPropertyID(const char* tagStr, int len) {
   const struct props* propsPtr = findProp(tagStr, len);
@@ -79,7 +87,7 @@ void StyleBaseImpl::checkLoaded() {
     m_parent->checkLoaded();
 }
 
-DOMString StyleBaseImpl::baseUrl() {
+DOMString StyleBaseImpl::baseURL() {
   // try to find the style sheet. If found look for it's url.
   // If it has none, look for the parentsheet, or the parentNode and
   // try to find out about their url
@@ -96,15 +104,12 @@ DOMString StyleBaseImpl::baseUrl() {
 
   // find parent
   if (sheet->parent())
-    return sheet->parent()->baseUrl();
+    return sheet->parent()->baseURL();
 
   if (!sheet->ownerNode())
     return DOMString();
 
-  DocumentImpl* doc = static_cast<DocumentImpl*>(
-      sheet->ownerNode()->nodeType() == Node::DOCUMENT_NODE
-          ? sheet->ownerNode()
-          : sheet->ownerNode()->ownerDocument());
+  DocumentImpl* doc = sheet->ownerNode()->getDocument();
 
   return doc->baseURL();
 }
@@ -226,13 +231,13 @@ CSSRuleImpl* StyleBaseImpl::parseAtRule(const QChar*& curP, const QChar* endP) {
       curP = parseToChar(startP, endP, ';', false, true);
     if (!curP)
       return 0;
-    QString media(startP, curP - startP);
-    media = media.stripWhiteSpace();
+
+    DOMString mediaList = DOMString(startP, curP - startP);
 // ### check if at the beginning of the stylesheet (no style rule
 //     before the import rule)
 #ifdef CSS_DEBUG
-    kdDebug(6080) << "at rule: url = '" << url.string() << "' media = '"
-                  << media << "'" << endl;
+    kdDebug(6080) << "import rule = " << url.string()
+                  << ", mediaList = " << mediaList.string() << endl;
 #endif
     // ignore block following @import rule
     if (*curP == '{') {
@@ -241,14 +246,10 @@ CSSRuleImpl* StyleBaseImpl::parseAtRule(const QChar*& curP, const QChar* endP) {
       if (curP)
         curP++;
     }
-    // ### only media="", "screen and "all" are imported for the moment...
-    // ### add at least "print" here once the MediaList class is implemented
-    if (!media.isEmpty() &&
-        !(media.contains("all") || media.contains("screen")))
-      return 0;
     if (!this->isCSSStyleSheet())
       return 0;
-    return new CSSImportRuleImpl(this, url, 0);
+
+    return new CSSImportRuleImpl(this, url, mediaList);
   } else if (rule == "charset") {
     // ### invoke decoder
     startP = curP++;
@@ -272,7 +273,7 @@ CSSRuleImpl* StyleBaseImpl::parseAtRule(const QChar*& curP, const QChar* endP) {
     // qDebug("mediaList = '%s'", mediaList.latin1() );
     if (!curP || curP >= endP)
       return 0;
-    QString mediaList = QString(startP, curP - startP);
+    DOMString mediaList = DOMString(startP, curP - startP);
     curP++;
     startP = curP;
     if (curP >= endP)
@@ -281,10 +282,10 @@ CSSRuleImpl* StyleBaseImpl::parseAtRule(const QChar*& curP, const QChar* endP) {
     if (!curP || startP >= curP)
       return 0;
 #ifdef CSS_DEBUG
-    kdDebug(6080) << "media rule = " << QString(startP, curP - startP) << endl;
+    kdDebug(6080) << "media rule = " << QString(startP, curP - startP)
+                  << ", mediaList = " << mediaList.string() << endl;
 #endif
-    if (mediaList.contains("screen") || mediaList.contains("all"))
-      return parseStyleRule(startP, curP);
+    return new CSSMediaRuleImpl(this, startP, curP, mediaList);
   } else if (rule == "page") {
     startP = curP++;
     curP = parseToChar(startP, endP, '{', false);
@@ -330,7 +331,8 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
     cs->attr = ATTR_ID;
     cs->match = CSSSelector::Exact;
     cs->value = getValue(curP + 1, endP, endVal);
-  } else if (*curP == '.' && (curP < endP && !((*(curP + 1)).isDigit()))) {
+  } else if (*curP == '.' && curP < endP &&
+             (!strictParsing || !(*(curP + 1)).isDigit())) {
     cs->tag = -1;
     cs->attr = ATTR_CLASS;
     cs->match = CSSSelector::List;
@@ -351,7 +353,8 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
         cs->match = CSSSelector::Exact;
         cs->value = getValue(curP + 1, endP, endVal);
         break;
-      } else if (*curP == '.' && (curP < endP && !((*(curP + 1)).isDigit()))) {
+      } else if (*curP == '.' && curP < endP &&
+                 (!strictParsing || !(*(curP + 1)).isDigit())) {
         tag = QString(startP, curP - startP);
         cs->attr = ATTR_CLASS;
         cs->match = CSSSelector::List;
@@ -377,6 +380,7 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
         const QChar* closebracket = parseToChar(curP, endP, ']', false);
         if (!closebracket) {
           kdWarning() << "error in css: closing bracket not found!" << endl;
+          delete cs;
           return 0;
         }
         QString attr;
@@ -394,19 +398,53 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
             endVal = 0;
         } else {
           // check relation: = / ~= / |=
+          // CSS3: ^= / $= / *=
           if (*(equal - 1) == '~') {
             attr = QString(curP, equal - curP - 1);
             cs->match = CSSSelector::List;
           } else if (*(equal - 1) == '|') {
             attr = QString(curP, equal - curP - 1);
             cs->match = CSSSelector::Hyphen;
+          } else if (*(equal - 1) == '^') {
+            attr = QString(curP, equal - curP - 1);
+            cs->match = CSSSelector::Begin;
+          } else if (*(equal - 1) == '$') {
+            attr = QString(curP, equal - curP - 1);
+            cs->match = CSSSelector::End;
+          } else if (*(equal - 1) == '*') {
+            attr = QString(curP, equal - curP - 1);
+            cs->match = CSSSelector::Contain;
           } else {
             attr = QString(curP, equal - curP);
             cs->match = CSSSelector::Exact;
           }
         }
-        attr = attr.stripWhiteSpace();
-        cs->attr = khtml::getAttrID(attr.ascii(), attr.length());
+        {
+          attr = attr.stripWhiteSpace();
+          StyleBaseImpl* root = this;
+          DocumentImpl* doc = 0;
+          while (root->parent())
+            root = root->parent();
+          if (root->isCSSStyleSheet())
+            doc = static_cast<CSSStyleSheetImpl*>(root)->doc();
+
+          if (doc) {
+            if (doc->isHTMLDocument())
+              attr = attr.lower();
+            const DOMString dattr(attr);
+            cs->attr = doc->attrId(0, dattr.implementation(), false);
+          } else {
+            cs->attr = khtml::getAttrID(attr.lower().ascii(), attr.length());
+            // this case should never happen - only when loading
+            // the default stylesheet - which must not contain unknown
+            // attributes
+            assert(cs->attr);
+          }
+          if (!cs->attr) {
+            delete cs;
+            return 0;
+          }
+        }
         if (equal) {
           equal++;
           while (equal < endP && *equal == ' ')
@@ -461,19 +499,21 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
         root = root->parent();
       if (root->isCSSStyleSheet())
         doc = static_cast<CSSStyleSheetImpl*>(root)->doc();
-      if (doc && !doc->isHTMLDocument()) {
-        const DOMString s = tag;
-        cs->tag = doc->elementId(s.implementation());
+
+      if (doc) {
+        if (doc->isHTMLDocument())
+          tag = tag.lower();
+        const DOMString dtag(tag);
+        cs->tag = doc->tagId(0, dtag.implementation(), false);
       } else {
-        int tagID = khtml::getTagID(tag.lower().ascii(), tag.length());
-        if (tagID != 0) {
-          cs->tag = tagID;
-        } else if (!(tag.isEmpty())) {
-          const DOMString s = tag;
-          cs->tag = doc->elementId(s.implementation());
-        } else {
-          kdWarning() << "Error in CSS" << endl;
-        }
+        cs->tag = khtml::getTagID(tag.lower().ascii(), tag.length());
+        // this case should never happen - only when loading
+        // the default stylesheet - which must not contain unknown tags
+        assert(cs->tag);
+      }
+      if (!cs->tag) {
+        delete cs;
+        return 0;
       }
     }
   }
@@ -561,14 +601,14 @@ CSSSelector* StyleBaseImpl::parseSelector1(const QChar* curP,
   return (selecStack);
 }
 
-QList<CSSSelector>* StyleBaseImpl::parseSelector(const QChar* curP,
-                                                 const QChar* endP) {
+QPtrList<CSSSelector>* StyleBaseImpl::parseSelector(const QChar* curP,
+                                                    const QChar* endP) {
 #ifdef CSS_DEBUG
   kdDebug(6080) << "selector is \'" << QString(curP, endP - curP) << "\'"
                 << endl;
 #endif
 
-  QList<CSSSelector>* slist = 0;
+  QPtrList<CSSSelector>* slist = 0;
   const QChar* startP;
 
   while (curP < endP) {
@@ -580,7 +620,7 @@ QList<CSSSelector>* StyleBaseImpl::parseSelector(const QChar* curP,
     CSSSelector* selector = parseSelector1(startP, curP);
     if (selector) {
       if (!slist) {
-        slist = new QList<CSSSelector>;
+        slist = new QPtrList<CSSSelector>;
         slist->setAutoDelete(true);
       }
       slist->append(selector);
@@ -598,6 +638,7 @@ QList<CSSSelector>* StyleBaseImpl::parseSelector(const QChar* curP,
 }
 
 void StyleBaseImpl::parseProperty(const QChar* curP, const QChar* endP) {
+  m_bnonCSSHint = false;
   m_bImportant = false;
   // Get rid of space in front of the declaration
 
@@ -679,9 +720,9 @@ void StyleBaseImpl::parseProperty(const QChar* curP, const QChar* endP) {
   }
 }
 
-QList<CSSProperty>* StyleBaseImpl::parseProperties(const QChar* curP,
-                                                   const QChar* endP) {
-  m_propList = new QList<CSSProperty>;
+QPtrList<CSSProperty>* StyleBaseImpl::parseProperties(const QChar* curP,
+                                                      const QChar* endP) {
+  m_propList = new QPtrList<CSSProperty>;
   m_propList->setAutoDelete(true);
   while (curP < endP) {
     const QChar* startP = curP;
@@ -884,7 +925,9 @@ class FontParser {
   }
 
   bool matchNameFamily(QString* ffamily) {
-    // kdDebug( 6080 ) << "matchNameFamily: [" << *ffamily << "]" << endl;
+#ifdef CSS_DEBUG
+    kdDebug(6080) << "matchNameFamily: [" << *ffamily << "]" << endl;
+#endif
     bool matched = false;
     if (m_yyTok == TOK_SYMBOL || (m_yyTok == TOK_STRING && !strictParsing)) {
       // accept quoted "serif" only in non strict mode.
@@ -895,7 +938,7 @@ class FontParser {
       }
       matched = true;
     } else if (m_yyTok == TOK_STRING) {
-      // kdDebug( 6080 ) << "[" << m_yyStr << "]" << endl;
+      //  kdDebug( 6080 ) << "[" << m_yyStr << "]" << endl;
       const struct css_value* cssval =
           findValue(m_yyStr.latin1(), m_yyStr.length());
       if (!cssval ||
@@ -909,7 +952,9 @@ class FontParser {
   }
 
   bool matchFontFamily(QString* ffamily) {
-    // kdDebug( 6080 ) << "matchFontFamily: [" << *ffamily << "]" << endl;
+#ifdef CSS_DEBUG
+    kdDebug(6080) << "matchFontFamily: [" << *ffamily << "]" << endl;
+#endif
     QStringList t;
     if (!matchFontFamily(&t))
       return false;
@@ -946,7 +991,6 @@ class FontParser {
                      QString* fsize,
                      QString* lheight,
                      QString* ffamily) {
-    // kdDebug( 6080 ) << "matchRealFont(..)" << endl;
     bool metFstyle = matchFontStyle(fstyle);
     bool metFvariant = matchFontVariant(fvariant);
     matchFontWeight(fweight);
@@ -1018,10 +1062,10 @@ bool StyleBaseImpl::parseFont(const QChar* curP, const QChar* endP) {
       return false;
     }
   }
-  // kdDebug(6080) << "[" << fstyle << "] [" << fvariant << "] [" << fweight <<
-  // "] ["
-  //		<< fsize << "] / [" << lheight << "] [" << ffamily << "]" <<
-  //endl;
+  //   kdDebug(6080) << "[" << fstyle << "] [" << fvariant << "] [" << fweight
+  //   << "] ["
+  //   		<< fsize << "] / [" << lheight << "] [" << ffamily << "]" <<
+  //   endl;
 
   if (!fstyle.isNull())
     parseValue(fstyle.unicode(), fstyle.unicode() + fstyle.length(),
@@ -1050,8 +1094,10 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
                                const QChar* endP,
                                int propId,
                                bool important,
-                               QList<CSSProperty>* propList) {
+                               bool nonCSSHint,
+                               QPtrList<CSSProperty>* propList) {
   m_bImportant = important;
+  m_bnonCSSHint = nonCSSHint;
   m_propList = propList;
   return parseValue(curP, endP, propId);
 }
@@ -1098,9 +1144,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
       case CSS_PROP_TEXT_SHADOW:  // none | [<color> || <length> <length>
                                   // <length>? ,]*
       //    [<color> || <length> <length> <length>?] | inherit
-      case CSS_PROP_CONTENT:  // [ <string> | <uri> | <counter> | attr(X) |
-                              // open-quote |
-      // close-quote | no-open-quote | no-close-quote ]+ | inherit
+
       case CSS_PROP_UNICODE_BIDI:  // normal | embed | bidi-override | inherit
       case CSS_PROP_WHITE_SPACE:   // normal | pre | nowrap | inherit
       case CSS_PROP_FONT_STRETCH:
@@ -1127,6 +1171,12 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         break;
       }
 
+      case CSS_PROP_CONTENT:  // [ <string> | <uri> | <counter> | attr(X) |
+                              // open-quote |
+        // close-quote | no-open-quote | no-close-quote ]+ | inherit
+        { parsedValue = parseContent(curP, endP); }
+
+      case CSS_PROP__KONQ_JS_CLIP:
       case CSS_PROP_CLIP:  // <shape> | auto | inherit
       {
         int i;
@@ -1163,8 +1213,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
               goto cleanup;
             CSSPrimitiveValueImpl* length = 0;
             if (str.find("auto", pos, FALSE) == pos)
-              length =
-                  new CSSPrimitiveValueImpl(value, CSSPrimitiveValue::CSS_PX);
+              length = new CSSPrimitiveValueImpl(CSS_VAL_AUTO);
             else
               length = parseUnit(start, end, LENGTH);
             if (!length)
@@ -1190,7 +1239,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
           break;
 
         cleanup:
-          qDebug(" rectangle parsing failed, i=%d", i);
+          // qDebug(" rectangle parsing failed, i=%d", i);
           delete rect;
         }
         break;
@@ -1263,7 +1312,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         {
           if (cssval) {
             int id = cssval->id;
-            if ((id >= CSS_VAL_CIRCLE && id <= CSS_VAL_KATAKANA_IROHA) ||
+            if ((id >= CSS_VAL_DISC && id <= CSS_VAL_KATAKANA_IROHA) ||
                 id == CSS_VAL_NONE) {
               parsedValue = new CSSPrimitiveValueImpl(id);
             }
@@ -1357,7 +1406,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
       {
         if (cssval) {
           int id = cssval->id;
-          if (id >= CSS_VAL_NONE && id <= CSS_VAL_OUTSET) {
+          if (id >= CSS_VAL_NONE && id <= CSS_VAL_RIDGE) {
             parsedValue = new CSSPrimitiveValueImpl(id);
           }
         }
@@ -1601,7 +1650,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
           if (str.left(4).lower() == "url(") {
             DOMString value(curP, endP - curP);
             value = khtml::parseURL(value);
-            parsedValue = new CSSImageValueImpl(value, baseUrl(), this);
+            parsedValue = new CSSImageValueImpl(value, this);
 #ifdef CSS_DEBUG
             kdDebug(6080) << "image, url=" << value.string()
                           << " base=" << baseURL().string() << endl;
@@ -1826,18 +1875,17 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         // [[ <family-name> | <generic-family> ],]* [<family-name> |
         // <generic-family>] | inherit
         {
-          CSSValueListImpl* list = new CSSValueListImpl;
           // css2 compatible parsing...
           FontParser fp;
           fp.startTokenizer(value, strictParsing);
           QStringList families;
           if (!fp.matchFontFamily(&families))
             return false;
+          CSSValueListImpl* list = new CSSValueListImpl;
           for (QStringList::Iterator it = families.begin();
                it != families.end(); ++it) {
             if (*it != QString::null) {
-              list->append(new CSSPrimitiveValueImpl(
-                  DOMString(*it), CSSPrimitiveValue::CSS_STRING));
+              list->append(new FontFamilyValueImpl(*it));
               // kdDebug() << "StyleBaseImpl::parsefont: family='" << *it << "'"
               // << endl;
             }
@@ -1893,7 +1941,6 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         break;
       }
       /* shorthand properties */
-
       case CSS_PROP_BACKGROUND:
         // ['background-color' || 'background-image' ||'background-repeat' ||
         // 'background-attachment' || 'background-position'] | inherit
@@ -1902,9 +1949,9 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
           kdDebug(6080) << "CSS_PROP_BACKGROUND" << endl;
 #endif
           const int properties[5] = {
-              CSS_PROP_BACKGROUND_COLOR, CSS_PROP_BACKGROUND_IMAGE,
-              CSS_PROP_BACKGROUND_REPEAT, CSS_PROP_BACKGROUND_ATTACHMENT,
-              CSS_PROP_BACKGROUND_POSITION};
+              CSS_PROP_BACKGROUND_IMAGE, CSS_PROP_BACKGROUND_REPEAT,
+              CSS_PROP_BACKGROUND_ATTACHMENT, CSS_PROP_BACKGROUND_POSITION,
+              CSS_PROP_BACKGROUND_COLOR};
           return parseShortHand(curP, endP, properties, 5);
 
           // return parseBackground(curP, endP);
@@ -1952,9 +1999,9 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
       case CSS_PROP_OUTLINE:
         // [ 'outline-color' || 'outline-style' || 'outline-width' ] | inherit
         {
-          const int properties[3] = {CSS_PROP_OUTLINE_COLOR,
+          const int properties[3] = {CSS_PROP_OUTLINE_WIDTH,
                                      CSS_PROP_OUTLINE_STYLE,
-                                     CSS_PROP_OUTLINE_WIDTH};
+                                     CSS_PROP_OUTLINE_COLOR};
           return parseShortHand(curP, endP, properties, 3);
         }
       case CSS_PROP_BORDER_COLOR:
@@ -2182,18 +2229,22 @@ bool StyleBaseImpl::parseAuralValue(const QChar* curP,
 void StyleBaseImpl::setParsedValue(int propId,
                                    const CSSValueImpl* parsedValue,
                                    bool important,
-                                   QList<CSSProperty>* propList) {
+                                   bool nonCSSHint,
+                                   QPtrList<CSSProperty>* propList) {
   m_bImportant = important;
+  m_bnonCSSHint = nonCSSHint;
   m_propList = propList;
   setParsedValue(propId, parsedValue);
 }
 
 void StyleBaseImpl::setParsedValue(int propId,
                                    const CSSValueImpl* parsedValue) {
-  QListIterator<CSSProperty> propIt(*m_propList);
+  QPtrListIterator<CSSProperty> propIt(*m_propList);
   propIt.toLast();  // just remove the top one - not sure what should happen if
                     // we have multiple instances of the property
-  while (propIt.current() && propIt.current()->m_id != propId)
+  while (propIt.current() && (propIt.current()->m_id != propId ||
+                              propIt.current()->nonCSSHint != m_bnonCSSHint ||
+                              propIt.current()->m_bImportant != m_bImportant))
     --propIt;
   if (propIt.current())
     m_propList->removeRef(propIt.current());
@@ -2202,11 +2253,14 @@ void StyleBaseImpl::setParsedValue(int propId,
   prop->m_id = propId;
   prop->setValue((CSSValueImpl*)parsedValue);
   prop->m_bImportant = m_bImportant;
+  prop->nonCSSHint = m_bnonCSSHint;
 
   m_propList->append(prop);
 #ifdef CSS_DEBUG
   kdDebug(6080) << "added property: " << getPropertyName(propId).string()
-                << ", value: " << parsedValue->cssText().string() << endl;
+                << ", value: " << parsedValue->cssText().string()
+                << " important: " << prop->m_bImportant
+                << " nonCSS: " << prop->nonCSSHint << endl;
 #endif
 }
 
@@ -2221,7 +2275,7 @@ bool StyleBaseImpl::parseShortHand(const QChar* curP,
 
   bool isLast = false;
   bool foundAnything = false;
-  bool fnd[5];  // Trust me ;)
+  bool fnd[6];  // Trust me ;)
   for (int i = 0; i < num; i++)
     fnd[i] = false;
 
@@ -2230,46 +2284,44 @@ bool StyleBaseImpl::parseShortHand(const QChar* curP,
                 << endl;
 #endif
 
-  for (int j = 0; j < num; j++) {
-    int propIndex = 0;
-    if (fnd[propIndex] == false) {  // We have not yet found such a property
-      while (propIndex < num && curP <= endP) {
-        const QChar* nextP = getNext(curP, endP, isLast);
-        // kdDebug(6080) << "PSH: \"" << QString(curP, nextP - curP) << "\"" <<
-        // endl;
+  for (int j = 0; j < num; ++j) {
+    const QChar* nextP = getNext(curP, endP, isLast);
+    // kdDebug(6080) << "in PSH: \"" << QString(curP, nextP - curP) << "\"" <<
+    // endl;
+    foundAnything = false;
+    for (int propIndex = 0; propIndex < num; ++propIndex) {
+      if (!fnd[propIndex]) {
         // We have to tread this seperately
         bool found = false;
-        if (!isLast && properties[propIndex] == CSS_PROP_BACKGROUND_POSITION) {
+        if (!isLast && properties[propIndex] == CSS_PROP_BACKGROUND_POSITION)
           found = parseBackgroundPosition(curP, nextP, endP);
-        } else {
+        else
           found = parseValue(curP, nextP, properties[propIndex]);
-        }
+
         if (found) {
-          fnd[propIndex] = true;
+          fnd[propIndex] = foundAnything = true;
 #ifdef CSS_DEBUG
           kdDebug(6080) << "FOUND: "
                         << getPropertyName(properties[propIndex]).string()
                         << ": " << QString(curP, nextP - curP) << endl;
 #endif
-          // kdDebug(6080) << "RESETTING" << endl;
-          propIndex = 0;
-          foundAnything = true;
-
-          do {  // skip Whitespace
-            nextP++;
-            curP = nextP;
-          } while (curP->isSpace() &&
-                   curP < endP);  // Is second cond.  necessary?
+          break;
         }
-        /*
-          for( int i = 0; i < num; i++ ) {
-          kdDebug(6080) << getPropertyName(properties[0] + i).string() << ": "
-          << fnd[i] << endl;
-          }
-        */
-        propIndex++;
       }
     }
+    // if we didn't find at least one match, this is an
+    // invalid shorthand and we have to ignore it
+    if (!foundAnything)
+      return foundAnything;
+
+    do {
+      nextP++;
+      curP = nextP;
+
+      // oh, less parameteres than we expected
+      if (curP >= endP)
+        return foundAnything;
+    } while (curP->isSpace());
   }
   return foundAnything;
 }
@@ -2290,11 +2342,12 @@ bool StyleBaseImpl::parseBackgroundPosition(const QChar* curP,
   // We first need to check if the property has two values.
   // if this fails we try one value only.
 
-  while (nextP->isSpace() && nextP < endP) {
-    nextP++;
+  const QChar* bckgrNextP = nextP;
+  while (bckgrNextP->isSpace() && bckgrNextP < endP) {
+    bckgrNextP++;
   }
   bool dummy;
-  const QChar* bckgrNextP = getNext(nextP, endP, dummy);
+  bckgrNextP = getNext(bckgrNextP, endP, dummy);
   // kdDebug(6080) << "BKCGR: 2: \"" << QString(curP, bckgrNextP - curP) << "\""
   // << endl;
 
@@ -2314,10 +2367,103 @@ bool StyleBaseImpl::parseBackgroundPosition(const QChar* curP,
   return found;
 }
 
-QList<QChar> StyleBaseImpl::splitShorthandProperties(const QChar* curP,
-                                                     const QChar* endP) {
+CSSValueImpl* StyleBaseImpl::parseContent(const QChar* curP,
+                                          const QChar* endP) {
+  CSSValueListImpl* values = new CSSValueListImpl();
+
+  QPtrList<QChar> list = splitContent(curP, endP);
+#if APPLE_CHANGES
+  for (unsigned n = 0; n < list.count(); n += 2)
+#else
+  for (int n = 0; n < list.count(); n += 2)
+#endif
+  {
+    QString str(list.at(n), list.at(n + 1) - list.at(n));
+    CSSValueImpl* parsedValue = 0;
+
+    if (str.left(4) == "url(") {
+      // url
+      DOMString value(curP, endP - curP);
+      value = khtml::parseURL(value);
+      parsedValue = new CSSImageValueImpl(value, this);
+#ifdef CSS_DEBUG
+      kdDebug(6080) << "content, url=" << value.string()
+                    << " base=" << baseURL().string() << endl;
+#endif
+    } else if (str.left(5) == "attr(") {
+      // attr
+    } else if (str.left(8) == "counter(") {
+      // counter
+    } else if (str == "open-quote") {
+      // open-quote
+    } else if (str == "close-quote") {
+      // open-quote
+    } else if (str == "no-open-quote") {
+      // no-open-quote
+    } else if (str == "no-close-quote") {
+      // no-close-quote
+    } else {
+      // string
+      QString str =
+          QConstString(list.at(n), list.at(n + 1) - list.at(n)).string();
+      str = str.replace(QRegExp("\\\\a"), "\n");
+      parsedValue = new CSSPrimitiveValueImpl(DOMString(str),
+                                              CSSPrimitiveValue::CSS_STRING);
+    }
+    if (parsedValue)
+      values->append(parsedValue);
+  }
+  return values;
+}
+
+QPtrList<QChar> StyleBaseImpl::splitContent(const QChar* curP,
+                                            const QChar* endP) {
   bool last = false;
-  QList<QChar> list;
+
+  QPtrList<QChar> list;
+  while (!last) {
+    const QChar* nextP = curP;
+    bool q = false;
+    bool dq = false;
+    if (*nextP == '\'')
+      q = true;
+    else if (*nextP == '\"')
+      dq = true;
+    while (!(nextP->isSpace()) || q || dq) {
+      nextP++;
+      if (nextP >= endP) {
+        last = true;
+        break;
+      }
+      if ((q && *nextP == '\'') || (dq && *nextP == '\"')) {
+        nextP++;
+        if (nextP >= endP)
+          last = true;
+        break;
+      }
+    }
+
+    list.append(curP + ((q || dq) ? 1 : 0));
+    list.append(nextP - ((q || dq) ? 1 : 0));
+
+    if (last)
+      break;
+    while (nextP->isSpace()) {  // skip over WS between tokens
+      nextP++;
+      curP = nextP;
+      if (curP >= endP) {
+        last = true;
+        break;
+      }
+    }
+  }
+  return list;
+}
+
+QPtrList<QChar> StyleBaseImpl::splitShorthandProperties(const QChar* curP,
+                                                        const QChar* endP) {
+  bool last = false;
+  QPtrList<QChar> list;
   while (!last) {
     const QChar* nextP = curP;
     while (!(nextP->isSpace())) {
@@ -2348,7 +2494,7 @@ QList<QChar> StyleBaseImpl::splitShorthandProperties(const QChar* curP,
 bool StyleBaseImpl::parse2Values(const QChar* curP,
                                  const QChar* endP,
                                  const int* properties) {
-  QList<QChar> list = splitShorthandProperties(curP, endP);
+  QPtrList<QChar> list = splitShorthandProperties(curP, endP);
   switch (list.count()) {
     case 2:
       if (!parseValue(list.at(0), list.at(1), properties[0]))
@@ -2383,7 +2529,7 @@ bool StyleBaseImpl::parse4Values(const QChar* curP,
    * right, bottom, and left, respectively.
    */
 
-  QList<QChar> list = splitShorthandProperties(curP, endP);
+  QPtrList<QChar> list = splitShorthandProperties(curP, endP);
   switch (list.count()) {
     case 2:
       if (!parseValue(list.at(0), list.at(1), properties[0]))
@@ -2467,7 +2613,7 @@ CSSPrimitiveValueImpl* StyleBaseImpl::parseUnit(const QChar* curP,
     // there are however too many web pages out there using CSS without units
     // cause ie and ns allow them. We do so if the document is not using a
     // strict dtd
-    if (allowedUnits & LENGTH && (value == 0 || !strictParsing))
+    if ((allowedUnits & LENGTH) && (value == 0 || !strictParsing))
       return new CSSPrimitiveValueImpl(value, CSSPrimitiveValue::CSS_PX);
 
     return 0;
@@ -2585,14 +2731,14 @@ CSSPrimitiveValueImpl* StyleBaseImpl::parseUnit(const QChar* curP,
   return 0;
 }
 
-CSSStyleRuleImpl* StyleBaseImpl::parseStyleRule(const QChar*& curP,
-                                                const QChar* endP) {
+CSSRuleImpl* StyleBaseImpl::parseStyleRule(const QChar*& curP,
+                                           const QChar* endP) {
   // kdDebug( 6080 ) << "style rule is \'" << QString(curP, endP-curP) << "\'"
   // << endl;
 
   const QChar* startP;
-  QList<CSSSelector>* slist;
-  QList<CSSProperty>* plist;
+  QPtrList<CSSSelector>* slist;
+  QPtrList<CSSProperty>* plist;
 
   startP = curP;
   curP = parseToChar(startP, endP, '{', false);
@@ -2866,20 +3012,6 @@ StyleListImpl::~StyleListImpl() {
 
 // --------------------------------------------------------------------------------
 
-CSSSelector::CSSSelector(void) : tag(0), tagHistory(0) {
-  attr = 0;
-  match = None;
-  relation = Descendant;
-  nonCSSHint = false;
-  pseudoId = 0;
-}
-
-CSSSelector::~CSSSelector(void) {
-  if (tagHistory) {
-    delete tagHistory;
-  }
-}
-
 void CSSSelector::print(void) {
   kdDebug(6080) << "[Selector: tag = " << tag << ", attr = \"" << attr
                 << "\", value = \"" << value.string().latin1()
@@ -2905,6 +3037,9 @@ unsigned int CSSSelector::specificity() {
     case List:
     case Hyphen:
     case Pseudo:
+    case Contain:
+    case Begin:
+    case End:
       s += 0x100;
     case None:
       break;
@@ -2933,20 +3068,3 @@ bool CSSSelector::operator==(const CSSSelector& other) {
 }
 
 // ----------------------------------------------------------------------------
-
-CSSProperty::~CSSProperty() {
-  if (m_value)
-    m_value->deref();
-}
-
-void CSSProperty::setValue(CSSValueImpl* val) {
-  if (m_value)
-    m_value->deref();
-  m_value = val;
-  if (m_value)
-    m_value->ref();
-}
-
-CSSValueImpl* CSSProperty::value() {
-  return m_value;
-}

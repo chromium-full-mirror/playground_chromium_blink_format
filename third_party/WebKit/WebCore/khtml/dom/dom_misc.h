@@ -55,8 +55,7 @@ class DomShared {
       delete this;
   }
 #endif /* APPLE_CHANGES not defined */
-  // ###  KDE 3.0: add const
-  bool hasOneRef() { return _ref == 1; }
+  bool hasOneRef() const { return _ref == 1; }
   unsigned int refCount() const { return _ref; }
 
  protected:

@@ -47,6 +47,7 @@ class KAction {
   KAction();
   virtual ~KAction();
 
+  void slotActivated();
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 

@@ -37,6 +37,7 @@ namespace DOM {
 
 class HTMLElementImpl;
 class DOMString;
+class HTMLCollection;
 
 /**
  * All HTML element interfaces derive from this class. Elements that
@@ -181,6 +182,12 @@ class HTMLElement : public Element {
    * children.
    */
   void setInnerText(const DOMString& text);
+
+  /**
+   * Retrieves a collection of nodes that are direct descendants of this node.
+   * IE-specific extension.
+   */
+  HTMLCollection children() const;
 
   /*
    * @internal

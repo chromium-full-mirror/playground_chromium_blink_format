@@ -43,16 +43,17 @@
 
 #include <KWQVectorImpl.h>
 
-// class QVector ===============================================================
+// class QPtrVector
+// ===============================================================
 template <class T>
-class QVector : public QCollection {
+class QPtrVector : public QPtrCollection {
  public:
   // constructors, copy constructors, and destructors ------------------------
 
-  QVector() : impl(deleteFunc) {}
-  QVector(uint size) : impl(size, deleteFunc) {}
-  QVector(const QVector<T>& v) : impl(v.impl) {}
-  ~QVector() {
+  QPtrVector() : impl(deleteFunc) {}
+  QPtrVector(uint size) : impl(size, deleteFunc) {}
+  QPtrVector(const QPtrVector<T>& v) : impl(v.impl) {}
+  ~QPtrVector() {
     if (del_item) {
       impl.clear(del_item);
     }
@@ -68,15 +69,16 @@ class QVector : public QCollection {
   bool resize(uint size) { return impl.resize(size, del_item); }
   bool insert(uint n, const T* item) { return impl.insert(n, item, del_item); }
   T* at(int n) const { return (T*)impl.at(n); }
+  T** data() { return (T**)impl.data(); }
 
   virtual int compareItems(void* a, void* b) { return a != b; }
 
   // operators ---------------------------------------------------------------
 
   T* operator[](int n) const { return (T*)impl.at(n); }
-  QVector& operator=(const QVector& v) {
+  QPtrVector& operator=(const QPtrVector& v) {
     impl.assign(v.impl, del_item);
-    QCollection::operator=(v);
+    QPtrCollection::operator=(v);
     return *this;
   }
 
@@ -84,15 +86,15 @@ class QVector : public QCollection {
   static void deleteFunc(void* item) { delete (T*)item; }
 
   KWQVectorImpl impl;
-};  // class QVector
+};  // class QPtrVector
     // ============================================================
 
 template <class T>
-inline ostream& operator<<(ostream& stream, const QVector<T>& v) {
+inline ostream& operator<<(ostream& stream, const QPtrVector<T>& v) {
   uint i = 0;
   uint count = v.count();
 
-  stream << "QVector: [size: " << count << "; items: ";
+  stream << "QPtrVector: [size: " << count << "; items: ";
 
   while (i < count) {
     stream << *v[i] << ", ";

@@ -74,6 +74,9 @@ class QApplication : public QObject {
   virtual void setMainWidget(QWidget*);
 
   // member functions --------------------------------------------------------
+
+  QWidget* focusWidget() const;
+
   // operators ---------------------------------------------------------------
 
   // protected
@@ -100,5 +103,7 @@ class QApplication : public QObject {
 
 };  // class QApplication
     // =======================================================
+
+extern QApplication* qApp;
 
 #endif

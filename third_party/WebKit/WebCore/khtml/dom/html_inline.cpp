@@ -2,6 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
+ * (C) 2001 Dirk mueller (mueller@kde.org)
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,14 +23,14 @@
  */
 // --------------------------------------------------------------------------
 
-#include "dom_string.h"
-#include "html_inline.h"
-#include "html_inlineimpl.h"
-#include "html_baseimpl.h"
-#include "dom_docimpl.h"
-using namespace DOM;
+#include "dom/dom_doc.h"
+#include "dom/html_inline.h"
+#include "html/html_inlineimpl.h"
+#include "html/html_baseimpl.h"
+#include "xml/dom_docimpl.h"
+#include "misc/htmlhashes.h"
 
-#include "htmlhashes.h"
+using namespace DOM;
 
 HTMLAnchorElement::HTMLAnchorElement() : HTMLElement() {}
 
@@ -191,14 +192,13 @@ void HTMLAnchorElement::setType(const DOMString& value) {
 }
 
 void HTMLAnchorElement::blur() {
-  if (impl && impl->ownerDocument() &&
-      impl->ownerDocument()->focusNode() == impl)
-    impl->ownerDocument()->setFocusNode(0);
+  if (impl && impl->getDocument()->focusNode() == impl)
+    impl->getDocument()->setFocusNode(0);
 }
 
 void HTMLAnchorElement::focus() {
-  if (impl && impl->ownerDocument())
-    impl->ownerDocument()->setFocusNode(static_cast<ElementImpl*>(impl));
+  if (impl)
+    impl->getDocument()->setFocusNode(static_cast<ElementImpl*>(impl));
 }
 
 // --------------------------------------------------------------------------
@@ -432,6 +432,12 @@ void HTMLIFrameElement::setWidth(const DOMString& value) {
     ((ElementImpl*)impl)->setAttribute(ATTR_WIDTH, value);
 }
 
+Document HTMLIFrameElement::contentDocument() const {
+  if (impl)
+    return static_cast<HTMLIFrameElementImpl*>(impl)->contentDocument();
+  return Document();
+}
+
 // --------------------------------------------------------------------------
 
 HTMLModElement::HTMLModElement() : HTMLElement() {}
@@ -439,7 +445,12 @@ HTMLModElement::HTMLModElement() : HTMLElement() {}
 HTMLModElement::HTMLModElement(const HTMLModElement& other)
     : HTMLElement(other) {}
 
-HTMLModElement::HTMLModElement(HTMLModElementImpl* impl) : HTMLElement(impl) {}
+HTMLModElement::HTMLModElement(HTMLElementImpl* _impl) : HTMLElement() {
+  if (_impl && (_impl->id() == ID_INS || _impl->id() == ID_DEL))
+    impl = _impl;
+  else
+    impl = 0;
+}
 
 HTMLModElement& HTMLModElement::operator=(const Node& other) {
   if (other.elementId() != ID_INS && other.elementId() != ID_DEL) {
@@ -486,8 +497,13 @@ HTMLQuoteElement::HTMLQuoteElement() : HTMLElement() {}
 HTMLQuoteElement::HTMLQuoteElement(const HTMLQuoteElement& other)
     : HTMLElement(other) {}
 
-HTMLQuoteElement::HTMLQuoteElement(HTMLQuoteElementImpl* impl)
-    : HTMLElement(impl) {}
+HTMLQuoteElement::HTMLQuoteElement(HTMLGenericElementImpl* _impl)
+    : HTMLElement() {
+  if (_impl && _impl->id() == ID_Q)
+    impl = _impl;
+  else
+    impl = 0;
+}
 
 HTMLQuoteElement& HTMLQuoteElement::operator=(const Node& other) {
   if (other.elementId() != ID_Q) {

@@ -196,18 +196,6 @@ class HTMLImageElement : public HTMLElement {
   ~HTMLImageElement();
 
   /**
-   * URI designating the source of this image, for low-resolution
-   * output.
-   *
-   */
-  DOMString lowSrc() const;
-
-  /**
-   * see @ref lowSrc
-   */
-  void setLowSrc(const DOMString&);
-
-  /**
    * The name of the element (for backwards compatibility).
    *
    */
@@ -254,12 +242,12 @@ class HTMLImageElement : public HTMLElement {
    * deprecated in HTML 4.0.
    *
    */
-  DOMString border() const;
+  long border() const;
 
   /**
    * see @ref border
    */
-  void setBorder(const DOMString&);
+  void setBorder(long);
 
   /**
    * Override height. See the <a
@@ -267,12 +255,12 @@ class HTMLImageElement : public HTMLElement {
    * height attribute definition </a> in HTML 4.0.
    *
    */
-  DOMString height() const;
+  long height() const;
 
   /**
    * see @ref height
    */
-  void setHeight(const DOMString&);
+  void setHeight(long);
 
   /**
    * Horizontal space to the left and right of this image. See the
@@ -282,12 +270,12 @@ class HTMLImageElement : public HTMLElement {
    * deprecated in HTML 4.0.
    *
    */
-  DOMString hspace() const;
+  long hspace() const;
 
   /**
    * see @ref hspace
    */
-  void setHspace(const DOMString&);
+  void setHspace(long);
 
   /**
    * Use server-side image map. See the <a
@@ -349,12 +337,12 @@ class HTMLImageElement : public HTMLElement {
    * deprecated in HTML 4.0.
    *
    */
-  DOMString vspace() const;
+  long vspace() const;
 
   /**
    * see @ref vspace
    */
-  void setVspace(const DOMString&);
+  void setVspace(long);
 
   /**
    * Override width. See the <a
@@ -362,12 +350,12 @@ class HTMLImageElement : public HTMLElement {
    * width attribute definition </a> in HTML 4.0.
    *
    */
-  DOMString width() const;
+  long width() const;
 
   /**
    * see @ref width
    */
-  void setWidth(const DOMString&);
+  void setWidth(long);
 };
 
 // --------------------------------------------------------------------------
