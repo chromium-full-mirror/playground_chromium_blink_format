@@ -1,8 +1,8 @@
 /*
-        WebView.h
-        Copyright 2001, 2002, Apple Computer, Inc.
+    WebView.h
+    Copyright (C) 2003 Apple Computer, Inc. All rights reserved.
 
-        Public header file.
+    Public header file.
 */
 
 #import <Cocoa/Cocoa.h>

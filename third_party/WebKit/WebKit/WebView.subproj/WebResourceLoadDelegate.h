@@ -1,9 +1,9 @@
 /*
-        WebResourceLoadDelegate.h
-        Copyright 2001, 2002, Apple Computer, Inc.
+    WebResourceLoadDelegate.h
+    Copyright (C) 2003 Apple Computer, Inc. All rights reserved.
 
-        Public header file.
-*/
+    Public header file.
+ */
 @class WebView;
 @class WebDataSource;
 @class NSURLResponse;

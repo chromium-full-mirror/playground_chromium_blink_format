@@ -1,9 +1,14 @@
-#ifndef __HIWebFrameView__
-#define __HIWebFrameView__
+/*
+    HIWebView.h
+    Copyright (C) 2003 Apple Computer, Inc. All rights reserved.
 
-#ifndef __HIWEBCONTROLLER__
+    Public header file.
+*/
+
+#ifndef __HIWebView__
+#define __HIWebView__
+
 #include <WebKit/WebView.h>
-#endif
 
 #include <AvailabilityMacros.h>
 
@@ -30,7 +35,7 @@ extern "C" {
  *    An operating system status code.
  *
  *  Availability:
- *    Mac OS X:         in version 10.2 and later
+ *    Mac OS X:         in version 10.2.7 and later
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
@@ -40,7 +45,7 @@ extern OSStatus HIWebViewCreate(HIViewRef* outControl);
  *  HIWebViewGetNSView()
  *
  *  Summary:
- *    Returns the WebKit WebFrameView for a given HIWebFrameView.
+ *    Returns the WebKit WebView for a given HIWebView.
  *
  *  Parameters:
  *
@@ -48,10 +53,10 @@ extern OSStatus HIWebViewCreate(HIViewRef* outControl);
  *      The view to inspect.
  *
  *  Result:
- *    A pointer to aweb frame view object, or NULL.
+ *    A pointer to a web view object, or NULL.
  *
  *  Availability:
- *    Mac OS X:         in version 10.2 and later
+ *    Mac OS X:         in version 10.2.7 and later
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
@@ -61,4 +66,4 @@ extern WebView* HIWebViewGetNSView(HIViewRef inView);
 }
 #endif
 
-#endif /* __HIWebFrameView__ */
+#endif /* __HIWebView__ */
