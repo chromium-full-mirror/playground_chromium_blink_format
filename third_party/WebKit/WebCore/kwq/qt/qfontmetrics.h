@@ -57,6 +57,10 @@ class QFontMetrics {
   QFontMetrics(const QFontMetrics&);
   ~QFontMetrics();
 
+  // operators ---------------------------------------------------------------
+
+  QFontMetrics& operator=(const QFontMetrics&);
+
   // member functions --------------------------------------------------------
 
   int ascent() const;
@@ -79,26 +83,10 @@ class QFontMetrics {
              char** intern = 0) const;
   int rightBearing(QChar) const;
   int leftBearing(QChar) const;
+  int baselineOffset() const;
 
-  // operators ---------------------------------------------------------------
-
-  QFontMetrics& operator=(const QFontMetrics&);
-
-// protected -------------------------------------------------------------------
-// private ---------------------------------------------------------------------
-#ifdef _KWQ_
-  int baselineOffset();
-  void _initialize();
-#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
-  // void _initializeWithData(QFontMetricsPrivate *);
-  void _initializeWithFont(NSFont* font);
-#else
-  void _initializeWithFont(void*);
-#endif
-  void _free();
-
-  QFontMetricsPrivate* data;
-#endif
+ private:
+  KWQRefPtr<QFontMetricsPrivate> data;
 
 };  // class QFontMetrics
     // =======================================================
