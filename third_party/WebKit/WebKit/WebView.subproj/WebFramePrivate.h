@@ -175,6 +175,9 @@ typedef enum {
 
 - (void)_defersCallbacksChanged;
 
+- (void)_viewWillMoveToHostWindow:(NSWindow*)hostWindow;
+- (void)_viewDidMoveToHostWindow;
+
 - (void)_reloadAllowingStaleDataWithOverrideEncoding:(NSString*)encoding;
 
 - (void)_addChild:(WebFrame*)child;

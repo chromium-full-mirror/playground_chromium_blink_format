@@ -49,6 +49,8 @@ enum { NumUserAgentStringTypes = WinIE + 1 };
   WebCoreSettings* settings;
 
   BOOL lastElementWasNonNil;
+
+  NSWindow* hostWindow;
 }
 @end
 
