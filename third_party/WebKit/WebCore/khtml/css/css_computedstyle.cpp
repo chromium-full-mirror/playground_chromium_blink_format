@@ -138,6 +138,7 @@ static const int computedProperties[] = {
     CSS_PROP_TABLE_LAYOUT,
     CSS_PROP_TEXT_ALIGN,
     CSS_PROP_TEXT_DECORATION,
+    CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
     CSS_PROP_TEXT_INDENT,
     CSS_PROP_TEXT_SHADOW,
     CSS_PROP_TEXT_TRANSFORM,
@@ -167,10 +168,7 @@ static const int inheritableProperties[] = {
     CSS_PROP_FONT_SIZE,       CSS_PROP_FONT_STYLE,
     CSS_PROP_FONT_VARIANT,    CSS_PROP_FONT_WEIGHT,
     CSS_PROP_LETTER_SPACING,  CSS_PROP_LINE_HEIGHT,
-    CSS_PROP_TEXT_ALIGN,
-    CSS_PROP_TEXT_DECORATION,  // this is not inheritable, yet we do want to
-                               // consider it for typing style (name change
-                               // needed? redesign?)
+    CSS_PROP_TEXT_ALIGN,      CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
     CSS_PROP_TEXT_INDENT,     CSS_PROP__APPLE_TEXT_SIZE_ADJUST,
     CSS_PROP_TEXT_TRANSFORM,  CSS_PROP_ORPHANS,
     CSS_PROP_WHITE_SPACE,     CSS_PROP_WIDOWS,
@@ -992,6 +990,29 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
         string += "line-through";
       }
       if (style->textDecoration() & khtml::BLINK) {
+        if (string.length() > 0)
+          string += " ";
+        string += "blink";
+      }
+      if (string.length() == 0)
+        return new CSSPrimitiveValueImpl(CSS_VAL_NONE);
+      return new CSSPrimitiveValueImpl(string, CSSPrimitiveValue::CSS_STRING);
+    }
+    case CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT: {
+      QString string;
+      if (style->textDecorationsInEffect() & khtml::UNDERLINE)
+        string += "underline";
+      if (style->textDecorationsInEffect() & khtml::OVERLINE) {
+        if (string.length() > 0)
+          string += " ";
+        string += "overline";
+      }
+      if (style->textDecorationsInEffect() & khtml::LINE_THROUGH) {
+        if (string.length() > 0)
+          string += " ";
+        string += "line-through";
+      }
+      if (style->textDecorationsInEffect() & khtml::BLINK) {
         if (string.length() > 0)
           string += " ";
         string += "blink";

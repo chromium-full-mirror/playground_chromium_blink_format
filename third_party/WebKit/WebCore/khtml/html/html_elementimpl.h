@@ -228,6 +228,9 @@ class HTMLElementImpl : public ElementImpl {
   static QPtrDict<QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>>*
       m_mappedAttributeDecls;
 
+  void invalidateStyleAttribute();
+  void updateStyleAttribute();
+
  protected:
   // for IMG, OBJECT and APPLET
   void addHTMLAlignment(HTMLAttributeImpl* htmlAttr);

@@ -175,11 +175,7 @@ class ElementImpl : public NodeBaseImpl {
   // convenience methods which ignore exceptions
   void setAttribute(NodeImpl::Id id, const DOMString& value);
 
-  NamedAttrMapImpl* attributes(bool readonly = false) const {
-    if (!readonly && !namedAttrMap)
-      createAttributeMap();
-    return namedAttrMap;
-  }
+  NamedAttrMapImpl* attributes(bool readonly = false) const;
 
   // This method is called whenever an attribute is added, changed or removed.
   virtual void attributeChanged(AttributeImpl* attr,
@@ -229,12 +225,18 @@ class ElementImpl : public NodeBaseImpl {
   virtual void createAttributeMap() const;
   DOMString openTagStartToString() const;
 
+  bool isStyleAttributeValid() const { return m_isStyleAttributeValid; }
+  void setStyleAttributeValid(bool valid) { m_isStyleAttributeValid = valid; }
+
  private:
   void updateId(const AtomicString& oldId, const AtomicString& newId);
+
+  void updateStyleAttributeIfNeeded() const;
 
  protected:  // member variables
   mutable NamedAttrMapImpl* namedAttrMap;
   DOMStringImpl* m_prefix;
+  bool m_isStyleAttributeValid;
 };
 
 class XMLElementImpl : public ElementImpl {

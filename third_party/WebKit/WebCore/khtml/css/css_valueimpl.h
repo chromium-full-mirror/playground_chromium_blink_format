@@ -66,11 +66,11 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 
   void diff(CSSMutableStyleDeclarationImpl*) const;
 
- protected:
-  CSSStyleDeclarationImpl(CSSRuleImpl* parentRule = 0);
-
   CSSMutableStyleDeclarationImpl* copyPropertiesInSet(const int* set,
                                                       unsigned length) const;
+
+ protected:
+  CSSStyleDeclarationImpl(CSSRuleImpl* parentRule = 0);
 
  private:
   CSSStyleDeclarationImpl(const CSSStyleDeclarationImpl&);

@@ -334,9 +334,9 @@ bool execSuperscript(KHTMLPart* part,
 bool execUnderline(KHTMLPart* part,
                    bool userInterface,
                    const DOMString& value) {
-  bool isUnderlined =
-      selectionStartHasStyle(part, CSS_PROP_TEXT_DECORATION, "underline");
-  return execStyleChange(part, CSS_PROP_TEXT_DECORATION,
+  bool isUnderlined = selectionStartHasStyle(
+      part, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "underline");
+  return execStyleChange(part, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
                          isUnderlined ? "none" : "underline");
 }
 
