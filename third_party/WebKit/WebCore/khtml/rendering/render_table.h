@@ -162,16 +162,13 @@ class RenderTable : public RenderFlow {
    * entire table.
    */
   struct ColInfo {
-    ColInfo() {
-      span = 0;
-      start = 0;
-      min = 0;
-      max = 0;
+    ColInfo() { needsRecalc(); }
+
+    void needsRecalc() {
+      span = start = min = max = value = 0;
+      minCell = maxCell = widthCell = 0;
       type = khtml::Variable;
-      value = 0;
-      minCell = 0;
-      maxCell = 0;
-      widthCell = 0;
+      needRecalc = true;
     }
 
     int span;
@@ -183,6 +180,7 @@ class RenderTable : public RenderFlow {
     khtml::LengthType type;
     int value;
     RenderTableCell* widthCell;
+    bool needRecalc;
   };
 
  protected:
