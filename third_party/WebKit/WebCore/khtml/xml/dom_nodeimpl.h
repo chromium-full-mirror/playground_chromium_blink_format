@@ -276,11 +276,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   DocumentPtr* docPtr() const { return document; }
 
-#ifdef APPLE_CHANGES
-  khtml::RenderObject* renderer() const;
-#else  /* APPLE_CHANGES not defined */
   khtml::RenderObject* renderer() const { return m_render; }
-#endif /* APPLE_CHANGES not defined */
   khtml::RenderObject* nextRenderer();
 
   void checkSetPrefix(const DOMString& _prefix, int& exceptioncode);

@@ -198,12 +198,6 @@ NodeImpl* NodeImpl::addChild(NodeImpl*) {
   return 0;
 }
 
-#ifdef APPLE_CHANGES
-khtml::RenderObject* NodeImpl::renderer() const {
-  return m_render;
-}
-
-#endif /* APPLE_CHANGES */
 QString NodeImpl::toHTML() const {
   NodeImpl* fc = firstChild();
   if (fc)
@@ -458,10 +452,10 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
 #ifdef APPLE_CHANGES
   if (tempEvent && view && view->part() && view->part()->jScript())
     view->part()->jScript()->finishedWithEvent(evt);
-#else  /* not APPLE_CHANGES */
+#else
   if (tempEvent && view && view->part()->jScript())
     view->part()->jScript()->finishedWithEvent(evt);
-#endif /* not APPLE_CHANGES */
+#endif
 
   return ret;
 }
