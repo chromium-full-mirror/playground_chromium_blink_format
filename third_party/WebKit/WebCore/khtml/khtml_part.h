@@ -45,6 +45,7 @@ class KHTMLSettings;
 class KJavaAppletContext;
 
 namespace DOM {
+class CSSComputedStyleDeclarationImpl;
 class CSSStyleDeclarationImpl;
 class DocumentImpl;
 class EventListener;
