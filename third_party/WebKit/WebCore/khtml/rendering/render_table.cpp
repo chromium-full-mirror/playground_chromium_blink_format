@@ -1409,12 +1409,19 @@ void RenderTableRow::layout() {
 
   RenderObject* child = firstChild();
   while (child) {
-    if (child->isTableCell() && child->needsLayout()) {
+    if (child->isTableCell()) {
       RenderTableCell* cell = static_cast<RenderTableCell*>(child);
-      cell->calcVerticalMargins();
-      cell->layout();
-      cell->setCellTopExtra(0);
-      cell->setCellBottomExtra(0);
+      if (cell->getCellPercentageHeight()) {
+        cell->setCellPercentageHeight(0);
+        if (!cell->needsLayout())
+          cell->setChildNeedsLayout(true);
+      }
+      if (child->needsLayout()) {
+        cell->calcVerticalMargins();
+        cell->layout();
+        cell->setCellTopExtra(0);
+        cell->setCellBottomExtra(0);
+      }
     }
     child = child->nextSibling();
   }
