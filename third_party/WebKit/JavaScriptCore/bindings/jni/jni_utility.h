@@ -154,10 +154,13 @@ JNIEnv* getJNIEnv();
 
 bool dispatchJNICall(const void* targetAppletView,
                      jobject obj,
-                     jmethodID methodID,
+                     bool isStatic,
                      JNIType returnType,
+                     jmethodID methodID,
                      jvalue* args,
-                     jvalue& result);
+                     jvalue& result,
+                     const char* callingURL,
+                     Value& exceptionDescription);
 
 }  // namespace Bindings
 

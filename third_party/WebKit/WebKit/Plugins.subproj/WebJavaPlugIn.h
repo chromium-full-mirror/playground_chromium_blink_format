@@ -39,9 +39,16 @@ typedef enum {
 /*!
     @method webPlugInCallJava:method:returnType:arguments:
     @param object The Java instance that will receive the method call.
-    @param method The ID of the Java method to call.
+    @param isStatic A flag that indicated whether the method is a class method.
     @param returnType The return type of the Java method.
+    @param method The ID of the Java method to call.
     @param args The arguments to use with the method invocation.
+    @param callingURL The URL of the page that contains the JavaScript that is
+   calling Java.
+    @param exceptionDescription Pass in nil or the address of pointer to a
+   string object.  If any exception
+    is thrown by Java the return value will be a description of the exception,
+   otherwise nil.
     @discussion Calls to Java from native code should not make direct
     use of JNI.  Instead they should use this method to dispatch calls to the
     Java VM.  This is required to guarantee that the correct thread will receive
@@ -52,8 +59,11 @@ typedef enum {
     @result The result of the method invocation.
 */
 - (jvalue)webPlugInCallJava:(jobject)object
-                     method:(jmethodID)method
+                   isStatic:(BOOL)isStatic
                  returnType:(WebJNIReturnType)returnType
-                  arguments:(jvalue*)args;
+                     method:(jmethodID)method
+                  arguments:(jvalue*)args
+                 callingURL:(NSURL*)url
+       exceptionDescription:(NSString**)exceptionString;
 
 @end
