@@ -571,6 +571,9 @@ Value XMLHttpRequestProtoFunc::tryCall(ExecState* exec,
             exec->setException(err);
           }
         } else {
+          // converting certain values (like null) to object can set an
+          // exception
+          exec->clearException();
           body = args[0].toString(exec).qstring();
         }
       }
