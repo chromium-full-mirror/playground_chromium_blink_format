@@ -3083,6 +3083,7 @@ int getHeightForLineCount(RenderBlock* block,
                       : 0);
       }
     } else {
+      RenderObject* normalFlowChildWithoutLines = 0;
       for (RenderObject* obj = block->firstChild(); obj;
            obj = obj->nextSibling()) {
         if (shouldCheckLines(obj)) {
@@ -3093,8 +3094,15 @@ int getHeightForLineCount(RenderBlock* block,
                    (includeBottom
                         ? (block->borderBottom() + block->paddingBottom())
                         : 0);
-        }
+        } else if (!obj->isFloatingOrPositioned() && !obj->isCompact() &&
+                   !obj->isRunIn())
+          normalFlowChildWithoutLines = obj;
       }
+      if (normalFlowChildWithoutLines && l == 0)
+        return normalFlowChildWithoutLines->yPos() +
+               normalFlowChildWithoutLines->height() +
+               (includeBottom ? (block->borderBottom() + block->paddingBottom())
+                              : 0);
     }
   }
 

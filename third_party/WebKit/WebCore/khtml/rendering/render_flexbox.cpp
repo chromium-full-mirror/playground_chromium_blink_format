@@ -730,7 +730,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
   // really part of the XUL box model.
   bool haveLineClamp = style()->lineClamp() >= 0 && style()->lineClamp() <= 100;
   if (haveLineClamp) {
-    int maxLineCount = 1;
+    int maxLineCount = 0;
     child = iterator.first();
     while (child) {
       if (!child->isPositioned()) {
@@ -757,7 +757,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
     // height to use the
     // specified height.
     int numVisibleLines =
-        int(maxLineCount * style()->lineClamp() / 100.0 + 1.0);
+        int((maxLineCount + 1) * style()->lineClamp() / 100.0);
     if (numVisibleLines < maxLineCount) {
       for (child = iterator.first(); child; child = iterator.next()) {
         if (child->isPositioned() || !child->style()->height().isVariable() ||
