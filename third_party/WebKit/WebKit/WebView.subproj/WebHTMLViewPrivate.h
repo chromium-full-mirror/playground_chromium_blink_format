@@ -20,7 +20,7 @@
   BOOL inNextValidKeyView;
   BOOL ignoringMouseDraggedEvents;
   BOOL printing;
-  BOOL isDragging;
+  BOOL initiatedDrag;
 
   id savedSubviews;
   BOOL subviewsSetAside;
@@ -60,8 +60,6 @@
 + (void)_postFlagsChangedEvent:(NSEvent*)flagsChangedEvent;
 - (void)_updateMouseoverWithFakeEvent;
 
-- (NSDictionary*)_elementAtPoint:(NSPoint)point;
-
 - (void)_setAsideSubviews;
 - (void)_restoreSubviews;
 
@@ -69,11 +67,11 @@
 - (void)_clearLastHitViewIfSelf;
 - (void)_updateMouseoverWithEvent:(NSEvent*)event;
 
++ (NSArray*)_insertablePasteboardTypes;
 + (NSArray*)_selectionPasteboardTypes;
 - (void)_writeSelectionToPasteboard:(NSPasteboard*)pasteboard;
 - (WebArchive*)_selectedArchive:(NSString**)markupString;
 - (NSData*)_selectedRTFData;
-
 - (BOOL)_canDelete;
 - (BOOL)_canPaste;
 - (BOOL)_haveSelection;
