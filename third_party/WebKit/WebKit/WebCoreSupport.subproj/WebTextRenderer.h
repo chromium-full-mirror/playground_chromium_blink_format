@@ -20,8 +20,8 @@ typedef struct GlyphMap GlyphMap;
   NSFont* font;
   GlyphMap* characterToGlyphMap;
   WidthMap* glyphToWidthMap;
-  float fixedWidth;
-  BOOL isFixedPitch;
+  float spaceWidth;
+  float adjustedSpaceWidth;
 }
 
 + (BOOL)shouldBufferTextDrawing;
