@@ -124,7 +124,7 @@ Value MathObjectImp::getValueProperty(ExecState*, int token) const {
 
 MathFuncImp::MathFuncImp(ExecState* exec, int i, int l)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->interpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
       id(i) {
   Value protect(this);
   putDirect(lengthPropertyName, l, DontDelete | ReadOnly | DontEnum);

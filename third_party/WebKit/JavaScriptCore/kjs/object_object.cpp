@@ -100,7 +100,7 @@ bool ObjectObjectImp::implementsConstruct() const {
 Object ObjectObjectImp::construct(ExecState* exec, const List& args) {
   // if no arguments have been passed ...
   if (args.isEmpty()) {
-    Object proto = exec->interpreter()->builtinObjectPrototype();
+    Object proto = exec->lexicalInterpreter()->builtinObjectPrototype();
     Object result(new ObjectImp(proto));
     return result;
   }
@@ -120,7 +120,7 @@ Object ObjectObjectImp::construct(ExecState* exec, const List& args) {
       assert(!"unhandled switch case in ObjectConstructor");
     case NullType:
     case UndefinedType:
-      Object proto = exec->interpreter()->builtinObjectPrototype();
+      Object proto = exec->lexicalInterpreter()->builtinObjectPrototype();
       return Object(new ObjectImp(proto));
   }
 }

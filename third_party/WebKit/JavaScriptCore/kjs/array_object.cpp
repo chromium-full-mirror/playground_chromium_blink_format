@@ -297,7 +297,7 @@ struct CompareWithCompareFunctionArguments {
   CompareWithCompareFunctionArguments(ExecState* e, ObjectImp* cf)
       : exec(e),
         compareFunction(cf),
-        globalObject(e->interpreter()->globalObject()) {
+        globalObject(e->dynamicInterpreter()->globalObject()) {
     arguments.append(Undefined());
     arguments.append(Undefined());
   }
@@ -420,7 +420,7 @@ Value ArrayPrototypeImp::get(ExecState* exec,
 
 ArrayProtoFuncImp::ArrayProtoFuncImp(ExecState* exec, int i, int len)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->interpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
       id(i) {
   Value protect(this);
   put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
@@ -471,7 +471,8 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
     }
     case Concat: {
       Object arr = Object::dynamicCast(
-          exec->interpreter()->builtinArray().construct(exec, List::empty()));
+          exec->lexicalInterpreter()->builtinArray().construct(exec,
+                                                               List::empty()));
       int n = 0;
       Value curArg = thisObj;
       Object curObj = Object::dynamicCast(thisObj);
@@ -580,7 +581,8 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
 
       // We return a new array
       Object resObj = Object::dynamicCast(
-          exec->interpreter()->builtinArray().construct(exec, List::empty()));
+          exec->lexicalInterpreter()->builtinArray().construct(exec,
+                                                               List::empty()));
       result = resObj;
       double begin = args[0].toInteger(exec);
       if (begin < 0) {
@@ -664,9 +666,9 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
             List l;
             l.append(jObj);
             l.append(minObj);
-            cmp =
-                sortFunction.call(exec, exec->interpreter()->globalObject(), l)
-                    .toNumber(exec);
+            cmp = sortFunction
+                      .call(exec, exec->dynamicInterpreter()->globalObject(), l)
+                      .toNumber(exec);
           } else {
             cmp = (jObj.toString(exec) < minObj.toString(exec)) ? -1 : 1;
           }
@@ -693,7 +695,8 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
     case Splice: {
       // 15.4.4.12 - oh boy this is huge
       Object resObj = Object::dynamicCast(
-          exec->interpreter()->builtinArray().construct(exec, List::empty()));
+          exec->lexicalInterpreter()->builtinArray().construct(exec,
+                                                               List::empty()));
       result = resObj;
       int begin = args[0].toUInt32(exec);
       if (begin < 0)
@@ -799,12 +802,12 @@ Object ArrayObjectImp::construct(ExecState* exec, const List& args) {
       return error;
     }
     return Object(new ArrayInstanceImp(
-        exec->interpreter()->builtinArrayPrototype().imp(), n));
+        exec->lexicalInterpreter()->builtinArrayPrototype().imp(), n));
   }
 
   // otherwise the array is constructed with the arguments in it
   return Object(new ArrayInstanceImp(
-      exec->interpreter()->builtinArrayPrototype().imp(), args));
+      exec->lexicalInterpreter()->builtinArrayPrototype().imp(), args));
 }
 
 bool ArrayObjectImp::implementsCall() const {

@@ -323,6 +323,8 @@ class InterpreterImp {
   InterpreterImp* nextInterpreter() const { return next; }
   InterpreterImp* prevInterpreter() const { return prev; }
 
+  static InterpreterImp* interpreterWithGlobalObject(ObjectImp*);
+
   void setContext(ContextImp* c) { _context = c; }
 
   void saveBuiltins(SavedBuiltins& builtins) const;

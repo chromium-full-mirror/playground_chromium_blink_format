@@ -308,7 +308,7 @@ Value KJS::getDOMStyleSheet(ExecState* exec, DOM::StyleSheet ss) {
   if (ss.isNull())
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if ((ret = interp->getDOMObject(ss.handle())))
     return Value(ret);
   else {
@@ -401,7 +401,7 @@ Value KJS::getDOMStyleSheetList(ExecState* exec,
   if (ssl.isNull())
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if ((ret = interp->getDOMObject(ssl.handle())))
     return Value(ret);
   else {
@@ -950,7 +950,7 @@ Value KJS::getDOMCSSValue(ExecState* exec, DOM::CSSValue v) {
   if (v.isNull())
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if ((ret = interp->getDOMObject(v.handle())))
     return Value(ret);
   else {

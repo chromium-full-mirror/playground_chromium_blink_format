@@ -385,7 +385,7 @@ Value KJS::getDOMEvent(ExecState* exec, DOM::Event e) {
   if (!ei)
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
 
   KJS::Interpreter::lock();
 

@@ -187,7 +187,7 @@ Value StringPrototypeImp::get(ExecState* exec,
 
 StringProtoFuncImp::StringProtoFuncImp(ExecState* exec, int i, int len)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->interpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
       id(i) {
   Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
@@ -303,7 +303,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
         reg = tmpReg = new RegExp(a0.toString(exec), RegExp::None);
       }
       RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-          exec->interpreter()->builtinRegExp().imp());
+          exec->lexicalInterpreter()->builtinRegExp().imp());
       int** ovector = regExpObj->registerRegexp(reg, u);
       UString mstr = reg->match(u, -1, &pos, ovector);
       if (id == Search) {
@@ -338,7 +338,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
             // other browsers and because Null is a false value.
             result = Null();
           } else {
-            result = exec->interpreter()->builtinArray().construct(exec, list);
+            result = exec->lexicalInterpreter()->builtinArray().construct(exec,
+                                                                          list);
           }
         }
       }
@@ -357,7 +358,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
           global = true;
 
         RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-            exec->interpreter()->builtinRegExp().imp());
+            exec->lexicalInterpreter()->builtinRegExp().imp());
         int lastIndex = 0;
         u3 = a1.toString(exec);  // replacement string
         // This is either a loop (if global is set) or a one-way (if not).
@@ -444,7 +445,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
       break;
     }
     case Split: {
-      Object constructor = exec->interpreter()->builtinArray();
+      Object constructor = exec->lexicalInterpreter()->builtinArray();
       Object res =
           Object::dynamicCast(constructor.construct(exec, List::empty()));
       result = res;
@@ -628,7 +629,7 @@ bool StringObjectImp::implementsConstruct() const {
 
 // ECMA 15.5.2
 Object StringObjectImp::construct(ExecState* exec, const List& args) {
-  ObjectImp* proto = exec->interpreter()->builtinStringPrototype().imp();
+  ObjectImp* proto = exec->lexicalInterpreter()->builtinStringPrototype().imp();
   if (args.size() == 0)
     return Object(new StringInstanceImp(proto));
   return Object(

@@ -57,7 +57,7 @@ class Parameter {
 
 FunctionImp::FunctionImp(ExecState* exec, const Identifier& n)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->interpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
       param(0L),
       ident(n) {}
 
@@ -70,9 +70,9 @@ bool FunctionImp::implementsCall() const {
 }
 
 Value FunctionImp::call(ExecState* exec, Object& thisObj, const List& args) {
-  Object& globalObj = exec->interpreter()->globalObject();
+  Object& globalObj = exec->dynamicInterpreter()->globalObject();
 
-  Debugger* dbg = exec->interpreter()->imp()->debugger();
+  Debugger* dbg = exec->dynamicInterpreter()->imp()->debugger();
   int sid = -1;
   int lineno = -1;
   if (dbg) {
@@ -90,9 +90,9 @@ Value FunctionImp::call(ExecState* exec, Object& thisObj, const List& args) {
   }
 
   // enter a new execution context
-  ContextImp ctx(globalObj, exec->interpreter()->imp(), thisObj, codeType(),
-                 exec->context().imp(), this, &args);
-  ExecState newExec(exec->interpreter(), &ctx);
+  ContextImp ctx(globalObj, exec->dynamicInterpreter()->imp(), thisObj,
+                 codeType(), exec->context().imp(), this, &args);
+  ExecState newExec(exec->dynamicInterpreter(), &ctx);
   newExec.setException(exec->exception());  // could be null
 
   // assign user supplied arguments to parameters
@@ -276,7 +276,7 @@ Object DeclaredFunctionImp::construct(ExecState* exec, const List& args) {
   if (p.type() == ObjectType)
     proto = Object(static_cast<ObjectImp*>(p.imp()));
   else
-    proto = exec->interpreter()->builtinObjectPrototype();
+    proto = exec->lexicalInterpreter()->builtinObjectPrototype();
 
   Object obj(new ObjectImp(proto));
 
@@ -306,14 +306,17 @@ const ClassInfo ArgumentsImp::info = {"Arguments", 0, 0, 0};
 
 // ECMA 10.1.8
 ArgumentsImp::ArgumentsImp(ExecState* exec, FunctionImp* func)
-    : ArrayInstanceImp(exec->interpreter()->builtinObjectPrototype().imp(), 0) {
+    : ArrayInstanceImp(
+          exec->lexicalInterpreter()->builtinObjectPrototype().imp(),
+          0) {
   Value protect(this);
   putDirect(calleePropertyName, func, DontEnum);
 }
 
 ArgumentsImp::ArgumentsImp(ExecState* exec, FunctionImp* func, const List& args)
-    : ArrayInstanceImp(exec->interpreter()->builtinObjectPrototype().imp(),
-                       args) {
+    : ArrayInstanceImp(
+          exec->lexicalInterpreter()->builtinObjectPrototype().imp(),
+          args) {
   Value protect(this);
   putDirect(calleePropertyName, func, DontEnum);
 }
@@ -538,11 +541,11 @@ Value GlobalFuncImp::call(ExecState* exec,
 
         // enter a new execution context
         Object thisVal(Object::dynamicCast(exec->context().thisValue()));
-        ContextImp ctx(exec->interpreter()->globalObject(),
-                       exec->interpreter()->imp(), thisVal, EvalCode,
+        ContextImp ctx(exec->dynamicInterpreter()->globalObject(),
+                       exec->dynamicInterpreter()->imp(), thisVal, EvalCode,
                        exec->context().imp());
 
-        ExecState newExec(exec->interpreter(), &ctx);
+        ExecState newExec(exec->dynamicInterpreter(), &ctx);
         newExec.setException(exec->exception());  // could be null
 
         // execute the code

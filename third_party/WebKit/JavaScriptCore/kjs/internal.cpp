@@ -38,6 +38,7 @@
 #include "error_object.h"
 #include "function_object.h"
 #include "internal.h"
+#include "interpreter_map.h"
 #include "lexer.h"
 #include "math_object.h"
 #include "nodes.h"
@@ -175,7 +176,7 @@ Object BooleanImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<BooleanImp*>(this));
   return Object::dynamicCast(
-      exec->interpreter()->builtinBoolean().construct(exec, args));
+      exec->lexicalInterpreter()->builtinBoolean().construct(exec, args));
 }
 
 // ------------------------------ StringImp ------------------------------------
@@ -200,7 +201,7 @@ Object StringImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<StringImp*>(this));
   return Object::dynamicCast(
-      exec->interpreter()->builtinString().construct(exec, args));
+      exec->lexicalInterpreter()->builtinString().construct(exec, args));
 }
 
 // ------------------------------ NumberImp ------------------------------------
@@ -245,7 +246,7 @@ Object NumberImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<NumberImp*>(this));
   return Object::dynamicCast(
-      exec->interpreter()->builtinNumber().construct(exec, args));
+      exec->lexicalInterpreter()->builtinNumber().construct(exec, args));
 }
 
 bool NumberImp::toUInt32(unsigned& uint32) const {
@@ -492,6 +493,8 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
     globalInit();
   }
 
+  InterpreterMap::setInterpreterForGlobalObject(this, glob.imp());
+
   global = glob;
   globExec = new ExecState(m_interpreter, 0);
   dbg = 0;
@@ -725,6 +728,8 @@ void InterpreterImp::clear() {
     s_hook = 0L;
     globalClear();
   }
+  InterpreterMap::removeInterpreterForGlobalObject(global.imp());
+
 #if APPLE_CHANGES
   unlockInterpreter();
 #endif
@@ -939,6 +944,10 @@ void InterpreterImp::restoreBuiltins(const SavedBuiltins& builtins) {
   b_syntaxErrorPrototype = builtins._internal->b_syntaxErrorPrototype;
   b_typeErrorPrototype = builtins._internal->b_typeErrorPrototype;
   b_uriErrorPrototype = builtins._internal->b_uriErrorPrototype;
+}
+
+InterpreterImp* InterpreterImp::interpreterWithGlobalObject(ObjectImp* global) {
+  return InterpreterMap::getInterpreterForGlobalObject(global);
 }
 
 // ------------------------------ InternalFunctionImp --------------------------

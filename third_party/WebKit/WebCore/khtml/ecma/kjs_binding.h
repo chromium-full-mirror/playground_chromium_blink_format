@@ -164,7 +164,7 @@ inline Value cacheDOMObject(ExecState* exec, DOMObj domObj) {
   if (domObj.isNull())
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if ((ret = interp->getDOMObject(domObj.handle())))
     return Value(ret);
   else {
@@ -267,14 +267,14 @@ template <class ClassCtor>
 inline Object cacheGlobalObject(ExecState* exec,
                                 const Identifier& propertyName) {
   ValueImp* obj =
-      static_cast<ObjectImp*>(exec->interpreter()->globalObject().imp())
+      static_cast<ObjectImp*>(exec->lexicalInterpreter()->globalObject().imp())
           ->getDirect(propertyName);
   if (obj)
     return Object::dynamicCast(Value(obj));
   else {
     Object newObject(new ClassCtor(exec));
-    exec->interpreter()->globalObject().put(exec, propertyName, newObject,
-                                            Internal);
+    exec->lexicalInterpreter()->globalObject().put(exec, propertyName,
+                                                   newObject, Internal);
     return newObject;
   }
 }
@@ -316,7 +316,7 @@ inline Object cacheGlobalObject(ExecState* exec,
                                                                              \
    protected:                                                                \
     ClassProto(ExecState* exec)                                              \
-        : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {}        \
+        : ObjectImp(exec->lexicalInterpreter()->builtinObjectPrototype()) {} \
                                                                              \
    public:                                                                   \
     virtual const ClassInfo* classInfo() const { return &info; }             \

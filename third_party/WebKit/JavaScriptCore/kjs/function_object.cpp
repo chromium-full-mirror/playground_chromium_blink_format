@@ -126,7 +126,7 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
 
       Object applyThis;
       if (thisArg.isA(NullType) || thisArg.isA(UndefinedType))
-        applyThis = exec->interpreter()->globalObject();
+        applyThis = exec->dynamicInterpreter()->globalObject();
       else
         applyThis = thisArg.toObject(exec);
 
@@ -160,7 +160,7 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
 
       Object callThis;
       if (thisArg.isA(NullType) || thisArg.isA(UndefinedType))
-        callThis = exec->interpreter()->globalObject();
+        callThis = exec->dynamicInterpreter()->globalObject();
       else
         callThis = thisArg.toObject(exec);
 
@@ -214,7 +214,7 @@ Object FunctionObjectImp::construct(ExecState* exec, const List& args) {
       Parser::parse(body.data(), body.size(), &sid, &errLine, &errMsg);
 
   // notify debugger that source has been parsed
-  Debugger* dbg = exec->interpreter()->imp()->debugger();
+  Debugger* dbg = exec->dynamicInterpreter()->imp()->debugger();
   if (dbg) {
     bool cont = dbg->sourceParsed(exec, sid, body, errLine);
     if (!cont) {
@@ -233,7 +233,7 @@ Object FunctionObjectImp::construct(ExecState* exec, const List& args) {
   }
 
   ScopeChain scopeChain;
-  scopeChain.push(exec->interpreter()->globalObject().imp());
+  scopeChain.push(exec->dynamicInterpreter()->globalObject().imp());
   FunctionBodyNode* bodyNode = progNode;
 
   FunctionImp* fimp =
@@ -277,7 +277,7 @@ Object FunctionObjectImp::construct(ExecState* exec, const List& args) {
 
   List consArgs;
 
-  Object objCons = exec->interpreter()->builtinObject();
+  Object objCons = exec->lexicalInterpreter()->builtinObject();
   Object prototype = objCons.construct(exec, List::empty());
   prototype.put(exec, constructorPropertyName, Value(fimp),
                 DontEnum | DontDelete | ReadOnly);

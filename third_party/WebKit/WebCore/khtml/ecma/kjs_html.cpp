@@ -245,7 +245,8 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       }
       case All:
         // Disable document.all when we try to be Netscape-compatible
-        if (exec->interpreter()->compatMode() == Interpreter::NetscapeCompat)
+        if (exec->dynamicInterpreter()->compatMode() ==
+            Interpreter::NetscapeCompat)
           return Undefined();
         return getHTMLCollection(exec, doc.all());
       case Clear:
@@ -390,7 +391,8 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
         // relative to the frame where the JavaScript is executing not
         // the target frame.
         KHTMLPart* activePart =
-            static_cast<KJS::ScriptInterpreter*>(exec->interpreter())->part();
+            static_cast<KJS::ScriptInterpreter*>(exec->dynamicInterpreter())
+                ->part();
         if (activePart) {
           KURL resolvedURL(activePart->baseURL(), str);
           str = resolvedURL.url();
@@ -398,8 +400,9 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
 
 #if APPLE_CHANGES
         // We want a new history item if this JS was called via a user gesture
-        bool userGesture = static_cast<ScriptInterpreter*>(exec->interpreter())
-                               ->wasRunByUserGesture();
+        bool userGesture =
+            static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+                ->wasRunByUserGesture();
         part->scheduleRedirection(0, str, !userGesture);
 #else
         part->scheduleRedirection(0, str, false /*don't lock history*/);
@@ -4389,7 +4392,7 @@ Value KJS::getSelectHTMLCollection(ExecState* exec,
   if (c.isNull())
     return Null();
   ScriptInterpreter* interp =
-      static_cast<ScriptInterpreter*>(exec->interpreter());
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if ((ret = interp->getDOMObject(c.handle())))
     return Value(ret);
   else {

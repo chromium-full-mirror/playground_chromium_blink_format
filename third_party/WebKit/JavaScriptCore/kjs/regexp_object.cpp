@@ -107,7 +107,7 @@ Value RegExpProtoFuncImp::call(ExecState* exec,
           Null();
       }
       RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-          exec->interpreter()->builtinRegExp().imp());
+          exec->lexicalInterpreter()->builtinRegExp().imp());
       int** ovector = regExpObj->registerRegexp(re, s.value());
 
       str = re->match(s.value(), i, 0L, ovector);
@@ -192,7 +192,7 @@ Object RegExpObjectImp::arrayOfMatches(ExecState* exec,
           lastOvector[2 * i], lastOvector[2 * i + 1] - lastOvector[2 * i]);
       list.append(String(substring));
     }
-  Object arr = exec->interpreter()->builtinArray().construct(exec, list);
+  Object arr = exec->lexicalInterpreter()->builtinArray().construct(exec, list);
   arr.put(exec, "index", Number(lastOvector[0]));
   arr.put(exec, "input", String(lastString));
   return arr;
@@ -225,7 +225,7 @@ Object RegExpObjectImp::construct(ExecState* exec, const List& args) {
   UString flags = args[1].toString(exec);
 
   RegExpPrototypeImp* proto = static_cast<RegExpPrototypeImp*>(
-      exec->interpreter()->builtinRegExpPrototype().imp());
+      exec->lexicalInterpreter()->builtinRegExpPrototype().imp());
   RegExpImp* dat = new RegExpImp(proto);
   Object obj(dat);  // protect from GC
 
