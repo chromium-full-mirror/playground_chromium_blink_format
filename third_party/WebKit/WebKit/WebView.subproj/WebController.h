@@ -19,7 +19,7 @@
 @class WebPreferences;
 @class WebView;
 
-@interface WebCapabilities : NSObject
+@interface WebContentTypes : NSObject
 /*!
     @method canShowMIMEType:
     @abstract Checks if the WebKit can show content of a certain MIME type.
@@ -37,6 +37,13 @@
    path.
 */
 + (BOOL)canShowFile:(NSString*)path;
+
+/*!
+    @method suggestedFileExtensionForMIMEType:
+    @param MIMEType The MIME type to check.
+    @result The extension based on the MIME type
+*/
++ (NSString*)suggestedFileExtensionForMIMEType:(NSString*)MIMEType;
 
 @end
 
