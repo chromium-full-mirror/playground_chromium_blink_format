@@ -136,6 +136,7 @@ void HTMLLinkElementImpl::attach() {
 }
 
 void HTMLLinkElementImpl::detach() {
+  // RJW:  Why is this done here?
   if (sheet())
     getDocument()->createSelector();
 
