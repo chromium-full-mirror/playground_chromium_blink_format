@@ -116,6 +116,9 @@
         not-yet-existing WKDOMNode.  We can't think of any initial clients that
   want
         to override the default behavior anyway.  Put it in WKGrabBag.h for now.
+
+        Simplified WKLocationChangeHandler and updated
+        WKAuthenticationHandler to use interfaces instead of structs..
 */
 
 /*
@@ -193,9 +196,8 @@
 - (BOOL)locationWillChangeTo:(NSURL*)url;
 
 - (void)locationChangeStarted;
-- (void)locationChangeCancelled:(WKError*)error;
-- (void)locationChangeStopped:(WKError*)error;
-- (void)locationChangeFinished;
+- (void)locationChangeInProgress;
+- (void)locationChangeDone:(WKError*)error;
 
 - (void)receivedPageTitle:(NSString*)title;
 
@@ -222,17 +224,15 @@
 // handshake.
 - (BOOL)locationWillChangeTo:(NSURL*)url;
 
-- (void)locationChangeStartedByDataSource:(WKWebDataSource*)dataSource;
-- (void)locationChangeCancelled:(WKError*)error
-                   byDataSource:(WKWebDataSource*)dataSource;
-- (void)locationChangeStopped:(WKError*)error
-                 byDataSource:(WKWebDataSource*)dataSource;
-- (void)locationChangeFinished byDataSource:(WKWebDataSource*)dataSource;
+- (void)locationChangeStartedForDataSource:(WKWebDataSource*)dataSource;
+- (void)locationChangeInProgressForDataSource:(WKWebDataSource*)dataSource;
+- (void)locationChangeDone:(WKError*)error
+             forDataSource:(WKWebDataSource*)dataSource;
 
 - (void)receivedPageTitle:(NSString*)title
-             byDataSource:(WKWebDataSource*)dataSource;
+            forDataSource:(WKWebDataSource*)dataSource;
 
-- (void)serverRedirectTo:(NSURL*)url byDataSource:(WKWebDataSource*)dataSource;
+- (void)serverRedirectTo:(NSURL*)url forDataSource:(WKWebDataSource*)dataSource;
 
 @end
 
@@ -283,17 +283,16 @@
 
 */
 
-/* should this be an interface instead? */
-struct WKSimpleAuthenticationResult {
+@interface WKSimpleAuthenticationResult {
   NSString* username;
   NSString* password;
   // May need an extra rememberThisPassword flag if the loader mechanism is
   // going to provide a persistent credentials cache (for starters we can have
   // just a session cache)
 }
+@end
 
-/* should this be an interface instead? */
-struct WKSimpleAuthenticationRequest {
+@interface WKSimpleAuthenticationRequest {
   NSURL* url;        // nil if for something non-URI based
   NSString* domain;  // http authentication domain or some representation of
                      // auth domain for non-URI-based locations; otherwise nil.
@@ -306,12 +305,12 @@ struct WKSimpleAuthenticationRequest {
   // different dialog based on count
 }
 
-    @protocol WKAuthenticationHandler
-    // Can we make this work without blocking the UI, or do we need to make it
-    // explicitly async
-    // somehow?
-    - (WKSimpleAuthenticationResult)authenticate
-    : (WKSimpleAuthenticationRequest)request;
+@protocol WKAuthenticationHandler
+// Can we make this work without blocking the UI, or do we need to make it
+// explicitly async
+// somehow?
+- (WKSimpleAuthenticationResult)authenticate:
+    (WKSimpleAuthenticationRequest)request;
 
 // do we need anything for fancier authentication schemes like kerberos or
 // GSSAPI?
@@ -319,29 +318,28 @@ struct WKSimpleAuthenticationRequest {
 // Do we provide a default dialog?
 @end
 
-    /*
-       =============================================================================
+/*
+   =============================================================================
 
-    */
-    @protocol WKWebDataSourceErrorHandler -
-    receivedError : (WKError*)error forDataSource
-                    : (WKWebDataSource*)dataSource;
+*/
+@protocol WKWebDataSourceErrorHandler
+- receivedError:(WKError*)error forDataSource:(WKWebDataSource*)dataSource;
 @end
 
-    /*
-       =============================================================================
+/*
+   =============================================================================
 
-        A class that implements WKScriptContextHandler provides all the state
-       information
-        that may be used by Javascript (AppleScript?).
+    A class that implements WKScriptContextHandler provides all the state
+   information
+    that may be used by Javascript (AppleScript?).
 
-    */
-    @protocol WKScriptContextHandler
+*/
+@protocol WKScriptContextHandler
 
-    // setStatusText and statusText are used by Javascript's status bar text
-    // methods.
-    - (void)setStatusText : (NSString*)text forDataSource
-                            : (WKWebDataSource*)dataSource;
+// setStatusText and statusText are used by Javascript's status bar text
+// methods.
+- (void)setStatusText:(NSString*)text
+        forDataSource:(WKWebDataSource*)dataSource;
 - (NSString*)statusTextForDataSource:(WKWebDataSource*)dataSource;
 
 // Need API for things like window size and position, window ids,
@@ -350,10 +348,11 @@ struct WKSimpleAuthenticationRequest {
 
 @end
 
-    /*
-       =============================================================================
+/*
+   =============================================================================
 
-    */
-    @protocol WKFrame @end
+*/
+@protocol WKFrame
+@end
 
 #endif
