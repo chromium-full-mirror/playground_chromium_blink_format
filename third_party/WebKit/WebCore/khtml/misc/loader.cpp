@@ -1180,7 +1180,12 @@ void Loader::slotFinished(KIO::Job* job) {
     r->object->setExpireDate(expireDate, false);
   }
 
-  r->object->finish();
+#if APPLE_CHANGES
+  // We don't want to ever finish the load in the case of an error because we
+  // don't want them cached.
+  if (!j->error())
+#endif
+    r->object->finish();
 
 #ifdef CACHE_DEBUG
   kdDebug(6060) << "Loader:: JOB FINISHED " << r->object << ": "

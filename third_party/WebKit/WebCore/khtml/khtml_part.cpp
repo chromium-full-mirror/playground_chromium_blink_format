@@ -254,6 +254,10 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled();
 
+#if APPLE_CHANGES
+  kwq = new KWQKHTMLPart(this);
+#endif
+
 #if !APPLE_CHANGES
   connect(this, SIGNAL(completed()), this, SLOT(updateActions()));
   connect(this, SIGNAL(completed(bool)), this, SLOT(updateActions()));
@@ -261,11 +265,6 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
 
   d->m_popupMenuXML = KXMLGUIFactory::readConfigFile(
       locate("data", "khtml/khtml_popupmenu.rc", KHTMLFactory::instance()));
-#endif
-
-#if APPLE_CHANGES
-  kwq = new KWQKHTMLPart(this);
-#endif
 
   connect(
       khtml::Cache::loader(),
@@ -277,6 +276,7 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   connect(khtml::Cache::loader(),
           SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
           SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
+#endif
 
   findTextBegin();  // reset find variables
 
@@ -309,6 +309,7 @@ KHTMLPart::~KHTMLPart() {
   if (!d->m_bComplete)
     closeURL();
 
+#if !APPLE_CHANGES
   disconnect(
       khtml::Cache::loader(),
       SIGNAL(requestStarted(khtml::DocLoader*, khtml::CachedObject*)), this,
@@ -321,6 +322,7 @@ KHTMLPart::~KHTMLPart() {
       khtml::Cache::loader(),
       SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
       SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
+#endif
 
   clear();
 
@@ -1526,21 +1528,19 @@ void KHTMLPart::slotFinishedParsing() {
   checkCompleted();
 }
 
+#if !APPLE_CHANGES
+
 void KHTMLPart::slotLoaderRequestStarted(khtml::DocLoader* dl,
                                          khtml::CachedObject* obj) {
   if (obj && obj->type() == khtml::CachedObject::Image && d->m_doc &&
       d->m_doc->docLoader() == dl) {
     KHTMLPart* p = this;
     while (p) {
-#if !APPLE_CHANGES
       KHTMLPart* op = p;
-#endif
       p->d->m_totalObjectCount++;
       p = p->parentPart();
-#if !APPLE_CHANGES
       if (!p && d->m_loadedObjects <= d->m_totalObjectCount)
         QTimer::singleShot(200, op, SLOT(slotProgressUpdate()));
-#endif
     }
   }
 }
@@ -1551,23 +1551,17 @@ void KHTMLPart::slotLoaderRequestDone(khtml::DocLoader* dl,
       d->m_doc->docLoader() == dl) {
     KHTMLPart* p = this;
     while (p) {
-#if !APPLE_CHANGES
       KHTMLPart* op = p;
-#endif
       p->d->m_loadedObjects++;
       p = p->parentPart();
-#if !APPLE_CHANGES
       if (!p && d->m_loadedObjects <= d->m_totalObjectCount &&
           d->m_jobPercent >= 100)
         QTimer::singleShot(200, op, SLOT(slotProgressUpdate()));
-#endif
     }
   }
 
   checkCompleted();
 }
-
-#if !APPLE_CHANGES
 
 void KHTMLPart::slotProgressUpdate() {
   int percent;
