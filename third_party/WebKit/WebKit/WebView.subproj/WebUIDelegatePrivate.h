@@ -10,6 +10,7 @@
 enum {
   WebMenuItemTagSearchInSpotlight = 1000,
   WebMenuItemTagSearchInGoogle,
+  WebMenuItemTagLookUpInDictionary,
 };
 
 @interface NSObject (WebUIDelegatePrivate)
