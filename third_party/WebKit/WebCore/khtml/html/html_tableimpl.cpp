@@ -899,19 +899,15 @@ bool HTMLTableCellElementImpl::mapToEntry(NodeImpl::Id attr,
 void HTMLTableCellElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWSPAN:
-      // ###
       rSpan = !attr->isNull() ? attr->value().toInt() : 1;
-      // limit this to something not causing an overflow with short int
-      if (rSpan < 1 || rSpan > 1024)
+      if (rSpan < 1)
         rSpan = 1;
       if (renderer() && renderer()->isTableCell())
         static_cast<RenderTableCell*>(renderer())->updateFromElement();
       break;
     case ATTR_COLSPAN:
-      // ###
       cSpan = !attr->isNull() ? attr->value().toInt() : 1;
-      // limit this to something not causing an overflow with short int
-      if (cSpan < 1 || cSpan > 1024)
+      if (cSpan < 1)
         cSpan = 1;
       if (renderer() && renderer()->isTableCell())
         static_cast<RenderTableCell*>(renderer())->updateFromElement();
