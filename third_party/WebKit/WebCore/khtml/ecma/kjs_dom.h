@@ -108,6 +108,7 @@ class DOMNode : public DOMObject {
     OnMove,
     OnReset,
     OnResize,
+    OnSearch,
     OnSelect,
     OnSubmit,
     OnUnload,

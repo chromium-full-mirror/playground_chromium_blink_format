@@ -213,6 +213,10 @@ EventImpl::EventId EventImpl::typeToId(DOMString type) {
     return KEYDOWN_EVENT;
   else if (type == "keyup")
     return KEYUP_EVENT;
+#if APPLE_CHANGES
+  else if (type == "search")
+    return SEARCH_EVENT;
+#endif
   else if (type == "textInput")
     return TEXTINPUT_EVENT;
   else if (type == "readystatechange")
@@ -290,6 +294,10 @@ DOMString EventImpl::idToType(EventImpl::EventId id) {
       return "keypress";
     case TEXTINPUT_EVENT:
       return "textInput";
+#if APPLE_CHANGES
+    case SEARCH_EVENT:
+      return "search";
+#endif
     // khtml extensions
     case KHTML_DBLCLICK_EVENT:
       return "dblclick";
