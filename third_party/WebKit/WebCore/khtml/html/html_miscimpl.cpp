@@ -146,10 +146,12 @@ unsigned long HTMLCollectionImpl::calcLength(NodeImpl* current) const {
         default:
           kdDebug(6030) << "Error in HTMLCollection, wrong tagId!" << endl;
       }
-      if (deep && current->firstChild())
-        len += calcLength(current->firstChild());
+      if (deep) {
+        current = current->traverseNextNode(base);
+        continue;
+      }
     }
-    current = current->nextSibling();
+    current = current->traverseNextSibling(base);
   }
   return len;
 }
@@ -239,13 +241,12 @@ NodeImpl* HTMLCollectionImpl::getItem(NodeImpl* current,
       }
       if (len == (index + 1))
         return current;
-      NodeImpl* retval = 0;
-      if (deep && current->firstChild())
-        retval = getItem(current->firstChild(), index, len);
-      if (retval)
-        return retval;
+      if (deep) {
+        current = current->traverseNextNode(base);
+        continue;
+      }
     }
-    current = current->nextSibling();
+    current = current->traverseNextSibling(base);
   }
   return 0;
 }
@@ -266,12 +267,6 @@ NodeImpl* HTMLCollectionImpl::item(unsigned long index) const {
   }
   int pos = (int)info->position;
   NodeImpl* node = getItem(info->current, index, pos);
-  while (!node && info->current->parentNode() &&
-         info->current->parentNode() != base) {
-    info->current = info->current->parentNode();
-    if (info->current->nextSibling())
-      node = getItem(info->current->nextSibling(), index, pos);
-  }
   info->current = node;
   info->position = index;
   return info->current;
@@ -285,26 +280,12 @@ NodeImpl* HTMLCollectionImpl::nextItem() const {
   resetCollectionInfo();
   int pos = 0;
 
-  info->position = ~0;  // no position
   // Look for the 'second' item. The first one is currentItem, already given
   // back.
   NodeImpl* retval = getItem(info->current, 1, pos);
-  if (retval) {
-    info->current = retval;
-    return retval;
-  }
-  // retval was 0, means we have to go up
-  while (!retval && info->current->parentNode() &&
-         info->current->parentNode() != base) {
-    info->current = info->current->parentNode();
-    if (info->current->nextSibling()) {
-      // ... and to take the first one from there
-      pos = 0;
-      retval = getItem(info->current->nextSibling(), 0, pos);
-    }
-  }
+
   info->current = retval;
-  return info->current;
+  return retval;
 }
 
 NodeImpl* HTMLCollectionImpl::getNamedItem(NodeImpl* current,
@@ -396,16 +377,12 @@ NodeImpl* HTMLCollectionImpl::getNamedItem(NodeImpl* current,
           return current;
         }
       }
-      NodeImpl* retval = 0;
-      if (deep && current->firstChild())
-        retval =
-            getNamedItem(current->firstChild(), attr_id, name, caseSensitive);
-      if (retval) {
-        // kdDebug( 6030 ) << "got a return value " << retval << endl;
-        return retval;
+      if (deep) {
+        current = current->traverseNextNode(base);
+        continue;
       }
     }
-    current = current->nextSibling();
+    current = current->traverseNextSibling(base);
   }
   return 0;
 }
@@ -418,7 +395,6 @@ NodeImpl* HTMLCollectionImpl::namedItem(const DOMString& name,
   // object with a matching name attribute, but only on those elements
   // that are allowed a name attribute.
   resetCollectionInfo();
-  info->position = ~0;  // no position
   idsDone = false;
   info->current = getNamedItem(base->firstChild(), ATTR_ID, name);
   if (info->current)
@@ -468,23 +444,6 @@ NodeImpl* HTMLCollectionImpl::nextNamedItemInternal(
       // endl;
       info->current = retval;
       return retval;
-    }
-
-    // retval was 0, means we have to go up
-    while (!retval && info->current->parentNode() &&
-           info->current->parentNode() != base) {
-      info->current = info->current->parentNode();
-      if (info->current->nextSibling()) {
-        // ... and to take the first one from there
-        retval = getNamedItem(info->current->nextSibling(),
-                              idsDone ? ATTR_NAME : ATTR_ID, name);
-      }
-    }
-    if (retval) {
-      // kdDebug() << "*HTMLCollectionImpl::nextNamedItem found after going up "
-      // << retval << endl;
-      info->current = retval;
-      return info->current;
     }
   }
 
@@ -631,8 +590,8 @@ NodeImpl* HTMLFormCollectionImpl::nextItem() const {
 
 NodeImpl* HTMLFormCollectionImpl::nextNamedItemInternal(
     const DOMString& name) const {
-  NodeImpl* retval =
-      getNamedFormItem(idsDone ? ATTR_NAME : ATTR_ID, name, ++currentPos, true);
+  NodeImpl* retval = getNamedFormItem(idsDone ? ATTR_NAME : ATTR_ID, name,
+                                      ++info->position, true);
   if (retval)
     return retval;
   if (idsDone)  // we're done
