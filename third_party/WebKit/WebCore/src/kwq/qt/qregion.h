@@ -43,6 +43,18 @@
 #include "qimage.h"
 #include "qrect.h"
 
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+#define Fixed MacFixed
+#define Rect MacRect
+#define Boolean MacBoolean
+
+#import <Cocoa/Cocoa.h>
+
+#undef Fixed
+#undef Rect
+#undef Boolean
+#endif
+
 // class QRegion ===============================================================
 
 class QRegion {
@@ -60,7 +72,7 @@ class QRegion {
 
   QRegion();
   QRegion(const QRect&);
-  QRegion(int, int, int, int, RegionType = Rectangle);
+  QRegion(int, int, int, int, RegionType t = Rectangle);
   QRegion(const QPointArray&);
   QRegion(const QRegion&);
   ~QRegion();
@@ -79,6 +91,19 @@ class QRegion {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+ private:
+  struct KWQRegionData {
+    RegionType type;
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+    NSBezierPath* path;
+#else
+    void* path;
+#endif
+  } * data;
+
+#ifdef _KWQ_
+  void _initialize();
+#endif
 
 };  // class QRegion
     // ============================================================

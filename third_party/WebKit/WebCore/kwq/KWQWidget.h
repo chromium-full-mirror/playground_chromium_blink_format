@@ -53,6 +53,8 @@
 #undef Boolean
 #endif
 
+class QWidgetPrivate;
+
 // class QWidget ===============================================================
 
 // FIX ME!  RJW - need to check if inheritance from QPaintDevice is really
@@ -183,20 +185,7 @@ class QWidget : public QObject, public QPaintDevice {
 
   void _initialize();
 
-  struct KWQWidgetData {  // Widget data.
-    QPoint pos;
-    QRect rect;
-    FocusPolicy focusPolicy;
-    QStyle* style;
-    QFont* font;
-    QCursor* cursor;
-    QPalette pal;
-#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
-    NSView* view;
-#else
-    void* view;
-#endif
-  } * data;
+  QWidgetPrivate* data;
 
 };  // class QWidget
     // ============================================================
