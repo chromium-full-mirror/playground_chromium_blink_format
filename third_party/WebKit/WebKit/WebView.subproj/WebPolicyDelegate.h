@@ -53,38 +53,18 @@ typedef enum {
   WebPolicyOpenURL,
   WebPolicyOpenNewWindow,
   WebPolicyOpenNewWindowBehind,
-  WebPolicyIgnore
+  WebPolicyIgnore,
+  WebPolicyShow
 } WebPolicyAction;
 
-/*!
-    @enum WebFileAction
-    @constant WebFileURLPolicyUseContentPolicy Continue processing the file, ask
-   for content policy.
-    @constant WebFileURLPolicyOpenExternally Open the file in another
-   application.
-    @constant WebFileURLPolicyRevealInFinder Reveal the file in the Finder.
-    @constant WebFileURLPolicyIgnore Do nothing with the file.
-*/
-typedef enum {
-  WebFileURLPolicyUseContentPolicy = WebPolicyUse,
-  WebFileURLPolicyOpenExternally = WebPolicyOpenURL,
-  WebFileURLPolicyRevealInFinder = WebPolicyRevealInFinder,
-  WebFileURLPolicyIgnore = WebPolicyIgnore
-} WebFileAction;
+@class WebPolicyDecisionListenerPrivate;
 
-/*!
-    @enum WebContentAction
-    @constant WebContentPolicyNone Unitialized state.
-    @constant WebContentPolicyShow Show the content in WebKit.
-    @constant WebContentPolicySave Save the content to disk.
-    @constant WebContentPolicyIgnore Do nothing with the content.
-*/
-typedef enum {
-  WebContentPolicyNone = WebPolicyNone,
-  WebContentPolicyShow = WebPolicyUse,
-  WebContentPolicySave = WebPolicySave,
-  WebContentPolicyIgnore = WebPolicyIgnore
-} WebContentAction;
+@interface WebPolicyDecisionListener : NSObject {
+ @private
+  WebPolicyDecisionListenerPrivate* _private
+}
+
+@end
 
 /*!
     @protocol WebControllerPolicyDelegate
@@ -96,7 +76,6 @@ typedef enum {
    order:
 
     navigationPolicyForAction:andRequest:inFrame:<BR>
-    fileURLPolicyForMIMEType:andRequest:inFrame:<BR>
     contentPolicyForMIMEType:andRequest:inFrame:<BR>
 */
 @protocol WebControllerPolicyDelegate<NSObject>
@@ -115,20 +94,6 @@ typedef enum {
                                      inFrame:(WebFrame*)frame;
 
 /*!
-     @method fileURLPolicyForMIMEType:inFrame:isDirectory:
-     @discussion Called when the response to URLPolicyForURL is
-   WebURLPolicyUseContentPolicy and the URL is
-     a file URL. This allows clients to special-case WebKit's behavior for file
-   URLs.
-     @param type MIME type for the file.
-     @param request WebResourceRequest to be used to load the item
-     @param frame The frame which will load the file.
-*/
-- (WebFileAction)fileURLPolicyForMIMEType:(NSString*)type
-                               andRequest:(WebResourceRequest*)request
-                                  inFrame:(WebFrame*)frame;
-
-/*!
     @method contentPolicyForResponse:andRequest:inFrame:withContentPolicy:
     @discussion Returns the policy for content which has been partially loaded.
    Sent after locationChangeStarted.
@@ -136,9 +101,9 @@ typedef enum {
     @param request A WebResourceRequest for the partially loaded content.
     @param frame The frame which is loading the URL.
 */
-- (WebContentAction)contentPolicyForMIMEType:(NSString*)type
-                                  andRequest:(WebResourceRequest*)request
-                                     inFrame:(WebFrame*)frame;
+- (WebPolicyAction)contentPolicyForMIMEType:(NSString*)type
+                                 andRequest:(WebResourceRequest*)request
+                                    inFrame:(WebFrame*)frame;
 
 /*!
     @method saveFilenameForResponse:andRequest:
