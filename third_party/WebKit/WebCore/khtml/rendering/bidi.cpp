@@ -491,6 +491,8 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
                 } else
                   eor = last;
                 appendRun();
+                dir = QChar::DirL;
+                status.eor = QChar::DirL;
               } else {
                 if (status.eor == QChar::DirR) {
                   appendRun();
@@ -579,8 +581,8 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
               if (status.lastStrong == QChar::DirR ||
                   status.lastStrong == QChar::DirAL) {
                 appendRun();
-                dir = QChar::DirAN;
-                status.eor = QChar::DirAN;
+                dir = QChar::DirEN;
+                status.eor = QChar::DirEN;
               }
             // fall through
             case QChar::DirEN:
@@ -593,7 +595,7 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
             case QChar::DirAN:
               appendRun();
               status.eor = QChar::DirEN;
-              dir = QChar::DirAN;
+              dir = QChar::DirEN;
               break;
             case QChar::DirES:
             case QChar::DirCS:
@@ -610,7 +612,8 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
                 // neutrals go to R
                 eor = last;
                 appendRun();
-                dir = QChar::DirAN;
+                dir = QChar::DirEN;
+                status.eor = QChar::DirEN;
               } else if (status.eor == QChar::DirL ||
                          (status.eor == QChar::DirEN &&
                           status.lastStrong == QChar::DirL)) {
@@ -623,7 +626,8 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
                   eor = last;
                   dir = QChar::DirR;
                   appendRun();
-                  dir = QChar::DirAN;
+                  dir = QChar::DirEN;
+                  status.eor = QChar::DirEN;
                 } else {
                   eor = current;
                   status.eor = dirCurrent;
@@ -648,6 +652,8 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
           case QChar::DirAL:
           case QChar::DirEN:
             appendRun();
+            dir = QChar::DirAN;
+            status.eor = QChar::DirAN;
             break;
           case QChar::DirCS:
             if (status.eor == QChar::DirAN) {
@@ -667,6 +673,7 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
               eor = last;
               appendRun();
               dir = QChar::DirAN;
+              status.eor = QChar::DirAN;
             } else if (status.eor == QChar::DirL ||
                        (status.eor == QChar::DirEN &&
                         status.lastStrong == QChar::DirL)) {
@@ -680,6 +687,7 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
                 dir = QChar::DirR;
                 appendRun();
                 dir = QChar::DirAN;
+                status.eor = QChar::DirAN;
               } else {
                 eor = current;
                 status.eor = dirCurrent;
@@ -751,6 +759,12 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
       case QChar::DirBN:
         // ignore these
         break;
+      case QChar::DirEN:
+        if (status.last == QChar::DirL) {
+          status.last = QChar::DirL;
+          break;
+        }
+      // fall through
       default:
         status.last = dirCurrent;
     }
