@@ -180,7 +180,9 @@ Value MathFuncImp::call(ExecState* exec,
           result = NaN;
           break;
         }
-        if (val > result)
+        // Comparing a number to negative infinity doesn't work.
+        // -dwh
+        if (k == 0 || val > result)
           result = val;
       }
       break;
@@ -194,7 +196,9 @@ Value MathFuncImp::call(ExecState* exec,
           result = NaN;
           break;
         }
-        if (val < result)
+        // Comparing a number to positive infinity doesn't work.
+        // -dwh
+        if (k == 0 || val < result)
           result = val;
       }
       break;
