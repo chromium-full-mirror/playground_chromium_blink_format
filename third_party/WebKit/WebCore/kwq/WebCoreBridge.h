@@ -92,6 +92,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 - (void)reapplyStyles;
 - (void)forceLayout;
+- (void)adjustFrames:(NSRect)rect;
 - (void)drawRect:(NSRect)rect;
 
 @end

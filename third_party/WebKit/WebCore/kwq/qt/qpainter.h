@@ -143,6 +143,8 @@ class QPainter : public Qt {
 
   static QColor selectedTextBackgroundColor();
 
+  void setPaintingDisabled(bool f);
+
  private:
   // no copying or assignment
   // note that these are "standard" (no pendantic stuff needed)
