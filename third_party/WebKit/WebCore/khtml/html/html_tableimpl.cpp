@@ -997,6 +997,8 @@ void HTMLTableColElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SPAN:
       _span = !attr->isNull() ? attr->value().toInt() : 1;
+      if (renderer() && renderer()->isTableCol())
+        static_cast<RenderTableCol*>(renderer())->updateFromElement();
       break;
     case ATTR_WIDTH:
       if (!attr->value().isEmpty())
