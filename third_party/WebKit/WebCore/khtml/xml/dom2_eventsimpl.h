@@ -32,6 +32,8 @@
 #include <qevent.h>
 
 class KHTMLPart;
+class QPoint;
+class QStringList;
 
 namespace DOM {
 
@@ -62,6 +64,9 @@ class EventImpl : public khtml::Shared<EventImpl> {
     DRAGOVER_EVENT,
     DRAGLEAVE_EVENT,
     DROP_EVENT,
+    DRAGSTART_EVENT,
+    DRAG_EVENT,
+    DRAGEND_EVENT,
     // Mutation events
     DOMSUBTREEMODIFIED_EVENT,
     DOMNODEINSERTED_EVENT,
@@ -387,6 +392,14 @@ class ClipboardImpl : public khtml::Shared<ClipboardImpl> {
   virtual void clearAllData() = 0;
   virtual DOMString getData(const DOMString& type, bool& success) const = 0;
   virtual bool setData(const DOMString& type, const DOMString& data) = 0;
+
+  // extensions beyond IE's API
+  virtual QStringList types() const = 0;
+
+  virtual QPoint dragLocation() const = 0;
+  virtual void setDragLocation(const QPoint&) = 0;
+  virtual QPixmap dragImage() const = 0;
+  virtual void setDragImage(const QPixmap&) = 0;
 };
 
 };  // namespace

@@ -4230,6 +4230,11 @@ bool KHTMLPart::dndEnabled() const {
   return d->m_bDnd;
 }
 
+bool KHTMLPart::shouldDragAutoNode(DOM::NodeImpl* node) const {
+  // No KDE impl yet
+  return false;
+}
+
 void KHTMLPart::customEvent(QCustomEvent* event) {
   if (khtml::MousePressEvent::test(event)) {
     khtmlMousePressEvent(static_cast<khtml::MousePressEvent*>(event));

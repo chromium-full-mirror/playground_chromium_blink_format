@@ -68,6 +68,7 @@ typedef DOMElement ObjCDOMElement;
 @class NSEvent;
 @class NSFileWrapper;
 @class NSFont;
+@class NSImage;
 @class NSMutableDictionary;
 @class NSResponder;
 @class NSString;
@@ -87,6 +88,7 @@ class NSColor;
 class NSEvent;
 class NSFileWrapper;
 class NSFont;
+class NSImage;
 class NSMutableDictionary;
 class NSResponder;
 class NSString;
@@ -241,6 +243,9 @@ class KWQKHTMLPart : public KHTMLPart {
   bool keyEvent(NSEvent*);
   bool lastEventIsMouseUp();
 
+  void dragSourceMovedTo(const QPoint& loc);
+  void dragSourceEndedAt(const QPoint& loc);
+
   bool sendContextMenuEvent(NSEvent*);
 
   void clearTimers();
@@ -325,6 +330,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void partClearedInBegin();
 
+  // Implementation of CSS property -khtml-user-drag == auto
+  bool shouldDragAutoNode(DOM::NodeImpl*) const;
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
@@ -347,6 +355,13 @@ class KWQKHTMLPart : public KHTMLPart {
   static KWQKHTMLPart* partForNode(DOM::NodeImpl*);
   static NSView* documentViewForNode(DOM::NodeImpl*);
 
+  bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
+  bool dispatchDragSrcEvent(int eventId,
+                            const QPoint& loc,
+                            bool declareTypes,
+                            NSImage** dragImage,
+                            NSPoint* dragLoc) const;
+
   WebCoreBridge* _bridge;
 
   KWQSignal _started;
@@ -358,6 +373,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _sendingEventToSubview;
   bool _mouseDownMayStartDrag;
   bool _mouseDownMayStartSelect;
+  // in our view's coords
+  int _mouseDownX, _mouseDownY;
 
   static NSEvent* _currentEvent;
   static NSResponder* _firstResponderAtMouseDownTime;
@@ -382,6 +399,12 @@ class KWQKHTMLPart : public KHTMLPart {
   // bound outside the context of a plugin.
   QPtrList<KJS::Bindings::RootObject> rootObjects;
   WebScriptObject* _windowScriptObject;
+
+  DOM::Node _dragSrc;  // element that may be a drag source, for the current
+                       // mouse gesture
+  bool _dragSrcIsLink;
+  bool _dragSrcIsImage;
+  bool _dragSrcInSelection;
 };
 
 inline KWQKHTMLPart* KWQ(KHTMLPart* part) {
