@@ -2711,7 +2711,15 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
             return;
         }
 
+        // This is a "logical" font size in the sense that it is relative to
+        // some UA default.
+        // Since the UA default can vary depending on the font family (e.g.,
+        // monospace could be 11pt
+        // but serif could be 20pt), we don't set our size specified bit.
+        fontDef.sizeSpecified = false;
+
       } else {
+        fontDef.sizeSpecified = true;
         int type = primitiveValue->primitiveType();
         if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
             type < CSSPrimitiveValue::CSS_DEG) {
@@ -2739,7 +2747,6 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
 
       // kdDebug( 6080 ) << "computed raw font size: " << size << endl;
 
-      fontDef.sizeSpecified = true;
       fontDef.size = int(size);
       if (style->setFontDef(fontDef))
         fontDirty = true;
