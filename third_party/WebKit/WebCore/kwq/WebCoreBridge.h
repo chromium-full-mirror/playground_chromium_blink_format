@@ -506,6 +506,7 @@ typedef enum {
                         at:(NSPoint)dragLoc
                  operation:(NSDragOperation)op
                      event:(NSEvent*)event;
+- (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
 - (void)handleAutoscrollForMouseDragged:(NSEvent*)event;
 - (BOOL)mayStartDragWithMouseDragged:(NSEvent*)event;
 

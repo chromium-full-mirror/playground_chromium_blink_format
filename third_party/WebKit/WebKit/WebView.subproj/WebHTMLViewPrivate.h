@@ -49,6 +49,7 @@
                          at:(NSPoint)dragLoc
                   operation:(NSDragOperation)op
                       event:(NSEvent*)event;
+- (void)_setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
 - (void)_handleAutoscrollForMouseDragged:(NSEvent*)event;
 - (BOOL)_mayStartDragWithMouseDragged:(NSEvent*)event;
 
