@@ -395,6 +395,7 @@ class RenderObject : public CachedObjectClient {
                            int tx,
                            int ty,
                            bool inside = false);
+  void setHoverAndActive(NodeInfo& info, bool oldinside, bool inside);
 
   // set the style of the object.
   virtual void setStyle(RenderStyle* style);

@@ -1024,6 +1024,23 @@ bool RenderObject::mouseInside() const {
   return m_mouseInside;
 }
 
+void RenderObject::setHoverAndActive(NodeInfo& info,
+                                     bool oldinside,
+                                     bool inside) {
+  DOM::NodeImpl* elt = element();
+  if (elt) {
+    bool strictMode = (elt->getDocument()->parseMode() == DocumentImpl::Strict);
+    if (strictMode || elt->id() != ID_A || elt->hasAnchor()) {
+      bool oldactive = elt->active();
+      if (oldactive != (inside && info.active() && elt == info.innerNode()))
+        elt->setActive(inside && info.active() && elt == info.innerNode());
+      if (((oldinside != mouseInside()) && style()->hasHover()) ||
+          ((oldactive != elt->active()) && style()->hasActive()))
+        elt->setChanged();
+    }
+  }
+}
+
 bool RenderObject::nodeAtPoint(NodeInfo& info,
                                int _x,
                                int _y,
@@ -1073,17 +1090,10 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
     // lets see if we need a new style
     bool oldinside = mouseInside();
     setMouseInside(inside);
-    DOM::NodeImpl* elt =
-        (!isInline() && continuation()) ? continuation()->element() : element();
-    RenderObject* obj = (!isInline() && continuation()) ? continuation() : this;
-    if (elt) {
-      bool oldactive = elt->active();
-      if (oldactive != (inside && info.active() && elt == info.innerNode()))
-        elt->setActive(inside && info.active() && elt == info.innerNode());
-      if (((oldinside != mouseInside()) && obj->style()->hasHover()) ||
-          ((oldactive != elt->active()) && obj->style()->hasActive()))
-        elt->setChanged();
-    }
+
+    setHoverAndActive(info, oldinside, inside);
+    if (!isInline() && continuation())
+      continuation()->setHoverAndActive(info, oldinside, inside);
   }
 
   return inside;
