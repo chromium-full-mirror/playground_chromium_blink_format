@@ -89,7 +89,7 @@ bool DOMNode::toBoolean(ExecState*) const {
 }
 
 /* Source for DOMNodeTable. Use "make hashtables" to regenerate.
-@begin DOMNodeTable 66
+@begin DOMNodeTable 67
   nodeName	DOMNode::NodeName	DontDelete|ReadOnly
   nodeValue	DOMNode::NodeValue	DontDelete
   nodeType	DOMNode::NodeType	DontDelete|ReadOnly
@@ -145,6 +145,7 @@ bool DOMNode::toBoolean(ExecState*) const {
   onscroll      DOMNode::OnScroll               DontDelete
   onsearch      DOMNode::OnSearch               DontDelete
   onselect	DOMNode::OnSelect		DontDelete
+  onselectstart	DOMNode::OnSelectStart		DontDelete
   onsubmit	DOMNode::OnSubmit		DontDelete
   onunload	DOMNode::OnUnload		DontDelete
 # IE extensions
@@ -279,6 +280,8 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
 #endif
     case OnSelect:
       return getListener(DOM::EventImpl::SELECT_EVENT);
+    case OnSelectStart:
+      return getListener(DOM::EventImpl::SELECTSTART_EVENT);
     case OnSubmit:
       return getListener(DOM::EventImpl::SUBMIT_EVENT);
     case OnUnload:
@@ -476,6 +479,9 @@ void DOMNode::putValue(ExecState* exec,
 #endif
     case OnSelect:
       setListener(exec, DOM::EventImpl::SELECT_EVENT, value);
+      break;
+    case OnSelectStart:
+      setListener(exec, DOM::EventImpl::SELECTSTART_EVENT, value);
       break;
     case OnSubmit:
       setListener(exec, DOM::EventImpl::SUBMIT_EVENT, value);

@@ -74,6 +74,8 @@ class EventImpl : public khtml::Shared<EventImpl> {
     DRAGSTART_EVENT,
     DRAG_EVENT,
     DRAGEND_EVENT,
+    // IE selection events
+    SELECTSTART_EVENT,
     // Mutation events
     DOMSUBTREEMODIFIED_EVENT,
     DOMNODEINSERTED_EVENT,

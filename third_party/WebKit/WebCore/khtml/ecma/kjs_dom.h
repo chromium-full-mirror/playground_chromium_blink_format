@@ -108,6 +108,7 @@ class DOMNode : public DOMObject {
     OnCopy,
     OnBeforePaste,
     OnPaste,
+    OnSelectStart,
     OnFocus,
     OnInput,
     OnKeyDown,

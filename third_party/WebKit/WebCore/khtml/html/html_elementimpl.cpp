@@ -527,6 +527,11 @@ void HTMLElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           EventImpl::DRAGEND_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
+    case ATTR_ONSELECTSTART:
+      setHTMLEventListener(
+          EventImpl::SELECTSTART_EVENT,
+          getDocument()->createHTMLEventListener(attr->value().string()));
+      break;
     // other misc attributes
     default:
 #ifdef UNSUPPORTED_ATTR
