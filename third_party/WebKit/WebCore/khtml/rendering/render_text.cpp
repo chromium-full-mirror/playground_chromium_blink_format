@@ -1189,9 +1189,15 @@ InlineBox* RenderText::createInlineBox() {
 }
 
 void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
+  TextRun* s = static_cast<TextRun*>(box);
+
   // ### should not be needed!!!
-  if (len == 0 || (str->l && len == 1 && *(str->s + from) == '\n'))
+  if (len == 0 || (str->l && len == 1 && *(str->s + from) == '\n')) {
+    // We want the box to be destroyed.  This is a <br>, and we don't
+    // need <br>s to be included.
+    s->detach(renderArena());
     return;
+  }
 
   reverse = reverse && !style()->visuallyOrdered();
 
@@ -1204,7 +1210,6 @@ void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
                   //metrics(false).ascent() << endl;
 #endif
 
-  TextRun* s = static_cast<TextRun*>(box);
   s->m_reversed = reverse;
   s->m_start = from;
   s->m_len = len;
