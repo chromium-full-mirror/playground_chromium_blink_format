@@ -190,6 +190,16 @@ void CSSStyleSheetImpl::deleteRule(unsigned long index, int& exceptioncode) {
   b->deref();
 }
 
+void CSSStyleSheetImpl::addNamespace(const DOM::DOMString& prefix,
+                                     const DOM::DOMString& uri) {
+  printf("Adding namespace.\n");
+}
+
+void CSSStyleSheetImpl::determineNamespace(CSSSelector* selector,
+                                           const DOM::DOMString& prefix) {
+  printf("Determining namespace.\n");
+}
+
 bool CSSStyleSheetImpl::parseString(const DOMString& string, bool strict) {
 #ifdef CSS_STYLESHEET_DEBUG
   kdDebug(6080) << "parsing sheet, len=" << string.length() << ", sheet is "

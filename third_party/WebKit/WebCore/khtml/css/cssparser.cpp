@@ -2056,6 +2056,7 @@ int DOM::CSSParser::lex(void* _yylval) {
     case MEDIA_SYM:
     case FONT_FACE_SYM:
     case CHARSET_SYM:
+    case NAMESPACE_SYM:
 
     case IMPORTANT_SYM:
       break;
