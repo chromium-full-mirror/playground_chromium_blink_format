@@ -108,7 +108,7 @@ class TreeWalkerImpl;
 // Like reinterpret_cast, but a compiler error if you use it on the wrong type.
 template <class Target, class Source>
 Target DOM_cast(Source) {
-  failToCompile();
+  Source::failToCompile();
 }
 
 // Type safe DOM wrapper access.

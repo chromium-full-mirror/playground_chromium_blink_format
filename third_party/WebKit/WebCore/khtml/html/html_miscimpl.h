@@ -138,8 +138,9 @@ class HTMLFormCollectionImpl : public HTMLCollectionImpl {
   virtual NodeImpl* firstItem() const;
   virtual NodeImpl* nextItem() const;
 
-  NodeImpl* namedItem(const DOMString& name, bool caseSensitive = true) const;
-  NodeImpl* nextNamedItem(const DOMString& name) const;
+  virtual NodeImpl* namedItem(const DOMString& name,
+                              bool caseSensitive = true) const;
+  virtual NodeImpl* nextNamedItem(const DOMString& name) const;
 
  protected:
   virtual void updateNameCache() const;
