@@ -101,7 +101,8 @@ using khtml::Decoder;
 using khtml::DeleteSelectionCommand;
 using khtml::EditCommand;
 using khtml::InlineTextBox;
-using khtml::PasteMarkupCommand;
+using khtml::PasteHTMLCommand;
+using khtml::PasteImageCommand;
 using khtml::RenderObject;
 using khtml::RenderText;
 using khtml::Tokenizer;
@@ -5131,8 +5132,13 @@ void KHTMLPart::reappliedEditing(EditCommand& cmd) {
   d->m_lastEditCommand = EditCommand::emptyCommand();
 }
 
-void KHTMLPart::pasteMarkupString(const QString& markupString) {
-  EditCommand cmd(PasteMarkupCommand(d->m_doc, DOMString(markupString)));
+void KHTMLPart::pasteHTMLString(const QString& HTMLString) {
+  EditCommand cmd(PasteHTMLCommand(d->m_doc, DOMString(HTMLString)));
+  cmd.apply();
+}
+
+void KHTMLPart::pasteImage(const QString& src) {
+  EditCommand cmd(PasteImageCommand(d->m_doc, DOMString(src)));
   cmd.apply();
 }
 
