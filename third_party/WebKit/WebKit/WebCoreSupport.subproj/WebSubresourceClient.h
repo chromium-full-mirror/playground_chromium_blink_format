@@ -25,4 +25,6 @@
                                       withURL:(NSURL*)URL
                                    dataSource:(WebDataSource*)dataSource;
 
+- (WebResourceHandle*)handle;
+
 @end
