@@ -188,8 +188,8 @@ typedef enum {
 @end
 
 /*!
-    @protocol WebControllerPolicyHandler
-    @discussion While loading a URL, WebKit asks the WebControllerPolicyHandler
+    @protocol WebControllerPolicyDelegate
+    @discussion While loading a URL, WebKit asks the WebControllerPolicyDelegate
    for
     policies that determine the action of what to do with the URL or the data
    that
