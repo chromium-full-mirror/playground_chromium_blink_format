@@ -83,16 +83,16 @@ class Token {
     if (text)
       text->deref();
   }
-  void addAttribute(DocumentImpl* doc,
+  void addAttribute(DOM::DocumentImpl* doc,
                     QChar* buffer,
                     const QString& attrName,
-                    const DOMString& v) {
-    AttributeImpl* a = 0;
+                    const DOM::DOMString& v) {
+    DOM::AttributeImpl* a = 0;
     if (buffer->unicode())
-      a = new AttributeImpl(buffer->unicode(), v.implementation());
+      a = new DOM::AttributeImpl(buffer->unicode(), v.implementation());
     else if (!attrName.isEmpty() && attrName != "/")
-      a = new AttributeImpl(
-          doc->attrId(0, DOMString(attrName).implementation(), false),
+      a = new DOM::AttributeImpl(
+          doc->attrId(0, DOM::DOMString(attrName).implementation(), false),
           v.implementation());
 
     if (a) {
@@ -116,7 +116,7 @@ class Token {
     flat = false;
   }
   DOM::NamedAttrMapImpl* attrs;
-  DOMStringImpl* text;
+  DOM::DOMStringImpl* text;
   ushort id;
   bool flat;
 };
@@ -233,11 +233,10 @@ class HTMLTokenizer : public Tokenizer, public khtml::CachedObjectClient {
     EntityName,
     SearchSemicolon
   } Entity;
+  unsigned EntityUnicodeValue;
 
   // are we in a <script> ... </script block
   bool script;
-
-  QChar EntityChar;
 
   // Are we in a <pre> ... </pre> block
   bool pre;

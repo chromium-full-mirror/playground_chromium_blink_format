@@ -29,7 +29,7 @@
 
 #include <qstring.h>
 
-using namespace DOM;
+#include <assert.h>
 
 namespace khtml {
 
@@ -48,16 +48,17 @@ class DOMStringIt {
     l = str.length();
     lines = 0;
   }
-  DOMStringIt(const DOMString& str) {
+  DOMStringIt(const DOM::DOMString& str) {
     s = str.unicode();
     l = str.length();
     lines = 0;
   }
 
   DOMStringIt* operator++() {
-    if (!pushedChar.isNull())
-      pushedChar = 0;
-    else if (l > 0) {
+    if (!pushedChar1.isNull()) {
+      pushedChar1 = pushedChar2;
+      pushedChar2 = 0;
+    } else if (l > 0) {
       if (*s == '\n')
         lines++;
       s++, l--;
@@ -65,30 +66,40 @@ class DOMStringIt {
     return this;
   }
 
- public:
-  void push(const QChar& c) { /* assert(pushedChar.isNull());*/
-    pushedChar = c;
+  void push(const QChar& c) {
+    if (pushedChar1.isNull())
+      pushedChar1 = c;
+    else {
+      assert(pushedChar2.isNull());
+      pushedChar2 = c;
+    }
   }
 
-  const QChar& operator*() const {
-    return pushedChar.isNull() ? *s : pushedChar;
-  }
-  const QChar* operator->() const {
-    return pushedChar.isNull() ? s : &pushedChar;
+  const QChar* current() const {
+    if (!pushedChar1.isNull())
+      return &pushedChar1;
+    if (!pushedChar2.isNull())
+      return &pushedChar2;
+    return s;
   }
 
-  bool escaped() const { return !pushedChar.isNull(); }
-  uint length() const { return l + (!pushedChar.isNull()); }
+  const QChar& operator*() const { return *current(); }
+  const QChar* operator->() const { return current(); }
 
-  const QChar* current() const { return pushedChar.isNull() ? s : &pushedChar; }
+  bool escaped() const { return !pushedChar1.isNull(); }
+  uint length() const {
+    return l + !pushedChar1.isNull() + !pushedChar2.isNull();
+  }
+
   int lineCount() const { return lines; }
 
  protected:
-  QChar pushedChar;
+  QChar pushedChar1;
+  QChar pushedChar2;
   const QChar* s;
   int l;
   int lines;
 };
-};
+}
 
 #endif
