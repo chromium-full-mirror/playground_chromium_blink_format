@@ -122,7 +122,6 @@ class QWidget : public QObject, public QPaintDevice {
   QCursor cursor();
   void unsetCursor();
   bool event(QEvent*);
-  bool hasMouseTracking() const;
 
   void show();
   void hide();
@@ -155,6 +154,12 @@ class QWidget : public QObject, public QPaintDevice {
   void sendConsumedMouseUp();
 
   void setIsSelected(bool isSelected);
+
+  static void beforeMouseDown(NSView*);
+  static void afterMouseDown(NSView*);
+
+  void addToSuperview(NSView* superview);
+  void removeFromSuperview();
 
  private:
   KWQWidgetPrivate* data;

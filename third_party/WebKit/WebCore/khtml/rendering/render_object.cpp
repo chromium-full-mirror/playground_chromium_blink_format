@@ -667,7 +667,7 @@ RenderBlock* RenderObject::containingBlock() const {
     }
   } else {
     while (o && ((o->isInline() && !o->isReplaced()) || o->isTableRow() ||
-                 o->isTableSection() || o->isTableCol()))
+                 o->isTableSection() || o->isTableCol() || o->isFrameSet()))
       o = o->parent();
   }
 

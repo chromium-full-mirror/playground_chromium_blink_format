@@ -39,6 +39,7 @@ class QTextEdit;
 }
 
 - initWithQTextEdit:(QTextEdit*)w;
+- (void)detachQTextEdit;
 
 - (void)setAlignment:(NSTextAlignment)alignment;
 - (void)setBaseWritingDirection:(NSWritingDirection)direction;

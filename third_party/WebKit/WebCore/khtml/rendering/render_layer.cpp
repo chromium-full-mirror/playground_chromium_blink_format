@@ -527,7 +527,7 @@ void RenderLayer::updateScrollPositionFromScrollbars() {
 void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
   if (hasScrollbar && !m_hBar) {
     QScrollView* scrollView = m_object->element()->getDocument()->view();
-    m_hBar = new QScrollBar(Qt::Horizontal, scrollView);
+    m_hBar = new QScrollBar(Qt::Horizontal, 0);
     scrollView->addChild(m_hBar, 0, -50000);
     if (!m_scrollMediator)
       m_scrollMediator = new RenderScrollMediator(this);
@@ -544,7 +544,7 @@ void RenderLayer::setHasHorizontalScrollbar(bool hasScrollbar) {
 void RenderLayer::setHasVerticalScrollbar(bool hasScrollbar) {
   if (hasScrollbar && !m_vBar) {
     QScrollView* scrollView = m_object->element()->getDocument()->view();
-    m_vBar = new QScrollBar(Qt::Vertical, scrollView);
+    m_vBar = new QScrollBar(Qt::Vertical, 0);
     scrollView->addChild(m_vBar, 0, -50000);
     if (!m_scrollMediator)
       m_scrollMediator = new RenderScrollMediator(this);
