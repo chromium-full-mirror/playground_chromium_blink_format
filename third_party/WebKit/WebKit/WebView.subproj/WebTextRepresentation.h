@@ -8,5 +8,7 @@
 @protocol WebDocumentRepresentation;
 
 @interface WebTextRepresentation : NSObject<WebDocumentRepresentation> {
+  NSString* RTFSource;
+  BOOL hasRTFSource;
 }
 @end

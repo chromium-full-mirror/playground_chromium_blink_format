@@ -54,4 +54,6 @@
 
 - (void)notifyDelegatesOfInterruptionByPolicyChange;
 
+- (void)setIdentifier:ident;
+
 @end

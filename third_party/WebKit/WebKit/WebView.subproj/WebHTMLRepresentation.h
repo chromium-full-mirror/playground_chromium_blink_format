@@ -10,6 +10,7 @@
 @class WebHTMLRepresentationPrivate;
 
 @protocol WebDocumentRepresentation;
+@protocol WebDocumentSourceRepresentation;
 @protocol WebDOMDocument;
 @protocol WebDOMNode;
 
@@ -19,12 +20,6 @@
 @interface WebHTMLRepresentation : NSObject<WebDocumentRepresentation> {
   WebHTMLRepresentationPrivate* _private;
 }
-
-/*!
-    @method documentSource
-    @abstract Get the actual source of the document.
-*/
-- (NSString*)documentSource;
 
 /*!
     @method DOMDocument
