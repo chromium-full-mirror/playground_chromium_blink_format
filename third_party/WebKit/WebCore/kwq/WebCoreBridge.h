@@ -156,7 +156,10 @@ typedef khtml::RenderPart KHTMLRenderPart;
     (NSString*)name;  // searches entire hierarchy starting with mainFrame
 
 - (void)loadURL:(NSURL*)URL referrer:(NSString*)referrer;
-- (void)postWithURL:(NSURL*)URL referrer:(NSString*)referrer data:(NSData*)data;
+- (void)postWithURL:(NSURL*)URL
+           referrer:(NSString*)referrer
+               data:(NSData*)data
+        contentType:(NSString*)contentType;
 - (WebCoreBridge*)openNewWindowWithURL:(NSURL*)URL
                               referrer:(NSString*)referrer
                              frameName:(NSString*)name;
