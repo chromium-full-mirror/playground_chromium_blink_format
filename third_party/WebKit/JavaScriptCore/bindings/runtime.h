@@ -26,6 +26,7 @@
 #define _RUNTIME_H_
 
 #include "list.h"
+#include "object.h"
 #include "value.h"
 
 namespace KJS {
@@ -38,12 +39,16 @@ class Method;
 // For now just use Java style type descriptors.
 typedef const char* RuntimeType;
 
+// FIXME:  Parameter should be removed from abstract runtime classes.
 class Parameter {
  public:
   virtual RuntimeType type() const = 0;
   virtual ~Parameter(){};
 };
 
+// FIXME:  Constructor should be removed from abstract runtime classes
+// unless we want to support instantiation of runtime objects from
+// JavaScript.
 class Constructor {
  public:
   virtual Parameter* parameterAt(long i) const = 0;
@@ -75,6 +80,9 @@ class MethodList {
 
   ~MethodList();
 
+  MethodList(const MethodList& other);
+  MethodList& operator=(const MethodList& other);
+
  private:
   Method** _methods;
   unsigned int _length;
@@ -83,8 +91,7 @@ class MethodList {
 class Method {
  public:
   virtual const char* name() const = 0;
-  virtual RuntimeType returnType() const = 0;
-  virtual Parameter* parameterAt(long i) const = 0;
+
   virtual long numParameters() const = 0;
 
   virtual ~Method(){};
@@ -94,7 +101,7 @@ class Class {
  public:
   virtual const char* name() const = 0;
 
-  virtual MethodList* methodsNamed(const char* name) const = 0;
+  virtual MethodList methodsNamed(const char* name) const = 0;
 
   virtual Constructor* constructorAt(long i) const = 0;
   virtual long numConstructors() const = 0;
@@ -111,6 +118,9 @@ class Instance {
   static Instance* createBindingForLanguageInstance(BindingLanguage language,
                                                     void* instance);
 
+  static Object createRuntimeObject(BindingLanguage language,
+                                    void* myInterface);
+
   // These functions are called before and after the main entry points into
   // the native implementations.  They can be used to establish and cleanup
   // any needed state.
@@ -125,7 +135,7 @@ class Instance {
                                const KJS::Value& aValue) const;
 
   virtual KJS::Value invokeMethod(KJS::ExecState* exec,
-                                  const MethodList* method,
+                                  const MethodList& method,
                                   const KJS::List& args) = 0;
 
   virtual KJS::Value defaultValue(KJS::Type hint) const = 0;

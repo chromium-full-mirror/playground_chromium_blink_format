@@ -216,7 +216,7 @@ class JavaMethod : public Method {
   };
 
   virtual const char* name() const { return _name.UTF8String(); };
-  virtual RuntimeType returnType() const { return _returnType.UTF8String(); };
+  RuntimeType returnType() const { return _returnType.UTF8String(); };
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
   virtual long numParameters() const { return _numParameters; };
 

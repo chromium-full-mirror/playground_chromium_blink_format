@@ -171,13 +171,13 @@ JavaClass* JavaClass::classForInstance(jobject instance) {
   return aClass;
 }
 
-MethodList* JavaClass::methodsNamed(const char* name) const {
+MethodList JavaClass::methodsNamed(const char* name) const {
   CFStringRef methodName =
       CFStringCreateWithCString(NULL, name, kCFStringEncodingASCII);
   MethodList* methodList =
       (MethodList*)CFDictionaryGetValue(_methods, methodName);
   CFRelease(methodName);
-  return methodList;
+  return *methodList;
 }
 
 Field* JavaClass::fieldNamed(const char* name) const {

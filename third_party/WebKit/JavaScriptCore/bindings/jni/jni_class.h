@@ -32,8 +32,6 @@
 #include <runtime.h>
 #include <jni_runtime.h>
 
-#include <runtime.h>
-
 namespace KJS {
 
 namespace Bindings {
@@ -93,7 +91,7 @@ class JavaClass : public Class {
 
   virtual const char* name() const { return _name; };
 
-  virtual MethodList* methodsNamed(const char* name) const;
+  virtual MethodList methodsNamed(const char* name) const;
 
   virtual Field* fieldNamed(const char* name) const;
 

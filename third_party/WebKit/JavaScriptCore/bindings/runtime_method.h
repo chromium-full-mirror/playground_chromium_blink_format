@@ -33,8 +33,8 @@ namespace KJS {
 class RuntimeMethodImp : public FunctionImp {
  public:
   RuntimeMethodImp(ExecState* exec,
-                   const Identifier& n = Identifier::null(),
-                   Bindings::MethodList* methodList = 0);
+                   const Identifier& n,
+                   Bindings::MethodList& methodList);
 
   virtual ~RuntimeMethodImp();
 
@@ -48,7 +48,7 @@ class RuntimeMethodImp : public FunctionImp {
   virtual Completion execute(ExecState* exec);
 
  private:
-  Bindings::MethodList* _methodList;
+  Bindings::MethodList _methodList;
 };
 
 }  // namespace KJS
