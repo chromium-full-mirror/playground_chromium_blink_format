@@ -33,6 +33,7 @@
 #include <qptrlist.h>
 #include <qobject.h>
 #include <qdict.h>
+#include <qptrdict.h>
 #include <qmap.h>
 #include <qdatetime.h>
 
@@ -117,6 +118,25 @@ class StyleSheetImpl;
 class StyleSheetListImpl;
 class TextImpl;
 class TreeWalkerImpl;
+
+// A range of a node within a document that is "marked", such as being
+// misspelled
+struct DocumentMarker {
+  enum MarkerType {
+    Spelling
+    // Not doing grammar yet, but this is a placeholder for it
+    // Grammar
+  };
+
+  enum MarkerType type;
+  ulong startOffset, endOffset;
+
+  bool operator==(const DocumentMarker& o) const {
+    return type == o.type && startOffset == o.startOffset &&
+           endOffset == o.endOffset;
+  }
+  bool operator!=(const DocumentMarker& o) const { return !(*this == o); }
+};
 
 class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
  public:
@@ -579,6 +599,12 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool queryCommandSupported(const DOMString& command);
   DOMString queryCommandValue(const DOMString& command);
 
+  void addMarker(Range range, enum DocumentMarker::MarkerType type);
+  void removeMarker(Range range, enum DocumentMarker::MarkerType type);
+  void addMarker(NodeImpl* node, DocumentMarker marker);
+  void removeMarker(NodeImpl* node, DocumentMarker marker);
+  QValueList<DocumentMarker> markersForNode(NodeImpl* node);
+
 #ifndef KHTML_NO_XBL
   // XBL methods
   XBL::XBLBindingManager* bindingManager() const { return m_bindingManager; }
@@ -670,6 +696,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   DOMString m_title;
 
   RenderArena* m_renderArena;
+
+  QPtrDict<QValueList<DocumentMarker>> m_markers;
 
 #if APPLE_CHANGES
   KWQAccObjectCache* m_accCache;

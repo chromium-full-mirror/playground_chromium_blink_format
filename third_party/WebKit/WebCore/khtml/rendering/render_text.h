@@ -38,6 +38,7 @@ class QFontMetrics;
 
 namespace DOM {
 class Position;
+class DocumentMarker;
 };
 
 // Define a constant for soft hyphen's unicode value.
@@ -115,6 +116,7 @@ class InlineTextBox : public InlineRunBox {
                       int ty,
                       int startPos,
                       int endPos);
+  void paintMarker(QPainter* pt, int _tx, int _ty, DOM::DocumentMarker marker);
 
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
