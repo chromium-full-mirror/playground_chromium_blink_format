@@ -333,7 +333,7 @@ ContextImp::ContextImp(Object& glob,
 
   // create and initialize activation object (ECMA 10.1.6)
   if (type == FunctionCode || type == AnonymousCode) {
-    activation = Object(new ActivationImp(exec));
+    activation = Object(new ActivationImp(this));
     variable = activation;
   } else {
     activation = Object();

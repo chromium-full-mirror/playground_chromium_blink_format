@@ -106,7 +106,7 @@ class ArgumentsImp : public ArrayInstanceImp {
 
 class ActivationImp : public ObjectImp {
  public:
-  ActivationImp(ExecState* exec);
+  ActivationImp(ContextImp*);
 
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
