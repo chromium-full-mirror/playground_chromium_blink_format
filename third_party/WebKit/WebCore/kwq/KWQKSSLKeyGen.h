@@ -34,7 +34,8 @@ class KSSLKeyGen {
   static QStringList supportedKeySizes();
   static QString signedPublicKeyAndChallengeString(
       unsigned keySizeIndex,
-      const QString& challengeString);
+      const QString& challengeString,
+      const KURL& url);
 };
 
 #endif

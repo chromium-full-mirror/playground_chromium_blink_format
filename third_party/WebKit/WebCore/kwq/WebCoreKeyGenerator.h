@@ -33,6 +33,7 @@
 - (NSArray*)strengthMenuItemTitles;
 - (NSString*)signedPublicKeyAndChallengeStringWithStrengthIndex:(unsigned)index
                                                       challenge:
-                                                          (NSString*)challenge;
+                                                          (NSString*)challenge
+                                                        pageURL:(NSURL*)pageURL;
 
 @end

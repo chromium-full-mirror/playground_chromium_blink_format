@@ -2380,7 +2380,8 @@ bool HTMLKeygenElementImpl::encoding(const QTextCodec* codec,
     return false;
   }
   QString value = KSSLKeyGen::signedPublicKeyAndChallengeString(
-      (unsigned)selectedIndex(), m_challenge.string());
+      (unsigned)selectedIndex(), m_challenge.string(),
+      getDocument()->part()->baseURL());
   if (!value.isNull()) {
     encoded_values += enc_name;
     encoded_values += value.utf8();
