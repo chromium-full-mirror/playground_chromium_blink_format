@@ -96,7 +96,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   virtual bool isMalformed() { return m_malformed; }
 
 #if APPLE_CHANGES
-  void performSubmitClick();
+  void submitClick();
 #endif
 
   static void i18nData();
