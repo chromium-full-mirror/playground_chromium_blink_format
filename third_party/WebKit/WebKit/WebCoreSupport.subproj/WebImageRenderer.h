@@ -6,9 +6,9 @@
 
 @protocol WebCoreImageRenderer;
 
-//#ifndef OMIT_TIGER_FEATURES
-//#define USE_CGIMAGEREF YES
-//#endif
+#ifndef OMIT_TIGER_FEATURES
+#define USE_CGIMAGEREF YES
+#endif
 
 #ifdef USE_CGIMAGEREF
 @class WebImageData;
@@ -17,6 +17,9 @@
   NSString* MIMEType;
 
   WebImageData* imageData;
+
+  NSImage* nsimage;
+  NSData* TIFFData;
 
   NSRect targetAnimationRect;
 
