@@ -3,12 +3,10 @@
 
     Private header.
 
-    Copyright 2001, Apple, Inc. All rights reserved.
+    Copyright 2001, 2002 Apple Computer Inc. All rights reserved.
 */
 
-#import <WebKit/IFLocationChangeHandler.h>
-#import <WebKit/IFWebControllerPolicyHandler.h>
-#import <WebFoundation/IFURLHandle.h>
+#import <Foundation/Foundation.h>
 
 @class IFDownloadHandler;
 @class IFWebDataSource;
@@ -16,13 +14,13 @@
 @protocol IFResourceProgressHandler;
 
 @interface IFMainURLHandleClient : NSObject<IFURLHandleClient> {
-  NSURL* url;
-  id dataSource;
+  NSURL* currentURL;
+  IFWebDataSource* dataSource;
   BOOL processedBufferedData;
   BOOL isFirstChunk;
   IFDownloadHandler* downloadHandler;
   id<IFResourceProgressHandler> downloadProgressHandler;
 }
-- initWithDataSource:(IFWebDataSource*)ds;
+- initWithDataSource:(IFWebDataSource*)dataSource;
 - (IFDownloadHandler*)downloadHandler;
 @end
