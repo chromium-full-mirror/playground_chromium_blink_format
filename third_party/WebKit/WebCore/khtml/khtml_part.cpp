@@ -1983,6 +1983,11 @@ void KHTMLPart::scheduleRedirection(double delay,
   }
 }
 
+bool KHTMLPart::isImmediateRedirectPending() {
+  return d->m_scheduledRedirection != noRedirectionScheduled &&
+         d->m_delayRedirect == 0;
+}
+
 void KHTMLPart::scheduleHistoryNavigation(int steps) {
   d->m_scheduledRedirection = historyNavigationScheduled;
   d->m_delayRedirect = 0;

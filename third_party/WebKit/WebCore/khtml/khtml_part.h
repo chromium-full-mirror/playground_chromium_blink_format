@@ -405,6 +405,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                            bool lockHistory = true,
                            bool userGesture = false);
 
+  bool isImmediateRedirectPending() const;
+
   /**
    * Schedules a history navigation operation (go forward, go back, etc.).
    * This is used for JavaScript-triggered location changes.
