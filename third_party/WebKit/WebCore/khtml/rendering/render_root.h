@@ -74,6 +74,8 @@ class RenderRoot : public RenderFlow {
                    int _tx,
                    int _ty,
                    PaintAction paintAction);
+  virtual void
+  paintBoxDecorations(QPainter*, int x, int y, int w, int h, int tx, int ty);
 
   virtual void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
   virtual void clearSelection(bool doRepaint = true);
