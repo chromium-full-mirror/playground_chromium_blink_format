@@ -355,7 +355,9 @@ void HTMLElementImpl::addHTMLColor(int id, const DOMString& c) {
 void HTMLElementImpl::removeCSSProperty(int id) {
   if (!m_styleDecls)
     return;
+  m_styleDecls->parent()->deref();
   m_styleDecls->setParent(getDocument()->elementSheet());
+  m_styleDecls->parent()->ref();
   m_styleDecls->removeProperty(id);
   setChanged();
 }
