@@ -172,10 +172,10 @@ class QString {
 
   // assignment operators ----------------------------------------------------
 
-  QString& operator=(QChar);
   QString& operator=(const QString&);
-  QString& operator=(const char*);
   QString& operator=(const QCString&);
+  QString& operator=(const char*);
+  QString& operator=(QChar);
   QString& operator=(char);
 
   // member functions --------------------------------------------------------
