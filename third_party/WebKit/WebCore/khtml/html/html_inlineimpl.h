@@ -35,7 +35,7 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
   HTMLAnchorElementImpl(DocumentPtr* doc);
   ~HTMLAnchorElementImpl();
 
-  virtual bool isSelectable() const;
+  virtual bool isFocusable() const;
   virtual Id id() const;
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);

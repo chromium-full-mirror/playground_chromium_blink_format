@@ -50,7 +50,7 @@ HTMLAnchorElementImpl::HTMLAnchorElementImpl(DocumentPtr* doc)
 
 HTMLAnchorElementImpl::~HTMLAnchorElementImpl() {}
 
-bool HTMLAnchorElementImpl::isSelectable() const {
+bool HTMLAnchorElementImpl::isFocusable() const {
   return m_hasAnchor && m_render && m_render->style() &&
          m_render->style()->visibility() == VISIBLE;
 }
