@@ -154,6 +154,7 @@ class RenderLayer {
 #if APPLE_CHANGES
   bool isTransparent();
   RenderLayer* transparentAncestor();
+  void beginTransparencyLayers(QPainter* p);
 #endif
 
   RenderLayer* root() {
@@ -293,6 +294,7 @@ class RenderLayer {
   void paintLayer(RenderLayer* rootLayer,
                   QPainter* p,
                   const QRect& paintDirtyRect,
+                  bool haveTransparency = false,
                   bool selectionOnly = false);
   RenderLayer* nodeAtPointForLayer(RenderLayer* rootLayer,
                                    RenderObject::NodeInfo& info,
@@ -336,7 +338,6 @@ class RenderLayer {
   // The width/height of our scrolled area.
   short m_scrollWidth;
   int m_scrollHeight;
-  bool m_scrollDimensionsDirty;
 
   // For layers with overflow, we have a pair of scrollbars.
   QScrollBar* m_hBar;
@@ -352,7 +353,15 @@ class RenderLayer {
   // z-indices.
   QPtrVector<RenderLayer>* m_posZOrderList;
   QPtrVector<RenderLayer>* m_negZOrderList;
-  bool m_zOrderListsDirty;
+
+  bool m_scrollDimensionsDirty : 1;
+  bool m_zOrderListsDirty : 1;
+#if APPLE_CHANGES
+  bool m_usedTransparency : 1;  // Tracks whether we need to close a transparent
+                                // layer, i.e., whether
+// we ended up painting this layer or any descendants (and therefore need to
+// blend).
+#endif
 
   Marquee* m_marquee;  // Used by layers with overflow:marquee
 };

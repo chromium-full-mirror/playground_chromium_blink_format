@@ -82,11 +82,11 @@ class QColor {
 };
 
 inline bool operator==(const QColor& a, const QColor& b) {
-  return a.color == b.color;
+  return a.color == b.color && a.valid == b.valid;
 }
 
 inline bool operator!=(const QColor& a, const QColor& b) {
-  return a.color != b.color;
+  return a.color != b.color || a.valid != b.valid;
 }
 
 #endif
