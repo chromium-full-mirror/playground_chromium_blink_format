@@ -1138,6 +1138,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 #ifdef APPLE_CHANGES
  public:
   void setTitle(const DOM::DOMString&);
+  void detachView();
 
   KWQKHTMLPartImpl* impl;
   friend class KWQKHTMLPartImpl;

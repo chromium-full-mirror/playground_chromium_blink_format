@@ -247,6 +247,7 @@ KHTMLView::~KHTMLView() {
     killTimer(d->repaintTimerId);
     d->timerId = 0;
     d->repaintTimerId = 0;
+    m_part->detachView();
     m_part->deref();
 #endif
   }
