@@ -1329,6 +1329,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
       // proportional font, needs a bit more work.
       int lastSpace = pos;
       bool isPre = o->style()->whiteSpace() == PRE;
+      int wordSpacing = o->style()->wordSpacing();
 
       // QChar space[1]; space[0] = ' ';
       // int spaceWidth = f->width(space, 1, 0);
@@ -1344,6 +1345,7 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
         if (isPre || !sawSpace)
           isLineEmpty = false;
 
+        bool applyWordSpacing = false;
         if ((isPre && str[pos] == '\n') ||
             (!isPre && isBreakable(str, pos, strlen))) {
           if (ignoringSpaces) {
@@ -1364,6 +1366,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
             if (sawSpace && !oldSawSpace)
               lastSpacePos = pos;
             tmpW += t->width(lastSpace, pos - lastSpace, f);
+            applyWordSpacing =
+                (wordSpacing && sawSpace && !oldSawSpace &&
+                 t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
           }
 
 #ifdef DEBUG_LINEBREAKS
@@ -1402,6 +1407,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
           w += tmpW;
           tmpW = 0;
           lastSpace = pos;
+
+          if (applyWordSpacing)
+            w += wordSpacing;
 
           if (!ignoringSpaces && !isPre) {
             // If we encounter a newline, or if we encounter a
