@@ -101,13 +101,17 @@ class JavaConstructor : public Constructor {
 
   ~JavaConstructor() { delete _parameters; };
 
-  JavaConstructor(const JavaConstructor& other) : Constructor() {
+  void _commonCopy(const JavaConstructor& other) {
     _numParameters = other._numParameters;
     _parameters = new JavaParameter[_numParameters];
     long i;
     for (i = 0; i < _numParameters; i++) {
       _parameters[i] = other._parameters[i];
     }
+  }
+
+  JavaConstructor(const JavaConstructor& other) : Constructor() {
+    _commonCopy(other);
   };
 
   JavaConstructor& operator=(const JavaConstructor& other) {
@@ -116,12 +120,7 @@ class JavaConstructor : public Constructor {
 
     delete _parameters;
 
-    _numParameters = other._numParameters;
-    _parameters = new JavaParameter[_numParameters];
-    long i;
-    for (i = 0; i < _numParameters; i++) {
-      _parameters[i] = other._parameters[i];
-    }
+    _commonCopy(other);
 
     return *this;
   }
@@ -160,7 +159,7 @@ class JavaField : public Field {
   }
 
   virtual const char* name() const { return _name->characters(); }
-  virtual const char* type() const { return _type->characters(); }
+  virtual RuntimeType type() const { return _type->characters(); }
 
  private:
   JavaString* _name;
