@@ -51,6 +51,8 @@ class ScheduledAction;
 @class NSView;
 @class WebCoreBridge;
 @class KWQPageState;
+@class NSString;
+@class NSArray;
 @class NSMutableDictionary;
 @class WebCoreDOMElement;
 #else
@@ -60,6 +62,8 @@ class NSResponder;
 class NSView;
 class WebCoreBridge;
 class KWQPageState;
+class NSString;
+class NSArray;
 class NSMutableDictionary;
 class WebCoreDOMElement;
 #endif
@@ -201,6 +205,11 @@ class KWQKHTMLPart : public KHTMLPart {
                        const QString& value,
                        DOM::HTMLFormElementImpl* element);
   DOM::HTMLFormElementImpl* currentForm() const;
+
+  NSString* searchForLabelsBeforeElement(NSArray* labels,
+                                         DOM::ElementImpl* element);
+  NSString* matchLabelsAgainstElement(NSArray* labels,
+                                      DOM::ElementImpl* element);
 
   void setSettings(KHTMLSettings* s);
 
