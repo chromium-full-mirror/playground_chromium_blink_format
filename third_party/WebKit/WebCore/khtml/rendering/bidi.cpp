@@ -1543,8 +1543,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
       tmpW += o->marginLeft() + o->borderLeft() + o->paddingLeft() +
               o->marginRight() + o->borderRight() + o->paddingRight();
     } else if (o->isReplaced()) {
-      if (o->style()->whiteSpace() != NOWRAP ||
-          last->style()->whiteSpace() != NOWRAP) {
+      if (o->style()->whiteSpace() == NORMAL ||
+          last->style()->whiteSpace() == NORMAL) {
         w += tmpW;
         tmpW = 0;
         lBreak.obj = o;
@@ -1648,7 +1648,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
           applyWordSpacing =
               (wordSpacing && currentCharacterIsSpace &&
                !previousCharacterIsSpace &&
-               t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
+               !t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
 
 #ifdef DEBUG_LINEBREAKS
           kdDebug(6041) << "found space at " << pos << " in string '"
@@ -1762,9 +1762,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
     RenderObject* next = Bidinext(start.par, o);
     bool isNormal = o->style()->whiteSpace() == NORMAL;
     bool checkForBreak = isNormal;
-    if (o->style()->whiteSpace() == NOWRAP && last &&
-        last->style()->whiteSpace() == NORMAL && w + tmpW > width + 1 &&
-        lBreak.obj == last)
+    if (w && w + tmpW > width + 1 && lBreak.obj &&
+        o->style()->whiteSpace() == NOWRAP)
       checkForBreak = true;
     else if (next && o->isText() && next->isText() && !next->isBR()) {
       if (isNormal || (next->style()->whiteSpace() == NORMAL)) {
@@ -1836,7 +1835,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
     o = next;
 
     if (!last->isFloatingOrPositioned() && last->isReplaced() &&
-        last->style()->whiteSpace() != NOWRAP) {
+        last->style()->whiteSpace() == NORMAL) {
       // Go ahead and add in tmpW.
       w += tmpW;
       tmpW = 0;
