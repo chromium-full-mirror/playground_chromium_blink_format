@@ -24,6 +24,7 @@
 #include "object.h"
 #include "reference_list.h"
 
+#define DEBUG_PROPERTIES 0
 #define DO_CONSISTENCY_CHECK 0
 #define DUMP_STATISTICS 0
 #define USE_SINGLE_ENTRY 1
@@ -74,9 +75,7 @@ class SavedProperty {
 SavedProperties::SavedProperties() : _count(0), _properties(0) {}
 
 SavedProperties::~SavedProperties() {
-  if (_properties) {
-    delete[] _properties;
-  }
+  delete[] _properties;
 }
 
 // Algorithm concepts from Algorithms in C++, Sedgewick.
@@ -181,7 +180,7 @@ ValueImp* PropertyMap::get(const Identifier& name) const {
   return 0;
 }
 
-#ifdef DEBUG_PROPERTIES
+#if DEBUG_PROPERTIES
 static void printAttributes(int attributes) {
   if (attributes == 0)
     printf("None ");
@@ -203,7 +202,7 @@ void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
 
   UString::Rep* rep = name._ustring.rep;
 
-#ifdef DEBUG_PROPERTIES
+#if DEBUG_PROPERTIES
   printf("adding property %s, attributes = 0x%08x (", name.ascii(), attributes);
   printAttributes(attributes);
   printf(")\n");
@@ -430,43 +429,44 @@ void PropertyMap::save(SavedProperties& p) const {
 
   if (!_table) {
 #if USE_SINGLE_ENTRY
-    if (_singleEntry.key)
+    if (_singleEntry.key &&
+        !(_singleEntry.attributes & (ReadOnly | DontEnum | Function)))
       ++count;
 #endif
   } else {
     for (int i = 0; i != _table->size; ++i)
       if (_table->entries[i].key &&
-          (_table->entries[i].attributes == 0 ||
-           _table->entries[i].attributes == (DontDelete | Internal)))
-        // if (_table->entries[i].key)
+          !(_table->entries[i].attributes & (ReadOnly | DontEnum | Function)))
         ++count;
   }
 
   delete[] p._properties;
+
+  p._count = count;
+
   if (count == 0) {
     p._properties = 0;
     return;
   }
 
   p._properties = new SavedProperty[count];
-  p._count = count;
 
   SavedProperty* prop = p._properties;
 
   if (!_table) {
 #if USE_SINGLE_ENTRY
-    if (_singleEntry.key) {
+    if (_singleEntry.key &&
+        !(_singleEntry.attributes & (ReadOnly | DontEnum | Function))) {
       prop->key = Identifier(_singleEntry.key);
       prop->value = Value(_singleEntry.value);
+      prop->attributes = _singleEntry.attributes;
       ++prop;
     }
 #endif
   } else {
     for (int i = 0; i != _table->size; ++i) {
       if (_table->entries[i].key &&
-          (_table->entries[i].attributes == 0 ||
-           _table->entries[i].attributes == (DontDelete | Internal))) {
-        // if (_table->entries[i].key) {
+          !(_table->entries[i].attributes & (ReadOnly | DontEnum | Function))) {
         prop->key = Identifier(_table->entries[i].key);
         prop->value = Value(_table->entries[i].value);
         prop->attributes = _table->entries[i].attributes;
@@ -477,10 +477,9 @@ void PropertyMap::save(SavedProperties& p) const {
 }
 
 void PropertyMap::restore(const SavedProperties& p) {
-  for (int i = 0; i != p._count; ++i) {
+  for (int i = 0; i != p._count; ++i)
     put(p._properties[i].key, p._properties[i].value.imp(),
         p._properties[i].attributes);
-  }
 }
 
 #if DO_CONSISTENCY_CHECK
