@@ -2233,10 +2233,9 @@ bool KHTMLPart::findTextNext(const QString& str,
             ->posOfChar(d->m_findPos, x, y);
         d->m_view->setContentsPos(x - 50, y - 50);
 #endif
-        Selection s = selection();
-        s.moveTo(d->m_findNode, d->m_findPos, d->m_findNode,
-                 d->m_findPos + matchLen);
-        setSelection(s);
+        Position p1(d->m_findNode, d->m_findPos);
+        Position p2(d->m_findNode, d->m_findPos + matchLen);
+        setSelection(Selection(p1, p2));
         return true;
       }
     }
@@ -2552,10 +2551,10 @@ void KHTMLPart::setFocusNodeIfNeeded(const Selection& s) {
   if (!xmlDocImpl() || s.state() == Selection::NONE)
     return;
 
-  NodeImpl* n = s.startNode();
+  NodeImpl* n = s.start().node();
   NodeImpl* target = n->isContentEditable() ? n : 0;
   if (!target) {
-    while (n != s.endNode()) {
+    while (n != s.end().node()) {
       if (n->isContentEditable()) {
         target = n;
         break;
@@ -2585,7 +2584,7 @@ void KHTMLPart::notifySelectionChanged(bool endTyping) {
   // see if a new caret blink timer needs to be started
   if (d->m_caretVisible && d->m_caretBlinks &&
       d->m_selection.state() == Selection::CARET &&
-      d->m_selection.startNode()->isContentEditable()) {
+      d->m_selection.start().node()->isContentEditable()) {
     d->m_caretBlinkTimer = startTimer(CARET_BLINK_FREQUENCY);
     d->m_caretPaint = true;
     d->m_selection.needsCaretRepaint();
@@ -4483,18 +4482,18 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
     return false;
   }
 
-  DOM::NodeImpl* n = d->m_selection.startNode();
+  DOM::NodeImpl* n = d->m_selection.start().node();
   while (n) {
     if (n == pos.node()) {
-      if ((n == d->m_selection.startNode() &&
-           pos.offset() < d->m_selection.startOffset()) ||
-          (n == d->m_selection.endNode() &&
-           pos.offset() > d->m_selection.endOffset())) {
+      if ((n == d->m_selection.start().node() &&
+           pos.offset() < d->m_selection.start().offset()) ||
+          (n == d->m_selection.end().node() &&
+           pos.offset() > d->m_selection.end().offset())) {
         return false;
       }
       return true;
     }
-    if (n == d->m_selection.endNode()) {
+    if (n == d->m_selection.end().node()) {
       break;
     }
     DOM::NodeImpl* next = n->firstChild();
@@ -4804,7 +4803,7 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   }
 #endif
 
-  sel.setExtent(pos.node(), pos.offset());
+  sel.setExtent(pos);
 
 #if APPLE_CHANGES
   if (d->m_textElement != Selection::CHARACTER) {
@@ -4873,8 +4872,8 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
       d->m_selection.state() == Selection::RANGE &&
       d->m_textElement == Selection::CHARACTER) {
     Selection selection;
-    if (isEditingAtNode(d->m_selection.baseNode()))
-      selection.moveTo(d->m_selection.baseNode()->positionForCoordinates(
+    if (isEditingAtNode(d->m_selection.base().node()))
+      selection.moveTo(d->m_selection.base().node()->positionForCoordinates(
           event->x(), event->y()));
     setSelection(selection);
   }
@@ -5074,7 +5073,8 @@ void KHTMLPart::selectAll() {
     return;
   Q_ASSERT(first->renderer());
   Q_ASSERT(last->renderer());
-  Selection selection(first, 0, last, last->nodeValue().length());
+  Selection selection(Position(first, 0),
+                      Position(last, last->nodeValue().length()));
   setSelection(selection);
 }
 
