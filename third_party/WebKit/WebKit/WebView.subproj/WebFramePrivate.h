@@ -252,5 +252,6 @@ extern NSString* WebPageCacheDocumentViewKey;
 - (NSArray*)_internalChildFrames;
 
 - (BOOL)_isDescendantOfFrame:(WebFrame*)frame;
+- (BOOL)_isFrameSet;
 
 @end
