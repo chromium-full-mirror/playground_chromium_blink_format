@@ -236,6 +236,8 @@ class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
 
   virtual Id id() const;
 
+  virtual bool isFocusable() const;
+
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 
@@ -349,6 +351,8 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
   HTMLLabelElementImpl(DocumentPtr* doc);
   virtual ~HTMLLabelElementImpl();
 
+  virtual bool isFocusable() const;
+
   virtual Id id() const;
 
   virtual void parseAttribute(AttributeImpl* attr);
@@ -368,6 +372,8 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
  public:
   HTMLLegendElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   virtual ~HTMLLegendElementImpl();
+
+  virtual bool isFocusable() const;
 
   virtual Id id() const;
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -496,6 +502,8 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual Id id() const;
   DOMString type() const;
 
+  virtual bool isFocusable() const;
+
   virtual NodeImpl* insertBefore(NodeImpl* newChild,
                                  NodeImpl* refChild,
                                  int& exceptioncode);
@@ -517,6 +525,8 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
 
  public:
   HTMLOptionElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
+
+  virtual bool isFocusable() const;
 
   virtual Id id() const;
   DOMString type() const;

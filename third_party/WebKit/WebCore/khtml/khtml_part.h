@@ -749,6 +749,9 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   bool isPointInsideSelection(int x, int y);
 
+  virtual bool tabsToLinks() const;
+  virtual bool tabsToAllControls() const;
+
   /**
    * @internal
    */

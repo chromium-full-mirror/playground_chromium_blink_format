@@ -5471,5 +5471,13 @@ int KHTMLPart::topLevelFrameCount() {
   return frameCount;
 }
 
+bool KHTMLPart::tabsToLinks() const {
+  return true;
+}
+
+bool KHTMLPart::tabsToAllControls() const {
+  return true;
+}
+
 using namespace KParts;
 #include "khtml_part.moc"
