@@ -90,6 +90,11 @@ class Collector {
    */
   static bool collecting;
 #endif
+#ifdef APPLE_CHANGES
+  static int numInterpreters();
+  static int numGCNotAllowedObjects();
+  static int numReferencedObjects();
+#endif
  private:
   static CollectorBlock* root;
   static CollectorBlock* currentBlock;
