@@ -223,7 +223,7 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
 
  protected:
   DOMString m_value;
-  QString m_currValue;
+  DOMString m_currValue;
   typeEnum m_type : 2;
   bool m_dirty : 1;
   bool m_activeSubmit : 1;
@@ -377,6 +377,8 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
+  virtual void accessKeyAction();
 
   /**
    * the form element this label is associated to.
