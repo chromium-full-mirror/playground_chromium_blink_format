@@ -167,7 +167,7 @@ void NPN_InitializeVariantWithVariant(NPVariant* destination,
         Undefined                   NPVariant (with type NPVariantUndefinedType)
         Null                        NPVariant (with type NPVariantNullType)
         Object (including Array)    NPVariant (with type NPVariantObjectType,
-   objectValue will be a NPObject)
+objectValue will be a NPObject)
         Object (NPObject wrapper)   NPVariant (with type NPVariantObjectType)
 
 
@@ -179,8 +179,13 @@ void NPN_InitializeVariantWithVariant(NPVariant* destination,
         NPVariant (with type NPVariantUndefinedType)          Undefined
         NPVariant (with type NPVariantNullType)               Null
         NPArray                                               Array (restricted)
+<<<<<<< npruntime.h
+        NPObject                                               Object or
+(NPObject wrapper)
+=======
         NObject                                               Object or
-   (NPObject wrapper)
+(NPObject wrapper)
+>>>>>>> 1.18
 
 */
 
