@@ -26,4 +26,6 @@
 #ifndef QWIDGET_H_
 #define QWIDGET_H_
 
+class QWidget {};
+
 #endif

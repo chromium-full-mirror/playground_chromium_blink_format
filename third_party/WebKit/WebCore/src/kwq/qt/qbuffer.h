@@ -26,6 +26,6 @@
 #ifndef QBUFFER_H_
 #define QBUFFER_H_
 
-class QBuffer;
+class QBuffer {};
 
 #endif

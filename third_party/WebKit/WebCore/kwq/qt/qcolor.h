@@ -31,6 +31,9 @@ class QColor {
   int red() const;
   int green() const;
   int blue() const;
+
+  bool operator==(const QColor& x) const;
+  bool operator!=(const QColor& x) const;
 };
 
 #endif

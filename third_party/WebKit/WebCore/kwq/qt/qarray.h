@@ -26,4 +26,6 @@
 #ifndef QARRAY_H_
 #define QARRAY_H_
 
+class QByteArray {};
+
 #endif

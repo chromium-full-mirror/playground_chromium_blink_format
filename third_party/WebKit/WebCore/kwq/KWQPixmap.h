@@ -26,6 +26,6 @@
 #ifndef QPIXMAP_H_
 #define QPIXMAP_H_
 
-class QPixmap;
+class QPixmap {};
 
 #endif
