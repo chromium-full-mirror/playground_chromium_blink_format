@@ -16,6 +16,16 @@
   z_stream _stream;
   BOOL _streamInitialized;
 
-  BOOL _failed;
+  BOOL _decodedHeader;
+  unsigned _modificationTime;
+  NSString* _filename;
+
+  unsigned _size;
+  unsigned _CRC32;
+
+  BOOL _finishedInflating;
+
+  unsigned char _trailingBytes[8];
+  int _trailingBytesLength;
 }
 @end
