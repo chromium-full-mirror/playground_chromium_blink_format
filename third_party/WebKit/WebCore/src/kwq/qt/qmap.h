@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qmap.h>
+#else
+
 #include <KWQDef.h>
 
 // class QMapIterator ==========================================================
@@ -172,5 +178,7 @@ class QMap {
 
 };  // class QMap
     // ===============================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif
