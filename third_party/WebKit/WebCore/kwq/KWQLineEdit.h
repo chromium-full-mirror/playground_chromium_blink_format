@@ -81,6 +81,7 @@ class QLineEdit : public QWidget {
   void setAutoSaveName(const QString& name);
   void setMaxResults(int maxResults);
   void setPlaceholderString(const QString& placeholder);
+  void addSearchResult();
 
  private:
   KWQSignal m_returnPressed;
