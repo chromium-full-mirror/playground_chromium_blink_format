@@ -1588,7 +1588,7 @@ void RenderObject::setStyle(RenderStyle* style) {
 }
 
 QRect RenderObject::viewRect() const {
-  return containingBlock()->viewRect();
+  return canvas()->viewRect();
 }
 
 bool RenderObject::absolutePosition(int& xPos, int& yPos, bool f) {

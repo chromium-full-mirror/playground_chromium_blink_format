@@ -93,7 +93,6 @@ class CSSStyleSelector : public StyleSelector {
   CSSStyleSelector(DOM::DocumentImpl* doc,
                    QString userStyleSheet,
                    DOM::StyleSheetListImpl* styleSheets,
-                   const KURL& url,
                    bool _strictParsing);
   /**
    * same as above but for a single stylesheet.
@@ -117,11 +116,13 @@ class CSSStyleSelector : public StyleSelector {
   bool canShareStyleWithElement(DOM::NodeImpl* e);
 
   bool strictParsing;
+
   struct Encodedurl {
     QString host;  // also contains protocol
     QString path;
     QString file;
   } encodedurl;
+  void setEncodedURL(const KURL& url);
 
   // Given a CSS keyword in the range (xx-small to -khtml-xxx-large), this
   // function will return
