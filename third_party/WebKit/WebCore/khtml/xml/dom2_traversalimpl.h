@@ -115,6 +115,7 @@ class NodeIteratorImpl : public TraversalImpl {
     m_beforeReferenceNode = flag;
   }
   bool detached() const { return m_detached; }
+  void setDetached(bool flag = true) { m_detached = flag; }
   DocumentImpl* document() const { return m_doc; }
   void setDocument(DocumentImpl*);
 
