@@ -1031,17 +1031,6 @@ class RenderStyle {
   const QColor& outlineColor() const { return background->outline.color; }
 
   EOverflow overflow() const { return noninherited_flags._overflow; }
-  bool hidesOverflow() const { return overflow() != OVISIBLE; }
-  bool hasAutoScrollbars() const {
-    return overflow() == OAUTO || overflow() == OOVERLAY;
-  }
-  bool scrollsOverflow() const {
-    return overflow() == OSCROLL || hasAutoScrollbars();
-  }
-  bool includeScrollbarSize() const {
-    return overflow() == OSCROLL || overflow() == OAUTO;
-  }
-
   EVisibility visibility() const { return inherited_flags._visibility; }
   EVerticalAlign verticalAlign() const {
     return noninherited_flags._vertical_align;
@@ -1469,9 +1458,12 @@ class RenderStyle {
   enum Diff { Equal, NonVisible = Equal, Visible, Position, Layout, CbLayout };
   Diff diff(const RenderStyle* other) const;
 
+  bool isDisplayReplacedType() {
+    return display() == INLINE_BLOCK || display() == INLINE_BOX ||
+           display() == INLINE_TABLE;
+  }
   bool isDisplayInlineType() {
-    return display() == INLINE || display() == INLINE_BLOCK ||
-           display() == INLINE_BOX || display() == INLINE_TABLE;
+    return display() == INLINE || isDisplayReplacedType();
   }
   bool isOriginalDisplayInlineType() {
     return originalDisplay() == INLINE || originalDisplay() == INLINE_BLOCK ||

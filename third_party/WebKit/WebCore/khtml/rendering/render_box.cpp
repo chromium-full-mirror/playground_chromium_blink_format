@@ -86,6 +86,15 @@ void RenderBox::setStyle(RenderStyle* _style) {
         setRelPositioned(true);
   }
 
+  // FIXME: Note that we restrict overflow to blocks for now.  One day table
+  // bodies and cells
+  // will need to support overflow.
+  // We also deal with the body scroll quirk here, since it sets the scrollbars
+  // for the document.
+  if (_style->overflow() != OVISIBLE && isBlockFlow() && !isTableCell() &&
+      (!document()->isHTMLDocument() || !isBody()))
+    setHasOverflowClip();
+
   if (requiresLayer()) {
     if (!m_layer) {
       m_layer = new (renderArena()) RenderLayer(this);
@@ -134,7 +143,7 @@ int RenderBox::contentWidth() const {
   int w = m_width - borderLeft() - borderRight();
   w -= paddingLeft() + paddingRight();
 
-  if (style()->includeScrollbarSize() && m_layer)
+  if (includeScrollbarSize())
     w -= m_layer->verticalScrollbarWidth();
 
   // kdDebug( 6040 ) << "RenderBox::contentWidth(2) = " << w << endl;
@@ -145,7 +154,7 @@ int RenderBox::contentHeight() const {
   int h = m_height - borderTop() - borderBottom();
   h -= paddingTop() + paddingBottom();
 
-  if (style()->includeScrollbarSize() && m_layer)
+  if (includeScrollbarSize())
     h -= m_layer->horizontalScrollbarHeight();
 
   return h;
@@ -556,7 +565,7 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
     f = true;
   RenderObject* o = container();
   if (o && o->absolutePosition(xPos, yPos, f)) {
-    if (o->style()->hidesOverflow() && o->layer())
+    if (o->hasOverflowClip())
       o->layer()->subtractScrollOffset(xPos, yPos);
 
     if (!isInline() || isReplaced())
@@ -657,10 +666,10 @@ void RenderBox::computeAbsoluteRepaintRect(QRect& r, bool f) {
 
   RenderObject* o = container();
   if (o) {
-    // <body> may not have a layer, since it might be applying its overflow
+    // <body> may not have overflow, since it might be applying its overflow
     // value to the
     // scrollbars.
-    if (o->style()->hidesOverflow() && o->layer()) {
+    if (o->hasOverflowClip()) {
       // o->height() is inaccurate if we're in the middle of a layout of |o|, so
       // use the
       // layer's size instead.  Even if the layer's size is wrong, the layer
@@ -1395,7 +1404,7 @@ void RenderBox::calcAbsoluteVertical() {
   if (m_height < h + pab)  // content must still fit
     m_height = h + pab;
 
-  if (style()->hidesOverflow() && m_height > h + pab)
+  if (hasOverflowClip() && m_height > h + pab)
     m_height = h + pab;
 
   // Do not allow the height to be negative.  This can happen when someone

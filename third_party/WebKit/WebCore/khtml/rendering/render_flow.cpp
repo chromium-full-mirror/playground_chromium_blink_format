@@ -417,7 +417,7 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
 int RenderFlow::lowestPosition(bool includeOverflowInterior,
                                bool includeSelf) const {
   int bottom = RenderBox::lowestPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return bottom;
 
   // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -441,7 +441,7 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
   int right =
       RenderBox::rightmostPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return right;
 
   // FIXME: Come up with a way to use the layer tree to avoid visiting all the
@@ -464,7 +464,7 @@ int RenderFlow::rightmostPosition(bool includeOverflowInterior,
 int RenderFlow::leftmostPosition(bool includeOverflowInterior,
                                  bool includeSelf) const {
   int left = RenderBox::leftmostPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return left;
 
   // FIXME: Come up with a way to use the layer tree to avoid visiting all the

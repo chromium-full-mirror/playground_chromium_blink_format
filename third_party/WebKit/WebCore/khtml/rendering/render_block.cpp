@@ -66,8 +66,9 @@ RenderBlock::~RenderBlock() {
 }
 
 void RenderBlock::setStyle(RenderStyle* _style) {
+  setReplaced(_style->isDisplayReplacedType());
+
   RenderFlow::setStyle(_style);
-  setReplaced(style()->display() == INLINE_BLOCK);
 
   m_pre = false;
   if (_style->whiteSpace() == PRE)
@@ -326,15 +327,6 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   }
 }
 
-bool RenderBlock::requiresLayer() {
-  // FIXME: The bogus table cell check is only here until we figure out how to
-  // position
-  // table cells properly when they have layers.
-  // Note that we also restrict overflow to blocks for now.
-  return !isTableCell() && (RenderObject::requiresLayer() ||
-                            (style()->hidesOverflow() && !isBody()));
-}
-
 bool RenderBlock::isSelfCollapsingBlock() const {
   // We are not self-collapsing if we
   // (a) have a non-zero height according to layout (an optimization to avoid
@@ -464,7 +456,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
       m_maxBottomPosMargin = m_maxBottomNegMargin = 0;
   }
 
-  if (style()->scrollsOverflow() && m_layer) {
+  if (scrollsOverflow()) {
     // For overflow:scroll blocks, ensure we have both scrollbars in place
     // always.
     if (style()->overflow() == OSCROLL) {
@@ -487,11 +479,11 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
   // Expand our intrinsic height to encompass floats.
   int toAdd = borderBottom() + paddingBottom();
-  if (style()->includeScrollbarSize() && m_layer)
+  if (includeScrollbarSize())
     toAdd += m_layer->horizontalScrollbarHeight();
   if (hasOverhangingFloats() &&
       (isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
-       style()->hidesOverflow() || (parent() && parent()->isFlexibleBox())))
+       hasOverflowClip() || (parent() && parent()->isFlexibleBox())))
     m_height = floatBottom() + toAdd;
 
   int oldHeight = m_height;
@@ -519,7 +511,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
       m_height += borderBottom() + paddingBottom();
     }
 
-    if (m_overflowHeight > m_height && !style()->hidesOverflow())
+    if (m_overflowHeight > m_height && !hasOverflowClip())
       m_height = m_overflowHeight + borderBottom() + paddingBottom();
   }
 
@@ -543,7 +535,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   // Update our scroll information if we're overflow:auto/scroll/hidden now that
   // we know if
   // we overflow or not.
-  if (style()->hidesOverflow() && m_layer)
+  if (hasOverflowClip())
     m_layer->updateScrollInfoAfterLayout();
 
   // Repaint with our new bounds if they are different from our old bounds.
@@ -571,7 +563,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     xPos = m_width - paddingRight() - borderRight();
 
   int toAdd = borderBottom() + paddingBottom();
-  if (style()->includeScrollbarSize() && m_layer)
+  if (includeScrollbarSize())
     toAdd += m_layer->horizontalScrollbarHeight();
 
   m_height = borderTop() + paddingTop();
@@ -609,10 +601,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   // For now we only worry about the top border/padding.  We will update the
   // variable's
   // value when it comes time to check against the bottom border/padding.
-  bool canCollapseWithChildren = !isCanvas() && !isRoot() && !isPositioned() &&
-                                 !isFloating() && !isTableCell() &&
-                                 !style()->hidesOverflow() &&
-                                 !isInlineBlockOrInlineTable();
+  bool canCollapseWithChildren =
+      !isCanvas() && !isRoot() && !isPositioned() && !isFloating() &&
+      !isTableCell() && !hasOverflowClip() && !isInlineBlockOrInlineTable();
   bool canCollapseTopWithChildren = canCollapseWithChildren && (m_height == 0);
 
   // If any height other than auto is specified in CSS, then we don't collapse
@@ -1134,7 +1125,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     if (child->isRenderBlock() && !child->avoidsFloats())
       prevFlow = static_cast<RenderBlock*>(child);
 
-    if (child->hasOverhangingFloats() && !child->style()->hidesOverflow()) {
+    if (child->hasOverhangingFloats() && !child->hasOverflowClip()) {
       // need to add the child's floats to our floating objects list, but not in
       // the case where
       // overflow is auto/scroll
@@ -1368,7 +1359,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   // 2. paint contents
   int scrolledX = _tx;
   int scrolledY = _ty;
-  if (style()->hidesOverflow() && m_layer)
+  if (hasOverflowClip())
     m_layer->subtractScrollOffset(scrolledX, scrolledY);
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
@@ -1709,7 +1700,7 @@ int RenderBlock::leftRelOffset(int y,
 
 int RenderBlock::rightOffset() const {
   int right = m_width - borderRight() - paddingRight();
-  if (style()->includeScrollbarSize() && m_layer)
+  if (includeScrollbarSize())
     right -= m_layer->verticalScrollbarWidth();
   return right;
 }
@@ -1782,7 +1773,7 @@ int RenderBlock::floatBottom() const {
 int RenderBlock::lowestPosition(bool includeOverflowInterior,
                                 bool includeSelf) const {
   int bottom = RenderFlow::lowestPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return bottom;
   if (includeSelf && m_overflowHeight > bottom)
     bottom = m_overflowHeight;
@@ -1822,7 +1813,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
                                    bool includeSelf) const {
   int right =
       RenderFlow::rightmostPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return right;
   if (includeSelf && m_overflowWidth > right)
     right = m_overflowWidth;
@@ -1862,7 +1853,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
 int RenderBlock::leftmostPosition(bool includeOverflowInterior,
                                   bool includeSelf) const {
   int left = RenderFlow::leftmostPosition(includeOverflowInterior, includeSelf);
-  if (!includeOverflowInterior && style()->hidesOverflow())
+  if (!includeOverflowInterior && hasOverflowClip())
     return left;
 
   // FIXME: Check left overflow when we eventually support it.
@@ -2101,7 +2092,7 @@ int RenderBlock::getClearDelta(RenderObject* child) {
 }
 
 bool RenderBlock::isPointInScrollbar(int _x, int _y, int _tx, int _ty) {
-  if (!style()->scrollsOverflow() || !m_layer)
+  if (!scrollsOverflow())
     return false;
 
   if (m_layer->verticalScrollbarWidth()) {
@@ -2144,7 +2135,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
   if (hitTestAction != HitTestSelfOnly && m_floatingObjects && !inScrollbar) {
     int stx = _tx + xPos();
     int sty = _ty + yPos();
-    if (style()->hidesOverflow() && m_layer)
+    if (hasOverflowClip())
       m_layer->subtractScrollOffset(stx, sty);
     if (isCanvas()) {
       stx += static_cast<RenderCanvas*>(this)->view()->contentsX();
@@ -2850,7 +2841,7 @@ void RenderBlock::updateFirstLetter() {
 }
 
 bool RenderBlock::inRootBlockContext() const {
-  if (isTableCell() || isFloatingOrPositioned() || style()->hidesOverflow())
+  if (isTableCell() || isFloatingOrPositioned() || hasOverflowClip())
     return false;
 
   if (isRoot() || isCanvas())
