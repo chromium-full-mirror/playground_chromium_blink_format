@@ -186,10 +186,11 @@ void HTMLNamedAttrMapImpl::parseClassAttribute(const DOMString& classStr) {
                  : DOMString(classStr.implementation()->lower()))
           : classStr;
 
-  if (classAttr.find(' ') == -1)
+  if (classAttr.find(' ') == -1 && classAttr.find('\n') == -1)
     m_classList.setString(AtomicString(classAttr));
   else {
     QString val = classAttr.string();
+    val.replace('\n', ' ');
     QStringList list = QStringList::split(' ', val);
 
     AtomicStringList* curr = 0;
