@@ -163,6 +163,9 @@ class ElementImpl : public NodeBaseImpl {
   ElementImpl(DocumentPtr* doc);
   ~ElementImpl();
 
+  // Used to quickly determine whether or not an element has a given CSS class.
+  virtual bool matchesCSSClass(const AtomicString& c, bool caseSensitive) const;
+
   DOMString getAttribute(NodeImpl::Id id) const;
   DOMString getAttribute(const DOMString& localName) const {
     return getAttributeNS(QString::null, localName);
@@ -236,7 +239,7 @@ class ElementImpl : public NodeBaseImpl {
   static Element createInstance(ElementImpl* impl);
 #endif
  protected:
-  void createAttributeMap() const;
+  virtual void createAttributeMap() const;
   void createDecl();
   DOMString openTagStartToString() const;
 
@@ -313,12 +316,14 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
       newAttribute->deref();
   }
 
+  virtual bool isHTMLAttributeMap() const;
+
  private:
   // this method is internal, does no error checking at all
   void addAttribute(AttributeImpl* newAttribute);
   // this method is internal, does no error checking at all
   void removeAttribute(NodeImpl::Id id);
-  void clearAttributes();
+  virtual void clearAttributes();
   void detachFromElement();
 
  protected:

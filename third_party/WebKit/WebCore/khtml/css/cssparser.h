@@ -25,6 +25,7 @@
 
 #include <qstring.h>
 #include <dom/dom_string.h>
+#include "dom_nameimpl.h"
 
 namespace DOM {
 class StyleListImpl;
@@ -42,6 +43,8 @@ class CSSRuleListImpl;
 struct ParseString {
   unsigned short* string;
   int length;
+
+  void lower();
 };
 
 struct Value;
@@ -66,6 +69,9 @@ static inline QString qString(const ParseString& ps) {
 }
 static inline DOMString domString(const ParseString& ps) {
   return DOMString((QChar*)ps.string, ps.length);
+}
+static inline AtomicString atomicString(const ParseString& ps) {
+  return AtomicString((AtomicChar*)ps.string, ps.length);
 }
 
 class ValueList {

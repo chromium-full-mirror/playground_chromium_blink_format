@@ -32,6 +32,21 @@ class CSSStyleDeclarationImpl;
 class HTMLFormElementImpl;
 class DocumentFragmentImpl;
 
+class HTMLNamedAttrMapImpl : public NamedAttrMapImpl {
+ public:
+  HTMLNamedAttrMapImpl(ElementImpl* e);
+
+  virtual void clearAttributes();
+
+  virtual bool isHTMLAttributeMap() const;
+
+  virtual void parseClassAttribute(const DOMString& classAttr);
+  bool matchesCSSClass(const AtomicString& c, bool caseSensitive) const;
+
+ private:
+  AtomicStringList m_classList;
+};
+
 class HTMLElementImpl : public ElementImpl {
  public:
   HTMLElementImpl(DocumentPtr* doc);
@@ -45,6 +60,9 @@ class HTMLElementImpl : public ElementImpl {
   virtual Id id() const = 0;
 
   virtual void parseAttribute(AttributeImpl* token);
+  virtual void createAttributeMap() const;
+
+  virtual bool matchesCSSClass(const AtomicString& c, bool caseSensitive) const;
 
   void addCSSLength(
       int id,

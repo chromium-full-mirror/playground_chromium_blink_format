@@ -120,6 +120,11 @@ CSSParser::~CSSParser() {
   free(data);
 }
 
+void ParseString::lower() {
+  for (int i = 0; i < length; i++)
+    string[i] = QChar(string[i]).lower();
+}
+
 void CSSParser::parseSheet(CSSStyleSheetImpl* sheet, const DOMString& string) {
   styleElement = sheet;
   defaultNamespace = anyNamespace;  // Reset the default namespace.

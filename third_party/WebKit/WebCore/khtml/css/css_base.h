@@ -108,6 +108,7 @@ class CSSSelector {
   enum Match {
     None = 0,
     Id,
+    Class,
     Exact,
     Set,
     List,
@@ -149,7 +150,7 @@ class CSSSelector {
     return _pseudoType;
   }
 
-  mutable DOM::DOMString value;
+  mutable DOM::AtomicString value;
   CSSSelector* tagHistory;
   CSSSelector* simpleSelector;  // Used for :not.
   Q_UINT32 attr;
