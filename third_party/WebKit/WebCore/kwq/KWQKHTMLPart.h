@@ -360,7 +360,6 @@ class KWQKHTMLPart : public KHTMLPart {
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
   bool dispatchDragSrcEvent(int eventId,
                             const QPoint& loc,
-                            bool declareTypes,
                             NSImage** dragImage,
                             NSPoint* dragLoc,
                             unsigned* op) const;
@@ -412,6 +411,9 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _dragSrcIsLink;
   bool _dragSrcIsImage;
   bool _dragSrcInSelection;
+  bool _dragSrcMayBeDHTML,
+      _dragSrcMayBeUA;  // Are DHTML and/or the UserAgent allowed to drag out?
+  bool _dragSrcIsDHTML;
 
   mutable DOM::Node _elementToDraw;
 };
