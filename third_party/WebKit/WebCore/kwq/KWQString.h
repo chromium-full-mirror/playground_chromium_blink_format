@@ -312,6 +312,8 @@ struct KWQStringData {
                                                   // ~15) + 14) size
 };
 
+#define QSTRING_NULL QString()
+
 class QString {
  public:
   static const char* const null;  // not a QString as in Qt (can't have static
