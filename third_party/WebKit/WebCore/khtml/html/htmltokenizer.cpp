@@ -1495,9 +1495,7 @@ void HTMLTokenizer::write(const QString& str, bool appendData) {
 
 void HTMLTokenizer::end() {
   if (buffer == 0) {
-#ifndef APPLE_CHANGES
     emit finishedParsing();
-#endif
     return;
   }
 
@@ -1514,9 +1512,7 @@ void HTMLTokenizer::end() {
   scriptCode = 0;
   scriptCodeSize = scriptCodeMaxSize = scriptCodeResync = 0;
   buffer = 0;
-#ifndef APPLE_CHANGES
   emit finishedParsing();
-#endif
 }
 
 void HTMLTokenizer::finish() {
