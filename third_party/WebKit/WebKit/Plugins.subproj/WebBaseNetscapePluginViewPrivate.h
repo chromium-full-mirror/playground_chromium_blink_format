@@ -6,10 +6,15 @@
 //  Copyright (c) 2002 Apple Computer, Inc. All rights reserved.
 //
 
-#import <WebPluginView.h>
+#import <WebBaseNetscapePluginView.h>
 
-@interface WebNetscapePluginView (WebNPPCallbacks)
+@class WebResourceRequest;
 
+@interface WebBaseNetscapePluginView (WebNPPCallbacks)
+
+- (NPError)loadRequest:(WebResourceRequest*)request
+              inTarget:(NSString*)target
+        withNotifyData:(void*)notifyData;
 - (NPError)getURLNotify:(const char*)URL
                  target:(const char*)target
              notifyData:(void*)notifyData;
