@@ -4,20 +4,13 @@
 */
 
 #import <Foundation/Foundation.h>
-#import "npapi.h"
+
 #import <WebCore/WebCoreViewFactory.h>
 
-@interface WebNetscapePluginPackage : NSObject<WebCorePluginInfo> {
-  NSMutableDictionary* MIMEToExtensions;
-  NSMutableDictionary* extensionToMIME;
-  NSMutableDictionary* MIMEToDescription;
+#import <WebKit/npapi.h>
+#import <WebKit/WebBasePluginPackage.h>
 
-  NSString* name;
-  NSString* path;
-  NSString* filename;
-  NSString* pluginDescription;
-
-  BOOL isLoaded;
+@interface WebNetscapePluginPackage : WebBasePluginPackage {
   BOOL isBundle;
   BOOL isCFM;
 
@@ -48,14 +41,6 @@
   NPP_SetValueProcPtr NPP_SetValue;
   NPP_ShutdownProcPtr NPP_Shutdown;
 }
-
-- initWithPath:(NSString*)pluginPath;
-- (BOOL)load;
-- (void)unload;
-- (NSString*)path;
-- (BOOL)isLoaded;
-- (NSString*)description;
-- (NSDictionary*)extensionToMIMEDictionary;
 
 - (NPP_NewProcPtr)NPP_New;
 - (NPP_DestroyProcPtr)NPP_Destroy;
