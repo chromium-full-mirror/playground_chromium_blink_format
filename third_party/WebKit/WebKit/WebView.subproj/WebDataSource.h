@@ -7,14 +7,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <WebKit/WebDocument.h>
+
 @class WebDataSourcePrivate;
 @class WebFrame;
 @class NSURLConnection;
 @class NSURLRequest;
 @class NSMutableURLRequest;
 @class NSURLResponse;
-
-@protocol WebDocumentRepresentation;
 
 /*!
     @class WebDataSource
