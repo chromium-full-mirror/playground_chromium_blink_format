@@ -56,6 +56,7 @@ void releaseCharactersForJStringInEnv(JNIEnv* env,
                                       const char* s);
 
 JNIType JNITypeFromClassName(const char* name);
+JNIType JNITypeFromPrimitiveType(char type);
 const char* signatureFromPrimitiveType(JNIType type);
 
 jvalue convertValueToJValue(KJS::ExecState* exec,

@@ -119,10 +119,11 @@ class Instance {
 
 class Array {
  public:
-  virtual void setValueAt(unsigned int index,
+  virtual void setValueAt(KJS::ExecState* exec,
+                          unsigned int index,
                           const KJS::Value& aValue) const = 0;
   virtual KJS::Value valueAt(unsigned int index) const = 0;
-
+  virtual unsigned int getLength() const = 0;
   virtual ~Array(){};
 };
 
