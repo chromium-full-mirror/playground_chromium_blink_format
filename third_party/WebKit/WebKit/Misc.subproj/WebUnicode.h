@@ -4,6 +4,8 @@
 
     Private header file.
 */
+#import <WebCore/WebCoreTextRenderer.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,12 +22,10 @@ extern int symmetricPairsSize;
 extern const unsigned short* const case_info[];
 extern const unsigned short* const ligature_info[];
 extern const unsigned short ligature_map[];
-extern UniChar* shapedString(UniChar* uc,
-                             int stringLength,
-                             int from,
-                             int len,
+extern UniChar* shapedString(const WebCoreTextRun* run,
                              int dir,
                              int* lengthOut);
+
 #ifdef __cplusplus
 }
 #endif
@@ -48,3 +48,13 @@ enum {
 #define LowSurrogatePair(c) (((c - 0x10000) & 0x3ff) + 0xdc00)
 #define IsHighSurrogatePair(c) ((c & 0xFC00) == HighSurrogateRangeStart)
 #define IsLowSurrogatePair(c) ((c & 0xFC00) == LowSurrogateRangeStart)
+
+typedef struct CharacterShapeIterator CharacterShapeIterator;
+struct CharacterShapeIterator {
+  const WebCoreTextRun* run;
+  const UniChar* currentCharacter;
+};
+extern bool initializeCharacterShapeIterator(CharacterShapeIterator* iterator,
+                                             const WebCoreTextRun* run);
+extern UniChar shapeForNextCharacter(CharacterShapeIterator* iterator);
+extern bool hasShapeForNextCharacter(const CharacterShapeIterator* iterator);
