@@ -55,6 +55,7 @@
 - (id)initWithFrame:(NSRect)r
              plugin:(IFPlugin*)plugin
                 url:(NSURL*)theURL
+            baseURL:(NSURL*)theBaseURL
                mime:(NSString*)mimeType
           arguments:(NSDictionary*)arguments;
 - (void)stop;
