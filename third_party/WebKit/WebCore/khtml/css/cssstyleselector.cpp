@@ -72,7 +72,7 @@ CSSStyleSelectorList* CSSStyleSelector::defaultStyle = 0;
 CSSStyleSelectorList* CSSStyleSelector::defaultQuirksStyle = 0;
 CSSStyleSelectorList* CSSStyleSelector::defaultPrintStyle = 0;
 CSSStyleSheetImpl* CSSStyleSelector::defaultSheet = 0;
-RenderStyle* CSSStyleSelector::displayNoneStyle = 0;
+RenderStyle* CSSStyleSelector::styleNotYetAvailable = 0;
 
 static CSSStyleSelector::Encodedurl* encodedurl = 0;
 
@@ -225,12 +225,12 @@ void CSSStyleSelector::clear() {
   delete defaultQuirksStyle;
   delete defaultPrintStyle;
   delete defaultSheet;
-  delete displayNoneStyle;
+  delete styleNotYetAvailable;
   defaultStyle = 0;
   defaultQuirksStyle = 0;
   defaultPrintStyle = 0;
   defaultSheet = 0;
-  displayNoneStyle = 0;
+  styleNotYetAvailable = 0;
 }
 
 #define MAXFONTSIZES 15
@@ -305,12 +305,12 @@ static inline void bubbleSort(CSSOrderedProperty** b, CSSOrderedProperty** e) {
 
 RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e, int state) {
   if (!e->getDocument()->haveStylesheetsLoaded()) {
-    if (!displayNoneStyle) {
-      displayNoneStyle = new RenderStyle();
-      displayNoneStyle->setDisplay(NONE);
-      displayNoneStyle->ref();
+    if (!styleNotYetAvailable) {
+      styleNotYetAvailable = new RenderStyle();
+      styleNotYetAvailable->setDisplay(NONE);
+      styleNotYetAvailable->ref();
     }
-    return displayNoneStyle;
+    return styleNotYetAvailable;
   }
 
   // set some variables we will need

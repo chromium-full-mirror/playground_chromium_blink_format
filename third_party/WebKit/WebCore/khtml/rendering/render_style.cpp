@@ -23,6 +23,7 @@
 #include "xml/dom_stringimpl.h"
 
 #include "render_style.h"
+#include "css/cssstyleselector.h"
 
 #include "kdebug.h"
 
@@ -209,6 +210,10 @@ bool RenderStyle::operator==(const RenderStyle& o) const {
           noninherited_flags == o.noninherited_flags && box == o.box &&
           visual == o.visual && background == o.background &&
           surround == o.surround && inherited == o.inherited);
+}
+
+bool RenderStyle::isStyleAvailable() const {
+  return this != CSSStyleSelector::styleNotYetAvailable;
 }
 
 RenderStyle* RenderStyle::getPseudoStyle(PseudoId pid) {
