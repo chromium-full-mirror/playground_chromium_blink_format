@@ -66,6 +66,7 @@ class TextIterator {
   void handleTextBox();
   void emitCharacter(QChar,
                      DOM::NodeImpl* textNode,
+                     DOM::NodeImpl* offsetBaseNode,
                      long textStartOffset,
                      long textEndOffset);
 
@@ -84,8 +85,9 @@ class TextIterator {
   // The current text and its position, in the form to be returned from the
   // iterator.
   DOM::NodeImpl* m_positionNode;
-  long m_positionStartOffset;
-  long m_positionEndOffset;
+  mutable DOM::NodeImpl* m_positionOffsetBaseNode;
+  mutable long m_positionStartOffset;
+  mutable long m_positionEndOffset;
   const QChar* m_textCharacters;
   long m_textLength;
 
