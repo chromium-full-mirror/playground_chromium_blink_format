@@ -36,6 +36,8 @@
 
 namespace KIO {
 
+class TransferJobPrivate;
+
 // class Job ===================================================================
 
 class Job : public QObject {
@@ -146,16 +148,17 @@ class TransferJob : public SimpleJob {
   TransferJob() {}
 #endif
 
-// add no-op destructor
-#ifdef _KWQ_PEDANTIC_
-  ~TransferJob() {}
-#endif
+  ~TransferJob();
 
   // member functions --------------------------------------------------------
 
   bool isErrorPage() const;
+  QString queryMetaData(const QString& key);
   void addMetaData(const QString& key, const QString& value);
   void kill(bool quietly = TRUE);
+
+  // this is special sauce for our implementation
+  void begin();
 
   // operators ---------------------------------------------------------------
 
@@ -168,8 +171,8 @@ class TransferJob : public SimpleJob {
   KURL _url;
   bool _reload;
   bool _showProgressInfo;
-
-  void doLoad();
+  int _status;
+  TransferJobPrivate* d;
 
 // add copy constructor
 // this private declaration prevents copying
