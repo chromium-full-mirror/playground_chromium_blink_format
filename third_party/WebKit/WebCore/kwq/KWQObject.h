@@ -27,6 +27,7 @@
 #define QOBJECT_H_
 
 #include <KWQDef.h>
+#include <KWQSignal.h>
 
 #include "qnamespace.h"
 #include "qstring.h"
@@ -92,15 +93,15 @@ class QObject : public Qt {
   void killTimers();
   virtual void timerEvent(QTimerEvent*);
 
-  void installEventFilter(const QObject* o) { m_eventFilterObject = o; }
-  void removeEventFilter(const QObject*) { m_eventFilterObject = 0; }
-  const QObject* eventFilterObject() const { return m_eventFilterObject; }
+  void installEventFilter(const QObject* o) { _eventFilterObject = o; }
+  void removeEventFilter(const QObject*) { _eventFilterObject = 0; }
+  const QObject* eventFilterObject() const { return _eventFilterObject; }
 
-  void blockSignals(bool b) { m_signalsBlocked = b; }
+  void blockSignals(bool b) { _signalsBlocked = b; }
 
   virtual bool event(QEvent*);
 
-  static const QObject* sender() { return m_sender; }
+  static const QObject* sender() { return _sender; }
 
  private:
   // no copying or assignment
@@ -109,13 +110,15 @@ class QObject : public Qt {
 
   KWQSignal* findSignal(const char* signalName) const;
 
-  QPtrList<QObject> guardedPtrDummyList;
-  mutable KWQSignal* m_signalListHead;
-  bool m_signalsBlocked;
+  QPtrList<QObject> _guardedPtrDummyList;
 
-  const QObject* m_eventFilterObject;
+  mutable KWQSignal* _signalListHead;
+  bool _signalsBlocked;
+  static const QObject* _sender;
 
-  static const QObject* m_sender;
+  KWQSignal _destroyed;
+
+  const QObject* _eventFilterObject;
 
   friend class KWQGuardedPtrBase;
   friend class KWQSignal;
@@ -128,7 +131,7 @@ class KWQObjectSenderScope {
   ~KWQObjectSenderScope();
 
  private:
-  const QObject* m_savedSender;
+  const QObject* _savedSender;
 };
 
 #endif
