@@ -42,7 +42,6 @@
 - downloadDelegate;
 
 - (void)cancel;
-- (void)cancelQuietly;
 - (void)cancelWithError:(WebError*)error;
 
 - (void)setDefersCallbacks:(BOOL)defers;
