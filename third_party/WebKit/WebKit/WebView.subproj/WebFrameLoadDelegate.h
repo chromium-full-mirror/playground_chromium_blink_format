@@ -52,6 +52,7 @@
 - (void)receivedPageTitle:(NSString*)title
             forDataSource:(WebDataSource*)dataSource;
 - (void)receivedPageIcon:(NSImage*)image
+                 fromURL:(NSURL*)iconURL
            forDataSource:(WebDataSource*)dataSource;
 
 - (void)serverRedirectTo:(NSURL*)URL forDataSource:(WebDataSource*)dataSource;
