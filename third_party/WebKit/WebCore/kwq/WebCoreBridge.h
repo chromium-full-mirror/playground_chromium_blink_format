@@ -106,6 +106,8 @@ enum FrameBorderStyle {
 - (void)restoreDocumentState;
 - (void)end;
 
+- (void)setContentType:(NSString*)contentType;
+
 - (NSURL*)URL;
 - (NSString*)referrer;
 
