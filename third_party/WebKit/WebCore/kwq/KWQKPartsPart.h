@@ -57,7 +57,7 @@ class Part : public QObject {
   }
 
   bool event(QEvent* event) {
-    customEvent((QCustomEvent*)event);
+    customEvent(event);
     return true;
   }
   virtual void customEvent(QCustomEvent*);

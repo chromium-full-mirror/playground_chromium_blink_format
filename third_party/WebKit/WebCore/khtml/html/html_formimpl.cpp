@@ -137,6 +137,7 @@ long HTMLFormElementImpl::length() const {
 }
 
 #if APPLE_CHANGES
+
 void HTMLFormElementImpl::submitClick() {
   bool submitFound = false;
   QPtrListIterator<HTMLGenericFormElementImpl> it(formElements);
@@ -154,7 +155,8 @@ void HTMLFormElementImpl::submitClick() {
   if (!submitFound)  // submit the form without a submit or image input
     prepareSubmit();
 }
-#endif
+
+#endif  // APPLE_CHANGES
 
 static QCString encodeCString(const QCString& e) {
   // http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.1
@@ -1776,33 +1778,31 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
       case IMAGE:
       case RESET:
       case SUBMIT:
-        // simulate mouse click for spacebar, return, and enter
-        if (key == "U+000020" || key == "U+00000d" || key == "Enter") {
+        // simulate mouse click for spacebar and enter
+        if (key == "U+000020" || key == "Enter") {
           m_form->submitClick();
           evt->setDefaultHandled();
         }
         break;
       case CHECKBOX:
       case RADIO:
-        // for return or enter, find the first successful image or submit
-        // element
+        // for enter, find the first successful image or submit element
         // send it a simulated mouse click
-        if (key == "U+00000d" || key == "Enter") {
+        if (key == "Enter") {
           m_form->submitClick();
           evt->setDefaultHandled();
         }
         break;
       case TEXT:
       case PASSWORD: {
-        // For enter or return, find the first successful image or submit
-        // element
+        // For enter, find the first successful image or submit element
         // send it a simulated mouse click only if the text input manager has
         // no marked text. If it does, then return needs to work in the
         // "accept" role for the input method.
         QWidget* widget = static_cast<RenderWidget*>(m_render)->widget();
         bool hasMarkedText =
             widget ? static_cast<QLineEdit*>(widget)->hasMarkedText() : false;
-        if (!hasMarkedText && (key == "U+00000d" || key == "Enter")) {
+        if (!hasMarkedText && key == "Enter") {
           m_form->submitClick();
           evt->setDefaultHandled();
         }
@@ -2308,6 +2308,7 @@ void HTMLSelectElementImpl::notifyOptionSelected(
 }
 
 #if APPLE_CHANGES
+
 void HTMLSelectElementImpl::defaultEventHandler(EventImpl* evt) {
   // Use key press event here since sending simulated mouse events
   // on key down blocks the proper sending of the key press event.
@@ -2317,14 +2318,15 @@ void HTMLSelectElementImpl::defaultEventHandler(EventImpl* evt) {
 
     DOMString key = static_cast<KeyboardEventImpl*>(evt)->keyIdentifier();
 
-    if (key == "U+00000d" || key == "Enter") {
+    if (key == "Enter") {
       m_form->submitClick();
       evt->setDefaultHandled();
     }
   }
   HTMLGenericFormElementImpl::defaultEventHandler(evt);
 }
-#endif
+
+#endif  // APPLE_CHANGES
 
 void HTMLSelectElementImpl::accessKeyAction() {
   focus();

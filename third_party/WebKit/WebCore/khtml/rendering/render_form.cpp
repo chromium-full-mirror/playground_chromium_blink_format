@@ -452,6 +452,8 @@ QString RenderPushButton::defaultLabel() {
 
 // -------------------------------------------------------------------------------
 
+#if !APPLE_CHANGES
+
 LineEditWidget::LineEditWidget(QWidget* parent) : KLineEdit(parent) {
   setMouseTracking(true);
 }
@@ -476,11 +478,17 @@ bool LineEditWidget::event(QEvent* e) {
   return KLineEdit::event(e);
 }
 
+#endif
+
 // -----------------------------------------------------------------------------
 
 RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
     : RenderFormElement(element), m_updating(false) {
+#if APPLE_CHANGES
+  KLineEdit* edit = new KLineEdit(view()->viewport());
+#else
   LineEditWidget* edit = new LineEditWidget(view()->viewport());
+#endif
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
@@ -489,6 +497,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   if (element->inputType() == HTMLInputElementImpl::PASSWORD)
     edit->setEchoMode(QLineEdit::Password);
 
+#if !APPLE_CHANGES
   if (element->autoComplete()) {
     QStringList completions =
         view()->formCompletionItems(element->name().string());
@@ -497,6 +506,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
       edit->setContextMenuEnabled(true);
     }
   }
+#endif
 
   setQWidget(edit);
 }
@@ -620,7 +630,7 @@ void RenderLineEdit::slotTextChanged(const QString& string) {
 }
 
 void RenderLineEdit::select() {
-  static_cast<LineEditWidget*>(m_widget)->selectAll();
+  static_cast<KLineEdit*>(m_widget)->selectAll();
 }
 
 // ---------------------------------------------------------------------------
@@ -915,6 +925,7 @@ ComboBoxWidget::ComboBoxWidget(QWidget* parent) : KComboBox(false, parent) {
 }
 
 bool ComboBoxWidget::event(QEvent* e) {
+#if !APPLE_CHANGES
   if (e->type() == QEvent::KeyPress) {
     QKeyEvent* ke = static_cast<QKeyEvent*>(e);
     switch (ke->key()) {
@@ -927,6 +938,7 @@ bool ComboBoxWidget::event(QEvent* e) {
         return KComboBox::event(e);
     }
   }
+#endif
   return KComboBox::event(e);
 }
 
@@ -1341,6 +1353,7 @@ TextAreaWidget::TextAreaWidget(int wrap, QWidget* parent) : KTextEdit(parent) {
 }
 
 bool TextAreaWidget::event(QEvent* e) {
+#if !APPLE_CHANGES
   if (e->type() == QEvent::AccelAvailable && isReadOnly()) {
     QKeyEvent* ke = (QKeyEvent*)e;
     if (ke->state() & ControlButton) {
@@ -1357,6 +1370,7 @@ bool TextAreaWidget::event(QEvent* e) {
       }
     }
   }
+#endif
   return KTextEdit::event(e);
 }
 

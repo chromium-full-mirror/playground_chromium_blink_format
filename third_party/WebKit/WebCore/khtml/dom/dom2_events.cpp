@@ -248,17 +248,21 @@ int UIEvent::keyCode() const {
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
   KeyboardEventImpl* keyEvent = dynamic_cast<KeyboardEventImpl*>(impl);
-  if (keyEvent) {
-#if APPLE_CHANGES
-    if (impl->id() == EventImpl::KEYDOWN_EVENT ||
-        impl->id() == EventImpl::KEYUP_EVENT) {
-      return keyEvent->qKeyEvent()->WindowsKeyCode();
-    }
-#endif
-    return keyEvent->qKeyEvent()->ascii();
-  }
+  if (keyEvent)
+    return keyEvent->keyCode();
+  else
+    return 0;
+}
 
-  return 0;
+int UIEvent::charCode() const {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  KeyboardEventImpl* keyEvent = dynamic_cast<KeyboardEventImpl*>(impl);
+  if (keyEvent)
+    return keyEvent->charCode();
+  else
+    return 0;
 }
 
 int UIEvent::pageX() const {
@@ -313,16 +317,10 @@ int UIEvent::which() const {
 
   // Netscape's "which" returns a virtual key code for keydown and keyup, and a
   // character code for keypress.
+  // That's exactly what IE's "keyCode" returns.
   KeyboardEventImpl* keyEvent = dynamic_cast<KeyboardEventImpl*>(impl);
-  if (keyEvent) {
-#if APPLE_CHANGES
-    if (impl->id() == EventImpl::KEYDOWN_EVENT ||
-        impl->id() == EventImpl::KEYUP_EVENT) {
-      return keyEvent->qKeyEvent()->WindowsKeyCode();
-    }
-#endif
-    return keyEvent->qKeyEvent()->ascii();
-  }
+  if (keyEvent)
+    return keyEvent->keyCode();
 
   // For khtml, the return values for left, middle and right mouse buttons are
   // 0, 1, 2, respectively.

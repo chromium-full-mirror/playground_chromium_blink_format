@@ -97,7 +97,7 @@ class EventImpl : public khtml::Shared<EventImpl> {
   EventImpl(EventId _id, bool canBubbleArg, bool cancelableArg);
   virtual ~EventImpl();
 
-  EventId id() { return m_id; }
+  EventId id() const { return m_id; }
 
   DOMString type() const;
   NodeImpl* target() const;
@@ -282,6 +282,10 @@ class KeyboardEventImpl : public UIEventImpl {
   bool altGraphKey() const { return m_altGraphKey; }
 
   QKeyEvent* qKeyEvent() const { return m_keyEvent; }
+
+  int keyCode()
+      const;  // key code for keydown and keyup, character for other events
+  int charCode() const;
 
   virtual bool isKeyboardEvent() const;
 

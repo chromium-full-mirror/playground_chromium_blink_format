@@ -979,6 +979,7 @@ void KHTMLView::keyPressEvent(QKeyEvent* _ke) {
     }
   }
 
+#if !APPLE_CHANGES
   int offs = (clipper()->height() < 30) ? clipper()->height() : 30;
   if (_ke->state() & ShiftButton)
     switch (_ke->key()) {
@@ -1063,6 +1064,7 @@ void KHTMLView::keyPressEvent(QKeyEvent* _ke) {
         return;
     }
   _ke->accept();
+#endif
 }
 
 void KHTMLView::keyReleaseEvent(QKeyEvent* _ke) {

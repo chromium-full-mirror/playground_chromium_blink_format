@@ -141,6 +141,7 @@ class DOMUIEvent : public DOMEvent {
     View,
     Detail,
     KeyCode,
+    CharCode,
     LayerX,
     LayerY,
     PageX,
