@@ -586,6 +586,7 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
         case ID_TFOOT:
         case ID_TBODY:
         case ID_TEXT:
+        case ID_FORM:
         case ID_COMMENT:
           return true;
         default:
@@ -595,7 +596,8 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
     case ID_TFOOT:
     case ID_TBODY:
       // THEAD: TR +
-      if (childID == ID_TR || childID == ID_TEXT || childID == ID_COMMENT)
+      if (childID == ID_FORM || childID == ID_TR || childID == ID_TEXT ||
+          childID == ID_COMMENT)
         return true;
       return false;
     case ID_COLGROUP:
