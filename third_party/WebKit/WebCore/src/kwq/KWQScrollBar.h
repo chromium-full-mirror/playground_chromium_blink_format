@@ -23,12 +23,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QSCROLLBAR_H_
-#define QSCROLLBAR_H_
+#ifndef KWQSCROLLVIEW_H_
+#define KWQSCROLLVIEW_H_
 
-#include "qwidget.h"
+#include <qwidget.h>
+#include <qpalette.h>
 
-class QScrollBar : public QWidget {
+class KWQScrollBar : public QWidget {
  public:
   virtual void setPalette(const QPalette&);
 };

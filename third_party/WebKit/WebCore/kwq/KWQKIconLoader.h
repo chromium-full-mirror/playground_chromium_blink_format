@@ -29,7 +29,12 @@
 #include <qpixmap.h>
 #include <qstring.h>
 #include <kinstance.h>
-#include "kicontheme.h"
+
+class KIcon {
+ public:
+  enum Context { Any, Action, Application, Device, FileSystem, MimeType };
+  enum States { DefaultState, ActiveState, DisabledState, LastState };
+};
 
 class KIconLoader {
  public:

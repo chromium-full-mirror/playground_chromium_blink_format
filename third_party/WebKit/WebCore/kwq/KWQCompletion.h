@@ -23,23 +23,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QDATASTREAM_H_
-#define QDATASTREAM_H_
+#ifndef KWQCOMPLETION_H_
+#define KWQCOMPLETION_H_
 
-#include <qarray.h>
-#include <qiodevice.h>
-#include <qstring.h>
+#include <qobject.h>
+#include <qstringlist.h>
 
-class QDataStream {
+class KWQCompletion : public QObject {
  public:
-  QDataStream(QByteArray, int mode);
-  virtual ~QDataStream();
+  KWQCompletion();
+  void setItems(const QStringList&);
+};
 
-  QDataStream& operator<<(long int);
-  QDataStream& operator<<(const char*);
-  QDataStream& operator<<(const QString&);
-  QDataStream& operator<<(const QCString&);
-  QDataStream& operator>>(const QString&);
+class KWQCompletionBase {
+ public:
+  KWQCompletionBase();
+  KWQCompletion* completionObject(bool hsig = true);
 };
 
 #endif

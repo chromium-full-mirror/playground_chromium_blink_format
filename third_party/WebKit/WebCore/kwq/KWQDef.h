@@ -23,31 +23,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QOBJECTDEFS_H_
-#define QOBJECTDEFS_H_
+#ifndef KWQDEF_H_
+#define KWQDEF_H_
 
-#define Q_PROPERTY(text)
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned uint;
 
-class QObject;
-class QEvent;
+typedef int Q_INT32;
+typedef unsigned int Q_UINT32;
 
-class QPaintDevice;
-class QPaintDeviceMetrics;
-class QWidget;
-class QColor;
-class QColorGroup;
-class QPalette;
-class QPainter;
-class QRegion;
-class QSize;
-class QSizePolicy;
-class QRect;
-class QFont;
-class QFontMetrics;
-class QBrush;
-class QBitmap;
-class QMovie;
-class QTimer;
-class QImage;
+typedef Q_INT32 QCOORD;
+
+typedef uint WFlags;
+typedef int WId;
+
+#define QMAX(a, b) ((a) > (b) ? (a) : (b))
+#define QMIN(a, b) ((a) < (b) ? (a) : (b))
+
+#define KMAX(a, b) QMAX(a, b)
+#define KMIN(a, b) QMIN(a, b)
+
+#define QABS(a) (((a) >= 0) ? (a) : -(a))
+
+#ifndef TRUE
+#define TRUE (1)
+#endif
+
+#ifndef FALSE
+#define FALSE (0)
+#endif
+
+#define ASSERT(a)
+void qDebug(const char* msg, ...);
+
+#ifdef NEED_BOGUS_X_DEFINES
+typedef int XEvent;
+#endif
 
 #endif
