@@ -26,6 +26,12 @@
 #ifndef QSIZE_H_
 #define QSIZE_H_
 
+#ifdef USING_BORROWED_QSIZE
+
+#include <_qsize.h>
+
+#else
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -88,5 +94,7 @@ class QSize {
 
 };  // class QSize
     // ==============================================================
+
+#endif
 
 #endif
