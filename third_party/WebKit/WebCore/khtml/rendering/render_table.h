@@ -162,6 +162,9 @@ class RenderTable : public RenderBlock {
   void setNeedSectionRecalc() { needSectionRecalc = true; }
 
   virtual RenderObject* removeChildNode(RenderObject* child);
+#if APPLE_CHANGES
+  virtual RenderTableCell* cellAbove(RenderTableCell* cell) const;
+#endif
 
  protected:
   void recalcSections();

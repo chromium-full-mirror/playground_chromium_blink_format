@@ -30,6 +30,7 @@
 
 #include "dom_nodeimpl.h"
 #include "html_formimpl.h"
+#include "html_tableimpl.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -213,6 +214,8 @@ class KWQKHTMLPart : public KHTMLPart {
                        DOM::HTMLFormElementImpl* element);
   DOM::HTMLFormElementImpl* currentForm() const;
 
+  NSString* searchForLabelsAboveCell(QRegExp* regExp,
+                                     DOM::HTMLTableCellElementImpl* cell);
   NSString* searchForLabelsBeforeElement(NSArray* labels,
                                          DOM::ElementImpl* element);
   NSString* matchLabelsAgainstElement(NSArray* labels,
