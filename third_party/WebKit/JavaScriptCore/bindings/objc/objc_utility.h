@@ -31,6 +31,12 @@
 
 #include <objc_header.h>
 
+#ifdef __OBJC__
+@class NSString;
+#else
+class NSString;
+#endif
+
 namespace KJS {
 
 namespace Bindings {
@@ -61,6 +67,7 @@ typedef enum {
 ObjcValue convertValueToObjcValue(KJS::ExecState* exec,
                                   const KJS::Value& value,
                                   ObjcValueType type);
+Value convertNSStringToString(NSString* nsstring);
 Value convertObjcValueToValue(KJS::ExecState* exec,
                               void* buffer,
                               ObjcValueType type);
