@@ -228,12 +228,20 @@ VisiblePosition nextWordPosition(const VisiblePosition& c) {
   return nextWordBoundary(c, nextWordPositionBoundary);
 }
 
-VisiblePosition previousLinePosition(const VisiblePosition& c, int x) {
-  return VisiblePosition(c.deepEquivalent().previousLinePosition(x));
+VisiblePosition previousLinePosition(const VisiblePosition& c,
+                                     EAffinity affinity,
+                                     int x) {
+  Position pos =
+      affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
+  return VisiblePosition(pos.previousLinePosition(x, affinity));
 }
 
-VisiblePosition nextLinePosition(const VisiblePosition& c, int x) {
-  return VisiblePosition(c.deepEquivalent().nextLinePosition(x));
+VisiblePosition nextLinePosition(const VisiblePosition& c,
+                                 EAffinity affinity,
+                                 int x) {
+  Position pos =
+      affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
+  return VisiblePosition(pos.nextLinePosition(x, affinity));
 }
 
 VisiblePosition startOfParagraph(const VisiblePosition& c) {
@@ -335,10 +343,12 @@ bool inSameParagraph(const VisiblePosition& a, const VisiblePosition& b) {
   return a == b || startOfParagraph(a) == startOfParagraph(b);
 }
 
-VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {
+VisiblePosition previousParagraphPosition(const VisiblePosition& p,
+                                          EAffinity affinity,
+                                          int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = previousLinePosition(pos, x);
+    VisiblePosition n = previousLinePosition(pos, affinity, x);
     if (n.isNull() || n == pos)
       return p;
     pos = n;
@@ -346,10 +356,12 @@ VisiblePosition previousParagraphPosition(const VisiblePosition& p, int x) {
   return pos;
 }
 
-VisiblePosition nextParagraphPosition(const VisiblePosition& p, int x) {
+VisiblePosition nextParagraphPosition(const VisiblePosition& p,
+                                      EAffinity affinity,
+                                      int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = nextLinePosition(pos, x);
+    VisiblePosition n = nextLinePosition(pos, affinity, x);
     if (n.isNull() || n == pos)
       return p;
     pos = n;

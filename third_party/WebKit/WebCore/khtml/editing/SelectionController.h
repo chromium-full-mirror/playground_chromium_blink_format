@@ -133,6 +133,8 @@ class Selection {
   VisiblePosition modifyExtendingLeftBackward(ETextGranularity);
   VisiblePosition modifyMovingLeftBackward(ETextGranularity);
 
+  void modifyAffinity(EAlter, EDirection, ETextGranularity);
+
   void layout();
   void needsCaretRepaint();
   void paintCaret(QPainter* p, const QRect& rect);
@@ -160,7 +162,8 @@ class Selection {
 };
 
 inline bool operator==(const Selection& a, const Selection& b) {
-  return a.start() == b.start() && a.end() == b.end();
+  return a.start() == b.start() && a.end() == b.end() &&
+         a.affinity() == b.affinity();
 }
 
 inline bool operator!=(const Selection& a, const Selection& b) {

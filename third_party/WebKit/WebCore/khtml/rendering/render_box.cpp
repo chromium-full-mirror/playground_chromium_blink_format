@@ -1505,7 +1505,7 @@ void RenderBox::calcAbsoluteVertical() {
   //    printf("v: h=%d, t=%d, b=%d, mt=%d, mb=%d, m_y=%d\n",h,t,b,mt,mb,m_y);
 }
 
-QRect RenderBox::caretRect(int offset, bool override) {
+QRect RenderBox::caretRect(int offset, EAffinity affinity) {
   // FIXME: Is it OK to check only first child instead of picking
   // right child based on offset? Is it OK to pass the same offset
   // along to the child instead of offset 0 or whatever?
@@ -1513,13 +1513,13 @@ QRect RenderBox::caretRect(int offset, bool override) {
   // propagate it downwards to its children, someone will feel responsible
   RenderObject* child = firstChild();
   if (child) {
-    QRect result = child->caretRect(offset, override);
+    QRect result = child->caretRect(offset, affinity);
     // FIXME: in-band signalling!
     if (result.isEmpty())
       return result;
   }
 
-  int _x, _y, width, height;
+  int _x, _y, height;
 
   // if not, use the extents of this box
   // offset 0 means left, offset 1 means right
@@ -1532,7 +1532,6 @@ QRect RenderBox::caretRect(int offset, bool override) {
     _y = yPos();
     height = m_height;
   }
-  width = override && offset == 0 ? m_width : 1;
   // If height of box is smaller than font height, use the latter one,
   // otherwise the caret might become invisible.
   //
@@ -1557,7 +1556,7 @@ QRect RenderBox::caretRect(int offset, bool override) {
     return QRect();
   }
 
-  return QRect(_x, _y, width, height);
+  return QRect(_x, _y, 1, height);
 }
 
 int RenderBox::lowestPosition(bool includeOverflowInterior,

@@ -132,7 +132,7 @@ class RenderBox : public RenderObject {
 
   virtual RenderLayer* layer() const { return m_layer; }
 
-  virtual QRect caretRect(int offset, bool override);
+  virtual QRect caretRect(int offset, EAffinity affinity = UPSTREAM);
 
   virtual void paintBackgroundExtended(QPainter* p,
                                        const QColor& c,

@@ -216,7 +216,7 @@ class RenderBlock : public RenderFlow {
 
   bool isPointInScrollbar(int x, int y, int tx, int ty);
 
-  virtual DOM::Position positionForCoordinates(int x, int y);
+  virtual DOM::Position positionForCoordinates(int x, int y, EAffinity* = 0);
 
   virtual void calcMinMaxWidth();
   void calcInlineMinMaxWidth();

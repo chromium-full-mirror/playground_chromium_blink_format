@@ -537,10 +537,10 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
   return left;
 }
 
-QRect RenderFlow::caretRect(int offset, bool override) {
+QRect RenderFlow::caretRect(int offset, EAffinity affinity) {
   if (firstChild() || style()->display() == INLINE) {
     // Do the normal calculation
-    return RenderContainer::caretRect(offset, override);
+    return RenderContainer::caretRect(offset, affinity);
   }
 
   // This is a special case:

@@ -208,7 +208,7 @@ class RenderText : public RenderObject {
 
   virtual void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
 
-  virtual DOM::Position positionForCoordinates(int _x, int _y);
+  virtual DOM::Position positionForCoordinates(int x, int y, EAffinity* = 0);
 
   unsigned int length() const { return str->l; }
   QChar* text() const { return str->s; }
@@ -269,7 +269,7 @@ class RenderText : public RenderObject {
   virtual SelectionState selectionState() const { return m_selectionState; }
   virtual void setSelectionState(SelectionState s);
   virtual QRect selectionRect();
-  virtual QRect caretRect(int offset, bool override);
+  virtual QRect caretRect(int offset, EAffinity affinity);
   void posOfChar(int ch, int& x, int& y);
 
   virtual short marginLeft() const { return style()->marginLeft().minWidth(0); }
@@ -289,7 +289,7 @@ class RenderText : public RenderObject {
   InlineTextBox* firstTextBox() const { return m_firstTextBox; }
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }
 
-  virtual InlineBox* inlineBox(long offset);
+  virtual InlineBox* inlineBox(long offset, EAffinity affinity = UPSTREAM);
 
 #if APPLE_CHANGES
   int widthFromCache(const Font*, int start, int len) const;

@@ -26,6 +26,8 @@
 #ifndef KHTML_EDITING_VISIBLE_UNITS_H
 #define KHTML_EDITING_VISIBLE_UNITS_H
 
+#include "text_affinity.h"
+
 namespace khtml {
 
 class VisiblePosition;
@@ -45,18 +47,21 @@ VisiblePosition previousWordPosition(const VisiblePosition&);
 VisiblePosition nextWordPosition(const VisiblePosition&);
 
 // lines
-VisiblePosition startOfLine(const VisiblePosition&);
+VisiblePosition startOfLine(const VisiblePosition&, EAffinity);
 VisiblePosition endOfLine(const VisiblePosition&,
+                          EAffinity,
                           EIncludeLineBreak = DoNotIncludeLineBreak);
-VisiblePosition previousLinePosition(const VisiblePosition&, int x);
-VisiblePosition nextLinePosition(const VisiblePosition&, int x);
+VisiblePosition previousLinePosition(const VisiblePosition&, EAffinity, int x);
+VisiblePosition nextLinePosition(const VisiblePosition&, EAffinity, int x);
 
 // paragraphs
 VisiblePosition startOfParagraph(const VisiblePosition&);
 VisiblePosition endOfParagraph(const VisiblePosition&,
                                EIncludeLineBreak = DoNotIncludeLineBreak);
-VisiblePosition previousParagraphPosition(const VisiblePosition&, int x);
-VisiblePosition nextParagraphPosition(const VisiblePosition&, int x);
+VisiblePosition previousParagraphPosition(const VisiblePosition&,
+                                          EAffinity,
+                                          int x);
+VisiblePosition nextParagraphPosition(const VisiblePosition&, EAffinity, int x);
 bool inSameParagraph(const VisiblePosition&, const VisiblePosition&);
 
 }  // namespace DOM
