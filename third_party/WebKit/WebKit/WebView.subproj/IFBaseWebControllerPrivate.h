@@ -7,9 +7,6 @@
 #import <WebKit/IFWebView.h>
 
 @interface IFBaseWebControllerPrivate : NSObject {
-  IFWebView* mainView;
-  IFWebDataSource* mainDataSource;
-  NSMutableDictionary* viewMap;
-  NSMutableDictionary* dataSourceMap;
+  IFWebFrame* mainFrame;
 }
 @end

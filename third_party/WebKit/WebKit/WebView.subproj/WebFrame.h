@@ -20,5 +20,6 @@
 - (NSString*)name;
 - (void)setView:view;
 - view;
+- (void)setDataSource:(IFWebDataSource*)ds;
 - (IFWebDataSource*)dataSource;
 @end
