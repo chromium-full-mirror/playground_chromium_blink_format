@@ -1091,7 +1091,11 @@ void DocumentImpl::open() {
 }
 
 void DocumentImpl::close() {
-  if (parsing() || !m_tokenizer)
+  closeInternal(true);
+}
+
+void DocumentImpl::closeInternal(bool checkTokenizer) {
+  if (parsing() || (checkTokenizer && !m_tokenizer))
     return;
 
   if (m_render)
