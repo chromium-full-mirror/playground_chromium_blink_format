@@ -48,6 +48,7 @@
 #include "rendering/render_frames.h"
 #include "misc/htmlhashes.h"
 #include "misc/loader.h"
+#include "xml/dom_caretposition.h"
 #include "xml/dom_selection.h"
 #include "xml/dom2_eventsimpl.h"
 #include "xml/xml_tokenizer.h"
@@ -4385,8 +4386,7 @@ void KHTMLPart::handleMousePressEventDoubleClick(
       innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(
         innerNode.handle()->positionForCoordinates(event->x(), event->y()));
-    if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
-                       pos.node()->nodeType() == Node::CDATA_SECTION_NODE)) {
+    if (pos.notEmpty()) {
       selection.moveTo(pos);
       selection.expandUsingGranularity(Selection::WORD);
     }
@@ -4413,8 +4413,7 @@ void KHTMLPart::handleMousePressEventTripleClick(
       innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(
         innerNode.handle()->positionForCoordinates(event->x(), event->y()));
-    if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
-                       pos.node()->nodeType() == Node::CDATA_SECTION_NODE)) {
+    if (pos.notEmpty()) {
       selection.moveTo(pos);
       selection.expandUsingGranularity(Selection::PARAGRAPH);
     }
@@ -4899,8 +4898,10 @@ void KHTMLPart::slotAutoScroll() {
 void KHTMLPart::selectAll() {
   if (!d->m_doc)
     return;
-  Selection selection(Position(d->m_doc->documentElement(), 0));
-  selection.validate(Selection::DOCUMENT);
+  CaretPosition start(d->m_doc->documentElement(), 0);
+  CaretPosition end(d->m_doc->documentElement(),
+                    d->m_doc->documentElement()->childNodeCount());
+  Selection selection(start.deepEquivalent(), end.deepEquivalent());
   setSelection(selection);
 }
 

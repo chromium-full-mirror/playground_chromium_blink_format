@@ -109,7 +109,7 @@ Position::Position(NodeImpl* node, long offset)
   if (node) {
     node->ref();
   }
-};
+}
 
 Position::Position(const Position& o) : m_node(o.m_node), m_offset(o.m_offset) {
   if (m_node) {
@@ -709,7 +709,7 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
   NodeImpl* block =
       node()->isBlockFlow() ? node() : node()->enclosingBlockFlowElement();
 
-  PositionIterator it(*this);
+  PositionIterator it(equivalentDeepPosition());
   for (; !it.atStart(); it.previous()) {
     if (stayInBlock) {
       NodeImpl* currentBlock =
@@ -767,7 +767,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
   NodeImpl* block =
       node()->isBlockFlow() ? node() : node()->enclosingBlockFlowElement();
 
-  PositionIterator it(*this);
+  PositionIterator it(equivalentDeepPosition());
   for (; !it.atEnd(); it.next()) {
     if (stayInBlock) {
       NodeImpl* currentBlock =
@@ -922,14 +922,6 @@ Position Position::closestRenderedPosition(EAffinity affinity) const {
   }
 
   return Position();
-}
-
-bool Position::atStartOfContainingEditableBlock() const {
-  return renderedOffset() == 0 && inFirstEditableInContainingEditableBlock();
-}
-
-bool Position::atStartOfRootEditableElement() const {
-  return renderedOffset() == 0 && inFirstEditableInRootEditableElement();
 }
 
 bool Position::inRenderedContent() const {
@@ -1178,35 +1170,6 @@ bool Position::isLastRenderedPositionOnLine() const {
   return true;
 }
 
-bool Position::isLastRenderedPositionInEditableBlock() const {
-  if (isEmpty())
-    return false;
-
-  RenderObject* renderer = node()->renderer();
-  if (!renderer)
-    return false;
-
-  if (renderer->style()->visibility() != VISIBLE)
-    return false;
-
-  if (renderedOffset() != (long)node()->caretMaxRenderedOffset())
-    return false;
-
-  PositionIterator it(*this);
-  while (!it.atEnd()) {
-    it.next();
-    if (!it.current().node()->inSameContainingBlockFlowElement(node()))
-      return true;
-    RenderObject* currentRenderer = it.current().node()->renderer();
-    if (!currentRenderer || currentRenderer->firstChild())
-      // we want a leaf for this check
-      continue;
-    if (it.current().inRenderedContent())
-      return false;
-  }
-  return true;
-}
-
 bool Position::inFirstEditableInRootEditableElement() const {
   if (isEmpty() || !inRenderedContent())
     return false;
@@ -1220,66 +1183,6 @@ bool Position::inFirstEditableInRootEditableElement() const {
       continue;
     if (it.current().inRenderedContent())
       return false;
-  }
-
-  return true;
-}
-
-bool Position::inLastEditableInRootEditableElement() const {
-  if (isEmpty() || !inRenderedContent())
-    return false;
-
-  PositionIterator it(*this);
-  while (!it.atEnd()) {
-    it.next();
-    RenderObject* currentRenderer = it.current().node()->renderer();
-    if (!currentRenderer || currentRenderer->firstChild())
-      // we want a leaf for this check
-      continue;
-    if (it.current().inRenderedContent())
-      return false;
-  }
-
-  return true;
-}
-
-bool Position::inFirstEditableInContainingEditableBlock() const {
-  if (isEmpty() || !inRenderedContent())
-    return false;
-
-  NodeImpl* block = node()->enclosingBlockFlowElement();
-
-  PositionIterator it(*this);
-  while (!it.atStart()) {
-    it.previous();
-    RenderObject* currentRenderer = it.current().node()->renderer();
-    if (!currentRenderer || currentRenderer->firstChild())
-      // we want a leaf for this check
-      continue;
-    if (!it.current().inRenderedContent())
-      continue;
-    return block != it.current().node()->enclosingBlockFlowElement();
-  }
-
-  return true;
-}
-
-bool Position::inLastEditableInContainingEditableBlock() const {
-  if (isEmpty() || !inRenderedContent())
-    return false;
-
-  NodeImpl* block = node()->enclosingBlockFlowElement();
-
-  PositionIterator it(*this);
-  while (!it.atEnd()) {
-    it.next();
-    RenderObject* currentRenderer = it.current().node()->renderer();
-    if (!currentRenderer || currentRenderer->firstChild())
-      // we want a leaf for this check
-      continue;
-    if (!it.current().inRenderedContent())
-      continue;
-    return block != it.current().node()->enclosingBlockFlowElement();
   }
 
   return true;
