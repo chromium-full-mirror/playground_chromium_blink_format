@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface IFDynamicScrollBarsView : NSScrollView {
+  bool breakRecursionCycle;
 }
 
 @end
