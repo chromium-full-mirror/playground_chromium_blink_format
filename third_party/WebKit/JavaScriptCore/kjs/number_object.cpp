@@ -92,16 +92,13 @@ Value NumberProtoFuncImp::call(ExecState* exec,
     return err;
   }
 
-  // execute "toString()" or "valueOf()", respectively
   Value v = thisObj.internalValue();
   switch (id) {
     case ToString: {
       double dradix = 10;
-      if (!args.isEmpty() && args[0].type() != UndefinedType)
+      if (!args.isEmpty())
         dradix = args[0].toInteger(exec);
-      if (dradix < 2 || dradix > 36 || dradix == 10)
-        result = String(v.toString(exec));
-      else {
+      if (dradix >= 2 && dradix <= 36 && dradix != 10) {  // false for NaN
         int radix = static_cast<int>(dradix);
         unsigned i = v.toUInt32(exec);
         char s[33];
@@ -112,7 +109,8 @@ Value NumberProtoFuncImp::call(ExecState* exec,
           i /= radix;
         } while (i);
         result = String(p);
-      }
+      } else
+        result = String(v.toString(exec));
       break;
     }
     case ToLocaleString: /* TODO */
