@@ -188,9 +188,8 @@ DOM::EventListener* KJSProxyImpl::createHTMLEventHandler(QString sourceUrl,
 #endif
 
   initScript();
-
-  return KJS::Window::retrieveWindow(m_part)->getJSLazyEventListener(code,
-                                                                     true);
+  return KJS::Window::retrieveWindow(m_part)->getJSLazyEventListener(
+      code, true, m_handlerLineno);
 }
 
 void KJSProxyImpl::finishedWithEvent(const DOM::Event& event) {

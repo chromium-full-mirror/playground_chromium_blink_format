@@ -117,7 +117,8 @@ class Window : public ObjectImp {
   Selection* selection() const;
   JSEventListener* getJSEventListener(const Value& val, bool html = false);
   JSLazyEventListener* getJSLazyEventListener(const QString& code,
-                                              bool html = false);
+                                              bool html = false,
+                                              int lineno = 0);
   void clear(ExecState* exec);
   virtual UString toString(ExecState* exec) const;
 
