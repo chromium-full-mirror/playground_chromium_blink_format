@@ -276,7 +276,7 @@ static const short yyrline[] = {
     448, 450, 454, 456, 457, 460, 463, 466, 470, 476, 478, 481, 483, 487,
     489, 496, 498, 502, 504, 512, 514, 518, 519, 525, 530, 535, 537, 541,
     543, 546, 548, 551, 553, 556, 558, 561, 567, 571, 573, 574, 577, 581,
-    585, 588, 592, 594, 599, 601, 605, 608, 612, 615, 619, 622, 628, 630};
+    585, 588, 592, 594, 599, 601, 605, 608, 612, 615, 619, 621, 624, 626};
 #endif
 
 #if YYDEBUG != 0 || defined(YYERROR_VERBOSE)
@@ -2410,21 +2410,21 @@ yyreduce:
       break;
     }
     case 193:
-#line 622 "grammar.y"
+#line 621 "grammar.y"
     {
       yyval.srcs = new SourceElementsNode(yyvsp[0].srcs, yyvsp[-1].src);
       ;
       break;
     }
     case 194:
-#line 629 "grammar.y"
+#line 625 "grammar.y"
     {
       yyval.src = new SourceElementNode(yyvsp[0].stat);
       ;
       break;
     }
     case 195:
-#line 630 "grammar.y"
+#line 626 "grammar.y"
     {
       yyval.src = new SourceElementNode(yyvsp[0].func);
       ;
@@ -2638,7 +2638,7 @@ yyabortlab:
   }
   return 1;
 }
-#line 633 "grammar.y"
+#line 629 "grammar.y"
 
 int yyerror(const char*) /* Called by yyparse on error */
 {
