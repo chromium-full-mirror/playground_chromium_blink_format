@@ -103,6 +103,7 @@ HTMLLinkElementImpl::HTMLLinkElementImpl(DocumentPtr* doc)
   m_sheet = 0;
   m_loading = false;
   m_cachedSheet = 0;
+  m_alternate = false;
 }
 
 HTMLLinkElementImpl::~HTMLLinkElementImpl() {
@@ -179,8 +180,12 @@ void HTMLLinkElementImpl::process() {
         m_media.contains("all") || m_media.contains("print")) {
       m_loading = true;
 
-      // Add ourselves as a pending sheet.
-      getDocument()->addPendingSheet();
+      // Add ourselves as a pending sheet, but only if we aren't an alternate
+      // stylesheet.  Alternate stylesheets don't hold up render tree
+      // construction.
+      m_alternate = rel.contains("alternate");
+      if (!isAlternate())
+        getDocument()->addPendingSheet();
 
       QString chset = getAttribute(ATTR_CHARSET).string();
       if (m_cachedSheet)
@@ -228,7 +233,7 @@ void HTMLLinkElementImpl::setStyleSheet(const DOM::DOMString& url,
   m_loading = false;
 
   // Tell the doc about the sheet.
-  if (!isLoading() && m_sheet)
+  if (!isLoading() && m_sheet && !isAlternate())
     getDocument()->stylesheetLoaded();
 }
 
@@ -243,7 +248,7 @@ bool HTMLLinkElementImpl::isLoading() const {
 }
 
 void HTMLLinkElementImpl::sheetLoaded() {
-  if (!isLoading())
+  if (!isLoading() && !isAlternate())
     getDocument()->stylesheetLoaded();
 }
 
