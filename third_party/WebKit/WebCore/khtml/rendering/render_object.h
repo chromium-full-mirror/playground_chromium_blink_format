@@ -403,6 +403,7 @@ class RenderObject : public CachedObjectClient {
   // the margin of the element.  Blocks override the maxTopMargin and
   // maxBottomMargin
   // methods.
+  virtual bool isSelfCollapsingBlock() const { return false; }
   virtual short collapsedMarginTop() const {
     return maxTopMargin(true) - maxTopMargin(false);
   }
