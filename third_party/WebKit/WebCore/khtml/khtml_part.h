@@ -1259,8 +1259,14 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   DOM::EventListener* createHTMLEventListener(QString code);
 
+#if APPLE_CHANGES
+ public:
+#endif
   DOM::HTMLDocumentImpl* docImpl() const;
   DOM::DocumentImpl* xmlDocImpl() const;
+#if APPLE_CHANGES
+ private:
+#endif
   khtml::ChildFrame* childFrame(const QObject* obj);
 
   khtml::ChildFrame* recursiveFrameRequest(const KURL& url,
