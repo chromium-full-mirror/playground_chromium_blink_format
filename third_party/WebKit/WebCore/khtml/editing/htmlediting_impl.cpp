@@ -282,32 +282,18 @@ void EditCommandImpl::setStartingSelection(const Selection& s) {
   m_startingSelection = s;
   EditCommand cmd = parent();
   while (cmd.notNull()) {
-    cmd.setStartingSelection(s);
+    cmd.handle()->m_startingSelection = s;
     cmd = cmd.parent();
   }
-  moveToStartingSelection();
 }
 
 void EditCommandImpl::setEndingSelection(const Selection& s) {
   m_endingSelection = s;
   EditCommand cmd = parent();
   while (cmd.notNull()) {
-    cmd.setEndingSelection(s);
+    cmd.handle()->m_endingSelection = s;
     cmd = cmd.parent();
   }
-  moveToEndingSelection();
-}
-
-void EditCommandImpl::moveToStartingSelection() {
-  ASSERT(m_document);
-  ASSERT(m_document->part());
-  m_document->part()->takeSelectionFrom(this, false);
-}
-
-void EditCommandImpl::moveToEndingSelection() {
-  ASSERT(m_document);
-  ASSERT(m_document->part());
-  m_document->part()->takeSelectionFrom(this, true);
 }
 
 EditCommand EditCommandImpl::parent() const {
@@ -338,7 +324,6 @@ void CompositeEditCommandImpl::doUnapply() {
   for (int i = m_cmds.count() - 1; i >= 0; --i)
     m_cmds[i]->unapply();
 
-  moveToStartingSelection();
   setState(NotApplied);
 }
 
@@ -351,7 +336,6 @@ void CompositeEditCommandImpl::doReapply() {
        it != m_cmds.end(); ++it)
     (*it)->reapply();
 
-  moveToEndingSelection();
   setState(Applied);
 }
 
@@ -2329,6 +2313,13 @@ int TypingCommandImpl::commandID() const {
 
 void TypingCommandImpl::doApply() {}
 
+void TypingCommandImpl::typingAddedToOpenCommand() {
+  ASSERT(document());
+  ASSERT(document()->part());
+  EditCommand cmd(this);
+  document()->part()->appliedEditing(cmd);
+}
+
 void TypingCommandImpl::insertText(const DOMString& text) {
   if (m_cmds.count() == 0) {
     InputTextCommand cmd(document());
@@ -2344,11 +2335,13 @@ void TypingCommandImpl::insertText(const DOMString& text) {
       cmd.input(text);
     }
   }
+  typingAddedToOpenCommand();
 }
 
 void TypingCommandImpl::insertNewline() {
   InputNewlineCommand cmd(document());
   applyCommandToComposite(cmd);
+  typingAddedToOpenCommand();
 }
 
 void TypingCommandImpl::issueCommandForDeleteKey() {
@@ -2365,6 +2358,7 @@ void TypingCommandImpl::issueCommandForDeleteKey() {
     selectionToDelete = Selection(pos.previousCharacterPosition(), pos);
   }
   deleteSelection(selectionToDelete);
+  typingAddedToOpenCommand();
 }
 
 void TypingCommandImpl::deleteKeyPressed() {
@@ -2377,6 +2371,7 @@ void TypingCommandImpl::deleteKeyPressed() {
   // right thing, but less efficiently and with the cost of more
   // objects.
   issueCommandForDeleteKey();
+  typingAddedToOpenCommand();
 #if 0    
     if (m_cmds.count() == 0) {
         issueCommandForDeleteKey();

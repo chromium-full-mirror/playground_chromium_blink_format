@@ -87,9 +87,6 @@ class EditCommandImpl : public SharedCommandImpl {
   void setStartingSelection(const DOM::Selection& s);
   void setEndingSelection(const DOM::Selection& s);
 
-  void moveToStartingSelection();
-  void moveToEndingSelection();
-
  private:
   DOM::DocumentImpl* m_document;
   ECommandState m_state;
@@ -619,6 +616,7 @@ class TypingCommandImpl : public CompositeEditCommandImpl {
  private:
   void issueCommandForDeleteKey();
   void removeCommand(const EditCommand&);
+  void typingAddedToOpenCommand();
 
   bool m_openForMoreTyping;
 };

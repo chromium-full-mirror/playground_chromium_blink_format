@@ -2276,28 +2276,12 @@ const Selection& KHTMLPart::selection() const {
   return d->m_selection;
 }
 
-void KHTMLPart::setSelection(const Selection& s) {
+void KHTMLPart::setSelection(const Selection& s, bool closeTyping) {
   if (d->m_selection != s) {
     clearCaretRectIfNeeded();
     setFocusNodeIfNeeded(s);
     d->m_selection = s;
-    notifySelectionChanged();
-  }
-}
-
-void KHTMLPart::takeSelectionFrom(const EditCommand& cmd,
-                                  bool useEndingSelection) {
-  Selection s;
-  if (useEndingSelection)
-    s = cmd.endingSelection();
-  else
-    s = cmd.startingSelection();
-
-  if (d->m_selection != s) {
-    clearCaretRectIfNeeded();
-    setFocusNodeIfNeeded(s);
-    d->m_selection = s;
-    notifySelectionChanged(false);
+    notifySelectionChanged(closeTyping);
   }
 }
 
@@ -2367,7 +2351,7 @@ void KHTMLPart::setFocusNodeIfNeeded(const Selection& s) {
   }
 }
 
-void KHTMLPart::notifySelectionChanged(bool endTyping) {
+void KHTMLPart::notifySelectionChanged(bool closeTyping) {
   // kill any caret blink timer now running
   if (d->m_caretBlinkTimer >= 0) {
     killTimer(d->m_caretBlinkTimer);
@@ -2386,7 +2370,7 @@ void KHTMLPart::notifySelectionChanged(bool endTyping) {
   if (d->m_doc)
     d->m_doc->updateSelection();
 
-  if (endTyping)
+  if (closeTyping)
     TypingCommand::closeTyping(lastEditCommand());
 
   // Always clear the x position used for vertical arrow navigation.
@@ -4871,18 +4855,25 @@ EditCommand KHTMLPart::lastEditCommand() {
 }
 
 void KHTMLPart::appliedEditing(EditCommand& cmd) {
-  if (d->m_lastEditCommand != cmd) {
+  setSelection(cmd.endingSelection(), false);
+  // Command will be equal to last edit command only in the case of typing
+  if (d->m_lastEditCommand == cmd) {
+    assert(cmd.commandID() == khtml::TypingCommandID);
+  } else {
 #if APPLE_CHANGES
+    // Only register a new undo command if the command passed in is
+    // different from the last command
     KWQ(this)->registerCommandForUndo(cmd);
-    KWQ(this)->postDidChangeNotification();
 #endif
+    d->m_lastEditCommand = cmd;
   }
-  d->m_lastEditCommand = cmd;
+#if APPLE_CHANGES
+  KWQ(this)->postDidChangeNotification();
+#endif
 }
 
 void KHTMLPart::unappliedEditing(EditCommand& cmd) {
-  TypingCommand::closeTyping(lastEditCommand());
-
+  setSelection(cmd.startingSelection());
 #if APPLE_CHANGES
   KWQ(this)->registerCommandForRedo(cmd);
   KWQ(this)->postDidChangeNotification();
@@ -4891,6 +4882,7 @@ void KHTMLPart::unappliedEditing(EditCommand& cmd) {
 }
 
 void KHTMLPart::reappliedEditing(EditCommand& cmd) {
+  setSelection(cmd.endingSelection());
 #if APPLE_CHANGES
   KWQ(this)->registerCommandForUndo(cmd);
   KWQ(this)->postDidChangeNotification();
