@@ -792,7 +792,7 @@ int AutoTableLayout::calcEffectiveWidth() {
         }
 
         for (unsigned int pos = col;
-             maxw > 0 && pos < lastCol && minWidth < cMinWidth; pos++) {
+             maxw > 0 && pos < lastCol && minw < cMinWidth; pos++) {
           if (!(layoutStruct[pos].width.type == Fixed && haveVariable &&
                 fixedWidth <= cMinWidth)) {
             int w = QMAX(layoutStruct[pos].effMinWidth,
