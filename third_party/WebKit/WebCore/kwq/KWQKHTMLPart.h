@@ -66,6 +66,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   bool frameExists(const QString& frameName);
 
+  KHTMLPart* parentPart();
+
   void urlSelected(const QString& url,
                    int button,
                    int state,
