@@ -95,6 +95,8 @@ extern NSString* _WebMainFrameURLKey;
   BOOL drawsBackground;
   BOOL editable;
   BOOL initiatedDrag;
+  BOOL doWebKitDragReponse;  // should we do the built-in WebKit handling of
+                             // incoming drags?
 
   NSString* mediaStyle;
 
@@ -307,6 +309,9 @@ backforward list.
 - (void)_writeLinkElement:(NSDictionary*)element
       withPasteboardTypes:(NSArray*)types
              toPasteboard:(NSPasteboard*)pasteboard;
+
+- (void)_setWebKitDragRespondsToDragging:(BOOL)flag;
+- (BOOL)_webKitDragRespondsToDragging;
 
 @end
 
