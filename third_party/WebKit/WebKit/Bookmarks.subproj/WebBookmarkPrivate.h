@@ -20,10 +20,7 @@
                               withGroup:(IFBookmarkGroup*)group;
 - (NSDictionary*)_dictionaryRepresentation;
 
-- (IFBookmark*)_parent;
 - (void)_setParent:(IFBookmark*)parent;
-
-- (IFBookmarkGroup*)_group;
 - (void)_setGroup:(IFBookmarkGroup*)group;
 
 - (unsigned)_numberOfDescendants;

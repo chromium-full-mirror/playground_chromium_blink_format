@@ -55,4 +55,10 @@ typedef enum {
 // IFBookmarkTypeList.
 - (void)removeChild:(IFBookmark*)bookmark;
 
+// The parent of this bookmark, or nil if this is the top bookmark in a group
+- (IFBookmark*)parent;
+
+// The group that this bookmark belongs to.
+- (IFBookmarkGroup*)group;
+
 @end
