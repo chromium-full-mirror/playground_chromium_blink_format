@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include "dom/html_head.h"
+#include "dom/dom_doc.h"
 #include "html/html_headimpl.h"
 #include "misc/htmlhashes.h"
 
@@ -50,7 +51,9 @@ HTMLBaseElement::~HTMLBaseElement() {}
 DOMString HTMLBaseElement::href() const {
   if (!impl)
     return DOMString();
-  return ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
+  DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
+  s = ownerDocument().completeURL(s);
+  return s;
 }
 
 void HTMLBaseElement::setHref(const DOMString& value) {
@@ -118,7 +121,9 @@ void HTMLLinkElement::setCharset(const DOMString& value) {
 DOMString HTMLLinkElement::href() const {
   if (!impl)
     return DOMString();
-  return ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
+  DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_HREF);
+  s = ownerDocument().completeURL(s);
+  return s;
 }
 
 void HTMLLinkElement::setHref(const DOMString& value) {
@@ -341,7 +346,9 @@ void HTMLScriptElement::setDefer(bool _defer) {
 DOMString HTMLScriptElement::src() const {
   if (!impl)
     return DOMString();
-  return ((ElementImpl*)impl)->getAttribute(ATTR_SRC);
+  DOMString s = ((ElementImpl*)impl)->getAttribute(ATTR_SRC);
+  s = ownerDocument().completeURL(s);
+  return s;
 }
 
 void HTMLScriptElement::setSrc(const DOMString& value) {
