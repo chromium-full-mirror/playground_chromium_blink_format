@@ -2,11 +2,13 @@
     WebViewPrivate.m
     Copyright 2001, Apple, Inc. All rights reserved.
 */
-#import <WebKit/DOM.h>
+
 #import <WebKit/WebPolicyDelegate.h>
 #import <WebKit/WebView.h>
 #import <WebKit/WebFramePrivate.h>
 
+@class DOMCSSStyleDeclaration;
+@class DOMNode;
 @class DOMRange;
 @class NSError;
 @class WebBackForwardList;
@@ -360,11 +362,11 @@ extern NSString* const WebViewDidChangeSelectionNotification;
     shouldChangeSelectedDOMRange:(DOMRange*)currentRange
                       toDOMRange:(DOMRange*)proposedRange;
 - (BOOL)webView:(WebView*)webView
-        shouldApplyStyle:(CSSStyleDeclaration*)style
+        shouldApplyStyle:(DOMCSSStyleDeclaration*)style
     toElementsInDOMRange:(DOMRange*)range;
 - (BOOL)webView:(WebView*)webView
-    shouldChangeTypingStyle:(CSSStyleDeclaration*)currentStyle
-                    toStyle:(CSSStyleDeclaration*)proposedStyle;
+    shouldChangeTypingStyle:(DOMCSSStyleDeclaration*)currentStyle
+                    toStyle:(DOMCSSStyleDeclaration*)proposedStyle;
 - (BOOL)webView:(WebView*)webView doCommandBySelector:(SEL)selector;
 - (void)webViewDidBeginEditing:(NSNotification*)notification;
 - (void)webViewDidChange:(NSNotification*)notification;
