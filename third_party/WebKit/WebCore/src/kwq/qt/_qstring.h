@@ -45,11 +45,11 @@
 
 // KWQ hacks ---------------------------------------------------------------
 
-// FIXME: we don't handle Q_EXPORT
-#define QT_STATIC_CONST static const
+#ifndef _KWQ_COMPLETE_
+#define _KWQ_COMPLETE_
+#endif
 
-typedef unsigned short Q_UINT16;
-typedef unsigned long ulong;
+#include <KWQDef.h>
 
 // -------------------------------------------------------------------------
 
