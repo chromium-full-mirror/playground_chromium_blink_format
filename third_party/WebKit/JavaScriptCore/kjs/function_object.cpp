@@ -112,7 +112,7 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
             "function " +
             static_cast<FunctionImp*>(thisObj.imp())->name().ustring() + "()");
       } else {
-        result = String("(Internal function)");
+        result = String("(Internal Function)");
       }
     } break;
     case Apply: {
