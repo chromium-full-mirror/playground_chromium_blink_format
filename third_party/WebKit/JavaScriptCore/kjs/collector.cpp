@@ -76,10 +76,18 @@ bool Collector::memLimitReached = false;
 bool Collector::collecting = false;
 #endif
 
+#if APPLE_CHANGES
+static int numAllocationsSinceLastCollect = 0;
+#endif
+
 void* Collector::allocate(size_t s) {
   if (s == 0)
     return 0L;
 
+#if APPLE_CHANGES
+  if (++numAllocationsSinceLastCollect >= KJS_MEM_INCREMENT)
+    collect();
+#else
   // Try and deal with memory requirements in a scalable way. Simple scripts
   // should only require small amounts of memory, but for complex scripts we
   // don't
@@ -101,6 +109,7 @@ void* Collector::allocate(size_t s) {
       increaseLimitAt *= 2;
     }
   }
+#endif
 
   void* m = malloc(s);
 #ifdef KJS_DEBUG_MEM
@@ -244,6 +253,10 @@ bool Collector::collect() {
     }
     block = next;
   }
+
+#if APPLE_CHANGES
+  numAllocationsSinceLastCollect = 0;
+#endif
 
 #if 0
   // This is useful to track down memory leaks
