@@ -993,6 +993,9 @@ class RenderObject : public CachedObjectClient {
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;
 
+  virtual long previousOffset(long current) const;
+  virtual long nextOffset(long current) const;
+
   virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
 
   virtual void selectionStartEnd(int& spos, int& epos);
