@@ -450,7 +450,12 @@ void RenderLayer::scrollToOffset(int x,
   m_scrollX = x;
   m_scrollY = y;
 
-  // FIXME: Fire the onscroll DOM event.
+// FIXME: Fire the onscroll DOM event.
+
+#if APPLE_CHANGES
+  // Move our widgets.
+  m_object->updateWidgetPositions();
+#endif
 
   // Just schedule a full repaint of our object.
   if (repaint)

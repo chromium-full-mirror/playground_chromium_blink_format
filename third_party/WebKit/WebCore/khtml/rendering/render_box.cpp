@@ -565,11 +565,15 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
     f = true;
   RenderObject* o = container();
   if (o && o->absolutePosition(xPos, yPos, f)) {
+    if (o->style()->hidesOverflow() && o->layer())
+      o->layer()->subtractScrollOffset(xPos, yPos);
+
     if (!isInline() || isReplaced())
       xPos += m_x, yPos += m_y;
 
     if (isRelPositioned())
       relativePositionOffset(xPos, yPos);
+
     return true;
   } else {
     xPos = yPos = 0;
