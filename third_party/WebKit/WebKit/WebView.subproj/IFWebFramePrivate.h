@@ -41,7 +41,7 @@ typedef enum {
   IFWebController* controller;
   IFWebFrameState state;
   BOOL scheduledLayoutPending;
-  IFWebCoreFrame* bridgeFrame;
+  IFWebCoreFrame* frameBridge;
 }
 
 - (void)setName:(NSString*)n;
@@ -69,6 +69,6 @@ typedef enum {
 - (void)_isLoadComplete;
 - (void)_checkLoadComplete;
 - (void)_timedLayout:userInfo;
-- (IFWebCoreFrame*)_bridgeFrame;
+- (IFWebCoreFrame*)_frameBridge;
 - (BOOL)_shouldShowDataSource:(IFWebDataSource*)dataSource;
 @end

@@ -93,7 +93,7 @@
 // pointers
 // can be managed externally, i.e. + controllerForDataSource: as a class method
 // on
-// IFDefaultWebController?
+// IFWebController?
 //- (void)setController: (IFWebController *)controller;
 - (IFWebController*)controller;
 
