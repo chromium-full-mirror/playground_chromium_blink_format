@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <WebKit/WebControllerPolicyHandler.h>
+
 @class WebDownloadHandler;
 @class WebDataSource;
 @protocol WebResourceClient;
@@ -16,10 +18,10 @@
 @interface WebMainResourceClient : NSObject<WebResourceClient> {
   NSURL* currentURL;
   WebDataSource* dataSource;
-  BOOL processedBufferedData;
   BOOL isFirstChunk;
   WebDownloadHandler* downloadHandler;
   id<WebResourceProgressHandler> downloadProgressHandler;
+  WebContentAction policyAction;
 }
 - initWithDataSource:(WebDataSource*)dataSource;
 - (WebDownloadHandler*)downloadHandler;
