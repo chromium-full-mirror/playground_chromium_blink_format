@@ -1658,6 +1658,12 @@ void RenderTableCol::updateFromElement() {
     _span = !(style() && style()->display() == TABLE_COLUMN_GROUP);
 }
 
+bool RenderTableCol::canHaveChildren() const {
+  // cols cannot have children.  This is actually necessary to fix a bug
+  // with libraries.uc.edu, which makes a <p> be a table-column.
+  return style()->display() == TABLE_COLUMN_GROUP;
+}
+
 void RenderTableCol::addChild(RenderObject* child, RenderObject* beforeChild) {
 #ifdef DEBUG_LAYOUT
 // kdDebug( 6040 ) << renderName() << "(Table)::addChild( " <<

@@ -424,6 +424,8 @@ class RenderTableCol : public RenderContainer {
 
   virtual void updateFromElement();
 
+  virtual bool canHaveChildren() const;
+
 #ifndef NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
