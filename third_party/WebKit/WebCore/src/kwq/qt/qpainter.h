@@ -150,7 +150,6 @@ class QPainter : public Qt {
   void
   drawTiledPixmap(int, int, int, int, const QPixmap&, int sx = 0, int sy = 0);
   void drawText(int x, int y, const QString&, int len = -1);
-  void drawText(int, int, int, int, AlignmentFlags, const QString&);
   void drawText(int,
                 int,
                 int,
