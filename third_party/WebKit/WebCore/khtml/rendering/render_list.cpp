@@ -123,6 +123,11 @@ void RenderListItem::setStyle(RenderStyle* _style) {
   RenderFlow::setStyle(_style);
 
   RenderStyle* newStyle = new RenderStyle();
+
+#ifdef APPLE_CHANGES
+  newStyle->ref();
+#endif
+
   newStyle->inheritFrom(style());
   if (newStyle->direction() == LTR)
     newStyle->setFloating(FLEFT);
@@ -141,7 +146,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
   }
 
 #ifdef APPLE_CHANGES
-// newStyle->deref();
+  newStyle->deref();
 #endif
 }
 
