@@ -1000,14 +1000,23 @@ bool CompositeEditCommand::insertBlockPlaceholderIfNeeded(NodeImpl* node) {
 }
 
 bool CompositeEditCommand::removeBlockPlaceholderIfNeeded(NodeImpl* node) {
+  NodeImpl* placeholder = findBlockPlaceholder(node);
+  if (placeholder) {
+    removeNode(placeholder);
+    return true;
+  }
+  return false;
+}
+
+NodeImpl* CompositeEditCommand::findBlockPlaceholder(NodeImpl* node) {
   if (!node)
-    return false;
+    return 0;
 
   document()->updateLayout();
 
   RenderObject* renderer = node->renderer();
   if (!renderer || !renderer->isBlockFlow())
-    return false;
+    return 0;
 
   for (NodeImpl* checkMe = node; checkMe;
        checkMe = checkMe->traverseNextNode(node)) {
@@ -1015,13 +1024,12 @@ bool CompositeEditCommand::removeBlockPlaceholderIfNeeded(NodeImpl* node) {
       ElementImpl* element = static_cast<ElementImpl*>(checkMe);
       if (element->enclosingBlockFlowElement() == node &&
           element->getAttribute(ATTR_CLASS) == blockPlaceholderClassString()) {
-        removeNode(element);
-        return true;
+        return element;
       }
     }
   }
 
-  return false;
+  return 0;
 }
 
 void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
@@ -4463,15 +4471,7 @@ void ReplaceSelectionCommand::doApply() {
   // can be removed
   // if so, do it and update startPos and endPos
   NodeImpl* block = startPos.node()->enclosingBlockFlowElement();
-  NodeImpl* placeholderBlock = 0;
-  if (removeBlockPlaceholderIfNeeded(block)) {
-    placeholderBlock = block;
-    Position pos = Position(block, 0);
-    // endPos might have been in the placeholder just removed
-    if (!endPos.node()->inDocument())
-      endPos = pos;
-    startPos = pos;
-  }
+  NodeImpl* placeholderBlock = findBlockPlaceholder(block);
 
   // check whether to "smart replace" needs to add leading and/or trailing space
   bool addLeadingSpace = false;

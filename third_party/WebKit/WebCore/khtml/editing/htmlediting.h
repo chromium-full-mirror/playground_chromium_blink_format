@@ -253,6 +253,7 @@ class CompositeEditCommand : public EditCommand {
   void insertBlockPlaceholder(DOM::NodeImpl*);
   bool insertBlockPlaceholderIfNeeded(DOM::NodeImpl*);
   bool removeBlockPlaceholderIfNeeded(DOM::NodeImpl*);
+  DOM::NodeImpl* findBlockPlaceholder(DOM::NodeImpl*);
 
   void moveParagraphContentsToNewBlockIfNecessary(const DOM::Position&);
 
