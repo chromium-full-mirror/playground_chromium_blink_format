@@ -128,8 +128,6 @@ void RenderBox::setPos(int xPos, int yPos) {
 
   m_x = xPos;
   m_y = yPos;
-  if (m_layer)
-    m_layer->updateLayerPosition();
 }
 
 short RenderBox::width() const {
