@@ -92,13 +92,14 @@ class QChar {
   QChar();
   QChar(char);
   QChar(uchar);
-  QChar(const QChar&);
-  QChar(ushort);
   QChar(short);
-  QChar(uint);
+  QChar(ushort);
   QChar(int);
+  QChar(uint);
 
-  ~QChar() {}
+  QChar(const QChar&);
+
+  ~QChar();
 
   // member functions --------------------------------------------------------
 
@@ -161,18 +162,21 @@ class QString {
 
   QString();
   QString(QChar);
-  QString(const QString&);
   QString(const QByteArray&);
   QString(const QChar*, uint);
   QString(const char*);
+
+  QString(const QString&);
+
+  ~QString();
+
+  // assignment operators ----------------------------------------------------
 
   QString& operator=(QChar);
   QString& operator=(const QString&);
   QString& operator=(const char*);
   QString& operator=(const QCString&);
   QString& operator=(char);
-
-  ~QString();
 
   // member functions --------------------------------------------------------
 
@@ -304,8 +308,9 @@ class QConstString : /* NOTE: this is NOT private */ QString {
   // ---------------------------------------------------------------------
 
  private:
-// add assignment operator
-// this private declaration prevents assignment
+// assignment operators ----------------------------------------------------
+
+// private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
 // NOTE: assignment operator not needed
 // QConstString &operator=(const QConstString &);
