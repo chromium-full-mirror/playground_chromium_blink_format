@@ -51,7 +51,6 @@
                       event:(NSEvent*)event
               sourceIsDHTML:(BOOL)flag
              DHTMLWroteData:(BOOL)dhtmlWroteData;
-- (void)_setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
 - (void)_handleAutoscrollForMouseDragged:(NSEvent*)event;
 - (BOOL)_mayStartDragWithMouseDragged:(NSEvent*)event;
 

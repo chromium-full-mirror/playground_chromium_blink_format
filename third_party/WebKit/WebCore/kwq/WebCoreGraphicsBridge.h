@@ -31,5 +31,6 @@
 - (void)setFocusRingStyle:(NSFocusRingPlacement)placement
                    radius:(int)radius
                     color:(NSColor*)color;
+- (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
 
 @end
