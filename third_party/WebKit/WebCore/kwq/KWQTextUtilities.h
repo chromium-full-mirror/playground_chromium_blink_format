@@ -33,5 +33,6 @@ void KWQFindWordBoundary(QChar* chars,
                          int position,
                          int* start,
                          int* end);
+int KWQFindNextWordFromIndex(QChar* chars, int len, int position, bool forward);
 
 #endif

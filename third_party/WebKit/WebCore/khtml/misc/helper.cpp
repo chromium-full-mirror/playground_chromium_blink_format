@@ -46,4 +46,12 @@ void findWordBoundary(QChar* chars,
 // KDE implementation
 #endif
 }
+
+int nextWordFromIndex(QChar* chars, int len, int position, bool forward) {
+#if APPLE_CHANGES
+  return KWQFindNextWordFromIndex(chars, len, position, forward);
+#else
+// KDE implementation
+#endif
+}
 }

@@ -44,6 +44,7 @@ void findWordBoundary(QChar* chars,
                       int position,
                       int* start,
                       int* end);
+int nextWordFromIndex(QChar* chars, int len, int position, bool forward);
 };
 
 #endif
