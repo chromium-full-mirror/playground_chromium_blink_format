@@ -525,7 +525,7 @@ static bool shouldDrawDecoration(RenderObject* obj) {
     if (curr->isInlineFlow()) {
       shouldDraw = true;
       break;
-    } else if (curr->isText() &&
+    } else if (curr->isText() && !curr->isBR() &&
                (curr->style()->whiteSpace() == PRE || !curr->element() ||
                 !curr->element()->containsOnlyWhitespace())) {
       shouldDraw = true;
