@@ -32,6 +32,12 @@
 
 class QListBoxItem;
 
+#ifdef __OBJC__
+@class NSMutableArray;
+#else
+class NSMutableArray;
+#endif
+
 class QListBox : public QScrollView {
   friend class QListBoxItem;
 
@@ -45,13 +51,11 @@ class QListBox : public QScrollView {
 
   uint count() const;
   void clear();
-  virtual void setSelectionMode(SelectionMode);
-
-  QListBoxItem* firstItem() const { return _head; }
+  void setSelectionMode(SelectionMode);
 
   void beginBatchInsert();
   void insertItem(const QString&, unsigned index);
-  void insertItem(QListBoxItem*, unsigned index);
+  void insertGroupLabel(const QString&, unsigned index);
   void endBatchInsert();
   void setSelected(int, bool);
   bool isSelected(int) const;
@@ -60,36 +64,13 @@ class QListBox : public QScrollView {
   void selectionChanged() { _selectionChanged.call(); }
 
  private:
-  void deleteItems();
-
-  QListBoxItem* _head;
+  NSMutableArray* _items;
   bool _insertingItems;
+  mutable float _width;
+  mutable bool _widthGood;
 
   KWQSignal _clicked;
   KWQSignal _selectionChanged;
-};
-
-class QListBoxItem {
-  friend class QListBox;
-
- public:
-  QListBoxItem(const QString& text);
-
-  void setSelectable(bool) {}
-  QListBoxItem* next() const { return _next; }
-  QString text() const { return _text; }
-
- private:
-  QString _text;
-  QListBoxItem* _next;
-
-  QListBoxItem(const QListBoxItem&);
-  QListBoxItem& operator=(const QListBoxItem&);
-};
-
-class QListBoxText : public QListBoxItem {
- public:
-  QListBoxText(const QString& text = QString::null) : QListBoxItem(text) {}
 };
 
 #endif
