@@ -85,6 +85,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)setRenderPart:(KHTMLRenderPart*)renderPart;
 - (KHTMLRenderPart*)renderPart;
 
+- (void)setName:(NSString*)name;
+- (NSString*)name;
+
 - (KHTMLPart*)part;
 
 - (void)setParent:(WebCoreBridge*)parent;
@@ -216,7 +219,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
                                          referrer:(NSString*)referrer;
 - (void)reportBadURL:(NSString*)badURL;
 - (void)objectLoadedFromCache:(NSURL*)URL
-                     response:response
+                     response:(id)response
                          size:(unsigned)bytes;
 - (BOOL)isReloading;
 
