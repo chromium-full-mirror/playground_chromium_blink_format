@@ -136,11 +136,11 @@ void NPN_GetIdentifiers(const NPUTF8** names,
   }
 }
 
-const NPUTF8* NPN_UTF8FromIdentifier(NPIdentifier identifier) {
+NPUTF8* NPN_UTF8FromIdentifier(NPIdentifier identifier) {
   if (identifier == 0 || (uint32_t)identifier >= identifierCount)
     return NULL;
 
-  return (const NPUTF8*)identifierNames[(uint32_t)identifier];
+  return (NPUTF8*)identifierNames[(uint32_t)identifier];
 }
 
 NPBool NPN_VariantIsVoid(const NPVariant* variant) {
@@ -473,10 +473,13 @@ NPArray* NPN_CreateArrayV(int32_t count, ...) {
   return (NPArray*)array;
 }
 
-NPObject* NPN_ObjectAtIndex(NPArray* obj, int32_t index) {
-  ArrayObject* array = (ArrayObject*)obj;
+/*
+NPVariant *NPN_ObjectAtIndex (NPArray *obj, int32_t index)
+{
+    ArrayObject *array = (ArrayObject *)obj;
 
-  assert(index < array->count && array > 0);
+    assert (index < array->count && array > 0);
 
-  return NPN_RetainObject(array->objects[index]);
+    return NPN_RetainObject (array->objects[index]);
 }
+*/

@@ -35,7 +35,7 @@
 #endif /* XP_PC */
 #endif /* __MWERKS__ */
 
-#ifdef __APPLE_CC__
+#if defined(__APPLE_CC__) && !defined(__MACOS_CLASSIC__)
 #define XP_MACOSX
 #endif
 
@@ -54,14 +54,14 @@
 #endif
 
 /*----------------------------------------------------------------------*/
-/*		     Plugin Version Constants				*/
+/*             Plugin Version Constants                                 */
 /*----------------------------------------------------------------------*/
 
 #define NP_VERSION_MAJOR 0
 #define NP_VERSION_MINOR 11
 
 /*----------------------------------------------------------------------*/
-/*		     Definition of Basic Types				*/
+/*             Definition of Basic Types                                */
 /*----------------------------------------------------------------------*/
 
 #ifndef _UINT16
@@ -101,7 +101,7 @@ typedef int16 NPReason;
 typedef char* NPMIMEType;
 
 /*----------------------------------------------------------------------*/
-/*		     Structures and definitions 			*/
+/*             Structures and definitions             */
 /*----------------------------------------------------------------------*/
 
 #ifdef XP_MAC
@@ -205,11 +205,11 @@ typedef enum { NPWindowTypeWindow = 1, NPWindowTypeDrawable } NPWindowType;
 typedef struct _NPWindow {
   void* window; /* Platform specific window handle */
   int32 x;      /* Position of top left corner relative */
-  int32 y;      /*	to a netscape page.					*/
+  int32 y;      /*    to a netscape page.                    */
   uint32 width; /* Maximum window size */
   uint32 height;
   NPRect clipRect; /* Clipping rectangle in port coordinates */
-                   /* Used by MAC only.			  */
+                   /* Used by MAC only.              */
 #ifdef XP_UNIX
   void* ws_info;     /* Platform-dependent additonal data */
 #endif               /* XP_UNIX */
@@ -218,9 +218,9 @@ typedef struct _NPWindow {
 
 typedef struct _NPFullPrint {
   NPBool pluginPrinted; /* Set TRUE if plugin handled fullscreen */
-                        /*	printing							 */
+                        /*    printing                             */
   NPBool printOne;      /* TRUE if plugin should print one copy  */
-                        /*	to default printer					 */
+                        /*    to default printer                     */
   void* platformPrint;  /* Platform-specific printing info */
 } NPFullPrint;
 
@@ -302,11 +302,11 @@ typedef struct NP_Port {
 #endif
 
 /*----------------------------------------------------------------------*/
-/*		     Error and Reason Code definitions			*/
+/*             Error and Reason Code definitions            */
 /*----------------------------------------------------------------------*/
 
 /*
- *	Values of type NPError:
+ *    Values of type NPError:
  */
 #define NPERR_BASE 0
 #define NPERR_NO_ERROR (NPERR_BASE + 0)
@@ -325,7 +325,7 @@ typedef struct NP_Port {
 #define NPERR_STREAM_NOT_SEEKABLE (NPERR_BASE + 13)
 
 /*
- *	Values of type NPReason:
+ *    Values of type NPReason:
  */
 #define NPRES_BASE 0
 #define NPRES_DONE (NPRES_BASE + 0)
@@ -350,7 +350,7 @@ typedef struct NP_Port {
 #define NPVERS_HAS_WINDOWLESS 11
 
 /*----------------------------------------------------------------------*/
-/*		     Function Prototypes				*/
+/*             Function Prototypes                */
 /*----------------------------------------------------------------------*/
 
 #if defined(_WINDOWS) && !defined(WIN32)
