@@ -1706,6 +1706,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
     return;
 
 #ifndef NDEBUG
+  bool wasInWrite = inWrite;
   inWrite = true;
 #endif
 
@@ -1911,7 +1912,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
 #endif
 
 #ifndef NDEBUG
-  inWrite = false;
+  inWrite = wasInWrite;
 #endif
 
   if (noMoreData && !loadingExtScript && !m_executingScript && !timerId)
