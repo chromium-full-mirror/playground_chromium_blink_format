@@ -260,18 +260,6 @@ void RenderBlock::makeChildrenNonInline(RenderObject* insertionPoint) {
   }
 }
 
-void RenderBlock::removeChildrenFromLineBoxes() {
-  // In the case where we do a collapse/merge from the destruction
-  // of a block in between two anonymous blocks with inlines (see removeChild in
-  // render_block.cpp),
-  // we have line boxes that need to have their parents nulled.
-  KHTMLAssert(!documentBeingDestroyed());
-  for (InlineFlowBox* box = m_firstLineBox; box; box = box->nextFlowBox())
-    for (InlineBox* child = box->firstChild(); child;
-         child = child->nextOnLine())
-      child->remove();
-}
-
 void RenderBlock::removeChild(RenderObject* oldChild) {
   // If this child is a block, and if our previous and next siblings are
   // both anonymous blocks with inline content, then we can go ahead and
@@ -283,9 +271,6 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       !oldChild->continuation() && prev && prev->isAnonymousBlock() &&
       prev->childrenInline() && next && next->isAnonymousBlock() &&
       next->childrenInline()) {
-    // Clean up the line box children inside |next|.
-    static_cast<RenderBlock*>(next)->removeChildrenFromLineBoxes();
-
     // Take all the children out of the |next| block and put them in
     // the |prev| block.
     RenderObject* o = next->firstChild();
@@ -310,7 +295,6 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     // The remerge has knocked us down to containing only a single anonymous
     // box.  We can go ahead and pull the content right back up into our
     // box.
-    static_cast<RenderBlock*>(prev)->removeChildrenFromLineBoxes();
     RenderObject* anonBlock = removeChildNode(prev);
     m_childrenInline = true;
     RenderObject* o = anonBlock->firstChild();
