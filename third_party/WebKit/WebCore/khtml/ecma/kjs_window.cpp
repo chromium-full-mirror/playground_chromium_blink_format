@@ -1222,7 +1222,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
 
               QRect screen = QApplication::desktop()->screenGeometry(scnum);
               if (key == "left" || key == "screenx") {
-                winargs.x = val.toInt() + screen.x();
+                winargs.x = (int)val.toFloat() + screen.x();
                 if (winargs.x < screen.x() || winargs.x > screen.right())
                   winargs.x =
                       screen.x();  // only safe choice until size is determined
@@ -1230,7 +1230,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 winargs.xSet = true;
 #endif
               } else if (key == "top" || key == "screeny") {
-                winargs.y = val.toInt() + screen.y();
+                winargs.y = (int)val.toFloat() + screen.y();
                 if (winargs.y < screen.y() || winargs.y > screen.bottom())
                   winargs.y =
                       screen.y();  // only safe choice until size is determined
@@ -1238,7 +1238,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 winargs.ySet = true;
 #endif
               } else if (key == "height") {
-                winargs.height = val.toInt() +
+                winargs.height = (int)val.toFloat() +
                                  2 *
                                      qApp->style().pixelMetric(
                                          QStyle::PM_DefaultFrameWidth) +
@@ -1252,7 +1252,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 winargs.heightSet = true;
 #endif
               } else if (key == "width") {
-                winargs.width = val.toInt() +
+                winargs.width = (int)val.toFloat() +
                                 2 *
                                     qApp->style().pixelMetric(
                                         QStyle::PM_DefaultFrameWidth) +
