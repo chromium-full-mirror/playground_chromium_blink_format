@@ -136,7 +136,6 @@ class KWQKHTMLPartImpl : public QObject {
   int m_redirectionTimer;
 
   KURL m_baseURL;
-  QString m_documentSource;
   bool m_decodingStarted;
 
   friend class KHTMLPart;
