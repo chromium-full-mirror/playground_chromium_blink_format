@@ -749,7 +749,7 @@ void DOMAttr::putValue(ExecState* exec,
 // -------------------------------------------------------------------------
 
 /* Source for DOMDocumentProtoTable. Use "make hashtables" to regenerate.
-@begin DOMDocumentProtoTable 23
+@begin DOMDocumentProtoTable 29
   createElement   DOMDocument::CreateElement DontDelete|Function 1
   createDocumentFragment DOMDocument::CreateDocumentFragment
 DontDelete|Function 1
@@ -773,6 +773,11 @@ DontDelete|Function 2
   createEvent        DOMDocument::CreateEvent DontDelete|Function 1
   getOverrideStyle   DOMDocument::GetOverrideStyle DontDelete|Function 2
   execCommand        DOMDocument::ExecCommand DontDelete|Function 3
+  queryCommandEnabled DOMDocument::QueryCommandEnabled DontDelete|Function 1
+  queryCommandIndeterm DOMDocument::QueryCommandIndeterm DontDelete|Function 1
+  queryCommandState DOMDocument::QueryCommandState DontDelete|Function 1
+  queryCommandSupported DOMDocument::QueryCommandSupported DontDelete|Function 1
+  queryCommandValue DOMDocument::QueryCommandValue DontDelete|Function 1
 @end
 */
 DEFINE_PROTOTYPE("DOMDocument", DOMDocumentProto)
@@ -980,6 +985,31 @@ Value DOMDocumentProtoFunc::tryCall(ExecState* exec,
       return Boolean(doc.execCommand(args[0].toString(exec).string(),
                                      args[1].toBoolean(exec),
                                      args[2].toString(exec).string()));
+    }
+    case DOMDocument::QueryCommandEnabled: {
+      return Boolean(doc.queryCommandEnabled(args[0].toString(exec).string()));
+    }
+    case DOMDocument::QueryCommandIndeterm: {
+      return Boolean(doc.queryCommandIndeterm(args[0].toString(exec).string()));
+    }
+    case DOMDocument::QueryCommandState: {
+      return Boolean(doc.queryCommandState(args[0].toString(exec).string()));
+    }
+    case DOMDocument::QueryCommandSupported: {
+      return Boolean(
+          doc.queryCommandSupported(args[0].toString(exec).string()));
+    }
+    case DOMDocument::QueryCommandValue: {
+      DOM::DOMString commandValue(
+          doc.queryCommandValue(args[0].toString(exec).string()));
+      // Method returns null DOMString to signal command is unsupported.
+      // Micorsoft documentation for this method says:
+      // "If not supported [for a command identifier], this method returns a
+      // Boolean set to false."
+      if (commandValue.isNull())
+        return Boolean(false);
+      else
+        return String(commandValue);
     }
     default:
       break;

@@ -217,7 +217,12 @@ class DOMDocument : public DOMNode {
     SelectedStylesheetSet,
     GetOverrideStyle,
     ReadyState,
-    ExecCommand
+    ExecCommand,
+    QueryCommandEnabled,
+    QueryCommandIndeterm,
+    QueryCommandState,
+    QueryCommandSupported,
+    QueryCommandValue
   };
 };
 

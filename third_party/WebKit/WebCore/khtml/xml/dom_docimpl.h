@@ -104,6 +104,7 @@ class HTMLDocumentImpl;
 class HTMLElementImpl;
 class HTMLImageLoader;
 class HTMLMapElementImpl;
+class JSEditor;
 class NodeFilter;
 class NodeFilterImpl;
 class NodeIteratorImpl;
@@ -573,6 +574,11 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool execCommand(const DOMString& command,
                    bool userInterface,
                    const DOMString& value);
+  bool queryCommandEnabled(const DOMString& command);
+  bool queryCommandIndeterm(const DOMString& command);
+  bool queryCommandState(const DOMString& command);
+  bool queryCommandSupported(const DOMString& command);
+  DOMString queryCommandValue(const DOMString& command);
 
 #ifndef KHTML_NO_XBL
   // XBL methods
@@ -713,6 +719,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   khtml::Decoder* decoder() const { return m_decoder; }
 
  private:
+  JSEditor* jsEditor();
+
+  JSEditor* m_jsEditor;
   bool relinquishesEditingFocus(NodeImpl* node);
   bool acceptsEditingFocus(NodeImpl* node);
 
