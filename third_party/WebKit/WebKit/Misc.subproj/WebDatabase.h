@@ -16,7 +16,6 @@
 - (void)removeObjectForKey:(id)key;
 - (void)removeAllObjects;
 - (id)objectForKey:(id)key;
-- (NSEnumerator*)keys;
 
 @end
 
