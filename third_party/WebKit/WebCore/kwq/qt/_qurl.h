@@ -38,6 +38,10 @@
 #ifndef QURL_H
 #define QURL_H
 
+#include <config.h>
+
+#ifdef USING_BORROWED_KURL
+
 #ifndef QT_H
 #include "qstring.h"
 #include "_qdir.h"
@@ -118,5 +122,7 @@ class Q_EXPORT QUrl {
  private:
   QUrlPrivate* d;
 };
+
+#endif USING_BORROWED_URL
 
 #endif

@@ -36,6 +36,9 @@
 **********************************************************************/
 
 #include "_qurl.h"
+#include <config.h>
+
+#ifdef USING_BORROWED_KURL
 
 #ifndef QT_NO_DIR
 
@@ -1145,3 +1148,5 @@ bool QUrl::cdUp() {
 }
 
 #endif  // QT_NO_NETWORKPROTOCOL
+
+#endif USING_BORROWED_KURL

@@ -39,6 +39,7 @@
 #else
 
 #include <qstring.h>
+#include <KWQRefPtr.h>
 
 // FIXME: this clever hack may need to be moved into KWQDef.h or elsewhere
 #define Fixed MacFixed
@@ -59,10 +60,12 @@ class KURL {
   // constants ---------------------------------------------------------------
   // static member functions -------------------------------------------------
 
+  static QString decode_string(const QString& urlString);
+
   // constructors, copy constructors, and destructors ------------------------
 
   KURL();
-  KURL(const char* url, int encoding_hint = 0);
+  KURL(const char*, int encoding_hint = 0);
   KURL(const KURL&, const QString&);
   KURL(const QString&, int encoding_hint = 0);
   KURL(const KURL&);
@@ -104,20 +107,11 @@ class KURL {
   // ---------------------------------------------------------------------
 
  private:
-  void init();
+  void copyOnWrite();
 
-  CFURLRef urlRef;
-  bool malformed;
-  QString sURL;
-  QString sProtocol;
-  QString sHost;
-  unsigned short int iPort;
-  QString sPass;
-  QString sUser;
-  QString sRef;
-  QString sQuery;
-  QString sPath;
+  class KWQKURLPrivate;
 
+  KWQRefPtr<KWQKURLPrivate> d;
 };  // class KURL
     // ===============================================================
 
