@@ -116,24 +116,13 @@ void WebKitLog(unsigned int level,
     }                                                                   \
   } while (0)
 
+#define WEBKIT_ASSERT_NOT_REACHED() \
+  WEBKIT_ASSERTION_FAILURE("reached unreachable code")
+
 #endif
-
-#define _logNeverImplemented() \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_NEVER_IMPLEMENTED, "ERROR (NOT IMPLEMENTED)")
-
-#define _logPartiallyImplemented()                   \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_PARTIALLY_IMPLEMENTED, \
-                   "WARNING (PARTIALLY IMPLEMENTED)")
-
-#define _logNotYetImplemented()                    \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_NOT_YET_IMPLEMENTED, \
-                   "WARNING (NOT YET IMPLEMENTED)")
 
 #define WEBKITDEBUG(format...) \
   WEBKITDEBUGLEVEL(WEBKIT_LOG_GENERIC_DEBUG, format)
-
-#define WEBKIT_ASSERT_NOT_REACHED() \
-  WEBKIT_ASSERTION_FAILURE("reached unreachable code")
 
 #ifdef WEB_MALLOC_TESTING
 #ifdef __cplusplus
