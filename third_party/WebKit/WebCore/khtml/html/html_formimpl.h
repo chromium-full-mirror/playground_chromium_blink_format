@@ -201,6 +201,8 @@ class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLFieldSetElementImpl();
 
   virtual Id id() const;
+
+  virtual void attach();
 };
 
 // -------------------------------------------------------------------------
