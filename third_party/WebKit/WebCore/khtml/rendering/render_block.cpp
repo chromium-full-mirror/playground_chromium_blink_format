@@ -1008,11 +1008,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     child->setPos(chPos, child->yPos());
 
     m_height += child->height();
-    if (m_overflowHeight < m_height) {
-      int overflowDelta = child->overflowHeight() - child->height();
-      if (m_height + overflowDelta > m_overflowHeight)
-        m_overflowHeight = m_height + overflowDelta;
-    }
+    int overflowDelta = child->effectiveHeight() - child->height();
+    if (m_height + overflowDelta > m_overflowHeight)
+      m_overflowHeight = m_height + overflowDelta;
 
     if (child->isRenderBlock())
       prevFlow = static_cast<RenderBlock*>(child);
