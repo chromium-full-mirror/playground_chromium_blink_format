@@ -227,9 +227,9 @@ class KWQKHTMLPart : public KHTMLPart {
   QRect selectionRect() const;
   NSRect visibleSelectionRect() const;
   NSImage* selectionImage() const;
-  NSImage* elementImage(DOM::Node node,
-                        NSRect* imageRect,
-                        NSRect* elementRect) const;
+  NSImage* snapshotDragImage(DOM::Node node,
+                             NSRect* imageRect,
+                             NSRect* elementRect) const;
 
   NSFont* fontForCurrentPosition() const;
 

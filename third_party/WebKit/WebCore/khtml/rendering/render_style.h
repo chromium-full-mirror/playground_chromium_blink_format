@@ -827,6 +827,7 @@ class RenderStyle {
              (_styleType == other._styleType) &&
              (_affectedByHover == other._affectedByHover) &&
              (_affectedByActive == other._affectedByActive) &&
+             (_affectedByDrag == other._affectedByDrag) &&
              (_pseudoBits == other._pseudoBits) &&
              (_unicodeBidi == other._unicodeBidi);
     }
@@ -852,6 +853,7 @@ class RenderStyle {
     PseudoId _styleType : 3;
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
+    bool _affectedByDrag : 1;
     int _pseudoBits : 6;
     EUnicodeBidi _unicodeBidi : 2;
   } noninherited_flags;
@@ -918,6 +920,7 @@ class RenderStyle {
     noninherited_flags._styleType = NOPSEUDO;
     noninherited_flags._affectedByHover = false;
     noninherited_flags._affectedByActive = false;
+    noninherited_flags._affectedByDrag = false;
     noninherited_flags._pseudoBits = 0;
     noninherited_flags._unicodeBidi = initialUnicodeBidi();
   }
@@ -943,12 +946,18 @@ class RenderStyle {
   bool affectedByActiveRules() const {
     return noninherited_flags._affectedByActive;
   }
+  bool affectedByDragRules() const {
+    return noninherited_flags._affectedByDrag;
+  }
 
   void setAffectedByHoverRules(bool b) {
     noninherited_flags._affectedByHover = b;
   }
   void setAffectedByActiveRules(bool b) {
     noninherited_flags._affectedByActive = b;
+  }
+  void setAffectedByDragRules(bool b) {
+    noninherited_flags._affectedByDrag = b;
   }
 
   bool operator==(const RenderStyle& other) const;

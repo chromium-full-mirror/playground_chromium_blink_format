@@ -288,6 +288,7 @@ class RenderObject : public CachedObjectClient {
     return style()->display() == RUN_IN;
   }  // run-in object
   bool mouseInside() const;
+  bool isDragging() const;
   bool isReplaced() const {
     return m_replaced;
   }  // a "replaced" element (see CSS)
@@ -318,6 +319,8 @@ class RenderObject : public CachedObjectClient {
 
   RenderStyle* getPseudoStyle(RenderStyle::PseudoId pseudo,
                               RenderStyle* parentStyle = 0) const;
+
+  void updateDragState(bool dragOn);
 
   RenderCanvas* canvas() const;
 
@@ -941,6 +944,7 @@ class RenderObject : public CachedObjectClient {
   bool m_inline : 1;
   bool m_replaced : 1;
   bool m_mouseInside : 1;
+  bool m_isDragging : 1;
   bool m_isSelectionBorder : 1;
 
   bool m_hasOverflowClip : 1;
