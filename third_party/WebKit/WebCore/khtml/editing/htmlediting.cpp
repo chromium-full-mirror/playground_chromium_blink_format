@@ -2325,10 +2325,10 @@ void InsertParagraphSeparatorCommand::doApply() {
   // then this <br> will collapse away when we add a block after it. Add an
   // extra <br>.
   if (!document()->inStrictMode()) {
-    if (pos.node()->id() == ID_BR) {
+    Position downstreamPos = pos.downstream(StayInBlock);
+    if (downstreamPos.node()->id() == ID_BR) {
       NodeImpl* extraBreak = createBreakElement(document());
-      insertNodeAfter(extraBreak, pos.node());
-      pos = Position(extraBreak, 0);
+      insertNodeAfter(extraBreak, downstreamPos.node());
     } else {
       Position upstreamPos = pos.upstream(StayInBlock);
       if (upstreamPos.node()->id() == ID_BR)
