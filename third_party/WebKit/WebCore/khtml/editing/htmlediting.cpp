@@ -929,7 +929,7 @@ void CompositeEditCommand::insertBlockPlaceholderIfNeeded(NodeImpl* node) {
 
 bool CompositeEditCommand::removeBlockPlaceholderIfNeeded(NodeImpl* node) {
   if (!node)
-    return;
+    return false;
 
   document()->updateLayout();
 
