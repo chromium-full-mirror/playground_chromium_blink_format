@@ -863,13 +863,6 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes) const {
     return "";
   }
 
-#ifdef USE_NODEIMPL_ALGORITHM
-  NodeImpl::Id id = commonAncestorBlock->id();
-  bool onlyIncludeChildren = (id != ID_TABLE && id != ID_OL && id != ID_UL);
-  return commonAncestorBlock->recursive_toHTML(onlyIncludeChildren, true, this,
-                                               nodes);
-#else
-
   QStringList markups;
   NodeImpl* pastEnd = pastEndNode();
   NodeImpl* lastClosed = 0;
@@ -956,7 +949,6 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes) const {
   }
 
   return markups.join("");
-#endif
 }
 
 DOMString RangeImpl::text() const {
