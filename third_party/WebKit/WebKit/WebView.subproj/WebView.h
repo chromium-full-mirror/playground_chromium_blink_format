@@ -161,6 +161,9 @@
 - (void)setPolicyHandler:(id<WebControllerPolicyHandler>)handler;
 - (id<WebControllerPolicyHandler>)policyHandler;
 
+- (void)setLocationChangeHandler:(id<WebLocationChangeHandler>)handler;
+- (id<WebLocationChangeHandler>)locationChangeHandler;
+
 - (void)setDirectsAllLinksToSystemBrowser:(BOOL)flag;
 - (BOOL)directsAllLinksToSystemBrowser;
 

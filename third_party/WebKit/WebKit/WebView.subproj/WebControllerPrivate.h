@@ -16,6 +16,7 @@
   id<WebResourceProgressHandler> resourceProgressHandler;
   id<WebResourceProgressHandler> downloadProgressHandler;
   id<WebControllerPolicyHandler> policyHandler;
+  id<WebLocationChangeHandler> locationChangeHandler;
   WebBackForwardList* backForwardList;
   BOOL openedByScript;
 }
