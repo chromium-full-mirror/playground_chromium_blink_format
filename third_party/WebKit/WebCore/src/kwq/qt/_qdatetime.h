@@ -45,6 +45,7 @@
 #endif
 
 #include <KWQDef.h>
+#include <iostream>
 
 // -------------------------------------------------------------------------
 
@@ -92,6 +93,10 @@ class Q_EXPORT QDate {
   static QDate currentDate();
   static bool isValid(int y, int m, int d);
   static bool leapYear(int year);
+
+#ifdef _KWQ_IOSTREAM_
+  friend ostream& operator<<(ostream&, const QDate&);
+#endif
 
  protected:
   static uint greg2jul(int y, int m, int d);
@@ -148,6 +153,10 @@ class Q_EXPORT QTime {
   int restart();
   int elapsed();
 
+#ifdef _KWQ_IOSTREAM_
+  friend ostream& operator<<(ostream&, const QTime&);
+#endif
+
  private:
   static bool currentTime(QTime*);
 
@@ -193,6 +202,10 @@ class Q_EXPORT QDateTime {
   bool operator>=(const QDateTime& dt) const;
 
   static QDateTime currentDateTime();
+
+#ifdef _KWQ_IOSTREAM_
+  friend ostream& operator<<(ostream&, const QDateTime&);
+#endif
 
  private:
   QDate d;
