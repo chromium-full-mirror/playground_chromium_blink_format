@@ -6,7 +6,8 @@ namespace KJS {
 const struct HashEntry DOMNodeProtoTableEntries[] = {
     {0, 0, 0, 0, 0},
     {"hasAttributes", DOMNode::HasAttributes, DontDelete | Function, 0, 0},
-    {"normalize", DOMNode::Normalize, DontDelete | Function, 0, 0},
+    {"normalize", DOMNode::Normalize, DontDelete | Function, 0,
+     &DOMNodeProtoTableEntries[16]},
     {"isSupported", DOMNode::IsSupported, DontDelete | Function, 2, 0},
     {"removeEventListener", DOMNode::RemoveEventListener, DontDelete | Function,
      3, 0},
@@ -24,9 +25,10 @@ const struct HashEntry DOMNodeProtoTableEntries[] = {
     {"removeChild", DOMNode::RemoveChild, DontDelete | Function, 1, 0},
     {"addEventListener", DOMNode::AddEventListener, DontDelete | Function, 3,
      0},
-    {"contains", DOMNode::Contains, DontDelete | Function, 1, 0}};
+    {"contains", DOMNode::Contains, DontDelete | Function, 1, 0},
+    {"item", DOMNode::Item, DontDelete | Function, 1, 0}};
 
-const struct HashTable DOMNodeProtoTable = {2, 16, DOMNodeProtoTableEntries,
+const struct HashTable DOMNodeProtoTable = {2, 17, DOMNodeProtoTableEntries,
                                             13};
 
 }  // namespace
