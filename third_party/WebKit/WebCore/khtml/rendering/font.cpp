@@ -132,7 +132,11 @@ void Font::floatCharacterWidths(QChar* str,
 
 int Font::width(QChar* chs, int slen, int pos, int len) const {
 #if APPLE_CHANGES
-  return fm.width(chs + pos, len);
+#ifndef ROUND_TO_INT
+#define ROUND_TO_INT(x) (unsigned int)((x) + .5)
+#endif
+  return ROUND_TO_INT(
+      fm.floatWidth(chs, slen, pos, len, letterSpacing, wordSpacing));
 #else
   QString qstr = QConstString(chs + pos, len).string();
   // hack for fonts that don't have a welldefined nbsp
@@ -165,7 +169,8 @@ int Font::width(QChar* chs, int slen, int pos, int len) const {
 
 int Font::width(QChar* chs, int slen, int pos) const {
 #if APPLE_CHANGES
-  return width(chs, slen, pos, 1);
+  return ROUND_TO_INT(
+      fm.floatWidth(chs, slen, pos, 1, letterSpacing, wordSpacing));
 #else
   int w;
   if (!fontDef.hasNbsp && (chs + pos)->unicode() == 0xa0)
