@@ -27,7 +27,9 @@
 #include "render_inline.h"
 #include "render_block.h"
 #include "xml/dom_docimpl.h"
+#include "xml/dom_position.h"
 
+using DOM::Position;
 using namespace khtml;
 
 RenderInline::RenderInline(DOM::NodeImpl* node)
@@ -578,4 +580,13 @@ bool RenderInline::nodeAtPoint(NodeInfo& info,
   }
 
   return inside;
+}
+
+Position RenderInline::positionForCoordinates(int x, int y) {
+  for (RenderObject* c = continuation(); c; c = c->continuation()) {
+    if (c->isInline() || c->firstChild())
+      return c->positionForCoordinates(x, y);
+  }
+
+  return RenderFlow::positionForCoordinates(x, y);
 }

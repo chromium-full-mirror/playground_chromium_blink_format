@@ -106,7 +106,10 @@ class QPainter : public Qt {
 
   void drawText(int x, int y, int, int, int alignmentFlags, const QString&);
   void drawHighlightForText(int x,
+                            int minX,
+                            int maxX,
                             int y,
+                            int h,
                             const QChar*,
                             int length,
                             int from,

@@ -42,7 +42,10 @@ using namespace khtml;
 #if APPLE_CHANGES
 void Font::drawHighlightForText(QPainter* p,
                                 int x,
+                                int minX,
+                                int maxX,
                                 int y,
+                                int h,
                                 QChar* str,
                                 int slen,
                                 int pos,
@@ -53,9 +56,10 @@ void Font::drawHighlightForText(QPainter* p,
                                 int from,
                                 int to,
                                 QColor bg) const {
-  p->drawHighlightForText(x, y, str + pos, std::min(slen - pos, len), from, to,
-                          toAdd, bg, d, visuallyOrdered, letterSpacing,
-                          wordSpacing, fontDef.smallCaps);
+  p->drawHighlightForText(x, minX, maxX, y, h, str + pos,
+                          std::min(slen - pos, len), from, to, toAdd, bg, d,
+                          visuallyOrdered, letterSpacing, wordSpacing,
+                          fontDef.smallCaps);
 }
 #endif
 

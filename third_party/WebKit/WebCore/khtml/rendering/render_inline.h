@@ -27,6 +27,10 @@
 
 #include "render_flow.h"
 
+namespace DOM {
+class Position;
+}
+
 namespace khtml {
 
 class RenderInline : public RenderFlow {
@@ -83,6 +87,8 @@ class RenderInline : public RenderFlow {
   virtual int offsetTop() const;
 
   void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
+
+  virtual DOM::Position positionForCoordinates(int x, int y);
 
 #ifdef APPLE_CHANGES
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
