@@ -329,13 +329,17 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
   DOM::HTMLCollection applets = doc.applets();
   DOM::HTMLElement anApplet = applets.namedItem(propertyName.string());
   if (!anApplet.isNull()) {
-    return getRuntimeObject(exec, anApplet);
+    Value v = getRuntimeObject(exec, anApplet);
+    if (!v.isNull())
+      return v;
   }
 
   DOM::HTMLCollection embeds = doc.embeds();
   DOM::HTMLElement anEmbed = embeds.namedItem(propertyName.string());
   if (!anEmbed.isNull()) {
-    return getRuntimeObject(exec, anEmbed);
+    Value v = getRuntimeObject(exec, anEmbed);
+    if (!v.isNull())
+      return v;
   }
 #endif
 
@@ -1270,7 +1274,9 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
 #if APPLE_CHANGES
     case ID_EMBED:
     case ID_APPLET: {
-      return getRuntimeObject(exec, element);
+      Value v = getRuntimeObject(exec, element);
+      if (!v.isNull())
+        return v;
     } break;
 #endif
     default:
@@ -4079,7 +4085,9 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
 #if APPLE_CHANGES
       if (!node.isNull() && (node.handle()->id() == ID_APPLET ||
                              node.handle()->id() == ID_EMBED)) {
-        return getRuntimeObject(exec, node);
+        Value v = getRuntimeObject(exec, node);
+        if (!v.isNull())
+          return v;
       }
 #endif
       return getDOMNode(exec, node);
@@ -4171,7 +4179,9 @@ Value KJS::HTMLCollection::getNamedItems(ExecState* exec,
 #if APPLE_CHANGES
     if (!node.isNull() &&
         (node.handle()->id() == ID_APPLET || node.handle()->id() == ID_EMBED)) {
-      return getRuntimeObject(exec, node);
+      Value v = getRuntimeObject(exec, node);
+      if (!v.isNull())
+        return v;
     }
 #endif
 

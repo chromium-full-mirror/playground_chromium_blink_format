@@ -1701,7 +1701,10 @@ Value KJS::getRuntimeObject(ExecState* exec, const DOM::Node& node) {
       }
     }
   }
-  return Undefined();
+
+  // If we don't have a runtime object return the a Value that reports isNull()
+  // == true.
+  return Value();
 }
 
 Value KJS::getDOMNodeList(ExecState* exec, const DOM::NodeList& l) {
