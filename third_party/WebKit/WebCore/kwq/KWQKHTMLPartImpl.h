@@ -68,6 +68,7 @@ class KWQKHTMLPartImpl : public QObject {
   IFWebDataSource* getDataSource();
 
   bool frameExists(const QString& frameName);
+  KHTMLPart* findFrame(const QString& frameName);
   QPtrList<KParts::ReadOnlyPart> frames() const;
 
   KHTMLPart* parentPart();
