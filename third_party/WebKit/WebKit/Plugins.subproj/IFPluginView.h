@@ -9,6 +9,7 @@
 #include <qwidget.h>
 #include <npapi.h>
 #import <WebFoundation/WebFoundation.h>
+#import <IFWebView.h>
 
 typedef struct _StreamData {
   uint16 transferMode;
@@ -30,7 +31,7 @@ typedef struct _StreamData {
 - (void)stop;
 @end
 
-@interface IFPluginView : IFCarbonWindowView {
+@interface IFPluginView : NSView {
   QWidget* widget;
   WCPlugin* plugin;
   IFPluginViewNullEventSender* eventSender;
@@ -69,7 +70,9 @@ typedef struct _StreamData {
              mime:(NSString*)mime
         arguments:(NSDictionary*)arguments;
 - (void)drawRect:(NSRect)rect;
-- (void)setWindow:(NSRect)rect;
+- (void)setWindow;
+- (void)viewHasMoved:(NSNotification*)note;
+- (NSView*)findSuperview:(NSString*)viewName;
 - (void)newStream:(NSString*)streamURL
          mimeType:(NSString*)mimeType
        notifyData:(void*)notifyData;
@@ -80,7 +83,6 @@ typedef struct _StreamData {
 - (void)sendUpdateEvent;
 - (void)mouseDown:(NSEvent*)theEvent;
 - (void)mouseUp:(NSEvent*)theEvent;
-- (void)mouseDragged:(NSEvent*)theEvent;
 - (void)mouseEntered:(NSEvent*)theEvent;
 - (void)mouseExited:(NSEvent*)theEvent;
 - (void)keyDown:(NSEvent*)theEvent;
