@@ -39,6 +39,7 @@
 - (void)_mergeAutoCompleteHints:(WebHistoryItem*)otherItem;
 
 - (void)setURL:(NSURL*)URL;
+- (void)setURLString:(NSString*)string;
 - (void)setOriginalURLString:(NSString*)URL;
 - (void)setTarget:(NSString*)target;
 - (void)setParent:(NSString*)parent;
@@ -58,6 +59,9 @@
 
 - (void)setAlwaysAttemptToUsePageCache:(BOOL)flag;
 - (BOOL)alwaysAttemptToUsePageCache;
+
+- (void)setNotificationsSuppressed:(BOOL)flag;
+- (BOOL)notificationsSuppressed;
 
 - (NSCalendarDate*)_lastVisitedDate;
 - (void)_setLastVisitedTimeInterval:(NSTimeInterval)time;
