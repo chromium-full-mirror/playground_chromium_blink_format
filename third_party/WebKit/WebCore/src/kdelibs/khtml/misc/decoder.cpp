@@ -238,6 +238,11 @@ QString Decoder::decode(const char* data, int len) {
       return QString::null;
     }
   }
+#ifdef _KWQ_
+  else {
+    buffer += QCString(data, len + 1);
+  }
+#endif
 
 found:
   // if we still haven't found an encoding latin1 will be used...
