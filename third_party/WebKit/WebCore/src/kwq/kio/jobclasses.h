@@ -159,6 +159,7 @@ class TransferJob : public SimpleJob {
   // member functions --------------------------------------------------------
 
   int error();
+  void setError(int);
   bool isErrorPage() const;
   QString queryMetaData(const QString& key);
   void addMetaData(const QString& key, const QString& value);
