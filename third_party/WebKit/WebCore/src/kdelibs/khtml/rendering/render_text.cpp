@@ -45,9 +45,6 @@
 
 #ifdef APPLE_CHANGES
 #define OPTIMIZE_STRING_USAGE
-#ifdef OPTIMIZE_STRING_USAGE
-static CFMutableStringRef reuseableString = 0;
-#endif
 #endif
 
 using namespace khtml;
@@ -742,8 +739,7 @@ void RenderText::calcMinMaxWidth() {
     } while (i + wordlen < len && !(isBreakable(str->s, i + wordlen, str->l)));
     if (wordlen) {
 #if (defined(APPLE_CHANGES) && defined(OPTIMIZE_STRING_USAGE))
-      int w = _fm._width(QString::gstring_toCFString(
-          &reuseableString, (UniChar*)(str->s + i), wordlen));
+      int w = _fm._width((const UniChar*)(str->s + i), wordlen);
 #else
       int w = _fm.width(QConstString(str->s + i, wordlen).string());
 #endif
@@ -765,8 +761,7 @@ void RenderText::calcMinMaxWidth() {
           m_minWidth = currMinWidth;
         currMinWidth = 0;
 #if (defined(APPLE_CHANGES) && defined(OPTIMIZE_STRING_USAGE))
-        currMaxWidth += _fm._width(QString::gstring_toCFString(
-            &reuseableString, (UniChar*)(str->s + i + wordlen), 1));
+        currMaxWidth += _fm._width((const UniChar*)(str->s + i + wordlen), 1);
 #else
         currMaxWidth += _fm.width(*(str->s + i + wordlen));
 #endif
@@ -961,8 +956,7 @@ unsigned int RenderText::width(unsigned int from,
     w = _fm->width(*(str->s + from));
   else
 #if (defined(APPLE_CHANGES) && defined(OPTIMIZE_STRING_USAGE))
-    w = _fm->_width(QString::gstring_toCFString(
-        &reuseableString, (UniChar*)(str->s + from), len));
+    w = _fm->_width((const UniChar*)(str->s + from), len);
 #else
     w = _fm->width(QConstString(str->s + from, len).string());
 #endif

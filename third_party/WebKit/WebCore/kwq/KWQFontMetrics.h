@@ -70,6 +70,7 @@ class QFontMetrics {
   int width(const QString&, int len = -1) const;
 #if (defined(__APPLE__))
   int _width(CFStringRef string) const;
+  int _width(const UniChar* uchars, int len) const;
 #endif
 
   int descent() const;
