@@ -371,7 +371,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   KCharsets* charsets;
   KHTMLParser* parser;
 
-  KHTMLView* view;
+  QGuardedPtr<KHTMLView> view;
 
 #ifndef NDEBUG
   bool inWrite;
