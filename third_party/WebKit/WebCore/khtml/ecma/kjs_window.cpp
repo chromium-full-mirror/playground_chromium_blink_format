@@ -1516,7 +1516,9 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           khtmlpart->setOpener(part);
           khtmlpart->setOpenedByJS(true);
           if (khtmlpart->document().isNull()) {
-            khtmlpart->begin();
+            part->docImpl()->baseURL() == 0
+                ? khtmlpart->begin()
+                : khtmlpart->begin(part->docImpl()->baseURL());
             khtmlpart->write("<HTML><BODY>");
             khtmlpart->end();
 
