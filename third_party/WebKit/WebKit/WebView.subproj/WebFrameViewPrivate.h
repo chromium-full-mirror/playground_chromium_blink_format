@@ -19,6 +19,8 @@
   int marginHeight;
 
   NSArray* draggingTypes;
+
+  BOOL inNextValidKeyView;
 }
 
 @end
