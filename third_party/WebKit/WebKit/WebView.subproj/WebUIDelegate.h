@@ -25,7 +25,11 @@ enum {
   WebMenuItemTagDownloadImageToDisk,
   WebMenuItemTagCopyImageToClipboard,
   WebMenuItemTagOpenFrameInNewWindow,
-  WebMenuItemTagCopy
+  WebMenuItemTagCopy,
+  WebMenuItemTagGoBack,
+  WebMenuItemTagGoForward,
+  WebMenuItemTagStop,
+  WebMenuItemTagReload
 };
 
 /*!
