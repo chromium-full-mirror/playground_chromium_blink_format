@@ -2308,10 +2308,9 @@ NodeImpl* NodeListImpl::recursiveItem(unsigned long offset,
     }
   }
 
-  NodeImpl* end = rootNode->nextSibling();
   NodeImpl* n = start;
 
-  while (n != 0 && n != end) {
+  while (n) {
     if (n->nodeType() == Node::ELEMENT_NODE) {
       if (nodeMatches(n)) {
         if (!remainingOffset) {
@@ -2324,15 +2323,7 @@ NodeImpl* NodeListImpl::recursiveItem(unsigned long offset,
       }
     }
 
-    if (n->firstChild()) {
-      n = n->firstChild();
-    } else if (n->nextSibling()) {
-      n = n->nextSibling();
-    } else if (n->parentNode()) {
-      n = n->parentNode()->nextSibling();
-    } else {
-      n = 0;
-    }
+    n = n->traverseNextNode(rootNode);
   }
 
   return 0;  // no matching node in this subtree
