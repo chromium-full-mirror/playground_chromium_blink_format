@@ -76,6 +76,10 @@ class FunctionObjectImp : public InternalFunctionImp {
   virtual ~FunctionObjectImp();
 
   virtual bool implementsConstruct() const;
+  virtual Object construct(ExecState* exec,
+                           const List& args,
+                           const UString& sourceURL,
+                           int lineNumber);
   virtual Object construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
