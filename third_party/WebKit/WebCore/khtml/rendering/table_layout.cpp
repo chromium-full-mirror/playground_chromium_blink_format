@@ -168,8 +168,13 @@ int FixedTableLayout::calcWidthArray(int tableWidth) {
     section = table->foot;
   if (section) {
     cCol = 0;
+    // FIXME: Technically the first row could be in an arbitrary section (e.g.,
+    // an nth section
+    // if the previous n-1 sections have no rows), so this check isn't good
+    // enough.
     // get the first cell in the first row
-    child = section->firstChild()->firstChild();
+    RenderObject* firstRow = section->firstChild();
+    child = firstRow ? firstRow->firstChild() : 0;
     while (child) {
       if (child->isTableCell()) {
         RenderTableCell* cell = static_cast<RenderTableCell*>(child);

@@ -79,10 +79,12 @@ void RenderContainer::addChild(RenderObject* newChild,
     switch (newChild->style()->display()) {
       case INLINE:
       case BLOCK:
+      case INLINE_BLOCK:
       case LIST_ITEM:
       case RUN_IN:
       case COMPACT:
-      case MARKER:
+      case BOX:
+      case INLINE_BOX:
       case TABLE:
       case INLINE_TABLE:
       case TABLE_COLUMN:

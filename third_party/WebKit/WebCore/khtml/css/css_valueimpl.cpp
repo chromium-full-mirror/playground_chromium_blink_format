@@ -30,6 +30,7 @@
 #include "css/cssparser.h"
 #include "css/cssproperties.h"
 #include "css/cssvalues.h"
+#include "css/cssstyleselector.h"
 
 #include "xml/dom_stringimpl.h"
 #include "xml/dom_docimpl.h"
@@ -48,6 +49,7 @@
 extern DOM::DOMString getPropertyName(unsigned short id);
 
 using khtml::FontDef;
+using khtml::CSSStyleSelector;
 
 using namespace DOM;
 
@@ -476,8 +478,9 @@ void CSSPrimitiveValueImpl::cleanup() {
 }
 
 int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
-                                         QPaintDeviceMetrics* devMetrics) {
-  double result = computeLengthFloat(style, devMetrics);
+                                         QPaintDeviceMetrics* devMetrics,
+                                         khtml::CSSStyleSelector* selector) {
+  double result = computeLengthFloat(style, devMetrics, selector);
 #if APPLE_CHANGES
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -491,8 +494,9 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
 
 int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
                                          QPaintDeviceMetrics* devMetrics,
+                                         khtml::CSSStyleSelector* selector,
                                          double multiplier) {
-  double result = multiplier * computeLengthFloat(style, devMetrics);
+  double result = multiplier * computeLengthFloat(style, devMetrics, selector);
 #if APPLE_CHANGES
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
   // We
@@ -506,7 +510,9 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
 
 double CSSPrimitiveValueImpl::computeLengthFloat(
     khtml::RenderStyle* style,
-    QPaintDeviceMetrics* devMetrics) {
+    QPaintDeviceMetrics* devMetrics,
+    khtml::CSSStyleSelector* selector,
+    bool applyZoomFactor) {
   unsigned short type = primitiveType();
 
   double dpiY = 72.;  // fallback
@@ -518,18 +524,24 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
   double factor = 1.;
   switch (type) {
     case CSSPrimitiveValue::CSS_EMS:
-      factor = style->htmlFont().getFontDef().floatSize();
+      factor = style->htmlFont().getFontDef().specifiedSize;
       break;
-    case CSSPrimitiveValue::CSS_EXS: {
-      QFontMetrics fm = style->fontMetrics();
+    case CSSPrimitiveValue::CSS_EXS:
+      // FIXME: We have a bug right now where the zoom will be applied multiple
+      // times to EX units.
+      // We really need to compute EX using fontMetrics for the original
+      // specifiedSize and not use
+      // our actual constructed rendering font.
+      {
+        QFontMetrics fm = style->fontMetrics();
 #if APPLE_CHANGES
-      factor = fm.xHeight();
+        factor = fm.xHeight();
 #else
-      QRect b = fm.boundingRect('x');
-      factor = b.height();
+        QRect b = fm.boundingRect('x');
+        factor = b.height();
 #endif
-      break;
-    }
+        break;
+      }
     case CSSPrimitiveValue::CSS_PX:
       break;
     case CSSPrimitiveValue::CSS_CM:
@@ -552,7 +564,15 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
       return -1;
   }
 
-  return getFloatValue(type) * factor;
+  float result = getFloatValue(type) * factor;
+  // FIXME: Will need to do this for EX units eventually as well, once they're
+  // patched
+  // to use specifiedSize and not a computed font size above.
+  // Need to adjust for the zoom and for the minimum font size.
+  if (type == CSSPrimitiveValue::CSS_EMS && selector && applyZoomFactor)
+    selector->getComputedSizeFromSpecifiedSize(
+        style->htmlFont().getFontDef().isAbsoluteSize, result);
+  return result;
 }
 
 void CSSPrimitiveValueImpl::setFloatValue(unsigned short unitType,

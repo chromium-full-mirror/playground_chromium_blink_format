@@ -100,7 +100,7 @@ class RenderBlock : public RenderFlow {
   virtual void setStyle(RenderStyle* _style);
 
   virtual void layout();
-  void layoutBlock(bool relayoutChildren);
+  virtual void layoutBlock(bool relayoutChildren);
   void layoutBlockChildren(bool relayoutChildren);
   void layoutInlineChildren(bool relayoutChildren);
 

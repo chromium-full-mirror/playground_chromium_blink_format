@@ -325,6 +325,35 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
 };
 
 //------------------------------------------------
+// CSS3 Flexible Box Properties
+
+enum EBoxAlignment { BSTRETCH, BSTART, BCENTER, BEND, BJUSTIFY, BBASELINE };
+enum EBoxOrient { HORIZONTAL, VERTICAL };
+enum EBoxLines { SINGLE, MULTIPLE };
+enum EBoxDirection { BNORMAL, BREVERSE };
+
+class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData> {
+ public:
+  StyleFlexibleBoxData();
+  ~StyleFlexibleBoxData() {}
+  StyleFlexibleBoxData(const StyleFlexibleBoxData& o);
+
+  bool operator==(const StyleFlexibleBoxData& o) const;
+  bool operator!=(const StyleFlexibleBoxData& o) const { return !(*this == o); }
+
+  float flex;
+  unsigned int flex_group;
+  unsigned int ordinal_group;
+  int flexed_height;  // Not an actual CSS property. Vertical flexing has to use
+                      // this as a cache.
+
+  EBoxAlignment align : 3;
+  EBoxAlignment pack : 3;
+  EBoxOrient orient : 1;
+  EBoxLines lines : 1;
+};
+
+//------------------------------------------------
 // Inherited attributes.
 //
 // the inherited-decoration and inherited-shadow attributes
@@ -469,7 +498,7 @@ enum EDisplay {
   LIST_ITEM,
   RUN_IN,
   COMPACT,
-  MARKER,
+  INLINE_BLOCK,
   TABLE,
   INLINE_TABLE,
   TABLE_ROW_GROUP,
@@ -480,6 +509,8 @@ enum EDisplay {
   TABLE_COLUMN,
   TABLE_CELL,
   TABLE_CAPTION,
+  BOX,
+  INLINE_BOX,
   NONE
 };
 
@@ -526,10 +557,11 @@ class RenderStyle : public Shared<RenderStyle> {
     bool _border_collapse : 1;
     EWhiteSpace _white_space : 2;
     EFontVariant _font_variant : 1;
+    EBoxDirection _box_direction : 1;  // CSS3 box_direction property (flexible
+                                       // box layout module)
     // non CSS2 inherited
     bool _visuallyOrdered : 1;
     bool _htmlHacks : 1;
-    int _unused : 1;
   } inherited_flags;
 
   // don't inherit
@@ -577,6 +609,7 @@ class RenderStyle : public Shared<RenderStyle> {
   DataRef<StyleVisualData> visual;
   DataRef<StyleBackgroundData> background;
   DataRef<StyleSurroundData> surround;
+  DataRef<StyleFlexibleBoxData> flexible_box;
 
   // inherited attributes
   DataRef<StyleInheritedData> inherited;
@@ -609,7 +642,7 @@ class RenderStyle : public Shared<RenderStyle> {
     inherited_flags._font_variant = FVNORMAL;
     inherited_flags._visuallyOrdered = false;
     inherited_flags._htmlHacks = false;
-    inherited_flags._unused = 0;
+    inherited_flags._box_direction = BNORMAL;
 
     noninherited_flags._effectiveDisplay = noninherited_flags._originalDisplay =
         INLINE;
@@ -838,6 +871,17 @@ class RenderStyle : public Shared<RenderStyle> {
 
   CachedImage* cursorImage() const { return inherited->cursor_image; }
 
+  // CSS3 Getter Methods
+  EBoxAlignment boxAlign() { return flexible_box->align; }
+  EBoxDirection boxDirection() { return inherited_flags._box_direction; }
+  float boxFlex() { return flexible_box->flex; }
+  unsigned int boxFlexGroup() { return flexible_box->flex_group; }
+  EBoxLines boxLines() { return flexible_box->lines; }
+  unsigned int boxOrdinalGroup() { return flexible_box->ordinal_group; }
+  EBoxOrient boxOrient() { return flexible_box->orient; }
+  EBoxAlignment boxPack() { return flexible_box->pack; }
+  int boxFlexedHeight() { return flexible_box->flexed_height; }
+
   // attribute setter methods
 
   void setDisplay(EDisplay v) { noninherited_flags._effectiveDisplay = v; }
@@ -1017,6 +1061,21 @@ class RenderStyle : public Shared<RenderStyle> {
     SET_VAR(box, z_index, v)
   }
 
+  // CSS3 Setters
+  void setBoxAlign(EBoxAlignment a) { SET_VAR(flexible_box, align, a); }
+  void setBoxDirection(EBoxDirection d) { inherited_flags._box_direction = d; }
+  void setBoxFlex(float f) { SET_VAR(flexible_box, flex, f); }
+  void setBoxFlexGroup(unsigned int fg) {
+    SET_VAR(flexible_box, flex_group, fg);
+  }
+  void setBoxLines(EBoxLines l) { SET_VAR(flexible_box, lines, l); }
+  void setBoxOrdinalGroup(unsigned int og) {
+    SET_VAR(flexible_box, ordinal_group, og);
+  }
+  void setBoxOrient(EBoxOrient o) { SET_VAR(flexible_box, orient, o); }
+  void setBoxPack(EBoxAlignment p) { SET_VAR(flexible_box, pack, p); }
+  void setBoxFlexedHeight(int h) { SET_VAR(flexible_box, flexed_height, h); }
+
   QPalette palette() const { return visual->palette; }
   void setPaletteColor(QPalette::ColorGroup g,
                        QColorGroup::ColorRole r,
@@ -1035,6 +1094,15 @@ class RenderStyle : public Shared<RenderStyle> {
 
   enum Diff { Equal, NonVisible = Equal, Visible, Position, Layout, CbLayout };
   Diff diff(const RenderStyle* other) const;
+
+  bool isDisplayInlineType() {
+    return display() == INLINE || display() == INLINE_BLOCK ||
+           display() == INLINE_BOX || display() == INLINE_TABLE;
+  }
+  bool isOriginalDisplayInlineType() {
+    return originalDisplay() == INLINE || originalDisplay() == INLINE_BLOCK ||
+           originalDisplay() == INLINE_BOX || originalDisplay() == INLINE_TABLE;
+  }
 };
 
 }  // namespace

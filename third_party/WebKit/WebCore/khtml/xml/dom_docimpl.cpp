@@ -922,7 +922,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
         fontDef.family.setFamily(stdfont);
         fontDef.family.appendFamily(0);
       }
-      fontDef.setSize(m_styleSelector->fontSizes()[3]);
+      m_styleSelector->setFontSize(fontDef, m_styleSelector->fontSizes()[3]);
     }
 
     // kdDebug() << "DocumentImpl::attach: setting to charset " <<
@@ -1017,8 +1017,7 @@ void DocumentImpl::attach() {
 
   // Create the rendering tree
   m_render = new (m_renderArena) RenderCanvas(this, m_view);
-  m_styleSelector->computeFontSizes(
-      paintDeviceMetrics(), m_view ? m_view->part()->zoomFactor() : 100);
+  m_styleSelector->computeFontSizes(paintDeviceMetrics());
   recalcStyle(Force);
 
   RenderObject* render = m_render;

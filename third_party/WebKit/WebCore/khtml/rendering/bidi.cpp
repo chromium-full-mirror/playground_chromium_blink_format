@@ -1534,10 +1534,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
           width = lineWidth(m_height);
         }
       } else if (o->isPositioned()) {
-        // If our original display wasn't an INLINE type, then we can
+        // If our original display wasn't an inline type, then we can
         // go ahead and determine our static x position now.
-        bool isInlineType = o->style()->originalDisplay() == INLINE ||
-                            o->style()->originalDisplay() == INLINE_TABLE;
+        bool isInlineType = o->style()->isOriginalDisplayInlineType();
         bool needToSetStaticX = o->hasStaticX();
         if (o->hasStaticX() && !isInlineType) {
           o->setStaticX(o->parent()->style()->direction() == LTR

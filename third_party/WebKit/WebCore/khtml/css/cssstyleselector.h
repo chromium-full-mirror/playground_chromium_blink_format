@@ -124,7 +124,6 @@ class CSSStyleSelector : public StyleSelector {
   RenderStyle* styleForElement(DOM::ElementImpl* e);
 
   QValueList<int> fontSizes() const { return m_fontSizes; }
-  QValueList<int> fixedFontSizes() const { return m_fixedFontSizes; }
 
   bool strictParsing;
   struct Encodedurl {
@@ -133,12 +132,10 @@ class CSSStyleSelector : public StyleSelector {
     QString file;
   } encodedurl;
 
-  void computeFontSizes(QPaintDeviceMetrics* paintDeviceMetrics,
-                        int zoomFactor);
-  void computeFontSizesFor(QPaintDeviceMetrics* paintDeviceMetrics,
-                           int zoomFactor,
-                           QValueList<int>& fontSizes,
-                           bool isFixed);
+  void computeFontSizes(QPaintDeviceMetrics* paintDeviceMetrics);
+  void setFontSize(FontDef& fontDef, float size);
+  float getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
+                                         float specifiedSize);
 
  protected:
   /* checks if the complete selector (which can be build up from a few
@@ -222,8 +219,9 @@ class CSSStyleSelector : public StyleSelector {
   const KHTMLSettings* settings;
   QPaintDeviceMetrics* paintDeviceMetrics;
   QValueList<int> m_fontSizes;
-  QValueList<int> m_fixedFontSizes;
-
+  float m_fixedScaleFactor;  // Used when converting from proportional to fixed
+                             // and vice
+                             // versa.
   bool fontDirty;
   bool isXMLDoc;
 

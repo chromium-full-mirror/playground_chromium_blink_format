@@ -68,7 +68,12 @@ void RenderReplaced::paint(QPainter* p,
   _tx += m_x;
   _ty += m_y;
 
+  // These checks should probably be >= and <=, because we
+  // can early exit if the element touches the edges.
   if ((_ty > _y + _h) || (_ty + m_height < _y))
+    return;
+
+  if ((_tx >= _x + _w) || (_tx + m_width <= _x))
     return;
 
   if (shouldPaintBackgroundOrBorder())
