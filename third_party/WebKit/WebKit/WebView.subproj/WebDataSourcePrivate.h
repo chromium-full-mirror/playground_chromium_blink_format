@@ -53,6 +53,12 @@ class KHTMLPart;
 
   NSString *pageTitle, *downloadPath;
 
+  // Errors associated with resources.
+  NSMutableDictionary* errors;
+
+  // Error associated with main document.
+  IFError* mainDocumentError;
+
   // The location change handler for this data source.
   id<IFLocationChangeHandler> locationChangeHandler;
 
@@ -90,4 +96,9 @@ class KHTMLPart;
 - (void)_setContentPolicy:(IFContentPolicy)policy;
 - (IFWebDataSource*)_recursiveDataSourceForLocationChangeHandler:
     (id<IFLocationChangeHandler>)handler;
+
+- (void)_clearErrors;
+- (void)_setMainDocumentError:(IFError*)error;
+- (void)_addError:(IFError*)error forResource:(NSString*)resourceDescription;
+
 @end

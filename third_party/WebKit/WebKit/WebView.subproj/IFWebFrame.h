@@ -74,14 +74,6 @@
 - (void)reload:(BOOL)forceRefresh;
 
 /*
-*/
-- (NSDictionary*)errors;
-
-/*
-*/
-- (IFError*)mainDocumentError;
-
-/*
     This method removes references the underlying resources.
     FIXME:  I think this should be private.
 */

@@ -38,8 +38,6 @@ typedef enum {
   khtml::RenderPart* renderFramePart;
   id<IFWebController> controller;
   IFWebFrameState state;
-  NSMutableDictionary* errors;
-  IFError* mainDocumentError;
   BOOL scheduledLayoutPending;
 }
 
@@ -69,10 +67,6 @@ typedef enum {
 - (void)_setState:(IFWebFrameState)newState;
 + (void)_recursiveCheckCompleteFromFrame:(IFWebFrame*)fromFrame;
 - (void)_isLoadComplete;
-- (void)_checkLoadCompleteResource:(NSString*)resourceDescription
-                             error:(IFError*)error
-                    isMainDocument:(BOOL)flag;
-- (void)_clearErrors;
-- (void)_setMainDocumentError:(IFError*)error;
+- (void)_checkLoadComplete;
 - (void)_timedLayout:userInfo;
 @end
