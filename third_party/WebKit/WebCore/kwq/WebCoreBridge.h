@@ -428,8 +428,10 @@ typedef enum {
 - (void)deleteKeyPressed;
 
 - (DOMCSSStyleDeclaration*)typingStyle;
-- (void)setTypingStyle:(DOMCSSStyleDeclaration*)style;
-- (void)applyStyle:(DOMCSSStyleDeclaration*)style;
+- (void)setTypingStyle:(DOMCSSStyleDeclaration*)style
+        withUndoAction:(WebUndoAction)undoAction;
+- (void)applyStyle:(DOMCSSStyleDeclaration*)style
+    withUndoAction:(WebUndoAction)undoAction;
 - (BOOL)selectionStartHasStyle:(DOMCSSStyleDeclaration*)style;
 - (void)applyEditingStyleToBodyElement;
 - (void)removeEditingStyleFromBodyElement;

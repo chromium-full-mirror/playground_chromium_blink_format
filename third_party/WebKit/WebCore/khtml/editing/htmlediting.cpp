@@ -251,8 +251,8 @@ void EditCommandPtr::reapply() const {
   get()->reapply();
 }
 
-HTMLEditAction EditCommandPtr::editingAction() const {
-  IF_IMPL_NULL_RETURN_ARG(HTMLEditActionUnspecified);
+EditAction EditCommandPtr::editingAction() const {
+  IF_IMPL_NULL_RETURN_ARG(EditActionUnspecified);
   return get()->editingAction();
 }
 
@@ -499,8 +499,8 @@ void EditCommand::doReapply() {
   doApply();
 }
 
-HTMLEditAction EditCommand::editingAction() const {
-  return HTMLEditActionUnspecified;
+EditAction EditCommand::editingAction() const {
+  return EditActionUnspecified;
 }
 
 void EditCommand::setStartingSelection(const Selection& s) {
@@ -999,8 +999,11 @@ void AppendNodeCommand::doUnapply() {
 // ApplyStyleCommand
 
 ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
-                                     CSSStyleDeclarationImpl* style)
-    : CompositeEditCommand(document), m_style(style->makeMutable()) {
+                                     CSSStyleDeclarationImpl* style,
+                                     EditAction editingAction)
+    : CompositeEditCommand(document),
+      m_style(style->makeMutable()),
+      m_editingAction(editingAction) {
   ASSERT(m_style);
   m_style->ref();
 }
@@ -1030,6 +1033,10 @@ void ApplyStyleCommand::doApply() {
   blockStyle->deref();
 
   setEndingSelectionNeedsLayout();
+}
+
+EditAction ApplyStyleCommand::editingAction() const {
+  return m_editingAction;
 }
 
 void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclarationImpl* style) {
@@ -1988,13 +1995,13 @@ void DeleteSelectionCommand::doApply() {
   rebalanceWhitespace();
 }
 
-HTMLEditAction DeleteSelectionCommand::editingAction() const {
+EditAction DeleteSelectionCommand::editingAction() const {
   // Note that DeleteSelectionCommand is also used when the user presses the
   // Delete key,
   // but in that case there's a TypingCommand that supplies the editingAction(),
   // so
   // the Undo menu correctly shows "Undo Typing"
-  return HTMLEditActionCut;
+  return EditActionCut;
 }
 
 bool DeleteSelectionCommand::preservesTypingStyle() const {
@@ -2858,8 +2865,8 @@ void MoveSelectionCommand::doApply() {
   applyCommandToComposite(cmd);
 }
 
-HTMLEditAction MoveSelectionCommand::editingAction() const {
-  return HTMLEditActionDrag;
+EditAction MoveSelectionCommand::editingAction() const {
+  return EditActionDrag;
 }
 
 //------------------------------------------------------------------------------------------
@@ -3872,8 +3879,8 @@ void TypingCommand::doApply() {
   ASSERT_NOT_REACHED();
 }
 
-HTMLEditAction TypingCommand::editingAction() const {
-  return HTMLEditActionTyping;
+EditAction TypingCommand::editingAction() const {
+  return EditActionTyping;
 }
 
 void TypingCommand::markMisspellingsAfterTyping() {
@@ -4029,8 +4036,8 @@ void TypingCommand::removeCommand(const EditCommandPtr& cmd) {
     setEndingSelection(m_cmds.last().endingSelection());
 }
 
-HTMLEditAction ReplaceSelectionCommand::editingAction() const {
-  return HTMLEditActionPaste;
+EditAction ReplaceSelectionCommand::editingAction() const {
+  return EditActionPaste;
 }
 
 bool TypingCommand::preservesTypingStyle() const {

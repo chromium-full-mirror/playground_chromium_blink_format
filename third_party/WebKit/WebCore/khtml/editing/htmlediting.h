@@ -27,6 +27,7 @@
 #define __htmlediting_h__
 
 #include "dom_nodeimpl.h"
+#include "editing/edit_actions.h"
 #include "qptrlist.h"
 #include "qvaluelist.h"
 #include "selection.h"
@@ -40,40 +41,6 @@ class DocumentFragmentImpl;
 class HTMLElementImpl;
 class TextImpl;
 }
-
-typedef enum {
-  HTMLEditActionUnspecified,
-  HTMLEditActionSetColor,
-  HTMLEditActionSetBackgroundColor,
-  HTMLEditActionTurnOffKerning,
-  HTMLEditActionTightenKerning,
-  HTMLEditActionLoosenKerning,
-  HTMLEditActionUseStandardKerning,
-  HTMLEditActionTurnOffLigatures,
-  HTMLEditActionUseStandardLigatures,
-  HTMLEditActionUseAllLigatures,
-  HTMLEditActionRaiseBaseline,
-  HTMLEditActionLowerBaseline,
-  HTMLEditActionSetTraditionalCharacterShape,
-  HTMLEditActionSetFont,
-  HTMLEditActionChangeAttributes,
-  HTMLEditActionAlignLeft,
-  HTMLEditActionAlignRight,
-  HTMLEditActionCenter,
-  HTMLEditActionJustify,
-  HTMLEditActionSetWritingDirection,
-  HTMLEditActionSubscript,
-  HTMLEditActionSuperscript,
-  HTMLEditActionUnderline,
-  HTMLEditActionOutline,
-  HTMLEditActionUnscript,
-  HTMLEditActionDrag,
-  HTMLEditActionCut,
-  HTMLEditActionPaste,
-  HTMLEditActionPasteFont,
-  HTMLEditActionPasteRuler,
-  HTMLEditActionTyping,
-} HTMLEditAction;
 
 namespace khtml {
 
@@ -99,15 +66,15 @@ class EditCommandPtr : public SharedPtr<EditCommand> {
   void unapply() const;
   void reapply() const;
 
-  HTMLEditAction editingAction() const;
+  EditAction editingAction() const;
 
   DOM::DocumentImpl* const document() const;
 
-  khtml::Selection startingSelection() const;
-  khtml::Selection endingSelection() const;
+  Selection startingSelection() const;
+  Selection endingSelection() const;
 
-  void setStartingSelection(const khtml::Selection& s) const;
-  void setEndingSelection(const khtml::Selection& s) const;
+  void setStartingSelection(const Selection& s) const;
+  void setEndingSelection(const Selection& s) const;
 
   DOM::CSSMutableStyleDeclarationImpl* typingStyle() const;
   void setTypingStyle(DOM::CSSMutableStyleDeclarationImpl*) const;
@@ -174,12 +141,12 @@ class EditCommand : public Shared<EditCommand> {
   virtual void doUnapply() = 0;
   virtual void doReapply();  // calls doApply()
 
-  virtual HTMLEditAction editingAction() const;
+  virtual EditAction editingAction() const;
 
   virtual DOM::DocumentImpl* const document() const { return m_document; }
 
-  khtml::Selection startingSelection() const { return m_startingSelection; }
-  khtml::Selection endingSelection() const { return m_endingSelection; }
+  Selection startingSelection() const { return m_startingSelection; }
+  Selection endingSelection() const { return m_endingSelection; }
 
   void setEndingSelectionNeedsLayout(bool flag = true) {
     m_endingSelection.setNeedsLayout(flag);
@@ -188,8 +155,8 @@ class EditCommand : public Shared<EditCommand> {
   ECommandState state() const { return m_state; }
   void setState(ECommandState state) { m_state = state; }
 
-  void setStartingSelection(const khtml::Selection& s);
-  void setEndingSelection(const khtml::Selection& s);
+  void setStartingSelection(const Selection& s);
+  void setEndingSelection(const Selection& s);
 
   DOM::CSSMutableStyleDeclarationImpl* typingStyle() const {
     return m_typingStyle;
@@ -206,8 +173,8 @@ class EditCommand : public Shared<EditCommand> {
 
   DOM::DocumentImpl* m_document;
   ECommandState m_state;
-  khtml::Selection m_startingSelection;
-  khtml::Selection m_endingSelection;
+  Selection m_startingSelection;
+  Selection m_endingSelection;
   DOM::CSSMutableStyleDeclarationImpl* m_typingStyle;
   EditCommand* m_parent;
 };
@@ -232,7 +199,7 @@ class CompositeEditCommand : public EditCommand {
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
-  void deleteSelection(const khtml::Selection& selection,
+  void deleteSelection(const Selection& selection,
                        bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
   void deleteTextFromNode(DOM::TextImpl* node, long offset, long count);
@@ -303,10 +270,13 @@ class AppendNodeCommand : public EditCommand {
 
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
-  ApplyStyleCommand(DOM::DocumentImpl*, DOM::CSSStyleDeclarationImpl* style);
+  ApplyStyleCommand(DOM::DocumentImpl*,
+                    DOM::CSSStyleDeclarationImpl* style,
+                    EditAction editingAction = EditActionChangeAttributes);
   virtual ~ApplyStyleCommand();
 
   virtual void doApply();
+  virtual EditAction editingAction() const;
 
   DOM::CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -345,6 +315,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   DOM::Position positionInsertionPoint(DOM::Position);
 
   DOM::CSSMutableStyleDeclarationImpl* m_style;
+  EditAction m_editingAction;
 };
 
 //------------------------------------------------------------------------------------------
@@ -381,12 +352,12 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
   DeleteSelectionCommand(DOM::DocumentImpl* document,
-                         const khtml::Selection& selection,
+                         const Selection& selection,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
 
   virtual void doApply();
-  virtual HTMLEditAction editingAction() const;
+  virtual EditAction editingAction() const;
 
  private:
   virtual bool preservesTypingStyle() const;
@@ -409,7 +380,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
 
   // This data is transient and should be cleared at the end of the doApply
   // function.
-  khtml::Selection m_selectionToDelete;
+  Selection m_selectionToDelete;
   DOM::Position m_upstreamStart;
   DOM::Position m_downstreamStart;
   DOM::Position m_upstreamEnd;
@@ -573,7 +544,7 @@ class MoveSelectionCommand : public CompositeEditCommand {
   virtual ~MoveSelectionCommand();
 
   virtual void doApply();
-  virtual HTMLEditAction editingAction() const;
+  virtual EditAction editingAction() const;
 
  private:
   DOM::DocumentFragmentImpl* m_fragment;
@@ -746,7 +717,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   virtual ~ReplaceSelectionCommand();
 
   virtual void doApply();
-  virtual HTMLEditAction editingAction() const;
+  virtual EditAction editingAction() const;
 
  private:
   void completeHTMLReplacement(const DOM::Position&, const DOM::Position&);
@@ -831,7 +802,7 @@ class TypingCommand : public CompositeEditCommand {
   static void closeTyping(const EditCommandPtr&);
 
   virtual void doApply();
-  virtual HTMLEditAction editingAction() const;
+  virtual EditAction editingAction() const;
 
   bool openForMoreTyping() const { return m_openForMoreTyping; }
   void closeTyping() { m_openForMoreTyping = false; }
