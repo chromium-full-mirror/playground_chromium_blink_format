@@ -11,7 +11,7 @@
 @protocol WebContextMenuHandler;
 
 @interface WebDefaultContextMenuHandler : NSObject<WebContextMenuHandler> {
-  NSDictionary* currentInfo;
+  NSDictionary* element;
 }
 
 @end
