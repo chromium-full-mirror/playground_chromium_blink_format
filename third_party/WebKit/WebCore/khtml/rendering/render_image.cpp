@@ -214,7 +214,8 @@ void RenderImage::paintObject(QPainter* p,
         // topBorder, cWidth, cHeight);
         p->setPen(Qt::lightGray);
         p->setBrush(Qt::NoBrush);
-        p->drawRect(_tx, _ty, cWidth, cHeight);
+        p->drawRect(_tx + leftBorder + leftPad, _ty + topBorder + topPad,
+                    cWidth, cHeight);
       }
 #else  /* not APPLE_CHANGES */
       if (!berrorPic) {

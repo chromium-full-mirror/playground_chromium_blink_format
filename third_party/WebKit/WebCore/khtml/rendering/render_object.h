@@ -94,6 +94,7 @@ class RenderRoot;
 class RenderText;
 class RenderFrameSet;
 class RenderLayer;
+class InlineBox;
 
 /**
  * Base Class for all rendering tree objects.
@@ -178,6 +179,7 @@ class RenderObject : public CachedObjectClient {
   // some helper functions...
   virtual bool isRenderBlock() const { return false; }
   virtual bool isRenderInline() const { return false; }
+  virtual bool isInlineFlow() const { return isRenderInline() || isRunIn(); }
   virtual bool childrenInline() const { return false; }
   virtual void setChildrenInline(bool b){};
   virtual RenderFlow* continuation() const { return 0; }
@@ -269,6 +271,8 @@ class RenderObject : public CachedObjectClient {
   void setIsSelectionBorder(bool b = true) { m_isSelectionBorder = b; }
 
   void scheduleRelayout(RenderObject* clippedObj = 0);
+
+  virtual InlineBox* createInlineBox();
 
   // for discussion of lineHeight see CSS2 spec
   virtual short lineHeight(bool firstLine) const;
@@ -595,7 +599,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool hasOverhangingFloats() { return false; }
 
   // positioning of inline childs (bidi)
-  virtual void position(int, int, int, int, int, bool, bool, int) {}
+  virtual void position(InlineBox*, int, int, int, bool) {}
 
   enum SelectionState {
     SelectionNone,

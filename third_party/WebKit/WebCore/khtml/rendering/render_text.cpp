@@ -189,7 +189,8 @@ void TextRun::paintBoxDecorations(QPainter* pt,
   _tx += m_x;
   _ty += m_y + halfleading - topExtra;
 
-  int width = m_width;
+  int width = m_width + p->borderLeft() + p->borderRight() + p->paddingLeft() +
+              p->paddingRight();
 
   // the height of the decorations is:  topBorder + topPadding + CSS font-size +
   // bottomPadding + bottomBorder
@@ -493,11 +494,7 @@ bool RenderText::nodeAtPoint(NodeInfo& info,
                              bool inside) {
   assert(parent());
 
-  _tx -= paddingLeft() + borderLeft();
-  _ty -= borderTop() + paddingTop();
-
-  int height = m_lineHeight + borderTop() + paddingTop() + borderBottom() +
-               paddingBottom();
+  int height = m_lineHeight;
 
   TextRun* s = m_lines.count() ? m_lines[0] : 0;
   int si = 0;
@@ -1249,7 +1246,8 @@ int RenderText::height() const {
   else
     retval = metrics(false).height();
 
-  retval += paddingTop() + paddingBottom() + borderTop() + borderBottom();
+  // FIXME: Totally bogus.
+  retval += borderTop() + paddingTop() + borderBottom() + paddingBottom();
 
   return retval;
 }
@@ -1266,29 +1264,21 @@ short RenderText::baselinePosition(bool firstLine) const {
   return fm.ascent() + (lineHeight(firstLine) - fm.height()) / 2;
 }
 
-void RenderText::position(int x,
+InlineBox* RenderText::createInlineBox() {
+  // FIXME: Either ditch the array or get this object into it.
+  return new (renderArena()) TextRun(this);
+}
+
+void RenderText::position(InlineBox* box,
                           int y,
                           int from,
                           int len,
-                          int width,
-                          bool reverse,
-                          bool firstLine,
-                          int spaceAdd) {
+                          bool reverse) {
   // ### should not be needed!!!
   if (len == 0 || (str->l && len == 1 && *(str->s + from) == '\n'))
     return;
 
   reverse = reverse && !style()->visuallyOrdered();
-
-  // ### margins and RTL
-  if (from == 0 && parent()->isInline() && parent()->firstChild() == this) {
-    x += paddingLeft() + borderLeft() + marginLeft();
-    width -= marginLeft();
-  }
-
-  if (from + len >= int(str->l) && parent()->isInline() &&
-      parent()->lastChild() == this)
-    width -= marginRight();
 
 #ifdef DEBUG_LAYOUT
   QChar* ch = str->s + from;
@@ -1299,9 +1289,12 @@ void RenderText::position(int x,
                   //metrics(false).ascent() << endl;
 #endif
 
-  TextRun* s = new (renderArena())
-      TextRun(x, y, from, len, baselinePosition(firstLine), width + spaceAdd,
-              reverse, spaceAdd, firstLine);
+  TextRun* s = static_cast<TextRun*>(box);
+  s->m_reversed = reverse;
+  s->m_y = y;
+  s->m_start = from;
+  s->m_len = len;
+  s->m_baseline = baselinePosition(s->m_firstLine);
 
   if (m_lines.count() == m_lines.size())
     m_lines.resize(m_lines.size() * 2 + 1);
@@ -1339,17 +1332,6 @@ unsigned int RenderText::width(unsigned int from,
   else
     w = f->width(str->s, str->l, from, len);
 
-  // ### add margins and support for RTL
-
-  if (parent()->isInline()) {
-    if (from == 0 &&
-        parent()->firstChild() == static_cast<const RenderObject*>(this))
-      w += borderLeft() + paddingLeft() + marginLeft();
-    if (from + len == str->l &&
-        parent()->lastChild() == static_cast<const RenderObject*>(this))
-      w += borderRight() + paddingRight() + marginRight();
-  }
-
   // kdDebug( 6040 ) << "RenderText::width(" << from << ", " << len << ") = " <<
   // w << endl;
   return w;
@@ -1370,13 +1352,6 @@ short RenderText::width() const {
 
   w = QMAX(0, maxx - minx);
 
-  if (parent()->isInline()) {
-    if (parent()->firstChild() == static_cast<const RenderObject*>(this))
-      w += borderLeft() + paddingLeft();
-    if (parent()->lastChild() == static_cast<const RenderObject*>(this))
-      w += borderRight() + paddingRight();
-  }
-
   return w;
 }
 
@@ -1395,12 +1370,7 @@ short RenderText::verticalPositionHint(bool firstLine) const {
 }
 
 const QFontMetrics& RenderText::metrics(bool firstLine) const {
-  if (firstLine && hasFirstLine()) {
-    RenderStyle* pseudoStyle = style()->getPseudoStyle(RenderStyle::FIRST_LINE);
-    if (pseudoStyle)
-      return pseudoStyle->fontMetrics();
-  }
-  return style()->fontMetrics();
+  return style(firstLine)->fontMetrics();
 }
 
 const Font* RenderText::htmlFont(bool firstLine) const {

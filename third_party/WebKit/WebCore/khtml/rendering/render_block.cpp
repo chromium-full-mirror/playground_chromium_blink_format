@@ -1893,8 +1893,7 @@ RenderObject* InlineMinMaxIterator::next() {
       result = current->firstChild();
     if (!result) {
       // We hit the end of our inline. (It was empty, e.g., <span></span>.)
-      if (!oldEndOfInline &&
-          (current->isRenderInline() || current->isRunIn())) {
+      if (!oldEndOfInline && current->isInlineFlow()) {
         result = current;
         endOfInline = true;
         break;
@@ -1905,8 +1904,7 @@ RenderObject* InlineMinMaxIterator::next() {
         if (result)
           break;
         current = current->parent();
-        if (current && current != parent &&
-            (current->isRenderInline() || current->isRunIn())) {
+        if (current && current != parent && current->isInlineFlow()) {
           result = current;
           endOfInline = true;
           break;
@@ -1918,7 +1916,7 @@ RenderObject* InlineMinMaxIterator::next() {
       break;
 
     if (result->isText() || result->isBR() || result->isFloating() ||
-        result->isReplaced() || result->isRenderInline() || result->isRunIn())
+        result->isReplaced() || result->isInlineFlow())
       break;
 
     current = result;
@@ -2022,7 +2020,7 @@ void RenderBlock::calcInlineMinMaxWidth() {
 
       if (!child->isText()) {
         // Case (1) and (2).  Inline replaced and inline flow elements.
-        if (child->isRenderInline() || child->isRunIn()) {
+        if (child->isInlineFlow()) {
           // Add in padding/border/margin from the appropriate side of
           // the element.
           int bpm = getBorderPaddingMargin(child, childIterator.endOfInline);

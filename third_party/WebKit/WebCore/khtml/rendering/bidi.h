@@ -30,6 +30,7 @@ class RenderArena;
 namespace khtml {
 class RenderBlock;
 class RenderObject;
+class InlineBox;
 
 class BidiContext {
  public:
@@ -59,13 +60,7 @@ struct BidiRun {
           RenderObject* _obj,
           BidiContext* context,
           QChar::Direction dir)
-      : vertical(0),
-        baseline(0),
-        height(0),
-        width(0),
-        start(_start),
-        stop(_stop),
-        obj(_obj) {
+      : start(_start), stop(_stop), obj(_obj), box(0) {
     if (dir == QChar::DirON)
       dir = context->dir;
 
@@ -83,14 +78,24 @@ struct BidiRun {
     }
   }
 
-  int vertical;
-  short baseline;
-  short height;
-  int width;
+  void detach(RenderArena* renderArena);
 
+  // Overloaded new operator.
+  void* operator new(size_t sz, RenderArena* renderArena) throw();
+
+  // Overridden to prevent the normal delete from being called.
+  void operator delete(void* ptr, size_t sz);
+
+ private:
+  // The normal operator new is disallowed.
+  void* operator new(size_t sz) throw();
+
+ public:
   int start;
   int stop;
+
   RenderObject* obj;
+  InlineBox* box;
 
   // explicit + implicit levels here
   uchar level;

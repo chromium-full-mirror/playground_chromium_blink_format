@@ -314,6 +314,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   ParseMode parseMode() const { return pMode; }
 
   bool inQuirksMode() { return pMode == Compat; }
+  bool inAlmostStrictMode() { return pMode == AlmostStrict; }
+  bool inStrictMode() { return pMode == Strict; }
 
   void setHTMLMode(HTMLMode m) { hMode = m; }
   HTMLMode htmlMode() const { return hMode; }
