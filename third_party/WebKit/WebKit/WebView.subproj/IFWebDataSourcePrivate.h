@@ -21,7 +21,6 @@
   id<IFDocumentRepresentation> representation;
 
   IFWebDataSource* parent;
-  NSMutableArray* children;
 
   IFWebController* controller;
 
