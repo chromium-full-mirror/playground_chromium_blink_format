@@ -443,15 +443,17 @@ Value DOMNodeProtoFunc::tryCall(ExecState* exec,
     case DOMNode::AddEventListener: {
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
-      node.addEventListener(args[0].toString(exec).string(), listener,
-                            args[2].toBoolean(exec));
+      if (listener)
+        node.addEventListener(args[0].toString(exec).string(), listener,
+                              args[2].toBoolean(exec));
       return Undefined();
     }
     case DOMNode::RemoveEventListener: {
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
-      node.removeEventListener(args[0].toString(exec).string(), listener,
-                               args[2].toBoolean(exec));
+      if (listener)
+        node.removeEventListener(args[0].toString(exec).string(), listener,
+                                 args[2].toBoolean(exec));
       return Undefined();
     }
     case DOMNode::DispatchEvent:
