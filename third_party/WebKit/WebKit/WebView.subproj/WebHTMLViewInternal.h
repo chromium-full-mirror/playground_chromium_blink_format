@@ -14,6 +14,9 @@
   // Is WebCore handling drag destination duties (DHTML dragging)?
   BOOL webCoreHandlingDrag;
   NSDragOperation webCoreDragOp;
+  // Offset from lower left corner of dragged image to mouse location (when
+  // we're the drag source)
+  NSPoint dragOffset;
 
   id savedSubviews;
   BOOL subviewsSetAside;

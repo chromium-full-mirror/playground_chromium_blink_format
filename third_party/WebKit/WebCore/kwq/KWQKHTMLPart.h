@@ -385,6 +385,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _sendingEventToSubview;
   bool _mouseDownMayStartDrag;
   bool _mouseDownMayStartSelect;
+  // in our window's coords
+  int _mouseDownWinX, _mouseDownWinY;
   // in our view's coords
   int _mouseDownX, _mouseDownY;
 
