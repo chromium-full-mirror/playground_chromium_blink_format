@@ -47,8 +47,7 @@
 @end
 
 @protocol IFLocationChangeHandler
-- (void)locationChangeDone:(IFError*)error
-             forDataSource:(IFWebDataSource*)dataSource;
+- (void)serverRedirectTo:(NSURL*)url forDataSource:(IFWebDataSource*)dataSource;
 @end
 
 @interface IFWebDataSource : NSObject
@@ -62,6 +61,7 @@
 - (void)_addURLHandle:(IFURLHandle*)handle;
 - (void)_removeURLHandle:(IFURLHandle*)handle;
 - controller;
+- (KHTMLPart*)_part;
 @end
 
 // This should not be allowed here.  data source should not reference view

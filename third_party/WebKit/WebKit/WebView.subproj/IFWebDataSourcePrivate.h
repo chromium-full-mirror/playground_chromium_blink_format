@@ -32,6 +32,9 @@
   // Child frames of this frame.
   NSMutableDictionary* frames;
 
+  // The main handle.
+  IFURLHandle* mainHandle;
+
   // The handle client for the main document associated with the
   // datasource.
   IFMainURLHandleClient* mainURLHandleClient;
