@@ -38,10 +38,17 @@
 - (void)drawCharacters:(const UniChar*)characters
                 length:(unsigned)length
                atPoint:(NSPoint)point
-             withColor:(NSColor*)color;
+         withTextColor:(NSColor*)color;
 - (void)drawUnderlineForString:(NSString*)string
                        atPoint:(NSPoint)point
                      withColor:(NSColor*)color;
+- (void)drawCharacters:(const UniChar*)characters
+             stringLength:(unsigned int)length
+    fromCharacterPosition:(int)from
+      toCharacterPosition:(int)to
+                  atPoint:(NSPoint)point
+            withTextColor:(NSColor*)textColor
+          backgroundColor:(NSColor*)backgroundColor;
 
 - (void)drawString:(NSString*)string
             inRect:(NSRect)rect

@@ -49,15 +49,23 @@ void Font::drawText(QPainter* p,
                     QColor bg) const {
   QString qstr = QConstString(str, slen).string();
 
+// fprintf (stdout, "x %d, y %d, pos %d, qstr.length() %d, len %d, toAdd %d,
+// from %d, to %d, str \"%s\"\n", x, y, pos, qstr.length(), len, toAdd, from,
+// to, qstr.ascii());
+#ifdef APPLE_CHANGES
+  if (pos != 0)
+    p->drawText(x, y, qstr.mid(pos, len), from, to, bg);
+  else if (len < slen) {
+    qstr.truncate(len);
+    p->drawText(x, y, qstr, from, to, bg);
+  } else
+    p->drawText(x, y, qstr, from, to, bg);
+#else
   // hack for fonts that don't have a welldefined nbsp
   if (!fontDef.hasNbsp) {
-#ifdef APPLE_CHANGES
-    qstr.truncate(slen);
-#else
     // str.setLength() always does a deep copy, so the replacement code below is
     // safe.
     qstr.setLength(slen);
-#endif
     QChar* uc = (QChar*)qstr.unicode();
     for (int i = 0; i < slen; i++)
       if ((uc + i)->unicode() == 0xa0)
@@ -104,6 +112,7 @@ void Font::drawText(QPainter* p,
         x += chw;
     }
   }
+#endif
 }
 
 int Font::width(QChar* chs, int slen, int pos, int len) const {
