@@ -214,7 +214,8 @@ class UString {
     void destroy();
 
     UChar* data() const {
-      return baseString ? (baseString->buf + offset) : (buf + offset);
+      return baseString ? (baseString->buf + baseString->preCapacity + offset)
+                        : (buf + preCapacity + offset);
     }
     int size() const { return len; }
 
@@ -244,6 +245,8 @@ class UString {
     UChar* buf;
     int usedCapacity;
     int capacity;
+    int usedPreCapacity;
+    int preCapacity;
 
     static Rep null;
     static Rep empty;
@@ -472,9 +475,11 @@ class UString {
   void attach(Rep* r);
   void detach();
   void release();
-  int expandedSize(int size) const;
+  int expandedSize(int size, int otherSize) const;
   int usedCapacity() const;
+  int usedPreCapacity() const;
   void expandCapacity(int requiredLength);
+  void expandPreCapacity(int requiredPreCap);
 
   Rep* rep;
 };
