@@ -56,9 +56,15 @@ class UString;
  * possible to exchange data with X and Qt with shallow copies.
  */
 struct UChar {
-  /**
-   * Construct a character with value 0.
-   */
+#ifdef APPLE_CHANGES
+/**
+ * Construct a character with uninitialized value.
+ */
+#else
+/**
+ * Construct a character with value 0.
+ */
+#endif
   UChar();
   /**
    * Construct a character with the value denoted by the arguments.
@@ -109,7 +115,11 @@ struct UChar {
   unsigned short uc;
 };
 
+#ifdef APPLE_CHANGES
 inline UChar::UChar() : uc(0) {}
+#else
+inline UChar::UChar() {}
+#endif
 inline UChar::UChar(unsigned char h, unsigned char l) : uc(h << 8 | l) {}
 inline UChar::UChar(unsigned short u) : uc(u) {}
 
@@ -214,6 +224,9 @@ class UString {
 
     UChar* dat;
     int len;
+#ifdef APPLE_CHANGES
+    int capacity;
+#endif
     int rc;
     static Rep null;
   };
@@ -236,12 +249,21 @@ class UString {
    * length.
    */
   UString(const UChar* c, int length);
-  /**
-   * If copy is false a shallow copy of the string will be created. That
-   * means that the data will NOT be copied and you'll have to guarantee that
-   * it doesn't get deleted during the lifetime of the UString object.
-   * Behaviour defaults to a deep copy if copy is true.
-   */
+#ifdef APPLE_CHANGES
+/**
+ * If copy is false the string data will be adopted.
+ * That means that the data will NOT be copied and the pointer will
+ * be deleted when the UString object is modified or destroyed.
+ * Behaviour defaults to a deep copy if copy is true.
+ */
+#else
+/**
+ * If copy is false a shallow copy of the string will be created. That
+ * means that the data will NOT be copied and you'll have to guarantee that
+ * it doesn't get deleted during the lifetime of the UString object.
+ * Behaviour defaults to a deep copy if copy is true.
+ */
+#endif
   UString(UChar* c, int length, bool copy);
   /**
    * Copy constructor. Makes a shallow copy only.
