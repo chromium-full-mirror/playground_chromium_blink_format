@@ -14,7 +14,4 @@
 - (void)_bookmarkDidChange:(WebBookmark*)bookmark;
 - (void)_bookmarkChildrenDidChange:(WebBookmark*)bookmark;
 
-- (void)_removedBookmark:(WebBookmark*)bookmark;
-- (void)_addedBookmark:(WebBookmark*)bookmark;
-
 @end
