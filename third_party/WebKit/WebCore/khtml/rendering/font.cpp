@@ -115,6 +115,16 @@ void Font::drawText(QPainter* p,
 #endif
 }
 
+#ifdef APPLE_CHANGES
+float Font::floatWidth(QChar* chs, int slen, int pos, int len) const {
+  return fm.floatWidth(chs, slen, pos, len);
+}
+
+float Font::floatCharacterWidth(QChar* chs, int slen, int pos) const {
+  return fm.floatCharacterWidth(chs, slen, pos);
+}
+#endif
+
 int Font::width(QChar* chs, int slen, int pos, int len) const {
 #ifdef APPLE_CHANGES
   return fm.width(chs + pos, len);

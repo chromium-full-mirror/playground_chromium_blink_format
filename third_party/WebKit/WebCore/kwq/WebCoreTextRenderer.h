@@ -61,6 +61,10 @@
            fromCharacterPosition:(int)pos
               numberOfCharacters:(int)len;
 
+- (float)floatWidthForCharacters:(const UniChar*)characters
+                    stringLength:(unsigned)stringLength
+               characterPosition:(int)pos;
+
 - (int)widthForCharacters:(const UniChar*)characters
              stringLength:(unsigned)stringLength
     fromCharacterPosition:(int)pos
