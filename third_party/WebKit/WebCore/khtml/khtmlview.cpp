@@ -562,7 +562,7 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 }
 
 static bool isSubmitImage(DOM::NodeImpl* node) {
-  return node->isHTMLElement() && node->id() == ID_INPUT &&
+  return node && node->isHTMLElement() && node->id() == ID_INPUT &&
          static_cast<HTMLInputElementImpl*>(node)->inputType() ==
              HTMLInputElementImpl::IMAGE;
 }
