@@ -99,7 +99,7 @@ CachedObject::~CachedObject() {
 }
 
 void CachedObject::finish() {
-  if (m_size > MAXCACHEABLE)
+  if (m_size > Cache::maxCacheableObjectSize())
     m_status = Uncacheable;
   else
     m_status = Cached;
@@ -1566,6 +1566,7 @@ QPtrList<DocLoader>* Cache::docloader = 0;
 Loader* Cache::m_loader = 0;
 
 int Cache::maxSize = DEFCACHESIZE;
+int Cache::maxCacheable = MAXCACHEABLE;
 int Cache::flushCount = 0;
 
 QPixmap* Cache::nullPixmap = 0;
@@ -2055,9 +2056,8 @@ void Cache::flush(bool force) {
     if (m_totalSizeOfLRULists <= maxSize)
       break;
 
-    while (m_totalSizeOfLRULists > maxSize && m_LRULists[i].m_tail) {
+    while (m_totalSizeOfLRULists > maxSize && m_LRULists[i].m_tail)
       removeCacheEntry(m_LRULists[i].m_tail);
-    }
   }
 
   flushCount = m_countOfLRUAndUncacheableLists +
@@ -2106,6 +2106,8 @@ void Cache::checkLRUAndUncacheableListIntegrity()
 
 void Cache::setSize(int bytes) {
   maxSize = bytes;
+  maxCacheable = maxSize / 128;
+
   // may be we need to clear parts of the cache
   flushCount = 0;
   flush(true);

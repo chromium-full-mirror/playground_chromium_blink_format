@@ -637,6 +637,8 @@ class Cache {
    */
   static int size() { return maxSize; };
 
+  static int maxCacheableObjectSize() { return maxCacheable; }
+
   /**
    * prints some statistics to stdout
    */
@@ -700,6 +702,7 @@ class Cache {
   static QPtrList<DocLoader>* docloader;
 
   static int maxSize;
+  static int maxCacheable;
   static int flushCount;
 
   static Loader* m_loader;
