@@ -15,7 +15,7 @@
 + (void)createSharedAdapter;
 
 - (BOOL)cookiesEnabled;
-- (NSString*)cookiesForURL:(NSURL*)url;
-- (void)setCookies:(NSString*)cookies forURL:(NSURL*)url;
+- (NSString*)cookiesForURL:(NSURL*)URL;
+- (void)setCookies:(NSString*)cookies forURL:(NSURL*)URL;
 
 @end

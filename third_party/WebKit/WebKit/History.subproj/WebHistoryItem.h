@@ -6,7 +6,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface WebHistoryItem : NSObject {
-  NSURL* _url;
+  NSURL* _URL;
   NSString* _target;
   NSString* _parent;
   NSString* _title;
@@ -17,12 +17,12 @@
   NSString* anchor;
 }
 
-+ (WebHistoryItem*)entryWithURL:(NSURL*)url;
++ (WebHistoryItem*)entryWithURL:(NSURL*)URL;
 
 - (id)init;
-- (id)initWithURL:(NSURL*)url title:(NSString*)title;
-- (id)initWithURL:(NSURL*)url title:(NSString*)title image:(NSImage*)image;
-- (id)initWithURL:(NSURL*)url
+- (id)initWithURL:(NSURL*)URL title:(NSString*)title;
+- (id)initWithURL:(NSURL*)URL title:(NSString*)title image:(NSImage*)image;
+- (id)initWithURL:(NSURL*)URL
            target:(NSString*)target
            parent:(NSString*)parent
             title:(NSString*)title
@@ -31,7 +31,7 @@
 - (NSDictionary*)dictionaryRepresentation;
 - (id)initFromDictionaryRepresentation:(NSDictionary*)dict;
 
-- (NSURL*)url;
+- (NSURL*)URL;
 - (NSString*)target;
 - (NSString*)parent;
 - (NSString*)title;
@@ -39,7 +39,7 @@
 - (NSImage*)image;
 - (NSCalendarDate*)lastVisitedDate;
 
-- (void)setURL:(NSURL*)url;
+- (void)setURL:(NSURL*)URL;
 - (void)setTarget:(NSString*)target;
 - (void)setParent:(NSString*)parent;
 - (void)setTitle:(NSString*)title;

@@ -21,10 +21,6 @@
 @class WebResourceHandle;
 @class WebController;
 
-#ifdef TENTATIVE_API
-@class WebLoader;
-#endif
-
 @class WebDataSourcePrivate;
 @protocol WebDocumentRepresentation;
 
@@ -43,7 +39,7 @@
 
 #ifdef TENTATIVE_API
 - initWithData:(NSData*)data;
-- initNSURL _web_URLWithString:(NSString*)string;
+- initWithString:(NSString*)string;
 - initWithLoader:(WebLoader*)loader;
 #endif
 
@@ -102,7 +98,10 @@
 // To monitor change in the URL, override the <WebLocationChangeHandler>
 // serverRedirectTo:forDataSource: method.
 - (NSURL*)URL;
-- (NSURL*)inputURL;  // deprecated
+
+// The original passed in at initialization time.
+// Starts out same as URL, but doesn't change if a redirect occurs.
+- (NSURL*)originalURL;
 
 // Start actually getting (if initialized with a URL) and parsing data. If the
 // data source
@@ -135,7 +134,7 @@
 - (NSString*)encoding;
 
 // Style sheet
-- (void)setUserStyleSheetFromURL:(NSURL*)url;
+- (void)setUserStyleSheetFromURL:(NSURL*)URL;
 - (void)setUserStyleSheetFromString:(NSString*)sheet;
 
 // a.k.a shortcut icons,

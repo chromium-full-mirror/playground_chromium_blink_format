@@ -87,7 +87,7 @@ typedef enum {
 // URL normally, hand the URL off to launch services, or
 // ignore the URL.  The default implementation could return
 // +defaultURLPolicyForURL:.
-- (WebURLPolicy*)URLPolicyForURL:(NSURL*)url;
+- (WebURLPolicy*)URLPolicyForURL:(NSURL*)URL;
 
 // Sent after locationChangeStarted.
 // Implementations typically call haveContentPolicy:forLocationChangeHandler: on
@@ -114,7 +114,7 @@ typedef enum {
 // launch services failure, etc.
 - (void)unableToImplementURLPolicy:(WebPolicy*)policy
                              error:(WebError*)error
-                            forURL:(NSURL*)url;
+                            forURL:(NSURL*)URL;
 
 // Called when a WebFileURLPolicy could not be completed. This is usually caused
 // by files not
@@ -130,6 +130,6 @@ typedef enum {
                          forDataSource:(WebDataSource*)dataSource;
 
 // Called when a plug-in for a certain mime type is not installed
-- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)url;
+- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)URL;
 
 @end

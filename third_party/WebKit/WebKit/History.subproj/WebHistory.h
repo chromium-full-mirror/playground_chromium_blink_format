@@ -55,7 +55,7 @@
 - (NSArray*)entriesWithTitleOrAddressContainingString:(NSString*)string;
 
 // testing contents for visited-link mechanism
-- (BOOL)containsURL:(NSURL*)url;
+- (BOOL)containsURL:(NSURL*)URL;
 
 // storing contents on disk
 
