@@ -1142,6 +1142,12 @@ void RenderTableSection::calcRowHeight() {
       if ((indx = r - cell->rowSpan() + 1) < 0)
         indx = 0;
 
+      if (cell->getCellPercentageHeight()) {
+        cell->setCellPercentageHeight(0);
+        cell->setChildNeedsLayout(true, false);
+        cell->layoutIfNeeded();
+      }
+
       // Explicit heights use the border box in quirks mode.  In strict mode do
       // the right
       // thing and actually add in the border and padding.
@@ -1290,7 +1296,8 @@ int RenderTableSection::layoutRows(int toAdd) {
       RenderObject* o = cell->firstChild();
       while (o) {
         if (o->style()->height().isPercent()) {
-          o->setNeedsLayout(true);
+          o->setNeedsLayout(true, false);
+          cell->setChildNeedsLayout(true, false);
           cellChildrenFlex = true;
         }
         o = o->nextSibling();
@@ -1562,11 +1569,6 @@ void RenderTableRow::layout() {
   while (child) {
     if (child->isTableCell()) {
       RenderTableCell* cell = static_cast<RenderTableCell*>(child);
-      if (cell->getCellPercentageHeight()) {
-        cell->setCellPercentageHeight(0);
-        if (!cell->needsLayout())
-          cell->setChildNeedsLayout(true);
-      }
       if (child->needsLayout()) {
         cell->calcVerticalMargins();
         cell->layout();
