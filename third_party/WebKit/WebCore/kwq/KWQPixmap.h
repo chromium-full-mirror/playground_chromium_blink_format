@@ -45,6 +45,8 @@ typedef WebCoreImageRenderer* WebCoreImageRendererPtr;
 
 class QWMatrix;
 
+bool canRenderImageType(const QString& type);
+
 class QPixmap : public QPaintDevice, public Qt {
  public:
   QPixmap();
