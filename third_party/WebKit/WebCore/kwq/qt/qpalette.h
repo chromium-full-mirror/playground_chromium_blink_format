@@ -44,7 +44,8 @@ class QColorGroup {
     Text
   };
 
-  void setColor(ColorRole role, const QColor& color);
+  const QColor& color(ColorRole) const;
+  void setColor(ColorRole, const QColor&);
   const QColor& foreground() const;
   const QColor& shadow() const;
   const QColor& light() const;
@@ -66,6 +67,7 @@ class QPalette {
   const QColorGroup& active() const;
   const QColorGroup& inactive() const;
   const QColorGroup& disabled() const;
+  const QColorGroup& normal() const;
 };
 
 #endif
