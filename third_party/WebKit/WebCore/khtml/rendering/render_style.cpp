@@ -49,14 +49,8 @@ bool StyleSurroundData::operator==(const StyleSurroundData& o) const {
 
 StyleBoxData::StyleBoxData() : z_index(0), z_auto(true) {
   // Initialize our min/max widths/heights.
-  min_width.type = Fixed;
-  min_width.value = 0;
-  min_height.type = Fixed;
-  min_height.value = 0;
-  max_width.type = Fixed;
-  max_width.value = UNDEFINED;
-  max_height.type = Fixed;
-  max_height.value = UNDEFINED;
+  min_width = min_height = RenderStyle::initialMinSize();
+  max_width = max_height = RenderStyle::initialMaxSize();
 }
 
 StyleBoxData::StyleBoxData(const StyleBoxData& o)
@@ -79,7 +73,7 @@ bool StyleBoxData::operator==(const StyleBoxData& o) const {
 
 StyleVisualData::StyleVisualData()
     : hasClip(false),
-      textDecoration(TDNONE),
+      textDecoration(RenderStyle::initialTextDecoration()),
       colspan(1),
       counter_increment(0),
       counter_reset(0),
@@ -97,7 +91,8 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       counter_reset(o.counter_reset),
       palette(o.palette) {}
 
-StyleBackgroundData::StyleBackgroundData() : image(0) {}
+StyleBackgroundData::StyleBackgroundData()
+    : image(RenderStyle::initialBackgroundImage()) {}
 
 StyleBackgroundData::StyleBackgroundData(const StyleBackgroundData& o)
     : Shared<StyleBackgroundData>(),
@@ -113,12 +108,11 @@ bool StyleBackgroundData::operator==(const StyleBackgroundData& o) const {
 }
 
 StyleMarqueeData::StyleMarqueeData() {
-  increment.type = Fixed;
-  increment.value = 6;  // 6 pixels is the WinIE default.
-  speed = 85;           // 85msec is the WinIE default.
-  direction = MAUTO;    // Direction is auto-determined by overflow by default.
-  behavior = MSCROLL;   // Scrolling marquee is the default.
-  loops = -1;           // Loop forever by default. Matches WinIE.
+  increment = RenderStyle::initialMarqueeIncrement();
+  speed = RenderStyle::initialMarqueeSpeed();
+  direction = RenderStyle::initialMarqueeDirection();
+  behavior = RenderStyle::initialMarqueeBehavior();
+  loops = RenderStyle::initialMarqueeLoopCount();
 }
 
 StyleMarqueeData::StyleMarqueeData(const StyleMarqueeData& o)
@@ -136,13 +130,13 @@ bool StyleMarqueeData::operator==(const StyleMarqueeData& o) const {
 }
 
 StyleFlexibleBoxData::StyleFlexibleBoxData() : Shared<StyleFlexibleBoxData>() {
-  flex = 0.0f;
-  flex_group = 1;
-  ordinal_group = 1;
-  align = BSTRETCH;
-  pack = BSTART;
-  orient = HORIZONTAL;
-  lines = SINGLE;
+  flex = RenderStyle::initialBoxFlex();
+  flex_group = RenderStyle::initialBoxFlexGroup();
+  ordinal_group = RenderStyle::initialBoxOrdinalGroup();
+  align = RenderStyle::initialBoxAlign();
+  pack = RenderStyle::initialBoxPack();
+  orient = RenderStyle::initialBoxOrient();
+  lines = RenderStyle::initialBoxLines();
   flexed_height = -1;
 }
 
@@ -166,7 +160,8 @@ bool StyleFlexibleBoxData::operator==(const StyleFlexibleBoxData& o) const {
 }
 
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
-    : Shared<StyleCSS3NonInheritedData>(), opacity(1.0f) {}
+    : Shared<StyleCSS3NonInheritedData>(),
+      opacity(RenderStyle::initialOpacity()) {}
 
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
     const StyleCSS3NonInheritedData& o)
@@ -203,17 +198,17 @@ bool StyleCSS3InheritedData::shadowDataEquivalent(
 }
 
 StyleInheritedData::StyleInheritedData()
-    : indent(Fixed),
-      line_height(-100, Percent),
-      style_image(0),
+    : indent(RenderStyle::initialTextIndent()),
+      line_height(RenderStyle::initialLineHeight()),
+      style_image(RenderStyle::initialListStyleImage()),
       cursor_image(0),
       font(),
-      color(Qt::black),
-      horizontal_border_spacing(0),
-      vertical_border_spacing(0),
-      widows(2),
-      orphans(2),
-      page_break_inside(PBAUTO) {}
+      color(RenderStyle::initialColor()),
+      horizontal_border_spacing(RenderStyle::initialHorizontalBorderSpacing()),
+      vertical_border_spacing(RenderStyle::initialVerticalBorderSpacing()),
+      widows(RenderStyle::initialWidows()),
+      orphans(RenderStyle::initialOrphans()),
+      page_break_inside(RenderStyle::initialPageBreak()) {}
 
 StyleInheritedData::~StyleInheritedData() {}
 
@@ -517,8 +512,6 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         other->inherited_flags._text_transform) ||
       !(inherited_flags._direction == other->inherited_flags._direction) ||
       !(inherited_flags._white_space == other->inherited_flags._white_space) ||
-      !(inherited_flags._font_variant ==
-        other->inherited_flags._font_variant) ||
       !(noninherited_flags._clear == other->noninherited_flags._clear))
     return Layout;
 
@@ -569,6 +562,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         other->noninherited_flags._bg_attachment) ||
       !(inherited_flags._text_decorations ==
         other->inherited_flags._text_decorations) ||
+      !(inherited_flags._should_correct_text_color ==
+        other->inherited_flags._should_correct_text_color) ||
       !(surround->border == other->surround->border) ||
       *background.get() != *other->background.get() ||
       !(visual->clip == other->visual->clip) ||

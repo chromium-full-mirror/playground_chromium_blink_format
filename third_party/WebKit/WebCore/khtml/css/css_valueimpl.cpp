@@ -378,9 +378,22 @@ void CSSValueImpl::setCssText(DOM::DOMString /*str*/) {
   // ###
 }
 
+unsigned short CSSInheritedValueImpl::cssValueType() const {
+  return CSSValue::CSS_INHERIT;
+}
+
 DOM::DOMString CSSInheritedValueImpl::cssText() const {
   return DOMString("inherited");
 }
+
+unsigned short CSSInitialValueImpl::cssValueType() const {
+  return CSSValue::CSS_INITIAL;
+}
+
+DOM::DOMString CSSInitialValueImpl::cssText() const {
+  return DOMString("initial");
+}
+
 // ----------------------------------------------------------------------------------------
 
 CSSValueListImpl::CSSValueListImpl() : CSSValueImpl() {}
