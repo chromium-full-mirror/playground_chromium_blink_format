@@ -10,7 +10,7 @@
 @class WebRequest;
 
 /*!
-    @protocol  WebResourceLoadDelegate
+    @category  WebResourceLoadDelegate
     @discussion Implementors of this protocol will receive messages indicating
     that a resource is about to be loaded, data has been received for a
    resource,
@@ -25,7 +25,7 @@
     resource.  For example, a single resource may generate multiple
     resource:willSendRequest:fromDataSource: messages as it's URL is redirected.
 */
-@protocol WebResourceLoadDelegate<NSObject>
+@interface NSObject (WebResourceLoadDelegate)
 
 /*!
     @method identifierForInitialRequest:fromDataSource:
@@ -125,21 +125,4 @@
 - (void)pluginFailedWithError:(WebPluginError*)error
                    dataSource:(WebDataSource*)dataSource;
 
-@end
-
-/*!
-    @class WebResourceLoadDelegate
-    @discussion The WebResourceLoadDelegate class responds to all
-   WebResourceLoadDelegate protocol
-    methods by doing nothing, except for
-   identifierForInitialRequest:fromDataSource: and
-    resource:willSendRequest:fromDataSource:, which return a new NSObject and
-   the
-    passed-in request, respectively. This class is provided for the convenience
-   of clients who only want
-    to implement some of the WebResourceLoadDelegate protocol methods and ignore
-   others.
-*/
-@interface WebResourceLoadDelegate : NSObject<WebResourceLoadDelegate> {
-}
 @end

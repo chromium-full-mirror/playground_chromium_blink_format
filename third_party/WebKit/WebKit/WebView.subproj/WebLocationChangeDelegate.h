@@ -12,11 +12,11 @@
 @class WebFrame;
 
 /*!
-    @protocol WebLocationChangeDelegate
+    @category WebLocationChangeDelegate
     @discussion A controller's WebLocationChangeDelegate track changes its
    frame's location.
 */
-@protocol WebLocationChangeDelegate<NSObject>
+@interface NSObject (WebLocationChangeDelegate)
 
 /*!
     @method locationChangeStartedForDataSource:
@@ -132,16 +132,4 @@
 */
 - (void)clientRedirectCancelledForFrame:(WebFrame*)frame;
 
-@end
-
-/*!
-    @class WebLocationChangeDelegate
-    @discussion The WebLocationChangeDelegate class responds to all
-   WebLocationChangeDelegate protocol
-    methods by doing nothing. It's provided for the convenience of clients who
-   only want
-    to implement some of the above methods and ignore others.
-*/
-@interface WebLocationChangeDelegate : NSObject<WebLocationChangeDelegate> {
-}
 @end

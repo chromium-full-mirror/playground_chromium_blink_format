@@ -79,7 +79,7 @@ typedef enum {
 @end
 
 /*!
-    @protocol WebControllerPolicyDelegate
+    @category WebControllerPolicyDelegate
     @discussion While loading a URL, WebKit asks the WebControllerPolicyDelegate
    for
     policies that determine the action of what to do with the URL or the data
@@ -90,7 +90,7 @@ typedef enum {
     decideNavigationPolicyForAction:andRequest:inFrame:decisionListener:<BR>
     contentPolicyForMIMEType:andRequest:inFrame:<BR>
 */
-@protocol WebControllerPolicyDelegate<NSObject>
+@interface NSObject (WebControllerPolicyDelegate)
 
 /*!
      @method

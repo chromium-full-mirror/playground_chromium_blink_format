@@ -13,7 +13,6 @@
 @class WebResponse;
 
 @protocol WebResourceDelegate;
-@protocol WebResourceLoadDelegate;
 
 @interface WebBaseResourceHandleDelegate : NSObject<WebResourceDelegate> {
  @protected
@@ -24,8 +23,8 @@
   WebController* controller;
   WebResponse* response;
   id identifier;
-  id<WebResourceLoadDelegate> resourceLoadDelegate;
-  id<WebResourceLoadDelegate> downloadDelegate;
+  id resourceLoadDelegate;
+  id downloadDelegate;
   NSURL* currentURL;
   BOOL reachedTerminalState;
   BOOL defersCallbacks;
@@ -39,8 +38,8 @@
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;
 
-- (id<WebResourceLoadDelegate>)resourceLoadDelegate;
-- (id<WebResourceLoadDelegate>)downloadDelegate;
+- resourceLoadDelegate;
+- downloadDelegate;
 - (BOOL)isDownload;
 
 - (void)cancel;

@@ -17,7 +17,7 @@
 }
 
 - (void)receivedData:(NSData*)data withDataSource:(WebDataSource*)dataSource;
-- (void)setFrame:(WebFrame*)webFrame;
+- (void)setWebFrame:(WebFrame*)webFrame;
 - (void)runOpenPanelForFileButtonWithResultListener:
     (id<WebOpenPanelResultListener>)resultListener;
 
