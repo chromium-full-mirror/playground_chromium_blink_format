@@ -186,7 +186,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool hasID() const { return m_hasId; }
   bool hasClass() const { return m_hasClass; }
   bool hasStyle() const { return m_hasStyle; }
-  bool pressed() const { return m_pressed; }
   bool active() const { return m_active; }
   bool focused() const { return m_focused; }
   bool attached() const { return m_attached; }
@@ -199,7 +198,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   void setHasID(bool b = true) { m_hasId = b; }
   void setHasClass(bool b = true) { m_hasClass = b; }
   void setHasStyle(bool b = true) { m_hasStyle = b; }
-  void setPressed(bool b = true) { m_pressed = b; }
   void setHasChangedChild(bool b = true) { m_hasChangedChild = b; }
   void setInDocument(bool b = true) { m_inDocument = b; }
   virtual void setFocus(bool b = true) { m_focused = b; }
@@ -422,7 +420,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool m_hasId : 1;
   bool m_hasClass : 1;
   bool m_hasStyle : 1;
-  bool m_pressed : 1;
   bool m_attached : 1;
   bool m_changed : 1;
   bool m_hasChangedChild : 1;

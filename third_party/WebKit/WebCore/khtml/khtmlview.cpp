@@ -680,8 +680,6 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
   bool swallowEvent = dispatchMouseEvent(
       EventImpl::MOUSEDOWN_EVENT, mev.innerNode.handle(), true, d->clickCount,
       _mouse, true, DOM::NodeImpl::MousePress);
-  if (mev.innerNode.handle())
-    mev.innerNode.handle()->setPressed();
 
   if (!swallowEvent) {
     khtml::MousePressEvent event(_mouse, xm, ym, mev.url, mev.target,
@@ -735,9 +733,6 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
   dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.handle(), true,
                      d->clickCount, _mouse, true, DOM::NodeImpl::MouseRelease);
 
-  if (mev.innerNode.handle())
-    mev.innerNode.handle()->setPressed(false);
-
   // Qt delivers a release event AND a double click event.
   if (!swallowEvent) {
     khtml::MouseReleaseEvent event1(_mouse, xm, ym, mev.url, mev.target,
@@ -760,9 +755,6 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
   bool swallowEvent = dispatchMouseEvent(
       EventImpl::MOUSEDOWN_EVENT, mev.innerNode.handle(), true, d->clickCount,
       _mouse, true, DOM::NodeImpl::MouseDblClick);
-
-  if (mev.innerNode.handle())
-    mev.innerNode.handle()->setPressed();
 
   if (!swallowEvent) {
     khtml::MouseDoubleClickEvent event(_mouse, xm, ym, mev.url, mev.target,
@@ -965,9 +957,6 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
                        d->clickCount, _mouse, true,
                        DOM::NodeImpl::MouseRelease);
 
-  if (mev.innerNode.handle())
-    mev.innerNode.handle()->setPressed(false);
-
   if (!swallowEvent) {
     khtml::MouseReleaseEvent event(_mouse, xm, ym, mev.url, mev.target,
                                    mev.innerNode);
@@ -1042,7 +1031,6 @@ void KHTMLView::keyPressEvent(QKeyEvent* _ke) {
       case Key_Enter:
       case Key_Return:
         // ### FIXME:
-        // move this code to HTMLAnchorElementImpl::setPressed(false),
         // or even better to HTMLAnchorElementImpl::event()
         if (m_part->xmlDocImpl()) {
           NodeImpl* n = m_part->xmlDocImpl()->focusNode();
