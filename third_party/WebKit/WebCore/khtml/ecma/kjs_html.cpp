@@ -33,6 +33,7 @@
 // ### HACK
 #include "html/html_baseimpl.h"
 #include "html/html_documentimpl.h"
+#include "html/html_objectimpl.h"
 
 #include "khtml_part.h"
 #include "khtmlview.h"
@@ -48,6 +49,10 @@
 #include "rendering/render_object.h"
 
 #include <kdebug.h>
+
+#if APPLE_CHANGES
+#include <JavaScriptCore/runtime_object.h>
+#endif
 
 using namespace KJS;
 
@@ -1208,7 +1213,15 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
             return globalObject.get(exec, propertyName);
         }
       }
-    }
+    } break;
+    case ID_APPLET: {
+      DOM::HTMLAppletElementImpl* appletElement =
+          static_cast<DOM::HTMLAppletElementImpl*>(element.handle());
+      RuntimeObjectImp valueForApplet(appletElement->getAppletInstance());
+      printf("%s:  ID_APPLET %p, propertyName %s\n", __PRETTY_FUNCTION__,
+             appletElement->getAppletInstance(), propertyName.ascii());
+      return valueForApplet.get(exec, propertyName);
+    } break;
     default:
       break;
   }

@@ -22,7 +22,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <CoreFoundation/CoreFoundation.h>
+
 #include "../runtime.h"
+
+namespace KJS {
+class Value;
+}
 
 namespace Bindings {
 
@@ -125,6 +131,7 @@ class JavaConstructor : public Constructor {
     return *this;
   }
 
+  virtual KJS::Value value() const { return KJS::Value(0); }
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
   virtual long numParameters() const { return _numParameters; };
 
@@ -158,6 +165,7 @@ class JavaField : public Field {
     return *this;
   }
 
+  virtual KJS::Value value() const { return KJS::Value(0); }
   virtual const char* name() const { return _name->characters(); }
   virtual RuntimeType type() const { return _type->characters(); }
 
@@ -204,6 +212,7 @@ class JavaMethod : public Method {
     return *this;
   };
 
+  virtual KJS::Value value() const { return KJS::Value(0); }
   virtual const char* name() const { return _name->characters(); };
   virtual RuntimeType returnType() const { return _returnType->characters(); };
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
@@ -222,9 +231,9 @@ class JavaClass : public Class {
 
   void _commonDelete() {
     free((void*)_name);
-    delete _fields;
+    CFRelease(_fields);
+    CFRelease(_methods);
     delete _constructors;
-    delete _methods;
   }
 
   ~JavaClass() { _commonDelete(); }
@@ -234,17 +243,8 @@ class JavaClass : public Class {
 
     _name = strdup(other._name);
 
-    _numFields = other._numFields;
-    _fields = new JavaField[_numFields];
-    for (i = 0; i < _numFields; i++) {
-      _fields[i] = other._fields[i];
-    }
-
-    _numMethods = other._numMethods;
-    _methods = new JavaMethod[_numMethods];
-    for (i = 0; i < _numMethods; i++) {
-      _methods[i] = other._methods[i];
-    }
+    _methods = CFDictionaryCreateCopy(NULL, other._methods);
+    _fields = CFDictionaryCreateCopy(NULL, other._fields);
 
     _numConstructors = other._numConstructors;
     _constructors = new JavaConstructor[_numConstructors];
@@ -267,9 +267,10 @@ class JavaClass : public Class {
 
   virtual const char* name() const { return _name; };
 
-  virtual Method* methodAt(long i) const { return &_methods[i]; };
-
-  virtual long numMethods() const { return _numMethods; };
+  virtual Method* methodNamed(const char* name) const {
+    Method* aMethod = (Method*)CFDictionaryGetValue(_methods, name);
+    return aMethod;
+  };
 
   virtual Constructor* constructorAt(long i) const {
     return &_constructors[i];
@@ -277,17 +278,30 @@ class JavaClass : public Class {
 
   virtual long numConstructors() const { return _numConstructors; };
 
-  virtual Field* fieldAt(long i) const { return &_fields[i]; };
-
-  virtual long numFields() const { return _numFields; }
+  virtual Field* fieldNamed(const char* name) const {
+    Field* aField = (Field*)CFDictionaryGetValue(_fields, name);
+    return aField;
+  };
 
  private:
   const char* _name;
-  JavaField* _fields;
-  long _numFields;
+  CFDictionaryRef _fields;
+  CFDictionaryRef _methods;
   JavaConstructor* _constructors;
   long _numConstructors;
-  JavaMethod* _methods;
-  long _numMethods;
+};
+
+class JavaInstance : public Instance {
+ public:
+  JavaInstance(JNIEnv* env, jobject instance, JavaClass* aClass);
+
+  ~JavaInstance();
+
+  virtual Class* getClass() const { return _class; }
+
+ private:
+  JNIEnv* _env;
+  jobject _instance;
+  JavaClass* _class;
 };
 }

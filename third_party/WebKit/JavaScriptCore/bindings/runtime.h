@@ -22,6 +22,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef _RUNTIME_H_
+#define _RUNTIME_H_
+
+#include "value.h"
+
 namespace Bindings {
 
 // For now just use Java style type descriptors.
@@ -37,6 +42,9 @@ class Constructor {
  public:
   virtual Parameter* parameterAt(long i) const = 0;
   virtual long numParameters() const = 0;
+
+  virtual KJS::Value value() const = 0;
+
   virtual ~Constructor(){};
 };
 
@@ -44,6 +52,9 @@ class Field {
  public:
   virtual const char* name() const = 0;
   virtual RuntimeType type() const = 0;
+
+  virtual KJS::Value value() const = 0;
+
   virtual ~Field(){};
 };
 
@@ -53,6 +64,9 @@ class Method {
   virtual RuntimeType returnType() const = 0;
   virtual Parameter* parameterAt(long i) const = 0;
   virtual long numParameters() const = 0;
+
+  virtual KJS::Value value() const = 0;
+
   virtual ~Method(){};
 };
 
@@ -60,14 +74,21 @@ class Class {
  public:
   virtual const char* name() const = 0;
 
-  virtual Method* methodAt(long i) const = 0;
-  virtual long numMethods() const = 0;
+  virtual Method* methodNamed(const char* name) const = 0;
 
   virtual Constructor* constructorAt(long i) const = 0;
   virtual long numConstructors() const = 0;
 
-  virtual Field* fieldAt(long i) const = 0;
-  virtual long numFields() const = 0;
+  virtual Field* fieldNamed(const char* name) const = 0;
+
   virtual ~Class(){};
 };
-}
+
+class Instance {
+ public:
+  virtual Class* getClass() const = 0;
+  virtual ~Instance(){};
+};
+};
+
+#endif
