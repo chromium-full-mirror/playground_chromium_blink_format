@@ -270,7 +270,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
     FILE,
     HIDDEN,
     IMAGE,
-    BUTTON
+    BUTTON,
+    SEARCH
   };
 
   HTMLInputElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);

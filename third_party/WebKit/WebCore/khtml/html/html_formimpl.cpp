@@ -1178,6 +1178,8 @@ void HTMLInputElementImpl::setType(const DOMString& t) {
     newType = BUTTON;
   else if (strcasecmp(t, "khtml_isindex") == 0)
     newType = ISINDEX;
+  else if (strcasecmp(t, "search") == 0)
+    newType = SEARCH;
   else
     newType = TEXT;
 
@@ -1220,6 +1222,8 @@ DOMString HTMLInputElementImpl::type() const {
       return "image";
     case BUTTON:
       return "button";
+    case SEARCH:
+      return "search";
     default:
       return "";
   }
@@ -1302,6 +1306,7 @@ void HTMLInputElementImpl::click() {
     case IMAGE:
     case ISINDEX:
     case PASSWORD:
+    case SEARCH:
     case TEXT:
       HTMLGenericFormElementImpl::click();
       break;
@@ -1315,6 +1320,7 @@ void HTMLInputElementImpl::accessKeyAction() {
       break;
     case TEXT:
     case PASSWORD:
+    case SEARCH:
     case ISINDEX:
       focus();
       break;
@@ -1433,6 +1439,7 @@ bool HTMLInputElementImpl::rendererIsNeeded(RenderStyle* style) {
   switch (m_type) {
     case TEXT:
     case PASSWORD:
+    case SEARCH:
     case ISINDEX:
     case CHECKBOX:
     case RADIO:
@@ -1454,6 +1461,7 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
   switch (m_type) {
     case TEXT:
     case PASSWORD:
+    case SEARCH:
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
     case CHECKBOX:
@@ -1576,6 +1584,7 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
   switch (m_type) {
     case HIDDEN:
     case TEXT:
+    case SEARCH:
     case PASSWORD:
       // always successful
       encoding += fixUpfromUnicode(codec, value().string());
@@ -1828,6 +1837,7 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
         }
         break;
       case TEXT:
+      case SEARCH:
       case PASSWORD: {
         // For enter, find the first successful image or submit element
         // send it a simulated mouse click.
@@ -1847,8 +1857,8 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
 }
 
 bool HTMLInputElementImpl::isEditable() {
-  return ((m_type == TEXT) || (m_type == PASSWORD) || (m_type == ISINDEX) ||
-          (m_type == FILE));
+  return ((m_type == TEXT) || (m_type == PASSWORD) || (m_type == SEARCH) ||
+          (m_type == ISINDEX) || (m_type == FILE));
 }
 
 bool HTMLInputElementImpl::isSubresourceURLAttribute(
