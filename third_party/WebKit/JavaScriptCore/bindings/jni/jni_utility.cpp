@@ -711,8 +711,11 @@ jvalue KJS::Bindings::convertValueToJValue(KJS::ExecState* exec,
         }
       }
 
-      // Now convert value to a string if the target type is a java.lang.string.
-      if (result.l == 0 && strcmp(javaClassName, "java.lang.String") == 0) {
+      // Now convert value to a string if the target type is a java.lang.string,
+      // and we're not
+      // converting from a Null.
+      if (result.l == 0 && strcmp(javaClassName, "java.lang.String") == 0 &&
+          value.type() != KJS::NullType) {
         KJS::UString stringValue = value.toString(exec);
         JNIEnv* env = getJNIEnv();
         jobject javaString = env->functions->NewString(
