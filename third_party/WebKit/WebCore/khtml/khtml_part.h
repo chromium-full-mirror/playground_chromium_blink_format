@@ -584,6 +584,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setSelection(const DOM::Range&);
 
   /**
+   * Returns the text for a part of the document.
+   */
+  QString text(const DOM::Range&) const;
+
+  /**
    * Has the user selected anything?
    *
    *  Call @ref selectedText() to

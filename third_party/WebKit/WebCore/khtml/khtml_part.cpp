@@ -2223,7 +2223,7 @@ bool KHTMLPart::findTextNext(const QString& str,
   }
 }
 
-QString KHTMLPart::selectedText() const {
+QString KHTMLPart::text(const DOM::Range& r) const {
   // FIXME: This whole function should use the render tree and not the DOM tree,
   // since elements could
   // be hidden using CSS, or additional generated content could be added.  For
@@ -2234,7 +2234,7 @@ QString KHTMLPart::selectedText() const {
   bool hasNewLine = true;
   bool addedSpace = true;
   QString text;
-  DOM::Node n = d->m_selectionStart;
+  DOM::Node n = r.startContainer();
   while (!n.isNull()) {
     if (n.nodeType() == DOM::Node::TEXT_NODE) {
       if (hasNewLine) {
@@ -2242,8 +2242,8 @@ QString KHTMLPart::selectedText() const {
         hasNewLine = false;
       }
       QString str = n.nodeValue().string();
-      int start = (n == d->m_selectionStart) ? d->m_startOffset : -1;
-      int end = (n == d->m_selectionEnd) ? d->m_endOffset : -1;
+      int start = (n == r.startContainer()) ? r.startOffset() : -1;
+      int end = (n == r.endContainer()) ? r.endOffset() : -1;
       RenderObject* renderer = n.handle()->renderer();
       if (renderer && renderer->isText()) {
         if (renderer->style()->whiteSpace() == khtml::PRE) {
@@ -2270,7 +2270,9 @@ QString KHTMLPart::selectedText() const {
               bool spaceBetweenRuns = false;
               if (runStart >= runs[i]->m_start &&
                   runStart < runs[i]->m_start + runs[i]->m_len) {
-                text += str.mid(runStart, runEnd - runStart);
+                QString runText = str.mid(runStart, runEnd - runStart);
+                runText.replace('\n', ' ');
+                text += runText;
                 start = -1;
                 spaceBetweenRuns =
                     i + 1 < runs.count() && runs[i + 1]->m_start > runEnd;
@@ -2327,7 +2329,7 @@ QString KHTMLPart::selectedText() const {
           break;
       }
     }
-    if (n == d->m_selectionEnd)
+    if (n == r.endContainer())
       break;
     DOM::Node next = n.firstChild();
     if (next.isNull())
@@ -2388,13 +2390,16 @@ QString KHTMLPart::selectedText() const {
   return text.mid(start, end - start);
 }
 
+QString KHTMLPart::selectedText() const {
+  return text(selection());
+}
+
 bool KHTMLPart::hasSelection() const {
   return (!d->m_selectionStart.isNull() && !d->m_selectionEnd.isNull());
 }
 
 DOM::Range KHTMLPart::selection() const {
   DOM::Range r = document().createRange();
-  DOM::Range();
   r.setStart(d->m_selectionStart, d->m_startOffset);
   r.setEnd(d->m_selectionEnd, d->m_endOffset);
   return r;
