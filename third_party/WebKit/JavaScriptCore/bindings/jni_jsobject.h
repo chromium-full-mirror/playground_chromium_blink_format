@@ -27,14 +27,28 @@
 #ifndef _JNI_JS_H_
 #define _JNI_JS_H_
 
+#include <JavaScriptCore/object.h>
+
 #include <JavaVM/jni.h>
 
-#define POINTER_JNI_JLONG(ptr) ((jlong)ptr)
+#define jlong_to_ptr(a) ((void*)(uintptr_t)(a))
+#define jlong_to_impptr(a) \
+  (static_cast<KJS::ValueImp*>(((void*)(uintptr_t)(a))))
+#define ptr_to_jlong(a) ((jlong)(uintptr_t)(a))
+
+typedef KJS::ObjectImp* (*KJSFindObjectForNativeHandleFunctionPtr)(void*);
+
+void KJS_setFindObjectForNativeHandleFunction(
+    KJSFindObjectForNativeHandleFunctionPtr aFunc);
+KJSFindObjectForNativeHandleFunctionPtr KJS_findObjectForNativeHandleFunction();
+
+extern "C" {
 
 // Functions called from the Java VM when making class to the JSObject class.
 jlong KJS_JSCreateNativeJSObject(JNIEnv* env,
                                  jclass clazz,
                                  jstring jurl,
+                                 jlong nativeHandle,
                                  jboolean ctx);
 void KJS_JSObject_JSFinalize(JNIEnv* env, jclass jsClass, jlong nativeJSObject);
 jobject KJS_JSObject_JSObjectCall(JNIEnv* env,
@@ -85,5 +99,6 @@ void KJS_JSObject_JSObjectSetSlot(JNIEnv* env,
 jstring KJS_JSObject_JSObjectToString(JNIEnv* env,
                                       jclass clazz,
                                       jlong nativeJSObject);
+}
 
 #endif
