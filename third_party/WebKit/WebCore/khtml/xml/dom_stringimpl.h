@@ -97,6 +97,9 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
 
   static DOMStringImpl* empty();
 
+  // For debugging only, leaks memory.
+  const char* ascii() const;
+
   unsigned int l;
   QChar* s;
   mutable unsigned _hash;
