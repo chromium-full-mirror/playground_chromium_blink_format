@@ -7,6 +7,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <WebKit/IFLocationChangeHandler.h>
+
 /*
     =============================================================================
 
@@ -51,6 +53,9 @@
 
 // Return the frame that represents this data source.
 - (IFWebFrame*)frame;
+
+// Return the frame that represents this data source. Same as above.
+- (IFWebFrame*)webFrame;
 
 // Add a child frame.  This should only be called by the data source's
 // controller
@@ -151,5 +156,7 @@
 - (NSString*)pageTitle;
 
 - (NSString*)frameName;
+
+- (IFContentPolicy)contentPolicy;
 
 @end
