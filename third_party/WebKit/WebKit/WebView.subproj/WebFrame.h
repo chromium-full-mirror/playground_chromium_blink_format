@@ -63,6 +63,23 @@
 - (void)loadRequest:(NSURLRequest*)request;
 
 /*!
+    @method loadData:baseURL:
+    @param data The data to use for the main page of the document.
+    @param encodingName The encoding of the data.
+    @param URL The base URL to apply to relative URLs within the document.
+*/
+- (void)loadData:(NSData*)data
+    encodingName:(NSString*)encodingName
+         baseURL:(NSURL*)URL;
+
+/*!
+    @method loadData:baseURL:
+    @param string The string to use for the main page of the document.
+    @param URL The base URL to apply to relative URLs within the document.
+*/
+- (void)loadString:(NSString*)string baseURL:(NSURL*)URL;
+
+/*!
     @method dataSource
     @discussion Returns the committed data source.  Will return nil if the
     provisional data source hasn't yet been loaded.
