@@ -50,7 +50,7 @@ class KWQSignal {
   QObject* m_object;
   KWQSignal* m_next;
   const char* m_name;
-  KWQSlot m_slot;
+  KWQSlot m_slots[4];
 
   friend class QObject;
 };

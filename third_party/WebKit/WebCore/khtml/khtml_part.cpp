@@ -4339,15 +4339,19 @@ void KHTMLPart::slotSelectAll() {
 #endif  // APPLE_CHANGES
 
 void KHTMLPart::startAutoScroll() {
+#ifndef APPLE_CHANGES
   connect(&d->m_scrollTimer, SIGNAL(timeout()), this, SLOT(slotAutoScroll()));
   d->m_scrollTimer.start(100, false);
+#endif
 }
 
 void KHTMLPart::stopAutoScroll() {
+#ifndef APPLE_CHANGES
   disconnect(&d->m_scrollTimer, SIGNAL(timeout()), this,
              SLOT(slotAutoScroll()));
   if (d->m_scrollTimer.isActive())
     d->m_scrollTimer.stop();
+#endif
 }
 
 void KHTMLPart::slotAutoScroll() {
