@@ -244,6 +244,16 @@ void EditCommandImpl::apply() {
   ASSERT(m_document->part());
   ASSERT(state() == NotApplied);
 
+  bool topLevel = !isCompositeStep();
+
+  KHTMLPart* part = m_document->part();
+
+#if APPLE_CHANGES
+  if (topLevel) {
+    KWQ(part)->markMisspellingsInSelection(part->selection());
+  }
+#endif
+
   doApply();
 
   m_state = Applied;
@@ -254,9 +264,10 @@ void EditCommandImpl::apply() {
   if (!preservesTypingStyle())
     setTypingStyle(0);
 
-  if (!isCompositeStep()) {
+  if (topLevel) {
+    document()->updateLayout();
     EditCommand cmd(this);
-    m_document->part()->appliedEditing(cmd);
+    part->appliedEditing(cmd);
   }
 }
 
@@ -265,13 +276,24 @@ void EditCommandImpl::unapply() {
   ASSERT(m_document->part());
   ASSERT(state() == Applied);
 
+  bool topLevel = !isCompositeStep();
+
+  KHTMLPart* part = m_document->part();
+
+#if APPLE_CHANGES
+  if (topLevel) {
+    KWQ(part)->markMisspellingsInSelection(part->selection());
+  }
+#endif
+
   doUnapply();
 
   m_state = NotApplied;
 
-  if (!isCompositeStep()) {
+  if (topLevel) {
+    document()->updateLayout();
     EditCommand cmd(this);
-    m_document->part()->unappliedEditing(cmd);
+    part->unappliedEditing(cmd);
   }
 }
 
@@ -280,13 +302,24 @@ void EditCommandImpl::reapply() {
   ASSERT(m_document->part());
   ASSERT(state() == NotApplied);
 
+  bool topLevel = !isCompositeStep();
+
+  KHTMLPart* part = m_document->part();
+
+#if APPLE_CHANGES
+  if (topLevel) {
+    KWQ(part)->markMisspellingsInSelection(part->selection());
+  }
+#endif
+
   doReapply();
 
   m_state = Applied;
 
-  if (!isCompositeStep()) {
+  if (topLevel) {
+    document()->updateLayout();
     EditCommand cmd(this);
-    m_document->part()->reappliedEditing(cmd);
+    part->reappliedEditing(cmd);
   }
 }
 
