@@ -110,6 +110,17 @@ class QPainter : public Qt {
                   int sh = -1,
                   int compositeOperator = -1,
                   CGContextRef context = 0);
+  void drawFloatPixmap(float x,
+                       float y,
+                       float w,
+                       float h,
+                       const QPixmap&,
+                       float sx = 0,
+                       float sy = 0,
+                       float sw = -1,
+                       float sh = -1,
+                       int compositeOperator = -1,
+                       CGContextRef context = 0);
   void drawTiledPixmap(int,
                        int,
                        int,
