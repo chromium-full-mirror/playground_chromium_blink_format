@@ -119,6 +119,14 @@ typedef khtml::RenderPart KHTMLRenderPart;
                  marginHeight:(int)height;
 
 - (WebCoreBridge*)openNewWindowWithURL:(NSURL*)URL;
+- (BOOL)areToolbarsVisisble;
+- (void)setToolbarsVisible:(BOOL)visible;
+- (BOOL)isStatusBarVisisble;
+- (void)setStatusBarVisible:(BOOL)visible;
+- (BOOL)areScrollbarsVisible;
+- (void)setScrollbarsVisible:(BOOL)visible;
+- (NSWindow*)window;
+- (void)setWindowFrame:(NSRect)frame;
 
 - (IFURLHandle*)startLoadingResource:(id<WebCoreResourceLoader>)loader
                              withURL:(NSURL*)URL;

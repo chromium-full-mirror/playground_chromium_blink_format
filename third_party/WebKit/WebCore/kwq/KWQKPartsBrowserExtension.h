@@ -55,6 +55,7 @@ struct WindowArgs {
   bool menuBarVisible;
   bool statusBarVisible;
   bool toolBarsVisible;
+  bool scrollbarsVisible;
   bool resizable;
   bool fullscreen;
   bool xSet;
@@ -70,6 +71,7 @@ struct WindowArgs {
         menuBarVisible(false),
         statusBarVisible(true),
         toolBarsVisible(true),
+        scrollbarsVisible(true),
         resizable(true),
         fullscreen(true),
         xSet(false),

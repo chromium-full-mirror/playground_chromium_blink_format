@@ -114,25 +114,33 @@ typedef enum {
 /*
    =============================================================================
 
-    A class that implements IFScriptContextHandler provides all the state
-   information
-    that may be used by Javascript (AppleScript?).
+    A class that implements IFWindowContext provides window-related methods
+    that may be used by Javascript, plugins and other aspects of web pages.
 
    =============================================================================
 */
-@protocol IFScriptContextHandler<NSObject>
+@protocol IFWindowContext<NSObject>
 
-// setStatusText and statusText are used by Javascript's status bar text
-// methods.
-- (void)setStatusText:(NSString*)text
-        forDataSource:(IFWebDataSource*)dataSource;
-- (NSString*)statusTextForDataSource:(IFWebDataSource*)dataSource;
-
-// Need API for things like window size and position, window ids,
-// screen goemetry.  Essentially all the 'view' items that are
-
-// FIXME: not strictly a scripting issue
 - (IFWebController*)openNewWindowWithURL:(NSURL*)url;
+
+#if 0
+- (void)setStatusText: (NSString *)text forDataSource: (IFWebDataSource *)dataSource;
+- (NSString *)statusTextForDataSource: (IFWebDataSource *)dataSource;
+#endif
+
+- (BOOL)areToolbarsVisible;
+- (void)setToolbarsVisible:(BOOL)visible;
+
+- (BOOL)isStatusBarVisible;
+- (void)setStatusBarVisible:(BOOL)visible;
+
+// Even though a caller could set the frame directly using the NSWindow,
+// this method is provided so implementors of this protocol can do special
+// things on programmatic move/resize, like avoiding autosaving of the size.
+- (void)setFrame:(NSRect)frame;
+
+- (NSWindow*)window;
+
 @end
 
 /*
@@ -145,7 +153,7 @@ typedef enum {
    =============================================================================
 */
 
-@interface IFWebController : NSObject<IFScriptContextHandler> {
+@interface IFWebController : NSObject {
  @private
   IFWebControllerPrivate* _private;
 }
@@ -156,6 +164,9 @@ typedef enum {
 // Designated initializer.
 - initWithView:(IFWebView*)view
     provisionalDataSource:(IFWebDataSource*)dataSource;
+
+- (void)setWindowContext:(id<IFWindowContext>)context;
+- (id<IFWindowContext>)windowContext;
 
 - (void)setResourceProgressHandler:(id<IFResourceProgressHandler>)handler;
 - (id<IFResourceProgressHandler>)resourceProgressHandler;
