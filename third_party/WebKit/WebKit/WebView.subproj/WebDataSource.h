@@ -181,7 +181,6 @@
 + (void)registerRepresentationClass:(Class)repClass
                         forMIMEType:(NSString*)MIMEType;
 
-+ (id<WebDocumentRepresentation>)createRepresentationForMIMEType:
-    (NSString*)MIMEType;
+- (void)makeRepresentation;
 
 @end

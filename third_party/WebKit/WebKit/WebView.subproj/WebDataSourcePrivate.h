@@ -9,6 +9,7 @@
 
 #import <WebKit/WebDataSource.h>
 #import <WebKit/WebLocationChangeHandler.h>
+#import <WebKit/WebBridge.h>
 
 @class WebResourceHandle;
 @class WebMainResourceClient;
@@ -72,6 +73,7 @@
 
 @interface WebDataSource (WebPrivate)
 - (void)_setResourceData:(NSData*)data;
+- (Class)_representationClass;
 - (void)_setRepresentation:(id<WebDocumentRepresentation>)representation;
 - (void)_setController:(WebController*)controller;
 - (void)_setParent:(WebDataSource*)p;
@@ -98,4 +100,8 @@
 + (NSMutableDictionary*)_repTypes;
 + (BOOL)_canShowMIMEType:(NSString*)MIMEType;
 - (void)_removeFromFrame;
+
+// Convenience interface for getting here from an WebDataSource.
+// This returns nil if the representation is not an WebHTMLRepresentation.
+- (WebBridge*)_bridge;
 @end
