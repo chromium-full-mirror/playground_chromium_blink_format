@@ -26,6 +26,7 @@
   NSMutableSet* iconsToEraseWithURLs;
   NSMutableSet* iconsToSaveWithURLs;
   NSMutableSet* iconURLsWithNoIcons;
+  NSMutableSet* originalIconsOnDiskWithURLs;
 
   int cleanupCount;
 

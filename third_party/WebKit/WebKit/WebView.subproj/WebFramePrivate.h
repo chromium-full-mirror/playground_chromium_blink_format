@@ -118,7 +118,7 @@ extern NSString* WebPageCacheDocumentViewKey;
 @interface WebFrame (WebPrivate)
 
 // API Considerations:
-- (void)loadHTMLPropertyList:(id)HTMLPropertyList;
+- (void)loadPropertyList:(id)HTMLPropertyList;
 
 - (NSURLRequest*)_webDataRequestForData:(NSData*)data
                                MIMEType:(NSString*)MIMEType
