@@ -1435,6 +1435,11 @@ ScheduledAction::ScheduledAction(QString _code, bool _singleShot) {
 }
 
 void ScheduledAction::execute(Window* window) {
+  ScriptInterpreter* interpreter = static_cast<ScriptInterpreter*>(
+      KJSProxy::proxy(window->m_part)->interpreter());
+
+  interpreter->setProcessingTimerCallback(true);
+
   // kdDebug(6070) << "ScheduledAction::execute " << this << endl;
   if (isFunction) {
     if (func.implementsCall()) {
@@ -1453,6 +1458,8 @@ void ScheduledAction::execute(Window* window) {
   } else {
     window->m_part->executeScript(code);
   }
+
+  interpreter->setProcessingTimerCallback(false);
 }
 
 ScheduledAction::~ScheduledAction() {
