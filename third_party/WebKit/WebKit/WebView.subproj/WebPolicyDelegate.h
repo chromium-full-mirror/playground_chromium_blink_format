@@ -61,7 +61,7 @@ typedef enum {
 
 @interface WebPolicyDecisionListener : NSObject {
  @private
-  WebPolicyDecisionListenerPrivate* _private
+  WebPolicyDecisionListenerPrivate* _private;
 }
 
 @end
