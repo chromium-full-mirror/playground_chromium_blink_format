@@ -43,7 +43,7 @@ class RenderImage : public RenderReplaced {
   virtual const char* renderName() const { return "RenderImage"; }
 
   virtual bool isRendered() const { return true; }
-  virtual bool isImage() const { return false; }
+  virtual bool isImage() const { return true; }
 
   virtual void paintObject(QPainter* p,
                            int /*x*/,
@@ -69,6 +69,7 @@ class RenderImage : public RenderReplaced {
   virtual void updateFromElement();
 
   virtual void notifyFinished(CachedObject* finishedObj);
+  void dispatchLoadEvent();
 
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
@@ -79,6 +80,8 @@ class RenderImage : public RenderReplaced {
 
   virtual short calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
+
+  virtual void detach(RenderArena*);
 
  private:
   bool isWidthSpecified() const;
