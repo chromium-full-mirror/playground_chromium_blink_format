@@ -51,10 +51,7 @@ class RootObject {
  public:
   RootObject(const void* nativeHandle)
       : _nativeHandle(nativeHandle), _imp(0), _interpreter(0) {}
-  ~RootObject() {
-    _imp->deref();
-    CFRelease(_runLoop);
-  }
+  ~RootObject() { _imp->deref(); }
 
   void setRootObjectImp(KJS::ObjectImp* i) {
     _imp = i;
