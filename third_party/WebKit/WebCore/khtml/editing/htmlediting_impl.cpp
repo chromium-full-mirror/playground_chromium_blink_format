@@ -671,8 +671,7 @@ void ApplyStyleCommandImpl::doApply() {
   // adjust to the positions we want to use for applying style
   Position start(endingSelection()
                      .start()
-                     .downstream()
-                     .equivalentShallowPosition()
+                     .downstream(StayInBlock)
                      .equivalentRangeCompliantPosition());
   Position end(endingSelection().end().upstream(StayInBlock));
 
@@ -773,10 +772,13 @@ void ApplyStyleCommandImpl::removeCSSStyle(HTMLElementImpl* elem) {
     // Check to see if the span is one we added to apply style.
     // If it is, and there are no more attributes on the span other than our
     // class marker, remove the span.
-    NamedAttrMapImpl* map = elem->attributes();
-    if (map && map->length() == 1 &&
-        elem->getAttribute(ATTR_CLASS) == styleSpanClassString())
-      removeNodePreservingChildren(elem);
+    if (decl->values()->count() == 0) {
+      removeNodeAttribute(elem, ATTR_STYLE);
+      NamedAttrMapImpl* map = elem->attributes();
+      if (map && map->length() == 1 &&
+          elem->getAttribute(ATTR_CLASS) == styleSpanClassString())
+        removeNodePreservingChildren(elem);
+    }
   }
 }
 
