@@ -122,13 +122,15 @@ class RenderBlock : public RenderFlow {
   virtual RenderObject* layoutLegend(bool relayoutChildren) { return 0; };
 
   // the implementation of the following functions is in bidi.cpp
-  void bidiReorderLine(const BidiIterator& start, const BidiIterator& end);
-  BidiIterator findNextLineBreak(BidiIterator& start);
+  void bidiReorderLine(const BidiIterator& start,
+                       const BidiIterator& end,
+                       BidiState& bidi);
+  BidiIterator findNextLineBreak(BidiIterator& start, BidiState& info);
   InlineFlowBox* constructLine(const BidiIterator& start,
                                const BidiIterator& end);
   InlineFlowBox* createLineBoxes(RenderObject* obj);
   void computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
-                                         BidiContext* endEmbed);
+                                         BidiState& bidi);
   void computeVerticalPositionsForLine(InlineFlowBox* lineBox);
   // end bidi.cpp functions
 
