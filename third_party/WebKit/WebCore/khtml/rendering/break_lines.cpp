@@ -94,12 +94,12 @@ bool isBreakable(const QChar* s, int pos, int len)
     if (status == 0) {
       findStatus =
           UCFindTextBreak(breakLocator, kUCTextBreakWordMask, NULL,
-                          (const UniChar*)c, (UniCharCount)len - pos,
-                          (UniCharArrayOffset)0, (UniCharArrayOffset*)&end);
+                          (const UniChar*)s, (UniCharCount)len,
+                          (UniCharArrayOffset)pos, (UniCharArrayOffset*)&end);
     }
     // If carbon fails, fail back on simple white space detection.
     if (findStatus == 0)
-      return end == 0 ? true : false;
+      return ((int)end == pos) ? true : false;
   }
   // What about hypenation?  We will correctly handle japanese hyphenation
   // above, but
