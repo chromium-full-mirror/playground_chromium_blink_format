@@ -39,7 +39,15 @@ enum HAlign { HDefault, Left, HCenter, Right, HNone = 0 };
 /*
  * %multiLength and %Length
  */
-enum LengthType { Variable = 0, Relative, Percent, Fixed, Static };
+enum LengthType {
+  Variable = 0,
+  Relative,
+  Percent,
+  Fixed,
+  Static,
+  Intrinsic,
+  MinIntrinsic
+};
 struct Length {
   Length() { *((Q_UINT32*)this) = 0; }
   Length(LengthType t) {

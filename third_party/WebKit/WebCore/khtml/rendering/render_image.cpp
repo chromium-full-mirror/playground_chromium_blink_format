@@ -623,9 +623,7 @@ bool RenderImage::isWidthSpecified() const {
     case Fixed:
     case Percent:
       return true;
-    case Variable:
-    case Relative:
-    case Static:
+    default:
       return false;
   }
   assert(false);
@@ -637,9 +635,7 @@ bool RenderImage::isHeightSpecified() const {
     case Fixed:
     case Percent:
       return true;
-    case Variable:
-    case Relative:
-    case Static:
+    default:
       return false;
   }
   assert(false);
