@@ -160,6 +160,7 @@ class DOMDocument : public DOMNode {
   DOMDocument(ExecState* exec, const DOM::Document& d);
   // Constructor for inherited classes
   DOMDocument(const Object& proto, const DOM::Document& d);
+  ~DOMDocument();
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void tryPut(ExecState* exec,
@@ -366,6 +367,7 @@ class DOMExceptionConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
+Value getDOMDocumentNode(ExecState* exec, const DOM::Document& n);
 Value getDOMNode(ExecState* exec, const DOM::Node& n);
 Value getDOMNamedNodeMap(ExecState* exec, const DOM::NamedNodeMap& m);
 Value getDOMNodeList(ExecState* exec, const DOM::NodeList& l);
