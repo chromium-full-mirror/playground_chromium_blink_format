@@ -8,6 +8,7 @@
 
 @class WebError;
 @class WebFrame;
+@class WebPreferences;
 @protocol WebFormDelegate;
 
 typedef enum { Safari, MacIE, WinIE } UserAgentStringType;
@@ -26,6 +27,8 @@ enum { NumUserAgentStringTypes = WinIE + 1 };
   id<WebFormDelegate> formDelegate;
 
   id<WebContextMenuDelegate> defaultContextMenuDelegate;
+
+  WebPreferences* preferences;
 
   WebBackForwardList* backForwardList;
   BOOL useBackForwardList;

@@ -16,6 +16,7 @@
 @class WebError;
 @class WebFrame;
 @class WebResourceHandle;
+@class WebPreferences;
 @class WebView;
 
 @protocol WebContextMenuDelegate;
@@ -408,5 +409,21 @@ extern NSString*
    failure.
 */
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)script;
+
+/*!
+    @method setPreferences:
+    @param preferences The preferences to use for the controller.
+    @abstract Override the standard setting for the controller.
+*/
+- (void)setPreferences:(WebPreferences*)prefs;
+
+/*!
+    @method preferences
+    @result Returns the preferences used by this controller.
+    @discussion This method will return [WebPreferences standardPreferences] if
+   no
+    other instance of WebPreferences has been set.
+*/
+- (WebPreferences*)preferences;
 
 @end
