@@ -418,6 +418,8 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void calculateTypingStyleAfterDelete(bool insertedPlaceholder);
   void clearTransientState();
 
+  void setStartNode(DOM::NodeImpl*);
+
   bool m_hasSelectionToDelete;
   bool m_smartDelete;
   bool m_mergeBlocksAfterDelete;
