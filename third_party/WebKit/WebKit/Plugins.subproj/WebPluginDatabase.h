@@ -18,7 +18,6 @@
 // Netscape
 - (WebBasePluginPackage*)pluginForMIMEType:(NSString*)mimeType;
 - (WebBasePluginPackage*)pluginForExtension:(NSString*)extension;
-- (WebBasePluginPackage*)pluginForFilename:(NSString*)filename;
 
 - (NSArray*)plugins;
 
