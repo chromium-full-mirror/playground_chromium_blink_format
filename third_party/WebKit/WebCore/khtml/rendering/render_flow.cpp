@@ -1351,7 +1351,6 @@ void RenderFlow::calcInlineMinMaxWidth() {
   int cw = containingBlock()->contentWidth();
 
   RenderObject* child = firstChild();
-  RenderObject* prevchild = 0;
 
   // If we are at the start of a line, we want to ignore all white-space.
   // Also strip spaces if we previously had text that ended in a trailing space.
@@ -1561,7 +1560,6 @@ void RenderFlow::calcInlineMinMaxWidth() {
       trailingSpaceChild = 0;
     }
 
-    prevchild = child;
     child = next(this, child);
   }
 
