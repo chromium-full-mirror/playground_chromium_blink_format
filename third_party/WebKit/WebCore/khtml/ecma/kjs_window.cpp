@@ -1528,10 +1528,14 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           // (this Window=%p)",part,win,window);
           khtmlpart->setOpener(part);
           khtmlpart->setOpenedByJS(true);
+
           if (khtmlpart->document().isNull()) {
-            part->docImpl()->baseURL() == 0
-                ? khtmlpart->begin()
-                : khtmlpart->begin(part->docImpl()->baseURL());
+            if (part->docImpl() && part->docImpl()->baseURL() != 0) {
+              khtmlpart->begin(part->docImpl()->baseURL());
+            } else {
+              khtmlpart->begin();
+            }
+
             khtmlpart->write("<HTML><BODY>");
             khtmlpart->end();
 
