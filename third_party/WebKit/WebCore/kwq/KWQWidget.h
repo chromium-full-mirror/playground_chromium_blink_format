@@ -98,8 +98,9 @@ class QWidget : public QObject, public QPaintDevice {
   virtual QPoint mapToGlobal(const QPoint&) const;
   virtual QPoint mapFromGlobal(const QPoint&) const;
 
-  virtual void setFocus();
-  virtual void clearFocus();
+  bool hasFocus() const;
+  void setFocus();
+  void clearFocus();
 
   virtual FocusPolicy focusPolicy() const;
   virtual void setFocusPolicy(FocusPolicy);
