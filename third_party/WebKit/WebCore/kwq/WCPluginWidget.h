@@ -35,11 +35,11 @@
 #import <WCPlugin.h>
 
 typedef id (*WCIFPluginMakeFunc)(NSRect rect,
-                                 QWidget* widget,
                                  WCPlugin* plugin,
                                  NSString* url,
                                  NSString* mimeType,
-                                 NSDictionary* arguments);
+                                 NSDictionary* arguments,
+                                 uint16 mode);
 void WCSetIFPluginMakeFunc(WCIFPluginMakeFunc func);
 
 // class WCPluginWidget
@@ -54,8 +54,7 @@ class WCPluginWidget : public QWidget {
 
   // constructors, copy constructors, and destructors ------------------------
 
-  WCPluginWidget(QWidget* parent = 0,
-                 const QString& url = 0,
+  WCPluginWidget(const QString& url = 0,
                  const QString& serviceType = 0,
                  const QStringList& args = QStringList());
   ~WCPluginWidget();
@@ -75,5 +74,7 @@ class WCPluginWidget : public QWidget {
 
 };  // class WCPluginWidget
     // ============================================================
+
+void* WCIFPluginMakeFunction();
 
 #endif

@@ -32,7 +32,6 @@ typedef struct _StreamData {
 @end
 
 @interface IFPluginView : NSView {
-  QWidget* widget;
   WCPlugin* plugin;
   IFPluginViewNullEventSender* eventSender;
 
@@ -64,11 +63,11 @@ typedef struct _StreamData {
 }
 
 - initWithFrame:(NSRect)r
-           widget:(QWidget*)w
            plugin:(WCPlugin*)plug
               url:(NSString*)location
              mime:(NSString*)mime
-        arguments:(NSDictionary*)arguments;
+        arguments:(NSDictionary*)arguments
+             mode:(uint16)mode;
 - (void)drawRect:(NSRect)rect;
 - (void)setWindow;
 - (void)viewHasMoved:(NSNotification*)note;
