@@ -113,10 +113,10 @@ void RenderHtml::printBoxDecorations(QPainter* p,
     printBorder(p, _tx, _ty, w, h, style());
 }
 
-void RenderHtml::repaint() {
+void RenderHtml::repaint(bool immediate) {
   RenderObject* cb = containingBlock();
   if (cb != this)
-    cb->repaint();
+    cb->repaint(immediate);
 }
 
 void RenderHtml::layout() {

@@ -253,7 +253,7 @@ class RenderText : public RenderObject {
 
   virtual int rightmostPosition() const;
 
-  virtual void repaint();
+  virtual void repaint(bool immediate = false);
 
   const QFontMetrics& metrics(bool firstLine) const;
   const Font* htmlFont(bool firstLine) const;
