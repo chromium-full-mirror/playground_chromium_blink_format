@@ -54,12 +54,8 @@ extern NSString* WebElementFrameKey;
 
     webController  = [[WebController alloc] initWithView: webView
    provisionalDataSource: nil];
-    dataSource = [[[WebDataSource alloc] initWithURL:url] autorelease];
     mainFrame = [webController mainFrame];
-
-    if([mainFrame setProvisionalDataSource: dataSource]){
-        [mainFrame startLoading];
-    }
+    [mainFrame loadRequest:request];
     </pre>
 
     WebControllers have the following delegates:  WebWindowOperationsDelegate,
@@ -112,7 +108,7 @@ extern NSString* WebElementFrameKey;
 + (BOOL)canShowFile:(NSString*)path;
 
 /*!
-    @method initWithView:provisionalDataSource:controllerSetName:
+    @method initWithView:controllerSetName:
     @abstract The designated initializer for WebController.
     @discussion Initialize a WebController with the supplied parameters.  This
    method
@@ -125,9 +121,7 @@ extern NSString* WebElementFrameKey;
    added.  May be nil.
     @result Returns an initialized WebController.
 */
-- initWithView:(WebView*)view
-    provisionalDataSource:(WebDataSource*)dataSource
-        controllerSetName:(NSString*)name;
+- initWithView:(WebView*)view controllerSetName:(NSString*)name;
 
 /*!
     @method setWindowOperationsDelegate:
