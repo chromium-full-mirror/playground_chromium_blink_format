@@ -900,6 +900,9 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   DOM::DOMString selectionStartStylePropertyValue(int stylePropertyID) const;
   void print();
 
+  // Used to keep the part alive when running a script that might destroy it.
+  void keepAlive();
+
  signals:
   /**
    * Emitted if the cursor is moved over an URL.
@@ -1193,6 +1196,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @internal
    */
   void slotClearSelection();
+
+  void slotEndLifeSupport();
 
  private:
   /**
