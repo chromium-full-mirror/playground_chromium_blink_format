@@ -46,6 +46,7 @@
 #endif
 
 #include <KWQDef.h>
+#include <iostream>
 
 // -------------------------------------------------------------------------
 
@@ -270,6 +271,11 @@ class Q_EXPORT QCString : public QByteArray  // C string class
 /*****************************************************************************
   QCString stream functions
  *****************************************************************************/
+
+#ifdef _KWQ_IOSTREAM_
+ostream& operator<<(ostream&, const QCString&);
+#endif
+
 #ifndef QT_NO_DATASTREAM
 Q_EXPORT QDataStream& operator<<(QDataStream&, const QCString&);
 Q_EXPORT QDataStream& operator>>(QDataStream&, QCString&);
