@@ -239,10 +239,6 @@ void RenderWidget::printObject(QPainter* /*p*/,
     return;
   }
 
-  // add offset for relative positioning
-  if (isRelPositioned())
-    relativePositionOffset(_tx, _ty);
-
   int xPos = _tx + borderLeft() + paddingLeft();
   int yPos = _ty + borderTop() + paddingTop();
 

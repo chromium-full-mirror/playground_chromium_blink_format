@@ -2471,12 +2471,21 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
           return;
         z_index = parentStyle->zIndex();
       } else {
-        if (!primitiveValue ||
-            primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
+        if (!primitiveValue)
           return;
+
+        if (primitiveValue->getIdent() == CSS_VAL_AUTO) {
+          style->setHasAutoZIndex();
+          return;
+        }
+
+        if (primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
+          return;  // Error case.
+
         z_index =
             (int)primitiveValue->getFloatValue(CSSPrimitiveValue::CSS_NUMBER);
       }
+
       style->setZIndex(z_index);
       return;
     }

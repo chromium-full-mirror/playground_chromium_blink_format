@@ -66,6 +66,14 @@ RenderRoot::RenderRoot(DOM::NodeImpl* node, KHTMLView* view)
 
 RenderRoot::~RenderRoot() {}
 
+void RenderRoot::calcHeight() {
+  if (!m_printingMode && m_view) {
+    m_height = m_view->visibleHeight();
+  } else if (!m_view) {
+    m_height = m_rootHeight;
+  }
+}
+
 void RenderRoot::calcWidth() {
   // the width gets set by KHTMLView::print when printing to a printer.
   if (m_printingMode || !m_view) {
@@ -153,6 +161,9 @@ void RenderRoot::layout() {
   kdDebug() << "RenderRoot::end time used=" << qt.elapsed() << endl;
 #endif
 
+  layer()->setHeight(m_height);
+  layer()->setWidth(m_width);
+
   setLayouted();
   // kdDebug(0) << "root: height = " << m_height << endl;
 }
@@ -189,10 +200,6 @@ void RenderRoot::printObject(QPainter* p,
                 << " ::printObject() w/h = (" << width() << "/" << height()
                 << ")" << endl;
 #endif
-  // add offset for relative positioning
-  if (isRelPositioned())
-    relativePositionOffset(_tx, _ty);
-
   // 1. print background, borders etc
   if (hasSpecialObjects() && !isInline())
     printBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
@@ -200,7 +207,7 @@ void RenderRoot::printObject(QPainter* p,
   // 2. print contents
   RenderObject* child = firstChild();
   while (child != 0) {
-    if (!child->isFloating() && !child->isPositioned()) {
+    if (!child->layer() && !child->isFloating()) {
       child->print(p, _x, _y, _w, _h, _tx, _ty);
     }
     child = child->nextSibling();

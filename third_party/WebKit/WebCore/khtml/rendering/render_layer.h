@@ -55,8 +55,15 @@ class RenderLayer {
   RenderLayer* firstChild() const { return m_first; }
   RenderLayer* lastChild() const { return m_last; }
 
-  void addChild(RenderLayer* newChild, RenderLayer* beforeChild = 0);
+  void addChild(RenderLayer* newChild);
   RenderLayer* removeChild(RenderLayer* oldChild);
+
+  RenderLayer* root() {
+    RenderLayer* curr = this;
+    while (curr->parent())
+      curr = curr->parent();
+    return curr;
+  }
 
   int xPos() const { return m_x; }
   int yPos() const { return m_y; }
@@ -65,17 +72,21 @@ class RenderLayer {
 
   void setWidth(int width) { m_width = width; }
   void setHeight(int height) { m_height = height; }
-
   void setPos(int xPos, int yPos) {
     m_x = xPos;
     m_y = yPos;
   }
+
   void updateLayerPosition();
+
+  RenderLayer* enclosingAncestor();
 
   void convertToLayerCoords(RenderLayer* ancestorLayer, int& x, int& y);
 
   bool hasAutoZIndex() { return renderer()->style()->hasAutoZIndex(); }
   int zIndex() { return renderer()->style()->zIndex(); }
+
+  void paint(QPainter* p, int x, int y, int w, int h, int tx, int ty);
 
  public:
   // Z-Index Implementation Notes
@@ -186,8 +197,7 @@ class RenderLayer {
   // +-------> L(L6)
   //
   RenderZTreeNode* constructZTree(const QRect& damageRect,
-                                  RenderLayer* rootLayer,
-                                  RenderLayer* paintingLayer);
+                                  RenderLayer* rootLayer);
 
   // Once the z-tree has been constructed, we call constructLayerList
   // to produce a flattened layer list for rendering/event handling.

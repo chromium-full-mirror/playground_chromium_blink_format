@@ -52,12 +52,14 @@ StyleBoxData::StyleBoxData(const StyleBoxData& o)
       max_width(o.max_width),
       min_height(o.min_height),
       max_height(o.max_height),
-      z_index(o.z_index) {}
+      z_index(o.z_index),
+      z_auto(o.z_auto) {}
 
 bool StyleBoxData::operator==(const StyleBoxData& o) const {
   return width == o.width && height == o.height && min_width == o.min_width &&
          max_width == o.max_width && min_height == o.min_height &&
-         max_height == o.max_height && z_index == o.z_index;
+         max_height == o.max_height && z_index == o.z_index &&
+         z_auto == o.z_auto;
 }
 
 StyleVisualData::StyleVisualData()
