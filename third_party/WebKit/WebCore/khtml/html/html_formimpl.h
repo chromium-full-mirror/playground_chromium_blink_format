@@ -482,14 +482,15 @@ class HTMLKeygenElementImpl : public HTMLSelectElementImpl {
 
   DOMString type() const;
 
-  long selectedIndex() const;
-  void setSelectedIndex(long index);
-
   // ### this is just a rough guess
   virtual bool isEnumeratable() const { return false; }
 
   virtual void parseAttribute(AttributeImpl* attr);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
+
+ protected:
+  DOMString m_challenge;
+  DOMString m_keyType;
 };
 
 // -------------------------------------------------------------------------

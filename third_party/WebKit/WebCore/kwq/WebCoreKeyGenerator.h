@@ -27,10 +27,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WebCoreLocalizedStringFactory : NSObject
+@interface WebCoreKeyGenerator : NSObject
 
-+ (WebCoreLocalizedStringFactory*)sharedFactory;
-
-- (NSArray*)keyGenerationMenuItemTitles;
++ (WebCoreKeyGenerator*)sharedGenerator;
+- (NSArray*)strengthMenuItemTitles;
+- (NSString*)signedPublicKeyAndChallengeStringWithStrengthIndex:(unsigned)index
+                                                      challenge:
+                                                          (NSString*)challenge;
 
 @end
