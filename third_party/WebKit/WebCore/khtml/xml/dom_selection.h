@@ -80,7 +80,6 @@ class Selection {
   Position extent() const { return m_extent; }
   Position start() const { return m_start; }
   Position end() const { return m_end; }
-  Position caretPosition() const { return m_caretPosition; }
 
   QRect getRepaintRect() const;
   void setNeedsLayout(bool flag = true);
@@ -153,7 +152,6 @@ class Selection {
   int m_caretX;  // caret coordinates, size, and position
   int m_caretY;
   int m_caretSize;
-  Position m_caretPosition;
 
   bool m_baseIsStart : 1;       // true if base node is before the extent node
   bool m_needsCaretLayout : 1;  // true if the caret position needs to be
