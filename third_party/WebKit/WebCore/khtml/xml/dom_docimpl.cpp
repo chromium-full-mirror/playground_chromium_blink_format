@@ -1159,6 +1159,8 @@ void DocumentImpl::detach() {
 
 #if APPLE_CHANGES
   if (m_inPageCache) {
+    if (render)
+      getAccObjectCache()->detach(render);
     return;
   }
 #endif
