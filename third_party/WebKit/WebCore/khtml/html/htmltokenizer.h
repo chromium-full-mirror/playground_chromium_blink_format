@@ -135,6 +135,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   virtual void write(const TokenizerString& str, bool appendData);
   virtual void finish();
   virtual void setOnHold(bool _onHold);
+  virtual void stopped();
+  virtual bool processingData() const;
 
  protected:
   void begin();
@@ -172,6 +174,12 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   void enlargeBuffer(int len);
   void enlargeScriptBuffer(int len);
+
+  bool continueProcessing(int& processedCount,
+                          const QTime& startTime,
+                          const KWQUIEventTime& eventTime);
+  void timerEvent(QTimerEvent*);
+  void allDataProcessed();
 
   // from CachedObjectClient
   void notifyFinished(CachedObject* finishedObj);
@@ -341,6 +349,9 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // line number at which the current <script> started
   int scriptStartLineno;
   int tagStartLineno;
+
+  // The timer for continued processing.
+  int timerId;
 
   bool includesCommentsInDOM;
 

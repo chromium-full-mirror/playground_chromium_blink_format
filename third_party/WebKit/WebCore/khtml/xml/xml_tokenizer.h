@@ -57,6 +57,9 @@ class Tokenizer : public QObject {
   virtual void setOnHold(bool onHold) = 0;
   virtual bool isWaitingForScripts() = 0;
 
+  virtual void stopped(){};
+  virtual bool processingData() const { return false; }
+
 #ifdef KHTML_XSLT
   virtual void setTransformSource(DOM::DocumentImpl* doc){};
 #endif

@@ -73,6 +73,11 @@ using DOM::endTag;
 #include "kentities.c"
 #undef __inline
 
+// #define INSTRUMENT_LAYOUT_SCHEDULING 1
+
+#define TOKENIZER_CHUNK_SIZE 4096
+#define TOKENIZER_TIME_DELAY 500
+
 namespace khtml {
 
 static const char commentStart[] = "<!--";
@@ -371,6 +376,7 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc,
   loadingExtScript = false;
   onHold = false;
   attrNamePresent = false;
+  timerId = 0;
   includesCommentsInDOM = includesComments;
 
   begin();
@@ -392,6 +398,7 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc,
   m_executingScript = 0;
   loadingExtScript = false;
   onHold = false;
+  timerId = 0;
   includesCommentsInDOM = includesComments;
 
   begin();
@@ -413,6 +420,12 @@ void HTMLTokenizer::reset() {
     KHTML_DELETE_QCHAR_VEC(scriptCode);
   scriptCode = 0;
   scriptCodeSize = scriptCodeMaxSize = scriptCodeResync = 0;
+
+  if (timerId) {
+    killTimer(timerId);
+    timerId = 0;
+  }
+  timerId = 0;
 
   currToken.reset();
 }
@@ -1652,7 +1665,10 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
     return;
   }
 
-  setSrc(str);
+  if (!src.isEmpty())
+    src.append(str);
+  else
+    setSrc(str);
 
 #ifndef NDEBUG
   inWrite = true;
@@ -1661,9 +1677,17 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   //     if (Entity)
   //         parseEntity(src, dest);
 
+  int processedCount = 0;
+  QTime startTime;
+  startTime.start();
+  KWQUIEventTime eventTime;
+
   while (!src.isEmpty() &&
          (!parser->doc()->part() ||
           !parser->doc()->part()->isScheduledLocationChangePending())) {
+    if (!continueProcessing(processedCount, startTime, eventTime))
+      break;
+
     // do we need to enlarge the buffer?
     checkBuffer();
 
@@ -1845,11 +1869,85 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   inWrite = false;
 #endif
 
-  if (noMoreData && !loadingExtScript && !m_executingScript)
+  if (noMoreData && !loadingExtScript && !m_executingScript && !timerId)
     end();  // this actually causes us to be deleted
 }
 
+void HTMLTokenizer::stopped() {
+  if (timerId) {
+    killTimer(timerId);
+    timerId = 0;
+  }
+}
+
+bool HTMLTokenizer::processingData() const {
+  return timerId != 0;
+}
+
+bool HTMLTokenizer::continueProcessing(int& processedCount,
+                                       const QTime& startTime,
+                                       const KWQUIEventTime& eventTime) {
+  // FIXME: For now, we don't bother trying to break out of the middle of an
+  // executing script.
+  // We don't want to be checking elapsed time with every character, so we only
+  // check after we've
+  // processed a certain number of characters.
+  if (!loadingExtScript && !m_executingScript &&
+      processedCount > TOKENIZER_CHUNK_SIZE) {
+    processedCount = 0;
+    if (eventTime.uiEventPending() ||
+        startTime.elapsed() > TOKENIZER_TIME_DELAY ||
+        !parser->doc()->haveStylesheetsLoaded() ||
+        (parser->doc()->ownerElement() &&
+         parser->doc()->ownerElement()->getDocument()->parsing())) {
+      // Schedule the timer to keep processing as soon as possible.
+      if (!timerId)
+        timerId = startTimer(0);
+      return false;
+    }
+  }
+
+  processedCount++;
+  return true;
+}
+
+void HTMLTokenizer::timerEvent(QTimerEvent* e) {
+  if (e->timerId() == timerId) {
+    // Kill the timer.
+    killTimer(timerId);
+    timerId = 0;
+
+    // Invoke write() as though more data came in.
+    bool oldNoMoreData = noMoreData;
+    noMoreData = false;  // This prevents write() from deleting the tokenizer.
+    write(TokenizerString(), true);
+    noMoreData = oldNoMoreData;
+
+    // If the timer dies (and stays dead after the write),  we need to let
+    // WebKit know that we're done processing the data.
+    allDataProcessed();
+  }
+}
+
+void HTMLTokenizer::allDataProcessed() {
+  if (noMoreData && !loadingExtScript && !m_executingScript && !onHold &&
+      !timerId) {
+    if (!parser || !parser->doc() || !parser->doc()->part())
+      return;
+    KHTMLPart* part = parser->doc()->part();
+    end();
+    part->tokenizerProcessedData();
+  }
+}
+
 void HTMLTokenizer::end() {
+  assert(timerId == 0);
+  if (timerId) {
+    // Clean up anyway.
+    killTimer(timerId);
+    timerId = 0;
+  }
+
   if (buffer == 0) {
     parser->finished();
     emit finishedParsing();
@@ -1907,7 +2005,7 @@ void HTMLTokenizer::finish() {
   // on
   // an external script to load, we can't finish parsing until that is done
   noMoreData = true;
-  if (!loadingExtScript && !m_executingScript && !onHold)
+  if (!loadingExtScript && !m_executingScript && !onHold && !timerId)
     end();  // this actually causes us to be deleted
 }
 
@@ -1990,6 +2088,11 @@ void HTMLTokenizer::enlargeScriptBuffer(int len) {
 }
 
 void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+  if (!parser->doc()->ownerElement())
+    printf("script loaded at %d\n", parser->doc()->elapsedTime());
+#endif
+
   assert(!cachedScript.isEmpty());
   bool finished = false;
   while (!finished && cachedScript.head()->isLoaded()) {
@@ -2015,8 +2118,14 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     // scriptExecution()
     // call above, so test afterwards.
     finished = cachedScript.isEmpty();
-    if (finished)
+    if (finished) {
       loadingExtScript = false;
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+      if (!parser->doc()->ownerElement())
+        printf("external script finished execution at %d\n",
+               parser->doc()->elapsedTime());
+#endif
+    }
 
     // 'script' is true when we are called synchronously from
     // parseScript(). In that case parseScript() will take care

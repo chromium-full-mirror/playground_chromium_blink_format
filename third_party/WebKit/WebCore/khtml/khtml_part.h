@@ -480,6 +480,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   virtual void end();
 
+  /**
+   * Similar to end, but called to abort a load rather than cleanly end.
+   */
+  void stop();
+
   /*
    * Prints the current HTML page layed out for the printer.
    *
@@ -781,6 +786,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    **/
   virtual void restoreState(QDataStream& stream);
 #endif
+
+  virtual void tokenizerProcessedData(){};
 
   /**
    * Returns the @p Node currently under the mouse
