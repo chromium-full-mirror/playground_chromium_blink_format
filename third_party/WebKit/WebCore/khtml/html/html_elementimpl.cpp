@@ -364,8 +364,7 @@ void HTMLElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           namedAttrMap->setID(nullAtom);
         else if (getDocument()->inCompatMode() &&
                  !attr->value().implementation()->isLower())
-          namedAttrMap->setID(
-              AtomicString(attr->value().implementation()->lower()));
+          namedAttrMap->setID(AtomicString(attr->value().domString().lower()));
         else
           namedAttrMap->setID(attr->value());
       }

@@ -85,9 +85,9 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
       // doc.clear(); // TODO
       return Undefined();
     case HTMLDocument::Open:
-      // For compatibility with other browsers, pass open calls with parameters
-      // to the window.
-      if (args.size() > 1) {
+      // For compatibility with other browsers, pass open calls with more than 2
+      // parameters to the window.
+      if (args.size() > 2) {
         KHTMLPart* part = static_cast<DOM::DocumentImpl*>(doc.handle())->part();
         if (part) {
           Window* window = Window::retrieveWindow(part);
@@ -105,7 +105,7 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
         }
         return Undefined();
       }
-      // In the case of no prameters, do a normal document open.
+      // In the case of two parameters or fewer, do a normal document open.
       doc.open();
       return Undefined();
     case HTMLDocument::Close:
