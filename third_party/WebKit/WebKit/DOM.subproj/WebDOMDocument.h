@@ -45,7 +45,8 @@
 
 - (id<WebDOMDocumentType>)createDocumentType:(NSString*)
                                qualifiedName:(NSString*)
-                                    publicId:(NSString*)systemId;
+                                    publicId:(NSString*)
+                                    systemId:(int*)exceptionCode;
 
 - (id<WebDOMDocument>)createDocument:(NSString*)
                         namespaceURI:(NSString*)
@@ -57,11 +58,11 @@
 
 - (id<WebDOMDocumentType>)doctype;
 
-- (id<WebDOMDocument>)implementation;
+- (id<WebDOMImplementation>)implementation;
 
-- (id<WebDOMDocument>)documentElement;
+- (id<WebDOMElement>)documentElement;
 
-- (id<WebDOMDocument>)createElement:(NSString*)tagName;
+- (id<WebDOMElement>)createElement:(NSString*)tagName;
 
 - (id<WebDOMElement>)createElementNS:(NSString*)
                         namespaceURI:(NSString*)qualifiedName;
@@ -79,18 +80,20 @@
 
 - (id<WebDOMAttr>)createAttribute:(NSString*)name;
 
-- (id<WebDOMAttr>)createAttributeNS:(NSString*)
-                       namespaceURI:(NSString*)qualifiedName;
+/*
+- (id<WebDOMAttr>)createAttributeNS:(NSString *)namespaceURI :(NSString
+*)qualifiedName;
+*/
 
 - (id<WebDOMEntityReference>)createEntityReference:(NSString*)name;
 
 - (id<WebDOMElement>)getElementById:(NSString*)elementId;
 
-- (id<WebDOMEntityReference>)getElementsByTagName:(NSString*)tagname;
+- (id<WebDOMNodeList>)getElementsByTagName:(NSString*)tagname;
 
-- (id<WebDOMEntityReference>)getElementsByTagNameNS:(NSString*)
-                                       namespaceURI:(NSString*)localName;
+- (id<WebDOMNodeList>)getElementsByTagNameNS:(NSString*)
+                                namespaceURI:(NSString*)localName;
 
-- (id<WebDOMEntityReference>)importNode:(id<WebDOMNode>)importedNode:(BOOL)deep;
+- (id<WebDOMNode>)importNode:(id<WebDOMNode>)importedNode:(BOOL)deep;
 
 @end

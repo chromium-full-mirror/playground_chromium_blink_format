@@ -62,6 +62,9 @@ class DocumentFragmentImpl;
 class DocumentImpl;
 class DocumentType;
 class DocumentTypeImpl;
+#ifdef APPLE_CHANGES
+class DOMImplementation;
+#endif
 class ElementImpl;
 class EntityReferenceImpl;
 class EventImpl;
@@ -116,6 +119,10 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
   // ever be present, and is used as a factory method for creating DocumentImpl
   // objects
   static DOMImplementationImpl* instance();
+
+#ifdef APPLE_CHANGES
+  static DOMImplementation createInstance(DOMImplementationImpl* impl);
+#endif
 
  protected:
   static DOMImplementationImpl* m_instance;
@@ -438,6 +445,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 #if APPLE_CHANGES
  public:
   KWQSignal m_finishedParsing;
+
+  static Document createInstance(DocumentImpl* impl);
 #endif
 
  protected:
@@ -552,6 +561,10 @@ class DocumentTypeImpl : public NodeImpl {
   void setName(const DOMString& n) { m_qualifiedName = n; }
   DOMImplementationImpl* implementation() const { return m_implementation; }
   void copyFrom(const DocumentTypeImpl&);
+
+#ifdef APPLE_CHANGES
+  static DocumentType createInstance(DocumentTypeImpl* impl);
+#endif
 
  protected:
   DOMImplementationImpl* m_implementation;
