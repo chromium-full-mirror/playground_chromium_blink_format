@@ -134,7 +134,7 @@ class RenderFlow : public RenderBox {
 
  protected:
   struct SpecialObject {
-    enum Type { FloatLeft, FloatRight, Positioned };
+    enum Type { FloatLeft, FloatRight, Positioned, RelPositioned };
 
     SpecialObject(Type _type) {
       node = 0;
