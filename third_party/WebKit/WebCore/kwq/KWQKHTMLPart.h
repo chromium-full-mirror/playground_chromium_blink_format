@@ -301,6 +301,9 @@ class KWQKHTMLPart : public KHTMLPart {
   void editingKeyEvent();
   void issueUndoCommand();
   void issueRedoCommand();
+  void issueCutCommand();
+  void issueCopyCommand();
+  void issuePasteCommand();
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
