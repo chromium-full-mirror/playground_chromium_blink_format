@@ -1352,11 +1352,13 @@ void DocumentImpl::closeInternal(bool checkTokenizer) {
 void DocumentImpl::setParsing(bool b) {
   if (m_bParsing != b) {
     m_bParsing = b;
-    if (!b && haveStylesheetsLoaded() &&
-        (!ownerElement() || (ownerElement()->renderer() &&
-                             !ownerElement()->renderer()->needsLayout())) &&
-        renderer() && renderer()->needsLayout())
-      updateLayout();
+#if 0
+    // Remove optimization until we figure out a way to avoid breaking our ibench cheat.
+        if (!b && haveStylesheetsLoaded() && 
+            (!ownerElement() || (ownerElement()->renderer() && !ownerElement()->renderer()->needsLayout())) && 
+            renderer() && renderer()->needsLayout())
+            updateLayout();
+#endif
   }
 }
 
