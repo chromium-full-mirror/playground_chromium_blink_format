@@ -14,7 +14,7 @@
 
 @interface IFBaseWebController : NSObject<IFWebController> {
  @private
-  IFBaseWebControllerPrivate* _controllerPrivate;
+  IFBaseWebControllerPrivate* _private;
 }
 
 // Calls designated initializer with nil arguments.

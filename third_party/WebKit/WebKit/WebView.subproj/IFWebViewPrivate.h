@@ -3,7 +3,7 @@
 
         Private header file.  This file may reference classes (both ObjectiveC
    and C++)
-        in WebCore.  Instances of this class are referenced by _viewPrivate in
+        in WebCore.  Instances of this class are referenced by _private in
         NSWebPageView.
 */
 

@@ -16,7 +16,7 @@
 
 @interface IFWebFrame : NSObject {
  @private
-  IFWebFramePrivate* _framePrivate;
+  IFWebFramePrivate* _private;
 }
 
 - initWithName:(NSString*)name

@@ -99,7 +99,7 @@
 
 @interface IFWebView : NSView {
  @private
-  IFWebViewPrivate* _viewPrivate;
+  IFWebViewPrivate* _private;
 }
 
 - initWithFrame:(NSRect)frame;
