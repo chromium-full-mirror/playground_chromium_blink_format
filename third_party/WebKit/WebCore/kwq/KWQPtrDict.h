@@ -59,7 +59,6 @@ class QPtrDict : public QCollection {
 
   void clear();
   uint count() const;
-  T* at(uint);
   T* take(void*);
 
   void append(const T*);
