@@ -80,6 +80,8 @@ class PropertyMap {
 
   void insert(UString::Rep*, ValueImp* value, int attributes);
 
+  void check();
+
   typedef PropertyMapHashTableEntry Entry;
 
   int _tableSizeMask;
