@@ -15,6 +15,7 @@
 @class WebFrameView;
 @class WebHistoryItem;
 @class NSURLRequest;
+@class NSMutableURLRequest;
 @class WebPolicyDecisionListener;
 @class WebView;
 
@@ -126,7 +127,7 @@ typedef enum {
 - (void)_setLoadType:(WebFrameLoadType)loadType;
 - (WebFrameLoadType)_loadType;
 
-- (void)_addExtraFieldsToRequest:(NSURLRequest*)request
+- (void)_addExtraFieldsToRequest:(NSMutableURLRequest*)request
                alwaysFromRequest:(BOOL)f;
 
 - (void)_checkNewWindowPolicyForRequest:(NSURLRequest*)request
