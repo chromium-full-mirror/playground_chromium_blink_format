@@ -97,9 +97,6 @@ static void printBorderStyle(QTextStream& ts,
     case khtml::DOUBLE:
       ts << "double";
       break;
-    case khtml::APPLEAQUA:
-      ts << "aqua";
-      break;
   }
 
   ts << " ";

@@ -1761,8 +1761,11 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
                                             BorderStyle)
       if (!primitiveValue)
         return;
-      style->setOutlineStyle(
-          (EBorderStyle)(primitiveValue->getIdent() - CSS_VAL_NONE));
+      if (primitiveValue->getIdent() == CSS_VAL_AUTO)
+        style->setOutlineStyle(DOTTED, true);
+      else
+        style->setOutlineStyle(
+            (EBorderStyle)(primitiveValue->getIdent() - CSS_VAL_NONE));
       break;
     case CSS_PROP_CAPTION_SIDE: {
       HANDLE_INHERIT_AND_INITIAL(captionSide, CaptionSide)

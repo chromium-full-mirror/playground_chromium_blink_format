@@ -166,10 +166,6 @@ enum EBorderStyle {
   DASHED,
   SOLID,
   DOUBLE
-#ifdef APPLE_CHANGES
-  ,
-  APPLEAQUA
-#endif
 };
 
 class BorderValue {
@@ -200,9 +196,13 @@ class BorderValue {
 
 class OutlineValue : public BorderValue {
  public:
-  OutlineValue() { offset = 0; }
+  OutlineValue() {
+    _offset = 0;
+    _auto = false;
+  }
 
-  int offset;
+  int _offset;
+  bool _auto;
 };
 
 enum EBorderPrecedence {
@@ -962,6 +962,7 @@ class RenderStyle : public Shared<RenderStyle> {
     return background->outline.width;
   }
   EBorderStyle outlineStyle() const { return background->outline.style; }
+  bool outlineStyleIsAuto() const { return background->outline._auto; }
   const QColor& outlineColor() const { return background->outline.color; }
 
   EOverflow overflow() const { return noninherited_flags._overflow; }
@@ -1073,7 +1074,7 @@ class RenderStyle : public Shared<RenderStyle> {
   int outlineOffset() const {
     if (background->outline.style == BNONE)
       return 0;
-    return background->outline.offset;
+    return background->outline._offset;
   }
   ShadowData* textShadow() const { return css3InheritedData->textShadow; }
   float opacity() { return css3NonInheritedData->opacity; }
@@ -1170,7 +1171,10 @@ class RenderStyle : public Shared<RenderStyle> {
   void setOutlineWidth(unsigned short v) {
     SET_VAR(background, outline.width, v)
   }
-  void setOutlineStyle(EBorderStyle v) { SET_VAR(background, outline.style, v) }
+  void setOutlineStyle(EBorderStyle v, bool isAuto = false) {
+    SET_VAR(background, outline.style, v)
+    SET_VAR(background, outline._auto, isAuto)
+  }
   void setOutlineColor(const QColor& v) {
     SET_VAR(background, outline.color, v)
   }
@@ -1307,7 +1311,7 @@ class RenderStyle : public Shared<RenderStyle> {
 
   // CSS3 Setters
   void setOutlineOffset(unsigned short v) {
-    SET_VAR(background, outline.offset, v)
+    SET_VAR(background, outline._offset, v)
   }
   void setTextShadow(ShadowData* val, bool add = false);
   void setOpacity(float f) { SET_VAR(css3NonInheritedData, opacity, f); }
