@@ -2478,12 +2478,13 @@ void KHTMLPart::setFocusNodeIfNeeded() {
   assert(target == 0 || target->isContentEditable());
 
   if (target) {
-    for (; target && !target->isFocusable(); target = target->parentNode())
-      ;  // loop
-    if (target && target->isMouseFocusable())
-      xmlDocImpl()->setFocusNode(target);
-    else if (!target || !target->focused())
-      xmlDocImpl()->setFocusNode(0);
+    for (; target; target = target->parentNode()) {
+      if (target->isMouseFocusable()) {
+        xmlDocImpl()->setFocusNode(target);
+        return;
+      }
+    }
+    xmlDocImpl()->setFocusNode(0);
   }
 }
 
@@ -2517,8 +2518,15 @@ int KHTMLPart::xPosForVerticalArrowNavigation() const {
 void KHTMLPart::timerEvent(QTimerEvent* e) {
   if (e->timerId() == d->m_caretBlinkTimer && d->m_caretVisible &&
       d->m_caretBlinks && d->m_selection.isCaret()) {
-    d->m_caretPaint = !d->m_caretPaint;
-    d->m_selection.needsCaretRepaint();
+    if (d->m_bMousePressed) {
+      if (!d->m_caretPaint) {
+        d->m_caretPaint = true;
+        d->m_selection.needsCaretRepaint();
+      }
+    } else {
+      d->m_caretPaint = !d->m_caretPaint;
+      d->m_selection.needsCaretRepaint();
+    }
   }
 }
 
@@ -5583,6 +5591,11 @@ void KHTMLPart::print() {
 }
 
 #endif
+
+bool KHTMLPart::isCharacterSmartReplaceExempt(const QChar&, bool) {
+  // no smart replace
+  return true;
+}
 
 void KHTMLPart::connectChild(const khtml::ChildFrame* child) const {
   ReadOnlyPart* part = child->m_part;

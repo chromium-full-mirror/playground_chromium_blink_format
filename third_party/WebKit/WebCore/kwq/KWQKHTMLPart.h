@@ -388,7 +388,7 @@ class KWQKHTMLPart : public KHTMLPart {
   NSMutableDictionary* dashboardRegionsDictionary();
   void dashboardRegionsChanged();
 
-  bool isCharacterSmartReplaceExempt(const QChar&, bool);
+  virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
