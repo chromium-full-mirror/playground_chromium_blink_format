@@ -103,7 +103,7 @@ RenderTable::RenderTable(DOM::NodeImpl* node) : RenderFlow(node) {
 
   totalCols = 0;  // this should be expanded to the maximum number of cols
                   // by the first row parsed
-  totalRows = 1;
+  totalRows = 0;
   allocRows = 5;  // allocate five rows initially
   rowInfo.resize(totalRows + 1);
   memset(rowInfo.data(), 0, (totalRows + 1) * sizeof(RowInfo));  // Init to 0.
@@ -239,6 +239,8 @@ void RenderTable::startRow() {
   col = 0;
   if (row > totalRows)
     totalRows = row;
+  if (totalRows == 0)
+    totalRows = 1;  // Go ahead and acknowledge that we have one row. -dwh.
 }
 
 void RenderTable::closeRow() {
@@ -1403,7 +1405,7 @@ void RenderTable::layoutRows(int yoff) {
   }
 
   bool tableGrew = false;
-  if (th && totalRows && rowInfo[totalRows].height) {
+  if (th && totalRows) {
     th -= (totalRows + 1) * spacing;
     int dh = th - rowInfo[totalRows].height;
     if (dh > 0) {
@@ -1426,11 +1428,17 @@ void RenderTable::layoutRows(int yoff) {
         if (totalPercentage) {
           if (rowInfo[r + 1].percentage)
             add += (rowInfo[r + 1].percentage / totalPercentage) * dh;
-        } else
+        } else if (tot)
           add += dh * (rowInfo[r + 1].height - prev) / tot;
         prev = rowInfo[r + 1].height;
         rowInfo[r + 1].height += add;
       }
+
+      int remaining = th - (rowInfo[totalRows].height + add);
+      if (remaining > 0 && totalRows > 0)
+        // Just give the space to the last row.
+        rowInfo[totalRows - 1].height += remaining;
+
       rowInfo[totalRows].height = th;
     }
   }
@@ -1740,7 +1748,7 @@ void RenderTable::recalcCells() {
 
   totalCols = 0;  // this should be expanded to the maximum number of cols
                   // by the first row parsed
-  totalRows = 1;
+  totalRows = 0;
   allocRows = 5;  // allocate five rows initially
 
   cells = new RenderTableCell**[allocRows];
