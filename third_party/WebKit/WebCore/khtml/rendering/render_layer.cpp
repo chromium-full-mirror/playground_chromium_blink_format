@@ -878,8 +878,31 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
   if (containsPoint(xMousePos, yMousePos, fgRect) &&
       renderer()->nodeAtPoint(
           info, xMousePos, yMousePos, layerBounds.x() - renderer()->xPos(),
-          layerBounds.y() - renderer()->yPos(), HitTestChildrenOnly))
+          layerBounds.y() - renderer()->yPos(), HitTestChildrenOnly)) {
+    // for positioned generated content, we might still not have a
+    // node by the time we get to the layer level, since none of
+    // the content in the layer has an element. So just walk up
+    // the tree.
+    if (!info.innerNode()) {
+      for (RenderObject* r = renderer(); r != NULL; r = r->parent()) {
+        if (r->element()) {
+          info.setInnerNode(r->element());
+          break;
+        }
+      }
+    }
+
+    if (!info.innerNonSharedNode()) {
+      for (RenderObject* r = renderer(); r != NULL; r = r->parent()) {
+        if (r->element()) {
+          info.setInnerNonSharedNode(r->element());
+          break;
+        }
+      }
+    }
+
     return this;
+  }
 
   // Now check our negative z-index children.
   if (m_negZOrderList) {
