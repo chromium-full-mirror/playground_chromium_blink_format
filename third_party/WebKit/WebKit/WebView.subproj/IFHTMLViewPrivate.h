@@ -15,6 +15,8 @@ class KHTMLView;
 @class KHTMLView;
 #endif
 
+@class IFWebCoreBridge;
+
 @interface IFHTMLViewPrivate : NSObject {
   IFWebController* controller;
   KHTMLView* widget;
@@ -38,4 +40,5 @@ class KHTMLView;
 - (KHTMLView*)_widget;
 - (KHTMLView*)_provisionalWidget;
 - (void)_takeOwnershipOfWidget;
+- (IFWebCoreBridge*)_bridge;
 @end
