@@ -33,11 +33,14 @@
 #include <qnamespace.h>
 #include <qcolor.h>
 
+class QPainter;
 class QPenPrivate;
 
 // class QPen ==================================================================
 
 class QPen : public Qt {
+  friend class QPainter;
+
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
