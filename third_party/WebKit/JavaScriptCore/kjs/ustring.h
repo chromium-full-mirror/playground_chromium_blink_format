@@ -98,10 +98,6 @@ struct UChar {
    * @return The character converted to upper case.
    */
   UChar toUpper() const;
-  /**
-   * A static instance of UChar(0).
-   */
-  static UChar null;
 
   unsigned short uc;
 };
@@ -420,7 +416,7 @@ class UString {
   /**
    * Static instance of a null string.
    */
-  static UString null;
+  static const UString& null();
 #ifdef KJS_DEBUG_MEM
   /**
    * Clear statically allocated resources.
