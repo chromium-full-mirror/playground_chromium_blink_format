@@ -283,6 +283,10 @@ class UString {
    */
   static UString from(unsigned int u);
   /**
+   * Constructs a string from a long.
+   */
+  static UString from(long l);
+  /**
    * Constructs a string from a double.
    */
   static UString from(double d);

@@ -37,6 +37,8 @@
 
 #include "ustring.h"
 
+#include "simple_number.h"
+
 // Primitive data types
 
 namespace KJS {
@@ -95,13 +97,18 @@ class ValueImp {
   ValueImp();
   virtual ~ValueImp();
 
-  // FIXNUM: need special case for fixnums below (should be no-op)
   inline ValueImp* ref() {
-    refcount++;
+    if (!SimpleNumber::isSimpleNumber(this))
+      refcount++;
     return this;
   }
   // FIXNUM: need special case for fixnums below (should be no-op)
-  inline bool deref() { return (!--refcount); }
+  inline bool deref() {
+    if (SimpleNumber::isSimpleNumber(this))
+      return false;
+    else
+      return (!--refcount);
+  }
   unsigned int refcount;
 
   virtual void mark();
@@ -416,6 +423,8 @@ extern const double Inf;
  * Represents an primitive Number value
  */
 class Number : public Value {
+  friend class ValueImp;
+
  public:
   Number(int i);
   Number(unsigned int u);
@@ -446,8 +455,11 @@ class Number : public Value {
 };
 
 inline Value ValueImp::dispatchGetValue(ExecState* exec) const {
-  // FIXNUM: need special case for fixnums here
-  return this->getValue(exec);
+  if (SimpleNumber::isSimpleNumber(this)) {
+    return Value(const_cast<ValueImp*>(this));
+  } else {
+    return this->getValue(exec);
+  }
 }
 
 };  // namespace
