@@ -3,16 +3,13 @@
 
     Public header file.
  */
-#ifndef _WEB_SCRIPT_OBJECT_H_
-#define _WEB_SCRIPT_OBJECT_H_
 
 #import <Foundation/Foundation.h>
 
-// NSObject (WebScriptMethods)
-// -----------------------------------------------------
+// NSObject (WebScripting) -----------------------------------------------------
 
 /*
-    The methods in WebScriptMethods are optionally implemented by classes whose
+    The methods in WebScripting are optionally implemented by classes whose
     interfaces are exported (wrapped) to a web scripting environment.  The
     scripting environment currently supported by WebKit uses the JavaScript
     language.
@@ -20,7 +17,7 @@
     Instances automatically reflect their interfaces in the scripting
    environment.  This
     automatic reflection can be overriden using the class methods defined in the
-   WebScriptMethods
+   WebScripting
     informal protocol.
 
     Access to the attributes of an instance is done using KVC. Specifically the
@@ -283,5 +280,3 @@
 + (WebUndefined*)undefined;
 
 @end
-
-#endif
