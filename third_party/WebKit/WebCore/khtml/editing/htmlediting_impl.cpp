@@ -1153,7 +1153,7 @@ void DeleteSelectionCommandImpl::doApply() {
          downstreamEnd.offset() >= startNode->caretMaxOffset())) {
       // just delete
       removeNode(startNode);
-    } else {
+    } else if (downstreamEnd.offset() - startOffset > 0) {
       // in a text node that needs to be trimmed
       TextImpl* text = static_cast<TextImpl*>(startNode);
       deleteText(text, startOffset, downstreamEnd.offset() - startOffset);
