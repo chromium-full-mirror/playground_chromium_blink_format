@@ -1123,6 +1123,19 @@ const struct HashTable HTMLIFrameElementTable = {
 
 namespace KJS {
 
+const struct HashEntry HTMLMarqueeElementTableEntries[] = {
+    {"start", KJS::HTMLElement::MarqueeStart, DontDelete | Function, 0,
+     &HTMLMarqueeElementTableEntries[2]},
+    {0, 0, 0, 0, 0},
+    {"stop", KJS::HTMLElement::MarqueeStop, DontDelete | Function, 0, 0}};
+
+const struct HashTable HTMLMarqueeElementTable = {
+    2, 3, HTMLMarqueeElementTableEntries, 2};
+
+}  // namespace
+
+namespace KJS {
+
 const struct HashEntry HTMLCollectionProtoTableEntries[] = {
     {0, 0, 0, 0, 0},
     {"namedItem", HTMLCollection::NamedItem, DontDelete | Function, 1, 0},

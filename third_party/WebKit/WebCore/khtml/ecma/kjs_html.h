@@ -115,7 +115,7 @@ class HTMLElement : public DOMElement {
       hr_info, mod_info, a_info, img_info, object_info, param_info, applet_info,
       map_info, area_info, script_info, table_info, caption_info, col_info,
       tablesection_info, tr_info, tablecell_info, frameSet_info, frame_info,
-      iFrame_info;
+      iFrame_info, marquee_info;
 
   enum {
     HtmlVersion,
@@ -448,6 +448,8 @@ class HTMLElement : public DOMElement {
     IFrameScrolling,
     IFrameWidth,
     IFrameContentDocument,
+    MarqueeStart,
+    MarqueeStop,
     ElementInnerHTML,
     ElementTitle,
     ElementId,
