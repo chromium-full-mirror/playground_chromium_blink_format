@@ -232,6 +232,7 @@ void HTMLFrameElementImpl::updateForNewURL() {
     // instead.
 
     KHTMLView* w = getDocument()->view();
+
     // avoid endless recursion
     KURL u;
     if (!url.isEmpty())
@@ -249,7 +250,12 @@ void HTMLFrameElementImpl::updateForNewURL() {
     if (!url.isEmpty() &&
         !(w->part()->onlyLocalReferences() && u.protocol() != "file")) {
       KHTMLPart* part = w->part()->findFrame(name.string());
-      part->openURL(u);
+      if (part) {
+        part->openURL(u);
+      } else {
+        w->part()->requestFrame(static_cast<RenderFrame*>(m_render),
+                                url.string(), name.string());
+      }
     }
   }
 }
