@@ -42,13 +42,7 @@ class KHTMLSettings;
 class KJavaAppletContext;
 
 #ifdef APPLE_CHANGES
-#ifdef __OBJC__
-@class IFURLHandle;
-@class IFWebDataSource;
-#else
-typedef void IFURLHandle;
-typedef void IFWebDataSource;
-#endif
+class KWQKHTMLPartImpl;
 #endif
 
 namespace DOM {
@@ -369,13 +363,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool onlyLocalReferences() const;
 
 #ifndef KDE_NO_COMPAT
-#ifndef APPLE_CHANGES
   void enableJScript(bool e) { setJScriptEnabled(e); }
   void enableJava(bool e) { setJavaEnabled(e); }
   void enablePlugins(bool e) { setPluginsEnabled(e); }
   void autoloadImages(bool e) { setAutoloadImages(e); }
   void enableMetaRefresh(bool e) { setMetaRefreshEnabled(e); }
-#endif
   bool setCharset(const QString&, bool) { return true; }
 
   KURL baseURL() const;
@@ -781,9 +773,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void htmlError(int errorCode, const QString& text, const KURL& reqUrl);
 
-#ifndef APPLE_CHANGES
   virtual void customEvent(QCustomEvent* event);
-#endif
 
   /**
    * Eventhandler of the khtml::MousePressEvent.
@@ -1147,41 +1137,10 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
 #ifdef APPLE_CHANGES
  public:
-  void redirectJS();
-  void timerEvent(QTimerEvent*);
-
-  // In the original KDE, these come from superclasses.
-  void ref() { _ref++; }
-  void deref() {
-    if (_ref)
-      _ref--;
-    if (!_ref)
-      delete this;
-  }
-  bool event(QEvent* event);
-
-  // Additions.
-
-  bool gotoBaseAnchor();
-
-  void setView(KHTMLView* view);
-
-  void slotData(NSString*,
-                const char* bytes,
-                int length,
-                bool complete = false);
-
-  void setBaseURL(const KURL&);
-
-  QString documentSource() const;
-
   void setTitle(const DOM::DOMString&);
 
-  void setDataSource(IFWebDataSource*);
-  IFWebDataSource* getDataSource();
-
- private:
-  unsigned int _ref;
+  KWQKHTMLPartImpl* impl;
+  friend class KWQKHTMLPartImpl;
 #endif
 };
 
