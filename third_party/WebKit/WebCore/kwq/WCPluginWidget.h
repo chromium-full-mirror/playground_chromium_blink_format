@@ -42,6 +42,11 @@ typedef id (*WCIFPluginMakeFunc)(NSRect rect,
                                  uint16 mode);
 void WCSetIFPluginMakeFunc(WCIFPluginMakeFunc func);
 
+typedef id (*WCIFNullPluginMakeFunc)(NSRect rect,
+                                     NSString* mimeType,
+                                     NSDictionary* arguments);
+void WCSetIFNullPluginMakeFunc(WCIFNullPluginMakeFunc func);
+
 // class WCPluginWidget
 // ===============================================================
 
@@ -76,5 +81,6 @@ class WCPluginWidget : public QWidget {
     // ============================================================
 
 void* WCIFPluginMakeFunction();
+void* WCIFNullPluginMakeFunction();
 
 #endif
