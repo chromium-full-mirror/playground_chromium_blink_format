@@ -217,7 +217,7 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
       style()->styleType() == RenderStyle::AFTER)
     return;
 
-  RenderStyle* pseudo = style()->getPseudoStyle(type);
+  RenderStyle* pseudo = getPseudoStyle(type);
 
   // Whether or not we currently have generated content attached.
   bool oldContentPresent = child && (child->style()->styleType() == type);

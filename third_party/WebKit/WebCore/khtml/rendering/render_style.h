@@ -695,6 +695,7 @@ class RenderStyle : public Shared<RenderStyle> {
              (_styleType == other._styleType) &&
              (_affectedByHover == other._affectedByHover) &&
              (_affectedByActive == other._affectedByActive) &&
+             (_pseudoBits == other._pseudoBits) &&
              (_unicodeBidi == other._unicodeBidi);
     }
 
@@ -717,6 +718,7 @@ class RenderStyle : public Shared<RenderStyle> {
     PseudoId _styleType : 3;
     bool _affectedByHover : 1;
     bool _affectedByActive : 1;
+    int _pseudoBits : 5;
     EUnicodeBidi _unicodeBidi : 2;
   } noninherited_flags;
 
@@ -776,6 +778,7 @@ class RenderStyle : public Shared<RenderStyle> {
     noninherited_flags._styleType = NOPSEUDO;
     noninherited_flags._affectedByHover = false;
     noninherited_flags._affectedByActive = false;
+    noninherited_flags._pseudoBits = 0;
     noninherited_flags._unicodeBidi = UBNormal;
   }
 
@@ -792,8 +795,7 @@ class RenderStyle : public Shared<RenderStyle> {
   PseudoId styleType() { return noninherited_flags._styleType; }
 
   RenderStyle* getPseudoStyle(PseudoId pi);
-  RenderStyle* addPseudoStyle(PseudoId pi);
-  bool hasPseudoStyle() const { return pseudoStyle; }
+  void addPseudoStyle(RenderStyle* pseudo);
   void removePseudoStyle(PseudoId pi);
 
   bool affectedByHoverRules() const {
@@ -820,6 +822,9 @@ class RenderStyle : public Shared<RenderStyle> {
   void setVisuallyOrdered(bool b) { inherited_flags._visuallyOrdered = b; }
 
   bool isStyleAvailable() const;
+
+  bool hasPseudoStyle(PseudoId pseudo) const;
+  void setHasPseudoStyle(PseudoId pseudo);
 
   // attribute getter methods
 
