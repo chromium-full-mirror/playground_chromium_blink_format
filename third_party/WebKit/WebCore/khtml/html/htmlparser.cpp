@@ -1246,6 +1246,16 @@ void KHTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   NodeImpl* blockElem = prevMaxElem ? prevMaxElem->node : current;
   NodeImpl* parentElem = elem->node;
 
+  // Check to see if the reparenting that is going to occur is allowed according
+  // to the DOM.
+  // FIXME: We should either always allow it or perform an additional fixup
+  // instead of
+  // just bailing here.
+  // Example: <p><font><center>blah</font></center></p> isn't doing a fixup
+  // right now.
+  if (!parentElem->childAllowed(blockElem))
+    return;
+
   if (maxElem->node->parentNode() != elem->node) {
     // Walk the stack and remove any elements that aren't residual style tags.
     // These
