@@ -1408,8 +1408,8 @@ void RenderTable::layoutRows(int yoff) {
     th = h.value;
   else if (h.isPercent()) {
     RenderObject* c = containingBlock();
-    for (; !c->isBody() && !c->isTableCell() && !c->isPositioned() &&
-           !c->isFloating();
+    for (; !c->isRoot() && !c->isBody() && !c->isTableCell() &&
+           !c->isPositioned() && !c->isFloating();
          c = c->containingBlock()) {
       Length ch = c->style()->height();
       if (ch.isFixed()) {
