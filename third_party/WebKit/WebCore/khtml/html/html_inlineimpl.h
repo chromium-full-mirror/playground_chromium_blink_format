@@ -44,7 +44,6 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
   virtual Id id() const;
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
-  void click();
 
  protected:
   bool m_hasTarget : 1;

@@ -64,6 +64,8 @@ class HTMLElementImpl : public ElementImpl {
   virtual DOMString contentEditable() const;
   virtual void setContentEditable(const DOMString& enabled);
 
+  virtual void click();
+
 #if APPLE_CHANGES
   virtual bool isGenericFormElement() const { return false; }
 #endif

@@ -295,7 +295,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void restoreState(QStringList&);
 
   void select();
-  void click();
+
+  virtual void click();
 
   virtual void parseAttribute(AttributeImpl* attr);
 
