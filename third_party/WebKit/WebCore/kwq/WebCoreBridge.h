@@ -287,6 +287,7 @@ enum FrameBorderStyle {
 - (void)setNeedsLayout;
 
 - (NSString*)requestedURL;
+- (NSString*)incomingReferrer;
 
 - (NSView*)viewForPluginWithURL:(NSString*)URL
                      attributes:(NSArray*)attributesArray

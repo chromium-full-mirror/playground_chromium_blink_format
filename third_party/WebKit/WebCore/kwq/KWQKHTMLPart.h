@@ -151,7 +151,7 @@ class KWQKHTMLPart : public KHTMLPart {
   static WebCoreBridge* bridgeForWidget(QWidget*);
 
   QString requestedURLString() const;
-  QString referrer() const;
+  QString incomingReferrer() const;
   QString userAgent() const;
 
   QString mimeTypeForFileName(const QString&) const;
