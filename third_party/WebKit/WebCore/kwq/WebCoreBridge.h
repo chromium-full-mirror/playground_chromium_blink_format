@@ -91,6 +91,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)removeFromFrame;
 
 - (void)scrollToBaseAnchor;
+- (void)gotoAnchor:(NSString*)anchor;
 
 - (void)createKHTMLViewWithNSView:(NSView*)view
                             width:(int)width
@@ -176,6 +177,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)unfocusWindow;
 
 - (BOOL)modifierTrackingEnabled;
+
+- (void)addBackForwardItemWithURL:(NSURL*)url anchor:(NSString*)anchor;
 
 @end
 

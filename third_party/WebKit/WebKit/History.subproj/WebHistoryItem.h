@@ -13,6 +13,7 @@
   NSImage* _image;
   NSCalendarDate* _lastVisitedDate;
   NSPoint _scrollPoint;
+  NSString* anchor;
 }
 
 + (WebHistoryItem*)entryWithURL:(NSURL*)url;
@@ -45,5 +46,7 @@
 - (NSPoint)scrollPoint;
 - (unsigned)hash;
 - (BOOL)isEqual:(id)anObject;
+- (NSString*)anchor;
+- (void)setAnchor:(NSString*)anchor;
 
 @end
