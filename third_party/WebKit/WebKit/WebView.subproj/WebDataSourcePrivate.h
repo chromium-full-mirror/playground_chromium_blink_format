@@ -68,7 +68,8 @@
 
   BOOL loading;  // self and controller are retained while loading
 
-  BOOL committed;  // This data source has been committed
+  BOOL gotFirstByte;  // got first byte
+  BOOL committed;     // This data source has been committed
 }
 
 @end
@@ -107,5 +108,9 @@
 // This returns nil if the representation is not an WebHTMLRepresentation.
 - (WebBridge*)_bridge;
 
-- (void)_commit;
+- (void)_commitIfReady;
+- (void)_makeRepresentation;
+- (void)_setGotFirstByte;
+- (BOOL)_gotFirstByte;
+- (BOOL)_isReadyForData;
 @end
