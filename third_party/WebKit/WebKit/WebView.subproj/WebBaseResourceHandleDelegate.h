@@ -14,9 +14,7 @@
 @class NSURLRequest;
 @class NSURLResponse;
 
-@protocol NSURLConnectionDelegate;
-
-@interface WebBaseResourceHandleDelegate : NSObject<NSURLConnectionDelegate> {
+@interface WebBaseResourceHandleDelegate : NSObject {
  @protected
   WebDataSource* dataSource;
   NSURLConnection* connection;
@@ -34,9 +32,6 @@
 }
 
 - (BOOL)loadWithRequest:(NSURLRequest*)request;
-
-// this method exists only to be subclassed, don't call it directly
-- (void)startLoading:(NSURLRequest*)r;
 
 - (void)setDataSource:(WebDataSource*)d;
 - (WebDataSource*)dataSource;

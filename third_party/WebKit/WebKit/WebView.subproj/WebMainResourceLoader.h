@@ -13,10 +13,10 @@
 @class WebPolicyDecisionListener;
 @class WebDataSource;
 
-@interface WebResourceDelegateProxy : NSObject<NSURLConnectionDelegate> {
-  id<NSURLConnectionDelegate> delegate;
+@interface WebResourceDelegateProxy : NSObject {
+  id delegate;
 }
-- (void)setDelegate:(id<NSURLConnectionDelegate>)theDelegate;
+- (void)setDelegate:(id)theDelegate;
 @end
 
 @interface WebMainResourceClient : WebBaseResourceHandleDelegate {
