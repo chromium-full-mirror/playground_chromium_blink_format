@@ -1024,8 +1024,8 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 
       // html blocks flow around floats
       if (child->style()->hidesOverflow() || child->isFlexibleBox() ||
-          ((style()->htmlHacks() || child->isTable()) &&
-           child->style()->flowAroundFloats())) {
+          child->isTable() || child->isReplaced() ||
+          child->style()->flowAroundFloats()) {
         int leftOff = leftOffset(m_height);
         if (leftOff != xPos) {
           // The object is shifting right. The object might be centered, so we
@@ -1047,9 +1047,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     } else {
       chPos -= child->width() + child->marginRight();
       if (child->style()->hidesOverflow() || child->isFlexibleBox() ||
-          ((style()->htmlHacks() || child->isTable()) &&
-           child->style()->flowAroundFloats()))
-        chPos -= leftOffset(m_height);
+          child->isTable() || child->isReplaced() ||
+          child->style()->flowAroundFloats())
+        chPos -= (xPos - rightOffset(m_height));
     }
 
     child->setPos(chPos, child->yPos());
@@ -1835,7 +1835,8 @@ void RenderBlock::clearFloats() {
   if (m_floatingObjects)
     m_floatingObjects->clear();
 
-  if (isFloating() || isPositioned())
+  if (isFloating() || isPositioned() || style()->hidesOverflow() ||
+      style()->flowAroundFloats() || isFlexibleBox())
     return;
 
   RenderObject* prev = previousSibling();
