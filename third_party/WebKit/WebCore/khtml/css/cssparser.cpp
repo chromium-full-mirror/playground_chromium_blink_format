@@ -1740,7 +1740,7 @@ CSSValueListImpl* CSSParser::parseFontFamily() {
   return list;
 }
 
-static bool parseColor(const QString& name, QRgb& rgb) {
+bool CSSParser::parseColor(const QString& name, QRgb& rgb) {
   int len = name.length();
 
   if (!len)
@@ -1785,12 +1785,12 @@ CSSPrimitiveValueImpl* CSSParser::parseColorFromValue(Value* value) {
       value->fValue >= 0. && value->fValue < 1000000.) {
     QString str;
     str.sprintf("%06d", (int)(value->fValue + .5));
-    if (!::parseColor(str, c))
+    if (!CSSParser::parseColor(str, c))
       return 0;
   } else if (value->unit == CSSPrimitiveValue::CSS_RGBCOLOR ||
              value->unit == CSSPrimitiveValue::CSS_IDENT ||
              value->unit == CSSPrimitiveValue::CSS_DIMENSION) {
-    if (!::parseColor(qString(value->string), c))
+    if (!CSSParser::parseColor(qString(value->string), c))
       return 0;
   } else if (value->unit == Value::Function && value->function->args != 0 &&
              value->function->args->numValues == 5 /* rgb + two commas */ &&
