@@ -1,5 +1,5 @@
 /*
-    WebController.mm
+    WebController.m
         Copyright 2001, Apple, Inc. All rights reserved.
 */
 
@@ -38,12 +38,9 @@
 
 @interface WebController (WebPrivate)
 
-/*
-        Called when a data source needs to create a frame.  This method
-   encapsulates the
-        specifics of creating and initializing a view of the appropriate class.
-*/
-- (WebFrame *)createFrameNamed: (NSString *)fname for: (WebDataSource *)child inParent: (WebFrame *)parent allowsScrolling: (BOOL)allowsScrolling;
+- (WebFrame*)_createFrameNamed:(NSString*)name
+                      inParent:(WebFrame*)parent
+               allowsScrolling:(BOOL)allowsScrolling;
 
 - (id<WebContextMenuDelegate>)_defaultContextMenuDelegate;
 - (void)_receivedProgressForResourceHandle:(WebResourceHandle*)resourceHandle
@@ -70,5 +67,9 @@
 
 - (void)_setTopLevelFrameName:(NSString*)name;
 - (WebFrame*)_frameInThisWindowNamed:(NSString*)name;
+
+- (WebController*)_openNewWindowWithURL:(NSURL*)URL
+                               referrer:(NSString*)referrer
+                                 behind:(BOOL)behind;
 
 @end
