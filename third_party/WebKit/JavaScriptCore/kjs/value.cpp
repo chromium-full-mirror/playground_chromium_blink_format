@@ -52,7 +52,6 @@ ValueImp::ValueImp()
 
 ValueImp::~ValueImp() {
   // fprintf(stderr,"ValueImp::~ValueImp %p\n",(void*)this);
-  _flags |= VI_DESTRUCTED;
 }
 
 void ValueImp::mark() {
