@@ -276,7 +276,7 @@ CFStringRef signedPublicKeyAndChallengeString(unsigned keySize,
    */
   memset(&spkc, 0, sizeof(spkc));
   perr = coder.decodeItem(subjectPubKey.KeyData,
-                          SS_SubjectPublicKeyInfoTemplate, &pkc->spki);
+                          NSS_SubjectPublicKeyInfoTemplate, &pkc->spki);
   if (perr) {
     /* should never happen */
     ERROR("***Error decoding subject public key info\n");
