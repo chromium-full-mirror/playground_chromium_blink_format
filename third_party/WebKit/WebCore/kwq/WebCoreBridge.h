@@ -160,6 +160,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                         top:(float)oldTop
                      bottom:(float)oldBottom
                       limit:(float)bottomLimit;
+- (NSArray*)computePageRects:(float)pageWidth withPageHeight:(float)pageHeight;
 
 - (void)setUsesInactiveTextBackgroundColor:(BOOL)uses;
 - (BOOL)usesInactiveTextBackgroundColor;

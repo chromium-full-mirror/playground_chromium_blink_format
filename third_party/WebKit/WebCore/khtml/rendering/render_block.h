@@ -236,6 +236,8 @@ class RenderBlock : public RenderFlow {
   virtual RenderBlock* firstLineBlock() const;
   virtual void updateFirstLetter();
 
+  bool inRootBlockContext() const;
+
 #ifndef NDEBUG
   virtual void printTree(int indent = 0) const;
   virtual void dump(QTextStream* stream, QString ind = "") const;

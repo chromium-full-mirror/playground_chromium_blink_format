@@ -659,7 +659,20 @@ int RenderCanvas::docWidth() const {
 // The idea here is to take into account what object is moving the pagination
 // point, and
 // thus choose the best place to chop it.
-void RenderCanvas::setBestTruncatedAt(int y, RenderObject* forRenderer) {
+void RenderCanvas::setBestTruncatedAt(int y,
+                                      RenderObject* forRenderer,
+                                      bool forcedBreak) {
+  // Nobody else can set a page break once we have a forced break.
+  if (m_forcedPageBreak)
+    return;
+
+  // Forced breaks always win over unforced breaks.
+  if (forcedBreak) {
+    m_forcedPageBreak = true;
+    m_bestTruncatedAt = y;
+    return;
+  }
+
   // prefer the widest object who tries to move the pagination point
   int width = forRenderer->width();
   if (width > m_truncatorWidth) {
