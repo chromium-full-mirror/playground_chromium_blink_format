@@ -206,6 +206,9 @@ class RenderLayer {
   void updateScrollInfoAfterLayout();
   void slotValueChanged(int);
   void updateScrollPositionFromScrollbars();
+  bool scroll(KWQScrollDirection direction,
+              KWQScrollGranularity granularity,
+              float multiplier = 1.0);
 
   void updateLayerPosition();
   void updateLayerPositions(bool doFullRepaint = false,

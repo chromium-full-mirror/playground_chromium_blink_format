@@ -110,6 +110,20 @@ typedef enum {
   WebSelectToDocumentBoundary
 } WebSelectionGranularity;
 
+typedef enum {
+  WebScrollUp,
+  WebScrollDown,
+  WebScrollLeft,
+  WebScrollRight
+} WebScrollDirection;
+
+typedef enum {
+  WebScrollLine,
+  WebScrollPage,
+  WebScrollDocument,
+  WebScrollWheel
+} WebScrollGranularity;
+
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
 // to be implemented by library clients, for example WebKit. The objects are
@@ -175,6 +189,10 @@ typedef enum {
 
 - (void)scrollToAnchor:(NSString*)anchor;
 - (void)scrollToAnchorWithURL:(NSURL*)URL;
+
+- (BOOL)scrollOverflowInDirection:(WebScrollDirection)direction
+                      granularity:(WebScrollGranularity)granularity;
+- (BOOL)scrollOverflowWithScrollWheelEvent:(NSEvent*)event;
 
 - (void)createKHTMLViewWithNSView:(NSView*)view
                       marginWidth:(int)mw

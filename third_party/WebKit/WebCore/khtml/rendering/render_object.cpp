@@ -564,6 +564,20 @@ int RenderObject::scrollHeight() const {
   return hasOverflowClip() ? layer()->scrollHeight() : overflowHeight();
 }
 
+bool RenderObject::scroll(KWQScrollDirection direction,
+                          KWQScrollGranularity granularity,
+                          float multiplier) {
+  RenderLayer* l = layer();
+  if (l != 0 && l->scroll(direction, granularity, multiplier)) {
+    return true;
+  }
+  RenderBlock* b = containingBlock();
+  if (b != 0 && !b->isCanvas()) {
+    return b->scroll(direction, granularity, multiplier);
+  }
+  return false;
+}
+
 bool RenderObject::hasStaticX() const {
   return (style()->left().isVariable() && style()->right().isVariable()) ||
          style()->left().isStatic() || style()->right().isStatic();
