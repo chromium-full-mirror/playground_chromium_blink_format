@@ -77,7 +77,6 @@ class KWQKHTMLPartImpl : public QObject {
                 bool complete = false);
 
   void scheduleRedirection(int delay, const QString& url);
-  void redirectURL();
   virtual void timerEvent(QTimerEvent*);
 
   bool gotoBaseAnchor();

@@ -53,7 +53,7 @@ class QEvent : public Qt {
   QEvent(Type t) : _type(t) {}
   virtual ~QEvent();
 
-  Type type() const;
+  Type type() const { return _type; }
 
  private:
   QEvent(const QEvent&);
@@ -71,13 +71,13 @@ class QMouseEvent : public QEvent {
               int button,
               int state);
 
-  int x();
-  int y();
-  int globalX();
-  int globalY();
-  const QPoint& pos() const;
-  ButtonState button();
-  ButtonState state();
+  int x() { return _position.x(); }
+  int y() { return _position.y(); }
+  int globalX() { return _position.x(); }  // we never really return global X
+  int globalY() { return _position.y(); }  // we never really return global Y
+  const QPoint& pos() const { return _position; }
+  ButtonState button() { return _button; }
+  ButtonState state() { return _state; }
   ButtonState stateAfter();
 
  private:
@@ -89,7 +89,6 @@ class QMouseEvent : public QEvent {
 class QTimerEvent : public QEvent {
  public:
   QTimerEvent(int timerId);
-  ~QTimerEvent();
 
   int timerId() const { return _timerId; }
 
@@ -118,65 +117,26 @@ class QKeyEvent : public QEvent {
   int ascii() const;
 };
 
-class QFocusEvent : public QEvent {
+class QFocusEvent {
  public:
-  enum Reason { Mouse, Tab, ActiveWindow, Popup, Shortcut, Other };
-
-  QFocusEvent(Type);
-
-  static Reason reason();
+  enum Reason { Popup, Other };
+  static Reason reason() { return Other; }
 };
 
-class QHideEvent : public QEvent {
- public:
-  QHideEvent(Type);
-};
-
-class QResizeEvent : public QEvent {
- public:
-  QResizeEvent(Type);
-};
-
-class QShowEvent : public QEvent {
- public:
-  QShowEvent(Type);
-};
-
-class QWheelEvent : public QEvent {
- public:
-  QWheelEvent(Type);
-
-  void accept();
-  void ignore();
-};
+class QHideEvent;
+class QResizeEvent;
+class QShowEvent;
+class QWheelEvent;
+class QContextMenuEvent;
 
 class QCustomEvent : public QEvent {
  public:
-  QCustomEvent(int type);
-  QCustomEvent(Type type, void* data) : QEvent(type), d(data){};
-
+  QCustomEvent(Type type, void* data = 0) : QEvent(type), d(data) {}
   void* data() const { return d; }
   void setData(void* data) { d = data; }
 
  private:
   void* d;
-};
-
-class QContextMenuEvent : public QEvent {
- public:
-  QContextMenuEvent(int, const QPoint&, const QPoint&, Qt::ButtonState);
-
-  int x() const;
-  int y() const;
-  ButtonState state() const;
-  int reason() const;
-  QPoint globalPos() const;
-
- private:
-  int m_reason;
-  QPoint m_pos;
-  QPoint m_globalPos;
-  ButtonState m_state;
 };
 
 #endif
