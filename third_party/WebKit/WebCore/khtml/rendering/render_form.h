@@ -116,6 +116,8 @@ class RenderFormElement : public khtml::RenderWidget {
   virtual bool isRenderButton() const { return false; }
   virtual bool isEditable() const { return false; }
 
+  AlignmentFlags textAlignment() const;
+
   QPoint m_mousePos;
   int m_state;
   int m_button;

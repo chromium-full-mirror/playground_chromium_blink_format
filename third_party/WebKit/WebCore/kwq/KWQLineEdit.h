@@ -78,4 +78,8 @@ class QLineEdit : public QWidget {
   KWQSignal m_clicked;
 };
 
+#ifdef __OBJC__
+NSTextAlignment KWQNSTextAlignmentForAlignmentFlags(Qt::AlignmentFlags);
+#endif
+
 #endif
