@@ -334,6 +334,8 @@ class RenderTableCell : public RenderBlock {
 
   virtual void updateFromElement();
 
+  virtual void layout();
+
   void setCellTopExtra(int p) { _topExtra = p; }
   void setCellBottomExtra(int p) { _bottomExtra = p; }
 
@@ -377,12 +379,6 @@ class RenderTableCell : public RenderBlock {
 #ifndef NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
-
-  bool widthChanged() {
-    bool retval = m_widthChanged;
-    m_widthChanged = false;
-    return retval;
-  }
 
  protected:
   virtual void paintBoxDecorations(QPainter* p,
