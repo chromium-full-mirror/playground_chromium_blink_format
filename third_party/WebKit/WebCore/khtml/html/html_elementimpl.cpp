@@ -427,6 +427,7 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
     return NULL;
 
   DocumentFragmentImpl* fragment = new DocumentFragmentImpl(docPtr());
+  fragment->ref();
   {
     HTMLTokenizer tok(docPtr(), fragment);
     tok.begin();
@@ -471,6 +472,12 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
       node = node->nextSibling();
     }
   }
+
+  // Trick to get the fragment back to the floating state, with 0
+  // refs but not destroyed.
+  fragment->setParent(this);
+  fragment->deref();
+  fragment->setParent(0);
 
   return fragment;
 }

@@ -122,7 +122,8 @@ KHTMLParser::KHTMLParser(KHTMLView* _parent, DocumentPtr* doc) : current(0) {
   reset();
 }
 
-KHTMLParser::KHTMLParser(DOM::DocumentFragmentImpl* i, DocumentPtr* doc) {
+KHTMLParser::KHTMLParser(DOM::DocumentFragmentImpl* i, DocumentPtr* doc)
+    : current(0) {
   HTMLWidget = 0;
   document = doc;
   document->ref();
