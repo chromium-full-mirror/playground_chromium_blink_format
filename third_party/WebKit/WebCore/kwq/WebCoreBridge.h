@@ -139,6 +139,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 - (CFStringEncoding)textEncoding;
 
+- (void)executeJavaScriptFromString:(NSString*)string;
+
 @end
 
 // The WebCoreBridge protocol contains methods for use by the WebCore side of
