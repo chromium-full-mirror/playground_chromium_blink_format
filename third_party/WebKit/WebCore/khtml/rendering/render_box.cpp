@@ -216,6 +216,7 @@ void RenderBox::printBackground(QPainter* p,
   if (c.isValid())
     p->fillRect(_tx, clipy, w, cliph, c);
   // no progressive loading of the background image
+
   if (bg && bg->pixmap_size() == bg->valid_rect().size() &&
       !bg->isTransparent() && !bg->isErrorImage()) {
     // kdDebug( 6040 ) << "printing bgimage at " << _tx << "/" << _ty << endl;
@@ -306,8 +307,15 @@ void RenderBox::printBackground(QPainter* p,
     //        kdDebug() << "cx="<<cx << " cy="<<cy<< " cw="<<cw << " ch="<<ch <<
     //        " sx="<<sx << " sy="<<sy << endl;
 
-    if (cw > 0 && ch > 0)
+    if (cw > 0 && ch > 0) {
+#ifdef _KWQ_
+      // This is a change in behavior. The difference is that we
+      // do not do a fill of the passed in color before tiling.
+      p->drawTiledPixmap(cx, cy, cw, ch, bg->pixmap(), sx, sy);
+#else
       p->drawTiledPixmap(cx, cy, cw, ch, bg->tiled_pixmap(c), sx, sy);
+#endif
+    }
   }
 }
 
