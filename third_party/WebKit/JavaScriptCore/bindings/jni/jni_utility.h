@@ -55,12 +55,13 @@ void releaseCharactersForJStringInEnv(JNIEnv* env,
                                       jstring aJString,
                                       const char* s);
 
-JNIType primitiveTypeFromClassName(const char* name);
+JNIType JNITypeFromClassName(const char* name);
 const char* signatureFromPrimitiveType(JNIType type);
 
 jvalue convertValueToJValue(KJS::ExecState* exec,
                             KJS::Value value,
-                            Bindings::JavaParameter* aParameter);
+                            JNIType _JNIType,
+                            const char* javaClassName);
 
 jvalue getJNIField(jobject obj,
                    JNIType type,

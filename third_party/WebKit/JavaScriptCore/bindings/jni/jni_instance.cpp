@@ -91,7 +91,8 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
   for (i = 0; i < count; i++) {
     JavaParameter* aParameter =
         static_cast<JavaParameter*>(jMethod->parameterAt(i));
-    jArgs[i] = convertValueToJValue(exec, args.at(i), aParameter);
+    jArgs[i] = convertValueToJValue(exec, args.at(i), aParameter->getJNIType(),
+                                    aParameter->type());
   }
 
   jvalue result;

@@ -82,9 +82,11 @@ void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
                            const Value& value,
                            int attr) {
-  printf("%s: NOT YET IMPLEMENTED %p: propertyName %s\n", __PRETTY_FUNCTION__,
-         instance, propertyName.ascii());
   // Set the value of the property.
+  Field* aField = instance->getClass()->fieldNamed(propertyName.ascii());
+  if (aField) {
+    getInternalInstance()->setValueOfField(exec, aField, value);
+  }
 }
 
 bool RuntimeObjectImp::canPut(ExecState* exec,
@@ -111,8 +113,6 @@ bool RuntimeObjectImp::deleteProperty(ExecState* exec,
 }
 
 Value RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
-  // Return a string representation of the instance.
-
   // FIXME:  Convert to appropriate type based on hint.
   // If UnspecifiedType should only convert to string if
   // native class is a string.
