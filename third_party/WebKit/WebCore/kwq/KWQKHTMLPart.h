@@ -280,8 +280,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool haveToldBridgeAboutLoad(const QString& urlString);
   void print();
 
-  Bindings::Instance* getAppletInstanceForView(NSView* aView);
-  void addPluginRootObject(const Bindings::RootObject* root);
+  KJS::Bindings::Instance* getAppletInstanceForView(NSView* aView);
+  void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
  private:
@@ -337,7 +337,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   friend class KHTMLPart;
 
-  QPtrList<Bindings::RootObject> rootObjects;
+  QPtrList<KJS::Bindings::RootObject> rootObjects;
 };
 
 inline KWQKHTMLPart* KWQ(KHTMLPart* part) {

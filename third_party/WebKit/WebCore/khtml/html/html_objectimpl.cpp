@@ -176,7 +176,7 @@ bool HTMLAppletElementImpl::callMember(const QString& name,
 }
 
 #if APPLE_CHANGES
-Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
+KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   if (appletInstance)
     return appletInstance;
 
