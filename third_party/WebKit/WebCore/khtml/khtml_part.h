@@ -758,6 +758,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void nodeActivated(const DOM::Node&);
 
+#ifdef APPLE_CHANGES
+  void completed();
+  void completed(bool);
+#endif
+
  protected:
   /**
    * returns a KURL object for the given url. Use when
