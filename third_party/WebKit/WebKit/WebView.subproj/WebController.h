@@ -198,8 +198,8 @@ typedef enum {
 // IFContentPolicySave or
 // IFContentPolicyOpenExternally.
 - (void)haveContentPolicy:(IFContentPolicy)policy
-                     andPath:(NSString*)path
-    forLocationChangeHandler:(id<IFLocationChangeHandler>)handler;
+                  andPath:(NSString*)path
+            forDataSource:(IFWebDataSource*)dataSource;
 
 // API to manage animated images.
 - (void)stopAnimatedImages;

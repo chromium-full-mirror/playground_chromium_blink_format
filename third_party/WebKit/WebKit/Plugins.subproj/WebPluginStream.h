@@ -10,7 +10,9 @@
 #import <WebKit/IFPluginView.h>
 #import <WebKit/npapi.h>
 
-@interface IFPluginStream : NSObject {
+@protocol IFDocumentRepresentation;
+
+@interface IFPluginStream : NSObject<IFDocumentRepresentation> {
   IFPluginView* view;
   NSURL* URL;
   NPP instance;
@@ -18,8 +20,14 @@
   int32 offset;
   NPStream npStream;
   NSString* path;
+  NSString* mimeType;
+  NSDictionary* attributes;
+
   void* notifyData;
-  BOOL receivedFirstChunk, stopped;
+
+  BOOL isFirstChunk;
+  BOOL stopped;
+
   IFURLHandle* URLHandle;
 
   NPP_NewStreamProcPtr NPP_NewStream;
@@ -39,5 +47,6 @@
        notifyData:(void*)theNotifyData
        attributes:(NSDictionary*)theAttributes;
 
+- (void)startLoad;
 - (void)stop;
 @end

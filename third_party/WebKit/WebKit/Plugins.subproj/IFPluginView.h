@@ -13,8 +13,9 @@
 @class IFWebDataSource;
 @class IFPlugin;
 @class IFWebController;
+@protocol IFDocumentView;
 
-@interface IFPluginView : NSView {
+@interface IFPluginView : NSView<IFDocumentView> {
   IFPluginNullEventSender* eventSender;
   unsigned argsCount;
   char **cAttributes, **cValues;
@@ -55,13 +56,13 @@
              plugin:(IFPlugin*)plugin
                 url:(NSURL*)theURL
                mime:(NSString*)mimeType
-          arguments:(NSDictionary*)arguments
-               mode:(uint16)mode;
+          arguments:(NSDictionary*)arguments;
 - (void)stop;
 - (IFWebDataSource*)webDataSource;
 - (IFWebController*)webController;
 + (void)getCarbonEvent:(EventRecord*)carbonEvent;
 
+- (NPP)pluginInstance;
 - (NPP_NewStreamProcPtr)NPP_NewStream;
 - (NPP_WriteReadyProcPtr)NPP_WriteReady;
 - (NPP_WriteProcPtr)NPP_Write;
