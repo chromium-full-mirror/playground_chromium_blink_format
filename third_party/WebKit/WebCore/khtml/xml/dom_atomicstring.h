@@ -73,6 +73,11 @@ class AtomicString {
 
   static void remove(DOMStringImpl*);
 
+#ifdef __OBJC__
+  AtomicString(NSString*);
+  operator NSString*() const { return m_string; }
+#endif
+
  private:
   DOMString m_string;
 

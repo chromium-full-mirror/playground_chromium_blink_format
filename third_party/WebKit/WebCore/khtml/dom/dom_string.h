@@ -117,6 +117,11 @@ class DOMString {
    */
   DOMStringImpl* implementation() const { return impl; }
 
+#ifdef __OBJC__
+  DOMString(NSString*);
+  operator NSString*() const;
+#endif
+
  protected:
   DOMStringImpl* impl;
 };
