@@ -75,6 +75,16 @@ class CachedObject;
 class Request;
 class DocLoader;
 
+#define MAX_LRU_LISTS 20
+
+struct LRUList {
+  CachedObject* m_head;
+  CachedObject* m_tail;
+
+  LRUList();
+  ~LRUList();
+};
+
 /**
  * @internal
  *
@@ -95,7 +105,7 @@ class CachedObject {
     Pending,     // only partially loaded
     Persistent,  // never delete this pixmap
     Cached,      // regular case
-    Uncacheable  // to big to be cached,
+    Uncacheable  // too big to be cached,
   };             // will be destroyed as soon as possible
 
   CachedObject(const DOM::DOMString& url,
@@ -116,6 +126,9 @@ class CachedObject {
     m_expireDate = _expireDate;
     m_deleted = false;
     m_expireDateChanged = false;
+
+    m_accessCount = 0;
+
     m_nextInLRUList = 0;
     m_prevInLRUList = 0;
   }
@@ -135,6 +148,9 @@ class CachedObject {
   Status status() const { return m_status; }
 
   int size() const { return m_size; }
+
+  int accessCount() const { return m_accessCount; }
+  void increaseAccessCount() { m_accessCount++; }
 
   /**
    * computes the status of an object after loading.
@@ -190,6 +206,7 @@ class CachedObject {
 
  private:
   int m_size;
+  int m_accessCount;
 
  protected:
   time_t m_expireDate;
@@ -574,7 +591,9 @@ class Cache {
 
   static void insertInLRUList(CachedObject*);
   static void removeFromLRUList(CachedObject*);
-  static void adjustSize(CachedObject*, int sizeDelta);
+  static bool adjustSize(CachedObject*, int sizeDelta);
+
+  static LRUList* getLRUListFor(CachedObject* o);
 
   static void checkLRUAndUncacheableListIntegrity();
 
@@ -591,9 +610,8 @@ class Cache {
 
   static void moveToHeadOfLRUList(CachedObject*);
 
-  static CachedObject* m_headOfLRUList;
-  static CachedObject* m_tailOfLRUList;
-  static int m_totalSizeOfLRUList;
+  static LRUList m_LRULists[];
+  static int m_totalSizeOfLRULists;
 
   static CachedObject* m_headOfUncacheableList;
 
