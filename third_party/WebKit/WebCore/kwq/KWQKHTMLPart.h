@@ -50,6 +50,7 @@ class ScheduledAction;
 @class NSView;
 @class WebCoreBridge;
 @class KWQPageState;
+@class NSMutableDictionary;
 #else
 class NSAttributedString;
 class NSEvent;
@@ -57,6 +58,7 @@ class NSResponder;
 class NSView;
 class WebCoreBridge;
 class KWQPageState;
+class NSMutableDictionary;
 #endif
 
 enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
@@ -189,6 +191,9 @@ class KWQKHTMLPart : public KHTMLPart {
     return mutableInstances();
   }
 
+  void clearRecordedFormValues();
+  void recordFormValue(const QString& name, const QString& value);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
@@ -232,6 +237,8 @@ class KWQKHTMLPart : public KHTMLPart {
   static NSResponder* _firstResponderAtMouseDownTime;
 
   bool _formSubmittedFlag;
+
+  NSMutableDictionary* _formValues;
 
   static QPtrList<KWQKHTMLPart>& mutableInstances();
 

@@ -221,13 +221,14 @@ enum FrameBorderStyle {
 - (NSString*)generateFrameName;
 
 - (void)loadURL:(NSString*)URL
-              reload:(BOOL)reload
-     triggeringEvent:(NSEvent*)event
-    isFormSubmission:(BOOL)isFormSubmission;
+             reload:(BOOL)reload
+    triggeringEvent:(NSEvent*)event
+         formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSString*)URL
                data:(NSData*)data
         contentType:(NSString*)contentType
-    triggeringEvent:(NSEvent*)event;
+    triggeringEvent:(NSEvent*)event
+         formValues:(NSDictionary*)values;
 
 - (WebCoreBridge*)createWindowWithURL:(NSString*)URL frameName:(NSString*)name;
 - (void)showWindow;

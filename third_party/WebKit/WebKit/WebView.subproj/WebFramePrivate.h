@@ -68,9 +68,13 @@ typedef enum {
       previousItem;  // BF item for previous content, see _itemForSavingDocState
 
   WebPolicyDecisionListener* listener;
+  // state we'll need to continue after waiting for the policy delegate's
+  // decision
   WebResourceRequest* policyRequest;
   id policyTarget;
   SEL policySelector;
+  NSDictionary* policyFormValues;
+
   BOOL justOpenedForTargetedLink;
   BOOL quickRedirectComing;
 }
@@ -121,6 +125,7 @@ typedef enum {
 
 - (void)_checkNavigationPolicyForRequest:(WebResourceRequest*)request
                               dataSource:(WebDataSource*)dataSource
+                              formValues:(NSDictionary*)values
                                  andCall:(id)target
                             withSelector:(SEL)selector;
 
@@ -128,14 +133,15 @@ typedef enum {
 
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
-            loadType:(WebFrameLoadType)loadType
-     triggeringEvent:(NSEvent*)event
-    isFormSubmission:(BOOL)isFormSubmission;
+           loadType:(WebFrameLoadType)loadType
+    triggeringEvent:(NSEvent*)event
+         formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
                 data:(NSData*)data
          contentType:(NSString*)contentType
-     triggeringEvent:(NSEvent*)event;
+     triggeringEvent:(NSEvent*)event
+          formValues:(NSDictionary*)values;
 
 - (void)_clientRedirectedTo:(NSURL*)URL
                       delay:(NSTimeInterval)seconds
@@ -165,7 +171,8 @@ typedef enum {
                               forURL:(NSURL*)URL;
 
 - (void)_loadDataSource:(WebDataSource*)dataSource
-           withLoadType:(WebFrameLoadType)type;
+           withLoadType:(WebFrameLoadType)type
+             formValues:(NSDictionary*)values;
 
 - (void)_downloadRequest:(WebResourceRequest*)request
              toDirectory:(NSString*)directory;
