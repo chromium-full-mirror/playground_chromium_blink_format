@@ -48,6 +48,7 @@ class QEvent : public Qt {
     KeyPress,
     KeyRelease,
     Paint,
+    Resize
   };
 
   QEvent(Type t) : _type(t) {}
@@ -141,10 +142,14 @@ class QFocusEvent : public QEvent {
 };
 
 class QHideEvent;
-class QResizeEvent;
 class QShowEvent;
 class QWheelEvent;
 class QContextMenuEvent;
+
+class QResizeEvent : public QEvent {
+ public:
+  QResizeEvent() : QEvent(Resize) {}
+};
 
 class QCustomEvent : public QEvent {
  public:
