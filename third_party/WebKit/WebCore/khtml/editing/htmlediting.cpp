@@ -1511,10 +1511,6 @@ void ApplyStyleCommand::applyInlineStyle(
   // <rdar://problem/3724344> Bolding and unbolding creates extraneous tags
   removeInlineStyle(style, start.upstream(StayInBlock), end);
 
-  if (splitStart || splitEnd) {
-    cleanUpEmptyStyleSpans(start, end);
-  }
-
   if (splitStart) {
     bool mergedStart = mergeStartWithPreviousIfIdentical(start, end);
     if (mergedStart) {
@@ -1564,6 +1560,10 @@ void ApplyStyleCommand::applyInlineStyle(
         break;
       node = node->traverseNextNode();
     }
+  }
+
+  if (splitStart || splitEnd) {
+    cleanUpEmptyStyleSpans(start, end);
   }
 }
 
