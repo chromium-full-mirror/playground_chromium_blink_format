@@ -78,7 +78,6 @@ class PropertyMap {
   void restore(const SavedProperties& p);
 
  private:
-  int hash(const UString::Rep*) const;
   static bool keysMatch(const UString::Rep*, const UString::Rep*);
   void expand();
 

@@ -217,7 +217,7 @@ class UString {
     UChar* data() const { return dat; }
     int size() const { return len; }
 
-    int hash() const {
+    unsigned hash() const {
       if (_hash == 0)
         _hash = computeHash(dat, len);
       return _hash;
@@ -235,7 +235,7 @@ class UString {
     int len;
     int capacity;
     int rc;
-    mutable int _hash;
+    mutable unsigned _hash;
 
     enum { capacityForIdentifier = 0x10000000 };
 
