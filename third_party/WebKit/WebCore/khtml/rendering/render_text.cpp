@@ -485,19 +485,33 @@ void RenderText::caretPos(int offset,
     return;
   }
 
-  int pos;
-  InlineTextBox* s = findNextInlineTextBox(offset, pos);
-  _y = s->m_y;
-  height = s->m_height;
+  // Find the text box for the given offset
+  InlineTextBox* box = 0;
+  for (box = firstTextBox(); box; box = box->nextTextBox()) {
+    if (offset <= box->m_start + box->m_len)
+      break;
+  }
 
-  const QFontMetrics& fm = metrics(s->m_firstLine);
-  QString tekst(str->s + s->m_start, s->m_len);
-  _x = s->m_x + (fm.boundingRect(tekst, pos)).right();
+  if (!box) {
+    _x = _y = height = -1;
+    return;
+  }
+
+  _y = box->m_y;
+  height = box->m_height;
+
+  const QFontMetrics& fm = metrics(box->isFirstLineStyle());
+  QString string(str->s + box->m_start, box->m_len);
+  long pos =
+      offset - box->m_start;  // the number of characters we are into the string
+  _x = box->m_x + (fm.boundingRect(string, pos)).right();
+
 #if 0
-  // EDIT FIXME
-  if(pos)
-      _x += fm.rightBearing( *(str->s + s->m_start + pos - 1 ) );
+    // EDIT FIXME
+    if (pos)
+        _x += fm.rightBearing(*(str->s + box->m_start + offset));
 #endif
+
   int absx, absy;
   absolutePosition(absx, absy);
   _x += absx;
