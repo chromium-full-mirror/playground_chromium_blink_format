@@ -1368,6 +1368,11 @@ int RenderTableSection::layoutRows(int toAdd) {
         cell->setCellBottomExtra(rHeight - cell->height() - te);
       }
 
+#ifdef INCREMENTAL_REPAINTING
+      int oldCellX = cell->xPos();
+      int oldCellY = cell->yPos();
+#endif
+
       if (style()->direction() == RTL) {
         cell->setPos(table()->columnPos[(int)totalCols] -
                          table()->columnPos[table()->colToEffCol(
@@ -1377,6 +1382,16 @@ int RenderTableSection::layoutRows(int toAdd) {
       } else {
         cell->setPos(table()->columnPos[c] + leftOffset, rowPos[rindx]);
       }
+
+#ifdef INCREMENTAL_REPAINTING
+      // If the cell moved, we have to repaint it as well as any
+      // floating/positioned
+      // descendants.  An exception is if we need a layout.  In this case, we
+      // know we're going to
+      // repaint ourselves (and the cell) anyway.
+      if (!selfNeedsLayout() && checkForRepaintDuringLayout())
+        cell->repaintDuringLayoutIfMoved(oldCellX, oldCellY);
+#endif
     }
   }
 
