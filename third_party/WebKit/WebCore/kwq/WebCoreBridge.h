@@ -177,9 +177,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
                       fireDate:(NSDate*)date;
 - (void)reportClientRedirectCancelled;
 
-- (BOOL)openedByScript;
-- (void)setOpenedByScript:(BOOL)openedByScript;
-
 - (void)unfocusWindow;
 
 - (BOOL)modifierTrackingEnabled;
