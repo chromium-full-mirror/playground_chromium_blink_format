@@ -45,8 +45,7 @@ class KLineEdit : public QLineEdit, public QCompletionBase {
   // constructors, copy constructors, and destructors ------------------------
 
   KLineEdit(QWidget* parent = 0, const char* name = 0);
-
-  ~KLineEdit();
+  virtual ~KLineEdit();
 
   // member functions --------------------------------------------------------
 
@@ -62,9 +61,17 @@ class KLineEdit : public QLineEdit, public QCompletionBase {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KLineEdit(const KLineEdit&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KLineEdit& operator=(const KLineEdit&);
+#endif
 
 };  // class __class_name__
     // =====================================================

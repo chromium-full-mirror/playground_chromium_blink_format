@@ -41,8 +41,7 @@ class KAction {
   // constructors, copy constructors, and destructors ------------------------
 
   KAction();
-
-  ~KAction();
+  virtual ~KAction();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -53,9 +52,17 @@ class KAction {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KAction(const KAction&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KAction& operator=(const KAction&);
+#endif
 
 };  // class KAction
     // ============================================================

@@ -44,6 +44,7 @@ class KComboBox : public QComboBox, public QCompletionBase {
 
   KComboBox(QWidget* parent = 0, const char* name = 0);
   KComboBox(bool rw, QWidget* parent = 0, const char* name = 0);
+  virtual ~KComboBox();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -54,9 +55,17 @@ class KComboBox : public QComboBox, public QCompletionBase {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KComboBox(const KComboBox&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KComboBox& operator=(const KComboBox&);
+#endif
 
 };  // class KComboBox
     // ==========================================================

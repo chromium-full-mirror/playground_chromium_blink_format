@@ -41,8 +41,7 @@ class KCompletionBox : public KListBox {
   // constructors, copy constructors, and destructors ------------------------
 
   KCompletionBox();
-
-  ~KCompletionBox();
+  virtual ~KCompletionBox();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -53,9 +52,17 @@ class KCompletionBox : public KListBox {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KCompletionBox(const KCompletionBox&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KCompletionBox& operator=(const KCompletionBox&);
+#endif
 
 };  // class KCompletionBox
     // =====================================================

@@ -68,11 +68,17 @@ class KMessageBox {
                     const QString& caption = QString::null,
                     bool notify = true);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  KMessageBox();
+// add no-op constructor
+#ifdef _KWQ_PEDANTIC_
+  KMessageBox() {}
+#endif
 
-  ~KMessageBox();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KMessageBox() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -83,9 +89,17 @@ class KMessageBox {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KMessageBox(const KMessageBox&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KMessageBox& operator=(const KMessageBox&);
+#endif
 
 };  // class KMessageBox
     // ========================================================

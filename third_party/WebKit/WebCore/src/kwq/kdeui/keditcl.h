@@ -50,7 +50,6 @@ class QTableView : public QFrame {
   // constructors, copy constructors, and destructors ------------------------
 
   QTableView();
-
   ~QTableView();
 
   // member functions --------------------------------------------------------
@@ -69,9 +68,17 @@ class QTableView : public QFrame {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   QTableView(const QTableView&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   QTableView& operator=(const QTableView&);
+#endif
 
 };  // class QTableView
     // =========================================================
@@ -91,7 +98,6 @@ class QMultiLineEdit : public QTableView {
   // constructors, copy constructors, and destructors ------------------------
 
   QMultiLineEdit();
-
   ~QMultiLineEdit();
 
   // member functions --------------------------------------------------------
@@ -118,6 +124,7 @@ class QMultiLineEdit : public QTableView {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   QMultiLineEdit(const QMultiLineEdit&);
   QMultiLineEdit& operator=(const QMultiLineEdit&);
 
@@ -138,7 +145,6 @@ class KEdit : public QMultiLineEdit {
 
   KEdit();
   KEdit(QWidget*);
-
   ~KEdit();
 
   // member functions --------------------------------------------------------
@@ -150,9 +156,17 @@ class KEdit : public QMultiLineEdit {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KEdit(const KEdit&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KEdit& operator=(const KEdit&);
+#endif
 
 };  // class KEdit
     // ==============================================================

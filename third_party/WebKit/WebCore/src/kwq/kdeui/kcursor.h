@@ -45,7 +45,10 @@ class KCursor {
 
   KCursor();
 
-  ~KCursor();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KCursor() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -56,9 +59,17 @@ class KCursor {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KCursor(const KCursor&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KCursor& operator=(const KCursor&);
+#endif
 
 };  // class KCursor
     // ============================================================

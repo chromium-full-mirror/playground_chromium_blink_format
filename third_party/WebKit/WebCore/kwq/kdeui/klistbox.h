@@ -44,6 +44,11 @@ class KListBox : public QListBox {
   KListBox();
   KListBox(QWidget*);
 
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KListBox() {}
+#endif
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -53,9 +58,17 @@ class KListBox : public QListBox {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KListBox(const KListBox&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KListBox& operator=(const KListBox&);
+#endif
 
 };  // class KListBox
     // ===========================================================
