@@ -8,13 +8,11 @@
 */
 
 #import <WebKit/WebDataSource.h>
-#import <WebKit/WebLocationChangeHandler.h>
 #import <WebKit/WebBridge.h>
 
 @class WebIconLoader;
 @class WebResourceHandle;
 @class WebMainResourceClient;
-@protocol WebLocationChangeHandler;
 @protocol WebDocumentRepresentation;
 
 @interface WebDataSourcePrivate : NSObject {
@@ -75,12 +73,6 @@
 
   NSURL* iconURL;
   WebIconLoader* iconLoader;
-
-  // Horrible hack to workaround another horrible hack.
-  // A 'fake' data source is created for every frame to guarantee
-  // that it has a part.  This flag is set if the data source
-  // in a 'fake' data source.
-  BOOL _isDummy;
 }
 
 @end
@@ -101,7 +93,6 @@
 - (double)_loadingStartedTime;
 - (void)_setTitle:(NSString*)title;
 - (void)_setFinalURL:(NSURL*)url;
-- (id<WebLocationChangeHandler>)_locationChangeHandler;
 - (void)_setContentPolicy:(WebContentPolicy*)policy;
 - (void)_setContentType:(NSString*)type;
 - (void)_setEncoding:(NSString*)encoding;
@@ -111,12 +102,9 @@
 - (void)_addError:(WebError*)error forResource:(NSString*)resourceDescription;
 + (NSMutableDictionary*)_repTypes;
 + (BOOL)_canShowMIMEType:(NSString*)MIMEType;
-- (void)_removeFromFrame;
 - (void)_loadIcon;
 - (void)_setIconURL:(NSURL*)url;
 - (void)_setIconURL:(NSURL*)url withType:(NSString*)iconType;
-- (BOOL)_isDummy;
-- (void)_setIsDummy:(BOOL)f;
 - (WebResourceHandle*)_mainHandle;
 
 // Convenience interface for getting here from an WebDataSource.
