@@ -104,6 +104,7 @@
   // WebResourceLoadDelegate messages if the item is loaded from the
   // page cache.
   NSMutableArray* responses;
+  BOOL stopRecordingResponses;
 
   BOOL justOpenedForTargetedLink;
 
@@ -201,6 +202,7 @@
 
 - (void)_addResponse:(NSURLResponse*)r;
 - (NSArray*)_responses;
+- (void)_stopRecordingResponses;
 
 - (void)_stopLoadingWithError:(NSError*)error;
 
