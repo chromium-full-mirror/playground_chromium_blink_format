@@ -688,15 +688,15 @@ class RenderObject : public CachedObjectClient {
   // maxBottomMargin
   // methods.
   virtual bool isSelfCollapsingBlock() const { return false; }
-  virtual short collapsedMarginTop() const {
+  virtual int collapsedMarginTop() const {
     return maxTopMargin(true) - maxTopMargin(false);
   }
-  virtual short collapsedMarginBottom() const {
+  virtual int collapsedMarginBottom() const {
     return maxBottomMargin(true) - maxBottomMargin(false);
   }
   virtual bool isTopMarginQuirk() const { return false; }
   virtual bool isBottomMarginQuirk() const { return false; }
-  virtual short maxTopMargin(bool positive) const {
+  virtual int maxTopMargin(bool positive) const {
     if (positive)
       if (marginTop() > 0)
         return marginTop();
@@ -707,7 +707,7 @@ class RenderObject : public CachedObjectClient {
     else
       return 0;
   }
-  virtual short maxBottomMargin(bool positive) const {
+  virtual int maxBottomMargin(bool positive) const {
     if (positive)
       if (marginBottom() > 0)
         return marginBottom();
@@ -719,10 +719,10 @@ class RenderObject : public CachedObjectClient {
       return 0;
   }
 
-  virtual short marginTop() const { return 0; }
-  virtual short marginBottom() const { return 0; }
-  virtual short marginLeft() const { return 0; }
-  virtual short marginRight() const { return 0; }
+  virtual int marginTop() const { return 0; }
+  virtual int marginBottom() const { return 0; }
+  virtual int marginLeft() const { return 0; }
+  virtual int marginRight() const { return 0; }
 
   // Virtual since table cells override
   virtual int paddingTop() const;

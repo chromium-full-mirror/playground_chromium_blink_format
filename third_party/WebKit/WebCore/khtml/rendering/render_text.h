@@ -272,10 +272,8 @@ class RenderText : public RenderObject {
   virtual QRect caretRect(int offset, EAffinity affinity);
   void posOfChar(int ch, int& x, int& y);
 
-  virtual short marginLeft() const { return style()->marginLeft().minWidth(0); }
-  virtual short marginRight() const {
-    return style()->marginRight().minWidth(0);
-  }
+  virtual int marginLeft() const { return style()->marginLeft().minWidth(0); }
+  virtual int marginRight() const { return style()->marginRight().minWidth(0); }
 
   virtual QRect getAbsoluteRepaintRect();
 
