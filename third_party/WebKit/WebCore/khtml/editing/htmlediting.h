@@ -453,6 +453,8 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
   virtual void doApply();
 
  private:
+  DOM::ElementImpl* createParagraphElement();
+
   QPtrList<DOM::NodeImpl> ancestors;
   QPtrList<DOM::NodeImpl> clonedNodes;
 };
