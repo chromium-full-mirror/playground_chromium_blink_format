@@ -135,7 +135,6 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_floating(false),
 
       m_positioned(false),
-      m_overhangingContents(false),
       m_relPositioned(false),
       m_paintBackground(false),
 
@@ -650,9 +649,7 @@ RenderBlock* RenderObject::containingBlock() const {
   }
 
   if (!o || !o->isRenderBlock())
-    // This can happen because of setOverhangingContents in RenderImage's
-    // setStyle method.
-    return 0;
+    return 0;  // Probably doesn't happen any more, but leave just in case. -dwh
 
   return static_cast<RenderBlock*>(o);
 }
@@ -1244,8 +1241,6 @@ QString RenderObject::information() const {
     ts << "rp ";
   if (isPositioned())
     ts << "ps ";
-  if (overhangingContents())
-    ts << "oc ";
   if (needsLayout())
     ts << "nl ";
   if (m_recalcMinMax)
@@ -1325,9 +1320,6 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
   }
   if (minMaxKnown()) {
     *stream << " minMaxKnown";
-  }
-  if (overhangingContents()) {
-    *stream << " overhangingContents";
   }
   *stream << endl;
 
@@ -1485,34 +1477,6 @@ void RenderObject::setStyle(RenderStyle* style) {
     setNeedsLayoutAndMinMaxRecalc();
   else if (!isText() && m_parent && d == RenderStyle::Visible)
     repaint();
-}
-
-void RenderObject::setOverhangingContents(bool p) {
-  if (m_overhangingContents == p)
-    return;
-
-  RenderObject* cb = containingBlock();
-  if (p) {
-    m_overhangingContents = true;
-    if (cb && cb != this)
-      cb->setOverhangingContents();
-  } else {
-    RenderObject* n;
-    bool c = false;
-
-    for (n = firstChild(); n != 0; n = n->nextSibling()) {
-      if (n->isPositioned() || n->overhangingContents())
-        c = true;
-    }
-
-    if (c)
-      return;
-    else {
-      m_overhangingContents = false;
-      if (cb && cb != this)
-        cb->setOverhangingContents(false);
-    }
-  }
 }
 
 QRect RenderObject::viewRect() const {
@@ -1760,8 +1724,8 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
       ((!isRenderBlock() ||
         !static_cast<RenderBlock*>(this)->isPointInScrollbar(_x, _y, _tx,
                                                              _ty)) &&
-       (overhangingContents() || inOverflowRect || isInline() || isCanvas() ||
-        isTableRow() || isTableSection() || inside || mouseInside() ||
+       (inOverflowRect || isInline() || isCanvas() || isTableRow() ||
+        isTableSection() || inside || mouseInside() ||
         (childrenInline() && firstChild() && firstChild()->isCompact())))) {
     if (hitTestAction == HitTestChildrenOnly)
       inside = false;

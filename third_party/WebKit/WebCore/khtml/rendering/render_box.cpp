@@ -959,9 +959,6 @@ void RenderBox::calcHeight() {
                      : calcHeightUsing(style()->maxHeight());
       height = kMin(maxH, height);
       height = kMax(minH, height);
-      if (height < m_height && !overhangingContents() &&
-          style()->overflow() == OVISIBLE)
-        setOverhangingContents();
     } else
       // The only times we don't check min/max height are when a fixed length
       // has

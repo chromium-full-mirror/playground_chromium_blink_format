@@ -300,7 +300,6 @@ class RenderObject : public CachedObjectClient {
   bool posChildNeedsLayout() const { return m_posChildNeedsLayout; }
   bool normalChildNeedsLayout() const { return m_normalChildNeedsLayout; }
   bool minMaxKnown() const { return m_minMaxKnown; }
-  bool overhangingContents() const { return m_overhangingContents; }
   bool isSelectionBorder() const { return m_isSelectionBorder; }
   bool recalcMinMax() const { return m_recalcMinMax; }
 
@@ -334,8 +333,6 @@ class RenderObject : public CachedObjectClient {
     * positioned elements
     */
   RenderObject* container() const;
-
-  void setOverhangingContents(bool p = true);
 
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
@@ -908,7 +905,6 @@ class RenderObject : public CachedObjectClient {
   bool m_floating : 1;
 
   bool m_positioned : 1;
-  bool m_overhangingContents : 1;
   bool m_relPositioned : 1;
   bool m_paintBackground : 1;  // if the box has something to paint in the
   // background painting phase (background, border, etc)

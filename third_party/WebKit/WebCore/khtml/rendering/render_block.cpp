@@ -129,9 +129,6 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
   if (!newChild->isInline())
     newChild->setPos(newChild->xPos(), -500000);
 
-  if (!newChild->isText() && newChild->style()->position() != STATIC)
-    setOverhangingContents();
-
   // A block has to either have all of its children inline, or all of its
   // children as blocks.
   // So, if our children are currently inline and a block child has to be
@@ -412,8 +409,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 //     kdDebug( 6040 ) << floatingObjects << "," << oldWidth << ","
 //                     << m_width << ","<< needsLayout() << "," << isAnonymous()
 //                     << ","
-//                     << overhangingContents() << "," << isPositioned() <<
-//                     endl;
+//                     << "," << isPositioned() << endl;
 
 #ifdef DEBUG_LAYOUT
   kdDebug(6040) << renderName() << "(RenderBlock) " << this
@@ -1312,8 +1308,7 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
   _ty += m_y;
 
   // check if we need to do anything at all...
-  if (!isRoot() && !isInlineFlow() && !overhangingContents() &&
-      !isRelPositioned() && !isPositioned()) {
+  if (!isRoot() && !isInlineFlow() && !isRelPositioned() && !isPositioned()) {
     int h = m_overflowHeight;
     int yPos = _ty;
     if (m_floatingObjects && floatBottom() > h)
@@ -1477,8 +1472,6 @@ void RenderBlock::insertPositionedObject(RenderObject* o) {
     }
   }
 
-  // Create the special object entry & append it to the list
-  setOverhangingContents();
   m_positionedObjects->append(o);
 }
 
