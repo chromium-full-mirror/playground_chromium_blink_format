@@ -1198,7 +1198,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   void slotLoaderRequestStarted(khtml::DocLoader*, khtml::CachedObject* obj);
   void slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject* obj);
-  void checkCompleted(bool ignoreDoc = false);
+  void checkCompleted();
 
   /**
    * @internal

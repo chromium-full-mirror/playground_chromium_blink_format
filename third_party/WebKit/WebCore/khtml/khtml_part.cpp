@@ -1713,7 +1713,7 @@ void KHTMLPart::stop() {
     // become true.  An example is when a subframe is a pure text doc, and that
     // subframe is the
     // last one to complete.
-    checkCompleted(true);
+    checkCompleted();
 }
 
 #if !APPLE_CHANGES
@@ -1847,7 +1847,7 @@ void KHTMLPart::slotJobPercent(KIO::Job* /*job*/, unsigned long percent) {
 
 #endif
 
-void KHTMLPart::checkCompleted(bool ignoreDoc) {
+void KHTMLPart::checkCompleted() {
 //   kdDebug( 6050 ) << "KHTMLPart::checkCompleted() parsing: " <<
 //   d->m_doc->parsing() << endl;
 //   kdDebug( 6050 ) << "                           complete: " <<
@@ -1877,10 +1877,6 @@ void KHTMLPart::checkCompleted(bool ignoreDoc) {
 
   // Are we still parsing?
   if (d->m_doc && d->m_doc->parsing())
-    return;
-
-  // Have we not even started getting data for the main resource yet?
-  if (!d->m_doc && !ignoreDoc)
     return;
 
   // Still waiting for images/scripts from the loader ?
