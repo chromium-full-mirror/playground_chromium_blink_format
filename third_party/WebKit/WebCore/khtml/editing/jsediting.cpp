@@ -480,7 +480,7 @@ void JSEditor::initDict() {
       // saveas command (not supported)
 
       // selectall command (supported)
-      {"selectAll",
+      {"selectall",
        {execCommandSelectAll, enabled, NoIndeterm, NoState, NoValue}},
 
       // sizetocontrol command (not supported)
