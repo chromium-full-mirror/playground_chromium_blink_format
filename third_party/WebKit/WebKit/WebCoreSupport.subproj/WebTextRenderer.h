@@ -6,7 +6,9 @@
 #import <WebCore/WebCoreTextRenderer.h>
 
 typedef struct WidthMap WidthMap;
+typedef struct WidthEntry WidthEntry;
 typedef struct GlyphMap GlyphMap;
+typedef struct GlyphEntry GlyphEntry;
 typedef struct UnicodeGlyphMap UnicodeGlyphMap;
 
 @interface WebTextRenderer : NSObject<WebCoreTextRenderer> {
