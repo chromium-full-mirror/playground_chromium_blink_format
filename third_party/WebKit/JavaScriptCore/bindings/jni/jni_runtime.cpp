@@ -64,7 +64,7 @@ KJS::Value JavaArray::convertJObjectToArray(KJS::ExecState* exec,
     return Undefined();
 
   return KJS::Object(
-      new RuntimeArrayImp(new JavaArray((jobject)anObject, type)));
+      new RuntimeArrayImp(exec, new JavaArray((jobject)anObject, type)));
 }
 
 KJS::Value JavaField::valueFromInstance(KJS::ExecState* exec,
