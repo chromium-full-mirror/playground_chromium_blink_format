@@ -611,6 +611,11 @@ void KHTMLView::layout() {
   layer->updateLayerPositions();
 #endif
 
+#if APPLE_CHANGES
+  // We update our widget positions right after doing a layout.
+  root->updateWidgetPositions();
+#endif
+
 #ifdef INCREMENTAL_REPAINTING
   if (root->needsLayout()) {
 #else
@@ -828,7 +833,7 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
 
   switch (style ? style->cursor() : CURSOR_AUTO) {
     case CURSOR_AUTO:
-      if (d->mousePressed)
+      if (d->mousePressed && m_part->hasSelection())
         // during selection, use an IBeam no matter what we're over
         c = KCursor::ibeamCursor();
       else if ((mev.url.length() || isSubmitImage(mev.innerNode.handle())) &&

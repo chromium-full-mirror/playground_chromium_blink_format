@@ -277,12 +277,19 @@ void RenderTable::layout() {
         tCaption->height() + tCaption->marginTop() + tCaption->marginBottom();
   }
 
-  m_height += borderTop();
+  m_height += borderTop() + paddingTop();
+
+  int oldHeight = m_height;
+  calcHeight();
+  int newHeight = m_height;
+  m_height = oldHeight;
 
   // html tables with percent height are relative to view
   Length h = style()->height();
   int th = 0;
-  if (h.isFixed())
+  if (isPositioned())
+    th = newHeight;
+  else if (h.isFixed())
     th = h.value;
   else if (h.isPercent()) {
     RenderObject* c = containingBlock();
@@ -327,7 +334,7 @@ void RenderTable::layout() {
       firstBody->layoutRows(th - calculatedHeight);
     }
   }
-  int bl = borderLeft();
+  int bl = borderLeft() + paddingLeft();
 
   // position the table sections
   if (head) {
@@ -347,30 +354,13 @@ void RenderTable::layout() {
     m_height += foot->height();
   }
 
-  m_height += borderBottom();
+  m_height += paddingBottom() + borderBottom();
 
   if (tCaption && tCaption->style()->captionSide() == CAPBOTTOM) {
     tCaption->setPos(tCaption->marginLeft(), m_height);
     m_height +=
         tCaption->height() + tCaption->marginTop() + tCaption->marginBottom();
   }
-
-  // kdDebug(0) << "table height: " << m_height << endl;
-
-  // FIXME: calcHeight should not affect height for tables.  In the positioned
-  // case,
-  // e.g., <table style="position:absolute">, it potentially does.  We're going
-  // to have to come up with a better
-  // solution eventually, but for now a good stopgap solution is to simply
-  // prevent this function
-  // from altering the height.
-  //
-  // When the height is implicitly determined via, e.g., explicit top and bottom
-  // values in CSS, we're still
-  // going to be completely wrong.
-  int oldHeight = m_height;
-  calcHeight();
-  m_height = oldHeight;
 
   // kdDebug(0) << "table height: " << m_height << endl;
 
@@ -972,7 +962,7 @@ void RenderTableSection::calcRowHeight() {
   int spacing = table()->cellSpacing();
 
   rowPos.resize(totalRows + 1);
-  rowPos[0] = spacing + borderTop();
+  rowPos[0] = spacing;
 
   for (int r = 0; r < totalRows; r++) {
     rowPos[r + 1] = 0;
@@ -1113,7 +1103,7 @@ int RenderTableSection::layoutRows(int toAdd) {
     }
   }
 
-  int leftOffset = borderLeft() + spacing;
+  int leftOffset = spacing;
 
   int nEffCols = table()->numEffCols();
   for (int r = 0; r < totalRows; r++) {

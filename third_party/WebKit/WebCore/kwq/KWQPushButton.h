@@ -36,7 +36,7 @@ class QPushButton : public QButton {
   QSize sizeHint() const;
   QRect frameGeometry() const;
   void setFrameGeometry(const QRect&);
-  int baselinePosition() const;
+  int baselinePosition(int height) const;
 
  private:
   const int* dimensions() const;

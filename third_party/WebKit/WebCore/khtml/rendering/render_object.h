@@ -467,6 +467,11 @@ class RenderObject : public CachedObjectClient {
   // elements do this.
   bool sizesToMaxWidth() const;
 
+#if APPLE_CHANGES
+  // Called recursively to update the absolute positions of all widgets.
+  virtual void updateWidgetPositions();
+#endif
+
   // does a query on the rendertree and finds the innernode
   // and overURL for the given position
   // if readonly == false, it will recalc hover styles accordingly

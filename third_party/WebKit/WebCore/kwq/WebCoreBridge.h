@@ -152,7 +152,6 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
               adjustingViewSize:(BOOL)adjustSizeFlag;
 - (void)sendResizeEvent;
 - (BOOL)needsLayout;
-- (void)adjustFrames:(NSRect)rect;
 - (void)drawRect:(NSRect)rect;
 - (void)adjustPageHeightNew:(float*)newBottom
                         top:(float)oldTop
