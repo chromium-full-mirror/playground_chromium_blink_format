@@ -36,7 +36,7 @@
 /*!
     @method frameScrollView
 */
-- frameScrollView;
+- (NSScrollView*)frameScrollView;
 
 /*!
     @method documentView
