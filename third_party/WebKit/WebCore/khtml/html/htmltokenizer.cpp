@@ -1364,7 +1364,7 @@ void HTMLTokenizer::parseTag(DOMStringIt& src) {
 }
 
 void HTMLTokenizer::addPending() {
-  if (select) {
+  if (select && !script) {
     *dest++ = ' ';
   } else if (textarea) {
     switch (pending) {
@@ -1527,7 +1527,7 @@ void HTMLTokenizer::write(const QString& str, bool appendData) {
 
       if (pending) {
         // pre context always gets its spaces/linefeeds
-        if (pre ||
+        if (pre || script ||
             (!parser->selectMode() && (!parser->noSpaces() || dest > buffer))) {
           addPending();
           discard =
@@ -1556,7 +1556,7 @@ void HTMLTokenizer::write(const QString& str, bool appendData) {
       ++src;
       startTag = true;
     } else if ((cc == '\n') || (cc == '\r')) {
-      if (select) {
+      if (select && !script) {
         if (discard == LFDiscard) {
           // Ignore this LF
           discard = NoneDiscard;  // We have discarded 1 LF
@@ -1584,7 +1584,7 @@ void HTMLTokenizer::write(const QString& str, bool appendData) {
       }
       ++src;
     } else if ((cc == ' ') || (cc == '\t')) {
-      if (select) {
+      if (select && !script) {
         if (discard == SpaceDiscard)
           discard = NoneDiscard;
         else if (discard == AllDiscard) {
