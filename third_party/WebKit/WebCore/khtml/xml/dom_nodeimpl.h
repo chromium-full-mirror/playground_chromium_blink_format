@@ -267,9 +267,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   QString recursive_toHTML(bool start = false) const;
   QString recursive_toHTMLWithOptions(
       bool start = false,
-      bool completeURLs = false,
       const DOM::RangeImpl* range = NULL,
       QStringList* subresourceURLs = NULL) const;
+  void recursive_completeURLs(QString baseURL);
 
   virtual bool isContentEditable() const;
   virtual QRect getRect() const;

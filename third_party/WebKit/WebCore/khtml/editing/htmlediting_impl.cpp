@@ -1396,8 +1396,11 @@ void JoinTextNodesCommandImpl::doUnapply() {
 // PasteMarkupCommandImpl
 
 PasteMarkupCommandImpl::PasteMarkupCommandImpl(DocumentImpl* document,
-                                               const DOMString& markupString)
-    : CompositeEditCommandImpl(document), m_markupString(markupString) {
+                                               const DOMString& markupString,
+                                               const DOM::DOMString& baseURL)
+    : CompositeEditCommandImpl(document),
+      m_markupString(markupString),
+      m_baseURL(baseURL) {
   ASSERT(!m_markupString.isEmpty());
 }
 
@@ -1412,6 +1415,10 @@ void PasteMarkupCommandImpl::doApply() {
       static_cast<HTMLElementImpl*>(document()->documentElement())
           ->createContextualFragment(m_markupString);
   ASSERT(root);
+
+  if (!m_baseURL.isEmpty() && m_baseURL != document()->baseURL()) {
+    root->recursive_completeURLs(m_baseURL.string());
+  }
 
   NodeImpl* firstChild = root->firstChild();
   NodeImpl* lastChild = root->lastChild();

@@ -262,7 +262,6 @@ static QString escapeHTML(const QString& in) {
 
 QString NodeImpl::recursive_toHTMLWithOptions(
     bool start,
-    bool completeURLs,
     const DOM::RangeImpl* range,
     QStringList* subresourceURLs) const {
   QString me = "";
@@ -333,17 +332,12 @@ QString NodeImpl::recursive_toHTMLWithOptions(
         unsigned long length = attrs->length();
         for (unsigned int i = 0; i < length; i++) {
           AttributeImpl* attr = attrs->attributeItem(i);
-          QString originalValue = attr->value().string();
-          QString newValue = originalValue;
-          if (completeURLs && el->isURLAttribute(attr)) {
-            newValue = getDocument()->completeURL(
-                khtml::parseURL(originalValue).string());
-          }
+          DOMString value = attr->value();
           me += " " + getDocument()->attrName(attr->id()).string() + "=\"" +
-                newValue + "\"";
+                value.string() + "\"";
           if (subresourceURLs && el->isSubresourceURLAttribute(attr)) {
-            QString URL = getDocument()->completeURL(
-                khtml::parseURL(originalValue).string());
+            QString URL =
+                getDocument()->completeURL(khtml::parseURL(value).string());
             if (!subresourceURLs->contains(URL)) {
               subresourceURLs->append(URL);
             }
@@ -357,8 +351,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(
   if (!isHTMLElement() || endTag[ident] != FORBIDDEN) {
     // print firstChild
     if ((n = firstChild())) {
-      me += n->recursive_toHTMLWithOptions(false, completeURLs, range,
-                                           subresourceURLs);
+      me += n->recursive_toHTMLWithOptions(false, range, subresourceURLs);
     }
     // Print my ending tag
     if (isNodeIncluded && nodeType() != Node::TEXT_NODE) {
@@ -367,8 +360,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(
   }
   // print next sibling
   if ((n = nextSibling())) {
-    me += n->recursive_toHTMLWithOptions(false, completeURLs, range,
-                                         subresourceURLs);
+    me += n->recursive_toHTMLWithOptions(false, range, subresourceURLs);
   }
 
   return me;
@@ -376,6 +368,29 @@ QString NodeImpl::recursive_toHTMLWithOptions(
 
 QString NodeImpl::recursive_toHTML(bool start) const {
   return recursive_toHTMLWithOptions(start);
+}
+
+void NodeImpl::recursive_completeURLs(QString baseURL) {
+  if (nodeType() == Node::ELEMENT_NODE) {
+    ElementImpl* el = static_cast<ElementImpl*>(this);
+    NamedAttrMapImpl* attrs = el->attributes();
+    unsigned long length = attrs->length();
+    for (unsigned int i = 0; i < length; i++) {
+      AttributeImpl* attr = attrs->attributeItem(i);
+      if (el->isURLAttribute(attr)) {
+        el->setAttribute(attr->id(),
+                         KURL(baseURL, attr->value().string()).url());
+      }
+    }
+  }
+
+  NodeImpl* n;
+  if ((n = firstChild())) {
+    n->recursive_completeURLs(baseURL);
+  }
+  if ((n = nextSibling())) {
+    n->recursive_completeURLs(baseURL);
+  }
 }
 
 bool NodeImpl::isContentEditable() const {

@@ -444,9 +444,10 @@ TextImpl* JoinTextNodesCommand::secondNode() const {
 // PasteMarkupCommand
 
 PasteMarkupCommand::PasteMarkupCommand(DocumentImpl* document,
-                                       const DOMString& markupString)
-    : CompositeEditCommand(new PasteMarkupCommandImpl(document, markupString)) {
-}
+                                       const DOMString& markupString,
+                                       const DOM::DOMString& baseURL)
+    : CompositeEditCommand(
+          new PasteMarkupCommandImpl(document, markupString, baseURL)) {}
 
 PasteMarkupCommand::~PasteMarkupCommand() {}
 
