@@ -391,6 +391,7 @@ class QString {
   uint length() const;
 
   const QChar* unicode() const;
+  const QChar* stableUnicode();
   const char* latin1() const;
   const char* ascii() const;
   bool isAllASCII() const;
