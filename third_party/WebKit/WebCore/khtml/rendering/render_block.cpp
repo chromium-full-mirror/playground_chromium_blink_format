@@ -1535,7 +1535,7 @@ int RenderBlock::nearestFloatBottom(int height) const {
   for (; (r = it.current()); ++it)
     if (r->endY > height && (r->endY < bottom || bottom == 0))
       bottom = r->endY;
-  return bottom;
+  return QMAX(bottom, height);
 }
 
 int RenderBlock::floatBottom() const {
