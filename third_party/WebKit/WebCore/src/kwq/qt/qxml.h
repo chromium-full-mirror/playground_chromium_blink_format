@@ -33,6 +33,7 @@ class QXmlAttributes {
   QString value(const QString& qName) const;
   int length() const;
   QString localName(int index) const;
+  QString value(int index) const;
 };
 
 class QXmlInputSource {

@@ -122,6 +122,7 @@ class QString {
   bool isEmpty() const;
   int find(char, int index = 0) const;
   int find(const char*, int index = 0, bool b = 0) const;
+  int find(const QString&, int index = 0, bool b = 0) const;
   int find(const QRegExp&, int index = 0, bool b = 0) const;
   int findRev(char, int index = 0) const;
   int findRev(const char*, int index = 0) const;
@@ -131,6 +132,8 @@ class QString {
   void truncate(uint pos);
   bool startsWith(const QString&) const;
 
+  QString arg(int&);
+  QString arg(int a, int fieldwidth = 0, int base = 10) const;
   QString arg(const QString&, int fieldwidth = 0) const;
 
   QString left(uint) const;
@@ -181,6 +184,7 @@ bool operator!=(const QString&, QChar);
 bool operator!=(const QString&, const QString&);
 bool operator!=(const QString&, const char*);
 bool operator!=(const char*, const QString&);
+QString operator+(char, const QString&);
 
 class QConstString {
  public:
