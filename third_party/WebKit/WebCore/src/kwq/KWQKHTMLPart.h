@@ -598,9 +598,9 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
 #ifdef _KWQ_
   void init();
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
-  void slotData(id<WCURICacheData> data);
+  void slotData(id handle, const char* bytes, int length);
 #else
-  void slotData(void* data);
+  void slotData(void* handle, const char* bytes, int length);
 #endif
 #endif
 
