@@ -178,7 +178,9 @@ extern NSString* WebPageCacheDocumentViewKey;
     triggeringEvent:(NSEvent*)event
                form:(DOMElement*)form
          formValues:(NSDictionary*)values;
-- (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
+- (void)_loadURL:(NSURL*)URL
+        referrer:(NSString*)referrer
+       intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
             referrer:(NSString*)referrer
               target:(NSString*)target

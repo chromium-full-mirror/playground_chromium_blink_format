@@ -412,6 +412,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * This is used for JavaScript-triggered location changes.
    */
   void scheduleLocationChange(const QString& url,
+                              const QString& referrer,
                               bool lockHistory = true,
                               bool userGesture = false);
   bool isScheduledLocationChangePending() const;

@@ -206,6 +206,10 @@ typedef enum {
 
 - (void)didNotOpenURL:(NSURL*)URL pageCache:(NSDictionary*)pageCache;
 
+- (BOOL)canLoadURL:(NSURL*)URL
+      fromReferrer:(NSString*)referrer
+      hideReferrer:(BOOL*)hideReferrer;
+
 - (void)saveDocumentState;
 - (void)restoreDocumentState;
 
@@ -531,6 +535,7 @@ typedef enum {
 
 - (WebCoreBridge*)createChildFrameNamed:(NSString*)frameName
                                 withURL:(NSURL*)URL
+                               referrer:(NSString*)referrer
                              renderPart:(KHTMLRenderPart*)renderPart
                         allowsScrolling:(BOOL)allowsScrolling
                             marginWidth:(int)width

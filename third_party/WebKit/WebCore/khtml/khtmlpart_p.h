@@ -302,6 +302,7 @@ class KHTMLPartPrivate {
   RedirectionScheduled m_scheduledRedirection;
   double m_delayRedirect;
   QString m_redirectURL;
+  QString m_redirectReferrer;
   int m_scheduledHistoryNavigationSteps;
 
 #if !APPLE_CHANGES
