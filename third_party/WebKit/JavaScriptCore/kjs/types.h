@@ -106,7 +106,7 @@ class ListIterator {
  * The list is explicitly shared. Note that while copy() returns a
  * copy of the list the referenced objects are still shared.
  */
-class List : private Value {
+class List {
   friend class ListIterator;
 
  public:
@@ -201,8 +201,10 @@ class List : private Value {
 
  private:
   List(ListImp*);
-  ListImp* imp() const { return (ListImp*)Value::imp(); }
+
+  ListImp* imp;
   bool m_needsMarking;
+  friend class ListNode;
 };
 
 };  // namespace
