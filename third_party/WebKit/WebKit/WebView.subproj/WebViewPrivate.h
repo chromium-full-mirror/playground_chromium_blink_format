@@ -380,6 +380,7 @@ extern NSString* const WebViewDidChangeSelectionNotification;
 - (DOMRange*)selectedDOMRange;
 - (void)setEditingDelegate:(id)delegate;
 - (id)editingDelegate;
+- (void)editingKeyDown:(NSEvent*)event;
 @end
 
 @interface WebView (WebViewUndoableEditing)
