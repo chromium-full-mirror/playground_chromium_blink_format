@@ -31,7 +31,7 @@
 #include <runtime_root.h>
 
 typedef struct {
-  NP_Object object;
+  NPObject object;
   KJS::ObjectImp* imp;
   KJS::Bindings::RootObject* root;
 } JavaScriptObject;

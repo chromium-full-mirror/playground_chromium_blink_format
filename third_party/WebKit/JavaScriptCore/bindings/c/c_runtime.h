@@ -39,7 +39,7 @@ namespace Bindings {
 
 class CField : public Field {
  public:
-  CField(NP_Identifier ident) : Field() { _fieldIdentifier = ident; };
+  CField(NPIdentifier ident) : Field() { _fieldIdentifier = ident; };
 
   virtual KJS::Value valueFromInstance(KJS::ExecState* exec,
                                        const Instance* instance) const;
@@ -48,28 +48,28 @@ class CField : public Field {
                                   const KJS::Value& aValue) const;
 
   virtual const char* name() const {
-    return NP_UTF8FromIdentifier(_fieldIdentifier);
+    return NPN_UTF8FromIdentifier(_fieldIdentifier);
   }
   virtual RuntimeType type() const { return ""; }
 
  private:
-  NP_Identifier _fieldIdentifier;
+  NPIdentifier _fieldIdentifier;
 };
 
 class CMethod : public Method {
  public:
   CMethod() : Method(), _methodIdentifier(0){};
 
-  CMethod(NP_Identifier ident) : Method(), _methodIdentifier(ident){};
+  CMethod(NPIdentifier ident) : Method(), _methodIdentifier(ident){};
 
   virtual const char* name() const {
-    return NP_UTF8FromIdentifier(_methodIdentifier);
+    return NPN_UTF8FromIdentifier(_methodIdentifier);
   };
 
   virtual long numParameters() const { return 0; };
 
  private:
-  NP_Identifier _methodIdentifier;
+  NPIdentifier _methodIdentifier;
 };
 
 #if 0
