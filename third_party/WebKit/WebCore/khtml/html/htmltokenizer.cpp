@@ -1631,6 +1631,7 @@ void HTMLTokenizer::write(const QString& str, bool appendData) {
 
 void HTMLTokenizer::end() {
   if (buffer == 0) {
+    parser->finished();
     emit finishedParsing();
     return;
   }
@@ -1648,6 +1649,7 @@ void HTMLTokenizer::end() {
   scriptCode = 0;
   scriptCodeSize = scriptCodeMaxSize = scriptCodeResync = 0;
   buffer = 0;
+  parser->finished();
   emit finishedParsing();
 }
 

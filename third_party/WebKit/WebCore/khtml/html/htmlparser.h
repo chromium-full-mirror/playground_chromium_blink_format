@@ -78,6 +78,11 @@ class KHTMLParser {
   void parseToken(khtml::Token* _t);
 
   /**
+   * tokenizer says it's not going to be sending us any more tokens
+   */
+  void finished();
+
+  /**
    * resets the parser
    */
   void reset();
