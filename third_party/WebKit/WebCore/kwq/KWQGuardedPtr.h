@@ -33,7 +33,7 @@ class KWQGuardedPtrBase {
   KWQGuardedPtrBase(QObject* = 0);
 
   QObject* pointer() const { return iterator.current(); }
-  bool isNull() const { return pointer() != 0; }
+  bool isNull() const { return pointer() == 0; }
 
  private:
   QPtrListIterator<QObject> iterator;
