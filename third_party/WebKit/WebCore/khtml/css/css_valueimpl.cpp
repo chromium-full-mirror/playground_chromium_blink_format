@@ -518,7 +518,7 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
   double factor = 1.;
   switch (type) {
     case CSSPrimitiveValue::CSS_EMS:
-      factor = style->font().pixelSize();
+      factor = style->htmlFont().getFontDef().floatSize();
       break;
     case CSSPrimitiveValue::CSS_EXS: {
       QFontMetrics fm = style->fontMetrics();

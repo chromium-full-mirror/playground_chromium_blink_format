@@ -39,7 +39,7 @@ class CSSStyleSelector;
 class FontDef {
  public:
   FontDef()
-      : size(0),
+      : size(0.0f),
         italic(false),
         smallCaps(false),
         sizeSpecified(false),
@@ -81,7 +81,17 @@ class FontDef {
   KWQFontFamily& firstFamily() { return family; }
 
   KWQFontFamily family;
-  short int size;
+
+  int pixelSize() const { return int(size + 0.5f); }
+  float floatSize() const { return size; }
+  void setSize(float s) { size = s; }
+
+ private:
+  float size;  // Making this private forces people to think about what value
+               // they want,
+               // either the floatSize or the pixelSize.
+
+ public:
   bool italic : 1;
   bool smallCaps : 1;
   bool sizeSpecified : 1;  // Whether or not CSS specified an explicit size
@@ -115,6 +125,8 @@ class Font {
     return (fontDef == other.fontDef && letterSpacing == other.letterSpacing &&
             wordSpacing == other.wordSpacing);
   }
+
+  const FontDef& getFontDef() const { return fontDef; }
 
   void update(QPaintDeviceMetrics* devMetrics) const;
 
