@@ -13,6 +13,7 @@
 @interface WebImageData : NSObject<NSCopying> {
   size_t imagesSize;
   CGImageRef* images;
+  size_t imagePropertiesSize;
   CFDictionaryRef* imageProperties;
   CGImageSourceRef imageSource;
 
@@ -33,8 +34,6 @@
 
   id _PDFDoc;
   BOOL isPDF;
-
-  BOOL imageDataUpdated;
 }
 
 - (size_t)numberOfImages;
