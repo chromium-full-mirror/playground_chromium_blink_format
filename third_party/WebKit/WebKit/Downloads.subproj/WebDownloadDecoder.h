@@ -34,4 +34,7 @@
 // NSFileCreationDate
 // fileAttributes is called after finishDecoding.
 - (NSDictionary*)fileAttributes;
+
+- (NSString*)filename;
+
 @end
