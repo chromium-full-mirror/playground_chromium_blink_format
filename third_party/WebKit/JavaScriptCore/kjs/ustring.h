@@ -55,15 +55,9 @@ class UString;
  * possible to exchange data with X and Qt with shallow copies.
  */
 struct UChar {
-#ifdef APPLE_CHANGES
-/**
- * Construct a character with uninitialized value.
- */
-#else
-/**
- * Construct a character with value 0.
- */
-#endif
+  /**
+   * Construct a character with uninitialized value.
+   */
   UChar();
   /**
    * Construct a character with the value denoted by the arguments.
@@ -75,6 +69,8 @@ struct UChar {
    * Construct a character with the given value.
    * @param u 16 bit Unicode value
    */
+  UChar(char u);
+  UChar(unsigned char u);
   UChar(unsigned short u);
   UChar(const UCharReference& c);
   /**
@@ -84,7 +80,7 @@ struct UChar {
   /**
    * @return The lower byte of the character.
    */
-  unsigned char low() const { return uc & 0xFF; }
+  unsigned char low() const { return uc; }
   /**
    * @return the 16 bit Unicode value of the character
    */
@@ -114,12 +110,10 @@ struct UChar {
   unsigned short uc;
 };
 
-#ifdef APPLE_CHANGES
-inline UChar::UChar() : uc(0) {}
-#else
 inline UChar::UChar() {}
-#endif
 inline UChar::UChar(unsigned char h, unsigned char l) : uc(h << 8 | l) {}
+inline UChar::UChar(char u) : uc((unsigned char)u) {}
+inline UChar::UChar(unsigned char u) : uc(u) {}
 inline UChar::UChar(unsigned short u) : uc(u) {}
 
 /**
@@ -193,7 +187,7 @@ class CString {
   CString& append(const CString&);
   CString& operator=(const char* c);
   CString& operator=(const CString&);
-  CString& operator+=(const CString&);
+  CString& operator+=(const CString& c) { return append(c); }
 
   int size() const;
   const char* c_str() const { return data; }
@@ -223,9 +217,7 @@ class UString {
 
     UChar* dat;
     int len;
-#ifdef APPLE_CHANGES
     int capacity;
-#endif
     int rc;
     static Rep null;
   };
@@ -248,21 +240,12 @@ class UString {
    * length.
    */
   UString(const UChar* c, int length);
-#ifdef APPLE_CHANGES
-/**
- * If copy is false the string data will be adopted.
- * That means that the data will NOT be copied and the pointer will
- * be deleted when the UString object is modified or destroyed.
- * Behaviour defaults to a deep copy if copy is true.
- */
-#else
-/**
- * If copy is false a shallow copy of the string will be created. That
- * means that the data will NOT be copied and you'll have to guarantee that
- * it doesn't get deleted during the lifetime of the UString object.
- * Behaviour defaults to a deep copy if copy is true.
- */
-#endif
+  /**
+   * If copy is false the string data will be adopted.
+   * That means that the data will NOT be copied and the pointer will
+   * be deleted when the UString object is modified or destroyed.
+   * Behaviour defaults to a deep copy if copy is true.
+   */
   UString(UChar* c, int length, bool copy);
   /**
    * Copy constructor. Makes a shallow copy only.
@@ -281,10 +264,14 @@ class UString {
    */
   UString(const DOM::DOMString&);
   /**
+   * Concatenation constructor. Makes operator+ more efficient.
+   */
+  UString(const UString&, const UString&);
+  /**
    * Destructor. If this handle was the only one holding a reference to the
    * string the data will be freed.
    */
-  ~UString();
+  ~UString() { release(); }
 
   /**
    * Constructs a string from an int.
@@ -340,7 +327,7 @@ class UString {
   /**
    * Appends the specified string.
    */
-  UString& operator+=(const UString& s);
+  UString& operator+=(const UString& s) { return append(s); }
 
   /**
    * @return A pointer to the internal Unicode data.
@@ -439,7 +426,9 @@ inline bool operator!=(const char* s1, const UString& s2) {
   return !KJS::operator==(s1, s2);
 }
 bool operator==(const CString& s1, const CString& s2);
-UString operator+(const UString& s1, const UString& s2);
+inline UString operator+(const UString& s1, const UString& s2) {
+  return UString(s1, s2);
+}
 
 };  // namespace
 
