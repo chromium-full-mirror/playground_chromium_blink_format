@@ -220,6 +220,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool isListMarker() const { return false; }
   virtual bool isCanvas() const { return false; }
   bool isRoot() const;
+  bool isBody() const;
   virtual bool isBR() const { return false; }
   virtual bool isTableCell() const { return false; }
   virtual bool isTableRow() const { return false; }
@@ -227,7 +228,6 @@ class RenderObject : public CachedObjectClient {
   virtual bool isTableCol() const { return false; }
   virtual bool isTable() const { return false; }
   virtual bool isWidget() const { return false; }
-  virtual bool isBody() const { return false; }
   virtual bool isFormElement() const { return false; }
   virtual bool isImage() const { return false; }
   virtual bool isTextArea() const { return false; }
@@ -265,6 +265,7 @@ class RenderObject : public CachedObjectClient {
   bool recalcMinMax() const { return m_recalcMinMax; }
 
   RenderCanvas* canvas() const;
+
   // don't even think about making this method virtual!
   DOM::NodeImpl* element() const { return m_node; }
 

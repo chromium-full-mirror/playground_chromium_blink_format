@@ -57,9 +57,6 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 
   virtual void parseAttribute(AttributeImpl*);
   virtual void insertedIntoDocument();
-  virtual void attach();
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
 
   CSSStyleSheetImpl* sheet() const { return m_styleSheet; }
 

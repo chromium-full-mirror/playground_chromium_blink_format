@@ -64,22 +64,11 @@ RenderBox::RenderBox(DOM::NodeImpl* node) : RenderContainer(node) {
 static void workAroundBug3321716(int) {}
 
 void RenderBox::setStyle(RenderStyle* _style) {
-  // Make sure the root element retains its display:block type even across style
-  // changes.
-  if (isRoot() && _style->display() != NONE)
-    _style->setDisplay(BLOCK);
-
   RenderObject::setStyle(_style);
 
   // The root always paints its background/border.
   if (isRoot())
     setShouldPaintBackgroundOrBorder(true);
-
-  // ### move this into the parser. --> should work. Lars
-  // if only horizontal position was defined, vertical should be 50%
-  // if(!_style->backgroundXPosition().isVariable() &&
-  // _style->backgroundYPosition().isVariable())
-  // style()->setBackgroundYPosition(Length(50, Percent));
 
   setInline(_style->isDisplayInlineType());
 
@@ -110,6 +99,10 @@ void RenderBox::setStyle(RenderStyle* _style) {
   }
 
   adjustZIndex();
+
+  // Set the text color if we're the body.
+  if (isBody())
+    element()->getDocument()->setTextColor(_style->color());
 }
 
 void RenderBox::adjustZIndex() {
@@ -223,11 +216,25 @@ void RenderBox::paintRootBoxDecorations(QPainter* p,
   QColor c = style()->backgroundColor();
   CachedImage* bg = style()->backgroundImage();
 
-  if (!c.isValid() && !bg && firstChild()) {
-    if (!c.isValid())
-      c = firstChild()->style()->backgroundColor();
-    if (!bg)
-      bg = firstChild()->style()->backgroundImage();
+  if (!c.isValid() && !bg) {
+    // Locate the <body> element using the DOM.  This is easier than trying
+    // to crawl around a render tree with potential :before/:after content and
+    // anonymous blocks created by inline <body> tags etc.  We can locate the
+    // <body>
+    // render object very easily via the DOM.
+    RenderObject* bodyObject = 0;
+    for (DOM::NodeImpl* elt = element()->firstChild(); elt;
+         elt = elt->nextSibling()) {
+      if (elt->id() == ID_BODY) {
+        bodyObject = elt->renderer();
+        break;
+      }
+    }
+
+    if (bodyObject) {
+      c = bodyObject->style()->backgroundColor();
+      bg = bodyObject->style()->backgroundImage();
+    }
   }
 
   // Only fill with a base color (e.g., white) if we're the root document, since
@@ -275,7 +282,7 @@ void RenderBox::paintRootBoxDecorations(QPainter* p,
 
   paintBackground(p, c, bg, my, _h, bx, by, bw, bh);
 
-  if (style()->hasBorder())
+  if (style()->hasBorder() && style()->display() != INLINE)
     paintBorder(p, _tx, _ty, w, h, style());
 }
 
@@ -301,8 +308,27 @@ void RenderBox::paintBoxDecorations(QPainter* p,
   else
     mh = QMIN(_h, h);
 
-  paintBackground(p, style()->backgroundColor(), style()->backgroundImage(), my,
-                  mh, _tx, _ty, w, h);
+  // The <body> only paints its background if the root element has defined a
+  // background
+  // independent of the body.  Go through the DOM to get to the root element's
+  // render object,
+  // since the root could be inline and wrapped in an anonymous block.
+  if (!isBody() ||
+      element()
+          ->getDocument()
+          ->documentElement()
+          ->renderer()
+          ->style()
+          ->backgroundColor()
+          .isValid() ||
+      element()
+          ->getDocument()
+          ->documentElement()
+          ->renderer()
+          ->style()
+          ->backgroundImage())
+    paintBackground(p, style()->backgroundColor(), style()->backgroundImage(),
+                    my, mh, _tx, _ty, w, h);
 
   if (style()->hasBorder())
     paintBorder(p, _tx, _ty, w, h, style());
@@ -598,7 +624,7 @@ void RenderBox::position(InlineBox* box, int from, int len, bool reverse) {
 
 void RenderBox::repaint(bool immediate) {
   // kdDebug( 6040 ) << "repaint!" << endl;
-  if (isRoot()) {
+  if (isRoot() || isBody()) {
     RenderObject* cb = containingBlock();
     if (cb != this)
       cb->repaint(immediate);
