@@ -174,6 +174,10 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual QString state();
   QString findMatchingState(QStringList& states);
 
+  virtual bool isSuccessfulSubmitButton() const { return false; }
+  virtual bool isActivatedSubmit() const { return false; }
+  virtual void setActivatedSubmit(bool flag) {}
+
  protected:
   HTMLFormElementImpl* getForm() const;
 
@@ -199,6 +203,10 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
+
+  virtual bool isSuccessfulSubmitButton() const;
+  virtual bool isActivatedSubmit() const;
+  virtual void setActivatedSubmit(bool flag);
 
  protected:
   DOMString m_value;
@@ -280,6 +288,10 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void init();
   virtual void attach();
   virtual bool encoding(const QTextCodec*, khtml::encodingList&, bool);
+
+  virtual bool isSuccessfulSubmitButton() const;
+  virtual bool isActivatedSubmit() const;
+  virtual void setActivatedSubmit(bool flag);
 
   typeEnum inputType() const { return m_type; }
   virtual void reset();

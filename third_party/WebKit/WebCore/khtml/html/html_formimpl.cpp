@@ -407,6 +407,9 @@ void HTMLFormElementImpl::submit() {
   kdDebug(6030) << "submitting!" << endl;
 #endif
 
+  HTMLGenericFormElementImpl* firstSuccessfulSubmitButton = 0;
+  bool needButtonActivation = true;  // do we need to activate a submit button?
+
   KHTMLView* view = getDocument()->view();
   for (QPtrListIterator<HTMLGenericFormElementImpl> it(formElements);
        it.current(); ++it) {
@@ -419,6 +422,19 @@ void HTMLFormElementImpl::submit() {
       view->addFormCompletionItem(input->name().string(),
                                   input->value().string());
     }
+
+    if (needButtonActivation) {
+      if (current->isActivatedSubmit()) {
+        needButtonActivation = false;
+      } else if (firstSuccessfulSubmitButton == 0 &&
+                 current->isSuccessfulSubmitButton()) {
+        firstSuccessfulSubmitButton = current;
+      }
+    }
+  }
+
+  if (needButtonActivation && firstSuccessfulSubmitButton) {
+    firstSuccessfulSubmitButton->setActivatedSubmit(true);
   }
 
   bool ok;
@@ -432,6 +448,10 @@ void HTMLFormElementImpl::submit() {
       view->part()->submitForm("get", m_url.string(), form_data,
                                m_target.string());
     }
+  }
+
+  if (needButtonActivation && firstSuccessfulSubmitButton) {
+    firstSuccessfulSubmitButton->setActivatedSubmit(false);
   }
 
   m_doingsubmit = m_insubmit = false;
@@ -883,6 +903,18 @@ void HTMLButtonElementImpl::defaultEventHandler(EventImpl* evt) {
   HTMLGenericFormElementImpl::defaultEventHandler(evt);
 }
 
+bool HTMLButtonElementImpl::isSuccessfulSubmitButton() const {
+  return m_type == SUBMIT && !m_disabled && !name().isEmpty();
+}
+
+bool HTMLButtonElementImpl::isActivatedSubmit() const {
+  return m_activeSubmit;
+}
+
+void HTMLButtonElementImpl::setActivatedSubmit(bool flag) {
+  m_activeSubmit = flag;
+}
+
 bool HTMLButtonElementImpl::encoding(const QTextCodec* codec,
                                      khtml::encodingList& encoding,
                                      bool /*multipart*/) {
@@ -1241,6 +1273,18 @@ DOMString HTMLInputElementImpl::altText() const {
 #endif
 
   return alt;
+}
+
+bool HTMLInputElementImpl::isSuccessfulSubmitButton() const {
+  return m_type == SUBMIT && !m_disabled && !name().isEmpty();
+}
+
+bool HTMLInputElementImpl::isActivatedSubmit() const {
+  return m_activeSubmit;
+}
+
+void HTMLInputElementImpl::setActivatedSubmit(bool flag) {
+  m_activeSubmit = flag;
 }
 
 bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
