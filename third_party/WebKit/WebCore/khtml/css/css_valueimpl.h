@@ -329,6 +329,8 @@ class FontFamilyValueImpl : public CSSPrimitiveValueImpl {
   const QString& fontName() const { return parsedFontName; }
   int genericFamilyType() const { return _genericFamilyType; }
 
+  virtual DOM::DOMString cssText() const;
+
   QString parsedFontName;
 
  private:
@@ -408,7 +410,7 @@ class CSSProperty {
   int id() const { return m_id; }
   bool isImportant() const { return m_bImportant; }
 
-  CSSValueImpl* value() { return m_value; }
+  CSSValueImpl* value() const { return m_value; }
 
   DOM::DOMString cssText() const;
 
