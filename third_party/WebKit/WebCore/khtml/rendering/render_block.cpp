@@ -113,6 +113,8 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
       pseudoStyle->setDisplay(INLINE);
       pseudoStyle->setPosition(
           STATIC);  // CSS2 says first-letter can't be positioned.
+      pseudoStyle->setFloating(
+          FNONE);  // CSS2 says first-letter can't be floated.
 
       RenderObject* firstLetter = RenderFlow::createFlow(
           0, pseudoStyle, renderArena());  // anonymous box
