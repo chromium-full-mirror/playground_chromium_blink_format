@@ -79,4 +79,5 @@ typedef enum {
 - (void)_checkLoadComplete;
 - (void)_timedLayout:userInfo;
 - (IFWebCoreFrame*)_bridgeFrame;
+- (BOOL)_shouldShowDataSource:(IFWebDataSource*)dataSource;
 @end

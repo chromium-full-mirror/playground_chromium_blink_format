@@ -27,7 +27,6 @@
     following messages, sent in order:
 
         - (void)locationChangeStarted;
-        - (void)requestContentPolicyForMIMEType: (NSString *)type;
         - (void)locationChangeCommitted;  // Only sent for the
    IFContentPolicyShow policy.
         - (void)locationChangeDone: (IFError *)error;
@@ -39,25 +38,9 @@
    =============================================================================
 */
 
-typedef enum {
-  IFContentPolicyNone,
-  IFContentPolicyShow,
-  IFContentPolicySave,
-  IFContentPolicyOpenExternally,
-  IFContentPolicyIgnore
-} IFContentPolicy;
-
 @protocol IFLocationChangeHandler<NSObject>
 
 - (void)locationChangeStartedForDataSource:(IFWebDataSource*)dataSource;
-
-// Sent after locationChangeStarted.
-// Implementations typically call haveContentPolicy:forLocationChangeHandler: on
-// IFWebController
-// after determining the appropriate policy, perhaps by presenting a
-// non-blocking dialog to the user.
-- (void)requestContentPolicyForMIMEType:(NSString*)type
-                             dataSource:(IFWebDataSource*)dataSource;
 
 - (void)locationChangeCommittedForDataSource:(IFWebDataSource*)dataSource;
 
@@ -68,10 +51,5 @@ typedef enum {
             forDataSource:(IFWebDataSource*)dataSource;
 
 - (void)serverRedirectTo:(NSURL*)url forDataSource:(IFWebDataSource*)dataSource;
-
-// Sent when errors are encountered with an un-implementable policy, i.e.
-// file i/o failure, launch services failure, type mismatches, etc.
-- (void)unableToImplementContentPolicy:(IFError*)error
-                         forDataSource:(IFWebDataSource*)dataSource;
 
 @end

@@ -37,4 +37,5 @@
             fromDataSource:(IFWebDataSource*)dataSource;
 - (void)_didStartLoading:(NSURL*)url;
 - (void)_didStopLoading:(NSURL*)url;
++ (NSString*)_MIMETypeForFile:(NSString*)path;
 @end
