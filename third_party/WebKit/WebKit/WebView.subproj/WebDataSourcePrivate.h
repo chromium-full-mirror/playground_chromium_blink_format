@@ -9,6 +9,7 @@
 #import <WebKit/WebDataSource.h>
 
 @class DOMDocumentFragment;
+@class DOMElement;
 @class DOMRange;
 @class NSError;
 @class NSURLRequest;
@@ -129,6 +130,7 @@
 - (void)_addSubframeArchives:(NSArray*)subframeArchives;
 - (WebArchive*)_popSubframeArchiveWithName:(NSString*)frameName;
 
+- (DOMElement*)_imageElementWithImageResource:(WebResource*)resource;
 - (DOMDocumentFragment*)_documentFragmentWithImageResource:
     (WebResource*)resource;
 - (DOMDocumentFragment*)_documentFragmentWithArchive:(WebArchive*)archive;
