@@ -422,9 +422,9 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
         bool userGesture =
             static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->wasRunByUserGesture();
-        part->scheduleRedirection(0, str, !userGesture);
+        part->scheduleLocationChange(str, !userGesture);
 #else
-        part->scheduleRedirection(0, str, false /*don't lock history*/);
+        part->scheduleLocationChange(str, false /*don't lock history*/);
 #endif
       }
       break;

@@ -106,8 +106,9 @@ static int khtml_part_dcop_counter = 0;
 enum RedirectionScheduled {
   noRedirectionScheduled,
   redirectionScheduled,
+  locationChangeScheduled,
   historyNavigationScheduled,
-  redirectionDuringLoad
+  locationChangeScheduledDuringLoad
 };
 
 class KHTMLPartPrivate {

@@ -916,10 +916,10 @@ void Window::put(ExecState* exec,
 #if APPLE_CHANGES
             // We want a new history item if this JS was called via a user
             // gesture
-            m_part->scheduleRedirection(0, dstUrl, !userGesture, userGesture);
+            m_part->scheduleLocationChange(dstUrl, !userGesture, userGesture);
 #else
-            m_part->scheduleRedirection(0, dstUrl, false /*don't lock history*/,
-                                        userGesture);
+            m_part->scheduleLocationChange(dstUrl, false /*don't lock history*/,
+                                           userGesture);
 #endif
           }
         }
@@ -1501,8 +1501,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          part->scheduleRedirection(0, url.url(), false /*don't lock history*/,
-                                    userGesture);
+          part->scheduleLocationChange(url.url(), false /*don't lock history*/,
+                                       userGesture);
           return Window::retrieve(part);
         }
         if (uargs.frameName == "_parent") {
@@ -1512,8 +1512,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          part->scheduleRedirection(0, url.url(), false /*don't lock history*/,
-                                    userGesture);
+          part->scheduleLocationChange(url.url(), false /*don't lock history*/,
+                                       userGesture);
           return Window::retrieve(part);
         }
         uargs.serviceType = "text/html";
@@ -1551,7 +1551,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                     ->wasRunByUserGesture();
             // FIXME: Need to pass referrer here.
-            khtmlpart->scheduleRedirection(0, url.url(), false, userGesture);
+            khtmlpart->scheduleLocationChange(url.url(), false, userGesture);
           }
 #else
           uargs.serviceType = QString::null;
@@ -2206,10 +2206,10 @@ void Location::put(ExecState* exec,
                          ->wasRunByUserGesture();
 #if APPLE_CHANGES
   // We want a new history item if this JS was called via a user gesture
-  m_part->scheduleRedirection(0, url.url(), !userGesture, userGesture);
+  m_part->scheduleLocationChange(url.url(), !userGesture, userGesture);
 #else
-  m_part->scheduleRedirection(0, url.url(), false /*don't lock history*/,
-                              userGesture);
+  m_part->scheduleLocationChange(url.url(), false /*don't lock history*/,
+                                 userGesture);
 #endif
 }
 
@@ -2247,9 +2247,9 @@ Value LocationFunc::tryCall(ExecState* exec,
           bool userGesture =
               static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                   ->wasRunByUserGesture();
-          part->scheduleRedirection(0,
-                                    p->htmlDocument().completeURL(str).string(),
-                                    true /*lock history*/, userGesture);
+          part->scheduleLocationChange(
+              p->htmlDocument().completeURL(str).string(),
+              true /*lock history*/, userGesture);
         }
         break;
       }
@@ -2257,8 +2257,8 @@ Value LocationFunc::tryCall(ExecState* exec,
         bool userGesture =
             static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->wasRunByUserGesture();
-        part->scheduleRedirection(0, part->url().url(), true /*lock history*/,
-                                  userGesture);
+        part->scheduleLocationChange(part->url().url(), true /*lock history*/,
+                                     userGesture);
         break;
       }
       case Location::ToString:
