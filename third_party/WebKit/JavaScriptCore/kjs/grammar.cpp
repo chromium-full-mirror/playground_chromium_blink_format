@@ -110,8 +110,7 @@
 /* default values for bison */
 #define YYDEBUG 0
 #define YYMAXDEPTH 0
-#ifdef APPLE_CHANGES
-#else
+#if !APPLE_CHANGES
 #define YYERROR_VERBOSE
 #endif
 #define DBG(l, s, e) \
