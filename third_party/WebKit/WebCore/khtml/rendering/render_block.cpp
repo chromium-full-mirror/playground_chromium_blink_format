@@ -1686,11 +1686,12 @@ int RenderBlock::floatBottom() const {
   return bottom;
 }
 
-int RenderBlock::lowestPosition(bool includeOverflowInterior) const {
-  int bottom = RenderFlow::lowestPosition(includeOverflowInterior);
+int RenderBlock::lowestPosition(bool includeOverflowInterior,
+                                bool includeSelf) const {
+  int bottom = RenderFlow::lowestPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && style()->hidesOverflow())
     return bottom;
-  if (m_overflowHeight > bottom)
+  if (includeSelf && m_overflowHeight > bottom)
     bottom = m_overflowHeight;
 
   if (m_floatingObjects) {
@@ -1699,7 +1700,7 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior) const {
     for (; (r = it.current()); ++it) {
       if (!r->noPaint) {
         int lp = r->startY + r->node->lowestPosition(false);
-        bottom = QMAX(bottom, lp);
+        bottom = kMax(bottom, lp);
       }
     }
   }
@@ -1711,18 +1712,25 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior) const {
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
       int lp = r->yPos() + r->lowestPosition(false);
-      bottom = QMAX(bottom, lp);
+      bottom = kMax(bottom, lp);
     }
+  }
+
+  if (!includeSelf && lastLineBox()) {
+    int lp = lastLineBox()->yPos() + lastLineBox()->height();
+    bottom = kMax(bottom, lp);
   }
 
   return bottom;
 }
 
-int RenderBlock::rightmostPosition(bool includeOverflowInterior) const {
-  int right = RenderFlow::rightmostPosition(includeOverflowInterior);
+int RenderBlock::rightmostPosition(bool includeOverflowInterior,
+                                   bool includeSelf) const {
+  int right =
+      RenderFlow::rightmostPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && style()->hidesOverflow())
     return right;
-  if (m_overflowWidth > right)
+  if (includeSelf && m_overflowWidth > right)
     right = m_overflowWidth;
 
   if (m_floatingObjects) {
@@ -1731,7 +1739,7 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior) const {
     for (; (r = it.current()); ++it) {
       if (!r->noPaint) {
         int rp = r->left + r->node->rightmostPosition(false);
-        right = QMAX(right, rp);
+        right = kMax(right, rp);
       }
     }
   }
@@ -1741,11 +1749,56 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior) const {
     QPtrListIterator<RenderObject> it(*m_positionedObjects);
     for (; (r = it.current()); ++it) {
       int rp = r->xPos() + r->rightmostPosition(false);
-      right = QMAX(right, rp);
+      right = kMax(right, rp);
+    }
+  }
+
+  if (!includeSelf && firstLineBox()) {
+    for (InlineRunBox* currBox = firstLineBox(); currBox;
+         currBox = currBox->nextLineBox()) {
+      int rp = currBox->xPos() + currBox->width();
+      right = kMax(right, rp);
     }
   }
 
   return right;
+}
+
+int RenderBlock::leftmostPosition(bool includeOverflowInterior,
+                                  bool includeSelf) const {
+  int left = RenderFlow::leftmostPosition(includeOverflowInterior, includeSelf);
+  if (!includeOverflowInterior && style()->hidesOverflow())
+    return left;
+
+  // FIXME: Check left overflow when we eventually support it.
+
+  if (m_floatingObjects) {
+    FloatingObject* r;
+    QPtrListIterator<FloatingObject> it(*m_floatingObjects);
+    for (; (r = it.current()); ++it) {
+      if (!r->noPaint) {
+        int lp = r->left + r->node->leftmostPosition(false);
+        left = kMin(left, lp);
+      }
+    }
+  }
+
+  if (m_positionedObjects && !isCanvas()) {
+    RenderObject* r;
+    QPtrListIterator<RenderObject> it(*m_positionedObjects);
+    for (; (r = it.current()); ++it) {
+      int lp = r->xPos() + r->leftmostPosition(false);
+      left = kMin(left, lp);
+    }
+  }
+
+  if (!includeSelf && firstLineBox()) {
+    for (InlineRunBox* currBox = firstLineBox(); currBox;
+         currBox = currBox->nextLineBox())
+      left = kMin(left, (int)currBox->xPos());
+  }
+
+  return left;
 }
 
 int RenderBlock::leftBottom() {

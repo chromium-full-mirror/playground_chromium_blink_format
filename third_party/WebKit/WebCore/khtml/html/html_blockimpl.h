@@ -106,6 +106,21 @@ class HTMLPreElementImpl : public HTMLGenericElementImpl {
 
 // -------------------------------------------------------------------------
 
+class HTMLMarqueeElementImpl : public HTMLElementImpl {
+ public:
+  HTMLMarqueeElementImpl(DocumentPtr* doc);
+
+  virtual NodeImpl::Id id() const;
+  virtual void parseAttribute(AttributeImpl* token);
+
+  int minimumDelay() const { return m_minimumDelay; }
+
+ private:
+  int m_minimumDelay;
+};
+
+// -------------------------------------------------------------------------
+
 class HTMLLayerElementImpl : public HTMLDivElementImpl {
  public:
   HTMLLayerElementImpl(DocumentPtr* doc);

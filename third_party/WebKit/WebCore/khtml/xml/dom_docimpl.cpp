@@ -837,6 +837,10 @@ ElementImpl* DocumentImpl::createHTMLElement(const DOMString& name) {
       n = new HTMLGenericElementImpl(docPtr(), id);
       break;
 
+    case ID_MARQUEE:
+      n = new HTMLMarqueeElementImpl(docPtr());
+      break;
+
     case ID_BDO:
       break;
 
