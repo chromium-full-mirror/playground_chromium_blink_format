@@ -509,7 +509,7 @@ unsigned int CSSStyleSelector::addInlineDeclarations(
     if (i == firstLen)
       values = addValues;
 
-    CSSProperty* prop = values->at(i);
+    CSSProperty* prop = values->at(i >= firstLen ? i - firstLen : i);
     Source source = Inline;
 
     if (prop->m_bImportant)

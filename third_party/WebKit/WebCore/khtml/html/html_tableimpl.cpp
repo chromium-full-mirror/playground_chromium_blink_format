@@ -101,8 +101,8 @@ DOM::CSSStyleDeclarationImpl* HTMLTableElementImpl::createSharedCellDecls() {
                                      true);
       m_sharedCellDecls->setProperty(CSS_PROP_BORDER_RIGHT_STYLE, v, false,
                                      true);
-      m_sharedCellDecls->setProperty(CSS_PROP_BORDER_COLOR, "inherit", false,
-                                     true);
+      m_sharedCellDecls->setProperty(CSS_PROP_BORDER_COLOR, CSS_VAL_INHERIT,
+                                     false, true);
     }
   }
 
