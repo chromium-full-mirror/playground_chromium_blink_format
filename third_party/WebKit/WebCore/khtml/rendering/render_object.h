@@ -388,6 +388,8 @@ class RenderObject : public CachedObjectClient {
 
   void scheduleRelayout();
 
+  void updateBackgroundImages(RenderStyle* oldStyle);
+
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox,
                                      bool isOnlyRun = false);
@@ -451,7 +453,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual void paintBackgroundExtended(QPainter* p,
                                        const QColor& c,
-                                       CachedImage* bg,
+                                       const BackgroundLayer* bgLayer,
                                        int clipy,
                                        int cliph,
                                        int _tx,
