@@ -279,7 +279,7 @@ class Clipboard : public DOMObject {
     Types,
     SetDragImage,
     DropEffect,
-    DropAllowed
+    EffectAllowed
   };
 
  private:

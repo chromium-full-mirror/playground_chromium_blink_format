@@ -913,7 +913,7 @@ const ClassInfo Clipboard::info = {"Clipboard", 0, &ClipboardTable, 0};
 /* Source for ClipboardTable. Use "make hashtables" to regenerate.
 @begin ClipboardTable 3
   dropEffect	Clipboard::DropEffect	DontDelete
-  dropAllowed	Clipboard::DropAllowed	DontDelete
+  effectAllowed	Clipboard::EffectAllowed	DontDelete
   types         Clipboard::Types	DontDelete|ReadOnly
 @end
 @begin ClipboardProtoTable 4
@@ -939,7 +939,15 @@ Clipboard::~Clipboard() {
     clipboard->deref();
 }
 
-// FIXME lookups of dropEffect and dropAllowed should fail if
+static Value stringOrUndefined(const DOM::DOMString& str) {
+  if (str.isNull()) {
+    return Undefined();
+  } else {
+    return String(str);
+  }
+}
+
+// FIXME lookups of dropEffect and effectAllowed should fail if
 // !clipboard->isForDragging
 
 Value Clipboard::tryGet(ExecState* exec, const Identifier& propertyName) const {
@@ -950,9 +958,9 @@ Value Clipboard::tryGet(ExecState* exec, const Identifier& propertyName) const {
 Value Clipboard::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case DropEffect:
-      return String(clipboard->dropEffect());
-    case DropAllowed:
-      return String(clipboard->dropAllowed());
+      return stringOrUndefined(clipboard->dropEffect());
+    case EffectAllowed:
+      return stringOrUndefined(clipboard->effectAllowed());
     case Types: {
       QStringList qTypes = clipboard->types();
       if (qTypes.isEmpty()) {
@@ -989,8 +997,8 @@ void Clipboard::putValue(ExecState* exec,
     case DropEffect:
       clipboard->setDropEffect(value.toString(exec).string());
       break;
-    case DropAllowed:
-      clipboard->setDropAllowed(value.toString(exec).string());
+    case EffectAllowed:
+      clipboard->setEffectAllowed(value.toString(exec).string());
       break;
     default:
       kdWarning() << "Clipboard::putValue unhandled token " << token << endl;

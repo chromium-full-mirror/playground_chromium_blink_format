@@ -361,7 +361,8 @@ class KWQKHTMLPart : public KHTMLPart {
                             const QPoint& loc,
                             bool declareTypes,
                             NSImage** dragImage,
-                            NSPoint* dragLoc) const;
+                            NSPoint* dragLoc,
+                            unsigned* op) const;
 
   WebCoreBridge* _bridge;
 

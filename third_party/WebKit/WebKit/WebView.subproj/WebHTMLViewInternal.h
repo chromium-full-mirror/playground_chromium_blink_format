@@ -13,6 +13,7 @@
   BOOL initiatedDrag;
   // Is WebCore handling drag destination duties (DHTML dragging)?
   BOOL webCoreHandlingDrag;
+  NSDragOperation webCoreDragOp;
 
   id savedSubviews;
   BOOL subviewsSetAside;
