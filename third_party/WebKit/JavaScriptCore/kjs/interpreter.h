@@ -205,6 +205,12 @@ class Interpreter {
                       const UString& code,
                       const Value& thisV = Value());
 
+  // Overload of evaluate to keep JavaScriptGlue both source and binary
+  // compatible.
+  Completion evaluate(const UString& code,
+                      const Value& thisV = Value(),
+                      const UString& sourceFilename = UString());
+
   /**
    * @internal
    *
