@@ -2131,8 +2131,15 @@ void RenderBlock::calcMinMaxWidth() {
   if (m_maxWidth < m_minWidth)
     m_maxWidth = m_minWidth;
 
-  if (preOrNowrap && childrenInline())
+  if (preOrNowrap && childrenInline()) {
     m_minWidth = m_maxWidth;
+
+    // A horizontal marquee with inline children has no minimum width.
+    if (style()->overflow() == OMARQUEE && m_layer && m_layer->marquee() &&
+        m_layer->marquee()->isHorizontal() &&
+        !m_layer->marquee()->isUnfurlMarquee())
+      m_minWidth = 0;
+  }
 
   if (style()->width().isFixed() && style()->width().value > 0) {
     if (isTableCell())
@@ -2513,6 +2520,7 @@ void RenderBlock::calcInlineMinMaxWidth() {
     m_minWidth = inlineMin;
   if (m_maxWidth < inlineMax)
     m_maxWidth = inlineMax;
+
   //         kdDebug( 6040 ) << "m_minWidth=" << m_minWidth
   // 			<< " m_maxWidth=" << m_maxWidth << endl;
 }
