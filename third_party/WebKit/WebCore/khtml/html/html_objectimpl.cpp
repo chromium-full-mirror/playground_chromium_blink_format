@@ -336,11 +336,13 @@ bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
 // -------------------------------------------------------------------------
 
 HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc), m_imageLoader(this) {
+    : HTMLElementImpl(doc), m_imageLoader(0) {
   needWidgetUpdate = false;
 }
 
-HTMLObjectElementImpl::~HTMLObjectElementImpl() {}
+HTMLObjectElementImpl::~HTMLObjectElementImpl() {
+  delete m_imageLoader;
+}
 
 NodeImpl::Id HTMLObjectElementImpl::id() const {
   return ID_OBJECT;
@@ -374,10 +376,19 @@ void HTMLObjectElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       if (pos != -1)
         serviceType = serviceType.left(pos);
       needWidgetUpdate = true;
+      if (!canRenderImageType(serviceType) && m_imageLoader) {
+        delete m_imageLoader;
+        m_imageLoader = 0;
+      }
       break;
     case ATTR_DATA:
       url = khtml::parseURL(val).string();
       needWidgetUpdate = true;
+      if (m_render && canRenderImageType(serviceType)) {
+        if (!m_imageLoader)
+          m_imageLoader = new HTMLImageLoader(this);
+        m_imageLoader->updateFromElement();
+      }
       break;
     case ATTR_WIDTH:
       addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
@@ -446,9 +457,13 @@ void HTMLObjectElementImpl::attach() {
 
   if (m_render) {
     if (canRenderImageType(serviceType)) {
-      m_imageLoader.updateFromElement();
-      RenderImage* imageObj = static_cast<RenderImage*>(renderer());
-      imageObj->setImage(m_imageLoader.image());
+      if (!m_imageLoader)
+        m_imageLoader = new HTMLImageLoader(this);
+      m_imageLoader->updateFromElement();
+      if (renderer()) {
+        RenderImage* imageObj = static_cast<RenderImage*>(renderer());
+        imageObj->setImage(m_imageLoader->image());
+      }
     } else {
       // If we are already cleared, then it means that we were attach()-ed
       // previously

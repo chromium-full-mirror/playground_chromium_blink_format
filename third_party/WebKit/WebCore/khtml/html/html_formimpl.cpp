@@ -31,6 +31,7 @@
 #include "khtmlview.h"
 #include "khtml_part.h"
 #include "html/html_documentimpl.h"
+#include "html_imageimpl.h"
 #include "khtml_settings.h"
 #include "misc/htmlhashes.h"
 
@@ -1126,7 +1127,7 @@ RenderObject* HTMLFieldSetElementImpl::createRenderer(RenderArena* arena,
 
 HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
                                            HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(doc, f) {
+    : HTMLGenericFormElementImpl(doc, f), m_imageLoader(0) {
   m_type = TEXT;
   m_maxLen = -1;
   m_size = 20;
@@ -1153,6 +1154,7 @@ HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
 HTMLInputElementImpl::~HTMLInputElementImpl() {
   if (getDocument())
     getDocument()->deregisterMaintainsState(this);
+  delete m_imageLoader;
 }
 
 NodeImpl::Id HTMLInputElementImpl::id() const {
@@ -1385,6 +1387,10 @@ void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     case ATTR_TYPE:
       setType(attr->value());
+      if (m_type != IMAGE && m_imageLoader) {
+        delete m_imageLoader;
+        m_imageLoader = 0;
+      }
       break;
     case ATTR_VALUE:
       if (m_value
@@ -1405,9 +1411,15 @@ void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       m_size = !attr->isNull() ? attr->value().toInt() : 20;
       break;
     case ATTR_ALT:
-    case ATTR_SRC:
       if (m_render && m_type == IMAGE)
-        m_render->updateFromElement();
+        static_cast<RenderImage*>(m_render)->updateAltText();
+      break;
+    case ATTR_SRC:
+      if (m_render && m_type == IMAGE) {
+        if (!m_imageLoader)
+          m_imageLoader = new HTMLImageLoader(this);
+        m_imageLoader->updateFromElement();
+      }
       break;
     case ATTR_USEMAP:
     case ATTR_ACCESSKEY:
@@ -1575,6 +1587,16 @@ void HTMLInputElementImpl::attach() {
   }
 
   HTMLGenericFormElementImpl::attach();
+
+  if (m_type == IMAGE) {
+    if (!m_imageLoader)
+      m_imageLoader = new HTMLImageLoader(this);
+    m_imageLoader->updateFromElement();
+    if (renderer()) {
+      RenderImage* imageObj = static_cast<RenderImage*>(renderer());
+      imageObj->setImage(m_imageLoader->image());
+    }
+  }
 
 #if APPLE_CHANGES
   // note we don't deal with calling passwordFieldRemoved() on detach, because
