@@ -20,4 +20,6 @@
 // and https URLs
 - (NSURL*)_web_bestURL;
 
+- (void)_web_writeURL:(NSURL*)URL andTitle:(NSString*)title withOwner:(id)owner;
+
 @end
