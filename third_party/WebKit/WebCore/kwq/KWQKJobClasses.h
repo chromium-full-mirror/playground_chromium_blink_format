@@ -58,8 +58,10 @@ class Job : public QObject {
 
 class TransferJob : public Job {
  public:
-  TransferJob(const KURL&, bool reload);
-  TransferJob(const KURL&, const khtml::FormData& postData);
+  TransferJob(const KURL&, bool reload, bool deliverAllData = false);
+  TransferJob(const KURL&,
+              const khtml::FormData& postData,
+              bool deliverAllData = false);
   ~TransferJob();
 
   int error() const;
@@ -77,8 +79,7 @@ class TransferJob : public Job {
 
   void emitData(const char*, int);
   void emitRedirection(const KURL&);
-  void emitResult();
-  void emitResult(NSData*);
+  void emitResult(NSData* allData = nil);
   void emitReceivedResponse(NSURLResponse*);
 
   khtml::FormData postData() const;
@@ -90,10 +91,11 @@ class TransferJob : public Job {
 
   TransferJobPrivate* d;
 
+  bool m_deliverAllData;
+
   KWQSignal m_data;
   KWQSignal m_redirection;
-  KWQSignal m_result1;
-  KWQSignal m_result2;
+  KWQSignal m_result;
   KWQSignal m_receivedResponse;
 };
 
