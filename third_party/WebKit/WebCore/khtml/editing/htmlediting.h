@@ -108,9 +108,19 @@ class StyleChange {
               const DOM::Position&,
               ELegacyHTMLStyles usesLegacyStyles = UseLegacyHTMLStyles);
 
+  static ELegacyHTMLStyles styleModeForParseMode(bool);
+
   DOM::DOMString cssStyle() const { return m_cssStyle; }
   bool applyBold() const { return m_applyBold; }
   bool applyItalic() const { return m_applyItalic; }
+  bool applyFontColor() const { return m_applyFontColor.length() > 0; }
+  bool applyFontFace() const { return m_applyFontFace.length() > 0; }
+  bool applyFontSize() const { return m_applyFontSize.length() > 0; }
+
+  DOM::DOMString fontColor() { return m_applyFontColor; }
+  DOM::DOMString fontFace() { return m_applyFontFace; }
+  DOM::DOMString fontSize() { return m_applyFontSize; }
+
   bool usesLegacyStyles() const { return m_usesLegacyStyles; }
 
  private:
@@ -121,6 +131,9 @@ class StyleChange {
   DOM::DOMString m_cssStyle;
   bool m_applyBold;
   bool m_applyItalic;
+  DOM::DOMString m_applyFontColor;
+  DOM::DOMString m_applyFontFace;
+  DOM::DOMString m_applyFontSize;
   bool m_usesLegacyStyles;
 };
 
@@ -306,6 +319,8 @@ class ApplyStyleCommand : public CompositeEditCommand {
   bool isHTMLStyleNode(DOM::CSSMutableStyleDeclarationImpl*,
                        DOM::HTMLElementImpl*);
   void removeHTMLStyleNode(DOM::HTMLElementImpl*);
+  void removeHTMLFontStyle(DOM::CSSMutableStyleDeclarationImpl*,
+                           DOM::HTMLElementImpl*);
   void removeCSSStyle(DOM::CSSMutableStyleDeclarationImpl*,
                       DOM::HTMLElementImpl*);
   void removeBlockStyle(DOM::CSSMutableStyleDeclarationImpl*,
@@ -998,6 +1013,7 @@ class TypingCommand : public CompositeEditCommand {
 DOM::ElementImpl* createDefaultParagraphElement(DOM::DocumentImpl* document);
 DOM::ElementImpl* createBlockPlaceholderElement(DOM::DocumentImpl* document);
 DOM::ElementImpl* createBreakElement(DOM::DocumentImpl* document);
+DOM::ElementImpl* createFontElement(DOM::DocumentImpl* document);
 DOM::ElementImpl* createStyleSpanElement(DOM::DocumentImpl* document);
 
 bool isNodeRendered(const DOM::NodeImpl*);
