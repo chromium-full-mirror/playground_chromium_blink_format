@@ -2413,7 +2413,7 @@ void RenderBlock::checkLinesForTextOverflow() {
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
     int lineBoxEdge = ltr ? curr->xPos() : curr->xPos() + curr->width();
     if ((ltr && lineBoxEdge > blockEdge) || (!ltr && lineBoxEdge < blockEdge)) {
-      // This line spills out of our box in the appopriate direction.  Now we
+      // This line spills out of our box in the appropriate direction.  Now we
       // need to see if the line
       // can be truncated.  In order for truncation to be possible, the line
       // must have sufficient space to
