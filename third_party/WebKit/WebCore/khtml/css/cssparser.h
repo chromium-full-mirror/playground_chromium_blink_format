@@ -132,6 +132,7 @@ class CSSParser {
   bool parseShortHand(const int* properties, int numProperties, bool important);
   bool parse4Values(const int* properties, bool important);
   bool parseContent(int propId, bool important);
+  bool parseDashboardRegions(int propId, bool important);
   bool parseShape(int propId, bool important);
   bool parseFont(bool important);
   CSSValueListImpl* parseFontFamily();

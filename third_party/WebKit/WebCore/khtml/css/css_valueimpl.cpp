@@ -525,6 +525,13 @@ CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(RectImpl* r) {
   m_type = CSSPrimitiveValue::CSS_RECT;
 }
 
+CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(DashboardRegionImpl* r) {
+  m_value.region = r;
+  if (m_value.region)
+    m_value.region->ref();
+  m_type = CSSPrimitiveValue::CSS_DASHBOARD_REGION;
+}
+
 CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(QRgb color) {
   m_value.rgbcolor = color;
   m_type = CSSPrimitiveValue::CSS_RGBCOLOR;
