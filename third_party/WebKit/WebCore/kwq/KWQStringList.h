@@ -34,6 +34,9 @@ class QStringList : public QValueList<QString> {
   static QStringList split(const QString& sep,
                            const QString& str,
                            bool allowEmptyEntries = FALSE);
+  static QStringList split(const QChar& sep,
+                           const QString& str,
+                           bool allowEmptyEntries = FALSE);
   QString join(const QString& sepx) const;
 };
 
