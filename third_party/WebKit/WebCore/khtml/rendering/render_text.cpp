@@ -857,7 +857,6 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
     bool drawMarkedTextBackground =
         haveMarkedText && pass == 0 && i.phase != PaintActionSelection;
     bool drawText = !(haveSelection || haveMarkedText) || pass == 1;
-#endif
 
     // run until we find one that is outside the range, then we
     // know we can stop
@@ -866,11 +865,7 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
         if (ty + s->m_y + s->height() > i.r.y() + i.r.height()) {
           RenderCanvas* canvasObj = canvas();
           if (ty + s->m_y < canvasObj->truncatedAt())
-#if APPLE_CHANGES
             canvasObj->setBestTruncatedAt(ty + s->m_y, this);
-#else
-          canvasObj->setTruncatedAt(ty + s->m_y);
-#endif
           // Let's stop here.
           break;
         }
@@ -888,10 +883,7 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
       font = &_style->htmlFont();  // Always update, since smallCaps is not
                                    // stored in the QFont.
 
-#if APPLE_CHANGES
       if (drawText) {
-#endif
-
         QColor textColor = _style->color();
         if (_style->shouldCorrectTextColor()) {
           textColor = correctedTextColor(textColor, _style->backgroundColor());
@@ -900,7 +892,6 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
         if (textColor != p->pen().color())
           p->setPen(textColor);
 
-#if APPLE_CHANGES
         // Set a text shadow if we have one.
         // FIXME: Support multiple shadow effects.  Need more from the CG API
         // before
@@ -911,7 +902,6 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
                        _style->textShadow()->blur, _style->textShadow()->color);
           setShadow = true;
         }
-#endif
 
         if (s->m_len > 0) {
           bool paintSelectedTextOnly = (i.phase == PaintActionSelection);
@@ -952,43 +942,23 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
             int ePos = QMIN(endPos - offset, s->m_len);
             if (paintSelectedTextSeparately) {
               if (sPos >= ePos)
-#if APPLE_CHANGES
                 font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
                                str->s, str->l, s->m_start, s->m_len, s->m_toAdd,
                                s->m_reversed ? QPainter::RTL : QPainter::LTR,
                                style()->visuallyOrdered());
-#else
-            font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline, str->s,
-                           str->l, s->m_start, s->m_len, s->m_toAdd,
-                           s->m_reversed ? QPainter::RTL : QPainter::LTR);
-#endif
               else {
                 if (sPos - 1 >= 0)
-#if APPLE_CHANGES
                   font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
                                  str->s, str->l, s->m_start, s->m_len,
                                  s->m_toAdd,
                                  s->m_reversed ? QPainter::RTL : QPainter::LTR,
                                  style()->visuallyOrdered(), 0, sPos);
-#else
-              font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
-                             str->s, str->l, s->m_start, s->m_len, s->m_toAdd,
-                             s->m_reversed ? QPainter::RTL : QPainter::LTR, 0,
-                             sPos);
-#endif
                 if (ePos < s->m_start + s->m_len)
-#if APPLE_CHANGES
                   font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
                                  str->s, str->l, s->m_start, s->m_len,
                                  s->m_toAdd,
                                  s->m_reversed ? QPainter::RTL : QPainter::LTR,
                                  style()->visuallyOrdered(), ePos, -1);
-#else
-              font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
-                             str->s, str->l, s->m_start, s->m_len, s->m_toAdd,
-                             s->m_reversed ? QPainter::RTL : QPainter::LTR,
-                             ePos, -1);
-#endif
               }
             }
 
@@ -996,29 +966,16 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
               if (selectionColor != p->pen().color())
                 p->setPen(selectionColor);
 
-#if APPLE_CHANGES
               if (selectionTextShadow)
                 p->setShadow(selectionTextShadow->x, selectionTextShadow->y,
                              selectionTextShadow->blur,
                              selectionTextShadow->color);
-#endif
-
-#if APPLE_CHANGES
               font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline,
                              str->s, str->l, s->m_start, s->m_len, s->m_toAdd,
                              s->m_reversed ? QPainter::RTL : QPainter::LTR,
                              style()->visuallyOrdered(), sPos, ePos);
-#else
-          font->drawText(p, s->m_x + tx, s->m_y + ty + s->m_baseline, str->s,
-                         str->l, s->m_start, s->m_len, s->m_toAdd,
-                         s->m_reversed ? QPainter::RTL : QPainter::LTR, sPos,
-                         ePos);
-#endif
-
-#if APPLE_CHANGES
               if (selectionTextShadow)
                 p->clearShadow();
-#endif
             }
           }
         }
@@ -1061,24 +1018,17 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
           }
         }
 
-#if APPLE_CHANGES
         if (setShadow)
           p->clearShadow();
 
       }  // drawText
-#endif
 
-#if APPLE_CHANGES
       if (drawMarkedTextBackground && !isPrinting)
         s->paintMarkedTextBackground(font, this, p, _style, tx, ty,
                                      markedTextRange.startOffset(),
                                      markedTextRange.endOffset());
 
-#endif
-
-#if APPLE_CHANGES
       if (drawSelectionBackground)
-#endif
         if (!isPrinting && (selectionState() != SelectionNone))
           s->paintSelection(font, this, p, _style, tx, ty, startPos, endPos);
 
@@ -1097,8 +1047,9 @@ void RenderText::paint(PaintInfo& i, int tx, int ty) {
     } while (((s = s->nextTextBox()) != 0) &&
              s->checkVerticalPoint(i.r.y(), ty, i.r.height()));
 
-#if APPLE_CHANGES
   }  // end of for loop
+#else
+#error This file no longer works without Apple changes
 #endif
 }
 
