@@ -20,6 +20,7 @@
   NSURL* currentURL;
   WebDataSource* dataSource;
   BOOL isFirstChunk;
+  BOOL suppressErrors;
   WebDownloadHandler* downloadHandler;
   id<WebResourceProgressHandler> downloadProgressHandler;
   WebContentAction policyAction;
