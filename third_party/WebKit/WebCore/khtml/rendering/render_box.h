@@ -68,6 +68,12 @@ class RenderBox : public RenderContainer {
   virtual void setWidth(int width) { m_width = width; }
   virtual void setHeight(int height) { m_height = height; }
 
+  // This method is now public so that centered objects like tables that are
+  // shifted right by left-aligned floats can recompute their left and
+  // right margins (so that they can remain centered after being
+  // shifted. -dwh
+  void calcHorizontalMargins(const Length& ml, const Length& mr, int cw);
+
   virtual void position(int x,
                         int y,
                         int from,
@@ -122,8 +128,6 @@ class RenderBox : public RenderContainer {
 
   void calcAbsoluteHorizontal();
   void calcAbsoluteVertical();
-
-  void calcHorizontalMargins(const Length& ml, const Length& mr, int cw);
 
   void calcClip(QPainter* p, int tx, int ty);
 
