@@ -826,7 +826,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     setClip(p, paintDirtyRect, damageRect);
 
     // Paint the background.
-    RenderObject::PaintInfo info(p, damageRect, PaintActionElementBackground,
+    RenderObject::PaintInfo info(p, damageRect, PaintActionBlockBackground,
                                  paintingRootForRenderer);
     renderer()->paint(info, x - renderer()->xPos(), y - renderer()->yPos());
 #if APPLE_CHANGES
@@ -867,7 +867,7 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     int ty = y - renderer()->yPos();
     RenderObject::PaintInfo info(
         p, clipRectToApply,
-        selectionOnly ? PaintActionSelection : PaintActionChildBackgrounds,
+        selectionOnly ? PaintActionSelection : PaintActionChildBlockBackgrounds,
         paintingRootForRenderer);
     renderer()->paint(info, tx, ty);
     if (!selectionOnly) {
@@ -902,14 +902,14 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 #endif
 }
 
-bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
+bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
 #if APPLE_CHANGES
   // Clear our our scrollbar variable
   RenderLayer::gScrollBar = 0;
 #endif
 
   QRect damageRect(m_x, m_y, width(), height());
-  RenderLayer* insideLayer = nodeAtPointForLayer(this, info, x, y, damageRect);
+  RenderLayer* insideLayer = hitTestLayer(this, info, x, y, damageRect);
 
   // Now determine if the result is inside an anchor; make sure an image map
   // wins if
@@ -930,11 +930,11 @@ bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
   return insideLayer;
 }
 
-RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
-                                              RenderObject::NodeInfo& info,
-                                              int xMousePos,
-                                              int yMousePos,
-                                              const QRect& hitTestRect) {
+RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
+                                       RenderObject::NodeInfo& info,
+                                       int xMousePos,
+                                       int yMousePos,
+                                       const QRect& hitTestRect) {
   // Calculate the clip rects we should use.
   QRect layerBounds, bgRect, fgRect;
   calculateRects(rootLayer, hitTestRect, layerBounds, bgRect, fgRect);
@@ -954,8 +954,8 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
     uint count = m_posZOrderList->count();
     for (int i = count - 1; i >= 0; i--) {
       RenderLayer* child = m_posZOrderList->at(i);
-      insideLayer = child->nodeAtPointForLayer(rootLayer, info, xMousePos,
-                                               yMousePos, hitTestRect);
+      insideLayer = child->hitTestLayer(rootLayer, info, xMousePos, yMousePos,
+                                        hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -964,9 +964,9 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
   // Next we want to see if the mouse pos is inside the child RenderObjects of
   // the layer.
   if (containsPoint(xMousePos, yMousePos, fgRect) &&
-      renderer()->nodeAtPoint(
+      renderer()->hitTest(
           info, xMousePos, yMousePos, layerBounds.x() - renderer()->xPos(),
-          layerBounds.y() - renderer()->yPos(), HitTestChildrenOnly)) {
+          layerBounds.y() - renderer()->yPos(), HitTestDescendants)) {
     // for positioned generated content, we might still not have a
     // node by the time we get to the layer level, since none of
     // the content in the layer has an element. So just walk up
@@ -988,7 +988,6 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
         }
       }
     }
-
     return this;
   }
 
@@ -997,8 +996,8 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
     uint count = m_negZOrderList->count();
     for (int i = count - 1; i >= 0; i--) {
       RenderLayer* child = m_negZOrderList->at(i);
-      insideLayer = child->nodeAtPointForLayer(rootLayer, info, xMousePos,
-                                               yMousePos, hitTestRect);
+      insideLayer = child->hitTestLayer(rootLayer, info, xMousePos, yMousePos,
+                                        hitTestRect);
       if (insideLayer)
         return insideLayer;
     }
@@ -1007,9 +1006,9 @@ RenderLayer* RenderLayer::nodeAtPointForLayer(RenderLayer* rootLayer,
   // Next we want to see if the mouse pos is inside this layer but not any of
   // its children.
   if (containsPoint(xMousePos, yMousePos, bgRect) &&
-      renderer()->nodeAtPoint(
-          info, xMousePos, yMousePos, layerBounds.x() - renderer()->xPos(),
-          layerBounds.y() - renderer()->yPos(), HitTestSelfOnly))
+      renderer()->hitTest(info, xMousePos, yMousePos,
+                          layerBounds.x() - renderer()->xPos(),
+                          layerBounds.y() - renderer()->yPos(), HitTestSelf))
     return this;
 
   // No luck.

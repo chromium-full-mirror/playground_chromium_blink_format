@@ -64,8 +64,7 @@ class RenderFrameSet : public RenderContainer {
                    int y,
                    int tx,
                    int ty,
-                   HitTestAction hitTestAction = HitTestAll,
-                   bool inside = false);
+                   HitTestAction hitTestAction);
 
   DOM::HTMLFrameSetElementImpl* element() const {
     return static_cast<DOM::HTMLFrameSetElementImpl*>(RenderObject::element());

@@ -74,9 +74,9 @@ class RenderArena;
  */
 
 typedef enum {
-  PaintActionElementBackground = 0,
-  PaintActionChildBackground,
-  PaintActionChildBackgrounds,
+  PaintActionBlockBackground,
+  PaintActionChildBlockBackground,
+  PaintActionChildBlockBackgrounds,
   PaintActionFloat,
   PaintActionForeground,
   PaintActionOutline,
@@ -84,10 +84,14 @@ typedef enum {
   PaintActionCollapsedTableBorders
 } PaintAction;
 
+typedef enum { HitTestAll, HitTestSelf, HitTestDescendants } HitTestFilter;
+
 typedef enum {
-  HitTestAll = 0,
-  HitTestSelfOnly = 1,
-  HitTestChildrenOnly = 2
+  HitTestBlockBackground,
+  HitTestChildBlockBackground,
+  HitTestChildBlockBackgrounds,
+  HitTestFloat,
+  HitTestForeground
 } HitTestAction;
 
 namespace DOM {
@@ -427,12 +431,20 @@ class RenderObject : public CachedObjectClient {
               const QRect& _r,
               PaintAction _phase,
               RenderObject* _paintingRoot)
-        : p(_p), r(_r), phase(_phase), paintingRoot(_paintingRoot) {}
+        : p(_p),
+          r(_r),
+          phase(_phase),
+          paintingRoot(_paintingRoot),
+          outlineObjects(0) {}
+    ~PaintInfo() { delete outlineObjects; }
     QPainter* p;
     QRect r;
     PaintAction phase;
     RenderObject*
         paintingRoot;  // used to draw just one element and its visual kids
+    QPtrDict<RenderFlow>* outlineObjects;  // used to list which outlines should
+                                           // be painted by a block with inline
+                                           // children
   };
   virtual void paint(PaintInfo& i, int tx, int ty);
   void paintBorder(QPainter* p,
@@ -579,13 +591,19 @@ class RenderObject : public CachedObjectClient {
         : m_object(o), m_repaintRect(r) {}
   };
 
+  bool hitTest(NodeInfo& info,
+               int x,
+               int y,
+               int tx,
+               int ty,
+               HitTestFilter hitTestFilter = HitTestAll);
   virtual bool nodeAtPoint(NodeInfo& info,
                            int x,
                            int y,
                            int tx,
                            int ty,
-                           HitTestAction hitTestAction = HitTestAll,
-                           bool inside = false);
+                           HitTestAction hitTestAction);
+  void setInnerNode(NodeInfo& info);
 
   virtual DOM::Position positionForCoordinates(int x, int y, EAffinity* = 0);
 
@@ -971,6 +989,15 @@ class RenderObject : public CachedObjectClient {
 
   virtual void selectionStartEnd(int& spos, int& epos);
 
+  RenderObject* paintingRootForChildren(PaintInfo& i) const {
+    // if we're the painting root, kids draw normally, and see root of 0
+    return (!i.paintingRoot || i.paintingRoot == this) ? 0 : i.paintingRoot;
+  }
+
+  bool shouldPaintWithinRoot(PaintInfo& i) const {
+    return !i.paintingRoot || i.paintingRoot == this;
+  }
+
  protected:
   virtual void printBoxDecorations(QPainter* /*p*/,
                                    int /*_x*/,
@@ -990,14 +1017,6 @@ class RenderObject : public CachedObjectClient {
   virtual void removeLeftoverAnonymousBoxes();
 
   void arenaDelete(RenderArena* arena);
-
-  RenderObject* paintingRootForChildren(PaintInfo& i) const {
-    // if we're the painting root, kids draw normally, and see root of 0
-    return (!i.paintingRoot || i.paintingRoot == this) ? 0 : i.paintingRoot;
-  }
-  bool shouldPaintWithinRoot(PaintInfo& i) const {
-    return !i.paintingRoot || i.paintingRoot == this;
-  }
 
  private:
   RenderStyle* m_style;

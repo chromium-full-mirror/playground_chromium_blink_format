@@ -79,11 +79,13 @@ class RenderFlow : public RenderContainer {
                                      bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
-  void paintLineBoxBackgroundBorder(PaintInfo& i, int _tx, int _ty);
-  void paintLineBoxDecorations(PaintInfo& i,
-                               int _tx,
-                               int _ty,
-                               bool paintedChildren = false);
+  void paintLines(PaintInfo& i, int _tx, int _ty);
+  bool hitTestLines(NodeInfo& i,
+                    int x,
+                    int y,
+                    int tx,
+                    int ty,
+                    HitTestAction hitTestAction);
 
   virtual QRect getAbsoluteRepaintRect();
 
@@ -97,6 +99,18 @@ class RenderFlow : public RenderContainer {
   virtual QRect caretRect(int offset,
                           EAffinity affinity = UPSTREAM,
                           int* extraWidthToEndOfLine = 0);
+
+#ifdef APPLE_CHANGES
+  virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
+  void paintFocusRing(QPainter* p, int tx, int ty);
+#endif
+  void paintOutlineForLine(QPainter* p,
+                           int tx,
+                           int ty,
+                           const QRect& prevLine,
+                           const QRect& thisLine,
+                           const QRect& nextLine);
+  void paintOutlines(QPainter* p, int tx, int ty);
 
  protected:
   // An inline can be split with blocks occurring in between the inline content.

@@ -191,7 +191,7 @@ void RenderCanvas::paint(PaintInfo& i, int _tx, int _ty) {
                 << ")" << endl;
 #endif
   // 1. paint background, borders etc
-  if (i.phase == PaintActionElementBackground) {
+  if (i.phase == PaintActionBlockBackground) {
     paintBoxDecorations(i, _tx, _ty);
     return;
   }

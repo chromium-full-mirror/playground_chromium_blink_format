@@ -72,8 +72,7 @@ class RenderImage : public RenderReplaced {
                            int y,
                            int tx,
                            int ty,
-                           HitTestAction hitTestAction = HitTestAll,
-                           bool inside = false);
+                           HitTestAction hitTestAction);
 
   virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;

@@ -69,14 +69,12 @@ class EllipsisBox : public InlineBox {
     m_markupBox = markupBox;
   }
 
-  void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
-  bool nodeAtPoint(RenderObject::NodeInfo& info,
-                   int _x,
-                   int _y,
-                   int _tx,
-                   int _ty,
-                   HitTestAction hitTestAction,
-                   bool inBox);
+  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo& info,
+                           int _x,
+                           int _y,
+                           int _tx,
+                           int _ty);
 
  private:
   DOM::AtomicString m_str;
@@ -150,6 +148,45 @@ void InlineBox::adjustPosition(int dx, int dy) {
   m_y += dy;
   if (m_object->isReplaced() || m_object->isBR())
     m_object->setPos(m_object->xPos() + dx, m_object->yPos() + dy);
+}
+
+void InlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
+  if (!object()->shouldPaintWithinRoot(i) || i.phase == PaintActionOutline)
+    return;
+
+  // Paint all phases of replaced elements atomically, as though the replaced
+  // element established its
+  // own stacking context.  (See Appendix E.2, section 6.4 on inline block/table
+  // elements in the CSS2.1
+  // specification.)
+  bool paintSelectionOnly = i.phase == PaintActionSelection;
+  RenderObject::PaintInfo info(
+      i.p, i.r, paintSelectionOnly ? i.phase : PaintActionBlockBackground,
+      i.paintingRoot);
+  object()->paint(info, tx, ty);
+  if (!paintSelectionOnly) {
+    info.phase = PaintActionChildBlockBackgrounds;
+    object()->paint(info, tx, ty);
+    info.phase = PaintActionFloat;
+    object()->paint(info, tx, ty);
+    info.phase = PaintActionForeground;
+    object()->paint(info, tx, ty);
+    info.phase = PaintActionOutline;
+    object()->paint(info, tx, ty);
+  }
+}
+
+bool InlineBox::nodeAtPoint(RenderObject::NodeInfo& i,
+                            int x,
+                            int y,
+                            int tx,
+                            int ty) {
+  // Hit test all phases of replaced elements atomically, as though the replaced
+  // element established its
+  // own stacking context.  (See Appendix E.2, section 6.4 on inline block/table
+  // elements in the CSS2.1
+  // specification.)
+  return object()->hitTest(i, x, y, tx, ty);
 }
 
 RootInlineBox* InlineBox::root() {
@@ -232,6 +269,10 @@ int InlineBox::placeEllipsisBox(bool ltr,
                                 bool&) {
   // Use -1 to mean "we didn't set the position."
   return -1;
+}
+
+RenderFlow* InlineFlowBox::flowObject() {
+  return static_cast<RenderFlow*>(m_object);
 }
 
 int InlineFlowBox::marginLeft() {
@@ -688,6 +729,69 @@ void InlineFlowBox::shrinkBoxesWithNoTextChildren(int topPos, int bottomPos) {
   }
 }
 
+bool InlineFlowBox::nodeAtPoint(RenderObject::NodeInfo& i,
+                                int x,
+                                int y,
+                                int tx,
+                                int ty) {
+  // Check children first.
+  for (InlineBox* curr = lastChild(); curr; curr = curr->prevOnLine()) {
+    if (!curr->object()->layer() && curr->nodeAtPoint(i, x, y, tx, ty)) {
+      object()->setInnerNode(i);
+      return true;
+    }
+  }
+
+  // Now check ourselves.
+  QRect rect(tx + m_x, ty + m_y, m_width, m_height);
+  if (object()->style()->visibility() == VISIBLE && rect.contains(x, y)) {
+    object()->setInnerNode(i);
+    return true;
+  }
+
+  return false;
+}
+
+void InlineFlowBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
+  bool intersectsDamageRect = true;
+  int xPos = tx + m_x - object()->maximalOutlineSize(i.phase);
+  int w = width() + 2 * object()->maximalOutlineSize(i.phase);
+  if ((xPos >= i.r.x() + i.r.width()) || (xPos + w <= i.r.x()))
+    intersectsDamageRect = false;
+
+  if (intersectsDamageRect) {
+    if (i.phase == PaintActionOutline) {
+      // Add ourselves to the paint info struct's list of inlines that need to
+      // paint their
+      // outlines.
+      if (object()->style()->visibility() == VISIBLE &&
+          object()->style()->outlineWidth() > 0 &&
+          !object()->isInlineContinuation()) {
+        if (!i.outlineObjects)
+          i.outlineObjects = new QPtrDict<RenderFlow>;
+        if (!i.outlineObjects->find(flowObject()))
+          i.outlineObjects->insert(flowObject(), flowObject());
+      }
+    } else {
+      // 1. Paint our background and border.
+      paintBackgroundAndBorder(i, tx, ty);
+
+      // 2. Paint our underline and overline.
+      paintDecorations(i, tx, ty, false);
+    }
+  }
+
+  // 3. Paint our children.
+  for (InlineBox* curr = firstChild(); curr; curr = curr->nextOnLine()) {
+    if (!curr->object()->layer())
+      curr->paint(i, tx, ty);
+  }
+
+  // 4. Paint our strike-through
+  if (intersectsDamageRect && i.phase != PaintActionOutline)
+    paintDecorations(i, tx, ty, true);
+}
+
 void InlineFlowBox::paintBackgrounds(QPainter* p,
                                      const QColor& c,
                                      const BackgroundLayer* bgLayer,
@@ -696,12 +800,11 @@ void InlineFlowBox::paintBackgrounds(QPainter* p,
                                      int _tx,
                                      int _ty,
                                      int w,
-                                     int h,
-                                     int xoff) {
+                                     int h) {
   if (!bgLayer)
     return;
-  paintBackgrounds(p, c, bgLayer->next(), my, mh, _tx, _ty, w, h, xoff);
-  paintBackground(p, c, bgLayer, my, mh, _tx, _ty, w, h, xoff);
+  paintBackgrounds(p, c, bgLayer->next(), my, mh, _tx, _ty, w, h);
+  paintBackground(p, c, bgLayer, my, mh, _tx, _ty, w, h);
 }
 
 void InlineFlowBox::paintBackground(QPainter* p,
@@ -712,8 +815,7 @@ void InlineFlowBox::paintBackground(QPainter* p,
                                     int _tx,
                                     int _ty,
                                     int w,
-                                    int h,
-                                    int xOffsetOnLine) {
+                                    int h) {
   CachedImage* bg = bgLayer->backgroundImage();
   bool hasBackgroundImage = bg &&
                             (bg->pixmap_size() == bg->valid_rect().size()) &&
@@ -731,6 +833,9 @@ void InlineFlowBox::paintBackground(QPainter* p,
     // as though you had one single line.  This means each line has to pick up
     // the background where
     // the previous line left off.
+    int xOffsetOnLine = 0;
+    for (InlineRunBox* curr = prevLineBox(); curr; curr = curr->prevLineBox())
+      xOffsetOnLine += curr->width();
     int startX = _tx - xOffsetOnLine;
     int totalWidth = xOffsetOnLine;
     for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
@@ -748,8 +853,12 @@ void InlineFlowBox::paintBackground(QPainter* p,
 
 void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                              int _tx,
-                                             int _ty,
-                                             int xOffsetOnLine) {
+                                             int _ty) {
+  if (!object()->shouldPaintWithinRoot(i) ||
+      object()->style()->visibility() != VISIBLE ||
+      i.phase != PaintActionForeground)
+    return;
+
   // Move x/y to our coordinates.
   _tx += m_x;
   _ty += m_y;
@@ -774,7 +883,7 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
       (parent() && object()->shouldPaintBackgroundOrBorder())) {
     QColor c = styleToUse->backgroundColor();
     paintBackgrounds(p, c, styleToUse->backgroundLayers(), my, mh, _tx, _ty, w,
-                     h, xOffsetOnLine);
+                     h);
 
     // :first-line cannot be used to put borders on a line. Always paint borders
     // with our
@@ -806,9 +915,13 @@ void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& i,
                                      int _tx,
                                      int _ty,
                                      bool paintedChildren) {
-  // Now paint our text decorations. We only do this if we aren't in quirks mode
-  // (i.e., in
+  // Paint text decorations like underlines/overlines. We only do this if we
+  // aren't in quirks mode (i.e., in
   // almost-strict mode or strict mode).
+  if (object()->style()->htmlHacks() || !object()->shouldPaintWithinRoot(i) ||
+      object()->style()->visibility() != VISIBLE)
+    return;
+
   QPainter* p = i.p;
   _tx += m_x;
   _ty += m_y;
@@ -991,7 +1104,7 @@ void EllipsisBox::paint(RenderObject::PaintInfo& i, int _tx, int _ty) {
     // Paint the markup box
     _tx += m_x + m_width - m_markupBox->xPos();
     _ty += m_y + m_baseline - (m_markupBox->yPos() + m_markupBox->baseline());
-    m_markupBox->object()->paint(i, _tx, _ty);
+    m_markupBox->paint(i, _tx, _ty);
   }
 }
 
@@ -999,17 +1112,23 @@ bool EllipsisBox::nodeAtPoint(RenderObject::NodeInfo& info,
                               int _x,
                               int _y,
                               int _tx,
-                              int _ty,
-                              HitTestAction hitTestAction,
-                              bool inBox) {
+                              int _ty) {
+  // Hit test the markup box.
   if (m_markupBox) {
     _tx += m_x + m_width - m_markupBox->xPos();
     _ty += m_y + m_baseline - (m_markupBox->yPos() + m_markupBox->baseline());
-    inBox |= m_markupBox->object()->nodeAtPoint(info, _x, _y, _tx, _ty,
-                                                hitTestAction, inBox);
+    if (m_markupBox->nodeAtPoint(info, _x, _y, _tx, _ty)) {
+      object()->setInnerNode(info);
+      return true;
+    }
   }
 
-  return inBox;
+  QRect rect(_tx + m_x, _ty + m_y, m_width, m_height);
+  if (object()->style()->visibility() == VISIBLE && rect.contains(_x, _y)) {
+    object()->setInnerNode(info);
+    return true;
+  }
+  return false;
 }
 
 void RootInlineBox::detach(RenderArena* arena) {
@@ -1087,21 +1206,29 @@ int RootInlineBox::placeEllipsisBox(bool ltr,
 void RootInlineBox::paintEllipsisBox(RenderObject::PaintInfo& i,
                                      int _tx,
                                      int _ty) const {
-  if (m_ellipsisBox)
+  if (m_ellipsisBox && object()->shouldPaintWithinRoot(i) &&
+      object()->style()->visibility() == VISIBLE &&
+      i.phase == PaintActionForeground)
     m_ellipsisBox->paint(i, _tx, _ty);
 }
 
-bool RootInlineBox::hitTestEllipsisBox(RenderObject::NodeInfo& info,
-                                       int _x,
-                                       int _y,
-                                       int _tx,
-                                       int _ty,
-                                       HitTestAction hitTestAction,
-                                       bool inBox) {
-  if (m_ellipsisBox)
-    inBox |= m_ellipsisBox->nodeAtPoint(info, _x, _y, _tx, _ty, hitTestAction,
-                                        inBox);
-  return inBox;
+void RootInlineBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
+  InlineFlowBox::paint(i, tx, ty);
+  paintEllipsisBox(i, tx, ty);
+}
+
+bool RootInlineBox::nodeAtPoint(RenderObject::NodeInfo& i,
+                                int x,
+                                int y,
+                                int tx,
+                                int ty) {
+  if (m_ellipsisBox && object()->style()->visibility() == VISIBLE) {
+    if (m_ellipsisBox->nodeAtPoint(i, x, y, tx, ty)) {
+      object()->setInnerNode(i);
+      return true;
+    }
+  }
+  return InlineFlowBox::nodeAtPoint(i, x, y, tx, ty);
 }
 
 void RootInlineBox::adjustPosition(int dx, int dy) {

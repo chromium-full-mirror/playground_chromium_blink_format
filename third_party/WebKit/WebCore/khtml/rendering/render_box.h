@@ -46,6 +46,12 @@ class RenderBox : public RenderObject {
 
   virtual void setStyle(RenderStyle* style);
   virtual void paint(PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(NodeInfo& i,
+                           int _x,
+                           int _y,
+                           int _tx,
+                           int _ty,
+                           HitTestAction hitTestAction);
 
   virtual void detach();
 

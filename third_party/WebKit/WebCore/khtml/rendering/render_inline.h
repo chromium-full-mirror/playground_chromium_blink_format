@@ -69,8 +69,7 @@ class RenderInline : public RenderFlow {
                            int _y,
                            int _tx,
                            int _ty,
-                           HitTestAction hitTestAction = HitTestAll,
-                           bool inside = false);
+                           HitTestAction hitTestAction);
 
   virtual void calcMinMaxWidth();
 
@@ -90,20 +89,8 @@ class RenderInline : public RenderFlow {
 
   virtual DOM::Position positionForCoordinates(int x, int y, EAffinity* = 0);
 
-#ifdef APPLE_CHANGES
-  virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
-  void paintFocusRing(QPainter* p, int tx, int ty);
-#endif
-
  protected:
   static RenderInline* cloneInline(RenderFlow* src);
-  void paintOutline(QPainter* p,
-                    int tx,
-                    int ty,
-                    const QRect& prevLine,
-                    const QRect& thisLine,
-                    const QRect& nextLine);
-  void paintOutlines(QPainter* p, int tx, int ty);
 
  private:
   bool m_isContinuation : 1;  // Whether or not we're a continuation of an

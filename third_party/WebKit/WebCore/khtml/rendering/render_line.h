@@ -34,6 +34,7 @@ class EllipsisBox;
 class InlineFlowBox;
 class RootInlineBox;
 class RenderBlock;
+class RenderFlow;
 
 // InlineBox represents a rectangle that occurs on a line.  It corresponds to
 // some RenderObject (i.e., it represents a portion of that RenderObject).
@@ -64,6 +65,13 @@ class InlineBox {
   virtual void attachLine();
 
   virtual void adjustPosition(int dx, int dy);
+
+  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
   // Overloaded new operator.
   void* operator new(size_t sz, RenderArena* renderArena) throw();
@@ -194,8 +202,7 @@ class InlineRunBox : public InlineBox {
 
   virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                         int _tx,
-                                        int _ty,
-                                        int xOffsetOnLine){};
+                                        int _ty){};
   virtual void paintDecorations(RenderObject::PaintInfo& i,
                                 int _tx,
                                 int _ty,
@@ -214,6 +221,8 @@ class InlineFlowBox : public InlineRunBox {
     m_includeLeftEdge = m_includeRightEdge = false;
     m_hasTextChildren = false;
   }
+
+  RenderFlow* flowObject();
 
   virtual bool isInlineFlowBox() { return true; }
 
@@ -249,8 +258,7 @@ class InlineFlowBox : public InlineRunBox {
 
   virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                         int _tx,
-                                        int _ty,
-                                        int xOffsetOnLine);
+                                        int _ty);
   void paintBackgrounds(QPainter* p,
                         const QColor& c,
                         const BackgroundLayer* bgLayer,
@@ -259,8 +267,7 @@ class InlineFlowBox : public InlineRunBox {
                         int _tx,
                         int _ty,
                         int w,
-                        int h,
-                        int xoff);
+                        int h);
   void paintBackground(QPainter* p,
                        const QColor& c,
                        const BackgroundLayer* bgLayer,
@@ -269,12 +276,17 @@ class InlineFlowBox : public InlineRunBox {
                        int _tx,
                        int _ty,
                        int w,
-                       int h,
-                       int xoff);
+                       int h);
   virtual void paintDecorations(RenderObject::PaintInfo& i,
                                 int _tx,
                                 int _ty,
                                 bool paintedChildren = false);
+  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
   int marginBorderPaddingLeft();
   int marginBorderPaddingRight();
@@ -428,6 +440,13 @@ class RootInlineBox : public InlineFlowBox {
                           bool inBox);
 
   virtual void clearTruncation();
+
+  virtual void paint(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual bool nodeAtPoint(RenderObject::NodeInfo& i,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty);
 
   bool hasSelectedChildren() const { return m_hasSelectedChildren; }
   void setHasSelectedChildren(bool b);
