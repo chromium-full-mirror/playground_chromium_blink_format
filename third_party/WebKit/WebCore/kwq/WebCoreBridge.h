@@ -195,10 +195,14 @@ enum FrameBorderStyle {
  * repeatable results for loads of the same frameset. */
 - (NSString*)generateFrameName;
 
-- (void)loadURL:(NSURL*)URL reload:(BOOL)reload triggeringEvent:(NSEvent*)event;
+- (void)loadURL:(NSURL*)URL
+              reload:(BOOL)reload
+     triggeringEvent:(NSEvent*)event
+    isFormSubmission:(BOOL)isFormSubmission;
 - (void)postWithURL:(NSURL*)URL
                data:(NSData*)data
-        contentType:(NSString*)contentType;
+        contentType:(NSString*)contentType
+    triggeringEvent:(NSEvent*)event;
 
 - (WebCoreBridge*)createWindowWithURL:(NSURL*)URL frameName:(NSString*)name;
 - (void)showWindow;

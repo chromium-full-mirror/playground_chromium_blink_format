@@ -3194,7 +3194,11 @@ void KHTMLPart::submitForm(const char* action,
     d->m_submitForm->submitBoundary = boundary;
     connect(this, SIGNAL(completed()), this, SLOT(submitFormAgain()));
   } else {
+#if APPLE_CHANGES
+    kwq->submitForm(u, args);
+#else
     emit d->m_extension->openURLRequest(u, args);
+#endif
   }
 }
 

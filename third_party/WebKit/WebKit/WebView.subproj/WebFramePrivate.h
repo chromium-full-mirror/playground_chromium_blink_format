@@ -112,16 +112,18 @@ typedef enum {
                      (WebNavigationType)navigationType
                                                event:(NSEvent*)event;
 - (BOOL)_continueAfterNavigationPolicyForRequest:(WebResourceRequest*)request
-                                           event:(NSEvent*)event;
+                                      dataSource:(WebDataSource*)dataSource;
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
-           loadType:(WebFrameLoadType)loadType
-     clientRedirect:(BOOL)clientRedirect
-    triggeringEvent:(NSEvent*)event;
+            loadType:(WebFrameLoadType)loadType
+      clientRedirect:(BOOL)clientRedirect
+     triggeringEvent:(NSEvent*)event
+    isFormSubmission:(BOOL)isFormSubmission;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
                 data:(NSData*)data
-         contentType:(NSString*)contentType;
+         contentType:(NSString*)contentType
+     triggeringEvent:(NSEvent*)event;
 
 - (void)_saveScrollPositionToItem:(WebHistoryItem*)item;
 - (void)_restoreScrollPosition;
