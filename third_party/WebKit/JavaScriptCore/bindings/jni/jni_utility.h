@@ -68,8 +68,6 @@ jvalue convertValueToJValue(KJS::ExecState* exec,
                             KJS::Value value,
                             JNIType _JNIType,
                             const char* javaClassName);
-jobject convertValueToJObject(KJS::ExecState* exec, KJS::Value value);
-KJS::Value convertJObjectToValue(KJS::ExecState* exec, jobject);
 
 jvalue getJNIField(jobject obj,
                    JNIType type,
@@ -136,8 +134,6 @@ jdouble callJNIDoubleMethodA(jobject obj,
                              const char* name,
                              const char* sig,
                              jvalue* args);
-
-KJS::List listFromJArray(jobjectArray jArray);
 
 JavaVM* getJavaVM();
 JNIEnv* getJNIEnv();

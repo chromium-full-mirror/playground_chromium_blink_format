@@ -42,8 +42,6 @@ RuntimeMethodImp::~RuntimeMethodImp() {}
 
 Value RuntimeMethodImp::get(ExecState* exec,
                             const Identifier& propertyName) const {
-  fprintf(stderr, "%s: this=%p, %s\n", __PRETTY_FUNCTION__, this,
-          propertyName.ascii());
   // Find the arguments from the closest context.
   if (propertyName == argumentsPropertyName) {
     ContextImp* context = exec->_context;
@@ -82,13 +80,9 @@ Value RuntimeMethodImp::call(ExecState* exec,
 }
 
 CodeType RuntimeMethodImp::codeType() const {
-  fprintf(stderr, "%s: this=%p\n", __PRETTY_FUNCTION__, this);
-  // NOTE:  What is this?  I don't think this is ever called.
   return FunctionCode;
 }
 
 Completion RuntimeMethodImp::execute(ExecState* exec) {
-  fprintf(stderr, "%s: this=%p\n", __PRETTY_FUNCTION__, this);
-  // NOTE:  What is this?  I don't think this is ever called.
   return Completion(Normal, Undefined());
 }
