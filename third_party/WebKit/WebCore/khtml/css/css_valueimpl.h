@@ -72,6 +72,15 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
                          bool important,
                          bool nonCSSHint = true,
                          bool multiLength = false);
+  void setStringProperty(int propertyId,
+                         const DOM::DOMString& value,
+                         DOM::CSSPrimitiveValue::UnitTypes,
+                         bool important = false,
+                         bool nonCSSHint = false);  // parsed string value
+  void setImageProperty(int propertyId,
+                        const DOM::DOMString& URL,
+                        bool important = false,
+                        bool nonCSSHint = false);
 
   // add a whole, unparsed property
   void setProperty(const DOMString& propertyString);

@@ -67,11 +67,13 @@ void HTMLBodyElementImpl::parseAttribute(AttributeImpl* attr) {
     case ATTR_BACKGROUND: {
       QString url = khtml::parseURL(attr->value()).string();
       if (!url.isEmpty()) {
-        url = getDocument()->completeURL(url);
-        addCSSProperty(CSS_PROP_BACKGROUND_IMAGE, "url('" + url + "')");
+        addCSSImageProperty(CSS_PROP_BACKGROUND_IMAGE,
+                            getDocument()->completeURL(url));
         m_bgSet = true;
-      } else
+      } else {
+        removeCSSProperty(CSS_PROP_BACKGROUND_IMAGE);
         m_bgSet = false;
+      }
       break;
     }
     case ATTR_MARGINWIDTH:
