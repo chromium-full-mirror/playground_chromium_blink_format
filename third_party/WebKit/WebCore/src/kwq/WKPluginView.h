@@ -63,5 +63,6 @@ typedef struct EventRecord EventRecord;
 - (void)drawRect:(NSRect)rect;
 - (BOOL)acceptsFirstResponder;
 - (void)sendNullEvent;
+- (void)dealloc;
 
 @end
