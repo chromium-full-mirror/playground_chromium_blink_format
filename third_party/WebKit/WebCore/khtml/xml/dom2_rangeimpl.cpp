@@ -110,7 +110,7 @@ long RangeImpl::endOffset(int& exceptioncode) const {
   return m_endOffset;
 }
 
-NodeImpl* RangeImpl::commonAncestorContainer(int& exceptioncode) {
+NodeImpl* RangeImpl::commonAncestorContainer(int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return 0;
@@ -242,8 +242,8 @@ void RangeImpl::collapse(bool toStart, int& exceptioncode) {
 }
 
 short RangeImpl::compareBoundaryPoints(Range::CompareHow how,
-                                       RangeImpl* sourceRange,
-                                       int& exceptioncode) {
+                                       const RangeImpl* sourceRange,
+                                       int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return 0;
@@ -385,13 +385,9 @@ short RangeImpl::compareBoundaryPoints(NodeImpl* containerA,
     return 1;  // A is after B
 }
 
-bool RangeImpl::boundaryPointsValid() {
-  short valid = compareBoundaryPoints(m_startContainer, m_startOffset,
-                                      m_endContainer, m_endOffset);
-  if (valid == 1)
-    return false;
-  else
-    return true;
+bool RangeImpl::boundaryPointsValid() const {
+  return compareBoundaryPoints(m_startContainer, m_startOffset, m_endContainer,
+                               m_endOffset) <= 0;
 }
 
 void RangeImpl::deleteContents(int& exceptioncode) {
@@ -745,18 +741,7 @@ void RangeImpl::insertNode(NodeImpl* newNode, int& exceptioncode) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised if an ancestor container of either
   // boundary-point of
   // the Range is read-only.
-  NodeImpl* n = m_startContainer;
-  while (n && !n->isReadOnly())
-    n = n->parentNode();
-  if (n) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
-  n = m_endContainer;
-  while (n && !n->isReadOnly())
-    n = n->parentNode();
-  if (n) {
+  if (containedByReadOnly()) {
     exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
@@ -807,7 +792,7 @@ void RangeImpl::insertNode(NodeImpl* newNode, int& exceptioncode) {
     }
   }
 
-  for (n = m_startContainer; n; n = n->parentNode()) {
+  for (NodeImpl* n = m_startContainer; n; n = n->parentNode()) {
     if (n == newNode) {
       exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
       return;
@@ -839,7 +824,7 @@ void RangeImpl::insertNode(NodeImpl* newNode, int& exceptioncode) {
   }
 }
 
-DOMString RangeImpl::toString(int& exceptioncode) {
+DOMString RangeImpl::toString(int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return DOMString();
@@ -861,7 +846,7 @@ DOMString RangeImpl::toString(int& exceptioncode) {
   return text;
 }
 
-DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes) {
+DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes) const {
   int exceptionCode;
   NodeImpl* commonAncestor = commonAncestorContainer(exceptionCode);
   NodeImpl* commonAncestorBlock =
@@ -889,8 +874,9 @@ DOMString RangeImpl::text() const {
   return plainText(const_cast<RangeImpl*>(this));
 }
 
-DocumentFragmentImpl* RangeImpl::createContextualFragment(DOMString& html,
-                                                          int& exceptioncode) {
+DocumentFragmentImpl* RangeImpl::createContextualFragment(
+    DOMString& html,
+    int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return NULL;
@@ -987,7 +973,7 @@ void RangeImpl::checkNodeBA(NodeImpl* n, int& exceptioncode) const {
                     RangeException::_EXCEPTION_OFFSET;
 }
 
-RangeImpl* RangeImpl::cloneRange(int& exceptioncode) {
+RangeImpl* RangeImpl::cloneRange(int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return 0;
@@ -1168,23 +1154,7 @@ void RangeImpl::surroundContents(NodeImpl* newParent, int& exceptioncode) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised if an ancestor container of either
   // boundary-point of
   // the Range is read-only.
-  if (readOnly()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
-  NodeImpl* n = m_startContainer;
-  while (n && !n->isReadOnly())
-    n = n->parentNode();
-  if (n) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return;
-  }
-
-  n = m_endContainer;
-  while (n && !n->isReadOnly())
-    n = n->parentNode();
-  if (n) {
+  if (containedByReadOnly()) {
     exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
@@ -1208,7 +1178,7 @@ void RangeImpl::surroundContents(NodeImpl* newParent, int& exceptioncode) {
     return;
   }
 
-  for (n = m_startContainer; n; n = n->parentNode()) {
+  for (NodeImpl* n = m_startContainer; n; n = n->parentNode()) {
     if (n == newParent) {
       exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
       return;
