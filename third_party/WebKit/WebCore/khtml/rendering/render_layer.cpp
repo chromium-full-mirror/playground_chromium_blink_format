@@ -242,7 +242,12 @@ void RenderLayer::convertToLayerCoords(RenderLayer* ancestorLayer,
   y += yPos();
 }
 
-void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
+void RenderLayer::paint(QPainter* p,
+                        int x,
+                        int y,
+                        int w,
+                        int h,
+                        bool selectionOnly) {
   // Create the z-tree of layers that should be displayed.
   QRect damageRect(x, y, w, h);
   RenderZTreeNode* node = constructZTree(damageRect, damageRect, this);
@@ -328,17 +333,25 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
       }
     }
 
-    elt->layer->renderer()->paint(
-        p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
-        elt->absBounds.y() - elt->layer->renderer()->yPos(),
-        PaintActionBackground);
-    elt->layer->renderer()->paint(
-        p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
-        elt->absBounds.y() - elt->layer->renderer()->yPos(), PaintActionFloat);
-    elt->layer->renderer()->paint(
-        p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
-        elt->absBounds.y() - elt->layer->renderer()->yPos(),
-        PaintActionForeground);
+    if (selectionOnly) {
+      elt->layer->renderer()->paint(
+          p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
+          elt->absBounds.y() - elt->layer->renderer()->yPos(),
+          PaintActionSelection);
+    } else {
+      elt->layer->renderer()->paint(
+          p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
+          elt->absBounds.y() - elt->layer->renderer()->yPos(),
+          PaintActionBackground);
+      elt->layer->renderer()->paint(
+          p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
+          elt->absBounds.y() - elt->layer->renderer()->yPos(),
+          PaintActionFloat);
+      elt->layer->renderer()->paint(
+          p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
+          elt->absBounds.y() - elt->layer->renderer()->yPos(),
+          PaintActionForeground);
+    }
   }
 
   if (currRect != paintRect)

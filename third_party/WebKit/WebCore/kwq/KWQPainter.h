@@ -115,6 +115,8 @@ class QPainter : public Qt {
                        int y,
                        const QChar*,
                        int length,
+                       int from,
+                       int to,
                        int toAdd,
                        int yOffset,
                        QPainter::TextDirection d,

@@ -83,7 +83,9 @@ class TextSlave {
                        int _ty,
                        int decoration,
                        bool begin,
-                       bool end);
+                       bool end,
+                       int from,
+                       int to);
 #else
   void paintDecoration(QPainter* pt,
                        RenderText* p,

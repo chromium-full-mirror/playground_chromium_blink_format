@@ -49,9 +49,11 @@ void Font::drawLineForText(QPainter* p,
                            int len,
                            int toAdd,
                            int yOffset,
-                           QPainter::TextDirection d) const {
-  p->drawLineForText(x, y, str + pos, std::min(slen - pos, len), toAdd, yOffset,
-                     d, letterSpacing, wordSpacing);
+                           QPainter::TextDirection d,
+                           int from,
+                           int to) const {
+  p->drawLineForText(x, y, str + pos, std::min(slen - pos, len), from, to,
+                     toAdd, yOffset, d, letterSpacing, wordSpacing);
 }
 #endif
 

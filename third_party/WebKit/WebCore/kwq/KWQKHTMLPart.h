@@ -145,6 +145,7 @@ class KWQKHTMLPart : public KHTMLPart {
   khtml::RenderObject* renderer();
   void forceLayout();
   void paint(QPainter*, const QRect&);
+  void paintSelectionOnly(QPainter* p, const QRect& rect);
 
   void createEmptyDocument();
 
@@ -160,6 +161,8 @@ class KWQKHTMLPart : public KHTMLPart {
   int selectionStartOffset() const;
   DOM::NodeImpl* selectionEnd() const;
   int selectionEndOffset() const;
+
+  QRect selectionRect() const;
 
   static NSAttributedString* attributedString(DOM::NodeImpl* startNode,
                                               int startOffset,
