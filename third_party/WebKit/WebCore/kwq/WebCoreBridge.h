@@ -522,6 +522,8 @@ typedef enum {
 - (BOOL)interceptEditingKeyEvent:(NSEvent*)event;
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
 - (BOOL)isEditable;
+- (BOOL)shouldBeginEditing:(DOMRange*)range;
+- (BOOL)shouldEndEditing:(DOMRange*)range;
 
 - (NSString*)overrideMediaType;
 

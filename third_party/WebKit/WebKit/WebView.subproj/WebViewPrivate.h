@@ -346,6 +346,8 @@ backforward list.
 @interface WebView (WebViewEditingExtras)
 - (BOOL)_interceptEditingKeyEvent:(NSEvent*)event;
 - (DOMDocument*)DOMDocument;
+- (BOOL)_shouldBeginEditingInDOMRange:(DOMRange*)range;
+- (BOOL)_shouldEndEditingInDOMRange:(DOMRange*)range;
 @end
 
 @interface WebView (JavaScriptBinding)

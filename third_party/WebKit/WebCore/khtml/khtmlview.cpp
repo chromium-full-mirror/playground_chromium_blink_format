@@ -1761,9 +1761,9 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
            nodeImpl = nodeImpl->parentNode())
         ;
       if (nodeImpl && nodeImpl->isMouseFocusable())
-        m_part->xmlDocImpl()->setFocusNode(nodeImpl);
+        swallowEvent = !m_part->xmlDocImpl()->setFocusNode(nodeImpl);
       else if (!nodeImpl || !nodeImpl->focused())
-        m_part->xmlDocImpl()->setFocusNode(0);
+        swallowEvent = !m_part->xmlDocImpl()->setFocusNode(0);
     }
   }
 
