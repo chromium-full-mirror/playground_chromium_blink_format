@@ -340,7 +340,7 @@ void RenderObject::setLayouted(bool b) {
       l->updateLayerPosition();
     }
   } else {
-    RenderObject* o = m_parent;
+    RenderObject* o = container();
     RenderObject* root = this;
 
     // If an attempt is made to
@@ -358,7 +358,7 @@ void RenderObject::setLayouted(bool b) {
       o->m_layouted = false;
       if (o->style()->overflow() == OHIDDEN && !clippedObj)
         clippedObj = o;
-      o = o->m_parent;
+      o = o->container();
     }
 
     root->scheduleRelayout(clippedObj);
@@ -887,7 +887,7 @@ void RenderObject::setStyle(RenderStyle* style) {
 
   RenderStyle::Diff d = m_style ? m_style->diff(style) : RenderStyle::Layout;
 
-  if (m_style && m_parent && d == RenderStyle::Visible)
+  if (m_style && m_parent && d == RenderStyle::Visible && !isText())
     // Do a repaint with the old style first, e.g., for example if we go from
     // having an outline to not having an outline.
     repaint();
