@@ -714,8 +714,9 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       // http://www.hixie.ch/tests/adhoc/css/box/block/margin-collapse/046.html
       // for
       // an example of this scenario.
-      int marginOffset =
-          !topMarginContributor ? (prevPosMargin - prevNegMargin) : 0;
+      int marginOffset = (!topMarginContributor || !canCollapseTopWithChildren)
+                             ? (prevPosMargin - prevNegMargin)
+                             : 0;
 
       m_height += marginOffset;
       positionNewFloats();
@@ -1128,6 +1129,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
   // If we can't collapse with children then go ahead and add in the bottom
   // margins.
   if (!canCollapseBottomWithChildren &&
+      (!topMarginContributor || !canCollapseTopWithChildren) &&
       (strictMode || !quirkContainer || !bottomChildQuirk))
     m_height += prevPosMargin - prevNegMargin;
 
