@@ -140,6 +140,14 @@ bool InlineBox::prevOnLineExists() const {
   return parent()->prevOnLineExists();
 }
 
+InlineBox* InlineBox::firstLeafChild() {
+  return this;
+}
+
+InlineBox* InlineBox::lastLeafChild() {
+  return this;
+}
+
 int InlineFlowBox::marginLeft() {
   if (!includeLeftEdge())
     return 0;
@@ -719,6 +727,34 @@ void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& i,
       p->clearShadow();
 #endif
   }
+}
+
+InlineBox* InlineFlowBox::firstLeafChild() {
+  InlineBox* box = firstChild();
+  while (box) {
+    InlineBox* next = 0;
+    if (!box->isInlineFlowBox())
+      break;
+    next = static_cast<InlineFlowBox*>(box)->firstChild();
+    if (!next)
+      break;
+    box = next;
+  }
+  return box;
+}
+
+InlineBox* InlineFlowBox::lastLeafChild() {
+  InlineBox* box = lastChild();
+  while (box) {
+    InlineBox* next = 0;
+    if (!box->isInlineFlowBox())
+      break;
+    next = static_cast<InlineFlowBox*>(box)->lastChild();
+    if (!next)
+      break;
+    box = next;
+  }
+  return box;
 }
 
 void RootInlineBox::adjustVerticalPosition(int delta) {

@@ -50,6 +50,7 @@ class RenderStyle;
 
 namespace DOM {
 
+class DOMPosition;
 class NodeListImpl;
 class NamedNodeMapImpl;
 class DocumentImpl;
@@ -178,6 +179,8 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   bool inSameRootEditableBlock(NodeImpl*);
   bool inSameContainingEditableBlock(NodeImpl*);
+
+  DOMPosition positionForCoordinates(int x, int y);
 
   // used by the parser. Doesn't do as many error checkings as
   // appendChild(), and returns the node into which will be parsed next.

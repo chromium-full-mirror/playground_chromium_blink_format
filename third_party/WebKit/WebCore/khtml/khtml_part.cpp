@@ -4460,28 +4460,24 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
     return false;
   }
 
-  int offset = 0, ax, ay;
-  DOM::NodeImpl* node = 0;
-
   // FIXME: Shouldn't be necessary to skip text nodes.
   if (innerNode->nodeType() == Node::TEXT_NODE) {
     innerNode = innerNode->parentNode();
   }
+  int ax, ay;
   innerNode->renderer()->absolutePosition(ax, ay);
-  innerNode->renderer()->checkSelectionPoint(
-      x, y, ax - innerNode->renderer()->xPos(),
-      ay - innerNode->renderer()->yPos(), node, offset);
-  if (!node) {
+  DOMPosition pos(innerNode->positionForCoordinates(ax, ay));
+  if (pos.isEmpty()) {
     return false;
   }
 
   DOM::NodeImpl* n = d->m_selection.startNode();
   while (n) {
-    if (n == node) {
+    if (n == pos.node()) {
       if ((n == d->m_selection.startNode() &&
-           offset < d->m_selection.startOffset()) ||
+           pos.offset() < d->m_selection.startOffset()) ||
           (n == d->m_selection.endNode() &&
-           offset > d->m_selection.endOffset())) {
+           pos.offset() > d->m_selection.endOffset())) {
         return false;
       }
       return true;
@@ -4504,21 +4500,6 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
 
 #if APPLE_CHANGES
 
-void KHTMLPart::checkSelectionPoint(khtml::MouseEvent* event,
-                                    DOM::NodeImpl*& node,
-                                    int& offset) {
-  DOM::Node innerNode = event->innerNode();
-
-  // EDIT FIXME: Shouldn't be necessary to skip text nodes.
-  if (innerNode.nodeType() == Node::TEXT_NODE)
-    innerNode = innerNode.parentNode();
-
-  innerNode.handle()->renderer()->checkSelectionPoint(
-      event->x(), event->y(),
-      event->absX() - innerNode.handle()->renderer()->xPos(),
-      event->absY() - innerNode.handle()->renderer()->yPos(), node, offset);
-}
-
 void KHTMLPart::handleMousePressEventDoubleClick(
     khtml::MousePressEvent* event) {
   QMouseEvent* mouse = event->qmouseEvent();
@@ -4528,12 +4509,11 @@ void KHTMLPart::handleMousePressEventDoubleClick(
 
   if (mouse->button() == LeftButton && !innerNode.isNull() &&
       innerNode.handle()->renderer()) {
-    NodeImpl* node = 0;
-    int offset = 0;
-    checkSelectionPoint(event, node, offset);
-    if (node && (node->nodeType() == Node::TEXT_NODE ||
-                 node->nodeType() == Node::CDATA_SECTION_NODE)) {
-      selection.moveTo(node, offset);
+    DOMPosition pos(
+        innerNode.handle()->positionForCoordinates(event->x(), event->y()));
+    if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
+                       pos.node()->nodeType() == Node::CDATA_SECTION_NODE)) {
+      selection.moveTo(pos);
       selection.expandToElement(KHTMLSelection::WORD);
     }
   }
@@ -4555,12 +4535,11 @@ void KHTMLPart::handleMousePressEventTripleClick(
 
   if (mouse->button() == LeftButton && !innerNode.isNull() &&
       innerNode.handle()->renderer()) {
-    NodeImpl* node = 0;
-    int offset = 0;
-    checkSelectionPoint(event, node, offset);
-    if (node && (node->nodeType() == Node::TEXT_NODE ||
-                 node->nodeType() == Node::CDATA_SECTION_NODE)) {
-      selection.moveTo(node, offset);
+    DOMPosition pos(
+        innerNode.handle()->positionForCoordinates(event->x(), event->y()));
+    if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
+                       pos.node()->nodeType() == Node::CDATA_SECTION_NODE)) {
+      selection.moveTo(pos);
       selection.expandToElement(KHTMLSelection::LINE);
     }
   }
@@ -4590,10 +4569,12 @@ void KHTMLPart::handleMousePressEventSingleClick(
         return;
       }
 #endif
-      DOM::NodeImpl* node = 0;
-      int offset = 0;
-      checkSelectionPoint(event, node, offset);
-      selection.moveTo(node, offset);
+      DOMPosition pos(
+          innerNode.handle()->positionForCoordinates(event->x(), event->y()));
+      if (pos.isEmpty())
+        pos = DOMPosition(innerNode.handle(),
+                          innerNode.handle()->caretMinOffset());
+      selection = pos;
     }
 
     setSelection(selection);
@@ -4792,14 +4773,12 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
     return;
 
   // handle making selection
-  DOM::NodeImpl* node = 0;
-  int offset = 0;
-
-  checkSelectionPoint(event, node, offset);
+  DOMPosition pos(
+      innerNode.handle()->positionForCoordinates(event->x(), event->y()));
 
 #if APPLE_CHANGES
   // Don't modify the selection if we're not on a node.
-  if (node == 0)
+  if (pos.isEmpty())
     return;
 
   // Restart the selection if this is the first mouse move. This work is usually
@@ -4809,11 +4788,11 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   sel.clearModifyBias();
   if (!d->m_mouseMovedSinceLastMousePress) {
     d->m_mouseMovedSinceLastMousePress = true;
-    sel.moveTo(node, offset);
+    sel.moveTo(pos);
   }
 #endif
 
-  sel.setExtent(node, offset);
+  sel.setExtent(pos.node(), pos.offset());
 
 #if APPLE_CHANGES
   if (d->m_textElement != KHTMLSelection::CHARACTER) {
@@ -4882,12 +4861,9 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
       d->m_selection.state() == KHTMLSelection::RANGE &&
       d->m_textElement == KHTMLSelection::CHARACTER) {
     KHTMLSelection selection;
-    if (isEditingAtNode(d->m_selection.baseNode())) {
-      NodeImpl* node = 0;
-      int offset = 0;
-      checkSelectionPoint(event, node, offset);
-      selection.moveTo(node, offset);
-    }
+    if (isEditingAtNode(d->m_selection.baseNode()))
+      selection.moveTo(d->m_selection.baseNode()->positionForCoordinates(
+          event->x(), event->y()));
     setSelection(selection);
   }
 #endif

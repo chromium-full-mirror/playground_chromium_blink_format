@@ -96,6 +96,9 @@ class InlineBox {
   bool nextOnLineExists() const;
   bool prevOnLineExists() const;
 
+  virtual InlineBox* firstLeafChild();
+  virtual InlineBox* lastLeafChild();
+
   RenderObject* object() const { return m_object; }
 
   InlineFlowBox* parent() const { return m_parent; }
@@ -197,6 +200,9 @@ class InlineFlowBox : public InlineRunBox {
 
   InlineBox* firstChild() { return m_firstChild; }
   InlineBox* lastChild() { return m_lastChild; }
+
+  virtual InlineBox* firstLeafChild();
+  virtual InlineBox* lastLeafChild();
 
   virtual void setConstructed() {
     InlineBox::setConstructed();

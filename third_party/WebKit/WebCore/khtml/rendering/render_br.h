@@ -74,14 +74,6 @@ class RenderBR : public RenderText {
                         int& _w,
                         int& _h);
 
-  virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
-      int _x,
-      int _y,
-      int _tx,
-      int _ty,
-      DOM::NodeImpl*& node,
-      int& offset);
-
  private:
   int m_x;
   int m_y;

@@ -36,6 +36,10 @@
 class QPainter;
 class QFontMetrics;
 
+namespace DOM {
+class DOMPosition;
+};
+
 // Define a constant for soft hyphen's unicode value.
 #define SOFT_HYPHEN 173
 
@@ -106,15 +110,7 @@ class InlineTextBox : public InlineRunBox {
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;
 
-  // Return before, after (offset set to max), or inside the text, at @p offset
-  FindSelectionResult checkSelectionPoint(int _x,
-                                          int _y,
-                                          int _tx,
-                                          int _ty,
-                                          const Font* f,
-                                          RenderText* text,
-                                          int& offset,
-                                          short lineheight);
+  int offsetForPosition(int _x, int _tx, const Font* f, const RenderText* text);
 
   /**
    * if this text run was rendered @ref _ty pixels below the upper edge
@@ -176,14 +172,7 @@ class RenderText : public RenderObject {
 
   virtual void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
 
-  // Return before, after (offset set to max), or inside the text, at @p offset
-  virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
-      int _x,
-      int _y,
-      int _tx,
-      int _ty,
-      DOM::NodeImpl*& node,
-      int& offset);
+  virtual DOM::DOMPosition positionForCoordinates(int _x, int _y);
 
   unsigned int length() const { return str->l; }
   QChar* text() const { return str->s; }
