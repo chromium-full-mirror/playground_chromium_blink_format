@@ -215,8 +215,8 @@ static QString decode(const QString& segment,
   QString result;
   // Encoding specified
   if (encoding_hint) {
-    QTextCodec* textCodec = codecForHint(encoding_hint);
     // FIXME: ignoring encodings for now
+    // QTextCodec * textCodec = codecForHint( encoding_hint );
     /*
     if (textCodec)
     {
@@ -1070,7 +1070,7 @@ KURL KURL::join(const KURL::List& lst) {
 QString KURL::fileName(bool _strip_trailing_slash) const {
   QString fname;
 
-  int len = m_strPath.length();
+  unsigned int len = m_strPath.length();
   if (len == 0)
     return fname;
 

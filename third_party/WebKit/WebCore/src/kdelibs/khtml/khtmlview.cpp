@@ -140,6 +140,10 @@ class KHTMLToolTip : public QToolTip {
     m_viewprivate = vp;
   };
 
+#ifdef _KWQ_
+  virtual ~KHTMLToolTip() {}
+#endif
+
  protected:
   virtual void maybeTip(const QPoint&);
 
@@ -1086,7 +1090,8 @@ void KHTMLView::addFormCompletionItem(const QString& name,
   // dashes or spaces as those are likely credit card numbers or
   // something similar
   bool cc_number(true);
-  for (int i = 0; i < value.length(); ++i) {
+  // [kocienda] fixed signed/unsigned int comparison
+  for (unsigned int i = 0; i < value.length(); ++i) {
     QChar c(value[i]);
     if (!c.isNumber() && c != '-' && !c.isSpace()) {
       cc_number = false;

@@ -61,7 +61,7 @@ class QImageConsumer {
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~QImageConsumer() {}
+  virtual ~QImageConsumer() {}
 #endif
 
   // member functions --------------------------------------------------------
