@@ -221,14 +221,8 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
   void setStringValue(unsigned short stringType,
                       const DOM::DOMString& stringValue,
                       int& exceptioncode);
-  DOM::DOMStringImpl* getStringValue() const {
-    return ((m_type < CSSPrimitiveValue::CSS_STRING ||
-             m_type > CSSPrimitiveValue::CSS_ATTR ||
-             m_type == CSSPrimitiveValue::CSS_IDENT)
-                ?  // fix IDENT
-                0
-                : m_value.string);
-  }
+  DOM::DOMString getStringValue() const;
+
   CounterImpl* getCounterValue() const {
     return (m_type != CSSPrimitiveValue::CSS_COUNTER ? 0 : m_value.counter);
   }
