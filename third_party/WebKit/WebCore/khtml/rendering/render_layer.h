@@ -143,6 +143,8 @@ class RenderLayer {
   void removeOnlyThisLayer();
   void insertOnlyThisLayer();
 
+  void repaintIncludingDescendants();
+
   void styleChanged();
 
   Marquee* marquee() const { return m_marquee; }

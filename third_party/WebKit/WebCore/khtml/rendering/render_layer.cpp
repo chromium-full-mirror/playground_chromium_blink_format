@@ -1246,6 +1246,12 @@ void RenderLayer::collectLayers(QPtrVector<RenderLayer>*& posBuffer,
   }
 }
 
+void RenderLayer::repaintIncludingDescendants() {
+  m_object->repaint();
+  for (RenderLayer* curr = firstChild(); curr; curr = curr->nextSibling())
+    curr->repaintIncludingDescendants();
+}
+
 void RenderLayer::styleChanged() {
   if (m_object->style()->overflow() == OMARQUEE &&
       m_object->style()->marqueeBehavior() != MNONE) {
