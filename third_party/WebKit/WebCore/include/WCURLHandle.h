@@ -14,8 +14,6 @@
 - (void)WCURLHandleResourceDidFinishLoading:(id)sender userData:(void*)userData;
 - (void)WCURLHandle:(id)sender
     resourceDataDidBecomeAvailable:(NSData*)data
-                            offset:(int)offset
-                            length:(int)length
                           userData:(void*)userData;
 - (void)WCURLHandle:(id)sender
     resourceDidFailLoadingWithResult:(int)result
