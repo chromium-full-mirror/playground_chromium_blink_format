@@ -28,6 +28,7 @@
 
 #include "qobject.h"
 #include "qpaintdevice.h"
+#include "qpainter.h"
 #include "qpoint.h"
 #include "qsize.h"
 #include "qpalette.h"
@@ -57,7 +58,6 @@ class QWidget : public QObject, public QPaintDevice {
   virtual void resize(int, int);
   void resize(const QSize&);
   QPoint pos() const;
-  virtual void show();
   virtual void move(const QPoint&);
   void move(int, int);
   QWidget* topLevelWidget() const;
@@ -84,6 +84,9 @@ class QWidget : public QObject, public QPaintDevice {
   virtual void setCursor(const QCursor&);
   bool event(QEvent*);
   bool focusNextPrevChild(bool);
+  virtual void show();
+  virtual void hide();
+  bool hasMouseTracking() const;
 };
 
 #endif
