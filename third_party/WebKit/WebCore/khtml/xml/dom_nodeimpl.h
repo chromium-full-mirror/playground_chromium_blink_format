@@ -190,6 +190,13 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   // appendChild(), and returns the node into which will be parsed next.
   virtual NodeImpl* addChild(NodeImpl* newChild);
 
+  // called by the parser when this element's close tag is reached,
+  // signalling that all child tags have been parsed and added.
+  // This is only needed for <applet> and <object> elements, which can't lay
+  // themselves out
+  // until they know all of their nested <param>s. [3603191, 4040848]
+  virtual void closeRenderer() {}
+
   typedef Q_UINT32 Id;
   // id() is used to easily and exactly identify a node. It
   // is optimized for quick comparison and low memory consumption.
