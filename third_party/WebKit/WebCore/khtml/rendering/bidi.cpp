@@ -651,6 +651,7 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
   int availableWidth = lineWidth(m_height);
   switch (style()->textAlign()) {
     case LEFT:
+    case KONQ_LEFT:
       numSpaces = 0;
       break;
     case JUSTIFY:
@@ -663,6 +664,7 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
       if (endEmbed->basicDir == QChar::DirL)
         break;
     case RIGHT:
+    case KONQ_RIGHT:
       x += availableWidth - totWidth;
       numSpaces = 0;
       break;
