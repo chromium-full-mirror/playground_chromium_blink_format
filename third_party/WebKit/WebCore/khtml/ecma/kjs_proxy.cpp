@@ -134,7 +134,9 @@ QVariant KJSProxyImpl::evaluate(QString filename,
     return ValueToVariant(m_script->globalExec(), comp.value());
   else {
     if (comp.complType() == Throw) {
+      KJS::Interpreter::lock();
       UString msg = comp.value().toString(m_script->globalExec());
+      KJS::Interpreter::unlock();
       kdWarning(6070) << "Script threw exception: " << msg.qstring() << endl;
     }
     return QVariant();
@@ -272,8 +274,10 @@ void KJSProxyImpl::initScript() {
   m_script->setDebuggingEnabled(m_debugEnabled);
 #endif
   // m_script->enableDebug();
+  KJS::Interpreter::lock();
   globalObject.put(m_script->globalExec(), "debug",
                    Value(new TestFunctionImp()), Internal);
+  KJS::Interpreter::unlock();
 
 #if APPLE_CHANGES
   QString userAgent = KWQ(m_part)->userAgent();
