@@ -172,6 +172,8 @@ backforward list.
 - _policyDelegateForwarder;
 - _UIDelegateForwarder;
 
+- (void)_closeWindow;
+
 - (void)_registerDraggedTypes;
 
 - (void)_close;

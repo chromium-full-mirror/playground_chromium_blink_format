@@ -300,7 +300,7 @@ enum FrameBorderStyle {
 - (NSResponder*)firstResponder;
 - (void)makeFirstResponder:(NSResponder*)view;
 
-- (void)closeWindow;
+- (void)closeWindowSoon;
 
 - (void)runJavaScriptAlertPanelWithMessage:(NSString*)message;
 - (BOOL)runJavaScriptConfirmPanelWithMessage:(NSString*)message;
