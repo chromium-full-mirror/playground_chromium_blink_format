@@ -630,6 +630,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     setHasHorizontalScrollbar(needHorizontalBar);
     setHasVerticalScrollbar(needVerticalBar);
 
+    m_object->repaint();
     if (m_object->style()->overflow() == OAUTO) {
       // Our proprietary overflow: overlay value doesn't trigger a layout.
       m_object->setNeedsLayout(true);
@@ -637,8 +638,8 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         static_cast<RenderBlock*>(m_object)->layoutBlock(true);
       else
         m_object->layout();
+      return;
     }
-    return;
   }
 
   // Set up the range (and page step/line step).
