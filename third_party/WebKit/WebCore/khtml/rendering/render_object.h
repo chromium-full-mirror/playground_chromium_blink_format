@@ -730,6 +730,9 @@ class RenderObject : public CachedObjectClient {
     return style(firstLine)->fontMetrics();
   }
 
+  // Convenience, to avoid repeating the code to dig down to get this.
+  QChar backslashAsCurrencySymbol() const;
+
  protected:
   virtual void selectionStartEnd(int& spos, int& epos);
 

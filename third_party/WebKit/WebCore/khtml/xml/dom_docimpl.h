@@ -284,10 +284,6 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setBaseTarget(const QString& baseTarget) { m_baseTarget = baseTarget; }
 
 #if APPLE_CHANGES
-  void setDecoder(khtml::Decoder* d) {
-    m_decoder = d;
-    d->ref();
-  }
   QString completeURL(const QString&);
 #else
   QString completeURL(const QString& url) {
@@ -589,6 +585,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   void setShouldCreateRenderers(bool f);
   bool shouldCreateRenderers();
+
+  void setDecoder(khtml::Decoder*);
+  khtml::Decoder* decoder() const { return m_decoder; }
 
  private:
   bool m_inPageCache;

@@ -249,6 +249,7 @@ void RenderImage::paintObject(QPainter* p,
 
       if (!alt.isEmpty()) {
         QString text = alt.string();
+        text.replace('\\', backslashAsCurrencySymbol());
         p->setFont(style()->font());
         p->setPen(style()->color());
         int ax = _tx + leftBorder + leftPad;
@@ -285,6 +286,7 @@ void RenderImage::paintObject(QPainter* p,
       }
       if (!alt.isEmpty()) {
         QString text = alt.string();
+        text.replace('\\', backslashAsCurrencySymbol());
         p->setFont(style()->font());
         p->setPen(style()->color());
         int ax = _tx + leftBorder + leftPad + 2;

@@ -231,6 +231,9 @@ class KWQKHTMLPart : public KHTMLPart {
     return _usesInactiveTextBackgroundColor;
   }
 
+  // Convenience, to avoid repeating the code to dig down to get this.
+  QChar backslashAsCurrencySymbol() const;
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);

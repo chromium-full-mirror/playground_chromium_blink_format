@@ -350,8 +350,10 @@ RenderText::RenderText(DOM::NodeImpl* node, DOMStringImpl* _str)
 #endif
 
   str = _str;
-  if (str)
+  if (str) {
+    str = str->replace('\\', backslashAsCurrencySymbol());
     str->ref();
+  }
   KHTMLAssert(!str || !str->l || str->s);
 
   m_selectionState = SelectionNone;
@@ -1161,25 +1163,28 @@ void RenderText::setText(DOMStringImpl* text, bool force) {
     return;
   if (str)
     str->deref();
-  str = text;
 
-  if (str && style()) {
-    if (style()->fontVariant() == SMALL_CAPS)
-      str = str->upper();
-    else
-      switch (style()->textTransform()) {
-        case CAPITALIZE:
-          str = str->capitalize();
-          break;
-        case UPPERCASE:
-          str = str->upper();
-          break;
-        case LOWERCASE:
-          str = str->lower();
-          break;
-        case NONE:
-        default:;
-      }
+  str = text;
+  if (str) {
+    str = str->replace('\\', backslashAsCurrencySymbol());
+    if (style()) {
+      if (style()->fontVariant() == SMALL_CAPS)
+        str = str->upper();
+      else
+        switch (style()->textTransform()) {
+          case CAPITALIZE:
+            str = str->capitalize();
+            break;
+          case UPPERCASE:
+            str = str->upper();
+            break;
+          case LOWERCASE:
+            str = str->lower();
+            break;
+          case NONE:
+          default:;
+        }
+    }
     str->ref();
   }
 

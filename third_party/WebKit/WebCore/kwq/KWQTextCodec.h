@@ -45,6 +45,8 @@ class QTextCodec {
   bool usesVisualOrdering() const { return _flags & VisualOrdering; }
   bool isJapanese() const { return _flags & IsJapanese; }
 
+  QChar backslashAsCurrencySymbol() const;
+
   QTextDecoder* makeDecoder() const;
 
   QCString fromUnicode(const QString&) const;
