@@ -43,29 +43,31 @@ class QChar {
   bool isNull() const;
   bool isDigit() const;
   bool isSpace() const;
-  friend inline int operator==(QChar, QChar);
-  friend inline int operator!=(QChar, QChar);
+  friend int operator==(QChar, QChar);
+  friend int operator!=(QChar, QChar);
+  operator char() const;
 
   enum Direction {
-    DirL,
-    DirR,
+    // NOTE: alphabetical order
+    DirAL,
+    DirAN,
+    DirB,
+    DirBN,
+    DirCS,
     DirEN,
     DirES,
     DirET,
-    DirAN,
-    DirCS,
-    DirB,
-    DirS,
-    DirWS,
-    DirON,
+    DirL,
     DirLRE,
     DirLRO,
-    DirAL,
+    DirNSM,
+    DirON,
+    DirPDF,
+    DirR,
     DirRLE,
     DirRLO,
-    DirPDF,
-    DirNSM,
-    DirBN
+    DirS,
+    DirWS
   };
 };
 
