@@ -502,7 +502,8 @@ Object Error::create(ExecState* exec,
   if (sourceId != -1)
     err.put(exec, "sourceId", Number(sourceId));
 
-  err.put(exec, "sourceURL", String(*sourceURL));
+  if (sourceURL)
+    err.put(exec, "sourceURL", String(*sourceURL));
 
   return err;
 
