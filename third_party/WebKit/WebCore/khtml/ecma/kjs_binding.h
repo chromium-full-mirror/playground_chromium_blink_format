@@ -110,10 +110,6 @@ class ScriptInterpreter : public Interpreter {
    */
   static void forgetDOMObject(void* objectHandle);
 
-  /**
-   * Mark objects in the DOMObject cache.
-   */
-  virtual void mark();
   KHTMLPart* part() const { return m_part; }
 
   virtual int rtti() { return 1; }

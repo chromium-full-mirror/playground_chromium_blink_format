@@ -66,10 +66,11 @@ IMPLEMENT_PROTOTYPE(DOMNodeProto, DOMNodeProtoFunc)
 
 const ClassInfo DOMNode::info = {"Node", 0, &DOMNodeTable, 0};
 
-DOMNode::DOMNode(ExecState* exec, DOM::Node n)
+DOMNode::DOMNode(ExecState* exec, const DOM::Node& n)
     : DOMObject(DOMNodeProto::self(exec)), node(n) {}
 
-DOMNode::DOMNode(Object proto, DOM::Node n) : DOMObject(proto), node(n) {}
+DOMNode::DOMNode(const Object& proto, const DOM::Node& n)
+    : DOMObject(proto), node(n) {}
 
 DOMNode::~DOMNode() {
   ScriptInterpreter::forgetDOMObject(node.handle());
@@ -702,10 +703,11 @@ DontDelete|ReadOnly
 @end
 */
 
-DOMDocument::DOMDocument(ExecState* exec, DOM::Document d)
+DOMDocument::DOMDocument(ExecState* exec, const DOM::Document& d)
     : DOMNode(DOMDocumentProto::self(exec), d) {}
 
-DOMDocument::DOMDocument(Object proto, DOM::Document d) : DOMNode(proto, d) {}
+DOMDocument::DOMDocument(const Object& proto, const DOM::Document& d)
+    : DOMNode(proto, d) {}
 
 Value DOMDocument::tryGet(ExecState* exec, const UString& propertyName) const {
 #ifdef KJS_VERBOSE
@@ -918,10 +920,11 @@ const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
   style		DOMElement::Style                           DontDelete|ReadOnly
 @end
 */
-DOMElement::DOMElement(ExecState* exec, DOM::Element e)
+DOMElement::DOMElement(ExecState* exec, const DOM::Element& e)
     : DOMNode(DOMElementProto::self(exec), e) {}
 
-DOMElement::DOMElement(Object proto, DOM::Element e) : DOMNode(proto, e) {}
+DOMElement::DOMElement(const Object& proto, const DOM::Element& e)
+    : DOMNode(proto, e) {}
 
 Value DOMElement::tryGet(ExecState* exec, const UString& propertyName) const {
 #ifdef KJS_VERBOSE
@@ -1052,7 +1055,7 @@ IMPLEMENT_PROTOTYPE(DOMDOMImplementationProto, DOMDOMImplementationProtoFunc)
 const ClassInfo DOMDOMImplementation::info = {"DOMImplementation", 0, 0, 0};
 
 DOMDOMImplementation::DOMDOMImplementation(ExecState* exec,
-                                           DOM::DOMImplementation i)
+                                           const DOM::DOMImplementation& i)
     : DOMObject(DOMDOMImplementationProto::self(exec)), implementation(i) {}
 
 DOMDOMImplementation::~DOMDOMImplementation() {
@@ -1113,7 +1116,7 @@ const ClassInfo DOMDocumentType::info = {"DocumentType", &DOMNode::info,
   internalSubset	DOMDocumentType::InternalSubset	DontDelete|ReadOnly
 @end
 */
-DOMDocumentType::DOMDocumentType(ExecState* exec, DOM::DocumentType dt)
+DOMDocumentType::DOMDocumentType(ExecState* exec, const DOM::DocumentType& dt)
     : DOMNode(/*### no proto yet*/ exec, dt) {}
 
 Value DOMDocumentType::tryGet(ExecState* exec,
@@ -1171,7 +1174,7 @@ IMPLEMENT_PROTOTYPE(DOMNamedNodeMapProto, DOMNamedNodeMapProtoFunc)
 
 const ClassInfo DOMNamedNodeMap::info = {"NamedNodeMap", 0, 0, 0};
 
-DOMNamedNodeMap::DOMNamedNodeMap(ExecState* exec, DOM::NamedNodeMap m)
+DOMNamedNodeMap::DOMNamedNodeMap(ExecState* exec, const DOM::NamedNodeMap& m)
     : DOMObject(DOMNamedNodeMapProto::self(exec)), map(m) {}
 
 DOMNamedNodeMap::~DOMNamedNodeMap() {
@@ -1351,7 +1354,7 @@ Value DOMEntity::getValueProperty(ExecState*, int token) const {
 
 // -------------------------------------------------------------------------
 
-Value KJS::getDOMNode(ExecState* exec, DOM::Node n) {
+Value KJS::getDOMNode(ExecState* exec, const DOM::Node& n) {
   DOMObject* ret = 0;
   if (n.isNull())
     return Null();
@@ -1410,16 +1413,17 @@ Value KJS::getDOMNode(ExecState* exec, DOM::Node n) {
   return Value(ret);
 }
 
-Value KJS::getDOMNamedNodeMap(ExecState* exec, DOM::NamedNodeMap m) {
+Value KJS::getDOMNamedNodeMap(ExecState* exec, const DOM::NamedNodeMap& m) {
   return Value(
       cacheDOMObject<DOM::NamedNodeMap, KJS::DOMNamedNodeMap>(exec, m));
 }
 
-Value KJS::getDOMNodeList(ExecState* exec, DOM::NodeList l) {
+Value KJS::getDOMNodeList(ExecState* exec, const DOM::NodeList& l) {
   return Value(cacheDOMObject<DOM::NodeList, KJS::DOMNodeList>(exec, l));
 }
 
-Value KJS::getDOMDOMImplementation(ExecState* exec, DOM::DOMImplementation i) {
+Value KJS::getDOMDOMImplementation(ExecState* exec,
+                                   const DOM::DOMImplementation& i) {
   return Value(
       cacheDOMObject<DOM::DOMImplementation, KJS::DOMDOMImplementation>(exec,
                                                                         i));
@@ -1597,8 +1601,9 @@ Object KJS::getDOMExceptionConstructor(ExecState* exec) {
 // for constructs like document.forms.<name>[1],
 // so it shouldn't be a problem that it's storing all the nodes (with the same
 // name). (David)
-DOMNamedNodesCollection::DOMNamedNodesCollection(ExecState*,
-                                                 QValueList<DOM::Node>& nodes)
+DOMNamedNodesCollection::DOMNamedNodesCollection(
+    ExecState*,
+    const QValueList<DOM::Node>& nodes)
     : DOMObject(), m_nodes(nodes) {
   // Maybe we should ref (and deref in the dtor) the nodes, though ?
 }
@@ -1640,10 +1645,11 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMCharacterDataProto,
                                 DOMCharacterDataProtoFunc,
                                 DOMNodeProto)
 
-DOMCharacterData::DOMCharacterData(ExecState* exec, DOM::CharacterData d)
+DOMCharacterData::DOMCharacterData(ExecState* exec, const DOM::CharacterData& d)
     : DOMNode(DOMCharacterDataProto::self(exec), d) {}
 
-DOMCharacterData::DOMCharacterData(Object proto, DOM::CharacterData d)
+DOMCharacterData::DOMCharacterData(const Object& proto,
+                                   const DOM::CharacterData& d)
     : DOMNode(proto, d) {}
 
 Value DOMCharacterData::tryGet(ExecState* exec, const UString& p) const {
@@ -1729,7 +1735,7 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMTextProto,
                                 DOMTextProtoFunc,
                                 DOMCharacterDataProto)
 
-DOMText::DOMText(ExecState* exec, DOM::Text t)
+DOMText::DOMText(ExecState* exec, const DOM::Text& t)
     : DOMCharacterData(DOMTextProto::self(exec), t) {}
 
 Value DOMText::tryGet(ExecState* exec, const UString& p) const {

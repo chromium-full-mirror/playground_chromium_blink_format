@@ -38,7 +38,8 @@ namespace KJS {
 
 class HTMLDocument : public DOMDocument {
  public:
-  HTMLDocument(ExecState* exec, DOM::HTMLDocument d) : DOMDocument(exec, d) {}
+  HTMLDocument(ExecState* exec, const DOM::HTMLDocument& d)
+      : DOMDocument(exec, d) {}
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   virtual void tryPut(ExecState* exec,
                       const UString& propertyName,
@@ -84,7 +85,8 @@ class HTMLDocument : public DOMDocument {
 
 class HTMLElement : public DOMElement {
  public:
-  HTMLElement(ExecState* exec, DOM::HTMLElement e) : DOMElement(exec, e) {}
+  HTMLElement(ExecState* exec, const DOM::HTMLElement& e)
+      : DOMElement(exec, e) {}
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void tryPut(ExecState* exec,
@@ -462,7 +464,7 @@ class HTMLElementFunction : public DOMFunction {
 
 class HTMLCollection : public DOMObject {
  public:
-  HTMLCollection(ExecState* exec, DOM::HTMLCollection c);
+  HTMLCollection(ExecState* exec, const DOM::HTMLCollection& c);
   ~HTMLCollection();
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
@@ -483,8 +485,8 @@ class HTMLCollection : public DOMObject {
 class HTMLSelectCollection : public HTMLCollection {
  public:
   HTMLSelectCollection(ExecState* exec,
-                       DOM::HTMLCollection c,
-                       DOM::HTMLSelectElement e)
+                       const DOM::HTMLCollection& c,
+                       const DOM::HTMLSelectElement& e)
       : HTMLCollection(exec, c), element(e) {}
   virtual Value tryGet(ExecState* exec, const UString& propertyName) const;
   virtual void tryPut(ExecState* exec,
@@ -541,10 +543,10 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
   khtml::CachedImage* img;
 };
 
-Value getHTMLCollection(ExecState* exec, DOM::HTMLCollection c);
+Value getHTMLCollection(ExecState* exec, const DOM::HTMLCollection& c);
 Value getSelectHTMLCollection(ExecState* exec,
-                              DOM::HTMLCollection c,
-                              DOM::HTMLSelectElement e);
+                              const DOM::HTMLCollection& c,
+                              const DOM::HTMLSelectElement& e);
 
 };  // namespace
 
