@@ -257,6 +257,10 @@ backforward list.
 - (void)_setDashboardBehavior:(WebDashboardBehavior)behavior to:(BOOL)flag;
 - (BOOL)_dashboardBehavior:(WebDashboardBehavior)behavior;
 
+- (void)handleAuthenticationForResource:(id)identifier
+                              challenge:(NSURLAuthenticationChallenge*)challenge
+                         fromDataSource:(WebDataSource*)dataSource;
+
 + (void)_setShouldUseFontSmoothing:(BOOL)f;
 + (BOOL)_shouldUseFontSmoothing;
 
