@@ -29,6 +29,23 @@
 
 @class DOMCSSStyleDeclaration;
 
+@interface DOMDocument (DOMDocumentExtensions)
+- (DOMCSSStyleDeclaration*)createCSSStyleDeclaration;
+@end
+
+@interface DOMHTMLElement (DOMHTMLElementExtensions)
+- (NSString*)innerHTML;
+- (void)setInnerHTML:(NSString*)innerHTML;
+- (NSString*)innerText;
+- (void)setInnerText:(NSString*)innerText;
+- (NSString*)outerHTML;
+- (void)setOuterHTML:(NSString*)outerHTML;
+- (DOMHTMLCollection*)children;
+- (NSString*)contentEditable;
+- (void)setContentEditable:(NSString*)contentEditable;
+- (BOOL)isContentEditable;
+@end
+
 @interface DOMHTMLEmbedElement : DOMHTMLElement
 - (NSString*)align;
 - (void)setAlign:(NSString*)align;
@@ -42,29 +59,4 @@
 - (void)setType:(NSString*)type;
 - (long)width;
 - (void)setWidth:(long)width;
-@end
-
-@interface DOMHTMLElement (DOMHTMLElementExtensions)
-- (NSString*)innerHTML;
-- (void)setInnerHTML:(NSString*)innerHTML;
-- (NSString*)innerText;
-- (void)setInnerText:(NSString*)innerText;
-- (DOMHTMLCollection*)children;
-- (NSString*)contentEditable;
-- (void)setContentEditable:(NSString*)contentEditable;
-- (BOOL)isContentEditable;
-@end
-
-@interface DOMHTMLTableElement (DOMHTMLTableElementExtensions)
-- (NSString*)background;
-- (void)setBackground:(NSString*)background;
-@end
-
-@interface DOMHTMLTableCellElement (DOMHTMLTableCellElementExtensions)
-- (NSString*)background;
-- (void)setBackground:(NSString*)background;
-@end
-
-@interface DOMDocument (DOMDocumentExtensions)
-- (DOMCSSStyleDeclaration*)createCSSStyleDeclaration;
 @end

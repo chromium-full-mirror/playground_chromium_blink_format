@@ -177,9 +177,11 @@ class HTMLElementImpl : public ElementImpl {
   void createMappedDecl(HTMLAttributeImpl* attr);
 
   DOMString innerHTML() const;
+  DOMString outerHTML() const;
   DOMString innerText() const;
   DocumentFragmentImpl* createContextualFragment(const DOMString& html);
   bool setInnerHTML(const DOMString& html);
+  bool setOuterHTML(const DOMString& html);
   bool setInnerText(const DOMString& text);
 
   virtual DOMString namespaceURI() const;
