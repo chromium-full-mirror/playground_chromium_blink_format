@@ -546,13 +546,25 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
 
   evt->setTarget(this);
 
-  KHTMLPart* part = document->document()->part();
+  // We've had at least one report of a crash on a page where document is nil
+  // here.
+  // Unfortunately that page no longer exists, but we'll make this code robust
+  // against
+  // that anyway.
+  // FIXME: Much code in this class assumes document is non-nil; it would be
+  // better to
+  // ensure that document can never be nil.
+  KHTMLPart* part = nil;
+  KHTMLView* view = nil;
 
-  // Since event handling code could cause this object to be deleted, grab a
-  // reference to the view now
-  KHTMLView* view = document->document()->view();
-  if (view)
-    view->ref();
+  if (document && document->document()) {
+    part = document->document()->part();
+    view = document->document()->view();
+    // Since event handling code could cause this object to be deleted, grab a
+    // reference to the view now
+    if (view)
+      view->ref();
+  }
 
   bool ret = dispatchGenericEvent(evt, exceptioncode);
 
