@@ -63,7 +63,7 @@ class QSize {
   void setHeight(int);
   QSize expandedTo(const QSize&) const;
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSIZE
   bool isNull() const;
   bool isEmpty() const;
   void transpose();
@@ -80,7 +80,7 @@ class QSize {
   friend bool operator==(const QSize&, const QSize&);
   friend bool operator!=(const QSize&, const QSize&);
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSIZE
   QSize& operator+=(const QSize&);
   QSize& operator-=(const QSize&);
   QSize& operator*=(int);

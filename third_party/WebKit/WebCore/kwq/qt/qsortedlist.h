@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QSORTEDLIST ==================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSORTEDLIST
 #include <_qsortedlist.h>
 #else
 
@@ -68,6 +68,6 @@ class QSortedList : public QList<T> {
 };  // class QSortedList
     // ========================================================
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QSORTEDLIST
 
 #endif

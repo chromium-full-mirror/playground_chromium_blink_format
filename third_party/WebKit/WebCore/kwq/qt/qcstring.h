@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QSTRING ======================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSTRING
 #include <_qcstring.h>
 #else
 
@@ -82,7 +82,7 @@ class QCString : public QByteArray {
   QCString& operator=(const QCString&);
   QCString& operator=(const char*);
   QCString& operator+=(const char*);
-  QCString& operator+=(const QCString&);
+  QCString& operator+=(char);
 
 #ifdef _KWQ_IOSTREAM_
   friend ostream& operator<<(ostream&, const QCString&);
@@ -92,6 +92,9 @@ class QCString : public QByteArray {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+
+ private:
+  bool resize(uint);
 
 };  // class QCString
     // ===========================================================
@@ -103,6 +106,6 @@ bool operator==(const QCString& s1, const char* s2);
 bool operator!=(const char* s1, const QCString& s2);
 bool operator!=(const QCString& s1, const char* s2);
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QSTRING
 
 #endif

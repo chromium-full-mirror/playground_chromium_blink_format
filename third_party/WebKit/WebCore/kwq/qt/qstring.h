@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QSTRING ======================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSTRING
 #include <_qstring.h>
 #else
 
@@ -195,8 +195,7 @@ class QString {
   QString& append(const char*);
   QString& append(const QString&);
 
-  int contains(const char*, bool) const;
-  int contains(const char*) const;
+  int contains(const char*, bool cs = TRUE) const;
   int contains(char) const;
 
   int find(char, int index = 0) const;
@@ -319,6 +318,6 @@ class QConstString : /* NOTE: this is NOT private */ QString {
 };  // class QConstString
     // =======================================================
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QSTRING
 
 #endif

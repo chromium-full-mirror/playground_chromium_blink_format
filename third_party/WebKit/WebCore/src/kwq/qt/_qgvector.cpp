@@ -37,9 +37,11 @@
 
 // KWQ hacks ---------------------------------------------------------------
 
-#ifndef _KWQ_COMPLETE_
-#define _KWQ_COMPLETE_
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
+
+#ifdef USING_BORROWED_QVECTOR
 
 // -------------------------------------------------------------------------
 
@@ -640,3 +642,9 @@ QDataStream& QGVector::write(QDataStream& s) const {  // write vector to stream
   return s;
 }
 #endif  // QT_NO_DATASTREAM
+
+// KWQ hacks ---------------------------------------------------------------
+
+#endif USING_BORROWED_QVECTOR
+
+// -------------------------------------------------------------------------

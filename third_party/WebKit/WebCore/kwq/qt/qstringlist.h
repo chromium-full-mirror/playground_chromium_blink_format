@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QSTRINGLIST ==================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QSTRINGLIST
 #include <_qstringlist.h>
 #else
 
@@ -79,6 +79,6 @@ class QStringList : public QValueList<QString> {
 };  // class QStringList
     // ========================================================
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QSTRINGLIST
 
 #endif

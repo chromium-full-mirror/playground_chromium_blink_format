@@ -37,9 +37,11 @@
 
 // KWQ hacks ---------------------------------------------------------------
 
-#ifndef _KWQ_COMPLETE_
-#define _KWQ_COMPLETE_
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
+
+#ifdef USING_BORROWED_QCOLOR
 
 // -------------------------------------------------------------------------
 
@@ -340,6 +342,7 @@ QString QColor::name() const {
 }
 
 static int hex2int(QChar hexchar) {
+#if USING_BORROWED_QSTRING
   int v;
   if (hexchar.isDigit())
     v = hexchar.digitValue();
@@ -350,6 +353,10 @@ static int hex2int(QChar hexchar) {
   else
     v = 0;
   return v;
+#else
+#warning this function not implemented
+  return 0;
+#endif
 }
 
 /*!
@@ -817,3 +824,9 @@ QDataStream& operator>>(QDataStream& s, QColor& c) {
   \overload int qGray( qRgb rgb )
   \relates QColor
 */
+
+// KWQ hacks ---------------------------------------------------------------
+
+#endif  // USING_BORROWED_QCOLOR
+
+// -------------------------------------------------------------------------

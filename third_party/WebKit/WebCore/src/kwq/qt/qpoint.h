@@ -63,7 +63,7 @@ class QPoint {
 
   int manhattanLength() const;
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QPOINT
   bool isNull() const;
   void setX(int);
   void setY(int);
@@ -78,7 +78,7 @@ class QPoint {
   friend QPoint operator+(const QPoint&, const QPoint&);
   friend QPoint operator-(const QPoint&, const QPoint&);
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QPOINT
   QPoint& operator+=(const QPoint&);
   QPoint& operator-=(const QPoint&);
   QPoint& operator*=(int);

@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QPTRDICT =====================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QPTRDICT
 #include <_qptrdict.h>
 #else
 
@@ -127,6 +127,6 @@ class QPtrDictIterator {
 };  // class QPtrDictIterator
     // ===================================================
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QPTRDICT
 
 #endif

@@ -30,9 +30,9 @@
 #include <config.h>
 #endif
 
-// _KWQ_COMPLETE_ ==============================================================
+// USING_BORROWED_QREGION ======================================================
 
-#ifdef _KWQ_COMPLETE_
+#ifdef USING_BORROWED_QREGION
 #include <_qregion.h>
 #include "qpoint.h"
 #include "qimage.h"
@@ -83,6 +83,6 @@ class QRegion {
 };  // class QRegion
     // ============================================================
 
-#endif  // _KWQ_COMPLETE_
+#endif  // USING_BORROWED_QREGION
 
 #endif
