@@ -85,6 +85,8 @@ class XMLTokenizer;
 };
 
 namespace KJS {
+class Selection;
+class SelectionFunc;
 class Window;
 class WindowFunc;
 class JSEventListener;
@@ -148,6 +150,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   friend class KHTMLRun;
   friend class DOM::HTMLFormElementImpl;
   friend class khtml::RenderPartObject;
+  friend class KJS::Selection;
+  friend class KJS::SelectionFunc;
   friend class KJS::Window;
   friend class KJS::WindowFunc;
   friend class KJS::JSEventListener;

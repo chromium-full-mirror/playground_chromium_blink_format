@@ -38,6 +38,7 @@ namespace KJS {
 class WindowFunc;
 class WindowQObject;
 class Location;
+class Selection;
 class History;
 class FrameArray;
 class JSEventListener;
@@ -113,6 +114,7 @@ class Window : public ObjectImp {
   void scheduleClose();
   bool isSafeScript(ExecState* exec) const;
   Location* location() const;
+  Selection* selection() const;
   JSEventListener* getJSEventListener(const Value& val, bool html = false);
   JSLazyEventListener* getJSLazyEventListener(const QString& code,
                                               bool html = false);
@@ -234,6 +236,7 @@ class Window : public ObjectImp {
   History* history;
   FrameArray* frames;
   Location* loc;
+  Selection* m_selection;
   WindowQObject* winq;
   DOM::Event* m_evt;
 };
@@ -317,6 +320,47 @@ class Location : public ObjectImp {
  private:
   friend class Window;
   Location(KHTMLPart* p);
+  QGuardedPtr<KHTMLPart> m_part;
+};
+
+class Selection : public ObjectImp {
+ public:
+  ~Selection();
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  virtual Value toPrimitive(ExecState* exec, Type preferred) const;
+  virtual UString toString(ExecState* exec) const;
+  enum {
+    AnchorNode,
+    AnchorOffset,
+    FocusNode,
+    FocusOffset,
+    BaseNode,
+    BaseOffset,
+    ExtentNode,
+    ExtentOffset,
+    IsCollapsed,
+    _Type,
+    EqualEqual,
+    Collapse,
+    CollapseToEnd,
+    CollapseToStart,
+    Empty,
+    ToString,
+    SetBaseAndExtent,
+    SetPosition,
+    Modify
+  };
+  KHTMLPart* part() const { return m_part; }
+  virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
+
+ private:
+  friend class Window;
+  Selection(KHTMLPart* p);
   QGuardedPtr<KHTMLPart> m_part;
 };
 

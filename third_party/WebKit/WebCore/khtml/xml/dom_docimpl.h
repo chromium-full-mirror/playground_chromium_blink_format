@@ -547,6 +547,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   DOMString toString() const;
 
+  bool execCommand(const DOMString& command,
+                   bool userInterface,
+                   const DOMString& value);
+
 #ifndef KHTML_NO_XBL
   // XBL methods
   XBL::XBLBindingManager* bindingManager() const { return m_bindingManager; }

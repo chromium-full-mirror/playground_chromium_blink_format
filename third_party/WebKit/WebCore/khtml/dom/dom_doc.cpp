@@ -483,6 +483,16 @@ CSSStyleDeclaration Document::getOverrideStyle(const Element& elt,
   return r;
 }
 
+bool Document::execCommand(const DOMString& command,
+                           bool userInterface,
+                           const DOMString& value) {
+  if (!impl)
+    throw DOMException(DOMException::NOT_FOUND_ERR);
+
+  return static_cast<DocumentImpl*>(impl)->execCommand(command, userInterface,
+                                                       value);
+}
+
 // ----------------------------------------------------------------------------
 
 DocumentFragment::DocumentFragment() : Node() {}

@@ -209,7 +209,8 @@ class DOMDocument : public DOMNode {
     PreferredStylesheetSet,
     SelectedStylesheetSet,
     GetOverrideStyle,
-    ReadyState
+    ReadyState,
+    ExecCommand
   };
 };
 

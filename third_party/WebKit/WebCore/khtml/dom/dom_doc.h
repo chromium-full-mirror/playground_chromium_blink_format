@@ -792,6 +792,15 @@ class Document : public Node {
 
   DOMString toString() const;
 
+  /**
+   * not part of the DOM
+   *
+   * executes an editing command
+   */
+  bool execCommand(const DOMString& command,
+                   bool userInterface,
+                   const DOMString& value);
+
   Document(DocumentImpl* i);
 
  protected:

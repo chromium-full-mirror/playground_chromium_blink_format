@@ -173,7 +173,7 @@ const struct HashEntry DOMDocumentProtoTableEntries[] = {
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
     {"createNodeIterator", DOMDocument::CreateNodeIterator,
-     DontDelete | Function, 3, 0},
+     DontDelete | Function, 3, &DOMDocumentProtoTableEntries[30]},
     {0, 0, 0, 0, 0},
     {"importNode", DOMDocument::ImportNode, DontDelete | Function, 2, 0},
     {"createElementNS", DOMDocument::CreateElementNS, DontDelete | Function, 2,
@@ -187,10 +187,11 @@ const struct HashEntry DOMDocumentProtoTableEntries[] = {
     {"createRange", DOMDocument::CreateRange, DontDelete | Function, 0, 0},
     {"createEvent", DOMDocument::CreateEvent, DontDelete | Function, 1, 0},
     {"getOverrideStyle", DOMDocument::GetOverrideStyle, DontDelete | Function,
-     2, 0}};
+     2, 0},
+    {"execCommand", DOMDocument::ExecCommand, DontDelete | Function, 3, 0}};
 
 const struct HashTable DOMDocumentProtoTable = {
-    2, 30, DOMDocumentProtoTableEntries, 23};
+    2, 31, DOMDocumentProtoTableEntries, 23};
 
 }  // namespace
 
