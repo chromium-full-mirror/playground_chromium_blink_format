@@ -186,7 +186,11 @@ class List {
    * function has a @ref KJS::List parameter.
    */
   static const List& empty();
+
   void mark();
+
+  void replaceFirst(ValueImp*);
+  void replaceLast(ValueImp*);
 
  private:
   void erase(ListNode* n);
