@@ -297,8 +297,10 @@ typedef enum {
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
 - (void)jumpToSelection;
+
 - (NSString*)advanceToNextMisspelling;
 - (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
+- (void)unmarkAllMisspellings;
 
 - (void)setTextSizeMultiplier:(float)multiplier;
 
