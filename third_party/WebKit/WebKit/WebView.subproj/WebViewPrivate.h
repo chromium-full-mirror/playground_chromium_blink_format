@@ -285,6 +285,10 @@ backforward list.
 - (void)_drawHeaderAndFooter;
 @end
 
+@interface WebView (WebViewEditingInMail)
+- (void)_insertNewlineInQuotedContent;
+@end
+
 @interface _WebSafeForwarder : NSObject {
   id target;  // Non-retained.  Don't retain delegates;
   id defaultTarget;
