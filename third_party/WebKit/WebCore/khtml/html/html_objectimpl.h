@@ -62,6 +62,8 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   bool callMember(const QString&, const QStringList&, JType&, QString&);
 
 #if APPLE_CHANGES
+  virtual void setAllParamsAvailable();
+  virtual bool allParamsAvailable();
   void setupApplet() const;
   KJS::Bindings::Instance* getAppletInstance() const;
 #endif
@@ -72,6 +74,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
  private:
 #if APPLE_CHANGES
   mutable KJS::Bindings::Instance* appletInstance;
+  bool m_allParamsAvailable;
 #endif
 };
 
