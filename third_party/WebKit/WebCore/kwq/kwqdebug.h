@@ -93,6 +93,7 @@ void KWQLog(unsigned int level,
 
 #import <signal.h>
 #import <sys/types.h>
+#import <sys/time.h>
 #import <sys/resource.h>
 
 #define KWQ_ASSERTION_FAILURE                               \
