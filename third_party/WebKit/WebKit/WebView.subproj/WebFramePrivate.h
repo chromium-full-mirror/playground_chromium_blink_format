@@ -25,7 +25,8 @@ typedef enum {
   void* renderFramePart;
   id<IFWebController> controller;
   IFWebFrameState state;
-  IFError* lastError;
+  NSMutableDictionary* errors;
+  IFError* mainDocumentError;
 }
 
 - (void)setName:(NSString*)n;
@@ -50,6 +51,11 @@ typedef enum {
 - (void)_transitionProvisionalToCommitted;
 - (IFWebFrameState)_state;
 - (void)_setState:(IFWebFrameState)newState;
-- (BOOL)_checkLoadComplete:(IFError*)error;
-- (void)_setLastError:(IFError*)error;
++ (void)_recursiveCheckCompleteFromFrame:(IFWebFrame*)fromFrame;
+- (void)_isLoadComplete;
+- (void)_checkLoadCompleteResource:(NSString*)resourceDescription
+                             error:(IFError*)error
+                    isMainDocument:(BOOL)flag;
+- (void)_clearErrors;
+- (void)_setMainDocumentError:(IFError*)error;
 @end

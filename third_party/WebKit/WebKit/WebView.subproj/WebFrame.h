@@ -72,7 +72,11 @@
 
 /*
 */
-- (IFError*)lastError;
+- (NSDictionary*)errors;
+
+/*
+*/
+- (IFError*)mainDocumentError;
 
 /*
     This method removes references the underlying resources.
