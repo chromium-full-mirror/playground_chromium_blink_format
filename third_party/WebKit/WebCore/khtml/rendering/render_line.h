@@ -24,6 +24,10 @@
 
 #include "rendering/render_object.h"
 
+namespace DOM {
+class AtomicString;
+};
+
 namespace khtml {
 
 class InlineFlowBox;
@@ -318,6 +322,27 @@ class InlineFlowBox : public InlineRunBox {
   bool m_hasTextChildren : 1;
 };
 
+class EllipsisBox : public InlineBox {
+ public:
+  EllipsisBox(RenderObject* obj,
+              const DOM::AtomicString& ellipsisStr,
+              InlineFlowBox* p,
+              int w,
+              int y,
+              int h,
+              int b)
+      : InlineBox(obj), m_str(ellipsisStr) {
+    m_parent = p;
+    m_width = w;
+    m_y = y;
+    m_height = h;
+    m_baseline = b;
+  }
+
+ private:
+  DOM::AtomicString m_str;
+};
+
 class RootInlineBox : public InlineFlowBox {
  public:
   RootInlineBox(RenderObject* obj)
@@ -370,7 +395,7 @@ class RootInlineBox : public InlineFlowBox {
                               int blockEdge,
                               int lineBoxEdge,
                               int ellipsisWidth);
-  void placeEllipsis(QChar* ellipsisStr,
+  void placeEllipsis(const DOM::AtomicString& ellipsisStr,
                      int blockEdge,
                      bool ltr,
                      int ellipsisWidth);
@@ -398,7 +423,7 @@ class RootInlineBox : public InlineFlowBox {
   bool m_endsWithBreak;
 
   // An inline text box that represents our text truncation string.
-  InlineBox* m_ellipsisBox;
+  EllipsisBox* m_ellipsisBox;
 };
 
 };  // namespace

@@ -849,13 +849,13 @@ bool RootInlineBox::canAccommodateEllipsis(bool ltr,
   return InlineFlowBox::canAccommodateEllipsis(ltr, blockEdge, ellipsisWidth);
 }
 
-void RootInlineBox::placeEllipsis(QChar* ellipsisStr,
+void RootInlineBox::placeEllipsis(const AtomicString& ellipsisStr,
                                   int blockEdge,
                                   bool ltr,
                                   int ellipsisWidth) {
   // Create an ellipsis box.
-
-  // Position the ellipsis box vertically.
+  m_ellipsisBox = new (m_object->renderArena()) EllipsisBox(
+      m_object, ellipsisStr, this, ellipsisWidth, yPos(), height(), baseline());
 
   // Now attempt to find the nearest glyph horizontally and place just to the
   // right (or left in RTL)
