@@ -424,7 +424,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   bool multiple() const { return m_multiple; }
 
-  void add(const HTMLElement& element, const HTMLElement& before);
+  void add(HTMLElementImpl* element, HTMLElementImpl* before);
   void remove(long index);
   void blur();
   void focus();

@@ -2022,13 +2022,13 @@ long HTMLSelectElementImpl::length() const {
   return len;
 }
 
-void HTMLSelectElementImpl::add(const HTMLElement& element,
-                                const HTMLElement& before) {
-  if (element.isNull() || element.handle()->id() != ID_OPTION)
+void HTMLSelectElementImpl::add(HTMLElementImpl* element,
+                                HTMLElementImpl* before) {
+  if (!element || element->id() != ID_OPTION)
     return;
 
   int exceptioncode = 0;
-  insertBefore(element.handle(), before.handle(), exceptioncode);
+  insertBefore(element, before, exceptioncode);
   if (!exceptioncode)
     setRecalcListItems();
 }
