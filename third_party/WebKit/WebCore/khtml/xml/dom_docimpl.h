@@ -299,12 +299,15 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   QPaintDevice* paintDevice() const { return m_paintDevice; }
   void setPaintDevice(QPaintDevice* dev);
 
-  enum HTMLMode { Html3 = 0, Html4 = 1, XHtml = 2 };
+  enum HTMLMode { Html3, Html4, XHtml };
 
-  enum ParseMode { Unknown, Compat, Transitional, Strict };
+  enum ParseMode { Compat, AlmostStrict, Strict };
+
   virtual void determineParseMode(const QString& str);
   void setParseMode(ParseMode m) { pMode = m; }
   ParseMode parseMode() const { return pMode; }
+
+  bool inQuirksMode() { return pMode == Compat; }
 
   void setHTMLMode(HTMLMode m) { hMode = m; }
   HTMLMode htmlMode() const { return hMode; }

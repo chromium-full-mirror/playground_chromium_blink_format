@@ -255,10 +255,9 @@ void HTMLLinkElementImpl::setStyleSheet(const DOM::DOMString& url,
     m_sheet->deref();
   m_sheet = new CSSStyleSheetImpl(this, url);
   kdDebug(6030) << "style sheet parse mode strict = "
-                << (getDocument()->parseMode() == DocumentImpl::Strict) << endl;
+                << (!getDocument()->inQuirksMode()) << endl;
   m_sheet->ref();
-  m_sheet->parseString(sheetStr,
-                       getDocument()->parseMode() == DocumentImpl::Strict);
+  m_sheet->parseString(sheetStr, !getDocument()->inQuirksMode());
 
   MediaListImpl* media = new MediaListImpl(m_sheet, m_media);
   m_sheet->setMedia(media);
@@ -403,8 +402,7 @@ void HTMLStyleElementImpl::childrenChanged() {
     m_loading = true;
     m_sheet = new CSSStyleSheetImpl(this);
     m_sheet->ref();
-    m_sheet->parseString(text,
-                         (getDocument()->parseMode() == DocumentImpl::Strict));
+    m_sheet->parseString(text, !getDocument()->inQuirksMode());
     m_loading = false;
   }
 

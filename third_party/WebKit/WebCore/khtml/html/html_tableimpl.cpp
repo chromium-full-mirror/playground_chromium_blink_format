@@ -476,7 +476,7 @@ void HTMLTableElementImpl::attach() {
     // solution...
     // only difference to 100% correct is that in strict mode <font> elements
     // are propagated into tables.
-    if (getDocument()->parseMode() != DocumentImpl::Strict) {
+    if (getDocument()->inQuirksMode()) {
       addCSSProperty(CSS_PROP_FONT_SIZE, CSS_VAL_MEDIUM);
       addCSSProperty(CSS_PROP_COLOR, getDocument()->textColor());
       addCSSProperty(CSS_PROP_FONT_FAMILY, "konq_body");

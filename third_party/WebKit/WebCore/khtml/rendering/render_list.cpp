@@ -192,8 +192,7 @@ static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
       break;
 
     if (currChild->element() &&
-        (currChild->element()->getDocument()->parseMode() !=
-         DocumentImpl::Strict) &&
+        (currChild->element()->getDocument()->inQuirksMode()) &&
         (currChild->element()->id() == ID_UL ||
          currChild->element()->id() == ID_OL))
       break;
