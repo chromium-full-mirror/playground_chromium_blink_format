@@ -1468,7 +1468,7 @@ Position DeleteSelectionCommand::endPositionForDelete() const {
           .equivalentDeepPosition();
   if (pos == VisiblePosition(rootEnd).deepEquivalent())
     pos = rootEnd;
-  else if (m_smartDelete && pos.leadingWhitespacePosition().isNotNull())
+  else if (m_smartDelete && pos.trailingWhitespacePosition().isNotNull())
     pos = VisiblePosition(pos).next().deepEquivalent();
   return pos;
 }
@@ -1528,6 +1528,12 @@ void DeleteSelectionCommand::performGeneralDelete() {
   int startOffset = m_upstreamStart.offset();
 
   if (startOffset >= m_startNode->caretMaxOffset()) {
+    // Move the start node to the next node in the tree since the startOffset is
+    // equal to
+    // or beyond the start node's caretMaxOffset This means there is nothing
+    // visible to delete.
+    // However, before moving on, delete any insignificant text that may be
+    // present in a text node.
     if (m_startNode->isTextNode()) {
       // Delete any insignificant text from this node.
       TextImpl* text = static_cast<TextImpl*>(m_startNode);
@@ -1545,7 +1551,7 @@ void DeleteSelectionCommand::performGeneralDelete() {
   }
 
   if (m_startNode == m_downstreamEnd.node()) {
-    // handle delete in one node
+    // The selection to delete is all in one node.
     if (!m_startNode->renderer() ||
         (startOffset <= m_startNode->caretMinOffset() &&
          m_downstreamEnd.offset() >= m_startNode->caretMaxOffset())) {
@@ -1559,6 +1565,7 @@ void DeleteSelectionCommand::performGeneralDelete() {
       m_trailingWhitespaceValid = false;
     }
   } else {
+    // The selection to delete spans more than one node.
     NodeImpl* node = m_startNode;
 
     if (startOffset > 0) {
