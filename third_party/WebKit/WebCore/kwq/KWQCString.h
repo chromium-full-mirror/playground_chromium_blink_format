@@ -74,6 +74,9 @@ class QCString : public QByteArray {
   uint length() const;
   bool truncate(uint);
   QCString lower() const;
+  QCString upper() const;
+  QCString left(uint) const;
+  QCString right(uint) const;
   QCString mid(uint, uint len = 0xffffffff) const;
 
   // operators ---------------------------------------------------------------

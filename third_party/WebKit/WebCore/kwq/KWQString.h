@@ -146,8 +146,6 @@ class QChar {
 
 class QString {
  public:
-  static QString fromLatin1(const char*, int len = -1);
-
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
   // constants ---------------------------------------------------------------
@@ -157,6 +155,7 @@ class QString {
   // static member functions -------------------------------------------------
 
   static QString number(long, int base = 10);
+  static QString fromLatin1(const char*, int len = -1);
 
   // constructors, copy constructors, and destructors ------------------------
 
