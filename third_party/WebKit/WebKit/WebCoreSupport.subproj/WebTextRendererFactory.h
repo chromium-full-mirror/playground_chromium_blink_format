@@ -8,12 +8,16 @@
 
 #import <WebCoreTextRendererFactory.h>
 
+@class IFTextRenderer;
+
 @interface IFTextRendererFactory : WebCoreTextRendererFactory {
   NSMutableDictionary* cache;
 }
 
 + (void)createSharedFactory;
++ (IFTextRendererFactory*)sharedFactory;
 - init;
-- (id<WebCoreTextRenderer>)rendererWithFont:(NSFont*)font;
+
+- (IFTextRenderer*)rendererWithFont:(NSFont*)font;
 
 @end
