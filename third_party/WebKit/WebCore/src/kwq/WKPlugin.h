@@ -11,8 +11,7 @@
 
 @interface WKPlugin : NSObject {
   NSDictionary* mimeTypes;
-  NSString* name;
-  NSString* executablePath;
+  NSString *name, *executablePath, *filename, *pluginDescription;
   BOOL isLoaded;
   NPPluginFuncs pluginFuncs;
   NPNetscapeFuncs browserFuncs;
@@ -37,6 +36,13 @@
 - (BOOL)initializeWithPath:(NSString*)plugin;
 - (void)load;
 - (void)unload;
+- (NSDictionary*)mimeTypes;
+- (NSString*)name;
+- (NSString*)filename;
+- (NSString*)executablePath;
+- (BOOL)isLoaded;
+- (NSString*)description;
+- (NSString*)pluginDescription;
 
 - (NPP_NewProcPtr)NPP_New;
 - (NPP_DestroyProcPtr)NPP_Destroy;
@@ -47,11 +53,6 @@
 - (NPP_StreamAsFileProcPtr)NPP_StreamAsFile;
 - (NPP_DestroyStreamProcPtr)NPP_DestroyStream;
 - (NPP_HandleEventProcPtr)NPP_HandleEvent;
-- (NSDictionary*)mimeTypes;
-- (NSString*)name;
-- (NSString*)executablePath;
-- (BOOL)isLoaded;
-- (NSString*)description;
 
 @end
 

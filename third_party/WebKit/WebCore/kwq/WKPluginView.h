@@ -13,9 +13,21 @@
 
 typedef NPStream* NPS;
 
+@interface WKPluginViewNullEventSender : NSObject {
+  NPP instance;
+  NPP_HandleEventProcPtr NPP_HandleEvent;
+}
+
+- (id)initializeWithNPP:(NPP)pluginInstance
+        functionPointer:(NPP_HandleEventProcPtr)HandleEventFunction;
+- (void)sendNullEvents;
+- (void)stop;
+@end
+
 @interface WKPluginView : NSQuickDrawView {
   QWidget* widget;
   WKPlugin* plugin;
+  WKPluginViewNullEventSender* eventSender;
 
   NPP instance;
   NPP_t instanceStruct;
@@ -61,7 +73,6 @@ typedef NPStream* NPS;
 - (BOOL)resignFirstResponder;
 - (void)sendActivateEvent;
 - (void)sendUpdateEvent;
-- (void)sendNullEvents;
 - (void)mouseDown:(NSEvent*)theEvent;
 - (void)mouseUp:(NSEvent*)theEvent;
 - (void)mouseDragged:(NSEvent*)theEvent;
