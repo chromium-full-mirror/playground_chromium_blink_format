@@ -155,6 +155,8 @@ class KWQKHTMLPart : public KHTMLPart {
                                       KWQSelectionDirection);
   static NSView* nextKeyViewForWidget(QWidget* startingPoint,
                                       KWQSelectionDirection);
+  static bool currentEventIsKeyboardOptionTab();
+  bool tabsToLinks();
 
   static bool currentEventIsMouseDownInWidget(QWidget* candidate);
 
