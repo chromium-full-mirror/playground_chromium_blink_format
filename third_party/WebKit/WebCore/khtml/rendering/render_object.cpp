@@ -1123,9 +1123,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
         //                 vpos = 0;
 
         const QFont& f = parent()->font(firstLine);
-        int fontheight = parent()->lineHeight(firstLine);
         int fontsize = f.pixelSize();
-        int halfleading = (fontheight - fontsize) / 2;
 
         if (va == SUB)
           vpos += fontsize / 5 + 1;
@@ -1143,7 +1141,7 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
           //                 style()->font().pixelSize(), baselinePosition(
           //                 firstLine ) );
           vpos += (baselinePosition(firstLine) -
-                   parent()->baselinePosition(firstLine) + halfleading);
+                   parent()->baselinePosition(firstLine));
         } else if (va == MIDDLE) {
 #if APPLE_CHANGES
           vpos += -(int)(QFontMetrics(f).xHeight() / 2) -
