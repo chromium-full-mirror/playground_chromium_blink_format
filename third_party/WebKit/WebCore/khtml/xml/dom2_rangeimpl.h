@@ -29,7 +29,10 @@
 
 #include <qptrlist.h>
 #include "dom/dom2_range.h"
+#include "editing/html_interchange.h"
 #include "misc/shared.h"
+
+class QStringList;
 
 namespace DOM {
 
@@ -78,7 +81,9 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   DocumentFragmentImpl* cloneContents(int& exceptioncode);
   void insertNode(NodeImpl* newNode, int& exceptioncode);
   DOMString toString(int& exceptioncode) const;
-  DOMString toHTML(QPtrList<NodeImpl>* nodes = NULL) const;
+  DOMString toHTML(
+      QPtrList<NodeImpl>* nodes = NULL,
+      EAnnotateForInterchange annotate = DoNotAnnotateForInterchange) const;
   DOMString text() const;
 
   DocumentFragmentImpl* createContextualFragment(DOMString& html,
@@ -125,6 +130,11 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   void setEndContainer(NodeImpl* _endContainer);
   void checkDeleteExtract(int& exceptioncode);
   bool containedByReadOnly() const;
+
+  enum EAddToMarkup { PrependToMarkup, AppendToMarkup };
+  void addCommentToHTMLMarkup(const DOMString&,
+                              QStringList&,
+                              EAddToMarkup) const;
 };
 
 }  // namespace
