@@ -1433,7 +1433,7 @@ bool TextAreaWidget::event(QEvent* e) {
 // -------------------------------------------------------------------------
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
-    : RenderFormElement(element) {
+    : RenderFormElement(element), m_dirty(false) {
 #if APPLE_CHANGES
   QTextEdit* edit = new KTextEdit(view());
 #else
@@ -1459,19 +1459,18 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
 }
 
 void RenderTextArea::detach() {
-  if (element()->m_dirtyvalue) {
-    element()->m_value = text();
-    element()->m_dirtyvalue = false;
-  }
+  element()->value();  // call this for the side effect of copying the value
+                       // from render to DOM
   RenderFormElement::detach();
 }
 
 void RenderTextArea::handleFocusOut() {
-  if (m_widget && element() && element()->m_dirtyvalue) {
-    element()->m_value = text();
-    element()->m_dirtyvalue = false;
+  if (m_dirty && element()) {
+    element()->value();  // call this for the side effect of copying the value
+                         // from render to DOM
     element()->onChange();
   }
+  m_dirty = false;
 }
 
 void RenderTextArea::calcMinMaxWidth() {
@@ -1545,7 +1544,7 @@ void RenderTextArea::updateFromElement() {
   // inline
   // input such as Hiragana, w->text() has a side effect of sending the
   // notification
-  // that we use in slotTextChanged to update element()->m_value
+  // that we use in slotTextChanged to update element()->m_value.
   QString widgetText = text();
   QString text = element()->value().string();
   text.replace(QChar('\\'), backslashAsCurrencySymbol());
@@ -1556,8 +1555,8 @@ void RenderTextArea::updateFromElement() {
     w->setText(text);
     w->setCursorPosition(line, col);
     w->blockSignals(false);
+    m_dirty = false;
   }
-  element()->m_dirtyvalue = false;
 
   RenderFormElement::updateFromElement();
 }
@@ -1596,6 +1595,7 @@ QString RenderTextArea::text() {
 
 void RenderTextArea::slotTextChanged() {
   element()->m_dirtyvalue = true;
+  m_dirty = true;
 }
 
 void RenderTextArea::select() {

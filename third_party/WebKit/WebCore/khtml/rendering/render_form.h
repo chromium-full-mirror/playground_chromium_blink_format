@@ -485,6 +485,8 @@ class RenderTextArea : public RenderFormElement {
   virtual void handleFocusOut();
 
   virtual bool isEditable() const { return true; }
+
+  bool m_dirty;
 };
 
 // -------------------------------------------------------------------------
