@@ -166,8 +166,6 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
     return false;
   }
 
-  virtual void setParent(NodeImpl* parent);
-
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool isEditable();
 
