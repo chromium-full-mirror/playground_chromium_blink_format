@@ -964,7 +964,8 @@ void RenderBox::calcAbsoluteVertical() {
   RenderObject* cb = containingBlock();
   Length hl = cb->style()->height();
   if (hl.isFixed())
-    ch = hl.value + cb->paddingTop() + cb->paddingBottom();
+    ch = hl.value + cb->paddingTop() + cb->paddingBottom() + cb->borderTop() +
+         cb->borderBottom();
   else if (cb->isHtml())
     ch = cb->availableHeight();
   else
