@@ -12,6 +12,7 @@
 @interface WebImageView : NSView<WebDocumentView, WebDocumentImage> {
   WebImageRepresentation* rep;
   BOOL needsLayout;
+  BOOL ignoringMouseDraggedEvents;
 }
 + (NSArray*)supportedImageMIMETypes;
 @end
