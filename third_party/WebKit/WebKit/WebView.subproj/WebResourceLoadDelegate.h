@@ -70,7 +70,7 @@
     will be request.
 */
 - (NSURLRequest*)webView:(WebView*)sender
-                resource:identifier
+                resource:(id)identifier
          willSendRequest:(NSURLRequest*)request
         redirectResponse:(NSURLResponse*)redirectResponse
           fromDataSource:(WebDataSource*)dataSource;
