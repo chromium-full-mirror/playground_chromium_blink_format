@@ -32,6 +32,8 @@
 
 - (BOOL)cookiesEnabled;
 - (NSString*)cookiesForURL:(NSURL*)url;
-- (void)setCookies:(NSString*)cookies forURL:(NSURL*)url;
+- (void)setCookies:(NSString*)cookies
+            forURL:(NSURL*)url
+     policyBaseURL:(NSURL*)url;
 
 @end

@@ -29,6 +29,6 @@ class KURL;
 class KWQKCookieJar {
  public:
   static QString cookie(const KURL&);
-  static void setCookie(const KURL&, const QString&);
+  static void setCookie(const KURL&, const KURL& policyBaseURL, const QString&);
   static bool cookieEnabled();
 };
