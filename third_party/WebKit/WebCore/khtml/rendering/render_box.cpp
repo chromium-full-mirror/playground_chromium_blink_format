@@ -644,8 +644,7 @@ short RenderBox::calcReplacedWidth(bool* ieHack) const {
       break;
     }
     case Fixed:
-      if (isFormElement() &&
-          (element()->id() == ID_SELECT || element()->id() == ID_BUTTON) &&
+      if (isFormElement() && element()->id() == ID_SELECT &&
           w.value < intrinsicWidth())
         // Disallow a CSS width that is too small to enclose the contents
         // of the list.
