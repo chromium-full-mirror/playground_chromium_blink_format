@@ -30,6 +30,7 @@ typedef struct GlyphMap GlyphMap;
 // Set applyRounding = NO to get an Cocoa equivalent width.
 - (float)floatWidthForCharacters:(const unichar*)characters
                           length:(unsigned)length
-                   applyRounding:(BOOL)applyRounding;
+                   applyRounding:(BOOL)applyRounding
+         attemptFontSubstitution:(BOOL)attemptFontSubstitution;
 
 @end
