@@ -667,13 +667,12 @@ void RenderText::paintObject(QPainter* p,
 
         if (isPrinting) {
           // FIXME: Need to understand what this section is doing.
-          int lh = lineHeight(false) + paddingBottom() + borderBottom();
           if (ty + s->m_y < y) {
             // This has been printed already we suppose.
             continue;
           }
 
-          if (ty + lh + s->m_y > y + h) {
+          if (ty + s->m_y + s->height() > y + h) {
             RenderCanvas* canvasObj = canvas();
             if (ty + s->m_y < canvasObj->truncatedAt())
 #if APPLE_CHANGES
