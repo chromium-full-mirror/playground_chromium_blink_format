@@ -53,7 +53,7 @@ class VisiblePosition {
   Position position() const { return rangeCompliantEquivalent(m_deepPosition); }
   Position deepEquivalent() const { return m_deepPosition; }
 
-  Position upstreamDeepEquivalent() const;
+  Position downstreamDeepEquivalent() const;
 
   friend bool operator==(const VisiblePosition& a, const VisiblePosition& b);
 
