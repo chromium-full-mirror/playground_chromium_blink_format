@@ -487,12 +487,13 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e) {
   // display, since it
   // may be needed for positioned elements that have to compute their static
   // normal flow
-  // positions.
+  // positions.  We also force inline-level roots to be block-level.
   style->setOriginalDisplay(style->display());
   if (style->display() != NONE && style->display() != BLOCK &&
       style->display() != TABLE && style->display() != BOX &&
       (style->position() == ABSOLUTE || style->position() == FIXED ||
-       style->floating() != FNONE)) {
+       style->floating() != FNONE ||
+       e->getDocument()->documentElement() == e)) {
     if (style->display() == INLINE_TABLE)
       style->setDisplay(TABLE);
     else if (style->display() == INLINE_BOX)
