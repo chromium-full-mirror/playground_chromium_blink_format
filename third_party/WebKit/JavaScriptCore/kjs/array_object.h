@@ -55,6 +55,9 @@ class ArrayInstanceImp : public ObjectImp {
 
   unsigned getLength() const { return length; }
 
+  void sort(ExecState* exec);
+  void sort(ExecState* exec, Object& compareFunction);
+
  private:
   void setLength(unsigned newLength);
 
