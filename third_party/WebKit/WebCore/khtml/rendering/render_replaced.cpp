@@ -264,6 +264,7 @@ void RenderWidget::paintObject(QPainter* /*p*/,
   int xPos = _tx + borderLeft() + paddingLeft();
   int yPos = _ty + borderTop() + paddingTop();
 
+#if !APPLE_CHANGES
   int childw = m_widget->width();
   int childh = m_widget->height();
   if ((childw == 2000 || childh == 3072) && m_widget->inherits("KHTMLView")) {
@@ -296,6 +297,8 @@ void RenderWidget::paintObject(QPainter* /*p*/,
     xPos = xNew;
     yPos = yNew;
   }
+#endif
+
   m_view->addChild(m_widget, xPos, yPos);
   m_widget->show();
 

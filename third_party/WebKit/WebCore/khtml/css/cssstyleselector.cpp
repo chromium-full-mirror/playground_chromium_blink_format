@@ -2906,10 +2906,19 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         if (primitiveValue->getIdent() == CSS_VAL_NORMAL)
           lineHeight = Length(-100, Percent);
         else if (type > CSSPrimitiveValue::CSS_PERCENTAGE &&
-                 type < CSSPrimitiveValue::CSS_DEG)
-          lineHeight = Length(
-              primitiveValue->computeLength(style, paintDeviceMetrics), Fixed);
-        else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
+                 type < CSSPrimitiveValue::CSS_DEG) {
+          double multiplier = 1.0;
+          // Scale for the font zoom factor only for types other than "em" and
+          // "ex", since those are
+          // already based on the font size.
+          if (type != CSSPrimitiveValue::CSS_EMS &&
+              type != CSSPrimitiveValue::CSS_EXS && view && view->part()) {
+            multiplier = view->part()->zoomFactor() / 100.0;
+          }
+          lineHeight = Length(primitiveValue->computeLength(
+                                  style, paintDeviceMetrics, multiplier),
+                              Fixed);
+        } else if (type == CSSPrimitiveValue::CSS_PERCENTAGE)
           lineHeight = Length((style->font().pixelSize() *
                                int(primitiveValue->getFloatValue(
                                    CSSPrimitiveValue::CSS_PERCENTAGE))) /
