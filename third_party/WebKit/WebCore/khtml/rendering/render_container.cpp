@@ -40,16 +40,20 @@ RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderObject(node) {
   m_last = 0;
 }
 
-RenderContainer::~RenderContainer() {
+RenderContainer::~RenderContainer() {}
+
+void RenderContainer::detach(RenderArena* renderArena) {
   RenderObject* next;
   for (RenderObject* n = m_first; n; n = next) {
     n->removeFromSpecialObjects();
     n->setParent(0);
     next = n->nextSibling();
-    n->detach();
+    n->detach(renderArena);
   }
   m_first = 0;
   m_last = 0;
+
+  RenderObject::detach(renderArena);
 }
 
 void RenderContainer::addChild(RenderObject* newChild,

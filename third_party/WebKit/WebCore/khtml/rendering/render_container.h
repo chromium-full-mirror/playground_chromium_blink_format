@@ -40,6 +40,8 @@ class RenderContainer : public RenderObject {
   virtual void addChild(RenderObject* newChild, RenderObject* beforeChild = 0);
   virtual void removeChild(RenderObject* oldChild);
 
+  virtual void detach(RenderArena* renderArena);
+
   virtual RenderObject* removeChildNode(RenderObject* child);
   virtual void appendChildNode(RenderObject* child);
   virtual void insertChildNode(RenderObject* child, RenderObject* before);

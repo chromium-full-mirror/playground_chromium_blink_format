@@ -43,6 +43,7 @@
 
 #include "rendering/render_root.h"
 #include "rendering/render_replaced.h"
+#include "render_arena.h"
 
 #include "khtmlview.h"
 #include "khtml_part.h"
@@ -238,6 +239,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_paintDeviceMetrics = 0;
 
   m_view = v;
+  m_renderArena = 0;
 
   if (v) {
     m_docLoader = new DocLoader(v->part(), this);
@@ -325,6 +327,8 @@ DocumentImpl::~DocumentImpl() {
   m_styleSheets->deref();
   if (m_focusNode)
     m_focusNode->deref();
+
+  delete m_renderArena;
 }
 
 DocumentTypeImpl* DocumentImpl::doctype() const {
@@ -965,8 +969,11 @@ void DocumentImpl::attach() {
   if (m_view)
     setPaintDevice(m_view);
 
+  if (!m_renderArena)
+    m_renderArena = new RenderArena();
+
   // Create the rendering tree
-  m_render = new RenderRoot(this, m_view);
+  m_render = new (m_renderArena) RenderRoot(this, m_view);
   m_styleSelector->computeFontSizes(
       paintDeviceMetrics(), m_view ? m_view->part()->zoomFactor() : 100);
   recalcStyle(Force);
@@ -987,9 +994,12 @@ void DocumentImpl::detach() {
   NodeBaseImpl::detach();
 
   if (render)
-    render->detach();
+    render->detach(m_renderArena);
 
   m_view = 0;
+
+  delete m_renderArena;
+  m_renderArena = 0;
 }
 
 void DocumentImpl::setVisuallyOrdered() {

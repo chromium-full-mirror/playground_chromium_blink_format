@@ -23,6 +23,9 @@
 #include "break_lines.h"
 #include "render_flow.h"
 #include "render_text.h"
+#include "render_arena.h"
+#include "xml/dom_docimpl.h"
+
 using namespace khtml;
 
 #include "kdebug.h"
@@ -39,6 +42,9 @@ static BidiIterator current;
 static BidiContext* context;
 static BidiStatus status;
 static QPtrList<BidiRun>* sruns = 0;
+static QPtrList<BidiIterator>* smidpoints = 0;
+static bool betweenMidpoints = false;
+static bool isLineEmpty = true;
 static QChar::Direction dir;
 static bool adjustEmbeddding = false;
 static bool emptyRun = true;
@@ -46,6 +52,23 @@ static int numSpaces;
 
 static void embed(QChar::Direction d);
 static void appendRun();
+
+void BidiIterator::detach(RenderArena* renderArena) {
+  delete this;
+
+  // Now perform the destroy.
+  size_t* sz = (size_t*)this;
+  renderArena->free(*sz, (void*)this);
+}
+
+void* BidiIterator::operator new(size_t sz, RenderArena* renderArena) throw() {
+  return renderArena->allocate(sz);
+}
+
+void BidiIterator::operator delete(void* ptr, size_t sz) {
+  size_t* szPtr = (size_t*)ptr;
+  *szPtr = sz;
+}
 
 // ---------------------------------------------------------------------
 
@@ -227,6 +250,35 @@ inline QChar::Direction BidiIterator::direction() const {
 
 // -------------------------------------------------------------------------------------------------
 
+static void appendRunsForObject(int start, int end, RenderObject* obj) {
+  BidiIterator* nextMidpoint =
+      (smidpoints && smidpoints->count()) ? smidpoints->at(0) : 0;
+  if (betweenMidpoints) {
+    if (!(nextMidpoint && nextMidpoint->obj == obj))
+      return;
+    // This is a new start point. Stop ignoring objects and
+    // adjust our start.
+    betweenMidpoints = false;
+    start = nextMidpoint->pos;
+    smidpoints->removeFirst();  // Delete the midpoint.
+    if (start < end)
+      return appendRunsForObject(start, end, obj);
+  } else {
+    if (!smidpoints || !nextMidpoint || (obj != nextMidpoint->obj)) {
+      sruns->append(new BidiRun(start, end, obj, context, dir));
+      return;
+    }
+
+    // An end midpoint has been encounted within our object.  We
+    // need to go ahead and append a run with our endpoint.
+    sruns->append(new BidiRun(start, nextMidpoint->pos + 1, obj, context, dir));
+    betweenMidpoints = true;
+    int nextPos = nextMidpoint->pos + 1;
+    smidpoints->removeFirst();
+    return appendRunsForObject(nextPos, end, obj);
+  }
+}
+
 static void appendRun() {
   if (emptyRun)
     return;
@@ -240,17 +292,11 @@ static void appendRun() {
   int start = sor.pos;
   RenderObject* obj = sor.obj;
   while (obj && obj != eor.obj) {
-    if (!obj->isHidden()) {
-      // kdDebug(6041) << "appendRun: "<< start << "/" << obj->length() <<endl;
-      sruns->append(new BidiRun(start, obj->length(), obj, context, dir));
-    }
+    appendRunsForObject(start, obj->length(), obj);
     start = 0;
     obj = Bidinext(sor.par, obj);
   }
-  if (obj && !obj->isHidden()) {
-    // kdDebug(6041) << "appendRun: "<< start << "/" << eor.pos <<endl;
-    sruns->append(new BidiRun(start, eor.pos + 1, obj, context, dir));
-  }
+  appendRunsForObject(start, eor.pos + 1, obj);
 
   ++eor;
   sor = eor;
@@ -956,6 +1002,20 @@ void RenderFlow::bidiReorderLine(const BidiIterator& start,
   sruns = 0;
 }
 
+static void deleteMidpoints(RenderArena* arena,
+                            QPtrList<BidiIterator>* midpoints) {
+  if (!midpoints)
+    return;
+
+  unsigned int len = midpoints->count();
+  for (unsigned int i = 0; i < len; i++) {
+    BidiIterator* s = midpoints->at(i);
+    if (s)
+      s->detach(arena);
+    midpoints->remove(i);
+  }
+}
+
 void RenderFlow::layoutInlineChildren() {
   invalidateVerticalPositions();
 #ifdef DEBUG_LAYOUT
@@ -974,6 +1034,7 @@ void RenderFlow::layoutInlineChildren() {
     m_height += paddingTop();
     toAdd += paddingBottom();
   }
+
   if (firstChild()) {
     // layout replaced elements
     RenderObject* o = first(this);
@@ -1011,30 +1072,44 @@ void RenderFlow::layoutInlineChildren() {
     BidiIterator end(this);
 
     firstLine = true;
+
+    if (!smidpoints) {
+      smidpoints = new QPtrList<BidiIterator>;
+      smidpoints->setAutoDelete(false);
+    }
+
     while (!end.atEnd()) {
       start = end;
-
-      end = findNextLineBreak(start);
+      betweenMidpoints = false;
+      isLineEmpty = true;
+      end = findNextLineBreak(start, *smidpoints);
       if (start.atEnd())
         break;
-      bidiReorderLine(start, end);
+      if (!isLineEmpty) {
+        bidiReorderLine(start, end);
 
-      if (end == start || (end.obj && end.obj->isBR() && !start.obj->isBR())) {
-        adjustEmbeddding = true;
-        ++end;
-        adjustEmbeddding = false;
-      } else if (m_pre && end.current() == QChar('\n')) {
-        adjustEmbeddding = true;
-        ++end;
-        adjustEmbeddding = false;
+        if (end == start ||
+            (end.obj && end.obj->isBR() && !start.obj->isBR())) {
+          adjustEmbeddding = true;
+          ++end;
+          adjustEmbeddding = false;
+        } else if (m_pre && end.current() == QChar('\n')) {
+          adjustEmbeddding = true;
+          ++end;
+          adjustEmbeddding = false;
+        }
+
+        newLine();
       }
-
-      newLine();
       firstLine = false;
+      deleteMidpoints(renderArena(), smidpoints);
     }
     startEmbed->deref();
     // embed->deref();
   }
+
+  deleteMidpoints(renderArena(), smidpoints);
+
   m_height += toAdd;
 
   // in case we have a float on the last line, it might not be positioned up to
@@ -1049,7 +1124,8 @@ void RenderFlow::layoutInlineChildren() {
   // kdDebug(6040) << "height = " << m_height <<endl;
 }
 
-BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start) {
+BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start,
+                                           QPtrList<BidiIterator>& midpoints) {
   int width = lineWidth(m_height);
   int w = 0;
   int tmpW = 0;
@@ -1096,6 +1172,24 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start) {
   if (start.atEnd())
     return start;
 
+  // This variable is used only if whitespace isn't set to PRE, and it tells us
+  // whether
+  // or not we are currently ignoring whitespace.
+  bool ignoringSpaces = false;
+
+  // This variable tracks whether the very last character we saw was a space.
+  // We use
+  // this to detect when we encounter a second space so we know we have to
+  // terminate
+  // a run.
+  bool sawSpace = false;
+  RenderObject* trailingSpaceObject = 0;
+
+  // The pos of the last whitespace char we saw, not to be confused with the
+  // lastSpace
+  // variable below, which is really the last breakable char.
+  int lastSpacePos = 0;
+
   BidiIterator lBreak = start;
 
   RenderObject* o = start.obj;
@@ -1111,6 +1205,13 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start) {
       if (w + tmpW <= width) {
         lBreak.obj = o;
         lBreak.pos = 0;
+
+        // A <br> always breaks a line, so don't let the line be collapsed
+        // away. Also, the space at the end of a line with a <br> does not
+        // get collapsed away. -dwh
+        isLineEmpty = false;
+        trailingSpaceObject = 0;
+
         // check the clear status
         EClear clear = o->style()->clear();
         if (clear != CNONE) {
@@ -1136,92 +1237,146 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start) {
       }
     } else if (o->isReplaced()) {
       tmpW += o->width() + o->marginLeft() + o->marginRight();
+      if (ignoringSpaces) {
+        BidiIterator* startMid = new (o->renderArena()) BidiIterator();
+        startMid->obj = o;
+        startMid->pos = 0;
+        midpoints.append(startMid);
+      }
+      isLineEmpty = false;
+      ignoringSpaces = false;
+      sawSpace = false;
+      lastSpacePos = 0;
+      trailingSpaceObject = 0;
     } else if (o->isText()) {
       RenderText* t = static_cast<RenderText*>(o);
       int strlen = t->stringLength();
       int len = strlen - pos;
       QChar* str = t->text();
-#if 0
-	    if ( ( !firstLine || !t->firstLine() ) && !t->hasReturn() && t->maxWidth() + w + tmpW < width ) {
-		// the rest of the object fits completely
-// 		kdDebug() << "RenderFlow::findNextLineBreak object fits completely, max=" << t->maxWidth()
-// 			  << " width =" << w << " avail = " << width <<" tmp=" << tmpW << endl;
-		//search backwards for last possible linebreak
-		int lastSpace = strlen-1;
-		while( lastSpace >= pos && !isBreakable( str, lastSpace, strlen ) )
-		    lastSpace--;
-		lastSpace++;
-		if ( lastSpace > pos ) {
-		    w += tmpW + t->width( pos, lastSpace-pos, firstLine);
-		    tmpW = 0;
-		    lBreak.obj = o;
-		    lBreak.pos = lastSpace;
-		}
-		tmpW += t->width( lastSpace, strlen-lastSpace, firstLine);
-// 		kdDebug() << "--> width=" << t->width( pos, strlen-pos, firstLine)
-// 			  <<" first=" << t->width( pos, lastSpace-pos, firstLine)
-// 			  <<" end=" << t->width( lastSpace, strlen-lastSpace, firstLine)
-// 			  << endl;
-	    } else {
-#endif
-      if (style()->whiteSpace() == NOWRAP ||
-          t->style()->whiteSpace() == NOWRAP) {
-        tmpW += t->maxWidth();
-        pos = len;
-        len = 0;
-      } else {
-        const Font* f = t->htmlFont(firstLine);
-        // proportional font, needs a bit more work.
-        int lastSpace = pos;
-        bool isPre = style()->whiteSpace() == PRE;
-        while (len) {
-          if ((isPre && str[pos] == '\n') ||
-              (!isPre && isBreakable(str, pos, strlen))) {
+
+      const Font* f = t->htmlFont(firstLine);
+      // proportional font, needs a bit more work.
+      int lastSpace = pos;
+      bool isPre = o->style()->whiteSpace() == PRE;
+      // QChar space[1]; space[0] = ' ';
+      // int spaceWidth = f->width(space, 1, 0);
+      while (len) {
+        // XXXdwh This is wrong. Still mutating the DOM
+        // string for newlines... will fix in second stage.
+        if (!isPre && str[pos] == '\n')
+          str[pos] = ' ';
+
+        bool oldSawSpace = sawSpace;
+        sawSpace = (str[pos].direction() == QChar::DirWS);
+
+        if (isPre || !sawSpace)
+          isLineEmpty = false;
+
+        if ((isPre && str[pos] == '\n') ||
+            (!isPre && isBreakable(str, pos, strlen))) {
+          if (ignoringSpaces) {
+            if (!sawSpace) {
+              // Stop ignoring spaces and begin at this
+              // new point.
+              BidiIterator* startMid = new (o->renderArena()) BidiIterator();
+              startMid->obj = o;
+              startMid->pos = pos;
+              midpoints.append(startMid);
+            } else {
+              // Just keep ignoring these spaces.
+              pos++;
+              len--;
+              continue;
+            }
+          } else {
+            if (sawSpace && !oldSawSpace)
+              lastSpacePos = pos;
             tmpW += t->width(lastSpace, pos - lastSpace, f);
-#ifdef DEBUG_LINEBREAKS
-            kdDebug(6041) << "found space at " << pos << " in string '"
-                          << QString(str, strlen).latin1() << "' adding "
-                          << tmpW << " new width = " << w << endl;
-#endif
-            if (!isPre && w + tmpW > width && w == 0) {
-              int fb = floatBottom();
-              int newLineWidth = lineWidth(fb);
-              if (!w && m_height < fb && width < newLineWidth) {
-                m_height = fb;
-                width = newLineWidth;
-#ifdef DEBUG_LINEBREAKS
-                kdDebug() << "RenderFlow::findNextLineBreak new position at "
-                          << m_height << " newWidth " << width << endl;
-#endif
-              }
-            }
-            if (!isPre && w + tmpW > width)
-              goto end;
-
-            lBreak.obj = o;
-            lBreak.pos = pos;
-
-            if (*(str + pos) == '\n') {
-#ifdef DEBUG_LINEBREAKS
-              kdDebug(6041) << "forced break sol: " << start.obj << " "
-                            << start.pos << "   end: " << lBreak.obj << " "
-                            << lBreak.pos << "   width=" << w << endl;
-#endif
-              return lBreak;
-            }
-            w += tmpW;
-            tmpW = 0;
-            lastSpace = pos;
           }
-          pos++;
-          len--;
-        }
-        // IMPORTANT: pos is > length here!
-        tmpW += t->width(lastSpace, pos - lastSpace, f);
-      }
-#if 0
-            }
+
+#ifdef DEBUG_LINEBREAKS
+          kdDebug(6041) << "found space at " << pos << " in string '"
+                        << QString(str, strlen).latin1() << "' adding " << tmpW
+                        << " new width = " << w << endl;
 #endif
+          if (!isPre && w + tmpW > width && w == 0) {
+            int fb = floatBottom();
+            int newLineWidth = lineWidth(fb);
+            if (!w && m_height < fb && width < newLineWidth) {
+              m_height = fb;
+              width = newLineWidth;
+#ifdef DEBUG_LINEBREAKS
+              kdDebug() << "RenderFlow::findNextLineBreak new position at "
+                        << m_height << " newWidth " << width << endl;
+#endif
+            }
+          }
+
+          if (!isPre && w + tmpW > width)
+            goto end;
+
+          lBreak.obj = o;
+          lBreak.pos = pos;
+
+          if (*(str + pos) == '\n' && isPre) {
+#ifdef DEBUG_LINEBREAKS
+            kdDebug(6041) << "forced break sol: " << start.obj << " "
+                          << start.pos << "   end: " << lBreak.obj << " "
+                          << lBreak.pos << "   width=" << w << endl;
+#endif
+            return lBreak;
+          }
+
+          w += tmpW;
+          tmpW = 0;
+          lastSpace = pos;
+
+          if (!ignoringSpaces && !isPre) {
+            // If we encounter a newline, or if we encounter a
+            // second space, we need to go ahead and break up this
+            // run and enter a mode where we start collapsing spaces.
+            if (sawSpace && oldSawSpace)
+              ignoringSpaces = true;
+
+            if (ignoringSpaces) {
+              // We just entered a mode where we are ignoring
+              // spaces. Create a midpoint to terminate the run
+              // before the second space.
+              BidiIterator* endMid = new (o->renderArena()) BidiIterator();
+              if (trailingSpaceObject) {
+                endMid->obj = trailingSpaceObject;
+              } else
+                endMid->obj = o;
+              endMid->pos = lastSpacePos;
+              midpoints.append(endMid);
+              lastSpace = pos;
+            }
+          }
+        } else if (ignoringSpaces) {
+          // Stop ignoring spaces and begin at this
+          // new point.
+          ignoringSpaces = false;
+          lastSpacePos = 0;
+          lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
+                            // ignored spaces.
+          BidiIterator* startMid = new (o->renderArena()) BidiIterator();
+          startMid->obj = o;
+          startMid->pos = pos;
+          midpoints.append(startMid);
+        }
+
+        if (!isPre && sawSpace && !ignoringSpaces)
+          trailingSpaceObject = o;
+        else if (isPre || !sawSpace)
+          trailingSpaceObject = 0;
+
+        pos++;
+        len--;
+      }
+
+      // IMPORTANT: pos is > length here!
+      if (!ignoringSpaces)
+        tmpW += t->width(lastSpace, pos - lastSpace, f);
     } else
       KHTMLAssert(false);
 
@@ -1231,6 +1386,9 @@ BidiIterator RenderFlow::findNextLineBreak(BidiIterator& start) {
       // << width << endl;
       // kdDebug() << "start=" << start.obj << " current=" << o << endl;
       // if we have floats, try to get below them.
+      if (sawSpace && !ignoringSpaces && o->style()->whiteSpace() != PRE)
+        trailingSpaceObject = 0;
+
       int fb = floatBottom();
       int newLineWidth = lineWidth(fb);
       if (!w && m_height < fb && width < newLineWidth) {
@@ -1319,6 +1477,27 @@ end:
                 << "   end: " << lBreak.obj << " " << lBreak.pos
                 << "   width=" << w << endl;
 #endif
+
+  if (trailingSpaceObject) {
+    // This object is either going to be part of the last midpoint, or it is
+    // going
+    // to be the actual endpoint.  In both cases we just decrease our pos by 1
+    // level to
+    // exclude the space, allowing it to - in effect - collapse into the
+    // newline.
+    int count = midpoints.count();
+    if (count % 2 == 1) {
+      BidiIterator* lastEndPoint = midpoints.at(count - 1);
+      lastEndPoint->pos--;
+    }
+    // else if (lBreak.pos > 0)
+    //    lBreak.pos--;
+    else if (lBreak.obj == 0 && trailingSpaceObject->isText()) {
+      lBreak.obj = trailingSpaceObject;
+      lBreak.pos = static_cast<RenderText*>(trailingSpaceObject)->length() - 1;
+    }
+  }
+
   return lBreak;
 }
 

@@ -160,7 +160,6 @@ void KHTMLParser::reset() {
   haveFrameSet = false;
   haveContent = false;
   inSelect = false;
-  m_inline = false;
 
   form = 0;
   map = 0;
@@ -195,8 +194,8 @@ void KHTMLParser::parseToken(Token* t) {
                 << getTagName(t->id).string() << "(" << t->id << ")"
                 << " current = " << getTagName(current->id()).string() << "("
                 << current->id() << ")" << endl;
-  kdDebug(6035) << "inline=" << m_inline << " inBody=" << inBody
-                << " haveFrameSet=" << haveFrameSet << endl;
+  kdDebug(6035) << " inBody=" << inBody << " haveFrameSet=" << haveFrameSet
+                << endl;
 #endif
 
   // holy shit. apparently some sites use </br> instead of <br>
@@ -212,7 +211,9 @@ void KHTMLParser::parseToken(Token* t) {
 
   // ignore spaces, if we're not inside a paragraph or other inline code
   if (t->id == ID_TEXT && t->text) {
-    if (inBody && !skipMode() && t->text->l > 2)
+    if (inBody && !skipMode() && current->id() != ID_STYLE &&
+        current->id() != ID_TITLE && current->id() != ID_SCRIPT &&
+        !t->text->containsOnlyWhitespace())
       haveContent = true;
 #ifdef PARSER_DEBUG
     kdDebug(6035) << "length=" << t->text->l << " text='"
@@ -322,9 +323,6 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
           n->renderer()->setBlockBidi();
       }
 #endif
-      //_inline = current->isInline();
-      if (current->isInline())
-        m_inline = true;
     } else {
 #if SPEED_DEBUG < 2
       if (!n->attached() && HTMLWidget) {
@@ -1179,6 +1177,12 @@ void KHTMLParser::popBlock(int _id) {
       popOneBlock();
       Elem = 0;
     } else {
+      if (Elem->id == ID_FORM && form)
+        // A <form> is being closed prematurely (and this is
+        // malformed HTML).  Set an attribute on the form to clear out its
+        // bottom margin.
+        form->setMalformed(true);
+
       popOneBlock();
       Elem = blockStack;
     }
@@ -1212,11 +1216,6 @@ void KHTMLParser::popOneBlock() {
   removeForbidden(Elem->id, forbiddenTag);
 
   blockStack = Elem->next;
-  // we only set inline to false, if the element we close is a block level
-  // element.
-  // This helps getting cases as <p><b>bla</b> <b>bla</b> right.
-  if (!current->isInline())
-    m_inline = false;
   current = Elem->node;
 
   delete Elem;

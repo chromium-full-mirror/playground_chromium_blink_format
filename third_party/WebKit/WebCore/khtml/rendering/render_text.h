@@ -59,6 +59,24 @@ class TextSlave {
     m_firstLine = firstLine;
     m_toAdd = toAdd;
   }
+
+  void detach(RenderArena* renderArena);
+
+  // Overloaded new operator.  Derived classes must override operator new
+  // in order to allocate out of the RenderArena.
+  void* operator new(size_t sz, RenderArena* renderArena) throw();
+
+  // Overridden to prevent the normal delete from being called.
+  void operator delete(void* ptr, size_t sz);
+
+ private:
+  // The normal operator new is disallowed.
+  void* operator new(size_t sz) throw() {
+    assert(false);
+    return 0;
+  };
+
+ public:
   void printDecoration(QPainter* pt,
                        RenderText* p,
                        int _tx,
@@ -151,6 +169,7 @@ class RenderText : public RenderObject {
   printObject(QPainter*, int x, int y, int w, int h, int tx, int ty);
 
   void deleteSlaves();
+  virtual void detach(RenderArena* renderArena);
 
   DOM::DOMString data() const { return str; }
   DOM::DOMStringImpl* string() const { return str; }
@@ -198,6 +217,17 @@ class RenderText : public RenderObject {
   virtual void calcMinMaxWidth();
   virtual short minWidth() const { return m_minWidth; }
   virtual short maxWidth() const { return m_maxWidth; }
+  virtual void trimmedMinMaxWidth(short& beginMinW,
+                                  bool& beginWS,
+                                  short& endMinW,
+                                  bool& endWS,
+                                  bool& hasBreakableChar,
+                                  bool& hasBreak,
+                                  short& beginMaxW,
+                                  short& endMaxW,
+                                  short& minW,
+                                  short& maxW,
+                                  bool& stripFrontSpaces);
 
   // returns the minimum x position of all slaves relative to the parent.
   // defaults to 0.
@@ -205,8 +235,6 @@ class RenderText : public RenderObject {
 
   virtual int xPos() const;
   virtual int yPos() const;
-
-  bool hasReturn() const { return m_hasReturn; }
 
   virtual const QFont& font();
   virtual short verticalPositionHint(bool firstLine) const;
@@ -230,7 +258,6 @@ class RenderText : public RenderObject {
 
   virtual void repaint();
 
-  bool hasBreakableChar() const { return m_hasBreakableChar; }
   const QFontMetrics& metrics(bool firstLine) const;
   const Font* htmlFont(bool firstLine) const;
 
@@ -263,10 +290,18 @@ class RenderText : public RenderObject {
   short m_lineHeight;
   short m_minWidth;
   short m_maxWidth;
+  short m_beginMinWidth;
+  short m_endMinWidth;
 
   SelectionState m_selectionState : 3;
-  bool m_hasReturn : 1;
-  bool m_hasBreakableChar : 1;
+  bool m_hasBreakableChar : 1;  // Whether or not we can be broken into multiple
+                                // lines.
+  bool m_hasBreak : 1;  // Whether or not we have a hard break (e.g., <pre> with
+                        // '\n').
+  bool m_hasBeginWS : 1;  // Whether or not we begin with WS (only true if we
+                          // aren't pre)
+  bool m_hasEndWS : 1;  // Whether or not we end with WS (only true if we aren't
+                        // pre)
 
   // 19 bits left
 };

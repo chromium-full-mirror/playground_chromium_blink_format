@@ -267,7 +267,8 @@ static const ushort tag_list_0[] = {
     ID_SELECT,  ID_TEXTAREA, ID_LABEL, ID_BUTTON, ID_INS,    ID_DEL,
     ID_COMMENT, ID_NOBR,     ID_WBR,   0};
 
-static const ushort tag_list_1[] = {ID_P,
+static const ushort tag_list_1[] = {ID_TEXT,
+                                    ID_P,
                                     ID_H1,
                                     ID_H2,
                                     ID_H3,
@@ -293,7 +294,6 @@ static const ushort tag_list_1[] = {ID_P,
                                     ID_TABLE,
                                     ID_FIELDSET,
                                     ID_ADDRESS,
-                                    ID_TEXT,
                                     ID_TT,
                                     ID_I,
                                     ID_B,
@@ -348,42 +348,43 @@ static const ushort tag_list_1[] = {ID_P,
 static const ushort tag_list_2[] = {ID_COMMENT, 0};
 
 static const ushort tag_list_3[] = {
-    ID_P,       ID_H1,      ID_H2,        ID_H3,       ID_H4,
-    ID_H5,      ID_H6,      ID_UL,        ID_OL,       ID_DIR,
-    ID_MENU,    ID_PRE,     ID_PLAINTEXT, ID_DL,       ID_DIV,
-    ID_LAYER,   ID_CENTER,  ID_NOSCRIPT,  ID_NOFRAMES, ID_BLOCKQUOTE,
-    ID_FORM,    ID_ISINDEX, ID_HR,        ID_TABLE,    ID_FIELDSET,
-    ID_ADDRESS, ID_COMMENT, ID_LI,        ID_XMP,      ID__KONQBLOCK,
-    ID_MARQUEE, 0};
+    ID_TEXT,       ID_P,       ID_H1,      ID_H2,        ID_H3,
+    ID_H4,         ID_H5,      ID_H6,      ID_UL,        ID_OL,
+    ID_DIR,        ID_MENU,    ID_PRE,     ID_PLAINTEXT, ID_DL,
+    ID_DIV,        ID_LAYER,   ID_CENTER,  ID_NOSCRIPT,  ID_NOFRAMES,
+    ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX, ID_HR,        ID_TABLE,
+    ID_FIELDSET,   ID_ADDRESS, ID_COMMENT, ID_LI,        ID_XMP,
+    ID__KONQBLOCK, ID_MARQUEE, 0};
 
 static const ushort tag_list_4[] = {
-    ID_PARAM,      ID_P,       ID_H1,       ID_H2,        ID_H3,
-    ID_H4,         ID_H5,      ID_H6,       ID_UL,        ID_OL,
-    ID_DIR,        ID_MENU,    ID_PRE,      ID_PLAINTEXT, ID_DL,
-    ID_DIV,        ID_LAYER,   ID_CENTER,   ID_NOSCRIPT,  ID_NOFRAMES,
-    ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX,  ID_HR,        ID_TABLE,
-    ID_FIELDSET,   ID_ADDRESS, ID_TEXT,     ID_TT,        ID_I,
-    ID_B,          ID_U,       ID_S,        ID_STRIKE,    ID_BIG,
-    ID_SMALL,      ID_EM,      ID_STRONG,   ID_DFN,       ID_CODE,
-    ID_SAMP,       ID_KBD,     ID_VAR,      ID_CITE,      ID_ABBR,
-    ID_ACRONYM,    ID_A,       ID_IMG,      ID_APPLET,    ID_OBJECT,
-    ID_EMBED,      ID_FONT,    ID_BASEFONT, ID_BR,        ID_SCRIPT,
-    ID_MAP,        ID_Q,       ID_SUB,      ID_SUP,       ID_SPAN,
-    ID_BDO,        ID_IFRAME,  ID_INPUT,    ID_SELECT,    ID_TEXTAREA,
-    ID_LABEL,      ID_BUTTON,  ID_COMMENT,  ID_LI,        ID_XMP,
-    ID_MARQUEE,    0};
+    ID_TEXT,     ID_PARAM,      ID_P,       ID_H1,       ID_H2,
+    ID_H3,       ID_H4,         ID_H5,      ID_H6,       ID_UL,
+    ID_OL,       ID_DIR,        ID_MENU,    ID_PRE,      ID_PLAINTEXT,
+    ID_DL,       ID_DIV,        ID_LAYER,   ID_CENTER,   ID_NOSCRIPT,
+    ID_NOFRAMES, ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX,  ID_HR,
+    ID_TABLE,    ID_FIELDSET,   ID_ADDRESS, ID_TEXT,     ID_TT,
+    ID_I,        ID_B,          ID_U,       ID_S,        ID_STRIKE,
+    ID_BIG,      ID_SMALL,      ID_EM,      ID_STRONG,   ID_DFN,
+    ID_CODE,     ID_SAMP,       ID_KBD,     ID_VAR,      ID_CITE,
+    ID_ABBR,     ID_ACRONYM,    ID_A,       ID_IMG,      ID_APPLET,
+    ID_OBJECT,   ID_EMBED,      ID_FONT,    ID_BASEFONT, ID_BR,
+    ID_SCRIPT,   ID_MAP,        ID_Q,       ID_SUB,      ID_SUP,
+    ID_SPAN,     ID_BDO,        ID_IFRAME,  ID_INPUT,    ID_SELECT,
+    ID_TEXTAREA, ID_LABEL,      ID_BUTTON,  ID_COMMENT,  ID_LI,
+    ID_XMP,      ID_MARQUEE,    0};
 
-static const ushort tag_list_6[] = {ID_DT, ID_DD, ID_COMMENT, 0};
+static const ushort tag_list_6[] = {ID_TEXT, ID_DT, ID_DD, ID_COMMENT, 0};
 
-static const ushort tag_list_7[] = {ID_OPTGROUP, ID_OPTION, ID_COMMENT,
-                                    ID_SCRIPT, 0};
+static const ushort tag_list_7[] = {ID_TEXT,    ID_OPTGROUP, ID_OPTION,
+                                    ID_COMMENT, ID_SCRIPT,   0};
 
 static const ushort tag_list_9[] = {ID_TH, ID_TD, ID_COMMENT, 0};
 
 static const ushort tag_list_10[] = {ID_FRAMESET, ID_FRAME, ID_COMMENT, 0};
 
-static const ushort tag_list_11[] = {ID_SCRIPT, ID_STYLE, ID_META,    ID_LINK,
-                                     ID_OBJECT, ID_EMBED, ID_COMMENT, 0};
+static const ushort tag_list_11[] = {ID_TEXT,  ID_SCRIPT,  ID_STYLE,
+                                     ID_META,  ID_LINK,    ID_OBJECT,
+                                     ID_EMBED, ID_COMMENT, 0};
 
 bool check_array(ushort child, const ushort* tagList) {
   int i = 0;
@@ -581,6 +582,8 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
         case ID_THEAD:
         case ID_TFOOT:
         case ID_TBODY:
+        case ID_TEXT:
+        case ID_COMMENT:
           return true;
         default:
           return false;
@@ -589,12 +592,12 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
     case ID_TFOOT:
     case ID_TBODY:
       // THEAD: TR +
-      if (childID == ID_TR)
+      if (childID == ID_TR || childID == ID_TEXT || childID == ID_COMMENT)
         return true;
       return false;
     case ID_COLGROUP:
       // COLGROUP: COL *
-      if (childID == ID_COL)
+      if (childID == ID_COL || childID == ID_TEXT || childID == ID_COMMENT)
         return true;
       return false;
     case ID_TR:

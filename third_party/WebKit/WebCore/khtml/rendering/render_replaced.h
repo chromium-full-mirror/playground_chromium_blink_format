@@ -81,7 +81,7 @@ class RenderWidget : public QObject,
 
   virtual bool isWidget() const { return true; };
 
-  virtual void detach();
+  virtual void detach(RenderArena* renderArena);
   virtual void layout();
 
   QWidget* widget() const { return m_widget; }

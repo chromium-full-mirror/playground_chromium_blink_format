@@ -119,6 +119,8 @@ class RenderFlow : public RenderBox {
   void positionNewFloats();
   void clearFloats();
   virtual void calcMinMaxWidth();
+  void calcInlineMinMaxWidth();
+  void calcBlockMinMaxWidth();
 
   virtual bool containsSpecial() { return specialObjects != 0; }
   virtual bool hasOverhangingFloats() { return floatBottom() > m_height; }
@@ -130,7 +132,8 @@ class RenderFlow : public RenderBox {
 
   // implementation of the following functions is in bidi.cpp
   void bidiReorderLine(const BidiIterator& start, const BidiIterator& end);
-  BidiIterator findNextLineBreak(BidiIterator& start);
+  BidiIterator findNextLineBreak(BidiIterator& start,
+                                 QPtrList<BidiIterator>& midpoints);
 
   virtual bool isSelfCollapsingBlock() const { return m_height == 0; }
   virtual bool isTopMarginQuirk() const { return m_topMarginQuirk; }

@@ -37,6 +37,7 @@ class QPainter;
 class QTextStream;
 class CSSStyle;
 class KHTMLView;
+class RenderArena;
 
 #ifndef NDEBUG
 #define KHTMLAssert(x)                 \
@@ -121,6 +122,23 @@ class RenderObject : public CachedObjectClient {
 #endif
 
   static RenderObject* createObject(DOM::NodeImpl* node, RenderStyle* style);
+
+  // Overloaded new operator.  Derived classes must override operator new
+  // in order to allocate out of the RenderArena.
+  void* operator new(size_t sz, RenderArena* renderArena) throw();
+
+  // Overridden to prevent the normal delete from being called.
+  void operator delete(void* ptr, size_t sz);
+
+ private:
+  // The normal operator new is disallowed on all render objects.
+  void* operator new(size_t sz) throw() {
+    assert(false);
+    return 0;
+  };
+
+ public:
+  RenderArena* renderArena();
 
   // some helper functions...
   virtual bool childrenInline() const { return false; }
@@ -515,7 +533,7 @@ class RenderObject : public CachedObjectClient {
   virtual void calcVerticalMargins() {}
   void removeFromSpecialObjects();
 
-  virtual void detach();
+  virtual void detach(RenderArena* renderArena);
 
   const QFont& font(bool firstLine) const { return style(firstLine)->font(); }
 

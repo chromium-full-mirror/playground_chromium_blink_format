@@ -44,6 +44,7 @@ class QPaintDevice;
 class QPaintDeviceMetrics;
 class KHTMLView;
 class Tokenizer;
+class RenderArena;
 
 namespace khtml {
 class CSSStyleSelector;
@@ -246,6 +247,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   virtual void attach();
   virtual void detach();
+
+  RenderArena* renderArena() { return m_renderArena; }
 
   // to get visually ordered hebrew and arabic pages right
   void setVisuallyOrdered();
@@ -517,6 +520,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_inStyleRecalc;
 
   DOMString m_title;
+
+  RenderArena* m_renderArena;
 };
 
 class DocumentFragmentImpl : public NodeBaseImpl {

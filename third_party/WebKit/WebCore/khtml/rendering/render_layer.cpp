@@ -25,6 +25,8 @@
 #include <assert.h>
 #include "khtmlview.h"
 #include "render_box.h"
+#include "render_arena.h"
+#include "xml/dom_docimpl.h"
 
 using namespace DOM;
 using namespace khtml;
@@ -44,6 +46,7 @@ RenderLayer::RenderLayer(RenderObject* object)
 RenderLayer::~RenderLayer() {
   // Child layers will be deleted by their corresponding render objects, so
   // our destructor doesn't have to do anything.
+  m_parent = m_previous = m_next = m_first = m_last = 0;
 }
 
 void RenderLayer::updateLayerPosition() {
@@ -75,6 +78,23 @@ RenderLayer* RenderLayer::enclosingPositionedAncestor() {
     ;
 
   return curr;
+}
+
+void* RenderLayer::operator new(size_t sz, RenderArena* renderArena) throw() {
+  return renderArena->allocate(sz);
+}
+
+void RenderLayer::operator delete(void* ptr, size_t sz) {
+  size_t* szPtr = (size_t*)ptr;
+  *szPtr = sz;
+}
+
+void RenderLayer::detach(RenderArena* renderArena) {
+  delete this;
+
+  // Now perform the destroy.
+  size_t* sz = (size_t*)this;
+  renderArena->free(*sz, (void*)this);
 }
 
 void RenderLayer::addChild(RenderLayer* child) {
@@ -197,7 +217,7 @@ void RenderLayer::paint(QPainter* p, int x, int y, int w, int h) {
   if (currRect != paintRect)
     p->restore();  // Pop the clip.
 
-  delete node;
+  node->detach(renderer()->element()->getDocument()->renderArena());
 }
 
 bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
@@ -231,7 +251,7 @@ bool RenderLayer::nodeAtPoint(RenderObject::NodeInfo& info, int x, int y) {
     if (inside)
       break;
   }
-  delete node;
+  node->detach(renderer()->element()->getDocument()->renderArena());
 
   return inside;
 }
@@ -240,6 +260,10 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
     QRect damageRect,
     RenderLayer* rootLayer,
     bool eventProcessing) {
+  // The arena we use for allocating our temporary ztree elements.
+  RenderArena* renderArena =
+      renderer()->element()->getDocument()->renderArena();
+
   // This variable stores the result we will hand back.
   RenderLayer::RenderZTreeNode* returnNode = 0;
 
@@ -264,7 +288,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   convertToLayerCoords(rootLayer, x, y);
   QRect layerBounds(x, y, width(), height());
 
-  returnNode = new RenderLayer::RenderZTreeNode(this);
+  returnNode = new (renderArena) RenderZTreeNode(this);
 
   // If we establish a clip rect, then we want to intersect that rect
   // with the damage rect to form a new damage rect.
@@ -309,10 +333,10 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
       (eventProcessing &&
        layerBounds.contains(damageRect.x(), damageRect.y())) ||
       (!eventProcessing && layerBounds.intersects(damageRect))) {
-    RenderLayerElement* layerElt =
-        new RenderLayerElement(this, layerBounds, damageRect, x, y);
+    RenderLayerElement* layerElt = new (renderArena)
+        RenderLayerElement(this, layerBounds, damageRect, x, y);
     if (returnNode->child) {
-      RenderZTreeNode* leaf = new RenderZTreeNode(layerElt);
+      RenderZTreeNode* leaf = new (renderArena) RenderZTreeNode(layerElt);
       leaf->next = returnNode->child;
       returnNode->child = leaf;
 
@@ -338,7 +362,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
       // children.
       if (returnNode->layerElement) {
         RenderZTreeNode* leaf = returnNode;
-        returnNode = new RenderLayer::RenderZTreeNode(this);
+        returnNode = new (renderArena) RenderZTreeNode(this);
         returnNode->child = leaf;
       }
 
@@ -474,4 +498,55 @@ void RenderLayer::RenderZTreeNode::constructLayerList(
     RenderLayer::RenderLayerElement* elt = buffer->at(i);
     elt->zindex = explicitZIndex;
   }
+}
+
+void* RenderLayer::RenderLayerElement::operator new(
+    size_t sz,
+    RenderArena* renderArena) throw() {
+  void* result = renderArena->allocate(sz);
+  if (result)
+    memset(result, 0, sz);
+  return result;
+}
+
+void RenderLayer::RenderLayerElement::operator delete(void* ptr, size_t sz) {
+  size_t* szPtr = (size_t*)ptr;
+  *szPtr = sz;
+}
+
+void RenderLayer::RenderLayerElement::detach(RenderArena* renderArena) {
+  delete this;
+
+  // Now perform the destroy.
+  size_t* sz = (size_t*)this;
+  renderArena->free(*sz, (void*)this);
+}
+
+void* RenderLayer::RenderZTreeNode::operator new(
+    size_t sz,
+    RenderArena* renderArena) throw() {
+  void* result = renderArena->allocate(sz);
+  if (result)
+    memset(result, 0, sz);
+  return result;
+}
+
+void RenderLayer::RenderZTreeNode::operator delete(void* ptr, size_t sz) {
+  size_t* szPtr = (size_t*)ptr;
+  *szPtr = sz;
+}
+
+void RenderLayer::RenderZTreeNode::detach(RenderArena* renderArena) {
+  if (next)
+    next->detach(renderArena);
+  if (child)
+    child->detach(renderArena);
+  if (layerElement)
+    layerElement->detach(renderArena);
+
+  delete this;
+
+  // Now perform the destroy.
+  size_t* sz = (size_t*)this;
+  renderArena->free(*sz, (void*)this);
 }

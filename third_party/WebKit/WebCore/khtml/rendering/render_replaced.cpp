@@ -23,6 +23,8 @@
 #include "render_replaced.h"
 #include "render_root.h"
 
+#include "render_arena.h"
+
 #include <assert.h>
 #include <qwidget.h>
 #include <qpainter.h>
@@ -117,7 +119,7 @@ RenderWidget::RenderWidget(DOM::NodeImpl* node) : RenderReplaced(node) {
   ref();
 }
 
-void RenderWidget::detach() {
+void RenderWidget::detach(RenderArena* renderArena) {
   remove();
 
   if (m_widget) {
@@ -127,6 +129,7 @@ void RenderWidget::detach() {
     m_widget->removeEventFilter(this);
     m_widget->setMouseTracking(false);
   }
+
   deref();
 }
 

@@ -24,6 +24,8 @@
 #include "render_list.h"
 #include "rendering/render_root.h"
 
+#include "xml/dom_docimpl.h"
+
 #include <qpainter.h>
 
 #include "misc/helper.h"
@@ -137,11 +139,11 @@ void RenderListItem::setStyle(RenderStyle* _style) {
     newStyle->setFloating(FRIGHT);
 
   if (!m_marker && style()->listStyleType() != LNONE) {
-    m_marker = new RenderListMarker();
+    m_marker = new (element()->getDocument()->renderArena()) RenderListMarker();
     m_marker->setStyle(newStyle);
     insertChildNode(m_marker, firstChild());
   } else if (m_marker && style()->listStyleType() == LNONE) {
-    m_marker->detach();
+    m_marker->detach(element()->getDocument()->renderArena());
     m_marker = 0;
   } else if (m_marker) {
     m_marker->setStyle(newStyle);

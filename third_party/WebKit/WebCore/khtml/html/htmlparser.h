@@ -83,7 +83,7 @@ class KHTMLParser {
   void reset();
 
   bool skipMode() const { return (discard_until != 0); }
-  bool noSpaces() const { return (!m_inline || !inBody); }
+  bool noSpaces() const { return !inBody; }
   bool selectMode() const { return inSelect; }
 
   DOM::HTMLDocumentImpl* doc() const {
@@ -161,7 +161,6 @@ class KHTMLParser {
   bool inBody;
   bool haveContent;
   bool haveFrameSet;
-  bool m_inline;
   bool end;
   bool haveKonqBlock;
   bool inSelect;

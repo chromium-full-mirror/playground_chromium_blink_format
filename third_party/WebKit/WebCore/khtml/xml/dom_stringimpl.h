@@ -75,6 +75,8 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
 
   khtml::Length toLength() const;
 
+  bool containsOnlyWhitespace() const;
+
   // ignores trailing garbage, unlike QString
   int toInt(bool* ok = 0) const {
     int len = l;
