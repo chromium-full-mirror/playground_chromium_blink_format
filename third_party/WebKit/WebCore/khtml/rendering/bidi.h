@@ -60,7 +60,7 @@ struct BidiRun {
           RenderObject* _obj,
           BidiContext* context,
           QChar::Direction dir)
-      : start(_start), stop(_stop), obj(_obj), box(0) {
+      : start(_start), stop(_stop), obj(_obj), box(0), nextRun(0) {
     if (dir == QChar::DirON)
       dir = context->dir;
 
@@ -99,6 +99,8 @@ struct BidiRun {
 
   // explicit + implicit levels here
   uchar level;
+
+  BidiRun* nextRun;
 };
 
 // an iterator which goes through a BidiParagraph
