@@ -256,6 +256,7 @@ breakBreak:
 }
 
 Decoder::Decoder() {
+  _refCount = 1;
   // latin1
   m_codec = QTextCodec::codecForName("iso8859-1");
   m_decoder = m_codec->makeDecoder();
@@ -266,6 +267,7 @@ Decoder::Decoder() {
   visualRTL = false;
 }
 Decoder::~Decoder() {
+  assert(_refCount == 0);
   delete m_decoder;
 }
 

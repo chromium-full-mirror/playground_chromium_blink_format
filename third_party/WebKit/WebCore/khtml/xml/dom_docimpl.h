@@ -283,7 +283,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setBaseTarget(const QString& baseTarget) { m_baseTarget = baseTarget; }
 
 #if APPLE_CHANGES
-  void setDecoder(khtml::Decoder* d) { m_decoder = d; }
+  void setDecoder(khtml::Decoder* d) {
+    m_decoder = d;
+    d->ref();
+  }
   QString completeURL(const QString&);
 #else
   QString completeURL(const QString& url) {
