@@ -94,7 +94,7 @@ void HTMLCollectionImpl::resetCollectionInfo() const {
 }
 
 NodeImpl* HTMLCollectionImpl::traverseNextItem(NodeImpl* current) const {
-  current = current->traverseNextNode();
+  current = current->traverseNextNode(base);
 
   while (current) {
     if (current->nodeType() == Node::ELEMENT_NODE) {
