@@ -1091,7 +1091,12 @@ void KHTMLPart::receivedFirstData() {
 
     if (pos == -1) {
       delay = qData.stripWhiteSpace().toDouble();
+#if APPLE_CHANGES
+      // We want a new history item if the refresh timeout > 1 second
+      scheduleRedirection(delay, m_url.url(), delay <= 1);
+#else
       scheduleRedirection(delay, m_url.url());
+#endif
     } else {
       int end_pos = qData.length();
       delay = qData.left(pos).stripWhiteSpace().toDouble();
@@ -1113,8 +1118,14 @@ void KHTMLPart::receivedFirstData() {
             end_pos = index;
         }
       }
+#if APPLE_CHANGES
+      // We want a new history item if the refresh timeout > 1 second
+      scheduleRedirection(delay, d->m_doc->completeURL(qData.mid(pos, end_pos)),
+                          delay <= 1);
+#else
       scheduleRedirection(delay,
                           d->m_doc->completeURL(qData.mid(pos, end_pos)));
+#endif
     }
     d->m_bHTTPRefresh = true;
   }

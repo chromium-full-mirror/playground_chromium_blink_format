@@ -135,7 +135,7 @@ class ScriptInterpreter : public Interpreter {
   /**
    * "Smart" window.open policy
    */
-  bool isWindowOpenAllowed() const;
+  bool wasRunByUserGesture() const;
 
   virtual void mark();
 

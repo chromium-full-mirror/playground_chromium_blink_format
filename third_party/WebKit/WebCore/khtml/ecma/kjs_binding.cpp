@@ -231,7 +231,7 @@ void ScriptInterpreter::forgetDOMObjectsForDocument(void* documentHandle) {
   }
 }
 
-bool ScriptInterpreter::isWindowOpenAllowed() const {
+bool ScriptInterpreter::wasRunByUserGesture() const {
   if (m_evt) {
     int id = m_evt->handle()->id();
     bool eventOk = (  // mouse events
