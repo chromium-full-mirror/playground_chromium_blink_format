@@ -178,7 +178,6 @@ void HTMLAnchorElementImpl::parseAttribute(AttributeImpl* attr) {
 }
 
 void HTMLAnchorElementImpl::accessKeyAction() {
-  focus();
   click();
 }
 
