@@ -31,8 +31,24 @@
 class QString;
 class QTextCodec;
 
+// class KCharsets =============================================================
+
 class KCharsets {
  public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  KCharsets();
+
+  ~KCharsets();
+
+  // member functions --------------------------------------------------------
+
   QTextCodec* codecForName(const QString&) const;
   QTextCodec* codecForName(const QString&, bool&) const;
   void setQFont(QFont&, QFont::CharSet charset = QFont::Unicode) const;
@@ -40,6 +56,20 @@ class KCharsets {
   QString name(QFont::CharSet);
   QString xCharsetName(QFont::CharSet) const;
   bool supportsScript(const QFont&, QFont::CharSet);
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  KCharsets(const KCharsets&);
+  KCharsets& operator=(const KCharsets&);
+
+};  // class KCharsets
+    // ==========================================================
 
 #endif

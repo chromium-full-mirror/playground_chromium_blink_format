@@ -29,11 +29,40 @@
 #include <qobject.h>
 #include <qsize.h>
 
+// class QStyle ================================================================
+
 class QStyle : public QObject {
  public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+  // constructors, copy constructors, and destructors ------------------------
+
+  QStyle();
+
+  ~QStyle();
+
+  // member functions --------------------------------------------------------
+
   GUIStyle guiStyle() const;
   virtual QSize indicatorSize() const = 0;
   virtual QSize exclusiveIndicatorSize() const = 0;
-};
+
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  QStyle(const QStyle&);
+  QStyle& operator=(const QStyle&);
+
+};  // class QStyle
+    // =============================================================
 
 #endif

@@ -35,7 +35,8 @@
 // added to help in compilation of khtml/khtml_part.h:867
 namespace KIO {
 
-SimpleJob* http_update_cache(const KURL& url, bool no_cache, time_t expireDate);
+SimpleJob* http_update_cache(const KURL&, bool, time_t);
+
 TransferJob* get(const KURL& url,
                  bool reload = false,
                  bool showProgressInfo = true);

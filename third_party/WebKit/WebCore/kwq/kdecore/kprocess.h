@@ -32,10 +32,28 @@
 #include <qstring.h>
 #include <KWQStrList.h>
 
+// class KProcess ==============================================================
+
 class KProcess : public QObject {
  public:
+  // structs -----------------------------------------------------------------
+
+  // typedefs ----------------------------------------------------------------
+
   enum Communication { NoCommunication = 0, Stdin = 1, Stdout = 2, NoRead };
   enum RunMode { DontCare, NotifyOnExit, Block };
+
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  KProcess();
+
+  ~KProcess();
+
+  // member functions --------------------------------------------------------
 
   QStrList* args();
   bool isRunning() const;
@@ -45,7 +63,21 @@ class KProcess : public QObject {
   virtual bool kill(int signo = SIGTERM);
   void resume();
 
+  // operators ---------------------------------------------------------------
+
   KProcess& operator<<(const QString& arg);
-};
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  KProcess(const KProcess&);
+  KProcess& operator=(const KProcess&);
+
+};  // class KProcess
+    // ===========================================================
 
 #endif

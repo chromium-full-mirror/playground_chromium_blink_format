@@ -35,12 +35,40 @@
 #include "part.h"
 #include "browserinterface.h"
 
-// This is a bad hack to get some rendering code to work
-class KXMLGUIClient {};
+// class KXMLGUIClient =========================================================
+
+class KXMLGUIClient {
+ public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  KXMLGUIClient();
+
+  ~KXMLGUIClient();
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  KXMLGUIClient(const KXMLGUIClient&);
+  KXMLGUIClient& operator=(const KXMLGUIClient&);
+
+};  // class KXMLGUIClient
+    // ======================================================
 
 namespace KParts {
 
-// Added for compilation of khtml/khtml_part.h:695
 struct URLArgs {
   QString frameName;
   QString serviceType;
@@ -58,20 +86,82 @@ struct WindowArgs {
   bool fullscreen;
 };
 
+// class BrowserExtension ======================================================
+
 class BrowserExtension {
  public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  BrowserExtension();
+
+  ~BrowserExtension();
+
+  // member functions --------------------------------------------------------
+
   BrowserInterface* browserInterface() const;
+
   void openURLRequest(const KURL&,
                       const KParts::URLArgs& args = KParts::URLArgs());
+
   void createNewWindow(const KURL&);
+
   void createNewWindow(const KURL&,
                        const KParts::URLArgs&,
                        const KParts::WindowArgs&,
                        KParts::ReadOnlyPart*&);
-};
 
-class BrowserHostExtension {};
+  // operators ---------------------------------------------------------------
 
-};  // namespace KParts
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  BrowserExtension(const BrowserExtension&);
+  BrowserExtension& operator=(const BrowserExtension&);
+
+};  // class BrowserExtension
+    // ===================================================
+
+// class BrowserHostExtension ==================================================
+
+class BrowserHostExtension {
+ public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  BrowserHostExtension();
+  ~BrowserHostExtension();
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  BrowserHostExtension(const BrowserHostExtension&);
+  BrowserHostExtension& operator=(const BrowserHostExtension&);
+
+};  // class BrowserHostExtension
+    // ===============================================
+
+}  // namespace KParts
 
 #endif

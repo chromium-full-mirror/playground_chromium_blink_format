@@ -29,17 +29,47 @@
 #include <qstring.h>
 
 class kdbgstream;
+
 typedef kdbgstream& (*KDBGFUNC)(kdbgstream&);
+
+// class kdbgstream ============================================================
 
 class kdbgstream {
  public:
+  // structs -----------------------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
+
+  // constructors, copy constructors, and destructors ------------------------
+
+  kdbgstream(unsigned int area, unsigned int level, bool print = true);
+
+  ~kdbgstream();
+
+  // member functions --------------------------------------------------------
+  // operators ---------------------------------------------------------------
+
   kdbgstream& operator<<(int);
   kdbgstream& operator<<(const char*);
   kdbgstream& operator<<(const void*);
   kdbgstream& operator<<(const QString&);
   kdbgstream& operator<<(const QCString&);
   kdbgstream& operator<<(KDBGFUNC);
-};
+
+  // protected
+  // -------------------------------------------------------------------
+  // private
+  // ---------------------------------------------------------------------
+
+ private:
+  // no copying or assignment
+  kdbgstream(const kdbgstream&);
+  kdbgstream& operator=(const kdbgstream&);
+
+};  // class kdbgstream
+    // =========================================================
 
 inline kdbgstream& endl(kdbgstream& s) {
   s << "\n";
