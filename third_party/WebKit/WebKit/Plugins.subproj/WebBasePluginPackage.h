@@ -10,10 +10,21 @@
 
 #import <WebCore/WebCoreViewFactory.h>
 
+#define WebPluginExtensionsKey @"WebPluginExtensions"
+#define WebPluginDescriptionKey @"WebPluginDescription"
+#define WebPluginLocalizationNameKey @"WebPluginLocalizationName"
+#define WebPluginMIMETypesFilenameKey @"WebPluginMIMETypesFilename"
+#define WebPluginMIMETypesKey @"WebPluginMIMETypes"
+#define WebPluginNameKey @"WebPluginName"
+#define WebPluginTypeDescriptionKey @"WebPluginTypeDescription"
+#define WebPluginTypeEnabledKey @"WebPluginTypeEnabled"
+
 @interface WebBasePluginPackage : NSObject<WebCorePluginInfo> {
   NSString* name;
   NSString* path;
   NSString* pluginDescription;
+
+  NSBundle* nsBundle;
 
   NSDictionary* MIMEToDescription;
   NSDictionary* MIMEToExtensions;
@@ -21,8 +32,9 @@
 }
 
 + (WebBasePluginPackage*)pluginWithPath:(NSString*)pluginPath;
-
 - initWithPath:(NSString*)pluginPath;
+
+- (BOOL)getPluginInfoFromBundleAndMIMEDictionary:(NSDictionary*)MIMETypes;
 
 - (BOOL)load;
 - (void)unload;

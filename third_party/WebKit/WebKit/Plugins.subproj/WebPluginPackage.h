@@ -13,7 +13,6 @@
 @protocol WebPluginViewFactory;
 
 @interface WebPluginPackage : WebBasePluginPackage {
-  NSBundle* bundle;
 }
 
 - (Class)viewFactory;
