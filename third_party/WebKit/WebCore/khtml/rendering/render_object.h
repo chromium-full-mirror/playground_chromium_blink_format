@@ -88,7 +88,6 @@ class RenderObject : public CachedObjectClient {
 
   virtual RenderLayer* layer() const { return 0; }
   virtual RenderLayer* enclosingLayer() { return 0; }
-  virtual bool hasChildLayers() const { return false; }
   virtual void setHasChildLayers(bool hasLayers) {}
   virtual void positionChildLayers() {}
 
