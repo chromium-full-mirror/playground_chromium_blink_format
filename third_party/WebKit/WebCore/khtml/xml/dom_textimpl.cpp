@@ -269,6 +269,12 @@ unsigned long CharacterDataImpl::caretMaxRenderedOffset() const {
   return r ? r->caretMaxRenderedOffset() : length();
 }
 
+bool CharacterDataImpl::rendererIsNeeded(RenderStyle* style) {
+  if (!str || str->l == 0)
+    return false;
+  return NodeImpl::rendererIsNeeded(style);
+}
+
 #ifndef NDEBUG
 void CharacterDataImpl::dump(QTextStream* stream, QString ind) const {
   *stream << " str=\"" << DOMString(str).string().ascii() << "\"";

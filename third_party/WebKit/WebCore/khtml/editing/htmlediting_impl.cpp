@@ -672,6 +672,7 @@ void ApplyStyleCommandImpl::doApply() {
   Position start(endingSelection()
                      .start()
                      .downstream()
+                     .equivalentShallowPosition()
                      .equivalentRangeCompliantPosition());
   Position end(endingSelection().end().upstream(StayInBlock));
 
