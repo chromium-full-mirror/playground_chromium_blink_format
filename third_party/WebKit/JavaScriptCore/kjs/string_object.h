@@ -89,7 +89,9 @@ class StringProtoFuncImp : public InternalFunctionImp {
     Substring,
     FromCharCode,
     ToLowerCase,
-    ToUpperCase
+    ToUpperCase,
+    ToLocaleLowerCase,
+    ToLocaleUpperCase
 #ifndef KJS_PURE_ECMA
     ,
     Big,
