@@ -1185,8 +1185,6 @@ void KJS::printInfo(ExecState* exec,
     fprintf(stderr, "KJS: %s: (null)", s);
   else {
     Value v = o;
-    if (o.isA(ReferenceType))
-      v = o.getValue(exec);
 
     UString name;
     switch (v.type()) {
@@ -1213,9 +1211,6 @@ void KJS::printInfo(ExecState* exec,
         if (name.isNull())
           name = "(unknown class)";
         break;
-      case ReferenceType:
-        name = "Reference";
-        break;
       case ListType:
         name = "List";
         break;
@@ -1238,12 +1233,6 @@ void KJS::printInfo(ExecState* exec,
       fprintf(stderr, ", line %d\n", lineno);
     else
       fprintf(stderr, "\n");
-    if (!o.isNull())
-      if (o.isA(ReferenceType)) {
-        fprintf(stderr, "KJS: Was property '%s'\n",
-                o.getPropertyName(exec).ascii());
-        printInfo(exec, "of", o.getBase(exec));
-      }
   }
 }
 #endif
