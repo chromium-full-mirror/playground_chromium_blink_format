@@ -763,7 +763,11 @@ KJavaAppletContext* KHTMLPart::javaContext() {
 KJavaAppletContext* KHTMLPart::createJavaContext() {
 #ifndef Q_WS_QWS
   if (!d->m_javaContext) {
+#ifndef APPLE_CHANGES
     d->m_javaContext = new KJavaAppletContext(d->m_dcopobject);
+#else
+    d->m_javaContext = new KJavaAppletContext(d->m_dcopobject, this);
+#endif
     connect(d->m_javaContext, SIGNAL(showStatus(const QString&)), this,
             SIGNAL(setStatusBarText(const QString&)));
     connect(d->m_javaContext,

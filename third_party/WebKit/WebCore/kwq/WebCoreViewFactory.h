@@ -32,21 +32,13 @@
 
 @protocol WebCoreViewFactory
 
-- (NSView*)viewForPluginWithURL:(NSURL*)url
-                    serviceType:(NSString*)serviceType
-                      arguments:(NSArray*)arguments
-                        baseURL:(NSURL*)baseURL;
-- (NSArray*)pluginsInfo;  // array of id <WebCorePluginInfo>
-
-- (NSView*)viewForJavaAppletWithFrame:(NSRect)frame
-                              baseURL:(NSURL*)URL
-                           parameters:(NSDictionary*)parameters;
-
 - (NSView<WebCoreFileButton>*)fileButton;
 
 - (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
                                   defaultText:(NSString*)defaultText
                                 returningText:(NSString**)result;
+
+- (NSArray*)pluginsInfo;  // array of id <WebCorePluginInfo>
 
 @end
 
