@@ -2581,7 +2581,7 @@ DOMString DocumentImpl::toString() const {
 
   for (NodeImpl* child = firstChild(); child != NULL;
        child = child->nextSibling()) {
-    child = child->nextSibling();
+    result += child->toString();
   }
 
   return result;
@@ -2626,7 +2626,7 @@ DOMString DocumentFragmentImpl::toString() const {
 
   for (NodeImpl* child = firstChild(); child != NULL;
        child = child->nextSibling()) {
-    child = child->nextSibling();
+    result += child->toString();
   }
 
   return result;

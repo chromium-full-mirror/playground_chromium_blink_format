@@ -792,9 +792,9 @@ class Document : public Node {
 
   DOMString toString() const;
 
- protected:
   Document(DocumentImpl* i);
 
+ protected:
   friend class Node;
 };
 

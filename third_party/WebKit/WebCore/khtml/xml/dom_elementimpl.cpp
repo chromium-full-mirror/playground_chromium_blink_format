@@ -156,7 +156,7 @@ DOMString AttrImpl::toString() const {
 
     for (NodeImpl* child = firstChild(); child != NULL;
          child = child->nextSibling()) {
-      child = child->nextSibling();
+      result += child->toString();
     }
 
     result += "\"";
@@ -538,7 +538,7 @@ DOMString ElementImpl::toString() const {
 
     for (NodeImpl* child = firstChild(); child != NULL;
          child = child->nextSibling()) {
-      child = child->nextSibling();
+      result += child->toString();
     }
 
     result += "</";
