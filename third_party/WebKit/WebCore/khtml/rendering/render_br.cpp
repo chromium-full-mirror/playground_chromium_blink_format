@@ -34,6 +34,11 @@ RenderBR::RenderBR(DOM::NodeImpl* node)
 
 RenderBR::~RenderBR() {}
 
+void RenderBR::setPos(int xPos, int yPos) {
+  m_x = xPos;
+  m_y = yPos;
+}
+
 InlineBox* RenderBR::createInlineBox(bool makePlaceholder,
                                      bool isRootLineBox,
                                      bool isOnlyRun) {
