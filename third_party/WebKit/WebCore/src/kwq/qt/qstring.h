@@ -256,8 +256,8 @@ class QString {
   int find(const char*, int index = 0, bool cs = TRUE) const;
   int find(const QRegExp&, int index = 0) const;
 
-  int findRev(char, int index = 0) const;
-  int findRev(const char*, int index = 0) const;
+  int findRev(char, int index = -1) const;
+  int findRev(const char*, int index = -1) const;
 
   int contains(char) const;
   int contains(const char*, bool cs = TRUE) const;
