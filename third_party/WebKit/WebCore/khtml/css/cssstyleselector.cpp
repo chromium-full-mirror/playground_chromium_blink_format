@@ -68,6 +68,7 @@ using namespace DOM;
 namespace khtml {
 
 CSSStyleSelectorList* CSSStyleSelector::defaultStyle = 0;
+CSSStyleSelectorList* CSSStyleSelector::defaultQuirksStyle = 0;
 CSSStyleSelectorList* CSSStyleSelector::defaultPrintStyle = 0;
 CSSStyleSheetImpl* CSSStyleSelector::defaultSheet = 0;
 RenderStyle* CSSStyleSelector::displayNoneStyle = 0;
@@ -108,7 +109,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
     userSheet->parseString(DOMString(userStyleSheet));
 
     userStyle = new CSSStyleSelectorList();
-    userStyle->append(userSheet, m_medium);
+    userStyle->append(userSheet, m_medium, strictParsing);
   }
 
   // add stylesheets from document
@@ -118,7 +119,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
   for (; it.current(); ++it) {
     if (it.current()->isCSSStyleSheet()) {
       authorStyle->append(static_cast<CSSStyleSheetImpl*>(it.current()),
-                          m_medium);
+                          m_medium, strictParsing);
     }
   }
 
@@ -155,7 +156,7 @@ CSSStyleSelector::CSSStyleSelector(CSSStyleSheetImpl* sheet) {
   m_medium = sheet->doc()->view()->mediaType();
 
   authorStyle = new CSSStyleSelectorList();
-  authorStyle->append(sheet, m_medium);
+  authorStyle->append(sheet, m_medium, strictParsing);
 }
 
 void CSSStyleSelector::init() {
@@ -180,7 +181,7 @@ CSSStyleSelector::~CSSStyleSelector() {
 
 void CSSStyleSelector::addSheet(CSSStyleSheetImpl* sheet) {
   m_medium = sheet->doc()->view()->mediaType();
-  authorStyle->append(sheet, m_medium);
+  authorStyle->append(sheet, m_medium, strictParsing);
 }
 
 void CSSStyleSelector::loadDefaultStyle(const KHTMLSettings* s) {
@@ -204,8 +205,13 @@ void CSSStyleSelector::loadDefaultStyle(const KHTMLSettings* s) {
   defaultSheet = new DOM::CSSStyleSheetImpl((DOM::CSSStyleSheetImpl*)0);
   defaultSheet->parseString(str);
 
+  // Collect only strict-mode rules.
   defaultStyle = new CSSStyleSelectorList();
-  defaultStyle->append(defaultSheet);
+  defaultStyle->append(defaultSheet, "screen", 1);
+
+  // Collect only quirks-mode rules.
+  defaultQuirksStyle = new CSSStyleSelectorList();
+  defaultQuirksStyle->append(defaultSheet, "screen", 2);
 
   defaultPrintStyle = new CSSStyleSelectorList();
   defaultPrintStyle->append(defaultSheet, "print");
@@ -215,10 +221,12 @@ void CSSStyleSelector::loadDefaultStyle(const KHTMLSettings* s) {
 
 void CSSStyleSelector::clear() {
   delete defaultStyle;
+  delete defaultQuirksStyle;
   delete defaultPrintStyle;
   delete defaultSheet;
   delete displayNoneStyle;
   defaultStyle = 0;
+  defaultQuirksStyle = 0;
   defaultPrintStyle = 0;
   defaultSheet = 0;
   displayNoneStyle = 0;
@@ -860,6 +868,10 @@ void CSSStyleSelector::buildLists() {
     defaultPrintStyle->collect(&selectorList, &propertyList, Default, Default);
   else if (defaultStyle)
     defaultStyle->collect(&selectorList, &propertyList, Default, Default);
+
+  if (!strictParsing && defaultQuirksStyle)
+    defaultQuirksStyle->collect(&selectorList, &propertyList, Default, Default);
+
   if (userStyle)
     userStyle->collect(&selectorList, &propertyList, User, UserImportant);
   if (authorStyle)
@@ -976,7 +988,8 @@ CSSStyleSelectorList::CSSStyleSelectorList() : QPtrList<CSSOrderedRule>() {
 CSSStyleSelectorList::~CSSStyleSelectorList() {}
 
 void CSSStyleSelectorList::append(CSSStyleSheetImpl* sheet,
-                                  const DOMString& medium) {
+                                  const DOMString& medium,
+                                  int quirksMode) {
   if (!sheet || !sheet->isCSSStyleSheet())
     return;
 
@@ -989,7 +1002,7 @@ void CSSStyleSelectorList::append(CSSStyleSheetImpl* sheet,
 
   for (int i = 0; i < len; i++) {
     StyleBaseImpl* item = sheet->item(i);
-    if (item->isStyleRule()) {
+    if (item->isStyleRule() && quirksMode != 2) {
       CSSStyleRuleImpl* r = static_cast<CSSStyleRuleImpl*>(item);
       QPtrList<CSSSelector>* s = r->selector();
       for (int j = 0; j < (int)s->count(); j++) {
@@ -1007,6 +1020,27 @@ void CSSStyleSelectorList::append(CSSStyleSheetImpl* sheet,
         CSSStyleSheetImpl* importedSheet = import->styleSheet();
         append(importedSheet, medium);
       }
+    } else if (item->isQuirksRule() && quirksMode != 1) {
+      CSSQuirksRuleImpl* r = static_cast<CSSQuirksRuleImpl*>(item);
+      CSSRuleListImpl* rules = r->cssRules();
+
+      for (unsigned j = 0; j < rules->length(); j++) {
+        // kdDebug( 6080 ) << "*** Rule #" << j << endl;
+
+        CSSRuleImpl* childItem = rules->item(j);
+        if (childItem->isStyleRule()) {
+          // It is a StyleRule, so append it to our list
+          CSSStyleRuleImpl* styleRule =
+              static_cast<CSSStyleRuleImpl*>(childItem);
+
+          QPtrList<CSSSelector>* s = styleRule->selector();
+          for (int j = 0; j < (int)s->count(); j++) {
+            CSSOrderedRule* orderedRule =
+                new CSSOrderedRule(styleRule, s->at(j), count());
+            QPtrList<CSSOrderedRule>::append(orderedRule);
+          }
+        }
+      }  // for rules
     } else if (item->isMediaRule()) {
       CSSMediaRuleImpl* r = static_cast<CSSMediaRuleImpl*>(item);
       CSSRuleListImpl* rules = r->cssRules();

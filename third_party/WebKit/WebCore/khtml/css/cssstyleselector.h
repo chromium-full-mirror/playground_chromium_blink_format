@@ -162,6 +162,7 @@ class CSSStyleSelector : public StyleSelector {
 
   static DOM::CSSStyleSheetImpl* defaultSheet;
   static CSSStyleSelectorList* defaultStyle;
+  static CSSStyleSelectorList* defaultQuirksStyle;
   static CSSStyleSelectorList* defaultPrintStyle;
   CSSStyleSelectorList* authorStyle;
   CSSStyleSelectorList* userStyle;
@@ -301,7 +302,8 @@ class CSSStyleSelectorList : public QPtrList<CSSOrderedRule> {
   virtual ~CSSStyleSelectorList();
 
   void append(DOM::CSSStyleSheetImpl* sheet,
-              const DOM::DOMString& medium = "screen");
+              const DOM::DOMString& medium = "screen",
+              int quirksMode = 0);
 
   void collect(QPtrList<DOM::CSSSelector>* selectorList,
                CSSOrderedPropertyList* propList,
