@@ -62,7 +62,7 @@ extern NSString* WebElementStringKey;  // NSString of the selected text
     WebFrame *mainFrame;
 
     webController  = [[WebController alloc] initWithView: webView
-   provisionalDataSource: nil];
+   controllerSetName: nil];
     mainFrame = [webController mainFrame];
     [mainFrame loadRequest:request];
     </pre>
