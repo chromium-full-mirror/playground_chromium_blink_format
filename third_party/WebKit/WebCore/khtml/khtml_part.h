@@ -64,7 +64,6 @@ class EventListener;
 }
 
 using DOM::TristateFlag;
-using khtml::EditCommandPtr;
 
 namespace khtml {
 class CachedObject;
@@ -650,7 +649,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Applies the given edit command.
    */
-  void applyCommand(const khtml::EditCommandPtr&);
+  void applyCommand(khtml::EditCommand&);
 
   /**
    * Performs an undo of the edit.
