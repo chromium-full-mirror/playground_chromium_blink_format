@@ -16,5 +16,9 @@
 + (void)setDisabled:(BOOL)disabled;
 
 + (int)javaScriptObjectsCount;
++ (int)javaScriptInterpretersCount;
++ (int)javaScriptNoGCAllowedObjectsCount;
++ (int)javaScriptReferencedObjectsCount;
 + (void)garbageCollectJavaScriptObjects;
+
 @end
