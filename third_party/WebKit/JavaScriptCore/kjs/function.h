@@ -147,7 +147,11 @@ class GlobalFuncImp : public InternalFunctionImp {
     IsNaN,
     IsFinite,
     Escape,
-    UnEscape
+    UnEscape,
+    DecodeURI,
+    DecodeURIComponent,
+    EncodeURI,
+    EncodeURIComponent
 #ifndef NDEBUG
     ,
     KJSPrint
