@@ -30,6 +30,7 @@
   NSString* applicationNameForUserAgent;
   NSString* userAgentOverride;
   NSString* userAgent;
+  NSString* userAgentWhenPretendingToBeMacIE;
 
   BOOL defersCallbacks;
 
