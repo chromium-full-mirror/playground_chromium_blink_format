@@ -1149,6 +1149,9 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
 #ifdef APPLE_CHANGES
  public:
+  void redirectJS();
+  void timerEvent(QTimerEvent*);
+
   // In the original KDE, these come from superclasses.
   void ref() { _ref++; }
   void deref() {

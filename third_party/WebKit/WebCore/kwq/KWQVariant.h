@@ -62,6 +62,7 @@ class QVariant {
   Type type() const;
   bool toBool() const;
   uint toUInt() const;
+  QString asString() const;
 
   // operators ---------------------------------------------------------------
 
