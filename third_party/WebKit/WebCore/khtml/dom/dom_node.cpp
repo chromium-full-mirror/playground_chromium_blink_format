@@ -414,6 +414,12 @@ NodeImpl* Node::handle() const {
   return impl;
 }
 
+bool Node::isContentEditable() const {
+  if (!impl)
+    return false;
+  return impl->isContentEditable();
+}
+
 //-----------------------------------------------------------------------------
 
 NodeList::NodeList() {
