@@ -206,16 +206,7 @@ static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
   return 0;
 }
 
-void RenderListItem::layout() {
-  KHTMLAssert(!layouted());
-  KHTMLAssert(minMaxKnown());
-
-  if (!checkChildren()) {
-    m_height = 0;
-    // kdDebug(0) << "empty item" << endl;
-    return;
-  }
-
+void RenderListItem::updateMarkerLocation() {
   // Sanity check the location of our marker.
   if (m_marker) {
     RenderObject* markerPar = m_marker->parent();
@@ -228,9 +219,31 @@ void RenderListItem::layout() {
       if (!lineBoxParent)
         lineBoxParent = this;
       lineBoxParent->addChild(m_marker, lineBoxParent->firstChild());
+      if (!m_marker->minMaxKnown())
+        m_marker->calcMinMaxWidth();
+      recalcMinMaxWidths();
     }
   }
+}
 
+void RenderListItem::calcMinMaxWidth() {
+  // Make sure our marker is in the correct location.
+  updateMarkerLocation();
+  if (!minMaxKnown())
+    RenderFlow::calcMinMaxWidth();
+}
+
+void RenderListItem::layout() {
+  KHTMLAssert(!layouted());
+  KHTMLAssert(minMaxKnown());
+
+  if (!checkChildren()) {
+    m_height = 0;
+    // kdDebug(0) << "empty item" << endl;
+    return;
+  }
+
+  updateMarkerLocation();
   RenderFlow::layout();
 }
 
