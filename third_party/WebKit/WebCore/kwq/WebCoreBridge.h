@@ -53,10 +53,10 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceLoader;
 
-#define WebCoreContextLinkURL @"WebCoreContextLinkURL"
-#define WebCoreContextImageURL @"WebCoreContextImageURL"
-#define WebCoreContextString @"WebCoreContextString"
-#define WebCoreContextImage @"WebCoreContextImage"
+#define WebCoreContextLinkURL @"WebContextLinkURL"
+#define WebCoreContextImageURL @"WebContextImageURL"
+#define WebCoreContextString @"WebContextString"
+#define WebCoreContextImage @"WebContextImage"
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
 // need
