@@ -907,7 +907,7 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes,
     }
 
     // Add the node to the markup.
-    markups.append(n->startMarkup(this));
+    markups.append(n->startMarkup(this, annotate));
     if (nodes) {
       nodes->append(n);
     }
@@ -940,7 +940,7 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes,
               for (NodeImpl* parent = n->parent();
                    parent != 0 && parent != nextParent;
                    parent = parent->parentNode()) {
-                markups.prepend(parent->startMarkup(this));
+                markups.prepend(parent->startMarkup(this, annotate));
                 markups.append(parent->endMarkup());
                 if (nodes) {
                   nodes->append(parent);
@@ -971,7 +971,7 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes,
         break;
       }
     }
-    markups.prepend(ancestor->startMarkup(this));
+    markups.prepend(ancestor->startMarkup(this, annotate));
     markups.append(ancestor->endMarkup());
     if (nodes) {
       nodes->append(ancestor);
@@ -992,6 +992,7 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes,
   }
 
   return markups.join("");
+  ;
 }
 
 DOMString RangeImpl::text() const {
