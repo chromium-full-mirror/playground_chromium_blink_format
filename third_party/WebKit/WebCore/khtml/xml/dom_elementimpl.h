@@ -29,9 +29,11 @@
 #include "dom/dom_element.h"
 #include "xml/dom_stringimpl.h"
 
-#if defined(APPLE_CHANGES) && defined(__OBJC__)
-#define id id_
-#endif /* APPLE_CHANGES, __OBJC__ */
+#ifdef APPLE_CHANGES
+#ifdef __OBJC__
+#define id id_AVOID_KEYWORD
+#endif
+#endif
 
 namespace khtml {
 class CSSStyleSelector;
@@ -297,8 +299,8 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
 
 };  // namespace
 
-#if defined(APPLE_CHANGES) && defined(__OBJC__)
+#ifdef APPLE_CHANGES
 #undef id
-#endif /* APPLE_CHANGES, __OBJC__ */
+#endif
 
 #endif

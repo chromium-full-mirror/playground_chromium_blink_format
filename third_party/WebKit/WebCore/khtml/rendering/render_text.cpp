@@ -81,12 +81,12 @@ void TextSlave::printDecoration(QPainter* pt,
   if (end)
     width -= p->paddingRight() + p->borderRight();
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
   if (deco & UNDERLINE) {
     QConstString s(p->str->s + m_start, m_len);
     pt->drawUnderlineForText(_tx, _ty + m_baseline, s.string());
   }
-#else  /* APPLE_CHANGES not defined */
+#else
   int underlineOffset = (pt->fontMetrics().height() + m_baseline) / 2;
   if (underlineOffset <= m_baseline)
     underlineOffset = m_baseline + 1;
@@ -95,7 +95,7 @@ void TextSlave::printDecoration(QPainter* pt,
     pt->drawLine(_tx, _ty + underlineOffset, _tx + width,
                  _ty + underlineOffset);
   }
-#endif /* APPLE_CHANGES not defined */
+#endif
   if (deco & OVERLINE)
     pt->drawLine(_tx, _ty, _tx + width, _ty);
   if (deco & LINE_THROUGH)
@@ -245,11 +245,7 @@ int TextSlaveArray::findFirstMatching(Item d) const {
     if ((*this)[mid] == 0)  // null item greater
       res = -1;
     else
-#ifdef APPLE_CHANGES
-      res = ((TextSlaveArray*)this)->compareItems(d, (*this)[mid]);
-#else  /* APPLE_CHANGES not defined */
       res = ((QGVector*)this)->compareItems(d, (*this)[mid]);
-#endif /* APPLE_CHANGES not defined */
     if (res < 0)
       n2 = mid - 1;
     else if (res > 0)
@@ -259,16 +255,11 @@ int TextSlaveArray::findFirstMatching(Item d) const {
       break;
     }
   }
-/* if ( !found )
-    return -1; */
-// search to first one equal or bigger
-#ifdef APPLE_CHANGES
-  while (found && (mid > 0) &&
-         !((TextSlaveArray*)this)->compareItems(d, (*this)[mid - 1]))
-#else  /* APPLE_CHANGES not defined */
+  /* if ( !found )
+      return -1; */
+  // search to first one equal or bigger
   while (found && (mid > 0) &&
          !((QGVector*)this)->compareItems(d, (*this)[mid - 1]))
-#endif /* APPLE_CHANGES not defined */
     mid--;
   return mid;
 }
@@ -668,10 +659,8 @@ void RenderText::print(QPainter* p,
                        int h,
                        int tx,
                        int ty) {
-  //#ifndef APPLE_CHANGES
   if (style()->visibility() != VISIBLE)
     return;
-  //#endif /* APPLE_CHANGES not defined */
 
   int s = m_lines.count() - 1;
   if (s < 0)

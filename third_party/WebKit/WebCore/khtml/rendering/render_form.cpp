@@ -27,9 +27,6 @@
 #include <kfiledialog.h>
 #include <kcompletionbox.h>
 #include <kcursor.h>
-#if APPLE_CHANGES
-#include <kglobalsettings.h>
-#endif /* APPLE_CHANGES */
 
 #include <qstyle.h>
 
@@ -71,10 +68,10 @@ short RenderFormElement::baselinePosition(bool f) const {
 #ifdef APPLE_CHANGES
   return RenderWidget::baselinePosition(f) - 6 -
          QFontMetrics(style()->font()).descent();
-#else  /* APPLE_CHANGES not defined */
+#else
   return RenderWidget::baselinePosition(f) - 2 -
          QFontMetrics(style()->font()).descent();
-#endif /* APPLE_CHANGES not defined */
+#endif
 }
 
 short RenderFormElement::calcReplacedWidth(bool*) const {
@@ -196,8 +193,6 @@ void RenderFormElement::layout() {
 
 #ifdef APPLE_CHANGES
 void RenderFormElement::performAction(QObject::Actions action) {
-  // fprintf (stdout, "RenderFormElement::performAction():  %d\n", action);
-
   if (m_widget)
     m_widget->endEditing();
 
@@ -207,9 +202,6 @@ void RenderFormElement::performAction(QObject::Actions action) {
 #endif /* APPLE_CHANGES */
 
 void RenderFormElement::slotClicked() {
-#ifdef APPLE_CHANGES
-// fprintf (stdout, "RenderFormElement::slotClicked():\n");
-#endif /* APPLE_CHANGES */
   if (isRenderButton()) {
     ref();
     QMouseEvent e2(QEvent::MouseButtonRelease, m_mousePos, m_button, m_state);
@@ -240,13 +232,8 @@ RenderCheckBox::RenderCheckBox(HTMLInputElementImpl* element)
   b->setAutoMask(true);
   b->setMouseTracking(true);
   setQWidget(b);
-#ifdef APPLE_CHANGES
-  connect(b, "SIGNAL(stateChanged(int))", this, "SLOT(slotStateChanged(int))");
-  connect(b, "SIGNAL(clicked())", this, "SLOT(slotClicked())");
-#else  /* APPLE_CHANGES not defined */
   connect(b, SIGNAL(stateChanged(int)), this, SLOT(slotStateChanged(int)));
   connect(b, SIGNAL(clicked()), this, SLOT(slotClicked()));
-#endif /* APPLE_CHANGES not defined */
 }
 
 void RenderCheckBox::calcMinMaxWidth() {
@@ -271,7 +258,6 @@ void RenderCheckBox::updateFromElement() {
 void RenderCheckBox::performAction(QObject::Actions action) {
   QCheckBox* cb = static_cast<QCheckBox*>(m_widget);
 
-  // fprintf (stdout, "RenderCheckBox::performAction():  %d\n", action);
   if (action == QObject::ACTION_CHECKBOX_CLICKED)
     slotStateChanged(cb->isChecked() ? 2 : 0);
 }
@@ -292,11 +278,7 @@ RenderRadioButton::RenderRadioButton(HTMLInputElementImpl* element)
   b->setAutoMask(true);
   b->setMouseTracking(true);
   setQWidget(b);
-#ifdef APPLE_CHANGES
-  connect(b, "SIGNAL(clicked())", this, "SLOT(slotClicked())");
-#else  /* APPLE_CHANGES not defined */
   connect(b, SIGNAL(clicked()), this, SLOT(slotClicked()));
-#endif /* APPLE_CHANGES not defined */
 }
 
 void RenderRadioButton::updateFromElement() {
@@ -306,9 +288,6 @@ void RenderRadioButton::updateFromElement() {
 }
 
 void RenderRadioButton::slotClicked() {
-#ifdef APPLE_CHANGES
-// fprintf (stdout, "RenderRadioButton::slotClicked():\n");
-#endif /* APPLE_CHANGES */
   element()->setChecked(widget()->isChecked());
 
   // emit mouseClick event etc
@@ -335,16 +314,13 @@ RenderSubmitButton::RenderSubmitButton(HTMLInputElementImpl* element)
   setQWidget(p);
   p->setAutoMask(true);
   p->setMouseTracking(true);
+  connect(p, SIGNAL(clicked()), this, SLOT(slotClicked()));
 #ifdef APPLE_CHANGES
-  connect(p, "SIGNAL(clicked())", this, "SLOT(slotClicked())");
-
   // Need to store a reference to this object and then invoke slotClicked on it.
   // p->setAction (&RenderFormElement::slotClicked);
   // p->setRenderObject (this);
   p->setTarget(this);
-#else  /* APPLE_CHANGES not defined */
-  connect(p, SIGNAL(clicked()), this, SLOT(slotClicked()));
-#endif /* APPLE_CHANGES not defined */
+#endif
 }
 
 QString RenderSubmitButton::rawText() {
@@ -403,15 +379,14 @@ QString RenderSubmitButton::defaultLabel() {
 
 short RenderSubmitButton::baselinePosition(bool f) const {
 #ifdef APPLE_CHANGES
-  // return RenderFormElement::baselinePosition( f );
-  // FIXED: [rjw] Where does this magic number '8' come from.  It's also used
+  // FIXED: [rjw] Where does this magic number '8' come from?  It's also used
   // above in
   // RenderSubmitButton::calcMinMaxWidth().
   return RenderWidget::baselinePosition(f) - 8 -
          QFontMetrics(style()->font()).descent();
-#else  /* APPLE_CHANGES not defined */
+#else
   return RenderFormElement::baselinePosition(f);
-#endif /* APPLE_CHANGES not defined */
+#endif
 }
 
 // -------------------------------------------------------------------------------
@@ -421,7 +396,7 @@ RenderImageButton::RenderImageButton(HTMLInputElementImpl* element)
 // ### support DOMActivate event when clicked
 #ifdef APPLE_CHANGES
   button = new KWQInvisibleButton(this);
-#endif /* APPLE_CHANGES */
+#endif
 }
 
 #ifdef APPLE_CHANGES
@@ -493,15 +468,9 @@ bool LineEditWidget::event(QEvent* e) {
 RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
     : RenderFormElement(element) {
   LineEditWidget* edit = new LineEditWidget(view()->viewport());
-#ifdef APPLE_CHANGES
-  connect(edit, "SIGNAL(returnPressed())", this, "SLOT(slotReturnPressed())");
-  connect(edit, "SIGNAL(textChanged(const QString &))", this,
-          "SLOT(slotTextChanged(const QString &))");
-#else  /* APPLE_CHANGES not defined */
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
-#endif /* APPLE_CHANGES not defined */
 
   if (element->inputType() == HTMLInputElementImpl::PASSWORD)
     edit->setEchoMode(QLineEdit::Password);
@@ -518,7 +487,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   setQWidget(edit);
 #ifdef APPLE_CHANGES
   edit->setTarget(this);
-#endif /* APPLE_CHANGES */
+#endif
 }
 
 void RenderLineEdit::slotReturnPressed() {
@@ -570,9 +539,9 @@ void RenderLineEdit::calcMinMaxWidth() {
   } else
 #ifdef APPLE_CHANGES
     s = QSize(w + 6, h + 6).expandedTo(QApplication::globalStrut());
-#else  /* APPLE_CHANGES not defined */
+#else
     s = QSize(w + 4, h + 4).expandedTo(QApplication::globalStrut());
-#endif /* APPLE_CHANGES not defined */
+#endif
 
   setIntrinsicWidth(s.width());
   setIntrinsicHeight(s.height());
@@ -604,8 +573,6 @@ void RenderLineEdit::updateFromElement() {
 void RenderLineEdit::performAction(QObject::Actions action) {
   KLineEdit* edit = static_cast<KLineEdit*>(m_widget);
 
-  // fprintf (stdout, "RenderLineEdit::performAction():  %d text value = %s\n",
-  // action, edit->text().latin1());
   if (action == QObject::ACTION_TEXT_FIELD_END_EDITING)
     slotTextChanged(edit->text());
   else if (action == QObject::ACTION_TEXT_FIELD)
@@ -635,23 +602,13 @@ RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
 
   m_edit = new LineEditWidget(w);
 
-#ifdef APPLE_CHANGES
-  connect(m_edit, "SIGNAL(returnPressed())", this, "SLOT(slotReturnPressed())");
-  connect(m_edit, "SIGNAL(textChanged(const QString &))", this,
-          "SLOT(slotTextChanged(const QString &))");
-#else  /* APPLE_CHANGES not defined */
   connect(m_edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(m_edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
-#endif /* APPLE_CHANGES not defined */
 
   m_button = new QPushButton(i18n("Browse..."), w);
   m_button->setFocusPolicy(QWidget::ClickFocus);
-#ifdef APPLE_CHANGES
-  connect(m_button, "SIGNAL(clicked())", this, "SLOT(slotClicked())");
-#else  /* APPLE_CHANGES not defined */
   connect(m_button, SIGNAL(clicked()), this, SLOT(slotClicked()));
-#endif /* APPLE_CHANGES not defined */
 
   w->setStretchFactor(m_edit, 2);
   w->setFocusProxy(m_edit);
@@ -959,10 +916,10 @@ void RenderSelect::layout() {
     // small.
     if (height < 60)
       height = 60;
-#else  /* APPLE_CHANGES not defined */
+#else
     width += 2 * w->frameWidth() + w->verticalScrollBar()->sizeHint().width();
     height = size * height + 2 * w->frameWidth();
-#endif /* APPLE_CHANGES not defined */
+#endif
 
     setIntrinsicWidth(width);
     setIntrinsicHeight(height);
@@ -1034,7 +991,6 @@ void RenderSelect::slotSelected(int index) {
 
 #ifdef APPLE_CHANGES
 void RenderSelect::performAction(QObject::Actions action) {
-  // fprintf (stdout, "RenderSelect::performAction():  %d\n", action);
   if (action == QObject::ACTION_LISTBOX_CLICKED)
     slotSelectionChanged();
   else if (action == QObject::ACTION_COMBOBOX_CLICKED) {
@@ -1071,14 +1027,9 @@ void RenderSelect::setOptionsChanged(bool _optionsChanged) {
 KListBox* RenderSelect::createListBox() {
   KListBox* lb = new KListBox(view()->viewport());
   lb->setSelectionMode(m_multiple ? QListBox::Extended : QListBox::Single);
-// ### looks broken
-// lb->setAutoMask(true);
-#ifdef APPLE_CHANGES
-  connect(lb, "SIGNAL(selectionChanged())", this,
-          "SLOT(slotSelectionChanged())");
-#else  /* APPLE_CHANGES not defined */
+  // ### looks broken
+  // lb->setAutoMask(true);
   connect(lb, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
-#endif /* APPLE_CHANGES not defined */
   m_ignoreSelectEvents = false;
   lb->setMouseTracking(true);
 
@@ -1087,11 +1038,7 @@ KListBox* RenderSelect::createListBox() {
 
 ComboBoxWidget* RenderSelect::createComboBox() {
   ComboBoxWidget* cb = new ComboBoxWidget(view()->viewport());
-#ifdef APPLE_CHANGES
-  connect(cb, "SIGNAL(activated(int))", this, "SLOT(slotSelected(int))");
-#else  /* APPLE_CHANGES not defined */
   connect(cb, SIGNAL(activated(int)), this, SLOT(slotSelected(int)));
-#endif /* APPLE_CHANGES not defined */
   return cb;
 }
 
@@ -1172,11 +1119,7 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
   TextAreaWidget* edit = new TextAreaWidget(element->wrap(), view());
   setQWidget(edit);
 
-#ifdef APPLE_CHANGES
-  connect(edit, "SIGNAL(textChanged())", this, "SLOT(slotTextChanged())");
-#else  /* APPLE_CHANGES not defined */
   connect(edit, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
-#endif /* APPLE_CHANGES not defined */
 }
 
 RenderTextArea::~RenderTextArea() {
@@ -1271,10 +1214,6 @@ QString RenderTextArea::text() {
 
 #ifdef APPLE_CHANGES
 void RenderTextArea::performAction(QObject::Actions action) {
-  // TextAreaWidget *edit = static_cast<TextAreaWidget*>(m_widget);
-
-  // fprintf (stdout, "RenderTextArea::performAction():  %d text value = %s\n",
-  // action, edit->text().latin1());
   if (action == QObject::ACTION_TEXT_AREA_END_EDITING)
     slotTextChanged();
 }

@@ -36,15 +36,9 @@
 
 // FIXME: should these macros be in "kwq.h" or other header file?
 #define slots
-#define SLOT(x) \
-  ""            \
-  "## x ##"     \
-  ""
+#define SLOT(x) #x
 #define signals protected
-#define SIGNAL(x) \
-  ""              \
-  "## x ##"       \
-  ""
+#define SIGNAL(x) #x
 #define emit
 #define Q_OBJECT
 #define Q_PROPERTY(text)
@@ -126,6 +120,8 @@ class QObject : public Qt {
   virtual void performAction(QObject::Actions action);
   void emitAction(QObject::Actions action);
   void setTarget(QObject* obj);
+
+  virtual bool event(QEvent*);
 
  private:
   // no copying or assignment

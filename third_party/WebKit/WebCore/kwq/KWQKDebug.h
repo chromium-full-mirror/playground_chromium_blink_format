@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,10 +26,6 @@
 #ifndef KDEBUG_H_
 #define KDEBUG_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <qstring.h>
 #include <qtextstream.h>
 
@@ -37,27 +33,9 @@ class kdbgstream;
 
 typedef kdbgstream& (*KDBGFUNC)(kdbgstream&);
 
-// class kdbgstream ============================================================
-
 class kdbgstream {
  public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
-
-  // constructors, copy constructors, and destructors ------------------------
-
   kdbgstream(unsigned int area, unsigned int level, bool print = true);
-
-// add no-op destructor
-#ifdef _KWQ_PEDANTIC_
-  ~kdbgstream() {}
-#endif
-
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
 
   kdbgstream& operator<<(int);
   kdbgstream& operator<<(const char*);
@@ -65,27 +43,7 @@ class kdbgstream {
   kdbgstream& operator<<(const QString&);
   kdbgstream& operator<<(const QCString&);
   kdbgstream& operator<<(KDBGFUNC);
-
-// add copy constructor
-// this private declaration prevents copying
-#ifdef _KWQ_PEDANTIC_
-  kdbgstream(const kdbgstream&);
-#endif
-
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
-
- private:
-// add assignment operator
-// this private declaration prevents assignment
-#ifdef _KWQ_PEDANTIC_
-  kdbgstream& operator=(const kdbgstream&);
-#endif
-
-};  // class kdbgstream
-    // =========================================================
+};
 
 inline kdbgstream& endl(kdbgstream& s) {
   s << "\n";

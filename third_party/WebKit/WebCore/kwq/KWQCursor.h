@@ -47,7 +47,7 @@ class QCursor {
 
   QCursor& operator=(const QCursor&);
 
-  int handle() const;
+  NSCursor* handle() const;
 
  private:
   NSCursor* cursor;

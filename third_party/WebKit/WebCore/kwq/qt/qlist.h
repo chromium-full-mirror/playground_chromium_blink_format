@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,25 +26,13 @@
 #ifndef QLIST_H_
 #define QLIST_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-// USING_BORROWED_QLIST ========================================================
-
-#ifdef USING_BORROWED_QLIST
-#include <_qlist.h>
-#else
-
-#include <iostream>
-
 #include <KWQDef.h>
 #include <qcollection.h>
-
 #include <KWQListImpl.h>
 
-// class QPtrList
-// =================================================================
+#ifdef _KWQ_IOSTREAM_
+#include <iostream>
+#endif
 
 template <class T>
 class QPtrListIterator;
@@ -52,17 +40,12 @@ class QPtrListIterator;
 template <class T>
 class QPtrList : public QPtrCollection {
  public:
-  // constructors, copy constructors, and destructors ------------------------
-
   QPtrList() : impl(deleteFunc) {}
-  QPtrList(const QPtrList<T>& l) : QPtrCollection(l), impl(l.impl) {}
   ~QPtrList() {
     if (del_item) {
       impl.clear(del_item);
     }
   }
-
-  // member functions --------------------------------------------------------
 
   bool isEmpty() const { return impl.isEmpty(); }
   uint count() const { return impl.count(); }
@@ -98,14 +81,6 @@ class QPtrList : public QPtrCollection {
 
   virtual int compareItems(void* a, void* b) { return a != b; }
 
-  // operators ---------------------------------------------------------------
-
-  QPtrList<T>& operator=(const QPtrList<T>& l) {
-    impl.assign(l.impl, del_item);
-    QPtrCollection::operator=(l);
-    return *this;
-  }
-
  private:
   static void deleteFunc(void* item) { delete (T*)item; }
 
@@ -117,23 +92,13 @@ class QPtrList : public QPtrCollection {
   friend class QPtrListIterator<T>;
 
   KWQListImpl impl;
-};  // class QPtrList
-    // ==============================================================
-
-// class QPtrListIterator
-// =========================================================
+};
 
 template <class T>
 class QPtrListIterator {
  public:
-  // constructors, copy constructors, and destructors ------------------------
-
   QPtrListIterator() {}
-  QPtrListIterator(const QPtrListIterator& li) : impl(li.impl) {}
   QPtrListIterator(const QPtrList<T>& l) : impl(l.impl) {}
-  ~QPtrListIterator() {}
-
-  // member functions --------------------------------------------------------
 
   uint count() const { return impl.count(); }
   T* toFirst() { return (T*)impl.toFirst(); }
@@ -145,15 +110,12 @@ class QPtrListIterator {
   operator T*() const { return (T*)impl.current(); }
   T* operator--() { return (T*)(--impl); }
   T* operator++() { return (T*)(++impl); }
-  QPtrListIterator& operator=(const QPtrListIterator& li) {
-    impl = li.impl;
-    return *this;
-  }
 
  private:
   KWQListIteratorImpl impl;
-};  // class QPtrListIterator
-    // ======================================================
+};
+
+#ifdef _KWQ_IOSTREAM_
 
 template <class T>
 inline std::ostream& operator<<(std::ostream& stream, const QPtrList<T>& l) {
@@ -179,6 +141,6 @@ inline std::ostream& operator<<(std::ostream& stream, const QPtrList<T>& l) {
   return stream << "]";
 }
 
-#endif  // USING_BORROWED_QLIST
+#endif
 
 #endif
