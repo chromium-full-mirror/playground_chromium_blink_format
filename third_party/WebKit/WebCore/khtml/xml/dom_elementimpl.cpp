@@ -347,17 +347,6 @@ bool ElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return false;
 }
 
-void ElementImpl::defaultEventHandler(EventImpl* evt) {
-#if APPLE_CHANGES
-  if (evt->id() == EventImpl::KEYPRESS_EVENT && isContentEditable()) {
-    KHTMLPart* part = getDocument()->part();
-    if (part && KWQ(part)->interceptEditingKeyEvent())
-      evt->setDefaultHandled();
-  }
-#endif
-  NodeBaseImpl::defaultEventHandler(evt);
-}
-
 RenderStyle* ElementImpl::styleForRenderer(RenderObject* parentRenderer) {
   return getDocument()->styleSelector()->styleForElement(this);
 }
