@@ -50,8 +50,6 @@
 
 - (WebError*)cancelledError;
 
-- (void)notifyDelegatesOfInterruptionByPolicyChange;
-
 - (void)setIdentifier:ident;
 
 @end
