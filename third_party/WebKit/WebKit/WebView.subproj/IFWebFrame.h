@@ -26,6 +26,8 @@
 - (void)setDataSource:(IFWebDataSource*)ds;
 - (IFWebDataSource*)dataSource;
 
+- (void)reset;
+
 // private
 - (void)_setRenderFramePart:(void*)p;
 - (void*)_renderFramePart;

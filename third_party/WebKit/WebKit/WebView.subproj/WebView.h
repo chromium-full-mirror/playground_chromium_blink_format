@@ -120,7 +120,7 @@
 - (BOOL)locationWillChangeTo:(NSURL*)url forFrame:(IFWebFrame*)frame;
 
 - (void)locationChangeStartedForFrame:(IFWebFrame*)frame;
-- (void)locationChangeInProgressForFrame:(IFWebFrame*)frame;
+- (void)locationChangeCommittedForFrame:(IFWebFrame*)frame;
 - (void)locationChangeDone:(IFError*)error forFrame:(IFWebFrame*)frame;
 
 - (void)receivedPageTitle:(NSString*)title
