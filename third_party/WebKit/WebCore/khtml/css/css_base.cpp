@@ -273,7 +273,7 @@ DOMString CSSSelector::selectorText() const {
     if (cs->attr == ATTR_ID && cs->match == CSSSelector::Exact) {
       str += "#";
       str += cs->value.string();
-    } else if (cs->attr == ATTR_CLASS && cs->match == CSSSelector::List) {
+    } else if (cs->attr == ATTR_CLASS && cs->match == CSSSelector::Class) {
       str += ".";
       str += cs->value.string();
     } else if (cs->match == CSSSelector::Pseudo) {
