@@ -2765,6 +2765,11 @@ CSSPrimitiveValueImpl* StyleBaseImpl::parseUnit(const QChar* curP,
       break;
   }
 
+  // Error handling. e.g., don't treat 10pts as a valid unit.
+  split++;
+  if (split <= endP && split->latin1() != ';' && split->isLetterOrNumber())
+    return 0;
+
   if (unit & allowedUnits) {
 #ifdef CSS_DEBUG
     kdDebug(6080) << "found allowed number " << value << ", unit " << type
