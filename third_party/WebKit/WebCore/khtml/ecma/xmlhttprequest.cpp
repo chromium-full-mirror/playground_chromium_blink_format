@@ -153,19 +153,23 @@ Value XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
         if (mimeType == "text/xml" || mimeType == "application/xml" ||
             mimeType == "application/xhtml+xml") {
           responseXML = DOM::Document(doc->implementation()->createDocument());
+
+          DOM::DocumentImpl* docImpl =
+              static_cast<DOM::DocumentImpl*>(responseXML.handle());
+
+          docImpl->open();
+          docImpl->write(response);
+          docImpl->finishParsing();
+          docImpl->close();
+          typeIsXML = true;
         } else {
-          responseXML =
-              DOM::Document(doc->implementation()->createHTMLDocument());
+          typeIsXML = false;
         }
-
-        DOM::DocumentImpl* docImpl =
-            static_cast<DOM::DocumentImpl*>(responseXML.handle());
-
-        docImpl->open();
-        docImpl->write(response);
-        docImpl->finishParsing();
-        docImpl->close();
         createdDocument = true;
+      }
+
+      if (!typeIsXML) {
+        return Undefined();
       }
 
       return getDOMNode(exec, responseXML);
