@@ -123,9 +123,9 @@
    mainFrame.
     findFrameNamed first searches from the current frame to all descending
    frames then the
-    rest of the frames in the controller. If still not found, findFrameNamed
+    rest of the frames in the WebView. If still not found, findFrameNamed
    searches the
-    frames of the other controllers.
+    frames of the other WebViews.
     @param name The name of the frame to find.
     @result The frame matching the provided name. nil if the frame is not found.
 */

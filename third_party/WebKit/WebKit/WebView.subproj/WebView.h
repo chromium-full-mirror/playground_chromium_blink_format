@@ -25,12 +25,12 @@ extern NSString* WebElementFrameKey;           // WebFrame of the element
 extern NSString* WebElementImageAltStringKey;  // NSString of the ALT attribute
                                                // of the image element
 extern NSString* WebElementImageKey;           // NSImage of the image element
-extern NSString* WebElementImageRectKey;  // NSValue of an NSRect, the rect of
-                                          // the image element
-extern NSString* WebElementImageURLKey;   // NSURL of the image element
-extern NSString* WebElementIsSelectedTextKey;  // NSNumber of BOOL indicating
-                                               // whether the element is
-                                               // selected text or not
+extern NSString* WebElementImageRectKey;   // NSValue of an NSRect, the rect of
+                                           // the image element
+extern NSString* WebElementImageURLKey;    // NSURL of the image element
+extern NSString* WebElementIsSelectedKey;  // NSNumber of BOOL indicating
+                                           // whether the element is selected
+                                           // text or not
 extern NSString* WebElementLinkURLKey;  // NSURL of the link if the element is
                                         // within an anchor
 extern NSString*
@@ -228,11 +228,11 @@ extern NSString*
 - (BOOL)goForward;
 
 /*!
-    @method goBackOrForwardToItem:
+    @method goToBackForwardItem:
     @abstract Go back or forward to an item in the backforward list.
     @result YES if able to go to the item, NO otherwise.
 */
-- (BOOL)goBackOrForwardToItem:(WebHistoryItem*)item;
+- (BOOL)goToBackForwardItem:(WebHistoryItem*)item;
 
 /*!
     @method setTextSizeMultiplier:
@@ -360,6 +360,23 @@ extern NSString*
     @result The host window for the web view.
 */
 - (NSWindow*)hostWindow;
+
+/*!
+    @method searchFor:direction:caseSensitive:
+    @abstract Searches a document view for a string and highlights the string if
+   it is found.
+    Starts the search from the current selection.  Will search across all
+   frames.
+    @param string The string to search for.
+    @param forward YES to search forward, NO to seach backwards.
+    @param caseFlag YES to for case-sensitive search, NO for case-insensitive
+   search.
+    @result YES if found, NO if not found.
+*/
+- (BOOL)searchFor:(NSString*)string
+        direction:(BOOL)forward
+    caseSensitive:(BOOL)caseFlag
+             wrap:(BOOL)wrapFlag;
 
 @end
 
