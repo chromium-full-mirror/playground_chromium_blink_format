@@ -448,49 +448,49 @@ NodeImpl* TreeWalkerImpl::parentNode() {
   NodeImpl* node = findParentNode(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::firstChild() {
   NodeImpl* node = findFirstChild(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::lastChild() {
   NodeImpl* node = findLastChild(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::previousSibling() {
   NodeImpl* node = findPreviousSibling(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::nextSibling() {
   NodeImpl* node = findNextSibling(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::previousNode() {
   NodeImpl* node = findPreviousNode(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 NodeImpl* TreeWalkerImpl::nextNode() {
   NodeImpl* node = findNextNode(currentNode());
   if (node)
     setCurrentNode(node);
-  return currentNode();
+  return node;
 }
 
 }  // namespace DOM
