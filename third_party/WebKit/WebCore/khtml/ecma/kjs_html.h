@@ -613,7 +613,6 @@ class Context2D : public DOMObject {
     DrawImage,
     DrawImageFromRect,
     SetShadow,
-    SetShadowWithColor,
     ClearShadow,
     SetAlpha
   };
