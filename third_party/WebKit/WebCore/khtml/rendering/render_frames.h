@@ -95,6 +95,7 @@ class RenderPart : public khtml::RenderWidget {
   Q_OBJECT
  public:
   RenderPart(DOM::HTMLElementImpl* node);
+  RenderPart::~RenderPart();
 
   virtual const char* renderName() const { return "RenderPart"; }
 

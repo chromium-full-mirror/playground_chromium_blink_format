@@ -79,8 +79,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void setBridge(WebCoreBridge* p);
   WebCoreBridge* bridge() const { return _bridge; }
-  void setView(KHTMLView* view, bool weOwnIt);
-  void setOwnsView(bool weOwnIt) { _ownsView = weOwnIt; }
+  void setView(KHTMLView* view);
   KHTMLView* view() const;
 
   virtual bool openURL(const KURL&);
@@ -262,8 +261,6 @@ class KWQKHTMLPart : public KHTMLPart {
   KWQSignal _started;
   KWQSignal _completed;
   KWQSignal _completedWithBool;
-
-  bool _ownsView;
 
   NSView* _mouseDownView;
   bool _mouseDownWasInSubframe;

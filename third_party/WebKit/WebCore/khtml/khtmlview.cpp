@@ -208,7 +208,8 @@ void KHTMLToolTip::maybeTip(const QPoint& /*p*/) {
 KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
     : QScrollView(parent,
                   name,
-                  WResizeNoErase | WRepaintNoErase | WPaintUnclipped) {
+                  WResizeNoErase | WRepaintNoErase | WPaintUnclipped),
+      _refCount(1) {
   m_medium = "screen";
 
   m_layoutObject = 0;
@@ -242,6 +243,8 @@ KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
 }
 
 KHTMLView::~KHTMLView() {
+  assert(_refCount == 0);
+
   if (m_part) {
     // WABA: Is this Ok? Do I need to deref it as well?
     // Does this need to be done somewhere else?
