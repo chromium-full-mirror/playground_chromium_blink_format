@@ -567,7 +567,6 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
 void RenderBox::dirtyLineBoxes(bool fullLayout, bool) {
   if (m_inlineBoxWrapper) {
     if (fullLayout) {
-      m_inlineBoxWrapper->remove();
       m_inlineBoxWrapper->detach(renderArena());
       m_inlineBoxWrapper = 0;
     } else

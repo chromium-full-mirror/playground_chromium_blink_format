@@ -92,7 +92,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
   virtual QRect getRect() const;
 
-  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
 
  protected:
   QRegion getRegion(int width_, int height) const;

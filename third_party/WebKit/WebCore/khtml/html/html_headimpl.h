@@ -94,6 +94,7 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   int disabledState() { return m_disabledState; }
   void setDisabledState(bool _disabled);
 
+  virtual bool isURLAttribute(AttributeImpl* attr) const;
   virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
 
  protected:
