@@ -318,8 +318,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   RenderArena* renderArena() { return m_renderArena; }
 
 #if APPLE_CHANGES
-  KWQAccObjectCache* getExistingAccObjectCache() { return m_accCache; }
-  KWQAccObjectCache* getOrCreateAccObjectCache();
+  KWQAccObjectCache* getAccObjectCache();
 #endif
 
   // to get visually ordered hebrew and arabic pages right
@@ -613,6 +612,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   InheritedBool getDesignMode() const;
   bool inDesignMode() const;
   DocumentImpl* parentDocument() const;
+  DocumentImpl* topDocument() const;
 
 #ifdef KHTML_XSLT
   void applyXSLTransform(ProcessingInstructionImpl* pi);

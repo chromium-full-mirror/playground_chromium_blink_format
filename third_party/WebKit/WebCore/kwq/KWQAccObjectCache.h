@@ -66,6 +66,9 @@ class KWQAccObjectCache {
   void childrenChanged(khtml::RenderObject* renderer);
 
   void postNotification(khtml::RenderObject* renderer, const QString& msg);
+  void postNotificationToTopWebArea(khtml::RenderObject* renderer,
+                                    const QString& msg);
+  void handleFocusedUIElementChanged(void);
 
   static void enableAccessibility() { gAccessibilityEnabled = true; }
   static bool accessibilityEnabled() { return gAccessibilityEnabled; }

@@ -200,9 +200,8 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   oldChild->setParent(0);
 
 #if APPLE_CHANGES
-  KWQAccObjectCache* cache = document()->getExistingAccObjectCache();
-  if (cache)
-    cache->childrenChanged(this);
+  if (KWQAccObjectCache::accessibilityEnabled())
+    document()->getAccObjectCache()->childrenChanged(this);
 #endif
 
   return oldChild;
@@ -368,9 +367,8 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
     dirtyLinesFromChangedChild(newChild);
 
 #if APPLE_CHANGES
-  KWQAccObjectCache* cache = document()->getExistingAccObjectCache();
-  if (cache)
-    cache->childrenChanged(this);
+  if (KWQAccObjectCache::accessibilityEnabled())
+    document()->getAccObjectCache()->childrenChanged(this);
 #endif
 }
 
@@ -412,9 +410,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
     dirtyLinesFromChangedChild(child);
 
 #if APPLE_CHANGES
-  KWQAccObjectCache* cache = document()->getExistingAccObjectCache();
-  if (cache)
-    cache->childrenChanged(this);
+  if (KWQAccObjectCache::accessibilityEnabled())
+    document()->getAccObjectCache()->childrenChanged(this);
 #endif
 }
 

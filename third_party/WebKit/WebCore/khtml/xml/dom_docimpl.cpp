@@ -1185,9 +1185,33 @@ void DocumentImpl::detach() {
 }
 
 #if APPLE_CHANGES
-KWQAccObjectCache* DocumentImpl::getOrCreateAccObjectCache() {
-  if (!m_accCache)
-    m_accCache = new KWQAccObjectCache;
+KWQAccObjectCache* DocumentImpl::getAccObjectCache() {
+  // The only document that actually has a KWQAccObjectCache is the top-level
+  // document.  This is because we need to be able to get from any KWQAccObject
+  // to any other KWQAccObject on the same page.  Using a single cache allows
+  // lookups across nested webareas (i.e. multiple documents).
+
+  // return already known cache (assert that this is the top-level document)
+  if (m_accCache) {
+    assert(!ownerElement());
+    return m_accCache;
+  }
+
+  // look for top-level document
+  ElementImpl* element = ownerElement();
+  if (element) {
+    DocumentImpl* doc;
+    while (element) {
+      doc = element->getDocument();
+      element = doc->ownerElement();
+    }
+
+    // ask the top-level document for its cache
+    return doc->getAccObjectCache();
+  }
+
+  // this is the top-level document, so install a new cache
+  m_accCache = new KWQAccObjectCache;
   return m_accCache;
 }
 #endif
@@ -1208,8 +1232,8 @@ void DocumentImpl::updateSelection() {
     canvas->clearSelection();
 #if APPLE_CHANGES
     if (KWQAccObjectCache::accessibilityEnabled())
-      getOrCreateAccObjectCache()->postNotification(renderer(),
-                                                    "AXSelectedTextChanged");
+      getAccObjectCache()->postNotificationToTopWebArea(
+          renderer(), "AXSelectedTextChanged");
 #endif
   } else {
     Position startPos = VisiblePosition(s.start(), UPSTREAM).deepEquivalent();
@@ -1220,9 +1244,10 @@ void DocumentImpl::updateSelection() {
       static_cast<RenderCanvas*>(m_render)->setSelection(
           startRenderer, startPos.offset(), endRenderer, endPos.offset());
 #if APPLE_CHANGES
-      if (KWQAccObjectCache::accessibilityEnabled())
-        getOrCreateAccObjectCache()->postNotification(renderer(),
-                                                      "AXSelectedTextChanged");
+      if (KWQAccObjectCache::accessibilityEnabled()) {
+        getAccObjectCache()->postNotificationToTopWebArea(
+            renderer(), "AXSelectedTextChanged");
+      }
 #endif
     }
   }
@@ -1339,8 +1364,7 @@ void DocumentImpl::close() {
     }
 #if APPLE_CHANGES
     if (renderer() && KWQAccObjectCache::accessibilityEnabled())
-      getOrCreateAccObjectCache()->postNotification(renderer(),
-                                                    "AXLoadComplete");
+      getAccObjectCache()->postNotification(renderer(), "AXLoadComplete");
 #endif
   }
 }
@@ -2417,9 +2441,9 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   }
 
 #if APPLE_CHANGES
-  if (!focusChangeBlocked && KWQAccObjectCache::accessibilityEnabled())
-    getOrCreateAccObjectCache()->postNotification(renderer(),
-                                                  "AXFocusedUIElementChanged");
+  if (!focusChangeBlocked && m_focusNode &&
+      KWQAccObjectCache::accessibilityEnabled())
+    getAccObjectCache()->handleFocusedUIElementChanged();
 #endif
 
 SetFocusNodeDone:
@@ -3104,6 +3128,17 @@ DocumentImpl* DocumentImpl::parentDocument() const {
   if (!parent)
     return 0;
   return parent->xmlDocImpl();
+}
+
+DocumentImpl* DocumentImpl::topDocument() const {
+  DocumentImpl* doc = const_cast<DocumentImpl*>(this);
+  ElementImpl* element;
+  while ((element = doc->ownerElement()) != 0) {
+    doc = element->getDocument();
+    element = doc ? doc->ownerElement() : 0;
+  }
+
+  return doc;
 }
 
 // ----------------------------------------------------------------------------

@@ -709,8 +709,8 @@ void KHTMLView::layout() {
   d->layoutCount++;
 #if APPLE_CHANGES
   if (KWQAccObjectCache::accessibilityEnabled())
-    root->document()->getOrCreateAccObjectCache()->postNotification(
-        root, "AXLayoutComplete");
+    root->document()->getAccObjectCache()->postNotification(root,
+                                                            "AXLayoutComplete");
 #endif
 
 #if APPLE_CHANGES

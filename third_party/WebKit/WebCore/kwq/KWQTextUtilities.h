@@ -37,5 +37,14 @@ int KWQFindNextWordFromIndex(const QChar* chars,
                              int len,
                              int position,
                              bool forward);
+void KWQFindSentenceBoundary(const QChar* chars,
+                             int len,
+                             int position,
+                             int* start,
+                             int* end);
+int KWQFindNextSentenceFromIndex(const QChar* chars,
+                                 int len,
+                                 int position,
+                                 bool forward);
 
 #endif
