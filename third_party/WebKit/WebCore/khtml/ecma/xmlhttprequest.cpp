@@ -336,7 +336,7 @@ void XMLHttpRequest::send(const QString& _body) {
       (url.protocol().lower() == "http" || url.protocol().lower() == "https")) {
     // FIXME: determine post encoding correctly by looking in headers for
     // charset
-    job = KIO::http_post(url, QCString(_body.utf8()), false);
+    job = KIO::http_post(url, _body.utf8(), false);
   } else {
     job = KIO::get(url, false, false);
   }
