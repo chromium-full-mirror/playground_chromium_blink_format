@@ -28,6 +28,9 @@
 #include <dom/css_rule.h>
 #include "kjs_binding.h"
 
+#if defined(APPLE_CHANGES) && defined(__OBJC__)
+#define id id_
+#endif /* APPLE_CHANGES, __OBJC__ */
 namespace KJS {
 
 class DOMCSSStyleDeclaration : public DOMObject {
@@ -49,7 +52,7 @@ class DOMCSSStyleDeclarationFunc : public DOMFunction {
 
  public:
   DOMCSSStyleDeclarationFunc(DOM::CSSStyleDeclaration s, int i)
-      : styleDecl(s), _id(i) {}
+      : styleDecl(s), id(i) {}
   Completion tryExecute(const List&);
   enum {
     GetPropertyValue,
@@ -62,7 +65,7 @@ class DOMCSSStyleDeclarationFunc : public DOMFunction {
 
  private:
   DOM::CSSStyleDeclaration styleDecl;
-  int _id;
+  int id;
 };
 
 KJSO getDOMCSSStyleDeclaration(DOM::CSSStyleDeclaration n);
@@ -104,13 +107,13 @@ class DOMStyleSheetListFunc : public DOMFunction {
 
  public:
   DOMStyleSheetListFunc(DOM::StyleSheetList ssl, int i)
-      : styleSheetList(ssl), _id(i) {}
+      : styleSheetList(ssl), id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::StyleSheetList styleSheetList;
-  int _id;
+  int id;
 };
 
 class DOMMediaList : public DOMObject {
@@ -133,13 +136,13 @@ class DOMMediaListFunc : public DOMFunction {
   friend class DOMMediaList;
 
  public:
-  DOMMediaListFunc(DOM::MediaList ml, int i) : mediaList(ml), _id(i) {}
+  DOMMediaListFunc(DOM::MediaList ml, int i) : mediaList(ml), id(i) {}
   Completion tryExecute(const List&);
   enum { Item, DeleteMedium, AppendMedium };
 
  private:
   DOM::MediaList mediaList;
-  int _id;
+  int id;
 };
 
 class DOMCSSStyleSheet : public DOMStyleSheet {
@@ -156,13 +159,13 @@ class DOMCSSStyleSheetFunc : public DOMFunction {
   friend class DOMNode;
 
  public:
-  DOMCSSStyleSheetFunc(DOM::CSSStyleSheet ss, int i) : styleSheet(ss), _id(i) {}
+  DOMCSSStyleSheetFunc(DOM::CSSStyleSheet ss, int i) : styleSheet(ss), id(i) {}
   Completion tryExecute(const List&);
   enum { InsertRule, DeleteRule };
 
  private:
   DOM::CSSStyleSheet styleSheet;
-  int _id;
+  int id;
 };
 
 class DOMCSSRuleList : public DOMObject {
@@ -180,13 +183,13 @@ class DOMCSSRuleList : public DOMObject {
 
 class DOMCSSRuleListFunc : public DOMFunction {
  public:
-  DOMCSSRuleListFunc(DOM::CSSRuleList rl, int i) : cssRuleList(rl), _id(i) {}
+  DOMCSSRuleListFunc(DOM::CSSRuleList rl, int i) : cssRuleList(rl), id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::CSSRuleList cssRuleList;
-  int _id;
+  int id;
 };
 
 KJSO getDOMCSSRuleList(DOM::CSSRuleList rl);
@@ -207,13 +210,13 @@ class DOMCSSRule : public DOMObject {
 
 class DOMCSSRuleFunc : public DOMFunction {
  public:
-  DOMCSSRuleFunc(DOM::CSSRule r, int i) : cssRule(r), _id(i) {}
+  DOMCSSRuleFunc(DOM::CSSRule r, int i) : cssRule(r), id(i) {}
   Completion tryExecute(const List&);
   enum { Item, InsertRule, DeleteRule };
 
  private:
   DOM::CSSRule cssRule;
-  int _id;
+  int id;
 };
 
 KJSO getDOMCSSRule(DOM::CSSRule r);
@@ -275,7 +278,7 @@ class DOMCSSPrimitiveValueFunc : public DOMFunction {
   friend class DOMNode;
 
  public:
-  DOMCSSPrimitiveValueFunc(DOM::CSSPrimitiveValue v, int i) : val(v), _id(i) {}
+  DOMCSSPrimitiveValueFunc(DOM::CSSPrimitiveValue v, int i) : val(v), id(i) {}
   Completion tryExecute(const List&);
   enum {
     SetFloatValue,
@@ -289,7 +292,7 @@ class DOMCSSPrimitiveValueFunc : public DOMFunction {
 
  private:
   DOM::CSSPrimitiveValue val;
-  int _id;
+  int id;
 };
 
 // Prototype object CSSPrimitiveValue
@@ -315,13 +318,13 @@ class DOMCSSValueList : public DOMCSSValue {
 
 class DOMCSSValueListFunc : public DOMFunction {
  public:
-  DOMCSSValueListFunc(DOM::CSSValueList vl, int i) : valueList(vl), _id(i) {}
+  DOMCSSValueListFunc(DOM::CSSValueList vl, int i) : valueList(vl), id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::CSSValueList valueList;
-  int _id;
+  int id;
 };
 
 class DOMRGBColor : public DOMObject {
@@ -370,5 +373,8 @@ class DOMCounter : public DOMObject {
 KJSO getDOMCounter(DOM::Counter c);
 
 };  // namespace
+#if defined(APPLE_CHANGES) && defined(__OBJC__)
+#undef id
+#endif /* APPLE_CHANGES, __OBJC__ */
 
 #endif

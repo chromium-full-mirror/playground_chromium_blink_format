@@ -65,8 +65,10 @@ class DocumentImpl;
 namespace khtml {
 class CachedObject;
 class Request;
+#ifdef APPLE_CHANGES
 class LoaderPrivate;
 class DocLoader;
+#endif /* APPLE_CHANGES */
 
 /**
  * @internal
@@ -91,12 +93,22 @@ class CachedObject {
     Uncacheable  // to big to be cached,
   };             // will be destroyed as soon as possible
 
+#ifdef APPLE_CHANGES
   CachedObject(const DocLoader* loader,
                const DOM::DOMString& url,
                Type type,
                bool _reload,
-               int _expireDate) {
+               int _expireDate)
+#else  /* APPLE_CHANGES not defined */
+  CachedObject(const DOM::DOMString& url,
+               Type type,
+               bool _reload,
+               int _expireDate)
+#endif /* APPLE_CHANGES not defined */
+  {
+#ifdef APPLE_CHANGES
     m_loader = loader;
+#endif /* APPLE_CHANGES */
     m_url = url;
     m_type = type;
     m_status = Pending;
@@ -158,12 +170,14 @@ class CachedObject {
   // e.g. "text/*"
   QString accept() const { return m_accept; }
   void setAccept(const QString& _accept) { m_accept = _accept; }
-
+#ifdef APPLE_CHANGES
   const DocLoader* loader() { return m_loader; }
+#endif /* APPLE_CHANGES */
 
  protected:
+#ifdef APPLE_CHANGES
   const DocLoader* m_loader;
-
+#endif /* APPLE_CHANGES */
   QList<CachedObjectClient> m_clients;
 
   DOM::DOMString m_url;
@@ -183,12 +197,20 @@ class CachedObject {
  */
 class CachedCSSStyleSheet : public CachedObject {
  public:
+#ifdef APPLE_CHANGES
   CachedCSSStyleSheet(const DocLoader* loader,
                       const DOM::DOMString& url,
                       const DOM::DOMString& baseURL,
                       bool reload,
                       int _expireDate,
                       const QString& charset);
+#else  /* APPLE_CHANGES not defined */
+  CachedCSSStyleSheet(const DOM::DOMString& url,
+                      const DOM::DOMString& baseURL,
+                      bool reload,
+                      int _expireDate,
+                      const QString& charset);
+#endif /* APPLE_CHANGES not defined */
   virtual ~CachedCSSStyleSheet();
 
   const DOM::DOMString& sheet() const { return m_sheet; }
@@ -212,12 +234,20 @@ class CachedCSSStyleSheet : public CachedObject {
  */
 class CachedScript : public CachedObject {
  public:
+#ifdef APPLE_CHANGES
   CachedScript(const DocLoader* loader,
                const DOM::DOMString& url,
                const DOM::DOMString& baseURL,
                bool reload,
                int _expireDate,
                const QString& charset);
+#else  /* APPLE_CHANGES not defined */
+  CachedScript(const DOM::DOMString& url,
+               const DOM::DOMString& baseURL,
+               bool reload,
+               int _expireDate,
+               const QString& charset);
+#endif /* APPLE_CHANGES not defined */
   virtual ~CachedScript();
 
   const DOM::DOMString& script() const { return m_script; }
@@ -244,11 +274,18 @@ class ImageSource;
 class CachedImage : public QObject, public CachedObject {
   Q_OBJECT
  public:
+#ifdef APPLE_CHANGES
   CachedImage(const DocLoader* loader,
               const DOM::DOMString& url,
               const DOM::DOMString& baseURL,
               bool reload,
               int _expireDate);
+#else  /* APPLE_CHANGES not defined */
+  CachedImage(const DOM::DOMString& url,
+              const DOM::DOMString& baseURL,
+              bool reload,
+              int _expireDate);
+#endif /* APPLE_CHANGES not defined */
   virtual ~CachedImage();
 
   const QPixmap& pixmap() const;
@@ -336,7 +373,9 @@ class DocLoader {
   void setReloading(bool);
   void setShowAnimations(bool);
   void removeCachedObject(CachedObject*) const;
+#ifdef APPLE_CHANGES
   const KHTMLPart* part() { return m_part; }
+#endif /* APPLE_CHANGES */
 
  private:
   friend class Cache;
@@ -364,9 +403,9 @@ class Request {
   QBuffer m_buffer;
   CachedObject* object;
   DOM::DOMString m_baseURL;
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void* client;
-#endif
+#endif /* APPLE_CHANGES */
 };
 
 /**
@@ -395,15 +434,15 @@ class Loader : public QObject {
   void requestDone(const DOM::DOMString& baseURL, khtml::CachedObject* obj);
   void requestFailed(const DOM::DOMString& baseURL, khtml::CachedObject* obj);
 
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
  public:
   void slotFinished(KIO::Job*);
   void slotData(KIO::Job*, const char* data, int size);
-#else
+#else  /* APPLE_CHANGES not defined */
  protected slots:
   void slotFinished(KIO::Job*);
   void slotData(KIO::Job*, const QByteArray&);
-#endif
+#endif /* APPLE_CHANGES not defined */
 
  private:
   void servePendingRequests();
@@ -413,13 +452,13 @@ class Loader : public QObject {
 #ifdef HAVE_LIBJPEG
   KJPEGFormatType m_jpegloader;
 #endif
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
   LoaderPrivate* d;
-#else
+#else  /* __APPLE__, __OBJC__, __cplusplus not defined */
   void* d;
-#endif  // __APPLE__, __OBJC__, __cplusplus
-#endif  // _KWQ_
+#endif /* __APPLE__, __OBJC__, __cplusplus not defined */
+#endif /* APPLE_CHANGES */
 };
 
 /**

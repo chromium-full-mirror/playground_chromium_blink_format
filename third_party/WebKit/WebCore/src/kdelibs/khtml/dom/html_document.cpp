@@ -169,12 +169,12 @@ HTMLCollection HTMLDocument::all() const {
 }
 
 DOMString HTMLDocument::cookie() const {
-// FIXME: implement cookies
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
+  // FIXME: implement cookies
   fprintf(stderr, "ERROR %s:%d  %s (NOT YET IMPLEMENTED)\n", __FILE__, __LINE__,
           __FUNCTION__);
   return DOMString("");
-#else
+#else  /* APPLE_CHANGES not defined */
   QCString replyType;
   QByteArray params, reply;
   QDataStream stream(params, IO_WriteOnly);
@@ -196,14 +196,14 @@ DOMString HTMLDocument::cookie() const {
   QString result;
   stream2 >> result;
   return DOMString(result);
-#endif
+#endif /* APPLE_CHANGES not defined */
 }
 
 void HTMLDocument::setCookie(const DOMString& value) {
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   fprintf(stderr, "ERROR %s:%d  %s (NOT YET IMPLEMENTED)\n", __FILE__, __LINE__,
           __FUNCTION__);
-#else
+#else  /* APPLE_CHANGES not defined */
   long windowId = view()->winId();
   QByteArray params;
   QDataStream stream(params, IO_WriteOnly);
@@ -216,7 +216,7 @@ void HTMLDocument::setCookie(const DOMString& value) {
                                 params)) {
     kdWarning(6010) << "Can't communicate with cookiejar!" << endl;
   }
-#endif
+#endif /* APPLE_CHANGES not defined */
 }
 
 void HTMLDocument::open() {

@@ -133,8 +133,10 @@ void RenderFlow::print(QPainter* p,
     if (specialObjects && floatBottom() > h)
       h = floatBottom();
     if ((_ty > _y + _h) || (_ty + h < _y)) {
-      // kdDebug( 6040 ) << "cut!" << endl;
-      // return;
+// kdDebug( 6040 ) << "cut!" << endl;
+#ifndef APPLE_CHANGES
+      return;
+#endif /* APPLE_CHANGES not defined */
     }
   }
 

@@ -75,9 +75,8 @@ static CSSStyleSelector::Encodedurl* encodedurl;
 
 CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc) {
   strictParsing = doc->parseMode() == DocumentImpl::Strict;
-  if (!defaultStyle) {
+  if (!defaultStyle)
     loadDefaultStyle(doc->view() ? doc->view()->part()->settings() : 0);
-  }
 
   selectors = 0;
   selectorCache = 0;
@@ -2084,9 +2083,14 @@ void khtml::applyRule(khtml::RenderStyle* style,
       float toPix = 1.;  // fallback
       if (!khtml::printpainter)
         toPix = paintDeviceMetrics->logicalDpiY() / 72.;
+#ifdef APPLE_CHANGES
       // FIXME: SCREEN_RESOLUTION hack good enough to keep?
       if (!khtml::printpainter && toPix < SCREEN_RESOLUTION / 72)
         toPix = SCREEN_RESOLUTION / 72;
+#else  /* APPLE_CHANGES not defined */
+      if (!khtml::printpainter && toPix < 96. / 72.)
+        toPix = 96. / 72.;
+#endif /* APPLE_CHANGES not defined */
 
       QValueList<int> standardSizes =
           e->ownerDocument()->view()->part()->fontSizes();

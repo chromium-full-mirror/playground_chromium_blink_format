@@ -23,8 +23,9 @@
 
 #include "dom_misc.h"
 using namespace DOM;
-
+#ifdef APPLE_CHANGES
 #include <stdio.h>
+#endif /* APPLE_CHANGES */
 
 DomShared::~DomShared() {
   // deliberately left blank
@@ -36,7 +37,7 @@ bool DomShared::deleteMe() {
   return false;
 }
 
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
 void* DomShared::instanceToCheck;
 
 void DomShared::ref() {
@@ -55,4 +56,4 @@ void DomShared::deref() {
   if (!_ref && deleteMe())
     delete this;
 }
-#endif
+#endif /* APPLE_CHANGES */

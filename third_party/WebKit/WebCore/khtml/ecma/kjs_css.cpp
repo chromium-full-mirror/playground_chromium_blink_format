@@ -144,7 +144,7 @@ Completion DOMCSSStyleDeclarationFunc::tryExecute(const List& args) {
   String str = args[0].toString();
   DOM::DOMString s = str.value().string();
 
-  switch (_id) {
+  switch (id) {
     case GetPropertyValue:
       result = getString(styleDecl.getPropertyValue(s));
       break;
@@ -278,7 +278,7 @@ KJSO KJS::getDOMStyleSheetList(DOM::StyleSheetList ssl) {
 Completion DOMStyleSheetListFunc::tryExecute(const List& args) {
   KJSO result;
 
-  if (_id == Item)
+  if (id == Item)
     result =
         getDOMStyleSheet(styleSheetList.item(args[0].toNumber().intValue()));
   return Completion(ReturnValue, result);
@@ -337,7 +337,7 @@ KJSO KJS::getDOMMediaList(DOM::MediaList ml) {
 Completion DOMMediaListFunc::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case Item:
       result = getString(mediaList.item(args[0].toNumber().intValue()));
       break;
@@ -387,7 +387,7 @@ Completion DOMCSSStyleSheetFunc::tryExecute(const List& args) {
   String str = args[0].toString();
   DOM::DOMString s = str.value().string();
 
-  switch (_id) {
+  switch (id) {
     case InsertRule:
       result = Number(styleSheet.insertRule(
           args[0].toString().value().string(),
@@ -430,7 +430,7 @@ KJSO DOMCSSRuleList::tryGet(const UString& p) const {
 Completion DOMCSSRuleListFunc::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case Item:
       result = getDOMCSSRule(cssRuleList.item(args[0].toNumber().intValue()));
       break;
@@ -570,10 +570,10 @@ Completion DOMCSSRuleFunc::tryExecute(const List& args) {
 
   if (cssRule.type() == DOM::CSSRule::MEDIA_RULE) {
     DOM::CSSMediaRule rule = static_cast<DOM::CSSMediaRule>(cssRule);
-    if (_id == InsertRule)
+    if (id == InsertRule)
       result = Number(rule.insertRule(args[0].toString().value().string(),
                                       args[1].toNumber().intValue()));
-    else if (_id == DeleteRule)
+    else if (id == DeleteRule)
       rule.deleteRule(args[0].toNumber().intValue());
   }
 
@@ -752,7 +752,7 @@ KJSO DOMCSSPrimitiveValue::tryGet(const UString& p) const {
 Completion DOMCSSPrimitiveValueFunc::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case SetFloatValue:
       val.setFloatValue(args[0].toNumber().intValue(),
                         args[1].toNumber().value());
@@ -883,7 +883,7 @@ KJSO DOMCSSValueList::tryGet(const UString& p) const {
 Completion DOMCSSValueListFunc::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case Item:
       result = getDOMCSSValue(valueList.item(args[0].toNumber().intValue()));
       break;

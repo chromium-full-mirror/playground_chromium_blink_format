@@ -174,11 +174,11 @@ void RenderImage::printObject(QPainter* p,
     if (cWidth > 2 && cHeight > 2) {
 // qDebug("qDrawShadePanel %d/%d/%d/%d", _tx + leftBorder, _ty + topBorder,
 // cWidth, cHeight);
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
       p->setPen(Qt::lightGray);
       p->setBrush(Qt::NoBrush);
       p->drawRect(_tx, _ty, cWidth, cHeight);
-#else
+#else  /* APPLE_CHANGES not defined */
       qDrawShadePanel(p, _tx + leftBorder + leftPad, _ty + topBorder + topPad,
                       cWidth, cHeight, KApplication::palette().inactive(), true,
                       1);
@@ -202,7 +202,7 @@ void RenderImage::printObject(QPainter* p,
         if (aw > 15 && ah > fm.height())
           p->drawText(ax, ay, aw, ah, Qt::WordBreak, text);
       }
-#endif
+#endif /* APPLE_CHANGES not defined */
     }
   } else if (image && !image->isTransparent()) {
     if ((cWidth != pixSize.width() || cHeight != pixSize.height()) &&

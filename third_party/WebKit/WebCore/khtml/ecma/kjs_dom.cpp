@@ -326,7 +326,7 @@ List* DOMNode::eventHandlerScope() const {
 Completion DOMNodeFunc::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case HasChildNodes:
       result = Boolean(node.hasChildNodes());
       break;
@@ -413,7 +413,7 @@ KJSO DOMNodeList::tryGet(const UString& p) const {
 Completion DOMNodeListFunc::tryExecute(const List& args) {
   KJSO result;
 
-  if (_id == Item)
+  if (id == Item)
     result = getDOMNode(list.item(args[0].toNumber().intValue()));
   return Completion(ReturnValue, result);
 }
@@ -524,7 +524,7 @@ KJSO DOMDocument::tryGet(const UString& p) const {
   return DOMNode::tryGet(p);
 }
 
-DOMDocFunction::DOMDocFunction(DOM::Document d, int i) : doc(d), _id(i) {}
+DOMDocFunction::DOMDocFunction(DOM::Document d, int i) : doc(d), id(i) {}
 
 #include <html_document.h>
 
@@ -533,7 +533,7 @@ Completion DOMDocFunction::tryExecute(const List& args) {
   String str = args[0].toString();
   DOM::DOMString s = str.value().string();
 
-  switch (_id) {
+  switch (id) {
     case CreateElement:
       result = getDOMNode(doc.createElement(s));
       break;
@@ -680,12 +680,12 @@ KJSO DOMElement::tryGet(const UString& p) const {
 }
 
 DOMElementFunction::DOMElementFunction(DOM::Element e, int i)
-    : element(e), _id(i) {}
+    : element(e), id(i) {}
 
 Completion DOMElementFunction::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case GetAttribute:
       result =
           String(element.getAttribute(args[0].toString().value().string()));
@@ -763,12 +763,12 @@ KJSO DOMDOMImplementation::tryGet(const UString& p) const {
 DOMDOMImplementationFunction::DOMDOMImplementationFunction(
     DOM::DOMImplementation impl,
     int i)
-    : implementation(impl), _id(i) {}
+    : implementation(impl), id(i) {}
 
 Completion DOMDOMImplementationFunction::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case HasFeature:
       result = Boolean(
           implementation.hasFeature(args[0].toString().value().string(),
@@ -858,12 +858,12 @@ KJSO DOMNamedNodeMap::tryGet(const UString& p) const {
 }
 
 DOMNamedNodeMapFunction::DOMNamedNodeMapFunction(DOM::NamedNodeMap m, int i)
-    : map(m), _id(i) {}
+    : map(m), id(i) {}
 
 Completion DOMNamedNodeMapFunction::tryExecute(const List& args) {
   KJSO result;
 
-  switch (_id) {
+  switch (id) {
     case GetNamedItem:
       result =
           getDOMNode(map.getNamedItem(args[0].toString().value().string()));

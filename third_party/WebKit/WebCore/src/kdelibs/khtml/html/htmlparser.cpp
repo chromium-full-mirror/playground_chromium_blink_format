@@ -66,9 +66,9 @@ using namespace khtml;
 class HTMLStackElem {
  public:
   HTMLStackElem(int _id, int _level, DOM::NodeImpl* _node, HTMLStackElem* _next)
-      : _id(_id), level(_level), node(_node), next(_next) {}
+      : id(_id), level(_level), node(_node), next(_next) {}
 
-  int _id;
+  int id;
   int level;
   NodeImpl* node;
   HTMLStackElem* next;
@@ -169,22 +169,22 @@ void KHTMLParser::reset() {
 }
 
 void KHTMLParser::parseToken(Token* t) {
-  if (t->_id > 2 * ID_CLOSE_TAG) {
-    kdDebug(6035) << "Unknown tag!! tagID = " << t->_id << endl;
+  if (t->id > 2 * ID_CLOSE_TAG) {
+    kdDebug(6035) << "Unknown tag!! tagID = " << t->id << endl;
     return;
   }
   if (discard_until) {
-    if (t->_id == discard_until)
+    if (t->id == discard_until)
       discard_until = 0;
 
     // do not skip </iframe>
-    if (discard_until || current->id() + ID_CLOSE_TAG != t->_id)
+    if (discard_until || current->id() + ID_CLOSE_TAG != t->id)
       return;
   }
 
 #ifdef PARSER_DEBUG
   kdDebug(6035) << "\n\n==> parser: processing token "
-                << getTagName(t->_id).string() << "(" << t->_id << ")"
+                << getTagName(t->id).string() << "(" << t->id << ")"
                 << " current = " << getTagName(current->id()).string() << "("
                 << current->id() << ")" << endl;
   kdDebug(6035) << "inline=" << _inline << " inBody=" << inBody
@@ -194,17 +194,17 @@ void KHTMLParser::parseToken(Token* t) {
 
   // holy shit. apparently some sites use </br> instead of <br>
   // be compatible with IE and NS
-  if (t->_id == ID_BR + ID_CLOSE_TAG &&
+  if (t->id == ID_BR + ID_CLOSE_TAG &&
       document->document()->parseMode() != DocumentImpl::Strict)
-    t->_id -= ID_CLOSE_TAG;
+    t->id -= ID_CLOSE_TAG;
 
-  if (t->_id > ID_CLOSE_TAG) {
+  if (t->id > ID_CLOSE_TAG) {
     processCloseTag(t);
     return;
   }
 
   // ignore spaces, if we're not inside a paragraph or other inline code
-  if (t->_id == ID_TEXT) {
+  if (t->id == ID_TEXT) {
 #ifdef PARSER_DEBUG
     if (t->text)
       kdDebug(6035) << "length=" << t->text->l << " text='"
@@ -228,12 +228,12 @@ void KHTMLParser::parseToken(Token* t) {
 
     // take care of optional close tags
     if (endTag[e->id()] == DOM::OPTIONAL)
-      popBlock(t->_id);
+      popBlock(t->id);
   }
 
   // if this tag is forbidden inside the current context, pop
   // blocks until we are allowed to add it...
-  while (forbiddenTag[t->_id])
+  while (forbiddenTag[t->id])
     popOneBlock();
 
   if (!insertNode(n)) {
@@ -259,7 +259,7 @@ void KHTMLParser::parseToken(Token* t) {
 }
 
 bool KHTMLParser::insertNode(NodeImpl* n) {
-  int _id = n->id();
+  int id = n->id();
 
 // let's be stupid and just try to insert it.
 // this should work if the document is wellformed
@@ -274,8 +274,8 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
                   << ", new current=" << newNode->nodeName().string() << endl;
 #endif
     // don't push elements without end tag on the stack
-    if (tagPriority[_id] != 0 && !flat) {
-      pushBlock(_id, tagPriority[_id]);
+    if (tagPriority[id] != 0 && !flat) {
+      pushBlock(id, tagPriority[id]);
       current = newNode;
 #if SPEED_DEBUG < 2
       if (!n->attached() && HTMLWidget)
@@ -295,7 +295,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
     }
 
 #if SPEED_DEBUG < 1
-    if (tagPriority[_id] == 0 && n->renderer())
+    if (tagPriority[id] == 0 && n->renderer())
       n->renderer()->calcMinMaxWidth();
 #endif
     return true;
@@ -310,7 +310,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
     bool handled = false;
 
     // switch according to the element to insert
-    switch (_id) {
+    switch (id) {
       case ID_COMMENT:
         break;
       case ID_HEAD:
@@ -345,7 +345,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
         if (head) {
           DOM::NodeImpl* newNode = head->addChild(n);
           if (newNode) {
-            pushBlock(_id, tagPriority[_id]);
+            pushBlock(id, tagPriority[id]);
             current = newNode;
 #if SPEED_DEBUG < 2
             if (!n->attached() && HTMLWidget)
@@ -450,7 +450,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
     // switch on the currently active element
     switch (current->id()) {
       case ID_HTML:
-        switch (_id) {
+        switch (id) {
           case ID_SCRIPT:
           case ID_STYLE:
           case ID_META:
@@ -489,7 +489,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
         break;
       case ID_HEAD:
         // we can get here only if the element is not allowed in head.
-        if (_id == ID_HTML)
+        if (id == ID_HTML)
           return false;
         else {
           // This means the body starts here...
@@ -505,7 +505,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
       case ID_BODY:
         break;
       case ID__KONQBLOCK:
-        switch (_id) {
+        switch (id) {
           case ID_THEAD:
           case ID_TFOOT:
           case ID_TBODY:
@@ -517,7 +517,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
             // and go ahead!
             popBlock(ID__KONQBLOCK);
             haveKonqBlock = false;
-            handled = checkChild(current->id(), _id);
+            handled = checkChild(current->id(), id);
             break;
           default:
             break;
@@ -528,7 +528,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
       case ID_TFOOT:
       case ID_TBODY:
       case ID_TR:
-        switch (_id) {
+        switch (id) {
           case ID_TABLE:
             popBlock(ID_TABLE);  // end the table
             handled = true;      // ...and start a new one
@@ -553,7 +553,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
                  (parent->id() == ID_THEAD || parent->id() == ID_TBODY ||
                   parent->id() == ID_TFOOT) &&
                  parentparent->id() == ID_TABLE) ||
-                (!checkChild(ID_TR, _id) &&
+                (!checkChild(ID_TR, id) &&
                  (node->id() == ID_THEAD || node->id() == ID_TBODY ||
                   node->id() == ID_TFOOT) &&
                  parent->id() == ID_TABLE)) {
@@ -594,7 +594,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
         }    // end switch
         break;
       case ID_OBJECT:
-        discard_until = _id + ID_CLOSE_TAG;
+        discard_until = id + ID_CLOSE_TAG;
         return false;
       case ID_UL:
       case ID_OL:
@@ -630,10 +630,10 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
         }
         break;
       case ID_OPTION:
-        if (_id == ID_OPTGROUP) {
+        if (id == ID_OPTGROUP) {
           popBlock(ID_OPTION);
           handled = true;
-        } else if (_id == ID_SELECT) {
+        } else if (id == ID_SELECT) {
           // IE treats a nested select as </select>. Let's do the same
           popBlock(ID_SELECT);
           break;
@@ -679,7 +679,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
 NodeImpl* KHTMLParser::getElement(Token* t) {
   NodeImpl* n = 0;
 
-  switch (t->_id) {
+  switch (t->id) {
     case ID_HTML:
       n = new HTMLHtmlElementImpl(document);
       break;
@@ -790,12 +790,12 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
       n = new HTMLDListElementImpl(document);
       break;
     case ID_DD:
-      n = new HTMLGenericElementImpl(document, t->_id);
+      n = new HTMLGenericElementImpl(document, t->id);
       popBlock(ID_DT);
       popBlock(ID_DD);
       break;
     case ID_DT:
-      n = new HTMLGenericElementImpl(document, t->_id);
+      n = new HTMLGenericElementImpl(document, t->id);
       popBlock(ID_DD);
       popBlock(ID_DT);
       break;
@@ -837,7 +837,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     case ID_H4:
     case ID_H5:
     case ID_H6:
-      n = new HTMLHeadingElementImpl(document, t->_id);
+      n = new HTMLHeadingElementImpl(document, t->id);
       break;
     case ID_HR:
       n = new HTMLHRElementImpl(document);
@@ -861,7 +861,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     // ins/del
     case ID_DEL:
     case ID_INS:
-      n = new HTMLModElementImpl(document, t->_id);
+      n = new HTMLModElementImpl(document, t->id);
       break;
 
     // anchor
@@ -907,7 +907,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
       break;
     case ID_COLGROUP:
     case ID_COL:
-      n = new HTMLTableColElementImpl(document, t->_id);
+      n = new HTMLTableColElementImpl(document, t->id);
       break;
     case ID_TR:
       popBlock(ID_TR);
@@ -917,7 +917,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     case ID_TH:
       popBlock(ID_TH);
       popBlock(ID_TD);
-      n = new HTMLTableCellElementImpl(document, t->_id);
+      n = new HTMLTableCellElementImpl(document, t->id);
       break;
     case ID_TBODY:
     case ID_THEAD:
@@ -925,7 +925,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
       popBlock(ID_THEAD);
       popBlock(ID_TBODY);
       popBlock(ID_TFOOT);
-      n = new HTMLTableSectionElementImpl(document, t->_id);
+      n = new HTMLTableSectionElementImpl(document, t->id);
       break;
 
     // inline elements
@@ -942,7 +942,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     case ID_ADDRESS:
     case ID_CENTER:
     case ID_LISTING:
-      n = new HTMLGenericElementImpl(document, t->_id);
+      n = new HTMLGenericElementImpl(document, t->id);
       break;
     // inline
     // %fontstyle
@@ -971,7 +971,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     case ID_SUB:
     case ID_SUP:
     case ID_SPAN:
-      n = new HTMLGenericElementImpl(document, t->_id);
+      n = new HTMLGenericElementImpl(document, t->id);
       break;
 
     case ID_BDO:
@@ -1004,7 +1004,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
 #endif
       break;
     default:
-      kdDebug(6035) << "Unknown tag " << t->_id << "!" << endl;
+      kdDebug(6035) << "Unknown tag " << t->id << "!" << endl;
   }
   return n;
 }
@@ -1012,7 +1012,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
 void KHTMLParser::processCloseTag(Token* t) {
   // support for really broken html. Can't believe I'm supporting such crap
   // (lars)
-  switch (t->_id) {
+  switch (t->id) {
     case ID_HTML + ID_CLOSE_TAG:
     case ID_BODY + ID_CLOSE_TAG:
       // we never close the body tag, since some stupid web pages close it
@@ -1051,7 +1051,7 @@ void KHTMLParser::processCloseTag(Token* t) {
     child = child->nextSibling();
   }
 #endif
-  popBlock(t->_id - ID_CLOSE_TAG);
+  popBlock(t->id - ID_CLOSE_TAG);
 #ifdef PARSER_DEBUG
   kdDebug(6035) << "closeTag --> current = " << current->nodeName().string()
                 << endl;
@@ -1072,13 +1072,13 @@ void KHTMLParser::popBlock(int _id) {
 #ifdef PARSER_DEBUG
   kdDebug(6035) << "popBlock(" << getTagName(_id).string() << ")" << endl;
   while (Elem) {
-    kdDebug(6035) << "   > " << getTagName(Elem->_id).string() << endl;
+    kdDebug(6035) << "   > " << getTagName(Elem->id).string() << endl;
     Elem = Elem->next;
   }
   Elem = blockStack;
 #endif
 
-  while (Elem && (Elem->_id != _id)) {
+  while (Elem && (Elem->id != _id)) {
     if (maxLevel < Elem->level) {
       maxLevel = Elem->level;
     }
@@ -1090,7 +1090,7 @@ void KHTMLParser::popBlock(int _id) {
   Elem = blockStack;
 
   while (Elem) {
-    if (Elem->_id == _id) {
+    if (Elem->id == _id) {
       popOneBlock();
       Elem = 0;
     } else {
@@ -1108,8 +1108,8 @@ void KHTMLParser::popOneBlock() {
   if (!Elem)
     return;
 #else
-  kdDebug(6035) << "popping block: " << getTagName(Elem->_id).string() << "("
-                << Elem->_id << ")" << endl;
+  kdDebug(6035) << "popping block: " << getTagName(Elem->id).string() << "("
+                << Elem->id << ")" << endl;
 #endif
 
 #if SPEED_DEBUG < 1
@@ -1118,7 +1118,7 @@ void KHTMLParser::popOneBlock() {
       current->renderer()->close();
 #endif
 
-  removeForbidden(Elem->_id, forbiddenTag);
+  removeForbidden(Elem->id, forbiddenTag);
 
   blockStack = Elem->next;
   // we only set inline to false, if the element we close is a block level

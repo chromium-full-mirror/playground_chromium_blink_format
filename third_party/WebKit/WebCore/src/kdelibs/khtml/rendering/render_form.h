@@ -83,10 +83,9 @@ class RenderFormElement : public khtml::RenderWidget {
   DOM::HTMLGenericFormElementImpl* element() { return m_element; }
 
   virtual bool eventFilter(QObject*, QEvent*);
-
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
-#endif
+#endif /* APPLE_CHANGES */
 
  public slots:
   virtual void slotClicked();
@@ -130,10 +129,9 @@ class RenderCheckBox : public RenderButton {
   virtual const char* renderName() const { return "RenderCheckBox"; }
   virtual void calcMinMaxWidth();
   virtual void layout();
-
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
-#endif
+#endif /* APPLE_CHANGES */
 
  public slots:
   virtual void slotStateChanged(int state);
@@ -214,10 +212,9 @@ class RenderLineEdit : public RenderFormElement {
 
   virtual const char* renderName() const { return "RenderLineEdit"; }
   void select();
-
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
-#endif
+#endif /* APPLE_CHANGES */
 
  public slots:
   void slotReturnPressed();
@@ -322,10 +319,9 @@ class RenderSelect : public RenderFormElement {
   }
 
   void updateSelection();
-
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
-#endif
+#endif /* APPLE_CHANGES */
 
  protected:
   KListBox* createListBox();
@@ -372,10 +368,9 @@ class RenderTextArea : public RenderFormElement {
 
   QString text();  // ### remove
 
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   void performAction(QObject::Actions action);
-#endif
-
+#endif /* APPLE_CHANGES */
   void select();
 
  protected slots:

@@ -56,10 +56,14 @@ float khtml::computeLengthFloat(DOM::CSSPrimitiveValueImpl* val,
   float dpiY = 72.;  // fallback
   if (devMetrics)
     dpiY = devMetrics->logicalDpiY();
-
+#ifdef APPLE_CHANGES
   // FIXME: SCREEN_RESOLUTION hack good enough to keep?
   if (!khtml::printpainter && dpiY < SCREEN_RESOLUTION)
     dpiY = SCREEN_RESOLUTION;
+#else  /* APPLE_CHANGES not defined */
+  if (!khtml::printpainter && dpiY < 96)
+    dpiY = 96.;
+#endif /* APPLE_CHANGES not defined */
 
   float factor = 1.;
   switch (type) {
@@ -153,11 +157,13 @@ void khtml::setFontSize(QFont& f,
                         int pixelsize,
                         const KHTMLSettings* s,
                         QPaintDeviceMetrics* devMetrics) {
+#ifndef APPLE_CHANGES
+  QFontDatabase db;
+#endif /* APPLE_CHANGES not defined */
+
   float size = pixelsize;
 
-#ifndef _KWQ_
-  QFontDatabase db;
-
+#ifndef APPLE_CHANGES
   float toPix = 1.;
   if (!khtml::printpainter)
     toPix = devMetrics->logicalDpiY() / 72.;
@@ -198,7 +204,8 @@ void khtml::setFontSize(QFont& f,
     //         else if ( size > 4 && size < 16 )
     //             size = float( int( ( size + 1 ) / 2 )*2 );
   }
-#endif
+#endif /* APPLE_CHANGES not defined */
+
   // qDebug(" -->>> using %f pixel font", size);
 
   f.setPixelSizeFloat(size);

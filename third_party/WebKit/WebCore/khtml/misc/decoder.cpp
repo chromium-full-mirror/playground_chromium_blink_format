@@ -238,11 +238,11 @@ QString Decoder::decode(const char* data, int len) {
       return QString::null;
     }
   }
-#ifdef _KWQ_
+#ifdef APPLE_CHANGES
   else {
     buffer += QCString(data, len + 1);
   }
-#endif
+#endif /* APPLE_CHANGES */
 
 found:
   // if we still haven't found an encoding latin1 will be used...
