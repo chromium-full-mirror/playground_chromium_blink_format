@@ -18,4 +18,5 @@
                    parent:(IFWebDataSource*)parent;
 - (void)_changeFrame:(IFWebFrame*)frame
           dataSource:(IFWebDataSource*)newDataSource;
+- (void)_checkLoadCompleteForDataSource:(IFWebDataSource*)dataSource;
 @end
