@@ -31,6 +31,7 @@
 template <class T>
 class QArray {
  public:
+  T& at(uint) const;
   T* data() const;
 
   uint size() const;

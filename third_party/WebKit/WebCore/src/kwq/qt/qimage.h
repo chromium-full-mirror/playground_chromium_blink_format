@@ -26,6 +26,14 @@
 #ifndef QIMAGE_H_
 #define QIMAGE_H_
 
-class QImage {};
+class QImage {
+ public:
+  int width() const;
+  int height() const;
+  int depth() const;
+  int pixelIndex(int, int) const;
+  QImage createAlphaMask(int conversion_flags = 0) const;
+  bool hasAlphaBuffer() const;
+};
 
 #endif

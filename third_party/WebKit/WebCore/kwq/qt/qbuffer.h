@@ -26,6 +26,15 @@
 #ifndef QBUFFER_H_
 #define QBUFFER_H_
 
-class QBuffer {};
+class QBuffer {
+ public:
+  QByteArray buffer() const;
+
+  uint size() const;
+  bool isOpen();
+  bool open(int);
+  void close();
+  int writeBlock(const char*, uint);
+};
 
 #endif

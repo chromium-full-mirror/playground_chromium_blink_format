@@ -30,6 +30,7 @@ class QString;
 
 class QFont {
  public:
+  enum CharSet { Latin1 };
   enum Weight { Normal = 50, Bold = 63 };
 
   int pixelSize() const;
@@ -43,7 +44,9 @@ class QFont {
   bool bold() const;
   bool operator==(const QFont& x) const;
   bool operator!=(const QFont& x) const;
-  enum CharSet {};
+
+ private:
+  friend class QPainter;
 };
 
 #endif

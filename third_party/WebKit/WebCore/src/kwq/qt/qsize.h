@@ -31,10 +31,12 @@ class QSize {
   QSize();
   QSize(int, int);
 
+  bool isValid() const;
   int width() const;
   int height() const;
 
   friend inline QSize operator+(const QSize&, const QSize&);
+  friend inline bool operator!=(const QSize&, const QSize&);
 };
 
 #endif

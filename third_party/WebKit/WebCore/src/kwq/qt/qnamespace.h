@@ -26,6 +26,8 @@
 #ifndef QNAMESPACE_H_
 #define QNAMESPACE_H_
 
+class QColor;
+
 class Qt {
  public:
   enum ButtonState {
@@ -36,6 +38,8 @@ class Qt {
     AltButton,
     ShiftButton,
   };
+
+  static const QColor& black;
 };
 
 #endif

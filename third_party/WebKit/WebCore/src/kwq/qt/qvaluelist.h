@@ -32,6 +32,7 @@ class QValueListIterator {
   QValueListIterator operator++();
   bool operator!=(const QValueListIterator<T>& it);
   T& operator*();
+  QValueListIterator<T>& operator--();
 };
 
 template <class T>
@@ -50,19 +51,22 @@ class QValueList {
  public:
   typedef QValueListIterator<T> Iterator;
   typedef QValueListConstIterator<T> ConstIterator;
+
   void clear();
   uint count() const;
   bool isEmpty() const;
-  void append(const T& x);
-  void remove(const T& x);
-  Iterator remove(Iterator it);
+  void append(const T&);
+  void remove(const T&);
+  uint contains(const T&);
+  Iterator remove(Iterator);
+  Iterator fromLast();
   const T& first() const;
   const T& last() const;
   Iterator begin();
   Iterator end();
   ConstIterator begin() const;
   ConstIterator end() const;
-  T& operator[](uint i);
+  T& operator[](uint);
 };
 
 #endif

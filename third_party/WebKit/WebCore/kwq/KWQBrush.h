@@ -26,4 +26,14 @@
 #ifndef QBRUSH_H_
 #define QBRUSH_H_
 
+#include "qcolor.h"
+
+class QBrush {
+  friend class QPainter;
+
+ public:
+  QBrush();
+  QBrush(const QColor&);
+};
+
 #endif

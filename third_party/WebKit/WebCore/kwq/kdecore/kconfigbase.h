@@ -26,6 +26,9 @@
 #ifndef KCONFIGBASE_H_
 #define KCONFIGBASE_H_
 
+class QString;
+class QColor;
+
 class KConfigBase {
  public:
   void setGroup(const QString& pGroup);
@@ -34,6 +37,7 @@ class KConfigBase {
   int readNumEntry(const char* pKey, int nDefault = 0) const;
   unsigned int readUnsignedNumEntry(const char* pKey,
                                     unsigned int nDefault = 0) const;
+  QColor readColorEntry(const char* pKey, const QColor* pDefault = 0L) const;
 };
 
 #endif

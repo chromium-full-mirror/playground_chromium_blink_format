@@ -60,6 +60,7 @@ class QListIterator {
   T* toFirst();
   T* toLast();
   T* current() const;
+  operator T*() const;
   T* operator--();
   T* operator++();
 };
