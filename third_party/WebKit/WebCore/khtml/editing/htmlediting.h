@@ -239,6 +239,10 @@ class CompositeEditCommand : public EditCommand {
   void insertBlockPlaceholderIfNeeded(DOM::NodeImpl*);
   bool removeBlockPlaceholderIfNeeded(DOM::NodeImpl*);
 
+  void moveParagraphContentsToNewBlockIfNecessary(const DOM::Position&);
+
+  bool isMailBlockquote(const DOM::NodeImpl*) const;
+
   QValueList<EditCommandPtr> m_cmds;
 };
 
@@ -301,7 +305,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void applyBlockStyle(DOM::CSSMutableStyleDeclarationImpl*);
   void applyInlineStyle(DOM::CSSMutableStyleDeclarationImpl*);
   void addBlockStyleIfNeeded(DOM::CSSMutableStyleDeclarationImpl*,
-                             DOM::HTMLElementImpl*);
+                             DOM::NodeImpl*);
   void addInlineStyleIfNeeded(DOM::CSSMutableStyleDeclarationImpl*,
                               DOM::NodeImpl* start,
                               DOM::NodeImpl* end);
@@ -489,8 +493,6 @@ class InsertParagraphSeparatorInQuotedContentCommand
   virtual void doApply();
 
  private:
-  bool isMailBlockquote(const DOM::NodeImpl*) const;
-
   QPtrList<DOM::NodeImpl> ancestors;
   QPtrList<DOM::NodeImpl> clonedNodes;
   DOM::ElementImpl* m_breakNode;
