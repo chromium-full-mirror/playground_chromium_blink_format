@@ -2,7 +2,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2004 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -50,6 +50,7 @@
 using namespace KJS;
 
 using DOM::DOMException;
+using DOM::DOMString;
 using DOM::NodeFilter;
 
 // -------------------------------------------------------------------------
@@ -567,8 +568,11 @@ Value DOMNodeProtoFunc::tryCall(ExecState* exec,
       node.normalize();
       return Undefined();
     case DOMNode::IsSupported:
-      return Boolean(node.isSupported(args[0].toString(exec).string(),
-                                      args[1].toString(exec).string()));
+      return Boolean(node.isSupported(
+          args[0].toString(exec).string(),
+          (args[1].type() != UndefinedType && args[1].type() != NullType)
+              ? args[1].toString(exec).string()
+              : DOMString()));
     case DOMNode::AddEventListener: {
       JSEventListener* listener =
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
@@ -1260,7 +1264,10 @@ Value DOMDOMImplementationProtoFunc::tryCall(ExecState* exec,
   switch (id) {
     case DOMDOMImplementation::HasFeature:
       return Boolean(implementation.hasFeature(
-          args[0].toString(exec).string(), args[1].toString(exec).string()));
+          args[0].toString(exec).string(),
+          (args[1].type() != UndefinedType && args[1].type() != NullType)
+              ? args[1].toString(exec).string()
+              : DOMString()));
     case DOMDOMImplementation::CreateDocumentType:  // DOM2
       return getDOMNode(exec, implementation.createDocumentType(
                                   args[0].toString(exec).string(),
