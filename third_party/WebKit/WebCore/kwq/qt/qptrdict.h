@@ -61,7 +61,7 @@ class QPtrDict : public QCollection {
   uint count() const;
   T* take(void*);
 
-  void append(const T*);
+  // void append(const T *);
   void insert(void*, const T*);
   void remove(void*);
 
