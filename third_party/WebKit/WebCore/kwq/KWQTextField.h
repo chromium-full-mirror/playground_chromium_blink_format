@@ -36,6 +36,7 @@ class QLineEdit;
   KWQTextFieldFormatter* formatter;
   BOOL edited;
   BOOL inNextValidKeyView;
+  NSRange lastSelectedRange;
 }
 
 - initWithQLineEdit:(QLineEdit*)widget;
@@ -44,7 +45,7 @@ class QLineEdit;
 - (BOOL)passwordMode;
 - (void)setMaximumLength:(int)len;
 - (int)maximumLength;
-- (BOOL)edited;
 - (void)setEdited:(BOOL)edited;
+- (BOOL)edited;
 
 @end
