@@ -41,6 +41,7 @@ class SavedProperties;
 
 @interface KWQPageState : NSObject {
   DOM::DocumentImpl* document;
+  DOM::NodeImpl* mousePressNode;
   KURL* URL;
   KJS::SavedProperties* windowProperties;
   KJS::SavedProperties* locationProperties;
@@ -55,6 +56,7 @@ class SavedProperties;
     interpreterBuiltins:(KJS::SavedBuiltins*)ib;
 
 - (DOM::DocumentImpl*)document;
+- (DOM::NodeImpl*)mousePressNode;
 - (KURL*)URL;
 - (KJS::SavedProperties*)windowProperties;
 - (KJS::SavedProperties*)locationProperties;

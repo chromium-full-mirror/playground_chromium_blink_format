@@ -407,6 +407,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
 
+  DOM::NodeImpl* mousePressNode();
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
