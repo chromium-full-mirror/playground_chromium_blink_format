@@ -34,6 +34,7 @@ class RenderObject;
 @interface KWQAccObject : NSObject {
   khtml::RenderObject* m_renderer;
   id m_data;
+  NSMutableArray* m_children;
 }
 
 - (id)initWithRenderer:(khtml::RenderObject*)renderer;
@@ -49,5 +50,8 @@ class RenderObject;
 - (KWQAccObject*)previousSibling;
 - (KWQAccObject*)nextSibling;
 - (KWQAccObject*)parentObject;
+
+- (void)childrenChanged;
+- (void)clearChildren;
 
 @end
