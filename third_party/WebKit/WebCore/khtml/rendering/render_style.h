@@ -266,6 +266,8 @@ class BorderData : public Shared<BorderData> {
   }
 };
 
+enum EMarginCollapse { MCOLLAPSE, MSEPARATE, MDISCARD };
+
 class StyleSurroundData : public Shared<StyleSurroundData> {
  public:
   StyleSurroundData();
@@ -278,6 +280,8 @@ class StyleSurroundData : public Shared<StyleSurroundData> {
   LengthBox margin;
   LengthBox padding;
   BorderData border;
+  EMarginCollapse marginTopCollapse : 2;
+  EMarginCollapse marginBottomCollapse : 2;
 };
 
 //------------------------------------------------
@@ -1206,6 +1210,12 @@ class RenderStyle {
   EUserDrag userDrag() const { return css3NonInheritedData->userDrag; }
   EUserSelect userSelect() const { return css3NonInheritedData->userSelect; }
   bool textOverflow() const { return css3NonInheritedData->textOverflow; }
+  EMarginCollapse marginTopCollapse() const {
+    return surround->marginTopCollapse;
+  }
+  EMarginCollapse marginBottomCollapse() const {
+    return surround->marginBottomCollapse;
+  }
 // End CSS3 Getters
 
 #if APPLE_CHANGES
@@ -1485,6 +1495,12 @@ class RenderStyle {
   void setTextOverflow(bool b) {
     SET_VAR(css3NonInheritedData, textOverflow, b);
   }
+  void setMarginTopCollapse(EMarginCollapse c) {
+    SET_VAR(surround, marginTopCollapse, c);
+  }
+  void setMarginBottomCollapse(EMarginCollapse c) {
+    SET_VAR(surround, marginBottomCollapse, c);
+  }
 // End CSS3 Setters
 
 #if APPLE_CHANGES
@@ -1603,6 +1619,8 @@ class RenderStyle {
   static EUserDrag initialUserDrag() { return DRAG_AUTO; }
   static EUserSelect initialUserSelect() { return SELECT_AUTO; }
   static bool initialTextOverflow() { return false; }
+  static EMarginCollapse initialMarginTopCollapse() { return MCOLLAPSE; }
+  static EMarginCollapse initialMarginBottomCollapse() { return MCOLLAPSE; }
 
 #if APPLE_CHANGES
   // Keep these at the end.
