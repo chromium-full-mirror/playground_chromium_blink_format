@@ -152,6 +152,10 @@ class SimplifiedBackwardsTextIterator {
   const QChar* m_textCharacters;
   long m_textLength;
 
+  // Used to do the whitespace logic.
+  DOM::NodeImpl* m_lastTextNode;
+  QChar m_lastCharacter;
+
   // Used for whitespace characters that aren't in the DOM, so we can point at
   // them.
   QChar m_singleCharacterBuffer;
