@@ -298,7 +298,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   void setType(const DOMString& t);
 
   DOMString value() const;
-  void setValue(DOMString val);
+  void setValue(const DOMString&);
 
   void blur();
   void focus();
@@ -345,6 +345,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 #endif
 
  protected:
+  bool storesValueSeparateFromAttribute() const;
+
   DOMString m_value;
   int xPos;
   short m_maxLen;
