@@ -30,9 +30,14 @@
 #include <qmap.h>
 
 namespace KIO {
+
 enum CacheControl { CC_Cache, CC_Verify, CC_Refresh, CC_Reload };
 
-const QMap<QString, QString> MetaData();
+typedef QMap<QString, QString> MetaData;
+
+inline QString getCacheControlString(CacheControl) {
+  return QString::null;
+}
 }
 
 #endif /* KIO_GLOBAL_H_ */

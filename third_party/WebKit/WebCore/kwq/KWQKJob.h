@@ -42,6 +42,12 @@ inline TransferJob* get(const KURL& url,
   return new TransferJob(url, reload, showProgressInfo);
 }
 
+inline TransferJob* http_post(const KURL& url,
+                              const QByteArray& postData,
+                              bool showProgressInfo = true) {
+  return new TransferJob(url, postData, showProgressInfo);
+}
+
 }  // namespace KIO
 
 #endif

@@ -115,6 +115,9 @@ class QValueListConstIterator {
 };
 
 template <class T>
+bool operator==(const QValueList<T>& a, const QValueList<T>& b);
+
+template <class T>
 class QValueList {
  public:
   typedef QValueListIterator<T> Iterator;
@@ -166,6 +169,8 @@ class QValueList {
     return *this;
   }
 
+  friend bool operator==<>(const QValueList<T>&, const QValueList<T>&);
+
  private:
   KWQValueListImpl impl;
 
@@ -180,6 +185,11 @@ class QValueList {
     return new QValueListNode<T>(((QValueListNode<T>*)node)->value);
   }
 };
+
+template <class T>
+inline bool operator==(const QValueList<T>& a, const QValueList<T>& b) {
+  return a.impl.isEqual(b.impl, QValueList<T>::nodesEqual);
+}
 
 #ifdef _KWQ_IOSTREAM_
 

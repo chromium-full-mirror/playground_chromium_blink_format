@@ -182,7 +182,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (id<WebCoreResourceHandle>)startLoadingResource:
                                  (id<WebCoreResourceLoader>)loader
                                           withURL:(NSURL*)URL;
-- (void)reportError:(WebError*)error;
+- (void)reportBadURL:(NSString*)badURL;
 - (void)objectLoadedFromCache:(NSURL*)URL size:(unsigned)bytes;
 - (BOOL)isReloading;
 

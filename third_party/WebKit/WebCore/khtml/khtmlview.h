@@ -197,7 +197,6 @@ class KHTMLView : public QScrollView {
 
   void scheduleRepaint(int x, int y, int w, int h);
 
-#ifndef APPLE_CHANGES
   /**
    * Paints the HTML document to a QPainter.
    * The document will be scaled to match the width of
@@ -207,7 +206,6 @@ class KHTMLView : public QScrollView {
    * beyond the rc or false if everything below yOff was painted.
    **/
   void paint(QPainter* p, const QRect& rc, int yOff = 0, bool* more = 0);
-#endif
 
   /**
    * Get/set the CSS Media Type.

@@ -55,6 +55,7 @@ class KURL {
   QString pass() const;
   QString user() const;
   QString ref() const;
+  bool hasRef() const;
   QString query() const;
   QString path() const;
   QString htmlRef() const;
@@ -90,5 +91,11 @@ class KURL {
   int queryEndPos;
   int fragmentEndPos;
 };
+
+// True if both URLs are the same.
+bool urlcmp(const QString& URLA,
+            const QString& URLB,
+            bool ignoreTrailingSlash,
+            bool ignoreRef);
 
 #endif

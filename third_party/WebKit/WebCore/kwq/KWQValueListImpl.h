@@ -93,6 +93,10 @@ class KWQValueListImpl {
   KWQValueListNodeImpl* nodeAt(uint index);
   KWQValueListNodeImpl* nodeAt(uint index) const;
 
+  bool isEqual(const KWQValueListImpl& other,
+               bool (*equalFunc)(const KWQValueListNodeImpl*,
+                                 const KWQValueListNodeImpl*)) const;
+
  private:
   void copyOnWrite();
 

@@ -39,6 +39,8 @@ class QStringList : public QValueList<QString> {
                            bool allowEmptyEntries = false);
 
   QString join(const QString&) const;
+
+  QString pop_front();
 };
 
 #endif
