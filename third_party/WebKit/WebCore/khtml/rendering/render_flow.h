@@ -109,8 +109,14 @@ class RenderFlow : public RenderBox {
                            int tx,
                            int ty,
                            PaintAction paintAction);
-  void
-  paintFloats(QPainter* p, int _x, int _y, int _w, int _h, int _tx, int _ty);
+  void paintFloats(QPainter* p,
+                   int _x,
+                   int _y,
+                   int _w,
+                   int _h,
+                   int _tx,
+                   int _ty,
+                   bool paintSelection = false);
 
   virtual bool requiresLayer() {
     return !isTableCell() && (isPositioned() || isRelPositioned() ||

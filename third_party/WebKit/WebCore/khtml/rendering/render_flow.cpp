@@ -180,8 +180,9 @@ void RenderFlow::paintObject(QPainter* p,
   }
 
   // 3. paint floats.
-  if (paintAction == PaintActionFloat)
-    paintFloats(p, _x, _y, _w, _h, _tx, _ty);
+  if (paintAction == PaintActionFloat || paintAction == PaintActionSelection)
+    paintFloats(p, _x, _y, _w, _h, _tx, _ty,
+                paintAction == PaintActionSelection);
 
   if (paintAction == PaintActionBackground && !isInline() &&
       !childrenInline() && style()->outlineWidth())
@@ -205,7 +206,8 @@ void RenderFlow::paintFloats(QPainter* p,
                              int _w,
                              int _h,
                              int _tx,
-                             int _ty) {
+                             int _ty,
+                             bool paintSelection) {
   if (!specialObjects)
     return;
 
@@ -214,18 +216,25 @@ void RenderFlow::paintFloats(QPainter* p,
   for (; (r = it.current()); ++it) {
     // Only paint the object if our noPaint flag isn't set.
     if (r->node->isFloating() && !r->noPaint) {
-      r->node->paint(p, _x, _y, _w, _h,
-                     _tx + r->left - r->node->xPos() + r->node->marginLeft(),
-                     _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     PaintActionBackground);
-      r->node->paint(p, _x, _y, _w, _h,
-                     _tx + r->left - r->node->xPos() + r->node->marginLeft(),
-                     _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     PaintActionFloat);
-      r->node->paint(p, _x, _y, _w, _h,
-                     _tx + r->left - r->node->xPos() + r->node->marginLeft(),
-                     _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     PaintActionForeground);
+      if (paintSelection) {
+        r->node->paint(p, _x, _y, _w, _h,
+                       _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                       _ty + r->startY - r->node->yPos() + r->node->marginTop(),
+                       PaintActionSelection);
+      } else {
+        r->node->paint(p, _x, _y, _w, _h,
+                       _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                       _ty + r->startY - r->node->yPos() + r->node->marginTop(),
+                       PaintActionBackground);
+        r->node->paint(p, _x, _y, _w, _h,
+                       _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                       _ty + r->startY - r->node->yPos() + r->node->marginTop(),
+                       PaintActionFloat);
+        r->node->paint(p, _x, _y, _w, _h,
+                       _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                       _ty + r->startY - r->node->yPos() + r->node->marginTop(),
+                       PaintActionForeground);
+      }
     }
   }
 }

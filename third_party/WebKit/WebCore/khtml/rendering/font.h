@@ -42,6 +42,7 @@ class FontDef {
       : size(0),
         italic(false),
         smallCaps(false),
+        sizeSpecified(false),
         weight(50),
         genericFamily(0),
         hasNbsp(true) {}
@@ -49,7 +50,7 @@ class FontDef {
   bool operator==(const FontDef& other) const {
     return (family == other.family && size == other.size &&
             italic == other.italic && smallCaps == other.smallCaps &&
-            weight == other.weight);
+            weight == other.weight && sizeSpecified == other.sizeSpecified);
   }
 
   enum GenericFamilyType {
@@ -72,6 +73,9 @@ class FontDef {
   short int size;
   bool italic : 1;
   bool smallCaps : 1;
+  bool sizeSpecified : 1;  // Whether or not CSS specified the size or if we're
+                           // using the
+  // default font size that the user specified via preferences.
   unsigned int weight : 8;
   unsigned int genericFamily : 3;
   mutable bool hasNbsp : 1;
