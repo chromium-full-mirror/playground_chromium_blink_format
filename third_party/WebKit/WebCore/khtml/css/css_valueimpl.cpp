@@ -829,33 +829,23 @@ void RectImpl::setLeft(CSSPrimitiveValueImpl* left) {
 
 CSSImageValueImpl::CSSImageValueImpl(const DOMString& url, StyleBaseImpl* style)
     : CSSPrimitiveValueImpl(url, CSSPrimitiveValue::CSS_URI),
-      m_loader(0),
       m_image(0),
-      m_accessedImage(false) {
-  StyleBaseImpl* root = style;
-  while (root->parent())
-    root = root->parent();
-  if (root->isCSSStyleSheet())
-    m_loader = static_cast<CSSStyleSheetImpl*>(root)->docLoader();
-}
+      m_accessedImage(false) {}
 
 CSSImageValueImpl::CSSImageValueImpl()
-    : CSSPrimitiveValueImpl(CSS_VAL_NONE),
-      m_loader(0),
-      m_image(0),
-      m_accessedImage(true) {}
+    : CSSPrimitiveValueImpl(CSS_VAL_NONE), m_image(0), m_accessedImage(true) {}
 
 CSSImageValueImpl::~CSSImageValueImpl() {
   if (m_image)
     m_image->deref(this);
 }
 
-khtml::CachedImage* CSSImageValueImpl::image() {
+khtml::CachedImage* CSSImageValueImpl::image(khtml::DocLoader* loader) {
   if (!m_accessedImage) {
     m_accessedImage = true;
 
-    if (m_loader)
-      m_image = m_loader->requestImage(getStringValue());
+    if (loader)
+      m_image = loader->requestImage(getStringValue());
     else
       m_image = khtml::Cache::requestImage(0, getStringValue());
 

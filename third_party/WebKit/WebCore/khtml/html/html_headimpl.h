@@ -50,7 +50,7 @@ class HTMLBaseElementImpl : public HTMLElementImpl {
   DOMString target() const { return m_target; }
 
   virtual Id id() const;
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
@@ -74,7 +74,7 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   StyleSheetImpl* sheet() const { return m_sheet; }
 
   // overload from HTMLElementImpl
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
   void process();
 
@@ -116,7 +116,7 @@ class HTMLMetaElementImpl : public HTMLElementImpl {
   ~HTMLMetaElementImpl();
 
   virtual Id id() const;
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void insertedIntoDocument();
 
   void process();
@@ -149,7 +149,7 @@ class HTMLStyleElementImpl : public HTMLElementImpl {
   StyleSheetImpl* sheet() const { return m_sheet; }
 
   // overload from HTMLElementImpl
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void childrenChanged();

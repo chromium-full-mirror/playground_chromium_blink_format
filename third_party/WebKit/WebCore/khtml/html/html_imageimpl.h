@@ -41,7 +41,9 @@ class HTMLImageElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl*);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 
   virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -76,7 +78,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
   bool isDefault() const { return shape == Default; }
 
@@ -110,7 +112,7 @@ class HTMLMapElementImpl : public HTMLElementImpl {
 
   virtual DOMString getName() const { return name; }
 
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
   bool mapMouseEvent(int x_,
                      int y_,

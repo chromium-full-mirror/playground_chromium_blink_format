@@ -55,14 +55,15 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl*);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+
   virtual void insertedIntoDocument();
 
   void createLinkDecl();
 
  protected:
-  bool m_bgSet;
-  bool m_fgSet;
   CSSStyleDeclarationImpl* m_linkDecl;
 };
 
@@ -79,7 +80,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl*);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
   virtual void attach();
   virtual void detach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -131,7 +132,7 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl*);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -194,7 +195,10 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,

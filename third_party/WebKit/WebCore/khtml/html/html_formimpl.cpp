@@ -582,7 +582,7 @@ void HTMLFormElementImpl::reset() {
   m_inreset = false;
 }
 
-void HTMLFormElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLFormElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ACTION:
 #if APPLE_CHANGES
@@ -656,7 +656,7 @@ void HTMLFormElementImpl::parseAttribute(AttributeImpl* attr) {
     }
     // fall through
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -703,7 +703,7 @@ HTMLGenericFormElementImpl::~HTMLGenericFormElementImpl() {
     m_form->removeFormElement(this);
 }
 
-void HTMLGenericFormElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLGenericFormElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_NAME:
       break;
@@ -718,7 +718,7 @@ void HTMLGenericFormElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     }
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -993,7 +993,7 @@ DOMString HTMLButtonElementImpl::type() const {
   return getAttribute(ATTR_TYPE);
 }
 
-void HTMLButtonElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLButtonElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
       if (strcasecmp(attr->value(), "submit") == 0)
@@ -1020,7 +1020,7 @@ void HTMLButtonElementImpl::parseAttribute(AttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -1176,7 +1176,7 @@ void HTMLInputElementImpl::setType(const DOMString& t) {
   if (m_type != newType) {
     if (newType == FILE && m_haveType) {
       // Set the attribute back to the old value.
-      // Useful in case we were called from inside parseAttribute.
+      // Useful in case we were called from inside parseHTMLAttribute.
       setAttribute(ATTR_TYPE, type());
     } else {
       m_type = newType;
@@ -1320,7 +1320,27 @@ void HTMLInputElementImpl::accessKeyAction() {
   }
 }
 
-void HTMLInputElementImpl::parseAttribute(AttributeImpl* attr) {
+bool HTMLInputElementImpl::mapToEntry(AttributeImpl* attr,
+                                      MappedAttributeEntry& result) const {
+  switch (attr->id()) {
+    case ATTR_WIDTH:
+    case ATTR_HEIGHT:
+    case ATTR_VSPACE:
+    case ATTR_HSPACE:
+      result = eUniversal;
+      return false;
+    case ATTR_ALIGN:
+      result = eReplaced;  // Share with <img> since the alignment behavior is
+                           // the same.
+      return false;
+    default:
+      break;
+  }
+
+  return HTMLElementImpl::mapToEntry(attr, result);
+}
+
+void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_AUTOCOMPLETE:
       m_autocomplete = strcasecmp(attr->value(), "off");
@@ -1356,25 +1376,21 @@ void HTMLInputElementImpl::parseAttribute(AttributeImpl* attr) {
       // ### ignore for the moment
       break;
     case ATTR_VSPACE:
-      addCSSLength(CSS_PROP_MARGIN_TOP, attr->value());
-      addCSSLength(CSS_PROP_MARGIN_BOTTOM, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_TOP, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_BOTTOM, attr->value());
       break;
     case ATTR_HSPACE:
-      addCSSLength(CSS_PROP_MARGIN_LEFT, attr->value());
-      addCSSLength(CSS_PROP_MARGIN_RIGHT, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_LEFT, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_RIGHT, attr->value());
       break;
     case ATTR_ALIGN:
-      addHTMLAlignment(attr->value());
+      addHTMLAlignment(attr);
       break;
     case ATTR_WIDTH:
-      // ignore this attribute,  do _not_ add
-      // a CSS_PROP_WIDTH here (we will honor this attribute for input
-      // type=image
-      // in the attach call)!
-      // webdesigner are stupid - and IE/NS behave the same ( Dirk )
+      addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
       break;
     case ATTR_HEIGHT:
-      addCSSLength(CSS_PROP_HEIGHT, attr->value());
+      addCSSLength(attr, CSS_PROP_HEIGHT, attr->value());
       break;
     case ATTR_ONFOCUS:
       setHTMLEventListener(
@@ -1397,7 +1413,7 @@ void HTMLInputElementImpl::parseAttribute(AttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -1473,14 +1489,14 @@ void HTMLInputElementImpl::attach() {
     m_inited = true;
   }
 
-  switch (m_type) {
-    case HIDDEN:
-    case IMAGE:
-      if (!getAttribute(ATTR_WIDTH).isEmpty())
-        addCSSLength(CSS_PROP_WIDTH, getAttribute(ATTR_WIDTH));
-      break;
-    default:
-      break;
+  // Disallow the width attribute on inputs other than HIDDEN and IMAGE.
+  // Dumb Web sites will try to set the width as an attribute on form controls
+  // that aren't
+  // images or hidden.
+  if (hasMappedAttributes() && m_type != HIDDEN && m_type != IMAGE &&
+      !getAttribute(ATTR_WIDTH).isEmpty()) {
+    int excCode;
+    removeAttribute(ATTR_WIDTH, excCode);
   }
 
   HTMLGenericFormElementImpl::attach();
@@ -1843,7 +1859,7 @@ NodeImpl::Id HTMLLabelElementImpl::id() const {
   return ID_LABEL;
 }
 
-void HTMLLabelElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLLabelElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ONFOCUS:
       setHTMLEventListener(
@@ -1856,7 +1872,7 @@ void HTMLLabelElementImpl::parseAttribute(AttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -2119,7 +2135,7 @@ NodeImpl* HTMLSelectElementImpl::addChild(NodeImpl* newChild) {
   return HTMLGenericFormElementImpl::addChild(newChild);
 }
 
-void HTMLSelectElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLSelectElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SIZE:
       m_size = QMAX(attr->value().toInt(), 1);
@@ -2149,7 +2165,7 @@ void HTMLSelectElementImpl::parseAttribute(AttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -2359,7 +2375,7 @@ DOMString HTMLKeygenElementImpl::type() const {
   return "keygen";
 }
 
-void HTMLKeygenElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLKeygenElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_CHALLENGE:
       m_challenge = attr->value();
@@ -2369,7 +2385,7 @@ void HTMLKeygenElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     default:
       // skip HTMLSelectElementImpl parsing!
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -2474,8 +2490,8 @@ NodeImpl* HTMLOptGroupElementImpl::addChild(NodeImpl* newChild) {
   return HTMLGenericFormElementImpl::addChild(newChild);
 }
 
-void HTMLOptGroupElementImpl::parseAttribute(AttributeImpl* attr) {
-  HTMLGenericFormElementImpl::parseAttribute(attr);
+void HTMLOptGroupElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+  HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   recalcSelectOptions();
 }
 
@@ -2552,7 +2568,7 @@ void HTMLOptionElementImpl::setIndex(long) {
   // ###
 }
 
-void HTMLOptionElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLOptionElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SELECTED:
       m_selected = (!attr->isNull());
@@ -2561,7 +2577,7 @@ void HTMLOptionElementImpl::parseAttribute(AttributeImpl* attr) {
       m_value = attr->value();
       break;
     default:
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -2644,7 +2660,7 @@ void HTMLTextAreaElementImpl::select() {
   onSelect();
 }
 
-void HTMLTextAreaElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLTextAreaElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWS:
       m_rows = !attr->isNull() ? attr->value().toInt() : 3;
@@ -2690,7 +2706,7 @@ void HTMLTextAreaElementImpl::parseAttribute(AttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
     default:
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -2803,14 +2819,14 @@ NodeImpl::Id HTMLIsIndexElementImpl::id() const {
   return ID_ISINDEX;
 }
 
-void HTMLIsIndexElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLIsIndexElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_PROMPT:
       setValue(attr->value());
     default:
-      // don't call HTMLInputElement::parseAttribute here, as it would
+      // don't call HTMLInputElement::parseHTMLAttribute here, as it would
       // accept attributes this element does not support
-      HTMLGenericFormElementImpl::parseAttribute(attr);
+      HTMLGenericFormElementImpl::parseHTMLAttribute(attr);
   }
 }
 

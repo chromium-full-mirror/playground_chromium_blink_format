@@ -50,7 +50,10 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl* token);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
+
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -80,7 +83,9 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -90,7 +95,6 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   QString url;
   QString pluginPage;
   QString serviceType;
-  bool hidden;
 };
 
 // -------------------------------------------------------------------------
@@ -105,7 +109,9 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   HTMLFormElementImpl* form() const;
 
-  virtual void parseAttribute(AttributeImpl* token);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -135,7 +141,7 @@ class HTMLParamElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseAttribute(AttributeImpl* token);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 
   QString name() const { return m_name.string(); }
   QString value() const { return m_value.string(); }

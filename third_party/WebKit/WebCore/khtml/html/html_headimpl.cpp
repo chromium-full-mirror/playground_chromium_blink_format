@@ -52,7 +52,7 @@ NodeImpl::Id HTMLBaseElementImpl::id() const {
   return ID_BASE;
 }
 
-void HTMLBaseElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLBaseElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_HREF:
       m_href = khtml::parseURL(attr->value());
@@ -63,7 +63,7 @@ void HTMLBaseElementImpl::parseAttribute(AttributeImpl* attr) {
       process();
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -161,7 +161,7 @@ void HTMLLinkElementImpl::setDisabledState(bool _disabled) {
   }
 }
 
-void HTMLLinkElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLLinkElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_REL:
       m_rel = attr->value();
@@ -184,7 +184,7 @@ void HTMLLinkElementImpl::parseAttribute(AttributeImpl* attr) {
       setDisabledState(!attr->isNull());
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -309,7 +309,7 @@ NodeImpl::Id HTMLMetaElementImpl::id() const {
   return ID_META;
 }
 
-void HTMLMetaElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLMetaElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_HTTP_EQUIV:
       m_equiv = attr->value();
@@ -322,7 +322,7 @@ void HTMLMetaElementImpl::parseAttribute(AttributeImpl* attr) {
     case ATTR_NAME:
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 
@@ -368,7 +368,7 @@ NodeImpl::Id HTMLStyleElementImpl::id() const {
 }
 
 // other stuff...
-void HTMLStyleElementImpl::parseAttribute(AttributeImpl* attr) {
+void HTMLStyleElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
       m_type = attr->value().domString().lower();
@@ -377,7 +377,7 @@ void HTMLStyleElementImpl::parseAttribute(AttributeImpl* attr) {
       m_media = attr->value().string().lower();
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLElementImpl::parseHTMLAttribute(attr);
   }
 }
 

@@ -49,6 +49,12 @@
 using namespace DOM;
 using namespace khtml;
 
+AttributeImpl* AttributeImpl::clone() const {
+  AttributeImpl* result = new AttributeImpl(m_id, _value);
+  result->setPrefix(_prefix);
+  return result;
+}
+
 void AttributeImpl::allocateImpl(ElementImpl* e) {
   _impl = new AttrImpl(e, e->docPtr(), this);
 }
@@ -112,7 +118,7 @@ void AttrImpl::setValue(const DOMString& v, int& exceptioncode) {
 
   m_attribute->setValue(v.implementation());
   if (m_element)
-    m_element->parseAttribute(m_attribute);
+    m_element->attributeChanged(m_attribute);
 }
 
 void AttrImpl::setNodeValue(const DOMString& v, int& exceptioncode) {
@@ -122,8 +128,7 @@ void AttrImpl::setNodeValue(const DOMString& v, int& exceptioncode) {
 }
 
 NodeImpl* AttrImpl::cloneNode(bool /*deep*/) {
-  return new AttrImpl(
-      0, docPtr(), new AttributeImpl(m_attribute->id(), m_attribute->value()));
+  return new AttrImpl(0, docPtr(), m_attribute->clone());
 }
 
 // DOM Section 1.1.1
@@ -203,22 +208,6 @@ unsigned short ElementImpl::nodeType() const {
   return Node::ELEMENT_NODE;
 }
 
-CSSStyleDeclarationImpl* ElementImpl::inlineStyleDecl() const {
-  return 0;
-}
-
-CSSStyleDeclarationImpl* ElementImpl::attributeStyleDecl() const {
-  return 0;
-}
-
-CSSStyleDeclarationImpl* ElementImpl::getInlineStyleDecl() {
-  return 0;
-}
-
-CSSStyleDeclarationImpl* ElementImpl::additionalAttributeStyleDecl() {
-  return 0;
-}
-
 const AtomicStringList* ElementImpl::getClassList() const {
   return 0;
 }
@@ -265,11 +254,16 @@ void ElementImpl::setAttribute(NodeImpl::Id id,
   if (old && !value)
     namedAttrMap->removeAttribute(id);
   else if (!old && value)
-    namedAttrMap->addAttribute(new AttributeImpl(id, value));
+    namedAttrMap->addAttribute(createAttribute(id, value));
   else if (old && value) {
     old->setValue(value);
-    parseAttribute(old);
+    attributeChanged(old);
   }
+}
+
+AttributeImpl* ElementImpl::createAttribute(NodeImpl::Id id,
+                                            DOMStringImpl* value) {
+  return new AttributeImpl(id, value);
 }
 
 void ElementImpl::setAttributeMap(NamedAttrMapImpl* list) {
@@ -295,7 +289,7 @@ void ElementImpl::setAttributeMap(NamedAttrMapImpl* list) {
     namedAttrMap->element = this;
     unsigned int len = namedAttrMap->length();
     for (unsigned int i = 0; i < len; i++)
-      parseAttribute(namedAttrMap->attrs[i]);
+      attributeChanged(namedAttrMap->attrs[i]);
   }
 }
 
@@ -469,7 +463,7 @@ void ElementImpl::recalcStyle(StyleChange change) {
       // attach recalulates the style for all children. No need to do it twice.
       setChanged(false);
       setHasChangedChild(false);
-      newStyle->deref();
+      newStyle->deref(getDocument()->renderArena());
       return;
     } else if (ch != NoChange) {
       if (m_render && newStyle) {
@@ -478,7 +472,7 @@ void ElementImpl::recalcStyle(StyleChange change) {
         m_render->setStyle(newStyle);
       }
     }
-    newStyle->deref();
+    newStyle->deref(getDocument()->renderArena());
 
     if (change != Force) {
       if (getDocument()->usesDescendantRules())
@@ -698,7 +692,8 @@ NamedAttrMapImpl::NamedAttrMapImpl(ElementImpl* e) : element(e) {
 }
 
 NamedAttrMapImpl::~NamedAttrMapImpl() {
-  clearAttributes();
+  NamedAttrMapImpl::clearAttributes();  // virtual method, so qualify just to be
+                                        // explicit
 }
 
 bool NamedAttrMapImpl::isHTMLAttributeMap() const {
@@ -815,10 +810,6 @@ AttrImpl* NamedAttrMapImpl::item(unsigned long index) const {
   return attrs[index]->attrImpl();
 }
 
-unsigned long NamedAttrMapImpl::length() const {
-  return len;
-}
-
 AttributeImpl* NamedAttrMapImpl::getAttributeItem(NodeImpl::Id id) const {
   bool matchAnyNamespace = (namespacePart(id) == anyNamespace);
   for (unsigned long i = 0; i < len; ++i) {
@@ -884,18 +875,21 @@ NamedAttrMapImpl& NamedAttrMapImpl::operator=(const NamedAttrMapImpl& other) {
   len = other.len;
   attrs = new AttributeImpl*[len];
 
-  // first initialize attrs vector, then call parseAttribute on it
-  // this allows parseAttribute to use getAttribute
+  // first initialize attrs vector, then call attributeChanged on it
+  // this allows attributeChanged to use getAttribute
   for (uint i = 0; i < len; i++) {
-    attrs[i] = new AttributeImpl(other.attrs[i]->id(), other.attrs[i]->value());
+    attrs[i] = other.attrs[i]->clone();
     attrs[i]->ref();
   }
 
+  // FIXME: This is wasteful.  The class list could be preserved on a copy, and
+  // we
+  // wouldn't have to waste time reparsing the attribute.
   // The derived class, HTMLNamedAttrMapImpl, which manages a parsed class list
   // for the CLASS attribute,
   // will update its member variable when parse attribute is called.
   for (uint i = 0; i < len; i++)
-    element->parseAttribute(attrs[i]);
+    element->attributeChanged(attrs[i], true);
 
   return *this;
 }
@@ -921,7 +915,7 @@ void NamedAttrMapImpl::addAttribute(AttributeImpl* attr) {
   // Note that element may be null here if we are called from insertAttr()
   // during parsing
   if (element) {
-    element->parseAttribute(attr);
+    element->attributeChanged(attr);
     element->dispatchAttrAdditionEvent(attr);
     element->dispatchSubtreeModifiedEvent();
   }
@@ -963,7 +957,7 @@ void NamedAttrMapImpl::removeAttribute(NodeImpl::Id id) {
   if (element && !attr->_value.isNull()) {
     AtomicString value = attr->_value;
     attr->_value = nullAtom;
-    element->parseAttribute(attr);
+    element->attributeChanged(attr);
     attr->_value = value;
   }
   if (element) {

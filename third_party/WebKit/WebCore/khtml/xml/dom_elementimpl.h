@@ -62,6 +62,7 @@ class AttributeImpl : public khtml::Shared<AttributeImpl> {
   // null value is forbidden !
   AttributeImpl(NodeImpl::Id id, const AtomicString& value)
       : m_id(id), _value(value), _impl(0){};
+  virtual ~AttributeImpl(){};
 
   const AtomicString& value() const { return _value; }
   const AtomicString& prefix() const { return _prefix; }
@@ -70,6 +71,8 @@ class AttributeImpl : public khtml::Shared<AttributeImpl> {
 
   bool isNull() const { return _value.isNull(); }
   bool isEmpty() const { return _value.isEmpty(); }
+
+  virtual AttributeImpl* clone() const;
 
  private:
   void setValue(const AtomicString& value) { _value = value; }
@@ -177,8 +180,9 @@ class ElementImpl : public NodeBaseImpl {
     return namedAttrMap;
   }
 
-  // This is always called, whenever an attribute changed
-  virtual void parseAttribute(AttributeImpl*) {}
+  // This method is called whenever an attribute is added, changed or removed.
+  virtual void attributeChanged(AttributeImpl* attr,
+                                bool preserveDecls = false) {}
 
   // not part of the DOM
   void setAttributeMap(NamedAttrMapImpl* list);
@@ -197,12 +201,7 @@ class ElementImpl : public NodeBaseImpl {
   virtual bool childAllowed(NodeImpl* newChild);
   virtual bool childTypeAllowed(unsigned short type);
 
-  virtual CSSStyleDeclarationImpl* inlineStyleDecl() const;
-  virtual CSSStyleDeclarationImpl* attributeStyleDecl() const;
-  virtual CSSStyleDeclarationImpl* getInlineStyleDecl();
-
-  // used by table cells to share style decls created by the enclosing table.
-  virtual CSSStyleDeclarationImpl* additionalAttributeStyleDecl();
+  virtual AttributeImpl* createAttribute(NodeImpl::Id id, DOMStringImpl* value);
 
   void dispatchAttrRemovalEvent(AttributeImpl* attr);
   void dispatchAttrAdditionEvent(AttributeImpl* attr);
@@ -269,7 +268,7 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   virtual Node setNamedItem(NodeImpl* arg, int& exceptioncode);
 
   virtual AttrImpl* item(unsigned long index) const;
-  virtual unsigned long length() const;
+  unsigned long length() const { return len; }
 
   // Other methods (not part of DOM)
   virtual NodeImpl::Id mapId(const DOMString& namespaceURI,
@@ -295,7 +294,7 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   const AtomicString& id() const { return m_id; }
   void setID(const AtomicString& _id) { m_id = _id; }
 
- private:
+ protected:
   // this method is internal, does no error checking at all
   void addAttribute(AttributeImpl* newAttribute);
   // this method is internal, does no error checking at all

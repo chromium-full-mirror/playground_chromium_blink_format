@@ -449,8 +449,11 @@ ProcessingInstructionImpl* DocumentImpl::createProcessingInstruction(
 }
 
 Attr DocumentImpl::createAttribute(NodeImpl::Id id) {
-  return new AttrImpl(0, docPtr(),
-                      new AttributeImpl(id, DOMString("").implementation()));
+  // Assume this is an HTML attribute, since createAttribute isn't
+  // namespace-aware.  There's no harm to XML
+  // documents if we're wrong.
+  return new AttrImpl(
+      0, docPtr(), new HTMLAttributeImpl(id, DOMString("").implementation()));
 }
 
 EntityReferenceImpl* DocumentImpl::createEntityReference(
@@ -995,7 +998,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     RenderStyle* oldStyle = m_render->style();
     if (oldStyle)
       oldStyle->ref();
-    RenderStyle* _style = new RenderStyle();
+    RenderStyle* _style = new (m_renderArena) RenderStyle();
     _style->setDisplay(BLOCK);
     _style->setVisuallyOrdered(visuallyOrdered);
     // ### make the font stuff _really_ work!!!!
@@ -1042,7 +1045,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
       change = ch;
 
     if (oldStyle)
-      oldStyle->deref();
+      oldStyle->deref(m_renderArena);
   }
 
   NodeImpl* n;

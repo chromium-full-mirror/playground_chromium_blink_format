@@ -536,6 +536,8 @@ void HTMLDocumentImpl::determineParseMode(const QString& str) {
     hMode = Html3;
   }
 
+  m_styleSelector->strictParsing = !inCompatMode();
+
   //     kdDebug() << "DocumentImpl::determineParseMode: publicId =" << publicId
   //     << " systemId = " << systemId << endl;
   //     kdDebug() << "DocumentImpl::determineParseMode: htmlMode = " << hMode<<

@@ -76,6 +76,7 @@ class AbstractViewImpl;
 class AttrImpl;
 class CDATASectionImpl;
 class CSSStyleSheetImpl;
+class CSSMappedAttributeDeclarationImpl;
 class CommentImpl;
 class DocumentFragmentImpl;
 class DocumentImpl;

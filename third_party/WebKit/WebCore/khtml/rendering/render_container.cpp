@@ -134,7 +134,7 @@ void RenderContainer::addChild(RenderObject* newChild,
     else {
       // kdDebug( 6040 ) << "creating anonymous table" << endl;
       table = new (renderArena()) RenderTable(document() /* is anonymous */);
-      RenderStyle* newStyle = new RenderStyle();
+      RenderStyle* newStyle = new (renderArena()) RenderStyle();
       newStyle->inheritFrom(style());
       newStyle->setDisplay(TABLE);
       table->setStyle(newStyle);
@@ -282,7 +282,7 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
           genChild->setStyle(pseudo);
         else {
           // Images get an empty style that inherits from the pseudo.
-          RenderStyle* style = new RenderStyle();
+          RenderStyle* style = new (renderArena()) RenderStyle();
           style->inheritFrom(pseudo);
           genChild->setStyle(style);
         }
@@ -316,7 +316,7 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
     } else if (contentData->contentType() == CONTENT_OBJECT) {
       RenderImage* img =
           new (renderArena()) RenderImage(document()); /* Anonymous object */
-      RenderStyle* style = new RenderStyle();
+      RenderStyle* style = new (renderArena()) RenderStyle();
       style->inheritFrom(pseudo);
       img->setStyle(style);
       img->setContentObject(contentData->contentObject());

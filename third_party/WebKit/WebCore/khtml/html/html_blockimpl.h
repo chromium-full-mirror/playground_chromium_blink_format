@@ -52,7 +52,10 @@ class HTMLDivElementImpl : public HTMLElementImpl {
   ~HTMLDivElementImpl();
 
   virtual NodeImpl::Id id() const;
-  virtual void parseAttribute(AttributeImpl* token);
+
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 };
 
 // -------------------------------------------------------------------------
@@ -63,11 +66,10 @@ class HTMLHRElementImpl : public HTMLElementImpl {
   ~HTMLHRElementImpl();
 
   virtual NodeImpl::Id id() const;
-  virtual void parseAttribute(AttributeImpl*);
-  virtual void attach();
 
- protected:
-  bool noShade : 1;
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 };
 
 // -------------------------------------------------------------------------
@@ -89,7 +91,9 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
  public:
   HTMLParagraphElementImpl(DocumentPtr* doc);
 
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
   virtual NodeImpl::Id id() const;
 };
@@ -111,7 +115,10 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
   HTMLMarqueeElementImpl(DocumentPtr* doc);
 
   virtual NodeImpl::Id id() const;
-  virtual void parseAttribute(AttributeImpl* token);
+
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 
   int minimumDelay() const { return m_minimumDelay; }
 
@@ -127,8 +134,6 @@ class HTMLLayerElementImpl : public HTMLDivElementImpl {
   ~HTMLLayerElementImpl();
 
   virtual NodeImpl::Id id() const;
-
-  virtual void parseAttribute(AttributeImpl*);
 
   bool fixed;
 };

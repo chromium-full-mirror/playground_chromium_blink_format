@@ -41,7 +41,7 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
 #endif
   virtual bool isFocusable() const;
   virtual Id id() const;
-  virtual void parseAttribute(AttributeImpl* attr);
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual void accessKeyAction();
 
@@ -59,7 +59,11 @@ class HTMLBRElementImpl : public HTMLElementImpl {
   ~HTMLBRElementImpl();
 
   virtual Id id() const;
-  virtual void parseAttribute(AttributeImpl* attr);
+
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 };
@@ -72,7 +76,10 @@ class HTMLFontElementImpl : public HTMLElementImpl {
   ~HTMLFontElementImpl();
 
   virtual Id id() const;
-  virtual void parseAttribute(AttributeImpl* attr);
+
+  virtual bool mapToEntry(AttributeImpl* attr,
+                          MappedAttributeEntry& result) const;
+  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 };
 
 };  // namespace

@@ -133,7 +133,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
   if (style()->listStyleType() != LNONE ||
       (style()->listStyleImage() &&
        !style()->listStyleImage()->isErrorImage())) {
-    RenderStyle* newStyle = new RenderStyle();
+    RenderStyle* newStyle = new (renderArena()) RenderStyle();
     newStyle->ref();
     // The marker always inherits from the list item, regardless of where it
     // might end
@@ -146,7 +146,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
       _markerInstalledInParent = false;
     } else
       m_marker->setStyle(newStyle);
-    newStyle->deref();
+    newStyle->deref(renderArena());
   } else if (m_marker) {
     m_marker->detach();
     m_marker = 0;

@@ -52,6 +52,8 @@
   if (!(group->variable == value))      \
     group.access()->variable = value;
 
+class RenderArena;
+
 namespace DOM {
 class DOMStringImpl;
 class ShadowValueImpl;
@@ -699,7 +701,7 @@ enum EDisplay {
   NONE
 };
 
-class RenderStyle : public Shared<RenderStyle> {
+class RenderStyle {
   friend class CSSStyleSelector;
 
  public:
@@ -715,6 +717,26 @@ class RenderStyle : public Shared<RenderStyle> {
     SELECTION,
     FIRST_LINE_INHERITED
   };
+
+  void ref() { m_ref++; }
+  void deref(RenderArena* arena) {
+    if (m_ref)
+      m_ref--;
+    if (!m_ref)
+      arenaDelete(arena);
+  }
+  bool hasOneRef() { return m_ref == 1; }
+  int refCount() const { return m_ref; }
+
+  // Overloaded new operator.  Derived classes must override operator new
+  // in order to allocate out of the RenderArena.
+  void* operator new(size_t sz, RenderArena* renderArena) throw();
+
+  // Overridden to prevent the normal delete from being called.
+  void operator delete(void* ptr, size_t sz);
+
+ private:
+  void arenaDelete(RenderArena* arena);
 
  protected:
   // !START SYNC!: Keep this in sync with the copy constructor in
@@ -828,6 +850,9 @@ class RenderStyle : public Shared<RenderStyle> {
   // added this here, so we can get rid of the vptr in this class.
   // makes up for the same size.
   ContentData* content;
+
+  int m_ref;
+
   // !END SYNC!
 
   // static default style
@@ -885,7 +910,6 @@ class RenderStyle : public Shared<RenderStyle> {
 
   RenderStyle* getPseudoStyle(PseudoId pi);
   void addPseudoStyle(RenderStyle* pseudo);
-  void removePseudoStyle(PseudoId pi);
 
   bool affectedByHoverRules() const {
     return noninherited_flags._affectedByHover;

@@ -388,7 +388,7 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
             for (unsigned long l = 0; map && l < map->length(); ++l) {
               AttributeImpl* it = map->attributeItem(l);
               changed = !bmap->getAttributeItem(it->id());
-              bmap->insertAttribute(new AttributeImpl(it->id(), it->value()));
+              bmap->insertAttribute(it->clone());
             }
             if (changed)
               doc()->recalcStyle(NodeImpl::Inherit);
@@ -436,7 +436,7 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
           for (unsigned long l = 0; map && l < map->length(); ++l) {
             AttributeImpl* it = map->attributeItem(l);
             changed = !bmap->getAttributeItem(it->id());
-            bmap->insertAttribute(new AttributeImpl(it->id(), it->value()));
+            bmap->insertAttribute(it->clone());
           }
           if (changed)
             doc()->recalcStyle(NodeImpl::Inherit);
@@ -641,8 +641,7 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
       case ID_OL:
       case ID_DIR:
       case ID_MENU:
-        e = new HTMLLIElementImpl(document);
-        e->addCSSProperty(CSS_PROP_LIST_STYLE_TYPE, CSS_VAL_NONE);
+        e = new HTMLDivElementImpl(document);
         insertNode(e);
         handled = true;
         break;
@@ -776,7 +775,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
         if (static_cast<HTMLDocumentImpl*>(document->document())->body())
           static_cast<HTMLDocumentImpl*>(document->document())
               ->body()
-              ->addCSSProperty(CSS_PROP_DISPLAY, "none");
+              ->setAttribute(ATTR_STYLE, "display:none");
         inBody = false;
       }
       if ((haveContent || haveFrameSet) && current->id() == ID_HTML)

@@ -314,10 +314,9 @@ class CSSImageValueImpl : public CSSPrimitiveValueImpl,
   CSSImageValueImpl();
   virtual ~CSSImageValueImpl();
 
-  khtml::CachedImage* image();
+  khtml::CachedImage* image(khtml::DocLoader* loader);
 
  protected:
-  khtml::DocLoader* m_loader;
   khtml::CachedImage* m_image;
   bool m_accessedImage;
 };

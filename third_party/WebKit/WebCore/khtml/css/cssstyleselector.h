@@ -39,6 +39,7 @@ namespace DOM {
 class DocumentImpl;
 class NodeImpl;
 class ElementImpl;
+class HTMLElementImpl;
 class StyleSheetImpl;
 class CSSStyleSheetImpl;
 class CSSSelector;
@@ -95,7 +96,6 @@ class CSSStyleSelector : public StyleSelector {
   ~CSSStyleSelector();
 
   static void loadDefaultStyle(const KHTMLSettings* s = 0);
-  static void clear();
 
   void initForStyleResolve(DOM::ElementImpl* e, RenderStyle* parentStyle);
   RenderStyle* styleForElement(DOM::ElementImpl* e,
@@ -199,6 +199,7 @@ class CSSStyleSelector : public StyleSelector {
   RenderStyle* style;
   RenderStyle* parentStyle;
   DOM::ElementImpl* element;
+  DOM::HTMLElementImpl* htmlElement;
   DOM::NodeImpl* parentNode;
   RenderStyle::PseudoId pseudoStyle;
   KHTMLView* view;
