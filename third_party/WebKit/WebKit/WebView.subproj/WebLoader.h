@@ -58,3 +58,11 @@
 - (NSURLResponse*)response;
 
 @end
+
+// Note: This interface can be removed once this method is declared
+// in Foundation (probably will be in Foundation-485).
+@interface NSObject (WebBaseResourceHandleDelegateExtras)
+- (void)connection:(NSURLConnection*)con
+    didReceiveData:(NSData*)data
+    lengthReceived:(long long)lengthReceived;
+@end
