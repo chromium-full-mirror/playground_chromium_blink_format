@@ -35,7 +35,9 @@ class Decoder {
   Decoder();
   ~Decoder();
 
-  void setEncoding(const char* encoding, bool force = false);
+  void setEncoding(const char* encoding,
+                   bool force = false,
+                   bool eightBitOnly = false);
   const char* encoding() const;
 
   QString decode(const char* data, int len);
