@@ -44,6 +44,7 @@
            forResource:(NSString*)resourceDescription
        partialProgress:(IFLoadProgress*)progress
         fromDataSource:(IFWebDataSource*)dataSource;
+- (IFWebFrame*)mainFrame;
 @end
 
 @protocol IFLocationChangeHandler
