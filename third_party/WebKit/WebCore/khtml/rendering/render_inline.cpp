@@ -317,3 +317,11 @@ int RenderInline::offsetTop() const {
     y += textChild->yPos() - textChild->borderTop() - textChild->paddingTop();
   return y;
 }
+
+const char* RenderInline::renderName() const {
+  if (isRelPositioned())
+    return "RenderInline (relative positioned)";
+  if (isAnonymousBox())
+    return "RenderInline (anonymous)";
+  return "RenderInline";
+}

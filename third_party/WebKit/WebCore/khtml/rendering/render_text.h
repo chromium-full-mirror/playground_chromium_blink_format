@@ -295,8 +295,7 @@ class RenderText : public RenderObject {
   }
 
 #if APPLE_CHANGES
-  TextSlave* findTextSlave(int offset, int& pos);
-  TextSlaveArray textSlaves() { return m_lines; }
+  TextSlaveArray textSlaves() const { return m_lines; }
   int widthFromCache(const Font*, int start, int len) const;
   bool shouldUseMonospaceCache(const Font*) const;
   void cacheWidths();
@@ -310,10 +309,10 @@ class RenderText : public RenderObject {
                         const QRect& thisLine,
                         const QRect& nextLine);
 
-#if !APPLE_CHANGES
-  TextSlave* findTextSlave(int offset, int& pos);
-
+#if APPLE_CHANGES
+ public:
 #endif
+  TextSlave* findTextSlave(int offset, int& pos);
 
  protected:  // members
   TextSlaveArray m_lines;
