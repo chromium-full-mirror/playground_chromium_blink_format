@@ -144,6 +144,12 @@ class RenderFlow : public RenderBox {
   BidiIterator findNextLineBreak(BidiIterator& start,
                                  QPtrList<BidiIterator>& midpoints);
 
+  // The height of a block when you include overflow spillage out of the bottom
+  // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
+  // inside
+  // it would have an overflow height of borderTop() + paddingTop() + 100px.
+  virtual int overflowHeight() const { return m_overflowHeight; }
+
   virtual bool isSelfCollapsingBlock() const { return m_height == 0; }
   virtual bool isTopMarginQuirk() const { return m_topMarginQuirk; }
   virtual bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
@@ -208,6 +214,10 @@ class RenderFlow : public RenderBox {
   short m_maxBottomNegMargin;
   bool m_topMarginQuirk;
   bool m_bottomMarginQuirk;
+
+  // How much content overflows out of our block vertically (all we support
+  // for now is spillage out of the bottom, which is the common case).
+  int m_overflowHeight;
 };
 
 };  // namespace

@@ -1024,6 +1024,8 @@ static void deleteMidpoints(RenderArena* arena,
 }
 
 void RenderFlow::layoutInlineChildren() {
+  m_overflowHeight = 0;
+
   invalidateVerticalPositions();
 #ifdef DEBUG_LAYOUT
   QTime qt;
@@ -1117,11 +1119,15 @@ void RenderFlow::layoutInlineChildren() {
 
   deleteMidpoints(renderArena(), smidpoints);
 
+  // Now add in the bottom border/padding.
   m_height += toAdd;
 
   // in case we have a float on the last line, it might not be positioned up to
   // now.
   positionNewFloats();
+
+  // Always make sure this is at least our height.
+  m_overflowHeight = m_height;
 
 #if BIDI_DEBUG > 1
   kdDebug(6041) << " ------- bidi end " << this << " -------" << endl;
