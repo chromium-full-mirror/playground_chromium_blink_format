@@ -234,6 +234,20 @@ void RenderCanvas::paintObject(QPainter* p,
 #endif
 }
 
+void RenderCanvas::paintBoxDecorations(QPainter* p,
+                                       int _x,
+                                       int _y,
+                                       int _w,
+                                       int _h,
+                                       int _tx,
+                                       int _ty) {
+  if (firstChild() || !view())
+    return;
+
+  p->fillRect(_tx, _ty, _w, _h,
+              view()->palette().active().color(QColorGroup::Base));
+}
+
 void RenderCanvas::repaintRectangle(int x,
                                     int y,
                                     int w,

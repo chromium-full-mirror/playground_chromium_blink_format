@@ -248,16 +248,6 @@ void RenderBlock::addChildToFlow(RenderObject* newChild,
 
   if (madeBoxesNonInline)
     removeLeftoverAnonymousBoxes();
-
-  if (newChild->isRoot()) {
-    // Create a layer if we need one.
-    RenderBlock* rootBlock = static_cast<RenderBlock*>(newChild);
-    if (!rootBlock->m_layer) {
-      rootBlock->m_layer = new (renderArena()) RenderLayer(rootBlock);
-      rootBlock->m_layer->insertOnlyThisLayer();
-    }
-    rootBlock->setShouldPaintBackgroundOrBorder(true);
-  }
 }
 
 static void getInlineRun(RenderObject* start,
