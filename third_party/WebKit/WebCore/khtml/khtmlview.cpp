@@ -275,7 +275,7 @@ void KHTMLView::init() {
 void KHTMLView::clear() {
   //    viewport()->erase();
 
-  setStaticBackground(true);
+  setStaticBackground(false);
 
   d->reset();
   killTimers();
