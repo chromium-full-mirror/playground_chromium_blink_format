@@ -70,17 +70,17 @@ typedef enum {
 } WebCoreUnicodeCategory;
 
 typedef enum {
-  DirectionL,   // Left Letter
-  DirectionR,   // Right Letter
-  DirectionEN,  // European Number
-  DirectionES,  // European Separator
-  DirectionET,  // European Terminator (post/prefix e.g. $ and %)
-  DirectionAN,  // Arabic Number
-  DirectionCS,  // Common Separator
-  DirectionB,   // Paragraph Separator (aka as PS)
-  DirectionS,   // Segment Separator (TAB)
-  DirectionWS,  // White space
-  DirectionON,  // Other Neutral
+  DirectionL = 0,  // Left Letter
+  DirectionR,      // Right Letter
+  DirectionEN,     // European Number
+  DirectionES,     // European Separator
+  DirectionET,     // European Terminator (post/prefix e.g. $ and %)
+  DirectionAN,     // Arabic Number
+  DirectionCS,     // Common Separator
+  DirectionB,      // Paragraph Separator (aka as PS)
+  DirectionS,      // Segment Separator (TAB)
+  DirectionWS,     // White space
+  DirectionON,     // Other Neutral
 
   // types for explicit controls
   DirectionLRE,
@@ -160,6 +160,7 @@ extern WebCoreUnicodeCombiningClass (*WebCoreUnicodeCombiningClassFunction)(
     UniChar c);
 extern UniChar (*WebCoreUnicodeLowerFunction)(UniChar c);
 extern UniChar (*WebCoreUnicodeUpperFunction)(UniChar c);
+extern const unsigned char* const* WebCoreDirectionInfo;
 
 #ifdef __cplusplus
 }

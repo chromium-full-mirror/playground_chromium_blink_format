@@ -45,7 +45,7 @@ class NSString;
 class QChar {
  public:
   enum Direction {
-    DirL,
+    DirL = 0,
     DirR,
     DirEN,
     DirES,
@@ -100,7 +100,11 @@ class QChar {
   QChar lower() const;
   QChar upper() const;
   Direction direction() const {
-    return (QChar::Direction)WebCoreUnicodeDirectionFunction(c);
+    const unsigned char* rowp = WebCoreDirectionInfo[((unsigned char)(c >> 8))];
+
+    if (!rowp)
+      return DirL;
+    return (QChar::Direction)(*(rowp + ((unsigned char)(c))) & 0x1f);
   }
 
   bool mirrored() const;
