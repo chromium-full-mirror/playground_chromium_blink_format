@@ -26,21 +26,14 @@
 #ifndef KHTML_SETTINGS_H_
 #define KHTML_SETTINGS_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qfont.h>
 #include <qmap.h>
 
-// FIXME: I am resetting the default screen resolution to 72
-#define SCREEN_RESOLUTION 72.0f
-
 class KHTMLSettings {
  public:
-  KHTMLSettings::KHTMLSettings();
+  KHTMLSettings();
 
   // Font settings
   QString stdFontName() const;
@@ -52,19 +45,13 @@ class KHTMLSettings {
 
   QString settingsToCSS() const;
 
-  QFont::CharSet charset() const;
-  void setCharset(QFont::CharSet c);
-
   const QString& encoding() const;
 
   int minFontSize() const;
   int mediumFontSize() const;
-  static QString availableFamilies();
 
   QFont::CharSet script() const;
   void setScript(QFont::CharSet c);
-
-  const QValueList<int>& fontSizes() const;
 
   bool changeCursor() const;
 
@@ -72,8 +59,6 @@ class KHTMLSettings {
   int maxFormCompletionItems() const;
 
  private:
-  mutable QValueList<int> m_fontSizes;
-  QString m_fontFamilies;
   QFont::CharSet m_charSet;
 };
 
