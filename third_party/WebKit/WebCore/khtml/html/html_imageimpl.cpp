@@ -120,7 +120,7 @@ void HTMLImageElementImpl::parseAttribute(AttributeImpl* attr) {
           EventImpl::ABORT_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
-    case ATTR_ONERROR:  // ### add support for this
+    case ATTR_ONERROR:
       setHTMLEventListener(
           EventImpl::ERROR_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));

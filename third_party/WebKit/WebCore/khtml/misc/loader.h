@@ -305,6 +305,8 @@ class CachedImage : public QObject, public CachedObject {
 
   virtual bool schedule() const { return true; }
 
+  void checkNotify();
+
  protected:
   void clear();
 
