@@ -1390,7 +1390,7 @@ int RenderTableSection::layoutRows(int toAdd) {
       // descendants.  An exception is if we need a layout.  In this case, we
       // know we're going to
       // repaint ourselves (and the cell) anyway.
-      if (!selfNeedsLayout() && checkForRepaintDuringLayout())
+      if (!table()->selfNeedsLayout() && checkForRepaintDuringLayout())
         cell->repaintDuringLayoutIfMoved(oldCellX, oldCellY);
 #endif
     }
