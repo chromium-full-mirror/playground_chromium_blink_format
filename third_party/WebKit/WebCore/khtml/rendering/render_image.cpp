@@ -380,6 +380,7 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
       // we're a client side image map
       inside = map->mapMouseEvent(_x - tx, _y - ty, contentWidth(),
                                   contentHeight(), info);
+      info.setInnerNonSharedNode(element());
     }
   }
 

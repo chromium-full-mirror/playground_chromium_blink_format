@@ -987,6 +987,9 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
     if (!info.innerNode())
       info.setInnerNode(element());
 
+    if (!info.innerNonSharedNode())
+      info.setInnerNonSharedNode(element());
+
     if (!info.URLElement()) {
       RenderObject* p = this;
       while (p) {

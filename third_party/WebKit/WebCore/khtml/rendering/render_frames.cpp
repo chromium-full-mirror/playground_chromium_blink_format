@@ -92,8 +92,10 @@ bool RenderFrameSet::nodeAtPoint(NodeInfo& info,
 
   bool inside = m_resizing || canResize(_x, _y);
 
-  if (inside && element() && !element()->noResize() && !info.readonly())
+  if (inside && element() && !element()->noResize() && !info.readonly()) {
     info.setInnerNode(element());
+    info.setInnerNonSharedNode(element());
+  }
 
   return inside || m_clientresizing;
 }
