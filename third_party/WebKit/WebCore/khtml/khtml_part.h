@@ -600,6 +600,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   const DOM::Selection& selection() const;
 
+  DOM::Selection::ETextGranularity selectionGranularity() const;
+
   /**
    * Returns the drag caret of the HTML.
    */
@@ -967,6 +969,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Eventhandler for the khtml::DrawContentsEvent.
    */
   virtual void khtmlDrawContentsEvent(khtml::DrawContentsEvent*);
+
+  void selectClosetWordFromMouseEvent(QMouseEvent* mouse,
+                                      DOM::Node& innerNode,
+                                      int x,
+                                      int y);
 
 #if !APPLE_CHANGES
   /**
