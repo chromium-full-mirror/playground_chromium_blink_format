@@ -1551,7 +1551,8 @@ int RenderBlock::rightRelOffset(int y,
 unsigned short RenderBlock::lineWidth(int y) const {
   // kdDebug( 6040 ) << "lineWidth(" << y << ")=" << rightOffset(y) -
   // leftOffset(y) << endl;
-  return rightOffset(y) - leftOffset(y);
+  int result = rightOffset(y) - leftOffset(y);
+  return (result < 0) ? 0 : result;
 }
 
 int RenderBlock::nearestFloatBottom(int height) const {
