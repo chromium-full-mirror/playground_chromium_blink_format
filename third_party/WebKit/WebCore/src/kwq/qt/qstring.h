@@ -480,13 +480,7 @@ class QString {
  private:
   // private enums -----------------------------------------------------------
 
-  enum CacheType {
-    CacheInvalid,
-    CacheUnicode,
-    CacheLatin1,
-    CacheAllocatedUnicode,
-    CacheAllocatedLatin1
-  };
+  enum CacheType { CacheInvalid, CacheUnicode, CacheLatin1 };
 
   // private member functions ------------------------------------------------
 
@@ -500,7 +494,6 @@ class QString {
 
   CFMutableStringRef s;
   mutable void* cache;
-  mutable CacheType cacheType;
 
   // friends -----------------------------------------------------------------
 
