@@ -26,4 +26,6 @@
 #ifndef KLINEEDIT_H_
 #define KLINEEDIT_H_
 
+class KLineEdit {};
+
 #endif
