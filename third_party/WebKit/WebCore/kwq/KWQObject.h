@@ -115,6 +115,9 @@ class QObject : public Qt {
 
   static const QObject* sender() { return _sender; }
 
+  static bool defersTimers() { return _defersTimers; }
+  static void setDefersTimers(bool defers);
+
  private:
   void _addTimer(NSTimer* timer, int _timerId);
 
@@ -133,6 +136,8 @@ class QObject : public Qt {
   KWQSignal _destroyed;
 
   const QObject* _eventFilterObject;
+
+  static bool _defersTimers;
 
   friend class KWQGuardedPtrBase;
   friend class KWQSignal;
