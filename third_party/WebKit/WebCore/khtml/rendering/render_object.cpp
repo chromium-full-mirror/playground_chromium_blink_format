@@ -366,9 +366,8 @@ void RenderObject::setLayouted(bool b) {
 RenderBlock* RenderObject::containingBlock() const {
   if (isTableCell())
     return static_cast<const RenderTableCell*>(this)->table();
-  else if (isRoot())
-    return 0;  // Ensures termination so you can walk up a containingBlock()
-               // chain.
+  if (isRoot())
+    return (RenderBlock*)this;
 
   RenderObject* o = parent();
   if (m_style->position() == FIXED) {
@@ -949,7 +948,7 @@ void RenderObject::setOverhangingContents(bool p) {
   RenderObject* cb = containingBlock();
   if (p) {
     m_overhangingContents = true;
-    if (cb)
+    if (cb != this)
       cb->setOverhangingContents();
   } else {
     RenderObject* n;
@@ -964,7 +963,7 @@ void RenderObject::setOverhangingContents(bool p) {
       return;
     else {
       m_overhangingContents = false;
-      if (cb)
+      if (cb != this)
         cb->setOverhangingContents(false);
     }
   }
