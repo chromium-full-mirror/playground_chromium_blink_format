@@ -1223,7 +1223,9 @@ void KHTMLView::restoreScrollBar() {
     layout();
     //        scheduleRepaint(contentsX(),contentsY(),visibleWidth(),visibleHeight());
   }
+#ifndef APPLE_CHANGES
   d->prevScrollbarVisible = verticalScrollBar()->isVisible();
+#endif
 }
 
 QStringList KHTMLView::formCompletionItems(const QString& name) const {
@@ -1403,6 +1405,7 @@ void KHTMLView::setIgnoreWheelEvents(bool e) {
 #ifndef QT_NO_WHEELEVENT
 
 void KHTMLView::viewportWheelEvent(QWheelEvent* e) {
+#ifndef APPLE_CHANGES
   if (d->ignoreWheelEvents && !verticalScrollBar()->isVisible() &&
       m_part->parentPart()) {
     if (m_part->parentPart()->view())
@@ -1414,6 +1417,7 @@ void KHTMLView::viewportWheelEvent(QWheelEvent* e) {
     d->scrollBarMoved = true;
     QScrollView::viewportWheelEvent(e);
   }
+#endif
 }
 #endif
 

@@ -66,9 +66,6 @@ class QScrollView : public QFrame {
 
   virtual void setContentsPos(int x, int y);
 
-  QScrollBar* horizontalScrollBar() const;
-  QScrollBar* verticalScrollBar() const;
-
   virtual void setVScrollBarMode(ScrollBarMode);
   virtual void setHScrollBarMode(ScrollBarMode);
 
