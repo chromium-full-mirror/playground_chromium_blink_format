@@ -25,6 +25,8 @@
 
 #include "KWQKPartsBrowserExtension.h"
 
+#include "KWQKPartsBrowserInterface.h"
+
 class QWidget;
 class KHTMLPart;
 
@@ -34,6 +36,10 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
   void editableWidgetFocused(QWidget*) {}
   void editableWidgetBlurred(QWidget*) {}
   void setLocationBarURL(const QString&) {}
+
+  virtual KParts::BrowserInterface* browserInterface() {
+    return &_browserInterface;
+  }
 
   virtual void openURLRequest(const KURL&,
                               const KParts::URLArgs& args = KParts::URLArgs());
@@ -56,7 +62,8 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
                        const KParts::WindowArgs& winArgs,
                        KParts::ReadOnlyPart** part);
 
-  KHTMLPart* m_part;
+  KWQKHTMLPart* _part;
+  KParts::BrowserInterface _browserInterface;
 };
 
 class KHTMLPartBrowserHostExtension {

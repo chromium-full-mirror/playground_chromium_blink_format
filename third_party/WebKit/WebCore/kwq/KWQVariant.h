@@ -33,10 +33,12 @@ class QString;
 
 class QVariant {
  public:
-  enum Type { Invalid, String, UInt, Double, Bool };
+  enum Type { Invalid, String, UInt, Double, Bool, Int };
 
   QVariant();
   QVariant(bool, int);
+  QVariant(int);
+  QVariant(uint);
   QVariant(double);
   QVariant(const QString&);
   ~QVariant();
@@ -47,6 +49,7 @@ class QVariant {
   Type type() const;
 
   bool toBool() const;
+  int toInt() const;
   uint toUInt() const;
 
   QString asString() const;
