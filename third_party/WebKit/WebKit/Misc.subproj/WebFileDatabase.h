@@ -6,5 +6,7 @@
 
 #import "IFDatabase.h"
 
-@interface IFURLFileDatabase : IFDatabase
+@interface IFURLFileDatabase : IFDatabase {
+  NSLock* mutex;
+}
 @end
