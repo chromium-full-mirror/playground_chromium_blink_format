@@ -4149,6 +4149,9 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
           int startOffset = 0, endOffset = 0;
           DOM::NodeImpl* node = 0;
 
+          // FIXME: Shouldn't be necessary to skip text nodes.
+          if (innerNode.nodeType() == Node::TEXT_NODE)
+            innerNode = innerNode.parentNode();
           innerNode.handle()->renderer()->checkSelectionPoint(
               event, event->absX() - innerNode.handle()->renderer()->xPos(),
               event->absY() - innerNode.handle()->renderer()->yPos(), node,
@@ -4197,6 +4200,9 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
           int startOffset = 0;
           DOM::NodeImpl* node = 0;
 
+          // FIXME: Shouldn't be necessary to skip text nodes.
+          if (innerNode.nodeType() == Node::TEXT_NODE)
+            innerNode = innerNode.parentNode();
           innerNode.handle()->renderer()->checkSelectionPoint(
               event, event->absX() - innerNode.handle()->renderer()->xPos(),
               event->absY() - innerNode.handle()->renderer()->yPos(), node,
@@ -4228,6 +4234,9 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
           int offset = 0;
           DOM::NodeImpl* node = 0;
 
+          // FIXME: Shouldn't be necessary to skip text nodes.
+          if (innerNode.nodeType() == Node::TEXT_NODE)
+            innerNode = innerNode.parentNode();
           innerNode.handle()->renderer()->checkSelectionPoint(
               event, event->absX() - innerNode.handle()->renderer()->xPos(),
               event->absY() - innerNode.handle()->renderer()->yPos(), node,
@@ -4382,6 +4391,9 @@ void KHTMLPart::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
       //              event->nodeAbsY()
       //              << endl;
       DOM::NodeImpl* node = 0;
+      // FIXME: Shouldn't be necessary to skip text nodes.
+      if (innerNode.nodeType() == Node::TEXT_NODE)
+        innerNode = innerNode.parentNode();
       innerNode.handle()->renderer()->checkSelectionPoint(
           event, event->absX() - innerNode.handle()->renderer()->xPos(),
           event->absY() - innerNode.handle()->renderer()->yPos(), node, offset);
