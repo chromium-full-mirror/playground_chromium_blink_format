@@ -102,6 +102,7 @@ using namespace DOM;
 #endif
 
 using khtml::ApplyStyleCommand;
+using khtml::ChildFrame;
 using khtml::Decoder;
 using khtml::DeleteSelectionCommand;
 using khtml::EditCommand;
@@ -1038,6 +1039,7 @@ void KHTMLPart::clear() {
     ConstFrameIt end = d->m_frames.end();
     for (; it != end; ++it) {
       if ((*it).m_part) {
+        disconnectChild(&*it);
 #if !APPLE_CHANGES
         partManager()->removePart((*it).m_part);
 #endif
@@ -1644,11 +1646,20 @@ void KHTMLPart::write(const QString& str) {
 }
 
 void KHTMLPart::end() {
+  // Make sure we're not deallocated half-way through due to JavaScript in the
+  // onload handler.
+  // With this ref we guarantee that if we are shut down, we won't actually
+  // destroy the object
+  // until we return here.
+  ref();
+
   // make sure nothing's left in there...
   if (d->m_decoder)
     write(d->m_decoder->flush());
   if (d->m_doc)
     d->m_doc->finishParsing();
+
+  deref();
 }
 
 #if !APPLE_CHANGES
@@ -1702,6 +1713,9 @@ void KHTMLPart::slotFinishedParsing() {
     return;  // We are probably being destructed.
 
   checkCompleted();
+
+  if (!d->m_view)
+    return;  // We are being destroyed by something checkCompleted called.
 
   // check if the scrollbars are really needed for the content
   // if not, remove them, relayout, and repaint
@@ -1821,19 +1835,11 @@ void KHTMLPart::checkCompleted() {
 
   checkEmitLoadEvent();  // if we didn't do it before
 
-#if APPLE_CHANGES
-  if (d->m_view) {
-#endif
-
 #if !APPLE_CHANGES
-    // check that the view has not been moved by the user
-    if (!m_url.hasRef() && d->m_view->contentsY() == 0)
-      d->m_view->setContentsPos(d->m_extension->urlArgs().xOffset,
-                                d->m_extension->urlArgs().yOffset);
-#endif
-
-#if APPLE_CHANGES
-  }  // if (d->m_view)
+  // check that the view has not been moved by the user
+  if (!m_url.hasRef() && d->m_view->contentsY() == 0)
+    d->m_view->setContentsPos(d->m_extension->urlArgs().xOffset,
+                              d->m_extension->urlArgs().yOffset);
 #endif
 
   if (d->m_scheduledRedirection != noRedirectionScheduled) {
@@ -3082,6 +3088,7 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
 
     // CRITICAL STUFF
     if (child->m_part) {
+      disconnectChild(child);
 #if !APPLE_CHANGES
       partManager()->removePart((KParts::ReadOnlyPart*)child->m_part);
 #endif
@@ -3102,17 +3109,7 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
     child->m_part = part;
     assert(((void*)child->m_part) != 0);
 
-    if (child->m_type != khtml::ChildFrame::Object) {
-      connect(part, SIGNAL(started(KIO::Job*)), this,
-              SLOT(slotChildStarted(KIO::Job*)));
-      connect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
-      connect(part, SIGNAL(completed(bool)), this,
-              SLOT(slotChildCompleted(bool)));
-      connect(part, SIGNAL(setStatusBarText(const QString&)), this,
-              SIGNAL(setStatusBarText(const QString&)));
-      connect(this, SIGNAL(completed()), part, SLOT(slotParentCompleted()));
-      connect(this, SIGNAL(completed(bool)), part, SLOT(slotParentCompleted()));
-    }
+    connectChild(child);
 
 #if APPLE_CHANGES
   }
@@ -3575,8 +3572,8 @@ void KHTMLPart::slotChildCompleted(bool complete) {
   child->m_bCompleted = true;
   child->m_args = KParts::URLArgs();
 
-  if (parentPart() == 0)
-    d->m_bPendingChildRedirection = (d->m_bPendingChildRedirection || complete);
+  if (complete && parentPart() == 0)
+    d->m_bPendingChildRedirection = true;
 
   checkCompleted();
 }
@@ -5381,6 +5378,37 @@ void KHTMLPart::print() {
 }
 
 #endif
+
+void KHTMLPart::connectChild(const khtml::ChildFrame* child) const {
+  ReadOnlyPart* part = child->m_part;
+  if (part && child->m_type != ChildFrame::Object) {
+    connect(part, SIGNAL(started(KIO::Job*)), this,
+            SLOT(slotChildStarted(KIO::Job*)));
+    connect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
+    connect(part, SIGNAL(completed(bool)), this,
+            SLOT(slotChildCompleted(bool)));
+    connect(part, SIGNAL(setStatusBarText(const QString&)), this,
+            SIGNAL(setStatusBarText(const QString&)));
+    connect(this, SIGNAL(completed()), part, SLOT(slotParentCompleted()));
+    connect(this, SIGNAL(completed(bool)), part, SLOT(slotParentCompleted()));
+  }
+}
+
+void KHTMLPart::disconnectChild(const khtml::ChildFrame* child) const {
+  ReadOnlyPart* part = child->m_part;
+  if (part && child->m_type != ChildFrame::Object) {
+    disconnect(part, SIGNAL(started(KIO::Job*)), this,
+               SLOT(slotChildStarted(KIO::Job*)));
+    disconnect(part, SIGNAL(completed()), this, SLOT(slotChildCompleted()));
+    disconnect(part, SIGNAL(completed(bool)), this,
+               SLOT(slotChildCompleted(bool)));
+    disconnect(part, SIGNAL(setStatusBarText(const QString&)), this,
+               SIGNAL(setStatusBarText(const QString&)));
+    disconnect(this, SIGNAL(completed()), part, SLOT(slotParentCompleted()));
+    disconnect(this, SIGNAL(completed(bool)), part,
+               SLOT(slotParentCompleted()));
+  }
+}
 
 using namespace KParts;
 #include "khtml_part.moc"
