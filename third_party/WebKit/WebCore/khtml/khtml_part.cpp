@@ -1363,11 +1363,14 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
     emit setWindowCaption(i18n("no title", "* Unknown *"));
 #endif
 
-  // ### not sure if XHTML documents served as text/xml should use DocumentImpl
-  // or HTMLDocumentImpl
+// ### not sure if XHTML documents served as text/xml should use DocumentImpl or
+// HTMLDocumentImpl
+#ifndef APPLE_CHANGES
+  // We can't deal with XML yet, so just give it an HTML document for now. -dwh
   if (args.serviceType == "text/xml")
     d->m_doc = DOMImplementationImpl::instance()->createDocument(d->m_view);
   else
+#endif
     d->m_doc = DOMImplementationImpl::instance()->createHTMLDocument(d->m_view);
 
   d->m_doc->ref();
