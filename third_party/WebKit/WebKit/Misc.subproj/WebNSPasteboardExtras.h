@@ -13,6 +13,16 @@ extern NSString* WebURLNamePboardType;
 
 @interface NSPasteboard (WebExtras)
 
+// Returns the array of drag types that _web_writeURL:andTitle:withOwner:
+// handles.
+// FIXME: It would be better to conceal this completely by changing
+// _web_writeURL:andTitle:withOwner:types: to take a list of additional types
+// instead of a complete list of types, but we're afraid to do so at this late
+// stage in Panther just in case some internal client is using
+// _web_writeURL:andTitle:withOwner:types:
+// already and relying on its current behavior.
++ (NSArray*)_web_writableDragTypesForURL;
+
 // Returns the array of drag types that _web_bestURL handles; note that the
 // presence
 // of one or more of these drag types on the pasteboard is not a guarantee that
@@ -23,7 +33,15 @@ extern NSString* WebURLNamePboardType;
 // and https URLs
 - (NSURL*)_web_bestURL;
 
+// Writes the URL to the pasteboard in all the types from
+// _web_writableDragTypesForURL
 - (void)_web_writeURL:(NSURL*)URL andTitle:(NSString*)title withOwner:(id)owner;
+
+// Writes the URL to the pasteboard in all the types from
+// _web_writableDragTypesForURL,
+// after declaring all the passed-in types. Any passed-in types not in
+// _web_writableDragTypesForURL
+// must be handled by the caller separately.
 - (void)_web_writeURL:(NSURL*)URL
              andTitle:(NSString*)title
             withOwner:(id)owner
