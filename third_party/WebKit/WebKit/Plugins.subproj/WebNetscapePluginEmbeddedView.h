@@ -16,6 +16,7 @@
                 URL:(NSURL*)URL
             baseURL:(NSURL*)baseURL
            MIMEType:(NSString*)MIME
-         attributes:(NSDictionary*)attributes;
+      attributeKeys:(NSArray*)keys
+    attributeValues:(NSArray*)values;
 
 @end
