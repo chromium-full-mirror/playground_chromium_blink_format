@@ -53,7 +53,6 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
     : ObjectImp((ObjectImp*)0) {
   ownsInstance = oi;
   instance = i;
-  _initializeClassInfoFromInstance();
 }
 
 Value RuntimeObjectImp::get(ExecState* exec,
@@ -142,9 +141,4 @@ Value RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
   instance->end();
 
   return aValue;
-}
-
-void RuntimeObjectImp::_initializeClassInfoFromInstance() {
-  if (!instance)
-    return;
 }
