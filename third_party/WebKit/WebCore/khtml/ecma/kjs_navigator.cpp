@@ -77,7 +77,7 @@ class PluginBase : public ObjectImp {
 class Plugins : public PluginBase {
  public:
   Plugins(ExecState* exec) : PluginBase(exec){};
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -88,7 +88,7 @@ const ClassInfo Plugins::info = {"PluginArray", 0, 0, 0};
 class MimeTypes : public PluginBase {
  public:
   MimeTypes(ExecState* exec) : PluginBase(exec){};
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -111,7 +111,7 @@ class Plugin : public ObjectImp {
     m_info = info;
   };
 #endif
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -135,7 +135,7 @@ class MimeType : public ObjectImp {
     m_info = info;
   };
 #endif
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
@@ -171,7 +171,7 @@ IMPLEMENT_PROTOFUNC(NavigatorFunc)
 Navigator::Navigator(ExecState* exec, KHTMLPart* p)
     : ObjectImp(exec->interpreter()->builtinObjectPrototype()), m_part(p) {}
 
-Value Navigator::get(ExecState* exec, const UString& propertyName) const {
+Value Navigator::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Navigator::get " << propertyName.ascii() << endl;
 #endif
@@ -368,7 +368,7 @@ void PluginBase::unref() {
 /*******************************************************************/
 IMPLEMENT_PROTOFUNC(PluginsFunc)
 
-Value Plugins::get(ExecState* exec, const UString& propertyName) const {
+Value Plugins::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Plugins::get " << propertyName.qstring() << endl;
 #endif
@@ -396,7 +396,7 @@ Value Plugins::get(ExecState* exec, const UString& propertyName) const {
 
 /*******************************************************************/
 
-Value MimeTypes::get(ExecState* exec, const UString& propertyName) const {
+Value MimeTypes::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "MimeTypes::get " << propertyName.qstring() << endl;
 #endif
@@ -423,7 +423,7 @@ Value MimeTypes::get(ExecState* exec, const UString& propertyName) const {
 
 /************************************************************************/
 
-Value Plugin::get(ExecState* exec, const UString& propertyName) const {
+Value Plugin::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Plugin::get " << propertyName.qstring() << endl;
 #endif
@@ -459,7 +459,7 @@ Value Plugin::get(ExecState* exec, const UString& propertyName) const {
 
 /*****************************************************************************/
 
-Value MimeType::get(ExecState* exec, const UString& propertyName) const {
+Value MimeType::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "MimeType::get " << propertyName.qstring() << endl;
 #endif

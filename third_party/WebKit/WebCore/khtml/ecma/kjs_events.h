@@ -49,7 +49,7 @@ Value getNodeEventListener(DOM::Node n, int eventId);
 class EventConstructor : public DOMObject {
  public:
   EventConstructor(ExecState*) {}
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -62,10 +62,10 @@ class DOMEvent : public DOMObject {
  public:
   DOMEvent(ExecState* exec, DOM::Event e);
   ~DOMEvent();
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   virtual void tryPut(ExecState* exec,
-                      const UString& propertyName,
+                      const Identifier& propertyName,
                       const Value& value,
                       int attr = None);
   void putValue(ExecState* exec, int token, const Value& value, int);
@@ -104,7 +104,7 @@ DOM::Event toEvent(const Value&);
 class EventExceptionConstructor : public DOMObject {
  public:
   EventExceptionConstructor(ExecState*) {}
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -117,7 +117,7 @@ class DOMUIEvent : public DOMEvent {
  public:
   DOMUIEvent(ExecState* exec, DOM::UIEvent ue) : DOMEvent(exec, ue) {}
   ~DOMUIEvent();
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -130,7 +130,7 @@ class DOMMouseEvent : public DOMUIEvent {
  public:
   DOMMouseEvent(ExecState* exec, DOM::MouseEvent me) : DOMUIEvent(exec, me) {}
   ~DOMMouseEvent();
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -163,7 +163,7 @@ class DOMMouseEvent : public DOMUIEvent {
 class MutationEventConstructor : public DOMObject {
  public:
   MutationEventConstructor(ExecState*) {}
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -177,7 +177,7 @@ class DOMMutationEvent : public DOMEvent {
   DOMMutationEvent(ExecState* exec, DOM::MutationEvent me)
       : DOMEvent(exec, me) {}
   ~DOMMutationEvent();
-  virtual Value tryGet(ExecState* exec, const UString& p) const;
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }

@@ -37,7 +37,7 @@ class FunctionImp : public InternalFunctionImp {
   friend class ActivationImp;
 
  public:
-  FunctionImp(ExecState* exec, const UString& n = UString::null);
+  FunctionImp(ExecState* exec, const Identifier& n = Identifier::null);
   virtual ~FunctionImp();
 
   virtual void mark();
@@ -45,20 +45,20 @@ class FunctionImp : public InternalFunctionImp {
   virtual bool implementsCall() const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
 
-  void addParameter(const UString& n);
+  void addParameter(const Identifier& n);
   // parameters in string representation, e.g. (a, b, c)
   UString parameterString() const;
   virtual CodeType codeType() const = 0;
 
   virtual Completion execute(ExecState* exec) = 0;
-  UString name() const { return ident; }
+  Identifier name() const { return ident; }
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  protected:
   Parameter* param;
-  UString ident;
+  Identifier ident;
 
  private:
   void processParameters(ExecState* exec, const List&);
@@ -68,7 +68,7 @@ class FunctionImp : public InternalFunctionImp {
 class DeclaredFunctionImp : public FunctionImp {
  public:
   DeclaredFunctionImp(ExecState* exec,
-                      const UString& n,
+                      const Identifier& n,
                       FunctionBodyNode* b,
                       const List& sc);
   ~DeclaredFunctionImp();

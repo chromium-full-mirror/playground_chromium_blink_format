@@ -27,7 +27,7 @@ using namespace KJS;
 
 // ------------------------------ Reference ------------------------------------
 
-Reference::Reference(const Object& b, const UString& p)
+Reference::Reference(const Object& b, const Identifier& p)
     : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
 
 Reference::Reference(const Object& b, unsigned p)
@@ -36,7 +36,7 @@ Reference::Reference(const Object& b, unsigned p)
       baseIsValue(false),
       propertyNameIsNumber(true) {}
 
-Reference::Reference(const Null& b, const UString& p)
+Reference::Reference(const Null& b, const Identifier& p)
     : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
 
 Reference::Reference(const Null& b, unsigned p)
@@ -65,16 +65,16 @@ Value Reference::getBase(ExecState* exec) const {
   return base;
 }
 
-UString Reference::getPropertyName(ExecState* exec) const {
+Identifier Reference::getPropertyName(ExecState* exec) const {
   if (baseIsValue) {
     // the spec wants a runtime error here. But getValue() and putValue()
     // will catch this case on their own earlier. When returning a Null
     // string we should be on the safe side.
-    return UString();
+    return Identifier();
   }
 
   if (propertyNameIsNumber && prop.isNull())
-    prop = UString::from(propertyNameAsNumber);
+    prop = Identifier::from(propertyNameAsNumber);
   return prop;
 }
 

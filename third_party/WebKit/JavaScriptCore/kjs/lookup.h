@@ -22,7 +22,7 @@
 #ifndef _KJSLOOKUP_H_
 #define _KJSLOOKUP_H_
 
-#include "ustring.h"
+#include "identifier.h"
 #include "value.h"
 #include <stdio.h>
 
@@ -100,7 +100,7 @@ class Lookup {
    * Find an entry in the table, and return its value (i.e. the value field of
    * HashEntry)
    */
-  static int find(const struct HashTable* table, const UString& s);
+  static int find(const struct HashTable* table, const Identifier& s);
   static int find(const struct HashTable* table,
                   const UChar* c,
                   unsigned int len);
@@ -111,7 +111,7 @@ class Lookup {
    * especially the attr field.
    */
   static const HashEntry* findEntry(const struct HashTable* table,
-                                    const UString& s);
+                                    const Identifier& s);
   static const HashEntry* findEntry(const struct HashTable* table,
                                     const UChar* c,
                                     unsigned int len);
@@ -119,7 +119,7 @@ class Lookup {
   /**
    * Calculate the hash value for a given key
    */
-  static unsigned int hash(const UString& key);
+  static unsigned int hash(const Identifier& key);
   static unsigned int hash(const UChar* c, unsigned int len);
   static unsigned int hash(const char* s);
 };
@@ -132,7 +132,7 @@ class UString;
  */
 template <class FuncImp>
 inline Value lookupOrCreateFunction(ExecState* exec,
-                                    const UString& propertyName,
+                                    const Identifier& propertyName,
                                     const ObjectImp* thisObj,
                                     int token,
                                     int params,
@@ -174,7 +174,7 @@ inline Value lookupOrCreateFunction(ExecState* exec,
  */
 template <class FuncImp, class ThisImp, class ParentImp>
 inline Value lookupGet(ExecState* exec,
-                       const UString& propertyName,
+                       const Identifier& propertyName,
                        const HashTable* table,
                        const ThisImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -197,7 +197,7 @@ inline Value lookupGet(ExecState* exec,
  */
 template <class FuncImp, class ParentImp>
 inline Value lookupGetFunction(ExecState* exec,
-                               const UString& propertyName,
+                               const Identifier& propertyName,
                                const HashTable* table,
                                const ObjectImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -222,7 +222,7 @@ inline Value lookupGetFunction(ExecState* exec,
  */
 template <class ThisImp, class ParentImp>
 inline Value lookupGetValue(ExecState* exec,
-                            const UString& propertyName,
+                            const Identifier& propertyName,
                             const HashTable* table,
                             const ThisImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -244,7 +244,7 @@ inline Value lookupGetValue(ExecState* exec,
  */
 template <class ThisImp, class ParentImp>
 inline void lookupPut(ExecState* exec,
-                      const UString& propertyName,
+                      const Identifier& propertyName,
                       const Value& value,
                       int attr,
                       const HashTable* table,

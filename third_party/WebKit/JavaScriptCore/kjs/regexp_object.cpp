@@ -195,7 +195,7 @@ Object RegExpObjectImp::arrayOfMatches(ExecState* exec,
   return arr;
 }
 
-Value RegExpObjectImp::get(ExecState* exec, const UString& p) const {
+Value RegExpObjectImp::get(ExecState* exec, const Identifier& p) const {
   if (p[0] == '$' && lastOvector) {
     bool ok;
     unsigned long i = p.substr(1).toULong(&ok);

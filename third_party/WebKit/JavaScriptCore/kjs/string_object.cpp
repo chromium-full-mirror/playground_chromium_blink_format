@@ -47,14 +47,14 @@ StringInstanceImp::StringInstanceImp(const Object& proto, const UString& string)
 }
 
 Value StringInstanceImp::get(ExecState* exec,
-                             const UString& propertyName) const {
+                             const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return Number(internalValue().toString(exec).size());
   return ObjectImp::get(exec, propertyName);
 }
 
 void StringInstanceImp::put(ExecState* exec,
-                            const UString& propertyName,
+                            const Identifier& propertyName,
                             const Value& value,
                             int attr) {
   if (propertyName == lengthPropertyName)
@@ -63,14 +63,14 @@ void StringInstanceImp::put(ExecState* exec,
 }
 
 bool StringInstanceImp::hasProperty(ExecState* exec,
-                                    const UString& propertyName) const {
+                                    const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return true;
   return ObjectImp::hasProperty(exec, propertyName);
 }
 
 bool StringInstanceImp::deleteProperty(ExecState* exec,
-                                       const UString& propertyName) {
+                                       const Identifier& propertyName) {
   if (propertyName == lengthPropertyName)
     return false;
   return ObjectImp::deleteProperty(exec, propertyName);
@@ -155,7 +155,7 @@ StringPrototypeImp::StringPrototypeImp(ExecState* exec,
 }
 
 Value StringPrototypeImp::get(ExecState* exec,
-                              const UString& propertyName) const {
+                              const Identifier& propertyName) const {
   return lookupGetFunction<StringProtoFuncImp, StringInstanceImp>(
       exec, propertyName, &stringTable, this);
 }

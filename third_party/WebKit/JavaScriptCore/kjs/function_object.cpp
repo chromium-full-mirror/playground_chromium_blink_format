@@ -236,7 +236,7 @@ Object FunctionObjectImp::construct(ExecState* exec, const List& args) {
   FunctionBodyNode* bodyNode = progNode;
 
   FunctionImp* fimp =
-      new DeclaredFunctionImp(exec, UString::null, bodyNode, scopeChain);
+      new DeclaredFunctionImp(exec, Identifier::null, bodyNode, scopeChain);
   Object ret(fimp);  // protect from GC
 
   // parse parameter list. throw syntax error on illegal identifiers

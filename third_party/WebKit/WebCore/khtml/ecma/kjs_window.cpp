@@ -65,7 +65,7 @@ class History : public ObjectImp {
  public:
   History(ExecState* exec, KHTMLPart* p)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()), part(p) {}
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -79,7 +79,7 @@ class FrameArray : public ObjectImp {
  public:
   FrameArray(ExecState* exec, KHTMLPart* p)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()), part(p) {}
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
 
  private:
   QGuardedPtr<KHTMLPart> part;
@@ -123,7 +123,7 @@ const ClassInfo Screen::info = {"Screen", 0, &ScreenTable, 0};
 Screen::Screen(ExecState* exec)
     : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {}
 
-Value Screen::get(ExecState* exec, const UString& p) const {
+Value Screen::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Screen::get " << p.qstring() << endl;
 #endif
@@ -349,7 +349,7 @@ void Window::mark() {
     loc->mark();
 }
 
-bool Window::hasProperty(ExecState* /*exec*/, const UString& /*p*/) const {
+bool Window::hasProperty(ExecState* /*exec*/, const Identifier& /*p*/) const {
   // fprintf( stderr, "Window::hasProperty: always saying true\n" );
 
   // emulate IE behaviour: it doesn't throw exceptions when undeclared
@@ -362,7 +362,7 @@ UString Window::toString(ExecState*) const {
   return "[object Window]";
 }
 
-Value Window::get(ExecState* exec, const UString& p) const {
+Value Window::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Window(" << this << ")::get " << p.qstring() << endl;
 #endif
@@ -703,7 +703,7 @@ Value Window::get(ExecState* exec, const UString& p) const {
 }
 
 void Window::put(ExecState* exec,
-                 const UString& propertyName,
+                 const Identifier& propertyName,
                  const Value& value,
                  int attr) {
   // Called by an internal KJS call (e.g. InterpreterImp's constructor) ?
@@ -859,7 +859,7 @@ bool Window::toBoolean(ExecState*) const {
   return !m_part.isNull();
 }
 
-int Window::installTimeout(const UString& handler, int t, bool singleShot) {
+int Window::installTimeout(const Identifier& handler, int t, bool singleShot) {
   return winq->installTimeout(handler, t, singleShot);
 }
 
@@ -1493,7 +1493,7 @@ void WindowQObject::parentDestroyed() {
   scheduledActions.clear();
 }
 
-int WindowQObject::installTimeout(const UString& handler,
+int WindowQObject::installTimeout(const Identifier& handler,
                                   int t,
                                   bool singleShot) {
   // kdDebug(6070) << "WindowQObject::installTimeout " << this << " " <<
@@ -1564,7 +1564,7 @@ void WindowQObject::timeoutClose() {
   }
 }
 
-Value FrameArray::get(ExecState* exec, const UString& p) const {
+Value FrameArray::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "FrameArray::get " << p.qstring() << " part=" << (void*)part
                 << endl;
@@ -1633,7 +1633,7 @@ Location::~Location() {
   // (void*)m_part << endl;
 }
 
-Value Location::get(ExecState* exec, const UString& p) const {
+Value Location::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Location::get " << p.qstring()
                 << " m_part=" << (void*)m_part << endl;
@@ -1698,7 +1698,7 @@ Value Location::get(ExecState* exec, const UString& p) const {
 }
 
 void Location::put(ExecState* exec,
-                   const UString& p,
+                   const Identifier& p,
                    const Value& v,
                    int attr) {
 #ifdef KJS_VERBOSE
@@ -1811,7 +1811,7 @@ const ClassInfo History::info = {"History", 0, 0, 0};
 */
 IMPLEMENT_PROTOFUNC(HistoryFunc)
 
-Value History::get(ExecState* exec, const UString& p) const {
+Value History::get(ExecState* exec, const Identifier& p) const {
   return lookupGet<HistoryFunc, History, ObjectImp>(exec, p, &HistoryTable,
                                                     this);
 }
@@ -1901,14 +1901,14 @@ Value HistoryFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
 
 const ClassInfo Konqueror::info = {"Konqueror", 0, 0, 0};
 
-bool Konqueror::hasProperty(ExecState* exec, const UString& p) const {
+bool Konqueror::hasProperty(ExecState* exec, const Identifier& p) const {
   if (p.qstring().startsWith("goHistory"))
     return false;
 
   return true;
 }
 
-Value Konqueror::get(ExecState* exec, const UString& p) const {
+Value Konqueror::get(ExecState* exec, const Identifier& p) const {
   if (p == "goHistory" || part->url().protocol() != "http" ||
       part->url().host() != "localhost")
     return Undefined();

@@ -46,14 +46,14 @@ const ClassInfo FunctionImp::info = {"Function", &InternalFunctionImp::info, 0,
 namespace KJS {
 class Parameter {
  public:
-  Parameter(const UString& n) : name(n), next(0L) {}
+  Parameter(const Identifier& n) : name(n), next(0L) {}
   ~Parameter() { delete next; }
-  UString name;
+  Identifier name;
   Parameter* next;
 };
 };
 
-FunctionImp::FunctionImp(ExecState* exec, const UString& n)
+FunctionImp::FunctionImp(ExecState* exec, const Identifier& n)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
           exec->interpreter()->builtinFunctionPrototype().imp())),
       param(0L),
@@ -156,7 +156,7 @@ Value FunctionImp::call(ExecState* exec, Object& thisObj, const List& args) {
     return Undefined();
 }
 
-void FunctionImp::addParameter(const UString& n) {
+void FunctionImp::addParameter(const Identifier& n) {
   Parameter** p = &param;
   while (*p)
     p = &(*p)->next;
@@ -221,7 +221,7 @@ const ClassInfo DeclaredFunctionImp::info = {"Function", &FunctionImp::info, 0,
                                              0};
 
 DeclaredFunctionImp::DeclaredFunctionImp(ExecState* exec,
-                                         const UString& n,
+                                         const Identifier& n,
                                          FunctionBodyNode* b,
                                          const List& sc)
     : FunctionImp(exec, n), body(b) {

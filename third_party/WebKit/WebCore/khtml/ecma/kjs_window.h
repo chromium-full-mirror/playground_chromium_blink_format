@@ -54,7 +54,7 @@ class Screen : public ObjectImp {
     AvailHeight,
     AvailWidth
   };
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
 
  private:
@@ -93,14 +93,14 @@ class Window : public ObjectImp {
   static Window* retrieveActive(ExecState* exec);
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
-  virtual bool hasProperty(ExecState* exec, const UString& p) const;
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual bool hasProperty(ExecState* exec, const Identifier& p) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
-                   const UString& propertyName,
+                   const Identifier& propertyName,
                    const Value& value,
                    int attr = None);
   virtual bool toBoolean(ExecState* exec) const;
-  int installTimeout(const UString& handler, int t, bool singleShot);
+  int installTimeout(const Identifier& handler, int t, bool singleShot);
   void clearTimeout(int timerId);
   void scheduleClose();
   bool isSafeScript(ExecState* exec) const;
@@ -241,7 +241,7 @@ class WindowQObject : public QObject {
  public:
   WindowQObject(Window* w);
   ~WindowQObject();
-  int installTimeout(const UString& handler, int t, bool singleShot);
+  int installTimeout(const Identifier& handler, int t, bool singleShot);
   int installTimeout(const Value& func, List args, int t, bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
  public slots:
@@ -261,9 +261,9 @@ class WindowQObject : public QObject {
 class Location : public ObjectImp {
  public:
   ~Location();
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
-                   const UString& propertyName,
+                   const Identifier& propertyName,
                    const Value& value,
                    int attr = None);
   virtual Value toPrimitive(ExecState* exec, Type preferred) const;
@@ -298,8 +298,8 @@ class Konqueror : public ObjectImp {
 
  public:
   Konqueror(KHTMLPart* p) : part(p) {}
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
-  virtual bool hasProperty(ExecState* exec, const UString& p) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool hasProperty(ExecState* exec, const Identifier& p) const;
   virtual UString toString(ExecState* exec) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
