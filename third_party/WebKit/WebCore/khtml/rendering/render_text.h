@@ -114,8 +114,7 @@ class InlineTextBox : public InlineRunBox {
                       int tx,
                       int ty,
                       int startPos,
-                      int endPos,
-                      bool extendSelection);
+                      int endPos);
 
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
