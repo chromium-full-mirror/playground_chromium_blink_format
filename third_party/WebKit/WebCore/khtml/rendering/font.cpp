@@ -50,7 +50,6 @@ void Font::drawText(QPainter* p,
                     int to,
                     QColor bg) const {
 #if APPLE_CHANGES
-  printf("for string length %d, letterSpacing = %d\n", slen, letterSpacing);
   p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg,
               d, letterSpacing, wordSpacing);
 #else
