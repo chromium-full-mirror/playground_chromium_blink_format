@@ -263,13 +263,6 @@ static QString escapeHTML(const QString& in) {
 QString NodeImpl::recursive_toHTMLWithOptions(bool start,
                                               const DOM::RangeImpl* range,
                                               QPtrList<NodeImpl>* nodes) const {
-  QString me = "";
-
-  int exceptionCode;
-  NodeImpl* startContainer =
-      range ? range->startContainer(exceptionCode) : NULL;
-  NodeImpl* endContainer = range ? range->endContainer(exceptionCode) : NULL;
-  NodeImpl* n = startContainer;
   bool isNodeIncluded = range ? false : true;
   Id ident = id();
 
@@ -278,32 +271,23 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
                                      ident == ID_UL)))) {
     // Check if this node is in the range or is an ancestor of a node in the
     // range.
-    while (n) {
-      NodeImpl* ancestor = n;
-      while (ancestor) {
+    NodeImpl* pastEnd = range->pastEndNode();
+    for (NodeImpl* n = range->startNode(); n != pastEnd;
+         n = n->traverseNextNode()) {
+      for (NodeImpl* ancestor = n; ancestor;
+           ancestor = ancestor->parentNode()) {
         if (this == ancestor) {
           isNodeIncluded = true;
           break;
         }
-        ancestor = ancestor->parentNode();
       }
       if (isNodeIncluded) {
         break;
       }
-      if (n == endContainer) {
-        break;
-      }
-      NodeImpl* next = n->firstChild();
-      if (!next) {
-        next = n->nextSibling();
-      }
-      while (!next && n->parentNode()) {
-        n = n->parentNode();
-        next = n->nextSibling();
-      }
-      n = next;
     }
   }
+
+  QString me = "";
 
   if (isNodeIncluded) {
     if (nodes) {
@@ -313,10 +297,11 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
     if (nodeType() == Node::TEXT_NODE) {
       DOMString str = nodeValue().copy();
       if (range) {
-        if (this == endContainer) {
+        int exceptionCode;
+        if (this == range->endContainer(exceptionCode)) {
           str.truncate(range->endOffset(exceptionCode));
         }
-        if (this == startContainer) {
+        if (this == range->startContainer(exceptionCode)) {
           str.remove(0, range->startOffset(exceptionCode));
         }
       }
@@ -343,7 +328,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
 
   if (!isHTMLElement() || endTag[ident] != FORBIDDEN) {
     // print firstChild
-    if ((n = firstChild())) {
+    if (NodeImpl* n = firstChild()) {
       me += n->recursive_toHTMLWithOptions(false, range, nodes);
     }
     // Print my ending tag
@@ -353,7 +338,7 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
     }
   }
   // print next sibling
-  if ((n = nextSibling())) {
+  if (NodeImpl* n = nextSibling()) {
     me += n->recursive_toHTMLWithOptions(false, range, nodes);
   }
 
@@ -1288,7 +1273,12 @@ void NodeImpl::createRendererIfNeeded() {
       m_render = createRenderer(getDocument()->renderArena(), style);
       m_render->setStyle(style);
       parentRenderer->addChild(m_render, nextRenderer());
+#ifndef KHTML_NO_XBL
+    }  // avoid confusing the change log code parser by having two close braces
+       // to match the two open braces above
+#else
     }
+#endif
     style->deref(getDocument()->renderArena());
   }
 }

@@ -100,6 +100,9 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
 
   bool readOnly() { return false; }
 
+  NodeImpl* startNode() const;
+  NodeImpl* pastEndNode() const;
+
 #if APPLE_CHANGES
   static Range createInstance(RangeImpl* impl);
 #endif
@@ -123,9 +126,6 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   void setEndContainer(NodeImpl* _endContainer);
   void checkDeleteExtract(int& exceptioncode);
   bool containedByReadOnly() const;
-
-  NodeImpl* startNode() const;
-  NodeImpl* pastEndNode() const;
 };
 
 }  // namespace
