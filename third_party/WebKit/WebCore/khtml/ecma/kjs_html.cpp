@@ -1783,7 +1783,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case AnchorTarget:
           return String(anchor.target());
         case AnchorText:
-          return String(anchor.innerHTML());
+          return String(anchor.innerText());
         case AnchorType:
           return String(anchor.type());
       }
