@@ -603,6 +603,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void removeMarker(Range range, DocumentMarker::MarkerType type);
   void addMarker(NodeImpl* node, DocumentMarker marker);
   void removeMarker(NodeImpl* node, DocumentMarker marker);
+  void removeAllMarkers(NodeImpl* node, ulong startOffset, long length);
   void removeAllMarkers(NodeImpl* node);
   void removeAllMarkers();
   void shiftMarkers(NodeImpl* node, ulong startOffset, long delta);
