@@ -120,7 +120,7 @@ const Bindings::RootObject* KJS::Bindings::rootForImp(ObjectImp* imp) {
       CFMutableDictionaryRef referencesDictionary =
           (CFMutableDictionaryRef)allValues[i];
       if (CFDictionaryGetValue(referencesDictionary, imp) != 0) {
-        rootObject = (const Bindings::RootObject*)allKeys[0];
+        rootObject = (const Bindings::RootObject*)allKeys[i];
         break;
       }
     }
