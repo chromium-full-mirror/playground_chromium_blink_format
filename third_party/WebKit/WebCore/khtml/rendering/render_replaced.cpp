@@ -58,7 +58,8 @@ void RenderReplaced::paint(QPainter* p,
                            int _tx,
                            int _ty,
                            PaintAction paintAction) {
-  if (paintAction != PaintActionForeground && paintAction != PaintActionOutline)
+  if (paintAction != PaintActionForeground &&
+      paintAction != PaintActionOutline && paintAction != PaintActionSelection)
     return;
 
   // if we're invisible or haven't received a layout yet, then just bail.
