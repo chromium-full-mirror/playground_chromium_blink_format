@@ -460,6 +460,10 @@ void RenderLayer::scrollToOffset(int x,
 #if APPLE_CHANGES
   // Move our widgets.
   m_object->updateWidgetPositions();
+
+  // Update dashboard regions, scrolling may change the clip of a
+  // particular region.
+  renderer()->canvas()->view()->updateDashboardRegions();
 #endif
 
   // Fire the scroll DOM event.

@@ -700,16 +700,7 @@ void KHTMLView::layout() {
 #endif
 
 #if APPLE_CHANGES
-  if (document->hasDashboardRegions()) {
-    QValueList<DashboardRegionValue> newRegions =
-        document->renderer()->computeDashboardRegions();
-    QValueList<DashboardRegionValue> currentRegions =
-        document->dashboardRegions();
-    if (!(newRegions == currentRegions)) {
-      document->setDashboardRegions(newRegions);
-      KWQ(m_part)->dashboardRegionsChanged(newRegions);
-    }
-  }
+  updateDashboardRegions();
 #endif
 
   if (root->needsLayout()) {
@@ -725,6 +716,22 @@ void KHTMLView::layout() {
   }
 #endif
 }
+
+#if APPLE_CHANGES
+void KHTMLView::updateDashboardRegions() {
+  DOM::DocumentImpl* document = m_part->xmlDocImpl();
+  if (document->hasDashboardRegions()) {
+    QValueList<DashboardRegionValue> newRegions =
+        document->renderer()->computeDashboardRegions();
+    QValueList<DashboardRegionValue> currentRegions =
+        document->dashboardRegions();
+    if (!(newRegions == currentRegions)) {
+      document->setDashboardRegions(newRegions);
+      KWQ(m_part)->dashboardRegionsChanged(newRegions);
+    }
+  }
+}
+#endif
 
 //
 // Event Handling

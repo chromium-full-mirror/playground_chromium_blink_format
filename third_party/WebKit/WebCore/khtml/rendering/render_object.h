@@ -114,6 +114,7 @@ class CollapsedBorderValue;
 struct DashboardRegionValue {
   QString label;
   QRect bounds;
+  QRect clip;
   int type;
 
   bool operator==(const DashboardRegionValue& o) const {
