@@ -1468,6 +1468,8 @@ void ApplyStyleCommand::applyInlineStyle(
     addInlineStyleIfNeeded(style, start.node(), end.node());
   } else {
     NodeImpl* node = start.node();
+    if (start.offset() >= start.node()->caretMaxOffset())
+      node = node->traverseNextNode();
     while (1) {
       if (node->childNodeCount() == 0 && node->renderer() &&
           node->renderer()->isInline()) {
