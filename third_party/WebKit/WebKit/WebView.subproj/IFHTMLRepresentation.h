@@ -18,10 +18,8 @@ class KHTMLPart;
 }
 
 - (KHTMLPart*)part;
-- (void)receivedData:(NSData*)data
-      withDataSource:(IFWebDataSource*)dataSource
-          isComplete:(BOOL)isComplete;
+- (void)receivedData:(NSData*)data withDataSource:(IFWebDataSource*)dataSource;
 - (void)receivedError:(IFError*)error
        withDataSource:(IFWebDataSource*)dataSource;
-
+- (void)finishedLoadingWithDataSource:(IFWebDataSource*)dataSource;
 @end

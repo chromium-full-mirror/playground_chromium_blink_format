@@ -126,15 +126,13 @@
 // Returns YES if there are any pending loads.
 - (BOOL)isLoading;
 
-/*
 #ifdef TENTATIVE_API
 // Get DOM access to the document.
-- (IFDOMDocument *)document;
+- (IFDOMDocument*)document;
 #endif
 
 // Get the source of the document by reconstructing it from the DOM.
-- (NSString *)documentTextFromDOM;
-*/
+- (NSString*)documentTextFromDOM;
 
 // Get the actual source of the document.
 - (NSString*)documentText;

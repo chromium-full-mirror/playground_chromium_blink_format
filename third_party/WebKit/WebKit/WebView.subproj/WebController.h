@@ -199,5 +199,5 @@ typedef enum {
 - (void)startAnimatedImageLooping;
 
 + (BOOL)canShowMIMEType:(NSString*)MIMEType;
-
++ (BOOL)canShowFile:(NSString*)path;
 @end
