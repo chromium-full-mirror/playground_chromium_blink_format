@@ -462,8 +462,17 @@ Value XMLHttpRequest::getStatusText() const {
   int endOfLine = responseHeaders.find("\n");
   QString firstLine =
       endOfLine == -1 ? responseHeaders : responseHeaders.left(endOfLine);
+  int codeStart = firstLine.find(" ");
+  int codeEnd = firstLine.find(" ", codeStart + 1);
 
-  return String(firstLine);
+  if (codeStart == -1 || codeEnd == -1) {
+    return Undefined();
+  }
+
+  QString statusText =
+      firstLine.mid(codeEnd + 1, endOfLine - (codeEnd + 1)).stripWhiteSpace();
+
+  return String(statusText);
 }
 
 #if APPLE_CHANGES
