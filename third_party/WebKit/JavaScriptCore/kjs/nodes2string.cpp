@@ -119,21 +119,19 @@ void ResolveNode::streamTo(SourceStream& s) const {
   s << ident;
 }
 
-void ElisionNode::streamTo(SourceStream& s) const {
-  if (elision)
-    s << elision << ",";
-  else
-    s << ",";
-}
-
 void ElementNode::streamTo(SourceStream& s) const {
+  for (int i = 0; i < elision; i++)
+    s << ",";
+  s << node;
   if (list)
-    s << list << ",";
-  s << elision << node;
+    s << "," << list;
 }
 
 void ArrayNode::streamTo(SourceStream& s) const {
-  s << "[" << element << elision << "]";
+  s << "[" << element;
+  for (int i = 0; i < elision; i++)
+    s << ",";
+  s << "]";
 }
 
 void ObjectLiteralNode::streamTo(SourceStream& s) const {
@@ -144,9 +142,9 @@ void ObjectLiteralNode::streamTo(SourceStream& s) const {
 }
 
 void PropertyValueNode::streamTo(SourceStream& s) const {
-  if (list)
-    s << list << ", ";
   s << name << ": " << assign;
+  if (list)
+    s << ", " << list;
 }
 
 void PropertyNode::streamTo(SourceStream& s) const {
@@ -165,9 +163,9 @@ void AccessorNode2::streamTo(SourceStream& s) const {
 }
 
 void ArgumentListNode::streamTo(SourceStream& s) const {
-  if (list)
-    s << list << ", ";
   s << expr;
+  if (list)
+    s << ", " << list;
 }
 
 void ArgumentsNode::streamTo(SourceStream& s) const {
@@ -369,9 +367,9 @@ void VarDeclNode::streamTo(SourceStream& s) const {
 }
 
 void VarDeclListNode::streamTo(SourceStream& s) const {
-  if (list)
-    s << list << ", ";
   s << var;
+  if (list)
+    s << ", " << list;
 }
 
 void VarStatementNode::streamTo(SourceStream& s) const {
@@ -517,11 +515,6 @@ void ParameterNode::streamTo(SourceStream& s) const {
   s << id;
   if (next)
     s << ", " << next;
-}
-
-void FunctionBodyNode::streamTo(SourceStream& s) const {
-  s << SourceStream::Endl << "{" << SourceStream::Indent << source
-    << SourceStream::Unindent << SourceStream::Endl << "}";
 }
 
 void FuncDeclNode::streamTo(SourceStream& s) const {

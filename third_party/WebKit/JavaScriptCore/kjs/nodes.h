@@ -39,6 +39,8 @@ class RegExp;
 class SourceElementsNode;
 class ProgramNode;
 class SourceStream;
+class PropertyValueNode;
+class PropertyNode;
 
 enum Operator {
   OpEqual,
@@ -213,66 +215,59 @@ class GroupNode : public Node {
   Node* group;
 };
 
-class ElisionNode : public Node {
- public:
-  ElisionNode(ElisionNode* e) : elision(e) {}
-  virtual void ref();
-  virtual bool deref();
-  Value evaluate(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
-
- private:
-  ElisionNode* elision;
-};
-
 class ElementNode : public Node {
  public:
-  ElementNode(ElisionNode* e, Node* n) : list(0L), elision(e), node(n) {}
-  ElementNode(ElementNode* l, ElisionNode* e, Node* n)
-      : list(l), elision(e), node(n) {}
+  ElementNode(int e, Node* n) : list(0L), elision(e), node(n) {}
+  ElementNode(ElementNode* l, int e, Node* n) : list(l), elision(e), node(n) {}
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  friend class ArrayNode;
   ElementNode* list;
-  ElisionNode* elision;
+  int elision;
   Node* node;
 };
 
 class ArrayNode : public Node {
  public:
-  ArrayNode(ElisionNode* e) : element(0L), elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) : element(ele), elision(0), opt(false) {}
-  ArrayNode(ElisionNode* eli, ElementNode* ele)
-      : element(ele), elision(eli), opt(true) {}
+  ArrayNode(int e) : element(0L), elision(e), opt(true) {}
+  ArrayNode(ElementNode* ele) : element(ele), elision(0), opt(false) {
+    reverseElementList();
+  }
+  ArrayNode(int eli, ElementNode* ele) : element(ele), elision(eli), opt(true) {
+    reverseElementList();
+  }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseElementList();
   ElementNode* element;
-  ElisionNode* elision;
+  int elision;
   bool opt;
 };
 
 class ObjectLiteralNode : public Node {
  public:
-  ObjectLiteralNode(Node* l) : list(l) {}
+  ObjectLiteralNode(PropertyValueNode* l) : list(l) { reverseList(); }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  Node* list;
+  void reverseList();
+  PropertyValueNode* list;
 };
 
 class PropertyValueNode : public Node {
  public:
-  PropertyValueNode(Node* n, Node* a, Node* l = 0L)
+  PropertyValueNode(PropertyNode* n, Node* a, PropertyValueNode* l = 0L)
       : name(n), assign(a), list(l) {}
   virtual void ref();
   virtual bool deref();
@@ -280,7 +275,10 @@ class PropertyValueNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  Node *name, *assign, *list;
+  friend class ObjectLiteralNode;
+  PropertyNode* name;
+  Node* assign;
+  PropertyValueNode* list;
 };
 
 class PropertyNode : public Node {
@@ -341,7 +339,7 @@ class ArgumentListNode : public Node {
 
 class ArgumentsNode : public Node {
  public:
-  ArgumentsNode(ArgumentListNode* l);
+  ArgumentsNode(ArgumentListNode* l) : list(l) { reverseList(); }
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -349,6 +347,7 @@ class ArgumentsNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseList();
   ArgumentListNode* list;
 };
 
@@ -671,7 +670,7 @@ class VarDeclNode : public Node {
 class VarDeclListNode : public Node {
  public:
   VarDeclListNode(VarDeclNode* v) : list(0L), var(v) {}
-  VarDeclListNode(Node* l, VarDeclNode* v) : list(l), var(v) {}
+  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : list(l), var(v) {}
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -679,13 +678,14 @@ class VarDeclListNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  Node* list;
+  friend class VarStatementNode;
+  VarDeclListNode* list;
   VarDeclNode* var;
 };
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclListNode* l) : list(l) {}
+  VarStatementNode(VarDeclListNode* l) : list(l) { reverseList(); }
   virtual void ref();
   virtual bool deref();
   virtual Completion execute(ExecState* exec);
@@ -693,6 +693,7 @@ class VarStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  void reverseList();
   VarDeclListNode* list;
 };
 
@@ -705,7 +706,7 @@ class BlockNode : public StatementNode {
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
- private:
+ protected:
   SourceElementsNode* source;
 };
 
@@ -1002,18 +1003,10 @@ class ParameterNode : public Node {
 };
 
 // inherited by ProgramNode
-class FunctionBodyNode : public StatementNode {
+class FunctionBodyNode : public BlockNode {
  public:
   FunctionBodyNode(SourceElementsNode* s);
-  virtual void ref();
-  virtual bool deref();
-  Completion execute(ExecState* exec);
-  virtual void processFuncDecl(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  void streamTo(SourceStream& s) const;
-
- protected:
-  SourceElementsNode* source;
+  void processFuncDecl(ExecState* exec);
 };
 
 class FuncDeclNode : public StatementNode {
@@ -1054,7 +1047,7 @@ class SourceElementNode : public StatementNode {
   virtual void ref();
   virtual bool deref();
   Completion execute(ExecState* exec);
-  virtual void processFuncDecl(ExecState* exec);
+  void processFuncDecl(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
@@ -1077,7 +1070,7 @@ class SourceElementsNode : public StatementNode {
   virtual void ref();
   virtual bool deref();
   Completion execute(ExecState* exec);
-  virtual void processFuncDecl(ExecState* exec);
+  void processFuncDecl(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
