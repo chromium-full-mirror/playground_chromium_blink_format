@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qarray.h>
+#else
+
 #include <KWQDef.h>
 
 // class QArray ================================================================
@@ -73,5 +79,7 @@ class QArray {
 
 };  // class QArray
     // =============================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif

@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qstring.h>
+#else
+
 #include "qstring.h"
 #include "qcstring.h"
 
@@ -134,5 +140,7 @@ class QTextCodec {
 
 };  // class QTextCodec
     // =========================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif

@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qstack.h>
+#else
+
 // class QStack ================================================================
 
 template <class T>
@@ -62,5 +68,7 @@ class QStack {
 
 };  // class QStack
     // =============================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif

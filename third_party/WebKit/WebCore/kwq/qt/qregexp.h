@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qregexp.h>
+#else
+
 #include "qstring.h"
 
 // class QRegExp ===============================================================
@@ -61,5 +67,7 @@ class QRegExp {
 
 };  // class QRegExp
     // ============================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif
