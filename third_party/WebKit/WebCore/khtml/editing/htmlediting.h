@@ -750,7 +750,10 @@ class ReplacementFragment {
 
   DOM::NodeImpl* mergeStartNode() const;
 
-  DOM::CSSMutableStyleDeclarationImpl* styleForNode(DOM::NodeImpl* node);
+  const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&
+  desiredStyles() {
+    return m_styles;
+  }
 
   void pruneEmptyNodes();
 
@@ -776,8 +779,6 @@ class ReplacementFragment {
   void removeUnrenderedNodesUsingTestRendering(DOM::NodeImpl*);
   int countRenderedBlocks(DOM::NodeImpl* holder);
   void removeStyleNodes();
-  void removeBlockquoteColorsIfNeeded(DOM::NodeImpl*,
-                                      DOM::CSSMutableStyleDeclarationImpl*);
 
   // A couple simple DOM helpers
   DOM::NodeImpl* enclosingBlock(DOM::NodeImpl*) const;
@@ -819,7 +820,8 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                                               DOM::NodeImpl* refChild);
 
   void updateNodesInserted(DOM::NodeImpl*);
-  void applyStyleToInsertedNodes();
+  void fixupNodeStyles(
+      const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
 
   ReplacementFragment m_fragment;
   DOM::NodeImpl* m_firstNodeInserted;
@@ -829,6 +831,12 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
   bool m_smartReplace;
   bool m_matchStyle;
 };
+
+void mapDesiredStyleForNode(
+    DOM::NodeImpl*,
+    QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
+void derefNodesAndStylesInMap(
+    const QMap<DOM::NodeImpl*, DOM::CSSMutableStyleDeclarationImpl*>&);
 
 //------------------------------------------------------------------------------------------
 // SetNodeAttributeCommand
