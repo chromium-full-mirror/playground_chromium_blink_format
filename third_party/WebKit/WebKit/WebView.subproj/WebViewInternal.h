@@ -4,7 +4,8 @@
 #import <WebKit/WebViewPrivate.h>
 
 @interface WebView (WebInternal)
-- (WebFrame*)_currentFrame;
+- (WebFrame*)_frameForCurrentSelection;
+- (WebBridge*)_bridgeForCurrentSelection;
 - (BOOL)_isLoading;
 - (void)_updateFontPanel;
 @end
