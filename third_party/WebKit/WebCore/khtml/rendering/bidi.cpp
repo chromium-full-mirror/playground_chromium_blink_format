@@ -376,9 +376,11 @@ static void addRun(BidiRun* bidiRun) {
   // Compute the number of spaces in this run,
   if (bidiRun->obj && bidiRun->obj->isText()) {
     RenderText* text = static_cast<RenderText*>(bidiRun->obj);
-    for (int i = bidiRun->start; i < bidiRun->stop; i++)
-      if (text->text()[i].unicode() == ' ')
+    for (int i = bidiRun->start; i < bidiRun->stop; i++) {
+      const QChar c = text->text()[i];
+      if (c == ' ' || c == '\n')
         numSpaces++;
+    }
   }
 }
 
@@ -752,9 +754,11 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
       if (numSpaces > 0 && r->obj->isText() && !r->compact) {
         // get the number of spaces in the run
         int spaces = 0;
-        for (int i = r->start; i < r->stop; i++)
-          if (static_cast<RenderText*>(r->obj)->text()[i].unicode() == ' ')
+        for (int i = r->start; i < r->stop; i++) {
+          const QChar c = static_cast<RenderText*>(r->obj)->text()[i];
+          if (c == ' ' || c == '\n')
             spaces++;
+        }
 
         KHTMLAssert(spaces <= numSpaces);
 
@@ -1504,8 +1508,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
   // be skipped.
   while (!start.atEnd() &&
          (start.obj->isInlineFlow() ||
-          (start.obj->style()->whiteSpace() != PRE &&
-           (start.current() == ' ' || start.obj->isFloatingOrPositioned())))) {
+          (start.obj->style()->whiteSpace() != PRE && !start.obj->isBR() &&
+           (start.current() == ' ' || start.current() == '\n' ||
+            start.obj->isFloatingOrPositioned())))) {
     if (start.obj->isFloatingOrPositioned()) {
       RenderObject* o = start.obj;
       // add to special objects...
@@ -1696,21 +1701,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       bool appliedEndWidth = false;
 
       while (len) {
-        // XXXdwh This is wrong. Still mutating the DOM
-        // string for newlines... will fix in second stage.
-        if (!isPre && str[pos] == '\n') {
-          str[pos] = ' ';
-        }
-
         bool previousCharacterIsSpace = currentCharacterIsSpace;
-        currentCharacterIsSpace = (str[pos].unicode() == ' ');
+        const QChar c = str[pos];
+        currentCharacterIsSpace = c == ' ' || (!isPre && c == '\n');
 
         if (isPre || !currentCharacterIsSpace)
           isLineEmpty = false;
 
         bool applyWordSpacing = false;
-        if ((isPre && str[pos] == '\n') ||
-            (!isPre && isBreakable(str, pos, strlen))) {
+        if ((isPre && c == '\n') || (!isPre && isBreakable(str, pos, strlen))) {
           if (ignoringSpaces) {
             if (!currentCharacterIsSpace) {
               // Stop ignoring spaces and begin at this
