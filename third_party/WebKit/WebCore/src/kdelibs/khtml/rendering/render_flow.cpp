@@ -275,8 +275,10 @@ void RenderFlow::layout() {
 
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
   if (childrenInline()) {
-    // ### make bidi resumeable so that we can get rid of this ugly hack
+// ### make bidi resumeable so that we can get rid of this ugly hack
+#ifndef APPLE_CHANGES
     if (!m_blockBidi)
+#endif
       layoutInlineChildren();
   } else
     layoutBlockChildren(relayoutChildren);
