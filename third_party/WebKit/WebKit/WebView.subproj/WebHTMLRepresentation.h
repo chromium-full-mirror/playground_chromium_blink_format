@@ -21,7 +21,7 @@
     @class WebHTMLRepresentation
 */
 @interface WebHTMLRepresentation
-    : NSObject<WebDocumentRepresentation, WebDocumentMarkup> {
+    : NSObject<WebDocumentRepresentation, WebDocumentDOM> {
   WebHTMLRepresentationPrivate* _private;
 }
 

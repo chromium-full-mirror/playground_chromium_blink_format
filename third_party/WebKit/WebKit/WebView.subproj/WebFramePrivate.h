@@ -9,6 +9,7 @@
 #import <WebKit/WebFrame.h>
 #import <WebKit/WebPolicyDelegatePrivate.h>
 
+@class DOMDocument;
 @class DOMElement;
 @class NSMutableURLRequest;
 @class NSURLRequest;
@@ -120,7 +121,8 @@ extern NSString* WebPageCacheDocumentViewKey;
 @interface WebFrame (WebPrivate)
 
 // API Considerations:
-- (void)loadWebArchive:(WebArchive*)webArchive;
++ (WebFrame*)frameForDOMDocument:(DOMDocument*)document;
+- (void)loadArchive:(WebArchive*)webArchive;
 
 // Other private methods
 - (NSURLRequest*)_webDataRequestForData:(NSData*)data
