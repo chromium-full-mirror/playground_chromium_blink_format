@@ -10,13 +10,13 @@
 @class WebController;
 @class WebDataSource;
 @class WebFrame;
-@class WebNetscapePlugin;
+@class WebNetscapePluginPackage;
 @class WebNetscapePluginNullEventSender;
 
 @interface WebBaseNetscapePluginView : NSView {
   WebNetscapePluginNullEventSender* eventSender;
 
-  WebNetscapePlugin* plugin;
+  WebNetscapePluginPackage* plugin;
 
   int mode;
 
@@ -69,8 +69,8 @@
 
 - (void)setUpWindowAndPort;
 
-- (WebNetscapePlugin*)plugin;
-- (void)setPlugin:(WebNetscapePlugin*)thePlugin;
+- (WebNetscapePluginPackage*)plugin;
+- (void)setPlugin:(WebNetscapePluginPackage*)thePlugin;
 - (void)setMIMEType:(NSString*)theMIMEType;
 - (void)setBaseURL:(NSURL*)theBaseURL;
 - (void)setArguments:(NSDictionary*)theArguments;
