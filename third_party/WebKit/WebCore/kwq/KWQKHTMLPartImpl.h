@@ -126,6 +126,8 @@ class KWQKHTMLPartImpl : public QObject {
   static NSView* nextKeyViewForWidget(QWidget* startingPoint,
                                       KWQSelectionDirection);
 
+  static WebCoreBridge* bridgeForWidget(QWidget*);
+
   // Incoming calls, used by the bridge.
 
   DOM::DocumentImpl* document();
@@ -141,6 +143,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
+  static DOM::NodeImpl* nodeForWidget(QWidget*);
+  static KWQKHTMLPartImpl* partForNode(DOM::NodeImpl*);
 
   KHTMLPart* part;
   KHTMLPartPrivate* d;
