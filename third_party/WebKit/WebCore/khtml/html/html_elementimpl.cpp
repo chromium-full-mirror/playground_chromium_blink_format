@@ -125,14 +125,18 @@ void HTMLElementImpl::removeMappedAttributeDecl(MappedAttributeEntry entryType,
 }
 
 void HTMLElementImpl::invalidateStyleAttribute() {
-  setStyleAttributeValid(false);
+  m_isStyleAttributeValid = false;
 }
 
-void HTMLElementImpl::updateStyleAttribute() {
-  // we need to say teh attribute is valid before setting it to avoid the
-  // possibility of an infinite loop
-  setStyleAttributeValid(true);
-  setAttribute(ATTR_STYLE, getInlineStyleDecl()->cssText());
+void HTMLElementImpl::updateStyleAttributeIfNeeded() const {
+  if (!m_isStyleAttributeValid) {
+    m_isStyleAttributeValid = true;
+    m_synchronizingStyleAttribute = true;
+    if (m_inlineStyleDecl)
+      const_cast<HTMLElementImpl*>(this)->setAttribute(
+          ATTR_STYLE, m_inlineStyleDecl->cssText());
+    m_synchronizingStyleAttribute = false;
+  }
 }
 
 HTMLAttributeImpl::~HTMLAttributeImpl() {
@@ -224,14 +228,12 @@ void HTMLNamedAttrMapImpl::parseClassAttribute(const DOMString& classStr) {
 
 HTMLElementImpl::HTMLElementImpl(DocumentPtr* doc) : ElementImpl(doc) {
   m_inlineStyleDecl = 0;
+  m_isStyleAttributeValid = true;
+  m_synchronizingStyleAttribute = false;
 }
 
 HTMLElementImpl::~HTMLElementImpl() {
-  if (m_inlineStyleDecl) {
-    m_inlineStyleDecl->setNode(0);
-    m_inlineStyleDecl->setParent(0);
-    m_inlineStyleDecl->deref();
-  }
+  destroyInlineStyleDecl();
 }
 
 AttributeImpl* HTMLElementImpl::createAttribute(NodeImpl::Id id,
@@ -286,6 +288,15 @@ void HTMLElementImpl::createInlineStyleDecl() {
   m_inlineStyleDecl->setParent(getDocument()->elementSheet());
   m_inlineStyleDecl->setNode(this);
   m_inlineStyleDecl->setStrictParsing(!getDocument()->inCompatMode());
+}
+
+void HTMLElementImpl::destroyInlineStyleDecl() {
+  if (m_inlineStyleDecl) {
+    m_inlineStyleDecl->setNode(0);
+    m_inlineStyleDecl->setParent(0);
+    m_inlineStyleDecl->deref();
+    m_inlineStyleDecl = 0;
+  }
 }
 
 NodeImpl* HTMLElementImpl::cloneNode(bool deep) {
@@ -352,6 +363,9 @@ bool HTMLElementImpl::mapToEntry(NodeImpl::Id attr,
     case ATTR_DIR:
       result = eUniversal;
       return false;
+    case ATTR_STYLE:
+      result = eNone;
+      return !m_synchronizingStyleAttribute;
     default:
       break;
   }
@@ -396,8 +410,12 @@ void HTMLElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       setContentEditable(attr);
       break;
     case ATTR_STYLE:
-      setHasStyle();
-      getInlineStyleDecl()->parseDeclaration(attr->value());
+      setHasStyle(!attr->isNull());
+      if (attr->isNull())
+        destroyInlineStyleDecl();
+      else
+        getInlineStyleDecl()->parseDeclaration(attr->value());
+      m_isStyleAttributeValid = true;
       setChanged();
       break;
     case ATTR_TABINDEX:

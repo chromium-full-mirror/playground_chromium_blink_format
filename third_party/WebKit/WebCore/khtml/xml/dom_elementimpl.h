@@ -225,18 +225,14 @@ class ElementImpl : public NodeBaseImpl {
   virtual void createAttributeMap() const;
   DOMString openTagStartToString() const;
 
-  bool isStyleAttributeValid() const { return m_isStyleAttributeValid; }
-  void setStyleAttributeValid(bool valid) { m_isStyleAttributeValid = valid; }
-
  private:
   void updateId(const AtomicString& oldId, const AtomicString& newId);
 
-  void updateStyleAttributeIfNeeded() const;
+  virtual void updateStyleAttributeIfNeeded() const {};
 
  protected:  // member variables
   mutable NamedAttrMapImpl* namedAttrMap;
   DOMStringImpl* m_prefix;
-  bool m_isStyleAttributeValid;
 };
 
 class XMLElementImpl : public ElementImpl {
