@@ -4122,7 +4122,13 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
   }
   // resize ?
   else if (propertyName == lengthPropertyName) {
-    long newLen = value.toInteger(exec);
+    unsigned newLen;
+    bool converted = value.toUInt32(newLen);
+
+    if (!converted) {
+      return;
+    }
+
     long diff = element.length() - newLen;
 
     if (diff < 0) {  // add dummy elements
