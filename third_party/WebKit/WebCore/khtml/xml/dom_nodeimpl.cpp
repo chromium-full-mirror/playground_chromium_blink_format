@@ -2054,7 +2054,8 @@ void NodeBaseImpl::setFocus(bool received) {
   NodeImpl::setFocus(received);
 
   if (received && isEditableBlock() && !hasChildNodes()) {
-    getDocument()->part()->setSelection(Position(this, 0));
+    getDocument()->part()->setSelection(
+        Selection(Position(this, 0), DOWNSTREAM));
   }
 
   // note that we need to recalc the style

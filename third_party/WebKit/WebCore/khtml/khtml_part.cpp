@@ -2327,7 +2327,8 @@ bool KHTMLPart::findTextNext(const QString& str,
         d->m_view->setContentsPos(x - 50, y - 50);
         Position p1(d->m_findNode, d->m_findPos);
         Position p2(d->m_findNode, d->m_findPos + matchLen);
-        setSelection(Selection(p1, p2));
+        setSelection(Selection(p1, khtml::DOWNSTREAM, p2,
+                               khtml::SEL_PREFER_UPSTREAM_AFFINITY));
         return true;
       }
     }
@@ -4451,8 +4452,7 @@ void KHTMLPart::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
     Position pos(innerNode.handle()->renderer()->positionForCoordinates(
         x, y, &affinity));
     if (pos.isNotNull()) {
-      selection.moveTo(pos);
-      selection.setAffinity(affinity);
+      selection.moveTo(pos, affinity);
       selection.expandUsingGranularity(WORD);
     }
   }
@@ -4489,8 +4489,7 @@ void KHTMLPart::handleMousePressEventTripleClick(
     Position pos(innerNode.handle()->renderer()->positionForCoordinates(
         event->x(), event->y(), &affinity));
     if (pos.isNotNull()) {
-      selection.moveTo(pos);
-      selection.setAffinity(affinity);
+      selection.moveTo(pos, affinity);
       selection.expandUsingGranularity(PARAGRAPH);
     }
   }
@@ -4542,9 +4541,9 @@ void KHTMLPart::handleMousePressEventSingleClick(
         short before = RangeImpl::compareBoundaryPoints(
             pos.node(), pos.offset(), start.node(), start.offset());
         if (before <= 0) {
-          sel.setBaseAndExtent(pos, sel.end());
+          sel.setBaseAndExtent(pos, affinity, sel.end(), sel.endAffinity());
         } else {
-          sel.setBaseAndExtent(start, pos);
+          sel.setBaseAndExtent(start, sel.startAffinity(), pos, affinity);
         }
 
         if (d->m_selectionGranularity != CHARACTER) {
@@ -4552,8 +4551,7 @@ void KHTMLPart::handleMousePressEventSingleClick(
         }
         d->m_beganSelectingText = true;
       } else {
-        sel = pos;
-        sel.setAffinity(affinity);
+        sel = Selection(pos, affinity);
         d->m_selectionGranularity = CHARACTER;
       }
     }
@@ -4765,11 +4763,10 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   sel.clearModifyBias();
   if (!d->m_beganSelectingText) {
     d->m_beganSelectingText = true;
-    sel.moveTo(pos);
-    sel.setAffinity(affinity);
+    sel.moveTo(pos, affinity);
   }
 
-  sel.setExtent(pos);
+  sel.setExtent(pos, affinity);
   if (d->m_selectionGranularity != CHARACTER) {
     sel.expandUsingGranularity(d->m_selectionGranularity);
   }
@@ -4842,8 +4839,7 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
       EAffinity affinity;
       Position pos = node->renderer()->positionForCoordinates(
           event->x(), event->y(), &affinity);
-      selection.moveTo(pos);
-      selection.setAffinity(affinity);
+      selection.moveTo(pos, affinity);
     }
     setSelection(selection);
   }
@@ -4997,7 +4993,8 @@ void KHTMLPart::selectAll() {
     return;
   NodeImpl* de = d->m_doc->documentElement();
   int n = de ? de->childNodeCount() : 0;
-  setSelection(Selection(VisiblePosition(de, 0), VisiblePosition(de, n)));
+  setSelection(Selection(VisiblePosition(de, 0, khtml::DOWNSTREAM),
+                         VisiblePosition(de, n, khtml::DOWNSTREAM)));
 }
 
 bool KHTMLPart::shouldBeginEditing(const Range& range) const {
@@ -5354,7 +5351,10 @@ void KHTMLPart::computeAndSetTypingStyle(CSSStyleDeclarationImpl* style,
     mutableStyle->ref();
   }
 
-  NodeImpl* node = VisiblePosition(selection().start()).deepEquivalent().node();
+  NodeImpl* node =
+      VisiblePosition(selection().start(), selection().startAffinity())
+          .deepEquivalent()
+          .node();
   CSSComputedStyleDeclarationImpl computedStyle(node);
   computedStyle.diff(mutableStyle);
 
@@ -5553,7 +5553,7 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   // for the style check downstream. There may be a block placeholder in this
   // block
   // which has been styled, and we want to use that for the style calculation.
-  VisiblePosition visiblePos(pos);
+  VisiblePosition visiblePos(pos, d->m_selection.startAffinity());
   if (isFirstVisiblePositionInBlock(visiblePos) &&
       isLastVisiblePositionInBlock(visiblePos))
     pos = pos.downstream(StayInBlock);

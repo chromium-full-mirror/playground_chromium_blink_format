@@ -30,11 +30,14 @@
 #include "htmltags.h"
 #include "misc/helper.h"
 #include "rendering/render_text.h"
+#include "rendering/render_block.h"
 #include "visible_position.h"
 #include "visible_text.h"
 #include "xml/dom_docimpl.h"
+#include "xml/dom_elementimpl.h"
 
 using DOM::DocumentImpl;
+using DOM::ElementImpl;
 using DOM::NodeImpl;
 using DOM::Position;
 using DOM::Range;
@@ -117,7 +120,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     }
   }
 
-  return VisiblePosition(pos, UPSTREAM);
+  return VisiblePosition(pos, DOWNSTREAM, VisiblePosition::INIT_UP);
 }
 
 static VisiblePosition nextBoundary(const VisiblePosition& c,
@@ -188,7 +191,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     pos = Position(charIt.range().endContainer().handle(),
                    charIt.range().endOffset());
   }
-  return VisiblePosition(pos, UPSTREAM);
+  return VisiblePosition(pos, UPSTREAM, VisiblePosition::INIT_UP);
 }
 
 // ---------
@@ -285,7 +288,7 @@ VisiblePosition startOfLine(const VisiblePosition& c, EAffinity affinity) {
     InlineTextBox* startTextBox = static_cast<InlineTextBox*>(startBox);
     startOffset = startTextBox->m_start;
   }
-  return VisiblePosition(startNode, startOffset);
+  return VisiblePosition(startNode, startOffset, affinity);
 }
 
 VisiblePosition endOfLine(const VisiblePosition& c,
@@ -317,7 +320,7 @@ VisiblePosition endOfLine(const VisiblePosition& c,
     InlineTextBox* endTextBox = static_cast<InlineTextBox*>(endBox);
     endOffset = endTextBox->m_start + endTextBox->m_len;
   }
-  return VisiblePosition(endNode, endOffset);
+  return VisiblePosition(endNode, endOffset, affinity);
 }
 
 bool inSameLine(const VisiblePosition& a,
@@ -340,7 +343,67 @@ VisiblePosition previousLinePosition(const VisiblePosition& c,
                                      int x) {
   Position p =
       affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
-  return VisiblePosition(p.previousLinePosition(x, affinity));
+  NodeImpl* node = p.node();
+  if (!node)
+    return VisiblePosition();
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return VisiblePosition();
+
+  RenderBlock* containingBlock = 0;
+  RootInlineBox* root = 0;
+  InlineBox* box = renderer->inlineBox(p.offset(), affinity);
+  if (box) {
+    root = box->root()->prevRootBox();
+    if (root)
+      containingBlock = renderer->containingBlock();
+  }
+
+  if (!root) {
+    // This containing editable block does not have a previous line.
+    // Need to move back to previous containing editable block in this root
+    // editable
+    // block and find the last root line box in that block.
+    NodeImpl* startBlock = node->enclosingBlockFlowElement();
+    NodeImpl* n = node->previousEditable();
+    while (n && startBlock == n->enclosingBlockFlowElement())
+      n = n->previousEditable();
+    while (n) {
+      if (!n->inSameRootEditableElement(node))
+        break;
+      Position pos(n, n->caretMinOffset());
+      if (pos.inRenderedContent()) {
+        assert(n->renderer());
+        box = n->renderer()->inlineBox(n->caretMaxOffset());
+        if (box) {
+          // previous root line box found
+          root = box->root();
+          containingBlock = n->renderer()->containingBlock();
+          break;
+        }
+
+        return VisiblePosition(pos, UPSTREAM);
+      }
+      n = n->previousEditable();
+    }
+  }
+
+  if (root) {
+    int absx, absy;
+    containingBlock->absolutePosition(absx, absy);
+    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    EAffinity posAffinity;
+    Position pos = renderer->positionForCoordinates(
+        x, absy + root->topOverflow(), &posAffinity);
+    return VisiblePosition(pos, posAffinity);
+  }
+
+  // Could not find a previous line. This means we must already be on the first
+  // line.
+  // Move to the start of the content in this block, which effectively moves us
+  // to the start of the line we're on.
+  return VisiblePosition(node->rootEditableElement(), 0, UPSTREAM);
 }
 
 VisiblePosition nextLinePosition(const VisiblePosition& c,
@@ -348,7 +411,68 @@ VisiblePosition nextLinePosition(const VisiblePosition& c,
                                  int x) {
   Position p =
       affinity == UPSTREAM ? c.deepEquivalent() : c.downstreamDeepEquivalent();
-  return VisiblePosition(p.nextLinePosition(x, affinity));
+  NodeImpl* node = p.node();
+  if (!node)
+    return VisiblePosition();
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return VisiblePosition();
+
+  RenderBlock* containingBlock = 0;
+  RootInlineBox* root = 0;
+  InlineBox* box = renderer->inlineBox(p.offset(), affinity);
+  if (box) {
+    root = box->root()->nextRootBox();
+    if (root)
+      containingBlock = renderer->containingBlock();
+  }
+
+  if (!root) {
+    // This containing editable block does not have a next line.
+    // Need to move forward to next containing editable block in this root
+    // editable
+    // block and find the first root line box in that block.
+    NodeImpl* startBlock = node->enclosingBlockFlowElement();
+    NodeImpl* n = node->nextEditable();
+    while (n && startBlock == n->enclosingBlockFlowElement())
+      n = n->nextEditable();
+    while (n) {
+      if (!n->inSameRootEditableElement(node))
+        break;
+      Position pos(n, n->caretMinOffset());
+      if (pos.inRenderedContent()) {
+        assert(n->renderer());
+        box = n->renderer()->inlineBox(n->caretMinOffset());
+        if (box) {
+          // next root line box found
+          root = box->root();
+          containingBlock = n->renderer()->containingBlock();
+          break;
+        }
+
+        return VisiblePosition(pos, UPSTREAM);
+      }
+      n = n->nextEditable();
+    }
+  }
+
+  if (root) {
+    int absx, absy;
+    containingBlock->absolutePosition(absx, absy);
+    RenderObject* renderer = root->closestLeafChildForXPos(x, absx)->object();
+    EAffinity posAffinity;
+    Position pos = renderer->positionForCoordinates(
+        x, absy + root->topOverflow(), &posAffinity);
+    return VisiblePosition(pos, posAffinity);
+  }
+
+  // Could not find a next line. This means we must already be on the last line.
+  // Move to the end of the content in this block, which effectively moves us
+  // to the end of the line we're on.
+  ElementImpl* rootElement = node->rootEditableElement();
+  return VisiblePosition(
+      rootElement, rootElement ? rootElement->childNodeCount() : 0, affinity);
 }
 
 // ---------
@@ -426,7 +550,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
           i = kMax(0L, o);
         while (--i >= 0)
           if (text[i] == '\n')
-            return VisiblePosition(n, i + 1);
+            return VisiblePosition(n, i + 1, DOWNSTREAM);
       }
       node = n;
       offset = 0;
@@ -436,7 +560,7 @@ VisiblePosition startOfParagraph(const VisiblePosition& c) {
     }
   }
 
-  return VisiblePosition(node, offset);
+  return VisiblePosition(node, offset, DOWNSTREAM);
 }
 
 VisiblePosition endOfParagraph(const VisiblePosition& c,
@@ -464,17 +588,17 @@ VisiblePosition endOfParagraph(const VisiblePosition& c,
       continue;
     if (r->isBR()) {
       if (includeLineBreak)
-        return VisiblePosition(n, 1);
+        return VisiblePosition(n, 1, UPSTREAM);
       break;
     }
     if (r->isBlockFlow()) {
       if (includeLineBreak)
-        return VisiblePosition(n, 0);
+        return VisiblePosition(n, 0, UPSTREAM);
       break;
     }
     if (r->isText()) {
       if (includeLineBreak && !n->isAncestor(startBlock))
-        return VisiblePosition(n, 0);
+        return VisiblePosition(n, 0, UPSTREAM);
       long length = static_cast<RenderText*>(r)->length();
       if (style->whiteSpace() == PRE) {
         QChar* text = static_cast<RenderText*>(r)->text();
@@ -483,7 +607,7 @@ VisiblePosition endOfParagraph(const VisiblePosition& c,
           o = offset;
         for (long i = o; i < length; ++i)
           if (text[i] == '\n')
-            return VisiblePosition(n, i + includeLineBreak);
+            return VisiblePosition(n, i + includeLineBreak, UPSTREAM);
       }
       node = n;
       offset = length;
@@ -495,7 +619,7 @@ VisiblePosition endOfParagraph(const VisiblePosition& c,
     }
   }
 
-  return VisiblePosition(node, offset);
+  return VisiblePosition(node, offset, UPSTREAM);
 }
 
 bool inSameParagraph(const VisiblePosition& a, const VisiblePosition& b) {
@@ -511,26 +635,28 @@ bool isEndOfParagraph(const VisiblePosition& pos) {
 }
 
 VisiblePosition previousParagraphPosition(const VisiblePosition& p,
-                                          EAffinity affinity,
+                                          EAffinity a,
                                           int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = previousLinePosition(pos, affinity, x);
-    if (n.isNull() || n == pos)
+    VisiblePosition n = previousLinePosition(pos, a, x);
+    if (n.isNull() || n == pos) {
       return p;
+    }
     pos = n;
   } while (inSameParagraph(p, pos));
   return pos;
 }
 
 VisiblePosition nextParagraphPosition(const VisiblePosition& p,
-                                      EAffinity affinity,
+                                      EAffinity a,
                                       int x) {
   VisiblePosition pos = p;
   do {
-    VisiblePosition n = nextLinePosition(pos, affinity, x);
-    if (n.isNull() || n == pos)
+    VisiblePosition n = nextLinePosition(pos, a, x);
+    if (n.isNull() || n == pos) {
       return p;
+    }
     pos = n;
   } while (inSameParagraph(p, pos));
   return pos;
@@ -543,7 +669,8 @@ VisiblePosition startOfBlock(const VisiblePosition& c) {
   NodeImpl* startNode = p.node();
   if (!startNode)
     return VisiblePosition();
-  return VisiblePosition(Position(startNode->enclosingBlockFlowElement(), 0));
+  return VisiblePosition(Position(startNode->enclosingBlockFlowElement(), 0),
+                         DOWNSTREAM);
 }
 
 // written, but not yet tested
@@ -570,12 +697,12 @@ VisiblePosition endOfBlock(const VisiblePosition& c,
       continue;
     if (r->isBlockFlow()) {
       if (includeLineBreak)
-        return VisiblePosition(n, 0);
+        return VisiblePosition(n, 0, DOWNSTREAM);
       break;
     }
     if (r->isText()) {
       if (includeLineBreak && !n->isAncestor(startBlock))
-        return VisiblePosition(n, 0);
+        return VisiblePosition(n, 0, DOWNSTREAM);
       node = n;
       offset = static_cast<RenderText*>(r)->length();
     } else if (r->isReplaced()) {
@@ -586,7 +713,7 @@ VisiblePosition endOfBlock(const VisiblePosition& c,
     }
   }
 
-  return VisiblePosition(node, offset);
+  return VisiblePosition(node, offset, DOWNSTREAM);
 }
 
 bool inSameBlock(const VisiblePosition& a, const VisiblePosition& b) {
@@ -613,7 +740,7 @@ VisiblePosition startOfDocument(const VisiblePosition& c) {
   if (!doc)
     return VisiblePosition();
 
-  return VisiblePosition(doc->documentElement(), 0);
+  return VisiblePosition(doc->documentElement(), 0, DOWNSTREAM);
 }
 
 VisiblePosition endOfDocument(const VisiblePosition& c) {
@@ -630,7 +757,7 @@ VisiblePosition endOfDocument(const VisiblePosition& c) {
   if (!node)
     return VisiblePosition();
 
-  return VisiblePosition(docElem, docElem->childNodeCount());
+  return VisiblePosition(docElem, docElem->childNodeCount(), DOWNSTREAM);
 }
 
 bool inSameDocument(const VisiblePosition& a, const VisiblePosition& b) {
