@@ -122,3 +122,20 @@ void WebKitLog(unsigned int level,
 
 #define WEBKITDEBUG(format...) \
   WEBKITDEBUGLEVEL(WEBKIT_LOG_GENERIC_DEBUG, format)
+
+#define IF_MALLOC_TESTING
+#ifdef IF_MALLOC_TESTING
+#ifdef __cplusplus
+extern "C" {
+void setupDebugMalloc(void);
+void clearDebugMalloc(void);
+void resetDebugMallocCounters(void);
+void printDebugMallocCounters(void);
+}
+#else
+void setupDebugMalloc(void);
+void clearDebugMalloc(void);
+void resetDebugMallocCounters(void);
+void printDebugMallocCounters(void);
+#endif
+#endif

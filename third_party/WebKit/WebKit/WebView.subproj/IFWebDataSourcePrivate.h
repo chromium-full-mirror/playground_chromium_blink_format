@@ -11,6 +11,7 @@
 
 #import <WebFoundation/WebFoundation.h>
 
+#import <WebKit/IFLocationChangeHandler.h>
 #import <WebKit/IFWebDataSource.h>
 
 // includes from kde
@@ -54,6 +55,9 @@
   bool stopping;
 
   NSString* pageTitle;
+
+  // The location change handler for this data source.
+  id<IFLocationChangeHandler> locationChangeHandler;
 }
 
 - init;
@@ -76,4 +80,7 @@
 - (double)_loadingStartedTime;
 - (void)_setTitle:(NSString*)title;
 - (void)_setFinalURL:(NSURL*)url;
+
+- (id<IFLocationChangeHandler>)_locationChangeHandler;
+- (void)_setLocationChangeHandler:(id<IFLocationChangeHandler>)l;
 @end
