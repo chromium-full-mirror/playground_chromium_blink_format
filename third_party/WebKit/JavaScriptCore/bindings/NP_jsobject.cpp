@@ -51,12 +51,14 @@ NPClass* NPScriptObjectClass = javascriptClass;
 
 Identifier identiferFromNPIdentifier(NPIdentifier ident) {
   const NPUTF8* name = NPN_UTF8FromIdentifier(ident);
-  NPString* string = NPN_CreateStringWithUTF8(name, strlen(name));
-  NPUTF16* methodName = NPN_UTF16FromString(string);
-  int32_t length = NPN_StringLength(string);
-  NPN_ReleaseObject(string);
-  Identifier identifier((const KJS::UChar*)methodName, length);
+  NPUTF16* methodName;
+  unsigned int UTF16Length;
+
+  convertUTF8ToUTF16(name, -1, &methodName,
+                     &UTF16Length);  // requires free() of returned memory.
+  Identifier identifier((const KJS::UChar*)methodName, UTF16Length);
   free((void*)methodName);
+
   return identifier;
 }
 
@@ -67,33 +69,34 @@ void NPN_Call(NPScriptObject* o,
               NPScriptResultFunctionPtr resultCallback,
               void* resultContext) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
+  NPVariant resultVariant;
 
   // Lookup the function object.
   ExecState* exec = obj->root->interpreter()->globalExec();
   Interpreter::lock();
-
   Value func = obj->imp->get(exec, identiferFromNPIdentifier(ident));
   Interpreter::unlock();
+
   if (func.isNull()) {
-    resultCallback(NPN_GetNull(), resultContext);
-    return;
+    NPN_InitializeVariantAsNull(&resultVariant);
   } else if (func.type() == UndefinedType) {
-    resultCallback(NPN_GetUndefined(), resultContext);
-    return;
+    NPN_InitializeVariantAsUndefined(&resultVariant);
+  } else {
+    // Call the function object.
+    ObjectImp* funcImp = static_cast<ObjectImp*>(func.imp());
+    Object thisObj = Object(const_cast<ObjectImp*>(obj->imp));
+    List argList = listFromNPArray(exec, args, argCount);
+    Interpreter::lock();
+    Value result = funcImp->call(exec, thisObj, argList);
+    Interpreter::unlock();
+
+    // Convert and return the result of the function call.
+    convertValueToNPVariant(exec, result, &resultVariant);
   }
 
-  // Call the function object.
-  ObjectImp* funcImp = static_cast<ObjectImp*>(func.imp());
-  Object thisObj = Object(const_cast<ObjectImp*>(obj->imp));
-  List argList = listFromNPArray(exec, args, argCount);
-  Interpreter::lock();
-  Value result = funcImp->call(exec, thisObj, argList);
-  Interpreter::unlock();
+  resultCallback(&resultVariant, resultContext);
 
-  // Convert and return the result of the function call.
-  NPObject* npresult = convertValueToNPValueType(exec, result);
-
-  resultCallback(npresult, resultContext);
+  NPN_ReleaseVariantValue(&resultVariant);
 }
 
 void NPN_Evaluate(NPScriptObject* o,
@@ -101,21 +104,29 @@ void NPN_Evaluate(NPScriptObject* o,
                   NPScriptResultFunctionPtr resultCallback,
                   void* resultContext) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
+  NPVariant resultVariant;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
   Object thisObj = Object(const_cast<ObjectImp*>(obj->imp));
+
   Interpreter::lock();
-  NPUTF16* script = NPN_UTF16FromString(s);
-  int32_t length = NPN_StringLength(s);
-  KJS::Value result = obj->root->interpreter()
-                          ->evaluate(UString((const UChar*)script, length))
-                          .value();
+  NPUTF16* scriptString;
+  unsigned int UTF16Length;
+  convertNPStringToUTF16(s, &scriptString,
+                         &UTF16Length);  // requires free() of returned memory.
+  KJS::Value result =
+      obj->root->interpreter()
+          ->evaluate(UString((const UChar*)scriptString, UTF16Length))
+          .value();
   Interpreter::unlock();
-  free((void*)script);
 
-  NPObject* npresult = convertValueToNPValueType(exec, result);
+  free((void*)scriptString);
 
-  resultCallback(npresult, resultContext);
+  convertValueToNPVariant(exec, result, &resultVariant);
+
+  resultCallback(&resultVariant, resultContext);
+
+  NPN_ReleaseVariantValue(&resultVariant);
 }
 
 void NPN_GetProperty(NPScriptObject* o,
@@ -123,26 +134,29 @@ void NPN_GetProperty(NPScriptObject* o,
                      NPScriptResultFunctionPtr resultCallback,
                      void* resultContext) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
+  NPVariant resultVariant;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
   Interpreter::lock();
   Value result = obj->imp->get(exec, identiferFromNPIdentifier(propertyName));
   Interpreter::unlock();
 
-  NPObject* npresult = convertValueToNPValueType(exec, result);
+  convertValueToNPVariant(exec, result, &resultVariant);
 
-  resultCallback(npresult, resultContext);
+  resultCallback(&resultVariant, resultContext);
+
+  NPN_ReleaseVariantValue(&resultVariant);
 }
 
 void NPN_SetProperty(NPScriptObject* o,
                      NPIdentifier propertyName,
-                     NPObject* value) {
+                     const NPVariant* variant) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
   Interpreter::lock();
   obj->imp->put(exec, identiferFromNPIdentifier(propertyName),
-                convertNPValueTypeToValue(exec, value));
+                convertNPVariantToValue(exec, variant));
   Interpreter::unlock();
 }
 
@@ -164,11 +178,14 @@ void NPN_ToString(NPScriptObject* o,
   Object thisObj = Object(const_cast<ObjectImp*>(obj->imp));
   ExecState* exec = obj->root->interpreter()->globalExec();
 
-  NPString* value = (NPString*)coerceValueToNPString(exec, thisObj);
+  NPVariant resultVariant;
+  coerceValueToNPVariantStringType(exec, thisObj, &resultVariant);
 
   Interpreter::unlock();
 
-  resultCallback(value, resultContext);
+  resultCallback(&resultVariant, resultContext);
+
+  NPN_ReleaseVariantValue(&resultVariant);
 }
 
 void NPN_GetPropertyAtIndex(NPScriptObject* o,
@@ -182,16 +199,21 @@ void NPN_GetPropertyAtIndex(NPScriptObject* o,
   Value result = obj->imp->get(exec, (unsigned)index);
   Interpreter::unlock();
 
-  NPObject* npresult = convertValueToNPValueType(exec, result);
+  NPVariant resultVariant;
+  convertValueToNPVariant(exec, result, &resultVariant);
 
-  resultCallback(npresult, resultContext);
+  resultCallback(&resultVariant, resultContext);
+
+  NPN_ReleaseVariantValue(&resultVariant);
 }
 
-void NPN_SetPropertyAtIndex(NPScriptObject* o, unsigned index, NPObject value) {
+void NPN_SetPropertyAtIndex(NPScriptObject* o,
+                            unsigned index,
+                            const NPVariant* value) {
   JavaScriptObject* obj = (JavaScriptObject*)o;
 
   ExecState* exec = obj->root->interpreter()->globalExec();
   Interpreter::lock();
-  obj->imp->put(exec, (unsigned)index, convertNPValueTypeToValue(exec, &value));
+  obj->imp->put(exec, (unsigned)index, convertNPVariantToValue(exec, value));
   Interpreter::unlock();
 }

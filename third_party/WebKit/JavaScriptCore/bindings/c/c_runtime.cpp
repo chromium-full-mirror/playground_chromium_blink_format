@@ -42,8 +42,9 @@ Value CField::valueFromInstance(KJS::ExecState* exec,
                                 const Instance* inst) const {
   const CInstance* instance = static_cast<const CInstance*>(inst);
   NPObject* obj = instance->getObject();
-  NPObject* property = obj->_class->getProperty(obj, _fieldIdentifier);
-  Value aValue = convertNPValueTypeToValue(exec, property);
+  NPVariant property;
+  obj->_class->getProperty(obj, _fieldIdentifier, &property);
+  Value aValue = convertNPVariantToValue(exec, &property);
   return aValue;
 }
 
@@ -52,8 +53,9 @@ void CField::setValueToInstance(KJS::ExecState* exec,
                                 const KJS::Value& aValue) const {
   const CInstance* instance = static_cast<const CInstance*>(inst);
   NPObject* obj = instance->getObject();
-  NPObject* value = convertValueToNPValueType(exec, aValue);
-  obj->_class->setProperty(obj, _fieldIdentifier, value);
+  NPVariant variant;
+  convertValueToNPVariant(exec, aValue, &variant);
+  obj->_class->setProperty(obj, _fieldIdentifier, &variant);
 }
 
 // ---------------------- CArray ----------------------
