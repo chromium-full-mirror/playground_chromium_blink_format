@@ -28,11 +28,17 @@
 @class NSString;
 @class NSView;
 
-@interface WebCoreViewFactory : NSObject {
-}
+@protocol WebCorePluginInfo<NSObject>
 
-+ (WebCoreViewFactory*)sharedFactory;
-- init;
+- (NSString*)name;
+- (NSString*)filename;
+- (NSString*)pluginDescription;
+- (NSDictionary*)MIMEToExtensionsDictionary;
+- (NSDictionary*)MIMEToDescriptionDictionary;
+
+@end
+
+@protocol WebCoreViewFactory
 
 - (NSView*)viewForPluginWithURL:(NSURL*)url
                     serviceType:(NSString*)serviceType
@@ -44,14 +50,18 @@
                               baseURL:(NSURL*)URL
                            parameters:(NSDictionary*)parameters;
 
+- (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
+                                  defaultText:(NSString*)defaultText
+                                returningText:(NSString**)result;
+
 @end
 
-@protocol WebCorePluginInfo<NSObject>
+@interface WebCoreViewFactory : NSObject {
+}
 
-- (NSString*)name;
-- (NSString*)filename;
-- (NSString*)pluginDescription;
-- (NSDictionary*)MIMEToExtensionsDictionary;
-- (NSDictionary*)MIMEToDescriptionDictionary;
++ (WebCoreViewFactory*)sharedFactory;
 
+@end
+
+@interface WebCoreViewFactory (SubclassResponsibility)<WebCoreViewFactory>
 @end
