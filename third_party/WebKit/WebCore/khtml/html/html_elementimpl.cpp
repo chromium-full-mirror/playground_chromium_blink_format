@@ -745,7 +745,7 @@ DOMString HTMLElementImpl::innerHTML() const {
 }
 
 DOMString HTMLElementImpl::outerHTML() const {
-  return recursive_toHTML(true);
+  return recursive_toHTML();
 }
 
 DOMString HTMLElementImpl::innerText() const {

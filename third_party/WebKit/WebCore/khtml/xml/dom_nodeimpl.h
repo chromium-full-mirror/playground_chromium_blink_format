@@ -275,12 +275,14 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isInline() const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool onlyIncludeChildren = false,
+                           bool includeSiblings = false,
                            const DOM::RangeImpl* range = NULL,
                            QPtrList<NodeImpl>* nodes = NULL) const;
   static QString recursive_toString(const NodeImpl* startNode,
-                                    bool onlyIncludeChildren = false,
-                                    const DOM::RangeImpl* range = NULL,
-                                    QPtrList<NodeImpl>* nodes = NULL);
+                                    bool onlyIncludeChildren,
+                                    bool includeSiblings,
+                                    const DOM::RangeImpl* range,
+                                    QPtrList<NodeImpl>* nodes);
   void recursive_completeURLs(QString baseURL);
 
   virtual bool isContentEditable() const;

@@ -232,11 +232,7 @@ NodeImpl* NodeImpl::addChild(NodeImpl*) {
 }
 
 QString NodeImpl::toHTML() const {
-  NodeImpl* fc = firstChild();
-  if (fc)
-    return fc->recursive_toHTML(true);
-
-  return "";
+  return recursive_toHTML(true);
 }
 
 static QString escapeHTML(const QString& in) {
@@ -262,6 +258,7 @@ static QString escapeHTML(const QString& in) {
 
 QString NodeImpl::recursive_toString(const NodeImpl* startNode,
                                      bool onlyIncludeChildren,
+                                     bool includeSiblings,
                                      const DOM::RangeImpl* range,
                                      QPtrList<NodeImpl>* nodes)
 
@@ -269,7 +266,7 @@ QString NodeImpl::recursive_toString(const NodeImpl* startNode,
   QString me = "";
 
   for (const NodeImpl* current = startNode; current != NULL;
-       current = current->nextSibling()) {
+       current = includeSiblings ? current->nextSibling() : NULL) {
     bool include = true;
     if (onlyIncludeChildren) {
       // Don't include the HTML of this node, but include the children in the
@@ -335,7 +332,7 @@ QString NodeImpl::recursive_toString(const NodeImpl* startNode,
     if (!current->isHTMLElement() || endTag[current->id()] != FORBIDDEN) {
       // print children
       if (NodeImpl* n = current->firstChild()) {
-        me += recursive_toString(n, false, range, nodes);
+        me += recursive_toString(n, false, true, range, nodes);
       }
       // Print my ending tag
       if (include && current->nodeType() != Node::TEXT_NODE &&
@@ -352,9 +349,11 @@ QString NodeImpl::recursive_toString(const NodeImpl* startNode,
 }
 
 QString NodeImpl::recursive_toHTML(bool onlyIncludeChildren,
+                                   bool includeSiblings,
                                    const DOM::RangeImpl* range,
                                    QPtrList<NodeImpl>* nodes) const {
-  return NodeImpl::recursive_toString(this, onlyIncludeChildren, range, nodes);
+  return NodeImpl::recursive_toString(this, onlyIncludeChildren,
+                                      includeSiblings, range, nodes);
 }
 
 void NodeImpl::recursive_completeURLs(QString baseURL) {
