@@ -957,59 +957,64 @@ short RenderObject::getVerticalPosition(bool firstLine) const {
   // vertical align for table cells has a different meaning
   int vpos = 0;
   if (!isTableCell()) {
-    EVerticalAlign va = style()->verticalAlign();
-    if (va == TOP) {
-      vpos = PositionTop;
-    } else if (va == BOTTOM) {
-      vpos = PositionBottom;
-    } else if (va == LENGTH) {
-      vpos = -style()->verticalAlignLength().width(lineHeight(firstLine));
-    } else if (parent() && parent()->childrenInline()) {
-      vpos = parent()->verticalPositionHint(firstLine);
-      // don't allow elements nested inside text-top to have a different
-      // valignment.
-      if (va == BASELINE)
-        return vpos;
+    if (parent() &&
+        parent()->childrenInline()) {  // Vertical-align only has meaning for
+                                       // inline elements and table cells. -dwh
+      EVerticalAlign va = style()->verticalAlign();
+      if (va == TOP) {
+        vpos = PositionTop;
+      } else if (va == BOTTOM) {
+        vpos = PositionBottom;
+      } else if (va == LENGTH) {
+        vpos = -style()->verticalAlignLength().width(lineHeight(firstLine));
+      } else {
+        vpos = parent()->verticalPositionHint(firstLine);
+        // don't allow elements nested inside text-top to have a different
+        // valignment.
+        if (va == BASELINE)
+          return vpos;
 
-      //     if ( vpos == PositionTop )
-      //                 vpos = 0;
+        //     if ( vpos == PositionTop )
+        //                 vpos = 0;
 
-      const QFont& f = parent()->font(firstLine);
-      int fontheight = parent()->lineHeight(firstLine);
-      int fontsize = f.pixelSize();
-      int halfleading = (fontheight - fontsize) / 2;
+        const QFont& f = parent()->font(firstLine);
+        int fontheight = parent()->lineHeight(firstLine);
+        int fontsize = f.pixelSize();
+        int halfleading = (fontheight - fontsize) / 2;
 
-      if (va == SUB)
-        vpos += fontsize / 5 + 1;
-      else if (va == SUPER)
-        vpos -= fontsize / 3 + 1;
-      else if (va == TEXT_TOP) {
-        //                 qDebug( "got TEXT_TOP vertical pos hint" );
-        //                 qDebug( "parent:" );
-        //                 qDebug( "CSSLH: %d, CSS_FS: %d, basepos: %d",
-        //                 fontheight, fontsize, parent()->baselinePosition(
-        //                 firstLine ) );
-        //                 qDebug( "this:" );
-        //                 qDebug( "CSSLH: %d, CSS_FS: %d, basepos: %d",
-        //                 lineHeight( firstLine ), style()->font().pixelSize(),
-        //                 baselinePosition( firstLine ) );
-        vpos += (baselinePosition(firstLine) -
-                 parent()->baselinePosition(firstLine) + halfleading);
-      } else if (va == MIDDLE) {
+        if (va == SUB)
+          vpos += fontsize / 5 + 1;
+        else if (va == SUPER)
+          vpos -= fontsize / 3 + 1;
+        else if (va == TEXT_TOP) {
+          //                 qDebug( "got TEXT_TOP vertical pos hint" );
+          //                 qDebug( "parent:" );
+          //                 qDebug( "CSSLH: %d, CSS_FS: %d, basepos: %d",
+          //                 fontheight, fontsize, parent()->baselinePosition(
+          //                 firstLine ) );
+          //                 qDebug( "this:" );
+          //                 qDebug( "CSSLH: %d, CSS_FS: %d, basepos: %d",
+          //                 lineHeight( firstLine ),
+          //                 style()->font().pixelSize(), baselinePosition(
+          //                 firstLine ) );
+          vpos += (baselinePosition(firstLine) -
+                   parent()->baselinePosition(firstLine) + halfleading);
+        } else if (va == MIDDLE) {
 #ifdef APPLE_CHANGES
-        vpos += -(int)(QFontMetrics(f).xHeight() / 2) -
-                lineHeight(firstLine) / 2 + baselinePosition(firstLine);
+          vpos += -(int)(QFontMetrics(f).xHeight() / 2) -
+                  lineHeight(firstLine) / 2 + baselinePosition(firstLine);
 #else
-        QRect b = QFontMetrics(f).boundingRect('x');
-        vpos += -b.height() / 2 - lineHeight(firstLine) / 2 +
-                baselinePosition(firstLine);
+          QRect b = QFontMetrics(f).boundingRect('x');
+          vpos += -b.height() / 2 - lineHeight(firstLine) / 2 +
+                  baselinePosition(firstLine);
 #endif
-      } else if (va == TEXT_BOTTOM) {
-        vpos += QFontMetrics(f).descent();
-        if (!isReplaced())
-          vpos -= fontMetrics(firstLine).descent();
-      } else if (va == BASELINE_MIDDLE)
-        vpos += -lineHeight(firstLine) / 2 + baselinePosition(firstLine);
+        } else if (va == TEXT_BOTTOM) {
+          vpos += QFontMetrics(f).descent();
+          if (!isReplaced())
+            vpos -= fontMetrics(firstLine).descent();
+        } else if (va == BASELINE_MIDDLE)
+          vpos += -lineHeight(firstLine) / 2 + baselinePosition(firstLine);
+      }
     }
   }
   return vpos;
