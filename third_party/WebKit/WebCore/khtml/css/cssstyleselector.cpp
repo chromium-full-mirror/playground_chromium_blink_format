@@ -930,7 +930,11 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         }
         break;
       case CSSSelector::PseudoTarget:
-        if (e && e == e->getDocument()->getCSSTarget())
+        if (!e->getDocument()->getCSSTarget() &&  // :target matches the root
+                                                  // when no CSS target exists
+            e == e->getDocument()->documentElement())
+          return true;
+        if (e == e->getDocument()->getCSSTarget())
           return true;
         break;
       case CSSSelector::PseudoLink:
