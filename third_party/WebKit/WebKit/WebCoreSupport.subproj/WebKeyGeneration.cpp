@@ -230,6 +230,8 @@ CFStringRef signedPublicKeyAndChallengeString(unsigned keySize,
   unsigned char* spkcB64 = NULL;  // base64 encoded encodedSpkc
   unsigned spkcB64Len;
   SecAccessRef accessRef;
+  CFArrayRef acls;
+  SecACLRef acl;
   CFStringRef result = NULL;
 
   ortn = SecAccessCreate(keyDescription, NULL, &accessRef);
@@ -237,7 +239,21 @@ CFStringRef signedPublicKeyAndChallengeString(unsigned keySize,
     ERROR("***SecAccessCreate %d", ortn);
     goto errOut;
   }
-  /* Cook up a key pair, just use any old params for now */
+  ortn = SecAccessCopySelectedACLList(accessRef, CSSM_ACL_AUTHORIZATION_DECRYPT,
+                                      &acls);
+  if (ortn) {
+    ERROR("***SecAccessCopySelectedACLList %d", ortn);
+    goto errOut;
+  }
+  acl = (SecACLRef)CFArrayGetValueAtIndex(acls, 0);
+  CFRelease(acls);
+  ortn = SecACLSetSimpleContents(acl, NULL, keyDescription, NULL);
+  if (ortn) {
+    ERROR("***SecACLSetSimpleContents %d", ortn);
+    goto errOut;
+  }
+
+  // Cook up a key pair, just use any old params for now
   ortn = SecKeyCreatePair(nil,              // in default KC
                           GNR_KEY_ALG,      // normally spec'd by user
                           keySize,          // key size, ditto
