@@ -456,8 +456,11 @@ void RenderStyle::setContent(DOM::DOMStringImpl* s) {
   else
     content->clearContent();
 
+  if (!s)
+    s = new DOM::DOMStringImpl("");
   content->_content.text = s;
   content->_content.text->ref();
+
   content->_contentType = CONTENT_TEXT;
 }
 
