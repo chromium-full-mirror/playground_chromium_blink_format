@@ -66,15 +66,6 @@ class CSSStyleSheetImpl;
 class DocumentImpl;
 };
 
-#ifdef APPLE_CHANGES
-class KWQLoaderImpl;
-#ifdef __OBJC__
-@class KWQURLLoadClient;
-#else
-class KWQURLLoadClient;
-#endif
-#endif
-
 namespace khtml {
 class CachedObject;
 class Request;
@@ -384,9 +375,6 @@ class Request {
   QBuffer m_buffer;
   CachedObject* object;
   DocLoader* m_docLoader;
-#ifdef APPLE_CHANGES
-  KWQURLLoadClient* client;
-#endif
 };
 
 /**
@@ -429,9 +417,6 @@ class Loader : public QObject {
   QPtrDict<Request> m_requestsLoading;
 #ifdef HAVE_LIBJPEG
   KJPEGFormatType m_jpegloader;
-#endif
-#ifdef APPLE_CHANGES
-  KWQLoaderImpl* d;
 #endif
 };
 
