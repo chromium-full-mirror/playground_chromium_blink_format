@@ -93,9 +93,6 @@ class QWidget : public QObject, public QPaintDevice {
 
   virtual int baselinePosition() const;  // relative to the top of the widget
 
-  virtual QWidget* topLevelWidget() const;
-
-  virtual QPoint mapToGlobal(const QPoint&) const;
   virtual QPoint mapFromGlobal(const QPoint&) const;
 
   bool hasFocus() const;

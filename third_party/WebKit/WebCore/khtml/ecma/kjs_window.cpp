@@ -484,10 +484,9 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
           return retrieve(m_part->opener());
       case OuterHeight:
       case OuterWidth: {
-        if (!m_part->widget())
+        if (!m_part->view())
           return Number(0);
-        KWin::Info inf =
-            KWin::info(m_part->widget()->topLevelWidget()->winId());
+        KWin::Info inf = KWin::info(m_part->view()->topLevelWidget()->winId());
         return Number(entry->value == OuterHeight ? inf.geometry.height()
                                                   : inf.geometry.width());
       }
@@ -1465,7 +1464,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
 #else
             ||
             KMessageBox::questionYesNo(
-                window->part()->widget(), i18n("Close window?"),
+                window->part()->view(), i18n("Close window?"),
                 i18n("Confirmation Required")) == KMessageBox::Yes
 #endif
             )

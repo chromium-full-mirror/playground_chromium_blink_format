@@ -188,6 +188,11 @@ class KHTMLView : public QScrollView {
 
   void timerEvent(QTimerEvent*);
 
+#if APPLE_CHANGES
+  QWidget* topLevelWidget() const;
+  QPoint mapToGlobal(const QPoint&) const;
+#endif
+
  protected slots:
   void slotPaletteChanged();
   void slotScrollBarMoved();
