@@ -87,6 +87,9 @@ class RenderWidget : public QObject,
   }
   void deref(RenderArena* arena);
 
+  virtual SelectionState selectionState() const { return m_selectionState; }
+  virtual void setSelectionState(SelectionState s);
+
 #if APPLE_CHANGES
   void sendConsumedMouseUp(const QPoint& mousePos, int button, int state);
   virtual void updateWidgetPositions();
@@ -104,6 +107,8 @@ class RenderWidget : public QObject,
   bool m_deleteWidget;
   QWidget* m_widget;
   KHTMLView* m_view;
+
+  SelectionState m_selectionState : 3;
 };
 };
 
