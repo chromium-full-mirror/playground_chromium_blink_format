@@ -68,12 +68,13 @@ void RenderImage::setStyle(RenderStyle* _style) {
 
   setOverhangingContents(style()->height().isPercent());
   setShouldPaintBackgroundOrBorder(true);
+}
 
-  CachedObject* co = style()->contentObject();
+void RenderImage::setContentObject(CachedObject* co) {
   if (co && image != co) {
     if (image)
       image->deref(this);
-    image = static_cast<CachedImage*>(style()->contentObject());
+    image = static_cast<CachedImage*>(co);
     if (image)
       image->ref(this);
   }
@@ -449,7 +450,7 @@ void RenderImage::updateFromElement() {
   }
 
   if (new_image && new_image != image &&
-      (!style() || !style()->contentObject())) {
+      (!style() || !style()->contentData())) {
     loadEventSent = false;
     CachedImage* old_image = image;
     image = new_image;

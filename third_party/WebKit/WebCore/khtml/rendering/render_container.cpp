@@ -210,36 +210,44 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
     return;  // Generated content is already added.  No need to add more.
 
   RenderStyle* pseudo = style()->getPseudoStyle(type);
+  if (!pseudo || pseudo->display() == NONE)
+    return;  // If we have no pseudo-style or if the pseudo's display type is
+             // NONE, then we
+             // have no generated content.
 
-  if (pseudo && pseudo->display() != NONE) {
-    RenderObject* insertBefore = (type == RenderStyle::BEFORE) ? child : 0;
+  RenderObject* insertBefore = (type == RenderStyle::BEFORE) ? child : 0;
 
-    // From the CSS2 specification:
-    // User agents must ignore the following properties with :before and :after
-    // pseudo-elements: 'position', 'float', list properties, and table
-    // properties.
-    // Basically we need to ensure that no RenderLayer gets made for generated
-    // content.
-    pseudo->setPosition(STATIC);
-    pseudo->setFloating(FNONE);
-    pseudo->setOverflow(OVISIBLE);  // FIXME: Glazman's blog does this. Wacky.
-    // This property might need to be allowed if the
-    // generated content is a block.
+  // From the CSS2 specification:
+  // User agents must ignore the following properties with :before and :after
+  // pseudo-elements: 'position', 'float', list properties, and table
+  // properties.
+  // Basically we need to ensure that no RenderLayer gets made for generated
+  // content.
+  pseudo->setPosition(STATIC);
+  pseudo->setFloating(FNONE);
+  pseudo->setOverflow(OVISIBLE);  // FIXME: Glazman's blog does this. Wacky.
+  // This property might need to be allowed if the
+  // generated content is a block.
 
-    if (isInlineFlow() && pseudo->display() != INLINE)
-      // According to the CSS2 spec (the end of section 12.1), the only allowed
-      // display values for the pseudo style are NONE and INLINE.  Since we
-      // already
-      // determined that the pseudo is not display NONE, any display other than
-      // inline should be mutated to INLINE.
-      pseudo->setDisplay(INLINE);
+  if (isInlineFlow() && pseudo->display() != INLINE)
+    // According to the CSS2 spec (the end of section 12.1), the only allowed
+    // display values for the pseudo style are NONE and INLINE.  Since we
+    // already
+    // determined that the pseudo is not display NONE, any display other than
+    // inline should be mutated to INLINE.
+    pseudo->setDisplay(INLINE);
 
-    if (pseudo->contentType() == CONTENT_TEXT) {
+  // Now walk our list of generated content and create render objects for every
+  // type
+  // we encounter.
+  for (ContentData* contentData = pseudo->contentData(); contentData;
+       contentData = contentData->_nextContent) {
+    if (contentData->contentType() == CONTENT_TEXT) {
       RenderObject* po =
           RenderFlow::createFlow(0, pseudo, renderArena()); /* anonymous box */
 
       RenderText* t = new (renderArena())
-          RenderText(0 /*anonymous object */, pseudo->contentText());
+          RenderText(0 /*anonymous object */, contentData->contentText());
       t->setStyle(pseudo);
       po->addChild(t);
 
@@ -248,14 +256,15 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
       // inside the inline for e.g., first-letter styling.
       addChild(po, insertBefore);
 
-      //            kdDebug() << DOM::DOMString(pseudo->contentText()).string()
-      //            << endl;
+      //            kdDebug() <<
+      //            DOM::DOMString(contentData->contentText()).string() << endl;
 
       t->close();
       po->close();
-    } else if (pseudo->contentType() == CONTENT_OBJECT) {
-      RenderObject* po = new (renderArena()) RenderImage(0);
+    } else if (contentData->contentType() == CONTENT_OBJECT) {
+      RenderImage* po = new (renderArena()) RenderImage(0);
       po->setStyle(pseudo);
+      po->setContentObject(contentData->contentObject());
       addChild(po, insertBefore);
       po->close();
     }
