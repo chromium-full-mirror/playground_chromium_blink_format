@@ -4282,8 +4282,14 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())->deleteKeyPressed();
   } else {
-    EditCommandPtr cmd(new TypingCommand(document, DeleteKey));
-    cmd.apply();
+    Selection selection = part->selection();
+    if (selection.isCaret() &&
+        VisiblePosition(selection.start()).previous().isNull()) {
+      // do nothing for a delete key at the start of an editable element.
+    } else {
+      EditCommandPtr cmd(new TypingCommand(document, DeleteKey));
+      cmd.apply();
+    }
   }
 }
 
