@@ -378,6 +378,8 @@ Value Window::get(ExecState* exec, const UString& p) const {
         return String(UString(m_part->jsStatusBarText()));
       case Document:
         if (isSafeScript(exec)) {
+#ifndef APPLE_CHANGES
+          // FIXME: need to figure out and emulate point of this code.
           if (m_part->document().isNull()) {
             kdDebug(6070)
                 << "Document.write: adding <HTML><BODY> to create document"
@@ -386,6 +388,7 @@ Value Window::get(ExecState* exec, const UString& p) const {
             m_part->write("<HTML><BODY>");
             m_part->end();
           }
+#endif
           Value val = getDOMNode(exec, m_part->document());
           return val;
         } else
