@@ -108,6 +108,8 @@ class RenderFlow : public RenderBox {
   // the remaining width on a given line (and the height of a single line).
   virtual short offsetWidth() const;
   virtual int offsetHeight() const;
+  virtual int offsetLeft() const;
+  virtual int offsetTop() const;
 
   void insertSpecialObject(RenderObject* o);
 
