@@ -32,6 +32,9 @@
 class QPainter;
 class QRect;
 
+// Uncomment to enable INCREMENTAL_REPAINTING
+//#define INCREMENTAL_REPAINTING
+
 namespace DOM {
 class HTMLDocumentImpl;
 class DocumentImpl;
@@ -151,6 +154,10 @@ class KHTMLView : public QScrollView {
   void layout();
 
   bool inLayout() const;
+
+#ifdef INCREMENTAL_REPAINTING
+  bool needsFullRepaint() const;
+#endif
 
 #if APPLE_CHANGES
   void resetScrollBars();

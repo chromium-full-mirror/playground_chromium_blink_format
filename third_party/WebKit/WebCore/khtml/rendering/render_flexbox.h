@@ -47,6 +47,8 @@ class RenderFlexibleBox : public RenderBlock {
 
   virtual const char* renderName() const;
 
+  void placeChild(RenderObject* child, int x, int y);
+
  protected:
   bool hasMultipleLines() { return style()->boxLines() == MULTIPLE; }
   bool isVertical() { return style()->boxOrient() == VERTICAL; }

@@ -117,10 +117,6 @@ void RenderCanvas::calcMinMaxWidth() {
 void RenderCanvas::layout() {
   KHTMLAssert(!view()->inLayout());
 
-#ifdef INCREMENTAL_REPAINTING
-  QRect oldBounds(m_x, m_y, m_width, m_height);
-#endif
-
   if (m_printingMode)
     m_minWidth = m_width;
 
@@ -172,12 +168,6 @@ void RenderCanvas::layout() {
 
   layer()->setHeight(QMAX(doch, m_height));
   layer()->setWidth(QMAX(docw, m_width));
-
-#ifdef INCREMENTAL_REPAINTING
-  QRect newBounds(m_x, m_y, m_width, m_height);
-  if (oldBounds != newBounds)
-    repaint();
-#endif
 
   setNeedsLayout(false);
 }

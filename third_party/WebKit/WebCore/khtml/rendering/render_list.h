@@ -74,6 +74,8 @@ class RenderListMarker : public RenderBox {
 
   virtual bool isListMarker() const { return true; }
 
+  CachedImage* listImage() const { return m_listImage; }
+
   RenderListItem* listItem() { return m_listItem; }
   void setListItem(RenderListItem* listItem) { m_listItem = listItem; }
 
@@ -124,6 +126,8 @@ class RenderListItem : public RenderBlock {
 
   virtual void layout();
   virtual void calcMinMaxWidth();
+
+  virtual QRect getAbsoluteRepaintRect();
 
   void updateMarkerLocation();
 

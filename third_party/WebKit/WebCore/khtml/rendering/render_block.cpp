@@ -431,12 +431,10 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   }
 
 #ifdef INCREMENTAL_REPAINTING
-  // FIXME: For now, if we have dirty inline children, we just always repaint.
-  if (normalChildNeedsLayout() && childrenInline())
-    repaint();
-
   QRect oldBounds, oldFullBounds;
-  getAbsoluteRepaintRectIncludingDescendants(oldBounds, oldFullBounds);
+  bool checkForRepaint = checkForRepaintDuringLayout();
+  if (checkForRepaint)
+    getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
 #endif
 
   int oldWidth = m_width;
@@ -576,7 +574,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
 
 #ifdef INCREMENTAL_REPAINTING
   // Repaint with our new bounds if they are different from our old bounds.
-  if (!isCanvas())
+  if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
 #endif
 
@@ -1156,13 +1154,14 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       treatCompactAsBlock = false;
     }
 
-// If the child moved, we have to repaint it as well as any floating/positioned
-// descendants.  An exception is if we need a layout.  In this case, we know
-// we're going to
-// repaint ourselves (and the child) anyway.
 #ifdef INCREMENTAL_REPAINTING
-    if (!selfNeedsLayout())
-      child->repaintIfMoved(oldChildX, oldChildY);
+    // If the child moved, we have to repaint it as well as any
+    // floating/positioned
+    // descendants.  An exception is if we need a layout.  In this case, we know
+    // we're going to
+    // repaint ourselves (and the child) anyway.
+    if (!selfNeedsLayout() && checkForRepaintDuringLayout())
+      child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
 #endif
 
     child = child->nextSibling();
@@ -1234,57 +1233,56 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
 }
 
 #ifdef INCREMENTAL_REPAINTING
-void RenderBlock::getAbsoluteRepaintRectIncludingDescendants(
-    QRect& bounds,
-    QRect& fullBounds) {
+void RenderBlock::getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
+                                                        QRect& fullBounds) {
   bounds = fullBounds = getAbsoluteRepaintRect();
-  if (m_positionedObjects) {
-    RenderObject* r;
-    QPtrListIterator<RenderObject> it(*m_positionedObjects);
-    for (; (r = it.current()); ++it) {
-      QRect childRect, childFullRect;
-      r->getAbsoluteRepaintRectIncludingDescendants(childRect, childFullRect);
-      fullBounds = fullBounds.unite(childFullRect);
-    }
-  }
 
   // Include any overhanging floats (if we know we're the one to paint them).
   if (hasOverhangingFloats()) {
     FloatingObject* r;
     QPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
-      // Only repaint the object if our noPaint flag isn't set.
-      if (!r->noPaint) {
+      // Only repaint the object if our noPaint flag isn't set and if it isn't
+      // in
+      // its own layer.
+      if (!r->noPaint && !r->node->layer()) {
         QRect childRect, childFullRect;
-        r->node->getAbsoluteRepaintRectIncludingDescendants(childRect,
-                                                            childFullRect);
+        r->node->getAbsoluteRepaintRectIncludingFloats(childRect,
+                                                       childFullRect);
         fullBounds = fullBounds.unite(childFullRect);
       }
     }
   }
 }
 
-void RenderBlock::repaintPositionedAndFloatingDescendants() {
-  if (m_positionedObjects) {
-    RenderObject* r;
-    QPtrListIterator<RenderObject> it(*m_positionedObjects);
-    for (; (r = it.current()); ++it) {
-      r->repaint();
-      r->repaintPositionedAndFloatingDescendants();
-    }
-  }
-
+void RenderBlock::repaintFloatingDescendants() {
   // Repaint any overhanging floats (if we know we're the one to paint them).
   if (hasOverhangingFloats()) {
     FloatingObject* r;
     QPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
-      // Only repaint the object if our noPaint flag isn't set.
-      if (!r->noPaint) {
+      // Only repaint the object if our noPaint flag isn't set and if it isn't
+      // in
+      // its own layer.
+      if (!r->noPaint && !r->node->layer()) {
         r->node->repaint();
-        r->node->repaintPositionedAndFloatingDescendants();
+        r->node->repaintFloatingDescendants();
       }
     }
+  }
+}
+
+void RenderBlock::repaintObjectsBeforeLayout() {
+  RenderFlow::repaintObjectsBeforeLayout();
+  if (!needsLayout())
+    return;
+
+  // Walk our positioned objects.
+  if (m_positionedObjects) {
+    RenderObject* r;
+    QPtrListIterator<RenderObject> it(*m_positionedObjects);
+    for (; (r = it.current()); ++it)
+      r->repaintObjectsBeforeLayout();
   }
 }
 #endif
