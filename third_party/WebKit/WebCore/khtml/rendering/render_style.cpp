@@ -184,7 +184,8 @@ StyleInheritedData::StyleInheritedData()
       cursor_image(0),
       font(),
       color(Qt::black),
-      border_spacing(0) {}
+      horizontal_border_spacing(0),
+      vertical_border_spacing(0) {}
 
 StyleInheritedData::~StyleInheritedData() {}
 
@@ -196,12 +197,15 @@ StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
       cursor_image(o.cursor_image),
       font(o.font),
       color(o.color),
-      border_spacing(o.border_spacing) {}
+      horizontal_border_spacing(o.horizontal_border_spacing),
+      vertical_border_spacing(o.vertical_border_spacing) {}
 
 bool StyleInheritedData::operator==(const StyleInheritedData& o) const {
   return indent == o.indent && line_height == o.line_height &&
-         border_spacing == o.border_spacing && style_image == o.style_image &&
-         cursor_image == o.cursor_image && font == o.font && color == o.color;
+         style_image == o.style_image && cursor_image == o.cursor_image &&
+         font == o.font && color == o.color &&
+         horizontal_border_spacing == o.horizontal_border_spacing &&
+         vertical_border_spacing == o.vertical_border_spacing;
 
   // doesn't work because structs are not packed
   // return memcmp(this, &o, sizeof(*this))==0;
@@ -386,7 +390,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(inherited->style_image == other->inherited->style_image) ||
       !(inherited->cursor_image == other->inherited->cursor_image) ||
       !(inherited->font == other->inherited->font) ||
-      !(inherited->border_spacing == other->inherited->border_spacing) ||
+      !(inherited->horizontal_border_spacing ==
+        other->inherited->horizontal_border_spacing) ||
+      !(inherited->vertical_border_spacing ==
+        other->inherited->vertical_border_spacing) ||
       !(inherited_flags._box_direction ==
         other->inherited_flags._box_direction) ||
       !(inherited_flags._visuallyOrdered ==

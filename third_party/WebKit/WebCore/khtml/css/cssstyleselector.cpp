@@ -1811,8 +1811,22 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       break;
     }
 
-    case CSS_PROP_EMPTY_CELLS:
+    case CSS_PROP_EMPTY_CELLS: {
+      if (value->cssValueType() == CSSValue::CSS_INHERIT) {
+        if (!parentNode)
+          return;
+        style->setEmptyCells(parentStyle->emptyCells());
+        break;
+      }
+      if (!primitiveValue)
+        break;
+      int id = primitiveValue->getIdent();
+      if (id == CSS_VAL_SHOW)
+        style->setEmptyCells(SHOW);
+      else if (id == CSS_VAL_HIDE)
+        style->setEmptyCells(HIDE);
       break;
+    }
     case CSS_PROP_FLOAT: {
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         if (!parentNode)
@@ -2221,14 +2235,26 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       break;
     }
     case CSS_PROP_BORDER_SPACING: {
-      if (!primitiveValue)
-        break;
-      short spacing = 0;
-      spacing = primitiveValue->computeLength(style, paintDeviceMetrics);
-      style->setBorderSpacing(spacing);
+      if (value->cssValueType() != CSSValue::CSS_INHERIT || !parentNode)
+        return;
+      style->setHorizontalBorderSpacing(parentStyle->horizontalBorderSpacing());
+      style->setVerticalBorderSpacing(parentStyle->verticalBorderSpacing());
       break;
     }
-    // CSS2BorderSpacing
+    case CSS_PROP__KHTML_HORIZONTAL_BORDER_SPACING: {
+      if (!primitiveValue)
+        break;
+      short spacing = primitiveValue->computeLength(style, paintDeviceMetrics);
+      style->setHorizontalBorderSpacing(spacing);
+      break;
+    }
+    case CSS_PROP__KHTML_VERTICAL_BORDER_SPACING: {
+      if (!primitiveValue)
+        break;
+      short spacing = primitiveValue->computeLength(style, paintDeviceMetrics);
+      style->setVerticalBorderSpacing(spacing);
+      break;
+    }
     case CSS_PROP_CURSOR:
       // CSS2Cursor
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
