@@ -34,6 +34,8 @@
   BOOL isNull;
   int useCount;
 
+  CGImageRef cachedImageRef;
+
   id _PDFDoc;
  @public
   NSData* originalData;

@@ -4463,6 +4463,7 @@ static bool isImagePattern(const Value& value) {
 }
 
 extern "C" {
+
 extern void CGContextReplacePathWithStrokedPath(CGContextRef c);
 }
 
@@ -4715,8 +4716,6 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
         CGContextDrawShading(drawingContext, shading);
 
         CGContextRestoreGState(drawingContext);
-      } else if (isImagePattern(contextObject->_fillStyle)) {
-        // FIXME:  Implement filling patterns
       } else
         CGContextFillPath(drawingContext);
 
@@ -4747,8 +4746,6 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
         CGContextDrawShading(drawingContext, shading);
 
         CGContextRestoreGState(drawingContext);
-      } else if (isImagePattern(contextObject->_fillStyle)) {
-        // FIXME:  Implement stroking patterns
       } else
         CGContextStrokePath(drawingContext);
       renderer->setNeedsImageUpdate();
@@ -5182,7 +5179,7 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
         repetitionType = ImagePattern::RepeatY;
       else if (repetitionString == "no-repeat")
         repetitionType = ImagePattern::NoRepeat;
-      return Object(new ImagePattern(args[0], repetitionType));
+      return Object(new ImagePattern(static_cast<Image*>(o), repetitionType));
     }
   }
 
@@ -5396,12 +5393,21 @@ void Context2D::putValue(ExecState* exec,
         // CG doesn't have the notion of a setting a stroke gradient.
         ObjectImp* o = static_cast<ObjectImp*>(value.imp());
 
-        if (o->type() != ObjectType || (o->type() == ObjectType &&
-                                        !(o->inherits(&Gradient::info) ||
+        if (o->type() != ObjectType || (!(o->inherits(&Gradient::info) ||
                                           o->inherits(&ImagePattern::info)))) {
           Object err = Error::create(exec, TypeError);
           exec->setException(err);
           return;
+        }
+
+        if (isImagePattern(value)) {
+          float patternAlpha = 1;
+          ImagePattern* imagePattern = static_cast<ImagePattern*>(o);
+          CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(NULL);
+          CGContextSetStrokeColorSpace(context, patternSpace);
+          CGContextSetStrokePattern(context, imagePattern->getPattern(),
+                                    &patternAlpha);
+          CGColorSpaceRelease(patternSpace);
         }
       }
       break;
@@ -5418,13 +5424,25 @@ void Context2D::putValue(ExecState* exec,
         // CG doesn't have the notion of setting a fill gradient.
         ObjectImp* o = static_cast<ObjectImp*>(value.imp());
 
-        if (o->type() != ObjectType || (o->type() == ObjectType &&
-                                        !(o->inherits(&Gradient::info) ||
+        if (o->type() != ObjectType || (!(o->inherits(&Gradient::info) ||
                                           o->inherits(&ImagePattern::info)))) {
           Object err = Error::create(exec, TypeError);
           exec->setException(err);
           return;
         }
+
+        if (isImagePattern(value)) {
+          float patternAlpha = 1;
+          ImagePattern* imagePattern = static_cast<ImagePattern*>(o);
+          CGColorSpaceRef patternSpace = CGColorSpaceCreatePattern(NULL);
+          CGContextSetFillColorSpace(context, patternSpace);
+          CGContextSetFillPattern(context, imagePattern->getPattern(),
+                                  &patternAlpha);
+          CGColorSpaceRelease(patternSpace);
+        }
+
+        // Gradients are constructed when needed during fill and stroke
+        // operations.
       }
       break;
     }
@@ -5860,9 +5878,55 @@ const ClassInfo KJS::ImagePattern::info = {"ImagePattern", 0,
 @end
 */
 
-ImagePattern::ImagePattern(Value i, int repetitionType) {
+static void drawPattern(void* info, CGContextRef context) {
+  ImagePattern* pattern = static_cast<ImagePattern*>(info);
+  QPainter p;
+  QPixmap pixmap = pattern->pixmap();
+  float w = pixmap.width();
+  float h = pixmap.height();
+
+  // Try and draw bitmap directly
+  CGImageRef ref = pixmap.imageRef();
+  if (ref) {
+    CGContextDrawImage(context, CGRectMake(0, 0, w, h), ref);
+  } else
+    p.drawFloatPixmap(
+        0, 0, w, h, pixmap, 0.f, 0.f, w, h,
+        QPainter::compositeOperatorFromString(QString("source-over")), context);
+}
+
+CGPatternCallbacks patternCallbacks = {0, drawPattern, NULL};
+ImagePattern::ImagePattern(Image* i, int repetitionType) {
   _repetitionType = repetitionType;
-  _image = i;
+  khtml::CachedImage* ci = i->image();
+  if (ci) {
+    _pixmap = ci->pixmap();
+    float w = _pixmap.width(), rw = 0;
+    float h = _pixmap.height(), rh = 0;
+    CGRect bounds = CGRectMake(0, 0, w, h);
+
+    if (repetitionType == Repeat) {
+      rw = w;
+      rh = h;
+    } else if (repetitionType == RepeatX) {
+      rw = w;
+      rh = 0;
+    } else if (repetitionType == RepeatY) {
+      rw = 0;
+      rh = h;
+    } else if (repetitionType == NoRepeat) {
+      rw = 0;
+      rh = 0;
+    }
+
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    transform = CGAffineTransformScale(transform, 1, -1);
+    transform = CGAffineTransformTranslate(transform, 0, -h);
+
+    _patternRef = CGPatternCreate(this, bounds, transform, rw, rh,
+                                  kCGPatternTilingConstantSpacing, true,
+                                  &patternCallbacks);
+  }
 }
 
 Value ImagePattern::tryGet(ExecState* exec,
@@ -5898,7 +5962,12 @@ void ImagePattern::putValue(ExecState* exec,
                             const Value& value,
                             int /*attr*/) {}
 
-ImagePattern::~ImagePattern() {}
+ImagePattern::~ImagePattern() {
+  if (_patternRef) {
+    CGPatternRelease(_patternRef);
+    _patternRef = 0;
+  }
+}
 
 ////////////////////////////////////////////////////////////////
 
