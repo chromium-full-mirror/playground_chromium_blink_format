@@ -1,3 +1,5 @@
+#ifndef KHTML_NO_XBL
+
 #include "qstringlist.h"
 #include "qstring.h"
 #include "xbl_protohandler.h"
@@ -94,3 +96,5 @@ void XBLPrototypeHandler::appendData(const QString& ch) {
   m_handlerText += ch;
 }
 }
+
+#endif

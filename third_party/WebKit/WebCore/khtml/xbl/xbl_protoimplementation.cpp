@@ -1,3 +1,5 @@
+#ifndef KHTML_NO_XBL
+
 #include "xbl_protoimplementation.h"
 #include "xbl_protobinding.h"
 
@@ -71,3 +73,5 @@ void XBLPrototypeProperty::appendSetterText(const DOM::DOMString& text) {
   m_setter += text;
 }
 }
+
+#endif  // KHTML_NO_XBL

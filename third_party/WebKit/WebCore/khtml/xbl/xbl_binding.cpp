@@ -1,3 +1,5 @@
+#ifndef KHTML_NO_XBL
+
 #include <kurl.h>
 #include "xbl_protobinding.h"
 #include "xbl_binding.h"
@@ -172,3 +174,5 @@ void XBLBinding::setXBLDocument(const DOMString& url, XBLDocumentImpl* doc) {
       chain()->element());
 }
 }
+
+#endif  // KHTML_NO_XBL

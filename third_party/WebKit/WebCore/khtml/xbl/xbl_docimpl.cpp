@@ -1,3 +1,5 @@
+#ifndef KHTML_NO_XBL
+
 #include "xbl_docimpl.h"
 #include "xbl_tokenizer.h"
 #include "xbl_protobinding.h"
@@ -31,3 +33,5 @@ XBLPrototypeBinding* XBLDocumentImpl::prototypeBinding(
   return m_prototypeBindingTable.find(id.string());
 }
 }
+
+#endif
