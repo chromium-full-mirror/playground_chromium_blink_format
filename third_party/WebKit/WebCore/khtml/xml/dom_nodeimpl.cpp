@@ -1040,6 +1040,7 @@ bool NodeImpl::rendererIsNeeded(RenderStyle* style) {
 
 RenderObject* NodeImpl::createRenderer(RenderArena* arena, RenderStyle* style) {
   assert(false);
+  return 0;
 }
 
 //-------------------------------------------------------------------------
