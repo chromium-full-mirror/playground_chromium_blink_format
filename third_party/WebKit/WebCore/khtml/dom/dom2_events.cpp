@@ -549,12 +549,12 @@ void MutationEvent::initMutationEvent(const DOMString& typeArg,
 
 // -----------------------------------------------------------------------------
 
-KeyboardEvent::KeyboardEvent() : UIEvent() {}
+KeyboardEvent::KeyboardEvent() {}
 
 KeyboardEvent::KeyboardEvent(const KeyboardEvent& other) : UIEvent(other) {}
 
-KeyboardEvent::KeyboardEvent(const Event& other) : UIEvent() {
-  (*this) = other;
+KeyboardEvent::KeyboardEvent(const Event& other) {
+  *this = other;
 }
 
 KeyboardEvent::KeyboardEvent(KeyboardEventImpl* impl) : UIEvent(impl) {}
@@ -577,6 +577,20 @@ KeyboardEvent& KeyboardEvent::operator=(const Event& other) {
 }
 
 KeyboardEvent::~KeyboardEvent() {}
+
+DOMString KeyboardEvent::keyIdentifier() const {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  return static_cast<KeyboardEventImpl*>(impl)->keyIdentifier();
+}
+
+unsigned long KeyboardEvent::keyLocation() const {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  return static_cast<KeyboardEventImpl*>(impl)->keyLocation();
+}
 
 bool KeyboardEvent::ctrlKey() const {
   if (!impl)

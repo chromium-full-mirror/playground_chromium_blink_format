@@ -171,6 +171,29 @@ class DOMMouseEvent : public DOMUIEvent {
   }
 };
 
+class DOMKeyboardEvent : public DOMUIEvent {
+ public:
+  DOMKeyboardEvent(ExecState* exec, DOM::KeyboardEvent ke)
+      : DOMUIEvent(exec, ke) {}
+  ~DOMKeyboardEvent();
+  virtual Value tryGet(ExecState* exec, const Identifier& p) const;
+  Value getValueProperty(ExecState*, int token) const;
+  // no put - all read-only
+  virtual const ClassInfo* classInfo() const;
+  static const ClassInfo info;
+  enum {
+    KeyIdentifier,
+    KeyLocation,
+    CtrlKey,
+    ShiftKey,
+    AltKey,
+    MetaKey,
+    AltGraphKey,
+    InitKeyboardEvent
+  };
+  DOM::KeyboardEvent toKeyboardEvent() const { return event; }
+};
+
 // Constructor object MutationEvent
 class MutationEventConstructor : public DOMObject {
  public:
