@@ -322,9 +322,9 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
         }
       }
       Id parentID = parentNode()->id();
-      me += (parentID == ID_SCRIPT || parentID == ID_TEXTAREA)
-                ? str.string()
-                : escapeHTML(str.string());
+      bool dontEscape = (parentID == ID_SCRIPT || parentID == ID_TEXTAREA ||
+                         parentID == ID_STYLE);
+      me += dontEscape ? str.string() : escapeHTML(str.string());
     } else if (nodeType() != Node::DOCUMENT_NODE) {
       // If I am an element, not a text
       me += QChar('<') + nodeName().string();
@@ -348,7 +348,8 @@ QString NodeImpl::recursive_toHTMLWithOptions(bool start,
       me += n->recursive_toHTMLWithOptions(false, range, nodes);
     }
     // Print my ending tag
-    if (isNodeIncluded && nodeType() != Node::TEXT_NODE) {
+    if (isNodeIncluded && nodeType() != Node::TEXT_NODE &&
+        nodeType() != Node::DOCUMENT_NODE) {
       me += "</" + nodeName().string() + ">";
     }
   }
