@@ -20,11 +20,11 @@
 }
 
 - (id)initWithHTMLView:(WebHTMLView*)HTMLView;
-- (void)HTMLViewWillBeDeallocated;
 
 - (void)addPlugin:(NSView<WebPlugin>*)view;
 
 - (void)startAllPlugins;
 - (void)stopAllPlugins;
+- (void)destroyAllPlugins;
 
 @end
