@@ -1265,7 +1265,8 @@ void RenderBlock::paint(QPainter* p,
     if (m_firstLineBox && m_firstLineBox->topOverflow() < 0)
       yPos += m_firstLineBox->topOverflow();
 
-    if ((yPos >= _y + _h) || (_ty + h <= _y))
+    int os = 2 * maximalOutlineSize(paintAction);
+    if ((yPos >= _y + _h + os) || (_ty + h <= _y - os))
       return;
   }
 

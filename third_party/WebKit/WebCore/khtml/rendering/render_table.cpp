@@ -430,9 +430,10 @@ void RenderTable::paint(QPainter* p,
                 << ")" << endl;
 #endif
   if (!overhangingContents() && !isRelPositioned() && !isPositioned()) {
-    if ((_ty >= _y + _h) || (_ty + height() <= _y))
+    int os = 2 * maximalOutlineSize(paintAction);
+    if ((_ty >= _y + _h + os) || (_ty + height() <= _y - os))
       return;
-    if ((_tx >= _x + _w) || (_tx + width() <= _x))
+    if ((_tx >= _x + _w + os) || (_tx + width() <= _x - os))
       return;
   }
 
@@ -1415,25 +1416,26 @@ void RenderTableSection::paint(QPainter* p,
 
   // check which rows and cols are visible and only paint these
   // ### fixme: could use a binary search here
+  int os = 2 * maximalOutlineSize(paintAction);
   unsigned int startrow = 0;
   unsigned int endrow = totalRows;
   for (; startrow < totalRows; startrow++) {
-    if (ty + rowPos[startrow + 1] > y)
+    if (ty + rowPos[startrow + 1] >= y - os)
       break;
   }
   for (; endrow > 0; endrow--) {
-    if (ty + rowPos[endrow - 1] < y + h)
+    if (ty + rowPos[endrow - 1] <= y + h + os)
       break;
   }
   unsigned int startcol = 0;
   unsigned int endcol = totalCols;
   if (style()->direction() == LTR) {
     for (; startcol < totalCols; startcol++) {
-      if (tx + table()->columnPos[startcol + 1] > x)
+      if (tx + table()->columnPos[startcol + 1] >= x - os)
         break;
     }
     for (; endcol > 0; endcol--) {
-      if (tx + table()->columnPos[endcol - 1] < x + w)
+      if (tx + table()->columnPos[endcol - 1] <= x + w + os)
         break;
     }
   }
@@ -2162,8 +2164,9 @@ void RenderTableCell::paint(QPainter* p,
   _ty += m_y + _topExtra;
 
   // check if we need to do anything at all...
-  if (!overhangingContents() &&
-      ((_ty - _topExtra > _y + _h) || (_ty + m_height + _bottomExtra < _y)))
+  int os = 2 * maximalOutlineSize(paintAction);
+  if (!overhangingContents() && ((_ty - _topExtra >= _y + _h + os) ||
+                                 (_ty + m_height + _bottomExtra <= _y - os)))
     return;
 
   paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
