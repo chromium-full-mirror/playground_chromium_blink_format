@@ -97,6 +97,7 @@ class KHTMLViewPrivate {
     timerId = 0;
     repaintTimerId = 0;
     complete = false;
+    mousePressed = false;
     tooltip = 0;
   }
   ~KHTMLViewPrivate() {
@@ -139,6 +140,7 @@ class KHTMLViewPrivate {
     timerId = 0;
     repaintTimerId = 0;
     complete = false;
+    mousePressed = false;
     firstRelayout = true;
     layoutSchedulingEnabled = true;
     updateRect = QRect();
@@ -176,6 +178,7 @@ class KHTMLViewPrivate {
   bool complete;
   bool firstRelayout;
   bool layoutSchedulingEnabled;
+  bool mousePressed;
   QRect updateRect;
   KHTMLToolTip* tooltip;
 };
@@ -433,6 +436,7 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
   // kdDebug( 6000 ) << "\nmousePressEvent: x=" << xm << ", y=" << ym << endl;
 
   d->isDoubleClick = false;
+  d->mousePressed = true;
 
   DOM::NodeImpl::MouseEvent mev(_mouse->stateAfter(),
                                 DOM::NodeImpl::MousePress);
@@ -591,7 +595,10 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
 
   switch (style ? style->cursor() : CURSOR_AUTO) {
     case CURSOR_AUTO:
-      if (mev.url.length() && m_part->settings()->changeCursor())
+      if (d->mousePressed)
+        // during selection, use an IBeam no matter what we're over
+        c = KCursor::ibeamCursor();
+      else if (mev.url.length() && m_part->settings()->changeCursor())
         c = m_part->urlCursor();
       else if (mev.innerNode.nodeType() == Node::TEXT_NODE ||
                mev.innerNode.nodeType() == Node::CDATA_SECTION_NODE)
@@ -662,6 +669,8 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
 
   int xm, ym;
   viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
+
+  d->mousePressed = false;
 
   // kdDebug( 6000 ) << "\nmouseReleaseEvent: x=" << xm << ", y=" << ym << endl;
 
