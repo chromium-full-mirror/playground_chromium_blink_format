@@ -17,7 +17,7 @@
 @interface WebBaseResourceHandleDelegate : NSObject<NSURLConnectionDelegate> {
  @protected
   WebDataSource* dataSource;
-  NSURLConnection* resource;
+  NSURLConnection* connection;
   NSURLRequest* request;
  @private
   WebView* controller;
