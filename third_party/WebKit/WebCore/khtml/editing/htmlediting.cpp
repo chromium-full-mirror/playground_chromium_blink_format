@@ -1730,7 +1730,7 @@ void ApplyStyleCommand::cleanUpEmptyStyleSpans(const Position& start,
        node = node->parentNode()) {
   }
 
-  if (isEmptyStyleSpan(node->previousSibling())) {
+  if (node && isEmptyStyleSpan(node->previousSibling())) {
     removeNodePreservingChildren(node->previousSibling());
   }
 
@@ -1771,7 +1771,7 @@ void ApplyStyleCommand::cleanUpEmptyStyleSpans(const Position& start,
   for (node = end.node(); node && !node->nextSibling();
        node = node->parentNode()) {
   }
-  if (isEmptyStyleSpan(node->nextSibling())) {
+  if (node && isEmptyStyleSpan(node->nextSibling())) {
     removeNodePreservingChildren(node->nextSibling());
   }
 }
