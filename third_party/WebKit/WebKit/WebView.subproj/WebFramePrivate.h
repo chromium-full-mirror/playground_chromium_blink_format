@@ -29,6 +29,15 @@ typedef enum {
   WebFrameStateComplete = 5
 } WebFrameState;
 
+typedef enum {
+  WebFrameLoadTypeStandard,
+  WebFrameLoadTypeBack,
+  WebFrameLoadTypeForward,
+  WebFrameLoadTypeIndexedBack,
+  WebFrameLoadTypeIndexedForward,
+  WebFrameLoadTypeRefresh,
+} WebFrameLoadType;
+
 #define WebFrameStateChangedNotification @"WebFrameStateChangedNotification"
 
 #define WebPreviousFrameState @"WebPreviousFrameState"
@@ -43,6 +52,7 @@ typedef enum {
   WebController* controller;
   WebFrameState state;
   NSTimer* scheduledLayoutTimer;
+  WebFrameLoadType loadType;
 }
 
 - (void)setName:(NSString*)n;
@@ -55,6 +65,8 @@ typedef enum {
 - (WebDataSource*)dataSource;
 - (void)setProvisionalDataSource:(WebDataSource*)d;
 - (WebDataSource*)provisionalDataSource;
+- (WebFrameLoadType)loadType;
+- (void)setLoadType:(WebFrameLoadType)loadType;
 
 @end
 
