@@ -264,6 +264,8 @@ backforward list.
 - (void)_didFailProvisionalLoadWithError:(NSError*)error
                                 forFrame:(WebFrame*)frame;
 
+- (void)_willChangeValueForKey:(NSString*)key;
+- (void)_didChangeValueForKey:(NSString*)key;
 @end
 
 @interface _WebSafeForwarder : NSObject {
