@@ -65,7 +65,7 @@ RenderImage::~RenderImage() {
 void RenderImage::setStyle(RenderStyle* _style) {
   RenderReplaced::setStyle(_style);
   // init RenderObject attributes
-  setInline(style()->display() == INLINE);
+  setInline(!isPositioned() && style()->display() == INLINE);
   setOverhangingContents(style()->height().isPercent());
   setSpecialObjects(true);
 
