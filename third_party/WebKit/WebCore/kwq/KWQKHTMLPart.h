@@ -70,7 +70,8 @@ class KWQKHTMLPart : public QObject {
 
   void setBridge(WebCoreBridge* p) { _bridge = p; }
   WebCoreBridge* bridge() const { return _bridge; }
-  void setView(KHTMLView* view);
+  void setView(KHTMLView* view, bool weOwnIt);
+  void setOwnsView(bool weOwnIt) { _ownsView = weOwnIt; }
   KHTMLView* view() const;
 
   void openURL(const KURL&);
@@ -184,6 +185,7 @@ class KWQKHTMLPart : public QObject {
   KWQSignal _completedWithBool;
 
   bool _needsToSetWidgetsAside;
+  bool _ownsView;
 
   NSEvent* _currentEvent;
 
