@@ -113,6 +113,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   QString userAgent() const;
 
+  void updatePolicyBaseURL();
+
   NSView* nextKeyView(DOM::NodeImpl* startingPoint, KWQSelectionDirection);
   NSView* nextKeyViewInFrameHierarchy(DOM::NodeImpl* startingPoint,
                                       KWQSelectionDirection);
@@ -142,6 +144,8 @@ class KWQKHTMLPartImpl : public QObject {
   }
 
  private:
+  void setPolicyBaseURL(const DOM::DOMString&);
+
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
 
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,

@@ -196,6 +196,14 @@ class HTMLDocument : public Document {
    */
   void setCookie(const DOMString&);
 
+#if APPLE_CHANGES
+  /**
+   * The base URL of the top level document. This is used to determine cookie
+   * policy.
+   */
+  void setPolicyBaseURL(const DOMString&);
+#endif
+
   /**
    * Note. This method and the ones following allow a user to add to
    * or replace the structure model of a document using strings of
