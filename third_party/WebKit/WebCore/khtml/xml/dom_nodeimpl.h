@@ -129,6 +129,8 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual void setPrefix(const DOMString& _prefix, int& exceptioncode);
   void normalize();
 
+  NodeImpl* lastDescendent() const;
+
   // Other methods (not part of DOM)
   virtual bool isElementNode() const { return false; }
   virtual bool isHTMLElement() const { return false; }

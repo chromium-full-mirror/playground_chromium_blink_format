@@ -348,6 +348,7 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
     return Position();
 
   NodeImpl* block = startNode->enclosingBlockFlowElement();
+  Position lastVisible;
 
   PositionIterator it(start);
   for (; !it.atStart(); it.previous()) {
@@ -365,6 +366,8 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
 
     if (renderer->style()->visibility() != VISIBLE)
       continue;
+
+    lastVisible = it.current();
 
     if (renderer->isReplaced() || renderer->isBR()) {
       if (it.current().offset() >= renderer->caretMaxOffset())
@@ -395,7 +398,7 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
     }
   }
 
-  return it.current();
+  return lastVisible.isNotNull() ? lastVisible : *this;
 }
 
 Position Position::downstream(EStayInBlock stayInBlock) const {
@@ -405,6 +408,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
     return Position();
 
   NodeImpl* block = startNode->enclosingBlockFlowElement();
+  Position lastVisible;
 
   PositionIterator it(start);
   for (; !it.atEnd(); it.next()) {
@@ -422,6 +426,8 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
 
     if (renderer->style()->visibility() != VISIBLE)
       continue;
+
+    lastVisible = it.current();
 
     if (currentNode != startNode && renderer->isBlockFlow()) {
       if (it.current().offset() == 0) {
@@ -471,7 +477,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
     }
   }
 
-  return it.current();
+  return lastVisible.isNotNull() ? lastVisible : *this;
 }
 
 Position Position::equivalentRangeCompliantPosition() const {

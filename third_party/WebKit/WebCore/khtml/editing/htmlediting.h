@@ -719,7 +719,6 @@ class ReplacementFragment {
   DOM::NodeImpl* lastChild() const;
 
   DOM::NodeImpl* mergeStartNode() const;
-  DOM::NodeImpl* mergeEndNode() const;
 
   void pruneEmptyNodes();
 
@@ -745,6 +744,7 @@ class ReplacementFragment {
   void insertNodeBefore(DOM::NodeImpl* node, DOM::NodeImpl* refNode);
 
   EFragmentType m_type;
+  DOM::CSSMutableStyleDeclarationImpl* m_defaultStyle;
   DOM::DocumentFragmentImpl* m_fragment;
   bool m_hasInterchangeNewline;
   bool m_hasMoreThanOneBlock;
@@ -766,9 +766,21 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
 
  private:
   void completeHTMLReplacement(const DOM::Position&, const DOM::Position&);
-  void completeHTMLReplacement(DOM::NodeImpl*, DOM::NodeImpl*);
+  void completeHTMLReplacement();
+
+  void insertNodeAfterAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
+                                             DOM::NodeImpl* refChild);
+  void insertNodeAtAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
+                                          DOM::NodeImpl* refChild,
+                                          long offset);
+  void insertNodeBeforeAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
+                                              DOM::NodeImpl* refChild);
+
+  void updateNodesInserted(DOM::NodeImpl*);
 
   ReplacementFragment m_fragment;
+  DOM::NodeImpl* m_firstNodeInserted;
+  DOM::NodeImpl* m_lastNodeInserted;
   bool m_selectReplacement;
   bool m_smartReplace;
 };
