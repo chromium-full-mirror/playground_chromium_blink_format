@@ -86,6 +86,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 - (void)openURL:(NSURL*)URL;
 - (void)addData:(NSData*)data withEncoding:(NSString*)encoding;
+- (void)addData:(NSData*)data withOverrideEncoding:(CFStringEncoding)encoding;
 - (void)closeURL;
 - (void)end;
 
@@ -126,6 +127,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (void)jumpToSelection;
 
 - (void)setTextSizeMultiplier:(float)multiplier;
+
+- (CFStringEncoding)textEncoding;
 
 @end
 

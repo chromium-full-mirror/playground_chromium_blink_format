@@ -6,6 +6,7 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import <WebKit/WebDocument.h>
 
 /*
     =============================================================================
@@ -14,13 +15,11 @@
 @class WebDataSource;
 @class WebController;
 @class WebHTMLViewPrivate;
-@protocol WebDocumentLoading;
-@protocol WebDocumentDragSettings;
-@protocol WebDocumentSearching;
 
-@interface WebHTMLView : NSView<WebDocumentLoading,
+@interface WebHTMLView : NSView<WebDocumentView,
                                 WebDocumentDragSettings,
-                                WebDocumentSearching> {
+                                WebDocumentSearching,
+                                WebDocumentTextEncoding> {
  @private
   WebHTMLViewPrivate* _private;
 }

@@ -69,6 +69,7 @@ class KWQKHTMLPartImpl : public QObject {
   bool openURLInFrame(const KURL&, const KParts::URLArgs&);
 
   void slotData(NSString*,
+                bool forceEncoding,
                 const char* bytes,
                 int length,
                 bool complete = false);
