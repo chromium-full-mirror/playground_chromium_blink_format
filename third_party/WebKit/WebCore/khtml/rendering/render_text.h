@@ -285,7 +285,6 @@ class RenderText : public RenderObject {
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
 
-  short m_lineHeight;
   short m_minWidth;
   short m_maxWidth;
   short m_beginMinWidth;

@@ -303,7 +303,6 @@ void RenderText::setStyle(RenderStyle* _style) {
         (style() && style()->textTransform() != _style->textTransform());
 
     RenderObject::setStyle(_style);
-    m_lineHeight = RenderObject::lineHeight(false);
 
     if (needToTransformText) {
       DOM::DOMStringImpl* textToTransform = originalString();
@@ -434,8 +433,8 @@ FindSelectionResult RenderText::checkSelectionPointIgnoringContinuations(
   for (InlineTextBox* s = firstTextBox(); s; s = s->nextTextBox()) {
     int result;
     const Font* f = htmlFont(s == firstTextBox());
-    result =
-        s->checkSelectionPoint(_x, _y, _tx, _ty, f, this, offset, m_lineHeight);
+    result = s->checkSelectionPoint(_x, _y, _tx, _ty, f, this, offset,
+                                    lineHeight(false));
 
     //         kdDebug(6040) << "RenderText::checkSelectionPoint " << this << "
     //         line " << si << " result=" << result << " offset=" << offset <<
@@ -1250,15 +1249,12 @@ int RenderText::height() const {
   // last text box? -dwh
   int retval = 0;
   if (firstTextBox())
-    retval = lastTextBox()->m_y + m_lineHeight - firstTextBox()->m_y;
+    retval = lastTextBox()->m_y + lineHeight(false) - firstTextBox()->m_y;
   return retval;
 }
 
-short RenderText::lineHeight(bool firstLine, bool) const {
-  if (firstLine)
-    return RenderObject::lineHeight(firstLine);
-
-  return m_lineHeight;
+short RenderText::lineHeight(bool firstLine, bool isRootLineBox) const {
+  return parent()->lineHeight(firstLine, isRootLineBox);
 }
 
 short RenderText::baselinePosition(bool firstLine, bool) const {
