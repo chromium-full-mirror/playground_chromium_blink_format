@@ -53,6 +53,7 @@
 #include "css/css_stylesheetimpl.h"
 #include <stdlib.h>
 #include <qptrstack.h>
+
 #ifdef APPLE_CHANGES
 #include <KWQKCookieJar.h>
 #endif
@@ -133,7 +134,7 @@ DOMString HTMLDocumentImpl::lastModified() const {
 
 DOMString HTMLDocumentImpl::cookie() const {
 #ifdef APPLE_CHANGES
-  return KWQKCookieJar::cookie(KURL(URL()));
+  return KWQKCookieJar::cookie(URL());
 #else
   QCString replyType;
   QByteArray params, reply;
@@ -167,7 +168,7 @@ DOMString HTMLDocumentImpl::cookie() const {
 
 void HTMLDocumentImpl::setCookie(const DOMString& value) {
 #ifdef APPLE_CHANGES
-  return KWQKCookieJar::setCookie(KURL(URL()), value.string());
+  return KWQKCookieJar::setCookie(URL(), value.string());
 #else
   long windowId = view() ? view()->winId() : 0;
   QByteArray params;

@@ -23,8 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <qstring.h>
-#include <kurl.h>
+class QString;
+class KURL;
 
 class KWQKCookieJar {
  public:

@@ -37,7 +37,6 @@
 #include "java/kjavaappletwidget.h"
 #include "misc/htmltags.h"
 #include "html/html_objectimpl.h"
-#include <iostream.h>
 
 using namespace khtml;
 using namespace DOM;
@@ -56,13 +55,9 @@ RenderApplet::RenderApplet(HTMLElementImpl* applet,
   }
 
   if (context) {
-// kdDebug(6100) << "RenderApplet::RenderApplet, setting QWidget" << endl;
-#ifdef APPLE_CHANGES
-    setQWidget(new KJavaAppletWidget(args));
-#else
+    // kdDebug(6100) << "RenderApplet::RenderApplet, setting QWidget" << endl;
     setQWidget(new KJavaAppletWidget(context, _view->viewport()));
     processArguments(args);
-#endif
   }
 }
 
@@ -88,6 +83,7 @@ int RenderApplet::intrinsicHeight() const {
 
 void RenderApplet::layout() {
   // kdDebug(6100) << "RenderApplet::layout" << endl;
+
   KHTMLAssert(!layouted());
   KHTMLAssert(minMaxKnown());
 
@@ -118,8 +114,6 @@ void RenderApplet::layout() {
   setLayouted();
 }
 
-#ifndef APPLE_CHANGES
-
 void RenderApplet::processArguments(const QMap<QString, QString>& args) {
   KJavaAppletWidget* w = static_cast<KJavaAppletWidget*>(m_widget);
   KJavaApplet* applet = w ? w->applet() : 0;
@@ -143,8 +137,6 @@ void RenderApplet::processArguments(const QMap<QString, QString>& args) {
       applet->setArchives(args[QString::fromLatin1("archive")]);
   }
 }
-
-#endif  // APPLE_CHANGES
 
 RenderEmptyApplet::RenderEmptyApplet(DOM::NodeImpl* node) : RenderWidget(node) {
   // init RenderObject attributes
