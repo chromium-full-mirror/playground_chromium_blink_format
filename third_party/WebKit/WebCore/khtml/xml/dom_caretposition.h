@@ -38,7 +38,7 @@ class CaretPosition {
  public:
   CaretPosition() : m_node(0), m_offset(0) {}
   CaretPosition(NodeImpl*, long offset);
-  explicit CaretPosition(const Position&);
+  CaretPosition(const Position&);
   CaretPosition(const CaretPosition&);
   ~CaretPosition();
 
@@ -94,7 +94,17 @@ class CaretPosition {
   long m_offset;
 };
 
+enum EIncludeLineBreak {
+  DoNotIncludeLineBreak = false,
+  IncludeLineBreak = true
+};
+
 Range makeRange(const CaretPosition& start, const CaretPosition& end);
+
+CaretPosition startParagraphBoundary(const CaretPosition&);
+CaretPosition endParagraphBoundary(
+    const CaretPosition&,
+    EIncludeLineBreak includeLineBreak = DoNotIncludeLineBreak);
 
 inline bool operator==(const CaretPosition& a, const CaretPosition& b) {
   return a.node() == b.node() && a.offset() == b.offset();

@@ -4898,9 +4898,9 @@ void KHTMLPart::slotAutoScroll() {
 void KHTMLPart::selectAll() {
   if (!d->m_doc)
     return;
-  CaretPosition start(d->m_doc->documentElement(), 0);
-  CaretPosition end(d->m_doc->documentElement(),
-                    d->m_doc->documentElement()->childNodeCount());
+  NodeImpl* de = d->m_doc->documentElement();
+  CaretPosition start(de, 0);
+  CaretPosition end(de, de ? de->childNodeCount() : 0);
   Selection selection(start.deepEquivalent(), end.deepEquivalent());
   setSelection(selection);
 }

@@ -26,11 +26,11 @@
 #ifndef __dom_selection_h__
 #define __dom_selection_h__
 
-#include "xml/dom_position.h"
+#include <qrect.h>
+#include "dom_caretposition.h"
 
 class KHTMLPart;
 class QPainter;
-class QRect;
 
 namespace khtml {
 class RenderObject;
@@ -140,16 +140,16 @@ class Selection {
     m_end = end;
   }
 
-  Position modifyExtendingRightForward(ETextGranularity);
-  Position modifyMovingRightForward(ETextGranularity);
-  Position modifyExtendingLeftBackward(ETextGranularity);
-  Position modifyMovingLeftBackward(ETextGranularity);
+  CaretPosition modifyExtendingRightForward(ETextGranularity);
+  CaretPosition modifyMovingRightForward(ETextGranularity);
+  CaretPosition modifyExtendingLeftBackward(ETextGranularity);
+  CaretPosition modifyMovingLeftBackward(ETextGranularity);
 
   void layoutCaret();
   void needsCaretRepaint();
   void paintCaret(QPainter* p, const QRect& rect);
 
-  bool nodeIsBeforeNode(NodeImpl* n1, NodeImpl* n2) const;
+  static bool nodeIsBeforeNode(NodeImpl* n1, NodeImpl* n2);
   int xPosForVerticalArrowNavigation(EPositionType, bool recalc = false) const;
 
   Position m_base;    // base position for the selection
@@ -160,9 +160,7 @@ class Selection {
   EState m_state;        // the state of the selection
   EAffinity m_affinity;  // the upstream/downstream affinity of the selection
 
-  int m_caretX;  // caret coordinates, size, and position
-  int m_caretY;
-  int m_caretSize;
+  QRect m_caretRect;  // caret coordinates, size, and position
 
   bool m_baseIsStart : 1;       // true if base node is before the extent node
   bool m_needsCaretLayout : 1;  // true if the caret position needs to be
