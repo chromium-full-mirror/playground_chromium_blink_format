@@ -225,6 +225,9 @@ static unsigned endWordBoundary(const QChar* characters, unsigned length) {
 VisiblePosition endOfWord(const VisiblePosition& c, EWordSide side) {
   VisiblePosition p = c;
   if (side == LeftWordIfOnBoundary) {
+    if (isStartOfParagraph(c))
+      return c;
+
     p = c.previous();
     if (p.isNull())
       return c;
