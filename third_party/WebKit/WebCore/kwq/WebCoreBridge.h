@@ -179,6 +179,8 @@ enum FrameBorderStyle {
 + (NSString*)stringWithData:(NSData*)data
            textEncodingName:(NSString*)textEncodingName;
 
+- (BOOL)interceptKeyEvent:(NSEvent*)event toView:(NSView*)view;
+
 @end
 
 // The WebCoreBridge protocol contains methods for use by the WebCore side of

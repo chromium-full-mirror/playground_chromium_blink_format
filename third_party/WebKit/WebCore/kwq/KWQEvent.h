@@ -122,6 +122,15 @@ class QKeyEvent : public QEvent {
   int count() const;
   QString text() const;
   int ascii() const;
+
+ private:
+  int _key;
+  int _ascii;
+  ButtonState _state;
+  QString _text;
+  bool _autoRepeat;
+  int _count;
+  bool _isAccepted;
 };
 
 class QFocusEvent {
