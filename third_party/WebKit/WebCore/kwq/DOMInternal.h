@@ -52,6 +52,7 @@ class StyleSheetListImpl;
 
 @interface DOMDocument (WebCoreInternal)
 + (DOMDocument*)_documentWithImpl:(DOM::DocumentImpl*)impl;
+- (DOM::DocumentImpl*)_documentImpl;
 @end
 
 @interface DOMRange (WebCoreInternal)
