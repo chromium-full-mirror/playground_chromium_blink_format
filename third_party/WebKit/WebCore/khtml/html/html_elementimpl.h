@@ -201,9 +201,7 @@ class HTMLElementImpl : public ElementImpl {
 
   virtual void click();
 
-  virtual CSSStyleDeclarationImpl* inlineStyleDecl() const {
-    return m_inlineStyleDecl;
-  }
+  CSSStyleDeclarationImpl* inlineStyleDecl() const { return m_inlineStyleDecl; }
   virtual CSSStyleDeclarationImpl* additionalAttributeStyleDecl();
   CSSStyleDeclarationImpl* getInlineStyleDecl();
   void createInlineStyleDecl();

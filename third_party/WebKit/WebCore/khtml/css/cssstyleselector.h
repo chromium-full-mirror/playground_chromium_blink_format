@@ -113,7 +113,7 @@ class CSSStyleSelector : public StyleSelector {
 
   RenderStyle* locateSharedStyle();
   DOM::NodeImpl* locateCousinList(DOM::ElementImpl* parent);
-  bool elementsCanShareStyle(DOM::ElementImpl* e1, DOM::ElementImpl* e2);
+  bool canShareStyleWithElement(DOM::NodeImpl* n);
 
   bool strictParsing;
 
