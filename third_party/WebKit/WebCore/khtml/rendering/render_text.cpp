@@ -322,8 +322,7 @@ void InlineTextBox::paintMarker(QPainter* pt,
   int width = m_width;  // how much line to draw
   bool useWholeWidth = true;
   ulong paintStart = m_start;
-  ulong paintEnd =
-      end() + 1;  // end doesn't points at the last char, not past it
+  ulong paintEnd = end() + 1;  // end points at the last char, not past it
   if (paintStart != marker.startOffset) {
     paintStart = marker.startOffset;
     useWholeWidth = false;
@@ -331,7 +330,7 @@ void InlineTextBox::paintMarker(QPainter* pt,
         m_start, paintStart - m_start, m_firstLine);
   }
   if (paintEnd !=
-      marker.endOffset) {  // end doesn't points at the last char, not past it
+      marker.endOffset) {  // end points at the last char, not past it
     paintEnd = kMin(paintEnd, marker.endOffset);
     useWholeWidth = false;
   }
@@ -344,14 +343,10 @@ void InlineTextBox::paintMarker(QPainter* pt,
         paintStart, paintEnd - paintStart, m_firstLine);
   }
 
-  int underlineOffset = (pt->fontMetrics().height() + m_baseline) / 2;
-  if (underlineOffset <= m_baseline) {
-    underlineOffset = m_baseline + 1;
-  }
-  pt->setPen(
-      QColor(0, 255, 0));  // FIXME - use AppKit pattern-based code to draw
-  pt->drawLine(_tx + start, _ty + underlineOffset, _tx + start + width,
-               _ty + underlineOffset);
+  // AppKit uses a two-pixel offset from the baseline for the misspelling
+  // underline.
+  int underlineOffset = m_baseline + 2;
+  pt->drawLineForMisspelling(_tx + start, _ty + underlineOffset, width);
 }
 
 long InlineTextBox::caretMinOffset() const {
