@@ -13,11 +13,13 @@
 @class WebDownloadHandler;
 @class WebDataSource;
 @class WebResourceHandle;
+@class WebResourceResponse;
 @protocol WebResourceHandleDelegate;
 @protocol WebResourceProgressDelegate;
 
 @interface WebMainResourceClient : NSObject<WebResourceHandleDelegate> {
   NSURL* currentURL;
+  WebResourceResponse* response;
   WebDataSource* dataSource;
   BOOL isFirstChunk;
   BOOL suppressErrors;
