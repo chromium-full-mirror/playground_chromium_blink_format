@@ -223,6 +223,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   // Set the state the document should restore to
   void setRestoreState(const QStringList& s) { m_state = s; }
+  QStringList& restoreState() { return m_state; }
 
   KHTMLView* view() const { return m_view; }
 

@@ -131,6 +131,8 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   HTMLFormElementImpl* form() { return m_form; }
 
+  virtual DOMString type() const = 0;
+
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void attach();
   virtual void reset() {}
@@ -168,6 +170,9 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool isEditable();
 
+  virtual QString state();
+  QString findMatchingState(QStringList& states);
+
  protected:
   HTMLFormElementImpl* getForm() const;
 
@@ -187,8 +192,8 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   enum typeEnum { SUBMIT, RESET, BUTTON };
 
   virtual Id id() const;
-
   DOMString type() const;
+
   virtual void attach();
   virtual void parseAttribute(AttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
@@ -212,6 +217,7 @@ class HTMLFieldSetElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLFieldSetElementImpl();
 
   virtual Id id() const;
+  DOMString type() const;
 
   virtual void attach();
 };
@@ -263,7 +269,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool maintainsState() { return true; }
   virtual QString state();
-  virtual void restoreState(const QString&);
+  virtual void restoreState(QStringList&);
 
   void select();
   void click();
@@ -329,6 +335,7 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLLegendElementImpl();
 
   virtual Id id() const;
+  DOMString type() const;
 };
 
 // -------------------------------------------------------------------------
@@ -341,7 +348,6 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   ~HTMLSelectElementImpl();
 
   virtual Id id() const;
-
   DOMString type() const;
 
   virtual void recalcStyle(StyleChange);
@@ -369,7 +375,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool maintainsState() { return true; }
   virtual QString state();
-  virtual void restoreState(const QString&);
+  virtual void restoreState(QStringList&);
 
   virtual NodeImpl* insertBefore(NodeImpl* newChild,
                                  NodeImpl* refChild,
@@ -444,6 +450,7 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLOptGroupElementImpl();
 
   virtual Id id() const;
+  DOMString type() const;
 
   virtual NodeImpl* insertBefore(NodeImpl* newChild,
                                  NodeImpl* refChild,
@@ -468,6 +475,7 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   HTMLOptionElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
   virtual Id id() const;
+  DOMString type() const;
 
   DOMString text() const;
 
@@ -512,7 +520,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool maintainsState() { return true; }
   virtual QString state();
-  virtual void restoreState(const QString&);
+  virtual void restoreState(QStringList&);
 
   void select();
 

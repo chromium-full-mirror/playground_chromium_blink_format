@@ -964,7 +964,7 @@ QString NodeImpl::state() {
   return QString::null;
 }
 
-void NodeImpl::restoreState(const QString& /*state*/) {}
+void NodeImpl::restoreState(QStringList& /*states*/) {}
 
 void NodeImpl::insertedIntoDocument() {
   setInDocument(true);
