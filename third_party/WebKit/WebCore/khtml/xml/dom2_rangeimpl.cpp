@@ -333,7 +333,7 @@ short RangeImpl::compareBoundaryPoints(NodeImpl* containerA,
   if (c) {
     int offsetC = 0;
     NodeImpl* n = containerA->firstChild();
-    while (n != c) {
+    while (n != c && offsetC < offsetA) {
       offsetC++;
       n = n->nextSibling();
     }
@@ -351,7 +351,7 @@ short RangeImpl::compareBoundaryPoints(NodeImpl* containerA,
   if (c) {
     int offsetC = 0;
     NodeImpl* n = containerB->firstChild();
-    while (n != c) {
+    while (n != c && offsetC < offsetB) {
       offsetC++;
       n = n->nextSibling();
     }
