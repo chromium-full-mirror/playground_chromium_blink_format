@@ -23,10 +23,7 @@
 @class WebScriptObject;
 @class WebViewPrivate;
 
-// These strings are keys into the element dictionary provided in
-// the WebContextMenuDelegate's contextMenuItemsForElement and the
-// WebwebViewPolicyDelegate's clickPolicyForElement.
-
+// Element dictionary keys
 extern NSString* WebElementDOMNodeKey;         // DOMNode of the element
 extern NSString* WebElementFrameKey;           // WebFrame of the element
 extern NSString* WebElementImageAltStringKey;  // NSString of the ALT attribute
@@ -47,19 +44,19 @@ extern NSString*
     WebElementLinkLabelKey;  // NSString of the text within the anchor
 
 /*
- @discussion Notifications sent by WebView to mark the progress of loads.
- @constant WebViewProgressStartedNotification Posted whenever a load begins in
- the WebView, including
- a load that is initiated in a subframe.  After receiving this notification zero
- or more
- WebViewProgressEstimateChangedNotifications will be sent.  The userInfo will be
- nil.
- @constant WebViewProgressEstimateChangedNotification Posted whenever the value
- of
- estimatedProgress changes.  The userInfo will be nil.
- @constant WebViewProgressFinishedNotification Posted when the load for a
- WebView has finished.
- The userInfo will be nil.
+    @discussion Notifications sent by WebView to mark the progress of loads.
+    @constant WebViewProgressStartedNotification Posted whenever a load begins
+   in the WebView, including
+    a load that is initiated in a subframe.  After receiving this notification
+   zero or more
+    WebViewProgressEstimateChangedNotifications will be sent.  The userInfo will
+   be nil.
+    @constant WebViewProgressEstimateChangedNotification Posted whenever the
+   value of
+    estimatedProgress changes.  The userInfo will be nil.
+    @constant WebViewProgressFinishedNotification Posted when the load for a
+   WebView has finished.
+    The userInfo will be nil.
 */
 extern NSString* WebViewProgressStartedNotification;
 extern NSString* WebViewProgressEstimateChangedNotification;

@@ -15,16 +15,16 @@
 @class WebPolicyPrivate;
 
 /*!
-  @enum WebNavigationType
-  @abstract The type of action that triggered a possible navigation.
-  @constant WebNavigationTypeLinkClicked A link with an href was clicked.
-  @constant WebNavigationTypeFormSubmitted A form was submitted.
-  @constant WebNavigationTypeBackForward The user chose back or forward.
-  @constant WebNavigationTypeReload The User hit the reload button.
-  @constant WebNavigationTypeFormResubmitted A form was resubmitted (by virtue
-  of doing back, forward or reload).
-  @constant WebNavigationTypeOther Navigation is taking place for some other
-  reason.
+    @enum WebNavigationType
+    @abstract The type of action that triggered a possible navigation.
+    @constant WebNavigationTypeLinkClicked A link with an href was clicked.
+    @constant WebNavigationTypeFormSubmitted A form was submitted.
+    @constant WebNavigationTypeBackForward The user chose back or forward.
+    @constant WebNavigationTypeReload The User hit the reload button.
+    @constant WebNavigationTypeFormResubmitted A form was resubmitted (by virtue
+   of doing back, forward or reload).
+    @constant WebNavigationTypeOther Navigation is taking place for some other
+   reason.
 */
 
 typedef enum {
@@ -140,26 +140,26 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
                    decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
-     @method
+    @method
    webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:
-     @discussion This method is called to decide what to do with an targetted
+    @discussion This method is called to decide what to do with an targetted
    nagivation that would open a new window.
-     @param actionInformation Dictionary that describes the action that
-   triggered this navigation.
-     @param request The request for the proposed navigation
-     @param frame The frame in which the navigation is taking place
-     @param listener The object to call when the decision is made
-     @discussion This method is provided so that modified clicks on a targetted
+    @param actionInformation Dictionary that describes the action that triggered
+   this navigation.
+    @param request The request for the proposed navigation
+    @param frame The frame in which the navigation is taking place
+    @param listener The object to call when the decision is made
+    @discussion This method is provided so that modified clicks on a targetted
    link which
-     opens a new frame can prevent the new window from being opened if they
+    opens a new frame can prevent the new window from being opened if they
    decide to
-     do something else, like download or present the new frame in a specialized
+    do something else, like download or present the new frame in a specialized
    way.
 
-     <p>If this method picks a policy of Use, the new window will be
-     opened, and decidePolicyForNavigationAction:request:frame:decisionListner:
-     will be called with a WebNavigationType of WebNavigationTypeOther
-     in its action. This is to avoid possible confusion about the modifiers.
+    <p>If this method picks a policy of Use, the new window will be
+    opened, and decidePolicyForNavigationAction:request:frame:decisionListner:
+    will be called with a WebNavigationType of WebNavigationTypeOther
+    in its action. This is to avoid possible confusion about the modifiers.
 */
 - (void)webView:(WebView*)webView
     decidePolicyForNewWindowAction:(NSDictionary*)actionInformation
