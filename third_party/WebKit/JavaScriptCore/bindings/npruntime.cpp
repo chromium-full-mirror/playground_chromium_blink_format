@@ -26,8 +26,80 @@
 
 #include <NP_runtime.h>
 
+static Boolean identifierEqual(const void* value1, const void* value2) {
+  return strcmp((const char*)value1, (const char*)value2) == 0;
+}
+
+static CFHashCode identifierHash(const void* value) {
+  const char* key = (const char*)value;
+  unsigned int len = strlen(key);
+  unsigned int result = len;
+
+  if (len <= 16) {
+    unsigned cnt = len;
+    while (cnt--)
+      result = result * 257 + *(unsigned char*)key++;
+  } else {
+    unsigned cnt;
+    for (cnt = 8; cnt > 0; cnt--)
+      result = result * 257 + *(unsigned char*)key++;
+    key += (len - 16);
+    for (cnt = 8; cnt > 0; cnt--)
+      result = result * 257 + *(unsigned char*)key++;
+  }
+  result += (result << (len & 31));
+
+  return result;
+}
+
+CFDictionaryKeyCallBacks identifierCallbacks = {
+    0, NULL, NULL, NULL, identifierEqual, identifierHash};
+
+static CFMutableDictionaryRef identifierDictionary = 0;
+
+static CFMutableDictionaryRef getIdentifierDictionary() {
+  if (!identifierDictionary)
+    identifierDictionary =
+        CFDictionaryCreateMutable(NULL, 0, &identifierCallbacks, NULL);
+  return identifierDictionary;
+}
+
+#define INITIAL_IDENTIFIER_NAME_COUNT 128
+
+static const char** identifierNames = 0;
+static unsigned int maxIdentifierNames;
+static NP_Identifier identifierCount = 1;
+
 NP_Identifier NP_IdentifierFromUTF8(NP_UTF8 name) {
-  return 0;
+  NP_Identifier identifier = 0;
+
+  identifier = (NP_Identifier)CFDictionaryGetValue(getIdentifierDictionary(),
+                                                   (const void*)name);
+  if (identifier == 0) {
+    identifier = identifierCount++;
+    // We never release identifier names, so this dictionary will grow, as will
+    // the memory for the identifier name strings.
+    const char* identifierName = strdup(name);
+
+    if (!identifierNames) {
+      identifierNames = (const char**)malloc(sizeof(const char*) *
+                                             INITIAL_IDENTIFIER_NAME_COUNT);
+      maxIdentifierNames = INITIAL_IDENTIFIER_NAME_COUNT;
+    }
+
+    if (identifierCount >= maxIdentifierNames) {
+      maxIdentifierNames *= 2;
+      identifierNames = (const char**)realloc(
+          (void*)identifierNames, sizeof(const char*) * maxIdentifierNames);
+    }
+
+    identifierNames[identifier] = identifierName;
+
+    CFDictionaryAddValue(getIdentifierDictionary(), identifierName,
+                         (const void*)identifier);
+  }
+
+  return identifier;
 }
 
 void NP_GetIdentifiers(NP_UTF8* names,
@@ -35,14 +107,20 @@ void NP_GetIdentifiers(NP_UTF8* names,
                        NP_Identifier* identifiers) {}
 
 NP_UTF8 NP_UTF8FromIdentifier(NP_Identifier identifier) {
-  return NULL;
+  if (identifier == 0 || identifier >= identifierCount)
+    return NULL;
+
+  return (NP_UTF8)identifierNames[identifier];
 }
 
 NP_Object* NP_CreateObject(NP_Class* aClass) {
-  if (aClass->create != NULL)
-    return aClass->create();
+  NP_Object* obj;
 
-  NP_Object* obj = (NP_Object*)malloc(sizeof(NP_Object));
+  if (aClass->allocate != NULL)
+    obj = aClass->allocate();
+  else
+    obj = (NP_Object*)malloc(sizeof(NP_Object));
+
   obj->_class = aClass;
   obj->referenceCount = 1;
 
@@ -61,14 +139,17 @@ void NP_ReleaseObject(NP_Object* obj) {
   obj->referenceCount--;
 
   if (obj->referenceCount == 0) {
-    if (obj->_class->destroy)
-      obj->_class->destroy(obj);
+    if (obj->_class->free)
+      obj->_class->free(obj);
     else
       free(obj);
   }
 }
 
 bool NP_IsKindOfClass(NP_Object* obj, NP_Class* aClass) {
+  if (obj->_class == aClass)
+    return true;
+
   return false;
 }
 
@@ -112,28 +193,58 @@ void NP_SetPropertyAtIndex(NP_JavaScriptObject* obj,
 
 // ---------------------------------- Types ----------------------------------
 
+// ---------------------------------- NP_Number
+// ----------------------------------
+
+typedef struct {
+  NP_Object object;
+  double number;
+} NumberObject;
+
+NP_Object* numberCreate() {
+  return (NP_Object*)malloc(sizeof(NumberObject));
+}
+
+static NP_Class _numberClass = {
+    1, numberCreate, (NP_FreeInterface)free, 0, 0, 0, 0, 0, 0,
+};
+
+static NP_Class* numberClass = &_numberClass;
+
 NP_Number* NP_CreateNumberWithInt(int i) {
-  return NULL;
+  NumberObject* number = (NumberObject*)NP_CreateObject(numberClass);
+  number->number = i;
+  return (NP_Number*)number;
 }
 
 NP_Number* NP_CreateNumberWithFloat(float f) {
-  return NULL;
+  NumberObject* number = (NumberObject*)NP_CreateObject(numberClass);
+  number->number = f;
+  return (NP_Number*)number;
 }
 
 NP_Number* NP_CreateNumberWithDouble(double d) {
-  return NULL;
+  NumberObject* number = (NumberObject*)NP_CreateObject(numberClass);
+  number->number = d;
+  return (NP_Number*)number;
 }
 
 int NP_IntFromNumber(NP_Number* obj) {
-  return 0;
+  assert(NP_IsKindOfClass(obj, numberClass));
+  NumberObject* number = (NumberObject*)obj;
+  return (int)number->number;
 }
 
 float NP_FloatFromNumber(NP_Number* obj) {
-  return 0.;
+  assert(NP_IsKindOfClass(obj, numberClass));
+  NumberObject* number = (NumberObject*)obj;
+  return (float)number->number;
 }
 
 double NP_DoubleFromNumber(NP_Number* obj) {
-  return 0.;
+  assert(NP_IsKindOfClass(obj, numberClass));
+  NumberObject* number = (NumberObject*)obj;
+  return number->number;
 }
 
 NP_String* NP_CreateStringWithUTF8(NP_UTF8 utf8String) {
