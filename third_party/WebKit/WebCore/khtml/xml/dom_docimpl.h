@@ -416,8 +416,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setCSSTarget(NodeImpl* n);
   NodeImpl* getCSSTarget();
 
-  bool isDocumentChanged() { return m_docChanged; }
-  virtual void setDocumentChanged(bool);
+  void setDocumentChanged(bool);
+
   void attachNodeIterator(NodeIteratorImpl* ni);
   void detachNodeIterator(NodeIteratorImpl* ni);
   void notifyBeforeNodeRemoval(NodeImpl* n);

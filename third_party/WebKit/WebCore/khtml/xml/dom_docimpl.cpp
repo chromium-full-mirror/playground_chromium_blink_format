@@ -1090,11 +1090,9 @@ void DocumentImpl::updateDocumentsRendering() {
   if (!changedDocuments)
     return;
 
-  while (!changedDocuments->isEmpty()) {
-    changedDocuments->first();
-    DocumentImpl* it = changedDocuments->take();
-    if (it->isDocumentChanged())
-      it->updateRendering();
+  while (DocumentImpl* doc = changedDocuments->take()) {
+    doc->m_docChanged = false;
+    doc->updateRendering();
   }
 }
 
