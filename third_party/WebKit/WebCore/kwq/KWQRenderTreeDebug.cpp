@@ -379,7 +379,7 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
     return;
 
   Selection selection = doc->part()->selection();
-  if (selection.state() == Selection::NONE)
+  if (selection.isNone())
     return;
 
   if (!selection.start().node()->isContentEditable() ||
@@ -394,7 +394,7 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
 
   NodeImpl* rootNode = doc->getElementById("root");
 
-  if (selection.state() == Selection::CARET) {
+  if (selection.isCaret()) {
     Position upstream = startPosition.upstream(DOM::StayInBlock);
     Position downstream = startPosition.downstream(DOM::StayInBlock);
     QString positionString =
@@ -411,7 +411,7 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
        << "\n"
           "downstream: position "
        << downstream.offset() << " of " << downstreamString << "\n";
-  } else if (selection.state() == Selection::RANGE) {
+  } else if (selection.isRange()) {
     QString startString =
         nodePositionRelativeToRoot(startPosition.node(), rootNode);
     Position upstreamStart = startPosition.upstream(DOM::StayInBlock);

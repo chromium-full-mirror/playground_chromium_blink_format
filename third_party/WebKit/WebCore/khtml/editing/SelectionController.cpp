@@ -240,7 +240,7 @@ CaretPosition Selection::modifyMovingRightForward(
   CaretPosition pos;
   switch (granularity) {
     case CHARACTER:
-      if (state() == RANGE)
+      if (isRange())
         pos = end();
       else
         pos = CaretPosition(extent()).next();
@@ -250,11 +250,11 @@ CaretPosition Selection::modifyMovingRightForward(
       break;
     case PARAGRAPH:
       pos = nextParagraphPosition(
-          end(), xPosForVerticalArrowNavigation(END, state() == RANGE));
+          end(), xPosForVerticalArrowNavigation(END, isRange()));
       break;
     case LINE:
-      pos = nextLinePosition(
-          end(), xPosForVerticalArrowNavigation(END, state() == RANGE));
+      pos = nextLinePosition(end(),
+                             xPosForVerticalArrowNavigation(END, isRange()));
       break;
     case LINE_BOUNDARY:
       pos = selectionForLine(end()).end();
@@ -306,7 +306,7 @@ CaretPosition Selection::modifyMovingLeftBackward(
   CaretPosition pos;
   switch (granularity) {
     case CHARACTER:
-      if (state() == RANGE)
+      if (isRange())
         pos = start();
       else
         pos = CaretPosition(extent()).previous();
@@ -316,11 +316,11 @@ CaretPosition Selection::modifyMovingLeftBackward(
       break;
     case PARAGRAPH:
       pos = previousParagraphPosition(
-          start(), xPosForVerticalArrowNavigation(START, state() == RANGE));
+          start(), xPosForVerticalArrowNavigation(START, isRange()));
       break;
     case LINE:
       pos = previousLinePosition(
-          start(), xPosForVerticalArrowNavigation(START, state() == RANGE));
+          start(), xPosForVerticalArrowNavigation(START, isRange()));
       break;
     case LINE_BOUNDARY:
       pos = selectionForLine(start()).start();
@@ -360,7 +360,7 @@ bool Selection::modify(EAlter alter,
       break;
   }
 
-  if (pos.isEmpty())
+  if (pos.isNull())
     return false;
 
   switch (alter) {
@@ -405,7 +405,7 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
     case MOVE:
       pos = verticalDistance > 0 ? end() : start();
       xPos = xPosForVerticalArrowNavigation(verticalDistance > 0 ? END : START,
-                                            state() == RANGE);
+                                            isRange());
       break;
     case EXTEND:
       pos = extent();
@@ -426,7 +426,7 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
   for (CaretPosition p = pos;; p = next) {
     next = verticalDistance > 0 ? nextLinePosition(p, xPos)
                                 : previousLinePosition(p, xPos);
-    if (next.isEmpty() || next == p)
+    if (next.isNull() || next == p)
       break;
     int nextY;
     if (!caretY(next, nextY))
@@ -441,7 +441,7 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
     }
   }
 
-  if (result.isEmpty())
+  if (result.isNull())
     return false;
 
   switch (alter) {
@@ -457,9 +457,8 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
 }
 
 bool Selection::expandUsingGranularity(ETextGranularity granularity) {
-  if (state() == NONE)
+  if (isNone())
     return false;
-
   validate(granularity);
   return true;
 }
@@ -468,7 +467,7 @@ int Selection::xPosForVerticalArrowNavigation(EPositionType type,
                                               bool recalc) const {
   int x = 0;
 
-  if (state() == NONE)
+  if (isNone())
     return x;
 
   Position pos;
@@ -543,7 +542,7 @@ void Selection::setNeedsLayout(bool flag) {
 }
 
 Range Selection::toRange() const {
-  if (isEmpty())
+  if (isNone())
     return Range();
 
   // Make sure we have an updated layout since this function is called
@@ -553,7 +552,7 @@ Range Selection::toRange() const {
   start().node()->getDocument()->updateLayout();
 
   Position s, e;
-  if (state() == CARET) {
+  if (isCaret()) {
     // If the selection is a caret, move the range start upstream. This helps us
     // match
     // the conventions of text editors tested, which make style determinations
@@ -578,7 +577,7 @@ Range Selection::toRange() const {
     // On a treasure map, <b>X</b> marks the spot.
     //                       ^ selected
     //
-    ASSERT(state() == RANGE);
+    ASSERT(isRange());
     s = start().downstream();
     e = end().upstream();
     if (RangeImpl::compareBoundaryPoints(s.node(), s.offset(), e.node(),
@@ -598,7 +597,7 @@ Range Selection::toRange() const {
 }
 
 void Selection::layoutCaret() {
-  if (state() != CARET || isEmpty() || !start().node()->inDocument()) {
+  if (!isCaret() || !start().node()->inDocument()) {
     m_caretRect = QRect();
     return;
   }
@@ -628,7 +627,7 @@ QRect Selection::caretRepaintRect() const {
 }
 
 void Selection::needsCaretRepaint() {
-  if (isEmpty())
+  if (!isCaret())
     return;
 
   if (!start().node()->getDocument())
@@ -675,7 +674,7 @@ void Selection::validate(ETextGranularity granularity) {
   Position originalBase(base());
   bool baseAndExtentEqual = base() == extent();
   bool updatedLayout = false;
-  if (base().notEmpty()) {
+  if (base().isNotNull()) {
     base().node()->getDocument()->updateLayout();
     updatedLayout = true;
     assignBase(
@@ -683,7 +682,7 @@ void Selection::validate(ETextGranularity granularity) {
     if (baseAndExtentEqual)
       assignExtent(base());
   }
-  if (extent().notEmpty() && !baseAndExtentEqual) {
+  if (extent().isNotNull() && !baseAndExtentEqual) {
     if (!updatedLayout)
       extent().node()->getDocument()->updateLayout();
     assignExtent(
@@ -691,13 +690,13 @@ void Selection::validate(ETextGranularity granularity) {
   }
 
   // Make sure we do not have a dangling start or end
-  if (base().isEmpty() && extent().isEmpty()) {
+  if (base().isNull() && extent().isNull()) {
     // Move the position to the enclosingBlockFlowElement of the original base,
     // if possible.
     // This has the effect of flashing the caret somewhere when a rendered
     // position for
     // the base and extent cannot be found.
-    if (originalBase.notEmpty()) {
+    if (originalBase.isNotNull()) {
       Position pos(originalBase.node()->enclosingBlockFlowElement(), 0);
       assignBaseAndExtent(pos, pos);
       assignStartAndEnd(pos, pos);
@@ -708,10 +707,10 @@ void Selection::validate(ETextGranularity granularity) {
       assignStartAndEnd(emptyPosition(), emptyPosition());
     }
     m_baseIsStart = true;
-  } else if (base().isEmpty()) {
+  } else if (base().isNull()) {
     assignBase(extent());
     m_baseIsStart = true;
-  } else if (extent().isEmpty()) {
+  } else if (extent().isNull()) {
     assignExtent(base());
     m_baseIsStart = true;
   } else {
@@ -742,11 +741,11 @@ void Selection::validate(ETextGranularity granularity) {
       Selection baseSelection = *this;
       Selection extentSelection = *this;
       Selection baseLine = selectionForLine(base());
-      if (baseLine.notEmpty()) {
+      if (baseLine.isCaretOrRange()) {
         baseSelection = baseLine;
       }
       Selection extentLine = selectionForLine(extent());
-      if (extentLine.notEmpty()) {
+      if (extentLine.isCaretOrRange()) {
         extentSelection = extentLine;
       }
       if (m_baseIsStart) {
@@ -786,7 +785,7 @@ void Selection::validate(ETextGranularity granularity) {
   }
 
   // adjust the state
-  if (start().isEmpty() && end().isEmpty()) {
+  if (start().isNull() && end().isNull()) {
     m_state = NONE;
   } else if (start() == end() ||
              start().upstream(StayInBlock) == end().upstream(StayInBlock)) {
@@ -821,7 +820,7 @@ static Position startOfFirstRunAt(RenderObject* renderNode, int y) {
     }
 
     Position position = startOfFirstRunAt(n->firstChild(), y);
-    if (position.notEmpty())
+    if (position.isNotNull())
       return position;
   }
 
@@ -837,7 +836,7 @@ static Position endOfLastRunAt(RenderObject* renderNode, int y) {
 
   while (1) {
     Position position = endOfLastRunAt(n->firstChild(), y);
-    if (position.notEmpty())
+    if (position.isNotNull())
       return position;
 
     if (n->isText()) {
@@ -887,13 +886,13 @@ static Selection selectionForLine(const Position& position) {
   // Look for all the first child in the block that is on the same line
   // as the selection point.
   Position start = startOfFirstRunAt(renderNode, selectionPointY);
-  if (start.isEmpty())
+  if (start.isNull())
     return Selection();
 
   // Look for all the last child in the block that is on the same line
   // as the selection point.
   Position end = endOfLastRunAt(renderNode, selectionPointY);
-  if (end.isEmpty())
+  if (end.isNull())
     return Selection();
 
   return Selection(start, end);
@@ -1067,8 +1066,8 @@ void Selection::formatForDebugger(char* buffer, unsigned length) const {
   DOMString result;
   DOMString s;
 
-  if (isEmpty()) {
-    result = "<empty>";
+  if (isNone()) {
+    result = "<none>";
   } else {
     char s[FormatBufferSize];
     result += "from ";

@@ -55,8 +55,8 @@ class Position {
   ElementImpl* element() const;
   CSSComputedStyleDeclarationImpl* computedStyle() const;
 
-  bool isEmpty() const { return m_node == 0; }
-  bool notEmpty() const { return m_node != 0; }
+  bool isNull() const { return m_node == 0; }
+  bool isNotNull() const { return m_node != 0; }
 
   Position previousLinePosition(int x) const;
   Position nextLinePosition(int x) const;

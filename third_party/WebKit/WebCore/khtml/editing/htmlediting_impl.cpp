@@ -148,8 +148,8 @@ static DOMString& styleSpanClassString() {
 static void debugPosition(const char* prefix, const Position& pos) {
   if (!prefix)
     prefix = "";
-  if (pos.isEmpty())
-    LOG(Editing, "%s <empty>", prefix);
+  if (pos.isNull())
+    LOG(Editing, "%s <null>", prefix);
   else
     LOG(Editing, "%s%s %p : %d", prefix,
         getTagName(pos.node()->id()).string().latin1(), pos.node(),
@@ -181,7 +181,7 @@ void StyleChange::init(CSSStyleDeclarationImpl* style,
 
     // If position is empty or the position passed in already has the
     // style, just move on.
-    if (position.notEmpty() && currentlyHasStyle(position, property))
+    if (position.isNotNull() && currentlyHasStyle(position, property))
       continue;
 
     // Figure out the manner of change that is needed.
@@ -210,7 +210,7 @@ void StyleChange::init(CSSStyleDeclarationImpl* style,
 
 bool StyleChange::currentlyHasStyle(const Position& pos,
                                     const CSSProperty* property) {
-  ASSERT(pos.notEmpty());
+  ASSERT(pos.isNotNull());
   CSSComputedStyleDeclarationImpl* style = pos.computedStyle();
   ASSERT(style);
   style->ref();
@@ -474,14 +474,14 @@ void CompositeEditCommandImpl::replaceText(TextImpl* node,
 }
 
 void CompositeEditCommandImpl::deleteSelection() {
-  if (endingSelection().state() == Selection::RANGE) {
+  if (endingSelection().isRange()) {
     DeleteSelectionCommand cmd(document());
     applyCommandToComposite(cmd);
   }
 }
 
 void CompositeEditCommandImpl::deleteSelection(const Selection& selection) {
-  if (selection.state() == Selection::RANGE) {
+  if (selection.isRange()) {
     DeleteSelectionCommand cmd(document(), selection);
     applyCommandToComposite(cmd);
   }
@@ -572,7 +572,7 @@ void CompositeEditCommandImpl::deleteUnrenderedText(NodeImpl* node) {
 }
 
 void CompositeEditCommandImpl::deleteUnrenderedText(const Position& pos) {
-  if (pos.isEmpty())
+  if (pos.isNull())
     return;
 
   Position upstream = pos.upstream(StayInBlock);
@@ -658,7 +658,7 @@ ApplyStyleCommandImpl::~ApplyStyleCommandImpl() {
 }
 
 void ApplyStyleCommandImpl::doApply() {
-  if (endingSelection().state() != Selection::RANGE)
+  if (!endingSelection().isRange())
     return;
 
   // adjust to the positions we want to use for applying style
@@ -1079,7 +1079,7 @@ void DeleteSelectionCommandImpl::doApply() {
   if (!m_hasSelectionToDelete)
     m_selectionToDelete = endingSelection();
 
-  if (m_selectionToDelete.state() != Selection::RANGE)
+  if (!m_selectionToDelete.isRange())
     return;
 
   Position upstreamStart(m_selectionToDelete.start().upstream(StayInBlock));
@@ -1218,7 +1218,7 @@ void DeleteSelectionCommandImpl::doApply() {
   }
 
   // Figure out where the end position should be
-  if (endingPosition.notEmpty())
+  if (endingPosition.isNotNull())
     goto FixupWhitespace;
 
   endingPosition = upstreamStart;
@@ -1242,18 +1242,18 @@ void DeleteSelectionCommandImpl::doApply() {
 // Perform whitespace fixup
 FixupWhitespace:
 
-  if (leading.notEmpty() || trailing.notEmpty())
+  if (leading.isNotNull() || trailing.isNotNull())
     document()->updateLayout();
 
   debugPosition("endingPosition   ", endingPosition);
 
-  if (leading.notEmpty() && !leading.isRenderedCharacter()) {
+  if (leading.isNotNull() && !leading.isRenderedCharacter()) {
     LOG(Editing, "replace leading");
     TextImpl* textNode = static_cast<TextImpl*>(leading.node());
     replaceText(textNode, leading.offset(), 1, nonBreakingSpaceString());
   }
 
-  if (trailing.notEmpty()) {
+  if (trailing.isNotNull()) {
     if (trailingValid) {
       if (!trailing.isRenderedCharacter()) {
         LOG(Editing, "replace trailing [valid]");
@@ -1462,7 +1462,7 @@ void InputNewlineCommandImpl::doApply() {
 
     // Handle whitespace that occurs after the split
     document()->updateLayout();
-    if (trailing.notEmpty() && !endingPosition.isRenderedCharacter()) {
+    if (trailing.isNotNull() && !endingPosition.isRenderedCharacter()) {
       // Clear out all whitespace and insert one non-breaking space
       deleteUnrenderedText(endingPosition);
       insertText(textNode, 0, nonBreakingSpaceString());
@@ -1504,7 +1504,7 @@ Position InputTextCommandImpl::prepareForTextInsertion(bool adjustDownstream) {
   // Prepare for text input by looking at the current position.
   // It may be necessary to insert a text node to receive characters.
   Selection selection = endingSelection();
-  ASSERT(selection.state() == Selection::CARET);
+  ASSERT(selection.isCaret());
 
   Position pos = selection.start();
   if (adjustDownstream)
@@ -1577,7 +1577,7 @@ void InputTextCommandImpl::input(const DOMString& text,
       selection.start().downstream(StayInBlock).isFirstRenderedPositionOnLine();
 
   // Delete the current selection, or collapse whitespace, as needed
-  if (selection.state() == Selection::RANGE)
+  if (selection.isRange())
     deleteSelection();
 
   deleteUnrenderedText(endingSelection().start());
@@ -1861,7 +1861,7 @@ void ReplaceSelectionCommandImpl::doApply() {
   Selection selection = endingSelection();
 
   // Delete the current selection, or collapse whitespace, as needed
-  if (selection.state() == Selection::RANGE)
+  if (selection.isRange())
     deleteSelection();
 
   // This command does not use any typing style that is set as a residual effect
@@ -1874,7 +1874,7 @@ void ReplaceSelectionCommandImpl::doApply() {
   setTypingStyle(0);
 
   selection = endingSelection();
-  ASSERT(!selection.isEmpty());
+  ASSERT(!selection.isNone());
 
   if (!firstChild) {
     // Pasting something that didn't parse or was empty.
@@ -1964,7 +1964,7 @@ MoveSelectionCommandImpl::~MoveSelectionCommandImpl() {
 
 void MoveSelectionCommandImpl::doApply() {
   Selection selection = endingSelection();
-  ASSERT(selection.state() == Selection::RANGE);
+  ASSERT(selection.isRange());
 
   // Update the position otherwise it may become invalid after the selection is
   // deleted.
@@ -2261,7 +2261,7 @@ TypingCommandImpl::TypingCommandImpl(DocumentImpl* document,
       m_selectInsertedText(selectInsertedText) {}
 
 void TypingCommandImpl::doApply() {
-  if (endingSelection().state() == Selection::NONE)
+  if (endingSelection().isNone())
     return;
 
   switch (m_commandType) {
@@ -2289,7 +2289,7 @@ void TypingCommandImpl::markMisspellingsAfterTyping() {
   // get this by being at the end of a word and typing a space.
   CaretPosition start(endingSelection().start());
   CaretPosition previous = start.previous();
-  if (previous.notEmpty()) {
+  if (previous.isNotNull()) {
     CaretPosition p1 = startOfWord(previous, LeftWordIfOnBoundary);
     CaretPosition p2 = startOfWord(start, LeftWordIfOnBoundary);
     if (p1 != p2)
@@ -2353,7 +2353,7 @@ void TypingCommandImpl::issueCommandForDeleteKey() {
       Position pos(endingSelection().start());
       Position start = CaretPosition(pos).previous().deepEquivalent();
       Position end = CaretPosition(pos).deepEquivalent();
-      if (start.notEmpty() && end.notEmpty() &&
+      if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
         selectionToDelete = Selection(start, end);
@@ -2364,7 +2364,7 @@ void TypingCommandImpl::issueCommandForDeleteKey() {
       break;
   }
 
-  if (selectionToDelete.notEmpty()) {
+  if (selectionToDelete.isCaretOrRange()) {
     deleteSelection(selectionToDelete);
     typingAddedToOpenCommand();
   }

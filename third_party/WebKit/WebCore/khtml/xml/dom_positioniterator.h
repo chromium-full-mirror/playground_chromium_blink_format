@@ -49,7 +49,7 @@ class PositionIterator {
 
   bool atStart() const;
   bool atEnd() const;
-  bool isEmpty() const { return m_current.isEmpty(); }
+  bool isEmpty() const { return m_current.isNull(); }
 
  private:
   Position m_current;

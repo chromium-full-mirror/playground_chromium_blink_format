@@ -2322,7 +2322,7 @@ QString KHTMLPart::selectedText() const {
 }
 
 bool KHTMLPart::hasSelection() const {
-  return !d->m_selection.isEmpty();
+  return d->m_selection.isCaretOrRange();
 }
 
 const Selection& KHTMLPart::selection() const {
@@ -2409,8 +2409,7 @@ void KHTMLPart::clearCaretRectIfNeeded() {
 }
 
 void KHTMLPart::setFocusNodeIfNeeded() {
-  if (!xmlDocImpl() || d->m_selection.state() == Selection::NONE ||
-      !d->m_isFocused)
+  if (!xmlDocImpl() || d->m_selection.isNone() || !d->m_isFocused)
     return;
 
   NodeImpl* n = d->m_selection.start().node();
@@ -2444,8 +2443,7 @@ void KHTMLPart::selectionLayoutChanged() {
   }
 
   // see if a new caret blink timer needs to be started
-  if (d->m_caretVisible && d->m_caretBlinks &&
-      d->m_selection.state() == Selection::CARET &&
+  if (d->m_caretVisible && d->m_caretBlinks && d->m_selection.isCaret() &&
       d->m_selection.start().node()->isContentEditable()) {
     d->m_caretBlinkTimer = startTimer(CARET_BLINK_FREQUENCY);
     d->m_caretPaint = true;
@@ -2485,7 +2483,7 @@ int KHTMLPart::xPosForVerticalArrowNavigation() const {
 
 void KHTMLPart::timerEvent(QTimerEvent* e) {
   if (e->timerId() == d->m_caretBlinkTimer && d->m_caretVisible &&
-      d->m_caretBlinks && d->m_selection.state() == Selection::CARET) {
+      d->m_caretBlinks && d->m_selection.isCaret()) {
     d->m_caretPaint = !d->m_caretPaint;
     d->m_selection.needsCaretRepaint();
   }
@@ -4339,7 +4337,7 @@ void KHTMLPart::customEvent(QCustomEvent* event) {
 
 bool KHTMLPart::isPointInsideSelection(int x, int y) {
   // Treat a collapsed selection like no selection.
-  if (d->m_selection.state() == Selection::CARET)
+  if (!d->m_selection.isRange())
     return false;
   if (!xmlDocImpl()->renderer())
     return false;
@@ -4351,7 +4349,7 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
     return false;
 
   Position pos(innerNode->positionForCoordinates(x, y));
-  if (pos.isEmpty())
+  if (pos.isNull())
     return false;
 
   NodeImpl* n = d->m_selection.start().node();
@@ -4382,13 +4380,13 @@ void KHTMLPart::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
   if (!innerNode.isNull() && innerNode.handle()->renderer() &&
       innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(innerNode.handle()->positionForCoordinates(x, y));
-    if (pos.notEmpty()) {
+    if (pos.isNotNull()) {
       selection.moveTo(pos);
       selection.expandUsingGranularity(Selection::WORD);
     }
   }
 
-  if (selection.state() != Selection::CARET) {
+  if (selection.isRange()) {
     d->m_selectionGranularity = Selection::WORD;
     d->m_beganSelectingText = true;
   }
@@ -4418,13 +4416,13 @@ void KHTMLPart::handleMousePressEventTripleClick(
       innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(
         innerNode.handle()->positionForCoordinates(event->x(), event->y()));
-    if (pos.notEmpty()) {
+    if (pos.isNotNull()) {
       selection.moveTo(pos);
       selection.expandUsingGranularity(Selection::PARAGRAPH);
     }
   }
 
-  if (selection.state() != Selection::CARET) {
+  if (selection.isRange()) {
     d->m_selectionGranularity = Selection::PARAGRAPH;
     d->m_beganSelectingText = true;
   }
@@ -4455,12 +4453,12 @@ void KHTMLPart::handleMousePressEventSingleClick(
       }
       Position pos(
           innerNode.handle()->positionForCoordinates(event->x(), event->y()));
-      if (pos.isEmpty())
+      if (pos.isNull())
         pos =
             Position(innerNode.handle(), innerNode.handle()->caretMinOffset());
 
       sel = selection();
-      if (extendSelection && sel.notEmpty()) {
+      if (extendSelection && sel.isCaretOrRange()) {
         sel.clearModifyBias();
         sel.setExtent(pos);
         if (d->m_selectionGranularity != Selection::CHARACTER) {
@@ -4669,7 +4667,7 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
       innerNode.handle()->positionForCoordinates(event->x(), event->y()));
 
   // Don't modify the selection if we're not on a node.
-  if (pos.isEmpty())
+  if (pos.isNull())
     return;
 
   // Restart the selection if this is the first mouse move. This work is usually
@@ -4748,7 +4746,7 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
   if (!d->m_beganSelectingText &&
       d->m_dragStartPos.x() == event->qmouseEvent()->x() &&
       d->m_dragStartPos.y() == event->qmouseEvent()->y() &&
-      d->m_selection.state() == Selection::RANGE) {
+      d->m_selection.isRange()) {
     Selection selection;
     if (d->m_selection.base().node()->isContentEditable())
       selection.moveTo(d->m_selection.base().node()->positionForCoordinates(
@@ -5296,7 +5294,7 @@ KHTMLPart::TriState KHTMLPart::selectionHasStyle(
   bool atStart = true;
   TriState state = falseTriState;
 
-  if (d->m_selection.state() != Selection::RANGE) {
+  if (!d->m_selection.isRange()) {
     NodeImpl* nodeToRemove;
     CSSStyleDeclarationImpl* selectionStyle =
         selectionComputedStyle(nodeToRemove);
@@ -5389,12 +5387,12 @@ CSSStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   if (!xmlDocImpl())
     return 0;
 
-  if (d->m_selection.state() == Selection::NONE)
+  if (d->m_selection.isNone())
     return 0;
 
   Range range(d->m_selection.toRange());
   Position pos(range.startContainer().handle(), range.startOffset());
-  assert(pos.notEmpty());
+  assert(pos.isNotNull());
   ElementImpl* elem = pos.element();
   if (!elem)
     return 0;

@@ -129,24 +129,16 @@ Position& Position::operator=(const Position& o) {
 }
 
 ElementImpl* Position::element() const {
-  if (isEmpty())
-    return 0;
-
-  NodeImpl* n = node();
-  for (; n && !n->isElementNode(); n = n->parentNode())
-    ;  // loop
-
+  NodeImpl* n;
+  for (n = node(); n && !n->isElementNode(); n = n->parentNode())
+    ;  // empty loop body
   return static_cast<ElementImpl*>(n);
 }
 
 CSSComputedStyleDeclarationImpl* Position::computedStyle() const {
-  if (isEmpty())
-    return 0;
-
   ElementImpl* elem = element();
   if (!elem)
     return 0;
-
   return new CSSComputedStyleDeclarationImpl(elem);
 }
 
@@ -175,7 +167,7 @@ long Position::renderedOffset() const {
 }
 
 Position Position::previousCharacterPosition() const {
-  if (isEmpty())
+  if (isNull())
     return Position();
 
   NodeImpl* fromRootEditableElement = node()->rootEditableElement();
@@ -201,7 +193,7 @@ Position Position::previousCharacterPosition() const {
 }
 
 Position Position::nextCharacterPosition() const {
-  if (isEmpty())
+  if (isNull())
     return Position();
 
   NodeImpl* fromRootEditableElement = node()->rootEditableElement();
@@ -460,7 +452,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
 }
 
 Position Position::equivalentRangeCompliantPosition() const {
-  if (isEmpty())
+  if (isNull())
     return *this;
 
   if (!node()->parentNode())
@@ -482,7 +474,7 @@ Position Position::equivalentRangeCompliantPosition() const {
 }
 
 Position Position::equivalentShallowPosition() const {
-  if (isEmpty())
+  if (isNull())
     return *this;
 
   Position pos(*this);
@@ -494,7 +486,7 @@ Position Position::equivalentShallowPosition() const {
 }
 
 Position Position::equivalentDeepPosition() const {
-  if (isEmpty() || node()->isAtomicNode())
+  if (isNull() || node()->isAtomicNode())
     return *this;
 
   NodeImpl* child = 0;
@@ -522,7 +514,7 @@ Position Position::equivalentDeepPosition() const {
 }
 
 Position Position::closestRenderedPosition(EAffinity affinity) const {
-  if (isEmpty() || inRenderedContent())
+  if (isNull() || inRenderedContent())
     return *this;
 
   Position pos;
@@ -567,7 +559,7 @@ Position Position::closestRenderedPosition(EAffinity affinity) const {
 }
 
 bool Position::inRenderedContent() const {
-  if (isEmpty())
+  if (isNull())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -609,7 +601,7 @@ bool Position::inRenderedContent() const {
 }
 
 bool Position::inRenderedText() const {
-  if (isEmpty() || !node()->isTextNode())
+  if (isNull() || !node()->isTextNode())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -633,7 +625,7 @@ bool Position::inRenderedText() const {
 }
 
 bool Position::isRenderedCharacter() const {
-  if (isEmpty() || !node()->isTextNode())
+  if (isNull() || !node()->isTextNode())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -657,7 +649,7 @@ bool Position::isRenderedCharacter() const {
 }
 
 bool Position::rendersInDifferentPosition(const Position& pos) const {
-  if (isEmpty() || pos.isEmpty())
+  if (isNull() || pos.isNull())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -752,7 +744,7 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
 }
 
 bool Position::isFirstRenderedPositionOnLine() const {
-  if (isEmpty())
+  if (isNull())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -781,7 +773,7 @@ bool Position::isFirstRenderedPositionOnLine() const {
 }
 
 bool Position::isLastRenderedPositionOnLine() const {
-  if (isEmpty())
+  if (isNull())
     return false;
 
   RenderObject* renderer = node()->renderer();
@@ -813,7 +805,7 @@ bool Position::isLastRenderedPositionOnLine() const {
 }
 
 bool Position::inFirstEditableInRootEditableElement() const {
-  if (isEmpty() || !inRenderedContent())
+  if (isNull() || !inRenderedContent())
     return false;
 
   PositionIterator it(*this);
@@ -836,7 +828,7 @@ static inline bool isWS(const QChar& c) {
 }
 
 Position Position::leadingWhitespacePosition() const {
-  if (isEmpty())
+  if (isNull())
     return Position();
 
   if (upstream(StayInBlock).node()->id() == ID_BR)
@@ -854,7 +846,7 @@ Position Position::leadingWhitespacePosition() const {
 }
 
 Position Position::trailingWhitespacePosition() const {
-  if (isEmpty())
+  if (isNull())
     return Position();
 
   if (node()->isTextNode()) {
@@ -882,8 +874,8 @@ Position Position::trailingWhitespacePosition() const {
 }
 
 void Position::debugPosition(const char* msg) const {
-  if (isEmpty())
-    fprintf(stderr, "Position [%s]: empty\n", msg);
+  if (isNull())
+    fprintf(stderr, "Position [%s]: null\n", msg);
   else
     fprintf(stderr, "Position [%s]: %s [%p] at %d\n", msg,
             getTagName(node()->id()).string().latin1(), node(), offset());
@@ -895,8 +887,8 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
   DOMString result;
   DOMString s;
 
-  if (isEmpty()) {
-    result = "<empty>";
+  if (isNull()) {
+    result = "<null>";
   } else {
     char s[FormatBufferSize];
     result += "offset ";
