@@ -346,7 +346,7 @@ RenderObject* RenderObject::offsetParent() const {
   return curr;
 }
 
-void RenderObject::markAllDescendantsWithFloatsForLayout() {}
+void RenderObject::markAllDescendantsWithFloatsForLayout(RenderObject*) {}
 
 void RenderObject::setLayouted(bool b) {
   m_layouted = b;
@@ -1158,11 +1158,16 @@ void RenderObject::invalidateLayout()
 
 void RenderObject::removeFromObjectLists() {
   if (isFloating()) {
-    RenderObject* p;
-    for (p = parent(); p; p = p->parent()) {
+    RenderBlock* outermostBlock = 0;
+    for (RenderObject* p = parent(); p; p = p->parent()) {
       if (p->isRenderBlock())
-        static_cast<RenderBlock*>(p)->removeFloatingObject(this);
+        outermostBlock = static_cast<RenderBlock*>(p);
+      if (!p->isRenderBlock() || !p->containsFloat(this) ||
+          p->isFloatingOrPositioned())
+        break;
     }
+    if (outermostBlock)
+      outermostBlock->markAllDescendantsWithFloatsForLayout(this);
   }
 
   if (isPositioned()) {
