@@ -884,7 +884,8 @@ void Selection::validate(ETextGranularity granularity) {
         m_end = wordEnd.deepEquivalent();
 
         // when double-clicking at end of document, select the last word
-        EWordSide side = (isCaret() && wordEnd.next().isNull())
+        EWordSide side = (isCaret() && wordEnd.next().isNull() &&
+                          !isFirstVisiblePositionOnLine(wordEnd))
                              ? LeftWordIfOnBoundary
                              : RightWordIfOnBoundary;
 
