@@ -280,6 +280,9 @@ backforward list.
 
 - (void)_reloadForPluginChanges;
 + (void)_setAlwaysUseATSU:(BOOL)f;
+
+- (NSCachedURLResponse*)_cachedResponseForURL:(NSURL*)URL;
+
 @end
 
 @interface _WebSafeForwarder : NSObject {
