@@ -128,6 +128,7 @@ class KWQKHTMLPartImpl : public QObject {
 
   DOM::DocumentImpl* document();
   khtml::RenderObject* renderer();
+  void paint(QPainter*, const QRect&);
 
   // Used internally, but need to be public because they are used by non-member
   // functions.
@@ -156,6 +157,8 @@ class KWQKHTMLPartImpl : public QObject {
   KWQSignal _started;
   KWQSignal _completed;
   KWQSignal _completedWithBool;
+
+  bool _needsToSetWidgetsAside;
 
   static QPtrList<KWQKHTMLPartImpl>& mutableInstances();
 
