@@ -95,6 +95,10 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   void setMalformed(bool malformed) { m_malformed = malformed; }
   virtual bool isMalformed() { return m_malformed; }
 
+#if APPLE_CHANGES
+  void performSubmitClick();
+#endif
+
   static void i18nData();
 
   friend class HTMLFormElement;
@@ -318,11 +322,6 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isEditable();
 
   DOMString altText() const;
-
-#if APPLE_CHANGES
- private:
-  void simulateButtonClickForEvent(EventImpl* evt);
-#endif
 
  protected:
   DOMString m_value;

@@ -489,7 +489,7 @@ void RenderLineEdit::slotReturnPressed() {
 
   HTMLFormElementImpl* fe = element()->form();
   if (fe)
-    fe->prepareSubmit();
+    fe->performSubmitClick();
 }
 
 void RenderLineEdit::handleFocusOut() {
