@@ -372,8 +372,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   void setParsing(bool b);
   bool parsing() const { return m_bParsing; }
+  bool allDataReceived() const { return m_bAllDataReceived; }
   int minimumLayoutDelay();
   bool shouldScheduleLayout();
+  int elapsedTime() const;
 
   void setTextColor(QColor color) { m_textColor = color; }
   QColor textColor() const { return m_textColor; }
@@ -653,6 +655,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_loadingSheet;
   bool visuallyOrdered;
   bool m_bParsing;
+  bool m_bAllDataReceived;
   bool m_docChanged;
   bool m_styleSelectorDirty;
   bool m_inStyleRecalc;

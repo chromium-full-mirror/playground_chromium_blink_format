@@ -234,6 +234,7 @@ class KHTMLView : public QScrollView {
 
   void scheduleRelayout();
   void unscheduleRelayout();
+  bool haveDelayedLayoutScheduled();
 
   /**
    * Paints the HTML document to a QPainter.
@@ -282,8 +283,6 @@ class KHTMLView : public QScrollView {
                           QMouseEvent* _mouse,
                           bool setUnder,
                           int mouseEventType);
-
-  void complete();
 
   void applyBodyScrollQuirk(khtml::RenderObject* o,
                             ScrollBarMode& hMode,
