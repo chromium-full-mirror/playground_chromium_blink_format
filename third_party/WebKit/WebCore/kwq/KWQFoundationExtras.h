@@ -62,7 +62,9 @@ static inline id KWQRetainNSRelease(id obj) {
 // CF objects need to be "made collectable" for autorelease to work
 // properly in GC
 static inline id KWQCFAutorelease(CFTypeRef obj) {
+#ifndef BUILDING_ON_PANTHER
   CFMakeCollectable(obj);
+#endif
   [(id)obj autorelease];
   return (id)obj;
 }
