@@ -1190,13 +1190,19 @@ void Loader::servePendingRequests() {
   }
 
   connect(job, SIGNAL(result(KIO::Job*)), this, SLOT(slotFinished(KIO::Job*)));
-  connect(job, SIGNAL(data(KIO::Job*, const QByteArray&)),
-          SLOT(slotData(KIO::Job*, const QByteArray&)));
 
 #if APPLE_CHANGES
+  connect(job, SIGNAL(data(KIO::Job*, const char*, int)),
+          SLOT(slotData(KIO::Job*, const char*, int)));
+  connect(job, SIGNAL(receivedResponse(KIO::Job*, void*)),
+          SLOT(slotReceivedResponse(KIO::Job*, void*)));
+
   if (KWQServeRequest(this, req, job))
     m_requestsLoading.insert(job, req);
 #else
+  connect(job, SIGNAL(data(KIO::Job*, const QByteArray&)),
+          SLOT(slotData(KIO::Job*, const QByteArray&)));
+
   if (req->object->schedule())
     KIO::Scheduler::scheduleJob(job);
 
@@ -1247,7 +1253,7 @@ void Loader::slotFinished(KIO::Job* job) {
 }
 
 #if APPLE_CHANGES
-void Loader::receivedResponse(KIO::Job* job, void* response) {
+void Loader::slotReceivedResponse(KIO::Job* job, void* response) {
   Request* r = m_requestsLoading[job];
   ASSERT(r);
   ASSERT(response);

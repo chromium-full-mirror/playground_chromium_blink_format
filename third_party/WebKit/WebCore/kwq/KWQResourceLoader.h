@@ -34,12 +34,11 @@ class TransferJob;
 }
 
 @interface KWQResourceLoader : NSObject<WebCoreResourceLoader> {
-  khtml::Loader* _loader;
   KIO::TransferJob* _job;
   id<WebCoreResourceHandle> _handle;
 }
 
-- (id)initWithLoader:(khtml::Loader*)loader job:(KIO::TransferJob*)job;
+- (id)initWithJob:(KIO::TransferJob*)job;
 - (void)setHandle:(id<WebCoreResourceHandle>)handle;
 - (void)jobWillBeDeallocated;
 

@@ -520,8 +520,10 @@ bool KHTMLPart::openURL(const KURL& url)
   d->m_job->addMetaData(args.metaData());
 
   connect(d->m_job, SIGNAL(result(KIO::Job*)), SLOT(slotFinished(KIO::Job*)));
+#if !APPLE_CHANGES
   connect(d->m_job, SIGNAL(data(KIO::Job*, const QByteArray&)),
           SLOT(slotData(KIO::Job*, const QByteArray&)));
+#endif
 
   connect(d->m_job, SIGNAL(redirection(KIO::Job*, const KURL&)),
           SLOT(slotRedirection(KIO::Job*, const KURL&)));
