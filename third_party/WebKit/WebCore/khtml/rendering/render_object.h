@@ -537,8 +537,6 @@ class RenderObject : public CachedObjectClient {
 
   virtual short minWidth() const { return 0; }
   virtual short maxWidth() const { return 0; }
-  virtual void setMaxWidth(short s) {}
-  virtual void setMinWidth(short s) {}
 
   RenderStyle* style() const { return m_style; }
   RenderStyle* style(bool firstLine) const {
