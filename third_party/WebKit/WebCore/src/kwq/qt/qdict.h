@@ -38,7 +38,7 @@
 
 #else
 
-#include <_qcollection.h>
+#include <qcollection.h>
 #include <qstring.h>
 
 #include <KWQDictImpl.h>

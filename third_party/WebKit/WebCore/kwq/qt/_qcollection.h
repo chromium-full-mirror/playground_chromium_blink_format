@@ -35,8 +35,8 @@
 **
 **********************************************************************/
 
-#ifndef QCOLLECTION_H
-#define QCOLLECTION_H
+#ifndef _QCOLLECTION_H
+#define _QCOLLECTION_H
 
 // KWQ hacks ---------------------------------------------------------------
 
@@ -70,4 +70,4 @@ class Q_EXPORT QCollection  // inherited by all collections
   virtual void deleteItem(Item);  // delete object
 };
 
-#endif  // QCOLLECTION_H
+#endif  // _QCOLLECTION_H
