@@ -44,7 +44,6 @@ class QButton : public QWidget {
 
   // constructors, copy constructors, and destructors ------------------------
 
-  QButton();
   QButton(QWidget* parent = 0);
   ~QButton();
 

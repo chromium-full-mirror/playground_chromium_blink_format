@@ -30,7 +30,7 @@
 #include <config.h>
 #endif
 
-#include <KWQButton.h>
+#include <qbutton.h>
 
 #include "qwidget.h"
 
@@ -38,18 +38,12 @@
 
 class QRadioButton : public QButton {
  public:
-// typedefs ----------------------------------------------------------------
-// enums -------------------------------------------------------------------
-// constants ---------------------------------------------------------------
-// static member functions -------------------------------------------------
+  // typedefs ----------------------------------------------------------------
+  // enums -------------------------------------------------------------------
+  // constants ---------------------------------------------------------------
+  // static member functions -------------------------------------------------
 
-// constructors, copy constructors, and destructors ------------------------
-
-// add no-arg constructor
-#ifdef _KWQ_PEDANTIC_
-  QRadioButton() {}
-#endif
-
+  // constructors, copy constructors, and destructors ------------------------
   QRadioButton(QWidget*);
 
 // add no-op destructor
