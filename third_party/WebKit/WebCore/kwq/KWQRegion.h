@@ -55,6 +55,8 @@ class QRegion {
 
   QRegion& operator=(const QRegion&);
 
+  NSBezierPath* getNSBezierPath() const { return path; }
+
  private:
   NSBezierPath* path;
 };
