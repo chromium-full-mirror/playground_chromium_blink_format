@@ -1694,22 +1694,21 @@ void RenderBlock::clearFloats() {
   }
 
   int offset = m_y;
-
-  if (parentHasFloats) {
+  if (parentHasFloats)
     addOverHangingFloats(static_cast<RenderBlock*>(parent()),
                          parent()->borderLeft() + parent()->paddingLeft(),
                          offset, false);
-  }
 
+  int xoffset = 0;
   if (prev) {
     if (prev->isTableCell())
       return;
-
     offset -= prev->yPos();
   } else {
     prev = parent();
     if (!prev)
       return;
+    xoffset += prev->borderLeft() + prev->paddingLeft();
   }
   // kdDebug() << "RenderBlock::clearFloats found previous "<< (void *)this << "
   // prev=" << (void *)prev<< endl;
@@ -1726,7 +1725,7 @@ void RenderBlock::clearFloats() {
              // intrude into their space.
 
   if (flow->floatBottom() > offset)
-    addOverHangingFloats(flow, 0, offset);
+    addOverHangingFloats(flow, xoffset, offset);
 }
 
 void RenderBlock::addOverHangingFloats(RenderBlock* flow,
