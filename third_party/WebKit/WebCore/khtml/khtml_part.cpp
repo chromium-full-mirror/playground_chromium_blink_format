@@ -2342,6 +2342,14 @@ const Selection& KHTMLPart::dragCaret() const {
   return d->m_dragCaret;
 }
 
+const Selection& KHTMLPart::mark() const {
+  return d->m_mark;
+}
+
+void KHTMLPart::setMark(const Selection& s) {
+  d->m_mark = s;
+}
+
 void KHTMLPart::setSelection(const Selection& s, bool closeTyping) {
   if (d->m_selection != s) {
     clearCaretRectIfNeeded();

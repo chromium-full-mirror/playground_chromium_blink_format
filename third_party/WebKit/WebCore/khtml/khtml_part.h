@@ -591,8 +591,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   int zoomFactor() const;
 
   /**
-     * Returns the text the user has marked.
-     */
+   * Returns the text the user has marked.
+   */
   virtual QString selectedText() const;
 
   /**
@@ -611,7 +611,17 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setSelection(const DOM::Selection&, bool closeTyping = true);
 
   /**
-      * Sets the current drag cart.
+   * Returns a mark, to be used as emacs uses it.
+   */
+  const DOM::Selection& mark() const;
+
+  /**
+   * Returns the mark.
+   */
+  void setMark(const DOM::Selection&);
+
+  /**
+   * Sets the current drag cart.
    */
   void setDragCaret(const DOM::Selection&);
 

@@ -365,8 +365,8 @@ class KWQKHTMLPart : public KHTMLPart {
   // Implementation of CSS property -khtml-user-drag == auto
   bool shouldDragAutoNode(DOM::NodeImpl*, int x, int y) const;
 
-  DOM::Range markedRange() const;
-  void setMarkedRange(const DOM::Range&);
+  DOM::Range markedTextRange() const;
+  void setMarkedTextRange(const DOM::Range&);
 
   bool canGoBackOrForward(int distance) const;
 
@@ -456,7 +456,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   mutable DOM::Node _elementToDraw;
 
-  DOM::Range m_markedRange;
+  DOM::Range m_markedTextRange;
 };
 
 inline KWQKHTMLPart* KWQ(KHTMLPart* part) {

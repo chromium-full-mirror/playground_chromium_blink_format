@@ -1696,6 +1696,8 @@ void NodeBaseImpl::removeChildren() {
   while (NodeImpl* n = _first) {
     NodeImpl* next = n->nextSibling();
 
+    n->ref();
+
     // Fire removed from document mutation events.
     dispatchChildRemovalEvents(n, exceptionCode);
 
@@ -1707,8 +1709,9 @@ void NodeBaseImpl::removeChildren() {
 
     if (n->inDocument())
       n->removedFromDocument();
-    if (!n->refCount())
-      delete n;
+
+    n->deref();
+
     _first = next;
   }
   _last = 0;
