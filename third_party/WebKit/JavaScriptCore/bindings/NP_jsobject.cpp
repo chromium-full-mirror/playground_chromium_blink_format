@@ -59,8 +59,7 @@ static NPClass _javascriptClass = {
     1, jsAllocate, (NPDeallocateFunctionPtr)jsDeallocate, 0, 0, 0, 0, 0, 0,
     0, 0};
 
-static NPClass* javascriptClass = &_javascriptClass;
-NPClass* NPScriptObjectClass = javascriptClass;
+NPClass* NPScriptObjectClass = &_javascriptClass;
 
 Identifier identiferFromNPIdentifier(const NPUTF8* name) {
   NPUTF16* methodName;
