@@ -345,9 +345,9 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
     return Undefined();
   }
 
-  DOM::HTMLCollection collAll = doc.all();
-  KJS::HTMLCollection htmlcoll(exec, collAll);
-  return htmlcoll.getNamedItems(
+  DOM::HTMLCollection nameableItems = doc.nameableItems();
+  KJS::HTMLCollection kjsCollection(exec, nameableItems);
+  return kjsCollection.getNamedItems(
       exec, propertyName);  // Get all the items with the same name
 
   return Undefined();

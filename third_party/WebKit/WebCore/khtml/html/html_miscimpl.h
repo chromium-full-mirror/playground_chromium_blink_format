@@ -66,8 +66,11 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
     SELECT_OPTIONS,
     // from HTMLMap
     MAP_AREAS,
-    DOC_ALL,        // "all" elements (IE)
-    NODE_CHILDREN,  // first-level children (IE)
+    DOC_ALL,             // "all" elements (IE)
+    NODE_CHILDREN,       // first-level children (IE)
+    DOC_NAMEABLE_ITEMS,  // all IMG, FORM, APPLET, EMBED and OBJECT elements,
+                         // used to look
+                         // up element name as document property
     LAST_TYPE
   };
 
