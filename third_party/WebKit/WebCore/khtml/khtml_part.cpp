@@ -1675,8 +1675,8 @@ void KHTMLPart::stopAnimations() {
 }
 
 void KHTMLPart::gotoAnchor() {
-  QString ref = m_url.encodedHtmlRef();
-  if (!ref.isEmpty())
+  if (m_url.hasRef()) {
+    QString ref = m_url.encodedHtmlRef();
     if (!gotoAnchor(ref)) {
       // Can't use htmlRef() here because it doesn't know which encoding to use
       // to decode.
@@ -1690,6 +1690,7 @@ void KHTMLPart::gotoAnchor() {
         gotoAnchor(KURL::decode_string(ref, d->m_decoder->codec()));
 #endif
     }
+  }
 }
 
 void KHTMLPart::slotFinishedParsing() {
@@ -1826,7 +1827,7 @@ void KHTMLPart::checkCompleted() {
 
 #if !APPLE_CHANGES
     // check that the view has not been moved by the user
-    if (m_url.encodedHtmlRef().isEmpty() && d->m_view->contentsY() == 0)
+    if (!m_url.hasRef() && d->m_view->contentsY() == 0)
       d->m_view->setContentsPos(d->m_extension->urlArgs().xOffset,
                                 d->m_extension->urlArgs().yOffset);
 #endif
@@ -2095,7 +2096,9 @@ bool KHTMLPart::gotoAnchor(const QString& name) {
 
   d->m_doc->setCSSTarget(n);  // Setting to null will clear the current target.
 
-  if (!n) {
+  // Implement the rule that "" and "top" both mean top of page as in other
+  // browsers.
+  if (!n && !(name.isEmpty() || name.lower() == "top")) {
     kdDebug(6050) << "KHTMLPart::gotoAnchor node '" << name << "' not found"
                   << endl;
     return false;
@@ -2113,16 +2116,17 @@ bool KHTMLPart::gotoAnchor(const QString& name) {
   }
 
   int x = 0, y = 0;
-  HTMLElementImpl* a = static_cast<HTMLElementImpl*>(n);
-  a->getUpperLeftCorner(x, y);
+  if (n) {
+    static_cast<HTMLElementImpl*>(n)->getUpperLeftCorner(x, y);
+  }
+// Scroll to actual top left of element with no slop, since some pages expect
+// anchors to be exactly scrolled to.
 #if APPLE_CHANGES
-  // Remove the 50 pixel slop factor; some pages expect anchors to be exactly
-  // scrolled to.
-  // Also, call recursive version so this will expose correctly from within
-  // nested frames.
+  // Call recursive version so this will expose correctly from within nested
+  // frames.
   d->m_view->setContentsPosRecursive(x, y);
 #else
-  d->m_view->setContentsPos(x - 50, y - 50);
+  d->m_view->setContentsPos(x, y);
 #endif
 
   return true;
