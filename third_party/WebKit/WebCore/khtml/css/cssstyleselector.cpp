@@ -3849,8 +3849,10 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
         case CSS_VAL_NONE:
           style->setUserDrag(DRAG_NONE);
           break;
-        default:
+        case CSS_VAL_ELEMENT:
           style->setUserDrag(DRAG_ELEMENT);
+        default:
+          return;
       }
       break;
     }
@@ -3866,7 +3868,19 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
       HANDLE_INHERIT_AND_INITIAL(userSelect, UserSelect)
       if (!primitiveValue || !primitiveValue->getIdent())
         return;
-      style->setUserSelect(primitiveValue->getIdent() == CSS_VAL_AUTO);
+      switch (primitiveValue->getIdent()) {
+        case CSS_VAL_AUTO:
+          style->setUserSelect(SELECT_AUTO);
+          break;
+        case CSS_VAL_NONE:
+          style->setUserSelect(SELECT_NONE);
+          break;
+        case CSS_VAL_TEXT:
+          style->setUserSelect(SELECT_TEXT);
+          break;
+        default:
+          return;
+      }
       break;
     }
     case CSS_PROP_TEXT_OVERFLOW: {

@@ -488,6 +488,10 @@ enum EUserModify { READ_ONLY, READ_WRITE };
 
 enum EUserDrag { DRAG_AUTO, DRAG_NONE, DRAG_ELEMENT };
 
+// CSS3 User Select Values
+
+enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT };
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -516,9 +520,9 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
   EUserDrag
       userDrag : 2;  // Whether or not a drag can be initiated by this element.
-  bool userSelect : 1;    // Whether or not the element is selectable.
-  bool textOverflow : 1;  // Whether or not lines that spill out should be
-                          // truncated with "..."
+  EUserSelect userSelect : 2;  // Whether or not the element is selectable.
+  bool textOverflow : 1;       // Whether or not lines that spill out should be
+                               // truncated with "..."
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1200,7 +1204,7 @@ class RenderStyle {
   }
   EUserModify userModify() const { return css3InheritedData->userModify; }
   EUserDrag userDrag() const { return css3NonInheritedData->userDrag; }
-  bool userSelect() const { return css3NonInheritedData->userSelect; }
+  EUserSelect userSelect() const { return css3NonInheritedData->userSelect; }
   bool textOverflow() const { return css3NonInheritedData->textOverflow; }
 // End CSS3 Getters
 
@@ -1475,7 +1479,9 @@ class RenderStyle {
     SET_VAR(css3InheritedData, userModify, u);
   }
   void setUserDrag(EUserDrag d) { SET_VAR(css3NonInheritedData, userDrag, d); }
-  void setUserSelect(bool b) { SET_VAR(css3NonInheritedData, userSelect, b); }
+  void setUserSelect(EUserSelect s) {
+    SET_VAR(css3NonInheritedData, userSelect, s);
+  }
   void setTextOverflow(bool b) {
     SET_VAR(css3NonInheritedData, textOverflow, b);
   }
@@ -1595,7 +1601,7 @@ class RenderStyle {
   static EMarqueeDirection initialMarqueeDirection() { return MAUTO; }
   static EUserModify initialUserModify() { return READ_ONLY; }
   static EUserDrag initialUserDrag() { return DRAG_AUTO; }
-  static bool initialUserSelect() { return true; }
+  static EUserSelect initialUserSelect() { return SELECT_AUTO; }
   static bool initialTextOverflow() { return false; }
 
 #if APPLE_CHANGES
