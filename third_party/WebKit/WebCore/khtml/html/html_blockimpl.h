@@ -53,7 +53,7 @@ class HTMLDivElementImpl : public HTMLElementImpl {
 
   virtual NodeImpl::Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 };
@@ -67,7 +67,7 @@ class HTMLHRElementImpl : public HTMLElementImpl {
 
   virtual NodeImpl::Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 };
@@ -91,7 +91,7 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
  public:
   HTMLParagraphElementImpl(DocumentPtr* doc);
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -116,7 +116,7 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
 
   virtual NodeImpl::Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 

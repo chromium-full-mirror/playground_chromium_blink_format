@@ -145,6 +145,34 @@ bool HTMLNamedAttrMapImpl::isHTMLAttributeMap() const {
   return true;
 }
 
+int HTMLNamedAttrMapImpl::declCount() const {
+  int result = 0;
+  for (uint i = 0; i < length(); i++) {
+    HTMLAttributeImpl* attr = attributeItem(i);
+    if (attr->decl())
+      result++;
+  }
+  return result;
+}
+
+bool HTMLNamedAttrMapImpl::mapsEquivalent(
+    const HTMLNamedAttrMapImpl* otherMap) const {
+  // The # of decls must match.
+  if (declCount() != otherMap->declCount())
+    return false;
+
+  // The values for each decl must match.
+  for (uint i = 0; i < length(); i++) {
+    HTMLAttributeImpl* attr = attributeItem(i);
+    if (attr->decl()) {
+      AttributeImpl* otherAttr = otherMap->getAttributeItem(attr->id());
+      if (!otherAttr || (attr->value() != otherAttr->value()))
+        return false;
+    }
+  }
+  return true;
+}
+
 void HTMLNamedAttrMapImpl::parseClassAttribute(const DOMString& classStr) {
   m_classList.clear();
   if (!element->hasClass())
@@ -258,7 +286,7 @@ void HTMLElementImpl::attributeChanged(AttributeImpl* attr,
 
   bool checkDecl = true;
   MappedAttributeEntry entry;
-  bool needToParse = mapToEntry(attr, entry);
+  bool needToParse = mapToEntry(attr->id(), entry);
   if (preserveDecls) {
     if (htmlAttr->decl()) {
       setChanged();
@@ -293,9 +321,9 @@ void HTMLElementImpl::attributeChanged(AttributeImpl* attr,
   }
 }
 
-bool HTMLElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLElementImpl::mapToEntry(NodeImpl::Id attr,
                                  MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_ALIGN:
     case ATTR_CONTENTEDITABLE:
     case ATTR_DIR:

@@ -70,9 +70,9 @@ void HTMLBodyElementImpl::createLinkDecl() {
   m_linkDecl->setStrictParsing(!getDocument()->inCompatMode());
 }
 
-bool HTMLBodyElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLBodyElementImpl::mapToEntry(NodeImpl::Id attr,
                                      MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_BACKGROUND:
     case ATTR_BGCOLOR:
     case ATTR_TEXT:
@@ -662,9 +662,9 @@ NodeImpl::Id HTMLIFrameElementImpl::id() const {
   return ID_IFRAME;
 }
 
-bool HTMLIFrameElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLIFrameElementImpl::mapToEntry(NodeImpl::Id attr,
                                        MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_WIDTH:
     case ATTR_HEIGHT:
       result = eUniversal;

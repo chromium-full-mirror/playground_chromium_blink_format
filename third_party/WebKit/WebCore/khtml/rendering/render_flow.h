@@ -79,7 +79,10 @@ class RenderFlow : public RenderBox {
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   void paintLineBoxBackgroundBorder(PaintInfo& i, int _tx, int _ty);
-  void paintLineBoxDecorations(PaintInfo& i, int _tx, int _ty);
+  void paintLineBoxDecorations(PaintInfo& i,
+                               int _tx,
+                               int _ty,
+                               bool paintedChildren = false);
 
   virtual QRect getAbsoluteRepaintRect();
 

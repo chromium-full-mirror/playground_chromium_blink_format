@@ -40,7 +40,7 @@ class HTMLUListElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 
@@ -78,7 +78,7 @@ class HTMLOListElementImpl : public HTMLUListElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 
@@ -99,7 +99,7 @@ class HTMLLIElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 

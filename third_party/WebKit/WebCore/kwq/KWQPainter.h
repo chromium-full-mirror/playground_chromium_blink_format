@@ -174,7 +174,7 @@ class QPainter : public Qt {
                    int _npoints,
                    bool fill);
 
-  void _updateRenderer(NSString** families);
+  void _updateRenderer();
 
   QPainterPrivate* data;
   bool _isForPrinting;

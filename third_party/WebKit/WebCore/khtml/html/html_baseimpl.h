@@ -55,7 +55,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl*);
 
@@ -199,7 +199,7 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 

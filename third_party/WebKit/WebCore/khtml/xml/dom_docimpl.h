@@ -244,6 +244,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   bool usesDescendantRules() { return m_usesDescendantRules; }
   void setUsesDescendantRules(bool b) { m_usesDescendantRules = b; }
+  bool usesSiblingRules() { return m_usesSiblingRules; }
+  void setUsesSiblingRules(bool b) { m_usesSiblingRules = b; }
 
   QString nextState();
 
@@ -641,6 +643,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_styleSelectorDirty;
   bool m_inStyleRecalc;
   bool m_usesDescendantRules;
+  bool m_usesSiblingRules;
 
   DOMString m_title;
 

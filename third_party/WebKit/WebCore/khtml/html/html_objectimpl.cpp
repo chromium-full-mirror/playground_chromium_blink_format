@@ -68,9 +68,9 @@ NodeImpl::Id HTMLAppletElementImpl::id() const {
   return ID_APPLET;
 }
 
-bool HTMLAppletElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLAppletElementImpl::mapToEntry(NodeImpl::Id attr,
                                        MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_WIDTH:
     case ATTR_HEIGHT:
       result = eUniversal;
@@ -227,9 +227,9 @@ NodeImpl::Id HTMLEmbedElementImpl::id() const {
   return ID_EMBED;
 }
 
-bool HTMLEmbedElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLEmbedElementImpl::mapToEntry(NodeImpl::Id attr,
                                       MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_WIDTH:
     case ATTR_HEIGHT:
     case ATTR_BORDER:
@@ -350,9 +350,9 @@ HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
   return 0;
 }
 
-bool HTMLObjectElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLObjectElementImpl::mapToEntry(NodeImpl::Id attr,
                                        MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_WIDTH:
     case ATTR_HEIGHT:
       result = eUniversal;

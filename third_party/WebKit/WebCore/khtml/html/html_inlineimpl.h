@@ -61,7 +61,7 @@ class HTMLBRElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -78,7 +78,7 @@ class HTMLFontElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 };

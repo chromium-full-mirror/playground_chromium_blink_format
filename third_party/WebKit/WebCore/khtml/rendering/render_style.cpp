@@ -318,7 +318,8 @@ void RenderStyle::arenaDelete(RenderArena* arena) {
   arena->free(*(size_t*)this, this);
 }
 
-RenderStyle::RenderStyle() {
+RenderStyle::RenderStyle()
+    : m_pseudoState(PseudoUnknown), m_affectedByAttributeSelectors(false) {
   m_ref = 0;
 
   if (!_default)
@@ -339,7 +340,8 @@ RenderStyle::RenderStyle() {
   content = 0;
 }
 
-RenderStyle::RenderStyle(bool) {
+RenderStyle::RenderStyle(bool)
+    : m_pseudoState(PseudoUnknown), m_affectedByAttributeSelectors(false) {
   setBitDefaults();
 
   box.init();
@@ -368,7 +370,9 @@ RenderStyle::RenderStyle(const RenderStyle& o)
       css3InheritedData(o.css3InheritedData),
       inherited(o.inherited),
       pseudoStyle(0),
-      content(o.content) {
+      content(o.content),
+      m_pseudoState(o.m_pseudoState),
+      m_affectedByAttributeSelectors(false) {
   m_ref = 0;
 }
 

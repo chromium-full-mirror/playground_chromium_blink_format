@@ -1368,6 +1368,9 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   int scrolledY = _ty;
   if (hasOverflowClip())
     m_layer->subtractScrollOffset(scrolledX, scrolledY);
+
+  paintLineBoxDecorations(paintInfo, scrolledX,
+                          scrolledY);  // Underline/overline
   for (RenderObject* child = firstChild(); child;
        child = child->nextSibling()) {
     // Check for page-break-before: always, and if it's set, break and bail.
@@ -1393,7 +1396,8 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
       return;
     }
   }
-  paintLineBoxDecorations(paintInfo, scrolledX, scrolledY);
+  paintLineBoxDecorations(paintInfo, scrolledX, scrolledY,
+                          true);  // Strike-through
 
   // 3. paint floats.
   if (!inlineFlow &&

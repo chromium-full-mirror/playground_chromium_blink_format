@@ -236,9 +236,9 @@ NodeImpl::Id HTMLBRElementImpl::id() const {
   return ID_BR;
 }
 
-bool HTMLBRElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLBRElementImpl::mapToEntry(NodeImpl::Id attr,
                                    MappedAttributeEntry& result) const {
-  if (attr->id() == ATTR_CLEAR) {
+  if (attr == ATTR_CLEAR) {
     result = eUniversal;
     return false;
   }
@@ -327,9 +327,9 @@ static bool parseFontSizeNumber(const DOMString& s, int& size) {
   return true;
 }
 
-bool HTMLFontElementImpl::mapToEntry(AttributeImpl* attr,
+bool HTMLFontElementImpl::mapToEntry(NodeImpl::Id attr,
                                      MappedAttributeEntry& result) const {
-  switch (attr->id()) {
+  switch (attr) {
     case ATTR_SIZE:
     case ATTR_COLOR:
     case ATTR_FACE:

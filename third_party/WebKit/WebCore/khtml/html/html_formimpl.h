@@ -315,7 +315,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void click();
   virtual void accessKeyAction();
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 

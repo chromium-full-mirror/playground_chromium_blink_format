@@ -114,6 +114,9 @@ class HTMLNamedAttrMapImpl : public NamedAttrMapImpl {
   void declRemoved() { m_mappedAttributeCount--; }
   void declAdded() { m_mappedAttributeCount++; }
 
+  bool mapsEquivalent(const HTMLNamedAttrMapImpl* otherMap) const;
+  int declCount() const;
+
   HTMLAttributeImpl* attributeItem(unsigned long index) const {
     return attrs ? static_cast<HTMLAttributeImpl*>(attrs[index]) : 0;
   }
@@ -151,8 +154,13 @@ class HTMLElementImpl : public ElementImpl {
   const HTMLNamedAttrMapImpl* htmlAttributes() const {
     return static_cast<HTMLNamedAttrMapImpl*>(namedAttrMap);
   }
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
+  bool isMappedAttribute(NodeImpl::Id attr) const {
+    MappedAttributeEntry res = eNone;
+    mapToEntry(attr, res);
+    return res != eNone;
+  }
 
   void addCSSLength(HTMLAttributeImpl* attr, int id, const DOMString& value);
   void addCSSProperty(HTMLAttributeImpl* attr, int id, const DOMString& value);

@@ -313,6 +313,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_styleSelectorDirty = false;
   m_inStyleRecalc = false;
   m_usesDescendantRules = false;
+  m_usesSiblingRules = false;
 
   m_styleSelector = new CSSStyleSelector(this, m_usersheet, m_styleSheets,
                                          m_url, !inCompatMode());

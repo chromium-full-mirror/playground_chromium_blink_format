@@ -50,7 +50,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 
@@ -83,7 +83,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -111,7 +111,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   HTMLFormElementImpl* form() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 

@@ -174,7 +174,10 @@ class InlineRunBox : public InlineBox {
                                         int _tx,
                                         int _ty,
                                         int xOffsetOnLine){};
-  virtual void paintDecorations(RenderObject::PaintInfo& i, int _tx, int _ty){};
+  virtual void paintDecorations(RenderObject::PaintInfo& i,
+                                int _tx,
+                                int _ty,
+                                bool paintedChildren = false){};
 
  protected:
   InlineRunBox* m_prevLine;  // The previous box that also uses our RenderObject
@@ -234,7 +237,10 @@ class InlineFlowBox : public InlineRunBox {
                                         int _tx,
                                         int _ty,
                                         int xOffsetOnLine);
-  virtual void paintDecorations(RenderObject::PaintInfo& i, int _tx, int _ty);
+  virtual void paintDecorations(RenderObject::PaintInfo& i,
+                                int _tx,
+                                int _ty,
+                                bool paintedChildren = false);
 
   int marginBorderPaddingLeft();
   int marginBorderPaddingRight();

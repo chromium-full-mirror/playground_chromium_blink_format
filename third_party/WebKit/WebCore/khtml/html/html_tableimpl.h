@@ -97,7 +97,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   // overrides
   virtual NodeImpl* addChild(NodeImpl* child);
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -135,7 +135,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
  public:
   HTMLTablePartElementImpl(DocumentPtr* doc) : HTMLElementImpl(doc) {}
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 };
@@ -201,7 +201,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
   virtual Id id() const { return _id; }
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -233,7 +233,7 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
   void setTable(HTMLTableElementImpl* t) { table = t; }
 
   // overrides
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
@@ -257,7 +257,7 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
 
   virtual Id id() const;
 
-  virtual bool mapToEntry(AttributeImpl* attr,
+  virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 };
