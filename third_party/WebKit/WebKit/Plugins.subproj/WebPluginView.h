@@ -42,7 +42,7 @@ typedef struct _StreamData {
   char **cAttributes, **cValues;
   bool isFlipped, transferred, hidden, stopped;
 
-  NSString *url, *mime;
+  NSString *URL, *mime;
   NSTrackingRectTag trackingTag;
   NSMutableArray* filesToErase;
 
@@ -59,7 +59,6 @@ typedef struct _StreamData {
   NPP_URLNotifyProcPtr NPP_URLNotify;
   NPP_GetValueProcPtr NPP_GetValue;
   NPP_SetValueProcPtr NPP_SetValue;
-  NPP_ShutdownProcPtr NPP_Shutdown;
 }
 
 - initWithFrame:(NSRect)r

@@ -34,6 +34,7 @@
   NPNetscapeFuncs browserFuncs;
   uint16 pluginSize;
   uint16 pluginVersion;
+
   NPP_NewProcPtr NPP_New;
   NPP_DestroyProcPtr NPP_Destroy;
   NPP_SetWindowProcPtr NPP_SetWindow;
@@ -54,6 +55,7 @@
 - (BOOL)getPluginInfoForResourceFile:(SInt16)resRef;
 - (void)load;
 - (void)unload;
+- (NSString*)mimeTypeForURL:(NSString*)URL;
 - (NSArray*)mimeTypes;
 - (NSString*)name;
 - (NSString*)filename;
