@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+#define NULL __null
+#endif
+
 #include <config.h>
 
 #include <assert.h>
