@@ -334,6 +334,7 @@ PluginBase::~PluginBase() {
 }
 
 #ifdef APPLE_CHANGES
+
 void PluginBase::ref() {
   m_refCount++;
 }
