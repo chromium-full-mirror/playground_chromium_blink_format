@@ -303,10 +303,6 @@ QRect RenderRoot::selectionRect() const {
   QRect selectionRect = enclosingPositionedRect(r);
 
   while (r && r != m_selectionEnd) {
-    if (r->selectionState() == SelectionInside && r != m_selectionStart) {
-      selectionRect = selectionRect.unite(enclosingPositionedRect(r));
-    }
-
     RenderObject* n;
     if (!(n = r->firstChild())) {
       if (!(n = r->nextSibling())) {
@@ -318,6 +314,9 @@ QRect RenderRoot::selectionRect() const {
       }
     }
     r = n;
+    if (r) {
+      selectionRect = selectionRect.unite(enclosingPositionedRect(r));
+    }
   }
 
   return selectionRect;

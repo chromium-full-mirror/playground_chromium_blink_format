@@ -143,8 +143,7 @@ void TextSlave::paintDecoration(QPainter* pt,
                                 int _ty,
                                 int decoration,
                                 bool begin,
-                                bool end);
-{
+                                bool end) {
   _tx += m_x;
   _ty += m_y;
 
@@ -809,8 +808,7 @@ void RenderText::paintObject(QPainter* p,
               }
             } else {
               s->paintDecoration(p, font, this, tx, ty, d, si == 0,
-                                 si == (int)m_lines.count() - 1, s->m_start,
-                                 s->m_start + s->m_len);
+                                 si == (int)m_lines.count() - 1);
             }
           }
 
