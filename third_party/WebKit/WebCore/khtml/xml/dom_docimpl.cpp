@@ -2691,7 +2691,10 @@ void DocumentTypeImpl::copyFrom(const DocumentTypeImpl& other) {
 
 DOMString DocumentTypeImpl::toString() const {
   DOMString result = "<!DOCTYPE";
-  result += m_qualifiedName;
+  if (!m_qualifiedName.isEmpty()) {
+    result += " ";
+    result += m_qualifiedName;
+  }
   if (!m_publicId.isEmpty()) {
     result += " PUBLIC \"";
     result += m_publicId;
@@ -2703,15 +2706,12 @@ DOMString DocumentTypeImpl::toString() const {
     result += m_systemId;
     result += "\"";
   }
-
   if (!m_subset.isEmpty()) {
     result += " [";
     result += m_subset;
     result += "]";
   }
-
   result += ">";
-
   return result;
 }
 

@@ -735,6 +735,8 @@ class DocumentTypeImpl : public NodeImpl {
 
   // Other methods (not part of DOM)
   void setName(const DOMString& n) { m_qualifiedName = n; }
+  void setPublicId(const DOMString& publicId) { m_publicId = publicId; }
+  void setSystemId(const DOMString& systemId) { m_systemId = systemId; }
   DOMImplementationImpl* implementation() const { return m_implementation; }
   void copyFrom(const DocumentTypeImpl&);
 
