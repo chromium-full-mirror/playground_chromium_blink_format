@@ -36,7 +36,6 @@ typedef enum {
                                        // list
   WebFrameLoadTypeReload,
   WebFrameLoadTypeReloadAllowingStaleData,
-  WebFrameLoadTypeClientRedirect,
   WebFrameLoadTypeInternal
 } WebFrameLoadType;
 
@@ -97,6 +96,12 @@ typedef enum {
 - (WebFrameLoadType)_loadType;
 - (void)_goToItem:(WebHistoryItem*)item
     withFrameLoadType:(WebFrameLoadType)type;
+- (void)_loadURL:(NSURL*)URL
+          loadType:(WebFrameLoadType)loadType
+    clientRedirect:(BOOL)clientRedirect;
+- (void)_postWithURL:(NSURL*)URL
+                data:(NSData*)data
+         contentType:(NSString*)contentType;
 - (void)_restoreScrollPosition;
 - (void)_scrollToTop;
 - (void)_textSizeMultiplierChanged;
