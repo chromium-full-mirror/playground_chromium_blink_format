@@ -15,6 +15,7 @@
 @class IFWebController;
 @class IFWebViewPrivate;
 @protocol IFDocumentLoading;
+@protocol IFDocumentView;
 
 @interface IFWebView : NSView {
  @private
@@ -27,7 +28,7 @@
 - (IFWebController*)controller;
 
 - frameScrollView;
-- documentView;
+- (NSView<IFDocumentView>*)documentView;
 
 - (BOOL)isDocumentHTML;
 

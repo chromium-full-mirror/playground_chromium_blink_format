@@ -39,6 +39,7 @@ class KWQKHTMLPartImpl : public QObject {
   void setBridge(WebCoreBridge* p) { bridge = p; }
   WebCoreBridge* getBridge() const { return bridge; }
   void setView(KHTMLView* view);
+  KHTMLView* getView() const;
 
   bool openURLInFrame(const KURL&, const KParts::URLArgs&);
   void openURL(const KURL&);
