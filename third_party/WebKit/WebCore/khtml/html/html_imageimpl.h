@@ -99,16 +99,13 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
   virtual QRect getRect() const;
 
-  virtual bool isURLAttribute(AttributeImpl* attr) const;
-
  protected:
   QRegion getRegion(int width_, int height) const;
   QRegion region;
   khtml::Length* m_coords;
   int m_coordsLen;
   int lastw, lasth;
-  Shape shape : 3;
-  bool nohref : 1;
+  Shape shape;
 };
 
 // -------------------------------------------------------------------------
