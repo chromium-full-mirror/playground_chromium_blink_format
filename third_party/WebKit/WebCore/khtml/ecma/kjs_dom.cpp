@@ -424,8 +424,9 @@ void DOMNode::setListener(ExecState* exec, int eventId, Value func) const {
 
 Value DOMNode::getListener(int eventId) const {
   DOM::EventListener* listener = node.handle()->getHTMLEventListener(eventId);
-  if (listener)
-    return static_cast<JSEventListener*>(listener)->listenerObj();
+  JSEventListener* jsListener = static_cast<JSEventListener*>(listener);
+  if (jsListener && jsListener->listenerObjImp())
+    return jsListener->listenerObj();
   else
     return Null();
 }
