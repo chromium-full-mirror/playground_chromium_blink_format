@@ -259,7 +259,6 @@ void Interpreter::finalCheck() {
   Node::finalCheck();
   Collector::finalCheck();
   Lexer::globalClear();
-  List::globalClear();
   UString::globalClear();
 }
 #endif
