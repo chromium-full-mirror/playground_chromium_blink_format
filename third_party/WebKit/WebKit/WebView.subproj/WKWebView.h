@@ -9,7 +9,6 @@
 #import <WebKit/WKWebDataSource.h>
 #import <WebKit/WKWebController.h>
 
-#ifdef READY_FOR_PRIMETIME
 /*
    =============================================================================
 
@@ -106,6 +105,8 @@
   id _viewPrivate;
 }
 
+#ifdef READY_FOR_PRIMETIME
+
 - initWithFrame:(NSRect)frame;
 
 // Convenience method.  initWithFrame:url: will create a controller and data
@@ -162,6 +163,8 @@
     // Get an attributed string that represents the current selection.
     -(NSAttributedString*)selectedText;
 
+#endif
+
 @end
 
 /*
@@ -180,5 +183,3 @@
 
         subclassing of WKWebView
 */
-
-#endif
