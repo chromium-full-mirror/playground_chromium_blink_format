@@ -1236,6 +1236,7 @@ bool HTMLInputElementImpl::rendererIsNeeded(RenderStyle* style) {
       return false;
   }
   assert(false);
+  return false;
 }
 
 RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
@@ -1263,6 +1264,7 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
       break;
   }
   assert(false);
+  return 0;
 }
 
 void HTMLInputElementImpl::attach() {
