@@ -278,6 +278,7 @@ typedef enum {
                                 startOffset:(int)startOffset
                                          to:(DOMNode*)endNode
                                   endOffset:(int)endOffset;
+- (NSFont*)renderedFontForNode:(DOMNode*)node;
 
 + (NSString*)stringWithData:(NSData*)data
                textEncoding:(CFStringEncoding)textEncoding;
