@@ -1018,114 +1018,123 @@ DOM::DocumentImpl* KHTMLPart::xmlDocImpl() const {
   return 0;
 }
 
-#if !APPLE_CHANGES
-
 /*bool KHTMLPart::isSSLInUse() const
 {
   return d->m_ssl_in_use;
 }*/
+
+void KHTMLPart::receivedFirstData() {
+  // Leave indented one extra for easier merging.
+
+  // kdDebug( 6050 ) << "begin!" << endl;
+
+  begin(d->m_workingURL, d->m_extension->urlArgs().xOffset,
+        d->m_extension->urlArgs().yOffset);
+
+  d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
+  d->m_workingURL = KURL();
+
+  d->m_cacheId = KHTMLPageCache::self()->createCacheEntry();
+
+// When the first data arrives, the metadata has just been made available
+#if APPLE_CHANGES
+  QString qData;
+#else
+  d->m_bSecurityInQuestion = false;
+  d->m_ssl_in_use = (d->m_job->queryMetaData("ssl_in_use") == "TRUE");
+  kdDebug(6050) << "SSL in use? " << d->m_job->queryMetaData("ssl_in_use")
+                << endl;
+
+  {
+    KHTMLPart* p = parentPart();
+    if (p && p->d->m_ssl_in_use != d->m_ssl_in_use) {
+      while (p->parentPart())
+        p = p->parentPart();
+
+      p->d->m_paSecurity->setIcon("halfencrypted");
+      p->d->m_bSecurityInQuestion = true;
+      kdDebug(6050) << "parent setIcon half done." << endl;
+    }
+  }
+
+  d->m_paSecurity->setIcon(d->m_ssl_in_use ? "encrypted" : "decrypted");
+  kdDebug(6050) << "setIcon " << (d->m_ssl_in_use ? "encrypted" : "decrypted")
+                << " done." << endl;
+
+  // Shouldn't all of this be done only if ssl_in_use == true ? (DF)
+
+  d->m_ssl_peer_certificate = d->m_job->queryMetaData("ssl_peer_certificate");
+  d->m_ssl_peer_chain = d->m_job->queryMetaData("ssl_peer_chain");
+  d->m_ssl_peer_ip = d->m_job->queryMetaData("ssl_peer_ip");
+  d->m_ssl_cipher = d->m_job->queryMetaData("ssl_cipher");
+  d->m_ssl_cipher_desc = d->m_job->queryMetaData("ssl_cipher_desc");
+  d->m_ssl_cipher_version = d->m_job->queryMetaData("ssl_cipher_version");
+  d->m_ssl_cipher_used_bits = d->m_job->queryMetaData("ssl_cipher_used_bits");
+  d->m_ssl_cipher_bits = d->m_job->queryMetaData("ssl_cipher_bits");
+  d->m_ssl_cert_state = d->m_job->queryMetaData("ssl_cert_state");
+
+  // Check for charset meta-data
+  QString qData = d->m_job->queryMetaData("charset");
+  if (!qData.isEmpty() && !d->m_haveEncoding)  // only use information if the
+                                               // user didn't override the
+                                               // settings
+    d->m_encoding = qData;
+#endif  // APPLE_CHANGES
+
+  // Support for http-refresh
+  qData = d->m_job->queryMetaData("http-refresh");
+  if (!qData.isEmpty() && d->m_metaRefreshEnabled) {
+    kdDebug(6050) << "HTTP Refresh Request: " << qData << endl;
+    double delay;
+    int pos = qData.find(';');
+    if (pos == -1)
+      pos = qData.find(',');
+
+    if (pos == -1) {
+      delay = qData.stripWhiteSpace().toDouble();
+      scheduleRedirection(delay, m_url.url());
+    } else {
+      int end_pos = qData.length();
+      delay = qData.left(pos).stripWhiteSpace().toDouble();
+      while (qData[++pos] == ' ')
+        ;
+      if (qData.find("url", pos, false) == pos) {
+        pos += 3;
+        while (qData[pos] == ' ' || qData[pos] == '=')
+          pos++;
+        if (qData[pos] == '"') {
+          pos++;
+          int index = end_pos - 1;
+          while (index > pos) {
+            if (qData[index] == '"')
+              break;
+            index--;
+          }
+          if (index > pos)
+            end_pos = index;
+        }
+      }
+      scheduleRedirection(delay,
+                          d->m_doc->completeURL(qData.mid(pos, end_pos)));
+    }
+    d->m_bHTTPRefresh = true;
+  }
+
+  // Support for http last-modified
+  d->m_lastModified = d->m_job->queryMetaData("modified");
+  // kdDebug() << "KHTMLPart::slotData metadata modified: " << d->m_lastModified
+  // << endl;
+}
+
+#if !APPLE_CHANGES
 
 void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
   assert(d->m_job == kio_job);
 
   // kdDebug( 6050 ) << "slotData: " << data.size() << endl;
   // The first data ?
-  if (!d->m_workingURL.isEmpty()) {
-    // kdDebug( 6050 ) << "begin!" << endl;
-
-    begin(d->m_workingURL, d->m_extension->urlArgs().xOffset,
-          d->m_extension->urlArgs().yOffset);
-
-    d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
-    d->m_workingURL = KURL();
-
-    d->m_cacheId = KHTMLPageCache::self()->createCacheEntry();
-
-    // When the first data arrives, the metadata has just been made available
-    d->m_bSecurityInQuestion = false;
-    d->m_ssl_in_use = (d->m_job->queryMetaData("ssl_in_use") == "TRUE");
-    kdDebug(6050) << "SSL in use? " << d->m_job->queryMetaData("ssl_in_use")
-                  << endl;
-
-    {
-      KHTMLPart* p = parentPart();
-      if (p && p->d->m_ssl_in_use != d->m_ssl_in_use) {
-        while (p->parentPart())
-          p = p->parentPart();
-
-        p->d->m_paSecurity->setIcon("halfencrypted");
-        p->d->m_bSecurityInQuestion = true;
-        kdDebug(6050) << "parent setIcon half done." << endl;
-      }
-    }
-
-    d->m_paSecurity->setIcon(d->m_ssl_in_use ? "encrypted" : "decrypted");
-    kdDebug(6050) << "setIcon " << (d->m_ssl_in_use ? "encrypted" : "decrypted")
-                  << " done." << endl;
-
-    // Shouldn't all of this be done only if ssl_in_use == true ? (DF)
-
-    d->m_ssl_peer_certificate = d->m_job->queryMetaData("ssl_peer_certificate");
-    d->m_ssl_peer_chain = d->m_job->queryMetaData("ssl_peer_chain");
-    d->m_ssl_peer_ip = d->m_job->queryMetaData("ssl_peer_ip");
-    d->m_ssl_cipher = d->m_job->queryMetaData("ssl_cipher");
-    d->m_ssl_cipher_desc = d->m_job->queryMetaData("ssl_cipher_desc");
-    d->m_ssl_cipher_version = d->m_job->queryMetaData("ssl_cipher_version");
-    d->m_ssl_cipher_used_bits = d->m_job->queryMetaData("ssl_cipher_used_bits");
-    d->m_ssl_cipher_bits = d->m_job->queryMetaData("ssl_cipher_bits");
-    d->m_ssl_cert_state = d->m_job->queryMetaData("ssl_cert_state");
-
-    // Check for charset meta-data
-    QString qData = d->m_job->queryMetaData("charset");
-    if (!qData.isEmpty() && !d->m_haveEncoding)  // only use information if the
-                                                 // user didn't override the
-                                                 // settings
-      d->m_encoding = qData;
-
-    // Support for http-refresh
-    qData = d->m_job->queryMetaData("http-refresh");
-    if (!qData.isEmpty() && d->m_metaRefreshEnabled) {
-      kdDebug(6050) << "HTTP Refresh Request: " << qData << endl;
-      double delay;
-      int pos = qData.find(';');
-      if (pos == -1)
-        pos = qData.find(',');
-
-      if (pos == -1) {
-        delay = qData.stripWhiteSpace().toDouble();
-        scheduleRedirection(delay, m_url.url());
-      } else {
-        int end_pos = qData.length();
-        delay = qData.left(pos).stripWhiteSpace().toDouble();
-        while (qData[++pos] == ' ')
-          ;
-        if (qData.find("url", pos, false) == pos) {
-          pos += 3;
-          while (qData[pos] == ' ' || qData[pos] == '=')
-            pos++;
-          if (qData[pos] == '"') {
-            pos++;
-            int index = end_pos - 1;
-            while (index > pos) {
-              if (qData[index] == '"')
-                break;
-              index--;
-            }
-            if (index > pos)
-              end_pos = index;
-          }
-        }
-        scheduleRedirection(delay,
-                            d->m_doc->completeURL(qData.mid(pos, end_pos)));
-      }
-      d->m_bHTTPRefresh = true;
-    }
-
-    // Support for http last-modified
-    d->m_lastModified = d->m_job->queryMetaData("modified");
-    // kdDebug() << "KHTMLPart::slotData metadata modified: " <<
-    // d->m_lastModified << endl;
-  }
+  if (!d->m_workingURL.isEmpty())
+    receivedFirstData();
 
   KHTMLPageCache::self()->addData(d->m_cacheId, data);
   write(data.data(), data.size());

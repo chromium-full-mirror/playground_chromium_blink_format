@@ -1127,6 +1127,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void checkEmitLoadEvent();
   void emitLoadEvent();
 
+  void receivedFirstData();
+
   KHTMLPartPrivate* d;
   friend class KHTMLPartPrivate;
 
