@@ -513,7 +513,7 @@ bool RenderText::nodeAtPoint(NodeInfo& info,
 
   setMouseInside(inside);
 
-  if (inside) {
+  if (inside && element()) {
     if (info.innerNode() && info.innerNode()->renderer() &&
         !info.innerNode()->renderer()->isInline()) {
       // Within the same layer, inlines are ALWAYS fully above blocks.  Change

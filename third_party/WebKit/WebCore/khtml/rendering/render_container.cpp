@@ -211,20 +211,26 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
   RenderStyle* pseudo = child->style()->getPseudoStyle(type);
 
   if (pseudo && pseudo->display() != NONE) {
+    // From the CSS2 specification:
+    // User agents must ignore the following properties with :before and :after
+    // pseudo-elements: 'position', 'float', list properties, and table
+    // properties.
+    // Basically we need to ensure that no RenderLayer gets made for generated
+    // content.
+    pseudo->setPosition(STATIC);
+    pseudo->setFloating(FNONE);
+    pseudo->setOverflow(OVISIBLE);  // FIXME: Glazman's blog does this. Wacky.
+    // This property might need to be allowed if the
+    // generated content is a block.
+
     if (pseudo->contentType() == CONTENT_TEXT) {
       RenderObject* po = new (renderArena()) RenderFlow(0 /* anonymous box */);
-      po->setParent(this);  // Set the parent now, so setStyle will be able to
-                            // find a renderArena.
       po->setStyle(pseudo);
-      po->setParent(0);  // Unset the parent to avoid asserting in addChild.
       addChild(po, beforeChild);
 
       RenderText* t = new (renderArena())
           RenderText(0 /*anonymous object */, pseudo->contentText());
-      t->setParent(po);  // Set the parent now, so setStyle will be able to find
-                         // a renderArena.
       t->setStyle(pseudo);
-      t->setParent(0);  // Unset the parent to avoid asserting in addChild.
       po->addChild(t);
 
       //            kdDebug() << DOM::DOMString(pseudo->contentText()).string()
@@ -234,10 +240,7 @@ void RenderContainer::insertPseudoChild(RenderStyle::PseudoId type,
       po->close();
     } else if (pseudo->contentType() == CONTENT_OBJECT) {
       RenderObject* po = new (renderArena()) RenderImage(0);
-      po->setParent(this);  // Set the parent now, so setStyle will be able to
-                            // find a renderArena.
       po->setStyle(pseudo);
-      po->setParent(0);  // Unset the parent to avoid asserting in addChild.
       addChild(po, beforeChild);
       po->close();
     }
