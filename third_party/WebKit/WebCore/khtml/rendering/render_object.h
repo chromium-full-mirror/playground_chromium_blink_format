@@ -299,8 +299,8 @@ class RenderObject : public CachedObjectClient {
   bool posChildNeedsLayout() const { return m_posChildNeedsLayout; }
   bool normalChildNeedsLayout() const { return m_normalChildNeedsLayout; }
   bool minMaxKnown() const { return m_minMaxKnown; }
-  bool isSelectionBorder() const { return m_isSelectionBorder; }
   bool recalcMinMax() const { return m_recalcMinMax; }
+  bool isSelectionBorder() const;
 
   bool hasOverflowClip() const { return m_hasOverflowClip; }
   bool hasAutoScrollbars() const {
@@ -368,7 +368,6 @@ class RenderObject : public CachedObjectClient {
   }
   void setRenderText() { m_isText = true; }
   void setReplaced(bool b = true) { m_replaced = b; }
-  void setIsSelectionBorder(bool b = true) { m_isSelectionBorder = b; }
   void setHasOverflowClip(bool b = true) { m_hasOverflowClip = b; }
 
   void scheduleRelayout();
@@ -957,7 +956,6 @@ class RenderObject : public CachedObjectClient {
   bool m_replaced : 1;
   bool m_mouseInside : 1;
   bool m_isDragging : 1;
-  bool m_isSelectionBorder : 1;
 
   bool m_hasOverflowClip : 1;
 

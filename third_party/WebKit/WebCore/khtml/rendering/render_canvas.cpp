@@ -387,20 +387,10 @@ void RenderCanvas::setSelection(RenderObject* s,
   while (e && e->lastChild())
     e = e->lastChild();
 
-  // set selection start
-  if (m_selectionStart)
-    m_selectionStart->setIsSelectionBorder(false);
+  // set selection start and end
   m_selectionStart = s;
-  if (m_selectionStart)
-    m_selectionStart->setIsSelectionBorder(true);
   m_selectionStartPos = sp;
-
-  // set selection end
-  if (m_selectionEnd)
-    m_selectionEnd->setIsSelectionBorder(false);
   m_selectionEnd = e;
-  if (m_selectionEnd)
-    m_selectionEnd->setIsSelectionBorder(true);
   m_selectionEndPos = ep;
 
   // Update the selection status of all objects between m_selectionStart and
