@@ -1253,8 +1253,10 @@ int RenderText::height() const {
   return retval;
 }
 
-short RenderText::lineHeight(bool firstLine, bool isRootLineBox) const {
-  return parent()->lineHeight(firstLine, isRootLineBox);
+short RenderText::lineHeight(bool firstLine, bool) const {
+  // Always use the interior line height of the parent (e.g., if our parent is
+  // an inline block).
+  return parent()->lineHeight(firstLine, true);
 }
 
 short RenderText::baselinePosition(bool firstLine, bool) const {
