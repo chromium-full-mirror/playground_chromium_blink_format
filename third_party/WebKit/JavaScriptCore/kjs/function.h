@@ -148,7 +148,7 @@ class GlobalFuncImp : public InternalFunctionImp {
     IsFinite,
     Escape,
     UnEscape
-#if !NDEBUG
+#ifndef NDEBUG
     ,
     KJSPrint
 #endif

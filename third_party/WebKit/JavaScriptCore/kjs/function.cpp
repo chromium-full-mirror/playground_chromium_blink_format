@@ -476,7 +476,7 @@ Value GlobalFuncImp::call(ExecState* exec,
       long long llValue = strtoll(cstr.c_str(), &endptr, radix);
       double value = llValue;
 #else
-      long value = strtoll(cstr.c_str(), &endptr, radix);
+      long value = strtol(cstr.c_str(), &endptr, radix);
 #endif
       if (errno != 0 || endptr == cstr.c_str())
         res = Number(NaN);
@@ -538,7 +538,7 @@ Value GlobalFuncImp::call(ExecState* exec,
       res = String(s);
       break;
     }
-#if !NDEBUG
+#ifndef NDEBUG
     case KJSPrint: {
       UString str = args[0].toString(exec);
       puts(str.ascii());
