@@ -455,6 +455,7 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
         // For last line, use the "magic BR" rather than a P.
         element = document->createHTMLElement("br", exceptionCode);
         assert(exceptionCode == 0);
+        element->ref();
         element->setAttribute(ATTR_CLASS, AppleInterchangeNewline);
       } else {
         element = createDefaultParagraphElement(document);
@@ -465,11 +466,13 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
           paragraphContents = document->createTextNode(s);
           assert(exceptionCode == 0);
         }
+        element->ref();
         element->appendChild(paragraphContents, exceptionCode);
         assert(exceptionCode == 0);
       }
       fragment->appendChild(element, exceptionCode);
       assert(exceptionCode == 0);
+      element->deref();
     }
   }
 
