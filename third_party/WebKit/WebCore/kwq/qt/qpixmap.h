@@ -37,6 +37,11 @@
 #include "qimage.h"
 #include "qsize.h"
 #include "qrect.h"
+#include "qpainter.h"
+
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+#import <Cocoa/Cocoa.h>
+#endif
 
 class QBitmap;
 class QWMatrix;
@@ -44,6 +49,8 @@ class QWMatrix;
 // class QPixmap ===============================================================
 
 class QPixmap : public QPaintDevice, public Qt {
+  friend class QPainter;
+
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -79,11 +86,16 @@ class QPixmap : public QPaintDevice, public Qt {
 
   QPixmap& operator=(const QPixmap&);
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
-
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
+#ifdef _KWQ_
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  NSImage* nsimage;
+#else
+  void* nsimage;
+#endif
+  QWMatrix xmatrix;
+#endif
 };  // class QPixmap
     // ============================================================
 

@@ -34,6 +34,10 @@
 #include "qpalette.h"
 #include "qsize.h"
 
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+#import <Cocoa/Cocoa.h>
+#endif
+
 // class QApplication ==========================================================
 
 class QApplication {
@@ -62,6 +66,11 @@ class QApplication {
   QApplication(int& argc, char** argv);
   virtual ~QApplication();
 
+  // These two functions (exec and setMainWidget) are only used by our
+  // test apps.
+  int exec();
+  virtual void setMainWidget(QWidget*);
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -76,6 +85,16 @@ class QApplication {
   // note that these are "standard" (no pendantic stuff needed)
   QApplication(const QApplication&);
   QApplication& operator=(const QApplication&);
+
+  void _initialize();
+
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  NSApplication* application;
+  NSAutoreleasePool* globalPool;
+#else
+  void* application;
+  void* globalPool;
+#endif
 
 };  // class QApplication
     // =======================================================

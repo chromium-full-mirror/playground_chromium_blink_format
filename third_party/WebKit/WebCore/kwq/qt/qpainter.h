@@ -42,10 +42,13 @@
 
 class QFont;
 class QPixmap;
+class QWidget;
 
 // class QWMatrix ==============================================================
 
 class QWMatrix {
+  friend QPainter;
+
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
@@ -79,10 +82,10 @@ class QWMatrix {
   QWMatrix(const QWMatrix&);
 #endif
 
-// add assignment operator
-// this private declaration prevents assignment
-#ifdef _KWQ_PEDANTIC_
-  QWMatrix& operator=(const QWMatrix&);
+#ifdef _KWQ_
+  bool empty;
+  double sx;
+  double sy;
 #endif
 
 };  // class QWMatrix
@@ -100,7 +103,14 @@ class QPainter : public Qt {
   // constructors, copy constructors, and destructors ------------------------
 
   QPainter();
+
+  // We may be able to remove this constructor and remove QPaintDevice.
   QPainter(const QPaintDevice*);
+
+#ifdef _KWQ_
+  QPainter(QWidget*);
+#endif
+
   ~QPainter();
 
   // member functions --------------------------------------------------------
@@ -130,6 +140,13 @@ class QPainter : public Qt {
                    int npoints = -1);
   void drawPixmap(const QPoint&, const QPixmap&);
   void drawPixmap(const QPoint&, const QPixmap&, const QRect&);
+  void drawPixmap(int x,
+                  int y,
+                  const QPixmap&,
+                  int sx = 0,
+                  int sy = 0,
+                  int sw = -1,
+                  int sh = -1);
   void
   drawTiledPixmap(int, int, int, int, const QPixmap&, int sx = 0, int sy = 0);
   void drawText(int x, int y, const QString&, int len = -1);
@@ -166,6 +183,30 @@ class QPainter : public Qt {
   QPainter(const QPainter&);
   QPainter& operator=(const QPainter&);
 
+#ifdef _KWQ_
+  void _lockFocus();
+  void _unlockFocus();
+
+  void _setColorFromBrush();
+  void _setColorFromPen();
+
+  void _initialize(QWidget* widget);
+  void _drawPoints(const QPointArray& _points,
+                   bool winding,
+                   int index,
+                   int _npoints,
+                   bool fill);
+
+  struct KWQPainterData {  // QPainter data.
+    QWidget* widget;       // Has a reference to a KWQView.
+    QFont qfont;
+    QBrush qbrush;
+    QPen qpen;
+    uint isFocusLocked : 1;
+    void* ps_stack;
+    NSCompositingOperation compositingOperation;
+  } * data;
+#endif
 };  // end class QPainter
 
 // =============================================================================

@@ -30,14 +30,14 @@
 #include <config.h>
 #endif
 
-// USING_BORROWED_QCOLOR =======================================================
+#include <qnamespace.h>
+#include <qstring.h>
 
-#ifdef USING_BORROWED_QCOLOR
-#include <_qcolor.h>
-#else
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+#import <Cocoa/Cocoa.h>
+#endif
 
-#include "qnamespace.h"
-#include "qstring.h"
+typedef unsigned int QRgb;  // RGB triplet
 
 QRgb qRgb(int r, int g, int b);
 QRgb qRgba(int r, int g, int b, int a);
@@ -58,10 +58,7 @@ class QColor {
   QColor(const char*);
   QColor(const QColor&);
 
-// add no-op destructor
-#ifdef _KWQ_PEDANTIC_
-  ~QColor() {}
-#endif
+  ~QColor();
 
   // member functions --------------------------------------------------------
 
@@ -92,10 +89,27 @@ class QColor {
   // -------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------
+  static bool globals_init;
+
+  void initGlobalColors();
+
+#ifdef _KWQ_
+  void _initialize(int, int, int);
+
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  NSColor* getNSColor();
+#else
+  void* getNSColor();
+#endif
+
+#if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
+  NSColor* color;
+#else
+  void* color;
+#endif
+#endif
 
 };  // class QColor
     // =============================================================
-
-#endif  // USING_BORROWED_QCOLOR
 
 #endif

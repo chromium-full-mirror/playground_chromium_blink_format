@@ -309,6 +309,8 @@ class QHideEvent : public QEvent {
   QHideEvent() {}
 #endif
 
+  QHideEvent(Type);
+
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
   ~QHideEvent() {}
@@ -353,6 +355,8 @@ class QResizeEvent : public QEvent {
 #ifdef _KWQ_PEDANTIC_
   QResizeEvent() {}
 #endif
+
+  QResizeEvent(Type);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
@@ -399,6 +403,8 @@ class QShowEvent : public QEvent {
   QShowEvent() {}
 #endif
 
+  QShowEvent(Type);
+
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
   ~QShowEvent() {}
@@ -443,6 +449,8 @@ class QWheelEvent : public QEvent {
 #ifdef _KWQ_PEDANTIC_
   QWheelEvent() {}
 #endif
+
+  QWheelEvent(Type);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
