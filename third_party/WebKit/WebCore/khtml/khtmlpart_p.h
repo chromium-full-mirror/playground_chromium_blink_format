@@ -40,6 +40,7 @@
 #include "khtml_iface.h"
 #include "khtml_settings.h"
 #include "misc/decoder.h"
+#include "misc/formdata.h"
 #include "java/kjavaappletcontext.h"
 #include "ecma/kjs_proxy.h"
 #include "css/css_valueimpl.h"
@@ -336,7 +337,7 @@ class KHTMLPartPrivate {
   struct SubmitForm {
     const char* submitAction;
     QString submitUrl;
-    QByteArray submitFormData;
+    khtml::FormData submitFormData;
     QString target;
     QString submitContentType;
     QString submitBoundary;

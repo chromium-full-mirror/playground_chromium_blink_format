@@ -107,6 +107,7 @@ using khtml::ChildFrame;
 using khtml::Decoder;
 using khtml::DeleteSelectionCommand;
 using khtml::EditCommand;
+using khtml::FormData;
 using khtml::InlineTextBox;
 using khtml::plainText;
 using khtml::RenderObject;
@@ -3371,7 +3372,7 @@ void KHTMLPart::submitFormAgain() {
 
 void KHTMLPart::submitForm(const char* action,
                            const QString& url,
-                           const QByteArray& formData,
+                           const FormData& formData,
                            const QString& _target,
                            const QString& contentType,
                            const QString& boundary) {
@@ -3505,18 +3506,16 @@ void KHTMLPart::submitForm(const char* action,
     QString bodyEnc;
     if (contentType.lower() == "multipart/form-data") {
       // FIXME: is this correct?  I suspect not
-      bodyEnc = KURL::encode_string(
-          QString::fromLatin1(formData.data(), formData.size()));
+      bodyEnc = KURL::encode_string(formData.flattenToString());
     } else if (contentType.lower() == "text/plain") {
       // Convention seems to be to decode, and s/&/\n/
-      QString tmpbody = QString::fromLatin1(formData.data(), formData.size());
-      tmpbody.replace(QRegExp("[&]"), "\n");
-      tmpbody.replace(QRegExp("[+]"), " ");
+      QString tmpbody = formData.flattenToString();
+      tmpbody.replace('&', '\n');
+      tmpbody.replace('+', ' ');
       tmpbody = KURL::decode_string(tmpbody);  // Decode the rest of it
       bodyEnc = KURL::encode_string(tmpbody);  // Recode for the URL
     } else {
-      bodyEnc = KURL::encode_string(
-          QString::fromLatin1(formData.data(), formData.size()));
+      bodyEnc = KURL::encode_string(formData.flattenToString());
     }
 
     nvps.append(QString("body=%1").arg(bodyEnc));
@@ -3526,10 +3525,14 @@ void KHTMLPart::submitForm(const char* action,
 
   if (strcmp(action, "get") == 0) {
     if (u.protocol() != "mailto")
-      u.setQuery(QString::fromLatin1(formData.data(), formData.size()));
+      u.setQuery(formData.flattenToString());
     args.setDoPost(false);
   } else {
+#if APPLE_CHANGES
     args.postData = formData;
+#else
+    args.postData = formData.flatten();
+#endif
     args.setDoPost(true);
 
     // construct some user headers if necessary

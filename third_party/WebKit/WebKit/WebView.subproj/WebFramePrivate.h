@@ -180,7 +180,7 @@ extern NSString* WebPageCacheDocumentViewKey;
 - (void)_postWithURL:(NSURL*)URL
             referrer:(NSString*)referrer
               target:(NSString*)target
-                data:(NSData*)data
+                data:(NSArray*)postData
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
                 form:(DOMElement*)form

@@ -35,13 +35,15 @@
 #include "KWQKPartsPart.h"
 #include "KWQKPartsBrowserInterface.h"
 
+#include "formdata.h"
+
 class KXMLGUIClient {};
 
 namespace KParts {
 
 struct URLArgs {
   QString frameName;
-  QByteArray postData;
+  khtml::FormData postData;
   bool reload;
   QString serviceType;
   int xOffset;
