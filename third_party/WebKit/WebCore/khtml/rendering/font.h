@@ -81,9 +81,14 @@ class Font {
   friend class CSSStyleSelector;
 
  public:
+#if APPLE_CHANGES
+  Font() : letterSpacing(0), wordSpacing(0) {}
+  Font(const FontDef& fd) : fontDef(fd), letterSpacing(0), wordSpacing(0) {}
+#else
   Font() : fontDef(), f(), fm(f), scFont(0), letterSpacing(0), wordSpacing(0) {}
   Font(const FontDef& fd)
       : fontDef(fd), f(), fm(f), scFont(0), letterSpacing(0), wordSpacing(0) {}
+#endif
 
   bool operator==(const Font& other) const {
     return (fontDef == other.fontDef && letterSpacing == other.letterSpacing &&
@@ -131,7 +136,9 @@ class Font {
   FontDef fontDef;
   mutable QFont f;
   mutable QFontMetrics fm;
+#if !APPLE_CHANGES
   QFont* scFont;
+#endif
   short letterSpacing;
   short wordSpacing;
 };

@@ -331,6 +331,17 @@ inline void fixUpChar(QChar& c) {
 
 #endif  // APPLE_CHANGES
 
+inline bool tagMatch(const char* s1, const QChar* s2, uint length) {
+  for (uint i = 0; i != length; ++i) {
+    char c1 = s1[i];
+    char uc1 = toupper(c1);
+    QChar c2 = s2[i];
+    if (c1 != c2 && uc1 != c2)
+      return false;
+  }
+  return true;
+}
+
 // ----------------------------------------------------------------------------
 
 HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc, KHTMLView* _view) {
@@ -500,7 +511,9 @@ void HTMLTokenizer::parseSpecial(DOMStringIt& src) {
     unsigned char ch = src->latin1();
     if (!scriptCodeResync && !brokenComments && !textarea && !xmp && !title &&
         ch == '-' && scriptCodeSize >= 3 && !src.escaped() &&
-        QConstString(scriptCode + scriptCodeSize - 3, 3).string() == "<!-") {
+        scriptCode[scriptCodeSize - 3] == '<' &&
+        scriptCode[scriptCodeSize - 2] == '!' &&
+        scriptCode[scriptCodeSize - 1] == '-') {
       comment = true;
       parseComment(src);
       continue;
@@ -535,10 +548,8 @@ void HTMLTokenizer::parseSpecial(DOMStringIt& src) {
     if (!scriptCodeResync && !escaped && !src.escaped() &&
         (ch == '>' || ch == '/' || ch <= ' ') && ch &&
         scriptCodeSize >= searchStopperLen &&
-        !QConstString(scriptCode + scriptCodeSize - searchStopperLen,
-                      searchStopperLen)
-             .string()
-             .find(searchStopper, 0, false)) {
+        tagMatch(searchStopper, scriptCode + scriptCodeSize - searchStopperLen,
+                 searchStopperLen)) {
       scriptCodeResync = scriptCodeSize - searchStopperLen + 1;
       tquote = NoQuote;
       continue;

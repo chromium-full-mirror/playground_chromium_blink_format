@@ -49,24 +49,22 @@ int getPropertyID(const char* tagStr, int len);
 // this class represents a selector for a StyleRule
 class CSSSelector {
  public:
-  CSSSelector(void)
+  CSSSelector()
       : tagHistory(0),
         attr(0),
         tag(0),
         relation(Descendant),
         match(None),
         nonCSSHint(false),
-        pseudoId(0) {}
+        pseudoId(0),
+        _pseudoType(PseudoNotParsed) {}
 
-  ~CSSSelector(void) {
-    if (tagHistory)
-      delete tagHistory;
-  }
+  ~CSSSelector() { delete tagHistory; }
 
   /**
    * Print debug output for this selector
    */
-  void print(void);
+  void print();
 
   /**
    * Re-create selector text from selector's data
@@ -95,7 +93,29 @@ class CSSSelector {
 
   enum Relation { Descendant = 0, Child, Sibling, SubSelector };
 
-  DOM::DOMString value;
+  enum PseudoType {
+    PseudoNotParsed = 0,
+    PseudoOther,
+    PseudoEmpty,
+    PseudoFirstChild,
+    PseudoFirstLine,
+    PseudoFirstLetter,
+    PseudoLink,
+    PseudoVisited,
+    PseudoHover,
+    PseudoFocus,
+    PseudoActive,
+    PseudoBefore,
+    PseudoAfter
+  };
+
+  inline PseudoType pseudoType() const {
+    if (_pseudoType == PseudoNotParsed)
+      extractPseudoType();
+    return _pseudoType;
+  }
+
+  mutable DOM::DOMString value;
   CSSSelector* tagHistory;
   int attr;
   int tag;
@@ -104,6 +124,11 @@ class CSSSelector {
   Match match : 4;
   bool nonCSSHint : 1;
   unsigned int pseudoId : 3;
+
+  mutable PseudoType _pseudoType;
+
+ private:
+  void extractPseudoType() const;
 };
 
 // a style class which has a parent (almost all have)

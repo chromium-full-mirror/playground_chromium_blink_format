@@ -36,11 +36,15 @@ class QFontMetricsPrivate;
 
 class QFontMetrics {
  public:
+  QFontMetrics();
   QFontMetrics(const QFont&);
   ~QFontMetrics();
 
   QFontMetrics(const QFontMetrics&);
   QFontMetrics& operator=(const QFontMetrics&);
+
+  const QFont& font() const;
+  void setFont(const QFont&);
 
   int ascent() const;
   int descent() const;
@@ -75,7 +79,7 @@ class QFontMetrics {
 
   int rightBearing(QChar) const;
   int leftBearing(QChar) const;
-  int baselineOffset() const;
+  int baselineOffset() const { return ascent(); }
 
  private:
   KWQRefPtr<QFontMetricsPrivate> data;

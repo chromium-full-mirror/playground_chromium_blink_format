@@ -1122,8 +1122,8 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
     return 0; /* e.g.: width="" */
   }
 
-  QString value(curP, endP - curP);
-  value = value.lower().stripWhiteSpace();
+  QString value =
+      QConstString(curP, endP - curP).string().lower().stripWhiteSpace();
 #ifdef CSS_DEBUG
   kdDebug(6080) << "id [" << getPropertyName(propId).string()
                 << "] parseValue [" << value << "]" << endl;
@@ -1196,8 +1196,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
           parsedValue = new CSSPrimitiveValueImpl(cssval->id);
         else {
           // only shape in CSS2 is rect( top right bottom left )
-          QString str =
-              QConstString(const_cast<QChar*>(curP), endP - curP).string();
+          QString str(curP, endP - curP);
           // the CSS specs are not really clear if there should be commas in
           // here or not. We accept both spaces and commas.
           QChar* uc = (QChar*)str.unicode();
@@ -2424,7 +2423,8 @@ CSSValueImpl* StyleBaseImpl::parseContent(const QChar* curP,
         break;
       nextP++;
     }
-    QString str = QConstString(curP, nextP - curP).string();
+    QConstString cstr(curP, nextP - curP);
+    QString str = cstr.string();
     CSSValueImpl* parsedValue = 0;
     if (str.startsWith("url(")) {
       // url
@@ -2927,7 +2927,13 @@ CSSRuleImpl* StyleBaseImpl::parseRule(const QChar*& curP, const QChar* endP) {
 
 const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
   // ### use DOMString here to avoid coversions
-  QString processed;
+
+  char fixedSizeBuffer[8192];
+  uint size = str.length() * 2 * sizeof(QChar);
+  char* buffer = fixedSizeBuffer;
+  if (size > sizeof(fixedSizeBuffer))
+    buffer = new char[size];
+  QChar* p = (QChar*)buffer;
 
   bool sq = false;                  // Within single quote
   bool dq = false;                  // Within double quote
@@ -2957,33 +2963,33 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
     //              skipgarbage);
     if (!comment && !sq && *ch == '"') {
       dq = !dq;
-      processed += *ch;
+      *p++ = *ch;
       space = skipgarbage = false;
     } else if (!comment && !dq && *ch == '\'') {
       skipgarbage = sq;
       sq = !sq;
-      processed += *ch;
+      *p++ = *ch;
       space = false;
     } else if (!comment && !dq && !sq && *ch == '(') {
       bracket = true;
-      processed += *ch;
+      *p++ = *ch;
       space = true;  // Explictly true
       skipgarbage = false;
     } else if (!comment && !dq && !sq && *ch == ')') {
       bracket = false;
-      processed += *ch;
-      processed += QChar(' ');  // Adding a space after this token
+      *p++ = *ch;
+      *p++ = QChar(' ');  // Adding a space after this token
       space = true;
       skipgarbage = false;
     } else if (!comment && !dq && !sq && *ch == '{') {
       ++curlyBracket;
-      processed += *ch;
+      *p++ = *ch;
       space = true;  // Explictly true
       skipgarbage = true;
     } else if (!comment && !dq && !sq && *ch == '}') {
       --curlyBracket;
-      processed += *ch;
-      processed += QChar(' ');  // Adding a space after this token
+      *p++ = *ch;
+      *p++ = QChar(' ');  // Adding a space after this token
       space = true;
       skipgarbage = true;
     } else if (!comment && skipgarbage && !dq && !sq && (*ch == '-') &&
@@ -3009,11 +3015,11 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
         if (*ch == '*') {
           comment = true;
         } else {
-          processed += '/';
+          *p++ = '/';
           if (curlyBracket > 0) {
-            processed += ch->lower();
+            *p++ = ch->lower();
           } else {
-            processed += *ch;
+            *p++ = *ch;
           }
           space = ch->isSpace();
         }
@@ -3021,8 +3027,8 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
       } else if (*ch == '/') {
         firstChar = true;  // Slash added only if next is not '*'
       } else if (*ch == ',' || *ch == ';') {
-        processed += *ch;
-        processed += QChar(' ');  // Adding a space after these tokens
+        *p++ = *ch;
+        *p++ = QChar(' ');  // Adding a space after these tokens
         space = true;
         skipgarbage = true;
       } else {
@@ -3038,34 +3044,40 @@ const QString StyleBaseImpl::preprocess(const QString& str, bool justOneRule) {
     ++ch;
   }
 
+  {
+    QString processed((QChar*)buffer, p - (QChar*)buffer);
+    if (buffer != fixedSizeBuffer)
+      delete[] buffer;
+
 #ifdef CSS_DEBUG
-  kdDebug(6080) << "---After ---" << endl;
-  kdDebug(6080) << "[" << processed << "]" << endl;
-  kdDebug(6080) << "------------" << endl;
-  kdDebug(6080) << "Length: " << processed.length() << ", reduced size by: "
-                << 100.0 - (100.0 * (processed.length() / orgLength)) << "%"
-                << endl;
-  kdDebug(6080) << "------------" << endl;
+    kdDebug(6080) << "---After ---" << endl;
+    kdDebug(6080) << "[" << processed << "]" << endl;
+    kdDebug(6080) << "------------" << endl;
+    kdDebug(6080) << "Length: " << processed.length() << ", reduced size by: "
+                  << 100.0 - (100.0 * (processed.length() / orgLength)) << "%"
+                  << endl;
+    kdDebug(6080) << "------------" << endl;
 #endif
 
-  return processed;
+    return processed;
+  }
 
 addChar:
   if (!sq && !dq && !bracket) {
     if (!(space && ch->isSpace())) {  // Don't add more than one space
       if (ch->isSpace()) {
-        processed += QChar(' ');  // Normalize whitespace
+        *p++ = QChar(' ');  // Normalize whitespace
       } else {
         if (curlyBracket > 0 || justOneRule) {
-          processed += ch->lower();
+          *p++ = ch->lower();
         } else {
-          processed += *ch;
+          *p++ = *ch;
         }
       }
     }
     space = ch->isSpace();
   } else {
-    processed += *ch;  // We're within quotes or brackets, leave untouched
+    *p++ = *ch;  // We're within quotes or brackets, leave untouched
   }
   goto end;
 }
@@ -3123,6 +3135,52 @@ unsigned int CSSSelector::specificity() {
     s += tagHistory->specificity();
   // make sure it doesn't overflow
   return s & 0xffffff;
+}
+
+void CSSSelector::extractPseudoType() const {
+  _pseudoType = PseudoOther;
+  if (!value.isEmpty()) {
+    switch (value[0]) {
+      case 'a':
+        if (value == "active")
+          _pseudoType = PseudoActive;
+        else if (value == "after")
+          _pseudoType = PseudoAfter;
+        break;
+      case 'b':
+        if (value == "before")
+          _pseudoType = PseudoBefore;
+        break;
+      case 'e':
+        if (value == "empty")
+          _pseudoType = PseudoEmpty;
+        break;
+      case 'f':
+        if (value == "first-child")
+          _pseudoType = PseudoFirstChild;
+        else if (value == "first-letter")
+          _pseudoType = PseudoFirstLetter;
+        else if (value == "first-line")
+          _pseudoType = PseudoFirstLine;
+        else if (value == "focus")
+          _pseudoType = PseudoFocus;
+        break;
+      case 'h':
+        if (value == "hover")
+          _pseudoType = PseudoHover;
+        break;
+      case 'l':
+        if (value == "link")
+          _pseudoType = PseudoLink;
+        break;
+      case 'v':
+        if (value == "visited")
+          _pseudoType = PseudoVisited;
+        break;
+    }
+  }
+
+  value = QString::null;
 }
 
 bool CSSSelector::operator==(const CSSSelector& other) {

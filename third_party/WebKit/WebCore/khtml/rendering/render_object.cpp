@@ -192,8 +192,9 @@ void RenderObject::removeLayers(RenderLayer* parentLayer) {
 RenderLayer* RenderObject::enclosingLayer() {
   RenderObject* curr = this;
   while (curr) {
-    if (curr->layer())
-      return curr->layer();
+    RenderLayer* layer = curr->layer();
+    if (layer)
+      return layer;
     curr = curr->parent();
   }
   return 0;

@@ -24,10 +24,6 @@
 
 using namespace DOM;
 
-DOMString::DOMString() {
-  impl = 0;
-}
-
 DOMString::DOMString(const QChar* str, uint len) {
   impl = new DOMStringImpl(str, len);
   impl->ref();
@@ -194,7 +190,7 @@ QString DOMString::string() const {
   if (!impl)
     return QString::null;
 
-  return QConstString(impl->s, impl->l).string();
+  return QString(impl->s, impl->l);
 }
 
 int DOMString::toInt() const {
@@ -276,19 +272,19 @@ bool DOM::operator==(const DOMString& a, const QString& b) {
 }
 
 bool DOM::operator==(const DOMString& a, const char* b) {
+  DOMStringImpl* aimpl = a.impl;
+
   if (!b)
-    return a.isNull();
-  unsigned int blen = strlen(b);
-  if (a.isNull())
-    return (blen == 0);
-  if (a.length() != blen)
-    return false;
+    return !aimpl;
 
-  const QChar* aptr = a.impl->s;
-  while (blen--) {
-    if ((*aptr++).latin1() != *b++)
-      return false;
+  if (aimpl) {
+    int alen = aimpl->l;
+    const QChar* aptr = aimpl->s;
+    while (alen--) {
+      unsigned char c = *b++;
+      if (!c || (*aptr++).unicode() != c)
+        return false;
+    }
   }
-
-  return true;
+  return *b == 0;
 }

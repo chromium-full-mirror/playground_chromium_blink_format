@@ -119,12 +119,12 @@ class HTMLParamElementImpl : public HTMLElementImpl {
   QString name() const {
     if (!m_name)
       return QString::null;
-    return QConstString(m_name->s, m_name->l).string();
+    return QString(m_name->s, m_name->l);
   }
   QString value() const {
     if (!m_value)
       return QString::null;
-    return QConstString(m_value->s, m_value->l).string();
+    return QString(m_value->s, m_value->l);
   }
 
  protected:
