@@ -103,6 +103,10 @@ class RenderWidget : public QObject,
   }
   void deref(RenderArena* arena);
 
+#if APPLE_CHANGES
+  void sendConsumedMouseUp(const QPoint& mousePos, int button, int state);
+#endif
+
  public slots:
   void slotWidgetDestructed();
 

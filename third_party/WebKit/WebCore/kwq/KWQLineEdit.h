@@ -60,9 +60,12 @@ class QLineEdit : public QWidget {
   void returnPressed() { m_returnPressed.call(); }
   void textChanged() { m_textChanged.call(text()); }
 
+  void clicked();
+
  private:
   KWQSignal m_returnPressed;
   KWQSignal m_textChanged;
+  KWQSignal m_clicked;
 };
 
 #endif

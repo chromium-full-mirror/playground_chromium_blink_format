@@ -30,12 +30,6 @@
 #include "KWQString.h"
 #include "KWQSignal.h"
 
-#ifdef __OBJC__
-@class KWQButtonAdapter;
-#else
-class KWQButtonAdapter;
-#endif
-
 class QButton : public QWidget {
  public:
   QButton();
@@ -48,7 +42,6 @@ class QButton : public QWidget {
 
  private:
   KWQSignal m_clicked;
-  KWQButtonAdapter* m_adapter;
 };
 
 #endif

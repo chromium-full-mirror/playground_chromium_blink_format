@@ -48,8 +48,10 @@ class KWQFileButton : public QWidget {
   int baselinePosition() const;
 
   void filenameChanged();
+  void clicked();
 
  private:
+  KWQSignal _clicked;
   KWQSignal _textChanged;
   KWQFileButtonAdapter* _adapter;
 };

@@ -418,6 +418,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
+  connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
 
   if (element->inputType() == HTMLInputElementImpl::PASSWORD)
     edit->setEchoMode(QLineEdit::Password);
@@ -529,6 +530,7 @@ RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
   KWQFileButton* w = new KWQFileButton(view()->part());
   connect(w, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
+  connect(w, SIGNAL(clicked()), this, SLOT(slotClicked()));
   setQWidget(w);
 #else
   QHBox* w = new QHBox(view()->viewport());
@@ -586,7 +588,9 @@ void RenderFileButton::handleFocusOut() {
 }
 
 void RenderFileButton::slotClicked() {
-#if !APPLE_CHANGES
+#if APPLE_CHANGES
+  RenderFormElement::slotClicked();
+#else
   QString file_name = KFileDialog::getOpenFileName(QString::null, QString::null,
                                                    0, i18n("Browse..."));
   if (!file_name.isNull()) {
@@ -1069,6 +1073,7 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
   setQWidget(edit);
 
   connect(edit, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
+  connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
 }
 
 RenderTextArea::~RenderTextArea() {
