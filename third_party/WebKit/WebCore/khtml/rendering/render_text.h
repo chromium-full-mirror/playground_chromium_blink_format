@@ -57,6 +57,7 @@ class InlineTextBox : public InlineRunBox {
     m_start = 0;
     m_len = 0;
     m_reversed = false;
+    m_treatAsText = true;
     m_toAdd = 0;
     m_truncation = cNoTruncation;
   }
@@ -114,6 +115,8 @@ class InlineTextBox : public InlineRunBox {
   int spaceAdd() { return m_toAdd; }
 
   virtual bool isInlineTextBox() { return true; }
+  virtual bool isText() const { return m_treatAsText; }
+  void setIsText(bool b) { m_treatAsText = b; }
 
   void paintDecoration(QPainter* pt, int _tx, int _ty, int decoration);
   void paintSelection(const Font* f,
@@ -162,7 +165,10 @@ class InlineTextBox : public InlineRunBox {
   // paints at all).
 
   bool m_reversed : 1;
-  int m_toAdd : 14;  // for justified text
+  bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
+                           // purposes of line height.
+  int m_toAdd : 14;        // for justified text
+
  private:
   friend class RenderText;
 };

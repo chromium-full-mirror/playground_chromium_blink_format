@@ -596,7 +596,7 @@ void InlineFlowBox::placeBoxesVertically(int y,
     int newY = curr->yPos();
     int newHeight = curr->height();
     int newBaseline = curr->baseline();
-    if (curr->isInlineTextBox() || curr->isInlineFlowBox()) {
+    if (curr->isText() || curr->isInlineFlowBox()) {
       const QFontMetrics& fm = curr->object()->fontMetrics(m_firstLine);
       newBaseline = fm.ascent();
       newY += curr->baseline() - newBaseline;
@@ -609,7 +609,7 @@ void InlineFlowBox::placeBoxesVertically(int y,
         newBaseline +=
             curr->object()->borderTop() + curr->object()->paddingTop();
       }
-    } else {
+    } else if (!curr->object()->isBR()) {
       newY += curr->object()->marginTop();
       newHeight = curr->height() - (curr->object()->marginTop() +
                                     curr->object()->marginBottom());

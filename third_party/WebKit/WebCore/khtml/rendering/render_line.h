@@ -81,6 +81,8 @@ class InlineBox {
   virtual bool isInlineTextBox() { return false; }
   virtual bool isRootInlineBox() { return false; }
 
+  virtual bool isText() const { return false; }
+
   bool isConstructed() { return m_constructed; }
   virtual void setConstructed() {
     m_constructed = true;
@@ -239,7 +241,7 @@ class InlineFlowBox : public InlineRunBox {
     }
     child->setFirstLineStyleBit(m_firstLine);
     child->setParent(this);
-    if (child->isInlineTextBox())
+    if (child->isText())
       m_hasTextChildren = true;
   }
 
