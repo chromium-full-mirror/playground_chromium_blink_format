@@ -350,13 +350,13 @@ void CSSPrimitiveValueImpl::cleanup() {
     delete m_value.rgbcolor;
   else if (m_type < CSSPrimitiveValue::CSS_STRING ||
            m_type == CSSPrimitiveValue::CSS_IDENT) {
-  } else if (m_type < CSSPrimitiveValue::CSS_COUNTER)
+  } else if (m_type < CSSPrimitiveValue::CSS_COUNTER) {
     if (m_value.string)
       m_value.string->deref();
-    else if (m_type == CSSPrimitiveValue::CSS_COUNTER)
-      m_value.counter->deref();
-    else if (m_type == CSSPrimitiveValue::CSS_RECT)
-      m_value.rect->deref();
+  } else if (m_type == CSSPrimitiveValue::CSS_COUNTER)
+    m_value.counter->deref();
+  else if (m_type == CSSPrimitiveValue::CSS_RECT)
+    m_value.rect->deref();
   m_type = 0;
 }
 
