@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2002 Apple Computer, Inc.
@@ -76,39 +75,43 @@ class SavedProperty {
 PropertyMap::PropertyMap() : _table(0) {}
 
 PropertyMap::~PropertyMap() {
+  if (!_table) {
 #if USE_SINGLE_ENTRY
-  UString::Rep* key = _singleEntry.key;
-  if (key)
-    key->deref();
+    UString::Rep* key = _singleEntry.key;
+    if (key)
+      key->deref();
 #endif
-  if (_table) {
-    for (int i = 0; i < _table->size; i++) {
-      UString::Rep* key = _table->entries[i].key;
-      if (key)
-        key->deref();
-    }
-    free(_table);
+    return;
   }
+
+  for (int i = 0; i < _table->size; i++) {
+    UString::Rep* key = _table->entries[i].key;
+    if (key)
+      key->deref();
+  }
+  free(_table);
 }
 
 void PropertyMap::clear() {
+  if (!_table) {
 #if USE_SINGLE_ENTRY
-  UString::Rep* key = _singleEntry.key;
-  if (key) {
-    key->deref();
-    _singleEntry.key = 0;
-  }
-#endif
-  if (_table) {
-    for (int i = 0; i < _table->size; i++) {
-      UString::Rep* key = _table->entries[i].key;
-      if (key) {
-        key->deref();
-        _table->entries[i].key = 0;
-      }
+    UString::Rep* key = _singleEntry.key;
+    if (key) {
+      key->deref();
+      _singleEntry.key = 0;
     }
-    _table->keyCount = 0;
+#endif
+    return;
   }
+
+  for (int i = 0; i < _table->size; i++) {
+    UString::Rep* key = _table->entries[i].key;
+    if (key) {
+      key->deref();
+      _table->entries[i].key = 0;
+    }
+  }
+  _table->keyCount = 0;
 }
 
 inline int PropertyMap::hash(const UString::Rep* s) const {
@@ -323,15 +326,14 @@ void PropertyMap::remove(const Identifier& name) {
 }
 
 void PropertyMap::mark() const {
-#if USE_SINGLE_ENTRY
-  if (_singleEntry.key) {
-    ValueImp* v = _singleEntry.value;
-    if (!v->marked())
-      v->mark();
-  }
-#endif
-
   if (!_table) {
+#if USE_SINGLE_ENTRY
+    if (_singleEntry.key) {
+      ValueImp* v = _singleEntry.value;
+      if (!v->marked())
+        v->mark();
+    }
+#endif
     return;
   }
 
@@ -346,12 +348,12 @@ void PropertyMap::mark() const {
 
 void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
                                                 const Object& base) const {
-#if USE_SINGLE_ENTRY
-  UString::Rep* key = _singleEntry.key;
-  if (key && !(_singleEntry.attributes & DontEnum))
-    list.append(Reference(base, Identifier(key)));
-#endif
   if (!_table) {
+#if USE_SINGLE_ENTRY
+    UString::Rep* key = _singleEntry.key;
+    if (key && !(_singleEntry.attributes & DontEnum))
+      list.append(Reference(base, Identifier(key)));
+#endif
     return;
   }
 
@@ -365,18 +367,17 @@ void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
 void PropertyMap::addSparseArrayPropertiesToReferenceList(
     ReferenceList& list,
     const Object& base) const {
-#if USE_SINGLE_ENTRY
-  UString::Rep* key = _singleEntry.key;
-  if (key) {
-    UString k(key);
-    bool fitsInUInt32;
-    k.toUInt32(&fitsInUInt32);
-    if (fitsInUInt32) {
-      list.append(Reference(base, Identifier(key)));
-    }
-  }
-#endif
   if (!_table) {
+#if USE_SINGLE_ENTRY
+    UString::Rep* key = _singleEntry.key;
+    if (key) {
+      UString k(key);
+      bool fitsInUInt32;
+      k.toUInt32(&fitsInUInt32);
+      if (fitsInUInt32)
+        list.append(Reference(base, Identifier(key)));
+    }
+#endif
     return;
   }
 
@@ -386,9 +387,8 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
       UString k(key);
       bool fitsInUInt32;
       k.toUInt32(&fitsInUInt32);
-      if (fitsInUInt32) {
+      if (fitsInUInt32)
         list.append(Reference(base, Identifier(key)));
-      }
     }
   }
 }
@@ -396,11 +396,12 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
 void PropertyMap::save(SavedProperties& p) const {
   int count = 0;
 
+  if (!_table) {
 #if USE_SINGLE_ENTRY
-  if (_singleEntry.key)
-    ++count;
+    if (_singleEntry.key)
+      ++count;
 #endif
-  if (_table) {
+  } else {
     for (int i = 0; i != _table->size; ++i)
       if (_table->entries[i].key && _table->entries[i].attributes == 0)
         ++count;
@@ -415,14 +416,15 @@ void PropertyMap::save(SavedProperties& p) const {
 
   SavedProperty* prop = p._properties;
 
+  if (!_table) {
 #if USE_SINGLE_ENTRY
-  if (_singleEntry.key) {
-    prop->key = Identifier(_singleEntry.key);
-    prop->value = Value(_singleEntry.value);
-    ++prop;
-  }
+    if (_singleEntry.key) {
+      prop->key = Identifier(_singleEntry.key);
+      prop->value = Value(_singleEntry.value);
+      ++prop;
+    }
 #endif
-  if (_table) {
+  } else {
     for (int i = 0; i != _table->size; ++i) {
       if (_table->entries[i].key && _table->entries[i].attributes == 0) {
         prop->key = Identifier(_table->entries[i].key);
@@ -440,33 +442,27 @@ void PropertyMap::restore(const SavedProperties& p) {
 #if DO_CONSISTENCY_CHECK
 
 void PropertyMap::checkConsistency() {
-  int count = 0;
-  if (_table) {
-    for (int j = 0; j != _table->size; ++j) {
-      UString::Rep* rep = _table->entries[j].key;
-      if (!rep)
-        continue;
-      int i = hash(rep);
-      while (UString::Rep* key = _table->entries[i].key) {
-        if (rep == key)
-          break;
-        i = (i + 1) & _tableSizeMask;
-      }
-      assert(i == j);
-      count++;
-    }
-  }
+  if (!_table)
+    return;
 
-#if USE_SINGLE_ENTRY
-  if (_singleEntry.key)
+  int count = 0;
+  for (int j = 0; j != _table->size; ++j) {
+    UString::Rep* rep = _table->entries[j].key;
+    if (!rep)
+      continue;
+    int i = hash(rep);
+    while (UString::Rep* key = _table->entries[i].key) {
+      if (rep == key)
+        break;
+      i = (i + 1) & _tableSizeMask;
+    }
+    assert(i == j);
     count++;
-#endif
-  if (_table) {
-    assert(count == _table->keyCount);
-    assert(_table->size >= 16);
-    assert(_table->sizeMask);
-    assert(_table->size == _table->sizeMask + 1);
   }
+  assert(count == _table->keyCount);
+  assert(_table->size >= 16);
+  assert(_table->sizeMask);
+  assert(_table->size == _table->sizeMask + 1);
 }
 
 #endif  // DO_CONSISTENCY_CHECK
