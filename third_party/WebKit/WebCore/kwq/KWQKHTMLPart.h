@@ -174,6 +174,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void mouseMoved(NSEvent*);
   bool keyEvent(NSEvent*);
 
+  void resetCursor();
+
   void clearTimers();
   static void clearTimers(KHTMLView*);
 
