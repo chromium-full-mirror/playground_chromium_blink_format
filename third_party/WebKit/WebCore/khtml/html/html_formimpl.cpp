@@ -1203,9 +1203,7 @@ RenderObject* HTMLFieldSetElementImpl::createRenderer(RenderArena* arena,
 
 HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
                                            HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(doc, f),
-      m_imageLoader(0),
-      m_valueMatchesRenderer(false) {
+    : HTMLGenericFormElementImpl(doc, f), m_imageLoader(0) {
   m_type = TEXT;
   m_maxLen = -1;
   m_size = 20;
@@ -1510,7 +1508,6 @@ void HTMLInputElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       // right now.
       if (m_value.isNull())
         setChanged();
-      m_valueMatchesRenderer = false;
       break;
     case ATTR_CHECKED:
       m_defaultChecked = !attr->isNull();
@@ -1929,15 +1926,6 @@ void HTMLInputElementImpl::setValue(const DOMString& value) {
   } else {
     setAttribute(ATTR_VALUE, value);
   }
-  m_valueMatchesRenderer = false;
-}
-
-void HTMLInputElementImpl::setValueFromRenderer(const DOMString& value) {
-  m_value = value;
-  m_valueMatchesRenderer = true;
-
-  // Fire the "input" DOM event.
-  dispatchHTMLEvent(EventImpl::INPUT_EVENT, true, false);
 }
 
 bool HTMLInputElementImpl::storesValueSeparateFromAttribute() const {
@@ -2861,14 +2849,13 @@ HTMLSelectElementImpl* HTMLOptionElementImpl::getSelect() const {
 
 HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentPtr* doc,
                                                  HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(doc, f),
-      m_valueIsValid(false),
-      m_valueMatchesRenderer(false) {
+    : HTMLGenericFormElementImpl(doc, f) {
   // DTD requires rows & cols be specified, but we will provide reasonable
   // defaults
   m_rows = 2;
   m_cols = 20;
   m_wrap = ta_Virtual;
+  m_dirtyvalue = true;
 }
 
 HTMLTextAreaElementImpl::~HTMLTextAreaElementImpl() {
@@ -2980,28 +2967,24 @@ void HTMLTextAreaElementImpl::reset() {
   setValue(defaultValue());
 }
 
-void HTMLTextAreaElementImpl::updateValue() {
-  if (!m_valueIsValid) {
-    if (m_render) {
-      m_value = static_cast<RenderTextArea*>(m_render)->text();
-      m_valueMatchesRenderer = true;
-    } else {
-      m_value = defaultValue().string();
-      m_valueMatchesRenderer = false;
-    }
-    m_valueIsValid = true;
-  }
-}
-
 DOMString HTMLTextAreaElementImpl::value() {
-  updateValue();
-  return m_value.isNull() ? DOMString("") : m_value;
+  if (m_dirtyvalue) {
+    if (m_render)
+      m_value = static_cast<RenderTextArea*>(m_render)->text();
+    else
+      m_value = defaultValue().string();
+    m_dirtyvalue = false;
+  }
+
+  if (m_value.isNull())
+    return "";
+
+  return m_value;
 }
 
-void HTMLTextAreaElementImpl::setValue(const DOMString& value) {
-  m_value = value.string();
-  m_valueIsValid = true;
-  m_valueMatchesRenderer = false;
+void HTMLTextAreaElementImpl::setValue(DOMString _value) {
+  m_value = _value.string();
+  m_dirtyvalue = false;
   setChanged(true);
 }
 
@@ -3023,7 +3006,7 @@ DOMString HTMLTextAreaElementImpl::defaultValue() {
   return val;
 }
 
-void HTMLTextAreaElementImpl::setDefaultValue(const DOMString& defaultValue) {
+void HTMLTextAreaElementImpl::setDefaultValue(DOMString _defaultValue) {
   // there may be comments - remove all the text nodes and replace them with one
   QPtrList<NodeImpl> toRemove;
   NodeImpl* n;
@@ -3035,9 +3018,9 @@ void HTMLTextAreaElementImpl::setDefaultValue(const DOMString& defaultValue) {
   for (; it.current(); ++it) {
     removeChild(it.current(), exceptioncode);
   }
-  insertBefore(getDocument()->createTextNode(defaultValue), firstChild(),
+  insertBefore(getDocument()->createTextNode(_defaultValue), firstChild(),
                exceptioncode);
-  setValue(defaultValue);
+  setValue(_defaultValue);
 }
 
 void HTMLTextAreaElementImpl::blur() {

@@ -307,10 +307,6 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   DOMString value() const;
   void setValue(const DOMString&);
 
-  void setValueFromRenderer(const DOMString&);
-  bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
-  void setValueMatchesRenderer() { m_valueMatchesRenderer = true; }
-
   void blur();
   void focus();
 
@@ -377,7 +373,6 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool m_haveType : 1;
   bool m_activeSubmit : 1;
   bool m_autocomplete : 1;
-  bool m_valueMatchesRenderer : 1;
 };
 
 // -------------------------------------------------------------------------
@@ -629,17 +624,11 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual bool appendFormData(FormDataList&, bool);
   virtual void reset();
   DOMString value();
-  void setValue(const DOMString& value);
+  void setValue(DOMString _value);
   DOMString defaultValue();
-  void setDefaultValue(const DOMString& value);
+  void setDefaultValue(DOMString _defaultValue);
   void blur();
   void focus();
-
-  void invalidateValue() { m_valueIsValid = false; }
-  void updateValue();
-
-  bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
-  void setValueMatchesRenderer() { m_valueMatchesRenderer = true; }
 
   virtual bool isEditable();
 
@@ -650,8 +639,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   int m_cols;
   WrapMethod m_wrap;
   QString m_value;
-  bool m_valueIsValid;
-  bool m_valueMatchesRenderer;
+  bool m_dirtyvalue;
 };
 
 // -------------------------------------------------------------------------
