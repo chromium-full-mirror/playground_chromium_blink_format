@@ -7,7 +7,7 @@
 #import <Foundation/Foundation.h>
 #import <WebFoundation/NSURLCredentialStorage.h>
 
-@class NSURLConnectionAuthenticationChallenge;
+@class NSURLAuthenticationChallenge;
 
 @interface WebPanelAuthenticationHandler : NSObject {
   NSMutableDictionary* windowToPanel;
@@ -15,8 +15,8 @@
 }
 
 + (id)sharedHandler;
-- (void)startAuthentication:(NSURLConnectionAuthenticationChallenge*)challenge
+- (void)startAuthentication:(NSURLAuthenticationChallenge*)challenge
                      window:(NSWindow*)w;
-- (void)cancelAuthentication:(NSURLConnectionAuthenticationChallenge*)challenge;
+- (void)cancelAuthentication:(NSURLAuthenticationChallenge*)challenge;
 
 @end
