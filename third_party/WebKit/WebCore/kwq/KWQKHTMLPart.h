@@ -216,6 +216,8 @@ class KWQKHTMLPart : public KHTMLPart {
   NSView* _mouseDownView;
   bool _mouseDownWasInSubframe;
   bool _sendingEventToSubview;
+  bool _mouseDownMayStartDrag;
+  bool _mouseDownMayStartSelect;
 
   static NSEvent* _currentEvent;
   static NSResponder* _firstResponderAtMouseDownTime;
