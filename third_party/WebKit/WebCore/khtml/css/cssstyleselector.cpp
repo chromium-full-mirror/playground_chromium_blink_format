@@ -657,9 +657,10 @@ void CSSStyleSelector::checkSelector(int selIndex, DOM::ElementImpl* e) {
   // so, we can't allow that to apply to every element on the page.  We assume
   // the author intended
   // to apply the rules only to links.
-  bool onlyHoverActive = (sel->match == CSSSelector::Pseudo &&
+  bool onlyHoverActive =
+      (sel->tag == -1 && (sel->match == CSSSelector::Pseudo &&
                           (sel->pseudoType() == CSSSelector::PseudoHover ||
-                           sel->pseudoType() == CSSSelector::PseudoActive));
+                           sel->pseudoType() == CSSSelector::PseudoActive)));
   bool affectedByHover = style->affectedByHoverRules();
   bool affectedByActive = style->affectedByActiveRules();
 
