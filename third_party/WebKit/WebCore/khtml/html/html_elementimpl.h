@@ -188,6 +188,7 @@ class HTMLElementImpl : public ElementImpl {
   virtual bool isContentEditable() const;
   virtual DOMString contentEditable() const;
   virtual void setContentEditable(HTMLAttributeImpl* attr);
+  virtual void setContentEditable(const DOMString& enabled);
 
   virtual void click();
 
