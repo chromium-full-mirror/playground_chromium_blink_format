@@ -1536,7 +1536,9 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 
   if (args.serviceType == "text/xml" || args.serviceType == "application/xml" ||
       args.serviceType == "application/xhtml+xml" ||
-      args.serviceType == "text/xsl")
+      args.serviceType == "text/xsl" ||
+      args.serviceType == "application/rss+xml" ||
+      args.serviceType == "application/atom+xml")
     d->m_doc = DOMImplementationImpl::instance()->createDocument(d->m_view);
   else
     d->m_doc = DOMImplementationImpl::instance()->createHTMLDocument(d->m_view);

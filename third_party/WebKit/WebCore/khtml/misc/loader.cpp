@@ -965,7 +965,8 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
     : CachedObject(url, XSLStyleSheet, _cachePolicy, _expireDate) {
   // It's XML we want.
   setAccept(QString::fromLatin1(
-      "text/xml, application/xml, application/xml+xhtml, text/xsl"));
+      "text/xml, application/xml, application/xhtml+xml, text/xsl, "
+      "application/rss+xml, application/atom+xml"));
 
   // load the file
   Cache::loader()->load(dl, this, false);
@@ -1028,7 +1029,8 @@ CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
     : CachedObject(url, XBL, _cachePolicy, _expireDate), m_document(0) {
   // It's XML we want.
   setAccept(QString::fromLatin1(
-      "text/xml, application/xml, application/xml+xhtml, text/xsl"));
+      "text/xml, application/xml, application/xhtml+xml, text/xsl, "
+      "application/rss+xml, application/atom+xml"));
 
   // Load the file
   Cache::loader()->load(dl, this, false);
