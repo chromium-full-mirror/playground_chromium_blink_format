@@ -28,8 +28,8 @@
   NPP_t instanceStruct;
 
   BOOL canRestart;
-  BOOL isHidden;
   BOOL isStarted;
+  BOOL inSetWindow;
 
   NSString* MIMEType;
   NSURL* baseURL;
