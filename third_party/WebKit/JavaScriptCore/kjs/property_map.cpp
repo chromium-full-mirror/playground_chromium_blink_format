@@ -23,6 +23,8 @@
 
 #include "property_map.h"
 
+#include <config.h>
+
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
@@ -117,7 +119,11 @@ PropertyMap::PropertyMap() {
   root = 0;
 }
 
-PropertyMap::~PropertyMap() {}
+PropertyMap::~PropertyMap() {
+#ifdef APPLE_CHANGES
+  clear();
+#endif
+}
 
 void PropertyMap::put(const UString& name, ValueImp* value, int attr) {
   // if not root; make the root the new node
