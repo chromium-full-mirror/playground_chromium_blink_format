@@ -104,13 +104,17 @@ class KHTMLViewPrivate {
     repaintRects = 0;
     underMouse = 0;
     reset();
+#if !APPLE_CHANGES
     tp = 0;
     paintBuffer = 0;
     formCompletions = 0;
+#endif
     layoutTimerId = 0;
     allDataReceivedWhenTimerSet = false;
     mousePressed = false;
+#ifndef QT_NO_TOOLTIP
     tooltip = 0;
+#endif
     doFullRepaint = true;
     isTransparent = false;
 #if APPLE_CHANGES
@@ -122,15 +126,19 @@ class KHTMLViewPrivate {
 #endif
   }
   ~KHTMLViewPrivate() {
+#if !APPLE_CHANGES
     delete formCompletions;
     delete tp;
     tp = 0;
     delete paintBuffer;
     paintBuffer = 0;
+#endif
 
     if (underMouse)
       underMouse->deref();
+#ifndef QT_NO_TOOLTIP
     delete tooltip;
+#endif
     delete repaintRects;
   }
   void reset() {
@@ -175,8 +183,10 @@ class KHTMLViewPrivate {
       repaintRects->clear();
   }
 
+#if !APPLE_CHANGES
   QPainter* tp;
   QPixmap* paintBuffer;
+#endif
   NodeImpl* underMouse;
 
   // the node that was selected when enter was pressed
@@ -197,7 +207,9 @@ class KHTMLViewPrivate {
   bool ignoreWheelEvents;
 
   int borderX, borderY;
+#if !APPLE_CHANGES
   KSimpleConfig* formCompletions;
+#endif
 
   int clickX, clickY, clickCount;
   bool isDoubleClick;
@@ -217,7 +229,9 @@ class KHTMLViewPrivate {
 #endif
   bool mousePressed;
   bool isTransparent;
+#ifndef QT_NO_TOOLTIP
   KHTMLToolTip* tooltip;
+#endif
 
   // Used by objects during layout to communicate repaints that need to take
   // place only
@@ -1163,6 +1177,8 @@ void KHTMLView::contentsContextMenuEvent(QContextMenuEvent* _ce) {
 #endif
 }
 
+#if !APPLE_CHANGES
+
 bool KHTMLView::focusNextPrevChild(bool next) {
   // Now try to find the next child
   if (m_part->xmlDocImpl()) {
@@ -1193,6 +1209,8 @@ void KHTMLView::doAutoScroll() {
     ensureVisible(xm, ym, 0, 5);
   }
 }
+
+#endif
 
 DOM::NodeImpl* KHTMLView::nodeUnderMouse() const {
   return d->underMouse;
@@ -1604,6 +1622,8 @@ void KHTMLView::restoreScrollBar() {
 #endif
 }
 
+#if !APPLE_CHANGES
+
 QStringList KHTMLView::formCompletionItems(const QString& name) const {
   if (!m_part->settings()->isFormCompletionEnabled())
     return QStringList();
@@ -1637,6 +1657,8 @@ void KHTMLView::addFormCompletionItem(const QString& name,
     items.remove(items.fromLast());
   d->formCompletions->writeEntry(name, items);
 }
+
+#endif
 
 bool KHTMLView::dispatchMouseEvent(int eventId,
                                    DOM::NodeImpl* targetNode,

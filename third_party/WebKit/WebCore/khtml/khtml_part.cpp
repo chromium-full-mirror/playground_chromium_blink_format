@@ -4785,12 +4785,16 @@ void KHTMLPart::stopAutoScroll() {
 #endif
 }
 
+#if !APPLE_CHANGES
+
 void KHTMLPart::slotAutoScroll() {
   if (d->m_view)
     d->m_view->doAutoScroll();
   else
     stopAutoScroll();  // Safety
 }
+
+#endif
 
 void KHTMLPart::selectAll() {
   if (!d->m_doc)

@@ -177,8 +177,8 @@ class KHTMLView : public QScrollView {
   virtual void resizeEvent(QResizeEvent* event);
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
-  virtual bool focusNextPrevChild(bool next);
 #if !APPLE_CHANGES
+  virtual bool focusNextPrevChild(bool next);
   virtual void drawContents(QPainter* p,
                             int clipx,
                             int clipy,
