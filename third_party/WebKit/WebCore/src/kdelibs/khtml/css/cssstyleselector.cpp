@@ -73,6 +73,13 @@ static int usedDynamicStates;
 static int selectorDynamicState;
 static CSSStyleSelector::Encodedurl* encodedurl;
 
+#ifdef APPLE_CHANGES
+#define OPTIMIZE_STRING_USAGE
+#ifdef OPTIMIZE_STRING_USAGE
+static CFMutableStringRef reuseableString = 0;
+#endif
+#endif
+
 CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc) {
   strictParsing = doc->parseMode() == DocumentImpl::Strict;
   if (!defaultStyle)
@@ -460,7 +467,14 @@ static void checkPseudoState(DOM::ElementImpl* e) {
     pseudoState = PseudoNone;
     return;
   }
+#if (defined(APPLE_CHANGES) && defined(OPTIMIZE_STRING_USAGE))
+  QString u = QString::gstring_toQString(
+      &reuseableString, (UniChar*)(attr.unicode()), attr.length());
+#else
+  // Pseudo elements. We need to check first child here. No dynamic pseudo
+  // elements for the moment
   QString u = attr.string();
+#endif
   if (!u.contains("://")) {
     if (u[0] == '/')
       u = encodedurl->host + u;
@@ -474,13 +488,6 @@ static void checkPseudoState(DOM::ElementImpl* e) {
   pseudoState =
       KHTMLFactory::vLinks()->contains(u) ? PseudoVisited : PseudoLink;
 }
-
-#ifdef APPLE_CHANGES
-#define OPTIMIZE_STRING_USAGE
-#ifdef OPTIMIZE_STRING_USAGE
-static CFMutableStringRef reuseableString = 0;
-#endif
-#endif
 
 bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
                                         DOM::ElementImpl* e) {
@@ -2346,7 +2353,13 @@ void khtml::applyRule(khtml::RenderStyle* style,
           if (!val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
             return;
           DOMStringImpl* str = val->getStringValue();
+#if (defined(APPLE_CHANGES) && defined(OPTIMIZE_STRING_USAGE))
+          QString face = QString::gstring_toQString(&reuseableString,
+                                                    (UniChar*)(str->s), str->l)
+                             .lower();
+#else
           QString face = QConstString(str->s, str->l).string().lower();
+#endif
           // a languge tag is often added in braces at the end. Remove it.
           face = face.replace(QRegExp(" \\(.*\\)$"), "");
           // kdDebug(0) << "searching for face '" << face << "'" << endl;
