@@ -656,6 +656,11 @@ void CSSPrimitiveValueImpl::cleanup() {
       break;
     case CSSPrimitiveValue::CSS_RECT:
       m_value.rect->deref();
+      break;
+    case CSSPrimitiveValue::CSS_DASHBOARD_REGION:
+      if (m_value.region)
+        m_value.region->deref();
+      break;
     default:
       break;
   }
