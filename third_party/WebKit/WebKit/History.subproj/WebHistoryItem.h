@@ -20,6 +20,7 @@
   NSString* anchor;
   NSArray* _documentState;
   NSMutableArray* _subItems;
+  NSMutableDictionary* pageCache;
   BOOL _loadedIcon;
   BOOL _isTargetItem;
 }
@@ -64,4 +65,10 @@
 - (WebHistoryItem*)childItemWithName:(NSString*)name;
 - (WebHistoryItem*)targetItem;
 
+@end
+
+@interface WebHistoryItem (WebPrivate)
+- (BOOL)pageCacheEnabled;
+- (void)setPageCacheEnabled:(BOOL)f;
+- (NSMutableDictionary*)pageCache;
 @end
