@@ -168,10 +168,10 @@ static void write(QTextStream& ts,
   ts << " " << r;
 
   if (r != r.intersect(e.backgroundClipRect)) {
-    ts << " backgroundClip" << e.backgroundClipRect;
+    ts << " backgroundClip " << e.backgroundClipRect;
   }
   if (r != r.intersect(e.clipRect)) {
-    ts << " clip" << e.clipRect;
+    ts << " clip " << e.clipRect;
   }
 
   ts << "\n";
