@@ -54,8 +54,14 @@ class RenderBlock : public RenderFlow {
   // of the block (e.g., a <div style="height:25px"> that has a 100px tall image
   // inside
   // it would have an overflow height of borderTop() + paddingTop() + 100px.
-  virtual int overflowHeight() const { return m_overflowHeight; }
-  virtual int overflowWidth() const { return m_overflowWidth; }
+  virtual int overflowHeight(bool includeInterior = true) const {
+    return (!includeInterior && style()->hidesOverflow()) ? m_height
+                                                          : m_overflowHeight;
+  }
+  virtual int overflowWidth(bool includeInterior = true) const {
+    return (!includeInterior && style()->hidesOverflow()) ? m_width
+                                                          : m_overflowWidth;
+  }
   virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
   virtual void setOverflowWidth(int w) { m_overflowWidth = w; }
 
