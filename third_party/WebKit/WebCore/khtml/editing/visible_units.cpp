@@ -100,7 +100,7 @@ static VisiblePosition previousWordBoundary(
     // to
     // iterate again to translate the next value into a DOM position.
     NodeImpl* node = it.range().startContainer().handle();
-    if (node->isTextNode()) {
+    if (node->isTextNode() || (node->renderer() && node->renderer()->isBR())) {
       // The next variable contains a usable index into a text node
       pos = Position(node, next);
     } else {
