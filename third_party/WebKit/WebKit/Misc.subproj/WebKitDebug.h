@@ -4,6 +4,23 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef xNDEBUG
+
+#define WEBKITDEBUGLEVEL(level, format) ((void)0)
+#define WEBKITDEBUGLEVEL1(level, format, arg1) ((void)0)
+#define WEBKITDEBUGLEVEL2(level, format, arg1, arg2) ((void)0)
+#define WEBKITDEBUGLEVEL3(level, format, arg1, arg2, arg3) ((void)0)
+#define WEBKITDEBUGLEVEL4(level, format, arg1, arg2, arg3, arg4) ((void)0)
+#define WEBKITDEBUGLEVEL5(level, format, arg1, arg2, arg3, arg4, arg5) ((void)0)
+#define WEBKITDEBUGLEVEL6(level, format, arg1, arg2, arg3, arg4, arg5, arg6) \
+  ((void)0)
+
+#define WEBKIT_ASSERT(expr) ((void)0)
+#define WEBKIT_ASSERT_VALID_ARG(arg, expr) ((void)0)
+#define WEBKIT_ASSERT_NOT_NIL(arg) ((void)0)
+
+#else
+
 /*-----------------------------------------------------------------------------
 * Logging macros
 *
@@ -41,54 +58,24 @@ extern "C" {
 
 void WebKitSetLogLevel(int mask);
 unsigned int WebKitGetLogLevel(void);
-void WebKitDebug(const char* format, ...);
-void WebKitDebugAtLevel(unsigned int level, const char* format, ...);
-void WebKitLog(NSString* format, ...);
-void WebKitLogAtLevel(unsigned int level, NSString* format, ...);
+void WebKitDebugAtLevel(unsigned int level, const char* format, ...)
+    __attribute__((__format__(__printf__, 2, 3)));
 
-#define _logNeverImplemented() \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_NEVER_IMPLEMENTED, "ERROR (NOT IMPLEMENTED)\n")
+#ifdef __cplusplus
+}
+#endif
 
-#define _logPartiallyImplemented()                   \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_PARTIALLY_IMPLEMENTED, \
-                   "WARNING (PARTIALLY IMPLEMENTED)\n")
-
-#define _logNotYetImplemented()                    \
-  WEBKITDEBUGLEVEL(WEBKIT_LOG_NOT_YET_IMPLEMENTED, \
-                   "WARNING (NOT YET IMPLEMENTED)\n")
-
-#define WEBKITDEBUG(format) WEBKITDEBUGLEVEL(WEBKIT_LOG_GENERIC_DEBUG, format)
-#define WEBKITDEBUG1(format, arg1) \
-  WEBKITDEBUGLEVEL1(WEBKIT_LOG_GENERIC_DEBUG, format, arg1)
-#define WEBKITDEBUG2(format, arg1, arg2) \
-  WEBKITDEBUGLEVEL2(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2)
-#define WEBKITDEBUG3(format, arg1, arg2, arg3) \
-  WEBKITDEBUGLEVEL3(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3)
-#define WEBKITDEBUG4(format, arg1, arg2, arg3, arg4) \
-  WEBKITDEBUGLEVEL4(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4)
-#define WEBKITDEBUG5(format, arg1, arg2, arg3, arg4, arg5)                    \
-  WEBKITDEBUGLEVEL5(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4, \
-                    arg5)
-#define WEBKITDEBUG6(format, arg1, arg2, arg3, arg4, arg5, arg6)              \
-  WEBKITDEBUGLEVEL6(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4, \
-                    arg5, arg6)
-
-#define WEBKITDEBUGLEVEL(level, format)                                       \
-  WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__, \
-                     format);                                                 \
+#define WEBKITDEBUGLEVEL(level, format)                                        \
+  WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__); \
   WebKitDebugAtLevel(level, format);
 
 #define WEBKITDEBUGLEVEL1(level, format, arg1)                                 \
   WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__); \
   WebKitDebugAtLevel(level, format, arg1);
 
-#if NDEBUG
-#define WEBKITDEBUGLEVEL2(level, format, arg1, arg2)
-#else
 #define WEBKITDEBUGLEVEL2(level, format, arg1, arg2)                           \
   WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__); \
   WebKitDebugAtLevel(level, format, arg1, arg2);
-#endif
 
 #define WEBKITDEBUGLEVEL3(level, format, arg1, arg2, arg3)                     \
   WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__); \
@@ -106,7 +93,7 @@ void WebKitLogAtLevel(unsigned int level, NSString* format, ...);
   WebKitDebugAtLevel(level, "[%s:%d  %s] ", __FILE__, __LINE__, __FUNCTION__); \
   WebKitDebugAtLevel(level, format, arg1, arg2, arg3, arg4, arg5, arg6);
 
-#define DEBUG_OBJECT(object) [[object description] cString]
+#define DEBUG_OBJECT(object) [[object description] lossyCString]
 
 /*-----------------------------------------------------------------------------
  * Assertion macros
@@ -148,6 +135,31 @@ void WebKitLogAtLevel(unsigned int level, NSString* format, ...);
     }                                                                      \
   } while (0)
 
-#ifdef __cplusplus
-}
 #endif
+
+#define _logNeverImplemented() \
+  WEBKITDEBUGLEVEL(WEBKIT_LOG_NEVER_IMPLEMENTED, "ERROR (NOT IMPLEMENTED)\n")
+
+#define _logPartiallyImplemented()                   \
+  WEBKITDEBUGLEVEL(WEBKIT_LOG_PARTIALLY_IMPLEMENTED, \
+                   "WARNING (PARTIALLY IMPLEMENTED)\n")
+
+#define _logNotYetImplemented()                    \
+  WEBKITDEBUGLEVEL(WEBKIT_LOG_NOT_YET_IMPLEMENTED, \
+                   "WARNING (NOT YET IMPLEMENTED)\n")
+
+#define WEBKITDEBUG(format) WEBKITDEBUGLEVEL(WEBKIT_LOG_GENERIC_DEBUG, format)
+#define WEBKITDEBUG1(format, arg1) \
+  WEBKITDEBUGLEVEL1(WEBKIT_LOG_GENERIC_DEBUG, format, arg1)
+#define WEBKITDEBUG2(format, arg1, arg2) \
+  WEBKITDEBUGLEVEL2(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2)
+#define WEBKITDEBUG3(format, arg1, arg2, arg3) \
+  WEBKITDEBUGLEVEL3(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3)
+#define WEBKITDEBUG4(format, arg1, arg2, arg3, arg4) \
+  WEBKITDEBUGLEVEL4(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4)
+#define WEBKITDEBUG5(format, arg1, arg2, arg3, arg4, arg5)                    \
+  WEBKITDEBUGLEVEL5(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4, \
+                    arg5)
+#define WEBKITDEBUG6(format, arg1, arg2, arg3, arg4, arg5, arg6)              \
+  WEBKITDEBUGLEVEL6(WEBKIT_LOG_GENERIC_DEBUG, format, arg1, arg2, arg3, arg4, \
+                    arg5, arg6)
