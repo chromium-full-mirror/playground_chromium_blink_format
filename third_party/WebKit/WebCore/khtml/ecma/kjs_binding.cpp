@@ -51,6 +51,7 @@ Value DOMObject::get(ExecState* exec, const Identifier& p) const {
     Object err =
         Error::create(exec, GeneralError,
                       QString("DOM exception %1").arg(e.code).local8Bit());
+    err.put(exec, "code", Number(e.code));
     exec->setException(err);
     result = Undefined();
   } catch (...) {
@@ -71,6 +72,7 @@ void DOMObject::put(ExecState* exec,
     Object err =
         Error::create(exec, GeneralError,
                       QString("DOM exception %1").arg(e.code).local8Bit());
+    err.put(exec, "code", Number(e.code));
     exec->setException(err);
   } catch (...) {
     kdError(6070) << "Unknown exception in DOMObject::put()" << endl;
@@ -90,6 +92,7 @@ Value DOMFunction::get(ExecState* exec, const Identifier& propertyName) const {
     Object err =
         Error::create(exec, GeneralError,
                       QString("DOM exception %1").arg(e.code).local8Bit());
+    err.put(exec, "code", Number(e.code));
     exec->setException(err);
   } catch (...) {
     kdError(6070) << "Unknown exception in DOMFunction::get()" << endl;

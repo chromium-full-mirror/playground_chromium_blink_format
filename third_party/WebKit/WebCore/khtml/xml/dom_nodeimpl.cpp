@@ -856,7 +856,7 @@ void NodeImpl::checkAddChild(NodeImpl* newChild, int& exceptioncode) {
   // as the fragment itself (otherwise they could not have been added as
   // children)
   if (newChild->getDocument() != getDocument()) {
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
+    exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
 
