@@ -26,7 +26,7 @@
 #ifndef QLIST_H_
 #define QLIST_H_
 
-#include <kwq.h>
+#include <kwqdef.h>
 #include "qcollection.h"
 
 template <class T>
@@ -40,6 +40,7 @@ class QList {
   void setAutoDelete(bool);
   bool insert(uint i, const T*);
   bool remove(const T*);
+  bool removeFirst();
   bool removeLast();
   void prepend(const T*);
   T* take(uint i);

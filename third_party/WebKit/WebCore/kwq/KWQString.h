@@ -26,13 +26,10 @@
 #ifndef QSTRING_H_
 #define QSTRING_H_
 
-#include <kwq.h>
-#include <string.h>
-
 #include "qcstring.h"
-#include "qregexp.h"
 
 class QString;
+class QRegExp;
 
 class QChar {
  public:
@@ -88,6 +85,7 @@ class QString {
   static QString fromLatin1(const char*, int len = -1);
 
   QString();
+  QString(QChar);
   QString(const QChar*, uint);
   QString(const char*);
   QString(const QByteArray&);
@@ -157,6 +155,10 @@ class QString {
 
 QString& operator+(const char*, const QString&);
 QString& operator+(QChar, const QString&);
+bool operator==(const QString&, QChar);
+bool operator==(const QString&, const QString&);
+bool operator==(const QString&, const char*);
+bool operator==(const char*, const QString&);
 bool operator!=(const QString&, QChar);
 bool operator!=(const QString&, const QString&);
 bool operator!=(const QString&, const char*);
