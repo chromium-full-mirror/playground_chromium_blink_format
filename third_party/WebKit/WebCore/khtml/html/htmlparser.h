@@ -137,6 +137,9 @@ class KHTMLParser {
 
   bool allowNestedRedundantTag(int _id);
 
+  static bool isHeaderTag(int _id);
+  void popNestedHeaderTag();
+
   ushort* forbiddenTag;
 
   /*
