@@ -3,18 +3,18 @@
         Copyright 2001, Apple, Inc. All rights reserved.
 */
 
-#import <WebKit/IFBaseWebController.h>
+#import <WebKit/IFWebController.h>
 
 @class IFError;
 @class IFLoadProgress;
 @class IFWebFrame;
 
-@interface IFBaseWebControllerPrivate : NSObject {
+@interface IFWebControllerPrivate : NSObject {
   IFWebFrame* mainFrame;
 }
 @end
 
-@interface IFBaseWebController (IFPrivate)
+@interface IFWebController (IFPrivate)
 ;
 - (void)_receivedProgress:(IFLoadProgress*)progress
               forResource:(NSString*)resourceDescription

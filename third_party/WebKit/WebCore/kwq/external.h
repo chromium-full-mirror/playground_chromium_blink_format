@@ -42,15 +42,14 @@ class Loader;
 @class IFError;
 @class IFURLHandle;
 @class IFLoadProgress;
+@protocol IFLocationChangeHandler;
 
-@protocol IFWebController
+@interface IFWebController<IFLocationChangeHandler>
 - (IFWebFrame *)createFrameNamed: (NSString *)name for: (IFWebDataSource *)dataSource inParent: (IFWebDataSource *)dataSource inScrollView: (BOOL)inScrollView;
 - (IFWebFrame*)frameNamed:(NSString*)name;
 - (IFWebFrame*)mainFrame;
-- (id<IFWebController>)openNewWindowWithURL:(NSURL*)url;
-@end
+- (IFWebController*)openNewWindowWithURL:(NSURL*)url;
 
-@interface IFBaseWebController
 - (void)_receivedProgress:(IFLoadProgress*)progress
               forResource:(NSString*)resourceDescription
            fromDataSource:(IFWebDataSource*)dataSource;
@@ -77,7 +76,7 @@ class Loader;
 - initWithURL:(NSURL*)url;
 - (void)setFrame:(IFWebFrame*)fName;
 - (IFWebFrame*)webFrame;
-- (id<IFWebController>)controller;
+- (IFWebController*)controller;
 - frameNamed:(NSString*)f;
 - (BOOL)frameExists:(NSString*)f;
 - (void)_setParent:(IFWebDataSource*)p;

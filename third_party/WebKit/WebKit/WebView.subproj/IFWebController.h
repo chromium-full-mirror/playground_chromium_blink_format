@@ -26,7 +26,7 @@
    example, a web
     crawler may implement a IFWebController with no corresponding view.
 
-    IFBaseWebController may be subclassed to modify the behavior of the standard
+    IFWebController may be subclassed to modify the behavior of the standard
     IFWebView and IFWebDataSource.
 
    =============================================================================
@@ -37,7 +37,9 @@
 @class IFLoadProgress;
 @class IFWebDataSource;
 @class IFWebFrame;
-@protocol IFWebController;
+@class IFWebView;
+@class IFWebController;
+@class IFWebControllerPrivate;
 
 /*
    =============================================================================
@@ -91,7 +93,7 @@
 // screen goemetry.  Essentially all the 'view' items that are
 
 // FIXME: not strictly a scripting issue
-- (id<IFWebController>)openNewWindowWithURL:(NSURL*)url;
+- (IFWebController*)openNewWindowWithURL:(NSURL*)url;
 @end
 
 /*
@@ -110,8 +112,29 @@ typedef enum {
   IFURLPolicyIgnore
 } IFURLPolicy;
 
-@protocol
-    IFWebController<NSObject, IFResourceProgressHandler, IFScriptContextHandler>
+@interface IFWebController
+    : NSObject<IFResourceProgressHandler, IFScriptContextHandler> {
+ @private
+  IFWebControllerPrivate* _private;
+}
+
+/*
+// Called when the content policy is set to IFContentPolicyShow
++ (id <IFDocumentView>) createViewForMIMEType:(NSString *)MIMEType
+
+// registerClass extends the views that WebKit supports
++ (void) registerClass:(Class)class forMIMEType:(NSString *)MIMEType
+*/
+
+// Calls designated initializer with nil arguments.
+- init;
+
+// Designated initializer.
+- initWithView:(IFWebView*)view
+    provisionalDataSource:(IFWebDataSource*)dataSource;
+
+- (void)setDirectsAllLinksToSystemBrowser:(BOOL)flag;
+- (BOOL)directsAllLinksToSystemBrowser;
 
 // Called when a data source needs to create a frame.  This method encapsulates
 // the

@@ -12,14 +12,14 @@
 @class IFPluginNullEventSender;
 @class IFWebDataSource;
 @class IFPlugin;
-@protocol IFWebController;
+@class IFWebController;
 
 @interface IFPluginView : NSView {
   IFPluginNullEventSender* eventSender;
   unsigned argsCount;
   char **cAttributes, **cValues;
 
-  id<IFWebController> webController;
+  IFWebController* webController;
   IFWebDataSource* webDataSource;
   IFWebFrame* webFrame;
 
@@ -59,7 +59,7 @@
                mode:(uint16)mode;
 - (void)stop;
 - (IFWebDataSource*)webDataSource;
-- (id<IFWebController>)webController;
+- (IFWebController*)webController;
 + (void)getCarbonEvent:(EventRecord*)carbonEvent;
 
 - (NPP_NewStreamProcPtr)NPP_NewStream;

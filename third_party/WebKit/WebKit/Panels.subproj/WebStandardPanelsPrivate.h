@@ -10,8 +10,8 @@
 @interface IFStandardPanels (Private)
 
 - (void)_didStartLoadingURL:(NSURL*)url
-               inController:(id<IFWebController>)controller;
+               inController:(IFWebController*)controller;
 - (void)_didStopLoadingURL:(NSURL*)url
-              inController:(id<IFWebController>)controller;
+              inController:(IFWebController*)controller;
 
 @end
