@@ -108,7 +108,7 @@ void Font::drawText(QPainter* p,
 
 int Font::width(QChar* chs, int slen, int pos, int len) const {
 #ifdef APPLE_CHANGES
-  return fm._width(chs + pos, kMin(len, slen - pos));
+  return fm.width(chs + pos, kMin(len, slen - pos));
 #else
   QString qstr = QConstString(chs + pos, slen - pos).string();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,13 +20,34 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include <kwqdebug.h>
+#import "IFTextRendererFactory.h"
+#import <kwqdebug.h>
 
-@interface KWQTextContainer : NSTextContainer {
+@implementation IFTextRendererFactory
+
+static IFTextRendererFactory *sharedFactory;
+
++ (IFTextRendererFactory *)sharedFactory
+{
+    return sharedFactory;
 }
-+ (KWQTextContainer*)sharedInstance;
+
+- init
+{
+    [super init];
+    
+    KWQ_ASSERT(!sharedFactory);
+    sharedFactory = [self retain];
+    
+    return self;
+}
+
+- (id <IFTextRenderer>)rendererWithFamily:(NSString *)family traits:(NSFontTraitMask)traits size:(float)size
+{
+    return nil;
+}
 
 @end

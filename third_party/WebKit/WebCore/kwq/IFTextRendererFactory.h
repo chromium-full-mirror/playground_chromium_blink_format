@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,33 +22,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #import <Cocoa/Cocoa.h>
 
-#include <kwqdebug.h>
+@protocol IFTextRenderer;
 
-#import <KWQMetrics.h>
-
-@interface KWQTextStorage : NSTextStorage {
-  NSDictionary* attributes;
-  NSString* string;
-  int stringCapacity;
-  NSMutableDictionary* fragmentCache;
-  NSLayoutManager* _layoutManager;
-#ifdef SPACE_OPTIMIZATION
-  id<KWQLayoutFragment> spaceFragment;
-  id<KWQLayoutFragment> expandedFragment;
-#endif
+@interface IFTextRendererFactory : NSObject {
 }
 
-- (id)initWithFontAttribute:(NSDictionary*)attrs;
-- (void)setAttributes:(NSDictionary*)at;
-
-- (id<KWQLayoutFragment>)getFragmentForString:(NSString*)string;
-
-- (void)setString:(NSString*)dString;
-
-#ifdef _DEBUG_LAYOUT_FRAGMENT
-- (NSDictionary*)fragmentCache;
-#endif
++ (IFTextRendererFactory*)sharedFactory;
+- init;
+- (id<IFTextRenderer>)rendererWithFamily:(NSString*)family
+                                  traits:(NSFontTraitMask)traits
+                                    size:(float)size;
 
 @end
