@@ -1364,7 +1364,7 @@ void KHTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
   curr = blockStack;
   HTMLStackElem* residualStyleStack = 0;
   while (curr && curr != maxElem) {
-    // In quirks mode only, we will actually schedule this tag for reopening
+    // We will actually schedule this tag for reopening
     // after we complete the close of this entire block.
     NodeImpl* currNode = current;
     if (isResidualStyleTag(curr->id)) {
@@ -1457,8 +1457,8 @@ void KHTMLParser::popBlock(int _id) {
 
   if (maxLevel > Elem->level) {
     // We didn't match because the tag is in a different scope, e.g.,
-    // <b><p>Foo</b>.  In quirks mode only, try to correct the problem.
-    if (!document->document()->inQuirksMode() || !isResidualStyleTag(_id))
+    // <b><p>Foo</b>.  Try to correct the problem.
+    if (!isResidualStyleTag(_id))
       return;
     return handleResidualStyleCloseTagAcrossBlocks(Elem);
   }
@@ -1478,11 +1478,10 @@ void KHTMLParser::popBlock(int _id) {
         // bottom margin.
         form->setMalformed(true);
 
-      // In quirks mode only, we will actually schedule this tag for reopening
+      // Schedule this tag for reopening
       // after we complete the close of this entire block.
       NodeImpl* currNode = current;
-      if (isAffectedByStyle && document->document()->inQuirksMode() &&
-          isResidualStyleTag(Elem->id)) {
+      if (isAffectedByStyle && isResidualStyleTag(Elem->id)) {
         // We've overloaded the use of stack elements and are just reusing the
         // struct with a slightly different meaning to the variables.  Instead
         // of chaining
