@@ -110,6 +110,9 @@ class KWQKHTMLPartImpl : public QObject {
 
   void unfocusWindow();
 
+  void saveDocumentState();
+  void restoreDocumentState();
+
   bool isFrameSet();
 
   void jumpToSelection();
