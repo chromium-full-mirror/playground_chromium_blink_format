@@ -45,8 +45,9 @@ RuntimeObjectImp::RuntimeObjectImp(ObjectImp* proto) : ObjectImp(proto) {
 }
 
 RuntimeObjectImp::~RuntimeObjectImp() {
-  if (ownsInstance)
+  if (ownsInstance) {
     delete instance;
+  }
 }
 
 RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)

@@ -28,6 +28,7 @@
 
 #import <WebCore/WebCoreKeyboardAccess.h>
 
+#import <JavaScriptCore/npruntime.h>
 #import <JavaVM/jni.h>
 
 #ifdef __cplusplus
@@ -351,6 +352,7 @@ typedef enum {
 - (void)ensureCaretVisible;
 
 - (WebScriptObject*)windowScriptObject;
+- (NPObject*)windowScriptNPObject;
 
 - (NSDragOperation)dragOperationForDraggingInfo:(id<NSDraggingInfo>)info;
 - (void)dragExitedWithDraggingInfo:(id<NSDraggingInfo>)info;

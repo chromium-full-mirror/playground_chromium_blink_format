@@ -33,7 +33,6 @@
 
 typedef uint16_t NPUTF16;
 NPUTF16* NPN_UTF16FromString(NPString* obj);
-NPUTF16* NPN_UTF16FromString(NPString* obj);
 
 typedef enum {
   NP_NumberValueType,
@@ -60,5 +59,13 @@ extern void convertValueToNPVariant(KJS::ExecState* exec,
                                     NPVariant* result);
 extern KJS::Value convertNPVariantToValue(KJS::ExecState* exec,
                                           const NPVariant* variant);
+
+typedef struct {
+  union {
+    const NPUTF8* string;
+    int32_t number;
+  } value;
+  bool isString;
+} PrivateIdentifier;
 
 #endif
