@@ -1626,6 +1626,16 @@ void RenderObject::setStyle(RenderStyle* style) {
     repaint();
 }
 
+void RenderObject::setStyleInternal(RenderStyle* st) {
+  if (m_style == st)
+    return;
+  if (m_style)
+    m_style->deref(renderArena());
+  m_style = st;
+  if (m_style)
+    m_style->ref();
+}
+
 QRect RenderObject::viewRect() const {
   return canvas()->viewRect();
 }

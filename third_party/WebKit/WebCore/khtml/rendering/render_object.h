@@ -585,8 +585,14 @@ class RenderObject : public CachedObjectClient {
   virtual void dirtyLinesFromChangedChild(RenderObject* child,
                                           bool adding = true);
 
-  // set the style of the object.
+  // Set the style of the object and update the state of the object accordingly.
   virtual void setStyle(RenderStyle* style);
+
+  // Updates only the local style ptr of the object.  Does not update the state
+  // of the object,
+  // and so only should be called when the style is known not to have changed
+  // (or from setStyle).
+  void setStyleInternal(RenderStyle* style);
 
   // returns the containing block level element for this element.
   RenderBlock* containingBlock() const;
