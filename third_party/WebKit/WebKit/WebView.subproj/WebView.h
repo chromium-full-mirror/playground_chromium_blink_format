@@ -66,7 +66,8 @@
 */
 - (void)receivedProgress:(IFLoadProgress*)progress
        forResourceHandle:(IFURLHandle*)resourceHandle
-          fromDataSource:(IFWebDataSource*)dataSource;
+          fromDataSource:(IFWebDataSource*)dataSource
+                complete:(BOOL)isComplete;
 
 - (void)receivedError:(IFError*)error
     forResourceHandle:(IFURLHandle*)resourceHandle
