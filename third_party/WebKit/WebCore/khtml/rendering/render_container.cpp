@@ -44,6 +44,9 @@ RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderObject(node) {
 RenderContainer::~RenderContainer() {}
 
 void RenderContainer::detach(RenderArena* renderArena) {
+  if (continuation())
+    continuation()->detach(renderArena);
+
   RenderObject* next;
   for (RenderObject* n = m_first; n; n = next) {
     n->removeFromSpecialObjects();
@@ -191,9 +194,6 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
 }
 
 void RenderContainer::removeChild(RenderObject* oldChild) {
-  if (oldChild->continuation())
-    oldChild->continuation()->parent()->removeChild(oldChild->continuation());
-
   removeChildNode(oldChild);
   setLayouted(false);
 }
@@ -350,7 +350,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
         c->m_first = 0;
         c->m_next = 0;
       }
-      delete child;
+      child->detach(renderArena());
     }
     child = next;
   }

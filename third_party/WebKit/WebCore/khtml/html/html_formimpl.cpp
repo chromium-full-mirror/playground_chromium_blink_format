@@ -88,15 +88,13 @@ NodeImpl::Id HTMLFormElementImpl::id() const {
 }
 
 void HTMLFormElementImpl::attach() {
-  RenderStyle* style = getDocument()->styleSelector()->styleForElement(this);
+  HTMLElementImpl::attach();
 
-  if (style->display() != NONE && getDocument()->isHTMLDocument()) {
+  if (m_render && getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
     document->addNamedImageOrForm(oldNameAttr);
     document->addNamedImageOrForm(oldIdAttr);
   }
-
-  HTMLElementImpl::attach();
 }
 
 void HTMLFormElementImpl::detach() {
@@ -520,10 +518,7 @@ void HTMLFormElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     case ATTR_NAME: {
       QString newNameAttr = attr->value().string();
-
-      if (attached() && getDocument()->isHTMLDocument() &&
-          getDocument()->styleSelector()->styleForElement(this)->display() !=
-              NONE) {
+      if (m_render && getDocument()->isHTMLDocument()) {
         HTMLDocumentImpl* document =
             static_cast<HTMLDocumentImpl*>(getDocument());
         document->removeNamedImageOrForm(oldNameAttr);
@@ -533,10 +528,7 @@ void HTMLFormElementImpl::parseAttribute(AttributeImpl* attr) {
     } break;
     case ATTR_ID: {
       QString newIdAttr = attr->value().string();
-
-      if (attached() && getDocument()->isHTMLDocument() &&
-          getDocument()->styleSelector()->styleForElement(this)->display() !=
-              NONE) {
+      if (m_render && getDocument()->isHTMLDocument()) {
         HTMLDocumentImpl* document =
             static_cast<HTMLDocumentImpl*>(getDocument());
         document->removeNamedImageOrForm(oldIdAttr);
@@ -1227,8 +1219,7 @@ void HTMLInputElementImpl::attach() {
           addCSSLength(CSS_PROP_WIDTH, width);
         }
         m_render = new (arena) RenderImageButton(this);
-        m_render->setStyle(
-            getDocument()->styleSelector()->styleForElement(this));
+        m_render->setStyle(_style);
         parentNode()->renderer()->addChild(m_render, nextRenderer());
         m_render->updateFromElement();
         NodeBaseImpl::attach();
@@ -1243,6 +1234,7 @@ void HTMLInputElementImpl::attach() {
         break;
       case BUTTON:
         m_render = new (arena) RenderPushButton(this);
+        break;
       case HIDDEN:
         break;
     }

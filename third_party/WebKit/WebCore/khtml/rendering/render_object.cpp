@@ -39,13 +39,19 @@
 using namespace DOM;
 using namespace khtml;
 
+#ifndef NDEBUG
+static void* baseOfRenderObjectBeingDeleted;
+#endif
+
 void* RenderObject::operator new(size_t sz, RenderArena* renderArena) throw() {
   return renderArena->allocate(sz);
 }
 
 void RenderObject::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(baseOfRenderObjectBeingDeleted == ptr);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
@@ -1019,11 +1025,25 @@ void RenderObject::detach(RenderArena* renderArena) {
   m_next = m_previous = 0;
 
   // by default no refcounting
-  delete this;
+  arenaDelete(renderArena, this);
+}
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+void RenderObject::arenaDelete(RenderArena* arena, void* base) {
+#ifndef NDEBUG
+  void* savedBase = baseOfRenderObjectBeingDeleted;
+  baseOfRenderObjectBeingDeleted = base;
+#endif
+  delete this;
+#ifndef NDEBUG
+  baseOfRenderObjectBeingDeleted = savedBase;
+#endif
+
+  // Recover the size left there for us by operator delete and free the memory.
+  arena->free(*(size_t*)base, base);
+}
+
+void RenderObject::arenaDelete(RenderArena* arena) {
+  arenaDelete(arena, dynamic_cast<void*>(this));
 }
 
 FindSelectionResult RenderObject::checkSelectionPoint(

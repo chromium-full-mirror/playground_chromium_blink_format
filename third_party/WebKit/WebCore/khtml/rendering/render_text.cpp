@@ -41,12 +41,21 @@
 using namespace khtml;
 using namespace DOM;
 
-void TextSlave::detach(RenderArena* renderArena) {
-  delete this;
+#ifndef NDEBUG
+static bool inTextSlaveDetach;
+#endif
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+void TextSlave::detach(RenderArena* renderArena) {
+#ifndef NDEBUG
+  inTextSlaveDetach = true;
+#endif
+  delete this;
+#ifndef NDEBUG
+  inTextSlaveDetach = false;
+#endif
+
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
 }
 
 void* TextSlave::operator new(size_t sz, RenderArena* renderArena) throw() {
@@ -54,8 +63,10 @@ void* TextSlave::operator new(size_t sz, RenderArena* renderArena) throw() {
 }
 
 void TextSlave::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(inTextSlaveDetach);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 void TextSlave::paintSelection(const Font* f,

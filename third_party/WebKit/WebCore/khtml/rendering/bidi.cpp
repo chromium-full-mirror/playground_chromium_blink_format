@@ -54,12 +54,21 @@ static int numSpaces;
 static void embed(QChar::Direction d);
 static void appendRun();
 
-void BidiIterator::detach(RenderArena* renderArena) {
-  delete this;
+#ifndef NDEBUG
+static bool inBidiIteratorDetach;
+#endif
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+void BidiIterator::detach(RenderArena* renderArena) {
+#ifndef NDEBUG
+  inBidiIteratorDetach = true;
+#endif
+  delete this;
+#ifndef NDEBUG
+  inBidiIteratorDetach = false;
+#endif
+
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
 }
 
 void* BidiIterator::operator new(size_t sz, RenderArena* renderArena) throw() {
@@ -67,8 +76,10 @@ void* BidiIterator::operator new(size_t sz, RenderArena* renderArena) throw() {
 }
 
 void BidiIterator::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(inBidiIteratorDetach);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 // ---------------------------------------------------------------------
@@ -265,6 +276,7 @@ static void appendRunsForObject(int start, int end, RenderObject* obj) {
     betweenMidpoints = false;
     start = nextMidpoint->pos;
     smidpoints->removeFirst();  // Delete the midpoint.
+    nextMidpoint->detach(obj->renderArena());
     if (start < end)
       return appendRunsForObject(start, end, obj);
   } else {
@@ -281,6 +293,7 @@ static void appendRunsForObject(int start, int end, RenderObject* obj) {
       betweenMidpoints = true;
       int nextPos = nextMidpoint->pos + 1;
       smidpoints->removeFirst();
+      nextMidpoint->detach(obj->renderArena());
       return appendRunsForObject(nextPos, end, obj);
     } else
       sruns->append(new BidiRun(start, end, obj, context, dir));
@@ -1020,8 +1033,8 @@ static void deleteMidpoints(RenderArena* arena,
     BidiIterator* s = midpoints->at(i);
     if (s)
       s->detach(arena);
-    midpoints->remove(i);
   }
+  midpoints->clear();
 }
 
 void RenderFlow::layoutInlineChildren(bool relayoutChildren) {

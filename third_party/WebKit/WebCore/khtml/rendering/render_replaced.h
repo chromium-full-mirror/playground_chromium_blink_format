@@ -100,6 +100,8 @@ class RenderWidget : public QObject,
   QWidget* widget() const { return m_widget; }
   KHTMLView* view() const { return m_view; }
 
+  void arenaDeref(RenderArena* arena);
+
  public slots:
   void slotWidgetDestructed();
 
@@ -110,6 +112,9 @@ class RenderWidget : public QObject,
 
   QWidget* m_widget;
   KHTMLView* m_view;
+
+ private:
+  using khtml::Shared<RenderWidget>::deref;
 };
 };
 

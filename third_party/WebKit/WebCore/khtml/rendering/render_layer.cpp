@@ -52,6 +52,12 @@
 using namespace DOM;
 using namespace khtml;
 
+#ifndef NDEBUG
+static bool inRenderLayerDetach;
+static bool inRenderLayerElementDetach;
+static bool inRenderZTreeNodeDetach;
+#endif
+
 RenderLayer::RenderLayer(RenderObject* object)
     : m_object(object),
       m_parent(0),
@@ -111,16 +117,23 @@ void* RenderLayer::operator new(size_t sz, RenderArena* renderArena) throw() {
 }
 
 void RenderLayer::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(inRenderLayerDetach);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 void RenderLayer::detach(RenderArena* renderArena) {
+#ifndef NDEBUG
+  inRenderLayerDetach = true;
+#endif
   delete this;
+#ifndef NDEBUG
+  inRenderLayerDetach = false;
+#endif
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
 }
 
 void RenderLayer::addChild(RenderLayer* child) {
@@ -597,16 +610,23 @@ void* RenderLayer::RenderLayerElement::operator new(
 }
 
 void RenderLayer::RenderLayerElement::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(inRenderLayerElementDetach);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 void RenderLayer::RenderLayerElement::detach(RenderArena* renderArena) {
+#ifndef NDEBUG
+  inRenderLayerElementDetach = true;
+#endif
   delete this;
+#ifndef NDEBUG
+  inRenderLayerElementDetach = false;
+#endif
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
 }
 
 void* RenderLayer::RenderZTreeNode::operator new(
@@ -619,8 +639,10 @@ void* RenderLayer::RenderZTreeNode::operator new(
 }
 
 void RenderLayer::RenderZTreeNode::operator delete(void* ptr, size_t sz) {
-  size_t* szPtr = (size_t*)ptr;
-  *szPtr = sz;
+  assert(inRenderZTreeNodeDetach);
+
+  // Stash size where detach can find it.
+  *(size_t*)ptr = sz;
 }
 
 void RenderLayer::RenderZTreeNode::detach(RenderArena* renderArena) {
@@ -631,9 +653,14 @@ void RenderLayer::RenderZTreeNode::detach(RenderArena* renderArena) {
   if (layerElement)
     layerElement->detach(renderArena);
 
+#ifndef NDEBUG
+  inRenderZTreeNodeDetach = true;
+#endif
   delete this;
+#ifndef NDEBUG
+  inRenderZTreeNodeDetach = false;
+#endif
 
-  // Now perform the destroy.
-  size_t* sz = (size_t*)this;
-  renderArena->free(*sz, (void*)this);
+  // Recover the size left there for us by operator delete and free the memory.
+  renderArena->free(*(size_t*)this, this);
 }

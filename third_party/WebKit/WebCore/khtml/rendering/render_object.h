@@ -629,6 +629,8 @@ class RenderObject : public CachedObjectClient {
 
   virtual void removeLeftoverAnonymousBoxes();
 
+  void arenaDelete(RenderArena* arena);
+
  private:
   RenderStyle* m_style;
   DOM::NodeImpl* m_node;
@@ -658,6 +660,8 @@ class RenderObject : public CachedObjectClient {
   bool m_mouseInside : 1;
   bool m_hasFirstLine : 1;
   bool m_isSelectionBorder : 1;
+
+  void arenaDelete(RenderArena* arena, void* objectBase);
 
   // note: do not add unnecessary bitflags, we have 32 bit already!
   friend class RenderListItem;

@@ -135,24 +135,17 @@ void HTMLImageElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     case ATTR_NAME: {
       QString newNameAttr = attr->value().string();
-
-      if (attached() && getDocument()->isHTMLDocument() &&
-          getDocument()->styleSelector()->styleForElement(this)->display() !=
-              NONE) {
+      if (m_render && getDocument()->isHTMLDocument()) {
         HTMLDocumentImpl* document =
             static_cast<HTMLDocumentImpl*>(getDocument());
         document->removeNamedImageOrForm(oldNameAttr);
         document->addNamedImageOrForm(newNameAttr);
       }
-
       oldNameAttr = newNameAttr;
     } break;
     case ATTR_ID: {
       QString newIdAttr = attr->value().string();
-
-      if (attached() && getDocument()->isHTMLDocument() &&
-          getDocument()->styleSelector()->styleForElement(this)->display() !=
-              NONE) {
+      if (m_render && getDocument()->isHTMLDocument()) {
         HTMLDocumentImpl* document =
             static_cast<HTMLDocumentImpl*>(getDocument());
         document->removeNamedImageOrForm(oldIdAttr);
@@ -194,9 +187,10 @@ void HTMLImageElementImpl::attach() {
 
   RenderStyle* _style = getDocument()->styleSelector()->styleForElement(this);
   _style->ref();
+
   if (parentNode()->renderer() && _style->display() != NONE) {
     m_render = new (getDocument()->renderArena()) RenderImage(this);
-    m_render->setStyle(getDocument()->styleSelector()->styleForElement(this));
+    m_render->setStyle(_style);
     parentNode()->renderer()->addChild(m_render, nextRenderer());
     m_render->updateFromElement();
   }
@@ -206,6 +200,7 @@ void HTMLImageElementImpl::attach() {
     document->addNamedImageOrForm(oldIdAttr);
     document->addNamedImageOrForm(oldNameAttr);
   }
+
   _style->deref();
 
   NodeBaseImpl::attach();
