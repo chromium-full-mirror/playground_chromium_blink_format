@@ -7,7 +7,6 @@
 
 @interface WebHistoryItem : NSObject {
   NSURL* _URL;
-  NSURL* _iconURL;
   NSString* _target;
   NSString* _parent;
   NSString* _title;
@@ -32,7 +31,6 @@
 - (id)initFromDictionaryRepresentation:(NSDictionary*)dict;
 
 - (NSURL*)URL;
-- (NSURL*)iconURL;
 - (NSString*)target;
 - (NSString*)parent;
 - (NSString*)title;
@@ -41,7 +39,6 @@
 - (NSCalendarDate*)lastVisitedDate;
 
 - (void)setURL:(NSURL*)URL;
-- (void)setIconURL:(NSURL*)iconURL;
 - (void)setTarget:(NSString*)target;
 - (void)setParent:(NSString*)parent;
 - (void)setTitle:(NSString*)title;

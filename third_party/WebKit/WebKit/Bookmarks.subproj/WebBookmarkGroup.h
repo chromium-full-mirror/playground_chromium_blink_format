@@ -44,12 +44,10 @@
 - (WebBookmark*)insertNewBookmarkAtIndex:(unsigned)index
                               ofBookmark:(WebBookmark*)parent
                                withTitle:(NSString*)newTitle
-                                 iconURL:(NSURL*)iconURL
                                URLString:(NSString*)newURLString
                                     type:(WebBookmarkType)bookmarkType;
 - (WebBookmark*)addNewBookmarkToBookmark:(WebBookmark*)parent
                                withTitle:(NSString*)newTitle
-                                 iconURL:(NSURL*)iconURL
                                URLString:(NSString*)newURLString
                                     type:(WebBookmarkType)bookmarkType;
 
