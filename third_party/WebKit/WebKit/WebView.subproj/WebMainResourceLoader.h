@@ -22,7 +22,6 @@
 @interface WebMainResourceClient : NSObject<WebResourceHandleDelegate> {
   NSURL* currentURL;
   WebDataSource* dataSource;
-  BOOL suppressErrors;
   WebDownloadHandler* downloadHandler;
 
   // Both of these delegates are retained by the client.
