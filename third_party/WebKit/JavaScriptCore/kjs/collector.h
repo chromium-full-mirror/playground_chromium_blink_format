@@ -49,6 +49,12 @@
 #include "types.h"
 #include "interpreter.h"
 
+#ifdef APPLE_CHANGES
+#if !defined(__OBJC__) && !defined(_COLLECTOR)
+typedef void* CFSetRef;
+#endif
+#endif
+
 namespace KJS {
 
 class CollectorBlock;
@@ -94,6 +100,7 @@ class Collector {
   static int numInterpreters();
   static int numGCNotAllowedObjects();
   static int numReferencedObjects();
+  static CFSetRef liveObjectClasses();
 #endif
  private:
   static CollectorBlock* root;
