@@ -77,8 +77,9 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
     case HTMLDocument::Write:
     case HTMLDocument::WriteLn: {
       // DOM only specifies single string argument, but NS & IE allow multiple
-      UString str = v.toString(exec);
-      for (int i = 1; i < args.size(); i++)
+      // or no arguments
+      UString str = "";
+      for (int i = 0; i < args.size(); i++)
         str += args[i].toString(exec);
       if (id == HTMLDocument::WriteLn)
         str += "\n";
