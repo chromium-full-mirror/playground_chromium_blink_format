@@ -131,6 +131,8 @@ class QPainter : public Qt {
                    int _npoints,
                    bool fill);
 
+  void _updateRenderer(NSString** families);
+
   QPainterPrivate* data;
 };
 
