@@ -469,7 +469,14 @@ class RenderStyle : public Shared<RenderStyle> {
   static void cleanup();
 
   // static pseudo styles. Dynamic ones are produced on the fly.
-  enum PseudoId { NOPSEUDO, FIRST_LINE, FIRST_LETTER, BEFORE, AFTER };
+  enum PseudoId {
+    NOPSEUDO,
+    FIRST_LINE,
+    FIRST_LETTER,
+    BEFORE,
+    AFTER,
+    SELECTION
+  };
 
  protected:
   // !START SYNC!: Keep this in sync with the copy constructor in

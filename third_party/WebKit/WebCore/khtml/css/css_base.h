@@ -51,6 +51,7 @@ class CSSSelector {
  public:
   CSSSelector()
       : tagHistory(0),
+        simpleSelector(0),
         attr(0),
         tag(-1),
         relation(Descendant),
@@ -59,7 +60,10 @@ class CSSSelector {
         pseudoId(0),
         _pseudoType(PseudoNotParsed) {}
 
-  ~CSSSelector() { delete tagHistory; }
+  ~CSSSelector() {
+    delete tagHistory;
+    delete simpleSelector;
+  }
 
   /**
    * Print debug output for this selector
@@ -99,6 +103,8 @@ class CSSSelector {
     PseudoOther,
     PseudoEmpty,
     PseudoFirstChild,
+    PseudoLastChild,
+    PseudoOnlyChild,
     PseudoFirstLine,
     PseudoFirstLetter,
     PseudoLink,
@@ -109,7 +115,10 @@ class CSSSelector {
     PseudoTarget,
     PseudoBefore,
     PseudoAfter,
-    PseudoFunction
+    PseudoLang,
+    PseudoNot,
+    PseudoRoot,
+    PseudoSelection
   };
 
   inline PseudoType pseudoType() const {
@@ -120,6 +129,7 @@ class CSSSelector {
 
   mutable DOM::DOMString value;
   CSSSelector* tagHistory;
+  CSSSelector* simpleSelector;  // Used for :not.
   int attr;
   int tag;
 
@@ -127,7 +137,7 @@ class CSSSelector {
   Match match : 4;
   bool nonCSSHint : 1;
   unsigned int pseudoId : 3;
-  mutable PseudoType _pseudoType : 4;
+  mutable PseudoType _pseudoType : 5;
 
  private:
   void extractPseudoType() const;
