@@ -566,7 +566,21 @@ List ArgumentListNode::evaluateList(ExecState* exec) {
 
 // ------------------------------ ArgumentsNode --------------------------------
 
-ArgumentsNode::ArgumentsNode(ArgumentListNode* l) : list(l) {}
+ArgumentsNode::ArgumentsNode(ArgumentListNode* l) : list(l) {
+  if (list == NULL) {
+    return;
+  }
+
+  ArgumentListNode* prev = list;
+  ArgumentListNode* cur = prev->list;
+
+  while (cur != NULL) {
+    prev->list = cur->list;
+    cur->list = list;
+    list = cur;
+    cur = prev->list;
+  }
+}
 
 void ArgumentsNode::ref() {
   Node::ref();

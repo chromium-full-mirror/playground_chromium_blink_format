@@ -333,6 +333,7 @@ class ArgumentListNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  friend class ArgumentsNode;
   ArgumentListNode* list;
   Node* expr;
 };
