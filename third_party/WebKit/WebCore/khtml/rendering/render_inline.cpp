@@ -174,7 +174,6 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
                              RenderObject* newChild,
                              RenderFlow* oldCont) {
   RenderBlock* pre = 0;
-  RenderStyle* newStyle = 0;
   RenderBlock* block = containingBlock();
   bool madeNewBeforeBlock = false;
   if (block->isAnonymousBox()) {
@@ -184,23 +183,11 @@ void RenderInline::splitFlow(RenderObject* beforeChild,
     block = block->containingBlock();
   } else {
     // No anonymous block available for use.  Make one.
-    newStyle = new RenderStyle();
-    newStyle->inheritFrom(block->style());
-    newStyle->setDisplay(BLOCK);
-    pre = new (renderArena()) RenderBlock(0 /* anonymous box */);
-    pre->setStyle(newStyle);
-    pre->setIsAnonymousBox(true);
-    pre->setChildrenInline(true);
+    pre = block->createAnonymousBlock();
     madeNewBeforeBlock = true;
   }
 
-  newStyle = new RenderStyle();
-  newStyle->inheritFrom(block->style());
-  newStyle->setDisplay(BLOCK);
-  RenderBlock* post = new (renderArena()) RenderBlock(0 /* anonymous box */);
-  post->setStyle(newStyle);
-  post->setIsAnonymousBox(true);
-  post->setChildrenInline(true);
+  RenderBlock* post = block->createAnonymousBlock();
 
   RenderObject* boxFirst =
       madeNewBeforeBlock ? block->firstChild() : pre->nextSibling();
