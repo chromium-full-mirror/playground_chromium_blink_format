@@ -185,7 +185,6 @@
 - (void)_commitIfReady:(NSDictionary*)pageCache;
 - (void)_makeRepresentation;
 - (void)_receivedData:(NSData*)data;
-- (void)_setData:(NSData*)data;
 - (void)_finishedLoading;
 - (void)_receivedMainResourceError:(NSError*)error complete:(BOOL)isComplete;
 - (void)_defersCallbacksChanged;
