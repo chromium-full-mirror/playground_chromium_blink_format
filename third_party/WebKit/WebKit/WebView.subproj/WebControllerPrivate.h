@@ -9,6 +9,9 @@
 @class WebError;
 @class WebFrame;
 
+typedef enum { Safari, MacIE, WinIE } UserAgentStringType;
+enum { NumUserAgentStringTypes = WinIE + 1 };
+
 @interface WebControllerPrivate : NSObject {
  @public
   WebFrame* mainFrame;
@@ -29,8 +32,7 @@
 
   NSString* applicationNameForUserAgent;
   NSString* userAgentOverride;
-  NSString* userAgent;
-  NSString* userAgentWhenPretendingToBeMacIE;
+  NSString* userAgent[NumUserAgentStringTypes];
 
   BOOL defersCallbacks;
 
