@@ -357,7 +357,7 @@ class Object : public Value {
 };
 
 inline Object Value::toObject(ExecState* exec) const {
-  return rep->toObject(exec);
+  return rep->dispatchToObject(exec);
 }
 
 class ObjectImp : public ValueImp {

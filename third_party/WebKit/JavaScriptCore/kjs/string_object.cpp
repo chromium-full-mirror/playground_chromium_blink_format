@@ -193,7 +193,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
     case Concat: {
       ListIterator it = args.begin();
       for (; it != args.end(); ++it) {
-        s += it->toString(exec);
+        s += it->dispatchToString(exec);
       }
       result = String(s);
       break;
@@ -545,7 +545,7 @@ Object StringObjectImp::construct(ExecState* exec, const List& args) {
 
   UString s;
   if (args.size() > 0)
-    s = args.begin()->toString(exec);
+    s = args.begin()->dispatchToString(exec);
   else
     s = UString("");
 
