@@ -54,8 +54,6 @@ class QComboBox : public QWidget {
   void setFrameGeometry(const QRect&);
   int baselinePosition() const;
 
-  bool eventFilter(QObject* object, QEvent* event) { return false; }
-
   void activated() { _activated.call(currentItem()); }
 
  private:

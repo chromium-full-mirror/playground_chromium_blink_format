@@ -113,6 +113,7 @@ class RenderWidget : public QObject,
   bool eventFilter(QObject* /*o*/, QEvent* e);
   void setQWidget(QWidget* widget);
   void resizeWidget(QWidget* widget, int w, int h);
+  virtual void handleFocusOut();
 
   QWidget* m_widget;
   KHTMLView* m_view;
