@@ -82,7 +82,8 @@ inline Q_UINT32 makeId(Q_UINT16 n, Q_UINT16 l) {
   return (n << 16) | l;
 }
 
-const Q_UINT32 anyQName = makeId(anyNamespace, anyLocalName);
+// Can't use makeId here because it results in an "initroutine".
+const Q_UINT32 anyQName = anyNamespace << 16 | anyLocalName;
 
 class DocumentPtr : public khtml::Shared<DocumentPtr> {
  public:
