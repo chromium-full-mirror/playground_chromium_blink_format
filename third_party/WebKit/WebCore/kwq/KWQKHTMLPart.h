@@ -28,6 +28,8 @@
 
 #include "khtml_part.h"
 
+#include "dom_nodeimpl.h"
+
 class KHTMLPartPrivate;
 
 namespace khtml {
@@ -165,12 +167,20 @@ class KWQKHTMLPart : public KHTMLPart {
 
   static void widgetWillReleaseView(NSView*);
 
+  static void setCurrentEvent(NSEvent* event) { _currentEvent = event; }
+  static NSEvent* currentEvent() { return _currentEvent; }
+
+  void clearTimers();
+
+  bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
   virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent*);
 
   bool handleMouseDownEventForWidget(khtml::MouseEvent*);
+  bool handleMouseDownEventForWidget(khtml::RenderWidget*);
 
   void setPolicyBaseURL(const DOM::DOMString&);
 
@@ -192,6 +202,9 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _ownsView;
 
   NSView* _mouseDownView;
+  bool _mouseDownWasInSubframe;
+
+  static NSEvent* _currentEvent;
 
   static QPtrList<KWQKHTMLPart>& mutableInstances();
 
