@@ -112,7 +112,6 @@ class CSSStyleSelector : public StyleSelector {
   void addSheet(DOM::StyleSheetImpl* sheet);
 
   static void loadDefaultStyle(const KHTMLSettings* s = 0);
-  static void setUserStyle(const DOM::DOMString& sheet);
   static void clear();
 
   virtual RenderStyle* styleForElement(DOM::ElementImpl* e, int state = None);
@@ -142,9 +141,9 @@ class CSSStyleSelector : public StyleSelector {
 
   static DOM::CSSStyleSheetImpl* defaultSheet;
   static CSSStyleSelectorList* defaultStyle;
-  static DOM::CSSStyleSheetImpl* userSheet;
-  static CSSStyleSelectorList* userStyle;
   CSSStyleSelectorList* authorStyle;
+  CSSStyleSelectorList* userStyle;
+  DOM::CSSStyleSheetImpl* userSheet;
 
  public:  // we need to make the enum public for SelectorCache
   enum SelectorState { Unknown = 0, Applies, AppliesPseudo, Invalid };
@@ -159,7 +158,6 @@ class CSSStyleSelector : public StyleSelector {
   unsigned int selectors_size;
   DOM::CSSSelector** selectors;
   SelectorCache* selectorCache;
-
   unsigned int properties_size;
   CSSOrderedProperty** properties;
   QArray<CSSOrderedProperty> inlineProps;

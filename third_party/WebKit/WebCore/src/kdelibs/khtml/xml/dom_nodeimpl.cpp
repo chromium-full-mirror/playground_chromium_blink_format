@@ -463,11 +463,13 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   evt->setEventPhase(
       0);  // I guess this is correct, the spec does not seem to say
 
-  if (!evt->defaultPrevented() && evt->bubbles()) {
+  if (evt->bubbles()) {
     // now we call all default event handlers (this is not part of DOM - it is
     // internal to khtml)
     it.toLast();
-    for (; it.current() && !evt->propagationStopped(); --it)
+    for (; it.current() && !evt->propagationStopped() &&
+           !evt->defaultPrevented() && !evt->defaultHandled();
+         --it)
       it.current()->defaultEventHandler(evt);
   }
 
@@ -1597,3 +1599,4 @@ void GenericRONamedNodeMapImpl::addNode(NodeImpl* n) {
   n->ref();
   m_contents->append(n);
 }
+// vim:ts=4:sw=4

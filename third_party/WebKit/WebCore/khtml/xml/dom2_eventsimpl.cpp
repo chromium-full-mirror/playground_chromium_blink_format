@@ -42,6 +42,7 @@ EventImpl::EventImpl() {
   m_eventPhase = 0;
   m_target = 0;
   m_createTime = QDateTime::currentDateTime();
+  m_defaultHandled = false;
 }
 
 EventImpl::EventImpl(EventId _id, bool canBubbleArg, bool cancelableArg) {
@@ -59,6 +60,7 @@ EventImpl::EventImpl(EventId _id, bool canBubbleArg, bool cancelableArg) {
   m_eventPhase = 0;
   m_target = 0;
   m_createTime = QDateTime::currentDateTime();
+  m_defaultHandled = false;
 }
 
 EventImpl::~EventImpl() {
@@ -268,6 +270,10 @@ DOMString EventImpl::idToType(EventImpl::EventId id) {
       return 0;
       break;
   }
+}
+
+void EventImpl::setDefaultHandled() {
+  m_defaultHandled = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -561,3 +567,5 @@ bool RegisteredEventListener::operator==(const RegisteredEventListener& other) {
   return (id == other.id && listener == other.listener &&
           useCapture == other.useCapture);
 }
+
+// vim:ts=4:sw=4

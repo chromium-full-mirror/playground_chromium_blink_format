@@ -1208,6 +1208,7 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
       dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 2);
     else
       dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, 1);
+    me->setDefaultHandled();
   }
 
   if ((evt->id() == EventImpl::DOMACTIVATE_EVENT) &&

@@ -190,6 +190,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   // from cachedObjectClient
   virtual void setStyleSheet(const DOM::DOMString& url,
                              const DOM::DOMString& sheetStr);
+  void setUserStyleSheet(const QString& sheet);
+  QString userStyleSheet() const { return m_usersheet; }
 
   CSSStyleSheetImpl* elementSheet();
   virtual Tokenizer* createTokenizer();
@@ -298,6 +300,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   DOMImplementationImpl* m_implementation;
 
   StyleSheetImpl* m_sheet;
+  QString m_usersheet;
   bool m_loadingSheet;
 
   CSSStyleSheetImpl* m_elemSheet;

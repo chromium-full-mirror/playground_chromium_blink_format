@@ -389,6 +389,9 @@ CSSSelector* StyleBaseImpl::parseSelector2(const QChar* curP,
 #endif
           cs->match = CSSSelector::Set;
           endVal = closebracket + 1;
+          // ### fixme we ignore everything after [..]
+          if (endVal == endP)
+            endVal = 0;
         } else {
           // check relation: = / ~= / |=
           if (*(equal - 1) == '~') {
@@ -1601,7 +1604,7 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
             parsedValue = new CSSImageValueImpl(value, baseUrl(), this);
 #ifdef CSS_DEBUG
             kdDebug(6080) << "image, url=" << value.string()
-                          << " base=" << baseUrl().string() << endl;
+                          << " base=" << baseURL().string() << endl;
 #endif
           }
         }

@@ -281,7 +281,7 @@ DOM::NodeFilter KJS::toNodeFilter(const KJSO& obj) {
 
 // -------------------------------------------------------------------------
 
-JSNodeFilter::JSNodeFilter(KJSO _filter) : CustomNodeFilter() {
+JSNodeFilter::JSNodeFilter(KJSO _filter) : DOM::CustomNodeFilter() {
   filter = _filter;
 }
 

@@ -278,6 +278,10 @@ bool DOM::operator==(const DOMString& a, const QString& b) {
 }
 
 bool DOM::operator==(const DOMString& a, const char* b) {
+  if (!b)
+    return a.isNull();
+  if (a.isNull())
+    return false;
   unsigned int blen = strlen(b);
   if (a.length() != blen)
     return false;

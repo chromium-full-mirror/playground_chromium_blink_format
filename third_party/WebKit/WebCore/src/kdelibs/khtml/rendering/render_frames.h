@@ -105,6 +105,9 @@ class RenderPart : public khtml::RenderWidget {
 
   virtual short intrinsicWidth() const;
   virtual int intrinsicHeight() const;
+
+ public slots:
+  virtual void slotViewCleared();
 };
 
 class RenderFrame : public khtml::RenderPart {

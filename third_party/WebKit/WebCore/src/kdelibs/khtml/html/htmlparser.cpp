@@ -176,7 +176,10 @@ void KHTMLParser::parseToken(Token* t) {
   if (discard_until) {
     if (t->id == discard_until)
       discard_until = 0;
-    return;
+
+    // do not skip </iframe>
+    if (discard_until || current->id() + ID_CLOSE_TAG != t->id)
+      return;
   }
 
 #ifdef PARSER_DEBUG
@@ -554,7 +557,7 @@ bool KHTMLParser::insertNode(NodeImpl* n) {
                  (node->id() == ID_THEAD || node->id() == ID_TBODY ||
                   node->id() == ID_TFOOT) &&
                  parent->id() == ID_TABLE)) {
-              node = parentparent;
+              node = (node->id() == ID_TR) ? parentparent : parent;
               NodeImpl* parent = node->parentNode();
               int exceptioncode = 0;
               NodeImpl* container =
@@ -735,6 +738,7 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
     // a bit a special case, since the frame is inlined...
     case ID_IFRAME:
       n = new HTMLIFrameElementImpl(document);
+      discard_until = ID_IFRAME + ID_CLOSE_TAG;
       break;
 
     // form elements
@@ -862,7 +866,6 @@ NodeImpl* KHTMLParser::getElement(Token* t) {
 
     // anchor
     case ID_A:
-      popBlock(ID_A);
       n = new HTMLAnchorElementImpl(document);
       break;
 

@@ -276,7 +276,7 @@ class CachedImage : public QObject, public CachedObject {
   void do_notify(const QPixmap& p, const QRect& r);
 
   DOM::DOMString m_baseURL;
-  QColor bgColor;
+  QRgb bgColor;
   QMovie* m;
   QPixmap* p;
   QPixmap* bg;
@@ -287,6 +287,7 @@ class CachedImage : public QObject, public CachedObject {
 
   int width;
   int height;
+  bool monochrome;
 
   // Is set if movie format type ( incremental/animation) was checked
   bool typeChecked;
