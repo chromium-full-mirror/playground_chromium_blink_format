@@ -107,8 +107,6 @@ class KWQKHTMLPartImpl : public QObject {
 
   void jumpToSelection();
 
-  void overURL(const QString& url, const QString& target, int modifierState);
-
   void layout();
 
   QString userAgent() const;
