@@ -108,7 +108,9 @@ class QPainter : public Qt {
                 int to,
                 int toAdd,
                 const QColor& backgroundColor,
-                QPainter::TextDirection d);
+                QPainter::TextDirection d,
+                int letterSpacing,
+                int wordSpacing);
   void drawUnderlineForText(int x, int y, const QChar*, int length);
   static QColor selectedTextBackgroundColor();
 

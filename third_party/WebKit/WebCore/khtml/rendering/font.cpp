@@ -50,8 +50,9 @@ void Font::drawText(QPainter* p,
                     int to,
                     QColor bg) const {
 #if APPLE_CHANGES
+  printf("for string length %d, letterSpacing = %d\n", slen, letterSpacing);
   p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg,
-              d);
+              d, letterSpacing, wordSpacing);
 #else
   QString qstr = QConstString(str, slen).string();
 
@@ -115,7 +116,7 @@ void Font::drawText(QPainter* p,
 #if APPLE_CHANGES
 
 float Font::floatWidth(QChar* chs, int slen, int pos, int len) const {
-  return fm.floatWidth(chs, slen, pos, len);
+  return fm.floatWidth(chs, slen, pos, len, letterSpacing, wordSpacing);
 }
 
 void Font::floatCharacterWidths(QChar* str,
@@ -124,7 +125,8 @@ void Font::floatCharacterWidths(QChar* str,
                                 int len,
                                 int toAdd,
                                 float* buffer) const {
-  fm.floatCharacterWidths(str, slen, pos, len, toAdd, buffer);
+  fm.floatCharacterWidths(str, slen, pos, len, toAdd, buffer, letterSpacing,
+                          wordSpacing);
 }
 
 #endif

@@ -45,7 +45,9 @@
                      withPadding:(int)padding
                    applyRounding:(BOOL)applyRounding
          attemptFontSubstitution:(BOOL)attemptFontSubstitution
-                          widths:(float*)buffer;
+                          widths:(float*)buffer
+                   letterSpacing:(int)letterSpacing
+                     wordSpacing:(int)wordSpacing;
 
 // drawing
 - (void)drawCharacters:(const UniChar*)characters
@@ -56,7 +58,9 @@
               withPadding:(int)padding
             withTextColor:(NSColor*)textColor
           backgroundColor:(NSColor*)backgroundColor
-              rightToLeft:(BOOL)rtl;
+              rightToLeft:(BOOL)rtl
+            letterSpacing:(int)letterSpacing
+              wordSpacing:(int)wordSpacing;
 - (void)drawUnderlineForCharacters:(const UniChar*)characters
                       stringLength:(unsigned)length
                            atPoint:(NSPoint)point

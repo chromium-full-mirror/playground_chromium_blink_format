@@ -36,6 +36,8 @@ typedef struct GlyphMap GlyphMap;
                            widths:(float*)widthBuffer
                             fonts:(NSFont**)fontBuffer
                            glyphs:(CGGlyph*)glyphBuffer
-                        numGlyphs:(int*)_numGlyphs;
+                        numGlyphs:(int*)_numGlyphs
+                    letterSpacing:(int)ls
+                      wordSpacing:(int)ws;
 
 @end
