@@ -375,7 +375,7 @@ bool ProcessingInstructionImpl::childTypeAllowed(unsigned short /*type*/) {
   return false;
 }
 
-void ProcessingInstructionImpl::checkStyleSheet() {
+bool ProcessingInstructionImpl::checkStyleSheet() {
   if (m_target && DOMString(m_target) == "xml-stylesheet") {
     // see http://www.w3.org/TR/xml-stylesheet/
     // ### check that this occurs only in the prolog
@@ -385,7 +385,7 @@ void ProcessingInstructionImpl::checkStyleSheet() {
     bool attrsOk;
     const QMap<QString, QString> attrs = parseAttributes(m_data, attrsOk);
     if (!attrsOk)
-      return;
+      return true;
     QMap<QString, QString>::ConstIterator i = attrs.find("type");
     QString type;
     if (i != attrs.end())
@@ -399,7 +399,12 @@ void ProcessingInstructionImpl::checkStyleSheet() {
 #else
     if (!isCSS)
 #endif
-      return;
+      return true;
+
+#ifdef KHTML_XSLT
+    if (m_isXSL)
+      getDocument()->tokenizer()->setTransformSource(getDocument());
+#endif
 
     i = attrs.find("href");
     QString href;
@@ -414,6 +419,9 @@ void ProcessingInstructionImpl::checkStyleSheet() {
         m_localHref = newLocalHref.implementation();
         if (m_localHref)
           m_localHref->ref();
+#ifdef KHTML_XSLT
+        return !m_isXSL;
+#endif
       } else {
         // ### some validation on the URL?
         // ### FIXME charset
@@ -432,10 +440,15 @@ void ProcessingInstructionImpl::checkStyleSheet() {
                 getDocument()->completeURL(href), QString::null);
           if (m_cachedSheet)
             m_cachedSheet->ref(this);
+#ifdef KHTML_XSLT
+          return !m_isXSL;
+#endif
         }
       }
     }
   }
+
+  return true;
 }
 
 StyleSheetImpl* ProcessingInstructionImpl::sheet() const {

@@ -36,6 +36,7 @@ class KHTMLView;
 
 namespace DOM {
 class DocumentPtr;
+class DocumentImpl;
 class NodeImpl;
 };
 
@@ -55,6 +56,10 @@ class Tokenizer : public QObject {
   virtual void finish() = 0;
   virtual void setOnHold(bool onHold) = 0;
   virtual bool isWaitingForScripts() = 0;
+
+#ifdef KHTML_XSLT
+  virtual void setTransformSource(DOM::DocumentImpl* doc){};
+#endif
 
  signals:
   void finishedParsing();

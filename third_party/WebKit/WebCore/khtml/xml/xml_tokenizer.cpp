@@ -144,6 +144,10 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   virtual void setOnHold(bool onHold);
   virtual bool isWaitingForScripts();
 
+#ifdef KHTML_XSLT
+  void setTransformSource(DocumentImpl* doc);
+#endif
+
   // from CachedObjectClient
   virtual void notifyFinished(CachedObject* finishedObj);
 
@@ -187,6 +191,7 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   bool m_sawError;
   bool m_parserStopped;
+  bool m_sawXSLTransform;
 
   int m_errorCount;
   int m_lastErrorLine;
@@ -200,16 +205,27 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
 
 // --------------------------------
 
+static int matchFunc(const char* URI) {
+  return 1;  // Match everything.
+}
+
+static void* openFunc(const char* URI) {
+  return NULL;  // Don't ever allow the open.
+}
+
 static xmlParserCtxtPtr createQStringParser(xmlSAXHandlerPtr handlers,
-                                            void* userData) {
+                                            void* userData,
+                                            const char* uri = NULL) {
   static bool didInit = false;
   if (!didInit) {
     xmlInitParser();
+    xmlRegisterInputCallbacks(matchFunc, openFunc, NULL, NULL);
+    xmlRegisterOutputCallbacks(matchFunc, openFunc, NULL, NULL);
     didInit = true;
   }
 
   xmlParserCtxtPtr parser =
-      xmlCreatePushParserCtxt(handlers, userData, NULL, 0, NULL);
+      xmlCreatePushParserCtxt(handlers, userData, NULL, 0, uri);
   const QChar BOM(0xFEFF);
   const unsigned char BOMHighByte =
       *reinterpret_cast<const unsigned char*>(&BOM);
@@ -443,7 +459,10 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
   m_currentNode->addChild(pi);
   // don't load stylesheets for standalone documents
   if (m_doc->document()->part()) {
-    pi->checkStyleSheet();
+    m_sawXSLTransform = !pi->checkStyleSheet();
+    if (m_sawXSLTransform)
+      // Stop the SAX parser.
+      stopParsing();
   }
 }
 
@@ -548,7 +567,8 @@ void XMLTokenizer::finish() {
   sax.warning = warningHandler;
   m_parserStopped = false;
   m_sawError = false;
-  m_context = createQStringParser(&sax, this);
+  m_sawXSLTransform = false;
+  m_context = createQStringParser(&sax, this, m_doc->document()->URL().ascii());
   parseQString(m_context, m_xmlCode);
   xmlFreeParserCtxt(m_context);
   m_context = NULL;
@@ -702,6 +722,12 @@ void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
 bool XMLTokenizer::isWaitingForScripts() {
   return m_cachedScript != 0;
 }
+
+#ifdef KHTML_XSLT
+void XMLTokenizer::setTransformSource(DocumentImpl* doc) {
+  doc->setTransformSource(m_xmlCode);
+}
+#endif
 
 Tokenizer* newXMLTokenizer(DocumentPtr* d, KHTMLView* v) {
   return new XMLTokenizer(d, v);

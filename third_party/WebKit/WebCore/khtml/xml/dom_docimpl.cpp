@@ -79,6 +79,11 @@
 
 #include <kio/job.h>
 
+#ifdef KHTML_XSLT
+#include "xsl_stylesheetimpl.h"
+#include "xslt_processorimpl.h"
+#endif
+
 #ifndef KHTML_NO_XBL
 #include "xbl/xbl_binding_manager.h"
 using XBL::XBLBindingManager;
@@ -251,6 +256,10 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       ,
       m_bindingManager(new XBLBindingManager(this))
 #endif
+#ifdef KHTML_XSLT
+      ,
+      m_transformSourceDocument(0)
+#endif
 #if APPLE_CHANGES
       ,
       m_finishedParsing(this, SIGNAL(finishedParsing())),
@@ -387,6 +396,11 @@ DocumentImpl::~DocumentImpl() {
     delete m_renderArena;
     m_renderArena = 0;
   }
+
+#ifdef KHTML_XSLT
+  if (m_transformSourceDocument)
+    m_transformSourceDocument->deref();
+#endif
 
 #ifndef KHTML_NO_XBL
   delete m_bindingManager;
@@ -2177,6 +2191,12 @@ void DocumentImpl::recalcStyleSelector() {
       ProcessingInstructionImpl* pi =
           static_cast<ProcessingInstructionImpl*>(n);
       sheet = pi->sheet();
+#ifdef KHTML_XSLT
+      if (pi->isXSL()) {
+        applyXSLTransform(pi);
+        return;
+      }
+#endif
       if (!sheet && !pi->localHref().isEmpty()) {
         // Processing instruction with reference to an element in this document
         // - e.g.
@@ -2969,10 +2989,15 @@ void DocumentImpl::removeMarker(NodeImpl* node, DocumentMarker target) {
       }
     }
   }
+}
 
-  // repaint the affected node
-  if (docDirty && node->renderer())
-    node->renderer()->repaint();
+QValueList<DocumentMarker> DocumentImpl::markersForNode(NodeImpl* node) {
+  QValueList<DocumentMarker>* markers = m_markers.find(node);
+  if (markers) {
+    return *markers;
+  } else {
+    return QValueList<DocumentMarker>();
+  }
 }
 
 void DocumentImpl::removeAllMarkers(NodeImpl* node,
@@ -3019,14 +3044,30 @@ void DocumentImpl::shiftMarkers(NodeImpl* node, ulong startOffset, long delta) {
     node->renderer()->repaint();
 }
 
-QValueList<DocumentMarker> DocumentImpl::markersForNode(NodeImpl* node) {
-  QValueList<DocumentMarker>* markers = m_markers.find(node);
-  if (markers) {
-    return *markers;
-  } else {
-    return QValueList<DocumentMarker>();
-  }
+#ifdef KHTML_XSLT
+void DocumentImpl::applyXSLTransform(ProcessingInstructionImpl* pi) {
+  // Ref ourselves to keep from being destroyed.
+  XSLTProcessorImpl processor(static_cast<XSLStyleSheetImpl*>(pi->sheet()),
+                              this, !pi->localHref().isEmpty());
+  DocumentImpl* result = processor.transformDocument(this);
+  if (result)
+    // Cache the source document.
+    result->setTransformSourceDocument(this);
+
+  // FIXME: If the transform failed we should probably report an error (like
+  // Mozilla does) in this
+  // case.
 }
+
+void DocumentImpl::setTransformSourceDocument(DocumentImpl* doc) {
+  if (m_transformSourceDocument)
+    m_transformSourceDocument->deref();
+  m_transformSourceDocument = doc;
+  if (doc)
+    doc->ref();
+}
+
+#endif
 
 // ----------------------------------------------------------------------------
 
