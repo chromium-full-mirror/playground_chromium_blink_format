@@ -558,6 +558,17 @@ NodeImpl::Id HTMLHeadElementImpl::id() const {
   return ID_HEAD;
 }
 
+// -------------------------------------------------------------------------
+
+HTMLHtmlElementImpl::HTMLHtmlElementImpl(DocumentPtr* doc)
+    : HTMLElementImpl(doc) {}
+
+HTMLHtmlElementImpl::~HTMLHtmlElementImpl() {}
+
+NodeImpl::Id HTMLHtmlElementImpl::id() const {
+  return ID_HTML;
+}
+
 bool HTMLHtmlElementImpl::rendererIsNeeded(RenderStyle* style) {
   // Ignore display: none.
   return true;
@@ -571,17 +582,6 @@ RenderObject* HTMLHtmlElementImpl::createRenderer(RenderArena* arena,
 void HTMLHtmlElementImpl::attach() {
   createRendererIfNeeded();
   NodeBaseImpl::attach();
-}
-
-// -------------------------------------------------------------------------
-
-HTMLHtmlElementImpl::HTMLHtmlElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {}
-
-HTMLHtmlElementImpl::~HTMLHtmlElementImpl() {}
-
-NodeImpl::Id HTMLHtmlElementImpl::id() const {
-  return ID_HTML;
 }
 
 // -------------------------------------------------------------------------

@@ -38,7 +38,9 @@ RenderHtml::RenderHtml(DOM::HTMLElementImpl* node) : RenderBlock(node) {
 RenderHtml::~RenderHtml() {}
 
 void RenderHtml::setStyle(RenderStyle* style) {
-  style->setDisplay(BLOCK);  // Don't allow RenderHTML to be inline.
+  if (style->display() != NONE) {
+    style->setDisplay(BLOCK);  // Don't allow RenderHTML to be inline.
+  }
   RenderBlock::setStyle(style);
   setShouldPaintBackgroundOrBorder(true);
 }
