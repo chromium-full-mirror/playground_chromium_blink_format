@@ -83,6 +83,9 @@ class QPixmap : public QPaintDevice, public Qt {
 
   WebCoreImageRendererPtr image() { return imageRenderer; };
 
+  void increaseUseCount() const;
+  void decreaseUseCount() const;
+
  private:
   WebCoreImageRendererPtr imageRenderer;
 
