@@ -167,6 +167,11 @@ static DOMString& styleSpanClassString() {
   return styleSpanClassString;
 }
 
+static DOMString& blockPlaceholderClassString() {
+  static DOMString blockPlaceholderClassString = "khtml-block-placeholder";
+  return blockPlaceholderClassString;
+}
+
 static void debugPosition(const char* prefix, const Position& pos) {
   if (!prefix)
     prefix = "";
@@ -768,6 +773,42 @@ void CompositeEditCommand::deleteUnrenderedText(const Position& pos) {
     setEndingSelection(block);
 }
 
+void CompositeEditCommand::insertBlockPlaceholderIfNeeded(NodeImpl* node) {
+  document()->updateLayout();
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer->isBlockFlow())
+    return;
+
+  if (renderer->height() > 0)
+    return;
+
+  int exceptionCode = 0;
+  ElementImpl* breakNode = document()->createHTMLElement("BR", exceptionCode);
+  ASSERT(exceptionCode == 0);
+  breakNode->setAttribute(ATTR_CLASS, blockPlaceholderClassString());
+  appendNode(breakNode, node);
+}
+
+void CompositeEditCommand::removeBlockPlaceholderIfNeeded(NodeImpl* node) {
+  document()->updateLayout();
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer->isBlockFlow())
+    return;
+
+  // This code will remove a block placeholder if it still is at the end
+  // of a block, where we placed it in insertBlockPlaceholderIfNeeded().
+  // Of course, a person who hand-edits an HTML file could move a
+  // placeholder around, but it seems OK to be unconcerned about that case.
+  NodeImpl* last = node->lastChild();
+  if (last->isHTMLElement()) {
+    ElementImpl* element = static_cast<ElementImpl*>(last);
+    if (element->getAttribute(ATTR_CLASS) == blockPlaceholderClassString())
+      removeNode(element);
+  }
+}
+
 //==========================================================================================
 // Concrete commands
 //------------------------------------------------------------------------------------------
@@ -1166,15 +1207,12 @@ void DeleteSelectionCommand::moveNodesAfterNode(NodeImpl* startNode,
     // Do not move content between parts of a table
     return;
 
+  // Now that we are about to add content, check to see if a placeholder element
+  // can be removed.
+  removeBlockPlaceholderIfNeeded(startBlock);
+
   NodeImpl* node =
       startNode == startBlock ? startBlock->firstChild() : startNode;
-
-  // Only do the move if node is a text node.
-  // This is done to duplicate the behavior in NSText, particularly to
-  // mimic the behavior in Mail where deletions are done between blocks
-  // that are quoted.
-  if (!node || !node->isTextNode())
-    return;
 
   // Do the move.
   NodeImpl* refNode = dstNode;
@@ -1203,9 +1241,9 @@ void DeleteSelectionCommand::moveNodesAfterNode(NodeImpl* startNode,
   // and 'Two'. This is undesirable. We fix this up by adding a BR before the
   // 'Three'.
   // This may not be ideal, but it is better than nothing.
-  if (!startBlock->firstChild()) {
+  document()->updateLayout();
+  if (startBlock->renderer() && startBlock->renderer()->height() == 0) {
     removeNode(startBlock);
-    document()->updateLayout();
     if (refNode->renderer() && refNode->renderer()->inlineBox() &&
         refNode->renderer()->inlineBox()->nextOnLineExists()) {
       int exceptionCode = 0;
@@ -1427,6 +1465,10 @@ FixupWhitespace:
       }
     }
   }
+
+  // If the delete emptied a block, add in a placeholder so the block does not
+  // seem to disappear.
+  insertBlockPlaceholderIfNeeded(endingPosition.node());
 
   // Compute the difference between the style before the delete and the style
   // now
@@ -1747,6 +1789,10 @@ void InputTextCommand::input(const DOMString& text, bool selectInsertedText) {
   TextImpl* textNode = static_cast<TextImpl*>(pos.node());
   long offset = pos.offset();
 
+  // Now that we are about to add content, check to see if a placeholder element
+  // can be removed.
+  removeBlockPlaceholderIfNeeded(textNode->enclosingBlockFlowElement());
+
   // These are temporary implementations for inserting adjoining spaces
   // into a document. We are working on a CSS-related whitespace solution
   // that will replace this some day. We hope.
@@ -2032,6 +2078,11 @@ void ReplaceSelectionCommand::doApply() {
 
   selection = endingSelection();
   ASSERT(selection.isCaret());
+
+  // Now that we are about to add content, check to see if a placeholder element
+  // can be removed.
+  removeBlockPlaceholderIfNeeded(
+      selection.start().node()->enclosingBlockFlowElement());
 
   bool addLeadingSpace = false;
   bool addTrailingSpace = false;
