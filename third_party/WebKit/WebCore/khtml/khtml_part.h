@@ -1151,6 +1151,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   bool didOpenURL(const KURL&);
   void setStatusBarText(const QString&);
   void started(KIO::Job*);
+  void frameDetached();
 #endif
 
   int frameCount;

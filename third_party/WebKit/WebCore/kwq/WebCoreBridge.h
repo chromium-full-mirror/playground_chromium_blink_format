@@ -242,6 +242,7 @@ enum FrameBorderStyle {
 /* Creates a name for an frame unnamed in the HTML.  It should produce
  * repeatable results for loads of the same frameset. */
 - (NSString*)generateFrameName;
+- (void)frameDetached;
 
 - (void)loadURL:(NSString*)URL
            referrer:(NSString*)referrer
