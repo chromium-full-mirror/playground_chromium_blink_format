@@ -66,4 +66,5 @@
 
 @interface WebBackForwardList (WebPrivate)
 - (BOOL)_usesPageCache;
+- (void)_clearPageCache;
 @end
