@@ -17,7 +17,7 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
   int lineSpacing;
   ATSGlyphRef spaceGlyph;
 
-  struct AttributeGroup* styleGroup;
+  ATSStyleGroupPtr styleGroup;
 
  @public
   NSFont* font;
