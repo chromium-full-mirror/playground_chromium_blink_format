@@ -489,6 +489,10 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
 }
 
 ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
+  if (elementId.length() == 0) {
+    return 0;
+  }
+
   QPtrStack<NodeImpl> nodeStack;
   NodeImpl* current = _first;
 
