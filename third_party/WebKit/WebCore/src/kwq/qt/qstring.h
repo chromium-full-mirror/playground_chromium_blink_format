@@ -80,12 +80,12 @@ class QChar {
   bool mirrored() const;
   QChar mirroredChar() const;
 
-  friend inline int operator==(char, QChar);
-  friend inline int operator==(QChar, char);
-  friend inline int operator==(QChar, QChar);
-  friend inline int operator!=(QChar, QChar);
-  friend inline int operator!=(char, QChar);
-  friend inline int operator!=(QChar, char);
+  friend int operator==(char, QChar);
+  friend int operator==(QChar, char);
+  friend int operator==(QChar, QChar);
+  friend int operator!=(QChar, QChar);
+  friend int operator!=(char, QChar);
+  friend int operator!=(QChar, char);
   operator char() const;
   ushort unicode() const;
 
