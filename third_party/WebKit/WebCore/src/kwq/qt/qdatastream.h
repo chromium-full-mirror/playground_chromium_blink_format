@@ -36,6 +36,8 @@ class QDataStream {
 
   QDataStream& operator<<(const char* str);
   QDataStream& operator<<(const QString& str);
+  QDataStream& operator<<(const QCString& str);
+  QDataStream& operator>>(const QString& str);
 };
 
 #endif

@@ -32,4 +32,11 @@
 // added to help in compilation of khtml/dom/html_documnent.cpp:182
 class QCString {};
 
+inline bool operator!=(const char* s1, const QCString& s2) {
+  return 0;
+}  // FIXME
+inline bool operator!=(const QCString& s1, const char* s2) {
+  return 0;
+}  // FIXME
+
 #endif
