@@ -4,6 +4,7 @@
 */
 
 #import <WebKit/WebControllerPolicyDelegate.h>
+#import <WebKit/WebFormDelegate.h>
 
 typedef enum {
   WebPolicyUse,
@@ -13,7 +14,8 @@ typedef enum {
 
 @class WebPolicyDecisionListenerPrivate;
 
-@interface WebPolicyDecisionListener : NSObject<WebPolicyDecisionListener> {
+@interface WebPolicyDecisionListener
+    : NSObject<WebPolicyDecisionListener, WebFormSubmissionListener> {
  @private
   WebPolicyDecisionListenerPrivate* _private;
 }

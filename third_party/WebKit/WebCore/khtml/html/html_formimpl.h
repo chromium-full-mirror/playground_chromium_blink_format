@@ -97,10 +97,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   static void i18nData();
 
-#if APPLE_CHANGES
-  bool isLoginForm();
-#endif
-
   friend class HTMLFormElement;
   friend class HTMLFormCollectionImpl;
 

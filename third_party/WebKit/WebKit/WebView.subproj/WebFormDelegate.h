@@ -11,6 +11,14 @@
 @protocol WebDOMElement;
 
 /*!
+    @protocol  WebFormSubmissionListener
+    @discussion .
+*/
+@protocol WebFormSubmissionListener<NSObject>
+- (void)continue;
+@end
+
+/*!
     @protocol  WebFormDelegate
     @discussion .
 */
@@ -51,9 +59,11 @@
                 inFrame:(WebFrame*)frame;
 
 // Sent when a form is just about to be submitted (before the load is started)
+// listener must be sent continue when the delegate is done.
 - (void)frame:(WebFrame*)frame
-    willSubmitForm:(id<WebDOMElement>)form
-        withValues:(NSDictionary*)values;
+        willSubmitForm:(id<WebDOMElement>)form
+            withValues:(NSDictionary*)values
+    submissionListener:(id<WebFormSubmissionListener>)listener;
 @end
 
 /*!
