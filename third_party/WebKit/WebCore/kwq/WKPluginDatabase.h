@@ -15,6 +15,7 @@
 
 + (WKPluginDatabase*)installedPlugins;
 - (WKPlugin*)getPluginForMimeType:(NSString*)mimeType;
+- (WKPlugin*)getPluginForURL:(NSString*)URL;
 - (NSArray*)plugins;
 
 @end
