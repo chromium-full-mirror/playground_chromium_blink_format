@@ -113,6 +113,7 @@ class QColor {
 #else
   void* color;
 #endif
+  QString cname;
 #endif
 
 };  // class QColor

@@ -37,6 +37,8 @@
 
 class KHTMLSettings {
  public:
+  KHTMLSettings::KHTMLSettings();
+
   // Font settings
   QString stdFontName() const;
   QString fixedFontName() const;
@@ -64,6 +66,9 @@ class KHTMLSettings {
 
   bool isFormCompletionEnabled() const;
   int maxFormCompletionItems() const;
+
+ private:
+  QValueList<int> m_fontSizes;
 };
 
 #endif

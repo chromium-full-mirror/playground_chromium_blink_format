@@ -537,6 +537,7 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   void scheduleRedirection(int delay,
                            const QString& url);  // ### KDE 3.0: make private?
   KHTMLView* view() const;
+  void setView(KHTMLView* view);
   QWidget* widget();
   KHTMLPart* opener();
   KHTMLPart* parentPart();

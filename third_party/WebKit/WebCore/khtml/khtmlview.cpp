@@ -224,6 +224,7 @@ void KHTMLView::init() {
 
   if (!d->paintBuffer)
     d->paintBuffer = new QPixmap(PAINT_BUFFER_HEIGHT, PAINT_BUFFER_HEIGHT);
+
   if (!d->tp)
     d->tp = new QPainter();
 
@@ -303,7 +304,18 @@ void KHTMLView::drawContents(QPainter* p, int ex, int ey, int ew, int eh) {
     d->tp->translate(-ex, -ey - py);
     d->tp->fillRect(ex, ey + py, ew, ph,
                     palette().normal().brush(QColorGroup::Base));
-    m_part->xmlDocImpl()->renderer()->print(d->tp, ex, ey + py, ew, ph, 0, 0);
+
+    // FIXME!
+    RenderObject* ro;
+    DOM::DocumentImpl* doc;
+
+    doc = m_part->xmlDocImpl();
+    if (doc) {
+      ro = doc->renderer();
+      if (ro) {
+        ro->print(d->tp, ex, ey + py, ew, ph, 0, 0);
+      }
+    }
 #ifdef BOX_DEBUG
     if (m_part->xmlDocImpl()->focusNode()) {
       d->tp->setBrush(Qt::NoBrush);
