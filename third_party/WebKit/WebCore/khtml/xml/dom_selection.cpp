@@ -465,7 +465,7 @@ Range Selection::toRange() const {
     // the conventions of text editors tested, which make style determinations
     // based
     // on the character before the caret, if any.
-    s = start().equivalentUpstreamPosition().equivalentRangeCompliantPosition();
+    s = start().upstream().equivalentRangeCompliantPosition();
     e = s;
   } else {
     // If the selection is a range, select the minimum range that encompasses
@@ -485,8 +485,8 @@ Range Selection::toRange() const {
     //                       ^ selected
     //
     ASSERT(state() == RANGE);
-    s = start().equivalentDownstreamPosition();
-    e = end().equivalentUpstreamPosition();
+    s = start().downstream();
+    e = end().upstream();
     if ((s.node() == e.node() && s.offset() > e.offset()) ||
         !nodeIsBeforeNode(s.node(), e.node())) {
       // Make sure the start is before the end.
@@ -725,9 +725,7 @@ void Selection::validate(ETextGranularity granularity) {
   // adjust the state
   if (start().isEmpty() && end().isEmpty()) {
     m_state = NONE;
-  } else if (start() == end() ||
-             start().equivalentUpstreamPosition() ==
-                 end().equivalentUpstreamPosition()) {
+  } else if (start() == end() || start().upstream() == end().upstream()) {
     m_state = CARET;
   } else {
     m_state = RANGE;
@@ -737,8 +735,8 @@ void Selection::validate(ETextGranularity granularity) {
     // purposes of comparing selections). This is an ideal point of the code
     // to do this operation, since all selection changes that result in a RANGE
     // come through here before anyone uses it.
-    assignStart(start().equivalentDownstreamPosition());
-    assignEnd(end().equivalentUpstreamPosition());
+    assignStart(start().downstream());
+    assignEnd(end().upstream());
   }
 
   m_needsCaretLayout = true;
@@ -1021,8 +1019,8 @@ void Selection::debugPosition() const {
 
   if (start() == end()) {
     Position pos = start();
-    Position upstream = pos.equivalentUpstreamPosition();
-    Position downstream = pos.equivalentDownstreamPosition();
+    Position upstream = pos.upstream();
+    Position downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
             getTagName(upstream.node()->id()).string().latin1(),
             upstream.node(), upstream.offset());
@@ -1034,8 +1032,8 @@ void Selection::debugPosition() const {
             downstream.node(), downstream.offset());
   } else {
     Position pos = start();
-    Position upstream = pos.equivalentUpstreamPosition();
-    Position downstream = pos.equivalentDownstreamPosition();
+    Position upstream = pos.upstream();
+    Position downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
             getTagName(upstream.node()->id()).string().latin1(),
             upstream.node(), upstream.offset());
@@ -1047,8 +1045,8 @@ void Selection::debugPosition() const {
             downstream.node(), downstream.offset());
     fprintf(stderr, "-----------------------------------\n");
     pos = end();
-    upstream = pos.equivalentUpstreamPosition();
-    downstream = pos.equivalentDownstreamPosition();
+    upstream = pos.upstream();
+    downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
             getTagName(upstream.node()->id()).string().latin1(),
             upstream.node(), upstream.offset());
