@@ -123,6 +123,7 @@ enum FrameBorderStyle {
 - (void)removeFromFrame;
 
 - (void)scrollToAnchor:(NSString*)anchor;
+- (void)scrollToAnchorWithURL:(NSString*)URL;
 
 - (void)createKHTMLViewWithNSView:(NSView*)view
                       marginWidth:(int)mw
@@ -279,7 +280,7 @@ enum FrameBorderStyle {
                            attributes:(NSDictionary*)attributes
                               baseURL:(NSString*)baseURL;
 
-- (BOOL)saveDocumentToPageCache:documentInfo;
+- (BOOL)saveDocumentToPageCache:(id)documentInfo;
 
 @end
 
