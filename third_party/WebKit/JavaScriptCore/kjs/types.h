@@ -35,13 +35,13 @@ namespace KJS {
 class List;
 class ListIterator;
 class ListNode;
+class ListHookNode;
 
 /**
  * @short Iterator for @ref KJS::List objects.
  */
 class ListIterator {
   friend class List;
-  friend class ListImp;
   ListIterator();
   ListIterator(ListNode* n);
 
@@ -197,14 +197,16 @@ class List {
   static void globalClear();
 #endif
   void mark();
-  static void markEmptyList();
 
  private:
-  List(ListImp*);
+  void erase(ListNode* n);
+  void clearInternal();
+  void refAll();
+  void derefAll();
+  void swap(List& other);
 
-  ListImp* imp;
+  ListHookNode* hook;
   bool m_needsMarking;
-  friend class ListNode;
 };
 
 };  // namespace
