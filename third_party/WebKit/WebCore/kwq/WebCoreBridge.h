@@ -331,6 +331,8 @@ typedef enum {
                selectReplacement:(BOOL)selectReplacement;
 - (void)replaceSelectionWithNewline;
 
+- (void)insertText:(NSString*)text;
+
 - (void)setSelectionToDragCaret;
 - (void)moveSelectionToDragCaret:(DOMDocumentFragment*)selectionFragment;
 - (void)moveDragCaretToPoint:(NSPoint)point;
