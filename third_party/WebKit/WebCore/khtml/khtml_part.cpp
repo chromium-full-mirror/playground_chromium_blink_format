@@ -4304,7 +4304,8 @@ void KHTMLPart::handleMousePressEventDoubleClick(
   Selection selection;
 
   if (mouse->button() == LeftButton && !innerNode.isNull() &&
-      innerNode.handle()->renderer()) {
+      innerNode.handle()->renderer() &&
+      innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(
         innerNode.handle()->positionForCoordinates(event->x(), event->y()));
     if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
@@ -4331,7 +4332,8 @@ void KHTMLPart::handleMousePressEventTripleClick(
   Selection selection;
 
   if (mouse->button() == LeftButton && !innerNode.isNull() &&
-      innerNode.handle()->renderer()) {
+      innerNode.handle()->renderer() &&
+      innerNode.handle()->renderer()->shouldSelect()) {
     Position pos(
         innerNode.handle()->positionForCoordinates(event->x(), event->y()));
     if (pos.node() && (pos.node()->nodeType() == Node::TEXT_NODE ||
@@ -4358,7 +4360,8 @@ void KHTMLPart::handleMousePressEventSingleClick(
   if (mouse->button() == LeftButton) {
     Selection sel;
 
-    if (!innerNode.isNull() && innerNode.handle()->renderer()) {
+    if (!innerNode.isNull() && innerNode.handle()->renderer() &&
+        innerNode.handle()->renderer()->shouldSelect()) {
       bool extendSelection = mouse->state() & ShiftButton;
 
       // Don't restart the selection when the mouse is pressed on an
@@ -4573,7 +4576,8 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   DOM::Node innerNode = event->innerNode();
 
   if (mouse->state() != LeftButton || !innerNode.handle() ||
-      !innerNode.handle()->renderer())
+      !innerNode.handle()->renderer() ||
+      !innerNode.handle()->renderer()->shouldSelect())
     return;
 
   // handle making selection

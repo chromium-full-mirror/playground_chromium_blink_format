@@ -487,6 +487,10 @@ struct BindingURI {
 
 enum EUserModify { READ_ONLY, READ_WRITE };
 
+// CSS3 User Drag Values
+
+enum EUserDrag { DRAG_AUTO, DRAG_NONE, DRAG_ELEMENT };
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -513,6 +517,10 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   float opacity;  // Whether or not we're transparent.
   DataRef<StyleFlexibleBoxData> flexibleBox;  // Flexible box properties
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
+  EUserDrag
+      userDrag : 2;  // Whether or not a drag can be initiated by this element.
+  bool userSelect : 1;  // Whether or not the element is selectable.
+
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
 #endif
@@ -1182,6 +1190,8 @@ class RenderStyle {
     return css3NonInheritedData->marquee->direction;
   }
   EUserModify userModify() const { return css3InheritedData->userModify; }
+  EUserDrag userDrag() const { return css3NonInheritedData->userDrag; }
+  bool userSelect() const { return css3NonInheritedData->userSelect; }
 // End CSS3 Getters
 
 #if APPLE_CHANGES
@@ -1456,6 +1466,8 @@ class RenderStyle {
   void setUserModify(EUserModify u) {
     SET_VAR(css3InheritedData, userModify, u);
   }
+  void setUserDrag(EUserDrag d) { SET_VAR(css3NonInheritedData, userDrag, d); }
+  void setUserSelect(bool b) { SET_VAR(css3NonInheritedData, userSelect, b); }
 // End CSS3 Setters
 
 #if APPLE_CHANGES
@@ -1568,6 +1580,9 @@ class RenderStyle {
   static EMarqueeBehavior initialMarqueeBehavior() { return MSCROLL; }
   static EMarqueeDirection initialMarqueeDirection() { return MAUTO; }
   static EUserModify initialUserModify() { return READ_ONLY; }
+  static EUserDrag initialUserDrag() { return DRAG_AUTO; }
+  static bool initialUserSelect() { return true; }
+
 #if APPLE_CHANGES
   // Keep these at the end.
   static int initialLineClamp() { return -1; }

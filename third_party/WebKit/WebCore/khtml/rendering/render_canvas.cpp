@@ -414,10 +414,11 @@ void RenderCanvas::setSelection(RenderObject* s,
   RenderObject* o = s;
 
   while (o && o != e) {
-    o->setSelectionState(SelectionInside);
+    if (o->style()->userSelect())
+      o->setSelectionState(SelectionInside);
     //      kdDebug( 6040 ) << "setting selected " << o << ", " << o->isText()
     //      << endl;
-    RenderObject* no;
+    RenderObject* no = 0;
     if (!(no = o->firstChild()))
       if (!(no = o->nextSibling())) {
         no = o->parent();
@@ -434,9 +435,12 @@ void RenderCanvas::setSelection(RenderObject* s,
 
     o = no;
   }
-  s->setSelectionState(SelectionStart);
-  e->setSelectionState(SelectionEnd);
-  if (s == e)
+
+  if (s->style()->userSelect())
+    s->setSelectionState(SelectionStart);
+  if (e->style()->userSelect())
+    e->setSelectionState(SelectionEnd);
+  if (s == e && s->style()->userSelect())
     s->setSelectionState(SelectionBoth);
 
 #if APPLE_CHANGES

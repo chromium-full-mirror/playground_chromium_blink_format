@@ -165,7 +165,9 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
 #if APPLE_CHANGES
       lineClamp(RenderStyle::initialLineClamp()),
 #endif
-      opacity(RenderStyle::initialOpacity())
+      opacity(RenderStyle::initialOpacity()),
+      userDrag(RenderStyle::initialUserDrag()),
+      userSelect(RenderStyle::initialUserSelect())
 #ifndef KHTML_NO_XBL
       ,
       bindingURI(0)
@@ -181,7 +183,9 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
 #endif
       opacity(o.opacity),
       flexibleBox(o.flexibleBox),
-      marquee(o.marquee) {
+      marquee(o.marquee),
+      userDrag(o.userDrag),
+      userSelect(o.userSelect) {
 #ifndef KHTML_NO_XBL
   bindingURI = o.bindingURI ? o.bindingURI->copy() : 0;
 #endif
@@ -209,7 +213,8 @@ bool StyleCSS3NonInheritedData::bindingsEquivalent(
 bool StyleCSS3NonInheritedData::operator==(
     const StyleCSS3NonInheritedData& o) const {
   return opacity == o.opacity && flexibleBox == o.flexibleBox &&
-         marquee == o.marquee
+         marquee == o.marquee && userDrag == o.userDrag &&
+         userSelect == o.userSelect
 #ifndef KHTML_NO_XBL
          && bindingsEquivalent(o)
 #endif
@@ -637,6 +642,9 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !css3InheritedData->shadowDataEquivalent(
           *other->css3InheritedData.get()) ||
       css3InheritedData->userModify != other->css3InheritedData->userModify ||
+      css3NonInheritedData->userSelect !=
+          other->css3NonInheritedData->userSelect ||
+      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag ||
       !(visual->palette == other->visual->palette))
     return Visible;
 

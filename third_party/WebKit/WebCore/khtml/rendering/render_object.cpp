@@ -1329,6 +1329,16 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
 }
 #endif
 
+bool RenderObject::shouldSelect() const {
+  const RenderObject* curr = this;
+  while (curr) {
+    if (!curr->style()->userSelect())
+      return false;
+    curr = curr->parent();
+  }
+  return true;
+}
+
 void RenderObject::selectionStartEnd(int& spos, int& epos) {
   if (parent())
     parent()->selectionStartEnd(spos, epos);

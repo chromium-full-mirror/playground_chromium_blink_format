@@ -802,6 +802,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual SelectionState selectionState() const { return SelectionNone; }
   virtual void setSelectionState(SelectionState) {}
+  bool shouldSelect() const;
 
   /**
    * Returns the content coordinates of the caret within this render object.
