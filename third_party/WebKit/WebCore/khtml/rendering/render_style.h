@@ -301,6 +301,8 @@ class StyleVisualData : public Shared<StyleVisualData> {
   short counter_increment;  // ok, so these are not visual mode spesific
   short counter_reset;  // can't go to inherited, since these are not inherited
 
+  float opacity;  // Whether or not we're transparent.
+
   QPalette palette;  // widget styling with IE attributes
 };
 
@@ -872,6 +874,7 @@ class RenderStyle : public Shared<RenderStyle> {
   CachedImage* cursorImage() const { return inherited->cursor_image; }
 
   // CSS3 Getter Methods
+  float opacity() { return visual->opacity; }
   EBoxAlignment boxAlign() { return flexible_box->align; }
   EBoxDirection boxDirection() { return inherited_flags._box_direction; }
   float boxFlex() { return flexible_box->flex; }
@@ -1062,6 +1065,7 @@ class RenderStyle : public Shared<RenderStyle> {
   }
 
   // CSS3 Setters
+  void setOpacity(float f) { SET_VAR(visual, opacity, f); }
   void setBoxAlign(EBoxAlignment a) { SET_VAR(flexible_box, align, a); }
   void setBoxDirection(EBoxDirection d) { inherited_flags._box_direction = d; }
   void setBoxFlex(float f) { SET_VAR(flexible_box, flex, f); }

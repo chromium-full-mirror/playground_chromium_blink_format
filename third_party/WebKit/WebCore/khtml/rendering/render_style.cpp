@@ -82,6 +82,7 @@ StyleVisualData::StyleVisualData()
       colspan(1),
       counter_increment(0),
       counter_reset(0),
+      opacity(1.0f),
       palette(QApplication::palette()) {}
 
 StyleVisualData::~StyleVisualData() {}
@@ -94,6 +95,7 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       colspan(o.colspan),
       counter_increment(o.counter_increment),
       counter_reset(o.counter_reset),
+      opacity(o.opacity),
       palette(o.palette) {}
 
 StyleBackgroundData::StyleBackgroundData() : image(0) {}
@@ -437,6 +439,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       !(visual->clip == other->visual->clip) ||
       visual->hasClip != other->visual->hasClip ||
       visual->textDecoration != other->visual->textDecoration ||
+      visual->opacity != other->visual->opacity ||
       !(visual->palette == other->visual->palette))
     return Visible;
 

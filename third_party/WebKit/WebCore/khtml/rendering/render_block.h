@@ -202,10 +202,13 @@ class RenderBlock : public RenderFlow {
   virtual InlineFlowBox* getFirstLineBox();
 
   // overrides RenderObject
+  // FIXME: The bogus table cell check is only here until we figure out how to
+  // position
+  // table cells properly when they have layers.
+  // Note that we also restrict overflow to blocks for now.
   virtual bool requiresLayer() {
-    return isRoot() ||
-           (!isTableCell() &&
-            (isPositioned() || isRelPositioned() || style()->hidesOverflow()));
+    return !isTableCell() &&
+           (RenderObject::requiresLayer() || style()->hidesOverflow());
   }
 
 #ifndef NDEBUG

@@ -125,8 +125,8 @@ class RenderObject : public CachedObjectClient {
                              bool checkParent = true);
   virtual void positionChildLayers() {}
   virtual bool requiresLayer() {
-    return isRoot() ||
-           (!isTableCell() && (isPositioned() || isRelPositioned()));
+    return isRoot() || isPositioned() || isRelPositioned() ||
+           style()->opacity() < 1.0f;
   }
 
   virtual QRect getOverflowClipRect(int tx, int ty) {
