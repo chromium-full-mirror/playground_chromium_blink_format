@@ -696,8 +696,9 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
         }
         break;
       case ID_OPTION:
+      case ID_OPTGROUP:
         if (id == ID_OPTGROUP) {
-          popBlock(ID_OPTION);
+          popBlock(current->id());
           handled = true;
         } else if (id == ID_SELECT) {
           // IE treats a nested select as </select>. Let's do the same

@@ -34,8 +34,10 @@ class QListBoxItem;
 
 #ifdef __OBJC__
 @class NSMutableArray;
+@class NSObject;
 #else
 class NSMutableArray;
+class NSObject;
 #endif
 
 class QListBox : public QScrollView {
@@ -64,6 +66,8 @@ class QListBox : public QScrollView {
   void selectionChanged() { _selectionChanged.call(); }
 
  private:
+  void insertItem(NSObject*, unsigned index);
+
   NSMutableArray* _items;
   bool _insertingItems;
   mutable float _width;
