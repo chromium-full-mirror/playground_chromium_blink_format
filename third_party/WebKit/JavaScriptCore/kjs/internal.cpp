@@ -415,6 +415,7 @@ ProgramNode* Parser::parse(const UChar* code,
   // extern int kjsyydebug;
   // kjsyydebug=1;
   int parseError = kjsyyparse();
+  Lexer::curr()->doneParsing();
   ProgramNode* prog = progNode;
   progNode = 0;
   sid = -1;

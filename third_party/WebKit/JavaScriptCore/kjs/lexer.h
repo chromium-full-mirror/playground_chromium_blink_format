@@ -27,6 +27,8 @@
 
 namespace KJS {
 
+class Identifier;
+
 class RegExp;
 
 class Lexer {
@@ -125,9 +127,15 @@ class Lexer {
    */
   static void globalClear();
 #endif
+
+  void doneParsing();
+
  private:
   void record8(unsigned short c);
   void record16(UChar c);
+
+  KJS::Identifier* makeIdentifier(UChar* buffer, unsigned int pos);
+  UString* makeUString(UChar* buffer, unsigned int pos);
 
   const UChar* code;
   unsigned int length;
@@ -138,6 +146,14 @@ class Lexer {
 
   // current and following unicode characters
   unsigned short current, next1, next2, next3;
+
+  UString** strings;
+  unsigned int numStrings;
+  unsigned int stringsCapacity;
+
+  KJS::Identifier** identifiers;
+  unsigned int numIdentifiers;
+  unsigned int identifiersCapacity;
 
   // for future extensions
   class LexerPrivate;
