@@ -90,6 +90,8 @@ extern NSString* WebPageCacheDocumentViewKey;
   BOOL justOpenedForTargetedLink;
   BOOL quickRedirectComing;
   BOOL isStoppingLoad;
+  BOOL delegateIsHandlingProvisionalLoadError;
+  BOOL delegateIsDecidingNavigationPolicy;
 }
 
 - (void)setName:(NSString*)name;
@@ -121,9 +123,9 @@ extern NSString* WebPageCacheDocumentViewKey;
 
 // unreachableURL represents a URL that couldn't be loaded; the HTML string acts
 // as an error page for that URL
-- (void)loadPlaceholderHTMLString:(NSString*)string
-                          baseURL:(NSURL*)URL
-                   unreachableURL:(NSURL*)unreachableURL;
+- (void)loadAlternateHTMLString:(NSString*)string
+                        baseURL:(NSURL*)URL
+              forUnreachableURL:(NSURL*)unreachableURL;
 
 - (NSURLRequest*)_webDataRequestForData:(NSData*)data
                                MIMEType:(NSString*)MIMEType
