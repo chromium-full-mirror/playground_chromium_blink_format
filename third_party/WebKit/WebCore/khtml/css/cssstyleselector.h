@@ -157,7 +157,8 @@ class CSSStyleSelector : public StyleSelector {
   void buildLists();
   void clearLists();
 
-  unsigned int addInlineDeclarations(DOM::CSSStyleDeclarationImpl* decl,
+  unsigned int addInlineDeclarations(DOM::ElementImpl* e,
+                                     DOM::CSSStyleDeclarationImpl* decl,
                                      unsigned int numProps);
 
   static DOM::CSSStyleSheetImpl* defaultSheet;
