@@ -40,10 +40,6 @@ class RenderPart;
 class RenderObject;
 }
 
-namespace KJS {
-class Window;
-}
-
 typedef khtml::RenderPart KHTMLRenderPart;
 
 #else
@@ -52,7 +48,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class KHTMLView;
 @class KHTMLRenderPart;
 @class RenderArena;
-@class Window;
 
 #endif
 

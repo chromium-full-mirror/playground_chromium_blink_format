@@ -26,19 +26,28 @@
  */
 #include <CoreFoundation/CoreFoundation.h>
 
+#include <identifier.h>
+#include <internal.h>
+#include <interpreter.h>
+#include <list.h>
 #include <jni_jsobject.h>
+#include <jni_runtime.h>
+#include <jni_utility.h>
 
-static KJSFindObjectForNativeHandleFunctionPtr
-    findObjectForNativeHandleFunctionPtr = 0;
+using namespace Bindings;
+using namespace KJS;
 
-void KJS_setFindObjectForNativeHandleFunction(
-    KJSFindObjectForNativeHandleFunctionPtr aFunc) {
-  findObjectForNativeHandleFunctionPtr = aFunc;
+static KJSFindRootObjectForNativeHandleFunctionPtr
+    findRootObjectForNativeHandleFunctionPtr = 0;
+
+void KJS_setFindRootObjectForNativeHandleFunction(
+    KJSFindRootObjectForNativeHandleFunctionPtr aFunc) {
+  findRootObjectForNativeHandleFunctionPtr = aFunc;
 }
 
-KJSFindObjectForNativeHandleFunctionPtr
-KJS_findObjectForNativeHandleFunction() {
-  return findObjectForNativeHandleFunctionPtr;
+KJSFindRootObjectForNativeHandleFunctionPtr
+KJS_findRootObjectForNativeHandleFunction() {
+  return findRootObjectForNativeHandleFunctionPtr;
 }
 
 // Java does NOT always call finalize (and thus KJS_JSObject_JSFinalize) when
@@ -58,44 +67,47 @@ KJS_findObjectForNativeHandleFunction() {
 // instances
 // are represented by a jlong.
 
-static CFMutableDictionaryRef referencesByOwnerDictionary = 0;
+static CFMutableDictionaryRef referencesByRootDictionary = 0;
 
-static CFMutableDictionaryRef getReferencesByOwnerDictionary() {
-  if (!referencesByOwnerDictionary)
-    referencesByOwnerDictionary = CFDictionaryCreateMutable(
+static CFMutableDictionaryRef getReferencesByRootDictionary() {
+  if (!referencesByRootDictionary)
+    referencesByRootDictionary = CFDictionaryCreateMutable(
         NULL, 0, NULL, &kCFTypeDictionaryValueCallBacks);
-  return referencesByOwnerDictionary;
+  return referencesByRootDictionary;
 }
 
-static CFMutableDictionaryRef getReferencesDictionary(const void* owner) {
-  CFMutableDictionaryRef refsByOwner = getReferencesByOwnerDictionary();
+static CFMutableDictionaryRef getReferencesDictionary(
+    const Bindings::RootObject* root) {
+  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
   CFMutableDictionaryRef referencesDictionary = 0;
 
-  referencesDictionary =
-      (CFMutableDictionaryRef)CFDictionaryGetValue(refsByOwner, owner);
+  referencesDictionary = (CFMutableDictionaryRef)CFDictionaryGetValue(
+      refsByRoot, (const void*)root);
   if (!referencesDictionary) {
     referencesDictionary = CFDictionaryCreateMutable(NULL, 0, NULL, NULL);
-    CFDictionaryAddValue(refsByOwner, owner, referencesDictionary);
+    CFDictionaryAddValue(refsByRoot, root, referencesDictionary);
     CFRelease(referencesDictionary);
   }
   return referencesDictionary;
 }
 
-// Scan all the dictionary for all the owners to see if any have a
+// Scan all the dictionary for all the roots to see if any have a
 // reference to the imp, and if so, return it's reference count
 // dictionary.
-// FIXME:  This is a potential performance bottleneck.
-static CFMutableDictionaryRef findReferenceDictionary(KJS::ValueImp* imp) {
-  CFMutableDictionaryRef refsByOwner = getReferencesByOwnerDictionary();
-  CFMutableDictionaryRef referencesDictionary = 0, foundDictionary = 0;
+// FIXME:  This is a potential performance bottleneck with many applets.  We
+// could fix be adding a
+// imp to root dictionary.
+static CFMutableDictionaryRef findReferenceDictionary(ObjectImp* imp) {
+  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
+  CFMutableDictionaryRef foundDictionary = 0;
 
-  if (refsByOwner) {
+  if (refsByRoot) {
     const void** allValues = 0;
     CFIndex count, i;
 
-    count = CFDictionaryGetCount(referencesDictionary);
-    CFDictionaryGetKeysAndValues(referencesDictionary, NULL, allValues);
+    count = CFDictionaryGetCount(refsByRoot);
     allValues = (const void**)malloc(sizeof(void*) * count);
+    CFDictionaryGetKeysAndValues(refsByRoot, NULL, allValues);
     for (i = 0; i < count; i++) {
       CFMutableDictionaryRef referencesDictionary =
           (CFMutableDictionaryRef)allValues[i];
@@ -110,8 +122,39 @@ static CFMutableDictionaryRef findReferenceDictionary(KJS::ValueImp* imp) {
   return foundDictionary;
 }
 
-static void addJavaReference(const void* owner, KJS::ValueImp* imp) {
-  CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(owner);
+// FIXME:  This is a potential performance bottleneck with many applets.  We
+// could fix be adding a
+// imp to root dictionary.
+const Bindings::RootObject* rootForImp(ObjectImp* imp) {
+  CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
+  const Bindings::RootObject* rootObject = 0;
+
+  if (refsByRoot) {
+    const void** allValues = 0;
+    const void** allKeys = 0;
+    CFIndex count, i;
+
+    count = CFDictionaryGetCount(refsByRoot);
+    allKeys = (const void**)malloc(sizeof(void*) * count);
+    allValues = (const void**)malloc(sizeof(void*) * count);
+    CFDictionaryGetKeysAndValues(refsByRoot, allKeys, allValues);
+    for (i = 0; i < count; i++) {
+      CFMutableDictionaryRef referencesDictionary =
+          (CFMutableDictionaryRef)allValues[i];
+      if (CFDictionaryGetValue(referencesDictionary, imp) != 0) {
+        rootObject = (const Bindings::RootObject*)allKeys[0];
+        break;
+      }
+    }
+
+    free((void*)allKeys);
+    free((void*)allValues);
+  }
+  return rootObject;
+}
+
+static void addJavaReference(const Bindings::RootObject* root, ObjectImp* imp) {
+  CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(root);
 
   unsigned int numReferences =
       (unsigned int)CFDictionaryGetValue(referencesDictionary, imp);
@@ -124,7 +167,7 @@ static void addJavaReference(const void* owner, KJS::ValueImp* imp) {
   }
 }
 
-static void removeJavaReference(KJS::ValueImp* imp) {
+static void removeJavaReference(ObjectImp* imp) {
   CFMutableDictionaryRef referencesDictionary = findReferenceDictionary(imp);
 
   unsigned int numReferences =
@@ -138,9 +181,11 @@ static void removeJavaReference(KJS::ValueImp* imp) {
   }
 }
 
+extern "C" {
+
 // Must be called when the applet is shutdown.
-void removeAllJavaReferencesForOwner(const void* owner) {
-  CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(owner);
+void KJS_removeAllJavaReferencesForRoot(Bindings::RootObject* root) {
+  CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(root);
 
   if (referencesDictionary) {
     void** allImps = 0;
@@ -151,37 +196,30 @@ void removeAllJavaReferencesForOwner(const void* owner) {
                                  NULL);
     allImps = (void**)malloc(sizeof(void*) * count);
     for (i = 0; i < count; i++) {
-      KJS::ValueImp* anImp = static_cast<KJS::ValueImp*>(allImps[i]);
+      ObjectImp* anImp = static_cast<ObjectImp*>(allImps[i]);
       anImp->deref();
     }
     free((void*)allImps);
     CFDictionaryRemoveAllValues(referencesDictionary);
 
-    CFMutableDictionaryRef refsByOwner = getReferencesByOwnerDictionary();
-    CFDictionaryRemoveValue(refsByOwner, owner);
+    CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
+    CFDictionaryRemoveValue(refsByRoot, (const void*)root);
+    delete root;
   }
 }
-
-extern "C" {
 
 jlong KJS_JSCreateNativeJSObject(JNIEnv* env,
                                  jclass clazz,
                                  jstring jurl,
                                  jlong nativeHandle,
                                  jboolean ctx) {
-  fprintf(stderr, "%s: nativeHandle = %p\n", __PRETTY_FUNCTION__,
-          jlong_to_ptr(nativeHandle));
-
-  KJSFindObjectForNativeHandleFunctionPtr aFunc =
-      KJS_findObjectForNativeHandleFunction();
+  KJSFindRootObjectForNativeHandleFunctionPtr aFunc =
+      KJS_findRootObjectForNativeHandleFunction();
   if (aFunc) {
-    KJS::ObjectImp* imp = aFunc(jlong_to_ptr(nativeHandle));
-    addJavaReference(jlong_to_ptr(nativeHandle), imp);
-    return ptr_to_jlong(imp);
+    Bindings::RootObject* root = aFunc(jlong_to_ptr(nativeHandle));
+    addJavaReference(root, root->rootObjectImp());
+    return ptr_to_jlong(root->rootObjectImp());
   }
-
-  fprintf(stderr, "%s: unable to find window for nativeHandle = %p\n",
-          __PRETTY_FUNCTION__, jlong_to_ptr(nativeHandle));
 
   return ptr_to_jlong(0);
 }
@@ -190,18 +228,40 @@ void KJS_JSObject_JSFinalize(JNIEnv* env,
                              jclass jsClass,
                              jlong nativeJSObject) {
   removeJavaReference(jlong_to_impptr(nativeJSObject));
-  fprintf(stderr, "%s:\n", __PRETTY_FUNCTION__);
 }
 
 jobject KJS_JSObject_JSObjectCall(JNIEnv* env,
                                   jclass jsClass,
                                   jlong nativeJSObject,
                                   jstring jurl,
-                                  jstring methodName,
+                                  jstring mName,
                                   jobjectArray args,
                                   jboolean ctx) {
-  fprintf(stderr, "%s:\n", __PRETTY_FUNCTION__);
-  return 0;
+  ObjectImp* imp = jlong_to_impptr(nativeJSObject);
+  const Bindings::RootObject* root = rootForImp(imp);
+
+  // Change to assert.
+  if (!root) {
+    return 0;
+  }
+
+  // Lookup the function object.
+  ExecState* exec = root->interpreter()->globalExec();
+  const char* methodName = JavaString(mName).characters();
+  Value func = imp->get(exec, Identifier(methodName));
+  if (func.isNull() || func.type() == UndefinedType) {
+    // Maybe throw an exception here?
+    return 0;
+  }
+
+  // Call the function object.
+  ObjectImp* funcImp = static_cast<ObjectImp*>(func.imp());
+  Object thisObj = Object(const_cast<ObjectImp*>(imp));
+  List argList = listFromJArray(args);
+  Value result = funcImp->call(exec, thisObj, argList);
+
+  // Convert and return the result of the function call.
+  return convertValueToJObject(exec, result);
 }
 
 jobject KJS_JSObject_JSObjectEval(JNIEnv* env,
