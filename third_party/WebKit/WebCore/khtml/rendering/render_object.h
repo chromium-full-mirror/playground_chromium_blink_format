@@ -179,6 +179,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool isTableCell() const { return false; }
   virtual bool isTableRow() const { return false; }
   virtual bool isTableSection() const { return false; }
+  virtual bool isTableCol() const { return false; }
   virtual bool isTable() const { return false; }
   virtual bool isWidget() const { return false; }
   virtual bool isBody() const { return false; }
@@ -351,6 +352,8 @@ class RenderObject : public CachedObjectClient {
   // The corresponding closing element has been parsed. ### remove me
   virtual void close() {}
 
+  virtual int availableHeight() const { return 0; }
+
   // does a query on the rendertree and finds the innernode
   // and overURL for the given position
   // if readonly == false, it will recalc hover styles accordingly
@@ -508,7 +511,6 @@ class RenderObject : public CachedObjectClient {
   virtual int paddingBottom() const;
   virtual int paddingLeft() const;
   virtual int paddingRight() const;
-  virtual bool hasPadding() const { return style()->hasPadding(); }
 
   virtual int borderTop() const { return style()->borderTopWidth(); }
   virtual int borderBottom() const { return style()->borderBottomWidth(); }

@@ -42,6 +42,7 @@
 #include "rendering/render_table.h"
 
 #include <kdebug.h>
+#include <kglobal.h>
 
 using namespace khtml;
 using namespace DOM;
@@ -53,12 +54,12 @@ HTMLTableElementImpl::HTMLTableElementImpl(DocumentPtr* doc)
   foot = 0;
   firstBody = 0;
 
-  rules = None;
-  frame = Void;
+#if 0
+    rules = None;
+    frame = Void;
+#endif
+  padding = 1;
 
-  m_cellPadding = -1;
-
-  incremental = false;
   m_noBorder = true;
   m_solid = false;
 }
@@ -67,29 +68,6 @@ HTMLTableElementImpl::~HTMLTableElementImpl() {}
 
 NodeImpl::Id HTMLTableElementImpl::id() const {
   return ID_TABLE;
-}
-
-void HTMLTableElementImpl::attach() {
-  assert(!m_attached);
-  if (parent()->renderer()) {
-    // reset font color and sizes here, if we don't have strict parse mode.
-    // this is 90% compatible to ie and mozilla, and the by way easiest
-    // solution...
-    // only difference to 100% correct is that in strict mode <font> elements
-    // are propagated into tables.
-    if (getDocument()->parseMode() != DocumentImpl::Strict) {
-      addCSSProperty(CSS_PROP_FONT_SIZE, CSS_VAL_MEDIUM);
-      addCSSProperty(CSS_PROP_COLOR, getDocument()->textColor());
-      addCSSProperty(CSS_PROP_FONT_FAMILY, "konq_body");
-    }
-  }
-
-  HTMLElementImpl::attach();
-
-  if (m_render && m_render->isTable()) {
-    RenderTable* table = static_cast<RenderTable*>(m_render);
-    table->setCellPadding(m_cellPadding);
-  }
 }
 
 NodeImpl* HTMLTableElementImpl::setCaption(HTMLTableCaptionElementImpl* c) {
@@ -139,13 +117,12 @@ NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
   int exceptioncode = 0;
   NodeImpl* r;
 
-  if (!firstBody)
-    firstBody = s;
-
-  if (foot)
-    r = insertBefore(s, foot, exceptioncode);
-  else
+  if (firstBody) {
+    replaceChild(s, firstBody, exceptioncode);
+    r = s;
+  } else
     r = appendChild(s, exceptioncode);
+  firstBody = s;
 
   return r;
 }
@@ -153,10 +130,11 @@ NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
 HTMLElementImpl* HTMLTableElementImpl::createTHead() {
   if (!head) {
     int exceptioncode = 0;
-    head = new HTMLTableSectionElementImpl(docPtr(), ID_THEAD);
+    head = new HTMLTableSectionElementImpl(docPtr(), ID_THEAD,
+                                           true /* implicit */);
     if (foot)
       insertBefore(head, foot, exceptioncode);
-    if (firstBody)
+    else if (firstBody)
       insertBefore(head, firstBody, exceptioncode);
     else
       appendChild(head, exceptioncode);
@@ -175,7 +153,8 @@ void HTMLTableElementImpl::deleteTHead() {
 HTMLElementImpl* HTMLTableElementImpl::createTFoot() {
   if (!foot) {
     int exceptioncode = 0;
-    foot = new HTMLTableSectionElementImpl(docPtr(), ID_TFOOT);
+    foot =
+        new HTMLTableSectionElementImpl(docPtr(), ID_TFOOT, true /*implicit */);
     if (firstBody)
       insertBefore(foot, firstBody, exceptioncode);
     else
@@ -209,44 +188,97 @@ void HTMLTableElementImpl::deleteCaption() {
   tCaption = 0;
 }
 
-HTMLElementImpl* HTMLTableElementImpl::insertRow(long index) {
+HTMLElementImpl* HTMLTableElementImpl::insertRow(long index,
+                                                 int& exceptioncode) {
+  // The DOM requires that we create a tbody if the table is empty
+  // (cf DOM2TS HTMLTableElement31 test)
+  // (note: this is different from "if the table has no sections", since we can
+  // have
+  // <TABLE><TR>)
+  if (!firstBody && !head && !foot && !hasChildNodes())
+    setTBody(new HTMLTableSectionElementImpl(docPtr(), ID_TBODY,
+                                             true /* implicit */));
+
+  // kdDebug(6030) << k_funcinfo << index << endl;
   // IE treats index=-1 as default value meaning 'append after last'
   // This isn't in the DOM. So, not implemented yet.
   HTMLTableSectionElementImpl* section = 0L;
+  HTMLTableSectionElementImpl* lastSection = 0L;
   NodeImpl* node = firstChild();
-  for (; node; node = node->nextSibling()) {
-    if (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
-        node->id() == ID_TBODY) {
+  bool append = (index == -1);
+  bool found = false;
+  for (; node && (index >= 0 || append); node = node->nextSibling()) {
+    // there could be 2 tfoot elements in the table. Only the first one is the
+    // "foot", that's why we have the more
+    // complicated if statement below.
+    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
+                         node->id() == ID_TBODY)) {
       section = static_cast<HTMLTableSectionElementImpl*>(node);
-      if (section->numRows() > index)
-        break;
-      else
-        index -= section->numRows();
+      lastSection = section;
+      // kdDebug(6030) << k_funcinfo << "section id=" << node->id() << " rows:"
+      // << section->numRows() << endl;
+      if (!append) {
+        int rows = section->numRows();
+        if (rows > index) {
+          found = true;
+          break;
+        } else
+          index -= rows;
+        // kdDebug(6030) << "       index is now " << index << endl;
+      }
     }
   }
-  if (!section) {
-    section = new HTMLTableSectionElementImpl(docPtr(), ID_TBODY);
-    setTBody(section);
+  if (!found && foot)
+    section = static_cast<HTMLTableSectionElementImpl*>(foot);
+
+  // Index == 0 means "insert before first row in current section"
+  // or "append after last row" (if there's no current section anymore)
+  if (!section && (index == 0 || append)) {
+    section = lastSection;
+    index = section ? section->numRows() : 0;
   }
-  return section->insertRow(index);
+  if (section && (index >= 0 || append)) {
+    // kdDebug(6030) << "Inserting row into section " << section << " at index "
+    // << index << endl;
+    return section->insertRow(index, exceptioncode);
+  } else {
+    // No more sections => index is too big
+    exceptioncode = DOMException::INDEX_SIZE_ERR;
+    return 0L;
+  }
 }
 
-void HTMLTableElementImpl::deleteRow(long index) {
+void HTMLTableElementImpl::deleteRow(long index, int& exceptioncode) {
   HTMLTableSectionElementImpl* section = 0L;
   NodeImpl* node = firstChild();
+  bool lastRow = index == -1;
+  HTMLTableSectionElementImpl* lastSection = 0L;
+  bool found = false;
   for (; node; node = node->nextSibling()) {
-    if (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
-        node->id() == ID_TBODY) {
+    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
+                         node->id() == ID_TBODY)) {
       section = static_cast<HTMLTableSectionElementImpl*>(node);
-      if (section->numRows() > index)
-        break;
-      else
-        index -= section->numRows();
+      lastSection = section;
+      int rows = section->numRows();
+      if (!lastRow) {
+        if (rows > index) {
+          found = true;
+          break;
+        } else
+          index -= rows;
+      }
     }
+    section = 0L;
   }
-  if (section && index >= 0 && index < section->numRows())
-    section->deleteRow(index);
-  // ## TODO error checking, returning exceptioncode
+  if (!found && foot)
+    section = static_cast<HTMLTableSectionElementImpl*>(foot);
+
+  if (lastRow)
+    lastSection->deleteRow(-1, exceptioncode);
+  else if (section && index >= 0 && index < section->numRows())
+    section->deleteRow(index, exceptioncode);
+  else
+    exceptioncode = DOMException::INDEX_SIZE_ERR;
 }
 
 NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
@@ -255,39 +287,40 @@ NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
                 << child->nodeName().string() << " )" << endl;
 #endif
 
-  switch (child->id()) {
-    case ID_CAPTION:
-      return setCaption(static_cast<HTMLTableCaptionElementImpl*>(child));
-      break;
-    case ID_COL:
-    case ID_COLGROUP: {
-      // these have to come before the table definition!
-      if (head || foot || firstBody)
-        return 0;
-      HTMLElementImpl::addChild(child);
-      // ###
-    }
-      return child;
-    case ID_THEAD:
-      //      if(incremental && !columnPos[totalCols]);// calcColWidth();
-      return setTHead(static_cast<HTMLTableSectionElementImpl*>(child));
-      break;
-    case ID_TFOOT:
-      // if(incremental && !columnPos[totalCols]);// calcColWidth();
-      return setTFoot(static_cast<HTMLTableSectionElementImpl*>(child));
-      break;
-    case ID_TBODY:
-      // if(incremental && !columnPos[totalCols]);// calcColWidth();
-      return setTBody(static_cast<HTMLTableSectionElementImpl*>(child));
-      break;
-    case ID_FORM:
-      // First add the child.
-      HTMLElementImpl::addChild(child);
-      // Now simply return ourselves as the newnode.  This has the effect of
-      // demoting the form to a leaf and moving it safely out of the way.
-      return this;
+  if (child->id() == ID_FORM) {
+    // First add the child.
+    HTMLElementImpl::addChild(child);
+    // Now simply return ourselves as the newnode.  This has the effect of
+    // demoting the form to a leaf and moving it safely out of the way.
+    return this;
   }
-  return 0;
+
+  int exceptioncode = 0;
+  NodeImpl* retval = appendChild(child, exceptioncode);
+  if (retval) {
+    switch (child->id()) {
+      case ID_CAPTION:
+        if (!tCaption)
+          tCaption = static_cast<HTMLTableCaptionElementImpl*>(child);
+        break;
+      case ID_COL:
+      case ID_COLGROUP:
+        break;
+      case ID_THEAD:
+        if (!head)
+          head = static_cast<HTMLTableSectionElementImpl*>(child);
+        break;
+      case ID_TFOOT:
+        if (!foot)
+          foot = static_cast<HTMLTableSectionElementImpl*>(child);
+        break;
+      case ID_TBODY:
+        if (!firstBody)
+          firstBody = static_cast<HTMLTableSectionElementImpl*>(child);
+        break;
+    }
+  }
+  return retval;
 }
 
 void HTMLTableElementImpl::parseAttribute(AttributeImpl* attr) {
@@ -399,13 +432,9 @@ void HTMLTableElementImpl::parseAttribute(AttributeImpl* attr) {
       break;
     case ATTR_CELLPADDING:
       if (!attr->value().isEmpty())
-        m_cellPadding = attr->value().toInt();
+        padding = kMax(0, attr->value().toInt());
       else
-        m_cellPadding = -1;
-      if (m_render && m_render->isTable()) {
-        RenderTable* table = static_cast<RenderTable*>(m_render);
-        table->setCellPadding(m_cellPadding);
-      }
+        padding = 0;
       break;
     case ATTR_COLS: {
 // ###
@@ -435,16 +464,32 @@ void HTMLTableElementImpl::parseAttribute(AttributeImpl* attr) {
   }
 }
 
-void HTMLTableElementImpl::init() {
-  HTMLElementImpl::init();
+void HTMLTableElementImpl::attach() {
+  assert(!m_attached);
+  if (parent()->renderer()) {
+    // reset font color and sizes here, if we don't have strict parse mode.
+    // this is 90% compatible to ie and mozilla, and the by way easiest
+    // solution...
+    // only difference to 100% correct is that in strict mode <font> elements
+    // are propagated into tables.
+    if (getDocument()->parseMode() != DocumentImpl::Strict) {
+      addCSSProperty(CSS_PROP_FONT_SIZE, CSS_VAL_MEDIUM);
+      addCSSProperty(CSS_PROP_COLOR, getDocument()->textColor());
+      addCSSProperty(CSS_PROP_FONT_FAMILY, "konq_body");
+    }
 
-  if (!m_noBorder) {
-    int v = m_solid ? CSS_VAL_SOLID : CSS_VAL_OUTSET;
-    addCSSProperty(CSS_PROP_BORDER_TOP_STYLE, v);
-    addCSSProperty(CSS_PROP_BORDER_BOTTOM_STYLE, v);
-    addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, v);
-    addCSSProperty(CSS_PROP_BORDER_RIGHT_STYLE, v);
+    if (!m_noBorder) {
+      int v = m_solid ? CSS_VAL_SOLID : CSS_VAL_OUTSET;
+      addCSSProperty(CSS_PROP_BORDER_TOP_STYLE, v);
+      addCSSProperty(CSS_PROP_BORDER_BOTTOM_STYLE, v);
+      addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, v);
+      addCSSProperty(CSS_PROP_BORDER_RIGHT_STYLE, v);
+    }
   }
+
+  HTMLElementImpl::attach();
+  if (m_render && m_render->isTable())
+    static_cast<RenderTable*>(m_render)->setCellPadding(padding);
 }
 
 // --------------------------------------------------------------------------
@@ -473,7 +518,6 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
         addCSSProperty(CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
         addCSSProperty(CSS_PROP_BORDER_RIGHT_STYLE, CSS_VAL_SOLID);
-        m_solid = true;
       }
       break;
     }
@@ -492,6 +536,12 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
       addCSSProperty(CSS_PROP_TEXT_ALIGN, v);
       break;
     }
+    case ATTR_HEIGHT:
+      if (!attr->value().isEmpty())
+        addCSSLength(CSS_PROP_HEIGHT, attr->value());
+      else
+        removeCSSProperty(CSS_PROP_HEIGHT);
+      break;
     case ATTR_NOSAVE:
       break;
     default:
@@ -502,14 +552,14 @@ void HTMLTablePartElementImpl::parseAttribute(AttributeImpl* attr) {
 // -------------------------------------------------------------------------
 
 HTMLTableSectionElementImpl::HTMLTableSectionElementImpl(DocumentPtr* doc,
-                                                         ushort tagid)
+                                                         ushort tagid,
+                                                         bool implicit)
     : HTMLTablePartElementImpl(doc) {
   _id = tagid;
+  m_implicit = implicit;
 }
 
-HTMLTableSectionElementImpl::~HTMLTableSectionElementImpl() {
-  nrows = 0;
-}
+HTMLTableSectionElementImpl::~HTMLTableSectionElementImpl() {}
 
 NodeImpl::Id HTMLTableSectionElementImpl::id() const {
   return _id;
@@ -533,47 +583,57 @@ NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
 
 // these functions are rather slow, since we need to get the row at
 // the index... but they aren't used during usual HTML parsing anyway
-HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(long index) {
-  nrows++;
-
-  HTMLTableRowElementImpl* r = new HTMLTableRowElementImpl(docPtr());
-
+HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(long index,
+                                                        int& exceptioncode) {
+  HTMLTableRowElementImpl* r = 0L;
   NodeListImpl* children = childNodes();
-  int exceptioncode = 0;
-  if (!children || (int)children->length() <= index)
-    appendChild(r, exceptioncode);
-  else {
-    NodeImpl* n;
-    if (index < 1)
-      n = firstChild();
-    else
-      n = children->item(index);
-    insertBefore(r, n, exceptioncode);
+  int numRows = children ? (int)children->length() : 0;
+  // kdDebug(6030) << k_funcinfo << "index=" << index << " numRows=" << numRows
+  // << endl;
+  if (index < -1 || index > numRows) {
+    exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
+  } else {
+    r = new HTMLTableRowElementImpl(docPtr());
+    if (numRows == index || index == -1)
+      appendChild(r, exceptioncode);
+    else {
+      NodeImpl* n;
+      if (index < 1)
+        n = firstChild();
+      else
+        n = children->item(index);
+      insertBefore(r, n, exceptioncode);
+    }
   }
-  if (children)
-    delete children;
+  delete children;
   return r;
 }
 
-void HTMLTableSectionElementImpl::deleteRow(long index) {
-  if (index < 0)
-    return;
+void HTMLTableSectionElementImpl::deleteRow(long index, int& exceptioncode) {
   NodeListImpl* children = childNodes();
-  if (children && (int)children->length() > index) {
-    nrows--;
-    int exceptioncode = 0;
+  int numRows = children ? (int)children->length() : 0;
+  if (index == -1)
+    index = numRows - 1;
+  if (index >= 0 && index < numRows)
     HTMLElementImpl::removeChild(children->item(index), exceptioncode);
+  else
+    exceptioncode = DOMException::INDEX_SIZE_ERR;
+  delete children;
+}
+
+int HTMLTableSectionElementImpl::numRows() const {
+  int rows = 0;
+  const NodeImpl* n = firstChild();
+  while (n) {
+    if (n->id() == ID_TR)
+      rows++;
+    n = n->nextSibling();
   }
-  if (children)
-    delete children;
+
+  return rows;
 }
 
 // -------------------------------------------------------------------------
-
-HTMLTableRowElementImpl::HTMLTableRowElementImpl(DocumentPtr* doc)
-    : HTMLTablePartElementImpl(doc) {}
-
-HTMLTableRowElementImpl::~HTMLTableRowElementImpl() {}
 
 NodeImpl::Id HTMLTableRowElementImpl::id() const {
   return ID_TR;
@@ -596,27 +656,42 @@ NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
 }
 
 long HTMLTableRowElementImpl::rowIndex() const {
-  // some complex traversal stuff here to take into account that some rows may
-  // be in different sections
   int rIndex = 0;
-  const NodeImpl* n = this;
-  do {
-    while (!n->previousSibling() &&
-           !(n->isElementNode() && n->id() == ID_TABLE))
-      n = n->parentNode();
-    if (n->isElementNode() && n->id() == ID_TABLE)
-      n = 0;
-    if (n) {
-      n = n->previousSibling();
-      while (!(n->isElementNode() && n->id() == ID_TR) && n->lastChild())
-        n = n->lastChild();
+
+  NodeImpl* table = parentNode();
+  if (!table)
+    return -1;
+  table = table->parentNode();
+  if (!table || table->id() != ID_TABLE)
+    return -1;
+
+  HTMLTableSectionElementImpl* foot =
+      static_cast<HTMLTableElementImpl*>(table)->tFoot();
+  NodeImpl* node = table->firstChild();
+  while (node) {
+    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
+                         node->id() == ID_TBODY)) {
+      HTMLTableSectionElementImpl* section =
+          static_cast<HTMLTableSectionElementImpl*>(node);
+      const NodeImpl* row = section->firstChild();
+      while (row) {
+        if (row == this)
+          return rIndex;
+        rIndex++;
+        row = row->nextSibling();
+      }
     }
-
-    if (n && n->isElementNode() && n->id() == ID_TR)
-      rIndex++;
-  } while (n && n->isElementNode() && n->id() == ID_TR);
-
-  return rIndex;
+    node = node->nextSibling();
+  }
+  const NodeImpl* row = foot->firstChild();
+  while (row) {
+    if (row == this)
+      return rIndex;
+    rIndex++;
+    row = row->nextSibling();
+  }
+  // should never happen
+  return -1;
 }
 
 long HTMLTableRowElementImpl::sectionRowIndex() const {
@@ -631,36 +706,40 @@ long HTMLTableRowElementImpl::sectionRowIndex() const {
   return rIndex;
 }
 
-HTMLElementImpl* HTMLTableRowElementImpl::insertCell(long index) {
-  HTMLTableCellElementImpl* c = new HTMLTableCellElementImpl(docPtr(), ID_TD);
-
+HTMLElementImpl* HTMLTableRowElementImpl::insertCell(long index,
+                                                     int& exceptioncode) {
+  HTMLTableCellElementImpl* c = 0L;
   NodeListImpl* children = childNodes();
-  int exceptioncode = 0;
-  if (!children || (int)children->length() <= index)
-    appendChild(c, exceptioncode);
+  int numCells = children ? children->length() : 0;
+  if (index < -1 || index > numCells)
+    exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   else {
-    NodeImpl* n;
-    if (index < 1)
-      n = firstChild();
-    else
-      n = children->item(index);
-    insertBefore(c, n, exceptioncode);
+    c = new HTMLTableCellElementImpl(docPtr(), ID_TD);
+    if (numCells == index || index == -1)
+      appendChild(c, exceptioncode);
+    else {
+      NodeImpl* n;
+      if (index < 1)
+        n = firstChild();
+      else
+        n = children->item(index);
+      insertBefore(c, n, exceptioncode);
+    }
   }
-  if (children)
-    delete children;
+  delete children;
   return c;
 }
 
-void HTMLTableRowElementImpl::deleteCell(long index) {
-  if (index < 0)
-    return;
+void HTMLTableRowElementImpl::deleteCell(long index, int& exceptioncode) {
   NodeListImpl* children = childNodes();
-  if (children && (int)children->length() > index) {
-    int exceptioncode = 0;
+  int numCells = children ? children->length() : 0;
+  if (index == -1)
+    index = numCells - 1;
+  if (index >= 0 && index < numCells)
     HTMLElementImpl::removeChild(children->item(index), exceptioncode);
-  }
-  if (children)
-    delete children;
+  else
+    exceptioncode = DOMException::INDEX_SIZE_ERR;
+  delete children;
 }
 
 // -------------------------------------------------------------------------
@@ -670,9 +749,9 @@ HTMLTableCellElementImpl::HTMLTableCellElementImpl(DocumentPtr* doc, int tag)
   _col = -1;
   _row = -1;
   cSpan = rSpan = 1;
-  m_nowrap = false;
   _id = tag;
   rowHeight = 0;
+  m_solid = false;
 }
 
 HTMLTableCellElementImpl::~HTMLTableCellElementImpl() {}
@@ -698,19 +777,16 @@ void HTMLTableCellElementImpl::parseAttribute(AttributeImpl* attr) {
         cSpan = 1;
       break;
     case ATTR_NOWRAP:
-      m_nowrap = (attr->val() != 0);
+      if (attr->val() != 0)
+        addCSSProperty(CSS_PROP_WHITE_SPACE, "-konq-nowrap");
+      else
+        removeCSSProperty(CSS_PROP_WHITE_SPACE);
       break;
     case ATTR_WIDTH:
       if (!attr->value().isEmpty())
         addCSSLength(CSS_PROP_WIDTH, attr->value());
       else
         removeCSSProperty(CSS_PROP_WIDTH);
-      break;
-    case ATTR_HEIGHT:
-      if (!attr->value().isEmpty())
-        addCSSLength(CSS_PROP_HEIGHT, attr->value());
-      else
-        removeCSSProperty(CSS_PROP_HEIGHT);
       break;
     case ATTR_NOSAVE:
       break;
@@ -719,9 +795,7 @@ void HTMLTableCellElementImpl::parseAttribute(AttributeImpl* attr) {
   }
 }
 
-void HTMLTableCellElementImpl::init() {
-  HTMLTablePartElementImpl::init();
-
+void HTMLTableCellElementImpl::attach() {
   HTMLElementImpl* p = static_cast<HTMLElementImpl*>(parentNode());
   while (p && p->id() != ID_TABLE)
     p = static_cast<HTMLElementImpl*>(p->parentNode());
@@ -742,40 +816,20 @@ void HTMLTableCellElementImpl::init() {
         addCSSProperty(CSS_PROP_BORDER_COLOR, "inherit");
     }
   }
+
+  HTMLTablePartElementImpl::attach();
 }
 
 // -------------------------------------------------------------------------
 
 HTMLTableColElementImpl::HTMLTableColElementImpl(DocumentPtr* doc, ushort i)
-    : HTMLElementImpl(doc) {
+    : HTMLTablePartElementImpl(doc) {
   _id = i;
   _span = (_id == ID_COLGROUP ? 0 : 1);
 }
 
-HTMLTableColElementImpl::~HTMLTableColElementImpl() {}
-
 NodeImpl::Id HTMLTableColElementImpl::id() const {
   return _id;
-}
-
-NodeImpl* HTMLTableColElementImpl::addChild(NodeImpl* child) {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6030) << nodeName().string() << "(Table)::addChild( "
-                << child->nodeName().string() << " )" << endl;
-#endif
-
-  switch (child->id()) {
-    case ID_COL: {
-      // these have to come before the table definition!
-      HTMLElementImpl::addChild(child);
-      return child;
-    }
-    default:
-      return 0;
-      break;
-      // ####
-  }
-  return child;
 }
 
 void HTMLTableColElementImpl::parseAttribute(AttributeImpl* attr) {
@@ -796,16 +850,11 @@ void HTMLTableColElementImpl::parseAttribute(AttributeImpl* attr) {
         removeCSSProperty(CSS_PROP_VERTICAL_ALIGN);
       break;
     default:
-      HTMLElementImpl::parseAttribute(attr);
+      HTMLTablePartElementImpl::parseAttribute(attr);
   }
 }
 
 // -------------------------------------------------------------------------
-
-HTMLTableCaptionElementImpl::HTMLTableCaptionElementImpl(DocumentPtr* doc)
-    : HTMLTablePartElementImpl(doc) {}
-
-HTMLTableCaptionElementImpl::~HTMLTableCaptionElementImpl() {}
 
 NodeImpl::Id HTMLTableCaptionElementImpl::id() const {
   return ID_CAPTION;

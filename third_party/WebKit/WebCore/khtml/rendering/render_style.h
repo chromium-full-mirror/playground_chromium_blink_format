@@ -326,7 +326,7 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
 //
 // this applies to decoration_color too
 
-enum EWhiteSpace { NORMAL, PRE, NOWRAP };
+enum EWhiteSpace { NORMAL, PRE, NOWRAP, KONQ_NOWRAP };
 
 enum ETextAlign { TAAUTO, LEFT, RIGHT, CENTER, JUSTIFY, KONQ_CENTER };
 
@@ -612,7 +612,6 @@ class RenderStyle : public Shared<RenderStyle> {
   bool operator==(const RenderStyle& other) const;
   bool isFloating() const { return !(noninherited_flags._floating == FNONE); }
   bool hasMargin() const { return surround->margin.nonZero(); }
-  bool hasPadding() const { return surround->padding.nonZero(); }
   bool hasBorder() const { return surround->border.hasBorder(); }
   bool hasOffset() const { return surround->offset.nonZero(); }
 
@@ -699,9 +698,7 @@ class RenderStyle : public Shared<RenderStyle> {
   EUnicodeBidi unicodeBidi() const { return noninherited_flags._unicodeBidi; }
 
   EClear clear() const { return noninherited_flags._clear; }
-  ETableLayout inheritedLayout() const {
-    return noninherited_flags._table_layout;
-  }
+  ETableLayout tableLayout() const { return noninherited_flags._table_layout; }
 
   short colSpan() const { return visual->colspan; }
 

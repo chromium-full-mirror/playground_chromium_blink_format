@@ -84,6 +84,9 @@ class RenderRoot : public RenderFlow {
   virtual void setWidth(int width) { m_rootWidth = m_width = width; }
   virtual void setHeight(int height) { m_rootHeight = m_height = height; }
 
+  int viewportWidth() const { return m_viewportWidth; }
+  int viewportHeight() const { return m_viewportHeight; }
+
  protected:
   virtual void selectionStartEnd(int& spos, int& epos);
 
@@ -98,6 +101,9 @@ class RenderRoot : public RenderFlow {
 
   int m_rootWidth;
   int m_rootHeight;
+
+  int m_viewportWidth;
+  int m_viewportHeight;
 
   // used to ignore viewport width when printing to the printer
   bool m_printingMode;

@@ -41,8 +41,9 @@ class RenderBody : public RenderFlow {
   virtual void repaint(bool immediate = false);
 
   virtual void layout();
-
   virtual void setStyle(RenderStyle* style);
+
+  virtual int availableHeight() const;
 
  protected:
   virtual void paintBoxDecorations(QPainter* p,

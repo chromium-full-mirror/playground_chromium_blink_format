@@ -26,6 +26,7 @@
 #include "xml/dom_docimpl.h"
 #include "khtmlview.h"
 
+#include <kglobal.h>
 #include <kdebug.h>
 
 using namespace khtml;
@@ -96,4 +97,15 @@ void RenderBody::layout() {
     scrollbarsStyled = true;
   }
 #endif /* APPLE_CHANGES not defined */
+}
+
+int RenderBody::availableHeight() const {
+  int h = RenderFlow::availableHeight();
+
+  if (style()->marginTop().isFixed())
+    h -= style()->marginTop().value;
+  if (style()->marginBottom().isFixed())
+    h -= style()->marginBottom().value;
+
+  return kMax(0, h);
 }

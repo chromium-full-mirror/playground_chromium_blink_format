@@ -30,7 +30,7 @@
 
 using namespace khtml;
 
-StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Fixed) {}
+StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Variable) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
     : Shared<StyleSurroundData>(),
