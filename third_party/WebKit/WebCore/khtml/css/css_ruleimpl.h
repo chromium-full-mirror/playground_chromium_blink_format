@@ -38,11 +38,10 @@ class CachedCSSStyleSheet;
 
 namespace DOM {
 
+class CSSMutableStyleDeclarationImpl;
 class CSSRule;
 class CSSStyleSheet;
 class CSSStyleSheetImpl;
-class CSSStyleDeclarationImpl;
-typedef CSSStyleDeclarationImpl CSSMutableStyleDeclarationImpl;
 class MediaListImpl;
 
 class CSSRuleImpl : public StyleBaseImpl {

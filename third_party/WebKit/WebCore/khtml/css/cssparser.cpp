@@ -217,10 +217,7 @@ bool CSSParser::parseValue(CSSMutableStyleDeclarationImpl* declaration,
   bool ok = false;
   if (numParsedProperties) {
     ok = true;
-    for (int i = 0; i < numParsedProperties; i++) {
-      declaration->removeProperty(parsedProperties[i]->m_id);
-      declaration->values()->append(parsedProperties[i]);
-    }
+    declaration->addParsedProperties(parsedProperties, numParsedProperties);
     numParsedProperties = 0;
   }
 
@@ -299,10 +296,7 @@ bool CSSParser::parseDeclaration(CSSMutableStyleDeclarationImpl* declaration,
   bool ok = false;
   if (numParsedProperties) {
     ok = true;
-    for (int i = 0; i < numParsedProperties; i++) {
-      declaration->removeProperty(parsedProperties[i]->m_id);
-      declaration->values()->append(parsedProperties[i]);
-    }
+    declaration->addParsedProperties(parsedProperties, numParsedProperties);
     numParsedProperties = 0;
   }
 
@@ -325,13 +319,10 @@ void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
 
 CSSMutableStyleDeclarationImpl* CSSParser::createStyleDeclaration(
     CSSStyleRuleImpl* rule) {
-  QPtrList<CSSProperty>* propList = new QPtrList<CSSProperty>;
-  propList->setAutoDelete(true);
-  for (int i = 0; i < numParsedProperties; i++)
-    propList->append(parsedProperties[i]);
-
+  CSSMutableStyleDeclarationImpl* result = new CSSMutableStyleDeclarationImpl(
+      rule, parsedProperties, numParsedProperties);
   numParsedProperties = 0;
-  return new CSSMutableStyleDeclarationImpl(rule, propList);
+  return result;
 }
 
 void CSSParser::clearProperties() {

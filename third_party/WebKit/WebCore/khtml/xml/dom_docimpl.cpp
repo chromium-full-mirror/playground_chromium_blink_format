@@ -510,9 +510,7 @@ EditingTextImpl* DocumentImpl::createEditingTextNode(const DOMString& text) {
 }
 
 CSSStyleDeclarationImpl* DocumentImpl::createCSSStyleDeclaration() {
-  QPtrList<CSSProperty>* propList = new QPtrList<CSSProperty>;
-  propList->setAutoDelete(true);
-  return new CSSStyleDeclarationImpl(0, propList);
+  return new CSSMutableStyleDeclarationImpl;
 }
 
 NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,

@@ -267,7 +267,7 @@ bool HTMLElementImpl::isInline() const {
 }
 
 void HTMLElementImpl::createInlineStyleDecl() {
-  m_inlineStyleDecl = new CSSStyleDeclarationImpl(0);
+  m_inlineStyleDecl = new CSSMutableStyleDeclarationImpl;
   m_inlineStyleDecl->ref();
   m_inlineStyleDecl->setParent(getDocument()->elementSheet());
   m_inlineStyleDecl->setNode(this);
@@ -386,7 +386,7 @@ void HTMLElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       // ### the inline sheet ay contain more than 1 property!
       // stylesheet info
       setHasStyle();
-      getInlineStyleDecl()->setProperty(attr->value());
+      getInlineStyleDecl()->parseProperty(attr->value());
       setChanged();
       break;
     case ATTR_TABINDEX:
@@ -553,13 +553,14 @@ void HTMLElementImpl::createAttributeMap() const {
   namedAttrMap->ref();
 }
 
-CSSStyleDeclarationImpl* HTMLElementImpl::getInlineStyleDecl() {
+CSSMutableStyleDeclarationImpl* HTMLElementImpl::getInlineStyleDecl() {
   if (!m_inlineStyleDecl)
     createInlineStyleDecl();
   return m_inlineStyleDecl;
 }
 
-CSSStyleDeclarationImpl* HTMLElementImpl::additionalAttributeStyleDecl() {
+CSSMutableStyleDeclarationImpl*
+HTMLElementImpl::additionalAttributeStyleDecl() {
   return 0;
 }
 
@@ -812,6 +813,7 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
   NodeImpl* nextNode;
   for (NodeImpl* node = fragment->firstChild(); node != NULL; node = nextNode) {
     nextNode = node->nextSibling();
+    node->ref();
     if (node->id() == ID_HTML || node->id() == ID_BODY) {
       NodeImpl* firstChild = node->firstChild();
       if (firstChild != NULL) {
@@ -826,11 +828,14 @@ DocumentFragmentImpl* HTMLElementImpl::createContextualFragment(
         child->deref();
       }
       fragment->removeChild(node, ignoredExceptionCode);
-      // FIXME: Does node leak here?
     } else if (node->id() == ID_HEAD) {
       fragment->removeChild(node, ignoredExceptionCode);
-      // FIXME: Does node leak here?
     }
+    // Important to do this deref after removeChild, because if the only thing
+    // keeping a node around is a parent that is non-0, removeChild will not
+    // delete the node. This works fine in JavaScript because there's always
+    // a ref of the node, but here in C++ we need to do it explicitly.
+    node->deref();
   }
 
   // Trick to get the fragment back to the floating state, with 0
@@ -851,8 +856,6 @@ bool HTMLElementImpl::setInnerHTML(const DOMString& html) {
   removeChildren();
   int ec = 0;
   appendChild(fragment, ec);
-  fragment->ref();
-  fragment->deref();
   return !ec;
 }
 
@@ -864,8 +867,6 @@ bool HTMLElementImpl::setOuterHTML(const DOMString& html) {
 
   int ec = 0;
   parentNode()->replaceChild(fragment, this, ec);
-  fragment->ref();
-  fragment->deref();
   return !ec;
 }
 

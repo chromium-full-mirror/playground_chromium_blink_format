@@ -5013,7 +5013,7 @@ CSSMutableStyleDeclarationImpl* KHTMLPart::typingStyle() const {
   return d->m_typingStyle;
 }
 
-void KHTMLPart::setTypingStyle(CSSStyleDeclarationImpl* style) {
+void KHTMLPart::setTypingStyle(CSSMutableStyleDeclarationImpl* style) {
   if (d->m_typingStyle == style)
     return;
 
@@ -5275,19 +5275,23 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style) {
       break;
     case Selection::CARET: {
       // Calculate the current typing style.
+      CSSMutableStyleDeclarationImpl* mutableStyle = style->makeMutable();
+      mutableStyle->ref();
       if (typingStyle()) {
-        typingStyle()->merge(style);
-        style = typingStyle();
+        typingStyle()->merge(mutableStyle);
+        mutableStyle->deref();
+        mutableStyle = typingStyle();
+        mutableStyle->ref();
       }
-      style->ref();
       CSSComputedStyleDeclarationImpl computedStyle(
           selection().start().upstream(StayInBlock).node());
-      computedStyle.diff(style);
+      computedStyle.diff(mutableStyle);
 
       // Handle block styles, substracting these from the typing style.
-      CSSStyleDeclarationImpl* blockStyle = style->copyBlockProperties();
+      CSSMutableStyleDeclarationImpl* blockStyle =
+          mutableStyle->copyBlockProperties();
       blockStyle->ref();
-      blockStyle->diff(style);
+      blockStyle->diff(mutableStyle);
       if (xmlDocImpl() && blockStyle->length() > 0) {
         EditCommandPtr cmd(new ApplyStyleCommand(xmlDocImpl(), blockStyle));
         cmd.apply();
@@ -5295,8 +5299,8 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style) {
       blockStyle->deref();
 
       // Set the remaining style as the typing style.
-      setTypingStyle(style);
-      style->deref();
+      setTypingStyle(mutableStyle);
+      mutableStyle->deref();
       break;
     }
     case Selection::RANGE:
@@ -5312,9 +5316,10 @@ static void updateState(CSSMutableStyleDeclarationImpl* desiredStyle,
                         CSSComputedStyleDeclarationImpl* computedStyle,
                         bool& atStart,
                         KHTMLPart::TriState& state) {
-  for (QPtrListIterator<CSSProperty> it(*desiredStyle->values()); it.current();
-       ++it) {
-    int propertyID = it.current()->id();
+  QValueListConstIterator<CSSProperty> end;
+  for (QValueListConstIterator<CSSProperty> it = desiredStyle->valuesIterator();
+       it != end; ++it) {
+    int propertyID = (*it).id();
     DOMString desiredProperty = desiredStyle->getPropertyValue(propertyID);
     DOMString computedProperty = computedStyle->getPropertyValue(propertyID);
     KHTMLPart::TriState propertyState =
@@ -5336,7 +5341,7 @@ KHTMLPart::TriState KHTMLPart::selectionHasStyle(
   bool atStart = true;
   TriState state = falseTriState;
 
-  CSSMutableStyleDeclarationImpl* mutableStyle = style;
+  CSSMutableStyleDeclarationImpl* mutableStyle = style->makeMutable();
   CSSStyleDeclaration protectQueryStyle(mutableStyle);
 
   if (!d->m_selection.isRange()) {
@@ -5380,16 +5385,17 @@ bool KHTMLPart::selectionStartHasStyle(CSSStyleDeclarationImpl* style) const {
   if (!selectionStyle)
     return false;
 
-  CSSMutableStyleDeclarationImpl* mutableStyle = style;
+  CSSMutableStyleDeclarationImpl* mutableStyle = style->makeMutable();
 
   CSSStyleDeclaration protectSelectionStyle(selectionStyle);
   CSSStyleDeclaration protectQueryStyle(mutableStyle);
 
   bool match = true;
-  for (QPtrListIterator<CSSProperty> it(*mutableStyle->values()); it.current();
-       ++it) {
-    int propertyID = it.current()->id();
-    DOMString desiredProperty = style->getPropertyValue(propertyID);
+  QValueListConstIterator<CSSProperty> end;
+  for (QValueListConstIterator<CSSProperty> it = mutableStyle->valuesIterator();
+       it != end; ++it) {
+    int propertyID = (*it).id();
+    DOMString desiredProperty = mutableStyle->getPropertyValue(propertyID);
     DOMString selectionProperty = selectionStyle->getPropertyValue(propertyID);
     if (strcasecmp(selectionProperty, desiredProperty) != 0) {
       match = false;
@@ -5469,16 +5475,15 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   return new CSSComputedStyleDeclarationImpl(styleElement);
 }
 
-static CSSStyleDeclarationImpl* editingStyle() {
-  static CSSStyleDeclarationImpl* editingStyle = 0;
+static CSSMutableStyleDeclarationImpl* editingStyle() {
+  static CSSMutableStyleDeclarationImpl* editingStyle = 0;
   if (!editingStyle) {
-    QPtrList<CSSProperty>* propList = new QPtrList<CSSProperty>;
-    propList->setAutoDelete(true);
-    editingStyle = new CSSStyleDeclarationImpl(0, propList);
-    delete propList;
+    editingStyle = new CSSMutableStyleDeclarationImpl;
+    int exceptionCode;
     editingStyle->setCssText(
         "word-wrap: break-word; -khtml-nbsp-mode: space; -khtml-line-break: "
-        "after-white-space;");
+        "after-white-space;",
+        exceptionCode);
   }
   return editingStyle;
 }
@@ -5519,9 +5524,9 @@ void KHTMLPart::applyEditingStyleToElement(ElementImpl* element) const {
   if (!renderer || !renderer->isBlockFlow())
     return;
 
-  CSSStyleDeclarationImpl* currentStyle =
+  CSSMutableStyleDeclarationImpl* currentStyle =
       static_cast<HTMLElementImpl*>(element)->getInlineStyleDecl();
-  CSSStyleDeclarationImpl* mergeStyle = editingStyle();
+  CSSMutableStyleDeclarationImpl* mergeStyle = editingStyle();
   if (mergeStyle) {
     currentStyle->merge(mergeStyle);
     element->setAttribute(ATTR_STYLE, currentStyle->cssText());
@@ -5536,12 +5541,17 @@ void KHTMLPart::removeEditingStyleFromElement(ElementImpl* element) const {
   if (!renderer || !renderer->isBlockFlow())
     return;
 
-  CSSStyleDeclarationImpl* currentStyle =
+  CSSMutableStyleDeclarationImpl* currentStyle =
       static_cast<HTMLElementImpl*>(element)->getInlineStyleDecl();
-  currentStyle->removeProperty(CSS_PROP_WORD_WRAP, false);
-  currentStyle->removeProperty(CSS_PROP__KHTML_NBSP_MODE, false);
-  currentStyle->removeProperty(CSS_PROP__KHTML_LINE_BREAK, false);
-  currentStyle->setChanged();
+  bool changed = false;
+  changed |= !currentStyle->removeProperty(CSS_PROP_WORD_WRAP, false).isNull();
+  changed |=
+      !currentStyle->removeProperty(CSS_PROP__KHTML_NBSP_MODE, false).isNull();
+  changed |=
+      !currentStyle->removeProperty(CSS_PROP__KHTML_LINE_BREAK, false).isNull();
+  if (changed)
+    currentStyle->setChanged();
+
   element->setAttribute(ATTR_STYLE, currentStyle->cssText());
 }
 

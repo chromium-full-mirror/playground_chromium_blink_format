@@ -129,7 +129,7 @@ namespace {
 bool execStyleChange(KHTMLPart* part,
                      int propertyID,
                      const DOMString& propertyValue) {
-  CSSStyleDeclarationImpl* style = new CSSStyleDeclarationImpl(0);
+  CSSMutableStyleDeclarationImpl* style = new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, propertyValue);
   style->ref();
   part->applyStyle(style);
@@ -146,7 +146,7 @@ bool execStyleChange(KHTMLPart* part,
 KHTMLPart::TriState stateStyle(KHTMLPart* part,
                                int propertyID,
                                const char* desiredValue) {
-  CSSStyleDeclarationImpl* style = new CSSStyleDeclarationImpl(0);
+  CSSMutableStyleDeclarationImpl* style = new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, desiredValue);
   style->ref();
   KHTMLPart::TriState state = part->selectionHasStyle(style);
@@ -157,7 +157,7 @@ KHTMLPart::TriState stateStyle(KHTMLPart* part,
 bool selectionStartHasStyle(KHTMLPart* part,
                             int propertyID,
                             const char* desiredValue) {
-  CSSStyleDeclarationImpl* style = new CSSStyleDeclarationImpl(0);
+  CSSMutableStyleDeclarationImpl* style = new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, desiredValue);
   style->ref();
   bool hasStyle = part->selectionStartHasStyle(style);

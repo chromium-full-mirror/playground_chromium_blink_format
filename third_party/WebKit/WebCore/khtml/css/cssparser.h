@@ -37,7 +37,7 @@ class NodeImpl;
 class CSSValueImpl;
 class CSSValueListImpl;
 class CSSPrimitiveValueImpl;
-typedef class CSSStyleDeclarationImpl CSSMutableStyleDeclarationImpl;
+class CSSMutableStyleDeclarationImpl;
 class CSSProperty;
 class CSSRuleListImpl;
 
