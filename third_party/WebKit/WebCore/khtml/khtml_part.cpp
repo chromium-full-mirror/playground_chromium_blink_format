@@ -2378,6 +2378,8 @@ QString KHTMLPart::text(const DOM::Range& r) const {
       next = n.nextSibling();
     while (next.isNull() && !n.parentNode().isNull()) {
       n = n.parentNode();
+      if (n == endNode)
+        break;
       next = n.nextSibling();
       unsigned short id = n.elementId();
       switch (id) {
