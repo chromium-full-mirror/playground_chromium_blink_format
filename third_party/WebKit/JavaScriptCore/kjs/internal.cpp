@@ -488,7 +488,6 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
     s_hook = next = prev = this;
     globalInit();
   }
-  unlockInterpreter();
 
   global = glob;
   globExec = new ExecState(m_interpreter, 0);
@@ -499,6 +498,7 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
   initGlobalObject();
 
   recursion = 0;
+  unlockInterpreter();
 }
 
 void InterpreterImp::lock() {
