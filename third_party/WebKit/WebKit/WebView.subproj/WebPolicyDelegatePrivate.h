@@ -1,9 +1,9 @@
 /*
-        WebControllerPolicyDelegatePrivate.h
+        WebPolicyDelegatePrivate.h
         Copyright 2002, Apple, Inc. All rights reserved.
 */
 
-#import <WebKit/WebControllerPolicyDelegate.h>
+#import <WebKit/WebPolicyDelegate.h>
 #import <WebKit/WebFormDelegate.h>
 
 typedef enum {
