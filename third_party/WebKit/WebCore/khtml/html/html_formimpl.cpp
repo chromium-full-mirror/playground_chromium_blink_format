@@ -2593,7 +2593,7 @@ void HTMLTextAreaElementImpl::attach() {
 bool HTMLTextAreaElementImpl::encoding(const QTextCodec* codec,
                                        encodingList& encoding,
                                        bool) {
-  if (name().isEmpty() || !m_render)
+  if (name().isEmpty())
     return false;
 
   encoding += fixUpfromUnicode(codec, name().string());
@@ -2610,6 +2610,8 @@ DOMString HTMLTextAreaElementImpl::value() {
   if (m_dirtyvalue) {
     if (m_render)
       m_value = static_cast<RenderTextArea*>(m_render)->text();
+    else
+      m_value = defaultValue().string();
     m_dirtyvalue = false;
   }
 
