@@ -1469,11 +1469,9 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
     case SUBMIT:
 
       if (m_activeSubmit) {
-        QString enc_str =
-            m_value.isNull()
-                ? static_cast<RenderSubmitButton*>(m_render)->defaultLabel()
-                : value().string();
-
+        QString enc_str = value().string();
+        if (enc_str.isEmpty())
+          enc_str = static_cast<RenderSubmitButton*>(m_render)->defaultLabel();
         if (!enc_str.isEmpty()) {
           encoding += fixUpfromUnicode(codec, enc_str);
           return true;
@@ -1545,7 +1543,7 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
       break;
     }
     case ISINDEX:
-      encoding += fixUpfromUnicode(codec, m_value.string());
+      encoding += fixUpfromUnicode(codec, value().string());
       return true;
   }
   return false;
