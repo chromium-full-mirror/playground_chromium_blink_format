@@ -13,7 +13,7 @@
 - (float)webViewFooterHeight:(WebView*)sender;
 - (void)webView:(WebView*)sender drawHeaderInRect:(NSRect)rect;
 - (void)webView:(WebView*)sender drawFooterInRect:(NSRect)rect;
-
+- (void)webView:(WebView*)webView addMessageToConsole:(NSDictionary*)message;
 - (BOOL)webView:(WebView*)webView
     shouldBeginDragForElement:(NSDictionary*)element
                    pasteboard:(NSPasteboard*)pasteboard

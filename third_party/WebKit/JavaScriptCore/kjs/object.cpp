@@ -466,7 +466,6 @@ Object Error::create(ExecState* exec,
                      int lineno,
                      int sourceId) {
   Object cons;
-
   switch (errtype) {
     case EvalError:
       cons = exec->lexicalInterpreter()->builtinEvalError();

@@ -427,6 +427,7 @@ typedef enum {
 - (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
                                   defaultText:(NSString*)defaultText
                                 returningText:(NSString**)result;
+- (void)addMessageToConsole:(NSDictionary*)message;
 
 - (id<WebCoreResourceHandle>)startLoadingResource:
                                  (id<WebCoreResourceLoader>)loader

@@ -430,7 +430,7 @@ ProgramNode* Parser::parse(const UChar* code,
     if (errLine)
       *errLine = eline;
     if (errMsg)
-      *errMsg = "Parse error at line " + UString::from(eline);
+      *errMsg = "Parse error";
     if (prog) {
       // must ref and deref to clean up properly
       prog->ref();

@@ -124,7 +124,6 @@ QVariant KJSProxyImpl::evaluate(QString filename,
   Completion comp = m_script->evaluate(code, thisNode, filename);
   bool success =
       (comp.complType() == Normal) || (comp.complType() == ReturnValue);
-
 #ifdef KJS_DEBUGGER
 //    KJSDebugWin::instance()->setCode(QString::null);
 #endif
@@ -136,8 +135,16 @@ QVariant KJSProxyImpl::evaluate(QString filename,
     if (comp.complType() == Throw) {
       KJS::Interpreter::lock();
       UString msg = comp.value().toString(m_script->globalExec());
+      int lineNumber = comp.value()
+                           .toObject(m_script->globalExec())
+                           .get(m_script->globalExec(), "line")
+                           .toInt32(m_script->globalExec());
       KJS::Interpreter::unlock();
+#if APPLE_CHANGES
+      KWQ(m_part)->addMessageToConsole(msg.qstring(), lineNumber);
+#else
       kdWarning(6070) << "Script threw exception: " << msg.qstring() << endl;
+#endif
     }
     return QVariant();
   }
