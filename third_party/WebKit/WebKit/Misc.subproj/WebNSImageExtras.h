@@ -14,4 +14,8 @@
 
 - (void)_web_dissolveToFraction:(float)delta;
 
+// Debug method. Saves an image and opens it in the preferred TIFF viewing
+// application.
+- (void)_web_saveAndOpen;
+
 @end
