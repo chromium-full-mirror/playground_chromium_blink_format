@@ -676,13 +676,13 @@ void RenderLayer::updateScrollInfoAfterLayout() {
     setHasHorizontalScrollbar(needHorizontalBar);
     setHasVerticalScrollbar(needVerticalBar);
 
-    m_object->repaint();
-
 #if APPLE_CHANGES
     // Force an update since we know the scrollbars have changed things.
     if (m_object->document()->hasDashboardRegions())
-      KWQ(m_object->document()->part())->dashboardRegionsChanged();
+      m_object->document()->setDashboardRegionsDirty(true);
 #endif
+
+    m_object->repaint();
 
     if (m_object->style()->overflow() == OAUTO) {
       // Our proprietary overflow: overlay value doesn't trigger a layout.
@@ -691,6 +691,7 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         static_cast<RenderBlock*>(m_object)->layoutBlock(true);
       else
         m_object->layout();
+
       return;
     }
   }
@@ -728,6 +729,12 @@ void RenderLayer::updateScrollInfoAfterLayout() {
         verticalScrollbarWidth(),
         m_object->height() - m_object->borderTop() - m_object->borderBottom()));
   }
+
+#if APPLE_CHANGES
+  // Force an update since we know the scrollbars have changed things.
+  if (m_object->document()->hasDashboardRegions())
+    m_object->document()->setDashboardRegionsDirty(true);
+#endif
 
   m_object->repaint();
 }
