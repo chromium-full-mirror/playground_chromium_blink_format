@@ -38,7 +38,7 @@ struct _F_wincond {
 @interface NSMonitor : NSObject<NSLocking> {
   F_STRUCT_MUTEX_T mutex;
   F_STRUCT_COND_T cond;
-  unsigned int value;
+  int value;
 }
 
 - (id)init;
