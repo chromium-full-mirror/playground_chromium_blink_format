@@ -27,6 +27,7 @@
 
 #if APPLE_CHANGES
 #include "KWQAssertions.h"
+#include "KWQLogging.h"
 #endif
 
 #include "khtmlview.h"
@@ -40,7 +41,6 @@
 #include "xml/dom_textimpl.h"
 
 using DOM::DocumentImpl;
-using DOM::DOMException;
 using DOM::DOMPosition;
 using DOM::DOMString;
 using DOM::ElementImpl;
@@ -61,21 +61,20 @@ using khtml::InsertTextStep;
 using khtml::JoinTextNodesStep;
 using khtml::ModifyTextNodeStep;
 using khtml::RemoveNodeStep;
-using khtml::SetSelectionStep;
+using khtml::MoveSelectionToStep;
 using khtml::SplitTextNodeStep;
 
 using khtml::DeleteTextCommand;
 using khtml::EditCommand;
 using khtml::InputTextCommand;
 
-#define APPLY_STEP(s)        \
-  do {                       \
-    int result = s->apply(); \
-    if (result) {            \
-      return result;         \
-    }                        \
-    m_steps.append(s);       \
-  } while (0)
+#if !APPLE_CHANGES
+#define ASSERT(assertion) ((void)0)
+#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs...) ((void)0)
+#define ASSERT_NOT_REACHED() ((void)0)
+#define LOG(channel, formatAndArgs...) ((void)0)
+#define ERROR(formatAndArgs...) ((void)0)
+#endif
 
 //------------------------------------------------------------------------------------------
 
@@ -86,38 +85,52 @@ using khtml::InputTextCommand;
 
 EditStep::EditStep(DocumentImpl* document)
     : m_document(document), m_state(NOT_APPLIED) {
-  assert(m_document);
-  assert(m_document->part());
+  ASSERT(m_document);
+  ASSERT(m_document->part());
   m_document->ref();
   m_startingSelection = m_document->part()->selection();
   m_endingSelection = m_startingSelection;
 }
 
 EditStep::~EditStep() {
-  assert(m_document);
+  ASSERT(m_document);
   m_document->deref();
 }
 
-int EditStep::apply() {
-  assert(m_document);
-  assert(m_document->part());
+void EditStep::reapply() {
+  apply();
+}
+
+inline void EditStep::beginApply() {
+  ASSERT(state() == NOT_APPLIED);
+}
+
+inline void EditStep::endApply() {
+  ASSERT(m_document);
+  ASSERT(m_document->part());
 
   m_state = APPLIED;
   m_document->part()->setSelection(m_endingSelection);
-  return EditResultOK;
 }
 
-int EditStep::unapply() {
-  assert(m_document);
-  assert(m_document->part());
+inline void EditStep::beginUnapply() {
+  ASSERT(state() == APPLIED);
+}
+
+inline void EditStep::endUnapply() {
+  ASSERT(m_document);
+  ASSERT(m_document->part());
 
   m_state = NOT_APPLIED;
   m_document->part()->setSelection(m_startingSelection);
-  return EditResultOK;
 }
 
-int EditStep::reapply() {
-  return apply();
+inline void EditStep::beginReapply() {
+  beginApply();
+}
+
+inline void EditStep::endReapply() {
+  endApply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -130,28 +143,97 @@ CompositeEditStep::CompositeEditStep(DocumentImpl* document)
 
 CompositeEditStep::~CompositeEditStep() {}
 
-int CompositeEditStep::unapply() {
+void CompositeEditStep::unapply() {
+  if (m_steps.count() == 0) {
+    ERROR("Unapplying composite step containing zero steps");
+  }
   QPtrListIterator<EditStep> it(m_steps);
   for (it.toLast(); it.current(); --it) {
-    int result = it.current()->unapply();
-    if (result != EditResultOK)
-      return result;
+    it.current()->unapply();
   }
-
-  return EditStep::unapply();
 }
 
-int CompositeEditStep::reapply() {
+void CompositeEditStep::reapply() {
+  if (m_steps.count() == 0) {
+    ERROR("Reapplying composite step containing zero steps");
+  }
   QPtrListIterator<EditStep> it(m_steps);
   for (; it.current(); ++it) {
-    int result = it.current()->reapply();
-    if (result != EditResultOK)
-      return result;
+    it.current()->reapply();
   }
+}
 
-  // Calls apply() and not reapply(), given that the default implementation of
-  // EditStep::reapply() calls apply(), which dispatches virtually.
-  return EditStep::apply();
+//
+// sugary-sweet convenience functions to help create and apply edit steps
+//
+void CompositeEditStep::applyStep(EditStep* step) {
+  step->apply();
+  m_steps.append(step);
+}
+
+void CompositeEditStep::insertNodeBefore(DOM::NodeImpl* insertChild,
+                                         DOM::NodeImpl* refChild) {
+  applyStep(new InsertNodeBeforeStep(document(), insertChild, refChild));
+}
+
+void CompositeEditStep::insertNodeAfter(DOM::NodeImpl* insertChild,
+                                        DOM::NodeImpl* refChild) {
+  if (refChild->parentNode()->lastChild() == refChild) {
+    appendNode(refChild->parentNode(), insertChild);
+  } else {
+    ASSERT(refChild->nextSibling());
+    insertNodeBefore(insertChild, refChild->nextSibling());
+  }
+}
+
+void CompositeEditStep::appendNode(DOM::NodeImpl* parent,
+                                   DOM::NodeImpl* appendChild) {
+  applyStep(new AppendNodeStep(document(), parent, appendChild));
+}
+
+void CompositeEditStep::removeNode(DOM::NodeImpl* removeChild) {
+  applyStep(new RemoveNodeStep(document(), removeChild));
+}
+
+void CompositeEditStep::splitTextNode(DOM::TextImpl* text, long offset) {
+  applyStep(new SplitTextNodeStep(document(), text, offset));
+}
+
+void CompositeEditStep::joinTextNodes(DOM::TextImpl* text1,
+                                      DOM::TextImpl* text2) {
+  applyStep(new JoinTextNodesStep(document(), text1, text2));
+}
+
+void CompositeEditStep::insertText(DOM::TextImpl* node,
+                                   long offset,
+                                   const DOM::DOMString& text) {
+  applyStep(new InsertTextStep(document(), node, offset, text));
+}
+
+void CompositeEditStep::deleteText(DOM::TextImpl* node,
+                                   long offset,
+                                   long count) {
+  applyStep(new DeleteTextStep(document(), node, offset, count));
+}
+
+void CompositeEditStep::moveSelectionTo(const KHTMLSelection& selection) {
+  applyStep(new MoveSelectionToStep(document(), selection));
+}
+
+void CompositeEditStep::moveSelectionTo(DOM::NodeImpl* node, long offset) {
+  applyStep(new MoveSelectionToStep(document(), node, offset));
+}
+
+void CompositeEditStep::moveSelectionTo(const DOM::DOMPosition& pos) {
+  applyStep(new MoveSelectionToStep(document(), pos));
+}
+
+void CompositeEditStep::deleteSelection() {
+  applyStep(new DeleteSelectionStep(document()));
+}
+
+void CompositeEditStep::deleteSelection(const KHTMLSelection& selection) {
+  applyStep(new DeleteSelectionStep(document(), selection));
 }
 
 //------------------------------------------------------------------------------------------
@@ -161,10 +243,10 @@ InsertNodeBeforeStep::InsertNodeBeforeStep(DocumentImpl* document,
                                            NodeImpl* insertChild,
                                            NodeImpl* refChild)
     : EditStep(document), m_insertChild(insertChild), m_refChild(refChild) {
-  assert(m_insertChild);
+  ASSERT(m_insertChild);
   m_insertChild->ref();
 
-  assert(m_refChild);
+  ASSERT(m_refChild);
   m_refChild->ref();
 }
 
@@ -175,32 +257,32 @@ InsertNodeBeforeStep::~InsertNodeBeforeStep() {
     m_refChild->deref();
 }
 
-int InsertNodeBeforeStep::apply() {
-  assert(m_insertChild);
-  assert(m_refChild);
-  assert(m_refChild->parent());
-  assert(state() == NOT_APPLIED);
+void InsertNodeBeforeStep::apply() {
+  beginApply();
+
+  ASSERT(m_insertChild);
+  ASSERT(m_refChild);
+  ASSERT(m_refChild->parent());
 
   int exceptionCode;
   m_refChild->parent()->insertBefore(m_insertChild, m_refChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::apply();
+  endApply();
 }
 
-int InsertNodeBeforeStep::unapply() {
-  assert(m_insertChild);
-  assert(m_refChild);
-  assert(m_refChild->parent());
-  assert(state() == APPLIED);
+void InsertNodeBeforeStep::unapply() {
+  beginUnapply();
+
+  ASSERT(m_insertChild);
+  ASSERT(m_refChild);
+  ASSERT(m_refChild->parent());
 
   int exceptionCode;
   m_refChild->parent()->removeChild(m_insertChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::unapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -210,10 +292,10 @@ AppendNodeStep::AppendNodeStep(DocumentImpl* document,
                                NodeImpl* parent,
                                NodeImpl* appendChild)
     : EditStep(document), m_parent(parent), m_appendChild(appendChild) {
-  assert(m_parent);
+  ASSERT(m_parent);
   m_parent->ref();
 
-  assert(m_appendChild);
+  ASSERT(m_appendChild);
   m_appendChild->ref();
 }
 
@@ -224,30 +306,31 @@ AppendNodeStep::~AppendNodeStep() {
     m_appendChild->deref();
 }
 
-int AppendNodeStep::apply() {
-  assert(m_parent);
-  assert(m_appendChild);
-  assert(state() == NOT_APPLIED);
+void AppendNodeStep::apply() {
+  beginApply();
+
+  ASSERT(m_parent);
+  ASSERT(m_appendChild);
 
   int exceptionCode;
   m_parent->appendChild(m_appendChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::apply();
+  endApply();
 }
 
-int AppendNodeStep::unapply() {
-  assert(m_parent);
-  assert(m_appendChild);
-  assert(state() == APPLIED);
+void AppendNodeStep::unapply() {
+  beginUnapply();
+
+  ASSERT(m_parent);
+  ASSERT(m_appendChild);
+  ASSERT(state() == APPLIED);
 
   int exceptionCode;
   m_parent->removeChild(m_appendChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::unapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -258,11 +341,11 @@ RemoveNodeStep::RemoveNodeStep(DocumentImpl* document, NodeImpl* removeChild)
       m_parent(0),
       m_removeChild(removeChild),
       m_refChild(0) {
-  assert(m_removeChild);
+  ASSERT(m_removeChild);
   m_removeChild->ref();
 
   m_parent = m_removeChild->parentNode();
-  assert(m_parent);
+  ASSERT(m_parent);
   m_parent->ref();
 
   NodeListImpl* children = m_parent->childNodes();
@@ -286,33 +369,33 @@ RemoveNodeStep::~RemoveNodeStep() {
     m_refChild->deref();
 }
 
-int RemoveNodeStep::apply() {
-  assert(m_parent);
-  assert(m_removeChild);
-  assert(state() == NOT_APPLIED);
+void RemoveNodeStep::apply() {
+  beginApply();
+
+  ASSERT(m_parent);
+  ASSERT(m_removeChild);
 
   int exceptionCode;
   m_parent->removeChild(m_removeChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::apply();
+  endApply();
 }
 
-int RemoveNodeStep::unapply() {
-  assert(m_parent);
-  assert(m_removeChild);
-  assert(state() == APPLIED);
+void RemoveNodeStep::unapply() {
+  beginUnapply();
+
+  ASSERT(m_parent);
+  ASSERT(m_removeChild);
 
   int exceptionCode;
   if (m_refChild)
     m_parent->insertBefore(m_removeChild, m_refChild, exceptionCode);
   else
     m_parent->appendChild(m_removeChild, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::unapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -322,9 +405,9 @@ ModifyTextNodeStep::ModifyTextNodeStep(DocumentImpl* document,
                                        TextImpl* text,
                                        long offset)
     : EditStep(document), m_text1(0), m_text2(text), m_offset(offset) {
-  assert(m_text2);
-  assert(m_text2->length() > 0);
-  assert(m_offset >= 0);
+  ASSERT(m_text2);
+  ASSERT(m_text2->length() > 0);
+  ASSERT(m_offset >= 0);
 
   m_text2->ref();
 }
@@ -333,11 +416,11 @@ ModifyTextNodeStep::ModifyTextNodeStep(DocumentImpl* document,
                                        TextImpl* text1,
                                        TextImpl* text2)
     : EditStep(document), m_text1(text1), m_text2(text2), m_offset(0) {
-  assert(m_text1);
-  assert(m_text2);
-  assert(m_text1->nextSibling() == m_text2);
-  assert(m_text1->length() > 0);
-  assert(m_text2->length() > 0);
+  ASSERT(m_text1);
+  ASSERT(m_text2);
+  ASSERT(m_text1->nextSibling() == m_text2);
+  ASSERT(m_text1->length() > 0);
+  ASSERT(m_text2->length() > 0);
 
   m_text1->ref();
   m_text2->ref();
@@ -350,64 +433,49 @@ ModifyTextNodeStep::~ModifyTextNodeStep() {
     m_text1->deref();
 }
 
-int ModifyTextNodeStep::splitTextNode() {
-  assert(m_text2);
-  assert(m_text1 == 0);
-  assert(m_offset > 0);
-  assert(state() == splitState());
+void ModifyTextNodeStep::splitTextNode() {
+  ASSERT(m_text2);
+  ASSERT(m_text1 == 0);
+  ASSERT(m_offset > 0);
+  ASSERT(state() == splitState());
 
-  RenderObject* textRenderer = m_text2->renderer();
-  if (!textRenderer)
-    return EditResultFailed;
-
-  if (m_offset <= textRenderer->caretMinOffset() ||
-      m_offset >= textRenderer->caretMaxOffset())
-    return EditResultNoActionTaken;
+  ASSERT(m_offset >= m_text2->caretMinOffset() &&
+         m_offset <= m_text2->caretMaxOffset());
 
   int exceptionCode;
   TextImpl* m_text1 = document()->createTextNode(
       m_text2->substringData(0, m_offset, exceptionCode));
-  if (exceptionCode)
-    return exceptionCode;
-  assert(m_text1);
+  ASSERT(exceptionCode == 0);
+  ASSERT(m_text1);
   m_text1->ref();
 
   m_text2->deleteData(0, m_offset, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
   m_text2->parentNode()->insertBefore(m_text1, m_text2, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  assert(m_text2->previousSibling()->isTextNode());
+  ASSERT(m_text2->previousSibling()->isTextNode());
   m_text1 = static_cast<TextImpl*>(m_text2->previousSibling());
-
-  return EditResultOK;
 }
 
-int ModifyTextNodeStep::joinTextNodes() {
-  assert(m_text1);
-  assert(m_text2);
-  assert(state() == joinState());
+void ModifyTextNodeStep::joinTextNodes() {
+  ASSERT(m_text1);
+  ASSERT(m_text2);
+  ASSERT(state() == joinState());
 
-  if (m_text1->nextSibling() != m_text2)
-    return EditResultFailed;
+  ASSERT(m_text1->nextSibling() == m_text2);
 
   int exceptionCode;
   m_text2->insertData(0, m_text1->data(), exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
   m_text2->parent()->removeChild(m_text2, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
   m_offset = m_text1->length();
   m_text1->deref();
   m_text1 = 0;
-
-  return EditResultOK;
 }
 
 //------------------------------------------------------------------------------------------
@@ -420,22 +488,16 @@ SplitTextNodeStep::SplitTextNodeStep(DocumentImpl* document,
 
 SplitTextNodeStep::~SplitTextNodeStep() {}
 
-int SplitTextNodeStep::apply() {
-  int result = splitTextNode();
-  if (result != EditResultOK)
-    return result;
-  else
-    return EditStep::apply();  // skips unimplemented
-                               // ModifyTextNodeStep::apply()
+void SplitTextNodeStep::apply() {
+  beginApply();
+  splitTextNode();
+  endApply();
 }
 
-int SplitTextNodeStep::unapply() {
-  int result = joinTextNodes();
-  if (result != EditResultOK)
-    return result;
-  else
-    return EditStep::unapply();  // skips unimplemented
-                                 // ModifyTextNodeStep::unapply()
+void SplitTextNodeStep::unapply() {
+  beginUnapply();
+  joinTextNodes();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -448,22 +510,16 @@ JoinTextNodesStep::JoinTextNodesStep(DocumentImpl* document,
 
 JoinTextNodesStep::~JoinTextNodesStep() {}
 
-int JoinTextNodesStep::apply() {
-  int result = joinTextNodes();
-  if (result != EditResultOK)
-    return result;
-  else
-    return EditStep::apply();  // skips unimplemented
-                               // ModifyTextNodeStep::apply()
+void JoinTextNodesStep::apply() {
+  beginApply();
+  joinTextNodes();
+  endApply();
 }
 
-int JoinTextNodesStep::unapply() {
-  int result = splitTextNode();
-  if (result != EditResultOK)
-    return result;
-  else
-    return EditStep::unapply();  // skips unimplemented
-                                 // ModifyTextNodeStep::unapply()
+void JoinTextNodesStep::unapply() {
+  beginUnapply();
+  splitTextNode();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -474,9 +530,9 @@ InsertTextStep::InsertTextStep(DocumentImpl* document,
                                long offset,
                                const DOMString& text)
     : EditStep(document), m_node(node), m_offset(offset) {
-  assert(m_node);
-  assert(m_offset >= 0);
-  assert(text.length() > 0);
+  ASSERT(m_node);
+  ASSERT(m_offset >= 0);
+  ASSERT(text.length() > 0);
 
   m_node->ref();
   m_text = text.copy();  // make a copy to ensure that the string never changes
@@ -487,30 +543,30 @@ InsertTextStep::~InsertTextStep() {
     m_node->deref();
 }
 
-int InsertTextStep::apply() {
-  assert(m_node);
-  assert(!m_text.isEmpty());
-  assert(state() == NOT_APPLIED);
+void InsertTextStep::apply() {
+  beginApply();
+
+  ASSERT(m_node);
+  ASSERT(!m_text.isEmpty());
 
   int exceptionCode;
   m_node->insertData(m_offset, m_text, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::apply();
+  endApply();
 }
 
-int InsertTextStep::unapply() {
-  assert(m_node);
-  assert(!m_text.isEmpty());
-  assert(state() == APPLIED);
+void InsertTextStep::unapply() {
+  beginUnapply();
+
+  ASSERT(m_node);
+  ASSERT(!m_text.isEmpty());
 
   int exceptionCode;
   m_node->deleteData(m_offset, m_text.length(), exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::unapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -521,9 +577,9 @@ DeleteTextStep::DeleteTextStep(DocumentImpl* document,
                                long offset,
                                long count)
     : EditStep(document), m_node(node), m_offset(offset), m_count(count) {
-  assert(m_node);
-  assert(m_offset >= 0);
-  assert(m_count >= 0);
+  ASSERT(m_node);
+  ASSERT(m_offset >= 0);
+  ASSERT(m_count >= 0);
 
   m_node->ref();
 }
@@ -533,67 +589,66 @@ DeleteTextStep::~DeleteTextStep() {
     m_node->deref();
 }
 
-int DeleteTextStep::apply() {
-  assert(m_node);
-  assert(state() == NOT_APPLIED);
+void DeleteTextStep::apply() {
+  beginApply();
+
+  ASSERT(m_node);
 
   int exceptionCode;
   m_text = m_node->substringData(m_offset, m_count, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
   m_node->deleteData(m_offset, m_count, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::apply();
+  endApply();
 }
 
-int DeleteTextStep::unapply() {
-  assert(m_node);
-  assert(!m_text.isEmpty());
-  assert(state() == APPLIED);
+void DeleteTextStep::unapply() {
+  beginUnapply();
+
+  ASSERT(m_node);
+  ASSERT(!m_text.isEmpty());
 
   int exceptionCode;
   m_node->insertData(m_offset, m_text, exceptionCode);
-  if (exceptionCode)
-    return exceptionCode;
+  ASSERT(exceptionCode == 0);
 
-  return EditStep::unapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
-// SetSelectionStep
+// MoveSelectionToStep
 
-SetSelectionStep::SetSelectionStep(DocumentImpl* document,
-                                   const KHTMLSelection& selection)
+MoveSelectionToStep::MoveSelectionToStep(DocumentImpl* document,
+                                         const KHTMLSelection& selection)
     : EditStep(document) {
   setEndingSelection(selection);
 }
 
-SetSelectionStep::SetSelectionStep(DocumentImpl* document,
-                                   DOM::NodeImpl* node,
-                                   long offset)
+MoveSelectionToStep::MoveSelectionToStep(DocumentImpl* document,
+                                         DOM::NodeImpl* node,
+                                         long offset)
     : EditStep(document) {
   KHTMLSelection selection(node, offset);
   setEndingSelection(selection);
 }
 
-SetSelectionStep::SetSelectionStep(DOM::DocumentImpl* document,
-                                   const DOM::DOMPosition& pos)
+MoveSelectionToStep::MoveSelectionToStep(DOM::DocumentImpl* document,
+                                         const DOM::DOMPosition& pos)
     : EditStep(document) {
   KHTMLSelection selection(pos);
   setEndingSelection(selection);
 }
 
-int SetSelectionStep::apply() {
-  assert(state() == NOT_APPLIED);
-  return EditStep::apply();
+void MoveSelectionToStep::apply() {
+  beginApply();
+  endApply();
 }
 
-int SetSelectionStep::unapply() {
-  assert(state() == APPLIED);
-  return EditStep::unapply();
+void MoveSelectionToStep::unapply() {
+  beginUnapply();
+  endUnapply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -610,11 +665,13 @@ DeleteSelectionStep::DeleteSelectionStep(DOM::DocumentImpl* document,
 
 DeleteSelectionStep::~DeleteSelectionStep() {}
 
-int DeleteSelectionStep::apply() {
-  assert(state() == NOT_APPLIED);
+void DeleteSelectionStep::apply() {
+  beginApply();
 
-  if (startingSelection().isEmpty())
-    return EditStep::apply();
+  if (startingSelection().isEmpty()) {
+    endApply();
+    return;
+  }
 
   KHTMLSelection selection = startingSelection();
 
@@ -680,25 +737,20 @@ int DeleteSelectionStep::apply() {
   //
   // Do the delete
   //
-  EditStep* step;
   NodeImpl* n = deleteStart.node()->nextLeafNode();
 
   // work on start node
   if (startIsCompletelySelected) {
-    step = new RemoveNodeStep(document(), deleteStart.node());
-    APPLY_STEP(step);
+    removeNode(deleteStart.node());
   } else if (deleteStart.node()->isTextNode()) {
     TextImpl* text = static_cast<TextImpl*>(deleteStart.node());
     int endOffset =
         text == deleteEnd.node() ? deleteEnd.offset() : text->length();
     if (endOffset > deleteStart.offset()) {
-      step = new DeleteTextStep(document(), text, deleteStart.offset(),
-                                endOffset - deleteStart.offset());
-      APPLY_STEP(step);
+      deleteText(text, deleteStart.offset(), endOffset - deleteStart.offset());
     }
   } else {
-    // never should reach this code
-    assert(0);
+    ASSERT_NOT_REACHED();
   }
 
   if (deleteStart.node() != deleteEnd.node()) {
@@ -706,24 +758,20 @@ int DeleteSelectionStep::apply() {
     while (n != deleteEnd.node()) {
       NodeImpl* d = n;
       n = n->nextLeafNode();
-      step = new RemoveNodeStep(document(), d);
-      APPLY_STEP(step);
+      removeNode(d);
     }
 
     // work on end node
-    assert(n == deleteEnd.node());
+    ASSERT(n == deleteEnd.node());
     if (endIsCompletelySelected) {
-      step = new RemoveNodeStep(document(), deleteEnd.node());
-      APPLY_STEP(step);
+      removeNode(deleteEnd.node());
     } else if (deleteEnd.node()->isTextNode()) {
       if (deleteEnd.offset() > 0) {
         TextImpl* text = static_cast<TextImpl*>(deleteEnd.node());
-        step = new DeleteTextStep(document(), text, 0, deleteEnd.offset());
-        APPLY_STEP(step);
+        deleteText(text, 0, deleteEnd.offset());
       }
     } else {
-      // never should reach this code
-      assert(0);
+      ASSERT_NOT_REACHED();
     }
   }
 
@@ -734,7 +782,7 @@ int DeleteSelectionStep::apply() {
   selection.moveToRenderedContent();
   setEndingSelection(selection);
 
-  return CompositeEditStep::apply();
+  endApply();
 }
 
 //------------------------------------------------------------------------------------------
@@ -746,48 +794,16 @@ int DeleteSelectionStep::apply() {
 
 static int cookieCounter = 0;
 
-EditCommand::EditCommand(DocumentImpl* document) : m_document(document) {
-  assert(m_document);
-  m_document->ref();
+EditCommand::EditCommand(DocumentImpl* document) : CompositeEditStep(document) {
   m_cookie = cookieCounter++;
-  m_steps.setAutoDelete(true);
 }
 
-EditCommand::~EditCommand() {
-  assert(m_document);
-  m_document->deref();
-}
+EditCommand::~EditCommand() {}
 
-const KHTMLSelection& EditCommand::selection() const {
-  assert(m_document);
-  assert(m_document->part());
-  return m_document->part()->selection();
-}
-
-int EditCommand::unapply() {
-  assert(m_steps.count() > 0);
-
-  QPtrListIterator<EditStep> it(m_steps);
-  for (it.toLast(); it.current(); --it) {
-    int result = it.current()->unapply();
-    if (result != EditResultOK)
-      return result;
-  }
-
-  return EditResultOK;
-}
-
-int EditCommand::reapply() {
-  assert(m_steps.count() > 0);
-
-  QPtrListIterator<EditStep> it(m_steps);
-  for (; it.current(); ++it) {
-    int result = it.current()->reapply();
-    if (result != EditResultOK)
-      return result;
-  }
-
-  return EditResultOK;
+const KHTMLSelection& EditCommand::currentSelection() const {
+  ASSERT(document());
+  ASSERT(document()->part());
+  return document()->part()->selection();
 }
 
 //------------------------------------------------------------------------------------------
@@ -814,21 +830,17 @@ bool InputTextCommand::isSpace() const {
   return m_text.length() == 1 && (m_text[0] == ' ');
 }
 
-int InputTextCommand::apply() {
-  KHTMLPart* part = document()->part();
-  assert(part);
+void InputTextCommand::apply() {
+  KHTMLSelection selection = startingSelection();
 
-  KHTMLSelection selection = part->selection();
   if (!selection.startNode()->isTextNode())
-    return EditResultFailed;
-
-  EditStep* step;
+    return;
 
   // Delete the current selection
   if (selection.state() == KHTMLSelection::RANGE) {
-    step = new DeleteSelectionStep(document());
-    APPLY_STEP(step);
+    deleteSelection();
   }
+  selection = currentSelection();
 
   TextImpl* textNode = static_cast<TextImpl*>(selection.startNode());
 
@@ -842,56 +854,29 @@ int InputTextCommand::apply() {
         selection.startOffset() == textNode->renderer()->caretMaxOffset();
     if (atStart) {
       // Set the cursor at the beginning of text node now following the new BR.
-      step = new InsertNodeBeforeStep(document(), breakNode, textNode);
-      APPLY_STEP(step);
-
-      step = new SetSelectionStep(document(), textNode, 0);
-      APPLY_STEP(step);
+      insertNodeBefore(breakNode, textNode);
+      moveSelectionTo(textNode, 0);
     } else if (atEnd) {
-      if (textNode->parentNode()->lastChild() == textNode) {
-        step =
-            new AppendNodeStep(document(), textNode->parentNode(), breakNode);
-        APPLY_STEP(step);
-      } else {
-        step = new InsertNodeBeforeStep(document(), breakNode,
-                                        textNode->nextSibling());
-        APPLY_STEP(step);
-      }
+      insertNodeAfter(breakNode, textNode);
       // Set the cursor at the beginning of the the BR.
-      step =
-          new SetSelectionStep(document(), selection.nextCharacterPosition());
-      APPLY_STEP(step);
+      moveSelectionTo(selection.nextCharacterPosition());
     } else {
       TextImpl* textBeforeNode = document()->createTextNode(
           textNode->substringData(0, selection.startOffset(), exceptionCode));
-      step =
-          new DeleteTextStep(document(), textNode, 0, selection.startOffset());
-      APPLY_STEP(step);
-
-      step = new InsertNodeBeforeStep(document(), textBeforeNode, textNode);
-      APPLY_STEP(step);
-
-      step = new InsertNodeBeforeStep(document(), breakNode, textNode);
-      APPLY_STEP(step);
-
+      deleteText(textNode, 0, selection.startOffset());
+      insertNodeBefore(textBeforeNode, textNode);
+      insertNodeBefore(breakNode, textNode);
       textBeforeNode->deref();
       // Set the cursor at the beginning of the node after the BR.
-      step = new SetSelectionStep(document(), textNode, 0);
-      APPLY_STEP(step);
+      moveSelectionTo(textNode, 0);
     }
 
     breakNode->deref();
   } else {
-    step = new InsertTextStep(document(), textNode, selection.startOffset(),
-                              text());
-    APPLY_STEP(step);
-
-    step = new SetSelectionStep(document(), selection.startNode(),
-                                selection.startOffset() + text().length());
-    APPLY_STEP(step);
+    insertText(textNode, selection.startOffset(), text());
+    moveSelectionTo(selection.startNode(),
+                    selection.startOffset() + text().length());
   }
-
-  return EditResultOK;
 }
 
 //------------------------------------------------------------------------------------------
@@ -900,43 +885,36 @@ int InputTextCommand::apply() {
 DeleteTextCommand::DeleteTextCommand(DocumentImpl* document)
     : EditCommand(document) {}
 
-int DeleteTextCommand::apply() {
+void DeleteTextCommand::apply() {
   KHTMLPart* part = document()->part();
-  assert(part);
+  ASSERT(part);
 
   KHTMLSelection selection = part->selection();
-  EditStep* step;
+  ASSERT(!selection.isEmpty());
 
   // Delete the current selection
   if (selection.state() == KHTMLSelection::RANGE) {
-    step = new DeleteSelectionStep(document());
-    APPLY_STEP(step);
-    return EditResultOK;
+    deleteSelection();
+    return;
   }
-
-  if (!selection.startNode())
-    return EditResultFailed;
 
   NodeImpl* caretNode = selection.startNode();
 
   if (caretNode->isTextNode()) {
-    int exceptionCode;
-
     // Check if we can delete character at cursor
     int offset = selection.startOffset() - 1;
-    if (offset >= 0) {
+    if (offset >= caretNode->caretMinOffset()) {
       TextImpl* textNode = static_cast<TextImpl*>(caretNode);
-      textNode->deleteData(offset, 1, exceptionCode);
-      selection.moveTo(textNode, offset);
-      return true;
+      deleteText(textNode, offset, 1);
+      moveSelectionTo(textNode, offset);
+      return;
     }
 
     // Check if previous sibling is a BR element
     NodeImpl* previousSibling = caretNode->previousSibling();
     if (previousSibling->renderer() && previousSibling->renderer()->isBR()) {
-      caretNode->parentNode()->removeChild(previousSibling, exceptionCode);
-      // EDIT FIXME: adjust selection position
-      return true;
+      removeNode(previousSibling);
+      return;
     }
 
     // Check if previous leaf node is a text node
@@ -944,11 +922,9 @@ int DeleteTextCommand::apply() {
     if (previousLeafNode->isTextNode()) {
       TextImpl* textNode = static_cast<TextImpl*>(previousLeafNode);
       offset = previousLeafNode->caretMaxOffset() - 1;
-      textNode->deleteData(offset, 1, exceptionCode);
-      selection.moveTo(textNode, offset);
-      return true;
+      deleteText(textNode, offset, 1);
+      moveSelectionTo(textNode, offset);
+      return;
     }
   }
-
-  return false;
 }
