@@ -329,7 +329,8 @@ enum FrameBorderStyle {
 - (void)reportClientRedirectToURL:(NSString*)URL
                             delay:(NSTimeInterval)seconds
                          fireDate:(NSDate*)date
-                      lockHistory:(BOOL)lockHistory;
+                      lockHistory:(BOOL)lockHistory
+           isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
 - (void)reportClientRedirectCancelled;
 
 - (void)focusWindow;

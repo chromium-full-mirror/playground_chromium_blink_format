@@ -394,6 +394,8 @@ class KHTMLPartPrivate {
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open
 
   bool m_bPendingChildRedirection;
+
+  bool m_executingJavaScriptFormAction;
 };
 
 #endif

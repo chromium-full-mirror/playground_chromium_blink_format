@@ -3304,7 +3304,9 @@ void KHTMLPart::submitForm(const char* action,
 
   if (urlstring.find(QString::fromLatin1("javascript:"), 0, false) == 0) {
     urlstring = KURL::decode_string(urlstring);
+    d->m_executingJavaScriptFormAction = true;
     executeScript(urlstring.right(urlstring.length() - 11));
+    d->m_executingJavaScriptFormAction = false;
     return;
   }
 
