@@ -111,8 +111,8 @@ typedef enum {
 - (NSDictionary*)_actionInformationForNavigationType:
                      (WebNavigationType)navigationType
                                                event:(NSEvent*)event;
-- (BOOL)_continueAfterClickPolicyForEvent:(NSEvent*)event
-                                  request:(WebResourceRequest*)request;
+- (BOOL)_continueAfterNavigationPolicyForRequest:(WebResourceRequest*)request
+                                           event:(NSEvent*)event;
 - (void)_goToItem:(WebHistoryItem*)item withLoadType:(WebFrameLoadType)type;
 - (void)_loadURL:(NSURL*)URL
            loadType:(WebFrameLoadType)loadType
