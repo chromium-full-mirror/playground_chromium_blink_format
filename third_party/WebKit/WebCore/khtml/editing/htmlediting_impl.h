@@ -242,9 +242,11 @@ class ApplyStyleCommandImpl : public CompositeEditCommandImpl {
 
 class DeleteSelectionCommandImpl : public CompositeEditCommandImpl {
  public:
-  DeleteSelectionCommandImpl(DOM::DocumentImpl* document);
   DeleteSelectionCommandImpl(DOM::DocumentImpl* document,
-                             const DOM::Selection& selection);
+                             bool smartDelete = false);
+  DeleteSelectionCommandImpl(DOM::DocumentImpl* document,
+                             const DOM::Selection& selection,
+                             bool smartDelete = false);
 
   virtual void doApply();
 
@@ -260,6 +262,7 @@ class DeleteSelectionCommandImpl : public CompositeEditCommandImpl {
 
   DOM::Selection m_selectionToDelete;
   bool m_hasSelectionToDelete;
+  bool m_smartDelete;
 };
 
 //------------------------------------------------------------------------------------------
@@ -396,7 +399,8 @@ class ReplaceSelectionCommandImpl : public CompositeEditCommandImpl {
  public:
   ReplaceSelectionCommandImpl(DOM::DocumentImpl* document,
                               DOM::DocumentFragmentImpl* fragment,
-                              bool selectReplacement = true);
+                              bool selectReplacement = true,
+                              bool smartReplace = false);
   virtual ~ReplaceSelectionCommandImpl();
 
   virtual void doApply();
@@ -404,6 +408,7 @@ class ReplaceSelectionCommandImpl : public CompositeEditCommandImpl {
  private:
   DOM::DocumentFragmentImpl* m_fragment;
   bool m_selectReplacement;
+  bool m_smartReplace;
 };
 
 //------------------------------------------------------------------------------------------

@@ -983,15 +983,20 @@ Position ApplyStyleCommandImpl::positionInsertionPoint(Position pos) {
 //------------------------------------------------------------------------------------------
 // DeleteSelectionCommandImpl
 
-DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(DocumentImpl* document)
-    : CompositeEditCommandImpl(document), m_hasSelectionToDelete(false) {}
+DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(DocumentImpl* document,
+                                                       bool smartDelete)
+    : CompositeEditCommandImpl(document),
+      m_hasSelectionToDelete(false),
+      m_smartDelete(smartDelete) {}
 
 DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(
     DocumentImpl* document,
-    const Selection& selection)
+    const Selection& selection,
+    bool smartDelete)
     : CompositeEditCommandImpl(document),
       m_selectionToDelete(selection),
-      m_hasSelectionToDelete(true) {}
+      m_hasSelectionToDelete(true),
+      m_smartDelete(smartDelete) {}
 
 CSSStyleDeclarationImpl* DeleteSelectionCommandImpl::computeTypingStyle(
     const Position& pos) const {
@@ -1114,6 +1119,18 @@ void DeleteSelectionCommandImpl::doApply() {
 
   if (!m_selectionToDelete.isRange())
     return;
+
+  if (m_smartDelete) {
+    if (!m_selectionToDelete.start().leadingWhitespacePosition().isNull()) {
+      m_selectionToDelete.modify(DOM::Selection::EXTEND, DOM::Selection::LEFT,
+                                 DOM::Selection::CHARACTER);
+    } else if (!m_selectionToDelete.end()
+                    .trailingWhitespacePosition()
+                    .isNull()) {
+      m_selectionToDelete.modify(DOM::Selection::EXTEND, DOM::Selection::RIGHT,
+                                 DOM::Selection::CHARACTER);
+    }
+  }
 
   Position upstreamStart(m_selectionToDelete.start().upstream(StayInBlock));
   Position downstreamStart(m_selectionToDelete.start().downstream(StayInBlock));
@@ -1874,10 +1891,12 @@ void JoinTextNodesCommandImpl::doUnapply() {
 ReplaceSelectionCommandImpl::ReplaceSelectionCommandImpl(
     DocumentImpl* document,
     DOM::DocumentFragmentImpl* fragment,
-    bool selectReplacement)
+    bool selectReplacement,
+    bool smartReplace)
     : CompositeEditCommandImpl(document),
       m_fragment(fragment),
-      m_selectReplacement(selectReplacement) {
+      m_selectReplacement(selectReplacement),
+      m_smartReplace(smartReplace) {
   ASSERT(m_fragment);
   m_fragment->ref();
 }
@@ -1907,15 +1926,32 @@ void ReplaceSelectionCommandImpl::doApply() {
   setTypingStyle(0);
 
   selection = endingSelection();
-  ASSERT(!selection.isNone());
+  ASSERT(selection.isCaret());
+
+  bool addLeadingSpace = false;
+  bool addTrailingSpace = false;
+  if (m_smartReplace) {
+    addLeadingSpace = selection.start().leadingWhitespacePosition().isNull();
+    addTrailingSpace = selection.start().trailingWhitespacePosition().isNull();
+  }
 
   if (!firstChild) {
     // Pasting something that didn't parse or was empty.
     ASSERT(!lastChild);
   } else if (firstChild == lastChild && firstChild->isTextNode()) {
+    // FIXME: HTML fragment case needs to be improved to the point
+    // where we can remove this separate case.
+
     // Simple text paste. Treat as if the text were typed.
     Position upstreamStart(selection.start().upstream(StayInBlock));
-    inputText(static_cast<TextImpl*>(firstChild)->data());
+    DOMString text = static_cast<TextImpl*>(firstChild)->data();
+    if (addLeadingSpace) {
+      text = " " + text;
+    }
+    if (addTrailingSpace) {
+      text += " ";
+    }
+    inputText(text);
     if (m_selectReplacement) {
       // Select what was inserted.
       setEndingSelection(
@@ -1927,6 +1963,10 @@ void ReplaceSelectionCommandImpl::doApply() {
     }
   } else {
     // HTML fragment paste.
+
+    // FIXME: Add leading and trailing spaces to the fragment?
+    // Or just insert them as we insert it?
+
     NodeImpl* beforeNode = firstChild;
     NodeImpl* node = firstChild->nextSibling();
 

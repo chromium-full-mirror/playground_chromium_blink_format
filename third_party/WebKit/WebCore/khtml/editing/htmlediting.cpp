@@ -220,13 +220,16 @@ CSSStyleDeclarationImpl* ApplyStyleCommand::style() const {
 //------------------------------------------------------------------------------------------
 // DeleteSelectionCommand
 
-DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document)
-    : CompositeEditCommand(new DeleteSelectionCommandImpl(document)) {}
+DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
+                                               bool smartDelete)
+    : CompositeEditCommand(
+          new DeleteSelectionCommandImpl(document, smartDelete)) {}
 
 DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
-                                               const Selection& selection)
+                                               const Selection& selection,
+                                               bool smartDelete)
     : CompositeEditCommand(
-          new DeleteSelectionCommandImpl(document, selection)) {}
+          new DeleteSelectionCommandImpl(document, selection, smartDelete)) {}
 
 DeleteSelectionCommandImpl* DeleteSelectionCommand::impl() const {
   return static_cast<DeleteSelectionCommandImpl*>(get());
@@ -375,11 +378,12 @@ TextImpl* JoinTextNodesCommand::secondNode() const {
 ReplaceSelectionCommand::ReplaceSelectionCommand(
     DocumentImpl* document,
     DOM::DocumentFragmentImpl* fragment,
-    bool selectReplacement)
+    bool selectReplacement,
+    bool smartReplace)
     : CompositeEditCommand(new ReplaceSelectionCommandImpl(document,
                                                            fragment,
-                                                           selectReplacement)) {
-}
+                                                           selectReplacement,
+                                                           smartReplace)) {}
 
 ReplaceSelectionCommandImpl* ReplaceSelectionCommand::impl() const {
   return static_cast<ReplaceSelectionCommandImpl*>(get());
