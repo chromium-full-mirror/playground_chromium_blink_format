@@ -375,6 +375,8 @@ void RenderListMarker::printObject(QPainter* p,
         // why.
         // - dwh
         _ty += fm.ascent();
+#else
+//_ty += fm.ascent() - fm.height()/2 + 1;
 #endif
         if (style()->listStylePosition() == INSIDE) {
           if (style()->direction() == LTR)
