@@ -98,6 +98,8 @@ extern NSString* WebHistoryItemsKey;
     or more history items, ordered from most recent to oldest.
     @result Returns an array of NSCalendarDates for which history items exist in
    the WebHistory.
+
+    ADVISORY NOTE:  This method may change for the 1.0 SDK.
 */
 - (NSArray*)orderedLastVisitedDays;
 
@@ -109,6 +111,8 @@ extern NSString* WebHistoryItemsKey;
     @param calendarDate A date identifying the unique day of interest.
     @result Returns an array of WebHistoryItems last visited on the indicated
    day.
+
+    ADVISORY NOTE:  This method may change for the 1.0 SDK.
 */
 - (NSArray*)orderedItemsLastVisitedOnDay:(NSCalendarDate*)calendarDate;
 
