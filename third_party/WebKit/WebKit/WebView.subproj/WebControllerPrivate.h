@@ -15,6 +15,8 @@
   id<WebWindowContext> windowContext;
   id<WebResourceProgressHandler> resourceProgressHandler;
   id<WebResourceProgressHandler> downloadProgressHandler;
+  id<WebContextMenuHandler> contextMenuHandler;
+  id<WebContextMenuHandler> defaultContextMenuHandler;
   id<WebControllerPolicyHandler> policyHandler;
   id<WebLocationChangeHandler> locationChangeHandler;
   WebBackForwardList* backForwardList;
@@ -24,6 +26,7 @@
 
 @interface WebController (WebPrivate)
 ;
+- (id<WebContextMenuHandler>)_defaultContextMenuHandler;
 - (void)_receivedProgress:(WebLoadProgress*)progress
         forResourceHandle:(WebResourceHandle*)resourceHandle
            fromDataSource:(WebDataSource*)dataSource
