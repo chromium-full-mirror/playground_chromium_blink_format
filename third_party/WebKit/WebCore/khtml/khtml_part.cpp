@@ -4368,10 +4368,10 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
   return false;
 }
 
-void KHTMLPart::selectClosetWordFromMouseEvent(QMouseEvent* mouse,
-                                               DOM::Node& innerNode,
-                                               int x,
-                                               int y) {
+void KHTMLPart::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
+                                                DOM::Node& innerNode,
+                                                int x,
+                                                int y) {
   Selection selection;
 
   if (!innerNode.isNull() && innerNode.handle()->renderer() &&
@@ -4396,8 +4396,8 @@ void KHTMLPart::handleMousePressEventDoubleClick(
     khtml::MousePressEvent* event) {
   if (event->qmouseEvent()->button() == LeftButton) {
     DOM::Node node = event->innerNode();
-    selectClosetWordFromMouseEvent(event->qmouseEvent(), node, event->x(),
-                                   event->y());
+    selectClosestWordFromMouseEvent(event->qmouseEvent(), node, event->x(),
+                                    event->y());
   }
 }
 

@@ -970,10 +970,10 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   virtual void khtmlDrawContentsEvent(khtml::DrawContentsEvent*);
 
-  void selectClosetWordFromMouseEvent(QMouseEvent* mouse,
-                                      DOM::Node& innerNode,
-                                      int x,
-                                      int y);
+  void selectClosestWordFromMouseEvent(QMouseEvent* mouse,
+                                       DOM::Node& innerNode,
+                                       int x,
+                                       int y);
 
 #if !APPLE_CHANGES
   /**
