@@ -101,7 +101,8 @@ typedef enum {
   WebSelectByWord,
   WebSelectByLine,
   WebSelectByParagraph,
-  WebSelectToLineBoundary,
+  WebSelectByDocument,
+  WebSelectToLineBoundary
 } WebSelectionGranularity;
 
 // WebCoreBridge objects are used by WebCore to abstract away operations that
