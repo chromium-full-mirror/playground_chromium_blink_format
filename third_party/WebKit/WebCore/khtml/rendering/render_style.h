@@ -515,6 +515,10 @@ enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT };
 
 enum EWordWrap { WBNORMAL, BREAK_WORD };
 
+enum ENBSPMode { NBNORMAL, SPACE };
+
+enum EKHTMLLineBreak { LBNORMAL, AFTER_WHITE_SPACE };
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -575,6 +579,8 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
       textShadow;  // Our text shadow information for shadowed text drawing.
   EUserModify userModify : 2;  // Flag used for editing state
   EWordWrap wordWrap : 1;      // Flag used for word wrap
+  ENBSPMode nbspMode : 1;
+  EKHTMLLineBreak khtmlLineBreak : 1;
 #if APPLE_CHANGES
   bool textSizeAdjust : 1;  // An Apple extension.  Not really CSS3 but not
                             // worth making a new struct over.
@@ -1249,6 +1255,10 @@ class RenderStyle {
     return css3NonInheritedData->marginBottomCollapse;
   }
   EWordWrap wordWrap() const { return css3InheritedData->wordWrap; }
+  ENBSPMode nbspMode() const { return css3InheritedData->nbspMode; }
+  EKHTMLLineBreak khtmlLineBreak() const {
+    return css3InheritedData->khtmlLineBreak;
+  }
 // End CSS3 Getters
 
 #if APPLE_CHANGES
@@ -1563,6 +1573,10 @@ class RenderStyle {
     SET_VAR(css3NonInheritedData, marginBottomCollapse, c);
   }
   void setWordWrap(EWordWrap b) { SET_VAR(css3InheritedData, wordWrap, b); }
+  void setNBSPMode(ENBSPMode b) { SET_VAR(css3InheritedData, nbspMode, b); }
+  void setKHTMLLineBreak(EKHTMLLineBreak b) {
+    SET_VAR(css3InheritedData, khtmlLineBreak, b);
+  }
 // End CSS3 Setters
 
 #if APPLE_CHANGES
@@ -1690,6 +1704,8 @@ class RenderStyle {
   static EMarginCollapse initialMarginTopCollapse() { return MCOLLAPSE; }
   static EMarginCollapse initialMarginBottomCollapse() { return MCOLLAPSE; }
   static EWordWrap initialWordWrap() { return WBNORMAL; }
+  static ENBSPMode initialNBSPMode() { return NBNORMAL; }
+  static EKHTMLLineBreak initialKHTMLLineBreak() { return LBNORMAL; }
 
 #if APPLE_CHANGES
   // Keep these at the end.
