@@ -83,6 +83,9 @@ class XMLHttpRequest : public DOMObject {
   friend class XMLHttpRequestProtoFunc;
   friend class XMLHttpRequestQObject;
 
+  Value getStatusText() const;
+  Value getStatus() const;
+
   XMLHttpRequestQObject* qObject;
 
 #if APPLE_CHANGES
@@ -96,6 +99,9 @@ class XMLHttpRequest : public DOMObject {
   void open(const QString& _method, const KURL& _url, bool _async);
   void send(const QString& _body);
   void abort();
+  void setRequestHeader(const QString& name, const QString& value);
+  Value getAllResponseHeaders() const;
+  Value getResponseHeader(const QString& name) const;
 
   void changeState(XMLHttpRequestState newState);
 
@@ -104,6 +110,7 @@ class XMLHttpRequest : public DOMObject {
   KURL url;
   QString method;
   bool async;
+  QString requestHeaders;
 
   KIO::TransferJob* job;
 
@@ -113,6 +120,8 @@ class XMLHttpRequest : public DOMObject {
   khtml::Decoder* decoder;
   QString encoding;
   QString response;
+
+  QString responseHeaders;
 };
 
 class XMLHttpRequestQObject : public QObject {

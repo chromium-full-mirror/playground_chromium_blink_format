@@ -79,6 +79,8 @@ class TransferJob : public Job {
   QString method() const;
 
  private:
+  void assembleResponseHeaders() const;
+
   TransferJobPrivate* d;
 
   KWQSignal m_data;
