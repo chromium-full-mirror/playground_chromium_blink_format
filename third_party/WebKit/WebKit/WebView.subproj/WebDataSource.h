@@ -35,9 +35,9 @@
 
 // Returns nil if object cannot be initialized due to a malformed URL (RFC
 // 1808).
-- (id)initWithURL:(NSURL*)inputURL;
-- (id)initWithURL:(NSURL*)theURL attributes:(NSDictionary*)theAttributes;
-- (id)initWithURL:(NSURL*)theURL
+- (id)initWithURL:(NSURL*)URL;
+- (id)initWithURL:(NSURL*)URL attributes:(NSDictionary*)theAttributes;
+- (id)initWithURL:(NSURL*)URL
        attributes:(NSDictionary*)theAttributes
             flags:(unsigned)theFlags;
 
@@ -85,7 +85,7 @@
 
 - (BOOL)frameExists:(NSString*)name;
 
-- (void)openURL:(NSURL*)url inFrameNamed:(NSString*)frameName;
+- (void)openURL:(NSURL*)URL inFrameNamed:(NSString*)frameName;
 
 // Set the controller for this data source.  NOTE:  The controller is not
 // retained by the
