@@ -166,6 +166,7 @@ class KHTMLPartPrivate {
     m_delayRedirect = 0;
 
     m_bPendingChildRedirection = false;
+    m_executingJavaScriptFormAction = false;
 
     // inherit settings from parent
     if (parent && parent->inherits("KHTMLPart")) {
