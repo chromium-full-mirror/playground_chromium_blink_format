@@ -85,7 +85,7 @@
 */
 @protocol WebWindowContext<NSObject>
 
-- (WebController*)openNewWindowWithURL:(NSURL*)URL;
+- (WebController*)openNewWindowWithURL:(NSURL*)URL referrer:(NSString*)referrer;
 
 - (void)setStatusText:(NSString*)text;
 - (NSString*)statusText;

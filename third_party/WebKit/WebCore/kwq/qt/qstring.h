@@ -321,6 +321,7 @@ class QString {
   ~QString();
 
   static QString fromLatin1(const char*);
+  static QString fromLatin1(const char*, int len);
   static QString fromStringWithEncoding(const char*, int, CFStringEncoding);
   static QString fromCFString(CFStringRef);
   static QString fromNSString(NSString*);
@@ -500,6 +501,10 @@ inline bool QString::isEmpty() const {
 
 inline QString QString::fromLatin1(const char* chs) {
   return chs;
+}
+
+inline QString QString::fromLatin1(const char* chs, int length) {
+  return QString(chs, length);
 }
 
 inline const char* QString::ascii() const {

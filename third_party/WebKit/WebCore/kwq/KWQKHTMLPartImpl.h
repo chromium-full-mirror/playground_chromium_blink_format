@@ -84,11 +84,10 @@ class KWQKHTMLPartImpl : public QObject {
   KHTMLPart* findFrame(const QString& frameName);
   QPtrList<KParts::ReadOnlyPart> frames() const;
 
-  void urlSelected(const QString& url,
+  void urlSelected(const KURL& url,
                    int button,
                    int state,
-                   const QString& _target,
-                   const KParts::URLArgs&);
+                   const KParts::URLArgs& args);
   bool requestFrame(khtml::RenderPart* frame,
                     const QString& url,
                     const QString& frameName,
@@ -99,12 +98,7 @@ class KWQKHTMLPartImpl : public QObject {
                      const QString& serviceType,
                      const QStringList& args);
 
-  void submitForm(const char* action,
-                  const QString& url,
-                  const QByteArray& formData,
-                  const QString& _target,
-                  const QString& contentType,
-                  const QString& boundary);
+  void submitForm(const KURL& url, const KParts::URLArgs&);
 
   void scheduleClose();
 
@@ -140,6 +134,8 @@ class KWQKHTMLPartImpl : public QObject {
   // functions.
 
   void redirectionTimerStartedOrStopped();
+
+  static NSString* referrer(const KParts::URLArgs&);
 
  private:
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
