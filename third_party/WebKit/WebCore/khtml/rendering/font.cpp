@@ -117,8 +117,13 @@ float Font::floatWidth(QChar* chs, int slen, int pos, int len) const {
   return fm.floatWidth(chs, slen, pos, len);
 }
 
-float Font::floatCharacterWidth(QChar* chs, int slen, int pos) const {
-  return fm.floatCharacterWidth(chs, slen, pos);
+void Font::floatCharacterWidths(QChar* str,
+                                int slen,
+                                int pos,
+                                int len,
+                                int toAdd,
+                                float* buffer) const {
+  fm.floatCharacterWidths(str, slen, pos, len, toAdd, buffer);
 }
 
 #endif

@@ -42,8 +42,10 @@
                     stringLength:(unsigned)length
            fromCharacterPosition:(int)pos
               numberOfCharacters:(int)len
+                     withPadding:(int)padding
                    applyRounding:(BOOL)applyRounding
-         attemptFontSubstitution:(BOOL)attemptFontSubstitution;
+         attemptFontSubstitution:(BOOL)attemptFontSubstitution
+                          widths:(float*)buffer;
 
 // drawing
 - (void)drawCharacters:(const UniChar*)characters
