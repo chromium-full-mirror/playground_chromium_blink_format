@@ -84,7 +84,9 @@ class RenderFormElement : public khtml::RenderWidget {
 
   virtual bool eventFilter(QObject*, QEvent*);
 
+#ifdef _KWQ_
   void performAction(QObject::Actions action);
+#endif
 
  public slots:
   virtual void slotClicked();
@@ -208,6 +210,10 @@ class RenderLineEdit : public RenderFormElement {
 
   virtual const char* renderName() const { return "RenderLineEdit"; }
   void select();
+
+#ifdef _KWQ_
+  void performAction(QObject::Actions action);
+#endif
 
  public slots:
   void slotReturnPressed();

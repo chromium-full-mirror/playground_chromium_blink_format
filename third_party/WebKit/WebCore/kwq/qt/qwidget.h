@@ -160,9 +160,11 @@ class QWidget : public QObject, public QPaintDevice {
 #if (defined(__APPLE__) && defined(__OBJC__) && defined(__cplusplus))
   NSView* getView() const;
   void setView(NSView* aView);
+  void endEditing();
 #else
   void* getView() const;
   void setView(void* aView);
+  void endEditing();
 #endif
 
 #endif _KWQ_
