@@ -1919,7 +1919,10 @@ void RenderBlock::calcMinMaxWidth() {
   // text].....</nobr></div></td>
   // We need to sanity-check our m_minWidth, and not let it exceed our clipped
   // boundary. -dwh
-  if (style()->overflow() == OHIDDEN && m_minWidth > m_width)
+  // FIXME: For now, punt on trying to apply this fix to table cells.  We don't
+  // know an accurate
+  // width for the cell here, so we can't do a comparison.
+  if (style()->overflow() == OHIDDEN && m_minWidth > m_width && !isTableCell())
     m_minWidth = m_width;
 
   setMinMaxKnown();
