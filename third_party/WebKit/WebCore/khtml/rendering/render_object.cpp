@@ -371,7 +371,7 @@ short RenderObject::clientWidth() const {
          (layer() ? layer()->verticalScrollbarWidth() : 0);
 }
 
-short RenderObject::clientHeight() const {
+int RenderObject::clientHeight() const {
   return height() - borderTop() - borderBottom() -
          (layer() ? layer()->horizontalScrollbarHeight() : 0);
 }
@@ -381,12 +381,12 @@ short RenderObject::clientHeight() const {
 // object has overflow:hidden/scroll/auto specified and also has overflow.
 short RenderObject::scrollWidth() const {
   return (style()->hidesOverflow() && layer()) ? layer()->scrollWidth()
-                                               : clientWidth();
+                                               : overflowWidth();
 }
 
-short RenderObject::scrollHeight() const {
+int RenderObject::scrollHeight() const {
   return (style()->hidesOverflow() && layer()) ? layer()->scrollHeight()
-                                               : clientHeight();
+                                               : overflowHeight();
 }
 
 bool RenderObject::hasStaticX() const {
