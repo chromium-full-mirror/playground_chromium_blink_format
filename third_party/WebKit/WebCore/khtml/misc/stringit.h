@@ -71,11 +71,17 @@ class TokenizerSubstring {
 
 class TokenizerString {
  public:
-  TokenizerString() : m_lines(0), m_composite(false) {}
+  TokenizerString() : m_currentChar(0), m_lines(0), m_composite(false) {}
   TokenizerString(const QChar* str, int length)
-      : m_currentString(str, length), m_lines(0), m_composite(false) {}
+      : m_currentString(str, length),
+        m_currentChar(m_currentString.m_current),
+        m_lines(0),
+        m_composite(false) {}
   TokenizerString(const QString& str)
-      : m_currentString(str), m_lines(0), m_composite(false) {}
+      : m_currentString(str),
+        m_currentChar(m_currentString.m_current),
+        m_lines(0),
+        m_composite(false) {}
 
   void clear();
 
@@ -83,9 +89,11 @@ class TokenizerString {
   void prepend(const TokenizerString&);
 
   void push(QChar c) {
-    if (m_pushedChar1.isNull())
+    if (m_pushedChar1.isNull()) {
       m_pushedChar1 = c;
-    else {
+      m_currentChar =
+          m_pushedChar1.isNull() ? m_currentString.m_current : &m_pushedChar1;
+    } else {
       assert(m_pushedChar2.isNull());
       m_pushedChar2 = c;
     }
@@ -103,6 +111,8 @@ class TokenizerString {
       if (--m_currentString.m_length == 0)
         advanceSubstring();
     }
+    m_currentChar =
+        m_pushedChar1.isNull() ? m_currentString.m_current : &m_pushedChar1;
   }
 
   bool escaped() const { return !m_pushedChar1.isNull(); }
@@ -121,13 +131,12 @@ class TokenizerString {
   void prepend(const TokenizerSubstring&);
 
   void advanceSubstring();
-  const QChar* current() const {
-    return m_pushedChar1.isNull() ? m_currentString.m_current : &m_pushedChar1;
-  }
+  const QChar* current() const { return m_currentChar; }
 
   QChar m_pushedChar1;
   QChar m_pushedChar2;
   TokenizerSubstring m_currentString;
+  const QChar* m_currentChar;
   QValueList<TokenizerSubstring> m_substrings;
   int m_lines;
   bool m_composite;
