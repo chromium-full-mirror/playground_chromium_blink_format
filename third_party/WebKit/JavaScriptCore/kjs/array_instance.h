@@ -64,6 +64,7 @@ class ArrayInstanceImp : public ObjectImp {
   unsigned pushUndefinedObjectsToEnd();
 
   unsigned length;
+  unsigned storageLength;
   unsigned capacity;
   ValueImp** storage;
 };

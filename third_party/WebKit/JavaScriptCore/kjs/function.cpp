@@ -323,8 +323,9 @@ const ClassInfo ActivationImp::info = {"Activation", 0, 0, 0};
 
 // ECMA 10.1.6
 ActivationImp::ActivationImp(ExecState* exec, FunctionImp* f, const List& args)
-    : _function(f), _arguments(args) {
+    : _function(f), _arguments(true) {
   Value protect(this);
+  _arguments = args;
   _argumentsObject = new ArgumentsImp(exec, f, args);
   putDirect(argumentsPropertyName, _argumentsObject, Internal | DontDelete);
 }
