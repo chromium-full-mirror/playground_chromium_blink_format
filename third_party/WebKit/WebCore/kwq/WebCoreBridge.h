@@ -519,10 +519,9 @@ typedef enum {
 - (void)issuePasteCommand;
 - (void)postDidChangeSelectionNotification;
 - (void)postDidChangeNotification;
-
 - (void)editingKeyDown:(NSEvent*)event;
-
 - (void)setIsSelected:(BOOL)isSelected forView:(NSView*)view;
+- (BOOL)isEditable;
 
 - (NSString*)overrideMediaType;
 

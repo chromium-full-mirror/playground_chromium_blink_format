@@ -896,6 +896,9 @@ bool HTMLElementImpl::isFocusable() const {
 }
 
 bool HTMLElementImpl::isContentEditable() const {
+  if (getDocument()->part() && getDocument()->part()->isContentEditable())
+    return true;
+
   getDocument()->updateRendering();
 
   if (!renderer()) {
