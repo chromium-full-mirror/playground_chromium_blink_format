@@ -416,6 +416,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (void)didSetName:(NSString*)name;
 
+- (NSFileWrapper*)fileWrapperForURL:(NSURL*)URL;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all

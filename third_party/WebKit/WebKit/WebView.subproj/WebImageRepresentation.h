@@ -16,6 +16,7 @@
 }
 - (WebImageRenderer*)image;
 - (NSString*)filename;
+- (NSFileWrapper*)fileWrapper;
 - (BOOL)doneLoading;
 - (NSData*)data;
 - (NSURL*)URL;

@@ -51,10 +51,9 @@ extern NSString* WebURLNamePboardType;
 // NSFindPboard.
 + (int)_web_setFindPasteboardString:(NSString*)string withOwner:(id)owner;
 
-// Writes file contents data to the pasteboard as an RTFD attachment.
+// Writes a file wrapper to the pasteboard as an RTFD attachment.
 // NSRTFDPboardType must be declared on the pasteboard before calling this
 // method.
-- (void)_web_writeFileDataAsRTFDAttachment:(NSData*)data
-                              withFilename:(NSString*)filename;
+- (void)_web_writeFileWrapperAsRTFDAttachment:(NSFileWrapper*)wrapper;
 
 @end

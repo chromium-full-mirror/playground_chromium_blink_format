@@ -284,6 +284,7 @@ backforward list.
 + (void)_setAlwaysUseATSU:(BOOL)f;
 
 - (NSCachedURLResponse*)_cachedResponseForURL:(NSURL*)URL;
+- (NSFileWrapper*)_fileWrapperForURL:(NSURL*)URL;
 
 @end
 
