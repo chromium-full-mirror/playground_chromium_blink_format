@@ -613,12 +613,18 @@ void ContextImp::popScope() {
 
 ProgramNode* Parser::progNode = 0;
 int Parser::sid = 0;
+#ifdef APPLE_CHANGES
+static pthread_mutex_t parserLock = {_PTHREAD_MUTEX_SIG_init, {}};
+#endif
 
 ProgramNode* Parser::parse(const UChar* code,
                            unsigned int length,
                            int* sourceId,
                            int* errLine,
                            UString* errMsg) {
+#ifdef APPLE_CHANGES
+  pthread_mutex_lock(&parserLock);
+#endif
   if (errLine)
     *errLine = -1;
   if (errMsg)
@@ -647,9 +653,15 @@ ProgramNode* Parser::parse(const UChar* code,
     fprintf(stderr, "KJS: JavaScript parse error at line %d.\n", eline);
 #endif
     delete prog;
+#ifdef APPLE_CHANGES
+    pthread_mutex_unlock(&parserLock);
+#endif
     return 0;
   }
 
+#ifdef APPLE_CHANGES
+  pthread_mutex_unlock(&parserLock);
+#endif
   return prog;
 }
 
@@ -686,8 +698,11 @@ void InterpreterImp::globalClear() {
 }
 
 InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob) {
-  // add this interpreter to the global chain
-  // as a root set for garbage collection
+// add this interpreter to the global chain
+// as a root set for garbage collection
+#ifdef APPLE_CHANGES
+  Collector::lock();
+#endif
   if (s_hook) {
     prev = s_hook;
     next = s_hook->next;
@@ -698,6 +713,9 @@ InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob) {
     s_hook = next = prev = this;
     globalInit();
   }
+#ifdef APPLE_CHANGES
+  Collector::unlock();
+#endif
 
   m_interpreter = interp;
   global = glob;
@@ -900,8 +918,11 @@ InterpreterImp::~InterpreterImp() {
 }
 
 void InterpreterImp::clear() {
-  // fprintf(stderr,"InterpreterImp::clear\n");
-  // remove from global chain (see init())
+// fprintf(stderr,"InterpreterImp::clear\n");
+// remove from global chain (see init())
+#ifdef APPLE_CHANGES
+  Collector::lock();
+#endif
   next->prev = prev;
   prev->next = next;
   s_hook = next;
@@ -910,6 +931,9 @@ void InterpreterImp::clear() {
     s_hook = 0L;
     globalClear();
   }
+#ifdef APPLE_CHANGES
+  Collector::unlock();
+#endif
 }
 
 void InterpreterImp::mark() {

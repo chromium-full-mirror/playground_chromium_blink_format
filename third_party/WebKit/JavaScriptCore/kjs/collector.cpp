@@ -29,6 +29,9 @@
 #ifdef KJS_DEBUG_MEM
 #include <typeinfo>
 #endif
+#ifdef APPLE_CHANGES
+#include <pthread.h>
+#endif
 
 namespace KJS {
 
@@ -56,6 +59,14 @@ CollectorBlock::~CollectorBlock() {
   mem = 0L;
 }
 
+#ifdef APPLE_CHANGES
+// FIXME: fix these once static initializers for pthread_cond_t and
+// pthread_mutex_t are fixed not to warn.
+static pthread_mutex_t collectorLock = {_PTHREAD_MUTEX_SIG_init, {}};
+static pthread_cond_t collectorCondition = {_PTHREAD_COND_SIG_init, {}};
+static unsigned collectorLockCount = 0;
+static pthread_t collectorLockThread;
+#endif
 CollectorBlock* Collector::root = 0L;
 CollectorBlock* Collector::currentBlock = 0L;
 unsigned long Collector::filled = 0;
@@ -73,6 +84,10 @@ bool Collector::collecting = false;
 void* Collector::allocate(size_t s) {
   if (s == 0)
     return 0L;
+
+#ifdef APPLE_CHANGES
+  lock();
+#endif
 
   // Try and deal with memory requirements in a scalable way. Simple scripts
   // should only require small amounts of memory, but for complex scripts we
@@ -141,6 +156,10 @@ void* Collector::allocate(size_t s) {
     fprintf(stderr, "Out of memory");
   }
 
+#ifdef APPLE_CHANGES
+  unlock();
+#endif
+
   return m;
 }
 
@@ -148,6 +167,9 @@ void* Collector::allocate(size_t s) {
  * Mark-sweep garbage collection.
  */
 bool Collector::collect() {
+#ifdef APPLE_CHANGES
+  lock();
+#endif
 #ifdef KJS_DEBUG_MEM
   fprintf(stderr, "Collector::collect()\n");
 #endif
@@ -248,11 +270,17 @@ bool Collector::collect() {
   if (s_count++ % 50 == 2)
     finalCheck();
 #endif
+#ifdef APPLE_CHANGES
+  unlock();
+#endif
   return deleted;
 }
 
 #ifdef KJS_DEBUG_MEM
 void Collector::finalCheck() {
+#ifdef APPLE_CHANGES
+  lock();
+#endif
   CollectorBlock* block = root;
   while (block) {
     ValueImp** r = (ValueImp**)block->mem;
@@ -269,11 +297,15 @@ void Collector::finalCheck() {
     }
     block = block->next;
   }
+#ifdef APPLE_CHANGES
+  unlock();
+#endif
 }
 #endif
 
 #ifdef APPLE_CHANGES
 int Collector::numInterpreters() {
+  lock();
   int count = 0;
   if (InterpreterImp::s_hook) {
     InterpreterImp* scr = InterpreterImp::s_hook;
@@ -282,10 +314,12 @@ int Collector::numInterpreters() {
       scr = scr->next;
     } while (scr != InterpreterImp::s_hook);
   }
+  unlock();
   return count;
 }
 
 int Collector::numGCNotAllowedObjects() {
+  lock();
   int count = 0;
   CollectorBlock* block = root;
   while (block) {
@@ -299,10 +333,12 @@ int Collector::numGCNotAllowedObjects() {
     }
     block = block->next;
   }
+  unlock();
   return count;
 }
 
 int Collector::numReferencedObjects() {
+  lock();
   int count = 0;
   CollectorBlock* block = root;
   while (block) {
@@ -316,6 +352,28 @@ int Collector::numReferencedObjects() {
     }
     block = block->next;
   }
+  unlock();
   return count;
 }
+
+void Collector::lock() {
+  pthread_mutex_lock(&collectorLock);
+  while (collectorLockCount > 0 &&
+         !pthread_equal(pthread_self(), collectorLockThread)) {
+    pthread_cond_wait(&collectorCondition, &collectorLock);
+  }
+  collectorLockThread = pthread_self();
+  collectorLockCount++;
+  pthread_mutex_unlock(&collectorLock);
+}
+
+void Collector::unlock() {
+  pthread_mutex_lock(&collectorLock);
+  collectorLockCount--;
+  if (collectorLockCount == 0) {
+    pthread_cond_signal(&collectorCondition);
+  }
+  pthread_mutex_unlock(&collectorLock);
+}
+
 #endif
