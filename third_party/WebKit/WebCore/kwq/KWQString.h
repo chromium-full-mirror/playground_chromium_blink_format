@@ -26,6 +26,7 @@
 #ifndef QSTRING_H_
 #define QSTRING_H_
 
+#include <CoreFoundation/CFString.h>
 #include "qcstring.h"
 
 class QString;
@@ -108,6 +109,11 @@ class QChar {
   friend int operator!=(char, QChar);
   friend int operator!=(QChar, char);
   operator char() const;
+
+  // data members ------------------------------------------------------------
+
+  // NOTE: this is NOT private:
+  UniChar c;
 
   // protected
   // -------------------------------------------------------------------
@@ -220,6 +226,11 @@ class QString {
   QString& operator+=(const QString&);
   operator QChar() const;
 
+  // data members ------------------------------------------------------------
+
+  // NOTE: this is NOT private:
+  CFMutableStringRef s;
+
   // protected
   // -------------------------------------------------------------------
   // private
@@ -244,7 +255,7 @@ QString operator+(char, const QString&);
 
 // class QConstString ==========================================================
 
-class QConstString {
+class QConstString : /* NOTE: this is NOT private */ QString {
  public:
   // typedefs ----------------------------------------------------------------
   // enums -------------------------------------------------------------------
