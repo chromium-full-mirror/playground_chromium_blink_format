@@ -55,3 +55,4 @@
 // cover methods themselves are private.
 #define WebKitRespectStandardStyleKeyEquivalentsPreferenceKey \
   @"WebKitRespectStandardStyleKeyEquivalents"
+#define WebKitShowsURLsInToolTipsPreferenceKey @"WebKitShowsURLsInToolTips"
