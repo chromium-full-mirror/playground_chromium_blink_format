@@ -2231,6 +2231,10 @@ QString KHTMLPart::text(const DOM::Range& r) const {
   // text objects walk their renderers' InlineTextBox objects, so that we at
   // least get the whitespace
   // stripped out properly and obey CSS visibility for text runs.
+
+  if (r.isNull())
+    return QString();
+
   bool hasNewLine = true;
   bool addedSpace = true;
   QString text;
@@ -2400,8 +2404,10 @@ bool KHTMLPart::hasSelection() const {
 
 DOM::Range KHTMLPart::selection() const {
   DOM::Range r = document().createRange();
-  r.setStart(d->m_selectionStart, d->m_startOffset);
-  r.setEnd(d->m_selectionEnd, d->m_endOffset);
+  if (hasSelection()) {
+    r.setStart(d->m_selectionStart, d->m_startOffset);
+    r.setEnd(d->m_selectionEnd, d->m_endOffset);
+  }
   return r;
 }
 
