@@ -363,6 +363,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                         statusCode:(int*)statusCode;
 
 - (BOOL)isReloading;
+- (time_t)expiresTimeForResponse:(NSURLResponse*)response;
 
 - (void)reportClientRedirectToURL:(NSURL*)URL
                             delay:(NSTimeInterval)seconds

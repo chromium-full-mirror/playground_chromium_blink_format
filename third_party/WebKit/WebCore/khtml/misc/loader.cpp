@@ -1226,12 +1226,12 @@ void Loader::slotFinished(KIO::Job* job) {
   } else {
     r->object->data(r->m_buffer, true);
     emit requestDone(r->m_docLoader, r->object);
-    time_t expireDate = j->queryMetaData("expire-date").toLong();
 #if !APPLE_CHANGES
+    time_t expireDate = j->queryMetaData("expire-date").toLong();
     kdDebug(6060) << "Loader::slotFinished, url = " << j->url().url()
                   << " expires " << ctime(&expireDate) << endl;
-#endif
     r->object->setExpireDate(expireDate, false);
+#endif
   }
 
 #if APPLE_CHANGES
@@ -1258,6 +1258,8 @@ void Loader::slotReceivedResponse(KIO::Job* job, void* response) {
   ASSERT(r);
   ASSERT(response);
   r->object->setResponse(response);
+  r->object->setExpireDate(KWQCacheObjectExpiresTime(r->m_docLoader, response),
+                           false);
 }
 #endif
 
@@ -1467,7 +1469,9 @@ CachedImage* Cache::requestImage(DocLoader* dl,
     o = im;
   }
 
+#if !APPLE_CHANGES
   o->setExpireDate(_expireDate, true);
+#endif
 
   if (o->type() != CachedObject::Image) {
 #ifdef CACHE_DEBUG
@@ -1541,7 +1545,9 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
     o = sheet;
   }
 
+#if !APPLE_CHANGES
   o->setExpireDate(_expireDate, true);
+#endif
 
   if (o->type() != CachedObject::CSSStyleSheet) {
 #ifdef CACHE_DEBUG
@@ -1625,7 +1631,9 @@ CachedScript* Cache::requestScript(DocLoader* dl,
     o = script;
   }
 
+#if !APPLE_CHANGES
   o->setExpireDate(_expireDate, true);
+#endif
 
   if (!(o->type() == CachedObject::Script)) {
 #ifdef CACHE_DEBUG
