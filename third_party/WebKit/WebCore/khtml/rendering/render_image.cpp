@@ -53,6 +53,7 @@ RenderImage::RenderImage(NodeImpl* _node) : RenderReplaced(_node) {
   image = 0;
   berrorPic = false;
   loadEventSent = false;
+  m_selectionState = SelectionNone;
 
   setIntrinsicWidth(0);
   setIntrinsicHeight(0);
@@ -218,6 +219,16 @@ void RenderImage::paintObject(QPainter* p,
       paintAction != PaintActionSelection)
     return;
 
+#if APPLE_CHANGES
+  bool drawSelectionTint = selectionState() != SelectionNone;
+  if (paintAction == PaintActionSelection) {
+    if (selectionState() == SelectionNone) {
+      return;
+    }
+    drawSelectionTint = false;
+  }
+#endif
+
   int cWidth = contentWidth();
   int cHeight = contentHeight();
   int leftBorder = borderLeft();
@@ -315,6 +326,9 @@ void RenderImage::paintObject(QPainter* p,
   } else if (image && !image->isTransparent()) {
     if ((cWidth != intrinsicWidth() || cHeight != intrinsicHeight()) &&
         pix.width() > 0 && pix.height() > 0 && image->valid_rect().isValid()) {
+#if APPLE_CHANGES
+      QSize tintSize;
+#endif
       if (resizeCache.isNull() && cWidth && cHeight) {
         QRect scaledrect(image->valid_rect());
         //                 kdDebug(6040) << "time elapsed: " << dt->elapsed() <<
@@ -353,10 +367,24 @@ void RenderImage::paintObject(QPainter* p,
         p->drawPixmap(
             QPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
             resizeCache, scaledrect);
-      } else
+#if APPLE_CHANGES
+        tintSize = s;
+#endif
+      } else {
         p->drawPixmap(
             QPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
             resizeCache);
+#if APPLE_CHANGES
+        tintSize = resizeCache.rect().size();
+#endif
+      }
+#if APPLE_CHANGES
+      if (drawSelectionTint) {
+        p->fillRect(_tx + leftBorder + leftPad, _ty + topBorder + topPad,
+                    tintSize.width(), tintSize.height(),
+                    QBrush(p->selectedImageTintColor()));
+      }
+#endif
     } else {
       // we might be just about switching images
       // so pix contains the old one (we want to paint), but image->valid_rect
@@ -384,6 +412,12 @@ void RenderImage::paintObject(QPainter* p,
       //             p->drawPixmap( offs.x(), y, pix, rect.x(), rect.y(),
       //             rect.width(), rect.height() );
       p->drawPixmap(offs, pix, rect);
+#if APPLE_CHANGES
+      if (drawSelectionTint) {
+        p->fillRect(offs.x() + rect.x(), offs.y() + rect.y(), rect.width(),
+                    rect.height(), QBrush(p->selectedImageTintColor()));
+      }
+#endif
     }
   }
 }
