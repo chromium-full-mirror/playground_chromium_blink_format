@@ -350,8 +350,6 @@ class KWQKHTMLPart : public KHTMLPart {
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
-  DOM::DocumentFragmentImpl* documentFragmentWithText(NSString* text);
-
   void registerCommandForUndo(const khtml::EditCommandPtr&);
   void registerCommandForRedo(const khtml::EditCommandPtr&);
   void clearUndoRedoOperations();
@@ -422,6 +420,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   khtml::RenderStyle* styleForSelectionStart(
       DOM::NodeImpl*& nodeToRemove) const;
+
+  virtual bool isKHTMLPart() const;
 
   WebCoreBridge* _bridge;
 

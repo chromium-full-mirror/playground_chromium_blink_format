@@ -333,7 +333,7 @@ Window* Window::retrieveWindow(KHTMLPart* p) {
   if (p && p->jScriptEnabled()) {
     assert(!obj.isNull());
 #ifndef QWS
-    assert(dynamic_cast<KJS::Window*>(obj.imp()));  // type checking
+// assert( dynamic_cast<KJS::Window*>(obj.imp()) ); // type checking
 #endif
   }
 #endif
@@ -346,7 +346,7 @@ Window* Window::retrieveActive(ExecState* exec) {
   ValueImp* imp = exec->dynamicInterpreter()->globalObject().imp();
   assert(imp);
 #ifndef QWS
-  assert(dynamic_cast<KJS::Window*>(imp));
+// assert( dynamic_cast<KJS::Window*>(imp) );
 #endif
   return static_cast<KJS::Window*>(imp);
 }

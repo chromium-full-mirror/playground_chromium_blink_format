@@ -88,6 +88,8 @@ class ReadOnlyPart : public Part {
   virtual bool closeURL() = 0;
 
  private:
+  virtual bool isKPartsReadOnlyPart() const;
+
   QObject* _parent;
   QString _name;
 };

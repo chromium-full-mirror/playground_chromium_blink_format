@@ -101,6 +101,7 @@ class NodeFilterImpl;
 class NodeIteratorImpl;
 class NodeListImpl;
 class ProcessingInstructionImpl;
+class Range;
 class RangeImpl;
 class RegisteredEventListener;
 class StyleSheetImpl;

@@ -1024,7 +1024,7 @@ class RenderObject : public CachedObjectClient {
 
   virtual void removeLeftoverAnonymousBoxes();
 
-  void arenaDelete(RenderArena* arena);
+  void arenaDelete(RenderArena* arena, void* objectBase);
 
  private:
   RenderStyle* m_style;
@@ -1057,8 +1057,6 @@ class RenderObject : public CachedObjectClient {
   bool m_isDragging : 1;
 
   bool m_hasOverflowClip : 1;
-
-  void arenaDelete(RenderArena* arena, void* objectBase);
 
   // note: do not add unnecessary bitflags, we have 32 bit already!
   friend class RenderListItem;

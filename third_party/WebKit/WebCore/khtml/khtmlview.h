@@ -304,6 +304,10 @@ class KHTMLView : public QScrollView {
                             ScrollBarMode& hMode,
                             ScrollBarMode& vMode);
 
+#if APPLE_CHANGES
+  virtual bool isKHTMLView() const;
+#endif
+
   // ------------------------------------- member variables
   // ------------------------------------
  private:
