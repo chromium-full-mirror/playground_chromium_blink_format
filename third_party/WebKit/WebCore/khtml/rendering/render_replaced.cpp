@@ -49,13 +49,17 @@ RenderReplaced::RenderReplaced(DOM::NodeImpl* node) : RenderBox(node) {
   m_intrinsicHeight = 150;
 }
 
-void RenderReplaced::print(QPainter* p,
+void RenderReplaced::paint(QPainter* p,
                            int _x,
                            int _y,
                            int _w,
                            int _h,
                            int _tx,
-                           int _ty) {
+                           int _ty,
+                           int paintPhase) {
+  if (paintPhase != FOREGROUND_PHASE)
+    return;
+
   // not visible or nont even once layouted?
   if (style()->visibility() != VISIBLE || m_y <= -500000)
     return;
@@ -66,10 +70,10 @@ void RenderReplaced::print(QPainter* p,
   if ((_ty > _y + _h) || (_ty + m_height < _y))
     return;
 
-  if (hasSpecialObjects())
-    printBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
+  if (shouldPaintBackgroundOrBorder())
+    paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
 
-  printObject(p, _x, _y, _w, _h, _tx, _ty);
+  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
 }
 
 void RenderReplaced::calcMinMaxWidth() {
@@ -217,28 +221,30 @@ void RenderWidget::setStyle(RenderStyle* _style) {
   }
 
   // do not paint background or borders for widgets
-  setSpecialObjects(false);
+  setShouldPaintBackgroundOrBorder(false);
 }
 
 #if APPLE_CHANGES
-void RenderWidget::printObject(QPainter* p,
+void RenderWidget::paintObject(QPainter* p,
                                int x,
                                int y,
                                int width,
                                int height,
                                int _tx,
-                               int _ty)
+                               int _ty,
+                               int paintPhase)
 #else
-void RenderWidget::printObject(QPainter* /*p*/,
+void RenderWidget::paintObject(QPainter* /*p*/,
                                int,
                                int,
                                int,
                                int,
                                int _tx,
-                               int _ty)
+                               int _ty,
+                               int paintPhase)
 #endif
 {
-  if (!m_widget || !m_view)
+  if (!m_widget || !m_view || paintPhase != FOREGROUND_PHASE)
     return;
 
   if (style()->visibility() != VISIBLE) {

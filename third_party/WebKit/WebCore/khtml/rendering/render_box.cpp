@@ -132,22 +132,23 @@ int RenderBox::height() const {
   return m_height;
 }
 
-// --------------------- printing stuff -------------------------------
+// --------------------- painting stuff -------------------------------
 
-void RenderBox::print(QPainter* p,
+void RenderBox::paint(QPainter* p,
                       int _x,
                       int _y,
                       int _w,
                       int _h,
                       int _tx,
-                      int _ty) {
+                      int _ty,
+                      int paintPhase) {
   _tx += m_x;
   _ty += m_y;
 
   // default implementation. Just pass things through to the children
   RenderObject* child = firstChild();
   while (child != 0) {
-    child->print(p, _x, _y, _w, _h, _tx, _ty);
+    child->paint(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
     child = child->nextSibling();
   }
 }
@@ -157,14 +158,14 @@ void RenderBox::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {
     repaint();  // repaint bg when it finished loading
 }
 
-void RenderBox::printBoxDecorations(QPainter* p,
+void RenderBox::paintBoxDecorations(QPainter* p,
                                     int,
                                     int _y,
                                     int,
                                     int _h,
                                     int _tx,
                                     int _ty) {
-  // kdDebug( 6040 ) << renderName() << "::printDecorations()" << endl;
+  // kdDebug( 6040 ) << renderName() << "::paintDecorations()" << endl;
 
   int w = width();
   int h = height() + borderTopExtra() + borderBottomExtra();
@@ -177,14 +178,14 @@ void RenderBox::printBoxDecorations(QPainter* p,
   else
     mh = QMIN(_h, h);
 
-  printBackground(p, style()->backgroundColor(), style()->backgroundImage(), my,
+  paintBackground(p, style()->backgroundColor(), style()->backgroundImage(), my,
                   mh, _tx, _ty, w, h);
 
   if (style()->hasBorder())
-    printBorder(p, _tx, _ty, w, h, style());
+    paintBorder(p, _tx, _ty, w, h, style());
 }
 
-void RenderBox::printBackground(QPainter* p,
+void RenderBox::paintBackground(QPainter* p,
                                 const QColor& c,
                                 CachedImage* bg,
                                 int clipy,

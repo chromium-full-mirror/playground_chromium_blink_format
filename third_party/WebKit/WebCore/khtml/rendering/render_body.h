@@ -45,7 +45,7 @@ class RenderBody : public RenderFlow {
   virtual void setStyle(RenderStyle* style);
 
  protected:
-  virtual void printBoxDecorations(QPainter* p,
+  virtual void paintBoxDecorations(QPainter* p,
                                    int _x,
                                    int _y,
                                    int _w,

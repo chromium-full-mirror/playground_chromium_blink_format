@@ -67,7 +67,7 @@ void RenderImage::setStyle(RenderStyle* _style) {
   // init RenderObject attributes
   setInline(!isPositioned() && style()->display() == INLINE);
   setOverhangingContents(style()->height().isPercent());
-  setSpecialObjects(true);
+  setShouldPaintBackgroundOrBorder(true);
 
   CachedObject* co = style()->contentObject();
   if (co && image != co) {
@@ -183,13 +183,17 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
   }
 }
 
-void RenderImage::printObject(QPainter* p,
+void RenderImage::paintObject(QPainter* p,
                               int /*_x*/,
                               int /*_y*/,
                               int /*_w*/,
                               int /*_h*/,
                               int _tx,
-                              int _ty) {
+                              int _ty,
+                              int paintPhase) {
+  if (paintPhase != FOREGROUND_PHASE)
+    return;
+
   int cWidth = contentWidth();
   int cHeight = contentHeight();
   int leftBorder = borderLeft();
@@ -315,7 +319,7 @@ void RenderImage::printObject(QPainter* p,
     }
   }
   if (style()->outlineWidth())
-    printOutline(p, _tx, _ty, width(), height(), style());
+    paintOutline(p, _tx, _ty, width(), height(), style());
 }
 
 void RenderImage::layout() {

@@ -122,7 +122,7 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_positioned(false),
       m_overhangingContents(false),
       m_relPositioned(false),
-      m_printSpecial(false),
+      m_paintBackground(false),
 
       m_isAnonymous(false),
       m_recalcMinMax(false),
@@ -540,7 +540,7 @@ void RenderObject::drawBorder(QPainter* p,
     p->setRasterOp(Qt::CopyROP);
 }
 
-void RenderObject::printBorder(QPainter* p,
+void RenderObject::paintBorder(QPainter* p,
                                int _tx,
                                int _ty,
                                int w,
@@ -607,7 +607,7 @@ void RenderObject::printBorder(QPainter* p,
   }
 }
 
-void RenderObject::printOutline(QPainter* p,
+void RenderObject::paintOutline(QPainter* p,
                                 int _tx,
                                 int _ty,
                                 int w,
@@ -633,14 +633,15 @@ void RenderObject::printOutline(QPainter* p,
              QColor(oc), style->color(), os, ow, ow, true);
 }
 
-void RenderObject::print(QPainter* p,
+void RenderObject::paint(QPainter* p,
                          int x,
                          int y,
                          int w,
                          int h,
                          int tx,
-                         int ty) {
-  printObject(p, x, y, w, h, tx, ty);
+                         int ty,
+                         int paintPhase) {
+  paintObject(p, x, y, w, h, tx, ty, paintPhase);
 }
 
 void RenderObject::repaintRectangle(int x,
@@ -745,8 +746,8 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
   if (isReplaced()) {
     *stream << " replaced";
   }
-  if (hasSpecialObjects()) {
-    *stream << " specialObjects";
+  if (shouldPaintBackgroundOrBorder()) {
+    *stream << " paintBackground";
   }
   if (layouted()) {
     *stream << " layouted";
@@ -786,7 +787,7 @@ void RenderObject::setStyle(RenderStyle* style) {
   m_floating = false;
   m_positioned = false;
   m_relPositioned = false;
-  m_printSpecial = false;
+  m_paintBackground = false;
   // no support for changing the display type dynamically... object must be
   // detached and re-attached as a different type
   // m_inline = true;
@@ -813,8 +814,8 @@ void RenderObject::setStyle(RenderStyle* style) {
       nb->ref(this);
   }
 
-  setSpecialObjects(m_style->backgroundColor().isValid() ||
-                    m_style->hasBorder() || nb);
+  setShouldPaintBackgroundOrBorder(m_style->backgroundColor().isValid() ||
+                                   m_style->hasBorder() || nb);
   m_hasFirstLine = (style->getPseudoStyle(RenderStyle::FIRST_LINE) != 0);
 
   if (d >= RenderStyle::Position && m_parent) {

@@ -41,8 +41,14 @@ class RenderBox : public RenderContainer {
   virtual const char* renderName() const { return "RenderBox"; }
 
   virtual void setStyle(RenderStyle* style);
-  virtual void
-  print(QPainter* p, int _x, int _y, int _w, int _h, int _tx, int _ty);
+  virtual void paint(QPainter* p,
+                     int _x,
+                     int _y,
+                     int _w,
+                     int _h,
+                     int _tx,
+                     int _ty,
+                     int paintPhase);
 
   virtual void close();
 
@@ -123,14 +129,14 @@ class RenderBox : public RenderContainer {
   virtual RenderLayer* layer() const { return m_layer; }
 
  protected:
-  virtual void printBoxDecorations(QPainter* p,
+  virtual void paintBoxDecorations(QPainter* p,
                                    int _x,
                                    int _y,
                                    int _w,
                                    int _h,
                                    int _tx,
                                    int _ty);
-  void printBackground(QPainter* p,
+  void paintBackground(QPainter* p,
                        const QColor& c,
                        CachedImage* bg,
                        int clipy,

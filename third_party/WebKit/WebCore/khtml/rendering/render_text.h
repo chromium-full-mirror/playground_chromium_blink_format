@@ -74,21 +74,21 @@ class TextSlave {
   void* operator new(size_t sz) throw();
 
  public:
-  void printDecoration(QPainter* pt,
+  void paintDecoration(QPainter* pt,
                        RenderText* p,
                        int _tx,
                        int _ty,
                        int decoration,
                        bool begin,
                        bool end);
-  void printBoxDecorations(QPainter* p,
+  void paintBoxDecorations(QPainter* p,
                            RenderStyle* style,
                            RenderText* parent,
                            int _tx,
                            int _ty,
                            bool begin,
                            bool end);
-  void printSelection(const Font* f,
+  void paintSelection(const Font* f,
                       RenderText* text,
                       QPainter* p,
                       RenderStyle* style,
@@ -161,9 +161,16 @@ class RenderText : public RenderObject {
 
   virtual bool isRendered() const { return true; }
 
-  virtual void print(QPainter*, int x, int y, int w, int h, int tx, int ty);
   virtual void
-  printObject(QPainter*, int x, int y, int w, int h, int tx, int ty);
+  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
+  virtual void paintObject(QPainter*,
+                           int x,
+                           int y,
+                           int w,
+                           int h,
+                           int tx,
+                           int ty,
+                           int paintPhase);
 
   void deleteSlaves(RenderArena* renderArena = 0);
   virtual void detach(RenderArena* renderArena);
@@ -268,7 +275,7 @@ class RenderText : public RenderObject {
 #endif
 
  protected:
-  void printTextOutline(QPainter* p,
+  void paintTextOutline(QPainter* p,
                         int tx,
                         int ty,
                         const QRect& prevLine,

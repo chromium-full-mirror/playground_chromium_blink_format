@@ -45,13 +45,14 @@ class RenderImage : public RenderReplaced {
   virtual bool isRendered() const { return true; }
   virtual bool isImage() const { return false; }
 
-  virtual void printObject(QPainter* p,
+  virtual void paintObject(QPainter* p,
                            int /*x*/,
                            int /*y*/,
                            int /*w*/,
                            int /*h*/,
                            int tx,
-                           int ty);
+                           int ty,
+                           int paintPhase);
 
   virtual void layout();
 

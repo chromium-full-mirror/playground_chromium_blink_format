@@ -110,7 +110,8 @@ class RenderTable : public RenderFlow {
 
   // overrides
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual void print(QPainter*, int x, int y, int w, int h, int tx, int ty);
+  virtual void
+  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
   virtual void layout();
   virtual void calcMinMaxWidth();
   virtual void close();
@@ -416,7 +417,14 @@ class RenderTableCell : public RenderFlow {
   virtual void setTable(RenderTable* t) { m_table = t; }
   RenderTable* table() const { return m_table; }
 
-  virtual void print(QPainter* p, int x, int y, int w, int h, int tx, int ty);
+  virtual void paint(QPainter* p,
+                     int x,
+                     int y,
+                     int w,
+                     int h,
+                     int tx,
+                     int ty,
+                     int paintPhase);
 
   virtual void close();
 
@@ -449,7 +457,7 @@ class RenderTableCell : public RenderFlow {
  protected:
   RenderTable* m_table;
 
-  virtual void printBoxDecorations(QPainter* p,
+  virtual void paintBoxDecorations(QPainter* p,
                                    int _x,
                                    int _y,
                                    int _w,

@@ -58,9 +58,16 @@ class RenderFlow : public RenderBox {
 
   // overrides RenderObject
 
-  virtual void print(QPainter*, int x, int y, int w, int h, int tx, int ty);
   virtual void
-  printObject(QPainter*, int x, int y, int w, int h, int tx, int ty);
+  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
+  virtual void paintObject(QPainter*,
+                           int x,
+                           int y,
+                           int w,
+                           int h,
+                           int tx,
+                           int ty,
+                           int paintPhase);
   void
   paintFloats(QPainter* p, int _x, int _y, int _w, int _h, int _tx, int _ty);
 
