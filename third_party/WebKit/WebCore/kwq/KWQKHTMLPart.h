@@ -306,7 +306,6 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void didTellBridgeAboutLoad(const QString& urlString);
   bool haveToldBridgeAboutLoad(const QString& urlString);
-  void print();
 
   KJS::Bindings::Instance* getAppletInstanceForView(NSView* aView);
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
@@ -397,6 +396,7 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _usesInactiveTextBackgroundColor;
   bool _showsFirstResponder;
   mutable bool _drawSelectionOnly;
+  bool _haveUndoRedoOperations;
 
   QDict<char> urlsBridgeKnowsAbout;
 
