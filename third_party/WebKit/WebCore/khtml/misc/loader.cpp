@@ -4,7 +4,7 @@
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller (mueller@kde.org)
     Copyright (C) 2002 Waldo Bastian (bastian@kde.org)
-    Copyright (C) 2003 Apple Computer, Inc.
+    Copyright (C) 2004 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -94,7 +94,8 @@ CachedObject::~CachedObject() {
   Cache::removeFromLRUList(this);
   m_deleted = true;
 #if APPLE_CHANGES
-  KWQReleaseResponse(m_response);
+  setResponse(0);
+  setAllData(0);
 #endif
 }
 
@@ -136,16 +137,6 @@ bool CachedObject::isExpired() const {
   time_t now = time(0);
   return (difftime(now, m_expireDate) >= 0);
 }
-
-#if APPLE_CHANGES
-
-void CachedObject::setResponse(void* response) {
-  KWQRetainResponse(response);
-  KWQReleaseResponse(m_response);
-  m_response = response;
-}
-
-#endif
 
 void CachedObject::setRequest(Request* _request) {
   if (_request && !m_request)
@@ -1398,8 +1389,10 @@ void Loader::servePendingRequests() {
 #if APPLE_CHANGES
   connect(job, SIGNAL(data(KIO::Job*, const char*, int)),
           SLOT(slotData(KIO::Job*, const char*, int)));
-  connect(job, SIGNAL(receivedResponse(KIO::Job*, void*)),
-          SLOT(slotReceivedResponse(KIO::Job*, void*)));
+  connect(job, SIGNAL(receivedResponse(KIO::Job*, NSURLResponse*)),
+          SLOT(slotReceivedResponse(KIO::Job*, NSURLResponse*)));
+  connect(job, SIGNAL(allData(KIO::Job*, NSData*)),
+          SLOT(slotAllData(KIO::Job*, NSData*)));
 
   if (KWQServeRequest(this, req, job))
     m_requestsLoading.insert(job, req);
@@ -1457,7 +1450,8 @@ void Loader::slotFinished(KIO::Job* job) {
 }
 
 #if APPLE_CHANGES
-void Loader::slotReceivedResponse(KIO::Job* job, void* response) {
+
+void Loader::slotReceivedResponse(KIO::Job* job, NSURLResponse* response) {
   Request* r = m_requestsLoading[job];
   ASSERT(r);
   ASSERT(response);
@@ -1465,6 +1459,14 @@ void Loader::slotReceivedResponse(KIO::Job* job, void* response) {
   r->object->setExpireDate(KWQCacheObjectExpiresTime(r->m_docLoader, response),
                            false);
 }
+
+void Loader::slotAllData(KIO::Job* job, NSData* data) {
+  Request* r = m_requestsLoading[job];
+  ASSERT(r);
+  ASSERT(data);
+  r->object->setAllData(data);
+}
+
 #endif
 
 #if APPLE_CHANGES
