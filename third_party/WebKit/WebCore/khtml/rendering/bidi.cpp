@@ -1658,6 +1658,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
           if (!isPre && w + tmpW > width && w == 0) {
             int fb = nearestFloatBottom(m_height);
             int newLineWidth = lineWidth(fb);
+            // See if |tmpW| will fit on the new line.  As long as it does not,
+            // keep adjusting our float bottom until we find some room.
+            int lastFloatBottom = m_height;
+            while (lastFloatBottom < fb && tmpW > newLineWidth) {
+              lastFloatBottom = fb;
+              fb = nearestFloatBottom(fb);
+              newLineWidth = lineWidth(fb);
+            }
+
             if (!w && m_height < fb && width < newLineWidth) {
               m_height = fb;
               width = newLineWidth;
@@ -1798,6 +1807,14 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
 
       int fb = nearestFloatBottom(m_height);
       int newLineWidth = lineWidth(fb);
+      // See if |tmpW| will fit on the new line.  As long as it does not,
+      // keep adjusting our float bottom until we find some room.
+      int lastFloatBottom = m_height;
+      while (lastFloatBottom < fb && tmpW > newLineWidth) {
+        lastFloatBottom = fb;
+        fb = nearestFloatBottom(fb);
+        newLineWidth = lineWidth(fb);
+      }
       if (!w && m_height < fb && width < newLineWidth) {
         m_height = fb;
         width = newLineWidth;
