@@ -88,6 +88,9 @@ class RenderFlow : public RenderBox {
 
   virtual void repaint(bool immediate = false);
 
+  virtual int lowestPosition() const;
+  virtual int rightmostPosition() const;
+
  protected:
   // An inline can be split with blocks occurring in between the inline content.
   // When this occurs we need a pointer to our next object.  We can basically be
