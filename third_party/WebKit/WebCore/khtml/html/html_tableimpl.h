@@ -100,6 +100,8 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   virtual void init();
 
+  int cellPadding() { return m_cellPadding; }
+
  protected:
   HTMLTableSectionElementImpl* head;
   HTMLTableSectionElementImpl* foot;
@@ -109,7 +111,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   Frame frame;
   Rules rules;
 
-  DOMString cellPadding;
+  int m_cellPadding;
 
   bool incremental : 1;
   bool m_noBorder : 1;

@@ -1030,7 +1030,7 @@ void RenderFlow::layoutInlineChildren() {
   int toAdd = style()->borderBottomWidth();
   m_height = style()->borderTopWidth();
 
-  if (style()->hasPadding()) {
+  if (hasPadding()) {
     m_height += paddingTop();
     toAdd += paddingBottom();
   }
