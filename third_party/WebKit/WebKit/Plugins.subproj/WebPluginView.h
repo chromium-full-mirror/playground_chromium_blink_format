@@ -15,6 +15,9 @@
   WCPlugin* plugin;
   IFPluginNullEventSender* eventSender;
 
+  char *cMime, **cAttributes, **cValues;
+  uint argsCount;
+
   id<IFWebController> webController;
   IFWebDataSource* webDataSource;
 
@@ -23,8 +26,7 @@
   NP_Port nPort;
   NPP_t instanceStruct;
 
-  char **cAttributes, **cValues;
-  bool isFlipped, transferred, hidden, stopped;
+  BOOL isFlipped, transferred, isHidden, stopped, WKFullMode;
 
   NSString *URL, *mime;
   NSURL* baseURL;
