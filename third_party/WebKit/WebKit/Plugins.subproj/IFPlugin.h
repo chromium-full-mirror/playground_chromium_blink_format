@@ -37,6 +37,7 @@
   uint16 pluginVersion;
   CFBundleRef bundle;
   CFragConnectionID connID;
+  SInt16 resourceRef;
 
   NPP_NewProcPtr NPP_New;
   NPP_DestroyProcPtr NPP_Destroy;
