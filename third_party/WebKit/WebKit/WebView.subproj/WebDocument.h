@@ -78,7 +78,8 @@
 */
 - (BOOL)searchFor:(NSString*)string
         direction:(BOOL)forward
-    caseSensitive:(BOOL)caseFlag;
+    caseSensitive:(BOOL)caseFlag
+             wrap:(BOOL)wrapFlag;
 @end
 
 /*!
