@@ -54,6 +54,7 @@ typedef enum {
 @end
 
 @interface IFWebFrame (IFPrivate)
+- (void)_setController:(id<IFWebController>)controller;
 - (void)_setRenderFramePart:(void*)p;
 - (void*)_renderFramePart;
 - (void)_setDataSource:(IFWebDataSource*)d;

@@ -629,6 +629,15 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
   QString documentSource();
 
   void init();
+
+  void ref() { _ref++; }
+  void deref() {
+    if (_ref)
+      _ref--;
+    if (!_ref)
+      delete this;
+  }
+
   void slotData(IFURLHandle* handle, const char* bytes, int length);
 #endif
 
@@ -652,6 +661,7 @@ class KHTMLPart : public KParts::ReadOnlyPart  // a.k.a. WebPageDocument
 #ifdef APPLE_CHANGES
   IFWebDataSource* dataSource;
   QValueList<QString> plugins;
+  unsigned int _ref;
 #endif
 };
 
