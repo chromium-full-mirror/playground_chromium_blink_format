@@ -47,8 +47,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 #endif
 
-@class WebError;
-@class WebFrame;
 @class WebCoreSettings;
 
 @protocol WebCoreDOMTreeCopier;
@@ -85,12 +83,6 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 // The WebCoreBridge interface contains methods for use by the non-WebCore side
 // of the bridge.
-
-enum FrameBorderStyle {
-  NoFrameBorder = 1,
-  SunkenFrameBorder = 2,
-  PlainFrameBorder = 4
-};
 
 @interface WebCoreBridge : NSObject {
   KWQKHTMLPart* _part;
@@ -223,6 +215,7 @@ enum FrameBorderStyle {
 - (void)deselectAll;
 
 - (NSRect)selectionRect;
+- (NSRect)visibleSelectionRect;
 - (NSImage*)selectionImage;
 
 - (id<WebDOMNode>)selectionStart;
@@ -234,8 +227,6 @@ enum FrameBorderStyle {
                                 startOffset:(int)startOffset
                                          to:(id<WebDOMNode>)endNode
                                   endOffset:(int)endOffset;
-
-- (int)frameBorderStyle;
 
 + (NSString*)stringWithData:(NSData*)data
                textEncoding:(CFStringEncoding)textEncoding;
@@ -405,6 +396,8 @@ enum FrameBorderStyle {
     doCommandBySelector:(SEL)commandSelector;
 
 - (NSView<WebCoreFileButton>*)fileButton;
+
+- (void)setHasBorder:(BOOL)hasBorder;
 
 @end
 
