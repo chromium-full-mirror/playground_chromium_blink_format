@@ -2218,8 +2218,9 @@ void RenderTableCell::paintBoxDecorations(QPainter* p,
 }
 
 void RenderTableCell::repaint(bool immediate) {
-  if (m_table)
-    m_table->repaint(immediate);
+  // XXXdwh WHY? This just causes way too much repainting!
+  // if ( m_table ) m_table->repaint(immediate);
+  return RenderFlow::repaint(immediate);
 }
 
 #ifndef NDEBUG
