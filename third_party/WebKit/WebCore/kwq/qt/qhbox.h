@@ -52,12 +52,13 @@ class QHBox : public QFrame {
 
   bool setStretchFactor(QWidget*, int stretch);
 
-  // operators ---------------------------------------------------------------
+// operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
+#ifdef _KWQ_
+  void setFocusProxy(QWidget* lineEdit);
+#endif
 
  private:
 // add copy constructor
@@ -70,10 +71,6 @@ class QHBox : public QFrame {
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
   QHBox& operator=(const QHBox&);
-#endif
-
-#ifdef _KWQ_
-  void setFocusProxy(QWidget* lineEdit);
 #endif
 
 };  // class QHBox
