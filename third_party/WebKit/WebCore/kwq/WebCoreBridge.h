@@ -25,6 +25,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <WebCore/WebCoreKeyboardAccess.h>
+
 #ifdef __cplusplus
 
 class KWQKHTMLPart;
@@ -403,6 +405,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (NSView<WebCoreFileButton>*)fileButton;
 
 - (void)setHasBorder:(BOOL)hasBorder;
+
+- (WebCoreKeyboardUIMode)keyboardUIMode;
 
 @end
 
