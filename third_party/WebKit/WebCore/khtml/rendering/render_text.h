@@ -238,6 +238,11 @@ class RenderText : public RenderObject {
     return static_cast<DOM::TextImpl*>(RenderObject::element());
   }
 
+#ifdef APPLE_CHANGES
+  TextSlave* findTextSlave(int offset, int& pos);
+  TextSlaveArray textSlaves() { return m_lines; }
+#endif
+
  protected:
   void printTextOutline(QPainter* p,
                         int tx,
@@ -246,7 +251,10 @@ class RenderText : public RenderObject {
                         const QRect& thisLine,
                         const QRect& nextLine);
 
+#ifndef APPLE_CHANGES
   TextSlave* findTextSlave(int offset, int& pos);
+
+#endif
 
  protected:  // members
   TextSlaveArray m_lines;

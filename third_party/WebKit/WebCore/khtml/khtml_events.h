@@ -110,6 +110,7 @@ class MouseDoubleClickEvent : public MouseEvent {
   static const char* s_strMouseDoubleClickEvent;
 };
 
+#ifdef APPLE_CHANGES
 class MouseTripleClickEvent : public MouseEvent {
  public:
   MouseTripleClickEvent(QMouseEvent* mouseEvent,
@@ -133,6 +134,7 @@ class MouseTripleClickEvent : public MouseEvent {
  private:
   static const char* s_strMouseTripleClickEvent;
 };
+#endif
 
 class MouseMoveEvent : public MouseEvent {
  public:
