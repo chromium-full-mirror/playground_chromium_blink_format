@@ -66,6 +66,7 @@ typedef void (*NPN_GetStringIdentifiersProcPtr)(const NPUTF8** names,
                                                 int32_t nameCount,
                                                 NPIdentifier* identifiers);
 typedef NPIdentifier (*NPN_GetIntIdentifierProcPtr)(int32_t intid);
+typedef NPIdentifier (*NPN_IntFromIdentifierProcPtr)(NPIdentifier identifier);
 typedef bool (*NPN_IdentifierIsStringProcPtr)(NPIdentifier identifier);
 typedef NPUTF8* (*NPN_UTF8FromIdentifierProcPtr)(NPIdentifier identifier);
 
@@ -90,6 +91,12 @@ typedef bool (*NPN_SetPropertyProcPtr)(NPP npp,
                                        NPObject* obj,
                                        NPIdentifier propertyName,
                                        const NPVariant* value);
+typedef bool (*NPN_HasPropertyProcPtr)(NPP,
+                                       NPObject* npobj,
+                                       NPIdentifier propertyName);
+typedef bool (*NPN_HasMethodProcPtr)(NPP npp,
+                                     NPObject* npobj,
+                                     NPIdentifier methodName);
 typedef bool (*NPN_RemovePropertyProcPtr)(NPP npp,
                                           NPObject* obj,
                                           NPIdentifier propertyName);
@@ -164,20 +171,23 @@ typedef struct _NPNetscapeFuncs {
   NPN_InvalidateRegionProcPtr invalidateregion;
   NPN_ForceRedrawProcPtr forceredraw;
 
-  NPN_ReleaseVariantValueProcPtr releasevariantvalue;
   NPN_GetStringIdentifierProcPtr getstringidentifier;
   NPN_GetStringIdentifiersProcPtr getstringidentifiers;
   NPN_GetIntIdentifierProcPtr getintidentifier;
   NPN_IdentifierIsStringProcPtr identifierisstring;
   NPN_UTF8FromIdentifierProcPtr utf8fromidentifier;
+  NPN_IntFromIdentifierProcPtr intfromidentifier;
   NPN_CreateObjectProcPtr createobject;
   NPN_RetainObjectProcPtr retainobject;
   NPN_ReleaseObjectProcPtr releaseobject;
   NPN_CallProcPtr call;
-  NPN_EvaluateProcPtr evalute;
+  NPN_EvaluateProcPtr evaluate;
   NPN_GetPropertyProcPtr getproperty;
   NPN_SetPropertyProcPtr setproperty;
   NPN_RemovePropertyProcPtr removeproperty;
+  NPN_HasPropertyProcPtr hasproperty;
+  NPN_HasMethodProcPtr hasmethod;
+  NPN_ReleaseVariantValueProcPtr releasevariantvalue;
   NPN_SetExceptionProcPtr setexception;
 } NPNetscapeFuncs;
 
