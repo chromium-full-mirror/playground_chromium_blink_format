@@ -97,7 +97,8 @@ typedef enum {
 - (void)_goToItem:(WebHistoryItem*)item
     withFrameLoadType:(WebFrameLoadType)type;
 
-- (BOOL)_continueAfterClickPolicyForEvent:(NSEvent*)event;
+- (BOOL)_continueAfterClickPolicyForEvent:(NSEvent*)event
+                                  request:(WebResourceRequest*)request;
 - (void)_loadURL:(NSURL*)URL
            loadType:(WebFrameLoadType)loadType
      clientRedirect:(BOOL)clientRedirect

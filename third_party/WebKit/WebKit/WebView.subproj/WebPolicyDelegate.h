@@ -222,7 +222,9 @@ typedef enum {
 */
 - (WebClickPolicy*)clickPolicyForElement:(NSDictionary*)elementInformation
                                   button:(NSEventType)eventType
-                           modifierFlags:(unsigned int)modifierFlags;
+                           modifierFlags:(unsigned int)modifierFlags
+                                 request:(WebResourceRequest*)request
+                                 inFrame:(WebFrame*)frame;
 
 /*!
     @method URLPolicyForURL:inFrame:
