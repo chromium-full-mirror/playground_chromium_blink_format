@@ -792,7 +792,10 @@ void RenderPartObject::updateWidget() {
 
 // ugly..
 void RenderPartObject::close() {
+#ifdef _KWQ_
+#else
   updateWidget();
+#endif
   RenderPart::close();
 }
 
