@@ -269,6 +269,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
              reload:(BOOL)reload
+        onLoadEvent:(BOOL)onLoad
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
                form:(NSObject<WebDOMElement>*)form
