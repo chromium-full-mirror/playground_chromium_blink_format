@@ -602,8 +602,8 @@ class Context2D : public DOMObject {
     AddQuadraticCurveToPoint,
     AddBezierCurveToPoint,
     ClearRect,
-    drawImage,
-    drawImageFromRect
+    DrawImage,
+    DrawImageFromRect
   };
 
   DOM::HTMLElementImpl* _element;

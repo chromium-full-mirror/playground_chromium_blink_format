@@ -1191,7 +1191,7 @@ const struct HashEntry Context2DTableEntries[] = {
     {"save", Context2D::Save, DontDelete | Function, 0,
      &Context2DTableEntries[21]},
     {"restore", Context2D::Restore, DontDelete | Function, 0, 0},
-    {0, 0, 0, 0, 0},
+    {"drawImage", Context2D::DrawImage, DontDelete | Function, 6, 0},
     {"translate", Context2D::Translate, DontDelete | Function, 1,
      &Context2DTableEntries[20]},
     {"rotate", Context2D::Rotate, DontDelete | Function, 2,
@@ -1205,7 +1205,8 @@ const struct HashEntry Context2DTableEntries[] = {
     {"beginPath", Context2D::BeginPath, DontDelete | Function, 0,
      &Context2DTableEntries[23]},
     {"closePath", Context2D::ClosePath, DontDelete | Function, 0, 0},
-    {"setStrokeColor", Context2D::SetStrokeColor, DontDelete | Function, 1, 0},
+    {"setStrokeColor", Context2D::SetStrokeColor, DontDelete | Function, 1,
+     &Context2DTableEntries[30]},
     {"setFillColor", Context2D::SetFillColor, DontDelete | Function, 1, 0},
     {"setLineCap", Context2D::SetLineCap, DontDelete | Function, 1,
      &Context2DTableEntries[26]},
@@ -1216,8 +1217,10 @@ const struct HashEntry Context2DTableEntries[] = {
     {"moveToPoint", Context2D::MoveToPoint, DontDelete | Function, 2, 0},
     {"addBezierCurveToPoint", Context2D::AddBezierCurveToPoint,
      DontDelete | Function, 6, 0},
-    {"clearRect", Context2D::ClearRect, DontDelete | Function, 4, 0}};
+    {"clearRect", Context2D::ClearRect, DontDelete | Function, 4, 0},
+    {"drawImageFromRect", Context2D::DrawImageFromRect, DontDelete | Function,
+     10, 0}};
 
-const struct HashTable Context2DTable = {2, 30, Context2DTableEntries, 20};
+const struct HashTable Context2DTable = {2, 31, Context2DTableEntries, 20};
 
 }  // namespace
