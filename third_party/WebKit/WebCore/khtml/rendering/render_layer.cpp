@@ -1314,6 +1314,7 @@ Marquee::Marquee(RenderLayer* l)
       m_unfurlPos(0),
       m_reset(false),
       m_suspended(false),
+      m_stopped(false),
       m_whiteSpace(NORMAL),
       m_direction(MAUTO) {}
 
@@ -1410,6 +1411,8 @@ void Marquee::start() {
   if (m_timerId || m_layer->renderer()->style()->marqueeIncrement().value == 0)
     return;
 
+  m_stopped = false;
+
   if (!m_suspended) {
     if (isUnfurlMarquee()) {
       bool forward = direction() == MDOWN || direction() == MRIGHT;
@@ -1438,6 +1441,15 @@ void Marquee::suspend() {
   m_suspended = true;
 }
 
+void Marquee::stop() {
+  if (m_timerId) {
+    killTimer(m_timerId);
+    m_timerId = 0;
+  }
+
+  m_stopped = true;
+}
+
 void Marquee::updateMarqueePosition() {
   bool activate = (m_totalLoops <= 0 || m_currentLoop < m_totalLoops);
   if (activate) {
@@ -1456,7 +1468,8 @@ void Marquee::updateMarqueePosition() {
       m_end = computePosition(reverseDirection(),
                               behavior == MALTERNATE || behavior == MSLIDE);
     }
-    start();
+    if (!m_stopped)
+      start();
   }
 }
 
