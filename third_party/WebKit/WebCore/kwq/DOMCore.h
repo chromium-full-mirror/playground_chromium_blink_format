@@ -23,20 +23,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//=========================================================================
-//=========================================================================
-//=========================================================================
-
-// Important Note:
-// Though this file appears as an exported header from WebKit, the
-// version you should edit is in WebCore. The WebKit version is copied
-// to WebKit during the build process.
-
-//=========================================================================
-//=========================================================================
-//=========================================================================
-
 #import <Foundation/Foundation.h>
+
+#import <JavaScriptCore/WebScriptObject.h>
 
 @class DOMDocument;
 @class DOMDocumentType;
@@ -46,7 +35,7 @@
 
 typedef struct DOMObjectInternal DOMObjectInternal;
 
-@interface DOMObject : NSObject<NSCopying> {
+@interface DOMObject : WebScriptObject<NSCopying> {
   DOMObjectInternal* _internal;
 }
 @end
