@@ -61,6 +61,10 @@ class PluginBase : public ObjectImp {
 
   static QPtrList<PluginInfo>* plugins;
   static QPtrList<MimeClassInfo>* mimes;
+#ifdef APPLE_CHANGES
+  static void ref();
+  static void unref();
+#endif
 
  private:
   static int m_refCount;
@@ -90,10 +94,19 @@ const ClassInfo MimeTypes::info = {"MimeTypeArray", 0, 0, 0};
 
 class Plugin : public ObjectImp {
  public:
+#ifdef APPLE_CHANGES
+  Plugin(ExecState* exec, PluginBase::PluginInfo* info)
+      : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
+    m_info = info;
+    PluginBase::ref();
+  };
+  virtual ~Plugin() { PluginBase::unref(); }
+#else
   Plugin(ExecState* exec, PluginBase::PluginInfo* info)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
     m_info = info;
   };
+#endif
   virtual Value get(ExecState* exec, const UString& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -105,10 +118,19 @@ const ClassInfo Plugin::info = {"Plugin", 0, 0, 0};
 
 class MimeType : public ObjectImp {
  public:
+#ifdef APPLE_CHANGES
+  MimeType(ExecState* exec, PluginBase::MimeClassInfo* info)
+      : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
+    m_info = info;
+    PluginBase::ref();
+  };
+  virtual ~MimeType() { PluginBase::unref(); }
+#else
   MimeType(ExecState* exec, PluginBase::MimeClassInfo* info)
       : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
     m_info = info;
   };
+#endif
   virtual Value get(ExecState* exec, const UString& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -277,6 +299,23 @@ PluginBase::~PluginBase() {
     mimes = 0;
   }
 }
+
+#ifdef APPLE_CHANGES
+void PluginBase::ref() {
+  m_refCount++;
+}
+
+void PluginBase::unref() {
+  m_refCount--;
+  if (m_refCount == 0) {
+    delete plugins;
+    delete mimes;
+    plugins = 0;
+    mimes = 0;
+  }
+}
+
+#endif
 
 /*******************************************************************/
 IMPLEMENT_PROTOFUNC(PluginsFunc)
