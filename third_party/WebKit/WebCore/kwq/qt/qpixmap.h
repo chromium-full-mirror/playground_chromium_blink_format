@@ -75,7 +75,7 @@ class QPixmap : public QPaintDevice, public Qt {
 
  private:
   WebCoreImageRendererPtr imageRenderer;
-  bool needCopyOnWrite;
+  mutable bool needCopyOnWrite;
 
   friend class QPainter;
 };
