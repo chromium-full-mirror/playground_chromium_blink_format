@@ -601,7 +601,7 @@ Value XMLHttpRequestProtoFunc::tryCall(ExecState* exec,
       QString method = args[0].toString(exec).qstring();
       KURL url = KURL(Window::retrieveActive(exec)
                           ->part()
-                          ->htmlDocument()
+                          ->document()
                           .completeURL(args[1].toString(exec).qstring())
                           .string());
 
