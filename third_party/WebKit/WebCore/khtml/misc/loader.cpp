@@ -896,14 +896,14 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   // must have arrived in one chunk.  This avoids the attempt
   // to perform incremental decoding.
   if (eof && !p) {
-    p = new QPixmap(_buffer.buffer());
+    p = new QPixmap(_buffer.buffer(), KWQResponseMIMEType(m_response));
     canDraw = true;
   } else {
     // Always attempt to load the image incrementally.
     // If the AppKit is unable to decode incrementally this pixmap
     // will not be renderable until all the data has been received.
     if (!p)
-      p = new QPixmap;
+      p = new QPixmap(KWQResponseMIMEType(m_response));
     canDraw = p->receivedData(_buffer.buffer(), eof);
   }
 
@@ -1431,6 +1431,12 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: Malformed url: " << kurl.url() << endl;
 #endif
+    return 0;
+  }
+#endif
+
+#if APPLE_CHANGES
+  if (!dl->doc()->shouldCreateRenderers()) {
     return 0;
   }
 #endif

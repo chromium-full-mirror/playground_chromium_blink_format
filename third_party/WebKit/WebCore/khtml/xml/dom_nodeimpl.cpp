@@ -1010,6 +1010,11 @@ RenderObject* NodeImpl::nextRenderer() {
 }
 
 void NodeImpl::createRendererIfNeeded() {
+#if APPLE_CHANGES
+  if (!getDocument()->shouldCreateRenderers())
+    return;
+#endif
+
   assert(!attached());
   assert(!m_render);
 
