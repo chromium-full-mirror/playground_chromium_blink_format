@@ -31,17 +31,37 @@
 using namespace KJS;
 #include <kdebug.h>
 
-static QString jsNameToProp(const Identifier& p) {
+static QString cssPropertyName(const Identifier& p,
+                               bool* hadPixelOrPosPrefix = 0) {
   QString prop = p.qstring();
+
   int i = prop.length();
   while (--i) {
     char c = prop[i].latin1();
-    if (c < 'A' || c > 'Z')
-      continue;
-    prop.insert(i, '-');
+    if (c >= 'A' && c <= 'Z')
+      prop.insert(i, '-');
   }
 
-  return prop.lower();
+  prop = prop.lower();
+
+  if (hadPixelOrPosPrefix)
+    *hadPixelOrPosPrefix = false;
+
+  if (prop.startsWith("css-")) {
+    prop = prop.mid(4);
+  } else if (prop.startsWith("pixel-")) {
+    prop = prop.mid(6);
+    if (hadPixelOrPosPrefix)
+      *hadPixelOrPosPrefix = true;
+  } else if (prop.startsWith("pos-")) {
+    prop = prop.mid(4);
+    if (hadPixelOrPosPrefix)
+      *hadPixelOrPosPrefix = true;
+  } else if (prop.startsWith("khtml-")) {
+    prop.insert(0, '-');
+  }
+
+  return prop;
 }
 
 /*
@@ -85,9 +105,11 @@ DOMCSSStyleDeclaration::~DOMCSSStyleDeclaration() {
 
 bool DOMCSSStyleDeclaration::hasProperty(ExecState* exec,
                                          const Identifier& p) const {
-  DOM::DOMString cssprop = jsNameToProp(p);
-  // strip pos- / pixel- prefix here?
-  if (DOM::getPropertyID(cssprop.string().ascii(), cssprop.length()))
+  if (p == "cssText")
+    return true;
+
+  QString prop = cssPropertyName(p);
+  if (DOM::getPropertyID(prop.ascii(), prop.length()))
     return true;
 
   return ObjectImp::hasProperty(exec, p);
@@ -125,26 +147,21 @@ Value DOMCSSStyleDeclaration::tryGet(ExecState* exec,
 
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "DOMCSSStyleDeclaration: converting to css property name: "
-                << jsNameToProp(propertyName) << endl;
+                << cssPropertyName(propertyName) << endl;
 #endif
   DOM::CSSStyleDeclaration styleDecl2 = styleDecl;
-  DOM::DOMString p = jsNameToProp(propertyName);
-  bool asNumber = false;
+
+  // Set up pixelOrPos boolean to handle the fact that
   // pixelTop returns "CSS Top" as number value in unit pixels
   // posTop returns "CSS top" as number value in unit pixels _if_ its a
   // positioned element. if it is not a positioned element, return 0
   // from MSIE documentation ### IMPLEMENT THAT (Dirk)
-  {
-    QString prop = p.string();
-    if (prop.startsWith("pixel-") || prop.startsWith("pos-")) {
-      p = prop.mid(prop.find('-') + 1);
-      asNumber = true;
-    }
-  }
+  bool pixelOrPos;
+  DOM::DOMString p = cssPropertyName(propertyName, &pixelOrPos);
 
   DOM::CSSValue v = styleDecl2.getPropertyCSSValue(p);
   if (!v.isNull()) {
-    if (asNumber && v.cssValueType() == DOM::CSSValue::CSS_PRIMITIVE_VALUE)
+    if (pixelOrPos && v.cssValueType() == DOM::CSSValue::CSS_PRIMITIVE_VALUE)
       return Number(static_cast<DOM::CSSPrimitiveValue>(v).getFloatValue(
           DOM::CSSPrimitiveValue::CSS_PX));
 
@@ -160,11 +177,9 @@ Value DOMCSSStyleDeclaration::tryGet(ExecState* exec,
 }
 
 void DOMCSSStyleDeclaration::tryPut(ExecState* exec,
-                                    const Identifier& pName,
+                                    const Identifier& propertyName,
                                     const Value& value,
                                     int) {
-  Identifier propertyName = pName;
-
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "DOMCSSStyleDeclaration::tryPut " << propertyName.qstring()
                 << endl;
@@ -172,16 +187,11 @@ void DOMCSSStyleDeclaration::tryPut(ExecState* exec,
   if (propertyName == "cssText") {
     styleDecl.setCssText(value.toString(exec).string());
   } else {
-    QString prop = jsNameToProp(propertyName);
+    bool pixelOrPos;
+    QString prop = cssPropertyName(propertyName, &pixelOrPos);
     QString propvalue = value.toString(exec).qstring();
-
-    if (prop.left(4) == "css-")
-      prop = prop.mid(4);
-
-    if (prop.startsWith("pixel-") || prop.startsWith("pos-")) {
-      prop = prop.mid(prop.find('-') + 1);
+    if (pixelOrPos)
       propvalue += "px";
-    }
 #ifdef KJS_VERBOSE
     kdDebug(6070) << "DOMCSSStyleDeclaration: prop=" << prop
                   << " propvalue=" << propvalue << endl;
