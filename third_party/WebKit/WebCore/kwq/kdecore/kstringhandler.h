@@ -41,11 +41,17 @@ class KStringHandler {
 
   static QString csqueeze(const QString&, uint maxlen = 40);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  KStringHandler();
+// add no-op constructor
+#ifdef KWQ_PEDANTIC
+  KStringHandler() {}
+#endif
 
-  ~KStringHandler();
+// add no-op destructor
+#ifdef KWQ_PEDANTIC
+  ~KStringHandler() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -56,9 +62,17 @@ class KStringHandler {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef KWQ_PEDANTIC
   KStringHandler(const KStringHandler&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef KWQ_PEDANTIC
   KStringHandler& operator=(const KStringHandler&);
+#endif
 
 };  // class KStringHandler
     // =====================================================

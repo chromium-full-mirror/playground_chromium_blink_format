@@ -50,7 +50,18 @@ class KWin {
 
   static Info info(int win);
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
+
+// add no-op constructor
+#ifdef KWQ_PEDANTIC
+  KWin() {}
+#endif
+
+// add no-op destructor
+#ifdef KWQ_PEDANTIC
+  ~KWin() {}
+#endif
+
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
 
@@ -60,9 +71,17 @@ class KWin {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef KWQ_PEDANTIC
   KWin(const KWin&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef KWQ_PEDANTIC
   KWin& operator=(const KWin&);
+#endif
 
 };  // class KWin
     // ===============================================================

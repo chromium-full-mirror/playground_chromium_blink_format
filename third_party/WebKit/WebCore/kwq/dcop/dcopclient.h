@@ -42,7 +42,6 @@ class DCOPClient : public QObject {
   // constructors, copy constructors, and destructors ------------------------
 
   DCOPClient();
-
   virtual ~DCOPClient();
 
   // member functions --------------------------------------------------------
@@ -85,9 +84,12 @@ class DCOPClient : public QObject {
   // ---------------------------------------------------------------------
 
  private:
+// add copy constructor and assignment operator
+#ifdef KWQ_PEDANTIC
   // no copying or assignment
   DCOPClient(const DCOPClient&);
   DCOPClient& operator=(const DCOPClient&);
+#endif
 
 };  // class DCOPClient
     // =========================================================

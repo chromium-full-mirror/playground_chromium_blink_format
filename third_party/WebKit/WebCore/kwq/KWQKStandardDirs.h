@@ -45,8 +45,7 @@ class KStandardDirs {
   // constructors, copy constructors, and destructors ------------------------
 
   KStandardDirs();
-
-  ~KStandardDirs();
+  virtual ~KStandardDirs();
 
   // member functions --------------------------------------------------------
 
@@ -63,6 +62,7 @@ class KStandardDirs {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   KStandardDirs(const KStandardDirs&);
   KStandardDirs& operator=(const KStandardDirs&);
 
