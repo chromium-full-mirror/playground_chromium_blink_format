@@ -34,6 +34,7 @@ class CSSStyleSheetImpl;
 class CSSRuleImpl;
 class CSSStyleRuleImpl;
 class DocumentImpl;
+class NodeImpl;
 class CSSValueImpl;
 class CSSValueListImpl;
 class CSSPrimitiveValueImpl;
@@ -112,6 +113,9 @@ class CSSParser {
                   int id,
                   const DOM::DOMString& string,
                   bool _important);
+  static QRgb CSSParser::parseColor(const DOM::DOMString& string);
+  bool parseColor(DOM::CSSStyleDeclarationImpl* declaration,
+                  const DOM::DOMString& string);
   bool parseDeclaration(DOM::CSSStyleDeclarationImpl* decls,
                         const DOM::DOMString& string);
 
@@ -165,6 +169,10 @@ class CSSParser {
   int lex();
 
  private:
+  void setupParser(const char* prefix,
+                   const DOMString& string,
+                   const char* suffix);
+
   unsigned short* data;
   unsigned short* yytext;
   unsigned short* yy_c_buf_p;
