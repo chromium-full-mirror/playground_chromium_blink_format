@@ -60,9 +60,6 @@ RenderBox::RenderBox(DOM::NodeImpl* node) : RenderContainer(node) {
   m_layer = 0;
 }
 
-// FIXME: Remove this workaround for gcc bug (Radar 3321716) once it's fixed.
-static void workAroundBug3321716(int) {}
-
 void RenderBox::setStyle(RenderStyle* _style) {
   RenderObject::setStyle(_style);
 
@@ -79,13 +76,12 @@ void RenderBox::setStyle(RenderStyle* _style) {
       break;
     default:
       setPositioned(false);
-      if (_style->isFloating()) {
+
+      if (_style->isFloating())
         setFloating(true);
-        workAroundBug3321716(1);
-      } else if (_style->position() == RELATIVE) {
+
+      if (_style->position() == RELATIVE)
         setRelPositioned(true);
-        workAroundBug3321716(2);
-      }
   }
 
   // Frames and framesets never honor position:relative or position:absolute.
