@@ -234,6 +234,8 @@ class HTMLElement : public DOMElement {
     TextAreaValue,
     TextAreaBlur,
     TextAreaFocus,
+    ButtonBlur,
+    ButtonFocus,
     ButtonForm,
     ButtonTabIndex,
     ButtonName,

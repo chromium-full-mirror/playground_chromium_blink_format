@@ -228,6 +228,8 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void click(bool sendMouseEvents);
   virtual void accessKeyAction(bool sendToAnyElement);
+  void blur();
+  void focus();
 
  protected:
   DOMString m_value;
