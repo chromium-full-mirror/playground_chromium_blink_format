@@ -50,8 +50,8 @@ class QStyle : public QObject {
   // member functions --------------------------------------------------------
 
   GUIStyle guiStyle() const;
-  virtual QSize indicatorSize() const = 0;
-  virtual QSize exclusiveIndicatorSize() const = 0;
+  virtual QSize indicatorSize() { return QSize(0, 0); };
+  virtual QSize exclusiveIndicatorSize() { return QSize(0, 0); };
 
   // operators ---------------------------------------------------------------
 
