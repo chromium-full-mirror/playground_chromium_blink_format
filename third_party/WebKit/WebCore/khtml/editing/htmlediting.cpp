@@ -2595,23 +2595,6 @@ bool DeleteSelectionCommand::handleSpecialCaseBRDelete() {
     return true;
   }
 
-  // Check for special-case where the selection contains only a BR right after a
-  // block ended.
-  bool downstreamEndIsBR = m_downstreamEnd.node()->id() == ID_BR;
-  Position upstreamFromBR = m_downstreamEnd.upstream();
-  Position downstreamFromStart = m_downstreamStart.downstream();
-  bool startIsBRAfterBlock =
-      downstreamEndIsBR &&
-      downstreamFromStart.node() == m_downstreamEnd.node() &&
-      m_downstreamEnd.node()->enclosingBlockFlowElement() !=
-          upstreamFromBR.node()->enclosingBlockFlowElement();
-  if (startIsBRAfterBlock) {
-    removeNode(m_downstreamEnd.node());
-    m_endingPosition = upstreamFromBR;
-    m_mergeBlocksAfterDelete = false;
-    return true;
-  }
-
   // Not a special-case delete per se, but we can detect that the merging of
   // content between blocks
   // should not be done.
@@ -2669,7 +2652,8 @@ void DeleteSelectionCommand::handleGeneralDelete() {
   } else if (m_startBlock != m_endBlock &&
              isStartOfBlock(VisiblePosition(
                  m_upstreamStart, m_selectionToDelete.startAffinity()))) {
-    if (!isStartOfBlock(visibleEnd) && endAtEndOfBlock) {
+    if (!m_startBlock->isAncestor(m_endBlock) && !isStartOfBlock(visibleEnd) &&
+        endAtEndOfBlock) {
       // Delete all the children of the block, but not the block itself.
       setStartNode(m_startBlock->firstChild());
       startOffset = 0;
