@@ -53,7 +53,8 @@
     @param request The request to load.
     @result The WebController for the WebView in the new window.
 */
-- (WebController*)createWindowWithRequest:(WebRequest*)request;
+- (WebController*)controller:(WebController*)controller
+     createWindowWithRequest:(WebRequest*)request;
 
 /*!
     @method showWindow
@@ -63,7 +64,7 @@
     @discussion This will only be called just after createWindowWithRequest:
     is used to create a new window.
 */
-- (void)showWindow;
+- (void)controllerShowWindow:(WebController*)controller;
 
 /*!
     @method closeWindow
@@ -73,7 +74,7 @@
     controller. Other clients may choose to ignore this method
     entirely.
 */
-- (void)closeWindow;
+- (void)controllerCloseWindow:(WebController*)controller;
 
 /*!
     @method focusWindow
@@ -81,7 +82,7 @@
     @discussion Clients showing multiple views in one window may want to
     also do something to focus the one corresponding to this controller.
 */
-- (void)focusWindow;
+- (void)controllerFocusWindow:(WebController*)controller;
 
 /*!
     @method unfocusWindow
@@ -89,7 +90,7 @@
     @discussion Clients showing multiple views in one window may want to
     also do something to unfocus the one corresponding to this controller.
 */
-- (void)unfocusWindow;
+- (void)controllerUnfocusWindow:(WebController*)controller;
 
 /*!
     @method firstResponderInWindow
@@ -100,7 +101,7 @@
     on the real NSWindow would. It's OK to return either nil or the
     real first responder if some control not in the window has focus.
 */
-- (NSResponder*)firstResponderInWindow;
+- (NSResponder*)controllerFirstResponderInWindow:(WebController*)controller;
 
 /*!
     @method makeFirstResponderInWindow:
@@ -112,21 +113,22 @@
     hierarchy, it may be desirable to save the first responder
     elsewhere, or possibly ignore this call.
 */
-- (void)makeFirstResponderInWindow:(NSResponder*)responder;
+- (void)controller:(WebController*)controller
+    makeFirstResponderInWindow:(NSResponder*)responder;
 
 /*!
     @method setStatusText:
     @abstract Set the window's status display, if any, to the specified string.
     @param text The status text to set
 */
-- (void)setStatusText:(NSString*)text;
+- (void)controller:(WebController*)controller setStatusText:(NSString*)text;
 
 /*!
     @method statusText
     @abstract Get the currently displayed status text.
     @result The status text
 */
-- (NSString*)statusText;
+- (NSString*)controllerStatusText:(WebController*)controller;
 
 /*!
     @method mouseDidMoveOverElement:modifierFlags:
@@ -137,8 +139,9 @@
    mouse is over, or nil.
     @param modifierFlags The modifier flags as in NSEvent.
 */
-- (void)mouseDidMoveOverElement:(NSDictionary*)elementInformation
-                  modifierFlags:(unsigned int)modifierFlags;
+- (void)controller:(WebController*)controller
+    mouseDidMoveOverElement:(NSDictionary*)elementInformation
+              modifierFlags:(unsigned int)modifierFlags;
 
 /*!
     @method areToolbarsVisible
@@ -150,7 +153,7 @@
     this method if at least one is on.
     @result YES if at least one toolbar is visible, otherwise NO.
 */
-- (BOOL)areToolbarsVisible;
+- (BOOL)controllerAreToolbarsVisible:(WebController*)controller;
 
 /*!
     @method setToolbarsVisible:
@@ -160,14 +163,14 @@
     (except for a possible status bar). Setting it to NO should turn
     off all toolbars (with the same exception).
 */
-- (void)setToolbarsVisible:(BOOL)visible;
+- (void)controller:(WebController*)controller setToolbarsVisible:(BOOL)visible;
 
 /*!
     @method isStatusBarVisible
     @abstract Determine whether the status bar is visible.
     @result YES if the status bar is visible, otherwise NO.
 */
-- (BOOL)isStatusBarVisible;
+- (BOOL)controllerIsStatusBarVisible:(WebController*)controller;
 
 /*!
     @method setStatusBarVisible:
@@ -176,7 +179,7 @@
     @discussion Setting this to YES should show the status bar,
     setting it to NO should hide it.
 */
-- (void)setStatusBarVisible:(BOOL)visible;
+- (void)controller:(WebController*)controller setStatusBarVisible:(BOOL)visible;
 
 /*!
     @method isResizable
@@ -186,7 +189,7 @@
     have have their own separate resize controls and this may need to
     be handled specially.
 */
-- (BOOL)isResizable;
+- (BOOL)controllerIsResizable:(WebController*)controller;
 
 /*!
     @method setResizable:
@@ -196,7 +199,7 @@
     have have their own separate resize controls and this may need to
     be handled specially.
 */
-- (void)setResizable:(BOOL)resizable;
+- (void)controller:(WebController*)controller setResizable:(BOOL)resizable;
 
 /*!
     @method setFrame:
@@ -207,14 +210,14 @@
     this method is provided so implementors of this protocol can do special
     things on programmatic move/resize, like avoiding autosaving of the size.
 */
-- (void)setFrame:(NSRect)frame;
+- (void)controller:(WebController*)controller setFrame:(NSRect)frame;
 
 /*!
     @method frame
     @abstract REturn the window's frame rect
     @discussion
 */
-- (NSRect)frame;
+- (NSRect)controllerFrame:(WebController*)controller;
 
 /*!
     @method runJavaScriptAlertPanelWithMessage:
@@ -223,7 +226,8 @@
     @discussion Clients should visually indicate that this panel comes
     from JavaScript. The panel should have a single OK button.
 */
-- (void)runJavaScriptAlertPanelWithMessage:(NSString*)message;
+- (void)controller:(WebController*)controller
+    runJavaScriptAlertPanelWithMessage:(NSString*)message;
 
 /*!
     @method runJavaScriptAlertPanelWithMessage:
@@ -234,7 +238,8 @@
     from JavaScript. The panel should have two buttons, e.g. "OK" and
     "Cancel".
 */
-- (BOOL)runJavaScriptConfirmPanelWithMessage:(NSString*)message;
+- (BOOL)controller:(WebController*)controller
+    runJavaScriptConfirmPanelWithMessage:(NSString*)message;
 
 /*!
     @method runJavaScriptTextInputPanelWithPrompt:defaultText:
@@ -246,8 +251,9 @@
     from JavaScript. The panel should have two buttons, e.g. "OK" and
     "Cancel", and an area to type text.
 */
-- (NSString*)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
-                                       defaultText:(NSString*)defaultText;
+- (NSString*)controller:(WebController*)controller
+    runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
+                              defaultText:(NSString*)defaultText;
 
 /*!
     @message runOpenPanelForFileButtonWithResultListener:
@@ -257,7 +263,8 @@
    return
     value so that it can be handled with a sheet.
 */
-- (void)runOpenPanelForFileButtonWithResultListener:
-    (id<WebOpenPanelResultListener>)resultListener;
+- (void)controller:(WebController*)controller
+    runOpenPanelForFileButtonWithResultListener:
+        (id<WebOpenPanelResultListener>)resultListener;
 
 @end

@@ -7,6 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class WebController;
 @class WebError;
 @class WebFrame;
 @class WebPolicyPrivate;
@@ -68,7 +69,6 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     this method.
 */
 - (void)use;
-
 /*!
     @method download
     @abstract Download the resource instead of displaying it.
@@ -122,10 +122,11 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    @discussion This method will be called before loading starts, and
    on every redirect.
 */
-- (void)decideNavigationPolicyForAction:(NSDictionary*)actionInformation
-                             andRequest:(WebRequest*)request
-                                inFrame:(WebFrame*)frame
-                       decisionListener:(id<WebPolicyDecisionListener>)listener;
+- (void)controller:(WebController*)c
+    decideNavigationPolicyForAction:(NSDictionary*)actionInformation
+                         andRequest:(WebRequest*)request
+                            inFrame:(WebFrame*)frame
+                   decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
      @method
@@ -150,10 +151,11 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
      will be called with a WebNavigationType of WebNavigationTypeOther
      in its action. This is to avoid possible confusion about the modifiers.
 */
-- (void)decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
-                            andRequest:(WebRequest*)request
-                          newFrameName:(NSString*)frameName
-                      decisionListener:(id<WebPolicyDecisionListener>)listener;
+- (void)controller:(WebController*)c
+    decideNewWindowPolicyForAction:(NSDictionary*)actionInformation
+                        andRequest:(WebRequest*)request
+                      newFrameName:(NSString*)frameName
+                  decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
     @method decideContentPolicyForMIMEType:andRequest:inFrame:
@@ -164,10 +166,11 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     @param frame The frame which is loading the URL.
     @param listener The object to call when the decision is made
 */
-- (void)decideContentPolicyForMIMEType:(NSString*)type
-                            andRequest:(WebRequest*)request
-                               inFrame:(WebFrame*)frame
-                      decisionListener:(id<WebPolicyDecisionListener>)listener;
+- (void)controller:(WebController*)c
+    decideContentPolicyForMIMEType:(NSString*)type
+                        andRequest:(WebRequest*)request
+                           inFrame:(WebFrame*)frame
+                  decisionListener:(id<WebPolicyDecisionListener>)listener;
 
 /*!
     @method unableToImplementPolicy:error:forURL:inFrame:
@@ -179,7 +182,8 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
    requested but failed.
     @param frame The frame in which the policy could not be implemented.
 */
-- (void)unableToImplementPolicyWithError:(WebError*)error
-                                 inFrame:(WebFrame*)frame;
+- (void)controller:(WebController*)c
+    unableToImplementPolicyWithError:(WebError*)error
+                             inFrame:(WebFrame*)frame;
 
 @end
