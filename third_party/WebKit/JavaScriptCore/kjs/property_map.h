@@ -55,6 +55,13 @@ struct PropertyMapHashTableEntry {
   int attributes;
 };
 
+struct PropertyMapHashTable {
+  int sizeMask;
+  int size;
+  int keyCount;
+  PropertyMapHashTableEntry entries[1];
+};
+
 class PropertyMap {
  public:
   PropertyMap();
@@ -83,11 +90,9 @@ class PropertyMap {
   void checkConsistency();
 
   typedef PropertyMapHashTableEntry Entry;
+  typedef PropertyMapHashTable Table;
 
-  int _tableSizeMask;
-  int _tableSize;
-  Entry* _table;
-  int _keyCount;
+  Table* _table;
 
   Entry _singleEntry;
 };
