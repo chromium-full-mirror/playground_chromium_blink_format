@@ -269,13 +269,6 @@ void HTMLFrameElementImpl::updateForNewURL() {
   KHTMLPart* framePart = part->findFrame(name.string());
   KURL kurl = getDocument()->completeURL(relativeURL.string());
 
-  // Temporarily treat javascript: URLs as about:blank, until we can
-  // properly support them as frame sources.
-  if (kurl.protocol() == "javascript") {
-    relativeURL = "about:blank";
-    kurl = "about:blank";
-  }
-
   if (framePart) {
     framePart->openURL(kurl);
   } else {
@@ -386,13 +379,6 @@ void HTMLFrameElementImpl::attach() {
 
   DOMString relativeURL = url;
   if (relativeURL.isEmpty()) {
-    relativeURL = "about:blank";
-  }
-
-  // Temporarily treat javascript: URLs as about:blank, until we can
-  // properly support them as frame sources.
-  if (KURL(getDocument()->completeURL(relativeURL.string())).protocol() ==
-      "javascript") {
     relativeURL = "about:blank";
   }
 

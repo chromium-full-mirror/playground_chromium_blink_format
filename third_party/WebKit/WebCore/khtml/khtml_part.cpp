@@ -725,6 +725,17 @@ KJSProxy* KHTMLPart::jScript() {
   return d->m_jscript;
 }
 
+void KHTMLPart::replaceContentsWithScriptResult(const KURL& url) {
+  QString script = KURL::decode_string(url.url().mid(strlen("javascript:")));
+  QVariant ret = executeScript(script);
+
+  if (ret.type() == QVariant::String) {
+    begin();
+    write(ret.asString());
+    end();
+  }
+}
+
 QVariant KHTMLPart::executeScript(const QString& script,
                                   bool forceUserGesture) {
   return executeScript(DOM::Node(), script, forceUserGesture);
@@ -2964,19 +2975,17 @@ bool KHTMLPart::requestFrame(khtml::RenderPart* frame,
   (*it).m_frame = frame;
   (*it).m_params = params;
 
-#if !APPLE_CHANGES
   // Support for <frame src="javascript:string">
   if (url.find(QString::fromLatin1("javascript:"), 0, false) == 0) {
-    QVariant res =
-        executeScript(DOM::Node(frame->element()),
-                      KURL::decode_string(url.right(url.length() - 11)));
-    KURL myurl;
-    myurl.setProtocol("javascript");
-    if (res.type() == QVariant::String)
-      myurl.setPath(res.asString());
-    return processObjectRequest(&(*it), myurl, QString("text/html"));
+    if (!processObjectRequest(&(*it), "about:blank", "text/html"))
+      return false;
+
+    KHTMLPart* newPart = static_cast<KHTMLPart*>(&*(*it).m_part);
+    newPart->replaceContentsWithScriptResult(url);
+
+    return true;
   }
-#endif  // APPLE_CHANGES
+
   return requestObject(&(*it), completeURL(url));
 }
 
