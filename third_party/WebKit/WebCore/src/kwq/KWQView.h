@@ -42,7 +42,7 @@ class KHTMLPart;
 - initWithFrame:(NSRect)r widget:(QWidget*)w;
 @end
 
-@interface KWQNSComboBox : NSComboBox {
+@interface KWQNSComboBox : NSPopUpButton {
   QWidget* widget;
 }
 - initWithFrame:(NSRect)r widget:(QWidget*)w;

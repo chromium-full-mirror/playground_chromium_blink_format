@@ -84,6 +84,8 @@ class RenderFormElement : public khtml::RenderWidget {
 
   virtual bool eventFilter(QObject*, QEvent*);
 
+  void performAction(QObject::Actions action);
+
  public slots:
   virtual void slotClicked();
 
