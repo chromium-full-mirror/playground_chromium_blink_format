@@ -292,6 +292,13 @@ static void completeURLs(NodeImpl* node, const QString& baseURL) {
   }
 }
 
+bool isMailBlockquote(const NodeImpl* node) {
+  if (!node || !node->renderer() ||
+      !node->isElementNode() && node->id() != ID_BLOCKQUOTE)
+    return false;
+  return static_cast<const ElementImpl*>(node)->getAttribute("type") == "cite";
+}
+
 QString createMarkup(const RangeImpl* range,
                      QPtrList<NodeImpl>* nodes,
                      EAnnotateForInterchange annotate) {
@@ -416,6 +423,15 @@ QString createMarkup(const RangeImpl* range,
       static const QString interchangeNewlineString =
           QString("<br class=\"") + AppleInterchangeNewline + "\">";
       markups.append(interchangeNewlineString);
+    }
+  }
+
+  // Retain the Mail quote level by including all ancestor mail block quotes.
+  for (NodeImpl* ancestor = commonAncestorBlock; ancestor;
+       ancestor = ancestor->parentNode()) {
+    if (isMailBlockquote(ancestor)) {
+      markups.prepend(startMarkup(ancestor, range, annotate, defaultStyle));
+      markups.append(endMarkup(ancestor));
     }
   }
 
