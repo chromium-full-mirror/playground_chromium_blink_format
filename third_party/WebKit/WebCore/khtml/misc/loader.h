@@ -66,6 +66,7 @@ namespace khtml {
 class CachedObject;
 class Request;
 class LoaderPrivate;
+class DocLoader;
 
 /**
  * @internal
@@ -90,10 +91,12 @@ class CachedObject {
     Uncacheable  // to big to be cached,
   };             // will be destroyed as soon as possible
 
-  CachedObject(const DOM::DOMString& url,
+  CachedObject(const DocLoader* loader,
+               const DOM::DOMString& url,
                Type type,
                bool _reload,
                int _expireDate) {
+    m_loader = loader;
     m_url = url;
     m_type = type;
     m_status = Pending;
@@ -156,7 +159,11 @@ class CachedObject {
   QString accept() const { return m_accept; }
   void setAccept(const QString& _accept) { m_accept = _accept; }
 
+  const DocLoader* loader() { return m_loader; }
+
  protected:
+  const DocLoader* m_loader;
+
   QList<CachedObjectClient> m_clients;
 
   DOM::DOMString m_url;
@@ -176,7 +183,8 @@ class CachedObject {
  */
 class CachedCSSStyleSheet : public CachedObject {
  public:
-  CachedCSSStyleSheet(const DOM::DOMString& url,
+  CachedCSSStyleSheet(const DocLoader* loader,
+                      const DOM::DOMString& url,
                       const DOM::DOMString& baseURL,
                       bool reload,
                       int _expireDate,
@@ -204,7 +212,8 @@ class CachedCSSStyleSheet : public CachedObject {
  */
 class CachedScript : public CachedObject {
  public:
-  CachedScript(const DOM::DOMString& url,
+  CachedScript(const DocLoader* loader,
+               const DOM::DOMString& url,
                const DOM::DOMString& baseURL,
                bool reload,
                int _expireDate,
@@ -235,7 +244,8 @@ class ImageSource;
 class CachedImage : public QObject, public CachedObject {
   Q_OBJECT
  public:
-  CachedImage(const DOM::DOMString& url,
+  CachedImage(const DocLoader* loader,
+              const DOM::DOMString& url,
               const DOM::DOMString& baseURL,
               bool reload,
               int _expireDate);
@@ -326,6 +336,7 @@ class DocLoader {
   void setReloading(bool);
   void setShowAnimations(bool);
   void removeCachedObject(CachedObject*) const;
+  const KHTMLPart* part() { return m_part; }
 
  private:
   friend class Cache;
@@ -353,6 +364,9 @@ class Request {
   QBuffer m_buffer;
   CachedObject* object;
   DOM::DOMString m_baseURL;
+#ifdef _KWQ_
+  void* client;
+#endif
 };
 
 /**

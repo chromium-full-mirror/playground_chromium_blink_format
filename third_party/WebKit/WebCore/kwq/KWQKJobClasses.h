@@ -170,6 +170,7 @@ class TransferJob : public SimpleJob {
 #else
   void begin(void* requestor, void* userData);
 #endif
+  KURL url() { return _url; }
 #endif
 
 // operators ---------------------------------------------------------------
