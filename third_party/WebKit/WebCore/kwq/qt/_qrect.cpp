@@ -20,6 +20,10 @@
 
 #include <qrect.h>
 
+// KWQ hacks ---------------------------------------------------------------
+
+#ifdef USING_BORROWED_QRECT
+
 QRect::QRect() {
   x1 = x2 = y1 = y2 = 0;
 }
@@ -114,10 +118,6 @@ ostream& operator<<(ostream& o, const QRect& r) {
            << "; bottom: " << (Q_INT32)r.bottom() << ']';
 }
 #endif
-
-// KWQ hacks ---------------------------------------------------------------
-
-#ifdef USING_BORROWED_QRECT
 
 // -------------------------------------------------------------------------
 

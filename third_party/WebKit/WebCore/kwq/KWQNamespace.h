@@ -276,18 +276,8 @@ class Qt {
   static const QCursor& splitHCursor;
   static const QCursor& splitVCursor;
 
-// static member functions -------------------------------------------------
-// constructors, copy constructors, and destructors ------------------------
-
-// add no-arg constructor
-#ifdef _KWQ_PEDANTIC_
-  Qt() {}
-#endif
-
-// add no-op destructor
-#ifdef _KWQ_PEDANTIC_
-  ~Qt() {}
-#endif
+  // static member functions -------------------------------------------------
+  // constructors, copy constructors, and destructors ------------------------
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -298,18 +288,6 @@ class Qt {
   // ---------------------------------------------------------------------
 
  private:
-// add copy constructor
-// this private declaration prevents copying
-#ifdef _KWQ_PEDANTIC_
-  Qt(const Qt&);
-#endif
-
-// add assignment operator
-// this private declaration prevents assignment
-#ifdef _KWQ_PEDANTIC_
-  Qt& operator=(const Qt&);
-#endif
-
 };  // class Qt
     // =================================================================
 

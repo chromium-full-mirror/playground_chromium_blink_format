@@ -47,7 +47,7 @@ class QSize {
 
   QSize();
   QSize(int, int);
-  QSize(const QSize&);
+// QSize(const QSize &);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
@@ -63,13 +63,6 @@ class QSize {
   void setHeight(int);
   QSize expandedTo(const QSize&) const;
 
-#ifdef USING_BORROWED_QSIZE
-  bool isNull() const;
-  bool isEmpty() const;
-  void transpose();
-  QSize boundedTo(const QSize&) const;
-#endif
-
   // operators ---------------------------------------------------------------
 
   /* Note: Trolltech seems to want operator= to be a bitwise copy
@@ -79,23 +72,6 @@ class QSize {
   friend QSize operator+(const QSize&, const QSize&);
   friend bool operator==(const QSize&, const QSize&);
   friend bool operator!=(const QSize&, const QSize&);
-
-#ifdef USING_BORROWED_QSIZE
-  QSize& operator+=(const QSize&);
-  QSize& operator-=(const QSize&);
-  QSize& operator*=(int);
-  QSize& operator*=(double);
-  QSize& operator/=(int);
-  QSize& operator/=(double);
-
-  friend QSize operator-(const QSize&, const QSize&);
-  friend QSize operator*(const QSize&, int);
-  friend QSize operator*(int, const QSize&);
-  friend QSize operator*(const QSize&, double);
-  friend QSize operator*(double, const QSize&);
-  friend QSize operator/(const QSize&, int);
-  friend QSize operator/(const QSize&, double);
-#endif
 
 #ifdef _KWQ_IOSTREAM_
   friend ostream& operator<<(ostream&, const QSize&);
