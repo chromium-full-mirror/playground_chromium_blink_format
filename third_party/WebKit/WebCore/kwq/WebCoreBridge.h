@@ -123,6 +123,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
     caseSensitive:(BOOL)caseFlag;
 - (void)jumpToSelection;
 
+- (void)setTextSizeMultiplier:(float)multiplier;
+
 @end
 
 // The WebCoreBridge protocol contains methods for use by the WebCore side of
