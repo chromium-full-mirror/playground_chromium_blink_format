@@ -190,6 +190,13 @@ void RenderCanvas::paint(PaintInfo& i, int _tx, int _ty) {
                 << " ::paintObject() w/h = (" << width() << "/" << height()
                 << ")" << endl;
 #endif
+
+  // Cache the print rect because the dirty rect could get changed during
+  // painting.
+  if (m_printingMode) {
+    setPrintRect(i.r);
+  }
+
   // 1. paint background, borders etc
   if (i.phase == PaintActionBlockBackground) {
     paintBoxDecorations(i, _tx, _ty);
