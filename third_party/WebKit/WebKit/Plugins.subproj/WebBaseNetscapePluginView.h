@@ -41,7 +41,7 @@
   NSURL* baseURL;
   NSTrackingRectTag trackingTag;
   NSMutableArray* streams;
-  NSMutableDictionary* streamNotifications;
+  NSMutableDictionary* pendingFrameLoads;
   NSTimer* nullEventTimer;
 
   NPP_NewProcPtr NPP_New;

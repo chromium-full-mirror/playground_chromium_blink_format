@@ -52,11 +52,6 @@ typedef enum {
   WebFrameLoadTypeInternal
 } WebFrameLoadType;
 
-#define WebFrameStateChangedNotification @"WebFrameStateChangedNotification"
-
-#define WebPreviousFrameState @"WebPreviousFrameState"
-#define WebCurrentFrameState @"WebCurrentFrameState"
-
 // Keys for accessing the values in the page cache dictionary.
 extern NSString* WebPageCacheEntryDateKey;
 extern NSString* WebPageCacheDataSourceKey;
@@ -97,6 +92,8 @@ extern NSString* WebPageCacheDocumentViewKey;
   BOOL delegateIsHandlingProvisionalLoadError;
   BOOL delegateIsDecidingNavigationPolicy;
   BOOL delegateIsHandlingUnimplementablePolicy;
+
+  id internalLoadDelegate;
 }
 
 - (void)setName:(NSString*)name;
