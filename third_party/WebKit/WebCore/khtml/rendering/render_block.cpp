@@ -1324,7 +1324,7 @@ void RenderBlock::paintObject(QPainter* p,
                 paintAction == PaintActionSelection);
 
   // 4. paint outline.
-  if (!inlineFlow && paintAction == PaintActionForeground &&
+  if (!inlineFlow && paintAction == PaintActionOutline &&
       style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(p, _tx, _ty, width(), height(), style());
 
@@ -1378,6 +1378,10 @@ void RenderBlock::paintFloats(QPainter* p,
                        _tx + r->left - r->node->xPos() + r->node->marginLeft(),
                        _ty + r->startY - r->node->yPos() + r->node->marginTop(),
                        PaintActionForeground);
+        r->node->paint(p, _x, _y, _w, _h,
+                       _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                       _ty + r->startY - r->node->yPos() + r->node->marginTop(),
+                       PaintActionOutline);
       }
     }
   }

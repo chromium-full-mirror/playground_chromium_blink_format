@@ -210,6 +210,10 @@ void RenderImage::paintObject(QPainter* p,
                               int _tx,
                               int _ty,
                               PaintAction paintAction) {
+  if (paintAction == PaintActionOutline && style()->outlineWidth() &&
+      style()->visibility() == VISIBLE)
+    paintOutline(p, _tx, _ty, width(), height(), style());
+
   if (paintAction != PaintActionForeground)
     return;
 
@@ -381,8 +385,6 @@ void RenderImage::paintObject(QPainter* p,
       p->drawPixmap(offs, pix, rect);
     }
   }
-  if (style()->outlineWidth() && style()->visibility() == VISIBLE)
-    paintOutline(p, _tx, _ty, width(), height(), style());
 }
 
 void RenderImage::layout() {

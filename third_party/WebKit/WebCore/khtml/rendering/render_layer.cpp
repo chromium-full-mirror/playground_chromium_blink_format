@@ -787,6 +787,10 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                         clipRectToApply.width(), clipRectToApply.height(),
                         x - renderer()->xPos(), y - renderer()->yPos(),
                         PaintActionForeground);
+      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
+                        clipRectToApply.width(), clipRectToApply.height(),
+                        x - renderer()->xPos(), y - renderer()->yPos(),
+                        PaintActionOutline);
     }
 
     // Now restore our clip.

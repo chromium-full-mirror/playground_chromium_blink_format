@@ -315,8 +315,7 @@ void RenderInline::paintObject(QPainter* p,
   }
 
   paintLineBoxDecorations(p, _x, _y, _w, _h, _tx, _ty, paintAction);
-  if (style()->visibility() == VISIBLE &&
-      paintAction == PaintActionForeground) {
+  if (style()->visibility() == VISIBLE && paintAction == PaintActionOutline) {
     QRect r(_x, _y, _w, _h);
     paintOutline(p, _tx, _ty, r, r, r);
   }
