@@ -86,6 +86,7 @@ class QPainter : public Qt {
   void drawConvexPolygon(const QPointArray&);
 
   void fillRect(int, int, int, int, const QBrush&);
+  void fillRect(const QRect&, const QBrush&);
 
   void drawPixmap(const QPoint&, const QPixmap&);
   void drawPixmap(const QPoint&, const QPixmap&, const QRect&);
