@@ -831,7 +831,6 @@ QString HTMLGenericFormElementImpl::findMatchingState(QStringList& states) {
 HTMLButtonElementImpl::HTMLButtonElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(doc, f) {
-  m_clicked = false;
   m_type = SUBMIT;
   m_dirty = true;
   m_activeSubmit = false;
@@ -888,8 +887,6 @@ void HTMLButtonElementImpl::attach() {
 
 void HTMLButtonElementImpl::defaultEventHandler(EventImpl* evt) {
   if (m_type != BUTTON && (evt->id() == EventImpl::DOMACTIVATE_EVENT)) {
-    m_clicked = true;
-
     if (m_form && m_type == SUBMIT) {
       m_activeSubmit = true;
       m_form->prepareSubmit();
@@ -958,7 +955,6 @@ HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
   m_type = TEXT;
   m_maxLen = -1;
   m_size = 20;
-  m_clicked = false;
   m_checked = false;
 
   m_haveType = false;
@@ -1280,7 +1276,8 @@ DOMString HTMLInputElementImpl::altText() const {
 }
 
 bool HTMLInputElementImpl::isSuccessfulSubmitButton() const {
-  return m_type == SUBMIT && !m_disabled && !name().isEmpty();
+  return !m_disabled &&
+         (m_type == IMAGE || (m_type == SUBMIT && !name().isEmpty()));
 }
 
 bool HTMLInputElementImpl::isActivatedSubmit() const {
@@ -1334,8 +1331,7 @@ bool HTMLInputElementImpl::encoding(const QTextCodec* codec,
 
     case IMAGE:
 
-      if (m_clicked && clickX() != -1) {
-        m_clicked = false;
+      if (m_activeSubmit) {
         QString astr(nme.isEmpty() ? QString::fromLatin1("x") : nme + ".x");
 
         encoding += fixUpfromUnicode(codec, astr);
@@ -1505,7 +1501,6 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
     if (!m_form || !m_render)
       return;
 
-    m_clicked = true;
     if (m_type == RESET) {
       m_form->reset();
     } else {
