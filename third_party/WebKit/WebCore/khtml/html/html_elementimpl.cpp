@@ -148,6 +148,11 @@ void HTMLElementImpl::parseAttribute(AttributeImpl* attr) {
           EventImpl::KHTML_CLICK_EVENT,
           getDocument()->createHTMLEventListener(attr->value().string()));
       break;
+    case ATTR_ONCONTEXTMENU:
+      setHTMLEventListener(
+          EventImpl::CONTEXTMENU_EVENT,
+          getDocument()->createHTMLEventListener(attr->value().string()));
+      break;
     case ATTR_ONDBLCLICK:
       setHTMLEventListener(
           EventImpl::KHTML_DBLCLICK_EVENT,

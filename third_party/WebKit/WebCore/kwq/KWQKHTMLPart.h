@@ -203,6 +203,8 @@ class KWQKHTMLPart : public KHTMLPart {
   bool keyEvent(NSEvent*);
   bool lastEventIsMouseUp();
 
+  bool sendContextMenuEvent(NSEvent*);
+
   void clearTimers();
   static void clearTimers(KHTMLView*);
 

@@ -90,6 +90,7 @@ class DOMNode : public DOMObject {
     OnBlur,
     OnChange,
     OnClick,
+    OnContextMenu,
     OnDblClick,
     OnDragDrop,
     OnError,

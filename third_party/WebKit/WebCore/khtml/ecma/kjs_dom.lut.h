@@ -36,12 +36,13 @@ namespace KJS {
 const struct HashEntry DOMNodeTableEntries[] = {
     {"ondblclick", DOMNode::OnDblClick, DontDelete, 0,
      &DOMNodeTableEntries[58]},
-    {"onsubmit", DOMNode::OnSubmit, DontDelete, 0, 0},
+    {"oncontextmenu", DOMNode::OnContextMenu, DontDelete, 0,
+     &DOMNodeTableEntries[62]},
     {0, 0, 0, 0, 0},
     {"onmousemove", DOMNode::OnMouseMove, DontDelete, 0, 0},
     {"nextSibling", DOMNode::NextSibling, DontDelete | ReadOnly, 0,
      &DOMNodeTableEntries[59]},
-    {"onerror", DOMNode::OnError, DontDelete, 0, &DOMNodeTableEntries[65]},
+    {"onerror", DOMNode::OnError, DontDelete, 0, &DOMNodeTableEntries[66]},
     {0, 0, 0, 0, 0},
     {"onkeypress", DOMNode::OnKeyPress, DontDelete, 0, 0},
     {"onmouseover", DOMNode::OnMouseOver, DontDelete, 0, 0},
@@ -65,7 +66,7 @@ const struct HashEntry DOMNodeTableEntries[] = {
     {0, 0, 0, 0, 0},
     {"namespaceURI", DOMNode::NamespaceURI, DontDelete | ReadOnly, 0, 0},
     {"ondragdrop", DOMNode::OnDragDrop, DontDelete, 0,
-     &DOMNodeTableEntries[66]},
+     &DOMNodeTableEntries[67]},
     {"localName", DOMNode::LocalName, DontDelete | ReadOnly, 0, 0},
     {0, 0, 0, 0, 0},
     {"clientHeight", DOMNode::ClientHeight, DontDelete | ReadOnly, 0, 0},
@@ -85,13 +86,13 @@ const struct HashEntry DOMNodeTableEntries[] = {
     {"parentElement", DOMNode::ParentElement, DontDelete | ReadOnly, 0, 0},
     {0, 0, 0, 0, 0},
     {"firstChild", DOMNode::FirstChild, DontDelete | ReadOnly, 0,
-     &DOMNodeTableEntries[67]},
+     &DOMNodeTableEntries[68]},
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
     {"prefix", DOMNode::Prefix, DontDelete, 0, 0},
     {"parentNode", DOMNode::ParentNode, DontDelete | ReadOnly, 0,
      &DOMNodeTableEntries[55]},
-    {"nodeValue", DOMNode::NodeValue, DontDelete, 0, &DOMNodeTableEntries[64]},
+    {"nodeValue", DOMNode::NodeValue, DontDelete, 0, &DOMNodeTableEntries[65]},
     {"offsetLeft", DOMNode::OffsetLeft, DontDelete | ReadOnly, 0, 0},
     {"onblur", DOMNode::OnBlur, DontDelete, 0, &DOMNodeTableEntries[61]},
     {"onresize", DOMNode::OnResize, DontDelete, 0, 0},
@@ -101,9 +102,10 @@ const struct HashEntry DOMNodeTableEntries[] = {
     {"onfocus", DOMNode::OnFocus, DontDelete, 0, 0},
     {"onkeydown", DOMNode::OnKeyDown, DontDelete, 0, &DOMNodeTableEntries[60]},
     {"onmousedown", DOMNode::OnMouseDown, DontDelete, 0,
-     &DOMNodeTableEntries[62]},
-    {"onmove", DOMNode::OnMove, DontDelete, 0, &DOMNodeTableEntries[63]},
+     &DOMNodeTableEntries[63]},
+    {"onmove", DOMNode::OnMove, DontDelete, 0, &DOMNodeTableEntries[64]},
     {"onreset", DOMNode::OnReset, DontDelete, 0, 0},
+    {"onsubmit", DOMNode::OnSubmit, DontDelete, 0, 0},
     {"offsetWidth", DOMNode::OffsetWidth, DontDelete | ReadOnly, 0, 0},
     {"offsetParent", DOMNode::OffsetParent, DontDelete | ReadOnly, 0, 0},
     {"clientWidth", DOMNode::ClientWidth, DontDelete | ReadOnly, 0, 0},
@@ -111,7 +113,7 @@ const struct HashEntry DOMNodeTableEntries[] = {
     {"scrollTop", DOMNode::ScrollTop, DontDelete, 0, 0},
     {"scrollHeight", DOMNode::ScrollHeight, DontDelete | ReadOnly, 0, 0}};
 
-const struct HashTable DOMNodeTable = {2, 68, DOMNodeTableEntries, 55};
+const struct HashTable DOMNodeTable = {2, 69, DOMNodeTableEntries, 55};
 
 };  // namespace
 
