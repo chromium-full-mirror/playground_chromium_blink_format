@@ -27,6 +27,8 @@
 #define QDRAWUTIL_H_
 
 #include "qpainter.h"
+#include "qpalette.h"
+#include "qbrush.h"
 
 void qDrawShadePanel(QPainter*,
                      int,
