@@ -100,7 +100,6 @@
 - (void)_setURL:(NSURL*)URL;
 - (void)_setRequest:(WebResourceRequest*)request;
 - (void)_setResponse:(WebResourceResponse*)response;
-- (void)_setEncoding:(NSString*)encoding;
 - (void)_setContentPolicy:(WebContentPolicy*)policy;
 - (void)_layoutChildren;
 - (void)_clearErrors;

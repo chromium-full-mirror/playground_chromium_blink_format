@@ -20,7 +20,6 @@
 @interface WebMainResourceClient : NSObject<WebResourceHandleDelegate> {
   NSURL* currentURL;
   WebDataSource* dataSource;
-  BOOL isFirstChunk;
   BOOL suppressErrors;
   WebDownloadHandler* downloadHandler;
   id<WebResourceProgressDelegate> downloadProgressDelegate;
