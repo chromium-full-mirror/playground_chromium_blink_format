@@ -37,6 +37,8 @@ class CSSValueImpl;
 class DOMString;
 class NodeImpl;
 
+enum EUpdateLayout { DoNotUpdateLayout = false, UpdateLayout = true };
+
 class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl {
  public:
   CSSComputedStyleDeclarationImpl(NodeImpl* node);
@@ -46,6 +48,7 @@ class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl {
   virtual void setCssText(const DOMString&);
 
   virtual CSSValueImpl* getPropertyCSSValue(int propertyID) const;
+  CSSValueImpl* getPropertyCSSValue(int propertyID, bool updateLayout) const;
   virtual DOMString getPropertyValue(int propertyID) const;
   virtual bool getPropertyPriority(int propertyID) const;
 

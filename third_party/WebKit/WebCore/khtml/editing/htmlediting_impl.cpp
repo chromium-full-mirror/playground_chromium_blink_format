@@ -68,6 +68,7 @@ using DOM::DocumentFragmentImpl;
 using DOM::DocumentImpl;
 using DOM::DOMString;
 using DOM::DOMStringImpl;
+using DOM::DoNotUpdateLayout;
 using DOM::EditingTextImpl;
 using DOM::ElementImpl;
 using DOM::HTMLElementImpl;
@@ -214,7 +215,8 @@ bool StyleChange::currentlyHasStyle(const Position& pos,
   CSSComputedStyleDeclarationImpl* style = pos.computedStyle();
   ASSERT(style);
   style->ref();
-  CSSValueImpl* value = style->getPropertyCSSValue(property->id());
+  CSSValueImpl* value =
+      style->getPropertyCSSValue(property->id(), DoNotUpdateLayout);
   style->deref();
   return value &&
          strcasecmp(value->cssText(), property->value()->cssText()) == 0;
@@ -549,6 +551,12 @@ NodeImpl* CompositeEditCommandImpl::applyTypingStyle(NodeImpl* child) const {
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
+
+  // update document layout once before running the rest of the function
+  // so that we avoid the expense of updating before each and every call
+  // to check a computed style
+  document()->updateLayout();
+
   StyleChange styleChange(document()->part()->typingStyle());
 
   NodeImpl* childToAppend = child;
@@ -702,6 +710,11 @@ void ApplyStyleCommandImpl::doApply() {
                      .equivalentRangeCompliantPosition());
   Position end(endingSelection().end().upstream(StayInBlock));
 
+  // update document layout once before removing styles
+  // so that we avoid the expense of updating before each and every call
+  // to check a computed style
+  document()->updateLayout();
+
   // Remove style from the selection.
   // Use the upstream position of the start for removing style.
   // This will ensure we remove all traces of the relevant styles from the
@@ -718,6 +731,11 @@ void ApplyStyleCommandImpl::doApply() {
   splitTextAtEndIfNeeded(start, end);
   start = endingSelection().start();
   end = endingSelection().end();
+
+  // update document layout once before running the rest of the function
+  // so that we avoid the expense of updating before each and every call
+  // to check a computed style
+  document()->updateLayout();
 
   if (start.node() == end.node()) {
     // simple case...start and end are the same node
@@ -791,7 +809,7 @@ void ApplyStyleCommandImpl::removeCSSStyle(HTMLElementImpl* elem) {
   for (QPtrListIterator<CSSProperty> it(*(style()->values())); it.current();
        ++it) {
     CSSProperty* property = it.current();
-    if (decl->getPropertyCSSValue(property->id()))
+    if (decl->getPropertyCSSValue(property->id()), DoNotUpdateLayout)
       removeCSSProperty(decl, property->id());
   }
 
@@ -998,54 +1016,6 @@ DeleteSelectionCommandImpl::DeleteSelectionCommandImpl(
       m_selectionToDelete(selection),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete) {}
-
-CSSStyleDeclarationImpl* DeleteSelectionCommandImpl::computeTypingStyle(
-    const Position& pos) const {
-  ElementImpl* element = pos.element();
-  if (!element)
-    return 0;
-
-  ElementImpl* shallowElement = pos.equivalentShallowPosition().element();
-  if (!shallowElement)
-    return 0;
-
-  ElementImpl* parent = Position(shallowElement->parentNode(), 0).element();
-  if (!parent)
-    return 0;
-
-  // Loop from the element up to the shallowElement, building up the
-  // style that this node has that its parent does not.
-  CSSStyleDeclarationImpl* result = document()->createCSSStyleDeclaration();
-  NodeImpl* node = element;
-  while (1) {
-    // check for an inline style declaration
-    if (node->isHTMLElement()) {
-      CSSStyleDeclarationImpl* s =
-          static_cast<HTMLElementImpl*>(node)->inlineStyleDecl();
-      if (s)
-        result->merge(s, false);
-    }
-    // check if this is a bold tag
-    if (node->id() == ID_B) {
-      CSSValueImpl* boldValue =
-          result->getPropertyCSSValue(CSS_PROP_FONT_WEIGHT);
-      if (!boldValue)
-        result->setProperty(CSS_PROP_FONT_WEIGHT, "bold");
-    }
-    // check if this is an italic tag
-    if (node->id() == ID_I) {
-      CSSValueImpl* italicValue =
-          result->getPropertyCSSValue(CSS_PROP_FONT_STYLE);
-      if (!italicValue)
-        result->setProperty(CSS_PROP_FONT_STYLE, "italic");
-    }
-    if (node == shallowElement)
-      break;
-    node = node->parentNode();
-  }
-
-  return result;
-}
 
 // This function moves nodes in the block containing startNode to dstBlock,
 // starting
