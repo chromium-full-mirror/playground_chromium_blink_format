@@ -440,7 +440,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       int pixw = bg->pixmap_size().width();
       int pixh = bg->pixmap_size().height();
       EBackgroundRepeat bgr = sptr->backgroundRepeat();
-      if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && w > pixw) {
+      if ((bgr == NO_REPEAT || bgr == REPEAT_Y) && pw > pixw) {
         cw = pixw;
         cx = vr.x() + sptr->backgroundXPosition().minWidth(pw - pixw);
       } else {
@@ -454,7 +454,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
         }
       }
 
-      if ((bgr == NO_REPEAT || bgr == REPEAT_X) && h > pixh) {
+      if ((bgr == NO_REPEAT || bgr == REPEAT_X) && ph > pixh) {
         ch = pixh;
         cy = vr.y() + sptr->backgroundYPosition().minWidth(ph - pixh);
       } else {
