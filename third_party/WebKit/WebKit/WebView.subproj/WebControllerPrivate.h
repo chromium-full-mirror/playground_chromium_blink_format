@@ -61,6 +61,7 @@
 - (void)_setDefersCallbacks:(BOOL)defers;
 
 - (void)_setTopLevelFrameName:(NSString*)name;
+- (WebFrame*)_findFrameInThisWindowNamed:(NSString*)name;
 - (WebFrame*)_findFrameNamed:(NSString*)name;
 
 - (WebController*)_openNewWindowWithURL:(NSURL*)URL
