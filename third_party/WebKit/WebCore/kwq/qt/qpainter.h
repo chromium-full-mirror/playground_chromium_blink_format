@@ -63,6 +63,7 @@ class QPainter : public Qt {
   void drawLine(int, int, int, int);
   void drawEllipse(int, int, int, int);
   void drawArc(int, int, int, int, int, int);
+  void drawPolyline(const QPointArray&, int index = 0, int npoints = -1);
   void drawPolygon(const QPointArray&,
                    bool winding = FALSE,
                    int index = 0,
