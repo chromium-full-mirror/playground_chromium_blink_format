@@ -1364,23 +1364,28 @@ void KHTMLParser::handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem) {
     curr = blockStack;
   }
 
-  reopenResidualStyleTags(
-      residualStyleStack,
-      false);  // FIXME: Deal with stray table content some day
-               // if it becomes necessary to do so.
+  reopenResidualStyleTags(residualStyleStack,
+                          0);  // FIXME: Deal with stray table content some day
+                               // if it becomes necessary to do so.
 }
 
 void KHTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
-                                          bool inMalformedTable) {
+                                          DOM::NodeImpl* malformedTableParent) {
   // Loop for each tag that needs to be reopened.
   while (elem) {
     // Create a shallow clone of the DOM node for this element.
     NodeImpl* newNode = elem->node->cloneNode(false);
 
-    // Append the new node.
+    // Append the new node. In the malformed table case, we need to insert
+    // before the table,
+    // which will be the last child.
     int exceptionCode = 0;
-    current->appendChild(newNode, exceptionCode);
-    // FIXME: Is it really OK to ignore the exception here?
+    if (malformedTableParent)
+      malformedTableParent->insertBefore(
+          newNode, malformedTableParent->lastChild(), exceptionCode);
+    else
+      current->appendChild(newNode, exceptionCode);
+    // FIXME: Is it really OK to ignore the exceptions here?
 
     // Now push a new stack element for this node we just created.
     pushBlock(elem->id, elem->level);
@@ -1388,9 +1393,13 @@ void KHTMLParser::reopenResidualStyleTags(HTMLStackElem* elem,
     // Set our strayTableContent boolean if needed, so that the reopened tag
     // also knows
     // that it is inside a malformed table.
-    blockStack->strayTableContent = !inStrayTableContent && inMalformedTable;
+    blockStack->strayTableContent =
+        !inStrayTableContent && malformedTableParent;
     if (blockStack->strayTableContent)
       inStrayTableContent = true;
+
+    // Clear our malformed table parent variable.
+    malformedTableParent = 0;
 
     // Update |current| manually to point to the new node.
     current = newNode;
@@ -1443,26 +1452,26 @@ void KHTMLParser::popBlock(int _id) {
 
   bool isAffectedByStyle = isAffectedByResidualStyle(Elem->id);
   HTMLStackElem* residualStyleStack = 0;
+  NodeImpl* malformedTableParent = 0;
 
-  bool residualStyleInMalformedTable = false;
   Elem = blockStack;
   while (Elem) {
     if (Elem->id == _id) {
       bool strayTable = inStrayTableContent;
-      NodeImpl* shiftedContentParent = current ? current->parentNode() : 0;
       popOneBlock();
       Elem = 0;
 
-      // This element was the root of some malformed content just inside a
-      // <table>.  If
-      // we end up needing to reopen residual style tags, the root of the
+      // This element was the root of some malformed content just inside an
+      // implicit or
+      // explicit <tbody>.
+      // If we end up needing to reopen residual style tags, the root of the
       // reopened chain
       // must also know that it is the root of malformed content inside a
-      // <table>.
-      if (strayTable && !inStrayTableContent && residualStyleStack) {
-        residualStyleInMalformedTable = true;
-        current = shiftedContentParent;
-      }
+      // <tbody>.
+      if (strayTable && !inStrayTableContent && residualStyleStack)
+        malformedTableParent = current && current->parentNode()
+                                   ? current->parentNode()->parentNode()
+                                   : 0;
     } else {
       if (Elem->id == ID_FORM && form)
         // A <form> is being closed prematurely (and this is
@@ -1500,7 +1509,7 @@ void KHTMLParser::popBlock(int _id) {
     }
   }
 
-  reopenResidualStyleTags(residualStyleStack, residualStyleInMalformedTable);
+  reopenResidualStyleTags(residualStyleStack, malformedTableParent);
 }
 
 void KHTMLParser::popOneBlock(bool delBlock) {
