@@ -397,7 +397,12 @@ Value GlobalFuncImp::call(ExecState* exec,
 
       char* endptr;
       errno = 0;
-      long value = strtol(cstr.c_str(), &endptr, radix);
+#ifdef HAVE_FUNC_STRTOLL
+      long long llValue = strtoll(cstr.c_str(), &endptr, radix);
+      double value = llValue;
+#else
+      long value = strtoll(cstr.c_str(), &endptr, radix);
+#endif
       if (errno != 0 || endptr == cstr.c_str())
         res = Number(NaN);
       else
