@@ -298,6 +298,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   khtml::RenderObject* renderer() const { return m_render; }
   khtml::RenderObject* nextRenderer();
   khtml::RenderObject* previousRenderer();
+  void setRenderer(khtml::RenderObject* renderer) { m_render = renderer; }
 
   void checkSetPrefix(const DOMString& _prefix, int& exceptioncode);
   void checkAddChild(NodeImpl* newChild, int& exceptioncode);

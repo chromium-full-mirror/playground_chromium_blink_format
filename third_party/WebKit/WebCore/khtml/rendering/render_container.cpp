@@ -323,11 +323,10 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
           document(), pseudo); /* anonymous box */
 
     if (contentData->contentType() == CONTENT_TEXT) {
-      RenderText* t = new (renderArena()) RenderText(
+      RenderText* t = new (renderArena()) RenderTextFragment(
           document() /*anonymous object */, contentData->contentText());
       t->setStyle(pseudo);
       pseudoContainer->addChild(t);
-      t->close();
     } else if (contentData->contentType() == CONTENT_OBJECT) {
       RenderImage* img =
           new (renderArena()) RenderImage(document()); /* Anonymous object */
@@ -336,7 +335,6 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
       img->setStyle(style);
       img->setContentObject(contentData->contentObject());
       pseudoContainer->addChild(img);
-      img->close();
     }
   }
 
