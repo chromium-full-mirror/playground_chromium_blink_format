@@ -55,7 +55,7 @@ class DOMNode : public DOMObject {
   virtual UString toString(ExecState* exec) const;
   void setListener(ExecState* exec, int eventId, Value func) const;
   Value getListener(int eventId) const;
-  virtual List eventHandlerScope(ExecState* exec) const;
+  virtual ScopeChain eventHandlerScope(ExecState* exec) const;
 
   enum {
     NodeName,

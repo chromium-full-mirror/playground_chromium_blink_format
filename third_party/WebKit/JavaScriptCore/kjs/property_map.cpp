@@ -37,6 +37,13 @@
 
 namespace KJS {
 
+struct PropertyMapHashTable {
+  int sizeMask;
+  int size;
+  int keyCount;
+  PropertyMapHashTableEntry entries[1];
+};
+
 class SavedProperty {
  public:
   Identifier key;
@@ -199,13 +206,13 @@ void PropertyMap::expand() {
   checkConsistency();
 
   Table* oldTable = _table;
-  int oldTableSize = oldTable ? _table->size : 0;
+  int oldTableSize = oldTable ? oldTable->size : 0;
 
   int newTableSize = oldTableSize ? oldTableSize * 2 : 16;
   _table =
       (Table*)calloc(1, sizeof(Table) + (newTableSize - 1) * sizeof(Entry));
   _table->size = newTableSize;
-  _table->sizeMask = _table->size - 1;
+  _table->sizeMask = newTableSize - 1;
 
 #if USE_SINGLE_ENTRY
   UString::Rep* key = _singleEntry.key;

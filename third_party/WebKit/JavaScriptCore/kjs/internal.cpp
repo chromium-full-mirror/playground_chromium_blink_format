@@ -31,6 +31,7 @@
 #include "array_object.h"
 #include "bool_object.h"
 #include "collector.h"
+#include "context.h"
 #include "date_object.h"
 #include "debugger.h"
 #include "error_object.h"
@@ -321,19 +322,22 @@ void LabelStack::clear() {
 
 // ECMA 10.2
 ContextImp::ContextImp(Object& glob,
-                       ExecState* exec,
+                       InterpreterImp* interpreter,
                        Object& thisV,
                        CodeType type,
-                       ContextImp* _callingContext,
+                       ContextImp* callingCon,
                        FunctionImp* func,
-                       const ArgumentList* args)
-    : _function(func), _arguments(args) {
+                       const List* args)
+    : _interpreter(interpreter),
+      _activationImp(this),
+      _function(func),
+      _arguments(args) {
   codeType = type;
-  callingCon = _callingContext;
+  _callingContext = callingCon;
 
   // create and initialize activation object (ECMA 10.1.6)
   if (type == FunctionCode || type == AnonymousCode) {
-    activation = Object(new ActivationImp(this));
+    activation = Object(&_activationImp);
     variable = activation;
   } else {
     activation = Object();
@@ -343,15 +347,15 @@ ContextImp::ContextImp(Object& glob,
   // ECMA 10.2
   switch (type) {
     case EvalCode:
-      if (callingCon) {
-        scope = callingCon->scopeChain().copy();
-        variable = callingCon->variableObject();
-        thisVal = callingCon->thisValue();
+      if (_callingContext) {
+        scope = _callingContext->scopeChain().copy();
+        variable = _callingContext->variableObject();
+        thisVal = _callingContext->thisValue();
         break;
       }  // else same as GlobalCode
     case GlobalCode:
-      scope = List();
-      scope.append(glob);
+      scope = ScopeChain();
+      scope.prepend(glob);
       thisVal = Object(static_cast<ObjectImp*>(glob.imp()));
       break;
     case FunctionCode:
@@ -360,17 +364,21 @@ ContextImp::ContextImp(Object& glob,
         scope = func->scope().copy();
         scope.prepend(activation);
       } else {
-        scope = List();
-        scope.append(activation);
-        scope.append(glob);
+        scope = ScopeChain();
+        scope.prepend(glob);
+        scope.prepend(activation);
       }
       variable = activation;  // TODO: DontDelete ? (ECMA 10.2.3)
       thisVal = thisV;
       break;
   }
+
+  _interpreter->setContext(this);
 }
 
-ContextImp::~ContextImp() {}
+ContextImp::~ContextImp() {
+  _interpreter->setContext(_callingContext);
+}
 
 void ContextImp::pushScope(const Object& s) {
   scope.prepend(s);
@@ -378,6 +386,11 @@ void ContextImp::pushScope(const Object& s) {
 
 void ContextImp::popScope() {
   scope.removeFirst();
+}
+
+void ContextImp::mark() {
+  for (ContextImp* context = this; context; context = context->_callingContext)
+    context->_activationImp.mark();
 }
 
 // ------------------------------ Parser ---------------------------------------
@@ -461,7 +474,8 @@ void InterpreterImp::globalClear() {
   NumberImp::staticNaN = 0;
 }
 
-InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob) {
+InterpreterImp::InterpreterImp(Interpreter* interp, const Object& glob)
+    : _context(0) {
 // add this interpreter to the global chain
 // as a root set for garbage collection
 #if APPLE_CHANGES
@@ -705,6 +719,8 @@ void InterpreterImp::mark() {
     global.imp()->mark();
   if (m_interpreter)
     m_interpreter->mark();
+  if (_context)
+    _context->mark();
 }
 
 bool InterpreterImp::checkSyntax(const UString& code) {
@@ -789,7 +805,7 @@ Completion InterpreterImp::evaluate(const UString& code, const Value& thisV) {
     res = Completion(Throw, globExec->exception());
   } else {
     // execute the code
-    ContextImp ctx(globalObj, 0, thisObj);
+    ContextImp ctx(globalObj, this, thisObj);
     ExecState newExec(m_interpreter, &ctx);
     res = progNode->execute(&newExec);
   }

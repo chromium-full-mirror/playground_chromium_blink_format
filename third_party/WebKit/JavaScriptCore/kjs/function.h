@@ -78,7 +78,7 @@ class DeclaredFunctionImp : public FunctionImp {
   DeclaredFunctionImp(ExecState* exec,
                       const Identifier& n,
                       FunctionBodyNode* b,
-                      const List& sc);
+                      const ScopeChain& sc);
   ~DeclaredFunctionImp();
 
   bool implementsConstruct() const;

@@ -68,7 +68,7 @@ class Context {
    *
    * @return The execution context's scope chain
    */
-  const List scopeChain() const;
+  const ScopeChain scopeChain() const;
 
   /**
    * Returns the variable object for the execution context. This contains a

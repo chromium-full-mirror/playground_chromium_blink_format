@@ -35,6 +35,7 @@
 #include "operations.h"
 #include "error_object.h"
 #include "nodes.h"
+#include "context.h"
 
 using namespace KJS;
 
@@ -63,7 +64,7 @@ ContextImp* Context::imp() const {
   return rep;
 }
 
-const List Context::scopeChain() const {
+const ScopeChain Context::scopeChain() const {
   return rep->scopeChain();
 }
 

@@ -24,11 +24,10 @@
 #ifndef _KJS_TYPES_H_
 #define _KJS_TYPES_H_
 
-// internal data types
-
 #include "value.h"
-#include "reference.h"
 #include "completion.h"
+
+// internal data types
 
 namespace KJS {
 
@@ -104,7 +103,7 @@ class List {
   friend class ListIterator;
 
  public:
-  List(bool needsMarking = false);
+  List();
   List(const List& l);
   List& operator=(const List& l);
 
@@ -200,10 +199,9 @@ class List {
   void swap(List& other);
 
   ListHookNode* hook;
-  bool m_needsMarking;
 };
 
-typedef List ArgumentList;
+typedef List List;
 
 };  // namespace
 

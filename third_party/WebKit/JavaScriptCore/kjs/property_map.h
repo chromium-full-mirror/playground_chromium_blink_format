@@ -33,6 +33,8 @@ class ValueImp;
 
 class SavedProperty;
 
+struct PropertyMapHashTable;
+
 class SavedProperties {
   friend class PropertyMap;
 
@@ -53,13 +55,6 @@ struct PropertyMapHashTableEntry {
   UString::Rep* key;
   ValueImp* value;
   int attributes;
-};
-
-struct PropertyMapHashTable {
-  int sizeMask;
-  int size;
-  int keyCount;
-  PropertyMapHashTableEntry entries[1];
 };
 
 class PropertyMap {
