@@ -270,6 +270,7 @@ typedef enum {
 - (NSRect)selectionRect;
 - (NSRect)visibleSelectionRect;
 - (NSImage*)selectionImage;
+- (NSRect)caretRectAtNode:(DOMNode*)node offset:(int)offset;
 
 - (DOMNode*)selectionStart;
 - (int)selectionStartOffset;
@@ -316,7 +317,7 @@ typedef enum {
 - (void)undoEditing:(id)arg;
 - (void)redoEditing:(id)arg;
 
-- (DOMRange*)selectedDOMRangeWithGranularity:
+- (DOMRange*)rangeByExpandingSelectionWithGranularity:
     (WebSelectionGranularity)granularity;
 - (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                    direction:(WebSelectionDirection)direction
