@@ -388,7 +388,7 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
         checkSelector(d->selector(), element)) {
       // If the rule has no properties to apply, then ignore it.
       CSSMutableStyleDeclarationImpl* decl = rule->declaration();
-      if (!decl)
+      if (!decl || !decl->length())
         continue;
 
       // If we're matching normal rules, set a pseudo bit if
@@ -853,15 +853,6 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
     RenderStyle* parentStyle) {
   if (!e)
     return 0;
-
-  if (!e->getDocument()->haveStylesheetsLoaded()) {
-    if (!styleNotYetAvailable) {
-      styleNotYetAvailable = ::new RenderStyle();
-      styleNotYetAvailable->setDisplay(NONE);
-      styleNotYetAvailable->ref();
-    }
-    return styleNotYetAvailable;
-  }
 
   initElementAndPseudoState(e);
   initForStyleResolve(e, parentStyle);
