@@ -26,20 +26,16 @@
 #ifndef KWQ_ARRAY_IMPL_H
 #define KWQ_ARRAY_IMPL_H
 
-#include <config.h>
 #include <KWQRefPtr.h>
 #include <KWQDef.h>
 #include <stddef.h>
 
-#ifndef USING_BORROWED_QARRAY
-
 class KWQArrayImpl {
  public:
-  KWQArrayImpl(size_t itemSize);
-  KWQArrayImpl(size_t itemSize, size_t numItems);
-  KWQArrayImpl(const KWQArrayImpl&);
+  KWQArrayImpl(size_t itemSize, size_t numItems = 0);
   ~KWQArrayImpl();
 
+  KWQArrayImpl(const KWQArrayImpl&);
   KWQArrayImpl& operator=(const KWQArrayImpl&);
 
   void* at(size_t pos) const;
@@ -56,7 +52,5 @@ class KWQArrayImpl {
 
   KWQRefPtr<KWQArrayPrivate> d;
 };
-
-#endif
 
 #endif
