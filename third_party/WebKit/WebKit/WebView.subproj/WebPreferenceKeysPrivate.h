@@ -49,3 +49,9 @@
 #define WebKitTabToLinksPreferenceKey @"WebKitTabToLinksPreferenceKey"
 #define WebKitPrivateBrowsingEnabledPreferenceKey \
   @"WebKitPrivateBrowsingEnabled"
+
+// These are private both because callers should be using the cover methods and
+// because the
+// cover methods themselves are private.
+#define WebKitRespectStandardStyleKeyEquivalentsPreferenceKey \
+  @"WebKitRespectStandardStyleKeyEquivalents"
