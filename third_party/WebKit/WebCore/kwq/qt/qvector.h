@@ -26,12 +26,14 @@
 #ifndef QVECTOR_H_
 #define QVECTOR_H_
 
-#include <iostream>
-
 #include <KWQDef.h>
 #include <qcollection.h>
 
 #include <KWQVectorImpl.h>
+
+#ifdef _KWQ_IOSTREAM_
+#include <ostream>
+#endif
 
 class QGVector : public QPtrCollection {
  public:
@@ -76,6 +78,8 @@ class QPtrVector : public QGVector {
   KWQVectorImpl impl;
 };
 
+#ifdef _KWQ_IOSTREAM_
+
 template <class T>
 inline std::ostream& operator<<(std::ostream& stream, const QPtrVector<T>& v) {
   uint i = 0;
@@ -90,5 +94,7 @@ inline std::ostream& operator<<(std::ostream& stream, const QPtrVector<T>& v) {
 
   return stream << "]";
 }
+
+#endif
 
 #endif

@@ -68,6 +68,11 @@ class DocumentImpl;
 
 #ifdef APPLE_CHANGES
 class KWQLoaderImpl;
+#ifdef __OBJC__
+@class KWQURLLoadClient;
+#else
+class KWQURLLoadClient;
+#endif
 #endif
 
 namespace khtml {
@@ -398,7 +403,7 @@ class Request {
   CachedObject* object;
   DocLoader* m_docLoader;
 #ifdef APPLE_CHANGES
-  void* client;
+  KWQURLLoadClient* client;
 #endif
 };
 

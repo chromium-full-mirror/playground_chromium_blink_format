@@ -33,6 +33,8 @@ class QWidget;
 - (void)_setController:(IFWebController*)controller;
 - (int)_marginWidth;
 - (int)_marginHeight;
+- (void)_setMarginWidth:(int)w;
+- (void)_setMarginHeight:(int)h;
 + (NSMutableDictionary*)_viewTypes;
 + (BOOL)_canShowMIMEType:(NSString*)MIMEType;
 @end

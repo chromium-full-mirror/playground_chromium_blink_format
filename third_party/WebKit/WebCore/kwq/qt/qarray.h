@@ -29,6 +29,10 @@
 #include <KWQDef.h>
 #include <KWQArrayImpl.h>
 
+#ifdef _KWQ_IOSTREAM_
+#include <ostream>
+#endif
+
 template <class T>
 class QMemArray {
  public:
@@ -59,8 +63,6 @@ class QMemArray {
 };
 
 #ifdef _KWQ_IOSTREAM_
-
-#include <iostream>
 
 template <class T>
 inline std::ostream& operator<<(std::ostream& stream, const QMemArray<T>& a) {

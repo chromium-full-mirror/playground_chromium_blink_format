@@ -342,6 +342,8 @@ KHTMLPart::~KHTMLPart() {
 
 #ifdef APPLE_CHANGES
   delete impl;
+
+  delete d->m_hostExtension;
 #endif
 
   delete d;

@@ -27,8 +27,10 @@
 
 #ifdef __OBJC__
 @class IFWebDataSource;
+@class WebCoreBridge;
 #else
 class IFWebDataSource;
+class WebCoreBridge;
 #endif
 
 class KWQKHTMLPartImpl : public QObject {
@@ -36,6 +38,8 @@ class KWQKHTMLPartImpl : public QObject {
   KWQKHTMLPartImpl(KHTMLPart*);
   ~KWQKHTMLPartImpl();
 
+  void setBridge(WebCoreBridge* p) { bridge = p; }
+  WebCoreBridge* getBridge() const { return bridge; }
   void setView(KHTMLView* view);
 
   bool openURLInFrame(const KURL&, const KParts::URLArgs&);
@@ -61,7 +65,6 @@ class KWQKHTMLPartImpl : public QObject {
 
   QString documentSource() const;
 
-  void setDataSource(IFWebDataSource*);
   IFWebDataSource* getDataSource();
 
   bool frameExists(const QString& frameName);
@@ -95,12 +98,13 @@ class KWQKHTMLPartImpl : public QObject {
   KHTMLPart* part;
   KHTMLPartPrivate* d;
 
+  WebCoreBridge* bridge;
+
   int m_redirectionTimer;
 
   KURL m_baseURL;
   QString m_documentSource;
   bool m_decodingStarted;
-  IFWebDataSource* m_dataSource;
 
   friend class KHTMLPart;
 };

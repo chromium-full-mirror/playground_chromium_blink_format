@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,7 +26,11 @@
 #ifndef QDATETIME_H_
 #define QDATETIME_H_
 
-#include <iostream>
+#include <KWQDef.h>
+
+#ifdef _KWQ_IOSTREAM_
+#include <iosfwd>
+#endif
 
 class QTime {
  public:
@@ -50,7 +54,9 @@ class QTime {
   uint timeMS;  // time is stored in milliseconds
 
   friend class QDateTime;
+#ifdef _KWQ_IOSTREAM_
   friend std::ostream& operator<<(std::ostream&, const QTime&);
+#endif
 };
 
 class QDate {
@@ -74,7 +80,9 @@ class QDate {
   void setCurrentDate();
 
   friend class QDateTime;
+#ifdef _KWQ_IOSTREAM_
   friend std::ostream& operator<<(std::ostream&, const QDate&);
+#endif
 };
 
 class QDateTime {
@@ -92,7 +100,9 @@ class QDateTime {
   QTime timeDT;
   QDate dateDT;
 
+#ifdef _KWQ_IOSTREAM_
   friend std::ostream& operator<<(std::ostream&, const QDateTime&);
+#endif
 };
 
 #endif
