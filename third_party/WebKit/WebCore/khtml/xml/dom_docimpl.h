@@ -490,6 +490,12 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setDomain(const DOMString& newDomain,
                  bool force = false);  // not part of the DOM
 
+  // The following implements the rule from HTML 4 for what valid names are.
+  // To get this right for all the XML cases, we probably have to improve this
+  // or move it
+  // and make it sensitive to the type of document.
+  static bool isValidName(const DOMString&);
+
  signals:
   void finishedParsing();
 

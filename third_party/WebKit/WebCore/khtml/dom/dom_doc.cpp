@@ -290,7 +290,9 @@ Attr Document::createAttributeNS(const DOMString& namespaceURI,
     localName.remove(0, colonpos + 1);
   }
 
-  // ### check correctness of parameters
+  if (!DocumentImpl::isValidName(localName))
+    throw DOMException(DOMException::INVALID_CHARACTER_ERR);
+  // ### check correctness of namespace, prefix?
 
   NodeImpl::Id id = static_cast<DocumentImpl*>(impl)->attrId(
       namespaceURI.implementation(), localName.implementation(),

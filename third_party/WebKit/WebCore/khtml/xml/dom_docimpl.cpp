@@ -572,6 +572,9 @@ unsigned short DocumentImpl::nodeType() const {
 }
 
 ElementImpl* DocumentImpl::createHTMLElement(const DOMString& name) {
+  if (!isValidName(name))
+    throw DOMException(DOMException::INVALID_CHARACTER_ERR);
+
   uint id =
       khtml::getTagID(name.string().lower().latin1(), name.string().length());
 
@@ -2310,6 +2313,30 @@ void DocumentImpl::setDomain(const DOMString& newDomain,
         m_domain = newDomain;
     }
   }
+}
+
+bool DocumentImpl::isValidName(const DOMString& name) {
+  static const char validFirstCharacter[] =
+      "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxyz";
+  static const char validSubsequentCharacter[] =
+      "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxyz0-9-_:.";
+  const unsigned length = name.length();
+  if (length == 0)
+    return false;
+  const QChar* const characters = name.unicode();
+  const char fc = characters[0];
+  if (!fc)
+    return false;
+  if (strchr(validFirstCharacter, fc) == 0)
+    return false;
+  for (unsigned i = 1; i < length; ++i) {
+    const char sc = characters[i];
+    if (!sc)
+      return false;
+    if (strchr(validSubsequentCharacter, sc) == 0)
+      return false;
+  }
+  return true;
 }
 
 #if APPLE_CHANGES
