@@ -45,7 +45,7 @@
                allowsScrolling:(BOOL)allowsScrolling;
 
 - (id<WebContextMenuDelegate>)_defaultContextMenuDelegate;
-- (void)_finsishedLoadingResourceFromDataSource:(WebDataSource*)dataSource;
+- (void)_finishedLoadingResourceFromDataSource:(WebDataSource*)dataSource;
 - (void)_receivedError:(WebError*)error
         fromDataSource:(WebDataSource*)dataSource;
 - (void)_mainReceivedBytesSoFar:(unsigned)bytesSoFar
