@@ -86,6 +86,7 @@ enum FrameBorderStyle {
   KHTMLPart* part;
   KHTMLRenderPart* renderPart;
   BOOL bridgeOwnsKHTMLView;
+  NSEvent* currentEvent;
 }
 
 - (void)setRenderPart:(KHTMLRenderPart*)renderPart;
@@ -193,7 +194,7 @@ enum FrameBorderStyle {
 - (WebCoreBridge*)findFramedNamed:(NSString*)name;
 - (WebCoreBridge*)findOrCreateFramedNamed:(NSString*)name;
 
-- (void)loadURL:(NSURL*)URL reload:(BOOL)reload;
+- (void)loadURL:(NSURL*)URL reload:(BOOL)reload triggeringEvent:(NSEvent*)event;
 - (void)postWithURL:(NSURL*)URL
                data:(NSData*)data
         contentType:(NSString*)contentType;
