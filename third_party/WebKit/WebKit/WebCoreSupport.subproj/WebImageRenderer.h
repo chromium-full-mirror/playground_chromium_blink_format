@@ -14,4 +14,11 @@
   unsigned lastLength;
   BOOL lastReturn;
 }
+- (BOOL)incrementalLoadWithBytes:(const void*)bytes
+                          length:(unsigned)length
+                        complete:(BOOL)isComplete;
+- (void)beginAnimationInView:(NSView*)view
+                      inRect:(NSRect)ir
+                    fromRect:(NSRect)fr;
+- (void)stopAnimation;
 @end

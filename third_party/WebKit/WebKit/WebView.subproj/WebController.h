@@ -41,6 +41,8 @@
 @class IFWebController;
 @class IFWebControllerPrivate;
 
+@protocol IFDocumentLoading;
+
 /*
    =============================================================================
 
@@ -117,14 +119,6 @@ typedef enum {
  @private
   IFWebControllerPrivate* _private;
 }
-
-/*
-// Called when the content policy is set to IFContentPolicyShow
-+ (id <IFDocumentView>) createViewForMIMEType:(NSString *)MIMEType
-
-// registerClass extends the views that WebKit supports
-+ (void) registerClass:(Class)class forMIMEType:(NSString *)MIMEType
-*/
 
 // Calls designated initializer with nil arguments.
 - init;
@@ -203,5 +197,7 @@ typedef enum {
 
 - (void)stopAnimatedImageLooping;
 - (void)startAnimatedImageLooping;
+
++ (BOOL)canShowMIMEType:(NSString*)MIMEType;
 
 @end

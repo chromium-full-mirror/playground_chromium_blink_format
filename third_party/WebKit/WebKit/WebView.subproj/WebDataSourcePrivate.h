@@ -10,13 +10,16 @@
 #import <WebKit/IFWebDataSource.h>
 #import <WebKit/IFLocationChangeHandler.h>
 
-class KHTMLPart;
-
 @class IFURLHandle;
 @class IFMainURLHandleClient;
 @protocol IFLocationChangeHandler;
+@protocol IFDocumentRepresentation;
 
 @interface IFWebDataSourcePrivate : NSObject {
+  NSData* resourceData;
+
+  id representation;
+
   IFWebDataSource* parent;
   NSMutableArray* children;
 
@@ -27,8 +30,6 @@ class KHTMLPart;
 
   // The original URL we may have been redirected to.
   NSURL* finalURL;
-
-  KHTMLPart* part;
 
   // Child frames of this frame.
   NSMutableDictionary* frames;
@@ -51,7 +52,7 @@ class KHTMLPart;
 
   BOOL stopping;
 
-  NSString *pageTitle, *downloadPath;
+  NSString *pageTitle, *downloadPath, *encoding, *contentType;
 
   // Errors associated with resources.
   NSMutableDictionary* errors;
@@ -73,8 +74,9 @@ class KHTMLPart;
 @end
 
 @interface IFWebDataSource (IFPrivate)
+- (void)_setResourceData:(NSData*)data;
+- (void)_setRepresentation:(id<IFDocumentRepresentation>)representation;
 - (void)_setController:(IFWebController*)controller;
-- (KHTMLPart*)_part;
 - (void)_setParent:(IFWebDataSource*)p;
 - (void)_startLoading:(BOOL)forceRefresh;
 
@@ -87,16 +89,19 @@ class KHTMLPart;
 - (double)_loadingStartedTime;
 - (void)_setTitle:(NSString*)title;
 - (void)_setFinalURL:(NSURL*)url;
-
 - (id<IFLocationChangeHandler>)_locationChangeHandler;
 - (void)_setLocationChangeHandler:(id<IFLocationChangeHandler>)l;
 - (void)_setDownloadPath:(NSString*)path;
 - (void)_setContentPolicy:(IFContentPolicy)policy;
+- (void)_setContentType:(NSString*)type;
+- (void)_setEncoding:(NSString*)encoding;
 - (IFWebDataSource*)_recursiveDataSourceForLocationChangeHandler:
     (id<IFLocationChangeHandler>)handler;
 
 - (void)_clearErrors;
 - (void)_setMainDocumentError:(IFError*)error;
 - (void)_addError:(IFError*)error forResource:(NSString*)resourceDescription;
-
+- (BOOL)_isDocumentHTML;
++ (NSMutableDictionary*)_repTypes;
++ (BOOL)_canShowMIMEType:(NSString*)MIMEType;
 @end
