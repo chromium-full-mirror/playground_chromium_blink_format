@@ -69,7 +69,7 @@ class RenderBlock : public RenderFlow {
   virtual void setOverflowHeight(int h) { m_overflowHeight = h; }
   virtual void setOverflowWidth(int w) { m_overflowWidth = w; }
 
-  virtual bool isSelfCollapsingBlock() const { return m_height == 0; }
+  virtual bool isSelfCollapsingBlock() const;
   virtual bool isTopMarginQuirk() const { return m_topMarginQuirk; }
   virtual bool isBottomMarginQuirk() const { return m_bottomMarginQuirk; }
 
@@ -157,7 +157,7 @@ class RenderBlock : public RenderFlow {
   // called from lineWidth, to position the floats added in the last line.
   void positionNewFloats();
   void clearFloats();
-  bool checkClear(RenderObject* child);
+  int getClearDelta(RenderObject* child);
   virtual void markAllDescendantsWithFloatsForLayout(
       RenderObject* floatToRemove = 0);
 
