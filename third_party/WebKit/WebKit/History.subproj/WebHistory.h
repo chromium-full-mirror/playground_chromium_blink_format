@@ -58,6 +58,9 @@ extern NSString* WebHistoryEntriesChangedNotification;
 // testing contents for visited-link mechanism
 - (BOOL)containsURL:(NSURL*)URL;
 
+// retreiving information for a specific URL
+- (WebHistoryItem*)entryForURL:(NSURL*)URL;
+
 // storing contents on disk
 
 // The file path used for storing history, specified in -[WebHistory
