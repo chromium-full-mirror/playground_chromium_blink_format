@@ -230,6 +230,7 @@ class InterpreterImp {
   void initGlobalObject();
   static void lock();
   static void unlock();
+  static int lockCount();
 
   void mark();
 
