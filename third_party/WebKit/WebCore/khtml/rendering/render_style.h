@@ -516,7 +516,9 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   DataRef<StyleMarqueeData> marquee;          // Marquee properties
   EUserDrag
       userDrag : 2;  // Whether or not a drag can be initiated by this element.
-  bool userSelect : 1;  // Whether or not the element is selectable.
+  bool userSelect : 1;    // Whether or not the element is selectable.
+  bool textOverflow : 1;  // Whether or not lines that spill out should be
+                          // truncated with "..."
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1186,6 +1188,7 @@ class RenderStyle {
   EUserModify userModify() const { return css3InheritedData->userModify; }
   EUserDrag userDrag() const { return css3NonInheritedData->userDrag; }
   bool userSelect() const { return css3NonInheritedData->userSelect; }
+  bool textOverflow() const { return css3NonInheritedData->textOverflow; }
 // End CSS3 Getters
 
 #if APPLE_CHANGES
@@ -1459,6 +1462,9 @@ class RenderStyle {
   }
   void setUserDrag(EUserDrag d) { SET_VAR(css3NonInheritedData, userDrag, d); }
   void setUserSelect(bool b) { SET_VAR(css3NonInheritedData, userSelect, b); }
+  void setTextOverflow(bool b) {
+    SET_VAR(css3NonInheritedData, textOverflow, b);
+  }
 // End CSS3 Setters
 
 #if APPLE_CHANGES
@@ -1573,6 +1579,7 @@ class RenderStyle {
   static EUserModify initialUserModify() { return READ_ONLY; }
   static EUserDrag initialUserDrag() { return DRAG_AUTO; }
   static bool initialUserSelect() { return true; }
+  static bool initialTextOverflow() { return false; }
 
 #if APPLE_CHANGES
   // Keep these at the end.
