@@ -625,7 +625,8 @@ void KHTMLView::layout() {
   d->layoutSchedulingEnabled = true;
   d->layoutSuppressed = false;
 
-  resizeContents(layer->width(), layer->height());
+  if (!root->printingMode())
+    resizeContents(layer->width(), layer->height());
 
   // Now update the positions of all layers.
   layer->updateLayerPositions(d->doFullRepaint);
