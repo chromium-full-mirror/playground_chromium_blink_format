@@ -181,7 +181,7 @@ class QWidget : public QObject, public QPaintDevice {
   QWidget& operator=(const QWidget&);
 
   void setCRect(const QRect& r);
-  void internalSetGeometry(int x, int y, int w, int h, bool updateView);
+  void internalSetGeometry(int x, int y, int w, int h);
 
   void _initialize();
 
