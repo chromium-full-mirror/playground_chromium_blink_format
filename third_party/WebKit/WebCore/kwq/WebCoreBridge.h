@@ -357,6 +357,7 @@ typedef enum {
              customAttributes:(NSArray*)attributes
                        ranges:(NSArray*)ranges;
 - (DOMRange*)markedTextDOMRange;
+- (void)replaceMarkedTextWithText:(NSString*)text;
 
 - (NSAttributedString*)attributedStringFrom:(DOMNode*)startNode
                                 startOffset:(int)startOffset
