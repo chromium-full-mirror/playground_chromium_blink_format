@@ -722,7 +722,7 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
         // Only justify text with white-space: normal.
         if (r->obj->style()->whiteSpace() != PRE) {
           spaceAdd = (availableWidth - totWidth) * spaces / numSpaces;
-          static_cast<TextRun*>(r->box)->setSpaceAdd(spaceAdd);
+          static_cast<InlineTextBox*>(r->box)->setSpaceAdd(spaceAdd);
           totWidth += spaceAdd;
         }
         numSpaces -= spaces;

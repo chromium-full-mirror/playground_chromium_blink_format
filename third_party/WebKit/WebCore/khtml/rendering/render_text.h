@@ -40,9 +40,9 @@ namespace khtml {
 class RenderText;
 class RenderStyle;
 
-class TextRun : public InlineBox {
+class InlineTextBox : public InlineBox {
  public:
-  TextRun(RenderObject* obj) : InlineBox(obj) {
+  InlineTextBox(RenderObject* obj) : InlineBox(obj) {
     m_start = 0;
     m_len = 0;
     m_reversed = false;
@@ -70,7 +70,7 @@ class TextRun : public InlineBox {
   }
   int spaceAdd() { return m_toAdd; }
 
-  virtual bool isTextRun() { return true; }
+  virtual bool isInlineTextBox() { return true; }
 
   void paintDecoration(QPainter* pt, int _tx, int _ty, int decoration);
   void paintSelection(const Font* f,
@@ -110,7 +110,7 @@ class TextRun : public InlineBox {
   int m_toAdd : 14;  // for justified text
  private:
   // this is just for QVector::bsearch. Don't use it otherwise
-  TextRun(int _x, int _y) : InlineBox(0) {
+  InlineTextBox(int _x, int _y) : InlineBox(0) {
     m_x = _x;
     m_y = _y;
     m_reversed = false;
@@ -118,18 +118,18 @@ class TextRun : public InlineBox {
   friend class RenderText;
 };
 
-class TextRunArray : public QPtrVector<TextRun> {
+class InlineTextBoxArray : public QPtrVector<InlineTextBox> {
  public:
-  TextRunArray();
+  InlineTextBoxArray();
 
-  TextRun* first();
+  InlineTextBox* first();
 
   int findFirstMatching(Item) const;
   virtual int compareItems(Item, Item);
 };
 
 class RenderText : public RenderObject {
-  friend class TextRun;
+  friend class InlineTextBox;
 
  public:
   RenderText(DOM::NodeImpl* node, DOM::DOMStringImpl* _str);
@@ -259,7 +259,7 @@ class RenderText : public RenderObject {
   }
 
 #if APPLE_CHANGES
-  TextRunArray textRuns() const { return m_lines; }
+  InlineTextBoxArray inlineTextBoxes() const { return m_lines; }
   int widthFromCache(const Font*, int start, int len) const;
   bool shouldUseMonospaceCache(const Font*) const;
   void cacheWidths();
@@ -277,10 +277,10 @@ class RenderText : public RenderObject {
 #if APPLE_CHANGES
  public:
 #endif
-  TextRun* findTextRun(int offset, int& pos);
+  InlineTextBox* findNextInlineTextBox(int offset, int& pos);
 
  protected:  // members
-  TextRunArray m_lines;
+  InlineTextBoxArray m_lines;
   DOM::DOMStringImpl* str;  //
 
   short m_lineHeight;
