@@ -30,9 +30,6 @@
 @interface WebCoreTextRendererFactory : NSObject {
 }
 
-- (void)startCoalesceTextDrawing;
-- (void)endCoalesceTextDrawing;
-
 + (WebCoreTextRendererFactory*)sharedFactory;
 - (id<WebCoreTextRenderer>)rendererWithFamily:(NSString*)family
                                        traits:(NSFontTraitMask)traits

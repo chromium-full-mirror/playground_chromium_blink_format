@@ -22,6 +22,9 @@
 - (WebTextRenderer*)rendererWithFont:(NSFont*)font;
 
 - (BOOL)coalesceTextDrawing;
+- (void)endCoalesceTextDrawing;
+- (void)startCoalesceTextDrawing;
+
 - (WebGlyphBuffer*)glyphBufferForFont:(NSFont*)font andColor:(NSColor*)color;
 
 @end
