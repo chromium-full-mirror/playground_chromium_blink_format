@@ -47,7 +47,7 @@ class QRegExp {
             bool treatStartAsStartOfInput = true) const;
 
   int search(const QString&, int startFrom = 0) const;
-  int searchRev(const QString&, int startFrom = -1) const;
+  int searchRev(const QString&) const;
 
   int pos(int n = 0);
   int matchedLength() const;
