@@ -42,7 +42,7 @@ extern "C" {
 extern OSStatus HIWebViewCreate(HIViewRef* outControl);
 
 /*
- *  HIWebViewGetNSView()
+ *  HIWebViewGetWebView()
  *
  *  Summary:
  *    Returns the WebKit WebView for a given HIWebView.
@@ -60,7 +60,7 @@ extern OSStatus HIWebViewCreate(HIViewRef* outControl);
  *    CarbonLib:        not available
  *    Non-Carbon CFM:   not available
  */
-extern WebView* HIWebViewGetNSView(HIViewRef inView);
+extern WebView* HIWebViewGetWebView(HIViewRef inView);
 
 #ifdef __cplusplus
 }
