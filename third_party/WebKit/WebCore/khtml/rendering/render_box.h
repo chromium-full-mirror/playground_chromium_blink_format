@@ -45,14 +45,7 @@ class RenderBox : public RenderContainer {
   virtual const char* renderName() const { return "RenderBox"; }
 
   virtual void setStyle(RenderStyle* style);
-  virtual void paint(QPainter* p,
-                     int _x,
-                     int _y,
-                     int _w,
-                     int _h,
-                     int _tx,
-                     int _ty,
-                     PaintAction paintAction);
+  virtual void paint(PaintInfo& i, int _tx, int _ty);
 
   virtual void detach();
 
@@ -151,20 +144,8 @@ class RenderBox : public RenderContainer {
   virtual void setStaticY(int staticY);
 
  protected:
-  virtual void paintBoxDecorations(QPainter* p,
-                                   int _x,
-                                   int _y,
-                                   int _w,
-                                   int _h,
-                                   int _tx,
-                                   int _ty);
-  void paintRootBoxDecorations(QPainter* p,
-                               int,
-                               int _y,
-                               int,
-                               int _h,
-                               int _tx,
-                               int _ty);
+  virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
+  void paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty);
 
   void paintBackground(QPainter* p,
                        const QColor& c,

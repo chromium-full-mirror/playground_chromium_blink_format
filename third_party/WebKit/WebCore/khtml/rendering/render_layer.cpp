@@ -741,10 +741,9 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     setClip(p, paintDirtyRect, damageRect);
 
     // Paint the background.
-    renderer()->paint(p, damageRect.x(), damageRect.y(), damageRect.width(),
-                      damageRect.height(), x - renderer()->xPos(),
-                      y - renderer()->yPos(), PaintActionElementBackground);
-
+    RenderObject::PaintInfo info =
+        RenderObject::PaintInfo(p, damageRect, PaintActionElementBackground);
+    renderer()->paint(info, x - renderer()->xPos(), y - renderer()->yPos());
 #if APPLE_CHANGES
     // Our scrollbar widgets paint exactly when we tell them to, so that they
     // work properly with
@@ -779,28 +778,19 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     // Set up the clip used when painting our children.
     setClip(p, paintDirtyRect, clipRectToApply);
 
-    if (selectionOnly)
-      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
-                        clipRectToApply.width(), clipRectToApply.height(),
-                        x - renderer()->xPos(), y - renderer()->yPos(),
-                        PaintActionSelection);
-    else {
-      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
-                        clipRectToApply.width(), clipRectToApply.height(),
-                        x - renderer()->xPos(), y - renderer()->yPos(),
-                        PaintActionChildBackgrounds);
-      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
-                        clipRectToApply.width(), clipRectToApply.height(),
-                        x - renderer()->xPos(), y - renderer()->yPos(),
-                        PaintActionFloat);
-      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
-                        clipRectToApply.width(), clipRectToApply.height(),
-                        x - renderer()->xPos(), y - renderer()->yPos(),
-                        PaintActionForeground);
-      renderer()->paint(p, clipRectToApply.x(), clipRectToApply.y(),
-                        clipRectToApply.width(), clipRectToApply.height(),
-                        x - renderer()->xPos(), y - renderer()->yPos(),
-                        PaintActionOutline);
+    int tx = x - renderer()->xPos();
+    int ty = y - renderer()->yPos();
+    RenderObject::PaintInfo info(
+        p, clipRectToApply,
+        selectionOnly ? PaintActionSelection : PaintActionChildBackgrounds);
+    renderer()->paint(info, tx, ty);
+    if (!selectionOnly) {
+      info.phase = PaintActionFloat;
+      renderer()->paint(info, tx, ty);
+      info.phase = PaintActionForeground;
+      renderer()->paint(info, tx, ty);
+      info.phase = PaintActionOutline;
+      renderer()->paint(info, tx, ty);
     }
 
     // Now restore our clip.

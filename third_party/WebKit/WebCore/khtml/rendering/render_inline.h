@@ -58,22 +58,7 @@ class RenderInline : public RenderFlow {
 
   virtual void layout() {}  // Do nothing for layout()
 
-  virtual void paint(QPainter*,
-                     int x,
-                     int y,
-                     int w,
-                     int h,
-                     int tx,
-                     int ty,
-                     PaintAction paintAction);
-  virtual void paintObject(QPainter*,
-                           int x,
-                           int y,
-                           int w,
-                           int h,
-                           int tx,
-                           int ty,
-                           PaintAction paintAction);
+  virtual void paint(PaintInfo& i, int tx, int ty);
 
   virtual bool nodeAtPoint(NodeInfo& info,
                            int _x,

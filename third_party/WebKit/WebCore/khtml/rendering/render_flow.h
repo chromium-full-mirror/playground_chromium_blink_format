@@ -71,22 +71,8 @@ class RenderFlow : public RenderBox {
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox);
 
-  void paintLineBoxBackgroundBorder(QPainter* p,
-                                    int _x,
-                                    int _y,
-                                    int _w,
-                                    int _h,
-                                    int _tx,
-                                    int _ty,
-                                    PaintAction paintAction);
-  void paintLineBoxDecorations(QPainter* p,
-                               int _x,
-                               int _y,
-                               int _w,
-                               int _h,
-                               int _tx,
-                               int _ty,
-                               PaintAction paintAction);
+  void paintLineBoxBackgroundBorder(PaintInfo& i, int _tx, int _ty);
+  void paintLineBoxDecorations(PaintInfo& i, int _tx, int _ty);
 
   virtual QRect getAbsoluteRepaintRect();
 

@@ -215,25 +215,25 @@ QColor RenderImage::selectionTintColor(QPainter* p) const {
 }
 #endif
 
-void RenderImage::paintObject(QPainter* p,
-                              int /*_x*/,
-                              int /*_y*/,
-                              int /*_w*/,
-                              int /*_h*/,
-                              int _tx,
-                              int _ty,
-                              PaintAction paintAction) {
-  if (paintAction == PaintActionOutline && style()->outlineWidth() &&
+void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
+  if (!shouldPaint(i, _tx, _ty))
+    return;
+
+  if (shouldPaintBackgroundOrBorder() && i.phase != PaintActionOutline)
+    paintBoxDecorations(i, _tx, _ty);
+
+  QPainter* p = i.p;
+
+  if (i.phase == PaintActionOutline && style()->outlineWidth() &&
       style()->visibility() == VISIBLE)
     paintOutline(p, _tx, _ty, width(), height(), style());
 
-  if (paintAction != PaintActionForeground &&
-      paintAction != PaintActionSelection)
+  if (i.phase != PaintActionForeground && i.phase != PaintActionSelection)
     return;
 
 #if APPLE_CHANGES
   bool drawSelectionTint = selectionState() != SelectionNone;
-  if (paintAction == PaintActionSelection) {
+  if (i.phase == PaintActionSelection) {
     if (selectionState() == SelectionNone) {
       return;
     }
@@ -254,9 +254,9 @@ void RenderImage::paintObject(QPainter* p,
   // kdDebug( 6040 ) << "    contents (" << contentWidth << "/" << contentHeight
   // << ") border=" << borderLeft() << " padding=" << paddingLeft() << endl;
   if (pix.isNull() || berrorPic) {
-    if (paintAction == PaintActionSelection) {
+    if (i.phase == PaintActionSelection)
       return;
-    }
+
     if (cWidth > 2 && cHeight > 2) {
 #if APPLE_CHANGES
       if (!berrorPic) {
@@ -576,12 +576,11 @@ void RenderImage::updateFromElement() {
   // page itself
   // loaded as an image.
   CachedImage* new_image;
-  if (attr.isEmpty()) {
+  if (attr.isEmpty())
     new_image = NULL;
-  } else {
+  else
     new_image = element()->getDocument()->docLoader()->requestImage(
         khtml::parseURL(attr));
-  }
 
   if (new_image && new_image != image &&
       (!style() || !style()->contentData())) {

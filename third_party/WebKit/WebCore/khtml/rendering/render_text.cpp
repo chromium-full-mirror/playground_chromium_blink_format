@@ -569,14 +569,19 @@ static QColor correctedTextColor(QColor textColor, QColor backgroundColor) {
   return textColor.light();
 }
 
-void RenderText::paintObject(QPainter* p,
-                             int /*x*/,
-                             int y,
-                             int /*w*/,
-                             int h,
-                             int tx,
-                             int ty,
-                             PaintAction paintAction) {
+void RenderText::paint(PaintInfo& i, int tx, int ty) {
+  if (i.phase != PaintActionForeground && i.phase != PaintActionSelection)
+    return;
+
+  if (style()->visibility() != VISIBLE || !firstTextBox())
+    return;
+
+  if (ty + firstTextBox()->yPos() > i.r.y() + i.r.height())
+    return;
+  if (ty + lastTextBox()->yPos() + lastTextBox()->height() < i.r.y())
+    return;
+
+  QPainter* p = i.p;
   RenderStyle* pseudoStyle = style(true);
   if (pseudoStyle == style())
     pseudoStyle = 0;
@@ -585,7 +590,8 @@ void RenderText::paintObject(QPainter* p,
 
   // Walk forward until we hit the first line that needs to be painted.
   InlineTextBox* s = firstTextBox();
-  for (; s && !s->checkVerticalPoint(y, ty, h); s = s->nextTextBox())
+  for (; s && !s->checkVerticalPoint(i.r.y(), ty, i.r.height());
+       s = s->nextTextBox())
     ;
   if (!s)
     return;
@@ -615,7 +621,7 @@ void RenderText::paintObject(QPainter* p,
   // Do one pass for the selection, then another for the rest.
   bool haveSelection =
       startPos != endPos && !isPrinting && selectionState() != SelectionNone;
-  if (!haveSelection && paintAction == PaintActionSelection) {
+  if (!haveSelection && i.phase == PaintActionSelection) {
     // When only painting the selection, don't bother to paint if there is none.
     return;
   }
@@ -624,7 +630,7 @@ void RenderText::paintObject(QPainter* p,
   for (int pass = 0; pass < (haveSelection ? 2 : 1); pass++) {
     s = startBox;
     bool drawSelectionBackground =
-        haveSelection && pass == 0 && paintAction != PaintActionSelection;
+        haveSelection && pass == 0 && i.phase != PaintActionSelection;
     bool drawText = !haveSelection || pass == 1;
 #endif
 
@@ -633,12 +639,12 @@ void RenderText::paintObject(QPainter* p,
     do {
       if (isPrinting) {
         // FIXME: Need to understand what this section is doing.
-        if (ty + s->m_y < y) {
+        if (ty + s->m_y < i.r.y()) {
           // This has been printed already we suppose.
           continue;
         }
 
-        if (ty + s->m_y + s->height() > y + h) {
+        if (ty + s->m_y + s->height() > i.r.y() + i.r.height()) {
           RenderCanvas* canvasObj = canvas();
           if (ty + s->m_y < canvasObj->truncatedAt())
 #if APPLE_CHANGES
@@ -686,7 +692,7 @@ void RenderText::paintObject(QPainter* p,
 #endif
 
         if (s->m_len > 0) {
-          bool paintSelectedTextOnly = (paintAction == PaintActionSelection);
+          bool paintSelectedTextOnly = (i.phase == PaintActionSelection);
           bool paintSelectedTextSeparately =
               false;  // Whether or not we have to do multiple paints.  Only
           // necessary when a custom ::selection foreground color is applied.
@@ -795,7 +801,7 @@ void RenderText::paintObject(QPainter* p,
           }
         }
 
-        if (d != TDNONE && paintAction == PaintActionForeground &&
+        if (d != TDNONE && i.phase == PaintActionForeground &&
             style()->htmlHacks()) {
           p->setPen(_style->color());
           s->paintDecoration(p, tx, ty, d);
@@ -833,37 +839,12 @@ void RenderText::paintObject(QPainter* p,
       }
 #endif
 
-    } while (((s = s->nextTextBox()) != 0) && s->checkVerticalPoint(y, ty, h));
+    } while (((s = s->nextTextBox()) != 0) &&
+             s->checkVerticalPoint(i.r.y(), ty, i.r.height()));
 
 #if APPLE_CHANGES
   }  // end of for loop
 #endif
-}
-
-void RenderText::paint(QPainter* p,
-                       int x,
-                       int y,
-                       int w,
-                       int h,
-                       int tx,
-                       int ty,
-                       PaintAction paintAction) {
-  if (paintAction != PaintActionForeground &&
-      paintAction != PaintActionSelection)
-    return;
-
-  if (style()->visibility() != VISIBLE)
-    return;
-
-  if (!firstTextBox())
-    return;
-
-  if (ty + firstTextBox()->yPos() > y + h)
-    return;
-  if (ty + lastTextBox()->yPos() + lastTextBox()->height() < y)
-    return;
-
-  paintObject(p, x, y, w, h, tx, ty, paintAction);
 }
 
 #ifdef APPLE_CHANGES

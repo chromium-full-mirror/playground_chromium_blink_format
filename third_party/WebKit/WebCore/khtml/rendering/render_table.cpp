@@ -407,19 +407,14 @@ void RenderTable::setCellWidths() {
   }
 }
 
-void RenderTable::paint(QPainter* p,
-                        int _x,
-                        int _y,
-                        int _w,
-                        int _h,
-                        int _tx,
-                        int _ty,
-                        PaintAction paintAction) {
+void RenderTable::paint(PaintInfo& i, int _tx, int _ty) {
   if (needsLayout())
     return;
 
   _tx += xPos();
   _ty += yPos();
+
+  PaintAction paintAction = i.phase;
 
 #ifdef TABLE_PRINT
   kdDebug(6040) << "RenderTable::paint() w/h = (" << width() << "/" << height()
@@ -427,9 +422,10 @@ void RenderTable::paint(QPainter* p,
 #endif
   if (!overhangingContents() && !isRelPositioned() && !isPositioned()) {
     int os = 2 * maximalOutlineSize(paintAction);
-    if ((_ty >= _y + _h + os) || (_ty + height() <= _y - os))
+    if ((_ty >= i.r.y() + i.r.height() + os) ||
+        (_ty + height() <= i.r.y() - os))
       return;
-    if ((_tx >= _x + _w + os) || (_tx + width() <= _x - os))
+    if ((_tx >= i.r.x() + i.r.width() + os) || (_tx + width() <= i.r.x() - os))
       return;
   }
 
@@ -441,7 +437,7 @@ void RenderTable::paint(QPainter* p,
   if ((paintAction == PaintActionElementBackground ||
        paintAction == PaintActionChildBackground) &&
       shouldPaintBackgroundOrBorder() && style()->visibility() == VISIBLE)
-    paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
+    paintBoxDecorations(i, _tx, _ty);
 
   // We're done.  We don't bother painting any children.
   if (paintAction == PaintActionElementBackground)
@@ -450,13 +446,11 @@ void RenderTable::paint(QPainter* p,
   // backgrounds.
   if (paintAction == PaintActionChildBackgrounds)
     paintAction = PaintActionChildBackground;
+  PaintInfo paintInfo(i.p, i.r, paintAction);
 
-  RenderObject* child = firstChild();
-  while (child) {
+  for (RenderObject* child = firstChild(); child; child = child->nextSibling())
     if (child->isTableSection() || child == tCaption)
-      child->paint(p, _x, _y, _w, _h, _tx, _ty, paintAction);
-    child = child->nextSibling();
-  }
+      child->paint(paintInfo, _tx, _ty);
 
   if (collapseBorders() && (paintAction == PaintActionElementBackground ||
                             paintAction == PaintActionChildBackground) &&
@@ -469,44 +463,38 @@ void RenderTable::paint(QPainter* p,
     QPtrList<CollapsedBorderValue> borderStyles;
     borderStyles.setAutoDelete(true);
     collectBorders(borderStyles);
+    paintInfo.phase = PaintActionCollapsedTableBorders;
     for (uint i = 0; i < borderStyles.count(); i++) {
       m_currentBorder = borderStyles.at(i);
-      for (child = firstChild(); child; child = child->nextSibling()) {
+      for (RenderObject* child = firstChild(); child;
+           child = child->nextSibling())
         if (child->isTableSection())
-          child->paint(p, _x, _y, _w, _h, _tx, _ty,
-                       PaintActionCollapsedTableBorders);
-      }
+          child->paint(paintInfo, _tx, _ty);
     }
   }
 
 #ifdef BOX_DEBUG
-  outlineBox(p, _tx, _ty, "blue");
+  outlineBox(i.p, _tx, _ty, "blue");
 #endif
 }
 
-void RenderTable::paintBoxDecorations(QPainter* p,
-                                      int _x,
-                                      int _y,
-                                      int _w,
-                                      int _h,
-                                      int _tx,
-                                      int _ty) {
+void RenderTable::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   int w = width();
   int h = height() + borderTopExtra() + borderBottomExtra();
   _ty -= borderTopExtra();
 
-  int my = kMax(_ty, _y);
+  int my = kMax(_ty, i.r.y());
   int mh;
-  if (_ty < _y)
-    mh = kMax(0, h - (_y - _ty));
+  if (_ty < i.r.y())
+    mh = kMax(0, h - (i.r.y() - _ty));
   else
-    mh = kMin(_h, h);
+    mh = kMin(i.r.height(), h);
 
-  paintBackground(p, style()->backgroundColor(), style()->backgroundImage(), my,
-                  mh, _tx, _ty, w, h);
+  paintBackground(i.p, style()->backgroundColor(), style()->backgroundImage(),
+                  my, mh, _tx, _ty, w, h);
 
   if (style()->hasBorder() && !collapseBorders())
-    paintBorder(p, _tx, _ty, w, h, style());
+    paintBorder(i.p, _tx, _ty, w, h, style());
 }
 
 void RenderTable::calcMinMaxWidth() {
@@ -1392,14 +1380,7 @@ int RenderTableSection::layoutRows(int toAdd) {
   return m_height;
 }
 
-void RenderTableSection::paint(QPainter* p,
-                               int x,
-                               int y,
-                               int w,
-                               int h,
-                               int tx,
-                               int ty,
-                               PaintAction paintAction) {
+void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
   unsigned int totalRows = grid.size();
   unsigned int totalCols = table()->columns.size();
 
@@ -1408,6 +1389,12 @@ void RenderTableSection::paint(QPainter* p,
 
   // check which rows and cols are visible and only paint these
   // ### fixme: could use a binary search here
+  PaintAction paintAction = i.phase;
+  int x = i.r.x();
+  int y = i.r.y();
+  int w = i.r.width();
+  int h = i.r.height();
+
   int os = 2 * maximalOutlineSize(paintAction);
   unsigned int startrow = 0;
   unsigned int endrow = totalRows;
@@ -1450,7 +1437,7 @@ void RenderTableSection::paint(QPainter* p,
 #ifdef TABLE_PRINT
         kdDebug(6040) << "painting cell " << r << "/" << c << endl;
 #endif
-        cell->paint(p, x, y, w, h, tx, ty, paintAction);
+        cell->paint(i, tx, ty);
       }
     }
   }
@@ -2136,36 +2123,26 @@ static void outlineBox(QPainter* p, int _tx, int _ty, int w, int h) {
 }
 #endif
 
-void RenderTableCell::paint(QPainter* p,
-                            int _x,
-                            int _y,
-                            int _w,
-                            int _h,
-                            int _tx,
-                            int _ty,
-                            PaintAction paintAction) {
+void RenderTableCell::paint(PaintInfo& i, int _tx, int _ty) {
 #ifdef TABLE_PRINT
   kdDebug(6040) << renderName() << "(RenderTableCell)::paint() w/h = ("
                 << width() << "/" << height() << ")"
                 << " _y/_h=" << _y << "/" << _h << endl;
 #endif
 
-  if (needsLayout())
-    return;
-
   _tx += m_x;
   _ty += m_y + _topExtra;
 
   // check if we need to do anything at all...
-  int os = 2 * maximalOutlineSize(paintAction);
-  if (!overhangingContents() && ((_ty - _topExtra >= _y + _h + os) ||
-                                 (_ty + m_height + _bottomExtra <= _y - os)))
+  int os = 2 * maximalOutlineSize(i.phase);
+  if (!overhangingContents() &&
+      ((_ty - _topExtra >= i.r.y() + i.r.height() + os) ||
+       (_ty + m_height + _bottomExtra <= i.r.y() - os)))
     return;
-
-  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
+  RenderBlock::paintObject(i, _tx, _ty);
 
 #ifdef BOX_DEBUG
-  ::outlineBox(p, _tx, _ty - _topExtra, width(),
+  ::outlineBox(i.p, _tx, _ty - _topExtra, width(),
                height() + borderTopExtra() + borderBottomExtra());
 #endif
 }
@@ -2334,31 +2311,7 @@ QRect RenderTableCell::getAbsoluteRepaintRect() {
   return r;
 }
 
-void RenderTableCell::paintObject(QPainter* p,
-                                  int _x,
-                                  int _y,
-                                  int _w,
-                                  int _h,
-                                  int _tx,
-                                  int _ty,
-                                  PaintAction paintAction) {
-  if (paintAction == PaintActionCollapsedTableBorders &&
-      style()->visibility() == VISIBLE) {
-    int w = width();
-    int h = height() + borderTopExtra() + borderBottomExtra();
-    _ty -= borderTopExtra();
-    paintCollapsedBorder(p, _tx, _ty, w, h);
-  } else
-    RenderBlock::paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
-}
-
-void RenderTableCell::paintBoxDecorations(QPainter* p,
-                                          int,
-                                          int _y,
-                                          int,
-                                          int _h,
-                                          int _tx,
-                                          int _ty) {
+void RenderTableCell::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
   RenderTable* tableElt = table();
   if (!tableElt->collapseBorders() && style()->emptyCells() == HIDE &&
       !firstChild())
@@ -2407,15 +2360,15 @@ void RenderTableCell::paintBoxDecorations(QPainter* p,
     }
   }
 
-  int my = QMAX(_ty, _y);
-  int end = QMIN(_y + _h, _ty + h);
+  int my = kMax(_ty, i.r.y());
+  int end = kMin(i.r.y() + i.r.height(), _ty + h);
   int mh = end - my;
 
   if (bg || c.isValid())
-    paintBackground(p, c, bg, my, mh, _tx, _ty, w, h);
+    paintBackground(i.p, c, bg, my, mh, _tx, _ty, w, h);
 
   if (style()->hasBorder() && !tableElt->collapseBorders())
-    paintBorder(p, _tx, _ty, w, h, style());
+    paintBorder(i.p, _tx, _ty, w, h, style());
 }
 
 #ifndef NDEBUG

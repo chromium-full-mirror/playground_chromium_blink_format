@@ -38,8 +38,7 @@ class RenderBR : public RenderText {
 
   virtual const char* renderName() const { return "RenderBR"; }
 
-  virtual void paint(QPainter*, int, int, int, int, int, int, int) {}
-  virtual void paintObject(QPainter*, int, int, int, int, int, int, int) {}
+  virtual void paint(PaintInfo&, int, int) {}
 
   virtual void position(InlineBox* box, int from, int len, bool reverse);
   virtual unsigned int width(unsigned int, unsigned int, const Font*) const {

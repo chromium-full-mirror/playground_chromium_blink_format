@@ -295,8 +295,7 @@ class RenderFieldset : public RenderBlock {
   virtual void setStyle(RenderStyle* _style);
 
  protected:
-  virtual void
-  paintBoxDecorations(QPainter* p, int, int _y, int, int _h, int _tx, int _ty);
+  virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
   void paintBorderMinusLegend(QPainter* p,
                               int _tx,
                               int _ty,

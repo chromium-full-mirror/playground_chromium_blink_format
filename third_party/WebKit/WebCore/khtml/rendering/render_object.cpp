@@ -1111,16 +1111,7 @@ void RenderObject::paintOutline(QPainter* p,
              QColor(oc), style->color(), os, ow, ow, true);
 }
 
-void RenderObject::paint(QPainter* p,
-                         int x,
-                         int y,
-                         int w,
-                         int h,
-                         int tx,
-                         int ty,
-                         PaintAction paintAction) {
-  paintObject(p, x, y, w, h, tx, ty, paintAction);
-}
+void RenderObject::paint(PaintInfo& i, int tx, int ty) {}
 
 void RenderObject::repaint(bool immediate) {
   // Can't use canvas(), since we might be unrooted.

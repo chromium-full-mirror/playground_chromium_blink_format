@@ -505,11 +505,7 @@ void InlineFlowBox::shrinkBoxesWithNoTextChildren(int topPos, int bottomPos) {
   }
 }
 
-void InlineFlowBox::paintBackgroundAndBorder(QPainter* p,
-                                             int _x,
-                                             int _y,
-                                             int _w,
-                                             int _h,
+void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                              int _tx,
                                              int _ty,
                                              int xOffsetOnLine) {
@@ -520,12 +516,14 @@ void InlineFlowBox::paintBackgroundAndBorder(QPainter* p,
   int w = width();
   int h = height();
 
-  int my = QMAX(_ty, _y);
+  int my = kMax(_ty, i.r.y());
   int mh;
-  if (_ty < _y)
-    mh = QMAX(0, h - (_y - _ty));
+  if (_ty < i.r.y())
+    mh = kMax(0, h - (i.r.y() - _ty));
   else
-    mh = QMIN(_h, h);
+    mh = kMin(i.r.height(), h);
+
+  QPainter* p = i.p;
 
   // You can use p::first-line to specify a background. If so, the root line
   // boxes for
@@ -592,16 +590,13 @@ static bool shouldDrawDecoration(RenderObject* obj) {
   return shouldDraw;
 }
 
-void InlineFlowBox::paintDecorations(QPainter* p,
-                                     int _x,
-                                     int _y,
-                                     int _w,
-                                     int _h,
+void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& i,
                                      int _tx,
                                      int _ty) {
   // Now paint our text decorations. We only do this if we aren't in quirks mode
   // (i.e., in
   // almost-strict mode or strict mode).
+  QPainter* p = i.p;
   _tx += m_x;
   _ty += m_y;
   RenderStyle* styleToUse = object()->style(m_firstLine);
