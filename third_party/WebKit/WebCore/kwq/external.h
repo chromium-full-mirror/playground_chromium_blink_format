@@ -74,7 +74,6 @@ class Loader;
 
 @interface IFWebDataSource : NSObject
 - initWithURL:(NSURL*)url;
-- (void)setFrame:(IFWebFrame*)fName;
 - (IFWebFrame*)webFrame;
 - (IFWebController*)controller;
 - frameNamed:(NSString*)f;
@@ -94,6 +93,10 @@ class Loader;
 
 @interface IFHTMLRepresentation : NSObject
 - (KHTMLPart*)part;
+@end
+
+@interface IFDynamicScrollBarsView
+- (void)setCursor:(NSCursor*)cur;
 @end
 
 @interface IFWebView : NSObject
