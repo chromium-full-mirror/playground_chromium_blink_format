@@ -556,11 +556,21 @@ void RenderLayer::paint(QPainter* p,
 
       // A clip is in effect.  The clip is never allowed to clip our render
       // object's
-      // background or borders.  Go ahead and draw those now without our clip
-      // (that will
+      // background, borders or scrollbars.  Go ahead and draw those now without
+      // our clip (that will
       // be used for our children) in effect.
       elt->layer->renderer()->paintBoxDecorations(
           p, x, y, w, h, elt->absBounds.x(), elt->absBounds.y());
+
+      // Position our scrollbars prior to painting.
+      elt->layer->positionScrollbars(elt->absBounds);
+
+#if APPLE_CHANGES
+      // Our scrollbar widgets paint exactly when we tell them to, so that they
+      // work properly with
+      // z-index.
+      elt->layer->paintScrollbars(p, x, y, w, h);
+#endif
     }
 
     if (elt->clipRect != currRect) {
@@ -618,16 +628,6 @@ void RenderLayer::paint(QPainter* p,
             p, x, y, w, h, elt->absBounds.x() - elt->layer->renderer()->xPos(),
             elt->absBounds.y() - elt->layer->renderer()->yPos(),
             PaintActionForeground);
-
-        // Position our scrollbars.
-        elt->layer->positionScrollbars(elt->absBounds);
-
-#if APPLE_CHANGES
-        // Our widgets paint exactly when we tell them to, so that they work
-        // properly with
-        // z-index.
-        elt->layer->paintScrollbars(p, x, y, w, h);
-#endif
       }
     }
   }
