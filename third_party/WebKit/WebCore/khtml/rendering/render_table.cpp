@@ -1335,7 +1335,8 @@ void RenderTable::layout() {
   // layout child objects
   RenderObject* child = firstChild();
   while (child) {
-    if (child != tCaption && !child->layouted())
+    if (child != tCaption && !child->layouted() &&
+        !(child->element() && child->element()->id() == ID_FORM))
       child->layout();
     child = child->nextSibling();
   }
