@@ -221,6 +221,11 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                       to:(id<WebDOMNode>)end
                endOffset:(int)endOffset;
 
+- (BOOL)isEditable;
+- (void)pasteHTMLString:(NSString*)HTMLString;
+- (void)deleteSelection;
+
+- (BOOL)haveSelection;
 - (NSString*)selectedHTML;
 - (NSString*)selectedString;
 - (NSAttributedString*)selectedAttributedString;
