@@ -507,8 +507,8 @@ CachedImage::CachedImage(DocLoader* dl,
   p = 0;
   pixPart = 0;
   bg = 0;
-  bgColor = qRgba(0, 0, 0, 0xFF);
 #if !APPLE_CHANGES
+  bgColor = qRgba(0, 0, 0, 0xFF);
   typeChecked = false;
 #endif
   isFullyTransparent = false;
@@ -818,7 +818,9 @@ void CachedImage::clear() {
   p = 0;
   delete bg;
   bg = 0;
+#if !APPLE_CHANGES
   bgColor = qRgba(0, 0, 0, 0xff);
+#endif
   delete pixPart;
   pixPart = 0;
 
