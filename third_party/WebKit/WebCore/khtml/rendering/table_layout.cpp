@@ -260,6 +260,8 @@ void FixedTableLayout::layout() {
   int tableWidth = table->width() - table->bordersAndSpacing();
   int available = tableWidth;
   int nEffCols = table->numEffCols();
+  int totalPercent = 0;
+
 #ifdef DEBUG_LAYOUT
   qDebug("FixedTableLayout::layout: tableWidth=%d, numEffCols=%d", tableWidth,
          nEffCols);
@@ -269,17 +271,8 @@ void FixedTableLayout::layout() {
   calcWidth.resize(nEffCols);
   calcWidth.fill(-1);
 
-  // first assign  fixed width
-  for (int i = 0; i < nEffCols; i++) {
-    if (width[i].type == Fixed) {
-      calcWidth[i] = width[i].value;
-      available -= width[i].value;
-    }
-  }
-
   // assign  percent width
   if (available > 0) {
-    int totalPercent = 0;
     for (int i = 0; i < nEffCols; i++)
       if (width[i].type == Percent)
         totalPercent += width[i].value;
@@ -306,7 +299,15 @@ void FixedTableLayout::layout() {
     }
   }
 
-  // assign  variable width
+  // next assign fixed width
+  for (int i = 0; i < nEffCols; i++) {
+    if (width[i].type == Fixed) {
+      calcWidth[i] = width[i].value;
+      available -= width[i].value;
+    }
+  }
+
+  // assign variable width
   if (available > 0) {
     int totalVariable = 0;
     for (int i = 0; i < nEffCols; i++)
@@ -326,6 +327,19 @@ void FixedTableLayout::layout() {
   for (int i = 0; i < nEffCols; i++)
     if (calcWidth[i] <= 0)
       calcWidth[i] = 0;  // IE gives min 1 px...
+
+  // spread extra space over columns
+  if (available > 0) {
+    int total = nEffCols;
+    // still have some width to spread
+    int i = nEffCols;
+    while (i--) {
+      int w = available / total;
+      available -= w;
+      total--;
+      calcWidth[i] += w;
+    }
+  }
 
   int pos = 0;
   int spacing = table->cellSpacing();
