@@ -95,6 +95,7 @@ class RenderPart : public khtml::RenderWidget {
 
   virtual void setWidget(QWidget* widget);
 
+#ifndef APPLE_CHANGES
   /**
    * Called by KHTMLPart to notify the frame object that loading the
    * part was not successfuly. (called either asyncroniously after a
@@ -109,6 +110,7 @@ class RenderPart : public khtml::RenderWidget {
   virtual bool partLoadingErrorNotify(khtml::ChildFrame* childFrame,
                                       const KURL& url,
                                       const QString& serviceType);
+#endif
 
   virtual short intrinsicWidth() const;
   virtual int intrinsicHeight() const;
@@ -150,9 +152,11 @@ class RenderPartObject : public khtml::RenderPart {
   virtual short calcReplacedWidth(bool* ieHack = 0) const;
   virtual int calcReplacedHeight() const;
 
+#ifndef APPLE_CHANGES
   virtual bool partLoadingErrorNotify(khtml::ChildFrame* childFrame,
                                       const KURL& url,
                                       const QString& serviceType);
+#endif
 
  public slots:
   void slotViewCleared();

@@ -417,9 +417,6 @@ class RenderTextArea : public RenderFormElement {
 
   QString text();
 
-#ifdef APPLE_CHANGES
-  void performAction(QObject::Actions action);
-#endif /* APPLE_CHANGES */
   void select();
 
  protected slots:

@@ -76,9 +76,6 @@ class KWQKHTMLPartImpl : public QObject {
                 int length,
                 bool complete = false);
 
-  void scheduleRedirection(int delay, const QString& url);
-  virtual void timerEvent(QTimerEvent*);
-
   bool gotoBaseAnchor();
 
   void setTitle(const DOM::DOMString&);
@@ -125,13 +122,15 @@ class KWQKHTMLPartImpl : public QObject {
 
   void overURL(const QString& url, const QString& target, int modifierState);
 
+  void redirectionTimerStartedOrStopped();
+
+  void layout();
+
  private:
   KHTMLPart* part;
   KHTMLPartPrivate* d;
 
   WebCoreBridge* bridge;
-
-  int m_redirectionTimer;
 
   friend class KHTMLPart;
 };
