@@ -104,7 +104,6 @@ using khtml::Decoder;
 using khtml::DeleteSelectionCommand;
 using khtml::EditCommand;
 using khtml::InlineTextBox;
-using khtml::PasteMarkupCommand;
 using khtml::plainText;
 using khtml::RenderObject;
 using khtml::RenderText;
@@ -2280,12 +2279,23 @@ const Selection& KHTMLPart::selection() const {
   return d->m_selection;
 }
 
+const Selection& KHTMLPart::dragCaret() const {
+  return d->m_dragCaret;
+}
+
 void KHTMLPart::setSelection(const Selection& s, bool closeTyping) {
   if (d->m_selection != s) {
     clearCaretRectIfNeeded();
     setFocusNodeIfNeeded(s);
     d->m_selection = s;
     notifySelectionChanged(closeTyping);
+  }
+}
+
+void KHTMLPart::setDragCaret(const DOM::Selection& dragCaret) {
+  if (d->m_dragCaret != dragCaret) {
+    d->m_dragCaret = dragCaret;
+    notifyDragCaretChanged();
   }
 }
 
@@ -2391,6 +2401,10 @@ void KHTMLPart::notifySelectionChanged(bool closeTyping) {
 #endif
 }
 
+void KHTMLPart::notifyDragCaretChanged() {
+  d->m_dragCaret.needsCaretRepaint();
+}
+
 void KHTMLPart::setXPosForVerticalArrowNavigation(int x) {
   d->m_xPosForVerticalArrowNavigation = x;
 }
@@ -2410,6 +2424,10 @@ void KHTMLPart::timerEvent(QTimerEvent* e) {
 void KHTMLPart::paintCaret(QPainter* p, const QRect& rect) const {
   if (d->m_caretPaint)
     d->m_selection.paintCaret(p, rect);
+}
+
+void KHTMLPart::paintDragCaret(QPainter* p, const QRect& rect) const {
+  d->m_dragCaret.paintCaret(p, rect);
 }
 
 #if !APPLE_CHANGES

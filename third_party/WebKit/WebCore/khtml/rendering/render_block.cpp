@@ -1431,6 +1431,7 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
     if (renderer && renderer->containingBlock() == this &&
         baseNode->isContentEditable()) {
       document()->part()->paintCaret(i.p, i.r);
+      document()->part()->paintDragCaret(i.p, i.r);
     }
   }
 

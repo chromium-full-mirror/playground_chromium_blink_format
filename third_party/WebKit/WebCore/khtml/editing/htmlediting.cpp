@@ -417,23 +417,36 @@ TextImpl* JoinTextNodesCommand::secondNode() const {
 }
 
 //------------------------------------------------------------------------------------------
-// PasteMarkupCommand
+// ReplaceSelectionCommand
 
-PasteMarkupCommand::PasteMarkupCommand(DocumentImpl* document,
-                                       const DOMString& markupString,
-                                       const DOM::DOMString& baseURL)
-    : CompositeEditCommand(
-          new PasteMarkupCommandImpl(document, markupString, baseURL)) {}
-
-PasteMarkupCommand::~PasteMarkupCommand() {}
-
-PasteMarkupCommandImpl* PasteMarkupCommand::impl() const {
-  return static_cast<PasteMarkupCommandImpl*>(get());
+ReplaceSelectionCommand::ReplaceSelectionCommand(
+    DocumentImpl* document,
+    DOM::DocumentFragmentImpl* fragment,
+    bool selectReplacement)
+    : CompositeEditCommand(new ReplaceSelectionCommandImpl(document,
+                                                           fragment,
+                                                           selectReplacement)) {
 }
 
-DOMString PasteMarkupCommand::markupString() const {
-  IF_IMPL_NULL_RETURN_ARG(DOMString());
-  return impl()->markupString();
+ReplaceSelectionCommand::~ReplaceSelectionCommand() {}
+
+ReplaceSelectionCommandImpl* ReplaceSelectionCommand::impl() const {
+  return static_cast<ReplaceSelectionCommandImpl*>(get());
+}
+
+//------------------------------------------------------------------------------------------
+// MoveSelectionCommand
+
+MoveSelectionCommand::MoveSelectionCommand(DocumentImpl* document,
+                                           DOM::DocumentFragmentImpl* fragment,
+                                           DOM::Position& position)
+    : CompositeEditCommand(
+          new MoveSelectionCommandImpl(document, fragment, position)) {}
+
+MoveSelectionCommand::~MoveSelectionCommand() {}
+
+MoveSelectionCommandImpl* MoveSelectionCommand::impl() const {
+  return static_cast<MoveSelectionCommandImpl*>(get());
 }
 
 //------------------------------------------------------------------------------------------

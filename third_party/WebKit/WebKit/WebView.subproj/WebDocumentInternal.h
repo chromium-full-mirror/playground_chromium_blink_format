@@ -22,6 +22,7 @@ textSizeMultiplier] returns the current value.
 @protocol WebDocumentDragging<NSObject>
 - (NSDragOperation)dragOperationForDraggingInfo:
     (id<NSDraggingInfo>)draggingInfo;
+- (void)draggingCancelledWithDraggingInfo:(id<NSDraggingInfo>)draggingInfo;
 - (void)draggingUpdatedWithDraggingInfo:(id<NSDraggingInfo>)draggingInfo;
 - (BOOL)concludeDragForDraggingInfo:(id<NSDraggingInfo>)draggingInfo;
 @end
