@@ -35,6 +35,10 @@
 
   id _PDFDoc;
   BOOL isPDF;
+
+  BOOL isSolidColor;  // Is frame 0 a solid color?
+  CGColorRef
+      solidColor;  // If isSolidColor this is the color, or NULL for transparent
 }
 
 - (size_t)numberOfImages;
