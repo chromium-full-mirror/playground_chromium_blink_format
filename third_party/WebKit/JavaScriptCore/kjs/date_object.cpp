@@ -718,10 +718,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
                               Object& /*thisObj*/,
                               const List& args) {
   if (id == Parse) {
-    if (args[0].type() == StringType)
-      return parseDate(args[0].toString(exec));
-    else
-      return Number(NaN);
+    return parseDate(args[0].toString(exec));
   } else {  // UTC
     struct tm t;
     memset(&t, 0, sizeof(t));
@@ -751,8 +748,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
 
 // -----------------------------------------------------------------------------
 
-Value KJS::parseDate(const String& s) {
-  UString u = s.value();
+Value KJS::parseDate(const UString& u) {
 #ifdef KJS_VERBOSE
   fprintf(stderr, "KJS::parseDate %s\n", u.ascii());
 #endif

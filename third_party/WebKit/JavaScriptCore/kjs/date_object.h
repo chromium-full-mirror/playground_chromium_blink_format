@@ -146,7 +146,7 @@ class DateObjectFuncImp : public InternalFunctionImp {
 };
 
 // helper functions
-Value parseDate(const String& s);
+Value parseDate(const UString& u);
 time_t KRFCDate_parseDate(const UString& _date);
 Value timeClip(const Value& t);
 
