@@ -28,6 +28,7 @@
 #include <qmap.h>
 
 #include "kjs_window.h"
+#include "dom_docimpl.h"
 
 class KURL;
 
@@ -47,6 +48,7 @@ class SavedProperties;
   KJS::SavedProperties* locationProperties;
   KJS::SavedBuiltins* interpreterBuiltins;
   QMap<int, KJS::ScheduledAction*>* pausedActions;
+  DOM::DocumentImpl::ParseMode parseMode;
 }
 
 - initWithDocument:(DOM::DocumentImpl*)doc
@@ -56,6 +58,7 @@ class SavedProperties;
     interpreterBuiltins:(KJS::SavedBuiltins*)ib;
 
 - (DOM::DocumentImpl*)document;
+- (DOM::DocumentImpl::ParseMode)parseMode;
 - (DOM::NodeImpl*)mousePressNode;
 - (KURL*)URL;
 - (KJS::SavedProperties*)windowProperties;
