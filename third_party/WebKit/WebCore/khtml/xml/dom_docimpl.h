@@ -76,7 +76,6 @@ class EventListener;
 class GenericRONamedNodeMapImpl;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
-class HTMLInputElementImpl;
 class NodeFilter;
 class NodeFilterImpl;
 class NodeIteratorImpl;
@@ -479,9 +478,6 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void removeImage(khtml::RenderImage*);
   virtual void timerEvent(QTimerEvent*);
 
-  void addCheckedRadioButton(HTMLInputElementImpl*);
-  void removeCheckedRadioButton(HTMLInputElementImpl*);
-
   // Returns the owning element in the parent document.
   // Returns 0 if this is the top level document.
   ElementImpl* ownerElement();
@@ -568,8 +564,6 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   QPtrList<khtml::RenderImage> m_imageLoadEventDispatchSoonList;
   QPtrList<khtml::RenderImage> m_imageLoadEventDispatchingList;
   int m_imageLoadEventTimer;
-
-  QMap<QString, HTMLInputElementImpl*> m_checkedRadioButtons;
 
   NodeImpl* m_cssTarget;
 
