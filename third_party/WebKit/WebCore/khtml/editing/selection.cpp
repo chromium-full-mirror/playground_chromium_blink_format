@@ -446,7 +446,7 @@ Range Selection::toRange() const {
     // the conventions of text editors tested, which make style determinations
     // based
     // on the character before the caret, if any.
-    s = start().upstream().equivalentRangeCompliantPosition();
+    s = start().upstream(StayInBlock).equivalentRangeCompliantPosition();
     e = s;
   } else {
     // If the selection is a range, select the minimum range that encompasses
