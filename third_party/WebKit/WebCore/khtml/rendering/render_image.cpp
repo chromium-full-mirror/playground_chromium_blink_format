@@ -497,7 +497,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       //             p->drawPixmap( offs.x(), y, pix, rect.x(), rect.y(),
       //             rect.width(), rect.height() );
       HTMLImageElementImpl* i =
-          element()->id() == ID_IMG
+          (element() && element()->id() == ID_IMG)
               ? static_cast<HTMLImageElementImpl*>(element())
               : 0;
       if (i && !i->compositeOperator().isNull()) {

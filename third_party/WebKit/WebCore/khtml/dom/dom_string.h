@@ -2,6 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -70,10 +71,6 @@ class DOMString {
    * append str to this string
    */
   DOMString& operator+=(const DOMString& str);
-  /**
-   * add two DOMString's
-   */
-  DOMString operator+(const DOMString& str);
 
   void insert(DOMString str, uint pos);
 
@@ -130,6 +127,7 @@ class DOMString {
   DOMStringImpl* impl;
 };
 
+DOMString operator+(const DOMString& a, const DOMString& b);
 bool operator==(const DOMString& a, const QString& b);
 bool operator==(const DOMString& a, const char* b);
 inline bool operator==(const QString& b, const DOMString& a) {

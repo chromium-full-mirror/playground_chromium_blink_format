@@ -2,7 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 #include "dom/dom_string.h"
 #include "xml/dom_stringimpl.h"
 
-using namespace DOM;
+namespace DOM {
 
 DOMString::DOMString(const QChar* str, uint len) {
   if (!str) {
@@ -105,16 +105,14 @@ DOMString& DOMString::operator+=(const DOMString& str) {
   return *this;
 }
 
-DOMString DOMString::operator+(const DOMString& str) {
-  if (!impl)
-    return str.copy();
-  if (str.impl) {
-    DOMString s = copy();
-    s += str;
-    return s;
-  }
-
-  return copy();
+DOMString operator+(const DOMString& a, const DOMString& b) {
+  if (a.isEmpty())
+    return b.copy();
+  if (b.isEmpty())
+    return a.copy();
+  DOMString c = a.copy();
+  c += b;
+  return c;
 }
 
 void DOMString::insert(DOMString str, uint pos) {
@@ -305,4 +303,5 @@ bool DOM::operator==(const DOMString& a, const char* b) {
     }
   }
   return *b == 0;
+}
 }

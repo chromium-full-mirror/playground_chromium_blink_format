@@ -2,6 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -104,6 +105,10 @@ class CSSStyleSheetImpl : public StyleSheetImpl {
                            unsigned long index,
                            int& exceptioncode);
   void deleteRule(unsigned long index, int& exceptioncode);
+  unsigned long addRule(const DOMString& selector,
+                        const DOMString& style,
+                        long index,
+                        int& exceptioncode);
 
   void addNamespace(CSSParser* p,
                     const DOM::DOMString& prefix,
