@@ -36,7 +36,7 @@
 @class IFLoadProgress;
 
 @protocol IFWebController
-- (IFWebFrame *)createFrameNamed: (NSString *)name for: (IFWebDataSource *)dataSource inParent: (IFWebDataSource *)dataSource;
+- (IFWebFrame *)createFrameNamed: (NSString *)name for: (IFWebDataSource *)dataSource inParent: (IFWebDataSource *)dataSource inScrollView: (BOOL)inScrollView;
 - (void)_receivedProgress:(IFLoadProgress*)progress
               forResource:(NSString*)resourceDescription
            fromDataSource:(IFWebDataSource*)dataSource;

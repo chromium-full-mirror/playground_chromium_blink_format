@@ -93,6 +93,12 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   DocumentImpl* contentDocument() const;
 
+#ifdef APPLE_CHANGES
+  QScrollView::ScrollBarMode scrollingMode() const { return scrolling; }
+  int getMarginWidth() const { return marginWidth; }
+  int getMarginHeight() const { return marginHeight; }
+#endif
+
  protected:
   DOMString url;
   DOMString name;
