@@ -575,7 +575,7 @@ void RenderTable::recalcSections() {
 
   RenderObject* child = firstChild();
   // We need to get valid pointers to caption, head, foot and firstbody again
-  while (child) {
+  while (child && !has_col_elems) {
     switch (child->style()->display()) {
       case TABLE_CAPTION:
         if (!tCaption) {
@@ -586,7 +586,7 @@ void RenderTable::recalcSections() {
       case TABLE_COLUMN:
       case TABLE_COLUMN_GROUP:
         has_col_elems = true;
-        return;
+        break;
       case TABLE_HEADER_GROUP: {
         RenderTableSection* section = static_cast<RenderTableSection*>(child);
         if (!head)
