@@ -52,10 +52,10 @@ extern NSString*
     Typical usage:
     </p>
     <pre>
-    WebView *WebView;
+    WebView *webView;
     WebFrame *mainFrame;
 
-    webView  = [[WebController alloc] initWithFrame: NSMakeRect (0,0,640,480)];
+    webView  = [[WebView alloc] initWithFrame: NSMakeRect (0,0,640,480)];
     mainFrame = [webView mainFrame];
     [mainFrame loadRequest:request];
     </pre>
