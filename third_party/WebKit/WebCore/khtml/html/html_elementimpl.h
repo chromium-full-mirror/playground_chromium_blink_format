@@ -29,6 +29,7 @@ namespace DOM {
 
 class DOMString;
 class CSSStyleDeclarationImpl;
+class HTMLFormElementImpl;
 
 class HTMLElementImpl : public ElementImpl {
  public:
