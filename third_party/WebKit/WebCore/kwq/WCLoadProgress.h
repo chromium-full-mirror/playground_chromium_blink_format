@@ -31,4 +31,6 @@
 typedef id (*WCIFLoadProgressMakeFunc)();
 void WCSetIFLoadProgressMakeFunc(WCIFLoadProgressMakeFunc func);
 
+extern WCIFLoadProgressMakeFunc WCIFLoadProgressMake;
+
 #endif /* __WCLOADPROGRESS__ */
