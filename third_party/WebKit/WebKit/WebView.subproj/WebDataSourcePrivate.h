@@ -99,10 +99,6 @@
   // page cache.
   NSMutableArray* responses;
 
-  BOOL isDownloading;
-  NSString* downloadPath;
-  NSString* downloadDirectory;
-
   BOOL justOpenedForTargetedLink;
 
   BOOL storedInPageCache;
