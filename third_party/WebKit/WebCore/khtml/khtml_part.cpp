@@ -2654,7 +2654,11 @@ unsigned KHTMLPartPrivate::m_frameNameId = 0;
 #endif
 
 QString KHTMLPart::requestFrameName() {
+#if APPLE_CHANGES
+  return kwq->generateFrameName();
+#else
   return QString::fromLatin1("<!--frame %1-->").arg(d->m_frameNameId++);
+#endif
 }
 
 bool KHTMLPart::requestObject(khtml::RenderPart* frame,

@@ -167,6 +167,8 @@ class KWQKHTMLPart : public QObject {
 
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
 
+  QString generateFrameName();
+
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
   static DOM::NodeImpl* nodeForWidget(QWidget*);

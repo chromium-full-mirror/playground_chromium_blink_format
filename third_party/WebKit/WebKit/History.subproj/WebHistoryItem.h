@@ -19,7 +19,9 @@
   NSPoint _scrollPoint;
   NSString* anchor;
   NSArray* _documentState;
+  NSMutableArray* _subItems;
   BOOL _loadedIcon;
+  BOOL _isTargetItem;
 }
 
 + (WebHistoryItem*)entryWithURL:(NSURL*)URL;
@@ -42,6 +44,7 @@
 - (NSCalendarDate*)lastVisitedDate;
 - (NSPoint)scrollPoint;
 - (NSArray*)documentState;
+- (BOOL)isTargetItem;
 - (NSString*)anchor;
 
 - (void)setURL:(NSURL*)URL;
@@ -53,5 +56,11 @@
 - (void)setScrollPoint:(NSPoint)p;
 - (void)setDocumentState:(NSArray*)state;
 - (void)setAnchor:(NSString*)anchor;
+- (void)setIsTargetItem:(BOOL)flag;
+
+- (NSArray*)children;
+- (void)addChildItem:(WebHistoryItem*)item;
+- (WebHistoryItem*)childItemWithName:(NSString*)name;
+- (WebHistoryItem*)targetItem;
 
 @end
