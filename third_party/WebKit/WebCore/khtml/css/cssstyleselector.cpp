@@ -3079,9 +3079,9 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
                 return;
             }
           }
-
-          style->setTextDecoration(t);
         }
+
+        style->setTextDecoration(t);
         break;
       }
     case CSS_PROP__KONQ_FLOW_MODE:
