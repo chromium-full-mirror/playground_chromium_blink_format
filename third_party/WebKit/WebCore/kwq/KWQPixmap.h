@@ -93,7 +93,6 @@ class QPixmap : public QPaintDevice, public Qt {
 #else
   void* nsimage;
 #endif
-  QWMatrix xmatrix;
 #endif
 };  // class QPixmap
     // ============================================================

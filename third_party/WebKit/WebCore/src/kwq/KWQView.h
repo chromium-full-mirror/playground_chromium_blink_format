@@ -62,4 +62,5 @@ class KHTMLPart;
 }
 - initWithFrame:(NSRect)r widget:(QWidget*)w;
 - (void)setIsFlipped:(bool)flag;
+- (void)setNeedsLayout:(bool)flag;
 @end

@@ -119,6 +119,11 @@ class QMultiLineEdit : public QTableView {
   int numLines() const;
   void selectAll();
 
+#ifdef _KWQ_
+  int verticalScrollBarWidth() const;
+  int horizontalScrollBarHeight() const;
+#endif
+
   // operators ---------------------------------------------------------------
 
   // protected
