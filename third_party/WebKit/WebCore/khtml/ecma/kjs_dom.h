@@ -117,7 +117,9 @@ class DOMNode : public DOMObject {
     ClientWidth,
     ClientHeight,
     ScrollLeft,
-    ScrollTop
+    ScrollTop,
+    ScrollWidth,
+    ScrollHeight
   };
 
  protected:

@@ -235,6 +235,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   bool passWidgetMouseDownEventToWidget(khtml::MouseEvent*);
   bool passWidgetMouseDownEventToWidget(khtml::RenderWidget*);
+  bool passWidgetMouseDownEventToWidget(QWidget*);
 
   void setPolicyBaseURL(const DOM::DOMString&);
 

@@ -346,6 +346,32 @@ RenderObject* RenderObject::offsetParent() const {
   return curr;
 }
 
+// More IE extensions.  clientWidth and clientHeight represent the interior of
+// an object
+// excluding border and scrollbar.
+short RenderObject::clientWidth() const {
+  return width() - borderLeft() - borderRight() -
+         (layer() ? layer()->verticalScrollbarWidth() : 0);
+}
+
+short RenderObject::clientHeight() const {
+  return height() - borderTop() - borderBottom() -
+         (layer() ? layer()->horizontalScrollbarHeight() : 0);
+}
+
+// scrollWidth/scrollHeight will be the same as clientWidth/clientHeight unless
+// the
+// object has overflow:hidden/scroll/auto specified and also has overflow.
+short RenderObject::scrollWidth() const {
+  return (style()->hidesOverflow() && layer()) ? layer()->scrollWidth()
+                                               : clientWidth();
+}
+
+short RenderObject::scrollHeight() const {
+  return (style()->hidesOverflow() && layer()) ? layer()->scrollHeight()
+                                               : clientHeight();
+}
+
 void RenderObject::markAllDescendantsWithFloatsForLayout(RenderObject*) {}
 
 void RenderObject::setLayouted(bool b) {
@@ -1330,18 +1356,25 @@ bool RenderObject::nodeAtPoint(NodeInfo& info,
   int ty = _ty + yPos();
 
   inside |= (style()->visibility() != HIDDEN &&
-             ((_y >= ty) && (_y < ty + overflowHeight()) && (_x >= tx) &&
-              (_x < tx + overflowWidth()))) ||
+             ((_y >= ty) && (_y < ty + effectiveHeight()) && (_x >= tx) &&
+              (_x < tx + effectiveWidth()))) ||
             isBody() || isHtml();
 
   // ### table should have its own, more performant method
-  if (overhangingContents() || isInline() || isRoot() || isTableRow() ||
-      isTableSection() || inside || mouseInside() ||
-      (childrenInline() && firstChild() && firstChild()->isCompact())) {
+  if (/* FIXME (!isRenderBlock() ||
+        !static_cast<RenderBlock*>(this)->isPointInScrollbar(_x, _y, _tx, _ty))
+        &&*/
+      (overhangingContents() || isInline() || isRoot() || isTableRow() ||
+       isTableSection() || inside || mouseInside() ||
+       (childrenInline() && firstChild() && firstChild()->isCompact()))) {
+    int stx = _tx + xPos();
+    int sty = _ty + yPos();
+    if (style()->hidesOverflow() && layer())
+      layer()->subtractScrollOffset(stx, sty);
     for (RenderObject* child = lastChild(); child;
          child = child->previousSibling())
       if (!child->layer() && !child->isFloating() &&
-          child->nodeAtPoint(info, _x, _y, _tx + xPos(), _ty + yPos()))
+          child->nodeAtPoint(info, _x, _y, stx, sty))
         inside = true;
   }
 
