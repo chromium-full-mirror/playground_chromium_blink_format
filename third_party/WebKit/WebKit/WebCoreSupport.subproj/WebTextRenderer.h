@@ -50,6 +50,7 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
                         numGlyphs:(int*)_numGlyphs
                     letterSpacing:(int)ls
                       wordSpacing:(int)ws
+                        smallCaps:(BOOL)smallCaps
                      fontFamilies:(NSString**)families;
 
 @end
