@@ -461,7 +461,8 @@ class HTMLElement : public DOMElement {
     ElementChildren,
     ElementContentEditable,
     ElementIsContentEditable,
-    ElementOuterHTML
+    ElementOuterHTML,
+    ElementOuterText
   };
 
   DOM::HTMLElement toElement() const {
