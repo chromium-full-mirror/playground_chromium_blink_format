@@ -26,7 +26,8 @@
 // Note that the controller is not retained.
 - (IFWebController*)controller;
 
-- (id)documentView;
+- frameScrollView;
+- documentView;
 
 - (BOOL)isDocumentHTML;
 

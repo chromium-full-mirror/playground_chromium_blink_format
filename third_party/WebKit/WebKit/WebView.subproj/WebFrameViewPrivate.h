@@ -11,18 +11,17 @@
 
 class QWidget;
 
+@class IFDynamicScrollBarsView;
+
 @interface IFWebViewPrivate : NSObject {
   IFWebController* controller;
-  id documentView;
-  NSScrollView* frameScrollView;
+  IFDynamicScrollBarsView* frameScrollView;
 
   // These margin values are used to temporarily hold
   // the margins of a frame until we have the appropriate
   // document view type.
   int marginWidth;
   int marginHeight;
-
-  BOOL allowsScrolling;
 }
 
 @end
@@ -30,9 +29,6 @@ class QWidget;
 @interface IFWebView (IFPrivate)
 - (void)_setDocumentView:(id<IFDocumentLoading>)view;
 - (void)_setController:(IFWebController*)controller;
-- (void)_setFrameScrollView:(NSScrollView*)sv;
-- (NSScrollView*)_frameScrollView;
-- (void)_setupScrollers;
 - (int)_marginWidth;
 - (int)_marginHeight;
 + (NSMutableDictionary*)_viewTypes;

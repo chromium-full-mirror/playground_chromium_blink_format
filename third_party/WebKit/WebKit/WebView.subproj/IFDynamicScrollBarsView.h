@@ -9,8 +9,15 @@
 #import <Cocoa/Cocoa.h>
 
 @interface IFDynamicScrollBarsView : NSScrollView {
-  bool breakRecursionCycle;
   NSCursor* cursor;
+  BOOL breakRecursionCycle;
+  BOOL allowsScrolling;
 }
+
+- (void)setAllowsScrolling:(BOOL)flag;
+- (BOOL)allowsScrolling;
+- (void)updateScrollers;
+- (void)setCursor:(NSCursor*)cur;
+- (void)resetCursorRects;
 
 @end
