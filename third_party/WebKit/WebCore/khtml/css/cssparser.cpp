@@ -218,7 +218,7 @@ bool CSSParser::parseValue(CSSMutableStyleDeclarationImpl* declaration,
   if (numParsedProperties) {
     ok = true;
     declaration->addParsedProperties(parsedProperties, numParsedProperties);
-    numParsedProperties = 0;
+    clearProperties();
   }
 
   return ok;
@@ -297,7 +297,7 @@ bool CSSParser::parseDeclaration(CSSMutableStyleDeclarationImpl* declaration,
   if (numParsedProperties) {
     ok = true;
     declaration->addParsedProperties(parsedProperties, numParsedProperties);
-    numParsedProperties = 0;
+    clearProperties();
   }
 
   return ok;
@@ -321,7 +321,7 @@ CSSMutableStyleDeclarationImpl* CSSParser::createStyleDeclaration(
     CSSStyleRuleImpl* rule) {
   CSSMutableStyleDeclarationImpl* result = new CSSMutableStyleDeclarationImpl(
       rule, parsedProperties, numParsedProperties);
-  numParsedProperties = 0;
+  clearProperties();
   return result;
 }
 
