@@ -574,6 +574,14 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
       } else
         style->setDisplay(BLOCK);
     }
+
+    // After performing the display mutation, check table rows.  We do not honor
+    // position:relative on
+    // table rows.  This has been established in CSS2.1 (and caused a crash in
+    // containingBlock() on
+    // some sites).
+    if (style->display() == TABLE_ROW && style->position() == RELATIVE)
+      style->setPosition(STATIC);
   }
 
   // Make sure our z-index value is only applied if the object is positioned,
