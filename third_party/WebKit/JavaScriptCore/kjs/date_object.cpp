@@ -2,7 +2,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
- *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2004 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -67,6 +67,7 @@ const time_t invalidDate = -1;
 // But we need to keep using this rather than the standard library functions
 // because this handles a larger range of dates.
 
+#include <notify.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
 
@@ -121,6 +122,26 @@ static CFTimeZoneRef UTCTimeZone() {
 }
 
 static CFTimeZoneRef CopyLocalTimeZone() {
+  // Check for a time zone notification, and tell CoreFoundation to re-get the
+  // time zone if it happened.
+  // Some day, CoreFoundation may do this itself, but for now it needs our help.
+  static bool registered = false;
+  static int notificationToken;
+  if (!registered) {
+    uint32_t status =
+        notify_register_check("com.apple.system.timezone", &notificationToken);
+    if (status == NOTIFY_STATUS_OK) {
+      registered = true;
+    }
+  }
+  if (registered) {
+    int notified;
+    uint32_t status = notify_check(notificationToken, &notified);
+    if (status == NOTIFY_STATUS_OK && notified) {
+      CFTimeZoneResetSystem();
+    }
+  }
+
   CFTimeZoneRef zone = CFTimeZoneCopyDefault();
   if (zone) {
     return zone;
