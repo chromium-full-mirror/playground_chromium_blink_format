@@ -80,6 +80,10 @@ class InlineTextBox : public InlineRunBox {
   virtual void attachLine();
 
   void clearTruncation() { m_truncation = cNoTruncation; }
+  virtual int placeEllipsisBox(bool ltr,
+                               int blockEdge,
+                               int ellipsisWidth,
+                               bool& foundBox);
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
@@ -117,7 +121,7 @@ class InlineTextBox : public InlineRunBox {
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;
 
-  int offsetForPosition(int _x, int _tx, const Font* f, const RenderText* text);
+  int offsetForPosition(int _x, bool includePartialGlyphs = true);
 
   /**
    * if this text run was rendered @ref _ty pixels below the upper edge

@@ -113,7 +113,8 @@ extern void WebCoreInitializeEmptyTextGeometry(WebCoreTextGeometry* geometry);
 
 // selection point check
 - (int)pointToOffset:(const WebCoreTextRun*)run
-               style:(const WebCoreTextStyle*)style
-            position:(int)x
-            reversed:(BOOL)reversed;
+                   style:(const WebCoreTextStyle*)style
+                position:(int)x
+                reversed:(BOOL)reversed
+    includePartialGlyphs:(BOOL)includePartialGlyphs;
 @end

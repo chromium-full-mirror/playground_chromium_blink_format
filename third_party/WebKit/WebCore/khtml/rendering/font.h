@@ -170,7 +170,8 @@ class Font {
                           int len,
                           int toAdd,
                           int x,
-                          bool reversed) const;
+                          bool reversed,
+                          bool includePartialGlyphs) const;
   void drawHighlightForText(QPainter* p,
                             int x,
                             int minX,

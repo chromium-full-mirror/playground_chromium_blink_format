@@ -2414,7 +2414,7 @@ void RenderBlock::checkLinesForTextOverflow() {
                                            // do RTL scrollbars, and then this
   // RTL computation will want to add in the vertical scroller's width.
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
-    int lineBoxEdge = ltr ? curr->xPos() : curr->xPos() + curr->width();
+    int lineBoxEdge = ltr ? curr->xPos() + curr->width() : curr->xPos();
     if ((ltr && lineBoxEdge > blockEdge) || (!ltr && lineBoxEdge < blockEdge)) {
       // This line spills out of our box in the appropriate direction.  Now we
       // need to see if the line
@@ -2425,8 +2425,8 @@ void RenderBlock::checkLinesForTextOverflow() {
       // space.
       int width =
           curr == firstRootBox() ? firstLineEllipsisWidth : ellipsisWidth;
-      if (curr->canAccommodateEllipsis(ltr, lineBoxEdge, blockEdge, width))
-        curr->placeEllipsis(ellipsisStr, blockEdge, ltr, width);
+      if (curr->canAccommodateEllipsis(ltr, blockEdge, lineBoxEdge, width))
+        curr->placeEllipsis(ellipsisStr, ltr, blockEdge, width);
     }
   }
 }

@@ -143,6 +143,10 @@ class InlineBox {
   virtual bool canAccommodateEllipsis(bool ltr,
                                       int blockEdge,
                                       int ellipsisWidth);
+  virtual int placeEllipsisBox(bool ltr,
+                               int blockEdge,
+                               int ellipsisWidth,
+                               bool&);
 
  public:  // FIXME: Would like to make this protected, but methods are accessing
           // these
@@ -313,6 +317,10 @@ class InlineFlowBox : public InlineRunBox {
   virtual bool canAccommodateEllipsis(bool ltr,
                                       int blockEdge,
                                       int ellipsisWidth);
+  virtual int placeEllipsisBox(bool ltr,
+                               int blockEdge,
+                               int ellipsisWidth,
+                               bool&);
 
  protected:
   InlineBox* m_firstChild;
@@ -330,14 +338,19 @@ class EllipsisBox : public InlineBox {
               int w,
               int y,
               int h,
-              int b)
+              int b,
+              bool firstLine)
       : InlineBox(obj), m_str(ellipsisStr) {
     m_parent = p;
     m_width = w;
     m_y = y;
     m_height = h;
     m_baseline = b;
+    m_firstLine = firstLine;
+    m_constructed = true;
   }
+
+  void paint(const RenderObject::PaintInfo& i, int _tx, int _ty);
 
  private:
   DOM::AtomicString m_str;
@@ -396,9 +409,15 @@ class RootInlineBox : public InlineFlowBox {
                               int lineBoxEdge,
                               int ellipsisWidth);
   void placeEllipsis(const DOM::AtomicString& ellipsisStr,
-                     int blockEdge,
                      bool ltr,
+                     int blockEdge,
                      int ellipsisWidth);
+  virtual int placeEllipsisBox(bool ltr,
+                               int blockEdge,
+                               int ellipsisWidth,
+                               bool&);
+
+  EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
 
  protected:
   // Normally we are only as tall as the style on our block dictates, but we

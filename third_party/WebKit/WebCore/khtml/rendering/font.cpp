@@ -163,9 +163,11 @@ int Font::checkSelectionPoint(QChar* s,
                               int len,
                               int toAdd,
                               int x,
-                              bool reversed) const {
+                              bool reversed,
+                              bool includePartialGlyphs) const {
   return fm.checkSelectionPoint(s, slen, pos, len, toAdd, letterSpacing,
-                                wordSpacing, fontDef.smallCaps, x, reversed);
+                                wordSpacing, fontDef.smallCaps, x, reversed,
+                                includePartialGlyphs);
 }
 
 #endif

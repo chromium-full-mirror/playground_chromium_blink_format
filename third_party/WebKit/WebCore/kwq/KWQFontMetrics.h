@@ -81,7 +81,8 @@ class QFontMetrics {
                           int wordSpacing,
                           bool smallCaps,
                           int x,
-                          bool reversed) const;
+                          bool reversed,
+                          bool includePartialGlyphs) const;
 
   QRect boundingRect(const QString&, int len = -1) const;
   QRect boundingRect(int, int, int, int, int, const QString&) const;
