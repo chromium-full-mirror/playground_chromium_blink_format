@@ -1016,11 +1016,21 @@ CSSStyleDeclarationImpl* DeleteSelectionCommandImpl::computeTypingStyle(
 // boundaries.
 void DeleteSelectionCommandImpl::moveNodesAfterNode(NodeImpl* startNode,
                                                     NodeImpl* dstNode) {
-  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
+  if (!startNode || !dstNode)
+    return;
 
-  // Do the move.
+  NodeImpl* startBlock = startNode->enclosingBlockFlowElement();
   NodeImpl* node =
       startNode == startBlock ? startBlock->firstChild() : startNode;
+
+  // Only do the move if node is a text node.
+  // This is done to duplicate the behavior in NSText, particularly to
+  // mimic the behavior in Mail where deletions are done between blocks
+  // that are quoted.
+  if (!node || !node->isTextNode())
+    return;
+
+  // Do the move.
   NodeImpl* refNode = dstNode;
   while (node && node->isAncestor(startBlock)) {
     NodeImpl* moveNode = node;
