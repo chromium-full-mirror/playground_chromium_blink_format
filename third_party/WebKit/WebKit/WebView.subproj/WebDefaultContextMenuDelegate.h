@@ -14,4 +14,9 @@
   NSDictionary* element;
 }
 
++ (void)addMenuItemWithTitle:(NSString*)title
+                      action:(SEL)selector
+                      target:(id)target
+                     toArray:(NSMutableArray*)menuItems;
+
 @end
