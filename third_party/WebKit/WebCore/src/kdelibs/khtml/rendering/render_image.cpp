@@ -172,8 +172,13 @@ void RenderImage::printObject(QPainter* p,
   // << ") border=" << borderLeft() << " padding=" << paddingLeft() << endl;
   if (pix.isNull() || berrorPic) {
     if (cWidth > 2 && cHeight > 2) {
-      // qDebug("qDrawShadePanel %d/%d/%d/%d", _tx + leftBorder, _ty +
-      // topBorder, cWidth, cHeight);
+// qDebug("qDrawShadePanel %d/%d/%d/%d", _tx + leftBorder, _ty + topBorder,
+// cWidth, cHeight);
+#ifdef _KWQ_
+      p->setPen(Qt::lightGray);
+      p->setBrush(Qt::NoBrush);
+      p->drawRect(_tx, _ty, cWidth, cHeight);
+#else
       qDrawShadePanel(p, _tx + leftBorder + leftPad, _ty + topBorder + topPad,
                       cWidth, cHeight, KApplication::palette().inactive(), true,
                       1);
@@ -197,6 +202,7 @@ void RenderImage::printObject(QPainter* p,
         if (aw > 15 && ah > fm.height())
           p->drawText(ax, ay, aw, ah, Qt::WordBreak, text);
       }
+#endif
     }
   } else if (image && !image->isTransparent()) {
     if ((cWidth != pixSize.width() || cHeight != pixSize.height()) &&
