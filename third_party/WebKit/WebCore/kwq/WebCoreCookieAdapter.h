@@ -31,9 +31,9 @@
 + (WebCoreCookieAdapter*)sharedAdapter;
 
 - (BOOL)cookiesEnabled;
-- (NSString*)cookiesForURL:(NSURL*)url;
+- (NSString*)cookiesForURL:(NSString*)URL;
 - (void)setCookies:(NSString*)cookies
-            forURL:(NSURL*)url
-     policyBaseURL:(NSURL*)url;
+            forURL:(NSString*)URL
+     policyBaseURL:(NSString*)URL;
 
 @end
