@@ -228,8 +228,8 @@ typedef NPError (*NPN_PostURLProcPtr)(NPP instance,
                                       uint32 len,
                                       const char* buf,
                                       NPBool file);
-typedef ProcPtr NPN_GetJavaEnvProcPtr;
-typedef ProcPtr NPN_GetJavaPeerProcPtr;
+typedef void* (*NPN_GetJavaEnvProcPtr)(void);
+typedef void* (*NPN_GetJavaPeerProcPtr)(NPP instance);
 
 typedef NPError (*NPP_NewProcPtr)(NPMIMEType pluginType,
                                   NPP instance,
@@ -418,6 +418,8 @@ void* NPN_MemAlloc(uint32 size);
 void NPN_MemFree(void* ptr);
 uint32 NPN_MemFlush(uint32 size);
 void NPN_ReloadPlugins(NPBool reloadPages);
+void* NPN_GetJavaEnv(void);
+void* NPN_GetJavaPeer(NPP instance);
 NPError NPN_GetValue(NPP instance, NPNVariable variable, void* value);
 NPError NPN_SetValue(NPP instance, NPPVariable variable, void* value);
 void NPN_InvalidateRect(NPP instance, NPRect* invalidRect);
