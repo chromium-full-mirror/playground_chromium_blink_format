@@ -50,6 +50,8 @@ void releaseCharactersForJStringInEnv(JNIEnv* env,
                                       const char* s);
 
 JNIType primitiveTypeFromClassName(const char* name);
+const char* signatureFromPrimitiveType(JNIType type);
+
 jvalue getJNIField(jobject obj,
                    JNIType type,
                    const char* name,

@@ -59,9 +59,7 @@ FunctionImp::FunctionImp(ExecState* exec, const Identifier& n)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
           exec->interpreter()->builtinFunctionPrototype().imp())),
       param(0L),
-      ident(n) {
-  // fprintf(stderr,"FunctionImp::FunctionImp this=%p\n");
-}
+      ident(n) {}
 
 FunctionImp::~FunctionImp() {
   delete param;

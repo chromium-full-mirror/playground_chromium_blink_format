@@ -392,6 +392,10 @@ class Interpreter {
 class ExecState {
   friend class InterpreterImp;
   friend class FunctionImp;
+#if APPLE_CHANGES
+  friend class RuntimeMethodImp;
+#endif
+
   friend class GlobalFuncImp;
 
  public:

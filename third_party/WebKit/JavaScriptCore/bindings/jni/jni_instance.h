@@ -37,6 +37,7 @@ class JavaClass;
 
 class JObjectWrapper {
   friend class JavaInstance;
+  friend class JavaMethod;
 
  protected:
   JObjectWrapper(jobject instance);
@@ -79,6 +80,8 @@ class JavaInstance : public Instance {
   };
 
   jobject javaInstance() const { return _instance->_instance; }
+
+  virtual KJS::Value invokeMethod(const Method* method, const KJS::List& args);
 
  private:
   JObjectWrapper* _instance;
