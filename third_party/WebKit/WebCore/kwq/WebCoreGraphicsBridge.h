@@ -32,5 +32,5 @@
                    radius:(int)radius
                     color:(NSColor*)color;
 - (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
-
+- (void)setAdditionalPatternPhase:(NSPoint)phase;
 @end
