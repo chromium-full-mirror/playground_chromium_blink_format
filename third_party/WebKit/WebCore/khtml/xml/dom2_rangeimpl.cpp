@@ -993,7 +993,7 @@ DOMString RangeImpl::toHTML(QPtrList<NodeImpl>* nodes,
     NodeImpl* upstreamBlock =
         pos.upstream().node()->enclosingBlockFlowElement();
     if (block != upstreamBlock) {
-      addCommentToHTMLMarkup(KHTMLInterchangeNewline, markups, AppendToMarkup);
+      addCommentToHTMLMarkup(AppleInterchangeNewline, markups, AppendToMarkup);
     }
   }
 
