@@ -171,6 +171,8 @@ class ElementImpl : public NodeBaseImpl {
   virtual NodeImpl* cloneNode(bool deep);
   virtual DOMString nodeName() const;
   virtual bool isElementNode() const { return true; }
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   // convenience methods which ignore exceptions
   void setAttribute(NodeImpl::Id id, const DOMString& value);
@@ -188,7 +190,6 @@ class ElementImpl : public NodeBaseImpl {
   virtual QString state() { return QString::null; }
 
   virtual void attach();
-  virtual void detach();
   virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);

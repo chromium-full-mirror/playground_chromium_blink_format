@@ -383,11 +383,10 @@ RenderObject* ElementImpl::createRenderer(RenderArena* arena,
   return RenderObject::createObject(this, style);
 }
 
-void ElementImpl::attach() {
-#if SPEED_DEBUG < 1
-  createRendererIfNeeded();
-#endif
-  NodeBaseImpl::attach();
+void ElementImpl::insertedIntoDocument() {
+  // need to do superclass processing first so inDocument() is true
+  // by the time we reach updateId
+  NodeBaseImpl::insertedIntoDocument();
 
   if (hasID()) {
     NamedAttrMapImpl* attrs = attributes(true);
@@ -400,7 +399,7 @@ void ElementImpl::attach() {
   }
 }
 
-void ElementImpl::detach() {
+void ElementImpl::removedFromDocument() {
   if (hasID()) {
     NamedAttrMapImpl* attrs = attributes(true);
     if (attrs) {
@@ -411,7 +410,14 @@ void ElementImpl::detach() {
     }
   }
 
-  NodeBaseImpl::detach();
+  NodeBaseImpl::removedFromDocument();
+}
+
+void ElementImpl::attach() {
+#if SPEED_DEBUG < 1
+  createRendererIfNeeded();
+#endif
+  NodeBaseImpl::attach();
 }
 
 void ElementImpl::recalcStyle(StyleChange change) {
@@ -590,7 +596,7 @@ DOMString ElementImpl::toString() const {
 
 void ElementImpl::updateId(const AtomicString& oldId,
                            const AtomicString& newId) {
-  if (!attached())
+  if (!inDocument())
     return;
 
   if (oldId == newId)
