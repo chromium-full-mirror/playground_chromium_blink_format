@@ -2316,6 +2316,7 @@ void InsertParagraphSeparatorCommand::
 }
 
 void InsertParagraphSeparatorCommand::doApply() {
+  bool splitText = false;
   Selection selection = endingSelection();
   if (selection.isNone())
     return;
@@ -2456,6 +2457,7 @@ void InsertParagraphSeparatorCommand::doApply() {
       applyCommandToComposite(cmd);
       startNode = splitCommand->node();
       pos = Position(startNode, 0);
+      splitText = true;
     }
   }
 
@@ -2502,6 +2504,19 @@ void InsertParagraphSeparatorCommand::doApply() {
       n = next;
     }
     leftParent = leftParent->parentNode();
+  }
+
+  // Handle whitespace that occurs after the split
+  if (splitText) {
+    document()->updateLayout();
+    pos = Position(blockToInsert, 0);
+    if (!pos.isRenderedCharacter()) {
+      // Clear out all whitespace and insert one non-breaking space
+      ASSERT(startNode && startNode->isTextNode());
+      deleteInsignificantTextDownstream(pos);
+      insertTextIntoNode(static_cast<TextImpl*>(startNode), 0,
+                         nonBreakingSpaceString());
+    }
   }
 
   setEndingSelection(Position(blockToInsert, 0));
