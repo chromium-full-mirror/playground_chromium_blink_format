@@ -153,7 +153,7 @@ class RenderLayer {
     }
 
     void constructLayerList(QPtrVector<RenderLayerElement>* mergeTmpBuffer,
-                            QPtrVector<RenderLayerElement>* finalBuffer){};
+                            QPtrVector<RenderLayerElement>* finalBuffer);
   };
 
  private:
