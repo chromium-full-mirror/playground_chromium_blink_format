@@ -1009,7 +1009,8 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     fontDef.italic = f.italic();
     fontDef.weight = f.weight();
 #if APPLE_CHANGES
-    bool printing = m_paintDevice->devType() == QInternal::Printer;
+    bool printing =
+        m_paintDevice && (m_paintDevice->devType() == QInternal::Printer);
     fontDef.usePrinterFont = printing;
 #endif
     if (m_view) {
@@ -1316,7 +1317,8 @@ void DocumentImpl::close() {
     updateRendering();
 
     // Always do a layout after loading if needed.
-    if (renderer() && (!renderer()->firstChild() || renderer()->needsLayout()))
+    if (view() && renderer() &&
+        (!renderer()->firstChild() || renderer()->needsLayout()))
       view()->layout();
   }
 }
