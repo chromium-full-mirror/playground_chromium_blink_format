@@ -68,5 +68,5 @@ typedef enum {
                     isMainDocument:(BOOL)flag;
 - (void)_clearErrors;
 - (void)_setMainDocumentError:(IFError*)error;
-- (void)_initialLayout:userInfo;
+- (void)_timedLayout:userInfo;
 @end
