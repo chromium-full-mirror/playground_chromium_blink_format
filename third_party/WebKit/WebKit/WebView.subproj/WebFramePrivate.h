@@ -8,6 +8,7 @@
 
 #import <WebKit/IFWebFrame.h>
 
+@class IFWebCoreFrame;
 @class IFWebView;
 @protocol IFDocumentLoading;
 
@@ -45,6 +46,7 @@ typedef enum {
   IFWebController* controller;
   IFWebFrameState state;
   BOOL scheduledLayoutPending;
+  IFWebCoreFrame* bridgeFrame;
 }
 
 - (void)setName:(NSString*)n;
@@ -75,4 +77,5 @@ typedef enum {
 - (void)_isLoadComplete;
 - (void)_checkLoadComplete;
 - (void)_timedLayout:userInfo;
+- (IFWebCoreFrame*)_bridgeFrame;
 @end

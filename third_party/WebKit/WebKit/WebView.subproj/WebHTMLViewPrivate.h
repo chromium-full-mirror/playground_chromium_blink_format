@@ -4,14 +4,16 @@
         Private header file.  This file may reference classes (both ObjectiveC
    and C++)
         in WebCore.  Instances of this class are referenced by _private in
-        NSWebPageView.
+        IFHTMLView.
 */
 
 #import <WebKit/IFHTMLView.h>
 
-class QWidget;
-class KHTMLPart;
+#ifdef __cplusplus
 class KHTMLView;
+#else
+@class KHTMLView;
+#endif
 
 @interface IFHTMLViewPrivate : NSObject {
   IFWebController* controller;
