@@ -121,7 +121,8 @@ TextIterator::TextIterator(const Range& r) {
     if (endOffset > 0 &&
         endOffset <= static_cast<long>(endNode->childNodeCount())) {
       endNode = endNode->childNode(endOffset - 1);
-      endOffset = endNode->maxOffset();
+      endOffset = endNode->hasChildNodes() ? endNode->childNodeCount()
+                                           : endNode->maxOffset();
     }
   }
 
