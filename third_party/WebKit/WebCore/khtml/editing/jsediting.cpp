@@ -43,6 +43,8 @@ class DocumentImpl;
 
 namespace {
 
+bool supportsPasteCommand = false;
+
 struct CommandImp {
   bool (*execFn)(KHTMLPart* part, bool userInterface, const DOMString& value);
   bool (*enabledFn)(KHTMLPart* part);
@@ -106,6 +108,8 @@ bool JSEditor::queryCommandState(const DOMString& command) {
 }
 
 bool JSEditor::queryCommandSupported(const DOMString& command) {
+  if (!supportsPasteCommand && command.string().lower() == "paste")
+    return false;
   return commandImp(command) != 0;
 }
 
@@ -118,6 +122,10 @@ DOMString JSEditor::queryCommandValue(const DOMString& command) {
     return DOMString();
   m_doc->updateLayout();
   return cmd->valueFn(part);
+}
+
+void JSEditor::setSupportsPasteCommand(bool flag) {
+  supportsPasteCommand = flag;
 }
 
 // =============================================================================================
@@ -276,14 +284,10 @@ bool execOutdent(KHTMLPart* part, bool userInterface, const DOMString& value) {
   return false;
 }
 
-#if SUPPORT_PASTE
-
 bool execPaste(KHTMLPart* part, bool userInterface, const DOMString& value) {
   part->pasteFromPasteboard();
   return true;
 }
-
-#endif
 
 bool execPrint(KHTMLPart* part, bool userInterface, const DOMString& value) {
   part->print();
@@ -351,13 +355,9 @@ bool enabledAnySelection(KHTMLPart* part) {
   return part->selection().isCaretOrRange();
 }
 
-#if SUPPORT_PASTE
-
 bool enabledPaste(KHTMLPart* part) {
-  return part->canPaste();
+  return supportsPasteCommand && part->canPaste();
 }
-
-#endif
 
 bool enabledRangeSelection(KHTMLPart* part) {
   return part->selection().isRange();
@@ -448,106 +448,107 @@ QDict<CommandImp> createCommandDictionary() {
 
   static const EditorCommand commands[] = {
 
-    {"BackColor", {execBackColor, enabled, stateNone, valueBackColor}},
-    {"Bold", {execBold, enabledAnySelection, stateBold, valueNull}},
-    {"Copy", {execCopy, enabledRangeSelection, stateNone, valueNull}},
-    {"Cut", {execCut, enabledRangeSelection, stateNone, valueNull}},
-    {"Delete", {execDelete, enabledAnySelection, stateNone, valueNull}},
-    {"FontName", {execFontName, enabledAnySelection, stateNone, valueFontName}},
-    {"FontSize", {execFontSize, enabledAnySelection, stateNone, valueFontSize}},
-    {"ForeColor",
-     {execForeColor, enabledAnySelection, stateNone, valueForeColor}},
-    {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
-    {"InsertNewline",
-     {execInsertNewline, enabledAnySelection, stateNone, valueNull}},
-    {"InsertParagraph",
-     {execInsertParagraph, enabledAnySelection, stateNone, valueNull}},
-    {"InsertText", {execInsertText, enabledAnySelection, stateNone, valueNull}},
-    {"Italic", {execItalic, enabledAnySelection, stateItalic, valueNull}},
-    {"JustifyCenter",
-     {execJustifyCenter, enabledAnySelection, stateNone, valueNull}},
-    {"JustifyFull",
-     {execJustifyFull, enabledAnySelection, stateNone, valueNull}},
-    {"JustifyLeft",
-     {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
-    {"JustifyNone",
-     {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
-    {"JustifyRight",
-     {execJustifyRight, enabledAnySelection, stateNone, valueNull}},
-    {"Outdent", {execOutdent, enabledAnySelection, stateNone, valueNull}},
-#if SUPPORT_PASTE
-    {"Paste", {execPaste, enabledPaste, stateNone, valueNull}},
-#endif
-    {"Print", {execPrint, enabled, stateNone, valueNull}},
-    {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
-    {"SelectAll", {execSelectAll, enabled, stateNone, valueNull}},
-    {"Subscript",
-     {execSubscript, enabledAnySelection, stateSubscript, valueNull}},
-    {"Superscript",
-     {execSuperscript, enabledAnySelection, stateSuperscript, valueNull}},
-    {"Underline",
-     {execUnderline, enabledAnySelection, stateUnderline, valueNull}},
-    {"Undo", {execUndo, enabledUndo, stateNone, valueNull}},
-    {"Unselect", {execUnselect, enabledAnySelection, stateNone, valueNull}}
+      {"BackColor", {execBackColor, enabled, stateNone, valueBackColor}},
+      {"Bold", {execBold, enabledAnySelection, stateBold, valueNull}},
+      {"Copy", {execCopy, enabledRangeSelection, stateNone, valueNull}},
+      {"Cut", {execCut, enabledRangeSelection, stateNone, valueNull}},
+      {"Delete", {execDelete, enabledAnySelection, stateNone, valueNull}},
+      {"FontName",
+       {execFontName, enabledAnySelection, stateNone, valueFontName}},
+      {"FontSize",
+       {execFontSize, enabledAnySelection, stateNone, valueFontSize}},
+      {"ForeColor",
+       {execForeColor, enabledAnySelection, stateNone, valueForeColor}},
+      {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
+      {"InsertNewline",
+       {execInsertNewline, enabledAnySelection, stateNone, valueNull}},
+      {"InsertParagraph",
+       {execInsertParagraph, enabledAnySelection, stateNone, valueNull}},
+      {"InsertText",
+       {execInsertText, enabledAnySelection, stateNone, valueNull}},
+      {"Italic", {execItalic, enabledAnySelection, stateItalic, valueNull}},
+      {"JustifyCenter",
+       {execJustifyCenter, enabledAnySelection, stateNone, valueNull}},
+      {"JustifyFull",
+       {execJustifyFull, enabledAnySelection, stateNone, valueNull}},
+      {"JustifyLeft",
+       {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
+      {"JustifyNone",
+       {execJustifyLeft, enabledAnySelection, stateNone, valueNull}},
+      {"JustifyRight",
+       {execJustifyRight, enabledAnySelection, stateNone, valueNull}},
+      {"Outdent", {execOutdent, enabledAnySelection, stateNone, valueNull}},
+      {"Paste", {execPaste, enabledPaste, stateNone, valueNull}},
+      {"Print", {execPrint, enabled, stateNone, valueNull}},
+      {"Redo", {execRedo, enabledRedo, stateNone, valueNull}},
+      {"SelectAll", {execSelectAll, enabled, stateNone, valueNull}},
+      {"Subscript",
+       {execSubscript, enabledAnySelection, stateSubscript, valueNull}},
+      {"Superscript",
+       {execSuperscript, enabledAnySelection, stateSuperscript, valueNull}},
+      {"Underline",
+       {execUnderline, enabledAnySelection, stateUnderline, valueNull}},
+      {"Undo", {execUndo, enabledUndo, stateNone, valueNull}},
+      {"Unselect", {execUnselect, enabledAnySelection, stateNone, valueNull}}
 
-    //
-    // The "unsupported" commands are listed here since they appear in the
-    // Microsoft
-    // documentation used as the basis for the list.
-    //
+      //
+      // The "unsupported" commands are listed here since they appear in the
+      // Microsoft
+      // documentation used as the basis for the list.
+      //
 
-    // 2D-Position (not supported)
-    // AbsolutePosition (not supported)
-    // BlockDirLTR (not supported)
-    // BlockDirRTL (not supported)
-    // BrowseMode (not supported)
-    // ClearAuthenticationCache (not supported)
-    // CreateBookmark (not supported)
-    // CreateLink (not supported)
-    // DirLTR (not supported)
-    // DirRTL (not supported)
-    // EditMode (not supported)
-    // FormatBlock (not supported)
-    // InlineDirLTR (not supported)
-    // InlineDirRTL (not supported)
-    // InsertButton (not supported)
-    // InsertFieldSet (not supported)
-    // InsertHorizontalRule (not supported)
-    // InsertIFrame (not supported)
-    // InsertImage (not supported)
-    // InsertInputButton (not supported)
-    // InsertInputCheckbox (not supported)
-    // InsertInputFileUpload (not supported)
-    // InsertInputHidden (not supported)
-    // InsertInputImage (not supported)
-    // InsertInputPassword (not supported)
-    // InsertInputRadio (not supported)
-    // InsertInputReset (not supported)
-    // InsertInputSubmit (not supported)
-    // InsertInputText (not supported)
-    // InsertMarquee (not supported)
-    // InsertOrderedList (not supported)
-    // InsertSelectDropDown (not supported)
-    // InsertSelectListBox (not supported)
-    // InsertTextArea (not supported)
-    // InsertUnorderedList (not supported)
-    // LiveResize (not supported)
-    // MultipleSelection (not supported)
-    // Open (not supported)
-    // Overwrite (not supported)
-    // PlayImage (not supported)
-    // Refresh (not supported)
-    // RemoveFormat (not supported)
-    // RemoveParaFormat (not supported)
-    // SaveAs (not supported)
-    // SizeToControl (not supported)
-    // SizeToControlHeight (not supported)
-    // SizeToControlWidth (not supported)
-    // Stop (not supported)
-    // StopImage (not supported)
-    // Strikethrough (not supported)
-    // Unbookmark (not supported)
-    // Unlink (not supported)
+      // 2D-Position (not supported)
+      // AbsolutePosition (not supported)
+      // BlockDirLTR (not supported)
+      // BlockDirRTL (not supported)
+      // BrowseMode (not supported)
+      // ClearAuthenticationCache (not supported)
+      // CreateBookmark (not supported)
+      // CreateLink (not supported)
+      // DirLTR (not supported)
+      // DirRTL (not supported)
+      // EditMode (not supported)
+      // FormatBlock (not supported)
+      // InlineDirLTR (not supported)
+      // InlineDirRTL (not supported)
+      // InsertButton (not supported)
+      // InsertFieldSet (not supported)
+      // InsertHorizontalRule (not supported)
+      // InsertIFrame (not supported)
+      // InsertImage (not supported)
+      // InsertInputButton (not supported)
+      // InsertInputCheckbox (not supported)
+      // InsertInputFileUpload (not supported)
+      // InsertInputHidden (not supported)
+      // InsertInputImage (not supported)
+      // InsertInputPassword (not supported)
+      // InsertInputRadio (not supported)
+      // InsertInputReset (not supported)
+      // InsertInputSubmit (not supported)
+      // InsertInputText (not supported)
+      // InsertMarquee (not supported)
+      // InsertOrderedList (not supported)
+      // InsertSelectDropDown (not supported)
+      // InsertSelectListBox (not supported)
+      // InsertTextArea (not supported)
+      // InsertUnorderedList (not supported)
+      // LiveResize (not supported)
+      // MultipleSelection (not supported)
+      // Open (not supported)
+      // Overwrite (not supported)
+      // PlayImage (not supported)
+      // Refresh (not supported)
+      // RemoveFormat (not supported)
+      // RemoveParaFormat (not supported)
+      // SaveAs (not supported)
+      // SizeToControl (not supported)
+      // SizeToControlHeight (not supported)
+      // SizeToControlWidth (not supported)
+      // Stop (not supported)
+      // StopImage (not supported)
+      // Strikethrough (not supported)
+      // Unbookmark (not supported)
+      // Unlink (not supported)
   };
 
   const int numCommands = sizeof(commands) / sizeof(commands[0]);
@@ -556,6 +557,9 @@ QDict<CommandImp> createCommandDictionary() {
   for (int i = 0; i < numCommands; ++i) {
     commandDictionary.insert(commands[i].name, &commands[i].imp);
   }
+#ifndef NDEBUG
+  supportsPasteCommand = true;
+#endif
   return commandDictionary;
 }
 
