@@ -185,6 +185,11 @@ class QMap : public KWQMapImpl {
     }
   }
 
+  bool contains(const K& key) const {
+    QMapNode<K, V> tmp(key, V());
+    return findInternal(&tmp);
+  }
+
   QMap<K, V>& operator=(const QMap<K, V>& map) {
     QMap<K, V> tmp(map);
     swap(tmp);

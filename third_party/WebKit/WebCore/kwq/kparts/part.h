@@ -78,6 +78,7 @@ class ReadOnlyPart : public Part {
   QObject* parent() const { return m_parent; }
   void setInstance(KInstance*, bool) {}
 
+  virtual bool openURL(const KURL&) = 0;
   virtual bool closeURL() = 0;
 
  private:

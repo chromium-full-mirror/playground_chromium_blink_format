@@ -45,6 +45,7 @@ class NodeImpl;
 }
 
 namespace khtml {
+class ChildFrame;
 class RenderObject;
 class RenderPart;
 }
@@ -84,15 +85,13 @@ class KWQKHTMLPartImpl : public QObject {
                    int button,
                    int state,
                    const KParts::URLArgs& args);
-  bool requestFrame(khtml::RenderPart* frame,
-                    const QString& url,
-                    const QString& frameName,
-                    const QStringList& params,
-                    bool isIFrame);
   bool requestObject(khtml::RenderPart* frame,
                      const QString& url,
                      const QString& serviceType,
                      const QStringList& args);
+  KParts::ReadOnlyPart* createPart(const khtml::ChildFrame& child,
+                                   const KURL& url,
+                                   const QString& mimeType);
 
   void submitForm(const KURL& url, const KParts::URLArgs&);
 

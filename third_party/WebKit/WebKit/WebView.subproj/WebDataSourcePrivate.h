@@ -85,7 +85,7 @@
 - (void)_setRepresentation:(id<WebDocumentRepresentation>)representation;
 - (void)_setController:(WebController*)controller;
 - (void)_setParent:(WebDataSource*)p;
-- (void)_startLoading:(BOOL)forceRefresh;
+- (void)_startLoading;
 - (void)_stopLoading;
 - (BOOL)_isStopping;
 - (void)_recursiveStopLoading;

@@ -37,6 +37,7 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
 
   virtual void openURLRequest(const KURL&,
                               const KParts::URLArgs& args = KParts::URLArgs());
+  virtual void openURLNotify();
 
   virtual void createNewWindow(
       const KURL& url,

@@ -167,6 +167,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 - (WebCoreBridge*)createChildFrameNamed:(NSString*)frameName
                                 withURL:(NSURL*)URL
+                               referrer:(NSString*)referrer
                              renderPart:(KHTMLRenderPart*)renderPart
                         allowsScrolling:(BOOL)allowsScrolling
                             marginWidth:(int)width

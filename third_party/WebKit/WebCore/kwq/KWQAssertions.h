@@ -104,6 +104,11 @@ void KWQLog(const char* file,
 }
 #endif
 
+// CRASH -- gets us into the debugger or the crash reporter -- signals are
+// ignored by the crash reporter so we must do better
+
+#define CRASH() *(int*)0x0badbeef = 0
+
 // ASSERT, ASSERT_WITH_MESSAGE, ASSERT_NOT_REACHED
 
 #if ASSERT_DISABLED
@@ -119,7 +124,7 @@ void KWQLog(const char* file,
     if (!(assertion)) {                                                  \
       KWQReportAssertionFailure(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
                                 #assertion);                             \
-      raise(SIGQUIT);                                                    \
+      CRASH();                                                           \
     }                                                                    \
   while (0)
 #define ASSERT_WITH_MESSAGE(assertion, formatAndArgs...)                       \
@@ -127,13 +132,13 @@ void KWQLog(const char* file,
     if (!(assertion)) {                                                        \
       KWQReportAssertionFailureWithMessage(                                    \
           __FILE__, __LINE__, __PRETTY_FUNCTION__, #assertion, formatAndArgs); \
-      raise(SIGQUIT);                                                          \
+      CRASH();                                                                 \
     }                                                                          \
   while (0)
 #define ASSERT_NOT_REACHED()                                               \
   do {                                                                     \
     KWQReportAssertionFailure(__FILE__, __LINE__, __PRETTY_FUNCTION__, 0); \
-    raise(SIGQUIT);                                                        \
+    CRASH();                                                               \
   } while (0)
 
 #endif
@@ -151,7 +156,7 @@ void KWQLog(const char* file,
     if (!(assertion)) {                                                   \
       KWQReportArgumentAssertionFailure(                                  \
           __FILE__, __LINE__, __PRETTY_FUNCTION__, #argName, #assertion); \
-      raise(SIGQUIT);                                                     \
+      CRASH();                                                            \
     }                                                                     \
   while (0)
 
@@ -166,7 +171,7 @@ void KWQLog(const char* file,
   do {                                                           \
     KWQReportFatalError(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
                         formatAndArgs);                          \
-    raise(SIGQUIT);                                              \
+    CRASH();                                                     \
   } while (0)
 #endif
 

@@ -72,7 +72,7 @@
 
 /*
 */
-- (void)reload:(BOOL)forceRefresh;
+- (void)reload;
 
 /*
     This method removes references the underlying resources.
