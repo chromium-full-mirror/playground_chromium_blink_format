@@ -1155,7 +1155,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
         v = args[2];
         QString features;
         if (!v.isNull() && v.type() != UndefinedType &&
-            v.toString(exec).length() > 0) {
+            v.toString(exec).size() > 0) {
           features = v.toString(exec).qstring();
           // specifying window params means false defaults
           winargs.menuBarVisible = false;
