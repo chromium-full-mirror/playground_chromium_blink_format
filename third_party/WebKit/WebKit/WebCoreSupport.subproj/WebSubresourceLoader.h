@@ -22,4 +22,10 @@
                                      referrer:(NSString*)referrer
                                 forDataSource:(WebDataSource*)source;
 
++ (WebSubresourceClient*)startLoadingResource:(id<WebCoreResourceLoader>)rLoader
+                                      withURL:(NSURL*)URL
+                                     postData:(NSData*)data
+                                     referrer:(NSString*)referrer
+                                forDataSource:(WebDataSource*)source;
+
 @end
