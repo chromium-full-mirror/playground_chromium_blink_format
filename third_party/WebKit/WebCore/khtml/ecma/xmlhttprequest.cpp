@@ -544,6 +544,7 @@ void XMLHttpRequest::slotData(KIO::Job*, const QByteArray& _data)
 {
   if (state < Loaded) {
     responseHeaders = job->queryMetaData("HTTP-Headers");
+    encoding = job->queryMetaData("charset");
     changeState(Loaded);
   }
 

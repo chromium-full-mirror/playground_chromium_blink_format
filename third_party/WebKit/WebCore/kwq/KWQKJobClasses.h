@@ -80,6 +80,7 @@ class TransferJob : public Job {
 
  private:
   void assembleResponseHeaders() const;
+  void retrieveCharset() const;
 
   TransferJobPrivate* d;
 
