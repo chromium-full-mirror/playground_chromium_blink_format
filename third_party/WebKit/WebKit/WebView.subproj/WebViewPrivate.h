@@ -173,6 +173,8 @@ backforward list.
 - _UIDelegateForwarder;
 
 - (void)_registerDraggedTypes;
+
+- (void)_close;
 @end
 
 @interface _WebSafeForwarder : NSObject {
