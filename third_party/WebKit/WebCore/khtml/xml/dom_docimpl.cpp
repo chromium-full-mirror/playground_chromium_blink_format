@@ -518,35 +518,25 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
     return 0;
   }
 
-  QPtrStack<NodeImpl> nodeStack;
-  NodeImpl* current = _first;
+  return m_elementsById.find(elementId.string());
+}
 
-  while (1) {
-    if (!current) {
-      if (nodeStack.isEmpty())
-        break;
-      current = nodeStack.pop();
-      current = current->nextSibling();
-    } else {
-      if (current->isElementNode()) {
-        ElementImpl* e = static_cast<ElementImpl*>(current);
-        if (e->getAttribute(ATTR_ID) == elementId)
-          return e;
-      }
+void DocumentImpl::addElementById(const DOMString& elementId,
+                                  ElementImpl* element) {
+  QString qId = elementId.string();
 
-      NodeImpl* child = current->firstChild();
-      if (child) {
-        nodeStack.push(current);
-        current = child;
-      } else {
-        current = current->nextSibling();
-      }
-    }
+  if (m_elementsById.find(qId) == NULL) {
+    m_elementsById.insert(qId, element);
   }
+}
 
-  // kdDebug() << "WARNING: *DocumentImpl::getElementById not found " <<
-  // elementId.string() << endl;
-  return 0;
+void DocumentImpl::removeElementById(const DOMString& elementId,
+                                     ElementImpl* element) {
+  QString qId = elementId.string();
+
+  if (m_elementsById.find(qId) == element) {
+    m_elementsById.remove(qId);
+  }
 }
 
 void DocumentImpl::setTitle(DOMString _title) {
