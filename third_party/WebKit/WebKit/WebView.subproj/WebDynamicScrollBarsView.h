@@ -17,6 +17,7 @@
   WebCoreScrollBarMode vScroll;
   BOOL suppressLayout;
   BOOL suppressScrollers;
+  BOOL inUpdateScrollers;
 }
 
 - (void)setAllowsHorizontalScrolling:(BOOL)flag;
