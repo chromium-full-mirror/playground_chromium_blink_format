@@ -43,6 +43,7 @@ DOMStringImpl* DOMStringImpl::empty() {
 
 DOMStringImpl::DOMStringImpl(const QChar* str, unsigned int len) {
   _hash = 0;
+  _inTable = false;
   bool havestr = str && len;
   s = QT_ALLOC_QCHAR_VEC(havestr ? len : 1);
   if (str && len) {
@@ -57,6 +58,7 @@ DOMStringImpl::DOMStringImpl(const QChar* str, unsigned int len) {
 
 DOMStringImpl::DOMStringImpl(const char* str) {
   _hash = 0;
+  _inTable = false;
   if (str && *str) {
     l = strlen(str);
     s = QT_ALLOC_QCHAR_VEC(l);
@@ -73,6 +75,7 @@ DOMStringImpl::DOMStringImpl(const char* str) {
 
 DOMStringImpl::DOMStringImpl(const char* str, unsigned int len) {
   _hash = 0;
+  _inTable = false;
   l = len;
   if (!l || !str)
     return;
@@ -86,20 +89,21 @@ DOMStringImpl::DOMStringImpl(const char* str, unsigned int len) {
 
 DOMStringImpl::DOMStringImpl(const QChar& ch) {
   _hash = 0;
+  _inTable = false;
   s = QT_ALLOC_QCHAR_VEC(1);
   s[0] = ch;
   l = 1;
 }
 
 DOMStringImpl::~DOMStringImpl() {
-  if (_hash)
+  if (_inTable)
     AtomicString::remove(this);
   if (s)
     QT_DELETE_QCHAR_VEC(s);
 }
 
 void DOMStringImpl::append(DOMStringImpl* str) {
-  assert(_hash == 0);
+  assert(!_inTable);
   if (str && str->l != 0) {
     int newlen = l + str->l;
     QChar* c = QT_ALLOC_QCHAR_VEC(newlen);
@@ -113,7 +117,7 @@ void DOMStringImpl::append(DOMStringImpl* str) {
 }
 
 void DOMStringImpl::insert(DOMStringImpl* str, uint pos) {
-  assert(_hash == 0);
+  assert(!_inTable);
   if (pos > l) {
     append(str);
     return;
@@ -132,7 +136,7 @@ void DOMStringImpl::insert(DOMStringImpl* str, uint pos) {
 }
 
 void DOMStringImpl::truncate(int len) {
-  assert(_hash == 0);
+  assert(!_inTable);
   if (len > (int)l)
     return;
 
@@ -146,7 +150,7 @@ void DOMStringImpl::truncate(int len) {
 }
 
 void DOMStringImpl::remove(uint pos, int len) {
-  assert(_hash == 0);
+  assert(!_inTable);
   if (len <= 0)
     return;
   if (pos >= l)
@@ -165,7 +169,7 @@ void DOMStringImpl::remove(uint pos, int len) {
 }
 
 DOMStringImpl* DOMStringImpl::split(uint pos) {
-  assert(_hash == 0);
+  assert(!_inTable);
   if (pos >= l)
     return new DOMStringImpl();
 

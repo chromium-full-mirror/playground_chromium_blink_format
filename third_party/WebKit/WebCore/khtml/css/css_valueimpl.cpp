@@ -223,13 +223,13 @@ CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
   QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
   CSSProperty* current;
   for (lstValuesIt.toLast(); (current = lstValuesIt.current()); --lstValuesIt)
-    if (current->m_id == propertyID && !current->nonCSSHint)
+    if (current->m_id == propertyID)
       return current->value();
   return 0;
 }
 
 DOMString CSSStyleDeclarationImpl::removeProperty(int propertyID,
-                                                  bool NonCSSHint) {
+                                                  bool notifyChanged) {
   if (!m_lstValues)
     return DOMString();
   DOMString value;
@@ -237,10 +237,11 @@ DOMString CSSStyleDeclarationImpl::removeProperty(int propertyID,
   QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
   CSSProperty* current;
   for (lstValuesIt.toLast(); (current = lstValuesIt.current()); --lstValuesIt)
-    if (current->m_id == propertyID && NonCSSHint == current->nonCSSHint) {
+    if (current->m_id == propertyID) {
       value = current->value()->cssText();
       m_lstValues->removeRef(current);
-      setChanged();
+      if (notifyChanged)
+        setChanged();
       break;
     }
 
@@ -278,20 +279,20 @@ bool CSSStyleDeclarationImpl::getPropertyPriority(int propertyID) const {
 bool CSSStyleDeclarationImpl::setProperty(int id,
                                           const DOMString& value,
                                           bool important,
-                                          bool nonCSSHint) {
+                                          bool notifyChanged) {
   if (!m_lstValues) {
     m_lstValues = new QPtrList<CSSProperty>;
     m_lstValues->setAutoDelete(true);
   }
-  removeProperty(id, nonCSSHint);
+  removeProperty(id);
 
   CSSParser parser(strictParsing);
-  bool success = parser.parseValue(this, id, value, important, nonCSSHint);
+  bool success = parser.parseValue(this, id, value, important);
   if (!success)
     kdDebug(6080) << "CSSStyleDeclarationImpl::setProperty invalid property: ["
                   << getPropertyName(id).string() << "] value: ["
                   << value.string() << "]" << endl;
-  else
+  else if (notifyChanged)
     setChanged();
   return success;
 }
@@ -299,45 +300,44 @@ bool CSSStyleDeclarationImpl::setProperty(int id,
 void CSSStyleDeclarationImpl::setProperty(int id,
                                           int value,
                                           bool important,
-                                          bool nonCSSHint) {
+                                          bool notifyChanged) {
   if (!m_lstValues) {
     m_lstValues = new QPtrList<CSSProperty>;
     m_lstValues->setAutoDelete(true);
   }
-  removeProperty(id, nonCSSHint);
+  removeProperty(id);
 
   CSSValueImpl* cssValue = new CSSPrimitiveValueImpl(value);
-  setParsedValue(id, cssValue, important, nonCSSHint, m_lstValues);
-  setChanged();
+  setParsedValue(id, cssValue, important, m_lstValues);
+  if (notifyChanged)
+    setChanged();
 }
 
 void CSSStyleDeclarationImpl::setStringProperty(
     int propertyId,
     const DOMString& value,
     CSSPrimitiveValue::UnitTypes type,
-    bool important,
-    bool nonCSSHint) {
+    bool important) {
   if (!m_lstValues) {
     m_lstValues = new QPtrList<CSSProperty>;
     m_lstValues->setAutoDelete(true);
   }
-  removeProperty(propertyId, nonCSSHint);
+  removeProperty(propertyId);
   setParsedValue(propertyId, new CSSPrimitiveValueImpl(value, type), important,
-                 nonCSSHint, m_lstValues);
+                 m_lstValues);
   setChanged();
 }
 
 void CSSStyleDeclarationImpl::setImageProperty(int propertyId,
                                                const DOMString& URL,
-                                               bool important,
-                                               bool nonCSSHint) {
+                                               bool important) {
   if (!m_lstValues) {
     m_lstValues = new QPtrList<CSSProperty>;
     m_lstValues->setAutoDelete(true);
   }
-  removeProperty(propertyId, nonCSSHint);
+  removeProperty(propertyId);
   setParsedValue(propertyId, new CSSImageValueImpl(URL, this), important,
-                 nonCSSHint, m_lstValues);
+                 m_lstValues);
   setChanged();
 }
 
@@ -348,19 +348,18 @@ void CSSStyleDeclarationImpl::setProperty(const DOMString& propertyString) {
   }
 
   CSSParser parser(strictParsing);
-  parser.parseDeclaration(this, propertyString, false);
+  parser.parseDeclaration(this, propertyString);
   setChanged();
 }
 
 void CSSStyleDeclarationImpl::setLengthProperty(int id,
                                                 const DOM::DOMString& value,
                                                 bool important,
-                                                bool nonCSSHint,
                                                 bool _multiLength) {
   bool parseMode = strictParsing;
   strictParsing = false;
   multiLength = _multiLength;
-  setProperty(id, value, important, nonCSSHint);
+  setProperty(id, value, important);
   strictParsing = parseMode;
   multiLength = false;
 }
@@ -387,40 +386,23 @@ DOM::DOMString CSSStyleDeclarationImpl::cssText() const {
     QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
     CSSProperty* current;
     for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
-         ++lstValuesIt) {
-      if (!current->nonCSSHint) {
-        result += current->cssText();
-      }
-    }
+         ++lstValuesIt)
+      result += current->cssText();
   }
 
   return result;
 }
 
-void CSSStyleDeclarationImpl::setCssText(DOM::DOMString text) {
-  if (m_lstValues) {
-    QPtrList<CSSProperty> nonCSSHints;
-
-    {
-      // make sure to destruct iterator before reassigning list contents
-      QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
-      CSSProperty* current;
-      for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
-           ++lstValuesIt) {
-        if (current->nonCSSHint) {
-          nonCSSHints.append(new CSSProperty(*current));
-        }
-      }
-    }
-
-    *m_lstValues = nonCSSHints;
-  } else {
+void CSSStyleDeclarationImpl::setCssText(const DOM::DOMString& text) {
+  if (m_lstValues)
+    m_lstValues->clear();
+  else {
     m_lstValues = new QPtrList<CSSProperty>;
     m_lstValues->setAutoDelete(true);
   }
 
   CSSParser parser(strictParsing);
-  parser.parseDeclaration(this, text, false);
+  parser.parseDeclaration(this, text);
   setChanged();
 }
 

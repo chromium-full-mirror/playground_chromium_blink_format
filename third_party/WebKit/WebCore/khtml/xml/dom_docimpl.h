@@ -61,7 +61,6 @@ class KWQAccObjectCache;
 namespace khtml {
 class CSSStyleSelector;
 class DocLoader;
-class CSSStyleSelectorList;
 class RenderImage;
 class EditCommand;
 }
@@ -361,6 +360,16 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setTextColor(QColor color) { m_textColor = color; }
   QColor textColor() const { return m_textColor; }
 
+  const QColor& linkColor() const { return m_linkColor; }
+  const QColor& visitedLinkColor() const { return m_visitedLinkColor; }
+  const QColor& activeLinkColor() const { return m_activeLinkColor; }
+  void setLinkColor(const QColor& c) { m_linkColor = c; }
+  void setVisitedLinkColor(const QColor& c) { m_visitedLinkColor = c; }
+  void setActiveLinkColor(const QColor& c) { m_activeLinkColor = c; }
+  void resetLinkColor();
+  void resetVisitedLinkColor();
+  void resetActiveLinkColor();
+
   // internal
   NodeImpl* findElement(Id id);
 
@@ -608,6 +617,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   LocalStyleRefs m_localStyleRefs;  // references to inlined style elements
   QPtrList<RegisteredEventListener> m_windowEventListeners;
   QPtrList<NodeImpl> m_maintainsState;
+
+  QColor m_linkColor;
+  QColor m_visitedLinkColor;
+  QColor m_activeLinkColor;
 
   DOMString m_preferredStylesheetSet;
 

@@ -30,6 +30,7 @@
 #include "css/css_base.h"
 #include "misc/loader_client.h"
 #include "misc/shared.h"
+#include "css_valueimpl.h"
 
 namespace khtml {
 class CachedCSSStyleSheet;
@@ -187,6 +188,8 @@ class CSSPageRuleImpl : public CSSRuleImpl {
   CSSStyleDeclarationImpl* m_style;
 };
 
+class CSSImportantRuleImpl;
+
 class CSSStyleRuleImpl : public CSSRuleImpl {
  public:
   CSSStyleRuleImpl(StyleBaseImpl* parent);
@@ -202,17 +205,15 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
 
   virtual bool parseString(const DOMString& string, bool = false);
 
-  void setSelector(QPtrList<CSSSelector>* selector) { m_selector = selector; }
+  void setSelector(CSSSelector* selector) { m_selector = selector; }
   void setDeclaration(CSSStyleDeclarationImpl* style);
 
-  QPtrList<CSSSelector>* selector() { return m_selector; }
+  CSSSelector* selector() { return m_selector; }
   CSSStyleDeclarationImpl* declaration() { return m_style; }
-
-  void setNonCSSHints();
 
  protected:
   CSSStyleDeclarationImpl* m_style;
-  QPtrList<CSSSelector>* m_selector;
+  CSSSelector* m_selector;
 };
 
 class CSSUnknownRuleImpl : public CSSRuleImpl {

@@ -40,6 +40,7 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
     s = 0;
     l = 0;
     _hash = 0;
+    _inTable = false;
     ref();
   }
 
@@ -47,6 +48,7 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   DOMStringImpl() {
     s = 0, l = 0;
     _hash = 0;
+    _inTable = false;
   }
 
  public:
@@ -97,6 +99,7 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   unsigned int l;
   QChar* s;
   mutable unsigned _hash;
+  bool _inTable;
 };
 };
 #endif

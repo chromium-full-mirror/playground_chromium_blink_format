@@ -110,11 +110,9 @@ class CSSParser {
   bool parseValue(DOM::CSSStyleDeclarationImpl* decls,
                   int id,
                   const DOM::DOMString& string,
-                  bool _important,
-                  bool _nonCSSHint);
+                  bool _important);
   bool parseDeclaration(DOM::CSSStyleDeclarationImpl* decls,
-                        const DOM::DOMString& string,
-                        bool _nonCSSHint);
+                        const DOM::DOMString& string);
 
   static CSSParser* current() { return currentParser; }
 
@@ -143,7 +141,6 @@ class CSSParser {
  public:
   bool strict;
   bool important;
-  bool nonCSSHint;
   int id;
   DOM::StyleListImpl* styleElement;
   DOM::CSSRuleImpl* rule;

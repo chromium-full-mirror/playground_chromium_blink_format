@@ -94,7 +94,6 @@ CSSParser::CSSParser(bool strictParsing) {
   rule = 0;
   id = 0;
   important = false;
-  nonCSSHint = false;
   inParseShortHand = false;
 
   defaultNamespace = anyNamespace;
@@ -122,7 +121,7 @@ CSSParser::~CSSParser() {
 
 void ParseString::lower() {
   for (int i = 0; i < length; i++)
-    string[i] = QChar(string[i]).lower();
+    string[i] = QChar(string[i]).lower().unicode();
 }
 
 void CSSParser::parseSheet(CSSStyleSheetImpl* sheet, const DOMString& string) {
@@ -191,12 +190,11 @@ CSSRuleImpl* CSSParser::parseRule(DOM::CSSStyleSheetImpl* sheet,
 bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
                            int _id,
                            const DOM::DOMString& string,
-                           bool _important,
-                           bool _nonCSSHint) {
+                           bool _important) {
 #ifdef CSS_DEBUG
   kdDebug(6080) << "CSSParser::parseValue: id=" << _id
-                << " important=" << _important << " nonCSSHint=" << _nonCSSHint
-                << " value='" << string.string() << "'" << endl;
+                << " important=" << _important << " value='" << string.string()
+                << "'" << endl;
 #endif
 
   styleElement = declaration->stylesheet();
@@ -221,7 +219,6 @@ bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
 
   id = _id;
   important = _important;
-  nonCSSHint = _nonCSSHint;
 
   CSSParser* old = currentParser;
   currentParser = this;
@@ -235,7 +232,7 @@ bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
   if (numParsedProperties) {
     ok = true;
     for (int i = 0; i < numParsedProperties; i++) {
-      declaration->removeProperty(parsedProperties[i]->m_id, nonCSSHint);
+      declaration->removeProperty(parsedProperties[i]->m_id);
       declaration->values()->append(parsedProperties[i]);
     }
     numParsedProperties = 0;
@@ -245,11 +242,10 @@ bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
 }
 
 bool CSSParser::parseDeclaration(DOM::CSSStyleDeclarationImpl* declaration,
-                                 const DOM::DOMString& string,
-                                 bool _nonCSSHint) {
+                                 const DOM::DOMString& string) {
 #ifdef CSS_DEBUG
-  kdDebug(6080) << "CSSParser::parseDeclaration: nonCSSHint=" << nonCSSHint
-                << " value='" << string.string() << "'" << endl;
+  kdDebug(6080) << "CSSParser::parseDeclaration:value='" << string.string()
+                << "'" << endl;
 #endif
 
   styleElement = declaration->stylesheet();
@@ -272,8 +268,6 @@ bool CSSParser::parseDeclaration(DOM::CSSStyleDeclarationImpl* declaration,
   yytext = yy_c_buf_p = data;
   yy_hold_char = *yy_c_buf_p;
 
-  nonCSSHint = _nonCSSHint;
-
   CSSParser* old = currentParser;
   currentParser = this;
   cssyyparse(this);
@@ -286,7 +280,7 @@ bool CSSParser::parseDeclaration(DOM::CSSStyleDeclarationImpl* declaration,
   if (numParsedProperties) {
     ok = true;
     for (int i = 0; i < numParsedProperties; i++) {
-      declaration->removeProperty(parsedProperties[i]->m_id, false);
+      declaration->removeProperty(parsedProperties[i]->m_id);
       declaration->values()->append(parsedProperties[i]);
     }
     numParsedProperties = 0;
@@ -300,7 +294,6 @@ void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
   prop->m_id = propId;
   prop->setValue(value);
   prop->m_bImportant = important;
-  prop->nonCSSHint = nonCSSHint;
 
   if (numParsedProperties >= maxParsedProperties) {
     maxParsedProperties += 32;
@@ -714,8 +707,7 @@ bool CSSParser::parseValue(int propId, bool important) {
 
     case CSS_PROP_BACKGROUND_POSITION_X:
     case CSS_PROP_BACKGROUND_POSITION_Y:
-      valid_primitive =
-          validUnit(value, FPercent | FLength, strict & (!nonCSSHint));
+      valid_primitive = validUnit(value, FPercent | FLength, strict);
       break;
 
     case CSS_PROP_BORDER_SPACING: {
@@ -740,8 +732,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     }
     case CSS_PROP__KHTML_BORDER_HORIZONTAL_SPACING:
     case CSS_PROP__KHTML_BORDER_VERTICAL_SPACING:
-      valid_primitive =
-          validUnit(value, FLength | FNonNeg, strict & (!nonCSSHint));
+      valid_primitive = validUnit(value, FLength | FNonNeg, strict);
       break;
     case CSS_PROP_SCROLLBAR_FACE_COLOR:        // IE5.5
     case CSS_PROP_SCROLLBAR_SHADOW_COLOR:      // IE5.5
@@ -773,8 +764,7 @@ bool CSSParser::parseValue(int propId, bool important) {
                    // since we use this in our UA sheets.
       else if (id >= CSS_VAL_AQUA && id <= CSS_VAL_WINDOWTEXT ||
                id == CSS_VAL_MENU ||
-               (id >= CSS_VAL_GREY && id < CSS_VAL__KHTML_TEXT &&
-                (nonCSSHint | !strict))) {
+               (id >= CSS_VAL_GREY && id < CSS_VAL__KHTML_TEXT && !strict)) {
         valid_primitive = true;
       } else {
         parsedValue = parseColor();
@@ -831,7 +821,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_THIN || id == CSS_VAL_MEDIUM || id == CSS_VAL_THICK)
         valid_primitive = true;
       else
-        valid_primitive = (validUnit(value, FLength, strict & (!nonCSSHint)));
+        valid_primitive = (validUnit(value, FLength, strict));
       break;
 
     case CSS_PROP_LETTER_SPACING:  // normal | <length> | inherit
@@ -839,7 +829,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_NORMAL)
         valid_primitive = true;
       else
-        valid_primitive = validUnit(value, FLength, strict & (!nonCSSHint));
+        valid_primitive = validUnit(value, FLength, strict);
       break;
 
     case CSS_PROP_TEXT_INDENT:     // <length> | <percentage> | inherit
@@ -847,8 +837,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSS_PROP_PADDING_RIGHT:   //   Which is defined as
     case CSS_PROP_PADDING_BOTTOM:  //   <length> | <percentage>
     case CSS_PROP_PADDING_LEFT:    ////
-      valid_primitive =
-          (!id && validUnit(value, FLength | FPercent, strict & (!nonCSSHint)));
+      valid_primitive = (!id && validUnit(value, FLength | FPercent, strict));
       break;
 
     case CSS_PROP_MAX_HEIGHT:  // <length> | <percentage> | none | inherit
@@ -860,8 +849,8 @@ bool CSSParser::parseValue(int propId, bool important) {
     /* nobreak */
     case CSS_PROP_MIN_HEIGHT:  // <length> | <percentage> | inherit
     case CSS_PROP_MIN_WIDTH:   // <length> | <percentage> | inherit
-      valid_primitive = (!id && validUnit(value, FLength | FPercent | FNonNeg,
-                                          strict & (!nonCSSHint)));
+      valid_primitive =
+          (!id && validUnit(value, FLength | FPercent | FNonNeg, strict));
       break;
 
     case CSS_PROP_FONT_SIZE:
@@ -869,8 +858,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id >= CSS_VAL_XX_SMALL && id <= CSS_VAL_LARGER)
         valid_primitive = true;
       else
-        valid_primitive =
-            (validUnit(value, FLength | FPercent, strict & (!nonCSSHint)));
+        valid_primitive = (validUnit(value, FLength | FPercent, strict));
       break;
 
     case CSS_PROP_FONT_STYLE:  // normal | italic | oblique | inherit
@@ -891,8 +879,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id >= CSS_VAL_BASELINE && id <= CSS_VAL__KHTML_BASELINE_MIDDLE)
         valid_primitive = true;
       else
-        valid_primitive = (!id && validUnit(value, FLength | FPercent,
-                                            strict & (!nonCSSHint)));
+        valid_primitive = (!id && validUnit(value, FLength | FPercent, strict));
       break;
 
     case CSS_PROP_HEIGHT:  // <length> | <percentage> | auto | inherit
@@ -901,8 +888,8 @@ bool CSSParser::parseValue(int propId, bool important) {
         valid_primitive = true;
       else
         // ### handle multilength case where we allow relative units
-        valid_primitive = (!id && validUnit(value, FLength | FPercent | FNonNeg,
-                                            strict & (!nonCSSHint)));
+        valid_primitive =
+            (!id && validUnit(value, FLength | FPercent | FNonNeg, strict));
       break;
 
     case CSS_PROP_BOTTOM:         // <length> | <percentage> | auto | inherit
@@ -916,8 +903,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_AUTO)
         valid_primitive = true;
       else
-        valid_primitive = (!id && validUnit(value, FLength | FPercent,
-                                            strict & (!nonCSSHint)));
+        valid_primitive = (!id && validUnit(value, FLength | FPercent, strict));
       break;
 
     case CSS_PROP_Z_INDEX:  // auto | <integer> | inherit
@@ -938,8 +924,8 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_NORMAL)
         valid_primitive = true;
       else
-        valid_primitive = (!id && validUnit(value, FNumber | FLength | FPercent,
-                                            strict & (!nonCSSHint)));
+        valid_primitive =
+            (!id && validUnit(value, FNumber | FLength | FPercent, strict));
       break;
 #if 0
 	// removed from CSS 2.1
@@ -1053,7 +1039,7 @@ bool CSSParser::parseValue(int propId, bool important) {
 #endif
       break;
     case CSS_PROP_OUTLINE_OFFSET:
-      valid_primitive = validUnit(value, FLength, strict & (!nonCSSHint));
+      valid_primitive = validUnit(value, FLength, strict);
       break;
     case CSS_PROP_TEXT_SHADOW:  // CSS2 property, dropped in CSS2.1, back in
                                 // CSS3, so treat as CSS3
@@ -1113,8 +1099,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_SMALL || id == CSS_VAL_LARGE || id == CSS_VAL_MEDIUM)
         valid_primitive = true;
       else
-        valid_primitive =
-            validUnit(value, FLength | FPercent, strict & (!nonCSSHint));
+        valid_primitive = validUnit(value, FLength | FPercent, strict);
       break;
     case CSS_PROP__KHTML_MARQUEE_STYLE:
       if (id == CSS_VAL_NONE || id == CSS_VAL_SLIDE || id == CSS_VAL_SCROLL ||
@@ -1125,15 +1110,13 @@ bool CSSParser::parseValue(int propId, bool important) {
       if (id == CSS_VAL_INFINITE)
         valid_primitive = true;
       else
-        valid_primitive =
-            validUnit(value, FInteger | FNonNeg, strict & (!nonCSSHint));
+        valid_primitive = validUnit(value, FInteger | FNonNeg, strict);
       break;
     case CSS_PROP__KHTML_MARQUEE_SPEED:
       if (id == CSS_VAL_NORMAL || id == CSS_VAL_SLOW || id == CSS_VAL_FAST)
         valid_primitive = true;
       else
-        valid_primitive = validUnit(value, FTime | FInteger | FNonNeg,
-                                    strict & (!nonCSSHint));
+        valid_primitive = validUnit(value, FTime | FInteger | FNonNeg, strict);
       break;
     case CSS_PROP__KHTML_USER_MODIFY:  // read-only | read-write
       if (id == CSS_VAL_READ_ONLY || id == CSS_VAL_READ_WRITE)
@@ -1985,7 +1968,7 @@ bool CSSParser::parseShadow(int propId, bool important) {
           (val->id >= CSS_VAL_AQUA && val->id <= CSS_VAL_WINDOWTEXT ||
            val->id == CSS_VAL_MENU ||
            (val->id >= CSS_VAL_GREY && val->id <= CSS_VAL__KHTML_TEXT &&
-            (nonCSSHint | !strict)));
+            !strict));
       if (isColor) {
         if (!context.allowColor)
           return context.failed();

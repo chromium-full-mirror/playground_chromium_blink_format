@@ -56,38 +56,35 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 
   unsigned long length() const;
   CSSRuleImpl* parentRule() const;
-  DOM::DOMString removeProperty(int propertyID, bool NonCSSHints = false);
+  DOM::DOMString removeProperty(int propertyID, bool notifyChanged = true);
   bool setProperty(int propertyId,
                    const DOM::DOMString& value,
                    bool important = false,
-                   bool nonCSSHint = false);
+                   bool notifyChanged = true);
   void setProperty(int propertyId,
                    int value,
                    bool important = false,
-                   bool nonCSSHint = false);
+                   bool notifyChanged = true);
   // this treats integers as pixels!
   // needed for conversion of html attributes
   void setLengthProperty(int id,
                          const DOM::DOMString& value,
                          bool important,
-                         bool nonCSSHint = true,
                          bool multiLength = false);
   void setStringProperty(int propertyId,
                          const DOM::DOMString& value,
                          DOM::CSSPrimitiveValue::UnitTypes,
-                         bool important = false,
-                         bool nonCSSHint = false);  // parsed string value
+                         bool important = false);  // parsed string value
   void setImageProperty(int propertyId,
                         const DOM::DOMString& URL,
-                        bool important = false,
-                        bool nonCSSHint = false);
+                        bool important = false);
 
   // add a whole, unparsed property
   void setProperty(const DOMString& propertyString);
   DOM::DOMString item(unsigned long index);
 
   virtual DOM::DOMString cssText() const;
-  void setCssText(DOM::DOMString str);
+  void setCssText(const DOM::DOMString& str);
 
   virtual bool isStyleDeclaration() { return true; }
 
@@ -99,6 +96,7 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 
   QPtrList<CSSProperty>* values() { return m_lstValues; }
   void setNode(NodeImpl* _node) { m_node = _node; }
+  NodeImpl* node() { return m_node; }
 
   void setChanged();
 
@@ -382,13 +380,11 @@ class CSSProperty {
   CSSProperty() {
     m_id = -1;
     m_bImportant = false;
-    nonCSSHint = false;
     m_value = 0;
   }
   CSSProperty(const CSSProperty& o) {
     m_id = o.m_id;
     m_bImportant = o.m_bImportant;
-    nonCSSHint = o.nonCSSHint;
     m_value = o.m_value;
     if (m_value)
       m_value->ref();
@@ -408,14 +404,16 @@ class CSSProperty {
     }
   }
 
+  int id() const { return m_id; }
+  bool isImportant() const { return m_bImportant; }
+
   CSSValueImpl* value() { return m_value; }
 
   DOM::DOMString cssText() const;
 
   // make sure the following fits in 4 bytes.
-  int m_id : 29;
+  int m_id : 30;
   bool m_bImportant : 1;
-  bool nonCSSHint : 1;
 
  protected:
   CSSValueImpl* m_value;

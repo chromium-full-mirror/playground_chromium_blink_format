@@ -278,7 +278,7 @@ bool Element::isHTMLElement() const {
 
 CSSStyleDeclaration Element::style() {
   if (impl)
-    return ((ElementImpl*)impl)->styleRules();
+    return ((ElementImpl*)impl)->getInlineStyleDecl();
   return 0;
 }
 

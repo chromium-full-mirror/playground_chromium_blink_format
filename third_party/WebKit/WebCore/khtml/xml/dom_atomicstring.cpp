@@ -141,6 +141,7 @@ DOMStringImpl* AtomicString::add(const char* c) {
 
   DOMStringImpl* r = new DOMStringImpl(c, length);
   r->_hash = hash;
+  r->_inTable = true;
 
   _table[i] = r;
   ++_keyCount;
@@ -176,6 +177,7 @@ DOMStringImpl* AtomicString::add(const QChar* s, int length) {
 
   DOMStringImpl* r = new DOMStringImpl(s, length);
   r->_hash = hash;
+  r->_inTable = true;
 
   _table[i] = r;
   ++_keyCount;
@@ -187,8 +189,8 @@ DOMStringImpl* AtomicString::add(const QChar* s, int length) {
 }
 
 DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
-  if (!r)
-    return 0;
+  if (!r || r->_inTable)
+    return r;
 
   if (r->l == 0)
     return DOMStringImpl::empty();
@@ -204,11 +206,13 @@ DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
   numCollisions += _table[i] && !equal(_table[i], r);
 #endif
   while (DOMStringImpl* key = _table[i]) {
-    if (equal(key, r))
+    if (equal(key, r)) {
       return key;
+    }
     i = (i + 1) & _tableSizeMask;
   }
 
+  r->_inTable = true;
   _table[i] = r;
   ++_keyCount;
 
@@ -233,7 +237,7 @@ inline void AtomicString::insert(DOMStringImpl* key) {
 }
 
 void AtomicString::remove(DOMStringImpl* r) {
-  unsigned hash = r->hash();
+  unsigned hash = r->_hash;
 
   DOMStringImpl* key;
 
@@ -243,7 +247,7 @@ void AtomicString::remove(DOMStringImpl* r) {
   numCollisions += _table[i] && equal(_table[i], r);
 #endif
   while ((key = _table[i])) {
-    if (equal(key, r))
+    if (key == r)
       break;
     i = (i + 1) & _tableSizeMask;
   }

@@ -74,18 +74,27 @@ class CSSSelector {
   CSSSelector()
       : tagHistory(0),
         simpleSelector(0),
+        nextSelector(0),
         attr(0),
         tag(anyQName),
         relation(Descendant),
         match(None),
-        nonCSSHint(false),
         pseudoId(0),
         _pseudoType(PseudoNotParsed) {}
 
   ~CSSSelector() {
     delete tagHistory;
     delete simpleSelector;
+    delete nextSelector;
   }
+
+  void append(CSSSelector* n) {
+    if (!nextSelector)
+      nextSelector = n;
+    else
+      nextSelector->append(n);
+  }
+  CSSSelector* next() { return nextSelector; }
 
   /**
    * Print debug output for this selector
@@ -132,6 +141,7 @@ class CSSSelector {
     PseudoFirstLetter,
     PseudoLink,
     PseudoVisited,
+    PseudoAnyLink,
     PseudoHover,
     PseudoFocus,
     PseudoActive,
@@ -153,12 +163,12 @@ class CSSSelector {
   mutable DOM::AtomicString value;
   CSSSelector* tagHistory;
   CSSSelector* simpleSelector;  // Used for :not.
+  CSSSelector* nextSelector;    // used for ,-chained selectors
   Q_UINT32 attr;
   Q_UINT32 tag;
 
   Relation relation : 2;
   Match match : 4;
-  bool nonCSSHint : 1;
   unsigned int pseudoId : 3;
   mutable PseudoType _pseudoType : 5;
 
@@ -171,13 +181,11 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
  public:
   StyleBaseImpl() {
     m_parent = 0;
-    hasInlinedDecl = false;
     strictParsing = true;
     multiLength = false;
   }
   StyleBaseImpl(StyleBaseImpl* p) {
     m_parent = p;
-    hasInlinedDecl = false;
     strictParsing = (m_parent ? m_parent->useStrictParsing() : true);
     multiLength = false;
   }
@@ -211,7 +219,6 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
   static void setParsedValue(int propId,
                              const CSSValueImpl* parsedValue,
                              bool important,
-                             bool nonCSSHint,
                              QPtrList<CSSProperty>* propList);
 
   virtual bool parseString(const DOMString& /*cssString*/, bool = false) {
@@ -226,7 +233,6 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
   StyleSheetImpl* stylesheet();
 
  protected:
-  bool hasInlinedDecl : 1;
   bool strictParsing : 1;
   bool multiLength : 1;
 };
