@@ -1967,9 +1967,6 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         case CSS_PROP_COLOR:
           style->setColor(col);
           break;
-        case CSS_PROP_TEXT_DECORATION_COLOR:
-          style->setTextDecorationColor(col);
-          break;
         case CSS_PROP_OUTLINE_COLOR:
           style->setOutlineColor(col);
           break;
@@ -2827,8 +2824,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
         if (value->cssValueType() == CSSValue::CSS_INHERIT) {
           if (!parentNode)
             return;
-          style->setTextDecoration(parentStyle->textDecoration());
-          style->setTextDecorationColor(parentStyle->textDecorationColor());
+          style->addToTextDecorationsInEffect(
+              parentStyle->textDecorationsInEffect());
+          style->setTextDecoration(parentStyle->textDecorationsInEffect());
           return;
         }
         int t = TDNONE;
@@ -2865,8 +2863,9 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
             }
           }
         }
+
+        style->addToTextDecorationsInEffect(t);
         style->setTextDecoration(t);
-        style->setTextDecorationColor(style->color());
         break;
       }
     case CSS_PROP__KONQ_FLOW_MODE:

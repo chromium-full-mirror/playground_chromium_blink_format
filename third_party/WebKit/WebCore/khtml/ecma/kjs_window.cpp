@@ -1495,13 +1495,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       if (listener) {
         DOM::Document doc = part->document();
-        if (doc.isHTMLDocument()) {
-          DOM::HTMLDocument htmlDoc = doc;
-          htmlDoc.body().addEventListener(args[0].toString(exec).string(),
-                                          listener, args[2].toBoolean(exec));
-        } else
-          doc.addEventListener(args[0].toString(exec).string(), listener,
-                               args[2].toBoolean(exec));
+        doc.addEventListener(args[0].toString(exec).string(), listener,
+                             args[2].toBoolean(exec));
       }
       return Undefined();
     }
@@ -1512,13 +1507,8 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
           Window::retrieveActive(exec)->getJSEventListener(args[1]);
       if (listener) {
         DOM::Document doc = part->document();
-        if (doc.isHTMLDocument()) {
-          DOM::HTMLDocument htmlDoc = doc;
-          htmlDoc.body().removeEventListener(args[0].toString(exec).string(),
-                                             listener, args[2].toBoolean(exec));
-        } else
-          doc.removeEventListener(args[0].toString(exec).string(), listener,
-                                  args[2].toBoolean(exec));
+        doc.removeEventListener(args[0].toString(exec).string(), listener,
+                                args[2].toBoolean(exec));
       }
       return Undefined();
     }

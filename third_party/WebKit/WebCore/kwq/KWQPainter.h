@@ -111,17 +111,7 @@ class QPainter : public Qt {
                 QPainter::TextDirection d,
                 int letterSpacing,
                 int wordSpacing);
-  void drawLineForText(int x,
-                       int y,
-                       const QChar*,
-                       int length,
-                       int from,
-                       int to,
-                       int toAdd,
-                       int yOffset,
-                       QPainter::TextDirection d,
-                       int letterSpacing,
-                       int wordSpacing);
+  void drawLineForText(int x, int y, int yOffset, int width);
   static QColor selectedTextBackgroundColor();
 
   bool paintingDisabled() const;

@@ -63,17 +63,9 @@
             letterSpacing:(int)letterSpacing
               wordSpacing:(int)wordSpacing
              fontFamilies:(NSString**)families;
-- (void)drawLineForCharacters:(const UniChar*)characters
-                 stringLength:(unsigned)length
-        fromCharacterPosition:(int)from
-          toCharacterPosition:(int)to
-                      atPoint:(NSPoint)point
+- (void)drawLineForCharacters:(NSPoint)point
                       yOffset:(float)yOffset
-                  withPadding:(int)padding
-                    withColor:(NSColor*)color
-                  rightToLeft:(BOOL)rtl
-                letterSpacing:(int)letterSpacing
-                  wordSpacing:(int)wordSpacing
-                 fontFamilies:(NSString**)families;
+                    withWidth:(int)width
+                    withColor:(NSColor*)color;
 
 @end
