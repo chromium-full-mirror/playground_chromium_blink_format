@@ -1099,6 +1099,10 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void slotIncZoom();
   void slotDecZoom();
 
+#if APPLE_CHANGES
+  void childBegin();
+#endif
+
   void slotLoadImages();
 
   /**

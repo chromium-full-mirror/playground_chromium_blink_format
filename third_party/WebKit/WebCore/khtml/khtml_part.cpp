@@ -1440,6 +1440,21 @@ void KHTMLPart::slotFinished(KIO::Job* job) {
     end();  // will emit completed()
 }
 
+#if APPLE_CHANGES
+void KHTMLPart::childBegin() {
+  // We need to do this when the child is created so as to avoid the bogus state
+  // of the parent's
+  // child->m_bCompleted being false but the child's m_bComplete being true.  If
+  // the child gets
+  // an error early on, we had trouble where checkingComplete on the child was a
+  // NOP because
+  // it thought it was already complete, and thus the parent was never signaled,
+  // and never set
+  // its child->m_bComplete.
+  d->m_bComplete = false;
+}
+#endif
+
 void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 #if APPLE_CHANGES
   // If we aren't loading an actual URL, then we need to make sure
@@ -3095,6 +3110,9 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
       part->openURL(url);
   } else {
     KParts::ReadOnlyPart* part = KWQ(this)->createPart(*child, url, mimetype);
+    KHTMLPart* khtml_part = dynamic_cast<KHTMLPart*>(part);
+    if (khtml_part)
+      khtml_part->childBegin();
 #else
   if (!child->m_services.contains(mimetype)) {
     KParts::ReadOnlyPart* part =
