@@ -50,7 +50,10 @@ void Font::drawText(QPainter* p,
                     int to,
                     QColor bg) const {
 #ifdef APPLE_CHANGES
-  p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg);
+  printf("QPainter::TextDirection d = %s\n",
+         d == QPainter::RTL ? "QPainter::RTL" : "QPainter::LTR");
+  p->drawText(x, y, str + pos, std::min(slen - pos, len), from, to, toAdd, bg,
+              d);
 #else
   QString qstr = QConstString(str, slen).string();
 

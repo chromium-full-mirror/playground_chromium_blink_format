@@ -55,7 +55,8 @@
                   atPoint:(NSPoint)point
               withPadding:(int)padding
             withTextColor:(NSColor*)textColor
-          backgroundColor:(NSColor*)backgroundColor;
+          backgroundColor:(NSColor*)backgroundColor
+              rightToLeft:(BOOL)rtl;
 - (void)drawUnderlineForCharacters:(const UniChar*)characters
                       stringLength:(unsigned)length
                            atPoint:(NSPoint)point
