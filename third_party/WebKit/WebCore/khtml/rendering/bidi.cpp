@@ -896,6 +896,18 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   //    context->ref();
 
   dir = QChar::DirON;
+
+  // Adopt the directionality of the text's element if specified as RTL
+  // and the first position is neutral.
+  if (start.direction() == QChar::DirON) {
+    if (start.obj) {
+      if (start.obj->style()->direction() == RTL)
+        dir = QChar::DirR;
+    } else if (style()->direction() == RTL) {
+      dir = QChar::DirR;
+    }
+  }
+
   emptyRun = true;
 
   numSpaces = 0;
@@ -903,6 +915,7 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   bidi.current = start;
   bidi.last = bidi.current;
   bool atEnd = false;
+
   while (1) {
     QChar::Direction dirCurrent;
     if (atEnd) {
@@ -1765,6 +1778,7 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
 
   adjustEmbedding = true;
   start = BidiIterator(this, startObj, pos);
+
   adjustEmbedding = false;
 
   return curr;
