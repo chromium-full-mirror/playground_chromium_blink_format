@@ -8,6 +8,7 @@
 @interface WebHistoryItem : NSObject {
   NSURL* _url;
   NSString* _target;
+  NSString* _parent;
   NSString* _title;
   NSString* _displayTitle;
   NSImage* _image;
@@ -23,6 +24,7 @@
 - (id)initWithURL:(NSURL*)url title:(NSString*)title image:(NSImage*)image;
 - (id)initWithURL:(NSURL*)url
            target:(NSString*)target
+           parent:(NSString*)parent
             title:(NSString*)title
             image:(NSImage*)image;
 
@@ -31,6 +33,7 @@
 
 - (NSURL*)url;
 - (NSString*)target;
+- (NSString*)parent;
 - (NSString*)title;
 - (NSString*)displayTitle;
 - (NSImage*)image;
@@ -38,6 +41,7 @@
 
 - (void)setURL:(NSURL*)url;
 - (void)setTarget:(NSString*)target;
+- (void)setParent:(NSString*)parent;
 - (void)setTitle:(NSString*)title;
 - (void)setDisplayTitle:(NSString*)displayTitle;
 - (void)setImage:(NSImage*)image;
