@@ -181,7 +181,7 @@ void RenderCanvasImage::paint(PaintInfo& i, int _tx, int _ty) {
 
   if (drawnImage()) {
     HTMLCanvasElementImpl* i =
-        (element() && element()->id() == ID_IMG)
+        (element() && element()->id() == ID_CANVAS)
             ? static_cast<HTMLCanvasElementImpl*>(element())
             : 0;
     int oldOperation = 0;
