@@ -486,6 +486,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   // Returns 0 if this is the top level document.
   ElementImpl* ownerElement();
 
+  DOMString domain() const;
+  void setDomain(const DOMString& newDomain,
+                 bool force = false);  // not part of the DOM
+
  signals:
   void finishedParsing();
 
@@ -594,6 +598,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   khtml::Decoder* decoder() const { return m_decoder; }
 
  private:
+  mutable DOMString m_domain;
   bool m_inPageCache;
   int m_passwordFields;
   int m_secureForms;
