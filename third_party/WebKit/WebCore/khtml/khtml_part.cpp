@@ -2554,7 +2554,7 @@ void KHTMLPart::setFocusNodeIfNeeded(const Selection& s) {
   NodeImpl* n = s.start().node();
   NodeImpl* target = n->isContentEditable() ? n : 0;
   if (!target) {
-    while (n != s.end().node()) {
+    while (n && n != s.end().node()) {
       if (n->isContentEditable()) {
         target = n;
         break;
