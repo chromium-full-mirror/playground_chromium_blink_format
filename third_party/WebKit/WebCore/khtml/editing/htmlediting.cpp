@@ -4105,6 +4105,8 @@ void MoveSelectionCommand::doApply() {
   ASSERT(selection.isRange());
 
   Position pos = m_position;
+  if (pos.isNull())
+    return;
 
   // Update the position otherwise it may become invalid after the selection is
   // deleted.
