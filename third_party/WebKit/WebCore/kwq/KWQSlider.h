@@ -51,6 +51,8 @@ class QSlider : public QWidget {
 
   void clicked();
 
+  virtual FocusPolicy focusPolicy() const;
+
  private:
   KWQSignal m_sliderValueChanged;
   KWQSignal m_clicked;
