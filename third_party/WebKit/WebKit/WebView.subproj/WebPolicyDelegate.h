@@ -21,6 +21,8 @@
     @constant WebPolicySaveAndOpen Save and open the resource in another
    application.
     @constant WebPolicyOpenNewWindow Open the resource in another window.
+    @constant WebPolicyOpenNewWindowBehind Open the resource in another window
+   behind this window.
     @constant WebPolicyIgnore Do nothing with the resource.
 */
 typedef enum {
@@ -31,6 +33,7 @@ typedef enum {
   WebPolicyOpenURL,
   WebPolicySaveAndOpen,
   WebPolicyOpenNewWindow,
+  WebPolicyOpenNewWindowBehind,
   WebPolicyIgnore
 } WebPolicyAction;
 
@@ -38,6 +41,8 @@ typedef enum {
 @enum WebClickAction
  @constant WebClickPolicyShow Have WebKit show the clicked URL.
  @constant WebClickPolicyOpenNewWindow Open the clicked URL in another window.
+ @constant WebClickPolicyOpenNewWindowBehind Open the clicked URL in another
+window behind this window.
  @constant WebClickPolicySave Save the clicked URL to disk.
  @constant WebClickPolicySaveAndOpenExternally Save the clicked URL to disk and
 open the file in another application.
@@ -46,6 +51,7 @@ open the file in another application.
 typedef enum {
   WebClickPolicyShow = WebPolicyUse,
   WebClickPolicyOpenNewWindow = WebPolicyOpenNewWindow,
+  WebClickPolicyOpenNewWindowBehind = WebPolicyOpenNewWindowBehind,
   WebClickPolicySave = WebPolicySave,
   WebClickPolicySaveAndOpenExternally = WebPolicySaveAndOpen,
   WebClickPolicyIgnore = WebPolicyIgnore
