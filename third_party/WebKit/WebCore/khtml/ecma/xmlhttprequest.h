@@ -65,6 +65,7 @@ class XMLHttpRequest : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
+    Onload,
     Onreadystatechange,
     ReadyState,
     ResponseText,
@@ -117,6 +118,7 @@ class XMLHttpRequest : public DOMObject {
 
   XMLHttpRequestState state;
   JSEventListener* onReadyStateChangeListener;
+  JSEventListener* onLoadListener;
 
   khtml::Decoder* decoder;
   QString encoding;

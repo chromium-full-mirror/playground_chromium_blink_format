@@ -108,7 +108,7 @@ const ClassInfo XMLHttpRequest::info = {"XMLHttpRequest", 0,
                                         &XMLHttpRequestTable, 0};
 
 /* Source for XMLHttpRequestTable.
-@begin XMLHttpRequestTable 6
+@begin XMLHttpRequestTable 7
   readyState		XMLHttpRequest::ReadyState
 DontDelete|ReadOnly
   responseText		XMLHttpRequest::ResponseText
@@ -120,6 +120,7 @@ DontDelete|ReadOnly
   statusText		XMLHttpRequest::StatusText
 DontDelete|ReadOnly
   onreadystatechange	XMLHttpRequest::Onreadystatechange	DontDelete
+  onload		XMLHttpRequest::Onload			DontDelete
 @end
 */
 
@@ -145,6 +146,12 @@ Value XMLHttpRequest::getValueProperty(ExecState*, int token) const {
       if (onReadyStateChangeListener &&
           onReadyStateChangeListener->listenerObjImp()) {
         return onReadyStateChangeListener->listenerObj();
+      } else {
+        return Null();
+      }
+    case Onload:
+      if (onLoadListener && onLoadListener->listenerObjImp()) {
+        return onLoadListener->listenerObj();
       } else {
         return Null();
       }
@@ -174,6 +181,12 @@ void XMLHttpRequest::putValue(ExecState* exec,
       if (onReadyStateChangeListener)
         onReadyStateChangeListener->ref();
       break;
+    case Onload:
+      onLoadListener =
+          Window::retrieveActive(exec)->getJSEventListener(value, true);
+      if (onLoadListener)
+        onLoadListener->ref();
+      break;
     default:
       kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
   }
@@ -187,6 +200,7 @@ XMLHttpRequest::XMLHttpRequest(ExecState* exec, const DOM::Document& d)
       job(0),
       state(Uninitialized),
       onReadyStateChangeListener(0),
+      onLoadListener(0),
       decoder(0) {}
 
 XMLHttpRequest::~XMLHttpRequest() {
@@ -203,6 +217,12 @@ void XMLHttpRequest::changeState(XMLHttpRequestState newState) {
       DOM::Event ev = doc->part()->document().createEvent("HTMLEvents");
       ev.initEvent("readystatechange", true, true);
       onReadyStateChangeListener->handleEvent(ev, true);
+    }
+
+    if (state == Completed && onLoadListener != 0 && doc->part()) {
+      DOM::Event ev = doc->part()->document().createEvent("HTMLEvents");
+      ev.initEvent("load", true, true);
+      onLoadListener->handleEvent(ev, true);
     }
   }
 }
