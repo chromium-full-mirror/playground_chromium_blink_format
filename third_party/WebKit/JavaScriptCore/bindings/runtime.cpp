@@ -43,6 +43,6 @@ Value Instance::getValueOfField(const Field* aField) const {
 
 void Instance::setValueOfField(KJS::ExecState* exec,
                                const Field* aField,
-                               Value aValue) const {
+                               const Value& aValue) const {
   return aField->setValueToInstance(exec, this, aValue);
 }

@@ -59,7 +59,7 @@ class Field {
   virtual KJS::Value valueFromInstance(const Instance* instance) const = 0;
   virtual void setValueToInstance(KJS::ExecState* exec,
                                   const Instance* instance,
-                                  KJS::Value aValue) const = 0;
+                                  const KJS::Value& aValue) const = 0;
 
   virtual ~Field(){};
 };
@@ -102,7 +102,7 @@ class Instance {
   virtual KJS::Value getValueOfField(const Field* aField) const;
   virtual void setValueOfField(KJS::ExecState* exec,
                                const Field* aField,
-                               KJS::Value aValue) const;
+                               const KJS::Value& aValue) const;
 
   virtual KJS::Value invokeMethod(KJS::ExecState* exec,
                                   const Method* method,
@@ -115,6 +115,15 @@ class Instance {
   };
 
   virtual ~Instance(){};
+};
+
+class Array {
+ public:
+  virtual void setValueAt(unsigned int index,
+                          const KJS::Value& aValue) const = 0;
+  virtual KJS::Value valueAt(unsigned int index) const = 0;
+
+  virtual ~Array(){};
 };
 
 const char* signatureForParameters(const KJS::List& aList);
