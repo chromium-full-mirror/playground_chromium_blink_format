@@ -1129,7 +1129,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                          const DOM::Node& n,
                          const QString& script);
 
-  void cancelRedirection();
+  void cancelRedirection(bool newLoadInProgress = false);
 
   KJSProxy* jScript();
 

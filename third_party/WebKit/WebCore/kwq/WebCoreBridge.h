@@ -332,7 +332,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                          fireDate:(NSDate*)date
                       lockHistory:(BOOL)lockHistory
            isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
-- (void)reportClientRedirectCancelled;
+- (void)reportClientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 
 - (void)focusWindow;
 - (void)unfocusWindow;

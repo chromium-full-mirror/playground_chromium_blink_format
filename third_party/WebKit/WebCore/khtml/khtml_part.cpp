@@ -1926,8 +1926,9 @@ void KHTMLPart::scheduleHistoryNavigation(int steps) {
   }
 }
 
-void KHTMLPart::cancelRedirection() {
+void KHTMLPart::cancelRedirection(bool cancelWithLoadInProgress) {
   if (d) {
+    d->m_cancelWithLoadInProgress = cancelWithLoadInProgress;
     d->m_scheduledRedirection = noRedirectionScheduled;
     d->m_redirectionTimer.stop();
   }
