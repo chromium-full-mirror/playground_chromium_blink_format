@@ -280,9 +280,12 @@ class AppendNodeCommand : public EditCommand {
 
 class ApplyStyleCommand : public CompositeEditCommand {
  public:
+  enum EPropertyLevel { PropertyDefault, ForceBlockProperties };
+
   ApplyStyleCommand(DOM::DocumentImpl*,
                     DOM::CSSStyleDeclarationImpl* style,
-                    EditAction editingAction = EditActionChangeAttributes);
+                    EditAction editingAction = EditActionChangeAttributes,
+                    EPropertyLevel = PropertyDefault);
   virtual ~ApplyStyleCommand();
 
   virtual void doApply();
@@ -356,6 +359,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
 
   DOM::CSSMutableStyleDeclarationImpl* m_style;
   EditAction m_editingAction;
+  EPropertyLevel m_propertyLevel;
 };
 
 //------------------------------------------------------------------------------------------

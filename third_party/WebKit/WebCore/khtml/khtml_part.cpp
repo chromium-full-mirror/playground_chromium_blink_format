@@ -5386,6 +5386,24 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style,
   }
 }
 
+void KHTMLPart::applyParagraphStyle(CSSStyleDeclarationImpl* style,
+                                    EditAction editingAction) {
+  switch (selection().state()) {
+    case Selection::NONE:
+      // do nothing
+      break;
+    case Selection::CARET:
+    case Selection::RANGE:
+      if (xmlDocImpl() && style) {
+        EditCommandPtr cmd(
+            new ApplyStyleCommand(xmlDocImpl(), style, editingAction,
+                                  ApplyStyleCommand::ForceBlockProperties));
+        cmd.apply();
+      }
+      break;
+  }
+}
+
 static void updateState(CSSMutableStyleDeclarationImpl* desiredStyle,
                         CSSComputedStyleDeclarationImpl* computedStyle,
                         bool& atStart,

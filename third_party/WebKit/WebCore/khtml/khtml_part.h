@@ -922,6 +922,9 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void applyStyle(
       DOM::CSSStyleDeclarationImpl*,
       khtml::EditAction editingAction = khtml::EditActionUnspecified);
+  void applyParagraphStyle(
+      DOM::CSSStyleDeclarationImpl*,
+      khtml::EditAction editingAction = khtml::EditActionUnspecified);
   TriState selectionHasStyle(DOM::CSSStyleDeclarationImpl*) const;
   bool selectionStartHasStyle(DOM::CSSStyleDeclarationImpl*) const;
   DOM::DOMString selectionStartStylePropertyValue(int stylePropertyID) const;

@@ -353,6 +353,7 @@ typedef enum {
 
 - (NSFont*)fontForSelection:(BOOL*)hasMultipleFonts;
 - (NSDictionary*)fontAttributesForSelectionStart;
+- (NSWritingDirection)baseWritingDirectionForSelectionStart;
 
 + (NSString*)stringWithData:(NSData*)data
                textEncoding:(CFStringEncoding)textEncoding;
@@ -436,6 +437,8 @@ typedef enum {
         withUndoAction:(WebUndoAction)undoAction;
 - (void)applyStyle:(DOMCSSStyleDeclaration*)style
     withUndoAction:(WebUndoAction)undoAction;
+- (void)applyParagraphStyle:(DOMCSSStyleDeclaration*)style
+             withUndoAction:(WebUndoAction)undoAction;
 - (BOOL)selectionStartHasStyle:(DOMCSSStyleDeclaration*)style;
 - (void)applyEditingStyleToBodyElement;
 - (void)removeEditingStyleFromBodyElement;
