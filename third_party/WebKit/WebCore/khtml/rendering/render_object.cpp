@@ -2178,8 +2178,8 @@ void RenderObject::addDashboardRegions(
       int x, y;
       absolutePosition(x, y);
 
-      int w = width() + marginLeft() + marginRight();
-      int h = height() + marginTop() + marginBottom();
+      int w = width();
+      int h = height();
 
       DashboardRegionValue region;
       region.label = styleRegion.label;

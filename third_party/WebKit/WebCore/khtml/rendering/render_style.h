@@ -323,6 +323,10 @@ struct StyleDashboardRegion {
   int type;
 
   enum { None, Circle, Rectangle };
+
+  bool operator==(const StyleDashboardRegion& o) const {
+    return type == o.type && offset == o.offset && label == o.label;
+  }
 };
 #endif
 
@@ -1264,8 +1268,11 @@ class RenderStyle {
   void setMaxHeight(Length v) { SET_VAR(box, max_height, v) }
 
 #if APPLE_CHANGES
-  QValueList<StyleDashboardRegion> dashboardRegions() {
+  QValueList<StyleDashboardRegion> dashboardRegions() const {
     return m_dashboardRegions;
+  }
+  void setDashboardRegions(QValueList<StyleDashboardRegion> regions) {
+    m_dashboardRegions = regions;
   }
   void setDashboardRegion(int type,
                           QString label,
@@ -1668,6 +1675,10 @@ class RenderStyle {
   // Keep these at the end.
   static int initialLineClamp() { return -1; }
   static bool initialTextSizeAdjust() { return true; }
+  static QValueList<StyleDashboardRegion> initialDashboardRegions() {
+    QValueList<StyleDashboardRegion> emptyList;
+    return emptyList;
+  }
 #endif
 };
 
