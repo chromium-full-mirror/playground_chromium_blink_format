@@ -1270,6 +1270,11 @@ void DocumentImpl::updateSelection() {
   Selection s = part()->selection();
   if (!s.isRange()) {
     canvas->clearSelection();
+#if APPLE_CHANGES
+    if (KWQAccObjectCache::accessibilityEnabled())
+      getOrCreateAccObjectCache()->postNotification(renderer(),
+                                                    "AXSelectedTextChanged");
+#endif
   } else {
     Position startPos = VisiblePosition(s.start(), UPSTREAM).deepEquivalent();
     Position endPos = VisiblePosition(s.end(), DOWNSTREAM).deepEquivalent();
@@ -1278,6 +1283,11 @@ void DocumentImpl::updateSelection() {
       RenderObject* endRenderer = endPos.node()->renderer();
       static_cast<RenderCanvas*>(m_render)->setSelection(
           startRenderer, startPos.offset(), endRenderer, endPos.offset());
+#if APPLE_CHANGES
+      if (KWQAccObjectCache::accessibilityEnabled())
+        getOrCreateAccObjectCache()->postNotification(renderer(),
+                                                      "AXSelectedTextChanged");
+#endif
     }
   }
 }
@@ -2472,6 +2482,12 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
             ->setFocus();
     }
   }
+
+#if APPLE_CHANGES
+  if (!focusChangeBlocked && KWQAccObjectCache::accessibilityEnabled())
+    getOrCreateAccObjectCache()->postNotification(renderer(),
+                                                  "AXFocusedUIElementChanged");
+#endif
 
 SetFocusNodeDone:
   updateRendering();
