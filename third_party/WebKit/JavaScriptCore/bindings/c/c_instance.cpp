@@ -109,15 +109,18 @@ Value CInstance::invokeMethod(KJS::ExecState* exec,
 
   // Invoke the 'C' method.
   NP_Object* result = _object->_class->invoke(_object, ident, cArgs, count);
+  if (result) {
+    resultValue = convertNPValueTypeToValue(exec, result);
 
-  resultValue = convertNPValueTypeToValue(exec, result);
+    if (cArgs != localBuffer)
+      free((void*)cArgs);
 
-  if (cArgs != localBuffer)
-    free((void*)cArgs);
+    NP_ReleaseObject(result);
 
-  NP_ReleaseObject(result);
+    return resultValue;
+  }
 
-  return resultValue;
+  return Undefined();
 }
 
 KJS::Value CInstance::defaultValue(KJS::Type hint) const {

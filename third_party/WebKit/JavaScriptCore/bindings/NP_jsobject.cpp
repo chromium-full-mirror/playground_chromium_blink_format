@@ -22,13 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <NP_runtime.h>
-
-#include <c_utility.h>
-
-#include <runtime.h>
-#include <runtime_object.h>
-#include <runtime_root.h>
+#include <NP_jsobject.h>
 
 using namespace KJS;
 using namespace KJS::Bindings;
@@ -39,12 +33,6 @@ static KJS::List listFromNPArray(KJS::ExecState* exec,
   KJS::List aList;
   return aList;
 }
-
-typedef struct {
-  NP_Object object;
-  KJS::ObjectImp* imp;
-  KJS::Bindings::RootObject* root;
-} JavaScriptObject;
 
 static NP_Object* jsAllocate() {
   return (NP_Object*)malloc(sizeof(JavaScriptObject));
@@ -175,8 +163,7 @@ void NP_ToString(NP_JavaScriptObject* o,
   Object thisObj = Object(const_cast<ObjectImp*>(obj->imp));
   ExecState* exec = obj->root->interpreter()->globalExec();
 
-  NP_String* value =
-      (NP_String*)coerceValueToNPValueType(exec, thisObj, NP_StringValueType);
+  NP_String* value = (NP_String*)coerceValueToNPString(exec, thisObj);
 
   Interpreter::unlock();
 
