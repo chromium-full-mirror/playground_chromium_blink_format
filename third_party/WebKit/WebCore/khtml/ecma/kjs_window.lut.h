@@ -34,7 +34,7 @@ const struct HashEntry WindowTableEntries[] = {
     {"offscreenBuffering", Window::OffscreenBuffering, DontDelete | ReadOnly, 0,
      0},
     {"setTimeout", Window::SetTimeout, DontDelete | Function, 2, 0},
-    {0, 0, 0, 0, 0},
+    {"getSelection", Window::GetSelection, DontDelete | Function, 0, 0},
     {0, 0, 0, 0, 0},
     {"DOMException", Window::DOMException, DontDelete, 0,
      &WindowTableEntries[103]},

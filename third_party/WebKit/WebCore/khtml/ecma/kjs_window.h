@@ -179,6 +179,7 @@ class Window : public ObjectImp {
     SetTimeout,
     ClearTimeout,
     Focus,
+    GetSelection,
     Blur,
     Close,
     SetInterval,
