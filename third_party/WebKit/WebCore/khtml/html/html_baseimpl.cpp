@@ -211,6 +211,18 @@ bool HTMLFrameElementImpl::isURLAllowed(const DOMString& URLString) const {
   KURL newURL(getDocument()->completeURL(URLString.string()));
   newURL.setRef(QString::null);
 
+  // Don't allow more than 1000 total frames in a set. This seems
+  // like a reasonable upper bound, and otherwise mutually recursive
+  // frameset pages can quickly bring the program to its knees with
+  // exponential growth in the number of frames.
+
+  // FIXME: This limit could be higher, but WebKit has some
+  // algorithms that happen while loading which appear to be N^2 or
+  // worse in the number of frames
+  if (w->part()->topLevelFrameCount() >= 200) {
+    return false;
+  }
+
   // Prohibit non-file URLs if we are asked to.
   if (w->part()->onlyLocalReferences() && newURL.protocol().lower() != "file") {
     return false;
@@ -360,6 +372,8 @@ void HTMLFrameElementImpl::attach() {
 
   KHTMLView* w = getDocument()->view();
 
+  w->part()->incrementFrameCount();
+
   // we need a unique name for every frame in the frameset. Hope that's unique
   // enough.
   if (name.isEmpty() || w->part()->frameExists(name.string()))
@@ -368,6 +382,15 @@ void HTMLFrameElementImpl::attach() {
   // load the frame contents
   w->part()->requestFrame(static_cast<RenderFrame*>(m_render), url.string(),
                           name.string());
+}
+
+void HTMLFrameElementImpl::detach() {
+  if (m_render) {
+    KHTMLView* w = getDocument()->view();
+    w->part()->decrementFrameCount();
+  }
+
+  HTMLElementImpl::detach();
 }
 
 // FIXME: Why is this different from updateForNewURL?
@@ -635,6 +658,7 @@ void HTMLIFrameElementImpl::attach() {
     // we need a unique name for every frame in the frameset. Hope that's unique
     // enough.
     KHTMLView* w = getDocument()->view();
+    w->part()->incrementFrameCount();
     if (name.isEmpty() || w->part()->frameExists(name.string()))
       name = DOMString(w->part()->requestFrameName());
 
