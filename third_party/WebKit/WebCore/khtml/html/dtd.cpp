@@ -97,7 +97,6 @@ const unsigned short DOM::tagPriority[] = {
     0,   // ID_ISINDEX
     1,   // ID_KBD
     0,   // ID_KEYGEN
-    5,   // ID__KONQBLOCK
     1,   // ID_LABEL
     1,   // ID_LAYER
     1,   // ID_LEGEND
@@ -204,7 +203,6 @@ const tagStatus DOM::endTag[] = {
     FORBIDDEN,  // ID_ISINDEX
     REQUIRED,   // ID_KBD
     REQUIRED,   // ID_KEYGEN
-    REQUIRED,   // ID__KONQBLOCK
     REQUIRED,   // ID_LABEL
     REQUIRED,   // ID_LAYER
     REQUIRED,   // ID_LEGEND
@@ -267,83 +265,26 @@ static const ushort tag_list_0[] = {
     ID_SELECT,  ID_TEXTAREA, ID_LABEL, ID_BUTTON, ID_INS,    ID_DEL,
     ID_COMMENT, ID_NOBR,     ID_WBR,   0};
 
-static const ushort tag_list_1[] = {ID_TEXT,
-                                    ID_P,
-                                    ID_H1,
-                                    ID_H2,
-                                    ID_H3,
-                                    ID_H4,
-                                    ID_H5,
-                                    ID_H6,
-                                    ID_UL,
-                                    ID_OL,
-                                    ID_DIR,
-                                    ID_MENU,
-                                    ID_PRE,
-                                    ID_PLAINTEXT,
-                                    ID_DL,
-                                    ID_DIV,
-                                    ID_LAYER,
-                                    ID_CENTER,
-                                    ID_NOSCRIPT,
-                                    ID_NOFRAMES,
-                                    ID_BLOCKQUOTE,
-                                    ID_FORM,
-                                    ID_ISINDEX,
-                                    ID_HR,
-                                    ID_TABLE,
-                                    ID_FIELDSET,
-                                    ID_ADDRESS,
-                                    ID_TT,
-                                    ID_I,
-                                    ID_B,
-                                    ID_U,
-                                    ID_S,
-                                    ID_STRIKE,
-                                    ID_BIG,
-                                    ID_SMALL,
-                                    ID_EM,
-                                    ID_STRONG,
-                                    ID_DFN,
-                                    ID_CODE,
-                                    ID_SAMP,
-                                    ID_KBD,
-                                    ID_VAR,
-                                    ID_CITE,
-                                    ID_ABBR,
-                                    ID_ACRONYM,
-                                    ID_A,
-                                    ID_IMG,
-                                    ID_APPLET,
-                                    ID_OBJECT,
-                                    ID_EMBED,
-                                    ID_FONT,
-                                    ID_BASEFONT,
-                                    ID_BR,
-                                    ID_SCRIPT,
-                                    ID_MAP,
-                                    ID_Q,
-                                    ID_SUB,
-                                    ID_SUP,
-                                    ID_SPAN,
-                                    ID_BDO,
-                                    ID_IFRAME,
-                                    ID_INPUT,
-                                    ID_KEYGEN,
-                                    ID_SELECT,
-                                    ID_TEXTAREA,
-                                    ID_LABEL,
-                                    ID_BUTTON,
-                                    ID_COMMENT,
-                                    ID_LI,
-                                    ID_XMP,
-                                    ID__KONQBLOCK,
-                                    ID_INS,
-                                    ID_DEL,
-                                    ID_NOBR,
-                                    ID_WBR,
-                                    ID_MARQUEE,
-                                    0};
+static const ushort tag_list_1[] = {
+    ID_TEXT,       ID_P,         ID_H1,       ID_H2,
+    ID_H3,         ID_H4,        ID_H5,       ID_H6,
+    ID_UL,         ID_OL,        ID_DIR,      ID_MENU,
+    ID_PRE,        ID_PLAINTEXT, ID_DL,       ID_DIV,
+    ID_LAYER,      ID_CENTER,    ID_NOSCRIPT, ID_NOFRAMES,
+    ID_BLOCKQUOTE, ID_FORM,      ID_ISINDEX,  ID_HR,
+    ID_TABLE,      ID_FIELDSET,  ID_ADDRESS,  ID_TT,
+    ID_I,          ID_B,         ID_U,        ID_S,
+    ID_STRIKE,     ID_BIG,       ID_SMALL,    ID_EM,
+    ID_STRONG,     ID_DFN,       ID_CODE,     ID_SAMP,
+    ID_KBD,        ID_VAR,       ID_CITE,     ID_ABBR,
+    ID_ACRONYM,    ID_A,         ID_IMG,      ID_APPLET,
+    ID_OBJECT,     ID_EMBED,     ID_FONT,     ID_BASEFONT,
+    ID_BR,         ID_SCRIPT,    ID_MAP,      ID_Q,
+    ID_SUB,        ID_SUP,       ID_SPAN,     ID_BDO,
+    ID_IFRAME,     ID_INPUT,     ID_KEYGEN,   ID_SELECT,
+    ID_TEXTAREA,   ID_LABEL,     ID_BUTTON,   ID_COMMENT,
+    ID_LI,         ID_XMP,       ID_INS,      ID_DEL,
+    ID_NOBR,       ID_WBR,       ID_MARQUEE,  0};
 
 static const ushort tag_list_2[] = {ID_COMMENT, 0};
 
@@ -354,7 +295,7 @@ static const ushort tag_list_3[] = {
     ID_DIV,        ID_LAYER,   ID_CENTER,  ID_NOSCRIPT,  ID_NOFRAMES,
     ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX, ID_HR,        ID_TABLE,
     ID_FIELDSET,   ID_ADDRESS, ID_COMMENT, ID_LI,        ID_XMP,
-    ID__KONQBLOCK, ID_MARQUEE, 0};
+    ID_MARQUEE,    0};
 
 static const ushort tag_list_4[] = {
     ID_TEXT,     ID_PARAM,      ID_P,       ID_H1,       ID_H2,
@@ -470,10 +411,6 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
       if (check_array(childID, tag_list_0))
         return true;
       return (childID == ID_P);
-    case ID__KONQBLOCK:
-      if (childID == ID__KONQBLOCK)
-        return false;
-    // Fall through!
     case ID_LI:
     case ID_DT:
     case ID_DIV:
@@ -574,6 +511,7 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
         case ID_TEXT:
         case ID_FORM:
         case ID_COMMENT:
+        case ID_SCRIPT:
           return true;
         default:
           return false;
@@ -583,7 +521,7 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
     case ID_TBODY:
       // THEAD: TR +
       if (childID == ID_FORM || childID == ID_TR || childID == ID_TEXT ||
-          childID == ID_COMMENT)
+          childID == ID_COMMENT || childID == ID_SCRIPT)
         return true;
       return false;
     case ID_COLGROUP:
@@ -593,6 +531,8 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
       return false;
     case ID_TR:
       // TR: _9 +
+      if (childID == ID_SCRIPT)
+        return true;
       return check_array(childID, tag_list_9);
     case ID_FRAMESET:
       // FRAMESET: ( _10 + & NOFRAMES ? )

@@ -90,6 +90,7 @@ bool HTMLElementImpl::isInline() const {
     case ID_NOBR:
     case ID_WBR:
       return true;
+
     default:
       return ElementImpl::isInline();
   }

@@ -162,7 +162,6 @@ class KHTMLParser {
   bool haveContent;
   bool haveFrameSet;
   bool end;
-  bool haveKonqBlock;
   bool inSelect;
 
   /*
