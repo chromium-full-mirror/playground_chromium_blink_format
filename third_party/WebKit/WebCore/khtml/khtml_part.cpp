@@ -1018,6 +1018,8 @@ DOM::DocumentImpl* KHTMLPart::xmlDocImpl() const {
   return 0;
 }
 
+#if !APPLE_CHANGES
+
 /*bool KHTMLPart::isSSLInUse() const
 {
   return d->m_ssl_in_use;
@@ -1051,19 +1053,15 @@ void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
         while (p->parentPart())
           p = p->parentPart();
 
-#if !APPLE_CHANGES
         p->d->m_paSecurity->setIcon("halfencrypted");
-#endif
         p->d->m_bSecurityInQuestion = true;
         kdDebug(6050) << "parent setIcon half done." << endl;
       }
     }
 
-#if !APPLE_CHANGES
     d->m_paSecurity->setIcon(d->m_ssl_in_use ? "encrypted" : "decrypted");
     kdDebug(6050) << "setIcon " << (d->m_ssl_in_use ? "encrypted" : "decrypted")
                   << " done." << endl;
-#endif
 
     // Shouldn't all of this be done only if ssl_in_use == true ? (DF)
 
@@ -1153,8 +1151,6 @@ void KHTMLPart::slotRestoreData(const QByteArray& data) {
       end();  // will emit completed()
   }
 }
-
-#if !APPLE_CHANGES
 
 void KHTMLPart::showError(KIO::Job* job) {
   kdDebug() << "KHTMLPart::showError d->m_bParsing="
@@ -2907,9 +2903,7 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
   if (child->m_extension)
     child->m_extension->setURLArgs(child->m_args);
 
-#if APPLE_CHANGES
-  if (!url.isEmpty())
-#else
+#if !APPLE_CHANGES
   if (url.protocol() == "javascript" || url.url() == "about:blank") {
     if (!child->m_part->inherits("KHTMLPart"))
       return false;
@@ -2927,13 +2921,12 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
     }
     p->end();
     return true;
-  } else if (!url.isEmpty())
-#endif
-  {
+  } else if (!url.isEmpty()) {
     // kdDebug( 6050 ) << "opening " << url.url() << " in frame " <<
     // child->m_part << endl;
     return child->m_part->openURL(url);
   } else
+#endif
     return true;
 }
 

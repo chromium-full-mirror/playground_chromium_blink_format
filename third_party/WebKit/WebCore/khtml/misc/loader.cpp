@@ -225,8 +225,9 @@ void CachedCSSStyleSheet::checkNotify() {
                 << endl;
 #endif
 
+  QPtrList<CachedObjectClient> clients(m_clients);
   CachedObjectClient* c;
-  for (c = m_clients.first(); c != 0; c = m_clients.next())
+  for (c = clients.first(); c != 0; c = clients.next())
     c->setStyleSheet(m_url, m_sheet);
 }
 
@@ -296,8 +297,9 @@ void CachedScript::checkNotify() {
   if (m_loading)
     return;
 
+  QPtrList<CachedObjectClient> clients(m_clients);
   CachedObjectClient* c;
-  for (c = m_clients.first(); c != 0; c = m_clients.next())
+  for (c = clients.first(); c != 0; c = clients.next())
     c->notifyFinished(this);
 }
 
@@ -649,9 +651,9 @@ QRect CachedImage::valid_rect() const {
 }
 
 void CachedImage::do_notify(const QPixmap& p, const QRect& r) {
+  QPtrList<CachedObjectClient> clients(m_clients);
   CachedObjectClient* c;
-
-  for (c = m_clients.first(); c != 0; c = m_clients.next())
+  for (c = clients.first(); c != 0; c = clients.next())
     c->setPixmap(p, r, this);
 }
 
@@ -733,8 +735,9 @@ void CachedImage::movieStatus(int status) {
       }
     }
 
+    QPtrList<CachedObjectClient> clients(m_clients);
     CachedObjectClient* c;
-    for (c = m_clients.first(); c != 0; c = m_clients.next())
+    for (c = clients.first(); c != 0; c = clients.next())
       c->notifyFinished(this);
   }
 
