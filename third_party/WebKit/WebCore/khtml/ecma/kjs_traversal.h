@@ -40,6 +40,8 @@ class DOMNodeIterator : public DOMObject {
     Root,
     WhatToShow,
     ExpandEntityReferences,
+    ReferenceNode,
+    PointerBeforeReferenceNode,
     NextNode,
     PreviousNode,
     Detach
@@ -117,11 +119,11 @@ Value getDOMTreeWalker(ExecState* exec, DOM::TreeWalker tw);
  */
 DOM::NodeFilter toNodeFilter(const Value&);
 
-class JSNodeFilter : public DOM::CustomNodeFilter {
+class JSNodeFilterCondition : public DOM::NodeFilterCondition {
  public:
-  JSNodeFilter(Object& _filter);
-  virtual ~JSNodeFilter();
-  virtual short acceptNode(const DOM::Node& n);
+  JSNodeFilterCondition(Object& _filter);
+  virtual ~JSNodeFilterCondition() {}
+  virtual short acceptNode(const DOM::Node&) const;
 
  protected:
   ProtectedObject filter;

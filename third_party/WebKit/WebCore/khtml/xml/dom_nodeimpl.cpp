@@ -988,7 +988,7 @@ void NodeImpl::checkAddChild(NodeImpl* newChild, int& exceptioncode) {
   // newChild node, or if the node to append is one of this node's ancestors.
 
   // check for ancestor/same node
-  if (isAncestor(newChild)) {
+  if (newChild == this || isAncestor(newChild)) {
     exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
     return;
   }
@@ -1020,12 +1020,11 @@ void NodeImpl::checkAddChild(NodeImpl* newChild, int& exceptioncode) {
   }
 }
 
-bool NodeImpl::isAncestor(NodeImpl* other) {
-  // Return true if other is the same as this node or an ancestor of it,
-  // otherwise false
-  NodeImpl* n;
-  for (n = this; n; n = n->parentNode()) {
-    if (n == other)
+bool NodeImpl::isAncestor(NodeImpl* node) const {
+  if (!node || node == this)
+    return false;
+  for (NodeImpl* p = node->parentNode(); p; p = p->parentNode()) {
+    if (p == this)
       return true;
   }
   return false;

@@ -957,26 +957,28 @@ RangeImpl* DocumentImpl::createRange() {
   return new RangeImpl(docPtr());
 }
 
-NodeIteratorImpl* DocumentImpl::createNodeIterator(
-    NodeImpl* root,
-    unsigned long whatToShow,
-    NodeFilter& filter,
-    bool entityReferenceExpansion,
-    int& exceptioncode) {
+NodeIteratorImpl* DocumentImpl::createNodeIterator(NodeImpl* root,
+                                                   unsigned long whatToShow,
+                                                   NodeFilterImpl* filter,
+                                                   bool expandEntityReferences,
+                                                   int& exceptioncode) {
   if (!root) {
     exceptioncode = DOMException::NOT_SUPPORTED_ERR;
     return 0;
   }
-
-  return new NodeIteratorImpl(root, whatToShow, filter,
-                              entityReferenceExpansion);
+  return new NodeIteratorImpl(root, whatToShow, filter, expandEntityReferences);
 }
 
-TreeWalkerImpl* DocumentImpl::createTreeWalker(const Node& root,
+TreeWalkerImpl* DocumentImpl::createTreeWalker(NodeImpl* root,
                                                unsigned long whatToShow,
-                                               const NodeFilter& filter,
-                                               bool entityReferenceExpansion) {
-  return new TreeWalkerImpl;
+                                               NodeFilterImpl* filter,
+                                               bool expandEntityReferences,
+                                               int& exceptioncode) {
+  if (!root) {
+    exceptioncode = DOMException::NOT_SUPPORTED_ERR;
+    return 0;
+  }
+  return new TreeWalkerImpl(root, whatToShow, filter, expandEntityReferences);
 }
 
 void DocumentImpl::setDocumentChanged(bool b) {

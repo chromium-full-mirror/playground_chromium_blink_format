@@ -265,14 +265,15 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   NodeIteratorImpl* createNodeIterator(NodeImpl* root,
                                        unsigned long whatToShow,
-                                       NodeFilter& filter,
-                                       bool entityReferenceExpansion,
+                                       NodeFilterImpl* filter,
+                                       bool expandEntityReferences,
                                        int& exceptioncode);
 
-  TreeWalkerImpl* createTreeWalker(const Node& root,
+  TreeWalkerImpl* createTreeWalker(NodeImpl* root,
                                    unsigned long whatToShow,
-                                   const NodeFilter& filter,
-                                   bool entityReferenceExpansion);
+                                   NodeFilterImpl* filter,
+                                   bool expandEntityReferences,
+                                   int& exceptioncode);
 
   // Special support for editing
   CSSStyleDeclarationImpl* createCSSStyleDeclaration();
