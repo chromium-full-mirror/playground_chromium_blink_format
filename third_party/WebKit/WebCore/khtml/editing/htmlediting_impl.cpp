@@ -1929,8 +1929,6 @@ void PasteMarkupCommandImpl::doApply() {
 
   NodeImpl* firstChild = root->firstChild();
   NodeImpl* lastChild = root->lastChild();
-  ASSERT(firstChild);
-  ASSERT(lastChild);
 
   Selection selection = endingSelection();
 
@@ -1943,7 +1941,10 @@ void PasteMarkupCommandImpl::doApply() {
   selection = endingSelection();
   ASSERT(!selection.isEmpty());
 
-  if (firstChild == lastChild && firstChild->isTextNode()) {
+  if (!firstChild) {
+    // Pasting something that didn't parse or was empty.
+    ASSERT(!lastChild);
+  } else if (firstChild == lastChild && firstChild->isTextNode()) {
     // Simple text paste. Treat as if the text were typed.
     inputText(static_cast<TextImpl*>(firstChild)->data());
   } else {
