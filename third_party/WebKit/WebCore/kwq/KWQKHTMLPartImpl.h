@@ -143,6 +143,8 @@ class KWQKHTMLPartImpl : public QObject {
     return mutableInstances();
   }
 
+  QString requestedURLString() const;
+
  private:
   void setPolicyBaseURL(const DOM::DOMString&);
 
