@@ -75,4 +75,7 @@ extern NSString* WebBookmarkChildrenKey;
 // at appropriate times.
 - (BOOL)saveBookmarkGroup;
 
+// Return the existing bookmark with the given UUID, or nil if none
+- (WebBookmark*)bookmarkForUUID:(NSString*)UUID;
+
 @end
