@@ -10,6 +10,7 @@
 
 @class WebDataSource;
 @class WebError;
+@class WebResourceResponse;
 
 @interface WebDownloadHandler : NSObject {
   WebDataSource* dataSource;
@@ -17,7 +18,8 @@
 }
 
 - initWithDataSource:(WebDataSource*)dSource;
-- (WebError*)receivedData:(NSData*)data;
+- (WebError*)receivedResponse:(WebResourceResponse*)response;
+- (void)receivedData:(NSData*)data;
 - (WebError*)finishedLoading;
 - (WebError*)cancel;
 @end
