@@ -427,7 +427,13 @@ CachedImage::CachedImage(DocLoader* dl,
                          const DOMString& url,
                          KIO::CacheControl _cachePolicy,
                          time_t _expireDate)
-    : QObject(), CachedObject(url, Image, _cachePolicy, _expireDate) {
+    : QObject(),
+      CachedObject(url, Image, _cachePolicy, _expireDate)
+#ifdef APPLE_CHANGES
+      ,
+      m_dataSize(0)
+#endif
+{
 #ifndef APPLE_CHANGES
   static const QString& acceptHeader =
       KGlobal::staticQString(buildAcceptHeader());
@@ -817,17 +823,8 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   }
 #else   // APPLE_CHANGES
   bool canDraw = false;
-  if (!eof) {
-    // If we didn't get all the data for the image we will always
-    // attempt to load the image incrementally.  If the AppKit is
-    // unable to decode incrementally this pixmap will not be
-    // renderable until all the data has been received.
-    if (!p)
-      p = new QPixmap();
-  }
 
-  if (p)
-    canDraw = p->receivedData(_buffer.buffer(), eof);
+  m_dataSize = _buffer.size();
 
   // If we're at eof and don't have a pixmap yet, the data
   // must have arrived in one chunk.  This avoids the attempt
@@ -835,6 +832,13 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
   if (eof && !p) {
     p = new QPixmap(_buffer.buffer());
     canDraw = true;
+  } else {
+    // Always attempt to load the image incrementally.
+    // If the AppKit is unable to decode incrementally this pixmap
+    // will not be renderable until all the data has been received.
+    if (!p)
+      p = new QPixmap;
+    canDraw = p->receivedData(_buffer.buffer(), eof);
   }
 
   if (canDraw || eof) {

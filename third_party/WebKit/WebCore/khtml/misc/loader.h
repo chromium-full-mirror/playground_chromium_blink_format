@@ -315,6 +315,14 @@ class CachedImage : public QObject, public CachedObject {
   KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
 
   friend class Cache;
+
+#ifdef APPLE_CHANGES
+ public:
+  int dataSize() const { return m_dataSize; }
+
+ private:
+  int m_dataSize;
+#endif
 };
 
 /**
