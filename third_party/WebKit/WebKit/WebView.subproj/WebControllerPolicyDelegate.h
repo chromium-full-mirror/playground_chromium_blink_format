@@ -7,6 +7,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class WebPolicyPrivate;
 @class WebDataSource;
 @class WebError;
 
@@ -50,10 +51,11 @@ typedef enum {
 } WebClickAction;
 
 @interface WebPolicy : NSObject {
-  WebPolicyAction policyAction;
+ @private
+  WebPolicyPrivate* _private;
 }
-- initWithPolicyAction:(WebPolicyAction)action;
 - (WebPolicyAction)policyAction;
+- (NSString*)path;
 @end
 
 @interface WebURLPolicy : WebPolicy
@@ -64,22 +66,13 @@ typedef enum {
 + webPolicyWithFileAction:(WebFileAction)action;
 @end
 
-@interface WebContentPolicy : WebPolicy {
-  NSString* path;
-}
+@interface WebContentPolicy : WebPolicy
 + webPolicyWithContentAction:(WebContentAction)action
                        andPath:(NSString*)thePath;
-- initWithContentPolicyAction:(WebContentAction)action
-                        andPath:(NSString*)thePath;
-- (NSString*)path;
 @end
 
-@interface WebClickPolicy : WebPolicy {
-  NSString* path;
-}
+@interface WebClickPolicy : WebPolicy
 + webPolicyWithClickAction:(WebClickAction)action andPath:(NSString*)thePath;
-- initWithClickPolicyAction:(WebClickAction)action andPath:(NSString*)thePath;
-- (NSString*)path;
 @end
 
 @protocol WebControllerPolicyHandler<NSObject>
