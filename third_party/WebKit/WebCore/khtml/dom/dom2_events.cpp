@@ -31,7 +31,7 @@ EventListener::EventListener() {}
 
 EventListener::~EventListener() {}
 
-void EventListener::handleEvent(Event& /*evt*/) {}
+void EventListener::handleEvent(Event& /*evt*/, bool) {}
 
 DOMString EventListener::eventListenerType() {
   return "";
