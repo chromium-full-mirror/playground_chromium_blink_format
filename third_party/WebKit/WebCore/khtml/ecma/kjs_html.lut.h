@@ -1139,6 +1139,16 @@ const struct HashTable HTMLMarqueeElementTable = {
 
 namespace KJS {
 
+const struct HashEntry HTMLCanvasElementTableEntries[] = {
+    {"getContext", KJS::HTMLElement::GetContext, DontDelete | Function, 0, 0}};
+
+const struct HashTable HTMLCanvasElementTable = {
+    2, 1, HTMLCanvasElementTableEntries, 1};
+
+}  // namespace
+
+namespace KJS {
+
 const struct HashEntry HTMLCollectionProtoTableEntries[] = {
     {0, 0, 0, 0, 0},
     {"namedItem", HTMLCollection::NamedItem, DontDelete | Function, 1, 0},

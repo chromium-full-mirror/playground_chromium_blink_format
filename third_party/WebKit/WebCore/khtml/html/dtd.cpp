@@ -61,6 +61,7 @@ const unsigned short DOM::tagPriority[] = {
     10,  // ID_BODY
     0,   // ID_BR
     1,   // ID_BUTTON
+    0,   // ID_CANVAS
     5,   // ID_CAPTION
     5,   // ID_CENTER
     1,   // ID_CITE
@@ -167,6 +168,7 @@ const tagStatus DOM::endTag[] = {
     REQUIRED,   // ID_BODY
     FORBIDDEN,  // ID_BR
     REQUIRED,   // ID_BUTTON
+    FORBIDDEN,  // ID_CANVAS
     REQUIRED,   // ID_CAPTION
     REQUIRED,   // ID_CENTER
     REQUIRED,   // ID_CITE
@@ -257,32 +259,94 @@ const tagStatus DOM::endTag[] = {
 };
 
 static const ushort tag_list_0[] = {
-    ID_TEXT,    ID_TT,       ID_I,     ID_B,      ID_U,      ID_S,
-    ID_STRIKE,  ID_BIG,      ID_SMALL, ID_EM,     ID_STRONG, ID_DFN,
-    ID_CODE,    ID_SAMP,     ID_KBD,   ID_VAR,    ID_CITE,   ID_ABBR,
-    ID_ACRONYM, ID_A,        ID_IMG,   ID_APPLET, ID_OBJECT, ID_EMBED,
-    ID_FONT,    ID_BASEFONT, ID_BR,    ID_SCRIPT, ID_MAP,    ID_Q,
-    ID_SUB,     ID_SUP,      ID_SPAN,  ID_BDO,    ID_IFRAME, ID_INPUT,
-    ID_SELECT,  ID_TEXTAREA, ID_LABEL, ID_BUTTON, ID_INS,    ID_DEL,
-    ID_COMMENT, ID_NOBR,     ID_WBR,   0};
+    ID_TEXT,    ID_TT,      ID_I,        ID_B,     ID_U,      ID_S,
+    ID_STRIKE,  ID_BIG,     ID_SMALL,    ID_EM,    ID_STRONG, ID_DFN,
+    ID_CODE,    ID_SAMP,    ID_KBD,      ID_VAR,   ID_CITE,   ID_ABBR,
+    ID_ACRONYM, ID_A,       ID_CANVAS,   ID_IMG,   ID_APPLET, ID_OBJECT,
+    ID_EMBED,   ID_FONT,    ID_BASEFONT, ID_BR,    ID_SCRIPT, ID_MAP,
+    ID_Q,       ID_SUB,     ID_SUP,      ID_SPAN,  ID_BDO,    ID_IFRAME,
+    ID_INPUT,   ID_SELECT,  ID_TEXTAREA, ID_LABEL, ID_BUTTON, ID_INS,
+    ID_DEL,     ID_COMMENT, ID_NOBR,     ID_WBR,   0};
 
-static const ushort tag_list_1[] = {
-    ID_TEXT,       ID_P,        ID_H1,      ID_H2,        ID_H3,
-    ID_H4,         ID_H5,       ID_H6,      ID_UL,        ID_OL,
-    ID_DIR,        ID_MENU,     ID_PRE,     ID_PLAINTEXT, ID_DL,
-    ID_DIV,        ID_LAYER,    ID_CENTER,  ID_NOSCRIPT,  ID_NOFRAMES,
-    ID_BLOCKQUOTE, ID_FORM,     ID_ISINDEX, ID_HR,        ID_TABLE,
-    ID_FIELDSET,   ID_ADDRESS,  ID_TT,      ID_I,         ID_B,
-    ID_U,          ID_S,        ID_STRIKE,  ID_BIG,       ID_SMALL,
-    ID_EM,         ID_STRONG,   ID_DFN,     ID_CODE,      ID_SAMP,
-    ID_KBD,        ID_VAR,      ID_CITE,    ID_ABBR,      ID_ACRONYM,
-    ID_A,          ID_IMG,      ID_APPLET,  ID_OBJECT,    ID_EMBED,
-    ID_FONT,       ID_BASEFONT, ID_BR,      ID_SCRIPT,    ID_MAP,
-    ID_Q,          ID_SUB,      ID_SUP,     ID_SPAN,      ID_BDO,
-    ID_IFRAME,     ID_INPUT,    ID_KEYGEN,  ID_SELECT,    ID_TEXTAREA,
-    ID_LABEL,      ID_BUTTON,   ID_COMMENT, ID_LI,        ID_DT,
-    ID_DD,         ID_XMP,      ID_INS,     ID_DEL,       ID_NOBR,
-    ID_WBR,        ID_MARQUEE,  0};
+static const ushort tag_list_1[] = {ID_TEXT,
+                                    ID_P,
+                                    ID_H1,
+                                    ID_H2,
+                                    ID_H3,
+                                    ID_H4,
+                                    ID_H5,
+                                    ID_H6,
+                                    ID_UL,
+                                    ID_OL,
+                                    ID_DIR,
+                                    ID_MENU,
+                                    ID_PRE,
+                                    ID_PLAINTEXT,
+                                    ID_DL,
+                                    ID_DIV,
+                                    ID_LAYER,
+                                    ID_CENTER,
+                                    ID_NOSCRIPT,
+                                    ID_NOFRAMES,
+                                    ID_BLOCKQUOTE,
+                                    ID_FORM,
+                                    ID_ISINDEX,
+                                    ID_HR,
+                                    ID_TABLE,
+                                    ID_FIELDSET,
+                                    ID_ADDRESS,
+                                    ID_TT,
+                                    ID_I,
+                                    ID_B,
+                                    ID_U,
+                                    ID_S,
+                                    ID_STRIKE,
+                                    ID_BIG,
+                                    ID_SMALL,
+                                    ID_EM,
+                                    ID_STRONG,
+                                    ID_DFN,
+                                    ID_CODE,
+                                    ID_SAMP,
+                                    ID_KBD,
+                                    ID_VAR,
+                                    ID_CITE,
+                                    ID_ABBR,
+                                    ID_ACRONYM,
+                                    ID_A,
+                                    ID_CANVAS,
+                                    ID_IMG,
+                                    ID_APPLET,
+                                    ID_OBJECT,
+                                    ID_EMBED,
+                                    ID_FONT,
+                                    ID_BASEFONT,
+                                    ID_BR,
+                                    ID_SCRIPT,
+                                    ID_MAP,
+                                    ID_Q,
+                                    ID_SUB,
+                                    ID_SUP,
+                                    ID_SPAN,
+                                    ID_BDO,
+                                    ID_IFRAME,
+                                    ID_INPUT,
+                                    ID_KEYGEN,
+                                    ID_SELECT,
+                                    ID_TEXTAREA,
+                                    ID_LABEL,
+                                    ID_BUTTON,
+                                    ID_COMMENT,
+                                    ID_LI,
+                                    ID_DT,
+                                    ID_DD,
+                                    ID_XMP,
+                                    ID_INS,
+                                    ID_DEL,
+                                    ID_NOBR,
+                                    ID_WBR,
+                                    ID_MARQUEE,
+                                    0};
 
 static const ushort tag_list_2[] = {ID_COMMENT, 0};
 
@@ -296,21 +360,21 @@ static const ushort tag_list_3[] = {
     ID_MARQUEE,    0};
 
 static const ushort tag_list_4[] = {
-    ID_TEXT,     ID_PARAM,      ID_P,       ID_H1,       ID_H2,
-    ID_H3,       ID_H4,         ID_H5,      ID_H6,       ID_UL,
-    ID_OL,       ID_DIR,        ID_MENU,    ID_PRE,      ID_PLAINTEXT,
-    ID_DL,       ID_DIV,        ID_LAYER,   ID_CENTER,   ID_NOSCRIPT,
-    ID_NOFRAMES, ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX,  ID_HR,
-    ID_TABLE,    ID_FIELDSET,   ID_ADDRESS, ID_TEXT,     ID_TT,
-    ID_I,        ID_B,          ID_U,       ID_S,        ID_STRIKE,
-    ID_BIG,      ID_SMALL,      ID_EM,      ID_STRONG,   ID_DFN,
-    ID_CODE,     ID_SAMP,       ID_KBD,     ID_VAR,      ID_CITE,
-    ID_ABBR,     ID_ACRONYM,    ID_A,       ID_IMG,      ID_APPLET,
-    ID_OBJECT,   ID_EMBED,      ID_FONT,    ID_BASEFONT, ID_BR,
-    ID_SCRIPT,   ID_MAP,        ID_Q,       ID_SUB,      ID_SUP,
-    ID_SPAN,     ID_BDO,        ID_IFRAME,  ID_INPUT,    ID_SELECT,
-    ID_TEXTAREA, ID_LABEL,      ID_BUTTON,  ID_COMMENT,  ID_LI,
-    ID_XMP,      ID_MARQUEE,    0};
+    ID_TEXT,     ID_PARAM,      ID_P,       ID_H1,      ID_H2,
+    ID_H3,       ID_H4,         ID_H5,      ID_H6,      ID_UL,
+    ID_OL,       ID_DIR,        ID_MENU,    ID_PRE,     ID_PLAINTEXT,
+    ID_DL,       ID_DIV,        ID_LAYER,   ID_CENTER,  ID_NOSCRIPT,
+    ID_NOFRAMES, ID_BLOCKQUOTE, ID_FORM,    ID_ISINDEX, ID_HR,
+    ID_TABLE,    ID_FIELDSET,   ID_ADDRESS, ID_TEXT,    ID_TT,
+    ID_I,        ID_B,          ID_U,       ID_S,       ID_STRIKE,
+    ID_BIG,      ID_SMALL,      ID_EM,      ID_STRONG,  ID_DFN,
+    ID_CODE,     ID_SAMP,       ID_KBD,     ID_VAR,     ID_CITE,
+    ID_ABBR,     ID_ACRONYM,    ID_A,       ID_CANVAS,  ID_IMG,
+    ID_APPLET,   ID_OBJECT,     ID_EMBED,   ID_FONT,    ID_BASEFONT,
+    ID_BR,       ID_SCRIPT,     ID_MAP,     ID_Q,       ID_SUB,
+    ID_SUP,      ID_SPAN,       ID_BDO,     ID_IFRAME,  ID_INPUT,
+    ID_SELECT,   ID_TEXTAREA,   ID_LABEL,   ID_BUTTON,  ID_COMMENT,
+    ID_LI,       ID_XMP,        ID_MARQUEE, 0};
 
 static const ushort tag_list_7[] = {ID_TEXT,    ID_OPTGROUP, ID_OPTION,
                                     ID_COMMENT, ID_SCRIPT,   0};
@@ -385,6 +449,7 @@ bool DOM::checkChild(ushort tagID, ushort childID) {
     case ID_BR:
     case ID_AREA:
     case ID_LINK:
+    case ID_CANVAS:
     case ID_IMG:
     case ID_PARAM:
     case ID_HR:
