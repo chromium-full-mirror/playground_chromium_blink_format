@@ -59,7 +59,7 @@ typedef enum {
 } ObjcValueType;
 
 ObjcValue convertValueToObjcValue(KJS::ExecState* exec,
-                                  KJS::Value value,
+                                  const KJS::Value& value,
                                   ObjcValueType type);
 Value convertObjcValueToValue(KJS::ExecState* exec,
                               void* buffer,
