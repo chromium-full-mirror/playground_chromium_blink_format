@@ -1641,12 +1641,20 @@ void KHTMLPart::checkCompleted() {
 
   checkEmitLoadEvent();  // if we didn't do it before
 
-  // check that the view has not been moved by the user
-  if (m_url.encodedHtmlRef().isEmpty() && d->m_view->contentsY() == 0)
-    d->m_view->setContentsPos(d->m_extension->urlArgs().xOffset,
-                              d->m_extension->urlArgs().yOffset);
+#if APPLE_CHANGES
+  if (d->m_view) {
+#endif
 
-  d->m_view->complete();
+    // check that the view has not been moved by the user
+    if (m_url.encodedHtmlRef().isEmpty() && d->m_view->contentsY() == 0)
+      d->m_view->setContentsPos(d->m_extension->urlArgs().xOffset,
+                                d->m_extension->urlArgs().yOffset);
+
+    d->m_view->complete();
+
+#if APPLE_CHANGES
+  }  // if (d->m_view)
+#endif
 
   if (!d->m_redirectURL.isEmpty()) {
     // Do not start redirection for frames here! That action is
