@@ -171,8 +171,11 @@ enum FrameBorderStyle {
                       to:(id<WebDOMNode>)end
                endOffset:(int)endOffset;
 
-- (NSString*)selectedText;
+- (NSString*)selectedString;
+- (NSAttributedString*)selectedAttributedString;
+
 - (void)selectAll;
+- (void)deselectAll;
 
 - (id<WebDOMNode>)selectionStart;
 - (int)selectionStartOffset;

@@ -8,11 +8,11 @@
 
 @protocol WebDocumentView;
 @protocol WebDocumentDragSettings;
-@protocol WebDocumentTextEncoding;
+@protocol WebDocumentText;
 
 @interface WebTextView : WebSearchableTextView<WebDocumentView,
                                                WebDocumentDragSettings,
-                                               WebDocumentTextEncoding> {
+                                               WebDocumentText> {
   BOOL canDragFrom;
   BOOL canDragTo;
 }
