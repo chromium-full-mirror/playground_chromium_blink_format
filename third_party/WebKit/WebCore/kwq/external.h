@@ -90,6 +90,7 @@ class Loader;
 - (void)_setFinalURL:(NSURL*)url;
 - (id<IFLocationChangeHandler>)_locationChangeHandler;
 - (BOOL)_isStopping;
+- (NSArray*)children;
 @end
 
 @interface IFWebView : NSObject
