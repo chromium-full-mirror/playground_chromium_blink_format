@@ -103,6 +103,18 @@ class QPainter : public Qt {
   void setRasterOp(RasterOp);
 
   void drawText(int x, int y, int, int, int alignmentFlags, const QString&);
+  void drawHighlightForText(int x,
+                            int y,
+                            const QChar*,
+                            int length,
+                            int from,
+                            int to,
+                            int toAdd,
+                            const QColor& backgroundColor,
+                            QPainter::TextDirection d,
+                            int letterSpacing,
+                            int wordSpacing,
+                            bool smallCaps);
   void drawText(int x,
                 int y,
                 const QChar*,

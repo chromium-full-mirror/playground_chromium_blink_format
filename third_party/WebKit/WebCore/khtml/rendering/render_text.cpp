@@ -104,9 +104,9 @@ void TextRun::paintSelection(const Font* f,
 
   // kdDebug( 6040 ) << "textRun::painting(" << s.string() << ") at(" << x+_tx
   // << "/" << y+_ty << ")" << endl;
-  f->drawText(p, m_x + tx, m_y + ty, text->str->s, text->str->l, m_start, m_len,
-              m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR, startPos,
-              endPos, c);
+  f->drawHighlightForText(
+      p, m_x + tx, m_y + ty, text->str->s, text->str->l, m_start, m_len,
+      m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR, startPos, endPos, c);
   p->restore();
 }
 
