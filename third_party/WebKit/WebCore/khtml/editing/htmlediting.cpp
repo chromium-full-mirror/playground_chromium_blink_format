@@ -3422,14 +3422,6 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
   if (!topBlockquote || !topBlockquote->parentNode())
     return;
 
-  // Build up list of ancestors in between the start node and the top
-  // blockquote.
-  if (startNode != topBlockquote) {
-    for (NodeImpl* n = startNode->parentNode(); n && n != topBlockquote;
-         n = n->parentNode())
-      ancestors.prepend(n);
-  }
-
   // Insert a break after the top blockquote.
   m_breakNode = createBreakElement(document());
   m_breakNode->ref();
@@ -3437,6 +3429,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
 
   if (!isLastVisiblePositionInNode(VisiblePosition(pos, affinity),
                                    topBlockquote)) {
+    NodeImpl* newStartNode = 0;
     // Split at pos if in the middle of a text node.
     if (startNode->isTextNode()) {
       TextImpl* textNode = static_cast<TextImpl*>(startNode);
@@ -3445,12 +3438,31 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
         splitTextNode(textNode, pos.offset());
         pos = Position(startNode, 0);
       } else if (atEnd) {
-        startNode = startNode->traverseNextNode();
-        ASSERT(startNode);
+        newStartNode = startNode->traverseNextNode();
+        ASSERT(newStartNode);
       }
     } else if (pos.offset() > 0) {
-      startNode = startNode->traverseNextNode();
-      ASSERT(startNode);
+      newStartNode = startNode->traverseNextNode();
+      ASSERT(newStartNode);
+    }
+
+    // If a new start node was determined, find a new top block quote.
+    if (newStartNode) {
+      startNode = newStartNode;
+      for (NodeImpl* n = startNode->parentNode(); n; n = n->parentNode()) {
+        if (isMailBlockquote(n))
+          topBlockquote = n;
+      }
+      if (!topBlockquote || !topBlockquote->parentNode())
+        return;
+    }
+
+    // Build up list of ancestors in between the start node and the top
+    // blockquote.
+    if (startNode != topBlockquote) {
+      for (NodeImpl* n = startNode->parentNode(); n && n != topBlockquote;
+           n = n->parentNode())
+        ancestors.prepend(n);
     }
 
     // Insert a clone of the top blockquote after the break.
@@ -3488,7 +3500,8 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
     // Move everything after the start node.
     NodeImpl* leftParent = ancestors.last();
 
-    if (!startIsBR) {
+    // Insert an extra new line when the start is at the beginning of a line.
+    if (!newStartNode && !startIsBR) {
       if (!leftParent)
         leftParent = topBlockquote;
       ElementImpl* b = createBreakElement(document());
