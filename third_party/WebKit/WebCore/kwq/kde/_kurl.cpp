@@ -1238,7 +1238,12 @@ QString KURL::htmlRef() const {
   }
 
   List lst = split(*this);
+#ifdef _KWQ_
+  QString s((*lst.begin()).ref());
+  return decode(s);
+#else
   return decode((*lst.begin()).ref());
+#endif
 }
 
 QString KURL::encodedHtmlRef() const {
