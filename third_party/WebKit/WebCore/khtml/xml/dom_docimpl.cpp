@@ -37,6 +37,7 @@
 #include "css/csshelper.h"
 #include "css/cssstyleselector.h"
 #include "css/css_stylesheetimpl.h"
+#include "css/css_valueimpl.h"
 #include "misc/htmlhashes.h"
 #include "misc/helper.h"
 #include "ecma/kjs_proxy.h"
@@ -463,6 +464,12 @@ EntityReferenceImpl* DocumentImpl::createEntityReference(
 
 EditingTextImpl* DocumentImpl::createEditingTextNode(const DOMString& text) {
   return new EditingTextImpl(docPtr(), text);
+}
+
+CSSStyleDeclarationImpl* DocumentImpl::createCSSStyleDeclaration() {
+  QPtrList<CSSProperty>* propList = new QPtrList<CSSProperty>;
+  propList->setAutoDelete(true);
+  return new CSSStyleDeclarationImpl(0, propList);
 }
 
 NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,

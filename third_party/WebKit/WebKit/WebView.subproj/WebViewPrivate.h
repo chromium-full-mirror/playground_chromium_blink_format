@@ -369,6 +369,8 @@ typedef enum {
 - (NSUndoManager*)undoManager;
 - (void)setEditingDelegate:(id)delegate;
 - (id)editingDelegate;
+- (DOMDocument*)DOMDocument;
+- (DOMCSSStyleDeclaration*)styleDeclarationWithText:(NSString*)text;
 @end
 
 @interface WebView (WebViewUndoableEditing)

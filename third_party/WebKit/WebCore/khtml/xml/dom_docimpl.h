@@ -273,6 +273,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
                                    bool entityReferenceExpansion);
 
   // Special support for editing
+  CSSStyleDeclarationImpl* createCSSStyleDeclaration();
   EditingTextImpl* createEditingTextNode(const DOMString& text);
 
   virtual void recalcStyle(StyleChange = NoChange);

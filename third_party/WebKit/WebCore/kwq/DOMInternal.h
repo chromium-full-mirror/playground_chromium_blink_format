@@ -67,6 +67,7 @@ class StyleSheetListImpl;
 @interface DOMCSSStyleDeclaration (WebCoreInternal)
 + (DOMCSSStyleDeclaration*)_styleDeclarationWithImpl:
     (DOM::CSSStyleDeclarationImpl*)impl;
+- (DOM::CSSStyleDeclarationImpl*)_styleDeclarationImpl;
 @end
 
 @interface DOMStyleSheetList (WebCoreInternal)
