@@ -35,6 +35,8 @@
 
   NSString* controllerSetName;
   NSString* topLevelFrameName;
+
+  BOOL lastElementWasNonNil;
 }
 @end
 
@@ -68,4 +70,8 @@
                                      behind:(BOOL)behind;
 
 - (NSMenu*)_menuForElement:(NSDictionary*)element;
+
+- (void)_mouseDidMoveOverElement:(NSDictionary*)dictionary
+                   modifierFlags:(unsigned)modifierFlags;
+
 @end
