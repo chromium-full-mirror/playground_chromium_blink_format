@@ -371,8 +371,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void didFirstLayout();
 
-  void dashboardRegionsChanged(
-      const QValueList<khtml::DashboardRegionValue>& regions);
+  NSMutableDictionary* dashboardRegionsDictionary();
+  void dashboardRegionsChanged();
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);

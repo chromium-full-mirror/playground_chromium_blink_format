@@ -272,7 +272,8 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       m_secureForms(0),
       m_decoder(0),
       m_createRenderers(true),
-      m_hasDashboardRegions(false)
+      m_hasDashboardRegions(false),
+      m_dashboardRegionsDirty(false)
 #endif
 {
   document->doc = this;
@@ -2368,6 +2369,7 @@ const QValueList<DashboardRegionValue>& DocumentImpl::dashboardRegions() const {
 void DocumentImpl::setDashboardRegions(
     const QValueList<DashboardRegionValue>& regions) {
   m_dashboardRegions = regions;
+  setDashboardRegionsDirty(false);
 }
 
 #endif

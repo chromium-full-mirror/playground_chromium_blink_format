@@ -1577,9 +1577,11 @@ bool CSSParser::parseContent(int propId, bool important) {
 }
 
 #define DASHBOARD_REGION_NUM_PARAMETERS 6
+#define DASHBOARD_REGION_SHORT_NUM_PARAMETERS 2
 
 static Value* skipCommaInDashboardRegion(ValueList* args) {
-  if (args->numValues == (DASHBOARD_REGION_NUM_PARAMETERS * 2 - 1)) {
+  if (args->numValues == (DASHBOARD_REGION_NUM_PARAMETERS * 2 - 1) ||
+      args->numValues == (DASHBOARD_REGION_SHORT_NUM_PARAMETERS * 2 - 1)) {
     Value* current = args->current();
     if (current->unit == Value::Operator && current->iValue == ',')
       return args->next();
@@ -1609,14 +1611,19 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
     }
 
     // Commas count as values, so allow:
-    // dashbaord-region( label, type, t, r, b, l ) or dashbaord-region( label
-    // type t r b l )
-    // dashbaord-region( label, type, t, r, b, l ) or dashbaord-region( label
-    // type t r b l )
+    // dashbaord-region(label, type, t, r, b, l) or dashbaord-region(label type
+    // t r b l)
+    // dashbaord-region(label, type, t, r, b, l) or dashbaord-region(label type
+    // t r b l)
+    // also allow
+    // dashbaord-region(label, type) or dashbaord-region(label type)
+    // dashbaord-region(label, type) or dashbaord-region(label type)
     ValueList* args = value->function->args;
     int numArgs = value->function->args->numValues;
-    if (numArgs != DASHBOARD_REGION_NUM_PARAMETERS &&
-        numArgs != (DASHBOARD_REGION_NUM_PARAMETERS * 2 - 1)) {
+    if ((numArgs != DASHBOARD_REGION_NUM_PARAMETERS &&
+         numArgs != (DASHBOARD_REGION_NUM_PARAMETERS * 2 - 1)) &&
+        (numArgs != DASHBOARD_REGION_SHORT_NUM_PARAMETERS &&
+         numArgs != (DASHBOARD_REGION_SHORT_NUM_PARAMETERS * 2 - 1))) {
       valid = false;
       break;
     }
@@ -1656,30 +1663,44 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 
     region->m_geometryType = qString(arg->string);
 
-    // Next four arguments must be offset numbers
-    int i;
-    for (i = 0; i < 4; i++) {
-      arg = args->next();
-      arg = skipCommaInDashboardRegion(args);
-
-      valid = arg->id == CSS_VAL_AUTO || validUnit(arg, FLength, strict);
-      if (!valid)
-        break;
-
+    if (numArgs == DASHBOARD_REGION_SHORT_NUM_PARAMETERS ||
+        numArgs == (DASHBOARD_REGION_SHORT_NUM_PARAMETERS * 2 - 1)) {
       CSSPrimitiveValueImpl* amount =
           arg->id == CSS_VAL_AUTO
               ? new CSSPrimitiveValueImpl(CSS_VAL_AUTO)
               : new CSSPrimitiveValueImpl(
-                    arg->fValue, (CSSPrimitiveValue::UnitTypes)arg->unit);
+                    (double)0, (CSSPrimitiveValue::UnitTypes)arg->unit);
 
-      if (i == 0)
-        region->setTop(amount);
-      else if (i == 1)
-        region->setRight(amount);
-      else if (i == 2)
-        region->setBottom(amount);
-      else
-        region->setLeft(amount);
+      region->setTop(amount);
+      region->setRight(amount);
+      region->setBottom(amount);
+      region->setLeft(amount);
+    } else {
+      // Next four arguments must be offset numbers
+      int i;
+      for (i = 0; i < 4; i++) {
+        arg = args->next();
+        arg = skipCommaInDashboardRegion(args);
+
+        valid = arg->id == CSS_VAL_AUTO || validUnit(arg, FLength, strict);
+        if (!valid)
+          break;
+
+        CSSPrimitiveValueImpl* amount =
+            arg->id == CSS_VAL_AUTO
+                ? new CSSPrimitiveValueImpl(CSS_VAL_AUTO)
+                : new CSSPrimitiveValueImpl(
+                      arg->fValue, (CSSPrimitiveValue::UnitTypes)arg->unit);
+
+        if (i == 0)
+          region->setTop(amount);
+        else if (i == 1)
+          region->setRight(amount);
+        else if (i == 2)
+          region->setBottom(amount);
+        else
+          region->setLeft(amount);
+      }
     }
 
     value = valueList->next();

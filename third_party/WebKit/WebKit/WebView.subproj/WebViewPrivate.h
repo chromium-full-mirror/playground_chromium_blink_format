@@ -243,6 +243,9 @@ backforward list.
       withPasteboardTypes:(NSArray*)types
              toPasteboard:(NSPasteboard*)pasteboard;
 
+- (void)_addScrollerDashboardRegions:(NSMutableDictionary*)regions;
+- (NSDictionary*)_dashboardRegions;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
