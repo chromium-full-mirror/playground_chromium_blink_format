@@ -331,21 +331,15 @@ typedef enum {
                                                (NSString*)baseURLString;
 - (DOMDocumentFragment*)documentFragmentWithText:(NSString*)text;
 
-// smartReplace insures that there is at least one space before or after the
-// replacement
 - (void)replaceSelectionWithFragment:(DOMDocumentFragment*)fragment
-                   selectReplacement:(BOOL)selectReplacement
-                        smartReplace:(BOOL)smartReplace;
+                   selectReplacement:(BOOL)selectReplacement;
 - (void)replaceSelectionWithNode:(DOMNode*)node
-               selectReplacement:(BOOL)selectReplacement
-                    smartReplace:(BOOL)smartReplace;
+               selectReplacement:(BOOL)selectReplacement;
 - (void)replaceSelectionWithMarkupString:(NSString*)markupString
                            baseURLString:(NSString*)baseURLString
-                       selectReplacement:(BOOL)selectReplacement
-                            smartReplace:(BOOL)smartReplace;
+                       selectReplacement:(BOOL)selectReplacement;
 - (void)replaceSelectionWithText:(NSString*)text
-               selectReplacement:(BOOL)selectReplacement
-                    smartReplace:(BOOL)smartReplace;
+               selectReplacement:(BOOL)selectReplacement;
 
 - (void)insertText:(NSString*)text selectInsertedText:(BOOL)selectInsertedText;
 - (void)insertNewline;
