@@ -11,6 +11,7 @@
 @class WebImageRenderer;
 
 @interface WebImageData : NSObject<NSCopying> {
+  size_t imagesSize;
   CGImageRef* images;
   CGImageSourceRef imageSource;
 
@@ -19,8 +20,11 @@
 
   CFMutableDictionaryRef animatingRenderers;
   NSTimer* frameTimer;
+
+  size_t frameDurationsSize;
   float* frameDurations;
 
+  size_t imagePropertiesSize;
   CFDictionaryRef* imageProperties;
 
   size_t currentFrame;
