@@ -44,6 +44,9 @@ class RenderBR : public RenderText {
 
   virtual void paint(PaintInfo& i, int tx, int ty);
 
+  // FIXME: This is just temporary.
+  virtual QRect selectionRect();
+
   virtual void position(InlineBox* box, int from, int len, bool reverse);
   virtual unsigned int width(unsigned int, unsigned int, const Font*) const {
     return 0;

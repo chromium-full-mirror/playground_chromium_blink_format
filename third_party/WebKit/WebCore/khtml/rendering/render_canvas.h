@@ -58,8 +58,8 @@ class RenderCanvas : public RenderBlock {
   virtual void paint(PaintInfo& i, int tx, int ty);
   virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
 
-  virtual void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
-  virtual void clearSelection(bool doRepaint = true);
+  void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
+  void clearSelection();
   virtual RenderObject* selectionStart() const { return m_selectionStart; }
   virtual RenderObject* selectionEnd() const { return m_selectionEnd; }
 
@@ -104,9 +104,9 @@ class RenderCanvas : public RenderBlock {
 
   virtual QRect viewRect() const;
 
- protected:
   virtual void selectionStartEnd(int& spos, int& epos);
 
+ protected:
   KHTMLView* m_view;
 
   RenderObject* m_selectionStart;

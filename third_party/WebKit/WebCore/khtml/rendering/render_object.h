@@ -203,7 +203,6 @@ class RenderObject : public CachedObjectClient {
   void setParent(RenderObject* parent) { m_parent = parent; }
   //////////////////////////////////////////
 
-  QRect absoluteBoundingBoxRect();
   void addAbsoluteRectForLayer(QRect& result);
 
  public:
@@ -708,6 +707,7 @@ class RenderObject : public CachedObjectClient {
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
   virtual void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
+  QRect absoluteBoundingBoxRect();
 
   // the rect that will be painted if this object is passed as the paintingRoot
   QRect paintingRootRect(QRect& topLevelRect);
@@ -816,7 +816,28 @@ class RenderObject : public CachedObjectClient {
 
   virtual SelectionState selectionState() const { return SelectionNone; }
   virtual void setSelectionState(SelectionState) {}
+  virtual QRect selectionRect() { return QRect(0, 0, 0, 0); }
   bool shouldSelect() const;
+
+  struct SelectionInfo {
+    RenderObject* m_object;
+    QRect m_rect;
+    RenderObject::SelectionState m_state;
+
+    RenderObject* object() const { return m_object; }
+    QRect rect() const { return m_rect; }
+    SelectionState state() const { return m_state; }
+
+    SelectionInfo() {
+      m_object = 0;
+      m_rect = QRect(0, 0, 0, 0);
+      m_state = RenderObject::SelectionNone;
+    }
+    SelectionInfo(RenderObject* o)
+        : m_object(o),
+          m_rect(o->selectionRect()),
+          m_state(o->selectionState()) {}
+  };
 
   DOM::NodeImpl* draggableNode(bool dhtmlOK,
                                bool uaOK,
@@ -877,9 +898,9 @@ class RenderObject : public CachedObjectClient {
 
   virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
 
- protected:
   virtual void selectionStartEnd(int& spos, int& epos);
 
+ protected:
   virtual void printBoxDecorations(QPainter* /*p*/,
                                    int /*_x*/,
                                    int /*_y*/,

@@ -76,6 +76,14 @@ class InlineTextBox : public InlineRunBox {
 
   void detach(RenderArena* arena);
 
+  QRect selectionRect(int absx,
+                      int absy,
+                      int startPos,
+                      int endPos,
+                      bool computeLeftRightEdges = true);
+
+  RenderText* textObject();
+
   virtual void deleteLine(RenderArena* arena);
   virtual void extractLine();
   virtual void attachLine();
@@ -258,6 +266,7 @@ class RenderText : public RenderObject {
 
   virtual SelectionState selectionState() const { return m_selectionState; }
   virtual void setSelectionState(SelectionState s) { m_selectionState = s; }
+  virtual QRect selectionRect();
   virtual QRect caretRect(int offset, bool override);
   void posOfChar(int ch, int& x, int& y);
 
