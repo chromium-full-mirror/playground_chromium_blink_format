@@ -111,7 +111,8 @@ class QPainter : public Qt {
   void drawUnderlineForText(int x, int y, const QChar*, int length);
   static QColor selectedTextBackgroundColor();
 
-  void setPaintingDisabled(bool f);
+  bool paintingDisabled() const;
+  void setPaintingDisabled(bool);
 
  private:
   // no copying or assignment

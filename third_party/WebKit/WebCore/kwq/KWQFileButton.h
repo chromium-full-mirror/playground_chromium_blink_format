@@ -51,7 +51,7 @@ class KWQFileButton : public QPushButton {
 
  private:
   virtual void clicked();
-  virtual void paint();
+  virtual void paint(QPainter*, const QRect&);
 
   KWQSignal _textChanged;
   QString _filename;
