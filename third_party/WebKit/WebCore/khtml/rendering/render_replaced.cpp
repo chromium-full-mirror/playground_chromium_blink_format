@@ -69,7 +69,7 @@ void RenderReplaced::print(QPainter* p,
 
   // overflow: hidden
   bool clipped = false;
-  if (style()->overflow() == OHIDDEN || style()->jsClipMode()) {
+  if (style()->overflow() == OHIDDEN) {
     calcClip(p, _tx, _ty);
     clipped = true;
   }

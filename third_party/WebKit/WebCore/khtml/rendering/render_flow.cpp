@@ -158,7 +158,8 @@ void RenderFlow::printObject(QPainter* p,
 
   bool clipped = false;
   // overflow: hidden
-  if (style()->overflow() == OHIDDEN || style()->jsClipMode()) {
+  if (style()->overflow() == OHIDDEN ||
+      (isPositioned() && style()->hasClip())) {
     calcClip(p, _tx, _ty);
     clipped = true;
   }

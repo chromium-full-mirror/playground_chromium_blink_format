@@ -1174,7 +1174,6 @@ bool StyleBaseImpl::parseValue(const QChar* curP,
         // close-quote | no-open-quote | no-close-quote ]+ | inherit
         { parsedValue = parseContent(curP, endP); }
 
-      case CSS_PROP__KONQ_JS_CLIP:
       case CSS_PROP_CLIP:  // <shape> | auto | inherit
       {
         int i;

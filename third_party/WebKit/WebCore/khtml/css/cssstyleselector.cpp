@@ -2549,7 +2549,6 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
     }
 
     // rect
-    case CSS_PROP__KONQ_JS_CLIP:
     case CSS_PROP_CLIP: {
       Length top;
       Length right;
@@ -2580,10 +2579,8 @@ void CSSStyleSelector::applyRule(DOM::CSSProperty* prop) {
       // 	qDebug("setting clip bottom to %d", bottom.value );
       // 	qDebug("setting clip left to %d", left.value );
       style->setClip(top, right, bottom, left);
+      style->setHasClip();
 
-      style->setJsClipMode(
-          (!strictParsing && prop->m_id == CSS_PROP__KONQ_JS_CLIP) ? true
-                                                                   : false);
       // rect, ident
       break;
     }
