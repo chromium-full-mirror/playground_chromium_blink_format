@@ -626,6 +626,8 @@ enum ENBSPMode { NBNORMAL, SPACE };
 
 enum EKHTMLLineBreak { LBNORMAL, AFTER_WHITE_SPACE };
 
+enum EMatchNearestMailBlockquoteColor { BCNORMAL, MATCH };
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -660,6 +662,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
                                // truncated with "..."
   EMarginCollapse marginTopCollapse : 2;
   EMarginCollapse marginBottomCollapse : 2;
+  EMatchNearestMailBlockquoteColor matchNearestMailBlockquoteColor : 1;
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1384,6 +1387,9 @@ class RenderStyle {
   EKHTMLLineBreak khtmlLineBreak() const {
     return css3InheritedData->khtmlLineBreak;
   }
+  EMatchNearestMailBlockquoteColor matchNearestMailBlockquoteColor() const {
+    return css3NonInheritedData->matchNearestMailBlockquoteColor;
+  }
 // End CSS3 Getters
 
 #if APPLE_CHANGES
@@ -1701,6 +1707,9 @@ class RenderStyle {
   void setKHTMLLineBreak(EKHTMLLineBreak b) {
     SET_VAR(css3InheritedData, khtmlLineBreak, b);
   }
+  void setMatchNearestMailBlockquoteColor(EMatchNearestMailBlockquoteColor c) {
+    SET_VAR(css3NonInheritedData, matchNearestMailBlockquoteColor, c);
+  }
 // End CSS3 Setters
 
 #if APPLE_CHANGES
@@ -1832,6 +1841,10 @@ class RenderStyle {
   static EWordWrap initialWordWrap() { return WBNORMAL; }
   static ENBSPMode initialNBSPMode() { return NBNORMAL; }
   static EKHTMLLineBreak initialKHTMLLineBreak() { return LBNORMAL; }
+  static EMatchNearestMailBlockquoteColor
+  initialMatchNearestMailBlockquoteColor() {
+    return BCNORMAL;
+  }
 
 #if APPLE_CHANGES
   // Keep these at the end.
