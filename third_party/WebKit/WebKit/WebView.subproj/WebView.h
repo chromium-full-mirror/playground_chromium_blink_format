@@ -17,7 +17,7 @@
 @class WebFrame;
 @class WebResource;
 @class WebPreferences;
-@class WebView;
+@class WebFrameView;
 
 @interface WebContentTypes : NSObject
 /*!
@@ -71,8 +71,8 @@ extern NSString*
 
 /*!
     @class WebController
-    WebController manages the interaction between WebViews and WebDataSources.
-   Modification
+    WebController manages the interaction between WebFrameViews and
+   WebDataSources.  Modification
     of the policies and behavior of the WebKit is largely managed by
    WebControllers and their
     delegates.
@@ -84,7 +84,7 @@ extern NSString*
     WebController *webController;
     WebFrame *mainFrame;
 
-    webController  = [[WebController alloc] initWithView: webView];
+    webController  = [[WebController alloc] initWithView: webFrameView];
     mainFrame = [webController mainFrame];
     [mainFrame loadRequest:request];
     </pre>
@@ -115,7 +115,7 @@ extern NSString*
    how
     content should be handled, based on the resource's URL and MIME type.
 */
-@interface WebController : NSObject {
+@interface WebController : NSView {
  @private
   WebControllerPrivate* _private;
 }
@@ -123,10 +123,10 @@ extern NSString*
 /*!
     @method initWithView:
     @abstract This method is a convenience equivalent to initWithView:view
-   frameName:nil setName:nil
+   frameName:nil groupName:nil
     @param view The view to use.
 */
-- initWithView:(WebView*)view;
+- initWithView:(WebFrameView*)view;
 
 /*!
     @method initWithView:frameName:setName:
@@ -140,13 +140,13 @@ extern NSString*
     way that still ends up creating a new WebController.
     @param view The main view to be associated with the controller.  May be nil.
     @param frameName The name to use for the top level frame. May be nil.
-    @param setName The name of the controller set to which this controller will
-   be added.  May be nil.
+    @param groupName The name of the controller set to which this controller
+   will be added.  May be nil.
     @result Returns an initialized WebController.
 */
-- initWithView:(WebView*)view
+- initWithView:(WebFrameView*)view
        frameName:(NSString*)frameName
-         setName:(NSString*)name;
+       groupName:(NSString*)name;
 
 /*!
     @method setWindowOperationsDelegate:
@@ -387,4 +387,11 @@ extern NSString*
 */
 - (WebPreferences*)preferences;
 
+@end
+
+@interface WebController (WebIBActions)
+- (IBAction)stopLoading:(id)sender;
+- (IBAction)goBack:(id)sender;
+- (IBAction)goForward:(id)sender;
+- (IBAction)takeStringURLFrom:(id)sender;
 @end

@@ -5,7 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class WebView;
+@class WebFrameView;
 
 @interface WebDebugDOMNode : NSObject {
   NSArray* children;
@@ -14,7 +14,7 @@
   NSString* source;
 }
 
-- initWithWebView:(WebView*)view;
+- initWithWebFrameView:(WebFrameView*)view;
 
 - (NSArray*)children;
 - (NSString*)name;
