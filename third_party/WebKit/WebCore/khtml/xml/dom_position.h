@@ -31,6 +31,12 @@ namespace DOM {
 class ElementImpl;
 class NodeImpl;
 
+// These match the AppKit values for these concepts.
+// From NSTextView.h:
+// NSSelectionAffinityUpstream = 0
+// NSSelectionAffinityDownstream = 1
+enum EAffinity { UPSTREAM = 0, DOWNSTREAM = 1 };
+
 class Position {
  public:
   Position() : m_node(0), m_offset(0){};
@@ -61,6 +67,7 @@ class Position {
   Position equivalentDownstreamPosition() const;
   Position equivalentRangeCompliantPosition() const;
   Position equivalentShallowPosition() const;
+  Position closestRenderedPosition(EAffinity) const;
   bool atStartOfContainingEditableBlock() const;
   bool atStartOfRootEditableElement() const;
   bool inRenderedContent() const;

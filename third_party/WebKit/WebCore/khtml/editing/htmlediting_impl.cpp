@@ -2412,7 +2412,12 @@ void TypingCommandImpl::issueCommandForDeleteKey() {
       // we're at the start of a root editable block...do nothing
       return;
     }
-    selectionToDelete = Selection(pos.previousCharacterPosition(), pos);
+    if (pos.inRenderedContent())
+      selectionToDelete = Selection(pos.previousCharacterPosition(), pos);
+    else
+      selectionToDelete = Selection(
+          pos.equivalentUpstreamPosition().previousCharacterPosition(),
+          pos.equivalentDownstreamPosition());
   }
   deleteSelection(selectionToDelete);
   typingAddedToOpenCommand();

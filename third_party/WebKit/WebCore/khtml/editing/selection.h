@@ -49,12 +49,6 @@ class Selection {
   enum EDirection { FORWARD, BACKWARD, RIGHT, LEFT };
   enum ETextGranularity { CHARACTER, WORD, LINE, PARAGRAPH };
 
-  // These match the AppKit values for these concepts.
-  // From NSTextView.h:
-  // NSSelectionAffinityUpstream = 0
-  // NSSelectionAffinityDownstream = 1
-  enum EAffinity { UPSTREAM = 0, DOWNSTREAM = 1 };
-
   Selection();
   Selection(const Range&);
   Selection(const Position&);
@@ -86,6 +80,7 @@ class Selection {
   Position extent() const { return m_extent; }
   Position start() const { return m_start; }
   Position end() const { return m_end; }
+  Position caretPosition() const { return m_caretPosition; }
 
   QRect getRepaintRect() const;
   void setNeedsLayout(bool flag = true);
@@ -135,6 +130,11 @@ class Selection {
     m_end = end;
   }
 
+  Position modifyExtendingRightForward(ETextGranularity);
+  Position modifyMovingRightForward(ETextGranularity);
+  Position modifyExtendingLeftBackward(ETextGranularity);
+  Position modifyMovingLeftBackward(ETextGranularity);
+
   void layoutCaret();
   void needsCaretRepaint();
   void paintCaret(QPainter* p, const QRect& rect);
@@ -150,9 +150,10 @@ class Selection {
   EState m_state;        // the state of the selection
   EAffinity m_affinity;  // the upstream/downstream affinity of the selection
 
-  int m_caretX;  // caret coordinates and size
+  int m_caretX;  // caret coordinates, size, and position
   int m_caretY;
   int m_caretSize;
+  Position m_caretPosition;
 
   bool m_baseIsStart : 1;       // true if base node is before the extent node
   bool m_needsCaretLayout : 1;  // true if the caret position needs to be

@@ -229,6 +229,7 @@ Position Position::previousCharacterPosition() const {
   PositionIterator it(*this);
 
   bool atStartOfLine = isFirstRenderedPositionOnLine();
+  bool rendered = inRenderedContent();
 
   while (!it.atStart()) {
     Position pos = it.previous();
@@ -236,7 +237,7 @@ Position Position::previousCharacterPosition() const {
     if (pos.node()->rootEditableElement() != fromRootEditableElement)
       return *this;
 
-    if (atStartOfLine) {
+    if (atStartOfLine || !rendered) {
       if (pos.inRenderedContent())
         return pos;
     } else if (rendersInDifferentPosition(pos))
@@ -254,6 +255,7 @@ Position Position::nextCharacterPosition() const {
   PositionIterator it(*this);
 
   bool atEndOfLine = isLastRenderedPositionOnLine();
+  bool rendered = inRenderedContent();
 
   while (!it.atEnd()) {
     Position pos = it.next();
@@ -261,7 +263,7 @@ Position Position::nextCharacterPosition() const {
     if (pos.node()->rootEditableElement() != fromRootEditableElement)
       return *this;
 
-    if (atEndOfLine) {
+    if (atEndOfLine || !rendered) {
       if (pos.inRenderedContent())
         return pos;
     } else if (rendersInDifferentPosition(pos))
@@ -546,6 +548,43 @@ Position Position::equivalentShallowPosition() const {
          pos.node() == pos.node()->parentNode()->firstChild())
     pos = Position(pos.node()->parentNode(), 0);
   return pos;
+}
+
+Position Position::closestRenderedPosition(EAffinity affinity) const {
+  if (inRenderedContent())
+    return *this;
+
+  Position pos;
+
+  pos = affinity == UPSTREAM ? equivalentUpstreamPosition()
+                             : equivalentDownstreamPosition();
+  if (pos.inRenderedContent())
+    return pos;
+
+  pos = affinity == DOWNSTREAM ? equivalentDownstreamPosition()
+                               : equivalentUpstreamPosition();
+  if (pos.inRenderedContent())
+    return pos;
+
+  pos = *this;
+  Position prev(previousCharacterPosition());
+  while (prev != pos && prev.node()->inSameContainingBlockFlowElement(node())) {
+    if (prev.inRenderedContent())
+      return prev;
+    pos = prev;
+    prev = pos.previousCharacterPosition();
+  }
+
+  pos = *this;
+  Position next(nextCharacterPosition());
+  while (next != pos && next.node()->inSameContainingBlockFlowElement(node())) {
+    if (next.inRenderedContent())
+      return next;
+    pos = next;
+    next = pos.nextCharacterPosition();
+  }
+
+  return Position();
 }
 
 bool Position::atStartOfContainingEditableBlock() const {
