@@ -3096,7 +3096,7 @@ void RemoveNodePreservingChildrenCommand::doApply() {
 
 ReplacementFragment::ReplacementFragment(DocumentFragmentImpl* fragment)
     : m_fragment(fragment),
-      m_hasInterchangeNewlineComment(false),
+      m_hasInterchangeNewline(false),
       m_hasMoreThanOneBlock(false) {
   if (!m_fragment) {
     m_type = EmptyFragment;
@@ -3122,12 +3122,12 @@ ReplacementFragment::ReplacementFragment(DocumentFragmentImpl* fragment)
 
   NodeImpl* node = firstChild;
   int realBlockCount = 0;
-  NodeImpl* commentToDelete = 0;
+  NodeImpl* nodeToDelete = 0;
   while (node) {
     NodeImpl* next = node->traverseNextNode();
-    if (isInterchangeNewlineComment(node)) {
-      m_hasInterchangeNewlineComment = true;
-      commentToDelete = node;
+    if (isInterchangeNewlineNode(node)) {
+      m_hasInterchangeNewline = true;
+      nodeToDelete = node;
     } else if (isInterchangeConvertedSpaceSpan(node)) {
       NodeImpl* n = 0;
       while ((n = node->firstChild())) {
@@ -3144,8 +3144,8 @@ ReplacementFragment::ReplacementFragment(DocumentFragmentImpl* fragment)
     node = next;
   }
 
-  if (commentToDelete)
-    removeNode(commentToDelete);
+  if (nodeToDelete)
+    removeNode(nodeToDelete);
 
   int blockCount = realBlockCount;
   firstChild = m_fragment->firstChild();
@@ -3222,16 +3222,19 @@ void ReplacementFragment::pruneEmptyNodes() {
   }
 }
 
-bool ReplacementFragment::isInterchangeNewlineComment(const NodeImpl* node) {
-  return isComment(node) && node->nodeValue() == AppleInterchangeNewline;
+bool ReplacementFragment::isInterchangeNewlineNode(const NodeImpl* node) {
+  static DOMString interchangeNewlineClassString(AppleInterchangeNewline);
+  return node && node->id() == ID_BR &&
+         static_cast<const ElementImpl*>(node)->getAttribute(ATTR_CLASS) ==
+             interchangeNewlineClassString;
 }
 
 bool ReplacementFragment::isInterchangeConvertedSpaceSpan(
     const NodeImpl* node) {
-  static DOMString convertedSpaceSpanClass(AppleConvertedSpace);
+  static DOMString convertedSpaceSpanClassString(AppleConvertedSpace);
   return node->isHTMLElement() &&
          static_cast<const HTMLElementImpl*>(node)->getAttribute(ATTR_CLASS) ==
-             convertedSpaceSpanClass;
+             convertedSpaceSpanClassString;
 }
 
 void ReplacementFragment::removeNode(NodeImpl* node) {
@@ -3258,10 +3261,6 @@ void ReplacementFragment::insertNodeBefore(NodeImpl* node, NodeImpl* refNode) {
   int exceptionCode = 0;
   parent->insertBefore(node, refNode, exceptionCode);
   ASSERT(exceptionCode == 0);
-}
-
-bool isComment(const NodeImpl* node) {
-  return node && node->nodeType() == Node::COMMENT_NODE;
 }
 
 bool isProbablyBlock(const NodeImpl* node) {
@@ -3317,10 +3316,10 @@ void ReplaceSelectionCommand::doApply() {
   NodeImpl* endBlock = selection.end().node()->enclosingBlockFlowElement();
 
   bool mergeStart =
-      !(startAtStartOfLine && (m_fragment.hasInterchangeNewlineComment() ||
+      !(startAtStartOfLine && (m_fragment.hasInterchangeNewline() ||
                                m_fragment.hasMoreThanOneBlock()));
-  bool mergeEnd = !m_fragment.hasInterchangeNewlineComment() &&
-                  m_fragment.hasMoreThanOneBlock();
+  bool mergeEnd =
+      !m_fragment.hasInterchangeNewline() && m_fragment.hasMoreThanOneBlock();
   Position startPos =
       Position(selection.start().node()->enclosingBlockFlowElement(), 0);
   Position endPos;
@@ -3328,7 +3327,7 @@ void ReplaceSelectionCommand::doApply() {
 
   // Delete the current selection, or collapse whitespace, as needed
   if (selection.isRange()) {
-    deleteSelection(false, !(m_fragment.hasInterchangeNewlineComment() ||
+    deleteSelection(false, !(m_fragment.hasInterchangeNewline() ||
                              m_fragment.hasMoreThanOneBlock()));
   } else if (selection.isCaret() && mergeEnd && !startAtBlockBoundary) {
     // The start and the end need to wind up in separate blocks.
@@ -3525,7 +3524,7 @@ void ReplaceSelectionCommand::doApply() {
   }
 
   // Handle trailing newline
-  if (m_fragment.hasInterchangeNewlineComment()) {
+  if (m_fragment.hasInterchangeNewline()) {
     if (startBlock == endBlock && !isProbablyBlock(lastNodeInserted)) {
       setEndingSelection(insertionPos);
       insertParagraphSeparator();
