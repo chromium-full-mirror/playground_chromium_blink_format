@@ -278,7 +278,7 @@ const ClassInfo ArgumentsImp::info = {"Arguments", 0, 0, 0};
 ArgumentsImp::ArgumentsImp(ExecState* exec, FunctionImp* func, const List& args)
     : ObjectImp(exec->interpreter()->builtinObjectPrototype()) {
   Value protect(this);
-  put(exec, "callee", Object(func), DontEnum);
+  put(exec, calleePropertyName, Object(func), DontEnum);
   put(exec, lengthPropertyName, Number(args.size()), DontEnum);
   if (!args.isEmpty()) {
     ListIterator arg = args.begin();

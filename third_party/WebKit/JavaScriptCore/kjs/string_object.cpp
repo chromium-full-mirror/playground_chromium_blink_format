@@ -561,7 +561,7 @@ StringObjectImp::StringObjectImp(ExecState* exec,
   put(exec, prototypePropertyName, Object(stringProto),
       DontEnum | DontDelete | ReadOnly);
 
-  static UString fromCharCode("fromCharCode");
+  static Identifier fromCharCode("fromCharCode");
   put(exec, fromCharCode, Object(new StringObjectFuncImp(exec, funcProto)),
       DontEnum);
 

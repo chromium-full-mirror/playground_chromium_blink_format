@@ -54,7 +54,7 @@ NumberPrototypeImp::NumberPrototypeImp(ExecState* exec,
       Object(new NumberProtoFuncImp(exec, funcProto,
                                     NumberProtoFuncImp::ToString, 1)),
       DontEnum);
-  put(exec, "toLocaleString",
+  put(exec, toLocaleStringPropertyName,
       Object(new NumberProtoFuncImp(exec, funcProto,
                                     NumberProtoFuncImp::ToLocaleString, 0)),
       DontEnum);
