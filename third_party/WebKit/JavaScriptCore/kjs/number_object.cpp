@@ -35,7 +35,7 @@ using namespace KJS;
 
 const ClassInfo NumberInstanceImp::info = {"Number", 0, 0, 0};
 
-NumberInstanceImp::NumberInstanceImp(const Object& proto) : ObjectImp(proto) {}
+NumberInstanceImp::NumberInstanceImp(ObjectImp* proto) : ObjectImp(proto) {}
 // ------------------------------ NumberPrototypeImp ---------------------------
 
 // ECMA 15.7.4
@@ -43,7 +43,7 @@ NumberInstanceImp::NumberInstanceImp(const Object& proto) : ObjectImp(proto) {}
 NumberPrototypeImp::NumberPrototypeImp(ExecState* exec,
                                        ObjectPrototypeImp* objProto,
                                        FunctionPrototypeImp* funcProto)
-    : NumberInstanceImp(Object(objProto)) {
+    : NumberInstanceImp(objProto) {
   Value protect(this);
   setInternalValue(NumberImp::zero());
 
@@ -165,7 +165,7 @@ bool NumberObjectImp::implementsConstruct() const {
 
 // ECMA 15.7.1
 Object NumberObjectImp::construct(ExecState* exec, const List& args) {
-  Object proto = exec->interpreter()->builtinNumberPrototype();
+  Object Imp* proto = exec->interpreter()->builtinNumberPrototype().imp();
   Object obj(new NumberInstanceImp(proto));
 
   Number n;
