@@ -149,6 +149,8 @@ class KWQKHTMLPart : public KHTMLPart {
   QString referrer() const;
   QString userAgent() const;
 
+  QString mimeTypeForFileName(const QString&) const;
+
   DOM::NodeImpl* selectionStart() const;
   int selectionStartOffset() const;
   DOM::NodeImpl* selectionEnd() const;

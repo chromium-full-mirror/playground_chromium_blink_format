@@ -293,6 +293,8 @@ enum FrameBorderStyle {
 
 - (void)loadEmptyDocumentSynchronously;
 
+- (NSString*)MIMETypeForPath:(NSString*)path;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all
