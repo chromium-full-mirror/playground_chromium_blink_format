@@ -77,11 +77,6 @@ DOMString::DOMString(const DOMString& other) {
     impl->ref();
 }
 
-DOMString::~DOMString() {
-  if (impl)
-    impl->deref();
-}
-
 DOMString& DOMString::operator=(const DOMString& other) {
   if (impl != other.impl) {
     if (impl)
