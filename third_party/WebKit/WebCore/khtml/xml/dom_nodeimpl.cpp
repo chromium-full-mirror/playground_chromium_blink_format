@@ -526,7 +526,9 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
 
   if (evt->bubbles()) {
     evt->setEventPhase(Event::BUBBLING_PHASE);
-    for (; it.current() && !evt->propagationStopped(); --it) {
+    for (;
+         it.current() && !evt->propagationStopped() && !evt->getCancelBubble();
+         --it) {
       evt->setCurrentTarget(it.current());
       it.current()->handleLocalEvents(evt, false);
     }
@@ -536,16 +538,15 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   evt->setEventPhase(
       0);  // I guess this is correct, the spec does not seem to say
            // anything about the default event handler phase.
-  if (evt->bubbles()) {
-    // now we call all default event handlers (this is not part of DOM - it is
-    // internal to khtml)
 
-    it.toLast();
-    for (; it.current() && !evt->propagationStopped() &&
-           !evt->defaultPrevented() && !evt->defaultHandled();
-         --it)
-      it.current()->defaultEventHandler(evt);
-  }
+  // now we call all default event handlers (this is not part of DOM - it is
+  // internal to khtml)
+
+  it.toLast();
+  for (; it.current() && !evt->propagationStopped() &&
+         !evt->defaultPrevented() && !evt->defaultHandled();
+       --it)
+    it.current()->defaultEventHandler(evt);
 
   // In the case of a mouse click, also send a DOMActivate event, which causes
   // things like form submissions

@@ -257,6 +257,12 @@ class Event {
    */
   DOMString eventModuleName();
 
+  /* Nonstandard extensions needed to support widely used JS event properties */
+  void setCancelBubble(bool cancel);
+  void setDefaultPrevented(bool returnValue);
+  bool getCancelBubble() const;
+  bool defaultPrevented() const;
+
  protected:
   Event(EventImpl* i);
   EventImpl* impl;
