@@ -3182,9 +3182,6 @@ void KHTMLPart::submitForm(const char* action,
                           boundary);
   }
 
-#if APPLE_CHANGES
-  kwq->submitForm(u, args);
-#else
   if (d->m_doc->parsing() || d->m_runningScripts > 0) {
     if (d->m_submitForm) {
       kdDebug(6000) << "KHTMLPart::submitForm ABORTING!" << endl;
@@ -3201,7 +3198,6 @@ void KHTMLPart::submitForm(const char* action,
   } else {
     emit d->m_extension->openURLRequest(u, args);
   }
-#endif  // APPLE_CHANGES
 }
 
 void KHTMLPart::popupMenu(const QString& linkUrl) {

@@ -98,8 +98,6 @@ class KWQKHTMLPart : public QObject {
                                    const KURL& url,
                                    const QString& mimeType);
 
-  void submitForm(const KURL& url, const KParts::URLArgs&);
-
   void scheduleClose();
 
   void unfocusWindow();
