@@ -173,6 +173,8 @@ class UCharReference {
   int offset;
 };
 
+inline UChar::UChar(const UCharReference& c) : uc(c.unicode()) {}
+
 /**
  * @short 8 bit char based string class
  */

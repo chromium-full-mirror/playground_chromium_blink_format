@@ -184,7 +184,6 @@ void ObjectImp::put(ExecState* exec,
                     const Value& value,
                     int attr) {
   assert(!value.isNull());
-  assert(value.type() != ReferenceType);
   assert(value.type() != CompletionType);
   assert(value.type() != ListType);
 
