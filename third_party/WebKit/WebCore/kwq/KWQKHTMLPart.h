@@ -67,6 +67,7 @@ typedef DOMElement ObjCDOMElement;
 @class NSColor;
 @class NSEvent;
 @class NSFileWrapper;
+@class NSFont;
 @class NSMutableDictionary;
 @class NSResponder;
 @class NSString;
@@ -85,6 +86,7 @@ class NSAttributedString;
 class NSColor;
 class NSEvent;
 class NSFileWrapper;
+class NSFont;
 class NSMutableDictionary;
 class NSResponder;
 class NSString;
@@ -219,6 +221,8 @@ class KWQKHTMLPart : public KHTMLPart {
   int selectionEndOffset() const;
 
   QRect selectionRect() const;
+
+  NSFont* fontForCurrentPosition() const;
 
   NSFileWrapper* fileWrapperForElement(DOM::ElementImpl*);
   NSAttributedString* attributedString(DOM::NodeImpl* startNode,

@@ -341,6 +341,7 @@ typedef enum {
 - (void)deleteSelection;
 - (void)deleteKeyPressed;
 - (void)applyStyle:(DOMCSSStyleDeclaration*)style;
+- (NSFont*)fontForCurrentPosition;
 - (void)ensureCaretVisible;
 
 - (WebScriptObject*)windowScriptObject;
