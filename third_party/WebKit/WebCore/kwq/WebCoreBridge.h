@@ -51,6 +51,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
 
 #endif
 
+@class DOMDocument;
+@class DOMNode;
+@class DOMElement;
 @class WebCoreSettings;
 
 @protocol WebCoreDOMTreeCopier;
@@ -59,9 +62,6 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @protocol WebCoreResourceLoader;
 @protocol WebCoreFileButton;
 @protocol WebCoreFileButtonDelegate;
-@protocol DOMDocument;
-@protocol DOMNode;
-@protocol DOMElement;
 
 extern NSString* WebCoreElementDOMNodeKey;
 extern NSString* WebCoreElementFrameKey;
@@ -191,17 +191,16 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (NSString*)renderTreeAsExternalRepresentation;
 
 - (NSDictionary*)elementAtPoint:(NSPoint)point;
-- (id<DOMElement>)elementWithName:(NSString*)name inForm:(id<DOMElement>)form;
-- (id<DOMElement>)elementForView:(NSView*)view;
-- (BOOL)elementDoesAutoComplete:(id<DOMElement>)element;
-- (BOOL)elementIsPassword:(id<DOMElement>)element;
-- (id<DOMElement>)formForElement:(id<DOMElement>)element;
-- (id<DOMElement>)currentForm;
-- (NSArray*)controlsInForm:(id<DOMElement>)form;
+- (DOMElement*)elementWithName:(NSString*)name inForm:(DOMElement*)form;
+- (DOMElement*)elementForView:(NSView*)view;
+- (BOOL)elementDoesAutoComplete:(DOMElement*)element;
+- (BOOL)elementIsPassword:(DOMElement*)element;
+- (DOMElement*)formForElement:(DOMElement*)element;
+- (DOMElement*)currentForm;
+- (NSArray*)controlsInForm:(DOMElement*)form;
 - (NSString*)searchForLabels:(NSArray*)labels
-               beforeElement:(id<DOMElement>)element;
-- (NSString*)matchLabels:(NSArray*)labels
-          againstElement:(id<DOMElement>)element;
+               beforeElement:(DOMElement*)element;
+- (NSString*)matchLabels:(NSArray*)labels againstElement:(DOMElement*)element;
 
 - (BOOL)searchFor:(NSString*)string
         direction:(BOOL)forward
@@ -215,11 +214,11 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string;
 
-- (id<DOMDocument>)DOMDocument;
+- (DOMDocument*)DOMDocument;
 
-- (void)setSelectionFrom:(id<DOMNode>)start
+- (void)setSelectionFrom:(DOMNode*)start
              startOffset:(int)startOffset
-                      to:(id<DOMNode>)end
+                      to:(DOMNode*)end
                endOffset:(int)endOffset;
 
 - (BOOL)isSelectionEditable;
@@ -245,14 +244,14 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (NSRect)visibleSelectionRect;
 - (NSImage*)selectionImage;
 
-- (id<DOMNode>)selectionStart;
+- (DOMNode*)selectionStart;
 - (int)selectionStartOffset;
-- (id<DOMNode>)selectionEnd;
+- (DOMNode*)selectionEnd;
 - (int)selectionEndOffset;
 
-- (NSAttributedString*)attributedStringFrom:(id<DOMNode>)startNode
+- (NSAttributedString*)attributedStringFrom:(DOMNode*)startNode
                                 startOffset:(int)startOffset
-                                         to:(id<DOMNode>)endNode
+                                         to:(DOMNode*)endNode
                                   endOffset:(int)endOffset;
 
 + (NSString*)stringWithData:(NSData*)data
@@ -300,7 +299,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
         onLoadEvent:(BOOL)onLoad
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
-               form:(NSObject<DOMElement>*)form
+               form:(DOMElement*)form
          formValues:(NSDictionary*)values;
 - (void)postWithURL:(NSURL*)URL
            referrer:(NSString*)referrer
@@ -308,7 +307,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                data:(NSData*)data
         contentType:(NSString*)contentType
     triggeringEvent:(NSEvent*)event
-               form:(NSObject<DOMElement>*)form
+               form:(DOMElement*)form
          formValues:(NSDictionary*)values;
 
 - (WebCoreBridge*)createWindowWithURL:(NSURL*)URL frameName:(NSString*)name;

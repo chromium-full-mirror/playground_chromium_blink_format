@@ -9,17 +9,16 @@
 #import <WebKit/WebFrame.h>
 #import <WebKit/WebPolicyDelegatePrivate.h>
 
+@class DOMElement;
+@class NSMutableURLRequest;
+@class NSURLRequest;
 @class WebBridge;
 @class WebFormState;
 @class WebFrameBridge;
 @class WebFrameView;
 @class WebHistoryItem;
-@class NSURLRequest;
-@class NSMutableURLRequest;
 @class WebPolicyDecisionListener;
 @class WebView;
-
-@protocol DOMElement;
 
 typedef enum {
   WebFrameStateProvisional,
@@ -169,7 +168,7 @@ extern NSString* WebPageCacheDocumentViewKey;
            loadType:(WebFrameLoadType)loadType
              target:(NSString*)target
     triggeringEvent:(NSEvent*)event
-               form:(NSObject<DOMElement>*)form
+               form:(DOMElement*)form
          formValues:(NSDictionary*)values;
 - (void)_loadURL:(NSURL*)URL intoChild:(WebFrame*)childFrame;
 - (void)_postWithURL:(NSURL*)URL
@@ -178,7 +177,7 @@ extern NSString* WebPageCacheDocumentViewKey;
                 data:(NSData*)data
          contentType:(NSString*)contentType
      triggeringEvent:(NSEvent*)event
-                form:(NSObject<DOMElement>*)form
+                form:(DOMElement*)form
           formValues:(NSDictionary*)values;
 
 - (void)_loadRequest:(NSURLRequest*)request inFrameNamed:(NSString*)frameName;
