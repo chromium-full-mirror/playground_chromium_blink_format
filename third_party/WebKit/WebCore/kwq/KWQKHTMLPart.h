@@ -147,6 +147,8 @@ class KWQKHTMLPart : public KHTMLPart {
   static NSView* nextKeyViewForWidget(QWidget* startingPoint,
                                       KWQSelectionDirection);
 
+  static bool currentEventIsMouseDownInWidget(QWidget* candidate);
+
   static void setDocumentFocus(QWidget*);
   static void clearDocumentFocus(QWidget*);
 
