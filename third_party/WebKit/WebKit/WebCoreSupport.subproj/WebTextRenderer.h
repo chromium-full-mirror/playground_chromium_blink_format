@@ -28,11 +28,14 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
   float ceiledSpaceWidth;
   float roundedSpaceWidth;
   float adjustedSpaceWidth;
+
+ @private
+  BOOL usingPrinterFont;
 }
 
 + (BOOL)shouldBufferTextDrawing;
 
-- initWithFont:(NSFont*)font;
+- initWithFont:(NSFont*)font usingPrinterFont:(BOOL)usingPrinterFont;
 
 - (float)_floatWidthForCharacters:(const UniChar*)characters
                      stringLength:(unsigned)stringLength

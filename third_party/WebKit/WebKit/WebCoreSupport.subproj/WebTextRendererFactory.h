@@ -10,7 +10,8 @@
 @class WebTextRenderer;
 
 @interface WebTextRendererFactory : WebCoreTextRendererFactory {
-  NSMutableDictionary* cache;
+  NSMutableDictionary* cacheForScreen;
+  NSMutableDictionary* cacheForPrinter;
   NSMutableDictionary* viewBuffers;
   NSMutableArray* viewStack;
 }
@@ -22,7 +23,8 @@
                            size:(float)size;
 - init;
 
-- (WebTextRenderer*)rendererWithFont:(NSFont*)font;
+- (WebTextRenderer*)rendererWithFont:(NSFont*)font
+                    usingPrinterFont:(BOOL)usingPrinterFont;
 
 - (BOOL)coalesceTextDrawing;
 - (void)endCoalesceTextDrawing;
