@@ -4611,7 +4611,7 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
           }
         }
       }
-      if (d->m_selectionStart == 0)
+      if (d->m_selectionStart == 0 || d->m_selectionEnd == 0)
         d->m_doc->clearSelection();
       else {
         d->m_initialSelectionStart = d->m_selectionStart;
@@ -4652,7 +4652,7 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
               d->m_selectionEnd, d->m_endOffset);
         }
       }
-      if (d->m_selectionStart == 0)
+      if (d->m_selectionStart == 0 || d->m_selectionEnd == 0)
         d->m_doc->clearSelection();
       else {
         d->m_initialSelectionStart = d->m_selectionStart;
