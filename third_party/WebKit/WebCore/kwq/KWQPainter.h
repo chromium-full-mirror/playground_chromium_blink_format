@@ -87,13 +87,15 @@ class QPainter : public Qt {
 
   void drawPixmap(const QPoint&, const QPixmap&);
   void drawPixmap(const QPoint&, const QPixmap&, const QRect&);
+  void drawPixmap(const QPoint&, const QPixmap&, const QRect&, const QString&);
   void drawPixmap(int x,
                   int y,
                   const QPixmap&,
                   int sx = 0,
                   int sy = 0,
                   int sw = -1,
-                  int sh = -1);
+                  int sh = -1,
+                  int compositeOperator = -1);
   void
   drawTiledPixmap(int, int, int, int, const QPixmap&, int sx = 0, int sy = 0);
 
