@@ -315,8 +315,13 @@ void HTMLDocumentImpl::close() {
   DocumentImpl::close();
 
   // Now do our painting
-  if (body() && doload)
+  if (body() && doload) {
     updateRendering();
+
+    // Always do a full and immediate repaint after loading.
+    if (renderer())
+      renderer()->repaint(true);
+  }
 }
 
 void HTMLDocumentImpl::determineParseMode(const QString& str) {
