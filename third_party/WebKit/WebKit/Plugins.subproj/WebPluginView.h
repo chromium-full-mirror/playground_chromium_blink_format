@@ -74,8 +74,9 @@ typedef struct _StreamData {
              mode:(uint16)mode;
 - (void)drawRect:(NSRect)rect;
 - (void)setWindow;
-- (void)viewHasMoved:(NSNotification*)note;
+- (void)viewHasMoved:(NSNotification*)notification;
 - (NSView*)findSuperview:(NSString*)viewName;
+- (void)windowWillClose:(NSNotification*)notification;
 - (void)newStream:(NSString*)streamURL
          mimeType:(NSString*)mimeType
        notifyData:(void*)notifyData;
@@ -91,6 +92,7 @@ typedef struct _StreamData {
 - (void)keyDown:(NSEvent*)theEvent;
 - (void)keyUp:(NSEvent*)theEvent;
 - (void)stop;
+- (void)start;
 - (void)dealloc;
 
 // plug-in to browser calls
