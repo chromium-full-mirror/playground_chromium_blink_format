@@ -12,6 +12,7 @@
 
 @interface WebBridge : WebCoreBridge<WebCoreBridge> {
   WebFrame* frame;
+  BOOL _doingInternalLoad;
 }
 
 - (void)receivedData:(NSData*)data withDataSource:(WebDataSource*)dataSource;
