@@ -580,7 +580,7 @@ NodeImpl::Id HTMLTableRowElementImpl::id() const {
 
 NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
 #ifdef DEBUG_LAYOUT
-  kdDebug(6030) << nodeName().string() << "(Tbody)::addChild( "
+  kdDebug(6030) << nodeName().string() << "(Trow)::addChild( "
                 << child->nodeName().string() << " )" << endl;
 #endif
 

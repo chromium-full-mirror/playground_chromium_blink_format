@@ -111,12 +111,6 @@ void RenderRoot::calcMinMaxWidth() {
 //#define SPEED_DEBUG
 
 void RenderRoot::layout() {
-#if APPLE_CHANGES
-  // Let the KWQKHTMLPart know we are doing a layout.
-  if (m_view && m_view->part())
-    m_view->part()->kwq->layout();
-#endif
-
   // kdDebug(6040) << "RenderRoot::layout()" << endl;
   if (m_printingMode)
     m_minWidth = m_width;
