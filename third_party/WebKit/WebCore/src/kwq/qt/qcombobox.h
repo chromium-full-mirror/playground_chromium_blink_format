@@ -72,6 +72,10 @@ class QComboBox : public QWidget {
   QComboBox(const QComboBox&);
   QComboBox& operator=(const QComboBox&);
 
+#ifdef _KWQ_
+  void init(bool isEditable);
+#endif
+
 };  // class QComboBox
     // ==========================================================
 
