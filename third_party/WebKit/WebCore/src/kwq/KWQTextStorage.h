@@ -31,4 +31,7 @@
   NSLayoutManager* _layoutManager;
 }
 
++ setString:(NSString*)str attributes:(NSDictionary*)attrs;
+- (void)setString:(NSString*)aString attributes:(NSDictionary*)at;
+
 @end

@@ -180,12 +180,6 @@ class KHTMLView : public QScrollView {
                             int clipw,
                             int cliph);
 
- signals:
-  void cleared();
-
- protected:
-  void clear();
-
   virtual void resizeEvent(QResizeEvent* event);
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
@@ -220,6 +214,12 @@ class KHTMLView : public QScrollView {
    */
   void doAutoScroll();
 
+ signals:
+  void cleared();
+
+  void clear();
+
+ protected:
  protected slots:
   void slotPaletteChanged();
 

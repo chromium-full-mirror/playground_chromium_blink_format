@@ -27,7 +27,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface KWQMetricsInfo : NSObject {
+@interface KWQLayoutInfo : NSObject {
   NSMutableDictionary* attributes;
   NSMutableDictionary* fragmentCache;
 }
@@ -36,12 +36,13 @@
            atPoint:(NSPoint)p
           withFont:(NSFont*)font
              color:(NSColor*)color;
-+ (KWQMetricsInfo*)getMetricsForFont:(NSFont*)aFont;
-+ (void)setMetric:(KWQMetricsInfo*)info forFont:(NSFont*)aFont;
++ (KWQLayoutInfo*)getMetricsForFont:(NSFont*)aFont;
++ (void)setMetric:(KWQLayoutInfo*)info forFont:(NSFont*)aFont;
 - initWithFont:(NSFont*)aFont;
 - (NSRect)rectForString:(NSString*)string;
 - (NSLayoutManager*)layoutManagerForString:(NSString*)string;
 - (void)setColor:(NSColor*)color;
+- (void)setFont:(NSFont*)aFont;
 @end
 
 @interface KWQLayoutFragment : NSObject {
