@@ -37,6 +37,8 @@ class Value;
 
 namespace Bindings {
 
+class CInstance;
+
 class CField : public Field {
  public:
   CField(NPIdentifier ident) : Field() { _fieldIdentifier = ident; };

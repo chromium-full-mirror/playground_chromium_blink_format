@@ -46,7 +46,7 @@ static KJS::List listFromVariantArgs(KJS::ExecState* exec,
   return aList;
 }
 
-static NPObject* jsAllocate(NPP npp) {
+static NPObject* jsAllocate(NPP npp, NPClass* aClass) {
   return (NPObject*)malloc(sizeof(JavaScriptObject));
 }
 
@@ -55,7 +55,8 @@ static void jsDeallocate(JavaScriptObject* obj) {
 }
 
 static NPClass _javascriptClass = {
-    1, jsAllocate, (NPDeallocateFunctionPtr)jsDeallocate, 0, 0, 0, 0, 0, 0, 0};
+    1, jsAllocate, (NPDeallocateFunctionPtr)jsDeallocate, 0, 0, 0, 0, 0, 0,
+    0, 0};
 
 static NPClass* javascriptClass = &_javascriptClass;
 NPClass* NPScriptObjectClass = javascriptClass;
@@ -86,12 +87,30 @@ NPObject* _NPN_CreateScriptObject(NPP npp,
   return (NPObject*)obj;
 }
 
-bool NPN_Call(NPP npp,
-              NPObject* o,
-              NPIdentifier methodName,
-              const NPVariant* args,
-              unsigned argCount,
-              NPVariant* result) {
+bool NPN_InvokeDefault(NPP npp,
+                       NPObject* o,
+                       const NPVariant* args,
+                       uint32_t argCount,
+                       NPVariant* result) {
+  if (o->_class == NPScriptObjectClass) {
+    // No notion of a default function on JS objects.  Just return false, can't
+    // handle.
+    return false;
+  } else {
+    if (o->_class->invokeDefault) {
+      return o->_class->invokeDefault(o, args, argCount, result);
+    }
+  }
+
+  return true;
+}
+
+bool NPN_Invoke(NPP npp,
+                NPObject* o,
+                NPIdentifier methodName,
+                const NPVariant* args,
+                uint32_t argCount,
+                NPVariant* result) {
   if (o->_class == NPScriptObjectClass) {
     JavaScriptObject* obj = (JavaScriptObject*)o;
 

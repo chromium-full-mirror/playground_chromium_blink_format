@@ -165,11 +165,11 @@ class ObjcArray : public Array {
   ObjectStructPtr _array;
 };
 
-class FallbackObjectImp : public KJS::ObjectImp {
+class ObjcFallbackObjectImp : public KJS::ObjectImp {
  public:
-  FallbackObjectImp(ObjectImp* proto);
+  ObjcFallbackObjectImp(ObjectImp* proto);
 
-  FallbackObjectImp(ObjcInstance* i, const KJS::Identifier propertyName);
+  ObjcFallbackObjectImp(ObjcInstance* i, const KJS::Identifier propertyName);
 
   const ClassInfo* classInfo() const { return &info; }
 
