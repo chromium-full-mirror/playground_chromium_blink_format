@@ -159,6 +159,8 @@ class CSSStyleSelector : public StyleSelector {
                                      DOM::CSSStyleDeclarationImpl* decl,
                                      unsigned int numProps);
 
+  void adjustRenderStyle(RenderStyle* style, DOM::ElementImpl* e);
+
   static DOM::CSSStyleSheetImpl* defaultSheet;
   static DOM::CSSStyleSheetImpl* quirksSheet;
   static CSSStyleSelectorList* defaultStyle;
