@@ -310,7 +310,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Implementation of CSS property -khtml-user-drag == auto
    */
-  virtual bool shouldDragAutoNode(DOM::NodeImpl*) const;
+  virtual bool shouldDragAutoNode(DOM::NodeImpl*, int x, int y) const;
 
   /**
    * Enables/disables Java applet support. Note that calling this function

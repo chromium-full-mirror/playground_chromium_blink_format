@@ -197,6 +197,7 @@ typedef enum {
 
 - (void)setShowsFirstResponder:(BOOL)flag;
 
+- (void)setActivationEventNumber:(int)num;
 - (void)mouseDown:(NSEvent*)event;
 - (void)mouseUp:(NSEvent*)event;
 - (void)mouseMoved:(NSEvent*)event;
@@ -354,6 +355,7 @@ typedef enum {
 - (WebScriptObject*)windowScriptObject;
 - (NPObject*)windowScriptNPObject;
 
+- (BOOL)eventMayStartDrag:(NSEvent*)event;
 - (NSDragOperation)dragOperationForDraggingInfo:(id<NSDraggingInfo>)info;
 - (void)dragExitedWithDraggingInfo:(id<NSDraggingInfo>)info;
 - (BOOL)concludeDragForDraggingInfo:(id<NSDraggingInfo>)info;
@@ -520,7 +522,7 @@ typedef enum {
              sourceIsDHTML:(BOOL)flag
             DHTMLWroteData:(BOOL)dhtmlWroteData;
 - (void)handleAutoscrollForMouseDragged:(NSEvent*)event;
-- (BOOL)mayStartDragWithMouseDragged:(NSEvent*)event;
+- (BOOL)mayStartDragAtEventLocation:(NSPoint)location;
 
 - (int)historyLength;
 - (void)goBackOrForward:(int)distance;

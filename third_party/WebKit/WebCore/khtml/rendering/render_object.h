@@ -822,6 +822,8 @@ class RenderObject : public CachedObjectClient {
 
   DOM::NodeImpl* draggableNode(bool dhtmlOK,
                                bool uaOK,
+                               int x,
+                               int y,
                                bool& dhtmlWillDrag) const;
 
   /**

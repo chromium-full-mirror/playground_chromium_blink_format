@@ -52,7 +52,7 @@
               sourceIsDHTML:(BOOL)flag
              DHTMLWroteData:(BOOL)dhtmlWroteData;
 - (void)_handleAutoscrollForMouseDragged:(NSEvent*)event;
-- (BOOL)_mayStartDragWithMouseDragged:(NSEvent*)event;
+- (BOOL)_mayStartDragAtEventLocation:(NSPoint)location;
 
 - (WebPluginController*)_pluginController;
 
