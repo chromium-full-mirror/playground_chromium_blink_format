@@ -55,7 +55,7 @@ class JSLazyEventListener : public JSEventListener {
  public:
   JSLazyEventListener(QString _code,
                       const Object& _win,
-                      bool _html = false,
+                      DOM::NodeImpl* node,
                       int lineno = 0);
   virtual void handleEvent(DOM::Event& evt, bool isWindowEvent);
   Object listenerObj() const;
@@ -66,6 +66,7 @@ class JSLazyEventListener : public JSEventListener {
   mutable QString code;
   mutable bool parsed;
   int lineNumber;
+  DOM::NodeImpl* originalNode;
 };
 
 Value getNodeEventListener(DOM::Node n, int eventId);

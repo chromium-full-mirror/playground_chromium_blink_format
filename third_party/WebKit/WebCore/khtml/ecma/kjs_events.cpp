@@ -36,6 +36,7 @@ using namespace KJS;
 
 using DOM::KeyboardEvent;
 using DOM::EventImpl;
+using DOM::NodeImpl;
 
 // -------------------------------------------------------------------------
 
@@ -81,10 +82,12 @@ void JSEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
     List args;
     args.append(getDOMEvent(exec, evt));
 
-    // Add the event's target element to the scope
-    // (and the document, and the form - see
-    // KJS::HTMLElement::eventHandlerScope)
-    ScopeChain oldScope = listener.scope();
+    Window* window = static_cast<Window*>(win.imp());
+    // Set the event we're handling in the Window object
+    window->setCurrentEvent(&evt);
+    // ... and in the interpreter
+    interpreter->setCurrentEvent(&evt);
+
     Object thisObj;
     if (isWindowEvent) {
       thisObj = win;
@@ -92,28 +95,11 @@ void JSEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
       KJS::Interpreter::lock();
       thisObj = Object::dynamicCast(getDOMNode(exec, evt.currentTarget()));
       KJS::Interpreter::unlock();
-      if (!thisObj.isNull()) {
-        ScopeChain scope;
-        KJS::Interpreter::lock();
-        static_cast<DOMNode*>(thisObj.imp())
-            ->pushEventHandlerScope(exec, scope);
-        KJS::Interpreter::unlock();
-        scope.push(oldScope);
-        listener.setScope(scope);
-      }
     }
-
-    Window* window = static_cast<Window*>(win.imp());
-    // Set the event we're handling in the Window object
-    window->setCurrentEvent(&evt);
-    // ... and in the interpreter
-    interpreter->setCurrentEvent(&evt);
 
     KJS::Interpreter::lock();
     Value retval = listener.call(exec, thisObj, args);
     KJS::Interpreter::unlock();
-
-    listener.setScope(oldScope);
 
     window->setCurrentEvent(0);
     interpreter->setCurrentEvent(0);
@@ -166,10 +152,18 @@ Object JSEventListener::listenerObj() const {
 
 JSLazyEventListener::JSLazyEventListener(QString _code,
                                          const Object& _win,
-                                         bool _html,
+                                         NodeImpl* _originalNode,
                                          int lineno)
-    : JSEventListener(Object(), _win, _html), code(_code), parsed(false) {
+    : JSEventListener(Object(), _win, true), code(_code), parsed(false) {
   lineNumber = lineno;
+
+  // We don't retain the original node, because we assume it
+  // will stay alive as long as this handler object is around
+  // and we need to avoid a reference cycle. If JS transfers
+  // this handler to another node, parseCode will be called and
+  // then originalNode is no longer needed.
+
+  originalNode = _originalNode;
 }
 
 void JSLazyEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
@@ -215,6 +209,24 @@ void JSLazyEventListener::parseCode() const {
 
         // failed to parse, so let's just make this listener a no-op
         listener = Object();
+      } else {
+        // Add the event's home element to the scope
+        // (and the document, and the form - see
+        // KJS::HTMLElement::eventHandlerScope)
+        ScopeChain scope = listener.scope();
+
+        KJS::Interpreter::lock();
+        Object thisObj = Object::dynamicCast(getDOMNode(exec, originalNode));
+        KJS::Interpreter::unlock();
+
+        if (!thisObj.isNull()) {
+          KJS::Interpreter::lock();
+          static_cast<DOMNode*>(thisObj.imp())
+              ->pushEventHandlerScope(exec, scope);
+          KJS::Interpreter::unlock();
+
+          listener.setScope(scope);
+        }
       }
     }
 

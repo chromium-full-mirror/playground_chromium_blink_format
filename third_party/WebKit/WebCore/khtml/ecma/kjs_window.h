@@ -131,7 +131,7 @@ class Window : public ObjectImp {
   BarInfo* toolbar(ExecState* exec) const;
   JSEventListener* getJSEventListener(const Value& val, bool html = false);
   JSLazyEventListener* getJSLazyEventListener(const QString& code,
-                                              bool html = false,
+                                              DOM::NodeImpl* node,
                                               int lineno = 0);
   void clear(ExecState* exec);
   virtual UString toString(ExecState* exec) const;

@@ -1310,9 +1310,9 @@ JSEventListener* Window::getJSEventListener(const Value& val, bool html) {
 }
 
 JSLazyEventListener* Window::getJSLazyEventListener(const QString& code,
-                                                    bool html,
+                                                    DOM::NodeImpl* node,
                                                     int lineNumber) {
-  return new JSLazyEventListener(code, Object(this), html, lineNumber);
+  return new JSLazyEventListener(code, Object(this), node, lineNumber);
 }
 
 void Window::clear(ExecState* exec) {

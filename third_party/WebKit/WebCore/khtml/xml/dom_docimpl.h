@@ -497,7 +497,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
                                  bool useCapture);
   bool hasWindowEventListener(int id);
 
-  EventListener* createHTMLEventListener(QString code);
+  EventListener* createHTMLEventListener(QString code, NodeImpl* node);
 
   /**
    * Searches through the document, starting from fromNode, for the next

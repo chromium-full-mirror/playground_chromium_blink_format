@@ -32,6 +32,7 @@ namespace DOM {
 class Node;
 class EventListener;
 class Event;
+class NodeImpl;
 };
 
 namespace KJS {
@@ -54,7 +55,8 @@ class KJSProxy {
                             const DOM::Node& n) = 0;
   virtual void clear() = 0;
   virtual DOM::EventListener* createHTMLEventHandler(QString sourceUrl,
-                                                     QString code) = 0;
+                                                     QString code,
+                                                     DOM::NodeImpl* node) = 0;
   virtual void finishedWithEvent(const DOM::Event& event) = 0;
   virtual KJS::Interpreter* interpreter() = 0;
 
