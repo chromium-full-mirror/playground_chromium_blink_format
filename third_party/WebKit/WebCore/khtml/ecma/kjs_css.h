@@ -49,7 +49,7 @@ class DOMCSSStyleDeclarationFunc : public DOMFunction {
 
  public:
   DOMCSSStyleDeclarationFunc(DOM::CSSStyleDeclaration s, int i)
-      : styleDecl(s), id(i) {}
+      : styleDecl(s), _id(i) {}
   Completion tryExecute(const List&);
   enum {
     GetPropertyValue,
@@ -62,7 +62,7 @@ class DOMCSSStyleDeclarationFunc : public DOMFunction {
 
  private:
   DOM::CSSStyleDeclaration styleDecl;
-  int id;
+  int _id;
 };
 
 KJSO getDOMCSSStyleDeclaration(DOM::CSSStyleDeclaration n);
@@ -104,13 +104,13 @@ class DOMStyleSheetListFunc : public DOMFunction {
 
  public:
   DOMStyleSheetListFunc(DOM::StyleSheetList ssl, int i)
-      : styleSheetList(ssl), id(i) {}
+      : styleSheetList(ssl), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::StyleSheetList styleSheetList;
-  int id;
+  int _id;
 };
 
 class DOMMediaList : public DOMObject {
@@ -133,13 +133,13 @@ class DOMMediaListFunc : public DOMFunction {
   friend class DOMMediaList;
 
  public:
-  DOMMediaListFunc(DOM::MediaList ml, int i) : mediaList(ml), id(i) {}
+  DOMMediaListFunc(DOM::MediaList ml, int i) : mediaList(ml), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item, DeleteMedium, AppendMedium };
 
  private:
   DOM::MediaList mediaList;
-  int id;
+  int _id;
 };
 
 class DOMCSSStyleSheet : public DOMStyleSheet {
@@ -156,13 +156,13 @@ class DOMCSSStyleSheetFunc : public DOMFunction {
   friend class DOMNode;
 
  public:
-  DOMCSSStyleSheetFunc(DOM::CSSStyleSheet ss, int i) : styleSheet(ss), id(i) {}
+  DOMCSSStyleSheetFunc(DOM::CSSStyleSheet ss, int i) : styleSheet(ss), _id(i) {}
   Completion tryExecute(const List&);
   enum { InsertRule, DeleteRule };
 
  private:
   DOM::CSSStyleSheet styleSheet;
-  int id;
+  int _id;
 };
 
 class DOMCSSRuleList : public DOMObject {
@@ -180,13 +180,13 @@ class DOMCSSRuleList : public DOMObject {
 
 class DOMCSSRuleListFunc : public DOMFunction {
  public:
-  DOMCSSRuleListFunc(DOM::CSSRuleList rl, int i) : cssRuleList(rl), id(i) {}
+  DOMCSSRuleListFunc(DOM::CSSRuleList rl, int i) : cssRuleList(rl), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::CSSRuleList cssRuleList;
-  int id;
+  int _id;
 };
 
 KJSO getDOMCSSRuleList(DOM::CSSRuleList rl);
@@ -207,13 +207,13 @@ class DOMCSSRule : public DOMObject {
 
 class DOMCSSRuleFunc : public DOMFunction {
  public:
-  DOMCSSRuleFunc(DOM::CSSRule r, int i) : cssRule(r), id(i) {}
+  DOMCSSRuleFunc(DOM::CSSRule r, int i) : cssRule(r), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item, InsertRule, DeleteRule };
 
  private:
   DOM::CSSRule cssRule;
-  int id;
+  int _id;
 };
 
 KJSO getDOMCSSRule(DOM::CSSRule r);
@@ -275,7 +275,7 @@ class DOMCSSPrimitiveValueFunc : public DOMFunction {
   friend class DOMNode;
 
  public:
-  DOMCSSPrimitiveValueFunc(DOM::CSSPrimitiveValue v, int i) : val(v), id(i) {}
+  DOMCSSPrimitiveValueFunc(DOM::CSSPrimitiveValue v, int i) : val(v), _id(i) {}
   Completion tryExecute(const List&);
   enum {
     SetFloatValue,
@@ -289,7 +289,7 @@ class DOMCSSPrimitiveValueFunc : public DOMFunction {
 
  private:
   DOM::CSSPrimitiveValue val;
-  int id;
+  int _id;
 };
 
 // Prototype object CSSPrimitiveValue
@@ -315,13 +315,13 @@ class DOMCSSValueList : public DOMCSSValue {
 
 class DOMCSSValueListFunc : public DOMFunction {
  public:
-  DOMCSSValueListFunc(DOM::CSSValueList vl, int i) : valueList(vl), id(i) {}
+  DOMCSSValueListFunc(DOM::CSSValueList vl, int i) : valueList(vl), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::CSSValueList valueList;
-  int id;
+  int _id;
 };
 
 class DOMRGBColor : public DOMObject {

@@ -59,7 +59,7 @@ class DOMNodeFunc : public DOMFunction {
   friend class DOMNode;
 
  public:
-  DOMNodeFunc(DOM::Node n, int i) : node(n), id(i) {}
+  DOMNodeFunc(DOM::Node n, int i) : node(n), _id(i) {}
   Completion tryExecute(const List&);
   enum {
     InsertBefore,
@@ -75,7 +75,7 @@ class DOMNodeFunc : public DOMFunction {
 
  private:
   DOM::Node node;
-  int id;
+  int _id;
 };
 
 class DOMNodeList : public DOMObject {
@@ -96,13 +96,13 @@ class DOMNodeListFunc : public DOMFunction {
   friend class DOMNodeList;
 
  public:
-  DOMNodeListFunc(DOM::NodeList l, int i) : list(l), id(i) {}
+  DOMNodeListFunc(DOM::NodeList l, int i) : list(l), _id(i) {}
   Completion tryExecute(const List&);
   enum { Item };
 
  private:
   DOM::NodeList list;
-  int id;
+  int _id;
 };
 
 class DOMDocument : public DOMNode {
@@ -142,7 +142,7 @@ class DOMDocFunction : public DOMFunction {
 
  private:
   DOM::Document doc;
-  int id;
+  int _id;
 };
 
 class DOMAttr : public DOMNode {
@@ -188,7 +188,7 @@ class DOMElementFunction : public DOMFunction {
 
  private:
   DOM::Element element;
-  int id;
+  int _id;
 };
 
 class DOMDOMImplementation : public DOMObject {
@@ -213,7 +213,7 @@ class DOMDOMImplementationFunction : public DOMFunction {
 
  private:
   DOM::DOMImplementation implementation;
-  int id;
+  int _id;
 };
 
 class DOMDocumentType : public DOMNode {
@@ -255,7 +255,7 @@ class DOMNamedNodeMapFunction : public DOMFunction {
 
  private:
   DOM::NamedNodeMap map;
-  int id;
+  int _id;
 };
 
 class DOMProcessingInstruction : public DOMNode {

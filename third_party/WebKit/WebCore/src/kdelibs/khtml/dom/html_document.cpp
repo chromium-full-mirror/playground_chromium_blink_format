@@ -169,6 +169,10 @@ HTMLCollection HTMLDocument::all() const {
 }
 
 DOMString HTMLDocument::cookie() const {
+#ifdef _KWQ_
+  fprintf(stderr, "ERROR %s:%d  %s (NOT YET IMPLEMENTED)\n", __FILE__, __LINE__,
+          __FUNCTION__);
+#else
   QCString replyType;
   QByteArray params, reply;
   QDataStream stream(params, IO_WriteOnly);
@@ -190,9 +194,14 @@ DOMString HTMLDocument::cookie() const {
   QString result;
   stream2 >> result;
   return DOMString(result);
+#endif
 }
 
 void HTMLDocument::setCookie(const DOMString& value) {
+#ifdef _KWQ_
+  fprintf(stderr, "ERROR %s:%d  %s (NOT YET IMPLEMENTED)\n", __FILE__, __LINE__,
+          __FUNCTION__);
+#else
   long windowId = view()->winId();
   QByteArray params;
   QDataStream stream(params, IO_WriteOnly);
@@ -205,6 +214,7 @@ void HTMLDocument::setCookie(const DOMString& value) {
                                 params)) {
     kdWarning(6010) << "Can't communicate with cookiejar!" << endl;
   }
+#endif
 }
 
 void HTMLDocument::open() {
