@@ -191,6 +191,9 @@ typedef enum {
 
 - (WebHistoryItem*)_itemForSavingDocState;
 - (WebHistoryItem*)_itemForRestoringDocState;
+
+- (void)_saveDocumentAndScrollState;
+
 - (void)_handleUnimplementablePolicyWithErrorCode:(int)code forURL:(NSURL*)URL;
 
 - (void)_loadDataSource:(WebDataSource*)dataSource
