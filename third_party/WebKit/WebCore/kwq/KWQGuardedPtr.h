@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2001, 2002 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,75 +26,28 @@
 #ifndef QGUARDEDPTR_H_
 #define QGUARDEDPTR_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "KWQRefPtr.h"
-
 #include "qobject.h"
 
-// class QGuardedPtrPrivate ====================================================
+class KWQGuardedPtrBase {
+ public:
+  KWQGuardedPtrBase(QObject* = 0);
 
-// class QGuardedPtr ===========================================================
+  QObject* pointer() const { return iterator.current(); }
+  bool isNull() const { return pointer() != 0; }
 
-class QGuardedPtrPrivate;
+ private:
+  QPtrListIterator<QObject> iterator;
+};
 
 template <class T>
-class QGuardedPtr {
+class QGuardedPtr : public KWQGuardedPtrBase {
  public:
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+  QGuardedPtr() {}
+  QGuardedPtr(T* p) : KWQGuardedPtrBase(p) {}
 
-  // constructors, copy constructors, and destructors ------------------------
-
-  QGuardedPtr() : d(new QGuardedPtrPrivate(0)) {}
-  QGuardedPtr(T* o) : d(new QGuardedPtrPrivate(o)) {}
-
-  QGuardedPtr(const QGuardedPtr<T>& p) { d = p.d; }
-
-  ~QGuardedPtr() {}
-
-  // member functions --------------------------------------------------------
-
-  bool isNull() const { return d->object() == 0; }
-
-  // operators ---------------------------------------------------------------
-
-  QGuardedPtr& operator=(const QGuardedPtr& p) {
-    d = p.d;
-    return *this;
-  }
-
-  T& operator*() const { return *(T*)d->object(); }
-
-  operator T*() const { return (T*)d->object(); }
-
-  T* operator->() const { return (T*)d->object(); }
-
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
- private:
-  KWQRefPtr<QGuardedPtrPrivate> d;
-};  // class QGuardedPtr
-    // ========================================================
-
-class QGuardedPtrPrivate {
- public:
-  QGuardedPtrPrivate(QObject* o);
-  ~QGuardedPtrPrivate();
-
-  QObject* object() { return p; }
-
- private:
-  QObject* p;
-  int refCount;
-
-  friend class KWQRefPtr<QGuardedPtrPrivate>;
+  T& operator*() const { return *(T*)pointer(); }
+  operator T*() const { return (T*)pointer(); }
+  T* operator->() const { return (T*)pointer(); }
 };
 
 #endif
