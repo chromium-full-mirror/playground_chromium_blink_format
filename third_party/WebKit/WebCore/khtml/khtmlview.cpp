@@ -1900,6 +1900,10 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
   bool swallowEvent = false;
 
   if (targetNode) {
+    // FIXME: Should share code with RenderFormElement::slotClicked, and
+    // NodeImpl::dispatchMouseEvent,
+    // which do a lot of the same stuff.
+
     // send the actual event
     MouseEventImpl* me = new MouseEventImpl(
         static_cast<EventImpl::EventId>(eventId), true, cancelable,
@@ -1908,6 +1912,7 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
     me->ref();
     targetNode->dispatchEvent(me, exceptioncode, true);
     bool defaultHandled = me->defaultHandled();
+    bool defaultPrevented = me->defaultPrevented();
     if (me->defaultHandled() || me->defaultPrevented())
       swallowEvent = true;
     me->deref();
@@ -1920,20 +1925,40 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
     // using DOM (only the click count is
     // stored, which is not necessarily the same)
     if (eventId == EventImpl::CLICK_EVENT) {
-      me = new MouseEventImpl(d->isDoubleClick ? EventImpl::KHTML_DBLCLICK_EVENT
-                                               : EventImpl::KHTML_CLICK_EVENT,
-                              true, cancelable,
+      me = new MouseEventImpl(EventImpl::KHTML_CLICK_EVENT, true, cancelable,
                               m_part->xmlDocImpl()->defaultView(), detail,
                               screenX, screenY, clientX, clientY, ctrlKey,
                               altKey, shiftKey, metaKey, button, 0);
-
       me->ref();
       if (defaultHandled)
         me->setDefaultHandled();
       targetNode->dispatchEvent(me, exceptioncode, true);
+      if (me->defaultHandled())
+        defaultHandled = true;
+      if (me->defaultPrevented())
+        defaultPrevented = true;
       if (me->defaultHandled() || me->defaultPrevented())
         swallowEvent = true;
       me->deref();
+
+      if (d->isDoubleClick) {
+        me = new MouseEventImpl(EventImpl::KHTML_DBLCLICK_EVENT, true,
+                                cancelable, m_part->xmlDocImpl()->defaultView(),
+                                detail, screenX, screenY, clientX, clientY,
+                                ctrlKey, altKey, shiftKey, metaKey, button, 0);
+        me->ref();
+        if (defaultHandled)
+          me->setDefaultHandled();
+        targetNode->dispatchEvent(me, exceptioncode, true);
+        if (me->defaultHandled() || me->defaultPrevented())
+          swallowEvent = true;
+        me->deref();
+      }
+
+      // Also send a DOMActivate event, which causes things like form
+      // submissions to occur.
+      if (!defaultPrevented && !targetNode->disabled())
+        targetNode->dispatchUIEvent(EventImpl::DOMACTIVATE_EVENT, detail);
     } else if (eventId == EventImpl::MOUSEDOWN_EVENT) {
       // Focus should be shifted on mouse down, not on a click.  -dwh
       // Blur current focus node when a link/button is clicked; this
