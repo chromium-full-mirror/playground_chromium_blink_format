@@ -25,5 +25,4 @@
           flags:(unsigned)flags
      withParent:(WebDataSource*)parent;
 
-- (NSDictionary*)elementInfoForMouseEvent:(NSEvent*)event;
 @end

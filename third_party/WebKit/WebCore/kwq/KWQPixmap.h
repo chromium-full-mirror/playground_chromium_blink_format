@@ -73,8 +73,11 @@ class QPixmap : public QPaintDevice, public Qt {
   bool receivedData(const QByteArray& bytes, bool isComplete);
   void stopAnimations();
 
+  WebCoreImageRendererPtr image() { return imageRenderer; };
+
  private:
   WebCoreImageRendererPtr imageRenderer;
+
   mutable bool needCopyOnWrite;
 
   friend class QPainter;
