@@ -43,8 +43,16 @@ static BidiIterator current;
 static BidiContext* context;
 static BidiStatus status;
 static QPtrList<BidiRun>* sruns = 0;
-static QPtrList<BidiIterator>* smidpoints = 0;
+
+// Midpoint globals.  The goal is not to do any allocation when dealing with
+// these midpoints, so we just keep an array around and never clear it.  We
+// track
+// the number of items and position using the two other variables.
+static QMemArray<BidiIterator>* smidpoints = 0;
+static uint sNumMidpoints = 0;
+static uint sCurrMidpoint = 0;
 static bool betweenMidpoints = false;
+
 static bool isLineEmpty = true;
 static QChar::Direction dir;
 static bool adjustEmbeddding = false;
@@ -88,34 +96,6 @@ static int inlineWidth(RenderObject* child,
     parent = child->parent();
   }
   return extraWidth;
-}
-
-#ifndef NDEBUG
-static bool inBidiIteratorDetach;
-#endif
-
-void BidiIterator::detach(RenderArena* renderArena) {
-#ifndef NDEBUG
-  inBidiIteratorDetach = true;
-#endif
-  delete this;
-#ifndef NDEBUG
-  inBidiIteratorDetach = false;
-#endif
-
-  // Recover the size left there for us by operator delete and free the memory.
-  renderArena->free(*(size_t*)this, this);
-}
-
-void* BidiIterator::operator new(size_t sz, RenderArena* renderArena) throw() {
-  return renderArena->allocate(sz);
-}
-
-void BidiIterator::operator delete(void* ptr, size_t sz) {
-  assert(inBidiIteratorDetach);
-
-  // Stash size where detach can find it.
-  *(size_t*)ptr = sz;
 }
 
 #ifndef NDEBUG
@@ -368,25 +348,37 @@ inline QChar::Direction BidiIterator::direction() const {
 
 // -------------------------------------------------------------------------------------------------
 
+static void addMidpoint(const BidiIterator& midpoint) {
+  if (!smidpoints)
+    return;
+
+  if (smidpoints->size() <= sNumMidpoints)
+    smidpoints->resize(sNumMidpoints + 10);
+
+  BidiIterator* midpoints = smidpoints->data();
+  midpoints[sNumMidpoints++] = midpoint;
+}
+
 static void appendRunsForObject(int start, int end, RenderObject* obj) {
   if (start > end || obj->isSpecial())
     return;
 
-  BidiIterator* nextMidpoint =
-      (smidpoints && smidpoints->count()) ? smidpoints->at(0) : 0;
+  bool haveNextMidpoint = (smidpoints && sCurrMidpoint < sNumMidpoints);
+  BidiIterator nextMidpoint;
+  if (haveNextMidpoint)
+    nextMidpoint = smidpoints->at(sCurrMidpoint);
   if (betweenMidpoints) {
-    if (!(nextMidpoint && nextMidpoint->obj == obj))
+    if (!(haveNextMidpoint && nextMidpoint.obj == obj))
       return;
     // This is a new start point. Stop ignoring objects and
     // adjust our start.
     betweenMidpoints = false;
-    start = nextMidpoint->pos;
-    smidpoints->removeFirst();  // Delete the midpoint.
-    nextMidpoint->detach(obj->renderArena());
+    start = nextMidpoint.pos;
+    sCurrMidpoint++;
     if (start < end)
       return appendRunsForObject(start, end, obj);
   } else {
-    if (!smidpoints || !nextMidpoint || (obj != nextMidpoint->obj)) {
+    if (!smidpoints || !haveNextMidpoint || (obj != nextMidpoint.obj)) {
       sruns->append(new (obj->renderArena())
                         BidiRun(start, end, obj, context, dir));
       return;
@@ -394,13 +386,12 @@ static void appendRunsForObject(int start, int end, RenderObject* obj) {
 
     // An end midpoint has been encounted within our object.  We
     // need to go ahead and append a run with our endpoint.
-    if (int(nextMidpoint->pos + 1) <= end) {
+    if (int(nextMidpoint.pos + 1) <= end) {
       sruns->append(new (obj->renderArena()) BidiRun(
-          start, nextMidpoint->pos + 1, obj, context, dir));
+          start, nextMidpoint.pos + 1, obj, context, dir));
       betweenMidpoints = true;
-      int nextPos = nextMidpoint->pos + 1;
-      smidpoints->removeFirst();
-      nextMidpoint->detach(obj->renderArena());
+      int nextPos = nextMidpoint.pos + 1;
+      sCurrMidpoint++;
       return appendRunsForObject(nextPos, end, obj);
     } else
       sruns->append(new (obj->renderArena())
@@ -1191,20 +1182,6 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
   sruns = 0;
 }
 
-static void deleteMidpoints(RenderArena* arena,
-                            QPtrList<BidiIterator>* midpoints) {
-  if (!midpoints)
-    return;
-
-  unsigned int len = midpoints->count();
-  for (unsigned int i = 0; i < len; i++) {
-    BidiIterator* s = midpoints->at(i);
-    if (s)
-      s->detach(arena);
-  }
-  midpoints->clear();
-}
-
 void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   m_overflowHeight = 0;
 
@@ -1268,16 +1245,17 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 
     m_firstLine = true;
 
-    if (!smidpoints) {
-      smidpoints = new QPtrList<BidiIterator>;
-      smidpoints->setAutoDelete(false);
-    }
+    if (!smidpoints)
+      smidpoints = new QMemArray<BidiIterator>;
+
+    sNumMidpoints = 0;
+    sCurrMidpoint = 0;
 
     while (!end.atEnd()) {
       start = end;
       betweenMidpoints = false;
       isLineEmpty = true;
-      end = findNextLineBreak(start, *smidpoints);
+      end = findNextLineBreak(start);
       if (start.atEnd())
         break;
       if (!isLineEmpty) {
@@ -1297,13 +1275,16 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
         m_firstLine = false;
         newLine();
       }
-      deleteMidpoints(renderArena(), smidpoints);
+
+      sNumMidpoints = 0;
+      sCurrMidpoint = 0;
     }
     startEmbed->deref();
     // embed->deref();
   }
 
-  deleteMidpoints(renderArena(), smidpoints);
+  sNumMidpoints = 0;
+  sCurrMidpoint = 0;
 
   // Now add in the bottom border/padding.
   m_height += toAdd;
@@ -1324,8 +1305,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   // kdDebug(6040) << "height = " << m_height <<endl;
 }
 
-BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
-                                            QPtrList<BidiIterator>& midpoints) {
+BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
   int width = lineWidth(m_height);
   int w = 0;
   int tmpW = 0;
@@ -1451,10 +1431,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
       tmpW += o->width() + o->marginLeft() + o->marginRight() + inlineWidth(o);
       if (ignoringSpaces) {
-        BidiIterator* startMid = new (o->renderArena()) BidiIterator();
-        startMid->obj = o;
-        startMid->pos = 0;
-        midpoints.append(startMid);
+        BidiIterator startMid;
+        startMid.obj = o;
+        startMid.pos = 0;
+        addMidpoint(startMid);
       }
       isLineEmpty = false;
       ignoringSpaces = false;
@@ -1479,10 +1459,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
              static_cast<RenderText*>(next)->text()[0] == '\n')) {
           currentCharacterIsSpace = true;
           ignoringSpaces = true;
-          BidiIterator* endMid = new (o->renderArena()) BidiIterator();
-          endMid->obj = o;
-          endMid->pos = 0;
-          midpoints.append(endMid);
+          BidiIterator endMid;
+          endMid.obj = o;
+          endMid.pos = 0;
+          addMidpoint(endMid);
         }
       }
     } else if (o->isText()) {
@@ -1522,10 +1502,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             if (!currentCharacterIsSpace) {
               // Stop ignoring spaces and begin at this
               // new point.
-              BidiIterator* startMid = new (o->renderArena()) BidiIterator();
-              startMid->obj = o;
-              startMid->pos = pos;
-              midpoints.append(startMid);
+              BidiIterator startMid;
+              startMid.obj = o;
+              startMid.pos = pos;
+              addMidpoint(startMid);
               ignoringSpaces = false;
             } else {
               // Just keep ignoring these spaces.
@@ -1606,13 +1586,13 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               // We just entered a mode where we are ignoring
               // spaces. Create a midpoint to terminate the run
               // before the second space.
-              BidiIterator* endMid = new (o->renderArena()) BidiIterator();
-              if (trailingSpaceObject) {
-                endMid->obj = trailingSpaceObject;
-              } else
-                endMid->obj = o;
-              endMid->pos = lastSpacePos;
-              midpoints.append(endMid);
+              BidiIterator endMid;
+              if (trailingSpaceObject)
+                endMid.obj = trailingSpaceObject;
+              else
+                endMid.obj = o;
+              endMid.pos = lastSpacePos;
+              addMidpoint(endMid);
               lastSpace = pos;
             }
           }
@@ -1623,10 +1603,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           lastSpacePos = 0;
           lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
                             // ignored spaces.
-          BidiIterator* startMid = new (o->renderArena()) BidiIterator();
-          startMid->obj = o;
-          startMid->pos = pos;
-          midpoints.append(startMid);
+          BidiIterator startMid;
+          startMid.obj = o;
+          startMid.pos = pos;
+          addMidpoint(startMid);
         }
 
         if (!isPre && currentCharacterIsSpace && !ignoringSpaces)
@@ -1791,21 +1771,19 @@ end:
     // level to
     // exclude the space, allowing it to - in effect - collapse into the
     // newline.
-    int count = midpoints.count();
-    if (count % 2 == 1) {
-      BidiIterator* lastEndPoint = midpoints.at(count - 1);
-      lastEndPoint->pos--;
+    if (sNumMidpoints % 2 == 1) {
+      BidiIterator* midpoints = smidpoints->data();
+      midpoints[sNumMidpoints - 1].pos--;
     }
     // else if (lBreak.pos > 0)
     //    lBreak.pos--;
     else if (lBreak.obj == 0 && trailingSpaceObject->isText()) {
       // Add a new end midpoint that stops right at the very end.
-      BidiIterator* endMid =
-          new (trailingSpaceObject->renderArena()) BidiIterator();
-      endMid->obj = trailingSpaceObject;
+      BidiIterator endMid;
+      endMid.obj = trailingSpaceObject;
       RenderText* text = static_cast<RenderText*>(trailingSpaceObject);
-      endMid->pos = text->length() >= 2 ? text->length() - 2 : 0;
-      midpoints.append(endMid);
+      endMid.pos = text->length() >= 2 ? text->length() - 2 : 0;
+      addMidpoint(endMid);
     }
   }
 
