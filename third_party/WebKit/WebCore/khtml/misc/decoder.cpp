@@ -257,7 +257,7 @@ breakBreak:
 
 Decoder::Decoder() {
   // latin1
-  m_codec = QTextCodec::codecForMib(4);
+  m_codec = QTextCodec::codecForName("iso8859-1");
   m_decoder = m_codec->makeDecoder();
   enc = 0;
   body = false;
@@ -292,7 +292,13 @@ void Decoder::setEncoding(const char* _encoding, bool force) {
   bool b;
   m_codec = KGlobal::charsets()->codecForName(enc, b);
 
-  if (m_codec->mibEnum() == 11) {
+  bool couldBeVisualRTL;
+#if APPLE_CHANGES
+  couldBeVisualRTL = m_codec->isISOLatin1Hebrew();
+#else
+  couldBeVisualRTL = m_codec->mibEnum() == 11;
+#endif
+  if (couldBeVisualRTL) {
     // visually ordered unless one of the following
     if (!(enc == "iso-8859-8-i" || enc == "iso_8859-8-i" ||
           enc == "csiso88598i" || enc == "logical"))
@@ -329,10 +335,14 @@ QString Decoder::decode(const char* data, int len) {
         uchars[0] == 0xff && uchars[1] == 0xfe) {
       enc = "ISO-10646-UCS-2";
       haveEncoding = true;
-      m_codec = QTextCodec::codecForMib(1000);
+      m_codec = QTextCodec::codecForName(enc);
       delete m_decoder;
       m_decoder = m_codec->makeDecoder();
     } else {
+#if APPLE_CHANGES
+      QString appendString(data, len);
+      buffer += appendString;
+#else
       if (m_codec->mibEnum() != 1000)  // utf16
       {
         // ### hack for a bug in QTextCodec. It cut's the input stream
@@ -345,10 +355,6 @@ QString Decoder::decode(const char* data, int len) {
           i--;
         }
       }
-#if APPLE_CHANGES
-      QString appendString(data, len);
-      buffer += appendString;
-#else
       buffer += QCString(data, len + 1);
 #endif
 // we still don't have an encoding, and are in the head
@@ -516,8 +522,8 @@ found:
     m_codec = QTextCodec::codecForName(enc);
     // be sure not to crash
     if (!m_codec) {
-      m_codec = QTextCodec::codecForMib(4);
       enc = "iso8859-1";
+      m_codec = QTextCodec::codecForName(enc);
     }
     delete m_decoder;
     m_decoder = m_codec->makeDecoder();
