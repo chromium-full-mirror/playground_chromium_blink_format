@@ -12,4 +12,5 @@
   NSArray* strengthMenuItemTitles;
 }
 + (void)createSharedGenerator;
+- (BOOL)addCertificateToKeyChainFromFileAtPath:(NSString*)path;
 @end
