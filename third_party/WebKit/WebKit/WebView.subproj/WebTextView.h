@@ -14,7 +14,7 @@
     : WebSearchableTextView<WebDocumentView, WebDocumentText> {
 }
 
-+ (NSArray*)unshowableMIMETypes;
++ (NSArray*)unsupportedTextMIMETypes;
 - (void)setFixedWidthFont;
 
 @end

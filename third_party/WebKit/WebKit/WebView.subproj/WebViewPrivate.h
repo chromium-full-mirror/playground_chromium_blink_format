@@ -104,7 +104,6 @@ enum { NumUserAgentStringTypes = WinIE + 1 };
             fromDataSource:(WebDataSource*)dataSource
                   complete:(BOOL)isComplete;
 + (NSString*)_MIMETypeForFile:(NSString*)path;
-+ (NSArray*)_supportedImageMIMETypes;
 - (void)_downloadURL:(NSURL*)URL;
 - (void)_downloadURL:(NSURL*)URL toDirectory:(NSString*)directoryPath;
 
