@@ -122,6 +122,7 @@
 @class WKWebDataSource;
 @class WKError;
 @class WKWebView;
+@class WKWebFrame;
 
 #ifdef TENTATIVE_API
 /*
@@ -324,4 +325,10 @@
                           WKScriptContextHandler,
                           WKAuthenticationHandler,
                           WKLocationChangeHandler>
+
+// Called when a data source needs to create a frame.  This method encapsulates
+// the
+// specifics of creating and initializaing a view of the appropriate class.
+- (WKWebFrame *)createFrameNamed: (NSString *)fname for: (WKWebDataSource *)child inParent: (WKWebDataSource *)parent;
+
 @end
