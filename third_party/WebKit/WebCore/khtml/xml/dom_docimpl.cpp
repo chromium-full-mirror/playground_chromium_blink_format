@@ -1191,10 +1191,12 @@ void DocumentImpl::clearSelection() {
 
 void DocumentImpl::deleteSelection() {
   KHTMLSelection& selection = part()->getKHTMLSelection();
-  clearSelection();
-  Range range(selection.startNode(), selection.startOffset(),
-              selection.endNode(), selection.endOffset());
-  range.deleteContents();
+  if (!selection.isEmpty()) {
+    clearSelection();
+    Range range(selection.startNode(), selection.startOffset(),
+                selection.endNode(), selection.endOffset());
+    range.deleteContents();
+  }
 }
 
 void DocumentImpl::pasteHTMLString(const QString& HTMLString) {
