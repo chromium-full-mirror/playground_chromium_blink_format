@@ -10,7 +10,7 @@
 @class WebDownloadPrivate;
 @class WebError;
 @class NSURLRequest;
-@class WebResponse;
+@class NSURLResponse;
 
 @protocol WebDownloadDecisionListener;
 
@@ -90,9 +90,9 @@
     @method download:didReceiveResponse:
     @abstract This method is called when the download has received a response
    from the server.
-    @param download The download that now has a WebResponse available for
+    @param download The download that now has a NSURLResponse available for
    inspection.
-    @param response The WebResponse object for the given download.
+    @param response The NSURLResponse object for the given download.
     @discussion In some rare cases, multiple responses may be received for a
    single download.
     This occurs with multipart/x-mixed-replace, or "server push". In this case,
@@ -102,7 +102,7 @@
     and should check the new response for the expected content length.
 */
 - (void)download:(WebDownload*)download
-    didReceiveResponse:(WebResponse*)response;
+    didReceiveResponse:(NSURLResponse*)response;
 
 /*!
     @method download:decidePathWithListener:suggestedFilename:

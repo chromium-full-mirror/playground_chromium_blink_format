@@ -7,7 +7,7 @@
 @class WebView;
 @class WebDataSource;
 @class WebPlugInError;
-@class WebResponse;
+@class NSURLResponse;
 @class NSURLRequest;
 
 /*!
@@ -89,7 +89,7 @@
 */
 - (void)webView:(WebView*)sender
               resource:identifier
-    didReceiveResponse:(WebResponse*)response
+    didReceiveResponse:(NSURLResponse*)response
         fromDataSource:(WebDataSource*)dataSource;
 
 /*!
