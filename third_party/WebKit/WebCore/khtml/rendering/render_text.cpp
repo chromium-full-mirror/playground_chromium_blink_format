@@ -905,6 +905,7 @@ void RenderText::trimmedMinMaxWidth(short& beginMinW,
   endMinW = m_endMinWidth;
 
   hasBreakableChar = m_hasBreakableChar;
+  hasBreak = m_hasBreak;
 
   if (len == 0)
     return;
@@ -924,8 +925,35 @@ void RenderText::trimmedMinMaxWidth(short& beginMinW,
   else if (minW > maxW)
     minW = maxW;
 
-  beginMaxW = m_beginMaxWidth;
-  endMaxW = m_endMaxWidth;
+  // Compute our max widths by scanning the string for newlines.
+  if (hasBreak) {
+    const Font* f = htmlFont(false);
+    bool firstLine = true;
+    beginMaxW = endMaxW = maxW;
+    for (int i = 0; i < len; i++) {
+      int linelen = 0;
+      while (i + linelen < len && str->s[i + linelen] != '\n')
+        linelen++;
+
+      if (linelen) {
+#if !APPLE_CHANGES
+        endMaxW = f->width(str->s, str->l, i, linelen);
+#else
+        endMaxW = widthFromBuffer(f, i, linelen);
+#endif
+        if (firstLine) {
+          firstLine = false;
+          beginMaxW = endMaxW;
+        }
+        i += linelen;
+        if (i == len - 1)
+          endMaxW = 0;
+      } else if (firstLine) {
+        beginMaxW = 0;
+        firstLine = false;
+      }
+    }
+  }
 }
 
 void RenderText::calcMinMaxWidth() {
@@ -933,7 +961,7 @@ void RenderText::calcMinMaxWidth() {
 
   // ### calc Min and Max width...
   m_minWidth = m_beginMinWidth = m_endMinWidth = 0;
-  m_maxWidth = m_beginMaxWidth = m_endMaxWidth = 0;
+  m_maxWidth = 0;
 
   if (isBR())
     return;
@@ -1028,36 +1056,6 @@ void RenderText::calcMinMaxWidth() {
 
   if (style()->whiteSpace() == NOWRAP)
     m_minWidth = m_maxWidth;
-
-  // Compute our max widths by scanning the string for newlines.
-  m_beginMaxWidth = m_endMaxWidth = m_maxWidth;
-  if (m_hasBreak) {
-    const Font* f = htmlFont(false);
-    bool firstLine = true;
-    for (int i = 0; i < len; i++) {
-      int linelen = 0;
-      while (i + linelen < len && str->s[i + linelen] != '\n')
-        linelen++;
-
-      if (linelen) {
-#if !APPLE_CHANGES
-        m_endMaxWidth = f->width(str->s, str->l, i, linelen);
-#else
-        m_endMaxWidth = widthFromBuffer(f, i, linelen);
-#endif
-        if (firstLine) {
-          firstLine = false;
-          m_beginMaxWidth = m_endMaxWidth;
-        }
-        i += linelen;
-        if (i == len - 1)
-          m_endMaxWidth = 0;
-      } else if (firstLine) {
-        m_beginMaxWidth = 0;
-        firstLine = false;
-      }
-    }
-  }
 
   setMinMaxKnown();
   // kdDebug( 6040 ) << "Text::calcMinMaxWidth(): min = " << m_minWidth << " max
