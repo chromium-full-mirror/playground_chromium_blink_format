@@ -288,10 +288,19 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   if (*box.get() != *other->box.get() ||
       *visual.get() != *other->visual.get() ||
-      *surround.get() != *other->surround.get() ||
-      *inherited.get() != *other->inherited.get())
+      *surround.get() != *other->surround.get())
     d = CbLayout;
 
+  if (d == CbLayout)
+    return d;
+
+  if (!(inherited->indent == other->inherited->indent) ||
+      !(inherited->line_height == other->inherited->line_height) ||
+      !(inherited->style_image == other->inherited->style_image) ||
+      !(inherited->cursor_image == other->inherited->cursor_image) ||
+      !(inherited->font == other->inherited->font) ||
+      !(inherited->border_spacing == other->inherited->border_spacing))
+    d = CbLayout;
   if (d == CbLayout)
     return d;
 
@@ -365,6 +374,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
 
   if (d == Layout)
     return d;
+
+  if (inherited->color != other->inherited->color ||
+      inherited->decoration_color != other->inherited->decoration_color)
+    d = Visible;
 
   // Visible:
   // 	EVisibility _visibility : 2;
