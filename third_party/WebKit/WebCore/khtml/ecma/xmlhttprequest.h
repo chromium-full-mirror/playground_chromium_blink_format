@@ -98,6 +98,12 @@ class XMLHttpRequest : public DOMObject {
   void slotFinished(KIO::Job*);
   void slotRedirection(KIO::Job*, const KURL&);
 
+#if APPLE_CHANGES
+  void processSyncLoadResults(const QByteArray& data,
+                              const KURL& finalURL,
+                              const QString& headers);
+#endif
+
   void open(const QString& _method, const KURL& _url, bool _async);
   void send(const QString& _body);
   void abort();
@@ -127,6 +133,8 @@ class XMLHttpRequest : public DOMObject {
   QString response;
   mutable bool createdDocument;
   mutable DOM::Document responseXML;
+
+  bool aborted;
 };
 
 class XMLHttpRequestQObject : public QObject {

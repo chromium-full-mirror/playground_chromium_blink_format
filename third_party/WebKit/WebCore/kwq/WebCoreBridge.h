@@ -354,6 +354,14 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (void)objectLoadedFromCacheWithURL:(NSURL*)URL
                             response:(id)response
                                 size:(unsigned)bytes;
+
+- (NSData*)syncLoadResourceWithURL:(NSURL*)URL
+                     customHeaders:(NSDictionary*)requestHeaders
+                          postData:(NSData*)postData
+                          finalURL:(NSURL**)finalNSURL
+                   responseHeaders:(NSDictionary**)responseHeaderDict
+                        statusCode:(int*)statusCode;
+
 - (BOOL)isReloading;
 
 - (void)reportClientRedirectToURL:(NSURL*)URL
