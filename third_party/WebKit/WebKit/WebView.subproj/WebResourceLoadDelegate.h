@@ -24,7 +24,8 @@
     parameter.  This identifier can be used to track messages associated with a
    single
     resource.  For example, a single resource may generate multiple
-    resource:willSendRequest:fromDataSource: messages as it's URL is redirected.
+    resource:willSendRequest:redirectResponse:fromDataSource: messages as it's
+   URL is redirected.
 */
 @interface NSObject (WebResourceLoadDelegate)
 
@@ -40,7 +41,8 @@
     passed as the first argument for all of the other WebResourceLoadDelegate
    methods.  The
     identifier is useful to track changes to a resources request, which will be
-    provided by one or more calls to resource:willSendRequest:fromDataSource:.
+    provided by one or more calls to
+   resource:willSendRequest:redirectResponse:fromDataSource:.
     @result An identifier that will be passed back to the implementor for each
    callback.
     The identifier will be retained.
@@ -50,7 +52,7 @@
                  fromDataSource:(WebDataSource*)dataSource;
 
 /*!
-    @method resource:willSendRequest:fromDataSource:
+    @method resource:willSendRequest:redirectResponse:fromDataSource:
     @discussion This message is sent before a load is initiated.  The request
    may be modified
     as necessary by the receiver.
@@ -67,6 +69,7 @@
 - (NSURLRequest*)webView:(WebView*)sender
                 resource:identifier
          willSendRequest:(NSURLRequest*)request
+        redirectResponse:(NSURLResponse*)redirectResponse
           fromDataSource:(WebDataSource*)dataSource;
 
 /*!
