@@ -191,8 +191,8 @@ void RenderImage::paintObject(QPainter* p,
                               int /*_h*/,
                               int _tx,
                               int _ty,
-                              int paintPhase) {
-  if (paintPhase != FOREGROUND_PHASE)
+                              PaintAction paintAction) {
+  if (paintAction != PaintActionForeground)
     return;
 
   int cWidth = contentWidth();

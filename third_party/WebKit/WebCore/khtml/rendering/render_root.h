@@ -58,8 +58,14 @@ class RenderRoot : public RenderFlow {
                                 int h,
                                 bool immediate = false,
                                 bool f = false);
-  virtual void
-  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
+  virtual void paint(QPainter*,
+                     int x,
+                     int y,
+                     int w,
+                     int h,
+                     int tx,
+                     int ty,
+                     PaintAction paintAction);
   void paintObject(QPainter* p,
                    int _x,
                    int _y,
@@ -67,7 +73,7 @@ class RenderRoot : public RenderFlow {
                    int _h,
                    int _tx,
                    int _ty,
-                   int paintPhase);
+                   PaintAction paintAction);
 
   virtual void setSelection(RenderObject* s, int sp, RenderObject* e, int ep);
   virtual void clearSelection(bool doRepaint = true);

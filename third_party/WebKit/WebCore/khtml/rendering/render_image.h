@@ -52,7 +52,7 @@ class RenderImage : public RenderReplaced {
                            int /*h*/,
                            int tx,
                            int ty,
-                           int paintPhase);
+                           PaintAction paintAction);
 
   virtual void layout();
 

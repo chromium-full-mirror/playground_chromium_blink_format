@@ -51,7 +51,7 @@ class RenderBox : public RenderContainer {
                      int _h,
                      int _tx,
                      int _ty,
-                     int paintPhase);
+                     PaintAction paintAction);
 
   virtual void close();
 

@@ -147,14 +147,14 @@ void RenderBox::paint(QPainter* p,
                       int _h,
                       int _tx,
                       int _ty,
-                      int paintPhase) {
+                      PaintAction paintAction) {
   _tx += m_x;
   _ty += m_y;
 
   // default implementation. Just pass things through to the children
   RenderObject* child = firstChild();
   while (child != 0) {
-    child->paint(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
+    child->paint(p, _x, _y, _w, _h, _tx, _ty, paintAction);
     child = child->nextSibling();
   }
 }

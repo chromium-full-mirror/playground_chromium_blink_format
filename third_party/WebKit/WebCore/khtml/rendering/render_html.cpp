@@ -49,12 +49,12 @@ void RenderHtml::paint(QPainter* p,
                        int _h,
                        int _tx,
                        int _ty,
-                       int paintPhase) {
+                       PaintAction paintAction) {
   _tx += m_x;
   _ty += m_y;
 
   // kdDebug(0) << "html:paint " << _tx << "/" << _ty << endl;
-  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
+  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
 }
 
 void RenderHtml::paintBoxDecorations(QPainter* p,

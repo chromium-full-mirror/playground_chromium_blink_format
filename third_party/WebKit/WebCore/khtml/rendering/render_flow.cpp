@@ -126,7 +126,7 @@ void RenderFlow::paint(QPainter* p,
                        int _h,
                        int _tx,
                        int _ty,
-                       int paintPhase) {
+                       PaintAction paintAction) {
 #ifdef DEBUG_LAYOUT
 //    kdDebug( 6040 ) << renderName() << "(RenderFlow) " << this << " ::print()
 //    x/y/w/h = ("  << xPos() << "/" << yPos() << "/" << width() << "/" <<
@@ -150,7 +150,7 @@ void RenderFlow::paint(QPainter* p,
     }
   }
 
-  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
+  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
 }
 
 void RenderFlow::paintObject(QPainter* p,
@@ -160,14 +160,14 @@ void RenderFlow::paintObject(QPainter* p,
                              int _h,
                              int _tx,
                              int _ty,
-                             int paintPhase) {
+                             PaintAction paintAction) {
 #ifdef DEBUG_LAYOUT
 //    kdDebug( 6040 ) << renderName() << "(RenderFlow) " << this << "
 //    ::paintObject() w/h = (" << width() << "/" << height() << ")" << endl;
 #endif
 
   // 1. paint background, borders etc
-  if (paintPhase == BACKGROUND_PHASE && shouldPaintBackgroundOrBorder() &&
+  if (paintAction == PaintActionBackground && shouldPaintBackgroundOrBorder() &&
       !isInline() && style()->visibility() == VISIBLE)
     paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
 
@@ -175,16 +175,16 @@ void RenderFlow::paintObject(QPainter* p,
   RenderObject* child = firstChild();
   while (child != 0) {
     if (!child->layer() && !child->isFloating())
-      child->paint(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
+      child->paint(p, _x, _y, _w, _h, _tx, _ty, paintAction);
     child = child->nextSibling();
   }
 
   // 3. paint floats.
-  if (paintPhase == FLOAT_PHASE)
+  if (paintAction == PaintActionFloat)
     paintFloats(p, _x, _y, _w, _h, _tx, _ty);
 
-  if (paintPhase == BACKGROUND_PHASE && !isInline() && !childrenInline() &&
-      style()->outlineWidth())
+  if (paintAction == PaintActionBackground && !isInline() &&
+      !childrenInline() && style()->outlineWidth())
     paintOutline(p, _tx, _ty, width(), height(), style());
 
 #ifdef BOX_DEBUG
@@ -217,15 +217,15 @@ void RenderFlow::paintFloats(QPainter* p,
       r->node->paint(p, _x, _y, _w, _h,
                      _tx + r->left - r->node->xPos() + r->node->marginLeft(),
                      _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     BACKGROUND_PHASE);
+                     PaintActionBackground);
       r->node->paint(p, _x, _y, _w, _h,
                      _tx + r->left - r->node->xPos() + r->node->marginLeft(),
                      _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     FLOAT_PHASE);
+                     PaintActionFloat);
       r->node->paint(p, _x, _y, _w, _h,
                      _tx + r->left - r->node->xPos() + r->node->marginLeft(),
                      _ty + r->startY - r->node->yPos() + r->node->marginTop(),
-                     FOREGROUND_PHASE);
+                     PaintActionForeground);
     }
   }
 }

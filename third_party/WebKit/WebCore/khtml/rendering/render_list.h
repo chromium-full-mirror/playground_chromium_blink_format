@@ -53,7 +53,7 @@ class RenderListMarker : public RenderBox {
                      int h,
                      int xoff,
                      int yoff,
-                     int paintPhase);
+                     PaintAction paintAction);
   virtual void paintObject(QPainter* p,
                            int x,
                            int y,
@@ -61,7 +61,7 @@ class RenderListMarker : public RenderBox {
                            int h,
                            int xoff,
                            int yoff,
-                           int paintPhase);
+                           PaintAction paintAction);
   virtual void layout();
   virtual void calcMinMaxWidth();
 
@@ -110,7 +110,7 @@ class RenderListItem : public RenderFlow {
                      int h,
                      int xoff,
                      int yoff,
-                     int paintPhase);
+                     PaintAction paintAction);
   virtual void paintObject(QPainter* p,
                            int x,
                            int y,
@@ -118,7 +118,7 @@ class RenderListItem : public RenderFlow {
                            int h,
                            int xoff,
                            int yoff,
-                           int paintPhase);
+                           PaintAction paintAction);
 
   virtual void layout();
   virtual void calcMinMaxWidth();

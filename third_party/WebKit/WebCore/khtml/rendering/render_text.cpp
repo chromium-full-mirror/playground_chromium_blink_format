@@ -653,7 +653,7 @@ void RenderText::paintObject(QPainter* p,
                              int h,
                              int tx,
                              int ty,
-                             int paintPhase) {
+                             PaintAction paintAction) {
   int ow = style()->outlineWidth();
   RenderStyle* pseudoStyle = style()->getPseudoStyle(RenderStyle::FIRST_LINE);
   int d = style()->textDecoration();
@@ -847,8 +847,8 @@ void RenderText::paint(QPainter* p,
                        int h,
                        int tx,
                        int ty,
-                       int paintPhase) {
-  if (paintPhase != FOREGROUND_PHASE || style()->visibility() != VISIBLE)
+                       PaintAction paintAction) {
+  if (paintAction != PaintActionForeground || style()->visibility() != VISIBLE)
     return;
 
   int s = m_lines.count() - 1;
@@ -861,7 +861,7 @@ void RenderText::paint(QPainter* p,
   if (ty + m_lines[s]->m_y + m_lines[s]->m_baseline + m_lineHeight + 64 < y)
     return;
 
-  paintObject(p, x, y, w, h, tx, ty, paintPhase);
+  paintObject(p, x, y, w, h, tx, ty, paintAction);
 }
 
 #ifdef APPLE_CHANGES

@@ -57,8 +57,8 @@ void RenderReplaced::paint(QPainter* p,
                            int _h,
                            int _tx,
                            int _ty,
-                           int paintPhase) {
-  if (paintPhase != FOREGROUND_PHASE)
+                           PaintAction paintAction) {
+  if (paintAction != PaintActionForeground)
     return;
 
   // not visible or nont even once layouted?
@@ -74,7 +74,7 @@ void RenderReplaced::paint(QPainter* p,
   if (shouldPaintBackgroundOrBorder())
     paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
 
-  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
+  paintObject(p, _x, _y, _w, _h, _tx, _ty, paintAction);
 }
 
 void RenderReplaced::calcMinMaxWidth() {
@@ -234,7 +234,7 @@ void RenderWidget::paintObject(QPainter* p,
                                int height,
                                int _tx,
                                int _ty,
-                               int paintPhase)
+                               PaintAction paintAction)
 #else
 void RenderWidget::paintObject(QPainter* /*p*/,
                                int,
@@ -243,10 +243,10 @@ void RenderWidget::paintObject(QPainter* /*p*/,
                                int,
                                int _tx,
                                int _ty,
-                               int paintPhase)
+                               PaintAction paintAction)
 #endif
 {
-  if (!m_widget || !m_view || paintPhase != FOREGROUND_PHASE)
+  if (!m_widget || !m_view || paintAction != PaintActionForeground)
     return;
 
   if (style()->visibility() != VISIBLE) {

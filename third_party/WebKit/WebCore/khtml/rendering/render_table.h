@@ -95,8 +95,14 @@ class RenderTable : public RenderFlow {
   virtual int overflowHeight() const { return height(); }
   virtual int overflowWidth() const { return width(); }
   virtual void addChild(RenderObject* child, RenderObject* beforeChild = 0);
-  virtual void
-  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
+  virtual void paint(QPainter*,
+                     int x,
+                     int y,
+                     int w,
+                     int h,
+                     int tx,
+                     int ty,
+                     PaintAction paintAction);
   virtual void layout();
   virtual void calcMinMaxWidth();
   virtual void close();
@@ -231,8 +237,14 @@ class RenderTableSection : public RenderBox {
     return (*(grid[row].row))[col];
   }
 
-  virtual void
-  paint(QPainter*, int x, int y, int w, int h, int tx, int ty, int paintPhase);
+  virtual void paint(QPainter*,
+                     int x,
+                     int y,
+                     int w,
+                     int h,
+                     int tx,
+                     int ty,
+                     PaintAction paintAction);
 
   int numRows() const { return grid.size(); }
   int getBaseline(int row) { return grid[row].baseLine; }
@@ -341,7 +353,7 @@ class RenderTableCell : public RenderFlow {
                      int h,
                      int tx,
                      int ty,
-                     int paintPhase);
+                     PaintAction paintAction);
 
   virtual void close();
 
