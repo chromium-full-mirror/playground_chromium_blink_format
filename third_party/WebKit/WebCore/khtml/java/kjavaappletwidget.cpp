@@ -49,6 +49,7 @@ void KJavaAppletWidget::showApplet() {
     m_applet->create();
 }
 
+#ifndef APPLE_CHANGES
 void KJavaAppletWidget::setWindow(WId w) {
   // make sure that this window has the right name, if so, embed it...
   KWin::Info w_info = KWin::info(w);
@@ -67,6 +68,7 @@ void KJavaAppletWidget::setWindow(WId w) {
     setFocus();
   }
 }
+#endif
 
 QSize KJavaAppletWidget::sizeHint() {
   kdDebug(6100) << "KJavaAppletWidget::sizeHint()" << endl;

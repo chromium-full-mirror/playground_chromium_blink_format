@@ -28,6 +28,10 @@
 
 #include <qwidget.h>
 
+#ifdef APPLE_CHANGES
+typedef QWidget KJavaEmbed;
+#else
+
 #ifndef Q_WS_QWS  // FIXME(E)? I don't think this is possible with Qt Embedded.
 class KJavaEmbedPrivate;
 class KJavaEmbed : public QWidget {
@@ -76,5 +80,6 @@ class KJavaEmbed : public QWidget {
   KJavaEmbedPrivate* d;
 };
 
+#endif
 #endif
 #endif
