@@ -382,7 +382,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Schedules a redirection after @p delay seconds.
    */
-  void scheduleRedirection(int delay,
+  void scheduleRedirection(double delay,
                            const QString& url,
                            bool lockHistory = true);
 

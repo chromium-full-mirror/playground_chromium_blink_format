@@ -1088,17 +1088,17 @@ void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
     qData = d->m_job->queryMetaData("http-refresh");
     if (!qData.isEmpty() && d->m_metaRefreshEnabled) {
       kdDebug(6050) << "HTTP Refresh Request: " << qData << endl;
-      int delay;
+      double delay;
       int pos = qData.find(';');
       if (pos == -1)
         pos = qData.find(',');
 
       if (pos == -1) {
-        delay = qData.stripWhiteSpace().toInt();
-        scheduleRedirection(qData.toInt(), m_url.url());
+        delay = qData.stripWhiteSpace().toDouble();
+        scheduleRedirection(delay, m_url.url());
       } else {
         int end_pos = qData.length();
-        delay = qData.left(pos).stripWhiteSpace().toInt();
+        delay = qData.left(pos).stripWhiteSpace().toDouble();
         while (qData[++pos] == ' ')
           ;
         if (qData.find("url", pos, false) == pos) {
@@ -1660,7 +1660,7 @@ void KHTMLPart::checkCompleted() {
     // Do not start redirection for frames here! That action is
     // deferred until the parent emits a completed signal.
     if (parentPart() == 0)
-      d->m_redirectionTimer.start(1000 * d->m_delayRedirect, true);
+      d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
 
     emit completed(true);
   } else {
@@ -1758,18 +1758,20 @@ KURL KHTMLPart::completeURL(const QString& url) {
   return KURL(d->m_doc->completeURL(url));
 }
 
-void KHTMLPart::scheduleRedirection(int delay,
+void KHTMLPart::scheduleRedirection(double delay,
                                     const QString& url,
                                     bool doLockHistory) {
   kdDebug(6050) << "KHTMLPart::scheduleRedirection delay=" << delay
                 << " url=" << url << endl;
+  if (delay < 0 || delay > INT_MAX / 1000)
+    return;
   if (d->m_redirectURL.isEmpty() || delay < d->m_delayRedirect) {
     d->m_delayRedirect = delay;
     d->m_redirectURL = url;
     d->m_redirectLockHistory = doLockHistory;
     if (d->m_bComplete) {
       d->m_redirectionTimer.stop();
-      d->m_redirectionTimer.start(1000 * d->m_delayRedirect, true);
+      d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
     }
   }
 }
@@ -3230,7 +3232,7 @@ void KHTMLPart::slotParentCompleted() {
   if (!d->m_redirectURL.isEmpty() && !d->m_redirectionTimer.isActive()) {
     // kdDebug(6050) << this << ": Child redirection -> " << d->m_redirectURL <<
     // endl;
-    d->m_redirectionTimer.start(1000 * d->m_delayRedirect, true);
+    d->m_redirectionTimer.start((int)(1000 * d->m_delayRedirect), true);
   }
 }
 
