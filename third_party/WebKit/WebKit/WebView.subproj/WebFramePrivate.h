@@ -36,6 +36,7 @@ typedef enum {
                                        // list
   WebFrameLoadTypeReload,
   WebFrameLoadTypeReloadAllowingStaleData,
+  WebFrameLoadTypeClientRedirect,
   WebFrameLoadTypeInternal
 } WebFrameLoadType;
 
