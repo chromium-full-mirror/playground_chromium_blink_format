@@ -77,6 +77,7 @@ class RenderFlow : public RenderBox {
   void addChildWithContinuation(RenderObject* newChild,
                                 RenderObject* beforeChild);
   void addChildToFlow(RenderObject* newChild, RenderObject* beforeChild);
+  void removeChild(RenderObject* oldChild);
 
   void makeChildrenNonInline(RenderObject* box2Start = 0);
 
