@@ -177,23 +177,22 @@ class BorderValue {
   BorderValue() {
     width = 3;  // medium is default value
     style = BNONE;
-    transparent = false;
   }
   QColor color;
-  unsigned short width : 11;
+  unsigned short width : 12;
   EBorderStyle style : 4;
-  bool transparent : 1;
 
   bool nonZero() const {
     // rikkus: workaround for gcc 2.95.3
     return width != 0 && !(style == BNONE);
   }
 
-  bool isTransparent() const { return transparent; }
+  bool isTransparent() const {
+    return color.isValid() && qAlpha(color.rgb()) == 0;
+  }
 
   bool operator==(const BorderValue& o) const {
-    return width == o.width && style == o.style && color == o.color &&
-           transparent == o.transparent;
+    return width == o.width && style == o.style && color == o.color;
   }
 };
 
@@ -223,7 +222,7 @@ struct CollapsedBorderValue {
   EBorderStyle style() const { return border ? border->style : BHIDDEN; }
   bool exists() const { return border; }
   QColor color() const { return border ? border->color : QColor(); }
-  bool isTransparent() const { return border ? border->transparent : true; }
+  bool isTransparent() const { return border ? border->isTransparent() : true; }
 
   bool operator==(const CollapsedBorderValue& o) const {
     if (!border)
@@ -1138,9 +1137,8 @@ class RenderStyle : public Shared<RenderStyle> {
   void setBorderLeftStyle(EBorderStyle v) {
     SET_VAR(surround, border.left.style, v)
   }
-  void setBorderLeftColor(const QColor& v, bool t = false) {
-    SET_VAR(surround, border.left.color, v);
-    SET_VAR(surround, border.left.transparent, t)
+  void setBorderLeftColor(const QColor& v) {
+    SET_VAR(surround, border.left.color, v)
   }
   void setBorderRightWidth(unsigned short v) {
     SET_VAR(surround, border.right.width, v)
@@ -1148,9 +1146,8 @@ class RenderStyle : public Shared<RenderStyle> {
   void setBorderRightStyle(EBorderStyle v) {
     SET_VAR(surround, border.right.style, v)
   }
-  void setBorderRightColor(const QColor& v, bool t = false) {
-    SET_VAR(surround, border.right.color, v);
-    SET_VAR(surround, border.right.transparent, t)
+  void setBorderRightColor(const QColor& v) {
+    SET_VAR(surround, border.right.color, v)
   }
   void setBorderTopWidth(unsigned short v) {
     SET_VAR(surround, border.top.width, v)
@@ -1158,9 +1155,8 @@ class RenderStyle : public Shared<RenderStyle> {
   void setBorderTopStyle(EBorderStyle v) {
     SET_VAR(surround, border.top.style, v)
   }
-  void setBorderTopColor(const QColor& v, bool t = false) {
-    SET_VAR(surround, border.top.color, v);
-    SET_VAR(surround, border.top.transparent, t)
+  void setBorderTopColor(const QColor& v) {
+    SET_VAR(surround, border.top.color, v)
   }
   void setBorderBottomWidth(unsigned short v) {
     SET_VAR(surround, border.bottom.width, v)
@@ -1168,9 +1164,8 @@ class RenderStyle : public Shared<RenderStyle> {
   void setBorderBottomStyle(EBorderStyle v) {
     SET_VAR(surround, border.bottom.style, v)
   }
-  void setBorderBottomColor(const QColor& v, bool t = false) {
-    SET_VAR(surround, border.bottom.color, v);
-    SET_VAR(surround, border.bottom.transparent, t)
+  void setBorderBottomColor(const QColor& v) {
+    SET_VAR(surround, border.bottom.color, v)
   }
   void setOutlineWidth(unsigned short v) {
     SET_VAR(background, outline.width, v)
