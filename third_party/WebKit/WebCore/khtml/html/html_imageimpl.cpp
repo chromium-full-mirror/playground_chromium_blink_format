@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -56,6 +56,8 @@ HTMLImageLoader::HTMLImageLoader(ElementImpl* elt)
 HTMLImageLoader::~HTMLImageLoader() {
   if (m_image)
     m_image->deref(this);
+  if (m_element->getDocument())
+    m_element->getDocument()->removeImage(this);
 }
 
 void HTMLImageLoader::updateFromElement() {
@@ -88,17 +90,6 @@ void HTMLImageLoader::updateFromElement() {
     if (oldImage)
       oldImage->deref(this);
   }
-}
-
-void HTMLImageLoader::removedFromDocument() {
-  if (m_image) {
-    m_image->deref(this);
-    m_image = 0;
-    m_element->getDocument()->removeImage(this);
-  }
-
-  m_firedLoad = true;
-  m_imageComplete = true;
 }
 
 void HTMLImageLoader::dispatchLoadEvent() {
@@ -307,10 +298,6 @@ void HTMLImageElementImpl::detach() {
   }
 
   HTMLElementImpl::detach();
-}
-
-void HTMLImageElementImpl::removedFromDocument() {
-  m_imageLoader.removedFromDocument();
 }
 
 long HTMLImageElementImpl::width() const {
