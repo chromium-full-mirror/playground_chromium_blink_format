@@ -96,7 +96,8 @@ class CSSParser {
   ~CSSParser();
 
   void parseSheet(DOM::CSSStyleSheetImpl* sheet, const DOM::DOMString& string);
-  DOM::CSSRuleImpl* parseRule(const DOM::DOMString& string);
+  DOM::CSSRuleImpl* parseRule(DOM::CSSStyleSheetImpl* sheet,
+                              const DOM::DOMString& string);
   bool parseValue(DOM::CSSStyleDeclarationImpl* decls,
                   int id,
                   const DOM::DOMString& string,
