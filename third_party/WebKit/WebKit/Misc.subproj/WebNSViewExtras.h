@@ -43,8 +43,9 @@
 // Resizes and applies alpha to image, extends pboard and sets drag origins for
 // dragging promised image files.
 - (void)_web_dragPromisedImage:(NSImage*)image
-                    fromOrigin:(NSPoint)origin
-                       withURL:(NSURL*)URL
+                        origin:(NSPoint)origin
+                           URL:(NSURL*)URL
+                      fileType:(NSString*)fileType
                          title:(NSString*)title
                          event:(NSEvent*)event;
 
@@ -54,10 +55,3 @@
 - initWithSource:(id)draggingSource;
 - (void)setTypes:(NSArray*)types onPasteboard:(NSPasteboard*)pboard;
 @end
-
-@interface WebFilePromiseDragSource : NSFilePromiseDragSource {
-  id _draggingSource;
-}
-- (id)draggingSource;
-@end
-;
