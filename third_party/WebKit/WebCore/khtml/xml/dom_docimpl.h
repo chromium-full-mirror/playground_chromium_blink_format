@@ -194,7 +194,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
    * (including
    * any @imports that they may be loading).
    */
-  bool haveStylesheetsLoaded() { return m_pendingStylesheets <= 0; }
+  bool haveStylesheetsLoaded() {
+    return m_pendingStylesheets <= 0 || m_ignorePendingStylesheets;
+  }
 
   /**
    * Increments the number of pending sheets.  The <link> elements
@@ -532,6 +534,10 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   // We use this count of pending sheets to detect when we can begin attaching
   // elements.
   int m_pendingStylesheets;
+
+  // But sometimes you need to ignore pending stylesheet count to
+  // force an immediate layout when requested by JS.
+  bool m_ignorePendingStylesheets;
 
   CSSStyleSheetImpl* m_elemSheet;
 

@@ -1768,8 +1768,6 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(image.alt());
         case ImageBorder:
           return Number(image.border());
-        case ImageHeight:
-          return Number(image.height());
         case ImageHspace:
           return Number(image.hspace());
         case ImageIsMap:
@@ -1782,12 +1780,22 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(image.useMap());
         case ImageVspace:
           return Number(image.vspace());
-        case ImageWidth:
-          return Number(image.width());
-        case ImageX:
-          return Number(image.x());
-        case ImageY:
-          return Number(image.y());
+        default:
+          // these attributes need layout
+          DOM::DocumentImpl* docimpl = node.handle()->getDocument();
+          if (docimpl) {
+            docimpl->updateLayout();
+          }
+          switch (token) {
+            case ImageHeight:
+              return Number(image.height());
+            case ImageWidth:
+              return Number(image.width());
+            case ImageX:
+              return Number(image.x());
+            case ImageY:
+              return Number(image.y());
+          }
       }
     } break;
     case ID_OBJECT: {
