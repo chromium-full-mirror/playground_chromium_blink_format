@@ -150,6 +150,7 @@ DocumentImpl* XSLTProcessorImpl::documentFromXMLDocPtr(
         m_sourceDocument->decoder());  // FIXME: Should just be UTF-16.
     result->docLoader()->setShowAnimations(
         m_sourceDocument->docLoader()->showAnimations());
+    result->setTransformSourceDocument(m_sourceDocument);
 
     if (xmlStrEqual(method, (const xmlChar*)"text")) {
       // Modify the output so that it is a well-formed XHTML document with a
