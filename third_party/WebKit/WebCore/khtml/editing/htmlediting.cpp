@@ -1299,8 +1299,9 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclarationImpl* style) {
 
   // apply specified styles to the block flow elements in the selected range
   prevBlock = 0;
-  for (NodeImpl* node = start.node(); node != beyondEnd;
-       node = node->traverseNextNode()) {
+  NodeImpl* node = start.node();
+  while (node != beyondEnd) {
+    NodeImpl* next = node->traverseNextNode();
     if (node->renderer()) {
       NodeImpl* block = node->enclosingBlockFlowElement();
       if (block != prevBlock) {
@@ -1308,6 +1309,7 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclarationImpl* style) {
         prevBlock = block;
       }
     }
+    node = next;
   }
 }
 
