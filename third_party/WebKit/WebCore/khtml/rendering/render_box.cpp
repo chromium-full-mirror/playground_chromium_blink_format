@@ -564,6 +564,17 @@ bool RenderBox::absolutePosition(int& xPos, int& yPos, bool f) {
   }
 }
 
+void RenderBox::dirtyLineBoxes(bool fullLayout, bool) {
+  if (m_inlineBoxWrapper) {
+    if (fullLayout) {
+      m_inlineBoxWrapper->remove();
+      m_inlineBoxWrapper->detach(renderArena());
+      m_inlineBoxWrapper = 0;
+    } else
+      m_inlineBoxWrapper->dirtyLineBoxes();
+  }
+}
+
 void RenderBox::position(InlineBox* box, int from, int len, bool reverse) {
   if (isPositioned()) {
     // Cache the x position only if we were an INLINE type originally.
@@ -607,6 +618,10 @@ InlineBox* RenderBox::inlineBoxWrapper() const {
 void RenderBox::deleteLineBoxWrapper() {
   if (m_inlineBoxWrapper)
     m_inlineBoxWrapper->detach(renderArena());
+}
+
+void RenderBox::setInlineBoxWrapper(InlineBox* b) {
+  m_inlineBoxWrapper = b;
 }
 
 QRect RenderBox::getAbsoluteRepaintRect() {

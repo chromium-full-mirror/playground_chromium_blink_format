@@ -358,7 +358,9 @@ class RenderObject : public CachedObjectClient {
   void scheduleRelayout();
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
-                                     bool isRootLineBox);
+                                     bool isRootLineBox,
+                                     bool isOnlyRun = false);
+  virtual void dirtyLineBoxes(bool fullLayout, bool isRootLineBox = false);
 
   // For inline replaced elements, this function returns the inline box that
   // owns us.  Enables
@@ -366,6 +368,7 @@ class RenderObject : public CachedObjectClient {
   // and to easily
   // iterate over structures on the line.
   virtual InlineBox* inlineBoxWrapper() const;
+  virtual void setInlineBoxWrapper(InlineBox* b);
   void deleteLineBoxWrapper();
 
   // for discussion of lineHeight see CSS2 spec
@@ -522,6 +525,17 @@ class RenderObject : public CachedObjectClient {
     bool m_active;
   };
 
+  // Used to signal a specific subrect within an object that must be repainted
+  // after
+  // layout is complete.
+  struct RepaintInfo {
+    RenderObject* m_object;
+    QRect m_repaintRect;
+
+    RepaintInfo(RenderObject* o, const QRect& r)
+        : m_object(o), m_repaintRect(r) {}
+  };
+
   FindSelectionResult checkSelectionPoint(int x,
                                           int y,
                                           int tx,
@@ -542,6 +556,8 @@ class RenderObject : public CachedObjectClient {
                            int ty,
                            HitTestAction hitTestAction = HitTestAll,
                            bool inside = false);
+
+  virtual void dirtyLinesFromChangedChild(RenderObject* child);
 
   // set the style of the object.
   virtual void setStyle(RenderStyle* style);
@@ -721,8 +737,8 @@ class RenderObject : public CachedObjectClient {
   void repaintRectangle(const QRect& r, bool immediate = false);
 
   // Repaint only if our old bounds and new bounds are different.
-  virtual void repaintAfterLayoutIfNeeded(const QRect& oldBounds,
-                                          const QRect& oldFullBounds);
+  bool repaintAfterLayoutIfNeeded(const QRect& oldBounds,
+                                  const QRect& oldFullBounds);
 
   // Repaint only if the object moved.
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);

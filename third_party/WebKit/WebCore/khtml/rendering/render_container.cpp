@@ -360,6 +360,9 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
   if (!normalChildNeedsLayout())
     setChildNeedsLayout(true);  // We may supply the static position for an
                                 // absolute positioned child.
+
+  if (!newChild->isFloatingOrPositioned() && childrenInline())
+    dirtyLinesFromChangedChild(newChild);
 }
 
 void RenderContainer::insertChildNode(RenderObject* child,
@@ -395,6 +398,9 @@ void RenderContainer::insertChildNode(RenderObject* child,
   if (!normalChildNeedsLayout())
     setChildNeedsLayout(true);  // We may supply the static position for an
                                 // absolute positioned child.
+
+  if (!child->isFloatingOrPositioned() && childrenInline())
+    dirtyLinesFromChangedChild(child);
 }
 
 void RenderContainer::layout() {

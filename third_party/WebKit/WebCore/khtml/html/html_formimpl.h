@@ -142,6 +142,8 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   virtual void attach();
+  virtual void removedFromDocument();
+
   virtual void reset() {}
 
   void onSelect();

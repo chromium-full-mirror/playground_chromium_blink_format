@@ -69,7 +69,6 @@ void CharacterDataImpl::setData(const DOMString& _data, int& exceptioncode) {
     str->ref();
   if (m_render)
     (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
 
   dispatchModifiedEvent(oldStr);
   if (oldStr)
@@ -105,8 +104,7 @@ void CharacterDataImpl::appendData(const DOMString& arg, int& exceptioncode) {
   str->ref();
   str->append(arg.impl);
   if (m_render)
-    (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
+    (static_cast<RenderText*>(m_render))->setTextWithOffset(str, oldStr->l, 0);
 
   dispatchModifiedEvent(oldStr);
   oldStr->deref();
@@ -125,8 +123,7 @@ void CharacterDataImpl::insertData(const unsigned long offset,
   str->ref();
   str->insert(arg.impl, offset);
   if (m_render)
-    (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
+    (static_cast<RenderText*>(m_render))->setTextWithOffset(str, offset, 0);
 
   dispatchModifiedEvent(oldStr);
   oldStr->deref();
@@ -145,8 +142,7 @@ void CharacterDataImpl::deleteData(const unsigned long offset,
   str->ref();
   str->remove(offset, count);
   if (m_render)
-    (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
+    (static_cast<RenderText*>(m_render))->setTextWithOffset(str, offset, count);
 
   dispatchModifiedEvent(oldStr);
   oldStr->deref();
@@ -173,8 +169,7 @@ void CharacterDataImpl::replaceData(const unsigned long offset,
   str->remove(offset, realCount);
   str->insert(arg.impl, offset);
   if (m_render)
-    (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
+    (static_cast<RenderText*>(m_render))->setTextWithOffset(str, offset, count);
 
   dispatchModifiedEvent(oldStr);
   oldStr->deref();
@@ -335,7 +330,6 @@ TextImpl* TextImpl::splitText(const unsigned long offset, int& exceptioncode) {
 
   if (m_render)
     (static_cast<RenderText*>(m_render))->setText(str);
-  setChanged(true);
   return newText;
 }
 

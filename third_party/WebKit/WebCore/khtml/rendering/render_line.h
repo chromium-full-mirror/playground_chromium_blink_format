@@ -27,6 +27,7 @@
 namespace khtml {
 
 class InlineFlowBox;
+class RootInlineBox;
 
 // InlineBox represents a rectangle that occurs on a line.  It corresponds to
 // some RenderObject (i.e., it represents a portion of that RenderObject).
@@ -40,7 +41,9 @@ class InlineBox {
         m_height(0),
         m_baseline(0),
         m_firstLine(false),
-        m_constructed(false) {
+        m_constructed(false),
+        m_dirty(false),
+        m_extracted(false) {
     m_next = 0;
     m_prev = 0;
     m_parent = 0;
@@ -49,6 +52,12 @@ class InlineBox {
   virtual ~InlineBox(){};
 
   void detach(RenderArena* renderArena);
+
+  virtual void deleteLine(RenderArena* arena);
+  virtual void extractLine();
+  virtual void attachLine();
+
+  virtual void adjustVerticalPosition(int delta);
 
   // Overloaded new operator.
   void* operator new(size_t sz, RenderArena* renderArena) throw();
@@ -73,6 +82,7 @@ class InlineBox {
     if (m_next)
       m_next->setConstructed();
   }
+  void setExtracted(bool b = true) { m_extracted = b; }
 
   void setFirstLineStyleBit(bool f) { m_firstLine = f; }
   bool isFirstLineStyle() const { return m_firstLine; }
@@ -83,11 +93,15 @@ class InlineBox {
   InlineBox* prevOnLine() const { return m_prev; }
   void setNextOnLine(InlineBox* next) { m_next = next; }
   void setPrevOnLine(InlineBox* prev) { m_prev = prev; }
+  bool nextOnLineExists() const;
+  bool prevOnLineExists() const;
 
-  RenderObject* object() { return m_object; }
+  RenderObject* object() const { return m_object; }
 
-  InlineFlowBox* parent() { return m_parent; }
+  InlineFlowBox* parent() const { return m_parent; }
   void setParent(InlineFlowBox* par) { m_parent = par; }
+
+  RootInlineBox* root();
 
   void setWidth(short w) { m_width = w; }
   short width() { return m_width; }
@@ -112,6 +126,11 @@ class InlineBox {
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
 
+  bool isDirty() const { return m_dirty; }
+  void markDirty(bool dirty = true) { m_dirty = dirty; }
+
+  void dirtyLineBoxes();
+
  public:  // FIXME: Would like to make this protected, but methods are accessing
           // these
           // members over in the part.
@@ -125,6 +144,8 @@ class InlineBox {
 
   bool m_firstLine : 1;
   bool m_constructed : 1;
+  bool m_dirty : 1;
+  bool m_extracted : 1;
 
   InlineBox* m_next;  // The next element on the same line as us.
   InlineBox* m_prev;  // The previous element on the same line as us.
@@ -166,6 +187,13 @@ class InlineFlowBox : public InlineRunBox {
 
   virtual bool isInlineFlowBox() { return true; }
 
+  InlineFlowBox* prevFlowBox() const {
+    return static_cast<InlineFlowBox*>(m_prevLine);
+  }
+  InlineFlowBox* nextFlowBox() const {
+    return static_cast<InlineFlowBox*>(m_nextLine);
+  }
+
   InlineBox* firstChild() { return m_firstChild; }
   InlineBox* lastChild() { return m_lastChild; }
 
@@ -187,6 +215,11 @@ class InlineFlowBox : public InlineRunBox {
     if (child->isInlineTextBox())
       m_hasTextChildren = true;
   }
+
+  virtual void deleteLine(RenderArena* arena);
+  virtual void extractLine();
+  virtual void attachLine();
+  virtual void adjustVerticalPosition(int delta);
 
   virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                         int _tx,
@@ -230,8 +263,6 @@ class InlineFlowBox : public InlineRunBox {
   // Helper functions used during line construction and placement.
   void determineSpacingForFlowBoxes(bool lastLine, RenderObject* endObject);
   int getFlowSpacingWidth();
-  bool nextOnLineExists();
-  bool prevOnLineExists();
   bool onEndChain(RenderObject* endObject);
   int placeBoxesHorizontally(int x);
   void verticallyAlignBoxes(int& heightOfBlock);
@@ -266,9 +297,23 @@ class InlineFlowBox : public InlineRunBox {
 
 class RootInlineBox : public InlineFlowBox {
  public:
-  RootInlineBox(RenderObject* obj) : InlineFlowBox(obj) {
-    m_topOverflow = m_bottomOverflow = 0;
+  RootInlineBox(RenderObject* obj)
+      : InlineFlowBox(obj),
+        m_topOverflow(0),
+        m_bottomOverflow(0),
+        m_lineBreakObj(0),
+        m_lineBreakPos(0),
+        m_blockHeight(0),
+        m_endsWithBreak(false) {}
+
+  RootInlineBox* nextRootBox() {
+    return static_cast<RootInlineBox*>(m_nextLine);
   }
+  RootInlineBox* prevRootBox() {
+    return static_cast<RootInlineBox*>(m_prevLine);
+  }
+
+  virtual void adjustVerticalPosition(int delta);
 
   virtual bool isRootInlineBox() { return true; }
   virtual int topOverflow() { return m_topOverflow; }
@@ -278,9 +323,43 @@ class RootInlineBox : public InlineFlowBox {
     m_bottomOverflow = bottom;
   }
 
+  void setLineBreakInfo(RenderObject* obj, uint breakPos) {
+    m_lineBreakObj = obj;
+    m_lineBreakPos = breakPos;
+  }
+  void setLineBreakPos(int p) { m_lineBreakPos = p; }
+
+  void setBlockHeight(int h) { m_blockHeight = h; }
+  void setEndsWithBreak(bool b) { m_endsWithBreak = b; }
+
+  int blockHeight() const { return m_blockHeight; }
+  bool endsWithBreak() const { return m_endsWithBreak; }
+  RenderObject* lineBreakObj() const { return m_lineBreakObj; }
+  uint lineBreakPos() const { return m_lineBreakPos; }
+
+  void childRemoved(InlineBox* box);
+
  protected:
+  // Normally we are only as tall as the style on our block dictates, but we
+  // might have content
+  // that spills out above the height of our font (e.g, a tall image), or
+  // something that extends further
+  // below our line (e.g., a child whose font has a huge descent).
   int m_topOverflow;
   int m_bottomOverflow;
+
+  // Where this line ended.  The exact object and the position within that
+  // object are stored so that
+  // we can create a BidiIterator beginning just after the end of this line.
+  RenderObject* m_lineBreakObj;
+  uint m_lineBreakPos;
+
+  // The height of the block at the end of this line.  This is where the next
+  // line starts.
+  int m_blockHeight;
+
+  // Whether the line ends with a <br>.
+  bool m_endsWithBreak;
 };
 
 };  // namespace

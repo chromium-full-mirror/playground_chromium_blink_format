@@ -83,6 +83,59 @@ long InlineBox::caretMaxOffset() const {
   return 1;
 }
 
+void InlineBox::dirtyLineBoxes() {
+  markDirty();
+  for (InlineFlowBox* curr = parent(); curr && !curr->isDirty();
+       curr = curr->parent())
+    curr->markDirty();
+}
+
+void InlineBox::deleteLine(RenderArena* arena) {
+  detach(arena);
+}
+
+void InlineBox::extractLine() {
+  m_extracted = true;
+  m_object->setInlineBoxWrapper(0);
+}
+
+void InlineBox::attachLine() {
+  m_extracted = false;
+  m_object->setInlineBoxWrapper(this);
+}
+
+void InlineBox::adjustVerticalPosition(int delta) {
+  m_y += delta;
+  if (m_object->isReplaced() || m_object->isBR())
+    m_object->setPos(m_object->xPos(), m_object->yPos() + delta);
+}
+
+RootInlineBox* InlineBox::root() {
+  if (m_parent)
+    return m_parent->root();
+  return static_cast<RootInlineBox*>(this);
+}
+
+bool InlineBox::nextOnLineExists() const {
+  if (!parent())
+    return false;
+
+  if (nextOnLine())
+    return true;
+
+  return parent()->nextOnLineExists();
+}
+
+bool InlineBox::prevOnLineExists() const {
+  if (!parent())
+    return false;
+
+  if (prevOnLine())
+    return true;
+
+  return parent()->prevOnLineExists();
+}
+
 int InlineFlowBox::marginLeft() {
   if (!includeLeftEdge())
     return 0;
@@ -123,6 +176,12 @@ int InlineFlowBox::getFlowSpacingWidth() {
 }
 
 void InlineFlowBox::removeChild(InlineBox* child) {
+  if (!m_dirty)
+    dirtyLineBoxes();
+
+  if (!child->nextOnLineExists())
+    child->root()->childRemoved(child);
+
   if (child == m_firstChild)
     m_firstChild = child->nextOnLine();
   if (child == m_lastChild)
@@ -133,24 +192,37 @@ void InlineFlowBox::removeChild(InlineBox* child) {
     child->prevOnLine()->setNextOnLine(child->nextOnLine());
 }
 
-bool InlineFlowBox::nextOnLineExists() {
-  if (!parent())
-    return false;
+void InlineFlowBox::deleteLine(RenderArena* arena) {
+  InlineBox* child = m_firstChild;
+  InlineBox* next = 0;
+  while (child) {
+    next = child->nextOnLine();
+    child->deleteLine(arena);
+    child = next;
+  }
 
-  if (nextOnLine())
-    return true;
-
-  return parent()->nextOnLineExists();
+  static_cast<RenderFlow*>(m_object)->removeLineBox(this);
+  detach(arena);
 }
 
-bool InlineFlowBox::prevOnLineExists() {
-  if (!parent())
-    return false;
+void InlineFlowBox::extractLine() {
+  if (!m_extracted)
+    static_cast<RenderFlow*>(m_object)->extractLineBox(this);
+  for (InlineBox* child = m_firstChild; child; child = child->nextOnLine())
+    child->extractLine();
+}
 
-  if (prevOnLine())
-    return true;
+void InlineFlowBox::attachLine() {
+  if (m_extracted)
+    static_cast<RenderFlow*>(m_object)->attachLineBox(this);
+  for (InlineBox* child = m_firstChild; child; child = child->nextOnLine())
+    child->attachLine();
+}
 
-  return parent()->prevOnLineExists();
+void InlineFlowBox::adjustVerticalPosition(int delta) {
+  InlineRunBox::adjustVerticalPosition(delta);
+  for (InlineBox* child = m_firstChild; child; child = child->nextOnLine())
+    child->adjustVerticalPosition(delta);
 }
 
 bool InlineFlowBox::onEndChain(RenderObject* endObject) {
@@ -304,7 +376,7 @@ void InlineFlowBox::verticallyAlignBoxes(int& heightOfBlock) {
   computeLogicalBoxHeights(maxPositionTop, maxPositionBottom, maxAscent,
                            maxDescent, strictMode);
 
-  if (maxAscent + maxDescent < QMAX(maxPositionTop, maxPositionBottom))
+  if (maxAscent + maxDescent < kMax(maxPositionTop, maxPositionBottom))
     adjustMaxAscentAndDescent(maxAscent, maxDescent, maxPositionTop,
                               maxPositionBottom);
 
@@ -341,7 +413,7 @@ void InlineFlowBox::adjustMaxAscentAndDescent(int& maxAscent,
           maxAscent = curr->height() - maxDescent;
       }
 
-      if (maxAscent + maxDescent >= QMAX(maxPositionTop, maxPositionBottom))
+      if (maxAscent + maxDescent >= kMax(maxPositionTop, maxPositionBottom))
         break;
     }
 
@@ -641,5 +713,23 @@ void InlineFlowBox::paintDecorations(RenderObject::PaintInfo& i,
     if (setShadow)
       p->clearShadow();
 #endif
+  }
+}
+
+void RootInlineBox::adjustVerticalPosition(int delta) {
+  InlineFlowBox::adjustVerticalPosition(delta);
+  m_topOverflow += delta;
+  m_bottomOverflow += delta;
+  m_blockHeight += delta;
+}
+
+void RootInlineBox::childRemoved(InlineBox* box) {
+  if (box->object() == m_lineBreakObj)
+    setLineBreakInfo(0, 0);
+
+  RootInlineBox* prev = prevRootBox();
+  if (prev && prev->lineBreakObj() == box->object()) {
+    prev->setLineBreakInfo(0, 0);
+    prev->markDirty();
   }
 }

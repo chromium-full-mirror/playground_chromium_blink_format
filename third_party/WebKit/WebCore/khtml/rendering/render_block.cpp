@@ -51,6 +51,7 @@ RenderBlock::RenderBlock(DOM::NodeImpl* node) : RenderFlow(node) {
   m_positionedObjects = 0;
   m_pre = false;
   m_firstLine = false;
+  m_linesAppended = false;
   m_clearStatus = CNONE;
   m_maxTopPosMargin = m_maxTopNegMargin = m_maxBottomPosMargin =
       m_maxBottomNegMargin = 0;
@@ -462,8 +463,9 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   }
 
   //    kdDebug( 6040 ) << "childrenInline()=" << childrenInline() << endl;
+  QRect repaintRect(0, 0, 0, 0);
   if (childrenInline())
-    layoutInlineChildren(relayoutChildren);
+    repaintRect = layoutInlineChildren(relayoutChildren);
   else
     layoutBlockChildren(relayoutChildren);
 
@@ -529,9 +531,16 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     m_layer->updateScrollInfoAfterLayout();
 
   // Repaint with our new bounds if they are different from our old bounds.
+  bool didFullRepaint = false;
   if (checkForRepaint)
-    repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
-
+    didFullRepaint = repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
+  if (!didFullRepaint && !repaintRect.isEmpty()) {
+    RenderCanvas* c = canvas();
+    if (c && c->view())
+      c->view()->addRepaintInfo(
+          this,
+          repaintRect);  // We need to do a partial repaint of our content.
+  }
   setNeedsLayout(false);
 }
 
@@ -1048,7 +1057,11 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       // way.
       if (child->avoidsFloats()) {
         int leftOff = leftOffset(m_height);
-        if (leftOff != xPos) {
+        if (style()->textAlign() != KHTML_CENTER &&
+            child->style()->marginLeft().type != Variable)
+          chPos = kMax(chPos, leftOff);  // Let the float sit in the child's
+                                         // margin if it can fit.
+        else if (leftOff != xPos) {
           // The object is shifting right. The object might be centered, so we
           // need to
           // recalculate our horizontal margins. Note that the containing block
@@ -1067,8 +1080,31 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       }
     } else {
       chPos -= child->width() + child->marginRight();
-      if (child->avoidsFloats())
-        chPos -= (xPos - rightOffset(m_height));
+      if (child->avoidsFloats()) {
+        int rightOff = rightOffset(m_height);
+        if (style()->textAlign() != KHTML_CENTER &&
+            child->style()->marginRight().type != Variable)
+          chPos = kMin(chPos, rightOff - child->width());  // Let the float sit
+                                                           // in the child's
+                                                           // margin if it can
+                                                           // fit.
+        else if (rightOff != xPos) {
+          // The object is shifting left. The object might be centered, so we
+          // need to
+          // recalculate our horizontal margins. Note that the containing block
+          // content
+          // width computation will take into account the delta between
+          // |rightOff| and |xPos|
+          // so that we can just pass the content width in directly to the
+          // |calcHorizontalMargins|
+          // function.
+          // -dwh
+          int cw = lineWidth(child->yPos());
+          static_cast<RenderBox*>(child)->calcHorizontalMargins(
+              child->style()->marginLeft(), child->style()->marginRight(), cw);
+          chPos = rightOff - child->marginRight() - child->width();
+        }
+      }
     }
 
     child->setPos(chPos, child->yPos());
@@ -1130,7 +1166,7 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // descendants.  An exception is if we need a layout.  In this case, we know
     // we're going to
     // repaint ourselves (and the child) anyway.
-    if (!selfNeedsLayout() && checkForRepaintDuringLayout())
+    if (!selfNeedsLayout() && child->checkForRepaintDuringLayout())
       child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
 
     child = child->nextSibling();
@@ -1585,7 +1621,7 @@ void RenderBlock::positionNewFloats() {
     f->endY = f->startY + _height;
 
     // If the child moved, we have to repaint it.
-    if (checkForRepaintDuringLayout())
+    if (o->checkForRepaintDuringLayout())
       o->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
 
     // kdDebug( 6040 ) << "floatingObject x/y= (" << f->left << "/" << f->startY
@@ -1740,7 +1776,8 @@ int RenderBlock::lowestPosition(bool includeOverflowInterior,
     QPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
       if (!r->noPaint) {
-        int lp = r->startY + r->node->lowestPosition(false);
+        int lp =
+            r->startY + r->node->marginTop() + r->node->lowestPosition(false);
         bottom = kMax(bottom, lp);
       }
     }
@@ -1779,7 +1816,8 @@ int RenderBlock::rightmostPosition(bool includeOverflowInterior,
     QPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
       if (!r->noPaint) {
-        int rp = r->left + r->node->rightmostPosition(false);
+        int rp =
+            r->left + r->node->marginLeft() + r->node->rightmostPosition(false);
         right = kMax(right, rp);
       }
     }
@@ -1818,7 +1856,8 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
     QPtrListIterator<FloatingObject> it(*m_floatingObjects);
     for (; (r = it.current()); ++it) {
       if (!r->noPaint) {
-        int lp = r->left + r->node->leftmostPosition(false);
+        int lp =
+            r->left + r->node->marginLeft() + r->node->leftmostPosition(false);
         left = kMin(left, lp);
       }
     }

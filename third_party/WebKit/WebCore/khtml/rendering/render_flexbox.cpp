@@ -954,7 +954,7 @@ void RenderFlexibleBox::placeChild(RenderObject* child, int x, int y) {
   // descendants.  An exception is if we need a layout.  In this case, we know
   // we're going to
   // repaint ourselves (and the child) anyway.
-  if (!selfNeedsLayout() && checkForRepaintDuringLayout())
+  if (!selfNeedsLayout() && child->checkForRepaintDuringLayout())
     child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
 }
 

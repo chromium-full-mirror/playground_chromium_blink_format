@@ -93,9 +93,9 @@ static uint sCurrMidpoint;
 static bool betweenMidpoints;
 
 static bool isLineEmpty = true;
-static bool previousLineBrokeAtBR = true;
+static bool previousLineBrokeCleanly = true;
 static QChar::Direction dir;
-static bool adjustEmbeddding;
+static bool adjustEmbedding;
 static bool emptyRun = true;
 static int numSpaces;
 
@@ -251,7 +251,7 @@ static inline RenderObject* Bidinext(RenderObject* par,
     if (!oldEndOfInline && !current->isFloating() && !current->isReplaced() &&
         !current->isPositioned()) {
       next = current->firstChild();
-      if (next && adjustEmbeddding) {
+      if (next && adjustEmbedding) {
         EUnicodeBidi ub = next->style()->unicodeBidi();
         if (ub != UBNormal && !emptyRun) {
           EDirection dir = next->style()->direction();
@@ -274,7 +274,7 @@ static inline RenderObject* Bidinext(RenderObject* par,
         next = current->nextSibling();
         if (next)
           break;
-        if (adjustEmbeddding && current->style()->unicodeBidi() != UBNormal &&
+        if (adjustEmbedding && current->style()->unicodeBidi() != UBNormal &&
             !emptyRun) {
           embed(QChar::DirPDF, bidi);
         }
@@ -526,8 +526,8 @@ static void appendRun(BidiState& bidi) {
   kdDebug(6041) << "appendRun: dir=" << (int)dir << endl;
 #endif
 
-  bool b = adjustEmbeddding;
-  adjustEmbeddding = false;
+  bool b = adjustEmbedding;
+  adjustEmbedding = false;
 
   int start = bidi.sor.pos;
   RenderObject* obj = bidi.sor.obj;
@@ -543,15 +543,15 @@ static void appendRun(BidiState& bidi) {
   bidi.sor = bidi.eor;
   dir = QChar::DirON;
   bidi.status.eor = QChar::DirON;
-  adjustEmbeddding = b;
+  adjustEmbedding = b;
 }
 
 static void embed(QChar::Direction d, BidiState& bidi) {
 #if BIDI_DEBUG > 1
   qDebug("*** embed dir=%d emptyrun=%d", d, emptyRun);
 #endif
-  bool b = adjustEmbeddding;
-  adjustEmbeddding = false;
+  bool b = adjustEmbedding;
+  adjustEmbedding = false;
   if (d == QChar::DirPDF) {
     BidiContext* c = bidi.context->parent;
     if (c) {
@@ -611,7 +611,7 @@ static void embed(QChar::Direction d, BidiState& bidi) {
       bidi.status.lastStrong = runDir;
     }
   }
-  adjustEmbeddding = b;
+  adjustEmbedding = b;
 }
 
 InlineFlowBox* RenderBlock::createLineBoxes(RenderObject* obj) {
@@ -649,7 +649,7 @@ InlineFlowBox* RenderBlock::createLineBoxes(RenderObject* obj) {
   return box;
 }
 
-InlineFlowBox* RenderBlock::constructLine(const BidiIterator& start,
+RootInlineBox* RenderBlock::constructLine(const BidiIterator& start,
                                           const BidiIterator& end) {
   if (!sFirstBidiRun)
     return 0;  // We had no runs. Don't make a root inline box at all. The line
@@ -658,19 +658,21 @@ InlineFlowBox* RenderBlock::constructLine(const BidiIterator& start,
   InlineFlowBox* parentBox = 0;
   for (BidiRun* r = sFirstBidiRun; r; r = r->nextRun) {
     // Create a box for our object.
-    r->box = r->obj->createInlineBox(r->obj->isPositioned(), false);
+    r->box = r->obj->createInlineBox(r->obj->isPositioned(), false,
+                                     sBidiRunCount == 1);
+    if (r->box) {
+      // If we have no parent box yet, or if the run is not simply a sibling,
+      // then we need to construct inline boxes as necessary to properly enclose
+      // the
+      // run's inline box.
+      if (!parentBox || (parentBox->object() != r->obj->parent()))
+        // Create new inline boxes all the way back to the appropriate insertion
+        // point.
+        parentBox = createLineBoxes(r->obj->parent());
 
-    // If we have no parent box yet, or if the run is not simply a sibling,
-    // then we need to construct inline boxes as necessary to properly enclose
-    // the
-    // run's inline box.
-    if (!parentBox || (parentBox->object() != r->obj->parent()))
-      // Create new inline boxes all the way back to the appropriate insertion
-      // point.
-      parentBox = createLineBoxes(r->obj->parent());
-
-    // Append the inline box to this line.
-    parentBox->addToLine(r->box);
+      // Append the inline box to this line.
+      parentBox->addToLine(r->box);
+    }
   }
 
   // We should have a root inline box.  It should be unconstructed and
@@ -691,16 +693,16 @@ InlineFlowBox* RenderBlock::constructLine(const BidiIterator& start,
   lastLineBox()->setConstructed();
 
   // Return the last line.
-  return lastLineBox();
+  return lastRootBox();
 }
 
-void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
+void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
                                                     BidiState& bidi) {
   // First determine our total width.
   int totWidth = lineBox->getFlowSpacingWidth();
   BidiRun* r = 0;
   for (r = sFirstBidiRun; r; r = r->nextRun) {
-    if (r->obj->isPositioned())
+    if (!r->box || r->obj->isPositioned())
       continue;  // Positioned objects are only participating to figure out
                  // their
     // correct static x position.  They have no effect on the width.
@@ -734,7 +736,7 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
       numSpaces = 0;
       break;
     case JUSTIFY:
-      if (numSpaces != 0 && !bidi.current.atEnd() && !bidi.current.obj->isBR())
+      if (numSpaces != 0 && !bidi.current.atEnd() && !lineBox->endsWithBreak())
         break;
     // fall through
     case TAAUTO:
@@ -757,6 +759,9 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
 
   if (numSpaces > 0) {
     for (r = sFirstBidiRun; r; r = r->nextRun) {
+      if (!r->box)
+        continue;
+
       int spaceAdd = 0;
       if (numSpaces > 0 && r->obj->isText() && !r->compact) {
         // get the number of spaces in the run
@@ -788,8 +793,9 @@ void RenderBlock::computeHorizontalPositionsForLine(InlineFlowBox* lineBox,
     m_overflowWidth = rightPos;  // FIXME: Work for rtl overflow also.
 }
 
-void RenderBlock::computeVerticalPositionsForLine(InlineFlowBox* lineBox) {
+void RenderBlock::computeVerticalPositionsForLine(RootInlineBox* lineBox) {
   lineBox->verticallyAlignBoxes(m_height);
+  lineBox->setBlockHeight(m_height);
 
   // See if the line spilled out.  If so set overflow height accordingly.
   int bottomOfLine = lineBox->bottomOverflow();
@@ -798,6 +804,9 @@ void RenderBlock::computeVerticalPositionsForLine(InlineFlowBox* lineBox) {
 
   // Now make sure we place replaced render objects correctly.
   for (BidiRun* r = sFirstBidiRun; r; r = r->nextRun) {
+    if (!r->box)
+      continue;  // Skip runs with no line boxes.
+
     // Align positioned boxes with the top of the line box.  This is
     // a reasonable approximation of an appropriate y position.
     if (r->obj->isPositioned())
@@ -1199,9 +1208,9 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
 
     // this causes the operator ++ to open and close embedding levels as needed
     // for the CSS unicode-bidi property
-    adjustEmbeddding = true;
+    adjustEmbedding = true;
     bidi.current.increment(bidi);
-    adjustEmbeddding = false;
+    adjustEmbedding = false;
 
     if (bidi.current == end) {
       if (emptyRun)
@@ -1301,14 +1310,14 @@ static void buildCompactRuns(RenderObject* compactObj, BidiState& bidi) {
     // runs for
     // the little compact and then reorder them for bidi.
     RenderBlock* compactBlock = static_cast<RenderBlock*>(compactObj);
-    adjustEmbeddding = true;
+    adjustEmbedding = true;
     BidiIterator start(compactBlock, first(compactBlock, bidi), 0);
-    adjustEmbeddding = false;
+    adjustEmbedding = false;
     BidiIterator end = start;
 
     betweenMidpoints = false;
     isLineEmpty = true;
-    previousLineBrokeAtBR = true;
+    previousLineBrokeCleanly = true;
 
     end = compactBlock->findNextLineBreak(start, bidi);
     if (!isLineEmpty)
@@ -1325,8 +1334,11 @@ static void buildCompactRuns(RenderObject* compactObj, BidiState& bidi) {
   sBuildingCompactRuns = false;
 }
 
-void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
+QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   BidiState bidi;
+
+  bool useRepaintRect = false;
+  QRect repaintRect(0, 0, 0, 0);
 
   m_overflowHeight = 0;
 
@@ -1346,35 +1358,49 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   if (style()->hidesOverflow() && m_layer)
     toAdd += m_layer->horizontalScrollbarHeight();
 
-  // Clear out our line boxes.
-  deleteLineBoxes();
+  // Figure out if we should clear out our line boxes.
+  // FIXME: Handle resize eventually!
+  // FIXME: Do something better when floats are present.
+  bool fullLayout = !firstLineBox() || !firstChild() || selfNeedsLayout() ||
+                    relayoutChildren || containsFloats();
+  if (fullLayout)
+    deleteLineBoxes();
 
   if (firstChild()) {
     // layout replaced elements
     bool endOfInline = false;
     RenderObject* o = first(this, bidi, false);
+    bool hasFloat = false;
     while (o) {
       if (o->isReplaced() || o->isFloating() || o->isPositioned()) {
-        // kdDebug(6041) << "layouting replaced or floating child" << endl;
         if (relayoutChildren || o->style()->width().isPercent() ||
             o->style()->height().isPercent())
           o->setChildNeedsLayout(true, false);
         if (o->isPositioned())
           o->containingBlock()->insertPositionedObject(o);
-        else
+        else {
+          if (o->isFloating())
+            hasFloat = true;
+          else if (fullLayout || o->needsLayout())  // Replaced elements
+            o->dirtyLineBoxes(fullLayout);
           o->layoutIfNeeded();
-
-        if (o->isReplaced())
-          o->deleteLineBoxWrapper();
-      } else if (o->isText()) {
-        static_cast<RenderText*>(o)->deleteTextBoxes();
-        o->setNeedsLayout(false);
-      } else if (o->isInlineFlow() && !endOfInline) {
-        static_cast<RenderFlow*>(o)->deleteLineBoxes();
+        }
+      } else if (o->isText() || (o->isInlineFlow() && !endOfInline)) {
+        if (fullLayout || o->selfNeedsLayout())
+          o->dirtyLineBoxes(fullLayout);
         o->setNeedsLayout(false);
       }
       o = Bidinext(this, o, bidi, false, &endOfInline);
     }
+
+    if (hasFloat)
+      fullLayout =
+          true;  // FIXME: Will need to find a way to optimize floats some day.
+
+    if (fullLayout && !selfNeedsLayout())
+      setNeedsLayout(true, false);  // Mark ourselves as needing a full layout.
+                                    // This way we'll repaint like
+                                    // we're supposed to.
 
     BidiContext* startEmbed;
     if (style()->direction() == LTR) {
@@ -1388,14 +1414,7 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 
     bidi.status.lastStrong = QChar::DirON;
     bidi.status.last = QChar::DirON;
-
     bidi.context = startEmbed;
-    adjustEmbeddding = true;
-    BidiIterator start(this, first(this, bidi), 0);
-    adjustEmbeddding = false;
-    BidiIterator end = start;
-
-    m_firstLine = true;
 
     if (!smidpoints)
       smidpoints = new QMemArray<BidiIterator>;
@@ -1405,10 +1424,43 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
     sCompactFirstBidiRun = sCompactLastBidiRun = 0;
     sCompactBidiRunCount = 0;
 
-    previousLineBrokeAtBR = true;
+    // We want to skip ahead to the first dirty line
+    BidiIterator start;
+    RootInlineBox* startLine = determineStartPosition(fullLayout, start, bidi);
 
+    // We also find the first clean line and extract these lines.  We will add
+    // them back
+    // if we determine that we're able to synchronize after handling all our
+    // dirty lines.
+    BidiIterator cleanLineStart;
+    int endLineYPos;
+    RootInlineBox* endLine =
+        (fullLayout || !startLine)
+            ? 0
+            : determineEndPosition(startLine, cleanLineStart, endLineYPos);
+
+    if (startLine) {
+      useRepaintRect = true;
+      repaintRect.setY(m_height);
+      RenderArena* arena = renderArena();
+      RootInlineBox* box = startLine;
+      while (box) {
+        RootInlineBox* next = box->nextRootBox();
+        box->deleteLine(arena);
+        box = next;
+      }
+      startLine = 0;
+    }
+
+    BidiIterator end = start;
+
+    bool endLineMatched = false;
     while (!end.atEnd()) {
       start = end;
+      if (endLine && (endLineMatched = matchedEndLine(start, cleanLineStart,
+                                                      endLine, endLineYPos)))
+        break;
+
       betweenMidpoints = false;
       isLineEmpty = true;
       if (m_firstLine && firstChild() && firstChild()->isCompact()) {
@@ -1434,9 +1486,12 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           sBidiRunCount += sCompactBidiRunCount;
         }
 
+        RootInlineBox* lineBox = 0;
         if (sBidiRunCount) {
-          InlineFlowBox* lineBox = constructLine(start, end);
+          lineBox = constructLine(start, end);
           if (lineBox) {
+            lineBox->setEndsWithBreak(previousLineBrokeCleanly);
+
             // Now we position all of our text runs horizontally.
             computeHorizontalPositionsForLine(lineBox, bidi);
 
@@ -1447,17 +1502,15 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           }
         }
 
-        if (end == start ||
-            (end.obj && end.obj->isBR() && !start.obj->isBR())) {
-          adjustEmbeddding = true;
+        if (end == start || (end.obj && end.obj->style()->whiteSpace() == PRE &&
+                             end.current() == QChar('\n'))) {
+          adjustEmbedding = true;
           end.increment(bidi);
-          adjustEmbeddding = false;
-        } else if (end.obj && end.obj->style()->whiteSpace() == PRE &&
-                   end.current() == QChar('\n')) {
-          adjustEmbeddding = true;
-          end.increment(bidi);
-          adjustEmbeddding = false;
+          adjustEmbedding = false;
         }
+
+        if (lineBox)
+          lineBox->setLineBreakInfo(end.obj, end.pos);
 
         m_firstLine = false;
         newLine();
@@ -1470,6 +1523,49 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
     }
     startEmbed->deref();
     // embed->deref();
+
+    if (endLine) {
+      if (endLineMatched) {
+        // Attach all the remaining lines, and then adjust their y-positions as
+        // needed.
+        for (RootInlineBox* line = endLine; line; line = line->nextRootBox())
+          line->attachLine();
+
+        // Now apply the offset to each line if needed.
+        int delta = m_height - endLineYPos;
+        if (delta)
+          for (RootInlineBox* line = endLine; line; line = line->nextRootBox())
+            line->adjustVerticalPosition(delta);
+
+        // Now set our height and check for overflow.
+        int currYPos = m_height;
+        m_height = lastRootBox()->blockHeight();
+        m_overflowHeight = kMax(m_height, m_overflowHeight);
+        int bottomOfLine = lastRootBox()->bottomOverflow();
+        if (bottomOfLine > m_height && bottomOfLine > m_overflowHeight)
+          m_overflowHeight = bottomOfLine;
+        if (delta)
+          repaintRect.setHeight(
+              kMax(m_overflowHeight - delta, m_overflowHeight) -
+              repaintRect.y());
+        else
+          repaintRect.setHeight(currYPos - repaintRect.y());
+      } else {
+        // Delete all the remaining lines.
+        m_overflowHeight = kMax(m_height, m_overflowHeight);
+        InlineRunBox* line = endLine;
+        RenderArena* arena = renderArena();
+        while (line) {
+          InlineRunBox* next = line->nextLineBox();
+          if (!next)
+            repaintRect.setHeight(
+                kMax(m_overflowHeight, line->bottomOverflow()) -
+                repaintRect.y());
+          line->deleteLine(arena);
+          line = next;
+        }
+      }
+    }
   }
 
   sNumMidpoints = 0;
@@ -1486,8 +1582,17 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   m_height += toAdd;
 
   // Always make sure this is at least our height.
-  if (m_overflowHeight < m_height)
-    m_overflowHeight = m_height;
+  m_overflowHeight = kMax(m_height, m_overflowHeight);
+
+  if (useRepaintRect) {
+    repaintRect.setWidth(kMax((int)m_width, m_overflowWidth));
+    if (repaintRect.height() == 0)
+      repaintRect.setHeight(m_overflowHeight - repaintRect.y());
+  }
+
+  setLinesAppended(false);
+
+  return repaintRect;
 
 #if BIDI_DEBUG > 1
   kdDebug(6041) << " ------- bidi end " << this << " -------" << endl;
@@ -1495,6 +1600,135 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
   // kdDebug() << "RenderBlock::layoutInlineChildren time used " << qt.elapsed()
   // << endl;
   // kdDebug(6040) << "height = " << m_height <<endl;
+}
+
+RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
+                                                   BidiIterator& start,
+                                                   BidiState& bidi) {
+  RootInlineBox* curr = 0;
+  RootInlineBox* last = 0;
+  RenderObject* startObj = 0;
+  int pos = 0;
+
+  if (fullLayout) {
+    // Nuke all our lines.
+    if (firstRootBox()) {
+      RenderArena* arena = renderArena();
+      curr = firstRootBox();
+      while (curr) {
+        RootInlineBox* next = curr->nextRootBox();
+        curr->deleteLine(arena);
+        curr = next;
+      }
+      KHTMLAssert(!m_firstLineBox && !m_lastLineBox);
+    }
+  } else {
+    for (curr = firstRootBox(); curr && !curr->isDirty();
+         curr = curr->nextRootBox())
+      ;
+    if (curr) {
+      // We have a dirty line.
+      if (curr->prevRootBox()) {
+        // We have a previous line.
+        if (!curr->prevRootBox()->endsWithBreak())
+          curr = curr->prevRootBox();  // The previous line didn't break
+                                       // cleanly, so treat it as dirty also.
+      }
+    } else {
+      // No dirty lines were found.
+      // If the last line didn't break cleanly, treat it as dirty.
+      if (lastRootBox() && !lastRootBox()->endsWithBreak())
+        curr = lastRootBox();
+    }
+
+    // If we have no dirty lines, then last is just the last root box.
+    last = curr ? curr->prevRootBox() : lastRootBox();
+  }
+
+  m_firstLine = !last;
+  previousLineBrokeCleanly = !last || last->endsWithBreak();
+  if (last) {
+    m_height = last->blockHeight();
+    int bottomOfLine = last->bottomOverflow();
+    if (bottomOfLine > m_height && bottomOfLine > m_overflowHeight)
+      m_overflowHeight = bottomOfLine;
+    startObj = last->lineBreakObj();
+    pos = last->lineBreakPos();
+  } else
+    startObj = first(this, bidi, 0);
+
+  adjustEmbedding = true;
+  start = BidiIterator(this, startObj, pos);
+  adjustEmbedding = false;
+
+  return curr;
+}
+
+RootInlineBox* RenderBlock::determineEndPosition(RootInlineBox* startLine,
+                                                 BidiIterator& cleanLineStart,
+                                                 int& yPos) {
+  RootInlineBox* last = 0;
+  if (m_linesAppended)
+    last = 0;
+  else {
+    for (RootInlineBox* curr = startLine; curr; curr = curr->nextRootBox())
+      if (curr->isDirty() && curr->nextRootBox() &&
+          !curr->nextRootBox()->isDirty())
+        last = curr->nextRootBox();
+  }
+
+  if (!last)
+    return 0;
+
+  cleanLineStart = BidiIterator(this, last->prevRootBox()->lineBreakObj(),
+                                last->prevRootBox()->lineBreakPos());
+  yPos = last->prevRootBox()->blockHeight();
+
+  for (RootInlineBox* line = last; line; line = line->nextRootBox())
+    line->extractLine();  // Disconnect all line boxes from their render objects
+                          // while preserving
+                          // their connections to one another.
+
+  return last;
+}
+
+bool RenderBlock::matchedEndLine(const BidiIterator& start,
+                                 const BidiIterator& endLineStart,
+                                 RootInlineBox*& endLine,
+                                 int& endYPos) {
+  if (start == endLineStart)
+    return true;  // The common case. All the data we already have is correct.
+  else {
+    // The first clean line doesn't match, but we can check a handful of
+    // following lines to try
+    // to match back up.
+    static int numLines = 8;  // The # of lines we're willing to match against.
+    RootInlineBox* line = endLine;
+    for (int i = 0; i < numLines && line; i++, line = line->nextRootBox()) {
+      if (line->lineBreakObj() == start.obj &&
+          line->lineBreakPos() == start.pos) {
+        // We have a match.
+        RootInlineBox* result = line->nextRootBox();
+
+        // Set our yPos to be the block height of endLine.
+        if (result)
+          endYPos = line->blockHeight();
+
+        // Now delete the lines that we failed to sync.
+        RootInlineBox* boxToDelete = endLine;
+        RenderArena* arena = renderArena();
+        while (boxToDelete && boxToDelete != result) {
+          RootInlineBox* next = boxToDelete->nextRootBox();
+          boxToDelete->deleteLine(arena);
+          boxToDelete = next;
+        }
+
+        endLine = result;
+        return result;
+      }
+    }
+  }
+  return false;
 }
 
 BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
@@ -1534,9 +1768,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       }
     }
 
-    adjustEmbeddding = true;
+    adjustEmbedding = true;
     start.increment(bidi);
-    adjustEmbeddding = false;
+    adjustEmbedding = false;
   }
 
   if (start.atEnd()) {
@@ -1567,8 +1801,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
   RenderObject* last = o;
   int pos = start.pos;
 
-  bool prevLineBrokeCleanly = previousLineBrokeAtBR;
-  previousLineBrokeAtBR = false;
+  bool prevLineBrokeCleanly = previousLineBrokeCleanly;
+  previousLineBrokeCleanly = false;
 
   while (o) {
 #ifdef DEBUG_LINEBREAKS
@@ -1579,6 +1813,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       if (w + tmpW <= width) {
         lBreak.obj = o;
         lBreak.pos = 0;
+        lBreak.increment(bidi);
 
         // A <br> always breaks a line, so don't let the line be collapsed
         // away. Also, the space at the end of a line with a <br> does not
@@ -1588,7 +1823,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
         if (prevLineBrokeCleanly)
           isLineEmpty = false;
         trailingSpaceObject = 0;
-        previousLineBrokeAtBR = true;
+        previousLineBrokeCleanly = true;
 
         if (!isLineEmpty) {
           // only check the clear status for non-empty lines.
@@ -1801,6 +2036,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           if (*(str + pos) == '\n' && isPre) {
             lBreak.obj = o;
             lBreak.pos = pos;
+            previousLineBrokeCleanly = true;
 
 #ifdef DEBUG_LINEBREAKS
             kdDebug(6041) << "forced break sol: " << start.obj << " "

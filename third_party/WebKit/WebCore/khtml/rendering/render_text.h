@@ -56,7 +56,16 @@ class InlineTextBox : public InlineRunBox {
     return static_cast<InlineTextBox*>(prevLineBox());
   }
 
+  uint start() const { return m_start; }
+  uint end() const { return m_len ? m_start + m_len - 1 : m_start; }
+
+  void offsetRun(int d) { m_start += d; }
+
   void detach(RenderArena* arena);
+
+  virtual void deleteLine(RenderArena* arena);
+  virtual void extractLine();
+  virtual void attachLine();
 
   // Overloaded new operator.  Derived classes must override operator new
   // in order to allocate out of the RenderArena.
@@ -138,13 +147,17 @@ class RenderText : public RenderObject {
 
   virtual void paint(PaintInfo& i, int tx, int ty);
 
+  void extractTextBox(InlineTextBox* textBox);
+  void attachTextBox(InlineTextBox* textBox);
+  void removeTextBox(InlineTextBox* textBox);
   void deleteTextBoxes();
   virtual void detach();
 
   DOM::DOMString data() const { return str; }
   DOM::DOMStringImpl* string() const { return str; }
 
-  virtual InlineBox* createInlineBox(bool, bool);
+  virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
+  virtual void dirtyLineBoxes(bool fullLayout, bool isRootInlineBox = false);
 
   virtual void layout() { assert(false); }
 
@@ -219,6 +232,10 @@ class RenderText : public RenderObject {
   bool isFixedWidthFont() const;
 
   void setText(DOM::DOMStringImpl* text, bool force = false);
+  void setTextWithOffset(DOM::DOMStringImpl* text,
+                         uint offset,
+                         uint len,
+                         bool force = false);
 
   virtual SelectionState selectionState() const { return m_selectionState; }
   virtual void setSelectionState(SelectionState s) { m_selectionState = s; }
@@ -285,7 +302,14 @@ class RenderText : public RenderObject {
   bool m_hasEndWS : 1;  // Whether or not we end with WS (only true if we aren't
                         // pre)
 
-// 19 bits left
+  bool m_linesDirty : 1;  // This bit indicates that the text run has already
+                          // dirtied specific
+// line boxes, and this hint will enable layoutInlineChildren to avoid
+// just dirtying everything when character data is modified (e.g.,
+// appended/inserted
+// or removed).
+
+// 22 bits left
 #if APPLE_CHANGES
   mutable bool m_allAsciiChecked : 1;
   mutable bool m_allAscii : 1;

@@ -94,6 +94,7 @@ class KHTMLViewPrivate {
 
  public:
   KHTMLViewPrivate() {
+    repaintRects = 0;
     underMouse = 0;
     reset();
     tp = 0;
@@ -122,6 +123,7 @@ class KHTMLViewPrivate {
     if (underMouse)
       underMouse->deref();
     delete tooltip;
+    delete repaintRects;
   }
   void reset() {
     if (underMouse)
@@ -160,6 +162,8 @@ class KHTMLViewPrivate {
 #if APPLE_CHANGES
     firstLayout = true;
 #endif
+    if (repaintRects)
+      repaintRects->clear();
   }
 
   QPainter* tp;
@@ -202,6 +206,11 @@ class KHTMLViewPrivate {
 #endif
   bool mousePressed;
   KHTMLToolTip* tooltip;
+
+  // Used by objects during layout to communicate repaints that need to take
+  // place only
+  // after all layout has been completed.
+  QPtrList<RenderObject::RepaintInfo>* repaintRects;
 };
 
 #ifndef QT_NO_TOOLTIP
@@ -498,6 +507,15 @@ bool KHTMLView::needsFullRepaint() const {
   return d->doFullRepaint;
 }
 
+void KHTMLView::addRepaintInfo(RenderObject* o, const QRect& r) {
+  if (!d->repaintRects) {
+    d->repaintRects = new QPtrList<RenderObject::RepaintInfo>;
+    d->repaintRects->setAutoDelete(true);
+  }
+
+  d->repaintRects->append(new RenderObject::RepaintInfo(o, r));
+}
+
 void KHTMLView::layout() {
   if (d->layoutSuppressed)
     return;
@@ -545,6 +563,8 @@ void KHTMLView::layout() {
   }
 
   d->doFullRepaint = d->firstLayout || root->printingMode();
+  if (d->repaintRects)
+    d->repaintRects->clear();
 
 #if APPLE_CHANGES
   // Now set our scrollbar state for the layout.
@@ -614,6 +634,16 @@ void KHTMLView::layout() {
   // We update our widget positions right after doing a layout.
   root->updateWidgetPositions();
 #endif
+
+  if (d->repaintRects && !d->repaintRects->isEmpty()) {
+    // FIXME: Could optimize this and have objects removed from this list
+    // if they ever do full repaints.
+    RenderObject::RepaintInfo* r;
+    QPtrListIterator<RenderObject::RepaintInfo> it(*d->repaintRects);
+    for (; (r = it.current()); ++it)
+      r->m_object->repaintRectangle(r->m_repaintRect);
+    d->repaintRects->clear();
+  }
 
   if (root->needsLayout()) {
     // qDebug("needs layout, delaying repaint");
