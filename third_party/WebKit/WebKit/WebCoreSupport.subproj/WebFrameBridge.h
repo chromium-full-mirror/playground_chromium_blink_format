@@ -1,25 +1,25 @@
 //
-//  IFWebCoreFrame.h
+//  WebFrameBridge.h
 //  WebKit
 //
 //  Created by Darin Adler on Sun Jun 16 2002.
 //  Copyright (c) 2002 Apple Computer, Inc. All rights reserved.
 //
 
-#import <WebCore/WebCoreFrame.h>
+#import <WebCore/WebCoreFrameBridge.h>
 
-@class IFWebDataSource;
-@class IFWebFrame;
+@class WebDataSource;
+@class WebFrame;
 
-@interface IFWebCoreFrame : WebCoreFrame<WebCoreFrame> {
-  IFWebFrame* frame;
+@interface WebFrameBridge : WebCoreFrameBridge<WebCoreFrameBridge> {
+  WebFrame* frame;
 }
 
-- initWithWebFrame:(IFWebFrame*)frame;
+- initWithWebFrame:(WebFrame*)frame;
 
 - (void)loadURL:(NSURL*)URL
      attributes:(NSDictionary*)attributes
           flags:(unsigned)flags
-     withParent:(IFWebDataSource*)parent;
+     withParent:(WebDataSource*)parent;
 
 @end

@@ -1,28 +1,28 @@
 /*
-    IFPluginView.h
+    WebPluginView.h
         Copyright 2002, Apple, Inc. All rights reserved.
 */
 
 #import <WebKit/WebKit.h>
-#import <WebKit/IFWebFrame.h>
+#import <WebKit/WebFrame.h>
 
 #import <Cocoa/Cocoa.h>
 #import <npapi.h>
 
-@class IFPluginNullEventSender;
-@class IFWebDataSource;
-@class IFPlugin;
-@class IFWebController;
-@protocol IFDocumentView;
+@class WebPluginNullEventSender;
+@class WebDataSource;
+@class WebPlugin;
+@class WebController;
+@protocol WebDocumentView;
 
-@interface IFPluginView : NSView<IFDocumentView> {
-  IFPluginNullEventSender* eventSender;
+@interface WebPluginView : NSView<WebDocumentView> {
+  WebPluginNullEventSender* eventSender;
   unsigned argsCount;
   char **cAttributes, **cValues;
 
-  IFWebController* webController;
-  IFWebDataSource* webDataSource;
-  IFWebFrame* webFrame;
+  WebController* webController;
+  WebDataSource* webDataSource;
+  WebFrame* webFrame;
 
   NPP instance;
   NPWindow window;
@@ -53,14 +53,14 @@
 }
 
 - (id)initWithFrame:(NSRect)r
-             plugin:(IFPlugin*)plugin
+             plugin:(WebPlugin*)plugin
                 url:(NSURL*)theURL
             baseURL:(NSURL*)theBaseURL
                mime:(NSString*)mimeType
           arguments:(NSDictionary*)arguments;
 - (void)stop;
-- (IFWebDataSource*)webDataSource;
-- (IFWebController*)webController;
+- (WebDataSource*)webDataSource;
+- (WebController*)webController;
 + (void)getCarbonEvent:(EventRecord*)carbonEvent;
 
 - (NPP)pluginInstance;

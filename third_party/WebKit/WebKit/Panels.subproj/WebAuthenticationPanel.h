@@ -1,13 +1,13 @@
 /*
-    IFAuthenticationPanel.h
+    WebAuthenticationPanel.h
 
     Copyright 2002 Apple, Inc. All rights reserved.
 */
 
 #import <Cocoa/Cocoa.h>
-#import <WebFoundation/IFAuthenticationManager.h>
+#import <WebFoundation/WebAuthenticationManager.h>
 
-@interface IFAuthenticationPanel : NSObject {
+@interface WebAuthenticationPanel : NSObject {
   IBOutlet id mainLabel;
   IBOutlet id panel;
   IBOutlet id password;
@@ -18,7 +18,7 @@
   BOOL usingSheet;
   id callback;
   SEL selector;
-  IFAuthenticationRequest* request;
+  WebAuthenticationRequest* request;
 }
 
 - (id)initWithCallback:(id)cb selector:(SEL)sel;
@@ -29,9 +29,9 @@
 
 - (BOOL)loadNib;
 
-- (void)runAsModalDialogWithRequest:(IFAuthenticationRequest*)req;
+- (void)runAsModalDialogWithRequest:(WebAuthenticationRequest*)req;
 - (void)runAsSheetOnWindow:(NSWindow*)window
-               withRequest:(IFAuthenticationRequest*)req;
+               withRequest:(WebAuthenticationRequest*)req;
 
 - (void)sheetDidEnd:(NSWindow*)sheet
          returnCode:(int)returnCode

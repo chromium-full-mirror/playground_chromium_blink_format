@@ -1,5 +1,5 @@
 //
-//  IFURLsWithTitles.h
+//  WebURLsWithTitles.h
 //  WebKit
 //
 //  Created by John Sullivan on Wed Jun 12 2002.
@@ -10,9 +10,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#define IFURLsWithTitlesPboardType @"IFURLsWithTitlesPboardType"
+#define WebURLsWithTitlesPboardType @"WebURLsWithTitlesPboardType"
 
-@interface IFURLsWithTitles : NSObject
+@interface WebURLsWithTitles : NSObject
 
 // Writes parallel arrays of URLs and titles to the pasteboard. These items can
 // be retrieved by
@@ -23,7 +23,7 @@
 // length than URLs, empty strings will be used for all titles. If URLs is nil,
 // this method
 // returns without doing anything. You must declare an
-// IFURLsWithTitlesPboardType data type
+// WebURLsWithTitlesPboardType data type
 // for pasteboard before invoking this method, or it will return without doing
 // anything.
 + (void)writeURLs:(NSArray*)URLs
@@ -32,14 +32,14 @@
 
 // Reads an array of NSURLs off the pasteboard. Returns nil if pasteboard does
 // not contain
-// data of type IFURLsWithTitlesPboardType. This array consists of the URLs that
-// correspond to
+// data of type WebURLsWithTitlesPboardType. This array consists of the URLs
+// that correspond to
 // the titles returned from titlesFromPasteboard.
 + (NSArray*)URLsFromPasteboard:(NSPasteboard*)pasteboard;
 
 // Reads an array of NSStrings off the pasteboard. Returns nil if pasteboard
 // does not contain
-// data of type IFURLsWithTitlesPboardType. This array consists of the titles
+// data of type WebURLsWithTitlesPboardType. This array consists of the titles
 // that correspond to
 // the URLs returned from URLsFromPasteboard.
 + (NSArray*)titlesFromPasteboard:(NSPasteboard*)pasteboard;

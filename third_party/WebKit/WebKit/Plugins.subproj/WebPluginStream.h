@@ -1,5 +1,5 @@
 /*
-    IFPluginStream.h
+    WebPluginStream.h
         Copyright 2002, Apple, Inc. All rights reserved.
 */
 
@@ -7,13 +7,13 @@
 #import <WebFoundation/WebFoundation.h>
 
 #import <WebKit/WebKit.h>
-#import <WebKit/IFPluginView.h>
+#import <WebKit/WebPluginView.h>
 #import <WebKit/npapi.h>
 
-@protocol IFDocumentRepresentation;
+@protocol WebDocumentRepresentation;
 
-@interface IFPluginStream : NSObject<IFDocumentRepresentation> {
-  IFPluginView* view;
+@interface WebPluginStream : NSObject<WebDocumentRepresentation> {
+  WebPluginView* view;
   NSURL* URL;
   NPP instance;
   uint16 transferMode;
@@ -28,7 +28,7 @@
   BOOL isFirstChunk;
   BOOL stopped;
 
-  IFURLHandle* URLHandle;
+  WebResourceHandle* URLHandle;
 
   NPP_NewStreamProcPtr NPP_NewStream;
   NPP_DestroyStreamProcPtr NPP_DestroyStream;
