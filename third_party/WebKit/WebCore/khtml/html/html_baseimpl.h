@@ -99,6 +99,8 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 #endif
 
  protected:
+  bool isURLAllowed(const DOMString&) const;
+
   DOMString url;
   DOMString name;
 
