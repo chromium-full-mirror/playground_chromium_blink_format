@@ -797,7 +797,7 @@ void RenderPartObject::updateWidget() {
     HTMLIFrameElementImpl* o = static_cast<HTMLIFrameElementImpl*>(element());
     url = o->url.string();
     if (url.isEmpty())
-      return;
+      url = "about:blank";
     KHTMLView* v = static_cast<KHTMLView*>(m_view);
     v->part()->requestFrame(this, url, o->name.string(), QStringList(), true);
   }
