@@ -196,13 +196,6 @@ static QCString encodeCString(const QCString& e) {
   return encoded;
 }
 
-inline static QCString fixUpfromUnicode(const QTextCodec* codec,
-                                        const QString& s) {
-  QCString str = codec->fromUnicode(s);
-  str.truncate(str.length());
-  return str;
-}
-
 // Change plain CR and plain LF to CRLF pairs.
 static QCString fixLineBreaks(const QCString& s) {
   // Compute the length.
@@ -249,6 +242,13 @@ static QCString fixLineBreaks(const QCString& s) {
     }
   }
   return result;
+}
+
+inline static QCString fixUpfromUnicode(const QTextCodec* codec,
+                                        const QString& s) {
+  QCString str = fixLineBreaks(codec->fromUnicode(s));
+  str.truncate(str.length());
+  return str;
 }
 
 #if !APPLE_CHANGES
@@ -406,11 +406,10 @@ QByteArray HTMLFormElementImpl::formData(bool& ok) {
 
           // append body
           unsigned int old_size = form_data.size();
-          QCString data = fixLineBreaks(*it);
-          form_data.resize(old_size + hstr.length() + data.size() + 1);
+          form_data.resize(old_size + hstr.length() + (*it).size() + 1);
           memcpy(form_data.data() + old_size, hstr.data(), hstr.length());
-          memcpy(form_data.data() + old_size + hstr.length(), data,
-                 data.size());
+          memcpy(form_data.data() + old_size + hstr.length(), (*it),
+                 (*it).size());
           form_data[form_data.size() - 2] = '\r';
           form_data[form_data.size() - 1] = '\n';
         }
