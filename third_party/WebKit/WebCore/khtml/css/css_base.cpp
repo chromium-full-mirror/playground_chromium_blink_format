@@ -259,7 +259,7 @@ DOMString CSSSelector::selectorText() const {
     str = "#";
     str += cs->value.string();
   } else if (tag == anyLocalName && cs->attr == ATTR_CLASS &&
-             cs->match == CSSSelector::List) {
+             cs->match == CSSSelector::Class) {
     str = ".";
     str += cs->value.string();
   } else if (tag == anyLocalName && cs->match == CSSSelector::Pseudo) {
