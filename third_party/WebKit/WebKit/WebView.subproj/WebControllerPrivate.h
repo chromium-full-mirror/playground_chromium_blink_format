@@ -45,9 +45,7 @@
                allowsScrolling:(BOOL)allowsScrolling;
 
 - (id<WebContextMenuDelegate>)_defaultContextMenuDelegate;
-- (void)_receivedProgressForResourceHandle:(WebResourceHandle*)resourceHandle
-                            fromDataSource:(WebDataSource*)dataSource
-                                  complete:(BOOL)isComplete;
+- (void)_finsishedLoadingResourceFromDataSource:(WebDataSource*)dataSource;
 - (void)_receivedError:(WebError*)error
      forResourceHandle:(WebResourceHandle*)resourceHandle
         fromDataSource:(WebDataSource*)dataSource;
