@@ -77,7 +77,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   virtual NodeImpl* firstItem() const;
   virtual NodeImpl* nextItem() const;
 
-  NodeImpl* namedItem(const DOMString& name) const;
+  NodeImpl* namedItem(const DOMString& name, bool caseSensitive = true) const;
   // In case of multiple items named the same way
   NodeImpl* nextNamedItem(const DOMString& name) const;
 
@@ -86,7 +86,8 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   virtual NodeImpl* getItem(NodeImpl* current, int index, int& pos) const;
   virtual NodeImpl* getNamedItem(NodeImpl* current,
                                  int attr_id,
-                                 const DOMString& name) const;
+                                 const DOMString& name,
+                                 bool caseSensitive = true) const;
   virtual NodeImpl* nextNamedItemInternal(const DOMString& name) const;
   // the base node, the collection refers to
   NodeImpl* base;
@@ -123,17 +124,20 @@ class HTMLFormCollectionImpl : public HTMLCollectionImpl {
   virtual NodeImpl* getItem(NodeImpl* current, int index, int& pos) const;
   virtual NodeImpl* getNamedItem(NodeImpl* current,
                                  int attr_id,
-                                 const DOMString& name) const;
+                                 const DOMString& name,
+                                 bool caseSensitive) const;
   virtual NodeImpl* nextNamedItemInternal(const DOMString& name) const;
 
  private:
   NodeImpl* getNamedFormItem(int attr_id,
                              const DOMString& name,
-                             int duplicateNumber) const;
+                             int duplicateNumber,
+                             bool caseSensitive) const;
   NodeImpl* getNamedImgItem(NodeImpl* current,
                             int attr_id,
                             const DOMString& name,
-                            int& duplicateNumber) const;
+                            int& duplicateNumber,
+                            bool caseSensitive) const;
   mutable int currentPos;
 };
 
