@@ -121,6 +121,7 @@ class QChar {
   bool isSpace() const;
   bool isDigit() const;
   bool isLetter() const;
+  bool isNumber() const;
   bool isLetterOrNumber() const;
   bool isPunct() const;
   QChar lower() const;
