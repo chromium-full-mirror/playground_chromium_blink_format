@@ -236,12 +236,10 @@ void RenderTable::layout() {
     return;
   }
 
-#ifdef INCREMENTAL_REPAINTING
   QRect oldBounds, oldFullBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
-#endif
 
   // kdDebug( 6040 ) << renderName() << "(Table)"<< this << " ::layout0()
   // width=" << width() << ", needsLayout=" << needsLayout() << endl;
@@ -388,11 +386,9 @@ void RenderTable::layout() {
   // ### only pass true if width or height changed.
   layoutPositionedObjects(true);
 
-#ifdef INCREMENTAL_REPAINTING
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
-#endif
 
   setNeedsLayout(false);
 }
@@ -1369,10 +1365,8 @@ int RenderTableSection::layoutRows(int toAdd) {
         cell->setCellBottomExtra(rHeight - cell->height() - te);
       }
 
-#ifdef INCREMENTAL_REPAINTING
       int oldCellX = cell->xPos();
       int oldCellY = cell->yPos();
-#endif
 
       if (style()->direction() == RTL) {
         cell->setPos(table()->columnPos[(int)totalCols] -
@@ -1384,7 +1378,6 @@ int RenderTableSection::layoutRows(int toAdd) {
         cell->setPos(table()->columnPos[c] + leftOffset, rowPos[rindx]);
       }
 
-#ifdef INCREMENTAL_REPAINTING
       // If the cell moved, we have to repaint it as well as any
       // floating/positioned
       // descendants.  An exception is if we need a layout.  In this case, we
@@ -1392,7 +1385,6 @@ int RenderTableSection::layoutRows(int toAdd) {
       // repaint ourselves (and the cell) anyway.
       if (!table()->selfNeedsLayout() && checkForRepaintDuringLayout())
         cell->repaintDuringLayoutIfMoved(oldCellX, oldCellY);
-#endif
     }
   }
 

@@ -1368,14 +1368,10 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren) {
           o->deleteLineBoxWrapper();
       } else if (o->isText()) {
         static_cast<RenderText*>(o)->deleteTextBoxes();
-#ifdef INCREMENTAL_REPAINTING
         o->setNeedsLayout(false);
-#endif
       } else if (o->isInlineFlow() && !endOfInline) {
         static_cast<RenderFlow*>(o)->deleteLineBoxes();
-#ifdef INCREMENTAL_REPAINTING
         o->setNeedsLayout(false);
-#endif
       }
       o = Bidinext(this, o, bidi, false, &endOfInline);
     }

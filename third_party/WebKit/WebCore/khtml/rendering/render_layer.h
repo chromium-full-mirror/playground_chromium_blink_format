@@ -54,9 +54,6 @@ class QScrollBar;
 template <class T>
 class QPtrVector;
 
-// Uncomment to enable incremental painting
-#define INCREMENTAL_REPAINTING 1
-
 namespace khtml {
 class RenderStyle;
 class RenderTable;
@@ -207,7 +204,6 @@ class RenderLayer {
   void updateScrollPositionFromScrollbars();
 
   void updateLayerPosition();
-#ifdef INCREMENTAL_REPAINTING
   void updateLayerPositions(bool doFullRepaint = false,
                             bool checkForRepaint = true);
   void computeRepaintRects();
@@ -215,9 +211,6 @@ class RenderLayer {
     relX += m_relX;
     relY += m_relY;
   }
-#else
-  void updateLayerPositions();
-#endif
 
   // Get the enclosing stacking context for this layer.  A stacking context is a
   // layer
@@ -314,14 +307,12 @@ class RenderLayer {
   RenderLayer* m_first;
   RenderLayer* m_last;
 
-#ifdef INCREMENTAL_REPAINTING
   QRect m_repaintRect;  // Cached repaint rects. Used by layout.
   QRect m_fullRepaintRect;
 
   // Our current relative position offset.
   int m_relX;
   int m_relY;
-#endif
 
   // Our (x,y) coordinates are in our parent layer's coordinate space.
   short m_x;

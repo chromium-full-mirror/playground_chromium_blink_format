@@ -105,9 +105,7 @@ class RenderBox : public RenderContainer {
   virtual QRect getAbsoluteRepaintRect();
   virtual void computeAbsoluteRepaintRect(QRect& r, bool f = false);
 
-#ifdef INCREMENTAL_REPAINTING
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
-#endif
 
   virtual short containingBlockWidth() const;
 

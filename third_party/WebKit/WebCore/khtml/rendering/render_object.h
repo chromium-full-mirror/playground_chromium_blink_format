@@ -36,9 +36,6 @@
 #include "khtml_events.h"
 #include "xml/dom_docimpl.h"
 
-// Uncomment to turn on incremental repainting.
-#define INCREMENTAL_REPAINTING 1
-
 class QPainter;
 class QTextStream;
 class CSSStyle;
@@ -354,11 +351,7 @@ class RenderObject : public CachedObjectClient {
   void setReplaced(bool b = true) { m_replaced = b; }
   void setIsSelectionBorder(bool b = true) { m_isSelectionBorder = b; }
 
-#ifdef INCREMENTAL_REPAINTING
   void scheduleRelayout();
-#else
-  void scheduleRelayout(RenderObject* clippedObj);
-#endif
 
   virtual InlineBox* createInlineBox(bool makePlaceHolderBox,
                                      bool isRootLineBox);
@@ -738,7 +731,6 @@ class RenderObject : public CachedObjectClient {
   // the object's coordinate space.
   void repaintRectangle(const QRect& r, bool immediate = false);
 
-#ifdef INCREMENTAL_REPAINTING
   // Repaint only if our old bounds and new bounds are different.
   virtual void repaintAfterLayoutIfNeeded(const QRect& oldBounds,
                                           const QRect& oldFullBounds);
@@ -754,7 +746,6 @@ class RenderObject : public CachedObjectClient {
   virtual void repaintObjectsBeforeLayout();
 
   bool checkForRepaintDuringLayout() const;
-#endif
 
   // Returns the rect that should be repainted whenever this object changes.
   // The rect is in the view's
@@ -763,10 +754,8 @@ class RenderObject : public CachedObjectClient {
 
   QRect getAbsoluteRepaintRectWithOutline(int ow);
 
-#ifdef INCREMENTAL_REPAINTING
   virtual void getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
                                                      QRect& boundsWithChildren);
-#endif
 
   // Given a rect in the object's coordinate space, this method converts the
   // rectangle to the view's

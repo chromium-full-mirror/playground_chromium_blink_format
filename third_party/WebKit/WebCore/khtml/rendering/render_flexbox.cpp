@@ -245,12 +245,10 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
     return;
   }
 
-#ifdef INCREMENTAL_REPAINTING
   QRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     oldBounds = getAbsoluteRepaintRect();
-#endif
 
   int oldWidth = m_width;
   int oldHeight = m_height;
@@ -332,11 +330,9 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren) {
   if (style()->hidesOverflow() && m_layer)
     m_layer->updateScrollInfoAfterLayout();
 
-#ifdef INCREMENTAL_REPAINTING
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
-#endif
 
   setNeedsLayout(false);
 }
@@ -947,13 +943,12 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
 }
 
 void RenderFlexibleBox::placeChild(RenderObject* child, int x, int y) {
-#ifdef INCREMENTAL_REPAINTING
   int oldChildX = child->xPos();
   int oldChildY = child->yPos();
-#endif
+
   // Place the child.
   child->setPos(x, y);
-#ifdef INCREMENTAL_REPAINTING
+
   // If the child moved, we have to repaint it as well as any
   // floating/positioned
   // descendants.  An exception is if we need a layout.  In this case, we know
@@ -961,7 +956,6 @@ void RenderFlexibleBox::placeChild(RenderObject* child, int x, int y) {
   // repaint ourselves (and the child) anyway.
   if (!selfNeedsLayout() && checkForRepaintDuringLayout())
     child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
-#endif
 }
 
 const char* RenderFlexibleBox::renderName() const {

@@ -76,10 +76,8 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_next(0),
       m_first(0),
       m_last(0),
-#ifdef INCREMENTAL_REPAINTING
       m_relX(0),
       m_relY(0),
-#endif
       m_x(0),
       m_y(0),
       m_width(0),
@@ -96,8 +94,7 @@ RenderLayer::RenderLayer(RenderObject* object)
       m_scrollDimensionsDirty(true),
       m_zOrderListsDirty(true),
       m_usedTransparency(false),
-      m_marquee(0) {
-}
+      m_marquee(0) {}
 
 RenderLayer::~RenderLayer() {
   // Child layers will be deleted by their corresponding render objects, so
@@ -110,7 +107,6 @@ RenderLayer::~RenderLayer() {
   delete m_marquee;
 }
 
-#ifdef INCREMENTAL_REPAINTING
 void RenderLayer::computeRepaintRects() {
   // FIXME: Child object could override visibility.
   if (m_object->style()->visibility() == VISIBLE)
@@ -119,26 +115,18 @@ void RenderLayer::computeRepaintRects() {
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
     child->computeRepaintRects();
 }
-#endif
 
-#ifdef INCREMENTAL_REPAINTING
-void RenderLayer::updateLayerPositions(bool doFullRepaint, bool checkForRepaint)
-#else
-void RenderLayer::updateLayerPositions()
-#endif
-{
-#ifdef INCREMENTAL_REPAINTING
+void RenderLayer::updateLayerPositions(bool doFullRepaint,
+                                       bool checkForRepaint) {
   if (doFullRepaint) {
     m_object->repaint();
     checkForRepaint = doFullRepaint = false;
   }
-#endif
 
   updateLayerPosition();  // For relpositioned layers or non-positioned layers,
-// we need to keep in sync, since we may have shifted relative
-// to our parent layer.
+  // we need to keep in sync, since we may have shifted relative
+  // to our parent layer.
 
-#ifdef INCREMENTAL_REPAINTING
   if (m_hBar || m_vBar) {
     // Need to position the scrollbars.
     int x = 0;
@@ -151,14 +139,9 @@ void RenderLayer::updateLayerPositions()
   // FIXME: Child object could override visibility.
   if (checkForRepaint && (m_object->style()->visibility() == VISIBLE))
     m_object->repaintAfterLayoutIfNeeded(m_repaintRect, m_fullRepaintRect);
-#endif
 
   for (RenderLayer* child = firstChild(); child; child = child->nextSibling())
-#ifdef INCREMENTAL_REPAINTING
     child->updateLayerPositions(doFullRepaint, checkForRepaint);
-#else
-    child->updateLayerPositions();
-#endif
 
   // With all our children positioned, now update our marquee if we need to.
   if (m_marquee)
@@ -186,17 +169,12 @@ void RenderLayer::updateLayerPosition() {
     }
   }
 
-#ifdef INCREMENTAL_REPAINTING
   m_relX = m_relY = 0;
   if (m_object->isRelPositioned()) {
     static_cast<RenderBox*>(m_object)->relativePositionOffset(m_relX, m_relY);
     x += m_relX;
     y += m_relY;
   }
-#else
-  if (m_object->isRelPositioned())
-    static_cast<RenderBox*>(m_object)->relativePositionOffset(x, y);
-#endif
 
   // Subtract our parent's scroll offset.
   if (parent())
@@ -766,11 +744,6 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     renderer()->paint(p, damageRect.x(), damageRect.y(), damageRect.width(),
                       damageRect.height(), x - renderer()->xPos(),
                       y - renderer()->yPos(), PaintActionElementBackground);
-
-#ifndef INCREMENTAL_REPAINTING
-    // Position our scrollbars.
-    positionScrollbars(layerBounds);
-#endif
 
 #if APPLE_CHANGES
     // Our scrollbar widgets paint exactly when we tell them to, so that they

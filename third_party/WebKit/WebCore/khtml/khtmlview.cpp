@@ -103,9 +103,7 @@ class KHTMLViewPrivate {
     complete = false;
     mousePressed = false;
     tooltip = 0;
-#ifdef INCREMENTAL_REPAINTING
     doFullRepaint = true;
-#endif
 #if APPLE_CHANGES
     vmode = hmode = QScrollView::Auto;
     firstLayout = true;
@@ -156,9 +154,7 @@ class KHTMLViewPrivate {
     layoutTimerId = 0;
     complete = false;
     mousePressed = false;
-#ifdef INCREMENTAL_REPAINTING
     doFullRepaint = true;
-#endif
     layoutSchedulingEnabled = true;
     layoutSuppressed = false;
 #if APPLE_CHANGES
@@ -176,9 +172,7 @@ class KHTMLViewPrivate {
   bool borderTouched : 1;
   bool borderStart : 1;
   bool scrollBarMoved : 1;
-#ifdef INCREMENTAL_REPAINTING
   bool doFullRepaint : 1;
-#endif
 
   QScrollView::ScrollBarMode vmode;
   QScrollView::ScrollBarMode hmode;
@@ -237,10 +231,6 @@ KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
                   WResizeNoErase | WRepaintNoErase | WPaintUnclipped),
       _refCount(1) {
   m_medium = "screen";
-
-#ifndef INCREMENTAL_REPAINTING
-  m_layoutObject = 0;
-#endif
 
   m_part = part;
 #if APPLE_CHANGES
@@ -502,11 +492,9 @@ bool KHTMLView::inLayout() const {
   return d->layoutSuppressed;
 }
 
-#ifdef INCREMENTAL_REPAINTING
 bool KHTMLView::needsFullRepaint() const {
   return d->doFullRepaint;
 }
-#endif
 
 void KHTMLView::layout() {
   if (d->layoutSuppressed)
@@ -554,9 +542,7 @@ void KHTMLView::layout() {
     }
   }
 
-#ifdef INCREMENTAL_REPAINTING
   d->doFullRepaint = d->firstLayout || root->printingMode();
-#endif
 
 #if APPLE_CHANGES
   // Now set our scrollbar state for the layout.
@@ -592,27 +578,21 @@ void KHTMLView::layout() {
   QScrollView::setVScrollBarMode(vMode);
 #endif
 
-#ifdef INCREMENTAL_REPAINTING
   int oldHeight = _height;
   int oldWidth = _width;
-#endif
 
   _height = visibleHeight();
   _width = visibleWidth();
 
-#ifdef INCREMENTAL_REPAINTING
   if (oldHeight != _height || oldWidth != _width)
     d->doFullRepaint = true;
-#endif
 
   RenderLayer* layer = root->layer();
 
-#ifdef INCREMENTAL_REPAINTING
   if (!d->doFullRepaint) {
     layer->computeRepaintRects();
     root->repaintObjectsBeforeLayout();
   }
-#endif
 
   root->layout();
 
@@ -625,38 +605,20 @@ void KHTMLView::layout() {
 
   resizeContents(layer->width(), layer->height());
 
-// Now update the positions of all layers.
-#ifdef INCREMENTAL_REPAINTING
+  // Now update the positions of all layers.
   layer->updateLayerPositions(d->doFullRepaint);
-#else
-  layer->updateLayerPositions();
-#endif
 
 #if APPLE_CHANGES
   // We update our widget positions right after doing a layout.
   root->updateWidgetPositions();
 #endif
 
-#ifdef INCREMENTAL_REPAINTING
-  if (root->needsLayout())
-#else
-  // Do not allow a full layout if we had a clip object set.
-  if (root->needsLayout() && !m_layoutObject)
-#endif
-  {
+  if (root->needsLayout()) {
     // qDebug("needs layout, delaying repaint");
     scheduleRelayout();
     return;
   }
   setStaticBackground(d->useSlowRepaints);
-
-#ifndef INCREMENTAL_REPAINTING
-  if (m_layoutObject) {
-    m_layoutObject->repaint();
-    m_layoutObject = 0;
-  } else
-    root->repaint();
-#endif
 }
 
 //
@@ -1819,12 +1781,6 @@ void KHTMLView::slotScrollBarMoved() {
 }
 
 void KHTMLView::repaintRectangle(const QRect& r, bool immediate) {
-#ifndef INCREMENTAL_REPAINTING
-  if (d->layoutTimerId)  // Don't bother scheduling a repaint when a layout is
-                         // pending.
-    return;
-#endif
-
   updateContents(r, immediate);
 }
 
@@ -1833,26 +1789,12 @@ void KHTMLView::timerEvent(QTimerEvent* e) {
     layout();
 }
 
-#ifdef INCREMENTAL_REPAINTING
-void KHTMLView::scheduleRelayout()
-#else
-void KHTMLView::scheduleRelayout(khtml::RenderObject* clippedObj)
-#endif
-{
+void KHTMLView::scheduleRelayout() {
   if (!d->layoutSchedulingEnabled)
     return;
 
-#ifndef INCREMENTAL_REPAINTING
-  if (m_layoutObject != clippedObj)
-    m_layoutObject = 0;
-#endif
-
   if (d->layoutTimerId)
     return;
-
-#ifndef INCREMENTAL_REPAINTING
-  m_layoutObject = clippedObj;
-#endif
 
   bool parsing = false;
   if (m_part->xmlDocImpl()) {
@@ -1863,10 +1805,6 @@ void KHTMLView::scheduleRelayout(khtml::RenderObject* clippedObj)
 }
 
 void KHTMLView::unscheduleRelayout() {
-#ifndef INCREMENTAL_REPAINTING
-  m_layoutObject = 0;
-#endif
-
   if (!d->layoutTimerId)
     return;
 

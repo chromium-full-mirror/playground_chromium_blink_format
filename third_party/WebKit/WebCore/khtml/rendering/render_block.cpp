@@ -384,12 +384,10 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     return;
   }
 
-#ifdef INCREMENTAL_REPAINTING
   QRect oldBounds, oldFullBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
-#endif
 
   int oldWidth = m_width;
 
@@ -530,11 +528,9 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   if (style()->hidesOverflow() && m_layer)
     m_layer->updateScrollInfoAfterLayout();
 
-#ifdef INCREMENTAL_REPAINTING
   // Repaint with our new bounds if they are different from our old bounds.
   if (checkForRepaint)
     repaintAfterLayoutIfNeeded(oldBounds, oldFullBounds);
-#endif
 
   setNeedsLayout(false);
 }
@@ -837,12 +833,10 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 
     child->calcVerticalMargins();
 
-// kdDebug(0) << "margin = " << margin << " yPos = " << m_height << endl;
+    // kdDebug(0) << "margin = " << margin << " yPos = " << m_height << endl;
 
-#ifdef INCREMENTAL_REPAINTING
     int oldChildX = child->xPos();
     int oldChildY = child->yPos();
-#endif
 
     // Try to guess our correct y position.  In most cases this guess will
     // be correct.  Only if we're wrong (when we compute the real y position)
@@ -1122,7 +1116,6 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       treatCompactAsBlock = false;
     }
 
-#ifdef INCREMENTAL_REPAINTING
     // If the child moved, we have to repaint it as well as any
     // floating/positioned
     // descendants.  An exception is if we need a layout.  In this case, we know
@@ -1130,7 +1123,6 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
     // repaint ourselves (and the child) anyway.
     if (!selfNeedsLayout() && checkForRepaintDuringLayout())
       child->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
-#endif
 
     child = child->nextSibling();
   }
@@ -1202,7 +1194,6 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren) {
   }
 }
 
-#ifdef INCREMENTAL_REPAINTING
 void RenderBlock::getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
                                                         QRect& fullBounds) {
   bounds = fullBounds = getAbsoluteRepaintRect();
@@ -1260,7 +1251,6 @@ void RenderBlock::repaintObjectsBeforeLayout() {
       r->repaintObjectsBeforeLayout();
   }
 }
-#endif
 
 void RenderBlock::paint(QPainter* p,
                         int _x,
@@ -1574,10 +1564,8 @@ void RenderBlock::positionNewFloats() {
     if (ro - lo < fwidth)
       fwidth = ro - lo;  // Never look for more than what will be available.
 
-#ifdef INCREMENTAL_REPAINTING
     int oldChildX = o->xPos();
     int oldChildY = o->yPos();
-#endif
 
     if (o->style()->floating() == FLEFT) {
       if (o->style()->clear() & CLEFT)
@@ -1617,11 +1605,9 @@ void RenderBlock::positionNewFloats() {
     f->startY = y;
     f->endY = f->startY + _height;
 
-#ifdef INCREMENTAL_REPAINTING
     // If the child moved, we have to repaint it.
     if (checkForRepaintDuringLayout())
       o->repaintDuringLayoutIfMoved(oldChildX, oldChildY);
-#endif
 
     // kdDebug( 6040 ) << "floatingObject x/y= (" << f->left << "/" << f->startY
     // << "-" << f->width << "/" << f->endY - f->startY << ")" << endl;
