@@ -7,6 +7,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WebDefaultWindowOperationsDelegate : NSObject
-+ (WebDefaultWindowOperationsDelegate*)sharedWindowOperationsDelegate;
+@interface WebDefaultUIDelegate : NSObject {
+  NSDictionary* element;
+}
+
++ (WebDefaultUIDelegate*)sharedUIDelegate;
 @end
