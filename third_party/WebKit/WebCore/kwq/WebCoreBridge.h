@@ -400,6 +400,11 @@ typedef enum {
 - (void)alterCurrentSelection:(WebSelectionAlteration)alteration
              verticalDistance:(float)distance;
 - (WebSelectionGranularity)selectionGranularity;
+- (DOMRange*)smartDeleteRangeForProposedRange:(DOMRange*)proposedCharRange;
+- (void)smartInsertForString:(NSString*)pasteString
+              replacingRange:(DOMRange*)charRangeToReplace
+                beforeString:(NSString**)beforeString
+                 afterString:(NSString**)afterString;
 
 - (DOMDocumentFragment*)documentFragmentWithMarkupString:(NSString*)markupString
                                            baseURLString:
