@@ -1115,14 +1115,6 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   }
 }
 
-bool CompositeEditCommand::isMailBlockquote(const NodeImpl* node) const {
-  if (!node || !node->renderer() ||
-      !node->isElementNode() && node->id() != ID_BLOCKQUOTE)
-    return false;
-
-  return static_cast<const ElementImpl*>(node)->getAttribute("type") == "cite";
-}
-
 //==========================================================================================
 // Concrete commands
 //------------------------------------------------------------------------------------------
@@ -4307,6 +4299,7 @@ void ReplacementFragment::computeStylesAndRemoveUnrendered() {
           computedStyle->copyInheritableProperties();
       style->ref();
       node->ref();
+      removeBlockquoteColorsIfNeeded(node, style);
       m_styles[node] = style;
       computedStyle->deref();
     }
@@ -4350,45 +4343,24 @@ void ReplacementFragment::removeStyleNodes() {
   }
 }
 
-bool isNodeRendered(const NodeImpl* node) {
-  if (!node)
-    return false;
+void ReplacementFragment::removeBlockquoteColorsIfNeeded(
+    NodeImpl* node,
+    CSSMutableStyleDeclarationImpl* style) {
+  if (!node || !style)
+    return;
 
-  RenderObject* renderer = node->renderer();
-  if (!renderer)
-    return false;
-
-  return renderer->style()->visibility() == VISIBLE;
-}
-
-bool isProbablyBlock(const NodeImpl* node) {
-  if (!node)
-    return false;
-
-  switch (node->id()) {
-    case ID_BLOCKQUOTE:
-    case ID_DD:
-    case ID_DIV:
-    case ID_DL:
-    case ID_DT:
-    case ID_H1:
-    case ID_H2:
-    case ID_H3:
-    case ID_H4:
-    case ID_H5:
-    case ID_H6:
-    case ID_HR:
-    case ID_LI:
-    case ID_OL:
-    case ID_P:
-    case ID_PRE:
-    case ID_TD:
-    case ID_TH:
-    case ID_UL:
-      return true;
+  if (NodeImpl* blockquote = closestMailBlockquote(node)) {
+    CSSComputedStyleDeclarationImpl* blockquoteStyle =
+        Position(blockquote, 0).computedStyle();
+    if (blockquoteStyle->getPropertyValue(CSS_PROP_COLOR) ==
+        style->getPropertyValue(CSS_PROP_COLOR)) {
+      // Don't remove altogether. Set to the document's color.
+      CSSComputedStyleDeclarationImpl* documentStyle =
+          Position(node->getDocument()->documentElement(), 0).computedStyle();
+      DOMString documentColor = documentStyle->getPropertyValue(CSS_PROP_COLOR);
+      style->setProperty(CSS_PROP_COLOR, documentColor, false, false);
+    }
   }
-
-  return false;
 }
 
 ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
@@ -5571,6 +5543,63 @@ ElementImpl* createStyleSpanElement(DocumentImpl* document) {
   ASSERT(exceptionCode == 0);
   styleElement->setAttribute(ATTR_CLASS, styleSpanClassString());
   return styleElement;
+}
+
+bool isNodeRendered(const NodeImpl* node) {
+  if (!node)
+    return false;
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return false;
+
+  return renderer->style()->visibility() == VISIBLE;
+}
+
+bool isProbablyBlock(const NodeImpl* node) {
+  if (!node)
+    return false;
+
+  switch (node->id()) {
+    case ID_BLOCKQUOTE:
+    case ID_DD:
+    case ID_DIV:
+    case ID_DL:
+    case ID_DT:
+    case ID_H1:
+    case ID_H2:
+    case ID_H3:
+    case ID_H4:
+    case ID_H5:
+    case ID_H6:
+    case ID_HR:
+    case ID_LI:
+    case ID_OL:
+    case ID_P:
+    case ID_PRE:
+    case ID_TD:
+    case ID_TH:
+    case ID_UL:
+      return true;
+  }
+
+  return false;
+}
+
+NodeImpl* closestMailBlockquote(const NodeImpl* node) {
+  for (NodeImpl* n = const_cast<NodeImpl*>(node); n; n = n->parentNode()) {
+    if (isMailBlockquote(n))
+      return n;
+  }
+  return 0;
+}
+
+bool isMailBlockquote(const NodeImpl* node) {
+  if (!node || !node->renderer() ||
+      !node->isElementNode() && node->id() != ID_BLOCKQUOTE)
+    return false;
+
+  return static_cast<const ElementImpl*>(node)->getAttribute("type") == "cite";
 }
 
 }  // namespace khtml
