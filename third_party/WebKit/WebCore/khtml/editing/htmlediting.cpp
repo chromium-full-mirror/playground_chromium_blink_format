@@ -1428,6 +1428,9 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
       m_typingStyle(0) {}
 
 void DeleteSelectionCommand::initializePositionData() {
+  //
+  // Handle setting some basic positions
+  //
   Position start = m_selectionToDelete.start();
   Position end = m_selectionToDelete.end();
 
@@ -1436,6 +1439,10 @@ void DeleteSelectionCommand::initializePositionData() {
   m_upstreamEnd = end.upstream(StayInBlock);
   m_downstreamEnd = end.downstream(StayInBlock);
 
+  //
+  // Handle leading and trailing whitespace, as well as smart delete adjustments
+  // to the selection
+  //
   m_leadingWhitespace = m_upstreamStart.leadingWhitespacePosition();
   bool hasLeadingWhitespaceBeforeAdjustment = m_leadingWhitespace.isNotNull();
   if (m_smartDelete && hasLeadingWhitespaceBeforeAdjustment) {
@@ -1446,7 +1453,6 @@ void DeleteSelectionCommand::initializePositionData() {
     m_downstreamStart = pos.downstream(StayInBlock);
     m_leadingWhitespace = m_upstreamStart.leadingWhitespacePosition();
   }
-
   m_trailingWhitespace = m_downstreamEnd.trailingWhitespacePosition();
   // Note: trailing whitespace is only considered for smart delete if there is
   // no leading
@@ -1461,13 +1467,17 @@ void DeleteSelectionCommand::initializePositionData() {
     m_downstreamEnd = pos.downstream(StayInBlock);
     m_trailingWhitespace = m_downstreamEnd.trailingWhitespacePosition();
   }
-
   m_trailingWhitespaceValid = true;
 
+  //
+  // Handle setting start and end blocks and the start node.
+  //
   m_startBlock = m_downstreamStart.node()->enclosingBlockFlowElement();
   m_startBlock->ref();
   m_endBlock = m_upstreamEnd.node()->enclosingBlockFlowElement();
   m_endBlock->ref();
+  m_startNode = m_upstreamStart.node();
+  m_startNode->ref();
 
   debugPosition("m_upstreamStart      ", m_upstreamStart);
   debugPosition("m_downstreamStart    ", m_downstreamStart);
@@ -1477,9 +1487,7 @@ void DeleteSelectionCommand::initializePositionData() {
   debugPosition("m_trailingWhitespace ", m_trailingWhitespace);
   debugNode("m_startBlock         ", m_startBlock);
   debugNode("m_endBlock           ", m_endBlock);
-
-  m_startNode = m_upstreamStart.node();
-  m_startNode->ref();
+  debugNode("m_startNode          ", m_startNode);
 }
 
 void DeleteSelectionCommand::saveTypingStyleState() {
