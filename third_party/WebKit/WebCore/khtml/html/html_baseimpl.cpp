@@ -304,13 +304,9 @@ void HTMLFrameElementImpl::attach() {
   if (!m_render)
     return;
 
-// we need a unique name for every frame in the frameset. Hope that's unique
-// enough.
-#ifdef APPLE_CHANGES
-  if (name.isEmpty())
-#else
+  // we need a unique name for every frame in the frameset. Hope that's unique
+  // enough.
   if (name.isEmpty() || w->part()->frameExists(name.string()))
-#endif
     name = DOMString(w->part()->requestFrameName());
 
   // load the frame contents
