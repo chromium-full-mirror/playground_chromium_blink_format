@@ -1428,8 +1428,6 @@ QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
       } else if (o->isText() || (o->isInlineFlow() && !endOfInline)) {
         if (fullLayout || o->selfNeedsLayout())
           o->dirtyLineBoxes(fullLayout);
-        if (hasTextOverflow && isText())
-          static_cast<RenderText*>(o)->clearTextOverflowTruncation();
         o->setNeedsLayout(false);
       }
       o = Bidinext(this, o, bidi, false, &endOfInline);
@@ -1591,7 +1589,7 @@ QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
         int delta = m_height - endLineYPos;
         if (delta)
           for (RootInlineBox* line = endLine; line; line = line->nextRootBox())
-            line->adjustVerticalPosition(delta);
+            line->adjustPosition(0, delta);
 
         // Now set our height and check for overflow.
         int currYPos = m_height;
@@ -2383,9 +2381,8 @@ end:
 }
 
 void RenderBlock::deleteEllipsisLineBoxes() {
-  RenderArena* arena = renderArena();
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox())
-    curr->detachEllipsisBox(arena);
+    curr->clearTruncation();
 }
 
 void RenderBlock::checkLinesForTextOverflow() {
@@ -2393,7 +2390,7 @@ void RenderBlock::checkLinesForTextOverflow() {
   QChar ellipsis = 0x2026;  // FIXME: CSS3 says this is configurable, also need
                             // to use 0x002E (FULL STOP) if 0x2026 not
                             // renderable
-  AtomicString ellipsisStr(ellipsis);
+  static AtomicString ellipsisStr(ellipsis);
   const Font& firstLineFont = style(true)->htmlFont();
   const Font& font = style()->htmlFont();
   int firstLineEllipsisWidth = firstLineFont.width(&ellipsis, 1, 0);
@@ -2408,12 +2405,8 @@ void RenderBlock::checkLinesForTextOverflow() {
   // Include the scrollbar for overflow blocks, which means we want to use
   // "contentWidth()"
   bool ltr = style()->direction() == LTR;
-  int blockEdge =
-      ltr ? borderLeft() + paddingLeft() + contentWidth()
-          : borderLeft() + paddingLeft();  // FIXME: In theory we will one day
-                                           // do RTL scrollbars, and then this
-  // RTL computation will want to add in the vertical scroller's width.
   for (RootInlineBox* curr = firstRootBox(); curr; curr = curr->nextRootBox()) {
+    int blockEdge = ltr ? rightOffset(curr->yPos()) : leftOffset(curr->yPos());
     int lineBoxEdge = ltr ? curr->xPos() + curr->width() : curr->xPos();
     if ((ltr && lineBoxEdge > blockEdge) || (!ltr && lineBoxEdge < blockEdge)) {
       // This line spills out of our box in the appropriate direction.  Now we

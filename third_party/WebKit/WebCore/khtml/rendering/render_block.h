@@ -240,14 +240,19 @@ class RenderBlock : public RenderFlow {
   void setLinesAppended(bool b = true) { m_linesAppended = b; }
   bool linesAppended() const { return m_linesAppended; }
 
+  void setHasMarkupTruncation(bool b = true) { m_hasMarkupTruncation = b; }
+  bool hasMarkupTruncation() const { return m_hasMarkupTruncation; }
+
 #ifndef NDEBUG
   virtual void printTree(int indent = 0) const;
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
 
   // Helper methods for computing line counts and heights for line counts.
+  RootInlineBox* lineAtIndex(int i);
   int lineCount();
-  int heightForLineCount(int l, bool includeBottom = true);
+  int heightForLineCount(int l);
+  void clearTruncation();
 
  protected:
   void newLine();
@@ -292,6 +297,7 @@ class RenderBlock : public RenderFlow {
   bool m_bottomMarginQuirk : 1;
   bool m_linesAppended : 1;  // Whether or not a block with inline children has
                              // had lines appended.
+  bool m_hasMarkupTruncation : 1;
 
   short m_maxTopPosMargin;
   short m_maxTopNegMargin;

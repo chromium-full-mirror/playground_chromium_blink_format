@@ -79,7 +79,7 @@ class InlineTextBox : public InlineRunBox {
   virtual void extractLine();
   virtual void attachLine();
 
-  void clearTruncation() { m_truncation = cNoTruncation; }
+  virtual void clearTruncation() { m_truncation = cNoTruncation; }
   virtual int placeEllipsisBox(bool ltr,
                                int blockEdge,
                                int ellipsisWidth,
@@ -273,8 +273,6 @@ class RenderText : public RenderObject {
   InlineTextBox* lastTextBox() const { return m_lastTextBox; }
 
   virtual InlineBox* inlineBox(long offset);
-
-  void clearTextOverflowTruncation();
 
 #if APPLE_CHANGES
   int widthFromCache(const Font*, int start, int len) const;

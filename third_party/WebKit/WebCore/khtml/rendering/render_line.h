@@ -30,6 +30,7 @@ class AtomicString;
 
 namespace khtml {
 
+class EllipsisBox;
 class InlineFlowBox;
 class RootInlineBox;
 
@@ -61,7 +62,7 @@ class InlineBox {
   virtual void extractLine();
   virtual void attachLine();
 
-  virtual void adjustVerticalPosition(int delta);
+  virtual void adjustPosition(int dx, int dy);
 
   // Overloaded new operator.
   void* operator new(size_t sz, RenderArena* renderArena) throw();
@@ -134,6 +135,8 @@ class InlineBox {
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;
+
+  virtual void clearTruncation(){};
 
   bool isDirty() const { return m_dirty; }
   void markDirty(bool dirty = true) { m_dirty = dirty; }
@@ -243,7 +246,9 @@ class InlineFlowBox : public InlineRunBox {
   virtual void deleteLine(RenderArena* arena);
   virtual void extractLine();
   virtual void attachLine();
-  virtual void adjustVerticalPosition(int delta);
+  virtual void adjustPosition(int dx, int dy);
+
+  virtual void clearTruncation();
 
   virtual void paintBackgroundAndBorder(RenderObject::PaintInfo& i,
                                         int _tx,
@@ -330,32 +335,6 @@ class InlineFlowBox : public InlineRunBox {
   bool m_hasTextChildren : 1;
 };
 
-class EllipsisBox : public InlineBox {
- public:
-  EllipsisBox(RenderObject* obj,
-              const DOM::AtomicString& ellipsisStr,
-              InlineFlowBox* p,
-              int w,
-              int y,
-              int h,
-              int b,
-              bool firstLine)
-      : InlineBox(obj), m_str(ellipsisStr) {
-    m_parent = p;
-    m_width = w;
-    m_y = y;
-    m_height = h;
-    m_baseline = b;
-    m_firstLine = firstLine;
-    m_constructed = true;
-  }
-
-  void paint(const RenderObject::PaintInfo& i, int _tx, int _ty);
-
- private:
-  DOM::AtomicString m_str;
-};
-
 class RootInlineBox : public InlineFlowBox {
  public:
   RootInlineBox(RenderObject* obj)
@@ -378,7 +357,7 @@ class RootInlineBox : public InlineFlowBox {
     return static_cast<RootInlineBox*>(m_prevLine);
   }
 
-  virtual void adjustVerticalPosition(int delta);
+  virtual void adjustPosition(int dx, int dy);
 
   virtual bool isRootInlineBox() { return true; }
   virtual int topOverflow() { return m_topOverflow; }
@@ -411,13 +390,24 @@ class RootInlineBox : public InlineFlowBox {
   void placeEllipsis(const DOM::AtomicString& ellipsisStr,
                      bool ltr,
                      int blockEdge,
-                     int ellipsisWidth);
+                     int ellipsisWidth,
+                     InlineBox* markupBox = 0);
   virtual int placeEllipsisBox(bool ltr,
                                int blockEdge,
                                int ellipsisWidth,
                                bool&);
 
   EllipsisBox* ellipsisBox() const { return m_ellipsisBox; }
+  void paintEllipsisBox(RenderObject::PaintInfo& i, int _tx, int _ty) const;
+  bool hitTestEllipsisBox(RenderObject::NodeInfo& info,
+                          int _x,
+                          int _y,
+                          int _tx,
+                          int _ty,
+                          HitTestAction hitTestAction,
+                          bool inBox);
+
+  virtual void clearTruncation();
 
  protected:
   // Normally we are only as tall as the style on our block dictates, but we
