@@ -110,7 +110,12 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isDocumentNode() const { return false; }
   virtual bool isXMLElementNode() const { return false; }
 
+  // Used by <form> elements to indicate a malformed state of some kind,
+  // typically
+  // used to keep from applying the bottom margin of the form.
   virtual bool isMalformed() { return false; }
+  virtual void setMalformed(bool malformed){};
+
   virtual bool containsOnlyWhitespace() const { return false; }
 
   // helper functions not being part of the DOM

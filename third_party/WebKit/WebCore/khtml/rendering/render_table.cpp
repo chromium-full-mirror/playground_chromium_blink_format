@@ -1376,23 +1376,23 @@ void RenderTable::layoutRows(int yoff) {
   if (h.isFixed())
     th = h.value;
   else if (h.isPercent()) {
-    Length ch = containingBlock()->style()->height();
-    if (ch.isFixed())
-      th = h.width(ch.value);
-    else {
-      // check we or not inside a table
-      RenderObject* ro = parent();
-      for (; ro && !ro->isTableCell(); ro = ro->parent())
-        ;
-      if (!ro) {
-        // we need to substract the bodys margins
-        // The cb is the <body>. Subtract out its margins. -dwh
-        th = h.width(viewRect().height() - containingBlock()->marginBottom() -
-                     containingBlock()->marginTop());
-        // not really, but this way the view height change
-        // gets propagated correctly
-        setOverhangingContents();
+    RenderObject* c = containingBlock();
+    for (; !c->isBody() && !c->isTableCell() && !c->isPositioned() &&
+           !c->isFloating();
+         c = c->containingBlock()) {
+      Length ch = c->style()->height();
+      if (ch.isFixed()) {
+        th = h.width(ch.value);
+        break;
       }
+    }
+
+    if (!c->isTableCell()) {
+      // we need to substract out the margins of this block. -dwh
+      th = h.width(viewRect().height() - c->marginBottom() - c->marginTop());
+      // not really, but this way the view height change
+      // gets propagated correctly
+      setOverhangingContents();
     }
   }
 

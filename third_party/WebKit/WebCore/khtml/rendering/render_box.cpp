@@ -630,9 +630,16 @@ short RenderBox::calcReplacedWidth(bool* ieHack) const {
     case Percent: {
       // RenderObject* p = parent();
       int cw = containingBlockWidth();
-      if (cw)
+      if (cw) {
         width = w.minWidth(cw);
-      else
+#if APPLE_CHANGES
+        // Aqua form controls have margins.  In order to make this work out
+        // well,
+        // subtract our margins out.
+        if (isFormElement())
+          width -= (marginLeft() + marginRight());
+#endif
+      } else
         width = intrinsicWidth();
       break;
     }
@@ -675,6 +682,13 @@ int RenderBox::calcReplacedHeight() const {
           if (tableCell->style()->height().isPercent() &&
               tableCell->getCellPercentageHeight()) {
             height = h.minWidth(tableCell->getCellPercentageHeight());
+#if APPLE_CHANGES
+            // Aqua form controls have margins.  In order to make this work out
+            // well,
+            // subtract our margins out.
+            if (isFormElement())
+              height -= (marginTop() + marginBottom());
+#endif
             break;
           }
         }
