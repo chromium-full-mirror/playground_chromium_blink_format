@@ -98,7 +98,7 @@ bool isBreakable(const QChar* s, int pos, int len)
     if (status == 0) {
       findStatus = UCFindTextBreak(breakLocator, kUCTextBreakLineMask, NULL,
                                    (const UniChar*)s, len, pos, &end);
-      UCDisposeTextBreakLocator(breakLocator);
+      UCDisposeTextBreakLocator(&breakLocator);
     }
     // If carbon fails, fail back on simple white space detection.
     if (findStatus == 0) {
