@@ -73,7 +73,7 @@ class RootObject {
 
   KJS::ObjectImp* rootObjectImp() const { return _imp; }
 
-  void setInterpreter(KJS::Interpreter* i) { _interpreter = i; }
+  void setInterpreter(KJS::Interpreter* i);
   KJS::Interpreter* interpreter() const { return _interpreter; }
 
   void removeAllNativeReferences();

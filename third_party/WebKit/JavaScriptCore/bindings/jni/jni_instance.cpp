@@ -45,7 +45,7 @@ using namespace KJS;
 JavaInstance::JavaInstance(jobject instance, const RootObject* r) {
   _instance = new JObjectWrapper(instance);
   _class = 0;
-  _root = r;
+  setExecutionContext(r);
 };
 
 JavaInstance::~JavaInstance() {
@@ -57,7 +57,6 @@ JavaInstance::JavaInstance(const JavaInstance& other) : Instance() {
   _instance->ref();
   // Classes are kept around forever.
   _class = other._class;
-  _root = other._root;
 };
 
 #define NUM_LOCAL_REFS 64
@@ -314,13 +313,6 @@ KJS::Value JavaInstance::defaultValue(KJS::Type hint) const {
 KJS::Value JavaInstance::valueOf() const {
   return stringValue();
 };
-
-void JavaInstance::setExecutionContext(RootObject* r) {
-  _root = r;
-}
-const RootObject* JavaInstance::executionContext() const {
-  return _root;
-}
 
 JObjectWrapper::JObjectWrapper(jobject instance) {
   assert(instance != 0);

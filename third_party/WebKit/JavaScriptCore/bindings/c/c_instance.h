@@ -64,13 +64,9 @@ class CInstance : public Instance {
 
   NPObject* getObject() const { return _object; }
 
-  void setExecutionContext(RootObject* r) { _root = r; }
-  const RootObject* executionContext() const { return _root; }
-
  private:
   mutable CClass* _class;
   NPObject* _object;
-  RootObject* _root;
 };
 
 }  // namespace Bindings

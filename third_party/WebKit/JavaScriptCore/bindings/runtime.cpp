@@ -121,3 +121,16 @@ Object Instance::createRuntimeObject(BindingLanguage language,
 
   return theObject;
 }
+
+Instance::Instance(const Instance& other) {
+  setExecutionContext(other.executionContext());
+};
+
+Instance& Instance::operator=(const Instance& other) {
+  if (this == &other)
+    return *this;
+
+  setExecutionContext(other.executionContext());
+
+  return *this;
+}
