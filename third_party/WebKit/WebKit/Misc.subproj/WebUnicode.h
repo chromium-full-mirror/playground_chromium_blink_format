@@ -30,8 +30,8 @@ extern UniChar* shapedString(UniChar* uc,
 }
 #endif
 
-#define WK_CELL(ucs) ((unsigned char)ucs & 0xff)
-#define WK_ROW(ucs) ((unsigned char)(ucs >> 8) & 0xff)
+#define WK_CELL(ucs) ((unsigned char)(ucs))
+#define WK_ROW(ucs) ((unsigned char)(ucs >> 8))
 
 // surrogate ranges
 enum {
