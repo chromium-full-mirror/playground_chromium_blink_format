@@ -12,15 +12,15 @@
 /*
    =============================================================================
 
-    A WKWebDataSource represents all the state associated
+    A IFWebDataSource represents all the state associated
     with a web page.  It is typicallly initialized with a URL, but
     may also be initialized with an NSString or NSData that hold
     HTML (?also other, i.e. image data?) content.
 
-    Typical usage of a WKWebDataSource.
+    Typical usage of a IFWebDataSource.
 
-    WKWebDataSource *dataSource = [[WKWebDataSource alloc] initWithURL: url];
-    id <WKWebController>myController = [[MyControllerClass alloc] init];
+    IFWebDataSource *dataSource = [[IFWebDataSource alloc] initWithURL: url];
+    id <IFWebController>myController = [[MyControllerClass alloc] init];
     [myController setDataSource: dataSource];
 
    Changes:
@@ -41,14 +41,14 @@
         Changed return type of baseTarget to (NSString *)
 
         Added the following two methods:
-            - (WKDataSource *)parent;
+            - (IFDataSource *)parent;
             - (NSArry *)children;
             - (BOOL)isMainDocument;
 
         Added the following methods:
 
             - (NSArray *)frameNames;
-            - (WKWebDataSource) findDataSourceForFrameNamed: (NSString *)name;
+            - (IFWebDataSource) findDataSourceForFrameNamed: (NSString *)name;
             - (BOOL)frameExists: (NSString *)name;
             - (void)openURL: (NSURL *)url inFrameNamed: (NSString *)frameName;
             - (void)openURL: (NSURL *)url inIFrame: (id)iFrameIdentifier;
@@ -58,9 +58,9 @@
         Removed all mentions of resolved URLs, because browsers don't
         actuall treat DNS aliases specially.
 
-        Moved search API to WKWebView.
+        Moved search API to IFWebView.
 
-        Moved WKPreferences to a new file, WKPreferences.h.  We are still
+        Moved IFPreferences to a new file, IFPreferences.h.  We are still
   discussing
         this item and it will not make it into the white paper.
 
@@ -70,10 +70,10 @@
   */
 
 #ifdef TENTATIVE_API
-@class WKLoader;
+@class IFLoader;
 #endif
 
-@interface WKWebDataSource : NSObject {
+@interface IFWebDataSource : NSObject {
  @private
   id _dataSourcePrivate;
 }
@@ -85,7 +85,7 @@
 #ifdef TENTATIVE_API
 - initWithData:(NSData*)data;
 - initWithString:(NSString*)string;
-- initWithLoader:(WKLoader*)loader;
+- initWithLoader:(IFLoader*)loader;
 #endif
 
 // Returns YES if this is the main document.  The main document is the 'top'
@@ -94,20 +94,20 @@
 
 // Returns nil if this data source represents the main document.  Otherwise
 // returns the parent data source.
-- (WKWebDataSource*)parent;
+- (IFWebDataSource*)parent;
 
 // Add a child frame.  This should only be called by the data source's
 // controller
 // as a result of a createFrame:inParent:.
 // [Should this be private?]
-- (void)addFrame:(WKWebFrame*)frame;
+- (void)addFrame:(IFWebFrame*)frame;
 
-// Returns an array of WKWebFrame.  The data sources in the array are
+// Returns an array of IFWebFrame.  The data sources in the array are
 // the data source assoicated with a frame set or iframe.  If the main document
 // is not a frameset, or has not iframes children will return nil.
 - (NSArray*)children;
 
-- (WKWebFrame*)frameNamed:(NSString*)frameName;
+- (IFWebFrame*)frameNamed:(NSString*)frameName;
 
 // Returns an array of NSStrings or nil.  The NSStrings corresponds to
 // frame names.  If this data source is the main document and has no
@@ -116,7 +116,7 @@
 
 // findDataSourceForFrameNamed: returns the child data source associated with
 // the frame named 'name', or nil.
-- (WKWebDataSource*)findDataSourceForFrameNamed:(NSString*)name;
+- (IFWebDataSource*)findDataSourceForFrameNamed:(NSString*)name;
 
 - (BOOL)frameExists:(NSString*)name;
 
@@ -130,16 +130,16 @@
 // pointers
 // can be managed externally, i.e. + controllerForDataSource: as a class method
 // on
-// WKDefaultWebController?
-//- (void)setController: (id <WKWebController>)controller;
-- (id<WKWebController>)controller;
+// IFDefaultWebController?
+//- (void)setController: (id <IFWebController>)controller;
+- (id<IFWebController>)controller;
 
 // May return nil if not initialized with a URL.
 - (NSURL*)inputURL;
 
 // finalURL returns the URL that was actually used.  The final URL
 // may be different than the inputURL if the server redirects.
-// <WKLocationChangedHandler> includes a message that is sent when
+// <IFLocationChangedHandler> includes a message that is sent when
 // a redirect is processed
 - (NSURL*)finalURL;
 
@@ -164,7 +164,7 @@
 
 #ifdef TENTATIVE_API
 // Get DOM access to the document.
-- (WKDOMDocument*)document;
+- (IFDOMDocument*)document;
 #endif
 
 // Get the source of the document by reconstructing it from the DOM.

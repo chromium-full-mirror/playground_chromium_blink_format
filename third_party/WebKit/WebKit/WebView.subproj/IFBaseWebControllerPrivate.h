@@ -6,9 +6,9 @@
 #import <WebKit/IFWebDataSource.h>
 #import <WebKit/IFWebView.h>
 
-@interface WKDefaultWebControllerPrivate : NSObject {
-  WKWebView* mainView;
-  WKWebDataSource* mainDataSource;
+@interface IFBaseWebControllerPrivate : NSObject {
+  IFWebView* mainView;
+  IFWebDataSource* mainDataSource;
   NSMutableDictionary* viewMap;
   NSMutableDictionary* dataSourceMap;
 }
