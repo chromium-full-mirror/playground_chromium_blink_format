@@ -616,6 +616,11 @@ class ObjectImp : public ValueImp {
   void saveProperties(SavedProperties& p) const { _prop.save(p); }
   void restoreProperties(const SavedProperties& p) { _prop.restore(p); }
 
+#if APPLE_CHANGES
+  bool forwardingScriptMessage() const { return _forwardingScriptMessage; }
+  void setForwardingScriptMessage(bool f) { _forwardingScriptMessage = f; }
+#endif
+
  protected:
   PropertyMap _prop;
 
@@ -624,6 +629,10 @@ class ObjectImp : public ValueImp {
   ValueImp* _proto;
   ValueImp* _internalValue;
   ScopeChain _scope;
+
+#if APPLE_CHANGES
+  bool _forwardingScriptMessage;
+#endif
 };
 
 /**

@@ -63,6 +63,7 @@ class ObjcInstance : public Instance {
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
                                const Value& aValue) const;
+  virtual bool supportsSetValueOfUndefinedField();
   virtual void setValueOfUndefinedField(ExecState* exec,
                                         const Identifier& property,
                                         const Value& aValue);

@@ -329,17 +329,37 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
   DOM::HTMLCollection applets = doc.applets();
   DOM::HTMLElement anApplet = applets.namedItem(propertyName.string());
   if (!anApplet.isNull()) {
-    Value v = getRuntimeObject(exec, anApplet);
-    if (!v.isNull())
-      return v;
+    Value domValue = getDOMNode(exec, anApplet);
+    ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+    if (!imp->forwardingScriptMessage()) {
+      Value v = getRuntimeObject(exec, anApplet, getDOMNode(exec, anApplet));
+      if (!v.isNull())
+        return v;
+    }
   }
 
   DOM::HTMLCollection embeds = doc.embeds();
   DOM::HTMLElement anEmbed = embeds.namedItem(propertyName.string());
   if (!anEmbed.isNull()) {
-    Value v = getRuntimeObject(exec, anEmbed);
-    if (!v.isNull())
-      return v;
+    Value domValue = getDOMNode(exec, anEmbed);
+    ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+    if (!imp->forwardingScriptMessage()) {
+      Value v = getRuntimeObject(exec, anEmbed, getDOMNode(exec, anEmbed));
+      if (!v.isNull())
+        return v;
+    }
+  }
+
+  DOM::HTMLCollection objects = doc.objects();
+  DOM::HTMLElement anObject = objects.namedItem(propertyName.string());
+  if (!anObject.isNull()) {
+    Value domValue = getDOMNode(exec, anObject);
+    ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+    if (!imp->forwardingScriptMessage()) {
+      Value v = getRuntimeObject(exec, anObject, getDOMNode(exec, anObject));
+      if (!v.isNull())
+        return v;
+    }
   }
 #endif
 
@@ -1273,10 +1293,15 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
     } break;
 #if APPLE_CHANGES
     case ID_EMBED:
+    case ID_OBJECT:
     case ID_APPLET: {
-      Value v = getRuntimeObject(exec, element);
-      if (!v.isNull())
-        return v;
+      Value domValue = getDOMNode(exec, element);
+      ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+      if (!imp->forwardingScriptMessage()) {
+        Value v = getRuntimeObject(exec, element, getDOMNode(exec, element));
+        if (!v.isNull())
+          return v;
+      }
     } break;
 #endif
     default:
@@ -4083,17 +4108,26 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
       DOM::Node node = collection.item(u);
 
 #if APPLE_CHANGES
-      if (!node.isNull() && (node.handle()->id() == ID_APPLET ||
-                             node.handle()->id() == ID_EMBED)) {
-        Value v = getRuntimeObject(exec, node);
-        if (!v.isNull())
-          return v;
+      if (!node.isNull()) {
+        Value domValue = getDOMNode(exec, node);
+        ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+        if (!imp->forwardingScriptMessage() &&
+            (node.handle()->id() == ID_APPLET ||
+             node.handle()->id() == ID_EMBED ||
+             node.handle()->id() == ID_OBJECT)) {
+          Value v = getRuntimeObject(exec, node, domValue);
+          if (!v.isNull())
+            return v;
+        }
+        return domValue;
       }
-#endif
+#else
       return getDOMNode(exec, node);
+#endif
     } else
       return getNamedItems(exec, propertyName);
   }
+  return Undefined();
 }
 
 // HTMLCollections are strange objects, they support both get and call,
@@ -4177,15 +4211,22 @@ Value KJS::HTMLCollection::getNamedItems(ExecState* exec,
   if (namedItems.count() == 1) {
     DOM::Node node = namedItems[0];
 #if APPLE_CHANGES
-    if (!node.isNull() &&
-        (node.handle()->id() == ID_APPLET || node.handle()->id() == ID_EMBED)) {
-      Value v = getRuntimeObject(exec, node);
-      if (!v.isNull())
-        return v;
+    if (!node.isNull()) {
+      Value domValue = getDOMNode(exec, node);
+      ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+      if (!imp->forwardingScriptMessage() &&
+          (node.handle()->id() == ID_APPLET ||
+           node.handle()->id() == ID_EMBED ||
+           node.handle()->id() == ID_OBJECT)) {
+        Value v = getRuntimeObject(exec, node, domValue);
+        if (!v.isNull())
+          return v;
+      }
+      return domValue;
     }
-#endif
-
+#else
     return getDOMNode(exec, node);
+#endif
   }
 
   return Value(new DOMNamedNodesCollection(exec, namedItems));

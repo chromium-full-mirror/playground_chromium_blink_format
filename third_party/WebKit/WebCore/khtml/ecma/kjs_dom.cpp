@@ -982,8 +982,27 @@ Value DOMDocumentProtoFunc::tryCall(ExecState* exec,
           exec, doc.getElementsByTagNameNS(args[0].toString(exec).string(),
                                            args[1].toString(exec).string()));
     case DOMDocument::GetElementById:
+#if APPLE_CHANGES
+    {
+      DOM::Element node = doc.getElementById(args[0].toString(exec).string());
+      if (!node.isNull()) {
+        Value domValue = getDOMNode(exec, node);
+        ObjectImp* imp = static_cast<ObjectImp*>(domValue.imp());
+        if (!imp->forwardingScriptMessage() &&
+            (node.handle()->id() == ID_APPLET ||
+             node.handle()->id() == ID_EMBED ||
+             node.handle()->id() == ID_OBJECT)) {
+          Value v = getRuntimeObject(exec, node, domValue);
+          if (!v.isNull())
+            return v;
+        }
+        return domValue;
+      }
+    }
+#else
       return getDOMNode(exec,
                         doc.getElementById(args[0].toString(exec).string()));
+#endif
     case DOMDocument::CreateRange:
       return getDOMRange(exec, doc.createRange());
     case DOMDocument::CreateNodeIterator: {
@@ -1143,8 +1162,17 @@ Value DOMElement::tryGet(ExecState* exec,
 }
 
 Value DOMElementProtoFunc::tryCall(ExecState* exec,
-                                   Object& thisObj,
+                                   Object& to,
                                    const List& args) {
+  Object thisObj;
+
+  if (to.classInfo() == &KJS::RuntimeObjectImp::info) {
+    KJS::RuntimeObjectImp* imp = static_cast<KJS::RuntimeObjectImp*>(to.imp());
+    thisObj = imp->fallbackObject().toObject(exec);
+  } else {
+    thisObj = to;
+  }
+
   if (!thisObj.inherits(
           &KJS::DOMNode::info)) {  // node should be enough here, given the cast
     Object err = Error::create(exec, TypeError);
@@ -1676,7 +1704,9 @@ Value KJS::getDOMNamedNodeMap(ExecState* exec, const DOM::NamedNodeMap& m) {
       cacheDOMObject<DOM::NamedNodeMap, KJS::DOMNamedNodeMap>(exec, m));
 }
 
-Value KJS::getRuntimeObject(ExecState* exec, const DOM::Node& node) {
+Value KJS::getRuntimeObject(ExecState* exec,
+                            const DOM::Node& node,
+                            const Value& fallback) {
   DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
 
   if (!node.isNull()) {
@@ -1686,8 +1716,8 @@ Value KJS::getRuntimeObject(ExecState* exec, const DOM::Node& node) {
 
       if (appletElement->getAppletInstance()) {
         // The instance is owned by the applet element.
-        RuntimeObjectImp* appletImp =
-            new RuntimeObjectImp(appletElement->getAppletInstance(), false);
+        RuntimeObjectImp* appletImp = new RuntimeObjectImp(
+            appletElement->getAppletInstance(), fallback, false);
         return Value(appletImp);
       }
     } else if (node.handle()->id() == ID_EMBED) {
@@ -1695,8 +1725,17 @@ Value KJS::getRuntimeObject(ExecState* exec, const DOM::Node& node) {
           static_cast<DOM::HTMLEmbedElementImpl*>(element.handle());
 
       if (embedElement->getEmbedInstance()) {
-        RuntimeObjectImp* runtimeImp =
-            new RuntimeObjectImp(embedElement->getEmbedInstance(), false);
+        RuntimeObjectImp* runtimeImp = new RuntimeObjectImp(
+            embedElement->getEmbedInstance(), fallback, false);
+        return Value(runtimeImp);
+      }
+    } else if (node.handle()->id() == ID_OBJECT) {
+      DOM::HTMLObjectElementImpl* objectElement =
+          static_cast<DOM::HTMLObjectElementImpl*>(element.handle());
+
+      if (objectElement->getObjectInstance()) {
+        RuntimeObjectImp* runtimeImp = new RuntimeObjectImp(
+            objectElement->getObjectInstance(), fallback, false);
         return Value(runtimeImp);
       }
     }

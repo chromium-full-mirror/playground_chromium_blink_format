@@ -159,6 +159,7 @@ class Instance {
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
                                const Value& aValue) const;
+  virtual bool supportsSetValueOfUndefinedField() { return false; };
   virtual void setValueOfUndefinedField(ExecState* exec,
                                         const Identifier& property,
                                         const Value& aValue){};
