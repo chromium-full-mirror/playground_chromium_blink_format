@@ -35,6 +35,7 @@
   BOOL reachedTerminalState;
   BOOL defersCallbacks;
   BOOL waitingToDeliverResource;
+  BOOL deliveredResource;
   WebResourceDelegateImplementationCache implementations;
   NSURL* originalURL;
   NSMutableData* resourceData;
