@@ -173,7 +173,7 @@ extern NSString* WebActionOriginalURLKey;     // NSURL
     @discussion Returns the policy for content which has been partially loaded.
    Sent after locationChangeStarted.
     @param type MIME type for the resource.
-    @param request A WebResourceRequest for the partially loaded content.
+    @param request A NSURLRequest for the partially loaded content.
     @param frame The frame which is loading the URL.
     @param listener The object to call when the decision is made
 */
