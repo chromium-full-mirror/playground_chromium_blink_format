@@ -27,6 +27,7 @@
 #include <runtime_object.h>
 #include <jni_instance.h>
 #include <objc_instance.h>
+#include <c_instance.h>
 
 using namespace KJS;
 using namespace KJS::Bindings;
@@ -92,10 +93,10 @@ Instance* Instance::createBindingForLanguageInstance(BindingLanguage language,
     return new Bindings::JavaInstance((jobject)instance);
   else if (language == Instance::ObjectiveCLanguage)
     return new Bindings::ObjcInstance((struct objc_object*)instance);
-#if 0
-    else if (language == Instance::CLanguage)
-        return new Bindings::CInstance ((struct objc_object *)instance);
-#endif
+
+  else if (language == Instance::CLanguage)
+    return new Bindings::CInstance((NP_Object*)instance);
+
   return 0;
 }
 
