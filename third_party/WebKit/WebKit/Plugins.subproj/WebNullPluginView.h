@@ -5,14 +5,13 @@
 
 #import <AppKit/AppKit.h>
 
+@class WebPluginError;
+
 @interface WebNullPluginView : NSImageView {
   BOOL didSendError;
-  NSString* MIMEType;
-  NSURL* pluginPageURL;
+  WebPluginError* error;
 }
 
-- initWithFrame:(NSRect)frame
-         MIMEType:(NSString*)mime
-       attributes:(NSDictionary*)attributes;
+- initWithFrame:(NSRect)frame error:(WebPluginError*)pluginError;
 
 @end

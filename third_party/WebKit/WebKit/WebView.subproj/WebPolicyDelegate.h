@@ -281,13 +281,4 @@ typedef enum {
                          forURL:(NSURL*)URL
                         inFrame:(WebFrame*)frame;
 
-/*!
-    @method pluginNotFoundForMIMEType:pluginPageURL:
-    @discussion Called when a plug-in for a certain mime type is not installed.
-    @param mime The MIME type that no installed plug-in supports.
-    @param URL The web page for the plug-in that supports the MIME type. Can be
-   nil.
-*/
-- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)URL;
-
 @end
