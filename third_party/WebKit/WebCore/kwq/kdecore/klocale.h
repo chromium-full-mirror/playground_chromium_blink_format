@@ -43,7 +43,6 @@ class KLocale {
   // constructors, copy constructors, and destructors ------------------------
 
   KLocale();
-
   ~KLocale();
 
   // member functions --------------------------------------------------------
@@ -59,6 +58,7 @@ class KLocale {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   KLocale(const KLocale&);
   KLocale& operator=(const KLocale&);
 

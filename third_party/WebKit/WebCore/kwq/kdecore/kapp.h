@@ -51,8 +51,7 @@ class KApplication : public QApplication {
   // constructors, copy constructors, and destructors ------------------------
 
   KApplication();
-
-  ~KApplication();
+  virtual ~KApplication();
 
   // member functions --------------------------------------------------------
 
@@ -71,6 +70,7 @@ class KApplication : public QApplication {
 
  private:
   // no copying or assignment
+  // note that these are "standard" (no pendantic stuff needed)
   KApplication(const KApplication&);
   KApplication& operator=(const KApplication&);
 

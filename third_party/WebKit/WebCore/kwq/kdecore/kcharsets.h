@@ -44,8 +44,7 @@ class KCharsets {
   // constructors, copy constructors, and destructors ------------------------
 
   KCharsets();
-
-  ~KCharsets();
+  virtual ~KCharsets();
 
   // member functions --------------------------------------------------------
 
@@ -65,9 +64,17 @@ class KCharsets {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KCharsets(const KCharsets&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KCharsets& operator=(const KCharsets&);
+#endif
 
 };  // class KCharsets
     // ==========================================================

@@ -45,11 +45,17 @@ class KGlobalSettings {
 
   static int contrast();
 
-  // constructors, copy constructors, and destructors ------------------------
+// constructors, copy constructors, and destructors ------------------------
 
-  KGlobalSettings();
+// add no-op constructor
+#ifdef _KWQ_PEDANTIC_
+  KGlobalSettings() {}
+#endif
 
-  ~KGlobalSettings();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KGlobalSettings() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -60,9 +66,17 @@ class KGlobalSettings {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KGlobalSettings(const KGlobalSettings&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KGlobalSettings& operator=(const KGlobalSettings&);
+#endif
 
 };  // class KGlobalSettings
     // ====================================================

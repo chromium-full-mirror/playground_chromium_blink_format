@@ -50,8 +50,7 @@ class KConfigBase {
   // constructors, copy constructors, and destructors ------------------------
 
   KConfigBase();
-
-  ~KConfigBase();
+  virtual ~KConfigBase();
 
   // member functions --------------------------------------------------------
 
@@ -77,9 +76,17 @@ class KConfigBase {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KConfigBase(const KConfigBase&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KConfigBase& operator=(const KConfigBase&);
+#endif
 
 };  // class KConfigBase
     // ========================================================
@@ -97,8 +104,7 @@ class KConfig : public KConfigBase {
   // constructors, copy constructors, and destructors ------------------------
 
   KConfig(const QString&, bool bReadOnly = false);
-
-  ~KConfig();
+  virtual ~KConfig();
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -109,9 +115,17 @@ class KConfig : public KConfigBase {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KConfig(const KConfig&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KConfig& operator=(const KConfig&);
+#endif
 
 };  // class KConfig
     // ============================================================

@@ -49,7 +49,10 @@ class KIcon {
 
   KIcon();
 
-  ~KIcon();
+// add no-op destructor
+#ifdef _KWQ_PEDANTIC_
+  ~KIcon() {}
+#endif
 
   // member functions --------------------------------------------------------
   // operators ---------------------------------------------------------------
@@ -60,9 +63,17 @@ class KIcon {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KIcon(const KIcon&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KIcon& operator=(const KIcon&);
+#endif
 
 };  // class KIcon
     // ==============================================================
@@ -80,7 +91,6 @@ class KIconLoader {
   // constructors, copy constructors, and destructors ------------------------
 
   KIconLoader();
-
   ~KIconLoader();
 
   // member functions --------------------------------------------------------
@@ -100,9 +110,17 @@ class KIconLoader {
   // ---------------------------------------------------------------------
 
  private:
-  // no copying or assignment
+// add copy constructor
+// this private declaration prevents copying
+#ifdef _KWQ_PEDANTIC_
   KIconLoader(const KIconLoader&);
+#endif
+
+// add assignment operator
+// this private declaration prevents assignment
+#ifdef _KWQ_PEDANTIC_
   KIconLoader& operator=(const KIconLoader&);
+#endif
 
 };  // class KIconLoader
     // ========================================================
