@@ -901,6 +901,9 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     fontDef.family = *(f.firstFamily());
     fontDef.italic = f.italic();
     fontDef.weight = f.weight();
+#if APPLE_CHANGES
+    fontDef.usePrinterFont = m_paintDevice->devType() == QInternal::Printer;
+#endif
     if (m_view) {
       const KHTMLSettings* settings = m_view->part()->settings();
       QString stdfont = settings->stdFontName();

@@ -45,12 +45,22 @@ class FontDef {
         sizeSpecified(false),
         weight(50),
         genericFamily(0),
-        hasNbsp(true) {}
+        hasNbsp(true)
+#if APPLE_CHANGES
+        ,
+        usePrinterFont(false)
+#endif
+  {
+  }
 
   bool operator==(const FontDef& other) const {
     return (family == other.family && size == other.size &&
             italic == other.italic && smallCaps == other.smallCaps &&
-            weight == other.weight && sizeSpecified == other.sizeSpecified);
+            weight == other.weight && sizeSpecified == other.sizeSpecified
+#if APPLE_CHANGES
+            && usePrinterFont == other.usePrinterFont
+#endif
+            );
   }
 
   enum GenericFamilyType {
@@ -79,6 +89,9 @@ class FontDef {
   unsigned int weight : 8;
   unsigned int genericFamily : 3;
   mutable bool hasNbsp : 1;
+#if APPLE_CHANGES
+  bool usePrinterFont : 1;
+#endif
 };
 
 class Font {
