@@ -47,7 +47,8 @@
          attemptFontSubstitution:(BOOL)attemptFontSubstitution
                           widths:(float*)buffer
                    letterSpacing:(int)letterSpacing
-                     wordSpacing:(int)wordSpacing;
+                     wordSpacing:(int)wordSpacing
+                    fontFamilies:(NSString**)families;
 
 // drawing
 - (void)drawCharacters:(const UniChar*)characters
@@ -60,7 +61,8 @@
           backgroundColor:(NSColor*)backgroundColor
               rightToLeft:(BOOL)rtl
             letterSpacing:(int)letterSpacing
-              wordSpacing:(int)wordSpacing;
+              wordSpacing:(int)wordSpacing
+             fontFamilies:(NSString**)families;
 - (void)drawUnderlineForCharacters:(const UniChar*)characters
                       stringLength:(unsigned)length
                            atPoint:(NSPoint)point

@@ -42,6 +42,7 @@ typedef struct UnicodeGlyphMap UnicodeGlyphMap;
                            glyphs:(CGGlyph*)glyphBuffer
                         numGlyphs:(int*)_numGlyphs
                     letterSpacing:(int)ls
-                      wordSpacing:(int)ws;
+                      wordSpacing:(int)ws
+                     fontFamilies:(NSString**)families;
 
 @end

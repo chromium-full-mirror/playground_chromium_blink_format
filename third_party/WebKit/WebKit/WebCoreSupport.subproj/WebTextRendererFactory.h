@@ -17,6 +17,12 @@
 
 + (void)createSharedFactory;
 + (WebTextRendererFactory*)sharedFactory;
+- (NSFont*)cachedFontFromFamily:(NSString*)family
+                         traits:(NSFontTraitMask)traits
+                           size:(float)size;
+- (NSFont*)cachedFontFromFamilies:(NSString**)families
+                           traits:(NSFontTraitMask)traits
+                             size:(float)size;
 - init;
 
 - (WebTextRenderer*)rendererWithFont:(NSFont*)font;
