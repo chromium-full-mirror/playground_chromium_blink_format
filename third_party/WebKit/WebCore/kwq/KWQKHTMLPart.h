@@ -306,6 +306,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void issueCutCommand();
   void issueCopyCommand();
   void issuePasteCommand();
+  void postDidChangeSelectionNotification();
+  void postDidChangeNotification();
 
   void bindObject(void* object, QString name);
 
