@@ -211,6 +211,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (NSArray*)documentState;
 
 - (void)setNeedsReapplyStyles;
+- (void)setNeedsLayout;
 
 - (NSURL*)requestedURL;
 

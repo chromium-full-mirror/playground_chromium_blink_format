@@ -130,6 +130,7 @@ class KWQKHTMLPartImpl : public QObject {
 
   DOM::DocumentImpl* document();
   khtml::RenderObject* renderer();
+  void forceLayout();
   void paint(QPainter*, const QRect&);
 
   // Used internally, but need to be public because they are used by non-member
