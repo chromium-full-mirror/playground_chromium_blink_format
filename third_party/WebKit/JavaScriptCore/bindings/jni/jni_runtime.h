@@ -130,7 +130,6 @@ class JavaConstructor : public Constructor {
     return *this;
   }
 
-  virtual KJS::Value value() const { return KJS::Value(0); }
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
   virtual long numParameters() const { return _numParameters; };
 
@@ -216,7 +215,6 @@ class JavaMethod : public Method {
     return *this;
   };
 
-  virtual KJS::Value value() const { return KJS::Value(0); }
   virtual const char* name() const { return _name.UTF8String(); };
   virtual RuntimeType returnType() const { return _returnType.UTF8String(); };
   virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };

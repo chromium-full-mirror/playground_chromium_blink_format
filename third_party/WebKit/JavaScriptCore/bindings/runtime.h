@@ -49,8 +49,6 @@ class Constructor {
   virtual Parameter* parameterAt(long i) const = 0;
   virtual long numParameters() const = 0;
 
-  virtual KJS::Value value() const = 0;
-
   virtual ~Constructor(){};
 };
 
@@ -88,8 +86,6 @@ class Method {
   virtual RuntimeType returnType() const = 0;
   virtual Parameter* parameterAt(long i) const = 0;
   virtual long numParameters() const = 0;
-
-  virtual KJS::Value value() const = 0;
 
   virtual ~Method(){};
 };
