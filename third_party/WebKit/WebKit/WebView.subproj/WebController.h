@@ -1,6 +1,6 @@
 /*
         IFWebController.h
-        Copyright 2001, Apple, Inc. All rights reserved.
+        Copyright 2001, 2002, Apple Computer, Inc.
 
         Public header file.
 */
@@ -172,7 +172,7 @@
 // if it is still
 // pending.  The path argument is only used when the policy is either
 // IFContentPolicySave or
-// IFContentPolicyOpenExternally.
+// IFContentPolicySaveAndOpenExternally.
 - (void)haveContentPolicy:(IFContentPolicy)policy
                   andPath:(NSString*)path
             forDataSource:(IFWebDataSource*)dataSource;
