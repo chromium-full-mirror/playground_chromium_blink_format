@@ -121,6 +121,7 @@ class KWQKHTMLPartImpl : public QObject {
   QString userAgent() const;
 
   static NSView* nextKeyView(QWidget* startingPoint, KWQSelectionDirection);
+  NSView* nextKeyView(DOM::NodeImpl* startingPoint, KWQSelectionDirection);
 
   // Incoming calls, used by the bridge.
 
@@ -135,8 +136,8 @@ class KWQKHTMLPartImpl : public QObject {
  private:
   WebCoreBridge* bridgeForFrameName(const QString& frameName);
 
-  NSView* nextKeyView(DOM::NodeImpl*, KWQSelectionDirection);
-  NSView* nextKeyViewInFrame(DOM::NodeImpl*, KWQSelectionDirection);
+  NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
+                             KWQSelectionDirection);
 
   KHTMLPart* part;
   KHTMLPartPrivate* d;
