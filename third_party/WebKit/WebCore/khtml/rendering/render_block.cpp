@@ -637,10 +637,6 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
 
   // kdDebug() << "RenderBlock::layoutBlockChildren " << prevMargin << endl;
 
-  // take care in case we inherited floats
-  if (child && floatBottom() > m_height)
-    child->setNeedsLayout(true);
-
   //     QTime t;
   //     t.start();
 
@@ -806,6 +802,10 @@ void RenderBlock::layoutBlockChildren(bool relayoutChildren) {
       shouldCollapseChild = false;
       clearOccurred = true;
     }
+
+    // take care in case we inherited floats
+    if (child && floatBottom() > m_height)
+      child->setNeedsLayout(true);
 
     child->calcVerticalMargins();
 
