@@ -23,7 +23,8 @@
   BOOL subviewsSetAside;
 
   NSEvent* mouseDownEvent;  // Kept after handling the event.
-  NSEvent* keyDownEvent;    // Kept only during handling of the event.
+  BOOL handlingMouseDownEvent;
+  NSEvent* keyDownEvent;  // Kept only during handling of the event.
 
   NSURL* draggingImageURL;
   unsigned int dragSourceActionMask;

@@ -1304,19 +1304,22 @@ void CSSParser::addBackgroundValue(CSSValueImpl*& lval, CSSValueImpl* rval) {
 }
 
 bool CSSParser::parseBackgroundShorthand(bool important) {
+  // Position must come before color in this array because a plain old "0" is a
+  // legal color
+  // in quirks mode but it's usually the X coordinate of a position.
   const int numProperties = 5;
-  const int numValues = numProperties + 1;
   const int properties[numProperties] = {
       CSS_PROP_BACKGROUND_IMAGE, CSS_PROP_BACKGROUND_REPEAT,
-      CSS_PROP_BACKGROUND_ATTACHMENT, CSS_PROP_BACKGROUND_COLOR,
-      CSS_PROP_BACKGROUND_POSITION};
+      CSS_PROP_BACKGROUND_ATTACHMENT, CSS_PROP_BACKGROUND_POSITION,
+      CSS_PROP_BACKGROUND_COLOR};
 
   inParseShortHand = true;
 
-  bool found = false;
   bool parsedProperty[numProperties] = {
-      false};                             // C compiler will repeat as necessary
-  CSSValueImpl* values[numValues] = {0};  // C compiler will repeat as necessary
+      false};  // compiler will repeat false as necessary
+  CSSValueImpl* values[numProperties] = {
+      0};  // compiler will repeat 0 as necessary
+  CSSValueImpl* positionYValue = 0;
   int i;
 
   while (valueList->current()) {
@@ -1325,20 +1328,16 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
       // We hit the end.  Fill in all remaining values with the initial value.
       valueList->next();
       for (i = 0; i < numProperties; ++i) {
-        if (properties[i] == CSS_PROP_BACKGROUND_COLOR && parsedProperty[i]) {
+        if (properties[i] == CSS_PROP_BACKGROUND_COLOR && parsedProperty[i])
           // Color is not allowed except as the last item in a list.  Reject the
           // entire
           // property.
-          inParseShortHand = false;
-          for (int k = 0; k < numValues; k++)
-            delete values[k];
-          return false;
-        }
+          goto fail;
 
         if (!parsedProperty[i] && properties[i] != CSS_PROP_BACKGROUND_COLOR) {
           addBackgroundValue(values[i], new CSSInitialValueImpl());
           if (properties[i] == CSS_PROP_BACKGROUND_POSITION)
-            addBackgroundValue(values[i + 1], new CSSInitialValueImpl());
+            addBackgroundValue(positionYValue, new CSSInitialValueImpl());
         }
         parsedProperty[i] = false;
       }
@@ -1346,7 +1345,7 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
         break;
     }
 
-    found = false;
+    bool found = false;
     for (i = 0; !found && i < numProperties; ++i) {
       if (!parsedProperty[i]) {
         CSSValueImpl *val1 = 0, *val2 = 0;
@@ -1355,22 +1354,16 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
                                     val2)) {
           parsedProperty[i] = found = true;
           addBackgroundValue(values[i], val1);
-          if (properties[i] == CSS_PROP_BACKGROUND_POSITION) {
-            i++;
-            addBackgroundValue(values[i], val2);
-          }
+          if (properties[i] == CSS_PROP_BACKGROUND_POSITION)
+            addBackgroundValue(positionYValue, val2);
         }
       }
     }
 
     // if we didn't find at least one match, this is an
     // invalid shorthand and we have to ignore it
-    if (!found) {
-      inParseShortHand = false;
-      for (int k = 0; k < numValues; k++)
-        delete values[k];
-      return false;
-    }
+    if (!found)
+      goto fail;
   }
 
   // Fill in any remaining properties with the initial value.
@@ -1378,7 +1371,7 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
     if (!parsedProperty[i]) {
       addBackgroundValue(values[i], new CSSInitialValueImpl());
       if (properties[i] == CSS_PROP_BACKGROUND_POSITION)
-        addBackgroundValue(values[i + 1], new CSSInitialValueImpl());
+        addBackgroundValue(positionYValue, new CSSInitialValueImpl());
     }
   }
 
@@ -1386,13 +1379,20 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
   for (i = 0; i < numProperties; i++) {
     if (properties[i] == CSS_PROP_BACKGROUND_POSITION) {
       addProperty(CSS_PROP_BACKGROUND_POSITION_X, values[i], important);
-      addProperty(CSS_PROP_BACKGROUND_POSITION_Y, values[i + 1], important);
+      addProperty(CSS_PROP_BACKGROUND_POSITION_Y, positionYValue, important);
     } else
       addProperty(properties[i], values[i], important);
   }
 
   inParseShortHand = false;
   return true;
+
+fail:
+  inParseShortHand = false;
+  for (int k = 0; k < numProperties; k++)
+    delete values[k];
+  delete positionYValue;
+  return false;
 }
 
 bool CSSParser::parseShortHand(const int* properties,

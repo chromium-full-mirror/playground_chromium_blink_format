@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -72,6 +72,7 @@ class QMouseEvent : public QEvent {
  public:
   QMouseEvent(Type, const QPoint& pos, int button, int state);
   QMouseEvent(Type, NSEvent*);
+  explicit QMouseEvent(Type);  // uses AppKit's current event
 
   const QPoint& pos() const { return _position; }
   int x() const { return _position.x(); }
@@ -88,9 +89,12 @@ class QMouseEvent : public QEvent {
     return static_cast<ButtonState>(_stateAfter);
   }
 
-  int clickCount() { return _clickCount; }
+  int clickCount() const { return _clickCount; }
+  bool isDoubleClick() const { return _clickCount > 0 && _clickCount % 2 == 0; }
 
  private:
+  void fixState();
+
   QPoint _position;
   int _button;
   int _state;
