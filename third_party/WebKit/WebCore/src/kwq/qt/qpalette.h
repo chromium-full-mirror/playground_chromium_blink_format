@@ -35,11 +35,13 @@ class QColorGroup {
     Shadow,
     Light,
     Mid,
+    Midlight,
     Dark,
     Base,
     ButtonText,
     Button,
-    Background
+    Background,
+    Text
   };
 
   void setColor(ColorRole role, const QColor& color);
@@ -57,7 +59,7 @@ class QColorGroup {
 
 class QPalette {
  public:
-  enum ColorGroup { Active, Inactive };
+  enum ColorGroup { Active, Inactive, Disabled };
 
   void setColor(ColorGroup, QColorGroup::ColorRole role, const QColor& color);
 

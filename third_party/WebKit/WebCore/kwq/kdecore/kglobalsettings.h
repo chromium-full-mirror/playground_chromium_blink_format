@@ -33,6 +33,8 @@ class KGlobalSettings {
   static QFont generalFont();
   static QFont windowTitleFont();
   static QFont menuFont();
+
+  static int contrast();
 };
 
 #endif

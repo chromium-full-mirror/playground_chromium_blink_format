@@ -33,36 +33,6 @@ class QRegExp;
 
 class QChar {
  public:
-  QChar();
-  QChar(char);
-  QChar(uchar);
-  QChar(const QChar&);
-  QChar(ushort);
-  QChar(short);
-  QChar(uint);
-  QChar(int);
-
-  QChar lower() const;
-  QChar upper() const;
-  char latin1() const;
-  bool isNull() const;
-  bool isDigit() const;
-  bool isSpace() const;
-  bool isLetter() const;
-  bool isLetterOrNumber() const;
-  uchar cell() const;
-  uchar row() const;
-  friend inline int operator==(char, QChar);
-  friend inline int operator==(QChar, char);
-  friend inline int operator==(QChar, QChar);
-  friend inline int operator!=(QChar, QChar);
-  friend inline int operator!=(char, QChar);
-  friend inline int operator!=(QChar, char);
-  operator char() const;
-  ushort unicode() const;
-
-  static const QChar null;
-
   enum Direction {
     // NOTE: alphabetical order
     DirAL,
@@ -85,6 +55,39 @@ class QChar {
     DirS,
     DirWS
   };
+
+  QChar();
+  QChar(char);
+  QChar(uchar);
+  QChar(const QChar&);
+  QChar(ushort);
+  QChar(short);
+  QChar(uint);
+  QChar(int);
+
+  QChar lower() const;
+  QChar upper() const;
+  char latin1() const;
+  bool isNull() const;
+  bool isDigit() const;
+  bool isSpace() const;
+  bool isLetter() const;
+  bool isLetterOrNumber() const;
+  bool isPunct() const;
+  uchar cell() const;
+  uchar row() const;
+  Direction direction() const;
+
+  friend inline int operator==(char, QChar);
+  friend inline int operator==(QChar, char);
+  friend inline int operator==(QChar, QChar);
+  friend inline int operator!=(QChar, QChar);
+  friend inline int operator!=(char, QChar);
+  friend inline int operator!=(QChar, char);
+  operator char() const;
+  ushort unicode() const;
+
+  static const QChar null;
 };
 
 class QString {

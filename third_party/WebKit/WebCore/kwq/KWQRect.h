@@ -33,6 +33,8 @@ class QRect {
   QRect();
   QRect(int l, int t, int w, int h);
 
+  int x() const;
+  int y() const;
   int left() const;
   int top() const;
   int width() const;
@@ -40,6 +42,7 @@ class QRect {
   bool isNull() const;
 
   QSize size() const;
+  QRect intersect(const QRect&) const;
 };
 
 #endif

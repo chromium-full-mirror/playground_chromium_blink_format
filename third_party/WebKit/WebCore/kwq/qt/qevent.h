@@ -28,6 +28,7 @@
 
 #include "qnamespace.h"
 #include "qregion.h"
+#include "qpoint.h"
 
 class QEvent : public Qt {
  public:
@@ -36,16 +37,22 @@ class QEvent : public Qt {
     MouseButtonRelease,
     MouseButtonDblClick,
     MouseMove,
+    FocusIn,
+    FocusOut,
+    AccelAvailable,
   };
   Type type() const;
 };
 
 class QMouseEvent : public QEvent {
  public:
+  QMouseEvent(Type type, const QPoint& pos, int button, int state);
+
   int x();
   int y();
   int globalX();
   int globalY();
+  const QPoint& pos() const;
   ButtonState button();
   ButtonState state();
 };
@@ -55,9 +62,14 @@ class QTimerEvent : public QEvent {
   int timerId() const;
 };
 
+class QKeyEvent : public QEvent {
+ public:
+  int key() const;
+  ButtonState state() const;
+};
+
 class QFocusEvent : public QEvent {};
 class QHideEvent : public QEvent {};
-class QKeyEvent : public QEvent {};
 class QResizeEvent : public QEvent {};
 class QShowEvent : public QEvent {};
 class QWheelEvent : public QEvent {};
