@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qlist.h>
+#else
+
 #include <KWQDef.h>
 #include <KWQCollection.h>
 
@@ -139,5 +145,7 @@ class QListIterator {
 
 };  // class QListIterator
     // ======================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif

@@ -30,6 +30,12 @@
 #include <config.h>
 #endif
 
+// _KWQ_COMPLETE_ ==============================================================
+
+#ifdef _KWQ_COMPLETE_
+#include <_qstringlist.h>
+#else
+
 #include "qstring.h"
 #include "qvaluelist.h"
 
@@ -72,5 +78,7 @@ class QStringList : public QValueList<QString> {
 
 };  // class QStringList
     // ========================================================
+
+#endif  // _KWQ_COMPLETE_
 
 #endif
