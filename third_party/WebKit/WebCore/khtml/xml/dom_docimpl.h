@@ -73,6 +73,9 @@ class EditCommand;
 class RenderImage;
 class Tokenizer;
 class XMLHandler;
+#if APPLE_CHANGES
+struct DashboardRegionValue;
+#endif
 }
 
 #ifndef KHTML_NO_XBL
@@ -765,6 +768,11 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setDecoder(khtml::Decoder*);
   khtml::Decoder* decoder() const { return m_decoder; }
 
+  bool hasDashboardRegions() const { return m_hasDashboardRegions; }
+  void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
+  QValueList<khtml::DashboardRegionValue> dashboardRegions() const;
+  void setDashboardRegions(QValueList<khtml::DashboardRegionValue>& regions);
+
  private:
   JSEditor* jsEditor();
 
@@ -786,6 +794,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   bool m_accessKeyDictValid;
 
   bool m_createRenderers;
+
+  QValueList<khtml::DashboardRegionValue> m_dashboardRegions;
+  bool m_hasDashboardRegions;
 #endif
 };
 

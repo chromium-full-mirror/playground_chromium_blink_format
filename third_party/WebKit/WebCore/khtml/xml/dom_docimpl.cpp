@@ -51,6 +51,7 @@
 #include "rendering/render_canvas.h"
 #include "rendering/render_frames.h"
 #include "rendering/render_image.h"
+#include "rendering/render_object.h"
 #include "render_arena.h"
 
 #include "khtmlview.h"
@@ -269,7 +270,8 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       m_passwordFields(0),
       m_secureForms(0),
       m_decoder(0),
-      m_createRenderers(true)
+      m_createRenderers(true),
+      m_hasDashboardRegions(false)
 #endif
 {
   document->doc = this;
@@ -1156,8 +1158,9 @@ void DocumentImpl::updateLayout() {
   updateRendering();
 
   // Only do a layout if changes have occurred that make it necessary.
-  if (m_view && renderer() && renderer()->needsLayout())
+  if (m_view && renderer() && renderer()->needsLayout()) {
     m_view->layout();
+  }
 
   m_ignorePendingStylesheets = oldIgnore;
 }
@@ -2344,6 +2347,15 @@ bool DocumentImpl::acceptsEditingFocus(NodeImpl* node) {
   Node root(rootImpl);
   Range range(root, 0, root, rootImpl->childNodeCount());
   return part()->shouldBeginEditing(range);
+}
+
+QValueList<DashboardRegionValue> DocumentImpl::dashboardRegions() const {
+  return m_dashboardRegions;
+}
+
+void DocumentImpl::setDashboardRegions(
+    QValueList<DashboardRegionValue>& regions) {
+  m_dashboardRegions = regions;
 }
 
 #endif

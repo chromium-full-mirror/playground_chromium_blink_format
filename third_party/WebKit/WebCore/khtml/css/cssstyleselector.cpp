@@ -3978,6 +3978,38 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
       fontDirty = true;
       break;
     }
+    case CSS_PROP__APPLE_DASHBOARD_REGION: {
+      if (!primitiveValue)
+        return;
+      DashboardRegionImpl* region = primitiveValue->getDashboardRegionValue();
+      if (!region)
+        return;
+
+      DashboardRegionImpl* first = region;
+      while (region) {
+        Length top = convertToLength(region->top(), style, paintDeviceMetrics);
+        Length right =
+            convertToLength(region->right(), style, paintDeviceMetrics);
+        Length bottom =
+            convertToLength(region->bottom(), style, paintDeviceMetrics);
+        Length left =
+            convertToLength(region->left(), style, paintDeviceMetrics);
+        if (region->m_isCircle) {
+          style->setDashboardRegion(StyleDashboardRegion::Circle,
+                                    region->m_label, top, right, bottom, left,
+                                    region == first ? false : true);
+        } else if (region->m_isRectangle) {
+          style->setDashboardRegion(StyleDashboardRegion::Rectangle,
+                                    region->m_label, top, right, bottom, left,
+                                    region == first ? false : true);
+        }
+        region = region->m_next;
+      }
+
+      element->getDocument()->setHasDashboardRegions(true);
+
+      break;
+    }
 #endif
 
     default:

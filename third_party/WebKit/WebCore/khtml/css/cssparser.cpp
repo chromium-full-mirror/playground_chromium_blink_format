@@ -505,11 +505,13 @@ bool CSSParser::parseValue(int propId, bool important) {
         return parseShape(propId, important);
       break;
 
+#if APPLE_CHANGES
     case CSS_PROP__APPLE_DASHBOARD_REGION:  // <dashboard-region-circle> |
                                             // <dashboard-region-rectangle>
       if (value->unit == Value::Function)
         return parseDashboardRegions(propId, important);
       break;
+#endif
 
     /* Start of supported CSS properties with validation. This is needed for
      * parseShortHand to work
@@ -1581,6 +1583,7 @@ static Value* skipCommaInDashboardRegion(ValueList* args) {
   return args->current();
 }
 
+#if APPLE_CHANGES
 bool CSSParser::parseDashboardRegions(int propId, bool important) {
   bool valid = true;
 
@@ -1630,7 +1633,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
       break;
     }
 
-    region->setLabel(qString(arg->string));
+    region->m_label = qString(arg->string);
 
     // Next four arguments must be offset numbers
     int i;
@@ -1664,6 +1667,7 @@ bool CSSParser::parseDashboardRegions(int propId, bool important) {
 
   return valid;
 }
+#endif
 
 bool CSSParser::parseShape(int propId, bool important) {
   Value* value = valueList->current();

@@ -700,6 +700,19 @@ void KHTMLView::layout() {
         root, "AXLayoutComplete");
 #endif
 
+#if APPLE_CHANGES
+  if (document->hasDashboardRegions()) {
+    QValueList<DashboardRegionValue> newRegions =
+        document->renderer()->computeDashboardRegions();
+    QValueList<DashboardRegionValue> currentRegions =
+        document->dashboardRegions();
+    if (!(newRegions == currentRegions)) {
+      document->setDashboardRegions(newRegions);
+      // FIXME:  Pass the regions on up to webkit.
+    }
+  }
+#endif
+
   if (root->needsLayout()) {
     // qDebug("needs layout, delaying repaint");
     scheduleRelayout();

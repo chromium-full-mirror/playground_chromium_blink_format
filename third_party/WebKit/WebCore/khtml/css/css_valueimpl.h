@@ -241,6 +241,13 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
     return (m_type != CSSPrimitiveValue::CSS_RGBCOLOR ? 0 : m_value.rgbcolor);
   }
 
+#if APPLE_CHANGES
+  DashboardRegionImpl* getDashboardRegionValue() const {
+    return (m_type != CSSPrimitiveValue::CSS_DASHBOARD_REGION ? 0
+                                                              : m_value.region);
+  }
+#endif
+
   virtual bool isPrimitiveValue() const { return true; }
   virtual unsigned short cssValueType() const;
 
@@ -315,6 +322,7 @@ class RectImpl : public khtml::Shared<RectImpl> {
   CSSPrimitiveValueImpl* m_left;
 };
 
+#if APPLE_CHANGES
 class DashboardRegionImpl : public RectImpl {
  public:
   DashboardRegionImpl()
@@ -332,14 +340,13 @@ class DashboardRegionImpl : public RectImpl {
     m_next = next;
   };
 
-  void setLabel(const QString& label) { m_label = label; };
-
  public:
   DashboardRegionImpl* m_next;
   QString m_label;
   unsigned int m_isCircle : 1;
   unsigned int m_isRectangle : 1;
 };
+#endif
 
 class CSSImageValueImpl : public CSSPrimitiveValueImpl,
                           public khtml::CachedObjectClient {
