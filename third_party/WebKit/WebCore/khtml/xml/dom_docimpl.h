@@ -360,7 +360,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   void setHTMLMode(HTMLMode m) { hMode = m; }
   HTMLMode htmlMode() const { return hMode; }
 
-  void setParsing(bool b) { m_bParsing = b; }
+  void setParsing(bool b);
   bool parsing() const { return m_bParsing; }
 
   void setTextColor(QColor color) { m_textColor = color; }
