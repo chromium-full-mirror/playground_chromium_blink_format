@@ -67,6 +67,8 @@ RenderCanvas::RenderCanvas(DOM::NodeImpl* node, KHTMLView* view)
 
   // Create a new root layer for our layer hierarchy.
   m_layer = new (node->getDocument()->renderArena()) RenderLayer(this);
+
+  m_view->scheduleRelayout();
 }
 
 RenderCanvas::~RenderCanvas() {}
