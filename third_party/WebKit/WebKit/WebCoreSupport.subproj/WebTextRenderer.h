@@ -20,11 +20,11 @@ typedef struct CharacterWidthIterator CharacterWidthIterator;
   int ascent;
   int descent;
   int lineSpacing;
-  ATSGlyphRef spaceGlyph;
 
   ATSStyleGroupPtr styleGroup;
 
  @public
+  ATSGlyphRef spaceGlyph;
   NSFont* font;
   GlyphMap* characterToGlyphMap;  // Used for 16bit clean unicode characters.
   UnicodeGlyphMap* unicodeCharacterToGlyphMap;  // Used for surrogates.
@@ -38,8 +38,11 @@ typedef struct CharacterWidthIterator CharacterWidthIterator;
   int maxSubstituteFontWidthMaps;
   SubstituteFontWidthMap* substituteFontWidthMaps;
   BOOL usingPrinterFont;
+  BOOL isSmallCapsRenderer;
 
  @private
+  WebTextRenderer* smallCapsRenderer;
+  NSFont* smallCapsFont;
   ATSUStyle _ATSUSstyle;
   BOOL ATSUStyleInitialized;
 }
