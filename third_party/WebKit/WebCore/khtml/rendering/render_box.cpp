@@ -1504,9 +1504,7 @@ void RenderBox::calcAbsoluteVertical() {
   //    printf("v: h=%d, t=%d, b=%d, mt=%d, mb=%d, m_y=%d\n",h,t,b,mt,mb,m_y);
 }
 
-QRect RenderBox::caretRect(int offset,
-                           bool override,
-                           int* extraWidthToEndOfLine) {
+QRect RenderBox::caretRect(int offset, bool override) {
   // FIXME: Is it OK to check only first child instead of picking
   // right child based on offset? Is it OK to pass the same offset
   // along to the child instead of offset 0 or whatever?
@@ -1514,7 +1512,7 @@ QRect RenderBox::caretRect(int offset,
   // propagate it downwards to its children, someone will feel responsible
   RenderObject* child = firstChild();
   if (child) {
-    QRect result = child->caretRect(offset, override, extraWidthToEndOfLine);
+    QRect result = child->caretRect(offset, override);
     // FIXME: in-band signalling!
     if (result.x() != -1)
       return result;
@@ -1557,9 +1555,6 @@ QRect RenderBox::caretRect(int offset,
     // just a relative one
     _x = _y = -1;
   }
-
-  if (extraWidthToEndOfLine)
-    *extraWidthToEndOfLine = m_width - width;
 
   return QRect(_x, _y, width, height);
 }
