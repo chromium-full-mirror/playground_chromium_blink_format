@@ -34,7 +34,7 @@ using DOM::DocumentImpl;
 using DOM::HTMLDocumentImpl;
 using DOM::NodeImpl;
 
-bool KWQKHTMLPart::isFrameSet() {
+bool KWQKHTMLPart::isFrameSet() const {
   DocumentImpl* document = d->m_doc;
   if (!document || !document->isHTMLDocument())
     return false;
@@ -48,9 +48,9 @@ int KWQKHTMLPart::selectionStartOffset() const {
 int KWQKHTMLPart::selectionEndOffset() const {
   return d->m_endOffset;
 }
-DOM::NodeImpl* KWQKHTMLPart::selectionStart() const {
+NodeImpl* KWQKHTMLPart::selectionStart() const {
   return d->m_selectionStart.handle();
 }
-DOM::NodeImpl* KWQKHTMLPart::selectionEnd() const {
+NodeImpl* KWQKHTMLPart::selectionEnd() const {
   return d->m_selectionEnd.handle();
 }

@@ -41,10 +41,12 @@ class SavedProperties;
 }
 
 #ifdef __OBJC__
+@class NSAttributedString;
+@class NSEvent;
 @class NSView;
 @class WebCoreBridge;
-@class NSEvent;
 #else
+class NSAttributedString;
 class NSView;
 class WebCoreBridge;
 class NSEvent;
@@ -72,6 +74,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void submitForm(const KURL&, const KParts::URLArgs&);
 
   void scrollToAnchor(const KURL&);
+  void jumpToSelection();
 
   void slotData(NSString*,
                 bool forceEncoding,
@@ -103,20 +106,16 @@ class KWQKHTMLPart : public KHTMLPart {
   void saveLocationProperties(KJS::SavedProperties* locationProperties);
   void restoreWindowProperties(KJS::SavedProperties* windowProperties);
   void restoreLocationProperties(KJS::SavedProperties* locationProperties);
-  void openURLFromPageCache(DOM::DocumentImpl* doc,
-                            RenderObject* renderer,
-                            KURL* url,
+  void openURLFromPageCache(DOM::DocumentImpl*,
+                            RenderObject*,
+                            KURL*,
                             KJS::SavedProperties* windowProperties,
                             KJS::SavedProperties* locationProperties);
 
   void saveDocumentState();
   void restoreDocumentState();
 
-  bool isFrameSet();
-
-  void jumpToSelection();
-
-  QString userAgent() const;
+  bool isFrameSet() const;
 
   void updatePolicyBaseURL();
 
@@ -135,10 +134,6 @@ class KWQKHTMLPart : public KHTMLPart {
                                   const QString& defaultValue,
                                   QString& result);
 
-  static WebCoreBridge* bridgeForWidget(QWidget*);
-
-  // Incoming calls, used by the bridge.
-
   using KHTMLPart::xmlDocImpl;
   khtml::RenderObject* renderer();
   void forceLayout();
@@ -146,23 +141,21 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void createDummyDocument();
 
-  // Used internally, but need to be public because they are used by non-member
-  // functions.
-
-  void redirectionTimerStartedOrStopped();
-
-  QString referrer() const;
-
-  static const QPtrList<KWQKHTMLPart>& instances() {
-    return mutableInstances();
-  }
+  static WebCoreBridge* bridgeForWidget(QWidget*);
 
   QString requestedURLString() const;
+  QString referrer() const;
+  QString userAgent() const;
 
-  int selectionStartOffset() const;
-  int selectionEndOffset() const;
   DOM::NodeImpl* selectionStart() const;
+  int selectionStartOffset() const;
   DOM::NodeImpl* selectionEnd() const;
+  int selectionEndOffset() const;
+
+  static NSAttributedString* attributedString(DOM::NodeImpl* startNode,
+                                              int startOffset,
+                                              DOM::NodeImpl* endNode,
+                                              int endOffset);
 
   void addMetaData(const QString& key, const QString& value);
 
@@ -175,8 +168,15 @@ class KWQKHTMLPart : public KHTMLPart {
   static void widgetWillReleaseView(NSView*);
 
   void clearTimers();
+  static void clearTimers(KHTMLView*);
 
   bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
+
+  void redirectionTimerStartedOrStopped();
+
+  static const QPtrList<KWQKHTMLPart>& instances() {
+    return mutableInstances();
+  }
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);

@@ -206,10 +206,16 @@ int Font::width(QChar* chs, int slen, int pos) const {
 }
 
 void Font::update(QPaintDeviceMetrics* devMetrics) const {
-  if (fontDef.family.family().isEmpty())
+#if APPLE_CHANGES
+  if (fontDef.family.familyIsEmpty())
     f.setFamily(KHTMLFactory::defaultHTMLSettings()->stdFontName());
   else
     f.setFirstFamily(fontDef.family);
+#else
+  f.setFamily(fontDef.family.isEmpty()
+                  ? KHTMLFactory::defaultHTMLSettings()->stdFontName()
+                  : fontDef.family);
+#endif
   f.setItalic(fontDef.italic);
   f.setWeight(fontDef.weight);
 

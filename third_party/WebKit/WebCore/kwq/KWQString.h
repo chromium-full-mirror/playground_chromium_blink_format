@@ -428,7 +428,6 @@ class QString {
   QString& insert(uint index, const char* insertChars, uint insertLength);
   QString& remove(uint, uint);
   QString& replace(uint index, uint len, const QString& s);
-  // QString &replace( uint index, uint len, const QChar* s, uint slen );
   QString& replace(const QRegExp&, const QString&);
 
   void truncate(uint);
@@ -449,6 +448,11 @@ class QString {
   QString& operator+=(char);
 
   void setBufferFromCFString(CFStringRef);
+
+  QString& prepend(const QChar*, uint length);
+  QString& insert(uint position, const QChar*, uint length);
+
+  uint hash() const;
 
  private:
   // Used by QConstString.
@@ -593,5 +597,7 @@ class QConstString : private QString {
   ~QConstString();
   const QString& string() const { return *this; }
 };
+
+extern const CFDictionaryKeyCallBacks CFDictionaryQStringKeyCallBacks;
 
 #endif

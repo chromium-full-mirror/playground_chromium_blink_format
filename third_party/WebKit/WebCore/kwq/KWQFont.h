@@ -26,7 +26,7 @@
 #ifndef QFONT_H_
 #define QFONT_H_
 
-class QString;
+#include "KWQString.h"
 
 #ifdef __OBJC__
 @class NSFont;
@@ -36,45 +36,49 @@ class NSFont;
 class NSString;
 #endif
 
-class QFontFamily {
+class KWQFontFamily {
  public:
-  QFontFamily();
-  ~QFontFamily() {
+  KWQFontFamily();
+  ~KWQFontFamily() {
     if (_next)
       _next->deref();
   }
 
-  QFontFamily(const QFontFamily& other);
-  QFontFamily& operator=(const QFontFamily& other);
+  KWQFontFamily(const KWQFontFamily&);
+  KWQFontFamily& operator=(const KWQFontFamily&);
 
   void setFamily(const QString&);
-  QString family() const;
+  QString family() const { return _family; }
+  bool familyIsEmpty() const { return _family.isEmpty(); }
 
-  NSString* getNSFamily() const { return _family; }
+  NSString* getNSFamily() const;
 
-  QFontFamily* next() { return _next; }
-  void appendFamily(QFontFamily* family) {
+  KWQFontFamily* next() { return _next; }
+  const KWQFontFamily* next() const { return _next; }
+
+  void appendFamily(KWQFontFamily* family) {
+    if (family)
+      family->ref();
     if (_next)
       _next->deref();
     _next = family;
-    if (_next)
-      _next->ref();
   }
 
-  bool operator==(const QFontFamily& compareFontFamily) const;
-  bool operator!=(const QFontFamily& x) const { return !(*this == x); }
+  bool operator==(const KWQFontFamily&) const;
+  bool operator!=(const KWQFontFamily& x) const { return !(*this == x); }
 
-  void ref() { _refCnt++; };
+  void ref() { _refCnt++; }
   void deref() {
     _refCnt--;
     if (_refCnt == 0)
       delete this;
-  };
+  }
 
  private:
-  NSString* _family;
-  QFontFamily* _next;
+  QString _family;
+  KWQFontFamily* _next;
   int _refCnt;
+  mutable NSString* _NSFamily;
 };
 
 class QFont {
@@ -87,8 +91,9 @@ class QFont {
   void setFamily(const QString&);
   QString family() const;
 
-  QFontFamily* firstFamily() { return &_family; }
-  void setFirstFamily(const QFontFamily& family);
+  const KWQFontFamily* firstFamily() const { return &_family; }
+  KWQFontFamily* firstFamily() { return &_family; }
+  void setFirstFamily(const KWQFontFamily& family);
 
   void setWeight(int);
   int weight() const;
@@ -110,7 +115,7 @@ class QFont {
   NSFont* getNSFont() const;
 
  private:
-  QFontFamily _family;
+  KWQFontFamily _family;
   int _trait;
   float _size;
   mutable NSFont* _nsfont;
@@ -121,24 +126,24 @@ class QFont {
 // performance critical code.  Create a NSSString ** name families
 // and populates with a NSString * for each family name.  Null terminates
 // the array.
-#define CREATE_FAMILY_ARRAY(font, families)          \
-  int __numFamilies = 0;                             \
-  {                                                  \
-    QFontFamily* __ff = ((QFont)font).firstFamily(); \
-    while (__ff) {                                   \
-      __numFamilies++;                               \
-      __ff = __ff->next();                           \
-    }                                                \
-  }                                                  \
-  NSString* families[__numFamilies + 1];             \
-  {                                                  \
-    int __i = 0;                                     \
-    QFontFamily* __ff = ((QFont)font).firstFamily(); \
-    while (__ff) {                                   \
-      families[__i++] = __ff->getNSFamily();         \
-      __ff = __ff->next();                           \
-    }                                                \
-    families[__i] = 0;                               \
+#define CREATE_FAMILY_ARRAY(font, families)           \
+  int __numFamilies = 0;                              \
+  {                                                   \
+    const KWQFontFamily* __ff = (font).firstFamily(); \
+    while (__ff) {                                    \
+      __numFamilies++;                                \
+      __ff = __ff->next();                            \
+    }                                                 \
+  }                                                   \
+  NSString* families[__numFamilies + 1];              \
+  {                                                   \
+    int __i = 0;                                      \
+    const KWQFontFamily* __ff = (font).firstFamily(); \
+    while (__ff) {                                    \
+      families[__i++] = __ff->getNSFamily();          \
+      __ff = __ff->next();                            \
+    }                                                 \
+    families[__i] = 0;                                \
   }
 
 #endif
