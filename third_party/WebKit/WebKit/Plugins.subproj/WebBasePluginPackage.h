@@ -6,9 +6,8 @@
 //  Copyright (c) 2002 Apple Computer, Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
 #import <WebCore/WebCoreViewFactory.h>
+#import <WebKit/npfunctions.h>
 
 #define WebPluginExtensionsKey @"WebPluginExtensions"
 #define WebPluginDescriptionKey @"WebPluginDescription"
@@ -20,6 +19,8 @@
 #define WebPluginTypeEnabledKey @"WebPluginTypeEnabled"
 
 @interface WebBasePluginPackage : NSObject<WebCorePluginInfo> {
+  BOOL isLoaded;
+
   NSString* name;
   NSString* path;
   NSString* pluginDescription;
@@ -31,12 +32,15 @@
   NSDictionary* MIMEToDescription;
   NSDictionary* MIMEToExtensions;
   NSMutableDictionary* extensionToMIME;
+
+  BP_CreatePluginMIMETypesPreferencesFuncPtr
+      BP_CreatePluginMIMETypesPreferences;
 }
 
 + (WebBasePluginPackage*)pluginWithPath:(NSString*)pluginPath;
 - (id)initWithPath:(NSString*)pluginPath;
 
-- (BOOL)getPluginInfoFromBundleAndMIMEDictionary:(NSDictionary*)MIMETypes;
+- (BOOL)getPluginInfoFromPLists;
 
 - (BOOL)load;
 - (void)unload;

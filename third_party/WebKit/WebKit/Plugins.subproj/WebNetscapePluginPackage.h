@@ -3,11 +3,6 @@
         Copyright (c) 2002, Apple, Inc. All rights reserved.
 */
 
-#import <Foundation/Foundation.h>
-
-#import <WebCore/WebCoreViewFactory.h>
-
-#import <WebKit/npfunctions.h>
 #import <WebKit/WebBasePluginPackage.h>
 
 typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
@@ -15,7 +10,6 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
 @interface WebNetscapePluginPackage : WebBasePluginPackage {
   BOOL isBundle;
   BOOL isCFM;
-  BOOL isLoaded;
 
   NPPluginFuncs pluginFuncs;
   NPNetscapeFuncs browserFuncs;
@@ -42,9 +36,6 @@ typedef enum { WebCFMExecutableType, WebMachOExecutableType } WebExecutableType;
   NPP_SetValueProcPtr NPP_SetValue;
   NPP_ShutdownProcPtr NPP_Shutdown;
   NPP_GetJavaClassProcPtr NPP_GetJavaClass;
-
-  BP_CreatePluginMIMETypesPreferencesFuncPtr
-      BP_CreatePluginMIMETypesPreferences;
 }
 
 - (WebExecutableType)executableType;
