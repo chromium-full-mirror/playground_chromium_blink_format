@@ -117,7 +117,7 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
   StyleBaseImpl(StyleBaseImpl* p) {
     m_parent = p;
     hasInlinedDecl = false;
-    strictParsing = true;
+    strictParsing = (m_parent ? m_parent->useStrictParsing() : true);
   }
 
   virtual ~StyleBaseImpl() {}
