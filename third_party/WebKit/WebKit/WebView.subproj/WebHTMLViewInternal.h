@@ -39,6 +39,8 @@
   NSEvent* autoscrollTriggerEvent;
 
   NSArray* pageRects;
+
+  BOOL resigningFirstResponder;
 }
 @end
 
