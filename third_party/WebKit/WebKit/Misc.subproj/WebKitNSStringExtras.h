@@ -14,4 +14,8 @@
 
 - (float)_web_widthWithFont:(NSFont*)font;
 
+// Handles home directories that have symlinks in their paths.
+// This works around 2774250.
+- (NSString*)_web_stringByAbbreviatingWithTildeInPath;
+
 @end
