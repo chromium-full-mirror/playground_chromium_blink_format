@@ -25,6 +25,7 @@
 #include "rendering/render_root.h"
 
 #include "xml/dom_docimpl.h"
+#include "misc/htmltags.h"
 
 #include <qpainter.h>
 
@@ -34,6 +35,7 @@
 
 //#define BOX_DEBUG
 
+using DOM::DocumentImpl;
 using namespace khtml;
 
 static QString toRoman(int number, bool upper) {
@@ -137,7 +139,7 @@ void RenderListItem::setStyle(RenderStyle* _style) {
   if (!m_marker && style()->listStyleType() != LNONE) {
     m_marker = new (renderArena()) RenderListMarker();
     m_marker->setStyle(newStyle);
-    insertChildNode(m_marker, firstChild());
+    m_marker->setListItem(this);
   } else if (m_marker && style()->listStyleType() == LNONE) {
     m_marker->detach(renderArena());
     m_marker = 0;
@@ -172,6 +174,41 @@ void RenderListItem::calcListValue() {
   }
 }
 
+static RenderObject* getParentOfFirstLineBox(RenderObject* curr,
+                                             RenderObject* marker) {
+  RenderObject* firstChild = curr->firstChild();
+  if (!firstChild)
+    return 0;
+
+  for (RenderObject* currChild = firstChild; currChild;
+       currChild = currChild->nextSibling()) {
+    if (currChild == marker)
+      continue;
+
+    if (currChild->isInline())
+      return curr;
+
+    if (currChild->isFloating() || currChild->isPositioned())
+      continue;
+
+    if (currChild->isTable() || !currChild->isFlow())
+      break;
+
+    if (currChild->element() &&
+        (currChild->element()->getDocument()->parseMode() !=
+         DocumentImpl::Strict) &&
+        (currChild->element()->id() == ID_UL ||
+         currChild->element()->id() == ID_OL))
+      break;
+
+    RenderObject* lineBox = getParentOfFirstLineBox(currChild, marker);
+    if (lineBox)
+      return lineBox;
+  }
+
+  return 0;
+}
+
 void RenderListItem::layout() {
   KHTMLAssert(!layouted());
   KHTMLAssert(minMaxKnown());
@@ -181,8 +218,22 @@ void RenderListItem::layout() {
     // kdDebug(0) << "empty item" << endl;
     return;
   }
-  if (m_marker && !m_marker->layouted())
-    m_marker->layout();
+
+  // Sanity check the location of our marker.
+  if (m_marker) {
+    RenderObject* markerPar = m_marker->parent();
+    RenderObject* lineBoxParent = getParentOfFirstLineBox(this, m_marker);
+    if (!lineBoxParent)
+      lineBoxParent = this;
+    if (markerPar != lineBoxParent) {
+      if (markerPar)
+        markerPar->removeChild(m_marker);
+      if (!lineBoxParent)
+        lineBoxParent = this;
+      lineBoxParent->addChild(m_marker, lineBoxParent->firstChild());
+    }
+  }
+
   RenderFlow::layout();
 }
 
@@ -291,6 +342,21 @@ void RenderListMarker::paint(QPainter* p,
                              int _tx,
                              int _ty,
                              int paintPhase) {
+  if (paintPhase != FOREGROUND_PHASE)
+    return;
+
+  if (style()->visibility() != VISIBLE)
+    return;
+
+  _tx += m_x;
+  _ty += m_y;
+
+  if ((_ty > _y + _h) || (_ty + m_height < _y))
+    return;
+
+  if (shouldPaintBackgroundOrBorder())
+    paintBoxDecorations(p, _x, _y, _w, _h, _tx, _ty);
+
   paintObject(p, _x, _y, _w, _h, _tx, _ty, paintPhase);
 }
 
@@ -313,6 +379,35 @@ void RenderListMarker::paintObject(QPainter* p,
   const QFontMetrics fm = p->fontMetrics();
   int offset = fm.ascent() * 2 / 3;
 
+  // The marker needs to adjust its tx, for the case where it's an outside
+  // marker.
+  RenderObject* listItem = 0;
+  int leftLineOffset = 0;
+  int rightLineOffset = 0;
+  if (style()->listStylePosition() == OUTSIDE) {
+    listItem = this;
+    int yOffset = 0;
+    int xOffset = 0;
+    while (listItem && listItem != m_listItem) {
+      yOffset += listItem->yPos();
+      xOffset += listItem->xPos();
+      listItem = listItem->parent();
+    }
+
+    // Now that we have our xoffset within the listbox, we need to adjust
+    // ourselves by the delta
+    // between our current xoffset and our desired position.
+    if (style()->direction() == LTR) {
+      leftLineOffset =
+          m_listItem->leftRelOffset(yOffset, m_listItem->leftOffset(yOffset));
+      _tx -= (xOffset - leftLineOffset);
+    } else {
+      rightLineOffset =
+          m_listItem->rightRelOffset(yOffset, m_listItem->rightOffset(yOffset));
+      _tx += (rightLineOffset - xOffset);
+    }
+  }
+
   bool isPrinting = (p->device()->devType() == QInternal::Printer);
   if (isPrinting) {
     if (_ty < _y) {
@@ -331,11 +426,11 @@ void RenderListMarker::paintObject(QPainter* p,
   int xoff = 0;
   int yoff = fm.ascent() - offset;
 
-  if (style()->listStylePosition() == OUTSIDE) {
-    xoff = -7 - offset;
-    if (style()->direction() == RTL)
-      xoff = -xoff + parent()->width();
-  }
+  if (style()->listStylePosition() == OUTSIDE)
+    if (listItem->style()->direction() == LTR)
+      xoff = -7 - offset;
+    else
+      xoff = offset;
 
   if (m_listImage && !m_listImage->isErrorImage()) {
     // For OUTSIDE bullets shrink back to only a 0.3em margin. 0.67 em is too
@@ -402,7 +497,7 @@ void RenderListMarker::paintObject(QPainter* p,
             p->drawText(_tx - offset / 2, _ty, 0, 0,
                         Qt::AlignRight | Qt::DontClip, m_item);
           else
-            p->drawText(_tx + offset / 2 + parent()->width(), _ty, 0, 0,
+            p->drawText(_tx + offset / 2, _ty, 0, 0,
                         Qt::AlignLeft | Qt::DontClip, m_item);
         }
       }
@@ -447,12 +542,8 @@ void RenderListMarker::calcMinMaxWidth() {
     return;
   }
 
-  if (m_value < 0) {  // not yet calculated
-    RenderObject* p = parent();
-    while (p->isAnonymousBox())
-      p = p->parent();
-    static_cast<RenderListItem*>(p)->calcListValue();
-  }
+  if (m_value < 0)  // not yet calculated
+    m_listItem->calcListValue();
 
   const QFontMetrics& fm = style()->fontMetrics();
   m_height = fm.ascent();
@@ -524,12 +615,15 @@ end:
   setMinMaxKnown();
 }
 
-short RenderListMarker::verticalPositionHint(bool) const {
-  return 0;
-}
-
 void RenderListMarker::calcWidth() {
   RenderBox::calcWidth();
+}
+
+short RenderListMarker::baselinePosition(bool b) const {
+  if (m_listImage)
+    return height() + marginTop() + marginBottom();
+  // FIXME: This should one day really align.
+  return RenderBox::baselinePosition(b);
 }
 
 #undef BOX_DEBUG
