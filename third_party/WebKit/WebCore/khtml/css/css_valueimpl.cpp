@@ -475,6 +475,9 @@ DOM::DOMString CSSValueListImpl::cssText() const {
 
   for (QPtrListIterator<CSSValueImpl> iterator(m_values); iterator.current();
        ++iterator) {
+    if (result.length() != 0) {
+      result += ", ";
+    }
     result += iterator.current()->cssText();
   }
 
@@ -794,8 +797,6 @@ DOM::DOMString CSSPrimitiveValueImpl::cssText() const {
       text += ")";
       break;
     }
-    default:
-      break;
   }
   return text;
 }
