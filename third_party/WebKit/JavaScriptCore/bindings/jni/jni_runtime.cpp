@@ -131,7 +131,7 @@ KJS::Value JavaField::valueFromInstance(KJS::ExecState* exec,
       if (arrayType[0] == '[') {
         jsresult = JavaArray::convertJObjectToArray(
             exec, anObject, arrayType, instance->executionContext());
-      } else {
+      } else if (anObject != 0) {
         jsresult = Instance::createRuntimeObject(
             Instance::JavaLanguage, anObject, instance->executionContext());
       }
