@@ -110,7 +110,7 @@
 
 // Font API
 - (void)setFontSizes:(NSArray*)sizes;
-- (NSArray*)fontSize;
+- (NSArray*)fontSizes;
 - (void)resetFontSizes;
 - (void)setStandardFont:(NSSFont*)font;
 - (NSFont*)standardFont;
@@ -126,7 +126,7 @@
 // Returns an array of built-in context menu items for this node.
 // Generally called by WKContextMenuHandlers from contextMenuItemsForNode:
 - (NSArray*)defaultContextMenuItemsForNode:(WKDOMNode*);
-- (void)setEnableContextMenus:(BOOL)flag;
+- (void)setContextMenusEnabled:(BOOL)flag;
 - (BOOL)contextMenusEnabled;
 
 // Most folks want selection API on the view.  Don suggested we mirror the

@@ -57,6 +57,8 @@
         Removed all mentions of resolved URLs, because browsers don't
         actuall treat DNS aliases specially.
 
+        Minor naming changes.
+
    =============================================================================
   */
 
@@ -69,13 +71,13 @@
 
 // Returns nil if object cannot be initialized due to a malformed URL (RFC
 // 1808).
-- initWithURL:(NSURL*)inputUrl;
+- initWithURL:(NSURL*)inputURL;
 
 - initWithData:(NSData*)data;
 - initWithString:(NSString*)string;
 
 // Ken, need some help with one.
-- initWithLoader:(WKURILoader*)loader;
+- initWithLoader:(WKLoader*)loader;
 
 // Returns nil if this data source represents the main document.  Otherwise
 // returns the parent data source.
@@ -126,7 +128,7 @@
 
 // Returns true if the inputURL has been redirected by the server,
 // i.e. inputURL != finalURL.
-- (BOOL)isRedirected;
+- (BOOL)wasRedirected;
 
 // Start actually getting (if initialized with a URL) and parsing data. If the
 // data source
@@ -198,7 +200,8 @@
 - (BOOL)jScriptEnabled;
 
 // Java preferences
-- (void)setJavaEnabled:(BOOL)flag - (BOOL)javaEnabled;
+- (void)setJavaEnabled:(BOOL)flag;
+- (BOOL)javaEnabled;
 
 // Document refreshes allowed
 - setRefreshEnabled:(BOOL)flag;
@@ -206,7 +209,7 @@
 
 // Plugins
 - (void)setPluginsEnabled:(BOOL)flag;
-- (BOOL)pluginEnabled;
+- (BOOL)pluginsEnabled;
 
 // Should images be loaded.
 - (void)setAutoloadImages:(BOOL)flag;
