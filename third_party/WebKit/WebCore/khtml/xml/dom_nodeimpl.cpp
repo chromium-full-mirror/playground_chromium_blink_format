@@ -2010,7 +2010,6 @@ void NodeBaseImpl::setFocus(bool received) {
   if (received && isEditableBlock() && !hasChildNodes()) {
     KHTMLPart* part = getDocument()->part();
     part->setSelection(KHTMLSelection(this, 0));
-    fprintf(stderr, "place caret in me\n");
   }
 
   // note that we need to recalc the style
