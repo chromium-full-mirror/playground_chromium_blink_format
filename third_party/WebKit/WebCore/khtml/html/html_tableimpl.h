@@ -109,6 +109,8 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   Frame frame;
   Rules rules;
 
+  DOMString cellPadding;
+
   bool incremental : 1;
   bool m_noBorder : 1;
   bool m_solid : 1;
