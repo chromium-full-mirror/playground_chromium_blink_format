@@ -22,6 +22,7 @@
  */
 
 #include "html/html_imageimpl.h"
+#include "html/html_formimpl.h"
 #include "html/html_documentimpl.h"
 
 #include "misc/htmlhashes.h"
@@ -122,14 +123,17 @@ void HTMLImageLoader::notifyFinished(CachedObject* image) {
 
 // -------------------------------------------------------------------------
 
-HTMLImageElementImpl::HTMLImageElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc), m_imageLoader(this) {
-  ismap = false;
+HTMLImageElementImpl::HTMLImageElementImpl(DocumentPtr* doc,
+                                           HTMLFormElementImpl* f)
+    : HTMLElementImpl(doc), m_imageLoader(this), ismap(false), m_form(f) {
+  if (m_form)
+    m_form->registerImgElement(this);
 }
 
-HTMLImageElementImpl::~HTMLImageElementImpl() {}
-
-// DOM related
+HTMLImageElementImpl::~HTMLImageElementImpl() {
+  if (m_form)
+    m_form->removeImgElement(this);
+}
 
 NodeImpl::Id HTMLImageElementImpl::id() const {
   return ID_IMG;

@@ -43,6 +43,8 @@ namespace DOM {
 
 class DOMString;
 
+class HTMLFormElementImpl;
+
 class HTMLImageLoader : public khtml::CachedObjectClient {
  public:
   HTMLImageLoader(ElementImpl* elt);
@@ -67,9 +69,10 @@ class HTMLImageLoader : public khtml::CachedObjectClient {
 };
 
 class HTMLImageElementImpl : public HTMLElementImpl {
- public:
-  HTMLImageElementImpl(DocumentPtr* doc);
+  friend class HTMLFormElementImpl;
 
+ public:
+  HTMLImageElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
   ~HTMLImageElementImpl();
 
   virtual Id id() const;
@@ -104,6 +107,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   HTMLImageLoader m_imageLoader;
   DOMString usemap;
   bool ismap;
+  HTMLFormElementImpl* m_form;
   QString oldIdAttr;
   QString oldNameAttr;
 #if APPLE_CHANGES

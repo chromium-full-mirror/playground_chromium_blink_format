@@ -121,6 +121,9 @@ HTMLFormElementImpl::~HTMLFormElementImpl() {
   QPtrListIterator<HTMLGenericFormElementImpl> it2(dormantFormElements);
   for (; it2.current(); ++it2)
     it2.current()->m_form = 0;
+  QPtrListIterator<HTMLImageElementImpl> it3(imgElements);
+  for (; it3.current(); ++it3)
+    it3.current()->m_form = 0;
 }
 
 NodeImpl::Id HTMLFormElementImpl::id() const {
@@ -710,6 +713,14 @@ void HTMLFormElementImpl::makeFormElementDormant(
 
 bool HTMLFormElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_ACTION;
+}
+
+void HTMLFormElementImpl::registerImgElement(HTMLImageElementImpl* e) {
+  imgElements.append(e);
+}
+
+void HTMLFormElementImpl::removeImgElement(HTMLImageElementImpl* e) {
+  imgElements.remove(e);
 }
 
 // -------------------------------------------------------------------------

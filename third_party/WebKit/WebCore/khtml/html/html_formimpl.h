@@ -53,6 +53,7 @@ class DOMString;
 class FormDataList;
 class HTMLFormElement;
 class HTMLGenericFormElementImpl;
+class HTMLImageElementImpl;
 class HTMLImageLoader;
 class HTMLOptionElementImpl;
 class HTMLOptionsCollectionImpl;
@@ -86,6 +87,8 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   void registerFormElement(HTMLGenericFormElementImpl*);
   void removeFormElement(HTMLGenericFormElementImpl*);
   void makeFormElementDormant(HTMLGenericFormElementImpl*);
+  void registerImgElement(HTMLImageElementImpl*);
+  void removeImgElement(HTMLImageElementImpl*);
 
   bool prepareSubmit();
   void submit(bool activateSubmitButton);
@@ -108,6 +111,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   QPtrList<HTMLGenericFormElementImpl> formElements;
   QPtrList<HTMLGenericFormElementImpl> dormantFormElements;
+  QPtrList<HTMLImageElementImpl> imgElements;
   DOMString m_url;
   DOMString m_target;
   DOMString m_enctype;

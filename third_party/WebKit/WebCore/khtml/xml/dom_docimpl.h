@@ -626,6 +626,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   XBL::XBLBindingManager* bindingManager() const { return m_bindingManager; }
 #endif
 
+  void incDOMTreeVersion() { ++m_domtree_version; }
+  unsigned int domTreeVersion() const { return m_domtree_version; }
+
  signals:
   void finishedParsing();
 
@@ -669,6 +672,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 
   NodeImpl* m_focusNode;
   NodeImpl* m_hoverNode;
+
+  unsigned int m_domtree_version;
 
   // ### replace me with something more efficient
   // in lookup and insertion.
