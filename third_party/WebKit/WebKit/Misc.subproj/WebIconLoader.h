@@ -13,11 +13,6 @@
 @class WebIconLoaderPrivate;
 @protocol WebResourceClient;
 
-@interface NSObject (WebIconLoaderDelegate)
-- (void)receivedPageIcon:(NSImage*)image;
-@end
-;
-
 @interface WebIconLoader : NSObject<WebResourceClient> {
   WebIconLoaderPrivate* _private;
 }
@@ -30,3 +25,8 @@
 - (void)startLoadingOnlyFromCache;
 - (void)stopLoading;
 @end
+
+@interface NSObject (WebIconLoaderDelegate)
+- (void)iconLoader:(WebIconLoader*)iconLoader receivedPageIcon:(NSImage*)image;
+@end
+;
