@@ -28,12 +28,17 @@
 
 #import <Foundation/Foundation.h>
 
+#if defined(__cplusplus)
 extern "C" {
+#endif
 
 typedef id (*WCIFErrorMakeFunc)(int);
 void WCSetIFErrorMakeFunc(WCIFErrorMakeFunc func);
 
 extern WCIFErrorMakeFunc WCIFErrorMake;
+
+#if defined(__cplusplus)
 }
+#endif
 
 #endif /* __WCERROR__ */
