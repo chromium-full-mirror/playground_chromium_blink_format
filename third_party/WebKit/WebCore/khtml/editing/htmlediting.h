@@ -683,6 +683,7 @@ class ReplacementFragment {
   static bool isInterchangeConvertedSpaceSpan(const DOM::NodeImpl*);
 
   // A couple simple DOM helpers
+  DOM::NodeImpl* enclosingBlock(DOM::NodeImpl*) const;
   void removeNode(DOM::NodeImpl*);
   void insertNodeBefore(DOM::NodeImpl* node, DOM::NodeImpl* refNode);
 
