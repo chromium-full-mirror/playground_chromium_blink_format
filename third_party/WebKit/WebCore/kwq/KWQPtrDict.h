@@ -46,6 +46,13 @@ class QPtrDict : public QPtrCollection {
   T* take(void* key) { return (T*)impl.take(key); }
   void insert(void* key, T* value) { impl.insert(key, value); }
   bool remove(void* key) { return impl.remove(key, del_item); }
+  void replace(void* key, T* value) {
+    if (find(key))
+      remove(key);
+    insert(key, value);
+  }
+  T* find(void* key) { return (T*)impl.find(key); }
+
   bool isEmpty() const { return count() == 0; }
 
   QPtrDict<T>& operator=(const QPtrDict<T>& pd) {

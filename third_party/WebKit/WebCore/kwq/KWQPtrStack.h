@@ -41,6 +41,9 @@ class QPtrStack {
     return tmp;
   }
   uint count() const { return list.count(); }
+  T* current() const { return list.getLast(); }
+
+  void setAutoDelete(bool b) { list.setAutoDelete(b); }
 
  private:
   QPtrList<T> list;

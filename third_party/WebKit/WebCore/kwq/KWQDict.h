@@ -47,6 +47,12 @@ class QDict : public QPtrCollection {
     impl.insert(key, (void*)value);
   }
   bool remove(const QString& key) { return impl.remove(key, del_item); }
+  void replace(const QString& key, const T* value) {
+    if (find(key))
+      remove(key);
+    insert(key, value);
+  }
+
   T* find(const QString& key) const { return (T*)impl.find(key); }
 
   QDict& operator=(const QDict& d) {
