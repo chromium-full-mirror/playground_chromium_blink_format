@@ -9,7 +9,6 @@
 #import <WebKit/WebDataSource.h>
 #import <WebKit/WebBridge.h>
 
-@class WebContentPolicy;
 @class WebIconLoader;
 @class WebMainResourceClient;
 @class WebResourceHandle;
@@ -58,8 +57,6 @@
   // Error associated with main document.
   WebError* mainDocumentError;
 
-  WebContentPolicy* contentPolicy;
-
   BOOL loading;  // self and controller are retained while loading
 
   BOOL gotFirstByte;  // got first byte
@@ -82,6 +79,9 @@
   // we keep this around for the benefit of the various policy
   // handlers.
   NSEvent* triggeringEvent;
+
+  BOOL isDownloading;
+  NSString* downloadPath;
 }
 
 @end
@@ -104,7 +104,6 @@
 - (void)_setURL:(NSURL*)URL;
 - (void)_setRequest:(WebResourceRequest*)request;
 - (void)_setResponse:(WebResourceResponse*)response;
-- (void)_setContentPolicy:(WebContentPolicy*)policy;
 - (void)_layoutChildren;
 - (void)_clearErrors;
 - (void)_setMainDocumentError:(WebError*)error;
@@ -140,5 +139,8 @@
 
 - (void)_setTriggeringEvent:(NSEvent*)event;
 - (NSEvent*)_triggeringEvent;
+
+- (void)_setIsDownloading:(BOOL)isDownloading;
+- (void)_setDownloadPath:(NSString*)downloadPath;
 
 @end
