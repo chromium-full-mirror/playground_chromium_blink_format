@@ -971,16 +971,16 @@ inline int RenderText::widthFromCache(const Font* f, int start, int len) const {
 
 #endif
 
-void RenderText::trimmedMinMaxWidth(short& beginMinW,
+void RenderText::trimmedMinMaxWidth(int& beginMinW,
                                     bool& beginWS,
-                                    short& endMinW,
+                                    int& endMinW,
                                     bool& endWS,
                                     bool& hasBreakableChar,
                                     bool& hasBreak,
-                                    short& beginMaxW,
-                                    short& endMaxW,
-                                    short& minW,
-                                    short& maxW,
+                                    int& beginMaxW,
+                                    int& endMaxW,
+                                    int& minW,
+                                    int& maxW,
                                     bool& stripFrontSpaces) {
   bool isPre = style()->whiteSpace() == PRE;
   if (isPre)
@@ -1444,7 +1444,7 @@ unsigned int RenderText::width(unsigned int from,
   return w;
 }
 
-short RenderText::width() const {
+int RenderText::width() const {
   int w;
   int minx = 100000000;
   int maxx = 0;

@@ -534,7 +534,7 @@ RenderObject* RenderObject::offsetParent() const {
 // More IE extensions.  clientWidth and clientHeight represent the interior of
 // an object
 // excluding border and scrollbar.
-short RenderObject::clientWidth() const {
+int RenderObject::clientWidth() const {
   return width() - borderLeft() - borderRight() -
          (layer() ? layer()->verticalScrollbarWidth() : 0);
 }
@@ -547,7 +547,7 @@ int RenderObject::clientHeight() const {
 // scrollWidth/scrollHeight will be the same as clientWidth/clientHeight unless
 // the
 // object has overflow:hidden/scroll/auto specified and also has overflow.
-short RenderObject::scrollWidth() const {
+int RenderObject::scrollWidth() const {
   return (style()->hidesOverflow() && layer()) ? layer()->scrollWidth()
                                                : overflowWidth();
 }
@@ -658,7 +658,7 @@ RenderBlock* RenderObject::containingBlock() const {
   return static_cast<RenderBlock*>(o);
 }
 
-short RenderObject::containingBlockWidth() const {
+int RenderObject::containingBlockWidth() const {
   // ###
   return containingBlock()->contentWidth();
 }

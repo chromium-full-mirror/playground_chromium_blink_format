@@ -131,7 +131,7 @@ class RenderTable : public RenderBlock {
       width = WidthUndefined;
     }
     ushort span;
-    ushort width;  // the calculated position of the column
+    uint width;  // the calculated position of the column
   };
 
   QMemArray<int> columnPos;

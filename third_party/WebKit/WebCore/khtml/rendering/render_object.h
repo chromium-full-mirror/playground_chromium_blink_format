@@ -181,7 +181,7 @@ class RenderObject : public CachedObjectClient {
   // to determine its position.
   bool hasStaticX() const;
   bool hasStaticY() const;
-  virtual void setStaticX(short staticX){};
+  virtual void setStaticX(int staticX){};
   virtual void setStaticY(int staticY){};
 
   // RenderObject tree manipulation
@@ -566,16 +566,16 @@ class RenderObject : public CachedObjectClient {
   RenderBlock* containingBlock() const;
 
   // return just the width of the containing block
-  virtual short containingBlockWidth() const;
+  virtual int containingBlockWidth() const;
   // return just the height of the containing block
   virtual int containingBlockHeight() const;
 
   // size of the content area (box size minus padding/border)
-  virtual short contentWidth() const { return 0; }
+  virtual int contentWidth() const { return 0; }
   virtual int contentHeight() const { return 0; }
 
   // intrinsic extend of replaced elements. undefined otherwise
-  virtual short intrinsicWidth() const { return 0; }
+  virtual int intrinsicWidth() const { return 0; }
   virtual int intrinsicHeight() const { return 0; }
 
   // relative to parent node
@@ -592,7 +592,7 @@ class RenderObject : public CachedObjectClient {
                                 bool fixed = false);
 
   // width and height are without margins but include paddings and borders
-  virtual short width() const { return 0; }
+  virtual int width() const { return 0; }
   virtual int height() const { return 0; }
 
   // The height of a block when you include normal flow overflow spillage out of
@@ -613,7 +613,7 @@ class RenderObject : public CachedObjectClient {
   // (render_flow)
   // to return the remaining width on a given line (and the height of a single
   // line). -dwh
-  virtual short offsetWidth() const { return width(); }
+  virtual int offsetWidth() const { return width(); }
   virtual int offsetHeight() const { return height(); }
 
   // IE exxtensions.  Also supported by Gecko.  We override in render flow to
@@ -626,13 +626,13 @@ class RenderObject : public CachedObjectClient {
   // More IE extensions.  clientWidth and clientHeight represent the interior of
   // an object
   // excluding border and scrollbar.
-  short clientWidth() const;
+  int clientWidth() const;
   int clientHeight() const;
 
   // scrollWidth/scrollHeight will be the same as clientWidth/clientHeight
   // unless the
   // object has overflow:hidden/scroll/auto specified and also has overflow.
-  short scrollWidth() const;
+  int scrollWidth() const;
   int scrollHeight() const;
 
   // The following seven functions are used to implement collapsing margins.
@@ -696,8 +696,8 @@ class RenderObject : public CachedObjectClient {
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
 #endif
 
-  virtual short minWidth() const { return 0; }
-  virtual short maxWidth() const { return 0; }
+  virtual int minWidth() const { return 0; }
+  virtual int maxWidth() const { return 0; }
 
   RenderStyle* style() const { return m_style; }
   RenderStyle* style(bool firstLine) const;

@@ -73,7 +73,7 @@ class RenderInline : public RenderFlow {
   // overrides RenderObject
   virtual bool requiresLayer();
 
-  virtual short width() const;
+  virtual int width() const;
   virtual int height() const;
 
   // used to calculate offsetWidth/Height.  Overridden by inlines (render_flow)

@@ -446,7 +446,7 @@ void RenderImage::layout() {
   if (checkForRepaint)
     oldBounds = getAbsoluteRepaintRect();
 
-  short oldwidth = m_width;
+  int oldwidth = m_width;
   int oldheight = m_height;
 
   // minimum height
@@ -627,7 +627,7 @@ bool RenderImage::isHeightSpecified() const {
   return false;
 }
 
-short RenderImage::calcReplacedWidth() const {
+int RenderImage::calcReplacedWidth() const {
   // If height is specified and not width, preserve aspect ratio.
   if (isHeightSpecified() && !isWidthSpecified()) {
     if (intrinsicHeight() == 0) {

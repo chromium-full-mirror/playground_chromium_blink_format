@@ -173,7 +173,7 @@ class RenderBlock : public RenderFlow {
   inline int leftBottom();
   inline int rightBottom();
 
-  virtual unsigned short lineWidth(int y) const;
+  virtual int lineWidth(int y) const;
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;
   virtual int rightmostPosition(bool includeOverflowInterior = true,
@@ -259,8 +259,8 @@ class RenderBlock : public RenderFlow {
     RenderObject* node;
     int startY;
     int endY;
-    short left;
-    short width;
+    int left;
+    int width;
     Type type : 1;  // left or right aligned
     bool noPaint : 1;
   };

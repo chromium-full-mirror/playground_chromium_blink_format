@@ -193,7 +193,7 @@ class RenderText : public RenderObject {
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
                              bool firstLine = false) const;
-  virtual short width() const;
+  virtual int width() const;
   virtual int height() const;
 
   // height of the contents (without paddings, margins and borders)
@@ -203,18 +203,18 @@ class RenderText : public RenderObject {
 
   // overrides
   virtual void calcMinMaxWidth();
-  virtual short minWidth() const { return m_minWidth; }
-  virtual short maxWidth() const { return m_maxWidth; }
-  virtual void trimmedMinMaxWidth(short& beginMinW,
+  virtual int minWidth() const { return m_minWidth; }
+  virtual int maxWidth() const { return m_maxWidth; }
+  virtual void trimmedMinMaxWidth(int& beginMinW,
                                   bool& beginWS,
-                                  short& endMinW,
+                                  int& endMinW,
                                   bool& endWS,
                                   bool& hasBreakableChar,
                                   bool& hasBreak,
-                                  short& beginMaxW,
-                                  short& endMaxW,
-                                  short& minW,
-                                  short& maxW,
+                                  int& beginMaxW,
+                                  int& endMaxW,
+                                  int& minW,
+                                  int& maxW,
                                   bool& stripFrontSpaces);
 
   bool containsOnlyWhitespace(unsigned int from, unsigned int len) const;
@@ -287,10 +287,10 @@ class RenderText : public RenderObject {
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
 
-  short m_minWidth;
-  short m_maxWidth;
-  short m_beginMinWidth;
-  short m_endMinWidth;
+  int m_minWidth;
+  int m_maxWidth;
+  int m_beginMinWidth;
+  int m_endMinWidth;
 
   SelectionState m_selectionState : 3;
   bool m_hasBreakableChar : 1;  // Whether or not we can be broken into multiple

@@ -124,7 +124,7 @@ class RenderPart : public khtml::RenderWidget {
                                       const KURL& url,
                                       const QString& serviceType);
 
-  virtual short intrinsicWidth() const;
+  virtual int intrinsicWidth() const;
   virtual int intrinsicHeight() const;
 
  public slots:

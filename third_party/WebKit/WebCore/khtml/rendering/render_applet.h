@@ -48,7 +48,7 @@ class RenderApplet : public RenderWidget {
 #endif
 
   virtual void layout();
-  virtual short intrinsicWidth() const;
+  virtual int intrinsicWidth() const;
   virtual int intrinsicHeight() const;
   virtual bool isApplet() const { return true; }
 
@@ -71,7 +71,7 @@ class RenderEmptyApplet : public RenderWidget {
 
   virtual const char* renderName() const { return "RenderEmptyApplet"; }
 
-  virtual short intrinsicWidth() const;
+  virtual int intrinsicWidth() const;
   virtual int intrinsicHeight() const;
   virtual void layout();
 };

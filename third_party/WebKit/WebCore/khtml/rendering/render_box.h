@@ -49,10 +49,10 @@ class RenderBox : public RenderContainer {
 
   virtual void detach();
 
-  virtual short minWidth() const { return m_minWidth; }
-  virtual short maxWidth() const { return m_maxWidth; }
+  virtual int minWidth() const { return m_minWidth; }
+  virtual int maxWidth() const { return m_maxWidth; }
 
-  virtual short contentWidth() const;
+  virtual int contentWidth() const;
   virtual int contentHeight() const;
 
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
@@ -61,7 +61,7 @@ class RenderBox : public RenderContainer {
 
   virtual int xPos() const { return m_x; }
   virtual int yPos() const { return m_y; }
-  virtual short width() const;
+  virtual int width() const;
   virtual int height() const;
 
   virtual short marginTop() const { return m_marginTop; }
@@ -103,7 +103,7 @@ class RenderBox : public RenderContainer {
 
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
 
-  virtual short containingBlockWidth() const;
+  virtual int containingBlockWidth() const;
 
   virtual void calcWidth();
   virtual void calcHeight();
@@ -112,7 +112,7 @@ class RenderBox : public RenderContainer {
   int calcReplacedWidthUsing(WidthType widthType) const;
   int calcReplacedHeightUsing(HeightType heightType) const;
 
-  virtual short calcReplacedWidth() const;
+  virtual int calcReplacedWidth() const;
   virtual int calcReplacedHeight() const;
 
   virtual int availableHeight() const;
@@ -143,7 +143,7 @@ class RenderBox : public RenderContainer {
                                        int bleft,
                                        int bright);
 
-  virtual void setStaticX(short staticX);
+  virtual void setStaticX(int staticX);
   virtual void setStaticY(int staticY);
 
  protected:
@@ -175,8 +175,8 @@ class RenderBox : public RenderContainer {
 
   int m_y;
 
-  short m_x;
-  short m_width;
+  int m_x;
+  int m_width;
 
   short m_marginTop;
   short m_marginBottom;
@@ -188,15 +188,15 @@ class RenderBox : public RenderContainer {
    * the minimum width the element needs, to be able to render
    * it's content without clipping
    */
-  short m_minWidth;
+  int m_minWidth;
   /* The maximum width the element can fill horizontally
    * ( = the width of the element with line breaking disabled)
    */
-  short m_maxWidth;
+  int m_maxWidth;
 
   // Cached normal flow values for absolute positioned elements with static
   // left/top values.
-  short m_staticX;
+  int m_staticX;
   int m_staticY;
 
   // A pointer to our layer if we have one.  Currently only positioned elements
