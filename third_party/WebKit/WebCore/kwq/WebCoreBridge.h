@@ -301,6 +301,8 @@ typedef enum {
 - (CFStringEncoding)textEncoding;
 
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string;
+- (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string
+                                   forceUserGesture:(BOOL)forceUserGesture;
 
 - (DOMDocument*)DOMDocument;
 - (DOMHTMLElement*)frameElement;
