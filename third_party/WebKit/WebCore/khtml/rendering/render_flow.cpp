@@ -805,12 +805,14 @@ void RenderFlow::layoutBlockChildren(bool relayoutChildren) {
 
   // If any height other than auto is specified in CSS, then we don't collapse
   // our bottom
-  // margins with our children's margins.  To do otherwise would be to risk odd
+  // margins with our children's margins. To do otherwise would be to risk odd
   // visual
   // effects when the children overflow out of the parent block and yet still
   // collapse
-  // with it.
-  if (canCollapseWithChildren && !autoHeight)
+  // with it. We also don't collapse if we had any bottom border/padding
+  // (represented by
+  // |toAdd|.
+  if (canCollapseWithChildren && (toAdd || !autoHeight))
     canCollapseWithChildren = false;
 
   // If we can't collapse with children then go ahead and add in the bottom
