@@ -254,6 +254,28 @@ int UIEvent::pageY() const {
     return 0;
 }
 
+int UIEvent::layerX() const {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  MouseEventImpl* mouseEvent = dynamic_cast<MouseEventImpl*>(impl);
+  if (mouseEvent)
+    return mouseEvent->layerX();
+  else
+    return 0;
+}
+
+int UIEvent::layerY() const {
+  if (!impl)
+    throw DOMException(DOMException::INVALID_STATE_ERR);
+
+  MouseEventImpl* mouseEvent = dynamic_cast<MouseEventImpl*>(impl);
+  if (mouseEvent)
+    return mouseEvent->layerY();
+  else
+    return 0;
+}
+
 void UIEvent::initUIEvent(const DOMString& typeArg,
                           bool canBubbleArg,
                           bool cancelableArg,
