@@ -4950,6 +4950,9 @@ void ReplaceSelectionCommand::completeHTMLReplacement() {
     firstLeaf = nextChild;
   }
 
+  // Call updateLayout so caretMinOffset and caretMaxOffset return correct
+  // values.
+  document()->updateLayout();
   Position start(firstLeaf, firstLeaf->caretMinOffset());
   Position end(lastLeaf, lastLeaf->caretMaxOffset());
   completeHTMLReplacement(start, end);
