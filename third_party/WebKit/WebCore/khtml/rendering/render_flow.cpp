@@ -165,10 +165,6 @@ void RenderFlow::printObject(QPainter* p,
     child = child->nextSibling();
   }
 
-  // 3. print floats and other non-flow objects
-  if (specialObjects)
-    printSpecialObjects(p, _x, _y, _w, _h, _tx, _ty);
-
   if (!isInline() && !childrenInline() && style()->outlineWidth())
     printOutline(p, _tx, _ty, width(), height(), style());
 
@@ -182,37 +178,6 @@ void RenderFlow::printObject(QPainter* p,
       outlineBox(p, _tx, _ty);
   }
 #endif
-}
-
-void RenderFlow::printSpecialObjects(QPainter* p,
-                                     int x,
-                                     int y,
-                                     int w,
-                                     int h,
-                                     int tx,
-                                     int ty) {
-  SpecialObject* r;
-  QPtrListIterator<SpecialObject> it(*specialObjects);
-  for (; (r = it.current()); ++it) {
-    // A special object may be registered with several different objects... so
-    // we only print the
-    // object if we are its containing block
-    if ((r->node->isFloating() && !r->noPaint)) {
-      r->node->print(p, x, y, w, h,
-                     tx + r->left - r->node->xPos() + r->node->marginLeft(),
-                     ty + r->startY - r->node->yPos() + r->node->marginTop());
-    }
-#ifdef FLOAT_DEBUG
-    p->save();
-    p->setPen(Qt::magenta);
-    p->setBrush(QPainter::NoBrush);
-    // qDebug("(%p): special object at (%d/%d-%d/%d)", this, r->left, r->startY,
-    // r->width, r->endY - r->startY );
-    p->drawRect(
-        QRect(r->left + tx, r->startY + ty, r->width, r->endY - r->startY));
-    p->restore();
-#endif
-  }
 }
 
 void RenderFlow::layout() {
@@ -1063,9 +1028,6 @@ void RenderFlow::addOverHangingFloats(RenderFlow* flow,
     if ((int)r->type <= (int)SpecialObject::FloatRight &&
         ((!child && r->endY > offset) ||
          (child && flow->yPos() + r->endY > height()))) {
-      if (child)
-        r->noPaint = true;
-
       SpecialObject* f = 0;
       // don't insert it twice!
       QPtrListIterator<SpecialObject> it(*specialObjects);
@@ -1093,7 +1055,6 @@ void RenderFlow::addOverHangingFloats(RenderFlow* flow,
           special->left += flow->marginLeft();
         if (!child) {
           special->left -= marginLeft();
-          special->noPaint = true;
         }
         special->width = r->width;
         special->node = r->node;
@@ -1684,8 +1645,7 @@ void RenderFlow::printTree(int indent) const {
                                                                 : "Positioned"))
                 << "[" << r->node->renderName() << ": " << (void*)r->node
                 << "] (" << r->startY << " - " << r->endY << ")"
-                << (r->noPaint ? "noPaint " : " ") << "width: " << r->width
-                << endl;
+                << "width: " << r->width << endl;
     }
   }
 }

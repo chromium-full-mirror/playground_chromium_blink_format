@@ -61,8 +61,6 @@ class RenderFlow : public RenderBox {
   virtual void print(QPainter*, int x, int y, int w, int h, int tx, int ty);
   virtual void
   printObject(QPainter*, int x, int y, int w, int h, int tx, int ty);
-  void
-  printSpecialObjects(QPainter*, int x, int y, int w, int h, int tx, int ty);
 
   virtual void layout();
 
@@ -159,7 +157,6 @@ class RenderFlow : public RenderBox {
       left = 0;
       width = 0;
       count = 0;
-      noPaint = false;
     }
     RenderObject* node;
     int startY;
@@ -168,7 +165,6 @@ class RenderFlow : public RenderBox {
     short width;
     short count;
     Type type : 2;  // left or right aligned
-    bool noPaint : 1;
 
     bool operator==(const SpecialObject&) const { return false; }
     bool operator<(const SpecialObject& o) const {
