@@ -56,6 +56,7 @@ class NodeListImpl;
 class NamedNodeMapImpl;
 class DocumentImpl;
 class CSSStyleDeclarationImpl;
+class Range;
 class RegisteredEventListener;
 class EventImpl;
 
@@ -217,6 +218,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isInline() const;
   virtual QString toHTML() const;
   QString recursive_toHTML(bool start = false) const;
+  QString recursive_toHTMLWithRange(bool start, const DOM::Range& range) const;
 
   virtual void getCursor(int offset, int& _x, int& _y, int& height);
   virtual QRect getRect() const;

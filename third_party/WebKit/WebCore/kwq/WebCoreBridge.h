@@ -221,6 +221,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                       to:(id<WebDOMNode>)end
                endOffset:(int)endOffset;
 
+- (NSString*)selectedHTML;
 - (NSString*)selectedString;
 - (NSAttributedString*)selectedAttributedString;
 
@@ -261,6 +262,8 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 + (void)updateAllViews;
 
 - (id)accessibilityTree;
+
+- (NSString*)reconstructedSource;
 
 @end
 

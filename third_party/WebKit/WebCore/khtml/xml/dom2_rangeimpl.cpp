@@ -30,7 +30,10 @@
 #include "dom_xmlimpl.h"
 #include "html/html_elementimpl.h"
 
+#include "render_block.h"
+
 using namespace DOM;
+using namespace khtml;
 
 RangeImpl::RangeImpl(DocumentPtr* _ownerDocument) {
   m_ownerDocument = _ownerDocument;
@@ -869,8 +872,29 @@ DOMString RangeImpl::toString(int& exceptioncode) {
 }
 
 DOMString RangeImpl::toHTML() {
-  // ### implement me!!!!
-  return DOMString();
+  // Find the common containing block node of the start and end nodes.
+  RenderBlock* startBlock = m_startContainer->renderer()->containingBlock();
+  RenderBlock* endBlock = m_endContainer->renderer()->containingBlock();
+  NodeImpl* commonBlockNode = 0;
+  while (1) {
+    RenderBlock* newEndBlock = endBlock;
+    while (1) {
+      if (startBlock == newEndBlock) {
+        commonBlockNode = startBlock->element();
+        break;
+      }
+      if (newEndBlock->isRoot()) {
+        break;
+      }
+      newEndBlock = newEndBlock->containingBlock();
+    }
+    if (commonBlockNode) {
+      break;
+    }
+    startBlock = startBlock->containingBlock();
+  }
+
+  return commonBlockNode->recursive_toHTMLWithRange(true, this);
 }
 
 DocumentFragmentImpl* RangeImpl::createContextualFragment(DOMString& html,
