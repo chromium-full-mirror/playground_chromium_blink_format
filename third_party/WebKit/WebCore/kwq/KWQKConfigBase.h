@@ -71,4 +71,6 @@ class KConfig {
   KWQKConfigImpl* impl;
 };
 
+void RefreshPlugins(bool reload);
+
 #endif

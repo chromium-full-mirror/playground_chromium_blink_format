@@ -223,6 +223,9 @@ backforward list.
        representationClass:(Class)representationClass
               forURLScheme:(NSString*)URLScheme;
 
++ (void)_unregisterViewClassAndRepresentationClassForMIMEType:
+    (NSString*)MIMEType;
+
 + (NSString*)_generatedMIMETypeForURLScheme:(NSString*)URLScheme;
 + (BOOL)_representationExistsForURLScheme:(NSString*)URLScheme;
 /*!
@@ -266,6 +269,8 @@ backforward list.
 
 - (void)_willChangeValueForKey:(NSString*)key;
 - (void)_didChangeValueForKey:(NSString*)key;
+
+- (void)_reloadForPluginChanges;
 @end
 
 @interface _WebSafeForwarder : NSObject {

@@ -229,4 +229,6 @@ extern NSString* WebPageCacheDocumentViewKey;
 
 - (NSColor*)_bodyBackgroundColor;
 
+- (void)_reloadForPluginChanges;
+
 @end
