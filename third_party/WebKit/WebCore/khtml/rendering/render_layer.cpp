@@ -1344,7 +1344,7 @@ int Marquee::computePosition(EMarqueeDirection dir, bool stopAtContentEdge) {
 }
 
 void Marquee::start() {
-  if (m_timerId)
+  if (m_timerId || m_layer->renderer()->style()->marqueeIncrement().value == 0)
     return;
 
   if (!m_suspended) {
@@ -1488,10 +1488,14 @@ void Marquee::timerEvent(QTimerEvent* evt) {
         addIncrement = !addIncrement;
     }
     bool positive = range > 0;
-    int clientSize = (isHorizontal() ? m_layer->renderer()->clientWidth()
-                                     : m_layer->renderer()->clientHeight());
+    int clientSize =
+        isUnfurlMarquee()
+            ? abs(range)
+            : (isHorizontal() ? m_layer->renderer()->clientWidth()
+                              : m_layer->renderer()->clientHeight());
     int increment =
-        abs(m_layer->renderer()->style()->marqueeIncrement().width(clientSize));
+        kMax(1, abs(m_layer->renderer()->style()->marqueeIncrement().width(
+                    clientSize)));
     int currentPos = isUnfurlMarquee()
                          ? m_unfurlPos
                          : (isHorizontal() ? m_layer->scrollXOffset()
