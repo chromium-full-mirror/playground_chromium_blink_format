@@ -97,10 +97,13 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
   virtual bool getPropertyPriority(int propertyID) const;
 
   QPtrList<CSSProperty>* values() { return m_lstValues; }
+  const QPtrList<CSSProperty>* values() const { return m_lstValues; }
   void setNode(NodeImpl* _node) { m_node = _node; }
   NodeImpl* node() const { return m_node; }
 
   void merge(CSSStyleDeclarationImpl*, bool argOverridesOnConflict = true);
+
+  virtual CSSStyleDeclarationImpl* copy() const;
 
   void setChanged();
 
