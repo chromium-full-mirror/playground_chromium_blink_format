@@ -120,12 +120,17 @@ class KHTMLParser {
   void pushBlock(int _id, int _level);
 
   void popBlock(int _id);
-  void popOneBlock();
+  void popOneBlock(bool delBlock = true);
   void popInlineBlocks();
 
   void freeBlock(void);
 
   void createHead();
+
+  bool isResidualStyleTag(int _id);
+  bool isAffectedByResidualStyle(int _id);
+  void handleResidualStyleCloseTagAcrossBlocks(HTMLStackElem* elem);
+  void reopenResidualStyleTags(HTMLStackElem* elem);
 
   ushort* forbiddenTag;
 
