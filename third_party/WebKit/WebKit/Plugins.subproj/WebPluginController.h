@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 
 @class WebHTMLView;
-
-@protocol WebPlugin;
-@protocol WebPluginContainer;
+@class WebPluginPackage;
 
 @interface WebPluginController : NSObject {
   NSView* _documentView;
   NSMutableArray* _views;
   BOOL _started;
 }
+
++ (NSView*)plugInViewWithArguments:(NSDictionary*)arguments
+                 fromPluginPackage:(WebPluginPackage*)plugin;
++ (BOOL)isPlugInView:(NSView*)view;
 
 - (id)initWithDocumentView:(NSView*)view;
 
