@@ -26,6 +26,15 @@
 #ifndef KFILEDIALOG_H_
 #define KFILEDIALOG_H_
 
-class KFileDialog {};
+#include <qstring.h>
+#include <qwidget.h>
+
+class KFileDialog {
+ public:
+  static QString getOpenFileName(const QString& startDir = QString::null,
+                                 const QString& filter = QString::null,
+                                 QWidget* parent = 0,
+                                 const QString& caption = QString::null);
+};
 
 #endif

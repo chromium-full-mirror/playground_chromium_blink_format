@@ -39,6 +39,7 @@ class QFrame : public QWidget {
     Sunken,
   };
 
+  QFrame();
   QFrame(QWidget* parent);
 
   virtual void setFrameStyle(int);

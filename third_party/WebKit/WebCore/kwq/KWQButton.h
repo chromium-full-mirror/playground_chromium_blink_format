@@ -36,6 +36,7 @@ class QButton : public QWidget {
   QButton(QWidget*);
 
   virtual void setText(const QString&);
+  QString text() const;
 };
 
 #endif

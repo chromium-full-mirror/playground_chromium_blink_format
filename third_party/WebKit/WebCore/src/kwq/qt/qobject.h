@@ -61,6 +61,7 @@ class QObject : public Qt {
   void killTimer(int);
   void killTimers();
   void installEventFilter(const QObject*);
+  void blockSignals(bool);
 };
 
 #endif
