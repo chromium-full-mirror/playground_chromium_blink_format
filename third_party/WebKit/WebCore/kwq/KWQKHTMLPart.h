@@ -160,7 +160,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void createEmptyDocument();
 
-  static WebCoreBridge* bridgeForWidget(QWidget*);
+  static WebCoreBridge* bridgeForWidget(const QWidget*);
 
   QString requestedURLString() const;
   QString incomingReferrer() const;
@@ -236,7 +236,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
-  static DOM::NodeImpl* nodeForWidget(QWidget*);
+  static DOM::NodeImpl* nodeForWidget(const QWidget*);
   static KWQKHTMLPart* partForNode(DOM::NodeImpl*);
 
   WebCoreBridge* _bridge;
