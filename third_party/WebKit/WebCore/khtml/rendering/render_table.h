@@ -173,6 +173,8 @@ class RenderTable : public RenderBlock {
 
   CollapsedBorderValue* currentBorderStyle() { return m_currentBorder; }
 
+  bool hasSections() const { return head || foot || firstBody; }
+
  protected:
   void recalcSections();
 
