@@ -460,7 +460,8 @@ class HTMLElement : public DOMElement {
     ElementDocument,
     ElementChildren,
     ElementContentEditable,
-    ElementIsContentEditable
+    ElementIsContentEditable,
+    ElementOuterHTML
   };
 
   DOM::HTMLElement toElement() const {

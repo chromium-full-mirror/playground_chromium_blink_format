@@ -708,7 +708,7 @@ const ClassInfo* KJS::HTMLElement::classInfo() const {
   }
 }
 /*
-@begin HTMLElementTable 11
+@begin HTMLElementTable 13
   id		KJS::HTMLElement::ElementId	DontDelete
   title		KJS::HTMLElement::ElementTitle	DontDelete
   lang		KJS::HTMLElement::ElementLang	DontDelete
@@ -717,6 +717,7 @@ const ClassInfo* KJS::HTMLElement::classInfo() const {
   className	KJS::HTMLElement::ElementClassName DontDelete
   innerHTML	KJS::HTMLElement::ElementInnerHTML DontDelete
   innerText	KJS::HTMLElement::ElementInnerText DontDelete
+  outerHTML	KJS::HTMLElement::ElementOuterHTML DontDelete
   document	KJS::HTMLElement::ElementDocument  DontDelete|ReadOnly
 # IE extension
   children	KJS::HTMLElement::ElementChildren  DontDelete|ReadOnly
@@ -2196,6 +2197,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       return String(element.innerHTML());
     case ElementInnerText:
       return String(element.innerText());
+    case ElementOuterHTML:
+      return String(element.outerHTML());
     case ElementDocument:
       return getDOMNode(exec, element.ownerDocument());
     case ElementChildren:
@@ -3920,6 +3923,9 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       return;
     case ElementInnerText:
       element.setInnerText(str);
+      return;
+    case ElementOuterHTML:
+      element.setOuterHTML(str);
       return;
     case ElementContentEditable:
       element.setContentEditable(str);
