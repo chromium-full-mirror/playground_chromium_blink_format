@@ -291,6 +291,8 @@ backforward list.
 
 @interface WebView (WebViewEditingInMail)
 - (void)_insertNewlineInQuotedContent;
+- (BOOL)_selectWordBeforeMenuEvent;
+- (void)_setSelectWordBeforeMenuEvent:(BOOL)flag;
 @end
 
 @interface _WebSafeForwarder : NSObject {
