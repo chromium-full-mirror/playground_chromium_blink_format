@@ -41,7 +41,7 @@ namespace khtml {
  */
 class RenderFlow : public RenderBox {
  public:
-  RenderFlow(DOM::NodeImpl* node) : RenderBox(node) {
+  RenderFlow(DOM::NodeImpl* node) : RenderBox(node), m_lineHeight(-1) {
     m_continuation = 0;
     m_firstLineBox = 0;
     m_lastLineBox = 0;

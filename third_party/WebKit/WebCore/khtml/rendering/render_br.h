@@ -49,6 +49,9 @@ class RenderBR : public RenderText {
     return 0;
   }
 
+  virtual short lineHeight(bool firstLine, bool isRootLineBox = false) const;
+  virtual void setStyle(RenderStyle* _style);
+
   // overrides
   virtual void calcMinMaxWidth() {}
   virtual short minWidth() const { return 0; }
@@ -82,6 +85,7 @@ class RenderBR : public RenderText {
   int m_x;
   int m_y;
   int m_height;
+  mutable short m_lineHeight;
 };
 }
 
