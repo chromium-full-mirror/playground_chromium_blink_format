@@ -243,9 +243,16 @@ class CompositeEditCommand : public EditCommand {
   void joinTextNodes(DOM::TextImpl* text1, DOM::TextImpl* text2);
   void rebalanceWhitespace();
   void removeCSSProperty(DOM::CSSStyleDeclarationImpl*, int property);
-  void removeFullySelectedNode(DOM::NodeImpl*);
+  void removeFullySelectedNodePreservingPosition(DOM::NodeImpl* node,
+                                                 DOM::Position& pos);
   void removeNodeAttribute(DOM::ElementImpl*, int attribute);
+  void removeChildrenInRangePreservingPosition(DOM::NodeImpl* node,
+                                               int from,
+                                               int to,
+                                               DOM::Position& pos);
   void removeNode(DOM::NodeImpl* removeChild);
+  void removeNodePreservingPosition(DOM::NodeImpl* removeChild,
+                                    DOM::Position& pos);
   void removeNodePreservingChildren(DOM::NodeImpl* node);
   void replaceTextInNode(DOM::TextImpl* node,
                          long offset,
@@ -266,10 +273,9 @@ class CompositeEditCommand : public EditCommand {
                                const DOM::Position& end);
   void deleteInsignificantTextDownstream(const DOM::Position&);
 
-  void insertBlockPlaceholder(DOM::NodeImpl*);
-  void appendBlockPlaceholder(DOM::NodeImpl*);
-  bool addBlockPlaceholderIfNeeded(DOM::NodeImpl*,
-                                   bool forceInsertIfNonEmpty = false);
+  DOM::NodeImpl* appendBlockPlaceholder(DOM::NodeImpl*);
+  DOM::NodeImpl* insertBlockPlaceholder(const DOM::Position& pos);
+  DOM::NodeImpl* addBlockPlaceholderIfNeeded(DOM::NodeImpl*);
   bool removeBlockPlaceholder(DOM::NodeImpl*);
   DOM::NodeImpl* findBlockPlaceholder(DOM::NodeImpl*);
 
@@ -442,7 +448,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   void fixupWhitespace();
   void moveNodesAfterNode();
   void calculateEndingPosition();
-  void calculateTypingStyleAfterDelete(bool insertedPlaceholder);
+  void calculateTypingStyleAfterDelete(DOM::NodeImpl* insertedPlaceholder);
   void clearTransientState();
 
   void setStartNode(DOM::NodeImpl*);

@@ -1362,9 +1362,8 @@ InlineBox* RootInlineBox::closestLeafChildForXPos(int _x, int _tx) {
        leaf = leaf->nextLeafChild()) {
     if (!leaf->object()->isListMarker()) {
       int leafX = _tx + leaf->m_x;
-      assert(_x >= leafX);
       if (_x < leafX + leaf->m_width)
-        // The x coordinate is greater or equal to left edge of the box's start.
+        // The x coordinate is less than the right edge of the box.
         // Return it.
         return leaf;
     }

@@ -116,6 +116,23 @@ void VisiblePosition::initUpstream(const Position& pos) {
   }
 }
 
+static bool isRenderedBR(NodeImpl* node) {
+  if (!node)
+    return false;
+
+  RenderObject* renderer = node->renderer();
+  if (!renderer)
+    return false;
+
+  if (renderer->style()->visibility() != VISIBLE)
+    return false;
+
+  if (renderer->isBR())
+    return true;
+
+  return false;
+}
+
 void VisiblePosition::initDownstream(const Position& pos) {
   Position deepPos = deepEquivalent(pos);
 
@@ -131,6 +148,8 @@ void VisiblePosition::initDownstream(const Position& pos) {
     Position next = nextVisiblePosition(deepPos);
     if (next.isNotNull()) {
       m_deepPosition = next;
+    } else if (isRenderedBR(deepPos.node()) && deepPos.offset() == 1) {
+      m_deepPosition = deepPos;
     } else {
       Position previous = previousVisiblePosition(deepPos);
       if (previous.isNotNull())
@@ -612,8 +631,8 @@ bool isLastVisiblePositionInBlock(const VisiblePosition& pos) {
     case NoBlockRelationship:
     case SameBlockRelationship:
     case AncestorBlockRelationship:
-    case OtherBlockRelationship:
       return false;
+    case OtherBlockRelationship:
     case PeerBlockRelationship:
     case DescendantBlockRelationship:
       return true;

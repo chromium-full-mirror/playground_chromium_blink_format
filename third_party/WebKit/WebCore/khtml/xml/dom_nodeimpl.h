@@ -139,6 +139,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isDocumentNode() const { return false; }
   virtual bool isXMLElementNode() const { return false; }
   bool isBlockFlow() const;
+  bool isBlockFlowOrTable() const;
 
   // Used by <form> elements to indicate a malformed state of some kind,
   // typically
@@ -180,6 +181,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   bool isEditableBlock() const;
   ElementImpl* enclosingBlockFlowElement() const;
+  ElementImpl* enclosingBlockFlowOrTableElement() const;
   ElementImpl* enclosingInlineElement() const;
   ElementImpl* rootEditableElement() const;
 

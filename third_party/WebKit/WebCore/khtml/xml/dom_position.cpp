@@ -233,7 +233,7 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
   if (!startNode)
     return Position();
 
-  NodeImpl* block = startNode->enclosingBlockFlowElement();
+  NodeImpl* block = startNode->enclosingBlockFlowOrTableElement();
   Position lastVisible;
 
   PositionIterator it(start);
@@ -241,7 +241,7 @@ Position Position::upstream(EStayInBlock stayInBlock) const {
     NodeImpl* currentNode = it.current().node();
 
     if (stayInBlock) {
-      NodeImpl* currentBlock = currentNode->enclosingBlockFlowElement();
+      NodeImpl* currentBlock = currentNode->enclosingBlockFlowOrTableElement();
       if (block != currentBlock)
         return it.next();
     }
@@ -293,7 +293,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
   if (!startNode)
     return Position();
 
-  NodeImpl* block = startNode->enclosingBlockFlowElement();
+  NodeImpl* block = startNode->enclosingBlockFlowOrTableElement();
   Position lastVisible;
 
   PositionIterator it(start);
@@ -301,7 +301,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
     NodeImpl* currentNode = it.current().node();
 
     if (stayInBlock) {
-      NodeImpl* currentBlock = currentNode->enclosingBlockFlowElement();
+      NodeImpl* currentBlock = currentNode->enclosingBlockFlowOrTableElement();
       if (block != currentBlock)
         return it.previous();
     }
@@ -344,7 +344,7 @@ Position Position::downstream(EStayInBlock stayInBlock) const {
 
     if (renderer->isText() &&
         static_cast<RenderText*>(renderer)->firstTextBox()) {
-      if (currentNode != node())
+      if (currentNode != start.node())
         return Position(currentNode, renderer->caretMinOffset());
 
       if (it.current().offset() < 0)
