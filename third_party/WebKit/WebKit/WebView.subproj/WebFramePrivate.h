@@ -141,7 +141,8 @@ typedef enum {
 
 - (void)_clientRedirectedTo:(NSURL*)URL
                       delay:(NSTimeInterval)seconds
-                   fireDate:(NSDate*)date;
+                   fireDate:(NSDate*)date
+                lockHistory:(BOOL)lockHistory;
 - (void)_clientRedirectCancelled;
 
 - (void)_textSizeMultiplierChanged;

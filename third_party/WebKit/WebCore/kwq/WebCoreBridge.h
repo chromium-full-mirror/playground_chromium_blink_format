@@ -257,7 +257,8 @@ enum FrameBorderStyle {
 
 - (void)reportClientRedirectToURL:(NSString*)URL
                             delay:(NSTimeInterval)seconds
-                         fireDate:(NSDate*)date;
+                         fireDate:(NSDate*)date
+                      lockHistory:(BOOL)lockHistory;
 - (void)reportClientRedirectCancelled;
 
 - (void)unfocusWindow;
