@@ -49,9 +49,9 @@ class KSharedPtr {
 
   // constructors, copy constructors, and destructors ------------------------
 
-  KSharedPtr();
+  KSharedPtr() {}
   KSharedPtr(const KSharedPtr&);
-  ~KSharedPtr();
+  ~KSharedPtr() {}
 
   // member functions --------------------------------------------------------
 
