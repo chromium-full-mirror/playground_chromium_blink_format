@@ -168,7 +168,7 @@ class CSSStyleSelector : public StyleSelector {
                          int& lastRuleIndex);
   void sortMatchedRules(uint firstRuleIndex, uint lastRuleIndex);
   void addMatchedRule(CSSRuleData* rule);
-  void addMatchedDeclaration(DOM::CSSStyleDeclarationImpl* decl);
+  void addMatchedDeclaration(DOM::CSSMutableStyleDeclarationImpl* decl);
   void applyDeclarations(bool firstPass,
                          bool important,
                          int startIndex,
@@ -204,7 +204,7 @@ class CSSStyleSelector : public StyleSelector {
   // and then a second time for all the remaining properties.  We then do the
   // same two passes
   // for any !important rules.
-  QMemArray<DOM::CSSStyleDeclarationImpl*> m_matchedDecls;
+  QMemArray<DOM::CSSMutableStyleDeclarationImpl*> m_matchedDecls;
   unsigned m_matchedDeclCount;
 
   // A buffer used to hold the set of matched rules for an element, and a

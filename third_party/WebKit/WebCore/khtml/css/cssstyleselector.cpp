@@ -329,7 +329,8 @@ void CSSStyleSelector::addMatchedRule(CSSRuleData* rule) {
   m_matchedRules[m_matchedRuleCount++] = rule;
 }
 
-void CSSStyleSelector::addMatchedDeclaration(CSSStyleDeclarationImpl* decl) {
+void CSSStyleSelector::addMatchedDeclaration(
+    CSSMutableStyleDeclarationImpl* decl) {
   if (m_matchedDecls.size() <= m_matchedDeclCount)
     m_matchedDecls.resize(2 * m_matchedDecls.size() + 1);
   m_matchedDecls[m_matchedDeclCount++] = decl;
@@ -386,7 +387,7 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
     if ((cssTagId == tag || tag == anyLocalName) &&
         checkSelector(d->selector(), element)) {
       // If the rule has no properties to apply, then ignore it.
-      CSSStyleDeclarationImpl* decl = rule->declaration();
+      CSSMutableStyleDeclarationImpl* decl = rule->declaration();
       if (!decl)
         continue;
 
@@ -775,7 +776,7 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e,
     // applied
     // after all attributes, since their mapped style depends on the values of
     // multiple attributes.
-    CSSStyleDeclarationImpl* attributeDecl =
+    CSSMutableStyleDeclarationImpl* attributeDecl =
         htmlElement->additionalAttributeStyleDecl();
     if (attributeDecl) {
       if (firstAuthorRule == -1)
@@ -790,7 +791,7 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e,
 
   // 7. Now check our inline style attribute.
   if (htmlElement) {
-    CSSStyleDeclarationImpl* inlineDecl = htmlElement->inlineStyleDecl();
+    CSSMutableStyleDeclarationImpl* inlineDecl = htmlElement->inlineStyleDecl();
     if (inlineDecl) {
       if (firstAuthorRule == -1)
         firstAuthorRule = m_matchedDeclCount;
@@ -1799,7 +1800,7 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
   if (startIndex == -1)
     return;
   for (int i = startIndex; i <= endIndex; i++) {
-    CSSStyleDeclarationImpl* decl = m_matchedDecls[i];
+    CSSMutableStyleDeclarationImpl* decl = m_matchedDecls[i];
     QPtrList<CSSProperty>* props = decl->values();
     if (props) {
       QPtrListIterator<CSSProperty> propertyIt(*props);

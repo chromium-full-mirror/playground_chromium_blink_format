@@ -73,7 +73,7 @@ class CSSStyleDeclaration {
    * resetting of the properties in the declaration block.
    *
    */
-  DOM::DOMString cssText() const;
+  DOMString cssText() const;
 
   /**
    * see @ref cssText
@@ -86,7 +86,7 @@ class CSSStyleDeclaration {
    * readonly.
    *
    */
-  void setCssText(const DOM::DOMString&);
+  void setCssText(const DOMString&);
 
   /**
    * The number of properties that have been explicitly set in this
@@ -114,7 +114,7 @@ class CSSStyleDeclaration {
    * string if the property has not been set.
    *
    */
-  DOM::DOMString getPropertyValue(const DOM::DOMString& propertyName);
+  DOMString getPropertyValue(const DOMString& propertyName);
 
   /**
    * Used to retrieve the object representation of the value of a
@@ -135,7 +135,7 @@ class CSSStyleDeclaration {
    * null </code> if the property has not been set.
    *
    */
-  CSSValue getPropertyCSSValue(const DOM::DOMString& propertyName);
+  CSSValue getPropertyCSSValue(const DOMString& propertyName);
 
   /**
    * Used to remove a CSS property if it has been explicitly set
@@ -155,7 +155,7 @@ class CSSStyleDeclaration {
    * readonly.
    *
    */
-  DOM::DOMString removeProperty(const DOM::DOMString& propertyName);
+  DOMString removeProperty(const DOMString& propertyName);
 
   /**
    * Used to retrieve the priority of a CSS property (e.g. the
@@ -171,7 +171,7 @@ class CSSStyleDeclaration {
    * exists.
    *
    */
-  DOM::DOMString getPropertyPriority(const DOM::DOMString& propertyName);
+  DOMString getPropertyPriority(const DOMString& propertyName);
 
   /**
    * Used to set a property value and priority within this
@@ -197,9 +197,9 @@ class CSSStyleDeclaration {
    * readonly.
    *
    */
-  void setProperty(const DOM::DOMString& propertyName,
-                   const DOM::DOMString& value,
-                   const DOM::DOMString& priority);
+  void setProperty(const DOMString& propertyName,
+                   const DOMString& value,
+                   const DOMString& priority);
 
   /**
    * Used to retrieve the properties that have been explicitly set
@@ -214,7 +214,7 @@ class CSSStyleDeclaration {
    * empty string if no property exists at this position.
    *
    */
-  DOM::DOMString item(unsigned long index);
+  DOMString item(unsigned long index);
 
   /**
    * @internal
@@ -263,7 +263,7 @@ class CSSValue {
    * A string representation of the current value.
    *
    */
-  DOM::DOMString cssText() const;
+  DOMString cssText() const;
 
   /**
    * see @ref cssText
@@ -276,7 +276,7 @@ class CSSValue {
    * readonly.
    *
    */
-  void setCssText(const DOM::DOMString&);
+  void setCssText(const DOMString&);
 
   /**
    * A code defining the type of the value as defined above.
@@ -496,8 +496,7 @@ class CSSPrimitiveValue : public CSSValue {
    * readonly.
    *
    */
-  void setStringValue(unsigned short stringType,
-                      const DOM::DOMString& stringValue);
+  void setStringValue(unsigned short stringType, const DOMString& stringValue);
 
   /**
    * This method is used to get the string value in a specified
@@ -514,7 +513,7 @@ class CSSPrimitiveValue : public CSSValue {
    * string value.
    *
    */
-  DOM::DOMString getStringValue();
+  DOMString getStringValue();
 
   /**
    * This method is used to get the Counter value. If this CSS value
@@ -688,19 +687,19 @@ class Counter {
    * This attribute is used for the identifier of the counter.
    *
    */
-  DOM::DOMString identifier() const;
+  DOMString identifier() const;
 
   /**
    * This attribute is used for the style of the list.
    *
    */
-  DOM::DOMString listStyle() const;
+  DOMString listStyle() const;
 
   /**
    * This attribute is used for the separator of nested counters.
    *
    */
-  DOM::DOMString separator() const;
+  DOMString separator() const;
 
   /**
    * @internal

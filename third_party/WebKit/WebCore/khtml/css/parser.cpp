@@ -1406,7 +1406,7 @@ yyreduce:
       CSSParser* p = static_cast<CSSParser*>(parser);
       if (yyvsp[-4].selector) {
         CSSStyleRuleImpl* rule = new CSSStyleRuleImpl(p->styleElement);
-        CSSStyleDeclarationImpl* decl = p->createStyleDeclaration(rule);
+        CSSMutableStyleDeclarationImpl* decl = p->createStyleDeclaration(rule);
         rule->setSelector(yyvsp[-4].selector);
         rule->setDeclaration(decl);
         yyval.rule = rule;

@@ -2,8 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- *
- * $Id$
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -190,9 +189,9 @@ CSSRuleImpl* CSSParser::parseRule(DOM::CSSStyleSheetImpl* sheet,
   return result;
 }
 
-bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
+bool CSSParser::parseValue(CSSMutableStyleDeclarationImpl* declaration,
                            int _id,
-                           const DOM::DOMString& string,
+                           const DOMString& string,
                            bool _important) {
 #ifdef CSS_DEBUG
   kdDebug(6080) << "CSSParser::parseValue: id=" << _id
@@ -230,8 +229,8 @@ bool CSSParser::parseValue(DOM::CSSStyleDeclarationImpl* declaration,
 
 QRgb CSSParser::parseColor(const DOM::DOMString& string) {
   QRgb color = 0;
-  DOM::CSSStyleDeclarationImpl* dummyStyleDeclaration =
-      new DOM::CSSStyleDeclarationImpl(0);
+  CSSMutableStyleDeclarationImpl* dummyStyleDeclaration =
+      new CSSMutableStyleDeclarationImpl;
 
   dummyStyleDeclaration->ref();
 
@@ -256,8 +255,8 @@ QRgb CSSParser::parseColor(const DOM::DOMString& string) {
   return color;
 }
 
-bool CSSParser::parseColor(DOM::CSSStyleDeclarationImpl* declaration,
-                           const DOM::DOMString& string) {
+bool CSSParser::parseColor(CSSMutableStyleDeclarationImpl* declaration,
+                           const DOMString& string) {
   styleElement = declaration->stylesheet();
 
   setupParser("@-khtml-decls{color:", string, "} ");
@@ -278,8 +277,8 @@ bool CSSParser::parseColor(DOM::CSSStyleDeclarationImpl* declaration,
   return ok;
 }
 
-bool CSSParser::parseDeclaration(DOM::CSSStyleDeclarationImpl* declaration,
-                                 const DOM::DOMString& string) {
+bool CSSParser::parseDeclaration(CSSMutableStyleDeclarationImpl* declaration,
+                                 const DOMString& string) {
 #ifdef CSS_DEBUG
   kdDebug(6080) << "CSSParser::parseDeclaration:value='" << string.string()
                 << "'" << endl;
@@ -324,7 +323,7 @@ void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
   parsedProperties[numParsedProperties++] = prop;
 }
 
-CSSStyleDeclarationImpl* CSSParser::createStyleDeclaration(
+CSSMutableStyleDeclarationImpl* CSSParser::createStyleDeclaration(
     CSSStyleRuleImpl* rule) {
   QPtrList<CSSProperty>* propList = new QPtrList<CSSProperty>;
   propList->setAutoDelete(true);
@@ -332,7 +331,7 @@ CSSStyleDeclarationImpl* CSSParser::createStyleDeclaration(
     propList->append(parsedProperties[i]);
 
   numParsedProperties = 0;
-  return new CSSStyleDeclarationImpl(rule, propList);
+  return new CSSMutableStyleDeclarationImpl(rule, propList);
 }
 
 void CSSParser::clearProperties() {

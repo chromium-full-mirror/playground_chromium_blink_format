@@ -66,10 +66,19 @@ DOMString CSSStyleDeclaration::cssText() const {
   return static_cast<CSSStyleDeclarationImpl*>(impl)->cssText();
 }
 
+static void throwException(int exceptioncode) {
+  if (exceptioncode >= CSSException::_EXCEPTION_OFFSET)
+    throw CSSException(exceptioncode - CSSException::_EXCEPTION_OFFSET);
+  if (exceptioncode)
+    throw DOMException(exceptioncode);
+}
+
 void CSSStyleDeclaration::setCssText(const DOMString& value) {
   if (!impl)
     return;
+  int exceptionCode = 0;
   impl->setCssText(value);
+  throwException(exceptionCode);
 }
 
 DOMString CSSStyleDeclaration::getPropertyValue(const DOMString& propertyName) {
@@ -333,10 +342,7 @@ void CSSPrimitiveValue::setFloatValue(unsigned short unitType,
   int exceptioncode = 0;
   ((CSSPrimitiveValueImpl*)impl)
       ->setFloatValue(unitType, floatValue, exceptioncode);
-  if (exceptioncode >= CSSException::_EXCEPTION_OFFSET)
-    throw CSSException(exceptioncode - CSSException::_EXCEPTION_OFFSET);
-  if (exceptioncode)
-    throw DOMException(exceptioncode);
+  throwException(exceptioncode);
 }
 
 float CSSPrimitiveValue::getFloatValue(unsigned short unitType) {
@@ -354,10 +360,7 @@ void CSSPrimitiveValue::setStringValue(unsigned short stringType,
   if (impl)
     ((CSSPrimitiveValueImpl*)impl)
         ->setStringValue(stringType, stringValue, exceptioncode);
-  if (exceptioncode >= CSSException::_EXCEPTION_OFFSET)
-    throw CSSException(exceptioncode - CSSException::_EXCEPTION_OFFSET);
-  if (exceptioncode)
-    throw DOMException(exceptioncode);
+  throwException(exceptioncode);
 }
 
 DOMString CSSPrimitiveValue::getStringValue() {

@@ -42,6 +42,7 @@ class KJavaAppletContext;
 namespace DOM {
 class CSSComputedStyleDeclarationImpl;
 class CSSStyleDeclarationImpl;
+typedef CSSStyleDeclarationImpl CSSMutableStyleDeclarationImpl;
 class DOMString;
 class Document;
 class DocumentImpl;
@@ -734,7 +735,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Returns the typing style for the document.
    */
-  DOM::CSSStyleDeclarationImpl* typingStyle() const;
+  DOM::CSSMutableStyleDeclarationImpl* typingStyle() const;
 
   /**
    * Sets the typing style for the document.
@@ -1380,7 +1381,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void handleMousePressEventTripleClick(khtml::MousePressEvent* event);
 #endif
 
-  DOM::CSSStyleDeclarationImpl* selectionComputedStyle(
+  DOM::CSSComputedStyleDeclarationImpl* selectionComputedStyle(
       DOM::NodeImpl*& nodeToRemove) const;
 
   KHTMLPartPrivate* d;

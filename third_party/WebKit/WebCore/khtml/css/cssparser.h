@@ -2,8 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- *
- * $Id$
+ * Copyright (C) 2004 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -38,7 +37,7 @@ class NodeImpl;
 class CSSValueImpl;
 class CSSValueListImpl;
 class CSSPrimitiveValueImpl;
-class CSSStyleDeclarationImpl;
+typedef class CSSStyleDeclarationImpl CSSMutableStyleDeclarationImpl;
 class CSSProperty;
 class CSSRuleListImpl;
 
@@ -109,14 +108,14 @@ class CSSParser {
   void parseSheet(DOM::CSSStyleSheetImpl* sheet, const DOM::DOMString& string);
   DOM::CSSRuleImpl* parseRule(DOM::CSSStyleSheetImpl* sheet,
                               const DOM::DOMString& string);
-  bool parseValue(DOM::CSSStyleDeclarationImpl* decls,
+  bool parseValue(DOM::CSSMutableStyleDeclarationImpl* decls,
                   int id,
                   const DOM::DOMString& string,
                   bool _important);
   static QRgb CSSParser::parseColor(const DOM::DOMString& string);
-  bool parseColor(DOM::CSSStyleDeclarationImpl* declaration,
+  bool parseColor(DOM::CSSMutableStyleDeclarationImpl* declaration,
                   const DOM::DOMString& string);
-  bool parseDeclaration(DOM::CSSStyleDeclarationImpl* decls,
+  bool parseDeclaration(DOM::CSSMutableStyleDeclarationImpl* decls,
                         const DOM::DOMString& string);
 
   static CSSParser* current() { return currentParser; }
@@ -125,7 +124,8 @@ class CSSParser {
 
   void addProperty(int propId, CSSValueImpl* value, bool important);
   bool hasProperties() const { return numParsedProperties > 0; }
-  CSSStyleDeclarationImpl* createStyleDeclaration(CSSStyleRuleImpl* rule);
+  CSSMutableStyleDeclarationImpl* createStyleDeclaration(
+      CSSStyleRuleImpl* rule);
   void clearProperties();
 
   bool parseValue(int propId, bool important);

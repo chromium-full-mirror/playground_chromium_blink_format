@@ -42,6 +42,7 @@ class CSSRule;
 class CSSStyleSheet;
 class CSSStyleSheetImpl;
 class CSSStyleDeclarationImpl;
+typedef CSSStyleDeclarationImpl CSSMutableStyleDeclarationImpl;
 class MediaListImpl;
 
 class CSSRuleImpl : public StyleBaseImpl {
@@ -84,12 +85,12 @@ class CSSFontFaceRuleImpl : public CSSRuleImpl {
 
   virtual ~CSSFontFaceRuleImpl();
 
-  CSSStyleDeclarationImpl* style() const { return m_style; }
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
   virtual bool isFontFaceRule() { return true; }
 
  protected:
-  CSSStyleDeclarationImpl* m_style;
+  CSSMutableStyleDeclarationImpl* m_style;
 };
 
 class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
@@ -177,7 +178,7 @@ class CSSPageRuleImpl : public CSSRuleImpl {
 
   virtual ~CSSPageRuleImpl();
 
-  CSSStyleDeclarationImpl* style() const { return m_style; }
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
   virtual bool isPageRule() { return true; }
 
@@ -185,7 +186,7 @@ class CSSPageRuleImpl : public CSSRuleImpl {
   void setSelectorText(DOM::DOMString str);
 
  protected:
-  CSSStyleDeclarationImpl* m_style;
+  CSSMutableStyleDeclarationImpl* m_style;
 };
 
 class CSSImportantRuleImpl;
@@ -196,7 +197,7 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
 
   virtual ~CSSStyleRuleImpl();
 
-  CSSStyleDeclarationImpl* style() const { return m_style; }
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
   virtual bool isStyleRule() { return true; }
 
@@ -206,13 +207,13 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
   virtual bool parseString(const DOMString& string, bool = false);
 
   void setSelector(CSSSelector* selector) { m_selector = selector; }
-  void setDeclaration(CSSStyleDeclarationImpl* style);
+  void setDeclaration(CSSMutableStyleDeclarationImpl* style);
 
   CSSSelector* selector() { return m_selector; }
-  CSSStyleDeclarationImpl* declaration() { return m_style; }
+  CSSMutableStyleDeclarationImpl* declaration() { return m_style; }
 
  protected:
-  CSSStyleDeclarationImpl* m_style;
+  CSSMutableStyleDeclarationImpl* m_style;
   CSSSelector* m_selector;
 };
 

@@ -5009,7 +5009,7 @@ void KHTMLPart::reappliedEditing(EditCommandPtr& cmd) {
   d->m_lastEditCommand = EditCommandPtr::emptyCommand();
 }
 
-CSSStyleDeclarationImpl* KHTMLPart::typingStyle() const {
+CSSMutableStyleDeclarationImpl* KHTMLPart::typingStyle() const {
   return d->m_typingStyle;
 }
 
@@ -5017,7 +5017,7 @@ void KHTMLPart::setTypingStyle(CSSStyleDeclarationImpl* style) {
   if (d->m_typingStyle == style)
     return;
 
-  CSSStyleDeclarationImpl* old = d->m_typingStyle;
+  CSSMutableStyleDeclarationImpl* old = d->m_typingStyle;
   d->m_typingStyle = style;
   if (d->m_typingStyle)
     d->m_typingStyle->ref();
@@ -5308,8 +5308,8 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style) {
   }
 }
 
-static void updateState(CSSStyleDeclarationImpl* desiredStyle,
-                        CSSStyleDeclarationImpl* computedStyle,
+static void updateState(CSSMutableStyleDeclarationImpl* desiredStyle,
+                        CSSComputedStyleDeclarationImpl* computedStyle,
                         bool& atStart,
                         KHTMLPart::TriState& state) {
   for (QPtrListIterator<CSSProperty> it(*desiredStyle->values()); it.current();
@@ -5336,14 +5336,17 @@ KHTMLPart::TriState KHTMLPart::selectionHasStyle(
   bool atStart = true;
   TriState state = falseTriState;
 
+  CSSMutableStyleDeclarationImpl* mutableStyle = style;
+  CSSStyleDeclaration protectQueryStyle(mutableStyle);
+
   if (!d->m_selection.isRange()) {
     NodeImpl* nodeToRemove;
-    CSSStyleDeclarationImpl* selectionStyle =
+    CSSComputedStyleDeclarationImpl* selectionStyle =
         selectionComputedStyle(nodeToRemove);
     if (!selectionStyle)
       return falseTriState;
     selectionStyle->ref();
-    updateState(style, selectionStyle, atStart, state);
+    updateState(mutableStyle, selectionStyle, atStart, state);
     selectionStyle->deref();
     if (nodeToRemove) {
       int exceptionCode = 0;
@@ -5353,11 +5356,11 @@ KHTMLPart::TriState KHTMLPart::selectionHasStyle(
   } else {
     for (NodeImpl* node = d->m_selection.start().node(); node;
          node = node->traverseNextNode()) {
-      CSSStyleDeclarationImpl* computedStyle =
+      CSSComputedStyleDeclarationImpl* computedStyle =
           new CSSComputedStyleDeclarationImpl(node);
       if (computedStyle) {
         computedStyle->ref();
-        updateState(style, computedStyle, atStart, state);
+        updateState(mutableStyle, computedStyle, atStart, state);
         computedStyle->deref();
       }
       if (state == mixedTriState)
@@ -5377,10 +5380,14 @@ bool KHTMLPart::selectionStartHasStyle(CSSStyleDeclarationImpl* style) const {
   if (!selectionStyle)
     return false;
 
-  selectionStyle->ref();
+  CSSMutableStyleDeclarationImpl* mutableStyle = style;
+
+  CSSStyleDeclaration protectSelectionStyle(selectionStyle);
+  CSSStyleDeclaration protectQueryStyle(mutableStyle);
 
   bool match = true;
-  for (QPtrListIterator<CSSProperty> it(*style->values()); it.current(); ++it) {
+  for (QPtrListIterator<CSSProperty> it(*mutableStyle->values()); it.current();
+       ++it) {
     int propertyID = it.current()->id();
     DOMString desiredProperty = style->getPropertyValue(propertyID);
     DOMString selectionProperty = selectionStyle->getPropertyValue(propertyID);
@@ -5389,8 +5396,6 @@ bool KHTMLPart::selectionStartHasStyle(CSSStyleDeclarationImpl* style) const {
       break;
     }
   }
-
-  selectionStyle->deref();
 
   if (nodeToRemove) {
     int exceptionCode = 0;
@@ -5422,7 +5427,7 @@ DOMString KHTMLPart::selectionStartStylePropertyValue(
   return value;
 }
 
-CSSStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
+CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
     NodeImpl*& nodeToRemove) const {
   nodeToRemove = 0;
 
