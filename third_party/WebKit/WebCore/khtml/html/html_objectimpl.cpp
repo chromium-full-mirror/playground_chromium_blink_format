@@ -178,7 +178,7 @@ bool HTMLAppletElementImpl::callMember(const QString& name,
 #if APPLE_CHANGES
 KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   KHTMLPart* part = getDocument()->part();
-  if (!part->javaEnabled())
+  if (!part || !part->javaEnabled())
     return 0;
 
   if (appletInstance)
@@ -191,8 +191,7 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
       // Call into the part (and over the bridge) to pull the Bindings::Instance
       // from the guts of the Java VM.
       void* _view = r->widget()->getView();
-      appletInstance =
-          part ? KWQ(part)->getAppletInstanceForView((NSView*)_view) : 0;
+      appletInstance = KWQ(part)->getAppletInstanceForView((NSView*)_view);
     }
   }
   return appletInstance;
