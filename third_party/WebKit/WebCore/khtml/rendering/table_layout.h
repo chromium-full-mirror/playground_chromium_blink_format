@@ -93,11 +93,11 @@ class AutoTableLayout : public TableLayout {
           calcWidth(0) {}
     Length width;
     Length effWidth;
-    short minWidth;
-    short maxWidth;
-    short effMinWidth;
-    short effMaxWidth;
-    short calcWidth;
+    int minWidth;
+    int maxWidth;
+    int effMinWidth;
+    int effMaxWidth;
+    int calcWidth;
   };
 
   QMemArray<Layout> layoutStruct;
