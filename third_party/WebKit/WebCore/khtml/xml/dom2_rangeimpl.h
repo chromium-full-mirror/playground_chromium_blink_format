@@ -72,6 +72,8 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   void insertNode(NodeImpl* newNode, int& exceptioncode);
   DOMString toString(int& exceptioncode);
   DOMString toHTML();
+  DOMString toHTMLWithOptions(bool completeURLs = false,
+                              QStringList* subresourceURLs = NULL);
 
   DocumentFragmentImpl* createContextualFragment(DOMString& html,
                                                  int& exceptioncode);

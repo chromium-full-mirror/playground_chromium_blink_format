@@ -60,6 +60,8 @@ class HTMLImageElementImpl : public HTMLElementImpl {
 
   DOMString imageMap() const { return usemap; }
 
+  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+
  protected:
   DOMString usemap;
   bool ismap;
@@ -89,6 +91,8 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
                      khtml::RenderObject::NodeInfo& info);
 
   virtual QRect getRect() const;
+
+  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
 
  protected:
   QRegion getRegion(int width_, int height) const;

@@ -67,6 +67,6 @@
 - (NSString*)matchLabels:(NSArray*)labels
           againstElement:(id<WebDOMElement>)element;
 
-- (NSString*)reconstructedSource;
+- (NSString*)HTMLString;
 
 @end

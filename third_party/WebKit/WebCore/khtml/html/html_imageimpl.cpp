@@ -284,6 +284,12 @@ QImage HTMLImageElementImpl::currentImage() const {
   return QImage();
 }
 
+bool HTMLImageElementImpl::isSubresourceURLAttribute(
+    AttributeImpl* attr) const {
+  return (attr->id() == ATTR_SRC ||
+          (attr->id() == ATTR_USEMAP && attr->value().domString()[0] != '#'));
+}
+
 // -------------------------------------------------------------------------
 
 HTMLMapElementImpl::HTMLMapElementImpl(DocumentPtr* doc)
@@ -476,4 +482,8 @@ QRegion HTMLAreaElementImpl::getRegion(int width_, int height_) const {
   // return null region
 
   return region;
+}
+
+bool HTMLAreaElementImpl::isSubresourceURLAttribute(AttributeImpl* attr) const {
+  return attr->id() == ATTR_HREF;
 }

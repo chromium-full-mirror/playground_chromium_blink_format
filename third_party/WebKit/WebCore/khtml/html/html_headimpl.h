@@ -94,6 +94,8 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   int disabledState() { return m_disabledState; }
   void setDisabledState(bool _disabled);
 
+  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
+
  protected:
   khtml::CachedCSSStyleSheet* m_cachedSheet;
   CSSStyleSheetImpl* m_sheet;
@@ -135,6 +137,8 @@ class HTMLScriptElementImpl : public HTMLElementImpl {
   ~HTMLScriptElementImpl();
 
   virtual Id id() const;
+
+  virtual bool isSubresourceURLAttribute(AttributeImpl* attr) const;
 };
 
 // -------------------------------------------------------------------------

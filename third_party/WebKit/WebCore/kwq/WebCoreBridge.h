@@ -230,11 +230,13 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (void)pasteImageWithURL:(NSURL*)URL;
 
 - (void)deleteSelection;
-
 - (BOOL)haveSelection;
-- (NSString*)selectedHTML;
-- (NSString*)selectedString;
+
 - (NSAttributedString*)selectedAttributedString;
+- (NSString*)selectedHTMLString:(NSArray**)subresourceURLStrings;
+- (NSString*)selectedString;
+
+- (NSString*)HTMLString:(NSArray**)subresourceURLStrings;
 
 - (void)selectAll;
 - (void)deselectAll;
@@ -273,8 +275,6 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 + (void)updateAllViews;
 
 - (id)accessibilityTree;
-
-- (NSString*)reconstructedSource;
 
 - (void)undoEditing:(id)arg;
 - (void)redoEditing:(id)arg;

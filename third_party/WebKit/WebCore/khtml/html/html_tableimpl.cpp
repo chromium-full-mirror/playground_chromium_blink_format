@@ -571,6 +571,11 @@ void HTMLTableElementImpl::attach() {
     static_cast<RenderTable*>(m_render)->setCellPadding(padding);
 }
 
+bool HTMLTableElementImpl::isSubresourceURLAttribute(
+    AttributeImpl* attr) const {
+  return attr->id() == ATTR_BACKGROUND;
+}
+
 // --------------------------------------------------------------------------
 
 bool HTMLTablePartElementImpl::mapToEntry(AttributeImpl* attr,
@@ -932,6 +937,11 @@ void HTMLTableCellElementImpl::attach() {
     p = static_cast<HTMLElementImpl*>(p->parentNode());
 
   HTMLTablePartElementImpl::attach();
+}
+
+bool HTMLTableCellElementImpl::isSubresourceURLAttribute(
+    AttributeImpl* attr) const {
+  return attr->id() == ATTR_BACKGROUND;
 }
 
 // -------------------------------------------------------------------------
