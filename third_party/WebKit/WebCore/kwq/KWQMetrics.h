@@ -74,7 +74,8 @@ CG_EXTERN int CGFontGetGlyphScaledAdvances(CGFontRef font,
 CG_EXTERN size_t CGFontGetNumberOfGlyphs(CGFontRef font);
 }
 
-typedef unsigned short _IFGlyphWidth;
+// typedef unsigned short _IFGlyphWidth;
+typedef float _IFGlyphWidth;
 
 #endif
 
