@@ -200,6 +200,8 @@ static UString formatLocaleTime(time_t tv) {
 
 using namespace KJS;
 
+const time_t invalidDate = -1;
+
 // ------------------------------ DateInstanceImp ------------------------------
 
 const ClassInfo DateInstanceImp::info = {"Date", 0, 0, 0};
@@ -360,6 +362,34 @@ Value DateProtoFuncImp::call(ExecState* exec,
 #endif
   Value v = thisObj.internalValue();
   double milli = v.toNumber(exec);
+
+  if (isNaN(milli)) {
+    switch (id) {
+      case ToString:
+      case ToDateString:
+      case ToTimeString:
+      case ToGMTString:
+      case ToUTCString:
+      case ToLocaleString:
+      case ToLocaleDateString:
+      case ToLocaleTimeString:
+        return String("Invalid Date");
+      case ValueOf:
+      case GetTime:
+      case GetYear:
+      case GetFullYear:
+      case GetMonth:
+      case GetDate:
+      case GetDay:
+      case GetHours:
+      case GetMinutes:
+      case GetSeconds:
+      case GetMilliSeconds:
+      case GetTimezoneOffset:
+        return Number(NaN);
+    }
+  }
+
   time_t tv = (time_t)(milli / 1000.0);
   int ms = int(milli - tv * 1000.0);
 
@@ -382,9 +412,6 @@ Value DateProtoFuncImp::call(ExecState* exec,
       break;
     case ToGMTString:
     case ToUTCString:
-      // FIXME: In other browsers, toUTCString seems to do toLocaleTimeString,
-      // instead of what hte specification says. Do we need to do that to be
-      // bug-compatible? Just in quirks mode?
       result = String(formatDate(*t, true) + " " + formatTime(*t));
       break;
     case ToLocaleString:
@@ -651,7 +678,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
     if (args[0].type() == StringType)
       return parseDate(args[0].toString(exec));
     else
-      return Undefined();
+      return Number(NaN);
   } else {  // UTC
     struct tm t;
     memset(&t, 0, sizeof(t));
@@ -683,8 +710,8 @@ Value KJS::parseDate(const String& s) {
 #ifdef KJS_VERBOSE
     fprintf(stderr, "KRFCDate_parseDate returned seconds=%d\n", seconds);
 #endif
-    if (seconds == -1)
-      return Undefined();
+    if (seconds == invalidDate)
+      return Number(NaN);
     else
       return Number(seconds * 1000.0);
   } else {
@@ -697,7 +724,7 @@ Value KJS::parseDate(const String& s) {
       fprintf(stderr,
               "KJS::parseDate parsing for this format isn't implemented\n%s",
               u.ascii());
-      return Number(0);
+      return Number(NaN);
     }
     int day = u.substr(firstSlash + 1, secondSlash - firstSlash - 1).toULong();
     int year = u.substr(secondSlash + 1).toULong();
@@ -712,7 +739,7 @@ Value KJS::parseDate(const String& s) {
     time_t seconds = mktime(&t);
     if (seconds == -1) {
       fprintf(stderr, "KJS::parseDate mktime returned -1.\n%s", u.ascii());
-      return Undefined();
+      return Number(NaN);
     } else
       return Number(seconds * 1000.0);
   }
@@ -762,7 +789,6 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
   //
   // We ignore the weekday
   //
-  time_t result = 0;
   int offset = 0;
   char* newPosStr;
   const char* dateString = _date.ascii();
@@ -802,16 +828,16 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
     dateString++;
 
   if (!*dateString)
-    return result;  // Invalid date
+    return invalidDate;  // Invalid date
 
   // ' 09-Nov-99 23:12:40 GMT'
   day = strtol(dateString, &newPosStr, 10);
   dateString = newPosStr;
 
   if ((day < 1) || (day > 31))
-    return result;  // Invalid date;
+    return invalidDate;  // Invalid date;
   if (!*dateString)
-    return result;  // Invalid date
+    return invalidDate;  // Invalid date
 
   if (*dateString == '-')
     dateString++;
@@ -823,7 +849,7 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
   {
     for (int i = 0; i < 3; i++) {
       if (!*dateString || (*dateString == '-') || isspace(*dateString))
-        return result;  // Invalid date
+        return invalidDate;  // Invalid date
       monthStr[i] = tolower(*dateString++);
     }
     monthStr[3] = '\0';
@@ -831,27 +857,27 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
     newPosStr = (char*)strstr(haystack, monthStr);
 
     if (!newPosStr)
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     month = (newPosStr - haystack) / 3;  // Jan=00, Feb=01, Mar=02, ..
 
     if ((month < 0) || (month > 11))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     while (*dateString && (*dateString != '-') && !isspace(*dateString))
       dateString++;
 
     if (!*dateString)
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     // '-99 23:12:40 GMT'
     if ((*dateString != '-') && !isspace(*dateString))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
     dateString++;
   }
 
   if ((month < 0) || (month > 11))
-    return result;  // Invalid date
+    return invalidDate;  // Invalid date
 
   // '99 23:12:40 GMT'
   year = strtol(dateString, &newPosStr, 10);
@@ -865,39 +891,39 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
     year += 1900;  // Y2K
 
   if ((year < 1900) || (year > 2500))
-    return result;  // Invalid date
+    return invalidDate;  // Invalid date
 
   // Don't fail if the time is missing.
   if (*dateString) {
     // ' 23:12:40 GMT'
     if (!isspace(*dateString++))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     hour = strtol(dateString, &newPosStr, 10);
     dateString = newPosStr;
 
     if ((hour < 0) || (hour > 23))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     if (!*dateString)
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     // ':12:40 GMT'
     if (*dateString++ != ':')
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     minute = strtol(dateString, &newPosStr, 10);
     dateString = newPosStr;
 
     if ((minute < 0) || (minute > 59))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     if (!*dateString)
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     // ':40 GMT'
     if (*dateString != ':' && !isspace(*dateString))
-      return result;  // Invalid date
+      return invalidDate;  // Invalid date
 
     // seconds are optional in rfc822 + rfc2822
     if (*dateString == ':') {
@@ -907,7 +933,7 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
       dateString = newPosStr;
 
       if ((second < 0) || (second > 59))
-        return result;  // Invalid date
+        return invalidDate;  // Invalid date
     } else {
       dateString++;
     }
@@ -918,12 +944,17 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
 
   // don't fail if the time zone is missing, some
   // broken mail-/news-clients omit the time zone
-  if (*dateString) {
+  bool localTime;
+  if (*dateString == 0) {
+    // Other web browsers interpret missing time zone as "current time zone".
+    localTime = true;
+  } else {
+    localTime = false;
     if ((*dateString == '+') || (*dateString == '-')) {
       offset = strtol(dateString, &newPosStr, 10);
 
       if ((offset < -9959) || (offset > 9959))
-        return result;  // Invalid date
+        return invalidDate;  // Invalid date
 
       int sgn = (offset < 0) ? -1 : 1;
       offset = abs(offset);
@@ -960,19 +991,27 @@ time_t KJS::KRFCDate_parseDate(const UString& _date) {
     }
   }
 
-  result = ymdhms_to_seconds(year, month + 1, day, hour, minute, second);
+  time_t result;
 
-  // avoid negative time values
-  if ((offset > 0) && (offset > result))
-    offset = 0;
+  if (localTime) {
+    struct tm tm;
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month;
+    tm.tm_mday = day;
+    tm.tm_hour = hour;
+    tm.tm_min = minute;
+    tm.tm_sec = second;
+    tm.tm_isdst = -1;
+    result = mktime(&tm);
+  } else {
+    result = ymdhms_to_seconds(year, month + 1, day, hour, minute, second);
 
-  result -= offset * 60;
+    // avoid negative time values
+    if ((offset > 0) && (offset > result))
+      offset = 0;
 
-  // If epoch 0 return epoch +1 which is Thu, 01-Jan-70 00:00:01 GMT
-  // This is so that parse error and valid epoch 0 return values won't
-  // be the same for sensitive applications...
-  if (result < 1)
-    result = 1;
+    result -= offset * 60;
+  }
 
   return result;
 }
