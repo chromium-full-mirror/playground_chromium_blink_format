@@ -288,7 +288,7 @@ class RenderTableRow : public RenderContainer {
   virtual void position(int, int, int, int, int, bool, bool, int) {}
 
   virtual void layout();
-  virtual void repaint(bool immediate = false);
+  virtual QRect getAbsoluteRepaintRect();
 
   RenderTable* table() const {
     return static_cast<RenderTable*>(parent()->parent());
@@ -358,12 +358,7 @@ class RenderTableCell : public RenderBlock {
   // lie position to outside observers
   virtual int yPos() const { return m_y + _topExtra; }
 
-  virtual void repaintRectangle(int x,
-                                int y,
-                                int w,
-                                int h,
-                                bool immediate = false,
-                                bool f = false);
+  virtual void computeAbsoluteRepaintRect(QRect& r, bool f = false);
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
 
   virtual short baselinePosition(bool = false) const;

@@ -377,7 +377,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
   //     DataRef<StyleInheritedData> inherited;
 
   if (*box.get() != *other->box.get() ||
-      *surround.get() != *other->surround.get() ||
+      !(surround->margin == other->surround->margin) ||
+      !(surround->padding == other->surround->padding) ||
       *css3NonInheritedData->flexibleBox.get() !=
           *other->css3NonInheritedData->flexibleBox.get() ||
       !(inherited->indent == other->inherited->indent) ||
@@ -460,6 +461,29 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         other->noninherited_flags._vertical_align))
     return Layout;
 
+  // If our border widths change, then we need to layout.  Other changes to
+  // borders
+  // only necessitate a repaint.
+  if (borderLeftWidth() != other->borderLeftWidth() ||
+      borderTopWidth() != other->borderTopWidth() ||
+      borderBottomWidth() != other->borderBottomWidth() ||
+      borderRightWidth() != other->borderRightWidth())
+    return Layout;
+
+  // Make sure these left/top/right/bottom checks stay below all layout checks
+  // and above
+  // all visible checks.
+  if (other->position() != STATIC &&
+      !(surround->offset == other->surround->offset)) {
+    // FIXME: would like to do this at some point, but will need a new hint that
+    // indicates
+    // descendants need to be repainted too.
+    //   if (other->position() == RELATIVE)
+    //       return Visible;
+    //   else
+    return Layout;
+  }
+
   // Visible:
   // 	EVisibility _visibility : 2;
   //     EOverflow _overflow : 4 ;
@@ -476,6 +500,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
         other->noninherited_flags._bg_attachment) ||
       !(inherited_flags._text_decorations ==
         other->inherited_flags._text_decorations) ||
+      !(surround->border == other->surround->border) ||
       *background.get() != *other->background.get() ||
       !(visual->clip == other->visual->clip) ||
       visual->hasClip != other->visual->hasClip ||

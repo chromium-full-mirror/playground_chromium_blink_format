@@ -159,13 +159,10 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
   pix = p;
 
   if (needlayout) {
-    setNeedsLayout(true);
-    setMinMaxKnown(false);
-
-    //         kdDebug( 6040 ) << "m_width: : " << m_width << " height: " <<
-    //         m_height << endl;
-    //         kdDebug( 6040 ) << "Image: size " << m_width << "/" << m_height
-    //         << endl;
+    if (!selfNeedsLayout())
+      setNeedsLayout(true);
+    if (minMaxKnown())
+      setMinMaxKnown(false);
   } else {
     bool completeRepaint = !resizeCache.isNull();
     int cHeight = contentHeight();
@@ -182,12 +179,13 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
 
     resizeCache = QPixmap();  // for resized animations
     if (completeRepaint)
-      repaintRectangle(borderLeft() + paddingLeft(), borderTop() + paddingTop(),
-                       contentWidth(), contentHeight());
+      repaintRectangle(QRect(borderLeft() + paddingLeft(),
+                             borderTop() + paddingTop(), contentWidth(),
+                             contentHeight()));
     else {
-      repaintRectangle(r.x() + borderLeft() + paddingLeft(),
-                       r.y() + borderTop() + paddingTop(), r.width(),
-                       r.height());
+      repaintRectangle(QRect(r.x() + borderLeft() + paddingLeft(),
+                             r.y() + borderTop() + paddingTop(), r.width(),
+                             r.height()));
     }
   }
 }
@@ -379,6 +377,10 @@ void RenderImage::layout() {
   KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
+#ifdef INCREMENTAL_PAINTING
+  QRect oldBounds(getAbsoluteRepaintRect());
+#endif
+
   short oldwidth = m_width;
   int oldheight = m_height;
 
@@ -410,6 +412,10 @@ void RenderImage::layout() {
 
   if (m_width != oldwidth || m_height != oldheight)
     resizeCache = QPixmap();
+
+#ifdef INCREMENTAL_PAINTING
+  repaintAfterLayoutIfNeeded(oldBounds, oldBounds);
+#endif
 
   setNeedsLayout(false);
 }

@@ -101,6 +101,12 @@ class RenderBlock : public RenderFlow {
                               RenderObject* beforeChild);
   virtual void removeChild(RenderObject* oldChild);
 
+#ifdef INCREMENTAL_REPAINTING
+  virtual void repaintPositionedAndFloatingDescendants();
+  virtual void getAbsoluteRepaintRectIncludingDescendants(QRect& bounds,
+                                                          QRect& fullBounds);
+#endif
+
   virtual void setStyle(RenderStyle* _style);
 
   virtual void layout();
@@ -208,8 +214,6 @@ class RenderBlock : public RenderFlow {
   virtual void calcMinMaxWidth();
   void calcInlineMinMaxWidth();
   void calcBlockMinMaxWidth();
-
-  virtual void close();
 
   virtual int getBaselineOfFirstLineBox();
   virtual InlineFlowBox* getFirstLineBox();

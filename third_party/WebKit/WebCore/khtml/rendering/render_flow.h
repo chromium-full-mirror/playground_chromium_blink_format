@@ -87,7 +87,7 @@ class RenderFlow : public RenderBox {
                                int _ty,
                                PaintAction paintAction);
 
-  virtual void repaint(bool immediate = false);
+  virtual QRect getAbsoluteRepaintRect();
 
   virtual int lowestPosition(bool includeOverflowInterior = true) const;
   virtual int rightmostPosition(bool includeOverflowInterior = true) const;

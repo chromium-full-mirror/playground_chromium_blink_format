@@ -516,7 +516,7 @@ void RenderListMarker::setPixmap(const QPixmap& p,
       m_height != m_listImage->pixmap_size().height())
     setNeedsLayoutAndMinMaxRecalc();
   else
-    repaintRectangle(0, 0, m_width, m_height);
+    repaint();
 }
 
 void RenderListMarker::calcMinMaxWidth() {

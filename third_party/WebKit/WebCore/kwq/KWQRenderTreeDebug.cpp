@@ -153,6 +153,7 @@ static void write(QTextStream& ts, const RenderObject& o, int indent = 0) {
     if (view) {
       RenderObject* root = KWQ(view->part())->renderer();
       if (root) {
+        root->layoutIfNeeded();
         RenderLayer* l = root->layer();
         if (l)
           writeLayers(ts, l, l,
@@ -225,11 +226,12 @@ static void writeLayers(QTextStream& ts,
   }
 }
 
-QString externalRepresentation(const RenderObject* o) {
+QString externalRepresentation(RenderObject* o) {
   QString s;
   {
     QTextStream ts(&s);
     if (o) {
+      o->layoutIfNeeded();
       RenderLayer* l = o->layer();
       if (l)
         writeLayers(ts, l, l,

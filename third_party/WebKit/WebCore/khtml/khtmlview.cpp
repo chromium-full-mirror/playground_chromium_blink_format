@@ -95,8 +95,7 @@ class KHTMLViewPrivate {
     paintBuffer = 0;
     formCompletions = 0;
     prevScrollbarVisible = true;
-    timerId = 0;
-    repaintTimerId = 0;
+    layoutTimerId = 0;
     complete = false;
     mousePressed = false;
     tooltip = 0;
@@ -138,13 +137,10 @@ class KHTMLViewPrivate {
     clickCount = 0;
     isDoubleClick = false;
     scrollingSelf = false;
-    timerId = 0;
-    repaintTimerId = 0;
+    layoutTimerId = 0;
     complete = false;
     mousePressed = false;
-    firstRelayout = true;
     layoutSchedulingEnabled = true;
-    updateRect = QRect();
   }
 
   QPainter* tp;
@@ -173,14 +169,11 @@ class KHTMLViewPrivate {
 
   int prevMouseX, prevMouseY;
   bool scrollingSelf;
-  int timerId;
+  int layoutTimerId;
 
-  int repaintTimerId;
   bool complete;
-  bool firstRelayout;
   bool layoutSchedulingEnabled;
   bool mousePressed;
-  QRect updateRect;
   KHTMLToolTip* tooltip;
 };
 
@@ -212,7 +205,9 @@ KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
       _refCount(1) {
   m_medium = "screen";
 
+#ifndef INCREMENTAL_REPAINTING
   m_layoutObject = 0;
+#endif
 
   m_part = part;
 #if APPLE_CHANGES
@@ -408,11 +403,12 @@ void KHTMLView::adjustViewSize() {
 }
 
 void KHTMLView::layout() {
+  d->layoutSchedulingEnabled = false;
+  khtml::RenderCanvas* root = 0;
   if (m_part->xmlDocImpl()) {
     DOM::DocumentImpl* document = m_part->xmlDocImpl();
 
-    khtml::RenderCanvas* root =
-        static_cast<khtml::RenderCanvas*>(document->renderer());
+    root = static_cast<khtml::RenderCanvas*>(document->renderer());
     if (!root)
       return;
 
@@ -428,17 +424,40 @@ void KHTMLView::layout() {
     _height = visibleHeight();
     _width = visibleWidth();
 
-    // QTime qt;
-    // qt.start();
-    root->setNeedsLayoutAndMinMaxRecalc();
-    // avoid recursing into relayouts because of scrollbar-flicker
-
     root->layout();
 
     // kdDebug( 6000 ) << "TIME: layout() dt=" << qt.elapsed() << endl;
   } else {
     _width = visibleWidth();
   }
+
+  d->layoutSchedulingEnabled = true;
+  killTimer(d->layoutTimerId);
+  d->layoutTimerId = 0;
+
+  if (!root)
+    return;
+
+#ifdef INCREMENTAL_REPAINTING
+  if (root->needsLayout()) {
+#else
+  // Do not allow a full layout if we had a clip object set.
+  if (root->needsLayout() && !m_layoutObject) {
+#endif
+    // qDebug("needs layout, delaying repaint");
+    scheduleRelayout();
+    return;
+  }
+  resizeContents(root->docWidth(), root->docHeight());
+  setStaticBackground(d->useSlowRepaints);
+
+#ifndef INCREMENTAL_REPAINTING
+  if (m_layoutObject) {
+    m_layoutObject->repaint();
+    m_layoutObject = 0;
+  } else
+    root->repaint();
+#endif
 }
 
 //
@@ -1545,148 +1564,57 @@ void KHTMLView::slotScrollBarMoved() {
     d->scrollBarMoved = true;
 }
 
-void KHTMLView::timerEvent(QTimerEvent* e) {
-  //    kdDebug() << "timer event " << e->timerId() << endl;
-  if (e->timerId() == d->timerId) {
-    d->firstRelayout = false;
-    killTimer(d->timerId);
+void KHTMLView::repaintRectangle(const QRect& r, bool immediate) {
+#ifndef INCREMENTAL_REPAINTING
+  if (d->layoutTimerId)  // Don't bother scheduling a repaint when a layout is
+                         // pending.
+    return;
+#endif
 
-    d->layoutSchedulingEnabled = false;
-    layout();
-    d->layoutSchedulingEnabled = true;
-
-    d->timerId = 0;
-
-    // scheduleRepaint(contentsX(),contentsY(),visibleWidth(),visibleHeight());
-    d->updateRect =
-        QRect(contentsX(), contentsY(), visibleWidth(), visibleHeight());
-  }
-
-  if (m_part && m_part->xmlDocImpl()) {
-    DOM::DocumentImpl* document = m_part->xmlDocImpl();
-    khtml::RenderCanvas* root =
-        static_cast<khtml::RenderCanvas*>(document->renderer());
-    if (root) {
-      // Do not allow a full layout if we had a clip object set.
-      if (root->needsLayout() && !m_layoutObject) {
-        killTimer(d->repaintTimerId);
-        d->repaintTimerId = 0;
-        // qDebug("needs layout, delaying repaint");
-        scheduleRelayout();
-        return;
-      }
-      resizeContents(root->docWidth(), root->docHeight());
-    }
-  }
-  setStaticBackground(d->useSlowRepaints);
-
-  //        kdDebug() << "scheduled repaint "<< d->repaintTimerId  << endl;
-  // If we have an overflow:hidden object, we cache the current update rect and
-  // then
-  // clear the update rect, so that when we call repaint(), the union of the
-  // layout
-  // object's rect and the current update rect is just the layout object's'
-  // rect.
-  QRect oldUpdateRect = d->updateRect;
-  bool hasRepaintTimer = d->repaintTimerId;
-  if (m_layoutObject) {
-    d->updateRect = QRect();
-    m_layoutObject->repaint();
-  }
-
-  // Now we paint.  This will be either a full paint or just the paint of a
-  // clipped
-  // object's area.
-  updateContents(d->updateRect);
-  killTimer(d->repaintTimerId);
-  d->repaintTimerId = 0;
-
-  if (m_layoutObject) {
-    // Restore the update rect, and if we had a repaint pending before the
-    // clipped
-    // object did its paint, go ahead and reschedule that paint to occur as soon
-    // as possible.
-    d->updateRect = oldUpdateRect;
-    if (hasRepaintTimer)
-      scheduleRepaint(d->updateRect.x(), d->updateRect.y(),
-                      d->updateRect.width(), d->updateRect.height());
-    m_layoutObject = 0;
-  }
+  updateContents(r, immediate);
 }
 
-void KHTMLView::scheduleRelayout(khtml::RenderObject* clippedObj) {
+void KHTMLView::timerEvent(QTimerEvent* e) {
+  //    kdDebug() << "timer event " << e->timerId() << endl;
+  if (e->timerId() == d->layoutTimerId)
+    layout();
+}
+
+#ifdef INCREMENTAL_REPAINTING
+void KHTMLView::scheduleRelayout()
+#else
+void KHTMLView::scheduleRelayout(khtml::RenderObject* clippedObj)
+#endif
+{
   if (!d->layoutSchedulingEnabled)
     return;
 
+#ifndef INCREMENTAL_REPAINTING
   if (m_layoutObject != clippedObj)
     m_layoutObject = 0;
+#endif
 
-  if (d->timerId)
+  if (d->layoutTimerId)
     return;
 
+#ifndef INCREMENTAL_REPAINTING
   m_layoutObject = clippedObj;
+#endif
 
   bool parsing = false;
   if (m_part->xmlDocImpl()) {
     parsing = m_part->xmlDocImpl()->parsing();
   }
 
-  d->timerId = startTimer(parsing ? 1000 : 0);
+  d->layoutTimerId = startTimer(parsing ? 1000 : 0);
 }
 
 void KHTMLView::unscheduleRelayout() {
-  if (!d->timerId)
+  if (!d->layoutTimerId)
     return;
 
-  killTimer(d->timerId);
-  d->timerId = 0;
-}
-
-void KHTMLView::unscheduleRepaint() {
-  if (!d->repaintTimerId)
-    return;
-
-  killTimer(d->repaintTimerId);
-  d->repaintTimerId = 0;
-}
-
-void KHTMLView::scheduleRepaint(int x, int y, int w, int h) {
-  // kdDebug() << "scheduleRepaint(" << x << "," << y << "," << w << "," << h <<
-  // ")" << endl;
-
-  bool parsing = false;
-  if (m_part->xmlDocImpl()) {
-    parsing = m_part->xmlDocImpl()->parsing();
-  }
-
-  //     kdDebug() << "parsing " << parsing << endl;
-  //     kdDebug() << "complete " << d->complete << endl;
-
-  int time;
-
-  // if complete...
-  if (d->complete)
-    // ...repaint immediatly
-    time = 0;
-  else {
-    if (parsing)
-      // not complete and still parsing
-      time = 300;
-    else
-      // not complete, not parsing, extend the timer if it exists
-      // otherwise, repaint immediatly
-      time = d->repaintTimerId ? 400 : 0;
-  }
-
-  if (d->repaintTimerId) {
-    killTimer(d->repaintTimerId);
-    d->updateRect = d->updateRect.unite(QRect(x, y, w, h));
-  } else
-    d->updateRect = QRect(x, y, w, h);
-
-  d->repaintTimerId = startTimer(time);
-
-  //     kdDebug() << "starting timer " << time << endl;
+  killTimer(d->layoutTimerId);
+  d->layoutTimerId = 0;
 }
 
 void KHTMLView::complete() {
@@ -1695,18 +1623,10 @@ void KHTMLView::complete() {
   d->complete = true;
 
   // is there a relayout pending?
-  if (d->timerId) {
+  if (d->layoutTimerId) {
     //         kdDebug() << "requesting relayout now" << endl;
     // do it now
-    killTimer(d->timerId);
-    d->timerId = startTimer(0);
-  }
-
-  // is there a repaint pending?
-  if (d->repaintTimerId) {
-    //         kdDebug() << "requesting repaint now" << endl;
-    // do it now
-    killTimer(d->repaintTimerId);
-    d->repaintTimerId = startTimer(1);
+    killTimer(d->layoutTimerId);
+    d->layoutTimerId = startTimer(0);
   }
 }

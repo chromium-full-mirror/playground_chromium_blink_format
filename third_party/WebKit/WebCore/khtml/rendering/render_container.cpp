@@ -145,11 +145,20 @@ void RenderContainer::addChild(RenderObject* newChild,
     // just add it...
     insertChildNode(newChild, beforeChild);
   }
-  newChild->setNeedsLayoutAndMinMaxRecalc();
 }
 
 RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   KHTMLAssert(oldChild->parent() == this);
+
+  // So that we'll get the appropriate dirty bit set (either that a normal flow
+  // child got yanked or
+  // that a positioned child got yanked).  We also repaint, so that the area
+  // exposed when the child
+  // disappears gets repainted properly.
+  oldChild->setNeedsLayoutAndMinMaxRecalc();
+#ifdef INCREMENTAL_REPAINTING
+  oldChild->repaint();
+#endif
 
   // Keep our layer hierarchy updated.
   oldChild->removeLayers(enclosingLayer());
@@ -192,14 +201,11 @@ RenderObject* RenderContainer::removeChildNode(RenderObject* oldChild) {
   oldChild->setNextSibling(0);
   oldChild->setParent(0);
 
-  setNeedsLayoutAndMinMaxRecalc();
-
   return oldChild;
 }
 
 void RenderContainer::removeChild(RenderObject* oldChild) {
   removeChildNode(oldChild);
-  setNeedsLayout(true);
 }
 
 void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
@@ -358,7 +364,10 @@ void RenderContainer::appendChildNode(RenderObject* newChild) {
   RenderLayer* layer = enclosingLayer();
   newChild->addLayers(layer, newChild);
 
-  newChild->setNeedsLayoutAndMinMaxRecalc();
+  newChild->setNeedsLayoutAndMinMaxRecalc();  // Goes up the containing block
+                                              // hierarchy.
+  setChildNeedsLayout(true);  // We may supply the static position for an
+                              // absolute positioned child.
 }
 
 void RenderContainer::insertChildNode(RenderObject* child,
@@ -391,6 +400,8 @@ void RenderContainer::insertChildNode(RenderObject* child,
   child->addLayers(layer, child);
 
   child->setNeedsLayoutAndMinMaxRecalc();
+  setChildNeedsLayout(true);  // We may supply the static position for an
+                              // absolute positioned child.
 }
 
 void RenderContainer::layout() {

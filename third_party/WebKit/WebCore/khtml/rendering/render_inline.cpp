@@ -72,8 +72,6 @@ void RenderInline::addChildToFlow(RenderObject* newChild,
       lastChild()->style()->styleType() == RenderStyle::AFTER)
     beforeChild = lastChild();
 
-  setNeedsLayout(true);
-
   if (!newChild->isText() && newChild->style()->position() != STATIC)
     setOverhangingContents();
 
