@@ -43,7 +43,7 @@ class SimpleNumber {
     return ((int)imp & mask) == tag;
   }
   static inline int value(const ValueImp* imp) {
-    return (int)imp / (1 << shift);
+    return ((int)imp >> shift) | (((int)imp & min) ? ~max : 0);
   }
 
   static inline bool fits(int i) { return i <= max && i >= min; }
