@@ -105,7 +105,8 @@ class HTMLStackElem {
  *    element or ignore the tag.
  *
  */
-KHTMLParser::KHTMLParser(KHTMLView* _parent, DocumentPtr* doc) : current(0) {
+KHTMLParser::KHTMLParser(KHTMLView* _parent, DocumentPtr* doc)
+    : current(0), currentIsReferenced(false) {
 // kdDebug( 6035 ) << "parser constructor" << endl;
 #if SPEED_DEBUG > 0
   qt.start();
@@ -177,11 +178,14 @@ void KHTMLParser::reset() {
 }
 
 void KHTMLParser::setCurrent(DOM::NodeImpl* newCurrent) {
-  if (newCurrent && newCurrent != document->document())
+  bool newCurrentIsReferenced =
+      newCurrent && newCurrent != document->document();
+  if (newCurrentIsReferenced)
     newCurrent->ref();
-  if (current && current != document->document())
+  if (currentIsReferenced)
     current->deref();
   current = newCurrent;
+  currentIsReferenced = newCurrentIsReferenced;
 }
 
 void KHTMLParser::parseToken(Token* t) {
