@@ -54,7 +54,7 @@
   NPP_ShutdownProcPtr NPP_Shutdown;
 }
 
-- (BOOL)initializeWithPath:(NSString*)pluginPath;
+- initWithPath:(NSString*)pluginPath;
 - (void)getPluginInfoForResourceFile:(SInt16)resRef;
 - (void)load;
 - (void)unload;
