@@ -41,48 +41,24 @@
 #else  // Panther version of WebImageRenderer
        // ------------------------------------
 
-@interface WebImageRenderer : NSImage<WebCoreImageRenderer> {
-  NSTimer* frameTimer;
-  NSView* frameView;
-  NSRect imageRect;
-  NSRect targetRect;
+@class WebInternalImage;
 
-  int loadStatus;
-
-  NSColor* patternColor;
-  int patternColorLoadStatus;
-
-  int repetitionsComplete;
-  BOOL animationFinished;
-
-  NSPoint tilePoint;
-  BOOL animatedTile;
-
-  int compositeOperator;
-  id redirectContext;
-  CGContextRef context;
-  BOOL needFlushRasterCache;
-  BOOL rasterFlushing;
-  NSImageCacheMode rasterFlushingOldMode;
-
-  NSString* MIMEType;
-  BOOL isNull;
-  int useCount;
-
-  CGImageRef cachedImageRef;
-
-  id _PDFDoc;
-
- @public
-  NSData* originalData;
+@interface WebImageRenderer : NSObject<WebCoreImageRenderer> {
+  WebInternalImage* image;
 }
 
 - (id)initWithMIMEType:(NSString*)MIME;
 - (id)initWithData:(NSData*)data MIMEType:(NSString*)MIME;
-+ (void)stopAnimationsInView:(NSView*)aView;
+- (id)initWithContentsOfFile:(NSString*)filename;
+
+- (NSImage*)image;
+- (NSString*)MIMEType;
+- (NSData*)TIFFRepresentation;
 - (int)frameCount;
 
-- (NSString*)MIMEType;
+- (void)setOriginalData:(NSData*)data;
+
++ (void)stopAnimationsInView:(NSView*)aView;
 
 @end
 
