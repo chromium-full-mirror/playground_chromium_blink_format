@@ -34,6 +34,8 @@ class InlineTextBox;
 
 // General utility functions
 
+enum IteratorKind { CONTENT = 0, RUNFINDER = 1 };
+
 QString plainText(const DOM::Range&);
 DOM::Range findPlainText(const DOM::Range&,
                          const QString&,
@@ -48,7 +50,7 @@ DOM::Range findPlainText(const DOM::Range&,
 class TextIterator {
  public:
   TextIterator();
-  explicit TextIterator(const DOM::Range&);
+  explicit TextIterator(const DOM::Range&, IteratorKind kind = CONTENT);
 
   bool atEnd() const { return !m_positionNode; }
   void advance();
