@@ -14,6 +14,7 @@
   id<IFWindowContext> windowContext;
   id<IFResourceProgressHandler> resourceProgressHandler;
   id<IFWebControllerPolicyHandler> policyHandler;
+  BOOL openedByScript;
 }
 @end
 
@@ -38,4 +39,6 @@
 - (void)_didStartLoading:(NSURL*)url;
 - (void)_didStopLoading:(NSURL*)url;
 + (NSString*)_MIMETypeForFile:(NSString*)path;
+- (BOOL)_openedByScript;
+- (void)_setOpenedByScript:(BOOL)openedByScript;
 @end

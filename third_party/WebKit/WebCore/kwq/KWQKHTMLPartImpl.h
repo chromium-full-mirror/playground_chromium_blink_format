@@ -92,6 +92,11 @@ class KWQKHTMLPartImpl : public QObject {
                   const QString& contentType,
                   const QString& boundary);
 
+  bool openedByJS();
+  void setOpenedByJS(bool _openedByJS);
+
+  void close();
+
  private:
   KHTMLPart* part;
   KHTMLPartPrivate* d;
