@@ -295,6 +295,13 @@ backforward list.
 
 - (NSCachedURLResponse*)_cachedResponseForURL:(NSURL*)URL;
 
+- (void)_writeImageElement:(NSDictionary*)element
+       withPasteboardTypes:(NSArray*)types
+              toPasteboard:(NSPasteboard*)pasteboard;
+- (void)_writeLinkElement:(NSDictionary*)element
+      withPasteboardTypes:(NSArray*)types
+             toPasteboard:(NSPasteboard*)pasteboard;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)

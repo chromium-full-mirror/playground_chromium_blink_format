@@ -6,9 +6,6 @@
 #import <WebKit/WebDocument.h>
 
 @class DOMDocument;
-@class DOMNode;
-@class DOMRange;
-@class WebArchive;
 
 @protocol WebDocumentImage<NSObject>
 - (NSImage*)image;
@@ -17,4 +14,10 @@
 // This method is deprecated as it now lives on WebFrame.
 @protocol WebDocumentDOM<NSObject>
 - (DOMDocument*)DOMDocument;
+@end
+
+@protocol WebDocumentSelection<NSObject>
+- (NSArray*)pasteboardTypesForSelection;
+- (void)writeSelectionWithPasteboardTypes:(NSArray*)types
+                             toPasteboard:(NSPasteboard*)pasteboard;
 @end
