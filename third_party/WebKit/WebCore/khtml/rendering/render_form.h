@@ -95,7 +95,7 @@ class RenderFormElement : public khtml::RenderWidget {
   // and honor that value.
   void addIntrinsicMarginsIfAllowed(RenderStyle* _style);
   virtual bool canHaveIntrinsicMargins() const { return false; }
-  virtual int intrinsicMargin() const { return 2; }
+  int intrinsicMargin() const { return 2; }
 
   virtual void setStyle(RenderStyle* _style);
 #endif
@@ -242,7 +242,6 @@ class RenderLineEdit : public RenderFormElement {
 #if APPLE_CHANGES
   int calcReplacedHeight() const { return intrinsicHeight(); }
   virtual bool canHaveIntrinsicMargins() const { return true; }
-  virtual int intrinsicMargin() const { return 3; }
 #endif
 
   virtual const char* renderName() const { return "RenderLineEdit"; }
@@ -440,7 +439,6 @@ class RenderTextArea : public RenderFormElement {
 
 #if APPLE_CHANGES
   virtual bool canHaveIntrinsicMargins() const { return true; }
-  virtual int intrinsicMargin() const { return 3; }
 #endif
 
  protected slots:
