@@ -20,8 +20,10 @@
  *
  */
 #include "render_br.h"
+#include "xml/dom_position.h"
 
 using namespace khtml;
+using DOM::DOMPosition;
 
 RenderBR::RenderBR(DOM::NodeImpl* node)
     : RenderText(node, new DOM::DOMStringImpl(QChar('\n'))),
@@ -91,6 +93,10 @@ long RenderBR::caretMaxOffset() const {
 
 unsigned long RenderBR::caretMaxRenderedOffset() const {
   return 1;
+}
+
+DOMPosition RenderBR::positionForCoordinates(int _x, int _y) {
+  return DOMPosition(element(), 0);
 }
 
 void RenderBR::caretPos(int offset,

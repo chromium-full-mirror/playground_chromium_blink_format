@@ -89,7 +89,9 @@ typedef enum {
   WebSelectForward,
   WebSelectBackward,
   WebSelectRight,
-  WebSelectLeft
+  WebSelectLeft,
+  WebSelectUp,
+  WebSelectDown,
 } WebSelectionDirection;
 
 typedef enum {
