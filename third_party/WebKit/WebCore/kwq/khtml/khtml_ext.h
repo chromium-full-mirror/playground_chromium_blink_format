@@ -46,6 +46,9 @@ class KHTMLPartBrowserExtension : public KParts::BrowserExtension {
                                const KParts::WindowArgs& winArgs,
                                KParts::ReadOnlyPart*& part);
 
+  virtual void setIconURL(const KURL& url);
+  virtual void setTypedIconURL(const KURL& url, const QString& type);
+
  private:
   void createNewWindow(const KURL& url,
                        const KParts::URLArgs& urlArgs,
