@@ -721,6 +721,15 @@ CSSValueImpl* CSSComputedStyleDeclarationImpl::getPropertyCSSValue(
     case CSS_PROP_WORD_SPACING:
       return new CSSPrimitiveValueImpl(style->wordSpacing(),
                                        CSSPrimitiveValue::CSS_PX);
+    case CSS_PROP_WORD_WRAP:
+      switch (style->wordWrap()) {
+        case khtml::WBNORMAL:
+          return new CSSPrimitiveValueImpl(CSS_VAL_NORMAL);
+        case khtml::BREAK_WORD:
+          return new CSSPrimitiveValueImpl(CSS_VAL_BREAK_WORD);
+      }
+      ASSERT_NOT_REACHED();
+      return 0;
     case CSS_PROP_Z_INDEX:
       // FIXME: unimplemented
       break;
