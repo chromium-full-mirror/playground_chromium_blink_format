@@ -2498,7 +2498,7 @@ bool DocumentImpl::isValidName(const DOMString& name) {
   static const char validFirstCharacter[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxyz";
   static const char validSubsequentCharacter[] =
-      "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxyz0-9-_:.";
+      "ABCDEFGHIJKLMNOPQRSTUVWXZYabcdefghijklmnopqrstuvwxyz0123456789-_:.";
   const unsigned length = name.length();
   if (length == 0)
     return false;
