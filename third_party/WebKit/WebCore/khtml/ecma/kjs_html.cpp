@@ -4953,16 +4953,19 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       int w = args[3].toInt32(exec);
       int h = args[4].toInt32(exec);
       QString compositeOperator = args[5].toString(exec).qstring().lower();
-      QPixmap pixmap = i->image()->pixmap();
-      QPainter p;
-      p.drawPixmap(x, y, pixmap, 0, 0, w, h,
-                   QPainter::compositeOperatorFromString(compositeOperator),
-                   drawingContext);
+      khtml::CachedImage* ci = i->image();
+      if (ci) {
+        QPixmap pixmap = ci->pixmap();
+        QPainter p;
+        p.drawPixmap(x, y, pixmap, 0, 0, w, h,
+                     QPainter::compositeOperatorFromString(compositeOperator),
+                     drawingContext);
 
-      if (contextObject->_needsFlushRasterCache)
-        pixmap.flushRasterCache();
+        if (contextObject->_needsFlushRasterCache)
+          pixmap.flushRasterCache();
 
-      renderer->setNeedsImageUpdate();
+        renderer->setNeedsImageUpdate();
+      }
       break;
     }
     case Context2D::DrawImageFromRect: {
@@ -4987,17 +4990,20 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
       int dw = args[7].toInt32(exec);
       int dh = args[8].toInt32(exec);
       QString compositeOperator = args[9].toString(exec).qstring().lower();
-      QPixmap pixmap = i->image()->pixmap();
-      QPainter p;
+      khtml::CachedImage* ci = i->image();
+      if (ci) {
+        QPixmap pixmap = ci->pixmap();
+        QPainter p;
 
-      p.drawPixmap(dx, dy, dw, dh, pixmap, sx, sy, sw, sh,
-                   QPainter::compositeOperatorFromString(compositeOperator),
-                   drawingContext);
+        p.drawPixmap(dx, dy, dw, dh, pixmap, sx, sy, sw, sh,
+                     QPainter::compositeOperatorFromString(compositeOperator),
+                     drawingContext);
 
-      if (contextObject->_needsFlushRasterCache)
-        pixmap.flushRasterCache();
+        if (contextObject->_needsFlushRasterCache)
+          pixmap.flushRasterCache();
 
-      renderer->setNeedsImageUpdate();
+        renderer->setNeedsImageUpdate();
+      }
       break;
     }
     case Context2D::SetAlpha: {
