@@ -160,7 +160,7 @@ void DOMString::remove(unsigned int pos, int len) {
     impl->remove(pos, len);
 }
 
-DOMString DOMString::substring(unsigned int pos, unsigned int len) {
+DOMString DOMString::substring(unsigned int pos, unsigned int len) const {
   if (!impl)
     return DOMString();
   return impl->substring(pos, len);

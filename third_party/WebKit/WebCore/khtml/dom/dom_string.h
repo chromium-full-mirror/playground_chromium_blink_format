@@ -86,7 +86,7 @@ class DOMString {
   void truncate(unsigned int len);
   void remove(unsigned int pos, int len = 1);
 
-  DOMString substring(unsigned int pos, unsigned int len);
+  DOMString substring(unsigned int pos, unsigned int len) const;
 
   /**
    * Splits the string into two. The original string gets truncated to pos, and
