@@ -46,7 +46,8 @@
 - (void)_lineRight;
 - (void)_goBack;
 - (void)_goForward;
-+ (NSMutableDictionary*)_viewTypes;
++ (NSMutableDictionary*)_viewTypesAllowImageTypeOmission:
+    (BOOL)allowImageTypeOmission;
 + (Class)_viewClassForMIMEType:(NSString*)MIMEType;
 + (BOOL)_canShowMIMETypeAsHTML:(NSString*)MIMEType;
 - (BOOL)_isMainFrame;
