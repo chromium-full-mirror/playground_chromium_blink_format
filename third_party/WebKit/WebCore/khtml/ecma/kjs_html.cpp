@@ -918,7 +918,7 @@ const ClassInfo* KJS::HTMLElement::classInfo() const {
   cite		KJS::HTMLElement::ModCite		DontDelete
   dateTime	KJS::HTMLElement::ModDateTime		DontDelete
 @end
-@begin HTMLAnchorElementTable 23
+@begin HTMLAnchorElementTable 24
   accessKey	KJS::HTMLElement::AnchorAccessKey	DontDelete
   charset	KJS::HTMLElement::AnchorCharset		DontDelete
   coords	KJS::HTMLElement::AnchorCoords		DontDelete
@@ -941,6 +941,7 @@ const ClassInfo* KJS::HTMLElement::classInfo() const {
   type		KJS::HTMLElement::AnchorType		DontDelete
   blur		KJS::HTMLElement::AnchorBlur		DontDelete|Function 0
   focus		KJS::HTMLElement::AnchorFocus		DontDelete|Function 0
+  toString      KJS::HTMLElement::AnchorToString        DontDelete|Function 0
 @end
 @begin HTMLImageElementTable 14
   name		KJS::HTMLElement::ImageName		DontDelete
@@ -2358,6 +2359,8 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       } else if (id == KJS::HTMLElement::AnchorFocus) {
         anchor.focus();
         return Undefined();
+      } else if (id == KJS::HTMLElement::AnchorToString) {
+        return String(thisObj.toString(exec));
       }
     } break;
     case ID_TABLE: {

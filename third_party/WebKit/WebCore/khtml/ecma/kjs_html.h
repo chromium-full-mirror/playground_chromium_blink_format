@@ -286,6 +286,7 @@ class HTMLElement : public DOMElement {
     AnchorTarget,
     AnchorText,
     AnchorBlur,
+    AnchorToString,
     ImageName,
     ImageAlign,
     ImageHspace,
