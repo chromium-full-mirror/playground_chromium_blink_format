@@ -471,6 +471,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 
 @protocol WebCoreFileButton<NSObject>
 - (void)setFilename:(NSString*)filename;
+- (void)performClick;
 - (NSString*)filename;
 - (float)baseline;
 - (void)setVisualFrame:(NSRect)rect;

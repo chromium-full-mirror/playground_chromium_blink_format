@@ -330,6 +330,10 @@ class RenderFileButton : public RenderFormElement {
   KLineEdit* lineEdit() const { return m_edit; }
 #endif
 
+#if APPLE_CHANGES
+  void click();
+#endif
+
  public slots:
   virtual void slotClicked();
   virtual void slotReturnPressed();

@@ -41,6 +41,7 @@ class KWQFileButton : public QWidget {
   ~KWQFileButton();
 
   void setFilename(const QString&);
+  void click();
 
   QSize sizeForCharacterWidth(int characters) const;
   QRect frameGeometry() const;
