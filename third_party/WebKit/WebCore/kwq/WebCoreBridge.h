@@ -55,6 +55,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @protocol WebCoreRenderTreeCopier;
 @protocol WebCoreResourceHandle;
 @protocol WebCoreResourceLoader;
+@protocol WebCoreFileButton;
 @protocol WebDOMDocument;
 @protocol WebDOMNode;
 @protocol WebDOMElement;
@@ -274,6 +275,12 @@ enum FrameBorderStyle {
 - (NSWindow*)window;
 - (void)setWindowFrame:(NSRect)frame;
 
+- (void)runJavaScriptAlertPanelWithMessage:(NSString*)message;
+- (BOOL)runJavaScriptConfirmPanelWithMessage:(NSString*)message;
+- (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
+                                  defaultText:(NSString*)defaultText
+                                returningText:(NSString**)result;
+
 - (id<WebCoreResourceHandle>)startLoadingResource:
                                  (id<WebCoreResourceLoader>)loader
                                           withURL:(NSString*)URL;
@@ -346,6 +353,8 @@ enum FrameBorderStyle {
                textView:(NSTextView*)textView
     doCommandBySelector:(SEL)commandSelector;
 
+- (NSView<WebCoreFileButton>*)fileButton;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all
@@ -371,3 +380,14 @@ enum FrameBorderStyle {
                      view:(NSView*)view
                  children:(NSArray*)children;
 @end
+
+@protocol WebCoreFileButton<NSObject>
+- (void)setFilename:(NSString*)filename;
+- (NSString*)filename;
+- (float)baseline;
+- (void)setVisualFrame:(NSRect)rect;
+- (NSRect)visualFrame;
+- (NSSize)bestVisualFrameSizeForCharacterCount:(int)count;
+@end
+
+extern NSString* WebCoreFileButtonFilenameChanged;
