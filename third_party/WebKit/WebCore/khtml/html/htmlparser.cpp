@@ -1267,7 +1267,11 @@ NodeImpl* KHTMLParser::handleIsindex(Token* t) {
   NodeImpl* child = new HTMLHRElementImpl(document);
   n->addChild(child);
   AttributeImpl* a = t->attrs ? t->attrs->getAttributeItem(ATTR_PROMPT) : 0;
+#if APPLE_CHANGES
+  DOMString text = searchableIndexIntroduction();
+#else
   DOMString text = i18n("This is a searchable index. Enter search keywords: ");
+#endif
   if (a)
     text = a->value() + " ";
   child = new TextImpl(document, text);

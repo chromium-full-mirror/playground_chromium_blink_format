@@ -125,6 +125,9 @@ class KWQKHTMLPartImpl : public QObject {
 
   static void runJavaScriptAlert(const QString& message);
   static bool runJavaScriptConfirm(const QString& message);
+  static bool runJavaScriptPrompt(const QString& message,
+                                  const QString& defaultValue,
+                                  QString& result);
 
   static WebCoreBridge* bridgeForWidget(QWidget*);
 
