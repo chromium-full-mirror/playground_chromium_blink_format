@@ -913,8 +913,13 @@ class RenderObject : public CachedObjectClient {
    * object.
    * @param override @p true if input overrides existing characters,
    * @p false if it inserts them. The width of the caret depends on this one.
+   * @param extraWidthToEndOfLine optional out arg to give extra width to end of
+   * line -
+   * useful for character range rect computations
    */
-  virtual QRect caretRect(int offset, EAffinity affinity = UPSTREAM);
+  virtual QRect caretRect(int offset,
+                          EAffinity affinity = UPSTREAM,
+                          int* extraWidthToEndOfLine = 0);
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const {

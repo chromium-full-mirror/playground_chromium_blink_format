@@ -293,6 +293,7 @@ typedef enum {
 - (NSRect)caretRectAtNode:(DOMNode*)node
                    offset:(int)offset
                  affinity:(NSSelectionAffinity)affinity;
+- (NSRect)firstRectForDOMRange:(DOMRange*)range;
 
 - (void)setSelectedDOMRange:(DOMRange*)range
                    affinity:(NSSelectionAffinity)selectionAffinity;

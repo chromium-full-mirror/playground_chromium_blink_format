@@ -94,7 +94,9 @@ class RenderFlow : public RenderContainer {
   virtual int leftmostPosition(bool includeOverflowInterior = true,
                                bool includeSelf = true) const;
 
-  virtual QRect caretRect(int offset, EAffinity affinity = UPSTREAM);
+  virtual QRect caretRect(int offset,
+                          EAffinity affinity = UPSTREAM,
+                          int* extraWidthToEndOfLine = 0);
 
  protected:
   // An inline can be split with blocks occurring in between the inline content.
