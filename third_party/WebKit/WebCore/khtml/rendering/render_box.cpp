@@ -231,7 +231,12 @@ void RenderBox::printBackground(QPainter* p,
       } else {
         cw = w - vpab;
         cx = _tx;
-        sx = pixw - ((sptr->backgroundXPosition().minWidth(pw - pixw)) % pixw);
+        if (pixw == 0) {
+          sx = 0;
+        } else {
+          sx =
+              pixw - ((sptr->backgroundXPosition().minWidth(pw - pixw)) % pixw);
+        }
       }
 
       cx += borderLeft();
@@ -242,7 +247,12 @@ void RenderBox::printBackground(QPainter* p,
       } else {
         ch = h - hpab;
         cy = _ty;
-        sy = pixh - ((sptr->backgroundYPosition().minWidth(ph - pixh)) % pixh);
+        if (pixh == 0) {
+          sy = 0;
+        } else {
+          sy =
+              pixh - ((sptr->backgroundYPosition().minWidth(ph - pixh)) % pixh);
+        }
       }
 
       cy += borderTop();
@@ -261,7 +271,12 @@ void RenderBox::printBackground(QPainter* p,
       } else {
         cw = pw;
         cx = vr.x();
-        sx = pixw - ((sptr->backgroundXPosition().minWidth(pw - pixw)) % pixw);
+        if (pixw == 0) {
+          sx = 0;
+        } else {
+          sx =
+              pixw - ((sptr->backgroundXPosition().minWidth(pw - pixw)) % pixw);
+        }
       }
 
       if ((bgr == NO_REPEAT || bgr == REPEAT_X) && h > pixh) {
@@ -270,7 +285,12 @@ void RenderBox::printBackground(QPainter* p,
       } else {
         ch = ph;
         cy = vr.y();
-        sy = pixh - ((sptr->backgroundYPosition().minWidth(ph - pixh)) % pixh);
+        if (pixh == 0) {
+          sy = 0;
+        } else {
+          sy =
+              pixh - ((sptr->backgroundYPosition().minWidth(ph - pixh)) % pixh);
+        }
       }
 
       QRect fix(cx, cy, cw, ch);
