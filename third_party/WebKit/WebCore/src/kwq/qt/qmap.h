@@ -30,10 +30,20 @@ template <class K, class T>
 class QMapIterator {};
 
 template <class K, class T>
+class QMapConstIterator {
+ public:
+  bool operator!=(const QMapConstIterator<K, T>&) const;
+  const T& operator*() const;
+};
+
+template <class K, class T>
 class QMap {
  public:
   typedef QMapIterator<K, T> Iterator;
+  typedef QMapConstIterator<K, T> ConstIterator;
+  ConstIterator end() const;
   Iterator insert(const K&, const T&);
+  ConstIterator find(const K&) const;
   void remove(const K&);
   void clear();
   T& operator[](const K& k);
