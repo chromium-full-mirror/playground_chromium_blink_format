@@ -329,6 +329,7 @@ RenderLayer::RenderZTreeNode* RenderLayer::constructZTree(
   // thus the layer does too).  We also exclude the root from this test, since
   // the HTML can be much taller than the root (because of scrolling).
   if (renderer()->isRoot() || renderer()->isHtml() || renderer()->isBody() ||
+      renderer()->hasOverhangingFloats() ||
       (renderer()->isInline() && !renderer()->isReplaced()) ||
       (eventProcessing &&
        layerBounds.contains(damageRect.x(), damageRect.y())) ||

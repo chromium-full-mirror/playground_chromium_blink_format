@@ -157,6 +157,9 @@ void RenderFlow::printObject(QPainter* p,
     child = child->nextSibling();
   }
 
+  // 3. paint floats.
+  paintFloats(p, _x, _y, _w, _h, _tx, _ty);
+
   if (!isInline() && !childrenInline() && style()->outlineWidth())
     printOutline(p, _tx, _ty, width(), height(), style());
 
@@ -170,6 +173,28 @@ void RenderFlow::printObject(QPainter* p,
       outlineBox(p, _tx, _ty);
   }
 #endif
+}
+
+void RenderFlow::paintFloats(QPainter* p,
+                             int _x,
+                             int _y,
+                             int _w,
+                             int _h,
+                             int _tx,
+                             int _ty) {
+  if (!specialObjects)
+    return;
+
+  SpecialObject* r;
+  QPtrListIterator<SpecialObject> it(*specialObjects);
+  for (; (r = it.current()); ++it) {
+    // Only paint the object if our noPaint flag isn't set.
+    if (r->node->isFloating() && !r->noPaint) {
+      r->node->print(p, _x, _y, _w, _h,
+                     _tx + r->left - r->node->xPos() + r->node->marginLeft(),
+                     _ty + r->startY - r->node->yPos() + r->node->marginTop());
+    }
+  }
 }
 
 void RenderFlow::layout() {
@@ -1220,6 +1245,9 @@ void RenderFlow::addOverHangingFloats(RenderFlow* flow,
     if ((int)r->type <= (int)SpecialObject::FloatRight &&
         ((!child && r->endY > offset) ||
          (child && flow->yPos() + r->endY > height()))) {
+      if (child)
+        r->noPaint = true;
+
       SpecialObject* f = 0;
       // don't insert it twice!
       QPtrListIterator<SpecialObject> it(*specialObjects);
@@ -1247,6 +1275,7 @@ void RenderFlow::addOverHangingFloats(RenderFlow* flow,
           special->left += flow->marginLeft();
         if (!child) {
           special->left -= marginLeft();
+          special->noPaint = true;
         }
         special->width = r->width;
         special->node = r->node;
@@ -1939,13 +1968,20 @@ void RenderFlow::makeChildrenNonInline(RenderObject* box2Start) {
 bool RenderFlow::nodeAtPoint(NodeInfo& info, int _x, int _y, int _tx, int _ty) {
   bool inBox = false;
   if (specialObjects) {
-    int stx = _tx;
-    int sty = _ty;
+    int stx = _tx + xPos();
+    int sty = _ty + yPos();
+    if (isRoot()) {
+      stx += static_cast<RenderRoot*>(this)->view()->contentsX();
+      sty += static_cast<RenderRoot*>(this)->view()->contentsY();
+    }
     SpecialObject* o;
     QPtrListIterator<SpecialObject> it(*specialObjects);
     for (it.toLast(); (o = it.current()); --it)
-      if (!o->node->layer() && o->node->containingBlock() == this)
-        inBox |= o->node->nodeAtPoint(info, _x, _y, stx + xPos(), sty + yPos());
+      if (o->node->isFloating() && !o->noPaint)
+        inBox |= o->node->nodeAtPoint(
+            info, _x, _y,
+            stx + o->left + o->node->marginLeft() - o->node->xPos(),
+            sty + o->startY + o->node->marginTop() - o->node->yPos());
   }
 
   inBox |= RenderBox::nodeAtPoint(info, _x, _y, _tx, _ty);
