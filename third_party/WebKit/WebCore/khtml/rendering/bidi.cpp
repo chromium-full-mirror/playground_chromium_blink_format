@@ -1349,14 +1349,18 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start) {
 #endif
 
   // eliminate spaces at beginning of line
-  // remove leading spaces
-  while (!start.atEnd() && start.obj->style()->whiteSpace() != PRE &&
+  // remove leading spaces.  Any inline flows we encounter will be empty and
+  // should also
+  // be skipped.
+  while (!start.atEnd() &&
+         (start.obj->isInlineFlow() ||
+          (start.obj->style()->whiteSpace() != PRE &&
 #ifndef QT_NO_UNICODETABLES
-         (start.direction() == QChar::DirWS || start.obj->isSpecial())
+           (start.direction() == QChar::DirWS || start.obj->isSpecial())
 #else
-         (start.current() == ' ' || start.obj->isSpecial())
+           (start.current() == ' ' || start.obj->isSpecial())
 #endif
-             ) {
+               ))) {
     if (start.obj->isSpecial()) {
       RenderObject* o = start.obj;
       // add to special objects...
