@@ -156,6 +156,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
                       adjustingViewSize:(BOOL)adjustSizeFlag;
 - (void)sendResizeEvent;
 - (BOOL)needsLayout;
+- (void)setNeedsLayout;
 - (void)drawRect:(NSRect)rect;
 - (void)adjustPageHeightNew:(float*)newBottom
                         top:(float)oldTop
@@ -380,7 +381,6 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
 - (NSArray*)documentState;
 
 - (void)setNeedsReapplyStyles;
-- (void)setNeedsLayout;
 
 // OK to be an NSString rather than an NSURL.
 // This URL is only used for coloring visited links.
