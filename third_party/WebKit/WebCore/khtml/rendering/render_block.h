@@ -242,6 +242,7 @@ class RenderBlock : public RenderFlow {
 
  protected:
   void newLine();
+  void removeChildrenFromLineBoxes();
 
  protected:
   struct FloatingObject {
