@@ -217,6 +217,12 @@ bool execFontSize(KHTMLPart* part, bool userInterface, const DOMString& value) {
   return execStyleChange(part, CSS_PROP_FONT_SIZE, value);
 }
 
+bool execFontSizeDelta(KHTMLPart* part,
+                       bool userInterface,
+                       const DOMString& value) {
+  return execStyleChange(part, CSS_PROP__KHTML_FONT_SIZE_DELTA, value);
+}
+
 bool execForeColor(KHTMLPart* part,
                    bool userInterface,
                    const DOMString& value) {
@@ -434,6 +440,10 @@ DOMString valueFontSize(KHTMLPart* part) {
   return valueStyle(part, CSS_PROP_FONT_SIZE);
 }
 
+DOMString valueFontSizeDelta(KHTMLPart* part) {
+  return valueStyle(part, CSS_PROP__KHTML_FONT_SIZE_DELTA);
+}
+
 DOMString valueForeColor(KHTMLPart* part) {
   return valueStyle(part, CSS_PROP_COLOR);
 }
@@ -457,6 +467,8 @@ QDict<CommandImp> createCommandDictionary() {
        {execFontName, enabledAnySelection, stateNone, valueFontName}},
       {"FontSize",
        {execFontSize, enabledAnySelection, stateNone, valueFontSize}},
+      {"FontSizeDelta",
+       {execFontSizeDelta, enabledAnySelection, stateNone, valueFontSizeDelta}},
       {"ForeColor",
        {execForeColor, enabledAnySelection, stateNone, valueForeColor}},
       {"Indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
