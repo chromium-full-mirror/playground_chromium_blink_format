@@ -39,6 +39,7 @@ class WindowFunc;
 class WindowQObject;
 class Location;
 class Selection;
+class BarInfo;
 class History;
 class FrameArray;
 class JSEventListener;
@@ -115,6 +116,12 @@ class Window : public ObjectImp {
   bool isSafeScript(ExecState* exec) const;
   Location* location() const;
   Selection* selection() const;
+  BarInfo* locationbar(ExecState* exec) const;
+  BarInfo* menubar(ExecState* exec) const;
+  BarInfo* personalbar(ExecState* exec) const;
+  BarInfo* scrollbars(ExecState* exec) const;
+  BarInfo* statusbar(ExecState* exec) const;
+  BarInfo* toolbar(ExecState* exec) const;
   JSEventListener* getJSEventListener(const Value& val, bool html = false);
   JSLazyEventListener* getJSLazyEventListener(const QString& code,
                                               bool html = false,
@@ -147,10 +154,12 @@ class Window : public ObjectImp {
     InnerWidth,
     Length,
     _Location,
+    Locationbar,
     Name,
     _Navigator,
     _Konqueror,
     ClientInformation,
+    Menubar,
     OffscreenBuffering,
     Opener,
     OuterHeight,
@@ -222,7 +231,9 @@ class Window : public ObjectImp {
     Onsearch,
     Onselect,
     Onsubmit,
-    Onunload
+    Onunload,
+    Statusbar,
+    Toolbar
   };
 
  protected:
@@ -238,6 +249,12 @@ class Window : public ObjectImp {
   FrameArray* frames;
   Location* loc;
   Selection* m_selection;
+  BarInfo* m_locationbar;
+  BarInfo* m_menubar;
+  BarInfo* m_personalbar;
+  BarInfo* m_scrollbars;
+  BarInfo* m_statusbar;
+  BarInfo* m_toolbar;
   WindowQObject* winq;
   DOM::Event* m_evt;
 };
@@ -363,6 +380,34 @@ class Selection : public ObjectImp {
   friend class Window;
   Selection(KHTMLPart* p);
   QGuardedPtr<KHTMLPart> m_part;
+};
+
+class BarInfo : public ObjectImp {
+ public:
+  ~BarInfo();
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  enum { Visible };
+  enum Type {
+    Locationbar,
+    Menubar,
+    Personalbar,
+    Scrollbars,
+    Statusbar,
+    Toolbar
+  };
+  KHTMLPart* part() const { return m_part; }
+  virtual const ClassInfo* classInfo() const { return &info; }
+  static const ClassInfo info;
+
+ private:
+  friend class Window;
+  BarInfo(ExecState* exec, KHTMLPart* p, Type barType);
+  QGuardedPtr<KHTMLPart> m_part;
+  Type m_type;
 };
 
 #ifdef Q_WS_QWS

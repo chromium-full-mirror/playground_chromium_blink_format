@@ -196,6 +196,13 @@ class KWQKHTMLPart : public KHTMLPart {
   bool runJavaScriptPrompt(const QString& message,
                            const QString& defaultValue,
                            QString& result);
+  bool locationbarVisible();
+  bool menubarVisible();
+  bool personalbarVisible();
+  bool scrollbarsVisible();
+  bool statusbarVisible();
+  bool toolbarVisible();
+
   void KWQKHTMLPart::addMessageToConsole(const QString& message,
                                          unsigned int lineNumber,
                                          const QString& sourceID);
