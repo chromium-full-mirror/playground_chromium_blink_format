@@ -97,7 +97,6 @@
 /*!
     @method pageTitle
     @result Returns nil or the page title.
-    // FIXME move to WebHTMLRepresentation
 */
 - (NSString*)pageTitle;
 
