@@ -149,6 +149,7 @@ class HTMLStyleElementImpl : public HTMLElementImpl {
 
  protected:
   StyleSheetImpl* m_sheet;
+  bool m_loading;
   DOMString m_type;
   QString m_media;
 };
