@@ -437,6 +437,7 @@ class QString {
   QString& remove(uint, uint);
   QString& replace(uint index, uint len, const QString& s);
   QString& replace(const QRegExp&, const QString&);
+  QString& replace(QChar, QChar);
 
   void truncate(uint);
   void fill(QChar, int len = -1);
