@@ -276,11 +276,13 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * and the code returned true itself or @p false otherwise.
    * @deprecated, use the one below.
    */
-  QVariant executeScript(const QString& script);
+  QVariant executeScript(const QString& script, bool forceUserGesture = false);
   /**
    * Same as above except the Node parameter specifying the 'this' value.
    */
-  QVariant executeScript(const DOM::Node& n, const QString& script);
+  QVariant executeScript(const DOM::Node& n,
+                         const QString& script,
+                         bool forceUserGesture = false);
 
   /**
    * Enables or disables Drag'n'Drop support. A drag operation is started if
@@ -382,7 +384,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void scheduleRedirection(double delay,
                            const QString& url,
-                           bool lockHistory = true);
+                           bool lockHistory = true,
+                           bool userGesture = false);
 
   /**
    * Schedules a history navigation operation (go forward, go back, etc.).
