@@ -2269,7 +2269,7 @@ void RenderObject::addDashboardRegions(
       int x, y;
       absolutePosition(x, y);
       region.bounds.setX(x + styleRegion.offset.left.value);
-      region.bounds.setY(y + styleRegion.offset.left.value);
+      region.bounds.setY(y + styleRegion.offset.top.value);
 
       regions.append(region);
     }

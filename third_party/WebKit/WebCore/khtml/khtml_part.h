@@ -1317,9 +1317,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 #if APPLE_CHANGES
  public:
 #endif
+
   DOM::HTMLDocumentImpl* docImpl() const;
   DOM::DocumentImpl* xmlDocImpl() const;
   void replaceDocImpl(DOM::DocumentImpl* newDoc);
+
 #if APPLE_CHANGES
  private:
 #endif
