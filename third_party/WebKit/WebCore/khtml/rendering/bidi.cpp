@@ -1833,9 +1833,17 @@ inline bool RenderBlock::skipNonBreakingSpace(BidiIterator& it) {
       it.current().unicode() != nonBreakingSpace)
     return false;
 
-  // Do not skip a non-breaking spaces if it is the first character
+  // Do not skip a non-breaking space if it is the first character
   // on the first line of a block.
-  return !m_firstLine || !isLineEmpty;
+  if (m_firstLine && isLineEmpty)
+    return false;
+
+  // Do not skip a non-breaking space if it is the first character
+  // on a line after a clean line break.
+  if (!m_firstLine && isLineEmpty && previousLineBrokeCleanly)
+    return false;
+
+  return true;
 }
 
 int RenderBlock::skipWhitespace(BidiIterator& it, BidiState& bidi) {
