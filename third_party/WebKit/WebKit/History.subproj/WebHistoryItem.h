@@ -3,7 +3,7 @@
 //  WebKit
 //
 //  Created by Kenneth Kocienda on Thu Nov 29 2001.
-//  Copyright (c) 2001 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2001 Apple Computer, Inc. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
