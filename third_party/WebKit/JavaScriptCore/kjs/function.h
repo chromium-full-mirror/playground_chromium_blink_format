@@ -39,7 +39,7 @@ class FunctionImp : public InternalFunctionImp {
   friend class ActivationImp;
 
  public:
-  FunctionImp(ExecState* exec, const Identifier& n = Identifier::null);
+  FunctionImp(ExecState* exec, const Identifier& n = Identifier::null());
   virtual ~FunctionImp();
 
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;

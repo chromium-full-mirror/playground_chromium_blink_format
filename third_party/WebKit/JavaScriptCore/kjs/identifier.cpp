@@ -45,8 +45,6 @@ IdentifierStatisticsExitLogger::~IdentifierStatisticsExitLogger() {
 
 #endif
 
-Identifier Identifier::null;
-
 extern const Identifier argumentsPropertyName("arguments");
 extern const Identifier calleePropertyName("callee");
 extern const Identifier constructorPropertyName("constructor");
@@ -285,6 +283,11 @@ void Identifier::rehash(int newTableSize) {
       insert(key);
 
   free(oldTable);
+}
+
+const Identifier& Identifier::null() {
+  static Identifier null;
+  return null;
 }
 
 }  // namespace KJS
