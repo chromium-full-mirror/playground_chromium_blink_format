@@ -79,6 +79,7 @@ class QScrollView : public QFrame {
   void updateContents(const QRect& r);
   void repaintContents(int x, int y, int w, int h, bool erase = TRUE);
   QPoint contentsToViewport(const QPoint&);
+  void contentsToViewport(int x, int y, int& vx, int& vy);
   void viewportToContents(int vx, int vy, int& x, int& y);
 
   virtual void viewportWheelEvent(QWheelEvent*);

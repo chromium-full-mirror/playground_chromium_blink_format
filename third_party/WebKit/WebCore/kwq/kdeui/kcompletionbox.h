@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KCOMPLETIONBOX_H_
@@ -35,40 +35,39 @@
 // class KCompletionBox ========================================================
 
 class KCompletionBox : public KListBox {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
+    
+    // constructors, copy constructors, and destructors ------------------------
+    
+    KCompletionBox();
+    virtual ~KCompletionBox();
+    
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  KCompletionBox();
-  virtual ~KCompletionBox();
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+private:
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
-
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KCompletionBox(const KCompletionBox&);
+    KCompletionBox(const KCompletionBox &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KCompletionBox& operator=(const KCompletionBox&);
+    KCompletionBox &operator=(const KCompletionBox &);
 #endif
 
-};  // class KCompletionBox
-    // =====================================================
+}; // class KCompletionBox =====================================================
 
 #endif

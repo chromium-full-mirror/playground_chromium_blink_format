@@ -25,7 +25,6 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#ifndef APPLE_CHANGES
 #include <kcursor.h>
 #include <klibloader.h>
 #include <kxmlguifactory.h>
@@ -47,6 +46,8 @@ namespace KIO {
 class Job;
 class TransferJob;
 };
+
+#ifndef APPLE_CHANGES
 
 namespace khtml {
 struct ChildFrame {
@@ -89,6 +90,8 @@ class FrameList : public QValueList<khtml::ChildFrame> {
 
 typedef FrameList::ConstIterator ConstFrameIt;
 typedef FrameList::Iterator FrameIt;
+
+#endif  // APPLE_CHANGES
 
 static int khtml_part_dcop_counter = 0;
 
@@ -148,6 +151,7 @@ class KHTMLPartPrivate {
 
     m_bPendingChildRedirection = false;
 
+#ifndef APPLE_CHANGES
     // inherit settings from parent
     if (parent && parent->inherits("KHTMLPart")) {
       KHTMLPart* part = static_cast<KHTMLPart*>(parent);
@@ -164,6 +168,7 @@ class KHTMLPartPrivate {
         m_zoomFactor = part->d->m_zoomFactor;
       }
     }
+#endif
 
     m_focusNodeNumber = -1;
     m_focusNodeRestored = false;
@@ -172,6 +177,11 @@ class KHTMLPartPrivate {
     m_newJSInterpreterExists = false;
     m_dcopobject = 0;
     m_dcop_counter = ++khtml_part_dcop_counter;
+
+#ifdef APPLE_CHANGES
+    m_decodingStarted = 0;
+    m_dataSource = 0;
+#endif
   }
   ~KHTMLPartPrivate() {
     delete m_dcopobject;
@@ -185,8 +195,10 @@ class KHTMLPartPrivate {
 #endif
   }
 
+#ifndef APPLE_CHANGES
   FrameList m_frames;
   QValueList<khtml::ChildFrame> m_objects;
+#endif
 
   QGuardedPtr<KHTMLView> m_view;
   KHTMLPartBrowserExtension* m_extension;
@@ -247,7 +259,11 @@ class KHTMLPartPrivate {
 
   KURL m_workingURL;
 
+#ifdef APPLE_CHANGES
+  int m_redirectionTimer;
+#else
   QTimer m_redirectionTimer;
+#endif
   QTime m_parsetime;
   int m_delayRedirect;
   QString m_redirectURL;
@@ -348,7 +364,13 @@ class KHTMLPartPrivate {
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open
 
   bool m_bPendingChildRedirection;
+
+#ifdef APPLE_CHANGES
+  KURL m_baseURL;
+  QString m_documentSource;
+  bool m_decodingStarted;
+  void* m_dataSource;
+#endif
 };
 
 #endif
-#endif /* APPLE_CHANGES not defined */

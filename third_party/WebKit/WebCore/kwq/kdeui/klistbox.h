@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KLISTBOX_H_
@@ -36,45 +36,44 @@
 // class KListBox ==============================================================
 
 class KListBox : public QListBox {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-  KListBox();
-  KListBox(QWidget*);
+    // constructors, copy constructors, and destructors ------------------------
+
+    KListBox();
+    KListBox(QWidget *);
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~KListBox() {}
+    ~KListBox() {}
 #endif
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
- private:
+private:
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KListBox(const KListBox&);
+    KListBox(const KListBox &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KListBox& operator=(const KListBox&);
+    KListBox &operator=(const KListBox &);
 #endif
 
-};  // class KListBox
-    // ===========================================================
+}; // class KListBox ===========================================================
 
 #endif

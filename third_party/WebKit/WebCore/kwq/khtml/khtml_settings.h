@@ -33,7 +33,15 @@
 
 class KHTMLSettings {
  public:
+  enum KAnimationAdvice {
+    KAnimationDisabled,
+    KAnimationLoopOnce,
+    KAnimationEnabled
+  };
+
   KHTMLSettings();
+
+  void init() {}
 
   // Font settings
   QString stdFontName() const;
@@ -42,6 +50,9 @@ class KHTMLSettings {
   QString sansSerifFontName() const;
   QString cursiveFontName() const;
   QString fantasyFontName() const;
+
+  void setStdFontName(const QString&) {}
+  void setFixedFontName(const QString&) {}
 
   QString settingsToCSS() const;
 
@@ -57,6 +68,19 @@ class KHTMLSettings {
 
   bool isFormCompletionEnabled() const;
   int maxFormCompletionItems() const;
+
+  bool autoLoadImages() const;
+  KAnimationAdvice showAnimations() const;
+
+  bool isJavaScriptEnabled() const;
+  bool isJavaScriptEnabled(const QString& host) const;
+  bool isJavaScriptDebugEnabled() const;
+  bool isJavaEnabled() const;
+  bool isJavaEnabled(const QString& host) const;
+  bool isPluginsEnabled() const;
+  bool isPluginsEnabled(const QString& host) const;
+
+  QString userStyleSheet() const;
 
  private:
   QFont::CharSet m_charSet;

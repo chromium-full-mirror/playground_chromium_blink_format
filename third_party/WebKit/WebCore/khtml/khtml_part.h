@@ -811,12 +811,12 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Internal reimplementation of KParts::Part::guiActivateEvent .
    */
   virtual void guiActivateEvent(KParts::GUIActivateEvent* event);
+#endif
 
   /**
    * Internal empty reimplementation of @ref KParts::ReadOnlyPart::openFile .
    */
   virtual bool openFile();
-#endif
 
   virtual void urlSelected(const QString& url,
                            int button,
@@ -871,8 +871,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   QCString dcopObjectId() const;
 
-#ifndef APPLE_CHANGES
-
  private slots:
 
   /**
@@ -912,6 +910,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @internal
    */
   void slotDebugRenderTree();
+#ifndef APPLE_CHANGES
   /**
    * @internal
    */
@@ -949,6 +948,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   virtual void slotFind();
   virtual void slotFindDone();
   virtual void slotFindDialogDestroyed();
+#endif
 
   void slotIncZoom();
   void slotDecZoom();
@@ -1030,8 +1030,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @internal
    */
   void slotClearSelection();
-
-#endif
 
  private:
   /**
@@ -1173,9 +1171,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setBaseURL(const KURL&);
 
   QString documentSource() const;
-
-  QString sheetUsed() const;
-  void setSheetUsed(const QString&);
 
   void setTitle(const DOM::DOMString&);
 

@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef DCOPCLIENT_H_
@@ -36,71 +36,54 @@
 // class DCOPClient ============================================================
 
 class DCOPClient : public QObject {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
+    
+    // constructors, copy constructors, and destructors ------------------------
+    
+    DCOPClient();
+    virtual ~DCOPClient();
+    
+    // member functions --------------------------------------------------------
 
-  DCOPClient();
-  virtual ~DCOPClient();
+	bool call(const char *remApp, const char *remObj, const char *remFun, 
+	    const QByteArray &data, QCString& replyType, QByteArray &replyData, 
+	    bool useEventLoop=false, bool fast=false);
+	
+	bool call(const QCString &remApp, const QCString &remObj, 
+	    const QCString &remFun, const QByteArray &data, QCString& replyType, 
+	    QByteArray &replyData, bool useEventLoop=false, bool fast=false);
 
-  // member functions --------------------------------------------------------
+	bool send(const char *remApp, const char *remObj, const char *remFun, 
+	    const QByteArray &data, bool fast=false);
+		
+	bool send(const QCString &remApp, const QCString &remObj, 
+	    const QCString &remFun, const QByteArray &data, bool fast=false);
 
-  bool call(const char* remApp,
-            const char* remObj,
-            const char* remFun,
-            const QByteArray& data,
-            QCString& replyType,
-            QByteArray& replyData,
-            bool useEventLoop = false,
-            bool fast = false);
+    // operators ---------------------------------------------------------------
 
-  bool call(const QCString& remApp,
-            const QCString& remObj,
-            const QCString& remFun,
-            const QByteArray& data,
-            QCString& replyType,
-            QByteArray& replyData,
-            bool useEventLoop = false,
-            bool fast = false);
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  bool send(const char* remApp,
-            const char* remObj,
-            const char* remFun,
-            const QByteArray& data,
-            bool fast = false);
+private:
 
-  bool send(const QCString& remApp,
-            const QCString& remObj,
-            const QCString& remFun,
-            const QByteArray& data,
-            bool fast = false);
-
-  // operators ---------------------------------------------------------------
-
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
-
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  DCOPClient(const DCOPClient&);
+    DCOPClient(const DCOPClient &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  DCOPClient& operator=(const DCOPClient&);
+    DCOPClient &operator=(const DCOPClient &);
 #endif
 
-};  // class DCOPClient
-    // =========================================================
+}; // class DCOPClient =========================================================
 
 #endif

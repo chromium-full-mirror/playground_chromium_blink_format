@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KLINEEDIT_H_
@@ -39,45 +39,44 @@
 // class __class_name__ ========================================================
 
 class KLineEdit : public QLineEdit, public KCompletionBase {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-  KLineEdit(QWidget* parent = 0, const char* name = 0);
-  virtual ~KLineEdit();
+    // constructors, copy constructors, and destructors ------------------------
 
-  // member functions --------------------------------------------------------
+    KLineEdit(QWidget *parent=0, const char *name=0);
+    virtual ~KLineEdit();
 
-  void setMouseTracking(bool);
-  virtual void setContextMenuEnabled(bool showMenu);
-  KCompletionBox* completionBox(bool create);
+    // member functions --------------------------------------------------------
 
-  // operators ---------------------------------------------------------------
+    void setMouseTracking(bool);
+    virtual void setContextMenuEnabled(bool showMenu);
+    KCompletionBox *completionBox(bool create);
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
- private:
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
+
+private:
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KLineEdit(const KLineEdit&);
+    KLineEdit(const KLineEdit &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KLineEdit& operator=(const KLineEdit&);
+    KLineEdit &operator=(const KLineEdit &);
 #endif
 
-};  // class __class_name__
-    // =====================================================
+}; // class __class_name__ =====================================================
 
 #endif

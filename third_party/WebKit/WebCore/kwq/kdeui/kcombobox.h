@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KCOMBOBOX_H_
@@ -37,46 +37,45 @@
 // class KComboBox =============================================================
 
 class KComboBox : public QComboBox, public KCompletionBase {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
-  // enums -------------------------------------------------------------------
-  // constants ---------------------------------------------------------------
-  // static member functions -------------------------------------------------
+public:
 
-  // constructors, copy constructors, and destructors ------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
+    // enums -------------------------------------------------------------------
+    // constants ---------------------------------------------------------------
+    // static member functions -------------------------------------------------
 
-  KComboBox(QWidget* parent = 0, const char* name = 0);
-  KComboBox(bool rw, QWidget* parent = 0, const char* name = 0);
-  virtual ~KComboBox();
+    // constructors, copy constructors, and destructors ------------------------
 
-// member functions --------------------------------------------------------
+    KComboBox(QWidget *parent=0, const char *name=0);
+    KComboBox(bool rw, QWidget *parent=0, const char *name=0);
+    virtual ~KComboBox();
+
+    // member functions --------------------------------------------------------
 #ifdef APPLE_CHANGES
-  void doneLoading();
-  void setSize(int size);
+    void doneLoading();
+    void setSize(int size);
 #endif
 
-  // operators ---------------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
- private:
+private:
+
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KComboBox(const KComboBox&);
+    KComboBox(const KComboBox &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KComboBox& operator=(const KComboBox&);
+    KComboBox &operator=(const KComboBox &);
 #endif
 
-};  // class KComboBox
-    // ==========================================================
+}; // class KComboBox ==========================================================
 
 #endif

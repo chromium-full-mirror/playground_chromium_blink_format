@@ -27,6 +27,12 @@
 #define SPEED_DEBUG
 #include "khtml_part.h"
 
+#ifdef APPLE_CHANGES
+#define DIRECT_LINKAGE_TO_ECMA
+#define QT_NO_CLIPBOARD
+#define QT_NO_DRAGANDDROP
+#endif
+
 #include "khtml_pagecache.h"
 
 #include "dom/dom_string.h"
@@ -83,6 +89,8 @@ using namespace DOM;
 #include <private/qucomextra_p.h>
 
 #include "khtmlpart_p.h"
+
+#ifndef APPLE_CHANGES
 
 namespace khtml {
 class PartStyleSheetLoader : public CachedObjectClient {
@@ -146,6 +154,8 @@ KHTMLPart::KHTMLPart(KHTMLView* view,
   init(view, prof);
 }
 
+#endif
+
 void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   if (prof == DefaultGUI)
     setXMLFile("khtml.rc");
@@ -164,6 +174,7 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_bSecurityInQuestion = false;
   d->m_paLoadImages = 0;
   d->m_bMousePressed = false;
+#ifndef APPLE_CHANGES
   d->m_paViewDocument = new KAction(i18n("View Document Source"), 0, this,
                                     SLOT(slotViewDocumentSource()),
                                     actionCollection(), "viewDocumentSource");
@@ -227,6 +238,7 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
                                            actionCollection(), "selectAll");
   if (parentPart())
     d->m_paSelectAll->setShortcut(KShortcut());  // avoid clashes
+#endif
 
   // set the default java(script) flags according to the current host.
   d->m_bJScriptEnabled =
@@ -237,12 +249,14 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   d->m_bPluginsEnabled =
       KHTMLFactory::defaultHTMLSettings()->isPluginsEnabled();
 
+#ifndef APPLE_CHANGES
   connect(this, SIGNAL(completed()), this, SLOT(updateActions()));
   connect(this, SIGNAL(completed(bool)), this, SLOT(updateActions()));
   connect(this, SIGNAL(started(KIO::Job*)), this, SLOT(updateActions()));
 
   d->m_popupMenuXML = KXMLGUIFactory::readConfigFile(
       locate("data", "khtml/khtml_popupmenu.rc", KHTMLFactory::instance()));
+#endif
 
   connect(
       khtml::Cache::loader(),
@@ -255,16 +269,22 @@ void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
           SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
           SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
 
+#ifndef APPLE_CHANGES
   findTextBegin();  // reset find variables
 
   connect(&d->m_redirectionTimer, SIGNAL(timeout()), this,
           SLOT(slotRedirect()));
 
   d->m_dcopobject = new KHTMLPartIface(this);
+#endif
 }
 
 KHTMLPart::~KHTMLPart() {
-  // kdDebug(6050) << "KHTMLPart::~KHTMLPart " << this << endl;
+// kdDebug(6050) << "KHTMLPart::~KHTMLPart " << this << endl;
+#ifdef APPLE_CHANGES
+  killTimers();
+#endif
+#ifndef APPLE_CHANGES
   if (d->m_findDialog)
     disconnect(d->m_findDialog, SIGNAL(destroyed()), this,
                SLOT(slotFindDialogDestroyed()));
@@ -275,9 +295,12 @@ KHTMLPart::~KHTMLPart() {
     // No need to, I would say. We specify "this" as parent qobject
     // in ::partManager() (Simon)
   }
+#endif
 
   stopAutoScroll();
+#ifndef APPLE_CHANGES
   d->m_redirectionTimer.stop();
+#endif
 
   if (d->m_job)
     d->m_job->kill();
@@ -314,7 +337,9 @@ KHTMLPart::~KHTMLPart() {
 bool KHTMLPart::restoreURL(const KURL& url) {
   kdDebug(6050) << "KHTMLPart::restoreURL " << url.url() << endl;
 
+#ifndef APPLE_CHANGES
   d->m_redirectionTimer.stop();
+#endif
 
   /*
    * That's not a good idea as it will call closeURL() on all
@@ -344,13 +369,17 @@ bool KHTMLPart::restoreURL(const KURL& url) {
 
   m_url = url;
 
+#ifndef APPLE_CHANGES
   KHTMLPageCache::self()->fetchData(d->m_cacheId, this,
                                     SLOT(slotRestoreData(const QByteArray&)));
 
   emit started(0L);
+#endif
 
   return true;
 }
+
+#ifndef APPLE_CHANGES
 
 bool KHTMLPart::openURL(const KURL& url) {
   kdDebug(6050) << "KHTMLPart(" << this << ")::openURL " << url.url() << endl;
@@ -489,9 +518,13 @@ bool KHTMLPart::openURL(const KURL& url) {
   return true;
 }
 
+#endif
+
 bool KHTMLPart::closeURL() {
   if (d->m_job) {
+#ifndef APPLE_CHANGES
     KHTMLPageCache::self()->cancelEntry(d->m_cacheId);
+#endif
     d->m_job->kill();
     d->m_job = 0;
   }
@@ -512,10 +545,14 @@ bool KHTMLPart::closeURL() {
   d->m_bLoadEventEmitted = true;  // don't want that one either
   d->m_bReloading = false;
 
+#ifndef APPLE_CHANGES
   KHTMLPageCache::self()->cancelFetch(this);
+#endif
   if (d->m_doc && d->m_doc->parsing()) {
     kdDebug(6050) << " was still parsing... calling end " << endl;
+#ifndef APPLE_CHANGES
     slotFinishedParsing();
+#endif
     d->m_doc->setParsing(false);
   }
 
@@ -529,6 +566,7 @@ bool KHTMLPart::closeURL() {
 
   d->m_workingURL = KURL();
 
+#ifndef APPLE_CHANGES
   if (d->m_doc && d->m_doc->docLoader())
     khtml::Cache::loader()->cancelRequests(d->m_doc->docLoader());
 
@@ -538,12 +576,15 @@ bool KHTMLPart::closeURL() {
   for (; it != end; ++it)
     if (!(*it).m_part.isNull())
       (*it).m_part->closeURL();
+#endif
 
   d->m_bPendingChildRedirection = false;
 
+#ifndef APPLE_CHANGES
   // Stop any started redirections as well!! (DA)
   if (d && d->m_redirectionTimer.isActive())
     d->m_redirectionTimer.stop();
+#endif
 
   // null node activated.
   emit nodeActivated(Node());
@@ -766,6 +807,7 @@ void KHTMLPart::slotShowDocument(const QString& url, const QString& target) {
       emit d->m_extension->openURLRequest(url, newArgs);
       return;
     } else if (frameName != QString::fromLatin1("_self")) {
+#ifndef APPLE_CHANGES
       khtml::ChildFrame* _frame = recursiveFrameRequest(url, args);
 
       if (!_frame) {
@@ -774,6 +816,7 @@ void KHTMLPart::slotShowDocument(const QString& url, const QString& target) {
       }
 
       child = _frame;
+#endif
     }
   }
 
@@ -817,6 +860,7 @@ void KHTMLPart::setAutoloadImages(bool enable) {
   if (d->m_doc)
     d->m_doc->docLoader()->setAutoloadImages(enable);
 
+#ifndef APPLE_CHANGES
   unplugActionList("loadImages");
 
   if (enable) {
@@ -832,6 +876,7 @@ void KHTMLPart::setAutoloadImages(bool enable) {
     lst.append(d->m_paLoadImages);
     plugActionList("loadImages", lst);
   }
+#endif
 }
 
 bool KHTMLPart::autoloadImages() const {
@@ -849,6 +894,7 @@ void KHTMLPart::clear() {
 
   d->m_bClearing = true;
 
+#ifndef APPLE_CHANGES
   {
     ConstFrameIt it = d->m_frames.begin();
     ConstFrameIt end = d->m_frames.end();
@@ -870,6 +916,7 @@ void KHTMLPart::clear() {
   }
 
   findTextBegin();  // resets d->m_findNode and d->m_findPos
+#endif
 
   d->m_mousePressNode = DOM::Node();
 
@@ -900,6 +947,7 @@ void KHTMLPart::clear() {
 
   d->m_decoder = 0;
 
+#ifndef APPLE_CHANGES
   {
     ConstFrameIt it = d->m_frames.begin();
     ConstFrameIt end = d->m_frames.end();
@@ -913,6 +961,7 @@ void KHTMLPart::clear() {
 
   d->m_frames.clear();
   d->m_objects.clear();
+#endif
 
 #ifndef Q_WS_QWS
   delete d->m_javaContext;
@@ -983,7 +1032,9 @@ void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
     d->m_doc->docLoader()->setReloading(d->m_bReloading);
     d->m_workingURL = KURL();
 
+#ifndef APPLE_CHANGES
     d->m_cacheId = KHTMLPageCache::self()->createCacheEntry();
+#endif
 
     // When the first data arrives, the metadata has just been made available
     d->m_bSecurityInQuestion = false;
@@ -997,15 +1048,19 @@ void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
         while (p->parentPart())
           p = p->parentPart();
 
+#ifndef APPLE_CHANGES
         p->d->m_paSecurity->setIcon("halfencrypted");
+#endif
         p->d->m_bSecurityInQuestion = true;
         kdDebug(6050) << "parent setIcon half done." << endl;
       }
     }
 
+#ifndef APPLE_CHANGES
     d->m_paSecurity->setIcon(d->m_ssl_in_use ? "encrypted" : "decrypted");
     kdDebug(6050) << "setIcon " << (d->m_ssl_in_use ? "encrypted" : "decrypted")
                   << " done." << endl;
+#endif
 
     // Shouldn't all of this be done only if ssl_in_use == true ? (DF)
 
@@ -1071,7 +1126,9 @@ void KHTMLPart::slotData(KIO::Job* kio_job, const QByteArray& data) {
     // d->m_lastModified << endl;
   }
 
+#ifndef APPLE_CHANGES
   KHTMLPageCache::self()->addData(d->m_cacheId, data);
+#endif
   write(data.data(), data.size());
 }
 
@@ -1095,6 +1152,8 @@ void KHTMLPart::slotRestoreData(const QByteArray& data) {
       end();  // will emit completed()
   }
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::showError(KIO::Job* job) {
   kdDebug() << "KHTMLPart::showError d->m_bParsing="
@@ -1219,19 +1278,29 @@ void KHTMLPart::htmlError(int errorCode,
   end();
 }
 
+#endif
+
 void KHTMLPart::slotFinished(KIO::Job* job) {
   if (job->error()) {
+#ifndef APPLE_CHANGES
     KHTMLPageCache::self()->cancelEntry(d->m_cacheId);
+#endif
     d->m_job = 0L;
+#ifndef APPLE_CHANGES
     emit canceled(job->errorString());
+#endif
     // TODO: what else ?
     checkCompleted();
+#ifndef APPLE_CHANGES
     showError(job);
+#endif
     return;
   }
-  // kdDebug( 6050 ) << "slotFinished" << endl;
+// kdDebug( 6050 ) << "slotFinished" << endl;
 
+#ifndef APPLE_CHANGES
   KHTMLPageCache::self()->endData(d->m_cacheId);
+#endif
 
   if (d->m_doc && d->m_doc->docLoader()->expireDate() &&
       m_url.protocol().lower().startsWith("http"))
@@ -1244,6 +1313,8 @@ void KHTMLPart::slotFinished(KIO::Job* job) {
     end();  // will emit completed()
 }
 
+#ifndef APPLE_CHANGES
+
 void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   clear();
   d->m_bCleared = false;
@@ -1251,6 +1322,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_bComplete = false;
   d->m_bLoadEventEmitted = false;
 
+#ifndef APPLE_CHANGES
   if (url.isValid()) {
     QString urlString = url.url();
     KHTMLFactory::vLinks()->insert(urlString);
@@ -1259,6 +1331,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
       KHTMLFactory::vLinks()->insert(urlString2);
     }
   }
+#endif
 
   // ###
   // stopParser();
@@ -1272,6 +1345,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   m_url = url;
   KURL baseurl;
 
+#ifndef APPLE_CHANGES
   if (!m_url.isEmpty()) {
     KURL::List lst = KURL::split(m_url);
     if (!lst.isEmpty())
@@ -1283,6 +1357,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
     emit setWindowCaption(title.url());
   } else
     emit setWindowCaption(i18n("no title", "* Unknown *"));
+#endif
 
   // ### not sure if XHTML documents served as text/xml should use DocumentImpl
   // or HTMLDocumentImpl
@@ -1298,9 +1373,12 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   // We prefer m_baseURL over m_url because m_url changes when we are
   // about to load a new page.
   d->m_doc->setBaseURL(baseurl.url());
+#ifndef APPLE_CHANGES
   d->m_doc->docLoader()->setShowAnimations(
       KHTMLFactory::defaultHTMLSettings()->showAnimations());
+#endif
 
+#ifndef APPLE_CHANGES
   // Inherit domain from parent
   KHTMLPart* parent = parentPart();
   if (d->m_doc->isHTMLDocument() && parent && parent->d->m_doc &&
@@ -1314,6 +1392,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 
   d->m_paUseStylesheet->setItems(QStringList());
   d->m_paUseStylesheet->setEnabled(false);
+#endif
 
   setAutoloadImages(KHTMLFactory::defaultHTMLSettings()->autoLoadImages());
   QString userStyleSheet =
@@ -1321,14 +1400,18 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   if (!userStyleSheet.isEmpty())
     setUserStyleSheet(KURL(userStyleSheet));
 
+#ifndef APPLE_CHANGES
   d->m_doc->setRestoreState(args.docState);
+#endif
   d->m_doc->open();
   // clear widget
   d->m_view->resizeContents(0, 0);
   connect(d->m_doc, SIGNAL(finishedParsing()), this,
           SLOT(slotFinishedParsing()));
 
+#ifndef APPLE_CHANGES
   emit d->m_extension->enableAction("print", true);
+#endif
 
   d->m_doc->setParsing(true);
 }
@@ -1374,6 +1457,8 @@ void KHTMLPart::write(const char* str, int len) {
     t->write(decoded, true);
 }
 
+#endif
+
 void KHTMLPart::write(const QString& str) {
   if (str.isNull())
     return;
@@ -1390,6 +1475,8 @@ void KHTMLPart::write(const QString& str) {
     t->write(str, true);
 }
 
+#ifndef APPLE_CHANGES
+
 void KHTMLPart::end() {
   // make sure nothing's left in there...
   if (d->m_decoder)
@@ -1398,6 +1485,8 @@ void KHTMLPart::end() {
     d->m_doc->finishParsing();
 }
 
+#endif
+
 void KHTMLPart::paint(QPainter* p, const QRect& rc, int yOff, bool* more) {
   if (!d->m_view)
     return;
@@ -1405,6 +1494,7 @@ void KHTMLPart::paint(QPainter* p, const QRect& rc, int yOff, bool* more) {
 }
 
 void KHTMLPart::stopAnimations() {
+#ifndef APPLE_CHANGES
   if (d->m_doc)
     d->m_doc->docLoader()->setShowAnimations(KHTMLSettings::KAnimationDisabled);
 
@@ -1415,6 +1505,7 @@ void KHTMLPart::stopAnimations() {
       KParts::ReadOnlyPart* p = (*it).m_part;
       static_cast<KHTMLPart*>(p)->stopAnimations();
     }
+#endif
 }
 
 void KHTMLPart::slotFinishedParsing() {
@@ -1470,6 +1561,8 @@ void KHTMLPart::slotLoaderRequestDone(khtml::DocLoader* dl,
   checkCompleted();
 }
 
+#ifndef APPLE_CHANGES
+
 void KHTMLPart::slotProgressUpdate() {
   int percent;
   if (d->m_loadedObjects < d->m_totalObjectCount)
@@ -1498,6 +1591,8 @@ void KHTMLPart::slotJobPercent(KIO::Job* /*job*/, unsigned long percent) {
     QTimer::singleShot(0, this, SLOT(slotProgressUpdate()));
 }
 
+#endif
+
 void KHTMLPart::checkCompleted() {
   //   kdDebug( 6050 ) << "KHTMLPart::checkCompleted() parsing: " <<
   //   d->m_doc->parsing() << endl;
@@ -1513,12 +1608,14 @@ void KHTMLPart::checkCompleted() {
     d->m_focusNodeRestored = true;
   }
 
+#ifndef APPLE_CHANGES
   // Any frame that hasn't completed yet ?
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_bCompleted)
       return;
+#endif
 
   // Are we still parsing - or have we done the completed stuff already ?
   if (d->m_bComplete || (d->m_doc && d->m_doc->parsing()))
@@ -1545,6 +1642,7 @@ void KHTMLPart::checkCompleted() {
 
   d->m_view->complete();
 
+#ifndef APPLE_CHANGES
   if (!d->m_redirectURL.isEmpty()) {
     // Do not start redirection for frames here! That action is
     // deferred until the parent emits a completed signal.
@@ -1558,11 +1656,13 @@ void KHTMLPart::checkCompleted() {
     else
       emit completed();
   }
+#endif
 
   // find the alternate stylesheets
   QStringList sheets;
   if (d->m_doc)
     sheets = d->m_doc->availableStyleSheets();
+#ifndef APPLE_CHANGES
   d->m_paUseStylesheet->setItems(sheets);
   d->m_paUseStylesheet->setEnabled(!sheets.isEmpty());
   if (!sheets.isEmpty())
@@ -1571,6 +1671,7 @@ void KHTMLPart::checkCompleted() {
 
   if (!parentPart())
     emit setStatusBarText(i18n("Done."));
+#endif
 
 #ifdef SPEED_DEBUG
   kdDebug(6050) << "DONE: " << d->m_parsetime.elapsed() << endl;
@@ -1578,6 +1679,7 @@ void KHTMLPart::checkCompleted() {
 }
 
 void KHTMLPart::checkEmitLoadEvent() {
+#ifndef APPLE_CHANGES
   if (d->m_bLoadEventEmitted || !d->m_doc || d->m_doc->parsing())
     return;
 
@@ -1590,6 +1692,7 @@ void KHTMLPart::checkEmitLoadEvent() {
   d->m_bLoadEventEmitted = true;
   if (d->m_doc)
     d->m_doc->close();
+#endif
 }
 
 const KHTMLSettings* KHTMLPart::settings() const {
@@ -1622,6 +1725,8 @@ KURL KHTMLPart::completeURL(const QString& url) {
   return KURL(d->m_doc->completeURL(url));
 }
 
+#ifndef APPLE_CHANGES
+
 // ### implement lockhistory being optional (sometimes javascript wants
 // to do redirection that end up in the history!)
 void KHTMLPart::scheduleRedirection(int delay,
@@ -1639,6 +1744,8 @@ void KHTMLPart::scheduleRedirection(int delay,
   }
 }
 
+#endif
+
 void KHTMLPart::slotRedirect() {
   QString u = d->m_redirectURL;
   d->m_delayRedirect = 0;
@@ -1648,18 +1755,22 @@ void KHTMLPart::slotRedirect() {
     // kdDebug( 6050 ) << "KHTMLPart::slotRedirect script=" << script << endl;
     QVariant res = executeScript(script);
     if (res.type() == QVariant::String) {
+#ifndef APPLE_CHANGES
       begin(url());
       write(res.asString());
       end();
+#endif
     }
     return;
   }
+#ifndef APPLE_CHANGES
   KParts::URLArgs args;
   if (urlcmp(u, m_url.url(), true, true))
     args.reload = true;
 
   args.setLockHistory(true);
   urlSelected(u, 0, 0, QString::null, args);
+#endif
 }
 
 void KHTMLPart::slotRedirection(KIO::Job*, const KURL& url) {
@@ -1673,6 +1784,7 @@ bool KHTMLPart::setEncoding(const QString& name, bool override) {
   d->m_encoding = name;
   d->m_haveEncoding = override;
 
+#ifndef APPLE_CHANGES
   if (!m_url.isEmpty()) {
     // reload document
     closeURL();
@@ -1680,6 +1792,7 @@ bool KHTMLPart::setEncoding(const QString& name, bool override) {
     m_url = 0;
     openURL(url);
   }
+#endif
 
   return true;
 }
@@ -1695,9 +1808,11 @@ QString KHTMLPart::encoding() const {
 }
 
 void KHTMLPart::setUserStyleSheet(const KURL& url) {
+#ifndef APPLE_CHANGES
   if (d->m_doc && d->m_doc->docLoader())
     (void)new khtml::PartStyleSheetLoader(this, url.url(),
                                           d->m_doc->docLoader());
+#endif
 }
 
 void KHTMLPart::setUserStyleSheet(const QString& styleSheet) {
@@ -1752,6 +1867,8 @@ bool KHTMLPart::onlyLocalReferences() const {
 void KHTMLPart::setOnlyLocalReferences(bool enable) {
   d->m_onlyLocalReferences = enable;
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::findTextBegin() {
   d->m_findPos = -1;
@@ -1853,6 +1970,8 @@ bool KHTMLPart::findTextNext(const QString& str,
   }
 }
 
+#endif
+
 QString KHTMLPart::selectedText() const {
   QString text;
   DOM::Node n = d->m_selectionStart;
@@ -1942,6 +2061,8 @@ void KHTMLPart::slotClearSelection() {
     d->m_doc->clearSelection();
   emitSelectionChanged();
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::overURL(const QString& url,
                         const QString& target,
@@ -2430,9 +2551,13 @@ bool KHTMLPart::requestFrame(khtml::RenderPart* frame,
   return requestObject(&(*it), completeURL(url));
 }
 
+#endif
+
 QString KHTMLPart::requestFrameName() {
   return QString::fromLatin1("<!--frame %1-->").arg(d->m_frameNameId++);
 }
+
+#ifndef APPLE_CHANGES
 
 bool KHTMLPart::requestObject(khtml::RenderPart* frame,
                               const QString& url,
@@ -2739,6 +2864,8 @@ KParts::PartManager* KHTMLPart::partManager() {
   return d->m_manager;
 }
 
+#endif
+
 void KHTMLPart::submitFormAgain() {
   if (d->m_doc && !d->m_doc->parsing() && d->m_submitForm)
     KHTMLPart::submitForm(
@@ -2750,6 +2877,8 @@ void KHTMLPart::submitFormAgain() {
   d->m_submitForm = 0;
   disconnect(this, SIGNAL(completed()), this, SLOT(submitFormAgain()));
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::submitForm(const char* action,
                            const QString& url,
@@ -3068,12 +3197,16 @@ bool KHTMLPart::frameExists(const QString& frameName) {
   return (!(*it).m_frame.isNull());
 }
 
+#endif
+
 KHTMLPart* KHTMLPart::parentPart() {
   if (!parent() || !parent()->inherits("KHTMLPart"))
     return 0L;
 
   return (KHTMLPart*)parent();
 }
+
+#ifndef APPLE_CHANGES
 
 khtml::ChildFrame* KHTMLPart::recursiveFrameRequest(const KURL& url,
                                                     const KParts::URLArgs& args,
@@ -3218,7 +3351,9 @@ void KHTMLPart::restoreState(QDataStream& stream) {
       d->m_ssl_cipher_desc >> d->m_ssl_cipher_version >>
       d->m_ssl_cipher_used_bits >> d->m_ssl_cipher_bits >> d->m_ssl_cert_state;
 
+#ifndef APPLE_CHANGES
   d->m_paSecurity->setIcon(d->m_ssl_in_use ? "encrypted" : "decrypted");
+#endif
 
   stream >> frameCount >> frameNames >> frameServiceTypes >>
       frameServiceNames >> frameURLs >> frameStateBuffers;
@@ -3342,6 +3477,8 @@ void KHTMLPart::restoreState(QDataStream& stream) {
   d->m_restored = true;
 }
 
+#endif
+
 void KHTMLPart::show() {
   if (d->m_view)
     d->m_view->show();
@@ -3357,9 +3494,11 @@ DOM::Node KHTMLPart::nodeUnderMouse() const {
 }
 
 void KHTMLPart::emitSelectionChanged() {
+#ifndef APPLE_CHANGES
   emit d->m_extension->enableAction("copy", hasSelection());
   emit d->m_extension->selectionInfo(selectedText());
   emit selectionChanged();
+#endif
 }
 
 int KHTMLPart::zoomFactor() const {
@@ -3401,6 +3540,7 @@ void KHTMLPart::slotDecZoom() {
 }
 
 void KHTMLPart::setZoomFactor(int percent) {
+#ifndef APPLE_CHANGES
   if (percent < minZoom)
     percent = minZoom;
   if (percent > maxZoom)
@@ -3428,6 +3568,7 @@ void KHTMLPart::setZoomFactor(int percent) {
 
   d->m_paDecZoomFactor->setEnabled(d->m_zoomFactor > minZoom);
   d->m_paIncZoomFactor->setEnabled(d->m_zoomFactor < maxZoom);
+#endif
 }
 
 void KHTMLPart::setJSStatusBarText(const QString& text) {
@@ -3456,6 +3597,8 @@ QString KHTMLPart::lastModified() const {
   return d->m_lastModified;
 }
 
+#ifndef APPLE_CHANGES
+
 void KHTMLPart::slotLoadImages() {
   if (d->m_doc)
     d->m_doc->docLoader()->setAutoloadImages(
@@ -3470,13 +3613,17 @@ void KHTMLPart::slotLoadImages() {
     }
 }
 
+#endif
+
 void KHTMLPart::reparseConfiguration() {
   KHTMLSettings* settings = KHTMLFactory::defaultHTMLSettings();
   settings->init();
 
   setAutoloadImages(settings->autoLoadImages());
+#ifndef APPLE_CHANGES
   if (d->m_doc)
     d->m_doc->docLoader()->setShowAnimations(settings->showAnimations());
+#endif
 
   d->m_bJScriptEnabled = settings->isJavaScriptEnabled(m_url.host());
   d->m_bJScriptDebugEnabled = settings->isJavaScriptDebugEnabled();
@@ -3490,6 +3637,8 @@ void KHTMLPart::reparseConfiguration() {
     d->m_doc->recalcStyle(NodeImpl::Force);
   QApplication::restoreOverrideCursor();
 }
+
+#ifndef APPLE_CHANGES
 
 QStringList KHTMLPart::frameNames() const {
   QStringList res;
@@ -3529,6 +3678,8 @@ bool KHTMLPart::openURLInFrame(const KURL& url,
   return true;
 }
 
+#endif
+
 void KHTMLPart::setDNDEnabled(bool b) {
   d->m_bDnd = b;
 }
@@ -3536,6 +3687,8 @@ void KHTMLPart::setDNDEnabled(bool b) {
 bool KHTMLPart::dndEnabled() const {
   return d->m_bDnd;
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::customEvent(QCustomEvent* event) {
   if (khtml::MousePressEvent::test(event)) {
@@ -3989,6 +4142,8 @@ void KHTMLPart::slotSelectAll() {
     static_cast<KHTMLPart*>(part)->selectAll();
 }
 
+#endif
+
 void KHTMLPart::startAutoScroll() {
   connect(&d->m_scrollTimer, SIGNAL(timeout()), this, SLOT(slotAutoScroll()));
   d->m_scrollTimer.start(100, false);
@@ -4069,6 +4224,8 @@ void KHTMLPart::selectAll() {
   emitSelectionChanged();
 }
 
+#ifndef APPLE_CHANGES
+
 bool KHTMLPart::checkLinkSecurity(const KURL& linkURL,
                                   const QString& message,
                                   const QString& button) {
@@ -4103,6 +4260,8 @@ bool KHTMLPart::checkLinkSecurity(const KURL& linkURL,
   return true;
 }
 
+#endif
+
 QVariant KHTMLPart::executeScript(QString filename,
                                   int baseLine,
                                   const DOM::Node& n,
@@ -4125,6 +4284,8 @@ void KHTMLPart::slotPartRemoved(KParts::Part* part) {
   if (part == d->m_activeFrame)
     d->m_activeFrame = 0L;
 }
+
+#ifndef APPLE_CHANGES
 
 void KHTMLPart::slotActiveFrameChanged(KParts::Part* part) {
   //    kdDebug(6050) << "KHTMLPart::slotActiveFrameChanged part=" << part <<
@@ -4162,6 +4323,8 @@ void KHTMLPart::slotActiveFrameChanged(KParts::Part* part) {
   d->m_extension->setExtensionProxy(
       KParts::BrowserExtension::childObject(d->m_activeFrame));
 }
+
+#endif
 
 void KHTMLPart::setActiveNode(const DOM::Node& node) {
   if (!d->m_doc || !d->m_view)
@@ -4214,11 +4377,15 @@ void KHTMLPart::preloadScript(const QString& url, const QString& script) {
   khtml::Cache::preloadScript(url, script);
 }
 
+#ifndef APPLE_CHANGES
+
 QCString KHTMLPart::dcopObjectId() const {
   QCString id;
   id.sprintf("html-widget%d", d->m_dcop_counter);
   return id;
 }
+
+#endif
 
 long KHTMLPart::cacheId() const {
   return d->m_cacheId;

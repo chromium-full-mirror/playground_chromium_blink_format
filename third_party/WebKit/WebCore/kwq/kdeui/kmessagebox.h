@@ -20,7 +20,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #ifndef KMESSAGEBOX_H_
@@ -36,76 +36,68 @@
 // class KMessageBox ===========================================================
 
 class KMessageBox {
- public:
-  // structs -----------------------------------------------------------------
-  // typedefs ----------------------------------------------------------------
+public:
 
-  // enums -------------------------------------------------------------------
+    // structs -----------------------------------------------------------------
+    // typedefs ----------------------------------------------------------------
 
-  enum { Ok = 1, Cancel = 2, Yes = 3, No = 4, Continue = 5 };
+    // enums -------------------------------------------------------------------
 
-  // constants ---------------------------------------------------------------
+    enum { Ok = 1, Cancel = 2, Yes = 3, No = 4, Continue = 5 };
 
-  // static member functions -------------------------------------------------
+    // constants ---------------------------------------------------------------
 
-  static void error(QWidget*,
-                    const QString&,
-                    const QString& caption = QString::null,
-                    bool notify = true);
+    // static member functions -------------------------------------------------
 
-  static int warningYesNo(QWidget*,
-                          const QString&,
-                          const QString& caption = QString::null,
-                          const QString& buttonYes = QString::null,
-                          const QString& buttonNo = QString::null,
-                          bool notify = true);
+    static void error(QWidget *, const QString &, 
+        const QString &caption=QString::null, bool notify=true);
+   
+    static int warningYesNo(QWidget *, const QString &, 
+        const QString &caption=QString::null, 
+        const QString &buttonYes=QString::null, 
+        const QString &buttonNo=QString::null, 
+        bool notify=true);
+   
+    static int questionYesNo(QWidget *, const QString &, 
+        const QString &caption=QString::null, 
+        const QString &buttonYes=QString::null, 
+        const QString &buttonNo=QString::null, bool notify=true);
+   
+    static void sorry(QWidget *, const QString &, 
+        const QString &caption=QString::null, bool notify=true);
 
-  static int questionYesNo(QWidget*,
-                           const QString&,
-                           const QString& caption = QString::null,
-                           const QString& buttonYes = QString::null,
-                           const QString& buttonNo = QString::null,
-                           bool notify = true);
-
-  static void sorry(QWidget*,
-                    const QString&,
-                    const QString& caption = QString::null,
-                    bool notify = true);
-
-// constructors, copy constructors, and destructors ------------------------
-
+    // constructors, copy constructors, and destructors ------------------------
+    
 // add no-arg constructor
 #ifdef _KWQ_PEDANTIC_
-  KMessageBox() {}
+    KMessageBox() {}
 #endif
 
 // add no-op destructor
 #ifdef _KWQ_PEDANTIC_
-  ~KMessageBox() {}
+    ~KMessageBox() {}
 #endif
+        
+    // member functions --------------------------------------------------------
+    // operators ---------------------------------------------------------------
 
-  // member functions --------------------------------------------------------
-  // operators ---------------------------------------------------------------
+// protected -------------------------------------------------------------------
+// private ---------------------------------------------------------------------
 
-  // protected
-  // -------------------------------------------------------------------
-  // private
-  // ---------------------------------------------------------------------
+private:
 
- private:
 // add copy constructor
 // this private declaration prevents copying
 #ifdef _KWQ_PEDANTIC_
-  KMessageBox(const KMessageBox&);
+    KMessageBox(const KMessageBox &);
 #endif
 
-// add assignment operator
+// add assignment operator 
 // this private declaration prevents assignment
 #ifdef _KWQ_PEDANTIC_
-  KMessageBox& operator=(const KMessageBox&);
+    KMessageBox &operator=(const KMessageBox &);
 #endif
 
-};  // class KMessageBox
-    // ========================================================
+}; // class KMessageBox ========================================================
 
 #endif
