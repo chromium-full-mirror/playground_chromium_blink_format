@@ -62,10 +62,9 @@ class QWidget : public QObject, public QPaintDevice {
   };
 
   QWidget(QWidget* parent = 0, const char* name = 0, int f = 0);
-  ~QWidget();
+  virtual ~QWidget();
 
   virtual QSize sizeHint() const;
-  virtual void resize(int, int);
   virtual void setActiveWindow();
   virtual void setEnabled(bool);
   virtual void setAutoMask(bool);
@@ -77,20 +76,21 @@ class QWidget : public QObject, public QPaintDevice {
   int width() const;
   int height() const;
   QSize size() const;
+  void resize(int, int);
   void resize(const QSize&);
   QPoint pos() const;
   void move(int, int);
-  virtual void move(const QPoint&);
+  void move(const QPoint&);
 
-  QRect frameGeometry() const;
+  virtual QRect frameGeometry() const;
 
-  QWidget* topLevelWidget() const;
+  virtual QWidget* topLevelWidget() const;
 
-  QPoint mapToGlobal(const QPoint&) const;
-  QPoint mapFromGlobal(const QPoint&) const;
+  virtual QPoint mapToGlobal(const QPoint&) const;
+  virtual QPoint mapFromGlobal(const QPoint&) const;
 
-  void setFocus();
-  void clearFocus();
+  virtual void setFocus();
+  virtual void clearFocus();
   FocusPolicy focusPolicy() const;
   virtual void setFocusPolicy(FocusPolicy);
   virtual void setFocusProxy(QWidget*);
@@ -109,7 +109,7 @@ class QWidget : public QObject, public QPaintDevice {
   virtual QSize minimumSizeHint() const;
   bool isVisible() const;
   virtual void setCursor(const QCursor&);
-  QCursor cursor();
+  virtual QCursor cursor();
   void unsetCursor();
   bool event(QEvent*);
   bool focusNextPrevChild(bool);
@@ -135,11 +135,12 @@ class QWidget : public QObject, public QPaintDevice {
   NSView* getView() const;
   void setView(NSView* aView);
 
-  void endEditing();
+  virtual void endEditing();
+
+ protected:
+  virtual void internalSetGeometry(int x, int y, int w, int h);
 
  private:
-  void internalSetGeometry(int x, int y, int w, int h);
-
   QWidgetPrivate* data;
 };
 
