@@ -42,7 +42,7 @@ bool StyleSurroundData::operator==(const StyleSurroundData& o) const {
          border == o.border;
 }
 
-StyleBoxData::StyleBoxData() : z_index(ZAUTO) {}
+StyleBoxData::StyleBoxData() : z_index(0), z_auto(true) {}
 
 StyleBoxData::StyleBoxData(const StyleBoxData& o)
     : Shared<StyleBoxData>(),
