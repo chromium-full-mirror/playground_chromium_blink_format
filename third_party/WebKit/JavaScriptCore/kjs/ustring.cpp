@@ -36,6 +36,7 @@
 
 #include "ustring.h"
 #include "operations.h"
+#include "identifier.h"
 #include <math.h>
 
 namespace KJS {
@@ -106,8 +107,8 @@ bool KJS::operator==(const KJS::CString& c1, const KJS::CString& c2) {
 }
 
 UChar UChar::null((char)0);
-UString::Rep UString::Rep::null = {0, 0, 0, 1};
-UString::Rep UString::Rep::empty = {0, 0, 0, 1};
+UString::Rep UString::Rep::null = {0, 0, 0, 1, 1};
+UString::Rep UString::Rep::empty = {0, 0, 0, 1, 1};
 UString UString::null;
 const int normalStatBufferSize = 4096;
 static char* statBuffer = 0;
@@ -149,8 +150,31 @@ UString::Rep* UString::Rep::create(UChar* d, int l) {
   r->len = l;
   r->capacity = l;
   r->rc = 1;
+  r->_hash = 0;
 
   return r;
+}
+
+void UString::Rep::destroy() {
+  if (capacity == capacityForIdentifier)
+    Identifier::aboutToDestroyUStringRep(this);
+  delete[] dat;
+  delete this;
+}
+
+void UString::Rep::computeHash() const {
+  int length = len;
+  int prefixLength = length < 8 ? length : 8;
+  int suffixPosition = length < 16 ? 8 : length - 8;
+
+  unsigned h = length;
+  for (int i = 0; i < prefixLength; i++)
+    h = 127 * h + dat[i].unicode();
+  for (int i = suffixPosition; i < length; i++)
+    h = 127 * h + dat[i].unicode();
+  if (h == 0)
+    h = 0x80000000;
+  _hash = h;
 }
 
 UString::UString() {
@@ -303,6 +327,7 @@ UString& UString::append(const UString& t) {
   if (rep->rc == 1 && newLen <= rep->capacity) {
     memcpy(rep->dat + l, t.data(), tLen * sizeof(UChar));
     rep->len = newLen;
+    rep->_hash = 0;
     return *this;
   }
 
@@ -359,8 +384,9 @@ void UString::globalClear() {
 UString& UString::operator=(const char* c) {
   int l = c ? strlen(c) : 0;
   UChar* d;
-  if (rep->rc == 1 && l < rep->capacity) {
+  if (rep->rc == 1 && l <= rep->capacity) {
     d = rep->dat;
+    rep->_hash = 0;
   } else {
     release();
     d = new UChar[l];
