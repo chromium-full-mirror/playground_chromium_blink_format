@@ -818,6 +818,8 @@ class RenderObject : public CachedObjectClient {
   // Convenience, to avoid repeating the code to dig down to get this.
   QChar backslashAsCurrencySymbol() const;
 
+  virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
+
  protected:
   virtual void selectionStartEnd(int& spos, int& epos);
 
