@@ -853,11 +853,9 @@ class RenderObject : public CachedObjectClient {
   // Convenience, to avoid repeating the code to dig down to get this.
   QChar backslashAsCurrencySymbol() const;
 
-  virtual long caretMinOffset() const { return 0; }
-  virtual long caretMaxOffset() const { return 0; }
-
-  bool precedesLineBreak() const;
-  bool followsLineBreak() const;
+  virtual long caretMinOffset() const;
+  virtual long caretMaxOffset() const;
+  virtual unsigned long caretMaxRenderedOffset() const;
 
   virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
 

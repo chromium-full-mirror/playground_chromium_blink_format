@@ -208,6 +208,10 @@ long InlineTextBox::caretMaxOffset() const {
   return m_start + m_len;
 }
 
+unsigned long InlineTextBox::caretMaxRenderedOffset() const {
+  return m_start + m_len;
+}
+
 #define LOCAL_WIDTH_BUF_SIZE 1024
 
 FindSelectionResult InlineTextBox::checkSelectionPoint(int _x,
@@ -344,11 +348,11 @@ RenderText::~RenderText() {
 
 void RenderText::detach() {
   if (!documentBeingDestroyed()) {
+    if (parent() && isBR())
+      parent()->dirtyLinesFromChangedChild(this);
     if (firstTextBox())
       for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
         box->remove();
-    else if (parent() && isBR())
-      parent()->dirtyLinesFromChangedChild(this);
   }
   deleteTextBoxes();
   RenderObject::detach();
@@ -1522,6 +1526,13 @@ long RenderText::caretMaxOffset() const {
   // or calculate and store it in bidi.cpp (needs calculation even if not
   // needed)
   return lastTextBox()->m_start + lastTextBox()->m_len;
+}
+
+unsigned long RenderText::caretMaxRenderedOffset() const {
+  int l = 0;
+  for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
+    l += box->m_len;
+  return l;
 }
 
 RenderTextFragment::RenderTextFragment(DOM::NodeImpl* _node,

@@ -83,6 +83,10 @@ long InlineBox::caretMaxOffset() const {
   return 1;
 }
 
+unsigned long InlineBox::caretMaxRenderedOffset() const {
+  return 1;
+}
+
 void InlineBox::dirtyLineBoxes() {
   markDirty();
   for (InlineFlowBox* curr = parent(); curr && !curr->isDirty();

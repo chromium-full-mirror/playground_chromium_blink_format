@@ -62,6 +62,7 @@ class CharacterDataImpl : public NodeImpl {
                            int& exceptioncode);
 
   virtual bool containsOnlyWhitespace() const;
+  bool containsOnlyWhitespace(unsigned int from, unsigned int len) const;
 
   // DOM methods overridden from  parent classes
 
@@ -74,8 +75,10 @@ class CharacterDataImpl : public NodeImpl {
   virtual void checkCharDataOperation(const unsigned long offset,
                                       int& exceptioncode);
 
+  virtual long maxOffset() const;
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
+  virtual unsigned long caretMaxRenderedOffset() const;
 
 #ifndef NDEBUG
   virtual void dump(QTextStream* stream, QString ind = "") const;
@@ -144,12 +147,17 @@ class TextImpl : public CharacterDataImpl {
 
   virtual DOMString toString() const;
 
+  void setRendererIsNeeded(bool flag = true) { m_rendererIsNeeded = flag; }
+
 #if APPLE_CHANGES
   static Text createInstance(TextImpl* impl);
 #endif
 
  protected:
   virtual TextImpl* createNew(DOMStringImpl* _str);
+
+ private:
+  bool m_rendererIsNeeded;
 };
 
 // ----------------------------------------------------------------------------

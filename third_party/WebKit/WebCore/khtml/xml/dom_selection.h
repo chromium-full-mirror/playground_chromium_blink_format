@@ -45,6 +45,7 @@ class KHTMLSelection {
   KHTMLSelection();
   KHTMLSelection(DOM::NodeImpl* node, long offset);
   KHTMLSelection(const DOM::DOMPosition&);
+  KHTMLSelection(const DOM::DOMPosition&, const DOM::DOMPosition&);
   KHTMLSelection(DOM::NodeImpl* startNode,
                  long startOffset,
                  DOM::NodeImpl* endNode,
@@ -88,16 +89,16 @@ class KHTMLSelection {
   DOM::NodeImpl* endNode() const { return m_endNode; }
   long endOffset() const { return m_endOffset; }
 
-  DOM::DOMPosition previousCharacterPosition() const;
-  static DOM::DOMPosition previousCharacterPosition(
-      const DOM::DOMPosition& from);
-  DOM::DOMPosition nextCharacterPosition() const;
-  static DOM::DOMPosition nextCharacterPosition(const DOM::DOMPosition& from);
+  DOM::DOMPosition basePosition() const;
+  DOM::DOMPosition extentPosition() const;
+  DOM::DOMPosition startPosition() const;
+  DOM::DOMPosition endPosition() const;
 
   void setNeedsLayout(bool flag = true);
   void clearModifyBias() { m_modifyBiasSet = false; }
 
-  bool isEmpty() const;
+  bool isEmpty() const { return state() == NONE; }
+  bool notEmpty() const { return !isEmpty(); }
   DOM::Range toRange() const;
 
   void debugPosition() const;
@@ -129,7 +130,6 @@ class KHTMLSelection {
   void setEndNode(DOM::NodeImpl*);
   void setEndOffset(long);
 
-  bool inRenderedContent(const DOM::DOMPosition&);
   bool nodeIsBeforeNode(DOM::NodeImpl* n1, DOM::NodeImpl* n2);
 
   void calculateStartAndEnd(ETextGranularity select = CHARACTER);

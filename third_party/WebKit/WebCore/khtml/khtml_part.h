@@ -1130,6 +1130,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * @internal
    */
+  void clearCaretRectIfNeeded();
+
+  /**
+   * @internal
+   */
   void notifySelectionChanged(bool endTyping = true);
 
   /**

@@ -507,7 +507,8 @@ void RenderFlow::caretPos(int offset,
   // the caret size of an empty :first-line'd block is wrong, but I think we
   // can live with that.
   RenderStyle* currentStyle = style(true);
-  height = currentStyle->fontMetrics().height();
+  // height = currentStyle->fontMetrics().height();
+  height = lineHeight(true);
   width = 1;
 
   // EDIT FIXME: This needs to account for text direction
@@ -533,6 +534,6 @@ void RenderFlow::caretPos(int offset,
 
   int absx, absy;
   absolutePosition(absx, absy, false);
-  _x += absx;
-  _y += absy;
+  _x += absx + paddingLeft() + borderLeft();
+  _y += absy + paddingTop() + borderTop();
 }

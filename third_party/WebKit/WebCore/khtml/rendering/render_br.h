@@ -65,6 +65,7 @@ class RenderBR : public RenderText {
 
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
+  virtual unsigned long caretMaxRenderedOffset() const;
 
   virtual void caretPos(int offset,
                         bool override,

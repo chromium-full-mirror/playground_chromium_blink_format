@@ -45,20 +45,20 @@ namespace khtml {
 
 class AppendNodeCommandImpl;
 class CompositeEditCommandImpl;
-class DeleteKeyCommandImpl;
+class DeleteCollapsibleWhitespaceCommandImpl;
 class DeleteSelectionCommandImpl;
 class DeleteTextCommandImpl;
+class EditCommand;
 class EditCommandImpl;
 class InputNewlineCommandImpl;
 class InputTextCommandImpl;
 class InsertNodeBeforeCommandImpl;
 class InsertTextCommandImpl;
 class JoinTextNodesCommandImpl;
-class ModifyTextNodeCommand;
-class ModifyTextNodeCommandImpl;
 class PasteHTMLCommandImpl;
 class PasteImageCommandImpl;
 class RemoveNodeCommandImpl;
+class RemoveNodeAndPruneCommandImpl;
 class SplitTextNodeCommandImpl;
 class TypingCommandImpl;
 
@@ -69,7 +69,7 @@ enum ECommandID {
   EditCommandID,  // leave the base class first, others in alpha order
   AppendNodeCommandID,
   CompositeEditCommandID,
-  DeleteKeyCommandID,
+  DeleteCollapsibleWhitespaceCommandID,
   DeleteSelectionCommandID,
   DeleteTextCommandID,
   InputNewlineCommandID,
@@ -77,10 +77,10 @@ enum ECommandID {
   InsertNodeBeforeCommandID,
   InsertTextCommandID,
   JoinTextNodesCommandID,
-  ModifyTextNodeCommandID,
   PasteHTMLCommandID,
   PasteImageCommandID,
   RemoveNodeCommandID,
+  RemoveNodeAndPruneCommandID,
   SplitTextNodeCommandID,
   TypingCommandID,
 };
@@ -95,7 +95,6 @@ class SharedCommandImpl : public Shared<SharedCommandImpl> {
 
   virtual int commandID() const = 0;
   virtual bool isCompositeStep() const = 0;
-  virtual void setIsCompositeStep(bool flag = true) = 0;
 
   virtual void apply() = 0;
   virtual void unapply() = 0;
@@ -112,6 +111,9 @@ class SharedCommandImpl : public Shared<SharedCommandImpl> {
 
   virtual void moveToStartingSelection() = 0;
   virtual void moveToEndingSelection() = 0;
+
+  virtual EditCommand parent() const = 0;
+  virtual void setParent(const EditCommand&) = 0;
 };
 
 //------------------------------------------------------------------------------------------
@@ -126,7 +128,8 @@ class EditCommand : public SharedPtr<SharedCommandImpl> {
 
   int commandID() const;
   bool isCompositeStep() const;
-  void setIsCompositeStep(bool flag = true);
+  bool isNull() const;
+  bool notNull() const;
 
   void apply();
   void unapply();
@@ -144,7 +147,12 @@ class EditCommand : public SharedPtr<SharedCommandImpl> {
   void moveToStartingSelection();
   void moveToEndingSelection();
 
+  EditCommand parent() const;
+  void setParent(const EditCommand&);
+
   EditCommandImpl* handle() const;
+
+  static EditCommand& emptyCommand();
 };
 
 //------------------------------------------------------------------------------------------
@@ -161,15 +169,6 @@ class CompositeEditCommand : public EditCommand {
   inline CompositeEditCommandImpl* impl() const;
 };
 
-//------------------------------------------------------------------------------------------
-// ModifyTextNodeCommand
-
-class ModifyTextNodeCommand : public EditCommand {
- public:
-  ModifyTextNodeCommand(ModifyTextNodeCommandImpl*);
-  virtual ~ModifyTextNodeCommand();
-};
-
 //==========================================================================================
 // Concrete commands
 //------------------------------------------------------------------------------------------
@@ -178,11 +177,11 @@ class ModifyTextNodeCommand : public EditCommand {
 class AppendNodeCommand : public EditCommand {
  public:
   AppendNodeCommand(DOM::DocumentImpl*,
-                    DOM::NodeImpl* parent,
+                    DOM::NodeImpl* parentNode,
                     DOM::NodeImpl* appendChild);
   virtual ~AppendNodeCommand();
 
-  DOM::NodeImpl* parent() const;
+  DOM::NodeImpl* parentNode() const;
   DOM::NodeImpl* appendChild() const;
 
  private:
@@ -190,15 +189,18 @@ class AppendNodeCommand : public EditCommand {
 };
 
 //------------------------------------------------------------------------------------------
-// DeleteKeyCommand
+// DeleteCollapsibleWhitespaceCommand
 
-class DeleteKeyCommand : public CompositeEditCommand {
+class DeleteCollapsibleWhitespaceCommand : public CompositeEditCommand {
  public:
-  DeleteKeyCommand(DOM::DocumentImpl* document);
-  virtual ~DeleteKeyCommand();
+  DeleteCollapsibleWhitespaceCommand(DOM::DocumentImpl* document);
+  DeleteCollapsibleWhitespaceCommand(DOM::DocumentImpl* document,
+                                     const KHTMLSelection& selection);
+
+  virtual ~DeleteCollapsibleWhitespaceCommand();
 
  private:
-  inline DeleteKeyCommandImpl* impl() const;
+  inline DeleteCollapsibleWhitespaceCommandImpl* impl() const;
 };
 
 //------------------------------------------------------------------------------------------
@@ -207,6 +209,8 @@ class DeleteKeyCommand : public CompositeEditCommand {
 class DeleteSelectionCommand : public CompositeEditCommand {
  public:
   DeleteSelectionCommand(DOM::DocumentImpl* document);
+  DeleteSelectionCommand(DOM::DocumentImpl* document,
+                         const KHTMLSelection& selection);
   virtual ~DeleteSelectionCommand();
 
  private:
@@ -222,6 +226,7 @@ class DeleteTextCommand : public EditCommand {
                     DOM::TextImpl*,
                     long offset,
                     long count);
+  DeleteTextCommand(const DeleteTextCommand&);
   virtual ~DeleteTextCommand();
 
   DOM::TextImpl* node() const;
@@ -249,13 +254,13 @@ class InputNewlineCommand : public CompositeEditCommand {
 
 class InputTextCommand : public CompositeEditCommand {
  public:
-  InputTextCommand(DOM::DocumentImpl* document, const DOM::DOMString& text);
+  InputTextCommand(DOM::DocumentImpl* document);
   virtual ~InputTextCommand();
 
-  DOM::DOMString text() const;
-
   void deleteCharacter();
-  void coalesce(const DOM::DOMString& text);
+  void input(const DOM::DOMString& text);
+
+  unsigned long charactersAdded() const;
 
  private:
   inline InputTextCommandImpl* impl() const;
@@ -302,7 +307,7 @@ class InsertTextCommand : public EditCommand {
 //------------------------------------------------------------------------------------------
 // JoinTextNodesCommand
 
-class JoinTextNodesCommand : public ModifyTextNodeCommand {
+class JoinTextNodesCommand : public EditCommand {
  public:
   JoinTextNodesCommand(DOM::DocumentImpl*, DOM::TextImpl*, DOM::TextImpl*);
   virtual ~JoinTextNodesCommand();
@@ -356,9 +361,23 @@ class RemoveNodeCommand : public EditCommand {
 };
 
 //------------------------------------------------------------------------------------------
+// RemoveNodeAndPruneCommand
+
+class RemoveNodeAndPruneCommand : public CompositeEditCommand {
+ public:
+  RemoveNodeAndPruneCommand(DOM::DocumentImpl*, DOM::NodeImpl*);
+  virtual ~RemoveNodeAndPruneCommand();
+
+  DOM::NodeImpl* node() const;
+
+ private:
+  inline RemoveNodeAndPruneCommandImpl* impl() const;
+};
+
+//------------------------------------------------------------------------------------------
 // SplitTextNodeCommand
 
-class SplitTextNodeCommand : public ModifyTextNodeCommand {
+class SplitTextNodeCommand : public EditCommand {
  public:
   SplitTextNodeCommand(DOM::DocumentImpl*, DOM::TextImpl*, long);
   virtual ~SplitTextNodeCommand();
