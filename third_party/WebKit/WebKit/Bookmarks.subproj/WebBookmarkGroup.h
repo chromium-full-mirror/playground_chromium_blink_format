@@ -13,6 +13,16 @@
 // bookmarks in group are modified
 #define IFBookmarkGroupChangedNotification @"IFBookmarkGroupChangedNotification"
 
+// keys for userInfo for IFBookmarkGroupChangedNotification. These are always
+// present.
+
+// The lowest common ancestor of all the IFBookmark objects that changed.
+#define IFModifiedBookmarkKey @"IFModifiedBookmarkKey"
+
+// An NSNumber object representing a boolean that distinguishes changes
+// to the bookmark itself from changes to its children.
+#define IFBookmarkChildrenChangedKey @"IFBookmarkChildrenChangedKey"
+
 @interface IFBookmarkGroup : NSObject {
   NSString* _file;
   IFBookmark* _topBookmark;
