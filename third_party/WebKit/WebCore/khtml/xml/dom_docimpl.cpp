@@ -1266,7 +1266,7 @@ void DocumentImpl::pasteHTMLString(const QString& HTMLString) {
       child = nextChild;
     }
     finalOffset =
-        child->isTextNode() ? static_cast<TextImpl*>(child)->length() : 0;
+        child->isTextNode() ? static_cast<TextImpl*>(child)->length() : 1;
     selection.setSelection(child, finalOffset);
   }
 
