@@ -3595,9 +3595,7 @@ void ReplaceSelectionCommand::doApply() {
     // Empty document. Merge neither start nor end.
     mergeStart = mergeEnd = false;
   } else {
-    mergeStart = (m_fragment.hasInterchangeNewline() ||
-                  m_fragment.hasMoreThanOneBlock()) &&
-                 !isStartOfParagraph(visibleStart);
+    mergeStart = !isStartOfParagraph(visibleStart);
     mergeEnd = !m_fragment.hasInterchangeNewline() &&
                m_fragment.hasMoreThanOneBlock() &&
                !isEndOfParagraph(visibleEnd);
