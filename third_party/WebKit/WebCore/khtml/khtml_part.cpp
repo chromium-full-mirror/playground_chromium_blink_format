@@ -2388,6 +2388,10 @@ ETextGranularity KHTMLPart::selectionGranularity() const {
   return d->m_selectionGranularity;
 }
 
+void KHTMLPart::setSelectionGranularity(ETextGranularity granularity) const {
+  d->m_selectionGranularity = granularity;
+}
+
 const Selection& KHTMLPart::dragCaret() const {
   return d->m_dragCaret;
 }
