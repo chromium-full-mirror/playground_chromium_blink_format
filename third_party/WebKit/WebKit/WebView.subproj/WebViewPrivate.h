@@ -31,6 +31,11 @@ extern NSString* _WebMainFrameIconKey;
 extern NSString* _WebMainFrameTitleKey;
 extern NSString* _WebMainFrameURLKey;
 
+typedef enum {
+  WebDashboardBehaviorAlwaysSendMouseEventsToAllWindows,
+  WebDashboardBehaviorAlwaysSendActiveNullEventsToPlugIns
+} WebDashboardBehavior;
+
 @interface WebView (WebPendingPublic)
 
 - (void)setMainFrameURL:(NSString*)URLString;
@@ -245,6 +250,9 @@ backforward list.
 
 - (void)_addScrollerDashboardRegions:(NSMutableDictionary*)regions;
 - (NSDictionary*)_dashboardRegions;
+
+- (void)_setDashboardBehavior:(WebDashboardBehavior)behavior to:(BOOL)flag;
+- (BOOL)_dashboardBehavior:(WebDashboardBehavior)behavior;
 
 @end
 
