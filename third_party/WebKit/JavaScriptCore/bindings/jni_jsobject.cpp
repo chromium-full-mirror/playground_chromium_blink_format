@@ -197,8 +197,6 @@ static void performJavaScriptAccess(void* info);
 static void performJavaScriptAccess(void* i) {
   assert(CFRunLoopGetCurrent() == RootObject::runLoop());
 
-  JS_LOG("completionSource = %p\n", completionSource);
-
   // Dispatch JavaScript calls here.
   CFRunLoopSourceContext sourceContext;
   CFRunLoopSourceGetContext(completionSource, &sourceContext);
@@ -206,8 +204,6 @@ static void performJavaScriptAccess(void* i) {
   CFRunLoopRef originatingLoop = callContext->originatingLoop;
 
   JSObject::invoke(callContext);
-
-  JS_LOG("originatingLoop = %p\n", originatingLoop);
 
   // Signal the originating thread that we're done.
   CFRunLoopSourceSignal(completionSource);
@@ -225,7 +221,6 @@ static void completedJavaScriptAccess(void* i) {
 
   assert(CFRunLoopGetCurrent() == runLoop);
 
-  JS_LOG("runLoop = %p\n", runLoop);
   CFRunLoopStop(runLoop);
 }
 
@@ -279,8 +274,6 @@ static void dispatchToJavaScriptThread(JSObjectCallContext* context) {
   completionSource = CFRunLoopSourceCreate(NULL, 0, &sourceContext);
   CFRunLoopAddSource(currentRunLoop, completionSource, kCFRunLoopDefaultMode);
 
-  JS_LOG("signalling, completionSource = %p\n", completionSource);
-
   // Wakeup JavaScript access thread and make it do it's work.
   CFRunLoopSourceSignal(RootObject::performJavaScriptSource());
   if (CFRunLoopIsWaiting(RootObject::runLoop())) {
@@ -293,8 +286,6 @@ static void dispatchToJavaScriptThread(JSObjectCallContext* context) {
   CFRunLoopRemoveSource(currentRunLoop, completionSource,
                         kCFRunLoopDefaultMode);
   CFRelease(completionSource);
-
-  JS_LOG("done\n");
 
   unlockJavaScriptAccess();
 }
@@ -334,9 +325,9 @@ void RootObject::removeAllJavaReferencesForRoot(Bindings::RootObject* root) {
     CFIndex count, i;
 
     count = CFDictionaryGetCount(referencesDictionary);
+    allImps = (void**)malloc(sizeof(void*) * count);
     CFDictionaryGetKeysAndValues(referencesDictionary, (const void**)allImps,
                                  NULL);
-    allImps = (void**)malloc(sizeof(void*) * count);
     for (i = 0; i < count; i++) {
       ObjectImp* anImp = static_cast<ObjectImp*>(allImps[i]);
       anImp->deref();
@@ -360,6 +351,11 @@ jvalue JSObject::invoke(JSObjectCallContext* context) {
     result = context->result;
   } else {
     jlong nativeHandle = context->nativeHandle;
+    if (nativeHandle == UndefinedHandle || nativeHandle == 0) {
+      bzero((void*)&result, sizeof(jvalue));
+      return result;
+    }
+
     switch (context->type) {
       case CreateNative: {
         result.j = JSObject::createNative(nativeHandle);
@@ -422,7 +418,6 @@ JSObject::JSObject(jlong nativeJSObject) {
   // terribly wrong.
   assert(_imp != 0);
 
-  // Find the root (window) object associated with the imp.
   _root = rootForImp(_imp);
 
   // If we can't find the root for the object something is terrible wrong.
@@ -461,10 +456,13 @@ jobject JSObject::eval(jstring script) const {
 }
 
 jobject JSObject::getMember(jstring memberName) const {
-  JS_LOG("memberName = %s\n", JavaString(memberName).characters());
+  JS_LOG("(%p) memberName = %s\n", _imp, JavaString(memberName).characters());
 
   ExecState* exec = _root->interpreter()->globalExec();
+
+  _root->interpreter()->lock();
   Value result = _imp->get(exec, Identifier(JavaString(memberName).ustring()));
+  _root->interpreter()->unlock();
 
   return convertValueToJObject(result);
 }
@@ -488,7 +486,9 @@ jobject JSObject::getSlot(jint index) const {
   JS_LOG("index = %d\n", index);
 
   ExecState* exec = _root->interpreter()->globalExec();
+  _root->interpreter()->lock();
   Value result = _imp->get(exec, (unsigned)index);
+  _root->interpreter()->unlock();
 
   return convertValueToJObject(result);
 }
