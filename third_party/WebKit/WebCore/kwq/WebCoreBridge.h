@@ -137,6 +137,8 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (BOOL)openedByScript;
 - (void)setOpenedByScript:(BOOL)openedByScript;
 
+- (void)unfocusWindow;
+
 @end
 
 // This interface definition allows those who hold a WebCoreBridge * to call all

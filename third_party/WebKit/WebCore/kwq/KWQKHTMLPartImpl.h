@@ -97,6 +97,8 @@ class KWQKHTMLPartImpl : public QObject {
 
   void close();
 
+  void unfocusWindow();
+
  private:
   KHTMLPart* part;
   KHTMLPartPrivate* d;
