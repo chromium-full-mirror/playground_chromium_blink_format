@@ -123,6 +123,9 @@ class KWQKHTMLPartImpl : public QObject {
   static void setDocumentFocus(QWidget*);
   static void clearDocumentFocus(QWidget*);
 
+  static void runJavaScriptAlert(const QString& message);
+  static bool runJavaScriptConfirm(const QString& message);
+
   static WebCoreBridge* bridgeForWidget(QWidget*);
 
   // Incoming calls, used by the bridge.
