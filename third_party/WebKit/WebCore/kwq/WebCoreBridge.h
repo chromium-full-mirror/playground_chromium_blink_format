@@ -117,6 +117,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (NSView*)nextKeyView;
 - (NSView*)previousKeyView;
 
+- (NSView*)nextKeyViewInsideWebViews;
+- (NSView*)previousKeyViewInsideWebViews;
+
 - (NSObject*)copyDOMTree:(id<WebCoreDOMTreeCopier>)copier;
 - (NSObject*)copyRenderTree:(id<WebCoreRenderTreeCopier>)copier;
 
@@ -189,6 +192,9 @@ typedef khtml::RenderPart KHTMLRenderPart;
 - (BOOL)modifierTrackingEnabled;
 
 - (void)addBackForwardItemWithURL:(NSURL*)URL anchor:(NSString*)anchor;
+
+- (NSView*)nextKeyViewOutsideWebViews;
+- (NSView*)previousKeyViewOutsideWebViews;
 
 @end
 

@@ -120,8 +120,11 @@ class KWQKHTMLPartImpl : public QObject {
 
   QString userAgent() const;
 
-  static NSView* nextKeyView(QWidget* startingPoint, KWQSelectionDirection);
   NSView* nextKeyView(DOM::NodeImpl* startingPoint, KWQSelectionDirection);
+  NSView* nextKeyViewInFrameHierarchy(DOM::NodeImpl* startingPoint,
+                                      KWQSelectionDirection);
+  static NSView* nextKeyViewForWidget(QWidget* startingPoint,
+                                      KWQSelectionDirection);
 
   // Incoming calls, used by the bridge.
 
