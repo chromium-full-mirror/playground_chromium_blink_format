@@ -604,11 +604,14 @@ class Context2D : public DOMObject {
     AddQuadraticCurveToPoint,
     AddBezierCurveToPoint,
     ClearRect,
+    FillRect,
+    StrokeRect,
     DrawImage,
     DrawImageFromRect,
     SetShadow,
     SetShadowWithColor,
-    ClearShadow
+    ClearShadow,
+    SetAlpha
   };
 
   DOM::HTMLElementImpl* _element;
