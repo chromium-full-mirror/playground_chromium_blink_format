@@ -74,7 +74,6 @@ class EditCommandImpl : public SharedCommandImpl {
 
   KHTMLSelection startingSelection() const { return m_startingSelection; }
   KHTMLSelection endingSelection() const { return m_endingSelection; }
-  KHTMLSelection currentSelection() const;
 
   ECommandState state() const { return m_state; }
   void setState(ECommandState state) { m_state = state; }
