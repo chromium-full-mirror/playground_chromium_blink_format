@@ -1135,40 +1135,37 @@ void Selection::debugPosition() const {
     Position upstream = pos.upstream();
     Position downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
-            getTagName(upstream.node()->id()).string().latin1(),
-            upstream.node(), upstream.offset());
+            upstream.node()->nodeName().string().latin1(), upstream.node(),
+            upstream.offset());
     fprintf(stderr, "pos:        %s %p:%d\n",
-            getTagName(pos.node()->id()).string().latin1(), pos.node(),
-            pos.offset());
+            pos.node()->nodeName().string().latin1(), pos.node(), pos.offset());
     fprintf(stderr, "downstream: %s %p:%d\n",
-            getTagName(downstream.node()->id()).string().latin1(),
-            downstream.node(), downstream.offset());
+            downstream.node()->nodeName().string().latin1(), downstream.node(),
+            downstream.offset());
   } else {
     Position pos = m_start;
     Position upstream = pos.upstream();
     Position downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
-            getTagName(upstream.node()->id()).string().latin1(),
-            upstream.node(), upstream.offset());
+            upstream.node()->nodeName().string().latin1(), upstream.node(),
+            upstream.offset());
     fprintf(stderr, "start:      %s %p:%d\n",
-            getTagName(pos.node()->id()).string().latin1(), pos.node(),
-            pos.offset());
+            pos.node()->nodeName().string().latin1(), pos.node(), pos.offset());
     fprintf(stderr, "downstream: %s %p:%d\n",
-            getTagName(downstream.node()->id()).string().latin1(),
-            downstream.node(), downstream.offset());
+            downstream.node()->nodeName().string().latin1(), downstream.node(),
+            downstream.offset());
     fprintf(stderr, "-----------------------------------\n");
     pos = m_end;
     upstream = pos.upstream();
     downstream = pos.downstream();
     fprintf(stderr, "upstream:   %s %p:%d\n",
-            getTagName(upstream.node()->id()).string().latin1(),
-            upstream.node(), upstream.offset());
+            upstream.node()->nodeName().string().latin1(), upstream.node(),
+            upstream.offset());
     fprintf(stderr, "end:        %s %p:%d\n",
-            getTagName(pos.node()->id()).string().latin1(), pos.node(),
-            pos.offset());
+            pos.node()->nodeName().string().latin1(), pos.node(), pos.offset());
     fprintf(stderr, "downstream: %s %p:%d\n",
-            getTagName(downstream.node()->id()).string().latin1(),
-            downstream.node(), downstream.offset());
+            downstream.node()->nodeName().string().latin1(), downstream.node(),
+            downstream.offset());
     fprintf(stderr, "-----------------------------------\n");
   }
 

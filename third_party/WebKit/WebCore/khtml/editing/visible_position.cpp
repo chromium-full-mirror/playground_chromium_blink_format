@@ -395,7 +395,7 @@ void VisiblePosition::debugPosition(const char* msg) const {
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
     fprintf(stderr, "Position [%s]: %s [%p] at %d\n", msg,
-            getTagName(m_deepPosition.node()->id()).string().latin1(),
+            m_deepPosition.node()->nodeName().string().latin1(),
             m_deepPosition.node(), m_deepPosition.offset());
 }
 
