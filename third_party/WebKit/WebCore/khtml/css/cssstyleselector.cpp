@@ -2202,6 +2202,7 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
     case CSS_PROP_SCROLLBAR_ARROW_COLOR:
 
     {
+      bool transparentBorder = false;
       QColor col;
       if (value->cssValueType() == CSSValue::CSS_INHERIT) {
         switch (id) {
@@ -2210,15 +2211,19 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
             break;
           case CSS_PROP_BORDER_TOP_COLOR:
             col = parentStyle->borderTopColor();
+            transparentBorder = parentStyle->borderTopIsTransparent();
             break;
           case CSS_PROP_BORDER_RIGHT_COLOR:
             col = parentStyle->borderRightColor();
+            transparentBorder = parentStyle->borderRightIsTransparent();
             break;
           case CSS_PROP_BORDER_BOTTOM_COLOR:
             col = parentStyle->borderBottomColor();
+            transparentBorder = parentStyle->borderBottomIsTransparent();
             break;
           case CSS_PROP_BORDER_LEFT_COLOR:
             col = parentStyle->borderLeftColor();
+            transparentBorder = parentStyle->borderLeftIsTransparent();
             break;
           case CSS_PROP_COLOR:
             col = parentStyle->color();
@@ -2236,9 +2241,10 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
         if (ident) {
           if (ident == CSS_VAL__KONQ_TEXT)
             col = element->getDocument()->textColor();
-          else if (ident == CSS_VAL_TRANSPARENT)
+          else if (ident == CSS_VAL_TRANSPARENT) {
             col = QColor();
-          else
+            transparentBorder = true;
+          } else
             col = colorForCSSValue(ident);
         } else if (primitiveValue->primitiveType() ==
                    CSSPrimitiveValue::CSS_RGBCOLOR) {
@@ -2256,16 +2262,16 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
           style->setBackgroundColor(col);
           break;
         case CSS_PROP_BORDER_TOP_COLOR:
-          style->setBorderTopColor(col);
+          style->setBorderTopColor(col, transparentBorder);
           break;
         case CSS_PROP_BORDER_RIGHT_COLOR:
-          style->setBorderRightColor(col);
+          style->setBorderRightColor(col, transparentBorder);
           break;
         case CSS_PROP_BORDER_BOTTOM_COLOR:
-          style->setBorderBottomColor(col);
+          style->setBorderBottomColor(col, transparentBorder);
           break;
         case CSS_PROP_BORDER_LEFT_COLOR:
-          style->setBorderLeftColor(col);
+          style->setBorderLeftColor(col, transparentBorder);
           break;
         case CSS_PROP_COLOR:
           style->setColor(col);
@@ -3175,14 +3181,6 @@ void CSSStyleSelector::applyRule(int id, DOM::CSSValueImpl* value) {
       //      style->setBackgroundPosition(parentStyle->backgroundPosition());
 
       break;
-    case CSS_PROP_BORDER_COLOR:
-      if (primitiveValue && primitiveValue->getIdent() == CSS_VAL_TRANSPARENT) {
-        style->setBorderTopColor(QColor());
-        style->setBorderBottomColor(QColor());
-        style->setBorderLeftColor(QColor());
-        style->setBorderRightColor(QColor());
-        return;
-      }
     case CSS_PROP_BORDER:
     case CSS_PROP_BORDER_STYLE:
     case CSS_PROP_BORDER_WIDTH:

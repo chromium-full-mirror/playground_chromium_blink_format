@@ -729,11 +729,16 @@ bool CSSParser::parseValue(int propId, bool important) {
         break;
       }
     /* nobreak */
-    case CSS_PROP_COLOR:                // <color> | inherit
-    case CSS_PROP_BORDER_TOP_COLOR:     // <color> | inherit
-    case CSS_PROP_BORDER_RIGHT_COLOR:   // <color> | inherit
-    case CSS_PROP_BORDER_BOTTOM_COLOR:  // <color> | inherit
-    case CSS_PROP_BORDER_LEFT_COLOR:    // <color> | inherit
+    case CSS_PROP_BORDER_TOP_COLOR:     // <color> | transparent | inherit
+    case CSS_PROP_BORDER_RIGHT_COLOR:   // <color> | transparent | inherit
+    case CSS_PROP_BORDER_BOTTOM_COLOR:  // <color> | transparent | inherit
+    case CSS_PROP_BORDER_LEFT_COLOR:    // <color> | transparent | inherit
+      if (id == CSS_VAL_TRANSPARENT) {
+        valid_primitive = true;
+        break;
+      }
+    /* fall through */
+    case CSS_PROP_COLOR:  // <color> | inherit
     case CSS_PROP_TEXT_DECORATION_COLOR:
       if (id >= CSS_VAL_AQUA && id <= CSS_VAL_WINDOWTEXT ||
           id == CSS_VAL_MENU ||
@@ -1057,11 +1062,6 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSS_PROP_BORDER_COLOR:
       // <color>{1,4} | transparent | inherit
       {
-        if (id == CSS_VAL_TRANSPARENT) {
-          // set border colors to invalid
-          valid_primitive = true;
-          break;
-        }
         const int properties[4] = {
             CSS_PROP_BORDER_TOP_COLOR, CSS_PROP_BORDER_RIGHT_COLOR,
             CSS_PROP_BORDER_BOTTOM_COLOR, CSS_PROP_BORDER_LEFT_COLOR};
