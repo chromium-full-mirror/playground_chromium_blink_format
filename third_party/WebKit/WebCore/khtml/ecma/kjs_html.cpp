@@ -376,7 +376,7 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
           str = resolvedURL.url();
         }
 
-        part->scheduleRedirection(0, str);
+        part->scheduleRedirection(0, str, false /*don't lock history*/);
       }
       break;
     }
