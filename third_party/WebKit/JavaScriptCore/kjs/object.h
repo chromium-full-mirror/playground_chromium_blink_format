@@ -612,7 +612,7 @@ class ObjectImp : public ValueImp {
   PropertyMap _prop;
   ValueImp* _proto;
   ValueImp* _internalValue;
-  ScopeChain _scope;
+  NoRefScopeChain _scope;
 };
 
 /**

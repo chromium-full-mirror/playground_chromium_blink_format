@@ -418,9 +418,7 @@ Value DOMNode::getListener(int eventId) const {
     return Null();
 }
 
-ScopeChain DOMNode::eventHandlerScope(ExecState*) const {
-  return ScopeChain();
-}
+void DOMNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}
 
 Value DOMNodeProtoFunc::tryCall(ExecState* exec,
                                 Object& thisObj,

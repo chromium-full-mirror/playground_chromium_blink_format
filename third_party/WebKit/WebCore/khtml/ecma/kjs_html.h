@@ -98,7 +98,7 @@ class HTMLElement : public DOMElement {
   virtual bool hasProperty(ExecState* exec,
                            const Identifier& propertyName) const;
   virtual UString toString(ExecState* exec) const;
-  virtual ScopeChain eventHandlerScope(ExecState* exec) const;
+  virtual void pushEventHandlerScope(ExecState* exec, ScopeChain& scope) const;
   virtual const ClassInfo* classInfo() const;
   static const ClassInfo info;
 
