@@ -32,6 +32,7 @@ class QTextEdit;
 @interface KWQTextArea : WebCoreScrollView<KWQWidgetHolder> {
   KWQTextAreaTextView* textView;
   QTextEdit* widget;
+  NSFont* _font;
   BOOL wrap;
   BOOL inNextValidKeyView;
   BOOL inDrawingMachinery;
