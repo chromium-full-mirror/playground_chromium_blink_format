@@ -102,7 +102,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       if (dradix < 2 || dradix > 36 || dradix == 10)
         result = String(v.toString(exec));
       else {
-        int radix = static_cast<int>(radix);
+        int radix = static_cast<int>(dradix);
         unsigned i = v.toUInt32(exec);
         char s[33];
         char* p = s + sizeof(s);
