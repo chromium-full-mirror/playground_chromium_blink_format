@@ -27,6 +27,7 @@
 
 #include "html/html_elementimpl.h"
 #include "dom/html_element.h"
+#include "html/html_miscimpl.h"
 
 #include <qptrvector.h>
 #include <qmemarray.h>
@@ -108,6 +109,8 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   friend class HTMLFormElement;
   friend class HTMLFormCollectionImpl;
+
+  HTMLCollectionImpl::CollectionInfo* collectionInfo;
 
   QPtrVector<HTMLGenericFormElementImpl> formElements;
   QPtrVector<HTMLGenericFormElementImpl> dormantFormElements;
