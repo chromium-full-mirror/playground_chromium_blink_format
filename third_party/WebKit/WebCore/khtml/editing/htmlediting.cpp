@@ -2544,8 +2544,8 @@ Position InsertTextCommand::prepareForTextInsertion(bool adjustDownstream) {
 
 void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
   Selection selection = endingSelection();
-  bool adjustDownstream =
-      selection.start().downstream(StayInBlock).isFirstRenderedPositionOnLine();
+  bool adjustDownstream = isFirstVisiblePositionOnLine(
+      VisiblePosition(selection.start().downstream(StayInBlock)));
 
   // Delete the current selection, or collapse whitespace, as needed
   if (selection.isRange())

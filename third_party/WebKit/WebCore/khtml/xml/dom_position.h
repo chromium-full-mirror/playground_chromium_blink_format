@@ -86,9 +86,6 @@ class Position {
   bool inRenderedContent() const;
   bool isRenderedCharacter() const;
   bool rendersInDifferentPosition(const Position& pos) const;
-  bool isFirstRenderedPositionOnLine() const;
-  bool isLastRenderedPositionOnLine() const;
-  bool inFirstEditableInRootEditableElement() const;
 
   void debugPosition(const char* msg = "") const;
 
