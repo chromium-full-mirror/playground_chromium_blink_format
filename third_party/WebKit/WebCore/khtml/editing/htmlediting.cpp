@@ -1491,7 +1491,8 @@ void DeleteSelectionCommand::initializePositionData() {
   if (isFirstVisiblePositionOnLine(visibleEnd)) {
     Position previousLineStart =
         previousLinePosition(visibleEnd, DOWNSTREAM, 0).deepEquivalent();
-    if (RangeImpl::compareBoundaryPoints(previousLineStart,
+    if (previousLineStart.isNull() ||
+        RangeImpl::compareBoundaryPoints(previousLineStart,
                                          m_downstreamStart) >= 0)
       m_mergeBlocksAfterDelete = false;
   }
