@@ -318,6 +318,7 @@ typedef enum {
 - (void)deleteKeyPressed;
 - (void)applyStyle:(DOMCSSStyleDeclaration*)style
     toElementsInDOMRange:(DOMRange*)range;
+- (void)ensureCaretVisible;
 
 - (void)bindObject:(id)object withName:(NSString*)name;
 
