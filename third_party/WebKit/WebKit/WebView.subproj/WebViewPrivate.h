@@ -354,7 +354,8 @@ typedef enum {
 @end
 
 @interface WebView (WebViewEditing)
-- (void)setSelectedDOMRange:(DOMRange*)range;
+- (void)setSelectedDOMRange:(DOMRange*)range
+                   affinity:(NSSelectionAffinity)selectionAffinity;
 - (DOMRange*)selectedDOMRange;
 - (void)setEditable:(BOOL)flag;
 - (BOOL)isEditable;
@@ -403,6 +404,7 @@ extern NSString* const WebViewDidChangeSelectionNotification;
 - (BOOL)webView:(WebView*)webView
     shouldChangeSelectedDOMRange:(DOMRange*)currentRange
                       toDOMRange:(DOMRange*)proposedRange
+                        affinity:(NSSelectionAffinity)selectionAffinity
                   stillSelecting:(BOOL)flag;
 - (BOOL)webView:(WebView*)webView
         shouldApplyStyle:(DOMCSSStyleDeclaration*)style
