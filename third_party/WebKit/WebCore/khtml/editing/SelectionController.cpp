@@ -137,6 +137,7 @@ KHTMLSelection::KHTMLSelection(const KHTMLSelection& o) {
 
   m_baseIsStart = o.m_baseIsStart;
   m_needsCaretLayout = o.m_needsCaretLayout;
+  m_modifyBiasSet = o.m_modifyBiasSet;
 
   // Only copy the coordinates over if the other object
   // has had a layout, otherwise keep the current
@@ -165,6 +166,7 @@ void KHTMLSelection::init() {
   m_caretSize = 0;
   m_baseIsStart = true;
   m_needsCaretLayout = true;
+  m_modifyBiasSet = false;
 }
 
 KHTMLSelection::~KHTMLSelection() {
@@ -193,6 +195,7 @@ KHTMLSelection& KHTMLSelection::operator=(const KHTMLSelection& o) {
 
   m_baseIsStart = o.m_baseIsStart;
   m_needsCaretLayout = o.m_needsCaretLayout;
+  m_modifyBiasSet = o.m_modifyBiasSet;
 
   // Only copy the coordinates over if the other object
   // has had a layout, otherwise keep the current
@@ -247,11 +250,23 @@ bool KHTMLSelection::modify(EAlter alter,
     case FORWARD:
       switch (elem) {
         case CHARACTER:
-          if (alter == EXTEND)
+          if (alter == EXTEND) {
+            if (!m_modifyBiasSet) {
+              m_modifyBiasSet = true;
+              setBaseNode(startNode());
+              setBaseOffset(startOffset());
+              setExtentNode(endNode());
+              setExtentOffset(endOffset());
+            }
             pos = nextCharacterPosition(
                 DOMPosition(extentNode(), extentOffset()));
-          else
-            pos = nextCharacterPosition();
+          } else {
+            m_modifyBiasSet = false;
+            if (state() == RANGE)
+              pos = DOMPosition(endNode(), endOffset());
+            else
+              pos = nextCharacterPosition();
+          }
           break;
         case WORD:
           // EDIT FIXME: implement
@@ -266,11 +281,23 @@ bool KHTMLSelection::modify(EAlter alter,
     case BACKWARD:
       switch (elem) {
         case CHARACTER:
-          if (alter == EXTEND)
+          if (alter == EXTEND) {
+            if (!m_modifyBiasSet) {
+              m_modifyBiasSet = true;
+              setBaseNode(endNode());
+              setBaseOffset(endOffset());
+              setExtentNode(startNode());
+              setExtentOffset(startOffset());
+            }
             pos = previousCharacterPosition(
                 DOMPosition(extentNode(), extentOffset()));
-          else
-            pos = previousCharacterPosition();
+          } else {
+            m_modifyBiasSet = false;
+            if (state() == RANGE)
+              pos = DOMPosition(startNode(), startOffset());
+            else
+              pos = previousCharacterPosition();
+          }
           break;
         case WORD:
           // EDIT FIXME: implement

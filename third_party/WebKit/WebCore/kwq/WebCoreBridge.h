@@ -296,10 +296,13 @@ typedef enum {
 
 - (void)undoEditing:(id)arg;
 - (void)redoEditing:(id)arg;
-- (DOMRange*)rangeByModifyingRange:(DOMRange*)range
-                        alteration:(WebSelectionAlteration)alteration
-                         direction:(WebSelectionDirection)direction
-                       granularity:(WebSelectionGranularity)granularity;
+- (DOMRange*)rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
+                                   direction:(WebSelectionDirection)direction
+                                 granularity:
+                                     (WebSelectionGranularity)granularity;
+- (void)alterCurrentSelection:(WebSelectionAlteration)alteration
+                    direction:(WebSelectionDirection)direction
+                  granularity:(WebSelectionGranularity)granularity;
 - (void)insertText:(NSString*)text;
 - (void)insertNewline;
 - (void)deleteKeyPressed;
