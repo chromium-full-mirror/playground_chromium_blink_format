@@ -54,7 +54,7 @@ typedef khtml::RenderPart KHTMLRenderPart;
 @class DOMCSSStyleDeclaration;
 @class DOMDocument;
 @class DOMElement;
-@class DOMHTMLImageElement;
+@class DOMHTMLElement;
 @class DOMNode;
 @class DOMRange;
 @class WebCoreSettings;
@@ -240,6 +240,7 @@ typedef enum {
 - (NSString*)stringByEvaluatingJavaScriptFromString:(NSString*)string;
 
 - (DOMDocument*)DOMDocument;
+- (DOMHTMLElement*)frameElement;
 
 - (void)setSelectionFrom:(DOMNode*)start
              startOffset:(int)startOffset

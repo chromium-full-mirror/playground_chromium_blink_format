@@ -7,11 +7,14 @@
 
 #import <Foundation/Foundation.h>
 
-@class WebView;
+@class DOMDocument;
+@class DOMHTMLElement;
+@class NSURLRequest;
+@class WebArchive;
 @class WebDataSource;
 @class WebFramePrivate;
 @class WebFrameView;
-@class NSURLRequest;
+@class WebView;
 
 /*!
     @class WebFrame
@@ -56,6 +59,24 @@
     @result The WebFrameView for this frame.
 */
 - (WebFrameView*)frameView;
+
+/*!
+    @method DOMDocument
+    @abstract Returns the DOM document of the frame.
+    @description Returns nil if the frame does not contain a DOM document such
+   as a standalone image.
+*/
+- (DOMDocument*)DOMDocument;
+
+/*!
+    @method frameElement
+    @abstract Returns the frame element of the frame.
+    @description The class of the result is either DOMHTMLFrameElement,
+   DOMHTMLIFrameElement or DOMHTMLObjectElement.
+    Returns nil if the frame is the main frame since there is no frame element
+   for the frame in this case.
+*/
+- (DOMHTMLElement*)frameElement;
 
 /*!
     @method loadRequest:
@@ -104,6 +125,13 @@
 - (void)loadAlternateHTMLString:(NSString*)string
                         baseURL:(NSURL*)baseURL
               forUnreachableURL:(NSURL*)unreachableURL;
+
+/*!
+    @method loadArchive:
+    @abstract Causes WebFrame to load a WebArchive.
+    @param archive The archive to be loaded.
+*/
+- (void)loadArchive:(WebArchive*)archive;
 
 /*!
     @method dataSource
