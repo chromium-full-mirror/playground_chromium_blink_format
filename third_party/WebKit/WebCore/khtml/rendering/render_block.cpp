@@ -1503,13 +1503,15 @@ void RenderBlock::paintEllipsisBoxes(PaintInfo& i, int _tx, int _ty) {
     // them.  Note that boxes can easily overlap, so we can't make any
     // assumptions
     // based off positions of our first line box or our last line box.
-    for (RootInlineBox* curr = firstRootBox(); curr;
-         curr = curr->nextRootBox()) {
-      yPos = _ty + curr->yPos();
-      h = curr->height();
-      if (curr->ellipsisBox() && (yPos < i.r.y() + i.r.height()) &&
-          (yPos + h > i.r.y()))
-        curr->paintEllipsisBox(i, _tx, _ty);
+    if (hasMarkupTruncation()) {
+      for (RootInlineBox* curr = firstRootBox(); curr;
+           curr = curr->nextRootBox()) {
+        yPos = _ty + curr->yPos();
+        h = curr->height();
+        if (curr->ellipsisBox() && (yPos < i.r.y() + i.r.height()) &&
+            (yPos + h > i.r.y()))
+          curr->paintEllipsisBox(i, _tx, _ty);
+      }
     }
   }
 }
