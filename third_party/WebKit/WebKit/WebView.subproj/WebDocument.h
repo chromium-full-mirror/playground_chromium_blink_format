@@ -8,7 +8,7 @@
 @class IFWebDataSource;
 @class IFError;
 
-@protocol IFDocumentLoading
+@protocol IFDocumentView<NSObject>
 - (void)provisionalDataSourceChanged:(IFWebDataSource*)dataSource;
 - (void)provisionalDataSourceCommitted:(IFWebDataSource*)dataSource;
 - (void)dataSourceUpdated:(IFWebDataSource*)dataSource;
@@ -28,7 +28,7 @@
     caseSensitive:(BOOL)caseFlag;
 @end
 
-@protocol IFDocumentRepresentation
+@protocol IFDocumentRepresentation<NSObject>
 - (void)receivedData:(NSData*)data withDataSource:(IFWebDataSource*)dataSource;
 - (void)receivedError:(IFError*)error
        withDataSource:(IFWebDataSource*)dataSource;

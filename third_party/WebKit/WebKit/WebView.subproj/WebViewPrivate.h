@@ -4,7 +4,6 @@
 */
 
 #import <WebKit/IFWebController.h>
-//#import <WebKit/IFDocument.h>
 
 @class IFError;
 @class IFLoadProgress;
@@ -12,23 +11,25 @@
 
 @interface IFWebControllerPrivate : NSObject {
   IFWebFrame* mainFrame;
+  id<IFResourceProgressHandler> resourceProgressHandler;
+  id<IFWebControllerPolicyHandler> policyHandler;
 }
 @end
 
 @interface IFWebController (IFPrivate)
 ;
 - (void)_receivedProgress:(IFLoadProgress*)progress
-              forResource:(NSString*)resourceDescription
+        forResourceHandle:(IFURLHandle*)resourceHandle
            fromDataSource:(IFWebDataSource*)dataSource;
 - (void)_receivedError:(IFError*)error
-           forResource:(NSString*)resourceDescription
+     forResourceHandle:(IFURLHandle*)resourceHandle
        partialProgress:(IFLoadProgress*)progress
         fromDataSource:(IFWebDataSource*)dataSource;
 - (void)_mainReceivedProgress:(IFLoadProgress*)progress
-                  forResource:(NSString*)resourceDescription
+            forResourceHandle:(IFURLHandle*)resourceHandle
                fromDataSource:(IFWebDataSource*)dataSource;
 - (void)_mainReceivedError:(IFError*)error
-               forResource:(NSString*)resourceDescription
+         forResourceHandle:(IFURLHandle*)resourceHandle
            partialProgress:(IFLoadProgress*)progress
             fromDataSource:(IFWebDataSource*)dataSource;
 - (void)_didStartLoading:(NSURL*)url;

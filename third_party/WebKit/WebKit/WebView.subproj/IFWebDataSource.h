@@ -49,7 +49,7 @@
 
 - (NSData*)data;
 
-- (id)representation;
+- (id<IFDocumentRepresentation>)representation;
 
 // Returns YES if this is the main document.  The main document is the 'top'
 // document, typically either a frameset or a normal HTML document.

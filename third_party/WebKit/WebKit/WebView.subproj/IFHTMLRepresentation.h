@@ -19,7 +19,6 @@ class KHTMLPart;
   IFHTMLRepresentationPrivate* _private;
 }
 
-- (KHTMLPart*)part;
 - (void)receivedData:(NSData*)data withDataSource:(IFWebDataSource*)dataSource;
 - (void)receivedError:(IFError*)error
        withDataSource:(IFWebDataSource*)dataSource;

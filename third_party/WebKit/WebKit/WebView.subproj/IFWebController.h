@@ -35,11 +35,12 @@
 @class IFDownloadHandler;
 @class IFError;
 @class IFLoadProgress;
+@class IFURLHandle;
+@class IFWebController;
+@class IFWebControllerPrivate;
 @class IFWebDataSource;
 @class IFWebFrame;
 @class IFWebView;
-@class IFWebController;
-@class IFWebControllerPrivate;
 
 @protocol IFDocumentLoading;
 
@@ -64,13 +65,48 @@
     has been completely downloaded.
 */
 - (void)receivedProgress:(IFLoadProgress*)progress
-             forResource:(NSString*)resourceDescription
+       forResourceHandle:(IFURLHandle*)resourceHandle
           fromDataSource:(IFWebDataSource*)dataSource;
 
 - (void)receivedError:(IFError*)error
-          forResource:(NSString*)resourceDescription
+    forResourceHandle:(IFURLHandle*)resourceHandle
       partialProgress:(IFLoadProgress*)progress
        fromDataSource:(IFWebDataSource*)dataSource;
+
+@end
+
+/*
+   =============================================================================
+
+   =============================================================================
+*/
+
+typedef enum {
+  IFURLPolicyUseContentPolicy,
+  IFURLPolicyOpenExternally,
+  IFURLPolicyIgnore
+} IFURLPolicy;
+
+@protocol IFWebControllerPolicyHandler<NSObject>
+
+- (id<IFLocationChangeHandler>)provideLocationChangeHandlerForFrame:
+    (IFWebFrame*)frame;
+
+// URLPolicyForURL: is used to determine what to do BEFORE a URL is loaded, i.e.
+// before it is clicked or loaded via a URL bar.  Clients can choose to handle
+// the
+// URL normally, hand the URL off to launch services, or
+// ignore the URL.  The default implementation could return
+// +defaultURLPolicyForURL:.
+- (IFURLPolicy)URLPolicyForURL:(NSURL*)url;
+
+// We may have different errors that cause the the policy to be
+// un-implementable, i.e.
+// launch services failure, etc.
+- (void)unableToImplementURLPolicyForURL:(NSURL*)url error:(IFError*)error;
+
+// Called when a plug-in for a certain mime type is not installed
+- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)url;
 
 @end
 
@@ -108,14 +144,7 @@
    =============================================================================
 */
 
-typedef enum {
-  IFURLPolicyUseContentPolicy,
-  IFURLPolicyOpenExternally,
-  IFURLPolicyIgnore
-} IFURLPolicy;
-
-@interface IFWebController
-    : NSObject<IFResourceProgressHandler, IFScriptContextHandler> {
+@interface IFWebController : NSObject<IFScriptContextHandler> {
  @private
   IFWebControllerPrivate* _private;
 }
@@ -127,13 +156,22 @@ typedef enum {
 - initWithView:(IFWebView*)view
     provisionalDataSource:(IFWebDataSource*)dataSource;
 
+- (void)setResourceProgressHandler:(id<IFResourceProgressHandler>)handler;
+- (id<IFResourceProgressHandler>)resourceProgressHandler;
+
++ (IFURLPolicy)defaultURLPolicyForURL:(NSURL*)url;
+
+- (void)setPolicyHandler:(id<IFWebControllerPolicyHandler>)handler;
+- (id<IFWebControllerPolicyHandler>)policyHandler;
+
 - (void)setDirectsAllLinksToSystemBrowser:(BOOL)flag;
 - (BOOL)directsAllLinksToSystemBrowser;
 
+// FIXME:  Should this method be private?
 // Called when a data source needs to create a frame.  This method encapsulates
 // the
 // specifics of creating and initializaing a view of the appropriate class.
-- (IFWebFrame *)createFrameNamed: (NSString *)fname for: (IFWebDataSource *)child inParent: (IFWebDataSource *)parent inScrollView: (BOOL)inScrollView;
+- (IFWebFrame *)createFrameNamed: (NSString *)fname for: (IFWebDataSource *)child inParent: (IFWebDataSource *)parent allowsScrolling: (BOOL)allowsScrolling;
 
 // Look for a frame named name, recursively.
 - (IFWebFrame*)frameNamed:(NSString*)name;
@@ -148,44 +186,16 @@ typedef enum {
 - (IFWebFrame*)frameForDataSource:(IFWebDataSource*)dataSource;
 
 // Return the frame associated with the view.  Traverses the
-// frame tree to find the data source.  Typically aView is
-// an IFWebView.
+// frame tree to find the view.
 - (IFWebFrame*)frameForView:(IFWebView*)aView;
 
-// DEPRECATED
-- (id<IFLocationChangeHandler>)provideLocationChangeHandlerForFrame:
-    (IFWebFrame*)frame;
-
-- (id<IFLocationChangeHandler>)provideLocationChangeHandlerForFrame:
-                                   (IFWebFrame*)frame
-                                                             andURL:(NSURL*)url;
-
-// URLPolicyForURL: is used to determine what to do BEFORE a URL is loaded, i.e.
-// before it is clicked or loaded via a URL bar.  Clients can choose to handle
-// the
-// URL normally (i.e. Alexander), hand the URL off to launch services (i.e.
-// Mail), or
-// ignore the URL (i.e. Help Viewer?).  This API could potentially be used by
-// mac manager
-// to filter allowable URLs.
-- (IFURLPolicy)URLPolicyForURL:(NSURL*)url;
-
-// We may have different errors that cause the the policy to be
-// un-implementable, i.e.
-// launch services failure, etc.
-- (void)unableToImplementURLPolicyForURL:(NSURL*)url error:(IFError*)error;
-
-// FIXME:  this method should be moved to a protocol
-// Called when a plug-in for a certain mime type is not installed
-- (void)pluginNotFoundForMIMEType:(NSString*)mime pluginPageURL:(NSURL*)url;
-
 // Typically called after requestContentPolicyForContentMIMEType: is sent to a
-// locationChangeHander.
-// The content policy of HTML URLs should always be IFContentPolicyShow.
-// Setting the policy to
-// IFContentPolicyIgnore will cancel the load of the URL if it is still pending.
-// The path argument
-// is only used when the policy is either IFContentPolicySave or
+// locationChangeHander.  The content policy of HTML URLs should always be
+// IFContentPolicyShow.
+// Setting the policy to IFContentPolicyIgnore will cancel the load of the URL
+// if it is still
+// pending.  The path argument is only used when the policy is either
+// IFContentPolicySave or
 // IFContentPolicyOpenExternally.
 - (void)haveContentPolicy:(IFContentPolicy)policy
                      andPath:(NSString*)path
