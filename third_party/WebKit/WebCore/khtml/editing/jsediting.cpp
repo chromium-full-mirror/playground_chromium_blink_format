@@ -217,6 +217,13 @@ bool execIndent(KHTMLPart* part, bool userInterface, const DOMString& value) {
   return false;
 }
 
+bool execInsertNewline(KHTMLPart* part,
+                       bool userInterface,
+                       const DOMString& value) {
+  TypingCommand::insertNewline(part->xmlDocImpl());
+  return true;
+}
+
 bool execInsertParagraph(KHTMLPart* part,
                          bool userInterface,
                          const DOMString& value) {
@@ -435,6 +442,8 @@ QDict<CommandImp> createCommandDictionary() {
     {"foreColor",
      {execForeColor, enabledAnySelection, stateNone, valueForeColor}},
     {"indent", {execIndent, enabledAnySelection, stateNone, valueNull}},
+    {"insertNewline",
+     {execInsertNewline, enabledAnySelection, stateNone, valueNull}},
     {"insertParagraph",
      {execInsertParagraph, enabledAnySelection, stateNone, valueNull}},
     {"insertText", {execInsertText, enabledAnySelection, stateNone, valueNull}},
