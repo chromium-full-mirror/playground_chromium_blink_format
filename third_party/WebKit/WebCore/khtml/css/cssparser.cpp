@@ -573,7 +573,7 @@ bool CSSParser::parseValue(int propId, bool important) {
     case CSS_PROP_BORDER_BOTTOM_STYLE:  //   solid | double | groove | ridge |
                                         //   inset | outset
     case CSS_PROP_BORDER_LEFT_STYLE:    ////
-      if (id >= CSS_VAL_NONE && id <= CSS_VAL_DOUBLE)
+      if (id >= CSS_VAL_NONE && id <= CSS_VAL__APPLE_AQUA)
         valid_primitive = true;
       break;
 

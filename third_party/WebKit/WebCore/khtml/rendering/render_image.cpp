@@ -381,7 +381,7 @@ void RenderImage::paintObject(QPainter* p,
       p->drawPixmap(offs, pix, rect);
     }
   }
-  if (style()->outlineWidth())
+  if (style()->outlineWidth() && style()->visibility() == VISIBLE)
     paintOutline(p, _tx, _ty, width(), height(), style());
 }
 

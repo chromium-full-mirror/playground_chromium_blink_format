@@ -268,14 +268,6 @@ class RenderText : public RenderObject {
   bool allAscii() const;
 #endif
 
- protected:
-  void paintTextOutline(QPainter* p,
-                        int tx,
-                        int ty,
-                        const QRect& prevLine,
-                        const QRect& thisLine,
-                        const QRect& nextLine);
-
 #if APPLE_CHANGES
  public:
 #endif

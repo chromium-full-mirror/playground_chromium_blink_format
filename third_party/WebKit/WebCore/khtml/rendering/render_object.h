@@ -674,6 +674,10 @@ class RenderObject : public CachedObjectClient {
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
+#if APPLE_CHANGES
+  virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
+#endif
+
   virtual short minWidth() const { return 0; }
   virtual short maxWidth() const { return 0; }
 
@@ -736,6 +740,8 @@ class RenderObject : public CachedObjectClient {
   // The rect is in the view's
   // coordinate space.  This method deals with outlines and overflow.
   virtual QRect getAbsoluteRepaintRect();
+
+  QRect getAbsoluteRepaintRectWithOutline(int ow);
 
 #ifdef INCREMENTAL_REPAINTING
   virtual void getAbsoluteRepaintRectIncludingFloats(QRect& bounds,

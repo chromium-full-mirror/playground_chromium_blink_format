@@ -266,6 +266,7 @@ typedef enum { WebCoreDeviceScreen, WebCoreDevicePrinter } WebCoreDeviceType;
  * repeatable results for loads of the same frameset. */
 - (NSString*)generateFrameName;
 - (void)frameDetached;
+- (NSView*)documentView;
 
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer

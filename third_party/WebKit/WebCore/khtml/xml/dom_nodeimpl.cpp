@@ -330,6 +330,10 @@ bool NodeImpl::isInline() const {
   return !isElementNode();
 }
 
+bool NodeImpl::isSelectable() const {
+  return false;
+}
+
 unsigned long NodeImpl::nodeIndex() const {
   NodeImpl* _tempNode = previousSibling();
   unsigned long count = 0;
@@ -1703,8 +1707,6 @@ void NodeBaseImpl::setFocus(bool received) {
     return;
 
   NodeImpl::setFocus(received);
-  for (NodeImpl* it = _first; it; it = it->nextSibling())
-    it->setFocus(received);
 
   // note that we need to recalc the style
   setChanged();

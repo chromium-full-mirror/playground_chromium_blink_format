@@ -166,6 +166,10 @@ enum EBorderStyle {
   DASHED,
   SOLID,
   DOUBLE
+#ifdef APPLE_CHANGES
+  ,
+  APPLEAQUA
+#endif
 };
 
 class BorderValue {

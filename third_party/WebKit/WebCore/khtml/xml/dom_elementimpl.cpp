@@ -381,10 +381,6 @@ void ElementImpl::recalcStyle(StyleChange change) {
   setHasChangedChild(false);
 }
 
-bool ElementImpl::isSelectable() const {
-  return false;
-}
-
 // DOM Section 1.1.1
 bool ElementImpl::childAllowed(NodeImpl* newChild) {
   if (!childTypeAllowed(newChild->nodeType()))

@@ -280,6 +280,7 @@ class KWQKHTMLPart : public KHTMLPart {
                              KWQSelectionDirection);
   static DOM::NodeImpl* nodeForWidget(const QWidget*);
   static KWQKHTMLPart* partForNode(DOM::NodeImpl*);
+  static NSView* documentViewForNode(DOM::NodeImpl*);
 
   WebCoreBridge* _bridge;
 

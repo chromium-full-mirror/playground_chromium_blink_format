@@ -143,6 +143,12 @@ class QPainter : public Qt {
   void setShadow(int x, int y, int blur, const QColor& color);
   void clearShadow();
 
+  void initFocusRing(int width);
+  void initFocusRing(int width, const QColor&);
+  void addFocusRingRect(int x, int y, int width, int height);
+  void drawFocusRing();
+  void clearFocusRing();
+
  private:
   // no copying or assignment
   QPainter(const QPainter&);
