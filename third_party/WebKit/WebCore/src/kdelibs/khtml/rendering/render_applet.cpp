@@ -101,6 +101,11 @@ void RenderApplet::layout() {
   calcWidth();
   calcHeight();
 
+#ifdef _KWQ_
+  m_widget->resize(
+      m_width - marginLeft() - marginRight() - paddingLeft() - paddingRight(),
+      m_height - marginTop() - marginBottom() - paddingTop() - paddingBottom());
+#else
   KJavaAppletWidget* tmp = static_cast<KJavaAppletWidget*>(m_widget);
   if (tmp) {
     NodeImpl* child = m_applet->firstChild();
@@ -121,7 +126,7 @@ void RenderApplet::layout() {
             paddingBottom());
     tmp->showApplet();
   }
-
+#endif
   setLayouted();
 }
 
