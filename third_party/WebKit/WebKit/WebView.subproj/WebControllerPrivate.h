@@ -75,4 +75,5 @@
                                referrer:(NSString*)referrer
                                  behind:(BOOL)behind;
 
+- (NSMenu*)_menuForElement:(NSDictionary*)element;
 @end

@@ -10,6 +10,8 @@
 
 @interface WebImageRepresentation : NSObject<WebDocumentRepresentation> {
   WebImageRenderer* image;
+  NSURL* URL;
 }
 - (WebImageRenderer*)image;
+- (NSURL*)URL;
 @end
