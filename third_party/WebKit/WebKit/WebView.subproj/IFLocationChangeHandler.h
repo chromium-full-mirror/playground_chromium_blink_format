@@ -48,7 +48,7 @@ typedef enum {
   IFContentPolicyIgnore
 } IFContentPolicy;
 
-@protocol IFLocationChangeHandler
+@protocol IFLocationChangeHandler<NSObject>
 
 - (void)locationChangeStarted;
 
