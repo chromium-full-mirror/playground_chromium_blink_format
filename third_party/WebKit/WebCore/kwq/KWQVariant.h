@@ -26,6 +26,19 @@
 #ifndef QVARIANT_H_
 #define QVARIANT_H_
 
-class QVariant {};
+class QString;
+
+class QVariant {
+ public:
+  enum Type { Bool };
+
+  QVariant();
+  QVariant(bool, int);
+  QVariant(double);
+  QVariant(const QString&);
+
+  Type type() const;
+  bool toBool() const;
+};
 
 #endif

@@ -26,4 +26,6 @@
 #ifndef QPAINTER_H_
 #define QPAINTER_H_
 
+class QPainter {};
+
 #endif

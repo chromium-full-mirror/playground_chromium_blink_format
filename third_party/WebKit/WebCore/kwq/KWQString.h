@@ -89,6 +89,7 @@ class QString {
   QString(const char* s);
   int toInt() const;
   int toInt(bool*) const;
+  uint toUInt(bool* ok = 0, int base = 10) const;
   bool isNull() const;
   const QChar* unicode() const;
   bool contains(const char* s, bool b) const;
@@ -107,6 +108,7 @@ class QString {
   QString left(uint len) const;
   QString& remove(uint index, uint len);
   QString& replace(const QRegExp&, const QString&);
+  QString& insert(uint, char);
   void truncate(uint pos);
 
   QString arg(const QString& a, int fieldwidth = 0) const;
@@ -126,10 +128,12 @@ class QString {
   QString& operator+=(QChar);
   QString& operator+=(const QString&);
 
+  QString& prepend(const QString&);
   QString& append(const char*);
   QString& append(const QString&);
 
   QCString utf8() const;
+  QCString local8Bit() const;
 
   static const QString null;
 

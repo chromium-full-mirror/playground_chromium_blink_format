@@ -37,7 +37,10 @@ class QValueListIterator {
 template <class T>
 class QValueListConstIterator {
  public:
+  QValueListConstIterator();
+  QValueListConstIterator(const QValueListIterator<T>& it);
   QValueListConstIterator operator++();
+  QValueListConstIterator operator++(int);
   bool operator!=(const QValueListConstIterator<T>& it);
   T& operator*();
 };

@@ -26,6 +26,15 @@
 #ifndef QSIZE_H_
 #define QSIZE_H_
 
-class QSize {};
+class QSize {
+ public:
+  QSize();
+  QSize(int, int);
+
+  int width() const;
+  int height() const;
+
+  friend inline QSize operator+(const QSize&, const QSize&);
+};
 
 #endif
