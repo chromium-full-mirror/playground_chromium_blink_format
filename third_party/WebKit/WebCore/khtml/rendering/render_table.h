@@ -107,7 +107,6 @@ class RenderTable : public RenderBlock {
   virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);
   virtual void layout();
   virtual void calcMinMaxWidth();
-  virtual void close();
 
   virtual RenderBlock* firstLineBlock() const;
   virtual void updateFirstLetter();
@@ -362,8 +361,6 @@ class RenderTableCell : public RenderBlock {
   virtual void paint(PaintInfo& i, int tx, int ty);
 
   void paintCollapsedBorder(QPainter* p, int x, int y, int w, int h);
-
-  virtual void close();
 
   // lie position to outside observers
   virtual int yPos() const { return m_y + _topExtra; }

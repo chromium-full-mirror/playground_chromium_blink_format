@@ -154,8 +154,6 @@ class RenderPartObject : public khtml::RenderPart {
 
   virtual const char* renderName() const { return "RenderPartObject"; }
 
-  virtual void close();
-
   virtual void layout();
   virtual void updateWidget();
 

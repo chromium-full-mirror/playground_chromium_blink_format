@@ -510,11 +510,6 @@ void RenderTable::calcMinMaxWidth() {
 #endif
 }
 
-void RenderTable::close() {
-  //    kdDebug( 6040 ) << "RenderTable::close()" << endl;
-  setNeedsLayoutAndMinMaxRecalc();
-}
-
 int RenderTable::borderTopExtra() {
   if (tCaption && tCaption->style()->captionSide() != CAPBOTTOM)
     return -(tCaption->height() + tCaption->marginBottom() +
@@ -1675,16 +1670,6 @@ void RenderTableCell::setWidth(int width) {
 void RenderTableCell::layout() {
   layoutBlock(m_widthChanged);
   m_widthChanged = false;
-}
-
-void RenderTableCell::close() {
-  RenderBlock::close();
-
-#ifdef DEBUG_LAYOUT
-  kdDebug(6040) << renderName()
-                << "(RenderTableCell)::close() total height =" << m_height
-                << endl;
-#endif
 }
 
 void RenderTableCell::computeAbsoluteRepaintRect(QRect& r, bool f) {

@@ -1531,12 +1531,6 @@ void RenderTextArea::updateFromElement() {
   RenderFormElement::updateFromElement();
 }
 
-void RenderTextArea::close() {
-  element()->setValue(element()->defaultValue());
-
-  RenderFormElement::close();
-}
-
 QString RenderTextArea::text() {
   QString txt;
   TextAreaWidget* w = static_cast<TextAreaWidget*>(m_widget);

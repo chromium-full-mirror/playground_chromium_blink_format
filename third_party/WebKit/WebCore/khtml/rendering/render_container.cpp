@@ -342,7 +342,6 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
     // will be able to find the text
     // inside the inline for e.g., first-letter styling.
     addChild(pseudoContainer, insertBefore);
-    pseudoContainer->close();
   }
 }
 
