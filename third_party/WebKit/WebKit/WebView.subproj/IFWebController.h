@@ -34,7 +34,7 @@
 
     (c) indicates a class, (p) indicates a protocol.  The solid lines indicate
    an
-    retain reference.  The dotted lines indicate a non-retained reference.
+    retained reference.  The dotted lines indicate a non-retained reference.
 
     The WKWebController implements required behavior.  WKWebView and
    WKWebDataSource
