@@ -150,7 +150,7 @@ typedef enum {
 // Return the frame associated with the view.  Traverses the
 // frame tree to find the data source.  Typically aView is
 // an IFWebView.
-- (IFWebFrame*)frameForView:(NSView*)aView;
+- (IFWebFrame*)frameForView:(IFWebView*)aView;
 
 // DEPRECATED
 - (id<IFLocationChangeHandler>)provideLocationChangeHandlerForFrame:

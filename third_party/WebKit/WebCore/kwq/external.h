@@ -107,11 +107,11 @@ class Loader;
 - (int)_marginWidth;
 - (void)_setMarginHeight:(int)h;
 - (int)_marginHeight;
+- (id)documentView;
 @end
 
 @interface IFWebFrame : NSObject
-- initWithName:(NSString*)n view:v dataSource:(IFWebDataSource*)d;
-- view;
+- (IFWebView*)webView;
 - (IFWebDataSource*)dataSource;
 - (IFWebDataSource*)provisionalDataSource;
 - (void)setProvisionalDataSource:(IFWebDataSource*)ds;
