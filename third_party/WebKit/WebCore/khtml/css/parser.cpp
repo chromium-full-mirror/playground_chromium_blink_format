@@ -11,7 +11,7 @@
 #define yychar cssyychar
 #define yydebug cssyydebug
 #define yynerrs cssyynerrs
-#define S 257
+#define WHITESPACE 257
 #define SGML_CD 258
 #define INCLUDES 259
 #define DASHMATCH 260
@@ -59,7 +59,7 @@
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2002-2003 Lars Knoll (knoll@kde.org)
- *  Copyright (c) 2003 Apple Computer
+ *  Copyright (C) 2004 Apple Computer, Inc.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -276,7 +276,7 @@ static const short yyrline[] = {
 static const char* const yytname[] = {"$",
                                       "error",
                                       "$undefined.",
-                                      "S",
+                                      "WHITESPACE",
                                       "SGML_CD",
                                       "INCLUDES",
                                       "DASHMATCH",

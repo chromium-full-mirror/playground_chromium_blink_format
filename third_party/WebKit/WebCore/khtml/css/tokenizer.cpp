@@ -492,7 +492,7 @@ YY_DECL {
         YY_RULE_SETUP
 #line 27 "tokenizer.flex"
         {
-          yyTok = S;
+          yyTok = WHITESPACE;
           return yyTok;
         }
         YY_BREAK
