@@ -1365,7 +1365,8 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
       if (me->defaultHandled() || me->defaultPrevented())
         swallowEvent = true;
       me->deref();
-
+    } else if (eventId == EventImpl::MOUSEDOWN_EVENT) {
+      // Focus should be shifted on mouse down, not on a click.  -dwh
       if (targetNode->isSelectable())
         m_part->xmlDocImpl()->setFocusNode(targetNode);
       else
