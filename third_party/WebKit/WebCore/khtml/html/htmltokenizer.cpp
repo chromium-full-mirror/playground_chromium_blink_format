@@ -1431,6 +1431,12 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
 
           if (foundTypeAttribute) {
             /*
+                Mozilla 1.5 accepts application/x-javascript, and some web
+               references claim it is the only
+                correct variation, but WinIE 6 doesn't accept it.
+                Neither Mozilla 1.5 nor WinIE 6 accept application/javascript,
+               application/ecmascript, or
+                application/x-ecmascript.
                 Mozilla 1.5 doesn't accept the text/javascript1.x formats, but
                WinIE 6 does.
                 Mozilla 1.5 doesn't accept text/jscript, text/ecmascript, and
@@ -1443,7 +1449,8 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
                accept, but not other values.
              */
             QString type = a->value().string().stripWhiteSpace().lower();
-            if (type.compare("text/javascript") != 0 &&
+            if (type.compare("application/x-javascript") != 0 &&
+                type.compare("text/javascript") != 0 &&
                 type.compare("text/javascript1.0") != 0 &&
                 type.compare("text/javascript1.1") != 0 &&
                 type.compare("text/javascript1.2") != 0 &&
