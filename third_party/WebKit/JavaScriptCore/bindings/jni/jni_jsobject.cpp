@@ -530,12 +530,17 @@ void JSObject::setSlot(jint index, jobject value) const {
 jstring JSObject::toString() const {
   JS_LOG("\n");
 
+  Interpreter::lock();
   Object thisObj = Object(const_cast<ObjectImp*>(_imp));
   ExecState* exec = _root->interpreter()->globalExec();
 
-  return (jstring)convertValueToJValue(exec, thisObj, object_type,
-                                       "java.lang.String")
-      .l;
+  jstring result = (jstring)convertValueToJValue(exec, thisObj, object_type,
+                                                 "java.lang.String")
+                       .l;
+
+  Interpreter::unlock();
+
+  return result;
 }
 
 void JSObject::finalize() const {
