@@ -542,6 +542,8 @@ EventListener* NodeImpl::getHTMLEventListener(int id) {
 bool NodeImpl::dispatchEvent(EventImpl* evt,
                              int& exceptioncode,
                              bool tempEvent) {
+  evt->ref();
+
   evt->setTarget(this);
 
   KHTMLPart* part = document->document()->part();
@@ -565,10 +567,14 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
   if (view)
     view->deref();
 
+  evt->deref();
+
   return ret;
 }
 
 bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
+  evt->ref();
+
   // ### check that type specified
 
   // work out what nodes to send event to
@@ -661,8 +667,12 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
 
   DocumentImpl::updateDocumentsRendering();
 
-  return !evt->defaultPrevented();  // ### what if defaultPrevented was called
-                                    // before dispatchEvent?
+  bool defaultPrevented = evt->defaultPrevented();
+
+  evt->deref();
+
+  return !defaultPrevented;  // ### what if defaultPrevented was called before
+                             // dispatchEvent?
 }
 
 bool NodeImpl::dispatchHTMLEvent(int _id,
@@ -671,10 +681,7 @@ bool NodeImpl::dispatchHTMLEvent(int _id,
   int exceptioncode = 0;
   EventImpl* evt = new EventImpl(static_cast<EventImpl::EventId>(_id),
                                  canBubbleArg, cancelableArg);
-  evt->ref();
-  bool r = dispatchEvent(evt, exceptioncode, true);
-  evt->deref();
-  return r;
+  return dispatchEvent(evt, exceptioncode, true);
 }
 
 bool NodeImpl::dispatchWindowEvent(int _id,
@@ -811,10 +818,7 @@ bool NodeImpl::dispatchMouseEvent(QMouseEvent* _mouse,
   EventImpl* evt = new MouseEventImpl(
       evtId, true, cancelable, getDocument()->defaultView(), detail, screenX,
       screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, 0);
-  evt->ref();
-  bool r = dispatchEvent(evt, exceptioncode, true);
-  evt->deref();
-  return r;
+  return dispatchEvent(evt, exceptioncode, true);
 }
 
 bool NodeImpl::dispatchUIEvent(int _id, int detail) {
@@ -830,10 +834,7 @@ bool NodeImpl::dispatchUIEvent(int _id, int detail) {
   UIEventImpl* evt =
       new UIEventImpl(static_cast<EventImpl::EventId>(_id), true, cancelable,
                       getDocument()->defaultView(), detail);
-  evt->ref();
-  bool r = dispatchEvent(evt, exceptioncode, true);
-  evt->deref();
-  return r;
+  return dispatchEvent(evt, exceptioncode, true);
 }
 
 bool NodeImpl::dispatchSubtreeModifiedEvent() {
