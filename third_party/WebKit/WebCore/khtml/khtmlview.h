@@ -56,9 +56,6 @@ class CSSStyleSelector;
 void applyRule(DOM::CSSProperty* prop);
 };
 
-#ifdef APPLE_CHANGES
-#include "khtml_part.h"
-#endif /* APPLE_CHANGES */
 class KHTMLPart;
 class KHTMLViewPrivate;
 
@@ -84,6 +81,9 @@ class KHTMLView : public QScrollView {
   friend class khtml::RenderWidget;
   friend class khtml::CSSStyleSelector;
   friend void khtml::applyRule(DOM::CSSProperty* prop);
+#ifdef APPLE_CHANGES
+  friend class KWQKHTMLPartImpl;
+#endif
 
  public:
   /**
