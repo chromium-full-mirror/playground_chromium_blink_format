@@ -166,16 +166,16 @@
 
 - (IFContentPolicy)contentPolicy;
 
+// MIME type
 - (NSString*)contentType;
+
+// extension based on the MIME type
+- (NSString*)fileType;
 
 - (NSString*)downloadPath;
 
-/*
-*/
 - (NSDictionary*)errors;
 
-/*
-*/
 - (IFError*)mainDocumentError;
 
 + (void)registerRepresentationClass:(Class)repClass
