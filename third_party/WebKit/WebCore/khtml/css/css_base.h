@@ -27,6 +27,7 @@
 
 #include "dom/dom_string.h"
 #include "dom/dom_misc.h"
+#include "xml/dom_nodeimpl.h"
 #include "misc/shared.h"
 #include <qdatetime.h>
 #include <qptrlist.h>
@@ -46,6 +47,27 @@ class CSSStyleRuleImpl;
 
 class DocumentImpl;
 
+struct CSSNamespace {
+  DOMString m_prefix;
+  DOMString m_uri;
+  CSSNamespace* m_parent;
+
+  CSSNamespace(const DOMString& p, const DOMString& u, CSSNamespace* parent)
+      : m_prefix(p), m_uri(u), m_parent(parent) {}
+  ~CSSNamespace() { delete m_parent; }
+
+  const DOMString& uri() { return m_uri; }
+  const DOMString& prefix() { return m_prefix; }
+
+  CSSNamespace* namespaceForPrefix(const DOMString& prefix) {
+    if (prefix == m_prefix)
+      return this;
+    if (m_parent)
+      return m_parent->namespaceForPrefix(prefix);
+    return 0;
+  }
+};
+
 // this class represents a selector for a StyleRule
 class CSSSelector {
  public:
@@ -53,7 +75,7 @@ class CSSSelector {
       : tagHistory(0),
         simpleSelector(0),
         attr(0),
-        tag(-1),
+        tag(anyQName),
         relation(Descendant),
         match(None),
         nonCSSHint(false),
@@ -130,8 +152,8 @@ class CSSSelector {
   mutable DOM::DOMString value;
   CSSSelector* tagHistory;
   CSSSelector* simpleSelector;  // Used for :not.
-  int attr;
-  int tag;
+  Q_UINT32 attr;
+  Q_UINT32 tag;
 
   Relation relation : 2;
   Match match : 4;
