@@ -86,7 +86,6 @@ extern NSString* WebPageCacheDocumentViewKey;
   WebFormState* policyFormState;
   WebDataSource* policyDataSource;
   WebFrameLoadType policyLoadType;
-  NSUndoManager* undoManager;
 
   BOOL justOpenedForTargetedLink;
   BOOL quickRedirectComing;
@@ -270,7 +269,5 @@ extern NSString* WebPageCacheDocumentViewKey;
 - (NSColor*)_bodyBackgroundColor;
 
 - (void)_reloadForPluginChanges;
-
-- (NSUndoManager*)undoManager;
 
 @end

@@ -596,6 +596,12 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setSelection(const KHTMLSelection&);
 
   /**
+   * Sets the current selection, using the given edit command.
+   */
+  void takeSelectionFrom(const khtml::EditCommand&,
+                         bool useEndingSelection = true);
+
+  /**
    * Clears the current selection.
    */
   void clearSelection();
@@ -641,25 +647,29 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void selectAll();
 
   /**
-   * Returns whether editing is enabled at the current caret
-   * position.
+   * Returns whether editing is enabled at the given node.
    */
-  bool isEditingAtCaret() const;
+  bool isEditingAtNode(const DOM::NodeImpl*) const;
 
   /**
-   * Applies the given edit command.
+   * Returns the most recent edit command applied.
    */
-  void applyCommand(khtml::EditCommand&);
+  khtml::EditCommand lastEditCommand();
 
   /**
-   * Performs an undo of the edit.
+   * Called when editing has been applied.
    */
-  void undoEditing();
+  void appliedEditing(khtml::EditCommand&);
 
   /**
-   * Performs a redo of the edit.
+   * Called when editing has been unapplied.
    */
-  void redoEditing();
+  void unappliedEditing(khtml::EditCommand&);
+
+  /**
+   * Called when editing has been reapplied.
+   */
+  void reappliedEditing(khtml::EditCommand&);
 
   /**
    * Pastes an HTML string at the current caret position.
@@ -1120,7 +1130,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * @internal
    */
-  void notifySelectionChanged();
+  void notifySelectionChanged(bool endTyping = true);
 
   /**
    * @internal

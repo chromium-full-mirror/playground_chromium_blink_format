@@ -236,29 +236,47 @@ void KHTMLSelection::moveTo(DOM::NodeImpl* baseNode,
   validate();
 }
 
-bool KHTMLSelection::modify(EAlter alter, EDirection dir, ETextElement elem) {
+bool KHTMLSelection::modify(EAlter alter,
+                            EDirection dir,
+                            ETextGranularity elem) {
   DOMPosition pos;
 
   switch (dir) {
+    // EDIT FIXME: This needs to handle bidi
+    case RIGHT:
     case FORWARD:
       switch (elem) {
         case CHARACTER:
-          pos = nextCharacterPosition();
+          if (alter == EXTEND)
+            pos = nextCharacterPosition(
+                DOMPosition(extentNode(), extentOffset()));
+          else
+            pos = nextCharacterPosition();
           break;
         case WORD:
+          // EDIT FIXME: implement
           break;
         case LINE:
+          // EDIT FIXME: implement
           break;
       }
       break;
+    // EDIT FIXME: This needs to handle bidi
+    case LEFT:
     case BACKWARD:
       switch (elem) {
         case CHARACTER:
-          pos = previousCharacterPosition();
+          if (alter == EXTEND)
+            pos = previousCharacterPosition(
+                DOMPosition(extentNode(), extentOffset()));
+          else
+            pos = previousCharacterPosition();
           break;
         case WORD:
+          // EDIT FIXME: implement
           break;
         case LINE:
+          // EDIT FIXME: implement
           break;
       }
       break;
@@ -275,7 +293,7 @@ bool KHTMLSelection::modify(EAlter alter, EDirection dir, ETextElement elem) {
   return true;
 }
 
-void KHTMLSelection::expandToElement(ETextElement select) {
+void KHTMLSelection::expandToElement(ETextGranularity select) {
   validate(select);
 }
 
@@ -458,7 +476,7 @@ void KHTMLSelection::setEndOffset(long offset) {
   m_endOffset = offset;
 }
 
-void KHTMLSelection::validate(ETextElement expandTo) {
+void KHTMLSelection::validate(ETextGranularity expandTo) {
   // make sure we do not have a dangling start or end
   if (!m_baseNode && !m_extentNode) {
     setBaseOffset(0);

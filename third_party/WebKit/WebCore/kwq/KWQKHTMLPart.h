@@ -294,9 +294,10 @@ class KWQKHTMLPart : public KHTMLPart {
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
-  void registerCommandForUndo();
-  void registerCommandForRedo();
+  void registerCommandForUndo(const khtml::EditCommand&);
+  void registerCommandForRedo(const khtml::EditCommand&);
   void clearUndoRedoOperations();
+  void editingKeyEvent();
 
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
