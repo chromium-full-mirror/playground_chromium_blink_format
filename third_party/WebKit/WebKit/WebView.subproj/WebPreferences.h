@@ -7,19 +7,42 @@
 
 #import <Foundation/Foundation.h>
 
+@class WebPreferencesPrivate;
+
 extern NSString* WebPreferencesChangedNotification;
 
 /*!
     @class WebPreferences
 */
-@interface WebPreferences : NSObject {
-  NSMutableDictionary* values;
+@interface WebPreferences : NSObject<NSCoding> {
+ @private
+  WebPreferencesPrivate* _private;
 }
 
 /*!
     @method standardPreferences
 */
 + (WebPreferences*)standardPreferences;
+
+/*!
+    @method initWithIdentifier:
+    @param anIdentifier The prefix to add to the user defaults keys for the
+   WebPreferences.
+    @discussion WebViews can share instances of WebPreferences by using an
+   instance of WebPreferences with
+    the same identifier.  Typically, instance are not created directly.  Instead
+   you set the preferences
+    identifier on a WebView.
+    @result Returns a new instance of WebPreferences of a previously allocated
+   instance with the same identifier.
+*/
+- (id)initWithIdentifier:(NSString*)anIdentifier;
+
+/*!
+    @method identifier
+    @result Returns the identifier for this WebPreferences.
+*/
+- (NSString*)identifier;
 
 /*!
     @method standardFontFamily
@@ -230,5 +253,19 @@ extern NSString* WebPreferencesChangedNotification;
     @method willLoadImagesAutomatically
 */
 - (BOOL)loadsImagesAutomatically;
+
+/*!
+    @method setAutosavesPreferences:
+    @param flag
+    @discussion If autosave preferences is YES the settings represented by
+    WebPreferences will be stored in the user defaults database.
+*/
+- (void)setAutosaves:(BOOL)flag;
+
+/*!
+    @method autosavesPreferences
+    @result The value of the autosave preferences flag.
+*/
+- (BOOL)autosaves;
 
 @end
