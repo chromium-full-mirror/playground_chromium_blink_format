@@ -274,7 +274,6 @@ class KWQKHTMLPart : public KHTMLPart {
                              KWQSelectionDirection);
   static DOM::NodeImpl* nodeForWidget(const QWidget*);
   static KWQKHTMLPart* partForNode(DOM::NodeImpl*);
-  khtml::ChildFrame* childFrameForPart(const KParts::ReadOnlyPart*) const;
 
   WebCoreBridge* _bridge;
 
