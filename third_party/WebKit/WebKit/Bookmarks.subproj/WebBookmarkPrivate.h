@@ -11,12 +11,10 @@
 
 @interface IFBookmark (IFPrivate)
 
-- (void)_setTitle:(NSString*)title;
-- (void)_setImage:(NSImage*)image;
-- (void)_setURLString:(NSString*)URLString;
+- (IFBookmark*)_parent;
 - (void)_setParent:(IFBookmark*)parent;
+
+- (IFBookmarkGroup*)_group;
 - (void)_setGroup:(IFBookmarkGroup*)group;
-- (void)_insertChild:(IFBookmark*)bookmark atIndex:(unsigned)index;
-- (void)_removeChild:(IFBookmark*)bookmark;
 
 @end
