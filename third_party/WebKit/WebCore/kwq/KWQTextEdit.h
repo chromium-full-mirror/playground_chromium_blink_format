@@ -64,6 +64,10 @@ class QTextEdit : public QScrollView {
 
   void textChanged() { m_textChanged.call(); }
 
+  FocusPolicy focusPolicy() const;
+
+  void setFont(const QFont&);
+
  private:
   KWQSignal m_textChanged;
 };

@@ -98,8 +98,10 @@ class QWidget : public QObject, public QPaintDevice {
 
   virtual void setFocus();
   virtual void clearFocus();
-  FocusPolicy focusPolicy() const;
+
+  virtual FocusPolicy focusPolicy() const;
   virtual void setFocusPolicy(FocusPolicy);
+
   virtual void setFocusProxy(QWidget*);
 
   const QPalette& palette() const;
