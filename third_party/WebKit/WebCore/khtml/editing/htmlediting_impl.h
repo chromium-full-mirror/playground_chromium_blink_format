@@ -265,7 +265,7 @@ class InputTextCommandImpl : public CompositeEditCommandImpl {
   unsigned long charactersAdded() const { return m_charactersAdded; }
 
  private:
-  DOM::DOMPosition prepareForTextInsertion();
+  DOM::DOMPosition prepareForTextInsertion(bool adjustDownstream);
   void execute(const DOM::DOMString& text);
   void insertSpace(DOM::TextImpl* textNode, unsigned long offset);
 

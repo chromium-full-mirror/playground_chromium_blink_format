@@ -147,17 +147,12 @@ class TextImpl : public CharacterDataImpl {
 
   virtual DOMString toString() const;
 
-  void setRendererIsNeeded(bool flag = true) { m_rendererIsNeeded = flag; }
-
 #if APPLE_CHANGES
   static Text createInstance(TextImpl* impl);
 #endif
 
  protected:
   virtual TextImpl* createNew(DOMStringImpl* _str);
-
- private:
-  bool m_rendererIsNeeded;
 };
 
 // ----------------------------------------------------------------------------
@@ -184,5 +179,16 @@ class CDATASectionImpl : public TextImpl {
   virtual TextImpl* createNew(DOMStringImpl* _str);
 };
 
-};  // namespace
+// ----------------------------------------------------------------------------
+
+class EditingTextImpl : public TextImpl {
+ public:
+  EditingTextImpl(DocumentPtr* impl, const DOMString& text);
+  EditingTextImpl(DocumentPtr* impl);
+  virtual ~EditingTextImpl();
+
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+};
+
+}  // namespace
 #endif

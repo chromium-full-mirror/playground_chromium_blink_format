@@ -228,10 +228,10 @@ FindSelectionResult InlineTextBox::checkSelectionPoint(int _x,
   //                   endl;
   offset = 0;
 
-  if (_y < _ty + m_y)
+  if (_y < _ty + root()->topOverflow())
     return SelectionPointBefore;  // above -> before
 
-  if (_y > _ty + m_y + m_height) {
+  if (_y > _ty + root()->bottomOverflow()) {
     // below -> after
     // Set the offset to the max
     offset = m_len;

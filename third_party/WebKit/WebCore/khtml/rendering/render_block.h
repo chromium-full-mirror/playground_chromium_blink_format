@@ -207,6 +207,14 @@ class RenderBlock : public RenderFlow {
 
   bool isPointInScrollbar(int x, int y, int tx, int ty);
 
+  virtual FindSelectionResult checkSelectionPointIgnoringContinuations(
+      int _x,
+      int _y,
+      int _tx,
+      int _ty,
+      DOM::NodeImpl*&,
+      int&);
+
   virtual void calcMinMaxWidth();
   void calcInlineMinMaxWidth();
   void calcBlockMinMaxWidth();
