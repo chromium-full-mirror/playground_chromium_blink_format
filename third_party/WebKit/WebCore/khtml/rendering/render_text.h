@@ -289,6 +289,8 @@ class RenderText : public RenderObject {
 #if APPLE_CHANGES
   TextSlave* findTextSlave(int offset, int& pos);
   TextSlaveArray textSlaves() { return m_lines; }
+  int widthFromBuffer(const Font*, int start, int len) const;
+  void computeWidths();
 #endif
 
  protected:
@@ -313,6 +315,8 @@ class RenderText : public RenderObject {
   short m_maxWidth;
   short m_beginMinWidth;
   short m_endMinWidth;
+  short m_beginMaxWidth;
+  short m_endMaxWidth;
 
   SelectionState m_selectionState : 3;
   bool m_hasBreakableChar : 1;  // Whether or not we can be broken into multiple
@@ -324,7 +328,10 @@ class RenderText : public RenderObject {
   bool m_hasEndWS : 1;  // Whether or not we end with WS (only true if we aren't
                         // pre)
 
-  // 19 bits left
+// 19 bits left
+#if APPLE_CHANGES
+  float* m_widths;
+#endif
 };
 };
 #endif
