@@ -14,7 +14,6 @@
 // and it no longer works outside of WebKit.
 
 @interface WebDynamicScrollBarsView : NSScrollView<WebCoreFrameView> {
-  NSCursor* cursor;
   BOOL disallowsScrolling;
   BOOL suppressLayout;
 }
