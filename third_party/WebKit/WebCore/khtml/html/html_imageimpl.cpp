@@ -432,12 +432,9 @@ bool HTMLAreaElementImpl::mapMouseEvent(int x_,
   return inside;
 }
 
-QRect HTMLAreaElementImpl::getRect() const {
-  if (parentNode()->renderer() == 0)
-    return QRect();
+QRect HTMLAreaElementImpl::getRect(RenderObject* obj) const {
   int dx, dy;
-  if (!parentNode()->renderer()->absolutePosition(dx, dy))
-    return QRect();
+  obj->absolutePosition(dx, dy);
   QRegion region = getRegion(lastw, lasth);
   region.translate(dx, dy);
   return region.boundingRect();

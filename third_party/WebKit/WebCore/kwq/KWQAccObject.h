@@ -27,6 +27,10 @@
 
 #import <Foundation/Foundation.h>
 
+namespace DOM {
+class HTMLAreaElementImpl;
+}
+
 namespace khtml {
 class RenderObject;
 }
@@ -34,6 +38,7 @@ class RenderObject;
 @interface KWQAccObject : NSObject {
   khtml::RenderObject* m_renderer;
   id m_data;
+  DOM::HTMLAreaElementImpl* m_areaElement;
   NSMutableArray* m_children;
 }
 

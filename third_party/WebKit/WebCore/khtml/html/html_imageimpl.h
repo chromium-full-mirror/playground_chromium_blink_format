@@ -97,7 +97,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
                      int height_,
                      khtml::RenderObject::NodeInfo& info);
 
-  virtual QRect getRect() const;
+  virtual QRect getRect(khtml::RenderObject* obj) const;
 
  protected:
   QRegion getRegion(int width_, int height) const;

@@ -31,6 +31,10 @@
 #include <qmap.h>
 #include <qpixmap.h>
 
+namespace DOM {
+class HTMLMapElementImpl;
+}
+
 namespace khtml {
 
 class DocLoader;
@@ -84,6 +88,8 @@ class RenderImage : public RenderReplaced {
   void setContentObject(CachedObject* co);
 
   bool isDisplayingError() const { return berrorPic; }
+
+  DOM::HTMLMapElementImpl* imageMap();
 
  private:
   bool isWidthSpecified() const;
