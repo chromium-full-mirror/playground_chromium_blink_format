@@ -16,13 +16,10 @@
 
 @interface IFDynamicScrollBarsView : NSScrollView<WebCoreFrameView> {
   NSCursor* cursor;
-  BOOL breakRecursionCycle;
   BOOL allowsScrolling;
 }
 
 - (void)setAllowsScrolling:(BOOL)flag;
 - (BOOL)allowsScrolling;
-- (void)updateScrollers;
-- (void)resetCursorRects;
 
 @end
