@@ -998,6 +998,14 @@ void DocumentImpl::updateDocumentsRendering() {
   }
 }
 
+void DocumentImpl::updateLayout() {
+  updateRendering();
+
+  // Only do a layout if changes have occurred that make it necessary.
+  if (m_view && renderer() && renderer()->needsLayout())
+    m_view->layout();
+}
+
 void DocumentImpl::attach() {
   assert(!attached());
 

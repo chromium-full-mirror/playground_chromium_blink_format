@@ -45,6 +45,8 @@
 
 #include "misc/htmltags.h"
 
+#include "rendering/render_object.h"
+
 #include <kdebug.h>
 
 using namespace KJS;
@@ -1322,14 +1324,22 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(body.text());
         case BodyVLink:
           return String(body.vLink());
-        case BodyScrollHeight:
-          return Number(body.ownerDocument().view()
-                            ? body.ownerDocument().view()->contentsHeight()
-                            : 0);
-        case BodyScrollWidth:
-          return Number(body.ownerDocument().view()
-                            ? body.ownerDocument().view()->contentsWidth()
-                            : 0);
+        default:
+          // Update the document's layout before we compute these attributes.
+          DOM::DocumentImpl* docimpl = node.handle()->getDocument();
+          if (docimpl) {
+            docimpl->updateLayout();
+          }
+          switch (token) {
+            case BodyScrollHeight:
+              return Number(body.ownerDocument().view()
+                                ? body.ownerDocument().view()->contentsHeight()
+                                : 0);
+            case BodyScrollWidth:
+              return Number(body.ownerDocument().view()
+                                ? body.ownerDocument().view()->contentsWidth()
+                                : 0);
+          }
       }
     } break;
 
