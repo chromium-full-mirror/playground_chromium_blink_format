@@ -115,7 +115,8 @@ inline bool operator==(const Identifier& a, const char* b) {
 #define KJS_IDENTIFIER_EACH_GLOBAL(macro)                               \
   macro(arguments) macro(callee) macro(constructor) macro(length)       \
       macro(message) macro(name) macro(prototype) macro(toLocaleString) \
-          macro(toString) macro(valueOf)
+          macro(toString) macro(toFixed) macro(toExponential)           \
+              macro(toPrecision) macro(valueOf)
 
 // Define external global variables for all property names above (and one more).
 #if !KJS_IDENTIFIER_HIDE_GLOBALS
