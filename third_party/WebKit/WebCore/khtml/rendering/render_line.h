@@ -76,8 +76,11 @@ class InlineBox {
 
   void setFirstLineStyleBit(bool f) { m_firstLine = f; }
 
-  InlineBox* nextOnLine() { return m_next; }
-  InlineBox* prevOnLine() { return m_prev; }
+  InlineBox* nextOnLine() const { return m_next; }
+  InlineBox* prevOnLine() const { return m_prev; }
+  void setNextOnLine(InlineBox* next) { m_next = next; }
+  void setPrevOnLine(InlineBox* prev) { m_prev = prev; }
+
   RenderObject* object() { return m_object; }
 
   InlineFlowBox* parent() { return m_parent; }
@@ -133,8 +136,8 @@ class InlineRunBox : public InlineBox {
     m_nextLine = 0;
   }
 
-  InlineRunBox* prevLineBox() { return m_prevLine; }
-  InlineRunBox* nextLineBox() { return m_nextLine; }
+  InlineRunBox* prevLineBox() const { return m_prevLine; }
+  InlineRunBox* nextLineBox() const { return m_nextLine; }
   void setNextLineBox(InlineRunBox* n) { m_nextLine = n; }
   void setPreviousLineBox(InlineRunBox* p) { m_prevLine = p; }
 
@@ -267,6 +270,8 @@ class InlineFlowBox : public InlineRunBox {
   void shrinkBoxesWithNoTextChildren(int topPosition, int bottomPosition);
 
   virtual void setOverflowPositions(int top, int bottom) {}
+
+  void removeChild(InlineBox* child);
 
  protected:
   InlineBox* m_firstChild;

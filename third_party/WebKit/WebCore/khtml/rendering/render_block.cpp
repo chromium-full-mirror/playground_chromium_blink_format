@@ -266,7 +266,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
   RenderObject* prev = oldChild->previousSibling();
   RenderObject* next = oldChild->nextSibling();
   bool mergedBlocks = false;
-  if (document()->renderer() && !isInline() && !oldChild->isInline() &&
+  if (!documentBeingDestroyed() && !isInline() && !oldChild->isInline() &&
       !oldChild->continuation() && prev && prev->isAnonymous() &&
       prev->childrenInline() && next && next->isAnonymous() &&
       next->childrenInline()) {

@@ -87,6 +87,14 @@ class RenderBox : public RenderContainer {
 
   virtual void position(InlineBox* box, int from, int len, bool reverse);
 
+  // For inline replaced elements, this function returns the inline box that
+  // owns us.  Enables
+  // the replaced RenderObject to quickly determine what line it is contained on
+  // and to easily
+  // iterate over structures on the line.
+  virtual InlineBox* inlineBoxWrapper() const;
+  void deleteLineBoxWrapper();
+
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;
   virtual int rightmostPosition(bool includeOverflowInterior = true,
@@ -212,6 +220,9 @@ class RenderBox : public RenderContainer {
   // A pointer to our layer if we have one.  Currently only positioned elements
   // and floaters have layers.
   RenderLayer* m_layer;
+
+  // For inline replaced elements, the inline box that owns us.
+  InlineBox* m_inlineBoxWrapper;
 };
 
 };  // namespace
