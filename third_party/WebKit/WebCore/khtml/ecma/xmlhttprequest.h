@@ -85,6 +85,7 @@ class XMLHttpRequest : public DOMObject {
 
   Value getStatusText() const;
   Value getStatus() const;
+  bool urlMatchesDocumentDomain(const KURL&) const;
 
   XMLHttpRequestQObject* qObject;
 
