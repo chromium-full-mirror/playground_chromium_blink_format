@@ -284,6 +284,8 @@ class KWQKHTMLPart : public KHTMLPart {
   void addPluginRootObject(const KJS::Bindings::RootObject* root);
   void cleanupPluginRootObjects();
 
+  void registerCommandForUndo(int cookie);
+
  private:
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
   virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
