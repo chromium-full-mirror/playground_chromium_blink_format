@@ -135,6 +135,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   virtual void write(const TokenizerString& str, bool appendData);
   virtual void finish();
   virtual void setOnHold(bool onHold);
+  virtual void setForceSynchronous(bool force);
   virtual bool isWaitingForScripts() const;
   virtual void stopped();
   virtual bool processingData() const;
@@ -352,6 +353,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // The timer for continued processing.
   int timerId;
   bool allowYield;
+  bool forceSynchronous;  // disables yielding
 
   bool includesCommentsInDOM;
 

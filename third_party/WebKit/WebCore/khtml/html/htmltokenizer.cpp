@@ -433,6 +433,7 @@ void HTMLTokenizer::reset() {
   }
   timerId = 0;
   allowYield = false;
+  forceSynchronous = false;
 
   currToken.reset();
 }
@@ -476,6 +477,11 @@ void HTMLTokenizer::begin() {
   lineno = 0;
   scriptStartLineno = 0;
   tagStartLineno = 0;
+  forceSynchronous = false;
+}
+
+void HTMLTokenizer::setForceSynchronous(bool force) {
+  forceSynchronous = force;
 }
 
 void HTMLTokenizer::processListing(TokenizerString list) {
@@ -1924,7 +1930,7 @@ bool HTMLTokenizer::continueProcessing(int& processedCount,
   // processed a certain number of characters.
   bool allowedYield = allowYield;
   allowYield = false;
-  if (!loadingExtScript && !m_executingScript &&
+  if (!loadingExtScript && !forceSynchronous && !m_executingScript &&
       (processedCount > TOKENIZER_CHUNK_SIZE || allowedYield)) {
     processedCount = 0;
     if (startTime.elapsed() > TOKENIZER_TIME_DELAY) {
