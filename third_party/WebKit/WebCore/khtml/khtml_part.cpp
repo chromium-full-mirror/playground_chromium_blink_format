@@ -4280,8 +4280,6 @@ bool KHTMLPart::isPointInsideSelection(int x, int y) {
   return false;
 }
 
-#if APPLE_CHANGES
-
 void KHTMLPart::handleMousePressEventDoubleClick(
     khtml::MousePressEvent* event) {
   QMouseEvent* mouse = event->qmouseEvent();
@@ -4301,7 +4299,8 @@ void KHTMLPart::handleMousePressEventDoubleClick(
   }
 
   if (selection.state() != Selection::CARET) {
-    d->m_textElement = Selection::WORD;
+    d->m_selectionGranularity = Selection::WORD;
+    d->m_beganSelectingText = true;
   }
 
   setSelection(selection);
@@ -4327,14 +4326,13 @@ void KHTMLPart::handleMousePressEventTripleClick(
   }
 
   if (selection.state() != Selection::CARET) {
-    d->m_textElement = Selection::LINE;
+    d->m_selectionGranularity = Selection::LINE;
+    d->m_beganSelectingText = true;
   }
 
   setSelection(selection);
   startAutoScroll();
 }
-
-#endif  // APPLE_CHANGES
 
 void KHTMLPart::handleMousePressEventSingleClick(
     khtml::MousePressEvent* event) {
@@ -4342,24 +4340,37 @@ void KHTMLPart::handleMousePressEventSingleClick(
   DOM::Node innerNode = event->innerNode();
 
   if (mouse->button() == LeftButton) {
-    Selection selection;
+    Selection sel;
+
     if (!innerNode.isNull() && innerNode.handle()->renderer()) {
-#if APPLE_CHANGES
+      bool extendSelection = mouse->state() & ShiftButton;
+
       // Don't restart the selection when the mouse is pressed on an
       // existing selection so we can allow for text dragging.
-      if (isPointInsideSelection(event->x(), event->y())) {
+      if (!extendSelection && isPointInsideSelection(event->x(), event->y())) {
         return;
       }
-#endif
       Position pos(
           innerNode.handle()->positionForCoordinates(event->x(), event->y()));
       if (pos.isEmpty())
         pos =
             Position(innerNode.handle(), innerNode.handle()->caretMinOffset());
-      selection = pos;
+
+      sel = selection();
+      if (extendSelection && sel.notEmpty()) {
+        sel.clearModifyBias();
+        sel.setExtent(pos);
+        if (d->m_selectionGranularity != Selection::CHARACTER) {
+          sel.expandUsingGranularity(d->m_selectionGranularity);
+        }
+        d->m_beganSelectingText = true;
+      } else {
+        sel = pos;
+        d->m_selectionGranularity = Selection::CHARACTER;
+      }
     }
 
-    setSelection(selection);
+    setSelection(sel);
     startAutoScroll();
   }
 }
@@ -4392,9 +4403,7 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
 #ifdef KHTML_NO_SELECTION
     d->m_dragLastPos = mouse->globalPos();
 #else
-#if APPLE_CHANGES
-    d->m_textElement = Selection::CHARACTER;
-    d->m_mouseMovedSinceLastMousePress = false;
+    d->m_beganSelectingText = false;
 
     if (mouse->clickCount() == 2) {
       handleMousePressEventDoubleClick(event);
@@ -4405,16 +4414,16 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
       handleMousePressEventTripleClick(event);
       return;
     }
-#endif  // APPLE_CHANGES
 
     handleMousePressEventSingleClick(event);
-
 #endif  // KHTML_NO_SELECTION
   }
 }
 
 void KHTMLPart::khtmlMouseDoubleClickEvent(
     khtml::MouseDoubleClickEvent* event) {}
+
+#if !APPLE_CHANGES
 
 bool KHTMLPart::handleMouseMoveEventDrag(khtml::MouseMoveEvent* event) {
 #ifdef QT_NO_DRAGANDDROP
@@ -4474,10 +4483,6 @@ bool KHTMLPart::handleMouseMoveEventDrag(khtml::MouseMoveEvent* event) {
 }
 
 bool KHTMLPart::handleMouseMoveEventOver(khtml::MouseMoveEvent* event) {
-#if APPLE_CHANGES
-  return false;
-#else
-
   // Mouse clicked. Do nothing.
   if (d->m_bMousePressed) {
     return false;
@@ -4527,8 +4532,9 @@ bool KHTMLPart::handleMouseMoveEventOver(khtml::MouseMoveEvent* event) {
   }
 
   return true;
-#endif  // APPLE_CHANGES
 }
+
+#endif  // APPLE_CHANGES
 
 void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   // Mouse not pressed. Do nothing.
@@ -4558,7 +4564,6 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   Position pos(
       innerNode.handle()->positionForCoordinates(event->x(), event->y()));
 
-#if APPLE_CHANGES
   // Don't modify the selection if we're not on a node.
   if (pos.isEmpty())
     return;
@@ -4568,31 +4573,28 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   // selection.
   Selection sel = selection();
   sel.clearModifyBias();
-  if (!d->m_mouseMovedSinceLastMousePress) {
-    d->m_mouseMovedSinceLastMousePress = true;
+  if (!d->m_beganSelectingText) {
+    d->m_beganSelectingText = true;
     sel.moveTo(pos);
   }
-#endif
 
   sel.setExtent(pos);
-
-#if APPLE_CHANGES
-  if (d->m_textElement != Selection::CHARACTER) {
-    sel.expandUsingGranularity(d->m_textElement);
+  if (d->m_selectionGranularity != Selection::CHARACTER) {
+    sel.expandUsingGranularity(d->m_selectionGranularity);
   }
-#endif
-
   setSelection(sel);
 
 #endif  // KHTML_NO_SELECTION
 }
 
 void KHTMLPart::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
+#if !APPLE_CHANGES
   if (handleMouseMoveEventDrag(event))
     return;
 
   if (handleMouseMoveEventOver(event))
     return;
+#endif
 
   handleMouseMoveEventSelection(event);
 }
@@ -4634,23 +4636,21 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
   }
 #endif
 
-#if APPLE_CHANGES
+#ifndef KHTML_NO_SELECTION
+
   // Clear the selection if the mouse didn't move after the last mouse press.
   // We do this so when clicking on the selection, the selection goes away.
   // However, if we are editing, place the caret.
-  if (d->m_dragStartPos.x() == event->qmouseEvent()->x() &&
+  if (!d->m_beganSelectingText &&
+      d->m_dragStartPos.x() == event->qmouseEvent()->x() &&
       d->m_dragStartPos.y() == event->qmouseEvent()->y() &&
-      d->m_selection.state() == Selection::RANGE &&
-      d->m_textElement == Selection::CHARACTER) {
+      d->m_selection.state() == Selection::RANGE) {
     Selection selection;
     if (d->m_selection.base().node()->isContentEditable())
       selection.moveTo(d->m_selection.base().node()->positionForCoordinates(
           event->x(), event->y()));
     setSelection(selection);
   }
-#endif
-
-#ifndef KHTML_NO_SELECTION
 
 #ifndef QT_NO_CLIPBOARD
   // get selected text and paste to the clipboard
