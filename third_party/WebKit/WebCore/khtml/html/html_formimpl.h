@@ -80,8 +80,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   virtual void parseAttribute(AttributeImpl* attr);
 
-  void radioClicked(HTMLGenericFormElementImpl* caller);
-
   void registerFormElement(khtml::RenderFormElement*);
   void removeFormElement(khtml::RenderFormElement*);
 
@@ -156,7 +154,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual void recalcStyle(StyleChange);
 
   DOMString name() const;
-  void setName(const DOMString& name);
+  virtual void setName(const DOMString& name);
 
   virtual bool isGenericFormElement() const { return true; }
 
@@ -286,6 +284,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   void click();
 
   virtual void parseAttribute(AttributeImpl* attr);
+  virtual void setName(const DOMString& name);
 
   virtual void init();
   virtual void attach();
@@ -322,6 +321,11 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool m_haveType : 1;
   bool m_activeSubmit : 1;
   bool m_autocomplete : 1;
+
+ private:
+  bool isCheckedRadioButtonForDocument() const;
+  void addCheckedRadioButtonToDocument();
+  void removeCheckedRadioButtonFromDocument();
 };
 
 // -------------------------------------------------------------------------
