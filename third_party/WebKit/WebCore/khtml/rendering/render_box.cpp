@@ -193,13 +193,13 @@ void RenderBox::paintBackground(QPainter* p,
                                 int _tx,
                                 int _ty,
                                 int w,
-                                int h) {
+                                int height) {
   if (c.isValid())
     p->fillRect(_tx, clipy, w, cliph, c);
   // no progressive loading of the background image
   if (bg && bg->pixmap_size() == bg->valid_rect().size() &&
       !bg->isTransparent() && !bg->isErrorImage()) {
-    // kdDebug( 6040 ) << "printing bgimage at " << _tx << "/" << _ty << endl;
+    // kdDebug( 6040 ) << "painting bgimage at " << _tx << "/" << _ty << endl;
     // ### might need to add some correct offsets
     // ### use paddingX/Y
 
@@ -220,7 +220,7 @@ void RenderBox::paintBackground(QPainter* p,
     if (sptr->backgroundAttachment()) {
       // scroll
       int pw = m_width - vpab;
-      int h = isHtml() ? h : m_height;
+      int h = isHtml() ? height : m_height;
       if (isTableCell()) {
         // Table cells' m_height variable is wrong.  You have to take into
         // account this hack extra stuff to get the right height.
@@ -288,7 +288,7 @@ void RenderBox::paintBackground(QPainter* p,
         }
       }
 
-      if ((bgr == NO_REPEAT || bgr == REPEAT_X) && h > pixh) {
+      if ((bgr == NO_REPEAT || bgr == REPEAT_X) && height > pixh) {
         ch = pixh;
         cy = vr.y() + sptr->backgroundYPosition().minWidth(ph - pixh);
       } else {
@@ -303,7 +303,7 @@ void RenderBox::paintBackground(QPainter* p,
       }
 
       QRect fix(cx, cy, cw, ch);
-      QRect ele(_tx + borderLeft(), _ty + borderTop(), w - vpab, h - hpab);
+      QRect ele(_tx + borderLeft(), _ty + borderTop(), w - vpab, height - hpab);
       QRect b = fix.intersect(ele);
       sx += b.x() - cx;
       sy += b.y() - cy;
