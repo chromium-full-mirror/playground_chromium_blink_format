@@ -13,9 +13,10 @@
 // and it is no longer completely appropriate for use outside of WebKit.
 
 @interface WebDynamicScrollBarsView : WebCoreScrollView<WebCoreFrameView> {
-  BOOL disallowsHorizontalScrolling;
-  BOOL disallowsVerticalScrolling;
+  WebCoreScrollBarMode hScroll;
+  WebCoreScrollBarMode vScroll;
   BOOL suppressLayout;
+  BOOL suppressScrollers;
 }
 
 - (void)setAllowsHorizontalScrolling:(BOOL)flag;
