@@ -638,13 +638,13 @@ Value NewExprNode::evaluate(ExecState* exec) {
   }
 
   if (v.type() != ObjectType) {
-    return throwError(exec, TypeError,
-                      "Expression is no object. Cannot be new'ed");
+    return throwError(exec, TypeError, "Value used with new is not object.");
   }
 
   Object constr = Object(static_cast<ObjectImp*>(v.imp()));
   if (!constr.implementsConstruct()) {
-    return throwError(exec, TypeError, "Expression is no constructor.");
+    return throwError(exec, TypeError,
+                      "Value asked to construct is not a constructor.");
   }
 
   Value res = constr.construct(exec, argList);
@@ -686,7 +686,7 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
     printInfo(exec, "WARNING: Failed function call attempt on", v, line);
 #endif
     return throwError(exec, TypeError,
-                      "Expression is no object. Cannot be called.");
+                      "Value is not object. Cannot be called.");
   }
 
   Object func = Object(static_cast<ObjectImp*>(v.imp()));
@@ -695,7 +695,7 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
 #ifndef NDEBUG
     printInfo(exec, "Failed function call attempt on", v, line);
 #endif
-    return throwError(exec, TypeError, "Expression does not allow calls.");
+    return throwError(exec, TypeError, "Object does not allow calls.");
   }
 
 #if KJS_MAX_STACK > 0
@@ -704,7 +704,8 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
 #ifndef NDEBUG
     printInfo(exec, "Exceeded maximum function call depth", v, line);
 #endif
-    return throwError(exec, RangeError, "Exceeded maximum call stack size.");
+    return throwError(exec, RangeError,
+                      "Exceeded maximum function call depth.");
   }
 #endif
 
@@ -1133,14 +1134,13 @@ Value RelationalNode::evaluate(ExecState* exec) {
   } else if (oper == OpIn) {
     // Is all of this OK for host objects?
     if (v2.type() != ObjectType)
-      return throwError(exec, TypeError,
-                        "Shift expression not an object into IN expression.");
+      return throwError(exec, TypeError, "Used IN expression with non-object.");
     Object o2(static_cast<ObjectImp*>(v2.imp()));
     b = o2.hasProperty(exec, Identifier(v1.toString(exec)));
   } else {
     if (v2.type() != ObjectType)
       return throwError(exec, TypeError,
-                        "Called instanceof operator on non-object.");
+                        "Used instanceof operator on non-object.");
 
     Object o2(static_cast<ObjectImp*>(v2.imp()));
     if (!o2.implementsHasInstance()) {

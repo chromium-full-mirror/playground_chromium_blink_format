@@ -656,6 +656,12 @@ void InterpreterImp::initGlobalObject() {
              Object(new GlobalFuncImp(globExec, funcProto,
                                       GlobalFuncImp::UnEscape, 1)),
              DontEnum);
+#if !NDEBUG
+  global.put(globExec, "kjsprint",
+             Object(new GlobalFuncImp(globExec, funcProto,
+                                      GlobalFuncImp::KJSPrint, 1)),
+             DontEnum);
+#endif
 
   // built-in objects
   global.put(globExec, "Math", Object(new MathObjectImp(globExec, objProto)),

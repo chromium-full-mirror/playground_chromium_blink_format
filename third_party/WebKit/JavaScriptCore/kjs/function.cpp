@@ -537,6 +537,12 @@ Value GlobalFuncImp::call(ExecState* exec,
       res = String(s);
       break;
     }
+#if !NDEBUG
+    case KJSPrint: {
+      UString str = args[0].toString(exec);
+      puts(str.ascii());
+    }
+#endif
   }
 
   return res;
