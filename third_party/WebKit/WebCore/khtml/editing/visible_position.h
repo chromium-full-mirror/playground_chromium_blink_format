@@ -43,7 +43,7 @@ class VisiblePosition {
 
   VisiblePosition() {}
   VisiblePosition(NodeImpl*, long offset, EAffinity affinity = DOWNSTREAM);
-  VisiblePosition(const Position&, EAffinity affinity = DOWNSTREAM);
+  explicit VisiblePosition(const Position&, EAffinity affinity = DOWNSTREAM);
 
   void clear() { m_deepPosition.clear(); }
 
