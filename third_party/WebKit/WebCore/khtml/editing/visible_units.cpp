@@ -40,9 +40,9 @@ using DOM::Range;
 
 namespace khtml {
 
-static VisiblePosition previousWordBoundary(
-    const VisiblePosition& c,
-    unsigned (*searchFunction)(const QChar*, unsigned)) {
+static VisiblePosition previousBoundary(const VisiblePosition& c,
+                                        unsigned (*searchFunction)(const QChar*,
+                                                                   unsigned)) {
   Position pos = c.deepEquivalent();
   NodeImpl* n = pos.node();
   if (!n)
@@ -62,9 +62,7 @@ static VisiblePosition previousWordBoundary(
   QString string;
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
-    // Keep asking the iterator for chunks until the nextWordFromIndex()
-    // function
-    // returns a non-zero value.
+    // iterate to get chunks until the searchFunction returns a non-zero value.
     string.prepend(it.characters(), it.length());
     next = searchFunction(string.unicode(), string.length());
     if (next != 0)
@@ -113,9 +111,9 @@ static VisiblePosition previousWordBoundary(
   return VisiblePosition(pos, UPSTREAM);
 }
 
-static VisiblePosition nextWordBoundary(const VisiblePosition& c,
-                                        unsigned (*searchFunction)(const QChar*,
-                                                                   unsigned)) {
+static VisiblePosition nextBoundary(const VisiblePosition& c,
+                                    unsigned (*searchFunction)(const QChar*,
+                                                               unsigned)) {
   Position pos = c.deepEquivalent();
   NodeImpl* n = pos.node();
   if (!n)
@@ -176,6 +174,8 @@ static VisiblePosition nextWordBoundary(const VisiblePosition& c,
   return VisiblePosition(pos, UPSTREAM);
 }
 
+// ---------
+
 static unsigned startWordBoundary(const QChar* characters, unsigned length) {
   int start, end;
   findWordBoundary(characters, length, length, &start, &end);
@@ -189,7 +189,7 @@ VisiblePosition startOfWord(const VisiblePosition& c, EWordSide side) {
     if (p.isNull())
       return c;
   }
-  return previousWordBoundary(p, startWordBoundary);
+  return previousBoundary(p, startWordBoundary);
 }
 
 static unsigned endWordBoundary(const QChar* characters, unsigned length) {
@@ -205,7 +205,7 @@ VisiblePosition endOfWord(const VisiblePosition& c, EWordSide side) {
     if (p.isNull())
       return c;
   }
-  return nextWordBoundary(p, endWordBoundary);
+  return nextBoundary(p, endWordBoundary);
 }
 
 static unsigned previousWordPositionBoundary(const QChar* characters,
@@ -214,7 +214,7 @@ static unsigned previousWordPositionBoundary(const QChar* characters,
 }
 
 VisiblePosition previousWordPosition(const VisiblePosition& c) {
-  return previousWordBoundary(c, previousWordPositionBoundary);
+  return previousBoundary(c, previousWordPositionBoundary);
 }
 
 static unsigned nextWordPositionBoundary(const QChar* characters,
@@ -223,8 +223,10 @@ static unsigned nextWordPositionBoundary(const QChar* characters,
 }
 
 VisiblePosition nextWordPosition(const VisiblePosition& c) {
-  return nextWordBoundary(c, nextWordPositionBoundary);
+  return nextBoundary(c, nextWordPositionBoundary);
 }
+
+// ---------
 
 VisiblePosition previousLinePosition(const VisiblePosition& c,
                                      EAffinity affinity,
@@ -252,10 +254,8 @@ static unsigned startSentenceBoundary(const QChar* characters,
 }
 
 VisiblePosition startOfSentence(const VisiblePosition& c) {
-  return previousWordBoundary(c, startSentenceBoundary);
+  return previousBoundary(c, startSentenceBoundary);
 }
-
-// ---------
 
 static unsigned endSentenceBoundary(const QChar* characters, unsigned length) {
   int start, end;
@@ -265,10 +265,8 @@ static unsigned endSentenceBoundary(const QChar* characters, unsigned length) {
 
 VisiblePosition endOfSentence(const VisiblePosition& c,
                               EIncludeLineBreak includeLineBreak) {
-  return nextWordBoundary(c, endSentenceBoundary);
+  return nextBoundary(c, endSentenceBoundary);
 }
-
-// ---------
 
 static unsigned previousSentencePositionBoundary(const QChar* characters,
                                                  unsigned length) {
@@ -278,10 +276,8 @@ static unsigned previousSentencePositionBoundary(const QChar* characters,
 VisiblePosition previousSentencePosition(const VisiblePosition& c,
                                          EAffinity,
                                          int x) {
-  return previousWordBoundary(c, previousSentencePositionBoundary);
+  return previousBoundary(c, previousSentencePositionBoundary);
 }
-
-// ---------
 
 static unsigned nextSentencePositionBoundary(const QChar* characters,
                                              unsigned length) {
@@ -291,10 +287,8 @@ static unsigned nextSentencePositionBoundary(const QChar* characters,
 VisiblePosition nextSentencePosition(const VisiblePosition& c,
                                      EAffinity,
                                      int x) {
-  return nextWordBoundary(c, nextSentencePositionBoundary);
+  return nextBoundary(c, nextSentencePositionBoundary);
 }
-
-// ---------
 
 VisiblePosition startOfParagraph(const VisiblePosition& c) {
   Position p = c.deepEquivalent();
@@ -434,4 +428,4 @@ VisiblePosition nextParagraphPosition(const VisiblePosition& p,
   return pos;
 }
 
-}  // namespace DOM
+}  // namespace khtml
