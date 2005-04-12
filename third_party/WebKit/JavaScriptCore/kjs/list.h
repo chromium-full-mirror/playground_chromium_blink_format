@@ -125,6 +125,8 @@ class List {
       markValues();
   }
 
+  static void markProtectedLists();
+
  private:
   ListImpBase* _impBase;
   bool _needsMarking;
