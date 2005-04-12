@@ -645,7 +645,7 @@ bool KHTMLParser::insertNode(NodeImpl* n, bool flat) {
                  (parent->id() == ID_THEAD || parent->id() == ID_TBODY ||
                   parent->id() == ID_TFOOT) &&
                  parentparent->id() == ID_TABLE) ||
-                (!checkChild(ID_TR, id) &&
+                (!checkChild(ID_TR, id, !doc()->inCompatMode()) &&
                  (node->id() == ID_THEAD || node->id() == ID_TBODY ||
                   node->id() == ID_TFOOT) &&
                  parent->id() == ID_TABLE)) {
