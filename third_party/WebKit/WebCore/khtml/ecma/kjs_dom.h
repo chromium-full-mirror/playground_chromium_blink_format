@@ -221,6 +221,7 @@ class DOMDocument : public DOMNode {
     CreateTreeWalker,
     DefaultView,
     CreateEvent,
+    ElementFromPoint,
     StyleSheets,
     PreferredStylesheetSet,
     SelectedStylesheetSet,

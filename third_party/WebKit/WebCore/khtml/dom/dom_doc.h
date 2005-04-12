@@ -485,6 +485,8 @@ class Document : public Node {
    */
   Element getElementById(const DOMString& elementId) const;
 
+  Element elementFromPoint(const int _x, const int _y) const;
+
   /**
    * No Exceptions.
    *
