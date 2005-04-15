@@ -98,15 +98,21 @@ void JSAbstractEventListener::handleEvent(DOM::Event& evt, bool isWindowEvent) {
                           .ascii();
       int lineNumber =
           exec->exception().toObject(exec).get(exec, "line").toInt32(exec);
-      UString sourceURL = exec->exception()
-                              .toObject(exec)
-                              .get(exec, "sourceURL")
-                              .toString(exec);
+      QString sourceURL;
+      {
+        // put this in a block to make sure UString is deallocated inside the
+        // lock
+        UString uSourceURL = exec->exception()
+                                 .toObject(exec)
+                                 .get(exec, "sourceURL")
+                                 .toString(exec);
+        sourceURL = uSourceURL.qstring();
+      }
       KJS::Interpreter::unlock();
       if (Interpreter::shouldPrintExceptions()) {
         printf("(event handler):%s\n", message);
       }
-      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL.qstring());
+      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL);
       exec->clearException();
     }
 #else
