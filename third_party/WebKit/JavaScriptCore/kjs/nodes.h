@@ -25,6 +25,8 @@
 #ifndef _NODES_H_
 #define _NODES_H_
 
+#include "fast_malloc.h"
+
 #include "internal.h"
 //#include "debugger.h"
 #ifndef NDEBUG
@@ -78,6 +80,9 @@ class Node {
  public:
   Node();
   virtual ~Node();
+
+  KJS_FAST_ALLOCATED;
+
   virtual Value evaluate(ExecState* exec) = 0;
   virtual Reference evaluateReference(ExecState* exec);
   UString toString() const;

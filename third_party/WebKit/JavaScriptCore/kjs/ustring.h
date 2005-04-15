@@ -24,6 +24,8 @@
 #ifndef _KJS_USTRING_H_
 #define _KJS_USTRING_H_
 
+#include "fast_malloc.h"
+
 #if APPLE_CHANGES
 #include <sys/types.h>
 #ifndef KWQ_UNSIGNED_TYPES_DEFINED
@@ -210,6 +212,7 @@ class UString {
     friend bool operator==(const UString&, const UString&);
 
     static Rep* create(UChar* d, int l);
+    static Rep* createCopying(const UChar* d, int l);
     static Rep* create(Rep* base, int offset, int length);
     void destroy();
 
@@ -226,6 +229,8 @@ class UString {
     }
     static unsigned computeHash(const UChar*, int length);
     static unsigned computeHash(const char*);
+
+    KJS_FAST_ALLOCATED;
 
     void ref() { ++rc; }
     void deref() {
@@ -302,6 +307,8 @@ class UString {
    * string the data will be freed.
    */
   ~UString() { release(); }
+
+  KJS_FAST_ALLOCATED;
 
   /**
    * Constructs a string from an int.

@@ -21,6 +21,7 @@
 
 #include "property_map.h"
 
+#include "fast_malloc.h"
 #include "object.h"
 #include "protect.h"
 #include "reference_list.h"
@@ -116,7 +117,7 @@ PropertyMap::~PropertyMap() {
     if (key)
       key->deref();
   }
-  free(_table);
+  kjs_fast_free(_table);
 }
 
 void PropertyMap::clear() {
@@ -364,8 +365,8 @@ void PropertyMap::rehash(int newTableSize) {
   int oldTableSize = oldTable ? oldTable->size : 0;
   int oldTableKeyCount = oldTable ? oldTable->keyCount : 0;
 
-  _table =
-      (Table*)calloc(1, sizeof(Table) + (newTableSize - 1) * sizeof(Entry));
+  _table = (Table*)kjs_fast_calloc(
+      1, sizeof(Table) + (newTableSize - 1) * sizeof(Entry));
   _table->size = newTableSize;
   _table->sizeMask = newTableSize - 1;
   _table->keyCount = oldTableKeyCount;
@@ -399,7 +400,7 @@ void PropertyMap::rehash(int newTableSize) {
   }
   _table->lastIndexUsed = lastIndexUsed;
 
-  free(oldTable);
+  kjs_fast_free(oldTable);
 
   checkConsistency();
 }
