@@ -599,7 +599,8 @@ void KHTMLView::layout() {
   ScrollBarMode hMode = d->hmode;
   ScrollBarMode vMode = d->vmode;
 
-  RenderObject* rootRenderer = document->documentElement()->renderer();
+  RenderObject* rootRenderer =
+      document->documentElement() ? document->documentElement()->renderer() : 0;
   if (document->isHTMLDocument()) {
     NodeImpl* body = static_cast<HTMLDocumentImpl*>(document)->body();
     if (body && body->renderer()) {
@@ -615,7 +616,7 @@ void KHTMLView::layout() {
             o, hMode, vMode);  // Only applies to HTML UAs, not to XML/XHTML UAs
       }
     }
-  } else
+  } else if (rootRenderer)
     applyOverflowToViewport(rootRenderer, hMode,
                             vMode);  // XML/XHTML UAs use the root element.
 
