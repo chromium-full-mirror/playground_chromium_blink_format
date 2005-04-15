@@ -95,8 +95,7 @@ void RenderBox::setStyle(RenderStyle* _style) {
   // will need to support overflow.
   // We also handle <body> and <html>, whose overflow applies to the viewport.
   if (_style->overflow() != OVISIBLE && isBlockFlow() && !isTableCell() &&
-      !isRoot() && (!isBody() || !document()->isHTMLDocument() ||
-                    !(parent() && parent()->style()->overflow() == OVISIBLE)))
+      !isRoot() && (!isBody() || !document()->isHTMLDocument()))
     setHasOverflowClip();
 
   if (requiresLayer()) {
