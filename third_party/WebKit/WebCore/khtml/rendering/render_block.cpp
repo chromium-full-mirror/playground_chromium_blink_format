@@ -574,7 +574,8 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
       m_height = m_overflowHeight + borderBottom() + paddingBottom();
   }
 
-  if (hasOverhangingFloats() && (isFloating() || isTableCell())) {
+  if (hasOverhangingFloats() &&
+      ((isFloating() && style()->height().isVariable()) || isTableCell())) {
     m_height = floatBottom();
     m_height += borderBottom() + paddingBottom();
   }

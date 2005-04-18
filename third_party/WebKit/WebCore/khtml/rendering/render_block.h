@@ -228,10 +228,10 @@ class RenderBlock : public RenderFlow {
 
   virtual int getBaselineOfFirstLineBox() const;
 
-  RootInlineBox* firstRootBox() {
+  RootInlineBox* firstRootBox() const {
     return static_cast<RootInlineBox*>(m_firstLineBox);
   }
-  RootInlineBox* lastRootBox() {
+  RootInlineBox* lastRootBox() const {
     return static_cast<RootInlineBox*>(m_lastLineBox);
   }
 
