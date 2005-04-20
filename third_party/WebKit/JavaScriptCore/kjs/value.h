@@ -94,6 +94,7 @@ class ValueImp {
   friend class Collector;
   friend class Value;
   friend class ContextImp;
+  friend class FunctionCallNode;
 
  public:
 #if USE_CONSERVATIVE_GC
@@ -147,6 +148,7 @@ class ValueImp {
                             Type preferredType = UnspecifiedType) const;
   bool dispatchToBoolean(ExecState* exec) const;
   double dispatchToNumber(ExecState* exec) const;
+  double dispatchToNumber(ExecState* exec, bool& knownToBeInteger) const;
   UString dispatchToString(ExecState* exec) const;
   bool dispatchToUInt32(uint32_t&) const;
   Object dispatchToObject(ExecState* exec) const;
@@ -226,6 +228,18 @@ class Value {
   Value& operator=(const Value& v);
 #endif
 
+  explicit Value(bool);
+
+  explicit Value(int);
+  explicit Value(unsigned);
+  explicit Value(double);
+  explicit Value(long);
+  explicit Value(unsigned long);
+  Value(double, bool knownToBeInteger);
+
+  explicit Value(const char*);
+  Value(const UString&);
+
   bool isNull() const { return rep == 0; }
   ValueImp* imp() const { return rep; }
 
@@ -263,6 +277,9 @@ class Value {
    * Performs the ToNumber type conversion operation on this value (ECMA 9.3)
    */
   double toNumber(ExecState* exec) const { return rep->dispatchToNumber(exec); }
+  double toNumber(ExecState* exec, bool& knownToBeInteger) const {
+    return rep->dispatchToNumber(exec, knownToBeInteger);
+  }
 
   /**
    * Performs the ToInteger type conversion operation on this value (ECMA 9.4)
@@ -422,6 +439,7 @@ class Number : public Value {
   Number(double d = 0.0);
   Number(long int l);
   Number(long unsigned int l);
+  Number(double d, bool knownToBeInteger);
 
   double value() const;
   int intValue() const;
@@ -445,6 +463,76 @@ class Number : public Value {
   explicit Number(NumberImp* v);
 };
 
-};  // namespace
+inline bool ValueImp::marked() const {
+// Simple numbers are always considered marked.
+#if USE_CONSERVATIVE_GC
+  return SimpleNumber::is(this) || _marked;
+#elif TEST_CONSERVATIVE_GC
+  if (conservativeMark) {
+    return SimpleNumber::is(this) || (_flags & VI_CONSERVATIVE_MARKED);
+  } else {
+    return SimpleNumber::is(this) || (_flags & VI_MARKED);
+  }
+#else
+  return SimpleNumber::is(this) || (_flags & VI_MARKED);
+#endif
+}
+
+// Dispatchers for virtual functions, to special-case simple numbers which
+// won't be real pointers.
+
+inline Type ValueImp::dispatchType() const {
+  if (SimpleNumber::is(this))
+    return NumberType;
+  return type();
+}
+
+inline Value ValueImp::dispatchToPrimitive(ExecState* exec,
+                                           Type preferredType) const {
+  if (SimpleNumber::is(this))
+    return Value(const_cast<ValueImp*>(this));
+  return toPrimitive(exec, preferredType);
+}
+
+inline bool ValueImp::dispatchToBoolean(ExecState* exec) const {
+  if (SimpleNumber::is(this))
+    return SimpleNumber::value(this);
+  return toBoolean(exec);
+}
+
+inline double ValueImp::dispatchToNumber(ExecState* exec) const {
+  if (SimpleNumber::is(this))
+    return SimpleNumber::value(this);
+  return toNumber(exec);
+}
+
+inline double ValueImp::dispatchToNumber(ExecState* exec,
+                                         bool& knownToBeInteger) const {
+  if (SimpleNumber::is(this)) {
+    knownToBeInteger = true;
+    return SimpleNumber::value(this);
+  }
+  knownToBeInteger = false;
+  return toNumber(exec);
+}
+
+inline UString ValueImp::dispatchToString(ExecState* exec) const {
+  if (SimpleNumber::is(this))
+    return UString::from(SimpleNumber::value(this));
+  return toString(exec);
+}
+
+inline bool ValueImp::dispatchToUInt32(uint32_t& result) const {
+  if (SimpleNumber::is(this)) {
+    long i = SimpleNumber::value(this);
+    if (i < 0)
+      return false;
+    result = i;
+    return true;
+  }
+  return toUInt32(result);
+}
+
+}  // namespace
 
 #endif  // _KJS_VALUE_H_

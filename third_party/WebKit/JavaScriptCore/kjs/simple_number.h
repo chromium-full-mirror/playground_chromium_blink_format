@@ -23,7 +23,6 @@
 #ifndef _KJS_SIMPLE_NUMBER_H_
 #define _KJS_SIMPLE_NUMBER_H_
 
-#include <limits.h>
 #include <math.h>
 #include <string.h>
 
@@ -57,8 +56,9 @@ class SimpleNumber {
   static inline bool fits(unsigned i) { return i <= (unsigned)max; }
   static inline bool fits(long i) { return i <= max && i >= min; }
   static inline bool fits(unsigned long i) { return i <= (unsigned)max; }
+  static inline bool integerFits(double d) { return !(d < min || d > max); }
   static inline bool fits(double d) {
-    return d <= max && d >= min && d == (double)(long)d && !IS_NEGATIVE_ZERO(d);
+    return d >= min && d <= max && d == (double)(long)d && !IS_NEGATIVE_ZERO(d);
   }
   static inline ValueImp* make(long i) {
     return (ValueImp*)((i << shift) | tag);

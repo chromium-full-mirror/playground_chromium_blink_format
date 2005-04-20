@@ -434,10 +434,9 @@ Value StringProtoFuncImp::call(ExecState* exec,
       // compatibility.
       dpos = a0.isA(UndefinedType) ? 0 : a0.toInteger(exec);
       if (dpos >= 0 && dpos < len)  // false for NaN
-        d = s[static_cast<int>(dpos)].unicode();
+        result = Number(s[static_cast<int>(dpos)].unicode());
       else
-        d = NaN;
-      result = Number(d);
+        result = Number(NaN);
       break;
     case Concat: {
       ListIterator it = args.begin();
@@ -459,8 +458,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
         } else
           dpos = 0;
       }
-      d = s.find(u2, static_cast<int>(dpos));
-      result = Number(d);
+      result = Number(s.find(u2, static_cast<int>(dpos)));
       break;
     case LastIndexOf:
       u2 = a0.toString(exec);
@@ -475,8 +473,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
         } else
           dpos = 0;
       }
-      d = s.rfind(u2, static_cast<int>(dpos));
-      result = Number(d);
+      result = Number(s.rfind(u2, static_cast<int>(dpos)));
       break;
     case Match:
     case Search: {

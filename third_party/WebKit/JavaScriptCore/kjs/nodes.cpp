@@ -47,6 +47,9 @@
 
 using namespace KJS;
 
+// Disabled for now because it shows up on benchmark (0.5%).
+#if DEBUGGER_SUPPORT
+
 #define KJS_BREAKPOINT     \
   if (!hitStatement(exec)) \
     return Completion(Normal);
@@ -55,6 +58,13 @@ using namespace KJS;
   if (exec->dynamicInterpreter()->imp()->debugger() &&                 \
       exec->dynamicInterpreter()->imp()->debugger()->imp()->aborted()) \
     return Completion(Normal);
+
+#else
+
+#define KJS_BREAKPOINT
+#define KJS_ABORTPOINT
+
+#endif
 
 #define KJS_CHECKEXCEPTION                       \
   if (exec->hadException())                      \
@@ -205,19 +215,19 @@ Value NullNode::evaluate(ExecState* /*exec*/) {
 // ------------------------------ BooleanNode ----------------------------------
 
 Value BooleanNode::evaluate(ExecState* /*exec*/) {
-  return Boolean(value);
+  return Value(value);
 }
 
 // ------------------------------ NumberNode -----------------------------------
 
 Value NumberNode::evaluate(ExecState* /*exec*/) {
-  return Number(value);
+  return Value(value);
 }
 
 // ------------------------------ StringNode -----------------------------------
 
 Value StringNode::evaluate(ExecState* /*exec*/) {
-  return String(value);
+  return value;
 }
 
 // ------------------------------ RegExpNode -----------------------------------
@@ -359,7 +369,7 @@ Value ArrayNode::evaluate(ExecState* exec) {
   }
 
   if (opt)
-    array.put(exec, lengthPropertyName, Number(elision + length),
+    array.put(exec, lengthPropertyName, Value(elision + length),
               DontEnum | DontDelete);
 
   return array;
@@ -660,39 +670,32 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
                       expr);
   }
 
-  Object func = Object(static_cast<ObjectImp*>(v.imp()));
+  ObjectImp* func = static_cast<ObjectImp*>(v.imp());
 
-  if (!func.implementsCall()) {
+  if (!func->implementsCall()) {
     return throwError(
         exec, TypeError,
         "Object %s (result of expression %s) does not allow calls.", v, expr);
   }
 
-  Value thisVal;
-  if (ref.isMutable())
-    thisVal = ref.getBase(exec);
-  else
-    thisVal = Null();
+  ObjectImp* thisObjImp = 0;
+  ValueImp* thisValImp = ref.baseIfMutable();
+  if (thisValImp && thisValImp->type() == ObjectType &&
+      !static_cast<ObjectImp*>(thisValImp)->inherits(&ActivationImp::info))
+    thisObjImp = static_cast<ObjectImp*>(thisValImp);
 
-  if (thisVal.type() == ObjectType &&
-      Object::dynamicCast(thisVal).inherits(&ActivationImp::info))
-    thisVal = Null();
-
-  if (thisVal.type() != ObjectType) {
+  if (!thisObjImp) {
     // ECMA 11.2.3 says that in this situation the this value should be null.
     // However, section 10.2.3 says that in the case where the value provided
     // by the caller is null, the global object should be used. It also says
     // that the section does not apply to interal functions, but for simplicity
     // of implementation we use the global object anyway here. This guarantees
     // that in host objects you always get a valid object for this.
-    // thisVal = Null();
-    thisVal = exec->dynamicInterpreter()->globalObject();
+    thisObjImp = exec->dynamicInterpreter()->globalObject().imp();
   }
 
-  Object thisObj = Object::dynamicCast(thisVal);
-  Value result = func.call(exec, thisObj, argList);
-
-  return result;
+  Object thisObj(thisObjImp);
+  return func->call(exec, thisObj, argList);
 }
 
 // ------------------------------ PostfixNode ----------------------------------
@@ -714,14 +717,14 @@ Value PostfixNode::evaluate(ExecState* exec) {
   Reference ref = expr->evaluateReference(exec);
   KJS_CHECKEXCEPTIONVALUE
   Value v = ref.getValue(exec);
-  Number n = v.toNumber(exec);
 
-  double newValue = (oper == OpPlusPlus) ? n.value() + 1 : n.value() - 1;
-  Value n2 = Number(newValue);
+  bool knownToBeInteger;
+  double n = v.toNumber(exec, knownToBeInteger);
 
-  ref.putValue(exec, n2);
+  double newValue = (oper == OpPlusPlus) ? n + 1 : n - 1;
+  ref.putValue(exec, Value(newValue, knownToBeInteger));
 
-  return n;
+  return Value(n, knownToBeInteger);
 }
 
 // ------------------------------ DeleteNode -----------------------------------
@@ -742,7 +745,7 @@ bool DeleteNode::deref() {
 Value DeleteNode::evaluate(ExecState* exec) {
   Reference ref = expr->evaluateReference(exec);
   KJS_CHECKEXCEPTIONVALUE
-  return Boolean(ref.deleteValue(exec));
+  return Value(ref.deleteValue(exec));
 }
 
 // ------------------------------ VoidNode -------------------------------------
@@ -786,11 +789,9 @@ Value TypeOfNode::evaluate(ExecState* exec) {
   const char* s = 0L;
   Reference ref = expr->evaluateReference(exec);
   KJS_CHECKEXCEPTIONVALUE
-  if (ref.isMutable()) {
-    Value b = ref.getBase(exec);
-    if (b.type() == NullType)
-      return String("undefined");
-  }
+  ValueImp* b = ref.baseIfMutable();
+  if (b && b->dispatchType() == NullType)
+    return Value("undefined");
   Value v = ref.getValue(exec);
   switch (v.type()) {
     case UndefinedType:
@@ -817,7 +818,7 @@ Value TypeOfNode::evaluate(ExecState* exec) {
       break;
   }
 
-  return String(s);
+  return Value(s);
 }
 
 // ------------------------------ PrefixNode -----------------------------------
@@ -839,10 +840,12 @@ Value PrefixNode::evaluate(ExecState* exec) {
   Reference ref = expr->evaluateReference(exec);
   KJS_CHECKEXCEPTIONVALUE
   Value v = ref.getValue(exec);
-  Number n = v.toNumber(exec);
 
-  double newValue = (oper == OpPlusPlus) ? n.value() + 1 : n.value() - 1;
-  Value n2 = Number(newValue);
+  bool knownToBeInteger;
+  double n = v.toNumber(exec, knownToBeInteger);
+
+  double newValue = (oper == OpPlusPlus) ? n + 1 : n - 1;
+  Value n2(newValue, knownToBeInteger);
 
   ref.putValue(exec, n2);
 
@@ -868,7 +871,7 @@ Value UnaryPlusNode::evaluate(ExecState* exec) {
   Value v = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  return Number(v.toNumber(exec)); /* TODO: optimize */
+  return Value(v.toNumber(exec)); /* TODO: optimize */
 }
 
 // ------------------------------ NegateNode -----------------------------------
@@ -889,11 +892,10 @@ bool NegateNode::deref() {
 Value NegateNode::evaluate(ExecState* exec) {
   Value v = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  Number n = v.toNumber(exec);
 
-  double d = -n.value();
-
-  return Number(d);
+  bool knownToBeInteger;
+  double n = v.toNumber(exec, knownToBeInteger);
+  return Value(-n, knownToBeInteger && n != 0);
 }
 
 // ------------------------------ BitwiseNotNode -------------------------------
@@ -914,9 +916,7 @@ bool BitwiseNotNode::deref() {
 Value BitwiseNotNode::evaluate(ExecState* exec) {
   Value v = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  int i32 = v.toInt32(exec);
-
-  return Number(~i32);
+  return Value(~v.toInt32(exec));
 }
 
 // ------------------------------ LogicalNotNode -------------------------------
@@ -937,9 +937,7 @@ bool LogicalNotNode::deref() {
 Value LogicalNotNode::evaluate(ExecState* exec) {
   Value v = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
-  bool b = v.toBoolean(exec);
-
-  return Boolean(!b);
+  return Value(!v.toBoolean(exec));
 }
 
 // ------------------------------ MultNode -------------------------------------
@@ -1027,23 +1025,17 @@ Value ShiftNode::evaluate(ExecState* exec) {
   unsigned int i2 = v2.toUInt32(exec);
   i2 &= 0x1f;
 
-  double result;
   switch (oper) {
     case OpLShift:
-      result = v1.toInt32(exec) << i2;
-      break;
+      return Value(v1.toInt32(exec) << i2);
     case OpRShift:
-      result = v1.toInt32(exec) >> i2;
-      break;
+      return Value(v1.toInt32(exec) >> i2);
     case OpURShift:
-      result = v1.toUInt32(exec) >> i2;
-      break;
+      return Value(v1.toUInt32(exec) >> i2);
     default:
       assert(!"ShiftNode: unhandled switch case");
-      result = 0;
+      return Undefined();
   }
-
-  return Number(result);
 }
 
 // ------------------------------ RelationalNode -------------------------------
@@ -1109,7 +1101,7 @@ Value RelationalNode::evaluate(ExecState* exec) {
       // property. It seems that all object have the property, but not all
       // implement it, so in this
       // case we return false (consistent with mozilla)
-      return Boolean(false);
+      return Value(false);
       //      return throwError(exec, TypeError,
       //			"Object does not implement the [[HasInstance]]
       //method." );
@@ -1117,7 +1109,7 @@ Value RelationalNode::evaluate(ExecState* exec) {
     return o2.hasInstance(exec, v1);
   }
 
-  return Boolean(b);
+  return Value(b);
 }
 
 // ------------------------------ EqualNode ------------------------------------
@@ -1155,7 +1147,7 @@ Value EqualNode::evaluate(ExecState* exec) {
     bool eq = strictEqual(exec, v1, v2);
     result = oper == OpStrEq ? eq : !eq;
   }
-  return Boolean(result);
+  return Value(result);
 }
 
 // ------------------------------ BitOperNode ----------------------------------
@@ -1192,7 +1184,7 @@ Value BitOperNode::evaluate(ExecState* exec) {
   else
     result = i1 | i2;
 
-  return Number(result);
+  return Value(result);
 }
 
 // ------------------------------ BinaryLogicalNode ----------------------------
@@ -1313,37 +1305,40 @@ Value AssignNode::evaluate(ExecState* exec) {
       case OpLShift:
         i1 = v1.toInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(i1 <<= i2);
+        v = Value(i1 << i2);
         break;
       case OpRShift:
         i1 = v1.toInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(i1 >>= i2);
+        v = Value(i1 >> i2);
         break;
       case OpURShift:
         ui = v1.toUInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(ui >>= i2);
+        v = Value(ui >> i2);
         break;
       case OpAndEq:
         i1 = v1.toInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(i1 &= i2);
+        v = Value(i1 & i2);
         break;
       case OpXOrEq:
         i1 = v1.toInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(i1 ^= i2);
+        v = Value(i1 ^ i2);
         break;
       case OpOrEq:
         i1 = v1.toInt32(exec);
         i2 = v2.toInt32(exec);
-        v = Number(i1 |= i2);
+        v = Value(i1 | i2);
         break;
       case OpModEq: {
-        double d1 = v1.toNumber(exec);
-        double d2 = v2.toNumber(exec);
-        v = Number(fmod(d1, d2));
+        bool d1KnownToBeInteger;
+        double d1 = v1.toNumber(exec, d1KnownToBeInteger);
+        bool d2KnownToBeInteger;
+        double d2 = v2.toNumber(exec, d2KnownToBeInteger);
+        v = Value(fmod(d1, d2),
+                  d1KnownToBeInteger && d2KnownToBeInteger && d2 != 0);
       } break;
       default:
         v = Undefined();
@@ -1494,8 +1489,7 @@ bool VarDeclNode::deref() {
 
 // ECMA 12.2
 Value VarDeclNode::evaluate(ExecState* exec) {
-  Object variable =
-      Object::dynamicCast(exec->context().imp()->variableObject());
+  Object variable = exec->context().imp()->variableObject();
 
   Value val;
   if (init) {
@@ -1517,7 +1511,7 @@ Value VarDeclNode::evaluate(ExecState* exec) {
   // window.location.
   variable.put(exec, ident, val, DontDelete | Internal);
 
-  return String(ident.ustring());
+  return ident.ustring();
 }
 
 void VarDeclNode::processVarDecls(ExecState* exec) {
@@ -1844,8 +1838,7 @@ bool ForNode::deref() {
 
 // ECMA 12.6.3
 Completion ForNode::execute(ExecState* exec) {
-  Value e, v, cval;
-  bool b;
+  Value v, cval;
 
   if (expr1) {
     v = expr1->evaluate(exec);
@@ -1855,8 +1848,7 @@ Completion ForNode::execute(ExecState* exec) {
     if (expr2) {
       v = expr2->evaluate(exec);
       KJS_CHECKEXCEPTION
-      b = v.toBoolean(exec);
-      if (b == false)
+      if (!v.toBoolean(exec))
         return Completion(Normal, cval);
     }
     // bail out on error

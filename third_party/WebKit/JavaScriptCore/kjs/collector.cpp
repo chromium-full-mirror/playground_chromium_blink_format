@@ -60,7 +60,7 @@ struct CollectorCell {
     double memory[CELL_ARRAY_LENGTH];
     struct {
       void* zeroIfFree;
-      CollectorCell* next;
+      ptrdiff_t next;
     } freeCell;
   } u;
 };
@@ -82,7 +82,7 @@ struct CollectorHeap {
   int usedOversizeCells;
 
   int numLiveObjects;
-  int numAllocationsSinceLastCollect;
+  int numLiveObjectsAtLastCollect;
 };
 
 static CollectorHeap heap = {NULL, 0, 0, 0, NULL, 0, 0, 0, 0};
@@ -92,15 +92,15 @@ bool Collector::memoryFull = false;
 void* Collector::allocate(size_t s) {
   assert(Interpreter::lockCount() > 0);
 
-  if (s == 0)
-    return 0L;
-
   // collect if needed
-  if (++heap.numAllocationsSinceLastCollect >= ALLOCATIONS_PER_COLLECTION) {
+  int numLiveObjects = heap.numLiveObjects;
+  if (numLiveObjects - heap.numLiveObjectsAtLastCollect >=
+      ALLOCATIONS_PER_COLLECTION) {
     collect();
+    numLiveObjects = heap.numLiveObjects;
   }
 
-  if (s > (unsigned)CELL_SIZE) {
+  if (s > static_cast<size_t>(CELL_SIZE)) {
     // oversize allocator
     if (heap.usedOversizeCells == heap.numOversizeCells) {
       heap.numOversizeCells =
@@ -112,11 +112,12 @@ void* Collector::allocate(size_t s) {
     void* newCell = kjs_fast_malloc(s);
     heap.oversizeCells[heap.usedOversizeCells] = (CollectorCell*)newCell;
     heap.usedOversizeCells++;
-    heap.numLiveObjects++;
+    heap.numLiveObjects = numLiveObjects + 1;
 
 #if !USE_CONSERVATIVE_GC
     ((ValueImp*)(newCell))->_flags = 0;
 #endif
+
     return newCell;
   }
 
@@ -152,23 +153,21 @@ void* Collector::allocate(size_t s) {
   // find a free spot in the block and detach it from the free list
   CollectorCell* newCell = targetBlock->freeList;
 
-  if (newCell->u.freeCell.next != NULL) {
-    targetBlock->freeList = newCell->u.freeCell.next;
-  } else if (targetBlock->usedCells == (CELLS_PER_BLOCK - 1)) {
-    // last cell in this block
-    targetBlock->freeList = NULL;
-  } else {
-    // all next pointers are initially 0, meaning "next cell"
-    targetBlock->freeList = newCell + 1;
-  }
+  // "next" field is a byte offset -- 0 means next cell, so a zeroed block is
+  // already initialized
+  // could avoid the casts by using a cell offset, but this avoids a
+  // relatively-slow multiply
+  targetBlock->freeList = reinterpret_cast<CollectorCell*>(
+      reinterpret_cast<char*>(newCell + 1) + newCell->u.freeCell.next);
 
   targetBlock->usedCells++;
-  heap.numLiveObjects++;
+  heap.numLiveObjects = numLiveObjects + 1;
 
 #if !USE_CONSERVATIVE_GC
   ((ValueImp*)(newCell))->_flags = 0;
 #endif
-  return (void*)(newCell);
+
+  return newCell;
 }
 
 #if TEST_CONSERVATIVE_GC || USE_CONSERVATIVE_GC
@@ -337,8 +336,10 @@ void Collector::markStackObjectsConservatively() {
 }
 
 void Collector::markProtectedObjects() {
-  for (int i = 0; i < ProtectedValues::_tableSize; i++) {
-    ValueImp* val = ProtectedValues::_table[i].key;
+  int size = ProtectedValues::_tableSize;
+  ProtectedValues::KeyValue* table = ProtectedValues::_table;
+  for (int i = 0; i < size; i++) {
+    ValueImp* val = table[i].key;
     if (val && !val->marked()) {
       val->mark();
     }
@@ -429,20 +430,22 @@ bool Collector::collect() {
   // everything else
 
   int emptyBlocks = 0;
+  int numLiveObjects = heap.numLiveObjects;
 
   for (int block = 0; block < heap.usedBlocks; block++) {
     CollectorBlock* curBlock = heap.blocks[block];
 
     int minimumCellsToProcess = curBlock->usedCells;
 
-    for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
-      if (minimumCellsToProcess < cell) {
+    for (int i = 0; i < CELLS_PER_BLOCK; i++) {
+      if (minimumCellsToProcess < i) {
         goto skip_block_sweep;
       }
 
-      ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
+      CollectorCell* cell = curBlock->cells + i;
+      ValueImp* imp = reinterpret_cast<ValueImp*>(cell);
 
-      if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0) {
+      if (cell->u.freeCell.zeroIfFree != 0) {
 #if USE_CONSERVATIVE_GC
         if (!imp->_marked)
 #else
@@ -455,13 +458,14 @@ bool Collector::collect() {
           // emulate destructing part of 'operator delete()'
           imp->~ValueImp();
           curBlock->usedCells--;
-          heap.numLiveObjects--;
+          numLiveObjects--;
           deleted = true;
 
           // put it on the free list
-          ((CollectorCell*)imp)->u.freeCell.zeroIfFree = 0;
-          ((CollectorCell*)imp)->u.freeCell.next = curBlock->freeList;
-          curBlock->freeList = (CollectorCell*)imp;
+          cell->u.freeCell.zeroIfFree = 0;
+          cell->u.freeCell.next = reinterpret_cast<char*>(curBlock->freeList) -
+                                  reinterpret_cast<char*>(cell + 1);
+          curBlock->freeList = cell;
 
         } else {
 #if USE_CONSERVATIVE_GC
@@ -528,7 +532,7 @@ bool Collector::collect() {
 
       heap.usedOversizeCells--;
       deleted = true;
-      heap.numLiveObjects--;
+      numLiveObjects--;
 
       if (heap.numOversizeCells > MIN_ARRAY_SIZE &&
           heap.usedOversizeCells < heap.numOversizeCells / LOW_WATER_FACTOR) {
@@ -549,9 +553,10 @@ bool Collector::collect() {
     }
   }
 
-  heap.numAllocationsSinceLastCollect = 0;
+  heap.numLiveObjects = numLiveObjects;
+  heap.numLiveObjectsAtLastCollect = numLiveObjects;
 
-  memoryFull = (heap.numLiveObjects >= KJS_MEM_LIMIT);
+  memoryFull = (numLiveObjects >= KJS_MEM_LIMIT);
 
   return deleted;
 }
@@ -609,8 +614,10 @@ int Collector::numReferencedObjects() {
   int count = 0;
 
 #if USE_CONSERVATIVE_GC
-  for (int i = 0; i < ProtectedValues::_tableSize; i++) {
-    ValueImp* val = ProtectedValues::_table[i].key;
+  int size = ProtectedValues::_tableSize;
+  ProtectedValues::KeyValue* table = ProtectedValues::_table;
+  for (int i = 0; i < size; i++) {
+    ValueImp* val = table[i].key;
     if (val) {
       ++count;
     }
@@ -646,8 +653,10 @@ const void* Collector::rootObjectClasses() {
   CFMutableSetRef classes = CFSetCreateMutable(NULL, 0, &kCFTypeSetCallBacks);
 
 #if USE_CONSERVATIVE_GC
-  for (int i = 0; i < ProtectedValues::_tableSize; i++) {
-    ValueImp* val = ProtectedValues::_table[i].key;
+  int size = ProtectedValues::_tableSize;
+  ProtectedValues::KeyValue* table = ProtectedValues::_table;
+  for (int i = 0; i < size; i++) {
+    ValueImp* val = table[i].key;
     if (val) {
       const char* mangled_name = typeid(*val).name();
       int status;
