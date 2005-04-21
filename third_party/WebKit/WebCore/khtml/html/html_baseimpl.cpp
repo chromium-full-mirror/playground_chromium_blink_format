@@ -75,6 +75,8 @@ bool HTMLBodyElementImpl::mapToEntry(NodeImpl::Id attr,
                                      MappedAttributeEntry& result) const {
   switch (attr) {
     case ATTR_BACKGROUND:
+      result = (MappedAttributeEntry)(eLastEntry + getDocument()->docID());
+      return false;
     case ATTR_BGCOLOR:
     case ATTR_TEXT:
     case ATTR_MARGINWIDTH:

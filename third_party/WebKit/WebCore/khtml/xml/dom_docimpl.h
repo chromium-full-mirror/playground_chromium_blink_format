@@ -616,6 +616,8 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   DocumentImpl* parentDocument() const;
   DocumentImpl* topDocument() const;
 
+  int docID() const { return m_docID; }
+
 #ifdef KHTML_XSLT
   void applyXSLTransform(ProcessingInstructionImpl* pi);
   void setTransformSource(void* doc) { m_transformSource = doc; }
@@ -753,6 +755,9 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
   DOMString m_policyBaseURL;
 
   QPtrDict<NodeImpl> m_disconnectedNodesWithEventListeners;
+
+  int m_docID;  // A unique document identifier used for things like
+                // document-specific mapped attributes.
 
 #if APPLE_CHANGES
  public:

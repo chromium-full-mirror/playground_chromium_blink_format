@@ -46,7 +46,8 @@ enum MappedAttributeEntry {
   eListItem,
   eTable,
   eCell,
-  eCaption
+  eCaption,
+  eLastEntry
 };
 
 class CSSMappedAttributeDeclarationImpl
