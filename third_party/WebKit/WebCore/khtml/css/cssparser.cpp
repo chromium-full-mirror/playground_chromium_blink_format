@@ -732,6 +732,7 @@ bool CSSParser::parseValue(int propId, bool important) {
               DOMString(
                   KURL(styleElement->baseURL().string(), uri.string()).url()),
               styleElement);
+          valueList->next();
         }
       }
       break;
