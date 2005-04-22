@@ -653,9 +653,8 @@ class Context2D : public DOMObject {
     CreatePattern
   };
 
-  static CGColorRef Context2D::colorRefFromValue(ExecState* exec,
-                                                 const Value& value);
-  static QColor Context2D::colorFromValue(ExecState* exec, const Value& value);
+  static CGColorRef colorRefFromValue(ExecState* exec, const Value& value);
+  static QColor colorFromValue(ExecState* exec, const Value& value);
 
  private:
   void save();
