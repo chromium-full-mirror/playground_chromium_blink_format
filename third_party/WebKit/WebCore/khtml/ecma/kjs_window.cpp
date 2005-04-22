@@ -66,6 +66,7 @@
 
 using DOM::DocumentImpl;
 using DOM::DOMString;
+using DOM::ElementImpl;
 using DOM::Node;
 using DOM::Position;
 using khtml::TypingCommand;
@@ -297,6 +298,7 @@ Window::get
   onselect	Window::Onselect	DontDelete
   onsubmit	Window::Onsubmit	DontDelete
   onunload	Window::Onunload	DontDelete
+  frameElement  Window::FrameElement    DontDelete|ReadOnly
 @end
 */
 IMPLEMENT_PROTOFUNC(WindowFunc)
@@ -837,6 +839,15 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
           return getListener(exec, DOM::EventImpl::UNLOAD_EVENT);
         else
           return Undefined();
+      case FrameElement: {
+        DocumentImpl* document = m_part->xmlDocImpl();
+        if (!document)
+          return Undefined();
+        ElementImpl* frameElement = document->ownerElement();
+        if (!frameElement)
+          return Undefined();
+        return Value(frameElement);
+      }
     }
   }
 

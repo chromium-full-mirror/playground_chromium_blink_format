@@ -244,7 +244,8 @@ class Window : public ObjectImp {
     Onsubmit,
     Onunload,
     Statusbar,
-    Toolbar
+    Toolbar,
+    FrameElement
   };
 
  protected:
