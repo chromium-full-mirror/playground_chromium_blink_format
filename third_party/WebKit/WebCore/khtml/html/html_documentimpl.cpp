@@ -511,4 +511,14 @@ void HTMLDocumentImpl::determineParseMode(const QString& str) {
   //         kdDebug(6020) << " using almost strict parseMode" << endl;
 }
 
+DOMStringImpl* HTMLDocumentImpl::HTMLElementNamespace() const {
+  // For HTML documents, we treat HTML elements as having no namespace.
+  return 0;
+}
+
+bool HTMLDocumentImpl::isHTMLNamespace(DOMStringImpl* n) const {
+  // For HTML documents, either "no namespace" or the HTML namespace qualifies.
+  return !n || DocumentImpl::isHTMLNamespace(n);
+}
+
 #include "html_documentimpl.moc"
