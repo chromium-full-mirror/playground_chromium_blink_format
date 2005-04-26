@@ -122,6 +122,7 @@ class DOMNode : public DOMObject {
     OnMouseOut,
     OnMouseOver,
     OnMouseUp,
+    OnMouseWheel,
     OnMove,
     OnReset,
     OnResize,

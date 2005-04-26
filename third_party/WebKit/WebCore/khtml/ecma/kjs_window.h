@@ -235,6 +235,7 @@ class Window : public ObjectImp {
     Onmouseout,
     Onmouseover,
     Onmouseup,
+    OnWindowMouseWheel,
     Onmove,
     Onreset,
     Onresize,

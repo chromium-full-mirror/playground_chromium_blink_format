@@ -64,7 +64,7 @@ const struct HashEntry DOMEventTableEntries[] = {
     {"eventPhase", DOMEvent::EventPhase, DontDelete | ReadOnly, 0,
      &DOMEventTableEntries[15]},
     {"cancelable", DOMEvent::Cancelable, DontDelete | ReadOnly, 0, 0},
-    {"dataTransfer", DOMMouseEvent::DataTransfer, DontDelete | ReadOnly, 0, 0},
+    {"dataTransfer", DOMEvent::DataTransfer, DontDelete | ReadOnly, 0, 0},
     {"clipboardData", DOMEvent::ClipboardData, DontDelete | ReadOnly, 0, 0}};
 
 const struct HashTable DOMEventTable = {2, 17, DOMEventTableEntries, 12};
@@ -255,6 +255,42 @@ const struct HashEntry DOMMutationEventProtoTableEntries[] = {
 
 const struct HashTable DOMMutationEventProtoTable = {
     2, 1, DOMMutationEventProtoTableEntries, 1};
+
+}  // namespace
+
+namespace KJS {
+
+const struct HashEntry DOMWheelEventTableEntries[] = {
+    {"metaKey", DOMWheelEvent::MetaKey, DontDelete | ReadOnly, 0,
+     &DOMWheelEventTableEntries[13]},
+    {"y", DOMWheelEvent::Y, DontDelete | ReadOnly, 0, 0},
+    {0, 0, 0, 0, 0},
+    {"wheelDelta", DOMWheelEvent::WheelDelta, DontDelete | ReadOnly, 0, 0},
+    {"ctrlKey", DOMWheelEvent::CtrlKey, DontDelete | ReadOnly, 0, 0},
+    {"offsetX", DOMWheelEvent::OffsetX, DontDelete | ReadOnly, 0, 0},
+    {"offsetY", DOMWheelEvent::OffsetY, DontDelete | ReadOnly, 0, 0},
+    {"clientX", DOMWheelEvent::ClientX, DontDelete | ReadOnly, 0, 0},
+    {"altKey", DOMWheelEvent::AltKey, DontDelete | ReadOnly, 0,
+     &DOMWheelEventTableEntries[10]},
+    {"screenY", DOMWheelEvent::ScreenY, DontDelete | ReadOnly, 0,
+     &DOMWheelEventTableEntries[12]},
+    {"clientY", DOMWheelEvent::ClientY, DontDelete | ReadOnly, 0,
+     &DOMWheelEventTableEntries[11]},
+    {"screenX", DOMWheelEvent::ScreenX, DontDelete | ReadOnly, 0, 0},
+    {"shiftKey", DOMWheelEvent::ShiftKey, DontDelete | ReadOnly, 0, 0},
+    {"x", DOMWheelEvent::X, DontDelete | ReadOnly, 0, 0}};
+
+const struct HashTable DOMWheelEventTable = {2, 14, DOMWheelEventTableEntries,
+                                             10};
+
+}  // namespace
+
+namespace KJS {
+
+const struct HashEntry DOMWheelEventProtoTableEntries[] = {};
+
+const struct HashTable DOMWheelEventProtoTable = {
+    2, 1, DOMWheelEventProtoTableEntries, 1};
 
 }  // namespace
 

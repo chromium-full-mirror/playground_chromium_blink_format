@@ -54,6 +54,7 @@ class QEvent : public Qt {
     KeyRelease,
     Paint,
     Resize,
+    Wheel,
     KParts
   };
 
@@ -146,9 +147,48 @@ class QFocusEvent : public QEvent {
   static Reason reason() { return Other; }
 };
 
+class QWheelEvent : public QEvent {
+ public:
+  QWheelEvent(const QPoint& position,
+              const QPoint& globalPosition,
+              int delta,
+              int state,
+              Orientation orientation)
+      : QEvent(Wheel),
+        _position(position),
+        _globalPosition(globalPosition),
+        _delta(delta),
+        _state(state),
+        _orientation(orientation),
+        _isAccepted(false) {}
+  QWheelEvent(NSEvent*);
+
+  const QPoint& pos() const { return _position; }
+  const QPoint& globalPos() const { return _globalPosition; }
+  int delta() const { return _delta; }
+  int state() const { return _state; }
+  Orientation orientation() const { return _orientation; }
+  bool isAccepted() const { return _isAccepted; }
+
+  int x() const { return _position.x(); }
+  int y() const { return _position.y(); }
+  int globalX() const { return _globalPosition.x(); }
+  int globalY() const { return _globalPosition.y(); }
+
+  void accept() { _isAccepted = true; }
+  void ignore() { _isAccepted = false; }
+
+ private:
+  QPoint _position;
+  QPoint _globalPosition;
+  int _delta;
+  int _state;
+  Orientation _orientation;
+  bool _isAccepted;
+};
+
 class QHideEvent;
 class QShowEvent;
-class QWheelEvent;
 class QContextMenuEvent;
 
 class QResizeEvent : public QEvent {

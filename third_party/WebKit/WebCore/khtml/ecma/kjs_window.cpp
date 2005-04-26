@@ -290,6 +290,7 @@ Window::get
   onmouseout	Window::Onmouseout	DontDelete
   onmouseover	Window::Onmouseover	DontDelete
   onmouseup	Window::Onmouseup	DontDelete
+  onmousewheel	Window::OnWindowMouseWheel	DontDelete
   onmove	Window::Onmove		DontDelete
   onreset	Window::Onreset		DontDelete
   onresize	Window::Onresize	DontDelete
@@ -797,6 +798,11 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
           return getListener(exec, DOM::EventImpl::MOUSEUP_EVENT);
         else
           return Undefined();
+      case OnWindowMouseWheel:
+        if (isSafeScript(exec))
+          return getListener(exec, DOM::EventImpl::MOUSEWHEEL_EVENT);
+        else
+          return Undefined();
       case Onmove:
         if (isSafeScript(exec))
           return getListener(exec, DOM::EventImpl::KHTML_MOVE_EVENT);
@@ -1037,6 +1043,10 @@ void Window::put(ExecState* exec,
       case Onmouseup:
         if (isSafeScript(exec))
           setListener(exec, DOM::EventImpl::MOUSEUP_EVENT, value);
+        return;
+      case OnWindowMouseWheel:
+        if (isSafeScript(exec))
+          setListener(exec, DOM::EventImpl::MOUSEWHEEL_EVENT, value);
         return;
       case Onmove:
         if (isSafeScript(exec))
