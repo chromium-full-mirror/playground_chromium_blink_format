@@ -50,6 +50,8 @@ struct CSSNamespace {
   DOMString m_uri;
   CSSNamespace* m_parent;
 
+  MAIN_THREAD_ALLOCATED;
+
   CSSNamespace(const DOMString& p, const DOMString& u, CSSNamespace* parent)
       : m_prefix(p), m_uri(u), m_parent(parent) {}
   ~CSSNamespace() { delete m_parent; }
@@ -85,6 +87,8 @@ class CSSSelector {
     delete simpleSelector;
     delete nextSelector;
   }
+
+  MAIN_THREAD_ALLOCATED;
 
   void append(CSSSelector* n) {
     if (!nextSelector)
@@ -190,6 +194,8 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
   }
 
   virtual ~StyleBaseImpl() {}
+
+  MAIN_THREAD_ALLOCATED;
 
   // returns the url of the style sheet this object belongs to
   DOMString baseURL();

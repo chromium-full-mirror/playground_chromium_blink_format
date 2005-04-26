@@ -27,9 +27,11 @@
 #include "dom/dom_misc.h"
 #include "misc/khtmllayout.h"
 #include "misc/shared.h"
+#include "misc/main_thread_malloc.h"
 
-#define QT_ALLOC_QCHAR_VEC(N) (QChar*)new char[sizeof(QChar) * (N)]
-#define QT_DELETE_QCHAR_VEC(P) delete[]((char*)(P))
+#define QT_ALLOC_QCHAR_VEC(N) \
+  static_cast<QChar*>(main_thread_malloc(sizeof(QChar) * (N)))
+#define QT_DELETE_QCHAR_VEC(P) main_thread_free((void*)(P))
 
 namespace DOM {
 
@@ -57,6 +59,8 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   DOMStringImpl(const char* str, unsigned int len);
   DOMStringImpl(const QChar& ch);
   ~DOMStringImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   unsigned hash() const {
     if (_hash == 0)

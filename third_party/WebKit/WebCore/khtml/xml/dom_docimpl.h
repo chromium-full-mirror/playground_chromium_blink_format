@@ -136,6 +136,8 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
   DOMImplementationImpl();
   ~DOMImplementationImpl();
 
+  MAIN_THREAD_ALLOCATED;
+
   // DOM methods & attributes for DOMImplementation
   bool hasFeature(const DOMString& feature, const DOMString& version);
   DocumentTypeImpl* createDocumentType(const DOMString& qualifiedName,

@@ -45,6 +45,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arena.h"
+#include "main_thread_malloc.h"
+
+using khtml::main_thread_malloc;
+using khtml::main_thread_free;
 
 //#define DEBUG_ARENA_MALLOC
 #ifdef DEBUG_ARENA_MALLOC
@@ -168,7 +172,7 @@ void* ArenaAllocate(ArenaPool* pool, unsigned int nb) {
     i++;
     printf("Malloc: %d\n", i);
 #endif
-    a = (Arena*)malloc(sz);
+    a = (Arena*)main_thread_malloc(sz);
     if (a) {
       a->limit = (uword)a + sz;
       a->base = a->avail = (uword)ARENA_ALIGN(pool, a + 1);
@@ -235,7 +239,7 @@ static void FreeArenaList(ArenaPool* pool, Arena* head, bool reallyFree) {
         printf("Free: %d\n", i);
       }
 #endif
-      free(a);
+      main_thread_free(a);
       a = 0;
     } while ((a = *ap) != 0);
   } else {
@@ -276,7 +280,7 @@ void ArenaFinish(void) {
 
   for (a = arena_freelist; a; a = next) {
     next = a->next;
-    free(a);
+    main_thread_free(a);
     a = 0;
   }
   arena_freelist = NULL;

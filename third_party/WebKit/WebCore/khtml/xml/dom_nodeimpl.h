@@ -28,6 +28,7 @@
 #include "dom/dom_misc.h"
 #include "dom/dom_string.h"
 #include "dom/dom_node.h"
+#include "misc/main_thread_malloc.h"
 #include "misc/helper.h"
 #include "misc/shared.h"
 #include "dom_atomicstring.h"
@@ -101,6 +102,8 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
  public:
   NodeImpl(DocumentPtr* doc);
   virtual ~NodeImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   // DOM methods & attributes for Node
   virtual DOMString nodeName() const;
@@ -611,6 +614,8 @@ class NodeListImpl : public khtml::Shared<NodeListImpl> {
   NodeListImpl(NodeImpl* _rootNode);
   virtual ~NodeListImpl();
 
+  MAIN_THREAD_ALLOCATED;
+
   // DOM methods & attributes for NodeList
   virtual unsigned long length() const = 0;
   virtual NodeImpl* item(unsigned long index) const = 0;
@@ -698,6 +703,8 @@ class NamedNodeMapImpl : public khtml::Shared<NamedNodeMapImpl> {
  public:
   NamedNodeMapImpl();
   virtual ~NamedNodeMapImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   // DOM methods & attributes for NamedNodeMap
   virtual NodeImpl* getNamedItem(NodeImpl::Id id) const = 0;

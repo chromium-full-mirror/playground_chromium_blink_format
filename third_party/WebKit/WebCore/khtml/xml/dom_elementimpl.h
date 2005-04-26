@@ -64,6 +64,8 @@ class AttributeImpl : public khtml::Shared<AttributeImpl> {
       : m_id(id), _value(value), _impl(0){};
   virtual ~AttributeImpl(){};
 
+  MAIN_THREAD_ALLOCATED;
+
   const AtomicString& value() const { return _value; }
   const AtomicString& prefix() const { return _prefix; }
   NodeImpl::Id id() const { return m_id; }

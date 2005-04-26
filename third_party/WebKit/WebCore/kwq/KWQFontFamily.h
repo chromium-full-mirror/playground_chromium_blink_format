@@ -25,6 +25,7 @@
 
 #include "KWQString.h"
 #include "dom_atomicstring.h"
+#include "misc/main_thread_malloc.h"
 
 #ifdef __OBJC__
 @class NSString;
@@ -42,6 +43,8 @@ class KWQFontFamily {
 
   KWQFontFamily(const KWQFontFamily&);
   KWQFontFamily& operator=(const KWQFontFamily&);
+
+  MAIN_THREAD_ALLOCATED;
 
   void setFamily(const DOM::AtomicString&);
   const DOM::AtomicString& family() const { return _family; }

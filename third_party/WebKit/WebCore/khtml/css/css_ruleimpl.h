@@ -132,6 +132,8 @@ class CSSRuleListImpl : public khtml::Shared<CSSRuleListImpl> {
 
   ~CSSRuleListImpl();
 
+  MAIN_THREAD_ALLOCATED;
+
   unsigned long length() const { return m_lstCSSRules.count(); }
   CSSRuleImpl* item(unsigned long index) { return m_lstCSSRules.at(index); }
 

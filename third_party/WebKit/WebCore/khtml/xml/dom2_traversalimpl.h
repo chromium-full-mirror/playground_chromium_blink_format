@@ -30,6 +30,7 @@
 #include "dom/dom_node.h"
 #include "dom/dom_misc.h"
 #include "misc/shared.h"
+#include "misc/main_thread_malloc.h"
 
 namespace DOM {
 
@@ -40,6 +41,8 @@ class NodeFilterImpl : public khtml::Shared<NodeFilterImpl> {
  public:
   NodeFilterImpl(NodeFilterCondition*);
   ~NodeFilterImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   short acceptNode(const Node&) const;
 
@@ -57,6 +60,8 @@ class TraversalImpl : public khtml::Shared<TraversalImpl> {
                 NodeFilterImpl*,
                 bool expandEntityReferences);
   ~TraversalImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   NodeImpl* root() const { return m_root; }
   unsigned long whatToShow() const { return m_whatToShow; }

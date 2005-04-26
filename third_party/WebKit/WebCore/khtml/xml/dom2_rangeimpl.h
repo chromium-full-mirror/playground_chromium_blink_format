@@ -30,7 +30,7 @@
 #include <qptrlist.h>
 #include "dom/dom2_range.h"
 #include "misc/shared.h"
-
+#include "misc/main_thread_malloc.h"
 namespace DOM {
 
 class DocumentPtr;
@@ -49,6 +49,8 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
             long _endOffset);
 
   ~RangeImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   // ### remove the get from these methods (i.e. getStartContainer() ->
   // startContainer())
