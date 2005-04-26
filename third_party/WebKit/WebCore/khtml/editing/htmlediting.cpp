@@ -819,9 +819,7 @@ void CompositeEditCommand::appendNode(NodeImpl* appendChild, NodeImpl* parent) {
   applyCommandToComposite(cmd);
 }
 
-void CompositeEditCommand::removeFullySelectedNodePreservingPosition(
-    NodeImpl* node,
-    Position& pos) {
+void CompositeEditCommand::removeFullySelectedNode(NodeImpl* node) {
   if (isTableStructureNode(node) || node == node->rootEditableElement()) {
     // Do not remove an element of table structure; remove its contents.
     // Likewise for the root editable element.
@@ -829,38 +827,23 @@ void CompositeEditCommand::removeFullySelectedNodePreservingPosition(
     while (child) {
       NodeImpl* remove = child;
       child = child->nextSibling();
-      removeFullySelectedNodePreservingPosition(remove, pos);
+      removeFullySelectedNode(remove);
     }
   } else {
-    removeNodePreservingPosition(node, pos);
+    removeNode(node);
   }
 }
 
-void CompositeEditCommand::removeChildrenInRangePreservingPosition(
-    NodeImpl* node,
-    int from,
-    int to,
-    Position& pos) {
+void CompositeEditCommand::removeChildrenInRange(NodeImpl* node,
+                                                 int from,
+                                                 int to) {
   NodeImpl* nodeToRemove = node->childNode(from);
   for (int i = from; i < to; i++) {
     ASSERT(nodeToRemove);
     NodeImpl* next = nodeToRemove->nextSibling();
-    removeNodePreservingPosition(nodeToRemove, pos);
+    removeNode(nodeToRemove);
     nodeToRemove = next;
   }
-}
-
-void CompositeEditCommand::removeNodePreservingPosition(NodeImpl* removeChild,
-                                                        Position& pos) {
-  if (removeChild == pos.node() || pos.node()->isAncestor(removeChild)) {
-    pos = Position(removeChild->parentNode(), removeChild->nodeIndex());
-  } else if (removeChild->parentNode() == pos.node() &&
-             removeChild->nodeIndex() < (unsigned)pos.offset()) {
-    pos = Position(pos.node(), pos.offset() - 1);
-  }
-
-  EditCommandPtr cmd(new RemoveNodeCommand(document(), removeChild));
-  applyCommandToComposite(cmd);
 }
 
 void CompositeEditCommand::removeNode(NodeImpl* removeChild) {
@@ -2970,7 +2953,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         (startOffset == 0 &&
          m_downstreamEnd.offset() >= maxDeepOffset(m_startNode))) {
       // just delete
-      removeFullySelectedNodePreservingPosition(m_startNode, m_upstreamStart);
+      removeFullySelectedNode(m_startNode);
     } else if (m_downstreamEnd.offset() - startOffset > 0) {
       if (m_startNode->isTextNode()) {
         // in a text node that needs to be trimmed
@@ -2979,9 +2962,8 @@ void DeleteSelectionCommand::handleGeneralDelete() {
                            m_downstreamEnd.offset() - startOffset);
         m_trailingWhitespaceValid = false;
       } else {
-        removeChildrenInRangePreservingPosition(m_startNode, startOffset,
-                                                m_downstreamEnd.offset(),
-                                                m_upstreamStart);
+        removeChildrenInRange(m_startNode, startOffset,
+                              m_downstreamEnd.offset());
         m_endingPosition = m_upstreamStart;
       }
     }
@@ -3016,7 +2998,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
           m_downstreamEnd =
               Position(m_downstreamEnd.node(), m_downstreamEnd.offset() - 1);
         }
-        removeFullySelectedNodePreservingPosition(node, m_upstreamStart);
+        removeFullySelectedNode(node);
         node = nextNode;
       } else {
         NodeImpl* n = node->lastChild();
@@ -3025,7 +3007,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
         if (n == m_downstreamEnd.node() &&
             m_downstreamEnd.offset() >=
                 m_downstreamEnd.node()->caretMaxOffset()) {
-          removeFullySelectedNodePreservingPosition(node, m_upstreamStart);
+          removeFullySelectedNode(node);
           m_trailingWhitespaceValid = false;
           node = 0;
         } else {
@@ -3048,8 +3030,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
                                      m_downstreamEnd.node()->nodeIndex());
         }
 
-        removeFullySelectedNodePreservingPosition(m_downstreamEnd.node(),
-                                                  m_upstreamStart);
+        removeFullySelectedNode(m_downstreamEnd.node());
         m_trailingWhitespaceValid = false;
       } else {
         if (m_downstreamEnd.node()->isTextNode()) {
@@ -3069,9 +3050,8 @@ void DeleteSelectionCommand::handleGeneralDelete() {
             if (n)
               offset = n->nodeIndex() + 1;
           }
-          removeChildrenInRangePreservingPosition(
-              m_downstreamEnd.node(), offset, m_downstreamEnd.offset(),
-              m_upstreamStart);
+          removeChildrenInRange(m_downstreamEnd.node(), offset,
+                                m_downstreamEnd.offset());
           m_downstreamEnd = Position(m_downstreamEnd.node(), offset);
         }
       }
