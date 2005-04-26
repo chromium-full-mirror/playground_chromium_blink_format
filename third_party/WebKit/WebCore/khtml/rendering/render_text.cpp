@@ -1605,8 +1605,7 @@ void RenderText::setTextWithOffset(DOMStringImpl* text,
   }
   for (RootInlineBox* curr = firstRootBox; curr && curr != lastRootBox;
        curr = curr->nextRootBox()) {
-    if (!curr->isDirty() && curr->lineBreakObj() == this &&
-        curr->lineBreakPos() > end)
+    if (curr->lineBreakObj() == this && curr->lineBreakPos() > end)
       curr->setLineBreakPos(curr->lineBreakPos() + delta);
   }
 
