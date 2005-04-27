@@ -509,8 +509,8 @@ KeyboardEventImpl::KeyboardEventImpl(QKeyEvent* key, AbstractViewImpl* view)
           view,
           0,
           key->state() & Qt::ControlButton,
-          key->state() & Qt::ShiftButton,
           key->state() & Qt::AltButton,
+          key->state() & Qt::ShiftButton,
           key->state() & Qt::MetaButton) {
 #if APPLE_CHANGES
   m_keyEvent = new QKeyEvent(*key);
@@ -546,8 +546,8 @@ KeyboardEventImpl::KeyboardEventImpl(EventId _id,
                                      const DOMString& keyIdentifierArg,
                                      unsigned long keyLocationArg,
                                      bool ctrlKeyArg,
-                                     bool shiftKeyArg,
                                      bool altKeyArg,
+                                     bool shiftKeyArg,
                                      bool metaKeyArg,
                                      bool altGraphKeyArg)
     : UIEventWithKeyStateImpl(_id,
@@ -556,8 +556,8 @@ KeyboardEventImpl::KeyboardEventImpl(EventId _id,
                               viewArg,
                               0,
                               ctrlKeyArg,
-                              shiftKeyArg,
                               altKeyArg,
+                              shiftKeyArg,
                               metaKeyArg) {
   m_keyEvent = 0;
   m_keyIdentifier = keyIdentifierArg.implementation();
@@ -580,8 +580,8 @@ void KeyboardEventImpl::initKeyboardEvent(const DOMString& typeArg,
                                           const DOMString& keyIdentifierArg,
                                           unsigned long keyLocationArg,
                                           bool ctrlKeyArg,
-                                          bool shiftKeyArg,
                                           bool altKeyArg,
+                                          bool shiftKeyArg,
                                           bool metaKeyArg,
                                           bool altGraphKeyArg) {
   if (m_keyIdentifier)
