@@ -105,7 +105,7 @@ typedef bool (*NPN_HasMethodProcPtr)(NPP npp,
 typedef bool (*NPN_RemovePropertyProcPtr)(NPP npp,
                                           NPObject* obj,
                                           NPIdentifier propertyName);
-typedef void (*NPN_SetExceptionProcPtr)(NPObject* obj, NPString* message);
+typedef void (*NPN_SetExceptionProcPtr)(NPObject* obj, const NPUTF8* message);
 
 typedef NPError (*NPP_NewProcPtr)(NPMIMEType pluginType,
                                   NPP instance,

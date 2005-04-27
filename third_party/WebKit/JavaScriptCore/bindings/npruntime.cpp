@@ -152,15 +152,17 @@ bool _NPN_IdentifierIsString(NPIdentifier identifier) {
 
 NPUTF8* _NPN_UTF8FromIdentifier(NPIdentifier identifier) {
   PrivateIdentifier* i = (PrivateIdentifier*)identifier;
-  if (!i->isString)
+  if (!i->isString || !i->value.string)
     return NULL;
 
-  return (NPUTF8*)i->value.string;
+  return (NPUTF8*)strdup(i->value.string);
 }
 
 int32_t _NPN_IntFromIdentifier(NPIdentifier identifier) {
-  // FIXME: Implement!
-  return 0;
+  PrivateIdentifier* i = (PrivateIdentifier*)identifier;
+  if (!i->isString)
+    return 0;
+  return i->value.number;
 }
 
 NPBool NPN_VariantIsVoid(const NPVariant* variant) {
@@ -398,9 +400,6 @@ void _NPN_SetExceptionWithUTF8(NPObject* obj,
   assert(message);
 
   if (obj && message) {
-    NPString string;
-    string.UTF8Characters = message;
-    string.UTF8Length = length;
-    _NPN_SetException(obj, &string);
+    _NPN_SetException(obj, message);
   }
 }
