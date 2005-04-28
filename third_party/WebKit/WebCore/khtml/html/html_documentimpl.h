@@ -70,9 +70,6 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
     return m_collection_info + type;
   }
 
-  virtual DOMStringImpl* HTMLElementNamespace() const;
-  virtual bool isHTMLNamespace(DOMStringImpl*) const;
-
  protected:
   HTMLElementImpl* bodyElement;
   HTMLElementImpl* htmlElement;
