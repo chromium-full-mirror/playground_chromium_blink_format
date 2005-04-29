@@ -2697,8 +2697,12 @@ void DeleteSelectionCommand::initializePositionData() {
   //
   m_leadingWhitespace = m_upstreamStart.leadingWhitespacePosition(
       m_selectionToDelete.startAffinity());
-  m_trailingWhitespace =
-      m_downstreamEnd.trailingWhitespacePosition(VP_DEFAULT_AFFINITY);
+  // NOTE: Workaround for bug <rdar://problem/4103339> is to avoid calculating
+  // trailingWhitespacePosition
+  // if the m_downstreamEnd is at the end of a paragraph.
+  if (!isEndOfParagraph(VisiblePosition(m_downstreamEnd, VP_DEFAULT_AFFINITY)))
+    m_trailingWhitespace =
+        m_downstreamEnd.trailingWhitespacePosition(VP_DEFAULT_AFFINITY);
 
   if (m_smartDelete) {
     // skip smart delete if the selection to delete already starts or ends with
@@ -2944,6 +2948,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     startOffset = 0;
   }
 
+  // Done adjusting the start.  See if we're all done.
   if (!m_startNode)
     return;
 
@@ -3017,6 +3022,7 @@ void DeleteSelectionCommand::handleGeneralDelete() {
     }
 
     if (m_downstreamEnd.node() != m_startNode &&
+        !m_upstreamStart.node()->isAncestor(m_downstreamEnd.node()) &&
         m_downstreamEnd.node()->inDocument() &&
         m_downstreamEnd.offset() >= m_downstreamEnd.node()->caretMinOffset()) {
       if (m_downstreamEnd.offset() >= maxDeepOffset(m_downstreamEnd.node())) {
