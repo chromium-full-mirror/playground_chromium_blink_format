@@ -1804,6 +1804,8 @@ Completion WhileNode::execute(ExecState* exec) {
     if (c.complType() != Normal)
       return c;
   }
+
+  return Completion();  // work around gcc 4.0 bug
 }
 
 void WhileNode::processVarDecls(ExecState* exec) {
@@ -1868,6 +1870,8 @@ Completion ForNode::execute(ExecState* exec) {
       KJS_CHECKEXCEPTION
     }
   }
+
+  return Completion();  // work around gcc 4.0 bug
 }
 
 void ForNode::processVarDecls(ExecState* exec) {
@@ -2300,8 +2304,7 @@ Completion SwitchNode::execute(ExecState* exec) {
 
   if ((res.complType() == Break) && ls.contains(res.target()))
     return Completion(Normal, res.value());
-  else
-    return res;
+  return res;
 }
 
 void SwitchNode::processVarDecls(ExecState* exec) {
@@ -2335,8 +2338,7 @@ Completion LabelNode::execute(ExecState* exec) {
 
   if ((e.complType() == Break) && (e.target() == label))
     return Completion(Normal, e.value());
-  else
-    return e;
+  return e;
 }
 
 void LabelNode::processVarDecls(ExecState* exec) {
