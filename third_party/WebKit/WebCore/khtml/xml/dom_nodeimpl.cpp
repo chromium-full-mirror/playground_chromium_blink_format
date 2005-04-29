@@ -255,6 +255,10 @@ DOMString NodeImpl::localName() const {
   return DOMString();
 }
 
+DOMString NodeImpl::namespaceURI() const {
+  return DOMString();
+}
+
 void NodeImpl::setFirstChild(NodeImpl*) {}
 
 void NodeImpl::setLastChild(NodeImpl*) {}

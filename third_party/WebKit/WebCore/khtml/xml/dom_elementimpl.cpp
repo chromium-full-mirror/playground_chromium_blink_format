@@ -316,22 +316,6 @@ bool ElementImpl::hasAttributes() const {
   return namedAttrMap && namedAttrMap->length() > 0;
 }
 
-NodeImpl* ElementImpl::cloneNode(bool deep) {
-  // ### we lose the namespace here ... FIXME
-  int exceptioncode;
-  ElementImpl* clone = getDocument()->createElement(tagName(), exceptioncode);
-  if (!clone)
-    return 0;
-
-  // clone attributes
-  if (namedAttrMap)
-    *clone->attributes() = *namedAttrMap;
-
-  if (deep)
-    cloneChildNodes(clone);
-  return clone;
-}
-
 DOMString ElementImpl::nodeName() const {
   return tagName();
 }
@@ -697,6 +681,10 @@ XMLElementImpl::~XMLElementImpl() {}
 
 DOMString XMLElementImpl::localName() const {
   return getDocument()->tagName(m_id);
+}
+
+DOMString XMLElementImpl::namespaceURI() const {
+  return getDocument()->namespaceURI(m_id);
 }
 
 NodeImpl* XMLElementImpl::cloneNode(bool deep) {

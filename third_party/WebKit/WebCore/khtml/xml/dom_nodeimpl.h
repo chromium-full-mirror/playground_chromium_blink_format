@@ -129,6 +129,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool hasChildNodes() const;
   virtual NodeImpl* cloneNode(bool deep) = 0;
   virtual DOMString localName() const;
+  virtual DOMString namespaceURI() const;
   virtual DOMString prefix() const;
   virtual void setPrefix(const DOMString& _prefix, int& exceptioncode);
   void normalize();
