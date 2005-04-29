@@ -2096,8 +2096,6 @@ Value DOMTextProtoFunc::tryCall(ExecState* exec,
   switch (id) {
     case DOMText::SplitText:
       return getDOMNode(exec, text.splitText(args[0].toInt32(exec)));
-      break;
-    default:
-      return Undefined();
   }
+  return Undefined();
 }
