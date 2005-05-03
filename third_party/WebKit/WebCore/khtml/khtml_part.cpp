@@ -3258,10 +3258,6 @@ bool KHTMLPart::processObjectRequest(khtml::ChildFrame* child,
 #endif
 
     if (!part) {
-      if (child->m_frame)
-        if (child->m_frame->partLoadingErrorNotify(child, url, mimetype))
-          return true;  // we succeeded after all (a fallback was used)
-
       checkEmitLoadEvent();
       return false;
     }
