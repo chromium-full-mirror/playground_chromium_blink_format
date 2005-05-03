@@ -896,7 +896,7 @@ void RenderText::detach() {
       for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
         box->remove();
     } else if (parent())
-      parent()->dirtyLinesFromChangedChild(this, false);
+      parent()->dirtyLinesFromChangedChild(this);
   }
   deleteTextBoxes();
   RenderObject::detach();

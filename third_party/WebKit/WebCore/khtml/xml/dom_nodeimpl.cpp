@@ -135,14 +135,6 @@ void NodeImpl::setNodeValue(const DOMString& /*_nodeValue*/,
   // be default nodeValue is null, so setting it has no effect
 }
 
-DOMString NodeImpl::nodeName() const {
-  return DOMString();
-}
-
-unsigned short NodeImpl::nodeType() const {
-  return 0;
-}
-
 NodeListImpl* NodeImpl::childNodes() {
   return new ChildNodeListImpl(this);
 }
