@@ -321,7 +321,7 @@ typedef enum {
     runJavaScriptAlertPanelWithMessage:(NSString*)message;
 
 /*!
-    @method webView:runJavaScriptAlertPanelWithMessage:
+    @method webView:runJavaScriptConfirmPanelWithMessage:
     @abstract Display a JavaScript confirm panel
     @param sender The WebView sending the delegate method.
     @param message The message to display
