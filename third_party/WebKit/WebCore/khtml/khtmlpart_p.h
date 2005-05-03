@@ -63,6 +63,7 @@ struct ChildFrame {
     m_bPreloaded = false;
     m_type = Frame;
     m_bNotify = false;
+    m_hasFallbackContent = false;
   }
 
 #if !APPLE_CHANGES
@@ -90,6 +91,7 @@ struct ChildFrame {
   QStringList m_paramNames;
   QStringList m_paramValues;
   bool m_bNotify;
+  bool m_hasFallbackContent;
 };
 }
 

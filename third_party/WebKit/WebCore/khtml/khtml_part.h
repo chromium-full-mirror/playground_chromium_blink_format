@@ -1359,6 +1359,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   // the frame you entirely selected.
   void selectFrameElementInParentIfFullySelected();
 
+  void handleFallbackContent();
+
  private:
   khtml::ChildFrame* childFrame(const QObject* obj);
 

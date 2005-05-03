@@ -48,7 +48,7 @@ RenderReplaced::RenderReplaced(DOM::NodeImpl* node) : RenderBox(node) {
   // init RenderObject attributes
   setReplaced(true);
 
-  m_intrinsicWidth = 200;
+  m_intrinsicWidth = 300;
   m_intrinsicHeight = 150;
   m_selectionState = SelectionNone;
 }

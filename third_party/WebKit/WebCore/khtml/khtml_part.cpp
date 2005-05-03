@@ -52,6 +52,7 @@
 #include "html/html_baseimpl.h"
 #include "html/html_miscimpl.h"
 #include "html/html_imageimpl.h"
+#include "html/html_objectimpl.h"
 #include "rendering/render_block.h"
 #include "rendering/render_text.h"
 #include "rendering/render_frames.h"
@@ -3135,6 +3136,7 @@ bool KHTMLPart::requestObject(khtml::RenderPart* frame,
   (*it).m_type = khtml::ChildFrame::Object;
   (*it).m_paramNames = paramNames;
   (*it).m_paramValues = paramValues;
+  (*it).m_hasFallbackContent = frame->hasFallbackContent();
 
   KURL completedURL;
   if (!url.isEmpty())
@@ -5855,6 +5857,21 @@ void KHTMLPart::selectFrameElementInParentIfFullySelected() {
   // after.
   parentView->setFocus();
   parent->setSelection(Selection(beforeOwnerElement, afterOwnerElement));
+}
+
+void KHTMLPart::handleFallbackContent() {
+  KHTMLPart* parent = parentPart();
+  if (!parent)
+    return;
+  ChildFrame* childFrame = parent->childFrame(this);
+  if (!childFrame || childFrame->m_type != ChildFrame::Object)
+    return;
+  khtml::RenderPart* renderPart = childFrame->m_frame;
+  if (!renderPart)
+    return;
+  HTMLObjectElementImpl* elt =
+      static_cast<HTMLObjectElementImpl*>(renderPart->element());
+  elt->renderFallbackContent();
 }
 
 using namespace KParts;
