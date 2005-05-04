@@ -488,6 +488,11 @@ KJS::Value JavaArray::valueAt(KJS::ExecState* exec, unsigned int index) const {
       jobject anObject;
       anObject = env->GetObjectArrayElement(objectArray, index);
 
+      // No object?
+      if (!anObject) {
+        return Null();
+      }
+
       // Nested array?
       if (_type[1] == '[') {
         return JavaArray::convertJObjectToArray(exec, anObject, _type + 1,
