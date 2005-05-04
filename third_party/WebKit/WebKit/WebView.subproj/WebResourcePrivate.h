@@ -14,7 +14,12 @@
             MIMEType:(NSString*)MIMEType
     textEncodingName:(NSString*)textEncodingName
            frameName:(NSString*)frameName
+            response:(NSURLResponse*)response
             copyData:(BOOL)copyData;
+
+- (id)_initWithData:(NSData*)data
+                URL:(NSURL*)URL
+           response:(NSURLResponse*)response;
 
 + (NSArray*)_resourcesFromPropertyLists:(NSArray*)propertyLists;
 + (NSArray*)_propertyListsFromResources:(NSArray*)resources;
