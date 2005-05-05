@@ -977,7 +977,7 @@ bool HTMLElementImpl::setOuterText(const DOMString& text) {
       break;
   }
 
-  NodeBaseImpl* parent = static_cast<NodeBaseImpl*>(parentNode());
+  NodeImpl* parent = parentNode();
 
   if (!parent) {
     return false;

@@ -40,7 +40,7 @@ class DOMString;
 class ProcessingInstruction;
 #endif
 
-class EntityImpl : public NodeBaseImpl {
+class EntityImpl : public ContainerNodeImpl {
  public:
   EntityImpl(DocumentPtr* doc);
   EntityImpl(DocumentPtr* doc, DOMString _name);
@@ -75,7 +75,7 @@ class EntityImpl : public NodeBaseImpl {
   DOMStringImpl* m_name;
 };
 
-class EntityReferenceImpl : public NodeBaseImpl {
+class EntityReferenceImpl : public ContainerNodeImpl {
  public:
   EntityReferenceImpl(DocumentPtr* doc);
   EntityReferenceImpl(DocumentPtr* doc, DOMStringImpl* _entityName);
@@ -97,7 +97,7 @@ class EntityReferenceImpl : public NodeBaseImpl {
   DOMStringImpl* m_entityName;
 };
 
-class NotationImpl : public NodeBaseImpl {
+class NotationImpl : public ContainerNodeImpl {
  public:
   NotationImpl(DocumentPtr* doc);
   NotationImpl(DocumentPtr* doc,
@@ -127,7 +127,7 @@ class NotationImpl : public NodeBaseImpl {
   DOMStringImpl* m_systemId;
 };
 
-class ProcessingInstructionImpl : public NodeBaseImpl,
+class ProcessingInstructionImpl : public ContainerNodeImpl,
                                   private khtml::CachedObjectClient {
  public:
   ProcessingInstructionImpl(DocumentPtr* doc);

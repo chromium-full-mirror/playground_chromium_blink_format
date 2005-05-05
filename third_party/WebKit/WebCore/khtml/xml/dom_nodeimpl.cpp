@@ -1561,12 +1561,12 @@ void NodeImpl::formatForDebugger(char* buffer, unsigned length) const {
 
 //-------------------------------------------------------------------------
 
-NodeBaseImpl::NodeBaseImpl(DocumentPtr* doc) : NodeImpl(doc) {
+ContainerNodeImpl::ContainerNodeImpl(DocumentPtr* doc) : NodeImpl(doc) {
   _first = _last = 0;
 }
 
-NodeBaseImpl::~NodeBaseImpl() {
-  // kdDebug( 6020 ) << "NodeBaseImpl destructor" << endl;
+ContainerNodeImpl::~ContainerNodeImpl() {
+  // kdDebug( 6020 ) << "ContainerNodeImpl destructor" << endl;
 
   // Avoid deep recursion when destroying the node tree.
   static bool alreadyInsideDestructor;
@@ -1616,17 +1616,17 @@ NodeBaseImpl::~NodeBaseImpl() {
   }
 }
 
-NodeImpl* NodeBaseImpl::firstChild() const {
+NodeImpl* ContainerNodeImpl::firstChild() const {
   return _first;
 }
 
-NodeImpl* NodeBaseImpl::lastChild() const {
+NodeImpl* ContainerNodeImpl::lastChild() const {
   return _last;
 }
 
-NodeImpl* NodeBaseImpl::insertBefore(NodeImpl* newChild,
-                                     NodeImpl* refChild,
-                                     int& exceptioncode) {
+NodeImpl* ContainerNodeImpl::insertBefore(NodeImpl* newChild,
+                                          NodeImpl* refChild,
+                                          int& exceptioncode) {
   exceptioncode = 0;
 
   // insertBefore(...,null) is equivalent to appendChild()
@@ -1700,9 +1700,9 @@ NodeImpl* NodeBaseImpl::insertBefore(NodeImpl* newChild,
   return newChild;
 }
 
-NodeImpl* NodeBaseImpl::replaceChild(NodeImpl* newChild,
-                                     NodeImpl* oldChild,
-                                     int& exceptioncode) {
+NodeImpl* ContainerNodeImpl::replaceChild(NodeImpl* newChild,
+                                          NodeImpl* oldChild,
+                                          int& exceptioncode) {
   exceptioncode = 0;
 
   Node protectNewChild(newChild);  // make sure the new child is ref'd and
@@ -1776,7 +1776,8 @@ NodeImpl* NodeBaseImpl::replaceChild(NodeImpl* newChild,
   return oldChild;
 }
 
-NodeImpl* NodeBaseImpl::removeChild(NodeImpl* oldChild, int& exceptioncode) {
+NodeImpl* ContainerNodeImpl::removeChild(NodeImpl* oldChild,
+                                         int& exceptioncode) {
   exceptioncode = 0;
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
@@ -1839,7 +1840,7 @@ NodeImpl* NodeBaseImpl::removeChild(NodeImpl* oldChild, int& exceptioncode) {
   return oldChild;
 }
 
-void NodeBaseImpl::removeChildren() {
+void ContainerNodeImpl::removeChildren() {
   int exceptionCode;
   while (NodeImpl* n = _first) {
     NodeImpl* next = n->nextSibling();
@@ -1868,7 +1869,8 @@ void NodeBaseImpl::removeChildren() {
   dispatchSubtreeModifiedEvent();
 }
 
-NodeImpl* NodeBaseImpl::appendChild(NodeImpl* newChild, int& exceptioncode) {
+NodeImpl* ContainerNodeImpl::appendChild(NodeImpl* newChild,
+                                         int& exceptioncode) {
   exceptioncode = 0;
 
   Node protectNewChild(newChild);  // make sure the new child is ref'd and
@@ -1933,21 +1935,22 @@ NodeImpl* NodeBaseImpl::appendChild(NodeImpl* newChild, int& exceptioncode) {
   return newChild;
 }
 
-bool NodeBaseImpl::hasChildNodes() const {
+bool ContainerNodeImpl::hasChildNodes() const {
   return _first != 0;
 }
 
 // not part of the DOM
-void NodeBaseImpl::setFirstChild(NodeImpl* child) {
+void ContainerNodeImpl::setFirstChild(NodeImpl* child) {
   _first = child;
 }
 
-void NodeBaseImpl::setLastChild(NodeImpl* child) {
+void ContainerNodeImpl::setLastChild(NodeImpl* child) {
   _last = child;
 }
 
 // check for same source document:
-bool NodeBaseImpl::checkSameDocument(NodeImpl* newChild, int& exceptioncode) {
+bool ContainerNodeImpl::checkSameDocument(NodeImpl* newChild,
+                                          int& exceptioncode) {
   exceptioncode = 0;
   DocumentImpl* ownerDocThis = getDocument();
   DocumentImpl* ownerDocNew = getDocument();
@@ -1960,21 +1963,8 @@ bool NodeBaseImpl::checkSameDocument(NodeImpl* newChild, int& exceptioncode) {
   return false;
 }
 
-// check for being (grand-..)father:
-// ### remove in favor or isAncestor()
-bool NodeBaseImpl::checkNoOwner(NodeImpl* newChild, int& exceptioncode) {
-  // check if newChild is parent of this...
-  NodeImpl* n;
-  for (n = this; (n != getDocument()) && (n != 0); n = n->parentNode())
-    if (n == newChild) {
-      exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-      return true;
-    }
-  return false;
-}
-
 // check for being child:
-bool NodeBaseImpl::checkIsChild(NodeImpl* oldChild, int& exceptioncode) {
+bool ContainerNodeImpl::checkIsChild(NodeImpl* oldChild, int& exceptioncode) {
   if (!oldChild || oldChild->parentNode() != this) {
     exceptioncode = DOMException::NOT_FOUND_ERR;
     return true;
@@ -1982,7 +1972,7 @@ bool NodeBaseImpl::checkIsChild(NodeImpl* oldChild, int& exceptioncode) {
   return false;
 }
 
-NodeImpl* NodeBaseImpl::addChild(NodeImpl* newChild) {
+NodeImpl* ContainerNodeImpl::addChild(NodeImpl* newChild) {
   // do not add applyChanges here! This function is only used during parsing
 
   Node protectNewChild(newChild);  // make sure the new child is ref'd and
@@ -2016,7 +2006,7 @@ NodeImpl* NodeBaseImpl::addChild(NodeImpl* newChild) {
   return this;
 }
 
-void NodeBaseImpl::attach() {
+void ContainerNodeImpl::attach() {
   NodeImpl* child = _first;
   while (child != 0) {
     child->attach();
@@ -2025,7 +2015,7 @@ void NodeBaseImpl::attach() {
   NodeImpl::attach();
 }
 
-void NodeBaseImpl::detach() {
+void ContainerNodeImpl::detach() {
   NodeImpl* child = _first;
   while (child != 0) {
     NodeImpl* prev = child;
@@ -2035,19 +2025,19 @@ void NodeBaseImpl::detach() {
   NodeImpl::detach();
 }
 
-void NodeBaseImpl::insertedIntoDocument() {
+void ContainerNodeImpl::insertedIntoDocument() {
   NodeImpl::insertedIntoDocument();
   for (NodeImpl* child = _first; child; child = child->nextSibling())
     child->insertedIntoDocument();
 }
 
-void NodeBaseImpl::removedFromDocument() {
+void ContainerNodeImpl::removedFromDocument() {
   NodeImpl::removedFromDocument();
   for (NodeImpl* child = _first; child; child = child->nextSibling())
     child->removedFromDocument();
 }
 
-void NodeBaseImpl::cloneChildNodes(NodeImpl* clone) {
+void ContainerNodeImpl::cloneChildNodes(NodeImpl* clone) {
   int exceptioncode = 0;
   NodeImpl* n;
   for (n = firstChild(); n && !exceptioncode; n = n->nextSibling()) {
@@ -2055,8 +2045,9 @@ void NodeBaseImpl::cloneChildNodes(NodeImpl* clone) {
   }
 }
 
-NodeListImpl* NodeBaseImpl::getElementsByTagNameNS(DOMStringImpl* namespaceURI,
-                                                   DOMStringImpl* localName) {
+NodeListImpl* ContainerNodeImpl::getElementsByTagNameNS(
+    DOMStringImpl* namespaceURI,
+    DOMStringImpl* localName) {
   if (!localName)
     return 0;
 
@@ -2081,7 +2072,7 @@ NodeListImpl* NodeBaseImpl::getElementsByTagNameNS(DOMStringImpl* namespaceURI,
 
 // I don't like this way of implementing the method, but I didn't find any
 // other way. Lars
-bool NodeBaseImpl::getUpperLeftCorner(int& xPos, int& yPos) const {
+bool ContainerNodeImpl::getUpperLeftCorner(int& xPos, int& yPos) const {
   if (!m_render)
     return false;
   RenderObject* o = m_render;
@@ -2120,7 +2111,7 @@ bool NodeBaseImpl::getUpperLeftCorner(int& xPos, int& yPos) const {
   return true;
 }
 
-bool NodeBaseImpl::getLowerRightCorner(int& xPos, int& yPos) const {
+bool ContainerNodeImpl::getLowerRightCorner(int& xPos, int& yPos) const {
   if (!m_render)
     return false;
 
@@ -2161,7 +2152,7 @@ bool NodeBaseImpl::getLowerRightCorner(int& xPos, int& yPos) const {
   return true;
 }
 
-QRect NodeBaseImpl::getRect() const {
+QRect ContainerNodeImpl::getRect() const {
   int xPos, yPos;
   if (!getUpperLeftCorner(xPos, yPos)) {
     xPos = 0;
@@ -2185,7 +2176,7 @@ QRect NodeBaseImpl::getRect() const {
   return QRect(xPos, yPos, xEnd - xPos, yEnd - yPos);
 }
 
-void NodeBaseImpl::setFocus(bool received) {
+void ContainerNodeImpl::setFocus(bool received) {
   if (m_focused == received)
     return;
 
@@ -2200,7 +2191,7 @@ void NodeBaseImpl::setFocus(bool received) {
   setChanged();
 }
 
-void NodeBaseImpl::setActive(bool down) {
+void ContainerNodeImpl::setActive(bool down) {
   if (down == active())
     return;
 
@@ -2211,7 +2202,7 @@ void NodeBaseImpl::setActive(bool down) {
     setChanged();
 }
 
-unsigned long NodeBaseImpl::childNodeCount() const {
+unsigned long ContainerNodeImpl::childNodeCount() const {
   unsigned long count = 0;
   NodeImpl* n;
   for (n = firstChild(); n; n = n->nextSibling())
@@ -2219,7 +2210,7 @@ unsigned long NodeBaseImpl::childNodeCount() const {
   return count;
 }
 
-NodeImpl* NodeBaseImpl::childNode(unsigned long index) {
+NodeImpl* ContainerNodeImpl::childNode(unsigned long index) {
   unsigned long i;
   NodeImpl* n = firstChild();
   for (i = 0; n != 0 && i < index; i++)
@@ -2227,8 +2218,8 @@ NodeImpl* NodeBaseImpl::childNode(unsigned long index) {
   return n;
 }
 
-void NodeBaseImpl::dispatchChildInsertedEvents(NodeImpl* child,
-                                               int& exceptioncode) {
+void ContainerNodeImpl::dispatchChildInsertedEvents(NodeImpl* child,
+                                                    int& exceptioncode) {
   NodeImpl* p = this;
   while (p->parentNode())
     p = p->parentNode();
@@ -2264,8 +2255,9 @@ void NodeBaseImpl::dispatchChildInsertedEvents(NodeImpl* child,
   }
 }
 
-void NodeBaseImpl::dispatchChildRemovalEvents(NodeImpl* child,
-                                              int& exceptioncode) {
+// base class for nodes that may have children
+void ContainerNodeImpl::dispatchChildRemovalEvents(NodeImpl* child,
+                                                   int& exceptioncode) {
   // Dispatch pre-removal mutation events
   getDocument()->notifyBeforeNodeRemoval(child);  // ### use events instead
   if (getDocument()->hasListenerType(DocumentImpl::DOMNODEREMOVED_LISTENER)) {

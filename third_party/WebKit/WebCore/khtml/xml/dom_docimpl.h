@@ -180,7 +180,7 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
 /**
  * @internal
  */
-class DocumentImpl : public QObject, public NodeBaseImpl {
+class DocumentImpl : public QObject, public ContainerNodeImpl {
   Q_OBJECT
  public:
   DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v);
@@ -830,7 +830,7 @@ class DocumentImpl : public QObject, public NodeBaseImpl {
 #endif
 };
 
-class DocumentFragmentImpl : public NodeBaseImpl {
+class DocumentFragmentImpl : public ContainerNodeImpl {
  public:
   DocumentFragmentImpl(DocumentPtr* doc);
 

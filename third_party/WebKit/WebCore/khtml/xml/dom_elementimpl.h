@@ -93,7 +93,7 @@ class AttributeImpl : public khtml::Shared<AttributeImpl> {
 // is to dynamically allocate a textchild and store the
 // resulting nodevalue in the AttributeImpl upon
 // destruction. however, this is not yet implemented.
-class AttrImpl : public NodeBaseImpl {
+class AttrImpl : public ContainerNodeImpl {
   friend class ElementImpl;
   friend class NamedAttrMapImpl;
 
@@ -140,7 +140,7 @@ class AttrImpl : public NodeBaseImpl {
   AttributeImpl* m_attribute;
 };
 
-class ElementImpl : public NodeBaseImpl {
+class ElementImpl : public ContainerNodeImpl {
   friend class DocumentImpl;
   friend class NamedAttrMapImpl;
   friend class AttrImpl;

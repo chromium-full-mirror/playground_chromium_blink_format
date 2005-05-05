@@ -260,7 +260,7 @@ QPtrList<DocumentImpl>* DocumentImpl::changedDocuments = 0;
 
 // KHTMLView might be 0
 DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
-    : NodeBaseImpl(new DocumentPtr()),
+    : ContainerNodeImpl(new DocumentPtr()),
       m_domtree_version(0),
       m_imageLoadEventTimer(0)
 #ifndef KHTML_NO_XBL
@@ -1186,7 +1186,7 @@ void DocumentImpl::attach() {
   RenderObject* render = m_render;
   m_render = 0;
 
-  NodeBaseImpl::attach();
+  ContainerNodeImpl::attach();
   m_render = render;
 }
 
@@ -1218,7 +1218,7 @@ void DocumentImpl::detach() {
   // to closeURL().
   removeAllEventListenersFromAllNodes();
 
-  NodeBaseImpl::detach();
+  ContainerNodeImpl::detach();
 
   if (render)
     render->detach();
@@ -3295,7 +3295,7 @@ DocumentImpl* DocumentImpl::topDocument() const {
 // ----------------------------------------------------------------------------
 
 DocumentFragmentImpl::DocumentFragmentImpl(DocumentPtr* doc)
-    : NodeBaseImpl(doc) {}
+    : ContainerNodeImpl(doc) {}
 
 DOMString DocumentFragmentImpl::nodeName() const {
   return "#document-fragment";

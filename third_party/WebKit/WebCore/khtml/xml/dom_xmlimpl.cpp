@@ -35,14 +35,15 @@ using khtml::parseAttributes;
 
 namespace DOM {
 
-EntityImpl::EntityImpl(DocumentPtr* doc) : NodeBaseImpl(doc) {
+EntityImpl::EntityImpl(DocumentPtr* doc) : ContainerNodeImpl(doc) {
   m_publicId = 0;
   m_systemId = 0;
   m_notationName = 0;
   m_name = 0;
 }
 
-EntityImpl::EntityImpl(DocumentPtr* doc, DOMString _name) : NodeBaseImpl(doc) {
+EntityImpl::EntityImpl(DocumentPtr* doc, DOMString _name)
+    : ContainerNodeImpl(doc) {
   m_publicId = 0;
   m_systemId = 0;
   m_notationName = 0;
@@ -55,7 +56,7 @@ EntityImpl::EntityImpl(DocumentPtr* doc,
                        DOMString _publicId,
                        DOMString _systemId,
                        DOMString _notationName)
-    : NodeBaseImpl(doc) {
+    : ContainerNodeImpl(doc) {
   m_publicId = _publicId.implementation();
   if (m_publicId)
     m_publicId->ref();
@@ -153,13 +154,14 @@ DOMString EntityImpl::toString() const {
 
 // -------------------------------------------------------------------------
 
-EntityReferenceImpl::EntityReferenceImpl(DocumentPtr* doc) : NodeBaseImpl(doc) {
+EntityReferenceImpl::EntityReferenceImpl(DocumentPtr* doc)
+    : ContainerNodeImpl(doc) {
   m_entityName = 0;
 }
 
 EntityReferenceImpl::EntityReferenceImpl(DocumentPtr* doc,
                                          DOMStringImpl* _entityName)
-    : NodeBaseImpl(doc) {
+    : ContainerNodeImpl(doc) {
   m_entityName = _entityName;
   if (m_entityName)
     m_entityName->ref();
@@ -214,7 +216,7 @@ DOMString EntityReferenceImpl::toString() const {
 
 // -------------------------------------------------------------------------
 
-NotationImpl::NotationImpl(DocumentPtr* doc) : NodeBaseImpl(doc) {
+NotationImpl::NotationImpl(DocumentPtr* doc) : ContainerNodeImpl(doc) {
   m_publicId = 0;
   m_systemId = 0;
   m_name = 0;
@@ -224,7 +226,7 @@ NotationImpl::NotationImpl(DocumentPtr* doc,
                            DOMString _name,
                            DOMString _publicId,
                            DOMString _systemId)
-    : NodeBaseImpl(doc) {
+    : ContainerNodeImpl(doc) {
   m_name = _name.implementation();
   if (m_name)
     m_name->ref();
@@ -279,7 +281,7 @@ bool NotationImpl::childTypeAllowed(unsigned short /*type*/) {
 // change or are added/removed
 
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc)
-    : NodeBaseImpl(doc) {
+    : ContainerNodeImpl(doc) {
   m_target = 0;
   m_data = 0;
   m_localHref = 0;
@@ -294,7 +296,7 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc)
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc,
                                                      DOMString _target,
                                                      DOMString _data)
-    : NodeBaseImpl(doc) {
+    : ContainerNodeImpl(doc) {
   m_target = _target.implementation();
   if (m_target)
     m_target->ref();

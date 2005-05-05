@@ -543,11 +543,10 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   // 3 bits unused
 };
 
-// this is the full Node Implementation with parents and children.
-class NodeBaseImpl : public NodeImpl {
+class ContainerNodeImpl : public NodeImpl {
  public:
-  NodeBaseImpl(DocumentPtr* doc);
-  virtual ~NodeBaseImpl();
+  ContainerNodeImpl(DocumentPtr* doc);
+  virtual ~ContainerNodeImpl();
 
   // DOM methods overridden from  parent classes
   virtual NodeImpl* firstChild() const;
@@ -586,9 +585,6 @@ class NodeBaseImpl : public NodeImpl {
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
-
-  // check for being (grand-..)father:
-  bool checkNoOwner(NodeImpl* other, int& exceptioncode);
 
   // protected:
   NodeImpl* _first;

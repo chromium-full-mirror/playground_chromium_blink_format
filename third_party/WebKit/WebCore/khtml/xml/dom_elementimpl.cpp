@@ -60,7 +60,7 @@ void AttributeImpl::allocateImpl(ElementImpl* e) {
 }
 
 AttrImpl::AttrImpl(ElementImpl* element, DocumentPtr* docPtr, AttributeImpl* a)
-    : NodeBaseImpl(docPtr), m_element(element), m_attribute(a) {
+    : ContainerNodeImpl(docPtr), m_element(element), m_attribute(a) {
   assert(!m_attribute->_impl);
   m_attribute->_impl = this;
   m_attribute->ref();
@@ -175,7 +175,7 @@ DOMString AttrImpl::toString() const {
 
 // -------------------------------------------------------------------------
 
-ElementImpl::ElementImpl(DocumentPtr* doc) : NodeBaseImpl(doc) {
+ElementImpl::ElementImpl(DocumentPtr* doc) : ContainerNodeImpl(doc) {
   namedAttrMap = 0;
   m_prefix = 0;
 }
@@ -370,7 +370,7 @@ RenderObject* ElementImpl::createRenderer(RenderArena* arena,
 void ElementImpl::insertedIntoDocument() {
   // need to do superclass processing first so inDocument() is true
   // by the time we reach updateId
-  NodeBaseImpl::insertedIntoDocument();
+  ContainerNodeImpl::insertedIntoDocument();
 
   if (hasID()) {
     NamedAttrMapImpl* attrs = attributes(true);
@@ -394,14 +394,14 @@ void ElementImpl::removedFromDocument() {
     }
   }
 
-  NodeBaseImpl::removedFromDocument();
+  ContainerNodeImpl::removedFromDocument();
 }
 
 void ElementImpl::attach() {
 #if SPEED_DEBUG < 1
   createRendererIfNeeded();
 #endif
-  NodeBaseImpl::attach();
+  ContainerNodeImpl::attach();
 }
 
 void ElementImpl::recalcStyle(StyleChange change) {
@@ -605,7 +605,7 @@ void ElementImpl::dump(QTextStream* stream, QString ind) const {
     }
   }
 
-  NodeBaseImpl::dump(stream, ind);
+  ContainerNodeImpl::dump(stream, ind);
 }
 #endif
 
