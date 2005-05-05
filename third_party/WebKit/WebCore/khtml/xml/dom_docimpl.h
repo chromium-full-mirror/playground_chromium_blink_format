@@ -718,6 +718,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool m_docChanged;
   bool m_styleSelectorDirty;
   bool m_inStyleRecalc;
+  bool m_closeAfterStyleRecalc;
   bool m_usesDescendantRules;
   bool m_usesSiblingRules;
 
