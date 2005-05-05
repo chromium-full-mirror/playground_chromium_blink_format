@@ -38,11 +38,9 @@ class RootObject;
 typedef RootObject* (*FindRootObjectForNativeHandleFunctionPtr)(void*);
 
 extern CFMutableDictionaryRef findReferenceDictionary(ObjectImp* imp);
-extern const Bindings::RootObject* rootForImp(ObjectImp* imp);
-extern const Bindings::RootObject* KJS::Bindings::rootForInterpreter(
-    KJS::Interpreter* interpreter);
-extern void addNativeReference(const Bindings::RootObject* root,
-                               ObjectImp* imp);
+extern const RootObject* rootForImp(ObjectImp* imp);
+extern const RootObject* rootForInterpreter(Interpreter* interpreter);
+extern void addNativeReference(const RootObject* root, ObjectImp* imp);
 extern void removeNativeReference(ObjectImp* imp);
 
 class RootObject {
@@ -60,7 +58,7 @@ class RootObject {
 #endif
   }
 
-  void setRootObjectImp(KJS::ObjectImp* i) {
+  void setRootObjectImp(ObjectImp* i) {
     _imp = i;
 #if !USE_CONSERVATIVE_GC
     _imp->ref();
@@ -71,10 +69,10 @@ class RootObject {
 #endif
   }
 
-  KJS::ObjectImp* rootObjectImp() const { return _imp; }
+  ObjectImp* rootObjectImp() const { return _imp; }
 
-  void setInterpreter(KJS::Interpreter* i);
-  KJS::Interpreter* interpreter() const { return _interpreter; }
+  void setInterpreter(Interpreter* i);
+  Interpreter* interpreter() const { return _interpreter; }
 
   void removeAllNativeReferences();
 
@@ -97,8 +95,8 @@ class RootObject {
 
  private:
   const void* _nativeHandle;
-  KJS::ObjectImp* _imp;
-  KJS::Interpreter* _interpreter;
+  ObjectImp* _imp;
+  Interpreter* _interpreter;
 
   static FindRootObjectForNativeHandleFunctionPtr
       _findRootObjectForNativeHandleFunctionPtr;
