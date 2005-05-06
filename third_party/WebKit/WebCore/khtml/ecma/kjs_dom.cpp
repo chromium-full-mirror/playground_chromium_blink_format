@@ -81,11 +81,11 @@ IMPLEMENT_PROTOTYPE(DOMNodeProto, DOMNodeProtoFunc)
 
 const ClassInfo DOMNode::info = {"Node", 0, &DOMNodeTable, 0};
 
-DOMNode::DOMNode(ExecState* exec, const DOM::Node& n)
-    : DOMObject(DOMNodeProto::self(exec)), node(n) {}
+DOMNode::DOMNode(ExecState* exec, const DOM::Node& n) : node(n) {
+  setPrototype(DOMNodeProto::self(exec));
+}
 
-DOMNode::DOMNode(const Object& proto, const DOM::Node& n)
-    : DOMObject(proto), node(n) {}
+DOMNode::DOMNode(const DOM::Node& n) : node(n) {}
 
 bool DOMNode::toBoolean(ExecState*) const {
   return !node.isNull();
@@ -849,11 +849,11 @@ DontDelete|ReadOnly
 @end
 */
 
-DOMDocument::DOMDocument(ExecState* exec, const DOM::Document& d)
-    : DOMNode(DOMDocumentProto::self(exec), d) {}
+DOMDocument::DOMDocument(ExecState* exec, const DOM::Document& d) : DOMNode(d) {
+  setPrototype(DOMDocumentProto::self(exec));
+}
 
-DOMDocument::DOMDocument(const Object& proto, const DOM::Document& d)
-    : DOMNode(proto, d) {}
+DOMDocument::DOMDocument(const DOM::Document& d) : DOMNode(d) {}
 
 DOMDocument::~DOMDocument() {
   ScriptInterpreter::forgetDOMObject(node.handle());
@@ -1109,11 +1109,11 @@ const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
   style		DOMElement::Style                           DontDelete|ReadOnly
 @end
 */
-DOMElement::DOMElement(ExecState* exec, const DOM::Element& e)
-    : DOMNode(DOMElementProto::self(exec), e) {}
+DOMElement::DOMElement(ExecState* exec, const DOM::Element& e) : DOMNode(e) {
+  setPrototype(DOMElementProto::self(exec));
+}
 
-DOMElement::DOMElement(const Object& proto, const DOM::Element& e)
-    : DOMNode(proto, e) {}
+DOMElement::DOMElement(const DOM::Element& e) : DOMNode(e) {}
 
 Value DOMElement::tryGet(ExecState* exec,
                          const Identifier& propertyName) const {
@@ -1271,7 +1271,9 @@ const ClassInfo DOMDOMImplementation::info = {"DOMImplementation", 0, 0, 0};
 
 DOMDOMImplementation::DOMDOMImplementation(ExecState* exec,
                                            const DOM::DOMImplementation& i)
-    : DOMObject(DOMDOMImplementationProto::self(exec)), implementation(i) {}
+    : implementation(i) {
+  setPrototype(DOMDOMImplementationProto::self(exec));
+}
 
 DOMDOMImplementation::~DOMDOMImplementation() {
   ScriptInterpreter::forgetDOMObject(implementation.handle());
@@ -1393,7 +1395,9 @@ IMPLEMENT_PROTOTYPE(DOMNamedNodeMapProto, DOMNamedNodeMapProtoFunc)
 const ClassInfo DOMNamedNodeMap::info = {"NamedNodeMap", 0, 0, 0};
 
 DOMNamedNodeMap::DOMNamedNodeMap(ExecState* exec, const DOM::NamedNodeMap& m)
-    : DOMObject(DOMNamedNodeMapProto::self(exec)), map(m) {}
+    : map(m) {
+  setPrototype(DOMNamedNodeMapProto::self(exec));
+}
 
 DOMNamedNodeMap::~DOMNamedNodeMap() {
   ScriptInterpreter::forgetDOMObject(map.handle());
@@ -1910,7 +1914,7 @@ Object KJS::getDOMExceptionConstructor(ExecState* exec) {
 DOMNamedNodesCollection::DOMNamedNodesCollection(
     ExecState*,
     const QValueList<DOM::Node>& nodes)
-    : DOMObject(), m_nodes(nodes) {
+    : m_nodes(nodes) {
   // Maybe we should ref (and deref in the dtor) the nodes, though ?
 }
 
@@ -1975,11 +1979,11 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMCharacterDataProto,
                                 DOMNodeProto)
 
 DOMCharacterData::DOMCharacterData(ExecState* exec, const DOM::CharacterData& d)
-    : DOMNode(DOMCharacterDataProto::self(exec), d) {}
+    : DOMNode(d) {
+  setPrototype(DOMCharacterDataProto::self(exec));
+}
 
-DOMCharacterData::DOMCharacterData(const Object& proto,
-                                   const DOM::CharacterData& d)
-    : DOMNode(proto, d) {}
+DOMCharacterData::DOMCharacterData(const DOM::CharacterData& d) : DOMNode(d) {}
 
 Value DOMCharacterData::tryGet(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
@@ -2071,8 +2075,9 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMTextProto,
                                 DOMTextProtoFunc,
                                 DOMCharacterDataProto)
 
-DOMText::DOMText(ExecState* exec, const DOM::Text& t)
-    : DOMCharacterData(DOMTextProto::self(exec), t) {}
+DOMText::DOMText(ExecState* exec, const DOM::Text& t) : DOMCharacterData(t) {
+  setPrototype(DOMTextProto::self(exec));
+}
 
 Value DOMText::tryGet(ExecState* exec, const Identifier& p) const {
   if (p == "")

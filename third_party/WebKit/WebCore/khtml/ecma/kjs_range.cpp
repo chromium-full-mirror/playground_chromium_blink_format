@@ -83,8 +83,9 @@ DEFINE_PROTOTYPE("DOMRange", DOMRangeProto)
 IMPLEMENT_PROTOFUNC(DOMRangeProtoFunc)
 IMPLEMENT_PROTOTYPE(DOMRangeProto, DOMRangeProtoFunc)
 
-DOMRange::DOMRange(ExecState* exec, DOM::Range r)
-    : DOMObject(DOMRangeProto::self(exec)), range(r) {}
+DOMRange::DOMRange(ExecState* exec, DOM::Range r) : range(r) {
+  setPrototype(DOMRangeProto::self(exec));
+}
 
 DOMRange::~DOMRange() {
   ScriptInterpreter::forgetDOMObject(range.handle());

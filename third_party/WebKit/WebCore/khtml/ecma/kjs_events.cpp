@@ -378,8 +378,9 @@ DEFINE_PROTOTYPE("DOMEvent", DOMEventProto)
 IMPLEMENT_PROTOFUNC(DOMEventProtoFunc)
 IMPLEMENT_PROTOTYPE(DOMEventProto, DOMEventProtoFunc)
 
-DOMEvent::DOMEvent(ExecState* exec, DOM::Event e)
-    : DOMObject(DOMEventProto::self(exec)), event(e), clipboard(0) {}
+DOMEvent::DOMEvent(ExecState* exec, DOM::Event e) : event(e), clipboard(0) {
+  setPrototype(DOMEventProto::self(exec));
+}
 
 DOMEvent::~DOMEvent() {
   ScriptInterpreter::forgetDOMObject(event.handle());
@@ -1099,8 +1100,9 @@ DEFINE_PROTOTYPE("Clipboard", ClipboardProto)
 IMPLEMENT_PROTOFUNC(ClipboardProtoFunc)
 IMPLEMENT_PROTOTYPE(ClipboardProto, ClipboardProtoFunc)
 
-Clipboard::Clipboard(ExecState* exec, DOM::ClipboardImpl* cb)
-    : DOMObject(ClipboardProto::self(exec)), clipboard(cb) {
+Clipboard::Clipboard(ExecState* exec, DOM::ClipboardImpl* cb) : clipboard(cb) {
+  setPrototype(ClipboardProto::self(exec));
+
   if (clipboard)
     clipboard->ref();
 }

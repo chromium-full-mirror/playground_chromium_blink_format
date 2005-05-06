@@ -4139,7 +4139,9 @@ IMPLEMENT_PROTOTYPE(HTMLCollectionProto, HTMLCollectionProtoFunc)
 const ClassInfo HTMLCollection::info = {"HTMLCollection", 0, 0, 0};
 
 HTMLCollection::HTMLCollection(ExecState* exec, const DOM::HTMLCollection& c)
-    : DOMObject(HTMLCollectionProto::self(exec)), collection(c) {}
+    : collection(c) {
+  setPrototype(HTMLCollectionProto::self(exec));
+}
 
 HTMLCollection::~HTMLCollection() {
   ScriptInterpreter::forgetDOMObject(collection.handle());

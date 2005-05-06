@@ -98,7 +98,9 @@ const ClassInfo DOMCSSStyleDeclaration::info = {
 
 DOMCSSStyleDeclaration::DOMCSSStyleDeclaration(ExecState* exec,
                                                DOM::CSSStyleDeclaration s)
-    : DOMObject(DOMCSSStyleDeclarationProto::self(exec)), styleDecl(s) {}
+    : styleDecl(s) {
+  setPrototype(DOMCSSStyleDeclarationProto::self(exec));
+}
 
 DOMCSSStyleDeclaration::~DOMCSSStyleDeclaration() {
   ScriptInterpreter::forgetDOMObject(styleDecl.handle());
@@ -446,8 +448,9 @@ DEFINE_PROTOTYPE("DOMMediaList", DOMMediaListProto)
 IMPLEMENT_PROTOFUNC(DOMMediaListProtoFunc)
 IMPLEMENT_PROTOTYPE(DOMMediaListProto, DOMMediaListProtoFunc)
 
-DOMMediaList::DOMMediaList(ExecState* exec, DOM::MediaList ml)
-    : DOMObject(DOMMediaListProto::self(exec)), mediaList(ml) {}
+DOMMediaList::DOMMediaList(ExecState* exec, DOM::MediaList ml) : mediaList(ml) {
+  setPrototype(DOMMediaListProto::self(exec));
+}
 
 DOMMediaList::~DOMMediaList() {
   ScriptInterpreter::forgetDOMObject(mediaList.handle());
@@ -531,7 +534,9 @@ IMPLEMENT_PROTOTYPE(DOMCSSStyleSheetProto,
                                                 // DOMStyleSheet gets a proto
 
 DOMCSSStyleSheet::DOMCSSStyleSheet(ExecState* exec, DOM::CSSStyleSheet ss)
-    : DOMStyleSheet(DOMCSSStyleSheetProto::self(exec), ss) {}
+    : DOMStyleSheet(ss) {
+  setPrototype(DOMCSSStyleSheetProto::self(exec));
+}
 
 DOMCSSStyleSheet::~DOMCSSStyleSheet() {}
 
@@ -1042,7 +1047,9 @@ IMPLEMENT_PROTOTYPE(DOMCSSPrimitiveValueProto, DOMCSSPrimitiveValueProtoFunc)
 
 DOMCSSPrimitiveValue::DOMCSSPrimitiveValue(ExecState* exec,
                                            DOM::CSSPrimitiveValue v)
-    : DOMCSSValue(DOMCSSPrimitiveValueProto::self(exec), v) {}
+    : DOMCSSValue(v) {
+  setPrototype(DOMCSSPrimitiveValueProto::self(exec));
+}
 
 Value DOMCSSPrimitiveValue::tryGet(ExecState* exec, const Identifier& p) const {
   if (p == "primitiveType")

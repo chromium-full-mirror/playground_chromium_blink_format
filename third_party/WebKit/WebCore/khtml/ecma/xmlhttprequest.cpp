@@ -252,8 +252,7 @@ void XMLHttpRequest::mark() {
 }
 
 XMLHttpRequest::XMLHttpRequest(ExecState* exec, const DOM::Document& d)
-    : DOMObject(XMLHttpRequestProto::self(exec)),
-      qObject(new XMLHttpRequestQObject(this)),
+    : qObject(new XMLHttpRequestQObject(this)),
       doc(static_cast<DOM::DocumentImpl*>(d.handle())),
       async(true),
       job(0),
@@ -262,7 +261,9 @@ XMLHttpRequest::XMLHttpRequest(ExecState* exec, const DOM::Document& d)
       onLoadListener(0),
       decoder(0),
       createdDocument(false),
-      aborted(false) {}
+      aborted(false) {
+  setPrototype(XMLHttpRequestProto::self(exec));
+}
 
 XMLHttpRequest::~XMLHttpRequest() {
   delete qObject;

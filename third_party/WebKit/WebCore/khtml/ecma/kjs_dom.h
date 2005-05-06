@@ -38,7 +38,7 @@ class DOMNode : public DOMObject {
   // Build a DOMNode
   DOMNode(ExecState* exec, const DOM::Node& n);
   // Constructor for inherited classes
-  DOMNode(const Object& proto, const DOM::Node& n);
+  DOMNode(const DOM::Node& n);
   virtual bool toBoolean(ExecState*) const;
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
@@ -187,7 +187,7 @@ class DOMDocument : public DOMNode {
   // Build a DOMDocument
   DOMDocument(ExecState* exec, const DOM::Document& d);
   // Constructor for inherited classes
-  DOMDocument(const Object& proto, const DOM::Document& d);
+  DOMDocument(const DOM::Document& d);
   ~DOMDocument();
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
@@ -257,7 +257,7 @@ class DOMElement : public DOMNode {
   // Build a DOMElement
   DOMElement(ExecState* exec, const DOM::Element& e);
   // Constructor for inherited classes
-  DOMElement(const Object& proto, const DOM::Element& e);
+  DOMElement(const DOM::Element& e);
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -385,7 +385,7 @@ class DOMEntity : public DOMNode {
 // Constructor for Node - constructor stuff not implemented yet
 class NodeConstructor : public DOMObject {
  public:
-  NodeConstructor(ExecState*) : DOMObject() {}
+  NodeConstructor(ExecState*) {}
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
@@ -396,7 +396,7 @@ class NodeConstructor : public DOMObject {
 // Constructor for DOMException - constructor stuff not implemented yet
 class DOMExceptionConstructor : public DOMObject {
  public:
-  DOMExceptionConstructor(ExecState*) : DOMObject() {}
+  DOMExceptionConstructor(ExecState*) {}
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
@@ -432,7 +432,7 @@ class DOMCharacterData : public DOMNode {
   // Build a DOMCharacterData
   DOMCharacterData(ExecState* exec, const DOM::CharacterData& d);
   // Constructor for inherited classes
-  DOMCharacterData(const Object& proto, const DOM::CharacterData& d);
+  DOMCharacterData(const DOM::CharacterData& d);
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState*, int token) const;
   virtual void tryPut(ExecState* exec,

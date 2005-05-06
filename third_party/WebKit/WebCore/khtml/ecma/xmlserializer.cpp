@@ -61,8 +61,9 @@ const ClassInfo XMLSerializer::info = {"XMLSerializer", 0, &XMLSerializerTable,
 @end
 */
 
-XMLSerializer::XMLSerializer(ExecState* exec)
-    : DOMObject(XMLSerializerProto::self(exec)) {}
+XMLSerializer::XMLSerializer(ExecState* exec) {
+  setPrototype(XMLSerializerProto::self(exec));
+}
 
 Value XMLSerializerProtoFunc::tryCall(ExecState* exec,
                                       Object& thisObj,
