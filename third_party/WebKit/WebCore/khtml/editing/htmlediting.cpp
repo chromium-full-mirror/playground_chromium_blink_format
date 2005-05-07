@@ -2159,7 +2159,8 @@ bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos = Position(node, node->childNodeCount()).upstream();
+  Position pos =
+      Position(node, node->childNodeCount()).upstream(DoNotStayInBlock);
   return RangeImpl::compareBoundaryPoints(node, 0, start.node(),
                                           start.offset()) >= 0 &&
          RangeImpl::compareBoundaryPoints(pos, end) <= 0;
@@ -2171,7 +2172,8 @@ bool ApplyStyleCommand::nodeFullyUnselected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos = Position(node, node->childNodeCount()).upstream();
+  Position pos =
+      Position(node, node->childNodeCount()).upstream(DoNotStayInBlock);
   bool isFullyBeforeStart = RangeImpl::compareBoundaryPoints(pos, start) < 0;
   bool isFullyAfterEnd =
       RangeImpl::compareBoundaryPoints(node, 0, end.node(), end.offset()) > 0;
@@ -2802,8 +2804,9 @@ void DeleteSelectionCommand::insertPlaceholderForAncestorBlockContent() {
   // surrounded by child blocks.
   //
   NodeImpl* upstreamBlock = m_upstreamStart.node()->enclosingBlockFlowElement();
-  NodeImpl* beforeUpstreamBlock =
-      m_upstreamStart.upstream().node()->enclosingBlockFlowElement();
+  NodeImpl* beforeUpstreamBlock = m_upstreamStart.upstream(DoNotStayInBlock)
+                                      .node()
+                                      ->enclosingBlockFlowElement();
 
   if (upstreamBlock != beforeUpstreamBlock &&
       beforeUpstreamBlock->isAncestor(upstreamBlock) &&
@@ -2811,7 +2814,9 @@ void DeleteSelectionCommand::insertPlaceholderForAncestorBlockContent() {
     NodeImpl* downstreamBlock =
         m_downstreamEnd.node()->enclosingBlockFlowElement();
     NodeImpl* afterDownstreamBlock =
-        m_downstreamEnd.downstream().node()->enclosingBlockFlowElement();
+        m_downstreamEnd.downstream(DoNotStayInBlock)
+            .node()
+            ->enclosingBlockFlowElement();
 
     if ((afterDownstreamBlock != downstreamBlock &&
          afterDownstreamBlock != upstreamBlock) ||
@@ -3898,7 +3903,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
   EAffinity affinity = selection.startAffinity();
   if (selection.isRange()) {
     deleteSelection(false, false);
-    pos = endingSelection().start().upstream();
+    pos = endingSelection().start().upstream(DoNotStayInBlock);
     affinity = endingSelection().startAffinity();
   }
 
@@ -4181,7 +4186,7 @@ void InsertTextCommand::insertSpace(TextImpl* textNode, unsigned long offset) {
     // By checking the character at the downstream position, we can
     // check if there is a rendered WS at the caret
     Position pos(textNode, offset);
-    Position downstream = pos.downstream();
+    Position downstream = pos.downstream(DoNotStayInBlock);
     if (downstream.offset() < (long)text.length() &&
         isCollapsibleWhitespace(text[downstream.offset()]))
       count--;  // leave this WS in
@@ -5178,7 +5183,7 @@ void ReplaceSelectionCommand::doApply() {
              isLastVisiblePositionInBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
     } else if (mergeStart && !isProbablyBlock(refNode)) {
-      Position pos = insertionPos.downstream();
+      Position pos = insertionPos.downstream(DoNotStayInBlock);
       insertNodeAtAndUpdateNodesInserted(refNode, pos.node(), pos.offset());
     } else {
       insertNodeAtAndUpdateNodesInserted(refNode, insertionPos.node(),
@@ -5240,7 +5245,8 @@ void ReplaceSelectionCommand::doApply() {
     removeLinePlaceholderIfNeeded(linePlaceholder);
 
     if (!m_lastNodeInserted) {
-      lastPositionToSelect = endingSelection().end().downstream();
+      lastPositionToSelect =
+          endingSelection().end().downstream(DoNotStayInBlock);
     } else {
       bool insertParagraph = false;
       if (startBlock == endBlock && !isProbablyBlock(m_lastTopNodeInserted)) {
@@ -5257,14 +5263,16 @@ void ReplaceSelectionCommand::doApply() {
       if (insertParagraph) {
         setEndingSelection(insertionPos, DOWNSTREAM);
         insertParagraphSeparator();
-        updateNodesInserted(endingSelection().end().downstream().node());
+        updateNodesInserted(
+            endingSelection().end().downstream(DoNotStayInBlock).node());
         // Select up to the paragraph separator that was added.
-        lastPositionToSelect = endingSelection().end().downstream();
+        lastPositionToSelect =
+            endingSelection().end().downstream(DoNotStayInBlock);
       } else {
         // Select up to the preexising paragraph separator.
         lastPositionToSelect =
             Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset())
-                .downstream();
+                .downstream(DoNotStayInBlock);
       }
     }
   } else {

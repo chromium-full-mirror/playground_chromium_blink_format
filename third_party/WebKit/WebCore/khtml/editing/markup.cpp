@@ -465,7 +465,7 @@ QString createMarkup(const RangeImpl* range,
     Position pos(endPosition(range));
     NodeImpl* block = pos.node()->enclosingBlockFlowElement();
     NodeImpl* upstreamBlock =
-        pos.upstream().node()->enclosingBlockFlowElement();
+        pos.upstream(DOM::DoNotStayInBlock).node()->enclosingBlockFlowElement();
     if (block != upstreamBlock) {
       markups.append(interchangeNewlineString);
     }
