@@ -390,6 +390,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool childAllowed(NodeImpl* newChild);
 
   virtual long maxOffset() const;
+  long maxDeepOffset() const;
   virtual long caretMinOffset() const;
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;

@@ -37,6 +37,10 @@ class Range;
 class RangeImpl;
 
 enum EStayInBlock { DoNotStayInBlock = false, StayInBlock = true };
+enum EUsingComposedCharacters {
+  NotUsingComposedCharacters = false,
+  UsingComposedCharacters = true
+};
 
 class Position {
  public:
@@ -57,6 +61,14 @@ class Position {
 
   ElementImpl* element() const;
   CSSComputedStyleDeclarationImpl* computedStyle() const;
+
+  // Move up or down the DOM by one position
+  Position previous(EUsingComposedCharacters usingComposedCharacters =
+                        NotUsingComposedCharacters) const;
+  Position next(EUsingComposedCharacters usingComposedCharacters =
+                    NotUsingComposedCharacters) const;
+  bool atStart() const;
+  bool atEnd() const;
 
   // FIXME: Make these non-member functions and put them somewhere in the
   // editing directory.
