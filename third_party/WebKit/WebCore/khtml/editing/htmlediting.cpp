@@ -73,7 +73,6 @@ using DOM::DOMStringImpl;
 using DOM::DoNotUpdateLayout;
 using DOM::EditingTextImpl;
 using DOM::ElementImpl;
-using DOM::EStayInBlock;
 using DOM::HTMLElementImpl;
 using DOM::HTMLImageElementImpl;
 using DOM::NamedAttrMapImpl;
@@ -83,7 +82,6 @@ using DOM::NodeListImpl;
 using DOM::Position;
 using DOM::Range;
 using DOM::RangeImpl;
-using DOM::StayInBlock;
 using DOM::TextImpl;
 using DOM::TreeWalkerImpl;
 
@@ -1072,7 +1070,7 @@ void CompositeEditCommand::deleteInsignificantTextDownstream(
   Position end = VisiblePosition(pos, VP_DEFAULT_AFFINITY)
                      .next()
                      .deepEquivalent()
-                     .downstream(StayInBlock);
+                     .downstream();
   deleteInsignificantText(pos, end);
 }
 
@@ -1161,10 +1159,8 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   VisiblePosition visibleParagraphStart(startOfParagraph(visiblePos));
   VisiblePosition visibleParagraphEnd(
       endOfParagraph(visiblePos, IncludeLineBreak));
-  Position paragraphStart =
-      visibleParagraphStart.deepEquivalent().upstream(StayInBlock);
-  Position paragraphEnd =
-      visibleParagraphEnd.deepEquivalent().upstream(StayInBlock);
+  Position paragraphStart = visibleParagraphStart.deepEquivalent().upstream();
+  Position paragraphEnd = visibleParagraphEnd.deepEquivalent().upstream();
 
   // Perform some checks to see if we need to perform work in this function.
   if (paragraphStart.node()->isBlockFlow()) {
@@ -1216,7 +1212,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   } else if (paragraphStart.node()->id() == ID_BR) {
     insertNodeAfter(newBlock, paragraphStart.node());
   } else {
-    insertNodeBefore(newBlock, paragraphStart.upstream(StayInBlock).node());
+    insertNodeBefore(newBlock, paragraphStart.upstream().node());
   }
 
   while (moveNode && !moveNode->isBlockFlow()) {
@@ -1573,8 +1569,8 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
 
   // Adjust to the positions we want to use for applying style.
   Selection selection = endingSelection();
-  Position start(selection.start().downstream(StayInBlock));
-  Position end(selection.end().upstream(StayInBlock));
+  Position start(selection.start().downstream());
+  Position end(selection.end().upstream());
   if (RangeImpl::compareBoundaryPoints(end, start) < 0) {
     Position swap = start;
     start = end;
@@ -1610,8 +1606,8 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
 
   NodeImpl* beyondEnd =
       end.node()->traverseNextNode();  // Calculate loop end point.
-  start = start.upstream(
-      StayInBlock);  // Move upstream to ensure we do not add redundant spans.
+  start = start.upstream();  // Move upstream to ensure we do not add redundant
+                             // spans.
   NodeImpl* startNode = start.node();
   if (startNode->isTextNode() &&
       start.offset() >= startNode->caretMaxOffset())  // Move out of text node
@@ -1688,9 +1684,9 @@ void ApplyStyleCommand::applyInlineStyle(
   // adjust to the positions we want to use for applying style
   Position start(endingSelection()
                      .start()
-                     .downstream(StayInBlock)
+                     .downstream()
                      .equivalentRangeCompliantPosition());
-  Position end(endingSelection().end().upstream(StayInBlock));
+  Position end(endingSelection().end().upstream());
 
   if (RangeImpl::compareBoundaryPoints(end, start) < 0) {
     Position swap = start;
@@ -1723,7 +1719,7 @@ void ApplyStyleCommand::applyInlineStyle(
   // selection
   // and prevent us from adding redundant ones, as described in:
   // <rdar://problem/3724344> Bolding and unbolding creates extraneous tags
-  removeInlineStyle(style, start.upstream(StayInBlock), end);
+  removeInlineStyle(style, start.upstream(), end);
   start = endingSelection().start();
   end = endingSelection().end();
 
@@ -2086,8 +2082,7 @@ void ApplyStyleCommand::removeInlineStyle(CSSMutableStyleDeclarationImpl* style,
       style->getPropertyCSSValue(CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT);
 
   if (textDecorationSpecialProperty) {
-    pushDownTextDecorationStyleAtBoundaries(start.downstream(StayInBlock),
-                                            end.upstream(StayInBlock));
+    pushDownTextDecorationStyleAtBoundaries(start.downstream(), end.upstream());
     style = style->copy();
     style->setProperty(
         CSS_PROP_TEXT_DECORATION, textDecorationSpecialProperty->cssText(),
@@ -2151,7 +2146,7 @@ bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos = Position(node, node->childNodeCount()).upstream(StayInBlock);
+  Position pos = Position(node, node->childNodeCount()).upstream();
   return RangeImpl::compareBoundaryPoints(node, 0, start.node(),
                                           start.offset()) >= 0 &&
          RangeImpl::compareBoundaryPoints(pos, end) <= 0;
@@ -2163,7 +2158,7 @@ bool ApplyStyleCommand::nodeFullyUnselected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos = Position(node, node->childNodeCount()).upstream(StayInBlock);
+  Position pos = Position(node, node->childNodeCount()).upstream();
   bool isFullyBeforeStart = RangeImpl::compareBoundaryPoints(pos, start) < 0;
   bool isFullyAfterEnd =
       RangeImpl::compareBoundaryPoints(node, 0, end.node(), end.offset()) > 0;
@@ -2666,14 +2661,13 @@ void DeleteSelectionCommand::initializePositionData() {
   Position end = m_selectionToDelete.end();
   end = positionOutsideContainingSpecialElement(end);
 
-  m_upstreamStart = positionBeforePossibleContainingSpecialElement(
-      start.upstream(StayInBlock));
-  m_downstreamStart = positionBeforePossibleContainingSpecialElement(
-      start.downstream(StayInBlock));
-  m_upstreamEnd =
-      positionAfterPossibleContainingSpecialElement(end.upstream(StayInBlock));
-  m_downstreamEnd = positionAfterPossibleContainingSpecialElement(
-      end.downstream(StayInBlock));
+  m_upstreamStart =
+      positionBeforePossibleContainingSpecialElement(start.upstream());
+  m_downstreamStart =
+      positionBeforePossibleContainingSpecialElement(start.downstream());
+  m_upstreamEnd = positionAfterPossibleContainingSpecialElement(end.upstream());
+  m_downstreamEnd =
+      positionAfterPossibleContainingSpecialElement(end.downstream());
 
   //
   // Handle leading and trailing whitespace, as well as smart delete adjustments
@@ -2710,8 +2704,8 @@ void DeleteSelectionCommand::initializePositionData() {
       pos = visiblePos.deepEquivalent();
       // Expand out one character upstream for smart delete and recalculate
       // positions based on this change.
-      m_upstreamStart = pos.upstream(StayInBlock);
-      m_downstreamStart = pos.downstream(StayInBlock);
+      m_upstreamStart = pos.upstream();
+      m_downstreamStart = pos.downstream();
       m_leadingWhitespace =
           m_upstreamStart.leadingWhitespacePosition(visiblePos.affinity());
     }
@@ -2728,8 +2722,8 @@ void DeleteSelectionCommand::initializePositionData() {
       pos = VisiblePosition(end, m_selectionToDelete.endAffinity())
                 .next()
                 .deepEquivalent();
-      m_upstreamEnd = pos.upstream(StayInBlock);
-      m_downstreamEnd = pos.downstream(StayInBlock);
+      m_upstreamEnd = pos.upstream();
+      m_downstreamEnd = pos.downstream();
       m_trailingWhitespace =
           m_downstreamEnd.trailingWhitespacePosition(VP_DEFAULT_AFFINITY);
     }
@@ -3063,7 +3057,7 @@ void DeleteSelectionCommand::fixupWhitespace() {
                           nonBreakingSpaceString());
       }
     } else {
-      Position pos = m_endingPosition.downstream(StayInBlock);
+      Position pos = m_endingPosition.downstream();
       pos = Position(pos.node(), pos.offset() - 1);
       if (nextCharacterIsCollapsibleWhitespace(pos) &&
           !pos.isRenderedCharacter()) {
@@ -3412,7 +3406,7 @@ void InsertLineBreakCommand::insertNodeAfterPosition(NodeImpl* node,
   // Insert the BR after the caret position. In the case the
   // position is a block, do an append. We don't want to insert
   // the BR *after* the block.
-  Position upstream(pos.upstream(StayInBlock));
+  Position upstream(pos.upstream());
   NodeImpl* cb = pos.node()->enclosingBlockFlowElement();
   if (cb == pos.node())
     appendNode(node, cb);
@@ -3425,7 +3419,7 @@ void InsertLineBreakCommand::insertNodeBeforePosition(NodeImpl* node,
   // Insert the BR after the caret position. In the case the
   // position is a block, do an append. We don't want to insert
   // the BR *before* the block.
-  Position upstream(pos.upstream(StayInBlock));
+  Position upstream(pos.upstream());
   NodeImpl* cb = pos.node()->enclosingBlockFlowElement();
   if (cb == pos.node())
     appendNode(node, cb);
@@ -3440,7 +3434,7 @@ void InsertLineBreakCommand::doApply() {
   ElementImpl* breakNode = createBreakElement(document());
   NodeImpl* nodeToInsert = breakNode;
 
-  Position pos(selection.start().upstream(StayInBlock));
+  Position pos(selection.start().upstream());
 
   pos = positionOutsideContainingSpecialElement(pos);
 
@@ -3480,14 +3474,14 @@ void InsertLineBreakCommand::doApply() {
   } else if (atStart) {
     LOG(Editing, "input newline case 2");
     // Insert node before downstream position, and place caret there as well.
-    Position endingPosition = pos.downstream(StayInBlock);
+    Position endingPosition = pos.downstream();
     insertNodeBeforePosition(nodeToInsert, endingPosition);
     setEndingSelection(endingPosition, DOWNSTREAM);
   } else if (atEnd) {
     LOG(Editing, "input newline case 3");
     // Insert BR after this node. Place caret in the position that is downstream
     // of the current position, reckoned before inserting the BR in between.
-    Position endingPosition = pos.downstream(StayInBlock);
+    Position endingPosition = pos.downstream();
     insertNodeAfterPosition(nodeToInsert, pos);
     setEndingSelection(endingPosition, DOWNSTREAM);
   } else {
@@ -3717,7 +3711,7 @@ void InsertParagraphSeparatorCommand::doApply() {
 
   if (prevInDifferentBlock || isFirstInBlock) {
     LOG(Editing, "insert paragraph separator: first in block case");
-    pos = pos.downstream(StayInBlock);
+    pos = pos.downstream();
     pos = positionOutsideContainingSpecialElement(pos);
     Position refPos;
     NodeImpl* refNode;
@@ -3749,14 +3743,14 @@ void InsertParagraphSeparatorCommand::doApply() {
   // then this <br> will collapse away when we add a block after it. Add an
   // extra <br>.
   if (!document()->inStrictMode()) {
-    Position upstreamPos = pos.upstream(StayInBlock);
+    Position upstreamPos = pos.upstream();
     if (upstreamPos.node()->id() == ID_BR)
       insertNodeAfter(createBreakElement(document()), upstreamPos.node());
   }
 
   // Move downstream. Typing style code will take care of carrying along the
   // style of the upstream position.
-  pos = pos.downstream(StayInBlock);
+  pos = pos.downstream();
   startNode = pos.node();
 
   // Build up list of ancestors in between the start node and the start block.
@@ -3767,8 +3761,7 @@ void InsertParagraphSeparatorCommand::doApply() {
   }
 
   // Make sure we do not cause a rendered space to become unrendered.
-  // FIXME: We need the affinity for pos, but pos.downstream(StayInBlock) does
-  // not give it
+  // FIXME: We need the affinity for pos, but pos.downstream() does not give it
   Position leadingWhitespace =
       pos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY);
   if (leadingWhitespace.isNotNull()) {
@@ -3885,7 +3878,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
   EAffinity affinity = selection.startAffinity();
   if (selection.isRange()) {
     deleteSelection(false, false);
-    pos = endingSelection().start().upstream(StayInBlock);
+    pos = endingSelection().start().upstream();
     affinity = endingSelection().startAffinity();
   }
 
@@ -4025,9 +4018,9 @@ Position InsertTextCommand::prepareForTextInsertion(bool adjustDownstream) {
 
   Position pos = selection.start();
   if (adjustDownstream)
-    pos = pos.downstream(StayInBlock);
+    pos = pos.downstream();
   else
-    pos = pos.upstream(StayInBlock);
+    pos = pos.upstream();
 
   Selection typingStyleRange;
 
@@ -4061,7 +4054,7 @@ void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
 
   Selection selection = endingSelection();
   bool adjustDownstream = isFirstVisiblePositionOnLine(
-      VisiblePosition(selection.start().downstream(StayInBlock), DOWNSTREAM));
+      VisiblePosition(selection.start().downstream(), DOWNSTREAM));
 
   // Delete the current selection, or collapse whitespace, as needed
   if (selection.isRange())
@@ -4168,7 +4161,7 @@ void InsertTextCommand::insertSpace(TextImpl* textNode, unsigned long offset) {
     // By checking the character at the downstream position, we can
     // check if there is a rendered WS at the caret
     Position pos(textNode, offset);
-    Position downstream = pos.downstream(StayInBlock);
+    Position downstream = pos.downstream();
     if (downstream.offset() < (long)text.length() &&
         isCollapsibleWhitespace(text[downstream.offset()]))
       count--;  // leave this WS in
@@ -4992,7 +4985,7 @@ void ReplaceSelectionCommand::doApply() {
   NodeImpl* beyondEndNode = 0;
   if (!isEndOfParagraph(visibleEnd) &&
       !m_fragment.hasInterchangeNewlineAtEnd()) {
-    Position beyondEndPos = selection.end().downstream(StayInBlock);
+    Position beyondEndPos = selection.end().downstream();
     if (!isFirstVisiblePositionInSpecialElement(beyondEndPos))
       beyondEndNode = beyondEndPos.node();
   }
@@ -5071,7 +5064,7 @@ void ReplaceSelectionCommand::doApply() {
   NodeImpl* block = startPos.node()->enclosingBlockFlowElement();
   NodeImpl* linePlaceholder = findBlockPlaceholder(block);
   if (!linePlaceholder) {
-    Position downstream = startPos.downstream(StayInBlock);
+    Position downstream = startPos.downstream();
     downstream = positionOutsideContainingSpecialElement(downstream);
     if (downstream.node()->id() == ID_BR && downstream.offset() == 0 &&
         m_fragment.hasInterchangeNewlineAtEnd() &&
@@ -5165,7 +5158,7 @@ void ReplaceSelectionCommand::doApply() {
              isLastVisiblePositionInBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
     } else if (mergeStart && !isProbablyBlock(refNode)) {
-      Position pos = visiblePos.next().deepEquivalent().downstream(StayInBlock);
+      Position pos = visiblePos.next().deepEquivalent().downstream();
       insertNodeAtAndUpdateNodesInserted(refNode, pos.node(), pos.offset());
     } else {
       insertNodeAtAndUpdateNodesInserted(refNode, insertionPos.node(),
@@ -5227,7 +5220,7 @@ void ReplaceSelectionCommand::doApply() {
     removeLinePlaceholderIfNeeded(linePlaceholder);
 
     if (!m_lastNodeInserted) {
-      lastPositionToSelect = endingSelection().end().downstream(StayInBlock);
+      lastPositionToSelect = endingSelection().end().downstream();
     } else {
       bool insertParagraph = false;
       VisiblePosition pos(insertionPos, VP_DEFAULT_AFFINITY);
@@ -5246,12 +5239,12 @@ void ReplaceSelectionCommand::doApply() {
         VisiblePosition next = pos.next();
 
         // Select up to the paragraph separator that was added.
-        lastPositionToSelect = next.deepEquivalent().downstream(StayInBlock);
+        lastPositionToSelect = next.deepEquivalent().downstream();
         updateNodesInserted(lastPositionToSelect.node());
       } else {
         // Select up to the preexising paragraph separator.
         VisiblePosition next = pos.next();
-        lastPositionToSelect = next.deepEquivalent().downstream(StayInBlock);
+        lastPositionToSelect = next.deepEquivalent().downstream();
       }
     }
   } else {

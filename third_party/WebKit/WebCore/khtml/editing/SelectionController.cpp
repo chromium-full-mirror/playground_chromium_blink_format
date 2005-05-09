@@ -60,7 +60,6 @@ using DOM::NodeImpl;
 using DOM::Position;
 using DOM::Range;
 using DOM::RangeImpl;
-using DOM::StayInBlock;
 
 namespace khtml {
 
@@ -626,7 +625,7 @@ Range Selection::toRange() const {
     // the conventions of text editors tested, which make style determinations
     // based
     // on the character before the caret, if any.
-    s = m_start.upstream(StayInBlock).equivalentRangeCompliantPosition();
+    s = m_start.upstream().equivalentRangeCompliantPosition();
     e = s;
   } else {
     // If the selection is a range, select the minimum range that encompasses
@@ -646,8 +645,8 @@ Range Selection::toRange() const {
     //                       ^ selected
     //
     ASSERT(isRange());
-    s = m_start.downstream(StayInBlock);
-    e = m_end.upstream(StayInBlock);
+    s = m_start.downstream();
+    e = m_end.upstream();
     if (RangeImpl::compareBoundaryPoints(s.node(), s.offset(), e.node(),
                                          e.offset()) > 0) {
       // Make sure the start is before the end.
@@ -948,8 +947,7 @@ void Selection::validate(ETextGranularity granularity) {
   if (m_start.isNull()) {
     ASSERT(m_end.isNull());
     m_state = NONE;
-  } else if (m_start == m_end ||
-             m_start.upstream(StayInBlock) == m_end.upstream(StayInBlock)) {
+  } else if (m_start == m_end || m_start.upstream() == m_end.upstream()) {
     m_state = CARET;
   } else {
     m_state = RANGE;
@@ -959,8 +957,8 @@ void Selection::validate(ETextGranularity granularity) {
     // purposes of comparing selections). This is an ideal point of the code
     // to do this operation, since all selection changes that result in a RANGE
     // come through here before anyone uses it.
-    m_start = m_start.downstream(StayInBlock);
-    m_end = m_end.upstream(StayInBlock);
+    m_start = m_start.downstream();
+    m_end = m_end.upstream();
   }
 
   m_needsLayout = true;

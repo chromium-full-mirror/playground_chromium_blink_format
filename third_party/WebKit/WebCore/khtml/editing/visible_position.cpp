@@ -48,7 +48,6 @@ using DOM::UsingComposedCharacters;
 using DOM::Position;
 using DOM::Range;
 using DOM::RangeImpl;
-using DOM::StayInBlock;
 using DOM::TextImpl;
 
 namespace khtml {
@@ -189,15 +188,14 @@ Position VisiblePosition::previousVisiblePosition(const Position& pos) {
     return Position();
 
   Position test = deepEquivalent(pos);
-  Position downstreamTest = test.downstream(StayInBlock);
+  Position downstreamTest = test.downstream();
   bool acceptAnyVisiblePosition = !isCandidate(test);
 
   Position current = test;
   while (!current.atStart()) {
     current = current.previous(UsingComposedCharacters);
-    if (isCandidate(current) &&
-        (acceptAnyVisiblePosition ||
-         (downstreamTest != current.downstream(StayInBlock)))) {
+    if (isCandidate(current) && (acceptAnyVisiblePosition ||
+                                 (downstreamTest != current.downstream()))) {
       return current;
     }
   }
@@ -213,12 +211,11 @@ Position VisiblePosition::nextVisiblePosition(const Position& pos) {
   bool acceptAnyVisiblePosition = !isCandidate(test);
 
   Position current = test;
-  Position downstreamTest = test.downstream(StayInBlock);
+  Position downstreamTest = test.downstream();
   while (!current.atEnd()) {
     current = current.next(UsingComposedCharacters);
-    if (isCandidate(current) &&
-        (acceptAnyVisiblePosition ||
-         (downstreamTest != current.downstream(StayInBlock)))) {
+    if (isCandidate(current) && (acceptAnyVisiblePosition ||
+                                 (downstreamTest != current.downstream()))) {
       return current;
     }
   }
@@ -314,13 +311,13 @@ Position VisiblePosition::downstreamDeepEquivalent() const {
   if (pos.isNull() || pos.atEnd())
     return pos;
 
-  Position downstreamTest = pos.downstream(StayInBlock);
+  Position downstreamTest = pos.downstream();
 
   Position current = pos;
   while (!current.atEnd()) {
     current = current.next(UsingComposedCharacters);
     if (isCandidate(current)) {
-      if (downstreamTest != current.downstream(StayInBlock))
+      if (downstreamTest != current.downstream())
         break;
       pos = current;
     }
@@ -538,7 +535,7 @@ bool isFirstVisiblePositionInParagraph(const VisiblePosition& pos) {
   if (pos.isNull())
     return false;
 
-  return pos.deepEquivalent().upstream(StayInBlock).node()->id() == ID_BR ||
+  return pos.deepEquivalent().upstream().node()->id() == ID_BR ||
          isFirstVisiblePositionInBlock(pos);
 }
 
@@ -546,7 +543,7 @@ bool isFirstVisiblePositionInBlock(const VisiblePosition& pos) {
   if (pos.isNull())
     return false;
 
-  Position upstream = pos.deepEquivalent().upstream(StayInBlock);
+  Position upstream = pos.deepEquivalent().upstream();
   return upstream.node()->isBlockFlow() && upstream.offset() == 0;
 }
 
@@ -572,7 +569,7 @@ bool isLastVisiblePositionInParagraph(const VisiblePosition& pos) {
   if (pos.isNull())
     return false;
 
-  return pos.deepEquivalent().downstream(StayInBlock).node()->id() == ID_BR ||
+  return pos.deepEquivalent().downstream().node()->id() == ID_BR ||
          isLastVisiblePositionInBlock(pos);
 }
 
