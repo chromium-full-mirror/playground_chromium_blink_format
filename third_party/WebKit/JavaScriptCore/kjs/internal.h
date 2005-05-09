@@ -124,6 +124,12 @@ class NumberImp : public ValueImp {
   friend class Value;
   friend class Number;
   friend class InterpreterImp;
+  friend ValueImp* number(int);
+  friend ValueImp* number(unsigned);
+  friend ValueImp* number(long);
+  friend ValueImp* number(unsigned long);
+  friend ValueImp* number(double);
+  friend ValueImp* number(double, bool);
 
  public:
   static ValueImp* create(int);

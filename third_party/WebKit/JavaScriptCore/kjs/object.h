@@ -90,7 +90,8 @@ struct ClassInfo {
 class Object : public Value {
  public:
   Object() {}
-  explicit Object(ObjectImp* v);
+  Object(ObjectImp*);
+  operator ObjectImp*() const { return imp(); }
 
   ObjectImp* imp() const;
 
@@ -640,6 +641,13 @@ enum ErrorType {
   URIError = 6
 };
 
+ObjectImp* error(ExecState* exec,
+                 ErrorType type = GeneralError,
+                 const char* message = 0,
+                 int lineno = -1,
+                 int sourceId = -1,
+                 const UString* sourceURL = 0);
+
 /**
  * @short Factory methods for error objects.
  */
@@ -667,10 +675,18 @@ class Error {
   static const char* const* const errorNames;
 };
 
-inline Object::Object(ObjectImp* v) : Value(v) {}
+inline bool ValueImp::isObject(const ClassInfo* info) const {
+  return isObject() && static_cast<const ObjectImp*>(this)->inherits(info);
+}
+
+inline ObjectImp* ValueImp::asObject() {
+  return isObject() ? static_cast<ObjectImp*>(this) : 0;
+}
+
+inline Object::Object(ObjectImp* o) : Value(o) {}
 
 inline ObjectImp* Object::imp() const {
-  return static_cast<ObjectImp*>(rep);
+  return static_cast<ObjectImp*>(Value::imp());
 }
 
 inline const ClassInfo* Object::classInfo() const {
@@ -793,6 +809,6 @@ inline void Object::restoreProperties(const SavedProperties& p) {
   imp()->restoreProperties(p);
 }
 
-};  // namespace
+}  // namespace
 
 #endif  // _KJS_OBJECT_H_

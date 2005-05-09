@@ -114,10 +114,6 @@ void* Collector::allocate(size_t s) {
     heap.usedOversizeCells++;
     heap.numLiveObjects = numLiveObjects + 1;
 
-#if !USE_CONSERVATIVE_GC
-    ((ValueImp*)(newCell))->_flags = 0;
-#endif
-
     return newCell;
   }
 
@@ -163,14 +159,8 @@ void* Collector::allocate(size_t s) {
   targetBlock->usedCells++;
   heap.numLiveObjects = numLiveObjects + 1;
 
-#if !USE_CONSERVATIVE_GC
-  ((ValueImp*)(newCell))->_flags = 0;
-#endif
-
   return newCell;
 }
-
-#if TEST_CONSERVATIVE_GC || USE_CONSERVATIVE_GC
 
 struct Collector::Thread {
   Thread(pthread_t pthread, mach_port_t mthread)
@@ -348,20 +338,11 @@ void Collector::markProtectedObjects() {
   }
 }
 
-#endif
-
 bool Collector::collect() {
   assert(Interpreter::lockCount() > 0);
 
   bool deleted = false;
 
-#if TEST_CONSERVATIVE_GC
-  // CONSERVATIVE MARK: mark the root set using conservative GC bit (will
-  // compare later)
-  ValueImp::useConservativeMark(true);
-#endif
-
-#if USE_CONSERVATIVE_GC || TEST_CONSERVATIVE_GC
   if (InterpreterImp::s_hook) {
     InterpreterImp* scr = InterpreterImp::s_hook;
     do {
@@ -370,63 +351,13 @@ bool Collector::collect() {
       scr = scr->next;
     } while (scr != InterpreterImp::s_hook);
   }
+
+  // MARK: first mark all referenced objects recursively starting out from the
+  // set of root objects
 
   markStackObjectsConservatively();
   markProtectedObjects();
   List::markProtectedLists();
-#endif
-
-#if TEST_CONSERVATIVE_GC
-  ValueImp::useConservativeMark(false);
-#endif
-
-#if !USE_CONSERVATIVE_GC
-  // MARK: first mark all referenced objects recursively
-  // starting out from the set of root objects
-  if (InterpreterImp::s_hook) {
-    InterpreterImp* scr = InterpreterImp::s_hook;
-    do {
-      // fprintf( stderr, "Collector marking interpreter %p\n",(void*)scr);
-      scr->mark();
-      scr = scr->next;
-    } while (scr != InterpreterImp::s_hook);
-  }
-
-  // mark any other objects that we wouldn't delete anyway
-  for (int block = 0; block < heap.usedBlocks; block++) {
-    int minimumCellsToProcess = heap.blocks[block]->usedCells;
-    CollectorBlock* curBlock = heap.blocks[block];
-
-    for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
-      if (minimumCellsToProcess < cell) {
-        goto skip_block_mark;
-      }
-
-      ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
-
-      if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0) {
-        if ((imp->_flags & (ValueImp::VI_CREATED | ValueImp::VI_MARKED)) ==
-                ValueImp::VI_CREATED &&
-            ((imp->_flags & ValueImp::VI_GCALLOWED) == 0 ||
-             imp->refcount != 0)) {
-          imp->mark();
-        }
-      } else {
-        minimumCellsToProcess++;
-      }
-    }
-  skip_block_mark:;
-  }
-
-  for (int cell = 0; cell < heap.usedOversizeCells; cell++) {
-    ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
-    if ((imp->_flags & (ValueImp::VI_CREATED | ValueImp::VI_MARKED)) ==
-            ValueImp::VI_CREATED &&
-        ((imp->_flags & ValueImp::VI_GCALLOWED) == 0 || imp->refcount != 0)) {
-      imp->mark();
-    }
-  }
-#endif
 
   // SWEEP: delete everything with a zero refcount (garbage) and unmark
   // everything else
@@ -448,13 +379,7 @@ bool Collector::collect() {
       ValueImp* imp = reinterpret_cast<ValueImp*>(cell);
 
       if (cell->u.freeCell.zeroIfFree != 0) {
-#if USE_CONSERVATIVE_GC
-        if (!imp->_marked)
-#else
-        if (!imp->refcount &&
-            imp->_flags == (ValueImp::VI_GCALLOWED | ValueImp::VI_CREATED))
-#endif
-        {
+        if (!imp->_marked) {
           // fprintf( stderr, "Collector::deleting ValueImp %p (%s)\n",
           // (void*)imp, typeid(*imp).name());
           // emulate destructing part of 'operator delete()'
@@ -470,14 +395,7 @@ bool Collector::collect() {
           curBlock->freeList = cell;
 
         } else {
-#if USE_CONSERVATIVE_GC
-          imp->_marked = 0;
-#elif TEST_CONSERVATIVE_GC
-          imp->_flags &=
-              ~(ValueImp::VI_MARKED | ValueImp::VI_CONSERVATIVE_MARKED);
-#else
-          imp->_flags &= ~ValueImp::VI_MARKED;
-#endif
+          imp->_marked = false;
         }
       } else {
         minimumCellsToProcess++;
@@ -515,13 +433,7 @@ bool Collector::collect() {
   while (cell < heap.usedOversizeCells) {
     ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
 
-#if USE_CONSERVATIVE_GC
     if (!imp->_marked) {
-#else
-    if (!imp->refcount &&
-        imp->_flags == (ValueImp::VI_GCALLOWED | ValueImp::VI_CREATED)) {
-#endif
-
       imp->~ValueImp();
 #if DEBUG_COLLECTOR
       heap.oversizeCells[cell]->u.freeCell.zeroIfFree = 0;
@@ -544,13 +456,7 @@ bool Collector::collect() {
       }
 
     } else {
-#if USE_CONSERVATIVE_GC
-      imp->_marked = 0;
-#elif TEST_CONSERVATIVE_GC
-      imp->_flags &= ~(ValueImp::VI_MARKED | ValueImp::VI_CONSERVATIVE_MARKED);
-#else
-    imp->_flags &= ~ValueImp::VI_MARKED;
-#endif
+      imp->_marked = false;
       cell++;
     }
   }
@@ -571,8 +477,6 @@ int Collector::size() {
 void Collector::finalCheck() {}
 #endif
 
-#if APPLE_CHANGES
-
 int Collector::numInterpreters() {
   int count = 0;
   if (InterpreterImp::s_hook) {
@@ -586,36 +490,12 @@ int Collector::numInterpreters() {
 }
 
 int Collector::numGCNotAllowedObjects() {
-  int count = 0;
-#if !USE_CONSERVATIVE_GC
-  for (int block = 0; block < heap.usedBlocks; block++) {
-    CollectorBlock* curBlock = heap.blocks[block];
-
-    for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
-      ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
-
-      if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0 &&
-          (imp->_flags & ValueImp::VI_GCALLOWED) == 0) {
-        ++count;
-      }
-    }
-  }
-
-  for (int cell = 0; cell < heap.usedOversizeCells; cell++) {
-    ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
-    if ((imp->_flags & ValueImp::VI_GCALLOWED) == 0) {
-      ++count;
-    }
-  }
-#endif
-
-  return count;
+  return 0;
 }
 
 int Collector::numReferencedObjects() {
   int count = 0;
 
-#if USE_CONSERVATIVE_GC
   int size = ProtectedValues::_tableSize;
   ProtectedValues::KeyValue* table = ProtectedValues::_table;
   for (int i = 0; i < size; i++) {
@@ -625,36 +505,14 @@ int Collector::numReferencedObjects() {
     }
   }
 
-#else
-
-  for (int block = 0; block < heap.usedBlocks; block++) {
-    CollectorBlock* curBlock = heap.blocks[block];
-
-    for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
-      ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
-
-      if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0 &&
-          imp->refcount != 0) {
-        ++count;
-      }
-    }
-  }
-
-  for (int cell = 0; cell < heap.usedOversizeCells; cell++) {
-    ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
-    if (imp->refcount != 0) {
-      ++count;
-    }
-  }
-#endif
-
   return count;
 }
+
+#if APPLE_CHANGES
 
 const void* Collector::rootObjectClasses() {
   CFMutableSetRef classes = CFSetCreateMutable(NULL, 0, &kCFTypeSetCallBacks);
 
-#if USE_CONSERVATIVE_GC
   int size = ProtectedValues::_tableSize;
   ProtectedValues::KeyValue* table = ProtectedValues::_table;
   for (int i = 0; i < size; i++) {
@@ -672,45 +530,6 @@ const void* Collector::rootObjectClasses() {
       CFRelease(className);
     }
   }
-#else
-  for (int block = 0; block < heap.usedBlocks; block++) {
-    CollectorBlock* curBlock = heap.blocks[block];
-    for (int cell = 0; cell < CELLS_PER_BLOCK; cell++) {
-      ValueImp* imp = (ValueImp*)(curBlock->cells + cell);
-
-      if (((CollectorCell*)imp)->u.freeCell.zeroIfFree != 0 &&
-          ((imp->_flags & ValueImp::VI_GCALLOWED) == 0 || imp->refcount != 0)) {
-        const char* mangled_name = typeid(*imp).name();
-        int status;
-        char* demangled_name =
-            __cxxabiv1::__cxa_demangle(mangled_name, NULL, NULL, &status);
-
-        CFStringRef className = CFStringCreateWithCString(
-            NULL, demangled_name, kCFStringEncodingASCII);
-        free(demangled_name);
-        CFSetAddValue(classes, className);
-        CFRelease(className);
-      }
-    }
-  }
-
-  for (int cell = 0; cell < heap.usedOversizeCells; cell++) {
-    ValueImp* imp = (ValueImp*)heap.oversizeCells[cell];
-
-    if ((imp->_flags & ValueImp::VI_GCALLOWED) == 0 || imp->refcount != 0) {
-      const char* mangled_name = typeid(*imp).name();
-      int status;
-      char* demangled_name =
-          __cxxabiv1::__cxa_demangle(mangled_name, NULL, NULL, &status);
-
-      CFStringRef className = CFStringCreateWithCString(NULL, demangled_name,
-                                                        kCFStringEncodingASCII);
-      free(demangled_name);
-      CFSetAddValue(classes, className);
-      CFRelease(className);
-    }
-  }
-#endif
 
   return classes;
 }

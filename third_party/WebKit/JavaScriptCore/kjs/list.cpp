@@ -106,7 +106,6 @@ inline void ListImp::markValues() {
 }
 
 void List::markProtectedLists() {
-#if TEST_CONSERVATIVE_GC || USE_CONSERVATIVE_GC
   int seen = 0;
   for (int i = 0; i < poolSize; i++) {
     if (seen >= poolUsed)
@@ -125,7 +124,6 @@ void List::markProtectedLists() {
       l->markValues();
     }
   }
-#endif
 }
 
 static inline ListImp* allocateListImp() {
@@ -205,41 +203,6 @@ List::List(bool needsMarking)
 #endif
 }
 
-void List::derefValues() {
-#if !USE_CONSERVATIVE_GC
-  ListImp* imp = static_cast<ListImp*>(_impBase);
-
-  int size = imp->size;
-
-  int inlineSize = MIN(size, inlineValuesSize);
-  for (int i = 0; i != inlineSize; ++i)
-    imp->values[i]->deref();
-
-  int overflowSize = size - inlineSize;
-  ValueImp** overflow = imp->overflow;
-
-  for (int i = 0; i != overflowSize; ++i)
-    overflow[i]->deref();
-#endif
-}
-
-void List::refValues() {
-#if !USE_CONSERVATIVE_GC
-  ListImp* imp = static_cast<ListImp*>(_impBase);
-
-  int size = imp->size;
-
-  int inlineSize = MIN(size, inlineValuesSize);
-  for (int i = 0; i != inlineSize; ++i)
-    imp->values[i]->ref();
-
-  int overflowSize = size - inlineSize;
-  ValueImp** overflow = imp->overflow;
-  for (int i = 0; i != overflowSize; ++i)
-    overflow[i]->ref();
-#endif
-}
-
 void List::markValues() {
   static_cast<ListImp*>(_impBase)->markValues();
 }
@@ -269,9 +232,6 @@ ValueImp* List::impAt(int i) const {
 }
 
 void List::clear() {
-  if (_impBase->valueRefCount > 0) {
-    derefValues();
-  }
   _impBase->size = 0;
 }
 
@@ -284,12 +244,6 @@ void List::append(ValueImp* v) {
   if (imp->size > listSizeHighWaterMark)
     listSizeHighWaterMark = imp->size;
 #endif
-
-  if (imp->valueRefCount > 0) {
-#if !USE_CONSERVATIVE_GC
-    v->ref();
-#endif
-  }
 
   if (i < inlineValuesSize) {
     imp->values[i] = v;
