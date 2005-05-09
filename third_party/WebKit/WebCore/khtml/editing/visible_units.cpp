@@ -733,7 +733,8 @@ VisiblePosition endOfBlock(const VisiblePosition& c,
 }
 
 bool inSameBlock(const VisiblePosition& a, const VisiblePosition& b) {
-  return a.isNotNull() && startOfBlock(a) == startOfBlock(b);
+  return !a.isNull() &&
+         enclosingBlockFlowElement(a) == enclosingBlockFlowElement(b);
 }
 
 bool isStartOfBlock(const VisiblePosition& pos) {

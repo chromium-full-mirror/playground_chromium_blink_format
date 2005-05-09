@@ -452,6 +452,13 @@ void setAffinityUsingLinePosition(VisiblePosition& pos) {
   }
 }
 
+DOM::NodeImpl* enclosingBlockFlowElement(const VisiblePosition& vp) {
+  if (vp.isNull())
+    return NULL;
+
+  return vp.position().node()->enclosingBlockFlowElement();
+}
+
 bool visiblePositionsOnDifferentLines(const VisiblePosition& pos1,
                                       const VisiblePosition& pos2) {
   if (pos1.isNull() || pos2.isNull())

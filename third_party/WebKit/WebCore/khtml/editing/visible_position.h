@@ -133,6 +133,8 @@ VisiblePosition endVisiblePosition(const DOM::RangeImpl*, EAffinity);
 
 void setAffinityUsingLinePosition(VisiblePosition&);
 
+DOM::NodeImpl* enclosingBlockFlowElement(const VisiblePosition&);
+
 bool visiblePositionsOnDifferentLines(const VisiblePosition&,
                                       const VisiblePosition&);
 bool visiblePositionsInDifferentBlocks(const VisiblePosition&,

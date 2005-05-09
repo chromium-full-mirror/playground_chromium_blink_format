@@ -70,7 +70,6 @@ using DOM::DocumentFragmentImpl;
 using DOM::DocumentImpl;
 using DOM::DOMString;
 using DOM::DOMStringImpl;
-using DOM::DoNotStayInBlock;
 using DOM::DoNotUpdateLayout;
 using DOM::EditingTextImpl;
 using DOM::ElementImpl;
@@ -1166,7 +1165,6 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
       visibleParagraphStart.deepEquivalent().upstream(StayInBlock);
   Position paragraphEnd =
       visibleParagraphEnd.deepEquivalent().upstream(StayInBlock);
-  Position beforeParagraphStart = paragraphStart.upstream(DoNotStayInBlock);
 
   // Perform some checks to see if we need to perform work in this function.
   if (paragraphStart.node()->isBlockFlow()) {
@@ -1217,14 +1215,8 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
     insertNodeAt(newBlock, paragraphStart.node(), 0);
   } else if (paragraphStart.node()->id() == ID_BR) {
     insertNodeAfter(newBlock, paragraphStart.node());
-  } else if (paragraphStart.node()->isBlockFlow()) {
-    insertNodeBefore(newBlock, paragraphStart.node());
-  } else if (beforeParagraphStart.node()->enclosingBlockFlowElement()->id() !=
-             ID_BODY) {
-    insertNodeAfter(newBlock,
-                    beforeParagraphStart.node()->enclosingBlockFlowElement());
   } else {
-    insertNodeAfter(newBlock, beforeParagraphStart.node());
+    insertNodeBefore(newBlock, paragraphStart.upstream(StayInBlock).node());
   }
 
   while (moveNode && !moveNode->isBlockFlow()) {
@@ -2159,8 +2151,7 @@ bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos =
-      Position(node, node->childNodeCount()).upstream(DoNotStayInBlock);
+  Position pos = Position(node, node->childNodeCount()).upstream(StayInBlock);
   return RangeImpl::compareBoundaryPoints(node, 0, start.node(),
                                           start.offset()) >= 0 &&
          RangeImpl::compareBoundaryPoints(pos, end) <= 0;
@@ -2172,8 +2163,7 @@ bool ApplyStyleCommand::nodeFullyUnselected(NodeImpl* node,
   ASSERT(node);
   ASSERT(node->isElementNode());
 
-  Position pos =
-      Position(node, node->childNodeCount()).upstream(DoNotStayInBlock);
+  Position pos = Position(node, node->childNodeCount()).upstream(StayInBlock);
   bool isFullyBeforeStart = RangeImpl::compareBoundaryPoints(pos, start) < 0;
   bool isFullyAfterEnd =
       RangeImpl::compareBoundaryPoints(node, 0, end.node(), end.offset()) > 0;
@@ -2799,26 +2789,21 @@ void DeleteSelectionCommand::insertPlaceholderForAncestorBlockContent() {
   // ancestor block
   // surrounded by child blocks.
   //
-  NodeImpl* upstreamBlock = m_upstreamStart.node()->enclosingBlockFlowElement();
-  NodeImpl* beforeUpstreamBlock = m_upstreamStart.upstream(DoNotStayInBlock)
-                                      .node()
-                                      ->enclosingBlockFlowElement();
+  VisiblePosition visibleStart(m_upstreamStart, VP_DEFAULT_AFFINITY);
+  VisiblePosition beforeStart = visibleStart.previous();
+  NodeImpl* startBlock = enclosingBlockFlowElement(visibleStart);
+  NodeImpl* beforeStartBlock = enclosingBlockFlowElement(beforeStart);
 
-  if (upstreamBlock != beforeUpstreamBlock &&
-      beforeUpstreamBlock->isAncestor(upstreamBlock) &&
-      upstreamBlock != m_upstreamStart.node()) {
-    NodeImpl* downstreamBlock =
-        m_downstreamEnd.node()->enclosingBlockFlowElement();
-    NodeImpl* afterDownstreamBlock =
-        m_downstreamEnd.downstream(DoNotStayInBlock)
-            .node()
-            ->enclosingBlockFlowElement();
+  if (!beforeStart.isNull() && !inSameBlock(visibleStart, beforeStart) &&
+      beforeStartBlock->isAncestor(startBlock) &&
+      startBlock != m_upstreamStart.node()) {
+    VisiblePosition visibleEnd(m_downstreamEnd, VP_DEFAULT_AFFINITY);
+    VisiblePosition afterEnd = visibleEnd.next();
 
-    if ((afterDownstreamBlock != downstreamBlock &&
-         afterDownstreamBlock != upstreamBlock) ||
+    if ((!afterEnd.isNull() && !inSameBlock(afterEnd, visibleEnd) &&
+         !inSameBlock(afterEnd, visibleStart)) ||
         (m_downstreamEnd == m_selectionToDelete.end() &&
-         isEndOfParagraph(
-             VisiblePosition(m_downstreamEnd, VP_DEFAULT_AFFINITY)))) {
+         isEndOfParagraph(visibleEnd))) {
       NodeImpl* block = createDefaultParagraphElement(document());
       insertNodeBefore(block, m_upstreamStart.node());
       addBlockPlaceholderIfNeeded(block);
@@ -3728,10 +3713,9 @@ void InsertParagraphSeparatorCommand::doApply() {
   //---------------------------------------------------------------------
   // Handle case when position is in the first visible position in its block.
   // and similar case where upstream position is in another block.
-  bool upstreamInDifferentBlock =
-      startBlock !=
-      pos.upstream(DoNotStayInBlock).node()->enclosingBlockFlowElement();
-  if (upstreamInDifferentBlock || isFirstInBlock) {
+  bool prevInDifferentBlock = !inSameBlock(visiblePos, visiblePos.previous());
+
+  if (prevInDifferentBlock || isFirstInBlock) {
     LOG(Editing, "insert paragraph separator: first in block case");
     pos = pos.downstream(StayInBlock);
     pos = positionOutsideContainingSpecialElement(pos);
@@ -3821,13 +3805,14 @@ void InsertParagraphSeparatorCommand::doApply() {
     parent = child;
   }
 
-  // Insert a block placeholder in this case because we know that ther will be
-  // no content
-  // on the first line of the new block before the first block child of the new
-  // block.
-  // So, we need the placeholder to "hold the first line open".
-  if (startBlock !=
-      pos.downstream(DoNotStayInBlock).node()->enclosingBlockFlowElement())
+  // Insert a block placeholder if the next visible position is in a different
+  // paragraph,
+  // because we know that there will be no content on the first line of the new
+  // block
+  // before the first block child. So, we need the placeholder to "hold the
+  // first line open".
+  VisiblePosition next = visiblePos.next();
+  if (!next.isNull() && !inSameBlock(visiblePos, next))
     appendBlockPlaceholder(blockToInsert);
 
   // Move the start node and the siblings of the start node.
@@ -3900,7 +3885,7 @@ void InsertParagraphSeparatorInQuotedContentCommand::doApply() {
   EAffinity affinity = selection.startAffinity();
   if (selection.isRange()) {
     deleteSelection(false, false);
-    pos = endingSelection().start().upstream(DoNotStayInBlock);
+    pos = endingSelection().start().upstream(StayInBlock);
     affinity = endingSelection().startAffinity();
   }
 
@@ -4183,7 +4168,7 @@ void InsertTextCommand::insertSpace(TextImpl* textNode, unsigned long offset) {
     // By checking the character at the downstream position, we can
     // check if there is a rendered WS at the caret
     Position pos(textNode, offset);
-    Position downstream = pos.downstream(DoNotStayInBlock);
+    Position downstream = pos.downstream(StayInBlock);
     if (downstream.offset() < (long)text.length() &&
         isCollapsibleWhitespace(text[downstream.offset()]))
       count--;  // leave this WS in
@@ -5180,7 +5165,7 @@ void ReplaceSelectionCommand::doApply() {
              isLastVisiblePositionInBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
     } else if (mergeStart && !isProbablyBlock(refNode)) {
-      Position pos = insertionPos.downstream(DoNotStayInBlock);
+      Position pos = visiblePos.next().deepEquivalent().downstream(StayInBlock);
       insertNodeAtAndUpdateNodesInserted(refNode, pos.node(), pos.offset());
     } else {
       insertNodeAtAndUpdateNodesInserted(refNode, insertionPos.node(),
@@ -5242,34 +5227,31 @@ void ReplaceSelectionCommand::doApply() {
     removeLinePlaceholderIfNeeded(linePlaceholder);
 
     if (!m_lastNodeInserted) {
-      lastPositionToSelect =
-          endingSelection().end().downstream(DoNotStayInBlock);
+      lastPositionToSelect = endingSelection().end().downstream(StayInBlock);
     } else {
       bool insertParagraph = false;
+      VisiblePosition pos(insertionPos, VP_DEFAULT_AFFINITY);
+
       if (startBlock == endBlock && !isProbablyBlock(m_lastTopNodeInserted)) {
         insertParagraph = true;
       } else {
         // Handle end-of-document case.
         document()->updateLayout();
-        VisiblePosition pos(
-            Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset()),
-            DOWNSTREAM);
         if (isEndOfDocument(pos))
           insertParagraph = true;
       }
       if (insertParagraph) {
         setEndingSelection(insertionPos, DOWNSTREAM);
         insertParagraphSeparator();
-        updateNodesInserted(
-            endingSelection().end().downstream(DoNotStayInBlock).node());
+        VisiblePosition next = pos.next();
+
         // Select up to the paragraph separator that was added.
-        lastPositionToSelect =
-            endingSelection().end().downstream(DoNotStayInBlock);
+        lastPositionToSelect = next.deepEquivalent().downstream(StayInBlock);
+        updateNodesInserted(lastPositionToSelect.node());
       } else {
         // Select up to the preexising paragraph separator.
-        lastPositionToSelect =
-            Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset())
-                .downstream(DoNotStayInBlock);
+        VisiblePosition next = pos.next();
+        lastPositionToSelect = next.deepEquivalent().downstream(StayInBlock);
       }
     }
   } else {
