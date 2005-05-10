@@ -57,6 +57,9 @@ typedef enum {
 
 - (void)toggleSmartInsertDelete:(id)sender;
 
+- (BOOL)canMakeTextStandardSize;
+- (IBAction)makeTextStandardSize:(id)sender;
+
 @end
 
 @interface WebView (WebPrivate)
