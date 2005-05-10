@@ -101,8 +101,9 @@ Document DOMImplementation::createDocument(const DOMString& namespaceURI,
     throw DOMException(DOMException::NOT_FOUND_ERR);
 
   int exceptioncode = 0;
-  DocumentImpl* r =
-      impl->createDocument(namespaceURI, qualifiedName, doctype, exceptioncode);
+  DocumentImpl* r = impl->createDocument(
+      namespaceURI, qualifiedName,
+      static_cast<DocumentTypeImpl*>(doctype.handle()), exceptioncode);
   if (exceptioncode)
     throw DOMException(exceptioncode);
   return r;
@@ -339,16 +340,16 @@ Element Document::elementFromPoint(const int _x, const int _y) const {
 NodeList Document::getElementsByTagName(const DOMString& tagName) {
   if (!impl)
     return 0;
-  return static_cast<DocumentImpl*>(impl)->getElementsByTagNameNS(
-      0, tagName.implementation());
+  return static_cast<DocumentImpl*>(impl)->getElementsByTagName(tagName).get();
 }
 
 NodeList Document::getElementsByTagNameNS(const DOMString& namespaceURI,
                                           const DOMString& localName) {
   if (!impl)
     return 0;
-  return static_cast<DocumentImpl*>(impl)->getElementsByTagNameNS(
-      namespaceURI.implementation(), localName.implementation());
+  return static_cast<DocumentImpl*>(impl)
+      ->getElementsByTagNameNS(namespaceURI, localName)
+      .get();
 }
 
 Node Document::importNode(const Node& importedNode, bool deep) {

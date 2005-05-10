@@ -86,10 +86,6 @@ class CharacterDataImpl : public NodeImpl {
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
 
-#if APPLE_CHANGES
-  static CharacterData createInstance(CharacterDataImpl* impl);
-#endif
-
  protected:
   // note: since DOMStrings are shared, str should always be copied when making
   // a change or returning a string
@@ -148,10 +144,6 @@ class TextImpl : public CharacterDataImpl {
   virtual bool childTypeAllowed(unsigned short type);
 
   virtual DOMString toString() const;
-
-#if APPLE_CHANGES
-  static Text createInstance(TextImpl* impl);
-#endif
 
 #ifndef NDEBUG
   virtual void formatForDebugger(char* buffer, unsigned length) const;

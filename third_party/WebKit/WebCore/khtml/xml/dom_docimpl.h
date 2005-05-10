@@ -56,13 +56,11 @@ class KWQAccObjectCache;
 
 namespace khtml {
 class CSSStyleSelector;
+struct DashboardRegionValue;
 class DocLoader;
 class RenderImage;
 class Tokenizer;
 class XMLHandler;
-#if APPLE_CHANGES
-struct DashboardRegionValue;
-#endif
 }
 
 #ifndef KHTML_NO_XBL
@@ -82,15 +80,13 @@ class DocumentFragmentImpl;
 class DocumentImpl;
 class DocumentType;
 class DocumentTypeImpl;
-#if APPLE_CHANGES
-class DOMImplementation;
-#endif
 class EditingTextImpl;
 class ElementImpl;
 class EntityReferenceImpl;
 class EventImpl;
 class EventListener;
 class GenericRONamedNodeMapImpl;
+class HTMLCollectionImpl;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
 class HTMLImageLoader;
@@ -108,9 +104,6 @@ class StyleSheetImpl;
 class StyleSheetListImpl;
 class TextImpl;
 class TreeWalkerImpl;
-#ifdef KHTML_XSLT
-class XSLStyleSheetImpl;
-#endif
 
 // A range of a node within a document that is "marked", such as being
 // misspelled
@@ -146,14 +139,14 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
                                        int& exceptioncode);
   DocumentImpl* createDocument(const DOMString& namespaceURI,
                                const DOMString& qualifiedName,
-                               const DocumentType& doctype,
+                               DocumentTypeImpl* doctype,
                                int& exceptioncode);
 
   DOMImplementationImpl* getInterface(const DOMString& feature) const;
 
   // From the DOMImplementationCSS interface
-  CSSStyleSheetImpl* createCSSStyleSheet(DOMStringImpl* title,
-                                         DOMStringImpl* media,
+  CSSStyleSheetImpl* createCSSStyleSheet(const DOMString& title,
+                                         const DOMString& media,
                                          int& exceptioncode);
 
   // From the HTMLDOMImplementation interface
@@ -168,10 +161,6 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
   // ever be present, and is used as a factory method for creating DocumentImpl
   // objects
   static DOMImplementationImpl* instance();
-
-#if APPLE_CHANGES
-  static DOMImplementation createInstance(DOMImplementationImpl* impl);
-#endif
 
  protected:
   static DOMImplementationImpl* m_instance;
@@ -188,7 +177,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   // DOM methods & attributes for Document
 
-  DocumentTypeImpl* doctype() const;
+  virtual DocumentTypeImpl* doctype() const;  // returns 0 for HTML documents
+  DocumentTypeImpl* realDocType() const { return m_doctype; }
 
   DOMImplementationImpl* implementation() const;
   virtual ElementImpl* documentElement() const;
@@ -201,7 +191,13 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   ProcessingInstructionImpl* createProcessingInstruction(
       const DOMString& target,
       const DOMString& data);
-  Attr createAttribute(NodeImpl::Id id);
+  AttrImpl* createAttribute(Id id);
+  AttrImpl* createAttribute(const DOMString& name, int& exception) {
+    return createAttributeNS(DOMString(), name, exception);
+  }
+  AttrImpl* createAttributeNS(const DOMString& namespaceURI,
+                              const DOMString& qualifiedName,
+                              int& exception);
   EntityReferenceImpl* createEntityReference(const DOMString& name);
   NodeImpl* importNode(NodeImpl* importedNode, bool deep, int& exceptioncode);
   virtual ElementImpl* createElementNS(const DOMString& _namespaceURI,
@@ -210,10 +206,22 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   ElementImpl* getElementById(const DOMString& elementId) const;
   ElementImpl* elementFromPoint(const int _x, const int _y) const;
 
+  SharedPtr<NameNodeListImpl> getElementsByName(const DOMString& elementName);
+
   // Actually part of HTMLDocument, but used for giving XML documents a window
   // title as well
   DOMString title() const { return m_title; }
   void setTitle(DOMString _title);
+
+  SharedPtr<HTMLCollectionImpl> images();
+  SharedPtr<HTMLCollectionImpl> embeds();
+  SharedPtr<HTMLCollectionImpl> applets();
+  SharedPtr<HTMLCollectionImpl> links();
+  SharedPtr<HTMLCollectionImpl> forms();
+  SharedPtr<HTMLCollectionImpl> anchors();
+  SharedPtr<HTMLCollectionImpl> all();
+  SharedPtr<HTMLCollectionImpl> objects();
+  SharedPtr<HTMLCollectionImpl> nameableItems();
 
   // DOM methods overridden from  parent classes
 
@@ -348,15 +356,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   QString baseTarget() const { return m_baseTarget; }
   void setBaseTarget(const QString& baseTarget) { m_baseTarget = baseTarget; }
 
-#if APPLE_CHANGES
   QString completeURL(const QString&);
-#else
-  QString completeURL(const QString& url) {
-    return KURL(baseURL(), url).url();
-  };
-#endif
-
-  DOM::DOMString completeURL(const DOM::DOMString&);
+  DOMString completeURL(const DOMString&);
 
   // from cachedObjectClient
   virtual void setStyleSheet(const DOMString& url, const DOMString& sheetStr);
@@ -484,7 +485,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   }
 
   CSSStyleDeclarationImpl* getOverrideStyle(ElementImpl* elt,
-                                            DOMStringImpl* pseudoElt);
+                                            const DOMString& pseudoElt);
 
   typedef QMap<QString, ProcessingInstructionImpl*> LocalStyleRefs;
   LocalStyleRefs* localStyleRefs() { return &m_localStyleRefs; }
@@ -768,8 +769,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
  public:
   KWQSignal m_finishedParsing;
 
-  static Document createInstance(DocumentImpl* impl);
-
   bool inPageCache();
   void setInPageCache(bool flag);
   void restoreRenderer(khtml::RenderObject* render);
@@ -881,10 +880,6 @@ class DocumentTypeImpl : public NodeImpl {
 
   virtual DOMString toString() const;
 
-#if APPLE_CHANGES
-  static DocumentType createInstance(DocumentTypeImpl* impl);
-#endif
-
  protected:
   DOMImplementationImpl* m_implementation;
   NamedNodeMapImpl* m_entities;
@@ -896,5 +891,6 @@ class DocumentTypeImpl : public NodeImpl {
   DOMString m_subset;
 };
 
-};  // namespace
+}  // namespace
+
 #endif

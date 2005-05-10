@@ -29,6 +29,7 @@
 #ifndef KWQCLIPBOARD_H_
 #define KWQCLIPBOARD_H_
 
+#include "KWQPixmap.h"
 #include "xml/dom2_eventsimpl.h"
 
 #ifdef __OBJC__
@@ -78,8 +79,8 @@ class KWQClipboard : public DOM::ClipboardImpl {
   QPoint dragLocation() const;  // same point as client passed us
   QPixmap dragImage() const;
   void setDragImage(const QPixmap&, const QPoint&);
-  const DOM::Node dragImageElement();
-  void setDragImageElement(const DOM::Node&, const QPoint&);
+  DOM::NodeImpl* dragImageElement();
+  void setDragImageElement(DOM::NodeImpl*, const QPoint&);
 
   // Methods for getting info in Cocoa's type system
   NSImage* dragNSImage(
@@ -94,7 +95,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   void setDragHasStarted() { m_dragStarted = true; }
 
  private:
-  void setDragImage(const QPixmap& pm, const DOM::Node&, const QPoint& loc);
+  void setDragImage(const QPixmap& pm, DOM::NodeImpl*, const QPoint& loc);
 
   NSPasteboard* m_pasteboard;
   bool m_forDragging;
@@ -102,7 +103,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   DOM::DOMString m_effectAllowed;
   QPoint m_dragLoc;
   QPixmap m_dragImage;
-  DOM::Node m_dragImageElement;
+  khtml::SharedPtr<DOM::NodeImpl> m_dragImageElement;
   AccessPolicy m_policy;
   int m_changeCount;
   bool m_dragStarted;

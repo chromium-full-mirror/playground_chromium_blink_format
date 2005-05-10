@@ -792,18 +792,18 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
   d->clickCount = _mouse->clickCount();
   if (d->clickNode)
     d->clickNode->deref();
-  d->clickNode = mev.innerNode.handle();
+  d->clickNode = mev.innerNode.get();
   if (d->clickNode)
     d->clickNode->ref();
 #endif
 
   bool swallowEvent = dispatchMouseEvent(
-      EventImpl::MOUSEDOWN_EVENT, mev.innerNode.handle(), true, d->clickCount,
+      EventImpl::MOUSEDOWN_EVENT, mev.innerNode.get(), true, d->clickCount,
       _mouse, true, DOM::NodeImpl::MousePress);
 
   if (!swallowEvent) {
     khtml::MousePressEvent event(_mouse, xm, ym, mev.url, mev.target,
-                                 mev.innerNode);
+                                 mev.innerNode.get());
     QApplication::sendEvent(m_part, &event);
 #if APPLE_CHANGES
     // Many AK widgets run their own event loops and consume events while the
@@ -818,7 +818,7 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
       d->mousePressed = false;
     }
 #endif
-    emit m_part->nodeActivated(mev.innerNode);
+    emit m_part->nodeActivated(mev.innerNode.get());
   }
 }
 
@@ -849,22 +849,22 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 
   d->clickCount = _mouse->clickCount();
   bool swallowEvent = dispatchMouseEvent(
-      EventImpl::MOUSEUP_EVENT, mev.innerNode.handle(), true, d->clickCount,
+      EventImpl::MOUSEUP_EVENT, mev.innerNode.get(), true, d->clickCount,
       _mouse, false, DOM::NodeImpl::MouseRelease);
 
-  if (mev.innerNode.handle() == d->clickNode)
-    dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.handle(), true,
+  if (mev.innerNode == d->clickNode)
+    dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.get(), true,
                        d->clickCount, _mouse, true,
                        DOM::NodeImpl::MouseRelease);
 
   // Qt delivers a release event AND a double click event.
   if (!swallowEvent) {
     khtml::MouseReleaseEvent event1(_mouse, xm, ym, mev.url, mev.target,
-                                    mev.innerNode);
+                                    mev.innerNode.get());
     QApplication::sendEvent(m_part, &event1);
 
     khtml::MouseDoubleClickEvent event2(_mouse, xm, ym, mev.url, mev.target,
-                                        mev.innerNode);
+                                        mev.innerNode.get());
     QApplication::sendEvent(m_part, &event2);
   }
 #else
@@ -925,8 +925,8 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
 #endif
 
   bool swallowEvent =
-      dispatchMouseEvent(EventImpl::MOUSEMOVE_EVENT, mev.innerNode.handle(),
-                         false, 0, _mouse, true, DOM::NodeImpl::MouseMove);
+      dispatchMouseEvent(EventImpl::MOUSEMOVE_EVENT, mev.innerNode.get(), false,
+                         0, _mouse, true, DOM::NodeImpl::MouseMove);
 
 #if !APPLE_CHANGES
   if (d->clickCount > 0 &&
@@ -941,7 +941,7 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   // come after the mouseout events
   m_part->executeScheduledScript();
 
-  NodeImpl* node = mev.innerNode.handle();
+  NodeImpl* node = mev.innerNode.get();
   RenderObject* renderer = node ? node->renderer() : 0;
   RenderStyle* style = renderer ? renderer->style() : 0;
 
@@ -1054,7 +1054,7 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
 
   if (!swallowEvent) {
     khtml::MouseMoveEvent event(_mouse, xm, ym, mev.url, mev.target,
-                                mev.innerNode);
+                                mev.innerNode.get());
     QApplication::sendEvent(m_part, &event);
   }
 }
@@ -1094,23 +1094,23 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
 #endif
 
   bool swallowEvent = dispatchMouseEvent(
-      EventImpl::MOUSEUP_EVENT, mev.innerNode.handle(), true, d->clickCount,
+      EventImpl::MOUSEUP_EVENT, mev.innerNode.get(), true, d->clickCount,
       _mouse, false, DOM::NodeImpl::MouseRelease);
 
-  if (d->clickCount > 0 && mev.innerNode.handle() == d->clickNode
+  if (d->clickCount > 0 && mev.innerNode == d->clickNode
 #if !APPLE_CHANGES
       &&
       QPoint(d->clickX - xm, d->clickY - ym).manhattanLength() <=
           QApplication::startDragDistance()
 #endif
           )
-    dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.handle(), true,
+    dispatchMouseEvent(EventImpl::CLICK_EVENT, mev.innerNode.get(), true,
                        d->clickCount, _mouse, true,
                        DOM::NodeImpl::MouseRelease);
 
   if (!swallowEvent) {
     khtml::MouseReleaseEvent event(_mouse, xm, ym, mev.url, mev.target,
-                                   mev.innerNode);
+                                   mev.innerNode.get());
     QApplication::sendEvent(m_part, &event);
   }
 
@@ -1291,7 +1291,7 @@ bool KHTMLView::updateDragAndDrop(const QPoint& loc,
   viewportToContents(loc.x(), loc.y(), xm, ym);
   DOM::NodeImpl::MouseEvent mev(0, DOM::NodeImpl::MouseMove);
   m_part->xmlDocImpl()->prepareMouseEvent(true, xm, ym, &mev);
-  DOM::Node newTarget = mev.innerNode;
+  DOM::Node newTarget = mev.innerNode.get();
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
@@ -1875,7 +1875,7 @@ bool KHTMLView::dispatchMouseEvent(int eventId,
           static_cast<NodeImpl::MouseEventType>(mouseEventType));
       m_part->xmlDocImpl()->prepareMouseEvent(true, d->prevMouseX,
                                               d->prevMouseY, &mev);
-      oldUnder = mev.innerNode.handle();
+      oldUnder = mev.innerNode.get();
     }
     if (oldUnder != targetNode) {
       // send mouseout event to the old node

@@ -27,12 +27,13 @@
 #ifndef _DOM2_RangeImpl_h_
 #define _DOM2_RangeImpl_h_
 
-#include <qptrlist.h>
 #include "dom/dom2_range.h"
 #include "misc/shared.h"
 #include "misc/main_thread_malloc.h"
+
 namespace DOM {
 
+class DocumentFragmentImpl;
 class DocumentPtr;
 class NodeImpl;
 class Position;
@@ -52,8 +53,6 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
 
   MAIN_THREAD_ALLOCATED;
 
-  // ### remove the get from these methods (i.e. getStartContainer() ->
-  // startContainer())
   NodeImpl* startContainer(int& exceptioncode) const;
   long startOffset(int& exceptioncode) const;
   NodeImpl* endContainer(int& exceptioncode) const;
@@ -108,10 +107,6 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   NodeImpl* pastEndNode() const;
 
   Position editingStartPosition() const;
-
-#if APPLE_CHANGES
-  static Range createInstance(RangeImpl* impl);
-#endif
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
