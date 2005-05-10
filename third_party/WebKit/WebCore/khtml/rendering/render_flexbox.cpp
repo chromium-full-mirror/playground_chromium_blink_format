@@ -795,7 +795,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
           continue;
         if (!anchorBox->object()->element())
           continue;
-        if (!anchorBox->object()->element()->hasAnchor())
+        if (!anchorBox->object()->element()->isLink())
           continue;
 
         RootInlineBox* lastVisibleLine =

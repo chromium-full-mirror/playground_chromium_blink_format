@@ -1305,7 +1305,7 @@ QString RenderObject::information() const {
     ts << "zI: " << style()->zIndex();
   if (element() && element()->active())
     ts << "act ";
-  if (element() && element()->hasAnchor())
+  if (element() && element()->isLink())
     ts << "anchor ";
   if (element() && element()->focused())
     ts << "focus ";

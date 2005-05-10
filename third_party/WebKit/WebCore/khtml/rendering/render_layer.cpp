@@ -996,7 +996,7 @@ bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
   // it already set URLElement and only use the innermost.
   DOM::NodeImpl* node = info.innerNode();
   while (node) {
-    if (node->hasAnchor() && !info.URLElement())
+    if (node->isLink() && !info.URLElement())
       info.setURLElement(node);
     node = node->parentNode();
   }

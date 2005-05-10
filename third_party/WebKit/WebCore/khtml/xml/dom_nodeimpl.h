@@ -269,7 +269,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool attached() const { return m_attached; }
   bool changed() const { return m_changed; }
   bool hasChangedChild() const { return m_hasChangedChild; }
-  bool hasAnchor() const { return m_hasAnchor; }
+  bool isLink() const { return m_isLink; }
   bool inDocument() const { return m_inDocument; }
   bool styleElement() const { return m_styleElement; }
   bool implicitNode() const { return m_implicit; }
@@ -554,7 +554,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool m_hasChangedChild : 1;
   bool m_inDocument : 1;
 
-  bool m_hasAnchor : 1;
+  bool m_isLink : 1;
   bool m_specified : 1;  // used in AttrImpl. Accessor functions there
   bool m_focused : 1;
   bool m_active : 1;
