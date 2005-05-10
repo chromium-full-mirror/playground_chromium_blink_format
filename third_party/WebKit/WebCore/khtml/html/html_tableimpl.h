@@ -31,21 +31,10 @@
 
 namespace DOM {
 
-class DOMString;
-class HTMLTableElementImpl;
+class HTMLCollectionImpl;
 class HTMLTableSectionElementImpl;
-class HTMLTableSectionElement;
-class HTMLTableRowElementImpl;
-class HTMLTableRowElement;
 class HTMLTableCellElementImpl;
-class HTMLTableCellElement;
-class HTMLTableColElementImpl;
-class HTMLTableColElement;
 class HTMLTableCaptionElementImpl;
-class HTMLTableCaptionElement;
-class HTMLElement;
-class HTMLCollection;
-class CSSStyleDeclarationImpl;
 
 class HTMLTableElementImpl : public HTMLElementImpl {
  public:
@@ -94,6 +83,36 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   HTMLElementImpl* insertRow(long index, int& exceptioncode);
   void deleteRow(long index, int& exceptioncode);
 
+  khtml::SharedPtr<HTMLCollectionImpl> rows();
+  khtml::SharedPtr<HTMLCollectionImpl> tBodies();
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString bgColor() const;
+  void setBgColor(const DOMString&);
+
+  DOMString border() const;
+  void setBorder(const DOMString&);
+
+  DOMString cellPadding() const;
+  void setCellPadding(const DOMString&);
+
+  DOMString cellSpacing() const;
+  void setCellSpacing(const DOMString&);
+
+  DOMString frame() const;
+  void setFrame(const DOMString&);
+
+  DOMString rules() const;
+  void setRules(const DOMString&);
+
+  DOMString summary() const;
+  void setSummary(const DOMString&);
+
+  DOMString width() const;
+  void setWidth(const DOMString&);
+
   // overrides
   virtual NodeImpl* addChild(NodeImpl* child);
 
@@ -114,11 +133,6 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   HTMLTableSectionElementImpl* foot;
   HTMLTableSectionElementImpl* firstBody;
   HTMLTableCaptionElementImpl* tCaption;
-
-#if 0
-    Frame frame;
-    Rules rules;
-#endif
 
   bool m_noBorder : 1;
   bool m_solid : 1;
@@ -146,8 +160,6 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
  public:
   HTMLTableSectionElementImpl(DocumentPtr* doc, ushort tagid, bool implicit);
 
-  ~HTMLTableSectionElementImpl();
-
   virtual Id id() const;
 
   virtual NodeImpl* addChild(NodeImpl* child);
@@ -156,6 +168,20 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
   void deleteRow(long index, int& exceptioncode);
 
   int numRows() const;
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString ch() const;
+  void setCh(const DOMString&);
+
+  DOMString chOff() const;
+  void setChOff(const DOMString&);
+
+  DOMString vAlign() const;
+  void setVAlign(const DOMString&);
+
+  khtml::SharedPtr<HTMLCollectionImpl> rows();
 
  protected:
   ushort _id;
@@ -176,6 +202,28 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
   HTMLElementImpl* insertCell(long index, int& exceptioncode);
   void deleteCell(long index, int& exceptioncode);
+
+  void setRowIndex(long);
+
+  void setSectionRowIndex(long);
+
+  khtml::SharedPtr<HTMLCollectionImpl> cells();
+  void setCells(HTMLCollectionImpl*, int& exception);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString bgColor() const;
+  void setBgColor(const DOMString&);
+
+  DOMString ch() const;
+  void setCh(const DOMString&);
+
+  DOMString chOff() const;
+  void setChOff(const DOMString&);
+
+  DOMString vAlign() const;
+  void setVAlign(const DOMString&);
 
  protected:
   int ncols;
@@ -212,6 +260,48 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
+  void setCellIndex(long);
+
+  DOMString abbr() const;
+  void setAbbr(const DOMString&);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString axis() const;
+  void setAxis(const DOMString&);
+
+  DOMString bgColor() const;
+  void setBgColor(const DOMString&);
+
+  DOMString ch() const;
+  void setCh(const DOMString&);
+
+  DOMString chOff() const;
+  void setChOff(const DOMString&);
+
+  void setColSpan(long);
+
+  DOMString headers() const;
+  void setHeaders(const DOMString&);
+
+  DOMString height() const;
+  void setHeight(const DOMString&);
+
+  bool noWrap() const;
+  void setNoWrap(bool);
+
+  void setRowSpan(long);
+
+  DOMString scope() const;
+  void setScope(const DOMString&);
+
+  DOMString vAlign() const;
+  void setVAlign(const DOMString&);
+
+  DOMString width() const;
+  void setWidth(const DOMString&);
+
  protected:
   int _row;
   int _col;
@@ -237,7 +327,24 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
-  int span() const { return _span; }
+  long span() const { return _span; }
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString ch() const;
+  void setCh(const DOMString&);
+
+  DOMString chOff() const;
+  void setChOff(const DOMString&);
+
+  void setSpan(long);
+
+  DOMString vAlign() const;
+  void setVAlign(const DOMString&);
+
+  DOMString width() const;
+  void setWidth(const DOMString&);
 
  protected:
   // could be ID_COL or ID_COLGROUP ... The DOM is not quite clear on
@@ -260,8 +367,11 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
 };
 
-};  // namespace
+}  // namespace
 
 #endif

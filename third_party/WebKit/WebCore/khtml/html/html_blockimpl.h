@@ -39,7 +39,10 @@ class HTMLBlockquoteElementImpl : public HTMLElementImpl {
   HTMLBlockquoteElementImpl(DocumentPtr* doc);
   ~HTMLBlockquoteElementImpl();
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
+
+  DOMString cite() const;
+  void setCite(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -51,11 +54,13 @@ class HTMLDivElementImpl : public HTMLElementImpl {
   HTMLDivElementImpl(DocumentPtr* doc);
   ~HTMLDivElementImpl();
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
-                          MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -65,11 +70,22 @@ class HTMLHRElementImpl : public HTMLElementImpl {
   HTMLHRElementImpl(DocumentPtr* doc);
   ~HTMLHRElementImpl();
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
-                          MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  bool noShade() const;
+  void setNoShade(bool);
+
+  DOMString size() const;
+  void setSize(const DOMString&);
+
+  DOMString width() const;
+  void setWidth(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -77,6 +93,9 @@ class HTMLHRElementImpl : public HTMLElementImpl {
 class HTMLHeadingElementImpl : public HTMLGenericElementImpl {
  public:
   HTMLHeadingElementImpl(DocumentPtr* doc, ushort _tagid);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -91,11 +110,13 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
  public:
   HTMLParagraphElementImpl(DocumentPtr* doc);
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
-                          MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -114,10 +135,9 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
  public:
   HTMLMarqueeElementImpl(DocumentPtr* doc);
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
-                          MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
 
   int minimumDelay() const { return m_minimumDelay; }
@@ -133,7 +153,7 @@ class HTMLLayerElementImpl : public HTMLDivElementImpl {
   HTMLLayerElementImpl(DocumentPtr* doc);
   ~HTMLLayerElementImpl();
 
-  virtual NodeImpl::Id id() const;
+  virtual Id id() const;
 
   bool fixed;
 };

@@ -22,8 +22,6 @@
  */
 #include "html_listimpl.h"
 
-using namespace DOM;
-
 #include "css/cssproperties.h"
 #include "css/cssvalues.h"
 #include "rendering/render_list.h"
@@ -31,6 +29,8 @@ using namespace DOM;
 #include "xml/dom_docimpl.h"
 
 using namespace khtml;
+
+namespace DOM {
 
 NodeImpl::Id HTMLUListElementImpl::id() const {
   return ID_UL;
@@ -59,16 +59,48 @@ void HTMLUListElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
   }
 }
 
+bool HTMLUListElementImpl::compact() const {
+  return !getAttribute(ATTR_COMPACT).isNull();
+}
+
+void HTMLUListElementImpl::setCompact(bool b) {
+  setAttribute(ATTR_COMPACT, b ? "" : 0);
+}
+
+DOMString HTMLUListElementImpl::type() const {
+  return getAttribute(ATTR_TYPE);
+}
+
+void HTMLUListElementImpl::setType(const DOMString& value) {
+  setAttribute(ATTR_TYPE, value);
+}
+
 // -------------------------------------------------------------------------
 
 NodeImpl::Id HTMLDirectoryElementImpl::id() const {
   return ID_DIR;
 }
 
+bool HTMLDirectoryElementImpl::compact() const {
+  return !getAttribute(ATTR_COMPACT).isNull();
+}
+
+void HTMLDirectoryElementImpl::setCompact(bool b) {
+  setAttribute(ATTR_COMPACT, b ? "" : 0);
+}
+
 // -------------------------------------------------------------------------
 
 NodeImpl::Id HTMLMenuElementImpl::id() const {
   return ID_MENU;
+}
+
+bool HTMLMenuElementImpl::compact() const {
+  return !getAttribute(ATTR_COMPACT).isNull();
+}
+
+void HTMLMenuElementImpl::setCompact(bool b) {
+  setAttribute(ATTR_COMPACT, b ? "" : 0);
 }
 
 // -------------------------------------------------------------------------
@@ -109,6 +141,26 @@ void HTMLOListElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     default:
       HTMLUListElementImpl::parseHTMLAttribute(attr);
   }
+}
+
+bool HTMLOListElementImpl::compact() const {
+  return !getAttribute(ATTR_COMPACT).isNull();
+}
+
+void HTMLOListElementImpl::setCompact(bool b) {
+  setAttribute(ATTR_COMPACT, b ? "" : 0);
+}
+
+void HTMLOListElementImpl::setStart(long start) {
+  setAttribute(ATTR_START, QString::number(start));
+}
+
+DOMString HTMLOListElementImpl::type() const {
+  return getAttribute(ATTR_TYPE);
+}
+
+void HTMLOListElementImpl::setType(const DOMString& value) {
+  setAttribute(ATTR_TYPE, value);
 }
 
 // -------------------------------------------------------------------------
@@ -200,8 +252,32 @@ void HTMLLIElementImpl::attach() {
   }
 }
 
+DOMString HTMLLIElementImpl::type() const {
+  return getAttribute(ATTR_TYPE);
+}
+
+void HTMLLIElementImpl::setType(const DOMString& value) {
+  setAttribute(ATTR_TYPE, value);
+}
+
+long HTMLLIElementImpl::value() const {
+  return getAttribute(ATTR_VALUE).toInt();
+}
+
+void HTMLLIElementImpl::setValue(long value) {
+  setAttribute(ATTR_VALUE, QString::number(value));
+}
 // -------------------------------------------------------------------------
 
 NodeImpl::Id HTMLDListElementImpl::id() const {
   return ID_DL;
+}
+
+bool HTMLDListElementImpl::compact() const {
+  return !getAttribute(ATTR_COMPACT).isNull();
+}
+
+void HTMLDListElementImpl::setCompact(bool b) {
+  setAttribute(ATTR_COMPACT, b ? "" : 0);
+}
 }
