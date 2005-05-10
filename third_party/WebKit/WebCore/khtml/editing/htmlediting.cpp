@@ -3440,8 +3440,8 @@ void InsertLineBreakCommand::doApply() {
 
   bool atStart = pos.offset() <= pos.node()->caretMinOffset();
   bool atEnd = pos.offset() >= pos.node()->caretMaxOffset();
-  bool atEndOfBlock = isLastVisiblePositionInBlock(
-      VisiblePosition(pos, selection.startAffinity()));
+  bool atEndOfBlock =
+      isEndOfBlock(VisiblePosition(pos, selection.startAffinity()));
 
   if (atEndOfBlock) {
     LOG(Editing, "input newline case 1");
@@ -3611,7 +3611,7 @@ void InsertParagraphSeparatorCommand::calculateStyleBeforeInsertion(
   // a paragraph. Otherwise, content that is moved as part of the work of the
   // command
   // will lend their styles to the new paragraph without any extra work needed.
-  VisiblePosition visiblePos(pos, UPSTREAM);
+  VisiblePosition visiblePos(pos, VP_DEFAULT_AFFINITY);
   if (!isFirstVisiblePositionInParagraph(visiblePos) &&
       !isLastVisiblePositionInParagraph(visiblePos))
     return;
@@ -3664,8 +3664,8 @@ void InsertParagraphSeparatorCommand::doApply() {
     return;
 
   VisiblePosition visiblePos(pos, affinity);
-  bool isFirstInBlock = isFirstVisiblePositionInBlock(visiblePos);
-  bool isLastInBlock = isLastVisiblePositionInBlock(visiblePos);
+  bool isFirstInBlock = isStartOfBlock(visiblePos);
+  bool isLastInBlock = isEndOfBlock(visiblePos);
   bool startBlockIsRoot = startBlock == startBlock->rootEditableElement();
 
   // This is the block that is going to be inserted.
@@ -4948,8 +4948,8 @@ void ReplaceSelectionCommand::doApply() {
 
   VisiblePosition visibleStart(selection.start(), selection.startAffinity());
   VisiblePosition visibleEnd(selection.end(), selection.endAffinity());
-  bool startAtStartOfBlock = isFirstVisiblePositionInBlock(visibleStart);
-  bool startAtEndOfBlock = isLastVisiblePositionInBlock(visibleStart);
+  bool startAtStartOfBlock = isStartOfBlock(visibleStart);
+  bool startAtEndOfBlock = isEndOfBlock(visibleStart);
   bool startAtBlockBoundary = startAtStartOfBlock || startAtEndOfBlock;
   NodeImpl* startBlock = selection.start().node()->enclosingBlockFlowElement();
   NodeImpl* endBlock = selection.end().node()->enclosingBlockFlowElement();
@@ -5152,10 +5152,10 @@ void ReplaceSelectionCommand::doApply() {
         insertionBlock == insertionBlock->rootEditableElement();
     VisiblePosition visiblePos(insertionPos, DOWNSTREAM);
     if (!insertionBlockIsRoot && isProbablyBlock(refNode) &&
-        isFirstVisiblePositionInBlock(visiblePos))
+        isStartOfBlock(visiblePos))
       insertNodeBeforeAndUpdateNodesInserted(refNode, insertionBlock);
     else if (!insertionBlockIsRoot && isProbablyBlock(refNode) &&
-             isLastVisiblePositionInBlock(visiblePos)) {
+             isEndOfBlock(visiblePos)) {
       insertNodeAfterAndUpdateNodesInserted(refNode, insertionBlock);
     } else if (mergeStart && !isProbablyBlock(refNode)) {
       Position pos = visiblePos.next().deepEquivalent().downstream();
@@ -5251,8 +5251,8 @@ void ReplaceSelectionCommand::doApply() {
     if (m_lastNodeInserted && m_lastNodeInserted->id() == ID_BR &&
         !document()->inStrictMode()) {
       document()->updateLayout();
-      VisiblePosition pos(Position(m_lastNodeInserted, 0), DOWNSTREAM);
-      if (isLastVisiblePositionInBlock(pos)) {
+      VisiblePosition pos(Position(m_lastNodeInserted, 1), DOWNSTREAM);
+      if (isEndOfBlock(pos)) {
         NodeImpl* next = m_lastNodeInserted->traverseNextNode();
         bool hasTrailingBR = next && next->id() == ID_BR &&
                              m_lastNodeInserted->enclosingBlockFlowElement() ==
