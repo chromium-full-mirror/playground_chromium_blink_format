@@ -46,14 +46,9 @@ class VisiblePosition {
   typedef DOM::NodeImpl NodeImpl;
   typedef DOM::Position Position;
 
-  enum EInitHint { INIT_UP, INIT_DOWN };
-
   VisiblePosition() { m_affinity = VP_DEFAULT_AFFINITY; };
-  VisiblePosition(NodeImpl*,
-                  long offset,
-                  EAffinity,
-                  EInitHint initHint = INIT_DOWN);
-  VisiblePosition(const Position&, EAffinity, EInitHint initHint = INIT_DOWN);
+  VisiblePosition(NodeImpl*, long offset, EAffinity);
+  VisiblePosition(const Position&, EAffinity);
   VisiblePosition(const VisiblePosition&);
 
   void clear() { m_deepPosition.clear(); }
@@ -94,7 +89,7 @@ class VisiblePosition {
 #endif
 
  private:
-  void init(const Position&, EInitHint, EAffinity);
+  void init(const Position&, EAffinity);
   void initUpstream(const Position&);
   void initDownstream(const Position&);
 

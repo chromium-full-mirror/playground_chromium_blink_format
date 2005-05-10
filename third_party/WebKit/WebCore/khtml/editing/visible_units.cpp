@@ -120,7 +120,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     }
   }
 
-  return VisiblePosition(pos, DOWNSTREAM, VisiblePosition::INIT_DOWN);
+  return VisiblePosition(pos, DOWNSTREAM);
 }
 
 static VisiblePosition nextBoundary(const VisiblePosition& c,
@@ -191,7 +191,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     pos = Position(charIt.range().endContainer().handle(),
                    charIt.range().endOffset());
   }
-  return VisiblePosition(pos, UPSTREAM, VisiblePosition::INIT_UP);
+  return VisiblePosition(pos, UPSTREAM);
 }
 
 // ---------
