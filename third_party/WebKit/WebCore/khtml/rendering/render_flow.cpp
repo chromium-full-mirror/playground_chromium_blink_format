@@ -816,7 +816,7 @@ void RenderFlow::paintOutlineForLine(QPainter* p,
   if (thisline.left() < lastline.left())
     drawBorder(
         p, l - ow, t - ow,
-        QMIN(r + ow, (lastline.isValid() ? tx + lastline.left() : 1000000)), t,
+        kMin(r + ow, (lastline.isValid() ? tx + lastline.left() : 1000000)), t,
         BSTop, oc, style()->color(), os, ow,
         (lastline.isValid() && tx + lastline.left() + 1 < r + ow ? -ow : ow),
         true);
@@ -824,7 +824,7 @@ void RenderFlow::paintOutlineForLine(QPainter* p,
   if (lastline.right() < thisline.right())
     drawBorder(
         p,
-        QMAX(lastline.isValid() ? tx + lastline.right() + 1 : -1000000, l - ow),
+        kMax(lastline.isValid() ? tx + lastline.right() + 1 : -1000000, l - ow),
         t - ow, r + ow, t, BSTop, oc, style()->color(), os,
         (lastline.isValid() && l - ow < tx + lastline.right() + 1 ? -ow : ow),
         ow, true);
@@ -833,7 +833,7 @@ void RenderFlow::paintOutlineForLine(QPainter* p,
   if (thisline.left() < nextline.left())
     drawBorder(
         p, l - ow, b,
-        QMIN(r + ow, nextline.isValid() ? tx + nextline.left() + 1 : 1000000),
+        kMin(r + ow, nextline.isValid() ? tx + nextline.left() + 1 : 1000000),
         b + ow, BSBottom, oc, style()->color(), os, ow,
         (nextline.isValid() && tx + nextline.left() + 1 < r + ow ? -ow : ow),
         true);
@@ -841,7 +841,7 @@ void RenderFlow::paintOutlineForLine(QPainter* p,
   if (nextline.right() < thisline.right())
     drawBorder(
         p,
-        QMAX(nextline.isValid() ? tx + nextline.right() + 1 : -1000000, l - ow),
+        kMax(nextline.isValid() ? tx + nextline.right() + 1 : -1000000, l - ow),
         b, r + ow, b + ow, BSBottom, oc, style()->color(), os,
         (nextline.isValid() && l - ow < tx + nextline.right() + 1 ? -ow : ow),
         ow, true);
