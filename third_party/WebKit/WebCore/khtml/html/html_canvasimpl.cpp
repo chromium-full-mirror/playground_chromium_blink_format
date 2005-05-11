@@ -68,13 +68,13 @@ bool HTMLCanvasElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLImageElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLCanvasElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLCanvasElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SRC: {
       // Do nothing.
       break;
     }
-    default: { HTMLImageElementImpl::parseHTMLAttribute(attr); }
+    default: { HTMLImageElementImpl::parseMappedAttribute(attr); }
   }
 }
 

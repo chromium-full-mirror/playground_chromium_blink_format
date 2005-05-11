@@ -73,7 +73,7 @@ bool HTMLDivElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLDivElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLDivElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALIGN: {
       DOMString v = attr->value();
@@ -89,7 +89,7 @@ void HTMLDivElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     }
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -127,7 +127,7 @@ bool HTMLHRElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLHRElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLHRElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALIGN: {
       if (strcasecmp(attr->value(), "left") == 0) {
@@ -158,16 +158,16 @@ void HTMLHRElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       addCSSProperty(attr, CSS_PROP_BORDER_RIGHT_STYLE, CSS_VAL_SOLID);
       addCSSProperty(attr, CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
       addCSSProperty(attr, CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
-      addHTMLColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
-      addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
       break;
     case ATTR_NOSHADE:
       addCSSProperty(attr, CSS_PROP_BORDER_TOP_STYLE, CSS_VAL_SOLID);
       addCSSProperty(attr, CSS_PROP_BORDER_RIGHT_STYLE, CSS_VAL_SOLID);
       addCSSProperty(attr, CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
       addCSSProperty(attr, CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
-      addHTMLColor(attr, CSS_PROP_BORDER_COLOR, DOMString("grey"));
-      addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, DOMString("grey"));
+      addCSSColor(attr, CSS_PROP_BORDER_COLOR, DOMString("grey"));
+      addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, DOMString("grey"));
       break;
     case ATTR_SIZE: {
       DOMStringImpl* si = attr->value().implementation();
@@ -180,7 +180,7 @@ void HTMLHRElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     }
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -247,7 +247,7 @@ bool HTMLParagraphElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLParagraphElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLParagraphElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALIGN: {
       DOMString v = attr->value();
@@ -263,7 +263,7 @@ void HTMLParagraphElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     }
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -321,7 +321,7 @@ bool HTMLMarqueeElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLMarqueeElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLMarqueeElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_WIDTH:
       if (!attr->value().isEmpty())
@@ -333,7 +333,7 @@ void HTMLMarqueeElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     case ATTR_BGCOLOR:
       if (!attr->value().isEmpty())
-        addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
+        addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
       break;
     case ATTR_VSPACE:
       if (!attr->value().isEmpty()) {
@@ -376,7 +376,7 @@ void HTMLMarqueeElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       m_minimumDelay = !attr->isNull() ? 0 : defaultMinimumDelay;
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 

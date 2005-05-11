@@ -57,7 +57,7 @@ class HTMLDivElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
+  virtual void parseMappedAttribute(MappedAttributeImpl* token);
 
   DOMString align() const;
   void setAlign(const DOMString&);
@@ -73,7 +73,7 @@ class HTMLHRElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   DOMString align() const;
   void setAlign(const DOMString&);
@@ -111,7 +111,7 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
   HTMLParagraphElementImpl(DocumentPtr* doc);
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual Id id() const;
 
@@ -138,7 +138,7 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* token);
+  virtual void parseMappedAttribute(MappedAttributeImpl* token);
 
   int minimumDelay() const { return m_minimumDelay; }
 

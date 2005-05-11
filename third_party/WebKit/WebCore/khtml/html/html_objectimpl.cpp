@@ -88,7 +88,7 @@ bool HTMLAppletElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLAppletElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLAppletElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALT:
     case ATTR_ARCHIVE:
@@ -108,7 +108,7 @@ void HTMLAppletElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       addHTMLAlignment(attr);
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -378,7 +378,7 @@ bool HTMLEmbedElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLEmbedElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   QString val = attr->value().string();
 
   int pos;
@@ -434,7 +434,7 @@ void HTMLEmbedElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       }
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -528,7 +528,7 @@ bool HTMLObjectElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLObjectElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   QString val = attr->value().string();
   int pos;
   switch (attr->id()) {
@@ -576,7 +576,7 @@ void HTMLObjectElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string(), this));
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -858,11 +858,11 @@ NodeImpl::Id HTMLParamElementImpl::id() const {
   return ID_PARAM;
 }
 
-void HTMLParamElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLParamElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ID:
       // Must call base class so that hasID bit gets set.
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
       if (getDocument()->htmlMode() != DocumentImpl::XHtml)
         break;
     // fall through

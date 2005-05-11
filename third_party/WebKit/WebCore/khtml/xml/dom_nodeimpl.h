@@ -146,6 +146,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   // Other methods (not part of DOM)
   virtual bool isElementNode() const { return false; }
   virtual bool isHTMLElement() const { return false; }
+  virtual bool isStyledElement() const { return false; }
   virtual bool isAttributeNode() const { return false; }
   virtual bool isTextNode() const { return false; }
   virtual bool isDocumentNode() const { return false; }

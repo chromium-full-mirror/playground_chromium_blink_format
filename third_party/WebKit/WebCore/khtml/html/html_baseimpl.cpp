@@ -93,7 +93,7 @@ bool HTMLBodyElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLBodyElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLBodyElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_BACKGROUND: {
       QString url = khtml::parseURL(attr->value()).string();
@@ -115,10 +115,10 @@ void HTMLBodyElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       addCSSLength(attr, CSS_PROP_MARGIN_TOP, attr->value());
       break;
     case ATTR_BGCOLOR:
-      addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
       break;
     case ATTR_TEXT:
-      addHTMLColor(attr, CSS_PROP_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_COLOR, attr->value());
       break;
     case ATTR_BGPROPERTIES:
       if (strcasecmp(attr->value(), "fixed") == 0)
@@ -193,7 +193,7 @@ void HTMLBodyElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_NOSAVE:
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -382,7 +382,7 @@ void HTMLFrameElementImpl::openURL() {
   }
 }
 
-void HTMLFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLFrameElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SRC:
       setLocation(khtml::parseURL(attr->value()));
@@ -390,7 +390,7 @@ void HTMLFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_ID:
       // Important to call through to base for ATTR_ID so the hasID bit gets
       // set.
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
     // fall through
     case ATTR_NAME:
       m_name = attr->value();
@@ -438,7 +438,7 @@ void HTMLFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string(), this));
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -648,7 +648,7 @@ NodeImpl::Id HTMLFrameSetElementImpl::id() const {
   return ID_FRAMESET;
 }
 
-void HTMLFrameSetElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLFrameSetElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWS:
       if (attr->isNull())
@@ -692,7 +692,7 @@ void HTMLFrameSetElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
           getDocument()->createHTMLEventListener(attr->value().string(), this));
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -842,7 +842,7 @@ bool HTMLIFrameElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLIFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLIFrameElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_WIDTH:
       addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
@@ -854,7 +854,7 @@ void HTMLIFrameElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       addHTMLAlignment(attr);
       break;
     default:
-      HTMLFrameElementImpl::parseHTMLAttribute(attr);
+      HTMLFrameElementImpl::parseMappedAttribute(attr);
   }
 }
 

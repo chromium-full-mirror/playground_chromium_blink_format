@@ -39,7 +39,7 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
   virtual bool isKeyboardFocusable() const;
   virtual bool isFocusable() const;
   virtual Id id() const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual void accessKeyAction(bool fullAction);
   virtual bool isURLAttribute(AttributeImpl* attr) const;
@@ -99,7 +99,7 @@ class HTMLBRElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -118,7 +118,7 @@ class HTMLFontElementImpl : public HTMLElementImpl {
   virtual Id id() const;
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   DOMString color() const;
   void setColor(const DOMString&);

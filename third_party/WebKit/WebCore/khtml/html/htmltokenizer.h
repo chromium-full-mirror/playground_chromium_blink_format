@@ -86,14 +86,14 @@ class Token {
                     const DOM::AtomicString& v) {
     DOM::AttributeImpl* a = 0;
     if (buffer->unicode())
-      a = new DOM::HTMLAttributeImpl(buffer->unicode(), v);
+      a = new DOM::MappedAttributeImpl(buffer->unicode(), v);
     else if (!attrName.isEmpty() && attrName != "/")
-      a = new DOM::HTMLAttributeImpl(
+      a = new DOM::MappedAttributeImpl(
           doc->attrId(0, DOM::DOMString(attrName).implementation(), false), v);
 
     if (a) {
       if (!attrs) {
-        attrs = new DOM::HTMLNamedAttrMapImpl(0);
+        attrs = new DOM::NamedMappedAttrMapImpl(0);
         attrs->ref();
       }
       attrs->insertAttribute(a);
@@ -111,7 +111,7 @@ class Token {
     }
     flat = false;
   }
-  DOM::HTMLNamedAttrMapImpl* attrs;
+  DOM::NamedMappedAttrMapImpl* attrs;
   DOM::DOMStringImpl* text;
   ushort id;
   bool flat;

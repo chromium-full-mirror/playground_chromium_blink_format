@@ -58,7 +58,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   virtual void insertedIntoDocument();
 
@@ -96,7 +96,7 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
   virtual void detach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -173,7 +173,7 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -250,7 +250,7 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);

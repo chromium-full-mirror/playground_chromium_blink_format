@@ -118,7 +118,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   // Used to obtain either a solid or outset border decl.
   virtual CSSMutableStyleDeclarationImpl* additionalAttributeStyleDecl();
@@ -151,7 +151,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 };
 
 // -------------------------------------------------------------------------
@@ -251,7 +251,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void attach();
 
@@ -325,7 +325,7 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
   // overrides
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   long span() const { return _span; }
 
@@ -366,7 +366,7 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   DOMString align() const;
   void setAlign(const DOMString&);

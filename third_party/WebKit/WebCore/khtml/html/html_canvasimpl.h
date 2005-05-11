@@ -48,7 +48,7 @@ class HTMLCanvasElementImpl : public HTMLImageElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl*);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   virtual void attach();
   virtual khtml::RenderObject* createRenderer(RenderArena*,

@@ -49,13 +49,13 @@ bool HTMLUListElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLUListElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLUListElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
       addCSSProperty(attr, CSS_PROP_LIST_STYLE_TYPE, attr->value());
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -122,7 +122,7 @@ bool HTMLOListElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLOListElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLOListElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_TYPE:
       if (strcmp(attr->value(), "a") == 0)
@@ -139,7 +139,7 @@ void HTMLOListElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_START:
       _start = !attr->isNull() ? attr->value().toInt() : 1;
     default:
-      HTMLUListElementImpl::parseHTMLAttribute(attr);
+      HTMLUListElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -182,7 +182,7 @@ bool HTMLLIElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLLIElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLLIElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_VALUE:
       isValued = true;
@@ -211,7 +211,7 @@ void HTMLLIElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
         addCSSProperty(attr, CSS_PROP_LIST_STYLE_TYPE, attr->value());
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 

@@ -82,7 +82,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   bool autoComplete() const { return m_autocomplete; }
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   void radioClicked(HTMLGenericFormElementImpl* caller);
 
@@ -164,7 +164,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual DOMString type() const = 0;
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void attach();
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -238,7 +238,7 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual Id id() const;
   DOMString type() const;
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool appendFormData(FormDataList&, bool);
 
@@ -356,7 +356,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -449,7 +449,7 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
 
   virtual Id id() const;
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void accessKeyAction(bool sendToAnyElement);
 
@@ -547,7 +547,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void childrenChanged();
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
@@ -601,7 +601,7 @@ class HTMLKeygenElementImpl : public HTMLSelectElementImpl {
   // ### this is just a rough guess
   virtual bool isEnumeratable() const { return false; }
 
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual bool appendFormData(FormDataList&, bool);
 
  protected:
@@ -630,7 +630,7 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual NodeImpl* removeChild(NodeImpl* oldChild, int& exceptioncode);
   virtual NodeImpl* appendChild(NodeImpl* newChild, int& exceptioncode);
   virtual NodeImpl* addChild(NodeImpl* newChild);
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   void recalcSelectOptions();
 
   DOMString label() const;
@@ -656,7 +656,8 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
 
   long index() const;
   void setIndex(long, int& exception);
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+
   DOMString value() const;
   void setValue(const DOMString&);
 
@@ -708,7 +709,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void select();
 
   virtual void childrenChanged();
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
   virtual void detach();
@@ -754,7 +755,8 @@ class HTMLIsIndexElementImpl : public HTMLInputElementImpl {
   HTMLIsIndexElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
 
   virtual Id id() const;
-  virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   DOMString prompt() const;
   void setPrompt(const DOMString&);

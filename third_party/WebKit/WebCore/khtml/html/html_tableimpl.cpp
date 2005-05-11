@@ -375,7 +375,7 @@ bool HTMLTableElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLTableElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLTableElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_WIDTH:
       addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
@@ -424,12 +424,12 @@ void HTMLTableElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
       break;
     }
     case ATTR_BGCOLOR:
-      addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
       break;
     case ATTR_BORDERCOLOR:
       m_solid = attr->decl();
       if (!attr->decl() && !attr->isEmpty()) {
-        addHTMLColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
+        addCSSColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
         addCSSProperty(attr, CSS_PROP_BORDER_TOP_STYLE, CSS_VAL_SOLID);
         addCSSProperty(attr, CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
         addCSSProperty(attr, CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
@@ -523,7 +523,7 @@ void HTMLTableElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_NOSAVE:
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -531,7 +531,7 @@ CSSMutableStyleDeclarationImpl*
 HTMLTableElementImpl::additionalAttributeStyleDecl() {
   if (m_noBorder)
     return 0;
-  HTMLAttributeImpl attr(ATTR_TABLEBORDER, m_solid ? "solid" : "outset");
+  MappedAttributeImpl attr(ATTR_TABLEBORDER, m_solid ? "solid" : "outset");
   CSSMappedAttributeDeclarationImpl* decl =
       getMappedAttributeDecl(ePersistent, &attr);
   if (!decl) {
@@ -558,8 +558,8 @@ HTMLTableElementImpl::additionalAttributeStyleDecl() {
 }
 
 CSSMutableStyleDeclarationImpl* HTMLTableElementImpl::getSharedCellDecl() {
-  HTMLAttributeImpl attr(ATTR_CELLBORDER,
-                         m_noBorder ? "none" : (m_solid ? "solid" : "inset"));
+  MappedAttributeImpl attr(ATTR_CELLBORDER,
+                           m_noBorder ? "none" : (m_solid ? "solid" : "inset"));
   CSSMappedAttributeDeclarationImpl* decl =
       getMappedAttributeDecl(ePersistent, &attr);
   if (!decl) {
@@ -706,10 +706,10 @@ bool HTMLTablePartElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLTablePartElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLTablePartElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_BGCOLOR:
-      addHTMLColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
+      addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
       break;
     case ATTR_BACKGROUND: {
       QString url = khtml::parseURL(attr->value()).string();
@@ -720,7 +720,7 @@ void HTMLTablePartElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     }
     case ATTR_BORDERCOLOR: {
       if (!attr->value().isEmpty()) {
-        addHTMLColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
+        addCSSColor(attr, CSS_PROP_BORDER_COLOR, attr->value());
         addCSSProperty(attr, CSS_PROP_BORDER_TOP_STYLE, CSS_VAL_SOLID);
         addCSSProperty(attr, CSS_PROP_BORDER_BOTTOM_STYLE, CSS_VAL_SOLID);
         addCSSProperty(attr, CSS_PROP_BORDER_LEFT_STYLE, CSS_VAL_SOLID);
@@ -755,7 +755,7 @@ void HTMLTablePartElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_NOSAVE:
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -1067,7 +1067,7 @@ bool HTMLTableCellElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLTablePartElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLTableCellElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLTableCellElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ROWSPAN:
       rSpan = !attr->isNull() ? attr->value().toInt() : 1;
@@ -1105,7 +1105,7 @@ void HTMLTableCellElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
     case ATTR_NOSAVE:
       break;
     default:
-      HTMLTablePartElementImpl::parseHTMLAttribute(attr);
+      HTMLTablePartElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -1264,7 +1264,7 @@ bool HTMLTableColElementImpl::mapToEntry(NodeImpl::Id attr,
   return HTMLTablePartElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLTableColElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLTableColElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_SPAN:
       _span = !attr->isNull() ? attr->value().toInt() : 1;
@@ -1276,7 +1276,7 @@ void HTMLTableColElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
         addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
       break;
     default:
-      HTMLTablePartElementImpl::parseHTMLAttribute(attr);
+      HTMLTablePartElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -1340,14 +1340,15 @@ bool HTMLTableCaptionElementImpl::mapToEntry(
   return HTMLElementImpl::mapToEntry(attr, result);
 }
 
-void HTMLTableCaptionElementImpl::parseHTMLAttribute(HTMLAttributeImpl* attr) {
+void HTMLTableCaptionElementImpl::parseMappedAttribute(
+    MappedAttributeImpl* attr) {
   switch (attr->id()) {
     case ATTR_ALIGN:
       if (!attr->value().isEmpty())
         addCSSProperty(attr, CSS_PROP_CAPTION_SIDE, attr->value());
       break;
     default:
-      HTMLElementImpl::parseHTMLAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
