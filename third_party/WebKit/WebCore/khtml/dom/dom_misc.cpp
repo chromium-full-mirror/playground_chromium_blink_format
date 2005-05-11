@@ -21,12 +21,18 @@
  */
 
 #include "dom_misc.h"
-using namespace DOM;
+
+namespace DOM {
 
 DomShared::~DomShared() {
   // deliberately left blank
 }
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
 bool DomShared::deleteMe() {
-  return !_ref;
+  return true;
+}
+
+#endif
 }

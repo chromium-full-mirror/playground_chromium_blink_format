@@ -71,6 +71,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   virtual void attach();
   virtual void detach();
 
+  SharedPtr<HTMLCollectionImpl> elements();
   long length() const;
 
   DOMString enctype() const { return m_enctype; }
@@ -92,7 +93,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   void removeImgElement(HTMLImageElementImpl*);
 
   bool prepareSubmit();
-  void submit(bool activateSubmitButton);
+  void submit(bool activateSubmitButton = false);
   void reset();
 
   void setMalformed(bool malformed) { m_malformed = malformed; }
@@ -100,10 +101,23 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-#if APPLE_CHANGES
   void submitClick();
   bool formWouldHaveSecureSubmission(const DOMString& url);
-#endif
+
+  DOMString name() const;
+  void setName(const DOMString&);
+
+  DOMString acceptCharset() const;
+  void setAcceptCharset(const DOMString&);
+
+  DOMString action() const;
+  void setAction(const DOMString&);
+
+  DOMString method() const;
+  void setMethod(const DOMString&);
+
+  DOMString target() const;
+  void setTarget(const DOMString&);
 
   static void i18nData();
 
@@ -129,6 +143,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   bool m_malformed : 1;
 
  private:
+  void parseEnctype(const DOMString&);
   bool formData(khtml::FormData&) const;
 
   QString oldIdAttr;
@@ -159,7 +174,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   void onSelect();
   void onChange();
 
-  virtual bool disabled() const;
+  bool disabled() const;
   void setDisabled(bool _disabled);
 
   virtual bool isFocusable() const;
@@ -168,12 +183,14 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual bool isEnumeratable() const { return false; }
 
   bool readOnly() const { return m_readOnly; }
-  void setReadOnly(bool _readOnly) { m_readOnly = _readOnly; }
+  void setReadOnly(bool _readOnly);
 
   virtual void recalcStyle(StyleChange);
 
   DOMString name() const;
   void setName(const DOMString& name);
+
+  void setOverrideName(const DOMString& name);
 
   virtual bool isGenericFormElement() const { return true; }
 
@@ -194,10 +211,13 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual bool isActivatedSubmit() const { return false; }
   virtual void setActivatedSubmit(bool flag) {}
 
+  long tabIndex() const;
+  void setTabIndex(long);
+
  protected:
   HTMLFormElementImpl* getForm() const;
 
-  DOMStringImpl* m_name;
+  DOMString m_overrideName;
   HTMLFormElementImpl* m_form;
   bool m_disabled, m_readOnly;
 
@@ -228,6 +248,13 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void click(bool sendMouseEvents);
   virtual void accessKeyAction(bool sendToAnyElement);
+
+  DOMString accessKey() const;
+  void setAccessKey(const DOMString&);
+
+  DOMString value() const;
+  void setValue(const DOMString&);
+
   void blur();
   void focus();
 
@@ -324,7 +351,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   void select();
 
-  virtual void click(bool sendMouseEvents);
+  virtual void click(bool sendMouseEvents = false);
   virtual void accessKeyAction(bool sendToAnyElement);
 
   virtual bool mapToEntry(NodeImpl::Id attr,
@@ -356,9 +383,37 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-#if APPLE_CHANGES
   long maxResults() const { return m_maxResults; }
-#endif
+
+  DOMString defaultValue() const;
+  void setDefaultValue(const DOMString&);
+
+  bool defaultChecked() const;
+  void setDefaultChecked(bool);
+
+  DOMString accept() const;
+  void setAccept(const DOMString&);
+
+  DOMString accessKey() const;
+  void setAccessKey(const DOMString&);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
+
+  DOMString alt() const;
+  void setAlt(const DOMString&);
+
+  DOMString sizeDOM()
+      const;  // FIXME: rename to size after renaming existing size attribute
+  void setSize(const DOMString&);
+
+  DOMString src() const;
+  void setSrc(const DOMString&);
+
+  void setMaxLength(long);
+
+  DOMString useMap() const;
+  void setUseMap(const DOMString&);
 
  protected:
   bool storesValueSeparateFromAttribute() const;
@@ -369,9 +424,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   short m_size;
   short yPos;
 
-#if APPLE_CHANGES
   short m_maxResults;
-#endif
 
   HTMLImageLoader* m_imageLoader;
 
@@ -405,6 +458,14 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
    */
   ElementImpl* formElement();
 
+  HTMLFormElementImpl* form();
+
+  DOMString accessKey() const;
+  void setAccessKey(const DOMString&);
+
+  DOMString htmlFor() const;
+  void setHtmlFor(const DOMString&);
+
  private:
   DOMString m_formElementID;
 };
@@ -423,6 +484,12 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
                                               khtml::RenderStyle*);
 
   virtual DOMString type() const;
+
+  DOMString accessKey() const;
+  void setAccessKey(const DOMString&);
+
+  DOMString align() const;
+  void setAlign(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -458,9 +525,11 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void focus();
 
   DOMString value();
-  void setValue(DOMStringImpl* value);
+  void setValue(const DOMString&);
 
   HTMLOptionsCollectionImpl* options();
+  SharedPtr<HTMLCollectionImpl>
+  optionsHTMLCollection();  // FIXME: Remove this and migrate to options().
 
   virtual bool maintainsState() { return true; }
   virtual QString state();
@@ -500,11 +569,12 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void notifyOptionSelected(HTMLOptionElementImpl* selectedOption,
                             bool selected);
 
-#if APPLE_CHANGES
   virtual void defaultEventHandler(EventImpl* evt);
-#endif
-
   virtual void accessKeyAction(bool sendToAnyElement);
+
+  void setMultiple(bool);
+
+  void setSize(long);
 
  private:
   void recalcListItems();
@@ -562,6 +632,9 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual NodeImpl* addChild(NodeImpl* newChild);
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   void recalcSelectOptions();
+
+  DOMString label() const;
+  void setLabel(const DOMString&);
 };
 
 // ---------------------------------------------------------------------------
@@ -579,12 +652,13 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   DOMString type() const;
 
   DOMString text() const;
+  void setText(const DOMString&, int& exception);
 
   long index() const;
-  void setIndex(long);
+  void setIndex(long, int& exception);
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
   DOMString value() const;
-  void setValue(DOMStringImpl* value);
+  void setValue(const DOMString&);
 
   bool selected() const { return m_selected; }
   void setSelected(bool _selected);
@@ -592,6 +666,12 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   HTMLSelectElementImpl* getSelect() const;
 
   virtual void childrenChanged();
+
+  bool defaultSelected() const;
+  void setDefaultSelected(bool);
+
+  DOMString label() const;
+  void setLabel(const DOMString&);
 
  protected:
   DOMString m_value;
@@ -651,6 +731,13 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void accessKeyAction(bool sendToAnyElement);
 
+  DOMString accessKey() const;
+  void setAccessKey(const DOMString&);
+
+  void setCols(long);
+
+  void setRows(long);
+
  protected:
   int m_rows;
   int m_cols;
@@ -668,6 +755,9 @@ class HTMLIsIndexElementImpl : public HTMLInputElementImpl {
 
   virtual Id id() const;
   virtual void parseHTMLAttribute(HTMLAttributeImpl* attr);
+
+  DOMString prompt() const;
+  void setPrompt(const DOMString&);
 
  protected:
   DOMString m_prompt;

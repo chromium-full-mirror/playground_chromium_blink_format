@@ -126,6 +126,7 @@ class HTMLCollection {
   HTMLCollection();
   HTMLCollection(const HTMLCollection& other);
   HTMLCollection(NodeImpl* base, int type);
+  HTMLCollection(HTMLCollectionImpl* imp);
 
  public:
   HTMLCollection& operator=(const HTMLCollection& other);

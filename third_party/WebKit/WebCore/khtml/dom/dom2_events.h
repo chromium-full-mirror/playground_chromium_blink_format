@@ -44,6 +44,12 @@ class MouseEventImpl;
 class MutationEventImpl;
 class KeyboardEventImpl;
 
+#if KHTML_NO_CPLUSPLUS_DOM
+typedef EventImpl* EventListenerEvent;
+#else
+typedef Event& EventListenerEvent;
+#endif
+
 /**
  * Introduced in DOM Level 2
  *
@@ -77,7 +83,7 @@ class EventListener : public DomShared {
    * target (there is no DOM node for the window, so it can't be the target).
    *
    */
-  virtual void handleEvent(Event& evt, bool isWindowEvent);
+  virtual void handleEvent(EventListenerEvent evt, bool isWindowEvent);
 
   /**
    * @internal
@@ -110,16 +116,24 @@ class EventListener : public DomShared {
  *
  */
 class Event {
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   friend class Document;
   friend class NodeImpl;
   friend class DocumentImpl;
 
+#endif
+
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   Event();
   Event(const Event& other);
   virtual ~Event();
 
   Event& operator=(const Event& other);
+
+#endif
 
   /**
    * An integer indicating which phase of event flow is being processed.
@@ -133,6 +147,8 @@ class Event {
    *
    */
   enum PhaseType { CAPTURING_PHASE = 1, AT_TARGET = 2, BUBBLING_PHASE = 3 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * The name of the event (case-insensitive). The name must be an XML name.
@@ -258,6 +274,8 @@ class Event {
 
  protected:
   EventImpl* impl;
+
+#endif
 };
 
 /**
@@ -269,10 +287,14 @@ class Event {
  */
 class EventException {
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   EventException(unsigned short _code);
   EventException(const EventException& other);
   EventException& operator=(const EventException& other);
   virtual ~EventException() {}
+
+#endif
 
   /**
    * An integer indicating the type of error generated.
@@ -285,8 +307,14 @@ class EventException {
    */
   enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   unsigned short code;
+
+#endif
 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 /**
  * Introduced in DOM Level 2
@@ -551,6 +579,8 @@ class MouseEvent : public UIEvent {
   MouseEvent(MouseEventImpl* impl);
 };
 
+#endif
+
 /**
  * Introduced in DOM Level 2
  *
@@ -560,12 +590,16 @@ class MouseEvent : public UIEvent {
  */
 class MutationEvent : public Event {
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   MutationEvent();
   MutationEvent(const MutationEvent& other);
   MutationEvent(const Event& other);
   MutationEvent& operator=(const MutationEvent& other);
   MutationEvent& operator=(const Event& other);
   virtual ~MutationEvent();
+
+#endif
 
   /**
    * An integer indicating in which way the Attr was changed.
@@ -578,6 +612,8 @@ class MutationEvent : public Event {
    *
    */
   enum attrChangeType { MODIFICATION = 1, ADDITION = 2, REMOVAL = 3 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * relatedNode is used to identify a secondary node related to a mutation
@@ -661,6 +697,8 @@ class MutationEvent : public Event {
 
  protected:
   MutationEvent(MutationEventImpl* impl);
+
+#endif
 };
 
 /**
@@ -670,7 +708,17 @@ class MutationEvent : public Event {
  * associated with Keyboard events.
  *
  */
-class KeyboardEvent : public UIEvent {
+class KeyboardEvent
+#if !KHTML_NO_CPLUSPLUS_DOM
+
+    : public UIEvent
+
+#endif
+
+{
+
+#if !KHTML_NO_CPLUSPLUS_DOM
+
  public:
   KeyboardEvent();
   KeyboardEvent(const KeyboardEvent& other);
@@ -679,12 +727,16 @@ class KeyboardEvent : public UIEvent {
   KeyboardEvent& operator=(const Event& other);
   virtual ~KeyboardEvent();
 
+#endif
+
   // KeyLocationCode
   static const unsigned long DOM_KEY_LOCATION_STANDARD = 0x00;
   static const unsigned long DOM_KEY_LOCATION_LEFT = 0x01;
   static const unsigned long DOM_KEY_LOCATION_RIGHT = 0x02;
   static const unsigned long DOM_KEY_LOCATION_NUMPAD = 0x03;
   static const unsigned long DOM_KEY_LOCATION_UNKNOWN = 0x04;
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * Holds the identifier of the key.
@@ -750,6 +802,8 @@ class KeyboardEvent : public UIEvent {
 
  protected:
   KeyboardEvent(KeyboardEventImpl* impl);
+
+#endif
 };
 
 };  // namespace

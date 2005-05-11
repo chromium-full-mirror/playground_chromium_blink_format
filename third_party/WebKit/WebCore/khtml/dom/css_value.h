@@ -37,6 +37,8 @@ class CSSStyleDeclarationImpl;
 class CSSRule;
 class CSSValue;
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
 /**
  * The <code> CSSStyleDeclaration </code> interface represents a
  * single <a href="http://www.w3.org/TR/REC-CSS2/syndata.html#block">
@@ -229,6 +231,8 @@ class CSSStyleDeclaration {
 
 class CSSValueImpl;
 
+#endif
+
 /**
  * The <code> CSSValue </code> interface represents a simple or a
  * complexe value.
@@ -236,6 +240,8 @@ class CSSValueImpl;
  */
 class CSSValue {
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   CSSValue();
   CSSValue(const CSSValue& other);
   CSSValue(CSSValueImpl* impl);
@@ -244,6 +250,9 @@ class CSSValue {
   CSSValue& operator=(const CSSValue& other);
 
   ~CSSValue();
+
+#endif
+
   /**
    * An integer indicating which type of unit applies to the value.
    *
@@ -258,6 +267,8 @@ class CSSValue {
     CSS_CUSTOM = 3,
     CSS_INITIAL = 4
   };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * A string representation of the current value.
@@ -295,7 +306,11 @@ class CSSValue {
 
  protected:
   CSSValueImpl* impl;
+
+#endif
 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 class CSSValueListImpl;
 class CSSValue;
@@ -349,6 +364,8 @@ class Counter;
 class RGBColor;
 class Rect;
 
+#endif
+
 /**
  * The <code> CSSPrimitiveValue </code> interface represents a single
  * <a href="http://www.w3.org/TR/REC-CSS2/syndata.html#values"> CSS
@@ -362,6 +379,8 @@ class Rect;
  */
 class CSSPrimitiveValue : public CSSValue {
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   CSSPrimitiveValue();
   CSSPrimitiveValue(const CSSPrimitiveValue& other);
   CSSPrimitiveValue(const CSSValue& other);
@@ -372,6 +391,9 @@ class CSSPrimitiveValue : public CSSValue {
   CSSPrimitiveValue& operator=(const CSSValue& other);
 
   ~CSSPrimitiveValue();
+
+#endif
+
   /**
    * An integer indicating which type of unit applies to the value.
    *
@@ -406,6 +428,8 @@ class CSSPrimitiveValue : public CSSValue {
     CSS_DASHBOARD_REGION = 26,
     CSS_HTML_RELATIVE = 255
   };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * The type of the value as defined by the constants specified
@@ -560,7 +584,11 @@ class CSSPrimitiveValue : public CSSValue {
    *
    */
   RGBColor getRGBColorValue();
+
+#endif
 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 /**
  * The <code> RGBColor </code> interface is used to represent any <a
@@ -713,6 +741,8 @@ class Counter {
   Counter(CounterImpl* i);
 };
 
-};  // namespace
+#endif
+
+}  // namespace
 
 #endif

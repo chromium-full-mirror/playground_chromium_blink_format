@@ -38,9 +38,16 @@ class HTMLBaseFontElementImpl : public HTMLElementImpl {
  public:
   HTMLBaseFontElementImpl(DocumentPtr* doc);
 
-  ~HTMLBaseFontElementImpl();
-
   virtual Id id() const;
+
+  DOMString color() const;
+  void setColor(const DOMString&);
+
+  DOMString face() const;
+  void setFace(const DOMString&);
+
+  DOMString size() const;
+  void setSize(const DOMString&);
 };
 
 // -------------------------------------------------------------------------
@@ -89,7 +96,9 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   // In case of multiple items named the same way
   virtual NodeImpl* nextNamedItem(const DOMString& name) const;
 
-  QValueList<Node> namedItems(const DOMString& name) const;
+  QValueList<SharedPtr<NodeImpl>> namedItems(const DOMString& name) const;
+
+  NodeImpl* base() { return m_base.get(); }
 
   struct CollectionInfo {
     CollectionInfo();
@@ -116,7 +125,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   virtual unsigned long calcLength() const;
   virtual void resetCollectionInfo() const;
   // the base node, the collection refers to
-  NodeImpl* base;
+  SharedPtr<NodeImpl> m_base;
   // The collection list the following elements
   int type;
   mutable CollectionInfo* info;

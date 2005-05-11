@@ -30,6 +30,7 @@ class CSSStyleDeclarationImpl;
 class CSSStyleSheetImpl;
 class DocumentFragmentImpl;
 class DocumentImpl;
+class DocumentTypeImpl;
 class ElementImpl;
 class NodeFilterImpl;
 class NodeImpl;

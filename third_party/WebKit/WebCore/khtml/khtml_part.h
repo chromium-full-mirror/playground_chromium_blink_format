@@ -234,6 +234,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   virtual void showError(KIO::Job* job);
 #endif
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   /**
    * Returns a reference to the DOM HTML document (for non-HTML documents,
    * returns null)
@@ -249,6 +251,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * Returns the node that has the keyboard focus.
    */
   DOM::Node activeNode() const;
+
+#endif
 
   /**
    * Returns a pointer to the @ref KParts::BrowserExtension.
@@ -292,10 +296,16 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @deprecated, use the one below.
    */
   QVariant executeScript(const QString& script, bool forceUserGesture = false);
-  /**
-   * Same as above except the Node parameter specifying the 'this' value.
-   */
+
+/**
+ * Same as above except the Node parameter specifying the 'this' value.
+ */
+#if !KHTML_NO_CPLUSPLUS_DOM
   QVariant executeScript(const DOM::Node& n,
+                         const QString& script,
+                         bool forceUserGesture = false);
+#endif
+  QVariant executeScript(DOM::NodeImpl* n,
                          const QString& script,
                          bool forceUserGesture = false);
 
@@ -800,10 +810,14 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   virtual void tokenizerProcessedData(){};
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   /**
    * Returns the @p Node currently under the mouse
    */
   DOM::Node nodeUnderMouse() const;
+
+#endif
 
   /**
    * @internal
@@ -964,6 +978,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    */
   void selectionChanged();
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   /**
    * This signal is emitted when an element retrieves the
    * keyboard focus. Note that the signal argument can be
@@ -972,6 +988,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * becoming active.
    */
   void nodeActivated(const DOM::Node&);
+
+#endif
 
  public:
   /**
@@ -1014,7 +1032,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   virtual void khtmlDrawContentsEvent(khtml::DrawContentsEvent*);
 
   void selectClosestWordFromMouseEvent(QMouseEvent* mouse,
-                                       DOM::Node& innerNode,
+                                       DOM::NodeImpl* innerNode,
                                        int x,
                                        int y);
 
@@ -1062,6 +1080,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
  public slots:
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   /**
    * Sets the focussed node of the document to the specified node. If the node
    * is a form control, the control will
@@ -1075,6 +1095,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
    * @param node The node to focus
    */
   void setActiveNode(const DOM::Node& node);
+
+#endif
 
   /**
    * Stops all animated images on the current and child pages
@@ -1317,7 +1339,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   virtual void clear();
 
-  bool scheduleScript(const DOM::Node& n, const QString& script);
+  bool scheduleScript(DOM::NodeImpl* n, const QString& script);
 
   QVariant executeScheduledScript();
 
@@ -1376,7 +1398,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                          const QString& button = QString::null);
   QVariant executeScript(QString filename,
                          int baseLine,
-                         const DOM::Node& n,
+                         DOM::NodeImpl* n,
                          const QString& script);
 
   void cancelRedirection(bool newLoadInProgress = false);

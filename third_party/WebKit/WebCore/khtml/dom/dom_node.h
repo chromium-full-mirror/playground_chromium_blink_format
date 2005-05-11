@@ -35,6 +35,8 @@ class QRect;
 
 namespace DOM {
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
 class Node;
 class DOMString;
 class NodeImpl;
@@ -230,9 +232,6 @@ class NamedNodeMap {
   friend class Node;
   friend class DocumentType;
   friend class NodeImpl;
-#if APPLE_CHANGES
-  friend class NamedNodeMapImpl;
-#endif
 };
 
 class NamedNodeMap;
@@ -242,6 +241,8 @@ class DOMString;
 class StyleSheet;
 
 class NodeImpl;
+
+#endif
 
 /**
  * The <code> Node </code> interface is the primary datatype for the
@@ -265,12 +266,18 @@ class NodeImpl;
  *
  */
 class Node {
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   friend class NamedNodeMap;
   friend class NodeList;
   friend class HTMLCollection;
   friend class StyleSheet;
 
+#endif
+
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   Node();
   Node(const Node& other);
 
@@ -286,6 +293,9 @@ class Node {
   bool operator!=(const Node& other);
 
   virtual ~Node();
+
+#endif
+
   /**
    * An integer indicating which type of node this is.
    *
@@ -390,6 +400,8 @@ class Node {
     DOCUMENT_FRAGMENT_NODE = 11,
     NOTATION_NODE = 12
   };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
   /**
    * The name of this node, depending on its type; see the table
@@ -777,7 +789,7 @@ class Node {
    */
   void addEventListener(const DOMString& type,
                         EventListener* listener,
-                        const bool useCapture);
+                        bool useCapture);
 
   /**
    * Introduced in DOM Level 2
@@ -879,7 +891,11 @@ class Node {
 
  protected:
   NodeImpl* impl;
+
+#endif
 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 class NodeListImpl;
 
@@ -939,10 +955,13 @@ class NodeList {
   NodeListImpl* handle() const;
   bool isNull() const;
 
- protected:
   NodeList(const NodeListImpl* i);
+
+ protected:
   NodeListImpl* impl;
 };
+
+#endif
 
 /**
  * A DOMTimeStamp represents a number of milliseconds.
@@ -950,5 +969,6 @@ class NodeList {
  */
 typedef unsigned long long DOMTimeStamp;
 
-};  // namespace
+}  // namespace
+
 #endif

@@ -808,6 +808,10 @@ class Document : public Node {
   bool queryCommandSupported(const DOMString& command);
   DOMString queryCommandValue(const DOMString& command);
 
+  /**
+   * @internal
+   * not part of the DOM
+   */
   Document(DocumentImpl* i);
 
  protected:
@@ -968,9 +972,9 @@ class DocumentType : public Node {
    */
   DOMString internalSubset() const;
 
- protected:
   DocumentType(DocumentTypeImpl* impl);
 };
 
-};  // namespace
+}  // namespace
+
 #endif

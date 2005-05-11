@@ -101,8 +101,9 @@
 
 template class QPtrStack<DOM::NodeImpl>;
 
-using namespace DOM;
 using namespace khtml;
+
+namespace DOM {
 
 HTMLDocumentImpl::HTMLDocumentImpl(DOMImplementationImpl* _implementation,
                                    KHTMLView* v)
@@ -509,6 +510,12 @@ void HTMLDocumentImpl::determineParseMode(const QString& str) {
   //         kdDebug(6020) << " using compatibility parseMode" << endl;
   //     else
   //         kdDebug(6020) << " using almost strict parseMode" << endl;
+}
+
+DocumentTypeImpl* HTMLDocumentImpl::doctype() const {
+  // According to a comment in dom_doc.cpp, doctype is null for HTML documents.
+  return 0;
+}
 }
 
 #include "html_documentimpl.moc"

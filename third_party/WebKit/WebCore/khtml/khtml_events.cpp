@@ -22,18 +22,19 @@
 #include "xml/dom_nodeimpl.h"
 #include "xml/dom_position.h"
 
-using namespace khtml;
 using namespace DOM;
 
-class khtml::MouseEvent::MouseEventPrivate {};
+namespace khtml {
 
-khtml::MouseEvent::MouseEvent(const char* name,
-                              QMouseEvent* qmouseEvent,
-                              int x,
-                              int y,
-                              const DOM::DOMString& url,
-                              const DOM::DOMString& target,
-                              const DOM::Node& innerNode)
+class MouseEvent::MouseEventPrivate {};
+
+MouseEvent::MouseEvent(const char* name,
+                       QMouseEvent* qmouseEvent,
+                       int x,
+                       int y,
+                       const DOM::DOMString& url,
+                       const DOM::DOMString& target,
+                       NodeImpl* innerNode)
     : KParts::Event(name),
       m_qmouseEvent(qmouseEvent),
       m_x(x),
@@ -42,62 +43,50 @@ khtml::MouseEvent::MouseEvent(const char* name,
       m_target(target),
       m_innerNode(innerNode) {
   d = 0;
-  if (innerNode.handle() && innerNode.handle()->renderer()) {
+  if (innerNode && innerNode->renderer()) {
     // FIXME: For text nodes, for now, we get the absolute position from
     // the parent.
-    DOM::Node n = innerNode;
-    if (n.nodeType() == Node::TEXT_NODE)
-      n = n.parentNode();
-    n.handle()->renderer()->absolutePosition(m_nodeAbsX, m_nodeAbsY);
+    NodeImpl* n = innerNode;
+    if (n->isTextNode())
+      n = n->parentNode();
+    n->renderer()->absolutePosition(m_nodeAbsX, m_nodeAbsY);
   }
 }
 
-khtml::MouseEvent::~MouseEvent() {
+MouseEvent::~MouseEvent() {
   delete d;
 }
 
-long khtml::MouseEvent::offset() const {
+long MouseEvent::offset() const {
   Position pos;
-  if (innerNode().handle()) {
+  if (NodeImpl* inner = m_innerNode.get()) {
     // FIXME: Shouldn't be necessary to skip text nodes.
-    DOM::Node inner = innerNode();
-    if (inner.nodeType() == Node::TEXT_NODE)
-      inner = inner.parentNode();
-    if (inner.handle()->renderer())
-      pos = inner.handle()
-                ->renderer()
-                ->positionForCoordinates(m_x, m_y)
-                .deepEquivalent();
+    if (inner->isTextNode())
+      inner = inner->parentNode();
+    if (inner->renderer())
+      pos =
+          inner->renderer()->positionForCoordinates(m_x, m_y).deepEquivalent();
   }
   return pos.offset();
 }
 
-const char* khtml::MousePressEvent::s_strMousePressEvent =
+const char* MousePressEvent::s_strMousePressEvent =
     "khtml/Events/MousePressEvent";
-
-const char* khtml::MouseDoubleClickEvent::s_strMouseDoubleClickEvent =
+const char* MouseDoubleClickEvent::s_strMouseDoubleClickEvent =
     "khtml/Events/MouseDoubleClickEvent";
-
-const char* khtml::MouseMoveEvent::s_strMouseMoveEvent =
-    "khtml/Events/MouseMoveEvent";
-
-const char* khtml::MouseReleaseEvent::s_strMouseReleaseEvent =
+const char* MouseMoveEvent::s_strMouseMoveEvent = "khtml/Events/MouseMoveEvent";
+const char* MouseReleaseEvent::s_strMouseReleaseEvent =
     "khtml/Events/MouseReleaseEvent";
-
-const char* khtml::DrawContentsEvent::s_strDrawContentsEvent =
+const char* DrawContentsEvent::s_strDrawContentsEvent =
     "khtml/Events/DrawContentsEvent";
 
-class khtml::DrawContentsEvent::DrawContentsEventPrivate {
- public:
-  DrawContentsEventPrivate() {}
-  ~DrawContentsEventPrivate() {}
-};
+class DrawContentsEvent::DrawContentsEventPrivate {};
 
-khtml::DrawContentsEvent::DrawContentsEvent(QPainter* painter,
-                                            int clipx,
-                                            int clipy,
-                                            int clipw,
-                                            int cliph)
+DrawContentsEvent::DrawContentsEvent(QPainter* painter,
+                                     int clipx,
+                                     int clipy,
+                                     int clipw,
+                                     int cliph)
     : KParts::Event(s_strDrawContentsEvent),
       m_painter(painter),
       m_clipx(clipx),
@@ -107,6 +96,7 @@ khtml::DrawContentsEvent::DrawContentsEvent(QPainter* painter,
   d = new DrawContentsEventPrivate;
 }
 
-khtml::DrawContentsEvent::~DrawContentsEvent() {
+DrawContentsEvent::~DrawContentsEvent() {
   delete d;
+}
 }

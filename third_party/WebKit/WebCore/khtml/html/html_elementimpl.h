@@ -31,9 +31,9 @@
 
 namespace DOM {
 
-class DOMString;
-class HTMLFormElementImpl;
 class DocumentFragmentImpl;
+class DOMString;
+class HTMLCollectionImpl;
 
 enum MappedAttributeEntry {
   eNone,
@@ -182,15 +182,29 @@ class HTMLElementImpl : public ElementImpl {
   void addHTMLColor(HTMLAttributeImpl* attr, int id, const DOMString& c);
   void createMappedDecl(HTMLAttributeImpl* attr);
 
+  SharedPtr<HTMLCollectionImpl> children();
+
+  DOMString idDOM()
+      const;  // rename to id after eliminating NodeImpl::id some day
+  void setId(const DOMString& value);
+  DOMString title() const;
+  void setTitle(const DOMString& value);
+  DOMString lang() const;
+  void setLang(const DOMString& value);
+  DOMString dir() const;
+  void setDir(const DOMString& value);
+  DOMString className() const;
+  void setClassName(const DOMString& value);
+
   DOMString innerHTML() const;
   DOMString outerHTML() const;
   DOMString innerText() const;
   DOMString outerText() const;
   DocumentFragmentImpl* createContextualFragment(const DOMString& html);
-  bool setInnerHTML(const DOMString& html);
-  bool setOuterHTML(const DOMString& html);
-  bool setInnerText(const DOMString& text);
-  bool setOuterText(const DOMString& text);
+  void setInnerHTML(const DOMString& html, int& exception);
+  void setOuterHTML(const DOMString& html, int& exception);
+  void setInnerText(const DOMString& text, int& exception);
+  void setOuterText(const DOMString& text, int& exception);
 
   virtual DOMString namespaceURI() const;
 
@@ -213,9 +227,7 @@ class HTMLElementImpl : public ElementImpl {
 
   virtual AttributeImpl* createAttribute(NodeImpl::Id id, DOMStringImpl* value);
 
-#if APPLE_CHANGES
   virtual bool isGenericFormElement() const { return false; }
-#endif
 
   virtual DOMString toString() const;
 
@@ -234,6 +246,8 @@ class HTMLElementImpl : public ElementImpl {
   void invalidateStyleAttribute();
   virtual void updateStyleAttributeIfNeeded() const;
 
+  virtual CSSStyleDeclarationImpl* style();
+
  protected:
   // for IMG, OBJECT and APPLET
   void addHTMLAlignment(HTMLAttributeImpl* htmlAttr);
@@ -245,16 +259,13 @@ class HTMLElementImpl : public ElementImpl {
 
 class HTMLGenericElementImpl : public HTMLElementImpl {
  public:
-  HTMLGenericElementImpl(DocumentPtr* doc, ushort i);
-
-  virtual ~HTMLGenericElementImpl();
-
-  virtual Id id() const { return _id; };
+  HTMLGenericElementImpl(DocumentPtr* doc, ushort elementId);
+  virtual Id id() const;
 
  protected:
-  ushort _id;
+  ushort m_elementId;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

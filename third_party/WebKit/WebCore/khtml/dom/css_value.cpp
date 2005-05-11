@@ -84,40 +84,30 @@ void CSSStyleDeclaration::setCssText(const DOMString& value) {
 DOMString CSSStyleDeclaration::getPropertyValue(const DOMString& propertyName) {
   if (!impl)
     return DOMString();
-  int id = getPropertyID(propertyName.string().ascii(), propertyName.length());
-  if (!id)
-    return DOMString();
-  return impl->getPropertyValue(id);
+  return impl->getPropertyValue(propertyName);
 }
 
 CSSValue CSSStyleDeclaration::getPropertyCSSValue(
     const DOMString& propertyName) {
   if (!impl)
     return 0;
-  int id = getPropertyID(propertyName.string().ascii(), propertyName.length());
-  if (!id)
-    return 0;
-  return impl->getPropertyCSSValue(id);
+  return impl->getPropertyCSSValue(propertyName);
 }
 
 DOMString CSSStyleDeclaration::removeProperty(const DOMString& property) {
-  int id = getPropertyID(property.string().ascii(), property.length());
-  if (!impl || !id)
+  if (!impl)
     return DOMString();
   int exceptionCode = 0;
-  DOMString result = impl->removeProperty(id, exceptionCode);
+  DOMString result = impl->removeProperty(property, exceptionCode);
   throwException(exceptionCode);
   return result;
 }
 
 DOMString CSSStyleDeclaration::getPropertyPriority(
     const DOMString& propertyName) {
-  int id = getPropertyID(propertyName.string().ascii(), propertyName.length());
-  if (!impl || !id)
+  if (!impl)
     return DOMString();
-  if (impl->getPropertyPriority(id))
-    return DOMString("important");
-  return DOMString();
+  return impl->getPropertyPriority(propertyName);
 }
 
 void CSSStyleDeclaration::setProperty(const DOMString& propName,
@@ -125,16 +115,8 @@ void CSSStyleDeclaration::setProperty(const DOMString& propName,
                                       const DOMString& priority) {
   if (!impl)
     return;
-  int id = getPropertyID(propName.string().lower().ascii(), propName.length());
-  if (!id)
-    return;
-  bool important = false;
-  QString str = priority.string();
-  if (str.find("important", 0, false) != -1)
-    important = true;
-
   int exceptionCode;
-  impl->setProperty(id, value, important, exceptionCode);
+  impl->setProperty(propName, value, priority, exceptionCode);
   throwException(exceptionCode);
 }
 

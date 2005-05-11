@@ -34,6 +34,8 @@
 
 namespace DOM {
 
+#if !KHTML_NO_CPLUSPLUS_DOM
+
 class StyleSheetImpl;
 class MediaList;
 class NodeImpl;
@@ -164,12 +166,16 @@ class StyleSheet {
   StyleSheetImpl* impl;
 };
 
+#endif
+
 /**
  * This exception is raised when a specific CSS operation is impossible
  * to perform.
  */
 class CSSException {
  public:
+#if !KHTML_NO_CPLUSPLUS_DOM
+
   CSSException(unsigned short _code) { code = _code; }
   CSSException(const CSSException& other) { code = other.code; }
 
@@ -185,12 +191,17 @@ class CSSException {
    */
   unsigned short code;
 
+#endif
+
   enum ExceptionCode {
     SYNTAX_ERR = 0,
     INVALID_MODIFICATION_ERR = 1,
-    _EXCEPTION_OFFSET = 1000
+    _EXCEPTION_OFFSET = 1000,
+    _EXCEPTION_MAX = 1999
   };
 };
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 class CSSStyleSheetImpl;
 class CSSRule;
@@ -484,6 +495,8 @@ class DocumentStyle {
   DocumentImpl* doc;
   DocumentStyleImpl* impl;
 };
+
+#endif
 
 };  // namespace
 
