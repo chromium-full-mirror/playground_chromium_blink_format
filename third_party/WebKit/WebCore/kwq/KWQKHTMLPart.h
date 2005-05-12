@@ -322,7 +322,11 @@ class KWQKHTMLPart : public KHTMLPart {
   NSString* matchLabelsAgainstElement(NSArray* labels,
                                       DOM::ElementImpl* element);
 
-  bool findString(NSString* str, bool forward, bool caseFlag, bool wrapFlag);
+  bool findString(NSString* str,
+                  bool forward,
+                  bool caseFlag,
+                  bool wrapFlag,
+                  bool findInSelection);
 
   void setSettings(KHTMLSettings*);
 
