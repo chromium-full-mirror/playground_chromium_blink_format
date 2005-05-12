@@ -19,31 +19,30 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "kjs_html.h"
+
 #include "misc/loader.h"
-#include "dom/html_block.h"
-#include "dom/html_head.h"
-#include "dom/html_image.h"
-#include "dom/html_inline.h"
-#include "dom/html_list.h"
-#include "dom/html_table.h"
-#include "dom/html_object.h"
 #include "dom/dom_exception.h"
 #include "xml/dom2_eventsimpl.h"
 
-// ### HACK
+#include "xml/dom_textimpl.h"
 #include "html/html_baseimpl.h"
+#include "html/html_blockimpl.h"
 #include "html/html_canvasimpl.h"
 #include "html/html_documentimpl.h"
+#include "html/html_formimpl.h"
+#include "html/html_headimpl.h"
 #include "html/html_imageimpl.h"
+#include "html/html_inlineimpl.h"
+#include "html/html_listimpl.h"
 #include "html/html_objectimpl.h"
+#include "html/html_tableimpl.h"
 
 #include "khtml_part.h"
 #include "khtmlview.h"
 
-#include "ecma/kjs_css.h"
-#include "ecma/kjs_html.h"
-#include "ecma/kjs_window.h"
-#include "ecma/kjs_html.lut.h"
+#include "kjs_css.h"
+#include "kjs_window.h"
 #include "kjs_events.h"
 #include "kjs_proxy.h"
 
@@ -55,21 +54,100 @@
 
 #include <kdebug.h>
 
-#include "cssparser.h"
-#include "css_stylesheetimpl.h"
+#include "css/cssparser.h"
+#include "css/css_stylesheetimpl.h"
+#include "css/css_ruleimpl.h"
 
-#include "qcolor.h"
-#include "qpixmap.h"
-#include "qpainter.h"
+#include <qcolor.h>
+#include <qpixmap.h>
+#include <qpainter.h>
 
+#if APPLE_CHANGES
 #include <ApplicationServices/ApplicationServices.h>
+#endif
 
-using namespace KJS;
-
-using DOM::DocumentImpl;
 using DOM::DOMString;
+using DOM::DocumentImpl;
+using DOM::ElementImpl;
+using DOM::EventImpl;
+using DOM::HTMLAnchorElementImpl;
+using DOM::HTMLAppletElementImpl;
+using DOM::HTMLAreaElementImpl;
+using DOM::HTMLBRElementImpl;
+using DOM::HTMLBaseElementImpl;
+using DOM::HTMLBaseFontElementImpl;
+using DOM::HTMLBlockquoteElementImpl;
+using DOM::HTMLBodyElementImpl;
+using DOM::HTMLButtonElementImpl;
+using DOM::HTMLCanvasElementImpl;
+using DOM::HTMLCollectionImpl;
+using DOM::HTMLDListElementImpl;
+using DOM::HTMLDirectoryElementImpl;
+using DOM::HTMLDivElementImpl;
+using DOM::HTMLDocumentImpl;
+using DOM::HTMLElementImpl;
+using DOM::HTMLFieldSetElementImpl;
+using DOM::HTMLFontElementImpl;
+using DOM::HTMLFormElementImpl;
 using DOM::HTMLFrameElementImpl;
+using DOM::HTMLFrameSetElementImpl;
+using DOM::HTMLGenericFormElementImpl;
+using DOM::HTMLHRElementImpl;
+using DOM::HTMLHeadElementImpl;
+using DOM::HTMLHeadingElementImpl;
+using DOM::HTMLHtmlElementImpl;
 using DOM::HTMLIFrameElementImpl;
+using DOM::HTMLIFrameElementImpl;
+using DOM::HTMLImageElementImpl;
+using DOM::HTMLInputElementImpl;
+using DOM::HTMLIsIndexElementImpl;
+using DOM::HTMLLIElementImpl;
+using DOM::HTMLLabelElementImpl;
+using DOM::HTMLLegendElementImpl;
+using DOM::HTMLLinkElementImpl;
+using DOM::HTMLMapElementImpl;
+using DOM::HTMLMenuElementImpl;
+using DOM::HTMLMetaElementImpl;
+using DOM::HTMLModElementImpl;
+using DOM::HTMLOListElementImpl;
+using DOM::HTMLObjectElementImpl;
+using DOM::HTMLOptGroupElementImpl;
+using DOM::HTMLOptionElementImpl;
+using DOM::HTMLParagraphElementImpl;
+using DOM::HTMLParamElementImpl;
+using DOM::HTMLPreElementImpl;
+using DOM::HTMLQuoteElementImpl;
+using DOM::HTMLScriptElementImpl;
+using DOM::HTMLSelectElementImpl;
+using DOM::HTMLStyleElementImpl;
+using DOM::HTMLTableCaptionElementImpl;
+using DOM::HTMLTableCellElementImpl;
+using DOM::HTMLTableColElementImpl;
+using DOM::HTMLTableElementImpl;
+using DOM::HTMLTableRowElementImpl;
+using DOM::HTMLTableSectionElementImpl;
+using DOM::HTMLTextAreaElementImpl;
+using DOM::HTMLTitleElementImpl;
+using DOM::HTMLUListElementImpl;
+using DOM::NodeImpl;
+using DOM::NodeListImpl;
+using DOM::TextImpl;
+
+using khtml::RenderCanvasImage;
+using khtml::SharedPtr;
+
+#include "kjs_html.lut.h"
+
+namespace KJS {
+
+class HTMLElementFunction : public DOMFunction {
+ public:
+  HTMLElementFunction(ExecState* exec, int i, int len);
+  virtual Value tryCall(ExecState* exec, Object& thisObj, const List& args);
+
+ private:
+  int id;
+};
 
 IMPLEMENT_PROTOFUNC(HTMLDocFunction)
 
@@ -81,8 +159,8 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
     exec->setException(err);
     return err;
   }
-  DOM::HTMLDocument doc =
-      static_cast<KJS::HTMLDocument*>(thisObj.imp())->toDocument();
+  HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(
+      static_cast<HTMLDocument*>(thisObj.imp())->impl());
 
   switch (id) {
     case HTMLDocument::Clear:  // even IE doesn't support that one...
@@ -92,7 +170,7 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
       // For compatibility with other browsers, pass open calls with more than 2
       // parameters to the window.
       if (args.size() > 2) {
-        KHTMLPart* part = static_cast<DOM::DocumentImpl*>(doc.handle())->part();
+        KHTMLPart* part = doc.part();
         if (part) {
           Window* window = Window::retrieveWindow(part);
           if (window) {
@@ -131,7 +209,7 @@ Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
     }
     case HTMLDocument::GetElementsByName:
       return getDOMNodeList(
-          exec, doc.getElementsByName(args[0].toString(exec).string()));
+          exec, doc.getElementsByName(args[0].toString(exec).string()).get());
     case HTMLDocument::CaptureEvents:
     case HTMLDocument::ReleaseEvents:
       // Do nothing for now. These are NS-specific legacy calls.
@@ -194,28 +272,30 @@ wouldn't,
 # ids
 @end
 */
-bool KJS::HTMLDocument::hasProperty(ExecState* exec,
-                                    const Identifier& p) const {
-#ifdef KJS_VERBOSE
-// kdDebug(6070) << "KJS::HTMLDocument::hasProperty " << p.qstring() << endl;
-#endif
-  DOM::HTMLDocumentImpl* docImpl =
-      static_cast<DOM::HTMLDocumentImpl*>(node.handle());
 
-  return (DOMDocument::hasProperty(exec, p) ||
-          docImpl->haveNamedImageOrForm(p.qstring()));
+HTMLDocument::HTMLDocument(ExecState* exec, HTMLDocumentImpl* d)
+    : DOMDocument(exec, d) {}
+
+bool HTMLDocument::hasProperty(ExecState* exec, const Identifier& p) const {
+#ifdef KJS_VERBOSE
+// kdDebug(6070) << "HTMLDocument::hasProperty " << p.qstring() << endl;
+#endif
+  HTMLDocumentImpl* doc = static_cast<HTMLDocumentImpl*>(impl());
+  return DOMDocument::hasProperty(exec, p) ||
+         doc->haveNamedImageOrForm(p.qstring());
 }
 
-Value KJS::HTMLDocument::tryGet(ExecState* exec,
-                                const Identifier& propertyName) const {
+Value HTMLDocument::tryGet(ExecState* exec,
+                           const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring()
                 << endl;
 #endif
-  DOM::HTMLDocument doc = static_cast<DOM::HTMLDocument>(node);
-  DOM::HTMLBodyElement body = doc.body();
+  HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
+  HTMLElementImpl* body = doc.body();
 
-  KHTMLView* view = static_cast<DOM::DocumentImpl*>(doc.handle())->view();
+  KHTMLView* view = doc.view();
+  KHTMLPart* part = doc.part();
 
   const HashEntry* entry = Lookup::findEntry(&HTMLDocumentTable, propertyName);
   if (entry) {
@@ -229,30 +309,28 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case URL:
         return String(doc.URL());
       case Body:
-        return getDOMNode(exec, doc.body());
+        return getDOMNode(exec, body);
       case Location:
-        if (view && view->part()) {
-          Window* win = Window::retrieveWindow(view->part());
+        if (part) {
+          Window* win = Window::retrieveWindow(part);
           if (win)
             return Value(win->location());
-          else
-            return Undefined();
-        } else
-          return Undefined();
+        }
+        return Undefined();
       case Cookie:
         return String(doc.cookie());
       case Images:
-        return getHTMLCollection(exec, doc.images());
+        return getHTMLCollection(exec, doc.images().get());
       case Embeds:
-        return getHTMLCollection(exec, doc.embeds());
+        return getHTMLCollection(exec, doc.embeds().get());
       case Applets:
-        return getHTMLCollection(exec, doc.applets());
+        return getHTMLCollection(exec, doc.applets().get());
       case Links:
-        return getHTMLCollection(exec, doc.links());
+        return getHTMLCollection(exec, doc.links().get());
       case Forms:
-        return getHTMLCollection(exec, doc.forms());
+        return getHTMLCollection(exec, doc.forms().get());
       case Anchors:
-        return getHTMLCollection(exec, doc.anchors());
+        return getHTMLCollection(exec, doc.anchors().get());
       case Scripts:  // TODO (IE-specific)
       {
         // To be implemented. Meanwhile, return an object with a length property
@@ -269,7 +347,7 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
         if (exec->dynamicInterpreter()->compatMode() ==
             Interpreter::NetscapeCompat)
           return Undefined();
-        return getHTMLCollection(exec, doc.all());
+        return getHTMLCollection(exec, doc.all().get());
       case Clear:
       case Open:
       case Close:
@@ -287,18 +365,32 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
   if (val)
     return Value(val);
 
+  HTMLBodyElementImpl* bodyElement =
+      (body && body->id() == ID_BODY) ? static_cast<HTMLBodyElementImpl*>(body)
+                                      : 0;
+
   if (entry) {
     switch (entry->value) {
       case BgColor:
-        return String(body.bgColor());
+        if (!bodyElement)
+          return Undefined();
+        return String(bodyElement->bgColor());
       case FgColor:
-        return String(body.text());
+        if (!bodyElement)
+          return Undefined();
+        return String(bodyElement->text());
       case AlinkColor:
-        return String(body.aLink());
+        if (!bodyElement)
+          return Undefined();
+        return String(bodyElement->aLink());
       case LinkColor:
-        return String(body.link());
+        if (!bodyElement)
+          return Undefined();
+        return String(bodyElement->link());
       case VlinkColor:
-        return String(body.vLink());
+        if (!bodyElement)
+          return Undefined();
+        return String(bodyElement->vLink());
       case LastModified:
         return String(doc.lastModified());
       case Height:
@@ -306,58 +398,39 @@ Value KJS::HTMLDocument::tryGet(ExecState* exec,
       case Width:
         return Number(view ? view->contentsWidth() : 0);
       case Dir:
-        return String(body.dir());
-      case DesignMode: {
-        DocumentImpl* docimpl = static_cast<DocumentImpl*>(doc.handle());
-        if (!docimpl)
-          return Undefined();
-        return String(docimpl->inDesignMode() ? "on" : "off");
-      }
+        return Undefined();
+        return String(bodyElement->dir());
+      case DesignMode:
+        return String(doc.inDesignMode() ? "on" : "off");
     }
   }
 
   if (DOMDocument::hasProperty(exec, propertyName))
     return DOMDocument::tryGet(exec, propertyName);
 
-// kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() << "
-// not found, returning element" << endl;
-// image and form elements with the name p will be looked up last
+  // kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() <<
+  // " not found, returning element" << endl;
+  // image and form elements with the name p will be looked up last
 
-#if APPLE_CHANGES
   // Look for named applets.
-  // FIXME:  Factor code that creates RuntimeObjectImp for applet.  It's also
+  // FIXME: Factor code that creates RuntimeObjectImp for applet. It's also
   // located in applets[0].
-  DOM::HTMLCollection applets = doc.applets();
-  DOM::HTMLElement anApplet = applets.namedItem(propertyName.string());
-  if (!anApplet.isNull()) {
-    return getDOMNode(exec, anApplet);
-  }
 
-  DOM::HTMLCollection embeds = doc.embeds();
-  DOM::HTMLElement anEmbed = embeds.namedItem(propertyName.string());
-  if (!anEmbed.isNull()) {
-    return getDOMNode(exec, anEmbed);
-  }
+  if (NodeImpl* applet = doc.applets()->namedItem(propertyName.string()))
+    return getDOMNode(exec, applet);
 
-  DOM::HTMLCollection objects = doc.objects();
-  DOM::HTMLElement anObject = objects.namedItem(propertyName.string());
-  if (!anObject.isNull()) {
-    return getDOMNode(exec, anObject);
-  }
-#endif
+  if (NodeImpl* embed = doc.embeds()->namedItem(propertyName.string()))
+    return getDOMNode(exec, embed);
 
-  DOM::HTMLDocumentImpl* docImpl =
-      static_cast<DOM::HTMLDocumentImpl*>(node.handle());
-  if (!docImpl->haveNamedImageOrForm(propertyName.qstring())) {
+  if (NodeImpl* object = doc.objects()->namedItem(propertyName.string()))
+    return getDOMNode(exec, object);
+
+  if (!doc.haveNamedImageOrForm(propertyName.qstring()))
     return Undefined();
-  }
 
-  DOM::HTMLCollection nameableItems = doc.nameableItems();
-  KJS::HTMLCollection kjsCollection(exec, nameableItems);
-  return kjsCollection.getNamedItems(
-      exec, propertyName);  // Get all the items with the same name
-
-  return Undefined();
+  return HTMLCollection(exec, doc.nameableItems().get())
+      .getNamedItems(exec,
+                     propertyName);  // Get all the items with the same name
 }
 
 void KJS::HTMLDocument::tryPut(ExecState* exec,
@@ -376,32 +449,28 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
                                  int token,
                                  const Value& value,
                                  int /*attr*/) {
-  DOM::HTMLDocument doc = static_cast<DOM::HTMLDocument>(node);
-  DOM::HTMLBodyElement body = doc.body();
+  DOMExceptionTranslator exception(exec);
+  HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
+  HTMLElementImpl* body = doc.body();
+  HTMLBodyElementImpl* bodyElement =
+      (body && body->id() == ID_BODY) ? static_cast<HTMLBodyElementImpl*>(body)
+                                      : 0;
 
   switch (token) {
     case Title:
       doc.setTitle(value.toString(exec).string());
       break;
-    case Body: {
-      DOMNode* node = new DOMNode(exec, KJS::toNode(value));
-      // This is required to avoid leaking the node.
-      Value nodeValue(node);
-      doc.setBody(node->toNode());
+    case Body:
+      doc.setBody(toHTMLElement(value), exception);
       break;
-    }
-    case Domain: {  // not part of the DOM
-      DOM::HTMLDocumentImpl* docimpl =
-          static_cast<DOM::HTMLDocumentImpl*>(doc.handle());
-      if (docimpl)
-        docimpl->setDomain(value.toString(exec).string());
+    case Domain:  // not part of the DOM
+      doc.setDomain(value.toString(exec).string());
       break;
-    }
     case Cookie:
       doc.setCookie(value.toString(exec).string());
       break;
     case Location: {
-      KHTMLPart* part = static_cast<DOM::DocumentImpl*>(doc.handle())->part();
+      KHTMLPart* part = doc.part();
       if (part) {
         QString str = value.toString(exec).qstring();
 
@@ -412,67 +481,58 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
             static_cast<KJS::ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->part();
         if (activePart)
-          str = activePart->htmlDocument().completeURL(str).string();
+          str = activePart->xmlDocImpl()->completeURL(str);
 
-#if APPLE_CHANGES
         // We want a new history item if this JS was called via a user gesture
         bool userGesture =
             static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->wasRunByUserGesture();
         part->scheduleLocationChange(str, activePart->referrer(), !userGesture);
-#else
-        part->scheduleLocationChange(str, activePart->referrer(),
-                                     false /*don't lock history*/);
-#endif
       }
       break;
     }
     case BgColor:
-      body.setBgColor(value.toString(exec).string());
+      if (bodyElement)
+        bodyElement->setBgColor(value.toString(exec).string());
       break;
     case FgColor:
-      body.setText(value.toString(exec).string());
+      if (bodyElement)
+        bodyElement->setText(value.toString(exec).string());
       break;
     case AlinkColor:
-      // this check is a bit silly, but some benchmarks like to set the
-      // document's link colors over and over to the same value and we
-      // don't want to incur a style update each time.
-      {
-        DOM::DOMString newColor = value.toString(exec).string();
-        if (body.aLink() != newColor) {
-          body.setALink(newColor);
-        }
+      if (bodyElement) {
+        // this check is a bit silly, but some benchmarks like to set the
+        // document's link colors over and over to the same value and we
+        // don't want to incur a style update each time.
+        DOMString newColor = value.toString(exec).string();
+        if (bodyElement->aLink() != newColor)
+          bodyElement->setALink(newColor);
       }
       break;
     case LinkColor:
-      // this check is a bit silly, but some benchmarks like to set the
-      // document's link colors over and over to the same value and we
-      // don't want to incur a style update each time.
-      {
-        DOM::DOMString newColor = value.toString(exec).string();
-        if (body.link() != newColor) {
-          body.setLink(newColor);
-        }
+      if (bodyElement) {
+        // this check is a bit silly, but some benchmarks like to set the
+        // document's link colors over and over to the same value and we
+        // don't want to incur a style update each time.
+        DOMString newColor = value.toString(exec).string();
+        if (bodyElement->link() != newColor)
+          bodyElement->setLink(newColor);
       }
       break;
     case VlinkColor:
-      // this check is a bit silly, but some benchmarks like to set the
-      // document's link colors over and over to the same value and we
-      // don't want to incur a style update each time.
-      {
-        DOM::DOMString newColor = value.toString(exec).string();
-        if (body.vLink() != newColor) {
-          body.setVLink(newColor);
-        }
+      if (bodyElement) {
+        // this check is a bit silly, but some benchmarks like to set the
+        // document's link colors over and over to the same value and we
+        // don't want to incur a style update each time.
+        DOMString newColor = value.toString(exec).string();
+        if (bodyElement->vLink() != newColor)
+          bodyElement->setVLink(newColor);
       }
       break;
     case Dir:
-      body.setDir(value.toString(exec).string());
+      body->setDir(value.toString(exec).string());
       break;
     case DesignMode: {
-      DocumentImpl* docimpl = static_cast<DocumentImpl*>(doc.handle());
-      if (!docimpl)
-        break;
       DOMString modeString = value.toString(exec).string();
       DocumentImpl::InheritedBool mode;
       if (!strcasecmp(modeString, "on"))
@@ -481,8 +541,9 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
         mode = DocumentImpl::off;
       else
         mode = DocumentImpl::inherit;
-      docimpl->setDesignMode(mode);
-    } break;
+      doc.setDesignMode(mode);
+      break;
+    }
     default:
       kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
   }
@@ -617,8 +678,7 @@ const ClassInfo KJS::HTMLElement::marquee_info = {
     "HTMLMarqueeElement", &KJS::HTMLElement::info, &HTMLMarqueeElementTable, 0};
 
 const ClassInfo* KJS::HTMLElement::classInfo() const {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
-  switch (element.elementId()) {
+  switch (impl()->id()) {
     case ID_HTML:
       return &html_info;
     case ID_HEAD:
@@ -1227,43 +1287,46 @@ DontDelete|ReadOnly
 @end
 */
 
+HTMLElement::HTMLElement(ExecState* exec, HTMLElementImpl* e)
+    : DOMElement(exec, e) {}
+
 Value KJS::HTMLElement::tryGet(ExecState* exec,
                                const Identifier& propertyName) const {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KJS::HTMLElement::tryGet " << propertyName.qstring()
                 << " thisTag=" << element.tagName().string() << endl;
 #endif
   // First look at dynamic properties
-  switch (element.elementId()) {
+  switch (element.id()) {
     case ID_FORM: {
-      DOM::HTMLFormElement form = element;
+      HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
       // Check if we're retrieving an element (by index or by name)
       bool ok;
       uint u = propertyName.toULong(&ok);
       if (ok)
-        return getDOMNode(exec, form.elements().item(u));
-      KJS::HTMLCollection coll(exec, form.elements());
-      Value namedItems = coll.getNamedItems(exec, propertyName);
-      if (namedItems.type() != UndefinedType)
+        return getDOMNode(exec, form.elements()->item(u));
+      ValueImp* namedItems = HTMLCollection(exec, form.elements().get())
+                                 .getNamedItems(exec, propertyName);
+      if (!namedItems->isUndefined())
         return namedItems;
     } break;
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       bool ok;
       uint u = propertyName.toULong(&ok);
       if (ok)
         return getDOMNode(
             exec,
-            select.options().item(
+            select.optionsHTMLCollection()->item(
                 u));  // not specified by DOM(?) but supported in netscape/IE
     } break;
     case ID_FRAMESET: {
-      DOM::Node frame = element.children().namedItem(propertyName.string());
-      if (!frame.isNull() && frame.elementId() == ID_FRAME) {
-        DOM::DocumentImpl* doc =
-            static_cast<DOM::HTMLFrameElementImpl*>(frame.handle())
-                ->contentDocument();
+      NodeImpl* frame = element.children()->namedItem(propertyName.string());
+      if (frame && frame->id() == ID_FRAME) {
+        DocumentImpl* doc =
+            static_cast<HTMLFrameElementImpl*>(frame)->contentDocument();
         if (doc) {
           KHTMLPart* part = doc->part();
           if (part) {
@@ -1277,20 +1340,14 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
     } break;
     case ID_FRAME:
     case ID_IFRAME: {
-      DOM::DocumentImpl* doc =
-          static_cast<DOM::HTMLFrameElementImpl*>(element.handle())
-              ->contentDocument();
+      DocumentImpl* doc =
+          static_cast<HTMLFrameElementImpl&>(element).contentDocument();
       if (doc) {
         KHTMLPart* part = doc->part();
         if (part) {
-          Object globalObject = Object::dynamicCast(Window::retrieve(part));
-          // Calling hasProperty on a Window object doesn't work, it always says
-          // true.
-          // Hence we need to use getDirect instead.
-          if (!globalObject.isNull() &&
-              static_cast<ObjectImp*>(globalObject.imp())
-                  ->getDirect(propertyName))
-            return globalObject.get(exec, propertyName);
+          Window* window = Window::retrieveWindow(part);
+          if (window && window->hasProperty(exec, propertyName))
+            return window->get(exec, propertyName);
         }
       }
     } break;
@@ -1299,11 +1356,10 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
     case ID_OBJECT:
     case ID_APPLET: {
       if (propertyName == "__apple_runtime_object") {
-        return getRuntimeObject(exec, element);
+        return getRuntimeObject(exec, &element);
       }
 
-      Value domValue = getDOMNode(exec, element);
-      Value runtimeObject = getRuntimeObject(exec, element);
+      Value runtimeObject = getRuntimeObject(exec, &element);
       if (!runtimeObject.isNull()) {
         ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject.imp());
         if (imp->hasProperty(exec, propertyName)) {
@@ -1328,21 +1384,19 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
 
   // Base HTMLElement stuff or parent class forward, as usual
   return DOMObjectLookupGet<KJS::HTMLElementFunction, KJS::HTMLElement,
-                            DOMElement>(exec, propertyName,
-                                        &KJS::HTMLElementTable, this);
+                            DOMElement>(exec, propertyName, &HTMLElementTable,
+                                        this);
 }
 
-#if APPLE_CHANGES
 bool KJS::HTMLElement::implementsCall() const {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
-  switch (element.elementId()) {
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(impl());
+  switch (element->id()) {
     case ID_EMBED:
     case ID_OBJECT:
     case ID_APPLET: {
-      DOM::DocumentImpl* doc = element.handle()->getDocument();
+      DocumentImpl* doc = element->getDocument();
       KJSProxy* proxy = KJSProxy::proxy(doc->part());
       ExecState* exec = proxy->interpreter()->globalExec();
-      Value domValue = getDOMNode(exec, element);
       Value runtimeObject = getRuntimeObject(exec, element);
       if (!runtimeObject.isNull()) {
         ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject.imp());
@@ -1358,12 +1412,11 @@ bool KJS::HTMLElement::implementsCall() const {
 Value KJS::HTMLElement::call(ExecState* exec,
                              Object& thisObj,
                              const List& args) {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
-  switch (element.elementId()) {
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(impl());
+  switch (element->id()) {
     case ID_EMBED:
     case ID_OBJECT:
     case ID_APPLET: {
-      Value domValue = getDOMNode(exec, element);
       Value runtimeObject = getRuntimeObject(exec, element);
       if (!runtimeObject.isNull()) {
         ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject.imp());
@@ -1375,23 +1428,22 @@ Value KJS::HTMLElement::call(ExecState* exec,
   }
   return Undefined();
 }
-#endif
 
 Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
-  switch (element.elementId()) {
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
+  switch (element.id()) {
     case ID_HTML: {
-      DOM::HTMLHtmlElement html = element;
+      HTMLHtmlElementImpl& html = static_cast<HTMLHtmlElementImpl&>(element);
       if (token == HtmlVersion)
         return String(html.version());
     } break;
     case ID_HEAD: {
-      DOM::HTMLHeadElement head = element;
+      HTMLHeadElementImpl& head = static_cast<HTMLHeadElementImpl&>(element);
       if (token == HeadProfile)
         return String(head.profile());
     } break;
     case ID_LINK: {
-      DOM::HTMLLinkElement link = element;
+      HTMLLinkElementImpl& link = static_cast<HTMLLinkElementImpl&>(element);
       switch (token) {
         case LinkDisabled:
           return Boolean(link.disabled());
@@ -1412,19 +1464,18 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case LinkType:
           return String(link.type());
         case LinkSheet:
-          return getDOMStyleSheet(
-              exec, static_cast<DOM::ProcessingInstruction>(node).sheet());
+          return getDOMStyleSheet(exec, link.sheet());
       }
     } break;
     case ID_TITLE: {
-      DOM::HTMLTitleElement title = element;
+      HTMLTitleElementImpl& title = static_cast<HTMLTitleElementImpl&>(element);
       switch (token) {
         case TitleText:
           return String(title.text());
       }
     } break;
     case ID_META: {
-      DOM::HTMLMetaElement meta = element;
+      HTMLMetaElementImpl& meta = static_cast<HTMLMetaElementImpl&>(element);
       switch (token) {
         case MetaContent:
           return String(meta.content());
@@ -1437,7 +1488,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_BASE: {
-      DOM::HTMLBaseElement base = element;
+      HTMLBaseElementImpl& base = static_cast<HTMLBaseElementImpl&>(element);
       switch (token) {
         case BaseHref:
           return String(base.href());
@@ -1446,7 +1497,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_ISINDEX: {
-      DOM::HTMLIsIndexElement isindex = element;
+      HTMLIsIndexElementImpl& isindex =
+          static_cast<HTMLIsIndexElementImpl&>(element);
       switch (token) {
         case IsIndexForm:
           return getDOMNode(exec, isindex.form());  // type HTMLFormElement
@@ -1455,7 +1507,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_STYLE: {
-      DOM::HTMLStyleElement style = element;
+      HTMLStyleElementImpl& style = static_cast<HTMLStyleElementImpl&>(element);
       switch (token) {
         case StyleDisabled:
           return Boolean(style.disabled());
@@ -1464,12 +1516,11 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case StyleType:
           return String(style.type());
         case StyleSheet:
-          return getDOMStyleSheet(
-              exec, static_cast<DOM::ProcessingInstruction>(node).sheet());
+          return getDOMStyleSheet(exec, style.sheet());
       }
     } break;
     case ID_BODY: {
-      DOM::HTMLBodyElement body = element;
+      HTMLBodyElementImpl& body = static_cast<HTMLBodyElementImpl&>(element);
       switch (token) {
         case BodyALink:
           return String(body.aLink());
@@ -1485,36 +1536,28 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(body.vLink());
         default:
           // Update the document's layout before we compute these attributes.
-          DOM::DocumentImpl* docimpl = node.handle()->getDocument();
-          if (docimpl) {
-            docimpl->updateLayoutIgnorePendingStylesheets();
-          }
+          DocumentImpl* doc = body.getDocument();
+          if (doc)
+            doc->updateLayoutIgnorePendingStylesheets();
+          KHTMLView* view = doc ? doc->view() : 0;
           switch (token) {
             case BodyScrollLeft:
-              return Number(body.ownerDocument().view()
-                                ? body.ownerDocument().view()->contentsX()
-                                : 0);
+              return Number(view ? view->contentsX() : 0);
             case BodyScrollTop:
-              return Number(body.ownerDocument().view()
-                                ? body.ownerDocument().view()->contentsY()
-                                : 0);
+              return Number(view ? view->contentsY() : 0);
             case BodyScrollHeight:
-              return Number(body.ownerDocument().view()
-                                ? body.ownerDocument().view()->contentsHeight()
-                                : 0);
+              return Number(view ? view->contentsHeight() : 0);
             case BodyScrollWidth:
-              return Number(body.ownerDocument().view()
-                                ? body.ownerDocument().view()->contentsWidth()
-                                : 0);
+              return Number(view ? view->contentsWidth() : 0);
           }
       }
     } break;
 
     case ID_FORM: {
-      DOM::HTMLFormElement form = element;
+      HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
       switch (token) {
         case FormElements:
-          return getHTMLCollection(exec, form.elements());
+          return getHTMLCollection(exec, form.elements().get());
         case FormLength:
           return Number(form.length());
         case FormName:
@@ -1532,7 +1575,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       switch (token) {
         case SelectType:
           return String(select.type());
@@ -1545,8 +1589,9 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case SelectForm:
           return getDOMNode(exec, select.form());  // type HTMLFormElement
         case SelectOptions:
-          return getSelectHTMLCollection(exec, select.options(),
-                                         select);  // type HTMLCollection
+          return getSelectHTMLCollection(exec,
+                                         select.optionsHTMLCollection().get(),
+                                         &select);  // type HTMLCollection
         case SelectDisabled:
           return Boolean(select.disabled());
         case SelectMultiple:
@@ -1560,7 +1605,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_OPTGROUP: {
-      DOM::HTMLOptGroupElement optgroup = element;
+      HTMLOptGroupElementImpl& optgroup =
+          static_cast<HTMLOptGroupElementImpl&>(element);
       switch (token) {
         case OptGroupDisabled:
           return Boolean(optgroup.disabled());
@@ -1569,7 +1615,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_OPTION: {
-      DOM::HTMLOptionElement option = element;
+      HTMLOptionElementImpl& option =
+          static_cast<HTMLOptionElementImpl&>(element);
       switch (token) {
         case OptionForm:
           return getDOMNode(exec, option.form());  // type HTMLFormElement
@@ -1590,7 +1637,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_INPUT: {
-      DOM::HTMLInputElement input = element;
+      HTMLInputElementImpl& input = static_cast<HTMLInputElementImpl&>(element);
       switch (token) {
         case InputDefaultValue:
           return String(input.defaultValue());
@@ -1617,7 +1664,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case InputReadOnly:
           return Boolean(input.readOnly());
         case InputSize:
-          return String(input.size());
+          return String(input.sizeDOM());
         case InputSrc:
           return String(input.src());
         case InputTabIndex:
@@ -1631,7 +1678,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_TEXTAREA: {
-      DOM::HTMLTextAreaElement textarea = element;
+      HTMLTextAreaElementImpl& textarea =
+          static_cast<HTMLTextAreaElementImpl&>(element);
       switch (token) {
         case TextAreaDefaultValue:
           return String(textarea.defaultValue());
@@ -1658,7 +1706,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_BUTTON: {
-      DOM::HTMLButtonElement button = element;
+      HTMLButtonElementImpl& button =
+          static_cast<HTMLButtonElementImpl&>(element);
       switch (token) {
         case ButtonForm:
           return getDOMNode(exec, button.form());  // type HTMLFormElement
@@ -1677,7 +1726,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_LABEL: {
-      DOM::HTMLLabelElement label = element;
+      HTMLLabelElementImpl& label = static_cast<HTMLLabelElementImpl&>(element);
       switch (token) {
         case LabelForm:
           return getDOMNode(exec, label.form());  // type HTMLFormElement
@@ -1688,14 +1737,16 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_FIELDSET: {
-      DOM::HTMLFieldSetElement fieldSet = element;
+      HTMLFieldSetElementImpl& fieldSet =
+          static_cast<HTMLFieldSetElementImpl&>(element);
       switch (token) {
         case FieldSetForm:
           return getDOMNode(exec, fieldSet.form());  // type HTMLFormElement
       }
     } break;
     case ID_LEGEND: {
-      DOM::HTMLLegendElement legend = element;
+      HTMLLegendElementImpl& legend =
+          static_cast<HTMLLegendElementImpl&>(element);
       switch (token) {
         case LegendForm:
           return getDOMNode(exec, legend.form());  // type HTMLFormElement
@@ -1706,7 +1757,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_UL: {
-      DOM::HTMLUListElement uList = element;
+      HTMLUListElementImpl& uList = static_cast<HTMLUListElementImpl&>(element);
       switch (token) {
         case UListCompact:
           return Boolean(uList.compact());
@@ -1715,7 +1766,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_OL: {
-      DOM::HTMLOListElement oList = element;
+      HTMLOListElementImpl& oList = static_cast<HTMLOListElementImpl&>(element);
       switch (token) {
         case OListCompact:
           return Boolean(oList.compact());
@@ -1726,28 +1777,29 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_DL: {
-      DOM::HTMLDListElement dList = element;
+      HTMLDListElementImpl& dList = static_cast<HTMLDListElementImpl&>(element);
       switch (token) {
         case DListCompact:
           return Boolean(dList.compact());
       }
     } break;
     case ID_DIR: {
-      DOM::HTMLDirectoryElement directory = element;
+      HTMLDirectoryElementImpl& directory =
+          static_cast<HTMLDirectoryElementImpl&>(element);
       switch (token) {
         case DirectoryCompact:
           return Boolean(directory.compact());
       }
     } break;
     case ID_MENU: {
-      DOM::HTMLMenuElement menu = element;
+      HTMLMenuElementImpl& menu = static_cast<HTMLMenuElementImpl&>(element);
       switch (token) {
         case MenuCompact:
           return Boolean(menu.compact());
       }
     } break;
     case ID_LI: {
-      DOM::HTMLLIElement li = element;
+      HTMLLIElementImpl& li = static_cast<HTMLLIElementImpl&>(element);
       switch (token) {
         case LIType:
           return String(li.type());
@@ -1756,14 +1808,15 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_DIV: {
-      DOM::HTMLDivElement div = element;
+      HTMLDivElementImpl& div = static_cast<HTMLDivElementImpl&>(element);
       switch (token) {
         case DivAlign:
           return String(div.align());
       }
     } break;
     case ID_P: {
-      DOM::HTMLParagraphElement paragraph = element;
+      HTMLParagraphElementImpl& paragraph =
+          static_cast<HTMLParagraphElementImpl&>(element);
       switch (token) {
         case ParagraphAlign:
           return String(paragraph.align());
@@ -1775,42 +1828,45 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
     case ID_H4:
     case ID_H5:
     case ID_H6: {
-      DOM::HTMLHeadingElement heading = element;
+      HTMLHeadingElementImpl& heading =
+          static_cast<HTMLHeadingElementImpl&>(element);
       switch (token) {
         case HeadingAlign:
           return String(heading.align());
       }
     } break;
     case ID_BLOCKQUOTE: {
-      DOM::HTMLBlockquoteElement blockquote = element;
+      HTMLBlockquoteElementImpl& blockquote =
+          static_cast<HTMLBlockquoteElementImpl&>(element);
       switch (token) {
         case BlockQuoteCite:
           return String(blockquote.cite());
       }
     }
     case ID_Q: {
-      DOM::HTMLQuoteElement quote = element;
+      HTMLQuoteElementImpl& quote = static_cast<HTMLQuoteElementImpl&>(element);
       switch (token) {
         case QuoteCite:
           return String(quote.cite());
       }
     }
     case ID_PRE: {
-      DOM::HTMLPreElement pre = element;
+      HTMLPreElementImpl& pre = static_cast<HTMLPreElementImpl&>(element);
       switch (token) {
         case PreWidth:
           return Number(pre.width());
       }
     } break;
     case ID_BR: {
-      DOM::HTMLBRElement br = element;
+      HTMLBRElementImpl& br = static_cast<HTMLBRElementImpl&>(element);
       switch (token) {
         case BRClear:
           return String(br.clear());
       }
     } break;
     case ID_BASEFONT: {
-      DOM::HTMLBaseFontElement baseFont = element;
+      HTMLBaseFontElementImpl& baseFont =
+          static_cast<HTMLBaseFontElementImpl&>(element);
       switch (token) {
         case BaseFontColor:
           return String(baseFont.color());
@@ -1821,7 +1877,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_FONT: {
-      DOM::HTMLFontElement font = element;
+      HTMLFontElementImpl& font = static_cast<HTMLFontElementImpl&>(element);
       switch (token) {
         case FontColor:
           return String(font.color());
@@ -1832,7 +1888,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_HR: {
-      DOM::HTMLHRElement hr = element;
+      HTMLHRElementImpl& hr = static_cast<HTMLHRElementImpl&>(element);
       switch (token) {
         case HRAlign:
           return String(hr.align());
@@ -1846,7 +1902,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
     } break;
     case ID_INS:
     case ID_DEL: {
-      DOM::HTMLModElement mod = element;
+      HTMLModElementImpl& mod = static_cast<HTMLModElementImpl&>(element);
       switch (token) {
         case ModCite:
           return String(mod.cite());
@@ -1855,7 +1911,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_A: {
-      DOM::HTMLAnchorElement anchor = element;
+      HTMLAnchorElementImpl& anchor =
+          static_cast<HTMLAnchorElementImpl&>(element);
       switch (token) {
         case AnchorAccessKey:
           return String(anchor.accessKey());
@@ -1901,17 +1958,14 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(anchor.target());
         case AnchorType:
           return String(anchor.type());
-        case AnchorText: {
-          DOM::DocumentImpl* docimpl = node.handle()->getDocument();
-          if (docimpl) {
-            docimpl->updateLayoutIgnorePendingStylesheets();
-          }
-        }
+        case AnchorText:
+          if (DocumentImpl* doc = anchor.getDocument())
+            doc->updateLayoutIgnorePendingStylesheets();
           return String(anchor.innerText());
       }
     } break;
     case ID_IMG: {
-      DOM::HTMLImageElement image = element;
+      HTMLImageElementImpl& image = static_cast<HTMLImageElementImpl&>(element);
       switch (token) {
         case ImageName:
           return String(image.name());
@@ -1922,8 +1976,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ImageBorder:
           return Number(image.border());
         case ImageHeight:
-          return Number(static_cast<DOM::HTMLImageElementImpl*>(image.handle())
-                            ->height(true));
+          return Number(image.height(true));
         case ImageHspace:
           return Number(image.hspace());
         case ImageIsMap:
@@ -1937,8 +1990,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case ImageVspace:
           return Number(image.vspace());
         case ImageWidth:
-          return Number(static_cast<DOM::HTMLImageElementImpl*>(image.handle())
-                            ->width(true));
+          return Number(image.width(true));
         case ImageX:
           return Number(image.x());
         case ImageY:
@@ -1946,7 +1998,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_OBJECT: {
-      DOM::HTMLObjectElement object = element;
+      HTMLObjectElementImpl& object =
+          static_cast<HTMLObjectElementImpl&>(element);
       switch (token) {
         case ObjectForm:
           return getDOMNode(exec, object.form());  // type HTMLFormElement
@@ -1991,7 +2044,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_PARAM: {
-      DOM::HTMLParamElement param = element;
+      HTMLParamElementImpl& param = static_cast<HTMLParamElementImpl&>(element);
       switch (token) {
         case ParamName:
           return String(param.name());
@@ -2004,7 +2057,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_APPLET: {
-      DOM::HTMLAppletElement applet = element;
+      HTMLAppletElementImpl& applet =
+          static_cast<HTMLAppletElementImpl&>(element);
       switch (token) {
         case AppletAlign:
           return String(applet.align());
@@ -2031,16 +2085,17 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_MAP: {
-      DOM::HTMLMapElement map = element;
+      HTMLMapElementImpl& map = static_cast<HTMLMapElementImpl&>(element);
       switch (token) {
         case MapAreas:
-          return getHTMLCollection(exec, map.areas());  // type HTMLCollection
+          return getHTMLCollection(exec,
+                                   map.areas().get());  // type HTMLCollection
         case MapName:
           return String(map.name());
       }
     } break;
     case ID_AREA: {
-      DOM::HTMLAreaElement area = element;
+      HTMLAreaElementImpl& area = static_cast<HTMLAreaElementImpl&>(element);
       switch (token) {
         case AreaAccessKey:
           return String(area.accessKey());
@@ -2081,7 +2136,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_SCRIPT: {
-      DOM::HTMLScriptElement script = element;
+      HTMLScriptElementImpl& script =
+          static_cast<HTMLScriptElementImpl&>(element);
       switch (token) {
         case ScriptText:
           return String(script.text());
@@ -2100,7 +2156,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_TABLE: {
-      DOM::HTMLTableElement table = element;
+      HTMLTableElementImpl& table = static_cast<HTMLTableElementImpl&>(element);
       switch (token) {
         case TableCaption:
           return getDOMNode(exec,
@@ -2112,10 +2168,11 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return getDOMNode(exec,
                             table.tFoot());  // type HTMLTableSectionElement
         case TableRows:
-          return getHTMLCollection(exec, table.rows());  // type HTMLCollection
-        case TableTBodies:
           return getHTMLCollection(exec,
-                                   table.tBodies());  // type HTMLCollection
+                                   table.rows().get());  // type HTMLCollection
+        case TableTBodies:
+          return getHTMLCollection(
+              exec, table.tBodies().get());  // type HTMLCollection
         case TableAlign:
           return String(table.align());
         case TableBgColor:
@@ -2137,14 +2194,16 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_CAPTION: {
-      DOM::HTMLTableCaptionElement tableCaption;
+      HTMLTableCaptionElementImpl& tableCaption =
+          static_cast<HTMLTableCaptionElementImpl&>(element);
       switch (token) {
         case TableCaptionAlign:
           return String(tableCaption.align());
       }
     } break;
     case ID_COL: {
-      DOM::HTMLTableColElement tableCol = element;
+      HTMLTableColElementImpl& tableCol =
+          static_cast<HTMLTableColElementImpl&>(element);
       switch (token) {
         case TableColAlign:
           return String(tableCol.align());
@@ -2163,7 +2222,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
     case ID_THEAD:
     case ID_TBODY:
     case ID_TFOOT: {
-      DOM::HTMLTableSectionElement tableSection = element;
+      HTMLTableSectionElementImpl& tableSection =
+          static_cast<HTMLTableSectionElementImpl&>(element);
       switch (token) {
         case TableSectionAlign:
           return String(tableSection.align());
@@ -2174,20 +2234,21 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
         case TableSectionVAlign:
           return String(tableSection.vAlign());
         case TableSectionRows:
-          return getHTMLCollection(exec,
-                                   tableSection.rows());  // type HTMLCollection
+          return getHTMLCollection(
+              exec, tableSection.rows().get());  // type HTMLCollection
       }
     } break;
     case ID_TR: {
-      DOM::HTMLTableRowElement tableRow = element;
+      HTMLTableRowElementImpl& tableRow =
+          static_cast<HTMLTableRowElementImpl&>(element);
       switch (token) {
         case TableRowRowIndex:
           return Number(tableRow.rowIndex());
         case TableRowSectionRowIndex:
           return Number(tableRow.sectionRowIndex());
         case TableRowCells:
-          return getHTMLCollection(exec,
-                                   tableRow.cells());  // type HTMLCollection
+          return getHTMLCollection(
+              exec, tableRow.cells().get());  // type HTMLCollection
         case TableRowAlign:
           return String(tableRow.align());
         case TableRowBgColor:
@@ -2202,7 +2263,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
     } break;
     case ID_TH:
     case ID_TD: {
-      DOM::HTMLTableCellElement tableCell = element;
+      HTMLTableCellElementImpl& tableCell =
+          static_cast<HTMLTableCellElementImpl&>(element);
       switch (token) {
         case TableCellCellIndex:
           return Number(tableCell.cellIndex());
@@ -2237,7 +2299,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_FRAMESET: {
-      DOM::HTMLFrameSetElement frameSet = element;
+      HTMLFrameSetElementImpl& frameSet =
+          static_cast<HTMLFrameSetElementImpl&>(element);
       switch (token) {
         case FrameSetCols:
           return String(frameSet.cols());
@@ -2246,7 +2309,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_FRAME: {
-      DOM::HTMLFrameElement frameElement = element;
+      HTMLFrameElementImpl& frameElement =
+          static_cast<HTMLFrameElementImpl&>(element);
       switch (token) {
         case FrameContentDocument:
           return checkNodeSecurity(exec, frameElement.contentDocument())
@@ -2254,9 +2318,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
                      : Undefined();
         case FrameContentWindow:
           return checkNodeSecurity(exec, frameElement.contentDocument())
-                     ? Window::retrieve(static_cast<HTMLFrameElementImpl*>(
-                                            frameElement.handle())
-                                            ->contentPart())
+                     ? Window::retrieve(frameElement.contentPart())
                      : Undefined();
         case FrameFrameBorder:
           return String(frameElement.frameBorder());
@@ -2278,7 +2340,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       }
     } break;
     case ID_IFRAME: {
-      DOM::HTMLIFrameElement iFrame = element;
+      HTMLIFrameElementImpl& iFrame =
+          static_cast<HTMLIFrameElementImpl&>(element);
       switch (token) {
         case IFrameAlign:
           return String(iFrame.align());
@@ -2290,9 +2353,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
                      : Undefined();
         case IFrameContentWindow:
           return checkNodeSecurity(exec, iFrame.contentDocument())
-                     ? Window::retrieve(
-                           static_cast<HTMLIFrameElementImpl*>(iFrame.handle())
-                               ->contentPart())
+                     ? Window::retrieve(iFrame.contentPart())
                      : Undefined();
         case IFrameFrameBorder:
           return String(iFrame.frameBorder());
@@ -2325,7 +2386,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       // iht.com relies on this value being "" when no id is present.  Other
       // browsers do this as well.
       // So we use String() instead of String() here.
-      return String(element.id());
+      return String(element.idDOM());
     case ElementTitle:
       return String(element.title());
     case ElementLang:
@@ -2336,12 +2397,9 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
       return String(element.className());
     case ElementInnerHTML:
       return String(element.innerHTML());
-    case ElementInnerText: {
-      DOM::DocumentImpl* docimpl = node.handle()->getDocument();
-      if (docimpl) {
-        docimpl->updateLayoutIgnorePendingStylesheets();
-      }
-    }
+    case ElementInnerText:
+      if (DocumentImpl* doc = impl()->getDocument())
+        doc->updateLayoutIgnorePendingStylesheets();
       return String(element.innerText());
     case ElementOuterHTML:
       return String(element.outerHTML());
@@ -2350,7 +2408,7 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
     case ElementDocument:
       return getDOMNode(exec, element.ownerDocument());
     case ElementChildren:
-      return getHTMLCollection(exec, element.children());
+      return getHTMLCollection(exec, element.children().get());
     case ElementContentEditable:
       return String(element.contentEditable());
     case ElementIsContentEditable:
@@ -2368,26 +2426,28 @@ bool KJS::HTMLElement::hasProperty(ExecState* exec,
 // kdDebug(6070) << "HTMLElement::hasProperty " << propertyName.qstring() <<
 // endl;
 #endif
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
   // First look at dynamic properties - keep this in sync with tryGet
-  switch (element.elementId()) {
+  switch (element.id()) {
     case ID_FORM: {
-      DOM::HTMLFormElement form = element;
+      HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
       // Check if we're retrieving an element (by index or by name)
       bool ok;
       uint u = propertyName.toULong(&ok);
-      if (ok && !(form.elements().item(u).isNull()))
+      if (ok && form.elements()->item(u))
         return true;
-      DOM::Node testnode = form.elements().namedItem(propertyName.string());
-      if (!testnode.isNull())
+      if (form.elements()->namedItem(propertyName.string()))
         return true;
+      break;
     }
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       bool ok;
       uint u = propertyName.toULong(&ok);
-      if (ok && !(select.options().item(u).isNull()))
+      if (ok && select.optionsHTMLCollection()->item(u))
         return true;
+      break;
     }
     default:
       break;
@@ -2397,97 +2457,57 @@ bool KJS::HTMLElement::hasProperty(ExecState* exec,
 }
 
 UString KJS::HTMLElement::toString(ExecState* exec) const {
-  if (node.elementId() == ID_A)
-    return UString(static_cast<const DOM::HTMLAnchorElement&>(node).href());
+  if (impl()->id() == ID_A)
+    return UString(static_cast<const HTMLAnchorElementImpl*>(impl())->href());
   else
     return DOMElement::toString(exec);
 }
 
-static void getForm(DOM::HTMLFormElement* form,
-                    const DOM::HTMLElement& element) {
-  switch (element.elementId()) {
-    case ID_ISINDEX: {
-      DOM::HTMLIsIndexElement isindex = element;
-      *form = isindex.form();
-      break;
-    }
-    case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
-      *form = select.form();
-      break;
-    }
-    case ID_OPTION: {
-      DOM::HTMLOptionElement option = element;
-      *form = option.form();
-      break;
-    }
-    case ID_INPUT: {
-      DOM::HTMLInputElement input = element;
-      *form = input.form();
-      break;
-    }
-    case ID_TEXTAREA: {
-      DOM::HTMLTextAreaElement textarea = element;
-      *form = textarea.form();
-      break;
-    }
-    case ID_LABEL: {
-      DOM::HTMLLabelElement label = element;
-      *form = label.form();
-      break;
-    }
-    case ID_FIELDSET: {
-      DOM::HTMLFieldSetElement fieldset = element;
-      *form = fieldset.form();
-      break;
-    }
-    case ID_LEGEND: {
-      DOM::HTMLLegendElement legend = element;
-      *form = legend.form();
-      break;
-    }
-    case ID_OBJECT: {
-      DOM::HTMLObjectElement object = element;
-      *form = object.form();
-      break;
-    }
-    default:
-      break;
+static HTMLFormElementImpl* getForm(HTMLElementImpl* element) {
+  if (element->isGenericFormElement())
+    return static_cast<HTMLGenericFormElementImpl*>(element)->form();
+
+  switch (element->id()) {
+    case ID_LABEL:
+      return static_cast<HTMLLabelElementImpl*>(element)->form();
+    case ID_OBJECT:
+      return static_cast<HTMLObjectElementImpl*>(element)->form();
   }
+
+  return 0;
 }
 
 void KJS::HTMLElement::pushEventHandlerScope(ExecState* exec,
                                              ScopeChain& scope) const {
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(impl());
 
   // The document is put on first, fall back to searching it only after the
   // element and form.
   scope.push(
-      static_cast<ObjectImp*>(getDOMNode(exec, element.ownerDocument()).imp()));
+      static_cast<ObjectImp*>(getDOMNode(exec, element->ownerDocument())));
 
   // The form is next, searched before the document, but after the element
   // itself.
-  DOM::HTMLFormElement formElt;
 
   // First try to obtain the form from the element itself.  We do this to deal
   // with
   // the malformed case where <form>s aren't in our parent chain (e.g., when
   // they were inside
   // <table> or <tbody>.
-  getForm(&formElt, element);
-  if (!formElt.isNull())
-    scope.push(static_cast<ObjectImp*>(getDOMNode(exec, formElt).imp()));
+  HTMLFormElementImpl* form = getForm(element);
+  if (form)
+    scope.push(static_cast<ObjectImp*>(getDOMNode(exec, form)));
   else {
-    DOM::Node form = element.parentNode();
-    while (!form.isNull() && form.elementId() != ID_FORM)
-      form = form.parentNode();
+    NodeImpl* form = element->parentNode();
+    while (form && form->id() != ID_FORM)
+      form = form->parentNode();
 
-    if (!form.isNull())
-      scope.push(static_cast<ObjectImp*>(getDOMNode(exec, form).imp()));
+    if (form)
+      scope.push(static_cast<ObjectImp*>(getDOMNode(exec, form)));
   }
 
   // The element is on top, searched first.
-  scope.push(static_cast<ObjectImp*>(getDOMNode(exec, element).imp()));
+  scope.push(static_cast<ObjectImp*>(getDOMNode(exec, element)));
 }
 
 HTMLElementFunction::HTMLElementFunction(ExecState* exec, int i, int len)
@@ -2505,12 +2525,13 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
     return err;
   }
   kdDebug() << "KJS::HTMLElementFunction::tryCall " << endl;
-  DOM::HTMLElement element =
-      static_cast<KJS::HTMLElement*>(thisObj.imp())->toElement();
+  DOMExceptionTranslator exception(exec);
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(
+      static_cast<HTMLElement*>(thisObj.imp())->impl());
 
-  switch (element.elementId()) {
+  switch (element.id()) {
     case ID_FORM: {
-      DOM::HTMLFormElement form = element;
+      HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
       if (id == KJS::HTMLElement::FormSubmit) {
         form.submit();
         return Undefined();
@@ -2520,9 +2541,10 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       if (id == KJS::HTMLElement::SelectAdd) {
-        select.add(KJS::toNode(args[0]), KJS::toNode(args[1]));
+        select.add(toHTMLElement(args[0]), toHTMLElement(args[1]));
         return Undefined();
       } else if (id == KJS::HTMLElement::SelectRemove) {
         select.remove(int(args[0].toNumber(exec)));
@@ -2536,7 +2558,7 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_INPUT: {
-      DOM::HTMLInputElement input = element;
+      HTMLInputElementImpl& input = static_cast<HTMLInputElementImpl&>(element);
       if (id == KJS::HTMLElement::InputBlur) {
         input.blur();
         return Undefined();
@@ -2552,7 +2574,8 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_BUTTON: {
-      DOM::HTMLButtonElement button = element;
+      HTMLButtonElementImpl& button =
+          static_cast<HTMLButtonElementImpl&>(element);
 
       if (id == KJS::HTMLElement::ButtonBlur) {
         button.blur();
@@ -2563,7 +2586,8 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_TEXTAREA: {
-      DOM::HTMLTextAreaElement textarea = element;
+      HTMLTextAreaElementImpl& textarea =
+          static_cast<HTMLTextAreaElementImpl&>(element);
       if (id == KJS::HTMLElement::TextAreaBlur) {
         textarea.blur();
         return Undefined();
@@ -2576,7 +2600,8 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_A: {
-      DOM::HTMLAnchorElement anchor = element;
+      HTMLAnchorElementImpl& anchor =
+          static_cast<HTMLAnchorElementImpl&>(element);
       if (id == KJS::HTMLElement::AnchorBlur) {
         anchor.blur();
         return Undefined();
@@ -2588,7 +2613,7 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       }
     } break;
     case ID_TABLE: {
-      DOM::HTMLTableElement table = element;
+      HTMLTableElementImpl& table = static_cast<HTMLTableElementImpl&>(element);
       if (id == KJS::HTMLElement::TableCreateTHead)
         return getDOMNode(exec, table.createTHead());
       else if (id == KJS::HTMLElement::TableDeleteTHead) {
@@ -2605,44 +2630,48 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
         table.deleteCaption();
         return Undefined();
       } else if (id == KJS::HTMLElement::TableInsertRow)
-        return getDOMNode(exec, table.insertRow(args[0].toInt32(exec)));
+        return getDOMNode(exec,
+                          table.insertRow(args[0].toInt32(exec), exception));
       else if (id == KJS::HTMLElement::TableDeleteRow) {
-        table.deleteRow(args[0].toInt32(exec));
+        table.deleteRow(args[0].toInt32(exec), exception);
         return Undefined();
       }
     } break;
     case ID_THEAD:
     case ID_TBODY:
     case ID_TFOOT: {
-      DOM::HTMLTableSectionElement tableSection = element;
+      HTMLTableSectionElementImpl& tableSection =
+          static_cast<HTMLTableSectionElementImpl&>(element);
       if (id == KJS::HTMLElement::TableSectionInsertRow)
-        return getDOMNode(exec, tableSection.insertRow(args[0].toInt32(exec)));
+        return getDOMNode(
+            exec, tableSection.insertRow(args[0].toInt32(exec), exception));
       else if (id == KJS::HTMLElement::TableSectionDeleteRow) {
-        tableSection.deleteRow(args[0].toInt32(exec));
+        tableSection.deleteRow(args[0].toInt32(exec), exception);
         return Undefined();
       }
     } break;
     case ID_TR: {
-      DOM::HTMLTableRowElement tableRow = element;
+      HTMLTableRowElementImpl& tableRow =
+          static_cast<HTMLTableRowElementImpl&>(element);
       if (id == KJS::HTMLElement::TableRowInsertCell)
-        return getDOMNode(exec, tableRow.insertCell(args[0].toInt32(exec)));
+        return getDOMNode(
+            exec, tableRow.insertCell(args[0].toInt32(exec), exception));
       else if (id == KJS::HTMLElement::TableRowDeleteCell) {
-        tableRow.deleteCell(args[0].toInt32(exec));
+        tableRow.deleteCell(args[0].toInt32(exec), exception);
         return Undefined();
       }
     }
     case ID_MARQUEE: {
-      if (id == KJS::HTMLElement::MarqueeStart &&
-          element.handle()->renderer() &&
-          element.handle()->renderer()->layer() &&
-          element.handle()->renderer()->layer()->marquee()) {
-        element.handle()->renderer()->layer()->marquee()->start();
+      if (id == KJS::HTMLElement::MarqueeStart && element.renderer() &&
+          element.renderer()->layer() &&
+          element.renderer()->layer()->marquee()) {
+        element.renderer()->layer()->marquee()->start();
         return Undefined();
-      } else if (id == KJS::HTMLElement::MarqueeStop &&
-                 element.handle()->renderer() &&
-                 element.handle()->renderer()->layer() &&
-                 element.handle()->renderer()->layer()->marquee()) {
-        element.handle()->renderer()->layer()->marquee()->stop();
+      }
+      if (id == KJS::HTMLElement::MarqueeStop && element.renderer() &&
+          element.renderer()->layer() &&
+          element.renderer()->layer()->marquee()) {
+        element.renderer()->layer()->marquee()->stop();
         return Undefined();
       }
       break;
@@ -2652,7 +2681,7 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
         if (args.size() == 0 ||
             (args.size() == 1 &&
              args[0].toString(exec).qstring().lower() == "2d")) {
-          return Object(new Context2D(element));
+          return Object(new Context2D(&element));
         }
         return Undefined();
       }
@@ -2672,21 +2701,22 @@ void KJS::HTMLElement::tryPut(ExecState* exec,
   DOM::DOMString str =
       value.isA(NullType) ? DOM::DOMString() : value.toString(exec).string();
 #endif
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KJS::HTMLElement::tryPut " << propertyName.qstring()
                 << " thisTag=" << element.tagName().string()
                 << " str=" << str.string() << endl;
 #endif
   // First look at dynamic properties
-  switch (element.elementId()) {
+  switch (element.id()) {
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       bool ok;
       /*uint u =*/propertyName.toULong(&ok);
       if (ok) {
-        Object coll = Object::dynamicCast(
-            getSelectHTMLCollection(exec, select.options(), select));
+        Object coll = Object::dynamicCast(getSelectHTMLCollection(
+            exec, select.optionsHTMLCollection().get(), &select));
         if (!coll.isNull())
           coll.put(exec, propertyName, value);
         return;
@@ -2696,8 +2726,7 @@ void KJS::HTMLElement::tryPut(ExecState* exec,
     case ID_EMBED:
     case ID_OBJECT:
     case ID_APPLET: {
-      Value domValue = getDOMNode(exec, element);
-      Value runtimeObject = getRuntimeObject(exec, element);
+      Value runtimeObject = getRuntimeObject(exec, &element);
       if (!runtimeObject.isNull()) {
         ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject.imp());
         if (imp->canPut(exec, propertyName)) {
@@ -2727,29 +2756,26 @@ void KJS::HTMLElement::tryPut(ExecState* exec,
     }
   }
   DOMObjectLookupPut<KJS::HTMLElement, DOMElement>(
-      exec, propertyName, value, attr, &KJS::HTMLElementTable, this);
+      exec, propertyName, value, attr, &HTMLElementTable, this);
 }
 
-void KJS::HTMLElement::putValue(ExecState* exec,
-                                int token,
-                                const Value& value,
-                                int) {
+void HTMLElement::putValue(ExecState* exec,
+                           int token,
+                           const Value& value,
+                           int) {
+  DOMExceptionTranslator exception(exec);
   DOM::DOMString str =
       value.isA(NullType) ? DOM::DOMString() : value.toString(exec).string();
-  DOMNode* kjsNode = new DOMNode(exec, KJS::toNode(value));
-  // Need to create a Value wrapper to avoid leaking the KJS::DOMNode
-  Value nodeValue(kjsNode);
-  DOM::Node n = kjsNode->toNode();
-  DOM::HTMLElement element = static_cast<DOM::HTMLElement>(node);
+  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KJS::HTMLElement::putValue "
                 << " thisTag=" << element.tagName().string()
                 << " token=" << token << endl;
 #endif
 
-  switch (element.elementId()) {
+  switch (element.id()) {
     case ID_HTML: {
-      DOM::HTMLHtmlElement html = element;
+      HTMLHtmlElementImpl& html = static_cast<HTMLHtmlElementImpl&>(element);
       switch (token) {
         case HtmlVersion: {
           html.setVersion(str);
@@ -2758,7 +2784,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_HEAD: {
-      DOM::HTMLHeadElement head = element;
+      HTMLHeadElementImpl& head = static_cast<HTMLHeadElementImpl&>(element);
       switch (token) {
         case HeadProfile: {
           head.setProfile(str);
@@ -2767,7 +2793,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_LINK: {
-      DOM::HTMLLinkElement link = element;
+      HTMLLinkElementImpl& link = static_cast<HTMLLinkElementImpl&>(element);
       switch (token) {
         case LinkDisabled: {
           link.setDisabled(value.toBoolean(exec));
@@ -2808,7 +2834,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_TITLE: {
-      DOM::HTMLTitleElement title = element;
+      HTMLTitleElementImpl& title = static_cast<HTMLTitleElementImpl&>(element);
       switch (token) {
         case TitleText: {
           title.setText(str);
@@ -2817,7 +2843,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_META: {
-      DOM::HTMLMetaElement meta = element;
+      HTMLMetaElementImpl& meta = static_cast<HTMLMetaElementImpl&>(element);
       switch (token) {
         case MetaContent: {
           meta.setContent(str);
@@ -2838,7 +2864,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BASE: {
-      DOM::HTMLBaseElement base = element;
+      HTMLBaseElementImpl& base = static_cast<HTMLBaseElementImpl&>(element);
       switch (token) {
         case BaseHref: {
           base.setHref(str);
@@ -2851,7 +2877,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_ISINDEX: {
-      DOM::HTMLIsIndexElement isindex = element;
+      HTMLIsIndexElementImpl& isindex =
+          static_cast<HTMLIsIndexElementImpl&>(element);
       switch (token) {
         // read-only: form
         case IsIndexPrompt: {
@@ -2861,7 +2888,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_STYLE: {
-      DOM::HTMLStyleElement style = element;
+      HTMLStyleElementImpl& style = static_cast<HTMLStyleElementImpl&>(element);
       switch (token) {
         case StyleDisabled: {
           style.setDisabled(value.toBoolean(exec));
@@ -2878,7 +2905,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BODY: {
-      DOM::HTMLBodyElement body = element;
+      HTMLBodyElementImpl& body = static_cast<HTMLBodyElementImpl&>(element);
       switch (token) {
         case BodyALink: {
           body.setALink(str);
@@ -2906,12 +2933,11 @@ void KJS::HTMLElement::putValue(ExecState* exec,
         }
         case BodyScrollLeft:
         case BodyScrollTop: {
-          QScrollView* sview = body.ownerDocument().view();
+          QScrollView* sview = body.ownerDocument()->view();
           if (sview) {
             // Update the document's layout before we compute these attributes.
-            DOM::DocumentImpl* docimpl = body.handle()->getDocument();
-            if (docimpl)
-              docimpl->updateLayoutIgnorePendingStylesheets();
+            if (DocumentImpl* doc = body.getDocument())
+              doc->updateLayoutIgnorePendingStylesheets();
             if (token == BodyScrollLeft)
               sview->setContentsPos(value.toInt32(exec), sview->contentsY());
             else
@@ -2922,7 +2948,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_FORM: {
-      DOM::HTMLFormElement form = element;
+      HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
       switch (token) {
         // read-only: elements
         // read-only: length
@@ -2935,7 +2961,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case FormAction: {
-          form.setAction(str.string());
+          form.setAction(str);
           return;
         }
         case FormEncType: {
@@ -2953,7 +2979,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_SELECT: {
-      DOM::HTMLSelectElement select = element;
+      HTMLSelectElementImpl& select =
+          static_cast<HTMLSelectElementImpl&>(element);
       switch (token) {
         // read-only: type
         case SelectSelectedIndex: {
@@ -2966,8 +2993,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
         }
         case SelectLength: {  // read-only according to the NS spec, but
                               // webpages need it writeable
-          Object coll = Object::dynamicCast(
-              getSelectHTMLCollection(exec, select.options(), select));
+          Object coll = Object::dynamicCast(getSelectHTMLCollection(
+              exec, select.optionsHTMLCollection().get(), &select));
           if (!coll.isNull())
             coll.put(exec, lengthPropertyName, value);
           return;
@@ -2997,7 +3024,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_OPTGROUP: {
-      DOM::HTMLOptGroupElement optgroup = element;
+      HTMLOptGroupElementImpl& optgroup =
+          static_cast<HTMLOptGroupElementImpl&>(element);
       switch (token) {
         case OptGroupDisabled: {
           optgroup.setDisabled(value.toBoolean(exec));
@@ -3010,32 +3038,16 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_OPTION: {
-      DOM::HTMLOptionElement option = element;
+      HTMLOptionElementImpl& option =
+          static_cast<HTMLOptionElementImpl&>(element);
       switch (token) {
         // read-only: form
         case OptionDefaultSelected: {
           option.setDefaultSelected(value.toBoolean(exec));
           return;
         }
-        // read-only: text  <--- According to the DOM, but JavaScript and
-        // JScript both allow changes.
-        // So, we'll do it here and not add it to our DOM headers.
         case OptionText: {
-          DOM::NodeList nl(option.childNodes());
-          for (unsigned int i = 0; i < nl.length(); i++) {
-            if (nl.item(i).nodeType() == DOM::Node::TEXT_NODE) {
-              static_cast<DOM::Text>(nl.item(i)).setData(str);
-              return;
-            }
-          }
-          // No child text node found, creating one
-          DOM::Text t = option.ownerDocument().createTextNode(str);
-          try {
-            option.appendChild(t);
-          } catch (DOM::DOMException& e) {
-            // #### exec->setException ?
-          }
-
+          option.setText(str, exception);
           return;
         }
         // read-only: index
@@ -3058,7 +3070,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_INPUT: {
-      DOM::HTMLInputElement input = element;
+      HTMLInputElementImpl& input = static_cast<HTMLInputElementImpl&>(element);
       switch (token) {
         case InputDefaultValue: {
           input.setDefaultValue(str);
@@ -3132,7 +3144,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_TEXTAREA: {
-      DOM::HTMLTextAreaElement textarea = element;
+      HTMLTextAreaElementImpl& textarea =
+          static_cast<HTMLTextAreaElementImpl&>(element);
       switch (token) {
         case TextAreaDefaultValue: {
           textarea.setDefaultValue(str);
@@ -3175,7 +3188,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BUTTON: {
-      DOM::HTMLButtonElement button = element;
+      HTMLButtonElementImpl& button =
+          static_cast<HTMLButtonElementImpl&>(element);
       switch (token) {
         // read-only: form
         case ButtonAccessKey: {
@@ -3202,7 +3216,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_LABEL: {
-      DOM::HTMLLabelElement label = element;
+      HTMLLabelElementImpl& label = static_cast<HTMLLabelElementImpl&>(element);
       switch (token) {
         // read-only: form
         case LabelAccessKey: {
@@ -3215,13 +3229,9 @@ void KJS::HTMLElement::putValue(ExecState* exec,
         }
       }
     } break;
-    //    case ID_FIELDSET: {
-    //      DOM::HTMLFieldSetElement fieldSet = element;
-    //      // read-only: form
-    //    }
-    //    break;
     case ID_LEGEND: {
-      DOM::HTMLLegendElement legend = element;
+      HTMLLegendElementImpl& legend =
+          static_cast<HTMLLegendElementImpl&>(element);
       switch (token) {
         // read-only: form
         case LegendAccessKey: {
@@ -3235,7 +3245,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_UL: {
-      DOM::HTMLUListElement uList = element;
+      HTMLUListElementImpl& uList = static_cast<HTMLUListElementImpl&>(element);
       switch (token) {
         case UListCompact: {
           uList.setCompact(value.toBoolean(exec));
@@ -3248,7 +3258,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_OL: {
-      DOM::HTMLOListElement oList = element;
+      HTMLOListElementImpl& oList = static_cast<HTMLOListElementImpl&>(element);
       switch (token) {
         case OListCompact: {
           oList.setCompact(value.toBoolean(exec));
@@ -3265,7 +3275,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_DL: {
-      DOM::HTMLDListElement dList = element;
+      HTMLDListElementImpl& dList = static_cast<HTMLDListElementImpl&>(element);
       switch (token) {
         case DListCompact: {
           dList.setCompact(value.toBoolean(exec));
@@ -3274,7 +3284,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_DIR: {
-      DOM::HTMLDirectoryElement directory = element;
+      HTMLDirectoryElementImpl& directory =
+          static_cast<HTMLDirectoryElementImpl&>(element);
       switch (token) {
         case DirectoryCompact: {
           directory.setCompact(value.toBoolean(exec));
@@ -3283,7 +3294,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_MENU: {
-      DOM::HTMLMenuElement menu = element;
+      HTMLMenuElementImpl& menu = static_cast<HTMLMenuElementImpl&>(element);
       switch (token) {
         case MenuCompact: {
           menu.setCompact(value.toBoolean(exec));
@@ -3292,7 +3303,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_LI: {
-      DOM::HTMLLIElement li = element;
+      HTMLLIElementImpl& li = static_cast<HTMLLIElementImpl&>(element);
       switch (token) {
         case LIType: {
           li.setType(str);
@@ -3305,7 +3316,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_DIV: {
-      DOM::HTMLDivElement div = element;
+      HTMLDivElementImpl& div = static_cast<HTMLDivElementImpl&>(element);
       switch (token) {
         case DivAlign: {
           div.setAlign(str);
@@ -3314,7 +3325,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_P: {
-      DOM::HTMLParagraphElement paragraph = element;
+      HTMLParagraphElementImpl& paragraph =
+          static_cast<HTMLParagraphElementImpl&>(element);
       switch (token) {
         case ParagraphAlign: {
           paragraph.setAlign(str);
@@ -3328,7 +3340,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
     case ID_H4:
     case ID_H5:
     case ID_H6: {
-      DOM::HTMLHeadingElement heading = element;
+      HTMLHeadingElementImpl& heading =
+          static_cast<HTMLHeadingElementImpl&>(element);
       switch (token) {
         case HeadingAlign: {
           heading.setAlign(str);
@@ -3337,7 +3350,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BLOCKQUOTE: {
-      DOM::HTMLBlockquoteElement blockquote = element;
+      HTMLBlockquoteElementImpl& blockquote =
+          static_cast<HTMLBlockquoteElementImpl&>(element);
       switch (token) {
         case BlockQuoteCite: {
           blockquote.setCite(str);
@@ -3346,7 +3360,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_Q: {
-      DOM::HTMLQuoteElement quote = element;
+      HTMLQuoteElementImpl& quote = static_cast<HTMLQuoteElementImpl&>(element);
       switch (token) {
         case QuoteCite: {
           quote.setCite(str);
@@ -3355,7 +3369,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_PRE: {
-      DOM::HTMLPreElement pre = element;
+      HTMLPreElementImpl& pre = static_cast<HTMLPreElementImpl&>(element);
       switch (token) {
         case PreWidth: {
           pre.setWidth(value.toInt32(exec));
@@ -3364,7 +3378,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BR: {
-      DOM::HTMLBRElement br = element;
+      HTMLBRElementImpl& br = static_cast<HTMLBRElementImpl&>(element);
       switch (token) {
         case BRClear: {
           br.setClear(str);
@@ -3373,7 +3387,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_BASEFONT: {
-      DOM::HTMLBaseFontElement baseFont = element;
+      HTMLBaseFontElementImpl& baseFont =
+          static_cast<HTMLBaseFontElementImpl&>(element);
       switch (token) {
         case BaseFontColor: {
           baseFont.setColor(str);
@@ -3390,7 +3405,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_FONT: {
-      DOM::HTMLFontElement font = element;
+      HTMLFontElementImpl& font = static_cast<HTMLFontElementImpl&>(element);
       switch (token) {
         case FontColor: {
           font.setColor(str);
@@ -3407,7 +3422,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_HR: {
-      DOM::HTMLHRElement hr = element;
+      HTMLHRElementImpl& hr = static_cast<HTMLHRElementImpl&>(element);
       switch (token) {
         case HRAlign: {
           hr.setAlign(str);
@@ -3429,7 +3444,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
     } break;
     case ID_INS:
     case ID_DEL: {
-      DOM::HTMLModElement mod = element;
+      HTMLModElementImpl& mod = static_cast<HTMLModElementImpl&>(element);
       switch (token) {
         case ModCite: {
           mod.setCite(str);
@@ -3442,7 +3457,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_A: {
-      DOM::HTMLAnchorElement anchor = element;
+      HTMLAnchorElementImpl& anchor =
+          static_cast<HTMLAnchorElementImpl&>(element);
       switch (token) {
         case AnchorAccessKey: {
           anchor.setAccessKey(str);
@@ -3495,7 +3511,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_IMG: {
-      DOM::HTMLImageElement image = element;
+      HTMLImageElementImpl& image = static_cast<HTMLImageElementImpl&>(element);
       switch (token) {
         case ImageName: {
           image.setName(str);
@@ -3548,7 +3564,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_OBJECT: {
-      DOM::HTMLObjectElement object = element;
+      HTMLObjectElementImpl& object =
+          static_cast<HTMLObjectElementImpl&>(element);
       switch (token) {
         // read-only: form
         case ObjectCode: {
@@ -3623,7 +3640,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_PARAM: {
-      DOM::HTMLParamElement param = element;
+      HTMLParamElementImpl& param = static_cast<HTMLParamElementImpl&>(element);
       switch (token) {
         case ParamName: {
           param.setName(str);
@@ -3644,7 +3661,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_APPLET: {
-      DOM::HTMLAppletElement applet = element;
+      HTMLAppletElementImpl& applet =
+          static_cast<HTMLAppletElementImpl&>(element);
       switch (token) {
         case AppletAlign: {
           applet.setAlign(str);
@@ -3693,7 +3711,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_MAP: {
-      DOM::HTMLMapElement map = element;
+      HTMLMapElementImpl& map = static_cast<HTMLMapElementImpl&>(element);
       switch (token) {
         // read-only: areas
         case MapName: {
@@ -3703,7 +3721,7 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_AREA: {
-      DOM::HTMLAreaElement area = element;
+      HTMLAreaElementImpl& area = static_cast<HTMLAreaElementImpl&>(element);
       switch (token) {
         case AreaAccessKey: {
           area.setAccessKey(str);
@@ -3740,7 +3758,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_SCRIPT: {
-      DOM::HTMLScriptElement script = element;
+      HTMLScriptElementImpl& script =
+          static_cast<HTMLScriptElementImpl&>(element);
       switch (token) {
         case ScriptText: {
           script.setText(str);
@@ -3773,20 +3792,20 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_TABLE: {
-      DOM::HTMLTableElement table = element;
+      HTMLTableElementImpl& table = static_cast<HTMLTableElementImpl&>(element);
       switch (token) {
         case TableCaption: {
-          table.setCaption(n);
+          table.setCaption(toHTMLTableCaptionElement(value));
           return;
-        }  // type HTMLTableCaptionElement
+        }
         case TableTHead: {
-          table.setTHead(n);
+          table.setTHead(toHTMLTableSectionElement(value));
           return;
-        }  // type HTMLTableSectionElement
+        }
         case TableTFoot: {
-          table.setTFoot(n);
+          table.setTFoot(toHTMLTableSectionElement(value));
           return;
-        }  // type HTMLTableSectionElement
+        }
         // read-only: rows
         // read-only: tbodies
         case TableAlign: {
@@ -3828,7 +3847,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_CAPTION: {
-      DOM::HTMLTableCaptionElement tableCaption;
+      HTMLTableCaptionElementImpl& tableCaption =
+          static_cast<HTMLTableCaptionElementImpl&>(element);
       switch (token) {
         case TableAlign: {
           tableCaption.setAlign(str);
@@ -3837,7 +3857,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_COL: {
-      DOM::HTMLTableColElement tableCol = element;
+      HTMLTableColElementImpl& tableCol =
+          static_cast<HTMLTableColElementImpl&>(element);
       switch (token) {
         case TableColAlign: {
           tableCol.setAlign(str);
@@ -3868,7 +3889,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
     case ID_THEAD:
     case ID_TBODY:
     case ID_TFOOT: {
-      DOM::HTMLTableSectionElement tableSection = element;
+      HTMLTableSectionElementImpl& tableSection =
+          static_cast<HTMLTableSectionElementImpl&>(element);
       switch (token) {
         case TableSectionAlign: {
           tableSection.setAlign(str);
@@ -3890,7 +3912,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_TR: {
-      DOM::HTMLTableRowElement tableRow = element;
+      HTMLTableRowElementImpl& tableRow =
+          static_cast<HTMLTableRowElementImpl&>(element);
       switch (token) {
         // read-only: rowIndex
         // read-only: sectionRowIndex
@@ -3919,7 +3942,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
     } break;
     case ID_TH:
     case ID_TD: {
-      DOM::HTMLTableCellElement tableCell = element;
+      HTMLTableCellElementImpl& tableCell =
+          static_cast<HTMLTableCellElementImpl&>(element);
       switch (token) {
         // read-only: cellIndex
         case TableCellAbbr: {
@@ -3981,7 +4005,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_FRAMESET: {
-      DOM::HTMLFrameSetElement frameSet = element;
+      HTMLFrameSetElementImpl& frameSet =
+          static_cast<HTMLFrameSetElementImpl&>(element);
       switch (token) {
         case FrameSetCols: {
           frameSet.setCols(str);
@@ -3994,7 +4019,8 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       }
     } break;
     case ID_FRAME: {
-      DOM::HTMLFrameElement frameElement = element;
+      HTMLFrameElementImpl& frameElement =
+          static_cast<HTMLFrameElementImpl&>(element);
       switch (token) {
         // read-only: FrameContentDocument:
         case FrameFrameBorder: {
@@ -4030,14 +4056,14 @@ void KJS::HTMLElement::putValue(ExecState* exec,
           return;
         }
         case FrameLocation: {
-          static_cast<DOM::HTMLFrameElementImpl*>(frameElement.handle())
-              ->setLocation(str);
+          frameElement.setLocation(str);
           return;
         }
       }
     } break;
     case ID_IFRAME: {
-      DOM::HTMLIFrameElement iFrame = element;
+      HTMLIFrameElementImpl& iFrame =
+          static_cast<HTMLIFrameElementImpl&>(element);
       switch (token) {
         case IFrameAlign: {
           iFrame.setAlign(str);
@@ -4103,16 +4129,16 @@ void KJS::HTMLElement::putValue(ExecState* exec,
       element.setClassName(str);
       return;
     case ElementInnerHTML:
-      element.setInnerHTML(str);
+      element.setInnerHTML(str, exception);
       return;
     case ElementInnerText:
-      element.setInnerText(str);
+      element.setInnerText(str, exception);
       return;
     case ElementOuterHTML:
-      element.setOuterHTML(str);
+      element.setOuterHTML(str, exception);
       return;
     case ElementOuterText:
-      element.setOuterText(str);
+      element.setOuterText(str, exception);
       return;
     case ElementContentEditable:
       element.setContentEditable(str);
@@ -4122,6 +4148,32 @@ void KJS::HTMLElement::putValue(ExecState* exec,
                   << " thisTag=" << element.tagName().string()
                   << " str=" << str.string() << endl;
   }
+}
+
+HTMLElementImpl* toHTMLElement(ValueImp* val) {
+  if (!val || !val->isObject(&HTMLElement::info))
+    return 0;
+  return static_cast<HTMLElementImpl*>(static_cast<HTMLElement*>(val)->impl());
+}
+
+HTMLTableCaptionElementImpl* toHTMLTableCaptionElement(ValueImp* val) {
+  if (HTMLElementImpl* e = toHTMLElement(val))
+    switch (e->id()) {
+      case ID_CAPTION:
+        return static_cast<HTMLTableCaptionElementImpl*>(e);
+    }
+  return 0;
+}
+
+HTMLTableSectionElementImpl* toHTMLTableSectionElement(ValueImp* val) {
+  if (HTMLElementImpl* e = toHTMLElement(val))
+    switch (e->id()) {
+      case ID_THEAD:
+      case ID_TBODY:
+      case ID_TFOOT:
+        return static_cast<HTMLTableSectionElementImpl*>(e);
+    }
+  return 0;
 }
 
 // -------------------------------------------------------------------------
@@ -4138,13 +4190,13 @@ IMPLEMENT_PROTOTYPE(HTMLCollectionProto, HTMLCollectionProtoFunc)
 
 const ClassInfo HTMLCollection::info = {"HTMLCollection", 0, 0, 0};
 
-HTMLCollection::HTMLCollection(ExecState* exec, const DOM::HTMLCollection& c)
-    : collection(c) {
+HTMLCollection::HTMLCollection(ExecState* exec, HTMLCollectionImpl* c)
+    : m_impl(c) {
   setPrototype(HTMLCollectionProto::self(exec));
 }
 
 HTMLCollection::~HTMLCollection() {
-  ScriptInterpreter::forgetDOMObject(collection.handle());
+  ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
 // We have to implement hasProperty since we don't use a hashtable for
@@ -4162,18 +4214,18 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
 #ifdef KJS_VERBOSE
   kdDebug() << "KJS::HTMLCollection::tryGet " << propertyName.ascii() << endl;
 #endif
+  HTMLCollectionImpl& collection = *m_impl;
   if (propertyName == lengthPropertyName)
     return Number(collection.length());
-  else if (propertyName == "selectedIndex" &&
-           collection.item(0).elementId() == ID_OPTION) {
+  else if (propertyName == "selectedIndex") {
     // NON-STANDARD options.selectedIndex
-    DOM::Node node = collection.item(0).parentNode();
-    while (!node.isNull()) {
-      if (node.elementId() == ID_SELECT) {
-        DOM::HTMLSelectElement sel = static_cast<DOM::HTMLSelectElement>(node);
-        return Number(sel.selectedIndex());
-      }
-      node = node.parentNode();
+    NodeImpl* option = collection.item(0);
+    if (option->id() == ID_OPTION) {
+      NodeImpl* select = option;
+      while ((select = select->parentNode()))
+        if (select->id() == ID_SELECT)
+          return Number(
+              static_cast<HTMLSelectElementImpl*>(select)->selectedIndex());
     }
     return Undefined();
   } else {
@@ -4185,14 +4237,10 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
     // name or index ?
     bool ok;
     unsigned int u = propertyName.toULong(&ok);
-    if (ok) {
-      DOM::Node node = collection.item(u);
-
-      return getDOMNode(exec, node);
-    } else
-      return getNamedItems(exec, propertyName);
+    if (ok)
+      return getDOMNode(exec, collection.item(u));
+    return getNamedItems(exec, propertyName);
   }
-  return Undefined();
 }
 
 // HTMLCollections are strange objects, they support both get and call,
@@ -4223,6 +4271,8 @@ Value KJS::HTMLCollection::tryCall(ExecState* exec, Object&, const List& args) {
     KJS::printInfo(exec,"KJS::HTMLCollection::tryCall thisObj",thisObj,-1);
     KJS::printInfo(exec,"KJS::HTMLCollection::tryCall this",Value(this),-1);
   }*/
+  HTMLCollectionImpl& collection = *m_impl;
+
   // Also, do we need the TypeError test here ?
 
   if (args.size() == 1) {
@@ -4230,10 +4280,8 @@ Value KJS::HTMLCollection::tryCall(ExecState* exec, Object&, const List& args) {
     bool ok;
     UString s = args[0].toString(exec);
     unsigned int u = s.toULong(&ok);
-    if (ok) {
-      DOM::Element element = collection.item(u);
-      return getDOMNode(exec, element);
-    }
+    if (ok)
+      return getDOMNode(exec, collection.item(u));
     // support for document.images('<name>') etc.
     return getNamedItems(exec, Identifier(s));
   } else if (args.size() >=
@@ -4244,8 +4292,8 @@ Value KJS::HTMLCollection::tryCall(ExecState* exec, Object&, const List& args) {
     unsigned int u = args[1].toString(exec).toULong(&ok);
     if (ok) {
       DOM::DOMString pstr = s.string();
-      DOM::Node node = collection.namedItem(pstr);
-      while (!node.isNull()) {
+      NodeImpl* node = collection.namedItem(pstr);
+      while (node) {
         if (!u)
           return getDOMNode(exec, node);
         node = collection.nextNamedItem(pstr);
@@ -4264,7 +4312,7 @@ Value KJS::HTMLCollection::getNamedItems(ExecState* exec,
 #endif
   DOM::DOMString pstr = propertyName.string();
 
-  QValueList<DOM::Node> namedItems = collection.namedItems(pstr);
+  QValueList<SharedPtr<NodeImpl>> namedItems = m_impl->namedItems(pstr);
 
   if (namedItems.isEmpty()) {
 #ifdef KJS_VERBOSE
@@ -4273,10 +4321,8 @@ Value KJS::HTMLCollection::getNamedItems(ExecState* exec,
     return Undefined();
   }
 
-  if (namedItems.count() == 1) {
-    DOM::Node node = namedItems[0];
-    return getDOMNode(exec, node);
-  }
+  if (namedItems.count() == 1)
+    return getDOMNode(exec, namedItems[0].get());
 
   return Value(new DOMNamedNodesCollection(exec, namedItems));
 }
@@ -4289,36 +4335,17 @@ Value KJS::HTMLCollectionProtoFunc::tryCall(ExecState* exec,
     exec->setException(err);
     return err;
   }
-  DOM::HTMLCollection coll =
-      static_cast<KJS::HTMLCollection*>(thisObj.imp())->toCollection();
+  HTMLCollectionImpl& coll =
+      *static_cast<HTMLCollection*>(thisObj.imp())->impl();
 
   switch (id) {
     case KJS::HTMLCollection::Item:
       return getDOMNode(exec, coll.item(args[0].toUInt32(exec)));
-    case KJS::HTMLCollection::Tags: {
-      DOM::DOMString tagName = args[0].toString(exec).string();
-      DOM::NodeList list;
-      // getElementsByTagName exists in Document and in Element, pick up the
-      // right one
-      if (coll.base().nodeType() == DOM::Node::DOCUMENT_NODE) {
-        DOM::Document doc = coll.base();
-        list = doc.getElementsByTagName(tagName);
-#ifdef KJS_VERBOSE
-        kdDebug() << "KJS::HTMLCollectionProtoFunc::tryCall document.tags("
-                  << tagName.string() << ") -> " << list.length()
-                  << " items in node list" << endl;
-#endif
-      } else {
-        DOM::Element e = coll.base();
-        list = e.getElementsByTagName(tagName);
-#ifdef KJS_VERBOSE
-        kdDebug() << "KJS::HTMLCollectionProtoFunc::tryCall element.tags("
-                  << tagName.string() << ") -> " << list.length()
-                  << " items in node list" << endl;
-#endif
-      }
-      return getDOMNodeList(exec, list);
-    }
+    case KJS::HTMLCollection::Tags:
+      return getDOMNodeList(
+          exec, coll.base()
+                    ->getElementsByTagName(args[0].toString(exec).string())
+                    .get());
     case KJS::HTMLCollection::NamedItem:
       return static_cast<HTMLCollection*>(thisObj.imp())
           ->getNamedItems(exec, Identifier(args[0].toString(exec)));
@@ -4327,10 +4354,17 @@ Value KJS::HTMLCollectionProtoFunc::tryCall(ExecState* exec,
   }
 }
 
+// -------------------------------------------------------------------------
+
+HTMLSelectCollection::HTMLSelectCollection(ExecState* exec,
+                                           HTMLCollectionImpl* c,
+                                           HTMLSelectElementImpl* e)
+    : HTMLCollection(exec, c), m_element(e) {}
+
 Value KJS::HTMLSelectCollection::tryGet(ExecState* exec,
                                         const Identifier& p) const {
   if (p == "selectedIndex")
-    return Number(element.selectedIndex());
+    return Number(m_element->selectedIndex());
 
   return HTMLCollection::tryGet(exec, p);
 }
@@ -4344,11 +4378,13 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
                 << propertyName.qstring() << endl;
 #endif
   if (propertyName == "selectedIndex") {
-    element.setSelectedIndex(value.toInt32(exec));
+    m_element->setSelectedIndex(value.toInt32(exec));
     return;
   }
   // resize ?
   else if (propertyName == lengthPropertyName) {
+    int exception = 0;
+
     unsigned newLen;
     bool converted = value.toUInt32(newLen);
 
@@ -4356,17 +4392,21 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
       return;
     }
 
-    long diff = element.length() - newLen;
+    long diff = m_element->length() - newLen;
 
     if (diff < 0) {  // add dummy elements
       do {
-        element.add(element.ownerDocument().createElement("option"),
-                    DOM::HTMLElement());
+        ElementImpl* option =
+            m_element->ownerDocument()->createElement("option", exception);
+        m_element->add(static_cast<HTMLElementImpl*>(option), 0);
+        if (exception)
+          break;
       } while (++diff);
     } else  // remove elements
       while (diff-- > 0)
-        element.remove(newLen);
+        m_element->remove(newLen);
 
+    setDOMException(exec, exception);
     return;
   }
   // an index ?
@@ -4377,37 +4417,43 @@ void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
 
   if (value.isA(NullType) || value.isA(UndefinedType)) {
     // null and undefined delete. others, too ?
-    element.remove(u);
+    m_element->remove(u);
     return;
   }
 
   // is v an option element ?
-  DOM::Node node = KJS::toNode(value);
-  if (node.isNull() || node.elementId() != ID_OPTION)
+  NodeImpl* option = toNode(value);
+  if (!option || option->id() != ID_OPTION)
     return;
 
-  DOM::HTMLOptionElement option = static_cast<DOM::HTMLOptionElement>(node);
-  long diff = long(u) - element.length();
-  DOM::HTMLElement before;
+  int exception = 0;
+  long diff = long(u) - m_element->length();
+  HTMLElementImpl* before = 0;
   // out of array bounds ? first insert empty dummies
   if (diff > 0) {
     while (diff--) {
-      element.add(element.ownerDocument().createElement("option"), before);
+      ElementImpl* dummyOption =
+          m_element->ownerDocument()->createElement("option", exception);
+      if (!dummyOption)
+        break;
+      m_element->add(static_cast<HTMLElementImpl*>(dummyOption), 0);
     }
     // replace an existing entry ?
   } else if (diff < 0) {
-    before = element.options().item(u + 1);
-    element.remove(u);
+    before = static_cast<HTMLElementImpl*>(m_element->options()->item(u + 1));
+    m_element->remove(u);
   }
   // finally add the new element
-  element.add(option, before);
+  if (exception == 0)
+    m_element->add(static_cast<HTMLOptionElementImpl*>(option), before);
+
+  setDOMException(exec, exception);
 }
 
 ////////////////////// Option Object ////////////////////////
 
-OptionConstructorImp::OptionConstructorImp(ExecState* exec,
-                                           const DOM::Document& d)
-    : ObjectImp(), doc(d) {
+OptionConstructorImp::OptionConstructorImp(ExecState* exec, DocumentImpl* d)
+    : m_doc(d) {
   // ## isn't there some redundancy between ObjectImp::_proto and the
   // "prototype" property ?
   // put(exec,"prototype", ...,DontEnum|DontDelete|ReadOnly);
@@ -4422,31 +4468,36 @@ bool OptionConstructorImp::implementsConstruct() const {
 }
 
 Object OptionConstructorImp::construct(ExecState* exec, const List& args) {
-  DOM::Element el = doc.createElement("option");
-  DOM::HTMLOptionElement opt = static_cast<DOM::HTMLOptionElement>(el);
-  int sz = args.size();
-  DOM::Text t = doc.createTextNode("");
-  try {
-    opt.appendChild(t);
-  } catch (DOM::DOMException& e) {
-    // #### exec->setException ?
+  int exception = 0;
+  ElementImpl* el = m_doc->createElement("option", exception);
+  HTMLOptionElementImpl* opt = 0;
+  if (el) {
+    el->ref();
+    opt = static_cast<HTMLOptionElementImpl*>(el);
+    int sz = args.size();
+    TextImpl* t = m_doc->createTextNode("");
+    t->ref();
+    opt->appendChild(t, exception);
+    if (exception == 0 && sz > 0)
+      t->setData(args[0].toString(exec).string(), exception);  // set the text
+    if (exception == 0 && sz > 1)
+      opt->setValue(args[1].toString(exec).string());
+    if (exception == 0 && sz > 2)
+      opt->setDefaultSelected(args[2].toBoolean(exec));
+    if (exception == 0 && sz > 3)
+      opt->setSelected(args[3].toBoolean(exec));
+    t->deref();
+    el->deref();
   }
-  if (sz > 0)
-    t.setData(args[0].toString(exec).string());  // set the text
-  if (sz > 1)
-    opt.setValue(args[1].toString(exec).string());
-  if (sz > 2)
-    opt.setDefaultSelected(args[2].toBoolean(exec));
-  if (sz > 3)
-    opt.setSelected(args[3].toBoolean(exec));
 
+  setDOMException(exec, exception);
   return Object::dynamicCast(getDOMNode(exec, opt));
 }
 
 ////////////////////// Image Object ////////////////////////
 
-ImageConstructorImp::ImageConstructorImp(ExecState*, const DOM::Document& d)
-    : ObjectImp(), doc(d) {}
+ImageConstructorImp::ImageConstructorImp(ExecState*, DocumentImpl* d)
+    : m_doc(d) {}
 
 bool ImageConstructorImp::implementsConstruct() const {
   return true;
@@ -4466,7 +4517,7 @@ Object ImageConstructorImp::construct(ExecState* exec, const List& list) {
     height = h.toInt32(exec);
   }
 
-  Object result(new Image(doc, widthSet, width, heightSet, height));
+  Object result(new Image(m_doc.get(), widthSet, width, heightSet, height));
 
   /* TODO: do we need a prototype ? */
   return result;
@@ -4574,16 +4625,17 @@ void Image::putValue(ExecState* exec,
 
 void Image::notifyFinished(khtml::CachedObject*) {
   if (onLoadListener && doc->part()) {
-    DOM::Event ev = doc->part()->document().createEvent("HTMLEvents");
-    ev.initEvent("load", true, true);
-    onLoadListener->handleEvent(ev, true);
+    int ignoreException;
+    EventImpl* ev = doc->createEvent("HTMLEvents", ignoreException);
+    ev->ref();
+    ev->initEvent("load", true, true);
+    onLoadListener->handleEventImpl(ev, true);
+    ev->deref();
   }
 }
 
-Image::Image(const DOM::Document& d, bool ws, int w, bool hs, int h)
-    : doc(static_cast<DOM::DocumentImpl*>(d.handle())),
-      img(0),
-      onLoadListener(0) {
+Image::Image(DocumentImpl* d, bool ws, int w, bool hs, int h)
+    : doc(d), img(0), onLoadListener(0) {
   widthSet = ws;
   width = w;
   heightSet = hs;
@@ -5226,18 +5278,14 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
         w = pixmap.width();
         h = pixmap.height();
       } else if (o->inherits(&KJS::HTMLElement::img_info)) {
-        DOM::HTMLElement element =
-            static_cast<KJS::HTMLElement*>(args[0].imp())->toElement();
-        DOM::HTMLImageElementImpl* e =
-            static_cast<DOM::HTMLImageElementImpl*>(element.handle());
+        NodeImpl* n = static_cast<HTMLElement*>(args[0].imp())->impl();
+        HTMLImageElementImpl* e = static_cast<HTMLImageElementImpl*>(n);
         pixmap = e->pixmap();
         w = pixmap.width();
         h = pixmap.height();
       } else if (o->inherits(&KJS::HTMLElement::canvas_info)) {
-        DOM::HTMLElement element =
-            static_cast<KJS::HTMLElement*>(args[0].imp())->toElement();
-        DOM::HTMLCanvasElementImpl* e =
-            static_cast<DOM::HTMLCanvasElementImpl*>(element.handle());
+        NodeImpl* n = static_cast<HTMLElement*>(args[0].imp())->impl();
+        HTMLCanvasElementImpl* e = static_cast<HTMLCanvasElementImpl*>(n);
         khtml::RenderCanvasImage* renderer =
             static_cast<khtml::RenderCanvasImage*>(e->renderer());
         if (!renderer) {
@@ -5454,7 +5502,7 @@ Value KJS::Context2DFunction::tryCall(ExecState* exec,
   return Undefined();
 }
 
-const ClassInfo KJS::Context2D::info = {"Context2D", 0, &Context2DTable, 0};
+const ClassInfo Context2D::info = {"Context2D", 0, &Context2DTable, 0};
 
 /* Source for Context2DTable. Use "make hashtables" to regenerate.
 @begin Context2DTable 48
@@ -5601,7 +5649,7 @@ CGContextRef Context2D::drawingContext() {
   return context;
 }
 
-CGColorRef Context2D::colorRefFromValue(ExecState* exec, const Value& value) {
+CGColorRef colorRefFromValue(ExecState* exec, const Value& value) {
   CGColorSpaceRef colorSpace;
   float components[4];
 
@@ -5622,7 +5670,7 @@ CGColorRef Context2D::colorRefFromValue(ExecState* exec, const Value& value) {
   return colorRef;
 }
 
-QColor Context2D::colorFromValue(ExecState* exec, const Value& value) {
+QColor colorFromValue(ExecState* exec, const Value& value) {
   QRgb color = DOM::CSSParser::parseColor(value.toString(exec).string());
   return QColor(color);
 }
@@ -5653,7 +5701,7 @@ void Context2D::putValue(ExecState* exec,
     case StrokeStyle: {
       _strokeStyle = value;
       if (value.type() == StringType) {
-        QColor qc = Context2D::colorFromValue(exec, value);
+        QColor qc = colorFromValue(exec, value);
         CGContextSetRGBStrokeColor(context, qc.red() / 255., qc.green() / 255.,
                                    qc.blue() / 255., qc.alpha() / 255.);
       } else {
@@ -5842,9 +5890,8 @@ void Context2D::restore() {
   stateStack.removeLast();
 }
 
-Context2D::Context2D(const DOM::HTMLElement& e)
-    : _element(static_cast<DOM::HTMLElementImpl*>(e.handle())),
-      _needsFlushRasterCache(0) {
+Context2D::Context2D(HTMLElementImpl* e)
+    : _element(e), _needsFlushRasterCache(false) {
   _lineWidth = Number(1.);
   _strokeStyle = String("black");
   _fillStyle = String("black");
@@ -5866,6 +5913,66 @@ Context2D::Context2D(const DOM::HTMLElement& e)
 
 Context2D::~Context2D() {}
 
+void Context2D::mark() {
+  ValueImp* v;
+
+  v = _strokeStyle;
+  if (!v->marked())
+    v->mark();
+
+  v = _fillStyle;
+  if (!v->marked())
+    v->mark();
+
+  v = _lineWidth;
+  if (!v->marked())
+    v->mark();
+
+  v = _lineCap;
+  if (!v->marked())
+    v->mark();
+
+  v = _lineJoin;
+  if (!v->marked())
+    v->mark();
+
+  v = _miterLimit;
+  if (!v->marked())
+    v->mark();
+
+  v = _shadowOffsetX;
+  if (!v->marked())
+    v->mark();
+
+  v = _shadowOffsetY;
+  if (!v->marked())
+    v->mark();
+
+  v = _shadowBlur;
+  if (!v->marked())
+    v->mark();
+
+  v = _shadowColor;
+  if (!v->marked())
+    v->mark();
+
+  v = _globalAlpha;
+  if (!v->marked())
+    v->mark();
+
+  v = _globalComposite;
+  ;
+  if (!v->marked())
+    v->mark();
+
+  QPtrListIterator<List> it(stateStack);
+  List* list;
+  while ((list = it.current())) {
+    list->mark();
+    ++it;
+  }
+}
+
 const ClassInfo KJS::Gradient::info = {"Gradient", 0, &GradientTable, 0};
 
 /* Source for GradientTable. Use "make hashtables" to regenerate.
@@ -5876,9 +5983,9 @@ const ClassInfo KJS::Gradient::info = {"Gradient", 0, &GradientTable, 0};
 
 IMPLEMENT_PROTOFUNC(GradientFunction)
 
-Value KJS::GradientFunction::tryCall(ExecState* exec,
-                                     Object& thisObj,
-                                     const List& args) {
+Value GradientFunction::tryCall(ExecState* exec,
+                                Object& thisObj,
+                                const List& args) {
   if (!thisObj.inherits(&Gradient::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -5895,7 +6002,7 @@ Value KJS::GradientFunction::tryCall(ExecState* exec,
         return err;
       }
 
-      QColor color = Context2D::colorFromValue(exec, args[1]);
+      QColor color = colorFromValue(exec, args[1]);
       gradient->addColorStop((float)args[0].toNumber(exec), color.red() / 255.f,
                              color.green() / 255.f, color.blue() / 255.f,
                              color.alpha() / 255.f);
@@ -6137,8 +6244,7 @@ const ColorStop* Gradient::colorStops(int* count) const {
   return stops;
 }
 
-const ClassInfo KJS::ImagePattern::info = {"ImagePattern", 0,
-                                           &ImagePatternTable, 0};
+const ClassInfo ImagePattern::info = {"ImagePattern", 0, &ImagePatternTable, 0};
 
 /* Source for ImagePatternTable. Use "make hashtables" to regenerate.
 @begin ImagePatternTable 0
@@ -6203,7 +6309,7 @@ Value ImagePattern::tryGet(ExecState* exec,
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
   if (entry) {
     if (entry->attr & Function)
-      return lookupOrCreateFunction<KJS::GradientFunction>(
+      return lookupOrCreateFunction<GradientFunction>(
           exec, propertyName, this, entry->value, entry->params, entry->attr);
     return getValueProperty(exec, entry->value);
   }
@@ -6238,23 +6344,25 @@ ImagePattern::~ImagePattern() {
 
 ////////////////////////////////////////////////////////////////
 
-Value KJS::getHTMLCollection(ExecState* exec, const DOM::HTMLCollection& c) {
-  return cacheDOMObject<DOM::HTMLCollection, KJS::HTMLCollection>(exec, c);
+ValueImp* getHTMLCollection(ExecState* exec, HTMLCollectionImpl* c) {
+  return cacheDOMObject<HTMLCollectionImpl, HTMLCollection>(exec, c);
 }
 
-Value KJS::getSelectHTMLCollection(ExecState* exec,
-                                   const DOM::HTMLCollection& c,
-                                   const DOM::HTMLSelectElement& e) {
+ValueImp* getSelectHTMLCollection(ExecState* exec,
+                                  HTMLCollectionImpl* c,
+                                  HTMLSelectElementImpl* e) {
   DOMObject* ret;
-  if (c.isNull())
+  if (!c)
     return Null();
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
-  if ((ret = interp->getDOMObject(c.handle())))
-    return Value(ret);
+  if ((ret = interp->getDOMObject(c)))
+    return ret;
   else {
     ret = new HTMLSelectCollection(exec, c, e);
-    interp->putDOMObject(c.handle(), ret);
-    return Value(ret);
+    interp->putDOMObject(c, ret);
+    return ret;
   }
 }
+
+}  // namespace

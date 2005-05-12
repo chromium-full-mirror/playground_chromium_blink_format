@@ -22,12 +22,18 @@
 #ifndef _KJS_EVENTS_H_
 #define _KJS_EVENTS_H_
 
-#include "ecma/kjs_dom.h"
-#include "ecma/kjs_html.h"
+#include "kjs_dom.h"
+#include "kjs_html.h"
+
 #include "dom/dom2_events.h"
 
 namespace DOM {
 class ClipboardImpl;
+class EventImpl;
+class KeyboardEventImpl;
+class MouseEventImpl;
+class MutationEventImpl;
+class UIEventImpl;
 class WheelEventImpl;
 }
 
@@ -40,7 +46,7 @@ class JSAbstractEventListener : public DOM::EventListener {
  public:
   JSAbstractEventListener(bool _html = false);
   virtual ~JSAbstractEventListener();
-  virtual void handleEvent(DOM::Event& evt, bool isWindowEvent);
+  virtual void handleEvent(DOM::EventListenerEvent evt, bool isWindowEvent);
   virtual DOM::DOMString eventListenerType();
   virtual Object listenerObj() const = 0;
   virtual Object windowObj() const = 0;
@@ -83,7 +89,7 @@ class JSLazyEventListener : public JSEventListener {
                       const Object& _win,
                       DOM::NodeImpl* node,
                       int lineno = 0);
-  virtual void handleEvent(DOM::Event& evt, bool isWindowEvent);
+  virtual void handleEvent(DOM::EventListenerEvent evt, bool isWindowEvent);
   Object listenerObj() const;
 
  private:
@@ -95,7 +101,7 @@ class JSLazyEventListener : public JSEventListener {
   DOM::NodeImpl* originalNode;
 };
 
-Value getNodeEventListener(DOM::Node n, int eventId);
+ValueImp* getNodeEventListener(DOM::NodeImpl* n, int eventId);
 
 // Constructor for Event - currently only used for some global vars
 class EventConstructor : public DOMObject {
@@ -112,7 +118,7 @@ Value getEventConstructor(ExecState* exec);
 
 class DOMEvent : public DOMObject {
  public:
-  DOMEvent(ExecState* exec, DOM::Event e);
+  DOMEvent(ExecState* exec, DOM::EventImpl* e);
   ~DOMEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -141,19 +147,17 @@ class DOMEvent : public DOMObject {
     ClipboardData,
     DataTransfer
   };
-  DOM::Event toEvent() const { return event; }
+  DOM::EventImpl* impl() const { return m_impl.get(); }
 
  protected:
-  DOM::Event event;
+  khtml::SharedPtr<DOM::EventImpl> m_impl;
   mutable Clipboard* clipboard;
 };
 
-Value getDOMEvent(ExecState* exec, DOM::Event e);
+ValueImp* getDOMEvent(ExecState* exec, DOM::EventImpl* e);
 
-/**
- * Convert an object to an Event. Returns a null Event if not possible.
- */
-DOM::Event toEvent(const Value&);
+DOM::EventImpl* toEvent(
+    ValueImp*);  // returns 0 if value is not a DOMEvent object
 
 // Constructor object EventException
 class EventExceptionConstructor : public DOMObject {
@@ -170,7 +174,7 @@ Value getEventExceptionConstructor(ExecState* exec);
 
 class DOMUIEvent : public DOMEvent {
  public:
-  DOMUIEvent(ExecState* exec, DOM::UIEvent ue) : DOMEvent(exec, ue) {}
+  DOMUIEvent(ExecState* exec, DOM::UIEventImpl* ue);
   ~DOMUIEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -189,12 +193,11 @@ class DOMUIEvent : public DOMEvent {
     Which,
     InitUIEvent
   };
-  DOM::UIEvent toUIEvent() const { return static_cast<DOM::UIEvent>(event); }
 };
 
 class DOMMouseEvent : public DOMUIEvent {
  public:
-  DOMMouseEvent(ExecState* exec, DOM::MouseEvent me) : DOMUIEvent(exec, me) {}
+  DOMMouseEvent(ExecState* exec, DOM::MouseEventImpl* me);
   ~DOMMouseEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -221,15 +224,11 @@ class DOMMouseEvent : public DOMUIEvent {
     ToElement,
     InitMouseEvent
   };
-  DOM::MouseEvent toMouseEvent() const {
-    return static_cast<DOM::MouseEvent>(event);
-  }
 };
 
 class DOMKeyboardEvent : public DOMUIEvent {
  public:
-  DOMKeyboardEvent(ExecState* exec, DOM::KeyboardEvent ke)
-      : DOMUIEvent(exec, ke) {}
+  DOMKeyboardEvent(ExecState* exec, DOM::KeyboardEventImpl* ke);
   ~DOMKeyboardEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -246,7 +245,6 @@ class DOMKeyboardEvent : public DOMUIEvent {
     AltGraphKey,
     InitKeyboardEvent
   };
-  DOM::KeyboardEvent toKeyboardEvent() const { return event; }
 };
 
 // Constructor object MutationEvent
@@ -264,8 +262,7 @@ Value getMutationEventConstructor(ExecState* exec);
 
 class DOMMutationEvent : public DOMEvent {
  public:
-  DOMMutationEvent(ExecState* exec, DOM::MutationEvent me)
-      : DOMEvent(exec, me) {}
+  DOMMutationEvent(ExecState* exec, DOM::MutationEventImpl* me);
   ~DOMMutationEvent();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState*, int token) const;
@@ -280,9 +277,6 @@ class DOMMutationEvent : public DOMEvent {
     NewValue,
     InitMutationEvent
   };
-  DOM::MutationEvent toMutationEvent() const {
-    return static_cast<DOM::MutationEvent>(event);
-  }
 };
 
 class DOMWheelEvent : public DOMUIEvent {
@@ -340,6 +334,6 @@ class Clipboard : public DOMObject {
   DOM::ClipboardImpl* clipboard;
 };
 
-};  // namespace
+}  // namespace
 
 #endif

@@ -19,6 +19,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "kjs_window.h"
+
 #include <qstylesheet.h>
 #include <qtimer.h>
 #include <qinputdialog.h>
@@ -41,7 +43,6 @@
 #endif
 #include <kjs/collector.h>
 #include "kjs_proxy.h"
-#include "kjs_window.h"
 #include "kjs_navigator.h"
 #include "kjs_html.h"
 #include "kjs_range.h"
@@ -62,17 +63,20 @@
 #include "xml/dom_elementimpl.h"
 #include "xml/dom_position.h"
 #include "html/html_documentimpl.h"
-
+#include "css/css_ruleimpl.h"
+#include "css/css_stylesheetimpl.h"
 #include "misc/htmltags.h"
 
 using DOM::DocumentImpl;
 using DOM::DOMString;
 using DOM::ElementImpl;
-using DOM::Node;
+using DOM::EventImpl;
+using DOM::HTMLCollectionImpl;
+using DOM::HTMLElementImpl;
+using DOM::NodeImpl;
 using DOM::Position;
-using khtml::TypingCommand;
 
-using namespace KJS;
+using khtml::TypingCommand;
 
 namespace KJS {
 
@@ -120,9 +124,11 @@ class KonquerorFunc : public DOMFunction {
   QCString m_name;
 };
 #endif
-};  // namespace KJS
+}
 
 #include "kjs_window.lut.h"
+
+namespace KJS {
 
 ////////////////////// Screen Object ////////////////////////
 
@@ -464,31 +470,6 @@ UString Window::toString(ExecState*) const {
   return "[object Window]";
 }
 
-static ElementImpl* frameElement(ExecState* exec, KHTMLPart* part) {
-  // Find the frame element.
-  DocumentImpl* document = part->xmlDocImpl();
-  if (!document)
-    return 0;
-  ElementImpl* frameElement = document->ownerElement();
-  if (!frameElement)
-    return 0;
-
-  // Find the window object for the frame element, and do a cross-domain check.
-  DocumentImpl* frameElementDocument = frameElement->getDocument();
-  if (!frameElementDocument)
-    return 0;
-  KHTMLPart* frameElementPart = frameElementDocument->part();
-  if (!frameElementPart)
-    return 0;
-  Window* frameElementWindow = Window::retrieveWindow(frameElementPart);
-  if (!frameElementWindow)
-    return 0;
-  if (!frameElementWindow->isSafeScript(exec))
-    return 0;
-
-  return frameElement;
-}
-
 Value Window::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "Window(" << this << ")::get " << p.qstring() << endl;
@@ -538,8 +519,7 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
             m_part->write("<HTML><BODY>");
             m_part->end();
           }
-          Value val = getDOMNode(exec, m_part->document());
-          return val;
+          return getDOMNode(exec, m_part->xmlDocImpl());
         } else
           return Undefined();
       case Node:
@@ -563,7 +543,7 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
 
       case Event:
         if (m_evt)
-          return getDOMEvent(exec, *m_evt);
+          return getDOMEvent(exec, m_evt);
         else {
 #ifdef KJS_VERBOSE
           kdWarning(6070) << "window(" << this << "," << m_part->name()
@@ -696,14 +676,13 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
         return Value(screen ? screen : (const_cast<Window*>(this)->screen =
                                             new Screen(exec)));
       case Image:
-        return Value(new ImageConstructorImp(exec, m_part->document()));
+        return new ImageConstructorImp(exec, m_part->xmlDocImpl());
       case Option:
-        return Value(new OptionConstructorImp(exec, m_part->document()));
+        return new OptionConstructorImp(exec, m_part->xmlDocImpl());
       case XMLHttpRequest:
-        return Value(
-            new XMLHttpRequestConstructorImp(exec, m_part->document()));
+        return new XMLHttpRequestConstructorImp(exec, m_part->xmlDocImpl());
       case XMLSerializer:
-        return Value(new XMLSerializerConstructorImp(exec));
+        return new XMLSerializerConstructorImp(exec);
       case Focus:
       case Blur:
       case Close:
@@ -869,12 +848,12 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
           return getListener(exec, DOM::EventImpl::UNLOAD_EVENT);
         else
           return Undefined();
-      case FrameElement: {
-        ElementImpl* fe = frameElement(exec, m_part);
-        if (!fe)
-          return Undefined();
-        return getDOMNode(exec, fe);
-      }
+      case FrameElement:
+        if (DocumentImpl* doc = m_part->xmlDocImpl())
+          if (ElementImpl* fe = doc->ownerElement())
+            if (checkNodeSecurity(exec, fe))
+              return getDOMNode(exec, fe);
+        return Undefined();
     }
   }
 
@@ -898,13 +877,11 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
   }
 
   // allow shortcuts like 'Image1' instead of document.images.Image1
-  if (isSafeScript(exec) &&
-      m_part->document().isHTMLDocument()) {  // might be XML
-    DOM::HTMLCollection coll = m_part->htmlDocument().all();
-    DOM::HTMLElement element = coll.namedItem(p.string());
-    if (!element.isNull()) {
+  DocumentImpl* doc = m_part->xmlDocImpl();
+  if (isSafeScript(exec) && doc->isHTMLDocument()) {  // might be XML
+    NodeImpl* element = doc->all()->namedItem(p.string());
+    if (element)
       return getDOMNode(exec, element);
-    }
   }
 
 // This isn't necessarily a bug. Some code uses if(!window.blah) window.blah=1
@@ -937,8 +914,11 @@ bool Window::hasProperty(ExecState* exec, const Identifier& p) const {
   if (m_part->findFrame(p.qstring()))
     return true;
 
-  if (!m_part->htmlDocument().all().namedItem(p.string()).isNull())
-    return true;
+  if (isSafeScript(exec)) {
+    DocumentImpl* doc = m_part->xmlDocImpl();
+    if (doc->isHTMLDocument() && doc->all()->namedItem(p.string()))
+      return true;
+  }
 
   return false;
 }
@@ -976,9 +956,8 @@ void Window::put(ExecState* exec,
       case _Location: {
         KHTMLPart* p = Window::retrieveActive(exec)->m_part;
         if (p) {
-          QString dstUrl = p->htmlDocument()
-                               .completeURL(value.toString(exec).string())
-                               .string();
+          QString dstUrl =
+              p->xmlDocImpl()->completeURL(value.toString(exec).qstring());
           if (!dstUrl.startsWith("javascript:", false) || isSafeScript(exec)) {
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
@@ -1315,8 +1294,7 @@ bool Window::isSafeScript(ExecState* exec) const {
 void Window::setListener(ExecState* exec, int eventId, Value func) {
   if (!isSafeScript(exec))
     return;
-  DOM::DocumentImpl* doc =
-      static_cast<DOM::DocumentImpl*>(m_part->htmlDocument().handle());
+  DOM::DocumentImpl* doc = m_part->xmlDocImpl();
   if (!doc)
     return;
 
@@ -1326,8 +1304,7 @@ void Window::setListener(ExecState* exec, int eventId, Value func) {
 Value Window::getListener(ExecState* exec, int eventId) const {
   if (!isSafeScript(exec))
     return Undefined();
-  DOM::DocumentImpl* doc =
-      static_cast<DOM::DocumentImpl*>(m_part->htmlDocument().handle());
+  DOM::DocumentImpl* doc = m_part->xmlDocImpl();
   if (!doc)
     return Undefined();
 
@@ -1394,7 +1371,7 @@ void Window::clear(ExecState* exec) {
   KJS::Interpreter::unlock();
 }
 
-void Window::setCurrentEvent(DOM::Event* evt) {
+void Window::setCurrentEvent(EventImpl* evt) {
   m_evt = evt;
   // kdDebug(6070) << "Window " << this << " (part=" << m_part <<
   // ")::setCurrentEvent m_evt=" << evt << endl;
@@ -1646,7 +1623,7 @@ Value WindowFunc::tryCall(ExecState* exec, Object& thisObj, const List& args) {
         KHTMLPart* activePart = Window::retrieveActive(exec)->m_part;
         if (!str.isEmpty()) {
           if (activePart)
-            url = activePart->htmlDocument().completeURL(str).string();
+            url = activePart->xmlDocImpl()->completeURL(str);
         }
 
         KParts::URLArgs uargs;
@@ -2340,7 +2317,7 @@ void Location::put(ExecState* exec,
       case Href: {
         KHTMLPart* p = Window::retrieveActive(exec)->part();
         if (p)
-          url = p->htmlDocument().completeURL(str).string();
+          url = p->xmlDocImpl()->completeURL(str);
         else
           url = str;
         break;
@@ -2431,9 +2408,9 @@ Value LocationFunc::tryCall(ExecState* exec,
             bool userGesture =
                 static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                     ->wasRunByUserGesture();
-            part->scheduleLocationChange(
-                p->htmlDocument().completeURL(str).string(), p->referrer(),
-                true /*lock history*/, userGesture);
+            part->scheduleLocationChange(p->xmlDocImpl()->completeURL(str),
+                                         p->referrer(), true /*lock history*/,
+                                         userGesture);
           }
         }
         break;
@@ -2526,13 +2503,13 @@ Value Selection::get(ExecState* exec, const Identifier& p) const {
     switch (entry->value) {
       case AnchorNode:
       case BaseNode:
-        return getDOMNode(exec, Node(m_part->selection().base().node()));
+        return getDOMNode(exec, m_part->selection().base().node());
       case AnchorOffset:
       case BaseOffset:
         return Number(m_part->selection().base().offset());
       case FocusNode:
       case ExtentNode:
-        return getDOMNode(exec, Node(m_part->selection().extent().node()));
+        return getDOMNode(exec, m_part->selection().extent().node());
       case FocusOffset:
       case ExtentOffset:
         return Number(m_part->selection().extent().offset());
@@ -2607,9 +2584,9 @@ Value SelectionFunc::tryCall(ExecState* exec,
     switch (id) {
       case Selection::Collapse:
         TypingCommand::closeTyping(part->lastEditCommand());
-        part->setSelection(khtml::Selection(
-            Position(KJS::toNode(args[0]).handle(), args[1].toInt32(exec)),
-            khtml::SEL_DEFAULT_AFFINITY));
+        part->setSelection(
+            khtml::Selection(Position(toNode(args[0]), args[1].toInt32(exec)),
+                             khtml::SEL_DEFAULT_AFFINITY));
         break;
       case Selection::CollapseToEnd:
         TypingCommand::closeTyping(part->lastEditCommand());
@@ -2627,8 +2604,8 @@ Value SelectionFunc::tryCall(ExecState* exec,
         break;
       case Selection::SetBaseAndExtent: {
         TypingCommand::closeTyping(part->lastEditCommand());
-        Position base(KJS::toNode(args[0]).handle(), args[1].toInt32(exec));
-        Position extent(KJS::toNode(args[2]).handle(), args[3].toInt32(exec));
+        Position base(toNode(args[0]), args[1].toInt32(exec));
+        Position extent(toNode(args[2]), args[3].toInt32(exec));
         part->setSelection(khtml::Selection(base, khtml::SEL_DEFAULT_AFFINITY,
                                             extent,
                                             khtml::SEL_DEFAULT_AFFINITY));
@@ -2636,9 +2613,9 @@ Value SelectionFunc::tryCall(ExecState* exec,
       }
       case Selection::SetPosition:
         TypingCommand::closeTyping(part->lastEditCommand());
-        part->setSelection(khtml::Selection(
-            Position(KJS::toNode(args[0]).handle(), args[1].toInt32(exec)),
-            khtml::SEL_DEFAULT_AFFINITY));
+        part->setSelection(
+            khtml::Selection(Position(toNode(args[0]), args[1].toInt32(exec)),
+                             khtml::SEL_DEFAULT_AFFINITY));
         break;
       case Selection::Modify: {
         TypingCommand::closeTyping(part->lastEditCommand());
@@ -2869,5 +2846,7 @@ UString Konqueror::toString(ExecState*) const {
 
 #endif
 /////////////////////////////////////////////////////////////////////////////
+
+}  // namespace KJS
 
 #include "kjs_window.moc"

@@ -25,13 +25,16 @@
 #include <qobject.h>
 #include <qguardedptr.h>
 #include <qmap.h>
-#include <qptrlist.h>
 
 #include "kjs_binding.h"
 
 class QTimer;
 class KHTMLView;
 class KHTMLPart;
+
+namespace DOM {
+class NodeImpl;
+}
 
 namespace KJS {
 
@@ -140,7 +143,7 @@ class Window : public ObjectImp {
   virtual UString toString(ExecState* exec) const;
 
   // Set the current "event" object
-  void setCurrentEvent(DOM::Event* evt);
+  void setCurrentEvent(DOM::EventImpl* evt);
 
   QPtrDict<JSEventListener> jsEventListeners;
   QPtrDict<JSUnprotectedEventListener> jsUnprotectedEventListeners;
@@ -269,7 +272,7 @@ class Window : public ObjectImp {
   BarInfo* m_statusbar;
   BarInfo* m_toolbar;
   WindowQObject* winq;
-  DOM::Event* m_evt;
+  DOM::EventImpl* m_evt;
 };
 
 /**
@@ -440,6 +443,6 @@ class Konqueror : public ObjectImp {
 };
 #endif
 
-};  // namespace
+}  // namespace
 
 #endif

@@ -41,12 +41,12 @@ class KJSProxyImpl : public KJSProxy {
   virtual QVariant evaluate(QString filename,
                             int baseLine,
                             const QString& str,
-                            const DOM::Node& n);
+                            DOM::NodeImpl* n);
   virtual void clear();
   virtual DOM::EventListener* createHTMLEventHandler(QString sourceUrl,
                                                      QString code,
                                                      DOM::NodeImpl* node);
-  virtual void finishedWithEvent(const DOM::Event& event);
+  virtual void finishedWithEvent(DOM::EventImpl* event);
   virtual KJS::ScriptInterpreter* interpreter();
 
   virtual void setDebugEnabled(bool enabled);
@@ -94,7 +94,7 @@ KJSProxyImpl::~KJSProxyImpl() {
 QVariant KJSProxyImpl::evaluate(QString filename,
                                 int baseLine,
                                 const QString& str,
-                                const DOM::Node& n) {
+                                DOM::NodeImpl* n) {
   // evaluate code. Returns the JS return value or an invalid QVariant
   // if there was none, an error occured or the type couldn't be converted.
 
@@ -118,8 +118,8 @@ QVariant KJSProxyImpl::evaluate(QString filename,
 #endif
 
   m_script->setInlineCode(inlineCode);
-  KJS::Value thisNode = n.isNull() ? Window::retrieve(m_part)
-                                   : getDOMNode(m_script->globalExec(), n);
+  KJS::Value thisNode = n ? Window::retrieve(m_part)
+                          : Value(getDOMNode(m_script->globalExec(), n));
 
   KJS::Interpreter::lock();
   UString code(str);
@@ -196,7 +196,7 @@ DOM::EventListener* KJSProxyImpl::createHTMLEventHandler(QString sourceUrl,
       code, node, m_handlerLineno);
 }
 
-void KJSProxyImpl::finishedWithEvent(const DOM::Event& event) {
+void KJSProxyImpl::finishedWithEvent(DOM::EventImpl* event) {
   // This is called when the DOM implementation has finished with a particular
   // event. This
   // is the case in sitations where an event has been created just for temporary
@@ -205,7 +205,7 @@ void KJSProxyImpl::finishedWithEvent(const DOM::Event& event) {
   // forgotten
   // by the DOM implementation and so does not need to be cached still by the
   // interpreter
-  m_script->forgetDOMObject(event.handle());
+  m_script->forgetDOMObject(event);
 }
 
 KJS::ScriptInterpreter* KJSProxyImpl::interpreter() {

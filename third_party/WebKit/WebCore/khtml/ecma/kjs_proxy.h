@@ -29,9 +29,8 @@ class KHTMLPart;
 class KJSDebugWin;
 
 namespace DOM {
-class Node;
+class EventImpl;
 class EventListener;
-class Event;
 class NodeImpl;
 };
 
@@ -52,12 +51,12 @@ class KJSProxy {
   virtual QVariant evaluate(QString filename,
                             int baseLine,
                             const QString&,
-                            const DOM::Node& n) = 0;
+                            DOM::NodeImpl* n) = 0;
   virtual void clear() = 0;
   virtual DOM::EventListener* createHTMLEventHandler(QString sourceUrl,
                                                      QString code,
                                                      DOM::NodeImpl* node) = 0;
-  virtual void finishedWithEvent(const DOM::Event& event) = 0;
+  virtual void finishedWithEvent(DOM::EventImpl* event) = 0;
   virtual KJS::Interpreter* interpreter() = 0;
 
   virtual void setDebugEnabled(bool enabled) = 0;

@@ -45,14 +45,13 @@
 #include "java/kjavaappletcontext.h"
 #include "ecma/kjs_proxy.h"
 #include "css/css_valueimpl.h"
-#include "dom/dom_misc.h"
 #include "editing/edit_command.h"
 #include "editing/selection.h"
 
 namespace KIO {
 class Job;
 class TransferJob;
-};
+}
 
 namespace khtml {
 struct ChildFrame {

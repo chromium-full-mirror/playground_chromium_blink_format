@@ -22,13 +22,16 @@
 #define _KJS_RANGE_H_
 
 #include "ecma/kjs_dom.h"
-#include "dom/dom2_range.h"
+
+namespace DOM {
+class RangeImpl;
+}
 
 namespace KJS {
 
 class DOMRange : public DOMObject {
  public:
-  DOMRange(ExecState* exec, DOM::Range r);
+  DOMRange(ExecState* exec, DOM::RangeImpl* r);
   ~DOMRange();
   virtual Value tryGet(ExecState* exec, const Identifier& p) const;
   Value getValueProperty(ExecState* exec, int token) const;
@@ -62,10 +65,10 @@ class DOMRange : public DOMObject {
     Detach,
     CreateContextualFragment
   };
-  DOM::Range toRange() const { return range; }
+  DOM::RangeImpl* impl() const { return m_impl.get(); }
 
- protected:
-  DOM::Range range;
+ private:
+  khtml::SharedPtr<DOM::RangeImpl> m_impl;
 };
 
 // Constructor object Range
@@ -79,14 +82,12 @@ class RangeConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-Value getDOMRange(ExecState* exec, DOM::Range r);
-Value getRangeConstructor(ExecState* exec);
+ValueImp* getDOMRange(ExecState* exec, DOM::RangeImpl* r);
+ValueImp* getRangeConstructor(ExecState* exec);
 
-/**
- * Convert an object to a Range. Returns a null Node if not possible.
- */
-DOM::Range toRange(const Value&);
+DOM::RangeImpl* toRange(
+    ValueImp*);  // returns 0 if the value is not a DOMRange object
 
-};  // namespace
+}  // namespace
 
 #endif

@@ -21,10 +21,20 @@
 #ifndef _XMLHTTPREQUEST_H_
 #define _XMLHTTPREQUEST_H_
 
-#include "ecma/kjs_binding.h"
-#include "ecma/kjs_dom.h"
-#include "misc/decoder.h"
-#include "kio/jobclasses.h"
+#include <qguardedptr.h>
+#include <qobject.h>
+#include <kurl.h>
+
+#include "kjs_dom.h"
+
+namespace khtml {
+class Decoder;
+}
+
+namespace KIO {
+class Job;
+class TransferJob;
+}
 
 namespace KJS {
 
@@ -42,17 +52,18 @@ enum XMLHttpRequestState {
 
 class XMLHttpRequestConstructorImp : public ObjectImp {
  public:
-  XMLHttpRequestConstructorImp(ExecState* exec, const DOM::Document& d);
+  XMLHttpRequestConstructorImp(ExecState* exec, DOM::DocumentImpl* d);
+  ~XMLHttpRequestConstructorImp();
   virtual bool implementsConstruct() const;
   virtual Object construct(ExecState* exec, const List& args);
 
  private:
-  DOM::Document doc;
+  khtml::SharedPtr<DOM::DocumentImpl> doc;
 };
 
 class XMLHttpRequest : public DOMObject {
  public:
-  XMLHttpRequest(ExecState*, const DOM::Document& d);
+  XMLHttpRequest(ExecState*, DOM::DocumentImpl* d);
   ~XMLHttpRequest();
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
@@ -137,7 +148,7 @@ class XMLHttpRequest : public DOMObject {
   QString response;
   mutable bool createdDocument;
   mutable bool typeIsXML;
-  mutable DOM::Document responseXML;
+  mutable khtml::SharedPtr<DOM::DocumentImpl> responseXML;
 
   bool aborted;
 };
@@ -161,6 +172,6 @@ class XMLHttpRequestQObject : public QObject {
   XMLHttpRequest* jsObject;
 };
 
-};  // namespace
+}  // namespace
 
 #endif
