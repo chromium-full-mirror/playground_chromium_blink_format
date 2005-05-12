@@ -68,7 +68,8 @@ void HTMLImageLoader::updateFromElement() {
   // don't want to slow
   // down the raw HTML parsing case by loading images we don't intend to
   // display.
-  if (!element()->getDocument()->renderer())
+  DocumentImpl* document = element()->getDocument();
+  if (!document || !document->renderer())
     return;
 
   AtomicString attr;
