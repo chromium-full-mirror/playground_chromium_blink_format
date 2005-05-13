@@ -569,7 +569,7 @@ void RenderLineEdit::addSearchResult() {
 #endif
 
 void RenderLineEdit::handleFocusOut() {
-  if (widget() && widget()->edited()) {
+  if (widget() && widget()->edited() && element()) {
     element()->onChange();
     widget()->setEdited(false);
   }
