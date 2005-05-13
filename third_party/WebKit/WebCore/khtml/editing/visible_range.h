@@ -34,7 +34,7 @@ class VisibleRange {
  public:
   typedef DOM::NodeImpl NodeImpl;
   typedef DOM::Position Position;
-  typedef DOM::Range Range;
+  typedef DOM::RangeImpl RangeImpl;
 
   VisibleRange() {}
   VisibleRange(NodeImpl* startContainer,
@@ -43,18 +43,18 @@ class VisibleRange {
                long endOffset);
   VisibleRange(const VisiblePosition&);
   VisibleRange(const VisiblePosition&, const VisiblePosition&);
-  VisibleRange(const Range&);
+  VisibleRange(const RangeImpl*);
   VisibleRange(const Position&);
   VisibleRange(const Position&, const Position&);
 
   VisibleRange& operator=(const VisiblePosition&);
-  VisibleRange& operator=(const Range&);
+  VisibleRange& operator=(const RangeImpl*);
   VisibleRange& operator=(const Position&);
 
   VisiblePosition start() const { return m_start; }
   VisiblePosition end() const { return m_end; }
 
-  Range range() const;
+  SharedPtr<RangeImpl> range() const;
 
   void clear() {
     m_start.clear();

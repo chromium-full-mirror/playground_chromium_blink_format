@@ -42,7 +42,6 @@ class HTMLTitleElementImpl;
 class HTMLGenericFormElementImpl;
 class HTMLFormElementImpl;
 class HTMLAnchorElementImpl;
-class Range;
 class NodeImpl;
 class CSSProperty;
 };

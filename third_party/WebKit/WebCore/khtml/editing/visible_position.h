@@ -30,10 +30,10 @@
 
 #include "xml/dom_position.h"
 #include "text_affinity.h"
+#include "misc/shared.h"
 
 namespace DOM {
 class NodeImpl;
-class Range;
 class RangeImpl;
 }
 
@@ -116,14 +116,11 @@ inline bool operator!=(const VisiblePosition& a, const VisiblePosition& b) {
   return !(a == b);
 }
 
-DOM::Range makeRange(const VisiblePosition& start, const VisiblePosition& end);
-bool setStart(DOM::Range&, const VisiblePosition& start);
+khtml::SharedPtr<DOM::RangeImpl> makeRange(const VisiblePosition& start,
+                                           const VisiblePosition& end);
 bool setStart(DOM::RangeImpl*, const VisiblePosition& start);
-bool setEnd(DOM::Range&, const VisiblePosition& start);
 bool setEnd(DOM::RangeImpl*, const VisiblePosition& start);
-VisiblePosition startVisiblePosition(const DOM::Range&, EAffinity);
 VisiblePosition startVisiblePosition(const DOM::RangeImpl*, EAffinity);
-VisiblePosition endVisiblePosition(const DOM::Range&, EAffinity);
 VisiblePosition endVisiblePosition(const DOM::RangeImpl*, EAffinity);
 
 void setAffinityUsingLinePosition(VisiblePosition&);

@@ -97,7 +97,6 @@ class NodeFilterImpl;
 class NodeIteratorImpl;
 class NodeListImpl;
 class ProcessingInstructionImpl;
-class Range;
 class RangeImpl;
 class RegisteredEventListener;
 class StyleSheetImpl;
@@ -600,8 +599,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool queryCommandSupported(const DOMString& command);
   DOMString queryCommandValue(const DOMString& command);
 
-  void addMarker(Range range, DocumentMarker::MarkerType type);
-  void removeMarker(Range range, DocumentMarker::MarkerType type);
+  void addMarker(RangeImpl* range, DocumentMarker::MarkerType type);
+  void removeMarker(RangeImpl* range, DocumentMarker::MarkerType type);
   void addMarker(NodeImpl* node, DocumentMarker marker);
   void removeMarker(NodeImpl* node, DocumentMarker marker);
   void removeAllMarkers(NodeImpl* node, ulong startOffset, long length);

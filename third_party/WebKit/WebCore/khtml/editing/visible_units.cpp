@@ -40,7 +40,7 @@ using DOM::DocumentImpl;
 using DOM::ElementImpl;
 using DOM::NodeImpl;
 using DOM::Position;
-using DOM::Range;
+using DOM::RangeImpl;
 
 namespace khtml {
 
@@ -66,11 +66,12 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     boundary = boundary->parentNode();
   }
 
-  Range searchRange(d);
-  searchRange.setStartBefore(boundary);
+  SharedPtr<RangeImpl> searchRange(d->createRange());
+  int exception = 0;
+  searchRange->setStartBefore(boundary, exception);
   Position end(pos.equivalentRangeCompliantPosition());
-  searchRange.setEnd(end.node(), end.offset());
-  SimplifiedBackwardsTextIterator it(searchRange);
+  searchRange->setEnd(end.node(), end.offset(), exception);
+  SimplifiedBackwardsTextIterator it(searchRange.get());
   QString string;
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
@@ -83,8 +84,9 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == 0) {
-    Range range(it.range());
-    pos = Position(range.startContainer().handle(), range.startOffset());
+    SharedPtr<RangeImpl> range(it.range());
+    pos = Position(range->startContainer(exception),
+                   range->startOffset(exception));
   } else if (!it.atEnd() && it.length() == 0) {
     // Got a zero-length chunk.
     // This means we have hit a replaced element.
@@ -98,25 +100,27 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     chars[1] = ' ';
     string.prepend(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    Range range(it.range());
+    SharedPtr<RangeImpl> range(it.range());
     if (pastImage == 0)
-      pos = Position(range.startContainer().handle(), range.startOffset());
+      pos = Position(range->startContainer(exception),
+                     range->startOffset(exception));
     else
-      pos = Position(range.endContainer().handle(), range.endOffset());
+      pos =
+          Position(range->endContainer(exception), range->endOffset(exception));
   } else if (next != 0) {
     // The simpler iterator used in this function, as compared to the one used
     // in
     // nextWordPosition(), gives us results we can use directly without having
     // to
     // iterate again to translate the next value into a DOM position.
-    NodeImpl* node = it.range().startContainer().handle();
+    NodeImpl* node = it.range()->startContainer(exception);
     if (node->isTextNode() || (node->renderer() && node->renderer()->isBR())) {
       // The next variable contains a usable index into a text node
       pos = Position(node, next);
     } else {
       // If we are not in a text node, we ended on a node boundary, so the
       // range start offset should be used.
-      pos = Position(node, it.range().startOffset());
+      pos = Position(node, it.range()->startOffset(exception));
     }
   }
 
@@ -145,11 +149,12 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     boundary = boundary->parentNode();
   }
 
-  Range searchRange(d);
+  SharedPtr<RangeImpl> searchRange(d->createRange());
   Position start(pos.equivalentRangeCompliantPosition());
-  searchRange.setStart(start.node(), start.offset());
-  searchRange.setEndAfter(boundary);
-  TextIterator it(searchRange, RUNFINDER);
+  int exception = 0;
+  searchRange->setStart(start.node(), start.offset(), exception);
+  searchRange->setEndAfter(boundary, exception);
+  TextIterator it(searchRange.get(), RUNFINDER);
   QString string;
   unsigned next = 0;
   while (!it.atEnd() && it.length() > 0) {
@@ -163,8 +168,10 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == string.length()) {
-    Range range(it.range());
-    pos = Position(range.startContainer().handle(), range.startOffset());
+    SharedPtr<RangeImpl> range(it.range());
+    int exception = 0;
+    pos = Position(range->startContainer(exception),
+                   range->startOffset(exception));
   } else if (!it.atEnd() && it.length() == 0) {
     // Got a zero-length chunk.
     // This means we have hit a replaced element.
@@ -178,18 +185,21 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     chars[1] = 'X';
     string.append(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    Range range(it.range());
+    SharedPtr<RangeImpl> range(it.range());
+    int exception = 0;
     if (next != pastImage)
-      pos = Position(range.endContainer().handle(), range.endOffset());
+      pos =
+          Position(range->endContainer(exception), range->endOffset(exception));
     else
-      pos = Position(range.startContainer().handle(), range.startOffset());
+      pos = Position(range->startContainer(exception),
+                     range->startOffset(exception));
   } else if (next != 0) {
     // Use the character iterator to translate the next value into a DOM
     // position.
-    CharacterIterator charIt(searchRange);
+    CharacterIterator charIt(searchRange.get());
     charIt.advance(next - 1);
-    pos = Position(charIt.range().endContainer().handle(),
-                   charIt.range().endOffset());
+    pos = Position(charIt.range()->endContainer(exception),
+                   charIt.range()->endOffset(exception));
   }
   return VisiblePosition(pos, UPSTREAM);
 }
