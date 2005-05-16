@@ -123,7 +123,7 @@ CString& CString::operator=(const CString& str) {
   return *this;
 }
 
-bool KJS::operator==(const KJS::CString& c1, const KJS::CString& c2) {
+bool operator==(const CString& c1, const CString& c2) {
   int len = c1.size();
   return len == c2.size() &&
          (len == 0 || memcmp(c1.c_str(), c2.c_str(), len) == 0);
@@ -1109,7 +1109,7 @@ void UString::detach() {
   }
 }
 
-bool KJS::operator==(const UString& s1, const UString& s2) {
+bool operator==(const UString& s1, const UString& s2) {
   if (s1.rep->len != s2.rep->len)
     return false;
 
@@ -1117,7 +1117,7 @@ bool KJS::operator==(const UString& s1, const UString& s2) {
           0);
 }
 
-bool KJS::operator==(const UString& s1, const char* s2) {
+bool operator==(const UString& s1, const char* s2) {
   if (s2 == 0) {
     return s1.isEmpty();
   }
@@ -1134,7 +1134,7 @@ bool KJS::operator==(const UString& s1, const char* s2) {
   return u == uend && *s2 == 0;
 }
 
-bool KJS::operator<(const UString& s1, const UString& s2) {
+bool operator<(const UString& s1, const UString& s2) {
   const int l1 = s1.size();
   const int l2 = s2.size();
   const int lmin = l1 < l2 ? l1 : l2;
@@ -1152,7 +1152,7 @@ bool KJS::operator<(const UString& s1, const UString& s2) {
   return (l1 < l2);
 }
 
-int KJS::compare(const UString& s1, const UString& s2) {
+int compare(const UString& s1, const UString& s2) {
   const int l1 = s1.size();
   const int l2 = s2.size();
   const int lmin = l1 < l2 ? l1 : l2;
