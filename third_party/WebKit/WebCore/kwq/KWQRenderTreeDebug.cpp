@@ -57,6 +57,7 @@ using khtml::RenderCanvas;
 using khtml::RenderBR;
 using khtml::Selection;
 using khtml::transparentColor;
+using khtml::UPSTREAM;
 
 static void writeLayers(QTextStream& ts,
                         const RenderLayer* rootLayer,
@@ -412,7 +413,10 @@ static void writeSelection(QTextStream& ts, const RenderObject* o) {
   Selection selection = part->selection();
   if (selection.isCaret()) {
     ts << "caret: position " << selection.start().offset() << " of "
-       << nodePosition(selection.start().node()) << "\n";
+       << nodePosition(selection.start().node());
+    if (selection.startAffinity() == UPSTREAM)
+      ts << " (upstream affinity)";
+    ts << "\n";
   } else if (selection.isRange()) {
     ts << "selection start: position " << selection.start().offset() << " of "
        << nodePosition(selection.start().node()) << "\n"
