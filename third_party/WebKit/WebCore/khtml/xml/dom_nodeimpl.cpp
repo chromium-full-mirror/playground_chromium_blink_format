@@ -2033,6 +2033,8 @@ bool ContainerNodeImpl::checkSameDocument(NodeImpl* newChild,
                                           int& exceptioncode) {
   exceptioncode = 0;
   DocumentImpl* ownerDocThis = getDocument();
+  // FIXME: Doh! This next line isn't getting newChild, so it's never going to
+  // work!
   DocumentImpl* ownerDocNew = getDocument();
   if (ownerDocThis != ownerDocNew) {
     kdDebug(6010) << "not same document, newChild = " << newChild

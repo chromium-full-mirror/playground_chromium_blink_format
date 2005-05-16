@@ -393,14 +393,14 @@ QString Identifier::qstring() const {
   return QString((QChar*)data(), size());
 }
 
-Value KJS::getStringOrNull(DOMString s) {
+Value getStringOrNull(DOMString s) {
   if (s.isNull())
     return Null();
   else
     return String(s);
 }
 
-QVariant KJS::ValueToVariant(ExecState* exec, const Value& val) {
+QVariant ValueToVariant(ExecState* exec, const Value& val) {
   QVariant res;
   switch (val.type()) {
     case BooleanType:

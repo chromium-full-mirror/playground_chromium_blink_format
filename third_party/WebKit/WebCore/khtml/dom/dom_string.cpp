@@ -223,7 +223,7 @@ DOMString DOMString::copy() const {
 
 // ------------------------------------------------------------------------
 
-bool DOM::strcasecmp(const DOMString& as, const DOMString& bs) {
+bool strcasecmp(const DOMString& as, const DOMString& bs) {
   if (as.length() != bs.length())
     return true;
 
@@ -242,7 +242,7 @@ bool DOM::strcasecmp(const DOMString& as, const DOMString& bs) {
   return false;
 }
 
-bool DOM::strcasecmp(const DOMString& as, const char* bs) {
+bool strcasecmp(const DOMString& as, const char* bs) {
   const QChar* a = as.unicode();
   int l = as.length();
   if (!bs)
@@ -274,7 +274,7 @@ const char* DOMString::ascii() const {
 
 //-----------------------------------------------------------------------------
 
-bool DOM::operator==(const DOMString& a, const DOMString& b) {
+bool operator==(const DOMString& a, const DOMString& b) {
   if (a.impl == b.impl)
     return true;
 
@@ -288,7 +288,7 @@ bool DOM::operator==(const DOMString& a, const DOMString& b) {
   return false;
 }
 
-bool DOM::operator==(const DOMString& a, const QString& b) {
+bool operator==(const DOMString& a, const QString& b) {
   unsigned int l = a.length();
 
   if (l != b.length())
@@ -299,7 +299,7 @@ bool DOM::operator==(const DOMString& a, const QString& b) {
   return false;
 }
 
-bool DOM::operator==(const DOMString& a, const char* b) {
+bool operator==(const DOMString& a, const char* b) {
   DOMStringImpl* aimpl = a.impl;
 
   if (!b)
