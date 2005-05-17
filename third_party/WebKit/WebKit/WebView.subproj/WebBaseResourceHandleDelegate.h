@@ -23,6 +23,7 @@
   WebDataSource* dataSource;
   NSURLConnection* connection;
   NSURLRequest* request;
+  BOOL reachedTerminalState;
  @private
   WebView* webView;
   NSURLResponse* response;
@@ -32,7 +33,6 @@
   NSURLAuthenticationChallenge* currentConnectionChallenge;
   NSURLAuthenticationChallenge* currentWebChallenge;
   BOOL cancelledFlag;
-  BOOL reachedTerminalState;
   BOOL defersCallbacks;
   BOOL waitingToDeliverResource;
   BOOL deliveredResource;
