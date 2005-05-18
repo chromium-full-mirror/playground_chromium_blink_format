@@ -1746,6 +1746,14 @@ KIO::Job* Loader::jobForRequest(const DOM::DOMString& url) const {
   return 0;
 }
 
+#if APPLE_CHANGES
+
+bool Loader::isKHTMLLoader() const {
+  return true;
+}
+
+#endif
+
 // ----------------------------------------------------------------------------
 
 LRUList::LRUList() : m_head(0), m_tail(0) {}

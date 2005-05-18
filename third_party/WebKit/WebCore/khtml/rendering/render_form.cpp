@@ -254,6 +254,10 @@ void RenderFormElement::addIntrinsicMarginsIfAllowed(RenderStyle* _style) {
   }
 }
 
+void RenderFormElement::slotTextChanged(const QString&) {
+  // do nothing
+}
+
 #endif
 
 // -------------------------------------------------------------------------

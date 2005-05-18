@@ -118,6 +118,13 @@ class QObject : public Qt {
   static bool defersTimers() { return _defersTimers; }
   static void setDefersTimers(bool defers);
 
+  virtual bool isKHTMLLoader() const;
+  virtual bool isKHTMLPart() const;
+  virtual bool isKHTMLView() const;
+  virtual bool isKPartsReadOnlyPart() const;
+  virtual bool isQFrame() const;
+  virtual bool isQScrollView() const;
+
  private:
   void _addTimer(NSTimer* timer, int _timerId);
 
@@ -138,12 +145,6 @@ class QObject : public Qt {
   const QObject* _eventFilterObject;
 
   static bool _defersTimers;
-
-  virtual bool isKHTMLPart() const;
-  virtual bool isKHTMLView() const;
-  virtual bool isKPartsReadOnlyPart() const;
-  virtual bool isQFrame() const;
-  virtual bool isQScrollView() const;
 
   friend class KWQGuardedPtrBase;
   friend class KWQSignal;

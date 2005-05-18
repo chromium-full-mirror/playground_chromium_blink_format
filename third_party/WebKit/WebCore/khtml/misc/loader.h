@@ -594,6 +594,10 @@ class Loader : public QObject {
  private:
   void servePendingRequests();
 
+#if APPLE_CHANGES
+  virtual bool isKHTMLLoader() const;
+#endif
+
   QPtrList<Request> m_requestsPending;
   QPtrDict<Request> m_requestsLoading;
 

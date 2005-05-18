@@ -23,9 +23,14 @@
 
 #include "dom/dom2_events.h"
 
+#include "xml/dom2_eventsimpl.h"
+
+#if !KHTML_NO_CPLUSPLUS_DOM
+
 #include "dom/dom2_views.h"
 #include "dom/dom_exception.h"
-#include "xml/dom2_eventsimpl.h"
+
+#endif
 
 using namespace DOM;
 
@@ -49,6 +54,8 @@ DOMString EventListener::eventListenerType() {
 }
 
 // -----------------------------------------------------------------------------
+
+#if !KHTML_NO_CPLUSPLUS_DOM
 
 Event::Event() {
   impl = 0;
@@ -661,3 +668,5 @@ void KeyboardEvent::initKeyboardEvent(const DOMString& typeArg,
       keyLocationArg, ctrlKeyArg, altKeyArg, shiftKeyArg, metaKeyArg,
       altGraphKeyArg);
 }
+
+#endif

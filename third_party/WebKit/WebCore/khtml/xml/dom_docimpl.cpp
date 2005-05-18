@@ -2677,10 +2677,9 @@ void DocumentImpl::defaultEventHandler(EventImpl* evt) {
   // them here
   QPtrList<RegisteredEventListener> listenersCopy = m_windowEventListeners;
   QPtrListIterator<RegisteredEventListener> it(listenersCopy);
-  Event ev(evt);
   for (; it.current(); ++it) {
     if (it.current()->id == evt->id()) {
-      it.current()->listener->handleEvent(ev, true);
+      it.current()->listener->handleEventImpl(evt, true);
     }
   }
 
