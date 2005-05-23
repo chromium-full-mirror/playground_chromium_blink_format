@@ -11,15 +11,15 @@
 - (void)_unmarkAllMisspellings;
 
 - (NSURLRequest*)_requestFromDelegateForRequest:(NSURLRequest*)request
-                                     identifier:(NSString**)identifier
+                                     identifier:(id*)identifier
                                           error:(NSError**)error;
-- (void)_sendRemainingDelegateMessagesWithIdentifier:(NSString*)identifier
+- (void)_sendRemainingDelegateMessagesWithIdentifier:(id)identifier
                                             response:(NSURLResponse*)response
                                               length:(unsigned)length
                                                error:(NSError*)error;
 - (void)
 _saveResourceAndSendRemainingDelegateMessagesWithRequest:(NSURLRequest*)request
-                                              identifier:(NSString*)identifier
+                                              identifier:(id)identifier
                                                 response:
                                                     (NSURLResponse*)response
                                                     data:(NSData*)data
