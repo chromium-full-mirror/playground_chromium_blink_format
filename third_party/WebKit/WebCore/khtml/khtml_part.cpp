@@ -652,6 +652,9 @@ bool KHTMLPart::closeURL() {
     }
   }
 
+  if (d->m_doc && !d->m_doc->inPageCache())
+    d->m_doc->removeAllEventListenersFromAllNodes();
+
   d->m_bComplete =
       true;  // to avoid emitting completed() in slotFinishedParsing() (David)
   d->m_bLoadingMainResource = false;
