@@ -36,6 +36,8 @@ class QTextEdit;
   BOOL wrap;
   BOOL inNextValidKeyView;
   BOOL inDrawingMachinery;
+  BOOL resizableByUser;
+  BOOL resizableByUserComputed;
 }
 
 - initWithQTextEdit:(QTextEdit*)w;
