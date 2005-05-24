@@ -641,9 +641,6 @@ void ApplyStyleCommand::applyInlineStyle(
   }
 }
 
-//------------------------------------------------------------------------------------------
-// ApplyStyleCommand: style-removal helpers
-
 bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclarationImpl* style,
                                         HTMLElementImpl* elem) {
   QValueListConstIterator<CSSProperty> end;
@@ -1037,9 +1034,6 @@ bool ApplyStyleCommand::nodeFullyUnselected(NodeImpl* node,
 
   return isFullyBeforeStart || isFullyAfterEnd;
 }
-
-//------------------------------------------------------------------------------------------
-// ApplyStyleCommand: style-application helpers
 
 bool ApplyStyleCommand::splitTextAtStartIfNeeded(const Position& start,
                                                  const Position& end) {
