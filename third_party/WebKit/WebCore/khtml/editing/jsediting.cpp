@@ -341,6 +341,13 @@ bool execSuperscript(KHTMLPart* part,
   return execStyleChange(part, CSS_PROP_VERTICAL_ALIGN, "super");
 }
 
+bool execTranspose(KHTMLPart* part,
+                   bool userInterface,
+                   const DOMString& value) {
+  part->transpose();
+  return true;
+}
+
 bool execUnderline(KHTMLPart* part,
                    bool userInterface,
                    const DOMString& value) {
@@ -524,6 +531,7 @@ QDict<CommandImp> createCommandDictionary() {
        {execSubscript, enabledAnySelection, stateSubscript, valueNull}},
       {"Superscript",
        {execSuperscript, enabledAnySelection, stateSuperscript, valueNull}},
+      {"Transpose", {execTranspose, enabled, stateNone, valueNull}},
       {"Underline",
        {execUnderline, enabledAnySelection, stateUnderline, valueNull}},
       {"Undo", {execUndo, enabledUndo, stateNone, valueNull}},

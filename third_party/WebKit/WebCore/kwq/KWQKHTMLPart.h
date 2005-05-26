@@ -370,6 +370,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void issueCopyCommand();
   void issuePasteCommand();
   void issuePasteAndMatchStyleCommand();
+  void issueTransposeCommand();
   void respondToChangedSelection(const khtml::Selection& oldSelection,
                                  bool closeTyping);
   void respondToChangedContents();
