@@ -664,6 +664,11 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void setDragCaret(const khtml::Selection&);
 
   /**
+   * Transposes characters either side of caret selection.
+   */
+  void transpose();
+
+  /**
    * Clears the current selection.
    */
   void clearSelection();
