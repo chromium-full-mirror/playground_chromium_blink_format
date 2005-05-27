@@ -519,6 +519,9 @@ class DocLoader {
   void setShowAnimations(KHTMLSettings::KAnimationAdvice);
   void removeCachedObject(CachedObject*) const;
 
+  void setLoadInProgress(bool);
+  bool loadInProgress() const { return m_loadInProgress; }
+
  private:
   bool needReload(const KURL& fullUrl);
 
@@ -533,6 +536,7 @@ class DocLoader {
   KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
   KHTMLPart* m_part;
   DOM::DocumentImpl* m_doc;
+  bool m_loadInProgress;
 };
 
 /**

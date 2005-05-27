@@ -1226,6 +1226,7 @@ DocLoader::DocLoader(KHTMLPart* part, DocumentImpl* doc) {
   m_showAnimations = KHTMLSettings::KAnimationEnabled;
   m_part = part;
   m_doc = doc;
+  m_loadInProgress = false;
 
 #if APPLE_CHANGES
   Cache::init();
@@ -1437,6 +1438,10 @@ void DocLoader::removeCachedObject(CachedObject* o) const {
   m_docObjects.removeRef(o);
 }
 
+void DocLoader::setLoadInProgress(bool load) {
+  m_loadInProgress = load;
+}
+
 // ------------------------------------------------------------------------------------------
 
 Loader::Loader() : QObject() {
@@ -1548,7 +1553,6 @@ void Loader::slotFinished(KIO::Job* job) {
     emit requestFailed(r->m_docLoader, r->object);
   } else {
     r->object->data(r->m_buffer, true);
-
     emit requestDone(r->m_docLoader, r->object);
     time_t expireDate = j->queryMetaData("expire-date").toLong();
     kdDebug(6060) << "Loader::slotFinished, url = " << j->url().url()
@@ -1589,14 +1593,17 @@ void Loader::slotFinished(KIO::Job* job, NSData* allData) {
           static_cast<CachedImage*>(object)->decoderCallback();
       callback->handleError();
     } else {
+      docLoader->setLoadInProgress(true);
       r->object->error(job->error(), job->errorText().ascii());
+      docLoader->setLoadInProgress(false);
       emit requestFailed(docLoader, object);
       Cache::removeCacheEntry(object);
     }
   } else {
+    docLoader->setLoadInProgress(true);
     object->data(r->m_buffer, true);
-
     r->object->setAllData(allData);
+    docLoader->setLoadInProgress(false);
 
     // Let the background image decoder trigger the done signal.
     if (!backgroundImageDecoding)
@@ -1672,6 +1679,9 @@ int Loader::numRequests(DocLoader* dl) const {
     if (bdIt.current()->m_docLoader == dl)
       res++;
 #endif
+
+  if (dl->loadInProgress())
+    res++;
 
   return res;
 }
