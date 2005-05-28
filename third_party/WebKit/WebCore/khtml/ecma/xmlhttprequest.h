@@ -94,6 +94,8 @@ class XMLHttpRequest : public DOMObject {
     OverrideMIMEType
   };
 
+  static void cancelRequests(DOM::DocumentImpl* d);
+
  private:
   friend class XMLHttpRequestProtoFunc;
   friend class XMLHttpRequestQObject;
@@ -126,6 +128,10 @@ class XMLHttpRequest : public DOMObject {
   Value getResponseHeader(const QString& name) const;
 
   void changeState(XMLHttpRequestState newState);
+
+  static QPtrDict<QPtrDict<XMLHttpRequest>>& requestsByDocument();
+  void addToRequestsByDocument();
+  void removeFromRequestsByDocument();
 
   QGuardedPtr<DOM::DocumentImpl> doc;
 
