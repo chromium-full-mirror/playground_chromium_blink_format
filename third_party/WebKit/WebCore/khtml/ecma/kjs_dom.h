@@ -47,10 +47,11 @@ namespace KJS {
 class DOMNode : public DOMObject {
  public:
   DOMNode(ExecState* exec, DOM::NodeImpl* n);
+  virtual ~DOMNode();
   virtual bool toBoolean(ExecState*) const;
   virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-
+  virtual void mark();
   virtual void tryPut(ExecState* exec,
                       const Identifier& propertyName,
                       const Value& value,

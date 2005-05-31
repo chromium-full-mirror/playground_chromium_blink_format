@@ -130,6 +130,46 @@ DOMNode::DOMNode(ExecState* exec, NodeImpl* n) : m_impl(n) {
 
 DOMNode::DOMNode(NodeImpl* n) : m_impl(n) {}
 
+DOMNode::~DOMNode() {
+  ScriptInterpreter::forgetDOMNodeForDocument(m_impl->getDocument(),
+                                              m_impl.get());
+}
+
+void DOMNode::mark() {
+  static bool markingTree = false;
+
+  if (m_impl->inDocument() || markingTree) {
+    DOMObject::mark();
+    return;
+  }
+
+  DocumentImpl* document = m_impl->getDocument();
+  NodeImpl* outermostWrappedNode = m_impl.get();
+  for (NodeImpl* current = m_impl->parentNode(); current;
+       current = current->parentNode()) {
+    if (ScriptInterpreter::getDOMNodeForDocument(document, current))
+      outermostWrappedNode = current;
+  }
+
+  markingTree = true;
+
+  NodeImpl* nodeToMark = outermostWrappedNode;
+  while (nodeToMark) {
+    DOMNode* wrapper =
+        ScriptInterpreter::getDOMNodeForDocument(document, nodeToMark);
+    if (!wrapper)
+      nodeToMark = nodeToMark->traverseNextNode();
+    else if (wrapper->marked())
+      nodeToMark = nodeToMark->traverseNextSibling();
+    else {
+      wrapper->mark();
+      nodeToMark = nodeToMark->traverseNextNode();
+    }
+  }
+
+  markingTree = false;
+}
+
 bool DOMNode::toBoolean(ExecState*) const {
   return m_impl.notNull();
 }
@@ -1694,14 +1734,14 @@ bool checkNodeSecurity(ExecState* exec, NodeImpl* n) {
 }
 
 ValueImp* getDOMNode(ExecState* exec, NodeImpl* n) {
-  DOMObject* ret = 0;
+  DOMNode* ret = 0;
   if (!n)
     return Null();
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   DocumentImpl* doc = n->getDocument();
 
-  if ((ret = interp->getDOMObjectForDocument(doc, n)))
+  if ((ret = interp->getDOMNodeForDocument(doc, n)))
     return ret;
 
   switch (n->nodeType()) {
@@ -1744,7 +1784,7 @@ ValueImp* getDOMNode(ExecState* exec, NodeImpl* n) {
       ret = new DOMNode(exec, n);
   }
 
-  interp->putDOMObjectForDocument(doc, n, ret);
+  interp->putDOMNodeForDocument(doc, n, ret);
 
   return ret;
 }
