@@ -49,7 +49,12 @@ struct URLArgs {
   int xOffset;
   int yOffset;
 
-  URLArgs() : reload(false), xOffset(0), yOffset(0), m_doPost(false) {}
+  URLArgs()
+      : reload(false),
+        xOffset(0),
+        yOffset(0),
+        m_doPost(false),
+        m_lockHistory(false) {}
 
   QString contentType() const { return m_contentType; }
   void setContentType(const QString& t) { m_contentType = t; }
@@ -85,6 +90,7 @@ struct WindowArgs {
   bool ySet;
   bool widthSet;
   bool heightSet;
+  bool dialog;
 
   WindowArgs()
       : x(0),
@@ -96,11 +102,12 @@ struct WindowArgs {
         toolBarsVisible(true),
         scrollbarsVisible(true),
         resizable(true),
-        fullscreen(true),
+        fullscreen(false),
         xSet(false),
         ySet(false),
         widthSet(false),
-        heightSet(false) {}
+        heightSet(false),
+        dialog(false) {}
 };
 
 class BrowserExtension : public QObject {

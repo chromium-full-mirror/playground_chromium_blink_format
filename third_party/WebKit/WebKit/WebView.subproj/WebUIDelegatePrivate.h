@@ -31,4 +31,8 @@ enum {
 - (void)webView:(WebView*)webView
     dashboardRegionsChanged:(NSDictionary*)regions;
 
+- (WebView*)webView:(WebView*)sender
+    createWebViewModalDialogWithRequest:(NSURLRequest*)request;
+- (void)webViewRunModal:(WebView*)sender;
+
 @end

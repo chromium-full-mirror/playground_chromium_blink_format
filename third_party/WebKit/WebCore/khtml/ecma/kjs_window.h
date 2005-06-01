@@ -145,6 +145,9 @@ class Window : public ObjectImp {
   // Set the current "event" object
   void setCurrentEvent(DOM::EventImpl* evt);
 
+  // Set a place to put a dialog return value when the window is cleared.
+  void setReturnValueSlot(ValueImp** slot) { m_returnValueSlot = slot; }
+
   QPtrDict<JSEventListener> jsEventListeners;
   QPtrDict<JSUnprotectedEventListener> jsUnprotectedEventListeners;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -249,7 +252,8 @@ class Window : public ObjectImp {
     Onunload,
     Statusbar,
     Toolbar,
-    FrameElement
+    FrameElement,
+    ShowModalDialog
   };
 
  protected:
@@ -273,6 +277,7 @@ class Window : public ObjectImp {
   BarInfo* m_toolbar;
   WindowQObject* winq;
   DOM::EventImpl* m_evt;
+  ValueImp** m_returnValueSlot;
 };
 
 /**
