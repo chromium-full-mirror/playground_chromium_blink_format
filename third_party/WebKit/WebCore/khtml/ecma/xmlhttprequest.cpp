@@ -645,9 +645,12 @@ void XMLHttpRequest::removeFromRequestsByDocument() {
   assert(doc);
 
   QPtrDict<XMLHttpRequest>* requests = requestsByDocument().find(doc);
-  assert(requests);
 
-  assert(requests->find(this));
+  // Since synchronous loads are not added to requestsByDocument(), we need to
+  // make sure we found the request.
+  if (!requests || !requests->find(this))
+    return;
+
   requests->remove(this);
 
   if (requests->isEmpty()) {
