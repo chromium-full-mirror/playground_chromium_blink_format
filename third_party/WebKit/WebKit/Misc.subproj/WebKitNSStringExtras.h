@@ -26,4 +26,6 @@
 
 + (NSStringEncoding)_web_encodingForResource:(Handle)resource;
 
+- (BOOL)_webkit_isCaseInsensitiveEqualToString:(NSString*)string;
+
 @end

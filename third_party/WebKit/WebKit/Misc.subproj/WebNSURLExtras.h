@@ -77,9 +77,10 @@
                                    // convenient cover
 
 // FIXME: change these names back to _web_ when identically-named
-// methods are removed from Foundation
+// methods are removed from or renamed in Foundation
 - (BOOL)_webkit_isJavaScriptURL;
 - (NSString*)_webkit_scriptIfJavaScriptURL;
 - (BOOL)_webkit_isFTPDirectoryURL;
+- (BOOL)_webkit_isFileURL;
 
 @end
