@@ -26,6 +26,7 @@
   NSString* pluginDescription;
 
   NSBundle* bundle;
+  CFBundleRef cfBundle;
 
   NSDate* lastModifiedDate;
 
