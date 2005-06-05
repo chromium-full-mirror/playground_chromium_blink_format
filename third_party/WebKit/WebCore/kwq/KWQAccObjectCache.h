@@ -24,13 +24,15 @@
  */
 
 #include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServicesPriv.h>
+
 #include "visible_position.h"
 
 #ifdef __OBJC__
 @class KWQAccObject;
+@class WebCoreTextMarker;
 #else
 class KWQAccObject;
+class WebCoreTextMarker;
 #endif
 
 class QString;
@@ -53,13 +55,11 @@ class KWQAccObjectCache {
 
   KWQAccObjectID getAccObjectID(KWQAccObject* accObject);
   void removeAccObjectID(KWQAccObject* accObject);
-#if OMIT_TIGER_FEATURES
-// no parameterized attributes in Panther... they were introduced in Tiger
-#else
-  AXTextMarkerRef textMarkerForVisiblePosition(const khtml::VisiblePosition&);
+
+  WebCoreTextMarker* textMarkerForVisiblePosition(
+      const khtml::VisiblePosition&);
   khtml::VisiblePosition visiblePositionForTextMarker(
-      AXTextMarkerRef textMarker);
-#endif
+      WebCoreTextMarker* textMarker);
 
   void detach(khtml::RenderObject* renderer);
 
