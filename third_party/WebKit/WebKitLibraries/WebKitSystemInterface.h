@@ -19,3 +19,12 @@ CFStringRef WKSignedPublicKeyAndChallengeString(unsigned keySize,
                                                 CFStringRef keyDescription);
 WKCertificateParseResult WKAddCertificatesToKeychainFromData(const void* bytes,
                                                              unsigned length);
+
+NSString* WKGetPreferredExtensionForMIMEType(NSString* type);
+NSArray* WKGetExtensionsForMIMEType(NSString* type);
+NSString* WKGetMIMETypeForExtension(NSString* extension);
+
+NSDate* WKGetNSURLResponseLastModifiedDate(NSURLResponse* response);
+NSTimeInterval WKGetNSURLResponseFreshnessLifetime(NSURLResponse* response);
+NSTimeInterval WKGetNSURLResponseCalculatedExpiration(NSURLResponse* response);
+BOOL WKGetNSURLResponseMustRevalidate(NSURLResponse* response);
