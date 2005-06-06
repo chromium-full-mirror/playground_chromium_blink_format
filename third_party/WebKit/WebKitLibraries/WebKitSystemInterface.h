@@ -54,3 +54,9 @@ WKNSURLConnectionDelegateProxyPtr WKCreateNSURLConnectionDelegateProxy();
 void WKDisableCGDeferredUpdates();
 
 Class WKNSURLProtocolClassForReqest(NSURLRequest* request);
+
+unsigned WKGetNSAutoreleasePoolCount();
+
+NSString* WKMouseMovedNotification();
+BOOL WKMouseIsDown();
+void WKSetNSWindowShouldPostEventNotifications(NSWindow* window, BOOL post);
