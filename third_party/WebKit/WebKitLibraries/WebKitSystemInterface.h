@@ -6,6 +6,7 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#import <Carbon/Carbon.h>
 
 typedef enum {
   WKCertificateParseResultSucceeded = 0,
@@ -101,3 +102,9 @@ void WKSetFocusRingStyle(NSFocusRingPlacement placement,
                          int radius,
                          NSColor* color);
 void WKSetDragImage(NSImage* image, NSPoint offset);
+
+void WKSendUserChangeNotifications();
+BOOL WKConvertNSEventToCarbonEvent(EventRecord* carbonEvent,
+                                   NSEvent* cocoaEvent);
+void WKSendKeyEventToTSM(NSEvent* theEvent);
+void WKCallDrawingNotification(CGrafPtr port, Rect* bounds);
