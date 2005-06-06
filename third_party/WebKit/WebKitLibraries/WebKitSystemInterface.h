@@ -96,3 +96,8 @@ CFReadStreamRef WKCreateCustomCFReadStream(
     void (*formSchedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void (*formUnschedule)(CFReadStreamRef, CFRunLoopRef, CFStringRef, void*),
     void* context);
+
+void WKSetFocusRingStyle(NSFocusRingPlacement placement,
+                         int radius,
+                         NSColor* color);
+void WKSetDragImage(NSImage* image, NSPoint offset);
