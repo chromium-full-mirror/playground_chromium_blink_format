@@ -73,10 +73,14 @@ using namespace KJS;
     return Completion(Throw,                     \
                       Error::create(exec, GeneralError, "Out of memory"));
 
-#define KJS_CHECKEXCEPTIONVALUE \
-  if (exec->hadException())     \
-    return exec->exception();   \
-  if (Collector::outOfMemory()) \
+#define KJS_CHECKEXCEPTIONVALUE                                \
+  if (exec->hadException()) {                                  \
+    Object exception = exec->exception().toObject(exec);       \
+    exception.put(exec, "line", Number(this->line));           \
+    exception.put(exec, "sourceURL", String(this->sourceURL)); \
+    return exec->exception();                                  \
+  }                                                            \
+  if (Collector::outOfMemory())                                \
     return Undefined();  // will be picked up by KJS_CHECKEXCEPTION
 
 #define KJS_CHECKEXCEPTIONREFERENCE                    \
