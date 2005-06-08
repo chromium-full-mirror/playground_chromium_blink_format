@@ -224,6 +224,7 @@ class Window : public ObjectImp {
     RemoveEventListener,
     XMLHttpRequest,
     XMLSerializer,
+    DOMParser,
     Onabort,
     Onblur,
     Onchange,
