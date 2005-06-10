@@ -116,6 +116,7 @@ class Node {
                    ErrorType e,
                    const char* msg,
                    Identifier label);
+  void setExceptionDetailsIfNeeded(ExecState* exec);
   int line;
   UString sourceURL;
   unsigned int refcount;

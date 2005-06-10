@@ -67,34 +67,37 @@ using namespace KJS;
 #endif
 
 #define KJS_CHECKEXCEPTION                       \
-  if (exec->hadException())                      \
+  if (exec->hadException()) {                    \
+    setExceptionDetailsIfNeeded(exec);           \
     return Completion(Throw, exec->exception()); \
+  }                                              \
   if (Collector::outOfMemory())                  \
     return Completion(Throw,                     \
                       Error::create(exec, GeneralError, "Out of memory"));
 
-#define KJS_CHECKEXCEPTIONVALUE                          \
-  if (exec->hadException()) {                            \
-    Object exception = exec->exception().toObject(exec); \
-    exception.put(exec, "line", Number(line));           \
-    exception.put(exec, "sourceURL", String(sourceURL)); \
-    return exec->exception();                            \
-  }                                                      \
-  if (Collector::outOfMemory())                          \
+#define KJS_CHECKEXCEPTIONVALUE        \
+  if (exec->hadException()) {          \
+    setExceptionDetailsIfNeeded(exec); \
+    return exec->exception();          \
+  }                                    \
+  if (Collector::outOfMemory())        \
     return Undefined();  // will be picked up by KJS_CHECKEXCEPTION
 
 #define KJS_CHECKEXCEPTIONREFERENCE                    \
-  if (exec->hadException())                            \
+  if (exec->hadException()) {                          \
+    setExceptionDetailsIfNeeded(exec);                 \
     return Reference::makeValueReference(Undefined()); \
-  ;                                                    \
+  }                                                    \
   if (Collector::outOfMemory())                        \
     return Reference::makeValueReference(              \
         Undefined());  // will be picked up by KJS_CHECKEXCEPTION
 
-#define KJS_CHECKEXCEPTIONLIST  \
-  if (exec->hadException())     \
-    return List();              \
-  if (Collector::outOfMemory()) \
+#define KJS_CHECKEXCEPTIONLIST         \
+  if (exec->hadException()) {          \
+    setExceptionDetailsIfNeeded(exec); \
+    return List();                     \
+  }                                    \
+  if (Collector::outOfMemory())        \
     return List();  // will be picked up by KJS_CHECKEXCEPTION
 
 #ifdef KJS_DEBUG_MEM
@@ -179,6 +182,17 @@ Value Node::throwError(ExecState* exec,
   delete[] message;
 
   return result;
+}
+
+void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
+  if (exec->hadException()) {
+    Object exception = exec->exception().toObject(exec);
+    if (!exception.hasProperty(exec, "line") &&
+        !exception.hasProperty(exec, "sourceURL")) {
+      exception.put(exec, "line", Number(line));
+      exception.put(exec, "sourceURL", String(sourceURL));
+    }
+  }
 }
 
 // ------------------------------ StatementNode --------------------------------
