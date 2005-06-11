@@ -14,6 +14,9 @@ typedef enum {
   WKCertificateParseResultPKCS7 = 2,
 } WKCertificateParseResult;
 
+NSString* WKCreateURLPasteboardFlavorTypeName(void);
+NSString* WKCreateURLNPasteboardFlavorTypeName(void);
+
 CFStringRef WKCopyCFLocalizationPreferredName(CFStringRef localization);
 CFStringRef WKSignedPublicKeyAndChallengeString(unsigned keySize,
                                                 CFStringRef challenge,
