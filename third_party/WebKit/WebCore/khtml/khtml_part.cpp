@@ -5910,6 +5910,8 @@ void KHTMLPart::handleFallbackContent() {
     return;
   HTMLObjectElementImpl* elt =
       static_cast<HTMLObjectElementImpl*>(renderPart->element());
+  if (!elt)
+    return;
   elt->renderFallbackContent();
 }
 
