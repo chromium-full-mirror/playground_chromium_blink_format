@@ -26,6 +26,8 @@
 
 namespace DOM {
 
+class QualifiedName;
+
 class HTMLNames {
  public:
   // The namespace URI.
