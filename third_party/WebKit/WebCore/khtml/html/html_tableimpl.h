@@ -237,7 +237,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
   ~HTMLTableCellElementImpl();
 
   // ### FIX these two...
-  long cellIndex() const { return 0; }
+  long cellIndex() const;
 
   int col() const { return _col; }
   void setCol(int col) { _col = col; }
