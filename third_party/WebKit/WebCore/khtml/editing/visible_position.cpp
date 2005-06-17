@@ -404,6 +404,11 @@ void VisiblePosition::debugPosition(const char* msg) const {
 void VisiblePosition::formatForDebugger(char* buffer, unsigned length) const {
   m_deepPosition.formatForDebugger(buffer, length);
 }
+
+void VisiblePosition::showTree() {
+  m_deepPosition.node()->showTreeAndMark(m_deepPosition.node(), "*", NULL,
+                                         NULL);
+}
 #endif
 
 SharedPtr<RangeImpl> makeRange(const VisiblePosition& start,

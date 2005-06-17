@@ -86,6 +86,7 @@ class VisiblePosition {
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
+  void showTree();
 #endif
 
  private:
