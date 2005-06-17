@@ -245,7 +245,6 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isActivatedSubmit() const;
   virtual void setActivatedSubmit(bool flag);
 
-  virtual void click(bool sendMouseEvents);
   virtual void accessKeyAction(bool sendToAnyElement);
 
   DOMString accessKey() const;
