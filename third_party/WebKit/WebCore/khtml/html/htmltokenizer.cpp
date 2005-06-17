@@ -1573,8 +1573,10 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
               searchStopperLen = 8;
               script = true;
               parseSpecial(src);
-            } else if (tagID <= ID_CLOSE_TAG)  // Handle <script src="foo"/>
+            } else if (tagID <= ID_CLOSE_TAG) {  // Handle <script src="foo"/>
+              script = true;
               scriptHandler();
+            }
             break;
           case ID_STYLE:
             if (beginTag) {
