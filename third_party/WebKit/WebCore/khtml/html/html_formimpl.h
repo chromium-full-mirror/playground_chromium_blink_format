@@ -464,6 +464,8 @@ class HTMLLabelElementImpl : public HTMLElementImpl {
   DOMString htmlFor() const;
   void setHtmlFor(const DOMString&);
 
+  void focus();
+
  private:
   DOMString m_formElementID;
 };
@@ -483,11 +485,20 @@ class HTMLLegendElementImpl : public HTMLGenericFormElementImpl {
 
   virtual DOMString type() const;
 
+  virtual void accessKeyAction(bool sendToAnyElement);
+
+  /**
+   * The first form element in the legend's fieldset
+   */
+  ElementImpl* formElement();
+
   DOMString accessKey() const;
   void setAccessKey(const DOMString&);
 
   DOMString align() const;
   void setAlign(const DOMString&);
+
+  void focus();
 };
 
 // -------------------------------------------------------------------------
