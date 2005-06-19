@@ -475,7 +475,10 @@ void HTMLMetaElementImpl::setScheme(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLScriptElementImpl::HTMLScriptElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc), m_cachedScript(0), m_createdByParser(false) {}
+    : HTMLElementImpl(doc),
+      m_cachedScript(0),
+      m_createdByParser(false),
+      m_evaluated(false) {}
 
 HTMLScriptElementImpl::~HTMLScriptElementImpl() {
   if (m_cachedScript)
@@ -488,6 +491,14 @@ NodeImpl::Id HTMLScriptElementImpl::id() const {
 
 bool HTMLScriptElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->id() == ATTR_SRC;
+}
+
+void HTMLScriptElementImpl::childrenChanged() {
+  // If a node is inserted as a child of the script element
+  // and the script element has been inserted in the document
+  // we evaluate the script.
+  if (!m_createdByParser && inDocument() && firstChild())
+    evaluateScript(getDocument()->URL(), text());
 }
 
 void HTMLScriptElementImpl::insertedIntoDocument() {
@@ -507,21 +518,12 @@ void HTMLScriptElementImpl::insertedIntoDocument() {
     return;
   }
 
-  DOMString scriptString = "";
-  for (NodeImpl* n = firstChild(); n; n = n->nextSibling())
-    if (n->isTextNode())
-      scriptString += static_cast<TextImpl*>(n)->data();
-
-  DocumentImpl* doc = getDocument();
-  KHTMLPart* part = doc->part();
-  if (!part)
-    return;
-  KJSProxy* proxy = KJSProxy::proxy(part);
-  if (!proxy)
-    return;
-
-  proxy->evaluate(doc->URL(), 0, scriptString.string(), 0);
-  DocumentImpl::updateDocumentsRendering();
+  // If there's an empty script node, we shouldn't evaluate the script
+  // because if a script is inserted afterwards (by setting text or innerText)
+  // it should be evaluated, and evaluateScript only evaluates a script once.
+  DOMString scriptString = text();
+  if (!scriptString.isEmpty())
+    evaluateScript(getDocument()->URL(), scriptString);
 }
 
 void HTMLScriptElementImpl::removedFromDocument() {
@@ -538,25 +540,54 @@ void HTMLScriptElementImpl::notifyFinished(CachedObject* o) {
 
   assert(cs == m_cachedScript);
 
-  KHTMLPart* part = getDocument()->part();
-  if (part) {
-    KJSProxy* proxy = KJSProxy::proxy(part);
-    if (proxy) {
-      proxy->evaluate(cs->url().string(), 0, cs->script().string(), 0);
-      DocumentImpl::updateDocumentsRendering();
-    }
-  }
+  evaluateScript(cs->url().string(), cs->script());
 
   cs->deref(this);
   m_cachedScript = 0;
 }
 
+void HTMLScriptElementImpl::evaluateScript(const QString& URL,
+                                           const DOMString& script) {
+  if (m_evaluated)
+    return;
+
+  KHTMLPart* part = getDocument()->part();
+  if (part) {
+    KJSProxy* proxy = KJSProxy::proxy(part);
+    if (proxy) {
+      m_evaluated = true;
+      proxy->evaluate(URL, 0, script.string(), 0);
+      DocumentImpl::updateDocumentsRendering();
+    }
+  }
+}
+
 DOMString HTMLScriptElementImpl::text() const {
-  return getAttribute(ATTR_TEXT);
+  DOMString val = "";
+
+  for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+    if (n->isTextNode())
+      val += static_cast<TextImpl*>(n)->data();
+  }
+
+  return val;
 }
 
 void HTMLScriptElementImpl::setText(const DOMString& value) {
-  setAttribute(ATTR_TEXT, value);
+  int exceptioncode = 0;
+  int numChildren = childNodeCount();
+
+  if (numChildren == 1 && firstChild()->isTextNode()) {
+    static_cast<DOM::TextImpl*>(firstChild())->setData(value, exceptioncode);
+    return;
+  }
+
+  if (numChildren > 0) {
+    removeChildren();
+  }
+
+  appendChild(getDocument()->createTextNode(value.implementation()),
+              exceptioncode);
 }
 
 DOMString HTMLScriptElementImpl::htmlFor() const {

@@ -185,6 +185,7 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void notifyFinished(khtml::CachedObject* finishedObj);
+  virtual void childrenChanged();
 
   virtual Id id() const;
   virtual bool isURLAttribute(AttributeImpl* attr) const;
@@ -192,6 +193,8 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;
   }
+
+  void evaluateScript(const QString&, const DOMString&);
 
   DOMString text() const;
   void setText(const DOMString&);
@@ -217,6 +220,7 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
  private:
   khtml::CachedScript* m_cachedScript;
   bool m_createdByParser;
+  bool m_evaluated;
 };
 
 // -------------------------------------------------------------------------
