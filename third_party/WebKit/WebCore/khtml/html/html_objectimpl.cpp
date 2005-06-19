@@ -75,6 +75,8 @@ bool HTMLAppletElementImpl::mapToEntry(NodeImpl::Id attr,
   switch (attr) {
     case ATTR_WIDTH:
     case ATTR_HEIGHT:
+    case ATTR_VSPACE:
+    case ATTR_HSPACE:
       result = eUniversal;
       return false;
     case ATTR_ALIGN:
@@ -103,6 +105,14 @@ void HTMLAppletElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       break;
     case ATTR_HEIGHT:
       addCSSLength(attr, CSS_PROP_HEIGHT, attr->value());
+      break;
+    case ATTR_VSPACE:
+      addCSSLength(attr, CSS_PROP_MARGIN_TOP, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_BOTTOM, attr->value());
+      break;
+    case ATTR_HSPACE:
+      addCSSLength(attr, CSS_PROP_MARGIN_LEFT, attr->value());
+      addCSSLength(attr, CSS_PROP_MARGIN_RIGHT, attr->value());
       break;
     case ATTR_ALIGN:
       addHTMLAlignment(attr);
