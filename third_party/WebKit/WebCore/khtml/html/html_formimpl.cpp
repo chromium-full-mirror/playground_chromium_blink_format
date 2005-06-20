@@ -3240,7 +3240,6 @@ void HTMLTextAreaElementImpl::restoreState(QStringList& states) {
 void HTMLTextAreaElementImpl::select() {
   if (m_render)
     static_cast<RenderTextArea*>(m_render)->select();
-  onSelect();
 }
 
 void HTMLTextAreaElementImpl::childrenChanged() {

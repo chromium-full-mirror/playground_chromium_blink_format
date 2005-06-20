@@ -66,6 +66,7 @@ class QTextEdit;
 - (BOOL)wordWrap;
 
 - (void)selectAll;
+- (BOOL)hasSelection;
 
 - (NSSize)sizeWithColumns:(int)columns rows:(int)rows;
 

@@ -258,6 +258,10 @@ void RenderFormElement::slotTextChanged(const QString&) {
   // do nothing
 }
 
+void RenderFormElement::slotSelectionChanged() {
+  // do nothing
+}
+
 #endif
 
 // -------------------------------------------------------------------------
@@ -517,6 +521,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   LineEditWidget* edit = new LineEditWidget(view()->viewport());
 #endif
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
+  connect(edit, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
   connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
@@ -540,6 +545,16 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
 #endif
 
   setQWidget(edit);
+}
+
+void RenderLineEdit::slotSelectionChanged() {
+  QLineEdit* w = static_cast<QLineEdit*>(m_widget);
+
+  // We only want to call onselect if there actually is a selection
+  if (!w->hasSelectedText())
+    return;
+
+  element()->onSelect();
 }
 
 void RenderLineEdit::slotReturnPressed() {
@@ -1435,6 +1450,7 @@ RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
 
   connect(edit, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
   connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
+  connect(edit, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
 }
 
 void RenderTextArea::detach() {
@@ -1578,6 +1594,16 @@ void RenderTextArea::slotTextChanged() {
 
 void RenderTextArea::select() {
   static_cast<QTextEdit*>(m_widget)->selectAll();
+}
+
+void RenderTextArea::slotSelectionChanged() {
+  QTextEdit* w = static_cast<QTextEdit*>(m_widget);
+
+  // We only want to call onselect if there actually is a selection
+  if (!w->hasSelectedText())
+    return;
+
+  element()->onSelect();
 }
 
 // ---------------------------------------------------------------------------

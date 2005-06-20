@@ -66,6 +66,7 @@ class QLineEdit : public QWidget {
   void setWritingDirection(QPainter::TextDirection);
 
   void selectAll();
+  bool hasSelectedText() const;
 
   QSize sizeForCharacterWidth(int numCharacters) const;
   int baselinePosition(int height) const;
@@ -73,6 +74,7 @@ class QLineEdit : public QWidget {
   void returnPressed() { m_returnPressed.call(); }
   void textChanged() { m_textChanged.call(text()); }
   void performSearch() { m_performSearch.call(); }
+  void selectionChanged() { m_selectionChanged.call(); }
 
   void clicked();
 
@@ -92,6 +94,8 @@ class QLineEdit : public QWidget {
   KWQSignal m_textChanged;
   KWQSignal m_clicked;
   KWQSignal m_performSearch;
+  KWQSignal m_selectionChanged;
+
   Type m_type;
   KWQTextFieldController* m_controller;
 };

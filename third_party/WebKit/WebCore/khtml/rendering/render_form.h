@@ -110,6 +110,7 @@ class RenderFormElement : public khtml::RenderWidget {
 
  public slots:
   virtual void slotClicked();
+  virtual void slotSelectionChanged();
 
 #if APPLE_CHANGES
   // Hack to make KWQSlot code work.
@@ -255,6 +256,7 @@ class RenderLineEdit : public RenderFormElement {
  public slots:
   void slotReturnPressed();
   void slotTextChanged(const QString& string);
+  void slotSelectionChanged();
 #if APPLE_CHANGES
   void slotPerformSearch();
 
@@ -478,6 +480,7 @@ class RenderTextArea : public RenderFormElement {
 
  protected slots:
   void slotTextChanged();
+  void slotSelectionChanged();
 
  protected:
   virtual void handleFocusOut();

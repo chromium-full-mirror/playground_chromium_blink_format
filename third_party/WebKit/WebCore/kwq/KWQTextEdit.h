@@ -56,6 +56,8 @@ class QTextEdit : public QScrollView {
   void setDisabled(bool);
   bool isDisabled() const;
 
+  bool hasSelectedText() const;
+
   void setText(const QString&);
   QString text() const;
   QString textWithHardLineBreaks() const;
@@ -75,6 +77,7 @@ class QTextEdit : public QScrollView {
 
   void textChanged() { _textChanged.call(); }
 
+  void selectionChanged() { _selectionChanged.call(); }
   void clicked();
 
   virtual FocusPolicy focusPolicy() const;
@@ -83,6 +86,7 @@ class QTextEdit : public QScrollView {
  private:
   KWQSignal _clicked;
   KWQSignal _textChanged;
+  KWQSignal _selectionChanged;
 };
 
 #endif /* QTEXTEDIT_H_ */
