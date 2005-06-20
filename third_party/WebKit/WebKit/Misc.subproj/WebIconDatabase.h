@@ -30,7 +30,7 @@
 
 // Sent whenever a site icon has changed. The object of the notification is the
 // icon database.
-// The userInfo contains the site URL who's icon has changed.
+// The userInfo contains the site URL whose icon has changed.
 // It can be accessed with the key WebIconNotificationUserInfoURLKey.
 extern NSString* WebIconDatabaseDidAddIconNotification;
 
