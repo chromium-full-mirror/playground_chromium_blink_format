@@ -102,8 +102,8 @@ class Window : public ObjectImp {
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
+  virtual bool hasOwnProperty(ExecState* exec,
+                              const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -439,7 +439,7 @@ class Konqueror : public ObjectImp {
  public:
   Konqueror(KHTMLPart* p) : part(p) {}
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual bool hasProperty(ExecState* exec, const Identifier& p) const;
+  virtual bool hasOwnProperty(ExecState* exec, const Identifier& p) const;
   virtual UString toString(ExecState* exec) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

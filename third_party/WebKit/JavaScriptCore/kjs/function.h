@@ -47,8 +47,8 @@ class FunctionImp : public InternalFunctionImp {
                    const Identifier& propertyName,
                    const Value& value,
                    int attr = None);
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
+  virtual bool hasOwnProperty(ExecState* exec,
+                              const Identifier& propertyName) const;
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
   virtual bool implementsCall() const;
@@ -110,8 +110,8 @@ class ActivationImp : public ObjectImp {
   ActivationImp(FunctionImp* function, const List& arguments);
 
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
+  virtual bool hasOwnProperty(ExecState* exec,
+                              const Identifier& propertyName) const;
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
   virtual const ClassInfo* classInfo() const { return &info; }

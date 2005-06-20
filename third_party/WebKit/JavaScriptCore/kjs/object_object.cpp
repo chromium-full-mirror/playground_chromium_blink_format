@@ -47,6 +47,10 @@ ObjectPrototypeImp::ObjectPrototypeImp(ExecState* exec,
       valueOfPropertyName,
       new ObjectProtoFuncImp(exec, funcProto, ObjectProtoFuncImp::ValueOf, 0),
       DontEnum);
+  putDirect("hasOwnProperty",
+            new ObjectProtoFuncImp(exec, funcProto,
+                                   ObjectProtoFuncImp::HasOwnProperty, 1),
+            DontEnum);
 }
 
 // ------------------------------ ObjectProtoFuncImp
@@ -65,15 +69,24 @@ bool ObjectProtoFuncImp::implementsCall() const {
   return true;
 }
 
-// ECMA 15.2.4.2 + 15.2.4.3
+// ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5
 
-Value ObjectProtoFuncImp::call(ExecState* /*exec*/,
+Value ObjectProtoFuncImp::call(ExecState* exec,
                                Object& thisObj,
-                               const List& /*args*/) {
-  if (id == ValueOf)
-    return thisObj;
-  else /* ToString */
-    return String("[object " + thisObj.className() + "]");
+                               const List& args) {
+  switch (id) {
+    case ValueOf:
+      return thisObj;
+    case HasOwnProperty: {
+      // Same as hasProperty() but without checking the prototype
+      Identifier propertyName(args[0].toString(exec));
+      bool exists = thisObj.hasOwnProperty(exec, propertyName);
+      return Value(exists ? BooleanImp::staticTrue : BooleanImp::staticFalse);
+    }
+    case ToString:
+    default:
+      return String("[object " + thisObj.className() + "]");
+  }
 }
 
 // ------------------------------ ObjectObjectImp

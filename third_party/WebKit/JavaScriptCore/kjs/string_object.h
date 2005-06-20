@@ -37,8 +37,8 @@ class StringInstanceImp : public ObjectImp {
                    const Identifier& propertyName,
                    const Value& value,
                    int attr = None);
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
+  virtual bool hasOwnProperty(ExecState* exec,
+                              const Identifier& propertyName) const;
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
   virtual const ClassInfo* classInfo() const { return &info; }

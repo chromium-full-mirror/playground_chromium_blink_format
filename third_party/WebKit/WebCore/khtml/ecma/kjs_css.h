@@ -54,8 +54,8 @@ class DOMCSSStyleDeclaration : public DOMObject {
                       const Identifier& propertyName,
                       const Value& value,
                       int attr = None);
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
+  virtual bool hasOwnProperty(ExecState* exec,
+                              const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
