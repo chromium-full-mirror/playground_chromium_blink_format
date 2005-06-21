@@ -654,6 +654,7 @@ Value GlobalFuncImp::call(ExecState* exec,
         newExec.setException(exec->exception());  // could be null
 
         // execute the code
+        progNode->processVarDecls(&newExec);
         Completion c = progNode->execute(&newExec);
 
         // if an exception occured, propogate it back to the previous execution

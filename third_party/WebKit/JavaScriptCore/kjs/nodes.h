@@ -688,7 +688,8 @@ class AssignExprNode : public Node {
 
 class VarDeclNode : public Node {
  public:
-  VarDeclNode(const Identifier& id, AssignExprNode* in);
+  enum Type { Variable, Constant };
+  VarDeclNode(const Identifier& id, AssignExprNode* in, Type t);
   virtual void ref();
   virtual bool deref();
   Value evaluate(ExecState* exec);
@@ -696,6 +697,7 @@ class VarDeclNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
+  Type varType;
   Identifier ident;
   AssignExprNode* init;
 };
