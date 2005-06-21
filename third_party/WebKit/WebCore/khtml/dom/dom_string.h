@@ -108,6 +108,7 @@ class DOMString {
 
   int toInt() const;
   khtml::Length* toLengthArray(int& len) const;
+  khtml::Length* toCoordsArray(int& len) const;
   bool percentage(int& _percentage) const;
 
   DOMString copy() const;

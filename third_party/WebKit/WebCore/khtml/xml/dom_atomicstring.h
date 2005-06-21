@@ -62,6 +62,9 @@ class AtomicString {
   khtml::Length* toLengthArray(int& len) const {
     return m_string.toLengthArray(len);
   }
+  khtml::Length* toCoordsArray(int& len) const {
+    return m_string.toCoordsArray(len);
+  }
 
   bool isNull() const { return m_string.isNull(); }
   bool isEmpty() const { return m_string.isEmpty(); }
