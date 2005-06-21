@@ -1120,7 +1120,8 @@ void Selection::formatForDebugger(char* buffer, unsigned length) const {
 #undef FormatBufferSize
 
 void Selection::showTree() {
-  m_start.node()->showTreeAndMark(m_start.node(), "S", m_end.node(), "E");
+  if (m_start.node())
+    m_start.node()->showTreeAndMark(m_start.node(), "S", m_end.node(), "E");
 }
 #endif
 

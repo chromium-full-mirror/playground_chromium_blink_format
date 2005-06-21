@@ -865,6 +865,11 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
   strncpy(buffer, result.string().latin1(), length - 1);
 }
 #undef FormatBufferSize
+
+void Position::showTree() const {
+  if (m_node)
+    m_node->showTree();
+}
 #endif
 
 Position startPosition(const RangeImpl* r) {

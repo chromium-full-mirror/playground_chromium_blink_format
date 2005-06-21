@@ -194,6 +194,9 @@ Position VisiblePosition::previousVisiblePosition(const Position& pos) {
   // itself (if it is a candidate) when iterating back from a deepEquivalent
   // that is not a candidate.  That is wrong!  However, our clients seem to
   // like it.  Gotta lose those clients! (initDownstream and initUpstream)
+
+  // How about "if isCandidate(pos) back up to the previous candidate, else
+  // back up to the second previous candidate"?
   Position current = test;
   while (!current.atStart()) {
     current = current.previous(UsingComposedCharacters);
@@ -406,8 +409,9 @@ void VisiblePosition::formatForDebugger(char* buffer, unsigned length) const {
 }
 
 void VisiblePosition::showTree() {
-  m_deepPosition.node()->showTreeAndMark(m_deepPosition.node(), "*", NULL,
-                                         NULL);
+  if (m_deepPosition.node())
+    m_deepPosition.node()->showTreeAndMark(m_deepPosition.node(), "*", NULL,
+                                           NULL);
 }
 #endif
 

@@ -105,6 +105,7 @@ class Position {
 
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
+  void showTree() const;
 #endif
 
  private:
