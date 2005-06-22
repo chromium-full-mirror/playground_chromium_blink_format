@@ -355,8 +355,7 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
     virtual const ClassInfo* classInfo() const { return &info; }             \
     static const ClassInfo info;                                             \
     Value get(ExecState* exec, const Identifier& propertyName) const;        \
-    bool hasOwnProperty(ExecState* exec,                                     \
-                        const Identifier& propertyName) const;               \
+    bool hasProperty(ExecState* exec, const Identifier& propertyName) const; \
   };                                                                         \
   const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};
 
@@ -368,11 +367,11 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
     return lookupGetFunction<ClassFunc, ObjectImp>(exec, propertyName,        \
                                                    &ClassProto##Table, this); \
   }                                                                           \
-  bool ClassProto::hasOwnProperty(ExecState* exec,                            \
-                                  const Identifier& propertyName)             \
+  bool ClassProto::hasProperty(ExecState* exec,                               \
+                               const Identifier& propertyName)                \
       const { /*stupid but we need this to have a common macro for the        \
                  declaration*/                                                \
-    return ObjectImp::hasOwnProperty(exec, propertyName);                     \
+    return ObjectImp::hasProperty(exec, propertyName);                        \
   }
 
 #define IMPLEMENT_PROTOTYPE_WITH_PARENT(ClassProto, ClassFunc, ParentProto) \
@@ -387,11 +386,11 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
     /* Not found -> forward request to "parent" prototype */                \
     return ParentProto::self(exec)->get(exec, propertyName);                \
   }                                                                         \
-  bool ClassProto::hasOwnProperty(ExecState* exec,                          \
-                                  const Identifier& propertyName) const {   \
-    if (ObjectImp::hasOwnProperty(exec, propertyName))                      \
+  bool ClassProto::hasProperty(ExecState* exec,                             \
+                               const Identifier& propertyName) const {      \
+    if (ObjectImp::hasProperty(exec, propertyName))                         \
       return true;                                                          \
-    return ParentProto::self(exec)->hasOwnProperty(exec, propertyName);     \
+    return ParentProto::self(exec)->hasProperty(exec, propertyName);        \
   }
 
 #define IMPLEMENT_PROTOFUNC(ClassFunc)                                         \

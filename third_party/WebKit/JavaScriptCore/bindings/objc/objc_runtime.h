@@ -185,8 +185,8 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
   virtual bool implementsCall() const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
 
-  virtual bool hasOwnProperty(ExecState* exec,
-                              const Identifier& propertyName) const;
+  virtual bool hasProperty(ExecState* exec,
+                           const Identifier& propertyName) const;
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 

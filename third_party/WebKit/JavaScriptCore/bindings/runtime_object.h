@@ -50,8 +50,8 @@ class RuntimeObjectImp : public ObjectImp {
 
   virtual bool canPut(ExecState* exec, const Identifier& propertyName) const;
 
-  virtual bool hasOwnProperty(ExecState* exec,
-                              const Identifier& propertyName) const;
+  virtual bool hasProperty(ExecState* exec,
+                           const Identifier& propertyName) const;
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 

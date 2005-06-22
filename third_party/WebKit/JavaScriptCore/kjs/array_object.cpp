@@ -137,8 +137,8 @@ void ArrayInstanceImp::put(ExecState* exec,
   ObjectImp::put(exec, Identifier::from(index), value, attr);
 }
 
-bool ArrayInstanceImp::hasOwnProperty(ExecState* exec,
-                                      const Identifier& propertyName) const {
+bool ArrayInstanceImp::hasProperty(ExecState* exec,
+                                   const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return true;
 
@@ -153,10 +153,10 @@ bool ArrayInstanceImp::hasOwnProperty(ExecState* exec,
     }
   }
 
-  return ObjectImp::hasOwnProperty(exec, propertyName);
+  return ObjectImp::hasProperty(exec, propertyName);
 }
 
-bool ArrayInstanceImp::hasOwnProperty(ExecState* exec, unsigned index) const {
+bool ArrayInstanceImp::hasProperty(ExecState* exec, unsigned index) const {
   if (index >= length)
     return false;
   if (index < storageLength) {
@@ -164,7 +164,7 @@ bool ArrayInstanceImp::hasOwnProperty(ExecState* exec, unsigned index) const {
     return v && v != UndefinedImp::staticUndefined;
   }
 
-  return ObjectImp::hasOwnProperty(exec, Identifier::from(index));
+  return ObjectImp::hasProperty(exec, Identifier::from(index));
 }
 
 bool ArrayInstanceImp::deleteProperty(ExecState* exec,

@@ -276,12 +276,12 @@ wouldn't,
 HTMLDocument::HTMLDocument(ExecState* exec, HTMLDocumentImpl* d)
     : DOMDocument(exec, d) {}
 
-bool HTMLDocument::hasOwnProperty(ExecState* exec, const Identifier& p) const {
+bool HTMLDocument::hasProperty(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
 // kdDebug(6070) << "HTMLDocument::hasProperty " << p.qstring() << endl;
 #endif
   HTMLDocumentImpl* doc = static_cast<HTMLDocumentImpl*>(impl());
-  return DOMDocument::hasOwnProperty(exec, p) ||
+  return DOMDocument::hasProperty(exec, p) ||
          doc->haveNamedImageOrForm(p.qstring());
 }
 
@@ -2422,8 +2422,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-bool KJS::HTMLElement::hasOwnProperty(ExecState* exec,
-                                      const Identifier& propertyName) const {
+bool KJS::HTMLElement::hasProperty(ExecState* exec,
+                                   const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
 // kdDebug(6070) << "HTMLElement::hasProperty " << propertyName.qstring() <<
 // endl;
@@ -2455,7 +2455,7 @@ bool KJS::HTMLElement::hasOwnProperty(ExecState* exec,
       break;
   }
 
-  return DOMElement::hasOwnProperty(exec, propertyName);
+  return DOMElement::hasProperty(exec, propertyName);
 }
 
 UString KJS::HTMLElement::toString(ExecState* exec) const {
@@ -4221,11 +4221,11 @@ HTMLCollection::~HTMLCollection() {
 // We have to implement hasProperty since we don't use a hashtable for
 // 'selectedIndex' and 'length'
 // ## this breaks "for (..in..)" though.
-bool KJS::HTMLCollection::hasOwnProperty(ExecState* exec,
-                                         const Identifier& p) const {
+bool KJS::HTMLCollection::hasProperty(ExecState* exec,
+                                      const Identifier& p) const {
   if (p == "selectedIndex" || p == lengthPropertyName)
     return true;
-  return DOMObject::hasOwnProperty(exec, p);
+  return DOMObject::hasProperty(exec, p);
 }
 
 Value KJS::HTMLCollection::tryGet(ExecState* exec,
