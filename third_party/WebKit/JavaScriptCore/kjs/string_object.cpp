@@ -308,6 +308,15 @@ static Value replace(ExecState* exec,
                      const UString& source,
                      const Value& pattern,
                      const Value& replacement) {
+  ObjectImp* replacementFunction = 0;
+  UString replacementString;
+
+  if (replacement.type() == ObjectType &&
+      replacement.toObject(exec).implementsCall())
+    replacementFunction = replacement.toObject(exec).imp();
+  else
+    replacementString = replacement.toString(exec);
+
   if (pattern.type() == ObjectType &&
       pattern.toObject(exec).inherits(&RegExpImp::info)) {
     RegExpImp* imp = static_cast<RegExpImp*>(pattern.toObject(exec).imp());
@@ -316,8 +325,6 @@ static Value replace(ExecState* exec,
 
     RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
         exec->lexicalInterpreter()->builtinRegExp().imp());
-
-    UString replacementString = replacement.toString(exec);
 
     int matchIndex = 0;
     int lastIndex = 0;
@@ -342,6 +349,28 @@ static Value replace(ExecState* exec,
 
       pushSourceRange(sourceRanges, sourceRangeCount, sourceRangeCapacity,
                       UString::Range(lastIndex, matchIndex - lastIndex));
+
+      if (replacementFunction) {
+        int completeMatchStart = (*ovector)[0];
+        List args;
+
+        args.append(Value(matchString));
+
+        for (unsigned i = 0; i < reg->subPatterns(); i++) {
+          int matchStart = (*ovector)[(i + 1) * 2];
+          int matchLen = (*ovector)[(i + 1) * 2 + 1] - matchStart;
+
+          args.append(Value(source.substr(matchStart, matchLen)));
+        }
+
+        args.append(Value(completeMatchStart));
+        args.append(Value(source));
+
+        replacementString =
+            replacementFunction
+                ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
+                .toString(exec);
+      }
 
       UString substitutedReplacement =
           substituteBackreferences(replacementString, source, ovector, reg);
@@ -379,7 +408,21 @@ static Value replace(ExecState* exec,
   // Do the replacement
   if (matchPos == -1)
     return String(source);
-  return String(source.substr(0, matchPos) + replacement.toString(exec) +
+
+  if (replacementFunction) {
+    List args;
+
+    args.append(Value(source.substr(matchPos, matchLen)));
+    args.append(Value(matchPos));
+    args.append(Value(source));
+
+    replacementString =
+        replacementFunction
+            ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
+            .toString(exec);
+  }
+
+  return String(source.substr(0, matchPos) + replacementString +
                 source.substr(matchPos + matchLen));
 }
 
