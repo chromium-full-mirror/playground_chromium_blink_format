@@ -28,166 +28,177 @@
 #include "xml/dom_atomicstring.h"
 
 namespace DOM {
-    class StyleListImpl;
-    class CSSStyleSheetImpl;
-    class CSSRuleImpl;
-    class CSSStyleRuleImpl;
-    class DocumentImpl;
-    class NodeImpl;
-    class CSSValueImpl;
-    class CSSValueListImpl;
-    class CSSPrimitiveValueImpl;
-    class CSSMutableStyleDeclarationImpl;
-    class CSSProperty;
-    class CSSRuleListImpl;
+class StyleListImpl;
+class CSSStyleSheetImpl;
+class CSSRuleImpl;
+class CSSStyleRuleImpl;
+class DocumentImpl;
+class NodeImpl;
+class CSSValueImpl;
+class CSSValueListImpl;
+class CSSPrimitiveValueImpl;
+class CSSMutableStyleDeclarationImpl;
+class CSSProperty;
+class CSSRuleListImpl;
 
+struct ParseString {
+  unsigned short* string;
+  int length;
 
-    struct ParseString {
-	unsigned short *string;
-	int length;
-        
-        void lower();
-    };
+  void lower();
+};
 
-    struct Value;
-    class ValueList;
-    struct Function;
-    
-    struct Value {
-	int id;
-	union {
-	    double fValue;
-	    int iValue;
-	    ParseString string;
-	    Function *function;
-	};
-	enum {
-	    Operator = 0x100000,
-	    Function = 0x100001,
-	    Q_EMS     = 0x100002
-	};
+struct Value;
+class ValueList;
+struct Function;
 
-	int unit;
-    };
+struct Value {
+  int id;
+  union {
+    double fValue;
+    int iValue;
+    ParseString string;
+    Function* function;
+  };
+  enum { Operator = 0x100000, Function = 0x100001, Q_EMS = 0x100002 };
 
-    static inline QString qString( const ParseString &ps ) {
-	return QString( (QChar *)ps.string, ps.length );
-    }
-    static inline DOMString domString( const ParseString &ps ) {
-	return DOMString( (QChar *)ps.string, ps.length );
-    }
-    static inline AtomicString atomicString( const ParseString &ps ) {
-	return AtomicString( ps.string, ps.length );
-    }
-    
-    class ValueList {
-    public:
-	ValueList();
-	~ValueList();
-	void addValue( const Value &val );
-	Value *current() { return currentValue < numValues ? values + currentValue : 0; }
-	Value *next() { ++currentValue; return current(); }
-	Value *values;
-	int numValues;
-	int maxValues;
-	int currentValue;
-    };
+  int unit;
+};
 
-    struct Function {
-        ParseString name;
-        ValueList *args;
+static inline QString qString(const ParseString& ps) {
+  return QString((QChar*)ps.string, ps.length);
+}
+static inline DOMString domString(const ParseString& ps) {
+  return DOMString((QChar*)ps.string, ps.length);
+}
+static inline AtomicString atomicString(const ParseString& ps) {
+  return AtomicString(ps.string, ps.length);
+}
 
-        ~Function() { delete args; }
-    };
-    
-    class CSSParser
-    {
-    public:
-	CSSParser( bool strictParsing = true );
-	~CSSParser();
+class ValueList {
+ public:
+  ValueList();
+  ~ValueList();
+  void addValue(const Value& val);
+  Value* current() {
+    return currentValue < numValues ? values + currentValue : 0;
+  }
+  Value* next() {
+    ++currentValue;
+    return current();
+  }
+  Value* values;
+  int numValues;
+  int maxValues;
+  int currentValue;
+};
 
-	void parseSheet( DOM::CSSStyleSheetImpl *sheet, const DOM::DOMString &string );
-	DOM::CSSRuleImpl *parseRule( DOM::CSSStyleSheetImpl *sheet, const DOM::DOMString &string );
-	bool parseValue( DOM::CSSMutableStyleDeclarationImpl *decls, int id, const DOM::DOMString &string,
-			 bool _important );
-        static QRgb CSSParser::parseColor( const DOM::DOMString &string );
-	bool parseColor( DOM::CSSMutableStyleDeclarationImpl *declaration, const DOM::DOMString &string );
-	bool parseDeclaration( DOM::CSSMutableStyleDeclarationImpl *decls, const DOM::DOMString &string );
+struct Function {
+  ParseString name;
+  ValueList* args;
 
-	static CSSParser *current() { return currentParser; }
+  ~Function() { delete args; }
+};
 
+class CSSParser {
+ public:
+  CSSParser(bool strictParsing = true);
+  ~CSSParser();
 
-	DOM::DocumentImpl *document() const;
+  void parseSheet(DOM::CSSStyleSheetImpl* sheet, const DOM::DOMString& string);
+  DOM::CSSRuleImpl* parseRule(DOM::CSSStyleSheetImpl* sheet,
+                              const DOM::DOMString& string);
+  bool parseValue(DOM::CSSMutableStyleDeclarationImpl* decls,
+                  int id,
+                  const DOM::DOMString& string,
+                  bool _important);
+  static QRgb CSSParser::parseColor(const DOM::DOMString& string);
+  bool parseColor(DOM::CSSMutableStyleDeclarationImpl* declaration,
+                  const DOM::DOMString& string);
+  bool parseDeclaration(DOM::CSSMutableStyleDeclarationImpl* decls,
+                        const DOM::DOMString& string);
 
-	void addProperty( int propId, CSSValueImpl *value, bool important );
-	bool hasProperties() const { return numParsedProperties > 0; }
-	CSSMutableStyleDeclarationImpl *createStyleDeclaration( CSSStyleRuleImpl *rule );
-	void clearProperties();
+  static CSSParser* current() { return currentParser; }
 
-	bool parseValue( int propId, bool important );
-	bool parseShortHand( const int *properties, int numProperties, bool important );
-	bool parse4Values( const int *properties, bool important );
-	bool parseContent( int propId, bool important );
+  DOM::DocumentImpl* document() const;
 
-        CSSValueImpl* parseBackgroundColor();
-        CSSValueImpl* parseBackgroundImage();
-        CSSValueImpl* parseBackgroundPositionXY(bool& xFound, bool& yFound);
-        void parseBackgroundPosition(CSSValueImpl*& value1, CSSValueImpl*& value2);
-        
-        bool parseBackgroundProperty(int propId, int& propId1, int& propId2, CSSValueImpl*& retValue1, CSSValueImpl*& retValue2);
-        bool parseBackgroundShorthand(bool important);
+  void addProperty(int propId, CSSValueImpl* value, bool important);
+  bool hasProperties() const { return numParsedProperties > 0; }
+  CSSMutableStyleDeclarationImpl* createStyleDeclaration(
+      CSSStyleRuleImpl* rule);
+  void clearProperties();
 
-        void addBackgroundValue(CSSValueImpl*& lval, CSSValueImpl* rval);
-        
-	bool parseDashboardRegions( int propId, bool important );
-	bool parseShape( int propId, bool important );
-	bool parseFont(bool important);
-	CSSValueListImpl *parseFontFamily();
-        CSSPrimitiveValueImpl *parseColor();
-	CSSPrimitiveValueImpl *parseColorFromValue(Value* val);
+  bool parseValue(int propId, bool important);
+  bool parseShortHand(const int* properties, int numProperties, bool important);
+  bool parse4Values(const int* properties, bool important);
+  bool parseContent(int propId, bool important);
 
-        static bool parseColor(const QString &name, QRgb& rgb);
+  CSSValueImpl* parseBackgroundColor();
+  CSSValueImpl* parseBackgroundImage();
+  CSSValueImpl* parseBackgroundPositionXY(bool& xFound, bool& yFound);
+  void parseBackgroundPosition(CSSValueImpl*& value1, CSSValueImpl*& value2);
 
-        // CSS3 Parsing Routines (for properties specific to CSS3)
-        bool parseShadow(int propId, bool important);
-        
-	int yyparse( void );
-    public:
-	bool strict;
-	bool important;
-	int id;
-	DOM::StyleListImpl *styleElement;
-	DOM::CSSRuleImpl *rule;
-	ValueList *valueList;
-	CSSProperty **parsedProperties;
-	int numParsedProperties;
-	int maxParsedProperties;
-	bool inParseShortHand;
+  bool parseBackgroundProperty(int propId,
+                               int& propId1,
+                               int& propId2,
+                               CSSValueImpl*& retValue1,
+                               CSSValueImpl*& retValue2);
+  bool parseBackgroundShorthand(bool important);
 
-        Q_UINT16 defaultNamespace;
-        
-	static CSSParser *currentParser;
+  void addBackgroundValue(CSSValueImpl*& lval, CSSValueImpl* rval);
 
-	// tokenizer methods and data
-    public:
-	int lex( void *yylval );
-	int token() { return yyTok; }
-	unsigned short *text( int *length);
-	int lex();
-        
-    private:
-        void setupParser(const char *prefix, const DOMString &string, const char *suffix);
-        
-	unsigned short *data;
-	unsigned short *yytext;
-	unsigned short *yy_c_buf_p;
-	unsigned short yy_hold_char;
-	int yy_last_accepting_state;
-	unsigned short *yy_last_accepting_cpos;
-	int yyleng;
-	int yyTok;
-	int yy_start;
-    };
+  bool parseDashboardRegions(int propId, bool important);
+  bool parseShape(int propId, bool important);
+  bool parseFont(bool important);
+  CSSValueListImpl* parseFontFamily();
+  CSSPrimitiveValueImpl* parseColor();
+  CSSPrimitiveValueImpl* parseColorFromValue(Value* val);
 
-}; // namespace
+  static bool parseColor(const QString& name, QRgb& rgb);
+
+  // CSS3 Parsing Routines (for properties specific to CSS3)
+  bool parseShadow(int propId, bool important);
+
+  int yyparse(void);
+
+ public:
+  bool strict;
+  bool important;
+  int id;
+  DOM::StyleListImpl* styleElement;
+  DOM::CSSRuleImpl* rule;
+  ValueList* valueList;
+  CSSProperty** parsedProperties;
+  int numParsedProperties;
+  int maxParsedProperties;
+  bool inParseShortHand;
+
+  Q_UINT16 defaultNamespace;
+
+  static CSSParser* currentParser;
+
+  // tokenizer methods and data
+ public:
+  int lex(void* yylval);
+  int token() { return yyTok; }
+  unsigned short* text(int* length);
+  int lex();
+
+ private:
+  void setupParser(const char* prefix,
+                   const DOMString& string,
+                   const char* suffix);
+
+  unsigned short* data;
+  unsigned short* yytext;
+  unsigned short* yy_c_buf_p;
+  unsigned short yy_hold_char;
+  int yy_last_accepting_state;
+  unsigned short* yy_last_accepting_cpos;
+  int yyleng;
+  int yyTok;
+  int yy_start;
+};
+
+};  // namespace
 #endif

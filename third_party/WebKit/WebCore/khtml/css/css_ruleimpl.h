@@ -33,7 +33,7 @@
 #include "css_valueimpl.h"
 
 namespace khtml {
-    class CachedCSSStyleSheet;
+class CachedCSSStyleSheet;
 }
 
 namespace DOM {
@@ -44,193 +44,186 @@ class CSSStyleSheet;
 class CSSStyleSheetImpl;
 class MediaListImpl;
 
-class CSSRuleImpl : public StyleBaseImpl
-{
-public:
-    CSSRuleImpl(StyleBaseImpl *parent)
-        : StyleBaseImpl(parent), m_type(CSSRule::UNKNOWN_RULE) {}
+class CSSRuleImpl : public StyleBaseImpl {
+ public:
+  CSSRuleImpl(StyleBaseImpl* parent)
+      : StyleBaseImpl(parent), m_type(CSSRule::UNKNOWN_RULE) {}
 
-    virtual bool isRule() { return true; }
-    unsigned short type() const { return m_type; }
+  virtual bool isRule() { return true; }
+  unsigned short type() const { return m_type; }
 
-    CSSStyleSheetImpl *parentStyleSheet() const;
-    CSSRuleImpl *parentRule() const;
+  CSSStyleSheetImpl* parentStyleSheet() const;
+  CSSRuleImpl* parentRule() const;
 
-    DOM::DOMString cssText() const;
-    void setCssText(DOM::DOMString str);
-    virtual void init() {}
+  DOM::DOMString cssText() const;
+  void setCssText(DOM::DOMString str);
+  virtual void init() {}
 
-protected:
-    CSSRule::RuleType m_type;
+ protected:
+  CSSRule::RuleType m_type;
 };
 
+class CSSCharsetRuleImpl : public CSSRuleImpl {
+ public:
+  CSSCharsetRuleImpl(StyleBaseImpl* parent) : CSSRuleImpl(parent) {
+    m_type = CSSRule::CHARSET_RULE;
+  }
 
-class CSSCharsetRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSCharsetRuleImpl(StyleBaseImpl *parent)
-        : CSSRuleImpl(parent) { m_type = CSSRule::CHARSET_RULE; }
+  virtual bool isCharsetRule() { return true; }
 
-    virtual bool isCharsetRule() { return true; }
+  DOMString encoding() const { return m_encoding; }
+  void setEncoding(DOMString _encoding) { m_encoding = _encoding; }
 
-    DOMString encoding() const { return m_encoding; }
-    void setEncoding(DOMString _encoding) { m_encoding = _encoding; }
-
-protected:
-    DOMString m_encoding;
+ protected:
+  DOMString m_encoding;
 };
 
+class CSSFontFaceRuleImpl : public CSSRuleImpl {
+ public:
+  CSSFontFaceRuleImpl(StyleBaseImpl* parent);
 
-class CSSFontFaceRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSFontFaceRuleImpl(StyleBaseImpl *parent);
+  virtual ~CSSFontFaceRuleImpl();
 
-    virtual ~CSSFontFaceRuleImpl();
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
-    CSSMutableStyleDeclarationImpl *style() const { return m_style; }
+  virtual bool isFontFaceRule() { return true; }
 
-    virtual bool isFontFaceRule() { return true; }
-
-protected:
-    CSSMutableStyleDeclarationImpl *m_style;
+ protected:
+  CSSMutableStyleDeclarationImpl* m_style;
 };
 
+class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
+ public:
+  CSSImportRuleImpl(StyleBaseImpl* parent,
+                    const DOM::DOMString& href,
+                    const DOM::DOMString& media);
+  CSSImportRuleImpl(StyleBaseImpl* parent,
+                    const DOM::DOMString& href,
+                    MediaListImpl* media);
 
-class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl
-{
-public:
-    CSSImportRuleImpl( StyleBaseImpl *parent, const DOM::DOMString &href,
-                       const DOM::DOMString &media );
-    CSSImportRuleImpl( StyleBaseImpl *parent, const DOM::DOMString &href,
-                       MediaListImpl *media );
+  virtual ~CSSImportRuleImpl();
 
-    virtual ~CSSImportRuleImpl();
+  DOM::DOMString href() const { return m_strHref; }
+  MediaListImpl* media() const { return m_lstMedia; }
+  CSSStyleSheetImpl* styleSheet() const { return m_styleSheet; }
 
-    DOM::DOMString href() const { return m_strHref; }
-    MediaListImpl *media() const { return m_lstMedia; }
-    CSSStyleSheetImpl *styleSheet() const { return m_styleSheet; }
+  virtual bool isImportRule() { return true; }
 
-    virtual bool isImportRule() { return true; }
+  // from CachedObjectClient
+  virtual void setStyleSheet(const DOM::DOMString& url,
+                             const DOM::DOMString& sheet);
 
-    // from CachedObjectClient
-    virtual void setStyleSheet(const DOM::DOMString &url, const DOM::DOMString &sheet);
+  bool isLoading();
+  virtual void init();
 
-    bool isLoading();
-    virtual void init();
-
-protected:
-    DOMString m_strHref;
-    MediaListImpl *m_lstMedia;
-    CSSStyleSheetImpl *m_styleSheet;
-    khtml::CachedCSSStyleSheet *m_cachedSheet;
-    bool m_loading;
+ protected:
+  DOMString m_strHref;
+  MediaListImpl* m_lstMedia;
+  CSSStyleSheetImpl* m_styleSheet;
+  khtml::CachedCSSStyleSheet* m_cachedSheet;
+  bool m_loading;
 };
 
 class MediaList;
 
-class CSSRuleListImpl : public khtml::Shared<CSSRuleListImpl>
-{
-public:
-    CSSRuleListImpl() { }
-    CSSRuleListImpl(StyleListImpl *);
-    ~CSSRuleListImpl();
+class CSSRuleListImpl : public khtml::Shared<CSSRuleListImpl> {
+ public:
+  CSSRuleListImpl() {}
+  CSSRuleListImpl(StyleListImpl*);
+  ~CSSRuleListImpl();
 
-    MAIN_THREAD_ALLOCATED;
+  MAIN_THREAD_ALLOCATED;
 
-    unsigned long length() const { return m_lstCSSRules.count(); }
-    CSSRuleImpl *item ( unsigned long index ) { return m_lstCSSRules.at( index ); }
+  unsigned long length() const { return m_lstCSSRules.count(); }
+  CSSRuleImpl* item(unsigned long index) { return m_lstCSSRules.at(index); }
 
-    /* not part of the DOM */
-    unsigned long insertRule ( CSSRuleImpl *rule, unsigned long index );
-    void deleteRule ( unsigned long index );
-    void append( CSSRuleImpl *rule );
+  /* not part of the DOM */
+  unsigned long insertRule(CSSRuleImpl* rule, unsigned long index);
+  void deleteRule(unsigned long index);
+  void append(CSSRuleImpl* rule);
 
-protected:
-    QPtrList<CSSRuleImpl> m_lstCSSRules;
+ protected:
+  QPtrList<CSSRuleImpl> m_lstCSSRules;
 };
 
-class CSSMediaRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSMediaRuleImpl( StyleBaseImpl *parent );
-    CSSMediaRuleImpl( StyleBaseImpl *parent, const DOM::DOMString &media );
-    CSSMediaRuleImpl( StyleBaseImpl *parent, MediaListImpl *mediaList, CSSRuleListImpl *ruleList );
+class CSSMediaRuleImpl : public CSSRuleImpl {
+ public:
+  CSSMediaRuleImpl(StyleBaseImpl* parent);
+  CSSMediaRuleImpl(StyleBaseImpl* parent, const DOM::DOMString& media);
+  CSSMediaRuleImpl(StyleBaseImpl* parent,
+                   MediaListImpl* mediaList,
+                   CSSRuleListImpl* ruleList);
 
-    virtual ~CSSMediaRuleImpl();
+  virtual ~CSSMediaRuleImpl();
 
-    MediaListImpl *media() const { return m_lstMedia; }
-    CSSRuleListImpl *cssRules() { return m_lstCSSRules; }
+  MediaListImpl* media() const { return m_lstMedia; }
+  CSSRuleListImpl* cssRules() { return m_lstCSSRules; }
 
-    unsigned long insertRule ( const DOM::DOMString &rule, unsigned long index );
-    void deleteRule ( unsigned long index ) { m_lstCSSRules->deleteRule( index ); }
+  unsigned long insertRule(const DOM::DOMString& rule, unsigned long index);
+  void deleteRule(unsigned long index) { m_lstCSSRules->deleteRule(index); }
 
-    virtual bool isMediaRule() { return true; }
+  virtual bool isMediaRule() { return true; }
 
-    /* Not part of the DOM */
-    unsigned long append( CSSRuleImpl *rule );
-protected:
-    MediaListImpl *m_lstMedia;
-    CSSRuleListImpl *m_lstCSSRules;
+  /* Not part of the DOM */
+  unsigned long append(CSSRuleImpl* rule);
+
+ protected:
+  MediaListImpl* m_lstMedia;
+  CSSRuleListImpl* m_lstCSSRules;
 };
 
+class CSSPageRuleImpl : public CSSRuleImpl {
+ public:
+  CSSPageRuleImpl(StyleBaseImpl* parent);
 
-class CSSPageRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSPageRuleImpl(StyleBaseImpl *parent);
+  virtual ~CSSPageRuleImpl();
 
-    virtual ~CSSPageRuleImpl();
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
-    CSSMutableStyleDeclarationImpl *style() const { return m_style; }
+  virtual bool isPageRule() { return true; }
 
-    virtual bool isPageRule() { return true; }
+  DOM::DOMString selectorText() const;
+  void setSelectorText(DOM::DOMString str);
 
-    DOM::DOMString selectorText() const;
-    void setSelectorText(DOM::DOMString str);
-
-protected:
-    CSSMutableStyleDeclarationImpl *m_style;
+ protected:
+  CSSMutableStyleDeclarationImpl* m_style;
 };
 
 class CSSImportantRuleImpl;
 
-class CSSStyleRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSStyleRuleImpl(StyleBaseImpl *parent);
+class CSSStyleRuleImpl : public CSSRuleImpl {
+ public:
+  CSSStyleRuleImpl(StyleBaseImpl* parent);
 
-    virtual ~CSSStyleRuleImpl();
+  virtual ~CSSStyleRuleImpl();
 
-    CSSMutableStyleDeclarationImpl *style() const { return m_style; }
+  CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
-    virtual bool isStyleRule() { return true; }
+  virtual bool isStyleRule() { return true; }
 
-    DOM::DOMString selectorText() const;
-    void setSelectorText(DOM::DOMString str);
+  DOM::DOMString selectorText() const;
+  void setSelectorText(DOM::DOMString str);
 
-    virtual bool parseString( const DOMString &string, bool = false );
+  virtual bool parseString(const DOMString& string, bool = false);
 
-    void setSelector(CSSSelector* selector) { m_selector = selector; }
-    void setDeclaration( CSSMutableStyleDeclarationImpl *style);
+  void setSelector(CSSSelector* selector) { m_selector = selector; }
+  void setDeclaration(CSSMutableStyleDeclarationImpl* style);
 
-    CSSSelector* selector() { return m_selector; }
-    CSSMutableStyleDeclarationImpl *declaration() { return m_style; }
- 
-protected:
-    CSSMutableStyleDeclarationImpl *m_style;
-    CSSSelector* m_selector;
+  CSSSelector* selector() { return m_selector; }
+  CSSMutableStyleDeclarationImpl* declaration() { return m_style; }
+
+ protected:
+  CSSMutableStyleDeclarationImpl* m_style;
+  CSSSelector* m_selector;
 };
 
-class CSSUnknownRuleImpl : public CSSRuleImpl
-{
-public:
-    CSSUnknownRuleImpl(StyleBaseImpl *parent) : CSSRuleImpl(parent) {}
+class CSSUnknownRuleImpl : public CSSRuleImpl {
+ public:
+  CSSUnknownRuleImpl(StyleBaseImpl* parent) : CSSRuleImpl(parent) {}
 
-    virtual bool isUnknownRule() { return true; }
+  virtual bool isUnknownRule() { return true; }
 };
 
-
-} // namespace
+}  // namespace
 
 #endif

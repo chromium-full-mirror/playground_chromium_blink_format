@@ -26,8 +26,8 @@
 #include "css/css_valueimpl.h"
 
 namespace khtml {
-    class RenderObject;
-    class RenderStyle;
+class RenderObject;
+class RenderStyle;
 }
 
 namespace DOM {
@@ -36,36 +36,38 @@ class CSSProperty;
 
 enum EUpdateLayout { DoNotUpdateLayout = false, UpdateLayout = true };
 
-class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl
-{
-public:
-    CSSComputedStyleDeclarationImpl(NodeImpl *node);
-    virtual ~CSSComputedStyleDeclarationImpl();
+class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl {
+ public:
+  CSSComputedStyleDeclarationImpl(NodeImpl* node);
+  virtual ~CSSComputedStyleDeclarationImpl();
 
-    virtual DOMString cssText() const;
+  virtual DOMString cssText() const;
 
-    virtual unsigned long length() const;
-    virtual DOMString item(unsigned long index) const;
+  virtual unsigned long length() const;
+  virtual DOMString item(unsigned long index) const;
 
-    virtual CSSValueImpl *getPropertyCSSValue(int propertyID) const;
-    virtual DOMString getPropertyValue(int propertyID) const;
-    virtual bool getPropertyPriority(int propertyID) const;
+  virtual CSSValueImpl* getPropertyCSSValue(int propertyID) const;
+  virtual DOMString getPropertyValue(int propertyID) const;
+  virtual bool getPropertyPriority(int propertyID) const;
 
-    virtual CSSMutableStyleDeclarationImpl *copy() const;
-    virtual CSSMutableStyleDeclarationImpl *makeMutable();
+  virtual CSSMutableStyleDeclarationImpl* copy() const;
+  virtual CSSMutableStyleDeclarationImpl* makeMutable();
 
-    CSSValueImpl *getPropertyCSSValue(int propertyID, EUpdateLayout updateLayout) const;
+  CSSValueImpl* getPropertyCSSValue(int propertyID,
+                                    EUpdateLayout updateLayout) const;
 
-    CSSMutableStyleDeclarationImpl *copyInheritableProperties() const;
+  CSSMutableStyleDeclarationImpl* copyInheritableProperties() const;
 
-private:
-    virtual void setCssText(const DOMString &, int &exceptionCode);
-    virtual DOMString removeProperty(int propertyID, int &exceptionCode);
-    virtual void setProperty(int propertyId, const DOMString &value, bool important, int &exceptionCode);
+ private:
+  virtual void setCssText(const DOMString&, int& exceptionCode);
+  virtual DOMString removeProperty(int propertyID, int& exceptionCode);
+  virtual void setProperty(int propertyId,
+                           const DOMString& value,
+                           bool important,
+                           int& exceptionCode);
 
-    SharedPtr<NodeImpl> m_node;
+  SharedPtr<NodeImpl> m_node;
 };
-
 }
 
 #endif
