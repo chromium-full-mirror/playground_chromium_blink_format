@@ -60,6 +60,7 @@ class QDict : public QPtrCollection {
     QPtrCollection::operator=(d);
     return *this;
   }
+  T* operator[](const QString& key) const { return find(key); }
 
  private:
   static void deleteFunc(void* item) { delete (T*)item; }
@@ -80,6 +81,7 @@ class QDictIterator {
   T* toFirst() { return (T*)impl.toFirst(); }
 
   T* operator++() { return (T*)++impl; }
+  T* operator*() { return (T*)impl.current(); }
 
  private:
   KWQDictIteratorImpl impl;

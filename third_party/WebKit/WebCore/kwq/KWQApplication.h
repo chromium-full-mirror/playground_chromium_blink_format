@@ -38,6 +38,7 @@ class QApplication : public QObject {
   static bool sendEvent(QObject* o, QEvent* e) { return o->event(e); }
   static void sendPostedEvents(QObject* receiver, int event_type) {}
   static QStyle& style();
+  static QPalette palette() { return QPalette(); }
 };
 
 QApplication* const qApp = 0;
