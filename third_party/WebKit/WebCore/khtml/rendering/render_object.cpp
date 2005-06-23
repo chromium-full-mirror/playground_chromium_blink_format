@@ -1384,6 +1384,11 @@ void RenderObject::dump(QTextStream* stream, QString ind) const {
     child = child->nextSibling();
   }
 }
+
+void RenderObject::showTree() const {
+  if (element())
+    element()->showTree();
+}
 #endif
 
 static NodeImpl* selectStartNode(const RenderObject* object) {
