@@ -349,7 +349,15 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual QString state();
   virtual void restoreState(QStringList&);
 
+  bool canHaveSelection();
+
+  long selectionStart();
+  long selectionEnd();
+  void setSelectionStart(long);
+  void setSelectionEnd(long);
+
   void select();
+  void setSelectionRange(long, long);
 
   virtual void click(bool sendMouseEvents = false);
   virtual void accessKeyAction(bool sendToAnyElement);
@@ -717,7 +725,14 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual QString state();
   virtual void restoreState(QStringList&);
 
+  long selectionStart();
+  long selectionEnd();
+
+  void setSelectionStart(long);
+  void setSelectionEnd(long);
+
   void select();
+  void setSelectionRange(long, long);
 
   virtual void childrenChanged();
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);

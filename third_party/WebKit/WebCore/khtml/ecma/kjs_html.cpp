@@ -935,6 +935,8 @@ DontDelete|ReadOnly
   maxLength	KJS::HTMLElement::InputMaxLength	DontDelete
   name		KJS::HTMLElement::InputName		DontDelete
   readOnly	KJS::HTMLElement::InputReadOnly		DontDelete
+  selectionStart	KJS::HTMLElement::InputSelectionStart	DontDelete
+  selectionEnd	KJS::HTMLElement::InputSelectionEnd	DontDelete
   size		KJS::HTMLElement::InputSize		DontDelete
   src		KJS::HTMLElement::InputSrc		DontDelete
   tabIndex	KJS::HTMLElement::InputTabIndex		DontDelete
@@ -945,8 +947,10 @@ DontDelete|ReadOnly
   focus		KJS::HTMLElement::InputFocus		DontDelete|Function 0
   select	KJS::HTMLElement::InputSelect		DontDelete|Function 0
   click		KJS::HTMLElement::InputClick		DontDelete|Function 0
+  setSelectionRange	KJS::HTMLElement::InputSetSelectionRange
+DontDelete|Function 2
 @end
-@begin HTMLTextAreaElementTable 13
+@begin HTMLTextAreaElementTable 17
   defaultValue	KJS::HTMLElement::TextAreaDefaultValue	DontDelete
   form		KJS::HTMLElement::TextAreaForm		DontDelete|ReadOnly
   accessKey	KJS::HTMLElement::TextAreaAccessKey	DontDelete
@@ -955,12 +959,17 @@ DontDelete|ReadOnly
   name		KJS::HTMLElement::TextAreaName		DontDelete
   readOnly	KJS::HTMLElement::TextAreaReadOnly	DontDelete
   rows		KJS::HTMLElement::TextAreaRows		DontDelete
+  selectionStart	KJS::HTMLElement::TextAreaSelectionStart
+DontDelete
+  selectionEnd	KJS::HTMLElement::TextAreaSelectionEnd	DontDelete
   tabIndex	KJS::HTMLElement::TextAreaTabIndex	DontDelete
   type		KJS::HTMLElement::TextAreaType		DontDelete|ReadOnly
   value		KJS::HTMLElement::TextAreaValue		DontDelete
   blur		KJS::HTMLElement::TextAreaBlur		DontDelete|Function 0
   focus		KJS::HTMLElement::TextAreaFocus		DontDelete|Function 0
   select	KJS::HTMLElement::TextAreaSelect	DontDelete|Function 0
+  setSelectionRange	KJS::HTMLElement::TextAreaSetSelectionRange
+DontDelete|Function 2
 @end
 @begin HTMLButtonElementTable 7
   form		KJS::HTMLElement::ButtonForm		DontDelete|ReadOnly
@@ -1431,6 +1440,20 @@ Value KJS::HTMLElement::call(ExecState* exec,
   return Undefined();
 }
 
+static Value getInputSelectionStart(HTMLInputElementImpl& input) {
+  if (input.canHaveSelection()) {
+    return Number(input.selectionStart());
+  }
+  return Undefined();
+}
+
+static Value getInputSelectionEnd(HTMLInputElementImpl& input) {
+  if (input.canHaveSelection()) {
+    return Number(input.selectionEnd());
+  }
+  return Undefined();
+}
+
 Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
   HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
   switch (element.id()) {
@@ -1665,6 +1688,10 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return String(input.name());
         case InputReadOnly:
           return Boolean(input.readOnly());
+        case InputSelectionStart:
+          return getInputSelectionStart(input);
+        case InputSelectionEnd:
+          return getInputSelectionEnd(input);
         case InputSize:
           return String(input.sizeDOM());
         case InputSrc:
@@ -1699,6 +1726,10 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
           return Boolean(textarea.readOnly());
         case TextAreaRows:
           return Number(textarea.rows());
+        case TextAreaSelectionStart:
+          return Number(textarea.selectionStart());
+        case TextAreaSelectionEnd:
+          return Number(textarea.selectionEnd());
         case TextAreaTabIndex:
           return Number(textarea.tabIndex());
         case TextAreaType:
@@ -2451,6 +2482,22 @@ bool KJS::HTMLElement::hasProperty(ExecState* exec,
         return true;
       break;
     }
+    case ID_INPUT: {
+      HTMLInputElementImpl& input = static_cast<HTMLInputElementImpl&>(element);
+      const HashTable* table = classInfo()->propHashTable;
+      const HashEntry* entry = Lookup::findEntry(table, propertyName);
+      if (entry) {
+        switch (entry->value) {
+          case InputSelectionStart:
+          case InputSelectionEnd:
+          case InputSetSelectionRange:
+            return input.canHaveSelection();
+          default:
+            break;
+        }
+      }
+      break;
+    }
     default:
       break;
   }
@@ -2573,6 +2620,9 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
       } else if (id == KJS::HTMLElement::InputClick) {
         input.click();
         return Undefined();
+      } else if (id == KJS::HTMLElement::InputSetSelectionRange) {
+        input.setSelectionRange(args[0].toInt32(exec), args[1].toInt32(exec));
+        return Undefined();
       }
     } break;
     case ID_LABEL: {
@@ -2615,6 +2665,10 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
         return Undefined();
       } else if (id == KJS::HTMLElement::TextAreaSelect) {
         textarea.select();
+        return Undefined();
+      } else if (id == KJS::HTMLElement::TextAreaSetSelectionRange) {
+        textarea.setSelectionRange(args[0].toInt32(exec),
+                                   args[1].toInt32(exec));
         return Undefined();
       }
     } break;
@@ -3136,6 +3190,14 @@ void HTMLElement::putValue(ExecState* exec,
           input.setReadOnly(value.toBoolean(exec));
           return;
         }
+        case InputSelectionStart: {
+          input.setSelectionStart(value.toInt32(exec));
+          return;
+        }
+        case InputSelectionEnd: {
+          input.setSelectionEnd(value.toInt32(exec));
+          return;
+        }
         case InputSize: {
           input.setSize(str);
           return;
@@ -3193,6 +3255,14 @@ void HTMLElement::putValue(ExecState* exec,
         }
         case TextAreaRows: {
           textarea.setRows(value.toInt32(exec));
+          return;
+        }
+        case TextAreaSelectionStart: {
+          textarea.setSelectionStart(value.toInt32(exec));
+          return;
+        }
+        case TextAreaSelectionEnd: {
+          textarea.setSelectionEnd(value.toInt32(exec));
           return;
         }
         case TextAreaTabIndex: {
