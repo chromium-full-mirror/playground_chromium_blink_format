@@ -1152,7 +1152,6 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
           case QChar::DirCS:
             if (bidi.status.eor == QChar::DirAN) {
               bidi.eor = bidi.current;
-              bidi.status.eor = QChar::DirR;
               break;
             }
           case QChar::DirES:
