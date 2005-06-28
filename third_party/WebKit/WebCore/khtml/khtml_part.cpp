@@ -2175,8 +2175,6 @@ void KHTMLPart::changeLocation(const QString& URL,
 
   KParts::URLArgs args;
 
-  if (urlcmp(URL, m_url.url(), true, false))
-    args.reload = true;
   args.setLockHistory(lockHistory);
   if (!referrer.isEmpty())
     args.metaData()["referrer"] = referrer;
