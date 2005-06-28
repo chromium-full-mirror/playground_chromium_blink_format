@@ -1005,8 +1005,11 @@ VisiblePosition RenderText::positionForCoordinates(int _x, int _y) {
         // check to see if position goes in this box
         int offset = box->offsetForPosition(_x - absx);
         if (offset != -1) {
+          EAffinity affinity = offset >= box->m_len && !box->nextOnLine()
+                                   ? UPSTREAM
+                                   : DOWNSTREAM;
           VisiblePosition result =
-              VisiblePosition(element(), offset + box->m_start, UPSTREAM);
+              VisiblePosition(element(), offset + box->m_start, affinity);
           setAffinityUsingLinePosition(result);
           return result;
         }
