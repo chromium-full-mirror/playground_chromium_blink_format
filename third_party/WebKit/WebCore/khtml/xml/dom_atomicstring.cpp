@@ -39,94 +39,17 @@
 
 #include "dom_atomicstring.h"
 #include "xml/dom_stringimpl.h"
+#include "hashset.h"
+
+using khtml::HashSet;
 
 namespace DOM {
 
-#define DUMP_STATISTICS 0
-
-#if DUMP_STATISTICS
-
-static int numAccesses;
-static int numCollisions;
-static int collisionGraph[4096];
-static int maxCollisions;
-static int numRehashes;
-static int numRemoves;
-static int numReinserts;
-
-struct AtomicStringStatisticsExitLogger {
-  ~AtomicStringStatisticsExitLogger();
-};
-
-static AtomicStringStatisticsExitLogger logger;
-
-AtomicStringStatisticsExitLogger::~AtomicStringStatisticsExitLogger() {
-  printf("\nkhtml::HashTable statistics\n\n");
-  printf("%d accesses\n", numAccesses);
-  printf("%d total collisions, average %.2f probes per access\n", numCollisions,
-         1.0 * (numAccesses + numCollisions) / numAccesses);
-  printf("longest collision chain: %d\n", maxCollisions);
-  for (int i = 1; i <= maxCollisions; i++) {
-    printf(
-        "  %d lookups with exactly %d collisions (%.2f%% , %.2f%% with this "
-        "many or more)\n",
-        collisionGraph[i], i,
-        100.0 * (collisionGraph[i] - collisionGraph[i + 1]) / numAccesses,
-        100.0 * collisionGraph[i] / numAccesses);
-  }
-  printf("%d rehashes\n", numRehashes);
-  printf("%d removes, %d reinserts\n", numRemoves, numReinserts);
+inline unsigned hash(DOMStringImpl* const& s) {
+  return s->hash();
 }
 
-static void recordCollisionAtCount(int count) {
-  if (count > maxCollisions)
-    maxCollisions = count;
-  numCollisions++;
-  collisionGraph[count]++;
-}
-#endif
-
-const int _minTableSize = 64;
-
-DOMStringImpl** AtomicString::_table;
-int AtomicString::_tableSize;
-int AtomicString::_tableSizeMask;
-int AtomicString::_keyCount;
-
-bool AtomicString::equal(DOMStringImpl* r, const char* s) {
-  if (!r && !s)
-    return true;
-  if (!r || !s)
-    return false;
-
-  int length = r->l;
-  const QChar* d = r->s;
-  for (int i = 0; i != length; ++i)
-    if (d[i] != s[i])
-      return false;
-  return s[length] == 0;
-}
-
-bool AtomicString::equal(const AtomicString& a, const char* b) {
-  return equal(a.m_string.implementation(), b);
-}
-
-bool AtomicString::equal(DOMStringImpl* r, const QChar* s, uint length) {
-  if (!r && !s)
-    return true;
-  if (!r || !s)
-    return false;
-
-  if (r->l != length)
-    return false;
-  const QChar* d = r->s;
-  for (uint i = 0; i != length; ++i)
-    if (d[i] != s[i])
-      return false;
-  return true;
-}
-
-bool AtomicString::equal(DOMStringImpl* r, DOMStringImpl* b) {
+bool equal(DOMStringImpl* const& r, DOMStringImpl* const& b) {
   if (r == b)
     return true;
   if (!r || !b)
@@ -142,6 +65,38 @@ bool AtomicString::equal(DOMStringImpl* r, DOMStringImpl* b) {
   return true;
 }
 
+static HashSet<DOMStringImpl*, hash, equal> stringTable;
+
+inline unsigned hash(const char* const& c) {
+  return DOMStringImpl::computeHash(c);
+}
+
+inline bool equal(DOMStringImpl* const& r, const char* const& s) {
+  if (!r && !s)
+    return true;
+  if (!r || !s)
+    return false;
+
+  int length = r->l;
+  const QChar* d = r->s;
+  for (int i = 0; i != length; ++i)
+    if (d[i] != s[i])
+      return false;
+  return s[length] == 0;
+}
+
+bool AtomicString::equal(const AtomicString& a, const char* b) {
+  return DOM::equal(a.m_string.implementation(), b);
+}
+
+inline DOMStringImpl* convert(const char* const& c, unsigned hash) {
+  DOMStringImpl* r = new DOMStringImpl(c);
+  r->_hash = hash;
+  r->_inTable = true;
+
+  return r;
+}
+
 DOMStringImpl* AtomicString::add(const char* c) {
   if (!c)
     return 0;
@@ -149,35 +104,37 @@ DOMStringImpl* AtomicString::add(const char* c) {
   if (length == 0)
     return DOMStringImpl::empty();
 
-  if (!_table)
-    expand();
+  return stringTable.insert<const char*, hash, DOM::equal, convert>(c);
+}
 
-  unsigned hash = DOMStringImpl::computeHash(c);
+struct QCharBuffer {
+  const QChar* s;
+  uint length;
+};
 
-  int i = hash & _tableSizeMask;
-#if DUMP_STATISTICS
-  ++numAccesses;
-  int collisionCount = 0;
-#endif
-  while (DOMStringImpl* key = _table[i]) {
-    if (equal(key, c))
-      return key;
-#if DUMP_STATISTICS
-    ++collisionCount;
-    recordCollisionAtCount(collisionCount);
-#endif
-    i = (i + 1) & _tableSizeMask;
-  }
+inline unsigned hash(const QCharBuffer& buf) {
+  return DOMStringImpl::computeHash(buf.s, buf.length);
+}
 
-  DOMStringImpl* r = new DOMStringImpl(c, length);
+inline bool equal(DOMStringImpl* const& r, const QCharBuffer& buf) {
+  if (!r && !buf.s)
+    return true;
+  if (!r || !buf.s)
+    return false;
+
+  if (r->l != buf.length)
+    return false;
+  const QChar* d = r->s;
+  for (uint i = 0; i != buf.length; ++i)
+    if (d[i] != buf.s[i])
+      return false;
+  return true;
+}
+
+inline DOMStringImpl* convert(const QCharBuffer& buf, unsigned hash) {
+  DOMStringImpl* r = new DOMStringImpl(buf.s, buf.length);
   r->_hash = hash;
   r->_inTable = true;
-
-  _table[i] = r;
-  ++_keyCount;
-
-  if (_keyCount * 2 >= _tableSize)
-    expand();
 
   return r;
 }
@@ -189,37 +146,8 @@ DOMStringImpl* AtomicString::add(const QChar* s, int length) {
   if (length == 0)
     return DOMStringImpl::empty();
 
-  if (!_table)
-    expand();
-
-  unsigned hash = DOMStringImpl::computeHash(s, length);
-
-  int i = hash & _tableSizeMask;
-#if DUMP_STATISTICS
-  ++numAccesses;
-  int collisionCount = 0;
-#endif
-  while (DOMStringImpl* key = _table[i]) {
-    if (equal(key, s, length))
-      return key;
-#if DUMP_STATISTICS
-    ++collisionCount;
-    recordCollisionAtCount(collisionCount);
-#endif
-    i = (i + 1) & _tableSizeMask;
-  }
-
-  DOMStringImpl* r = new DOMStringImpl(s, length);
-  r->_hash = hash;
-  r->_inTable = true;
-
-  _table[i] = r;
-  ++_keyCount;
-
-  if (_keyCount * 2 >= _tableSize)
-    expand();
-
-  return r;
+  QCharBuffer buf = {s, length};
+  return stringTable.insert<QCharBuffer, hash, DOM::equal, convert>(buf);
 }
 
 DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
@@ -229,126 +157,14 @@ DOMStringImpl* AtomicString::add(DOMStringImpl* r) {
   if (r->l == 0)
     return DOMStringImpl::empty();
 
-  if (!_table)
-    expand();
-
-  unsigned hash = r->hash();
-
-  int i = hash & _tableSizeMask;
-#if DUMP_STATISTICS
-  ++numAccesses;
-  int collisionCount = 0;
-#endif
-  while (DOMStringImpl* key = _table[i]) {
-    if (equal(key, r)) {
-      return key;
-    }
-#if DUMP_STATISTICS
-    ++collisionCount;
-    recordCollisionAtCount(collisionCount);
-#endif
-    i = (i + 1) & _tableSizeMask;
-  }
-
-  r->_inTable = true;
-  _table[i] = r;
-  ++_keyCount;
-
-  if (_keyCount * 2 >= _tableSize)
-    expand();
-
-  return r;
-}
-
-inline void AtomicString::insert(DOMStringImpl* key) {
-  unsigned hash = key->hash();
-
-  int i = hash & _tableSizeMask;
-#if DUMP_STATISTICS
-  ++numAccesses;
-  int collisionCount = 0;
-#endif
-  while (_table[i] && !(key == _table[i])) {
-#if DUMP_STATISTICS
-    ++collisionCount;
-    recordCollisionAtCount(collisionCount);
-#endif
-    i = (i + 1) & _tableSizeMask;
-  }
-  _table[i] = key;
+  DOMStringImpl* result = stringTable.insert(r);
+  if (result == r)
+    r->_inTable = true;
+  return result;
 }
 
 void AtomicString::remove(DOMStringImpl* r) {
-  unsigned hash = r->_hash;
-
-  DOMStringImpl* key;
-
-  int i = hash & _tableSizeMask;
-#if DUMP_STATISTICS
-  ++numRemoves;
-  ++numAccesses;
-  int collisionCount = 0;
-#endif
-  while ((key = _table[i])) {
-    if (key == r)
-      break;
-#if DUMP_STATISTICS
-    ++collisionCount;
-    recordCollisionAtCount(collisionCount);
-#endif
-    i = (i + 1) & _tableSizeMask;
-  }
-  if (!key)
-    return;
-
-  _table[i] = 0;
-  --_keyCount;
-
-  if (_keyCount * 6 < _tableSize && _tableSize > _minTableSize) {
-    shrink();
-    return;
-  }
-
-  // Reinsert all the items to the right in the same cluster.
-  while (1) {
-    i = (i + 1) & _tableSizeMask;
-    key = _table[i];
-    if (!key)
-      break;
-#if DUMP_STATISTICS
-    ++numReinserts;
-#endif
-    _table[i] = 0;
-    insert(key);
-  }
-}
-
-void AtomicString::expand() {
-  rehash(_tableSize == 0 ? _minTableSize : _tableSize * 2);
-}
-
-void AtomicString::shrink() {
-  rehash(_tableSize / 2);
-}
-
-void AtomicString::rehash(int newTableSize) {
-  int oldTableSize = _tableSize;
-  DOMStringImpl** oldTable = _table;
-
-#if DUMP_STATISTICS
-  if (oldTableSize != 0)
-    ++numRehashes;
-#endif
-
-  _tableSize = newTableSize;
-  _tableSizeMask = newTableSize - 1;
-  _table = (DOMStringImpl**)calloc(newTableSize, sizeof(DOMStringImpl*));
-
-  for (int i = 0; i != oldTableSize; ++i)
-    if (DOMStringImpl* key = oldTable[i])
-      insert(key);
-
-  free(oldTable);
+  stringTable.remove(r);
 }
 
 // Global constants for property name strings.
