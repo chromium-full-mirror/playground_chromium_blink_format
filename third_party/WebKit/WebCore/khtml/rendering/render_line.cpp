@@ -768,7 +768,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       // outlines.
       if (object()->style()->visibility() == VISIBLE &&
           object()->style()->outlineWidth() > 0 &&
-          !object()->isInlineContinuation()) {
+          !object()->isInlineContinuation() && !isRootInlineBox()) {
         if (!i.outlineObjects)
           i.outlineObjects = new QPtrDict<RenderFlow>;
         if (!i.outlineObjects->find(flowObject()))
