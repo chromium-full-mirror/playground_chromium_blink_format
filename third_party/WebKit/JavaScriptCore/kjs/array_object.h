@@ -54,7 +54,10 @@ class ArrayProtoFuncImp : public InternalFunctionImp {
     Slice,
     Sort,
     Splice,
-    UnShift
+    UnShift,
+    Every,
+    ForEach,
+    Some
   };
 
  private:
