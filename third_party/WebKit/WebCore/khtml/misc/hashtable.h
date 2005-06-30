@@ -72,7 +72,7 @@ class HashTableIterator {
   typedef KeyType& ReferenceType;
   typedef KeyType* PointerType;
 
-  friend class HashTableType;
+  friend class HashTable<Key, Hash, Equal>;
 
   HashTableIterator(HashTablePointerType table,
                     PointerType position,
@@ -132,7 +132,7 @@ class HashTableConstIterator {
   typedef const KeyType& ReferenceType;
   typedef const KeyType* PointerType;
 
-  friend class HashTableType;
+  friend class HashTable<Key, Hash, Equal>;
 
   HashTableConstIterator(HashTablePointerType table,
                          PointerType position,
