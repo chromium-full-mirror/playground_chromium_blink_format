@@ -147,6 +147,7 @@ class RenderBlock : public RenderFlow {
   RootInlineBox* constructLine(const BidiIterator& start,
                                const BidiIterator& end);
   InlineFlowBox* createLineBoxes(RenderObject* obj);
+  int tabWidth(bool isWhitespacePre);
   void computeHorizontalPositionsForLine(RootInlineBox* lineBox,
                                          BidiState& bidi);
   void computeVerticalPositionsForLine(RootInlineBox* lineBox);

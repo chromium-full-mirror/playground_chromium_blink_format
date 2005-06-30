@@ -3077,7 +3077,7 @@ static void stripTrailingSpace(bool pre,
     const Font* f = t->htmlFont(false);
     QChar space[1];
     space[0] = ' ';
-    int spaceWidth = f->width(space, 1, 0);
+    int spaceWidth = f->width(space, 1, 0, 0);
     inlineMax -= spaceWidth;
     if (inlineMin > inlineMax)
       inlineMin = inlineMax;
@@ -3253,7 +3253,7 @@ void RenderBlock::calcInlineMinMaxWidth() {
         int beginMin, endMin;
         bool beginWS, endWS;
         int beginMax, endMax;
-        t->trimmedMinMaxWidth(beginMin, beginWS, endMin, endWS,
+        t->trimmedMinMaxWidth(inlineMax, beginMin, beginWS, endMin, endWS,
                               hasBreakableChar, hasBreak, beginMax, endMax,
                               childMin, childMax, stripFrontSpaces);
 
