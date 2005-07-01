@@ -41,7 +41,7 @@
 @class WebResource;
 @class WebView;
 
-@interface WebBaseResourceHandleDelegate : NSObject {
+@interface WebLoader : NSObject {
  @protected
   WebDataSource* dataSource;
   NSURLConnection* connection;
@@ -115,7 +115,7 @@
 
 // Note: This interface can be removed once this method is declared
 // in Foundation (probably will be in Foundation-485).
-@interface NSObject (WebBaseResourceHandleDelegateExtras)
+@interface NSObject (WebLoaderExtras)
 - (void)connection:(NSURLConnection*)con
     didReceiveData:(NSData*)data
     lengthReceived:(long long)lengthReceived;
