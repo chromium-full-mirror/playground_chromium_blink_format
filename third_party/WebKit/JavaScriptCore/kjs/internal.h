@@ -165,7 +165,7 @@ inline Number::Number(NumberImp* imp) : Value(imp) {}
  */
 class LabelStack {
  public:
-  LabelStack() : tos(0L) {}
+  LabelStack() : tos(0L), iterationDepth(0), switchDepth(0) {}
   ~LabelStack();
 
   LabelStack(const LabelStack& other);
@@ -185,6 +185,14 @@ class LabelStack {
    */
   void pop();
 
+  void pushIteration() { iterationDepth++; }
+  void popIteration() { iterationDepth--; }
+  bool inIteration() const { return (iterationDepth > 0); }
+
+  void pushSwitch() { switchDepth++; }
+  void popSwitch() { switchDepth--; }
+  bool inSwitch() const { return (switchDepth > 0); }
+
  private:
   struct StackElem {
     Identifier id;
@@ -193,6 +201,8 @@ class LabelStack {
 
   StackElem* tos;
   void clear();
+  int iterationDepth;
+  int switchDepth;
 };
 
 // ---------------------------------------------------------------------------
