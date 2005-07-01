@@ -677,10 +677,10 @@ Value FunctionCallNode::evaluate(ExecState* exec) {
   KJS_CHECKEXCEPTIONVALUE
 
   List argList = args->evaluateList(exec);
-
   KJS_CHECKEXCEPTIONVALUE
 
   Value v = ref.getValue(exec);
+  KJS_CHECKEXCEPTIONVALUE
 
   if (v.type() != ObjectType) {
     return throwError(exec, TypeError,
