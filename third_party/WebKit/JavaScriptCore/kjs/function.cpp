@@ -230,12 +230,12 @@ void FunctionImp::put(ExecState* exec,
   InternalFunctionImp::put(exec, propertyName, value, attr);
 }
 
-bool FunctionImp::hasProperty(ExecState* exec,
-                              const Identifier& propertyName) const {
+bool FunctionImp::hasOwnProperty(ExecState* exec,
+                                 const Identifier& propertyName) const {
   if (propertyName == argumentsPropertyName ||
       propertyName == lengthPropertyName)
     return true;
-  return InternalFunctionImp::hasProperty(exec, propertyName);
+  return InternalFunctionImp::hasOwnProperty(exec, propertyName);
 }
 
 bool FunctionImp::deleteProperty(ExecState* exec,
@@ -350,11 +350,11 @@ Value ActivationImp::get(ExecState* exec,
   return ObjectImp::get(exec, propertyName);
 }
 
-bool ActivationImp::hasProperty(ExecState* exec,
-                                const Identifier& propertyName) const {
+bool ActivationImp::hasOwnProperty(ExecState* exec,
+                                   const Identifier& propertyName) const {
   if (propertyName == argumentsPropertyName)
     return true;
-  return ObjectImp::hasProperty(exec, propertyName);
+  return ObjectImp::hasOwnProperty(exec, propertyName);
 }
 
 bool ActivationImp::deleteProperty(ExecState* exec,

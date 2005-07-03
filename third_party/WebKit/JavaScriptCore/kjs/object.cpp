@@ -264,15 +264,7 @@ bool ObjectImp::canPut(ExecState*, const Identifier& propertyName) const {
 // ECMA 8.6.2.4
 bool ObjectImp::hasProperty(ExecState* exec,
                             const Identifier& propertyName) const {
-  if (_prop.get(propertyName))
-    return true;
-
-  // Look in the static hashtable of properties
-  if (findPropertyHashEntry(propertyName))
-    return true;
-
-  // non-standard netscape extension
-  if (propertyName == specialPrototypePropertyName)
+  if (hasOwnProperty(exec, propertyName))
     return true;
 
   if (_proto->dispatchType() != ObjectType) {
@@ -284,7 +276,35 @@ bool ObjectImp::hasProperty(ExecState* exec,
 }
 
 bool ObjectImp::hasProperty(ExecState* exec, unsigned propertyName) const {
-  return hasProperty(exec, Identifier::from(propertyName));
+  if (hasOwnProperty(exec, propertyName))
+    return true;
+
+  if (_proto->dispatchType() != ObjectType) {
+    return false;
+  }
+
+  // Look in the prototype
+  return static_cast<ObjectImp*>(_proto)->hasProperty(exec, propertyName);
+}
+
+bool ObjectImp::hasOwnProperty(ExecState* exec,
+                               const Identifier& propertyName) const {
+  if (_prop.get(propertyName))
+    return true;
+
+  // Look in the static hashtable of properties
+  if (findPropertyHashEntry(propertyName))
+    return true;
+
+  // non-standard netscape extension
+  if (propertyName == specialPrototypePropertyName)
+    return true;
+
+  return false;
+}
+
+bool ObjectImp::hasOwnProperty(ExecState* exec, unsigned propertyName) const {
+  return hasOwnProperty(exec, Identifier::from(propertyName));
 }
 
 // ECMA 8.6.2.5

@@ -276,12 +276,12 @@ wouldn't,
 HTMLDocument::HTMLDocument(ExecState* exec, HTMLDocumentImpl* d)
     : DOMDocument(exec, d) {}
 
-bool HTMLDocument::hasProperty(ExecState* exec, const Identifier& p) const {
+bool HTMLDocument::hasOwnProperty(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
 // kdDebug(6070) << "HTMLDocument::hasProperty " << p.qstring() << endl;
 #endif
   HTMLDocumentImpl* doc = static_cast<HTMLDocumentImpl*>(impl());
-  return DOMDocument::hasProperty(exec, p) ||
+  return DOMDocument::hasOwnProperty(exec, p) ||
          doc->haveNamedImageOrForm(p.qstring());
 }
 
@@ -405,7 +405,10 @@ Value HTMLDocument::tryGet(ExecState* exec,
     }
   }
 
-  if (DOMDocument::hasProperty(exec, propertyName))
+  ValueImp* proto = prototype().imp();
+  if (DOMDocument::hasOwnProperty(exec, propertyName) ||
+      (proto->dispatchType() == ObjectType &&
+       static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName)))
     return DOMDocument::tryGet(exec, propertyName);
 
   // kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() <<
@@ -2453,8 +2456,8 @@ Value KJS::HTMLElement::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-bool KJS::HTMLElement::hasProperty(ExecState* exec,
-                                   const Identifier& propertyName) const {
+bool KJS::HTMLElement::hasOwnProperty(ExecState* exec,
+                                      const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
 // kdDebug(6070) << "HTMLElement::hasProperty " << propertyName.qstring() <<
 // endl;
@@ -2502,7 +2505,7 @@ bool KJS::HTMLElement::hasProperty(ExecState* exec,
       break;
   }
 
-  return DOMElement::hasProperty(exec, propertyName);
+  return DOMElement::hasOwnProperty(exec, propertyName);
 }
 
 UString KJS::HTMLElement::toString(ExecState* exec) const {
@@ -4291,11 +4294,11 @@ HTMLCollection::~HTMLCollection() {
 // We have to implement hasProperty since we don't use a hashtable for
 // 'selectedIndex' and 'length'
 // ## this breaks "for (..in..)" though.
-bool KJS::HTMLCollection::hasProperty(ExecState* exec,
-                                      const Identifier& p) const {
+bool KJS::HTMLCollection::hasOwnProperty(ExecState* exec,
+                                         const Identifier& p) const {
   if (p == "selectedIndex" || p == lengthPropertyName)
     return true;
-  return DOMObject::hasProperty(exec, p);
+  return DOMObject::hasOwnProperty(exec, p);
 }
 
 Value KJS::HTMLCollection::tryGet(ExecState* exec,
