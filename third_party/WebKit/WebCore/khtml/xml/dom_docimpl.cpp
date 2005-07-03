@@ -1076,8 +1076,8 @@ TreeWalkerImpl* DocumentImpl::createTreeWalker(NodeImpl* root,
 
 void DocumentImpl::setDocumentChanged(bool b) {
   if (!changedDocuments)
-    changedDocuments =
-        s_changedDocumentsDeleter.setObject(new QPtrList<DocumentImpl>());
+    changedDocuments = s_changedDocumentsDeleter.setObject(
+        changedDocuments, new QPtrList<DocumentImpl>());
 
   if (b && !m_docChanged)
     changedDocuments->append(this);

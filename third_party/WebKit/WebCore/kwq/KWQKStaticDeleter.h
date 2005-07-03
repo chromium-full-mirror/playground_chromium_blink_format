@@ -33,7 +33,10 @@
 template <class T>
 class KStaticDeleter {
  public:
-  T* setObject(T* ptr, bool array = false) { return ptr; }
+  T* setObject(T*& global, T* ptr, bool array = false) {
+    global = ptr;
+    return ptr;
+  }
 };
 
 #endif
