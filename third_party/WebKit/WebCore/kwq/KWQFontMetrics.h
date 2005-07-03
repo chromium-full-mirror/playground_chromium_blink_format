@@ -90,6 +90,7 @@ class QFontMetrics {
                           bool reversed,
                           bool includePartialGlyphs) const;
 
+  QRect boundingRect(QChar) const;
   QRect boundingRect(const QString&,
                      int tabWidth,
                      int xpos,
