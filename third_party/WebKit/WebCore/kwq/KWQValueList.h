@@ -121,7 +121,9 @@ template <class T>
 class QValueList {
  public:
   typedef QValueListIterator<T> Iterator;
+  typedef QValueListIterator<T> iterator;
   typedef QValueListConstIterator<T> ConstIterator;
+  typedef QValueListConstIterator<T> const_iterator;
 
   QValueList() : impl(deleteNode, copyNode) {}
 
@@ -142,6 +144,10 @@ class QValueList {
   uint contains(const T& val) const {
     QValueListNode<T> node(val);
     return impl.containsEqualNodes(&node, nodesEqual);
+  }
+  Iterator find(const T& val) const {
+    QValueListNode<T> node(val);
+    return impl.findEqualNode(&node, nodesEqual);
   }
 
   Iterator insert(Iterator iter, const T& val) {
@@ -166,6 +172,8 @@ class QValueList {
 
   ConstIterator begin() const { return impl.begin(); }
   ConstIterator end() const { return impl.end(); }
+  ConstIterator constBegin() const { return impl.begin(); }
+  ConstIterator constEnd() const { return impl.end(); }
   ConstIterator fromLast() const { return impl.fromLast(); }
 
   T& operator[](uint index) {
