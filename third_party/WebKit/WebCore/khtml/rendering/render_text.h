@@ -148,7 +148,6 @@ class InlineTextBox : public InlineRunBox {
   virtual long caretMaxOffset() const;
   virtual unsigned long caretMaxRenderedOffset() const;
 
-  int textPos() const;
   int offsetForPosition(int _x, bool includePartialGlyphs = true) const;
   int positionForOffset(int offset) const;
 
@@ -228,11 +227,9 @@ class RenderText : public RenderObject {
 
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
-                             const Font* f,
-                             int xpos) const;
+                             const Font* f) const;
   virtual unsigned int width(unsigned int from,
                              unsigned int len,
-                             int xpos,
                              bool firstLine = false) const;
   virtual int width() const;
   virtual int height() const;
@@ -246,11 +243,7 @@ class RenderText : public RenderObject {
   virtual void calcMinMaxWidth();
   virtual int minWidth() const { return m_minWidth; }
   virtual int maxWidth() const { return m_maxWidth; }
-
-  // widths
-  void calcMinMaxWidth(int leadWidth);
-  virtual void trimmedMinMaxWidth(int leadWidth,
-                                  int& beginMinW,
+  virtual void trimmedMinMaxWidth(int& beginMinW,
                                   bool& beginWS,
                                   int& endMinW,
                                   bool& endWS,
@@ -307,11 +300,7 @@ class RenderText : public RenderObject {
   virtual InlineBox* inlineBox(long offset, EAffinity affinity = UPSTREAM);
 
 #if APPLE_CHANGES
-  int widthFromCache(const Font*,
-                     int start,
-                     int len,
-                     int tabWidth,
-                     int xpos) const;
+  int widthFromCache(const Font*, int start, int len) const;
   bool shouldUseMonospaceCache(const Font*) const;
   void cacheWidths();
   bool allAscii() const;
@@ -345,8 +334,6 @@ class RenderText : public RenderObject {
                                 // lines.
   bool m_hasBreak : 1;  // Whether or not we have a hard break (e.g., <pre> with
                         // '\n').
-  bool m_hasTab : 1;    // Whether or not we have a variable width tab character
-                        // (e.g., <pre> with '\t').
   bool m_hasBeginWS : 1;  // Whether or not we begin with WS (only true if we
                           // aren't pre)
   bool m_hasEndWS : 1;  // Whether or not we end with WS (only true if we aren't
