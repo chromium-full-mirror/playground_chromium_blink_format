@@ -30,7 +30,19 @@
 
 class QColorGroup {
  public:
-  enum ColorRole { Background, Foreground, NColorRoles, Base = Background };
+  enum ColorRole {
+    Light,
+    Text,
+    Button,
+    Shadow,
+    ButtonText,
+    Dark,
+    Midlight,
+    Background,
+    Foreground,
+    NColorRoles,
+    Base = Background
+  };
 
   QColorGroup() : m_background(Qt::white) {}
   QColorGroup(const QColor& b, const QColor& f)
@@ -65,10 +77,14 @@ class QPalette {
   QPalette() {}
   QPalette(const QColor& b, const QColor& f) : m_active(b, f) {}
 
+  enum ColorGroup { Disabled, Active, Inactive, NColorGroups, Normal = Active };
+
   const QColorGroup& active() const { return m_active; }
 
   const QColor& background() const { return m_active.background(); }
   const QColor& foreground() const { return m_active.foreground(); }
+
+  void setColor(ColorGroup g, QColorGroup::ColorRole r, const QColor& c);
 
   bool operator==(const QPalette& other) const {
     return m_active == other.m_active;
