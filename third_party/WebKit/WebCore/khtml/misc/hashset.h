@@ -34,6 +34,11 @@ inline T identityExtract(const T& t) {
   return t;
 }
 
+template <typename Value, typename T, Value ConvertT(const T&, unsigned)>
+inline Value convertAdapter(const T& t, const T&, unsigned h) {
+  return ConvertT(t, h);
+}
+
 template <typename Value,
           typename HashFunctions = DefaultHash<Value>,
           typename Traits = HashTraits<Value>>
@@ -80,9 +85,6 @@ class HashSet {
   void clear();
 
  private:
-  template <typename T, ValueType ConvertT(const T&, unsigned)>
-  static ValueType convertAdapter(const T& t, const T&, unsigned h);
-
   ImplType m_impl;
 };
 
@@ -156,8 +158,8 @@ template <typename T,
           Value ConvertT(const T&, unsigned)>
 std::pair<typename HashSet<Value, HashFunctions, Traits>::iterator, bool>
 HashSet<Value, HashFunctions, Traits>::insert(const T& value) {
-  return m_impl.insert<T, T, HashT, EqualT,
-                       HashSet::convertAdapter<T, ConvertT>>(value, value);
+  return m_impl.insert<T, T, HashT, EqualT, convertAdapter<Value, T, ConvertT>>(
+      value, value);
 }
 
 template <typename Value, typename HashFunctions, typename Traits>
@@ -173,14 +175,6 @@ void HashSet<Value, HashFunctions, Traits>::remove(iterator it) {
 template <typename Value, typename HashFunctions, typename Traits>
 void HashSet<Value, HashFunctions, Traits>::clear() {
   m_impl.clear();
-}
-
-template <typename Value, typename HashFunctions, typename Traits>
-template <typename T, Value ConvertT(const T&, unsigned)>
-inline Value HashSet<Value, HashFunctions, Traits>::convertAdapter(const T& t,
-                                                                   const T&,
-                                                                   unsigned h) {
-  return ConvertT(t, h);
 }
 
 }  // namespace khtml
