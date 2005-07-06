@@ -344,9 +344,8 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
           rules->getClassRules(singleClass->string().implementation()),
           firstRuleIndex, lastRuleIndex);
   }
-  matchRulesForList(
-      rules->getTagRules((void*)(int)localNamePart(element->id())),
-      firstRuleIndex, lastRuleIndex);
+  matchRulesForList(rules->getTagRules(localNamePart(element->id())),
+                    firstRuleIndex, lastRuleIndex);
   matchRulesForList(rules->getUniversalRules(), firstRuleIndex, lastRuleIndex);
 
   // If we didn't match any rules, we're done.
@@ -1450,23 +1449,42 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
 // -----------------------------------------------------------------
 
 CSSRuleSet::CSSRuleSet() {
-  m_idRules.setAutoDelete(true);
-  m_classRules.setAutoDelete(true);
-  m_tagRules.setAutoDelete(true);
   m_universalRules = 0;
   m_ruleCount = 0;
 }
 
-void CSSRuleSet::addToRuleSet(void* hash,
-                              QPtrDict<CSSRuleDataList>& dict,
+CSSRuleSet::~CSSRuleSet() {
+  deleteAllValues(m_idRules);
+  deleteAllValues(m_classRules);
+  deleteAllValues(m_tagRules);
+
+  delete m_universalRules;
+}
+
+void CSSRuleSet::addToRuleSet(DOM::DOMStringImpl* key,
+                              AtomRuleMap& map,
                               CSSStyleRuleImpl* rule,
                               CSSSelector* sel) {
-  if (!hash)
+  if (!key)
     return;
-  CSSRuleDataList* rules = dict.find(hash);
+  CSSRuleDataList* rules = map.get(key);
   if (!rules) {
     rules = new CSSRuleDataList(m_ruleCount++, rule, sel);
-    dict.insert(hash, rules);
+    map.insert(key, rules);
+  } else
+    rules->append(m_ruleCount++, rule, sel);
+}
+
+void CSSRuleSet::addToRuleSet(int key,
+                              IntRuleMap& map,
+                              CSSStyleRuleImpl* rule,
+                              CSSSelector* sel) {
+  assert(key);
+  assert(key != -1);
+  CSSRuleDataList* rules = map.get(key);
+  if (!rules) {
+    rules = new CSSRuleDataList(m_ruleCount++, rule, sel);
+    map.insert(key, rules);
   } else
     rules->append(m_ruleCount++, rule, sel);
 }
@@ -1483,7 +1501,8 @@ void CSSRuleSet::addRule(CSSStyleRuleImpl* rule, CSSSelector* sel) {
 
   Q_UINT16 localName = localNamePart(sel->tag);
   if (localName != anyLocalName) {
-    addToRuleSet((void*)(int)localName, m_tagRules, rule, sel);
+    // FIXME: maybe it would be better to just use an int-keyed HashMap here
+    addToRuleSet(localName, m_tagRules, rule, sel);
     return;
   }
 

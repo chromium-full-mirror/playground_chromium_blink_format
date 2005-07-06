@@ -50,7 +50,7 @@ HashTableStats::~HashTableStats() {
         100.0 * collisionGraph[i] / numAccesses);
   }
   printf("%d rehashes\n", numRehashes);
-  printf("%d removes, %d reinserts\n", numRemoves, numReinserts);
+  printf("%d reinserts\n", numReinserts);
 }
 
 void HashTableStats::recordCollisionAtCount(int count) {
