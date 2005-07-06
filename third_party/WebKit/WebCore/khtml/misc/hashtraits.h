@@ -39,6 +39,7 @@ struct HashTraits {
 };
 
 // may not be appropriate for all uses since it would disallow 0 and -1 as keys
+template <>
 struct HashTraits<int> {
   typedef int traitType;
   static const bool emptyValueIsZero = true;
