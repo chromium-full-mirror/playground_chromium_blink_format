@@ -80,6 +80,11 @@ class QPtrDictIterator {
 
   T* toFirst() { return (T*)(impl.toFirst()); }
 
+  T* operator()() {
+    T* ret = (T*)impl.current();
+    ++impl;
+    return ret;
+  }
   T* operator++() { return (T*)++impl; }
 
  private:
