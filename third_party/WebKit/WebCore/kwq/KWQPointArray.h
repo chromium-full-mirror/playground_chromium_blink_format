@@ -35,6 +35,9 @@
 #include "KWQMemArray.h"
 
 typedef struct _NSPoint NSPoint;
+typedef struct CGPoint CGPoint;
+
+class QRect;
 
 class QPoint {
  public:
@@ -45,10 +48,22 @@ class QPoint {
   int x() const { return xCoord; }
   int y() const { return yCoord; }
 
+  void setX(int x) { xCoord = x; }
+  void setY(int y) { yCoord = y; }
+
+  bool isNull() const { return xCoord == 0 && yCoord == 0; }
+
+  QPoint& operator-=(const QPoint& two) {
+    xCoord -= two.xCoord;
+    yCoord -= two.yCoord;
+    return *this;
+  }
+  friend const QPoint operator*(const QPoint& p, double s);
   friend QPoint operator+(const QPoint&, const QPoint&);
   friend QPoint operator-(const QPoint&, const QPoint&);
 
   operator NSPoint() const;
+  operator CGPoint() const;
 
  private:
   int xCoord;
@@ -59,9 +74,14 @@ class QPointArray : public QMemArray<QPoint> {
  public:
   QPointArray() {}
   QPointArray(int size) : QMemArray<QPoint>(size) {}
-
+  QPointArray(const QRect& rect);
   QPointArray(int, const int*);
 
+  QRect boundingRect() const;
+
+  QPointArray copy() const;
+
+  void point(uint, int*, int*);
   void setPoint(uint, int, int);
 #if 0
     // FIXME: Workaround for Radar 2921061.
