@@ -474,7 +474,7 @@ template <typename Key,
           typename Traits>
 inline bool HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::contains(
     const KeyType& key) const {
-  return lookup(key).second;
+  return const_cast<HashTable*>(this)->lookup(key).second;
 }
 
 template <typename Key,
