@@ -436,6 +436,8 @@ class KWQKHTMLPart : public KHTMLPart {
 
   NSView* mouseDownViewIfStillGood();
 
+  bool userGestureHint();
+
   QString generateFrameName();
 
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
