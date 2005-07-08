@@ -74,7 +74,7 @@ Value ErrorProtoFuncImp::call(ExecState* exec,
 
   v = thisObj.get(exec, messagePropertyName);
   if (v.type() != UndefinedType) {
-    s += " - " + v.toString(exec);
+    s += " : " + v.toString(exec);  // Mozilla compatible format
   }
 
   return String(s);
