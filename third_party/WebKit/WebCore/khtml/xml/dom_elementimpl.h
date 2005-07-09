@@ -365,7 +365,8 @@ enum MappedAttributeEntry {
   eTable,
   eCell,
   eCaption,
-  eLastEntry
+  eLastEntry,
+  eMarquee
 };
 
 class CSSMappedAttributeDeclarationImpl
