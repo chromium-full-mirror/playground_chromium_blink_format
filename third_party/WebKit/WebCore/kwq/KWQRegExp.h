@@ -49,6 +49,8 @@ class QRegExp {
   int pos(int n = 0);
   int matchedLength() const;
 
+  QString cap(int n = 0) const;
+
  private:
   class KWQRegExpPrivate;
   KWQRefPtr<KWQRegExpPrivate> d;
