@@ -90,8 +90,9 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-int HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::size() const {
-  return m_impl.count();
+inline int HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::size()
+    const {
+  return m_impl.size();
 }
 
 template <typename Key,
@@ -109,8 +110,8 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-bool HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::isEmpty()
-    const {
+inline bool
+HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::isEmpty() const {
   return size() == 0;
 }
 
@@ -119,8 +120,9 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::iterator
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::begin() {
+inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
+    iterator
+    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::begin() {
   return m_impl.begin();
 }
 
@@ -129,8 +131,9 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::iterator
-HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::end() {
+inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
+    iterator
+    HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::end() {
   return m_impl.end();
 }
 
@@ -139,7 +142,7 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
+inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
     const_iterator
     HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::begin()
         const {
@@ -151,7 +154,7 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
+inline typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
     const_iterator
     HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::end() const {
   return m_impl.end();
@@ -217,7 +220,7 @@ template <typename Key,
           typename HashFunctions,
           typename KeyTraits,
           typename MappedTraits>
-Mapped HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::get(
+inline Mapped HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::get(
     const KeyType& key) const {
   const_iterator it = find(key);
   if (it == end())

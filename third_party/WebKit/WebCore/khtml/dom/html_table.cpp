@@ -42,7 +42,7 @@ HTMLTableCaptionElement::HTMLTableCaptionElement(
     : HTMLElement(impl) {}
 
 HTMLTableCaptionElement& HTMLTableCaptionElement::operator=(const Node& other) {
-  assignOther(other, ID_CAPTION);
+  assignOther(other, HTMLNames::caption());
   return *this;
 }
 
@@ -76,7 +76,8 @@ HTMLTableCellElement::HTMLTableCellElement(HTMLTableCellElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTableCellElement& HTMLTableCellElement::operator=(const Node& other) {
-  if (other.elementId() != ID_TD && other.elementId() != ID_TH) {
+  if (!other.handle()->hasTagName(HTMLNames::td()) ||
+      !other.handle()->hasTagName(HTMLNames::th())) {
     if (impl)
       impl->deref();
     impl = 0;
@@ -273,7 +274,8 @@ HTMLTableColElement::HTMLTableColElement(HTMLTableColElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTableColElement& HTMLTableColElement::operator=(const Node& other) {
-  if (other.elementId() != ID_COL && other.elementId() != ID_COLGROUP) {
+  if (!other.handle()->hasTagName(HTMLNames::col()) &&
+      !other.handle()->hasTagName(HTMLNames::colgroup())) {
     if (impl)
       impl->deref();
     impl = 0;
@@ -370,7 +372,7 @@ HTMLTableElement::HTMLTableElement(HTMLTableElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTableElement& HTMLTableElement::operator=(const Node& other) {
-  assignOther(other, ID_TABLE);
+  assignOther(other, HTMLNames::table());
   return *this;
 }
 
@@ -591,7 +593,7 @@ HTMLTableRowElement::HTMLTableRowElement(HTMLTableRowElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTableRowElement& HTMLTableRowElement::operator=(const Node& other) {
-  assignOther(other, ID_TR);
+  assignOther(other, HTMLNames::tr());
   return *this;
 }
 
@@ -720,8 +722,9 @@ HTMLTableSectionElement::HTMLTableSectionElement(
     : HTMLElement(impl) {}
 
 HTMLTableSectionElement& HTMLTableSectionElement::operator=(const Node& other) {
-  if (other.elementId() != ID_TBODY && other.elementId() != ID_THEAD &&
-      other.elementId() != ID_TFOOT) {
+  if (!other.handle()->hasTagName(HTMLNames::tbody()) &&
+      !other.handle()->hasTagName(HTMLNames::thead()) &&
+      !other.handle()->hasTagName(HTMLNames::tfoot())) {
     if (impl)
       impl->deref();
     impl = 0;

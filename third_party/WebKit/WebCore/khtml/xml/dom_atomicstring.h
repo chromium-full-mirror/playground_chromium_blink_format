@@ -123,17 +123,14 @@ inline bool operator==(const AtomicString& a, const char* b) {
 
 // List of property names, passed to a macro so we can do set them up various
 // ways without repeating the list.
-#define KHTML_ATOMICSTRING_EACH_GLOBAL(macro)
 
-// Define external global variables for all property names above (and one more).
+// Define external global variables for the commonly used atomic strings.
 #if !KHTML_ATOMICSTRING_HIDE_GLOBALS
 extern const AtomicString nullAtom;
 extern const AtomicString emptyAtom;
-#define KHTML_ATOMICSTRING_DECLARE_GLOBAL(name) \
-  extern const AtomicString name##PropertyName;
-KHTML_ATOMICSTRING_EACH_GLOBAL(KHTML_ATOMICSTRING_DECLARE_GLOBAL)
-KHTML_ATOMICSTRING_DECLARE_GLOBAL(specialPrototype)
-#undef KHTML_ATOMICSTRING_DECLARE_GLOBAL
+extern const AtomicString textAtom;
+extern const AtomicString commentAtom;
+extern const AtomicString starAtom;
 #endif
 
 bool operator==(const AtomicString& a, const DOMString& b);

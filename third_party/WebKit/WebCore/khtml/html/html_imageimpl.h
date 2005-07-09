@@ -74,9 +74,11 @@ class HTMLImageElementImpl : public HTMLElementImpl {
 
  public:
   HTMLImageElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
+  HTMLImageElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
   ~HTMLImageElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
@@ -159,7 +161,8 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
   HTMLAreaElementImpl(DocumentPtr* doc);
   ~HTMLAreaElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
@@ -211,10 +214,11 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 class HTMLMapElementImpl : public HTMLElementImpl {
  public:
   HTMLMapElementImpl(DocumentPtr* doc);
-
   ~HTMLMapElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 1; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   virtual DOMString getName() const { return m_name; }
 

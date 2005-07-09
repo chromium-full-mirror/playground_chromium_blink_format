@@ -26,7 +26,6 @@
 #ifndef HTML_BASEIMPL_H
 #define HTML_BASEIMPL_H
 
-#include "html/dtd.h"
 #include "html/html_elementimpl.h"
 #include "misc/khtmllayout.h"
 
@@ -54,7 +53,8 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
   HTMLBodyElementImpl(DocumentPtr* doc);
   ~HTMLBodyElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 10; }
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;
@@ -91,10 +91,13 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
  public:
   HTMLFrameElementImpl(DocumentPtr* doc);
-
+  HTMLFrameElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
   ~HTMLFrameElementImpl();
 
-  virtual Id id() const;
+  void init();
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
@@ -168,10 +171,11 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
  public:
   HTMLFrameSetElementImpl(DocumentPtr* doc);
-
   ~HTMLFrameSetElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 10; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
@@ -216,10 +220,11 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 class HTMLHeadElementImpl : public HTMLElementImpl {
  public:
   HTMLHeadElementImpl(DocumentPtr* doc);
-
   ~HTMLHeadElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
+  virtual int tagPriority() const { return 10; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   DOMString profile() const;
   void setProfile(const DOMString&);
@@ -232,7 +237,9 @@ class HTMLHtmlElementImpl : public HTMLElementImpl {
   HTMLHtmlElementImpl(DocumentPtr* doc);
   ~HTMLHtmlElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 11; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   DOMString version() const;
   void setVersion(const DOMString&);
@@ -243,10 +250,10 @@ class HTMLHtmlElementImpl : public HTMLElementImpl {
 class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
  public:
   HTMLIFrameElementImpl(DocumentPtr* doc);
-
   ~HTMLIFrameElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 1; }
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;

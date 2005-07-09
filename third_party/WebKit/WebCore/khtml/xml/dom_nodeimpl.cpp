@@ -27,7 +27,6 @@
 #include "dom/dom_exception.h"
 #include "dom/dom2_events.h"
 #include "misc/htmlattrs.h"
-#include "misc/htmltags.h"
 #include "xml/dom_elementimpl.h"
 #include "xml/dom_textimpl.h"
 #include "xml/dom2_eventsimpl.h"
@@ -50,7 +49,8 @@
 #include "khtmlview.h"
 #include "khtml_part.h"
 
-#include "html/dtd.h"
+// FIXME: Should not have to include this.  Cut the HTML dependency!
+#include "htmlnames.h"
 
 #ifndef KHTML_NO_XBL
 #include "xbl/xbl_binding_manager.h"
@@ -64,8 +64,30 @@
 #define LOG(channel, formatAndArgs...) ((void)0)
 #endif
 
-using namespace DOM;
 using namespace khtml;
+
+namespace DOM {
+/**
+ * NodeList which lists all Nodes in a document with a given tag name
+ */
+class TagNodeListImpl : public NodeListImpl {
+ public:
+  TagNodeListImpl(NodeImpl* n,
+                  const AtomicString& namespaceURI,
+                  const AtomicString& localName);
+
+  // DOM methods overridden from  parent classes
+  virtual unsigned long length() const;
+  virtual NodeImpl* item(unsigned long index) const;
+
+  // Other methods (not part of DOM)
+
+ protected:
+  virtual bool nodeMatches(NodeImpl* testNode) const;
+
+  AtomicString m_namespaceURI;
+  AtomicString m_localName;
+};
 
 NodeImpl::NodeImpl(DocumentPtr* doc)
     : document(doc),
@@ -148,7 +170,7 @@ NodeImpl* NodeImpl::lastChild() const {
   return 0;
 }
 
-NodeImpl* NodeImpl::lastDescendent() const {
+NodeImpl* NodeImpl::lastDescendant() const {
   NodeImpl* n = const_cast<NodeImpl*>(this);
   while (n && n->lastChild())
     n = n->lastChild();
@@ -230,12 +252,12 @@ void NodeImpl::normalize() {
   }
 }
 
-DOMString NodeImpl::prefix() const {
+const AtomicString& NodeImpl::prefix() const {
   // For nodes other than elements and attributes, the prefix is always null
-  return DOMString();
+  return nullAtom;
 }
 
-void NodeImpl::setPrefix(const DOMString& /*_prefix*/, int& exceptioncode) {
+void NodeImpl::setPrefix(const AtomicString& /*_prefix*/, int& exceptioncode) {
   // The spec says that for nodes other than elements and attributes, prefix is
   // always null.
   // It does not say what to do when the user tries to set the prefix on another
@@ -244,12 +266,12 @@ void NodeImpl::setPrefix(const DOMString& /*_prefix*/, int& exceptioncode) {
   exceptioncode = DOMException::NAMESPACE_ERR;
 }
 
-DOMString NodeImpl::localName() const {
-  return DOMString();
+const AtomicString& NodeImpl::localName() const {
+  return emptyAtom;
 }
 
-DOMString NodeImpl::namespaceURI() const {
-  return DOMString();
+const AtomicString& NodeImpl::namespaceURI() const {
+  return emptyAtom;
 }
 
 void NodeImpl::setFirstChild(NodeImpl*) {}
@@ -285,12 +307,6 @@ void NodeImpl::setChanged(bool b) {
     }
     getDocument()->setDocumentChanged(true);
   }
-}
-
-bool NodeImpl::isInline() const {
-  if (m_render)
-    return m_render->style()->display() == khtml::INLINE;
-  return !isElementNode();
 }
 
 bool NodeImpl::isFocusable() const {
@@ -1007,18 +1023,12 @@ NodeImpl* NodeImpl::traversePreviousNodePostOrder(
   return 0;
 }
 
-void NodeImpl::checkSetPrefix(const DOMString& _prefix, int& exceptioncode) {
-// Perform error checking as required by spec for setting Node.prefix. Used by
-// ElementImpl::setPrefix() and AttrImpl::setPrefix()
+void NodeImpl::checkSetPrefix(const AtomicString& _prefix, int& exceptioncode) {
+  // Perform error checking as required by spec for setting Node.prefix. Used by
+  // ElementImpl::setPrefix() and AttrImpl::setPrefix()
 
-#if 0
-    // FIXME: Add this check (but not in a way that depends on the C++ DOM!)
-    // INVALID_CHARACTER_ERR: Raised if the specified prefix contains an illegal character.
-    if (!Element::khtmlValidPrefix(_prefix)) {
-        exceptioncode = DOMException::INVALID_CHARACTER_ERR;
-        return;
-    }
-#endif
+  // FIXME: Implement support for INVALID_CHARACTER_ERR: Raised if the specified
+  // prefix contains an illegal character.
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly.
   if (isReadOnly()) {
@@ -1026,28 +1036,27 @@ void NodeImpl::checkSetPrefix(const DOMString& _prefix, int& exceptioncode) {
     return;
   }
 
-  // NAMESPACE_ERR: - Raised if the specified prefix is malformed
+  // FIXME: Implement NAMESPACE_ERR: - Raised if the specified prefix is
+  // malformed
+  // We have to comment this out, since it's used for attributes and tag names,
+  // and we've only
+  // switched one over.
+  /*
   // - if the namespaceURI of this node is null,
   // - if the specified prefix is "xml" and the namespaceURI of this node is
-  // different from
+  different from
   //   "http://www.w3.org/XML/1998/namespace",
   // - if this node is an attribute and the specified prefix is "xmlns" and
   //   the namespaceURI of this node is different from
-  //   "http://www.w3.org/2000/xmlns/",
+  "http://www.w3.org/2000/xmlns/",
   // - or if this node is an attribute and the qualifiedName of this node is
-  // "xmlns" [Namespaces].
-  if (
-#if 0
-        // FIXME: Add this check (but not in a way that depends on the C++ DOM!)
-        Element::khtmlMalformedPrefix(_prefix) ||
-#endif
-      (namespacePart(id()) == noNamespace && id() > ID_LAST_TAG) ||
-      (_prefix == "xml" &&
-       DOMString(getDocument()->namespaceURI(id())) !=
-           "http://www.w3.org/XML/1998/namespace")) {
-    exceptioncode = DOMException::NAMESPACE_ERR;
-    return;
-  }
+  "xmlns" [Namespaces].
+  if ((namespacePart(id()) == noNamespace && id() > ID_LAST_TAG) ||
+      (_prefix == "xml" && DOMString(getDocument()->namespaceURI(id())) !=
+  "http://www.w3.org/XML/1998/namespace")) {
+      exceptioncode = DOMException::NAMESPACE_ERR;
+      return;
+  }*/
 }
 
 void NodeImpl::checkAddChild(NodeImpl* newChild, int& exceptioncode) {
@@ -1292,9 +1301,10 @@ RenderObject* NodeImpl::nextRenderer() {
   return 0;
 }
 
+// FIXME: This code is used by editing.  Seems like it could move over there and
+// not pollute NodeImpl.
 bool NodeImpl::isAtomicNode() const {
-  return !hasChildNodes() ||
-         (id() == ID_OBJECT && renderer() && renderer()->isReplaced());
+  return !hasChildNodes() || (renderer() && renderer()->isWidget());
 }
 
 NodeImpl* NodeImpl::previousNodeConsideringAtomicNodes() const {
@@ -1402,13 +1412,16 @@ long NodeImpl::maxOffset() const {
   return 1;
 }
 
+// FIXME: Shouldn't these functions be in the editing code?  Code that asks
+// questions about HTML in the core DOM class
+// is obviously misplaced.
 // method for editing madness, which allows BR,1 as a position, though that is
 // incorrect
 long NodeImpl::maxDeepOffset() const {
   if (offsetInCharacters(nodeType()))
     return static_cast<const TextImpl*>(this)->length();
 
-  if (id() == ID_BR || (renderer() && renderer()->isReplaced()))
+  if (hasTagName(HTMLNames::br()) || (renderer() && renderer()->isReplaced()))
     return 1;
 
   return childNodeCount();
@@ -1455,7 +1468,7 @@ ElementImpl* NodeImpl::enclosingBlockFlowOrTableElement() const {
     n = n->parentNode();
     if (!n)
       break;
-    if (n->isBlockFlowOrTable() || n->id() == ID_BODY)
+    if (n->isBlockFlowOrTable() || n->hasTagName(HTMLNames::body()))
       return static_cast<ElementImpl*>(n);
   }
   return 0;
@@ -1470,7 +1483,7 @@ ElementImpl* NodeImpl::enclosingBlockFlowElement() const {
     n = n->parentNode();
     if (!n)
       break;
-    if (n->isBlockFlow() || n->id() == ID_BODY)
+    if (n->isBlockFlow() || n->hasTagName(HTMLNames::body()))
       return static_cast<ElementImpl*>(n);
   }
   return 0;
@@ -1482,7 +1495,7 @@ ElementImpl* NodeImpl::enclosingInlineElement() const {
 
   while (1) {
     p = n->parentNode();
-    if (!p || p->isBlockFlow() || p->id() == ID_BODY)
+    if (!p || p->isBlockFlow() || p->hasTagName(HTMLNames::body()))
       return static_cast<ElementImpl*>(n);
     // Also stop if any previous sibling is a block
     for (NodeImpl* sibling = n->previousSibling(); sibling;
@@ -1501,7 +1514,7 @@ ElementImpl* NodeImpl::rootEditableElement() const {
     return 0;
 
   NodeImpl* n = const_cast<NodeImpl*>(this);
-  if (n->id() == ID_BODY)
+  if (n->hasTagName(HTMLNames::body()))
     return static_cast<ElementImpl*>(n);
 
   NodeImpl* result = n->isEditableBlock() ? n : 0;
@@ -1509,7 +1522,7 @@ ElementImpl* NodeImpl::rootEditableElement() const {
     n = n->parentNode();
     if (!n || !n->isContentEditable())
       break;
-    if (n->id() == ID_BODY) {
+    if (n->hasTagName(HTMLNames::body())) {
       result = n;
       break;
     }
@@ -1528,6 +1541,9 @@ bool NodeImpl::inSameContainingBlockFlowElement(NodeImpl* n) {
            : false;
 }
 
+// FIXME: End of obviously misplaced HTML editing functions.  Try to move these
+// out of NodeImpl.
+
 void NodeImpl::addEventListener(const DOMString& type,
                                 EventListener* listener,
                                 bool useCapture) {
@@ -1543,26 +1559,15 @@ void NodeImpl::removeEventListener(const DOMString& type,
 SharedPtr<NodeListImpl> NodeImpl::getElementsByTagNameNS(
     const DOMString& namespaceURI,
     const DOMString& localName) {
-  if (localName.isNull())
-    return SharedPtr<NodeListImpl>();
+  if (namespaceURI.isNull() || localName.isNull())
+    return SharedPtr<NodeListImpl>();  // FIXME: Who cares about this additional
+                                       // check?
 
-  Id idMask = namespaceMask | localNameMask;
-  if (localName[0] == '*')
-    idMask &= ~localNameMask;
-  if (namespaceURI.isNull() || namespaceURI[0] == '*')
-    idMask &= ~namespaceMask;
-
-  Id id = 0;  // 0 means "all items"
-  if ((idMask & localNameMask) ||
-      !namespaceURI.isNull()) {  // not getElementsByTagName("*")
-    id = getDocument()->tagId(namespaceURI.implementation(),
-                              localName.implementation(), true);
-    if (!id)  // not found -> we want to return an empty list, not "all items"
-      id = (Id)-1;  // HACK. HEAD has a cleaner implementation of
-                    // TagNodeListImpl it seems.
-  }
-
-  return SharedPtr<NodeListImpl>(new TagNodeListImpl(this, id, idMask));
+  DOMString name = localName;
+  if (getDocument()->isHTMLDocument())
+    name = localName.lower();
+  return SharedPtr<NodeListImpl>(new TagNodeListImpl(
+      this, AtomicString(namespaceURI), AtomicString(name)));
 }
 
 bool NodeImpl::isSupported(const DOMString& feature, const DOMString& version) {
@@ -1581,12 +1586,6 @@ bool NodeImpl::hasAttributes() const {
 NamedAttrMapImpl* NodeImpl::attributes() const {
   return 0;
 }
-
-#if APPLE_CHANGES
-NodeImpl::Id NodeImpl::identifier() const {
-  return id();
-}
-#endif
 
 #ifndef NDEBUG
 
@@ -1633,7 +1632,7 @@ void NodeImpl::showTreeAndMark(NodeImpl* markedNode1,
                                const char* markedLabel2) const {
   NodeImpl* rootNode;
   NodeImpl* node = (NodeImpl*)this;
-  while (node->parentNode() != NULL && node->id() != ID_BODY)
+  while (node->parentNode() && !node->hasTagName(HTMLNames::body()))
     node = node->parentNode();
   rootNode = node;
 
@@ -2096,12 +2095,8 @@ NodeImpl* ContainerNodeImpl::addChild(NodeImpl* newChild) {
                                                   // don't leak it
 
   // short check for consistency with DTD
-  if (!isXMLElementNode() && !newChild->isXMLElementNode() &&
-      !childAllowed(newChild)) {
-    // kdDebug( 6020 ) << "AddChild failed! id=" << id() << ", child->id=" <<
-    // newChild->id() << endl;
+  if (getDocument()->isHTMLDocument() && !childAllowed(newChild))
     return 0;
-  }
 
   // just add it...
   newChild->setParent(this);
@@ -2516,9 +2511,9 @@ bool ChildNodeListImpl::nodeMatches(NodeImpl* testNode) const {
 }
 
 TagNodeListImpl::TagNodeListImpl(NodeImpl* n,
-                                 NodeImpl::Id _id,
-                                 NodeImpl::Id _idMask)
-    : NodeListImpl(n), m_id(_id & _idMask), m_idMask(_idMask) {}
+                                 const AtomicString& namespaceURI,
+                                 const AtomicString& localName)
+    : NodeListImpl(n), m_namespaceURI(namespaceURI), m_localName(localName) {}
 
 unsigned long TagNodeListImpl::length() const {
   return recursiveLength();
@@ -2529,7 +2524,13 @@ NodeImpl* TagNodeListImpl::item(unsigned long index) const {
 }
 
 bool TagNodeListImpl::nodeMatches(NodeImpl* testNode) const {
-  return (testNode->isElementNode() && (testNode->id() & m_idMask) == m_id);
+  if (!testNode->isElementNode())
+    return false;
+
+  if (m_namespaceURI != starAtom && m_namespaceURI != testNode->namespaceURI())
+    return false;
+
+  return m_localName == starAtom || m_localName == testNode->localName();
 }
 
 NameNodeListImpl::NameNodeListImpl(NodeImpl* n, const DOMString& t)
@@ -2564,107 +2565,4 @@ SharedPtr<NodeImpl> NamedNodeMapImpl::removeNamedItemNS(
     int& exception) {
   return removeNamedItem(mapId(namespaceURI, localName, true), exception);
 }
-
-// ----------------------------------------------------------------------------
-
-// ### unused
-#if 0
-GenericRONamedNodeMapImpl::GenericRONamedNodeMapImpl(DocumentPtr* doc)
-    : NamedNodeMapImpl()
-{
-    m_doc = doc->document();
-    m_contents = new QPtrList<NodeImpl>;
 }
-
-GenericRONamedNodeMapImpl::~GenericRONamedNodeMapImpl()
-{
-    while (m_contents->count() > 0)
-        m_contents->take(0)->deref();
-
-    delete m_contents;
-}
-
-NodeImpl *GenericRONamedNodeMapImpl::getNamedItem ( const DOMString &name, int &/*exceptioncode*/ ) const
-{
-    QPtrListIterator<NodeImpl> it(*m_contents);
-    for (; it.current(); ++it)
-        if (it.current()->nodeName() == name)
-            return it.current();
-    return 0;
-}
-
-Node GenericRONamedNodeMapImpl::setNamedItem ( const Node &/*arg*/, int &exceptioncode )
-{
-    // can't modify this list through standard DOM functions
-    // NO_MODIFICATION_ALLOWED_ERR: Raised if this map is readonly
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return 0;
-}
-
-Node GenericRONamedNodeMapImpl::removeNamedItem ( const DOMString &/*name*/, int &exceptioncode )
-{
-    // can't modify this list through standard DOM functions
-    // NO_MODIFICATION_ALLOWED_ERR: Raised if this map is readonly
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return 0;
-}
-
-NodeImpl *GenericRONamedNodeMapImpl::item ( unsigned long index ) const
-{
-    // ### check this when calling from javascript using -1 = 2^sizeof(int)-1
-    // (also for other similar methods)
-    if (index >= m_contents->count())
-        return 0;
-
-    return m_contents->at(index);
-}
-
-unsigned long GenericRONamedNodeMapImpl::length(  ) const
-{
-    return m_contents->count();
-}
-
-NodeImpl *GenericRONamedNodeMapImpl::getNamedItemNS( const DOMString &namespaceURI,
-                                                     const DOMString &localName,
-                                                     int &/*exceptioncode*/ ) const
-{
-    NodeImpl::Id searchId = m_doc->tagId(namespaceURI.implementation(),
-                                                   localName.implementation(), true);
-
-    QPtrListIterator<NodeImpl> it(*m_contents);
-    for (; it.current(); ++it)
-        if (it.current()->id() == searchId)
-            return it.current();
-
-    return 0;
-}
-
-NodeImpl *GenericRONamedNodeMapImpl::setNamedItemNS( NodeImpl */*arg*/, int &exceptioncode )
-{
-    // can't modify this list through standard DOM functions
-    // NO_MODIFICATION_ALLOWED_ERR: Raised if this map is readonly
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return 0;
-}
-
-NodeImpl *GenericRONamedNodeMapImpl::removeNamedItemNS( const DOMString &/*namespaceURI*/,
-                                                        const DOMString &/*localName*/,
-                                                        int &exceptioncode )
-{
-    // can't modify this list through standard DOM functions
-    exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return 0;
-}
-
-void GenericRONamedNodeMapImpl::addNode(NodeImpl *n)
-{
-    // The spec says that in the case of duplicates we only keep the first one
-    int exceptioncode = 0;
-    if (getNamedItem(n->nodeName(),exceptioncode))
-        return;
-
-    n->ref();
-    m_contents->append(n);
-}
-
-#endif

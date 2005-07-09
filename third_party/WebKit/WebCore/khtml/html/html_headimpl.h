@@ -47,10 +47,12 @@ class HTMLBaseElementImpl : public HTMLElementImpl {
   HTMLBaseElementImpl(DocumentPtr* doc);
   ~HTMLBaseElementImpl();
 
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
+
   DOMString href() const { return m_href; }
   DOMString target() const { return m_target; }
 
-  virtual Id id() const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -73,7 +75,8 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
   HTMLLinkElementImpl(DocumentPtr* doc);
   ~HTMLLinkElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   bool disabled() const;
   void setDisabled(bool);
@@ -148,10 +151,11 @@ class HTMLLinkElementImpl : public khtml::CachedObjectClient,
 class HTMLMetaElementImpl : public HTMLElementImpl {
  public:
   HTMLMetaElementImpl(DocumentPtr* doc);
-
   ~HTMLMetaElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
+
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void insertedIntoDocument();
 
@@ -182,12 +186,18 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
   HTMLScriptElementImpl(DocumentPtr* doc);
   ~HTMLScriptElementImpl();
 
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 1; }
+  virtual bool checkDTD(const NodeImpl* newChild) {
+    return newChild->isTextNode();
+  }
+
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void notifyFinished(khtml::CachedObject* finishedObj);
+
   virtual void childrenChanged();
 
-  virtual Id id() const;
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
   void setCreatedByParser(bool createdByParser) {
@@ -230,7 +240,11 @@ class HTMLStyleElementImpl : public HTMLElementImpl {
   HTMLStyleElementImpl(DocumentPtr* doc);
   ~HTMLStyleElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 1; }
+  virtual bool checkDTD(const NodeImpl* newChild) {
+    return newChild->isTextNode();
+  }
 
   StyleSheetImpl* sheet() const { return m_sheet; }
 
@@ -264,10 +278,11 @@ class HTMLStyleElementImpl : public HTMLElementImpl {
 class HTMLTitleElementImpl : public HTMLElementImpl {
  public:
   HTMLTitleElementImpl(DocumentPtr* doc);
-
   ~HTMLTitleElementImpl();
 
-  virtual Id id() const;
+  virtual bool checkDTD(const NodeImpl* newChild) {
+    return newChild->isTextNode();
+  }
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();

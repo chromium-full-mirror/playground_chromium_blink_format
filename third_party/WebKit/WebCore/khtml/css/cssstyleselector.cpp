@@ -344,7 +344,7 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
           rules->getClassRules(singleClass->string().implementation()),
           firstRuleIndex, lastRuleIndex);
   }
-  matchRulesForList(rules->getTagRules(localNamePart(element->id())),
+  matchRulesForList(rules->getTagRules(element->localName().implementation()),
                     firstRuleIndex, lastRuleIndex);
   matchRulesForList(rules->getUniversalRules(), firstRuleIndex, lastRuleIndex);
 
@@ -367,9 +367,9 @@ void CSSStyleSelector::matchRulesForList(CSSRuleDataList* rules,
     return;
   for (CSSRuleData* d = rules->first(); d; d = d->next()) {
     CSSStyleRuleImpl* rule = d->rule();
-    Q_UINT16 cssTagId = localNamePart(element->id());
-    Q_UINT16 tag = localNamePart(d->selector()->tag);
-    if ((cssTagId == tag || tag == anyLocalName) &&
+    const AtomicString& localName = element->localName();
+    const AtomicString& selectorLocalName = d->selector()->tag.localName();
+    if ((localName == selectorLocalName || selectorLocalName == starAtom) &&
         checkSelector(d->selector(), element)) {
       // If the rule has no properties to apply, then ignore it.
       CSSMutableStyleDeclarationImpl* decl = rule->declaration();
@@ -614,7 +614,7 @@ bool CSSStyleSelector::canShareStyleWithElement(NodeImpl* n) {
     bool mouseInside =
         element->renderer() ? element->renderer()->mouseInside() : false;
     StyledElementImpl* s = static_cast<StyledElementImpl*>(n);
-    if (s->renderer() && (s->id() == element->id()) && !s->hasID() &&
+    if (s->renderer() && (s->tagName() == element->tagName()) && !s->hasID() &&
         (s->hasClass() == element->hasClass()) && !s->inlineStyleDecl() &&
         (s->hasMappedAttributes() == styledElement->hasMappedAttributes()) &&
         (s->isLink() == element->isLink()) &&
@@ -915,10 +915,10 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
     // quirks mode we force
     // these tags to retain their display types.
     if (!strictParsing && e) {
-      if (e->id() == ID_TD) {
+      if (e->hasTagName(HTMLNames::td())) {
         style->setDisplay(TABLE_CELL);
         style->setFloating(FNONE);
-      } else if (e->id() == ID_TABLE)
+      } else if (e->hasTagName(HTMLNames::table()))
         style->setDisplay(style->isDisplayInlineType() ? INLINE_TABLE : TABLE);
     }
 
@@ -926,14 +926,15 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
     // This is necessary to
     // fix a crash where a site tries to position these objects.  They also
     // never honor display.
-    if (e && (e->id() == ID_FRAME || e->id() == ID_FRAMESET)) {
+    if (e && (e->hasTagName(HTMLNames::frame()) ||
+              e->hasTagName(HTMLNames::frameset()))) {
       style->setPosition(STATIC);
       style->setDisplay(BLOCK);
     }
 
     // Table headers with a text-align of auto will change the text-align to
     // center.
-    if (e && e->id() == ID_TH && style->textAlign() == TAAUTO)
+    if (e && e->hasTagName(HTMLNames::th()) && style->textAlign() == TAAUTO)
       style->setTextAlign(CENTER);
 
     // Mutate the display to BLOCK or TABLE for certain cases, e.g., if someone
@@ -1025,10 +1026,10 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, ElementImpl* e) {
   // so, we can't allow that to apply to every element on the page.  We assume
   // the author intended
   // to apply the rules only to links.
-  bool onlyHoverActive = (sel->tag == anyQName &&
-                          (sel->match == CSSSelector::PseudoClass &&
-                           (sel->pseudoType() == CSSSelector::PseudoHover ||
-                            sel->pseudoType() == CSSSelector::PseudoActive)));
+  bool onlyHoverActive =
+      (!sel->hasTag() && (sel->match == CSSSelector::PseudoClass &&
+                          (sel->pseudoType() == CSSSelector::PseudoHover ||
+                           sel->pseudoType() == CSSSelector::PseudoActive)));
   bool affectedByHover = style ? style->affectedByHoverRules() : false;
   bool affectedByActive = style ? style->affectedByActiveRules() : false;
   bool havePseudo = pseudoStyle != RenderStyle::NOPSEUDO;
@@ -1145,20 +1146,14 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
   if (!e)
     return false;
 
-  if (sel->tag != anyQName) {
-    int eltID = e->id();
-    Q_UINT16 localName = localNamePart(eltID);
-    Q_UINT16 ns = namespacePart(eltID);
-    Q_UINT16 selLocalName = localNamePart(sel->tag);
-    Q_UINT16 selNS = namespacePart(sel->tag);
+  if (sel->hasTag()) {
+    const AtomicString& localName = e->localName();
+    const AtomicString& ns = e->namespaceURI();
+    const AtomicString& selLocalName = sel->tag.localName();
+    const AtomicString& selNS = sel->tag.namespaceURI();
 
-    if (localName <= ID_LAST_TAG && e->isHTMLElement())
-      ns = xhtmlNamespace;  // FIXME: Really want to move away from this
-                            // complicated hackery and just
-                            // switch tags and attr names over to AtomicStrings.
-
-    if ((selLocalName != anyLocalName && localName != selLocalName) ||
-        (selNS != anyNamespace && ns != selNS))
+    if ((selLocalName != starAtom && localName != selLocalName) ||
+        (selNS != starAtom && ns != selNS))
       return false;
   }
 
@@ -1349,7 +1344,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         // If we're in quirks mode, then hover should never match anchors with
         // no
         // href.  This is important for sites like wsj.com.
-        if (strictParsing || e->id() != ID_A || e->isLink()) {
+        if (strictParsing || !e->hasTagName(HTMLNames::a()) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByHoverRules(true);
           if (e->renderer()) {
@@ -1381,7 +1376,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         // If we're in quirks mode, then :active should never match anchors with
         // no
         // href.
-        if (strictParsing || e->id() != ID_A || e->isLink()) {
+        if (strictParsing || !e->hasTagName(HTMLNames::a()) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByActiveRules(true);
           else if (e->renderer())
@@ -1475,20 +1470,6 @@ void CSSRuleSet::addToRuleSet(DOM::DOMStringImpl* key,
     rules->append(m_ruleCount++, rule, sel);
 }
 
-void CSSRuleSet::addToRuleSet(int key,
-                              IntRuleMap& map,
-                              CSSStyleRuleImpl* rule,
-                              CSSSelector* sel) {
-  assert(key);
-  assert(key != -1);
-  CSSRuleDataList* rules = map.get(key);
-  if (!rules) {
-    rules = new CSSRuleDataList(m_ruleCount++, rule, sel);
-    map.insert(key, rules);
-  } else
-    rules->append(m_ruleCount++, rule, sel);
-}
-
 void CSSRuleSet::addRule(CSSStyleRuleImpl* rule, CSSSelector* sel) {
   if (sel->match == CSSSelector::Id) {
     addToRuleSet(sel->value.implementation(), m_idRules, rule, sel);
@@ -1499,10 +1480,9 @@ void CSSRuleSet::addRule(CSSStyleRuleImpl* rule, CSSSelector* sel) {
     return;
   }
 
-  Q_UINT16 localName = localNamePart(sel->tag);
-  if (localName != anyLocalName) {
-    // FIXME: maybe it would be better to just use an int-keyed HashMap here
-    addToRuleSet(localName, m_tagRules, rule, sel);
+  const AtomicString& localName = sel->tag.localName();
+  if (localName != starAtom) {
+    addToRuleSet(localName.implementation(), m_tagRules, rule, sel);
     return;
   }
 

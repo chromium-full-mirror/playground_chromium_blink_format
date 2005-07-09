@@ -27,7 +27,7 @@
 
 #include "visible_position.h"
 #include "misc/htmlattrs.h"
-#include "misc/htmltags.h"
+#include "htmlnames.h"
 #include "xml/dom_docimpl.h"
 #include "html_interchange.h"
 #include "xml/dom_textimpl.h"
@@ -58,6 +58,7 @@ using DOM::DOMString;
 using DOM::HTMLElementImpl;
 using DOM::CSSMutableStyleDeclarationImpl;
 using DOM::Position;
+using DOM::HTMLNames;
 
 namespace khtml {
 
@@ -162,30 +163,19 @@ static bool isProbablyBlock(const NodeImpl* node) {
   if (!node)
     return false;
 
-  switch (node->id()) {
-    case ID_BLOCKQUOTE:
-    case ID_DD:
-    case ID_DIV:
-    case ID_DL:
-    case ID_DT:
-    case ID_H1:
-    case ID_H2:
-    case ID_H3:
-    case ID_H4:
-    case ID_H5:
-    case ID_H6:
-    case ID_HR:
-    case ID_LI:
-    case ID_OL:
-    case ID_P:
-    case ID_PRE:
-    case ID_TD:
-    case ID_TH:
-    case ID_UL:
-      return true;
-  }
-
-  return false;
+  // FIXME: This function seems really broken to me.  It isn't even including
+  // all the block-level elements.
+  return (
+      node->hasTagName(HTMLNames::blockquote()) ||
+      node->hasTagName(HTMLNames::dd()) || node->hasTagName(HTMLNames::div()) ||
+      node->hasTagName(HTMLNames::dl()) || node->hasTagName(HTMLNames::dt()) ||
+      node->hasTagName(HTMLNames::h1()) || node->hasTagName(HTMLNames::h2()) ||
+      node->hasTagName(HTMLNames::h3()) || node->hasTagName(HTMLNames::h4()) ||
+      node->hasTagName(HTMLNames::h5()) || node->hasTagName(HTMLNames::h6()) ||
+      node->hasTagName(HTMLNames::hr()) || node->hasTagName(HTMLNames::li()) ||
+      node->hasTagName(HTMLNames::ol()) || node->hasTagName(HTMLNames::p()) ||
+      node->hasTagName(HTMLNames::pre()) || node->hasTagName(HTMLNames::td()) ||
+      node->hasTagName(HTMLNames::th()) || node->hasTagName(HTMLNames::ul()));
 }
 
 static bool isMailPasteAsQuotationNode(const NodeImpl* node) {
@@ -207,16 +197,12 @@ static bool isProbablyTableStructureNode(const NodeImpl* node) {
   if (!node)
     return false;
 
-  switch (node->id()) {
-    case ID_TABLE:
-    case ID_TBODY:
-    case ID_TD:
-    case ID_TFOOT:
-    case ID_THEAD:
-    case ID_TR:
-      return true;
-  }
-  return false;
+  return (node->hasTagName(HTMLNames::table()) ||
+          node->hasTagName(HTMLNames::tbody()) ||
+          node->hasTagName(HTMLNames::td()) ||
+          node->hasTagName(HTMLNames::tfoot()) ||
+          node->hasTagName(HTMLNames::thead()) ||
+          node->hasTagName(HTMLNames::tr()));
 }
 
 void ReplacementFragment::pruneEmptyNodes() {
@@ -241,7 +227,7 @@ void ReplacementFragment::pruneEmptyNodes() {
 
 bool ReplacementFragment::isInterchangeNewlineNode(const NodeImpl* node) {
   static DOMString interchangeNewlineClassString(AppleInterchangeNewline);
-  return node && node->id() == ID_BR &&
+  return node && node->hasTagName(HTMLNames::br()) &&
          static_cast<const ElementImpl*>(node)->getAttribute(ATTR_CLASS) ==
              interchangeNewlineClassString;
 }
@@ -514,11 +500,18 @@ void ReplacementFragment::removeStyleNodes() {
     NodeImpl* next = node->traverseNextNode();
     // This list of tags change the appearance of content
     // in ways we can add back on later with CSS, if necessary.
-    if (node->id() == ID_B || node->id() == ID_BIG || node->id() == ID_CENTER ||
-        node->id() == ID_FONT || node->id() == ID_I || node->id() == ID_S ||
-        node->id() == ID_SMALL || node->id() == ID_STRIKE ||
-        node->id() == ID_SUB || node->id() == ID_SUP || node->id() == ID_TT ||
-        node->id() == ID_U || isStyleSpan(node)) {
+    //  FIXME: This list is incomplete
+    if (node->hasTagName(HTMLNames::b()) ||
+        node->hasTagName(HTMLNames::big()) ||
+        node->hasTagName(HTMLNames::center()) ||
+        node->hasTagName(HTMLNames::font()) ||
+        node->hasTagName(HTMLNames::i()) || node->hasTagName(HTMLNames::s()) ||
+        node->hasTagName(HTMLNames::small()) ||
+        node->hasTagName(HTMLNames::strike()) ||
+        node->hasTagName(HTMLNames::sub()) ||
+        node->hasTagName(HTMLNames::sup()) ||
+        node->hasTagName(HTMLNames::tt()) || node->hasTagName(HTMLNames::u()) ||
+        isStyleSpan(node)) {
       removeNodePreservingChildren(node);
     } else if (node->isHTMLElement()) {
       HTMLElementImpl* elem = static_cast<HTMLElementImpl*>(node);
@@ -756,8 +749,8 @@ void ReplaceSelectionCommand::doApply() {
   if (!linePlaceholder) {
     Position downstream = startPos.downstream();
     downstream = positionOutsideContainingSpecialElement(downstream);
-    if (downstream.node()->id() == ID_BR && downstream.offset() == 0 &&
-        m_fragment.hasInterchangeNewlineAtEnd() &&
+    if (downstream.node()->hasTagName(HTMLNames::br()) &&
+        downstream.offset() == 0 && m_fragment.hasInterchangeNewlineAtEnd() &&
         isStartOfLine(VisiblePosition(downstream, VP_DEFAULT_AFFINITY)))
       linePlaceholder = downstream.node();
   }
@@ -939,13 +932,13 @@ void ReplaceSelectionCommand::doApply() {
       }
     }
   } else {
-    if (m_lastNodeInserted && m_lastNodeInserted->id() == ID_BR &&
+    if (m_lastNodeInserted && m_lastNodeInserted->hasTagName(HTMLNames::br()) &&
         !document()->inStrictMode()) {
       document()->updateLayout();
       VisiblePosition pos(Position(m_lastNodeInserted, 1), DOWNSTREAM);
       if (isEndOfBlock(pos)) {
         NodeImpl* next = m_lastNodeInserted->traverseNextNode();
-        bool hasTrailingBR = next && next->id() == ID_BR &&
+        bool hasTrailingBR = next && next->hasTagName(HTMLNames::br()) &&
                              m_lastNodeInserted->enclosingBlockFlowElement() ==
                                  next->enclosingBlockFlowElement();
         if (!hasTrailingBR) {
@@ -976,7 +969,7 @@ void ReplaceSelectionCommand::doApply() {
         insertNodeAfter(node, refNode);
         refNode = node;
         // We want to move the first BR we see, so check for that here.
-        if (node->id() == ID_BR)
+        if (node->hasTagName(HTMLNames::br()))
           break;
         node = next;
       }
@@ -1130,7 +1123,7 @@ void ReplaceSelectionCommand::updateNodesInserted(NodeImpl* node) {
 
   // update m_lastNodeInserted
   NodeImpl* old = m_lastNodeInserted;
-  m_lastNodeInserted = node->lastDescendent();
+  m_lastNodeInserted = node->lastDescendant();
   m_lastNodeInserted->ref();
   if (old)
     old->deref();

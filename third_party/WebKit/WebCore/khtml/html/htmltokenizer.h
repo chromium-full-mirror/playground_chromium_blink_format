@@ -34,8 +34,6 @@
 #include <qptrqueue.h>
 
 #include "misc/loader_client.h"
-#include "misc/htmltags.h"
-#include "xml/dom_stringimpl.h"
 #include "xml/xml_tokenizer.h"
 #include "html/html_elementimpl.h"
 #include "xml/dom_docimpl.h"
@@ -47,7 +45,7 @@
 #endif
 
 class KCharsets;
-class KHTMLParser;
+class HTMLParser;
 class KHTMLView;
 
 namespace DOM {
@@ -68,18 +66,20 @@ class CachedScript;
 class Token {
  public:
   Token() {
-    id = 0;
     attrs = 0;
     text = 0;
+    beginTag = true;
     flat = false;
     // qDebug("new token, creating %08lx", attrs);
   }
+
   ~Token() {
     if (attrs)
       attrs->deref();
     if (text)
       text->deref();
   }
+
   void addAttribute(DOM::DocumentImpl* doc,
                     QChar* buffer,
                     const QString& attrName,
@@ -99,22 +99,36 @@ class Token {
       attrs->insertAttribute(a);
     }
   }
+
+  bool isOpenTag(const DOM::QualifiedName& fullName) const {
+    return beginTag && fullName.localName() == tagName;
+  }
+  bool isCloseTag(const DOM::QualifiedName& fullName) const {
+    return !beginTag && fullName.localName() == tagName;
+  }
+
   void reset() {
     if (attrs) {
       attrs->deref();
       attrs = 0;
     }
-    id = 0;
+
+    tagName = DOM::nullAtom;
+
     if (text) {
       text->deref();
       text = 0;
     }
+
+    beginTag = true;
     flat = false;
   }
+
   DOM::NamedMappedAttrMapImpl* attrs;
   DOM::DOMStringImpl* text;
-  ushort id;
-  bool flat;
+  DOM::AtomicString tagName;
+  bool beginTag : 1;
+  bool flat : 1;
 };
 
 // The count of spaces used for each tab.
@@ -369,7 +383,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   TokenizerString src;
 
   KCharsets* charsets;
-  KHTMLParser* parser;
+  HTMLParser* parser;
 
   QGuardedPtr<KHTMLView> view;
 

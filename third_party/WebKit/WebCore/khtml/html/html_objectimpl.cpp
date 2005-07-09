@@ -58,7 +58,7 @@ namespace DOM {
 // -------------------------------------------------------------------------
 
 HTMLAppletElementImpl::HTMLAppletElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {
+    : HTMLElementImpl(HTMLNames::applet(), doc) {
   appletInstance = 0;
   m_allParamsAvailable = false;
 }
@@ -67,8 +67,9 @@ HTMLAppletElementImpl::~HTMLAppletElementImpl() {
   delete appletInstance;
 }
 
-NodeImpl::Id HTMLAppletElementImpl::id() const {
-  return ID_APPLET;
+bool HTMLAppletElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::param()) ||
+         HTMLElementImpl::checkDTD(newChild);
 }
 
 bool HTMLAppletElementImpl::mapToEntry(NodeImpl::Id attr,
@@ -333,12 +334,13 @@ void HTMLAppletElementImpl::setWidth(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLEmbedElementImpl::HTMLEmbedElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc), embedInstance(0) {}
+    : HTMLElementImpl(HTMLNames::embed(), doc), embedInstance(0) {}
 
 HTMLEmbedElementImpl::~HTMLEmbedElementImpl() {}
 
-NodeImpl::Id HTMLEmbedElementImpl::id() const {
-  return ID_EMBED;
+bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::param()) ||
+         HTMLElementImpl::checkDTD(newChild);
 }
 
 #if APPLE_CHANGES
@@ -453,7 +455,8 @@ bool HTMLEmbedElementImpl::rendererIsNeeded(RenderStyle* style) {
   KHTMLPart* part = getDocument()->part();
   if (!part)
     return false;
-  return part->pluginsEnabled() && parentNode()->id() != ID_OBJECT;
+  return part->pluginsEnabled() &&
+         !parentNode()->hasTagName(HTMLNames::object());
 }
 
 RenderObject* HTMLEmbedElementImpl::createRenderer(RenderArena* arena,
@@ -476,11 +479,11 @@ bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
 
 HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentPtr* doc)
 #if APPLE_CHANGES
-    : HTMLElementImpl(doc),
+    : HTMLElementImpl(HTMLNames::object(), doc),
       m_imageLoader(0),
       objectInstance(0)
 #else
-    : HTMLElementImpl(doc),
+    : HTMLElementImpl(HTMLNames::object(), doc),
       m_imageLoader(0)
 #endif
 {
@@ -492,8 +495,9 @@ HTMLObjectElementImpl::~HTMLObjectElementImpl() {
   delete m_imageLoader;
 }
 
-NodeImpl::Id HTMLObjectElementImpl::id() const {
-  return ID_OBJECT;
+bool HTMLObjectElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::param()) ||
+         HTMLElementImpl::checkDTD(newChild);
 }
 
 #if APPLE_CHANGES
@@ -527,7 +531,7 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
 
 HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
   for (NodeImpl* p = parentNode(); p != 0; p = p->parentNode()) {
-    if (p->id() == ID_FORM)
+    if (p->hasTagName(HTMLNames::form()))
       return static_cast<HTMLFormElementImpl*>(p);
   }
 
@@ -887,13 +891,9 @@ void HTMLObjectElementImpl::setWidth(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLParamElementImpl::HTMLParamElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {}
+    : HTMLElementImpl(HTMLNames::param(), doc) {}
 
 HTMLParamElementImpl::~HTMLParamElementImpl() {}
-
-NodeImpl::Id HTMLParamElementImpl::id() const {
-  return ID_PARAM;
-}
 
 void HTMLParamElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   switch (attr->id()) {

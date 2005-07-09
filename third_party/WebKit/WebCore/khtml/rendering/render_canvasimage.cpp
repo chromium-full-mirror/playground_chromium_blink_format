@@ -37,10 +37,8 @@
 #include "css/csshelper.h"
 #include "misc/helper.h"
 #include "misc/htmlattrs.h"
-#include "misc/htmltags.h"
 #include "html/html_formimpl.h"
 #include "html/html_canvasimpl.h"
-#include "html/dtd.h"
 #include "xml/dom2_eventsimpl.h"
 #include "html/html_documentimpl.h"
 
@@ -189,7 +187,7 @@ void RenderCanvasImage::paint(PaintInfo& i, int _tx, int _ty) {
 
   if (drawnImage()) {
     HTMLCanvasElementImpl* i =
-        (element() && element()->id() == ID_CANVAS)
+        (element() && element()->hasTagName(HTMLNames::canvas()))
             ? static_cast<HTMLCanvasElementImpl*>(element())
             : 0;
     int oldOperation = 0;

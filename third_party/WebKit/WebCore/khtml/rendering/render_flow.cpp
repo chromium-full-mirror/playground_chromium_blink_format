@@ -40,7 +40,6 @@
 #include "render_line.h"
 
 #include "khtmlview.h"
-#include "htmltags.h"
 
 using namespace DOM;
 using namespace khtml;
@@ -699,7 +698,7 @@ void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   if (element() && element()->isContentEditable()) {
     if (element()->parentNode() &&
         !element()->parentNode()->isContentEditable() &&
-        element()->id() != ID_BODY)
+        !element()->hasTagName(HTMLNames::body()))
       p->addFocusRingRect(_tx, _ty, width(), height());
     return;
   }

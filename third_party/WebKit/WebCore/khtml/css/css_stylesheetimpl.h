@@ -113,9 +113,9 @@ class CSSStyleSheetImpl : public StyleSheetImpl {
                         int& exceptioncode);
 
   void addNamespace(CSSParser* p,
-                    const DOM::DOMString& prefix,
-                    const DOM::DOMString& uri);
-  void determineNamespace(Q_UINT32& id, const DOM::DOMString& prefix);
+                    const AtomicString& prefix,
+                    const AtomicString& uri);
+  const AtomicString& determineNamespace(const AtomicString& prefix);
 
   virtual bool parseString(const DOMString& string, bool strict = true);
 

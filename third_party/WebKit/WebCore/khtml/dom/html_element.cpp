@@ -168,8 +168,8 @@ HTMLCollection HTMLElement::children() const {
   return HTMLCollection(impl, HTMLCollectionImpl::NODE_CHILDREN);
 }
 
-void HTMLElement::assignOther(const Node& other, int elementId) {
-  if ((int)other.elementId() != elementId) {
+void HTMLElement::assignOther(const Node& other, const QualifiedName& tagName) {
+  if (!other.handle()->hasTagName(tagName)) {
     if (impl)
       impl->deref();
     impl = 0;

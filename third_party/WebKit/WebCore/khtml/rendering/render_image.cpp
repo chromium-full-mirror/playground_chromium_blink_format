@@ -37,10 +37,8 @@
 #include "css/csshelper.h"
 #include "misc/helper.h"
 #include "misc/htmlattrs.h"
-#include "misc/htmltags.h"
 #include "html/html_formimpl.h"
 #include "html/html_imageimpl.h"
-#include "html/dtd.h"
 #include "xml/dom2_eventsimpl.h"
 #include "html/html_documentimpl.h"
 
@@ -451,7 +449,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       //             p->drawPixmap( offs.x(), y, pix, rect.x(), rect.y(),
       //             rect.width(), rect.height() );
       HTMLImageElementImpl* i =
-          (element() && element()->id() == ID_IMG)
+          (element() && element()->hasTagName(HTMLNames::img()))
               ? static_cast<HTMLImageElementImpl*>(element())
               : 0;
       if (i && !i->compositeOperator().isNull()) {
@@ -519,7 +517,7 @@ void RenderImage::layout() {
 }
 
 HTMLMapElementImpl* RenderImage::imageMap() {
-  HTMLImageElementImpl* i = element()->id() == ID_IMG
+  HTMLImageElementImpl* i = element()->hasTagName(HTMLNames::img())
                                 ? static_cast<HTMLImageElementImpl*>(element())
                                 : 0;
   return i ? i->getDocument()->getImageMap(i->imageMap()) : 0;
@@ -551,9 +549,9 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
 }
 
 void RenderImage::updateAltText() {
-  if (element()->id() == ID_INPUT)
+  if (element()->hasTagName(HTMLNames::input()))
     alt = static_cast<HTMLInputElementImpl*>(element())->altText();
-  else if (element()->id() == ID_IMG)
+  else if (element()->hasTagName(HTMLNames::img()))
     alt = static_cast<HTMLImageElementImpl*>(element())->altText();
 }
 

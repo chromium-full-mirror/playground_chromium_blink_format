@@ -51,7 +51,7 @@
 using namespace DOM;
 using namespace khtml;
 
-//#define INSTRUMENT_LAYOUT_SCHEDULING 1
+// #define INSTRUMENT_LAYOUT_SCHEDULING 1
 
 HTMLImageLoader::HTMLImageLoader(ElementImpl* elt)
     : m_element(elt), m_image(0), m_firedLoad(true), m_imageComplete(true) {}
@@ -73,7 +73,7 @@ void HTMLImageLoader::updateFromElement() {
     return;
 
   AtomicString attr;
-  if (element()->id() == ID_OBJECT)
+  if (element()->hasLocalName(HTMLNames::object()))
     attr = element()->getAttribute(ATTR_DATA);
   else
     attr = element()->getAttribute(ATTR_SRC);
@@ -85,6 +85,11 @@ void HTMLImageLoader::updateFromElement() {
         khtml::parseURL(attr));
 
   if (newImage != m_image) {
+#ifdef INSTRUMENT_LAYOUT_SCHEDULING
+    if (!document->ownerElement() && newImage)
+      printf("Image requested at %d\n",
+             element()->getDocument()->elapsedTime());
+#endif
     m_firedLoad = false;
     m_imageComplete = false;
     CachedImage* oldImage = m_image;
@@ -132,18 +137,24 @@ void HTMLImageLoader::notifyFinished(CachedObject* image) {
 
 HTMLImageElementImpl::HTMLImageElementImpl(DocumentPtr* doc,
                                            HTMLFormElementImpl* f)
-    : HTMLElementImpl(doc), m_imageLoader(this), ismap(false), m_form(f) {
+    : HTMLElementImpl(HTMLNames::img(), doc),
+      m_imageLoader(this),
+      ismap(false),
+      m_form(f) {
   if (m_form)
     m_form->registerImgElement(this);
 }
 
+HTMLImageElementImpl::HTMLImageElementImpl(const QualifiedName& tagName,
+                                           DocumentPtr* doc)
+    : HTMLElementImpl(tagName, doc),
+      m_imageLoader(this),
+      ismap(false),
+      m_form(0) {}
+
 HTMLImageElementImpl::~HTMLImageElementImpl() {
   if (m_form)
     m_form->removeImgElement(this);
-}
-
-NodeImpl::Id HTMLImageElementImpl::id() const {
-  return ID_IMG;
 }
 
 bool HTMLImageElementImpl::mapToEntry(NodeImpl::Id attr,
@@ -495,15 +506,17 @@ long HTMLImageElementImpl::y() const {
 // -------------------------------------------------------------------------
 
 HTMLMapElementImpl::HTMLMapElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {}
+    : HTMLElementImpl(HTMLNames::map(), doc) {}
 
 HTMLMapElementImpl::~HTMLMapElementImpl() {
   if (getDocument())
     getDocument()->removeImageMap(this);
 }
 
-NodeImpl::Id HTMLMapElementImpl::id() const {
-  return ID_MAP;
+bool HTMLMapElementImpl::checkDTD(const NodeImpl* newChild) {
+  // FIXME: This seems really odd, allowing only blocks inside map.
+  return newChild->hasTagName(HTMLNames::area()) ||
+         newChild->hasTagName(HTMLNames::script()) || inBlockTagList(newChild);
 }
 
 bool HTMLMapElementImpl::mapMouseEvent(int x_,
@@ -524,19 +537,20 @@ bool HTMLMapElementImpl::mapMouseEvent(int x_,
       current = current->nextSibling();
       continue;
     }
-    if (current->id() == ID_AREA) {
+
+    if (current->hasTagName(HTMLNames::area())) {
       // cout << "area found " << endl;
       HTMLAreaElementImpl* area = static_cast<HTMLAreaElementImpl*>(current);
       if (area->mapMouseEvent(x_, y_, width_, height_, info))
         return true;
     }
+
     NodeImpl* child = current->firstChild();
     if (child) {
       nodeStack.push(current);
       current = child;
-    } else {
+    } else
       current = current->nextSibling();
-    }
   }
 
   return false;
@@ -578,7 +592,7 @@ void HTMLMapElementImpl::setName(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLAreaElementImpl::HTMLAreaElementImpl(DocumentPtr* doc)
-    : HTMLAnchorElementImpl(doc) {
+    : HTMLAnchorElementImpl(HTMLNames::area(), doc) {
   m_coords = 0;
   m_coordsLen = 0;
   m_shape = Unknown;
@@ -588,10 +602,6 @@ HTMLAreaElementImpl::HTMLAreaElementImpl(DocumentPtr* doc)
 HTMLAreaElementImpl::~HTMLAreaElementImpl() {
   if (m_coords)
     delete[] m_coords;
-}
-
-NodeImpl::Id HTMLAreaElementImpl::id() const {
-  return ID_AREA;
 }
 
 void HTMLAreaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {

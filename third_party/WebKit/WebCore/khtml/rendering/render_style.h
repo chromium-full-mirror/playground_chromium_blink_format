@@ -278,8 +278,10 @@ enum EMarginCollapse { MCOLLAPSE, MSEPARATE, MDISCARD };
 class StyleSurroundData : public Shared<StyleSurroundData> {
  public:
   StyleSurroundData();
-
   StyleSurroundData(const StyleSurroundData& o);
+
+  MAIN_THREAD_ALLOCATED;
+
   bool operator==(const StyleSurroundData& o) const;
   bool operator!=(const StyleSurroundData& o) const { return !(*this == o); }
 
@@ -295,8 +297,9 @@ class StyleSurroundData : public Shared<StyleSurroundData> {
 class StyleBoxData : public Shared<StyleBoxData> {
  public:
   StyleBoxData();
-
   StyleBoxData(const StyleBoxData& o);
+
+  MAIN_THREAD_ALLOCATED;
 
   // copy and assignment
   //    StyleBoxData(const StyleBoxData &other);
@@ -364,10 +367,10 @@ enum EUnicodeBidi { UBNormal, Embed, Override };
 class StyleVisualData : public Shared<StyleVisualData> {
  public:
   StyleVisualData();
-
   ~StyleVisualData();
-
   StyleVisualData(const StyleVisualData& o);
+
+  MAIN_THREAD_ALLOCATED;
 
   bool operator==(const StyleVisualData& o) const {
     return (clip == o.clip && hasClip == o.hasClip && colspan == o.colspan &&
@@ -503,6 +506,8 @@ class StyleBackgroundData : public Shared<StyleBackgroundData> {
   ~StyleBackgroundData() {}
   StyleBackgroundData(const StyleBackgroundData& o);
 
+  MAIN_THREAD_ALLOCATED;
+
   bool operator==(const StyleBackgroundData& o) const;
   bool operator!=(const StyleBackgroundData& o) const { return !(*this == o); }
 
@@ -530,6 +535,8 @@ class StyleMarqueeData : public Shared<StyleMarqueeData> {
   StyleMarqueeData();
   StyleMarqueeData(const StyleMarqueeData& o);
 
+  MAIN_THREAD_ALLOCATED;
+
   bool operator==(const StyleMarqueeData& o) const;
   bool operator!=(const StyleMarqueeData& o) const { return !(*this == o); }
 
@@ -554,6 +561,8 @@ class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData> {
  public:
   StyleFlexibleBoxData();
   StyleFlexibleBoxData(const StyleFlexibleBoxData& o);
+
+  MAIN_THREAD_ALLOCATED;
 
   bool operator==(const StyleFlexibleBoxData& o) const;
   bool operator!=(const StyleFlexibleBoxData& o) const { return !(*this == o); }
@@ -642,6 +651,8 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   ~StyleCSS3NonInheritedData();
   StyleCSS3NonInheritedData(const StyleCSS3NonInheritedData& o);
 
+  MAIN_THREAD_ALLOCATED;
+
 #ifndef KHTML_NO_XBL
   bool bindingsEquivalent(const StyleCSS3NonInheritedData& o) const;
 #endif
@@ -682,6 +693,8 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
   StyleCSS3InheritedData();
   ~StyleCSS3InheritedData();
   StyleCSS3InheritedData(const StyleCSS3InheritedData& o);
+
+  MAIN_THREAD_ALLOCATED;
 
   bool operator==(const StyleCSS3InheritedData& o) const;
   bool operator!=(const StyleCSS3InheritedData& o) const {
@@ -740,6 +753,8 @@ class StyleInheritedData : public Shared<StyleInheritedData> {
   StyleInheritedData();
   ~StyleInheritedData();
   StyleInheritedData(const StyleInheritedData& o);
+
+  MAIN_THREAD_ALLOCATED;
 
   bool operator==(const StyleInheritedData& o) const;
   bool operator!=(const StyleInheritedData& o) const { return !(*this == o); }

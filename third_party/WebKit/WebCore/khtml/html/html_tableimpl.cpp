@@ -51,7 +51,7 @@ using namespace khtml;
 namespace DOM {
 
 HTMLTableElementImpl::HTMLTableElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(doc) {
+    : HTMLElementImpl(HTMLNames::table(), doc) {
   tCaption = 0;
   head = 0;
   foot = 0;
@@ -70,8 +70,15 @@ HTMLTableElementImpl::HTMLTableElementImpl(DocumentPtr* doc)
 
 HTMLTableElementImpl::~HTMLTableElementImpl() {}
 
-NodeImpl::Id HTMLTableElementImpl::id() const {
-  return ID_TABLE;
+bool HTMLTableElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->isTextNode() || newChild->hasTagName(HTMLNames::caption()) ||
+         newChild->hasTagName(HTMLNames::col()) ||
+         newChild->hasTagName(HTMLNames::colgroup()) ||
+         newChild->hasTagName(HTMLNames::thead()) ||
+         newChild->hasTagName(HTMLNames::tfoot()) ||
+         newChild->hasTagName(HTMLNames::tbody()) ||
+         newChild->hasTagName(HTMLNames::form()) ||
+         newChild->hasTagName(HTMLNames::script());
 }
 
 NodeImpl* HTMLTableElementImpl::setCaption(HTMLTableCaptionElementImpl* c) {
@@ -134,7 +141,7 @@ NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
 HTMLElementImpl* HTMLTableElementImpl::createTHead() {
   if (!head) {
     int exceptioncode = 0;
-    head = new HTMLTableSectionElementImpl(docPtr(), ID_THEAD,
+    head = new HTMLTableSectionElementImpl(HTMLNames::thead(), docPtr(),
                                            true /* implicit */);
     if (foot)
       insertBefore(head, foot, exceptioncode);
@@ -157,8 +164,8 @@ void HTMLTableElementImpl::deleteTHead() {
 HTMLElementImpl* HTMLTableElementImpl::createTFoot() {
   if (!foot) {
     int exceptioncode = 0;
-    foot =
-        new HTMLTableSectionElementImpl(docPtr(), ID_TFOOT, true /*implicit */);
+    foot = new HTMLTableSectionElementImpl(HTMLNames::tfoot(), docPtr(),
+                                           true /*implicit */);
     if (firstBody)
       insertBefore(foot, firstBody, exceptioncode);
     else
@@ -200,7 +207,7 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(long index,
   // have
   // <TABLE><TR>)
   if (!firstBody && !head && !foot && !hasChildNodes())
-    setTBody(new HTMLTableSectionElementImpl(docPtr(), ID_TBODY,
+    setTBody(new HTMLTableSectionElementImpl(HTMLNames::tbody(), docPtr(),
                                              true /* implicit */));
 
   // kdDebug(6030) << k_funcinfo << index << endl;
@@ -215,8 +222,9 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(long index,
     // there could be 2 tfoot elements in the table. Only the first one is the
     // "foot", that's why we have the more
     // complicated if statement below.
-    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
-                         node->id() == ID_TBODY)) {
+    if (node != foot && (node->hasTagName(HTMLNames::thead()) ||
+                         node->hasTagName(HTMLNames::tfoot()) ||
+                         node->hasTagName(HTMLNames::tbody()))) {
       section = static_cast<HTMLTableSectionElementImpl*>(node);
       lastSection = section;
       // kdDebug(6030) << k_funcinfo << "section id=" << node->id() << " rows:"
@@ -259,8 +267,9 @@ void HTMLTableElementImpl::deleteRow(long index, int& exceptioncode) {
   HTMLTableSectionElementImpl* lastSection = 0L;
   bool found = false;
   for (; node; node = node->nextSibling()) {
-    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
-                         node->id() == ID_TBODY)) {
+    if (node != foot && (node->hasTagName(HTMLNames::thead()) ||
+                         node->hasTagName(HTMLNames::tfoot()) ||
+                         node->hasTagName(HTMLNames::tbody()))) {
       section = static_cast<HTMLTableSectionElementImpl*>(node);
       lastSection = section;
       int rows = section->numRows();
@@ -291,7 +300,7 @@ NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
                 << child->nodeName().string() << " )" << endl;
 #endif
 
-  if (child->id() == ID_FORM) {
+  if (child->hasTagName(HTMLNames::form())) {
     // First add the child.
     HTMLElementImpl::addChild(child);
     // Now simply return ourselves as the newnode.  This has the effect of
@@ -320,27 +329,14 @@ NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
   int exceptioncode = 0;
   NodeImpl* retval = appendChild(child, exceptioncode);
   if (retval) {
-    switch (child->id()) {
-      case ID_CAPTION:
-        if (!tCaption)
-          tCaption = static_cast<HTMLTableCaptionElementImpl*>(child);
-        break;
-      case ID_COL:
-      case ID_COLGROUP:
-        break;
-      case ID_THEAD:
-        if (!head)
-          head = static_cast<HTMLTableSectionElementImpl*>(child);
-        break;
-      case ID_TFOOT:
-        if (!foot)
-          foot = static_cast<HTMLTableSectionElementImpl*>(child);
-        break;
-      case ID_TBODY:
-        if (!firstBody)
-          firstBody = static_cast<HTMLTableSectionElementImpl*>(child);
-        break;
-    }
+    if (!tCaption && child->hasTagName(HTMLNames::caption()))
+      tCaption = static_cast<HTMLTableCaptionElementImpl*>(child);
+    else if (!head && child->hasTagName(HTMLNames::thead()))
+      head = static_cast<HTMLTableSectionElementImpl*>(child);
+    else if (!foot && child->hasTagName(HTMLNames::tfoot()))
+      foot = static_cast<HTMLTableSectionElementImpl*>(child);
+    else if (!firstBody && child->hasTagName(HTMLNames::tbody()))
+      firstBody = static_cast<HTMLTableSectionElementImpl*>(child);
   }
   return retval;
 }
@@ -761,16 +757,18 @@ void HTMLTablePartElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 
 // -------------------------------------------------------------------------
 
-HTMLTableSectionElementImpl::HTMLTableSectionElementImpl(DocumentPtr* doc,
-                                                         ushort tagid,
-                                                         bool implicit)
-    : HTMLTablePartElementImpl(doc) {
-  _id = tagid;
+HTMLTableSectionElementImpl::HTMLTableSectionElementImpl(
+    const QualifiedName& tagName,
+    DocumentPtr* doc,
+    bool implicit)
+    : HTMLTablePartElementImpl(tagName, doc) {
   m_implicit = implicit;
 }
 
-NodeImpl::Id HTMLTableSectionElementImpl::id() const {
-  return _id;
+bool HTMLTableSectionElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::tr()) ||
+         newChild->hasTagName(HTMLNames::form()) ||
+         newChild->hasTagName(HTMLNames::script());
 }
 
 NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
@@ -779,7 +777,7 @@ NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
                 << child->nodeName().string() << " )" << endl;
 #endif
 
-  if (child->id() == ID_FORM) {
+  if (child->hasTagName(HTMLNames::form())) {
     // First add the child.
     HTMLElementImpl::addChild(child);
     // Now simply return ourselves as the newnode.  This has the effect of
@@ -833,7 +831,7 @@ int HTMLTableSectionElementImpl::numRows() const {
   int rows = 0;
   const NodeImpl* n = firstChild();
   while (n) {
-    if (n->id() == ID_TR)
+    if (n->hasTagName(HTMLNames::tr()))
       rows++;
     n = n->nextSibling();
   }
@@ -880,8 +878,11 @@ SharedPtr<HTMLCollectionImpl> HTMLTableSectionElementImpl::rows() {
 
 // -------------------------------------------------------------------------
 
-NodeImpl::Id HTMLTableRowElementImpl::id() const {
-  return ID_TR;
+bool HTMLTableRowElementImpl::checkDTD(const NodeImpl* newChild) {
+  return newChild->hasTagName(HTMLNames::td()) ||
+         newChild->hasTagName(HTMLNames::th()) ||
+         newChild->hasTagName(HTMLNames::form()) ||
+         newChild->hasTagName(HTMLNames::script());
 }
 
 NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
@@ -890,7 +891,7 @@ NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
                 << child->nodeName().string() << " )" << endl;
 #endif
 
-  if (child->id() == ID_FORM) {
+  if (child->hasTagName(HTMLNames::form())) {
     // First add the child.
     HTMLElementImpl::addChild(child);
     // Now simply return ourselves as the newnode.  This has the effect of
@@ -907,15 +908,16 @@ long HTMLTableRowElementImpl::rowIndex() const {
   if (!table)
     return -1;
   table = table->parentNode();
-  if (!table || table->id() != ID_TABLE)
+  if (!table || !table->hasTagName(HTMLNames::table()))
     return -1;
 
   HTMLTableSectionElementImpl* foot =
       static_cast<HTMLTableElementImpl*>(table)->tFoot();
   NodeImpl* node = table->firstChild();
   while (node) {
-    if (node != foot && (node->id() == ID_THEAD || node->id() == ID_TFOOT ||
-                         node->id() == ID_TBODY)) {
+    if (node != foot && (node->hasTagName(HTMLNames::thead()) ||
+                         node->hasTagName(HTMLNames::tfoot()) ||
+                         node->hasTagName(HTMLNames::tbody()))) {
       HTMLTableSectionElementImpl* section =
           static_cast<HTMLTableSectionElementImpl*>(node);
       const NodeImpl* row = section->firstChild();
@@ -944,7 +946,7 @@ long HTMLTableRowElementImpl::sectionRowIndex() const {
   const NodeImpl* n = this;
   do {
     n = n->previousSibling();
-    if (n && n->isElementNode() && n->id() == ID_TR)
+    if (n && n->hasTagName(HTMLNames::tr()))
       rIndex++;
   } while (n);
 
@@ -959,7 +961,7 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(long index,
   if (index < -1 || index > numCells)
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   else {
-    c = new HTMLTableCellElementImpl(docPtr(), ID_TD);
+    c = new HTMLTableCellElementImpl(HTMLNames::td(), docPtr());
     if (numCells == index || index == -1)
       appendChild(c, exceptioncode);
     else {
@@ -1038,12 +1040,12 @@ void HTMLTableRowElementImpl::setVAlign(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLTableCellElementImpl::HTMLTableCellElementImpl(DocumentPtr* doc, int tag)
-    : HTMLTablePartElementImpl(doc) {
+HTMLTableCellElementImpl::HTMLTableCellElementImpl(const QualifiedName& tagName,
+                                                   DocumentPtr* doc)
+    : HTMLTablePartElementImpl(tagName, doc) {
   _col = -1;
   _row = -1;
   cSpan = rSpan = 1;
-  _id = tag;
   rowHeight = 0;
   m_solid = false;
 }
@@ -1054,7 +1056,7 @@ long HTMLTableCellElementImpl::cellIndex() const {
   int index = 0;
   for (const NodeImpl* node = previousSibling(); node;
        node = node->previousSibling()) {
-    if (node->id() == ID_TD || node->id() == ID_TH)
+    if (node->hasTagName(HTMLNames::td()) || node->hasTagName(HTMLNames::th()))
       index++;
   }
 
@@ -1123,9 +1125,9 @@ void HTMLTableCellElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 // used by table cells to share style decls created by the enclosing table.
 CSSMutableStyleDeclarationImpl*
 HTMLTableCellElementImpl::additionalAttributeStyleDecl() {
-  HTMLElementImpl* p = static_cast<HTMLElementImpl*>(parentNode());
-  while (p && p->id() != ID_TABLE)
-    p = static_cast<HTMLElementImpl*>(p->parentNode());
+  NodeImpl* p = parentNode();
+  while (p && !p->hasTagName(HTMLNames::table()))
+    p = p->parentNode();
 
   if (p) {
     HTMLTableElementImpl* table = static_cast<HTMLTableElementImpl*>(p);
@@ -1133,14 +1135,6 @@ HTMLTableCellElementImpl::additionalAttributeStyleDecl() {
   }
 
   return 0;
-}
-
-void HTMLTableCellElementImpl::attach() {
-  HTMLElementImpl* p = static_cast<HTMLElementImpl*>(parentNode());
-  while (p && p->id() != ID_TABLE)
-    p = static_cast<HTMLElementImpl*>(p->parentNode());
-
-  HTMLTablePartElementImpl::attach();
 }
 
 bool HTMLTableCellElementImpl::isURLAttribute(AttributeImpl* attr) const {
@@ -1253,14 +1247,10 @@ void HTMLTableCellElementImpl::setWidth(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLTableColElementImpl::HTMLTableColElementImpl(DocumentPtr* doc, ushort i)
-    : HTMLTablePartElementImpl(doc) {
-  _id = i;
-  _span = (_id == ID_COLGROUP ? 0 : 1);
-}
-
-NodeImpl::Id HTMLTableColElementImpl::id() const {
-  return _id;
+HTMLTableColElementImpl::HTMLTableColElementImpl(const QualifiedName& tagName,
+                                                 DocumentPtr* doc)
+    : HTMLTablePartElementImpl(tagName, doc) {
+  _span = (tagName.matches(HTMLNames::colgroup()) ? 0 : 1);
 }
 
 bool HTMLTableColElementImpl::mapToEntry(NodeImpl::Id attr,
@@ -1336,10 +1326,6 @@ void HTMLTableColElementImpl::setWidth(const DOMString& value) {
 }
 
 // -------------------------------------------------------------------------
-
-NodeImpl::Id HTMLTableCaptionElementImpl::id() const {
-  return ID_CAPTION;
-}
 
 bool HTMLTableCaptionElementImpl::mapToEntry(
     NodeImpl::Id attr,

@@ -32,10 +32,6 @@ using namespace khtml;
 
 namespace DOM {
 
-NodeImpl::Id HTMLUListElementImpl::id() const {
-  return ID_UL;
-}
-
 bool HTMLUListElementImpl::mapToEntry(NodeImpl::Id attr,
                                       MappedAttributeEntry& result) const {
   switch (attr) {
@@ -77,10 +73,6 @@ void HTMLUListElementImpl::setType(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-NodeImpl::Id HTMLDirectoryElementImpl::id() const {
-  return ID_DIR;
-}
-
 bool HTMLDirectoryElementImpl::compact() const {
   return !getAttribute(ATTR_COMPACT).isNull();
 }
@@ -91,10 +83,6 @@ void HTMLDirectoryElementImpl::setCompact(bool b) {
 
 // -------------------------------------------------------------------------
 
-NodeImpl::Id HTMLMenuElementImpl::id() const {
-  return ID_MENU;
-}
-
 bool HTMLMenuElementImpl::compact() const {
   return !getAttribute(ATTR_COMPACT).isNull();
 }
@@ -104,10 +92,6 @@ void HTMLMenuElementImpl::setCompact(bool b) {
 }
 
 // -------------------------------------------------------------------------
-
-NodeImpl::Id HTMLOListElementImpl::id() const {
-  return ID_OL;
-}
 
 bool HTMLOListElementImpl::mapToEntry(NodeImpl::Id attr,
                                       MappedAttributeEntry& result) const {
@@ -138,8 +122,9 @@ void HTMLOListElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       break;
     case ATTR_START:
       _start = !attr->isNull() ? attr->value().toInt() : 1;
+      break;
     default:
-      HTMLUListElementImpl::parseMappedAttribute(attr);
+      HTMLElementImpl::parseMappedAttribute(attr);
   }
 }
 
@@ -164,10 +149,6 @@ void HTMLOListElementImpl::setType(const DOMString& value) {
 }
 
 // -------------------------------------------------------------------------
-
-NodeImpl::Id HTMLLIElementImpl::id() const {
-  return ID_LI;
-}
 
 bool HTMLLIElementImpl::mapToEntry(NodeImpl::Id attr,
                                    MappedAttributeEntry& result) const {
@@ -227,11 +208,8 @@ void HTMLLIElementImpl::attach() {
     NodeImpl* listNode = 0;
     NodeImpl* n = this;
     while (!listNode && (n = n->parentNode())) {
-      switch (n->id()) {
-        case ID_UL:
-        case ID_OL:
-          listNode = n;
-      }
+      if (n->hasTagName(HTMLNames::ul()) || n->hasTagName(HTMLNames::ol()))
+        listNode = n;
     }
 
     // If we are not in a list, tell the renderer so it can position us inside.
@@ -241,7 +219,8 @@ void HTMLLIElementImpl::attach() {
       render->setNotInList(true);
 
     // If we are first, and the OL has a start attr, set the value.
-    if (listNode && listNode->id() == ID_OL && !m_render->previousSibling()) {
+    if (listNode && listNode->hasTagName(HTMLNames::ol()) &&
+        !m_render->previousSibling()) {
       HTMLOListElementImpl* ol = static_cast<HTMLOListElementImpl*>(listNode);
       render->setValue(ol->start());
     }
@@ -267,11 +246,8 @@ long HTMLLIElementImpl::value() const {
 void HTMLLIElementImpl::setValue(long value) {
   setAttribute(ATTR_VALUE, QString::number(value));
 }
-// -------------------------------------------------------------------------
 
-NodeImpl::Id HTMLDListElementImpl::id() const {
-  return ID_DL;
-}
+// -------------------------------------------------------------------------
 
 bool HTMLDListElementImpl::compact() const {
   return !getAttribute(ATTR_COMPACT).isNull();

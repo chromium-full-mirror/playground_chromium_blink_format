@@ -30,6 +30,7 @@
 #include "css/css_base.h"
 #include "misc/loader_client.h"
 #include "misc/shared.h"
+#include "misc/main_thread_malloc.h"
 #include "css_valueimpl.h"
 
 namespace khtml {
@@ -48,6 +49,8 @@ class CSSRuleImpl : public StyleBaseImpl {
  public:
   CSSRuleImpl(StyleBaseImpl* parent)
       : StyleBaseImpl(parent), m_type(CSSRule::UNKNOWN_RULE) {}
+
+  MAIN_THREAD_ALLOCATED;
 
   virtual bool isRule() { return true; }
   unsigned short type() const { return m_type; }
@@ -69,6 +72,8 @@ class CSSCharsetRuleImpl : public CSSRuleImpl {
     m_type = CSSRule::CHARSET_RULE;
   }
 
+  MAIN_THREAD_ALLOCATED;
+
   virtual bool isCharsetRule() { return true; }
 
   DOMString encoding() const { return m_encoding; }
@@ -81,8 +86,9 @@ class CSSCharsetRuleImpl : public CSSRuleImpl {
 class CSSFontFaceRuleImpl : public CSSRuleImpl {
  public:
   CSSFontFaceRuleImpl(StyleBaseImpl* parent);
-
   virtual ~CSSFontFaceRuleImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -100,8 +106,9 @@ class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
   CSSImportRuleImpl(StyleBaseImpl* parent,
                     const DOM::DOMString& href,
                     MediaListImpl* media);
-
   virtual ~CSSImportRuleImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   DOM::DOMString href() const { return m_strHref; }
   MediaListImpl* media() const { return m_lstMedia; }
@@ -153,8 +160,9 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
   CSSMediaRuleImpl(StyleBaseImpl* parent,
                    MediaListImpl* mediaList,
                    CSSRuleListImpl* ruleList);
-
   virtual ~CSSMediaRuleImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   MediaListImpl* media() const { return m_lstMedia; }
   CSSRuleListImpl* cssRules() { return m_lstCSSRules; }
@@ -175,8 +183,9 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
 class CSSPageRuleImpl : public CSSRuleImpl {
  public:
   CSSPageRuleImpl(StyleBaseImpl* parent);
-
   virtual ~CSSPageRuleImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -194,8 +203,9 @@ class CSSImportantRuleImpl;
 class CSSStyleRuleImpl : public CSSRuleImpl {
  public:
   CSSStyleRuleImpl(StyleBaseImpl* parent);
-
   virtual ~CSSStyleRuleImpl();
+
+  MAIN_THREAD_ALLOCATED;
 
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -220,6 +230,8 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
 class CSSUnknownRuleImpl : public CSSRuleImpl {
  public:
   CSSUnknownRuleImpl(StyleBaseImpl* parent) : CSSRuleImpl(parent) {}
+
+  MAIN_THREAD_ALLOCATED;
 
   virtual bool isUnknownRule() { return true; }
 };

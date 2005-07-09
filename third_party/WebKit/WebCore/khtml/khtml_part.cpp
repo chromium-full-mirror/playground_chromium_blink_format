@@ -210,6 +210,8 @@ KHTMLPart::KHTMLPart(KHTMLView* view,
 
 void KHTMLPart::init(KHTMLView* view, GUIProfile prof) {
   AtomicString::init();
+  HTMLNames::init();  // FIXME: We should make this happen only when HTML is
+                      // used.
   if (prof == DefaultGUI)
     setXMLFile("khtml.rc");
   else if (prof == BrowserViewGUI)
@@ -5691,7 +5693,8 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   int exceptionCode = 0;
 
   if (d->m_typingStyle) {
-    styleElement = xmlDocImpl()->createHTMLElement("span", exceptionCode);
+    styleElement = xmlDocImpl()->createElementNS(HTMLNames::xhtmlNamespaceURI(),
+                                                 "span", exceptionCode);
     assert(exceptionCode == 0);
 
     styleElement->ref();

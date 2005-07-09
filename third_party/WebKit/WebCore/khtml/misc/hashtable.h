@@ -76,6 +76,13 @@ class HashTableIterator {
 
   friend class HashTable<Key, Value, ExtractKey, HashFunctions, Traits>;
 
+  void skipEmptyBuckets() {
+    while (m_position != m_endPosition &&
+           (HashTableType::isEmptyOrDeletedBucket(*m_position))) {
+      ++m_position;
+    }
+  }
+
   HashTableIterator(PointerType position, PointerType endPosition)
       : m_position(position), m_endPosition(endPosition) {
     skipEmptyBuckets();
@@ -107,13 +114,6 @@ class HashTableIterator {
   }
 
  private:
-  void skipEmptyBuckets() {
-    while (m_position != m_endPosition &&
-           (HashTableType::isEmptyOrDeletedBucket(*m_position))) {
-      ++m_position;
-    }
-  }
-
   PointerType m_position;
   PointerType m_endPosition;
 };
@@ -341,11 +341,11 @@ inline typename HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::
     FullLookupType
     HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::lookup(
         const T& key) {
-  if (!m_table)
-    return makeLookupResult(0, false, 0);
+  assert(m_table);
 
   unsigned h = HashT(key);
-  int i = h & m_tableSizeMask;
+  int sizeMask = m_tableSizeMask;
+  int i = h & sizeMask;
   int k = 0;
 
 #if DUMP_HASHTABLE_STATS
@@ -353,9 +353,10 @@ inline typename HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::
   int probeCount = 0;
 #endif
 
+  ValueType* table = m_table;
   ValueType* entry;
   ValueType* deletedEntry = 0;
-  while (!isEmptyBucket(*(entry = m_table + i))) {
+  while (!isEmptyBucket(*(entry = table + i))) {
     if (isDeletedBucket(*entry))
       deletedEntry = entry;
     else if (EqualT(extractKey(*entry), key))
@@ -365,8 +366,8 @@ inline typename HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::
     ++probeCount;
 #endif
     if (k == 0)
-      k = 1 | (h % m_tableSizeMask);
-    i = (i + k) & m_tableSizeMask;
+      k = 1 | (h % sizeMask);
+    i = (i + k) & sizeMask;
   }
 
   return makeLookupResult(deletedEntry ? deletedEntry : entry, false, h);
@@ -446,6 +447,9 @@ inline
     typename HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::iterator
     HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::find(
         const Key& key) {
+  if (!m_table)
+    return end();
+
   LookupType result = lookup(key);
   if (!result.second)
     return end();
@@ -461,6 +465,9 @@ inline typename HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::
     const_iterator
     HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::find(
         const Key& key) const {
+  if (!m_table)
+    return end();
+
   LookupType result = const_cast<HashTable*>(this)->lookup(key);
   if (!result.second)
     return end();
@@ -474,6 +481,9 @@ template <typename Key,
           typename Traits>
 inline bool HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::contains(
     const KeyType& key) const {
+  if (!m_table)
+    return false;
+
   return const_cast<HashTable*>(this)->lookup(key).second;
 }
 
@@ -507,6 +517,9 @@ template <typename Key,
           typename Traits>
 inline void HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::remove(
     const KeyType& key) {
+  if (!m_table)
+    return;
+
   remove(lookup(key).first);
 }
 

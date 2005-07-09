@@ -292,8 +292,12 @@ CommentImpl::CommentImpl(DocumentPtr* doc) : CharacterDataImpl(doc) {}
 
 CommentImpl::~CommentImpl() {}
 
+const AtomicString& CommentImpl::localName() const {
+  return commentAtom;
+}
+
 DOMString CommentImpl::nodeName() const {
-  return "#comment";
+  return commentAtom.string();
 }
 
 unsigned short CommentImpl::nodeType() const {
@@ -302,10 +306,6 @@ unsigned short CommentImpl::nodeType() const {
 
 NodeImpl* CommentImpl::cloneNode(bool /*deep*/) {
   return getDocument()->createComment(str);
-}
-
-NodeImpl::Id CommentImpl::id() const {
-  return ID_COMMENT;
 }
 
 // DOM Section 1.1.1
@@ -370,8 +370,12 @@ TextImpl* TextImpl::splitText(const unsigned long offset, int& exceptioncode) {
   return newText;
 }
 
+const AtomicString& TextImpl::localName() const {
+  return textAtom;
+}
+
 DOMString TextImpl::nodeName() const {
-  return "#text";
+  return textAtom.string();
 }
 
 unsigned short TextImpl::nodeType() const {
@@ -432,10 +436,6 @@ RenderObject* TextImpl::createRenderer(RenderArena* arena, RenderStyle* style) {
 void TextImpl::attach() {
   createRendererIfNeeded();
   CharacterDataImpl::attach();
-}
-
-NodeImpl::Id TextImpl::id() const {
-  return ID_TEXT;
 }
 
 void TextImpl::recalcStyle(StyleChange change) {

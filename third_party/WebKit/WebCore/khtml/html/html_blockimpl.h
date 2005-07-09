@@ -26,7 +26,6 @@
 #define HTML_BLOCKIMPL_H
 
 #include "html_elementimpl.h"
-#include "dtd.h"
 
 namespace DOM {
 
@@ -39,7 +38,8 @@ class HTMLBlockquoteElementImpl : public HTMLElementImpl {
   HTMLBlockquoteElementImpl(DocumentPtr* doc);
   ~HTMLBlockquoteElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 5; }
 
   DOMString cite() const;
   void setCite(const DOMString&);
@@ -54,7 +54,8 @@ class HTMLDivElementImpl : public HTMLElementImpl {
   HTMLDivElementImpl(DocumentPtr* doc);
   ~HTMLDivElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 5; }
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
@@ -70,7 +71,8 @@ class HTMLHRElementImpl : public HTMLElementImpl {
   HTMLHRElementImpl(DocumentPtr* doc);
   ~HTMLHRElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl*);
@@ -90,9 +92,13 @@ class HTMLHRElementImpl : public HTMLElementImpl {
 
 // -------------------------------------------------------------------------
 
-class HTMLHeadingElementImpl : public HTMLGenericElementImpl {
+class HTMLHeadingElementImpl : public HTMLElementImpl {
  public:
-  HTMLHeadingElementImpl(DocumentPtr* doc, ushort _tagid);
+  HTMLHeadingElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 5; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   DOMString align() const;
   void setAlign(const DOMString&);
@@ -100,20 +106,16 @@ class HTMLHeadingElementImpl : public HTMLGenericElementImpl {
 
 // -------------------------------------------------------------------------
 
-/*
- * were not using HTMLElementImpl as parent class, since a
- * paragraph should be able to flow around aligned objects. Thus
- * a <p> element has to be inline, and is rendered by
- * HTMLBlockImpl::calcParagraph
- */
 class HTMLParagraphElementImpl : public HTMLElementImpl {
  public:
   HTMLParagraphElementImpl(DocumentPtr* doc);
 
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
+  virtual int tagPriority() const { return 3; }
+  virtual bool checkDTD(const NodeImpl* newChild);
+
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
-
-  virtual Id id() const;
 
   DOMString align() const;
   void setAlign(const DOMString&);
@@ -121,9 +123,12 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
 
 // -------------------------------------------------------------------------
 
-class HTMLPreElementImpl : public HTMLGenericElementImpl {
+class HTMLPreElementImpl : public HTMLElementImpl {
  public:
-  HTMLPreElementImpl(DocumentPtr* doc, ushort _tagid);
+  HTMLPreElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 5; }
 
   long width() const;
   void setWidth(long w);
@@ -135,7 +140,8 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
  public:
   HTMLMarqueeElementImpl(DocumentPtr* doc);
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 3; }
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
@@ -144,18 +150,6 @@ class HTMLMarqueeElementImpl : public HTMLElementImpl {
 
  private:
   int m_minimumDelay;
-};
-
-// -------------------------------------------------------------------------
-
-class HTMLLayerElementImpl : public HTMLDivElementImpl {
- public:
-  HTMLLayerElementImpl(DocumentPtr* doc);
-  ~HTMLLayerElementImpl();
-
-  virtual Id id() const;
-
-  bool fixed;
 };
 
 };  // namespace

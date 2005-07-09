@@ -28,7 +28,7 @@
 #include "css/css_computedstyle.h"
 #include "htmlediting.h"
 #include "khtml_part.h"
-#include "misc/htmltags.h"
+#include "htmlnames.h"
 #include "rendering/render_line.h"
 #include "rendering/render_object.h"
 #include "visible_text.h"
@@ -52,6 +52,7 @@ using DOM::NodeImpl;
 using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
+using DOM::HTMLNames;
 
 namespace khtml {
 
@@ -60,10 +61,12 @@ static bool isListStructureNode(const NodeImpl* node) {
   // for isTableStructureNode,
   // but here we also have to peek at the type of DOM node?
   RenderObject* r = node->renderer();
-  NodeImpl::Id nodeID = node->id();
-  return (r && r->isListItem()) ||
-         (nodeID == ID_OL || nodeID == ID_UL || nodeID == ID_DD ||
-          nodeID == ID_DT || nodeID == ID_DIR || nodeID == ID_MENU);
+  return (r && r->isListItem()) || node->hasTagName(HTMLNames::ol()) ||
+         node->hasTagName(HTMLNames::ul()) ||
+         node->hasTagName(HTMLNames::dd()) ||
+         node->hasTagName(HTMLNames::dt()) ||
+         node->hasTagName(HTMLNames::dir()) ||
+         node->hasTagName(HTMLNames::menu());
 }
 
 static int maxDeepOffset(NodeImpl* n) {
@@ -308,8 +311,9 @@ void DeleteSelectionCommand::saveTypingStyleState() {
 bool DeleteSelectionCommand::handleSpecialCaseBRDelete() {
   // Check for special-case where the selection contains only a BR on a line by
   // itself after another BR.
-  bool upstreamStartIsBR = m_startNode->id() == ID_BR;
-  bool downstreamStartIsBR = m_downstreamStart.node()->id() == ID_BR;
+  bool upstreamStartIsBR = m_startNode->hasTagName(HTMLNames::br());
+  bool downstreamStartIsBR =
+      m_downstreamStart.node()->hasTagName(HTMLNames::br());
   bool isBROnLineByItself = upstreamStartIsBR && downstreamStartIsBR &&
                             m_downstreamStart.node() == m_upstreamEnd.node();
   if (isBROnLineByItself) {
@@ -365,12 +369,13 @@ void DeleteSelectionCommand::handleGeneralDelete() {
   // not delete the
   // start block, otherwise delete the start block.
   // A similar case is provided to cover selections starting in BR elements.
-  if (startOffset == 1 && m_startNode && m_startNode->id() == ID_BR) {
+  if (startOffset == 1 && m_startNode &&
+      m_startNode->hasTagName(HTMLNames::br())) {
     setStartNode(m_startNode->traverseNextNode());
     startOffset = 0;
   }
   if (m_startBlock != m_endBlock && startOffset == 0 && m_startNode &&
-      m_startNode->id() == ID_BR && endAtEndOfBlock) {
+      m_startNode->hasTagName(HTMLNames::br()) && endAtEndOfBlock) {
     // Don't delete the BR element
     setStartNode(m_startNode->traverseNextNode());
   } else if (m_startBlock != m_endBlock &&
@@ -616,7 +621,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
     NodeImpl* moveNode = node;
     node = node->nextSibling();
     removeNode(moveNode);
-    if (moveNode->id() == ID_BR && !moveNode->renderer()) {
+    if (moveNode->hasTagName(HTMLNames::br()) && !moveNode->renderer()) {
       // Just remove this node, and don't put it back.
       // If the BR was not rendered (since it was at the end of a block, for
       // instance),
@@ -629,7 +634,7 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
     else
       insertNodeAfter(moveNode, refNode);
     refNode = moveNode;
-    if (moveNode->id() == ID_BR)
+    if (moveNode->hasTagName(HTMLNames::br()))
       break;
   }
 

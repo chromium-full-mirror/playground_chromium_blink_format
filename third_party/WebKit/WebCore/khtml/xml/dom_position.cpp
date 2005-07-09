@@ -35,7 +35,6 @@
 #include "dom2_rangeimpl.h"
 #include "dom2_viewsimpl.h"
 #include "helper.h"
-#include "htmltags.h"
 #include "text_affinity.h"
 #include "visible_position.h"
 #include "visible_units.h"
@@ -45,6 +44,7 @@
 #include "rendering/render_style.h"
 #include "rendering/render_text.h"
 #include "editing/visible_text.h"
+#include "htmlnames.h"
 
 #if APPLE_CHANGES
 #include "KWQAssertions.h"
@@ -444,7 +444,7 @@ Position Position::downstream() const {
 
     // stop before going above the body, up into the head
     // return the last visible streamer position
-    if (currentNode->id() == ID_BODY &&
+    if (currentNode->hasTagName(HTMLNames::body()) &&
         currentOffset >= (int)currentNode->childNodeCount())
       break;
 
@@ -706,7 +706,7 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     return false;
 
   if (node() == pos.node()) {
-    if (node()->id() == ID_BR)
+    if (node()->hasTagName(HTMLNames::br()))
       return false;
 
     if (offset() == pos.offset())
@@ -718,10 +718,10 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     }
   }
 
-  if (node()->id() == ID_BR && pos.inRenderedContent())
+  if (node()->hasTagName(HTMLNames::br()) && pos.inRenderedContent())
     return true;
 
-  if (pos.node()->id() == ID_BR && inRenderedContent())
+  if (pos.node()->hasTagName(HTMLNames::br()) && inRenderedContent())
     return true;
 
   if (node()->enclosingBlockFlowElement() !=
@@ -786,7 +786,7 @@ Position Position::leadingWhitespacePosition(
   if (isNull())
     return Position();
 
-  if (upstream().node()->id() == ID_BR)
+  if (upstream().node()->hasTagName(HTMLNames::br()))
     return Position();
 
   Position prev = previousCharacterPosition(affinity);
@@ -821,7 +821,7 @@ Position Position::trailingWhitespacePosition(
     }
   }
 
-  if (downstream().node()->id() == ID_BR)
+  if (downstream().node()->hasTagName(HTMLNames::br()))
     return Position();
 
   Position next = nextCharacterPosition(affinity);

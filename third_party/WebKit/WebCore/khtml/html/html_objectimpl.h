@@ -41,10 +41,11 @@ class HTMLFormElementImpl;
 class HTMLAppletElementImpl : public HTMLElementImpl {
  public:
   HTMLAppletElementImpl(DocumentPtr* doc);
-
   ~HTMLAppletElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 1; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
@@ -111,10 +112,11 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 class HTMLEmbedElementImpl : public HTMLElementImpl {
  public:
   HTMLEmbedElementImpl(DocumentPtr* doc);
-
   ~HTMLEmbedElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 0; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
@@ -145,10 +147,11 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 class HTMLObjectElementImpl : public HTMLElementImpl {
  public:
   HTMLObjectElementImpl(DocumentPtr* doc);
-
   ~HTMLObjectElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
+  virtual int tagPriority() const { return 7; }
+  virtual bool checkDTD(const NodeImpl* newChild);
 
   HTMLFormElementImpl* form() const;
 
@@ -247,10 +250,10 @@ class HTMLParamElementImpl : public HTMLElementImpl {
 
  public:
   HTMLParamElementImpl(DocumentPtr* doc);
-
   ~HTMLParamElementImpl();
 
-  virtual Id id() const;
+  virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
+  virtual int tagPriority() const { return 0; }
 
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
 

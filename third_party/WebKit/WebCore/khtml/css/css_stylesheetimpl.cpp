@@ -38,8 +38,6 @@
 #include "html/html_documentimpl.h"
 #include "misc/loader.h"
 
-#include "xml_namespace_table.h"
-
 #include <kdebug.h>
 
 using namespace DOM;
@@ -208,8 +206,8 @@ void CSSStyleSheetImpl::deleteRule(unsigned long index, int& exceptioncode) {
 }
 
 void CSSStyleSheetImpl::addNamespace(CSSParser* p,
-                                     const DOM::DOMString& prefix,
-                                     const DOM::DOMString& uri) {
+                                     const AtomicString& prefix,
+                                     const AtomicString& uri) {
   if (uri.isEmpty())
     return;
 
@@ -219,31 +217,22 @@ void CSSStyleSheetImpl::addNamespace(CSSParser* p,
     // Set the default namespace on the parser so that selectors that omit
     // namespace info will
     // be able to pick it up easily.
-    p->defaultNamespace = XmlNamespaceTable::getNamespaceID(uri, false);
+    p->defaultNamespace = uri;
 }
 
-void CSSStyleSheetImpl::determineNamespace(Q_UINT32& id,
-                                           const DOM::DOMString& prefix) {
-  // If the stylesheet has no namespaces we can just return.  There won't be any
-  // need to ever check
-  // namespace values in selectors.
-  if (!m_namespaces)
-    return;
-
+const AtomicString& CSSStyleSheetImpl::determineNamespace(
+    const AtomicString& prefix) {
   if (prefix.isEmpty())
-    id = makeId(noNamespace, localNamePart(id));  // No namespace. If an
-                                                  // element/attribute has a
-                                                  // namespace, we won't match
-                                                  // it.
-  else if (prefix == "*")
-    id = makeId(anyNamespace, localNamePart(id));  // We'll match any namespace.
-  else {
+    return emptyAtom;  // No namespace. If an element/attribute has a namespace,
+                       // we won't match it.
+  else if (prefix == starAtom)
+    return starAtom;  // We'll match any namespace.
+  else if (m_namespaces) {
     CSSNamespace* ns = m_namespaces->namespaceForPrefix(prefix);
     if (ns)
-      // Look up the id for this namespace URI.
-      id = makeId(XmlNamespaceTable::getNamespaceID(ns->uri(), false),
-                  localNamePart(id));
+      return ns->uri();
   }
+  return emptyAtom;  // Assume we wont match any namespaces.
 }
 
 bool CSSStyleSheetImpl::parseString(const DOMString& string, bool strict) {

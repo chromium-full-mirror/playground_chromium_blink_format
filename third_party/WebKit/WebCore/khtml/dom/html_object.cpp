@@ -36,7 +36,7 @@ HTMLAppletElement::HTMLAppletElement(HTMLAppletElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLAppletElement& HTMLAppletElement::operator=(const Node& other) {
-  assignOther(other, ID_APPLET);
+  assignOther(other, HTMLNames::applet());
   return *this;
 }
 
@@ -180,7 +180,7 @@ HTMLObjectElement::HTMLObjectElement(HTMLObjectElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLObjectElement& HTMLObjectElement::operator=(const Node& other) {
-  assignOther(other, ID_OBJECT);
+  assignOther(other, HTMLNames::object());
   return *this;
 }
 
@@ -408,7 +408,7 @@ HTMLParamElement::HTMLParamElement(HTMLParamElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLParamElement& HTMLParamElement::operator=(const Node& other) {
-  assignOther(other, ID_PARAM);
+  assignOther(other, HTMLNames::param());
   return *this;
 }
 

@@ -41,10 +41,7 @@ class DOMString;
 class HTMLCanvasElementImpl : public HTMLImageElementImpl {
  public:
   HTMLCanvasElementImpl(DocumentPtr* doc);
-
   ~HTMLCanvasElementImpl();
-
-  virtual Id id() const;
 
   virtual bool mapToEntry(NodeImpl::Id attr,
                           MappedAttributeEntry& result) const;

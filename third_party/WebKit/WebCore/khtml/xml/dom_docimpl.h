@@ -232,9 +232,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
 
-  ElementImpl* createHTMLElement(const DOMString& tagName, int& exceptioncode);
-  ElementImpl* createHTMLElement(unsigned short tagID);
-
   khtml::CSSStyleSelector* styleSelector() { return m_styleSelector; }
 
   ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key);
@@ -408,9 +405,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void resetVisitedLinkColor();
   void resetActiveLinkColor();
 
-  // internal
-  NodeImpl* findElement(Id id);
-
   bool prepareMouseEvent(bool readonly, int x, int y, MouseEvent* ev);
 
   virtual bool childAllowed(NodeImpl* newChild);
@@ -421,19 +415,10 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   // in order to be able to reassign those that are no longer in use
   // (could make problems when it is still kept somewhere around, i.e.
   // styleselector)
-  NodeImpl::Id tagId(DOMStringImpl* _namespaceURI,
-                     DOMStringImpl* _name,
-                     bool readonly);
-  DOMString tagName(NodeImpl::Id _id) const;
-
   NodeImpl::Id attrId(DOMStringImpl* _namespaceURI,
                       DOMStringImpl* _name,
                       bool readonly);
   DOMString attrName(NodeImpl::Id _id) const;
-
-  // the namespace uri is mapped to the same id for both
-  // tagnames as well as attributes.
-  DOMStringImpl* namespaceURI(NodeImpl::Id _id) const;
 
   StyleSheetListImpl* styleSheets();
 

@@ -47,7 +47,7 @@
 #include "wrap_contents_in_dummy_span_command.h"
 
 #include "misc/htmlattrs.h"
-#include "misc/htmltags.h"
+#include "htmlnames.h"
 #include "rendering/render_text.h"
 #include "xml/dom2_rangeimpl.h"
 #include "xml/dom_textimpl.h"
@@ -67,6 +67,7 @@ using DOM::NodeImpl;
 using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
+using DOM::HTMLNames;
 
 namespace khtml {
 
@@ -123,7 +124,7 @@ void CompositeEditCommand::insertParagraphSeparator() {
 
 void CompositeEditCommand::insertNodeBefore(NodeImpl* insertChild,
                                             NodeImpl* refChild) {
-  ASSERT(refChild->id() != ID_BODY);
+  ASSERT(!refChild->hasTagName(HTMLNames::body()));
   EditCommandPtr cmd(
       new InsertNodeBeforeCommand(document(), insertChild, refChild));
   applyCommandToComposite(cmd);
@@ -131,7 +132,7 @@ void CompositeEditCommand::insertNodeBefore(NodeImpl* insertChild,
 
 void CompositeEditCommand::insertNodeAfter(NodeImpl* insertChild,
                                            NodeImpl* refChild) {
-  ASSERT(refChild->id() != ID_BODY);
+  ASSERT(!refChild->hasTagName(HTMLNames::body()));
   if (refChild->parentNode()->lastChild() == refChild) {
     appendNode(insertChild, refChild->parentNode());
   } else {
@@ -556,7 +557,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   //       additional level of quoting.
   NodeImpl* startBlock = paragraphStart.node()->enclosingBlockFlowElement();
   NodeImpl* newBlock = 0;
-  if (startBlock->id() == ID_BODY ||
+  if (startBlock->hasTagName(HTMLNames::body()) ||
       (isMailBlockquote(startBlock) && paragraphStart.node() != startBlock))
     newBlock = createDefaultParagraphElement(document());
   else
@@ -567,9 +568,9 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
     moveNode = moveNode->traverseNextNode();
   NodeImpl* endNode = paragraphEnd.node();
 
-  if (paragraphStart.node()->id() == ID_BODY) {
+  if (paragraphStart.node()->hasTagName(HTMLNames::body())) {
     insertNodeAt(newBlock, paragraphStart.node(), 0);
-  } else if (paragraphStart.node()->id() == ID_BR) {
+  } else if (paragraphStart.node()->hasTagName(HTMLNames::br())) {
     insertNodeAfter(newBlock, paragraphStart.node());
   } else {
     insertNodeBefore(newBlock, paragraphStart.upstream().node());
@@ -587,7 +588,8 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
 
 ElementImpl* createBlockPlaceholderElement(DocumentImpl* document) {
   int exceptionCode = 0;
-  ElementImpl* breakNode = document->createHTMLElement("br", exceptionCode);
+  ElementImpl* breakNode = document->createElementNS(
+      HTMLNames::xhtmlNamespaceURI(), "br", exceptionCode);
   ASSERT(exceptionCode == 0);
   breakNode->setAttribute(ATTR_CLASS, blockPlaceholderClassString());
   return breakNode;
