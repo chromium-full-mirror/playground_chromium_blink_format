@@ -350,6 +350,7 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   AtomicString m_id;
 };
 
+// When adding new entries, make sure to keep eLastEntry at the end of the list.
 enum MappedAttributeEntry {
   eNone,
   eUniversal,
@@ -362,8 +363,8 @@ enum MappedAttributeEntry {
   eTable,
   eCell,
   eCaption,
-  eLastEntry,
-  eMarquee
+  eMarquee,
+  eLastEntry
 };
 
 class CSSMappedAttributeDeclarationImpl
