@@ -69,6 +69,7 @@ typedef struct CharacterWidthIterator CharacterWidthIterator;
   NSFont* smallCapsFont;
   ATSUStyle _ATSUSstyle;
   BOOL ATSUStyleInitialized;
+  BOOL ATSUMirrors;
 }
 
 + (BOOL)shouldBufferTextDrawing;
