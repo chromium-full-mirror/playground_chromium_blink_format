@@ -104,8 +104,11 @@ typedef unsigned long long DOMTimeStamp;
 #define isImplicitNode(n) (false)  // TODO: check that when khtml2 is ready
 
 // Debugging helper
-// inline kndbgstream &operator<<(kndbgstream &stream, const DOMString &string)
-// { return (stream << string.string()); }
+#ifndef APPLE_CHANGES
+inline kndbgstream& operator<<(kndbgstream& stream, const DOMString& string) {
+  return (stream << string.string());
+}
+#endif
 inline kdbgstream& operator<<(kdbgstream& stream, const DOMString& string) {
   return (stream << string.string());
 }
