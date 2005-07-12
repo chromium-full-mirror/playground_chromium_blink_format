@@ -363,7 +363,6 @@ enum MappedAttributeEntry {
   eTable,
   eCell,
   eCaption,
-  eMarquee,
   eLastEntry
 };
 
