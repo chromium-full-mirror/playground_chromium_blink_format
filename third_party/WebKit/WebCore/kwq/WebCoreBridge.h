@@ -303,10 +303,9 @@ typedef enum {
 - (NSString*)matchLabels:(NSArray*)labels againstElement:(DOMElement*)element;
 
 - (BOOL)searchFor:(NSString*)string
-          direction:(BOOL)forward
-      caseSensitive:(BOOL)caseFlag
-               wrap:(BOOL)wrapFlag
-    findInSelection:(BOOL)inSelectionFlag;
+        direction:(BOOL)forward
+    caseSensitive:(BOOL)caseFlag
+             wrap:(BOOL)wrapFlag;
 - (void)jumpToSelection;
 
 - (NSString*)advanceToNextMisspelling;
