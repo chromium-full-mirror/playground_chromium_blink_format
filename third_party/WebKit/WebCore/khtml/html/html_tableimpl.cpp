@@ -68,7 +68,10 @@ HTMLTableElementImpl::HTMLTableElementImpl(DocumentPtr* doc)
   m_solid = false;
 }
 
-HTMLTableElementImpl::~HTMLTableElementImpl() {}
+HTMLTableElementImpl::~HTMLTableElementImpl() {
+  if (firstBody)
+    firstBody->deref();
+}
 
 bool HTMLTableElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->isTextNode() || newChild->hasTagName(HTMLNames::caption()) ||
@@ -128,8 +131,10 @@ NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
   int exceptioncode = 0;
   NodeImpl* r;
 
+  s->ref();
   if (firstBody) {
     replaceChild(s, firstBody, exceptioncode);
+    firstBody->deref();
     r = s;
   } else
     r = appendChild(s, exceptioncode);
@@ -206,7 +211,7 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(long index,
   // (note: this is different from "if the table has no sections", since we can
   // have
   // <TABLE><TR>)
-  if (!firstBody && !head && !foot && !hasChildNodes())
+  if (!firstBody && !head && !foot)
     setTBody(new HTMLTableSectionElementImpl(HTMLNames::tbody(), docPtr(),
                                              true /* implicit */));
 
@@ -335,10 +340,21 @@ NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
       head = static_cast<HTMLTableSectionElementImpl*>(child);
     else if (!foot && child->hasTagName(HTMLNames::tfoot()))
       foot = static_cast<HTMLTableSectionElementImpl*>(child);
-    else if (!firstBody && child->hasTagName(HTMLNames::tbody()))
+    else if (!firstBody && child->hasTagName(HTMLNames::tbody())) {
       firstBody = static_cast<HTMLTableSectionElementImpl*>(child);
+      firstBody->ref();
+    }
   }
   return retval;
+}
+
+void HTMLTableElementImpl::childrenChanged() {
+  HTMLElementImpl::childrenChanged();
+
+  if (firstBody && firstBody->parentNode() != this) {
+    firstBody->deref();
+    firstBody = 0;
+  }
 }
 
 bool HTMLTableElementImpl::mapToEntry(NodeImpl::Id attr,
