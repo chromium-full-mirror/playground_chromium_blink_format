@@ -35,7 +35,7 @@ enum DOMEventExceptionCode { DOM_UNSPECIFIED_EVENT_TYPE_ERR = 0 };
 - (void)handleEvent:(DOMEvent*)event;
 @end
 
-@protocol DOMEventTarget<NSObject>
+@protocol DOMEventTarget<NSObject, NSCopying>
 - (void)addEventListener:(NSString*)
                     type:(id<DOMEventListener>)
                 listener:(BOOL)useCapture;

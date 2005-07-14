@@ -122,7 +122,7 @@ inline id getDOMWrapper(Source impl) {
   return getDOMWrapperImpl(DOM_cast<DOMObjectInternal*>(impl));
 }
 template <class Source>
-inline void addDOMWrapper(id wrapper, Source impl) {
+inline void addDOMWrapper(NSObject* wrapper, Source impl) {
   addDOMWrapperImpl(wrapper, DOM_cast<DOMObjectInternal*>(impl));
 }
 void removeDOMWrapper(DOMObjectInternal* impl);
