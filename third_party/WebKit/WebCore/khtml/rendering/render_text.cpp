@@ -817,7 +817,7 @@ int InlineTextBox::positionForOffset(int offset) const {
 // -------------------------------------------------------------------------------------
 
 RenderText::RenderText(DOM::NodeImpl* node, DOMStringImpl* _str)
-    : RenderObject(node), m_linesDirty(false) {
+    : RenderObject(node), m_linesDirty(false), m_containsReversedText(false) {
   // init RenderObject attributes
   setRenderText();  // our object inherits from RenderText
 
@@ -1717,6 +1717,7 @@ void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
   }
 
   reverse = reverse && !style()->visuallyOrdered();
+  m_containsReversedText |= reverse;
 
 #ifdef DEBUG_LAYOUT
   QChar* ch = str->s + from;

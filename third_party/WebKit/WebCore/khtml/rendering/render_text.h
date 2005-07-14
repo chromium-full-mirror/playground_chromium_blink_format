@@ -110,6 +110,10 @@ class InlineTextBox : public InlineRunBox {
   // Overridden to prevent the normal delete from being called.
   void operator delete(void* ptr, size_t sz);
 
+  // Current used only for sorting, == could be made more robust if needed
+  bool operator==(const InlineTextBox& b) { return m_start == b.m_start; }
+  bool operator<(const InlineTextBox& b) { return m_start < b.m_start; }
+
  private:
   // The normal operator new is disallowed.
   void* operator new(size_t sz) throw();
@@ -313,6 +317,8 @@ class RenderText : public RenderObject {
   virtual long previousOffset(long current) const;
   virtual long nextOffset(long current) const;
 
+  bool containsReversedText() { return m_containsReversedText; }
+
 #if APPLE_CHANGES
  public:
 #endif
@@ -341,10 +347,11 @@ class RenderText : public RenderObject {
 
   bool m_linesDirty : 1;  // This bit indicates that the text run has already
                           // dirtied specific
-// line boxes, and this hint will enable layoutInlineChildren to avoid
-// just dirtying everything when character data is modified (e.g.,
-// appended/inserted
-// or removed).
+  // line boxes, and this hint will enable layoutInlineChildren to avoid
+  // just dirtying everything when character data is modified (e.g.,
+  // appended/inserted
+  // or removed).
+  bool m_containsReversedText : 1;
 
 // 22 bits left
 #if APPLE_CHANGES

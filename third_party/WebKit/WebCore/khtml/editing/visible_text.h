@@ -27,6 +27,8 @@
 #define KHTML_EDITING_VISIBLE_TEXT_H
 
 #include "xml/dom2_rangeimpl.h"
+#include "render_text.h"
+#include "../kwq/KWQSortedList.h"
 
 #include <qstring.h>
 
@@ -128,6 +130,9 @@ class TextIterator {
   // Used for whitespace characters that aren't in the DOM, so we can point at
   // them.
   QChar m_singleCharacterBuffer;
+
+  // Used when text boxes are out of order (Hebrew/Arabic w/ embeded LTR text)
+  QSortedList<InlineTextBox> m_sortedTextBoxes;
 };
 
 // Iterates through the DOM range, returning all the text, and 0-length
