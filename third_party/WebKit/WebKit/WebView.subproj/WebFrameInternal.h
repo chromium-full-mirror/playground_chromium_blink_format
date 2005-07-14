@@ -45,6 +45,7 @@
                                             response:(NSURLResponse*)response
                                               length:(unsigned)length
                                                error:(NSError*)error;
+- (void)_safeLoadURL:(NSURL*)URL;
 - (void)
 _saveResourceAndSendRemainingDelegateMessagesWithRequest:(NSURLRequest*)request
                                               identifier:(id)identifier
