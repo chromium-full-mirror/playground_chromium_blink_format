@@ -43,6 +43,10 @@ ObjectPrototypeImp::ObjectPrototypeImp(ExecState* exec,
       toStringPropertyName,
       new ObjectProtoFuncImp(exec, funcProto, ObjectProtoFuncImp::ToString, 0),
       DontEnum);
+  putDirect(toLocaleStringPropertyName,
+            new ObjectProtoFuncImp(exec, funcProto,
+                                   ObjectProtoFuncImp::ToLocaleString, 0),
+            DontEnum);
   putDirect(
       valueOfPropertyName,
       new ObjectProtoFuncImp(exec, funcProto, ObjectProtoFuncImp::ValueOf, 0),
@@ -83,6 +87,8 @@ Value ObjectProtoFuncImp::call(ExecState* exec,
       bool exists = thisObj.hasOwnProperty(exec, propertyName);
       return Value(exists ? BooleanImp::staticTrue : BooleanImp::staticFalse);
     }
+    case ToLocaleString:
+      return thisObj.imp()->toString(exec);
     case ToString:
     default:
       return String("[object " + thisObj.className() + "]");
