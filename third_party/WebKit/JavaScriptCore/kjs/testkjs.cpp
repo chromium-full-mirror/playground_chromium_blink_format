@@ -29,6 +29,7 @@
 #include "object.h"
 #include "types.h"
 #include "interpreter.h"
+#include "collector.h"
 
 using namespace KJS;
 
@@ -38,7 +39,7 @@ class TestFunctionImp : public ObjectImp {
   virtual bool implementsCall() const { return true; }
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
 
-  enum { Print, Debug, Quit };
+  enum { Print, Debug, Quit, GC };
 
  private:
   int id;
@@ -59,6 +60,11 @@ Value TestFunctionImp::call(ExecState* exec,
     case Quit:
       exit(0);
       return Undefined();
+    case GC:
+      Interpreter::lock();
+      Collector::collect();
+      Interpreter::unlock();
+      break;
     default:
       break;
   }
@@ -111,6 +117,9 @@ int main(int argc, char** argv) {
     // add "quit" for compatibility with the mozilla js shell
     global.put(interp.globalExec(), "quit",
                Object(new TestFunctionImp(TestFunctionImp::Quit, 0)));
+    // add "gc" for compatibility with the mozilla js shell
+    global.put(interp.globalExec(), "gc",
+               Object(new TestFunctionImp(TestFunctionImp::GC, 0)));
     // add "version" for compatibility with the mozilla js shell
     global.put(interp.globalExec(), "version",
                Object(new VersionFunctionImp()));
