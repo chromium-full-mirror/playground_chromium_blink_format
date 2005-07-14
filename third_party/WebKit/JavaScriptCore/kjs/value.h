@@ -17,8 +17,8 @@
  *
  *  You should have received a copy of the GNU Library General Public License
  *  along with this library; see the file COPYING.LIB.  If not, write to
- *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- *  Boston, MA 02111-1307, USA.
+ *  the Free Software Foundation, Inc., 51 Franklin Steet, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
  *
  */
 
@@ -242,7 +242,7 @@ class Value {
   /**
    * Checks whether or not the value is of a particular tpye
    *
-   * @param The type to compare with
+   * @param t The type to compare with
    * @return true if the value is of the specified type, otherwise false
    */
   bool isA(Type t) const { return rep->dispatchType() == t; }
@@ -325,7 +325,7 @@ class Undefined : public Value {
    * Converts a Value into an Undefined. If the value's type is not
    * UndefinedType, a null object will be returned (i.e. one with it's
    * internal pointer set to 0). If you do not know for sure whether the
-   * value is of type UndefinedType, you should check the @ref isNull()
+   * value is of type UndefinedType, you should check the isValid()
    * methods afterwards before calling any methods on the returned value.
    *
    * @return The value converted to an Undefined
@@ -350,7 +350,7 @@ class Null : public Value {
    * Converts a Value into an Null. If the value's type is not NullType,
    * a null object will be returned (i.e. one with it's internal pointer set
    * to 0). If you do not know for sure whether the value is of type
-   * NullType, you should check the @ref isNull() methods afterwards before
+   * NullType, you should check the isValid() methods afterwards before
    * calling any methods on the returned value.
    *
    * @return The value converted to a Null
@@ -363,7 +363,7 @@ class Null : public Value {
 };
 
 /**
- * Represents an primitive Null value
+ * Represents an primitive Boolean value
  */
 class Boolean : public Value {
  public:
@@ -373,7 +373,7 @@ class Boolean : public Value {
    * Converts a Value into an Boolean. If the value's type is not BooleanType,
    * a null object will be returned (i.e. one with it's internal pointer set
    * to 0). If you do not know for sure whether the value is of type
-   * BooleanType, you should check the @ref isNull() methods afterwards before
+   * BooleanType, you should check the isValid() methods afterwards before
    * calling any methods on the returned value.
    *
    * @return The value converted to a Boolean
@@ -388,7 +388,7 @@ class Boolean : public Value {
 };
 
 /**
- * Represents an primitive Null value
+ * Represents an primitive String value
  */
 class String : public Value {
  public:
@@ -398,7 +398,7 @@ class String : public Value {
    * Converts a Value into an String. If the value's type is not StringType,
    * a null object will be returned (i.e. one with it's internal pointer set
    * to 0). If you do not know for sure whether the value is of type
-   * StringType, you should check the @ref isNull() methods afterwards before
+   * StringType, you should check the isValid() methods afterwards before
    * calling any methods on the returned value.
    *
    * @return The value converted to a String
@@ -439,7 +439,7 @@ class Number : public Value {
    * Converts a Value into an Number. If the value's type is not NumberType,
    * a null object will be returned (i.e. one with it's internal pointer set
    * to 0). If you do not know for sure whether the value is of type
-   * NumberType, you should check the @ref isNull() methods afterwards before
+   * NumberType, you should check the isNull() methods afterwards before
    * calling any methods on the returned value.
    *
    * @return The value converted to a Number

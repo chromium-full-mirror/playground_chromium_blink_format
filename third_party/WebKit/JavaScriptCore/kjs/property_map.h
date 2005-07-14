@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2004 Apple Computer, Inc.
@@ -14,8 +15,8 @@
  *
  *  You should have received a copy of the GNU Library General Public License
  *  along with this library; see the file COPYING.LIB.  If not, write to
- *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- *  Boston, MA 02111-1307, USA.
+ *  the Free Software Foundation, Inc., 51 Franklin Steet, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
  *
  */
 
@@ -34,6 +35,9 @@ class SavedProperty;
 
 struct PropertyMapHashTable;
 
+/**
+* Saved Properties
+*/
 class SavedProperties {
   friend class PropertyMap;
 
@@ -49,6 +53,9 @@ class SavedProperties {
   SavedProperties& operator=(const SavedProperties&);
 };
 
+/**
+* A hashtable entry for the @ref PropertyMap.
+*/
 struct PropertyMapHashTableEntry {
   PropertyMapHashTableEntry() : key(0) {}
   UString::Rep* key;
@@ -56,6 +63,9 @@ struct PropertyMapHashTableEntry {
   int attributes;
   int index;
 };
+/**
+* Javascript Property Map.
+*/
 
 class PropertyMap {
  public:
@@ -95,6 +105,6 @@ class PropertyMap {
   Entry _singleEntry;
 };
 
-};  // namespace
+}  // namespace
 
 #endif  // _KJS_PROPERTY_MAP_H_

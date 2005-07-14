@@ -164,4 +164,4 @@ unsigned InterpreterMap::computeHash(ObjectImp* pointer) {
   return pointerHash(pointer);
 }
 
-};  // namespace
+}  // namespace

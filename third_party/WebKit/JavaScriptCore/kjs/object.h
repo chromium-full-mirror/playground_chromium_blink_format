@@ -17,8 +17,8 @@
  *
  *  You should have received a copy of the GNU Library General Public License
  *  along with this library; see the file COPYING.LIB.  If not, write to
- *  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- *  Boston, MA 02111-1307, USA.
+ *  the Free Software Foundation, Inc., 51 Franklin Steet, Fifth Floor,
+ *  Boston, MA 02110-1301, USA.
  *
  */
 
@@ -102,7 +102,7 @@ class Object : public Value {
    * Converts a Value into an Object. If the value's type is not ObjectType,
    * a null object will be returned (i.e. one with it's internal pointer set
    * to 0). If you do not know for sure whether the value is of type
-   * ObjectType, you should check the @ref isNull() methods afterwards before
+   * ObjectType, you should check the isValid() methods afterwards before
    * calling any methods on the Object.
    *
    * @return The value converted to an object
@@ -250,7 +250,7 @@ class Object : public Value {
    * this is discouraged.
    *
    * If an error occurs during construction, the execution state's exception
-   * will be set. This can be tested for with @ref ExecState::hadException().
+   * will be set. This can be tested for with ExecState::hadException().
    * Under some circumstances, the exception object may also be returned.
    *
    * Note: This function should not be called if implementsConstruct() returns
@@ -307,12 +307,12 @@ class Object : public Value {
   bool implementsHasInstance() const;
 
   /**
-   * Checks whether value delegates behaviour to this object. Used by the
+   * Checks whether value delegates behavior to this object. Used by the
    * instanceof operator.
    *
    * @param exec The current execution state
    * @param value The value to check
-   * @return true if value delegates behaviour to this object, otherwise
+   * @return true if value delegates behavior to this object, otherwise
    * false
    */
   Boolean hasInstance(ExecState* exec, const Value& value);
@@ -323,6 +323,7 @@ class Object : public Value {
    * extra object in it's scope. An example of this is functions declared
    * inside other functions:
    *
+   * \code
    * function f() {
    *
    *   function b() {
@@ -333,6 +334,7 @@ class Object : public Value {
    *   // do some stuff
    * }
    * f.prototype = new String();
+   * \endcode
    *
    * When the function f.b is executed, its scope will include properties of
    * f. So in the example above the return value of f.b() would be the new
@@ -415,7 +417,7 @@ class ObjectImp : public ValueImp {
   /**
    * A pointer to a ClassInfo struct for this class. This provides a basic
    * facility for run-time type information, and can be used to check an
-   * object's class an inheritance (see @ref inherits()). This should
+   * object's class an inheritance (see inherits()). This should
    * always return a statically declared pointer, or 0 to indicate that
    * there is no class information.
    *
@@ -426,6 +428,7 @@ class ObjectImp : public ValueImp {
    * where FooImp inherits from BarImp, you would add the following in your
    * class declarations:
    *
+   * \code
    *   class BarImp : public ObjectImp {
    *     virtual const ClassInfo *classInfo() const { return &info; }
    *     static const ClassInfo info;
@@ -437,11 +440,14 @@ class ObjectImp : public ValueImp {
    *     static const ClassInfo info;
    *     // ...
    *   };
+   * \endcode
    *
    * And in your source file:
    *
+   * \code
    *   const ClassInfo BarImp::info = {0, 0, 0}; // no parent class
    *   const ClassInfo FooImp::info = {&BarImp::info, 0, 0};
+   * \endcode
    *
    * @see inherits()
    */
@@ -461,7 +467,7 @@ class ObjectImp : public ValueImp {
    *   }
    *
    * If you have a handle to a statically declared ClassInfo, such as in the
-   * @ref classInfo() example, you can check for inheritance without needing
+   * classInfo() example, you can check for inheritance without needing
    * an instance of the other class:
    *
    *   if (obj1->inherits(FooImp::info)) {
@@ -491,8 +497,8 @@ class ObjectImp : public ValueImp {
    * Objects)
    *
    * The default implementation uses classInfo().
-   * You should either implement @ref classInfo(), or
-   * if you simply need a classname, you can reimplement @ref className()
+   * You should either implement classInfo(), or
+   * if you simply need a classname, you can reimplement className()
    * instead.
    *
    * @see Object::className()
@@ -685,7 +691,7 @@ class Error {
                        const UString* sourceURL = 0);
 
   /**
-   * Array of error names corresponding to @ref ErrorType
+   * Array of error names corresponding to ErrorType
    */
   static const char* const* const errorNames;
 };
