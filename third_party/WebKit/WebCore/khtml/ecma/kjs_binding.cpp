@@ -29,6 +29,7 @@
 #include "dom/dom_exception.h"
 #include "dom/dom2_events.h"
 #include "dom/dom2_range.h"
+#include "misc/hashmap.h"
 #include "xml/dom_nodeimpl.h"
 #include "xml/dom2_eventsimpl.h"
 #include "dom/css_stylesheet.h"
@@ -37,8 +38,11 @@
 
 using DOM::CSSException;
 using DOM::DOMString;
+using DOM::DocumentImpl;
 using DOM::NodeImpl;
 using DOM::RangeException;
+using khtml::HashMap;
+using khtml::PointerHash;
 
 namespace KJS {
 
@@ -73,22 +77,19 @@ Value DOMFunction::call(ExecState* exec, Object& thisObj, const List& args) {
   return tryCall(exec, thisObj, args);
 }
 
-static QPtrDict<DOMObject>* staticDomObjects = 0;
-QPtrDict<QPtrDict<DOMNode>>* staticDOMNodesPerDocument = 0;
+typedef HashMap<void*, DOMObject*> DOMObjectMap;
+typedef HashMap<NodeImpl*, DOMNode*, PointerHash<NodeImpl*>> NodeMap;
+typedef HashMap<DocumentImpl*, NodeMap*, PointerHash<DocumentImpl*>>
+    NodePerDocMap;
 
-QPtrDict<DOMObject>& ScriptInterpreter::domObjects() {
-  if (!staticDomObjects) {
-    staticDomObjects = new QPtrDict<DOMObject>(1021);
-  }
-  return *staticDomObjects;
+static DOMObjectMap* domObjects() {
+  static DOMObjectMap* staticDomObjects = new DOMObjectMap();
+  return staticDomObjects;
 }
 
-QPtrDict<QPtrDict<DOMNode>>& ScriptInterpreter::domNodesPerDocument() {
-  if (!staticDOMNodesPerDocument) {
-    staticDOMNodesPerDocument = new QPtrDict<QPtrDict<DOMNode>>();
-    staticDOMNodesPerDocument->setAutoDelete(true);
-  }
-  return *staticDOMNodesPerDocument;
+static NodePerDocMap* domNodesPerDocument() {
+  static NodePerDocMap* staticDOMNodesPerDocument = new NodePerDocMap();
+  return staticDOMNodesPerDocument;
 }
 
 ScriptInterpreter::ScriptInterpreter(const Object& global, KHTMLPart* part)
@@ -110,23 +111,34 @@ ScriptInterpreter::~ScriptInterpreter() {
 #endif
 }
 
+DOMObject* ScriptInterpreter::getDOMObject(void* objectHandle) {
+  return domObjects()->get(objectHandle);
+}
+
+void ScriptInterpreter::putDOMObject(void* objectHandle, DOMObject* obj) {
+  domObjects()->insert(objectHandle, obj);
+}
+
+void ScriptInterpreter::deleteDOMObject(void* objectHandle) {
+  domObjects()->remove(objectHandle);
+}
+
 void ScriptInterpreter::forgetDOMObject(void* objectHandle) {
   deleteDOMObject(objectHandle);
 }
 
 DOMNode* ScriptInterpreter::getDOMNodeForDocument(DOM::DocumentImpl* document,
                                                   DOM::NodeImpl* node) {
-  QPtrDict<DOMNode>* documentDict =
-      (QPtrDict<DOMNode>*)domNodesPerDocument()[document];
+  NodeMap* documentDict = domNodesPerDocument()->get(document);
   if (documentDict)
-    return (*documentDict)[node];
+    return documentDict->get(node);
 
   return NULL;
 }
 
 void ScriptInterpreter::forgetDOMNodeForDocument(DOM::DocumentImpl* document,
                                                  NodeImpl* node) {
-  QPtrDict<DOMNode>* documentDict = domNodesPerDocument()[document];
+  NodeMap* documentDict = domNodesPerDocument()->get(document);
   if (documentDict)
     documentDict->remove(node);
 }
@@ -134,38 +146,38 @@ void ScriptInterpreter::forgetDOMNodeForDocument(DOM::DocumentImpl* document,
 void ScriptInterpreter::putDOMNodeForDocument(DOM::DocumentImpl* document,
                                               NodeImpl* nodeHandle,
                                               DOMNode* nodeWrapper) {
-  QPtrDict<DOMNode>* documentDict = domNodesPerDocument()[document];
+  NodeMap* documentDict = domNodesPerDocument()->get(document);
   if (!documentDict) {
-    documentDict = new QPtrDict<DOMNode>();
-    domNodesPerDocument().insert(document, documentDict);
+    documentDict = new NodeMap();
+    domNodesPerDocument()->insert(document, documentDict);
   }
-
   documentDict->insert(nodeHandle, nodeWrapper);
 }
 
 void ScriptInterpreter::forgetAllDOMNodesForDocument(
     DOM::DocumentImpl* document) {
-  domNodesPerDocument().remove(document);
+  NodePerDocMap::iterator it = domNodesPerDocument()->find(document);
+  if (it != domNodesPerDocument()->end()) {
+    delete it->second;
+    domNodesPerDocument()->remove(it);
+  }
 }
 
 void ScriptInterpreter::mark() {
-  QPtrDictIterator<QPtrDict<DOMNode>> dictIterator(domNodesPerDocument());
-
-  QPtrDict<DOMNode>* nodeDict;
-  while ((nodeDict = dictIterator.current())) {
-    QPtrDictIterator<DOMNode> nodeIterator(*nodeDict);
-
-    DOMNode* node;
-    while ((node = nodeIterator.current())) {
+  NodePerDocMap::iterator dictEnd = domNodesPerDocument()->end();
+  for (NodePerDocMap::iterator dictIt = domNodesPerDocument()->begin();
+       dictIt != dictEnd; ++dictIt) {
+    NodeMap* nodeDict = dictIt->second;
+    NodeMap::iterator nodeEnd = nodeDict->end();
+    for (NodeMap::iterator nodeIt = nodeDict->begin(); nodeIt != nodeEnd;
+         ++nodeIt) {
+      DOMNode* node = nodeIt->second;
       // don't mark wrappers for nodes that are no longer in the
       // document - they should not be saved if the node is not
       // otherwise reachable from JS.
       if (node->impl()->inDocument() && !node->marked())
         node->mark();
-
-      ++nodeIterator;
     }
-    ++dictIterator;
   }
 }
 

@@ -520,7 +520,7 @@ inline void HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::remove(
   if (!m_table)
     return;
 
-  remove(lookup(key).first);
+  remove(find(key));
 }
 
 template <typename Key,
@@ -530,6 +530,9 @@ template <typename Key,
           typename Traits>
 inline void HashTable<Key, Value, ExtractKey, HashFunctions, Traits>::remove(
     iterator it) {
+  if (it == end())
+    return;
+
   remove(it.m_position);
 }
 

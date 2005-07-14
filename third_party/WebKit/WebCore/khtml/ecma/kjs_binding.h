@@ -24,7 +24,6 @@
 
 #include <kjs/interpreter.h>
 #include <qvariant.h>
-#include <qptrdict.h>
 #include <kjs/lookup.h>
 #include <kjs/protect.h>
 
@@ -107,16 +106,9 @@ class ScriptInterpreter : public Interpreter {
   ScriptInterpreter(const Object& global, KHTMLPart* part);
   virtual ~ScriptInterpreter();
 
-  static DOMObject* getDOMObject(void* objectHandle) {
-    return domObjects()[objectHandle];
-  }
-  static void putDOMObject(void* objectHandle, DOMObject* obj) {
-    domObjects().insert(objectHandle, obj);
-  }
-  static bool deleteDOMObject(void* objectHandle) {
-    return domObjects().remove(objectHandle);
-  }
-
+  static DOMObject* getDOMObject(void* objectHandle);
+  static void putDOMObject(void* objectHandle, DOMObject* obj);
+  static void deleteDOMObject(void* objectHandle);
   static void forgetDOMObject(void* objectHandle);
 
   static DOMNode* getDOMNodeForDocument(DOM::DocumentImpl* document,
@@ -170,9 +162,6 @@ class ScriptInterpreter : public Interpreter {
 
  private:
   KHTMLPart* m_part;
-
-  static QPtrDict<DOMObject>& domObjects();
-  static QPtrDict<QPtrDict<DOMNode>>& domNodesPerDocument();
 
   DOM::EventImpl* m_evt;
   bool m_inlineCode;
