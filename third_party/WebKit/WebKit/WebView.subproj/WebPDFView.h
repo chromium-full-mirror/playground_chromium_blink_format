@@ -35,6 +35,7 @@
 
 @interface WebPDFView : NSView<WebDocumentView,
                                WebDocumentSearching,
+                               WebDocumentText,
                                _web_WebDocumentTextSizing> {
   PDFView* PDFSubview;
   WebDataSource* dataSource;
