@@ -589,6 +589,13 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
                              // dispatchEvent?
 }
 
+DocumentPtr* DocumentPtr::nullDocumentPtr() {
+  static DocumentPtr doc;
+
+  doc.ref();
+  return &doc;
+}
+
 bool NodeImpl::dispatchHTMLEvent(int _id,
                                  bool canBubbleArg,
                                  bool cancelableArg) {
