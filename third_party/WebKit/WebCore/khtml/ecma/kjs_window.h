@@ -352,7 +352,8 @@ class Location : public ObjectImp {
     EqualEqual,
     Replace,
     Reload,
-    ToString
+    ToString,
+    Assign
   };
   KHTMLPart* part() const { return m_part; }
   virtual const ClassInfo* classInfo() const { return &info; }

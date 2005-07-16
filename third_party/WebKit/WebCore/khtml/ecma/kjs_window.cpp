@@ -2468,7 +2468,8 @@ UString FrameArray::toString(ExecState*) const {
 
 const ClassInfo Location::info = {"Location", 0, 0, 0};
 /*
-@begin LocationTable 11
+@begin LocationTable 12
+  assign    Location::Assign    DontDelete|Function 1
   hash		Location::Hash		DontDelete
   host		Location::Host		DontDelete
   hostname	Location::Hostname	DontDelete
@@ -2555,6 +2556,9 @@ Value Location::get(ExecState* exec, const Identifier& p) const {
         return lookupOrCreateFunction<LocationFunc>(exec, p, this, entry->value,
                                                     entry->params, entry->attr);
       case Reload:
+        return lookupOrCreateFunction<LocationFunc>(exec, p, this, entry->value,
+                                                    entry->params, entry->attr);
+      case Assign:
         return lookupOrCreateFunction<LocationFunc>(exec, p, this, entry->value,
                                                     entry->params, entry->attr);
     }
@@ -2690,6 +2694,31 @@ Value LocationFunc::tryCall(ExecState* exec,
           part->scheduleLocationChange(part->url().url(),
                                        activePart->referrer(),
                                        true /*lock history*/, userGesture);
+        }
+        break;
+      }
+      case Location::Assign: {
+        KHTMLPart* p = Window::retrieveActive(exec)->part();
+        if (p) {
+          const Window* window = Window::retrieveWindow(part);
+          QString dstUrl =
+              p->xmlDocImpl()->completeURL(args[0].toString(exec).qstring());
+          if (!dstUrl.startsWith("javascript:", false) ||
+              (window && window->isSafeScript(exec))) {
+            bool userGesture =
+                static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
+                    ->wasRunByUserGesture();
+#if APPLE_CHANGES
+            // We want a new history item if this JS was called via a user
+            // gesture
+            part->scheduleLocationChange(dstUrl, p->referrer(), !userGesture,
+                                         userGesture);
+#else
+            part->scheduleLocationChange(dstUrl, p->referrer(),
+                                         false /*don't lock history*/,
+                                         userGesture);
+#endif
+          }
         }
         break;
       }
