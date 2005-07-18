@@ -54,9 +54,3 @@ textSizeMultiplier] returns the current value.
 @protocol WebDocumentElement<NSObject>
 - (NSDictionary*)elementAtPoint:(NSPoint)point;
 @end
-
-@protocol WebDocumentSelection<NSObject>
-- (NSArray*)pasteboardTypesForSelection;
-- (void)writeSelectionWithPasteboardTypes:(NSArray*)types
-                             toPasteboard:(NSPasteboard*)pasteboard;
-@end

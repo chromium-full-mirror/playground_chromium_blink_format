@@ -33,8 +33,7 @@
 
 @interface WebTextView : WebSearchableTextView<WebDocumentView,
                                                WebDocumentText,
-                                               WebDocumentElement,
-                                               WebDocumentSelection> {
+                                               WebDocumentElement> {
   float _textSizeMultiplier;
 }
 
