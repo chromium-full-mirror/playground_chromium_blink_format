@@ -102,7 +102,8 @@ class HTMLBRElementImpl : public HTMLElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
 
-  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -122,7 +123,8 @@ class HTMLFontElementImpl : public HTMLElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 1; }
 
-  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   DOMString color() const;

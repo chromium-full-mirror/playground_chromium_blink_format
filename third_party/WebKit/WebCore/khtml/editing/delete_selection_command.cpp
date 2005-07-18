@@ -705,6 +705,8 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete(
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
+  if (!m_typingStyle)
+    return;
   CSSComputedStyleDeclarationImpl endingStyle(m_endingPosition.node());
   endingStyle.diff(m_typingStyle);
   if (!m_typingStyle->length()) {

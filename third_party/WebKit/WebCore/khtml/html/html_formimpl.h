@@ -371,7 +371,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void click(bool sendMouseEvents = false);
   virtual void accessKeyAction(bool sendToAnyElement);
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
@@ -420,9 +420,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   DOMString alt() const;
   void setAlt(const DOMString&);
 
-  DOMString sizeDOM()
-      const;  // FIXME: rename to size after renaming existing size attribute
-  void setSize(const DOMString&);
+  void setSize(unsigned long);
 
   DOMString src() const;
   void setSrc(const DOMString&);

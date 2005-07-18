@@ -1965,7 +1965,7 @@ Value HTMLElement::inputGetter(ExecState* exec, int token) const {
     case InputSelectionEnd:
       return getInputSelectionEnd(input);
     case InputSize:
-      return String(input.sizeDOM());
+      return Number(input.size());
     case InputSrc:
       return String(input.src());
     case InputTabIndex:
@@ -3484,7 +3484,7 @@ void HTMLElement::inputSetter(ExecState* exec,
       return;
     }
     case InputSize: {
-      input.setSize(str);
+      input.setSize(value.toInt32(exec));
       return;
     }
     case InputSelectionStart: {

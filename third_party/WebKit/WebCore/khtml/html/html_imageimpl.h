@@ -80,7 +80,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
   virtual int tagPriority() const { return 0; }
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl*);
 

@@ -78,8 +78,8 @@ class CSSSelector {
       : tagHistory(0),
         simpleSelector(0),
         nextSelector(0),
-        attr(0),
-        tag(anyTagName()),
+        attr(anyQName()),
+        tag(anyQName()),
         relation(Descendant),
         match(None),
         pseudoId(0),
@@ -89,7 +89,7 @@ class CSSSelector {
       : tagHistory(0),
         simpleSelector(0),
         nextSelector(0),
-        attr(0),
+        attr(anyQName()),
         tag(qName),
         relation(Descendant),
         match(None),
@@ -184,16 +184,15 @@ class CSSSelector {
     return _pseudoType;
   }
 
-  static const QualifiedName& anyTagName();
-
-  bool hasTag() const { return tag != anyTagName(); }
+  bool hasTag() const { return tag != anyQName(); }
+  bool hasAttribute() const { return attr != anyQName(); }
 
   mutable DOM::AtomicString value;
   CSSSelector* tagHistory;
   CSSSelector* simpleSelector;  // Used for :not.
   CSSSelector* nextSelector;    // used for ,-chained selectors
-  Q_UINT32 attr;
 
+  QualifiedName attr;
   QualifiedName tag;
 
   Relation relation : 3;

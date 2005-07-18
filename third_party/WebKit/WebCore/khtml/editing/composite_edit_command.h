@@ -33,6 +33,7 @@ namespace DOM {
 class CSSStyleDeclarationImpl;
 class DOMString;
 class TextImpl;
+class QualifiedName;
 }
 
 namespace khtml {
@@ -74,7 +75,8 @@ class CompositeEditCommand : public EditCommand {
   void rebalanceWhitespace();
   void removeCSSProperty(DOM::CSSStyleDeclarationImpl*, int property);
   void removeFullySelectedNode(DOM::NodeImpl* node);
-  void removeNodeAttribute(DOM::ElementImpl*, int attribute);
+  void removeNodeAttribute(DOM::ElementImpl*,
+                           const DOM::QualifiedName& attribute);
   void removeChildrenInRange(DOM::NodeImpl* node, int from, int to);
   void removeNode(DOM::NodeImpl* removeChild);
   void removeNodePreservingChildren(DOM::NodeImpl* node);
@@ -83,7 +85,7 @@ class CompositeEditCommand : public EditCommand {
                          long count,
                          const DOM::DOMString& replacementText);
   void setNodeAttribute(DOM::ElementImpl*,
-                        int attribute,
+                        const DOM::QualifiedName& attribute,
                         const DOM::DOMString&);
   void splitTextNode(DOM::TextImpl* text, long offset);
   void splitElement(DOM::ElementImpl* element, DOM::NodeImpl* atChild);

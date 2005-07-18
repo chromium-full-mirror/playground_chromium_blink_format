@@ -42,7 +42,6 @@ using namespace DOM;
 
 #include "misc/khtmllayout.h"
 #include "khtml_settings.h"
-#include "misc/htmlhashes.h"
 #include "misc/helper.h"
 #include "misc/loader.h"
 
@@ -547,7 +546,7 @@ static void checkPseudoState(DOM::ElementImpl* e, bool checkVisited = true) {
     return;
   }
 
-  const AtomicString& attr = e->getAttribute(ATTR_HREF);
+  const AtomicString& attr = e->getAttribute(HTMLAttributes::href());
   if (attr.isNull()) {
     pseudoState = PseudoNone;
     return;
@@ -624,8 +623,10 @@ bool CSSStyleSelector::canShareStyleWithElement(NodeImpl* n) {
         (s->focused() == element->focused())) {
       bool classesMatch = true;
       if (s->hasClass()) {
-        const AtomicString& class1 = element->getAttribute(ATTR_CLASS);
-        const AtomicString& class2 = s->getAttribute(ATTR_CLASS);
+        const AtomicString& class1 =
+            element->getAttribute(HTMLAttributes::classAttr());
+        const AtomicString& class2 =
+            s->getAttribute(HTMLAttributes::classAttr());
         classesMatch = (class1 == class2);
       }
 
@@ -1157,7 +1158,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       return false;
   }
 
-  if (sel->attr) {
+  if (sel->hasAttribute()) {
     if (sel->match == CSSSelector::Class) {
       if (!e->hasClass())
         return false;
@@ -3285,17 +3286,14 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
             continue;
           CSSPrimitiveValueImpl* val =
               static_cast<CSSPrimitiveValueImpl*>(item);
-          if (val->primitiveType() == CSSPrimitiveValue::CSS_STRING) {
+          if (val->primitiveType() == CSSPrimitiveValue::CSS_STRING)
             style->setContent(val->getStringValue().implementation(), i != 0);
-          } else if (val->primitiveType() == CSSPrimitiveValue::CSS_ATTR) {
-            // FIXME: Should work with generic XML attributes also, and not
-            // just the hardcoded HTML set.  Can a namespace be specified for
-            // an attr(foo)?
-            int attrID = element->getDocument()->attrId(
-                0, val->getStringValue().implementation(), false);
-            if (attrID)
-              style->setContent(element->getAttribute(attrID).implementation(),
-                                i != 0);
+          else if (val->primitiveType() == CSSPrimitiveValue::CSS_ATTR) {
+            // FIXME: Can a namespace be specified for an attr(foo)?
+            QualifiedName attr(nullAtom, val->getStringValue().implementation(),
+                               nullAtom);
+            style->setContent(element->getAttribute(attr).implementation(),
+                              i != 0);
           } else if (val->primitiveType() == CSSPrimitiveValue::CSS_URI) {
             CSSImageValueImpl* image = static_cast<CSSImageValueImpl*>(val);
             style->setContent(image->image(element->getDocument()->docLoader()),

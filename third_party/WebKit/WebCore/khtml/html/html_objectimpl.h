@@ -47,7 +47,8 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   virtual int tagPriority() const { return 1; }
   virtual bool checkDTD(const NodeImpl* newChild);
 
-  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
 
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
@@ -118,7 +119,8 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   virtual int tagPriority() const { return 0; }
   virtual bool checkDTD(const NodeImpl* newChild);
 
-  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   virtual void attach();
@@ -155,7 +157,8 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
 
   HTMLFormElementImpl* form() const;
 
-  virtual bool mapToEntry(Id attr, MappedAttributeEntry& result) const;
+  virtual bool mapToEntry(const QualifiedName& attrName,
+                          MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* token);
 
   virtual void attach();

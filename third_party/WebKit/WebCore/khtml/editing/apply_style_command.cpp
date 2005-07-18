@@ -34,7 +34,6 @@
 #include "dom/dom_string.h"
 #include "html/html_elementimpl.h"
 #include "htmlnames.h"
-#include "misc/htmlattrs.h"
 #include "rendering/render_object.h"
 #include "xml/dom_docimpl.h"
 #include "xml/dom_textimpl.h"
@@ -66,6 +65,7 @@ using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
 using DOM::HTMLNames;
+using DOM::HTMLAttributes;
 
 namespace khtml {
 
@@ -261,8 +261,9 @@ bool isStyleSpan(const NodeImpl* node) {
     return false;
 
   const HTMLElementImpl* elem = static_cast<const HTMLElementImpl*>(node);
-  return elem->hasLocalName(HTMLNames::span()) &&
-         elem->getAttribute(ATTR_CLASS) == styleSpanClassString();
+  return elem->hasLocalName(HTMLAttributes::span()) &&
+         elem->getAttribute(HTMLAttributes::classAttr()) ==
+             styleSpanClassString();
 }
 
 static bool isEmptyStyleSpan(const NodeImpl* node) {
@@ -272,7 +273,8 @@ static bool isEmptyStyleSpan(const NodeImpl* node) {
   const HTMLElementImpl* elem = static_cast<const HTMLElementImpl*>(node);
   CSSMutableStyleDeclarationImpl* inlineStyleDecl = elem->inlineStyleDecl();
   return (!inlineStyleDecl || inlineStyleDecl->length() == 0) &&
-         elem->getAttribute(ATTR_CLASS) == styleSpanClassString();
+         elem->getAttribute(HTMLAttributes::classAttr()) ==
+             styleSpanClassString();
 }
 
 static bool isEmptyFontTag(const NodeImpl* node) {
@@ -282,7 +284,8 @@ static bool isEmptyFontTag(const NodeImpl* node) {
   const ElementImpl* elem = static_cast<const ElementImpl*>(node);
   NamedAttrMapImpl* map = elem->attributes(true);  // true for read-only
   return (!map || map->length() == 1) &&
-         elem->getAttribute(ATTR_CLASS) == styleSpanClassString();
+         elem->getAttribute(HTMLAttributes::classAttr()) ==
+             styleSpanClassString();
 }
 
 static ElementImpl* createFontElement(DocumentImpl* document) {
@@ -290,7 +293,7 @@ static ElementImpl* createFontElement(DocumentImpl* document) {
   ElementImpl* fontNode = document->createElementNS(
       HTMLNames::xhtmlNamespaceURI(), "font", exceptionCode);
   ASSERT(exceptionCode == 0);
-  fontNode->setAttribute(ATTR_CLASS, styleSpanClassString());
+  fontNode->setAttribute(HTMLAttributes::classAttr(), styleSpanClassString());
   return fontNode;
 }
 
@@ -299,7 +302,8 @@ ElementImpl* createStyleSpanElement(DocumentImpl* document) {
   ElementImpl* styleElement = document->createElementNS(
       HTMLNames::xhtmlNamespaceURI(), "span", exceptionCode);
   ASSERT(exceptionCode == 0);
-  styleElement->setAttribute(ATTR_CLASS, styleSpanClassString());
+  styleElement->setAttribute(HTMLAttributes::classAttr(),
+                             styleSpanClassString());
   return styleElement;
 }
 
@@ -527,10 +531,11 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
       desiredFontSizeString += "px";
       inlineStyleDecl->setProperty(CSS_PROP_FONT_SIZE, desiredFontSizeString,
                                    false, false);
-      setNodeAttribute(elem, ATTR_STYLE, inlineStyleDecl->cssText());
+      setNodeAttribute(elem, HTMLAttributes::style(),
+                       inlineStyleDecl->cssText());
     }
     if (inlineStyleDecl->length() == 0) {
-      removeNodeAttribute(elem, ATTR_STYLE);
+      removeNodeAttribute(elem, HTMLAttributes::style());
       if (isEmptyStyleSpan(elem))
         emptySpans.append(elem);
     }
@@ -686,15 +691,15 @@ void ApplyStyleCommand::removeHTMLFontStyle(
        it != end; ++it) {
     switch ((*it).id()) {
       case CSS_PROP_COLOR:
-        elem->removeAttribute(ATTR_COLOR, exceptionCode);
+        elem->removeAttribute(HTMLAttributes::color(), exceptionCode);
         ASSERT(exceptionCode == 0);
         break;
       case CSS_PROP_FONT_FAMILY:
-        elem->removeAttribute(ATTR_FACE, exceptionCode);
+        elem->removeAttribute(HTMLAttributes::face(), exceptionCode);
         ASSERT(exceptionCode == 0);
         break;
       case CSS_PROP_FONT_SIZE:
-        elem->removeAttribute(ATTR_SIZE, exceptionCode);
+        elem->removeAttribute(HTMLAttributes::size(), exceptionCode);
         ASSERT(exceptionCode == 0);
         break;
     }
@@ -868,7 +873,7 @@ void ApplyStyleCommand::applyTextDecorationStyle(
     CSSMutableStyleDeclarationImpl* decl = element->inlineStyleDecl();
     if (decl)
       cssText += decl->cssText();
-    setNodeAttribute(element, ATTR_STYLE, cssText);
+    setNodeAttribute(element, HTMLAttributes::style(), cssText);
   }
 }
 
@@ -1138,7 +1143,7 @@ static bool areIdenticalElements(NodeImpl* first, NodeImpl* second) {
   for (unsigned i = 0; i < firstLength; i++) {
     DOM::AttributeImpl* attribute = firstMap->attributeItem(i);
     DOM::AttributeImpl* secondAttribute =
-        secondMap->getAttributeItem(attribute->id());
+        secondMap->getAttributeItem(attribute->name());
 
     if (!secondAttribute || attribute->value() != secondAttribute->value())
       return false;
@@ -1336,7 +1341,7 @@ void ApplyStyleCommand::addBlockStyleIfNeeded(
     CSSMutableStyleDeclarationImpl* decl = block->inlineStyleDecl();
     if (decl)
       cssText += decl->cssText();
-    setNodeAttribute(block, ATTR_STYLE, cssText);
+    setNodeAttribute(block, HTMLAttributes::style(), cssText);
   }
 }
 
@@ -1359,18 +1364,19 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
     ASSERT(exceptionCode == 0);
     insertNodeBefore(fontElement, startNode);
     if (styleChange.applyFontColor())
-      fontElement->setAttribute(ATTR_COLOR, styleChange.fontColor());
+      fontElement->setAttribute(HTMLAttributes::color(),
+                                styleChange.fontColor());
     if (styleChange.applyFontFace())
-      fontElement->setAttribute(ATTR_FACE, styleChange.fontFace());
+      fontElement->setAttribute(HTMLAttributes::face(), styleChange.fontFace());
     if (styleChange.applyFontSize())
-      fontElement->setAttribute(ATTR_SIZE, styleChange.fontSize());
+      fontElement->setAttribute(HTMLAttributes::size(), styleChange.fontSize());
     surroundNodeRangeWithElement(startNode, endNode, fontElement);
   }
 
   if (styleChange.cssStyle().length() > 0) {
     ElementImpl* styleElement = createStyleSpanElement(document());
     styleElement->ref();
-    styleElement->setAttribute(ATTR_STYLE, styleChange.cssStyle());
+    styleElement->setAttribute(HTMLAttributes::style(), styleChange.cssStyle());
     insertNodeBefore(styleElement, startNode);
     styleElement->deref();
     surroundNodeRangeWithElement(startNode, endNode, styleElement);

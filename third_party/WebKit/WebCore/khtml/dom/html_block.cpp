@@ -26,8 +26,6 @@
 
 using namespace DOM;
 
-#include "misc/htmlhashes.h"
-
 HTMLBlockquoteElement::HTMLBlockquoteElement() : HTMLElement() {}
 
 HTMLBlockquoteElement::HTMLBlockquoteElement(const HTMLBlockquoteElement& other)

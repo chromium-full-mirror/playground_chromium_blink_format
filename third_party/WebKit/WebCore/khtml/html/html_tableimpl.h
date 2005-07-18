@@ -119,7 +119,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
   virtual NodeImpl* addChild(NodeImpl* child);
   virtual void childrenChanged();
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
@@ -153,7 +153,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
   HTMLTablePartElementImpl(const QualifiedName& tagName, DocumentPtr* doc)
       : HTMLElementImpl(tagName, doc) {}
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 };
@@ -257,7 +257,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
   int colSpan() const { return cSpan; }
   int rowSpan() const { return rSpan; }
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
@@ -337,7 +337,7 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
   void setTable(HTMLTableElementImpl* t) { table = t; }
 
   // overrides
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
@@ -375,7 +375,7 @@ class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 

@@ -26,7 +26,6 @@
 #include "html/html_canvasimpl.h"
 #include "html/html_documentimpl.h"
 
-#include "misc/htmlhashes.h"
 #include "khtmlview.h"
 #include "khtml_part.h"
 
@@ -59,19 +58,17 @@ HTMLCanvasElementImpl::HTMLCanvasElementImpl(DocumentPtr* doc)
 
 HTMLCanvasElementImpl::~HTMLCanvasElementImpl() {}
 
-bool HTMLCanvasElementImpl::mapToEntry(NodeImpl::Id attr,
+bool HTMLCanvasElementImpl::mapToEntry(const QualifiedName& attrName,
                                        MappedAttributeEntry& result) const {
-  return HTMLImageElementImpl::mapToEntry(attr, result);
+  if (attrName != HTMLAttributes::src())  // Ignore the src attribute
+    return HTMLImageElementImpl::mapToEntry(attrName, result);
+  return false;
 }
 
 void HTMLCanvasElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  switch (attr->id()) {
-    case ATTR_SRC: {
-      // Do nothing.
-      break;
-    }
-    default: { HTMLImageElementImpl::parseMappedAttribute(attr); }
-  }
+  if (attr->name() !=
+      HTMLAttributes::src())  // Canvas ignores the src attribute
+    HTMLImageElementImpl::parseMappedAttribute(attr);
 }
 
 RenderObject* HTMLCanvasElementImpl::createRenderer(RenderArena* arena,
@@ -90,5 +87,6 @@ void HTMLCanvasElementImpl::detach() {
 }
 
 bool HTMLCanvasElementImpl::isURLAttribute(AttributeImpl* attr) const {
-  return ((attr->id() == ATTR_USEMAP && attr->value().domString()[0] != '#'));
+  return ((attr->name() == HTMLAttributes::usemap() &&
+           attr->value().domString()[0] != '#'));
 }

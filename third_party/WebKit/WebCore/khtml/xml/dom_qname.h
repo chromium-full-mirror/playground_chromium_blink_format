@@ -43,7 +43,6 @@ class QualifiedName {
   QualifiedName(const AtomicString& p,
                 const AtomicString& l,
                 const AtomicString& n);
-  QualifiedName(QualifiedNameImpl* inner);
   ~QualifiedName();
 
   QualifiedName(const QualifiedName& other);
@@ -68,12 +67,24 @@ class QualifiedName {
   const AtomicString& localName() const { return m_impl->m_localName; }
   const AtomicString& namespaceURI() const { return m_impl->m_namespace; }
 
+  DOMString toString() const;
+
+  // Init routine for globals
+  static void init();
+
  private:
   void ref() { m_impl->ref(); }
   void deref();
 
   QualifiedNameImpl* m_impl;
 };
+
+#if !KHTML_QNAME_HIDE_GLOBALS
+extern const QualifiedName anyName;
+inline const QualifiedName& anyQName() {
+  return anyName;
+}
+#endif
 
 inline bool operator==(const AtomicString& a, const QualifiedName& q) {
   return a == q.localName();

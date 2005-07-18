@@ -35,7 +35,6 @@
 
 #include "css_stylesheetimpl.h"
 #include "xml/dom_docimpl.h"
-#include "misc/htmlhashes.h"
 #include "css_valueimpl.h"
 using namespace DOM;
 
@@ -94,16 +93,12 @@ StyleListImpl::~StyleListImpl() {
 
 // --------------------------------------------------------------------------------
 
-const QualifiedName& CSSSelector::anyTagName() {
-  static QualifiedName anyName(nullAtom, starAtom, starAtom);
-  return anyName;
-}
-
 void CSSSelector::print(void) {
   kdDebug(6080) << "[Selector: tag = " << tag.localName().string()
-                << ", attr = \"" << attr << "\", match = \"" << match
-                << "\" value = \"" << value.string().latin1()
-                << "\" relation = " << (int)relation << "]" << endl;
+                << ", attr = \"" << attr.localName().string()
+                << "\", match = \"" << match << "\" value = \""
+                << value.string().latin1() << "\" relation = " << (int)relation
+                << "]" << endl;
   if (tagHistory)
     tagHistory->print();
   kdDebug(6080) << "    specificity = " << specificity() << endl;
@@ -244,12 +239,10 @@ DOMString CSSSelector::selectorText() const {
   DOMString str;
   const CSSSelector* cs = this;
   const AtomicString& localName = cs->tag.localName();
-  if (localName == starAtom && cs->attr == ATTR_ID &&
-      cs->match == CSSSelector::Exact) {
+  if (localName == starAtom && cs->match == CSSSelector::Id) {
     str = "#";
     str += cs->value.string();
-  } else if (localName == starAtom && cs->attr == ATTR_CLASS &&
-             cs->match == CSSSelector::Class) {
+  } else if (localName == starAtom && cs->match == CSSSelector::Class) {
     str = ".";
     str += cs->value.string();
   } else if (localName == starAtom && cs->match == CSSSelector::PseudoClass) {
@@ -263,10 +256,10 @@ DOMString CSSSelector::selectorText() const {
       str = "*";
     else
       str = localName;
-    if (cs->attr == ATTR_ID && cs->match == CSSSelector::Exact) {
+    if (cs->match == CSSSelector::Id) {
       str += "#";
       str += cs->value.string();
-    } else if (cs->attr == ATTR_CLASS && cs->match == CSSSelector::Class) {
+    } else if (cs->match == CSSSelector::Class) {
       str += ".";
       str += cs->value.string();
     } else if (cs->match == CSSSelector::PseudoClass) {
@@ -277,8 +270,9 @@ DOMString CSSSelector::selectorText() const {
       str += cs->value.string();
     }
     // optional attribute
-    if (cs->attr) {
-      DOMString attrName = getAttrName(cs->attr);
+    if (cs->hasAttribute()) {
+      // FIXME: Add support for dumping namespaces.
+      DOMString attrName = cs->attr.localName();
       str += "[";
       str += attrName;
       switch (cs->match) {

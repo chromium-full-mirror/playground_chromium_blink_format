@@ -26,7 +26,6 @@
 
 #include "dom/dom_exception.h"
 #include "dom/dom2_events.h"
-#include "misc/htmlattrs.h"
 #include "xml/dom_elementimpl.h"
 #include "xml/dom_textimpl.h"
 #include "xml/dom2_eventsimpl.h"
@@ -271,7 +270,7 @@ const AtomicString& NodeImpl::localName() const {
 }
 
 const AtomicString& NodeImpl::namespaceURI() const {
-  return emptyAtom;
+  return nullAtom;
 }
 
 void NodeImpl::setFirstChild(NodeImpl*) {}
@@ -1598,11 +1597,10 @@ NamedAttrMapImpl* NodeImpl::attributes() const {
 
 static void appendAttributeDesc(const NodeImpl* node,
                                 QString& string,
-                                NodeImpl::Id attrID,
+                                const QualifiedName& name,
                                 QString attrDesc) {
   if (node->isElementNode()) {
-    DOMString attr =
-        static_cast<const ElementImpl*>(node)->getAttribute(attrID);
+    DOMString attr = static_cast<const ElementImpl*>(node)->getAttribute(name);
     if (!attr.isEmpty()) {
       string += attrDesc;
       string += attr.string();
@@ -1622,8 +1620,8 @@ void NodeImpl::showNode(const char* prefix) const {
             value.local8Bit().data());
   } else {
     QString attrs = "";
-    appendAttributeDesc(this, attrs, ATTR_CLASS, " CLASS=");
-    appendAttributeDesc(this, attrs, ATTR_STYLE, " STYLE=");
+    appendAttributeDesc(this, attrs, HTMLAttributes::classAttr(), " CLASS=");
+    appendAttributeDesc(this, attrs, HTMLAttributes::style(), " STYLE=");
     fprintf(stderr, "%s%s\t%p%s\n", prefix,
             nodeName().string().local8Bit().data(), this, attrs.ascii());
   }
@@ -2552,8 +2550,8 @@ NodeImpl* NameNodeListImpl::item(unsigned long index) const {
 }
 
 bool NameNodeListImpl::nodeMatches(NodeImpl* testNode) const {
-  return static_cast<ElementImpl*>(testNode)->getAttribute(ATTR_NAME) ==
-         nodeName;
+  return static_cast<ElementImpl*>(testNode)->getAttribute(
+             HTMLAttributes::name()) == nodeName;
 }
 
 // ---------------------------------------------------------------------------
@@ -2562,14 +2560,16 @@ NamedNodeMapImpl::~NamedNodeMapImpl() {}
 
 NodeImpl* NamedNodeMapImpl::getNamedItemNS(const DOMString& namespaceURI,
                                            const DOMString& localName) const {
-  return getNamedItem(const_cast<NamedNodeMapImpl*>(this)->mapId(
-      namespaceURI, localName, true));
+  return getNamedItem(QualifiedName(nullAtom, localName.implementation(),
+                                    namespaceURI.implementation()));
 }
 
 SharedPtr<NodeImpl> NamedNodeMapImpl::removeNamedItemNS(
     const DOMString& namespaceURI,
     const DOMString& localName,
     int& exception) {
-  return removeNamedItem(mapId(namespaceURI, localName, true), exception);
+  return removeNamedItem(QualifiedName(nullAtom, localName.implementation(),
+                                       namespaceURI.implementation()),
+                         exception);
 }
 }

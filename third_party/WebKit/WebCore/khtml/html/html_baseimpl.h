@@ -56,7 +56,7 @@ class HTMLBodyElementImpl : public HTMLElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 10; }
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl*);
 
@@ -255,7 +255,7 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 1; }
 
-  virtual bool mapToEntry(NodeImpl::Id attr,
+  virtual bool mapToEntry(const QualifiedName& attrName,
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
