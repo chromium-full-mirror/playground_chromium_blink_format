@@ -199,7 +199,7 @@ void HTMLParser::parseToken(Token* t) {
 
   // Apparently some sites use </br> instead of <br>.  Be compatible with IE and
   // Firefox and treat this like <br>.
-  if (t->isCloseTag(HTMLNames::br()) && doc()->inCompatMode())
+  if (t->isCloseTag(HTMLTags::br()) && doc()->inCompatMode())
     t->beginTag = true;
 
   if (!t->beginTag) {
@@ -209,9 +209,9 @@ void HTMLParser::parseToken(Token* t) {
 
   // ignore spaces, if we're not inside a paragraph or other inline code
   if (t->tagName == textAtom && t->text) {
-    if (inBody && !skipMode() && current->localName() != HTMLNames::style() &&
-        current->localName() != HTMLNames::title() &&
-        current->localName() != HTMLNames::script() &&
+    if (inBody && !skipMode() && current->localName() != HTMLTags::style() &&
+        current->localName() != HTMLTags::title() &&
+        current->localName() != HTMLTags::script() &&
         !t->text->containsOnlyWhitespace())
       haveContent = true;
   }
@@ -254,17 +254,17 @@ void HTMLParser::parseToken(Token* t) {
 }
 
 static bool isTableSection(NodeImpl* n) {
-  return n->hasTagName(HTMLNames::tbody()) ||
-         n->hasTagName(HTMLNames::tfoot()) || n->hasTagName(HTMLNames::thead());
+  return n->hasTagName(HTMLTags::tbody()) || n->hasTagName(HTMLTags::tfoot()) ||
+         n->hasTagName(HTMLTags::thead());
 }
 
 static bool isTablePart(NodeImpl* n) {
-  return n->hasTagName(HTMLNames::tr()) || n->hasTagName(HTMLNames::td()) ||
-         n->hasTagName(HTMLNames::th()) || isTableSection(n);
+  return n->hasTagName(HTMLTags::tr()) || n->hasTagName(HTMLTags::td()) ||
+         n->hasTagName(HTMLTags::th()) || isTableSection(n);
 }
 
 static bool isTableRelated(NodeImpl* n) {
-  return n->hasTagName(HTMLNames::table()) || isTablePart(n);
+  return n->hasTagName(HTMLTags::table()) || isTablePart(n);
 }
 
 bool HTMLParser::insertNode(NodeImpl* n, bool flat) {
@@ -316,24 +316,24 @@ bool HTMLParser::handleError(NodeImpl* n,
 
   // 1. Check out the element's tag name to decide how to deal with errors.
   if (n->isTextNode()) {
-    if (current->hasTagName(HTMLNames::select()))
+    if (current->hasTagName(HTMLTags::select()))
       return false;
   } else if (n->isHTMLElement()) {
     HTMLElementImpl* h = static_cast<HTMLElementImpl*>(n);
-    if (h->hasLocalName(HTMLNames::tr()) || h->hasLocalName(HTMLNames::th()) ||
-        h->hasLocalName(HTMLNames::td())) {
+    if (h->hasLocalName(HTMLTags::tr()) || h->hasLocalName(HTMLTags::th()) ||
+        h->hasLocalName(HTMLTags::td())) {
       if (inStrayTableContent && !isTableRelated(current)) {
         // pop out to the nearest enclosing table-related tag.
         while (blockStack && !isTableRelated(current))
           popOneBlock();
         return insertNode(n);
       }
-    } else if (h->hasLocalName(HTMLNames::head())) {
-      if (!current->isDocumentNode() && !current->hasTagName(HTMLNames::html()))
+    } else if (h->hasLocalName(HTMLTags::head())) {
+      if (!current->isDocumentNode() && !current->hasTagName(HTMLTags::html()))
         return false;
-    } else if (h->hasLocalName(HTMLNames::meta()) ||
-               h->hasLocalName(HTMLNames::link()) ||
-               h->hasLocalName(HTMLNames::base())) {
+    } else if (h->hasLocalName(HTMLTags::meta()) ||
+               h->hasLocalName(HTMLTags::link()) ||
+               h->hasLocalName(HTMLTags::base())) {
       if (!head)
         createHead();
       if (head) {
@@ -344,9 +344,9 @@ bool HTMLParser::handleError(NodeImpl* n,
         } else
           return false;
       }
-    } else if (h->hasLocalName(HTMLNames::html())) {
+    } else if (h->hasLocalName(HTMLTags::html())) {
       if (!current->isDocumentNode()) {
-        if (doc()->firstChild()->hasTagName(HTMLNames::html())) {
+        if (doc()->firstChild()->hasTagName(HTMLTags::html())) {
           // we have another <HTML> element.... apply attributes to existing one
           // make sure we don't overwrite already existing attributes
           NamedAttrMapImpl* map =
@@ -364,8 +364,8 @@ bool HTMLParser::handleError(NodeImpl* n,
         }
         return false;
       }
-    } else if (h->hasLocalName(HTMLNames::title()) ||
-               h->hasLocalName(HTMLNames::style())) {
+    } else if (h->hasLocalName(HTMLTags::title()) ||
+               h->hasLocalName(HTMLTags::style())) {
       if (!head)
         createHead();
       if (head) {
@@ -376,15 +376,15 @@ bool HTMLParser::handleError(NodeImpl* n,
           if (!n->attached() && HTMLWidget)
             n->attach();
         } else {
-          setSkipMode(HTMLNames::style());
+          setSkipMode(HTMLTags::style());
           return false;
         }
         return true;
       } else if (inBody) {
-        setSkipMode(HTMLNames::style());
+        setSkipMode(HTMLTags::style());
         return false;
       }
-    } else if (h->hasLocalName(HTMLNames::body())) {
+    } else if (h->hasLocalName(HTMLTags::body())) {
       if (inBody && doc()->body()) {
         // we have another <BODY> element.... apply attributes to existing one
         // make sure we don't overwrite already existing attributes
@@ -402,7 +402,7 @@ bool HTMLParser::handleError(NodeImpl* n,
         return false;
       } else if (!current->isDocumentNode())
         return false;
-    } else if (h->hasLocalName(HTMLNames::input())) {
+    } else if (h->hasLocalName(HTMLTags::input())) {
       DOMString type = h->getAttribute(HTMLAttributes::type());
       if (strcasecmp(type, "hidden") == 0 && form) {
         form->addChild(n);
@@ -410,14 +410,14 @@ bool HTMLParser::handleError(NodeImpl* n,
           n->attach();
         return true;
       }
-    } else if (h->hasLocalName(HTMLNames::dd()) ||
-               h->hasLocalName(HTMLNames::dt())) {
+    } else if (h->hasLocalName(HTMLTags::dd()) ||
+               h->hasLocalName(HTMLTags::dt())) {
       e = new HTMLDListElementImpl(document);
       if (insertNode(e)) {
         insertNode(n);
         return true;
       }
-    } else if (h->hasLocalName(HTMLNames::area())) {
+    } else if (h->hasLocalName(HTMLTags::area())) {
       if (map) {
         map->addChild(n);
         if (!n->attached() && HTMLWidget)
@@ -426,13 +426,13 @@ bool HTMLParser::handleError(NodeImpl* n,
       } else
         return false;
       return true;
-    } else if (h->hasLocalName(HTMLNames::caption())) {
+    } else if (h->hasLocalName(HTMLTags::caption())) {
       if (isTablePart(current)) {
         NodeImpl* tsection = current;
-        if (current->hasTagName(HTMLNames::tr()))
+        if (current->hasTagName(HTMLTags::tr()))
           tsection = current->parent();
-        else if (current->hasTagName(HTMLNames::td()) ||
-                 current->hasTagName(HTMLNames::th()))
+        else if (current->hasTagName(HTMLTags::td()) ||
+                 current->hasTagName(HTMLTags::th()))
           tsection = current->parent()->parent();
         NodeImpl* table = tsection->parent();
         int exceptioncode = 0;
@@ -443,10 +443,10 @@ bool HTMLParser::handleError(NodeImpl* n,
         blockStack->strayTableContent = true;
         return true;
       }
-    } else if (h->hasLocalName(HTMLNames::thead()) ||
-               h->hasLocalName(HTMLNames::tbody()) ||
-               h->hasLocalName(HTMLNames::tfoot()) ||
-               h->hasLocalName(HTMLNames::colgroup())) {
+    } else if (h->hasLocalName(HTMLTags::thead()) ||
+               h->hasLocalName(HTMLTags::tbody()) ||
+               h->hasLocalName(HTMLTags::tfoot()) ||
+               h->hasLocalName(HTMLTags::colgroup())) {
       if (isTableRelated(current)) {
         while (blockStack && isTablePart(current))
           popOneBlock();
@@ -460,18 +460,18 @@ bool HTMLParser::handleError(NodeImpl* n,
   if (current->isHTMLElement()) {
     HTMLElementImpl* h = static_cast<HTMLElementImpl*>(current);
     const AtomicString& currentTagName = current->localName();
-    if (h->hasLocalName(HTMLNames::html())) {
+    if (h->hasLocalName(HTMLTags::html())) {
       HTMLElementImpl* elt =
           n->isHTMLElement() ? static_cast<HTMLElementImpl*>(n) : 0;
-      if (elt && (elt->hasLocalName(HTMLNames::script()) ||
-                  elt->hasLocalName(HTMLNames::style()) ||
-                  elt->hasLocalName(HTMLNames::meta()) ||
-                  elt->hasLocalName(HTMLNames::link()) ||
-                  elt->hasLocalName(HTMLNames::object()) ||
-                  elt->hasLocalName(HTMLNames::embed()) ||
-                  elt->hasLocalName(HTMLNames::title()) ||
-                  elt->hasLocalName(HTMLNames::isindex()) ||
-                  elt->hasLocalName(HTMLNames::base()))) {
+      if (elt && (elt->hasLocalName(HTMLTags::script()) ||
+                  elt->hasLocalName(HTMLTags::style()) ||
+                  elt->hasLocalName(HTMLTags::meta()) ||
+                  elt->hasLocalName(HTMLTags::link()) ||
+                  elt->hasLocalName(HTMLTags::object()) ||
+                  elt->hasLocalName(HTMLTags::embed()) ||
+                  elt->hasLocalName(HTMLTags::title()) ||
+                  elt->hasLocalName(HTMLTags::isindex()) ||
+                  elt->hasLocalName(HTMLTags::base()))) {
         if (!head) {
           head = new HTMLHeadElementImpl(document);
           e = head;
@@ -491,8 +491,8 @@ bool HTMLParser::handleError(NodeImpl* n,
           handled = true;
         }
       }
-    } else if (h->hasLocalName(HTMLNames::head())) {
-      if (n->hasTagName(HTMLNames::html()))
+    } else if (h->hasLocalName(HTMLTags::head())) {
+      if (n->hasTagName(HTMLTags::html()))
         return false;
       else {
         // This means the body starts here...
@@ -504,14 +504,14 @@ bool HTMLParser::handleError(NodeImpl* n,
           handled = true;
         }
       }
-    } else if (h->hasLocalName(HTMLNames::caption())) {
+    } else if (h->hasLocalName(HTMLTags::caption())) {
       // Illegal content in a caption. Close the caption and try again.
       popBlock(currentTagName);
       if (isTablePart(n))
         return insertNode(n, flat);
-    } else if (h->hasLocalName(HTMLNames::table()) ||
-               h->hasLocalName(HTMLNames::tr()) || isTableSection(h)) {
-      if (n->hasTagName(HTMLNames::table())) {
+    } else if (h->hasLocalName(HTMLTags::table()) ||
+               h->hasLocalName(HTMLTags::tr()) || isTableSection(h)) {
+      if (n->hasTagName(HTMLTags::table())) {
         popBlock(localName);  // end the table
         handled = true;       // ...and start a new one
       } else {
@@ -535,18 +535,17 @@ bool HTMLParser::handleError(NodeImpl* n,
           NodeImpl* grandparent = parent->parentNode();
 
           if (n->isTextNode() ||
-              (h->hasLocalName(HTMLNames::tr()) && isTableSection(parent) &&
-               grandparent->hasTagName(HTMLNames::table())) ||
-              ((!n->hasTagName(HTMLNames::td()) &&
-                !n->hasTagName(HTMLNames::th()) &&
-                !n->hasTagName(HTMLNames::form()) &&
-                !n->hasTagName(HTMLNames::script())) &&
-               isTableSection(node) &&
-               parent->hasTagName(HTMLNames::table()))) {
-            node = (node->hasTagName(HTMLNames::table()))
+              (h->hasLocalName(HTMLTags::tr()) && isTableSection(parent) &&
+               grandparent->hasTagName(HTMLTags::table())) ||
+              ((!n->hasTagName(HTMLTags::td()) &&
+                !n->hasTagName(HTMLTags::th()) &&
+                !n->hasTagName(HTMLTags::form()) &&
+                !n->hasTagName(HTMLTags::script())) &&
+               isTableSection(node) && parent->hasTagName(HTMLTags::table()))) {
+            node = (node->hasTagName(HTMLTags::table()))
                        ? node
-                       : ((node->hasTagName(HTMLNames::tr())) ? grandparent
-                                                              : parent);
+                       : ((node->hasTagName(HTMLTags::tr())) ? grandparent
+                                                             : parent);
             NodeImpl* parent = node->parentNode();
             parent->insertBefore(n, node, exceptionCode);
             if (!exceptionCode) {
@@ -563,10 +562,10 @@ bool HTMLParser::handleError(NodeImpl* n,
           }
 
           if (!exceptionCode) {
-            if (current->hasTagName(HTMLNames::tr()))
-              e = new HTMLTableCellElementImpl(HTMLNames::td(), document);
-            else if (current->hasTagName(HTMLNames::table()))
-              e = new HTMLTableSectionElementImpl(HTMLNames::tbody(), document,
+            if (current->hasTagName(HTMLTags::tr()))
+              e = new HTMLTableCellElementImpl(HTMLTags::td(), document);
+            else if (current->hasTagName(HTMLTags::table()))
+              e = new HTMLTableSectionElementImpl(HTMLTags::tbody(), document,
                                                   true);  // implicit
             else
               e = new HTMLTableRowElementImpl(document);
@@ -576,49 +575,49 @@ bool HTMLParser::handleError(NodeImpl* n,
           }
         }
       }
-    } else if (h->hasLocalName(HTMLNames::object())) {
-      setSkipMode(HTMLNames::object());
+    } else if (h->hasLocalName(HTMLTags::object())) {
+      setSkipMode(HTMLTags::object());
       return false;
-    } else if (h->hasLocalName(HTMLNames::ul()) ||
-               h->hasLocalName(HTMLNames::ol()) ||
-               h->hasLocalName(HTMLNames::dir()) ||
-               h->hasLocalName(HTMLNames::menu())) {
+    } else if (h->hasLocalName(HTMLTags::ul()) ||
+               h->hasLocalName(HTMLTags::ol()) ||
+               h->hasLocalName(HTMLTags::dir()) ||
+               h->hasLocalName(HTMLTags::menu())) {
       e = new HTMLDivElementImpl(document);
       insertNode(e);
       handled = true;
-    } else if (h->hasLocalName(HTMLNames::dl()) ||
-               h->hasLocalName(HTMLNames::dt())) {
+    } else if (h->hasLocalName(HTMLTags::dl()) ||
+               h->hasLocalName(HTMLTags::dt())) {
       popBlock(currentTagName);
       handled = true;
-    } else if (h->hasLocalName(HTMLNames::select())) {
+    } else if (h->hasLocalName(HTMLTags::select())) {
       if (isInline(n))
         return false;
-    } else if (h->hasLocalName(HTMLNames::p()) || isHeaderTag(currentTagName)) {
+    } else if (h->hasLocalName(HTMLTags::p()) || isHeaderTag(currentTagName)) {
       if (!isInline(n)) {
         popBlock(currentTagName);
         handled = true;
       }
-    } else if (h->hasLocalName(HTMLNames::option()) ||
-               h->hasLocalName(HTMLNames::optgroup())) {
-      if (localName == HTMLNames::optgroup()) {
+    } else if (h->hasLocalName(HTMLTags::option()) ||
+               h->hasLocalName(HTMLTags::optgroup())) {
+      if (localName == HTMLTags::optgroup()) {
         popBlock(currentTagName);
         handled = true;
-      } else if (localName == HTMLNames::select()) {
+      } else if (localName == HTMLTags::select()) {
         // IE treats a nested select as </select>. Let's do the same
         popBlock(localName);
       }
-    } else if (h->hasLocalName(HTMLNames::address())) {
+    } else if (h->hasLocalName(HTMLTags::address())) {
       popBlock(currentTagName);
       handled = true;
-    } else if (h->hasLocalName(HTMLNames::colgroup())) {
+    } else if (h->hasLocalName(HTMLTags::colgroup())) {
       if (!n->isTextNode()) {
         popBlock(currentTagName);
         handled = true;
       }
-    } else if (h->hasLocalName(HTMLNames::font())) {
+    } else if (h->hasLocalName(HTMLTags::font())) {
       popBlock(currentTagName);
       handled = true;
-    } else if (!h->hasLocalName(HTMLNames::body())) {
+    } else if (!h->hasLocalName(HTMLTags::body())) {
       if (isInline(current)) {
         popInlineBlocks();
         handled = true;
@@ -657,22 +656,22 @@ bool HTMLParser::commentCreateErrorCheck(Token* t, NodeImpl*& result) {
 }
 
 bool HTMLParser::headCreateErrorCheck(Token* t, NodeImpl*& result) {
-  return (!head || current->localName() == HTMLNames::html());
+  return (!head || current->localName() == HTMLTags::html());
 }
 
 bool HTMLParser::bodyCreateErrorCheck(Token* t, NodeImpl*& result) {
   // body no longer allowed if we have a frameset
   if (haveFrameSet)
     return false;
-  popBlock(HTMLNames::head());
+  popBlock(HTMLTags::head());
   startBody();
   return true;
 }
 
 bool HTMLParser::framesetCreateErrorCheck(Token* t, NodeImpl*& result) {
-  popBlock(HTMLNames::head());
+  popBlock(HTMLTags::head());
   if (inBody && !haveFrameSet && !haveContent) {
-    popBlock(HTMLNames::body());
+    popBlock(HTMLTags::body());
     // ### actually for IE document.body returns the now hidden "body" element
     // we can't implement that behaviour now because it could cause too many
     // regressions and the headaches are not worth the work as long as there is
@@ -681,8 +680,7 @@ bool HTMLParser::framesetCreateErrorCheck(Token* t, NodeImpl*& result) {
       doc()->body()->setAttribute(HTMLAttributes::style(), "display:none");
     inBody = false;
   }
-  if ((haveContent || haveFrameSet) &&
-      current->localName() == HTMLNames::html())
+  if ((haveContent || haveFrameSet) && current->localName() == HTMLTags::html())
     return false;
   haveFrameSet = true;
   startBody();
@@ -691,7 +689,7 @@ bool HTMLParser::framesetCreateErrorCheck(Token* t, NodeImpl*& result) {
 
 bool HTMLParser::iframeCreateErrorCheck(Token* t, NodeImpl*& result) {
   // a bit of a special case, since the frame is inlined
-  setSkipMode(HTMLNames::iframe());
+  setSkipMode(HTMLTags::iframe());
   return true;
 }
 
@@ -721,14 +719,14 @@ bool HTMLParser::selectCreateErrorCheck(Token* t, NodeImpl*& result) {
 }
 
 bool HTMLParser::ddCreateErrorCheck(Token* t, NodeImpl*& result) {
-  popBlock(HTMLNames::dt());
-  popBlock(HTMLNames::dd());
+  popBlock(HTMLTags::dt());
+  popBlock(HTMLTags::dd());
   return true;
 }
 
 bool HTMLParser::dtCreateErrorCheck(Token* t, NodeImpl*& result) {
-  popBlock(HTMLNames::dd());
-  popBlock(HTMLNames::dt());
+  popBlock(HTMLTags::dd());
+  popBlock(HTMLTags::dt());
   return true;
 }
 
@@ -742,31 +740,31 @@ bool HTMLParser::nestedStyleCreateErrorCheck(Token* t, NodeImpl*& result) {
 }
 
 bool HTMLParser::tableCellCreateErrorCheck(Token* t, NodeImpl*& result) {
-  popBlock(HTMLNames::td());
-  popBlock(HTMLNames::th());
+  popBlock(HTMLTags::td());
+  popBlock(HTMLTags::th());
   return true;
 }
 
 bool HTMLParser::tableSectionCreateErrorCheck(Token* t, NodeImpl*& result) {
-  popBlock(HTMLNames::thead());
-  popBlock(HTMLNames::tbody());
-  popBlock(HTMLNames::tfoot());
+  popBlock(HTMLTags::thead());
+  popBlock(HTMLTags::tbody());
+  popBlock(HTMLTags::tfoot());
   return true;
 }
 
 bool HTMLParser::noembedCreateErrorCheck(Token* t, NodeImpl*& result) {
-  setSkipMode(HTMLNames::noembed());
+  setSkipMode(HTMLTags::noembed());
   return false;
 }
 
 bool HTMLParser::noframesCreateErrorCheck(Token* t, NodeImpl*& result) {
-  setSkipMode(HTMLNames::noframes());
+  setSkipMode(HTMLTags::noframes());
   return false;
 }
 
 bool HTMLParser::noscriptCreateErrorCheck(Token* t, NodeImpl*& result) {
   if (HTMLWidget && HTMLWidget->part()->jScriptEnabled())
-    setSkipMode(HTMLNames::noscript());
+    setSkipMode(HTMLTags::noscript());
   return false;
 }
 
@@ -782,67 +780,67 @@ NodeImpl* HTMLParser::getNode(Token* t) {
                         &HTMLParser::textCreateErrorCheck);
     gFunctionMap.insert(commentAtom.implementation(),
                         &HTMLParser::commentCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::head().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::head().localName().implementation(),
                         &HTMLParser::headCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::body().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::body().localName().implementation(),
                         &HTMLParser::bodyCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::frameset().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::frameset().localName().implementation(),
                         &HTMLParser::framesetCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::iframe().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::iframe().localName().implementation(),
                         &HTMLParser::iframeCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::form().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::form().localName().implementation(),
                         &HTMLParser::formCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::isindex().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::isindex().localName().implementation(),
                         &HTMLParser::isindexCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::select().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::select().localName().implementation(),
                         &HTMLParser::selectCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::dd().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::dd().localName().implementation(),
                         &HTMLParser::ddCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::dt().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::dt().localName().implementation(),
                         &HTMLParser::dtCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::li().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::li().localName().implementation(),
                         &HTMLParser::nestedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::a().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::a().localName().implementation(),
                         &HTMLParser::nestedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::nobr().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::nobr().localName().implementation(),
                         &HTMLParser::nestedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::wbr().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::wbr().localName().implementation(),
                         &HTMLParser::nestedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::tr().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::tr().localName().implementation(),
                         &HTMLParser::nestedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::td().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::td().localName().implementation(),
                         &HTMLParser::tableCellCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::th().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::th().localName().implementation(),
                         &HTMLParser::tableCellCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::tbody().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::tbody().localName().implementation(),
                         &HTMLParser::tableSectionCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::thead().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::thead().localName().implementation(),
                         &HTMLParser::tableSectionCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::tfoot().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::tfoot().localName().implementation(),
                         &HTMLParser::tableSectionCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::tt().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::tt().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::u().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::u().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::b().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::b().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::i().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::i().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::s().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::s().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::strike().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::strike().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::big().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::big().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::small().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::small().localName().implementation(),
                         &HTMLParser::nestedStyleCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::noembed().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::noembed().localName().implementation(),
                         &HTMLParser::noembedCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::noframes().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::noframes().localName().implementation(),
                         &HTMLParser::noframesCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::noscript().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::noscript().localName().implementation(),
                         &HTMLParser::noscriptCreateErrorCheck);
-    gFunctionMap.insert(HTMLNames::nolayer().localName().implementation(),
+    gFunctionMap.insert(HTMLTags::nolayer().localName().implementation(),
                         &HTMLParser::nolayerCreateErrorCheck);
   }
 
@@ -855,7 +853,7 @@ NodeImpl* HTMLParser::getNode(Token* t) {
 
   if (proceed) {
     result = HTMLElementFactory::createHTMLElement(t->tagName, doc(), form);
-    if (t->tagName == HTMLNames::form())
+    if (t->tagName == HTMLTags::form())
       form = static_cast<HTMLFormElementImpl*>(result);
   }
   return result;
@@ -881,19 +879,19 @@ void HTMLParser::processCloseTag(Token* t) {
   // we never close the body tag, since some stupid web pages close it before
   // the actual end of the doc.
   // let's rely on the end() call to close things.
-  if (t->tagName == HTMLNames::html() || t->tagName == HTMLNames::body())
+  if (t->tagName == HTMLTags::html() || t->tagName == HTMLTags::body())
     return;
 
-  if (t->tagName == HTMLNames::form())
+  if (t->tagName == HTMLTags::form())
     form = 0;
-  else if (t->tagName == HTMLNames::map())
+  else if (t->tagName == HTMLTags::map())
     map = 0;
-  else if (t->tagName == HTMLNames::select())
+  else if (t->tagName == HTMLTags::select())
     inSelect = false;
 
   HTMLStackElem* oldElem = blockStack;
   popBlock(t->tagName);
-  if (oldElem == blockStack && t->tagName == HTMLNames::p()) {
+  if (oldElem == blockStack && t->tagName == HTMLTags::p()) {
     // We encountered a stray </p>.  Amazingly Gecko, WinIE, and MacIE all treat
     // this as a valid break, i.e., <p></p>.  So go ahead and make the empty
     // paragraph.
@@ -910,12 +908,12 @@ void HTMLParser::processCloseTag(Token* t) {
 bool HTMLParser::isHeaderTag(const AtomicString& tagName) {
   static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> headerTags;
   if (headerTags.isEmpty()) {
-    headerTags.insert(HTMLNames::h1().localName().implementation());
-    headerTags.insert(HTMLNames::h2().localName().implementation());
-    headerTags.insert(HTMLNames::h3().localName().implementation());
-    headerTags.insert(HTMLNames::h4().localName().implementation());
-    headerTags.insert(HTMLNames::h5().localName().implementation());
-    headerTags.insert(HTMLNames::h6().localName().implementation());
+    headerTags.insert(HTMLTags::h1().localName().implementation());
+    headerTags.insert(HTMLTags::h2().localName().implementation());
+    headerTags.insert(HTMLTags::h3().localName().implementation());
+    headerTags.insert(HTMLTags::h4().localName().implementation());
+    headerTags.insert(HTMLTags::h5().localName().implementation());
+    headerTags.insert(HTMLTags::h6().localName().implementation());
   }
 
   return headerTags.contains(tagName.implementation());
@@ -942,27 +940,21 @@ bool HTMLParser::isInline(DOM::NodeImpl* node) const {
 
   if (node->isHTMLElement()) {
     HTMLElementImpl* e = static_cast<HTMLElementImpl*>(node);
-    if (e->hasLocalName(HTMLNames::a()) || e->hasLocalName(HTMLNames::font()) ||
-        e->hasLocalName(HTMLNames::tt()) || e->hasLocalName(HTMLNames::u()) ||
-        e->hasLocalName(HTMLNames::b()) || e->hasLocalName(HTMLNames::i()) ||
-        e->hasLocalName(HTMLNames::s()) ||
-        e->hasLocalName(HTMLNames::strike()) ||
-        e->hasLocalName(HTMLNames::big()) ||
-        e->hasLocalName(HTMLNames::small()) ||
-        e->hasLocalName(HTMLNames::em()) ||
-        e->hasLocalName(HTMLNames::strong()) ||
-        e->hasLocalName(HTMLNames::dfn()) ||
-        e->hasLocalName(HTMLNames::code()) ||
-        e->hasLocalName(HTMLNames::samp()) ||
-        e->hasLocalName(HTMLNames::kbd()) ||
-        e->hasLocalName(HTMLNames::var()) ||
-        e->hasLocalName(HTMLNames::cite()) ||
-        e->hasLocalName(HTMLNames::abbr()) ||
-        e->hasLocalName(HTMLNames::acronym()) ||
-        e->hasLocalName(HTMLNames::sub()) ||
-        e->hasLocalName(HTMLNames::sup()) ||
-        e->hasLocalName(HTMLNames::span()) ||
-        e->hasLocalName(HTMLNames::nobr()) || e->hasLocalName(HTMLNames::wbr()))
+    if (e->hasLocalName(HTMLTags::a()) || e->hasLocalName(HTMLTags::font()) ||
+        e->hasLocalName(HTMLTags::tt()) || e->hasLocalName(HTMLTags::u()) ||
+        e->hasLocalName(HTMLTags::b()) || e->hasLocalName(HTMLTags::i()) ||
+        e->hasLocalName(HTMLTags::s()) || e->hasLocalName(HTMLTags::strike()) ||
+        e->hasLocalName(HTMLTags::big()) ||
+        e->hasLocalName(HTMLTags::small()) || e->hasLocalName(HTMLTags::em()) ||
+        e->hasLocalName(HTMLTags::strong()) ||
+        e->hasLocalName(HTMLTags::dfn()) || e->hasLocalName(HTMLTags::code()) ||
+        e->hasLocalName(HTMLTags::samp()) || e->hasLocalName(HTMLTags::kbd()) ||
+        e->hasLocalName(HTMLTags::var()) || e->hasLocalName(HTMLTags::cite()) ||
+        e->hasLocalName(HTMLTags::abbr()) ||
+        e->hasLocalName(HTMLTags::acronym()) ||
+        e->hasLocalName(HTMLTags::sub()) || e->hasLocalName(HTMLTags::sup()) ||
+        e->hasLocalName(HTMLTags::span()) ||
+        e->hasLocalName(HTMLTags::nobr()) || e->hasLocalName(HTMLTags::wbr()))
       return true;
   }
 
@@ -972,23 +964,23 @@ bool HTMLParser::isInline(DOM::NodeImpl* node) const {
 bool HTMLParser::isResidualStyleTag(const AtomicString& tagName) {
   static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> residualStyleTags;
   if (residualStyleTags.isEmpty()) {
-    residualStyleTags.insert(HTMLNames::a().localName().implementation());
-    residualStyleTags.insert(HTMLNames::font().localName().implementation());
-    residualStyleTags.insert(HTMLNames::tt().localName().implementation());
-    residualStyleTags.insert(HTMLNames::u().localName().implementation());
-    residualStyleTags.insert(HTMLNames::b().localName().implementation());
-    residualStyleTags.insert(HTMLNames::i().localName().implementation());
-    residualStyleTags.insert(HTMLNames::s().localName().implementation());
-    residualStyleTags.insert(HTMLNames::strike().localName().implementation());
-    residualStyleTags.insert(HTMLNames::big().localName().implementation());
-    residualStyleTags.insert(HTMLNames::small().localName().implementation());
-    residualStyleTags.insert(HTMLNames::em().localName().implementation());
-    residualStyleTags.insert(HTMLNames::strong().localName().implementation());
-    residualStyleTags.insert(HTMLNames::dfn().localName().implementation());
-    residualStyleTags.insert(HTMLNames::code().localName().implementation());
-    residualStyleTags.insert(HTMLNames::samp().localName().implementation());
-    residualStyleTags.insert(HTMLNames::kbd().localName().implementation());
-    residualStyleTags.insert(HTMLNames::var().localName().implementation());
+    residualStyleTags.insert(HTMLTags::a().localName().implementation());
+    residualStyleTags.insert(HTMLTags::font().localName().implementation());
+    residualStyleTags.insert(HTMLTags::tt().localName().implementation());
+    residualStyleTags.insert(HTMLTags::u().localName().implementation());
+    residualStyleTags.insert(HTMLTags::b().localName().implementation());
+    residualStyleTags.insert(HTMLTags::i().localName().implementation());
+    residualStyleTags.insert(HTMLTags::s().localName().implementation());
+    residualStyleTags.insert(HTMLTags::strike().localName().implementation());
+    residualStyleTags.insert(HTMLTags::big().localName().implementation());
+    residualStyleTags.insert(HTMLTags::small().localName().implementation());
+    residualStyleTags.insert(HTMLTags::em().localName().implementation());
+    residualStyleTags.insert(HTMLTags::strong().localName().implementation());
+    residualStyleTags.insert(HTMLTags::dfn().localName().implementation());
+    residualStyleTags.insert(HTMLTags::code().localName().implementation());
+    residualStyleTags.insert(HTMLTags::samp().localName().implementation());
+    residualStyleTags.insert(HTMLTags::kbd().localName().implementation());
+    residualStyleTags.insert(HTMLTags::var().localName().implementation());
   }
 
   return residualStyleTags.contains(tagName.implementation());
@@ -1000,25 +992,25 @@ bool HTMLParser::isAffectedByResidualStyle(const AtomicString& tagName) {
 
   static HashSet<DOMStringImpl*, PointerHash<DOMStringImpl*>> affectedBlockTags;
   if (affectedBlockTags.isEmpty()) {
-    affectedBlockTags.insert(HTMLNames::h1().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::h2().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::h3().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::h4().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::h5().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::h6().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::p().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::div().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h1().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h2().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h3().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h4().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h5().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::h6().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::p().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::div().localName().implementation());
     affectedBlockTags.insert(
-        HTMLNames::blockquote().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::address().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::center().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::ul().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::ol().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::li().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::dl().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::dt().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::dd().localName().implementation());
-    affectedBlockTags.insert(HTMLNames::pre().localName().implementation());
+        HTMLTags::blockquote().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::address().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::center().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::ul().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::ol().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::li().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::dl().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::dt().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::dd().localName().implementation());
+    affectedBlockTags.insert(HTMLTags::pre().localName().implementation());
   }
 
   return affectedBlockTags.contains(tagName.implementation());
@@ -1303,12 +1295,12 @@ void HTMLParser::popBlock(const AtomicString& _tagName) {
       if (strayTable && (inStrayTableContent < strayTable) &&
           residualStyleStack) {
         NodeImpl* curr = current;
-        while (curr && !curr->hasTagName(HTMLNames::table()))
+        while (curr && !curr->hasTagName(HTMLTags::table()))
           curr = curr->parentNode();
         malformedTableParent = curr ? curr->parentNode() : 0;
       }
     } else {
-      if (form && Elem->tagName == HTMLNames::form())
+      if (form && Elem->tagName == HTMLTags::form())
         // A <form> is being closed prematurely (and this is
         // malformed HTML).  Set an attribute on the form to clear out its
         // bottom margin.

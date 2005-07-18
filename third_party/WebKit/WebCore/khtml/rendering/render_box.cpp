@@ -255,7 +255,7 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
     // render object very easily via the DOM.
     HTMLElementImpl* body = document()->body();
     RenderObject* bodyObject =
-        (body && body->hasLocalName(HTMLNames::body())) ? body->renderer() : 0;
+        (body && body->hasLocalName(HTMLTags::body())) ? body->renderer() : 0;
     if (bodyObject) {
       bgLayer = bodyObject->style()->backgroundLayers();
       bgColor = bodyObject->style()->backgroundColor();
@@ -407,7 +407,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
     bool isTransparent;
     DOM::NodeImpl* elt = document()->ownerElement();
     if (elt) {
-      if (elt->hasTagName(HTMLNames::frame()))
+      if (elt->hasTagName(HTMLTags::frame()))
         isTransparent = false;
       else {
         // Locate the <body> element using the DOM.  This is easier than trying
@@ -418,10 +418,10 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
         // render object very easily via the DOM.
         HTMLElementImpl* body = document()->body();
         isTransparent =
-            !body ||
-            !body->hasLocalName(HTMLNames::frameset());  // Can't scroll a
-                                                         // frameset document
-                                                         // anyway.
+            !body || !body->hasLocalName(HTMLTags::frameset());  // Can't scroll
+                                                                 // a frameset
+                                                                 // document
+                                                                 // anyway.
       }
     } else
       isTransparent = canvas()->view()->isTransparent();

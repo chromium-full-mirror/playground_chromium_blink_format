@@ -1498,7 +1498,7 @@ Marquee::Marquee(RenderLayer* l)
 int Marquee::marqueeSpeed() const {
   int result = m_layer->renderer()->style()->marqueeSpeed();
   DOM::NodeImpl* elt = m_layer->renderer()->element();
-  if (elt && elt->hasTagName(HTMLNames::marquee())) {
+  if (elt && elt->hasTagName(HTMLTags::marquee())) {
     HTMLMarqueeElementImpl* marqueeElt =
         static_cast<HTMLMarqueeElementImpl*>(elt);
     result = kMax(result, marqueeElt->minimumDelay());

@@ -44,7 +44,7 @@ using namespace khtml;
 namespace DOM {
 
 HTMLAnchorElementImpl::HTMLAnchorElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLNames::a(), doc) {
+    : HTMLElementImpl(HTMLTags::a(), doc) {
   m_hasTarget = false;
 }
 
@@ -149,7 +149,7 @@ void HTMLAnchorElementImpl::defaultEventHandler(EventImpl* evt) {
     if (e && e->button() == 1)
       utarget = "_blank";
 
-    if (evt->target()->hasTagName(HTMLNames::img())) {
+    if (evt->target()->hasTagName(HTMLTags::img())) {
       HTMLImageElementImpl* img =
           static_cast<HTMLImageElementImpl*>(evt->target());
       if (img && img->isServerMap()) {
@@ -341,7 +341,7 @@ void HTMLAnchorElementImpl::focus() {
 // -------------------------------------------------------------------------
 
 HTMLBRElementImpl::HTMLBRElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLNames::br(), doc) {}
+    : HTMLElementImpl(HTMLTags::br(), doc) {}
 
 HTMLBRElementImpl::~HTMLBRElementImpl() {}
 
@@ -386,7 +386,7 @@ void HTMLBRElementImpl::setClear(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLFontElementImpl::HTMLFontElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLNames::font(), doc) {}
+    : HTMLElementImpl(HTMLTags::font(), doc) {}
 
 HTMLFontElementImpl::~HTMLFontElementImpl() {}
 
@@ -536,7 +536,7 @@ void HTMLModElementImpl::setDateTime(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLQuoteElementImpl::HTMLQuoteElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLNames::q(), doc) {}
+    : HTMLElementImpl(HTMLTags::q(), doc) {}
 
 DOMString HTMLQuoteElementImpl::cite() const {
   return getAttribute(HTMLAttributes::cite());

@@ -187,7 +187,7 @@ void HTMLLIElementImpl::attach() {
     NodeImpl* listNode = 0;
     NodeImpl* n = this;
     while (!listNode && (n = n->parentNode())) {
-      if (n->hasTagName(HTMLNames::ul()) || n->hasTagName(HTMLNames::ol()))
+      if (n->hasTagName(HTMLTags::ul()) || n->hasTagName(HTMLTags::ol()))
         listNode = n;
     }
 
@@ -198,7 +198,7 @@ void HTMLLIElementImpl::attach() {
       render->setNotInList(true);
 
     // If we are first, and the OL has a start attr, set the value.
-    if (listNode && listNode->hasTagName(HTMLNames::ol()) &&
+    if (listNode && listNode->hasTagName(HTMLTags::ol()) &&
         !m_render->previousSibling()) {
       HTMLOListElementImpl* ol = static_cast<HTMLOListElementImpl*>(listNode);
       render->setValue(ol->start());

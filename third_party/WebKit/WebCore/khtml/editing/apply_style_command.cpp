@@ -64,7 +64,7 @@ using DOM::NodeImpl;
 using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
-using DOM::HTMLNames;
+using DOM::HTMLTags;
 using DOM::HTMLAttributes;
 
 namespace khtml {
@@ -267,7 +267,7 @@ bool isStyleSpan(const NodeImpl* node) {
 }
 
 static bool isEmptyStyleSpan(const NodeImpl* node) {
-  if (!node || !node->isHTMLElement() || !node->hasTagName(HTMLNames::span()))
+  if (!node || !node->isHTMLElement() || !node->hasTagName(HTMLTags::span()))
     return false;
 
   const HTMLElementImpl* elem = static_cast<const HTMLElementImpl*>(node);
@@ -278,7 +278,7 @@ static bool isEmptyStyleSpan(const NodeImpl* node) {
 }
 
 static bool isEmptyFontTag(const NodeImpl* node) {
-  if (!node || !node->hasTagName(HTMLNames::font()))
+  if (!node || !node->hasTagName(HTMLTags::font()))
     return false;
 
   const ElementImpl* elem = static_cast<const ElementImpl*>(node);
@@ -291,7 +291,7 @@ static bool isEmptyFontTag(const NodeImpl* node) {
 static ElementImpl* createFontElement(DocumentImpl* document) {
   int exceptionCode = 0;
   ElementImpl* fontNode = document->createElementNS(
-      HTMLNames::xhtmlNamespaceURI(), "font", exceptionCode);
+      HTMLTags::xhtmlNamespaceURI(), "font", exceptionCode);
   ASSERT(exceptionCode == 0);
   fontNode->setAttribute(HTMLAttributes::classAttr(), styleSpanClassString());
   return fontNode;
@@ -300,7 +300,7 @@ static ElementImpl* createFontElement(DocumentImpl* document) {
 ElementImpl* createStyleSpanElement(DocumentImpl* document) {
   int exceptionCode = 0;
   ElementImpl* styleElement = document->createElementNS(
-      HTMLNames::xhtmlNamespaceURI(), "span", exceptionCode);
+      HTMLTags::xhtmlNamespaceURI(), "span", exceptionCode);
   ASSERT(exceptionCode == 0);
   styleElement->setAttribute(HTMLAttributes::classAttr(),
                              styleSpanClassString());
@@ -629,7 +629,7 @@ void ApplyStyleCommand::applyInlineStyle(
           // the current group.
           if (node == end.node() ||
               runStart->parentNode() != next->parentNode() ||
-              (next->isElementNode() && !next->hasTagName(HTMLNames::br())) ||
+              (next->isElementNode() && !next->hasTagName(HTMLTags::br())) ||
               (next->renderer() && !next->renderer()->isInline()))
             break;
           node = next;
@@ -655,11 +655,11 @@ bool ApplyStyleCommand::isHTMLStyleNode(CSSMutableStyleDeclarationImpl* style,
        it != end; ++it) {
     switch ((*it).id()) {
       case CSS_PROP_FONT_WEIGHT:
-        if (elem->hasLocalName(HTMLNames::b()))
+        if (elem->hasLocalName(HTMLTags::b()))
           return true;
         break;
       case CSS_PROP_FONT_STYLE:
-        if (elem->hasLocalName(HTMLNames::i()))
+        if (elem->hasLocalName(HTMLTags::i()))
           return true;
     }
   }
@@ -682,7 +682,7 @@ void ApplyStyleCommand::removeHTMLFontStyle(
   ASSERT(style);
   ASSERT(elem);
 
-  if (!elem->hasLocalName(HTMLNames::font()))
+  if (!elem->hasLocalName(HTMLTags::font()))
     return;
 
   int exceptionCode = 0;
@@ -1216,7 +1216,7 @@ bool ApplyStyleCommand::mergeEndWithNextIfIdentical(const Position& start,
     endOffset = parentLastOffset;
   }
 
-  if (!endNode->isElementNode() || endNode->hasTagName(HTMLNames::br()))
+  if (!endNode->isElementNode() || endNode->hasTagName(HTMLTags::br()))
     return false;
 
   NodeImpl* nextSibling = endNode->nextSibling();
@@ -1384,7 +1384,7 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
 
   if (styleChange.applyBold()) {
     ElementImpl* boldElement = document()->createElementNS(
-        HTMLNames::xhtmlNamespaceURI(), "b", exceptionCode);
+        HTMLTags::xhtmlNamespaceURI(), "b", exceptionCode);
     ASSERT(exceptionCode == 0);
     insertNodeBefore(boldElement, startNode);
     surroundNodeRangeWithElement(startNode, endNode, boldElement);
@@ -1392,7 +1392,7 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
 
   if (styleChange.applyItalic()) {
     ElementImpl* italicElement = document()->createElementNS(
-        HTMLNames::xhtmlNamespaceURI(), "i", exceptionCode);
+        HTMLTags::xhtmlNamespaceURI(), "i", exceptionCode);
     ASSERT(exceptionCode == 0);
     insertNodeBefore(italicElement, startNode);
     surroundNodeRangeWithElement(startNode, endNode, italicElement);

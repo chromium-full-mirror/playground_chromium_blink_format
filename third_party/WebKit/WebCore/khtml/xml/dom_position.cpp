@@ -444,7 +444,7 @@ Position Position::downstream() const {
 
     // stop before going above the body, up into the head
     // return the last visible streamer position
-    if (currentNode->hasTagName(HTMLNames::body()) &&
+    if (currentNode->hasTagName(HTMLTags::body()) &&
         currentOffset >= (int)currentNode->childNodeCount())
       break;
 
@@ -706,7 +706,7 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     return false;
 
   if (node() == pos.node()) {
-    if (node()->hasTagName(HTMLNames::br()))
+    if (node()->hasTagName(HTMLTags::br()))
       return false;
 
     if (offset() == pos.offset())
@@ -718,10 +718,10 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     }
   }
 
-  if (node()->hasTagName(HTMLNames::br()) && pos.inRenderedContent())
+  if (node()->hasTagName(HTMLTags::br()) && pos.inRenderedContent())
     return true;
 
-  if (pos.node()->hasTagName(HTMLNames::br()) && inRenderedContent())
+  if (pos.node()->hasTagName(HTMLTags::br()) && inRenderedContent())
     return true;
 
   if (node()->enclosingBlockFlowElement() !=
@@ -786,7 +786,7 @@ Position Position::leadingWhitespacePosition(
   if (isNull())
     return Position();
 
-  if (upstream().node()->hasTagName(HTMLNames::br()))
+  if (upstream().node()->hasTagName(HTMLTags::br()))
     return Position();
 
   Position prev = previousCharacterPosition(affinity);
@@ -821,7 +821,7 @@ Position Position::trailingWhitespacePosition(
     }
   }
 
-  if (downstream().node()->hasTagName(HTMLNames::br()))
+  if (downstream().node()->hasTagName(HTMLTags::br()))
     return Position();
 
   Position next = nextCharacterPosition(affinity);

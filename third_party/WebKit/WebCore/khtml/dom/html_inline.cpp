@@ -39,7 +39,7 @@ HTMLAnchorElement::HTMLAnchorElement(HTMLAnchorElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLAnchorElement& HTMLAnchorElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::a());
+  assignOther(other, HTMLTags::a());
   return *this;
 }
 
@@ -202,7 +202,7 @@ HTMLBRElement::HTMLBRElement(const HTMLBRElement& other) : HTMLElement(other) {}
 HTMLBRElement::HTMLBRElement(HTMLBRElementImpl* impl) : HTMLElement(impl) {}
 
 HTMLBRElement& HTMLBRElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::br());
+  assignOther(other, HTMLTags::br());
   return *this;
 }
 
@@ -235,7 +235,7 @@ HTMLFontElement::HTMLFontElement(HTMLFontElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLFontElement& HTMLFontElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::font());
+  assignOther(other, HTMLTags::font());
   return *this;
 }
 
@@ -287,8 +287,8 @@ HTMLModElement::HTMLModElement(const HTMLModElement& other)
     : HTMLElement(other) {}
 
 HTMLModElement::HTMLModElement(HTMLElementImpl* _impl) : HTMLElement() {
-  if (_impl && (_impl->hasTagName(HTMLNames::ins()) ||
-                _impl->hasTagName(HTMLNames::del())))
+  if (_impl && (_impl->hasTagName(HTMLTags::ins()) ||
+                _impl->hasTagName(HTMLTags::del())))
     impl = _impl;
   else
     impl = 0;
@@ -297,8 +297,8 @@ HTMLModElement::HTMLModElement(HTMLElementImpl* _impl) : HTMLElement() {
 }
 
 HTMLModElement& HTMLModElement::operator=(const Node& other) {
-  if (!other.handle()->hasTagName(HTMLNames::ins()) &&
-      !other.handle()->hasTagName(HTMLNames::del())) {
+  if (!other.handle()->hasTagName(HTMLTags::ins()) &&
+      !other.handle()->hasTagName(HTMLTags::del())) {
     if (impl)
       impl->deref();
     impl = 0;
@@ -352,7 +352,7 @@ HTMLQuoteElement::HTMLQuoteElement(HTMLQuoteElementImpl* _impl)
 }
 
 HTMLQuoteElement& HTMLQuoteElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::q());
+  assignOther(other, HTMLTags::q());
   return *this;
 }
 

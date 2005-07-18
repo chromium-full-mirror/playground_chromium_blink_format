@@ -35,7 +35,7 @@ HTMLDListElement::HTMLDListElement(HTMLDListElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLDListElement& HTMLDListElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::dl());
+  assignOther(other, HTMLTags::dl());
   return *this;
 }
 
@@ -72,7 +72,7 @@ HTMLDirectoryElement::HTMLDirectoryElement(HTMLDirectoryElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLDirectoryElement& HTMLDirectoryElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::dir());
+  assignOther(other, HTMLTags::dir());
   return *this;
 }
 
@@ -108,7 +108,7 @@ HTMLLIElement::HTMLLIElement(const HTMLLIElement& other) : HTMLElement(other) {}
 HTMLLIElement::HTMLLIElement(HTMLLIElementImpl* impl) : HTMLElement(impl) {}
 
 HTMLLIElement& HTMLLIElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::li());
+  assignOther(other, HTMLTags::li());
   return *this;
 }
 
@@ -154,7 +154,7 @@ HTMLMenuElement::HTMLMenuElement(HTMLMenuElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLMenuElement& HTMLMenuElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::menu());
+  assignOther(other, HTMLTags::menu());
   return *this;
 }
 
@@ -191,7 +191,7 @@ HTMLOListElement::HTMLOListElement(HTMLOListElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLOListElement& HTMLOListElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::ol());
+  assignOther(other, HTMLTags::ol());
   return *this;
 }
 
@@ -252,7 +252,7 @@ HTMLUListElement::HTMLUListElement(HTMLUListElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLUListElement& HTMLUListElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::ul());
+  assignOther(other, HTMLTags::ul());
   return *this;
 }
 

@@ -916,10 +916,10 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
     // quirks mode we force
     // these tags to retain their display types.
     if (!strictParsing && e) {
-      if (e->hasTagName(HTMLNames::td())) {
+      if (e->hasTagName(HTMLTags::td())) {
         style->setDisplay(TABLE_CELL);
         style->setFloating(FNONE);
-      } else if (e->hasTagName(HTMLNames::table()))
+      } else if (e->hasTagName(HTMLTags::table()))
         style->setDisplay(style->isDisplayInlineType() ? INLINE_TABLE : TABLE);
     }
 
@@ -927,15 +927,15 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
     // This is necessary to
     // fix a crash where a site tries to position these objects.  They also
     // never honor display.
-    if (e && (e->hasTagName(HTMLNames::frame()) ||
-              e->hasTagName(HTMLNames::frameset()))) {
+    if (e && (e->hasTagName(HTMLTags::frame()) ||
+              e->hasTagName(HTMLTags::frameset()))) {
       style->setPosition(STATIC);
       style->setDisplay(BLOCK);
     }
 
     // Table headers with a text-align of auto will change the text-align to
     // center.
-    if (e && e->hasTagName(HTMLNames::th()) && style->textAlign() == TAAUTO)
+    if (e && e->hasTagName(HTMLTags::th()) && style->textAlign() == TAAUTO)
       style->setTextAlign(CENTER);
 
     // Mutate the display to BLOCK or TABLE for certain cases, e.g., if someone
@@ -1345,7 +1345,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         // If we're in quirks mode, then hover should never match anchors with
         // no
         // href.  This is important for sites like wsj.com.
-        if (strictParsing || !e->hasTagName(HTMLNames::a()) || e->isLink()) {
+        if (strictParsing || !e->hasTagName(HTMLTags::a()) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByHoverRules(true);
           if (e->renderer()) {
@@ -1377,7 +1377,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         // If we're in quirks mode, then :active should never match anchors with
         // no
         // href.
-        if (strictParsing || !e->hasTagName(HTMLNames::a()) || e->isLink()) {
+        if (strictParsing || !e->hasTagName(HTMLTags::a()) || e->isLink()) {
           if (element == e && style)
             style->setAffectedByActiveRules(true);
           else if (e->renderer())

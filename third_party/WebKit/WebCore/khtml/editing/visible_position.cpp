@@ -50,7 +50,7 @@ using DOM::Position;
 using DOM::Range;
 using DOM::RangeImpl;
 using DOM::TextImpl;
-using DOM::HTMLNames;
+using DOM::HTMLTags;
 
 namespace khtml {
 
@@ -73,8 +73,7 @@ void VisiblePosition::init(const Position& pos, EAffinity affinity) {
   m_affinity = affinity;
 
   // For <br> 0, it's important not to move past the <br>.
-  if (pos.node() && pos.node()->hasTagName(HTMLNames::br()) &&
-      pos.offset() == 0)
+  if (pos.node() && pos.node()->hasTagName(HTMLTags::br()) && pos.offset() == 0)
     initUpstream(pos);
   else
     initDownstream(pos);
@@ -273,7 +272,7 @@ bool VisiblePosition::isCandidate(const Position& pos) {
 
   if (renderer->isBlockFlow() &&
       (!renderer->firstChild() || !pos.node()->firstChild()) &&
-      (renderer->height() || pos.node()->hasTagName(HTMLNames::body()))) {
+      (renderer->height() || pos.node()->hasTagName(HTMLTags::body()))) {
     // return true for offset 0 into rendered blocks that are empty of rendered
     // kids, but have a height
     return pos.offset() == 0;
@@ -357,7 +356,7 @@ long VisiblePosition::maxOffset(const NodeImpl* node) {
 
 bool VisiblePosition::isAtomicNode(const NodeImpl* node) {
   return node && (!node->hasChildNodes() ||
-                  (node->hasTagName(HTMLNames::object()) && node->renderer() &&
+                  (node->hasTagName(HTMLTags::object()) && node->renderer() &&
                    node->renderer()->isReplaced()));
 }
 

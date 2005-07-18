@@ -35,7 +35,7 @@ HTMLBaseFontElement::HTMLBaseFontElement(HTMLBaseFontElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLBaseFontElement& HTMLBaseFontElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::basefont());
+  assignOther(other, HTMLTags::basefont());
   return *this;
 }
 

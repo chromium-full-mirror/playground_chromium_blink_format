@@ -648,7 +648,7 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLOptGroupElementImpl();
 
   virtual bool checkDTD(const NodeImpl* newChild) {
-    return newChild->hasTagName(HTMLNames::option());
+    return newChild->hasTagName(HTMLTags::option());
   }
 
   DOMString type() const;

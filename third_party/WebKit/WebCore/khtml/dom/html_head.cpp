@@ -36,7 +36,7 @@ HTMLBaseElement::HTMLBaseElement(HTMLBaseElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLBaseElement& HTMLBaseElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::base());
+  assignOther(other, HTMLTags::base());
   return *this;
 }
 
@@ -83,7 +83,7 @@ HTMLLinkElement::HTMLLinkElement(HTMLLinkElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLLinkElement& HTMLLinkElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::link());
+  assignOther(other, HTMLTags::link());
   return *this;
 }
 
@@ -215,7 +215,7 @@ HTMLMetaElement::HTMLMetaElement(HTMLMetaElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLMetaElement& HTMLMetaElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::meta());
+  assignOther(other, HTMLTags::meta());
   return *this;
 }
 
@@ -281,7 +281,7 @@ HTMLScriptElement::HTMLScriptElement(HTMLScriptElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLScriptElement& HTMLScriptElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::script());
+  assignOther(other, HTMLTags::script());
   return *this;
 }
 
@@ -380,7 +380,7 @@ HTMLStyleElement::HTMLStyleElement(HTMLStyleElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLStyleElement& HTMLStyleElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::style());
+  assignOther(other, HTMLTags::style());
   return *this;
 }
 
@@ -441,7 +441,7 @@ HTMLTitleElement::HTMLTitleElement(HTMLTitleElementImpl* impl)
     : HTMLElement(impl) {}
 
 HTMLTitleElement& HTMLTitleElement::operator=(const Node& other) {
-  assignOther(other, HTMLNames::title());
+  assignOther(other, HTMLTags::title());
   return *this;
 }
 

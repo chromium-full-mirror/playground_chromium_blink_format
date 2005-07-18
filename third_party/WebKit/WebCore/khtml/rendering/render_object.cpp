@@ -166,16 +166,16 @@ bool RenderObject::isRoot() const {
 
 bool RenderObject::isBody() const {
   return element() && element()->renderer() == this &&
-         element()->hasTagName(HTMLNames::body());
+         element()->hasTagName(HTMLTags::body());
 }
 
 bool RenderObject::isHR() const {
-  return element() && element()->hasTagName(HTMLNames::hr());
+  return element() && element()->hasTagName(HTMLTags::hr());
 }
 
 bool RenderObject::isHTMLMarquee() const {
   return element() && element()->renderer() == this &&
-         element()->hasTagName(HTMLNames::marquee());
+         element()->hasTagName(HTMLTags::marquee());
 }
 
 bool RenderObject::canHaveChildren() const {
@@ -693,8 +693,8 @@ bool RenderObject::sizesToMaxWidth() const {
   // but they allow text to sit on the same line as the marquee.
   if (isFloating() || (isCompact() && isInline()) ||
       (isInlineBlockOrInlineTable() && !isHTMLMarquee()) ||
-      (element() && (element()->hasTagName(HTMLNames::button()) ||
-                     element()->hasTagName(HTMLNames::legend()))))
+      (element() && (element()->hasTagName(HTMLTags::button()) ||
+                     element()->hasTagName(HTMLTags::legend()))))
     return true;
 
   // Children of a horizontal marquee do not fill the container by default.
@@ -1564,8 +1564,8 @@ void RenderObject::setStyle(RenderStyle* style) {
     // the canvas.  Just dirty the entire canvas when our style changes
     // substantially.
     if (d >= RenderStyle::Repaint && element() &&
-        (element()->hasTagName(HTMLNames::html()) ||
-         element()->hasTagName(HTMLNames::body())))
+        (element()->hasTagName(HTMLTags::html()) ||
+         element()->hasTagName(HTMLTags::body())))
       canvas()->repaint();
     else if (m_parent && !isText()) {
       // Do a repaint with the old style first, e.g., for example if we go from
@@ -2200,8 +2200,8 @@ void RenderObject::getTextDecorationColors(int decorations,
       curr = curr->continuation();
   } while (curr && decorations &&
            (!quirksMode || !curr->element() ||
-            (!curr->element()->hasTagName(HTMLNames::a()) &&
-             !curr->element()->hasTagName(HTMLNames::font()))));
+            (!curr->element()->hasTagName(HTMLTags::a()) &&
+             !curr->element()->hasTagName(HTMLTags::font()))));
 
   // If we bailed out, use the element we bailed out at (typically a <font> or
   // <a> element).
@@ -2334,8 +2334,8 @@ void RenderObject::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {
   // into RenderObject.
 
   if (image && image->pixmap_size() == image->valid_rect().size() && parent()) {
-    if (canvas() && element() && (element()->hasTagName(HTMLNames::html()) ||
-                                  element()->hasTagName(HTMLNames::body())))
+    if (canvas() && element() && (element()->hasTagName(HTMLTags::html()) ||
+                                  element()->hasTagName(HTMLTags::body())))
       canvas()->repaint();  // repaint the entire canvas since the background
                             // gets propagated up
     else

@@ -698,7 +698,7 @@ void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   if (element() && element()->isContentEditable()) {
     if (element()->parentNode() &&
         !element()->parentNode()->isContentEditable() &&
-        !element()->hasTagName(HTMLNames::body()))
+        !element()->hasTagName(HTMLTags::body()))
       p->addFocusRingRect(_tx, _ty, width(), height());
     return;
   }

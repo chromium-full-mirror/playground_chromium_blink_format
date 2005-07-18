@@ -658,16 +658,16 @@ void RenderPartObject::updateWidget() {
 
   setNeedsLayoutAndMinMaxRecalc();
 
-  if (element()->hasTagName(HTMLNames::object())) {
+  if (element()->hasTagName(HTMLTags::object())) {
     HTMLObjectElementImpl* o = static_cast<HTMLObjectElementImpl*>(element());
 
     // Check for a child EMBED tag.
     HTMLEmbedElementImpl* embed = 0;
     for (NodeImpl* child = o->firstChild(); child;) {
-      if (child->hasTagName(HTMLNames::embed())) {
+      if (child->hasTagName(HTMLTags::embed())) {
         embed = static_cast<HTMLEmbedElementImpl*>(child);
         break;
-      } else if (child->hasTagName(HTMLNames::object())) {
+      } else if (child->hasTagName(HTMLTags::object())) {
         child = child->nextSibling();  // Don't descend into nested OBJECT tags
       } else {
         child = child->traverseNextNode(
@@ -710,7 +710,7 @@ void RenderPartObject::updateWidget() {
     // Get the attributes from the params if there is no EMBED tag.
     NodeImpl* child = o->firstChild();
     while (child && (url.isEmpty() || serviceType.isEmpty() || !embed)) {
-      if (child->hasTagName(HTMLNames::param())) {
+      if (child->hasTagName(HTMLTags::param())) {
         HTMLParamElementImpl* p = static_cast<HTMLParamElementImpl*>(child);
         QString name = p->name().string().lower();
         if (url.isEmpty() && (name == "src" || name == "movie" ||
@@ -814,9 +814,9 @@ void RenderPartObject::updateWidget() {
     m_hasFallbackContent = false;
     for (NodeImpl* child = o->firstChild(); child && !m_hasFallbackContent;
          child = child->nextSibling()) {
-      if ((!child->isTextNode() && !child->hasTagName(HTMLNames::embed()) &&
+      if ((!child->isTextNode() && !child->hasTagName(HTMLTags::embed()) &&
            !child->hasTagName(
-               HTMLNames::param())) ||  // Discount <embed> and <param>
+               HTMLTags::param())) ||  // Discount <embed> and <param>
           (child->isTextNode() && !child->containsOnlyWhitespace()))
         m_hasFallbackContent = true;
     }
@@ -824,7 +824,7 @@ void RenderPartObject::updateWidget() {
         part->requestObject(this, url, serviceType, paramNames, paramValues);
     if (!success && m_hasFallbackContent)
       o->renderFallbackContent();
-  } else if (element()->hasTagName(HTMLNames::embed())) {
+  } else if (element()->hasTagName(HTMLTags::embed())) {
     HTMLEmbedElementImpl* o = static_cast<HTMLEmbedElementImpl*>(element());
     url = o->url;
     serviceType = o->serviceType;
@@ -851,7 +851,7 @@ void RenderPartObject::updateWidget() {
     }
     part->requestObject(this, url, serviceType, paramNames, paramValues);
   } else {
-    assert(element()->hasTagName(HTMLNames::iframe()));
+    assert(element()->hasTagName(HTMLTags::iframe()));
     HTMLIFrameElementImpl* o = static_cast<HTMLIFrameElementImpl*>(element());
     url = o->m_URL.string();
     if (url.isEmpty()) {
@@ -896,7 +896,7 @@ void RenderPartObject::slotViewCleared() {
     QScrollView::ScrollBarMode scroll = QScrollView::Auto;
     int marginw = -1;
     int marginh = -1;
-    if (element()->hasTagName(HTMLNames::iframe())) {
+    if (element()->hasTagName(HTMLTags::iframe())) {
       HTMLIFrameElementImpl* frame =
           static_cast<HTMLIFrameElementImpl*>(element());
       if (frame->m_frameBorder)
@@ -917,8 +917,7 @@ void RenderPartObject::slotViewCleared() {
       kdDebug(6031) << "frame is a KHTMLview!" << endl;
 #endif
       KHTMLView* htmlView = static_cast<KHTMLView*>(view);
-      htmlView->setIgnoreWheelEvents(
-          element()->hasTagName(HTMLNames::iframe()));
+      htmlView->setIgnoreWheelEvents(element()->hasTagName(HTMLTags::iframe()));
       if (marginw != -1)
         htmlView->setMarginWidth(marginw);
       if (marginh != -1)

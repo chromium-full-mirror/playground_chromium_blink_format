@@ -322,7 +322,7 @@ DEFINE_ATTR_GLOBAL(vspace)
 DEFINE_ATTR_GLOBAL(width)
 DEFINE_ATTR_GLOBAL(wrap)
 
-void HTMLNames::init() {
+void HTMLTags::init() {
   static bool initialized;
   if (!initialized) {
     // Use placement new to initialize the globals.

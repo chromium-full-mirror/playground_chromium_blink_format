@@ -603,11 +603,11 @@ void KHTMLView::layout() {
   if (document->isHTMLDocument()) {
     NodeImpl* body = static_cast<HTMLDocumentImpl*>(document)->body();
     if (body && body->renderer()) {
-      if (body->hasTagName(HTMLNames::frameset())) {
+      if (body->hasTagName(HTMLTags::frameset())) {
         body->renderer()->setNeedsLayout(true);
         vMode = AlwaysOff;
         hMode = AlwaysOff;
-      } else if (body->hasTagName(HTMLNames::body())) {
+      } else if (body->hasTagName(HTMLTags::body())) {
         RenderObject* o = (rootRenderer->style()->overflow() == OVISIBLE)
                               ? body->renderer()
                               : rootRenderer;
@@ -895,7 +895,7 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 }
 
 static bool isSubmitImage(DOM::NodeImpl* node) {
-  return node && node->hasTagName(HTMLNames::input()) &&
+  return node && node->hasTagName(HTMLTags::input()) &&
          static_cast<HTMLInputElementImpl*>(node)->inputType() ==
              HTMLInputElementImpl::IMAGE;
 }
