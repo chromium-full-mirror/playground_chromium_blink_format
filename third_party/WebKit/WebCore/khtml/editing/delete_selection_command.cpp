@@ -704,8 +704,6 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete(
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
-  if (!m_typingStyle)
-    return;
   CSSComputedStyleDeclarationImpl endingStyle(m_endingPosition.node());
   endingStyle.diff(m_typingStyle);
   if (!m_typingStyle->length()) {
@@ -797,17 +795,6 @@ void DeleteSelectionCommand::doApply() {
     return;
   }
 
-  // deleting just a BR is handled specially, at least because we do not
-  // want to replace it with a placeholder BR!
-  if (handleSpecialCaseBRDelete()) {
-    calculateTypingStyleAfterDelete(false);
-    debugPosition("endingPosition   ", m_endingPosition);
-    setEndingSelection(Selection(m_endingPosition, affinity));
-    clearTransientState();
-    rebalanceWhitespace();
-    return;
-  }
-
   // if all we are deleting is complete paragraph(s), we need to make
   // sure a blank paragraph remains when we are done
   bool forceBlankParagraph =
@@ -820,6 +807,17 @@ void DeleteSelectionCommand::doApply() {
   deleteInsignificantTextDownstream(m_trailingWhitespace);
 
   saveTypingStyleState();
+
+  // deleting just a BR is handled specially, at least because we do not
+  // want to replace it with a placeholder BR!
+  if (handleSpecialCaseBRDelete()) {
+    calculateTypingStyleAfterDelete(false);
+    debugPosition("endingPosition   ", m_endingPosition);
+    setEndingSelection(Selection(m_endingPosition, affinity));
+    clearTransientState();
+    rebalanceWhitespace();
+    return;
+  }
 
   insertPlaceholderForAncestorBlockContent();
   handleGeneralDelete();
