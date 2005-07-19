@@ -1471,7 +1471,8 @@ void RenderBlock::paintObject(PaintInfo& i, int _tx, int _ty) {
   // If the caret's node's render object's containing block is this block, and
   // the paint action is PaintActionForeground,
   // then paint the caret.
-  if (!inlineFlow && paintAction == PaintActionForeground) {
+  if (!inlineFlow && paintAction == PaintActionForeground && element() &&
+      element()->isContentEditable()) {
     paintCaret(i, CursorCaret);
     paintCaret(i, DragCaret);
   }
