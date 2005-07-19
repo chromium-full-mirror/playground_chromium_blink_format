@@ -310,7 +310,8 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
       userSelect(RenderStyle::initialUserSelect()),
       textOverflow(RenderStyle::initialTextOverflow()),
       marginTopCollapse(MCOLLAPSE),
-      marginBottomCollapse(MCOLLAPSE)
+      marginBottomCollapse(MCOLLAPSE),
+      m_appearance(RenderStyle::initialAppearance())
 #ifndef KHTML_NO_XBL
       ,
       bindingURI(0)
@@ -331,7 +332,8 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
       userSelect(o.userSelect),
       textOverflow(o.textOverflow),
       marginTopCollapse(o.marginTopCollapse),
-      marginBottomCollapse(o.marginBottomCollapse) {
+      marginBottomCollapse(o.marginBottomCollapse),
+      m_appearance(o.m_appearance) {
 #ifndef KHTML_NO_XBL
   bindingURI = o.bindingURI ? o.bindingURI->copy() : 0;
 #endif
@@ -362,7 +364,8 @@ bool StyleCSS3NonInheritedData::operator==(
          marquee == o.marquee && userDrag == o.userDrag &&
          userSelect == o.userSelect && textOverflow == o.textOverflow &&
          marginTopCollapse == o.marginTopCollapse &&
-         marginBottomCollapse == o.marginBottomCollapse
+         marginBottomCollapse == o.marginBottomCollapse &&
+         m_appearance == o.m_appearance
 #ifndef KHTML_NO_XBL
          && bindingsEquivalent(o)
 #endif
@@ -683,6 +686,8 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       box->vertical_align != other->box->vertical_align ||
       !(surround->margin == other->surround->margin) ||
       !(surround->padding == other->surround->padding) ||
+      css3NonInheritedData->m_appearance !=
+          other->css3NonInheritedData->m_appearance ||
       css3NonInheritedData->marginTopCollapse !=
           other->css3NonInheritedData->marginTopCollapse ||
       css3NonInheritedData->marginBottomCollapse !=

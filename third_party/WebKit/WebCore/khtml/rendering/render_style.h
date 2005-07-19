@@ -641,6 +641,39 @@ enum EKHTMLLineBreak { LBNORMAL, AFTER_WHITE_SPACE };
 
 enum EMatchNearestMailBlockquoteColor { BCNORMAL, MATCH };
 
+enum EAppearance {
+  NoAppearance,
+  CheckboxAppearance,
+  RadioAppearance,
+  ButtonAppearance,
+  ButtonBevelAppearance,
+  ListboxAppearance,
+  ListItemAppearance,
+  MenulistAppearance,
+  MenulistButtonAppearance,
+  MenulistTextAppearance,
+  MenulistTextFieldAppearance,
+  ScrollbarButtonUpAppearance,
+  ScrollbarButtonDownAppearance,
+  ScrollbarButtonLeftAppearance,
+  ScrollbarButtonRightAppearance,
+  ScrollbarTrackHorizontalAppearance,
+  ScrollbarTrackVerticalAppearance,
+  ScrollbarThumbHorizontalAppearance,
+  ScrollbarThumbVerticalAppearance,
+  ScrollbarGripperHorizontalAppearance,
+  ScrollbarGripperVerticalAppearance,
+  SliderHorizontalAppearance,
+  SliderVerticalAppearance,
+  SliderThumbHorizontalAppearance,
+  SliderThumbVerticalAppearance,
+  CaretAppearance,
+  SearchFieldAppearance,
+  SearchFieldResultsAppearance,
+  SearchFieldCloseAppearance,
+  TextFieldAppearance
+};
+
 // This struct is for rarely used non-inherited CSS3 properties.  By grouping
 // them together,
 // we save space, and only allocate this object when someone actually uses
@@ -678,6 +711,8 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
   EMarginCollapse marginTopCollapse : 2;
   EMarginCollapse marginBottomCollapse : 2;
   EMatchNearestMailBlockquoteColor matchNearestMailBlockquoteColor : 1;
+
+  EAppearance m_appearance : 5;
 
 #ifndef KHTML_NO_XBL
   BindingURI* bindingURI;  // The XBL binding URI list.
@@ -1363,6 +1398,7 @@ class RenderStyle {
   }
   ShadowData* textShadow() const { return css3InheritedData->textShadow; }
   float opacity() const { return css3NonInheritedData->opacity; }
+  EAppearance appearance() const { return css3NonInheritedData->m_appearance; }
   EBoxAlignment boxAlign() const {
     return css3NonInheritedData->flexibleBox->align;
   }
@@ -1669,6 +1705,9 @@ class RenderStyle {
   }
   void setTextShadow(ShadowData* val, bool add = false);
   void setOpacity(float f) { SET_VAR(css3NonInheritedData, opacity, f); }
+  void setAppearance(EAppearance a) {
+    SET_VAR(css3NonInheritedData, m_appearance, a);
+  }
   void setBoxAlign(EBoxAlignment a) {
     SET_VAR(css3NonInheritedData.access()->flexibleBox, align, a);
   }
@@ -1865,6 +1904,7 @@ class RenderStyle {
   initialMatchNearestMailBlockquoteColor() {
     return BCNORMAL;
   }
+  static EAppearance initialAppearance() { return NoAppearance; }
 
 #if APPLE_CHANGES
   // Keep these at the end.
