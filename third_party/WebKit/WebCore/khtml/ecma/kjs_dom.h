@@ -153,7 +153,8 @@ class DOMNode : public DOMObject {
     ScrollLeft,
     ScrollTop,
     ScrollWidth,
-    ScrollHeight
+    ScrollHeight,
+    ScrollIntoView
   };
 
  protected:
@@ -292,7 +293,8 @@ class DOMElement : public DOMNode {
     HasAttribute,
     HasAttributeNS,
     ScrollByLines,
-    ScrollByPages
+    ScrollByPages,
+    ScrollIntoView
   };
 
  protected:

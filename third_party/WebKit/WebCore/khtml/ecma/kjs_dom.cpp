@@ -1181,6 +1181,8 @@ DontDelete|Function 1
   getElementsByTagNameNS DOMElement::GetElementsByTagNameNS
 DontDelete|Function 2
   hasAttributeNS	DOMElement::HasAttributeNS	DontDelete|Function 2
+  scrollIntoView        DOMElement::ScrollIntoView      DontDelete|Function 1
+
 # extension for Safari RSS
   scrollByLines         DOMElement::ScrollByLines       DontDelete|Function 1
   scrollByPages         DOMElement::ScrollByPages       DontDelete|Function 1
@@ -1316,6 +1318,11 @@ Value DOMElementProtoFunc::call(ExecState* exec,
     case DOMElement::HasAttributeNS:  // DOM2
       return Boolean(element.hasAttributeNS(args[0].toString(exec).string(),
                                             args[1].toString(exec).string()));
+    case DOMElement::ScrollIntoView:
+      (args[0].type() != UndefinedType && args[0].type() != NullType)
+          ? element.scrollIntoView(args[0].toBoolean(exec))
+          : element.scrollIntoView(true);
+      return Undefined();
     case DOMElement::ScrollByLines:
     case DOMElement::ScrollByPages:
       if (DocumentImpl* doc = element.getDocument()) {
