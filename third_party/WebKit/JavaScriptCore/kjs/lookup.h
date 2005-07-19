@@ -250,7 +250,7 @@ inline void lookupPut(ExecState* exec,
                       const Value& value,
                       int attr,
                       const HashTable* table,
-                      const ThisImp* thisObj) {
+                      ThisImp* thisObj) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
 
   if (!entry)  // not found: forward to parent
