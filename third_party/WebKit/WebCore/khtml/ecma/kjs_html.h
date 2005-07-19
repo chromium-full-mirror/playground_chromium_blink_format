@@ -47,12 +47,15 @@ class JSAbstractEventListener;
 class HTMLDocument : public DOMDocument {
  public:
   HTMLDocument(ExecState* exec, DOM::HTMLDocumentImpl* d);
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        const Value& value,
+                        int /*attr*/);
   virtual bool hasOwnProperty(ExecState* exec,
                               const Identifier& propertyName) const;
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -97,13 +100,13 @@ class HTMLDocument : public DOMDocument {
 class HTMLElement : public DOMElement {
  public:
   HTMLElement(ExecState* exec, DOM::HTMLElementImpl* e);
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec, int token, const Value& value, int);
   virtual bool hasOwnProperty(ExecState* exec,
                               const Identifier& propertyName) const;
   virtual UString toString(ExecState* exec) const;
@@ -797,9 +800,8 @@ class HTMLCollection : public DOMObject {
  public:
   HTMLCollection(ExecState* exec, DOM::HTMLCollectionImpl* c);
   ~HTMLCollection();
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
-  virtual Value tryCall(ExecState* exec, Object& thisObj, const List& args);
   virtual bool implementsCall() const { return true; }
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual bool hasOwnProperty(ExecState* exec, const Identifier& p) const;
@@ -818,11 +820,11 @@ class HTMLSelectCollection : public HTMLCollection {
   HTMLSelectCollection(ExecState* exec,
                        DOM::HTMLCollectionImpl* c,
                        DOM::HTMLSelectElementImpl* e);
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
 
  private:
   khtml::SharedPtr<DOM::HTMLSelectElementImpl> m_element;
@@ -856,13 +858,16 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
  public:
   Image(DOM::DocumentImpl* d, bool ws, int w, bool hs, int h);
   ~Image();
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        const Value& value,
+                        int /*attr*/);
   void notifyFinished(khtml::CachedObject*);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -890,13 +895,16 @@ class Context2D : public DOMObject {
  public:
   Context2D(DOM::HTMLElementImpl* e);
   ~Context2D();
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        const Value& value,
+                        int /*attr*/);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual void mark();
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -1003,13 +1011,16 @@ class Gradient : public DOMObject {
   Gradient(float x0, float y0, float x1, float y1);
   Gradient(float x0, float y0, float r0, float x1, float y1, float r1);
   ~Gradient();
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        const Value& value,
+                        int /*attr*/);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -1049,13 +1060,16 @@ class ImagePattern : public DOMObject {
  public:
   ImagePattern(Image* i, int type);
   ~ImagePattern();
-  virtual Value tryGet(ExecState* exec, const Identifier& propertyName) const;
+  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
-  virtual void tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr = None);
-  void putValue(ExecState* exec, int token, const Value& value, int /*attr*/);
+  virtual void put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr = None);
+  void putValueProperty(ExecState* exec,
+                        int token,
+                        const Value& value,
+                        int /*attr*/);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

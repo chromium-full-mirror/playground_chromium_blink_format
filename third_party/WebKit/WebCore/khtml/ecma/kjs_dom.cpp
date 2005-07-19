@@ -88,7 +88,7 @@ class DOMNodeListFunc : public DOMFunction {
 
  public:
   DOMNodeListFunc(ExecState* exec, int id, int len);
-  virtual Value tryCall(ExecState* exec, Object& thisObj, const List&);
+  virtual Value call(ExecState* exec, Object& thisObj, const List&);
   enum { Item };
 
  private:
@@ -271,12 +271,12 @@ bool DOMNode::toBoolean(ExecState*) const {
   scrollHeight  DOMNode::ScrollHeight           DontDelete|ReadOnly
 @end
 */
-Value DOMNode::tryGet(ExecState* exec, const Identifier& propertyName) const {
+Value DOMNode::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNode::tryGet " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMNode::get " << propertyName.qstring() << endl;
 #endif
-  return DOMObjectLookupGetValue<DOMNode, DOMObject>(exec, propertyName,
-                                                     &DOMNodeTable, this);
+  return lookupGetValue<DOMNode, DOMObject>(exec, propertyName, &DOMNodeTable,
+                                            this);
 }
 
 Value DOMNode::getValueProperty(ExecState* exec, int token) const {
@@ -454,21 +454,21 @@ Value DOMNode::getValueProperty(ExecState* exec, int token) const {
   return Value();
 }
 
-void DOMNode::tryPut(ExecState* exec,
-                     const Identifier& propertyName,
-                     const Value& value,
-                     int attr) {
+void DOMNode::put(ExecState* exec,
+                  const Identifier& propertyName,
+                  const Value& value,
+                  int attr) {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNode::tryPut " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMNode::put " << propertyName.qstring() << endl;
 #endif
-  DOMObjectLookupPut<DOMNode, DOMObject>(exec, propertyName, value, attr,
-                                         &DOMNodeTable, this);
+  lookupPut<DOMNode, DOMObject>(exec, propertyName, value, attr, &DOMNodeTable,
+                                this);
 }
 
-void DOMNode::putValue(ExecState* exec,
-                       int token,
-                       const Value& value,
-                       int /*attr*/) {
+void DOMNode::putValueProperty(ExecState* exec,
+                               int token,
+                               const Value& value,
+                               int /*attr*/) {
   DOMExceptionTranslator exception(exec);
   NodeImpl& node = *m_impl;
   switch (token) {
@@ -617,7 +617,8 @@ void DOMNode::putValue(ExecState* exec,
       break;
     }
     default:
-      kdWarning() << "DOMNode::putValue unhandled token " << token << endl;
+      kdWarning() << "DOMNode::putValueProperty unhandled token " << token
+                  << endl;
   }
 }
 
@@ -651,9 +652,9 @@ Value DOMNode::getListener(int eventId) const {
 
 void DOMNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}
 
-Value DOMNodeProtoFunc::tryCall(ExecState* exec,
-                                Object& thisObj,
-                                const List& args) {
+Value DOMNodeProtoFunc::call(ExecState* exec,
+                             Object& thisObj,
+                             const List& args) {
   if (!thisObj.inherits(&DOMNode::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -749,9 +750,9 @@ bool DOMNodeList::hasOwnProperty(ExecState* exec, const Identifier& p) const {
   return ObjectImp::hasOwnProperty(exec, p);
 }
 
-Value DOMNodeList::tryGet(ExecState* exec, const Identifier& p) const {
+Value DOMNodeList::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNodeList::tryGet " << p.ascii() << endl;
+  kdDebug(6070) << "DOMNodeList::get " << p.ascii() << endl;
 #endif
   Value result;
 
@@ -784,22 +785,7 @@ Value DOMNodeList::tryGet(ExecState* exec, const Identifier& p) const {
 }
 
 // Need to support both get and call, so that list[0] and list(0) work.
-Value DOMNodeList::call(ExecState* exec, Object& thisObj, const List& args) {
-  // This code duplication is necessary, DOMNodeList isn't a DOMFunction
-  Value val;
-  try {
-    val = tryCall(exec, thisObj, args);
-  }
-  // pity there's no way to distinguish between these in JS code
-  catch (...) {
-    Object err =
-        Error::create(exec, GeneralError, "Exception from DOMNodeList");
-    exec->setException(err);
-  }
-  return val;
-}
-
-Value DOMNodeList::tryCall(ExecState* exec, Object&, const List& args) {
+Value DOMNodeList::call(ExecState* exec, Object&, const List& args) {
   // Do not use thisObj here. See HTMLCollection.
   UString s = args[0].toString(exec);
   bool ok;
@@ -807,8 +793,8 @@ Value DOMNodeList::tryCall(ExecState* exec, Object&, const List& args) {
   if (ok)
     return getDOMNode(exec, m_impl->item(u));
 
-  kdWarning() << "KJS::DOMNodeList::tryCall " << s.qstring()
-              << " not implemented" << endl;
+  kdWarning() << "KJS::DOMNodeList::call " << s.qstring() << " not implemented"
+              << endl;
   return Undefined();
 }
 
@@ -819,9 +805,9 @@ DOMNodeListFunc::DOMNodeListFunc(ExecState* exec, int i, int len)
 }
 
 // Not a prototype class currently, but should probably be converted to one
-Value DOMNodeListFunc::tryCall(ExecState* exec,
-                               Object& thisObj,
-                               const List& args) {
+Value DOMNodeListFunc::call(ExecState* exec,
+                            Object& thisObj,
+                            const List& args) {
   if (!thisObj.inherits(&KJS::DOMNodeList::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -850,12 +836,12 @@ const ClassInfo DOMAttr::info = {"Attr", &DOMNode::info, &DOMAttrTable, 0};
 
 DOMAttr::DOMAttr(ExecState* exec, AttrImpl* a) : DOMNode(exec, a) {}
 
-Value DOMAttr::tryGet(ExecState* exec, const Identifier& propertyName) const {
+Value DOMAttr::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMAttr::tryPut " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMAttr::put " << propertyName.qstring() << endl;
 #endif
-  return DOMObjectLookupGetValue<DOMAttr, DOMNode>(exec, propertyName,
-                                                   &DOMAttrTable, this);
+  return lookupGetValue<DOMAttr, DOMNode>(exec, propertyName, &DOMAttrTable,
+                                          this);
 }
 
 Value DOMAttr::getValueProperty(ExecState* exec, int token) const {
@@ -873,21 +859,21 @@ Value DOMAttr::getValueProperty(ExecState* exec, int token) const {
   return Value();  // not reached
 }
 
-void DOMAttr::tryPut(ExecState* exec,
-                     const Identifier& propertyName,
-                     const Value& value,
-                     int attr) {
+void DOMAttr::put(ExecState* exec,
+                  const Identifier& propertyName,
+                  const Value& value,
+                  int attr) {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMAttr::tryPut " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMAttr::put " << propertyName.qstring() << endl;
 #endif
-  DOMObjectLookupPut<DOMAttr, DOMNode>(exec, propertyName, value, attr,
-                                       &DOMAttrTable, this);
+  lookupPut<DOMAttr, DOMNode>(exec, propertyName, value, attr, &DOMAttrTable,
+                              this);
 }
 
-void DOMAttr::putValue(ExecState* exec,
-                       int token,
-                       const Value& value,
-                       int /*attr*/) {
+void DOMAttr::putValueProperty(ExecState* exec,
+                               int token,
+                               const Value& value,
+                               int /*attr*/) {
   DOMExceptionTranslator exception(exec);
   switch (token) {
     case ValueProperty:
@@ -895,7 +881,8 @@ void DOMAttr::putValue(ExecState* exec,
                                                exception);
       return;
     default:
-      kdWarning() << "DOMAttr::putValue unhandled token " << token << endl;
+      kdWarning() << "DOMAttr::putValueProperty unhandled token " << token
+                  << endl;
   }
 }
 
@@ -973,13 +960,12 @@ DOMDocument::~DOMDocument() {
   ScriptInterpreter::forgetDOMObject(static_cast<DocumentImpl*>(m_impl.get()));
 }
 
-Value DOMDocument::tryGet(ExecState* exec,
-                          const Identifier& propertyName) const {
+Value DOMDocument::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMDocument::tryGet " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMDocument::get " << propertyName.qstring() << endl;
 #endif
-  return DOMObjectLookupGetValue<DOMDocument, DOMNode>(exec, propertyName,
-                                                       &DOMDocumentTable, this);
+  return lookupGetValue<DOMDocument, DOMNode>(exec, propertyName,
+                                              &DOMDocumentTable, this);
 }
 
 Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
@@ -1020,21 +1006,21 @@ Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-void DOMDocument::tryPut(ExecState* exec,
-                         const Identifier& propertyName,
-                         const Value& value,
-                         int attr) {
+void DOMDocument::put(ExecState* exec,
+                      const Identifier& propertyName,
+                      const Value& value,
+                      int attr) {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMDocument::tryPut " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMDocument::put " << propertyName.qstring() << endl;
 #endif
-  DOMObjectLookupPut<DOMDocument, DOMNode>(exec, propertyName, value, attr,
-                                           &DOMDocumentTable, this);
+  lookupPut<DOMDocument, DOMNode>(exec, propertyName, value, attr,
+                                  &DOMDocumentTable, this);
 }
 
-void DOMDocument::putValue(ExecState* exec,
-                           int token,
-                           const Value& value,
-                           int /*attr*/) {
+void DOMDocument::putValueProperty(ExecState* exec,
+                                   int token,
+                                   const Value& value,
+                                   int /*attr*/) {
   DocumentImpl& doc = *static_cast<DocumentImpl*>(impl());
   switch (token) {
     case SelectedStylesheetSet: {
@@ -1044,9 +1030,9 @@ void DOMDocument::putValue(ExecState* exec,
   }
 }
 
-Value DOMDocumentProtoFunc::tryCall(ExecState* exec,
-                                    Object& thisObj,
-                                    const List& args) {
+Value DOMDocumentProtoFunc::call(ExecState* exec,
+                                 Object& thisObj,
+                                 const List& args) {
   if (!thisObj.inherits(&KJS::DOMNode::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -1221,10 +1207,9 @@ DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
 
 DOMElement::DOMElement(ElementImpl* e) : DOMNode(e) {}
 
-Value DOMElement::tryGet(ExecState* exec,
-                         const Identifier& propertyName) const {
+Value DOMElement::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMElement::tryGet " << propertyName.qstring() << endl;
+  kdDebug(6070) << "DOMElement::get " << propertyName.qstring() << endl;
 #endif
   ElementImpl& element = *static_cast<ElementImpl*>(impl());
 
@@ -1236,8 +1221,8 @@ Value DOMElement::tryGet(ExecState* exec,
       case Style:
         return getDOMCSSStyleDeclaration(exec, element.style());
       default:
-        kdWarning() << "Unhandled token in DOMElement::tryGet : "
-                    << entry->value << endl;
+        kdWarning() << "Unhandled token in DOMElement::get : " << entry->value
+                    << endl;
         break;
     }
   }
@@ -1249,7 +1234,7 @@ Value DOMElement::tryGet(ExecState* exec,
   if (DOMNode::hasOwnProperty(exec, propertyName) ||
       (proto->dispatchType() == ObjectType &&
        static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName)))
-    return DOMNode::tryGet(exec, propertyName);
+    return DOMNode::get(exec, propertyName);
 
   DOM::DOMString attr = element.getAttribute(propertyName.string());
   // Give access to attributes
@@ -1259,9 +1244,9 @@ Value DOMElement::tryGet(ExecState* exec,
   return Undefined();
 }
 
-Value DOMElementProtoFunc::tryCall(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+Value DOMElementProtoFunc::call(ExecState* exec,
+                                Object& thisObj,
+                                const List& args) {
   if (!thisObj.inherits(
           &KJS::DOMNode::info)) {  // node should be enough here, given the cast
     Object err = Error::create(exec, TypeError);
@@ -1394,9 +1379,9 @@ DOMDOMImplementation::~DOMDOMImplementation() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-Value DOMDOMImplementationProtoFunc::tryCall(ExecState* exec,
-                                             Object& thisObj,
-                                             const List& args) {
+Value DOMDOMImplementationProtoFunc::call(ExecState* exec,
+                                          Object& thisObj,
+                                          const List& args) {
   if (!thisObj.inherits(&KJS::DOMDOMImplementation::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -1456,10 +1441,10 @@ const ClassInfo DOMDocumentType::info = {"DocumentType", &DOMNode::info,
 DOMDocumentType::DOMDocumentType(ExecState* exec, DocumentTypeImpl* dt)
     : DOMNode(/*### no proto yet*/ exec, dt) {}
 
-Value DOMDocumentType::tryGet(ExecState* exec,
-                              const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<DOMDocumentType, DOMNode>(
-      exec, propertyName, &DOMDocumentTypeTable, this);
+Value DOMDocumentType::get(ExecState* exec,
+                           const Identifier& propertyName) const {
+  return lookupGetValue<DOMDocumentType, DOMNode>(exec, propertyName,
+                                                  &DOMDocumentTypeTable, this);
 }
 
 Value DOMDocumentType::getValueProperty(ExecState* exec, int token) const {
@@ -1535,7 +1520,7 @@ bool DOMNamedNodeMap::hasOwnProperty(ExecState* exec,
   return DOMObject::hasOwnProperty(exec, p);
 }
 
-Value DOMNamedNodeMap::tryGet(ExecState* exec, const Identifier& p) const {
+Value DOMNamedNodeMap::get(ExecState* exec, const Identifier& p) const {
   NamedNodeMapImpl& map = *m_impl;
   if (p == lengthPropertyName)
     return Number(map.length());
@@ -1547,12 +1532,12 @@ Value DOMNamedNodeMap::tryGet(ExecState* exec, const Identifier& p) const {
     return getDOMNode(exec, map.item(idx));
 
   // Anything else (including functions, defined in the prototype)
-  return DOMObject::tryGet(exec, p);
+  return DOMObject::get(exec, p);
 }
 
-Value DOMNamedNodeMapProtoFunc::tryCall(ExecState* exec,
-                                        Object& thisObj,
-                                        const List& args) {
+Value DOMNamedNodeMapProtoFunc::call(ExecState* exec,
+                                     Object& thisObj,
+                                     const List& args) {
   if (!thisObj.inherits(&KJS::DOMNamedNodeMap::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -1611,9 +1596,9 @@ DOMProcessingInstruction::DOMProcessingInstruction(ExecState* exec,
                                                    ProcessingInstructionImpl* i)
     : DOMNode(exec, i) {}
 
-Value DOMProcessingInstruction::tryGet(ExecState* exec,
-                                       const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<DOMProcessingInstruction, DOMNode>(
+Value DOMProcessingInstruction::get(ExecState* exec,
+                                    const Identifier& propertyName) const {
+  return lookupGetValue<DOMProcessingInstruction, DOMNode>(
       exec, propertyName, &DOMProcessingInstructionTable, this);
 }
 
@@ -1636,10 +1621,10 @@ Value DOMProcessingInstruction::getValueProperty(ExecState* exec,
   }
 }
 
-void DOMProcessingInstruction::tryPut(ExecState* exec,
-                                      const Identifier& propertyName,
-                                      const Value& value,
-                                      int attr) {
+void DOMProcessingInstruction::put(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   const Value& value,
+                                   int attr) {
   ProcessingInstructionImpl* pi =
       static_cast<ProcessingInstructionImpl*>(impl());
   DOMExceptionTranslator exception(exec);
@@ -1647,7 +1632,7 @@ void DOMProcessingInstruction::tryPut(ExecState* exec,
   if (propertyName == "data")
     pi->setData(value.toString(exec).string(), exception);
   else
-    DOMNode::tryPut(exec, propertyName, value, attr);
+    DOMNode::put(exec, propertyName, value, attr);
 }
 
 // -------------------------------------------------------------------------
@@ -1664,10 +1649,9 @@ const ClassInfo DOMNotation::info = {"Notation", &DOMNode::info,
 
 DOMNotation::DOMNotation(ExecState* exec, NotationImpl* n) : DOMNode(exec, n) {}
 
-Value DOMNotation::tryGet(ExecState* exec,
-                          const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<DOMNotation, DOMNode>(exec, propertyName,
-                                                       &DOMNotationTable, this);
+Value DOMNotation::get(ExecState* exec, const Identifier& propertyName) const {
+  return lookupGetValue<DOMNotation, DOMNode>(exec, propertyName,
+                                              &DOMNotationTable, this);
 }
 
 Value DOMNotation::getValueProperty(ExecState*, int token) const {
@@ -1697,9 +1681,9 @@ const ClassInfo DOMEntity::info = {"Entity", &DOMNode::info, 0, 0};
 
 DOMEntity::DOMEntity(ExecState* exec, EntityImpl* e) : DOMNode(exec, e) {}
 
-Value DOMEntity::tryGet(ExecState* exec, const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<DOMEntity, DOMNode>(exec, propertyName,
-                                                     &DOMEntityTable, this);
+Value DOMEntity::get(ExecState* exec, const Identifier& propertyName) const {
+  return lookupGetValue<DOMEntity, DOMNode>(exec, propertyName, &DOMEntityTable,
+                                            this);
 }
 
 Value DOMEntity::getValueProperty(ExecState*, int token) const {
@@ -1878,9 +1862,9 @@ DontDelete|ReadOnly
 DontDelete|ReadOnly
 @end
 */
-Value NodeConstructor::tryGet(ExecState* exec,
-                              const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<NodeConstructor, DOMObject>(
+Value NodeConstructor::get(ExecState* exec,
+                           const Identifier& propertyName) const {
+  return lookupGetValue<NodeConstructor, DOMObject>(
       exec, propertyName, &NodeConstructorTable, this);
 }
 
@@ -1964,9 +1948,9 @@ DontDelete|ReadOnly
 @end
 */
 
-Value DOMExceptionConstructor::tryGet(ExecState* exec,
-                                      const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<DOMExceptionConstructor, DOMObject>(
+Value DOMExceptionConstructor::get(ExecState* exec,
+                                   const Identifier& propertyName) const {
+  return lookupGetValue<DOMExceptionConstructor, DOMObject>(
       exec, propertyName, &DOMExceptionConstructorTable, this);
 }
 
@@ -2028,8 +2012,8 @@ DOMNamedNodesCollection::DOMNamedNodesCollection(
     const QValueList<SharedPtr<NodeImpl>>& nodes)
     : m_nodes(nodes) {}
 
-Value DOMNamedNodesCollection::tryGet(ExecState* exec,
-                                      const Identifier& propertyName) const {
+Value DOMNamedNodesCollection::get(ExecState* exec,
+                                   const Identifier& propertyName) const {
   if (propertyName == lengthPropertyName)
     return Number(m_nodes.count());
   // index?
@@ -2062,7 +2046,7 @@ Value DOMNamedNodesCollection::tryGet(ExecState* exec,
     }
   }
 
-  return DOMObject::tryGet(exec, propertyName);
+  return DOMObject::get(exec, propertyName);
 }
 
 // -------------------------------------------------------------------------
@@ -2095,11 +2079,11 @@ DOMCharacterData::DOMCharacterData(ExecState* exec, CharacterDataImpl* d)
 
 DOMCharacterData::DOMCharacterData(CharacterDataImpl* d) : DOMNode(d) {}
 
-Value DOMCharacterData::tryGet(ExecState* exec, const Identifier& p) const {
+Value DOMCharacterData::get(ExecState* exec, const Identifier& p) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMCharacterData::tryGet " << p.string().string() << endl;
+  kdDebug(6070) << "DOMCharacterData::get " << p.string().string() << endl;
 #endif
-  return DOMObjectLookupGetValue<DOMCharacterData, DOMNode>(
+  return lookupGetValue<DOMCharacterData, DOMNode>(
       exec, p, &DOMCharacterDataTable, this);
 }
 
@@ -2117,21 +2101,21 @@ Value DOMCharacterData::getValueProperty(ExecState*, int token) const {
   }
 }
 
-void DOMCharacterData::tryPut(ExecState* exec,
-                              const Identifier& propertyName,
-                              const Value& value,
-                              int attr) {
+void DOMCharacterData::put(ExecState* exec,
+                           const Identifier& propertyName,
+                           const Value& value,
+                           int attr) {
   DOMExceptionTranslator exception(exec);
   if (propertyName == "data")
     static_cast<CharacterDataImpl*>(impl())->setData(
         value.toString(exec).string(), exception);
   else
-    DOMNode::tryPut(exec, propertyName, value, attr);
+    DOMNode::put(exec, propertyName, value, attr);
 }
 
-Value DOMCharacterDataProtoFunc::tryCall(ExecState* exec,
-                                         Object& thisObj,
-                                         const List& args) {
+Value DOMCharacterDataProtoFunc::call(ExecState* exec,
+                                      Object& thisObj,
+                                      const List& args) {
   if (!thisObj.inherits(&KJS::DOMCharacterData::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -2196,16 +2180,16 @@ DOMText::DOMText(ExecState* exec, TextImpl* t) : DOMCharacterData(t) {
   setPrototype(DOMTextProto::self(exec));
 }
 
-Value DOMText::tryGet(ExecState* exec, const Identifier& p) const {
+Value DOMText::get(ExecState* exec, const Identifier& p) const {
   if (p == "")
     return Undefined();  // ### TODO
   else
-    return DOMCharacterData::tryGet(exec, p);
+    return DOMCharacterData::get(exec, p);
 }
 
-Value DOMTextProtoFunc::tryCall(ExecState* exec,
-                                Object& thisObj,
-                                const List& args) {
+Value DOMTextProtoFunc::call(ExecState* exec,
+                             Object& thisObj,
+                             const List& args) {
   if (!thisObj.inherits(&KJS::DOMText::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);

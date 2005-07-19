@@ -142,7 +142,7 @@ namespace KJS {
 class HTMLElementFunction : public DOMFunction {
  public:
   HTMLElementFunction(ExecState* exec, int i, int len);
-  virtual Value tryCall(ExecState* exec, Object& thisObj, const List& args);
+  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
 
  private:
   int id;
@@ -150,9 +150,9 @@ class HTMLElementFunction : public DOMFunction {
 
 IMPLEMENT_PROTOFUNC(HTMLDocFunction)
 
-Value KJS::HTMLDocFunction::tryCall(ExecState* exec,
-                                    Object& thisObj,
-                                    const List& args) {
+Value KJS::HTMLDocFunction::call(ExecState* exec,
+                                 Object& thisObj,
+                                 const List& args) {
   if (!thisObj.inherits(&HTMLDocument::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -284,11 +284,9 @@ bool HTMLDocument::hasOwnProperty(ExecState* exec, const Identifier& p) const {
          doc->haveNamedImageOrForm(p.qstring());
 }
 
-Value HTMLDocument::tryGet(ExecState* exec,
-                           const Identifier& propertyName) const {
+Value HTMLDocument::get(ExecState* exec, const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring()
-                << endl;
+  kdDebug(6070) << "KJS::HTMLDocument::get " << propertyName.qstring() << endl;
 #endif
   HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
   HTMLElementImpl* body = doc.body();
@@ -409,10 +407,10 @@ Value HTMLDocument::tryGet(ExecState* exec,
   if (DOMDocument::hasOwnProperty(exec, propertyName) ||
       (proto->dispatchType() == ObjectType &&
        static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName)))
-    return DOMDocument::tryGet(exec, propertyName);
+    return DOMDocument::get(exec, propertyName);
 
-  // kdDebug(6070) << "KJS::HTMLDocument::tryGet " << propertyName.qstring() <<
-  // " not found, returning element" << endl;
+  // kdDebug(6070) << "KJS::HTMLDocument::get " << propertyName.qstring() << "
+  // not found, returning element" << endl;
   // image and form elements with the name p will be looked up last
 
   // Look for named applets.
@@ -436,22 +434,21 @@ Value HTMLDocument::tryGet(ExecState* exec,
                      propertyName);  // Get all the items with the same name
 }
 
-void KJS::HTMLDocument::tryPut(ExecState* exec,
-                               const Identifier& propertyName,
-                               const Value& value,
-                               int attr) {
+void KJS::HTMLDocument::put(ExecState* exec,
+                            const Identifier& propertyName,
+                            const Value& value,
+                            int attr) {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "KJS::HTMLDocument::tryPut " << propertyName.qstring()
-                << endl;
+  kdDebug(6070) << "KJS::HTMLDocument::put " << propertyName.qstring() << endl;
 #endif
-  DOMObjectLookupPut<HTMLDocument, DOMDocument>(exec, propertyName, value, attr,
-                                                &HTMLDocumentTable, this);
+  lookupPut<HTMLDocument, DOMDocument>(exec, propertyName, value, attr,
+                                       &HTMLDocumentTable, this);
 }
 
-void KJS::HTMLDocument::putValue(ExecState* exec,
-                                 int token,
-                                 const Value& value,
-                                 int /*attr*/) {
+void KJS::HTMLDocument::putValueProperty(ExecState* exec,
+                                         int token,
+                                         const Value& value,
+                                         int /*attr*/) {
   DOMExceptionTranslator exception(exec);
   HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
   HTMLElementImpl* body = doc.body();
@@ -549,7 +546,8 @@ void KJS::HTMLDocument::putValue(ExecState* exec,
       break;
     }
     default:
-      kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
+      kdWarning() << "HTMLDocument::putValueProperty unhandled token " << token
+                  << endl;
   }
 }
 
@@ -1568,8 +1566,8 @@ DontDelete|ReadOnly
 HTMLElement::HTMLElement(ExecState* exec, HTMLElementImpl* e)
     : DOMElement(exec, e) {}
 
-Value KJS::HTMLElement::tryGet(ExecState* exec,
-                               const Identifier& propertyName) const {
+Value KJS::HTMLElement::get(ExecState* exec,
+                            const Identifier& propertyName) const {
   HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KJS::HTMLElement::tryGet " << propertyName.qstring()
@@ -1651,9 +1649,8 @@ Value KJS::HTMLElement::tryGet(ExecState* exec,
   }
 
   // Base HTMLElement stuff or parent class forward, as usual
-  return DOMObjectLookupGet<KJS::HTMLElementFunction, KJS::HTMLElement,
-                            DOMElement>(exec, propertyName, &HTMLElementTable,
-                                        this);
+  return lookupGet<KJS::HTMLElementFunction, KJS::HTMLElement, DOMElement>(
+      exec, propertyName, &HTMLElementTable, this);
 }
 
 bool KJS::HTMLElement::implementsCall() const {
@@ -2857,9 +2854,9 @@ HTMLElementFunction::HTMLElementFunction(ExecState* exec, int i, int len)
   put(exec, lengthPropertyName, Number(len), DontDelete | ReadOnly | DontEnum);
 }
 
-Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
-                                        Object& thisObj,
-                                        const List& args) {
+Value KJS::HTMLElementFunction::call(ExecState* exec,
+                                     Object& thisObj,
+                                     const List& args) {
   if (!thisObj.inherits(&KJS::HTMLElement::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -3037,10 +3034,10 @@ Value KJS::HTMLElementFunction::tryCall(ExecState* exec,
   return Undefined();
 }
 
-void KJS::HTMLElement::tryPut(ExecState* exec,
-                              const Identifier& propertyName,
-                              const Value& value,
-                              int attr) {
+void KJS::HTMLElement::put(ExecState* exec,
+                           const Identifier& propertyName,
+                           const Value& value,
+                           int attr) {
 #ifdef KJS_VERBOSE
   DOM::DOMString str =
       value.isA(NullType) ? DOM::DOMString() : value.toString(exec).string();
@@ -3085,15 +3082,15 @@ void KJS::HTMLElement::tryPut(ExecState* exec,
     if (entry->attr & Function) {  // function: put as override property
       ObjectImp::put(exec, propertyName, value, attr);
       return;
-    } else if ((entry->attr & ReadOnly) ==
-               0) {  // let DOMObjectLookupPut print the warning if not
-      putValue(exec, entry->value, value, attr);
+    } else if (!(entry->attr &
+                 ReadOnly)) {  // let lookupPut print the warning if read-only
+      putValueProperty(exec, entry->value, value, attr);
       return;
     }
   }
 
-  DOMObjectLookupPut<KJS::HTMLElement, DOMElement>(
-      exec, propertyName, value, attr, &HTMLElementTable, this);
+  lookupPut<KJS::HTMLElement, DOMElement>(exec, propertyName, value, attr,
+                                          &HTMLElementTable, this);
 }
 
 void HTMLElement::htmlSetter(ExecState* exec,
@@ -4585,10 +4582,10 @@ void HTMLElement::marqueeSetter(ExecState* exec,
   // FIXME: Find out what WinIE supports and implement it.
 }
 
-void HTMLElement::putValue(ExecState* exec,
-                           int token,
-                           const Value& value,
-                           int) {
+void HTMLElement::putValueProperty(ExecState* exec,
+                                   int token,
+                                   const Value& value,
+                                   int) {
   DOMExceptionTranslator exception(exec);
   DOM::DOMString str =
       value.isA(NullType) ? DOM::DOMString() : value.toString(exec).string();
@@ -4689,10 +4686,10 @@ bool KJS::HTMLCollection::hasOwnProperty(ExecState* exec,
   return DOMObject::hasOwnProperty(exec, p);
 }
 
-Value KJS::HTMLCollection::tryGet(ExecState* exec,
-                                  const Identifier& propertyName) const {
+Value KJS::HTMLCollection::get(ExecState* exec,
+                               const Identifier& propertyName) const {
 #ifdef KJS_VERBOSE
-  kdDebug() << "KJS::HTMLCollection::tryGet " << propertyName.ascii() << endl;
+  kdDebug() << "KJS::HTMLCollection::get " << propertyName.ascii() << endl;
 #endif
   HTMLCollectionImpl& collection = *m_impl;
   if (propertyName == lengthPropertyName)
@@ -4725,31 +4722,14 @@ Value KJS::HTMLCollection::tryGet(ExecState* exec,
 
 // HTMLCollections are strange objects, they support both get and call,
 // so that document.forms.item(0) and document.forms(0) both work.
-Value KJS::HTMLCollection::call(ExecState* exec,
-                                Object& thisObj,
-                                const List& args) {
-  // This code duplication is necessary, HTMLCollection isn't a DOMFunction
-  Value val;
-  try {
-    val = tryCall(exec, thisObj, args);
-  }
-  // pity there's no way to distinguish between these in JS code
-  catch (...) {
-    Object err =
-        Error::create(exec, GeneralError, "Exception from HTMLCollection");
-    exec->setException(err);
-  }
-  return val;
-}
-
-Value KJS::HTMLCollection::tryCall(ExecState* exec, Object&, const List& args) {
+Value KJS::HTMLCollection::call(ExecState* exec, Object&, const List& args) {
   // Do not use thisObj here. It can be the HTMLDocument, in the
   // document.forms(i) case.
   /*if( thisObj.imp() != this )
   {
-    kdWarning() << "thisObj.imp() != this in HTMLCollection::tryCall" << endl;
-    KJS::printInfo(exec,"KJS::HTMLCollection::tryCall thisObj",thisObj,-1);
-    KJS::printInfo(exec,"KJS::HTMLCollection::tryCall this",Value(this),-1);
+    kdWarning() << "thisObj.imp() != this in HTMLCollection::call" << endl;
+    KJS::printInfo(exec,"KJS::HTMLCollection::call thisObj",thisObj,-1);
+    KJS::printInfo(exec,"KJS::HTMLCollection::call this",Value(this),-1);
   }*/
   HTMLCollectionImpl& collection = *m_impl;
 
@@ -4807,9 +4787,9 @@ Value KJS::HTMLCollection::getNamedItems(ExecState* exec,
   return Value(new DOMNamedNodesCollection(exec, namedItems));
 }
 
-Value KJS::HTMLCollectionProtoFunc::tryCall(ExecState* exec,
-                                            Object& thisObj,
-                                            const List& args) {
+Value KJS::HTMLCollectionProtoFunc::call(ExecState* exec,
+                                         Object& thisObj,
+                                         const List& args) {
   if (!thisObj.inherits(&KJS::HTMLCollection::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -4841,21 +4821,21 @@ HTMLSelectCollection::HTMLSelectCollection(ExecState* exec,
                                            HTMLSelectElementImpl* e)
     : HTMLCollection(exec, c), m_element(e) {}
 
-Value KJS::HTMLSelectCollection::tryGet(ExecState* exec,
-                                        const Identifier& p) const {
+Value KJS::HTMLSelectCollection::get(ExecState* exec,
+                                     const Identifier& p) const {
   if (p == "selectedIndex")
     return Number(m_element->selectedIndex());
 
-  return HTMLCollection::tryGet(exec, p);
+  return HTMLCollection::get(exec, p);
 }
 
-void KJS::HTMLSelectCollection::tryPut(ExecState* exec,
-                                       const Identifier& propertyName,
-                                       const Value& value,
-                                       int) {
+void KJS::HTMLSelectCollection::put(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    const Value& value,
+                                    int) {
 #ifdef KJS_VERBOSE
-  kdDebug(6070) << "KJS::HTMLSelectCollection::tryPut "
-                << propertyName.qstring() << endl;
+  kdDebug(6070) << "KJS::HTMLSelectCollection::put " << propertyName.qstring()
+                << endl;
 #endif
   if (propertyName == "selectedIndex") {
     m_element->setSelectedIndex(value.toInt32(exec));
@@ -5013,9 +4993,9 @@ const ClassInfo KJS::Image::info = {"Image", 0, &ImageTable, 0};
 @end
 */
 
-Value Image::tryGet(ExecState* exec, const Identifier& propertyName) const {
-  return DOMObjectLookupGetValue<Image, DOMObject>(exec, propertyName,
-                                                   &ImageTable, this);
+Value Image::get(ExecState* exec, const Identifier& propertyName) const {
+  return lookupGetValue<Image, DOMObject>(exec, propertyName, &ImageTable,
+                                          this);
 }
 
 Value Image::getValueProperty(ExecState*, int token) const {
@@ -5059,18 +5039,18 @@ Value Image::getValueProperty(ExecState*, int token) const {
   }
 }
 
-void Image::tryPut(ExecState* exec,
-                   const Identifier& propertyName,
-                   const Value& value,
-                   int attr) {
-  DOMObjectLookupPut<Image, DOMObject>(exec, propertyName, value, attr,
-                                       &ImageTable, this);
+void Image::put(ExecState* exec,
+                const Identifier& propertyName,
+                const Value& value,
+                int attr) {
+  lookupPut<Image, DOMObject>(exec, propertyName, value, attr, &ImageTable,
+                              this);
 }
 
-void Image::putValue(ExecState* exec,
-                     int token,
-                     const Value& value,
-                     int /*attr*/) {
+void Image::putValueProperty(ExecState* exec,
+                             int token,
+                             const Value& value,
+                             int /*attr*/) {
   switch (token) {
     case Src: {
       String str = value.toString(exec);
@@ -5097,7 +5077,8 @@ void Image::putValue(ExecState* exec,
       height = value.toInt32(exec);
       break;
     default:
-      kdWarning() << "HTMLDocument::putValue unhandled token " << token << endl;
+      kdWarning() << "HTMLDocument::putValueProperty unhandled token " << token
+                  << endl;
   }
 }
 
@@ -5149,9 +5130,9 @@ static bool isImagePattern(const Value& value) {
 #define BYTES_PER_ROW(width, bitsPerComponent, numComponents) \
   ((width * bitsPerComponent * numComponents + 7) / 8)
 
-Value KJS::Context2DFunction::tryCall(ExecState* exec,
-                                      Object& thisObj,
-                                      const List& args) {
+Value KJS::Context2DFunction::call(ExecState* exec,
+                                   Object& thisObj,
+                                   const List& args) {
   if (!thisObj.inherits(&Context2D::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -6035,7 +6016,7 @@ DontDelete|Function 1
 @end
 */
 
-Value Context2D::tryGet(ExecState* exec, const Identifier& propertyName) const {
+Value Context2D::get(ExecState* exec, const Identifier& propertyName) const {
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -6046,8 +6027,8 @@ Value Context2D::tryGet(ExecState* exec, const Identifier& propertyName) const {
     return getValueProperty(exec, entry->value);
   }
 
-  return DOMObjectLookupGetValue<Context2D, DOMObject>(exec, propertyName,
-                                                       &Context2DTable, this);
+  return lookupGetValue<Context2D, DOMObject>(exec, propertyName,
+                                              &Context2DTable, this);
 }
 
 Value Context2D::getValueProperty(ExecState*, int token) const {
@@ -6106,12 +6087,12 @@ Value Context2D::getValueProperty(ExecState*, int token) const {
   return Undefined();
 }
 
-void Context2D::tryPut(ExecState* exec,
-                       const Identifier& propertyName,
-                       const Value& value,
-                       int attr) {
-  DOMObjectLookupPut<Context2D, DOMObject>(exec, propertyName, value, attr,
-                                           &Context2DTable, this);
+void Context2D::put(ExecState* exec,
+                    const Identifier& propertyName,
+                    const Value& value,
+                    int attr) {
+  lookupPut<Context2D, DOMObject>(exec, propertyName, value, attr,
+                                  &Context2DTable, this);
 }
 
 CGContextRef Context2D::drawingContext() {
@@ -6167,10 +6148,10 @@ void Context2D::setShadow(ExecState* exec) {
   CFRelease(colorRef);
 }
 
-void Context2D::putValue(ExecState* exec,
-                         int token,
-                         const Value& value,
-                         int /*attr*/) {
+void Context2D::putValueProperty(ExecState* exec,
+                                 int token,
+                                 const Value& value,
+                                 int /*attr*/) {
   CGContextRef context = drawingContext();
   if (!context)
     return;
@@ -6462,9 +6443,9 @@ const ClassInfo KJS::Gradient::info = {"Gradient", 0, &GradientTable, 0};
 
 IMPLEMENT_PROTOFUNC(GradientFunction)
 
-Value GradientFunction::tryCall(ExecState* exec,
-                                Object& thisObj,
-                                const List& args) {
+Value GradientFunction::call(ExecState* exec,
+                             Object& thisObj,
+                             const List& args) {
   if (!thisObj.inherits(&Gradient::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -6576,7 +6557,7 @@ Gradient::Gradient(float x0, float y0, float r0, float x1, float y1, float r1) {
   commonInit();
 }
 
-Value Gradient::tryGet(ExecState* exec, const Identifier& propertyName) const {
+Value Gradient::get(ExecState* exec, const Identifier& propertyName) const {
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -6587,26 +6568,26 @@ Value Gradient::tryGet(ExecState* exec, const Identifier& propertyName) const {
     return getValueProperty(exec, entry->value);
   }
 
-  return DOMObjectLookupGetValue<Gradient, DOMObject>(exec, propertyName,
-                                                      &GradientTable, this);
+  return lookupGetValue<Gradient, DOMObject>(exec, propertyName, &GradientTable,
+                                             this);
 }
 
 Value Gradient::getValueProperty(ExecState*, int token) const {
   return Undefined();
 }
 
-void Gradient::tryPut(ExecState* exec,
-                      const Identifier& propertyName,
-                      const Value& value,
-                      int attr) {
-  DOMObjectLookupPut<Gradient, DOMObject>(exec, propertyName, value, attr,
-                                          &GradientTable, this);
+void Gradient::put(ExecState* exec,
+                   const Identifier& propertyName,
+                   const Value& value,
+                   int attr) {
+  lookupPut<Gradient, DOMObject>(exec, propertyName, value, attr,
+                                 &GradientTable, this);
 }
 
-void Gradient::putValue(ExecState* exec,
-                        int token,
-                        const Value& value,
-                        int /*attr*/) {}
+void Gradient::putValueProperty(ExecState* exec,
+                                int token,
+                                const Value& value,
+                                int /*attr*/) {}
 
 Gradient::~Gradient() {
   if (_shadingRef) {
@@ -6781,8 +6762,7 @@ ImagePattern::ImagePattern(Image* i, int repetitionType) {
   }
 }
 
-Value ImagePattern::tryGet(ExecState* exec,
-                           const Identifier& propertyName) const {
+Value ImagePattern::get(ExecState* exec, const Identifier& propertyName) const {
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
@@ -6793,26 +6773,26 @@ Value ImagePattern::tryGet(ExecState* exec,
     return getValueProperty(exec, entry->value);
   }
 
-  return DOMObjectLookupGetValue<ImagePattern, DOMObject>(
-      exec, propertyName, &ImagePatternTable, this);
+  return lookupGetValue<ImagePattern, DOMObject>(exec, propertyName,
+                                                 &ImagePatternTable, this);
 }
 
 Value ImagePattern::getValueProperty(ExecState*, int token) const {
   return Undefined();
 }
 
-void ImagePattern::tryPut(ExecState* exec,
-                          const Identifier& propertyName,
-                          const Value& value,
-                          int attr) {
-  DOMObjectLookupPut<ImagePattern, DOMObject>(exec, propertyName, value, attr,
-                                              &ImagePatternTable, this);
+void ImagePattern::put(ExecState* exec,
+                       const Identifier& propertyName,
+                       const Value& value,
+                       int attr) {
+  lookupPut<ImagePattern, DOMObject>(exec, propertyName, value, attr,
+                                     &ImagePatternTable, this);
 }
 
-void ImagePattern::putValue(ExecState* exec,
-                            int token,
-                            const Value& value,
-                            int /*attr*/) {}
+void ImagePattern::putValueProperty(ExecState* exec,
+                                    int token,
+                                    const Value& value,
+                                    int /*attr*/) {}
 
 ImagePattern::~ImagePattern() {
   if (_patternRef) {

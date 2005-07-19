@@ -100,9 +100,8 @@ DOMRange::~DOMRange() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-Value DOMRange::tryGet(ExecState* exec, const Identifier& p) const {
-  return DOMObjectLookupGetValue<DOMRange, DOMObject>(exec, p, &DOMRangeTable,
-                                                      this);
+Value DOMRange::get(ExecState* exec, const Identifier& p) const {
+  return lookupGetValue<DOMRange, DOMObject>(exec, p, &DOMRangeTable, this);
 }
 
 Value DOMRange::getValueProperty(ExecState* exec, int token) const {
@@ -128,9 +127,9 @@ Value DOMRange::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-Value DOMRangeProtoFunc::tryCall(ExecState* exec,
-                                 Object& thisObj,
-                                 const List& args) {
+Value DOMRangeProtoFunc::call(ExecState* exec,
+                              Object& thisObj,
+                              const List& args) {
   if (!thisObj.inherits(&KJS::DOMRange::info)) {
     Object err = Error::create(exec, TypeError);
     exec->setException(err);
@@ -225,8 +224,8 @@ const ClassInfo RangeConstructor::info = {"RangeConstructor", 0,
   END_TO_START		DOM::Range::END_TO_START	DontDelete|ReadOnly
 @end
 */
-Value RangeConstructor::tryGet(ExecState* exec, const Identifier& p) const {
-  return DOMObjectLookupGetValue<RangeConstructor, DOMObject>(
+Value RangeConstructor::get(ExecState* exec, const Identifier& p) const {
+  return lookupGetValue<RangeConstructor, DOMObject>(
       exec, p, &RangeConstructorTable, this);
 }
 
