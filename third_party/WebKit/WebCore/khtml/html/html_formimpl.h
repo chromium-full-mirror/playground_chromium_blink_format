@@ -759,6 +759,7 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
+  virtual void attach();
   virtual void detach();
   virtual bool appendFormData(FormDataList&, bool);
   virtual void reset();

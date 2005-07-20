@@ -3422,6 +3422,7 @@ DOMString HTMLTextAreaElementImpl::defaultValue() {
   for (n = firstChild(); n; n = n->nextSibling())
     if (n->isTextNode())
       val += static_cast<TextImpl*>(n)->data();
+
   if (val[0] == '\r' && val[1] == '\n') {
     val = val.copy();
     val.remove(0, 2);
@@ -3465,6 +3466,12 @@ bool HTMLTextAreaElementImpl::isEditable() {
 
 void HTMLTextAreaElementImpl::accessKeyAction(bool sendToAnyElement) {
   focus();
+}
+
+void HTMLTextAreaElementImpl::attach() {
+  m_valueIsValid = true;
+  HTMLGenericFormElementImpl::attach();
+  updateValue();
 }
 
 void HTMLTextAreaElementImpl::detach() {
