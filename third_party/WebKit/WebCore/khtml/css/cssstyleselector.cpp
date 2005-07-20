@@ -46,6 +46,7 @@ using namespace DOM;
 #include "misc/loader.h"
 
 #include "rendering/font.h"
+#include "render_theme.h"
 
 #include "khtmlview.h"
 #include "khtml_part.h"
@@ -1003,6 +1004,11 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
   // Cull out any useless layers and also repeat patterns into additional
   // layers.
   style->adjustBackgroundLayers();
+
+  // Let the theme get a crack at changing the style if an appearance has been
+  // set.
+  if (style->appearance() != NoAppearance)
+    theme()->adjustStyle(style);
 
   // Only use slow repaints if we actually have a background image.
   // FIXME: We only need to invalidate the fixed regions when scrolling.  It's
@@ -3613,7 +3619,7 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
       if (id == CSS_VAL_NONE)
         appearance = NoAppearance;
       else
-        appearance = EAppearance(id - CSS_VAL_CHECKBOX);
+        appearance = EAppearance(id - CSS_VAL_CHECKBOX + 1);
       style->setAppearance(appearance);
     }
     case CSS_PROP__KHTML_BINDING: {

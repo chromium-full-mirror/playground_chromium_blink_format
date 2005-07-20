@@ -1790,8 +1790,11 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
 #endif
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
-    case CHECKBOX:
+    case CHECKBOX: {
+      if (style->appearance() == CheckboxAppearance)
+        return RenderObject::createObject(this, style);
       return new (arena) RenderCheckBox(this);
+    }
     case RADIO:
       return new (arena) RenderRadioButton(this);
     case SUBMIT:

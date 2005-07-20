@@ -32,6 +32,7 @@
 #include "rendering/render_table.h"
 #include "render_flexbox.h"
 #include "render_arena.h"
+#include "render_theme.h"
 
 #include "xml/dom_nodeimpl.h"
 #include "xml/dom_docimpl.h"
@@ -317,6 +318,11 @@ void RenderBox::paintBoxDecorations(PaintInfo& i, int _tx, int _ty) {
     mh = kMax(0, h - (i.r.y() - _ty));
   else
     mh = kMin(i.r.height(), h);
+
+  // If we have a native theme appearance, use that instead of painting our
+  // border/background.
+  if (style()->appearance() != NoAppearance)
+    return theme()->paint(this, i, QRect(_tx, _ty, w, h));
 
   // The <body> only paints its background if the root element has defined a
   // background
