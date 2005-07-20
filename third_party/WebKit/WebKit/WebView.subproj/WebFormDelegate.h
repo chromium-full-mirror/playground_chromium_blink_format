@@ -68,17 +68,6 @@
 - (BOOL)control:(NSControl*)control
     textShouldEndEditing:(NSText*)fieldEditor
                  inFrame:(WebFrame*)frame;
-- (BOOL)control:(NSControl*)control
-    didFailToFormatString:(NSString*)string
-         errorDescription:(NSString*)error
-                  inFrame:(WebFrame*)frame;
-- (void)control:(NSControl*)control
-    didFailToValidatePartialString:(NSString*)string
-                  errorDescription:(NSString*)error
-                           inFrame:(WebFrame*)frame;
-- (BOOL)control:(NSControl*)control
-    isValidObject:(id)obj
-          inFrame:(WebFrame*)frame;
 
 - (BOOL)control:(NSControl*)control
                textView:(NSTextView*)textView
