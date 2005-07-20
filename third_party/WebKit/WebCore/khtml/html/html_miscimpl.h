@@ -80,10 +80,12 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
     DOC_NAMEABLE_ITEMS,  // all IMG, FORM, APPLET, EMBED and OBJECT elements,
                          // used to look
                          // up element name as document property
-    LAST_TYPE
+    WINDOW_NAMED_ITEMS
   };
 
-  HTMLCollectionImpl(NodeImpl* _base, int _tagId);
+  enum { NUM_CACHEABLE_TYPES = DOC_NAMEABLE_ITEMS + 1 };
+
+  HTMLCollectionImpl(NodeImpl* _base, int _type);
   virtual ~HTMLCollectionImpl();
 
   unsigned long length() const;
@@ -133,6 +135,16 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
 
   // For nextNamedItem()
   mutable bool idsDone;
+};
+
+class HTMLNameCollectionImpl : public HTMLCollectionImpl {
+ public:
+  HTMLNameCollectionImpl(DocumentImpl* _base, int _type, DOMString& name);
+
+  virtual NodeImpl* traverseNextItem(NodeImpl* start) const;
+
+ private:
+  DOMString m_name;
 };
 
 // this whole class is just a big hack to find form elements even in

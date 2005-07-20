@@ -69,7 +69,8 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   virtual int tagPriority() const { return 3; }
 
   virtual void attach();
-  virtual void detach();
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   SharedPtr<HTMLCollectionImpl> elements();
   long length() const;
@@ -148,8 +149,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   unsigned formElementIndex(HTMLGenericFormElementImpl*);
 
-  QString oldIdAttr;
-  QString oldNameAttr;
+  DOMString oldNameAttr;
 };
 
 // -------------------------------------------------------------------------

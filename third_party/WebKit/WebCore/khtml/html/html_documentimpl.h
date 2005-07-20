@@ -28,6 +28,7 @@
 #include "xml/dom_docimpl.h"
 #include "misc/loader_client.h"
 #include "html/html_miscimpl.h"
+#include "misc/hashmap.h"
 
 class KHTMLView;
 class QString;
@@ -62,12 +63,14 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
 
   virtual void determineParseMode(const QString& str);
 
-  void addNamedImageOrForm(const QString& name);
-  void removeNamedImageOrForm(const QString& name);
-  bool haveNamedImageOrForm(const QString& name);
+  void addNamedItem(const DOMString& name);
+  void removeNamedItem(const DOMString& name);
+  bool hasNamedItem(const DOMString& name);
 
   HTMLCollectionImpl::CollectionInfo* collectionInfo(int type) {
-    return m_collection_info + type;
+    if (type < HTMLCollectionImpl::NUM_CACHEABLE_TYPES)
+      return m_collection_info + type;
+    return 0;
   }
 
   virtual DocumentTypeImpl* doctype() const;
@@ -84,10 +87,11 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
 
  private:
   HTMLCollectionImpl::CollectionInfo
-      m_collection_info[HTMLCollectionImpl::LAST_TYPE];
+      m_collection_info[HTMLCollectionImpl::NUM_CACHEABLE_TYPES];
   // we actually store ints inside the pointer value itself; would use void *
   // but that makes the template unhappy.
-  QDict<char> namedImageAndFormCounts;
+  typedef khtml::HashMap<DOMStringImpl*, int> NameCountMap;
+  NameCountMap namedItemCounts;
 };
 
 };  // namespace

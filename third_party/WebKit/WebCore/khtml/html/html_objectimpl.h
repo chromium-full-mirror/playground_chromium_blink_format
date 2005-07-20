@@ -98,10 +98,14 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   KJS::Bindings::Instance* getAppletInstance() const;
 #endif
 
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
  protected:
   khtml::VAlign valign;
 
  private:
+  DOMString oldNameAttr;
 #if APPLE_CHANGES
   mutable KJS::Bindings::Instance* appletInstance;
   bool m_allParamsAvailable;
@@ -127,6 +131,8 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
@@ -138,8 +144,9 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
   QString pluginPage;
   QString serviceType;
 
-#if APPLE_CHANGES
  private:
+  DOMString oldNameAttr;
+#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* embedInstance;
 #endif
 };
@@ -166,6 +173,8 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
   virtual void detach();
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
 
   virtual void recalcStyle(StyleChange ch);
   virtual void childrenChanged();
@@ -240,8 +249,9 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   bool m_useFallbackContent : 1;
   HTMLImageLoader* m_imageLoader;
 
-#if APPLE_CHANGES
  private:
+  DOMString oldNameAttr;
+#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* objectInstance;
 #endif
 };
