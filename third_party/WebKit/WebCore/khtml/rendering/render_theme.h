@@ -55,6 +55,8 @@ class RenderTheme {
   // old theme.
   void themeChanged();
 
+  virtual ~RenderTheme(){};
+
  protected:
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(RenderStyle* style) = 0;
