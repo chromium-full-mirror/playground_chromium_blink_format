@@ -259,6 +259,9 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
+  virtual void insertedIntoDocument();
+  virtual void removedFromDocument();
+
   virtual void attach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -282,6 +285,9 @@ class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
   virtual void openURL();
 
   bool needWidgetUpdate;
+
+ private:
+  DOMString oldNameAttr;
 };
 
 }  // namespace

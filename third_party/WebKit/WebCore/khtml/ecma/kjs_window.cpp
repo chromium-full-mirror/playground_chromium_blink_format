@@ -1157,7 +1157,7 @@ Value Window::get(ExecState* exec, const Identifier& p) const {
       if (collection->length() == 1)
         return getDOMNode(exec, collection->firstItem());
       else
-        return getHTMLCollection(exec, &*collection);
+        return getHTMLCollection(exec, collection.get());
     }
   }
 

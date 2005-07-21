@@ -220,8 +220,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   SharedPtr<HTMLCollectionImpl> anchors();
   SharedPtr<HTMLCollectionImpl> all();
   SharedPtr<HTMLCollectionImpl> objects();
-  SharedPtr<HTMLCollectionImpl> nameableItems();
   SharedPtr<HTMLCollectionImpl> windowNamedItems(DOMString& name);
+  SharedPtr<HTMLCollectionImpl> documentNamedItems(DOMString& name);
 
   // DOM methods overridden from  parent classes
 

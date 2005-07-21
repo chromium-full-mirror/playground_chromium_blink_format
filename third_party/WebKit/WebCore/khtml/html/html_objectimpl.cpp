@@ -120,6 +120,17 @@ void HTMLAppletElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       document->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
+  } else if (attr->name() == HTMLAttributes::idAttr()) {
+    DOMString newIdAttr = attr->value();
+    if (inDocument() && getDocument()->isHTMLDocument()) {
+      HTMLDocumentImpl* document =
+          static_cast<HTMLDocumentImpl*>(getDocument());
+      document->removeDocExtraNamedItem(oldIdAttr);
+      document->addDocExtraNamedItem(newIdAttr);
+    }
+    oldIdAttr = newIdAttr;
+    // also call superclass
+    HTMLElementImpl::parseMappedAttribute(attr);
   } else
     HTMLElementImpl::parseMappedAttribute(attr);
 }
@@ -128,6 +139,7 @@ void HTMLAppletElementImpl::insertedIntoDocument() {
   if (getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
     document->addNamedItem(oldNameAttr);
+    document->addDocExtraNamedItem(oldIdAttr);
   }
 
   HTMLElementImpl::insertedIntoDocument();
@@ -137,6 +149,7 @@ void HTMLAppletElementImpl::removedFromDocument() {
   if (getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
     document->removeNamedItem(oldNameAttr);
+    document->removeDocExtraNamedItem(oldIdAttr);
   }
 
   HTMLElementImpl::removedFromDocument();
@@ -645,7 +658,17 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       document->addNamedItem(newNameAttr);
     }
     oldNameAttr = newNameAttr;
-
+  } else if (attr->name() == HTMLAttributes::idAttr()) {
+    DOMString newIdAttr = attr->value();
+    if (inDocument() && getDocument()->isHTMLDocument()) {
+      HTMLDocumentImpl* document =
+          static_cast<HTMLDocumentImpl*>(getDocument());
+      document->removeDocExtraNamedItem(oldIdAttr);
+      document->addDocExtraNamedItem(newIdAttr);
+    }
+    oldIdAttr = newIdAttr;
+    // also call superclass
+    HTMLElementImpl::parseMappedAttribute(attr);
   } else
     HTMLElementImpl::parseMappedAttribute(attr);
 }
@@ -729,6 +752,7 @@ void HTMLObjectElementImpl::insertedIntoDocument() {
   if (getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
     document->addNamedItem(oldNameAttr);
+    document->addDocExtraNamedItem(oldIdAttr);
   }
 
   HTMLElementImpl::insertedIntoDocument();
@@ -738,6 +762,7 @@ void HTMLObjectElementImpl::removedFromDocument() {
   if (getDocument()->isHTMLDocument()) {
     HTMLDocumentImpl* document = static_cast<HTMLDocumentImpl*>(getDocument());
     document->removeNamedItem(oldNameAttr);
+    document->removeDocExtraNamedItem(oldIdAttr);
   }
 
   HTMLElementImpl::removedFromDocument();

@@ -67,6 +67,10 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   void removeNamedItem(const DOMString& name);
   bool hasNamedItem(const DOMString& name);
 
+  void addDocExtraNamedItem(const DOMString& name);
+  void removeDocExtraNamedItem(const DOMString& name);
+  bool hasDocExtraNamedItem(const DOMString& name);
+
   HTMLCollectionImpl::CollectionInfo* collectionInfo(int type) {
     if (type < HTMLCollectionImpl::NUM_CACHEABLE_TYPES)
       return m_collection_info + type;
@@ -74,6 +78,8 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   }
 
   virtual DocumentTypeImpl* doctype() const;
+
+  typedef khtml::HashMap<DOMStringImpl*, int> NameCountMap;
 
  protected:
   HTMLElementImpl* bodyElement;
@@ -88,10 +94,9 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
  private:
   HTMLCollectionImpl::CollectionInfo
       m_collection_info[HTMLCollectionImpl::NUM_CACHEABLE_TYPES];
-  // we actually store ints inside the pointer value itself; would use void *
-  // but that makes the template unhappy.
-  typedef khtml::HashMap<DOMStringImpl*, int> NameCountMap;
+
   NameCountMap namedItemCounts;
+  NameCountMap docExtraNamedItemCounts;
 };
 
 };  // namespace
