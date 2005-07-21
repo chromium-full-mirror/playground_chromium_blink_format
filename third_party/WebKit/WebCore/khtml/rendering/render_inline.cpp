@@ -61,7 +61,10 @@ void RenderInline::setStyle(RenderStyle* _style) {
   m_lineHeight = -1;
 
   // Update pseudos for :before and :after now.
-  updatePseudoChild(RenderStyle::BEFORE, firstChild());
+  RenderObject* first = firstChild();
+  while (first && first->isListMarker())
+    first = first->nextSibling();
+  updatePseudoChild(RenderStyle::BEFORE, first);
   updatePseudoChild(RenderStyle::AFTER, lastChild());
 }
 
