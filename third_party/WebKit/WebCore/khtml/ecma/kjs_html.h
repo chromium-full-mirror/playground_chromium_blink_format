@@ -966,6 +966,12 @@ class Context2D : public DOMObject {
 
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGContextRef drawingContext();
+  CGAffineTransform _lastFillImagePatternCTM;
+  CGAffineTransform _lastStrokeImagePatternCTM;
+  bool _validFillImagePattern;
+  bool _validStrokeImagePattern;
+  void updateFillImagePattern();
+  void updateStrokeImagePattern();
 
   void setShadow(ExecState* exec);
 
@@ -1059,7 +1065,6 @@ class Gradient : public DOMObject {
 class ImagePattern : public DOMObject {
  public:
   ImagePattern(Image* i, int type);
-  ~ImagePattern();
   virtual Value get(ExecState* exec, const Identifier& propertyName) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
@@ -1075,18 +1080,17 @@ class ImagePattern : public DOMObject {
   static const ClassInfo info;
 
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
-  CGPatternRef getPattern() { return _patternRef; }
+  CGPatternRef createPattern(CGAffineTransform transform);
 
   QPixmap pixmap() { return _pixmap; }
 
   enum { Repeat, RepeatX, RepeatY, NoRepeat };
 
  private:
-  int _repetitionType;
+  float _rw, _rh;
   QPixmap _pixmap;
-
-  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPixmap.
-  CGPatternRef _patternRef;
+  // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
+  CGRect _bounds;
 };
 
 ValueImp* getHTMLCollection(ExecState* exec, DOM::HTMLCollectionImpl* c);
