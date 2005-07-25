@@ -416,10 +416,11 @@ NumberObjectImp::NumberObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-Value NumberObjectImp::get(ExecState* exec,
-                           const Identifier& propertyName) const {
-  return lookupGetValue<NumberObjectImp, InternalFunctionImp>(
-      exec, propertyName, &numberTable, this);
+bool NumberObjectImp::getOwnProperty(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     Value& result) const {
+  return lookupGetOwnValue<NumberObjectImp, InternalFunctionImp>(
+      exec, propertyName, &numberTable, this, result);
 }
 
 Value NumberObjectImp::getValueProperty(ExecState*, int token) const {

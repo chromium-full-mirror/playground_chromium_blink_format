@@ -66,34 +66,47 @@ ArrayInstanceImp::~ArrayInstanceImp() {
   free(storage);
 }
 
-Value ArrayInstanceImp::get(ExecState* exec,
-                            const Identifier& propertyName) const {
-  if (propertyName == lengthPropertyName)
-    return Number(length);
+bool ArrayInstanceImp::getOwnProperty(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      Value& result) const {
+  if (propertyName == lengthPropertyName) {
+    result = Number(length);
+    return true;
+  }
 
   bool ok;
   unsigned index = propertyName.toArrayIndex(&ok);
   if (ok) {
     if (index >= length)
-      return Undefined();
+      return false;
     if (index < storageLength) {
       ValueImp* v = storage[index];
-      return v ? Value(v) : Undefined();
+      if (!v || v == UndefinedImp::staticUndefined)
+        return false;
+
+      result = Value(v);
+      return true;
     }
   }
 
-  return ObjectImp::get(exec, propertyName);
+  return ObjectImp::getOwnProperty(exec, propertyName, result);
 }
 
-Value ArrayInstanceImp::get(ExecState* exec, unsigned index) const {
+bool ArrayInstanceImp::getOwnProperty(ExecState* exec,
+                                      unsigned index,
+                                      Value& result) const {
   if (index >= length)
-    return Undefined();
+    return false;
   if (index < storageLength) {
     ValueImp* v = storage[index];
-    return v ? Value(v) : Undefined();
+    if (!v || v == UndefinedImp::staticUndefined)
+      return false;
+
+    result = Value(v);
+    return true;
   }
 
-  return ObjectImp::get(exec, Identifier::from(index));
+  return ObjectImp::getOwnProperty(exec, Identifier::from(index), result);
 }
 
 // Special implementation of [[Put]] - see ECMA 15.4.5.1
@@ -412,11 +425,11 @@ ArrayPrototypeImp::ArrayPrototypeImp(ExecState* exec,
   setInternalValue(Null());
 }
 
-Value ArrayPrototypeImp::get(ExecState* exec,
-                             const Identifier& propertyName) const {
-  // fprintf( stderr, "ArrayPrototypeImp::get(%s)\n", propertyName.ascii() );
-  return lookupGetFunction<ArrayProtoFuncImp, ArrayInstanceImp>(
-      exec, propertyName, &arrayTable, this);
+bool ArrayPrototypeImp::getOwnProperty(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       Value& result) const {
+  return lookupGetOwnFunction<ArrayProtoFuncImp, ArrayInstanceImp>(
+      exec, propertyName, &arrayTable, this, result);
 }
 
 // ------------------------------ ArrayProtoFuncImp ----------------------------
@@ -438,6 +451,7 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
                               Object& thisObj,
                               const List& args) {
   unsigned int length = thisObj.get(exec, lengthPropertyName).toUInt32(exec);
+  ObjectImp* thisImp = thisObj.imp();
 
   Value result;
 
@@ -500,8 +514,9 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
           // empty array.
           length = curObj.get(exec, lengthPropertyName).toUInt32(exec);
           while (k < length) {
-            if (curObj.hasProperty(exec, k))
-              arr.put(exec, n, curObj.get(exec, k));
+            Value v;
+            if (curObj.imp()->getProperty(exec, k, v))
+              arr.put(exec, n, v);
             n++;
             k++;
           }
@@ -545,26 +560,20 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
 
       for (unsigned int k = 0; k < middle; k++) {
         unsigned lk1 = length - k - 1;
-        Value obj = thisObj.get(exec, k);
-        Value obj2 = thisObj.get(exec, lk1);
-        if (thisObj.hasProperty(exec, lk1)) {
-          if (thisObj.hasProperty(exec, k)) {
-            thisObj.put(exec, k, obj2);
-            thisObj.put(exec, lk1, obj);
-          } else {
-            thisObj.put(exec, k, obj2);
-            thisObj.deleteProperty(exec, lk1);
-          }
-        } else {
-          if (thisObj.hasProperty(exec, k)) {
-            thisObj.deleteProperty(exec, k);
-            thisObj.put(exec, lk1, obj);
-          } else {
-            // why delete something that's not there ? Strange.
-            thisObj.deleteProperty(exec, k);
-            thisObj.deleteProperty(exec, lk1);
-          }
-        }
+        Value obj;
+        Value obj2;
+        bool has2 = thisImp->getProperty(exec, lk1, obj2);
+        bool has1 = thisImp->getProperty(exec, k, obj);
+
+        if (has2)
+          thisObj.put(exec, k, obj2);
+        else
+          thisObj.deleteProperty(exec, k);
+
+        if (has1)
+          thisObj.put(exec, lk1, obj);
+        else
+          thisObj.deleteProperty(exec, lk1);
       }
       result = thisObj;
       break;
@@ -577,10 +586,10 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
       } else {
         result = thisObj.get(exec, 0);
         for (unsigned int k = 1; k < length; k++) {
-          if (thisObj.hasProperty(exec, k)) {
-            Value obj = thisObj.get(exec, k);
+          Value obj;
+          if (thisImp->getProperty(exec, k, obj))
             thisObj.put(exec, k - 1, obj);
-          } else
+          else
             thisObj.deleteProperty(exec, k - 1);
         }
         thisObj.deleteProperty(exec, length - 1);
@@ -628,10 +637,9 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
       int b = static_cast<int>(begin);
       int e = static_cast<int>(end);
       for (int k = b; k < e; k++, n++) {
-        if (thisObj.hasProperty(exec, k)) {
-          Value obj = thisObj.get(exec, k);
+        Value obj;
+        if (thisImp->getProperty(exec, k, obj))
           resObj.put(exec, n, obj);
-        }
       }
       resObj.put(exec, lengthPropertyName, Number(n), DontEnum | DontDelete);
       break;
@@ -650,11 +658,11 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
           useSortFunction = false;
       }
 
-      if (thisObj.imp()->classInfo() == &ArrayInstanceImp::info) {
+      if (thisImp->classInfo() == &ArrayInstanceImp::info) {
         if (useSortFunction)
-          ((ArrayInstanceImp*)thisObj.imp())->sort(exec, sortFunction);
+          ((ArrayInstanceImp*)thisImp)->sort(exec, sortFunction);
         else
-          ((ArrayInstanceImp*)thisObj.imp())->sort(exec);
+          ((ArrayInstanceImp*)thisImp)->sort(exec);
         result = thisObj;
         break;
       }
@@ -725,10 +733,9 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
 
       // printf( "Splicing from %d, deleteCount=%d \n", begin, deleteCount );
       for (unsigned int k = 0; k < deleteCount; k++) {
-        if (thisObj.hasProperty(exec, k + begin)) {
-          Value obj = thisObj.get(exec, k + begin);
+        Value obj;
+        if (thisImp->getProperty(exec, k + begin, obj))
           resObj.put(exec, k, obj);
-        }
       }
       resObj.put(exec, lengthPropertyName, Number(deleteCount),
                  DontEnum | DontDelete);
@@ -737,10 +744,10 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
       if (additionalArgs != deleteCount) {
         if (additionalArgs < deleteCount) {
           for (unsigned int k = begin; k < length - deleteCount; ++k) {
-            if (thisObj.hasProperty(exec, k + deleteCount)) {
-              Value obj = thisObj.get(exec, k + deleteCount);
+            Value obj;
+            if (thisImp->getProperty(exec, k + deleteCount, obj))
               thisObj.put(exec, k + additionalArgs, obj);
-            } else
+            else
               thisObj.deleteProperty(exec, k + additionalArgs);
           }
           for (unsigned int k = length;
@@ -748,10 +755,10 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
             thisObj.deleteProperty(exec, k - 1);
         } else {
           for (unsigned int k = length - deleteCount; (int)k > begin; --k) {
-            if (thisObj.hasProperty(exec, k + deleteCount - 1)) {
-              Value obj = thisObj.get(exec, k + deleteCount - 1);
+            Value obj;
+            if (thisImp->getProperty(exec, k + deleteCount - 1, obj))
               thisObj.put(exec, k + additionalArgs - 1, obj);
-            } else
+            else
               thisObj.deleteProperty(exec, k + additionalArgs - 1);
           }
         }
@@ -767,12 +774,11 @@ Value ArrayProtoFuncImp::call(ExecState* exec,
     case UnShift: {  // 15.4.4.13
       unsigned int nrArgs = args.size();
       for (unsigned int k = length; k > 0; --k) {
-        if (thisObj.hasProperty(exec, k - 1)) {
-          Value obj = thisObj.get(exec, k - 1);
+        Value obj;
+        if (thisImp->getProperty(exec, k - 1, obj))
           thisObj.put(exec, k + nrArgs - 1, obj);
-        } else {
+        else
           thisObj.deleteProperty(exec, k + nrArgs - 1);
-        }
       }
       for (unsigned int k = 0; k < nrArgs; ++k)
         thisObj.put(exec, k, args[k]);

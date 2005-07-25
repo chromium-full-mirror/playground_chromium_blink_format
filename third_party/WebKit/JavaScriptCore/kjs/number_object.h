@@ -94,7 +94,9 @@ class NumberObjectImp : public InternalFunctionImp {
   virtual bool implementsCall() const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
 
-  Value get(ExecState* exec, const Identifier& p) const;
+  bool getOwnProperty(ExecState* exec,
+                      const Identifier& propertyName,
+                      Value& result) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

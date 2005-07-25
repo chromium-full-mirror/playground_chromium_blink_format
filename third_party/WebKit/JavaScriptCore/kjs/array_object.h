@@ -30,7 +30,9 @@ namespace KJS {
 class ArrayPrototypeImp : public ArrayInstanceImp {
  public:
   ArrayPrototypeImp(ExecState* exec, ObjectPrototypeImp* objProto);
-  Value get(ExecState* exec, const Identifier& p) const;
+  bool getOwnProperty(ExecState* exec,
+                      const Identifier& propertyName,
+                      Value& result) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 };

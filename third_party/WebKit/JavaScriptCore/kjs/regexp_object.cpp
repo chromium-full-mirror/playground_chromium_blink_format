@@ -219,7 +219,9 @@ Object RegExpObjectImp::arrayOfMatches(ExecState* exec,
   return arr;
 }
 
-Value RegExpObjectImp::get(ExecState* exec, const Identifier& p) const {
+bool RegExpObjectImp::getOwnProperty(ExecState* exec,
+                                     const Identifier& p,
+                                     Value& result) const {
   UString s = p.ustring();
   if (s[0] == '$' && lastOvector) {
     bool ok;
@@ -228,12 +230,15 @@ Value RegExpObjectImp::get(ExecState* exec, const Identifier& p) const {
       if (i < lastNrSubPatterns + 1) {
         UString substring = lastString.substr(
             lastOvector[2 * i], lastOvector[2 * i + 1] - lastOvector[2 * i]);
-        return String(substring);
-      }
-      return String("");
+        result = String(substring);
+      } else
+        result = String("");
+
+      return true;
     }
   }
-  return InternalFunctionImp::get(exec, p);
+
+  return InternalFunctionImp::getOwnProperty(exec, p, result);
 }
 
 bool RegExpObjectImp::implementsConstruct() const {

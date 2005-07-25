@@ -42,7 +42,9 @@ class FunctionImp : public InternalFunctionImp {
   FunctionImp(ExecState* exec, const Identifier& n = Identifier::null());
   virtual ~FunctionImp();
 
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -120,7 +122,9 @@ class ArgumentsImp : public ObjectImp {
                const List& args,
                ActivationImp* act);
   virtual void mark();
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -140,7 +144,9 @@ class ActivationImp : public ObjectImp {
  public:
   ActivationImp(FunctionImp* function, const List& arguments);
 
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual bool hasOwnProperty(ExecState* exec,
                               const Identifier& propertyName) const;
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);

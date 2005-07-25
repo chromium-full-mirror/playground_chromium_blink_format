@@ -131,10 +131,11 @@ DontDelete|ReadOnly
 @end
 */
 
-Value XMLHttpRequest::get(ExecState* exec,
-                          const Identifier& propertyName) const {
-  return lookupGetValue<XMLHttpRequest, DOMObject>(exec, propertyName,
-                                                   &XMLHttpRequestTable, this);
+bool XMLHttpRequest::getOwnProperty(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    Value& result) const {
+  return lookupGetOwnValue<XMLHttpRequest, DOMObject>(
+      exec, propertyName, &XMLHttpRequestTable, this, result);
 }
 
 Value XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {

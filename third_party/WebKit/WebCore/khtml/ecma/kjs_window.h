@@ -63,7 +63,9 @@ class Screen : public ObjectImp {
     AvailHeight,
     AvailWidth
   };
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   Value getValueProperty(ExecState* exec, int token) const;
 
  private:
@@ -102,7 +104,9 @@ class Window : public ObjectImp {
   static Window* retrieveActive(ExecState* exec);
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual bool hasOwnProperty(ExecState* exec,
                               const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
@@ -291,7 +295,6 @@ class ScheduledAction {
  public:
   ScheduledAction(Object _func, List _args, bool _singleShot);
   ScheduledAction(const QString& _code, bool _singleShot);
-  ~ScheduledAction();
   void execute(Window* window);
 
   ProtectedObject func;
@@ -332,8 +335,9 @@ class WindowQObject : public QObject {
 
 class Location : public ObjectImp {
  public:
-  ~Location();
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -367,12 +371,9 @@ class Location : public ObjectImp {
 
 class Selection : public ObjectImp {
  public:
-  ~Selection();
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   const Value& value,
-                   int attr = None);
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual Value toPrimitive(ExecState* exec, Type preferred) const;
   virtual UString toString(ExecState* exec) const;
   enum {
@@ -408,12 +409,9 @@ class Selection : public ObjectImp {
 
 class BarInfo : public ObjectImp {
  public:
-  ~BarInfo();
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   const Value& value,
-                   int attr = None);
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   enum { Visible };
   enum Type {
     Locationbar,
@@ -440,7 +438,9 @@ class Konqueror : public ObjectImp {
 
  public:
   Konqueror(KHTMLPart* p) : part(p) {}
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual bool hasOwnProperty(ExecState* exec, const Identifier& p) const;
   virtual UString toString(ExecState* exec) const;
   virtual const ClassInfo* classInfo() const { return &info; }

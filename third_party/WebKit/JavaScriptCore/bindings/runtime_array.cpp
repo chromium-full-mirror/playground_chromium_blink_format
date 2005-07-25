@@ -44,26 +44,36 @@ RuntimeArrayImp::~RuntimeArrayImp() {
   delete _array;
 }
 
-Value RuntimeArrayImp::get(ExecState* exec,
-                           const Identifier& propertyName) const {
-  if (propertyName == lengthPropertyName)
-    return Number(getLength());
+bool RuntimeArrayImp::getOwnProperty(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     Value& result) const {
+  if (propertyName == lengthPropertyName) {
+    result = Number(getLength());
+    return true;
+  }
 
   bool ok;
   unsigned index = propertyName.toArrayIndex(&ok);
   if (ok) {
     if (index >= getLength())
-      return Undefined();
-    return getConcreteArray()->valueAt(exec, index);
+      result = Undefined();
+    else
+      result = getConcreteArray()->valueAt(exec, index);
+    return true;
   }
 
-  return ObjectImp::get(exec, propertyName);
+  return ArrayInstanceImp::getOwnProperty(exec, propertyName, result);
 }
 
-Value RuntimeArrayImp::get(ExecState* exec, unsigned index) const {
+bool RuntimeArrayImp::getOwnProperty(ExecState* exec,
+                                     unsigned index,
+                                     Value& result) const {
   if (index >= getLength())
-    return Undefined();
-  return getConcreteArray()->valueAt(exec, index);
+    result = Undefined();
+  else
+    result = getConcreteArray()->valueAt(exec, index);
+
+  return true;
 }
 
 void RuntimeArrayImp::put(ExecState* exec,

@@ -271,12 +271,11 @@ bool DOMNode::toBoolean(ExecState*) const {
   scrollHeight  DOMNode::ScrollHeight           DontDelete|ReadOnly
 @end
 */
-Value DOMNode::get(ExecState* exec, const Identifier& propertyName) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNode::get " << propertyName.qstring() << endl;
-#endif
-  return lookupGetValue<DOMNode, DOMObject>(exec, propertyName, &DOMNodeTable,
-                                            this);
+bool DOMNode::getOwnProperty(ExecState* exec,
+                             const Identifier& propertyName,
+                             Value& result) const {
+  return lookupGetOwnValue<DOMNode, DOMObject>(exec, propertyName,
+                                               &DOMNodeTable, this, result);
 }
 
 Value DOMNode::getValueProperty(ExecState* exec, int token) const {
@@ -750,38 +749,37 @@ bool DOMNodeList::hasOwnProperty(ExecState* exec, const Identifier& p) const {
   return ObjectImp::hasOwnProperty(exec, p);
 }
 
-Value DOMNodeList::get(ExecState* exec, const Identifier& p) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNodeList::get " << p.ascii() << endl;
-#endif
-  Value result;
-
+bool DOMNodeList::getOwnProperty(ExecState* exec,
+                                 const Identifier& p,
+                                 Value& result) const {
   NodeListImpl& list = *m_impl;
-  if (p == lengthPropertyName)
+  if (p == lengthPropertyName) {
     result = Number(list.length());
-  else if (p == "item") {
+    return true;
+  } else if (p == "item") {
     // No need for a complete hashtable for a single func, but we still want
     // to use the caching feature of lookupOrCreateFunction.
     result = lookupOrCreateFunction<DOMNodeListFunc>(
         exec, p, this, DOMNodeListFunc::Item, 1, DontDelete | Function);
+    return true;
   } else {
     // array index ?
     bool ok;
     long unsigned int idx = p.toULong(&ok);
     if (ok) {
       result = getDOMNode(exec, list.item(idx));
+      return true;
     } else {
       NodeImpl* node = list.itemById(p.string());
 
       if (node) {
         result = getDOMNode(exec, node);
-      } else {
-        result = ObjectImp::get(exec, p);
+        return true;
       }
     }
   }
 
-  return result;
+  return DOMNodeList::getOwnProperty(exec, p, result);
 }
 
 // Need to support both get and call, so that list[0] and list(0) work.
@@ -836,12 +834,11 @@ const ClassInfo DOMAttr::info = {"Attr", &DOMNode::info, &DOMAttrTable, 0};
 
 DOMAttr::DOMAttr(ExecState* exec, AttrImpl* a) : DOMNode(exec, a) {}
 
-Value DOMAttr::get(ExecState* exec, const Identifier& propertyName) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMAttr::put " << propertyName.qstring() << endl;
-#endif
-  return lookupGetValue<DOMAttr, DOMNode>(exec, propertyName, &DOMAttrTable,
-                                          this);
+bool DOMAttr::getOwnProperty(ExecState* exec,
+                             const Identifier& propertyName,
+                             Value& result) const {
+  return lookupGetOwnValue<DOMAttr, DOMNode>(exec, propertyName, &DOMAttrTable,
+                                             this, result);
 }
 
 Value DOMAttr::getValueProperty(ExecState* exec, int token) const {
@@ -960,12 +957,11 @@ DOMDocument::~DOMDocument() {
   ScriptInterpreter::forgetDOMObject(static_cast<DocumentImpl*>(m_impl.get()));
 }
 
-Value DOMDocument::get(ExecState* exec, const Identifier& propertyName) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMDocument::get " << propertyName.qstring() << endl;
-#endif
-  return lookupGetValue<DOMDocument, DOMNode>(exec, propertyName,
-                                              &DOMDocumentTable, this);
+bool DOMDocument::getOwnProperty(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 Value& result) const {
+  return lookupGetOwnValue<DOMDocument, DOMNode>(
+      exec, propertyName, &DOMDocumentTable, this, result);
 }
 
 Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
@@ -1209,41 +1205,44 @@ DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
 
 DOMElement::DOMElement(ElementImpl* e) : DOMNode(e) {}
 
-Value DOMElement::get(ExecState* exec, const Identifier& propertyName) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMElement::get " << propertyName.qstring() << endl;
-#endif
+bool DOMElement::getOwnProperty(ExecState* exec,
+                                const Identifier& propertyName,
+                                Value& result) const {
   ElementImpl& element = *static_cast<ElementImpl*>(impl());
 
   const HashEntry* entry = Lookup::findEntry(&DOMElementTable, propertyName);
   if (entry) {
     switch (entry->value) {
       case TagName:
-        return getStringOrNull(element.nodeName());
-      case Style:
-        return getDOMCSSStyleDeclaration(exec, element.style());
-      default:
-        kdWarning() << "Unhandled token in DOMElement::get : " << entry->value
-                    << endl;
+        result = getStringOrNull(element.nodeName());
         break;
+      case Style:
+        result = getDOMCSSStyleDeclaration(exec, element.style());
+        break;
+      default:
+        assert(0);
     }
+    return true;
   }
   // We have to check in DOMNode before giving access to attributes, otherwise
   // onload="..." would make onload return the string (attribute value) instead
   // of
   // the listener object (function).
   ValueImp* proto = prototype().imp();
-  if (DOMNode::hasOwnProperty(exec, propertyName) ||
-      (proto->dispatchType() == ObjectType &&
-       static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName)))
-    return DOMNode::get(exec, propertyName);
+  if (DOMNode::hasOwnProperty(exec, propertyName))
+    return DOMNode::getOwnProperty(exec, propertyName, result);
+  if (proto->dispatchType() == ObjectType &&
+      static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName))
+    return false;
 
   DOM::DOMString attr = element.getAttribute(propertyName.string());
   // Give access to attributes
-  if (!attr.isNull())
-    return getStringOrNull(attr);
+  if (!attr.isNull()) {
+    result = getStringOrNull(attr);
+    return true;
+  }
 
-  return Undefined();
+  return false;
 }
 
 Value DOMElementProtoFunc::call(ExecState* exec,
@@ -1448,10 +1447,11 @@ const ClassInfo DOMDocumentType::info = {"DocumentType", &DOMNode::info,
 DOMDocumentType::DOMDocumentType(ExecState* exec, DocumentTypeImpl* dt)
     : DOMNode(/*### no proto yet*/ exec, dt) {}
 
-Value DOMDocumentType::get(ExecState* exec,
-                           const Identifier& propertyName) const {
-  return lookupGetValue<DOMDocumentType, DOMNode>(exec, propertyName,
-                                                  &DOMDocumentTypeTable, this);
+bool DOMDocumentType::getOwnProperty(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     Value& result) const {
+  return lookupGetOwnValue<DOMDocumentType, DOMNode>(
+      exec, propertyName, &DOMDocumentTypeTable, this, result);
 }
 
 Value DOMDocumentType::getValueProperty(ExecState* exec, int token) const {
@@ -1527,19 +1527,25 @@ bool DOMNamedNodeMap::hasOwnProperty(ExecState* exec,
   return DOMObject::hasOwnProperty(exec, p);
 }
 
-Value DOMNamedNodeMap::get(ExecState* exec, const Identifier& p) const {
+bool DOMNamedNodeMap::getOwnProperty(ExecState* exec,
+                                     const Identifier& p,
+                                     Value& result) const {
   NamedNodeMapImpl& map = *m_impl;
-  if (p == lengthPropertyName)
-    return Number(map.length());
+  if (p == lengthPropertyName) {
+    result = Number(map.length());
+    return true;
+  }
 
   // array index ?
   bool ok;
   long unsigned int idx = p.toULong(&ok);
-  if (ok)
-    return getDOMNode(exec, map.item(idx));
+  if (ok) {
+    result = getDOMNode(exec, map.item(idx));
+    return true;
+  }
 
   // Anything else (including functions, defined in the prototype)
-  return DOMObject::get(exec, p);
+  return DOMObject::getOwnProperty(exec, p, result);
 }
 
 Value DOMNamedNodeMapProtoFunc::call(ExecState* exec,
@@ -1603,10 +1609,11 @@ DOMProcessingInstruction::DOMProcessingInstruction(ExecState* exec,
                                                    ProcessingInstructionImpl* i)
     : DOMNode(exec, i) {}
 
-Value DOMProcessingInstruction::get(ExecState* exec,
-                                    const Identifier& propertyName) const {
-  return lookupGetValue<DOMProcessingInstruction, DOMNode>(
-      exec, propertyName, &DOMProcessingInstructionTable, this);
+bool DOMProcessingInstruction::getOwnProperty(ExecState* exec,
+                                              const Identifier& propertyName,
+                                              Value& result) const {
+  return lookupGetOwnValue<DOMProcessingInstruction, DOMNode>(
+      exec, propertyName, &DOMProcessingInstructionTable, this, result);
 }
 
 Value DOMProcessingInstruction::getValueProperty(ExecState* exec,
@@ -1656,9 +1663,11 @@ const ClassInfo DOMNotation::info = {"Notation", &DOMNode::info,
 
 DOMNotation::DOMNotation(ExecState* exec, NotationImpl* n) : DOMNode(exec, n) {}
 
-Value DOMNotation::get(ExecState* exec, const Identifier& propertyName) const {
-  return lookupGetValue<DOMNotation, DOMNode>(exec, propertyName,
-                                              &DOMNotationTable, this);
+bool DOMNotation::getOwnProperty(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 Value& result) const {
+  return lookupGetOwnValue<DOMNotation, DOMNode>(
+      exec, propertyName, &DOMNotationTable, this, result);
 }
 
 Value DOMNotation::getValueProperty(ExecState*, int token) const {
@@ -1688,9 +1697,11 @@ const ClassInfo DOMEntity::info = {"Entity", &DOMNode::info, 0, 0};
 
 DOMEntity::DOMEntity(ExecState* exec, EntityImpl* e) : DOMNode(exec, e) {}
 
-Value DOMEntity::get(ExecState* exec, const Identifier& propertyName) const {
-  return lookupGetValue<DOMEntity, DOMNode>(exec, propertyName, &DOMEntityTable,
-                                            this);
+bool DOMEntity::getOwnProperty(ExecState* exec,
+                               const Identifier& propertyName,
+                               Value& result) const {
+  return lookupGetOwnValue<DOMEntity, DOMNode>(exec, propertyName,
+                                               &DOMEntityTable, this, result);
 }
 
 Value DOMEntity::getValueProperty(ExecState*, int token) const {
@@ -1869,10 +1880,11 @@ DontDelete|ReadOnly
 DontDelete|ReadOnly
 @end
 */
-Value NodeConstructor::get(ExecState* exec,
-                           const Identifier& propertyName) const {
-  return lookupGetValue<NodeConstructor, DOMObject>(
-      exec, propertyName, &NodeConstructorTable, this);
+bool NodeConstructor::getOwnProperty(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     Value& result) const {
+  return lookupGetOwnValue<NodeConstructor, DOMObject>(
+      exec, propertyName, &NodeConstructorTable, this, result);
 }
 
 Value NodeConstructor::getValueProperty(ExecState*, int token) const {
@@ -1955,10 +1967,11 @@ DontDelete|ReadOnly
 @end
 */
 
-Value DOMExceptionConstructor::get(ExecState* exec,
-                                   const Identifier& propertyName) const {
-  return lookupGetValue<DOMExceptionConstructor, DOMObject>(
-      exec, propertyName, &DOMExceptionConstructorTable, this);
+bool DOMExceptionConstructor::getOwnProperty(ExecState* exec,
+                                             const Identifier& propertyName,
+                                             Value& result) const {
+  return lookupGetOwnValue<DOMExceptionConstructor, DOMObject>(
+      exec, propertyName, &DOMExceptionConstructorTable, this, result);
 }
 
 Value DOMExceptionConstructor::getValueProperty(ExecState*, int token) const {
@@ -2019,15 +2032,19 @@ DOMNamedNodesCollection::DOMNamedNodesCollection(
     const QValueList<SharedPtr<NodeImpl>>& nodes)
     : m_nodes(nodes) {}
 
-Value DOMNamedNodesCollection::get(ExecState* exec,
-                                   const Identifier& propertyName) const {
-  if (propertyName == lengthPropertyName)
-    return Number(m_nodes.count());
+bool DOMNamedNodesCollection::getOwnProperty(ExecState* exec,
+                                             const Identifier& propertyName,
+                                             Value& result) const {
+  if (propertyName == lengthPropertyName) {
+    result = Number(m_nodes.count());
+    return true;
+  }
   // index?
   bool ok;
   unsigned int u = propertyName.toULong(&ok);
   if (ok && u < m_nodes.count()) {
-    return getDOMNode(exec, m_nodes[u].get());
+    result = getDOMNode(exec, m_nodes[u].get());
+    return true;
   }
   // For IE compatibility, we need to be able to look up elements in a
   // document.formName.name result by id as well as be index.
@@ -2048,12 +2065,13 @@ Value DOMNamedNodesCollection::get(ExecState* exec,
       }
 
       if (idAttr->nodeValue() == propertyName.string()) {
-        return getDOMNode(exec, node);
+        result = getDOMNode(exec, node);
+        return true;
       }
     }
   }
 
-  return DOMObject::get(exec, propertyName);
+  return DOMObject::getOwnProperty(exec, propertyName, result);
 }
 
 // -------------------------------------------------------------------------
@@ -2086,12 +2104,11 @@ DOMCharacterData::DOMCharacterData(ExecState* exec, CharacterDataImpl* d)
 
 DOMCharacterData::DOMCharacterData(CharacterDataImpl* d) : DOMNode(d) {}
 
-Value DOMCharacterData::get(ExecState* exec, const Identifier& p) const {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMCharacterData::get " << p.string().string() << endl;
-#endif
-  return lookupGetValue<DOMCharacterData, DOMNode>(
-      exec, p, &DOMCharacterDataTable, this);
+bool DOMCharacterData::getOwnProperty(ExecState* exec,
+                                      const Identifier& p,
+                                      Value& result) const {
+  return lookupGetOwnValue<DOMCharacterData, DOMNode>(
+      exec, p, &DOMCharacterDataTable, this, result);
 }
 
 Value DOMCharacterData::getValueProperty(ExecState*, int token) const {
@@ -2185,13 +2202,6 @@ IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMTextProto,
 
 DOMText::DOMText(ExecState* exec, TextImpl* t) : DOMCharacterData(t) {
   setPrototype(DOMTextProto::self(exec));
-}
-
-Value DOMText::get(ExecState* exec, const Identifier& p) const {
-  if (p == "")
-    return Undefined();  // ### TODO
-  else
-    return DOMCharacterData::get(exec, p);
 }
 
 Value DOMTextProtoFunc::call(ExecState* exec,

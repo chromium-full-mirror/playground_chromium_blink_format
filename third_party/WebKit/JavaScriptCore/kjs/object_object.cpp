@@ -82,7 +82,7 @@ Value ObjectProtoFuncImp::call(ExecState* exec,
     case ValueOf:
       return thisObj;
     case HasOwnProperty: {
-      // Same as hasProperty() but without checking the prototype
+      // Same as the in operator but without checking the prototype
       Identifier propertyName(args[0].toString(exec));
       bool exists = thisObj.hasOwnProperty(exec, propertyName);
       return Value(exists ? BooleanImp::staticTrue : BooleanImp::staticFalse);

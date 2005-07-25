@@ -512,8 +512,20 @@ class ObjectImp : public ValueImp {
    * @see Object::get()
    */
   // [[Get]] - must be implemented by all Objects
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual Value get(ExecState* exec, unsigned propertyName) const;
+  Value get(ExecState* exec, const Identifier& propertyName) const;
+  Value get(ExecState* exec, unsigned propertyName) const;
+
+  bool getProperty(ExecState* exec,
+                   const Identifier& propertyName,
+                   Value& result) const;
+  bool getProperty(ExecState* exec, unsigned propertyName, Value& result) const;
+
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              unsigned propertyName,
+                              Value& result) const;
 
   /**
    * Implementation of the [[Put]] internal property (implemented by all
@@ -647,6 +659,51 @@ class ObjectImp : public ValueImp {
   ValueImp* _internalValue;
   ScopeChain _scope;
 };
+
+// it may seem crazy to inline a function this large but it makes a big
+// difference
+// since this is function very hot in variable lookup
+inline bool ObjectImp::getProperty(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   Value& result) const {
+  const ObjectImp* imp = this;
+
+  while (true) {
+    if (imp->getOwnProperty(exec, propertyName, result))
+      return true;
+
+    const ValueImp* proto = imp->_proto;
+    if (proto->dispatchType() != ObjectType)
+      break;
+
+    imp = static_cast<const ObjectImp*>(proto);
+  }
+
+  return false;
+}
+
+// it may seem crazy to inline a function this large, especially a virtual
+// function,
+// but it makes a big difference to property lookup if subclasses can inline
+// their
+// superclass call to this
+inline bool ObjectImp::getOwnProperty(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      Value& result) const {
+  ValueImp* imp = getDirect(propertyName);
+  if (imp) {
+    result = Value(imp);
+    return true;
+  }
+
+  // non-standard netscape extension
+  if (propertyName == specialPrototypePropertyName) {
+    result = Value(_proto);
+    return true;
+  }
+
+  return false;
+}
 
 /**
  * Types of Native Errors available. For custom errors, GeneralError

@@ -175,21 +175,23 @@ inline Value lookupOrCreateFunction(ExecState* exec,
  * @param thisObj "this"
  */
 template <class FuncImp, class ThisImp, class ParentImp>
-inline Value lookupGet(ExecState* exec,
-                       const Identifier& propertyName,
-                       const HashTable* table,
-                       const ThisImp* thisObj) {
+inline bool lookupGetOwnProperty(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 const HashTable* table,
+                                 const ThisImp* thisObj,
+                                 Value& result) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
 
   if (!entry)  // not found, forward to parent
-    return thisObj->ParentImp::get(exec, propertyName);
+    return thisObj->ParentImp::getOwnProperty(exec, propertyName, result);
 
-  // fprintf(stderr, "lookupGet: found value=%d attr=%d\n", entry->value,
-  // entry->attr);
   if (entry->attr & Function)
-    return lookupOrCreateFunction<FuncImp>(
+    result = lookupOrCreateFunction<FuncImp>(
         exec, propertyName, thisObj, entry->value, entry->params, entry->attr);
-  return thisObj->getValueProperty(exec, entry->value);
+  else
+    result = thisObj->getValueProperty(exec, entry->value);
+
+  return true;
 }
 
 /**
@@ -198,23 +200,22 @@ inline Value lookupGet(ExecState* exec,
  * getValueProperty.
  */
 template <class FuncImp, class ParentImp>
-inline Value lookupGetFunction(ExecState* exec,
-                               const Identifier& propertyName,
-                               const HashTable* table,
-                               const ObjectImp* thisObj) {
+inline bool lookupGetOwnFunction(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 const HashTable* table,
+                                 const ObjectImp* thisObj,
+                                 Value& result) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
 
   if (!entry)  // not found, forward to parent
-    return static_cast<const ParentImp*>(thisObj)->ParentImp::get(exec,
-                                                                  propertyName);
+    return static_cast<const ParentImp*>(thisObj)->ParentImp::getOwnProperty(
+        exec, propertyName, result);
 
-  if (entry->attr & Function)
-    return lookupOrCreateFunction<FuncImp>(
-        exec, propertyName, thisObj, entry->value, entry->params, entry->attr);
+  assert(entry->attr & Function);
 
-  fprintf(stderr,
-          "Function bit not set! Shouldn't happen in lookupGetFunction!\n");
-  return Undefined();
+  result = lookupOrCreateFunction<FuncImp>(
+      exec, propertyName, thisObj, entry->value, entry->params, entry->attr);
+  return true;
 }
 
 /**
@@ -223,21 +224,20 @@ inline Value lookupGetFunction(ExecState* exec,
  * Using this instead of lookupGet removes the need for a FuncImp class.
  */
 template <class ThisImp, class ParentImp>
-inline Value lookupGetValue(ExecState* exec,
-                            const Identifier& propertyName,
-                            const HashTable* table,
-                            const ThisImp* thisObj) {
+inline bool lookupGetOwnValue(ExecState* exec,
+                              const Identifier& propertyName,
+                              const HashTable* table,
+                              const ThisImp* thisObj,
+                              Value& result) {
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
 
   if (!entry)  // not found, forward to parent
-    return thisObj->ParentImp::get(exec, propertyName);
+    return thisObj->ParentImp::getOwnProperty(exec, propertyName, result);
 
-  if (entry->attr & Function)
-    fprintf(stderr,
-            "Function bit set! Shouldn't happen in lookupGetValue! "
-            "propertyName was %s\n",
-            propertyName.ascii());
-  return thisObj->getValueProperty(exec, entry->value);
+  assert(!entry->attr & Function);
+
+  result = thisObj->getValueProperty(exec, entry->value);
+  return true;
 }
 
 /**
@@ -333,19 +333,19 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
    public:                                                                   \
     virtual const ClassInfo* classInfo() const { return &info; }             \
     static const ClassInfo info;                                             \
-    Value get(ExecState* exec, const Identifier& propertyName) const;        \
+    bool getOwnProperty(ExecState* exec,                                     \
+                        const Identifier& propertyName,                      \
+                        Value& result) const;                                \
     bool hasOwnProperty(ExecState* exec,                                     \
                         const Identifier& propertyName) const;               \
   };                                                                         \
   const ClassInfo ClassProto::info = {ClassName, 0, &ClassProto##Table, 0};
 
 #define IMPLEMENT_PROTOTYPE(ClassProto, ClassFunc)                            \
-  Value ClassProto::get(ExecState* exec, const Identifier& propertyName)      \
-      const {                                                                 \
-    /*fprintf( stderr, "%sProto::get(%s) [in macro, no parent]\n",            \
-     * info.className, propertyName.ascii());*/                               \
-    return lookupGetFunction<ClassFunc, ObjectImp>(exec, propertyName,        \
-                                                   &ClassProto##Table, this); \
+  bool ClassProto::getOwnProperty(                                            \
+      ExecState* exec, const Identifier& propertyName, Value& result) const { \
+    return lookupGetOwnFunction<ClassFunc, ObjectImp>(                        \
+        exec, propertyName, &ClassProto##Table, this, result);                \
   }                                                                           \
   bool ClassProto::hasOwnProperty(ExecState* exec,                            \
                                   const Identifier& propertyName)             \
@@ -354,23 +354,20 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
     return ObjectImp::hasOwnProperty(exec, propertyName);                     \
   }
 
-#define IMPLEMENT_PROTOTYPE_WITH_PARENT(ClassProto, ClassFunc, ParentProto) \
-  Value ClassProto::get(ExecState* exec, const Identifier& propertyName)    \
-      const {                                                               \
-    /*fprintf( stderr, "%sProto::get(%s) [in macro]\n", info.className,     \
-     * propertyName.ascii());*/                                             \
-    Value val = lookupGetFunction<ClassFunc, ObjectImp>(                    \
-        exec, propertyName, &ClassProto##Table, this);                      \
-    if (val.type() != UndefinedType)                                        \
-      return val;                                                           \
-    /* Not found -> forward request to "parent" prototype */                \
-    return ParentProto::self(exec)->get(exec, propertyName);                \
-  }                                                                         \
-  bool ClassProto::hasOwnProperty(ExecState* exec,                          \
-                                  const Identifier& propertyName) const {   \
-    if (ObjectImp::hasOwnProperty(exec, propertyName))                      \
-      return true;                                                          \
-    return ParentProto::self(exec)->hasOwnProperty(exec, propertyName);     \
+#define IMPLEMENT_PROTOTYPE_WITH_PARENT(ClassProto, ClassFunc, ParentProto)   \
+  bool ClassProto::getOwnProperty(                                            \
+      ExecState* exec, const Identifier& propertyName, Value& result) const { \
+    if (lookupGetOwnFunction<ClassFunc, ObjectImp>(                           \
+            exec, propertyName, &ClassProto##Table, this, result))            \
+      return true;                                                            \
+    return ParentProto::self(exec)->getOwnProperty(exec, propertyName,        \
+                                                   result);                   \
+  }                                                                           \
+  bool ClassProto::hasOwnProperty(ExecState* exec,                            \
+                                  const Identifier& propertyName) const {     \
+    if (ObjectImp::hasOwnProperty(exec, propertyName))                        \
+      return true;                                                            \
+    return ParentProto::self(exec)->hasOwnProperty(exec, propertyName);       \
   }
 
 #define IMPLEMENT_PROTOFUNC(ClassFunc)                                      \

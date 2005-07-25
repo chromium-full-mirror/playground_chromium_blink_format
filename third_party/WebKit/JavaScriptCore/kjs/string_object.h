@@ -32,7 +32,9 @@ class StringInstanceImp : public ObjectImp {
   StringInstanceImp(ObjectImp* proto);
   StringInstanceImp(ObjectImp* proto, const UString& string);
 
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -54,7 +56,9 @@ class StringInstanceImp : public ObjectImp {
 class StringPrototypeImp : public StringInstanceImp {
  public:
   StringPrototypeImp(ExecState* exec, ObjectPrototypeImp* objProto);
-  Value get(ExecState* exec, const Identifier& p) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 };

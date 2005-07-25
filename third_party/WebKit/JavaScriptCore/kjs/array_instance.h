@@ -33,8 +33,12 @@ class ArrayInstanceImp : public ObjectImp {
   ArrayInstanceImp(ObjectImp* proto, const List& initialValues);
   ~ArrayInstanceImp();
 
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
-  virtual Value get(ExecState* exec, unsigned propertyName) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& propertyName,
+                              Value& result) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              unsigned index,
+                              Value& result) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,

@@ -56,10 +56,9 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi)
   instance = i;
 }
 
-Value RuntimeObjectImp::get(ExecState* exec,
-                            const Identifier& propertyName) const {
-  Value result = Undefined();
-
+bool RuntimeObjectImp::getOwnProperty(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      Value& result) const {
   instance->begin();
 
   Class* aClass = instance->getClass();
@@ -69,6 +68,7 @@ Value RuntimeObjectImp::get(ExecState* exec,
     Field* aField = aClass->fieldNamed(propertyName.ascii(), instance);
     if (aField) {
       result = instance->getValueOfField(exec, aField);
+      return true;
     } else {
       // Now check if a method with specified name exists, if so return a
       // function object for
@@ -77,18 +77,22 @@ Value RuntimeObjectImp::get(ExecState* exec,
           aClass->methodsNamed(propertyName.ascii(), instance);
       if (methodList.length() > 0) {
         result = Object(new RuntimeMethodImp(exec, propertyName, methodList));
+        return true;
       }
     }
 
     if (result.type() == UndefinedType) {
       // Try a fallback object.
       result = aClass->fallbackObject(exec, instance, propertyName);
+      return true;
     }
   }
 
   instance->end();
 
-  return result;
+  // don't call superclass, because runtime objects can't have custom properties
+  // or a prototype
+  return false;
 }
 
 void RuntimeObjectImp::put(ExecState* exec,

@@ -36,7 +36,9 @@ class DOMNodeIterator : public DOMObject {
  public:
   DOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);
   ~DOMNodeIterator();
-  virtual Value get(ExecState* exec, const Identifier& p) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& p,
+                              Value& result) const;
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -62,7 +64,9 @@ class DOMNodeIterator : public DOMObject {
 class NodeFilterConstructor : public DOMObject {
  public:
   NodeFilterConstructor(ExecState*) {}
-  virtual Value get(ExecState* exec, const Identifier& p) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& p,
+                              Value& result) const;
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -87,7 +91,9 @@ class DOMTreeWalker : public DOMObject {
  public:
   DOMTreeWalker(ExecState* exec, DOM::TreeWalkerImpl* tw);
   ~DOMTreeWalker();
-  virtual Value get(ExecState* exec, const Identifier& p) const;
+  virtual bool getOwnProperty(ExecState* exec,
+                              const Identifier& p,
+                              Value& result) const;
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
