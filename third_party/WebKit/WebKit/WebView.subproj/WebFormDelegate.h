@@ -67,8 +67,7 @@
 - (void)textDidChangeInTextArea:(DOMHTMLTextAreaElement*)element
                         inFrame:(WebFrame*)frame;
 
-- (BOOL)control:(NSControl*)control
-               textView:(NSTextView*)textView
+- (BOOL)textField:(DOMHTMLInputElement*)element
     doCommandBySelector:(SEL)commandSelector
                 inFrame:(WebFrame*)frame;
 - (BOOL)textField:(DOMHTMLInputElement*)element

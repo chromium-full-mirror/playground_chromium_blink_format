@@ -694,8 +694,7 @@ typedef enum {
 - (void)textDidChangeInTextField:(DOMHTMLInputElement*)element;
 - (void)textDidChangeInTextArea:(DOMHTMLTextAreaElement*)element;
 
-- (BOOL)control:(NSControl*)control
-               textView:(NSTextView*)textView
+- (BOOL)textField:(DOMHTMLInputElement*)element
     doCommandBySelector:(SEL)commandSelector;
 - (BOOL)textField:(DOMHTMLInputElement*)element
     shouldHandleEvent:(NSEvent*)event;
