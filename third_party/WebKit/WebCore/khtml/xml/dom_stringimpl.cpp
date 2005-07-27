@@ -359,6 +359,7 @@ DOMStringImpl* DOMStringImpl::upper() const {
 
 DOMStringImpl* DOMStringImpl::capitalize() const {
   DOMStringImpl* c = new DOMStringImpl;
+  bool haveCapped = false;
   if (!l)
     return c;
 
@@ -367,8 +368,23 @@ DOMStringImpl* DOMStringImpl::capitalize() const {
 
   if (l)
     c->s[0] = s[0].upper();
-  for (unsigned int i = 1; i < l; i++)
-    c->s[i] = s[i - 1].isLetterOrNumber() ? s[i] : s[i].upper();
+
+  // This patch takes care of a lot of the text_transform: capitalize problems,
+  // particularly
+  // with the apostrophe. But it is just a temporary fix until we implement
+  // UBreakIterator as a
+  // way to determine when to break for words.
+  for (unsigned int i = 0; i < l; i++) {
+    if (haveCapped) {
+      if (s[i].isSpace())
+        haveCapped = false;
+      c->s[i] = s[i];
+    } else if (s[i].isLetterOrNumber()) {
+      c->s[i] = s[i].upper();
+      haveCapped = true;
+    } else
+      c->s[i] = s[i];
+  }
 
   return c;
 }
