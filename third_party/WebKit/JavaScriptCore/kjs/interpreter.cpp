@@ -129,10 +129,6 @@ Completion Interpreter::evaluate(const UString& sourceURL,
   return comp;
 }
 
-InterpreterImp* Interpreter::imp() {
-  return rep;
-}
-
 Object Interpreter::builtinObject() const {
   return rep->builtinObject();
 }

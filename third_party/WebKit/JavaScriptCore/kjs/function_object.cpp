@@ -221,7 +221,8 @@ Object FunctionObjectImp::construct(ExecState* exec,
   // notify debugger that source has been parsed
   Debugger* dbg = exec->dynamicInterpreter()->imp()->debugger();
   if (dbg) {
-    bool cont = dbg->sourceParsed(exec, sid, body, errLine);
+    // send empty sourceURL to indicate constructed code
+    bool cont = dbg->sourceParsed(exec, sid, UString(), body, errLine);
     if (!cont) {
       dbg->imp()->abort();
       return Object(new ObjectImp());

@@ -229,7 +229,7 @@ class Interpreter {
    * Returns the implementation object associated with this interpreter.
    * Only useful for internal KJS operations.
    */
-  InterpreterImp* imp();
+  InterpreterImp* imp() const { return rep; }
 
   /**
    * Returns the builtin "Object" object. This is the object that was set

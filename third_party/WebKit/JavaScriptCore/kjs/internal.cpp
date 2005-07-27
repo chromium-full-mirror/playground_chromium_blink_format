@@ -421,7 +421,7 @@ ProgramNode* Parser::parse(const UString& sourceURL,
   Lexer::curr()->doneParsing();
   ProgramNode* prog = progNode;
   progNode = 0;
-  sid = -1;
+  //  sid = -1;
 
   if (parseError || lexError) {
     int eline = Lexer::curr()->lineNo();
@@ -790,7 +790,7 @@ Completion InterpreterImp::evaluate(const UString& code,
 
   // notify debugger that source has been parsed
   if (dbg) {
-    bool cont = dbg->sourceParsed(globExec, sid, code, errLine);
+    bool cont = dbg->sourceParsed(globExec, sid, sourceURL, code, errLine);
     if (!cont)
 #if APPLE_CHANGES
     {
@@ -852,12 +852,6 @@ Completion InterpreterImp::evaluate(const UString& code,
   unlockInterpreter();
 #endif
   return res;
-}
-
-void InterpreterImp::setDebugger(Debugger* d) {
-  if (d)
-    d->detach(m_interpreter);
-  dbg = d;
 }
 
 void InterpreterImp::saveBuiltins(SavedBuiltins& builtins) const {

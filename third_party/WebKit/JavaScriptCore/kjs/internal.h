@@ -301,7 +301,7 @@ class InterpreterImp {
                       const UString& sourceURL,
                       int startingLineNumber);
   Debugger* debugger() const { return dbg; }
-  void setDebugger(Debugger* d);
+  void setDebugger(Debugger* d) { dbg = d; }
 
   Object builtinObject() const { return b_Object; }
   Object builtinFunction() const { return b_Function; }
