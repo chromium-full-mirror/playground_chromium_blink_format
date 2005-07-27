@@ -30,6 +30,8 @@
 
 #include "KWQRefPtr.h"
 
+class KWQMapImpl;
+
 class KWQMapNodeImpl {
  protected:
   typedef enum { Red = 0, Black = 1 } KWQMapNodeColor;

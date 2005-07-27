@@ -49,6 +49,7 @@ class FrameArray;
 class JSEventListener;
 class JSUnprotectedEventListener;
 class JSLazyEventListener;
+class ScheduledAction;
 
 class Screen : public ObjectImp {
  public:
