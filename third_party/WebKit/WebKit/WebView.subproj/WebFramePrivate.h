@@ -219,8 +219,6 @@ extern NSString* WebPageCacheDocumentViewKey;
      isJavaScriptFormAction:(BOOL)isJavaScriptFormAction;
 - (void)_clientRedirectCancelled:(BOOL)cancelWithLoadInProgress;
 
-- (void)_textSizeMultiplierChanged;
-
 - (void)_defersCallbacksChanged;
 
 - (void)_viewWillMoveToHostWindow:(NSWindow*)hostWindow;
