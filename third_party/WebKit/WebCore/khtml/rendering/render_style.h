@@ -1172,6 +1172,7 @@ class RenderStyle {
   bool hasFixedBackgroundImage() const {
     return background->m_background.hasFixedImage();
   }
+  bool hasAppearance() const { return appearance() != NoAppearance; }
 
   bool visuallyOrdered() const { return inherited_flags._visuallyOrdered; }
   void setVisuallyOrdered(bool b) { inherited_flags._visuallyOrdered = b; }
@@ -1504,6 +1505,12 @@ class RenderStyle {
   }
 #endif
 
+  void resetBorder() {
+    resetBorderTop();
+    resetBorderRight();
+    resetBorderBottom();
+    resetBorderLeft();
+  }
   void resetBorderTop() { SET_VAR(surround, border.top, BorderValue()) }
   void resetBorderRight() { SET_VAR(surround, border.right, BorderValue()) }
   void resetBorderBottom() { SET_VAR(surround, border.bottom, BorderValue()) }

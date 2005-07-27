@@ -838,8 +838,14 @@ void HTMLGenericFormElementImpl::parseMappedAttribute(
   } else if (attr->name() == HTMLAttributes::disabled()) {
     bool oldDisabled = m_disabled;
     m_disabled = !attr->isNull();
-    if (oldDisabled != m_disabled)
+    if (oldDisabled != m_disabled) {
       setChanged();
+      if (renderer() && renderer()->style()->hasAppearance())
+        // FIXME: Let the theme decide whether a repaint is necessary.
+        // Repaint the renderer when its disabled state changes so the theme
+        // will redraw properly.
+        renderer()->repaint();
+    }
   } else if (attr->name() == HTMLAttributes::readonly()) {
     bool oldReadOnly = m_readOnly;
     m_readOnly = !attr->isNull();
@@ -1565,6 +1571,12 @@ void HTMLInputElementImpl::click(bool sendMouseEvents) {
       // a no-op for this type
       break;
     case CHECKBOX:
+      if (renderer() && renderer()->style()->hasAppearance()) {
+        // Do the click.
+        HTMLGenericFormElementImpl::click(sendMouseEvents);
+        break;
+      }
+    // Fall through for now
     case RADIO:
     case SUBMIT:
     case RESET:
@@ -2044,6 +2056,12 @@ void HTMLInputElementImpl::setChecked(bool _checked) {
   m_useDefaultChecked = false;
   m_checked = _checked;
   setChanged();
+  if (renderer() && renderer()->style()->hasAppearance())
+    // FIXME: Let the theme decide whether a repaint is necessary.
+    // Repaint the renderer when its checked state changes so the theme will
+    // redraw
+    // properly.
+    renderer()->repaint();
 }
 
 DOMString HTMLInputElementImpl::value() const {
@@ -2181,20 +2199,26 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
   // on the element, or presses enter while it is the active element. Javacsript
   // code wishing to activate the element
   // must dispatch a DOMActivate event - a click event will not do the job.
-  if ((evt->id() == EventImpl::DOMACTIVATE_EVENT) &&
-      (m_type == IMAGE || m_type == SUBMIT || m_type == RESET)) {
-    if (!m_form)
-      return;
-
-    if (m_type == RESET) {
-      m_form->reset();
-    } else {
-      m_activeSubmit = true;
-      if (!m_form->prepareSubmit()) {
-        xPos = 0;
-        yPos = 0;
+  if (evt->id() == EventImpl::DOMACTIVATE_EVENT) {
+    if (m_type == IMAGE || m_type == SUBMIT || m_type == RESET) {
+      if (!m_form)
+        return;
+      if (m_type == RESET)
+        m_form->reset();
+      else {
+        m_activeSubmit = true;
+        if (!m_form->prepareSubmit()) {
+          xPos = 0;
+          yPos = 0;
+        }
+        m_activeSubmit = false;
       }
-      m_activeSubmit = false;
+    } else if (m_type == CHECKBOX || m_type == RADIO) {
+      if (renderer() && renderer()->style()->hasAppearance())
+        // FIXME: We key off appearance for now, but this is temporary.  When we
+        // cut over
+        // for real this will just always be used.
+        setChecked(!checked());
     }
   }
 
