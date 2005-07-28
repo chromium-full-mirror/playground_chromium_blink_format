@@ -171,6 +171,9 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual DOMString type() const = 0;
 
+  virtual bool isControl() const { return true; }
+  virtual bool isEnabled() const { return !disabled(); }
+
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void attach();
   virtual void insertedIntoDocument();
@@ -334,6 +337,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
 
   bool autoComplete() const { return m_autocomplete; }
+
+  virtual bool isChecked() const { return checked(); }
 
   bool checked() const { return m_checked; }
   void setChecked(bool);
