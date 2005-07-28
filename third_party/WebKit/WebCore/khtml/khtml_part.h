@@ -972,6 +972,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   void print();
   virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
 
+  virtual bool displaysWithFocusAttributes() const { return true; }
+
   // Used to keep the part alive when running a script that might destroy it.
   void keepAlive();
 

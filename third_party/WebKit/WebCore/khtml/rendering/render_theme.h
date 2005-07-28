@@ -66,6 +66,12 @@ class RenderTheme {
   // the baseline position API above).
   virtual bool isControlContainer(EAppearance appearance) const { return true; }
 
+  // An API asking if the control changes its tint when the window has focus or
+  // not.
+  virtual bool controlSupportsTints(const RenderObject* o) const {
+    return false;
+  }
+
   // Some controls may spill out of their containers (e.g., the check on an OS X
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
@@ -79,10 +85,10 @@ class RenderTheme {
 
  protected:
   // Methods for state querying
-  bool isChecked(const RenderObject* o);
-  bool isEnabled(const RenderObject* o);
-  bool isFocused(const RenderObject* o);
-  bool isPressed(const RenderObject* o);
+  bool isChecked(const RenderObject* o) const;
+  bool isEnabled(const RenderObject* o) const;
+  bool isFocused(const RenderObject* o) const;
+  bool isPressed(const RenderObject* o) const;
 
   // Methods for each appearance value.
   virtual void adjustCheckboxStyle(RenderStyle* style) const = 0;

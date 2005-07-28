@@ -1375,7 +1375,8 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
         break;
       }
       case CSSSelector::PseudoFocus:
-        if (e && e->focused()) {
+        if (e && e->focused() &&
+            e->getDocument()->part()->displaysWithFocusAttributes()) {
           return true;
         }
         break;
