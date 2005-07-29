@@ -146,7 +146,6 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_inline(true),
 
       m_replaced(false),
-      m_mouseInside(false),
       m_isDragging(false),
       m_hasOverflowClip(false) {}
 
@@ -1306,8 +1305,6 @@ QString RenderObject::information() const {
     ts << "nl ";
   if (m_recalcMinMax)
     ts << "rmm ";
-  if (mouseInside())
-    ts << "mi ";
   if (style() && style()->zIndex())
     ts << "zI: " << style()->zIndex();
   if (element() && element()->active())
@@ -1893,12 +1890,6 @@ void RenderObject::arenaDelete(RenderArena* arena, void* base) {
 
 VisiblePosition RenderObject::positionForCoordinates(int x, int y) {
   return VisiblePosition(element(), caretMinOffset(), DOWNSTREAM);
-}
-
-bool RenderObject::mouseInside() const {
-  if (!m_mouseInside && continuation())
-    return continuation()->mouseInside();
-  return m_mouseInside;
 }
 
 bool RenderObject::isDragging() const {

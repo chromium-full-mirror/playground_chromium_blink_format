@@ -629,7 +629,7 @@ enum EUserDrag { DRAG_AUTO, DRAG_NONE, DRAG_ELEMENT };
 
 // CSS3 User Select Values
 
-enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT };
+enum EUserSelect { SELECT_AUTO, SELECT_NONE, SELECT_TEXT, SELECT_ELEMENT };
 
 // Word Break Values. Matches WinIE, rather than CSS3
 

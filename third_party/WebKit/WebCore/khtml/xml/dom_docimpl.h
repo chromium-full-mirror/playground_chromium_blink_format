@@ -406,6 +406,11 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void resetActiveLinkColor();
 
   bool prepareMouseEvent(bool readonly, int x, int y, MouseEvent* ev);
+  bool prepareMouseEvent(bool readonly,
+                         bool active,
+                         int x,
+                         int y,
+                         MouseEvent* ev);
 
   virtual bool childAllowed(NodeImpl* newChild);
   virtual bool childTypeAllowed(unsigned short nodeType);
@@ -428,6 +433,9 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   NodeImpl* hoverNode() const { return m_hoverNode; }
   void setHoverNode(NodeImpl* newHoverNode);
+
+  NodeImpl* activeNode() const { return m_activeNode; }
+  void setActiveNode(NodeImpl* newActiveNode);
 
   // Updates for :target (CSS3 selector).
   void setCSSTarget(NodeImpl* n);
@@ -658,6 +666,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   NodeImpl* m_focusNode;
   NodeImpl* m_hoverNode;
+  NodeImpl* m_activeNode;
 
   unsigned int m_domtree_version;
 

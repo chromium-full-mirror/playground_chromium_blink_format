@@ -4579,7 +4579,7 @@ void KHTMLPart::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
                                                 int y) {
   Selection selection;
 
-  if (innerNode && innerNode->renderer() &&
+  if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
       innerNode->renderer()->shouldSelect()) {
     VisiblePosition pos(innerNode->renderer()->positionForCoordinates(x, y));
     if (pos.isNotNull()) {
@@ -4619,25 +4619,23 @@ void KHTMLPart::handleMousePressEventTripleClick(
   QMouseEvent* mouse = event->qmouseEvent();
   NodeImpl* innerNode = event->innerNode();
 
-  Selection selection;
-
   if (mouse->button() == LeftButton && innerNode && innerNode->renderer() &&
-      innerNode->renderer()->shouldSelect()) {
+      mouseDownMayStartSelect() && innerNode->renderer()->shouldSelect()) {
+    Selection selection;
     VisiblePosition pos(
         innerNode->renderer()->positionForCoordinates(event->x(), event->y()));
     if (pos.isNotNull()) {
       selection.moveTo(pos);
       selection.expandUsingGranularity(PARAGRAPH);
     }
-  }
+    if (selection.isRange()) {
+      d->m_selectionGranularity = PARAGRAPH;
+      d->m_beganSelectingText = true;
+    }
 
-  if (selection.isRange()) {
-    d->m_selectionGranularity = PARAGRAPH;
-    d->m_beganSelectingText = true;
+    setSelection(selection);
+    startAutoScroll();
   }
-
-  setSelection(selection);
-  startAutoScroll();
 }
 
 void KHTMLPart::handleMousePressEventSingleClick(
@@ -4646,10 +4644,10 @@ void KHTMLPart::handleMousePressEventSingleClick(
   NodeImpl* innerNode = event->innerNode();
 
   if (mouse->button() == LeftButton) {
-    Selection sel;
-
-    if (innerNode && innerNode->renderer() &&
+    if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
         innerNode->renderer()->shouldSelect()) {
+      Selection sel;
+
       // Extend the selection if the Shift key is down, unless the click is in a
       // link.
       bool extendSelection =
@@ -4694,10 +4692,10 @@ void KHTMLPart::handleMousePressEventSingleClick(
         sel = Selection(visiblePos);
         d->m_selectionGranularity = CHARACTER;
       }
-    }
 
-    setSelection(sel);
-    startAutoScroll();
+      setSelection(sel);
+      startAutoScroll();
+    }
   }
 }
 
@@ -4880,7 +4878,7 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   NodeImpl* innerNode = event->innerNode();
 
   if (mouse->state() != LeftButton || !innerNode || !innerNode->renderer() ||
-      !innerNode->renderer()->shouldSelect())
+      !mouseDownMayStartSelect() || !innerNode->renderer()->shouldSelect())
     return;
 
   // handle making selection
@@ -4964,7 +4962,7 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
   // Clear the selection if the mouse didn't move after the last mouse press.
   // We do this so when clicking on the selection, the selection goes away.
   // However, if we are editing, place the caret.
-  if (!d->m_beganSelectingText &&
+  if (mouseDownMayStartSelect() && !d->m_beganSelectingText &&
       d->m_dragStartPos.x() == event->qmouseEvent()->x() &&
       d->m_dragStartPos.y() == event->qmouseEvent()->y() &&
       d->m_selection.isRange()) {

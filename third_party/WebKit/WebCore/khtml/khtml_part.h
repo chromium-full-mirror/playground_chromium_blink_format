@@ -1396,6 +1396,8 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   // the frame you entirely selected.
   void selectFrameElementInParentIfFullySelected();
 
+  virtual bool mouseDownMayStartSelect() const { return true; }
+
   void handleFallbackContent();
 
  private:
