@@ -44,10 +44,16 @@ class RenderBR : public RenderText {
 
   virtual QRect selectionRect() { return QRect(); }
 
-  virtual unsigned int width(unsigned int, unsigned int, const Font*) const {
+  virtual unsigned int width(unsigned int from,
+                             unsigned int len,
+                             const Font* f,
+                             int xpos) const {
     return 0;
   }
-  virtual unsigned int width(unsigned int, unsigned int, bool) const {
+  virtual unsigned int width(unsigned int from,
+                             unsigned int len,
+                             int xpos,
+                             bool firstLine = false) const {
     return 0;
   }
 

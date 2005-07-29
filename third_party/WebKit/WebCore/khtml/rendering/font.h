@@ -132,6 +132,8 @@ class Font {
   void drawText(QPainter* p,
                 int x,
                 int y,
+                int tabWidth,
+                int xpos,
                 QChar* str,
                 int slen,
                 int pos,
@@ -146,6 +148,8 @@ class Font {
   void drawText(QPainter* p,
                 int x,
                 int y,
+                int tabWidth,
+                int xpos,
                 QChar* str,
                 int slen,
                 int pos,
@@ -156,12 +160,19 @@ class Font {
                 int from = -1,
                 int to = -1,
                 QColor bg = QColor()) const;
-  float floatWidth(QChar* str, int slen, int pos, int len) const;
+  float floatWidth(QChar* str,
+                   int slen,
+                   int pos,
+                   int len,
+                   int tabWidth,
+                   int xpos) const;
   void floatCharacterWidths(QChar* str,
                             int slen,
                             int pos,
                             int len,
                             int toAdd,
+                            int tabWidth,
+                            int xpos,
                             float* buffer) const;
   bool isFixedPitch() const;
   int checkSelectionPoint(QChar* s,
@@ -169,6 +180,8 @@ class Font {
                           int pos,
                           int len,
                           int toAdd,
+                          int tabWidth,
+                          int xpos,
                           int x,
                           bool reversed,
                           bool includePartialGlyphs) const;
@@ -176,6 +189,8 @@ class Font {
                             int x,
                             int y,
                             int h,
+                            int tabWidth,
+                            int xpos,
                             QChar* str,
                             int slen,
                             int pos,
@@ -187,8 +202,9 @@ class Font {
                             int to = -1,
                             QColor bg = QColor()) const;
 #endif
-  int width(QChar* str, int slen, int pos, int len) const;
-  int width(QChar* str, int slen, int pos) const;
+  int width(QChar* str, int slen, int pos, int len, int tabWidth, int xpos)
+      const;
+  int width(QChar* str, int slen, int tabWidth, int xpos) const;
 
   bool isSmallCaps() const { return fontDef.smallCaps; }
 

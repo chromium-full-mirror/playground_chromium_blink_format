@@ -147,6 +147,7 @@ class RenderBlock : public RenderFlow {
   RootInlineBox* constructLine(const BidiIterator& start,
                                const BidiIterator& end);
   InlineFlowBox* createLineBoxes(RenderObject* obj);
+  int tabWidth(bool isWhitespacePre);
   void computeHorizontalPositionsForLine(RootInlineBox* lineBox,
                                          BidiState& bidi);
   void computeVerticalPositionsForLine(RootInlineBox* lineBox);
@@ -571,6 +572,9 @@ class RenderBlock : public RenderFlow {
   // when dirty rect checking and hit testing.
   int m_overflowLeft;
   int m_overflowTop;
+
+  // full width of a tab character
+  int m_tabWidth;
 };
 
 };  // namespace

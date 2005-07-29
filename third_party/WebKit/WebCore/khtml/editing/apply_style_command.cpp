@@ -32,6 +32,7 @@
 #include "css/cssparser.h"
 #include "css/cssproperties.h"
 #include "dom/dom_string.h"
+#include "htmlediting.h"
 #include "html/html_elementimpl.h"
 #include "htmlnames.h"
 #include "rendering/render_object.h"
@@ -724,6 +725,8 @@ void ApplyStyleCommand::removeCSSStyle(CSSMutableStyleDeclarationImpl* style,
     int propertyID = (*it).id();
     CSSValueImpl* value = decl->getPropertyCSSValue(propertyID);
     if (value) {
+      if (propertyID == CSS_PROP_WHITE_SPACE && isTabSpanNode(elem))
+        continue;
       value->ref();
       removeCSSProperty(decl, propertyID);
       value->deref();
@@ -1353,6 +1356,11 @@ void ApplyStyleCommand::addInlineStyleIfNeeded(
       style, Position(startNode, 0),
       StyleChange::styleModeForParseMode(document()->inCompatMode()));
   int exceptionCode = 0;
+
+  // Prevent style changes to our tab spans, because it might remove the
+  // whitespace:pre we are after
+  if (isTabSpanTextNode(startNode))
+    return;
 
   //
   // Font tags need to go outside of CSS so that CSS font sizes override leagcy

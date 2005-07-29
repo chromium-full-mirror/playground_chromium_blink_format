@@ -115,9 +115,6 @@ class Token {
   bool flat : 1;
 };
 
-// The count of spaces used for each tab.
-#define TAB_SIZE 8
-
 //-----------------------------------------------------------------------------
 
 class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
@@ -200,7 +197,11 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // are we in quotes within a html tag
   enum { NoQuote = 0, SingleQuote, DoubleQuote } tquote;
 
-  enum { NonePending = 0, SpacePending, LFPending, TabPending } pending;
+  enum {
+    NonePending = 0,
+    SpacePending,
+    LFPending,
+  } pending;
 
   // Discard line breaks immediately after start-tags
   // Discard spaces after '=' within tags
@@ -245,12 +246,6 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   // are we in a <script> ... </script block
   bool script;
-
-  // Are we in a <pre> ... </pre> block
-  bool pre;
-
-  // if 'pre == true' we track in which column we are
-  int prePos;
 
   // Are we in a <style> ... </style> block
   bool style;

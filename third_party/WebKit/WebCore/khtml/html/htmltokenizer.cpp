@@ -461,8 +461,6 @@ void HTMLTokenizer::begin() {
   tag = NoTag;
   pending = NonePending;
   discard = NoneDiscard;
-  pre = false;
-  prePos = 0;
   plaintext = false;
   xmp = false;
   processingInstruction = false;
@@ -497,16 +495,10 @@ void HTMLTokenizer::setForceSynchronous(bool force) {
 }
 
 void HTMLTokenizer::processListing(TokenizerString list) {
-  bool old_pre = pre;
   // This function adds the listing 'list' as
   // preformatted text-tokens to the token-collection
-  // thereby converting TABs.
-  if (!style)
-    pre = true;
-  prePos = 0;
-
   while (!list.isEmpty()) {
-    checkBuffer(3 * TAB_SIZE);
+    checkBuffer();
 
     if (skipLF && (*list != '\n')) {
       skipLF = false;
@@ -530,13 +522,10 @@ void HTMLTokenizer::processListing(TokenizerString list) {
         skipLF = true;
       }
       ++list;
-    } else if ((*list == ' ') || (*list == '\t')) {
+    } else if (*list == ' ') {
       if (pending)
         addPending();
-      if (*list == ' ')
-        pending = SpacePending;
-      else
-        pending = TabPending;
+      pending = SpacePending;
 
       ++list;
     } else {
@@ -544,7 +533,6 @@ void HTMLTokenizer::processListing(TokenizerString list) {
       if (pending)
         addPending();
 
-      prePos++;
       *dest++ = *list;
       ++list;
     }
@@ -552,10 +540,6 @@ void HTMLTokenizer::processListing(TokenizerString list) {
 
   if (pending)
     addPending();
-
-  prePos = 0;
-
-  pre = old_pre;
 }
 
 void HTMLTokenizer::parseSpecial(TokenizerString& src) {
@@ -641,7 +625,8 @@ void HTMLTokenizer::parseSpecial(TokenizerString& src) {
       scriptCodeSize = scriptCodeDest - scriptCode;
     } else {
       scriptCode[scriptCodeSize] = *src;
-      fixUpChar(scriptCode[scriptCodeSize]);
+      if (src->unicode() >= 0x0080)
+        fixUpChar(scriptCode[scriptCodeSize]);
       ++scriptCodeSize;
       ++src;
     }
@@ -940,7 +925,8 @@ void HTMLTokenizer::parseText(TokenizerString& src) {
       ++src;
     } else {
       *dest = *src;
-      fixUpChar(*dest);
+      if (src->unicode() >= 0x0080)
+        fixUpChar(*dest);
       ++dest;
       ++src;
     }
@@ -1066,7 +1052,8 @@ void HTMLTokenizer::parseEntity(TokenizerString& src,
 
           if (EntityUnicodeValue <= 0xFFFF) {
             QChar c(EntityUnicodeValue);
-            fixUpChar(c);
+            if (c.unicode() >= 0x0080)
+              fixUpChar(c);
             checkBuffer();
             src.push(c);
           } else {
@@ -1089,8 +1076,6 @@ void HTMLTokenizer::parseEntity(TokenizerString& src,
           for (unsigned int i = 0; i < cBufferPos; i++)
             dest[i] = cBuffer[i];
           dest += cBufferPos;
-          if (pre)
-            prePos += cBufferPos + 1;
         }
 
         Entity = NoEntity;
@@ -1237,28 +1222,26 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
 
         while (ll--) {
           curchar = *src;
-          if (curchar <= '>') {
-            if (curchar <= ' ' || curchar == '=' || curchar == '>') {
-              cBuffer[cBufferPos] = '\0';
-              attrName = AtomicString(cBuffer);
-              dest = buffer;
-              *dest++ = 0;
-              tag = SearchEqual;
-              // This is a deliberate quirk to match Mozilla and Opera.  We have
-              // to do this
-              // since sites that use the "standards-compliant" path sometimes
-              // send
-              // <script src="foo.js"/>.  Both Moz and Opera will honor this,
-              // despite it
-              // being bogus HTML.  They do not honor the "/" for other tags.
-              // This behavior
-              // also deviates from WinIE, but in this case we'll just copy Moz
-              // and Opera.
-              if (currToken.tagName == HTMLTags::script() && curchar == '>' &&
-                  attrName == "/")
-                currToken.flat = true;
-              break;
-            }
+          if (curchar <= '>' && (curchar >= '=' || curchar <= ' ')) {
+            cBuffer[cBufferPos] = '\0';
+            attrName = AtomicString(cBuffer);
+            dest = buffer;
+            *dest++ = 0;
+            tag = SearchEqual;
+            // This is a deliberate quirk to match Mozilla and Opera.  We have
+            // to do this
+            // since sites that use the "standards-compliant" path sometimes
+            // send
+            // <script src="foo.js"/>.  Both Moz and Opera will honor this,
+            // despite it
+            // being bogus HTML.  They do not honor the "/" for other tags.
+            // This behavior
+            // also deviates from WinIE, but in this case we'll just copy Moz
+            // and Opera.
+            if (currToken.tagName == HTMLTags::script() && curchar == '>' &&
+                attrName == "/")
+              currToken.flat = true;
+            break;
           }
 
           // tolower() shows up on profiles. This is faster!
@@ -1382,7 +1365,8 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
             }
           }
           *dest = *src;
-          fixUpChar(*dest);
+          if (dest->unicode() >= 0x0080)
+            fixUpChar(*dest);
           ++dest;
           ++src;
         }
@@ -1415,7 +1399,8 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
           }
 
           *dest = *src;
-          fixUpChar(*dest);
+          if (dest->unicode() >= 0x0080)
+            fixUpChar(*dest);
           ++dest;
           ++src;
         }
@@ -1548,8 +1533,6 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
         processToken();
 
         if (tagName == HTMLTags::pre()) {
-          prePos = 0;
-          pre = beginTag;
           discard = LFDiscard;  // Discard the first LF after we open a pre.
         } else if (tagName == HTMLTags::script()) {
           if (beginTag) {
@@ -1607,44 +1590,23 @@ void HTMLTokenizer::addPending() {
     switch (pending) {
       case LFPending:
         *dest++ = '\n';
-        prePos = 0;
         break;
       case SpacePending:
         *dest++ = ' ';
-        ++prePos;
-        break;
-      case TabPending:
-        *dest++ = '\t';
-        prePos += TAB_SIZE - (prePos % TAB_SIZE);
         break;
       case NonePending:
         assert(0);
     }
   } else {
-    int p;
-
     switch (pending) {
       case SpacePending:
         // Insert a breaking space
         *dest++ = QChar(' ');
-        prePos++;
         break;
 
       case LFPending:
         *dest = '\n';
         dest++;
-        prePos = 0;
-        break;
-
-      case TabPending:
-        p = TAB_SIZE - (prePos % TAB_SIZE);
-#ifdef TOKEN_DEBUG
-        qDebug("tab pending, prePos: %d, toadd: %d", prePos, p);
-#endif
-
-        for (int x = 0; x < p; x++)
-          *dest++ = QChar(' ');
-        prePos += p;
         break;
 
       case NonePending:
@@ -1793,8 +1755,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
       };  // end case
 
       if (pending) {
-        // pre context always gets its spaces/linefeeds
-        if (pre || script ||
+        if (script ||
             (!parser->selectMode() && (!parser->noSpaces() || dest > buffer)))
           addPending();
         // just forget it
@@ -1847,7 +1808,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
         skipLF = true;
       }
       ++src;
-    } else if ((cc == ' ') || (cc == '\t')) {
+    } else if (cc == ' ') {
       if (select && !script) {
         if (discard == SpaceDiscard)
           discard = NoneDiscard;
@@ -1861,10 +1822,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
 
         if (pending)
           addPending();
-        if (cc == ' ')
-          pending = SpacePending;
-        else
-          pending = TabPending;
+        pending = SpacePending;
       }
 
       ++src;
@@ -1873,16 +1831,14 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
         addPending();
 
       discard = NoneDiscard;
-      if (pre) {
-        prePos++;
-      }
 #if QT_VERSION < 300
       unsigned char row = src->row();
       if (row > 0x05 && row < 0x10 || row > 0xfd)
         currToken.complexText = true;
 #endif
       *dest = *src;
-      fixUpChar(*dest);
+      if (dest->unicode() >= 0x0080)
+        fixUpChar(*dest);
       ++dest;
       ++src;
     }

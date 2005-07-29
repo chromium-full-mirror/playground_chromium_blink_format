@@ -51,15 +51,17 @@ class QFontMetrics {
   int lineSpacing() const;
   float xHeight() const;
 
-  int width(QChar) const;
-  int width(char) const;
-  int width(const QString&, int len = -1) const;
-  int charWidth(const QString&, int pos) const;
-  int width(const QChar*, int len) const;
+  int width(QChar, int tabWidth, int xpos) const;
+  int width(char, int tabWidth, int xpos) const;
+  int width(const QString&, int tabWidth, int xpos, int len = -1) const;
+  int charWidth(const QString&, int pos, int tabWidth, int xpos) const;
+  int width(const QChar*, int len, int tabWidth, int xpos) const;
   float floatWidth(const QChar*,
                    int slen,
                    int pos,
                    int len,
+                   int tabWidth,
+                   int xpos,
                    int letterSpacing,
                    int wordSpacing,
                    bool smallCaps) const;
@@ -68,6 +70,8 @@ class QFontMetrics {
                              int pos,
                              int len,
                              int toAdd,
+                             int tabWidth,
+                             int xpos,
                              float* buffer,
                              int letterSpacing,
                              int wordSpacing,
@@ -77,6 +81,8 @@ class QFontMetrics {
                           int pos,
                           int len,
                           int toAdd,
+                          int tabWidth,
+                          int xpos,
                           int letterSpacing,
                           int wordSpacing,
                           bool smallCaps,
@@ -85,10 +91,20 @@ class QFontMetrics {
                           bool includePartialGlyphs) const;
 
   QRect boundingRect(QChar) const;
-  QRect boundingRect(const QString&, int len = -1) const;
-  QRect boundingRect(int, int, int, int, int, const QString&) const;
+  QRect boundingRect(const QString&,
+                     int tabWidth,
+                     int xpos,
+                     int len = -1) const;
+  QRect boundingRect(int,
+                     int,
+                     int,
+                     int,
+                     int,
+                     const QString&,
+                     int tabWidth,
+                     int xpos) const;
 
-  QSize size(int, const QString&) const;
+  QSize size(int, const QString&, int tabWidth, int xpos) const;
 
   int baselineOffset() const { return ascent(); }
 
