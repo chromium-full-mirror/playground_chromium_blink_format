@@ -78,7 +78,6 @@ class DeleteSelectionCommand : public CompositeEditCommand {
   DOM::NodeImpl* m_endBlock;
   DOM::NodeImpl* m_startNode;
   DOM::CSSMutableStyleDeclarationImpl* m_typingStyle;
-  DOM::CSSMutableStyleDeclarationImpl* m_deleteIntoBlockquoteStyle;
 };
 
 }  // namespace khtml
