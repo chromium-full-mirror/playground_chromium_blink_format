@@ -633,6 +633,13 @@ bool KHTMLPart::openURL(const KURL& url)
 void KHTMLPart::didExplicitOpen() {
   d->m_bComplete = false;
   d->m_bLoadEventEmitted = false;
+
+  // Prevent window.open(url) -- eg window.open("about:blank") -- from blowing
+  // away results
+  // from a subsequent window.document.open / window.document.write call.
+  // Cancelling redirection here works for all cases because document.open
+  // implicitly precedes document.write.
+  cancelRedirection();
 }
 
 void KHTMLPart::stopLoading(bool sendUnload) {
