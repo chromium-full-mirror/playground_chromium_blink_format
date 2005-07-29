@@ -47,6 +47,7 @@
 #include "khtmlview.h"
 #include "render_canvas.h"
 #include "render_arena.h"
+#include "render_theme.h"
 #include "xml/dom_docimpl.h"
 #include "xml/dom2_eventsimpl.h"
 #include "html/html_blockimpl.h"
@@ -1300,6 +1301,8 @@ void RenderLayer::updateHoverActiveState(RenderObject::NodeInfo& info) {
         if (curr->style()->affectedByHoverRules() ||
             (curr->style()->affectedByActiveRules() && oldActive))
           curr->element()->setChanged();
+        if (curr && curr->style()->hasAppearance())
+          theme()->stateChanged(renderer(), HoverState);
       }
     }
   }
@@ -1315,6 +1318,8 @@ void RenderLayer::updateHoverActiveState(RenderObject::NodeInfo& info) {
           (curr->style()->affectedByActiveRules() &&
            oldActive != info.active()))
         curr->element()->setChanged();
+      if (curr && curr->style()->hasAppearance() && !oldInside)
+        theme()->stateChanged(renderer(), HoverState);
     }
   }
 }
