@@ -64,6 +64,7 @@
 #define LOG(channel, formatAndArgs...) ((void)0)
 #endif
 
+using namespace HTMLNames;
 using namespace khtml;
 
 namespace DOM {
@@ -1428,7 +1429,7 @@ long NodeImpl::maxDeepOffset() const {
   if (offsetInCharacters(nodeType()))
     return static_cast<const TextImpl*>(this)->length();
 
-  if (hasTagName(HTMLTags::br()) || (renderer() && renderer()->isReplaced()))
+  if (hasTagName(brTag) || (renderer() && renderer()->isReplaced()))
     return 1;
 
   return childNodeCount();
@@ -1475,7 +1476,7 @@ ElementImpl* NodeImpl::enclosingBlockFlowOrTableElement() const {
     n = n->parentNode();
     if (!n)
       break;
-    if (n->isBlockFlowOrTable() || n->hasTagName(HTMLTags::body()))
+    if (n->isBlockFlowOrTable() || n->hasTagName(bodyTag))
       return static_cast<ElementImpl*>(n);
   }
   return 0;
@@ -1490,7 +1491,7 @@ ElementImpl* NodeImpl::enclosingBlockFlowElement() const {
     n = n->parentNode();
     if (!n)
       break;
-    if (n->isBlockFlow() || n->hasTagName(HTMLTags::body()))
+    if (n->isBlockFlow() || n->hasTagName(bodyTag))
       return static_cast<ElementImpl*>(n);
   }
   return 0;
@@ -1502,7 +1503,7 @@ ElementImpl* NodeImpl::enclosingInlineElement() const {
 
   while (1) {
     p = n->parentNode();
-    if (!p || p->isBlockFlow() || p->hasTagName(HTMLTags::body()))
+    if (!p || p->isBlockFlow() || p->hasTagName(bodyTag))
       return static_cast<ElementImpl*>(n);
     // Also stop if any previous sibling is a block
     for (NodeImpl* sibling = n->previousSibling(); sibling;
@@ -1521,7 +1522,7 @@ ElementImpl* NodeImpl::rootEditableElement() const {
     return 0;
 
   NodeImpl* n = const_cast<NodeImpl*>(this);
-  if (n->hasTagName(HTMLTags::body()))
+  if (n->hasTagName(bodyTag))
     return static_cast<ElementImpl*>(n);
 
   NodeImpl* result = n->isEditableBlock() ? n : 0;
@@ -1529,7 +1530,7 @@ ElementImpl* NodeImpl::rootEditableElement() const {
     n = n->parentNode();
     if (!n || !n->isContentEditable())
       break;
-    if (n->hasTagName(HTMLTags::body())) {
+    if (n->hasTagName(bodyTag)) {
       result = n;
       break;
     }
@@ -1621,8 +1622,8 @@ void NodeImpl::showNode(const char* prefix) const {
             value.local8Bit().data());
   } else {
     QString attrs = "";
-    appendAttributeDesc(this, attrs, HTMLAttributes::classAttr(), " CLASS=");
-    appendAttributeDesc(this, attrs, HTMLAttributes::style(), " STYLE=");
+    appendAttributeDesc(this, attrs, classAttr, " CLASS=");
+    appendAttributeDesc(this, attrs, styleAttr, " STYLE=");
     fprintf(stderr, "%s%s\t%p%s\n", prefix,
             nodeName().string().local8Bit().data(), this, attrs.ascii());
   }
@@ -1638,7 +1639,7 @@ void NodeImpl::showTreeAndMark(NodeImpl* markedNode1,
                                const char* markedLabel2) const {
   NodeImpl* rootNode;
   NodeImpl* node = (NodeImpl*)this;
-  while (node->parentNode() && !node->hasTagName(HTMLTags::body()))
+  while (node->parentNode() && !node->hasTagName(bodyTag))
     node = node->parentNode();
   rootNode = node;
 
@@ -2573,8 +2574,8 @@ NodeImpl* NameNodeListImpl::item(unsigned long index) const {
 }
 
 bool NameNodeListImpl::nodeMatches(NodeImpl* testNode) const {
-  return static_cast<ElementImpl*>(testNode)->getAttribute(
-             HTMLAttributes::name()) == nodeName;
+  return static_cast<ElementImpl*>(testNode)->getAttribute(nameAttr) ==
+         nodeName;
 }
 
 // ---------------------------------------------------------------------------

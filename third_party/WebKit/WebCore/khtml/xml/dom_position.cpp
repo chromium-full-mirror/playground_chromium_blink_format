@@ -54,6 +54,7 @@
 #define LOG(channel, formatAndArgs...) ((void)0)
 #endif
 
+using namespace HTMLNames;
 using khtml::EAffinity;
 using khtml::InlineBox;
 using khtml::InlineTextBox;
@@ -444,7 +445,7 @@ Position Position::downstream() const {
 
     // stop before going above the body, up into the head
     // return the last visible streamer position
-    if (currentNode->hasTagName(HTMLTags::body()) &&
+    if (currentNode->hasTagName(bodyTag) &&
         currentOffset >= (int)currentNode->childNodeCount())
       break;
 
@@ -706,7 +707,7 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     return false;
 
   if (node() == pos.node()) {
-    if (node()->hasTagName(HTMLTags::br()))
+    if (node()->hasTagName(brTag))
       return false;
 
     if (offset() == pos.offset())
@@ -718,10 +719,10 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
     }
   }
 
-  if (node()->hasTagName(HTMLTags::br()) && pos.inRenderedContent())
+  if (node()->hasTagName(brTag) && pos.inRenderedContent())
     return true;
 
-  if (pos.node()->hasTagName(HTMLTags::br()) && inRenderedContent())
+  if (pos.node()->hasTagName(brTag) && inRenderedContent())
     return true;
 
   if (node()->enclosingBlockFlowElement() !=
@@ -786,7 +787,7 @@ Position Position::leadingWhitespacePosition(
   if (isNull())
     return Position();
 
-  if (upstream().node()->hasTagName(HTMLTags::br()))
+  if (upstream().node()->hasTagName(brTag))
     return Position();
 
   Position prev = previousCharacterPosition(affinity);
@@ -821,7 +822,7 @@ Position Position::trailingWhitespacePosition(
     }
   }
 
-  if (downstream().node()->hasTagName(HTMLTags::br()))
+  if (downstream().node()->hasTagName(brTag))
     return Position();
 
   Position next = nextCharacterPosition(affinity);

@@ -38,6 +38,7 @@
 #include "java/kjavaappletwidget.h"
 #include "html/html_objectimpl.h"
 
+using namespace HTMLNames;
 using namespace khtml;
 using namespace DOM;
 
@@ -103,7 +104,7 @@ void RenderApplet::createWidgetIfNecessary() {
                              paddingTop() - paddingBottom();
       NodeImpl* child = element()->firstChild();
       while (child) {
-        if (child->hasTagName(HTMLTags::param())) {
+        if (child->hasTagName(paramTag)) {
           HTMLParamElementImpl* p = static_cast<HTMLParamElementImpl*>(child);
           m_args.insert(p->name().string(), p->value().string());
         }

@@ -264,7 +264,7 @@ HTMLElementImpl* headingConstructor(const AtomicString& tagName,
                                     HTMLFormElementImpl* form,
                                     bool createdByParser) {
   return new HTMLHeadingElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 
 HTMLElementImpl* hrConstructor(const AtomicString& tagName,
@@ -286,7 +286,7 @@ HTMLElementImpl* preConstructor(const AtomicString& tagName,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLPreElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 
 HTMLElementImpl* basefontConstructor(const AtomicString& tagName,
@@ -308,7 +308,7 @@ HTMLElementImpl* modConstructor(const AtomicString& tagName,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLModElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 
 HTMLElementImpl* anchorConstructor(const AtomicString& tagName,
@@ -402,7 +402,7 @@ HTMLElementImpl* tableColConstructor(const AtomicString& tagName,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLTableColElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 
 HTMLElementImpl* tableRowConstructor(const AtomicString& tagName,
@@ -417,7 +417,7 @@ HTMLElementImpl* tableCellConstructor(const AtomicString& tagName,
                                       HTMLFormElementImpl* form,
                                       bool createdByParser) {
   return new HTMLTableCellElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 
 HTMLElementImpl* tableSectionConstructor(const AtomicString& tagName,
@@ -425,8 +425,7 @@ HTMLElementImpl* tableSectionConstructor(const AtomicString& tagName,
                                          HTMLFormElementImpl* form,
                                          bool createdByParser) {
   return new HTMLTableSectionElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr,
-      false);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr, false);
 }
 
 HTMLElementImpl* brConstructor(const AtomicString& tagName,
@@ -464,139 +463,139 @@ HTMLElementImpl* HTMLElementFactory::createHTMLElement(
     gFunctionMap = new FunctionMap;
 
     // Populate it with constructor functions.
-    gFunctionMap->insert(HTMLTags::html().localName().implementation(),
+    gFunctionMap->insert(htmlTag.localName().implementation(),
                          (void*)&htmlConstructor);
-    gFunctionMap->insert(HTMLTags::head().localName().implementation(),
+    gFunctionMap->insert(headTag.localName().implementation(),
                          (void*)&headConstructor);
-    gFunctionMap->insert(HTMLTags::body().localName().implementation(),
+    gFunctionMap->insert(bodyTag.localName().implementation(),
                          (void*)&bodyConstructor);
-    gFunctionMap->insert(HTMLTags::base().localName().implementation(),
+    gFunctionMap->insert(baseTag.localName().implementation(),
                          (void*)&baseConstructor);
-    gFunctionMap->insert(HTMLTags::link().localName().implementation(),
+    gFunctionMap->insert(linkTag.localName().implementation(),
                          (void*)&linkConstructor);
-    gFunctionMap->insert(HTMLTags::meta().localName().implementation(),
+    gFunctionMap->insert(metaTag.localName().implementation(),
                          (void*)&metaConstructor);
-    gFunctionMap->insert(HTMLTags::style().localName().implementation(),
+    gFunctionMap->insert(styleTag.localName().implementation(),
                          (void*)&styleConstructor);
-    gFunctionMap->insert(HTMLTags::title().localName().implementation(),
+    gFunctionMap->insert(titleTag.localName().implementation(),
                          (void*)&titleConstructor);
-    gFunctionMap->insert(HTMLTags::frame().localName().implementation(),
+    gFunctionMap->insert(frameTag.localName().implementation(),
                          (void*)&frameConstructor);
-    gFunctionMap->insert(HTMLTags::frameset().localName().implementation(),
+    gFunctionMap->insert(framesetTag.localName().implementation(),
                          (void*)&framesetConstructor);
-    gFunctionMap->insert(HTMLTags::iframe().localName().implementation(),
+    gFunctionMap->insert(iframeTag.localName().implementation(),
                          (void*)&iframeConstructor);
-    gFunctionMap->insert(HTMLTags::form().localName().implementation(),
+    gFunctionMap->insert(formTag.localName().implementation(),
                          (void*)&formConstructor);
-    gFunctionMap->insert(HTMLTags::button().localName().implementation(),
+    gFunctionMap->insert(buttonTag.localName().implementation(),
                          (void*)&buttonConstructor);
-    gFunctionMap->insert(HTMLTags::input().localName().implementation(),
+    gFunctionMap->insert(inputTag.localName().implementation(),
                          (void*)&inputConstructor);
-    gFunctionMap->insert(HTMLTags::isindex().localName().implementation(),
+    gFunctionMap->insert(isindexTag.localName().implementation(),
                          (void*)&isindexConstructor);
-    gFunctionMap->insert(HTMLTags::fieldset().localName().implementation(),
+    gFunctionMap->insert(fieldsetTag.localName().implementation(),
                          (void*)&fieldsetConstructor);
-    gFunctionMap->insert(HTMLTags::label().localName().implementation(),
+    gFunctionMap->insert(labelTag.localName().implementation(),
                          (void*)&labelConstructor);
-    gFunctionMap->insert(HTMLTags::legend().localName().implementation(),
+    gFunctionMap->insert(legendTag.localName().implementation(),
                          (void*)&legendConstructor);
-    gFunctionMap->insert(HTMLTags::optgroup().localName().implementation(),
+    gFunctionMap->insert(optgroupTag.localName().implementation(),
                          (void*)&optgroupConstructor);
-    gFunctionMap->insert(HTMLTags::option().localName().implementation(),
+    gFunctionMap->insert(optionTag.localName().implementation(),
                          (void*)&optionConstructor);
-    gFunctionMap->insert(HTMLTags::select().localName().implementation(),
+    gFunctionMap->insert(selectTag.localName().implementation(),
                          (void*)&selectConstructor);
-    gFunctionMap->insert(HTMLTags::textarea().localName().implementation(),
+    gFunctionMap->insert(textareaTag.localName().implementation(),
                          (void*)&textareaConstructor);
-    gFunctionMap->insert(HTMLTags::dl().localName().implementation(),
+    gFunctionMap->insert(dlTag.localName().implementation(),
                          (void*)&dlConstructor);
-    gFunctionMap->insert(HTMLTags::ol().localName().implementation(),
+    gFunctionMap->insert(olTag.localName().implementation(),
                          (void*)&olConstructor);
-    gFunctionMap->insert(HTMLTags::ul().localName().implementation(),
+    gFunctionMap->insert(ulTag.localName().implementation(),
                          (void*)&ulConstructor);
-    gFunctionMap->insert(HTMLTags::dir().localName().implementation(),
+    gFunctionMap->insert(dirTag.localName().implementation(),
                          (void*)&dirConstructor);
-    gFunctionMap->insert(HTMLTags::menu().localName().implementation(),
+    gFunctionMap->insert(menuTag.localName().implementation(),
                          (void*)&menuConstructor);
-    gFunctionMap->insert(HTMLTags::li().localName().implementation(),
+    gFunctionMap->insert(liTag.localName().implementation(),
                          (void*)&liConstructor);
-    gFunctionMap->insert(HTMLTags::blockquote().localName().implementation(),
+    gFunctionMap->insert(blockquoteTag.localName().implementation(),
                          (void*)&blockquoteConstructor);
-    gFunctionMap->insert(HTMLTags::div().localName().implementation(),
+    gFunctionMap->insert(divTag.localName().implementation(),
                          (void*)&divConstructor);
-    gFunctionMap->insert(HTMLTags::h1().localName().implementation(),
+    gFunctionMap->insert(h1Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::h2().localName().implementation(),
+    gFunctionMap->insert(h2Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::h3().localName().implementation(),
+    gFunctionMap->insert(h3Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::h4().localName().implementation(),
+    gFunctionMap->insert(h4Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::h5().localName().implementation(),
+    gFunctionMap->insert(h5Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::h6().localName().implementation(),
+    gFunctionMap->insert(h6Tag.localName().implementation(),
                          (void*)&headingConstructor);
-    gFunctionMap->insert(HTMLTags::hr().localName().implementation(),
+    gFunctionMap->insert(hrTag.localName().implementation(),
                          (void*)&hrConstructor);
-    gFunctionMap->insert(HTMLTags::p().localName().implementation(),
+    gFunctionMap->insert(pTag.localName().implementation(),
                          (void*)&paragraphConstructor);
-    gFunctionMap->insert(HTMLTags::pre().localName().implementation(),
+    gFunctionMap->insert(preTag.localName().implementation(),
                          (void*)&preConstructor);
-    gFunctionMap->insert(HTMLTags::xmp().localName().implementation(),
+    gFunctionMap->insert(xmpTag.localName().implementation(),
                          (void*)&preConstructor);
-    gFunctionMap->insert(HTMLTags::basefont().localName().implementation(),
+    gFunctionMap->insert(basefontTag.localName().implementation(),
                          (void*)&basefontConstructor);
-    gFunctionMap->insert(HTMLTags::font().localName().implementation(),
+    gFunctionMap->insert(fontTag.localName().implementation(),
                          (void*)&fontConstructor);
-    gFunctionMap->insert(HTMLTags::del().localName().implementation(),
+    gFunctionMap->insert(delTag.localName().implementation(),
                          (void*)&modConstructor);
-    gFunctionMap->insert(HTMLTags::ins().localName().implementation(),
+    gFunctionMap->insert(insTag.localName().implementation(),
                          (void*)&modConstructor);
-    gFunctionMap->insert(HTMLTags::a().localName().implementation(),
+    gFunctionMap->insert(aTag.localName().implementation(),
                          (void*)&anchorConstructor);
-    gFunctionMap->insert(HTMLTags::img().localName().implementation(),
+    gFunctionMap->insert(imgTag.localName().implementation(),
                          (void*)&imageConstructor);
-    gFunctionMap->insert(HTMLTags::map().localName().implementation(),
+    gFunctionMap->insert(mapTag.localName().implementation(),
                          (void*)&mapConstructor);
-    gFunctionMap->insert(HTMLTags::area().localName().implementation(),
+    gFunctionMap->insert(areaTag.localName().implementation(),
                          (void*)&areaConstructor);
-    gFunctionMap->insert(HTMLTags::canvas().localName().implementation(),
+    gFunctionMap->insert(canvasTag.localName().implementation(),
                          (void*)&canvasConstructor);
-    gFunctionMap->insert(HTMLTags::applet().localName().implementation(),
+    gFunctionMap->insert(appletTag.localName().implementation(),
                          (void*)&appletConstructor);
-    gFunctionMap->insert(HTMLTags::embed().localName().implementation(),
+    gFunctionMap->insert(embedTag.localName().implementation(),
                          (void*)&embedConstructor);
-    gFunctionMap->insert(HTMLTags::object().localName().implementation(),
+    gFunctionMap->insert(objectTag.localName().implementation(),
                          (void*)&objectConstructor);
-    gFunctionMap->insert(HTMLTags::param().localName().implementation(),
+    gFunctionMap->insert(paramTag.localName().implementation(),
                          (void*)&paramConstructor);
-    gFunctionMap->insert(HTMLTags::script().localName().implementation(),
+    gFunctionMap->insert(scriptTag.localName().implementation(),
                          (void*)&scriptConstructor);
-    gFunctionMap->insert(HTMLTags::table().localName().implementation(),
+    gFunctionMap->insert(tableTag.localName().implementation(),
                          (void*)&tableConstructor);
-    gFunctionMap->insert(HTMLTags::caption().localName().implementation(),
+    gFunctionMap->insert(captionTag.localName().implementation(),
                          (void*)&tableCaptionConstructor);
-    gFunctionMap->insert(HTMLTags::colgroup().localName().implementation(),
+    gFunctionMap->insert(colgroupTag.localName().implementation(),
                          (void*)&tableColConstructor);
-    gFunctionMap->insert(HTMLTags::col().localName().implementation(),
+    gFunctionMap->insert(colTag.localName().implementation(),
                          (void*)&tableColConstructor);
-    gFunctionMap->insert(HTMLTags::tr().localName().implementation(),
+    gFunctionMap->insert(trTag.localName().implementation(),
                          (void*)&tableRowConstructor);
-    gFunctionMap->insert(HTMLTags::td().localName().implementation(),
+    gFunctionMap->insert(tdTag.localName().implementation(),
                          (void*)&tableCellConstructor);
-    gFunctionMap->insert(HTMLTags::th().localName().implementation(),
+    gFunctionMap->insert(thTag.localName().implementation(),
                          (void*)&tableCellConstructor);
-    gFunctionMap->insert(HTMLTags::thead().localName().implementation(),
+    gFunctionMap->insert(theadTag.localName().implementation(),
                          (void*)&tableSectionConstructor);
-    gFunctionMap->insert(HTMLTags::tbody().localName().implementation(),
+    gFunctionMap->insert(tbodyTag.localName().implementation(),
                          (void*)&tableSectionConstructor);
-    gFunctionMap->insert(HTMLTags::tfoot().localName().implementation(),
+    gFunctionMap->insert(tfootTag.localName().implementation(),
                          (void*)&tableSectionConstructor);
-    gFunctionMap->insert(HTMLTags::br().localName().implementation(),
+    gFunctionMap->insert(brTag.localName().implementation(),
                          (void*)&brConstructor);
-    gFunctionMap->insert(HTMLTags::q().localName().implementation(),
+    gFunctionMap->insert(qTag.localName().implementation(),
                          (void*)&quoteConstructor);
-    gFunctionMap->insert(HTMLTags::marquee().localName().implementation(),
+    gFunctionMap->insert(marqueeTag.localName().implementation(),
                          (void*)&marqueeConstructor);
   }
 
@@ -608,6 +607,6 @@ HTMLElementImpl* HTMLElementFactory::createHTMLElement(
 
   // elements with no special representation in the DOM
   return new HTMLElementImpl(
-      QualifiedName(nullAtom, tagName, HTMLTags::xhtmlNamespaceURI()), docPtr);
+      QualifiedName(nullAtom, tagName, xhtmlNamespaceURI), docPtr);
 }
 }

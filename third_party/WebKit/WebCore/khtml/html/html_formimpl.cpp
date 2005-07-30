@@ -63,6 +63,7 @@
 
 #include <assert.h>
 
+using namespace HTMLNames;
 using namespace khtml;
 
 namespace DOM {
@@ -111,7 +112,7 @@ class FormDataList {
 };
 
 HTMLFormElementImpl::HTMLFormElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLTags::form(), doc) {
+    : HTMLElementImpl(formTag, doc) {
   collectionInfo = 0;
   m_post = false;
   m_multipart = false;
@@ -191,7 +192,7 @@ long HTMLFormElementImpl::length() const {
 void HTMLFormElementImpl::submitClick() {
   bool submitFound = false;
   for (unsigned i = 0; i < formElements.count(); ++i) {
-    if (formElements[i]->hasLocalName(HTMLTags::input())) {
+    if (formElements[i]->hasLocalName(inputTag)) {
       HTMLInputElementImpl* element =
           static_cast<HTMLInputElementImpl*>(formElements[i]);
       if (element->isSuccessfulSubmitButton() && element->renderer()) {
@@ -387,7 +388,7 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
 
           // if the current type is FILE, then we also need to
           // include the filename
-          if (current->hasLocalName(HTMLTags::input()) &&
+          if (current->hasLocalName(inputTag) &&
               static_cast<HTMLInputElementImpl*>(current)->inputType() ==
                   HTMLInputElementImpl::FILE) {
             QString path =
@@ -535,7 +536,7 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
     // autocomplete,
     // so we are more lenient in pushing values, and let the app decide what to
     // save when.
-    if (current->hasLocalName(HTMLTags::input())) {
+    if (current->hasLocalName(inputTag)) {
       HTMLInputElementImpl* input = static_cast<HTMLInputElementImpl*>(current);
       if (input->inputType() == HTMLInputElementImpl::TEXT ||
           input->inputType() == HTMLInputElementImpl::PASSWORD ||
@@ -615,7 +616,7 @@ void HTMLFormElementImpl::reset() {
 }
 
 void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::action())
+  if (attr->name() == actionAttr)
 #if APPLE_CHANGES
   {
     bool oldURLWasSecure = formWouldHaveSecureSubmission(m_url);
@@ -631,32 +632,32 @@ void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
         getDocument()->secureFormRemoved();
   }
 #endif
-  else if (attr->name() == HTMLAttributes::target()) {
+  else if (attr->name() == targetAttr) {
     m_target = attr->value();
-  } else if (attr->name() == HTMLAttributes::method()) {
+  } else if (attr->name() == methodAttr) {
     if (strcasecmp(attr->value(), "post") == 0)
       m_post = true;
     else if (strcasecmp(attr->value(), "get") == 0)
       m_post = false;
-  } else if (attr->name() == HTMLAttributes::enctype()) {
+  } else if (attr->name() == enctypeAttr) {
     parseEnctype(attr->value());
-  } else if (attr->name() == HTMLAttributes::accept_charset()) {
+  } else if (attr->name() == accept_charsetAttr) {
     // space separated list of charsets the server
     // accepts - see rfc2045
     m_acceptcharset = attr->value();
-  } else if (attr->name() == HTMLAttributes::accept()) {
+  } else if (attr->name() == acceptAttr) {
     // ignore this one for the moment...
-  } else if (attr->name() == HTMLAttributes::autocomplete()) {
+  } else if (attr->name() == autocompleteAttr) {
     m_autocomplete = strcasecmp(attr->value(), "off");
-  } else if (attr->name() == HTMLAttributes::onsubmit()) {
+  } else if (attr->name() == onsubmitAttr) {
     setHTMLEventListener(
         EventImpl::SUBMIT_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onreset()) {
+  } else if (attr->name() == onresetAttr) {
     setHTMLEventListener(
         EventImpl::RESET_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::name()) {
+  } else if (attr->name() == nameAttr) {
     DOMString newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
       HTMLDocumentImpl* document =
@@ -672,7 +673,7 @@ void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 void HTMLFormElementImpl::radioClicked(HTMLGenericFormElementImpl* caller) {
   for (unsigned i = 0; i < formElements.count(); ++i) {
     HTMLGenericFormElementImpl* current = formElements[i];
-    if (current->hasLocalName(HTMLTags::input()) &&
+    if (current->hasLocalName(inputTag) &&
         static_cast<HTMLInputElementImpl*>(current)->inputType() ==
             HTMLInputElementImpl::RADIO &&
         current != caller && current->form() == caller->form() &&
@@ -750,7 +751,7 @@ void HTMLFormElementImpl::makeFormElementDormant(
 }
 
 bool HTMLFormElementImpl::isURLAttribute(AttributeImpl* attr) const {
-  return attr->name() == HTMLAttributes::action();
+  return attr->name() == actionAttr;
 }
 
 void HTMLFormElementImpl::registerImgElement(HTMLImageElementImpl* e) {
@@ -766,47 +767,47 @@ SharedPtr<HTMLCollectionImpl> HTMLFormElementImpl::elements() {
 }
 
 DOMString HTMLFormElementImpl::name() const {
-  return getAttribute(HTMLAttributes::name());
+  return getAttribute(nameAttr);
 }
 
 void HTMLFormElementImpl::setName(const DOMString& value) {
-  setAttribute(HTMLAttributes::name(), value);
+  setAttribute(nameAttr, value);
 }
 
 DOMString HTMLFormElementImpl::acceptCharset() const {
-  return getAttribute(HTMLAttributes::accept_charset());
+  return getAttribute(accept_charsetAttr);
 }
 
 void HTMLFormElementImpl::setAcceptCharset(const DOMString& value) {
-  setAttribute(HTMLAttributes::accept_charset(), value);
+  setAttribute(accept_charsetAttr, value);
 }
 
 DOMString HTMLFormElementImpl::action() const {
-  return getAttribute(HTMLAttributes::action());
+  return getAttribute(actionAttr);
 }
 
 void HTMLFormElementImpl::setAction(const DOMString& value) {
-  setAttribute(HTMLAttributes::action(), value);
+  setAttribute(actionAttr, value);
 }
 
 void HTMLFormElementImpl::setEnctype(const DOMString& value) {
-  setAttribute(HTMLAttributes::enctype(), value);
+  setAttribute(enctypeAttr, value);
 }
 
 DOMString HTMLFormElementImpl::method() const {
-  return getAttribute(HTMLAttributes::method());
+  return getAttribute(methodAttr);
 }
 
 void HTMLFormElementImpl::setMethod(const DOMString& value) {
-  setAttribute(HTMLAttributes::method(), value);
+  setAttribute(methodAttr, value);
 }
 
 DOMString HTMLFormElementImpl::target() const {
-  return getAttribute(HTMLAttributes::target());
+  return getAttribute(targetAttr);
 }
 
 void HTMLFormElementImpl::setTarget(const DOMString& value) {
-  setAttribute(HTMLAttributes::target(), value);
+  setAttribute(targetAttr, value);
 }
 
 // -------------------------------------------------------------------------
@@ -834,9 +835,9 @@ HTMLGenericFormElementImpl::~HTMLGenericFormElementImpl() {
 
 void HTMLGenericFormElementImpl::parseMappedAttribute(
     MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::name()) {
+  if (attr->name() == nameAttr) {
     // Do nothing.
-  } else if (attr->name() == HTMLAttributes::disabled()) {
+  } else if (attr->name() == disabledAttr) {
     bool oldDisabled = m_disabled;
     m_disabled = !attr->isNull();
     if (oldDisabled != m_disabled) {
@@ -844,7 +845,7 @@ void HTMLGenericFormElementImpl::parseMappedAttribute(
       if (renderer() && renderer()->style()->hasAppearance())
         theme()->stateChanged(renderer(), EnabledState);
     }
-  } else if (attr->name() == HTMLAttributes::readonly()) {
+  } else if (attr->name() == readonlyAttr) {
     bool oldReadOnly = m_readOnly;
     m_readOnly = !attr->isNull();
     if (oldReadOnly != m_readOnly)
@@ -913,7 +914,7 @@ void HTMLGenericFormElementImpl::removedFromDocument() {
 HTMLFormElementImpl* HTMLGenericFormElementImpl::getForm() const {
   NodeImpl* p = parentNode();
   while (p) {
-    if (p->hasTagName(HTMLTags::form()))
+    if (p->hasTagName(formTag))
       return static_cast<HTMLFormElementImpl*>(p);
     p = p->parentNode();
   }
@@ -927,12 +928,12 @@ DOMString HTMLGenericFormElementImpl::name() const {
   if (!m_overrideName.isNull())
     return m_overrideName;
 
-  DOMString n = getAttribute(HTMLAttributes::name());
+  DOMString n = getAttribute(nameAttr);
   return n.isNull() ? "" : n;
 }
 
 void HTMLGenericFormElementImpl::setName(const DOMString& value) {
-  setAttribute(HTMLAttributes::name(), value);
+  setAttribute(nameAttr, value);
 }
 
 void HTMLGenericFormElementImpl::setOverrideName(const DOMString& value) {
@@ -954,11 +955,11 @@ bool HTMLGenericFormElementImpl::disabled() const {
 }
 
 void HTMLGenericFormElementImpl::setDisabled(bool b) {
-  setAttribute(HTMLAttributes::disabled(), b ? "" : 0);
+  setAttribute(disabledAttr, b ? "" : 0);
 }
 
 void HTMLGenericFormElementImpl::setReadOnly(bool b) {
-  setAttribute(HTMLAttributes::readonly(), b ? "" : 0);
+  setAttribute(readonlyAttr, b ? "" : 0);
 }
 
 void HTMLGenericFormElementImpl::recalcStyle(StyleChange ch) {
@@ -1115,18 +1116,18 @@ QString HTMLGenericFormElementImpl::findMatchingState(QStringList& states) {
 }
 
 long HTMLGenericFormElementImpl::tabIndex() const {
-  return getAttribute(HTMLAttributes::tabindex()).toInt();
+  return getAttribute(tabindexAttr).toInt();
 }
 
 void HTMLGenericFormElementImpl::setTabIndex(long value) {
-  setAttribute(HTMLAttributes::tabindex(), QString::number(value));
+  setAttribute(tabindexAttr, QString::number(value));
 }
 
 // -------------------------------------------------------------------------
 
 HTMLButtonElementImpl::HTMLButtonElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::button(), doc, f) {
+    : HTMLGenericFormElementImpl(buttonTag, doc, f) {
   m_type = SUBMIT;
   m_dirty = true;
   m_activeSubmit = false;
@@ -1135,7 +1136,7 @@ HTMLButtonElementImpl::HTMLButtonElementImpl(DocumentPtr* doc,
 HTMLButtonElementImpl::~HTMLButtonElementImpl() {}
 
 DOMString HTMLButtonElementImpl::type() const {
-  return getAttribute(HTMLAttributes::type());
+  return getAttribute(typeAttr);
 }
 
 void HTMLButtonElementImpl::blur() {
@@ -1148,23 +1149,23 @@ void HTMLButtonElementImpl::focus() {
 }
 
 void HTMLButtonElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::type()) {
+  if (attr->name() == typeAttr) {
     if (strcasecmp(attr->value(), "submit") == 0)
       m_type = SUBMIT;
     else if (strcasecmp(attr->value(), "reset") == 0)
       m_type = RESET;
     else if (strcasecmp(attr->value(), "button") == 0)
       m_type = BUTTON;
-  } else if (attr->name() == HTMLAttributes::value()) {
+  } else if (attr->name() == valueAttr) {
     m_value = attr->value();
     m_currValue = m_value;
-  } else if (attr->name() == HTMLAttributes::accesskey()) {
+  } else if (attr->name() == accesskeyAttr) {
     // Do nothing.
-  } else if (attr->name() == HTMLAttributes::onfocus()) {
+  } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onblur()) {
+  } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
@@ -1219,32 +1220,31 @@ void HTMLButtonElementImpl::accessKeyAction(bool sendToAnyElement) {
 }
 
 DOMString HTMLButtonElementImpl::accessKey() const {
-  return getAttribute(HTMLAttributes::accesskey());
+  return getAttribute(accesskeyAttr);
 }
 
 void HTMLButtonElementImpl::setAccessKey(const DOMString& value) {
-  setAttribute(HTMLAttributes::accesskey(), value);
+  setAttribute(accesskeyAttr, value);
 }
 
 DOMString HTMLButtonElementImpl::value() const {
-  return getAttribute(HTMLAttributes::value());
+  return getAttribute(valueAttr);
 }
 
 void HTMLButtonElementImpl::setValue(const DOMString& value) {
-  setAttribute(HTMLAttributes::value(), value);
+  setAttribute(valueAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
 HTMLFieldSetElementImpl::HTMLFieldSetElementImpl(DocumentPtr* doc,
                                                  HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::fieldset(), doc, f) {}
+    : HTMLGenericFormElementImpl(fieldsetTag, doc, f) {}
 
 HTMLFieldSetElementImpl::~HTMLFieldSetElementImpl() {}
 
 bool HTMLFieldSetElementImpl::checkDTD(const NodeImpl* newChild) {
-  return newChild->hasTagName(HTMLTags::legend()) ||
-         HTMLElementImpl::checkDTD(newChild);
+  return newChild->hasTagName(legendTag) || HTMLElementImpl::checkDTD(newChild);
 }
 
 bool HTMLFieldSetElementImpl::isFocusable() const {
@@ -1264,7 +1264,7 @@ RenderObject* HTMLFieldSetElementImpl::createRenderer(RenderArena* arena,
 
 HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
                                            HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::input(), doc, f) {
+    : HTMLGenericFormElementImpl(inputTag, doc, f) {
   init();
 }
 
@@ -1345,7 +1345,7 @@ void HTMLInputElementImpl::setType(const DOMString& t) {
     if (newType == FILE && m_haveType) {
       // Set the attribute back to the old value.
       // Useful in case we were called from inside parseMappedAttribute.
-      setAttribute(HTMLAttributes::type(), type());
+      setAttribute(typeAttr, type());
     } else {
       bool wasAttached = m_attached;
       if (wasAttached)
@@ -1354,11 +1354,11 @@ void HTMLInputElementImpl::setType(const DOMString& t) {
       m_type = newType;
       bool willStoreValue = storesValueSeparateFromAttribute();
       if (didStoreValue && !willStoreValue && !m_value.isNull()) {
-        setAttribute(HTMLAttributes::value(), m_value);
+        setAttribute(valueAttr, m_value);
         m_value = DOMString();
       }
       if (!didStoreValue && willStoreValue) {
-        m_value = getAttribute(HTMLAttributes::value());
+        m_value = getAttribute(valueAttr);
       }
       if (wasAttached)
         attach();
@@ -1649,15 +1649,13 @@ void HTMLInputElementImpl::accessKeyAction(bool sendToAnyElement) {
 
 bool HTMLInputElementImpl::mapToEntry(const QualifiedName& attrName,
                                       MappedAttributeEntry& result) const {
-  if (attrName == HTMLAttributes::width() ||
-      attrName == HTMLAttributes::height() ||
-      attrName == HTMLAttributes::vspace() ||
-      attrName == HTMLAttributes::hspace()) {
+  if (attrName == widthAttr || attrName == heightAttr ||
+      attrName == vspaceAttr || attrName == hspaceAttr) {
     result = eUniversal;
     return false;
   }
 
-  if (attrName == HTMLAttributes::align()) {
+  if (attrName == alignAttr) {
     result = eReplaced;  // Share with <img> since the alignment behavior is the
                          // same.
     return false;
@@ -1667,72 +1665,71 @@ bool HTMLInputElementImpl::mapToEntry(const QualifiedName& attrName,
 }
 
 void HTMLInputElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::autocomplete()) {
+  if (attr->name() == autocompleteAttr) {
     m_autocomplete = strcasecmp(attr->value(), "off");
-  } else if (attr->name() == HTMLAttributes::type()) {
+  } else if (attr->name() == typeAttr) {
     setType(attr->value());
     if (m_type != IMAGE && m_imageLoader) {
       delete m_imageLoader;
       m_imageLoader = 0;
     }
-  } else if (attr->name() == HTMLAttributes::value()) {
+  } else if (attr->name() == valueAttr) {
     // We only need to setChanged if the form is looking at the default value
     // right now.
     if (m_value.isNull())
       setChanged();
     m_valueMatchesRenderer = false;
-  } else if (attr->name() == HTMLAttributes::checked()) {
+  } else if (attr->name() == checkedAttr) {
     m_defaultChecked = !attr->isNull();
     if (m_useDefaultChecked) {
       setChecked(m_defaultChecked);
       m_useDefaultChecked = true;
     }
-  } else if (attr->name() == HTMLAttributes::maxlength()) {
+  } else if (attr->name() == maxlengthAttr) {
     m_maxLen = !attr->isNull() ? attr->value().toInt() : -1;
     setChanged();
-  } else if (attr->name() == HTMLAttributes::size()) {
+  } else if (attr->name() == sizeAttr) {
     m_size = !attr->isNull() ? attr->value().toInt() : 20;
-  } else if (attr->name() == HTMLAttributes::alt()) {
+  } else if (attr->name() == altAttr) {
     if (m_render && m_type == IMAGE)
       static_cast<RenderImage*>(m_render)->updateAltText();
-  } else if (attr->name() == HTMLAttributes::src()) {
+  } else if (attr->name() == srcAttr) {
     if (m_render && m_type == IMAGE) {
       if (!m_imageLoader)
         m_imageLoader = new HTMLImageLoader(this);
       m_imageLoader->updateFromElement();
     }
-  } else if (attr->name() == HTMLAttributes::usemap() ||
-             attr->name() == HTMLAttributes::accesskey()) {
+  } else if (attr->name() == usemapAttr || attr->name() == accesskeyAttr) {
     // FIXME: ignore for the moment
-  } else if (attr->name() == HTMLAttributes::vspace()) {
+  } else if (attr->name() == vspaceAttr) {
     addCSSLength(attr, CSS_PROP_MARGIN_TOP, attr->value());
     addCSSLength(attr, CSS_PROP_MARGIN_BOTTOM, attr->value());
-  } else if (attr->name() == HTMLAttributes::hspace()) {
+  } else if (attr->name() == hspaceAttr) {
     addCSSLength(attr, CSS_PROP_MARGIN_LEFT, attr->value());
     addCSSLength(attr, CSS_PROP_MARGIN_RIGHT, attr->value());
-  } else if (attr->name() == HTMLAttributes::align()) {
+  } else if (attr->name() == alignAttr) {
     addHTMLAlignment(attr);
-  } else if (attr->name() == HTMLAttributes::width()) {
+  } else if (attr->name() == widthAttr) {
     addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
-  } else if (attr->name() == HTMLAttributes::height()) {
+  } else if (attr->name() == heightAttr) {
     addCSSLength(attr, CSS_PROP_HEIGHT, attr->value());
-  } else if (attr->name() == HTMLAttributes::onfocus()) {
+  } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onblur()) {
+  } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onselect()) {
+  } else if (attr->name() == onselectAttr) {
     setHTMLEventListener(
         EventImpl::SELECT_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onchange()) {
+  } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::oninput()) {
+  } else if (attr->name() == oninputAttr) {
     setHTMLEventListener(
         EventImpl::INPUT_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
@@ -1740,19 +1737,16 @@ void HTMLInputElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   // Search field and slider attributes all just cause updateFromElement to be
   // called through style
   // recalcing.
-  else if (attr->name() == HTMLAttributes::onsearch()) {
+  else if (attr->name() == onsearchAttr) {
     setHTMLEventListener(
         EventImpl::SEARCH_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::results()) {
+  } else if (attr->name() == resultsAttr) {
     m_maxResults = !attr->isNull() ? attr->value().toInt() : -1;
     setChanged();
-  } else if (attr->name() == HTMLAttributes::autosave() ||
-             attr->name() == HTMLAttributes::incremental() ||
-             attr->name() == HTMLAttributes::placeholder() ||
-             attr->name() == HTMLAttributes::min() ||
-             attr->name() == HTMLAttributes::max() ||
-             attr->name() == HTMLAttributes::precision()) {
+  } else if (attr->name() == autosaveAttr || attr->name() == incrementalAttr ||
+             attr->name() == placeholderAttr || attr->name() == minAttr ||
+             attr->name() == maxAttr || attr->name() == precisionAttr) {
     setChanged();
   } else
     HTMLGenericFormElementImpl::parseMappedAttribute(attr);
@@ -1823,11 +1817,11 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
 void HTMLInputElementImpl::attach() {
   if (!m_inited) {
     if (!m_haveType)
-      setType(getAttribute(HTMLAttributes::type()));
+      setType(getAttribute(typeAttr));
 
     // FIXME: This needs to be dynamic, doesn't it, since someone could set this
     // after attachment?
-    DOMString val = getAttribute(HTMLAttributes::value());
+    DOMString val = getAttribute(valueAttr);
     if ((uint)m_type <= ISINDEX && !val.isEmpty()) {
       // remove newline stuff..
       QString nvalue;
@@ -1836,10 +1830,10 @@ void HTMLInputElementImpl::attach() {
           nvalue += val[i];
 
       if (val.length() != nvalue.length())
-        setAttribute(HTMLAttributes::value(), nvalue);
+        setAttribute(valueAttr, nvalue);
     }
 
-    m_defaultChecked = (!getAttribute(HTMLAttributes::checked()).isNull());
+    m_defaultChecked = (!getAttribute(checkedAttr).isNull());
 
     m_inited = true;
   }
@@ -1849,9 +1843,9 @@ void HTMLInputElementImpl::attach() {
   // that aren't
   // images or hidden.
   if (hasMappedAttributes() && m_type != HIDDEN && m_type != IMAGE &&
-      !getAttribute(HTMLAttributes::width()).isEmpty()) {
+      !getAttribute(widthAttr).isEmpty()) {
     int excCode;
-    removeAttribute(HTMLAttributes::width(), excCode);
+    removeAttribute(widthAttr, excCode);
   }
 
   HTMLGenericFormElementImpl::attach();
@@ -1884,12 +1878,12 @@ DOMString HTMLInputElementImpl::altText() const {
   // http://www.w3.org/TR/1998/REC-html40-19980424/appendix/notes.html#altgen
   // also heavily discussed by Hixie on bugzilla
   // note this is intentionally different to HTMLImageElementImpl::altText()
-  DOMString alt = getAttribute(HTMLAttributes::alt());
+  DOMString alt = getAttribute(altAttr);
   // fall back to title attribute
   if (alt.isNull())
-    alt = getAttribute(HTMLAttributes::title());
+    alt = getAttribute(titleAttr);
   if (alt.isNull())
-    alt = getAttribute(HTMLAttributes::value());
+    alt = getAttribute(valueAttr);
   if (alt.isEmpty())
 #if APPLE_CHANGES
     alt = inputElementAltText();
@@ -2066,7 +2060,7 @@ DOMString HTMLInputElementImpl::value() const {
   // the
   // value attribute in markup.
   if (value.isNull() && m_type != FILE)
-    value = getAttribute(HTMLAttributes::value());
+    value = getAttribute(valueAttr);
 
   // If no attribute exists, then just use "on" or "" based off the checked()
   // state of the control.
@@ -2126,7 +2120,7 @@ void HTMLInputElementImpl::setValue(const DOMString& value) {
       m_render->updateFromElement();
     setChanged();
   } else {
-    setAttribute(HTMLAttributes::value(), value);
+    setAttribute(valueAttr, value);
   }
 }
 
@@ -2292,85 +2286,85 @@ bool HTMLInputElementImpl::isEditable() {
 }
 
 bool HTMLInputElementImpl::isURLAttribute(AttributeImpl* attr) const {
-  return (attr->name() == HTMLAttributes::src());
+  return (attr->name() == srcAttr);
 }
 
 DOMString HTMLInputElementImpl::defaultValue() const {
-  return getAttribute(HTMLAttributes::value());
+  return getAttribute(valueAttr);
 }
 
 void HTMLInputElementImpl::setDefaultValue(const DOMString& value) {
-  setAttribute(HTMLAttributes::value(), value);
+  setAttribute(valueAttr, value);
 }
 
 bool HTMLInputElementImpl::defaultChecked() const {
-  return !getAttribute(HTMLAttributes::checked()).isNull();
+  return !getAttribute(checkedAttr).isNull();
 }
 
 void HTMLInputElementImpl::setDefaultChecked(bool defaultChecked) {
-  setAttribute(HTMLAttributes::checked(), defaultChecked ? "" : 0);
+  setAttribute(checkedAttr, defaultChecked ? "" : 0);
 }
 
 DOMString HTMLInputElementImpl::accept() const {
-  return getAttribute(HTMLAttributes::accept());
+  return getAttribute(acceptAttr);
 }
 
 void HTMLInputElementImpl::setAccept(const DOMString& value) {
-  setAttribute(HTMLAttributes::accept(), value);
+  setAttribute(acceptAttr, value);
 }
 
 DOMString HTMLInputElementImpl::accessKey() const {
-  return getAttribute(HTMLAttributes::accesskey());
+  return getAttribute(accesskeyAttr);
 }
 
 void HTMLInputElementImpl::setAccessKey(const DOMString& value) {
-  setAttribute(HTMLAttributes::accesskey(), value);
+  setAttribute(accesskeyAttr, value);
 }
 
 DOMString HTMLInputElementImpl::align() const {
-  return getAttribute(HTMLAttributes::align());
+  return getAttribute(alignAttr);
 }
 
 void HTMLInputElementImpl::setAlign(const DOMString& value) {
-  setAttribute(HTMLAttributes::align(), value);
+  setAttribute(alignAttr, value);
 }
 
 DOMString HTMLInputElementImpl::alt() const {
-  return getAttribute(HTMLAttributes::alt());
+  return getAttribute(altAttr);
 }
 
 void HTMLInputElementImpl::setAlt(const DOMString& value) {
-  setAttribute(HTMLAttributes::alt(), value);
+  setAttribute(altAttr, value);
 }
 
 void HTMLInputElementImpl::setMaxLength(long _maxLength) {
-  setAttribute(HTMLAttributes::maxlength(), QString::number(_maxLength));
+  setAttribute(maxlengthAttr, QString::number(_maxLength));
 }
 
 void HTMLInputElementImpl::setSize(unsigned long _size) {
-  setAttribute(HTMLAttributes::size(), QString::number(_size));
+  setAttribute(sizeAttr, QString::number(_size));
 }
 
 DOMString HTMLInputElementImpl::src() const {
-  return getDocument()->completeURL(getAttribute(HTMLAttributes::src()));
+  return getDocument()->completeURL(getAttribute(srcAttr));
 }
 
 void HTMLInputElementImpl::setSrc(const DOMString& value) {
-  setAttribute(HTMLAttributes::src(), value);
+  setAttribute(srcAttr, value);
 }
 
 DOMString HTMLInputElementImpl::useMap() const {
-  return getAttribute(HTMLAttributes::usemap());
+  return getAttribute(usemapAttr);
 }
 
 void HTMLInputElementImpl::setUseMap(const DOMString& value) {
-  setAttribute(HTMLAttributes::usemap(), value);
+  setAttribute(usemapAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
 HTMLLabelElementImpl::HTMLLabelElementImpl(DocumentPtr* doc)
-    : HTMLElementImpl(HTMLTags::label(), doc) {}
+    : HTMLElementImpl(labelTag, doc) {}
 
 HTMLLabelElementImpl::~HTMLLabelElementImpl() {}
 
@@ -2379,11 +2373,11 @@ bool HTMLLabelElementImpl::isFocusable() const {
 }
 
 void HTMLLabelElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::onfocus()) {
+  if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onblur()) {
+  } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
@@ -2392,7 +2386,7 @@ void HTMLLabelElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 }
 
 ElementImpl* HTMLLabelElementImpl::formElement() {
-  DOMString formElementId = getAttribute(HTMLAttributes::forAttr());
+  DOMString formElementId = getAttribute(forAttr);
   if (formElementId.isNull()) {
     // Search children of the label element for a form element.
     NodeImpl* node = this;
@@ -2423,7 +2417,7 @@ void HTMLLabelElementImpl::accessKeyAction(bool sendToAnyElement) {
 
 HTMLFormElementImpl* HTMLLabelElementImpl::form() {
   for (NodeImpl* p = parentNode(); p != 0; p = p->parentNode()) {
-    if (p->hasTagName(HTMLTags::form()))
+    if (p->hasTagName(formTag))
       return static_cast<HTMLFormElementImpl*>(p);
   }
 
@@ -2431,26 +2425,26 @@ HTMLFormElementImpl* HTMLLabelElementImpl::form() {
 }
 
 DOMString HTMLLabelElementImpl::accessKey() const {
-  return getAttribute(HTMLAttributes::accesskey());
+  return getAttribute(accesskeyAttr);
 }
 
 void HTMLLabelElementImpl::setAccessKey(const DOMString& value) {
-  setAttribute(HTMLAttributes::accesskey(), value);
+  setAttribute(accesskeyAttr, value);
 }
 
 DOMString HTMLLabelElementImpl::htmlFor() const {
-  return getAttribute(HTMLAttributes::forAttr());
+  return getAttribute(forAttr);
 }
 
 void HTMLLabelElementImpl::setHtmlFor(const DOMString& value) {
-  setAttribute(HTMLAttributes::forAttr(), value);
+  setAttribute(forAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
 HTMLLegendElementImpl::HTMLLegendElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::legend(), doc, f) {}
+    : HTMLGenericFormElementImpl(legendTag, doc, f) {}
 
 HTMLLegendElementImpl::~HTMLLegendElementImpl() {}
 
@@ -2468,25 +2462,25 @@ DOMString HTMLLegendElementImpl::type() const {
 }
 
 DOMString HTMLLegendElementImpl::accessKey() const {
-  return getAttribute(HTMLAttributes::accesskey());
+  return getAttribute(accesskeyAttr);
 }
 
 void HTMLLegendElementImpl::setAccessKey(const DOMString& value) {
-  setAttribute(HTMLAttributes::accesskey(), value);
+  setAttribute(accesskeyAttr, value);
 }
 
 DOMString HTMLLegendElementImpl::align() const {
-  return getAttribute(HTMLAttributes::align());
+  return getAttribute(alignAttr);
 }
 
 void HTMLLegendElementImpl::setAlign(const DOMString& value) {
-  setAttribute(HTMLAttributes::align(), value);
+  setAttribute(alignAttr, value);
 }
 
 ElementImpl* HTMLLegendElementImpl::formElement() {
   // Check if there's a fieldset belonging to this legend.
   NodeImpl* fieldset = parentNode();
-  while (fieldset && !fieldset->hasTagName(HTMLTags::fieldset()))
+  while (fieldset && !fieldset->hasTagName(fieldsetTag))
     fieldset = fieldset->parentNode();
   if (!fieldset)
     return 0;
@@ -2497,8 +2491,7 @@ ElementImpl* HTMLLegendElementImpl::formElement() {
   while ((node = node->traverseNextNode(fieldset))) {
     if (node->isHTMLElement()) {
       HTMLElementImpl* element = static_cast<HTMLElementImpl*>(node);
-      if (!element->hasLocalName(HTMLTags::legend()) &&
-          element->isGenericFormElement())
+      if (!element->hasLocalName(legendTag) && element->isGenericFormElement())
         return element;
     }
   }
@@ -2520,7 +2513,7 @@ void HTMLLegendElementImpl::accessKeyAction(bool sendToAnyElement) {
 
 HTMLSelectElementImpl::HTMLSelectElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::select(), doc, f), m_options(0) {
+    : HTMLGenericFormElementImpl(selectTag, doc, f), m_options(0) {
   init();
 }
 
@@ -2550,9 +2543,8 @@ HTMLSelectElementImpl::~HTMLSelectElementImpl() {
 }
 
 bool HTMLSelectElementImpl::checkDTD(const NodeImpl* newChild) {
-  return newChild->isTextNode() || newChild->hasTagName(HTMLTags::option()) ||
-         newChild->hasTagName(HTMLTags::optgroup()) ||
-         newChild->hasTagName(HTMLTags::script());
+  return newChild->isTextNode() || newChild->hasTagName(optionTag) ||
+         newChild->hasTagName(optgroupTag) || newChild->hasTagName(scriptTag);
 }
 
 void HTMLSelectElementImpl::recalcStyle(StyleChange ch) {
@@ -2572,7 +2564,7 @@ long HTMLSelectElementImpl::selectedIndex() const {
   uint o = 0;
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   for (unsigned int i = 0; i < items.size(); i++) {
-    if (items[i]->hasLocalName(HTMLTags::option())) {
+    if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElementImpl*>(items[i])->selected())
         return o;
       o++;
@@ -2587,7 +2579,7 @@ void HTMLSelectElementImpl::setSelectedIndex(long index) {
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   int listIndex;
   for (listIndex = 0; listIndex < int(items.size()); listIndex++) {
-    if (items[listIndex]->hasLocalName(HTMLTags::option()))
+    if (items[listIndex]->hasLocalName(optionTag))
       static_cast<HTMLOptionElementImpl*>(items[listIndex])->setSelected(false);
   }
   listIndex = optionToListIndex(index);
@@ -2602,7 +2594,7 @@ long HTMLSelectElementImpl::length() const {
   uint i;
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   for (i = 0; i < items.size(); i++) {
-    if (items[i]->hasLocalName(HTMLTags::option()))
+    if (items[i]->hasLocalName(optionTag))
       len++;
   }
   return len;
@@ -2610,7 +2602,7 @@ long HTMLSelectElementImpl::length() const {
 
 void HTMLSelectElementImpl::add(HTMLElementImpl* element,
                                 HTMLElementImpl* before) {
-  if (!element || !element->hasLocalName(HTMLTags::option()))
+  if (!element || !element->hasLocalName(optionTag))
     return;
 
   int exceptioncode = 0;
@@ -2645,7 +2637,7 @@ DOMString HTMLSelectElementImpl::value() {
   uint i;
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   for (i = 0; i < items.size(); i++) {
-    if (items[i]->hasLocalName(HTMLTags::option()) &&
+    if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElementImpl*>(items[i])->selected())
       return static_cast<HTMLOptionElementImpl*>(items[i])->value();
   }
@@ -2659,7 +2651,7 @@ void HTMLSelectElementImpl::setValue(const DOMString& value) {
   // and make it the current selection.
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   for (unsigned i = 0; i < items.size(); i++)
-    if (items[i]->hasLocalName(HTMLTags::option()) &&
+    if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElementImpl*>(items[i])->value() == value) {
       static_cast<HTMLOptionElementImpl*>(items[i])->setSelected(true);
       return;
@@ -2678,7 +2670,7 @@ QString HTMLSelectElementImpl::state() {
   QChar stateChars[l];
 
   for (int i = 0; i < l; i++)
-    if (items[i]->hasLocalName(HTMLTags::option()) &&
+    if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElementImpl*>(items[i])->selected())
       stateChars[i] = 'X';
     else
@@ -2717,7 +2709,7 @@ void HTMLSelectElementImpl::restoreState(QStringList& _states) {
 
   int l = items.count();
   for (int i = 0; i < l; i++) {
-    if (items[i]->hasLocalName(HTMLTags::option())) {
+    if (items[i]->hasLocalName(optionTag)) {
       HTMLOptionElementImpl* oe = static_cast<HTMLOptionElementImpl*>(items[i]);
       oe->setSelected(state[i] == 'X');
     }
@@ -2770,23 +2762,23 @@ NodeImpl* HTMLSelectElementImpl::addChild(NodeImpl* newChild) {
 }
 
 void HTMLSelectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::size()) {
+  if (attr->name() == sizeAttr) {
     m_size = kMax(attr->value().toInt(), 1);
-  } else if (attr->name() == HTMLAttributes::width()) {
+  } else if (attr->name() == widthAttr) {
     m_minwidth = kMax(attr->value().toInt(), 0);
-  } else if (attr->name() == HTMLAttributes::multiple()) {
+  } else if (attr->name() == multipleAttr) {
     m_multiple = (!attr->isNull());
-  } else if (attr->name() == HTMLAttributes::accesskey()) {
+  } else if (attr->name() == accesskeyAttr) {
     // FIXME: ignore for the moment
-  } else if (attr->name() == HTMLAttributes::onfocus()) {
+  } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onblur()) {
+  } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onchange()) {
+  } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
@@ -2805,7 +2797,7 @@ bool HTMLSelectElementImpl::appendFormData(FormDataList& encoded_values, bool) {
 
   uint i;
   for (i = 0; i < items.size(); i++) {
-    if (items[i]->hasLocalName(HTMLTags::option())) {
+    if (items[i]->hasLocalName(optionTag)) {
       HTMLOptionElementImpl* option =
           static_cast<HTMLOptionElementImpl*>(items[i]);
       if (option->selected()) {
@@ -2820,7 +2812,7 @@ bool HTMLSelectElementImpl::appendFormData(FormDataList& encoded_values, bool) {
   // FIXME!
   // we return the first one if it was a combobox select
   if (!successful && !m_multiple && m_size <= 1 && items.size() &&
-      (items[0]->hasLocalName(HTMLTags::option()))) {
+      (items[0]->hasLocalName(optionTag))) {
     HTMLOptionElementImpl* option =
         static_cast<HTMLOptionElementImpl*>(items[0]);
     if (option->value().isNull())
@@ -2843,7 +2835,7 @@ int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
   int optionIndex2 = 0;
   for (; optionIndex2 < int(items.size()) && optionIndex2 <= optionIndex;
        listIndex++) {  // not a typo!
-    if (items[listIndex]->hasLocalName(HTMLTags::option()))
+    if (items[listIndex]->hasLocalName(optionTag))
       optionIndex2++;
   }
   listIndex--;
@@ -2853,14 +2845,14 @@ int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
 int HTMLSelectElementImpl::listToOptionIndex(int listIndex) const {
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   if (listIndex < 0 || listIndex >= int(items.size()) ||
-      !items[listIndex]->hasLocalName(HTMLTags::option()))
+      !items[listIndex]->hasLocalName(optionTag))
     return -1;
 
   int optionIndex = 0;  // actual index of option not counting OPTGROUP entries
                         // that may be in list
   int i;
   for (i = 0; i < listIndex; i++)
-    if (items[i]->hasLocalName(HTMLTags::option()))
+    if (items[i]->hasLocalName(optionTag))
       optionIndex++;
   return optionIndex;
 }
@@ -2887,7 +2879,7 @@ void HTMLSelectElementImpl::recalcListItems() {
   m_listItems.resize(0);
   HTMLOptionElementImpl* foundSelected = 0;
   while (current) {
-    if (current->hasTagName(HTMLTags::optgroup()) && current->firstChild()) {
+    if (current->hasTagName(optgroupTag) && current->firstChild()) {
       // ### what if optgroup contains just comments? don't want one of no
       // options in it...
       m_listItems.resize(m_listItems.size() + 1);
@@ -2895,7 +2887,7 @@ void HTMLSelectElementImpl::recalcListItems() {
           static_cast<HTMLGenericFormElementImpl*>(current);
       current = current->firstChild();
     }
-    if (current->hasTagName(HTMLTags::option())) {
+    if (current->hasTagName(optionTag)) {
       m_listItems.resize(m_listItems.size() + 1);
       m_listItems[m_listItems.size() - 1] =
           static_cast<HTMLGenericFormElementImpl*>(current);
@@ -2935,11 +2927,10 @@ void HTMLSelectElementImpl::reset() {
   QMemArray<HTMLGenericFormElementImpl*> items = listItems();
   uint i;
   for (i = 0; i < items.size(); i++) {
-    if (items[i]->hasLocalName(HTMLTags::option())) {
+    if (items[i]->hasLocalName(optionTag)) {
       HTMLOptionElementImpl* option =
           static_cast<HTMLOptionElementImpl*>(items[i]);
-      bool selected =
-          (!option->getAttribute(HTMLAttributes::selected()).isNull());
+      bool selected = (!option->getAttribute(selectedAttr).isNull());
       option->setSelected(selected);
     }
   }
@@ -2956,7 +2947,7 @@ void HTMLSelectElementImpl::notifyOptionSelected(
     QMemArray<HTMLGenericFormElementImpl*> items = listItems();
     uint i;
     for (i = 0; i < items.size(); i++) {
-      if (items[i]->hasLocalName(HTMLTags::option()))
+      if (items[i]->hasLocalName(optionTag))
         static_cast<HTMLOptionElementImpl*>(items[i])->m_selected =
             (items[i] == selectedOption);
     }
@@ -2989,18 +2980,18 @@ void HTMLSelectElementImpl::accessKeyAction(bool sendToAnyElement) {
 }
 
 void HTMLSelectElementImpl::setMultiple(bool multiple) {
-  setAttribute(HTMLAttributes::multiple(), multiple ? "" : 0);
+  setAttribute(multipleAttr, multiple ? "" : 0);
 }
 
 void HTMLSelectElementImpl::setSize(long size) {
-  setAttribute(HTMLAttributes::size(), QString::number(size));
+  setAttribute(sizeAttr, QString::number(size));
 }
 
 // -------------------------------------------------------------------------
 
 HTMLKeygenElementImpl::HTMLKeygenElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
-    : HTMLSelectElementImpl(HTMLTags::keygen(), doc, f) {
+    : HTMLSelectElementImpl(keygenTag, doc, f) {
   QStringList keys = KSSLKeyGen::supportedKeySizes();
   for (QStringList::Iterator i = keys.begin(); i != keys.end(); ++i) {
     HTMLOptionElementImpl* o = new HTMLOptionElementImpl(doc, form());
@@ -3014,9 +3005,9 @@ DOMString HTMLKeygenElementImpl::type() const {
 }
 
 void HTMLKeygenElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::challenge())
+  if (attr->name() == challengeAttr)
     m_challenge = attr->value();
-  else if (attr->name() == HTMLAttributes::keytype())
+  else if (attr->name() == keytypeAttr)
     m_keyType = attr->value();
   else
     // skip HTMLSelectElementImpl parsing!
@@ -3058,7 +3049,7 @@ bool HTMLKeygenElementImpl::appendFormData(FormDataList& encoded_values, bool) {
 
 HTMLOptGroupElementImpl::HTMLOptGroupElementImpl(DocumentPtr* doc,
                                                  HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::optgroup(), doc, f) {}
+    : HTMLGenericFormElementImpl(optgroupTag, doc, f) {}
 
 HTMLOptGroupElementImpl::~HTMLOptGroupElementImpl() {}
 
@@ -3121,25 +3112,25 @@ void HTMLOptGroupElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 
 void HTMLOptGroupElementImpl::recalcSelectOptions() {
   NodeImpl* select = parentNode();
-  while (select && !select->hasTagName(HTMLTags::select()))
+  while (select && !select->hasTagName(selectTag))
     select = select->parentNode();
   if (select)
     static_cast<HTMLSelectElementImpl*>(select)->setRecalcListItems();
 }
 
 DOMString HTMLOptGroupElementImpl::label() const {
-  return getAttribute(HTMLAttributes::label());
+  return getAttribute(labelAttr);
 }
 
 void HTMLOptGroupElementImpl::setLabel(const DOMString& value) {
-  setAttribute(HTMLAttributes::label(), value);
+  setAttribute(labelAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
 HTMLOptionElementImpl::HTMLOptionElementImpl(DocumentPtr* doc,
                                              HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::option(), doc, f) {
+    : HTMLGenericFormElementImpl(optionTag, doc, f) {
   m_selected = false;
 }
 
@@ -3156,7 +3147,7 @@ DOMString HTMLOptionElementImpl::text() const {
 
   // WinIE does not use the label attribute, so as a quirk, we ignore it.
   if (getDocument() && !getDocument()->inCompatMode()) {
-    DOMString text = getAttribute(HTMLAttributes::label());
+    DOMString text = getAttribute(labelAttr);
     if (!text.isEmpty())
       return text;
   }
@@ -3191,7 +3182,7 @@ long HTMLOptionElementImpl::index() const {
   int l = items.count();
   int optionIndex = 0;
   for (int i = 0; i < l; i++) {
-    if (items[i]->hasLocalName(HTMLTags::option())) {
+    if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElementImpl*>(items[i]) == this)
         return optionIndex;
       optionIndex++;
@@ -3209,9 +3200,9 @@ void HTMLOptionElementImpl::setIndex(long, int& exception) {
 }
 
 void HTMLOptionElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::selected())
+  if (attr->name() == selectedAttr)
     m_selected = (!attr->isNull());
-  else if (attr->name() == HTMLAttributes::value())
+  else if (attr->name() == valueAttr)
     m_value = attr->value();
   else
     HTMLGenericFormElementImpl::parseMappedAttribute(attr);
@@ -3225,7 +3216,7 @@ DOMString HTMLOptionElementImpl::value() const {
 }
 
 void HTMLOptionElementImpl::setValue(const DOMString& value) {
-  setAttribute(HTMLAttributes::value(), value);
+  setAttribute(valueAttr, value);
 }
 
 void HTMLOptionElementImpl::setSelected(bool _selected) {
@@ -3245,32 +3236,32 @@ void HTMLOptionElementImpl::childrenChanged() {
 
 HTMLSelectElementImpl* HTMLOptionElementImpl::getSelect() const {
   NodeImpl* select = parentNode();
-  while (select && !select->hasTagName(HTMLTags::select()))
+  while (select && !select->hasTagName(selectTag))
     select = select->parentNode();
   return static_cast<HTMLSelectElementImpl*>(select);
 }
 
 bool HTMLOptionElementImpl::defaultSelected() const {
-  return !getAttribute(HTMLAttributes::selected()).isNull();
+  return !getAttribute(selectedAttr).isNull();
 }
 
 void HTMLOptionElementImpl::setDefaultSelected(bool b) {
-  setAttribute(HTMLAttributes::selected(), b ? "" : 0);
+  setAttribute(selectedAttr, b ? "" : 0);
 }
 
 DOMString HTMLOptionElementImpl::label() const {
-  return getAttribute(HTMLAttributes::label());
+  return getAttribute(labelAttr);
 }
 
 void HTMLOptionElementImpl::setLabel(const DOMString& value) {
-  setAttribute(HTMLAttributes::label(), value);
+  setAttribute(labelAttr, value);
 }
 
 // -------------------------------------------------------------------------
 
 HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentPtr* doc,
                                                  HTMLFormElementImpl* f)
-    : HTMLGenericFormElementImpl(HTMLTags::textarea(), doc, f),
+    : HTMLGenericFormElementImpl(textareaTag, doc, f),
       m_valueIsValid(false),
       m_valueMatchesRenderer(false) {
   // DTD requires rows & cols be specified, but we will provide reasonable
@@ -3340,15 +3331,15 @@ void HTMLTextAreaElementImpl::childrenChanged() {
 }
 
 void HTMLTextAreaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::rows()) {
+  if (attr->name() == rowsAttr) {
     m_rows = !attr->isNull() ? attr->value().toInt() : 3;
     if (renderer())
       renderer()->setNeedsLayoutAndMinMaxRecalc();
-  } else if (attr->name() == HTMLAttributes::cols()) {
+  } else if (attr->name() == colsAttr) {
     m_cols = !attr->isNull() ? attr->value().toInt() : 60;
     if (renderer())
       renderer()->setNeedsLayoutAndMinMaxRecalc();
-  } else if (attr->name() == HTMLAttributes::wrap()) {
+  } else if (attr->name() == wrapAttr) {
     // virtual / physical is Netscape extension of HTML 3.0, now deprecated
     // soft/ hard / off is recommendation for HTML 4 extension by IE and NS 4
     if (strcasecmp(attr->value(), "virtual") == 0 ||
@@ -3363,21 +3354,21 @@ void HTMLTextAreaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       m_wrap = ta_NoWrap;
     if (renderer())
       renderer()->setNeedsLayoutAndMinMaxRecalc();
-  } else if (attr->name() == HTMLAttributes::accesskey()) {
+  } else if (attr->name() == accesskeyAttr) {
     // ignore for the moment
-  } else if (attr->name() == HTMLAttributes::onfocus()) {
+  } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onblur()) {
+  } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onselect()) {
+  } else if (attr->name() == onselectAttr) {
     setHTMLEventListener(
         EventImpl::SELECT_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
-  } else if (attr->name() == HTMLAttributes::onchange()) {
+  } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
         getDocument()->createHTMLEventListener(attr->value().string(), this));
@@ -3493,32 +3484,32 @@ void HTMLTextAreaElementImpl::detach() {
 }
 
 DOMString HTMLTextAreaElementImpl::accessKey() const {
-  return getAttribute(HTMLAttributes::accesskey());
+  return getAttribute(accesskeyAttr);
 }
 
 void HTMLTextAreaElementImpl::setAccessKey(const DOMString& value) {
-  setAttribute(HTMLAttributes::accesskey(), value);
+  setAttribute(accesskeyAttr, value);
 }
 
 void HTMLTextAreaElementImpl::setCols(long cols) {
-  setAttribute(HTMLAttributes::cols(), QString::number(cols));
+  setAttribute(colsAttr, QString::number(cols));
 }
 
 void HTMLTextAreaElementImpl::setRows(long rows) {
-  setAttribute(HTMLAttributes::rows(), QString::number(rows));
+  setAttribute(rowsAttr, QString::number(rows));
 }
 
 // -------------------------------------------------------------------------
 
 HTMLIsIndexElementImpl::HTMLIsIndexElementImpl(DocumentPtr* doc,
                                                HTMLFormElementImpl* f)
-    : HTMLInputElementImpl(HTMLTags::isindex(), doc, f) {
+    : HTMLInputElementImpl(isindexTag, doc, f) {
   m_type = TEXT;
   setOverrideName("isindex");
 }
 
 void HTMLIsIndexElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == HTMLAttributes::prompt())
+  if (attr->name() == promptAttr)
     setValue(attr->value());
   else
     // don't call HTMLInputElement::parseMappedAttribute here, as it would
@@ -3527,11 +3518,11 @@ void HTMLIsIndexElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 }
 
 DOMString HTMLIsIndexElementImpl::prompt() const {
-  return getAttribute(HTMLAttributes::prompt());
+  return getAttribute(promptAttr);
 }
 
 void HTMLIsIndexElementImpl::setPrompt(const DOMString& value) {
-  setAttribute(HTMLAttributes::prompt(), value);
+  setAttribute(promptAttr, value);
 }
 
 // -------------------------------------------------------------------------

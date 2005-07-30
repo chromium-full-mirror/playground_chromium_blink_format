@@ -93,6 +93,7 @@ using XBL::XBLBindingManager;
 #endif
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
@@ -624,7 +625,7 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
 
   // FIXME: Use registered namespaces and look up in a hash to find the right
   // factory.
-  if (_namespaceURI == HTMLTags::xhtmlNamespaceURI()) {
+  if (_namespaceURI == xhtmlNamespaceURI) {
     // FIXME: Really should only be done from the public DOM API.  Internal
     // callers know the name is valid.
     if (!isValidName(localName)) {
@@ -669,8 +670,7 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
 
       element = static_cast<ElementImpl*>(n);
 
-      if (element->hasID() &&
-          element->getAttribute(HTMLAttributes::idAttr()) == elementId) {
+      if (element->hasID() && element->getAttribute(idAttr) == elementId) {
         if (idCount == 1)
           m_idCount.remove(qId);
         else
@@ -742,8 +742,7 @@ ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
       if (!n->isElementNode())
         continue;
       const ElementImpl* elementImpl = static_cast<const ElementImpl*>(n);
-      DOMString accessKey(
-          elementImpl->getAttribute(HTMLAttributes::accesskey()));
+      DOMString accessKey(elementImpl->getAttribute(accesskeyAttr));
       ;
       if (!accessKey.isEmpty()) {
         QString ak = accessKey.string().lower();
@@ -1267,10 +1266,10 @@ HTMLElementImpl* DocumentImpl::body() {
   // try to prefer a FRAMESET element over BODY
   NodeImpl* body = 0;
   for (NodeImpl* i = de->firstChild(); i; i = i->nextSibling()) {
-    if (i->hasTagName(HTMLTags::frameset()))
+    if (i->hasTagName(framesetTag))
       return static_cast<HTMLElementImpl*>(i);
 
-    if (i->hasTagName(HTMLTags::body()))
+    if (i->hasTagName(bodyTag))
       body = i;
   }
   return static_cast<HTMLElementImpl*>(body);
@@ -1412,7 +1411,7 @@ bool DocumentImpl::shouldScheduleLayout() {
   // (c) we have a <body>
   return (renderer() && renderer()->needsLayout() && haveStylesheetsLoaded() &&
           documentElement() && documentElement()->renderer() &&
-          (!documentElement()->hasTagName(HTMLTags::html()) || body()));
+          (!documentElement()->hasTagName(htmlTag) || body()));
 }
 
 int DocumentImpl::minimumLayoutDelay() {
@@ -1848,8 +1847,8 @@ bool DocumentImpl::prepareMouseEvent(bool readonly,
     if (renderInfo.URLElement()) {
       assert(renderInfo.URLElement()->isElementNode());
       ElementImpl* e = static_cast<ElementImpl*>(renderInfo.URLElement());
-      DOMString href = khtml::parseURL(e->getAttribute(HTMLAttributes::href()));
-      DOMString target = e->getAttribute(HTMLAttributes::target());
+      DOMString href = khtml::parseURL(e->getAttribute(hrefAttr));
+      DOMString target = e->getAttribute(targetAttr);
 
       if (!target.isNull() && !href.isNull()) {
         ev->target = target;
@@ -2025,12 +2024,12 @@ void DocumentImpl::recalcStyleSelector() {
         }
       }
 
-    } else if (n->isHTMLElement() && (n->hasTagName(HTMLTags::link()) ||
-                                      n->hasTagName(HTMLTags::style()))) {
+    } else if (n->isHTMLElement() &&
+               (n->hasTagName(linkTag) || n->hasTagName(styleTag))) {
       HTMLElementImpl* e = static_cast<HTMLElementImpl*>(n);
-      QString title = e->getAttribute(HTMLAttributes::title()).string();
+      QString title = e->getAttribute(titleAttr).string();
       bool enabledViaScript = false;
-      if (e->hasLocalName(HTMLTags::link())) {
+      if (e->hasLocalName(linkTag)) {
         // <LINK> element
         HTMLLinkElementImpl* l = static_cast<HTMLLinkElementImpl*>(n);
         if (l->isLoading() || l->isDisabled())
@@ -2042,7 +2041,7 @@ void DocumentImpl::recalcStyleSelector() {
 
       // Get the current preferred styleset.  This is the
       // set of sheets that will be enabled.
-      if (e->hasLocalName(HTMLTags::link()))
+      if (e->hasLocalName(linkTag))
         sheet = static_cast<HTMLLinkElementImpl*>(n)->sheet();
       else
         // <STYLE> element
@@ -2058,8 +2057,8 @@ void DocumentImpl::recalcStyleSelector() {
           // we are NOT an alternate sheet, then establish
           // us as the preferred set.  Otherwise, just ignore
           // this sheet.
-          QString rel = e->getAttribute(HTMLAttributes::rel()).string();
-          if (e->hasLocalName(HTMLTags::style()) || !rel.contains("alternate"))
+          QString rel = e->getAttribute(relAttr).string();
+          if (e->hasLocalName(styleTag) || !rel.contains("alternate"))
             m_preferredStylesheetSet = view()->part()->d->m_sheetUsed = title;
         }
 
@@ -2079,7 +2078,7 @@ void DocumentImpl::recalcStyleSelector() {
     // For HTML documents, stylesheets are not allowed within/after the <BODY>
     // tag. So we
     // can stop searching here.
-    if (isHTMLDocument() && n->hasTagName(HTMLTags::body()))
+    if (isHTMLDocument() && n->hasTagName(bodyTag))
       break;
   }
 

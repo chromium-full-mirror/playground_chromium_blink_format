@@ -45,6 +45,7 @@
 #include <assert.h>
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 #define TABLECELLMARGIN -0x4000
@@ -256,7 +257,7 @@ void RenderBox::paintRootBoxDecorations(PaintInfo& i, int _tx, int _ty) {
     // render object very easily via the DOM.
     HTMLElementImpl* body = document()->body();
     RenderObject* bodyObject =
-        (body && body->hasLocalName(HTMLTags::body())) ? body->renderer() : 0;
+        (body && body->hasLocalName(bodyTag)) ? body->renderer() : 0;
     if (bodyObject) {
       bgLayer = bodyObject->style()->backgroundLayers();
       bgColor = bodyObject->style()->backgroundColor();
@@ -413,7 +414,7 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
     bool isTransparent;
     DOM::NodeImpl* elt = document()->ownerElement();
     if (elt) {
-      if (elt->hasTagName(HTMLTags::frame()))
+      if (elt->hasTagName(frameTag))
         isTransparent = false;
       else {
         // Locate the <body> element using the DOM.  This is easier than trying
@@ -424,10 +425,9 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
         // render object very easily via the DOM.
         HTMLElementImpl* body = document()->body();
         isTransparent =
-            !body || !body->hasLocalName(HTMLTags::frameset());  // Can't scroll
-                                                                 // a frameset
-                                                                 // document
-                                                                 // anyway.
+            !body ||
+            !body->hasLocalName(
+                framesetTag);  // Can't scroll a frameset document anyway.
       }
     } else
       isTransparent = canvas()->view()->isTransparent();

@@ -71,6 +71,7 @@
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 class KHTMLToolTip;
 
@@ -603,11 +604,11 @@ void KHTMLView::layout() {
   if (document->isHTMLDocument()) {
     NodeImpl* body = static_cast<HTMLDocumentImpl*>(document)->body();
     if (body && body->renderer()) {
-      if (body->hasTagName(HTMLTags::frameset())) {
+      if (body->hasTagName(framesetTag)) {
         body->renderer()->setNeedsLayout(true);
         vMode = AlwaysOff;
         hMode = AlwaysOff;
-      } else if (body->hasTagName(HTMLTags::body())) {
+      } else if (body->hasTagName(bodyTag)) {
         RenderObject* o = (rootRenderer->style()->overflow() == OVISIBLE)
                               ? body->renderer()
                               : rootRenderer;
@@ -895,7 +896,7 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 }
 
 static bool isSubmitImage(DOM::NodeImpl* node) {
-  return node && node->hasTagName(HTMLTags::input()) &&
+  return node && node->hasTagName(inputTag) &&
          static_cast<HTMLInputElementImpl*>(node)->inputType() ==
              HTMLInputElementImpl::IMAGE;
 }

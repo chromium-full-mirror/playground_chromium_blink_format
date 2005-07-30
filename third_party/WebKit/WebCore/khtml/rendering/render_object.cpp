@@ -51,6 +51,7 @@
 
 #include <assert.h>
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 #ifndef NDEBUG
@@ -165,16 +166,16 @@ bool RenderObject::isRoot() const {
 
 bool RenderObject::isBody() const {
   return element() && element()->renderer() == this &&
-         element()->hasTagName(HTMLTags::body());
+         element()->hasTagName(bodyTag);
 }
 
 bool RenderObject::isHR() const {
-  return element() && element()->hasTagName(HTMLTags::hr());
+  return element() && element()->hasTagName(hrTag);
 }
 
 bool RenderObject::isHTMLMarquee() const {
   return element() && element()->renderer() == this &&
-         element()->hasTagName(HTMLTags::marquee());
+         element()->hasTagName(marqueeTag);
 }
 
 bool RenderObject::canHaveChildren() const {
@@ -692,8 +693,8 @@ bool RenderObject::sizesToMaxWidth() const {
   // but they allow text to sit on the same line as the marquee.
   if (isFloating() || (isCompact() && isInline()) ||
       (isInlineBlockOrInlineTable() && !isHTMLMarquee()) ||
-      (element() && (element()->hasTagName(HTMLTags::button()) ||
-                     element()->hasTagName(HTMLTags::legend()))))
+      (element() &&
+       (element()->hasTagName(buttonTag) || element()->hasTagName(legendTag))))
     return true;
 
   // Children of a horizontal marquee do not fill the container by default.
@@ -1568,8 +1569,7 @@ void RenderObject::setStyle(RenderStyle* style) {
     // the canvas.  Just dirty the entire canvas when our style changes
     // substantially.
     if (d >= RenderStyle::Repaint && element() &&
-        (element()->hasTagName(HTMLTags::html()) ||
-         element()->hasTagName(HTMLTags::body())))
+        (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
       canvas()->repaint();
     else if (m_parent && !isText()) {
       // Do a repaint with the old style first, e.g., for example if we go from
@@ -2201,10 +2201,9 @@ void RenderObject::getTextDecorationColors(int decorations,
     curr = curr->parent();
     if (curr && curr->isRenderBlock() && curr->continuation())
       curr = curr->continuation();
-  } while (curr && decorations &&
-           (!quirksMode || !curr->element() ||
-            (!curr->element()->hasTagName(HTMLTags::a()) &&
-             !curr->element()->hasTagName(HTMLTags::font()))));
+  } while (curr && decorations && (!quirksMode || !curr->element() ||
+                                   (!curr->element()->hasTagName(aTag) &&
+                                    !curr->element()->hasTagName(fontTag))));
 
   // If we bailed out, use the element we bailed out at (typically a <font> or
   // <a> element).
@@ -2337,8 +2336,8 @@ void RenderObject::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {
   // into RenderObject.
 
   if (image && image->pixmap_size() == image->valid_rect().size() && parent()) {
-    if (canvas() && element() && (element()->hasTagName(HTMLTags::html()) ||
-                                  element()->hasTagName(HTMLTags::body())))
+    if (canvas() && element() &&
+        (element()->hasTagName(htmlTag) || element()->hasTagName(bodyTag)))
       canvas()->repaint();  // repaint the entire canvas since the background
                             // gets propagated up
     else

@@ -49,25 +49,25 @@
 #include <qpointarray.h>
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 // -------------------------------------------------------------------------
 
 HTMLCanvasElementImpl::HTMLCanvasElementImpl(DocumentPtr* doc)
-    : HTMLImageElementImpl(HTMLTags::canvas(), doc) {}
+    : HTMLImageElementImpl(canvasTag, doc) {}
 
 HTMLCanvasElementImpl::~HTMLCanvasElementImpl() {}
 
 bool HTMLCanvasElementImpl::mapToEntry(const QualifiedName& attrName,
                                        MappedAttributeEntry& result) const {
-  if (attrName != HTMLAttributes::src())  // Ignore the src attribute
+  if (attrName != srcAttr)  // Ignore the src attribute
     return HTMLImageElementImpl::mapToEntry(attrName, result);
   return false;
 }
 
 void HTMLCanvasElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() !=
-      HTMLAttributes::src())  // Canvas ignores the src attribute
+  if (attr->name() != srcAttr)  // Canvas ignores the src attribute
     HTMLImageElementImpl::parseMappedAttribute(attr);
 }
 
@@ -87,6 +87,5 @@ void HTMLCanvasElementImpl::detach() {
 }
 
 bool HTMLCanvasElementImpl::isURLAttribute(AttributeImpl* attr) const {
-  return ((attr->name() == HTMLAttributes::usemap() &&
-           attr->value().domString()[0] != '#'));
+  return ((attr->name() == usemapAttr && attr->value().domString()[0] != '#'));
 }

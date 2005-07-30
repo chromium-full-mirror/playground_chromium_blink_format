@@ -48,6 +48,7 @@
 #include <cmath>
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 // -------------------------------------------------------------------------
@@ -451,7 +452,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       //             p->drawPixmap( offs.x(), y, pix, rect.x(), rect.y(),
       //             rect.width(), rect.height() );
       HTMLImageElementImpl* i =
-          (element() && element()->hasTagName(HTMLTags::img()))
+          (element() && element()->hasTagName(imgTag))
               ? static_cast<HTMLImageElementImpl*>(element())
               : 0;
       if (i && !i->compositeOperator().isNull()) {
@@ -519,7 +520,7 @@ void RenderImage::layout() {
 }
 
 HTMLMapElementImpl* RenderImage::imageMap() {
-  HTMLImageElementImpl* i = element()->hasTagName(HTMLTags::img())
+  HTMLImageElementImpl* i = element()->hasTagName(imgTag)
                                 ? static_cast<HTMLImageElementImpl*>(element())
                                 : 0;
   return i ? i->getDocument()->getImageMap(i->imageMap()) : 0;
@@ -551,9 +552,9 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
 }
 
 void RenderImage::updateAltText() {
-  if (element()->hasTagName(HTMLTags::input()))
+  if (element()->hasTagName(inputTag))
     alt = static_cast<HTMLInputElementImpl*>(element())->altText();
-  else if (element()->hasTagName(HTMLTags::img()))
+  else if (element()->hasTagName(imgTag))
     alt = static_cast<HTMLImageElementImpl*>(element())->altText();
 }
 

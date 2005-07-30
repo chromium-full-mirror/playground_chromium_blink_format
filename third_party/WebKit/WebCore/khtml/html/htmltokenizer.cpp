@@ -64,8 +64,7 @@ using DOM::emptyAtom;
 using DOM::commentAtom;
 using DOM::nullAtom;
 using DOM::textAtom;
-using DOM::HTMLAttributes;
-using DOM::HTMLTags;
+using namespace HTMLNames;
 using DOM::QualifiedName;
 using DOM::MappedAttributeImpl;
 using DOM::NamedMappedAttrMapImpl;
@@ -575,16 +574,16 @@ void HTMLTokenizer::parseSpecial(TokenizerString& src) {
         processListing(TokenizerString(scriptCode, scriptCodeSize));
         processToken();
         if (style) {
-          currToken.tagName = HTMLTags::style().localName();
+          currToken.tagName = styleTag.localName();
           currToken.beginTag = false;
         } else if (textarea) {
-          currToken.tagName = HTMLTags::textarea().localName();
+          currToken.tagName = textareaTag.localName();
           currToken.beginTag = false;
         } else if (title) {
-          currToken.tagName = HTMLTags::title().localName();
+          currToken.tagName = titleTag.localName();
           currToken.beginTag = false;
         } else if (xmp) {
-          currToken.tagName = HTMLTags::xmp().localName();
+          currToken.tagName = xmpTag.localName();
           currToken.beginTag = false;
         }
         processToken();
@@ -662,7 +661,7 @@ void HTMLTokenizer::scriptHandler() {
   processListing(TokenizerString(scriptCode, scriptCodeSize));
   QString exScript(buffer, dest - buffer);
   processToken();
-  currToken.tagName = HTMLTags::script().localName();
+  currToken.tagName = scriptTag.localName();
   currToken.beginTag = false;
   processToken();
 
@@ -1238,7 +1237,7 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
             // This behavior
             // also deviates from WinIE, but in this case we'll just copy Moz
             // and Opera.
-            if (currToken.tagName == HTMLTags::script() && curchar == '>' &&
+            if (currToken.tagName == scriptTag && curchar == '>' &&
                 attrName == "/")
               currToken.flat = true;
             break;
@@ -1441,9 +1440,9 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
         // for Dashboard
         // compatibility.
         bool isSelfClosingScript = currToken.flat && currToken.beginTag &&
-                                   currToken.tagName == HTMLTags::script();
+                                   currToken.tagName == scriptTag;
         bool beginTag = !currToken.flat && currToken.beginTag;
-        if (currToken.beginTag && currToken.tagName == HTMLTags::script()) {
+        if (currToken.beginTag && currToken.tagName == scriptTag) {
           AttributeImpl* a = 0;
           bool foundTypeAttribute = false;
           scriptSrc = QString::null;
@@ -1455,21 +1454,19 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
                   ->jScriptEnabled() && /* jscript allowed at all? */
               view /* are we a regular tokenizer or just for innerHTML ? */
               ) {
-            if ((a = currToken.attrs->getAttributeItem(HTMLAttributes::src())))
+            if ((a = currToken.attrs->getAttributeItem(srcAttr)))
               scriptSrc =
                   parser->doc()->completeURL(parseURL(a->value()).string());
-            if ((a = currToken.attrs->getAttributeItem(
-                     HTMLAttributes::charset())))
+            if ((a = currToken.attrs->getAttributeItem(charsetAttr)))
               scriptSrcCharset = a->value().string().stripWhiteSpace();
             if (scriptSrcCharset.isEmpty())
               scriptSrcCharset = parser->doc()->part()->encoding();
             /* Check type before language, since language is deprecated */
-            if ((a = currToken.attrs->getAttributeItem(
-                     HTMLAttributes::type())) != 0 &&
+            if ((a = currToken.attrs->getAttributeItem(typeAttr)) != 0 &&
                 !a->value().string().isEmpty())
               foundTypeAttribute = true;
             else
-              a = currToken.attrs->getAttributeItem(HTMLAttributes::language());
+              a = currToken.attrs->getAttributeItem(languageAttr);
           }
           javascript = true;
 
@@ -1532,9 +1529,9 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
 
         processToken();
 
-        if (tagName == HTMLTags::pre()) {
+        if (tagName == preTag) {
           discard = LFDiscard;  // Discard the first LF after we open a pre.
-        } else if (tagName == HTMLTags::script()) {
+        } else if (tagName == scriptTag) {
           if (beginTag) {
             searchStopper = scriptEnd;
             searchStopperLen = 8;
@@ -1544,37 +1541,37 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
             script = true;
             scriptHandler();
           }
-        } else if (tagName == HTMLTags::style()) {
+        } else if (tagName == styleTag) {
           if (beginTag) {
             searchStopper = styleEnd;
             searchStopperLen = 7;
             style = true;
             parseSpecial(src);
           }
-        } else if (tagName == HTMLTags::textarea()) {
+        } else if (tagName == textareaTag) {
           if (beginTag) {
             searchStopper = textareaEnd;
             searchStopperLen = 10;
             textarea = true;
             parseSpecial(src);
           }
-        } else if (tagName == HTMLTags::title()) {
+        } else if (tagName == titleTag) {
           if (beginTag) {
             searchStopper = titleEnd;
             searchStopperLen = 7;
             title = true;
             parseSpecial(src);
           }
-        } else if (tagName == HTMLTags::xmp()) {
+        } else if (tagName == xmpTag) {
           if (beginTag) {
             searchStopper = xmpEnd;
             searchStopperLen = 5;
             xmp = true;
             parseSpecial(src);
           }
-        } else if (tagName == HTMLTags::select())
+        } else if (tagName == selectTag)
           select = beginTag;
-        else if (tagName == HTMLTags::plaintext())
+        else if (tagName == plaintextTag)
           plaintext = beginTag;
         return;  // Finished parsing tag!
       }

@@ -55,6 +55,7 @@ CG_EXTERN_C_END
 #endif
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 // -------------------------------------------------------------------------
@@ -187,7 +188,7 @@ void RenderCanvasImage::paint(PaintInfo& i, int _tx, int _ty) {
 
   if (drawnImage()) {
     HTMLCanvasElementImpl* i =
-        (element() && element()->hasTagName(HTMLTags::canvas()))
+        (element() && element()->hasTagName(canvasTag))
             ? static_cast<HTMLCanvasElementImpl*>(element())
             : 0;
     int oldOperation = 0;

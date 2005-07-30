@@ -46,15 +46,14 @@ using DOM::DocumentImpl;
 using DOM::DOMString;
 using DOM::ElementImpl;
 using DOM::TagStatusForbidden;
-using DOM::HTMLAttributes;
 using DOM::HTMLElementImpl;
-using DOM::HTMLTags;
 using DOM::NamedAttrMapImpl;
 using DOM::Node;
 using DOM::NodeImpl;
 using DOM::Position;
 using DOM::RangeImpl;
 using DOM::TextImpl;
+using namespace HTMLNames;
 
 #if APPLE_CHANGES
 #include "KWQAssertions.h"
@@ -176,10 +175,10 @@ static QString startMarkup(const NodeImpl* node,
   switch (type) {
     case Node::TEXT_NODE: {
       if (node->parentNode()) {
-        if (node->parentNode()->hasTagName(HTMLTags::pre()) ||
-            node->parentNode()->hasTagName(HTMLTags::script()) ||
-            node->parentNode()->hasTagName(HTMLTags::style()) ||
-            node->parentNode()->hasTagName(HTMLTags::textarea()))
+        if (node->parentNode()->hasTagName(preTag) ||
+            node->parentNode()->hasTagName(scriptTag) ||
+            node->parentNode()->hasTagName(styleTag) ||
+            node->parentNode()->hasTagName(textareaTag))
           return stringValueForRange(node, range);
       }
       QString markup = annotate ? escapeHTML(renderedText(node, range))
@@ -233,14 +232,13 @@ static QString startMarkup(const NodeImpl* node,
         if (length == 0 && additionalStyle.length() > 0) {
           // FIXME: Handle case where additionalStyle has illegal characters in
           // it, like "
-          markup += " " + HTMLAttributes::style().localName().string() + "=\"" +
+          markup += " " + styleAttr.localName().string() + "=\"" +
                     additionalStyle.string() + "\"";
         } else {
           for (unsigned int i = 0; i < length; i++) {
             AttributeImpl* attr = attrs->attributeItem(i);
             DOMString value = attr->value();
-            if (attr->name() == HTMLAttributes::style() &&
-                additionalStyle.length() > 0)
+            if (attr->name() == styleAttr && additionalStyle.length() > 0)
               value += "; " + additionalStyle;
             // FIXME: Handle case where value has illegal characters in it, like
             // "
@@ -448,10 +446,8 @@ QString createMarkup(const RangeImpl* range,
       if (commonAncestorBlock == ancestor) {
         // Include ancestors that are required to retain the appearance of the
         // copied markup.
-        if (ancestor->hasTagName(HTMLTags::pre()) ||
-            ancestor->hasTagName(HTMLTags::table()) ||
-            ancestor->hasTagName(HTMLTags::ol()) ||
-            ancestor->hasTagName(HTMLTags::ul())) {
+        if (ancestor->hasTagName(preTag) || ancestor->hasTagName(tableTag) ||
+            ancestor->hasTagName(olTag) || ancestor->hasTagName(ulTag)) {
           breakAtEnd = true;
         } else {
           break;
@@ -632,12 +628,11 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
       ElementImpl* element;
       if (s.isEmpty() && list.isEmpty()) {
         // For last line, use the "magic BR" rather than a P.
-        element = document->createElementNS(HTMLTags::xhtmlNamespaceURI(), "br",
-                                            exceptionCode);
+        element =
+            document->createElementNS(xhtmlNamespaceURI, "br", exceptionCode);
         ASSERT(exceptionCode == 0);
         element->ref();
-        element->setAttribute(HTMLAttributes::classAttr(),
-                              AppleInterchangeNewline);
+        element->setAttribute(classAttr, AppleInterchangeNewline);
       } else {
         element = createDefaultParagraphElement(document);
         createParagraphContentsFromString(document, element, s);

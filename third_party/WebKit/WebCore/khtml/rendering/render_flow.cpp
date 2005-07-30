@@ -42,6 +42,7 @@
 #include "khtmlview.h"
 
 using namespace DOM;
+using namespace HTMLNames;
 using namespace khtml;
 
 RenderFlow* RenderFlow::createAnonymousFlow(DOM::DocumentImpl* doc,
@@ -698,7 +699,7 @@ void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   if (element() && element()->isContentEditable()) {
     if (element()->parentNode() &&
         !element()->parentNode()->isContentEditable() &&
-        !element()->hasTagName(HTMLTags::body()))
+        !element()->hasTagName(bodyTag))
       p->addFocusRingRect(_tx, _ty, width(), height());
     return;
   }
