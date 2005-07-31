@@ -3403,7 +3403,7 @@ void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
         } else if (val->primitiveType() == CSS_COUNTER)
           style->setContent(val->getCounterValue(), i != 0);
         else if (val->primitiveType() == CSS_IDENT) {
-          EQuoteContent quote;
+          EQuoteContent quote = QC_NO_QUOTE;
           switch (val->getIdent()) {
             case CSS_VAL_OPEN_QUOTE: {
               quote = QC_OPEN_QUOTE;
