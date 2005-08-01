@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <WebCore/DOMCSS.h>
+#import <WebCore/DOMHTML.h>
 #import <WebCore/DOMRange.h>
 
 @interface DOMRange (WebPrivate)
@@ -62,6 +64,7 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 @interface DOMHTMLInputElement (FormsAutoFillTransition)
 - (NSString*)_displayedValue;  // the string currently displayed in the field,
                                // even when the field is being edited
+- (BOOL)_isTextField;
 - (void)_setDisplayedValue:(NSString*)newValue;  // set the value displayed,
                                                  // even when the field is being
                                                  // edited
