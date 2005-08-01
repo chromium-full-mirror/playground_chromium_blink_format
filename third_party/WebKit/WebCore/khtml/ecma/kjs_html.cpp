@@ -5626,11 +5626,11 @@ Value KJS::Context2DFunction::call(ExecState* exec,
               components[1] = qc.green() / 255.;
               components[2] = qc.blue() / 255.;
               components[3] = 1.0f;
-              colorSpace = QPainter::rgbColorSpace();
+              colorSpace = CGColorSpaceCreateDeviceRGB();
             } else {
               components[0] = (float)args[3].toNumber(exec);
               components[1] = 1.0f;
-              colorSpace = QPainter::grayColorSpace();
+              colorSpace = CGColorSpaceCreateDeviceGray();
             }
           } break;
           case 2: {
@@ -5643,11 +5643,11 @@ Value KJS::Context2DFunction::call(ExecState* exec,
               components[1] = qc.green() / 255.;
               components[2] = qc.blue() / 255.;
               components[3] = a;
-              colorSpace = QPainter::rgbColorSpace();
+              colorSpace = CGColorSpaceCreateDeviceRGB();
             } else {
               components[0] = (float)args[3].toNumber(exec);
               components[1] = a;
-              colorSpace = QPainter::grayColorSpace();
+              colorSpace = CGColorSpaceCreateDeviceGray();
             }
           } break;
           case 4: {
@@ -5655,7 +5655,7 @@ Value KJS::Context2DFunction::call(ExecState* exec,
             components[1] = (float)args[4].toNumber(exec);  // g
             components[2] = (float)args[5].toNumber(exec);  // b
             components[3] = (float)args[6].toNumber(exec);  // a
-            colorSpace = QPainter::rgbColorSpace();
+            colorSpace = CGColorSpaceCreateDeviceRGB();
           } break;
           case 5: {
             components[0] = (float)args[3].toNumber(exec);  // c
@@ -5664,7 +5664,7 @@ Value KJS::Context2DFunction::call(ExecState* exec,
             components[3] = (float)args[6].toNumber(exec);  // k
             components[4] = (float)args[7].toNumber(exec);  // a
 
-            colorSpace = QPainter::cmykColorSpace();
+            colorSpace = CGColorSpaceCreateDeviceCMYK();
           } break;
           default: {
             Object err = Error::create(exec, SyntaxError);
@@ -5805,7 +5805,7 @@ Value KJS::Context2DFunction::call(ExecState* exec,
           size_t csw = (size_t)sw;
           size_t csh = (size_t)sh;
 
-          CGColorSpaceRef colorSpace = QPainter::rgbColorSpace();
+          CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
           size_t numComponents = CGColorSpaceGetNumberOfComponents(colorSpace);
           size_t bytesPerRow = BYTES_PER_ROW(
               csw, BITS_PER_COMPONENT, (numComponents + 1));  // + 1 for alpha
@@ -6104,7 +6104,7 @@ CGColorRef colorRefFromValue(ExecState* exec, const Value& value) {
     components[1] = qc.green() / 255.;
     components[2] = qc.blue() / 255.;
     components[3] = qc.alpha();
-    colorSpace = QPainter::rgbColorSpace();
+    colorSpace = CGColorSpaceCreateDeviceRGB();
   } else
     return 0;
 
@@ -6613,7 +6613,7 @@ CGShadingRef Gradient::getShading() {
   CGFunctionRef _colorFunction =
       CGFunctionCreate((void*)this, 1, intervalRangeDomin, 4,
                        colorComponentRangeDomains, &gradientCallbacks);
-  CGColorSpaceRef colorSpace = QPainter::rgbColorSpace();
+  CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 
   if (_gradientType == Gradient::Radial) {
     _shadingRef = CGShadingCreateRadial(colorSpace, CGPointMake(_x0, _y0), _r0,
