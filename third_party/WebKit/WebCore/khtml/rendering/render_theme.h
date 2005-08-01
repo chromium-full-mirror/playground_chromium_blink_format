@@ -80,6 +80,9 @@ class RenderTheme {
     return false;
   }
 
+  // A general API asking if any control tinting is supported at all.
+  virtual bool supportsControlTints() const { return false; }
+
   // Some controls may spill out of their containers (e.g., the check on an OS X
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
