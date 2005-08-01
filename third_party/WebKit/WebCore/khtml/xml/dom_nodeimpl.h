@@ -509,8 +509,10 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
 
   void registerNodeList(NodeListImpl* list);
   void unregisterNodeList(NodeListImpl* list);
-  void notifyNodeListsSubtreeModified();
-  void notifyLocalNodeListsSubtreeModified();
+  void notifyNodeListsChildrenChanged();
+  void notifyLocalNodeListsChildrenChanged();
+  void notifyNodeListsAttributeChanged();
+  void notifyLocalNodeListsAttributeChanged();
 
   SharedPtr<NodeListImpl> getElementsByTagName(const DOMString& name) {
     return getElementsByTagNameNS("*", name);
@@ -628,7 +630,8 @@ class NodeListImpl : public khtml::Shared<NodeListImpl> {
 
   // Other methods (not part of DOM)
 
-  void rootNodeSubtreeModified();
+  virtual void rootNodeChildrenChanged();
+  virtual void rootNodeAttributeChanged() {}
 
  protected:
   // helper functions for searching all ElementImpls in a tree
@@ -670,6 +673,10 @@ class NameNodeListImpl : public NodeListImpl {
   virtual NodeImpl* item(unsigned long index) const;
 
   // Other methods (not part of DOM)
+  virtual void rootNodeChildrenChanged(){};
+  virtual void rootNodeAttributeChanged() {
+    NodeListImpl::rootNodeChildrenChanged();
+  }
 
  protected:
   virtual bool nodeMatches(NodeImpl* testNode) const;
