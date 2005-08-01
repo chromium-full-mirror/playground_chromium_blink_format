@@ -30,6 +30,7 @@
 
 @class PDFView;
 @class WebDataSource;
+@class PDFPrefUpdatingProxy;
 
 @protocol _WebDocumentTextSizing;
 @protocol _WebDocumentViewState;
@@ -47,6 +48,8 @@
   WebDataSource* dataSource;
   NSString* path;
   BOOL written;
+  BOOL firstLayoutDone;
+  PDFView* PDFSubviewProxy;
 }
 
 + (NSBundle*)PDFKitBundle;

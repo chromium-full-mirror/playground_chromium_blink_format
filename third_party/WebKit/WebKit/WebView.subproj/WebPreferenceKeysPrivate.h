@@ -76,3 +76,5 @@
 #define WebKitRespectStandardStyleKeyEquivalentsPreferenceKey \
   @"WebKitRespectStandardStyleKeyEquivalents"
 #define WebKitShowsURLsInToolTipsPreferenceKey @"WebKitShowsURLsInToolTips"
+#define WebKitPDFDisplayModePreferenceKey @"WebKitPDFDisplayMode"
+#define WebKitPDFScaleFactorPreferenceKey @"WebKitPDFScaleFactor"
