@@ -392,6 +392,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual void setActivatedSubmit(bool flag);
 
   typeEnum inputType() const { return m_type; }
+  void setInputType(const DOMString& value);
+
   virtual void reset();
 
   // used in case input type=image was clicked.
