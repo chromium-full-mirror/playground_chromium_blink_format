@@ -154,12 +154,14 @@ void ScriptInterpreter::mark() {
   }
 }
 
-void ScriptInterpreter::updateDOMNodeDocument(NodeImpl* node,
+void ScriptInterpreter::updateDOMNodeDocument(DOM::NodeImpl* node,
                                               DOM::DocumentImpl* oldDoc,
                                               DOM::DocumentImpl* newDoc) {
   DOMNode* cachedObject = getDOMNodeForDocument(oldDoc, node);
-  if (cachedObject)
+  if (cachedObject) {
     putDOMNodeForDocument(newDoc, node, cachedObject);
+    forgetDOMNodeForDocument(oldDoc, node);
+  }
 }
 
 bool ScriptInterpreter::wasRunByUserGesture() const {
