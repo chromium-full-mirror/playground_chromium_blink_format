@@ -962,6 +962,8 @@ bool HTMLParser::isResidualStyleTag(const AtomicString& tagName) {
     residualStyleTags.insert(sampTag.localName().implementation());
     residualStyleTags.insert(kbdTag.localName().implementation());
     residualStyleTags.insert(varTag.localName().implementation());
+    residualStyleTags.insert(nobrTag.localName().implementation());
+    residualStyleTags.insert(wbrTag.localName().implementation());
   }
 
   return residualStyleTags.contains(tagName.implementation());
