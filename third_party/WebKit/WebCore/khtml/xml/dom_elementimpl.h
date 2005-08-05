@@ -316,6 +316,12 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
   NamedAttrMapImpl& operator=(const NamedAttrMapImpl& other);
 
   // DOM methods & attributes for NamedNodeMap
+  virtual NodeImpl* getNamedItemNS(const DOMString& namespaceURI,
+                                   const DOMString& localName) const;
+  virtual SharedPtr<NodeImpl> removeNamedItemNS(const DOMString& namespaceURI,
+                                                const DOMString& localName,
+                                                int& exception);
+
   virtual AttrImpl* getNamedItem(const QualifiedName& name) const;
 
   virtual SharedPtr<NodeImpl> removeNamedItem(const QualifiedName& name,
