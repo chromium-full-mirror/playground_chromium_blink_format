@@ -54,6 +54,9 @@ class KCanvasContainer : public KCanvasItem {
   virtual void invalidate() const;
   virtual QRect bbox(bool includeStroke = true) const;
 
+  KCanvasItem* first() const;
+  KCanvasItem* last() const;
+
  private:
   friend class KCanvasItem;
 

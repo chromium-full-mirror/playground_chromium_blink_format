@@ -40,7 +40,7 @@ class KCanvas::Private {
   ~Private() {
     delete registry;
     delete rootContainer;
-    delete renderingDevice;
+    // delete renderingDevice;  // Should not delete the rendering device!
   }
 
   QSize canvasSize;
