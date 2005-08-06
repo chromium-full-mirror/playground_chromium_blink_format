@@ -74,8 +74,12 @@ class HashMap {
   bool contains(const KeyType& key) const;
   MappedType get(const KeyType& key) const;
 
-  std::pair<iterator, bool> insert(const KeyType& key,
-                                   const MappedType& mapped);
+  std::pair<iterator, bool> insert(
+      const KeyType& key,
+      const MappedType& mapped);  // no effect if key is already present
+  std::pair<iterator, bool> set(
+      const KeyType& key,
+      const MappedType& mapped);  // replaces if key is already present
 
   void remove(const KeyType& key);
   void remove(iterator it);
@@ -206,12 +210,26 @@ HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::insert(
     const KeyType& key,
     const MappedType& mapped) {
   pair<iterator, bool> result = m_impl.insert(ValueType(key, mapped));
-  iterator it = result.first;
-
   // insert won't change anything if the key is already there
   if (!result.second)
-    it->second = mapped;
+    result.first->second = mapped;
+  return result;
+}
 
+template <typename Key,
+          typename Mapped,
+          typename HashFunctions,
+          typename KeyTraits,
+          typename MappedTraits>
+std::pair<
+    typename HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::
+        iterator,
+    bool>
+HashMap<Key, Mapped, HashFunctions, KeyTraits, MappedTraits>::set(
+    const KeyType& key,
+    const MappedType& mapped) {
+  pair<iterator, bool> result = m_impl.insert(ValueType(key, mapped));
+  result.first->second = mapped;
   return result;
 }
 
