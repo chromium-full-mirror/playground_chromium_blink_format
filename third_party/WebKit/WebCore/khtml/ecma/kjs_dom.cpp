@@ -271,11 +271,11 @@ bool DOMNode::toBoolean(ExecState*) const {
   scrollHeight  DOMNode::ScrollHeight           DontDelete|ReadOnly
 @end
 */
-bool DOMNode::getOwnProperty(ExecState* exec,
-                             const Identifier& propertyName,
-                             Value& result) const {
-  return lookupGetOwnValue<DOMNode, DOMObject>(exec, propertyName,
-                                               &DOMNodeTable, this, result);
+bool DOMNode::getOwnPropertySlot(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 PropertySlot& slot) {
+  return getStaticValueSlot<DOMNode, DOMObject>(exec, &DOMNodeTable, this,
+                                                propertyName, slot);
 }
 
 Value DOMNode::getValueProperty(ExecState* exec, int token) const {
@@ -727,7 +727,14 @@ NodeImpl* toNode(ValueImp* val) {
 
 // -------------------------------------------------------------------------
 
-const ClassInfo DOMNodeList::info = {"NodeList", 0, 0, 0};
+/*
+@begin DOMNodeListTable 2
+  length	DOMStyleSheetList::Length	DontDelete|ReadOnly
+  item		DOMStyleSheetList::Item		DontDelete|Function 1
+@end
+*/
+
+const ClassInfo DOMNodeList::info = {"NodeList", 0, &DOMNodeListTable, 0};
 
 DOMNodeList::~DOMNodeList() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -740,46 +747,54 @@ Value DOMNodeList::toPrimitive(ExecState* exec, Type /*preferred*/) const {
   return String(toString(exec));
 }
 
-// We have to implement hasProperty since we don't use a hashtable for 'length'
-// and 'item'
-// ## this breaks "for (..in..)" though.
-bool DOMNodeList::hasOwnProperty(ExecState* exec, const Identifier& p) const {
-  if (p == lengthPropertyName || p == "item")
-    return true;
-  return ObjectImp::hasOwnProperty(exec, p);
+Value DOMNodeList::getValueProperty(ExecState* exec, int token) const {
+  assert(token == Length);
+  return Number(m_impl->length());
 }
 
-bool DOMNodeList::getOwnProperty(ExecState* exec,
-                                 const Identifier& p,
-                                 Value& result) const {
-  NodeListImpl& list = *m_impl;
-  if (p == lengthPropertyName) {
-    result = Number(list.length());
+Value DOMNodeList::indexGetter(ExecState* exec,
+                               const Identifier& propertyName,
+                               const PropertySlot& slot) {
+  DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
+  return getDOMNode(exec, thisObj->m_impl->item(slot.index()));
+}
+
+Value DOMNodeList::nameGetter(ExecState* exec,
+                              const Identifier& propertyName,
+                              const PropertySlot& slot) {
+  DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
+  return getDOMNode(exec, thisObj->m_impl->itemById(propertyName.string()));
+}
+
+bool DOMNodeList::getOwnPropertySlot(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     PropertySlot& slot) {
+  const HashEntry* entry = Lookup::findEntry(&DOMNodeListTable, propertyName);
+
+  if (entry) {
+    if (entry->attr & Function)
+      slot.setStaticEntry(this, entry, staticFunctionGetter<DOMNodeListFunc>);
+    else
+      slot.setStaticEntry(this, entry, staticValueGetter<DOMNodeList>);
     return true;
-  } else if (p == "item") {
-    // No need for a complete hashtable for a single func, but we still want
-    // to use the caching feature of lookupOrCreateFunction.
-    result = lookupOrCreateFunction<DOMNodeListFunc>(
-        exec, p, this, DOMNodeListFunc::Item, 1, DontDelete | Function);
+  }
+
+  NodeListImpl& list = *m_impl;
+
+  // array index ?
+  bool ok;
+  long unsigned int idx = propertyName.toULong(&ok);
+  if (ok && idx < list.length()) {
+    slot.setCustomIndex(this, idx, indexGetter);
     return true;
   } else {
-    // array index ?
-    bool ok;
-    long unsigned int idx = p.toULong(&ok);
-    if (ok) {
-      result = getDOMNode(exec, list.item(idx));
+    if (list.itemById(propertyName.string())) {
+      slot.setCustom(this, nameGetter);
       return true;
-    } else {
-      NodeImpl* node = list.itemById(p.string());
-
-      if (node) {
-        result = getDOMNode(exec, node);
-        return true;
-      }
     }
   }
 
-  return DOMNodeList::getOwnProperty(exec, p, result);
+  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 // Need to support both get and call, so that list[0] and list(0) work.
@@ -791,8 +806,6 @@ Value DOMNodeList::call(ExecState* exec, Object&, const List& args) {
   if (ok)
     return getDOMNode(exec, m_impl->item(u));
 
-  kdWarning() << "KJS::DOMNodeList::call " << s.qstring() << " not implemented"
-              << endl;
   return Undefined();
 }
 
@@ -834,11 +847,11 @@ const ClassInfo DOMAttr::info = {"Attr", &DOMNode::info, &DOMAttrTable, 0};
 
 DOMAttr::DOMAttr(ExecState* exec, AttrImpl* a) : DOMNode(exec, a) {}
 
-bool DOMAttr::getOwnProperty(ExecState* exec,
-                             const Identifier& propertyName,
-                             Value& result) const {
-  return lookupGetOwnValue<DOMAttr, DOMNode>(exec, propertyName, &DOMAttrTable,
-                                             this, result);
+bool DOMAttr::getOwnPropertySlot(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 PropertySlot& slot) {
+  return getStaticValueSlot<DOMAttr, DOMNode>(exec, &DOMAttrTable, this,
+                                              propertyName, slot);
 }
 
 Value DOMAttr::getValueProperty(ExecState* exec, int token) const {
@@ -957,11 +970,11 @@ DOMDocument::~DOMDocument() {
   ScriptInterpreter::forgetDOMObject(static_cast<DocumentImpl*>(m_impl.get()));
 }
 
-bool DOMDocument::getOwnProperty(ExecState* exec,
-                                 const Identifier& propertyName,
-                                 Value& result) const {
-  return lookupGetOwnValue<DOMDocument, DOMNode>(
-      exec, propertyName, &DOMDocumentTable, this, result);
+bool DOMDocument::getOwnPropertySlot(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     PropertySlot& slot) {
+  return getStaticValueSlot<DOMDocument, DOMNode>(exec, &DOMDocumentTable, this,
+                                                  propertyName, slot);
 }
 
 Value DOMDocument::getValueProperty(ExecState* exec, int token) const {
@@ -1205,40 +1218,58 @@ DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
 
 DOMElement::DOMElement(ElementImpl* e) : DOMNode(e) {}
 
-bool DOMElement::getOwnProperty(ExecState* exec,
-                                const Identifier& propertyName,
-                                Value& result) const {
-  ElementImpl& element = *static_cast<ElementImpl*>(impl());
+Value DOMElement::getValueProperty(ExecState* exec, int token) const {
+  ElementImpl* element = static_cast<ElementImpl*>(impl());
+  switch (token) {
+    case TagName:
+      return getStringOrNull(element->nodeName());
+    case Style:
+      return getDOMCSSStyleDeclaration(exec, element->style());
+    default:
+      assert(0);
+      return Undefined();
+  }
+}
 
+Value DOMElement::attributeGetter(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  const PropertySlot& slot) {
+  DOMElement* thisObj = static_cast<DOMElement*>(slot.slotBase());
+
+  ElementImpl* element = static_cast<ElementImpl*>(thisObj->impl());
+  DOM::DOMString attr = element->getAttribute(propertyName.string());
+  return getStringOrNull(attr);
+}
+
+bool DOMElement::getOwnPropertySlot(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    PropertySlot& slot) {
   const HashEntry* entry = Lookup::findEntry(&DOMElementTable, propertyName);
   if (entry) {
-    switch (entry->value) {
-      case TagName:
-        result = getStringOrNull(element.nodeName());
-        break;
-      case Style:
-        result = getDOMCSSStyleDeclaration(exec, element.style());
-        break;
-      default:
-        assert(0);
-    }
+    slot.setStaticEntry(this, entry, staticValueGetter<DOMElement>);
     return true;
   }
+
   // We have to check in DOMNode before giving access to attributes, otherwise
   // onload="..." would make onload return the string (attribute value) instead
   // of
   // the listener object (function).
+  if (DOMNode::getOwnPropertySlot(exec, propertyName, slot))
+    return true;
+
   ValueImp* proto = prototype().imp();
-  if (DOMNode::hasOwnProperty(exec, propertyName))
-    return DOMNode::getOwnProperty(exec, propertyName, result);
   if (proto->dispatchType() == ObjectType &&
       static_cast<ObjectImp*>(proto)->hasProperty(exec, propertyName))
     return false;
 
+  ElementImpl& element = *static_cast<ElementImpl*>(impl());
+
+  // FIXME: do we really want to do this attribute lookup thing? Mozilla doesn't
+  // do it,
+  // and it seems like it could interfere with XBL.
   DOM::DOMString attr = element.getAttribute(propertyName.string());
-  // Give access to attributes
   if (!attr.isNull()) {
-    result = getStringOrNull(attr);
+    slot.setCustom(this, attributeGetter);
     return true;
   }
 
@@ -1447,11 +1478,11 @@ const ClassInfo DOMDocumentType::info = {"DocumentType", &DOMNode::info,
 DOMDocumentType::DOMDocumentType(ExecState* exec, DocumentTypeImpl* dt)
     : DOMNode(/*### no proto yet*/ exec, dt) {}
 
-bool DOMDocumentType::getOwnProperty(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     Value& result) const {
-  return lookupGetOwnValue<DOMDocumentType, DOMNode>(
-      exec, propertyName, &DOMDocumentTypeTable, this, result);
+bool DOMDocumentType::getOwnPropertySlot(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         PropertySlot& slot) {
+  return getStaticValueSlot<DOMDocumentType, DOMNode>(
+      exec, &DOMDocumentTypeTable, this, propertyName, slot);
 }
 
 Value DOMDocumentType::getValueProperty(ExecState* exec, int token) const {
@@ -1518,34 +1549,38 @@ DOMNamedNodeMap::~DOMNamedNodeMap() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-// We have to implement hasProperty since we don't use a hashtable for 'length'
-// ## this breaks "for (..in..)" though.
-bool DOMNamedNodeMap::hasOwnProperty(ExecState* exec,
-                                     const Identifier& p) const {
-  if (p == lengthPropertyName)
-    return true;
-  return DOMObject::hasOwnProperty(exec, p);
+Value DOMNamedNodeMap::lengthGetter(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    const PropertySlot& slot) {
+  DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
+  return Number(thisObj->m_impl->length());
 }
 
-bool DOMNamedNodeMap::getOwnProperty(ExecState* exec,
-                                     const Identifier& p,
-                                     Value& result) const {
+Value DOMNamedNodeMap::indexGetter(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   const PropertySlot& slot) {
+  DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
+  return getDOMNode(exec, thisObj->m_impl->item(slot.index()));
+}
+
+bool DOMNamedNodeMap::getOwnPropertySlot(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         PropertySlot& slot) {
   NamedNodeMapImpl& map = *m_impl;
-  if (p == lengthPropertyName) {
-    result = Number(map.length());
+  if (propertyName == lengthPropertyName) {
+    slot.setCustom(this, lengthGetter);
     return true;
   }
 
   // array index ?
   bool ok;
-  long unsigned int idx = p.toULong(&ok);
-  if (ok) {
-    result = getDOMNode(exec, map.item(idx));
+  long unsigned int idx = propertyName.toULong(&ok);
+  if (ok && idx < map.length()) {
+    slot.setCustomIndex(this, idx, indexGetter);
     return true;
   }
 
-  // Anything else (including functions, defined in the prototype)
-  return DOMObject::getOwnProperty(exec, p, result);
+  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 Value DOMNamedNodeMapProtoFunc::call(ExecState* exec,
@@ -1609,11 +1644,12 @@ DOMProcessingInstruction::DOMProcessingInstruction(ExecState* exec,
                                                    ProcessingInstructionImpl* i)
     : DOMNode(exec, i) {}
 
-bool DOMProcessingInstruction::getOwnProperty(ExecState* exec,
-                                              const Identifier& propertyName,
-                                              Value& result) const {
-  return lookupGetOwnValue<DOMProcessingInstruction, DOMNode>(
-      exec, propertyName, &DOMProcessingInstructionTable, this, result);
+bool DOMProcessingInstruction::getOwnPropertySlot(
+    ExecState* exec,
+    const Identifier& propertyName,
+    PropertySlot& slot) {
+  return getStaticValueSlot<DOMProcessingInstruction, DOMNode>(
+      exec, &DOMProcessingInstructionTable, this, propertyName, slot);
 }
 
 Value DOMProcessingInstruction::getValueProperty(ExecState* exec,
@@ -1663,11 +1699,11 @@ const ClassInfo DOMNotation::info = {"Notation", &DOMNode::info,
 
 DOMNotation::DOMNotation(ExecState* exec, NotationImpl* n) : DOMNode(exec, n) {}
 
-bool DOMNotation::getOwnProperty(ExecState* exec,
-                                 const Identifier& propertyName,
-                                 Value& result) const {
-  return lookupGetOwnValue<DOMNotation, DOMNode>(
-      exec, propertyName, &DOMNotationTable, this, result);
+bool DOMNotation::getOwnPropertySlot(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     PropertySlot& slot) {
+  return getStaticValueSlot<DOMNotation, DOMNode>(exec, &DOMNotationTable, this,
+                                                  propertyName, slot);
 }
 
 Value DOMNotation::getValueProperty(ExecState*, int token) const {
@@ -1697,11 +1733,11 @@ const ClassInfo DOMEntity::info = {"Entity", &DOMNode::info, 0, 0};
 
 DOMEntity::DOMEntity(ExecState* exec, EntityImpl* e) : DOMNode(exec, e) {}
 
-bool DOMEntity::getOwnProperty(ExecState* exec,
-                               const Identifier& propertyName,
-                               Value& result) const {
-  return lookupGetOwnValue<DOMEntity, DOMNode>(exec, propertyName,
-                                               &DOMEntityTable, this, result);
+bool DOMEntity::getOwnPropertySlot(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   PropertySlot& slot) {
+  return getStaticValueSlot<DOMEntity, DOMNode>(exec, &DOMEntityTable, this,
+                                                propertyName, slot);
 }
 
 Value DOMEntity::getValueProperty(ExecState*, int token) const {
@@ -1880,11 +1916,11 @@ DontDelete|ReadOnly
 DontDelete|ReadOnly
 @end
 */
-bool NodeConstructor::getOwnProperty(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     Value& result) const {
-  return lookupGetOwnValue<NodeConstructor, DOMObject>(
-      exec, propertyName, &NodeConstructorTable, this, result);
+bool NodeConstructor::getOwnPropertySlot(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         PropertySlot& slot) {
+  return getStaticValueSlot<NodeConstructor, DOMObject>(
+      exec, &NodeConstructorTable, this, propertyName, slot);
 }
 
 Value NodeConstructor::getValueProperty(ExecState*, int token) const {
@@ -1967,11 +2003,11 @@ DontDelete|ReadOnly
 @end
 */
 
-bool DOMExceptionConstructor::getOwnProperty(ExecState* exec,
-                                             const Identifier& propertyName,
-                                             Value& result) const {
-  return lookupGetOwnValue<DOMExceptionConstructor, DOMObject>(
-      exec, propertyName, &DOMExceptionConstructorTable, this, result);
+bool DOMExceptionConstructor::getOwnPropertySlot(ExecState* exec,
+                                                 const Identifier& propertyName,
+                                                 PropertySlot& slot) {
+  return getStaticValueSlot<DOMExceptionConstructor, DOMObject>(
+      exec, &DOMExceptionConstructorTable, this, propertyName, slot);
 }
 
 Value DOMExceptionConstructor::getValueProperty(ExecState*, int token) const {
@@ -2032,37 +2068,54 @@ DOMNamedNodesCollection::DOMNamedNodesCollection(
     const QValueList<SharedPtr<NodeImpl>>& nodes)
     : m_nodes(nodes) {}
 
-bool DOMNamedNodesCollection::getOwnProperty(ExecState* exec,
-                                             const Identifier& propertyName,
-                                             Value& result) const {
+Value DOMNamedNodesCollection::lengthGetter(ExecState* exec,
+                                            const Identifier& propertyName,
+                                            const PropertySlot& slot) {
+  DOMNamedNodesCollection* thisObj =
+      static_cast<DOMNamedNodesCollection*>(slot.slotBase());
+  return Number(thisObj->m_nodes.count());
+}
+
+Value DOMNamedNodesCollection::indexGetter(ExecState* exec,
+                                           const Identifier& propertyName,
+                                           const PropertySlot& slot) {
+  DOMNamedNodesCollection* thisObj =
+      static_cast<DOMNamedNodesCollection*>(slot.slotBase());
+  return getDOMNode(exec, thisObj->m_nodes[slot.index()].get());
+}
+
+bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
+                                                 const Identifier& propertyName,
+                                                 PropertySlot& slot) {
   if (propertyName == lengthPropertyName) {
-    result = Number(m_nodes.count());
+    slot.setCustom(this, lengthGetter);
     return true;
   }
-  // index?
+
+  // array index ?
   bool ok;
-  unsigned int u = propertyName.toULong(&ok);
-  if (ok && u < m_nodes.count()) {
-    result = getDOMNode(exec, m_nodes[u].get());
+  long unsigned int idx = propertyName.toULong(&ok);
+  if (ok && idx < m_nodes.count()) {
+    slot.setCustomIndex(this, idx, indexGetter);
     return true;
   }
+
   // For IE compatibility, we need to be able to look up elements in a
   // document.formName.name result by id as well as be index.
 
-  if (!ok) {
-    QValueListConstIterator<SharedPtr<NodeImpl>> end = m_nodes.end();
-    for (QValueListConstIterator<SharedPtr<NodeImpl>> it = m_nodes.begin();
-         it != end; it++) {
-      NodeImpl* node = (*it).get();
-      if (node->hasAttributes() &&
-          node->attributes()->id() == propertyName.string()) {
-        result = getDOMNode(exec, node);
-        return true;
-      }
+  QValueListConstIterator<SharedPtr<NodeImpl>> end = m_nodes.end();
+  int i = 0;
+  for (QValueListConstIterator<SharedPtr<NodeImpl>> it = m_nodes.begin();
+       it != end; ++it, ++i) {
+    NodeImpl* node = (*it).get();
+    if (node->hasAttributes() &&
+        node->attributes()->id() == propertyName.string()) {
+      slot.setCustomIndex(this, i, indexGetter);
+      return true;
     }
   }
 
-  return DOMObject::getOwnProperty(exec, propertyName, result);
+  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 // -------------------------------------------------------------------------
@@ -2095,11 +2148,11 @@ DOMCharacterData::DOMCharacterData(ExecState* exec, CharacterDataImpl* d)
 
 DOMCharacterData::DOMCharacterData(CharacterDataImpl* d) : DOMNode(d) {}
 
-bool DOMCharacterData::getOwnProperty(ExecState* exec,
-                                      const Identifier& p,
-                                      Value& result) const {
-  return lookupGetOwnValue<DOMCharacterData, DOMNode>(
-      exec, p, &DOMCharacterDataTable, this, result);
+bool DOMCharacterData::getOwnPropertySlot(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          PropertySlot& slot) {
+  return getStaticValueSlot<DOMCharacterData, DOMNode>(
+      exec, &DOMCharacterDataTable, this, propertyName, slot);
 }
 
 Value DOMCharacterData::getValueProperty(ExecState*, int token) const {

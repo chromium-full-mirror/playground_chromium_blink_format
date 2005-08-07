@@ -430,7 +430,7 @@ class Document : public Node,
                         const KJS::Value& value,
                         int attr);
 };
-};
+}
 
 KDOM_DEFINE_PROTOTYPE(DocumentProto)
 KDOM_IMPLEMENT_PROTOFUNC(DocumentProtoFunc, Document)

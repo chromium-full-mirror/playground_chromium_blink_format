@@ -152,17 +152,20 @@ inline KJS::Value lookupGet(KJS::ExecState* exec,
                             const KJS::HashTable* table,
                             const ThisImp* thisObj,  // the 'impl' object
                             const KJS::ObjectImp* bridge) {
-  const KJS::HashEntry* entry = KJS::Lookup::findEntry(table, propertyName);
+#if 0
+		const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
 
-  if (!entry)  // not found, forward to parents
-    return thisObj->getInParents(exec, propertyName, bridge);
+		if(!entry) // not found, forward to parents
+			return thisObj->getInParents(exec, propertyName, bridge);
 
-  if (entry->attr & KJS::Function)
-    return KJS::lookupOrCreateFunction<FuncImp>(
-        exec, propertyName, const_cast<KJS::ObjectImp*>(bridge), entry->value,
-        entry->params, entry->attr);
+		if(entry->attr & KJS::Function)
+			return KJS::lookupOrCreateFunction<FuncImp>(exec, propertyName,
+														const_cast<KJS::ObjectImp *>(bridge),
+														entry->value, entry->params, entry->attr);
 
-  return thisObj->getValueProperty(exec, entry->value);
+		return thisObj->getValueProperty(exec, entry->value);
+#endif
+  return KJS::Undefined();
 }
 
 /**
@@ -176,17 +179,18 @@ inline KJS::Value lookupGetValue(KJS::ExecState* exec,
                                  const KJS::HashTable* table,
                                  const ThisImp* thisObj,  // the 'impl' object
                                  const KJS::ObjectImp* bridge) {
-  const KJS::HashEntry* entry = KJS::Lookup::findEntry(table, propertyName);
+#if 0
+		const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
 
-  if (!entry)  // not found, forward to parents
-    return thisObj->getInParents(exec, propertyName, bridge);
+		if(!entry) // not found, forward to parents
+			return thisObj->getInParents(exec, propertyName, bridge);
 
-  if (entry->attr & KJS::Function)
-    kdError(26004) << "Function bit set! Shouldn't happen in lookupGetValue! "
-                      "propertyName was "
-                   << propertyName.qstring() << endl;
+		if(entry->attr & KJS::Function)
+			kdError(26004) << "Function bit set! Shouldn't happen in lookupGetValue! propertyName was " << propertyName.qstring() << endl;
 
-  return thisObj->getValueProperty(exec, entry->value);
+		return thisObj->getValueProperty(exec, entry->value);
+#endif
+  return KJS::Undefined();
 }
 
 /**
@@ -268,7 +272,7 @@ inline bool lookupPut(KJS::ExecState* exec,
     static const struct KJS::HashTable s_hashTable;              \
   };                                                             \
   KJS::Value get##ClassName(KJS::ExecState* exec);               \
-  };
+  }
 
 // Same as kjs' DEFINE_PROTOTYPE, but with a pointer to the hashtable too, and
 // no ClassName here
@@ -290,7 +294,7 @@ inline bool lookupPut(KJS::ExecState* exec,
                                                                            \
     static const struct KJS::HashTable s_hashTable;                        \
   };                                                                       \
-  };
+  }
 
 // same as IMPLEMENT_PROTOTYPE but in the KDOM namespace, and with ClassName
 // here
@@ -299,10 +303,10 @@ inline bool lookupPut(KJS::ExecState* exec,
 #define ECMA_IMPLEMENT_PROTOTYPE(Space, ClassName, ClassProto, ClassFunc)     \
   KJS::Value Space::ClassProto::get(                                          \
       KJS::ExecState* exec, const KJS::Identifier& propertyName) const {      \
-    KJS::Value result;                                                        \
-    if (KJS::lookupGetOwnFunction<ClassFunc, KJS::ObjectImp>(                 \
-            exec, propertyName, &s_hashTable, this, result))                  \
-      return result;                                                          \
+    /* KJS::Value result;                                                     \
+    if (KJS::lookupGetOwnFunction<ClassFunc,KJS::ObjectImp>(exec,             \
+    propertyName, &s_hashTable, this, result))                                \
+    return result;  */                                                        \
     return KJS::Undefined();                                                  \
     /* return KJS::lookupGetFunction<ClassFunc,KJS::ObjectImp>(exec,          \
      * propertyName, &s_hashTable, this ); */                                 \
@@ -344,7 +348,7 @@ inline bool lookupPut(KJS::ExecState* exec,
   };                                                                      \
   /* Is eventually generated, if KDOM_CAST is given */                    \
   Class to##Class(KJS::ExecState* exec, const KJS::ObjectImp* bridge);    \
-  };
+  }
 
 // To be used when casting the type of an argument
 #define KDOM_CHECK(ClassName, theObj)                                     \

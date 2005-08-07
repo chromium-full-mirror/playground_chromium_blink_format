@@ -504,7 +504,7 @@ KDOM_DEFINE_CAST(Node)
     }                                                                       \
     return *this;                                                           \
   }
-};
+}
 
 KDOM_DEFINE_PROTOTYPE(NodeProto)
 KDOM_IMPLEMENT_PROTOFUNC(NodeProtoFunc, Node)

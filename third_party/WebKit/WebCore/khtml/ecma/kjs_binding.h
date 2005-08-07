@@ -25,7 +25,6 @@
 #include <kjs/interpreter.h>
 #include <qvariant.h>
 #include <kjs/lookup.h>
-#include <kjs/protect.h>
 
 #if APPLE_CHANGES
 #include <JavaScriptCore/runtime.h>
@@ -124,7 +123,7 @@ class ScriptInterpreter : public Interpreter {
   virtual bool isSafeScript(const Interpreter* target);
   virtual void* createLanguageInstanceForValue(
       ExecState* exec,
-      Bindings::Instance::BindingLanguage language,
+      int language,
       const Object& value,
       const Bindings::RootObject* origin,
       const Bindings::RootObject* current);

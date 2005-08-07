@@ -228,7 +228,7 @@ Interpreter* ScriptInterpreter::interpreterForGlobalObject(
 
 void* ScriptInterpreter::createLanguageInstanceForValue(
     ExecState* exec,
-    Bindings::Instance::BindingLanguage language,
+    int language,
     const Object& value,
     const Bindings::RootObject* origin,
     const Bindings::RootObject* current) {

@@ -1,4 +1,4 @@
-// -*- c-basic-offset: 2 -*-
+// -*- c-basic-offset: 4 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
@@ -275,183 +275,149 @@ wouldn't,
 HTMLDocument::HTMLDocument(ExecState* exec, HTMLDocumentImpl* d)
     : DOMDocument(exec, d) {}
 
-bool HTMLDocument::hasOwnProperty(ExecState* exec, const Identifier& p) const {
-#ifdef KJS_VERBOSE
-// kdDebug(6070) << "HTMLDocument::hasProperty " << p.qstring() << endl;
-#endif
-  if (DOMDocument::hasOwnProperty(exec, p))
-    return true;
+Value HTMLDocument::namedItemGetter(ExecState* exec,
+                                    const Identifier& propertyName,
+                                    const PropertySlot& slot) {
+  HTMLDocument* thisObj = static_cast<HTMLDocument*>(slot.slotBase());
+  HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(thisObj->impl());
 
-  HTMLDocumentImpl* doc = static_cast<HTMLDocumentImpl*>(impl());
-  DOMString name = p.string();
-  return doc->hasNamedItem(name) || doc->hasDocExtraNamedItem(name);
+  DOMString name = propertyName.string();
+  SharedPtr<DOM::HTMLCollectionImpl> collection = doc.documentNamedItems(name);
+
+  if (collection->length() == 1) {
+    NodeImpl* node = collection->firstItem();
+    KHTMLPart* part;
+    if (node->hasTagName(iframeTag) &&
+        (part = static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentPart()))
+      return Window::retrieve(part);
+
+    return getDOMNode(exec, node);
+  }
+
+  return getHTMLCollection(exec, collection.get());
 }
 
-bool HTMLDocument::getOwnProperty(ExecState* exec,
-                                  const Identifier& propertyName,
-                                  Value& result) const {
+Value HTMLDocument::getValueProperty(ExecState* exec, int token) const {
   HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
-  HTMLElementImpl* body = doc.body();
 
   KHTMLView* view = doc.view();
   KHTMLPart* part = doc.part();
 
-  DOMString name = propertyName.string();
-  if (doc.hasNamedItem(name) || doc.hasDocExtraNamedItem(name)) {
-    SharedPtr<DOM::HTMLCollectionImpl> collection =
-        doc.documentNamedItems(name);
-    if (collection->length() == 1) {
-      NodeImpl* node = collection->firstItem();
-      KHTMLPart* part;
-      if (node->hasTagName(iframeTag) &&
-          (part =
-               static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentPart()))
-        result = Window::retrieve(part);
-      else
-        result = getDOMNode(exec, node);
-    } else
-      result = getHTMLCollection(exec, collection.get());
-    return true;
-  }
-
+  HTMLElementImpl* body = doc.body();
   HTMLBodyElementImpl* bodyElement =
       (body && body->hasTagName(bodyTag))
           ? static_cast<HTMLBodyElementImpl*>(body)
           : 0;
 
-  const HashEntry* entry = Lookup::findEntry(&HTMLDocumentTable, propertyName);
-  if (entry) {
-    switch (entry->value) {
-      case Title:
-        result = String(doc.title());
-        return true;
-      case Referrer:
-        result = String(doc.referrer());
-        return true;
-      case Domain:
-        result = String(doc.domain());
-        return true;
-      case URL:
-        result = String(doc.URL());
-        return true;
-      case Body:
-        result = getDOMNode(exec, body);
-        return true;
-      case Location:
-        if (part) {
-          Window* win = Window::retrieveWindow(part);
-          if (win) {
-            result = Value(win->location());
-            return true;
-          }
-        }
-        result = Undefined();
-        return true;
-      case Cookie:
-        result = String(doc.cookie());
-        return true;
-      case Images:
-        result = getHTMLCollection(exec, doc.images().get());
-        return true;
-      case Embeds:
-        result = getHTMLCollection(exec, doc.embeds().get());
-        return true;
-      case Applets:
-        result = getHTMLCollection(exec, doc.applets().get());
-        return true;
-      case Links:
-        result = getHTMLCollection(exec, doc.links().get());
-        return true;
-      case Forms:
-        result = getHTMLCollection(exec, doc.forms().get());
-        return true;
-      case Anchors:
-        result = getHTMLCollection(exec, doc.anchors().get());
-        return true;
-      case Scripts:  // TODO (IE-specific)
-      {
-        // To be implemented. Meanwhile, return an object with a length property
-        // set to 0
-        kdWarning()
-            << "KJS::HTMLDocument document.scripts called - not implemented"
-            << endl;
-        Object obj(new ObjectImp());
-        obj.put(exec, lengthPropertyName, Number(0));
-        result = obj;
-        return true;
+  switch (token) {
+    case Title:
+      return String(doc.title());
+    case Referrer:
+      return String(doc.referrer());
+    case Domain:
+      return String(doc.domain());
+    case URL:
+      return String(doc.URL());
+    case Body:
+      return getDOMNode(exec, body);
+    case Location:
+      if (part) {
+        Window* win = Window::retrieveWindow(part);
+        if (win)
+          return Value(win->location());
       }
-      case All:
-        // Disable document.all when we try to be Netscape-compatible
-        if (exec->dynamicInterpreter()->compatMode() ==
-            Interpreter::NetscapeCompat)
-          result = Undefined();
-        result = getHTMLCollection(exec, doc.all().get());
-        return true;
-      case Clear:
-      case Open:
-      case Close:
-      case Write:
-      case WriteLn:
-      case GetElementsByName:
-      case CaptureEvents:
-      case ReleaseEvents:
-        result = lookupOrCreateFunction<HTMLDocFunction>(
-            exec, propertyName, this, entry->value, entry->params, entry->attr);
-        return true;
-      case BgColor:
-        if (bodyElement)
-          result = String(bodyElement->bgColor());
-        else
-          result = Undefined();
-        return true;
-      case FgColor:
-        if (bodyElement)
-          result = String(bodyElement->text());
-        else
-          result = Undefined();
-        return true;
-      case AlinkColor:
-        if (bodyElement)
-          result = String(bodyElement->aLink());
-        else
-          result = Undefined();
-        return true;
-      case LinkColor:
-        if (bodyElement)
-          result = String(bodyElement->link());
-        else
-          result = Undefined();
-        return true;
-      case VlinkColor:
-        if (bodyElement)
-          result = String(bodyElement->vLink());
-        else
-          result = Undefined();
-        return true;
-      case LastModified:
-        result = String(doc.lastModified());
-        return true;
-      case Height:
-        result = Number(view ? view->contentsHeight() : 0);
-        return true;
-      case Width:
-        result = Number(view ? view->contentsWidth() : 0);
-        return true;
-      case Dir:
-        if (bodyElement)
-          result = String(bodyElement->dir());
-        else
-          result = Undefined();
-        return true;
-      case DesignMode:
-        result = String(doc.inDesignMode() ? "on" : "off");
-        return true;
-      default:
-        assert(0);
+
+      return Undefined();
+    case Cookie:
+      return String(doc.cookie());
+    case Images:
+      return getHTMLCollection(exec, doc.images().get());
+    case Embeds:
+      return getHTMLCollection(exec, doc.embeds().get());
+    case Applets:
+      return getHTMLCollection(exec, doc.applets().get());
+    case Links:
+      return getHTMLCollection(exec, doc.links().get());
+    case Forms:
+      return getHTMLCollection(exec, doc.forms().get());
+    case Anchors:
+      return getHTMLCollection(exec, doc.anchors().get());
+    case Scripts:  // TODO (IE-specific)
+    {
+      // To be implemented. Meanwhile, return an object with a length property
+      // set to 0
+      kdWarning()
+          << "KJS::HTMLDocument document.scripts called - not implemented"
+          << endl;
+      Object obj(new ObjectImp());
+      obj.put(exec, lengthPropertyName, Number(0));
+      return obj;
     }
+    case All:
+      // Disable document.all when we try to be Netscape-compatible
+      if (exec->dynamicInterpreter()->compatMode() ==
+          Interpreter::NetscapeCompat)
+        return Undefined();
+      return getHTMLCollection(exec, doc.all().get());
+    case BgColor:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->bgColor());
+    case FgColor:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->text());
+    case AlinkColor:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->aLink());
+    case LinkColor:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->link());
+    case VlinkColor:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->vLink());
+    case LastModified:
+      return String(doc.lastModified());
+    case Height:
+      return Number(view ? view->contentsHeight() : 0);
+    case Width:
+      return Number(view ? view->contentsWidth() : 0);
+    case Dir:
+      if (!bodyElement)
+        return Undefined();
+      return String(bodyElement->dir());
+    case DesignMode:
+      return String(doc.inDesignMode() ? "on" : "off");
+    default:
+      assert(0);
+      return Undefined();
+  }
+}
+
+bool HTMLDocument::getOwnPropertySlot(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      PropertySlot& slot) {
+  HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
+
+  DOMString name = propertyName.string();
+  if (doc.hasNamedItem(name) || doc.hasDocExtraNamedItem(name)) {
+    slot.setCustom(this, namedItemGetter);
+    return true;
   }
 
-  return DOMDocument::getOwnProperty(exec, propertyName, result);
+  const HashEntry* entry = Lookup::findEntry(&HTMLDocumentTable, propertyName);
+  if (entry) {
+    if (entry->attr & Function)
+      slot.setStaticEntry(this, entry, staticFunctionGetter<HTMLDocFunction>);
+    else
+      slot.setStaticEntry(this, entry, staticValueGetter<HTMLDocument>);
+    return true;
+  }
+
+  return DOMDocument::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void KJS::HTMLDocument::put(ExecState* exec,
@@ -1525,9 +1491,103 @@ DontDelete|ReadOnly
 HTMLElement::HTMLElement(ExecState* exec, HTMLElementImpl* e)
     : DOMElement(exec, e) {}
 
-bool KJS::HTMLElement::getOwnProperty(ExecState* exec,
+Value HTMLElement::formIndexGetter(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLFormElementImpl* form =
+      static_cast<HTMLFormElementImpl*>(thisObj->impl());
+
+  return getDOMNode(exec, form->elements()->item(slot.index()));
+}
+
+Value HTMLElement::formNameGetter(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLFormElementImpl* form =
+      static_cast<HTMLFormElementImpl*>(thisObj->impl());
+
+  return HTMLCollection(exec, form->elements().get())
+      .getNamedItems(exec, propertyName);
+}
+
+Value HTMLElement::selectIndexGetter(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLSelectElementImpl* select =
+      static_cast<HTMLSelectElementImpl*>(thisObj->impl());
+
+  return getDOMNode(exec, select->optionsHTMLCollection()->item(slot.index()));
+}
+
+Value HTMLElement::framesetNameGetter(ExecState* exec,
                                       const Identifier& propertyName,
-                                      Value& result) const {
+                                      const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(thisObj->impl());
+
+  NodeImpl* frame = element->children()->namedItem(propertyName.string());
+  DocumentImpl* doc =
+      static_cast<HTMLFrameElementImpl*>(frame)->contentDocument();
+  if (doc) {
+    KHTMLPart* part = doc->part();
+    if (part) {
+      Window* window = Window::retrieveWindow(part);
+      if (window) {
+        return Value(window);
+      }
+    }
+  }
+
+  return Undefined();
+}
+
+Value HTMLElement::frameWindowPropertyGetter(ExecState* exec,
+                                             const Identifier& propertyName,
+                                             const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  DocumentImpl* doc =
+      static_cast<HTMLFrameElementImpl*>(thisObj->impl())->contentDocument();
+
+  if (doc) {
+    KHTMLPart* part = doc->part();
+    if (part) {
+      Window* window = Window::retrieveWindow(part);
+      if (window)
+        return window->get(exec, propertyName);
+    }
+  }
+
+  return Undefined();
+}
+
+Value HTMLElement::runtimeObjectGetter(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(thisObj->impl());
+
+  return getRuntimeObject(exec, element);
+}
+
+Value HTMLElement::runtimeObjectPropertyGetter(ExecState* exec,
+                                               const Identifier& propertyName,
+                                               const PropertySlot& slot) {
+  HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
+  HTMLElementImpl* element = static_cast<HTMLElementImpl*>(thisObj->impl());
+
+  Value runtimeObject = getRuntimeObject(exec, element);
+  if (!runtimeObject.isNull())
+    return static_cast<ObjectImp*>(runtimeObject.imp())
+        ->get(exec, propertyName);
+  return Undefined();
+}
+
+bool HTMLElement::getOwnPropertySlot(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     PropertySlot& slot) {
   HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
 
   // First look at dynamic properties
@@ -1537,41 +1597,30 @@ bool KJS::HTMLElement::getOwnProperty(ExecState* exec,
     bool ok;
     uint u = propertyName.toULong(&ok);
     if (ok) {
-      result = getDOMNode(exec, form.elements()->item(u));
+      slot.setCustomIndex(this, u, formIndexGetter);
       return true;
     }
 
+    // FIXME: need faster way to check for a named item and/or a way to pass on
+    // the named items subcollection
     ValueImp* namedItems = HTMLCollection(exec, form.elements().get())
                                .getNamedItems(exec, propertyName);
     if (!namedItems->isUndefined()) {
-      result = namedItems;
+      slot.setCustom(this, formNameGetter);
       return true;
     }
   } else if (element.hasLocalName(selectTag)) {
-    HTMLSelectElementImpl& select =
-        static_cast<HTMLSelectElementImpl&>(element);
     bool ok;
     uint u = propertyName.toULong(&ok);
     if (ok) {
       // not specified by DOM(?) but supported in netscape/IE
-      result = getDOMNode(exec, select.optionsHTMLCollection()->item(u));
+      slot.setCustomIndex(this, u, selectIndexGetter);
       return true;
     }
   } else if (element.hasLocalName(framesetTag)) {
     NodeImpl* frame = element.children()->namedItem(propertyName.string());
     if (frame && frame->hasTagName(frameTag)) {
-      DocumentImpl* doc =
-          static_cast<HTMLFrameElementImpl*>(frame)->contentDocument();
-      if (doc) {
-        KHTMLPart* part = doc->part();
-        if (part) {
-          Window* window = Window::retrieveWindow(part);
-          if (window) {
-            result = Value(window);
-            return true;
-          }
-        }
-      }
+      slot.setCustom(this, framesetNameGetter);
     }
   } else if (element.hasLocalName(frameTag) ||
              element.hasLocalName(iframeTag)) {
@@ -1582,8 +1631,8 @@ bool KJS::HTMLElement::getOwnProperty(ExecState* exec,
       if (part) {
         Window* window = Window::retrieveWindow(part);
         if (window && window->hasProperty(exec, propertyName)) {
-          result = window->get(exec, propertyName);
-          return result;
+          slot.setCustom(this, frameWindowPropertyGetter);
+          return true;
         }
       }
     }
@@ -1592,14 +1641,14 @@ bool KJS::HTMLElement::getOwnProperty(ExecState* exec,
   else if (element.hasLocalName(embedTag) || element.hasLocalName(objectTag) ||
            element.hasLocalName(appletTag)) {
     if (propertyName == "__apple_runtime_object") {
-      result = getRuntimeObject(exec, &element);
+      slot.setCustom(this, runtimeObjectGetter);
       return true;
     }
     Value runtimeObject = getRuntimeObject(exec, &element);
     if (!runtimeObject.isNull()) {
       ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject.imp());
       if (imp->hasProperty(exec, propertyName)) {
-        result = imp->get(exec, propertyName);
+        slot.setCustom(this, runtimeObjectPropertyGetter);
         return true;
       }
     }
@@ -1610,18 +1659,36 @@ bool KJS::HTMLElement::getOwnProperty(ExecState* exec,
       classInfo()->propHashTable;  // get the right hashtable
   const HashEntry* entry = Lookup::findEntry(table, propertyName);
   if (entry) {
-    if (entry->attr & Function)
-      result = lookupOrCreateFunction<KJS::HTMLElementFunction>(
-          exec, propertyName, this, entry->value, entry->params, entry->attr);
-    else
-      result = getValueProperty(exec, entry->value);
-    return true;
+    // don't expose selection properties for input types that can't have a
+    // selection
+    if (element.hasLocalName(inputTag) &&
+        !static_cast<HTMLInputElementImpl*>(impl())->canHaveSelection()) {
+      switch (entry->value) {
+        case InputSetSelectionRange:
+        case InputSelectionStart:
+        case InputSelectionEnd:
+          break;
+        default:
+          if (entry->attr & Function)
+            slot.setStaticEntry(this, entry,
+                                staticFunctionGetter<HTMLElementFunction>);
+          else
+            slot.setStaticEntry(this, entry, staticValueGetter<HTMLElement>);
+          return true;
+      }
+    } else {
+      if (entry->attr & Function)
+        slot.setStaticEntry(this, entry,
+                            staticFunctionGetter<HTMLElementFunction>);
+      else
+        slot.setStaticEntry(this, entry, staticValueGetter<HTMLElement>);
+      return true;
+    }
   }
 
   // Base HTMLElement stuff or parent class forward, as usual
-  return lookupGetOwnProperty<KJS::HTMLElementFunction, KJS::HTMLElement,
-                              DOMElement>(exec, propertyName, &HTMLElementTable,
-                                          this, result);
+  return getStaticPropertySlot<HTMLElementFunction, HTMLElement, DOMElement>(
+      exec, &HTMLElementTable, this, propertyName, slot);
 }
 
 bool KJS::HTMLElement::implementsCall() const {
@@ -2721,49 +2788,6 @@ Value HTMLElement::getValueProperty(ExecState* exec, int token) const {
   if (info && info->m_getter)
     return (this->*(info->m_getter))(exec, token);
   return Undefined();
-}
-
-bool KJS::HTMLElement::hasOwnProperty(ExecState* exec,
-                                      const Identifier& propertyName) const {
-#ifdef KJS_VERBOSE
-// kdDebug(6070) << "HTMLElement::hasProperty " << propertyName.qstring() <<
-// endl;
-#endif
-  HTMLElementImpl& element = *static_cast<HTMLElementImpl*>(impl());
-  // First look at dynamic properties - keep this in sync with tryGet
-  if (element.hasLocalName(formTag)) {
-    HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
-    // Check if we're retrieving an element (by index or by name)
-    bool ok;
-    uint u = propertyName.toULong(&ok);
-    if (ok && form.elements()->item(u))
-      return true;
-    if (form.elements()->namedItem(propertyName.string()))
-      return true;
-  } else if (element.hasLocalName(selectTag)) {
-    HTMLSelectElementImpl& select =
-        static_cast<HTMLSelectElementImpl&>(element);
-    bool ok;
-    uint u = propertyName.toULong(&ok);
-    if (ok && select.optionsHTMLCollection()->item(u))
-      return true;
-  } else if (element.hasLocalName(inputTag)) {
-    HTMLInputElementImpl& input = static_cast<HTMLInputElementImpl&>(element);
-    const HashTable* table = classInfo()->propHashTable;
-    const HashEntry* entry = Lookup::findEntry(table, propertyName);
-    if (entry) {
-      switch (entry->value) {
-        case InputSelectionStart:
-        case InputSelectionEnd:
-        case InputSetSelectionRange:
-          return input.canHaveSelection();
-        default:
-          break;
-      }
-    }
-  }
-
-  return DOMElement::hasOwnProperty(exec, propertyName);
 }
 
 UString KJS::HTMLElement::toString(ExecState* exec) const {
@@ -4642,38 +4666,33 @@ HTMLCollection::~HTMLCollection() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-// We have to implement hasOwnProperty since we don't use a hashtable for
-// 'selectedIndex' and 'length'
-// ## this breaks "for (..in..)" though.
-bool KJS::HTMLCollection::hasOwnProperty(ExecState* exec,
-                                         const Identifier& p) const {
-  if (p == "selectedIndex" || p == lengthPropertyName)
-    return true;
-  return DOMObject::hasOwnProperty(exec, p);
+Value HTMLCollection::lengthGetter(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   const PropertySlot& slot) {
+  HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
+  return Number(thisObj->m_impl->length());
 }
 
-bool KJS::HTMLCollection::getOwnProperty(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         Value& result) const {
-  HTMLCollectionImpl& collection = *m_impl;
-  if (propertyName == lengthPropertyName) {
-    result = Number(collection.length());
-    return true;
-  } else if (propertyName == "selectedIndex") {
-    // FIXME: should we really handle selectedIndex here, as well as in
-    // HTMLSelectCollection?
+Value HTMLCollection::indexGetter(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  const PropertySlot& slot) {
+  HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
+  return getDOMNode(exec, thisObj->m_impl->item(slot.index()));
+}
 
-    // NON-STANDARD options.selectedIndex
-    NodeImpl* option = collection.item(0);
-    if (option->hasTagName(optionTag)) {
-      NodeImpl* select = option;
-      while ((select = select->parentNode()))
-        if (select->hasTagName(selectTag)) {
-          result = Number(
-              static_cast<HTMLSelectElementImpl*>(select)->selectedIndex());
-          return true;
-        }
-    }
+Value HTMLCollection::nameGetter(ExecState* exec,
+                                 const Identifier& propertyName,
+                                 const PropertySlot& slot) {
+  HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
+  return thisObj->getNamedItems(exec, propertyName);
+}
+
+bool HTMLCollection::getOwnPropertySlot(ExecState* exec,
+                                        const Identifier& propertyName,
+                                        PropertySlot& slot) {
+  if (propertyName == lengthPropertyName) {
+    slot.setCustom(this, lengthGetter);
+    return true;
   } else {
     // Look in the prototype (for functions) before assuming it's an item's name
     Object proto = Object::dynamicCast(prototype());
@@ -4684,18 +4703,17 @@ bool KJS::HTMLCollection::getOwnProperty(ExecState* exec,
     bool ok;
     unsigned int u = propertyName.toULong(&ok);
     if (ok) {
-      result = getDOMNode(exec, collection.item(u));
+      slot.setCustomIndex(this, u, indexGetter);
       return true;
     }
 
-    Value items = getNamedItems(exec, propertyName);
-    if (!items.imp()->isUndefined()) {
-      result = items;
+    if (!getNamedItems(exec, propertyName).imp()->isUndefined()) {
+      slot.setCustom(this, nameGetter);
       return true;
     }
   }
 
-  return DOMObject::getOwnProperty(exec, propertyName, result);
+  return DOMObject::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 // HTMLCollections are strange objects, they support both get and call,
@@ -4799,15 +4817,24 @@ HTMLSelectCollection::HTMLSelectCollection(ExecState* exec,
                                            HTMLSelectElementImpl* e)
     : HTMLCollection(exec, c), m_element(e) {}
 
-bool KJS::HTMLSelectCollection::getOwnProperty(ExecState* exec,
-                                               const Identifier& p,
-                                               Value& result) const {
-  if (p == "selectedIndex") {
-    result = Number(m_element->selectedIndex());
+Value HTMLSelectCollection::selectedIndexGetter(ExecState* exec,
+                                                const Identifier& propertyName,
+                                                const PropertySlot& slot) {
+  HTMLSelectCollection* thisObj =
+      static_cast<HTMLSelectCollection*>(slot.slotBase());
+  return Number(thisObj->m_element->selectedIndex());
+}
+
+bool HTMLSelectCollection::getOwnPropertySlot(ExecState* exec,
+                                              const Identifier& propertyName,
+                                              PropertySlot& slot) {
+  if (propertyName == "selectedIndex") {
+    slot.setCustom(this, selectedIndexGetter);
+    // result = Number(m_element->selectedIndex());
     return true;
   }
 
-  return HTMLCollection::getOwnProperty(exec, p, result);
+  return HTMLCollection::getOwnPropertySlot(exec, propertyName, slot);
 }
 
 void KJS::HTMLSelectCollection::put(ExecState* exec,
@@ -4974,11 +5001,11 @@ const ClassInfo KJS::Image::info = {"Image", 0, &ImageTable, 0};
 @end
 */
 
-bool Image::getOwnProperty(ExecState* exec,
-                           const Identifier& propertyName,
-                           Value& result) const {
-  return lookupGetOwnValue<Image, DOMObject>(exec, propertyName, &ImageTable,
-                                             this, result);
+bool Image::getOwnPropertySlot(ExecState* exec,
+                               const Identifier& propertyName,
+                               PropertySlot& slot) {
+  return getStaticValueSlot<Image, DOMObject>(exec, &ImageTable, this,
+                                              propertyName, slot);
 }
 
 Value Image::getValueProperty(ExecState*, int token) const {
@@ -6008,12 +6035,12 @@ DontDelete|Function 1
 @end
 */
 
-bool Context2D::getOwnProperty(ExecState* exec,
-                               const Identifier& propertyName,
-                               Value& result) const {
+bool Context2D::getOwnPropertySlot(ExecState* exec,
+                                   const Identifier& propertyName,
+                                   PropertySlot& slot) {
   // FIXME: functions should be on the prototype, not in the object itself
-  return lookupGetOwnProperty<Context2DFunction, Context2D, DOMObject>(
-      exec, propertyName, &Context2DTable, this, result);
+  return getStaticPropertySlot<Context2DFunction, Context2D, DOMObject>(
+      exec, &Context2DTable, this, propertyName, slot);
 }
 
 Value Context2D::getValueProperty(ExecState*, int token) const {
@@ -6566,11 +6593,11 @@ Gradient::Gradient(float x0, float y0, float r0, float x1, float y1, float r1) {
   commonInit();
 }
 
-bool Gradient::getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const {
-  return lookupGetOwnProperty<GradientFunction, Gradient, DOMObject>(
-      exec, propertyName, &GradientTable, this, result);
+bool Gradient::getOwnPropertySlot(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  PropertySlot& slot) {
+  return getStaticPropertySlot<GradientFunction, Gradient, DOMObject>(
+      exec, &GradientTable, this, propertyName, slot);
 }
 
 Value Gradient::getValueProperty(ExecState*, int token) const {
@@ -6768,11 +6795,11 @@ CGPatternRef ImagePattern::createPattern(CGAffineTransform transform) {
                          &patternCallbacks);
 }
 
-bool ImagePattern::getOwnProperty(ExecState* exec,
-                                  const Identifier& propertyName,
-                                  Value& result) const {
-  return lookupGetOwnValue<ImagePattern, DOMObject>(
-      exec, propertyName, &ImagePatternTable, this, result);
+bool ImagePattern::getOwnPropertySlot(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      PropertySlot& slot) {
+  return getStaticValueSlot<ImagePattern, DOMObject>(exec, &ImagePatternTable,
+                                                     this, propertyName, slot);
 }
 
 Value ImagePattern::getValueProperty(ExecState*, int token) const {

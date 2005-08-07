@@ -28,6 +28,7 @@
 #include "ustring.h"
 #include "value.h"
 #include "object.h"
+#include "protected_object.h"
 #include "types.h"
 #include "interpreter.h"
 #include "scope_chain.h"
@@ -294,7 +295,7 @@ class InterpreterImp {
 
   void mark();
 
-  ExecState* globalExec() { return globExec; }
+  ExecState* globalExec() { return &globExec; }
   bool checkSyntax(const UString& code);
   Completion evaluate(const UString& code,
                       const Value& thisV,
@@ -399,7 +400,7 @@ class InterpreterImp {
   ProtectedObject b_typeErrorPrototype;
   ProtectedObject b_uriErrorPrototype;
 
-  ExecState* globExec;
+  ExecState globExec;
   Interpreter::CompatMode m_compatMode;
 
   // Chained list of interpreters (ring) - for collector

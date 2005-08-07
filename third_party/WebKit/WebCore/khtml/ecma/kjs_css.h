@@ -49,21 +49,17 @@ class DOMCSSStyleDeclaration : public DOMObject {
  public:
   DOMCSSStyleDeclaration(ExecState* exec, DOM::CSSStyleDeclarationImpl* s);
   virtual ~DOMCSSStyleDeclaration();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
                    int attr = None);
-  virtual bool hasOwnProperty(ExecState* exec,
-                              const Identifier& propertyName) const;
+  Value getValueProperty(ExecState* exec, int token);
+
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
+  enum { CssText, Length, ParentRule };
   enum {
-    CssText,
-    Length,
-    ParentRule,
     GetPropertyValue,
     GetPropertyCSSValue,
     RemoveProperty,
@@ -74,6 +70,11 @@ class DOMCSSStyleDeclaration : public DOMObject {
   DOM::CSSStyleDeclarationImpl* impl() const { return m_impl.get(); }
 
  private:
+  static Value indexGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static Value cssPropertyGetter(ExecState*,
+                                 const Identifier&,
+                                 const PropertySlot&);
+
   khtml::SharedPtr<DOM::CSSStyleDeclarationImpl> m_impl;
 };
 
@@ -84,9 +85,7 @@ class DOMStyleSheet : public DOMObject {
  public:
   DOMStyleSheet(ExecState*, DOM::StyleSheetImpl* ss) : m_impl(ss) {}
   virtual ~DOMStyleSheet();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -115,9 +114,8 @@ class DOMStyleSheetList : public DOMObject {
                     DOM::DocumentImpl* doc)
       : m_impl(ssl), m_doc(doc) {}
   virtual ~DOMStyleSheetList();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   virtual bool toBoolean(ExecState*) const { return true; }
@@ -126,6 +124,9 @@ class DOMStyleSheetList : public DOMObject {
   enum { Item, Length };
 
  private:
+  static Value indexGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static Value nameGetter(ExecState*, const Identifier&, const PropertySlot&);
+
   khtml::SharedPtr<DOM::StyleSheetListImpl> m_impl;
   khtml::SharedPtr<DOM::DocumentImpl> m_doc;
 };
@@ -140,9 +141,8 @@ class DOMMediaList : public DOMObject {
  public:
   DOMMediaList(ExecState*, DOM::MediaListImpl* ml);
   virtual ~DOMMediaList();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -154,6 +154,9 @@ class DOMMediaList : public DOMObject {
   DOM::MediaListImpl* impl() const { return m_impl.get(); }
 
  private:
+  static Value indexGetter(ExecState* exec,
+                           const Identifier&,
+                           const PropertySlot& slot);
   khtml::SharedPtr<DOM::MediaListImpl> m_impl;
 };
 
@@ -163,9 +166,8 @@ class DOMCSSStyleSheet : public DOMStyleSheet {
  public:
   DOMCSSStyleSheet(ExecState* exec, DOM::CSSStyleSheetImpl* ss);
   virtual ~DOMCSSStyleSheet();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -176,9 +178,8 @@ class DOMCSSRuleList : public DOMObject {
  public:
   DOMCSSRuleList(ExecState*, DOM::CSSRuleListImpl* rl) : m_impl(rl) {}
   virtual ~DOMCSSRuleList();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -186,6 +187,10 @@ class DOMCSSRuleList : public DOMObject {
   DOM::CSSRuleListImpl* impl() const { return m_impl.get(); }
 
  private:
+  static Value indexGetter(ExecState* exec,
+                           const Identifier&,
+                           const PropertySlot& slot);
+
   khtml::SharedPtr<DOM::CSSRuleListImpl> m_impl;
 };
 
@@ -195,9 +200,7 @@ class DOMCSSRule : public DOMObject {
  public:
   DOMCSSRule(ExecState*, DOM::CSSRuleImpl* r) : m_impl(r) {}
   virtual ~DOMCSSRule();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -242,9 +245,7 @@ ValueImp* getDOMCSSRule(ExecState* exec, DOM::CSSRuleImpl* r);
 class CSSRuleConstructor : public DOMObject {
  public:
   CSSRuleConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -266,9 +267,8 @@ class DOMCSSValue : public DOMObject {
  public:
   DOMCSSValue(ExecState*, DOM::CSSValueImpl* v) : m_impl(v) {}
   virtual ~DOMCSSValue();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -292,9 +292,7 @@ ValueImp* getDOMCSSValue(ExecState* exec, DOM::CSSValueImpl* v);
 class CSSValueConstructor : public DOMObject {
  public:
   CSSValueConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -307,9 +305,8 @@ Value getCSSValueConstructor(ExecState* exec);
 class DOMCSSPrimitiveValue : public DOMCSSValue {
  public:
   DOMCSSPrimitiveValue(ExecState* exec, DOM::CSSPrimitiveValueImpl* v);
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token);
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -330,9 +327,7 @@ class DOMCSSPrimitiveValue : public DOMCSSValue {
 class CSSPrimitiveValueConstructor : public CSSValueConstructor {
  public:
   CSSPrimitiveValueConstructor(ExecState* exec) : CSSValueConstructor(exec) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -344,22 +339,24 @@ Value getCSSPrimitiveValueConstructor(ExecState* exec);
 class DOMCSSValueList : public DOMCSSValue {
  public:
   DOMCSSValueList(ExecState* exec, DOM::CSSValueListImpl* l);
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum { Item, Length };
+  enum { Length, Item };
+
+ private:
+  static Value indexGetter(ExecState* exec,
+                           const Identifier&,
+                           const PropertySlot& slot);
 };
 
 class DOMRGBColor : public DOMObject {
  public:
   DOMRGBColor(unsigned color) : m_color(color) {}
   ~DOMRGBColor();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -376,9 +373,7 @@ class DOMRect : public DOMObject {
  public:
   DOMRect(ExecState*, DOM::RectImpl* r) : m_rect(r) {}
   ~DOMRect();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -395,9 +390,7 @@ class DOMCounter : public DOMObject {
  public:
   DOMCounter(ExecState*, DOM::CounterImpl* c) : m_counter(c) {}
   ~DOMCounter();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }

@@ -173,9 +173,7 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
 
   const ClassInfo* classInfo() const { return &info; }
 
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -186,9 +184,6 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
 
   virtual bool implementsCall() const;
   virtual Value call(ExecState* exec, Object& thisObj, const List& args);
-
-  virtual bool hasOwnProperty(ExecState* exec,
-                              const Identifier& propertyName) const;
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 

@@ -100,11 +100,11 @@ DOMRange::~DOMRange() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-bool DOMRange::getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const {
-  return lookupGetOwnValue<DOMRange, DOMObject>(exec, p, &DOMRangeTable, this,
-                                                result);
+bool DOMRange::getOwnPropertySlot(ExecState* exec,
+                                  const Identifier& propertyName,
+                                  PropertySlot& slot) {
+  return getStaticValueSlot<DOMRange, DOMObject>(exec, &DOMRangeTable, this,
+                                                 propertyName, slot);
 }
 
 Value DOMRange::getValueProperty(ExecState* exec, int token) const {
@@ -227,11 +227,11 @@ const ClassInfo RangeConstructor::info = {"RangeConstructor", 0,
   END_TO_START		DOM::Range::END_TO_START	DontDelete|ReadOnly
 @end
 */
-bool RangeConstructor::getOwnProperty(ExecState* exec,
-                                      const Identifier& p,
-                                      Value& result) const {
-  return lookupGetOwnValue<RangeConstructor, DOMObject>(
-      exec, p, &RangeConstructorTable, this, result);
+bool RangeConstructor::getOwnPropertySlot(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          PropertySlot& slot) {
+  return getStaticValueSlot<RangeConstructor, DOMObject>(
+      exec, &RangeConstructorTable, this, propertyName, slot);
 }
 
 Value RangeConstructor::getValueProperty(ExecState*, int token) const {

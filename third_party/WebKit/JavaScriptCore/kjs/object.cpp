@@ -190,66 +190,69 @@ UString ObjectImp::className() const {
 }
 
 Value ObjectImp::get(ExecState* exec, const Identifier& propertyName) const {
-  Value result;
+  PropertySlot slot;
 
-  const ObjectImp* imp = this;
-
-  while (true) {
-    if (imp->getOwnProperty(exec, propertyName, result))
-      return result;
-
-    const ValueImp* proto = imp->_proto;
-    if (proto->dispatchType() != ObjectType)
-      break;
-
-    imp = static_cast<const ObjectImp*>(proto);
-  }
+  if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot))
+    return slot.getValue(exec, propertyName);
 
   return Undefined();
 }
 
-bool ObjectImp::getOwnProperty(ExecState* exec,
-                               unsigned propertyName,
-                               Value& result) const {
-  return getOwnProperty(exec, Identifier::from(propertyName), result);
-}
-
 Value ObjectImp::get(ExecState* exec, unsigned propertyName) const {
-  Value result;
-
-  const ObjectImp* imp = this;
-
-  while (imp) {
-    if (imp->getOwnProperty(exec, propertyName, result))
-      return result;
-
-    const ValueImp* proto = imp->_proto;
-    if (proto->dispatchType() != ObjectType)
-      break;
-
-    imp = static_cast<const ObjectImp*>(proto);
-  }
+  PropertySlot slot;
+  if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot))
+    return slot.getValue(exec, propertyName);
 
   return Undefined();
 }
 
 bool ObjectImp::getProperty(ExecState* exec,
-                            unsigned propertyName,
+                            const Identifier& propertyName,
                             Value& result) const {
-  const ObjectImp* imp = this;
-
-  while (true) {
-    if (imp->getOwnProperty(exec, propertyName, result))
-      return true;
-
-    const ValueImp* proto = imp->_proto;
-    if (proto->dispatchType() != ObjectType)
-      break;
-
-    imp = static_cast<const ObjectImp*>(proto);
+  PropertySlot slot;
+  if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot)) {
+    result = slot.getValue(exec, propertyName);
+    return true;
   }
 
   return false;
+}
+
+bool ObjectImp::getProperty(ExecState* exec,
+                            unsigned propertyName,
+                            Value& result) const {
+  PropertySlot slot;
+  if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot)) {
+    result = slot.getValue(exec, propertyName);
+    return true;
+  }
+
+  return false;
+}
+
+bool ObjectImp::getPropertySlot(ExecState* exec,
+                                unsigned propertyName,
+                                PropertySlot& slot) {
+  ObjectImp* imp = this;
+
+  while (true) {
+    if (imp->getOwnPropertySlot(exec, propertyName, slot))
+      return true;
+
+    ValueImp* proto = imp->_proto;
+    if (proto->dispatchType() != ObjectType)
+      break;
+
+    imp = static_cast<ObjectImp*>(proto);
+  }
+
+  return false;
+}
+
+bool ObjectImp::getOwnPropertySlot(ExecState* exec,
+                                   unsigned propertyName,
+                                   PropertySlot& slot) {
+  return getOwnPropertySlot(exec, Identifier::from(propertyName), slot);
 }
 
 // ECMA 8.6.2.2
@@ -260,7 +263,8 @@ void ObjectImp::put(ExecState* exec,
   assert(!value.isNull());
 
   // non-standard netscape extension
-  if (propertyName == specialPrototypePropertyName) {
+  if (propertyName ==
+      exec->dynamicInterpreter()->specialPrototypeIdentifier()) {
     setPrototype(value);
     return;
   }
@@ -307,47 +311,22 @@ bool ObjectImp::canPut(ExecState*, const Identifier& propertyName) const {
 // ECMA 8.6.2.4
 bool ObjectImp::hasProperty(ExecState* exec,
                             const Identifier& propertyName) const {
-  if (hasOwnProperty(exec, propertyName))
-    return true;
-
-  if (!_proto || _proto->dispatchType() != ObjectType) {
-    return false;
-  }
-
-  // Look in the prototype
-  return static_cast<ObjectImp*>(_proto)->hasProperty(exec, propertyName);
+  PropertySlot slot;
+  return const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName,
+                                                       slot);
 }
 
 bool ObjectImp::hasProperty(ExecState* exec, unsigned propertyName) const {
-  if (hasOwnProperty(exec, propertyName))
-    return true;
-
-  if (!_proto || _proto->dispatchType() != ObjectType) {
-    return false;
-  }
-
-  // Look in the prototype
-  return static_cast<ObjectImp*>(_proto)->hasProperty(exec, propertyName);
+  PropertySlot slot;
+  return const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName,
+                                                       slot);
 }
 
 bool ObjectImp::hasOwnProperty(ExecState* exec,
                                const Identifier& propertyName) const {
-  if (_prop.get(propertyName))
-    return true;
-
-  // Look in the static hashtable of properties
-  if (findPropertyHashEntry(propertyName))
-    return true;
-
-  // non-standard netscape extension
-  if (propertyName == specialPrototypePropertyName)
-    return true;
-
-  return false;
-}
-
-bool ObjectImp::hasOwnProperty(ExecState* exec, unsigned propertyName) const {
-  return hasOwnProperty(exec, Identifier::from(propertyName));
+  PropertySlot slot;
+  return const_cast<ObjectImp*>(this)->getOwnPropertySlot(exec, propertyName,
+                                                          slot);
 }
 
 // ECMA 8.6.2.5

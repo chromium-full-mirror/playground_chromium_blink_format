@@ -178,11 +178,12 @@ KJS::Value GlobalObject::get(KJS::ExecState* exec,
       case GlobalObjectConstants::Confirm:
       case GlobalObjectConstants::Debug:
       case GlobalObjectConstants::Prompt: {
-        if (isSafeScript(exec))
-          return KJS::lookupOrCreateFunction<GlobalObjectFunc>(
-              exec, p, this, entry->value, entry->params, entry->attr);
-        else
-          return KJS::Undefined();
+#if 0
+				if(isSafeScript(exec))
+					return KJS::lookupOrCreateFunction<GlobalObjectFunc>(exec, p, this, entry->value, entry->params, entry->attr);
+				else
+#endif
+        return KJS::Undefined();
       }
       case GlobalObjectConstants::Node:
         return getNodeConstructor(exec);

@@ -416,11 +416,11 @@ NumberObjectImp::NumberObjectImp(ExecState* exec,
             ReadOnly | DontDelete | DontEnum);
 }
 
-bool NumberObjectImp::getOwnProperty(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     Value& result) const {
-  return lookupGetOwnValue<NumberObjectImp, InternalFunctionImp>(
-      exec, propertyName, &numberTable, this, result);
+bool NumberObjectImp::getOwnPropertySlot(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         PropertySlot& slot) {
+  return getStaticValueSlot<NumberObjectImp, InternalFunctionImp>(
+      exec, &numberTable, this, propertyName, slot);
 }
 
 Value NumberObjectImp::getValueProperty(ExecState*, int token) const {

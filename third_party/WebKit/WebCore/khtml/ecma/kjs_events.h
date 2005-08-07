@@ -107,9 +107,7 @@ ValueImp* getNodeEventListener(DOM::NodeImpl* n, int eventId);
 class EventConstructor : public DOMObject {
  public:
   EventConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -122,9 +120,7 @@ class DOMEvent : public DOMObject {
  public:
   DOMEvent(ExecState* exec, DOM::EventImpl* e);
   ~DOMEvent();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
@@ -167,9 +163,7 @@ DOM::EventImpl* toEvent(
 class EventExceptionConstructor : public DOMObject {
  public:
   EventExceptionConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -182,9 +176,7 @@ class DOMUIEvent : public DOMEvent {
  public:
   DOMUIEvent(ExecState* exec, DOM::UIEventImpl* ue);
   ~DOMUIEvent();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -207,9 +199,7 @@ class DOMMouseEvent : public DOMUIEvent {
  public:
   DOMMouseEvent(ExecState* exec, DOM::MouseEventImpl* me);
   ~DOMMouseEvent();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   virtual void mark();
   // no put - all read-only
@@ -240,9 +230,7 @@ class DOMKeyboardEvent : public DOMUIEvent {
  public:
   DOMKeyboardEvent(ExecState* exec, DOM::KeyboardEventImpl* ke);
   ~DOMKeyboardEvent();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const;
@@ -263,9 +251,7 @@ class DOMKeyboardEvent : public DOMUIEvent {
 class MutationEventConstructor : public DOMObject {
  public:
   MutationEventConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -278,9 +264,7 @@ class DOMMutationEvent : public DOMEvent {
  public:
   DOMMutationEvent(ExecState* exec, DOM::MutationEventImpl* me);
   ~DOMMutationEvent();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -298,9 +282,7 @@ class DOMMutationEvent : public DOMEvent {
 class DOMWheelEvent : public DOMUIEvent {
  public:
   DOMWheelEvent(ExecState*, DOM::WheelEventImpl*);
-  virtual bool getOwnProperty(ExecState*,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -328,9 +310,7 @@ class Clipboard : public DOMObject {
  public:
   Clipboard(ExecState* exec, DOM::ClipboardImpl* ds);
   ~Clipboard();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,

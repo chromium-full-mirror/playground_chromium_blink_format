@@ -36,12 +36,8 @@ class RuntimeArrayImp : public ArrayInstanceImp {
   RuntimeArrayImp(ExecState* exec, Bindings::Array* i);
   ~RuntimeArrayImp();
 
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& propertyName,
-                              Value& result) const;
-  virtual bool getOwnProperty(ExecState* exec,
-                              unsigned index,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
+  virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    const Value& value,
@@ -51,9 +47,6 @@ class RuntimeArrayImp : public ArrayInstanceImp {
                    const Value& value,
                    int attr = None);
 
-  virtual bool hasOwnProperty(ExecState* exec,
-                              const Identifier& propertyName) const;
-  virtual bool hasOwnProperty(ExecState* exec, unsigned propertyName) const;
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState* exec, unsigned propertyName);
 
@@ -66,6 +59,9 @@ class RuntimeArrayImp : public ArrayInstanceImp {
   static const ClassInfo info;
 
  private:
+  static Value lengthGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static Value indexGetter(ExecState*, const Identifier&, const PropertySlot&);
+
   Bindings::Array* _array;
 };
 

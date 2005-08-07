@@ -23,6 +23,7 @@
 
 #include "kjs_dom.h"
 #include "dom/dom2_traversal.h"
+#include <kjs/protected_object.h>
 
 namespace DOM {
 class NodeFilterImpl;
@@ -36,9 +37,7 @@ class DOMNodeIterator : public DOMObject {
  public:
   DOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);
   ~DOMNodeIterator();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -64,9 +63,9 @@ class DOMNodeIterator : public DOMObject {
 class NodeFilterConstructor : public DOMObject {
  public:
   NodeFilterConstructor(ExecState*) {}
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier&,
+                                  PropertySlot& slot);
   Value getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
@@ -91,9 +90,9 @@ class DOMTreeWalker : public DOMObject {
  public:
   DOMTreeWalker(ExecState* exec, DOM::TreeWalkerImpl* tw);
   ~DOMTreeWalker();
-  virtual bool getOwnProperty(ExecState* exec,
-                              const Identifier& p,
-                              Value& result) const;
+  virtual bool getOwnPropertySlot(ExecState*,
+                                  const Identifier&,
+                                  PropertySlot& slot);
   Value getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
