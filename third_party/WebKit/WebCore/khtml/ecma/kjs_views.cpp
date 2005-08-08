@@ -56,7 +56,7 @@ DOMAbstractView::~DOMAbstractView() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
 }
 
-Value DOMAbstractView::getValueProperty(ExecState* exec, int token) {
+ValueImp* DOMAbstractView::getValueProperty(ExecState* exec, int token) {
   assert(token == Document);
   return getDOMNode(exec, impl()->document());
 }
@@ -68,16 +68,16 @@ bool DOMAbstractView::getOwnPropertySlot(ExecState* exec,
       exec, &DOMAbstractViewTable, this, propertyName, slot);
 }
 
-Value DOMAbstractViewFunc::call(ExecState* exec,
-                                Object& thisObj,
-                                const List& args) {
-  if (!thisObj.inherits(&DOMAbstractView::info)) {
-    Object err = Error::create(exec, TypeError);
+ValueImp* DOMAbstractViewFunc::callAsFunction(ExecState* exec,
+                                              ObjectImp* thisObj,
+                                              const List& args) {
+  if (!thisObj->inherits(&DOMAbstractView::info)) {
+    ObjectImp* err = Error::create(exec, TypeError);
     exec->setException(err);
     return err;
   }
   AbstractViewImpl& abstractView =
-      *static_cast<DOMAbstractView*>(thisObj.imp())->impl();
+      *static_cast<DOMAbstractView*>(thisObj)->impl();
   switch (id) {
     case DOMAbstractView::GetComputedStyle: {
       ElementImpl* arg0 = toElement(args[0]);
@@ -88,7 +88,7 @@ Value DOMAbstractViewFunc::call(ExecState* exec,
           doc->updateLayoutIgnorePendingStylesheets();
         return getDOMCSSStyleDeclaration(
             exec, abstractView.getComputedStyle(
-                      arg0, args[1].toString(exec).string().implementation()));
+                      arg0, args[1]->toString(exec).string().implementation()));
       }
     }
   }

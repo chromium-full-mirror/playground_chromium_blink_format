@@ -66,20 +66,20 @@ typedef enum {
 
 class RootObject;
 
-ObjcValue convertValueToObjcValue(KJS::ExecState* exec,
-                                  const KJS::Value& value,
+ObjcValue convertValueToObjcValue(ExecState* exec,
+                                  ValueImp* value,
                                   ObjcValueType type);
-Value convertNSStringToString(NSString* nsstring);
-Value convertObjcValueToValue(KJS::ExecState* exec,
-                              void* buffer,
-                              ObjcValueType type);
+ValueImp* convertNSStringToString(NSString* nsstring);
+ValueImp* convertObjcValueToValue(ExecState* exec,
+                                  void* buffer,
+                                  ObjcValueType type);
 ObjcValueType objcValueTypeForType(const char* type);
 
 void JSMethodNameToObjCMethodName(const char* name,
                                   char* name,
                                   unsigned int length);
 
-void* createObjcInstanceForValue(const Object& value,
+void* createObjcInstanceForValue(ObjectImp* value,
                                  const RootObject* origin,
                                  const RootObject* current);
 

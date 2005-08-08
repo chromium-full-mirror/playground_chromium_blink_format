@@ -55,7 +55,7 @@ class Constructor {
   virtual Parameter* parameterAt(long i) const = 0;
   virtual long numParameters() const = 0;
 
-  virtual ~Constructor(){};
+  virtual ~Constructor() {}
 };
 
 class Field {
@@ -63,18 +63,17 @@ class Field {
   virtual const char* name() const = 0;
   virtual RuntimeType type() const = 0;
 
-  virtual KJS::Value valueFromInstance(ExecState* exec,
-                                       const Instance* instance) const = 0;
-  virtual void setValueToInstance(ExecState* exec,
-                                  const Instance* instance,
-                                  const Value& aValue) const = 0;
+  virtual ValueImp* valueFromInstance(ExecState*, const Instance*) const = 0;
+  virtual void setValueToInstance(ExecState*,
+                                  const Instance*,
+                                  ValueImp*) const = 0;
 
-  virtual ~Field(){};
+  virtual ~Field() {}
 };
 
 class MethodList {
  public:
-  MethodList() : _methods(0), _length(0){};
+  MethodList() : _methods(0), _length(0) {}
 
   void addMethod(Method* aMethod);
   unsigned int length() const;
@@ -111,13 +110,11 @@ class Class {
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const = 0;
 
-  virtual Value fallbackObject(ExecState* exec,
-                               Bindings::Instance* instance,
-                               const Identifier& propertyName) {
+  virtual ValueImp* fallbackObject(ExecState*, Instance*, const Identifier&) {
     return Undefined();
   }
 
-  virtual ~Class(){};
+  virtual ~Class() {}
 };
 
 typedef void (*KJSDidExecuteFunctionPtr)(ExecState* exec,
@@ -135,12 +132,12 @@ class Instance {
                                                     const RootObject* r = 0);
   static void* createLanguageInstanceForValue(ExecState* exec,
                                               BindingLanguage language,
-                                              const Object& value,
+                                              ObjectImp* value,
                                               const RootObject* origin,
                                               const RootObject* current);
-  static Object createRuntimeObject(BindingLanguage language,
-                                    void* nativeInstance,
-                                    const RootObject* r = 0);
+  static ObjectImp* createRuntimeObject(BindingLanguage language,
+                                        void* nativeInstance,
+                                        const RootObject* r = 0);
 
   Instance() : _executionContext(0){};
 
@@ -156,33 +153,33 @@ class Instance {
 
   virtual Class* getClass() const = 0;
 
-  virtual Value getValueOfField(ExecState* exec, const Field* aField) const;
-  virtual Value getValueOfUndefinedField(ExecState* exec,
-                                         const Identifier& property,
-                                         Type hint) const {
+  virtual ValueImp* getValueOfField(ExecState* exec, const Field* aField) const;
+  virtual ValueImp* getValueOfUndefinedField(ExecState* exec,
+                                             const Identifier& property,
+                                             Type hint) const {
     return Undefined();
   };
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
-                               const Value& aValue) const;
+                               ValueImp* aValue) const;
   virtual bool supportsSetValueOfUndefinedField() { return false; };
   virtual void setValueOfUndefinedField(ExecState* exec,
                                         const Identifier& property,
-                                        const Value& aValue){};
+                                        ValueImp* aValue){};
 
-  virtual Value invokeMethod(ExecState* exec,
-                             const MethodList& method,
-                             const List& args) = 0;
-  virtual Value invokeDefaultMethod(ExecState* exec, const List& args) = 0;
+  virtual ValueImp* invokeMethod(ExecState* exec,
+                                 const MethodList& method,
+                                 const List& args) = 0;
+  virtual ValueImp* invokeDefaultMethod(ExecState* exec, const List& args) = 0;
 
-  virtual Value defaultValue(Type hint) const = 0;
+  virtual ValueImp* defaultValue(Type hint) const = 0;
 
-  virtual Value valueOf() const { return String(getClass()->name()); };
+  virtual ValueImp* valueOf() const { return String(getClass()->name()); };
 
   void setExecutionContext(const RootObject* r) { _executionContext = r; }
   const RootObject* executionContext() const { return _executionContext; }
 
-  virtual ~Instance(){};
+  virtual ~Instance() {}
 
  protected:
   const RootObject* _executionContext;
@@ -190,15 +187,13 @@ class Instance {
 
 class Array {
  public:
-  virtual void setValueAt(ExecState* exec,
-                          unsigned int index,
-                          const Value& aValue) const = 0;
-  virtual Value valueAt(ExecState* exec, unsigned int index) const = 0;
+  virtual void setValueAt(ExecState*, unsigned index, ValueImp*) const = 0;
+  virtual ValueImp* valueAt(ExecState*, unsigned index) const = 0;
   virtual unsigned int getLength() const = 0;
-  virtual ~Array(){};
+  virtual ~Array() {}
 };
 
-const char* signatureForParameters(const KJS::List& aList);
+const char* signatureForParameters(const List& aList);
 
 }  // namespace Bindings
 

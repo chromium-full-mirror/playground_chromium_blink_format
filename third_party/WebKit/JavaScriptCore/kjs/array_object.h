@@ -40,7 +40,9 @@ class ArrayProtoFuncImp : public InternalFunctionImp {
   ArrayProtoFuncImp(ExecState* exec, int i, int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   enum {
     ToString,
@@ -71,9 +73,11 @@ class ArrayObjectImp : public InternalFunctionImp {
                  ArrayPrototypeImp* arrayProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 }  // namespace

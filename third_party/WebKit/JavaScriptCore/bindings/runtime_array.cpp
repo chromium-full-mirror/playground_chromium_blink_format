@@ -33,9 +33,8 @@ const ClassInfo RuntimeArrayImp::info = {"RuntimeArray",
                                          &ArrayInstanceImp::info, 0, 0};
 
 RuntimeArrayImp::RuntimeArrayImp(ExecState* exec, Bindings::Array* a)
-    : ArrayInstanceImp(
-          exec->lexicalInterpreter()->builtinArrayPrototype().imp(),
-          a->getLength()) {
+    : ArrayInstanceImp(exec->lexicalInterpreter()->builtinArrayPrototype(),
+                       a->getLength()) {
   // Always takes ownership of concrete array.
   _array = a;
 }
@@ -44,16 +43,16 @@ RuntimeArrayImp::~RuntimeArrayImp() {
   delete _array;
 }
 
-Value RuntimeArrayImp::lengthGetter(ExecState* exec,
-                                    const Identifier& propertyName,
-                                    const PropertySlot& slot) {
+ValueImp* RuntimeArrayImp::lengthGetter(ExecState* exec,
+                                        const Identifier& propertyName,
+                                        const PropertySlot& slot) {
   RuntimeArrayImp* thisObj = static_cast<RuntimeArrayImp*>(slot.slotBase());
   return Number(thisObj->getLength());
 }
 
-Value RuntimeArrayImp::indexGetter(ExecState* exec,
-                                   const Identifier& propertyName,
-                                   const PropertySlot& slot) {
+ValueImp* RuntimeArrayImp::indexGetter(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       const PropertySlot& slot) {
   RuntimeArrayImp* thisObj = static_cast<RuntimeArrayImp*>(slot.slotBase());
   return thisObj->getConcreteArray()->valueAt(exec, slot.index());
 }
@@ -91,10 +90,10 @@ bool RuntimeArrayImp::getOwnPropertySlot(ExecState* exec,
 
 void RuntimeArrayImp::put(ExecState* exec,
                           const Identifier& propertyName,
-                          const Value& value,
+                          ValueImp* value,
                           int attr) {
   if (propertyName == lengthPropertyName) {
-    Object err = Error::create(exec, RangeError);
+    ObjectImp* err = Error::create(exec, RangeError);
     exec->setException(err);
     return;
   }
@@ -111,10 +110,10 @@ void RuntimeArrayImp::put(ExecState* exec,
 
 void RuntimeArrayImp::put(ExecState* exec,
                           unsigned index,
-                          const Value& value,
+                          ValueImp* value,
                           int attr) {
   if (index >= getLength()) {
-    Object err = Error::create(exec, RangeError);
+    ObjectImp* err = Error::create(exec, RangeError);
     exec->setException(err);
     return;
   }

@@ -88,14 +88,14 @@ KJSDidExecuteFunctionPtr Instance::didExecuteFunction() {
   return _DidExecuteFunction;
 }
 
-Value Instance::getValueOfField(KJS::ExecState* exec,
-                                const Field* aField) const {
+ValueImp* Instance::getValueOfField(KJS::ExecState* exec,
+                                    const Field* aField) const {
   return aField->valueFromInstance(exec, this);
 }
 
 void Instance::setValueOfField(KJS::ExecState* exec,
                                const Field* aField,
-                               const Value& aValue) const {
+                               ValueImp* aValue) const {
   aField->setValueToInstance(exec, this, aValue);
 }
 
@@ -130,14 +130,14 @@ Instance* Instance::createBindingForLanguageInstance(
   return newInstance;
 }
 
-Object Instance::createRuntimeObject(BindingLanguage language,
-                                     void* nativeInstance,
-                                     const RootObject* executionContext) {
+ObjectImp* Instance::createRuntimeObject(BindingLanguage language,
+                                         void* nativeInstance,
+                                         const RootObject* executionContext) {
   Instance* interfaceObject = Instance::createBindingForLanguageInstance(
       language, (void*)nativeInstance, executionContext);
 
   Interpreter::lock();
-  Object theObject(new RuntimeObjectImp(interfaceObject, true));
+  ObjectImp* theObject(new RuntimeObjectImp(interfaceObject, true));
   Interpreter::unlock();
 
   return theObject;
@@ -145,15 +145,15 @@ Object Instance::createRuntimeObject(BindingLanguage language,
 
 void* Instance::createLanguageInstanceForValue(ExecState* exec,
                                                BindingLanguage language,
-                                               const Object& value,
+                                               ObjectImp* value,
                                                const RootObject* origin,
                                                const RootObject* current) {
   void* result = 0;
 
-  if (value.type() != ObjectType)
+  if (!value->isObject())
     return 0;
 
-  ObjectImp* imp = static_cast<ObjectImp*>(value.imp());
+  ObjectImp* imp = static_cast<ObjectImp*>(value);
 
   switch (language) {
     case Instance::ObjectiveCLanguage: {

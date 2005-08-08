@@ -38,7 +38,7 @@ class DOMNodeIterator : public DOMObject {
   DOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);
   ~DOMNodeIterator();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  Value getValueProperty(ExecState* exec, int token) const;
+  ValueImp* getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -66,7 +66,7 @@ class NodeFilterConstructor : public DOMObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier&,
                                   PropertySlot& slot);
-  Value getValueProperty(ExecState* exec, int token) const;
+  ValueImp* getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -93,10 +93,10 @@ class DOMTreeWalker : public DOMObject {
   virtual bool getOwnPropertySlot(ExecState*,
                                   const Identifier&,
                                   PropertySlot& slot);
-  Value getValueProperty(ExecState* exec, int token) const;
+  ValueImp* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -121,7 +121,7 @@ class DOMTreeWalker : public DOMObject {
 };
 
 ValueImp* getDOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);
-Value getNodeFilterConstructor(ExecState* exec);
+ValueImp* getNodeFilterConstructor(ExecState* exec);
 ValueImp* getDOMNodeFilter(ExecState* exec, DOM::NodeFilterImpl* nf);
 ValueImp* getDOMTreeWalker(ExecState* exec, DOM::TreeWalkerImpl* tw);
 
@@ -130,7 +130,7 @@ DOM::NodeFilterImpl* toNodeFilter(
 
 class JSNodeFilterCondition : public DOM::NodeFilterCondition {
  public:
-  JSNodeFilterCondition(Object& _filter);
+  JSNodeFilterCondition(ObjectImp* _filter);
   virtual ~JSNodeFilterCondition() {}
   virtual short acceptNode(DOM::FilterNode) const;
 

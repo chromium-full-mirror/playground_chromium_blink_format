@@ -40,11 +40,11 @@ class RuntimeArrayImp : public ArrayInstanceImp {
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual void put(ExecState* exec,
                    unsigned propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
@@ -59,8 +59,12 @@ class RuntimeArrayImp : public ArrayInstanceImp {
   static const ClassInfo info;
 
  private:
-  static Value lengthGetter(ExecState*, const Identifier&, const PropertySlot&);
-  static Value indexGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static ValueImp* lengthGetter(ExecState*,
+                                const Identifier&,
+                                const PropertySlot&);
+  static ValueImp* indexGetter(ExecState*,
+                               const Identifier&,
+                               const PropertySlot&);
 
   Bindings::Array* _array;
 };

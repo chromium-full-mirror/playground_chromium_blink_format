@@ -37,11 +37,11 @@ class ArrayInstanceImp : public ObjectImp {
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual void put(ExecState* exec,
                    unsigned propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual bool deleteProperty(ExecState* exec, unsigned propertyName);
@@ -55,10 +55,12 @@ class ArrayInstanceImp : public ObjectImp {
   unsigned getLength() const { return length; }
 
   void sort(ExecState* exec);
-  void sort(ExecState* exec, Object& compareFunction);
+  void sort(ExecState* exec, ObjectImp* compareFunction);
 
  private:
-  static Value lengthGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static ValueImp* lengthGetter(ExecState*,
+                                const Identifier&,
+                                const PropertySlot&);
 
   void setLength(unsigned newLength, ExecState* exec);
 

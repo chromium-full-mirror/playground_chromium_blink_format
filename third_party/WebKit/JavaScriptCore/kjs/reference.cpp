@@ -27,15 +27,6 @@ namespace KJS {
 
 // ------------------------------ Reference ------------------------------------
 
-Reference::Reference(const Object& b, const Identifier& p)
-    : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
-
-Reference::Reference(const Object& b, unsigned p)
-    : base(b),
-      propertyNameAsNumber(p),
-      baseIsValue(false),
-      propertyNameIsNumber(true) {}
-
 Reference::Reference(ObjectImp* b, const Identifier& p)
     : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
 
@@ -45,26 +36,29 @@ Reference::Reference(ObjectImp* b, unsigned p)
       baseIsValue(false),
       propertyNameIsNumber(true) {}
 
-Reference::Reference(const Null& b, const Identifier& p)
-    : base(b), baseIsValue(false), propertyNameIsNumber(false), prop(p) {}
+Reference::Reference(const Identifier& p)
+    : base(jsNull()),
+      baseIsValue(false),
+      propertyNameIsNumber(false),
+      prop(p) {}
 
-Reference::Reference(const Null& b, unsigned p)
-    : base(b),
+Reference::Reference(unsigned p)
+    : base(jsNull()),
       propertyNameAsNumber(p),
       baseIsValue(false),
       propertyNameIsNumber(true) {}
 
-Reference Reference::makeValueReference(const Value& v) {
+Reference Reference::makeValueReference(ValueImp* v) {
   Reference valueRef;
   valueRef.base = v;
   valueRef.baseIsValue = true;
   return valueRef;
 }
 
-Value Reference::getBase(ExecState* exec) const {
+ValueImp* Reference::getBase(ExecState* exec) const {
   if (baseIsValue) {
-    Object err = Error::create(exec, ReferenceError,
-                               I18N_NOOP("Invalid reference base"));
+    ObjectImp* err = Error::create(exec, ReferenceError,
+                                   I18N_NOOP("Invalid reference base"));
     exec->setException(err);
     return err;
   }
@@ -85,25 +79,25 @@ Identifier Reference::getPropertyName(ExecState* exec) const {
   return prop;
 }
 
-Value Reference::getValue(ExecState* exec) const {
+ValueImp* Reference::getValue(ExecState* exec) const {
   if (baseIsValue) {
     return base;
   }
 
-  ValueImp* o = base.imp();
-  Type t = o ? o->dispatchType() : NullType;
+  ValueImp* o = base;
+  Type t = o ? o->type() : NullType;
 
   if (t == NullType) {
     UString m =
         I18N_NOOP("Can't find variable: ") + getPropertyName(exec).ustring();
-    Object err = Error::create(exec, ReferenceError, m.ascii());
+    ObjectImp* err = Error::create(exec, ReferenceError, m.ascii());
     exec->setException(err);
     return err;
   }
 
   if (t != ObjectType) {
     UString m = I18N_NOOP("Base is not an object");
-    Object err = Error::create(exec, ReferenceError, m.ascii());
+    ObjectImp* err = Error::create(exec, ReferenceError, m.ascii());
     exec->setException(err);
     return err;
   }
@@ -113,9 +107,9 @@ Value Reference::getValue(ExecState* exec) const {
   return static_cast<ObjectImp*>(o)->get(exec, prop);
 }
 
-void Reference::putValue(ExecState* exec, const Value& w) {
+void Reference::putValue(ExecState* exec, ValueImp* w) {
   if (baseIsValue) {
-    Object err = Error::create(exec, ReferenceError);
+    ObjectImp* err = Error::create(exec, ReferenceError);
     exec->setException(err);
     return;
   }
@@ -128,11 +122,11 @@ void Reference::putValue(ExecState* exec, const Value& w) {
             w);
 #endif
 
-  ValueImp* o = base.imp();
-  Type t = o ? o->dispatchType() : NullType;
+  ValueImp* o = base;
+  Type t = o ? o->type() : NullType;
 
   if (t == NullType)
-    o = exec->lexicalInterpreter()->globalObject().imp();
+    o = exec->lexicalInterpreter()->globalObject();
 
   if (propertyNameIsNumber)
     return static_cast<ObjectImp*>(o)->put(exec, propertyNameAsNumber, w);
@@ -141,13 +135,13 @@ void Reference::putValue(ExecState* exec, const Value& w) {
 
 bool Reference::deleteValue(ExecState* exec) {
   if (baseIsValue) {
-    Object err = Error::create(exec, ReferenceError);
+    ObjectImp* err = Error::create(exec, ReferenceError);
     exec->setException(err);
     return false;
   }
 
-  ValueImp* o = base.imp();
-  Type t = o ? o->dispatchType() : NullType;
+  ValueImp* o = base;
+  Type t = o ? o->type() : NullType;
 
   // The spec doesn't mention what to do if the base is null... just return true
   if (t != ObjectType) {

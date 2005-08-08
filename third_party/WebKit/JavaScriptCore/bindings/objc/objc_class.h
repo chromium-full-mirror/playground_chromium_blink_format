@@ -70,9 +70,9 @@ class ObjcClass : public KJS::Bindings::Class {
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const;
 
-  virtual Value fallbackObject(ExecState* exec,
-                               Instance* instance,
-                               const Identifier& propertyName);
+  virtual ValueImp* fallbackObject(ExecState* exec,
+                                   Instance* instance,
+                                   const Identifier& propertyName);
 
   virtual Constructor* constructorAt(long i) const { return 0; };
 

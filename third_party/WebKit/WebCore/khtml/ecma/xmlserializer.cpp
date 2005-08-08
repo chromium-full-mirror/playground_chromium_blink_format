@@ -50,8 +50,9 @@ bool XMLSerializerConstructorImp::implementsConstruct() const {
   return true;
 }
 
-Object XMLSerializerConstructorImp::construct(ExecState* exec, const List&) {
-  return Object(new XMLSerializer(exec));
+ObjectImp* XMLSerializerConstructorImp::construct(ExecState* exec,
+                                                  const List&) {
+  return new XMLSerializer(exec);
 }
 
 const ClassInfo XMLSerializer::info = {"XMLSerializer", 0, &XMLSerializerTable,
@@ -66,11 +67,11 @@ XMLSerializer::XMLSerializer(ExecState* exec) {
   setPrototype(XMLSerializerProto::self(exec));
 }
 
-Value XMLSerializerProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
-  if (!thisObj.inherits(&XMLSerializer::info)) {
-    Object err = Error::create(exec, TypeError);
+ValueImp* XMLSerializerProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
+  if (!thisObj->inherits(&XMLSerializer::info)) {
+    ObjectImp* err = Error::create(exec, TypeError);
     exec->setException(err);
     return err;
   }
@@ -81,12 +82,12 @@ Value XMLSerializerProtoFunc::call(ExecState* exec,
         return Undefined();
       }
 
-      if (!args[0].toObject(exec).inherits(&DOMDocument::info)) {
+      if (!args[0]->toObject(exec)->inherits(&DOMDocument::info)) {
         return Undefined();
       }
 
       DocumentImpl* doc = static_cast<DocumentImpl*>(
-          static_cast<DOMDocument*>(args[0].toObject(exec).imp())->impl());
+          static_cast<DOMDocument*>(args[0]->toObject(exec))->impl());
       return getStringOrNull(doc->toString().string());
     }
   }

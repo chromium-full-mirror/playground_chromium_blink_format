@@ -40,14 +40,14 @@
   }
 #endif
 
-using namespace KJS::Bindings;
-using namespace KJS;
+namespace KJS {
+namespace Bindings {
 
 CInstance::CInstance(NPObject* o) {
   _object = _NPN_RetainObject(o);
   _class = 0;
   setExecutionContext(0);
-};
+}
 
 CInstance::~CInstance() {
   _NPN_ReleaseObject(_object);
@@ -87,10 +87,10 @@ void CInstance::end() {
   // Do nothing.
 }
 
-Value CInstance::invokeMethod(KJS::ExecState* exec,
-                              const MethodList& methodList,
-                              const List& args) {
-  Value resultValue;
+ValueImp* CInstance::invokeMethod(ExecState* exec,
+                                  const MethodList& methodList,
+                                  const List& args) {
+  ValueImp* resultValue;
 
   // Overloading methods are not allowed by NPObjects.  Should only be one
   // name match for a particular method.
@@ -139,8 +139,8 @@ Value CInstance::invokeMethod(KJS::ExecState* exec,
   return Undefined();
 }
 
-Value CInstance::invokeDefaultMethod(KJS::ExecState* exec, const List& args) {
-  Value resultValue;
+ValueImp* CInstance::invokeDefaultMethod(ExecState* exec, const List& args) {
+  ValueImp* resultValue;
 
   if (_object->_class->invokeDefault) {
     unsigned i, count = args.size();
@@ -179,37 +179,36 @@ Value CInstance::invokeDefaultMethod(KJS::ExecState* exec, const List& args) {
   return Undefined();
 }
 
-KJS::Value CInstance::defaultValue(KJS::Type hint) const {
-  if (hint == KJS::StringType) {
+ValueImp* CInstance::defaultValue(Type hint) const {
+  if (hint == StringType) {
     return stringValue();
-  } else if (hint == KJS::NumberType) {
+  } else if (hint == NumberType) {
     return numberValue();
-  } else if (hint == KJS::BooleanType) {
+  } else if (hint == BooleanType) {
     return booleanValue();
   }
 
   return valueOf();
 }
 
-KJS::Value CInstance::stringValue() const {
+ValueImp* CInstance::stringValue() const {
   char buf[1024];
   snprintf(buf, 1024, "NPObject %p, NPClass %p", _object, _object->_class);
-  KJS::String v(buf);
-  return v;
+  return jsString(buf);
 }
 
-KJS::Value CInstance::numberValue() const {
+ValueImp* CInstance::numberValue() const {
   // FIXME:  Implement something sensible
-  KJS::Number v(0);
-  return v;
+  return jsNumber(0);
 }
 
-KJS::Value CInstance::booleanValue() const {
+ValueImp* CInstance::booleanValue() const {
   // FIXME:  Implement something sensible
-  KJS::Boolean v((bool)0);
-  return v;
+  return jsBoolean(false);
 }
 
-KJS::Value CInstance::valueOf() const {
+ValueImp* CInstance::valueOf() const {
   return stringValue();
-};
+}
+}
+}

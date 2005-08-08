@@ -45,7 +45,9 @@ class RegExpProtoFuncImp : public InternalFunctionImp {
                      int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   enum { Exec, Test, ToString };
 
@@ -74,19 +76,21 @@ class RegExpObjectImp : public InternalFunctionImp {
                   RegExpPrototypeImp* regProto);
   virtual ~RegExpObjectImp();
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   int** registerRegexp(const RegExp* re, const UString& s);
   void setSubPatterns(int num) { lastNrSubPatterns = num; }
-  Object arrayOfMatches(ExecState* exec, const UString& result) const;
+  ObjectImp* arrayOfMatches(ExecState* exec, const UString& result) const;
 
  private:
-  static Value backrefGetter(ExecState* exec,
-                             const Identifier&,
-                             const PropertySlot& slot);
+  static ValueImp* backrefGetter(ExecState* exec,
+                                 const Identifier&,
+                                 const PropertySlot& slot);
 
   UString lastString;
   int* lastOvector;

@@ -39,9 +39,7 @@ using namespace KJS;
 
 FunctionPrototypeImp::FunctionPrototypeImp(ExecState* exec)
     : InternalFunctionImp(0) {
-  Value protect(this);
-  putDirect(lengthPropertyName, NumberImp::zero(),
-            DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsZero(), DontDelete | ReadOnly | DontEnum);
   putDirect(
       toStringPropertyName,
       new FunctionProtoFuncImp(exec, this, FunctionProtoFuncImp::ToString, 0),
@@ -63,9 +61,9 @@ bool FunctionPrototypeImp::implementsCall() const {
 }
 
 // ECMA 15.3.4
-Value FunctionPrototypeImp::call(ExecState* /*exec*/,
-                                 Object& /*thisObj*/,
-                                 const List& /*args*/) {
+ValueImp* FunctionPrototypeImp::callAsFunction(ExecState* /*exec*/,
+                                               ObjectImp* /*thisObj*/,
+                                               const List& /*args*/) {
   return Undefined();
 }
 
@@ -76,7 +74,6 @@ FunctionProtoFuncImp::FunctionProtoFuncImp(ExecState* exec,
                                            int i,
                                            int len)
     : InternalFunctionImp(funcProto), id(i) {
-  Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
@@ -84,89 +81,90 @@ bool FunctionProtoFuncImp::implementsCall() const {
   return true;
 }
 
-Value FunctionProtoFuncImp::call(ExecState* exec,
-                                 Object& thisObj,
-                                 const List& args) {
-  Value result;
+ValueImp* FunctionProtoFuncImp::callAsFunction(ExecState* exec,
+                                               ObjectImp* thisObj,
+                                               const List& args) {
+  ValueImp* result = NULL;
 
   switch (id) {
     case ToString: {
       // ### also make this work for internal functions
-      if (thisObj.isNull() || !thisObj.inherits(&InternalFunctionImp::info)) {
+      if (!thisObj || !thisObj->inherits(&InternalFunctionImp::info)) {
 #ifndef NDEBUG
         fprintf(stderr,
                 "attempted toString() call on null or non-function object\n");
 #endif
-        Object err = Error::create(exec, TypeError);
+        ObjectImp* err = Error::create(exec, TypeError);
         exec->setException(err);
         return err;
       }
-      if (thisObj.inherits(&DeclaredFunctionImp::info)) {
-        DeclaredFunctionImp* fi =
-            static_cast<DeclaredFunctionImp*>(thisObj.imp());
+      if (thisObj->inherits(&DeclaredFunctionImp::info)) {
+        DeclaredFunctionImp* fi = static_cast<DeclaredFunctionImp*>(thisObj);
         return String("function " + fi->name().ustring() + "(" +
                       fi->parameterString() + ") " + fi->body->toString());
-      } else if (thisObj.inherits(&FunctionImp::info) &&
-                 !static_cast<FunctionImp*>(thisObj.imp())->name().isNull()) {
-        result = String(
-            "function " +
-            static_cast<FunctionImp*>(thisObj.imp())->name().ustring() + "()");
+      } else if (thisObj->inherits(&FunctionImp::info) &&
+                 !static_cast<FunctionImp*>(thisObj)->name().isNull()) {
+        result =
+            String("function " +
+                   static_cast<FunctionImp*>(thisObj)->name().ustring() + "()");
       } else {
         result = String("(Internal Function)");
       }
     } break;
     case Apply: {
-      Value thisArg = args[0];
-      Value argArray = args[1];
-      Object func = thisObj;
+      ValueImp* thisArg = args[0];
+      ValueImp* argArray = args[1];
+      ObjectImp* func = thisObj;
 
-      if (!func.implementsCall()) {
-        Object err = Error::create(exec, TypeError);
+      if (!func->implementsCall()) {
+        ObjectImp* err = Error::create(exec, TypeError);
         exec->setException(err);
         return err;
       }
 
-      Object applyThis;
-      if (thisArg.isA(NullType) || thisArg.isA(UndefinedType))
+      ObjectImp* applyThis;
+      if (thisArg->isUndefinedOrNull())
         applyThis = exec->dynamicInterpreter()->globalObject();
       else
-        applyThis = thisArg.toObject(exec);
+        applyThis = thisArg->toObject(exec);
 
       List applyArgs;
-      if (!argArray.isA(NullType) && !argArray.isA(UndefinedType)) {
-        if (argArray.isA(ObjectType) &&
-            (Object::dynamicCast(argArray).inherits(&ArrayInstanceImp::info) ||
-             Object::dynamicCast(argArray).inherits(&ArgumentsImp::info))) {
-          Object argArrayObj = Object::dynamicCast(argArray);
+      if (!argArray->isUndefinedOrNull()) {
+        if (argArray->isObject() &&
+            (static_cast<ObjectImp*>(argArray)->inherits(
+                 &ArrayInstanceImp::info) ||
+             static_cast<ObjectImp*>(argArray)->inherits(
+                 &ArgumentsImp::info))) {
+          ObjectImp* argArrayObj = static_cast<ObjectImp*>(argArray);
           unsigned int length =
-              argArrayObj.get(exec, lengthPropertyName).toUInt32(exec);
+              argArrayObj->get(exec, lengthPropertyName)->toUInt32(exec);
           for (unsigned int i = 0; i < length; i++)
-            applyArgs.append(argArrayObj.get(exec, i));
+            applyArgs.append(argArrayObj->get(exec, i));
         } else {
-          Object err = Error::create(exec, TypeError);
+          ObjectImp* err = Error::create(exec, TypeError);
           exec->setException(err);
           return err;
         }
       }
-      result = func.call(exec, applyThis, applyArgs);
+      result = func->call(exec, applyThis, applyArgs);
     } break;
     case Call: {
-      Value thisArg = args[0];
-      Object func = thisObj;
+      ValueImp* thisArg = args[0];
+      ObjectImp* func = thisObj;
 
-      if (!func.implementsCall()) {
-        Object err = Error::create(exec, TypeError);
+      if (!func->implementsCall()) {
+        ObjectImp* err = Error::create(exec, TypeError);
         exec->setException(err);
         return err;
       }
 
-      Object callThis;
-      if (thisArg.isA(NullType) || thisArg.isA(UndefinedType))
+      ObjectImp* callThis;
+      if (thisArg->isUndefinedOrNull())
         callThis = exec->dynamicInterpreter()->globalObject();
       else
-        callThis = thisArg.toObject(exec);
+        callThis = thisArg->toObject(exec);
 
-      result = func.call(exec, callThis, args.copyTail());
+      result = func->call(exec, callThis, args.copyTail());
     } break;
   }
 
@@ -178,12 +176,10 @@ Value FunctionProtoFuncImp::call(ExecState* exec,
 FunctionObjectImp::FunctionObjectImp(ExecState* exec,
                                      FunctionPrototypeImp* funcProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
   putDirect(prototypePropertyName, funcProto, DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, NumberImp::one(),
-            ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, jsOne(), ReadOnly | DontDelete | DontEnum);
 }
 
 FunctionObjectImp::~FunctionObjectImp() {}
@@ -193,22 +189,22 @@ bool FunctionObjectImp::implementsConstruct() const {
 }
 
 // ECMA 15.3.2 The Function Constructor
-Object FunctionObjectImp::construct(ExecState* exec,
-                                    const List& args,
-                                    const UString& sourceURL,
-                                    int lineNumber) {
+ObjectImp* FunctionObjectImp::construct(ExecState* exec,
+                                        const List& args,
+                                        const UString& sourceURL,
+                                        int lineNumber) {
   UString p("");
   UString body;
   int argsSize = args.size();
   if (argsSize == 0) {
     body = "";
   } else if (argsSize == 1) {
-    body = args[0].toString(exec);
+    body = args[0]->toString(exec);
   } else {
-    p = args[0].toString(exec);
+    p = args[0]->toString(exec);
     for (int k = 1; k < argsSize - 1; k++)
-      p += "," + args[k].toString(exec);
-    body = args[argsSize - 1].toString(exec);
+      p += "," + args[k]->toString(exec);
+    body = args[argsSize - 1]->toString(exec);
   }
 
   // parse the source code
@@ -225,13 +221,13 @@ Object FunctionObjectImp::construct(ExecState* exec,
     bool cont = dbg->sourceParsed(exec, sid, UString(), body, errLine);
     if (!cont) {
       dbg->imp()->abort();
-      return Object(new ObjectImp());
+      return new ObjectImp();
     }
   }
 
   // no program node == syntax error - throw a syntax error
   if (!progNode) {
-    Object err = Error::create(exec, SyntaxError, errMsg.ascii(), errLine);
+    ObjectImp* err = Error::create(exec, SyntaxError, errMsg.ascii(), errLine);
     // we can't return a Completion(Throw) here, so just set the exception
     // and return it
     exec->setException(err);
@@ -239,12 +235,11 @@ Object FunctionObjectImp::construct(ExecState* exec,
   }
 
   ScopeChain scopeChain;
-  scopeChain.push(exec->dynamicInterpreter()->globalObject().imp());
+  scopeChain.push(exec->dynamicInterpreter()->globalObject());
   FunctionBodyNode* bodyNode = progNode;
 
   FunctionImp* fimp =
       new DeclaredFunctionImp(exec, Identifier::null(), bodyNode, scopeChain);
-  Object ret(fimp);  // protect from GC
 
   // parse parameter list. throw syntax error on illegal identifiers
   int len = p.size();
@@ -275,25 +270,25 @@ Object FunctionObjectImp::construct(ExecState* exec,
         continue;
       }  // else error
     }
-    Object err = Error::create(exec, SyntaxError,
-                               I18N_NOOP("Syntax error in parameter list"), -1);
+    ObjectImp* err = Error::create(
+        exec, SyntaxError, I18N_NOOP("Syntax error in parameter list"), -1);
     exec->setException(err);
     return err;
   }
 
   List consArgs;
 
-  Object objCons = exec->lexicalInterpreter()->builtinObject();
-  Object prototype = objCons.construct(exec, List::empty());
-  prototype.put(exec, constructorPropertyName, Value(fimp),
-                DontEnum | DontDelete | ReadOnly);
+  ObjectImp* objCons = exec->lexicalInterpreter()->builtinObject();
+  ObjectImp* prototype = objCons->construct(exec, List::empty());
+  prototype->put(exec, constructorPropertyName, fimp,
+                 DontEnum | DontDelete | ReadOnly);
   fimp->put(exec, prototypePropertyName, prototype,
             DontEnum | DontDelete | ReadOnly);
-  return ret;
+  return fimp;
 }
 
 // ECMA 15.3.2 The Function Constructor
-Object FunctionObjectImp::construct(ExecState* exec, const List& args) {
+ObjectImp* FunctionObjectImp::construct(ExecState* exec, const List& args) {
   return FunctionObjectImp::construct(exec, args, UString(), 0);
 }
 
@@ -302,8 +297,8 @@ bool FunctionObjectImp::implementsCall() const {
 }
 
 // ECMA 15.3.1 The Function Constructor Called as a Function
-Value FunctionObjectImp::call(ExecState* exec,
-                              Object& /*thisObj*/,
-                              const List& args) {
+ValueImp* FunctionObjectImp::callAsFunction(ExecState* exec,
+                                            ObjectImp* /*thisObj*/,
+                                            const List& args) {
   return construct(exec, args);
 }

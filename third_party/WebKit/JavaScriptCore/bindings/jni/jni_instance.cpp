@@ -75,38 +75,34 @@ Class* JavaInstance::getClass() const {
   return _class;
 }
 
-KJS::Value JavaInstance::stringValue() const {
+ValueImp* JavaInstance::stringValue() const {
   jstring stringValue = (jstring)callJNIObjectMethod(
       _instance->_instance, "toString", "()Ljava/lang/String;");
   JNIEnv* env = getJNIEnv();
-  const UChar* c =
-      (const UChar*)getUCharactersFromJStringInEnv(env, stringValue);
-  UString u(c, (int)env->GetStringLength(stringValue));
-  String v(u);
-  releaseUCharactersForJStringInEnv(env, stringValue, (const jchar*)c);
-  return v;
+  const jchar* c = getUCharactersFromJStringInEnv(env, stringValue);
+  UString u((const UChar*)c, (int)env->GetStringLength(stringValue));
+  releaseUCharactersForJStringInEnv(env, stringValue, c);
+  return jsString(u);
 }
 
-KJS::Value JavaInstance::numberValue() const {
+ValueImp* JavaInstance::numberValue() const {
   jdouble doubleValue =
       callJNIDoubleMethod(_instance->_instance, "doubleValue", "()D");
-  KJS::Number v(doubleValue);
-  return v;
+  return jsNumber(doubleValue);
 }
 
-KJS::Value JavaInstance::booleanValue() const {
+ValueImp* JavaInstance::booleanValue() const {
   jboolean booleanValue =
       callJNIBooleanMethod(_instance->_instance, "booleanValue", "()Z");
-  KJS::Boolean v(booleanValue);
-  return v;
+  return jsBoolean(booleanValue);
 }
 
-Value JavaInstance::invokeMethod(KJS::ExecState* exec,
-                                 const MethodList& methodList,
-                                 const List& args) {
+ValueImp* JavaInstance::invokeMethod(ExecState* exec,
+                                     const MethodList& methodList,
+                                     const List& args) {
   int i, count = args.size();
   jvalue* jArgs;
-  Value resultValue;
+  ValueImp* resultValue;
   Method* method = 0;
   unsigned int numMethods = methodList.length();
 
@@ -143,7 +139,7 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
         static_cast<JavaParameter*>(jMethod->parameterAt(i));
     jArgs[i] = convertValueToJValue(exec, args.at(i), aParameter->getJNIType(),
                                     aParameter->type());
-    JS_LOG("arg[%d] = %s\n", i, args.at(i).toString(exec).ascii());
+    JS_LOG("arg[%d] = %s\n", i, args.at(i)->toString(exec).ascii());
   }
 
   jvalue result;
@@ -155,17 +151,16 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
   bool handled = false;
   if (execContext && execContext->nativeHandle()) {
     jobject obj = _instance->_instance;
-    Value exceptionDescription;
+    ValueImp* exceptionDescription;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
     handled =
         dispatchJNICall(execContext->nativeHandle(), obj, jMethod->isStatic(),
                         jMethod->JNIReturnType(), jMethod->methodID(obj), jArgs,
                         result, callingURL, exceptionDescription);
-    if (!exceptionDescription.isNull()) {
-      Object error = Error::create(
+    if (exceptionDescription) {
+      ObjectImp* error = Error::create(
           exec, GeneralError,
-          exceptionDescription.toString(exec).UTF8String().c_str());
-
+          exceptionDescription->toString(exec).UTF8String().c_str());
       exec->setException(error);
 
       free(jArgs);
@@ -244,7 +239,7 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
     } break;
 
     case boolean_type: {
-      resultValue = KJS::Boolean(result.z);
+      resultValue = Boolean(result.z);
     } break;
 
     case byte_type: {
@@ -284,12 +279,11 @@ Value JavaInstance::invokeMethod(KJS::ExecState* exec,
   return resultValue;
 }
 
-KJS::Value JavaInstance::invokeDefaultMethod(KJS::ExecState* exec,
-                                             const KJS::List& args) {
+ValueImp* JavaInstance::invokeDefaultMethod(ExecState* exec, const List& args) {
   return Undefined();
 }
 
-KJS::Value JavaInstance::defaultValue(KJS::Type hint) const {
+ValueImp* JavaInstance::defaultValue(Type hint) const {
   if (hint == StringType) {
     return stringValue();
   } else if (hint == NumberType) {
@@ -310,7 +304,7 @@ KJS::Value JavaInstance::defaultValue(KJS::Type hint) const {
   return valueOf();
 }
 
-KJS::Value JavaInstance::valueOf() const {
+ValueImp* JavaInstance::valueOf() const {
   return stringValue();
 };
 

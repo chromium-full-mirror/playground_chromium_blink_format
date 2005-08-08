@@ -43,7 +43,6 @@ ErrorPrototypeImp::ErrorPrototypeImp(ExecState* exec,
                                      ObjectPrototypeImp* objectProto,
                                      FunctionPrototypeImp* funcProto)
     : ObjectImp(objectProto) {
-  Value protect(this);
   setInternalValue(Undefined());
   // The constructor will be added later in ErrorObjectImp's constructor
 
@@ -58,29 +57,27 @@ ErrorPrototypeImp::ErrorPrototypeImp(ExecState* exec,
 ErrorProtoFuncImp::ErrorProtoFuncImp(ExecState* exec,
                                      FunctionPrototypeImp* funcProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
-  putDirect(lengthPropertyName, NumberImp::zero(),
-            DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsZero(), DontDelete | ReadOnly | DontEnum);
 }
 
 bool ErrorProtoFuncImp::implementsCall() const {
   return true;
 }
 
-Value ErrorProtoFuncImp::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& /*args*/) {
+ValueImp* ErrorProtoFuncImp::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& /*args*/) {
   // toString()
   UString s = "Error";
 
-  Value v = thisObj.get(exec, namePropertyName);
-  if (v.type() != UndefinedType) {
-    s = v.toString(exec);
+  ValueImp* v = thisObj->get(exec, namePropertyName);
+  if (!v->isUndefined()) {
+    s = v->toString(exec);
   }
 
-  v = thisObj.get(exec, messagePropertyName);
-  if (v.type() != UndefinedType) {
-    s += ": " + v.toString(exec);  // Mozilla compatible format
+  v = thisObj->get(exec, messagePropertyName);
+  if (!v->isUndefined()) {
+    s += ": " + v->toString(exec);  // Mozilla compatible format
   }
 
   return String(s);
@@ -92,12 +89,10 @@ ErrorObjectImp::ErrorObjectImp(ExecState* exec,
                                FunctionPrototypeImp* funcProto,
                                ErrorPrototypeImp* errorProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
   // ECMA 15.11.3.1 Error.prototype
   putDirect(prototypePropertyName, errorProto,
             DontEnum | DontDelete | ReadOnly);
-  putDirect(lengthPropertyName, NumberImp::one(),
-            DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsOne(), DontDelete | ReadOnly | DontEnum);
   // putDirect(namePropertyName, String(n));
 }
 
@@ -106,15 +101,14 @@ bool ErrorObjectImp::implementsConstruct() const {
 }
 
 // ECMA 15.9.3
-Object ErrorObjectImp::construct(ExecState* exec, const List& args) {
-  Object proto =
-      Object::dynamicCast(exec->lexicalInterpreter()->builtinErrorPrototype());
-  ObjectImp* imp = new ErrorInstanceImp(proto.imp());
-  Object obj(imp);
+ObjectImp* ErrorObjectImp::construct(ExecState* exec, const List& args) {
+  ObjectImp* proto = static_cast<ObjectImp*>(
+      exec->lexicalInterpreter()->builtinErrorPrototype());
+  ObjectImp* imp = new ErrorInstanceImp(proto);
+  ObjectImp* obj(imp);
 
-  if (!args.isEmpty() && args[0].type() != UndefinedType) {
-    imp->putDirect(messagePropertyName, new StringImp(args[0].toString(exec)));
-  }
+  if (!args[0]->isUndefined())
+    imp->putDirect(messagePropertyName, jsString(args[0]->toString(exec)));
 
   return obj;
 }
@@ -124,9 +118,9 @@ bool ErrorObjectImp::implementsCall() const {
 }
 
 // ECMA 15.9.2
-Value ErrorObjectImp::call(ExecState* exec,
-                           Object& /*thisObj*/,
-                           const List& args) {
+ValueImp* ErrorObjectImp::callAsFunction(ExecState* exec,
+                                         ObjectImp* /*thisObj*/,
+                                         const List& args) {
   // "Error()" gives the sames result as "new Error()"
   return construct(exec, args);
 }
@@ -139,10 +133,9 @@ NativeErrorPrototypeImp::NativeErrorPrototypeImp(ExecState* exec,
                                                  UString name,
                                                  UString message)
     : ObjectImp(errorProto) {
-  Value protect(this);
   errType = et;
-  putDirect(namePropertyName, new StringImp(name), 0);
-  putDirect(messagePropertyName, new StringImp(message), 0);
+  putDirect(namePropertyName, jsString(name), 0);
+  putDirect(messagePropertyName, jsString(message), 0);
 }
 
 // ------------------------------ NativeErrorImp -------------------------------
@@ -152,12 +145,11 @@ const ClassInfo NativeErrorImp::info = {"Function", &InternalFunctionImp::info,
 
 NativeErrorImp::NativeErrorImp(ExecState* exec,
                                FunctionPrototypeImp* funcProto,
-                               const Object& prot)
+                               ObjectImp* prot)
     : InternalFunctionImp(funcProto), proto(0) {
-  Value protect(this);
-  proto = static_cast<ObjectImp*>(prot.imp());
+  proto = static_cast<ObjectImp*>(prot);
 
-  putDirect(lengthPropertyName, NumberImp::one(),
+  putDirect(lengthPropertyName, jsOne(),
             DontDelete | ReadOnly | DontEnum);  // ECMA 15.11.7.5
   putDirect(prototypePropertyName, proto, DontDelete | ReadOnly | DontEnum);
 }
@@ -166,11 +158,11 @@ bool NativeErrorImp::implementsConstruct() const {
   return true;
 }
 
-Object NativeErrorImp::construct(ExecState* exec, const List& args) {
+ObjectImp* NativeErrorImp::construct(ExecState* exec, const List& args) {
   ObjectImp* imp = new ErrorInstanceImp(proto);
-  Object obj(imp);
-  if (args[0].type() != UndefinedType)
-    imp->putDirect(messagePropertyName, new StringImp(args[0].toString(exec)));
+  ObjectImp* obj(imp);
+  if (!args[0]->isUndefined())
+    imp->putDirect(messagePropertyName, jsString(args[0]->toString(exec)));
   return obj;
 }
 
@@ -178,9 +170,9 @@ bool NativeErrorImp::implementsCall() const {
   return true;
 }
 
-Value NativeErrorImp::call(ExecState* exec,
-                           Object& /*thisObj*/,
-                           const List& args) {
+ValueImp* NativeErrorImp::callAsFunction(ExecState* exec,
+                                         ObjectImp* /*thisObj*/,
+                                         const List& args) {
   return construct(exec, args);
 }
 

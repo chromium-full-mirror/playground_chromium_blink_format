@@ -68,50 +68,48 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
 }
 
 // Variant value must be released with NPReleaseVariantValue()
-void coerceValueToNPVariantStringType(KJS::ExecState* exec,
-                                      const KJS::Value& value,
+void coerceValueToNPVariantStringType(ExecState* exec,
+                                      ValueImp* value,
                                       NPVariant* result) {
-  UString ustring = value.toString(exec);
+  UString ustring = value->toString(exec);
   CString cstring = ustring.UTF8String();
   NPString string = {(const NPUTF8*)cstring.c_str(), cstring.size()};
   NPN_InitializeVariantWithStringCopy(result, &string);
 }
 
 // Variant value must be released with NPReleaseVariantValue()
-void convertValueToNPVariant(KJS::ExecState* exec,
-                             const KJS::Value& value,
+void convertValueToNPVariant(ExecState* exec,
+                             ValueImp* value,
                              NPVariant* result) {
-  Type type = value.type();
+  Type type = value->type();
 
   if (type == StringType) {
-    UString ustring = value.toString(exec);
+    UString ustring = value->toString(exec);
     CString cstring = ustring.UTF8String();
     NPString string = {(const NPUTF8*)cstring.c_str(), cstring.size()};
     NPN_InitializeVariantWithStringCopy(result, &string);
   } else if (type == NumberType) {
-    NPN_InitializeVariantWithDouble(result, value.toNumber(exec));
+    NPN_InitializeVariantWithDouble(result, value->toNumber(exec));
   } else if (type == BooleanType) {
-    NPN_InitializeVariantWithBool(result, value.toBoolean(exec));
+    NPN_InitializeVariantWithBool(result, value->toBoolean(exec));
   } else if (type == UnspecifiedType) {
     NPN_InitializeVariantAsUndefined(result);
   } else if (type == NullType) {
     NPN_InitializeVariantAsNull(result);
   } else if (type == ObjectType) {
-    KJS::ObjectImp* objectImp = static_cast<KJS::ObjectImp*>(value.imp());
-    if (objectImp->classInfo() == &KJS::RuntimeObjectImp::info) {
-      KJS::RuntimeObjectImp* imp =
-          static_cast<KJS::RuntimeObjectImp*>(value.imp());
+    ObjectImp* objectImp = static_cast<ObjectImp*>(value);
+    if (objectImp->classInfo() == &RuntimeObjectImp::info) {
+      RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(value);
       CInstance* instance = static_cast<CInstance*>(imp->getInternalInstance());
       NPN_InitializeVariantWithObject(result, instance->getObject());
     } else {
-      KJS::Interpreter* originInterpreter = exec->interpreter();
+      Interpreter* originInterpreter = exec->interpreter();
       const Bindings::RootObject* originExecutionContext =
           rootForInterpreter(originInterpreter);
 
-      KJS::Interpreter* interpreter = 0;
+      Interpreter* interpreter = 0;
       if (originInterpreter->isGlobalObject(value)) {
-        interpreter =
-            originInterpreter->interpreterForGlobalObject(value.imp());
+        interpreter = originInterpreter->interpreterForGlobalObject(value);
       }
 
       if (!interpreter)
@@ -120,15 +118,14 @@ void convertValueToNPVariant(KJS::ExecState* exec,
       const Bindings::RootObject* executionContext =
           rootForInterpreter(interpreter);
       if (!executionContext) {
-        Bindings::RootObject* newExecutionContext =
-            new KJS::Bindings::RootObject(0);
+        Bindings::RootObject* newExecutionContext = new Bindings::RootObject(0);
         newExecutionContext->setInterpreter(interpreter);
         executionContext = newExecutionContext;
       }
 
       NPObject* obj =
           (NPObject*)exec->interpreter()->createLanguageInstanceForValue(
-              exec, Instance::CLanguage, value.toObject(exec),
+              exec, Instance::CLanguage, value->toObject(exec),
               originExecutionContext, executionContext);
       NPN_InitializeVariantWithObject(result, obj);
       _NPN_ReleaseObject(obj);
@@ -137,14 +134,14 @@ void convertValueToNPVariant(KJS::ExecState* exec,
     NPN_InitializeVariantAsUndefined(result);
 }
 
-Value convertNPVariantToValue(KJS::ExecState* exec, const NPVariant* variant) {
+ValueImp* convertNPVariantToValue(ExecState* exec, const NPVariant* variant) {
   NPVariantType type = variant->type;
 
   if (type == NPVariantType_Bool) {
     NPBool aBool;
     if (NPN_VariantToBool(variant, &aBool))
-      return KJS::Boolean(aBool);
-    return KJS::Boolean(false);
+      return jsBoolean(aBool);
+    return jsBoolean(false);
   } else if (type == NPVariantType_Null) {
     return Null();
   } else if (type == NPVariantType_Void) {
@@ -165,16 +162,16 @@ Value convertNPVariantToValue(KJS::ExecState* exec, const NPVariant* variant) {
     convertNPStringToUTF16(
         &variant->value.stringValue, &stringValue,
         &UTF16Length);  // requires free() of returned memory.
-    String resultString(UString((const UChar*)stringValue, UTF16Length));
+    UString resultString((const UChar*)stringValue, UTF16Length);
     free(stringValue);
-    return resultString;
+    return jsString(resultString);
   } else if (type == NPVariantType_Object) {
     NPObject* obj = variant->value.objectValue;
 
     if (obj->_class == NPScriptObjectClass) {
       // Get ObjectImp from NP_JavaScriptObject.
       JavaScriptObject* o = (JavaScriptObject*)obj;
-      return Object(const_cast<ObjectImp*>(o->imp));
+      return const_cast<ObjectImp*>(o->imp);
     } else {
       //  Wrap NPObject in a CInstance.
       return Instance::createRuntimeObject(Instance::CLanguage, (void*)obj);

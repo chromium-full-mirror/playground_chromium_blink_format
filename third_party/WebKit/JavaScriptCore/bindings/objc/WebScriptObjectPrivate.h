@@ -13,7 +13,7 @@
 #include <JavaScriptCore/value.h>
 
 @interface WebScriptObject (Private)
-+ (id)_convertValueToObjcValue:(KJS::Value)value
++ (id)_convertValueToObjcValue:(KJS::ValueImp*)value
         originExecutionContext:
             (const KJS::Bindings::RootObject*)originExecutionContext
               executionContext:

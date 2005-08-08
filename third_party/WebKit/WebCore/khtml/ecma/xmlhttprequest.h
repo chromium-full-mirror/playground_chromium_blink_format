@@ -56,7 +56,7 @@ class XMLHttpRequestConstructorImp : public ObjectImp {
   XMLHttpRequestConstructorImp(ExecState* exec, DOM::DocumentImpl* d);
   ~XMLHttpRequestConstructorImp();
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
   khtml::SharedPtr<DOM::DocumentImpl> doc;
@@ -67,14 +67,14 @@ class XMLHttpRequest : public DOMObject {
   XMLHttpRequest(ExecState*, DOM::DocumentImpl* d);
   ~XMLHttpRequest();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  Value getValueProperty(ExecState* exec, int token) const;
+  ValueImp* getValueProperty(ExecState* exec, int token) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   void putValueProperty(ExecState* exec,
                         int token,
-                        const Value& value,
+                        ValueImp* value,
                         int /*attr*/);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual void mark();
@@ -104,8 +104,8 @@ class XMLHttpRequest : public DOMObject {
   friend class XMLHttpRequestProtoFunc;
   friend class XMLHttpRequestQObject;
 
-  Value getStatusText() const;
-  Value getStatus() const;
+  ValueImp* getStatusText() const;
+  ValueImp* getStatus() const;
   bool urlMatchesDocumentDomain(const KURL&) const;
 
   XMLHttpRequestQObject* qObject;
@@ -128,8 +128,8 @@ class XMLHttpRequest : public DOMObject {
   void send(const QString& _body);
   void abort();
   void setRequestHeader(const QString& name, const QString& value);
-  Value getAllResponseHeaders() const;
-  Value getResponseHeader(const QString& name) const;
+  ValueImp* getAllResponseHeaders() const;
+  ValueImp* getResponseHeader(const QString& name) const;
 
   void changeState(XMLHttpRequestState newState);
 

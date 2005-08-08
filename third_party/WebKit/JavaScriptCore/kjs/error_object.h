@@ -46,7 +46,9 @@ class ErrorProtoFuncImp : public InternalFunctionImp {
  public:
   ErrorProtoFuncImp(ExecState* exec, FunctionPrototypeImp* funcProto);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 class ErrorObjectImp : public InternalFunctionImp {
@@ -56,10 +58,12 @@ class ErrorObjectImp : public InternalFunctionImp {
                  ErrorPrototypeImp* errorProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 class NativeErrorPrototypeImp : public ObjectImp {
@@ -78,12 +82,14 @@ class NativeErrorImp : public InternalFunctionImp {
  public:
   NativeErrorImp(ExecState* exec,
                  FunctionPrototypeImp* funcProto,
-                 const Object& prot);
+                 ObjectImp* prot);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   virtual void mark();
 

@@ -107,14 +107,14 @@ bool DOMRange::getOwnPropertySlot(ExecState* exec,
                                                  propertyName, slot);
 }
 
-Value DOMRange::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DOMRange::getValueProperty(ExecState* exec, int token) const {
   DOMExceptionTranslator exception(exec);
   RangeImpl& range = *m_impl;
   switch (token) {
     case StartContainer:
       return getDOMNode(exec, range.startContainer(exception));
     case StartOffset:
-      return number(range.startOffset(exception));
+      return jsNumber(range.startOffset(exception));
     case EndContainer:
       return getDOMNode(exec, range.endContainer(exception));
     case EndOffset:
@@ -126,28 +126,28 @@ Value DOMRange::getValueProperty(ExecState* exec, int token) const {
     default:
       kdWarning() << "Unhandled token in DOMRange::getValueProperty : " << token
                   << endl;
-      return Value();
+      return NULL;
   }
 }
 
-Value DOMRangeProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
-  if (!thisObj.inherits(&KJS::DOMRange::info)) {
-    Object err = Error::create(exec, TypeError);
+ValueImp* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
+  if (!thisObj->inherits(&KJS::DOMRange::info)) {
+    ObjectImp* err = Error::create(exec, TypeError);
     exec->setException(err);
     return err;
   }
-  RangeImpl& range = *static_cast<DOMRange*>(thisObj.imp())->impl();
-  Value result = Undefined();
+  RangeImpl& range = *static_cast<DOMRange*>(thisObj)->impl();
+  ValueImp* result = Undefined();
   int exception = 0;
 
   switch (id) {
     case DOMRange::SetStart:
-      range.setStart(toNode(args[0]), args.impAt(1)->toInt32(exec), exception);
+      range.setStart(toNode(args[0]), args[1]->toInt32(exec), exception);
       break;
     case DOMRange::SetEnd:
-      range.setEnd(toNode(args[0]), args.impAt(1)->toInt32(exec), exception);
+      range.setEnd(toNode(args[0]), args[1]->toInt32(exec), exception);
       break;
     case DOMRange::SetStartBefore:
       range.setStartBefore(toNode(args[0]), exception);
@@ -162,7 +162,7 @@ Value DOMRangeProtoFunc::call(ExecState* exec,
       range.setEndAfter(toNode(args[0]), exception);
       break;
     case DOMRange::Collapse:
-      range.collapse(args[0].toBoolean(exec), exception);
+      range.collapse(args[0]->toBoolean(exec), exception);
       break;
     case DOMRange::SelectNode:
       range.selectNode(toNode(args[0]), exception);
@@ -171,8 +171,8 @@ Value DOMRangeProtoFunc::call(ExecState* exec,
       range.selectNodeContents(toNode(args[0]), exception);
       break;
     case DOMRange::CompareBoundaryPoints:
-      result = number(range.compareBoundaryPoints(
-          static_cast<Range::CompareHow>(args[0].toInt32(exec)),
+      result = jsNumber(range.compareBoundaryPoints(
+          static_cast<Range::CompareHow>(args[0]->toInt32(exec)),
           toRange(args[1]), exception));
       break;
     case DOMRange::DeleteContents:
@@ -200,9 +200,7 @@ Value DOMRangeProtoFunc::call(ExecState* exec,
       range.detach(exception);
       break;
     case DOMRange::CreateContextualFragment:
-      Value value = args[0];
-      DOMString str = value.isA(NullType) ? DOM::DOMString()
-                                          : value.toString(exec).string();
+      DOMString str = args[0]->toString(exec).string();
       result = getDOMNode(exec, range.createContextualFragment(str, exception));
       break;
   };
@@ -234,7 +232,7 @@ bool RangeConstructor::getOwnPropertySlot(ExecState* exec,
       exec, &RangeConstructorTable, this, propertyName, slot);
 }
 
-Value RangeConstructor::getValueProperty(ExecState*, int token) const {
+ValueImp* RangeConstructor::getValueProperty(ExecState*, int token) const {
   return Number(token);
 }
 

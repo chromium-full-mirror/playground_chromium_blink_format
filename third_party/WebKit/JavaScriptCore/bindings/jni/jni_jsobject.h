@@ -86,13 +86,13 @@ class JSObject {
 
   static jvalue invoke(JSObjectCallContext* context);
 
-  jobject convertValueToJObject(KJS::Value value) const;
-  KJS::Value convertJObjectToValue(jobject theObject) const;
-  KJS::List listFromJArray(jobjectArray jArray) const;
+  jobject convertValueToJObject(ValueImp* value) const;
+  ValueImp* convertJObjectToValue(jobject theObject) const;
+  List listFromJArray(jobjectArray jArray) const;
 
  private:
-  const Bindings::RootObject* _root;
-  KJS::ObjectImp* _imp;
+  const RootObject* _root;
+  ObjectImp* _imp;
 };
 
 }  // namespace Bindings
@@ -156,7 +156,6 @@ void KJS_JSObject_JSObjectSetSlot(JNIEnv* env,
 jstring KJS_JSObject_JSObjectToString(JNIEnv* env,
                                       jclass clazz,
                                       jlong nativeJSObject);
-
-}  // namespace Bindings
+}
 
 #endif

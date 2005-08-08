@@ -33,7 +33,6 @@
 #include <objc_header.h>
 
 namespace KJS {
-class Value;
 
 namespace Bindings {
 
@@ -81,11 +80,11 @@ class ObjcField : public Field {
     return *this;
   };
 
-  virtual KJS::Value valueFromInstance(KJS::ExecState* exec,
-                                       const Instance* instance) const;
-  virtual void setValueToInstance(KJS::ExecState* exec,
+  virtual ValueImp* valueFromInstance(ExecState* exec,
+                                      const Instance* instance) const;
+  virtual void setValueToInstance(ExecState* exec,
                                   const Instance* instance,
-                                  const KJS::Value& aValue) const;
+                                  ValueImp* aValue) const;
 
   virtual const char* name() const;
   virtual RuntimeType type() const;
@@ -148,28 +147,28 @@ class ObjcArray : public Array {
 
   ObjcArray& operator=(const ObjcArray& other);
 
-  virtual void setValueAt(KJS::ExecState* exec,
+  virtual void setValueAt(ExecState* exec,
                           unsigned int index,
-                          const KJS::Value& aValue) const;
-  virtual KJS::Value valueAt(KJS::ExecState* exec, unsigned int index) const;
+                          ValueImp* aValue) const;
+  virtual ValueImp* valueAt(ExecState* exec, unsigned int index) const;
   virtual unsigned int getLength() const;
 
   virtual ~ObjcArray();
 
   ObjectStructPtr getObjcArray() const { return _array; }
 
-  static KJS::Value convertObjcArrayToArray(KJS::ExecState* exec,
-                                            ObjectStructPtr anObject);
+  static ValueImp* convertObjcArrayToArray(ExecState* exec,
+                                           ObjectStructPtr anObject);
 
  private:
   ObjectStructPtr _array;
 };
 
-class ObjcFallbackObjectImp : public KJS::ObjectImp {
+class ObjcFallbackObjectImp : public ObjectImp {
  public:
   ObjcFallbackObjectImp(ObjectImp* proto);
 
-  ObjcFallbackObjectImp(ObjcInstance* i, const KJS::Identifier propertyName);
+  ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
 
   const ClassInfo* classInfo() const { return &info; }
 
@@ -177,17 +176,19 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
 
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
 
   virtual bool canPut(ExecState* exec, const Identifier& propertyName) const;
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
-  virtual Value defaultValue(ExecState* exec, Type hint) const;
+  virtual ValueImp* defaultValue(ExecState* exec, Type hint) const;
 
   virtual Type type() const;
   virtual bool toBoolean(ExecState* exec) const;
@@ -196,7 +197,7 @@ class ObjcFallbackObjectImp : public KJS::ObjectImp {
   static const ClassInfo info;
 
   ObjcInstance* _instance;
-  KJS::Identifier _item;
+  Identifier _item;
 };
 
 }  // namespace Bindings

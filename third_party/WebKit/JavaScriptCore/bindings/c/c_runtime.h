@@ -34,7 +34,6 @@
 #include <ustring.h>
 
 namespace KJS {
-class Value;
 
 namespace Bindings {
 
@@ -44,11 +43,11 @@ class CField : public Field {
  public:
   CField(NPIdentifier ident) : Field() { _fieldIdentifier = ident; };
 
-  virtual KJS::Value valueFromInstance(KJS::ExecState* exec,
-                                       const Instance* instance) const;
-  virtual void setValueToInstance(KJS::ExecState* exec,
+  virtual ValueImp* valueFromInstance(ExecState* exec,
+                                      const Instance* instance) const;
+  virtual void setValueToInstance(ExecState* exec,
                                   const Instance* instance,
-                                  const KJS::Value& aValue) const;
+                                  ValueImp* aValue) const;
 
   virtual const char* name() const {
     return _NPN_UTF8FromIdentifier(_fieldIdentifier);
@@ -85,8 +84,8 @@ public:
 
     CArray &operator=(const CArray &other);
     
-    virtual void setValueAt(KJS::ExecState *exec, unsigned int index, const KJS::Value &aValue) const;
-    virtual KJS::Value valueAt(KJS::ExecState *exec, unsigned int index) const;
+    virtual void setValueAt(ExecState *exec, unsigned int index, ValueImp *aValue) const;
+    virtual ValueImp *valueAt(ExecState *exec, unsigned int index) const;
     virtual unsigned int getLength() const;
     
     virtual ~CArray();

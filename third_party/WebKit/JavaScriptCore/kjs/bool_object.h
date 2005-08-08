@@ -62,7 +62,9 @@ class BooleanProtoFuncImp : public InternalFunctionImp {
                       int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   enum { ToString, ValueOf };
 
@@ -84,10 +86,12 @@ class BooleanObjectImp : public InternalFunctionImp {
                    BooleanPrototypeImp* booleanProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 }  // namespace

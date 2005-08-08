@@ -65,7 +65,7 @@ static NodePerDocMap* domNodesPerDocument() {
   return staticDOMNodesPerDocument;
 }
 
-ScriptInterpreter::ScriptInterpreter(const Object& global, KHTMLPart* part)
+ScriptInterpreter::ScriptInterpreter(ObjectImp* global, KHTMLPart* part)
     : Interpreter(global),
       m_part(part),
       m_evt(0L),
@@ -204,13 +204,9 @@ bool ScriptInterpreter::wasRunByUserGesture() const {
 }
 
 #if APPLE_CHANGES
-bool ScriptInterpreter::isGlobalObject(const Value& v) {
-  if (v.type() == ObjectType) {
-    Object o = v.toObject(globalExec());
-    if (o.classInfo() == &Window::info)
-      return true;
-  }
-  return false;
+
+bool ScriptInterpreter::isGlobalObject(ValueImp* v) {
+  return v->isObject(&Window::info);
 }
 
 bool ScriptInterpreter::isSafeScript(const Interpreter* _target) {
@@ -229,7 +225,7 @@ Interpreter* ScriptInterpreter::interpreterForGlobalObject(
 void* ScriptInterpreter::createLanguageInstanceForValue(
     ExecState* exec,
     int language,
-    const Object& value,
+    ObjectImp* value,
     const Bindings::RootObject* origin,
     const Bindings::RootObject* current) {
   void* result = 0;
@@ -304,24 +300,24 @@ QString Identifier::qstring() const {
   return QString((QChar*)data(), size());
 }
 
-Value getStringOrNull(DOMString s) {
+ValueImp* getStringOrNull(DOMString s) {
   if (s.isNull())
     return Null();
   else
     return String(s);
 }
 
-QVariant ValueToVariant(ExecState* exec, const Value& val) {
+QVariant ValueToVariant(ExecState* exec, ValueImp* val) {
   QVariant res;
-  switch (val.type()) {
+  switch (val->type()) {
     case BooleanType:
-      res = QVariant(val.toBoolean(exec), 0);
+      res = QVariant(val->toBoolean(exec), 0);
       break;
     case NumberType:
-      res = QVariant(val.toNumber(exec));
+      res = QVariant(val->toNumber(exec));
       break;
     case StringType:
-      res = QVariant(val.toString(exec).qstring());
+      res = QVariant(val->toString(exec).qstring());
       break;
     default:
       // everything else will be 'invalid'
@@ -351,8 +347,8 @@ void setDOMException(ExecState* exec, int DOMExceptionCode) {
                      // plus a null character
   sprintf(buffer, "%s exception %d", type, code);
 
-  Object errorObject = Error::create(exec, GeneralError, buffer);
-  errorObject.put(exec, "code", Number(code));
+  ObjectImp* errorObject = Error::create(exec, GeneralError, buffer);
+  errorObject->put(exec, "code", Number(code));
   exec->setException(errorObject);
 }
 }

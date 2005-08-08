@@ -47,8 +47,7 @@ NumberPrototypeImp::NumberPrototypeImp(ExecState* exec,
                                        ObjectPrototypeImp* objProto,
                                        FunctionPrototypeImp* funcProto)
     : NumberInstanceImp(objProto) {
-  Value protect(this);
-  setInternalValue(NumberImp::zero());
+  setInternalValue(jsZero());
 
   // The constructor will be added later, after NumberObjectImp has been
   // constructed
@@ -86,7 +85,6 @@ NumberProtoFuncImp::NumberProtoFuncImp(ExecState* exec,
                                        int i,
                                        int len)
     : InternalFunctionImp(funcProto), id(i) {
-  Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
@@ -137,27 +135,25 @@ static UString char_sequence(char c, int count) {
 }
 
 // ECMA 15.7.4.2 - 15.7.4.7
-Value NumberProtoFuncImp::call(ExecState* exec,
-                               Object& thisObj,
-                               const List& args) {
-  Value result;
-
+ValueImp* NumberProtoFuncImp::callAsFunction(ExecState* exec,
+                                             ObjectImp* thisObj,
+                                             const List& args) {
   // no generic function. "this" has to be a Number object
-  if (!thisObj.inherits(&NumberInstanceImp::info)) {
-    Object err = Error::create(exec, TypeError);
+  if (!thisObj->inherits(&NumberInstanceImp::info)) {
+    ObjectImp* err = Error::create(exec, TypeError);
     exec->setException(err);
     return err;
   }
 
-  Value v = thisObj.internalValue();
+  ValueImp* v = thisObj->internalValue();
   switch (id) {
     case ToString: {
       double dradix = 10;
       if (!args.isEmpty())
-        dradix = args[0].toInteger(exec);
+        dradix = args[0]->toInteger(exec);
       if (dradix >= 2 && dradix <= 36 && dradix != 10) {  // false for NaN
         int radix = static_cast<int>(dradix);
-        unsigned i = v.toUInt32(exec);
+        unsigned i = v->toUInt32(exec);
         char s[33];
         char* p = s + sizeof(s);
         *--p = '\0';
@@ -165,22 +161,19 @@ Value NumberProtoFuncImp::call(ExecState* exec,
           *--p = "0123456789abcdefghijklmnopqrstuvwxyz"[i % radix];
           i /= radix;
         } while (i);
-        result = String(p);
+        return String(p);
       } else
-        result = String(v.toString(exec));
-      break;
+        return String(v->toString(exec));
     }
     case ToLocaleString: /* TODO */
-      result = String(v.toString(exec));
-      break;
+      return String(v->toString(exec));
     case ValueOf:
-      result = Number(v.toNumber(exec));
-      break;
+      return Number(v->toNumber(exec));
     case ToFixed: {
-      Value fractionDigits = args[0];
-      double df = fractionDigits.toInteger(exec);
+      ValueImp* fractionDigits = args[0];
+      double df = fractionDigits->toInteger(exec);
       if (!(df >= 0 && df <= 20)) {  // true for NaN
-        Object err =
+        ObjectImp* err =
             Error::create(exec, RangeError,
                           "toFixed() digits argument must be between 0 and 20");
 
@@ -189,7 +182,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       }
       int f = (int)df;
 
-      double x = v.toNumber(exec);
+      double x = v->toNumber(exec);
       if (isNaN(x))
         return String("NaN");
 
@@ -223,15 +216,15 @@ Value NumberProtoFuncImp::call(ExecState* exec,
         return String(s + m.substr(0, k - f));
     }
     case ToExponential: {
-      double x = v.toNumber(exec);
+      double x = v->toNumber(exec);
 
       if (isNaN(x) || isInf(x))
         return String(UString::from(x));
 
-      Value fractionDigits = args[0];
-      double df = fractionDigits.toInteger(exec);
+      ValueImp* fractionDigits = args[0];
+      double df = fractionDigits->toInteger(exec);
       if (!(df >= 0 && df <= 20)) {  // true for NaN
-        Object err = Error::create(
+        ObjectImp* err = Error::create(
             exec, RangeError, "toExponential() argument must between 0 and 20");
         exec->setException(err);
         return err;
@@ -239,7 +232,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       int f = (int)df;
 
       int decimalAdjust = 0;
-      if (!fractionDigits.isA(UndefinedType)) {
+      if (!fractionDigits->isUndefined()) {
         double logx = floor(log10(x));
         x /= pow(10, logx);
         double fx = floor(x * pow(10, f)) / pow(10, f);
@@ -274,7 +267,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       } else {
         buf[i++] = result[0];
 
-        if (fractionDigits.isA(UndefinedType))
+        if (fractionDigits->isUndefined())
           f = length - 1;
 
         if (length > 1 && f > 0) {
@@ -319,10 +312,10 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       int e = 0;
       UString m;
 
-      double dp = args[0].toInteger(exec);
-      double x = v.toNumber(exec);
+      double dp = args[0]->toInteger(exec);
+      double x = v->toNumber(exec);
       if (isNaN(dp) || isNaN(x) || isInf(x))
-        return String(v.toString(exec));
+        return String(v->toString(exec));
 
       UString s = "";
       if (x < 0) {
@@ -331,7 +324,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       }
 
       if (dp < 1 || dp > 21) {
-        Object err =
+        ObjectImp* err =
             Error::create(exec, RangeError,
                           "toPrecision() argument must be between 1 and 21");
         exec->setException(err);
@@ -379,7 +372,7 @@ Value NumberProtoFuncImp::call(ExecState* exec,
       }
     }
   }
-  return result;
+  return NULL;
 }
 
 // ------------------------------ NumberObjectImp ------------------------------
@@ -406,14 +399,12 @@ NumberObjectImp::NumberObjectImp(ExecState* exec,
                                  FunctionPrototypeImp* funcProto,
                                  NumberPrototypeImp* numberProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
   // Number.Prototype
   putDirect(prototypePropertyName, numberProto,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, NumberImp::one(),
-            ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, jsOne(), ReadOnly | DontDelete | DontEnum);
 }
 
 bool NumberObjectImp::getOwnPropertySlot(ExecState* exec,
@@ -423,11 +414,11 @@ bool NumberObjectImp::getOwnPropertySlot(ExecState* exec,
       exec, &numberTable, this, propertyName, slot);
 }
 
-Value NumberObjectImp::getValueProperty(ExecState*, int token) const {
+ValueImp* NumberObjectImp::getValueProperty(ExecState*, int token) const {
   // ECMA 15.7.3
   switch (token) {
     case NaNValue:
-      return Number(NaN);
+      return jsNaN();
     case NegInfinity:
       return Number(-Inf);
     case PosInfinity:
@@ -445,17 +436,17 @@ bool NumberObjectImp::implementsConstruct() const {
 }
 
 // ECMA 15.7.1
-Object NumberObjectImp::construct(ExecState* exec, const List& args) {
-  ObjectImp* proto = exec->lexicalInterpreter()->builtinNumberPrototype().imp();
-  Object obj(new NumberInstanceImp(proto));
+ObjectImp* NumberObjectImp::construct(ExecState* exec, const List& args) {
+  ObjectImp* proto = exec->lexicalInterpreter()->builtinNumberPrototype();
+  ObjectImp* obj(new NumberInstanceImp(proto));
 
-  Number n;
+  double n;
   if (args.isEmpty())
-    n = Number(0);
+    n = 0;
   else
-    n = args[0].toNumber(exec);
+    n = args[0]->toNumber(exec);
 
-  obj.setInternalValue(n);
+  obj->setInternalValue(jsNumber(n));
 
   return obj;
 }
@@ -465,11 +456,11 @@ bool NumberObjectImp::implementsCall() const {
 }
 
 // ECMA 15.7.2
-Value NumberObjectImp::call(ExecState* exec,
-                            Object& /*thisObj*/,
-                            const List& args) {
+ValueImp* NumberObjectImp::callAsFunction(ExecState* exec,
+                                          ObjectImp* /*thisObj*/,
+                                          const List& args) {
   if (args.isEmpty())
     return Number(0);
   else
-    return Number(args[0].toNumber(exec));
+    return Number(args[0]->toNumber(exec));
 }

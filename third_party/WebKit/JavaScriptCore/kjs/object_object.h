@@ -53,7 +53,7 @@ class ObjectProtoFuncImp : public InternalFunctionImp {
                      int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState*, ObjectImp*, const List& args);
 
   enum { ToString, ToLocaleString, ValueOf, HasOwnProperty };
 
@@ -73,9 +73,9 @@ class ObjectObjectImp : public InternalFunctionImp {
                   FunctionPrototypeImp* funcProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState*, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState*, ObjectImp*, const List& args);
 };
 
 }  // namespace

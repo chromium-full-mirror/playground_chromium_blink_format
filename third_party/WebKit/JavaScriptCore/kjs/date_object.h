@@ -62,7 +62,9 @@ class DateProtoFuncImp : public InternalFunctionImp {
   DateProtoFuncImp(ExecState* exec, int i, int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   Completion execute(const List&);
   enum {
@@ -115,12 +117,14 @@ class DateObjectImp : public InternalFunctionImp {
                 DatePrototypeImp* dateProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   Completion execute(const List&);
-  Object construct(const List&);
+  ObjectImp* construct(const List&);
 };
 
 /**
@@ -137,7 +141,9 @@ class DateObjectFuncImp : public InternalFunctionImp {
                     int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   enum { Parse, UTC };
 

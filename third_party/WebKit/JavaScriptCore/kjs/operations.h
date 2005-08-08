@@ -55,8 +55,8 @@ bool isPosInf(double d);
 bool isNegInf(double d);
 #endif
 
-bool equal(ExecState* exec, const Value& v1, const Value& v2);
-bool strictEqual(ExecState* exec, const Value& v1, const Value& v2);
+bool equal(ExecState* exec, ValueImp* v1, ValueImp* v2);
+bool strictEqual(ExecState* exec, ValueImp* v1, ValueImp* v2);
 /**
  * This operator performs an abstract relational comparison of the two
  * arguments that can be of arbitrary type. If possible, conversions to the
@@ -65,7 +65,7 @@ bool strictEqual(ExecState* exec, const Value& v1, const Value& v2);
  * @return 1 if v1 is "less-than" v2, 0 if the relation is "greater-than-or-
  * equal". -1 if the result is undefined.
  */
-int relation(ExecState* exec, const Value& v1, const Value& v2);
+int relation(ExecState* exec, ValueImp* v1, ValueImp* v2);
 int maxInt(int d1, int d2);
 int minInt(int d1, int d2);
 /**
@@ -74,7 +74,7 @@ int minInt(int d1, int d2);
  * @param oper '+' or '-' for an addition or substraction, respectively.
  * @return The result of the operation.
  */
-Value add(ExecState* exec, const Value& v1, const Value& v2, char oper);
+ValueImp* add(ExecState* exec, ValueImp* v1, ValueImp* v2, char oper);
 /**
  * Multiplicative operator. Either multiplies/divides v1 and v2 or
  * calculates the remainder from an division.
@@ -82,7 +82,7 @@ Value add(ExecState* exec, const Value& v1, const Value& v2, char oper);
  * modulo operation.
  * @return The result of the operation.
  */
-Value mult(ExecState* exec, const Value& v1, const Value& v2, char oper);
+ValueImp* mult(ExecState* exec, ValueImp* v1, ValueImp* v2, char oper);
 };
 
 #endif

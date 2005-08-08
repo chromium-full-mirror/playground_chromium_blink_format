@@ -276,12 +276,12 @@ static UString formatLocaleDate(KJS::ExecState* exec,
   UString arg1String;
   bool useCustomFormat = false;
   UString customFormatString;
-  arg0String = args[0].toString(exec);
+  arg0String = args[0]->toString(exec);
   if ((arg0String == "custom") && (argCount >= 2)) {
     useCustomFormat = true;
-    customFormatString = args[1].toString(exec);
+    customFormatString = args[1]->toString(exec);
   } else if (includeDate && includeTime && (argCount >= 2)) {
-    arg1String = args[1].toString(exec);
+    arg1String = args[1]->toString(exec);
     dateStyle = styleFromArgString(arg0String, dateStyle);
     timeStyle = styleFromArgString(arg1String, timeStyle);
   } else if (includeDate && (argCount >= 1)) {
@@ -321,7 +321,7 @@ static UString formatLocaleDate(KJS::ExecState* exec,
 
 #endif  // APPLE_CHANGES
 
-using namespace KJS;
+namespace KJS {
 
 static int day(double t) {
   return int(floor(t / msPerDay));
@@ -406,17 +406,17 @@ static double timeFromArgs(ExecState* exec,
   // hours
   if (maxArgs >= 4 && idx < numArgs) {
     t->tm_hour = 0;
-    result = args[idx++].toInt32(exec) * msPerHour;
+    result = args[idx++]->toInt32(exec) * msPerHour;
   }
   // minutes
   if (maxArgs >= 3 && idx < numArgs) {
     t->tm_min = 0;
-    result += args[idx++].toInt32(exec) * msPerMinute;
+    result += args[idx++]->toInt32(exec) * msPerMinute;
   }
   // seconds
   if (maxArgs >= 2 && idx < numArgs) {
     t->tm_sec = 0;
-    result += args[idx++].toInt32(exec) * msPerSecond;
+    result += args[idx++]->toInt32(exec) * msPerSecond;
   }
   // read ms from args if present or add the old value
   result += idx < numArgs ? roundValue(exec, args[idx]) : ms;
@@ -532,8 +532,7 @@ DontEnum|Function	3
 
 DatePrototypeImp::DatePrototypeImp(ExecState*, ObjectPrototypeImp* objectProto)
     : DateInstanceImp(objectProto) {
-  Value protect(this);
-  setInternalValue(NumberImp::create(NaN));
+  setInternalValue(jsNaN());
   // The constructor will be added later, after DateObjectImp has been built
 }
 
@@ -548,12 +547,11 @@ bool DatePrototypeImp::getOwnPropertySlot(ExecState* exec,
 
 DateProtoFuncImp::DateProtoFuncImp(ExecState* exec, int i, int len)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype())),
       id(abs(i)),
       utc(i < 0)
 // We use a negative ID to denote the "UTC" variant.
 {
-  Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
@@ -561,21 +559,21 @@ bool DateProtoFuncImp::implementsCall() const {
   return true;
 }
 
-Value DateProtoFuncImp::call(ExecState* exec,
-                             Object& thisObj,
-                             const List& args) {
+ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
+                                           ObjectImp* thisObj,
+                                           const List& args) {
   if ((id == ToString || id == ValueOf || id == GetTime || id == SetTime) &&
-      !thisObj.inherits(&DateInstanceImp::info)) {
+      !thisObj->inherits(&DateInstanceImp::info)) {
     // non-generic function called on non-date object
 
     // ToString and ValueOf are generic according to the spec, but the mozilla
     // tests suggest otherwise...
-    Object err = Error::create(exec, TypeError);
+    ObjectImp* err = Error::create(exec, TypeError);
     exec->setException(err);
     return err;
   }
 
-  Value result;
+  ValueImp* result = NULL;
   UString s;
 #if !APPLE_CHANGES
   const int bufsize = 100;
@@ -584,8 +582,8 @@ Value DateProtoFuncImp::call(ExecState* exec,
   if (!oldlocale.c_str())
     oldlocale = setlocale(LC_ALL, NULL);
 #endif
-  Value v = thisObj.internalValue();
-  double milli = v.toNumber(exec);
+  ValueImp* v = thisObj->internalValue();
+  double milli = v->toNumber(exec);
 
   if (isNaN(milli)) {
     switch (id) {
@@ -610,7 +608,7 @@ Value DateProtoFuncImp::call(ExecState* exec,
       case GetSeconds:
       case GetMilliSeconds:
       case GetTimezoneOffset:
-        return Number(NaN);
+        return jsNaN();
     }
   }
 
@@ -758,7 +756,7 @@ Value DateProtoFuncImp::call(ExecState* exec,
     case SetTime:
       milli = roundValue(exec, args[0]);
       result = Number(milli);
-      thisObj.setInternalValue(result);
+      thisObj->setInternalValue(result);
       break;
     case SetMilliSeconds:
       ms = roundValue(exec, args[0]);
@@ -774,23 +772,24 @@ Value DateProtoFuncImp::call(ExecState* exec,
       break;
     case SetDate:
       t->tm_mday = 0;
-      ms += args[0].toInt32(exec) * msPerDay;
+      ms += args[0]->toInt32(exec) * msPerDay;
       break;
     case SetMonth:
-      t->tm_mon = args[0].toInt32(exec);
+      t->tm_mon = args[0]->toInt32(exec);
       if (args.size() >= 2)
-        t->tm_mday = args[1].toInt32(exec);
+        t->tm_mday = args[1]->toInt32(exec);
       break;
     case SetFullYear:
-      t->tm_year = args[0].toInt32(exec) - 1900;
+      t->tm_year = args[0]->toInt32(exec) - 1900;
       if (args.size() >= 2)
-        t->tm_mon = args[1].toInt32(exec);
+        t->tm_mon = args[1]->toInt32(exec);
       if (args.size() >= 3)
-        t->tm_mday = args[2].toInt32(exec);
+        t->tm_mday = args[2]->toInt32(exec);
       break;
     case SetYear:
-      t->tm_year = args[0].toInt32(exec) >= 1900 ? args[0].toInt32(exec) - 1900
-                                                 : args[0].toInt32(exec);
+      t->tm_year = args[0]->toInt32(exec) >= 1900
+                       ? args[0]->toInt32(exec) - 1900
+                       : args[0]->toInt32(exec);
       break;
   }
 
@@ -798,7 +797,7 @@ Value DateProtoFuncImp::call(ExecState* exec,
       id == SetMinutes || id == SetHours || id == SetDate || id == SetMonth ||
       id == SetFullYear) {
     result = Number(makeTime(t, ms, utc));
-    thisObj.setInternalValue(result);
+    thisObj->setInternalValue(result);
   }
 
   return result;
@@ -812,8 +811,6 @@ DateObjectImp::DateObjectImp(ExecState* exec,
                              FunctionPrototypeImp* funcProto,
                              DatePrototypeImp* dateProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
-
   // ECMA 15.9.4.1 Date.prototype
   putDirect(prototypePropertyName, dateProto, DontEnum | DontDelete | ReadOnly);
 
@@ -835,7 +832,7 @@ bool DateObjectImp::implementsConstruct() const {
 }
 
 // ECMA 15.9.3
-Object DateObjectImp::construct(ExecState* exec, const List& args) {
+ObjectImp* DateObjectImp::construct(ExecState* exec, const List& args) {
   int numArgs = args.size();
 
 #ifdef KJS_VERBOSE
@@ -862,37 +859,37 @@ Object DateObjectImp::construct(ExecState* exec, const List& args) {
 #endif
     value = utc;
   } else if (numArgs == 1) {
-    if (args[0].type() == StringType)
-      value = parseDate(args[0].toString(exec));
+    if (args[0]->isString())
+      value = parseDate(args[0]->toString(exec));
     else
-      value = args[0].toPrimitive(exec).toNumber(exec);
+      value = args[0]->toPrimitive(exec)->toNumber(exec);
   } else {
     struct tm t;
     memset(&t, 0, sizeof(t));
-    if (isNaN(args[0].toNumber(exec)) || isNaN(args[1].toNumber(exec)) ||
-        (numArgs >= 3 && isNaN(args[2].toNumber(exec))) ||
-        (numArgs >= 4 && isNaN(args[3].toNumber(exec))) ||
-        (numArgs >= 5 && isNaN(args[4].toNumber(exec))) ||
-        (numArgs >= 6 && isNaN(args[5].toNumber(exec))) ||
-        (numArgs >= 7 && isNaN(args[6].toNumber(exec)))) {
+    if (isNaN(args[0]->toNumber(exec)) || isNaN(args[1]->toNumber(exec)) ||
+        (numArgs >= 3 && isNaN(args[2]->toNumber(exec))) ||
+        (numArgs >= 4 && isNaN(args[3]->toNumber(exec))) ||
+        (numArgs >= 5 && isNaN(args[4]->toNumber(exec))) ||
+        (numArgs >= 6 && isNaN(args[5]->toNumber(exec))) ||
+        (numArgs >= 7 && isNaN(args[6]->toNumber(exec)))) {
       value = NaN;
     } else {
-      int year = args[0].toInt32(exec);
+      int year = args[0]->toInt32(exec);
       t.tm_year = (year >= 0 && year <= 99) ? year : year - 1900;
-      t.tm_mon = args[1].toInt32(exec);
-      t.tm_mday = (numArgs >= 3) ? args[2].toInt32(exec) : 1;
-      t.tm_hour = (numArgs >= 4) ? args[3].toInt32(exec) : 0;
-      t.tm_min = (numArgs >= 5) ? args[4].toInt32(exec) : 0;
-      t.tm_sec = (numArgs >= 6) ? args[5].toInt32(exec) : 0;
+      t.tm_mon = args[1]->toInt32(exec);
+      t.tm_mday = (numArgs >= 3) ? args[2]->toInt32(exec) : 1;
+      t.tm_hour = (numArgs >= 4) ? args[3]->toInt32(exec) : 0;
+      t.tm_min = (numArgs >= 5) ? args[4]->toInt32(exec) : 0;
+      t.tm_sec = (numArgs >= 6) ? args[5]->toInt32(exec) : 0;
       t.tm_isdst = -1;
       double ms = (numArgs >= 7) ? roundValue(exec, args[6]) : 0;
       value = makeTime(&t, ms, false);
     }
   }
 
-  Object proto = exec->lexicalInterpreter()->builtinDatePrototype();
-  Object ret(new DateInstanceImp(proto.imp()));
-  ret.setInternalValue(Number(timeClip(value)));
+  DateInstanceImp* ret =
+      new DateInstanceImp(exec->lexicalInterpreter()->builtinDatePrototype());
+  ret->setInternalValue(Number(timeClip(value)));
   return ret;
 }
 
@@ -901,12 +898,9 @@ bool DateObjectImp::implementsCall() const {
 }
 
 // ECMA 15.9.2
-Value DateObjectImp::call(ExecState* /*exec*/,
-                          Object& /*thisObj*/,
-                          const List& /*args*/) {
-#ifdef KJS_VERBOSE
-  fprintf(stderr, "DateObjectImp::call - current time\n");
-#endif
+ValueImp* DateObjectImp::callAsFunction(ExecState* /*exec*/,
+                                        ObjectImp* /*thisObj*/,
+                                        const List& /*args*/) {
   time_t t = time(0L);
 #if APPLE_CHANGES
   struct tm* tm = localtime(&t);
@@ -926,7 +920,6 @@ DateObjectFuncImp::DateObjectFuncImp(ExecState* exec,
                                      int i,
                                      int len)
     : InternalFunctionImp(funcProto), id(i) {
-  Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
@@ -935,30 +928,30 @@ bool DateObjectFuncImp::implementsCall() const {
 }
 
 // ECMA 15.9.4.2 - 3
-Value DateObjectFuncImp::call(ExecState* exec,
-                              Object& /*thisObj*/,
-                              const List& args) {
+ValueImp* DateObjectFuncImp::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   if (id == Parse) {
-    return Number(parseDate(args[0].toString(exec)));
+    return Number(parseDate(args[0]->toString(exec)));
   } else {  // UTC
     struct tm t;
     memset(&t, 0, sizeof(t));
     int n = args.size();
-    if (isNaN(args[0].toNumber(exec)) || isNaN(args[1].toNumber(exec)) ||
-        (n >= 3 && isNaN(args[2].toNumber(exec))) ||
-        (n >= 4 && isNaN(args[3].toNumber(exec))) ||
-        (n >= 5 && isNaN(args[4].toNumber(exec))) ||
-        (n >= 6 && isNaN(args[5].toNumber(exec))) ||
-        (n >= 7 && isNaN(args[6].toNumber(exec)))) {
+    if (isNaN(args[0]->toNumber(exec)) || isNaN(args[1]->toNumber(exec)) ||
+        (n >= 3 && isNaN(args[2]->toNumber(exec))) ||
+        (n >= 4 && isNaN(args[3]->toNumber(exec))) ||
+        (n >= 5 && isNaN(args[4]->toNumber(exec))) ||
+        (n >= 6 && isNaN(args[5]->toNumber(exec))) ||
+        (n >= 7 && isNaN(args[6]->toNumber(exec)))) {
       return Number(NaN);
     }
-    int year = args[0].toInt32(exec);
+    int year = args[0]->toInt32(exec);
     t.tm_year = (year >= 0 && year <= 99) ? year : year - 1900;
-    t.tm_mon = args[1].toInt32(exec);
-    t.tm_mday = (n >= 3) ? args[2].toInt32(exec) : 1;
-    t.tm_hour = (n >= 4) ? args[3].toInt32(exec) : 0;
-    t.tm_min = (n >= 5) ? args[4].toInt32(exec) : 0;
-    t.tm_sec = (n >= 6) ? args[5].toInt32(exec) : 0;
+    t.tm_mon = args[1]->toInt32(exec);
+    t.tm_mday = (n >= 3) ? args[2]->toInt32(exec) : 1;
+    t.tm_hour = (n >= 4) ? args[3]->toInt32(exec) : 0;
+    t.tm_min = (n >= 5) ? args[4]->toInt32(exec) : 0;
+    t.tm_sec = (n >= 6) ? args[5]->toInt32(exec) : 0;
     double ms = (n >= 7) ? roundValue(exec, args[6]) : 0;
     return Number(makeTime(&t, ms, true));
   }
@@ -966,7 +959,7 @@ Value DateObjectFuncImp::call(ExecState* exec,
 
 // -----------------------------------------------------------------------------
 
-double KJS::parseDate(const UString& u) {
+double parseDate(const UString& u) {
 #ifdef KJS_VERBOSE
   fprintf(stderr, "KJS::parseDate %s\n", u.ascii());
 #endif
@@ -1070,7 +1063,7 @@ static int findMonth(const char* monthStr) {
   return -1;
 }
 
-double KJS::KRFCDate_parseDate(const UString& _date) {
+double KRFCDate_parseDate(const UString& _date) {
   // This parse a date in the form:
   //     Tuesday, 09-Nov-99 23:12:40 GMT
   // or
@@ -1382,11 +1375,12 @@ double KJS::KRFCDate_parseDate(const UString& _date) {
   return result;
 }
 
-double KJS::timeClip(double t) {
+double timeClip(double t) {
   if (!isfinite(t))
     return NaN;
   double at = fabs(t);
   if (at > 8.64E15)
     return NaN;
   return copysign(floor(at), t);
+}
 }

@@ -133,18 +133,18 @@ class UString;
  * Helper for getStaticFunctionSlot and getStaticPropertySlot
  */
 template <class FuncImp>
-inline Value staticFunctionGetter(ExecState* exec,
-                                  const Identifier& propertyName,
-                                  const PropertySlot& slot) {
+inline ValueImp* staticFunctionGetter(ExecState* exec,
+                                      const Identifier& propertyName,
+                                      const PropertySlot& slot) {
   // Look for cached value in dynamic map of properties (in ObjectImp)
   ObjectImp* thisObj = slot.slotBase();
   ValueImp* cachedVal = thisObj->getDirect(propertyName);
   if (cachedVal)
-    return Value(cachedVal);
+    return cachedVal;
 
   const HashEntry* entry = slot.staticEntry();
-  Value val = Value(new FuncImp(exec, entry->value, entry->params));
-  thisObj->putDirect(propertyName, val.imp(), entry->attr);
+  ValueImp* val = new FuncImp(exec, entry->value, entry->params);
+  thisObj->putDirect(propertyName, val, entry->attr);
   return val;
 }
 
@@ -153,9 +153,9 @@ inline Value staticFunctionGetter(ExecState* exec,
  * Helper for getStaticValueSlot and getStaticPropertySlot
  */
 template <class ThisImp>
-inline Value staticValueGetter(ExecState* exec,
-                               const Identifier&,
-                               const PropertySlot& slot) {
+inline ValueImp* staticValueGetter(ExecState* exec,
+                                   const Identifier&,
+                                   const PropertySlot& slot) {
   ThisImp* thisObj = static_cast<ThisImp*>(slot.slotBase());
   const HashEntry* entry = slot.staticEntry();
   return thisObj->getValueProperty(exec, entry->value);
@@ -255,7 +255,7 @@ inline bool getStaticValueSlot(ExecState* exec,
 template <class ThisImp, class ParentImp>
 inline void lookupPut(ExecState* exec,
                       const Identifier& propertyName,
-                      const Value& value,
+                      ValueImp* value,
                       int attr,
                       const HashTable* table,
                       ThisImp* thisObj) {
@@ -289,14 +289,14 @@ template <class ClassCtor>
 inline ObjectImp* cacheGlobalObject(ExecState* exec,
                                     const Identifier& propertyName) {
   ObjectImp* globalObject =
-      static_cast<ObjectImp*>(exec->lexicalInterpreter()->globalObject().imp());
+      static_cast<ObjectImp*>(exec->lexicalInterpreter()->globalObject());
   ValueImp* obj = globalObject->getDirect(propertyName);
   if (obj) {
     assert(obj->isObject());
     return static_cast<ObjectImp*>(obj);
   }
   ObjectImp* newObject = new ClassCtor(exec);
-  globalObject->put(exec, propertyName, Value(newObject), Internal);
+  globalObject->put(exec, propertyName, newObject, Internal);
   return newObject;
 }
 
@@ -362,18 +362,20 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
                                                        slot);                  \
   }
 
-#define IMPLEMENT_PROTOFUNC(ClassFunc)                                      \
-  class ClassFunc : public DOMFunction {                                    \
-   public:                                                                  \
-    ClassFunc(ExecState* exec, int i, int len) : id(i) {                    \
-      put(exec, lengthPropertyName, Number(len),                            \
-          DontDelete | ReadOnly | DontEnum);                                \
-    }                                                                       \
-    /* Macro user needs to implement the call function. */                  \
-    virtual Value call(ExecState* exec, Object& thisObj, const List& args); \
-                                                                            \
-   private:                                                                 \
-    int id;                                                                 \
+#define IMPLEMENT_PROTOFUNC(ClassFunc)                               \
+  class ClassFunc : public DOMFunction {                             \
+   public:                                                           \
+    ClassFunc(ExecState* exec, int i, int len) : id(i) {             \
+      put(exec, lengthPropertyName, Number(len),                     \
+          DontDelete | ReadOnly | DontEnum);                         \
+    }                                                                \
+    /* Macro user needs to implement the callAsFunction function. */ \
+    virtual ValueImp* callAsFunction(ExecState* exec,                \
+                                     ObjectImp* thisObj,             \
+                                     const List& args);              \
+                                                                     \
+   private:                                                          \
+    int id;                                                          \
   };
 
 /*

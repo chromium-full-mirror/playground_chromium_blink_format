@@ -47,22 +47,22 @@ StringInstanceImp::StringInstanceImp(ObjectImp* proto, const UString& string)
   setInternalValue(String(string));
 }
 
-Value StringInstanceImp::lengthGetter(ExecState* exec,
-                                      const Identifier& propertyName,
-                                      const PropertySlot& slot) {
-  return Value(static_cast<StringInstanceImp*>(slot.slotBase())
-                   ->internalValue()
-                   .toString(exec)
-                   .size());
+ValueImp* StringInstanceImp::lengthGetter(ExecState* exec,
+                                          const Identifier& propertyName,
+                                          const PropertySlot& slot) {
+  return jsNumber(static_cast<StringInstanceImp*>(slot.slotBase())
+                      ->internalValue()
+                      ->toString(exec)
+                      .size());
 }
 
-Value StringInstanceImp::indexGetter(ExecState* exec,
-                                     const Identifier& propertyName,
-                                     const PropertySlot& slot) {
+ValueImp* StringInstanceImp::indexGetter(ExecState* exec,
+                                         const Identifier& propertyName,
+                                         const PropertySlot& slot) {
   const UChar c = static_cast<StringInstanceImp*>(slot.slotBase())
                       ->internalValue()
-                      .toString(exec)[slot.index()];
-  return Value(UString(&c, 1));
+                      ->toString(exec)[slot.index()];
+  return jsString(UString(&c, 1));
 }
 
 bool StringInstanceImp::getOwnPropertySlot(ExecState* exec,
@@ -76,7 +76,7 @@ bool StringInstanceImp::getOwnPropertySlot(ExecState* exec,
   bool ok;
   const unsigned index = propertyName.toArrayIndex(&ok);
   if (ok) {
-    const UString s = internalValue().toString(exec);
+    const UString s = internalValue()->toString(exec);
     const unsigned length = s.size();
     if (index >= length)
       return false;
@@ -89,7 +89,7 @@ bool StringInstanceImp::getOwnPropertySlot(ExecState* exec,
 
 void StringInstanceImp::put(ExecState* exec,
                             const Identifier& propertyName,
-                            const Value& value,
+                            ValueImp* value,
                             int attr) {
   if (propertyName == lengthPropertyName)
     return;
@@ -180,10 +180,8 @@ const ClassInfo StringPrototypeImp::info = {"String", &StringInstanceImp::info,
 StringPrototypeImp::StringPrototypeImp(ExecState* exec,
                                        ObjectPrototypeImp* objProto)
     : StringInstanceImp(objProto) {
-  Value protect(this);
   // The constructor will be added later, after StringObjectImp has been built
-  putDirect(lengthPropertyName, NumberImp::zero(),
-            DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsZero(), DontDelete | ReadOnly | DontEnum);
 }
 
 bool StringPrototypeImp::getOwnPropertySlot(ExecState* exec,
@@ -197,9 +195,8 @@ bool StringPrototypeImp::getOwnPropertySlot(ExecState* exec,
 
 StringProtoFuncImp::StringProtoFuncImp(ExecState* exec, int i, int len)
     : InternalFunctionImp(static_cast<FunctionPrototypeImp*>(
-          exec->lexicalInterpreter()->builtinFunctionPrototype().imp())),
+          exec->lexicalInterpreter()->builtinFunctionPrototype())),
       id(i) {
-  Value protect(this);
   putDirect(lengthPropertyName, len, DontDelete | ReadOnly | DontEnum);
 }
 
@@ -208,9 +205,8 @@ bool StringProtoFuncImp::implementsCall() const {
 }
 
 static inline bool regExpIsGlobal(RegExpImp* regExp, ExecState* exec) {
-  Value globalProperty = regExp->get(exec, "global");
-  return globalProperty.type() != UndefinedType &&
-         globalProperty.toBoolean(exec);
+  ValueImp* globalProperty = regExp->get(exec, "global");
+  return !globalProperty->isUndefined() && globalProperty->toBoolean(exec);
 }
 
 static inline void expandSourceRanges(UString::Range*& array,
@@ -310,27 +306,26 @@ static inline UString substituteBackreferences(const UString& replacement,
   return substitutedReplacement;
 }
 
-static Value replace(ExecState* exec,
-                     const UString& source,
-                     const Value& pattern,
-                     const Value& replacement) {
+static ValueImp* replace(ExecState* exec,
+                         const UString& source,
+                         ValueImp* pattern,
+                         ValueImp* replacement) {
   ObjectImp* replacementFunction = 0;
   UString replacementString;
 
-  if (replacement.type() == ObjectType &&
-      replacement.toObject(exec).implementsCall())
-    replacementFunction = replacement.toObject(exec).imp();
+  if (replacement->isObject() && replacement->toObject(exec)->implementsCall())
+    replacementFunction = replacement->toObject(exec);
   else
-    replacementString = replacement.toString(exec);
+    replacementString = replacement->toString(exec);
 
-  if (pattern.type() == ObjectType &&
-      pattern.toObject(exec).inherits(&RegExpImp::info)) {
-    RegExpImp* imp = static_cast<RegExpImp*>(pattern.toObject(exec).imp());
+  if (pattern->isObject() &&
+      pattern->toObject(exec)->inherits(&RegExpImp::info)) {
+    RegExpImp* imp = static_cast<RegExpImp*>(pattern->toObject(exec));
     RegExp* reg = imp->regExp();
     bool global = regExpIsGlobal(imp, exec);
 
     RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-        exec->lexicalInterpreter()->builtinRegExp().imp());
+        exec->lexicalInterpreter()->builtinRegExp());
 
     int matchIndex = 0;
     int lastIndex = 0;
@@ -360,22 +355,22 @@ static Value replace(ExecState* exec,
         int completeMatchStart = (*ovector)[0];
         List args;
 
-        args.append(Value(matchString));
+        args.append(jsString(matchString));
 
         for (unsigned i = 0; i < reg->subPatterns(); i++) {
           int matchStart = (*ovector)[(i + 1) * 2];
           int matchLen = (*ovector)[(i + 1) * 2 + 1] - matchStart;
 
-          args.append(Value(source.substr(matchStart, matchLen)));
+          args.append(jsString(source.substr(matchStart, matchLen)));
         }
 
-        args.append(Value(completeMatchStart));
-        args.append(Value(source));
+        args.append(jsNumber(completeMatchStart));
+        args.append(jsString(source));
 
         replacementString =
             replacementFunction
                 ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
-                .toString(exec);
+                ->toString(exec);
       }
 
       UString substitutedReplacement =
@@ -408,7 +403,7 @@ static Value replace(ExecState* exec,
   }
 
   // First arg is a string
-  UString patternString = pattern.toString(exec);
+  UString patternString = pattern->toString(exec);
   int matchPos = source.find(patternString);
   int matchLen = patternString.size();
   // Do the replacement
@@ -418,14 +413,14 @@ static Value replace(ExecState* exec,
   if (replacementFunction) {
     List args;
 
-    args.append(Value(source.substr(matchPos, matchLen)));
-    args.append(Value(matchPos));
-    args.append(Value(source));
+    args.append(jsString(source.substr(matchPos, matchLen)));
+    args.append(jsNumber(matchPos));
+    args.append(jsString(source));
 
     replacementString =
         replacementFunction
             ->call(exec, exec->dynamicInterpreter()->globalObject(), args)
-            .toString(exec);
+            ->toString(exec);
   }
 
   return String(source.substr(0, matchPos) + replacementString +
@@ -433,20 +428,20 @@ static Value replace(ExecState* exec,
 }
 
 // ECMA 15.5.4.2 - 15.5.4.20
-Value StringProtoFuncImp::call(ExecState* exec,
-                               Object& thisObj,
-                               const List& args) {
-  Value result;
+ValueImp* StringProtoFuncImp::callAsFunction(ExecState* exec,
+                                             ObjectImp* thisObj,
+                                             const List& args) {
+  ValueImp* result = NULL;
 
   // toString and valueOf are no generic function.
   if (id == ToString || id == ValueOf) {
-    if (thisObj.isNull() || !thisObj.inherits(&StringInstanceImp::info)) {
-      Object err = Error::create(exec, TypeError);
+    if (!thisObj || !thisObj->inherits(&StringInstanceImp::info)) {
+      ObjectImp* err = Error::create(exec, TypeError);
       exec->setException(err);
       return err;
     }
 
-    return String(thisObj.internalValue().toString(exec));
+    return String(thisObj->internalValue()->toString(exec));
   }
 
   UString u, u2, u3;
@@ -454,11 +449,11 @@ Value StringProtoFuncImp::call(ExecState* exec,
   double dpos;
   double d = 0.0;
 
-  UString s = thisObj.toString(exec);
+  UString s = thisObj->toString(exec);
 
   int len = s.size();
-  Value a0 = args[0];
-  Value a1 = args[1];
+  ValueImp* a0 = args[0];
+  ValueImp* a1 = args[1];
 
   switch (id) {
     case ToString:
@@ -469,7 +464,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
       // Other browsers treat an omitted parameter as 0 rather than NaN.
       // That doesn't match the ECMA standard, but is needed for site
       // compatibility.
-      dpos = a0.isA(UndefinedType) ? 0 : a0.toInteger(exec);
+      dpos = a0->isUndefined() ? 0 : a0->toInteger(exec);
       if (dpos >= 0 && dpos < len)  // false for NaN
         u = s.substr(static_cast<int>(dpos), 1);
       else
@@ -480,26 +475,26 @@ Value StringProtoFuncImp::call(ExecState* exec,
       // Other browsers treat an omitted parameter as 0 rather than NaN.
       // That doesn't match the ECMA standard, but is needed for site
       // compatibility.
-      dpos = a0.isA(UndefinedType) ? 0 : a0.toInteger(exec);
+      dpos = a0->isUndefined() ? 0 : a0->toInteger(exec);
       if (dpos >= 0 && dpos < len)  // false for NaN
         result = Number(s[static_cast<int>(dpos)].unicode());
       else
-        result = Number(NaN);
+        result = jsNaN();
       break;
     case Concat: {
       ListIterator it = args.begin();
       for (; it != args.end(); ++it) {
-        s += it->dispatchToString(exec);
+        s += it->toString(exec);
       }
       result = String(s);
       break;
     }
     case IndexOf:
-      u2 = a0.toString(exec);
-      if (a1.type() == UndefinedType)
+      u2 = a0->toString(exec);
+      if (a1->isUndefined())
         dpos = 0;
       else {
-        dpos = a1.toInteger(exec);
+        dpos = a1->toInteger(exec);
         if (dpos >= 0) {  // false for NaN
           if (dpos > len)
             dpos = len;
@@ -509,12 +504,12 @@ Value StringProtoFuncImp::call(ExecState* exec,
       result = Number(s.find(u2, static_cast<int>(dpos)));
       break;
     case LastIndexOf:
-      u2 = a0.toString(exec);
-      d = a1.toNumber(exec);
-      if (a1.type() == UndefinedType || KJS::isNaN(d))
+      u2 = a0->toString(exec);
+      d = a1->toNumber(exec);
+      if (a1->isUndefined() || KJS::isNaN(d))
         dpos = len;
       else {
-        dpos = a1.toInteger(exec);
+        dpos = a1->toInteger(exec);
         if (dpos >= 0) {  // false for NaN
           if (dpos > len)
             dpos = len;
@@ -528,8 +523,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
       u = s;
       RegExp *reg, *tmpReg = 0;
       RegExpImp* imp = 0;
-      if (a0.isA(ObjectType) && a0.toObject(exec).inherits(&RegExpImp::info)) {
-        imp = static_cast<RegExpImp*>(a0.toObject(exec).imp());
+      if (a0->isObject() && a0->getObject()->inherits(&RegExpImp::info)) {
+        imp = static_cast<RegExpImp*>(a0);
         reg = imp->regExp();
       } else { /*
                 *  ECMA 15.5.4.12 String.prototype.search (regexp)
@@ -538,10 +533,10 @@ Value StringProtoFuncImp::call(ExecState* exec,
                 *  replaced with the result of the expression new
                 * RegExp(regexp).
                 */
-        reg = tmpReg = new RegExp(a0.toString(exec), RegExp::None);
+        reg = tmpReg = new RegExp(a0->toString(exec), RegExp::None);
       }
       RegExpObjectImp* regExpObj = static_cast<RegExpObjectImp*>(
-          exec->lexicalInterpreter()->builtinRegExp().imp());
+          exec->lexicalInterpreter()->builtinRegExp());
       int** ovector = regExpObj->registerRegexp(reg, u);
       UString mstr = reg->match(u, -1, &pos, ovector);
       if (id == Search) {
@@ -562,7 +557,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
           int lastIndex = 0;
           while (pos >= 0) {
             if (mstr.isNull())
-              list.append(UndefinedImp::staticUndefined);
+              list.append(jsUndefined());
             else
               list.append(String(mstr));
             lastIndex = pos;
@@ -579,8 +574,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
             // other browsers and because Null is a false value.
             result = Null();
           } else {
-            result = exec->lexicalInterpreter()->builtinArray().construct(exec,
-                                                                          list);
+            result = exec->lexicalInterpreter()->builtinArray()->construct(
+                exec, list);
           }
         }
       }
@@ -593,7 +588,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
     case Slice:  // http://developer.netscape.com/docs/manuals/js/client/jsref/string.htm#1194366
     {
       // The arg processing is very much like ArrayProtoFunc::Slice
-      double begin = args[0].toInteger(exec);
+      double begin = args[0]->toInteger(exec);
       if (begin >= 0) {  // false for NaN
         if (begin > len)
           begin = len;
@@ -603,8 +598,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
           begin = 0;
       }
       double end = len;
-      if (args[1].type() != UndefinedType) {
-        end = args[1].toInteger(exec);
+      if (!args[1]->isUndefined()) {
+        end = args[1]->toInteger(exec);
         if (end >= 0) {  // false for NaN
           if (end > len)
             end = len;
@@ -620,21 +615,20 @@ Value StringProtoFuncImp::call(ExecState* exec,
       break;
     }
     case Split: {
-      Object constructor = exec->lexicalInterpreter()->builtinArray();
-      Object res =
-          Object::dynamicCast(constructor.construct(exec, List::empty()));
+      ObjectImp* constructor = exec->lexicalInterpreter()->builtinArray();
+      ObjectImp* res =
+          static_cast<ObjectImp*>(constructor->construct(exec, List::empty()));
       result = res;
       u = s;
       i = p0 = 0;
-      uint32_t limit =
-          a1.type() == UndefinedType ? 0xFFFFFFFFU : a1.toUInt32(exec);
-      if (a0.type() == ObjectType &&
-          Object::dynamicCast(a0).inherits(&RegExpImp::info)) {
-        Object obj0 = Object::dynamicCast(a0);
-        RegExp reg(obj0.get(exec, "source").toString(exec));
+      uint32_t limit = a1->isUndefined() ? 0xFFFFFFFFU : a1->toUInt32(exec);
+      if (a0->isObject() &&
+          static_cast<ObjectImp*>(a0)->inherits(&RegExpImp::info)) {
+        ObjectImp* obj0 = static_cast<ObjectImp*>(a0);
+        RegExp reg(obj0->get(exec, "source")->toString(exec));
         if (u.isEmpty() && !reg.match(u, 0).isNull()) {
           // empty string matched by regexp -> empty array
-          res.put(exec, lengthPropertyName, Number(0));
+          res->put(exec, lengthPropertyName, Number(0));
           break;
         }
         pos = 0;
@@ -649,13 +643,13 @@ Value StringProtoFuncImp::call(ExecState* exec,
             break;
           pos = mpos + (mstr.isEmpty() ? 1 : mstr.size());
           if (mpos != p0 || !mstr.isEmpty()) {
-            res.put(exec, i, String(u.substr(p0, mpos - p0)));
+            res->put(exec, i, String(u.substr(p0, mpos - p0)));
             p0 = mpos + mstr.size();
             i++;
           }
         }
       } else {
-        u2 = a0.toString(exec);
+        u2 = a0->toString(exec);
         if (u2.isEmpty()) {
           if (u.isEmpty()) {
             // empty separator matches empty string -> empty array
@@ -663,12 +657,12 @@ Value StringProtoFuncImp::call(ExecState* exec,
             break;
           } else {
             while (static_cast<uint32_t>(i) != limit && i < u.size() - 1)
-              res.put(exec, i++, String(u.substr(p0++, 1)));
+              res->put(exec, i++, String(u.substr(p0++, 1)));
           }
         } else {
           while (static_cast<uint32_t>(i) != limit &&
                  (pos = u.find(u2, p0)) >= 0) {
-            res.put(exec, i, String(u.substr(p0, pos - p0)));
+            res->put(exec, i, String(u.substr(p0, pos - p0)));
             p0 = pos + u2.size();
             i++;
           }
@@ -676,12 +670,12 @@ Value StringProtoFuncImp::call(ExecState* exec,
       }
       // add remaining string, if any
       if (static_cast<uint32_t>(i) != limit)
-        res.put(exec, i++, String(u.substr(p0)));
-      res.put(exec, lengthPropertyName, Number(i));
+        res->put(exec, i++, String(u.substr(p0)));
+      res->put(exec, lengthPropertyName, Number(i));
     } break;
     case Substr: {
-      double d = a0.toInteger(exec);
-      double d2 = a1.toInteger(exec);
+      double d = a0->toInteger(exec);
+      double d2 = a1->toInteger(exec);
       if (!(d >= 0)) {  // true for NaN
         d += len;
         if (!(d >= 0))  // true for NaN
@@ -699,8 +693,8 @@ Value StringProtoFuncImp::call(ExecState* exec,
       break;
     }
     case Substring: {
-      double start = a0.toNumber(exec);
-      double end = a1.toNumber(exec);
+      double start = a0->toNumber(exec);
+      double end = a1->toNumber(exec);
       if (KJS::isNaN(start))
         start = 0;
       if (KJS::isNaN(end))
@@ -713,7 +707,7 @@ Value StringProtoFuncImp::call(ExecState* exec,
         start = len;
       if (end > len)
         end = len;
-      if (a1.type() == UndefinedType)
+      if (a1->isUndefined())
         end = len;
       if (start > end) {
         double temp = end;
@@ -769,17 +763,17 @@ Value StringProtoFuncImp::call(ExecState* exec,
       break;
     case Fontcolor:
       result =
-          String("<font color=\"" + a0.toString(exec) + "\">" + s + "</font>");
+          String("<font color=\"" + a0->toString(exec) + "\">" + s + "</font>");
       break;
     case Fontsize:
       result =
-          String("<font size=\"" + a0.toString(exec) + "\">" + s + "</font>");
+          String("<font size=\"" + a0->toString(exec) + "\">" + s + "</font>");
       break;
     case Anchor:
-      result = String("<a name=\"" + a0.toString(exec) + "\">" + s + "</a>");
+      result = String("<a name=\"" + a0->toString(exec) + "\">" + s + "</a>");
       break;
     case Link:
-      result = String("<a href=\"" + a0.toString(exec) + "\">" + s + "</a>");
+      result = String("<a href=\"" + a0->toString(exec) + "\">" + s + "</a>");
       break;
 #endif
   }
@@ -793,7 +787,6 @@ StringObjectImp::StringObjectImp(ExecState* exec,
                                  FunctionPrototypeImp* funcProto,
                                  StringPrototypeImp* stringProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
   // ECMA 15.5.3.1 String.prototype
   putDirect(prototypePropertyName, stringProto,
             DontEnum | DontDelete | ReadOnly);
@@ -802,8 +795,7 @@ StringObjectImp::StringObjectImp(ExecState* exec,
   putDirect(fromCharCode, new StringObjectFuncImp(exec, funcProto), DontEnum);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, NumberImp::one(),
-            ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, jsOne(), ReadOnly | DontDelete | DontEnum);
 }
 
 bool StringObjectImp::implementsConstruct() const {
@@ -811,12 +803,11 @@ bool StringObjectImp::implementsConstruct() const {
 }
 
 // ECMA 15.5.2
-Object StringObjectImp::construct(ExecState* exec, const List& args) {
-  ObjectImp* proto = exec->lexicalInterpreter()->builtinStringPrototype().imp();
+ObjectImp* StringObjectImp::construct(ExecState* exec, const List& args) {
+  ObjectImp* proto = exec->lexicalInterpreter()->builtinStringPrototype();
   if (args.size() == 0)
-    return Object(new StringInstanceImp(proto));
-  return Object(
-      new StringInstanceImp(proto, args.begin()->dispatchToString(exec)));
+    return new StringInstanceImp(proto);
+  return new StringInstanceImp(proto, args.begin()->toString(exec));
 }
 
 bool StringObjectImp::implementsCall() const {
@@ -824,14 +815,14 @@ bool StringObjectImp::implementsCall() const {
 }
 
 // ECMA 15.5.1
-Value StringObjectImp::call(ExecState* exec,
-                            Object& /*thisObj*/,
-                            const List& args) {
+ValueImp* StringObjectImp::callAsFunction(ExecState* exec,
+                                          ObjectImp* /*thisObj*/,
+                                          const List& args) {
   if (args.isEmpty())
     return String("");
   else {
-    Value v = args[0];
-    return String(v.toString(exec));
+    ValueImp* v = args[0];
+    return String(v->toString(exec));
   }
 }
 
@@ -841,18 +832,16 @@ Value StringObjectImp::call(ExecState* exec,
 StringObjectFuncImp::StringObjectFuncImp(ExecState* exec,
                                          FunctionPrototypeImp* funcProto)
     : InternalFunctionImp(funcProto) {
-  Value protect(this);
-  putDirect(lengthPropertyName, NumberImp::one(),
-            DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsOne(), DontDelete | ReadOnly | DontEnum);
 }
 
 bool StringObjectFuncImp::implementsCall() const {
   return true;
 }
 
-Value StringObjectFuncImp::call(ExecState* exec,
-                                Object& /*thisObj*/,
-                                const List& args) {
+ValueImp* StringObjectFuncImp::callAsFunction(ExecState* exec,
+                                              ObjectImp* /*thisObj*/,
+                                              const List& args) {
   UString s;
   if (args.size()) {
     UChar* buf =

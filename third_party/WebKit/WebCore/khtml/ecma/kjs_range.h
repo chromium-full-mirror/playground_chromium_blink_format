@@ -34,7 +34,7 @@ class DOMRange : public DOMObject {
   DOMRange(ExecState* exec, DOM::RangeImpl* r);
   ~DOMRange();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  Value getValueProperty(ExecState* exec, int token) const;
+  ValueImp* getValueProperty(ExecState* exec, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -76,7 +76,7 @@ class RangeConstructor : public DOMObject {
  public:
   RangeConstructor(ExecState*) {}
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  Value getValueProperty(ExecState*, int token) const;
+  ValueImp* getValueProperty(ExecState*, int token) const;
   // no put - all read-only
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

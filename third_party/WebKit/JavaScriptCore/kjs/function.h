@@ -46,12 +46,14 @@ class FunctionImp : public InternalFunctionImp {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   void addParameter(const Identifier& n);
   Identifier getParameterName(int index);
@@ -70,10 +72,12 @@ class FunctionImp : public InternalFunctionImp {
   Identifier ident;
 
  private:
-  static Value argumentsGetter(ExecState*,
-                               const Identifier&,
-                               const PropertySlot&);
-  static Value lengthGetter(ExecState*, const Identifier&, const PropertySlot&);
+  static ValueImp* argumentsGetter(ExecState*,
+                                   const Identifier&,
+                                   const PropertySlot&);
+  static ValueImp* lengthGetter(ExecState*,
+                                const Identifier&,
+                                const PropertySlot&);
 
   void processParameters(ExecState* exec, const List&);
   virtual void processVarDecls(ExecState* exec);
@@ -88,7 +92,7 @@ class DeclaredFunctionImp : public FunctionImp {
   ~DeclaredFunctionImp();
 
   bool implementsConstruct() const;
-  Object construct(ExecState* exec, const List& args);
+  ObjectImp* construct(ExecState* exec, const List& args);
 
   virtual Completion execute(ExecState* exec);
   CodeType codeType() const { return FunctionCode; }
@@ -127,16 +131,16 @@ class ArgumentsImp : public ObjectImp {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
  private:
-  static Value mappedIndexGetter(ExecState* exec,
-                                 const Identifier&,
-                                 const PropertySlot& slot);
+  static ValueImp* mappedIndexGetter(ExecState* exec,
+                                     const Identifier&,
+                                     const PropertySlot& slot);
 
   ActivationImp* _activationObject;
   mutable IndexToNameMap indexToNameMap;
@@ -158,9 +162,9 @@ class ActivationImp : public ObjectImp {
 
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
-  static Value argumentsGetter(ExecState* exec,
-                               const Identifier&,
-                               const PropertySlot& slot);
+  static ValueImp* argumentsGetter(ExecState* exec,
+                                   const Identifier&,
+                                   const PropertySlot& slot);
   void createArgumentsObject(ExecState* exec) const;
 
   FunctionImp* _function;
@@ -175,7 +179,9 @@ class GlobalFuncImp : public InternalFunctionImp {
                 int i,
                 int len);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
   virtual CodeType codeType() const;
   enum {
     Eval,

@@ -35,7 +35,7 @@ class StringInstanceImp : public ObjectImp {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
@@ -43,12 +43,12 @@ class StringInstanceImp : public ObjectImp {
   static const ClassInfo info;
 
  private:
-  static Value lengthGetter(ExecState* exec,
-                            const Identifier&,
-                            const PropertySlot& slot);
-  static Value indexGetter(ExecState* exec,
-                           const Identifier&,
-                           const PropertySlot& slot);
+  static ValueImp* lengthGetter(ExecState* exec,
+                                const Identifier&,
+                                const PropertySlot& slot);
+  static ValueImp* indexGetter(ExecState* exec,
+                               const Identifier&,
+                               const PropertySlot& slot);
 };
 
 /**
@@ -76,7 +76,9 @@ class StringProtoFuncImp : public InternalFunctionImp {
   StringProtoFuncImp(ExecState* exec, int i, int len);
 
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 
   enum {
     ToString,
@@ -131,9 +133,11 @@ class StringObjectImp : public InternalFunctionImp {
                   StringPrototypeImp* stringProto);
 
   virtual bool implementsConstruct() const;
-  virtual Object construct(ExecState* exec, const List& args);
+  virtual ObjectImp* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 /**
@@ -146,7 +150,9 @@ class StringObjectFuncImp : public InternalFunctionImp {
  public:
   StringObjectFuncImp(ExecState* exec, FunctionPrototypeImp* funcProto);
   virtual bool implementsCall() const;
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
 };
 
 }  // namespace

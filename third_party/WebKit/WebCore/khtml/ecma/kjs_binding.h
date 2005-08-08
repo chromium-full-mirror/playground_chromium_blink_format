@@ -61,7 +61,7 @@ class DOMFunction : public ObjectImp {
  public:
   virtual bool implementsCall() const { return true; }
   virtual bool toBoolean(ExecState*) const { return true; }
-  virtual Value toPrimitive(ExecState* exec, Type) const {
+  virtual ValueImp* toPrimitive(ExecState* exec, Type) const {
     return String(toString(exec));
   }
   virtual UString toString(ExecState*) const { return UString("[function]"); }
@@ -76,7 +76,7 @@ class DOMNode;
  */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(const Object& global, KHTMLPart* part);
+  ScriptInterpreter(ObjectImp* global, KHTMLPart* part);
   virtual ~ScriptInterpreter();
 
   static DOMObject* getDOMObject(void* objectHandle);
@@ -118,17 +118,17 @@ class ScriptInterpreter : public Interpreter {
   DOM::EventImpl* getCurrentEvent() const { return m_evt; }
 
 #if APPLE_CHANGES
-  virtual bool isGlobalObject(const Value& v);
+  virtual bool isGlobalObject(ValueImp* v);
   virtual Interpreter* interpreterForGlobalObject(const ValueImp* imp);
   virtual bool isSafeScript(const Interpreter* target);
   virtual void* createLanguageInstanceForValue(
       ExecState* exec,
       int language,
-      const Object& value,
+      ObjectImp* value,
       const Bindings::RootObject* origin,
       const Bindings::RootObject* current);
   void* createObjcInstanceForValue(ExecState* exec,
-                                   const Object& value,
+                                   ObjectImp* value,
                                    const Bindings::RootObject* origin,
                                    const Bindings::RootObject* current);
 #endif
@@ -147,7 +147,7 @@ class ScriptInterpreter : public Interpreter {
 template <class DOMObj, class KJSDOMObj>
 inline ValueImp* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
   if (!domObj)
-    return null();
+    return jsNull();
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   if (DOMObject* ret = interp->getDOMObject(domObj))
@@ -177,12 +177,12 @@ class DOMExceptionTranslator {
 /**
  *  Get a String object, or Null() if s is null
  */
-Value getStringOrNull(DOM::DOMString s);
+ValueImp* getStringOrNull(DOM::DOMString s);
 
 /**
  * Convert a KJS value into a QVariant
  */
-QVariant ValueToVariant(ExecState* exec, const Value& val);
+QVariant ValueToVariant(ExecState* exec, ValueImp* val);
 
 }  // namespace
 
