@@ -151,7 +151,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
   bool handled = false;
   if (execContext && execContext->nativeHandle()) {
     jobject obj = _instance->_instance;
-    ValueImp* exceptionDescription;
+    ValueImp* exceptionDescription = NULL;
     const char* callingURL = 0;  // FIXME, need to propagate calling URL to Java
     handled =
         dispatchJNICall(execContext->nativeHandle(), obj, jMethod->isStatic(),
