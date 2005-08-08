@@ -1652,7 +1652,6 @@ void HTMLInputElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
     case HIDDEN:
       // a no-op for this type
       break;
-    case RADIO:
     case SUBMIT:
     case RESET:
     case BUTTON:
@@ -1679,6 +1678,7 @@ void HTMLInputElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
       HTMLGenericFormElementImpl::click(sendMouseEvents, showPressedLook);
       break;
     case CHECKBOX:
+    case RADIO:
     case IMAGE:
     case ISINDEX:
     case PASSWORD:
@@ -1861,9 +1861,8 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
     case CHECKBOX:
-      return RenderObject::createObject(this, style);
     case RADIO:
-      return new (arena) RenderRadioButton(this);
+      return RenderObject::createObject(this, style);
     case SUBMIT:
       return new (arena) RenderSubmitButton(this);
     case IMAGE:
@@ -2111,7 +2110,7 @@ void HTMLInputElementImpl::reset() {
 
 void HTMLInputElementImpl::setChecked(bool _checked) {
   // WinIE does not allow unnamed radio buttons to even be checked.
-  if (checked() == _checked || name().isEmpty())
+  if (checked() == _checked || (m_type == RADIO && name().isEmpty()))
     return;
 
   if (m_form && m_type == RADIO && _checked)
@@ -2238,6 +2237,14 @@ void HTMLInputElementImpl::focus() {
   getDocument()->setFocusNode(this);
 }
 
+void HTMLInputElementImpl::preDispatchEventHandler(EventImpl* evt) {
+  if (evt->isMouseEvent() && evt->id() == EventImpl::CLICK_EVENT &&
+      static_cast<MouseEventImpl*>(evt)->button() == 0) {
+    if (m_type == CHECKBOX || m_type == RADIO)
+      setChecked(!checked());
+  }
+}
+
 void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
   if (evt->isMouseEvent() && (evt->id() == EventImpl::KHTML_CLICK_EVENT ||
                               evt->id() == EventImpl::KHTML_DBLCLICK_EVENT) &&
@@ -2273,13 +2280,6 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
         }
         m_activeSubmit = false;
       }
-    } else if (m_type == CHECKBOX || m_type == RADIO) {
-      if (m_type == CHECKBOX ||
-          (renderer() && renderer()->style()->hasAppearance()))
-        // FIXME: We key off appearance for now, but this is temporary.  When we
-        // cut over
-        // for real this will just always be used.
-        setChecked(!checked());
     }
   }
 

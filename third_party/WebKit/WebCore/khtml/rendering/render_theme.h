@@ -111,10 +111,13 @@ class RenderTheme {
   virtual void paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
                              const QRect& r) = 0;
-  virtual int sizeForFont(RenderStyle* style) const;
+  virtual void setCheckboxSize(RenderStyle* style) const {};
 
-  void setSizeFromFont(RenderStyle* style) const;
-  void setCheckboxSize(RenderStyle* style) const;
+  virtual void adjustRadioStyle(RenderStyle* style) const;
+  virtual void paintRadio(RenderObject* o,
+                          const RenderObject::PaintInfo& i,
+                          const QRect& r) = 0;
+  virtual void setRadioSize(RenderStyle* style) const {};
 };
 
 // Function to obtain the theme.  This is implemented in your platform-specific
