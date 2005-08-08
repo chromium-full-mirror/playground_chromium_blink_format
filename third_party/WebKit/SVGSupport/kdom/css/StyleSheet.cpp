@@ -50,7 +50,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value StyleSheet::getValueProperty(ExecState* exec, int token) const {
+ValueImp* StyleSheet::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case StyleSheetConstants::Type:
       return getDOMString(type());
@@ -76,11 +76,11 @@ Value StyleSheet::getValueProperty(ExecState* exec, int token) const {
 
 void StyleSheet::putValueProperty(ExecState* exec,
                                   int token,
-                                  const Value& value,
+                                  ValueImp* value,
                                   int) {
   switch (token) {
     case StyleSheetConstants::Disabled:
-      setDisabled(value.toBoolean(exec));
+      setDisabled(value->toBoolean(exec));
       break;
     default:
       kdWarning() << "Unhandled token in " << k_funcinfo << " : " << token

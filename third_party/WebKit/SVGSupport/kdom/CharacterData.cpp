@@ -55,7 +55,7 @@ KDOM_IMPLEMENT_PROTOTYPE("CharacterData",
                          CharacterDataProto,
                          CharacterDataProtoFunc)
 
-Value CharacterData::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CharacterData::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -74,7 +74,7 @@ Value CharacterData::getValueProperty(ExecState* exec, int token) const {
 
 void CharacterData::putValueProperty(ExecState* exec,
                                      int token,
-                                     const Value& value,
+                                     ValueImp* value,
                                      int) {
   KDOM_ENTER_SAFE
 
@@ -92,9 +92,9 @@ void CharacterData::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value CharacterDataProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+ValueImp* CharacterDataProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
   KDOM_CHECK_THIS(CharacterData)
   KDOM_ENTER_SAFE
 
@@ -105,8 +105,8 @@ Value CharacterDataProtoFunc::call(ExecState* exec,
       return Undefined();
     }
     case CharacterDataConstants::SubstringData: {
-      unsigned long offset = args[0].toUInt32(exec);
-      unsigned long count = args[1].toUInt32(exec);
+      unsigned long offset = args[0]->toUInt32(exec);
+      unsigned long count = args[1]->toUInt32(exec);
       return getDOMString(obj.substringData(offset, count));
     }
     case CharacterDataConstants::AppendData: {
@@ -115,20 +115,20 @@ Value CharacterDataProtoFunc::call(ExecState* exec,
       return Undefined();
     }
     case CharacterDataConstants::InsertData: {
-      unsigned long offset = args[0].toUInt32(exec);
+      unsigned long offset = args[0]->toUInt32(exec);
       DOMString arg = toDOMString(exec, args[1]);
       obj.insertData(offset, arg);
       return Undefined();
     }
     case CharacterDataConstants::DeleteData: {
-      unsigned long offset = args[0].toUInt32(exec);
-      unsigned long count = args[1].toUInt32(exec);
+      unsigned long offset = args[0]->toUInt32(exec);
+      unsigned long count = args[1]->toUInt32(exec);
       obj.deleteData(offset, count);
       return Undefined();
     }
     case CharacterDataConstants::ReplaceData: {
-      unsigned long offset = args[0].toUInt32(exec);
-      unsigned long count = args[1].toUInt32(exec);
+      unsigned long offset = args[0]->toUInt32(exec);
+      unsigned long count = args[1]->toUInt32(exec);
       DOMString arg = toDOMString(exec, args[2]);
       obj.replaceData(offset, count, arg);
       return Undefined();

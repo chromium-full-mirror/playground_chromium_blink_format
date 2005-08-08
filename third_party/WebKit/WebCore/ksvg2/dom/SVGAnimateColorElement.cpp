@@ -37,8 +37,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGAnimateColorElement::getValueProperty(ExecState* exec,
-                                               int token) const {
+ValueImp* SVGAnimateColorElement::getValueProperty(ExecState* exec,
+                                                   int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

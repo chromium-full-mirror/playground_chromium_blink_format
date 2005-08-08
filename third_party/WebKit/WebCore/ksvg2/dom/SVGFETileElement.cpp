@@ -43,7 +43,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGFETileElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGFETileElement::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

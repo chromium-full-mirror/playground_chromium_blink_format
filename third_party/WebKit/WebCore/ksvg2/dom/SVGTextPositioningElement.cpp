@@ -56,8 +56,8 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGTextPositioningElement::getValueProperty(ExecState* exec,
-                                                  int token) const {
+ValueImp* SVGTextPositioningElement::getValueProperty(ExecState* exec,
+                                                      int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

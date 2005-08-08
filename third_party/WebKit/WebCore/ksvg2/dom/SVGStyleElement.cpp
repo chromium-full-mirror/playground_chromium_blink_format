@@ -43,7 +43,7 @@ using namespace KSVG;
 @end
 */
 
-Value SVGStyleElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGStyleElement::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -66,7 +66,7 @@ Value SVGStyleElement::getValueProperty(ExecState* exec, int token) const {
 
 void SVGStyleElement::putValueProperty(ExecState* exec,
                                        int token,
-                                       const Value& value,
+                                       ValueImp* value,
                                        int) {
   KDOM_ENTER_SAFE
 

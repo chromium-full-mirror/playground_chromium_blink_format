@@ -32,14 +32,14 @@ EventListenerImpl::EventListenerImpl() : Shared(true) {
   m_doc = 0;
   m_ecmaEventListener = false;
 
-  m_listener = KJS::Object();
-  m_compareListener = KJS::Value();
+  m_listener = NULL;
+  m_compareListener = NULL;
 }
 
 EventListenerImpl::~EventListenerImpl() {
   if (m_doc && m_doc->ecmaEngine() && m_ecmaEventListener)
     m_doc->ecmaEngine()->removeEventListener(
-        static_cast<KJS::ObjectImp*>(m_compareListener.imp()));
+        static_cast<KJS::ObjectImp*>(m_compareListener));
 }
 
 void EventListenerImpl::handleEvent(EventImpl* evt) {
@@ -50,7 +50,7 @@ void EventListenerImpl::handleEvent(EventImpl* evt) {
 
   KJS::Interpreter::lock();
   Ecma* ecmaEngine = m_doc->ecmaEngine();
-  if (ecmaEngine && m_listener.implementsCall()) {
+  if (ecmaEngine && m_listener->implementsCall()) {
     ScriptInterpreter* interpreter = ecmaEngine->interpreter();
     KJS::ExecState* exec = ecmaEngine->globalExec();
 
@@ -64,9 +64,9 @@ void EventListenerImpl::handleEvent(EventImpl* evt) {
     interpreter->setCurrentEvent(evt);
 
     // Call it!
-    KJS::Object thisObj = KJS::Object::dynamicCast(
+    KJS::ObjectImp* thisObj = static_cast<KJS::ObjectImp*>(
         safe_cache<EventTarget>(exec, evtObj.currentTarget()));
-    KJS::Value retVal = m_listener.call(exec, thisObj, args);
+    KJS::ValueImp* retVal = m_listener->callAsFunction(exec, thisObj, args);
 
     // Reset current event after processing
     interpreter->setCurrentEvent(0);
@@ -90,20 +90,20 @@ DOMString EventListenerImpl::internalType() const {
   return m_internalType;
 }
 
-KJS::Value EventListenerImpl::ecmaListener() const {
+KJS::ValueImp* EventListenerImpl::ecmaListener() const {
   if (!m_ecmaEventListener)
-    return KJS::Value();
+    return NULL;
 
   return m_compareListener;
 }
 
 void EventListenerImpl::initListener(DocumentImpl* doc,
                                      bool ecmaEventListener,
-                                     KJS::Object listener,
-                                     KJS::Value compareListener,
+                                     KJS::ObjectImp* listener,
+                                     KJS::ValueImp* compareListener,
                                      const DOMString& internalType) {
-  if (!listener.isValid() || !listener.implementsCall())
-    kdError() << "EcmaScript listener object " << listener.imp()
+  if (!listener || !listener->implementsCall())
+    kdError() << "EcmaScript listener object " << listener
               << " is not valid or doesn't implement a call!" << endl;
 
   m_doc = doc;

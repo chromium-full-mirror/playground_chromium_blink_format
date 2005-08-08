@@ -64,7 +64,7 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGStringList",
                          SVGStringListProto,
                          SVGStringListProtoFunc)
 
-Value SVGStringList::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGStringList::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -79,9 +79,9 @@ Value SVGStringList::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value SVGStringListProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+ValueImp* SVGStringListProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
   KDOM_CHECK_THIS(SVGStringList)
   KDOM_ENTER_SAFE
 
@@ -95,21 +95,21 @@ Value SVGStringListProtoFunc::call(ExecState* exec,
       return KDOM::getDOMString(obj.initialize(newItem));
     }
     case SVGStringListConstants::GetItem: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return KDOM::getDOMString(obj.getItem(index));
     }
     case SVGStringListConstants::InsertItemBefore: {
       KDOM::DOMString newItem = KDOM::toDOMString(exec, args[0]);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       return KDOM::getDOMString(obj.insertItemBefore(newItem, index));
     }
     case SVGStringListConstants::ReplaceItem: {
       KDOM::DOMString newItem = KDOM::toDOMString(exec, args[0]);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       return KDOM::getDOMString(obj.replaceItem(newItem, index));
     }
     case SVGStringListConstants::RemoveItem: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return KDOM::getDOMString(obj.removeItem(index));
     }
     case SVGStringListConstants::AppendItem: {

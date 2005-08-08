@@ -50,7 +50,7 @@ DontDelete|Function 1
 
 KSVG_IMPLEMENT_PROTOTYPE("SVGPoint", SVGPointProto, SVGPointProtoFunc)
 
-Value SVGPoint::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGPoint::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -69,16 +69,16 @@ Value SVGPoint::getValueProperty(ExecState* exec, int token) const {
 
 void SVGPoint::putValueProperty(ExecState* exec,
                                 int token,
-                                const Value& value,
+                                ValueImp* value,
                                 int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGPointConstants::X:
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       break;
     case SVGPointConstants::Y:
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       break;
     default:
       kdWarning() << "Unhandled token in " << k_funcinfo << " : " << token
@@ -88,9 +88,9 @@ void SVGPoint::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(KDOM::DOMException)
 }
 
-Value SVGPointProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* SVGPointProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(SVGPoint)
   KDOM_ENTER_SAFE
 

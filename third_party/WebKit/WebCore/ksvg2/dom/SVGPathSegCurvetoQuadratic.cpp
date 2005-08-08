@@ -36,8 +36,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGPathSegCurvetoQuadraticAbs::getValueProperty(ExecState*,
-                                                      int token) const {
+ValueImp* SVGPathSegCurvetoQuadraticAbs::getValueProperty(ExecState*,
+                                                          int token) const {
   switch (token) {
     case SVGPathSegCurvetoQuadraticConstants::X:
       return Number(x());
@@ -57,23 +57,23 @@ Value SVGPathSegCurvetoQuadraticAbs::getValueProperty(ExecState*,
 
 void SVGPathSegCurvetoQuadraticAbs::putValueProperty(ExecState* exec,
                                                      int token,
-                                                     const Value& value,
+                                                     ValueImp* value,
                                                      int) {
   switch (token) {
     case SVGPathSegCurvetoQuadraticConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::X1: {
-      setX1(value.toNumber(exec));
+      setX1(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::Y1: {
-      setY1(value.toNumber(exec));
+      setY1(value->toNumber(exec));
       return;
     }
     default:
@@ -173,8 +173,8 @@ float SVGPathSegCurvetoQuadraticAbs::y1() const {
 @end
 */
 
-Value SVGPathSegCurvetoQuadraticRel::getValueProperty(ExecState*,
-                                                      int token) const {
+ValueImp* SVGPathSegCurvetoQuadraticRel::getValueProperty(ExecState*,
+                                                          int token) const {
   switch (token) {
     case SVGPathSegCurvetoQuadraticConstants::X:
       return Number(x());
@@ -194,23 +194,23 @@ Value SVGPathSegCurvetoQuadraticRel::getValueProperty(ExecState*,
 
 void SVGPathSegCurvetoQuadraticRel::putValueProperty(ExecState* exec,
                                                      int token,
-                                                     const Value& value,
+                                                     ValueImp* value,
                                                      int) {
   switch (token) {
     case SVGPathSegCurvetoQuadraticConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::X1: {
-      setX1(value.toNumber(exec));
+      setX1(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticConstants::Y1: {
-      setY1(value.toNumber(exec));
+      setY1(value->toNumber(exec));
       return;
     }
     default:

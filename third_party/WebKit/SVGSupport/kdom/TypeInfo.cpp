@@ -45,7 +45,7 @@ DontDelete|ReadOnly
 
 KDOM_IMPLEMENT_PROTOTYPE("TypeInfo", TypeInfoProto, TypeInfoProtoFunc)
 
-Value TypeInfo::getValueProperty(ExecState* exec, int token) const {
+ValueImp* TypeInfo::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -58,9 +58,9 @@ Value TypeInfo::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value TypeInfoProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* TypeInfoProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(TypeInfo)
   KDOM_ENTER_SAFE
 
@@ -68,7 +68,7 @@ Value TypeInfoProtoFunc::call(ExecState* exec,
     case TypeInfoConstants::IsDerivedFrom: {
       const DOMString typeNamespaceArg = toDOMString(exec, args[0]);
       const DOMString typeNameArg = toDOMString(exec, args[1]);
-      const unsigned long derivationMethod = args[2].toUInt32(exec);
+      const unsigned long derivationMethod = args[2]->toUInt32(exec);
 
       return KJS::Boolean(
           obj.isDerivedFrom(typeNamespaceArg, typeNameArg, derivationMethod));

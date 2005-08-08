@@ -66,7 +66,7 @@ DontDelete|Function 0
 
 KDOM_IMPLEMENT_PROTOTYPE("LSParser", LSParserProto, LSParserProtoFunc)
 
-Value LSParser::getValueProperty(ExecState* exec, int token) const {
+ValueImp* LSParser::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -89,7 +89,7 @@ Value LSParser::getValueProperty(ExecState* exec, int token) const {
 
 void LSParser::putValueProperty(ExecState* exec,
                                 int token,
-                                const Value& /* value */,
+                                ValueImp* /* value */,
                                 int) {
   KDOM_ENTER_SAFE
 
@@ -104,9 +104,9 @@ void LSParser::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value LSParserProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* LSParserProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(LSParser)
   KDOM_ENTER_SAFE
   KDOM_ENTER_SAFE
@@ -123,7 +123,7 @@ Value LSParserProtoFunc::call(ExecState* exec,
     case LSParserConstants::ParseWithContext: {
       LSInput input = ecma_cast<LSInput>(exec, args[0], &toLSInput);
       Node contextArg = ecma_cast<Node>(exec, args[1], &toNode);
-      unsigned short action = args[2].toUInt32(exec);
+      unsigned short action = args[2]->toUInt32(exec);
       return getDOMNode(exec, obj.parseWithContext(input, contextArg, action));
     }
     case LSParserConstants::Abort: {

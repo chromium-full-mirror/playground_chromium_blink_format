@@ -58,7 +58,7 @@ class SVGFEOffsetElement : public SVGElement,
   KDOM_GET
   KDOM_FORWARDPUT
 
-  KJS::Value getValueProperty(KJS::ExecState* exec, int token) const;
+  KJS::ValueImp* getValueProperty(KJS::ExecState* exec, int token) const;
 };
 };
 

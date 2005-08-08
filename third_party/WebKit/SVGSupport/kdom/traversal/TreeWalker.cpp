@@ -66,7 +66,7 @@ DontDelete|Function 1
 
 KDOM_IMPLEMENT_PROTOTYPE("TreeWalker", TreeWalkerProto, TreeWalkerProtoFunc)
 
-Value TreeWalker::getValueProperty(ExecState* exec, int token) const {
+ValueImp* TreeWalker::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -89,10 +89,7 @@ Value TreeWalker::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 };
 
-void TreeWalker::putValueProperty(ExecState* exec,
-                                  int token,
-                                  const Value&,
-                                  int) {
+void TreeWalker::putValueProperty(ExecState* exec, int token, ValueImp*, int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -107,7 +104,9 @@ void TreeWalker::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value TreeWalkerProtoFunc::call(ExecState* exec, Object& thisObj, const List&) {
+ValueImp* TreeWalkerProtoFunc::callAsFunction(ExecState* exec,
+                                              ObjectImp* thisObj,
+                                              const List&) {
   KDOM_CHECK_THIS(TreeWalker)
   KDOM_ENTER_SAFE
 

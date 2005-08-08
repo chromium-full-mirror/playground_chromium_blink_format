@@ -53,7 +53,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value DocumentType::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DocumentType::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

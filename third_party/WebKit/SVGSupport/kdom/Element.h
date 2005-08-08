@@ -117,7 +117,7 @@ class Element : public Node {
    * setAttributeNS method.
    *
    * @param name The name of the attribute to create or alter.
-   * @param value Value to set in string form.
+   * @param value ValueImp *to set in string form.
    */
   void setAttribute(const DOMString& name, const DOMString& value);
 
@@ -421,7 +421,7 @@ class Element : public Node {
   KDOM_GET
   KDOM_FORWARDPUT
 
-  KJS::Value getValueProperty(KJS::ExecState* exec, int token) const;
+  KJS::ValueImp* getValueProperty(KJS::ExecState* exec, int token) const;
 };
 };
 

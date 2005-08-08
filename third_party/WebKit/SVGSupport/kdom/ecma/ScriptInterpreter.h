@@ -26,8 +26,8 @@
 #include <kdom/ecma/DOMBridge.h>
 
 namespace KJS {
-class Value;
-class Object;
+class ValueImp;
+class ObjectImp;
 class Interpreter;
 };
 
@@ -37,7 +37,7 @@ class DocumentImpl;
 
 class ScriptInterpreter : public KJS::Interpreter {
  public:
-  ScriptInterpreter(const KJS::Object& global, DocumentImpl* doc);
+  ScriptInterpreter(KJS::ObjectImp* global, DocumentImpl* doc);
   virtual ~ScriptInterpreter();
 
   DocumentImpl* document() const;
@@ -62,8 +62,8 @@ class ScriptInterpreter : public KJS::Interpreter {
 
 // Lookup or create JS object around an existing "DOM Object"
 template <class DOMObj>
-inline KJS::Value cacheDOMObject(KJS::ExecState* exec,
-                                 typename DOMObj::Private* domObj) {
+inline KJS::ValueImp* cacheDOMObject(KJS::ExecState* exec,
+                                     typename DOMObj::Private* domObj) {
   KJS::ObjectImp* ret = 0;
   if (!domObj)
     return KJS::Null();
@@ -71,11 +71,11 @@ inline KJS::Value cacheDOMObject(KJS::ExecState* exec,
   ScriptInterpreter* interpreter =
       static_cast<ScriptInterpreter*>(exec->interpreter());
   if ((ret = interpreter->getDOMObject(domObj)))
-    return KJS::Value(ret);
+    return ret;
   else {
     ret = DOMObj(domObj).bridge(exec);
     interpreter->putDOMObject(domObj, ret);
-    return KJS::Value(ret);
+    return ret;
   }
 }
 
@@ -84,19 +84,19 @@ inline KJS::Value cacheDOMObject(KJS::ExecState* exec,
 // (Very much like KJS::cacheGlobalObject, which is for a singleton ObjectImp)
 // This one is _only_ used for Constructor objects.
 template <class ClassCtor>
-inline KJS::Object cacheGlobalBridge(KJS::ExecState* exec,
-                                     const KJS::Identifier& propertyName) {
+inline KJS::ObjectImp* cacheGlobalBridge(KJS::ExecState* exec,
+                                         const KJS::Identifier& propertyName) {
   KJS::ValueImp* obj =
-      static_cast<KJS::ObjectImp*>(exec->interpreter()->globalObject().imp())
+      static_cast<KJS::ObjectImp*>(exec->interpreter()->globalObject())
           ->getDirect(propertyName);
   if (obj)
-    return KJS::Object::dynamicCast(KJS::Value(obj));
+    return static_cast<KJS::ObjectImp*>(obj);
   else {
     ClassCtor* ctor = new ClassCtor(exec);  // create the ClassCtor instance
-    KJS::Object newObject(new DOMBridgeCtor<ClassCtor>(
+    KJS::ObjectImp* newObject(new DOMBridgeCtor<ClassCtor>(
         exec, ctor));  // create the bridge around it
-    exec->interpreter()->globalObject().put(exec, propertyName, newObject,
-                                            KJS::Internal);
+    exec->interpreter()->globalObject()->put(exec, propertyName, newObject,
+                                             KJS::Internal);
     return newObject;
   }
 }

@@ -35,11 +35,11 @@ class GlobalObject : public KJS::ObjectImp {
   GlobalObject(DocumentImpl* doc);
   virtual ~GlobalObject();
 
-  virtual KJS::Value get(KJS::ExecState* exec,
-                         const KJS::Identifier& propertyName) const;
+  virtual KJS::ValueImp* get(KJS::ExecState* exec,
+                             const KJS::Identifier& propertyName) const;
   virtual void put(KJS::ExecState* exec,
                    const KJS::Identifier& propertyName,
-                   const KJS::Value& value,
+                   KJS::ValueImp* value,
                    int attr = KJS::None);
   virtual bool hasProperty(KJS::ExecState* exec,
                            const KJS::Identifier& p) const;
@@ -74,7 +74,7 @@ class GlobalObject : public KJS::ObjectImp {
 // Internal classes! Do not use as 3rd party developer!
 class ScheduledAction {
  public:
-  ScheduledAction(KJS::Object func, KJS::List args, bool singleShot);
+  ScheduledAction(KJS::ObjectImp* func, KJS::List args, bool singleShot);
   ScheduledAction(const QString& code, bool singleShot);
   ~ScheduledAction();
 
@@ -83,7 +83,7 @@ class ScheduledAction {
  private:
   friend class GlobalQObject;
 
-  KJS::Object m_func;
+  KJS::ObjectImp* m_func;
   KJS::List m_args;
   QString m_code;
   bool m_isFunction;
@@ -97,7 +97,7 @@ class GlobalQObject : public QObject {
   ~GlobalQObject();
 
   int installTimeout(const KJS::UString& handler, int t, bool singleShot);
-  int installTimeout(const KJS::Value& func,
+  int installTimeout(KJS::ValueImp* func,
                      KJS::List args,
                      int t,
                      bool singleShot);

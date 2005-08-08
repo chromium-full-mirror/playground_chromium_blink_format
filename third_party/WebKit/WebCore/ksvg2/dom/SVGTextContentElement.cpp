@@ -77,8 +77,8 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGTextContentElement",
                          SVGTextContentElementProto,
                          SVGTextContentElementProtoFunc)
 
-Value SVGTextContentElement::getValueProperty(ExecState* exec,
-                                              int token) const {
+ValueImp* SVGTextContentElement::getValueProperty(ExecState* exec,
+                                                  int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -95,11 +95,10 @@ Value SVGTextContentElement::getValueProperty(ExecState* exec,
   return Undefined();
 }
 
-Value SVGTextContentElementProtoFunc::call(ExecState* exec,
-                                           Object& thisObj,
-                                           const List& args) {
-  SVGTextContentElement obj(
-      cast(exec, static_cast<KJS::ObjectImp*>(thisObj.imp())));
+ValueImp* SVGTextContentElementProtoFunc::callAsFunction(ExecState* exec,
+                                                         ObjectImp* thisObj,
+                                                         const List& args) {
+  SVGTextContentElement obj(cast(exec, thisObj));
   KDOM_ENTER_SAFE
 
   switch (id) {
@@ -110,27 +109,27 @@ Value SVGTextContentElementProtoFunc::call(ExecState* exec,
       return Number(obj.getComputedTextLength());
     }
     case SVGTextContentElementConstants::GetSubStringLength: {
-      return Number(obj.getSubStringLength(args[0].toUInt32(exec),
-                                           args[1].toUInt32(exec)));
+      return Number(obj.getSubStringLength(args[0]->toUInt32(exec),
+                                           args[1]->toUInt32(exec)));
     }
     case SVGTextContentElementConstants::GetStartPositionOfChar:
       return KDOM::safe_cache<SVGPoint>(
-          exec, obj.getStartPositionOfChar(args[0].toUInt32(exec)));
+          exec, obj.getStartPositionOfChar(args[0]->toUInt32(exec)));
     case SVGTextContentElementConstants::GetEndPositionOfChar:
       return KDOM::safe_cache<SVGPoint>(
-          exec, obj.getStartPositionOfChar(args[0].toUInt32(exec)));
+          exec, obj.getStartPositionOfChar(args[0]->toUInt32(exec)));
     case SVGTextContentElementConstants::GetExtentOfChar:
       return KDOM::safe_cache<SVGRect>(
-          exec, obj.getExtentOfChar(args[0].toUInt32(exec)));
+          exec, obj.getExtentOfChar(args[0]->toUInt32(exec)));
     case SVGTextContentElementConstants::GetRotationOfChar: {
-      return Number(obj.getRotationOfChar(args[0].toUInt32(exec)));
+      return Number(obj.getRotationOfChar(args[0]->toUInt32(exec)));
     }
     case SVGTextContentElementConstants::GetCharNumAtPosition: {
       SVGPoint point = KDOM::ecma_cast<SVGPoint>(exec, args[0], &toSVGPoint);
       return Number(obj.getCharNumAtPosition(point));
     }
     case SVGTextContentElementConstants::SelectSubString: {
-      obj.selectSubString(args[0].toUInt32(exec), args[1].toUInt32(exec));
+      obj.selectSubString(args[0]->toUInt32(exec), args[1]->toUInt32(exec));
       return Undefined();
     }
     default:

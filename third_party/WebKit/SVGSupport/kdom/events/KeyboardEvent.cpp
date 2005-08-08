@@ -59,7 +59,7 @@ KDOM_IMPLEMENT_PROTOTYPE("KeyboardEvent",
                          KeyboardEventProto,
                          KeyboardEventProtoFunc)
 
-Value KeyboardEvent::getValueProperty(ExecState* exec, int token) const {
+ValueImp* KeyboardEvent::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -80,9 +80,9 @@ Value KeyboardEvent::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value KeyboardEventProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+ValueImp* KeyboardEventProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
   KDOM_CHECK_THIS(KeyboardEvent)
   KDOM_ENTER_SAFE
 
@@ -93,16 +93,16 @@ Value KeyboardEventProtoFunc::call(ExecState* exec,
     }
     case KeyboardEventConstants::InitKeyboardEvent: {
       DOMString typeArg = toDOMString(exec, args[0]);
-      bool canBubbleArg = args[1].toBoolean(exec);
-      bool cancelableArg = args[2].toBoolean(exec);
+      bool canBubbleArg = args[1]->toBoolean(exec);
+      bool cancelableArg = args[2]->toBoolean(exec);
       AbstractView viewArg =
           ecma_cast<AbstractView>(exec, args[3], &toAbstractView);
       DOMString keyIdentifierArg = toDOMString(exec, args[4]);
-      long keyLocationArg = args[5].toInt32(exec);
-      bool ctrlKeyArg = args[6].toBoolean(exec);
-      bool altKeyArg = args[7].toBoolean(exec);
-      bool shiftKeyArg = args[8].toBoolean(exec);
-      bool metaKeyArg = args[9].toBoolean(exec);
+      long keyLocationArg = args[5]->toInt32(exec);
+      bool ctrlKeyArg = args[6]->toBoolean(exec);
+      bool altKeyArg = args[7]->toBoolean(exec);
+      bool shiftKeyArg = args[8]->toBoolean(exec);
+      bool metaKeyArg = args[9]->toBoolean(exec);
 
       obj.initKeyboardEvent(typeArg, canBubbleArg, cancelableArg, viewArg,
                             keyIdentifierArg, keyLocationArg, ctrlKeyArg,

@@ -165,7 +165,7 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGSVGElement",
                          SVGSVGElementProto,
                          SVGSVGElementProtoFunc)
 
-Value SVGSVGElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGSVGElement::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -209,7 +209,7 @@ Value SVGSVGElement::getValueProperty(ExecState* exec, int token) const {
 
 void SVGSVGElement::putValueProperty(ExecState* exec,
                                      int token,
-                                     const Value& value,
+                                     ValueImp* value,
                                      int) {
   KDOM_ENTER_SAFE
 
@@ -223,7 +223,7 @@ void SVGSVGElement::putValueProperty(ExecState* exec,
       return;
     }
     case SVGSVGElementConstants::CurrentScale: {
-      setCurrentScale(value.toNumber(exec));
+      setCurrentScale(value->toNumber(exec));
       return;
     }
     default:
@@ -234,10 +234,10 @@ void SVGSVGElement::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(SVGException)
 }
 
-Value SVGSVGElementProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
-  SVGSVGElement obj(cast(exec, static_cast<KJS::ObjectImp*>(thisObj.imp())));
+ValueImp* SVGSVGElementProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
+  SVGSVGElement obj(cast(exec, thisObj));
   KDOM_ENTER_SAFE
 
   switch (id) {
@@ -262,13 +262,13 @@ Value SVGSVGElementProtoFunc::call(ExecState* exec,
           exec, obj.createSVGTransformFromMatrix(matrix));
     }
     case SVGSVGElementConstants::SuspendRedraw: {
-      unsigned long max_wait_milliseconds = args[0].toUInt32(exec);
+      unsigned long max_wait_milliseconds = args[0]->toUInt32(exec);
       ;
       obj.suspendRedraw(max_wait_milliseconds);
       return Undefined();
     }
     case SVGSVGElementConstants::UnsuspendRedraw: {
-      unsigned long suspend_handle_id = args[0].toUInt32(exec);
+      unsigned long suspend_handle_id = args[0]->toUInt32(exec);
       ;
       obj.unsuspendRedraw(suspend_handle_id);
       return Undefined();
@@ -295,7 +295,7 @@ Value SVGSVGElementProtoFunc::call(ExecState* exec,
       return Number(obj.getCurrentTime());
     }
     case SVGSVGElementConstants::SetCurrentTime: {
-      obj.setCurrentTime(args[0].toNumber(exec));
+      obj.setCurrentTime(args[0]->toNumber(exec));
       return Undefined();
     }
     case SVGSVGElementConstants::GetIntersectionList: {

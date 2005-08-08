@@ -38,7 +38,8 @@ using namespace KJS;
 @end
 */
 
-Value LSSerializerFilter::getValueProperty(ExecState* exec, int token) const {
+ValueImp* LSSerializerFilter::getValueProperty(ExecState* exec,
+                                               int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

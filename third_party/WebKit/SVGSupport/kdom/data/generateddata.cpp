@@ -354,7 +354,7 @@ bool AbstractView::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value AbstractView::get(GET_METHOD_ARGS) const {
+ValueImp* AbstractView::get(GET_METHOD_ARGS) const {
   return lookupGetValue<AbstractView>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -375,17 +375,17 @@ AbstractView KDOM::toAbstractView(KJS::ExecState* exec, const ObjectImp* p1) {
   return AbstractView::null;
 }
 
-Value AbstractView::getInParents(GET_METHOD_ARGS) const {
+ValueImp* AbstractView::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object AbstractView::prototype(ExecState* p1) const {
+ObjectImp* AbstractView::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* AbstractView::bridge(ExecState* p1) const {
@@ -393,7 +393,7 @@ ObjectImp* AbstractView::bridge(ExecState* p1) const {
                                      static_cast<AbstractView::Private*>(d));
 }
 
-Value AbstractView::cache(ExecState* p1) const {
+ValueImp* AbstractView::cache(ExecState* p1) const {
   return cacheDOMObject<AbstractView>(p1,
                                       static_cast<AbstractView::Private*>(d));
 }
@@ -407,7 +407,7 @@ bool Attr::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value Attr::get(GET_METHOD_ARGS) const {
+ValueImp* Attr::get(GET_METHOD_ARGS) const {
   return lookupGetValue<Attr>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -421,7 +421,7 @@ Attr KDOM::toAttr(KJS::ExecState* exec, const ObjectImp* p1) {
   return Attr::null;
 }
 
-Value Attr::getInParents(GET_METHOD_ARGS) const {
+ValueImp* Attr::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -439,17 +439,17 @@ bool Attr::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Attr::prototype(ExecState* p1) const {
+ObjectImp* Attr::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Attr::bridge(ExecState* p1) const {
   return new DOMRWBridge<Attr>(p1, static_cast<Attr::Private*>(d));
 }
 
-Value Attr::cache(ExecState* p1) const {
+ValueImp* Attr::cache(ExecState* p1) const {
   return cacheDOMObject<Attr>(p1, static_cast<Attr::Private*>(d));
 }
 
@@ -462,11 +462,11 @@ bool CSSCharsetRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSCharsetRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSCharsetRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSCharsetRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSCharsetRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSCharsetRule::getInParents(GET_METHOD_ARGS) const {
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -484,10 +484,10 @@ bool CSSCharsetRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSCharsetRule::prototype(ExecState* p1) const {
+ObjectImp* CSSCharsetRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSCharsetRule::bridge(ExecState* p1) const {
@@ -495,7 +495,7 @@ ObjectImp* CSSCharsetRule::bridge(ExecState* p1) const {
       p1, static_cast<CSSCharsetRule::Private*>(d));
 }
 
-Value CSSCharsetRule::cache(ExecState* p1) const {
+ValueImp* CSSCharsetRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSCharsetRule>(
       p1, static_cast<CSSCharsetRule::Private*>(d));
 }
@@ -509,11 +509,11 @@ bool CSSFontFaceRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSFontFaceRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSFontFaceRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSFontFaceRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSFontFaceRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSFontFaceRule::getInParents(GET_METHOD_ARGS) const {
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -531,10 +531,10 @@ bool CSSFontFaceRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSFontFaceRule::prototype(ExecState* p1) const {
+ObjectImp* CSSFontFaceRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSFontFaceRule::bridge(ExecState* p1) const {
@@ -542,7 +542,7 @@ ObjectImp* CSSFontFaceRule::bridge(ExecState* p1) const {
       p1, static_cast<CSSFontFaceRule::Private*>(d));
 }
 
-Value CSSFontFaceRule::cache(ExecState* p1) const {
+ValueImp* CSSFontFaceRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSFontFaceRule>(
       p1, static_cast<CSSFontFaceRule::Private*>(d));
 }
@@ -556,11 +556,11 @@ bool CSSImportRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSImportRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSImportRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSImportRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSImportRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSImportRule::getInParents(GET_METHOD_ARGS) const {
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -578,10 +578,10 @@ bool CSSImportRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSImportRule::prototype(ExecState* p1) const {
+ObjectImp* CSSImportRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSImportRule::bridge(ExecState* p1) const {
@@ -589,7 +589,7 @@ ObjectImp* CSSImportRule::bridge(ExecState* p1) const {
       p1, static_cast<CSSImportRule::Private*>(d));
 }
 
-Value CSSImportRule::cache(ExecState* p1) const {
+ValueImp* CSSImportRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSImportRule>(p1,
                                        static_cast<CSSImportRule::Private*>(d));
 }
@@ -598,15 +598,15 @@ bool CSSMediaRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CSSMediaRule::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSMediaRuleProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSMediaRuleProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (CSSRule::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value CSSMediaRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSMediaRule::get(GET_METHOD_ARGS) const {
   return lookupGet<CSSMediaRuleProtoFunc, CSSMediaRule>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
@@ -637,10 +637,10 @@ CSSMediaRule KDOM::EcmaInterface::inheritedCSSMediaRuleCast(
   return CSSMediaRule::null;
 }
 
-Value CSSMediaRule::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSMediaRuleProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSMediaRule::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSMediaRuleProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -658,10 +658,10 @@ bool CSSMediaRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSMediaRule::prototype(ExecState* p1) const {
+ObjectImp* CSSMediaRule::prototype(ExecState* p1) const {
   if (p1)
     return CSSMediaRuleProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSMediaRule::bridge(ExecState* p1) const {
@@ -669,7 +669,7 @@ ObjectImp* CSSMediaRule::bridge(ExecState* p1) const {
                                        static_cast<CSSMediaRule::Private*>(d));
 }
 
-Value CSSMediaRule::cache(ExecState* p1) const {
+ValueImp* CSSMediaRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSMediaRule>(p1,
                                       static_cast<CSSMediaRule::Private*>(d));
 }
@@ -683,11 +683,11 @@ bool CSSPageRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSPageRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSPageRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSPageRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSPageRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSPageRule::getInParents(GET_METHOD_ARGS) const {
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -705,10 +705,10 @@ bool CSSPageRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSPageRule::prototype(ExecState* p1) const {
+ObjectImp* CSSPageRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSPageRule::bridge(ExecState* p1) const {
@@ -716,7 +716,7 @@ ObjectImp* CSSPageRule::bridge(ExecState* p1) const {
                                       static_cast<CSSPageRule::Private*>(d));
 }
 
-Value CSSPageRule::cache(ExecState* p1) const {
+ValueImp* CSSPageRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSPageRule>(p1, static_cast<CSSPageRule::Private*>(d));
 }
 
@@ -724,15 +724,15 @@ bool CSSPrimitiveValue::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CSSPrimitiveValue::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSPrimitiveValueProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSPrimitiveValueProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (CSSValue::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value CSSPrimitiveValue::get(GET_METHOD_ARGS) const {
+ValueImp* CSSPrimitiveValue::get(GET_METHOD_ARGS) const {
   return lookupGet<CSSPrimitiveValueProtoFunc, CSSPrimitiveValue>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -764,10 +764,10 @@ CSSPrimitiveValue KDOM::EcmaInterface::inheritedCSSPrimitiveValueCast(
   return CSSPrimitiveValue::null;
 }
 
-Value CSSPrimitiveValue::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSPrimitiveValueProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSPrimitiveValue::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSPrimitiveValueProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (CSSValue::hasProperty(p1, p2))
     return CSSValue::get(p1, p2, p3);
   return Undefined();
@@ -785,10 +785,10 @@ bool CSSPrimitiveValue::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSPrimitiveValue::prototype(ExecState* p1) const {
+ObjectImp* CSSPrimitiveValue::prototype(ExecState* p1) const {
   if (p1)
     return CSSPrimitiveValueProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSPrimitiveValue::bridge(ExecState* p1) const {
@@ -796,7 +796,7 @@ ObjectImp* CSSPrimitiveValue::bridge(ExecState* p1) const {
       p1, static_cast<CSSPrimitiveValue::Private*>(d));
 }
 
-Value CSSPrimitiveValue::cache(ExecState* p1) const {
+ValueImp* CSSPrimitiveValue::cache(ExecState* p1) const {
   return cacheDOMObject<CSSPrimitiveValue>(
       p1, static_cast<CSSPrimitiveValue::Private*>(d));
 }
@@ -809,11 +809,11 @@ bool CSSRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSRule::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -832,17 +832,17 @@ bool CSSRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSRule::prototype(ExecState* p1) const {
+ObjectImp* CSSRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSRule::bridge(ExecState* p1) const {
   return new DOMRWBridge<CSSRule>(p1, static_cast<CSSRule::Private*>(d));
 }
 
-Value CSSRule::cache(ExecState* p1) const {
+ValueImp* CSSRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSRule>(p1, static_cast<CSSRule::Private*>(d));
 }
 
@@ -850,8 +850,8 @@ bool CSSRuleList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CSSRuleList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSRuleListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSRuleListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -860,7 +860,7 @@ bool CSSRuleList::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSRuleList::get(GET_METHOD_ARGS) const {
+ValueImp* CSSRuleList::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -894,25 +894,25 @@ CSSRuleList KDOM::EcmaInterface::inheritedCSSRuleListCast(const ObjectImp* p1) {
   return CSSRuleList::null;
 }
 
-Value CSSRuleList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSRuleListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSRuleList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSRuleListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object CSSRuleList::prototype(ExecState* p1) const {
+ObjectImp* CSSRuleList::prototype(ExecState* p1) const {
   if (p1)
     return CSSRuleListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSRuleList::bridge(ExecState* p1) const {
   return new DOMBridge<CSSRuleList>(p1, static_cast<CSSRuleList::Private*>(d));
 }
 
-Value CSSRuleList::cache(ExecState* p1) const {
+ValueImp* CSSRuleList::cache(ExecState* p1) const {
   return cacheDOMObject<CSSRuleList>(p1, static_cast<CSSRuleList::Private*>(d));
 }
 
@@ -921,8 +921,8 @@ bool CSSStyleDeclaration::hasProperty(ExecState* p1,
   const HashEntry* e = Lookup::findEntry(&CSSStyleDeclaration::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSStyleDeclarationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSStyleDeclarationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -931,7 +931,7 @@ bool CSSStyleDeclaration::hasProperty(ExecState* p1,
   return false;
 }
 
-Value CSSStyleDeclaration::get(GET_METHOD_ARGS) const {
+ValueImp* CSSStyleDeclaration::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -968,10 +968,10 @@ CSSStyleDeclaration KDOM::EcmaInterface::inheritedCSSStyleDeclarationCast(
   return CSSStyleDeclaration::null;
 }
 
-Value CSSStyleDeclaration::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSStyleDeclarationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSStyleDeclaration::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSStyleDeclarationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -988,10 +988,10 @@ bool CSSStyleDeclaration::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSStyleDeclaration::prototype(ExecState* p1) const {
+ObjectImp* CSSStyleDeclaration::prototype(ExecState* p1) const {
   if (p1)
     return CSSStyleDeclarationProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSStyleDeclaration::bridge(ExecState* p1) const {
@@ -999,7 +999,7 @@ ObjectImp* CSSStyleDeclaration::bridge(ExecState* p1) const {
       p1, static_cast<CSSStyleDeclaration::Private*>(d));
 }
 
-Value CSSStyleDeclaration::cache(ExecState* p1) const {
+ValueImp* CSSStyleDeclaration::cache(ExecState* p1) const {
   return cacheDOMObject<CSSStyleDeclaration>(
       p1, static_cast<CSSStyleDeclaration::Private*>(d));
 }
@@ -1013,11 +1013,11 @@ bool CSSStyleRule::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSStyleRule::get(GET_METHOD_ARGS) const {
+ValueImp* CSSStyleRule::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSStyleRule>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSStyleRule::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSStyleRule::getInParents(GET_METHOD_ARGS) const {
   if (CSSRule::hasProperty(p1, p2))
     return CSSRule::get(p1, p2, p3);
   return Undefined();
@@ -1035,10 +1035,10 @@ bool CSSStyleRule::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSStyleRule::prototype(ExecState* p1) const {
+ObjectImp* CSSStyleRule::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSStyleRule::bridge(ExecState* p1) const {
@@ -1046,7 +1046,7 @@ ObjectImp* CSSStyleRule::bridge(ExecState* p1) const {
                                        static_cast<CSSStyleRule::Private*>(d));
 }
 
-Value CSSStyleRule::cache(ExecState* p1) const {
+ValueImp* CSSStyleRule::cache(ExecState* p1) const {
   return cacheDOMObject<CSSStyleRule>(p1,
                                       static_cast<CSSStyleRule::Private*>(d));
 }
@@ -1055,15 +1055,15 @@ bool CSSStyleSheet::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CSSStyleSheet::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSStyleSheetProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSStyleSheetProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (StyleSheet::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value CSSStyleSheet::get(GET_METHOD_ARGS) const {
+ValueImp* CSSStyleSheet::get(GET_METHOD_ARGS) const {
   return lookupGet<CSSStyleSheetProtoFunc, CSSStyleSheet>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -1094,10 +1094,10 @@ CSSStyleSheet KDOM::EcmaInterface::inheritedCSSStyleSheetCast(
   return CSSStyleSheet::null;
 }
 
-Value CSSStyleSheet::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSStyleSheetProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSStyleSheet::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSStyleSheetProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (StyleSheet::hasProperty(p1, p2))
     return StyleSheet::get(p1, p2, p3);
   return Undefined();
@@ -1115,10 +1115,10 @@ bool CSSStyleSheet::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSStyleSheet::prototype(ExecState* p1) const {
+ObjectImp* CSSStyleSheet::prototype(ExecState* p1) const {
   if (p1)
     return CSSStyleSheetProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSStyleSheet::bridge(ExecState* p1) const {
@@ -1126,7 +1126,7 @@ ObjectImp* CSSStyleSheet::bridge(ExecState* p1) const {
       p1, static_cast<CSSStyleSheet::Private*>(d));
 }
 
-Value CSSStyleSheet::cache(ExecState* p1) const {
+ValueImp* CSSStyleSheet::cache(ExecState* p1) const {
   return cacheDOMObject<CSSStyleSheet>(p1,
                                        static_cast<CSSStyleSheet::Private*>(d));
 }
@@ -1139,11 +1139,11 @@ bool CSSValue::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSValue::get(GET_METHOD_ARGS) const {
+ValueImp* CSSValue::get(GET_METHOD_ARGS) const {
   return lookupGetValue<CSSValue>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value CSSValue::getInParents(GET_METHOD_ARGS) const {
+ValueImp* CSSValue::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1162,17 +1162,17 @@ bool CSSValue::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSValue::prototype(ExecState* p1) const {
+ObjectImp* CSSValue::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSValue::bridge(ExecState* p1) const {
   return new DOMRWBridge<CSSValue>(p1, static_cast<CSSValue::Private*>(d));
 }
 
-Value CSSValue::cache(ExecState* p1) const {
+ValueImp* CSSValue::cache(ExecState* p1) const {
   return cacheDOMObject<CSSValue>(p1, static_cast<CSSValue::Private*>(d));
 }
 
@@ -1180,8 +1180,8 @@ bool CSSValueList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CSSValueList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CSSValueListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CSSValueListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (CSSValue::hasProperty(p1, p2))
     return true;
@@ -1192,7 +1192,7 @@ bool CSSValueList::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value CSSValueList::get(GET_METHOD_ARGS) const {
+ValueImp* CSSValueList::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -1227,10 +1227,10 @@ CSSValueList KDOM::EcmaInterface::inheritedCSSValueListCast(
   return CSSValueList::null;
 }
 
-Value CSSValueList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CSSValueListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CSSValueList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CSSValueListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (CSSValue::hasProperty(p1, p2))
     return CSSValue::get(p1, p2, p3);
   return Undefined();
@@ -1248,10 +1248,10 @@ bool CSSValueList::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CSSValueList::prototype(ExecState* p1) const {
+ObjectImp* CSSValueList::prototype(ExecState* p1) const {
   if (p1)
     return CSSValueListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CSSValueList::bridge(ExecState* p1) const {
@@ -1259,7 +1259,7 @@ ObjectImp* CSSValueList::bridge(ExecState* p1) const {
                                        static_cast<CSSValueList::Private*>(d));
 }
 
-Value CSSValueList::cache(ExecState* p1) const {
+ValueImp* CSSValueList::cache(ExecState* p1) const {
   return cacheDOMObject<CSSValueList>(p1,
                                       static_cast<CSSValueList::Private*>(d));
 }
@@ -1268,15 +1268,15 @@ bool CharacterData::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&CharacterData::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = CharacterDataProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = CharacterDataProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (Node::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value CharacterData::get(GET_METHOD_ARGS) const {
+ValueImp* CharacterData::get(GET_METHOD_ARGS) const {
   return lookupGet<CharacterDataProtoFunc, CharacterData>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -1324,10 +1324,10 @@ CharacterData KDOM::EcmaInterface::inheritedCharacterDataCast(
   return CharacterData::null;
 }
 
-Value CharacterData::getInParents(GET_METHOD_ARGS) const {
-  Object proto = CharacterDataProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* CharacterData::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = CharacterDataProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -1345,10 +1345,10 @@ bool CharacterData::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object CharacterData::prototype(ExecState* p1) const {
+ObjectImp* CharacterData::prototype(ExecState* p1) const {
   if (p1)
     return CharacterDataProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* CharacterData::bridge(ExecState* p1) const {
@@ -1356,7 +1356,7 @@ ObjectImp* CharacterData::bridge(ExecState* p1) const {
       p1, static_cast<CharacterData::Private*>(d));
 }
 
-Value CharacterData::cache(ExecState* p1) const {
+ValueImp* CharacterData::cache(ExecState* p1) const {
   return cacheDOMObject<CharacterData>(p1,
                                        static_cast<CharacterData::Private*>(d));
 }
@@ -1369,28 +1369,28 @@ bool Counter::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value Counter::get(GET_METHOD_ARGS) const {
+ValueImp* Counter::get(GET_METHOD_ARGS) const {
   return lookupGetValue<Counter>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value Counter::getInParents(GET_METHOD_ARGS) const {
+ValueImp* Counter::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object Counter::prototype(ExecState* p1) const {
+ObjectImp* Counter::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Counter::bridge(ExecState* p1) const {
   return new DOMBridge<Counter>(p1, static_cast<Counter::Private*>(d));
 }
 
-Value Counter::cache(ExecState* p1) const {
+ValueImp* Counter::cache(ExecState* p1) const {
   return cacheDOMObject<Counter>(p1, static_cast<Counter::Private*>(d));
 }
 
@@ -1398,13 +1398,13 @@ bool DOMConfiguration::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DOMConfiguration::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DOMConfigurationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DOMConfigurationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DOMConfiguration::get(GET_METHOD_ARGS) const {
+ValueImp* DOMConfiguration::get(GET_METHOD_ARGS) const {
   return lookupGet<DOMConfigurationProtoFunc, DOMConfiguration>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -1436,18 +1436,18 @@ DOMConfiguration KDOM::EcmaInterface::inheritedDOMConfigurationCast(
   return DOMConfiguration::null;
 }
 
-Value DOMConfiguration::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DOMConfigurationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DOMConfiguration::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DOMConfigurationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMConfiguration::prototype(ExecState* p1) const {
+ObjectImp* DOMConfiguration::prototype(ExecState* p1) const {
   if (p1)
     return DOMConfigurationProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMConfiguration::bridge(ExecState* p1) const {
@@ -1455,7 +1455,7 @@ ObjectImp* DOMConfiguration::bridge(ExecState* p1) const {
       p1, static_cast<DOMConfiguration::Private*>(d));
 }
 
-Value DOMConfiguration::cache(ExecState* p1) const {
+ValueImp* DOMConfiguration::cache(ExecState* p1) const {
   return cacheDOMObject<DOMConfiguration>(
       p1, static_cast<DOMConfiguration::Private*>(d));
 }
@@ -1468,7 +1468,7 @@ bool DOMError::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DOMError::get(GET_METHOD_ARGS) const {
+ValueImp* DOMError::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DOMError>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -1483,24 +1483,24 @@ DOMError KDOM::toDOMError(KJS::ExecState* exec, const ObjectImp* p1) {
   return DOMError::null;
 }
 
-Value DOMError::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DOMError::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMError::prototype(ExecState* p1) const {
+ObjectImp* DOMError::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMError::bridge(ExecState* p1) const {
   return new DOMBridge<DOMError>(p1, static_cast<DOMError::Private*>(d));
 }
 
-Value DOMError::cache(ExecState* p1) const {
+ValueImp* DOMError::cache(ExecState* p1) const {
   return cacheDOMObject<DOMError>(p1, static_cast<DOMError::Private*>(d));
 }
 
@@ -1508,13 +1508,13 @@ bool DOMErrorHandler::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DOMErrorHandler::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DOMErrorHandlerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DOMErrorHandlerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DOMErrorHandler::get(GET_METHOD_ARGS) const {
+ValueImp* DOMErrorHandler::get(GET_METHOD_ARGS) const {
   return lookupGet<DOMErrorHandlerProtoFunc, DOMErrorHandler>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -1546,18 +1546,18 @@ DOMErrorHandler KDOM::EcmaInterface::inheritedDOMErrorHandlerCast(
   return DOMErrorHandler::null;
 }
 
-Value DOMErrorHandler::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DOMErrorHandlerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DOMErrorHandler::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DOMErrorHandlerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMErrorHandler::prototype(ExecState* p1) const {
+ObjectImp* DOMErrorHandler::prototype(ExecState* p1) const {
   if (p1)
     return DOMErrorHandlerProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMErrorHandler::bridge(ExecState* p1) const {
@@ -1565,7 +1565,7 @@ ObjectImp* DOMErrorHandler::bridge(ExecState* p1) const {
       p1, static_cast<DOMErrorHandler::Private*>(d));
 }
 
-Value DOMErrorHandler::cache(ExecState* p1) const {
+ValueImp* DOMErrorHandler::cache(ExecState* p1) const {
   return cacheDOMObject<DOMErrorHandler>(
       p1, static_cast<DOMErrorHandler::Private*>(d));
 }
@@ -1578,21 +1578,21 @@ bool DOMException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DOMException::get(GET_METHOD_ARGS) const {
+ValueImp* DOMException::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DOMException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value DOMException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DOMException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMException::prototype(ExecState* p1) const {
+ObjectImp* DOMException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMException::bridge(ExecState* p1) const {
@@ -1600,7 +1600,7 @@ ObjectImp* DOMException::bridge(ExecState* p1) const {
                                      static_cast<DOMException::Private*>(d));
 }
 
-Value DOMException::cache(ExecState* p1) const {
+ValueImp* DOMException::cache(ExecState* p1) const {
   return cacheDOMObject<DOMException>(p1,
                                       static_cast<DOMException::Private*>(d));
 }
@@ -1609,13 +1609,13 @@ bool DOMImplementation::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DOMImplementation::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DOMImplementationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DOMImplementationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DOMImplementation::get(GET_METHOD_ARGS) const {
+ValueImp* DOMImplementation::get(GET_METHOD_ARGS) const {
   return lookupGet<DOMImplementationProtoFunc, DOMImplementation>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -1647,18 +1647,18 @@ DOMImplementation KDOM::EcmaInterface::inheritedDOMImplementationCast(
   return DOMImplementation::null;
 }
 
-Value DOMImplementation::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DOMImplementationProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DOMImplementation::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DOMImplementationProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMImplementation::prototype(ExecState* p1) const {
+ObjectImp* DOMImplementation::prototype(ExecState* p1) const {
   if (p1)
     return DOMImplementationProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMImplementation::bridge(ExecState* p1) const {
@@ -1666,7 +1666,7 @@ ObjectImp* DOMImplementation::bridge(ExecState* p1) const {
       p1, static_cast<DOMImplementation::Private*>(d));
 }
 
-Value DOMImplementation::cache(ExecState* p1) const {
+ValueImp* DOMImplementation::cache(ExecState* p1) const {
   return cacheDOMObject<DOMImplementation>(
       p1, static_cast<DOMImplementation::Private*>(d));
 }
@@ -1679,28 +1679,28 @@ bool DOMLocator::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DOMLocator::get(GET_METHOD_ARGS) const {
+ValueImp* DOMLocator::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DOMLocator>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value DOMLocator::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DOMLocator::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMLocator::prototype(ExecState* p1) const {
+ObjectImp* DOMLocator::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMLocator::bridge(ExecState* p1) const {
   return new DOMBridge<DOMLocator>(p1, static_cast<DOMLocator::Private*>(d));
 }
 
-Value DOMLocator::cache(ExecState* p1) const {
+ValueImp* DOMLocator::cache(ExecState* p1) const {
   return cacheDOMObject<DOMLocator>(p1, static_cast<DOMLocator::Private*>(d));
 }
 
@@ -1708,13 +1708,13 @@ bool DOMStringList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DOMStringList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DOMStringListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DOMStringListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DOMStringList::get(GET_METHOD_ARGS) const {
+ValueImp* DOMStringList::get(GET_METHOD_ARGS) const {
   return lookupGet<DOMStringListProtoFunc, DOMStringList>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -1745,18 +1745,18 @@ DOMStringList KDOM::EcmaInterface::inheritedDOMStringListCast(
   return DOMStringList::null;
 }
 
-Value DOMStringList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DOMStringListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DOMStringList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DOMStringListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMStringList::prototype(ExecState* p1) const {
+ObjectImp* DOMStringList::prototype(ExecState* p1) const {
   if (p1)
     return DOMStringListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMStringList::bridge(ExecState* p1) const {
@@ -1764,7 +1764,7 @@ ObjectImp* DOMStringList::bridge(ExecState* p1) const {
                                       static_cast<DOMStringList::Private*>(d));
 }
 
-Value DOMStringList::cache(ExecState* p1) const {
+ValueImp* DOMStringList::cache(ExecState* p1) const {
   return cacheDOMObject<DOMStringList>(p1,
                                        static_cast<DOMStringList::Private*>(d));
 }
@@ -1777,7 +1777,7 @@ bool DOMUserData::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DOMUserData::get(GET_METHOD_ARGS) const {
+ValueImp* DOMUserData::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DOMUserData>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -1792,24 +1792,24 @@ DOMUserData KDOM::toDOMUserData(KJS::ExecState* exec, const ObjectImp* p1) {
   return DOMUserData::null;
 }
 
-Value DOMUserData::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DOMUserData::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DOMUserData::prototype(ExecState* p1) const {
+ObjectImp* DOMUserData::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DOMUserData::bridge(ExecState* p1) const {
   return new DOMBridge<DOMUserData>(p1, static_cast<DOMUserData::Private*>(d));
 }
 
-Value DOMUserData::cache(ExecState* p1) const {
+ValueImp* DOMUserData::cache(ExecState* p1) const {
   return cacheDOMObject<DOMUserData>(p1, static_cast<DOMUserData::Private*>(d));
 }
 
@@ -1817,8 +1817,8 @@ bool Document::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Document::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DocumentProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DocumentProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (DocumentEvent::hasProperty(p1, p2))
     return true;
@@ -1837,7 +1837,7 @@ bool Document::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value Document::get(GET_METHOD_ARGS) const {
+ValueImp* Document::get(GET_METHOD_ARGS) const {
   return lookupGet<DocumentProtoFunc, Document>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -1866,10 +1866,10 @@ Document KDOM::EcmaInterface::inheritedDocumentCast(const ObjectImp* p1) {
   return Document::null;
 }
 
-Value Document::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DocumentProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Document::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DocumentProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (DocumentEvent::hasProperty(p1, p2))
     return DocumentEvent::get(p1, p2, p3);
   if (DocumentRange::hasProperty(p1, p2))
@@ -1899,10 +1899,10 @@ bool Document::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Document::prototype(ExecState* p1) const {
+ObjectImp* Document::prototype(ExecState* p1) const {
   if (p1)
     return DocumentProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Document::bridge(ExecState* p1) const {
@@ -1910,7 +1910,7 @@ ObjectImp* Document::bridge(ExecState* p1) const {
       p1, static_cast<Document::Private*>(KDOM::EventTarget::d));
 }
 
-Value Document::cache(ExecState* p1) const {
+ValueImp* Document::cache(ExecState* p1) const {
   return cacheDOMObject<Document>(
       p1, static_cast<Document::Private*>(KDOM::EventTarget::d));
 }
@@ -1919,13 +1919,13 @@ bool DocumentEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DocumentEvent::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DocumentEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DocumentEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DocumentEvent::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentEvent::get(GET_METHOD_ARGS) const {
   return lookupGet<DocumentEventProtoFunc, DocumentEvent>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -1962,18 +1962,18 @@ DocumentEvent KDOM::EcmaInterface::inheritedDocumentEventCast(
   return DocumentEvent::null;
 }
 
-Value DocumentEvent::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DocumentEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DocumentEvent::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DocumentEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DocumentEvent::prototype(ExecState* p1) const {
+ObjectImp* DocumentEvent::prototype(ExecState* p1) const {
   if (p1)
     return DocumentEventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentEvent::bridge(ExecState* p1) const {
@@ -1981,7 +1981,7 @@ ObjectImp* DocumentEvent::bridge(ExecState* p1) const {
                                       static_cast<DocumentEvent::Private*>(d));
 }
 
-Value DocumentEvent::cache(ExecState* p1) const {
+ValueImp* DocumentEvent::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentEvent>(p1,
                                        static_cast<DocumentEvent::Private*>(d));
 }
@@ -1990,13 +1990,13 @@ bool DocumentRange::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DocumentRange::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DocumentRangeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DocumentRangeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DocumentRange::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentRange::get(GET_METHOD_ARGS) const {
   return lookupGet<DocumentRangeProtoFunc, DocumentRange>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -2033,18 +2033,18 @@ DocumentRange KDOM::EcmaInterface::inheritedDocumentRangeCast(
   return DocumentRange::null;
 }
 
-Value DocumentRange::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DocumentRangeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DocumentRange::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DocumentRangeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DocumentRange::prototype(ExecState* p1) const {
+ObjectImp* DocumentRange::prototype(ExecState* p1) const {
   if (p1)
     return DocumentRangeProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentRange::bridge(ExecState* p1) const {
@@ -2052,7 +2052,7 @@ ObjectImp* DocumentRange::bridge(ExecState* p1) const {
                                       static_cast<DocumentRange::Private*>(d));
 }
 
-Value DocumentRange::cache(ExecState* p1) const {
+ValueImp* DocumentRange::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentRange>(p1,
                                        static_cast<DocumentRange::Private*>(d));
 }
@@ -2065,21 +2065,21 @@ bool DocumentStyle::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DocumentStyle::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentStyle::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DocumentStyle>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value DocumentStyle::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DocumentStyle::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DocumentStyle::prototype(ExecState* p1) const {
+ObjectImp* DocumentStyle::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentStyle::bridge(ExecState* p1) const {
@@ -2087,7 +2087,7 @@ ObjectImp* DocumentStyle::bridge(ExecState* p1) const {
                                       static_cast<DocumentStyle::Private*>(d));
 }
 
-Value DocumentStyle::cache(ExecState* p1) const {
+ValueImp* DocumentStyle::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentStyle>(p1,
                                        static_cast<DocumentStyle::Private*>(d));
 }
@@ -2096,13 +2096,13 @@ bool DocumentTraversal::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&DocumentTraversal::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = DocumentTraversalProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = DocumentTraversalProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value DocumentTraversal::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentTraversal::get(GET_METHOD_ARGS) const {
   return lookupGet<DocumentTraversalProtoFunc, DocumentTraversal>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -2141,18 +2141,18 @@ DocumentTraversal KDOM::EcmaInterface::inheritedDocumentTraversalCast(
   return DocumentTraversal::null;
 }
 
-Value DocumentTraversal::getInParents(GET_METHOD_ARGS) const {
-  Object proto = DocumentTraversalProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* DocumentTraversal::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = DocumentTraversalProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DocumentTraversal::prototype(ExecState* p1) const {
+ObjectImp* DocumentTraversal::prototype(ExecState* p1) const {
   if (p1)
     return DocumentTraversalProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentTraversal::bridge(ExecState* p1) const {
@@ -2160,7 +2160,7 @@ ObjectImp* DocumentTraversal::bridge(ExecState* p1) const {
       p1, static_cast<DocumentTraversal::Private*>(d));
 }
 
-Value DocumentTraversal::cache(ExecState* p1) const {
+ValueImp* DocumentTraversal::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentTraversal>(
       p1, static_cast<DocumentTraversal::Private*>(d));
 }
@@ -2174,7 +2174,7 @@ bool DocumentType::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DocumentType::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentType::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DocumentType>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2189,7 +2189,7 @@ DocumentType KDOM::toDocumentType(KJS::ExecState* exec, const ObjectImp* p1) {
   return DocumentType::null;
 }
 
-Value DocumentType::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DocumentType::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -2203,10 +2203,10 @@ bool DocumentType::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object DocumentType::prototype(ExecState* p1) const {
+ObjectImp* DocumentType::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentType::bridge(ExecState* p1) const {
@@ -2214,7 +2214,7 @@ ObjectImp* DocumentType::bridge(ExecState* p1) const {
                                        static_cast<DocumentType::Private*>(d));
 }
 
-Value DocumentType::cache(ExecState* p1) const {
+ValueImp* DocumentType::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentType>(p1,
                                       static_cast<DocumentType::Private*>(d));
 }
@@ -2227,21 +2227,21 @@ bool DocumentView::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value DocumentView::get(GET_METHOD_ARGS) const {
+ValueImp* DocumentView::get(GET_METHOD_ARGS) const {
   return lookupGetValue<DocumentView>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value DocumentView::getInParents(GET_METHOD_ARGS) const {
+ValueImp* DocumentView::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object DocumentView::prototype(ExecState* p1) const {
+ObjectImp* DocumentView::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* DocumentView::bridge(ExecState* p1) const {
@@ -2249,7 +2249,7 @@ ObjectImp* DocumentView::bridge(ExecState* p1) const {
                                      static_cast<DocumentView::Private*>(d));
 }
 
-Value DocumentView::cache(ExecState* p1) const {
+ValueImp* DocumentView::cache(ExecState* p1) const {
   return cacheDOMObject<DocumentView>(p1,
                                       static_cast<DocumentView::Private*>(d));
 }
@@ -2258,15 +2258,15 @@ bool Element::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Element::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = ElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = ElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (Node::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value Element::get(GET_METHOD_ARGS) const {
+ValueImp* Element::get(GET_METHOD_ARGS) const {
   return lookupGet<ElementProtoFunc, Element>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2295,10 +2295,10 @@ Element KDOM::EcmaInterface::inheritedElementCast(const ObjectImp* p1) {
   return Element::null;
 }
 
-Value Element::getInParents(GET_METHOD_ARGS) const {
-  Object proto = ElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Element::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = ElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -2312,17 +2312,17 @@ bool Element::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Element::prototype(ExecState* p1) const {
+ObjectImp* Element::prototype(ExecState* p1) const {
   if (p1)
     return ElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Element::bridge(ExecState* p1) const {
   return new DOMRWBridge<Element>(p1, static_cast<Element::Private*>(d));
 }
 
-Value Element::cache(ExecState* p1) const {
+ValueImp* Element::cache(ExecState* p1) const {
   return cacheDOMObject<Element>(p1, static_cast<Element::Private*>(d));
 }
 
@@ -2335,11 +2335,11 @@ bool Entity::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value Entity::get(GET_METHOD_ARGS) const {
+ValueImp* Entity::get(GET_METHOD_ARGS) const {
   return lookupGetValue<Entity>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value Entity::getInParents(GET_METHOD_ARGS) const {
+ValueImp* Entity::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -2353,17 +2353,17 @@ bool Entity::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Entity::prototype(ExecState* p1) const {
+ObjectImp* Entity::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Entity::bridge(ExecState* p1) const {
   return new DOMRWBridge<Entity>(p1, static_cast<Entity::Private*>(d));
 }
 
-Value Entity::cache(ExecState* p1) const {
+ValueImp* Entity::cache(ExecState* p1) const {
   return cacheDOMObject<Entity>(p1, static_cast<Entity::Private*>(d));
 }
 
@@ -2371,13 +2371,13 @@ bool Event::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Event::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = EventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = EventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value Event::get(GET_METHOD_ARGS) const {
+ValueImp* Event::get(GET_METHOD_ARGS) const {
   return lookupGet<EventProtoFunc, Event>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2432,25 +2432,25 @@ Event KDOM::EcmaInterface::inheritedEventCast(const ObjectImp* p1) {
   return Event::null;
 }
 
-Value Event::getInParents(GET_METHOD_ARGS) const {
-  Object proto = EventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Event::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = EventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object Event::prototype(ExecState* p1) const {
+ObjectImp* Event::prototype(ExecState* p1) const {
   if (p1)
     return EventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Event::bridge(ExecState* p1) const {
   return new DOMBridge<Event>(p1, static_cast<Event::Private*>(d));
 }
 
-Value Event::cache(ExecState* p1) const {
+ValueImp* Event::cache(ExecState* p1) const {
   return cacheDOMObject<Event>(p1, static_cast<Event::Private*>(d));
 }
 
@@ -2462,21 +2462,21 @@ bool EventException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value EventException::get(GET_METHOD_ARGS) const {
+ValueImp* EventException::get(GET_METHOD_ARGS) const {
   return lookupGetValue<EventException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value EventException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* EventException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object EventException::prototype(ExecState* p1) const {
+ObjectImp* EventException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* EventException::bridge(ExecState* p1) const {
@@ -2484,7 +2484,7 @@ ObjectImp* EventException::bridge(ExecState* p1) const {
       p1, static_cast<EventException::Private*>(d));
 }
 
-Value EventException::cache(ExecState* p1) const {
+ValueImp* EventException::cache(ExecState* p1) const {
   return cacheDOMObject<EventException>(
       p1, static_cast<EventException::Private*>(d));
 }
@@ -2493,13 +2493,13 @@ bool EventTarget::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&EventTarget::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = EventTargetProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = EventTargetProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value EventTarget::get(GET_METHOD_ARGS) const {
+ValueImp* EventTarget::get(GET_METHOD_ARGS) const {
   return lookupGet<EventTargetProtoFunc, EventTarget>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -2621,10 +2621,10 @@ EventTarget KDOM::EcmaInterface::inheritedEventTargetCast(const ObjectImp* p1) {
   return EventTarget::null;
 }
 
-Value EventTarget::getInParents(GET_METHOD_ARGS) const {
-  Object proto = EventTargetProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* EventTarget::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = EventTargetProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -2637,10 +2637,10 @@ bool EventTarget::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object EventTarget::prototype(ExecState* p1) const {
+ObjectImp* EventTarget::prototype(ExecState* p1) const {
   if (p1)
     return EventTargetProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* EventTarget::bridge(ExecState* p1) const {
@@ -2648,7 +2648,7 @@ ObjectImp* EventTarget::bridge(ExecState* p1) const {
                                       static_cast<EventTarget::Private*>(d));
 }
 
-Value EventTarget::cache(ExecState* p1) const {
+ValueImp* EventTarget::cache(ExecState* p1) const {
   return cacheDOMObject<EventTarget>(p1, static_cast<EventTarget::Private*>(d));
 }
 
@@ -2656,15 +2656,15 @@ bool KeyboardEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&KeyboardEvent::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = KeyboardEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = KeyboardEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (UIEvent::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value KeyboardEvent::get(GET_METHOD_ARGS) const {
+ValueImp* KeyboardEvent::get(GET_METHOD_ARGS) const {
   return lookupGet<KeyboardEventProtoFunc, KeyboardEvent>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -2695,19 +2695,19 @@ KeyboardEvent KDOM::EcmaInterface::inheritedKeyboardEventCast(
   return KeyboardEvent::null;
 }
 
-Value KeyboardEvent::getInParents(GET_METHOD_ARGS) const {
-  Object proto = KeyboardEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* KeyboardEvent::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = KeyboardEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (UIEvent::hasProperty(p1, p2))
     return UIEvent::get(p1, p2, p3);
   return Undefined();
 }
 
-Object KeyboardEvent::prototype(ExecState* p1) const {
+ObjectImp* KeyboardEvent::prototype(ExecState* p1) const {
   if (p1)
     return KeyboardEventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* KeyboardEvent::bridge(ExecState* p1) const {
@@ -2715,7 +2715,7 @@ ObjectImp* KeyboardEvent::bridge(ExecState* p1) const {
                                       static_cast<KeyboardEvent::Private*>(d));
 }
 
-Value KeyboardEvent::cache(ExecState* p1) const {
+ValueImp* KeyboardEvent::cache(ExecState* p1) const {
   return cacheDOMObject<KeyboardEvent>(p1,
                                        static_cast<KeyboardEvent::Private*>(d));
 }
@@ -2728,28 +2728,28 @@ bool LSException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value LSException::get(GET_METHOD_ARGS) const {
+ValueImp* LSException::get(GET_METHOD_ARGS) const {
   return lookupGetValue<LSException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value LSException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* LSException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object LSException::prototype(ExecState* p1) const {
+ObjectImp* LSException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSException::bridge(ExecState* p1) const {
   return new DOMBridge<LSException>(p1, static_cast<LSException::Private*>(d));
 }
 
-Value LSException::cache(ExecState* p1) const {
+ValueImp* LSException::cache(ExecState* p1) const {
   return cacheDOMObject<LSException>(p1, static_cast<LSException::Private*>(d));
 }
 
@@ -2761,7 +2761,7 @@ bool LSInput::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value LSInput::get(GET_METHOD_ARGS) const {
+ValueImp* LSInput::get(GET_METHOD_ARGS) const {
   return lookupGetValue<LSInput>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2776,7 +2776,7 @@ LSInput KDOM::toLSInput(KJS::ExecState* exec, const ObjectImp* p1) {
   return LSInput::null;
 }
 
-Value LSInput::getInParents(GET_METHOD_ARGS) const {
+ValueImp* LSInput::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -2795,17 +2795,17 @@ bool LSInput::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object LSInput::prototype(ExecState* p1) const {
+ObjectImp* LSInput::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSInput::bridge(ExecState* p1) const {
   return new DOMRWBridge<LSInput>(p1, static_cast<LSInput::Private*>(d));
 }
 
-Value LSInput::cache(ExecState* p1) const {
+ValueImp* LSInput::cache(ExecState* p1) const {
   return cacheDOMObject<LSInput>(p1, static_cast<LSInput::Private*>(d));
 }
 
@@ -2817,7 +2817,7 @@ bool LSOutput::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value LSOutput::get(GET_METHOD_ARGS) const {
+ValueImp* LSOutput::get(GET_METHOD_ARGS) const {
   return lookupGetValue<LSOutput>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2832,7 +2832,7 @@ LSOutput KDOM::toLSOutput(KJS::ExecState* exec, const ObjectImp* p1) {
   return LSOutput::null;
 }
 
-Value LSOutput::getInParents(GET_METHOD_ARGS) const {
+ValueImp* LSOutput::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -2851,17 +2851,17 @@ bool LSOutput::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object LSOutput::prototype(ExecState* p1) const {
+ObjectImp* LSOutput::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSOutput::bridge(ExecState* p1) const {
   return new DOMRWBridge<LSOutput>(p1, static_cast<LSOutput::Private*>(d));
 }
 
-Value LSOutput::cache(ExecState* p1) const {
+ValueImp* LSOutput::cache(ExecState* p1) const {
   return cacheDOMObject<LSOutput>(p1, static_cast<LSOutput::Private*>(d));
 }
 
@@ -2869,15 +2869,15 @@ bool LSParser::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&LSParser::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = LSParserProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = LSParserProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (EventTarget::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value LSParser::get(GET_METHOD_ARGS) const {
+ValueImp* LSParser::get(GET_METHOD_ARGS) const {
   return lookupGet<LSParserProtoFunc, LSParser>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2906,10 +2906,10 @@ LSParser KDOM::EcmaInterface::inheritedLSParserCast(const ObjectImp* p1) {
   return LSParser::null;
 }
 
-Value LSParser::getInParents(GET_METHOD_ARGS) const {
-  Object proto = LSParserProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* LSParser::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = LSParserProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (EventTarget::hasProperty(p1, p2))
     return EventTarget::get(p1, p2, p3);
   return Undefined();
@@ -2927,17 +2927,17 @@ bool LSParser::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object LSParser::prototype(ExecState* p1) const {
+ObjectImp* LSParser::prototype(ExecState* p1) const {
   if (p1)
     return LSParserProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSParser::bridge(ExecState* p1) const {
   return new DOMRWBridge<LSParser>(p1, static_cast<LSParser::Private*>(d));
 }
 
-Value LSParser::cache(ExecState* p1) const {
+ValueImp* LSParser::cache(ExecState* p1) const {
   return cacheDOMObject<LSParser>(p1, static_cast<LSParser::Private*>(d));
 }
 
@@ -2945,13 +2945,13 @@ bool LSParserFilter::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&LSParserFilter::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = LSParserFilterProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = LSParserFilterProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value LSParserFilter::get(GET_METHOD_ARGS) const {
+ValueImp* LSParserFilter::get(GET_METHOD_ARGS) const {
   return lookupGet<LSParserFilterProtoFunc, LSParserFilter>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -2983,18 +2983,18 @@ LSParserFilter KDOM::EcmaInterface::inheritedLSParserFilterCast(
   return LSParserFilter::null;
 }
 
-Value LSParserFilter::getInParents(GET_METHOD_ARGS) const {
-  Object proto = LSParserFilterProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* LSParserFilter::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = LSParserFilterProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object LSParserFilter::prototype(ExecState* p1) const {
+ObjectImp* LSParserFilter::prototype(ExecState* p1) const {
   if (p1)
     return LSParserFilterProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSParserFilter::bridge(ExecState* p1) const {
@@ -3002,7 +3002,7 @@ ObjectImp* LSParserFilter::bridge(ExecState* p1) const {
       p1, static_cast<LSParserFilter::Private*>(d));
 }
 
-Value LSParserFilter::cache(ExecState* p1) const {
+ValueImp* LSParserFilter::cache(ExecState* p1) const {
   return cacheDOMObject<LSParserFilter>(
       p1, static_cast<LSParserFilter::Private*>(d));
 }
@@ -3012,13 +3012,13 @@ bool LSResourceResolver::hasProperty(ExecState* p1,
   const HashEntry* e = Lookup::findEntry(&LSResourceResolver::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = LSResourceResolverProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = LSResourceResolverProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value LSResourceResolver::get(GET_METHOD_ARGS) const {
+ValueImp* LSResourceResolver::get(GET_METHOD_ARGS) const {
   return lookupGet<LSResourceResolverProtoFunc, LSResourceResolver>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -3051,18 +3051,18 @@ LSResourceResolver KDOM::EcmaInterface::inheritedLSResourceResolverCast(
   return LSResourceResolver::null;
 }
 
-Value LSResourceResolver::getInParents(GET_METHOD_ARGS) const {
-  Object proto = LSResourceResolverProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* LSResourceResolver::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = LSResourceResolverProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object LSResourceResolver::prototype(ExecState* p1) const {
+ObjectImp* LSResourceResolver::prototype(ExecState* p1) const {
   if (p1)
     return LSResourceResolverProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSResourceResolver::bridge(ExecState* p1) const {
@@ -3070,7 +3070,7 @@ ObjectImp* LSResourceResolver::bridge(ExecState* p1) const {
       p1, static_cast<LSResourceResolver::Private*>(d));
 }
 
-Value LSResourceResolver::cache(ExecState* p1) const {
+ValueImp* LSResourceResolver::cache(ExecState* p1) const {
   return cacheDOMObject<LSResourceResolver>(
       p1, static_cast<LSResourceResolver::Private*>(d));
 }
@@ -3079,13 +3079,13 @@ bool LSSerializer::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&LSSerializer::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = LSSerializerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = LSSerializerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value LSSerializer::get(GET_METHOD_ARGS) const {
+ValueImp* LSSerializer::get(GET_METHOD_ARGS) const {
   return lookupGet<LSSerializerProtoFunc, LSSerializer>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
@@ -3116,10 +3116,10 @@ LSSerializer KDOM::EcmaInterface::inheritedLSSerializerCast(
   return LSSerializer::null;
 }
 
-Value LSSerializer::getInParents(GET_METHOD_ARGS) const {
-  Object proto = LSSerializerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* LSSerializer::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = LSSerializerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -3136,10 +3136,10 @@ bool LSSerializer::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object LSSerializer::prototype(ExecState* p1) const {
+ObjectImp* LSSerializer::prototype(ExecState* p1) const {
   if (p1)
     return LSSerializerProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSSerializer::bridge(ExecState* p1) const {
@@ -3147,7 +3147,7 @@ ObjectImp* LSSerializer::bridge(ExecState* p1) const {
                                        static_cast<LSSerializer::Private*>(d));
 }
 
-Value LSSerializer::cache(ExecState* p1) const {
+ValueImp* LSSerializer::cache(ExecState* p1) const {
   return cacheDOMObject<LSSerializer>(p1,
                                       static_cast<LSSerializer::Private*>(d));
 }
@@ -3161,21 +3161,21 @@ bool LSSerializerFilter::hasProperty(ExecState* p1,
   return false;
 }
 
-Value LSSerializerFilter::get(GET_METHOD_ARGS) const {
+ValueImp* LSSerializerFilter::get(GET_METHOD_ARGS) const {
   return lookupGetValue<LSSerializerFilter>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value LSSerializerFilter::getInParents(GET_METHOD_ARGS) const {
+ValueImp* LSSerializerFilter::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object LSSerializerFilter::prototype(ExecState* p1) const {
+ObjectImp* LSSerializerFilter::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* LSSerializerFilter::bridge(ExecState* p1) const {
@@ -3183,7 +3183,7 @@ ObjectImp* LSSerializerFilter::bridge(ExecState* p1) const {
       p1, static_cast<LSSerializerFilter::Private*>(d));
 }
 
-Value LSSerializerFilter::cache(ExecState* p1) const {
+ValueImp* LSSerializerFilter::cache(ExecState* p1) const {
   return cacheDOMObject<LSSerializerFilter>(
       p1, static_cast<LSSerializerFilter::Private*>(d));
 }
@@ -3192,8 +3192,8 @@ bool MediaList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&MediaList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = MediaListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = MediaListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -3202,7 +3202,7 @@ bool MediaList::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value MediaList::get(GET_METHOD_ARGS) const {
+ValueImp* MediaList::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -3236,10 +3236,10 @@ MediaList KDOM::EcmaInterface::inheritedMediaListCast(const ObjectImp* p1) {
   return MediaList::null;
 }
 
-Value MediaList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = MediaListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* MediaList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = MediaListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -3256,17 +3256,17 @@ bool MediaList::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object MediaList::prototype(ExecState* p1) const {
+ObjectImp* MediaList::prototype(ExecState* p1) const {
   if (p1)
     return MediaListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* MediaList::bridge(ExecState* p1) const {
   return new DOMRWBridge<MediaList>(p1, static_cast<MediaList::Private*>(d));
 }
 
-Value MediaList::cache(ExecState* p1) const {
+ValueImp* MediaList::cache(ExecState* p1) const {
   return cacheDOMObject<MediaList>(p1, static_cast<MediaList::Private*>(d));
 }
 
@@ -3274,15 +3274,15 @@ bool MouseEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&MouseEvent::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = MouseEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = MouseEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (UIEvent::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value MouseEvent::get(GET_METHOD_ARGS) const {
+ValueImp* MouseEvent::get(GET_METHOD_ARGS) const {
   return lookupGet<MouseEventProtoFunc, MouseEvent>(p1, p2, &s_hashTable, this,
                                                     p3);
 }
@@ -3312,26 +3312,26 @@ MouseEvent KDOM::EcmaInterface::inheritedMouseEventCast(const ObjectImp* p1) {
   return MouseEvent::null;
 }
 
-Value MouseEvent::getInParents(GET_METHOD_ARGS) const {
-  Object proto = MouseEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* MouseEvent::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = MouseEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (UIEvent::hasProperty(p1, p2))
     return UIEvent::get(p1, p2, p3);
   return Undefined();
 }
 
-Object MouseEvent::prototype(ExecState* p1) const {
+ObjectImp* MouseEvent::prototype(ExecState* p1) const {
   if (p1)
     return MouseEventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* MouseEvent::bridge(ExecState* p1) const {
   return new DOMBridge<MouseEvent>(p1, static_cast<MouseEvent::Private*>(d));
 }
 
-Value MouseEvent::cache(ExecState* p1) const {
+ValueImp* MouseEvent::cache(ExecState* p1) const {
   return cacheDOMObject<MouseEvent>(p1, static_cast<MouseEvent::Private*>(d));
 }
 
@@ -3339,15 +3339,15 @@ bool MutationEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&MutationEvent::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = MutationEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = MutationEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (Event::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value MutationEvent::get(GET_METHOD_ARGS) const {
+ValueImp* MutationEvent::get(GET_METHOD_ARGS) const {
   return lookupGet<MutationEventProtoFunc, MutationEvent>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
@@ -3378,19 +3378,19 @@ MutationEvent KDOM::EcmaInterface::inheritedMutationEventCast(
   return MutationEvent::null;
 }
 
-Value MutationEvent::getInParents(GET_METHOD_ARGS) const {
-  Object proto = MutationEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* MutationEvent::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = MutationEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (Event::hasProperty(p1, p2))
     return Event::get(p1, p2, p3);
   return Undefined();
 }
 
-Object MutationEvent::prototype(ExecState* p1) const {
+ObjectImp* MutationEvent::prototype(ExecState* p1) const {
   if (p1)
     return MutationEventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* MutationEvent::bridge(ExecState* p1) const {
@@ -3398,7 +3398,7 @@ ObjectImp* MutationEvent::bridge(ExecState* p1) const {
                                       static_cast<MutationEvent::Private*>(d));
 }
 
-Value MutationEvent::cache(ExecState* p1) const {
+ValueImp* MutationEvent::cache(ExecState* p1) const {
   return cacheDOMObject<MutationEvent>(p1,
                                        static_cast<MutationEvent::Private*>(d));
 }
@@ -3407,8 +3407,8 @@ bool NamedNodeMap::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&NamedNodeMap::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = NamedNodeMapProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = NamedNodeMapProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -3417,7 +3417,7 @@ bool NamedNodeMap::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value NamedNodeMap::get(GET_METHOD_ARGS) const {
+ValueImp* NamedNodeMap::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -3452,10 +3452,10 @@ NamedNodeMap KDOM::EcmaInterface::inheritedNamedNodeMapCast(
   return NamedNodeMap::null;
 }
 
-Value NamedNodeMap::getInParents(GET_METHOD_ARGS) const {
-  Object proto = NamedNodeMapProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* NamedNodeMap::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = NamedNodeMapProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -3468,10 +3468,10 @@ bool NamedNodeMap::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object NamedNodeMap::prototype(ExecState* p1) const {
+ObjectImp* NamedNodeMap::prototype(ExecState* p1) const {
   if (p1)
     return NamedNodeMapProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* NamedNodeMap::bridge(ExecState* p1) const {
@@ -3479,7 +3479,7 @@ ObjectImp* NamedNodeMap::bridge(ExecState* p1) const {
                                        static_cast<NamedNodeMap::Private*>(d));
 }
 
-Value NamedNodeMap::cache(ExecState* p1) const {
+ValueImp* NamedNodeMap::cache(ExecState* p1) const {
   return cacheDOMObject<NamedNodeMap>(p1,
                                       static_cast<NamedNodeMap::Private*>(d));
 }
@@ -3488,15 +3488,15 @@ bool Node::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Node::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = NodeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = NodeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (EventTarget::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value Node::get(GET_METHOD_ARGS) const {
+ValueImp* Node::get(GET_METHOD_ARGS) const {
   return lookupGet<NodeProtoFunc, Node>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -3608,10 +3608,10 @@ Node KDOM::EcmaInterface::inheritedNodeCast(const ObjectImp* p1) {
   return Node::null;
 }
 
-Value Node::getInParents(GET_METHOD_ARGS) const {
-  Object proto = NodeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Node::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = NodeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (EventTarget::hasProperty(p1, p2))
     return EventTarget::get(p1, p2, p3);
   return Undefined();
@@ -3629,17 +3629,17 @@ bool Node::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Node::prototype(ExecState* p1) const {
+ObjectImp* Node::prototype(ExecState* p1) const {
   if (p1)
     return NodeProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Node::bridge(ExecState* p1) const {
   return new DOMRWBridge<Node>(p1, static_cast<Node::Private*>(d));
 }
 
-Value Node::cache(ExecState* p1) const {
+ValueImp* Node::cache(ExecState* p1) const {
   return cacheDOMObject<Node>(p1, static_cast<Node::Private*>(d));
 }
 
@@ -3647,13 +3647,13 @@ bool NodeIterator::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&NodeIterator::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = NodeIteratorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = NodeIteratorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value NodeIterator::get(GET_METHOD_ARGS) const {
+ValueImp* NodeIterator::get(GET_METHOD_ARGS) const {
   return lookupGet<NodeIteratorProtoFunc, NodeIterator>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
@@ -3684,18 +3684,18 @@ NodeIterator KDOM::EcmaInterface::inheritedNodeIteratorCast(
   return NodeIterator::null;
 }
 
-Value NodeIterator::getInParents(GET_METHOD_ARGS) const {
-  Object proto = NodeIteratorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* NodeIterator::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = NodeIteratorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object NodeIterator::prototype(ExecState* p1) const {
+ObjectImp* NodeIterator::prototype(ExecState* p1) const {
   if (p1)
     return NodeIteratorProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* NodeIterator::bridge(ExecState* p1) const {
@@ -3703,7 +3703,7 @@ ObjectImp* NodeIterator::bridge(ExecState* p1) const {
                                      static_cast<NodeIterator::Private*>(d));
 }
 
-Value NodeIterator::cache(ExecState* p1) const {
+ValueImp* NodeIterator::cache(ExecState* p1) const {
   return cacheDOMObject<NodeIterator>(p1,
                                       static_cast<NodeIterator::Private*>(d));
 }
@@ -3712,8 +3712,8 @@ bool NodeList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&NodeList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = NodeListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = NodeListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -3722,7 +3722,7 @@ bool NodeList::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value NodeList::get(GET_METHOD_ARGS) const {
+ValueImp* NodeList::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -3755,25 +3755,25 @@ NodeList KDOM::EcmaInterface::inheritedNodeListCast(const ObjectImp* p1) {
   return NodeList::null;
 }
 
-Value NodeList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = NodeListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* NodeList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = NodeListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object NodeList::prototype(ExecState* p1) const {
+ObjectImp* NodeList::prototype(ExecState* p1) const {
   if (p1)
     return NodeListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* NodeList::bridge(ExecState* p1) const {
   return new DOMBridge<NodeList>(p1, static_cast<NodeList::Private*>(d));
 }
 
-Value NodeList::cache(ExecState* p1) const {
+ValueImp* NodeList::cache(ExecState* p1) const {
   return cacheDOMObject<NodeList>(p1, static_cast<NodeList::Private*>(d));
 }
 
@@ -3786,11 +3786,11 @@ bool Notation::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value Notation::get(GET_METHOD_ARGS) const {
+ValueImp* Notation::get(GET_METHOD_ARGS) const {
   return lookupGetValue<Notation>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value Notation::getInParents(GET_METHOD_ARGS) const {
+ValueImp* Notation::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -3804,17 +3804,17 @@ bool Notation::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Notation::prototype(ExecState* p1) const {
+ObjectImp* Notation::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Notation::bridge(ExecState* p1) const {
   return new DOMRWBridge<Notation>(p1, static_cast<Notation::Private*>(d));
 }
 
-Value Notation::cache(ExecState* p1) const {
+ValueImp* Notation::cache(ExecState* p1) const {
   return cacheDOMObject<Notation>(p1, static_cast<Notation::Private*>(d));
 }
 
@@ -3829,11 +3829,11 @@ bool ProcessingInstruction::hasProperty(ExecState* p1,
   return false;
 }
 
-Value ProcessingInstruction::get(GET_METHOD_ARGS) const {
+ValueImp* ProcessingInstruction::get(GET_METHOD_ARGS) const {
   return lookupGetValue<ProcessingInstruction>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value ProcessingInstruction::getInParents(GET_METHOD_ARGS) const {
+ValueImp* ProcessingInstruction::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -3851,10 +3851,10 @@ bool ProcessingInstruction::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object ProcessingInstruction::prototype(ExecState* p1) const {
+ObjectImp* ProcessingInstruction::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* ProcessingInstruction::bridge(ExecState* p1) const {
@@ -3862,7 +3862,7 @@ ObjectImp* ProcessingInstruction::bridge(ExecState* p1) const {
       p1, static_cast<ProcessingInstruction::Private*>(d));
 }
 
-Value ProcessingInstruction::cache(ExecState* p1) const {
+ValueImp* ProcessingInstruction::cache(ExecState* p1) const {
   return cacheDOMObject<ProcessingInstruction>(
       p1, static_cast<ProcessingInstruction::Private*>(d));
 }
@@ -3875,21 +3875,21 @@ bool KDOM::RGBColor::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value KDOM::RGBColor::get(GET_METHOD_ARGS) const {
+ValueImp* KDOM::RGBColor::get(GET_METHOD_ARGS) const {
   return lookupGetValue<KDOM::RGBColor>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value KDOM::RGBColor::getInParents(GET_METHOD_ARGS) const {
+ValueImp* KDOM::RGBColor::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object KDOM::RGBColor::prototype(ExecState* p1) const {
+ObjectImp* KDOM::RGBColor::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* KDOM::RGBColor::bridge(ExecState* p1) const {
@@ -3897,7 +3897,7 @@ ObjectImp* KDOM::RGBColor::bridge(ExecState* p1) const {
       p1, static_cast<KDOM::RGBColor::Private*>(d));
 }
 
-Value KDOM::RGBColor::cache(ExecState* p1) const {
+ValueImp* KDOM::RGBColor::cache(ExecState* p1) const {
   return cacheDOMObject<KDOM::RGBColor>(
       p1, static_cast<KDOM::RGBColor::Private*>(d));
 }
@@ -3906,13 +3906,13 @@ bool Range::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Range::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = RangeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = RangeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value Range::get(GET_METHOD_ARGS) const {
+ValueImp* Range::get(GET_METHOD_ARGS) const {
   return lookupGet<RangeProtoFunc, Range>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -3943,25 +3943,25 @@ Range KDOM::EcmaInterface::inheritedRangeCast(const ObjectImp* p1) {
   return Range::null;
 }
 
-Value Range::getInParents(GET_METHOD_ARGS) const {
-  Object proto = RangeProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Range::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = RangeProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object Range::prototype(ExecState* p1) const {
+ObjectImp* Range::prototype(ExecState* p1) const {
   if (p1)
     return RangeProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Range::bridge(ExecState* p1) const {
   return new DOMBridge<Range>(p1, static_cast<Range::Private*>(d));
 }
 
-Value Range::cache(ExecState* p1) const {
+ValueImp* Range::cache(ExecState* p1) const {
   return cacheDOMObject<Range>(p1, static_cast<Range::Private*>(d));
 }
 
@@ -3973,21 +3973,21 @@ bool RangeException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value RangeException::get(GET_METHOD_ARGS) const {
+ValueImp* RangeException::get(GET_METHOD_ARGS) const {
   return lookupGetValue<RangeException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value RangeException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* RangeException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object RangeException::prototype(ExecState* p1) const {
+ObjectImp* RangeException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* RangeException::bridge(ExecState* p1) const {
@@ -3995,7 +3995,7 @@ ObjectImp* RangeException::bridge(ExecState* p1) const {
       p1, static_cast<RangeException::Private*>(d));
 }
 
-Value RangeException::cache(ExecState* p1) const {
+ValueImp* RangeException::cache(ExecState* p1) const {
   return cacheDOMObject<RangeException>(
       p1, static_cast<RangeException::Private*>(d));
 }
@@ -4008,28 +4008,28 @@ bool KDOM::Rect::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value KDOM::Rect::get(GET_METHOD_ARGS) const {
+ValueImp* KDOM::Rect::get(GET_METHOD_ARGS) const {
   return lookupGetValue<Rect>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value KDOM::Rect::getInParents(GET_METHOD_ARGS) const {
+ValueImp* KDOM::Rect::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object KDOM::Rect::prototype(ExecState* p1) const {
+ObjectImp* KDOM::Rect::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* KDOM::Rect::bridge(ExecState* p1) const {
   return new DOMBridge<KDOM::Rect>(p1, static_cast<KDOM::Rect::Private*>(d));
 }
 
-Value KDOM::Rect::cache(ExecState* p1) const {
+ValueImp* KDOM::Rect::cache(ExecState* p1) const {
   return cacheDOMObject<KDOM::Rect>(p1, static_cast<KDOM::Rect::Private*>(d));
 }
 
@@ -4041,11 +4041,11 @@ bool StyleSheet::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value StyleSheet::get(GET_METHOD_ARGS) const {
+ValueImp* StyleSheet::get(GET_METHOD_ARGS) const {
   return lookupGetValue<StyleSheet>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value StyleSheet::getInParents(GET_METHOD_ARGS) const {
+ValueImp* StyleSheet::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -4064,17 +4064,17 @@ bool StyleSheet::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object StyleSheet::prototype(ExecState* p1) const {
+ObjectImp* StyleSheet::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* StyleSheet::bridge(ExecState* p1) const {
   return new DOMRWBridge<StyleSheet>(p1, static_cast<StyleSheet::Private*>(d));
 }
 
-Value StyleSheet::cache(ExecState* p1) const {
+ValueImp* StyleSheet::cache(ExecState* p1) const {
   return cacheDOMObject<StyleSheet>(p1, static_cast<StyleSheet::Private*>(d));
 }
 
@@ -4082,8 +4082,8 @@ bool StyleSheetList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&StyleSheetList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = StyleSheetListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = StyleSheetListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
@@ -4092,7 +4092,7 @@ bool StyleSheetList::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value StyleSheetList::get(GET_METHOD_ARGS) const {
+ValueImp* StyleSheetList::get(GET_METHOD_ARGS) const {
   bool ok;
   unsigned int i = p2.toArrayIndex(&ok);
   if (ok && i < length())
@@ -4128,18 +4128,18 @@ StyleSheetList KDOM::EcmaInterface::inheritedStyleSheetListCast(
   return StyleSheetList::null;
 }
 
-Value StyleSheetList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = StyleSheetListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* StyleSheetList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = StyleSheetListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object StyleSheetList::prototype(ExecState* p1) const {
+ObjectImp* StyleSheetList::prototype(ExecState* p1) const {
   if (p1)
     return StyleSheetListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* StyleSheetList::bridge(ExecState* p1) const {
@@ -4147,7 +4147,7 @@ ObjectImp* StyleSheetList::bridge(ExecState* p1) const {
       p1, static_cast<StyleSheetList::Private*>(d));
 }
 
-Value StyleSheetList::cache(ExecState* p1) const {
+ValueImp* StyleSheetList::cache(ExecState* p1) const {
   return cacheDOMObject<StyleSheetList>(
       p1, static_cast<StyleSheetList::Private*>(d));
 }
@@ -4156,15 +4156,15 @@ bool Text::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&Text::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = TextProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = TextProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (CharacterData::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value Text::get(GET_METHOD_ARGS) const {
+ValueImp* Text::get(GET_METHOD_ARGS) const {
   return lookupGet<TextProtoFunc, Text>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -4197,10 +4197,10 @@ Text KDOM::EcmaInterface::inheritedTextCast(const ObjectImp* p1) {
   return Text::null;
 }
 
-Value Text::getInParents(GET_METHOD_ARGS) const {
-  Object proto = TextProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* Text::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = TextProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (CharacterData::hasProperty(p1, p2))
     return CharacterData::get(p1, p2, p3);
   return Undefined();
@@ -4214,17 +4214,17 @@ bool Text::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object Text::prototype(ExecState* p1) const {
+ObjectImp* Text::prototype(ExecState* p1) const {
   if (p1)
     return TextProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* Text::bridge(ExecState* p1) const {
   return new DOMRWBridge<Text>(p1, static_cast<Text::Private*>(d));
 }
 
-Value Text::cache(ExecState* p1) const {
+ValueImp* Text::cache(ExecState* p1) const {
   return cacheDOMObject<Text>(p1, static_cast<Text::Private*>(d));
 }
 
@@ -4232,13 +4232,13 @@ bool TreeWalker::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&TreeWalker::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = TreeWalkerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = TreeWalkerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value TreeWalker::get(GET_METHOD_ARGS) const {
+ValueImp* TreeWalker::get(GET_METHOD_ARGS) const {
   return lookupGet<TreeWalkerProtoFunc, TreeWalker>(p1, p2, &s_hashTable, this,
                                                     p3);
 }
@@ -4268,10 +4268,10 @@ TreeWalker KDOM::EcmaInterface::inheritedTreeWalkerCast(const ObjectImp* p1) {
   return TreeWalker::null;
 }
 
-Value TreeWalker::getInParents(GET_METHOD_ARGS) const {
-  Object proto = TreeWalkerProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* TreeWalker::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = TreeWalkerProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -4288,17 +4288,17 @@ bool TreeWalker::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object TreeWalker::prototype(ExecState* p1) const {
+ObjectImp* TreeWalker::prototype(ExecState* p1) const {
   if (p1)
     return TreeWalkerProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* TreeWalker::bridge(ExecState* p1) const {
   return new DOMRWBridge<TreeWalker>(p1, static_cast<TreeWalker::Private*>(d));
 }
 
-Value TreeWalker::cache(ExecState* p1) const {
+ValueImp* TreeWalker::cache(ExecState* p1) const {
   return cacheDOMObject<TreeWalker>(p1, static_cast<TreeWalker::Private*>(d));
 }
 
@@ -4306,13 +4306,13 @@ bool TypeInfo::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&TypeInfo::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = TypeInfoProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = TypeInfoProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value TypeInfo::get(GET_METHOD_ARGS) const {
+ValueImp* TypeInfo::get(GET_METHOD_ARGS) const {
   return lookupGet<TypeInfoProtoFunc, TypeInfo>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -4341,25 +4341,25 @@ TypeInfo KDOM::EcmaInterface::inheritedTypeInfoCast(const ObjectImp* p1) {
   return TypeInfo::null;
 }
 
-Value TypeInfo::getInParents(GET_METHOD_ARGS) const {
-  Object proto = TypeInfoProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* TypeInfo::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = TypeInfoProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object TypeInfo::prototype(ExecState* p1) const {
+ObjectImp* TypeInfo::prototype(ExecState* p1) const {
   if (p1)
     return TypeInfoProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* TypeInfo::bridge(ExecState* p1) const {
   return new DOMBridge<TypeInfo>(p1, static_cast<TypeInfo::Private*>(d));
 }
 
-Value TypeInfo::cache(ExecState* p1) const {
+ValueImp* TypeInfo::cache(ExecState* p1) const {
   return cacheDOMObject<TypeInfo>(p1, static_cast<TypeInfo::Private*>(d));
 }
 
@@ -4367,15 +4367,15 @@ bool UIEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&UIEvent::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = UIEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = UIEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (Event::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value UIEvent::get(GET_METHOD_ARGS) const {
+ValueImp* UIEvent::get(GET_METHOD_ARGS) const {
   return lookupGet<UIEventProtoFunc, UIEvent>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -4416,26 +4416,26 @@ UIEvent KDOM::EcmaInterface::inheritedUIEventCast(const ObjectImp* p1) {
   return UIEvent::null;
 }
 
-Value UIEvent::getInParents(GET_METHOD_ARGS) const {
-  Object proto = UIEventProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* UIEvent::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = UIEventProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (Event::hasProperty(p1, p2))
     return Event::get(p1, p2, p3);
   return Undefined();
 }
 
-Object UIEvent::prototype(ExecState* p1) const {
+ObjectImp* UIEvent::prototype(ExecState* p1) const {
   if (p1)
     return UIEventProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* UIEvent::bridge(ExecState* p1) const {
   return new DOMBridge<UIEvent>(p1, static_cast<UIEvent::Private*>(d));
 }
 
-Value UIEvent::cache(ExecState* p1) const {
+ValueImp* UIEvent::cache(ExecState* p1) const {
   return cacheDOMObject<UIEvent>(p1, static_cast<UIEvent::Private*>(d));
 }
 
@@ -4443,13 +4443,13 @@ bool XPathEvaluator::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&XPathEvaluator::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = XPathEvaluatorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = XPathEvaluatorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value XPathEvaluator::get(GET_METHOD_ARGS) const {
+ValueImp* XPathEvaluator::get(GET_METHOD_ARGS) const {
   return lookupGet<XPathEvaluatorProtoFunc, XPathEvaluator>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4488,18 +4488,18 @@ XPathEvaluator KDOM::EcmaInterface::inheritedXPathEvaluatorCast(
   return XPathEvaluator::null;
 }
 
-Value XPathEvaluator::getInParents(GET_METHOD_ARGS) const {
-  Object proto = XPathEvaluatorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* XPathEvaluator::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = XPathEvaluatorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object XPathEvaluator::prototype(ExecState* p1) const {
+ObjectImp* XPathEvaluator::prototype(ExecState* p1) const {
   if (p1)
     return XPathEvaluatorProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathEvaluator::bridge(ExecState* p1) const {
@@ -4507,7 +4507,7 @@ ObjectImp* XPathEvaluator::bridge(ExecState* p1) const {
       p1, static_cast<XPathEvaluator::Private*>(d));
 }
 
-Value XPathEvaluator::cache(ExecState* p1) const {
+ValueImp* XPathEvaluator::cache(ExecState* p1) const {
   return cacheDOMObject<XPathEvaluator>(
       p1, static_cast<XPathEvaluator::Private*>(d));
 }
@@ -4520,21 +4520,21 @@ bool XPathException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value XPathException::get(GET_METHOD_ARGS) const {
+ValueImp* XPathException::get(GET_METHOD_ARGS) const {
   return lookupGetValue<XPathException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value XPathException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* XPathException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object XPathException::prototype(ExecState* p1) const {
+ObjectImp* XPathException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathException::bridge(ExecState* p1) const {
@@ -4542,7 +4542,7 @@ ObjectImp* XPathException::bridge(ExecState* p1) const {
       p1, static_cast<XPathException::Private*>(d));
 }
 
-Value XPathException::cache(ExecState* p1) const {
+ValueImp* XPathException::cache(ExecState* p1) const {
   return cacheDOMObject<XPathException>(
       p1, static_cast<XPathException::Private*>(d));
 }
@@ -4551,13 +4551,13 @@ bool XPathExpression::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&XPathExpression::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = XPathExpressionProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = XPathExpressionProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value XPathExpression::get(GET_METHOD_ARGS) const {
+ValueImp* XPathExpression::get(GET_METHOD_ARGS) const {
   return lookupGet<XPathExpressionProtoFunc, XPathExpression>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4589,18 +4589,18 @@ XPathExpression KDOM::EcmaInterface::inheritedXPathExpressionCast(
   return XPathExpression::null;
 }
 
-Value XPathExpression::getInParents(GET_METHOD_ARGS) const {
-  Object proto = XPathExpressionProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* XPathExpression::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = XPathExpressionProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object XPathExpression::prototype(ExecState* p1) const {
+ObjectImp* XPathExpression::prototype(ExecState* p1) const {
   if (p1)
     return XPathExpressionProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathExpression::bridge(ExecState* p1) const {
@@ -4608,7 +4608,7 @@ ObjectImp* XPathExpression::bridge(ExecState* p1) const {
       p1, static_cast<XPathExpression::Private*>(d));
 }
 
-Value XPathExpression::cache(ExecState* p1) const {
+ValueImp* XPathExpression::cache(ExecState* p1) const {
   return cacheDOMObject<XPathExpression>(
       p1, static_cast<XPathExpression::Private*>(d));
 }
@@ -4617,13 +4617,13 @@ bool XPathNSResolver::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&XPathNSResolver::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = XPathNSResolverProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = XPathNSResolverProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value XPathNSResolver::get(GET_METHOD_ARGS) const {
+ValueImp* XPathNSResolver::get(GET_METHOD_ARGS) const {
   return lookupGet<XPathNSResolverProtoFunc, XPathNSResolver>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4660,18 +4660,18 @@ XPathNSResolver KDOM::EcmaInterface::inheritedXPathNSResolverCast(
   return XPathNSResolver::null;
 }
 
-Value XPathNSResolver::getInParents(GET_METHOD_ARGS) const {
-  Object proto = XPathNSResolverProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* XPathNSResolver::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = XPathNSResolverProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object XPathNSResolver::prototype(ExecState* p1) const {
+ObjectImp* XPathNSResolver::prototype(ExecState* p1) const {
   if (p1)
     return XPathNSResolverProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathNSResolver::bridge(ExecState* p1) const {
@@ -4679,7 +4679,7 @@ ObjectImp* XPathNSResolver::bridge(ExecState* p1) const {
       p1, static_cast<XPathNSResolver::Private*>(d));
 }
 
-Value XPathNSResolver::cache(ExecState* p1) const {
+ValueImp* XPathNSResolver::cache(ExecState* p1) const {
   return cacheDOMObject<XPathNSResolver>(
       p1, static_cast<XPathNSResolver::Private*>(d));
 }
@@ -4693,11 +4693,11 @@ bool XPathNamespace::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value XPathNamespace::get(GET_METHOD_ARGS) const {
+ValueImp* XPathNamespace::get(GET_METHOD_ARGS) const {
   return lookupGetValue<XPathNamespace>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value XPathNamespace::getInParents(GET_METHOD_ARGS) const {
+ValueImp* XPathNamespace::getInParents(GET_METHOD_ARGS) const {
   if (Node::hasProperty(p1, p2))
     return Node::get(p1, p2, p3);
   return Undefined();
@@ -4711,10 +4711,10 @@ bool XPathNamespace::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object XPathNamespace::prototype(ExecState* p1) const {
+ObjectImp* XPathNamespace::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathNamespace::bridge(ExecState* p1) const {
@@ -4722,7 +4722,7 @@ ObjectImp* XPathNamespace::bridge(ExecState* p1) const {
       p1, static_cast<XPathNamespace::Private*>(d));
 }
 
-Value XPathNamespace::cache(ExecState* p1) const {
+ValueImp* XPathNamespace::cache(ExecState* p1) const {
   return cacheDOMObject<XPathNamespace>(
       p1, static_cast<XPathNamespace::Private*>(d));
 }
@@ -4731,13 +4731,13 @@ bool XPathResult::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&XPathResult::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = XPathResultProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = XPathResultProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value XPathResult::get(GET_METHOD_ARGS) const {
+ValueImp* XPathResult::get(GET_METHOD_ARGS) const {
   return lookupGet<XPathResultProtoFunc, XPathResult>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -4767,24 +4767,24 @@ XPathResult KDOM::EcmaInterface::inheritedXPathResultCast(const ObjectImp* p1) {
   return XPathResult::null;
 }
 
-Value XPathResult::getInParents(GET_METHOD_ARGS) const {
-  Object proto = XPathResultProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* XPathResult::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = XPathResultProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object XPathResult::prototype(ExecState* p1) const {
+ObjectImp* XPathResult::prototype(ExecState* p1) const {
   if (p1)
     return XPathResultProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* XPathResult::bridge(ExecState* p1) const {
   return new DOMBridge<XPathResult>(p1, static_cast<XPathResult::Private*>(d));
 }
 
-Value XPathResult::cache(ExecState* p1) const {
+ValueImp* XPathResult::cache(ExecState* p1) const {
   return cacheDOMObject<XPathResult>(p1, static_cast<XPathResult::Private*>(d));
 }

@@ -50,7 +50,7 @@ class CSSFontFaceRule : public CSSRule {
   KDOM_GET
   KDOM_PUT
 
-  KJS::Value getValueProperty(KJS::ExecState* exec, int token) const;
+  KJS::ValueImp* getValueProperty(KJS::ExecState* exec, int token) const;
 };
 };
 

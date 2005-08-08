@@ -45,7 +45,7 @@ using namespace KSVG;
 
 KSVG_IMPLEMENT_PROTOTYPE("SVGPaint", SVGPaintProto, SVGPaintProtoFunc)
 
-Value SVGPaint::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGPaint::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -60,9 +60,9 @@ Value SVGPaint::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value SVGPaintProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* SVGPaintProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(SVGPaint)
   KDOM_ENTER_SAFE
 
@@ -73,7 +73,7 @@ Value SVGPaintProtoFunc::call(ExecState* exec,
       return Undefined();
     }
     case SVGPaintConstants::SetPaint: {
-      unsigned short paintType = args[0].toUInt16(exec);
+      unsigned short paintType = args[0]->toUInt16(exec);
       KDOM::DOMString uri = KDOM::toDOMString(exec, args[1]);
       KDOM::DOMString rgbPaint = KDOM::toDOMString(exec, args[2]);
       KDOM::DOMString iccPaint = KDOM::toDOMString(exec, args[3]);

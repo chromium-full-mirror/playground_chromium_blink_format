@@ -40,7 +40,7 @@ using namespace KJS;
 @end
 */
 
-KJS::Value Rect::getValueProperty(ExecState* exec, int token) const {
+KJS::ValueImp* Rect::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case RectConstants::Top:
       return safe_cache<CSSPrimitiveValue>(exec, top());

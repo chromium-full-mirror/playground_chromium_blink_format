@@ -60,7 +60,7 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGPathSegList",
                          SVGPathSegListProto,
                          SVGPathSegListProtoFunc)
 
-Value SVGPathSegList::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGPathSegList::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -75,9 +75,9 @@ Value SVGPathSegList::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value SVGPathSegListProtoFunc::call(ExecState* exec,
-                                    Object& thisObj,
-                                    const List& args) {
+ValueImp* SVGPathSegListProtoFunc::callAsFunction(ExecState* exec,
+                                                  ObjectImp* thisObj,
+                                                  const List& args) {
   KDOM_CHECK_THIS(SVGPathSegList)
   KDOM_ENTER_SAFE
 
@@ -92,23 +92,23 @@ Value SVGPathSegListProtoFunc::call(ExecState* exec,
       return getSVGPathSeg(exec, obj.initialize(newItem));
     }
     case SVGPathSegListConstants::GetItem: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return getSVGPathSeg(exec, obj.getItem(index));
     }
     case SVGPathSegListConstants::InsertItemBefore: {
       SVGPathSeg newItem =
           KDOM::ecma_cast<SVGPathSeg>(exec, args[0], &toSVGPathSeg);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       return getSVGPathSeg(exec, obj.insertItemBefore(newItem, index));
     }
     case SVGPathSegListConstants::ReplaceItem: {
       SVGPathSeg newItem =
           KDOM::ecma_cast<SVGPathSeg>(exec, args[0], &toSVGPathSeg);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       return getSVGPathSeg(exec, obj.replaceItem(newItem, index));
     }
     case SVGPathSegListConstants::RemoveItem: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return getSVGPathSeg(exec, obj.removeItem(index));
     }
     case SVGPathSegListConstants::AppendItem: {

@@ -72,7 +72,8 @@ KDOM_IMPLEMENT_PROTOTYPE("DOMImplementation",
                          DOMImplementationProto,
                          DOMImplementationProtoFunc)
 
-Value DOMImplementation::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DOMImplementation::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -85,9 +86,9 @@ Value DOMImplementation::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value DOMImplementationProtoFunc::call(ExecState* exec,
-                                       Object& thisObj,
-                                       const List& args) {
+ValueImp* DOMImplementationProtoFunc::callAsFunction(ExecState* exec,
+                                                     ObjectImp* thisObj,
+                                                     const List& args) {
   KDOM_CHECK_THIS(DOMImplementation)
   KDOM_ENTER_SAFE
 
@@ -133,7 +134,7 @@ Value DOMImplementationProtoFunc::call(ExecState* exec,
                                        obj.createCSSStyleSheet(title, media));
     }
     case DOMImplementationConstants::CreateLSParser: {
-      unsigned short mode = args[0].toUInt32(exec);
+      unsigned short mode = args[0]->toUInt32(exec);
       DOMString schemaType = toDOMString(exec, args[1]);
       return safe_cache<LSParser>(exec, obj.createLSParser(mode, schemaType));
     }

@@ -41,8 +41,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGAnimatedNumberList::getValueProperty(ExecState* exec,
-                                              int token) const {
+ValueImp* SVGAnimatedNumberList::getValueProperty(ExecState* exec,
+                                                  int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

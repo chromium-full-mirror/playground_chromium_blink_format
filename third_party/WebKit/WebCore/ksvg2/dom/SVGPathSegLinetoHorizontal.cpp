@@ -33,8 +33,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGPathSegLinetoHorizontalAbs::getValueProperty(ExecState*,
-                                                      int token) const {
+ValueImp* SVGPathSegLinetoHorizontalAbs::getValueProperty(ExecState*,
+                                                          int token) const {
   switch (token) {
     case SVGPathSegLinetoHorizontalConstants::X:
       return Number(x());
@@ -48,11 +48,11 @@ Value SVGPathSegLinetoHorizontalAbs::getValueProperty(ExecState*,
 
 void SVGPathSegLinetoHorizontalAbs::putValueProperty(ExecState* exec,
                                                      int token,
-                                                     const Value& value,
+                                                     ValueImp* value,
                                                      int) {
   switch (token) {
     case SVGPathSegLinetoHorizontalConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     default:
@@ -112,8 +112,8 @@ float SVGPathSegLinetoHorizontalAbs::x() const {
 @end
 */
 
-Value SVGPathSegLinetoHorizontalRel::getValueProperty(ExecState*,
-                                                      int token) const {
+ValueImp* SVGPathSegLinetoHorizontalRel::getValueProperty(ExecState*,
+                                                          int token) const {
   switch (token) {
     case SVGPathSegLinetoHorizontalConstants::X:
       return Number(x());
@@ -127,11 +127,11 @@ Value SVGPathSegLinetoHorizontalRel::getValueProperty(ExecState*,
 
 void SVGPathSegLinetoHorizontalRel::putValueProperty(ExecState* exec,
                                                      int token,
-                                                     const Value& value,
+                                                     ValueImp* value,
                                                      int) {
   switch (token) {
     case SVGPathSegLinetoHorizontalConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     default:

@@ -41,7 +41,8 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGFEMergeElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGFEMergeElement::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

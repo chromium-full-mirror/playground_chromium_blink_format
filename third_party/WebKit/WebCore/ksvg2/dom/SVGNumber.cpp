@@ -42,7 +42,7 @@ using namespace KSVG;
 @end
 */
 
-Value SVGNumber::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGNumber::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -59,13 +59,13 @@ Value SVGNumber::getValueProperty(ExecState* exec, int token) const {
 
 void SVGNumber::putValueProperty(ExecState* exec,
                                  int token,
-                                 const Value& value,
+                                 ValueImp* value,
                                  int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGNumberConstants::Value: {
-      setValue(value.toNumber(exec));
+      setValue(value->toNumber(exec));
       break;
     }
     default:

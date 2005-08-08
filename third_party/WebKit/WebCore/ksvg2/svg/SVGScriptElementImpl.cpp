@@ -88,13 +88,14 @@ void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
       ecmaEngine->evaluate(jsCode.string(), ecmaEngine->globalObject());
   if (comp.complType() == KJS::Throw) {
     KJS::ExecState* exec = ecmaEngine->globalExec();
-    KJS::Value exVal = comp.value();
+    KJS::ValueImp* exVal = comp.value();
 
     int lineno = -1;
-    if (exVal.type() == KJS::ObjectType) {
-      KJS::Value lineVal = KJS::Object::dynamicCast(exVal).get(exec, "line");
-      if (lineVal.type() == KJS::NumberType)
-        lineno = int(lineVal.toNumber(exec));
+    if (exVal->isObject()) {
+      KJS::ValueImp* lineVal =
+          static_cast<KJS::ObjectImp*>(exVal)->get(exec, "line");
+      if (lineVal->type() == KJS::NumberType)
+        lineno = int(lineVal->toNumber(exec));
     }
 
     // Fire ERROR_EVENT upon errors...
@@ -113,10 +114,10 @@ void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
     kdDebug() << "[SVGScriptElement] Evaluation error, line "
               << (lineno != -1 ? QString::number(lineno)
                                : QString::fromLatin1("N/A"))
-              << " " << exVal.toString(exec).qstring() << endl;
+              << " " << exVal->toString(exec).qstring() << endl;
   } else if (comp.complType() == KJS::ReturnValue)
     kdDebug() << "[SVGScriptElement] Return value: "
-              << comp.value().toString(ecmaEngine->globalExec()).qstring()
+              << comp.value()->toString(ecmaEngine->globalExec()).qstring()
               << endl;
   else if (comp.complType() == KJS::Normal)
     kdDebug() << "[SVGScriptElement] Evaluated ecma script!" << endl;

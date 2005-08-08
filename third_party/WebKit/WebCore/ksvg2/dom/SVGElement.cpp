@@ -53,7 +53,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGElement::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -76,7 +76,7 @@ Value SVGElement::getValueProperty(ExecState* exec, int token) const {
 
 void SVGElement::putValueProperty(ExecState* exec,
                                   int token,
-                                  const Value& value,
+                                  ValueImp* value,
                                   int) {
   KDOM_ENTER_SAFE
 

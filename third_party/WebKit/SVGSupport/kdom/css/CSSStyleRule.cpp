@@ -42,7 +42,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value CSSStyleRule::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CSSStyleRule::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case CSSStyleRuleConstants::SelectorText:
       return getDOMString(selectorText());
@@ -58,7 +58,7 @@ Value CSSStyleRule::getValueProperty(ExecState* exec, int token) const {
 
 void CSSStyleRule::putValueProperty(ExecState* exec,
                                     int token,
-                                    const Value& value,
+                                    ValueImp* value,
                                     int) {
   KDOM_ENTER_SAFE
 

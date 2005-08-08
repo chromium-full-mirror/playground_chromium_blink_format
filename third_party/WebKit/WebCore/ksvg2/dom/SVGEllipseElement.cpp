@@ -42,7 +42,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGEllipseElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGEllipseElement::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

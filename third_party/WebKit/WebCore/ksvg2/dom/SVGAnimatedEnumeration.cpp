@@ -43,8 +43,8 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGAnimatedEnumeration::getValueProperty(ExecState* exec,
-                                               int token) const {
+ValueImp* SVGAnimatedEnumeration::getValueProperty(ExecState* exec,
+                                                   int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -63,14 +63,14 @@ Value SVGAnimatedEnumeration::getValueProperty(ExecState* exec,
 
 void SVGAnimatedEnumeration::putValueProperty(ExecState* exec,
                                               int token,
-                                              const Value& value,
+                                              ValueImp* value,
                                               int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGAnimatedEnumerationConstants::BaseVal: {
       if (impl)
-        impl->setBaseVal(static_cast<unsigned short>(value.toNumber(exec)));
+        impl->setBaseVal(static_cast<unsigned short>(value->toNumber(exec)));
 
       break;
     }

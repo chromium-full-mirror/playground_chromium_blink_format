@@ -49,7 +49,8 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGFEBlendElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGFEBlendElement::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

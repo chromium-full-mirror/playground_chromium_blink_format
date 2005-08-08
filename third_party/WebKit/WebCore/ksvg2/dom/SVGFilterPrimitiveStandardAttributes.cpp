@@ -51,8 +51,9 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGFilterPrimitiveStandardAttributes::getValueProperty(ExecState* exec,
-                                                             int token) const {
+ValueImp* SVGFilterPrimitiveStandardAttributes::getValueProperty(
+    ExecState* exec,
+    int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

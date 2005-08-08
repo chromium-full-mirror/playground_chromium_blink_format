@@ -70,22 +70,22 @@ class DOMBridge<DOMUserData> : public KJS::ObjectImp {
 
   DOMUserDataImpl* impl() const { return m_impl; }
 
-  virtual KJS::Value get(KJS::ExecState* exec,
-                         const KJS::Identifier& propertyName) const {
+  virtual KJS::ValueImp* get(KJS::ExecState* exec,
+                             const KJS::Identifier& propertyName) const {
     kdDebug(26004) << "DOMBridge::get(), " << propertyName.qstring()
                    << " Name: " << classInfo()->className
                    << " Object: " << this->m_impl << endl;
 
     // Look for standard properties (e.g. those in the hashtables)
     DOMUserData obj(m_impl);
-    KJS::Value val = obj.get(exec, propertyName, this);
+    KJS::ValueImp* val = obj.get(exec, propertyName, this);
 
-    if (val.type() != KJS::UndefinedType)
+    if (val->type() != KJS::UndefinedType)
       return val;
 
     // Not found -> forward to ObjectImp.
     val = KJS::ObjectImp::get(exec, propertyName);
-    if (val.type() == KJS::UndefinedType)
+    if (val->type() == KJS::UndefinedType)
       kdDebug(26004) << "WARNING: " << propertyName.qstring()
                      << " not found in... Name: " << classInfo()->className
                      << " Object: " << m_impl
@@ -111,8 +111,8 @@ class DOMBridge<DOMUserData> : public KJS::ObjectImp {
   virtual const KJS::ClassInfo* classInfo() const {
     return &DOMUserData::s_classInfo;
   }
-  virtual KJS::Value toPrimitive(KJS::ExecState*,
-                                 KJS::Type = KJS::UndefinedType) const {
+  virtual KJS::ValueImp* toPrimitive(KJS::ExecState*,
+                                     KJS::Type = KJS::UndefinedType) const {
     kdDebug() << k_funcinfo << endl;
     if (m_impl && (*((bool*)(m_impl->userData()))))
       return KJS::String("true");

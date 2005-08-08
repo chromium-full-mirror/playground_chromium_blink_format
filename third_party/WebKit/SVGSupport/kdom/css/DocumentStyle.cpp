@@ -37,7 +37,7 @@ using namespace KJS;
 @end
 */
 
-Value DocumentStyle::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DocumentStyle::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case DocumentStyleConstants::StyleSheets:
       return safe_cache<StyleSheetList>(exec, styleSheets());

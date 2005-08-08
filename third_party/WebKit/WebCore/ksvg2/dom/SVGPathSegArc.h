@@ -67,10 +67,10 @@ class SVGPathSegArcAbs : public SVGPathSeg {
   KDOM_GET
   KDOM_PUT
 
-  KJS::Value getValueProperty(KJS::ExecState* exec, int token) const;
+  KJS::ValueImp* getValueProperty(KJS::ExecState* exec, int token) const;
   void putValueProperty(KJS::ExecState* exec,
                         int token,
-                        const KJS::Value& value,
+                        KJS::ValueImp* value,
                         int attr);
 };
 
@@ -115,10 +115,10 @@ class SVGPathSegArcRel : public SVGPathSeg {
   KDOM_GET
   KDOM_PUT
 
-  KJS::Value getValueProperty(KJS::ExecState* exec, int token) const;
+  KJS::ValueImp* getValueProperty(KJS::ExecState* exec, int token) const;
   void putValueProperty(KJS::ExecState* exec,
                         int token,
-                        const KJS::Value& value,
+                        KJS::ValueImp* value,
                         int attr);
 };
 };

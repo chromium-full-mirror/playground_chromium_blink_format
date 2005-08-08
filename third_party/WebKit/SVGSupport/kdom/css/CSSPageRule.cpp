@@ -40,7 +40,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value CSSPageRule::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CSSPageRule::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case CSSPageRuleConstants::SelectorText:
       return getDOMString(selectorText());
@@ -56,7 +56,7 @@ Value CSSPageRule::getValueProperty(ExecState* exec, int token) const {
 
 void CSSPageRule::putValueProperty(ExecState* exec,
                                    int token,
-                                   const Value& value,
+                                   ValueImp* value,
                                    int) {
   KDOM_ENTER_SAFE
 

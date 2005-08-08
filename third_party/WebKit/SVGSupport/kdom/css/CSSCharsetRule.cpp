@@ -37,7 +37,7 @@ using namespace KJS;
 @end
 */
 
-Value CSSCharsetRule::getValueProperty(ExecState*, int token) const {
+ValueImp* CSSCharsetRule::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case CSSCharsetRuleConstants::Encoding:
       return getDOMString(encoding());
@@ -51,7 +51,7 @@ Value CSSCharsetRule::getValueProperty(ExecState*, int token) const {
 
 void CSSCharsetRule::putValueProperty(ExecState* exec,
                                       int token,
-                                      const Value& value,
+                                      ValueImp* value,
                                       int) {
   KDOM_ENTER_SAFE
 

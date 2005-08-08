@@ -42,7 +42,7 @@ DontDelete
 @end
 */
 
-Value LSOutput::getValueProperty(ExecState* exec, int token) const {
+ValueImp* LSOutput::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -61,7 +61,7 @@ Value LSOutput::getValueProperty(ExecState* exec, int token) const {
 
 void LSOutput::putValueProperty(ExecState* exec,
                                 int token,
-                                const Value& value,
+                                ValueImp* value,
                                 int) {
   KDOM_ENTER_SAFE
 

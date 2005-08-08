@@ -46,7 +46,7 @@ KDOM_IMPLEMENT_PROTOTYPE("DOMStringList",
                          DOMStringListProto,
                          DOMStringListProtoFunc)
 
-Value DOMStringList::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DOMStringList::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -61,15 +61,15 @@ Value DOMStringList::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value DOMStringListProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+ValueImp* DOMStringListProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
   KDOM_CHECK_THIS(DOMStringList)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case DOMStringListConstants::Item: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return getDOMString(obj.item(index));
     }
     case DOMStringListConstants::Contains: {

@@ -55,7 +55,7 @@ DontDelete|Function 2
 
 KSVG_IMPLEMENT_PROTOTYPE("SVGAngle", SVGAngleProto, SVGAngleProtoFunc)
 
-Value SVGAngle::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGAngle::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -78,17 +78,17 @@ Value SVGAngle::getValueProperty(ExecState* exec, int token) const {
 
 void SVGAngle::putValueProperty(ExecState* exec,
                                 int token,
-                                const Value& value,
+                                ValueImp* value,
                                 int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGAngleConstants::Value: {
-      setValue(value.toNumber(exec));
+      setValue(value->toNumber(exec));
       break;
     }
     case SVGAngleConstants::ValueInSpecifiedUnits: {
-      setValueInSpecifiedUnits(value.toNumber(exec));
+      setValueInSpecifiedUnits(value->toNumber(exec));
       break;
     }
     case SVGAngleConstants::ValueAsString: {
@@ -103,20 +103,20 @@ void SVGAngle::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(KDOM::DOMException)
 }
 
-Value SVGAngleProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* SVGAngleProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(SVGAngle)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case SVGAngleConstants::ConvertToSpecifiedUnits: {
-      unsigned short unitType = args[0].toUInt16(exec);
+      unsigned short unitType = args[0]->toUInt16(exec);
       obj.convertToSpecifiedUnits(unitType);
     }
     case SVGAngleConstants::NewValueSpecifiedUnits: {
-      unsigned short unitType = args[0].toUInt16(exec);
-      float valueInSpecifiedUnits = args[1].toNumber(exec);
+      unsigned short unitType = args[0]->toUInt16(exec);
+      float valueInSpecifiedUnits = args[1]->toNumber(exec);
       obj.newValueSpecifiedUnits(unitType, valueInSpecifiedUnits);
     }
     default:

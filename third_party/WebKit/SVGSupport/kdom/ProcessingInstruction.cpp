@@ -38,8 +38,8 @@ using namespace KJS;
 @end
 */
 
-Value ProcessingInstruction::getValueProperty(ExecState* exec,
-                                              int token) const {
+ValueImp* ProcessingInstruction::getValueProperty(ExecState* exec,
+                                                  int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -58,7 +58,7 @@ Value ProcessingInstruction::getValueProperty(ExecState* exec,
 
 void ProcessingInstruction::putValueProperty(ExecState* exec,
                                              int token,
-                                             const Value& value,
+                                             ValueImp* value,
                                              int) {
   KDOM_ENTER_SAFE
 

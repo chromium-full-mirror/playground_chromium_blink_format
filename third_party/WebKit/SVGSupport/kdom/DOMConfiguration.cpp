@@ -53,7 +53,7 @@ KDOM_IMPLEMENT_PROTOTYPE("DOMConfiguration",
                          DOMConfigurationProto,
                          DOMConfigurationProtoFunc)
 
-Value DOMConfiguration::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DOMConfiguration::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -68,16 +68,16 @@ Value DOMConfiguration::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value DOMConfigurationProtoFunc::call(ExecState* exec,
-                                      Object& thisObj,
-                                      const List& args) {
+ValueImp* DOMConfigurationProtoFunc::callAsFunction(ExecState* exec,
+                                                    ObjectImp* thisObj,
+                                                    const List& args) {
   KDOM_CHECK_THIS(DOMConfiguration)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case DOMConfigurationConstants::SetParameter: {
       DOMString name = toDOMString(exec, args[0]);
-      bool value = args[1].toBoolean(exec);
+      bool value = args[1]->toBoolean(exec);
       //			DOMUserData value = ecma_cast<DOMUserData>(exec,
       //args[1], &toDOMUserData);
       obj.setParameter(name, value);

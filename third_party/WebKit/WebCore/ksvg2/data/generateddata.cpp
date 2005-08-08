@@ -684,11 +684,11 @@ bool SVGAElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGAElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -718,10 +718,10 @@ bool SVGAElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAElement::prototype(ExecState* p1) const {
+ObjectImp* SVGAElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAElement::bridge(ExecState* p1) const {
@@ -729,7 +729,7 @@ ObjectImp* SVGAElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGAElement::Private*>(d));
 }
 
-Value SVGAElement::cache(ExecState* p1) const {
+ValueImp* SVGAElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAElement>(
       p1, static_cast<SVGAElement::Private*>(d));
 }
@@ -738,13 +738,13 @@ bool SVGAngle::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGAngle::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGAngleProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGAngleProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGAngle::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAngle::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGAngleProtoFunc, SVGAngle>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -764,10 +764,10 @@ SVGAngle KSVG::toSVGAngle(KJS::ExecState*, const ObjectImp* p1) {
   return SVGAngle::null;
 }
 
-Value SVGAngle::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGAngleProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGAngle::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGAngleProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -784,10 +784,10 @@ bool SVGAngle::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAngle::prototype(ExecState* p1) const {
+ObjectImp* SVGAngle::prototype(ExecState* p1) const {
   if (p1)
     return SVGAngleProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAngle::bridge(ExecState* p1) const {
@@ -795,7 +795,7 @@ ObjectImp* SVGAngle::bridge(ExecState* p1) const {
                                          static_cast<SVGAngle::Private*>(impl));
 }
 
-Value SVGAngle::cache(ExecState* p1) const {
+ValueImp* SVGAngle::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAngle>(p1,
                                         static_cast<SVGAngle::Private*>(impl));
 }
@@ -811,12 +811,12 @@ bool SVGAnimateColorElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimateColorElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateColorElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimateColorElement>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
 
-Value SVGAnimateColorElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateColorElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimationElement::hasProperty(p1, p2))
     return SVGAnimationElement::get(p1, p2, p3);
   return Undefined();
@@ -830,10 +830,10 @@ bool SVGAnimateColorElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimateColorElement::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimateColorElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimateColorElement::bridge(ExecState* p1) const {
@@ -841,7 +841,7 @@ ObjectImp* SVGAnimateColorElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimateColorElement::Private*>(d));
 }
 
-Value SVGAnimateColorElement::cache(ExecState* p1) const {
+ValueImp* SVGAnimateColorElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimateColorElement>(
       p1, static_cast<SVGAnimateColorElement::Private*>(d));
 }
@@ -855,12 +855,12 @@ bool SVGAnimateElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimateElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimateElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGAnimateElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimationElement::hasProperty(p1, p2))
     return SVGAnimationElement::get(p1, p2, p3);
   return Undefined();
@@ -874,10 +874,10 @@ bool SVGAnimateElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimateElement::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimateElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimateElement::bridge(ExecState* p1) const {
@@ -885,7 +885,7 @@ ObjectImp* SVGAnimateElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimateElement::Private*>(d));
 }
 
-Value SVGAnimateElement::cache(ExecState* p1) const {
+ValueImp* SVGAnimateElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimateElement>(
       p1, static_cast<SVGAnimateElement::Private*>(d));
 }
@@ -901,12 +901,12 @@ bool SVGAnimateTransformElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimateTransformElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateTransformElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimateTransformElement>(p1, p2, &s_hashTable,
                                                           this, p3);
 }
 
-Value SVGAnimateTransformElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimateTransformElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimationElement::hasProperty(p1, p2))
     return SVGAnimationElement::get(p1, p2, p3);
   return Undefined();
@@ -920,10 +920,10 @@ bool SVGAnimateTransformElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimateTransformElement::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimateTransformElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimateTransformElement::bridge(ExecState* p1) const {
@@ -931,7 +931,7 @@ ObjectImp* SVGAnimateTransformElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimateTransformElement::Private*>(d));
 }
 
-Value SVGAnimateTransformElement::cache(ExecState* p1) const {
+ValueImp* SVGAnimateTransformElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimateTransformElement>(
       p1, static_cast<SVGAnimateTransformElement::Private*>(d));
 }
@@ -944,21 +944,21 @@ bool SVGAnimatedAngle::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedAngle::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedAngle::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedAngle>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGAnimatedAngle::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedAngle::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedAngle::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedAngle::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedAngle::bridge(ExecState* p1) const {
@@ -966,7 +966,7 @@ ObjectImp* SVGAnimatedAngle::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedAngle::Private*>(impl));
 }
 
-Value SVGAnimatedAngle::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedAngle::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedAngle>(
       p1, static_cast<SVGAnimatedAngle::Private*>(impl));
 }
@@ -980,12 +980,12 @@ bool SVGAnimatedBoolean::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedBoolean::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedBoolean::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedBoolean>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGAnimatedBoolean::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedBoolean::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1005,10 +1005,10 @@ bool SVGAnimatedBoolean::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimatedBoolean::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedBoolean::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedBoolean::bridge(ExecState* p1) const {
@@ -1016,7 +1016,7 @@ ObjectImp* SVGAnimatedBoolean::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedBoolean::Private*>(impl));
 }
 
-Value SVGAnimatedBoolean::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedBoolean::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedBoolean>(
       p1, static_cast<SVGAnimatedBoolean::Private*>(impl));
 }
@@ -1031,12 +1031,12 @@ bool SVGAnimatedEnumeration::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedEnumeration::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedEnumeration::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedEnumeration>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
 
-Value SVGAnimatedEnumeration::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedEnumeration::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1056,10 +1056,10 @@ bool SVGAnimatedEnumeration::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimatedEnumeration::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedEnumeration::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedEnumeration::bridge(ExecState* p1) const {
@@ -1067,7 +1067,7 @@ ObjectImp* SVGAnimatedEnumeration::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedEnumeration::Private*>(impl));
 }
 
-Value SVGAnimatedEnumeration::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedEnumeration::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedEnumeration>(
       p1, static_cast<SVGAnimatedEnumeration::Private*>(impl));
 }
@@ -1081,12 +1081,12 @@ bool SVGAnimatedInteger::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedInteger::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedInteger::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedInteger>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGAnimatedInteger::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedInteger::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1106,10 +1106,10 @@ bool SVGAnimatedInteger::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimatedInteger::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedInteger::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedInteger::bridge(ExecState* p1) const {
@@ -1117,7 +1117,7 @@ ObjectImp* SVGAnimatedInteger::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedInteger::Private*>(impl));
 }
 
-Value SVGAnimatedInteger::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedInteger::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedInteger>(
       p1, static_cast<SVGAnimatedInteger::Private*>(impl));
 }
@@ -1130,22 +1130,22 @@ bool SVGAnimatedLength::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedLength::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedLength::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedLength>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGAnimatedLength::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedLength::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedLength::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedLength::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedLength::bridge(ExecState* p1) const {
@@ -1153,7 +1153,7 @@ ObjectImp* SVGAnimatedLength::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedLength::Private*>(impl));
 }
 
-Value SVGAnimatedLength::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedLength::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedLength>(
       p1, static_cast<SVGAnimatedLength::Private*>(impl));
 }
@@ -1168,22 +1168,22 @@ bool SVGAnimatedLengthList::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedLengthList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedLengthList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedLengthList>(p1, p2, &s_hashTable, this,
                                                      p3);
 }
 
-Value SVGAnimatedLengthList::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedLengthList::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedLengthList::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedLengthList::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedLengthList::bridge(ExecState* p1) const {
@@ -1191,7 +1191,7 @@ ObjectImp* SVGAnimatedLengthList::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedLengthList::Private*>(impl));
 }
 
-Value SVGAnimatedLengthList::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedLengthList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedLengthList>(
       p1, static_cast<SVGAnimatedLengthList::Private*>(impl));
 }
@@ -1204,12 +1204,12 @@ bool SVGAnimatedNumber::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedNumber::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedNumber::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedNumber>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGAnimatedNumber::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedNumber::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1228,10 +1228,10 @@ bool SVGAnimatedNumber::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimatedNumber::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedNumber::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedNumber::bridge(ExecState* p1) const {
@@ -1239,7 +1239,7 @@ ObjectImp* SVGAnimatedNumber::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedNumber::Private*>(impl));
 }
 
-Value SVGAnimatedNumber::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedNumber::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedNumber>(
       p1, static_cast<SVGAnimatedNumber::Private*>(impl));
 }
@@ -1254,22 +1254,22 @@ bool SVGAnimatedNumberList::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedNumberList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedNumberList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedNumberList>(p1, p2, &s_hashTable, this,
                                                      p3);
 }
 
-Value SVGAnimatedNumberList::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedNumberList::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedNumberList::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedNumberList::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedNumberList::bridge(ExecState* p1) const {
@@ -1277,7 +1277,7 @@ ObjectImp* SVGAnimatedNumberList::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedNumberList::Private*>(impl));
 }
 
-Value SVGAnimatedNumberList::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedNumberList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedNumberList>(
       p1, static_cast<SVGAnimatedNumberList::Private*>(impl));
 }
@@ -1291,22 +1291,22 @@ bool SVGAnimatedPathData::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedPathData::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPathData::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedPathData>(p1, p2, &s_hashTable, this,
                                                    p3);
 }
 
-Value SVGAnimatedPathData::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPathData::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedPathData::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedPathData::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedPathData::bridge(ExecState* p1) const {
@@ -1314,7 +1314,7 @@ ObjectImp* SVGAnimatedPathData::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedPathData::Private*>(impl));
 }
 
-Value SVGAnimatedPathData::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedPathData::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedPathData>(
       p1, static_cast<SVGAnimatedPathData::Private*>(impl));
 }
@@ -1327,22 +1327,22 @@ bool SVGAnimatedPoints::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedPoints::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPoints::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedPoints>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGAnimatedPoints::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPoints::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedPoints::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedPoints::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedPoints::bridge(ExecState* p1) const {
@@ -1350,7 +1350,7 @@ ObjectImp* SVGAnimatedPoints::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedPoints::Private*>(impl));
 }
 
-Value SVGAnimatedPoints::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedPoints::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedPoints>(
       p1, static_cast<SVGAnimatedPoints::Private*>(impl));
 }
@@ -1365,22 +1365,22 @@ bool SVGAnimatedPreserveAspectRatio::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedPreserveAspectRatio::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPreserveAspectRatio::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedPreserveAspectRatio>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGAnimatedPreserveAspectRatio::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedPreserveAspectRatio::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedPreserveAspectRatio::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedPreserveAspectRatio::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedPreserveAspectRatio::bridge(ExecState* p1) const {
@@ -1388,7 +1388,7 @@ ObjectImp* SVGAnimatedPreserveAspectRatio::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedPreserveAspectRatio::Private*>(impl));
 }
 
-Value SVGAnimatedPreserveAspectRatio::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedPreserveAspectRatio::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedPreserveAspectRatio>(
       p1, static_cast<SVGAnimatedPreserveAspectRatio::Private*>(impl));
 }
@@ -1401,21 +1401,21 @@ bool SVGAnimatedRect::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedRect::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedRect::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedRect>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGAnimatedRect::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedRect::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedRect::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedRect::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedRect::bridge(ExecState* p1) const {
@@ -1423,7 +1423,7 @@ ObjectImp* SVGAnimatedRect::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedRect::Private*>(impl));
 }
 
-Value SVGAnimatedRect::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedRect::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedRect>(
       p1, static_cast<SVGAnimatedRect::Private*>(impl));
 }
@@ -1436,12 +1436,12 @@ bool SVGAnimatedString::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGAnimatedString::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedString::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedString>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGAnimatedString::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedString::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -1460,10 +1460,10 @@ bool SVGAnimatedString::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimatedString::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedString::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedString::bridge(ExecState* p1) const {
@@ -1471,7 +1471,7 @@ ObjectImp* SVGAnimatedString::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedString::Private*>(impl));
 }
 
-Value SVGAnimatedString::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedString::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedString>(
       p1, static_cast<SVGAnimatedString::Private*>(impl));
 }
@@ -1486,22 +1486,22 @@ bool SVGAnimatedTransformList::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimatedTransformList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedTransformList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGAnimatedTransformList>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
 
-Value SVGAnimatedTransformList::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimatedTransformList::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGAnimatedTransformList::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimatedTransformList::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimatedTransformList::bridge(ExecState* p1) const {
@@ -1509,7 +1509,7 @@ ObjectImp* SVGAnimatedTransformList::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimatedTransformList::Private*>(impl));
 }
 
-Value SVGAnimatedTransformList::cache(ExecState* p1) const {
+ValueImp* SVGAnimatedTransformList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimatedTransformList>(
       p1, static_cast<SVGAnimatedTransformList::Private*>(impl));
 }
@@ -1519,8 +1519,8 @@ bool SVGAnimationElement::hasProperty(ExecState* p1,
   const HashEntry* e = Lookup::findEntry(&SVGAnimationElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGAnimationElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGAnimationElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGElement::hasProperty(p1, p2))
     return true;
@@ -1531,7 +1531,7 @@ bool SVGAnimationElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGAnimationElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGAnimationElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGAnimationElementProtoFunc, SVGAnimationElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -1577,10 +1577,10 @@ SVGAnimationElement SVGAnimationElementProtoFunc::cast(
   return SVGAnimationElement::null;
 }
 
-Value SVGAnimationElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGAnimationElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGAnimationElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGAnimationElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -1598,10 +1598,10 @@ bool SVGAnimationElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGAnimationElement::prototype(ExecState* p1) const {
+ObjectImp* SVGAnimationElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGAnimationElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGAnimationElement::bridge(ExecState* p1) const {
@@ -1609,7 +1609,7 @@ ObjectImp* SVGAnimationElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGAnimationElement::Private*>(d));
 }
 
-Value SVGAnimationElement::cache(ExecState* p1) const {
+ValueImp* SVGAnimationElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGAnimationElement>(
       p1, static_cast<SVGAnimationElement::Private*>(d));
 }
@@ -1633,11 +1633,11 @@ bool SVGCircleElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGCircleElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGCircleElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGCircleElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGCircleElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGCircleElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -1665,10 +1665,10 @@ bool SVGCircleElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGCircleElement::prototype(ExecState* p1) const {
+ObjectImp* SVGCircleElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGCircleElement::bridge(ExecState* p1) const {
@@ -1676,7 +1676,7 @@ ObjectImp* SVGCircleElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGCircleElement::Private*>(d));
 }
 
-Value SVGCircleElement::cache(ExecState* p1) const {
+ValueImp* SVGCircleElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGCircleElement>(
       p1, static_cast<SVGCircleElement::Private*>(d));
 }
@@ -1701,12 +1701,12 @@ bool SVGClipPathElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGClipPathElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGClipPathElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGClipPathElement>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGClipPathElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGClipPathElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -1734,10 +1734,10 @@ bool SVGClipPathElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGClipPathElement::prototype(ExecState* p1) const {
+ObjectImp* SVGClipPathElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGClipPathElement::bridge(ExecState* p1) const {
@@ -1745,7 +1745,7 @@ ObjectImp* SVGClipPathElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGClipPathElement::Private*>(d));
 }
 
-Value SVGClipPathElement::cache(ExecState* p1) const {
+ValueImp* SVGClipPathElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGClipPathElement>(
       p1, static_cast<SVGClipPathElement::Private*>(d));
 }
@@ -1754,15 +1754,15 @@ bool SVGColor::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGColor::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGColorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGColorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (KDOM::CSSValue::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGColor::get(GET_METHOD_ARGS) const {
+ValueImp* SVGColor::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGColorProtoFunc, SVGColor>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -1783,10 +1783,10 @@ SVGColor SVGColorProtoFunc::cast(KJS::ExecState*, const ObjectImp* p1) const {
   return SVGColor::null;
 }
 
-Value SVGColor::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGColorProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGColor::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGColorProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (KDOM::CSSValue::hasProperty(p1, p2))
     return KDOM::CSSValue::get(p1, p2, p3);
   return Undefined();
@@ -1800,10 +1800,10 @@ bool SVGColor::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGColor::prototype(ExecState* p1) const {
+ObjectImp* SVGColor::prototype(ExecState* p1) const {
   if (p1)
     return SVGColorProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGColor::bridge(ExecState* p1) const {
@@ -1811,7 +1811,7 @@ ObjectImp* SVGColor::bridge(ExecState* p1) const {
                                          static_cast<SVGColor::Private*>(d));
 }
 
-Value SVGColor::cache(ExecState* p1) const {
+ValueImp* SVGColor::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGColor>(p1, static_cast<SVGColor::Private*>(d));
 }
 
@@ -1827,12 +1827,13 @@ bool SVGComponentTransferFunctionElement::hasProperty(
   return false;
 }
 
-Value SVGComponentTransferFunctionElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGComponentTransferFunctionElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGComponentTransferFunctionElement>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGComponentTransferFunctionElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGComponentTransferFunctionElement::getInParents(
+    GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   return Undefined();
@@ -1846,10 +1847,10 @@ bool SVGComponentTransferFunctionElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGComponentTransferFunctionElement::prototype(ExecState* p1) const {
+ObjectImp* SVGComponentTransferFunctionElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGComponentTransferFunctionElement::bridge(ExecState* p1) const {
@@ -1857,7 +1858,7 @@ ObjectImp* SVGComponentTransferFunctionElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGComponentTransferFunctionElement::Private*>(d));
 }
 
-Value SVGComponentTransferFunctionElement::cache(ExecState* p1) const {
+ValueImp* SVGComponentTransferFunctionElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGComponentTransferFunctionElement>(
       p1, static_cast<SVGComponentTransferFunctionElement::Private*>(d));
 }
@@ -1881,11 +1882,11 @@ bool SVGDefsElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGDefsElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGDefsElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGDefsElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGDefsElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGDefsElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -1913,10 +1914,10 @@ bool SVGDefsElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGDefsElement::prototype(ExecState* p1) const {
+ObjectImp* SVGDefsElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGDefsElement::bridge(ExecState* p1) const {
@@ -1924,7 +1925,7 @@ ObjectImp* SVGDefsElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGDefsElement::Private*>(d));
 }
 
-Value SVGDefsElement::cache(ExecState* p1) const {
+ValueImp* SVGDefsElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGDefsElement>(
       p1, static_cast<SVGDefsElement::Private*>(d));
 }
@@ -1942,11 +1943,11 @@ bool SVGDescElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGDescElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGDescElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGDescElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGDescElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGDescElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGLangSpace::hasProperty(p1, p2))
@@ -1968,10 +1969,10 @@ bool SVGDescElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGDescElement::prototype(ExecState* p1) const {
+ObjectImp* SVGDescElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGDescElement::bridge(ExecState* p1) const {
@@ -1979,7 +1980,7 @@ ObjectImp* SVGDescElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGDescElement::Private*>(d));
 }
 
-Value SVGDescElement::cache(ExecState* p1) const {
+ValueImp* SVGDescElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGDescElement>(
       p1, static_cast<SVGDescElement::Private*>(d));
 }
@@ -1993,11 +1994,11 @@ bool SVGDocument::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGDocument::get(GET_METHOD_ARGS) const {
+ValueImp* SVGDocument::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGDocument>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGDocument::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGDocument::getInParents(GET_METHOD_ARGS) const {
   if (KDOM::Document::hasProperty(p1, p2))
     return KDOM::Document::get(p1, p2, p3);
   return Undefined();
@@ -2015,10 +2016,10 @@ bool SVGDocument::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGDocument::prototype(ExecState* p1) const {
+ObjectImp* SVGDocument::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 KDOM::Document KSVG::EcmaInterface::inheritedDocumentCast(const ObjectImp* p1) {
@@ -2060,7 +2061,7 @@ ObjectImp* SVGDocument::bridge(ExecState* p1) const {
       p1, static_cast<SVGDocument::Private*>(KDOM::EventTarget::d));
 }
 
-Value SVGDocument::cache(ExecState* p1) const {
+ValueImp* SVGDocument::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGDocument>(
       p1, static_cast<SVGDocument::Private*>(KDOM::EventTarget::d));
 }
@@ -2074,7 +2075,7 @@ bool SVGElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGElement>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -2413,7 +2414,7 @@ SVGElement KSVG::toSVGElement(KJS::ExecState*, const ObjectImp* p1) {
   return SVGElement::null;
 }
 
-Value SVGElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGElement::getInParents(GET_METHOD_ARGS) const {
   if (KDOM::Element::hasProperty(p1, p2))
     return KDOM::Element::get(p1, p2, p3);
   return Undefined();
@@ -2431,10 +2432,10 @@ bool SVGElement::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGElement::prototype(ExecState* p1) const {
+ObjectImp* SVGElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 KDOM::Element KSVG::EcmaInterface::inheritedElementCast(const ObjectImp* p1) {
@@ -2458,7 +2459,7 @@ ObjectImp* SVGElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGElement::Private*>(d));
 }
 
-Value SVGElement::cache(ExecState* p1) const {
+ValueImp* SVGElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGElement>(p1,
                                           static_cast<SVGElement::Private*>(d));
 }
@@ -2473,12 +2474,12 @@ bool SVGElementInstance::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGElementInstance::get(GET_METHOD_ARGS) const {
+ValueImp* SVGElementInstance::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGElementInstance>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGElementInstance::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGElementInstance::getInParents(GET_METHOD_ARGS) const {
   if (KDOM::EventTarget::hasProperty(p1, p2))
     return KDOM::EventTarget::get(p1, p2, p3);
   return Undefined();
@@ -2492,10 +2493,10 @@ bool SVGElementInstance::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGElementInstance::prototype(ExecState* p1) const {
+ObjectImp* SVGElementInstance::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGElementInstance::bridge(ExecState* p1) const {
@@ -2503,7 +2504,7 @@ ObjectImp* SVGElementInstance::bridge(ExecState* p1) const {
       p1, static_cast<SVGElementInstance::Private*>(d));
 }
 
-Value SVGElementInstance::cache(ExecState* p1) const {
+ValueImp* SVGElementInstance::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGElementInstance>(
       p1, static_cast<SVGElementInstance::Private*>(d));
 }
@@ -2514,13 +2515,13 @@ bool SVGElementInstanceList::hasProperty(ExecState* p1,
       Lookup::findEntry(&SVGElementInstanceList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGElementInstanceListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGElementInstanceListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGElementInstanceList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGElementInstanceList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGElementInstanceListProtoFunc,
                          SVGElementInstanceList>(p1, p2, &s_hashTable, this,
                                                  p3);
@@ -2539,18 +2540,18 @@ SVGElementInstanceList SVGElementInstanceListProtoFunc::cast(
   return SVGElementInstanceList::null;
 }
 
-Value SVGElementInstanceList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGElementInstanceListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGElementInstanceList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGElementInstanceListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGElementInstanceList::prototype(ExecState* p1) const {
+ObjectImp* SVGElementInstanceList::prototype(ExecState* p1) const {
   if (p1)
     return SVGElementInstanceListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGElementInstanceList::bridge(ExecState* p1) const {
@@ -2558,7 +2559,7 @@ ObjectImp* SVGElementInstanceList::bridge(ExecState* p1) const {
       p1, static_cast<SVGElementInstanceList::Private*>(impl));
 }
 
-Value SVGElementInstanceList::cache(ExecState* p1) const {
+ValueImp* SVGElementInstanceList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGElementInstanceList>(
       p1, static_cast<SVGElementInstanceList::Private*>(impl));
 }
@@ -2582,12 +2583,12 @@ bool SVGEllipseElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGEllipseElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGEllipseElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGEllipseElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGEllipseElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGEllipseElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -2615,10 +2616,10 @@ bool SVGEllipseElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGEllipseElement::prototype(ExecState* p1) const {
+ObjectImp* SVGEllipseElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGEllipseElement::bridge(ExecState* p1) const {
@@ -2626,7 +2627,7 @@ ObjectImp* SVGEllipseElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGEllipseElement::Private*>(d));
 }
 
-Value SVGEllipseElement::cache(ExecState* p1) const {
+ValueImp* SVGEllipseElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGEllipseElement>(
       p1, static_cast<SVGEllipseElement::Private*>(d));
 }
@@ -2640,11 +2641,11 @@ bool SVGEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGEvent::get(GET_METHOD_ARGS) const {
+ValueImp* SVGEvent::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGEvent>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGEvent::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGEvent::getInParents(GET_METHOD_ARGS) const {
   if (KDOM::Event::hasProperty(p1, p2))
     return KDOM::Event::get(p1, p2, p3);
   return Undefined();
@@ -2658,10 +2659,10 @@ bool SVGEvent::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGEvent::prototype(ExecState* p1) const {
+ObjectImp* SVGEvent::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGEvent::bridge(ExecState* p1) const {
@@ -2669,7 +2670,7 @@ ObjectImp* SVGEvent::bridge(ExecState* p1) const {
                                          static_cast<SVGEvent::Private*>(d));
 }
 
-Value SVGEvent::cache(ExecState* p1) const {
+ValueImp* SVGEvent::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGEvent>(p1, static_cast<SVGEvent::Private*>(d));
 }
 
@@ -2681,21 +2682,21 @@ bool SVGException::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGException::get(GET_METHOD_ARGS) const {
+ValueImp* SVGException::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGException>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGException::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGException::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGException::prototype(ExecState* p1) const {
+ObjectImp* SVGException::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGException::bridge(ExecState* p1) const {
@@ -2703,7 +2704,7 @@ ObjectImp* SVGException::bridge(ExecState* p1) const {
       p1, static_cast<SVGException::Private*>(impl));
 }
 
-Value SVGException::cache(ExecState* p1) const {
+ValueImp* SVGException::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGException>(
       p1, static_cast<SVGException::Private*>(impl));
 }
@@ -2718,22 +2719,22 @@ bool SVGExternalResourcesRequired::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGExternalResourcesRequired::get(GET_METHOD_ARGS) const {
+ValueImp* SVGExternalResourcesRequired::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGExternalResourcesRequired>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGExternalResourcesRequired::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGExternalResourcesRequired::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGExternalResourcesRequired::prototype(ExecState* p1) const {
+ObjectImp* SVGExternalResourcesRequired::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGExternalResourcesRequired::bridge(ExecState* p1) const {
@@ -2741,7 +2742,7 @@ ObjectImp* SVGExternalResourcesRequired::bridge(ExecState* p1) const {
       p1, static_cast<SVGExternalResourcesRequired::Private*>(impl));
 }
 
-Value SVGExternalResourcesRequired::cache(ExecState* p1) const {
+ValueImp* SVGExternalResourcesRequired::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGExternalResourcesRequired>(
       p1, static_cast<SVGExternalResourcesRequired::Private*>(impl));
 }
@@ -2757,12 +2758,12 @@ bool SVGFEBlendElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFEBlendElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEBlendElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEBlendElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGFEBlendElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEBlendElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -2778,10 +2779,10 @@ bool SVGFEBlendElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEBlendElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEBlendElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEBlendElement::bridge(ExecState* p1) const {
@@ -2789,7 +2790,7 @@ ObjectImp* SVGFEBlendElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEBlendElement::Private*>(d));
 }
 
-Value SVGFEBlendElement::cache(ExecState* p1) const {
+ValueImp* SVGFEBlendElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEBlendElement>(
       p1, static_cast<SVGFEBlendElement::Private*>(d));
 }
@@ -2807,12 +2808,12 @@ bool SVGFEColorMatrixElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFEColorMatrixElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEColorMatrixElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEColorMatrixElement>(p1, p2, &s_hashTable,
                                                        this, p3);
 }
 
-Value SVGFEColorMatrixElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEColorMatrixElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -2828,10 +2829,10 @@ bool SVGFEColorMatrixElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEColorMatrixElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEColorMatrixElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEColorMatrixElement::bridge(ExecState* p1) const {
@@ -2839,7 +2840,7 @@ ObjectImp* SVGFEColorMatrixElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEColorMatrixElement::Private*>(d));
 }
 
-Value SVGFEColorMatrixElement::cache(ExecState* p1) const {
+ValueImp* SVGFEColorMatrixElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEColorMatrixElement>(
       p1, static_cast<SVGFEColorMatrixElement::Private*>(d));
 }
@@ -2857,12 +2858,12 @@ bool SVGFEComponentTransferElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFEComponentTransferElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEComponentTransferElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEComponentTransferElement>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGFEComponentTransferElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEComponentTransferElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -2878,10 +2879,10 @@ bool SVGFEComponentTransferElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEComponentTransferElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEComponentTransferElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEComponentTransferElement::bridge(ExecState* p1) const {
@@ -2889,7 +2890,7 @@ ObjectImp* SVGFEComponentTransferElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEComponentTransferElement::Private*>(d));
 }
 
-Value SVGFEComponentTransferElement::cache(ExecState* p1) const {
+ValueImp* SVGFEComponentTransferElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEComponentTransferElement>(
       p1, static_cast<SVGFEComponentTransferElement::Private*>(d));
 }
@@ -2907,12 +2908,12 @@ bool SVGFECompositeElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFECompositeElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFECompositeElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFECompositeElement>(p1, p2, &s_hashTable, this,
                                                      p3);
 }
 
-Value SVGFECompositeElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFECompositeElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -2928,10 +2929,10 @@ bool SVGFECompositeElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFECompositeElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFECompositeElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFECompositeElement::bridge(ExecState* p1) const {
@@ -2939,7 +2940,7 @@ ObjectImp* SVGFECompositeElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFECompositeElement::Private*>(d));
 }
 
-Value SVGFECompositeElement::cache(ExecState* p1) const {
+ValueImp* SVGFECompositeElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFECompositeElement>(
       p1, static_cast<SVGFECompositeElement::Private*>(d));
 }
@@ -2955,12 +2956,12 @@ bool SVGFEFloodElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFEFloodElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEFloodElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEFloodElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGFEFloodElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEFloodElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -2976,10 +2977,10 @@ bool SVGFEFloodElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEFloodElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEFloodElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEFloodElement::bridge(ExecState* p1) const {
@@ -2987,7 +2988,7 @@ ObjectImp* SVGFEFloodElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEFloodElement::Private*>(d));
 }
 
-Value SVGFEFloodElement::cache(ExecState* p1) const {
+ValueImp* SVGFEFloodElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEFloodElement>(
       p1, static_cast<SVGFEFloodElement::Private*>(d));
 }
@@ -2998,8 +2999,8 @@ bool SVGFEGaussianBlurElement::hasProperty(ExecState* p1,
       Lookup::findEntry(&SVGFEGaussianBlurElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGFEGaussianBlurElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGFEGaussianBlurElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGElement::hasProperty(p1, p2))
     return true;
@@ -3008,7 +3009,7 @@ bool SVGFEGaussianBlurElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFEGaussianBlurElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEGaussianBlurElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGFEGaussianBlurElementProtoFunc,
                          SVGFEGaussianBlurElement>(p1, p2, &s_hashTable, this,
                                                    p3);
@@ -3027,10 +3028,10 @@ SVGFEGaussianBlurElement SVGFEGaussianBlurElementProtoFunc::cast(
   return SVGFEGaussianBlurElement::null;
 }
 
-Value SVGFEGaussianBlurElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGFEGaussianBlurElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGFEGaussianBlurElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGFEGaussianBlurElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -3046,10 +3047,10 @@ bool SVGFEGaussianBlurElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEGaussianBlurElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEGaussianBlurElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGFEGaussianBlurElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEGaussianBlurElement::bridge(ExecState* p1) const {
@@ -3057,7 +3058,7 @@ ObjectImp* SVGFEGaussianBlurElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEGaussianBlurElement::Private*>(d));
 }
 
-Value SVGFEGaussianBlurElement::cache(ExecState* p1) const {
+ValueImp* SVGFEGaussianBlurElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEGaussianBlurElement>(
       p1, static_cast<SVGFEGaussianBlurElement::Private*>(d));
 }
@@ -3079,12 +3080,12 @@ bool SVGFEImageElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFEImageElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEImageElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEImageElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGFEImageElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEImageElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3110,10 +3111,10 @@ bool SVGFEImageElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEImageElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEImageElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEImageElement::bridge(ExecState* p1) const {
@@ -3121,7 +3122,7 @@ ObjectImp* SVGFEImageElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEImageElement::Private*>(d));
 }
 
-Value SVGFEImageElement::cache(ExecState* p1) const {
+ValueImp* SVGFEImageElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEImageElement>(
       p1, static_cast<SVGFEImageElement::Private*>(d));
 }
@@ -3137,12 +3138,12 @@ bool SVGFEMergeElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFEMergeElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEMergeElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEMergeElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGFEMergeElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEMergeElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -3158,10 +3159,10 @@ bool SVGFEMergeElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEMergeElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEMergeElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEMergeElement::bridge(ExecState* p1) const {
@@ -3169,7 +3170,7 @@ ObjectImp* SVGFEMergeElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEMergeElement::Private*>(d));
 }
 
-Value SVGFEMergeElement::cache(ExecState* p1) const {
+ValueImp* SVGFEMergeElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEMergeElement>(
       p1, static_cast<SVGFEMergeElement::Private*>(d));
 }
@@ -3185,12 +3186,12 @@ bool SVGFEMergeNodeElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFEMergeNodeElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEMergeNodeElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEMergeNodeElement>(p1, p2, &s_hashTable, this,
                                                      p3);
 }
 
-Value SVGFEMergeNodeElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEMergeNodeElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   return Undefined();
@@ -3204,10 +3205,10 @@ bool SVGFEMergeNodeElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEMergeNodeElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEMergeNodeElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEMergeNodeElement::bridge(ExecState* p1) const {
@@ -3215,7 +3216,7 @@ ObjectImp* SVGFEMergeNodeElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEMergeNodeElement::Private*>(d));
 }
 
-Value SVGFEMergeNodeElement::cache(ExecState* p1) const {
+ValueImp* SVGFEMergeNodeElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEMergeNodeElement>(
       p1, static_cast<SVGFEMergeNodeElement::Private*>(d));
 }
@@ -3232,12 +3233,12 @@ bool SVGFEOffsetElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFEOffsetElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFEOffsetElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFEOffsetElement>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGFEOffsetElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFEOffsetElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -3253,10 +3254,10 @@ bool SVGFEOffsetElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFEOffsetElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFEOffsetElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFEOffsetElement::bridge(ExecState* p1) const {
@@ -3264,7 +3265,7 @@ ObjectImp* SVGFEOffsetElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFEOffsetElement::Private*>(d));
 }
 
-Value SVGFEOffsetElement::cache(ExecState* p1) const {
+ValueImp* SVGFEOffsetElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFEOffsetElement>(
       p1, static_cast<SVGFEOffsetElement::Private*>(d));
 }
@@ -3280,11 +3281,11 @@ bool SVGFETileElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFETileElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFETileElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFETileElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGFETileElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFETileElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -3300,10 +3301,10 @@ bool SVGFETileElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFETileElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFETileElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFETileElement::bridge(ExecState* p1) const {
@@ -3311,7 +3312,7 @@ ObjectImp* SVGFETileElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFETileElement::Private*>(d));
 }
 
-Value SVGFETileElement::cache(ExecState* p1) const {
+ValueImp* SVGFETileElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFETileElement>(
       p1, static_cast<SVGFETileElement::Private*>(d));
 }
@@ -3329,12 +3330,12 @@ bool SVGFETurbulenceElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGFETurbulenceElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFETurbulenceElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFETurbulenceElement>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
 
-Value SVGFETurbulenceElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFETurbulenceElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGFilterPrimitiveStandardAttributes::hasProperty(p1, p2))
@@ -3350,10 +3351,10 @@ bool SVGFETurbulenceElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFETurbulenceElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFETurbulenceElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFETurbulenceElement::bridge(ExecState* p1) const {
@@ -3361,7 +3362,7 @@ ObjectImp* SVGFETurbulenceElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFETurbulenceElement::Private*>(d));
 }
 
-Value SVGFETurbulenceElement::cache(ExecState* p1) const {
+ValueImp* SVGFETurbulenceElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFETurbulenceElement>(
       p1, static_cast<SVGFETurbulenceElement::Private*>(d));
 }
@@ -3370,8 +3371,8 @@ bool SVGFilterElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGFilterElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGFilterElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGFilterElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGElement::hasProperty(p1, p2))
     return true;
@@ -3386,7 +3387,7 @@ bool SVGFilterElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFilterElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFilterElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGFilterElementProtoFunc, SVGFilterElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -3403,10 +3404,10 @@ SVGFilterElement SVGFilterElementProtoFunc::cast(KJS::ExecState*,
   return SVGFilterElement::null;
 }
 
-Value SVGFilterElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGFilterElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGFilterElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGFilterElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3432,10 +3433,10 @@ bool SVGFilterElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGFilterElement::prototype(ExecState* p1) const {
+ObjectImp* SVGFilterElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGFilterElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFilterElement::bridge(ExecState* p1) const {
@@ -3443,7 +3444,7 @@ ObjectImp* SVGFilterElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGFilterElement::Private*>(d));
 }
 
-Value SVGFilterElement::cache(ExecState* p1) const {
+ValueImp* SVGFilterElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFilterElement>(
       p1, static_cast<SVGFilterElement::Private*>(d));
 }
@@ -3460,22 +3461,23 @@ bool SVGFilterPrimitiveStandardAttributes::hasProperty(
   return false;
 }
 
-Value SVGFilterPrimitiveStandardAttributes::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFilterPrimitiveStandardAttributes::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFilterPrimitiveStandardAttributes>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGFilterPrimitiveStandardAttributes::getInParents(
+ValueImp* SVGFilterPrimitiveStandardAttributes::getInParents(
     GET_METHOD_ARGS) const {
   if (SVGStylable::hasProperty(p1, p2))
     return SVGStylable::get(p1, p2, p3);
   return Undefined();
 }
 
-Object SVGFilterPrimitiveStandardAttributes::prototype(ExecState* p1) const {
+ObjectImp* SVGFilterPrimitiveStandardAttributes::prototype(
+    ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFilterPrimitiveStandardAttributes::bridge(ExecState* p1) const {
@@ -3483,7 +3485,7 @@ ObjectImp* SVGFilterPrimitiveStandardAttributes::bridge(ExecState* p1) const {
       p1, static_cast<SVGFilterPrimitiveStandardAttributes::Private*>(impl));
 }
 
-Value SVGFilterPrimitiveStandardAttributes::cache(ExecState* p1) const {
+ValueImp* SVGFilterPrimitiveStandardAttributes::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFilterPrimitiveStandardAttributes>(
       p1, static_cast<SVGFilterPrimitiveStandardAttributes::Private*>(impl));
 }
@@ -3496,21 +3498,21 @@ bool SVGFitToViewBox::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGFitToViewBox::get(GET_METHOD_ARGS) const {
+ValueImp* SVGFitToViewBox::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGFitToViewBox>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGFitToViewBox::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGFitToViewBox::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGFitToViewBox::prototype(ExecState* p1) const {
+ObjectImp* SVGFitToViewBox::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGFitToViewBox::bridge(ExecState* p1) const {
@@ -3518,7 +3520,7 @@ ObjectImp* SVGFitToViewBox::bridge(ExecState* p1) const {
       p1, static_cast<SVGFitToViewBox::Private*>(impl));
 }
 
-Value SVGFitToViewBox::cache(ExecState* p1) const {
+ValueImp* SVGFitToViewBox::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGFitToViewBox>(
       p1, static_cast<SVGFitToViewBox::Private*>(impl));
 }
@@ -3542,11 +3544,11 @@ bool SVGGElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGGElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGGElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGGElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGGElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGGElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3574,10 +3576,10 @@ bool SVGGElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGGElement::prototype(ExecState* p1) const {
+ObjectImp* SVGGElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGGElement::bridge(ExecState* p1) const {
@@ -3585,7 +3587,7 @@ ObjectImp* SVGGElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGGElement::Private*>(d));
 }
 
-Value SVGGElement::cache(ExecState* p1) const {
+ValueImp* SVGGElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGGElement>(
       p1, static_cast<SVGGElement::Private*>(d));
 }
@@ -3606,12 +3608,12 @@ bool SVGGradientElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGGradientElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGGradientElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGGradientElement>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGGradientElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGGradientElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3631,10 +3633,10 @@ bool SVGGradientElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGGradientElement::prototype(ExecState* p1) const {
+ObjectImp* SVGGradientElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGGradientElement::bridge(ExecState* p1) const {
@@ -3642,7 +3644,7 @@ ObjectImp* SVGGradientElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGGradientElement::Private*>(d));
 }
 
-Value SVGGradientElement::cache(ExecState* p1) const {
+ValueImp* SVGGradientElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGGradientElement>(
       p1, static_cast<SVGGradientElement::Private*>(d));
 }
@@ -3668,11 +3670,11 @@ bool SVGImageElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGImageElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGImageElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGImageElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGImageElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGImageElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3702,10 +3704,10 @@ bool SVGImageElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGImageElement::prototype(ExecState* p1) const {
+ObjectImp* SVGImageElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGImageElement::bridge(ExecState* p1) const {
@@ -3713,7 +3715,7 @@ ObjectImp* SVGImageElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGImageElement::Private*>(d));
 }
 
-Value SVGImageElement::cache(ExecState* p1) const {
+ValueImp* SVGImageElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGImageElement>(
       p1, static_cast<SVGImageElement::Private*>(d));
 }
@@ -3726,11 +3728,11 @@ bool SVGLangSpace::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGLangSpace::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLangSpace::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGLangSpace>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGLangSpace::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGLangSpace::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -3749,10 +3751,10 @@ bool SVGLangSpace::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGLangSpace::prototype(ExecState* p1) const {
+ObjectImp* SVGLangSpace::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLangSpace::bridge(ExecState* p1) const {
@@ -3760,7 +3762,7 @@ ObjectImp* SVGLangSpace::bridge(ExecState* p1) const {
       p1, static_cast<SVGLangSpace::Private*>(impl));
 }
 
-Value SVGLangSpace::cache(ExecState* p1) const {
+ValueImp* SVGLangSpace::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLangSpace>(
       p1, static_cast<SVGLangSpace::Private*>(impl));
 }
@@ -3769,13 +3771,13 @@ bool SVGLength::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGLength::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGLengthProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGLengthProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGLength::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLength::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGLengthProtoFunc, SVGLength>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
@@ -3795,10 +3797,10 @@ SVGLength KSVG::toSVGLength(KJS::ExecState*, const ObjectImp* p1) {
   return SVGLength::null;
 }
 
-Value SVGLength::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGLengthProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGLength::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGLengthProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -3815,10 +3817,10 @@ bool SVGLength::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGLength::prototype(ExecState* p1) const {
+ObjectImp* SVGLength::prototype(ExecState* p1) const {
   if (p1)
     return SVGLengthProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLength::bridge(ExecState* p1) const {
@@ -3826,7 +3828,7 @@ ObjectImp* SVGLength::bridge(ExecState* p1) const {
       p1, static_cast<SVGLength::Private*>(impl));
 }
 
-Value SVGLength::cache(ExecState* p1) const {
+ValueImp* SVGLength::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLength>(
       p1, static_cast<SVGLength::Private*>(impl));
 }
@@ -3835,13 +3837,13 @@ bool SVGLengthList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGLengthList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGLengthListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGLengthListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGLengthList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLengthList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGLengthListProtoFunc, SVGLengthList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -3857,18 +3859,18 @@ SVGLengthList SVGLengthListProtoFunc::cast(KJS::ExecState*,
   return SVGLengthList::null;
 }
 
-Value SVGLengthList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGLengthListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGLengthList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGLengthListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGLengthList::prototype(ExecState* p1) const {
+ObjectImp* SVGLengthList::prototype(ExecState* p1) const {
   if (p1)
     return SVGLengthListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLengthList::bridge(ExecState* p1) const {
@@ -3876,7 +3878,7 @@ ObjectImp* SVGLengthList::bridge(ExecState* p1) const {
       p1, static_cast<SVGLengthList::Private*>(impl));
 }
 
-Value SVGLengthList::cache(ExecState* p1) const {
+ValueImp* SVGLengthList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLengthList>(
       p1, static_cast<SVGLengthList::Private*>(impl));
 }
@@ -3900,11 +3902,11 @@ bool SVGLineElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGLineElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLineElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGLineElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGLineElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGLineElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -3932,10 +3934,10 @@ bool SVGLineElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGLineElement::prototype(ExecState* p1) const {
+ObjectImp* SVGLineElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLineElement::bridge(ExecState* p1) const {
@@ -3943,7 +3945,7 @@ ObjectImp* SVGLineElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGLineElement::Private*>(d));
 }
 
-Value SVGLineElement::cache(ExecState* p1) const {
+ValueImp* SVGLineElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLineElement>(
       p1, static_cast<SVGLineElement::Private*>(d));
 }
@@ -3959,12 +3961,12 @@ bool SVGLinearGradientElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGLinearGradientElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLinearGradientElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGLinearGradientElement>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
 
-Value SVGLinearGradientElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGLinearGradientElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGGradientElement::hasProperty(p1, p2))
     return SVGGradientElement::get(p1, p2, p3);
   return Undefined();
@@ -3978,10 +3980,10 @@ bool SVGLinearGradientElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGLinearGradientElement::prototype(ExecState* p1) const {
+ObjectImp* SVGLinearGradientElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLinearGradientElement::bridge(ExecState* p1) const {
@@ -3989,7 +3991,7 @@ ObjectImp* SVGLinearGradientElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGLinearGradientElement::Private*>(d));
 }
 
-Value SVGLinearGradientElement::cache(ExecState* p1) const {
+ValueImp* SVGLinearGradientElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLinearGradientElement>(
       p1, static_cast<SVGLinearGradientElement::Private*>(d));
 }
@@ -3998,13 +4000,13 @@ bool SVGLocatable::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGLocatable::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGLocatableProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGLocatableProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGLocatable::get(GET_METHOD_ARGS) const {
+ValueImp* SVGLocatable::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGLocatableProtoFunc, SVGLocatable>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4122,18 +4124,18 @@ SVGLocatable SVGLocatableProtoFunc::cast(KJS::ExecState*,
   return SVGLocatable::null;
 }
 
-Value SVGLocatable::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGLocatableProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGLocatable::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGLocatableProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGLocatable::prototype(ExecState* p1) const {
+ObjectImp* SVGLocatable::prototype(ExecState* p1) const {
   if (p1)
     return SVGLocatableProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGLocatable::bridge(ExecState* p1) const {
@@ -4141,7 +4143,7 @@ ObjectImp* SVGLocatable::bridge(ExecState* p1) const {
       p1, static_cast<SVGLocatable::Private*>(impl));
 }
 
-Value SVGLocatable::cache(ExecState* p1) const {
+ValueImp* SVGLocatable::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGLocatable>(
       p1, static_cast<SVGLocatable::Private*>(impl));
 }
@@ -4150,8 +4152,8 @@ bool SVGMarkerElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGMarkerElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGMarkerElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGMarkerElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGElement::hasProperty(p1, p2))
     return true;
@@ -4166,7 +4168,7 @@ bool SVGMarkerElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGMarkerElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGMarkerElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGMarkerElementProtoFunc, SVGMarkerElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4183,10 +4185,10 @@ SVGMarkerElement SVGMarkerElementProtoFunc::cast(KJS::ExecState*,
   return SVGMarkerElement::null;
 }
 
-Value SVGMarkerElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGMarkerElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGMarkerElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGMarkerElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -4212,10 +4214,10 @@ bool SVGMarkerElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGMarkerElement::prototype(ExecState* p1) const {
+ObjectImp* SVGMarkerElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGMarkerElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGMarkerElement::bridge(ExecState* p1) const {
@@ -4223,7 +4225,7 @@ ObjectImp* SVGMarkerElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGMarkerElement::Private*>(d));
 }
 
-Value SVGMarkerElement::cache(ExecState* p1) const {
+ValueImp* SVGMarkerElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGMarkerElement>(
       p1, static_cast<SVGMarkerElement::Private*>(d));
 }
@@ -4232,13 +4234,13 @@ bool SVGMatrix::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGMatrix::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGMatrixProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGMatrixProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGMatrix::get(GET_METHOD_ARGS) const {
+ValueImp* SVGMatrix::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGMatrixProtoFunc, SVGMatrix>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
@@ -4258,10 +4260,10 @@ SVGMatrix KSVG::toSVGMatrix(KJS::ExecState*, const ObjectImp* p1) {
   return SVGMatrix::null;
 }
 
-Value SVGMatrix::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGMatrixProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGMatrix::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGMatrixProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -4278,10 +4280,10 @@ bool SVGMatrix::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGMatrix::prototype(ExecState* p1) const {
+ObjectImp* SVGMatrix::prototype(ExecState* p1) const {
   if (p1)
     return SVGMatrixProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGMatrix::bridge(ExecState* p1) const {
@@ -4289,7 +4291,7 @@ ObjectImp* SVGMatrix::bridge(ExecState* p1) const {
       p1, static_cast<SVGMatrix::Private*>(impl));
 }
 
-Value SVGMatrix::cache(ExecState* p1) const {
+ValueImp* SVGMatrix::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGMatrix>(
       p1, static_cast<SVGMatrix::Private*>(impl));
 }
@@ -4302,7 +4304,7 @@ bool SVGNumber::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGNumber::get(GET_METHOD_ARGS) const {
+ValueImp* SVGNumber::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGNumber>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -4316,7 +4318,7 @@ SVGNumber KSVG::toSVGNumber(KJS::ExecState*, const ObjectImp* p1) {
   return SVGNumber::null;
 }
 
-Value SVGNumber::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGNumber::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -4335,10 +4337,10 @@ bool SVGNumber::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGNumber::prototype(ExecState* p1) const {
+ObjectImp* SVGNumber::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGNumber::bridge(ExecState* p1) const {
@@ -4346,7 +4348,7 @@ ObjectImp* SVGNumber::bridge(ExecState* p1) const {
       p1, static_cast<SVGNumber::Private*>(impl));
 }
 
-Value SVGNumber::cache(ExecState* p1) const {
+ValueImp* SVGNumber::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGNumber>(
       p1, static_cast<SVGNumber::Private*>(impl));
 }
@@ -4355,13 +4357,13 @@ bool SVGNumberList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGNumberList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGNumberListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGNumberListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGNumberList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGNumberList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGNumberListProtoFunc, SVGNumberList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4377,18 +4379,18 @@ SVGNumberList SVGNumberListProtoFunc::cast(KJS::ExecState*,
   return SVGNumberList::null;
 }
 
-Value SVGNumberList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGNumberListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGNumberList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGNumberListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGNumberList::prototype(ExecState* p1) const {
+ObjectImp* SVGNumberList::prototype(ExecState* p1) const {
   if (p1)
     return SVGNumberListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGNumberList::bridge(ExecState* p1) const {
@@ -4396,7 +4398,7 @@ ObjectImp* SVGNumberList::bridge(ExecState* p1) const {
       p1, static_cast<SVGNumberList::Private*>(impl));
 }
 
-Value SVGNumberList::cache(ExecState* p1) const {
+ValueImp* SVGNumberList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGNumberList>(
       p1, static_cast<SVGNumberList::Private*>(impl));
 }
@@ -4405,15 +4407,15 @@ bool SVGPaint::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGPaint::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGPaintProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGPaintProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGColor::hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGPaint::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPaint::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGPaintProtoFunc, SVGPaint>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -4428,10 +4430,10 @@ SVGPaint SVGPaintProtoFunc::cast(KJS::ExecState*, const ObjectImp* p1) const {
   return SVGPaint::null;
 }
 
-Value SVGPaint::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGPaintProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGPaint::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGPaintProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGColor::hasProperty(p1, p2))
     return SVGColor::get(p1, p2, p3);
   return Undefined();
@@ -4445,10 +4447,10 @@ bool SVGPaint::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPaint::prototype(ExecState* p1) const {
+ObjectImp* SVGPaint::prototype(ExecState* p1) const {
   if (p1)
     return SVGPaintProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPaint::bridge(ExecState* p1) const {
@@ -4456,7 +4458,7 @@ ObjectImp* SVGPaint::bridge(ExecState* p1) const {
                                          static_cast<SVGPaint::Private*>(d));
 }
 
-Value SVGPaint::cache(ExecState* p1) const {
+ValueImp* SVGPaint::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPaint>(p1, static_cast<SVGPaint::Private*>(d));
 }
 
@@ -4464,8 +4466,8 @@ bool SVGPathElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGPathElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGPathElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGPathElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGAnimatedPathData::hasProperty(p1, p2))
     return true;
@@ -4484,7 +4486,7 @@ bool SVGPathElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPathElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGPathElementProtoFunc, SVGPathElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -4501,10 +4503,10 @@ SVGPathElement SVGPathElementProtoFunc::cast(KJS::ExecState*,
   return SVGPathElement::null;
 }
 
-Value SVGPathElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGPathElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGPathElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGPathElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGAnimatedPathData::hasProperty(p1, p2))
     return SVGAnimatedPathData::get(p1, p2, p3);
   if (SVGElement::hasProperty(p1, p2))
@@ -4534,10 +4536,10 @@ bool SVGPathElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathElement::prototype(ExecState* p1) const {
+ObjectImp* SVGPathElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGPathElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathElement::bridge(ExecState* p1) const {
@@ -4545,7 +4547,7 @@ ObjectImp* SVGPathElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathElement::Private*>(d));
 }
 
-Value SVGPathElement::cache(ExecState* p1) const {
+ValueImp* SVGPathElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathElement>(
       p1, static_cast<SVGPathElement::Private*>(d));
 }
@@ -4558,7 +4560,7 @@ bool SVGPathSeg::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPathSeg::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSeg::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSeg>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -4690,17 +4692,17 @@ SVGPathSeg KSVG::toSVGPathSeg(KJS::ExecState*, const ObjectImp* p1) {
   return SVGPathSeg::null;
 }
 
-Value SVGPathSeg::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSeg::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGPathSeg::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSeg::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSeg::bridge(ExecState* p1) const {
@@ -4708,7 +4710,7 @@ ObjectImp* SVGPathSeg::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSeg::Private*>(impl));
 }
 
-Value SVGPathSeg::cache(ExecState* p1) const {
+ValueImp* SVGPathSeg::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSeg>(
       p1, static_cast<SVGPathSeg::Private*>(impl));
 }
@@ -4722,11 +4724,11 @@ bool SVGPathSegArcAbs::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPathSegArcAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegArcAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegArcAbs>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegArcAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegArcAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4744,10 +4746,10 @@ bool SVGPathSegArcAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegArcAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegArcAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegArcAbs::bridge(ExecState* p1) const {
@@ -4755,7 +4757,7 @@ ObjectImp* SVGPathSegArcAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegArcAbs::Private*>(impl));
 }
 
-Value SVGPathSegArcAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegArcAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegArcAbs>(
       p1, static_cast<SVGPathSegArcAbs::Private*>(impl));
 }
@@ -4769,11 +4771,11 @@ bool SVGPathSegArcRel::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPathSegArcRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegArcRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegArcRel>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegArcRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegArcRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4791,10 +4793,10 @@ bool SVGPathSegArcRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegArcRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegArcRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegArcRel::bridge(ExecState* p1) const {
@@ -4802,7 +4804,7 @@ ObjectImp* SVGPathSegArcRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegArcRel::Private*>(impl));
 }
 
-Value SVGPathSegArcRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegArcRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegArcRel>(
       p1, static_cast<SVGPathSegArcRel::Private*>(impl));
 }
@@ -4818,12 +4820,12 @@ bool SVGPathSegCurvetoCubicAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoCubicAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoCubicAbs>(p1, p2, &s_hashTable,
                                                          this, p3);
 }
 
-Value SVGPathSegCurvetoCubicAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4842,10 +4844,10 @@ bool SVGPathSegCurvetoCubicAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoCubicAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoCubicAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoCubicAbs::bridge(ExecState* p1) const {
@@ -4853,7 +4855,7 @@ ObjectImp* SVGPathSegCurvetoCubicAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoCubicAbs::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoCubicAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoCubicAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoCubicAbs>(
       p1, static_cast<SVGPathSegCurvetoCubicAbs::Private*>(impl));
 }
@@ -4869,12 +4871,12 @@ bool SVGPathSegCurvetoCubicRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoCubicRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoCubicRel>(p1, p2, &s_hashTable,
                                                          this, p3);
 }
 
-Value SVGPathSegCurvetoCubicRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4893,10 +4895,10 @@ bool SVGPathSegCurvetoCubicRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoCubicRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoCubicRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoCubicRel::bridge(ExecState* p1) const {
@@ -4904,7 +4906,7 @@ ObjectImp* SVGPathSegCurvetoCubicRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoCubicRel::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoCubicRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoCubicRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoCubicRel>(
       p1, static_cast<SVGPathSegCurvetoCubicRel::Private*>(impl));
 }
@@ -4920,12 +4922,12 @@ bool SVGPathSegCurvetoCubicSmoothAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoCubicSmoothAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoCubicSmoothAbs>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoCubicSmoothAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4944,10 +4946,10 @@ bool SVGPathSegCurvetoCubicSmoothAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoCubicSmoothAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoCubicSmoothAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoCubicSmoothAbs::bridge(ExecState* p1) const {
@@ -4955,7 +4957,7 @@ ObjectImp* SVGPathSegCurvetoCubicSmoothAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoCubicSmoothAbs::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoCubicSmoothAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoCubicSmoothAbs>(
       p1, static_cast<SVGPathSegCurvetoCubicSmoothAbs::Private*>(impl));
 }
@@ -4971,12 +4973,12 @@ bool SVGPathSegCurvetoCubicSmoothRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoCubicSmoothRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoCubicSmoothRel>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoCubicSmoothRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -4995,10 +4997,10 @@ bool SVGPathSegCurvetoCubicSmoothRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoCubicSmoothRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoCubicSmoothRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoCubicSmoothRel::bridge(ExecState* p1) const {
@@ -5006,7 +5008,7 @@ ObjectImp* SVGPathSegCurvetoCubicSmoothRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoCubicSmoothRel::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoCubicSmoothRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoCubicSmoothRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoCubicSmoothRel>(
       p1, static_cast<SVGPathSegCurvetoCubicSmoothRel::Private*>(impl));
 }
@@ -5022,12 +5024,12 @@ bool SVGPathSegCurvetoQuadraticAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoQuadraticAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoQuadraticAbs>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoQuadraticAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5046,10 +5048,10 @@ bool SVGPathSegCurvetoQuadraticAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoQuadraticAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoQuadraticAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoQuadraticAbs::bridge(ExecState* p1) const {
@@ -5057,7 +5059,7 @@ ObjectImp* SVGPathSegCurvetoQuadraticAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoQuadraticAbs::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoQuadraticAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoQuadraticAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoQuadraticAbs>(
       p1, static_cast<SVGPathSegCurvetoQuadraticAbs::Private*>(impl));
 }
@@ -5073,12 +5075,12 @@ bool SVGPathSegCurvetoQuadraticRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegCurvetoQuadraticRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoQuadraticRel>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoQuadraticRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5097,10 +5099,10 @@ bool SVGPathSegCurvetoQuadraticRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoQuadraticRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoQuadraticRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoQuadraticRel::bridge(ExecState* p1) const {
@@ -5108,7 +5110,7 @@ ObjectImp* SVGPathSegCurvetoQuadraticRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoQuadraticRel::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoQuadraticRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoQuadraticRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoQuadraticRel>(
       p1, static_cast<SVGPathSegCurvetoQuadraticRel::Private*>(impl));
 }
@@ -5125,12 +5127,13 @@ bool SVGPathSegCurvetoQuadraticSmoothAbs::hasProperty(
   return false;
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoQuadraticSmoothAbs>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothAbs::getInParents(
+    GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5149,10 +5152,10 @@ bool SVGPathSegCurvetoQuadraticSmoothAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoQuadraticSmoothAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoQuadraticSmoothAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoQuadraticSmoothAbs::bridge(ExecState* p1) const {
@@ -5160,7 +5163,7 @@ ObjectImp* SVGPathSegCurvetoQuadraticSmoothAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoQuadraticSmoothAbs::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoQuadraticSmoothAbs>(
       p1, static_cast<SVGPathSegCurvetoQuadraticSmoothAbs::Private*>(impl));
 }
@@ -5177,12 +5180,13 @@ bool SVGPathSegCurvetoQuadraticSmoothRel::hasProperty(
   return false;
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegCurvetoQuadraticSmoothRel>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothRel::getInParents(
+    GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5201,10 +5205,10 @@ bool SVGPathSegCurvetoQuadraticSmoothRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegCurvetoQuadraticSmoothRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegCurvetoQuadraticSmoothRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegCurvetoQuadraticSmoothRel::bridge(ExecState* p1) const {
@@ -5212,7 +5216,7 @@ ObjectImp* SVGPathSegCurvetoQuadraticSmoothRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegCurvetoQuadraticSmoothRel::Private*>(impl));
 }
 
-Value SVGPathSegCurvetoQuadraticSmoothRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegCurvetoQuadraticSmoothRel>(
       p1, static_cast<SVGPathSegCurvetoQuadraticSmoothRel::Private*>(impl));
 }
@@ -5227,12 +5231,12 @@ bool SVGPathSegLinetoAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoAbs>(p1, p2, &s_hashTable, this,
                                                    p3);
 }
 
-Value SVGPathSegLinetoAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5251,10 +5255,10 @@ bool SVGPathSegLinetoAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoAbs::bridge(ExecState* p1) const {
@@ -5262,7 +5266,7 @@ ObjectImp* SVGPathSegLinetoAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoAbs::Private*>(impl));
 }
 
-Value SVGPathSegLinetoAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoAbs>(
       p1, static_cast<SVGPathSegLinetoAbs::Private*>(impl));
 }
@@ -5278,12 +5282,12 @@ bool SVGPathSegLinetoHorizontalAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoHorizontalAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoHorizontalAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoHorizontalAbs>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegLinetoHorizontalAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoHorizontalAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5302,10 +5306,10 @@ bool SVGPathSegLinetoHorizontalAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoHorizontalAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoHorizontalAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoHorizontalAbs::bridge(ExecState* p1) const {
@@ -5313,7 +5317,7 @@ ObjectImp* SVGPathSegLinetoHorizontalAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoHorizontalAbs::Private*>(impl));
 }
 
-Value SVGPathSegLinetoHorizontalAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoHorizontalAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoHorizontalAbs>(
       p1, static_cast<SVGPathSegLinetoHorizontalAbs::Private*>(impl));
 }
@@ -5329,12 +5333,12 @@ bool SVGPathSegLinetoHorizontalRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoHorizontalRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoHorizontalRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoHorizontalRel>(
       p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGPathSegLinetoHorizontalRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoHorizontalRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5353,10 +5357,10 @@ bool SVGPathSegLinetoHorizontalRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoHorizontalRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoHorizontalRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoHorizontalRel::bridge(ExecState* p1) const {
@@ -5364,7 +5368,7 @@ ObjectImp* SVGPathSegLinetoHorizontalRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoHorizontalRel::Private*>(impl));
 }
 
-Value SVGPathSegLinetoHorizontalRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoHorizontalRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoHorizontalRel>(
       p1, static_cast<SVGPathSegLinetoHorizontalRel::Private*>(impl));
 }
@@ -5379,12 +5383,12 @@ bool SVGPathSegLinetoRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoRel>(p1, p2, &s_hashTable, this,
                                                    p3);
 }
 
-Value SVGPathSegLinetoRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5403,10 +5407,10 @@ bool SVGPathSegLinetoRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoRel::bridge(ExecState* p1) const {
@@ -5414,7 +5418,7 @@ ObjectImp* SVGPathSegLinetoRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoRel::Private*>(impl));
 }
 
-Value SVGPathSegLinetoRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoRel>(
       p1, static_cast<SVGPathSegLinetoRel::Private*>(impl));
 }
@@ -5430,12 +5434,12 @@ bool SVGPathSegLinetoVerticalAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoVerticalAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoVerticalAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoVerticalAbs>(p1, p2, &s_hashTable,
                                                            this, p3);
 }
 
-Value SVGPathSegLinetoVerticalAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoVerticalAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5454,10 +5458,10 @@ bool SVGPathSegLinetoVerticalAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoVerticalAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoVerticalAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoVerticalAbs::bridge(ExecState* p1) const {
@@ -5465,7 +5469,7 @@ ObjectImp* SVGPathSegLinetoVerticalAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoVerticalAbs::Private*>(impl));
 }
 
-Value SVGPathSegLinetoVerticalAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoVerticalAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoVerticalAbs>(
       p1, static_cast<SVGPathSegLinetoVerticalAbs::Private*>(impl));
 }
@@ -5481,12 +5485,12 @@ bool SVGPathSegLinetoVerticalRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegLinetoVerticalRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoVerticalRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegLinetoVerticalRel>(p1, p2, &s_hashTable,
                                                            this, p3);
 }
 
-Value SVGPathSegLinetoVerticalRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegLinetoVerticalRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5505,10 +5509,10 @@ bool SVGPathSegLinetoVerticalRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegLinetoVerticalRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegLinetoVerticalRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegLinetoVerticalRel::bridge(ExecState* p1) const {
@@ -5516,7 +5520,7 @@ ObjectImp* SVGPathSegLinetoVerticalRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegLinetoVerticalRel::Private*>(impl));
 }
 
-Value SVGPathSegLinetoVerticalRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegLinetoVerticalRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegLinetoVerticalRel>(
       p1, static_cast<SVGPathSegLinetoVerticalRel::Private*>(impl));
 }
@@ -5525,13 +5529,13 @@ bool SVGPathSegList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGPathSegList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGPathSegListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGPathSegListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGPathSegList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGPathSegListProtoFunc, SVGPathSegList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -5548,18 +5552,18 @@ SVGPathSegList SVGPathSegListProtoFunc::cast(KJS::ExecState*,
   return SVGPathSegList::null;
 }
 
-Value SVGPathSegList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGPathSegListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGPathSegList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGPathSegListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGPathSegList::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegList::prototype(ExecState* p1) const {
   if (p1)
     return SVGPathSegListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegList::bridge(ExecState* p1) const {
@@ -5567,7 +5571,7 @@ ObjectImp* SVGPathSegList::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegList::Private*>(impl));
 }
 
-Value SVGPathSegList::cache(ExecState* p1) const {
+ValueImp* SVGPathSegList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegList>(
       p1, static_cast<SVGPathSegList::Private*>(impl));
 }
@@ -5582,12 +5586,12 @@ bool SVGPathSegMovetoAbs::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegMovetoAbs::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegMovetoAbs::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegMovetoAbs>(p1, p2, &s_hashTable, this,
                                                    p3);
 }
 
-Value SVGPathSegMovetoAbs::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegMovetoAbs::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5606,10 +5610,10 @@ bool SVGPathSegMovetoAbs::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegMovetoAbs::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegMovetoAbs::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegMovetoAbs::bridge(ExecState* p1) const {
@@ -5617,7 +5621,7 @@ ObjectImp* SVGPathSegMovetoAbs::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegMovetoAbs::Private*>(impl));
 }
 
-Value SVGPathSegMovetoAbs::cache(ExecState* p1) const {
+ValueImp* SVGPathSegMovetoAbs::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegMovetoAbs>(
       p1, static_cast<SVGPathSegMovetoAbs::Private*>(impl));
 }
@@ -5632,12 +5636,12 @@ bool SVGPathSegMovetoRel::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPathSegMovetoRel::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegMovetoRel::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPathSegMovetoRel>(p1, p2, &s_hashTable, this,
                                                    p3);
 }
 
-Value SVGPathSegMovetoRel::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPathSegMovetoRel::getInParents(GET_METHOD_ARGS) const {
   if (SVGPathSeg::hasProperty(p1, p2))
     return SVGPathSeg::get(p1, p2, p3);
   return Undefined();
@@ -5656,10 +5660,10 @@ bool SVGPathSegMovetoRel::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPathSegMovetoRel::prototype(ExecState* p1) const {
+ObjectImp* SVGPathSegMovetoRel::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPathSegMovetoRel::bridge(ExecState* p1) const {
@@ -5667,7 +5671,7 @@ ObjectImp* SVGPathSegMovetoRel::bridge(ExecState* p1) const {
       p1, static_cast<SVGPathSegMovetoRel::Private*>(impl));
 }
 
-Value SVGPathSegMovetoRel::cache(ExecState* p1) const {
+ValueImp* SVGPathSegMovetoRel::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPathSegMovetoRel>(
       p1, static_cast<SVGPathSegMovetoRel::Private*>(impl));
 }
@@ -5693,12 +5697,12 @@ bool SVGPatternElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPatternElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPatternElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPatternElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGPatternElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPatternElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -5728,10 +5732,10 @@ bool SVGPatternElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPatternElement::prototype(ExecState* p1) const {
+ObjectImp* SVGPatternElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPatternElement::bridge(ExecState* p1) const {
@@ -5739,7 +5743,7 @@ ObjectImp* SVGPatternElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGPatternElement::Private*>(d));
 }
 
-Value SVGPatternElement::cache(ExecState* p1) const {
+ValueImp* SVGPatternElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPatternElement>(
       p1, static_cast<SVGPatternElement::Private*>(d));
 }
@@ -5748,13 +5752,13 @@ bool SVGPoint::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGPoint::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGPointProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGPointProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGPoint::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPoint::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGPointProtoFunc, SVGPoint>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -5774,10 +5778,10 @@ SVGPoint KSVG::toSVGPoint(KJS::ExecState*, const ObjectImp* p1) {
   return SVGPoint::null;
 }
 
-Value SVGPoint::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGPointProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGPoint::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGPointProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
@@ -5794,10 +5798,10 @@ bool SVGPoint::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPoint::prototype(ExecState* p1) const {
+ObjectImp* SVGPoint::prototype(ExecState* p1) const {
   if (p1)
     return SVGPointProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPoint::bridge(ExecState* p1) const {
@@ -5805,7 +5809,7 @@ ObjectImp* SVGPoint::bridge(ExecState* p1) const {
                                          static_cast<SVGPoint::Private*>(impl));
 }
 
-Value SVGPoint::cache(ExecState* p1) const {
+ValueImp* SVGPoint::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPoint>(p1,
                                         static_cast<SVGPoint::Private*>(impl));
 }
@@ -5814,13 +5818,13 @@ bool SVGPointList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGPointList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGPointListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGPointListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGPointList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPointList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGPointListProtoFunc, SVGPointList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -5836,18 +5840,18 @@ SVGPointList SVGPointListProtoFunc::cast(KJS::ExecState*,
   return SVGPointList::null;
 }
 
-Value SVGPointList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGPointListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGPointList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGPointListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGPointList::prototype(ExecState* p1) const {
+ObjectImp* SVGPointList::prototype(ExecState* p1) const {
   if (p1)
     return SVGPointListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPointList::bridge(ExecState* p1) const {
@@ -5855,7 +5859,7 @@ ObjectImp* SVGPointList::bridge(ExecState* p1) const {
       p1, static_cast<SVGPointList::Private*>(impl));
 }
 
-Value SVGPointList::cache(ExecState* p1) const {
+ValueImp* SVGPointList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPointList>(
       p1, static_cast<SVGPointList::Private*>(impl));
 }
@@ -5881,12 +5885,12 @@ bool SVGPolygonElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGPolygonElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPolygonElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPolygonElement>(p1, p2, &s_hashTable, this,
                                                  p3);
 }
 
-Value SVGPolygonElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPolygonElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimatedPoints::hasProperty(p1, p2))
     return SVGAnimatedPoints::get(p1, p2, p3);
   if (SVGElement::hasProperty(p1, p2))
@@ -5916,10 +5920,10 @@ bool SVGPolygonElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPolygonElement::prototype(ExecState* p1) const {
+ObjectImp* SVGPolygonElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPolygonElement::bridge(ExecState* p1) const {
@@ -5927,7 +5931,7 @@ ObjectImp* SVGPolygonElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGPolygonElement::Private*>(d));
 }
 
-Value SVGPolygonElement::cache(ExecState* p1) const {
+ValueImp* SVGPolygonElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPolygonElement>(
       p1, static_cast<SVGPolygonElement::Private*>(d));
 }
@@ -5954,12 +5958,12 @@ bool SVGPolylineElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPolylineElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPolylineElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPolylineElement>(p1, p2, &s_hashTable, this,
                                                   p3);
 }
 
-Value SVGPolylineElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPolylineElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimatedPoints::hasProperty(p1, p2))
     return SVGAnimatedPoints::get(p1, p2, p3);
   if (SVGElement::hasProperty(p1, p2))
@@ -5989,10 +5993,10 @@ bool SVGPolylineElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPolylineElement::prototype(ExecState* p1) const {
+ObjectImp* SVGPolylineElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPolylineElement::bridge(ExecState* p1) const {
@@ -6000,7 +6004,7 @@ ObjectImp* SVGPolylineElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGPolylineElement::Private*>(d));
 }
 
-Value SVGPolylineElement::cache(ExecState* p1) const {
+ValueImp* SVGPolylineElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPolylineElement>(
       p1, static_cast<SVGPolylineElement::Private*>(d));
 }
@@ -6015,12 +6019,12 @@ bool SVGPreserveAspectRatio::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGPreserveAspectRatio::get(GET_METHOD_ARGS) const {
+ValueImp* SVGPreserveAspectRatio::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGPreserveAspectRatio>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
 
-Value SVGPreserveAspectRatio::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGPreserveAspectRatio::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -6040,10 +6044,10 @@ bool SVGPreserveAspectRatio::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGPreserveAspectRatio::prototype(ExecState* p1) const {
+ObjectImp* SVGPreserveAspectRatio::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGPreserveAspectRatio::bridge(ExecState* p1) const {
@@ -6051,7 +6055,7 @@ ObjectImp* SVGPreserveAspectRatio::bridge(ExecState* p1) const {
       p1, static_cast<SVGPreserveAspectRatio::Private*>(impl));
 }
 
-Value SVGPreserveAspectRatio::cache(ExecState* p1) const {
+ValueImp* SVGPreserveAspectRatio::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGPreserveAspectRatio>(
       p1, static_cast<SVGPreserveAspectRatio::Private*>(impl));
 }
@@ -6067,12 +6071,12 @@ bool SVGRadialGradientElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGRadialGradientElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGRadialGradientElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGRadialGradientElement>(p1, p2, &s_hashTable,
                                                         this, p3);
 }
 
-Value SVGRadialGradientElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGRadialGradientElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGGradientElement::hasProperty(p1, p2))
     return SVGGradientElement::get(p1, p2, p3);
   return Undefined();
@@ -6086,10 +6090,10 @@ bool SVGRadialGradientElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGRadialGradientElement::prototype(ExecState* p1) const {
+ObjectImp* SVGRadialGradientElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGRadialGradientElement::bridge(ExecState* p1) const {
@@ -6097,7 +6101,7 @@ ObjectImp* SVGRadialGradientElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGRadialGradientElement::Private*>(d));
 }
 
-Value SVGRadialGradientElement::cache(ExecState* p1) const {
+ValueImp* SVGRadialGradientElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGRadialGradientElement>(
       p1, static_cast<SVGRadialGradientElement::Private*>(d));
 }
@@ -6110,7 +6114,7 @@ bool SVGRect::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGRect::get(GET_METHOD_ARGS) const {
+ValueImp* SVGRect::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGRect>(p1, p2, &s_hashTable, this, p3);
 }
 
@@ -6124,7 +6128,7 @@ SVGRect KSVG::toSVGRect(KJS::ExecState*, const ObjectImp* p1) {
   return SVGRect::null;
 }
 
-Value SVGRect::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGRect::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -6143,10 +6147,10 @@ bool SVGRect::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGRect::prototype(ExecState* p1) const {
+ObjectImp* SVGRect::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGRect::bridge(ExecState* p1) const {
@@ -6154,7 +6158,7 @@ ObjectImp* SVGRect::bridge(ExecState* p1) const {
                                         static_cast<SVGRect::Private*>(impl));
 }
 
-Value SVGRect::cache(ExecState* p1) const {
+ValueImp* SVGRect::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGRect>(p1,
                                        static_cast<SVGRect::Private*>(impl));
 }
@@ -6178,11 +6182,11 @@ bool SVGRectElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGRectElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGRectElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGRectElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGRectElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGRectElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -6210,10 +6214,10 @@ bool SVGRectElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGRectElement::prototype(ExecState* p1) const {
+ObjectImp* SVGRectElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGRectElement::bridge(ExecState* p1) const {
@@ -6221,7 +6225,7 @@ ObjectImp* SVGRectElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGRectElement::Private*>(d));
 }
 
-Value SVGRectElement::cache(ExecState* p1) const {
+ValueImp* SVGRectElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGRectElement>(
       p1, static_cast<SVGRectElement::Private*>(d));
 }
@@ -6230,8 +6234,8 @@ bool SVGSVGElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGSVGElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGSVGElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGSVGElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (KDOM::DocumentEvent::hasProperty(p1, p2))
     return true;
@@ -6254,7 +6258,7 @@ bool SVGSVGElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGSVGElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGSVGElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGSVGElementProtoFunc, SVGSVGElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -6270,10 +6274,10 @@ SVGSVGElement SVGSVGElementProtoFunc::cast(KJS::ExecState*,
   return SVGSVGElement::null;
 }
 
-Value SVGSVGElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGSVGElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGSVGElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGSVGElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (KDOM::DocumentEvent::hasProperty(p1, p2))
     return KDOM::DocumentEvent::get(p1, p2, p3);
   if (SVGElement::hasProperty(p1, p2))
@@ -6315,10 +6319,10 @@ bool SVGSVGElement::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGSVGElement::prototype(ExecState* p1) const {
+ObjectImp* SVGSVGElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGSVGElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGSVGElement::bridge(ExecState* p1) const {
@@ -6326,7 +6330,7 @@ ObjectImp* SVGSVGElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGSVGElement::Private*>(KDOM::EventTarget::d));
 }
 
-Value SVGSVGElement::cache(ExecState* p1) const {
+ValueImp* SVGSVGElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGSVGElement>(
       p1, static_cast<SVGSVGElement::Private*>(KDOM::EventTarget::d));
 }
@@ -6344,11 +6348,11 @@ bool SVGScriptElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGScriptElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGScriptElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGScriptElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGScriptElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGScriptElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -6370,10 +6374,10 @@ bool SVGScriptElement::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGScriptElement::prototype(ExecState* p1) const {
+ObjectImp* SVGScriptElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGScriptElement::bridge(ExecState* p1) const {
@@ -6381,7 +6385,7 @@ ObjectImp* SVGScriptElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGScriptElement::Private*>(d));
 }
 
-Value SVGScriptElement::cache(ExecState* p1) const {
+ValueImp* SVGScriptElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGScriptElement>(
       p1, static_cast<SVGScriptElement::Private*>(d));
 }
@@ -6395,11 +6399,11 @@ bool SVGSetElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGSetElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGSetElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGSetElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGSetElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGSetElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGAnimationElement::hasProperty(p1, p2))
     return SVGAnimationElement::get(p1, p2, p3);
   return Undefined();
@@ -6413,10 +6417,10 @@ bool SVGSetElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGSetElement::prototype(ExecState* p1) const {
+ObjectImp* SVGSetElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGSetElement::bridge(ExecState* p1) const {
@@ -6424,7 +6428,7 @@ ObjectImp* SVGSetElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGSetElement::Private*>(d));
 }
 
-Value SVGSetElement::cache(ExecState* p1) const {
+ValueImp* SVGSetElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGSetElement>(
       p1, static_cast<SVGSetElement::Private*>(d));
 }
@@ -6440,11 +6444,11 @@ bool SVGStopElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGStopElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGStopElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGStopElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGStopElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGStopElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGStylable::hasProperty(p1, p2))
@@ -6460,10 +6464,10 @@ bool SVGStopElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGStopElement::prototype(ExecState* p1) const {
+ObjectImp* SVGStopElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGStopElement::bridge(ExecState* p1) const {
@@ -6471,7 +6475,7 @@ ObjectImp* SVGStopElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGStopElement::Private*>(d));
 }
 
-Value SVGStopElement::cache(ExecState* p1) const {
+ValueImp* SVGStopElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGStopElement>(
       p1, static_cast<SVGStopElement::Private*>(d));
 }
@@ -6480,13 +6484,13 @@ bool SVGStringList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGStringList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGStringListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGStringListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGStringList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGStringList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGStringListProtoFunc, SVGStringList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -6502,18 +6506,18 @@ SVGStringList SVGStringListProtoFunc::cast(KJS::ExecState*,
   return SVGStringList::null;
 }
 
-Value SVGStringList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGStringListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGStringList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGStringListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGStringList::prototype(ExecState* p1) const {
+ObjectImp* SVGStringList::prototype(ExecState* p1) const {
   if (p1)
     return SVGStringListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGStringList::bridge(ExecState* p1) const {
@@ -6521,7 +6525,7 @@ ObjectImp* SVGStringList::bridge(ExecState* p1) const {
       p1, static_cast<SVGStringList::Private*>(impl));
 }
 
-Value SVGStringList::cache(ExecState* p1) const {
+ValueImp* SVGStringList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGStringList>(
       p1, static_cast<SVGStringList::Private*>(impl));
 }
@@ -6530,13 +6534,13 @@ bool SVGStylable::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGStylable::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGStylableProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGStylableProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGStylable::get(GET_METHOD_ARGS) const {
+ValueImp* SVGStylable::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGStylableProtoFunc, SVGStylable>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -6799,18 +6803,18 @@ SVGStylable SVGStylableProtoFunc::cast(KJS::ExecState*,
   return SVGStylable::null;
 }
 
-Value SVGStylable::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGStylableProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGStylable::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGStylableProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGStylable::prototype(ExecState* p1) const {
+ObjectImp* SVGStylable::prototype(ExecState* p1) const {
   if (p1)
     return SVGStylableProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGStylable::bridge(ExecState* p1) const {
@@ -6818,7 +6822,7 @@ ObjectImp* SVGStylable::bridge(ExecState* p1) const {
       p1, static_cast<SVGStylable::Private*>(impl));
 }
 
-Value SVGStylable::cache(ExecState* p1) const {
+ValueImp* SVGStylable::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGStylable>(
       p1, static_cast<SVGStylable::Private*>(impl));
 }
@@ -6832,11 +6836,11 @@ bool SVGStyleElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGStyleElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGStyleElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGStyleElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGStyleElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGStyleElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   return Undefined();
@@ -6854,10 +6858,10 @@ bool SVGStyleElement::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGStyleElement::prototype(ExecState* p1) const {
+ObjectImp* SVGStyleElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGStyleElement::bridge(ExecState* p1) const {
@@ -6865,7 +6869,7 @@ ObjectImp* SVGStyleElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGStyleElement::Private*>(d));
 }
 
-Value SVGStyleElement::cache(ExecState* p1) const {
+ValueImp* SVGStyleElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGStyleElement>(
       p1, static_cast<SVGStyleElement::Private*>(d));
 }
@@ -6889,11 +6893,11 @@ bool SVGSwitchElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGSwitchElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGSwitchElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGSwitchElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGSwitchElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGSwitchElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -6921,10 +6925,10 @@ bool SVGSwitchElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGSwitchElement::prototype(ExecState* p1) const {
+ObjectImp* SVGSwitchElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGSwitchElement::bridge(ExecState* p1) const {
@@ -6932,7 +6936,7 @@ ObjectImp* SVGSwitchElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGSwitchElement::Private*>(d));
 }
 
-Value SVGSwitchElement::cache(ExecState* p1) const {
+ValueImp* SVGSwitchElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGSwitchElement>(
       p1, static_cast<SVGSwitchElement::Private*>(d));
 }
@@ -6954,11 +6958,11 @@ bool SVGSymbolElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGSymbolElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGSymbolElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGSymbolElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGSymbolElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGSymbolElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -6984,10 +6988,10 @@ bool SVGSymbolElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGSymbolElement::prototype(ExecState* p1) const {
+ObjectImp* SVGSymbolElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGSymbolElement::bridge(ExecState* p1) const {
@@ -6995,7 +6999,7 @@ ObjectImp* SVGSymbolElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGSymbolElement::Private*>(d));
 }
 
-Value SVGSymbolElement::cache(ExecState* p1) const {
+ValueImp* SVGSymbolElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGSymbolElement>(
       p1, static_cast<SVGSymbolElement::Private*>(d));
 }
@@ -7009,11 +7013,11 @@ bool SVGTSpanElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGTSpanElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTSpanElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGTSpanElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGTSpanElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGTSpanElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGTextPositioningElement::hasProperty(p1, p2))
     return SVGTextPositioningElement::get(p1, p2, p3);
   return Undefined();
@@ -7027,10 +7031,10 @@ bool SVGTSpanElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGTSpanElement::prototype(ExecState* p1) const {
+ObjectImp* SVGTSpanElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTSpanElement::bridge(ExecState* p1) const {
@@ -7038,7 +7042,7 @@ ObjectImp* SVGTSpanElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGTSpanElement::Private*>(d));
 }
 
-Value SVGTSpanElement::cache(ExecState* p1) const {
+ValueImp* SVGTSpanElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTSpanElement>(
       p1, static_cast<SVGTSpanElement::Private*>(d));
 }
@@ -7047,13 +7051,13 @@ bool SVGTests::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGTests::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGTestsProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGTestsProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGTests::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTests::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGTestsProtoFunc, SVGTests>(p1, p2, &s_hashTable,
                                                       this, p3);
 }
@@ -7218,18 +7222,18 @@ SVGTests SVGTestsProtoFunc::cast(KJS::ExecState*, const ObjectImp* p1) const {
   return SVGTests::null;
 }
 
-Value SVGTests::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGTestsProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGTests::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGTestsProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGTests::prototype(ExecState* p1) const {
+ObjectImp* SVGTests::prototype(ExecState* p1) const {
   if (p1)
     return SVGTestsProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTests::bridge(ExecState* p1) const {
@@ -7237,7 +7241,7 @@ ObjectImp* SVGTests::bridge(ExecState* p1) const {
                                        static_cast<SVGTests::Private*>(impl));
 }
 
-Value SVGTests::cache(ExecState* p1) const {
+ValueImp* SVGTests::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTests>(p1,
                                         static_cast<SVGTests::Private*>(impl));
 }
@@ -7248,8 +7252,8 @@ bool SVGTextContentElement::hasProperty(ExecState* p1,
       Lookup::findEntry(&SVGTextContentElement::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGTextContentElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGTextContentElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   if (SVGElement::hasProperty(p1, p2))
     return true;
@@ -7264,7 +7268,7 @@ bool SVGTextContentElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGTextContentElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTextContentElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGTextContentElementProtoFunc, SVGTextContentElement>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -7303,10 +7307,10 @@ SVGTextContentElement SVGTextContentElementProtoFunc::cast(
   return SVGTextContentElement::null;
 }
 
-Value SVGTextContentElement::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGTextContentElementProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGTextContentElement::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGTextContentElementProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -7332,10 +7336,10 @@ bool SVGTextContentElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGTextContentElement::prototype(ExecState* p1) const {
+ObjectImp* SVGTextContentElement::prototype(ExecState* p1) const {
   if (p1)
     return SVGTextContentElementProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTextContentElement::bridge(ExecState* p1) const {
@@ -7343,7 +7347,7 @@ ObjectImp* SVGTextContentElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGTextContentElement::Private*>(d));
 }
 
-Value SVGTextContentElement::cache(ExecState* p1) const {
+ValueImp* SVGTextContentElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTextContentElement>(
       p1, static_cast<SVGTextContentElement::Private*>(d));
 }
@@ -7359,11 +7363,11 @@ bool SVGTextElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGTextElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTextElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGTextElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGTextElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGTextElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGTextPositioningElement::hasProperty(p1, p2))
     return SVGTextPositioningElement::get(p1, p2, p3);
   if (SVGTransformable::hasProperty(p1, p2))
@@ -7379,10 +7383,10 @@ bool SVGTextElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGTextElement::prototype(ExecState* p1) const {
+ObjectImp* SVGTextElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTextElement::bridge(ExecState* p1) const {
@@ -7390,7 +7394,7 @@ ObjectImp* SVGTextElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGTextElement::Private*>(d));
 }
 
-Value SVGTextElement::cache(ExecState* p1) const {
+ValueImp* SVGTextElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTextElement>(
       p1, static_cast<SVGTextElement::Private*>(d));
 }
@@ -7406,12 +7410,12 @@ bool SVGTextPositioningElement::hasProperty(ExecState* p1,
   return false;
 }
 
-Value SVGTextPositioningElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTextPositioningElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGTextPositioningElement>(p1, p2, &s_hashTable,
                                                          this, p3);
 }
 
-Value SVGTextPositioningElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGTextPositioningElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGTextContentElement::hasProperty(p1, p2))
     return SVGTextContentElement::get(p1, p2, p3);
   return Undefined();
@@ -7425,10 +7429,10 @@ bool SVGTextPositioningElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGTextPositioningElement::prototype(ExecState* p1) const {
+ObjectImp* SVGTextPositioningElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTextPositioningElement::bridge(ExecState* p1) const {
@@ -7436,7 +7440,7 @@ ObjectImp* SVGTextPositioningElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGTextPositioningElement::Private*>(d));
 }
 
-Value SVGTextPositioningElement::cache(ExecState* p1) const {
+ValueImp* SVGTextPositioningElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTextPositioningElement>(
       p1, static_cast<SVGTextPositioningElement::Private*>(d));
 }
@@ -7454,11 +7458,11 @@ bool SVGTitleElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGTitleElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTitleElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGTitleElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGTitleElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGTitleElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGLangSpace::hasProperty(p1, p2))
@@ -7480,10 +7484,10 @@ bool SVGTitleElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGTitleElement::prototype(ExecState* p1) const {
+ObjectImp* SVGTitleElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTitleElement::bridge(ExecState* p1) const {
@@ -7491,7 +7495,7 @@ ObjectImp* SVGTitleElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGTitleElement::Private*>(d));
 }
 
-Value SVGTitleElement::cache(ExecState* p1) const {
+ValueImp* SVGTitleElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTitleElement>(
       p1, static_cast<SVGTitleElement::Private*>(d));
 }
@@ -7500,13 +7504,13 @@ bool SVGTransform::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGTransform::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGTransformProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGTransformProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGTransform::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTransform::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGTransformProtoFunc, SVGTransform>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -7526,18 +7530,18 @@ SVGTransform KSVG::toSVGTransform(KJS::ExecState*, const ObjectImp* p1) {
   return SVGTransform::null;
 }
 
-Value SVGTransform::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGTransformProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGTransform::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGTransformProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGTransform::prototype(ExecState* p1) const {
+ObjectImp* SVGTransform::prototype(ExecState* p1) const {
   if (p1)
     return SVGTransformProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTransform::bridge(ExecState* p1) const {
@@ -7545,7 +7549,7 @@ ObjectImp* SVGTransform::bridge(ExecState* p1) const {
       p1, static_cast<SVGTransform::Private*>(impl));
 }
 
-Value SVGTransform::cache(ExecState* p1) const {
+ValueImp* SVGTransform::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTransform>(
       p1, static_cast<SVGTransform::Private*>(impl));
 }
@@ -7554,13 +7558,13 @@ bool SVGTransformList::hasProperty(ExecState* p1, const Identifier& p2) const {
   const HashEntry* e = Lookup::findEntry(&SVGTransformList::s_hashTable, p2);
   if (e)
     return true;
-  Object proto = SVGTransformListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
+  ObjectImp* proto = SVGTransformListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
     return true;
   return false;
 }
 
-Value SVGTransformList::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTransformList::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGet<SVGTransformListProtoFunc, SVGTransformList>(
       p1, p2, &s_hashTable, this, p3);
 }
@@ -7577,18 +7581,18 @@ SVGTransformList SVGTransformListProtoFunc::cast(KJS::ExecState*,
   return SVGTransformList::null;
 }
 
-Value SVGTransformList::getInParents(GET_METHOD_ARGS) const {
-  Object proto = SVGTransformListProto::self(p1);
-  if (proto.hasProperty(p1, p2))
-    return proto.get(p1, p2);
+ValueImp* SVGTransformList::getInParents(GET_METHOD_ARGS) const {
+  ObjectImp* proto = SVGTransformListProto::self(p1);
+  if (proto->hasProperty(p1, p2))
+    return proto->get(p1, p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGTransformList::prototype(ExecState* p1) const {
+ObjectImp* SVGTransformList::prototype(ExecState* p1) const {
   if (p1)
     return SVGTransformListProto::self(p1);
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTransformList::bridge(ExecState* p1) const {
@@ -7596,7 +7600,7 @@ ObjectImp* SVGTransformList::bridge(ExecState* p1) const {
       p1, static_cast<SVGTransformList::Private*>(impl));
 }
 
-Value SVGTransformList::cache(ExecState* p1) const {
+ValueImp* SVGTransformList::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTransformList>(
       p1, static_cast<SVGTransformList::Private*>(impl));
 }
@@ -7610,20 +7614,20 @@ bool SVGTransformable::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGTransformable::get(GET_METHOD_ARGS) const {
+ValueImp* SVGTransformable::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGTransformable>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGTransformable::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGTransformable::getInParents(GET_METHOD_ARGS) const {
   if (SVGLocatable::hasProperty(p1, p2))
     return SVGLocatable::get(p1, p2, p3);
   return Undefined();
 }
 
-Object SVGTransformable::prototype(ExecState* p1) const {
+ObjectImp* SVGTransformable::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGTransformable::bridge(ExecState* p1) const {
@@ -7631,7 +7635,7 @@ ObjectImp* SVGTransformable::bridge(ExecState* p1) const {
       p1, static_cast<SVGTransformable::Private*>(impl));
 }
 
-Value SVGTransformable::cache(ExecState* p1) const {
+ValueImp* SVGTransformable::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGTransformable>(
       p1, static_cast<SVGTransformable::Private*>(impl));
 }
@@ -7644,21 +7648,21 @@ bool SVGURIReference::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGURIReference::get(GET_METHOD_ARGS) const {
+ValueImp* SVGURIReference::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGURIReference>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGURIReference::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGURIReference::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
   return Undefined();
 }
 
-Object SVGURIReference::prototype(ExecState* p1) const {
+ObjectImp* SVGURIReference::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGURIReference::bridge(ExecState* p1) const {
@@ -7666,7 +7670,7 @@ ObjectImp* SVGURIReference::bridge(ExecState* p1) const {
       p1, static_cast<SVGURIReference::Private*>(impl));
 }
 
-Value SVGURIReference::cache(ExecState* p1) const {
+ValueImp* SVGURIReference::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGURIReference>(
       p1, static_cast<SVGURIReference::Private*>(impl));
 }
@@ -7692,11 +7696,11 @@ bool SVGUseElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGUseElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGUseElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGUseElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGUseElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGUseElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -7726,10 +7730,10 @@ bool SVGUseElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGUseElement::prototype(ExecState* p1) const {
+ObjectImp* SVGUseElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGUseElement::bridge(ExecState* p1) const {
@@ -7737,7 +7741,7 @@ ObjectImp* SVGUseElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGUseElement::Private*>(d));
 }
 
-Value SVGUseElement::cache(ExecState* p1) const {
+ValueImp* SVGUseElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGUseElement>(
       p1, static_cast<SVGUseElement::Private*>(d));
 }
@@ -7757,11 +7761,11 @@ bool SVGViewElement::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGViewElement::get(GET_METHOD_ARGS) const {
+ValueImp* SVGViewElement::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGViewElement>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGViewElement::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGViewElement::getInParents(GET_METHOD_ARGS) const {
   if (SVGElement::hasProperty(p1, p2))
     return SVGElement::get(p1, p2, p3);
   if (SVGExternalResourcesRequired::hasProperty(p1, p2))
@@ -7785,10 +7789,10 @@ bool SVGViewElement::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGViewElement::prototype(ExecState* p1) const {
+ObjectImp* SVGViewElement::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGViewElement::bridge(ExecState* p1) const {
@@ -7796,7 +7800,7 @@ ObjectImp* SVGViewElement::bridge(ExecState* p1) const {
       p1, static_cast<SVGViewElement::Private*>(d));
 }
 
-Value SVGViewElement::cache(ExecState* p1) const {
+ValueImp* SVGViewElement::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGViewElement>(
       p1, static_cast<SVGViewElement::Private*>(d));
 }
@@ -7809,11 +7813,11 @@ bool SVGZoomAndPan::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGZoomAndPan::get(GET_METHOD_ARGS) const {
+ValueImp* SVGZoomAndPan::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGZoomAndPan>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGZoomAndPan::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGZoomAndPan::getInParents(GET_METHOD_ARGS) const {
   Q_UNUSED(p1);
   Q_UNUSED(p2);
   Q_UNUSED(p3);
@@ -7832,10 +7836,10 @@ bool SVGZoomAndPan::putInParents(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGZoomAndPan::prototype(ExecState* p1) const {
+ObjectImp* SVGZoomAndPan::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 ObjectImp* SVGZoomAndPan::bridge(ExecState* p1) const {
@@ -7843,7 +7847,7 @@ ObjectImp* SVGZoomAndPan::bridge(ExecState* p1) const {
       p1, static_cast<SVGZoomAndPan::Private*>(impl));
 }
 
-Value SVGZoomAndPan::cache(ExecState* p1) const {
+ValueImp* SVGZoomAndPan::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGZoomAndPan>(
       p1, static_cast<SVGZoomAndPan::Private*>(impl));
 }
@@ -7857,11 +7861,11 @@ bool SVGZoomEvent::hasProperty(ExecState* p1, const Identifier& p2) const {
   return false;
 }
 
-Value SVGZoomEvent::get(GET_METHOD_ARGS) const {
+ValueImp* SVGZoomEvent::get(GET_METHOD_ARGS) const {
   return KDOM::lookupGetValue<SVGZoomEvent>(p1, p2, &s_hashTable, this, p3);
 }
 
-Value SVGZoomEvent::getInParents(GET_METHOD_ARGS) const {
+ValueImp* SVGZoomEvent::getInParents(GET_METHOD_ARGS) const {
   if (KDOM::UIEvent::hasProperty(p1, p2))
     return KDOM::UIEvent::get(p1, p2, p3);
   return Undefined();
@@ -7875,10 +7879,10 @@ bool SVGZoomEvent::put(PUT_METHOD_ARGS) {
   return false;
 }
 
-Object SVGZoomEvent::prototype(ExecState* p1) const {
+ObjectImp* SVGZoomEvent::prototype(ExecState* p1) const {
   if (p1)
     return p1->interpreter()->builtinObjectPrototype();
-  return Object::dynamicCast(Null());
+  return NULL;
 }
 
 KDOM::UIEvent KSVG::EcmaInterface::inheritedUIEventCast(const ObjectImp* p1) {
@@ -7902,7 +7906,7 @@ ObjectImp* SVGZoomEvent::bridge(ExecState* p1) const {
       p1, static_cast<SVGZoomEvent::Private*>(d));
 }
 
-Value SVGZoomEvent::cache(ExecState* p1) const {
+ValueImp* SVGZoomEvent::cache(ExecState* p1) const {
   return KDOM::cacheDOMObject<SVGZoomEvent>(
       p1, static_cast<SVGZoomEvent::Private*>(d));
 }

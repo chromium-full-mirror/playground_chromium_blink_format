@@ -49,7 +49,7 @@ KDOM_IMPLEMENT_PROTOTYPE("CSSStyleSheet",
                          CSSStyleSheetProto,
                          CSSStyleSheetProtoFunc)
 
-Value CSSStyleSheet::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CSSStyleSheet::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case CSSStyleSheetConstants::OwnerRule:
       return getDOMCSSRule(exec, ownerRule());
@@ -63,16 +63,16 @@ Value CSSStyleSheet::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value CSSStyleSheetProtoFunc::call(ExecState* exec,
-                                   Object& thisObj,
-                                   const List& args) {
+ValueImp* CSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
+                                                 ObjectImp* thisObj,
+                                                 const List& args) {
   KDOM_CHECK_THIS(CSSStyleSheet)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case CSSStyleSheetConstants::InsertRule: {
       DOMString rule = toDOMString(exec, args[0]);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       obj.insertRule(rule, index);
       return Undefined();
     }

@@ -61,7 +61,7 @@ KDOM_IMPLEMENT_PROTOTYPE("LSSerializer",
                          LSSerializerProto,
                          LSSerializerProtoFunc)
 
-Value LSSerializer::getValueProperty(ExecState* exec, int token) const {
+ValueImp* LSSerializer::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -82,7 +82,7 @@ Value LSSerializer::getValueProperty(ExecState* exec, int token) const {
 
 void LSSerializer::putValueProperty(ExecState* exec,
                                     int token,
-                                    const Value& value,
+                                    ValueImp* value,
                                     int) {
   KDOM_ENTER_SAFE
 
@@ -100,9 +100,9 @@ void LSSerializer::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(LSException)
 }
 
-Value LSSerializerProtoFunc::call(ExecState* exec,
-                                  Object& thisObj,
-                                  const List& args) {
+ValueImp* LSSerializerProtoFunc::callAsFunction(ExecState* exec,
+                                                ObjectImp* thisObj,
+                                                const List& args) {
   KDOM_CHECK_THIS(LSSerializer)
   KDOM_ENTER_SAFE
 

@@ -37,7 +37,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGPathSeg::getValueProperty(ExecState*, int token) const {
+ValueImp* SVGPathSeg::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case SVGPathSegConstants::PathSegType:
       return Number(pathSegType());

@@ -55,7 +55,7 @@ DontDelete
 @end
 */
 
-Value LSInput::getValueProperty(ExecState* exec, int token) const {
+ValueImp* LSInput::getValueProperty(ExecState* exec, int token) const {
 #ifndef APPLE_COMPILE_HACK
   KDOM_ENTER_SAFE
 
@@ -87,7 +87,7 @@ Value LSInput::getValueProperty(ExecState* exec, int token) const {
 
 void LSInput::putValueProperty(ExecState* exec,
                                int token,
-                               const Value& value,
+                               ValueImp* value,
                                int) {
   KDOM_ENTER_SAFE
 

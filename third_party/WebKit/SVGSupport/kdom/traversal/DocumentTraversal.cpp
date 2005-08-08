@@ -52,7 +52,8 @@ KDOM_IMPLEMENT_PROTOTYPE("DocumentTraversal",
                          DocumentTraversalProto,
                          DocumentTraversalProtoFunc)
 
-Value DocumentTraversal::getValueProperty(ExecState* exec, int token) const {
+ValueImp* DocumentTraversal::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -65,19 +66,18 @@ Value DocumentTraversal::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value DocumentTraversalProtoFunc::call(ExecState* exec,
-                                       Object& thisObj,
-                                       const List& args) {
-  DocumentTraversal obj(
-      cast(exec, static_cast<KJS::ObjectImp*>(thisObj.imp())));
+ValueImp* DocumentTraversalProtoFunc::callAsFunction(ExecState* exec,
+                                                     ObjectImp* thisObj,
+                                                     const List& args) {
+  DocumentTraversal obj(cast(exec, thisObj));
   Q_ASSERT(obj.d != 0);
   KDOM_ENTER_SAFE
 
   switch (id) {
     case DocumentTraversalConstants::CreateNodeIterator: {
       Node root = ecma_cast<Node>(exec, args[0], &toNode);
-      unsigned short whatToShow = args[1].toUInt16(exec);
-      bool entityReferenceExpansion = args[3].toBoolean(exec);
+      unsigned short whatToShow = args[1]->toUInt16(exec);
+      bool entityReferenceExpansion = args[3]->toBoolean(exec);
       return obj
           .createNodeIterator(root, whatToShow, NodeFilter::null,
                               entityReferenceExpansion)
@@ -85,8 +85,8 @@ Value DocumentTraversalProtoFunc::call(ExecState* exec,
     }
     case DocumentTraversalConstants::CreateTreeWalker: {
       Node root = ecma_cast<Node>(exec, args[0], &toNode);
-      unsigned short whatToShow = args[1].toUInt16(exec);
-      bool entityReferenceExpansion = args[3].toBoolean(exec);
+      unsigned short whatToShow = args[1]->toUInt16(exec);
+      bool entityReferenceExpansion = args[3]->toBoolean(exec);
       return obj
           .createTreeWalker(root, whatToShow, NodeFilter::null,
                             entityReferenceExpansion)

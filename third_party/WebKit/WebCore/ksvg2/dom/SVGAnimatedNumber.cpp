@@ -43,7 +43,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGAnimatedNumber::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGAnimatedNumber::getValueProperty(ExecState* exec,
+                                              int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -62,7 +63,7 @@ Value SVGAnimatedNumber::getValueProperty(ExecState* exec, int token) const {
 
 void SVGAnimatedNumber::putValueProperty(ExecState* exec,
                                          int token,
-                                         const Value& value,
+                                         ValueImp* value,
                                          int) {
   KDOM_ENTER_SAFE
 

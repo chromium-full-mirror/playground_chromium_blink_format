@@ -113,7 +113,7 @@ DontDelete|Function 2
 
 KDOM_IMPLEMENT_PROTOTYPE("Node", NodeProto, NodeProtoFunc)
 
-Value Node::getValueProperty(ExecState* exec, int token) const {
+ValueImp* Node::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -158,10 +158,7 @@ Value Node::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 };
 
-void Node::putValueProperty(ExecState* exec,
-                            int token,
-                            const Value& value,
-                            int) {
+void Node::putValueProperty(ExecState* exec, int token, ValueImp* value, int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -182,7 +179,9 @@ void Node::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value NodeProtoFunc::call(ExecState* exec, Object& thisObj, const List& args) {
+ValueImp* NodeProtoFunc::callAsFunction(ExecState* exec,
+                                        ObjectImp* thisObj,
+                                        const List& args) {
   KDOM_CHECK_THIS(Node)
   KDOM_ENTER_SAFE
 
@@ -208,12 +207,12 @@ Value NodeProtoFunc::call(ExecState* exec, Object& thisObj, const List& args) {
     case NodeConstants::HasChildNodes:
       return KJS::Boolean(obj.hasChildNodes());
     case NodeConstants::CloneNode: {
-      bool deep = args[0].toBoolean(exec);
+      bool deep = args[0]->toBoolean(exec);
       return getDOMNode(exec, obj.cloneNode(deep));
     }
     case NodeConstants::Normalize: {
       obj.normalize();
-      return Value();
+      return NULL;
     }
     case NodeConstants::IsSupported: {
       DOMString feature = toDOMString(exec, args[0]);

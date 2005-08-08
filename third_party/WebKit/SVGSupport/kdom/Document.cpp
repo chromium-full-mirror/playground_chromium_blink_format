@@ -126,7 +126,7 @@ DontDelete|Function 3
 
 KDOM_IMPLEMENT_PROTOTYPE("Document", DocumentProto, DocumentProtoFunc)
 
-Value Document::getValueProperty(ExecState* exec, int token) const {
+ValueImp* Document::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -161,19 +161,19 @@ Value Document::getValueProperty(ExecState* exec, int token) const {
 
 void Document::putValueProperty(ExecState* exec,
                                 int token,
-                                const Value& value,
+                                ValueImp* value,
                                 int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case DocumentConstants::XmlStandalone:
-      setXmlStandalone(value.toBoolean(exec));
+      setXmlStandalone(value->toBoolean(exec));
       break;
     case DocumentConstants::XmlVersion:
       setXmlVersion(toDOMString(exec, value));
       break;
     case DocumentConstants::StrictErrorChecking:
-      setStrictErrorChecking(value.toBoolean(exec));
+      setStrictErrorChecking(value->toBoolean(exec));
       break;
     case DocumentConstants::DocumentURI:
       setDocumentURI(toDOMString(exec, value));
@@ -186,9 +186,9 @@ void Document::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value DocumentProtoFunc::call(ExecState* exec,
-                              Object& thisObj,
-                              const List& args) {
+ValueImp* DocumentProtoFunc::callAsFunction(ExecState* exec,
+                                            ObjectImp* thisObj,
+                                            const List& args) {
   KDOM_CHECK_THIS(Document)
   KDOM_ENTER_SAFE
 
@@ -230,7 +230,7 @@ Value DocumentProtoFunc::call(ExecState* exec,
     }
     case DocumentConstants::ImportNode: {
       Node importedNode = ecma_cast<Node>(exec, args[0], &toNode);
-      bool deep = args[1].toBoolean(exec);
+      bool deep = args[1]->toBoolean(exec);
       return getDOMNode(exec, obj.importNode(importedNode, deep));
     }
     case DocumentConstants::NormalizeDocument: {

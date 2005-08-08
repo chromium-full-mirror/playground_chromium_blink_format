@@ -35,7 +35,7 @@ using namespace KSVG;
 @end
 */
 
-Value SVGZoomAndPan::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGZoomAndPan::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -52,13 +52,13 @@ Value SVGZoomAndPan::getValueProperty(ExecState* exec, int token) const {
 
 void SVGZoomAndPan::putValueProperty(ExecState* exec,
                                      int token,
-                                     const Value& value,
+                                     ValueImp* value,
                                      int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGZoomAndPanConstants::ZoomAndPan: {
-      setZoomAndPan(value.toUInt16(exec));
+      setZoomAndPan(value->toUInt16(exec));
       return;
     }
     default:

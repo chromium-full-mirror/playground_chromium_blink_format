@@ -39,8 +39,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGFEMergeNodeElement::getValueProperty(ExecState* exec,
-                                              int token) const {
+ValueImp* SVGFEMergeNodeElement::getValueProperty(ExecState* exec,
+                                                  int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

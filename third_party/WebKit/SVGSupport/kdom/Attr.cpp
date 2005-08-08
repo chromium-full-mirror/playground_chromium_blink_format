@@ -46,7 +46,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value Attr::getValueProperty(ExecState* exec, int token) const {
+ValueImp* Attr::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -71,10 +71,7 @@ Value Attr::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-void Attr::putValueProperty(ExecState* exec,
-                            int token,
-                            const Value& value,
-                            int) {
+void Attr::putValueProperty(ExecState* exec, int token, ValueImp* value, int) {
   KDOM_ENTER_SAFE
 
   switch (token) {

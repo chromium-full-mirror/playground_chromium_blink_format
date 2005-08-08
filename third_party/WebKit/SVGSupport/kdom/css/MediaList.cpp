@@ -46,7 +46,7 @@ using namespace KJS;
 
 KDOM_IMPLEMENT_PROTOTYPE("MediaList", MediaListProto, MediaListProtoFunc)
 
-Value MediaList::getValueProperty(ExecState*, int token) const {
+ValueImp* MediaList::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case MediaListConstants::MediaText:
       return getDOMString(mediaText());
@@ -62,7 +62,7 @@ Value MediaList::getValueProperty(ExecState*, int token) const {
 
 void MediaList::putValueProperty(ExecState* exec,
                                  int token,
-                                 const Value& value,
+                                 ValueImp* value,
                                  int) {
   KDOM_ENTER_SAFE
 
@@ -78,15 +78,15 @@ void MediaList::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(DOMException)
 }
 
-Value MediaListProtoFunc::call(ExecState* exec,
-                               Object& thisObj,
-                               const List& args) {
+ValueImp* MediaListProtoFunc::callAsFunction(ExecState* exec,
+                                             ObjectImp* thisObj,
+                                             const List& args) {
   KDOM_CHECK_THIS(MediaList)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case MediaListConstants::Item: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return getDOMString(obj.item(index));
     }
     case MediaListConstants::DeleteMedium: {

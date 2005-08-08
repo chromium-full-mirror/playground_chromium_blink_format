@@ -59,8 +59,9 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGComponentTransferFunctionElement::getValueProperty(ExecState* exec,
-                                                            int token) const {
+ValueImp* SVGComponentTransferFunctionElement::getValueProperty(
+    ExecState* exec,
+    int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

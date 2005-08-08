@@ -34,8 +34,9 @@ using namespace KSVG;
 @end
 */
 
-Value SVGPathSegCurvetoQuadraticSmoothAbs::getValueProperty(ExecState*,
-                                                            int token) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothAbs::getValueProperty(
+    ExecState*,
+    int token) const {
   switch (token) {
     case SVGPathSegCurvetoQuadraticSmoothConstants::X:
       return Number(x());
@@ -51,15 +52,15 @@ Value SVGPathSegCurvetoQuadraticSmoothAbs::getValueProperty(ExecState*,
 
 void SVGPathSegCurvetoQuadraticSmoothAbs::putValueProperty(ExecState* exec,
                                                            int token,
-                                                           const Value& value,
+                                                           ValueImp* value,
                                                            int) {
   switch (token) {
     case SVGPathSegCurvetoQuadraticSmoothConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticSmoothConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     default:
@@ -133,8 +134,9 @@ float SVGPathSegCurvetoQuadraticSmoothAbs::y() const {
 @end
 */
 
-Value SVGPathSegCurvetoQuadraticSmoothRel::getValueProperty(ExecState*,
-                                                            int token) const {
+ValueImp* SVGPathSegCurvetoQuadraticSmoothRel::getValueProperty(
+    ExecState*,
+    int token) const {
   switch (token) {
     case SVGPathSegCurvetoQuadraticSmoothConstants::X:
       return Number(x());
@@ -150,15 +152,15 @@ Value SVGPathSegCurvetoQuadraticSmoothRel::getValueProperty(ExecState*,
 
 void SVGPathSegCurvetoQuadraticSmoothRel::putValueProperty(ExecState* exec,
                                                            int token,
-                                                           const Value& value,
+                                                           ValueImp* value,
                                                            int) {
   switch (token) {
     case SVGPathSegCurvetoQuadraticSmoothConstants::X: {
-      setX(value.toNumber(exec));
+      setX(value->toNumber(exec));
       return;
     }
     case SVGPathSegCurvetoQuadraticSmoothConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     default:

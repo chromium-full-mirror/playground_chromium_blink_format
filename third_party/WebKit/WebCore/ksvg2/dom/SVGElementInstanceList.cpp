@@ -50,8 +50,8 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGElementInstanceList",
                          SVGElementInstanceListProto,
                          SVGElementInstanceListProtoFunc)
 
-Value SVGElementInstanceList::getValueProperty(ExecState* exec,
-                                               int token) const {
+ValueImp* SVGElementInstanceList::getValueProperty(ExecState* exec,
+                                                   int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -66,15 +66,15 @@ Value SVGElementInstanceList::getValueProperty(ExecState* exec,
   return Undefined();
 }
 
-Value SVGElementInstanceListProtoFunc::call(ExecState* exec,
-                                            Object& thisObj,
-                                            const List& args) {
+ValueImp* SVGElementInstanceListProtoFunc::callAsFunction(ExecState* exec,
+                                                          ObjectImp* thisObj,
+                                                          const List& args) {
   KDOM_CHECK_THIS(SVGElementInstanceList)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case SVGElementInstanceListConstants::Item: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       return KDOM::safe_cache<SVGElementInstance>(exec, obj.item(index));
     }
     default:

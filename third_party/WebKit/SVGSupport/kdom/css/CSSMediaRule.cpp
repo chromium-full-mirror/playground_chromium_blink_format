@@ -49,7 +49,7 @@ KDOM_IMPLEMENT_PROTOTYPE("CSSMediaRule",
                          CSSMediaRuleProto,
                          CSSMediaRuleProtoFunc)
 
-Value CSSMediaRule::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CSSMediaRule::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case CSSMediaRuleConstants::Media:
       return safe_cache<MediaList>(exec, media());
@@ -63,20 +63,20 @@ Value CSSMediaRule::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value CSSMediaRuleProtoFunc::call(ExecState* exec,
-                                  Object& thisObj,
-                                  const List& args) {
+ValueImp* CSSMediaRuleProtoFunc::callAsFunction(ExecState* exec,
+                                                ObjectImp* thisObj,
+                                                const List& args) {
   KDOM_CHECK_THIS(CSSMediaRule)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case CSSMediaRuleConstants::InsertRule: {
       DOMString rule = toDOMString(exec, args[0]);
-      unsigned long index = args[1].toUInt32(exec);
+      unsigned long index = args[1]->toUInt32(exec);
       return Number(obj.insertRule(rule, index));
     }
     case CSSMediaRuleConstants::DeleteRule: {
-      unsigned long index = args[0].toUInt32(exec);
+      unsigned long index = args[0]->toUInt32(exec);
       obj.deleteRule(index);
       return Undefined();
     }

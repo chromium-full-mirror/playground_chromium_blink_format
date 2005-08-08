@@ -118,7 +118,7 @@ GlobalObject::~GlobalObject() {
 }
 
 GlobalObject* GlobalObject::retrieveActive(KJS::ExecState* exec) {
-  KJS::ValueImp* imp = exec->interpreter()->globalObject().imp();
+  KJS::ValueImp* imp = exec->interpreter()->globalObject();
   Q_ASSERT(imp);
 
   return static_cast<GlobalObject*>(imp);
@@ -135,8 +135,8 @@ bool GlobalObject::hasProperty(KJS::ExecState*, const KJS::Identifier&) const {
   return true;  // See KJS::Window::hasProperty
 }
 
-KJS::Value GlobalObject::get(KJS::ExecState* exec,
-                             const KJS::Identifier& p) const {
+KJS::ValueImp* GlobalObject::get(KJS::ExecState* exec,
+                                 const KJS::Identifier& p) const {
   kdDebug(26004) << "GlobalObject (" << this << ")::get " << p.qstring()
                  << endl;
 
@@ -150,8 +150,8 @@ KJS::Value GlobalObject::get(KJS::ExecState* exec,
   }
 
   // Look for overrides first
-  KJS::Value val = KJS::ObjectImp::get(exec, p);
-  if (!val.isA(KJS::UndefinedType))
+  KJS::ValueImp* val = KJS::ObjectImp::get(exec, p);
+  if (val->type() != KJS::UndefinedType)
     return isSafeScript(exec) ? val : KJS::Undefined();
 
   // Not the right way in the long run. Should use retrieve(m_doc)...
@@ -163,12 +163,12 @@ KJS::Value GlobalObject::get(KJS::ExecState* exec,
   if (entry) {
     switch (entry->value) {
       case GlobalObjectConstants::Window:
-        return KJS::Value(const_cast<GlobalObject*>(this));
+        return const_cast<GlobalObject*>(this);
       case GlobalObjectConstants::Evt:
         return getDOMEvent(exec, Event(interpreter->currentEvent()));
       case GlobalObjectConstants::Document:
         // special case, Ecma::setup created it, so we don't need to do it
-        return KJS::Value(interpreter->getDOMObject(d->document));
+        return interpreter->getDOMObject(d->document);
       case GlobalObjectConstants::SetTimeout:
       case GlobalObjectConstants::ClearTimeout:
       case GlobalObjectConstants::SetInterval:
@@ -213,7 +213,7 @@ KJS::Value GlobalObject::get(KJS::ExecState* exec,
 
 void GlobalObject::put(KJS::ExecState* exec,
                        const KJS::Identifier& propertyName,
-                       const KJS::Value& value,
+                       KJS::ValueImp* value,
                        int attr) {
   // If we are called by an internal KJS call, then directly jump to ObjectImp
   // -> saves time
@@ -291,18 +291,18 @@ const KJS::ClassInfo* GlobalObject::classInfo() const {
 }
 
 // EcmaScript function handling
-KJS::Value GlobalObjectFunc::call(KJS::ExecState* exec,
-                                  KJS::Object& thisObj,
-                                  const KJS::List& args) {
-  if (!thisObj.inherits(&GlobalObject::s_classInfo)) {
-    KJS::Object err = KJS::Error::create(exec, KJS::TypeError);
+KJS::ValueImp* GlobalObjectFunc::callAsFunction(KJS::ExecState* exec,
+                                                KJS::ObjectImp* thisObj,
+                                                const KJS::List& args) {
+  if (!thisObj->inherits(&GlobalObject::s_classInfo)) {
+    KJS::ObjectImp* err = KJS::Error::create(exec, KJS::TypeError);
     exec->setException(err);
     return err;
   }
 
-  GlobalObject* global = static_cast<GlobalObject*>(thisObj.imp());
-  KJS::Value v = args[0];
-  KJS::UString s = v.toString(exec);
+  GlobalObject* global = static_cast<GlobalObject*>(thisObj);
+  KJS::ValueImp* v = args[0];
+  KJS::UString s = v->toString(exec);
   QString str = s.qstring();
 
   switch (id) {
@@ -333,7 +333,7 @@ KJS::Value GlobalObjectFunc::call(KJS::ExecState* exec,
       return KJS::Undefined();
     case GlobalObjectConstants::ClearTimeout:
     case GlobalObjectConstants::ClearInterval:
-      global->clearTimeout(v.toInt32(exec));
+      global->clearTimeout(v->toInt32(exec));
       return KJS::Undefined();
     case GlobalObjectConstants::PrintNode: {
       QString result;
@@ -367,28 +367,26 @@ KJS::Value GlobalObjectFunc::call(KJS::ExecState* exec,
         return KJS::Null();
     }
     case GlobalObjectConstants::SetInterval: {
-      if (args.size() >= 2 && v.isA(KJS::StringType)) {
-        int i = args[1].toInt32(exec);
-        int r = global->installTimeout(s, args[i].toInt32(exec), false);
+      if (args.size() >= 2 && v->isString()) {
+        int i = args[1]->toInt32(exec);
+        int r = global->installTimeout(s, args[i]->toInt32(exec), false);
         return KJS::Number(r);
-      } else if (args.size() >= 2 && !KJS::Object::dynamicCast(v).isNull() &&
-                 KJS::Object::dynamicCast(v).implementsCall()) {
-        KJS::Value func = args[0];
-        int i = args[1].toInt32(exec);
+      } else if (args.size() >= 2 && v->isObject() &&
+                 static_cast<KJS::ObjectImp*>(v)->implementsCall()) {
+        int i = args[1]->toInt32(exec);
         int r = global->installTimeout(s, i, false);
         return KJS::Number(r);
       } else
         return KJS::Undefined();
     }
     case GlobalObjectConstants::SetTimeout: {
-      if (args.size() == 2 && v.isA(KJS::StringType)) {
-        int i = args[1].toInt32(exec);
+      if (args.size() == 2 && v->isString()) {
+        int i = args[1]->toInt32(exec);
         int r = global->installTimeout(s, i, true /*single shot*/);
         return KJS::Number(r);
-      } else if (args.size() >= 2 && v.isA(KJS::ObjectType) &&
-                 KJS::Object::dynamicCast(v).implementsCall()) {
-        KJS::Value func = args[0];
-        int i = args[1].toInt32(exec);
+      } else if (args.size() >= 2 && v->isObject() &&
+                 static_cast<KJS::ObjectImp*>(v)->implementsCall()) {
+        int i = args[1]->toInt32(exec);
         int r = global->installTimeout(s, i, false);
         return KJS::Number(r);
       } else
@@ -416,7 +414,7 @@ void GlobalObject::clearTimeout(int timerId) {
 }
 
 ////////////////////// ScheduledAction ////////////////////////
-ScheduledAction::ScheduledAction(KJS::Object func,
+ScheduledAction::ScheduledAction(KJS::ObjectImp* func,
                                  KJS::List args,
                                  bool singleShot) {
   m_func = func;
@@ -441,13 +439,14 @@ void ScheduledAction::execute(GlobalObject* global) {
 
   ScriptInterpreter* interpreter = global->doc()->ecmaEngine()->interpreter();
   if (m_isFunction) {
-    if (m_func.implementsCall()) {
+    if (m_func->implementsCall()) {
       KJS::ExecState* exec = interpreter->globalExec();
-      Q_ASSERT(global == interpreter->globalObject().imp());
+      Q_ASSERT(global == interpreter->globalObject());
 
-      KJS::Object obj(global);
-      m_func.call(exec, obj, m_args);  // note that call() creates its own
-                                       // execution state for the func call
+      KJS::ObjectImp* obj(global);
+      m_func->callAsFunction(exec, obj, m_args);  // note that callAsFunction()
+                                                  // creates its own execution
+                                                  // state for the func call
     }
   } else
     interpreter->evaluate(m_code);
@@ -483,11 +482,11 @@ int GlobalQObject::installTimeout(const KJS::UString& handler,
   return id;
 }
 
-int GlobalQObject::installTimeout(const KJS::Value& func,
+int GlobalQObject::installTimeout(KJS::ValueImp* func,
                                   KJS::List args,
                                   int t,
                                   bool singleShot) {
-  KJS::Object objFunc = KJS::Object::dynamicCast(func);
+  KJS::ObjectImp* objFunc = static_cast<KJS::ObjectImp*>(func);
   if (t < 10)
     t = 10;
   int id = startTimer(t);

@@ -33,8 +33,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGPathSegLinetoVerticalAbs::getValueProperty(ExecState*,
-                                                    int token) const {
+ValueImp* SVGPathSegLinetoVerticalAbs::getValueProperty(ExecState*,
+                                                        int token) const {
   switch (token) {
     case SVGPathSegLinetoVerticalConstants::Y:
       return Number(y());
@@ -48,11 +48,11 @@ Value SVGPathSegLinetoVerticalAbs::getValueProperty(ExecState*,
 
 void SVGPathSegLinetoVerticalAbs::putValueProperty(ExecState* exec,
                                                    int token,
-                                                   const Value& value,
+                                                   ValueImp* value,
                                                    int) {
   switch (token) {
     case SVGPathSegLinetoVerticalConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     default:
@@ -112,8 +112,8 @@ float SVGPathSegLinetoVerticalAbs::y() const {
 @end
 */
 
-Value SVGPathSegLinetoVerticalRel::getValueProperty(ExecState*,
-                                                    int token) const {
+ValueImp* SVGPathSegLinetoVerticalRel::getValueProperty(ExecState*,
+                                                        int token) const {
   switch (token) {
     case SVGPathSegLinetoVerticalConstants::Y:
       return Number(y());
@@ -127,11 +127,11 @@ Value SVGPathSegLinetoVerticalRel::getValueProperty(ExecState*,
 
 void SVGPathSegLinetoVerticalRel::putValueProperty(ExecState* exec,
                                                    int token,
-                                                   const Value& value,
+                                                   ValueImp* value,
                                                    int) {
   switch (token) {
     case SVGPathSegLinetoVerticalConstants::Y: {
-      setY(value.toNumber(exec));
+      setY(value->toNumber(exec));
       return;
     }
     default:

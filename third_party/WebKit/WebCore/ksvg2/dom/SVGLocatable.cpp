@@ -61,7 +61,7 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGLocatable",
                          SVGLocatableProto,
                          SVGLocatableProtoFunc)
 
-Value SVGLocatable::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGLocatable::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -78,10 +78,10 @@ Value SVGLocatable::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value SVGLocatableProtoFunc::call(ExecState* exec,
-                                  Object& thisObj,
-                                  const List& args) {
-  SVGLocatable obj(cast(exec, static_cast<KJS::ObjectImp*>(thisObj.imp())));
+ValueImp* SVGLocatableProtoFunc::callAsFunction(ExecState* exec,
+                                                ObjectImp* thisObj,
+                                                const List& args) {
+  SVGLocatable obj(cast(exec, thisObj));
   KDOM_ENTER_SAFE
 
   switch (id) {

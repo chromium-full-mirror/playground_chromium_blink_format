@@ -55,7 +55,7 @@ DontDelete|ReadOnly
 // TODO: instanceRoot		SVGUseElementConstants::InstanceRoot
 // DontDelete|ReadOnly
 
-Value SVGUseElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGUseElement::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

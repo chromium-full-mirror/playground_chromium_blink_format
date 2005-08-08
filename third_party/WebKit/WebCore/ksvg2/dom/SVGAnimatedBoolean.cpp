@@ -42,7 +42,8 @@ using namespace KSVG;
 @end
 */
 
-Value SVGAnimatedBoolean::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGAnimatedBoolean::getValueProperty(ExecState* exec,
+                                               int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -61,14 +62,14 @@ Value SVGAnimatedBoolean::getValueProperty(ExecState* exec, int token) const {
 
 void SVGAnimatedBoolean::putValueProperty(ExecState* exec,
                                           int token,
-                                          const Value& value,
+                                          ValueImp* value,
                                           int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGAnimatedBooleanConstants::BaseVal: {
       if (impl)
-        impl->setBaseVal(value.toBoolean(exec));
+        impl->setBaseVal(value->toBoolean(exec));
 
       break;
     }

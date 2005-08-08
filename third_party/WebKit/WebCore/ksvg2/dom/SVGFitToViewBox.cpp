@@ -40,7 +40,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGFitToViewBox::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGFitToViewBox::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

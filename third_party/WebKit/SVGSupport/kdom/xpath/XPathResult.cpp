@@ -59,8 +59,8 @@ DontDelete|Function 1
 
 KDOM_IMPLEMENT_PROTOTYPE("XPathResult", XPathResultProto, XPathResultProtoFunc)
 
-KJS::Value XPathResult::getValueProperty(KJS::ExecState* exec,
-                                         int token) const {
+KJS::ValueImp* XPathResult::getValueProperty(KJS::ExecState* exec,
+                                             int token) const {
   KDOM_ENTER_SAFE
   KDOM_ENTER_SAFE
 
@@ -87,9 +87,9 @@ KJS::Value XPathResult::getValueProperty(KJS::ExecState* exec,
   return Undefined();
 }
 
-Value XPathResultProtoFunc::call(ExecState* exec,
-                                 Object& thisObj,
-                                 const List& args) {
+ValueImp* XPathResultProtoFunc::callAsFunction(ExecState* exec,
+                                               ObjectImp* thisObj,
+                                               const List& args) {
   KDOM_CHECK_THIS(XPathResult)
   KDOM_ENTER_SAFE
   KDOM_ENTER_SAFE
@@ -98,7 +98,7 @@ Value XPathResultProtoFunc::call(ExecState* exec,
     case XPathResultConstants::IterateNext:
       return getDOMNode(exec, obj.iterateNext());
     case XPathResultConstants::SnapshotItem: {
-      const unsigned long index = (unsigned long)args[0].toUInt32(exec);
+      const unsigned long index = (unsigned long)args[0]->toUInt32(exec);
       return getDOMNode(exec, obj.snapshotItem(index));
     }
     default:

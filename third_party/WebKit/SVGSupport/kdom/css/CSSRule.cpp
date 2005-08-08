@@ -47,7 +47,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value CSSRule::getValueProperty(ExecState* exec, int token) const {
+ValueImp* CSSRule::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case CSSRuleConstants::Type:
       return Number(type());
@@ -67,7 +67,7 @@ Value CSSRule::getValueProperty(ExecState* exec, int token) const {
 
 void CSSRule::putValueProperty(ExecState* exec,
                                int token,
-                               const Value& value,
+                               ValueImp* value,
                                int) {
   KDOM_ENTER_SAFE
 

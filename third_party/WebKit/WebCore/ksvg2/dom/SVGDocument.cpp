@@ -54,7 +54,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value SVGDocument::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGDocument::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case SVGDocumentConstants::Title:
       return getDOMString(title());

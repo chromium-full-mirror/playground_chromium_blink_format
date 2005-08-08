@@ -44,7 +44,7 @@ DontDelete|ReadOnly
 @end
 */
 
-Value Entity::getValueProperty(ExecState* exec, int token) const {
+ValueImp* Entity::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {

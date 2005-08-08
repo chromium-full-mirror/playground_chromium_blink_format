@@ -60,7 +60,7 @@ DontDelete|Function 1
 
 KSVG_IMPLEMENT_PROTOTYPE("SVGLength", SVGLengthProto, SVGLengthProtoFunc)
 
-Value SVGLength::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGLength::getValueProperty(ExecState* exec, int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -83,19 +83,19 @@ Value SVGLength::getValueProperty(ExecState* exec, int token) const {
 
 void SVGLength::putValueProperty(ExecState* exec,
                                  int token,
-                                 const Value& value,
+                                 ValueImp* value,
                                  int) {
   KDOM_ENTER_SAFE
 
   switch (token) {
     case SVGLengthConstants::Value:
-      setValue(value.toNumber(exec));
+      setValue(value->toNumber(exec));
       break;
     case SVGLengthConstants::ValueAsString:
       setValueAsString(KDOM::toDOMString(exec, value));
       break;
     case SVGLengthConstants::ValueInSpecifiedUnits:
-      setValueInSpecifiedUnits(value.toNumber(exec));
+      setValueInSpecifiedUnits(value->toNumber(exec));
       break;
     default:
       kdWarning() << "Unhandled token in " << k_funcinfo << " : " << token
@@ -105,21 +105,21 @@ void SVGLength::putValueProperty(ExecState* exec,
   KDOM_LEAVE_SAFE(KDOM::DOMException)
 }
 
-Value SVGLengthProtoFunc::call(ExecState* exec,
-                               Object& thisObj,
-                               const List& args) {
+ValueImp* SVGLengthProtoFunc::callAsFunction(ExecState* exec,
+                                             ObjectImp* thisObj,
+                                             const List& args) {
   KDOM_CHECK_THIS(SVGLength)
   KDOM_ENTER_SAFE
 
   switch (id) {
     case SVGLengthConstants::NewValueSpecifiedUnits: {
-      unsigned short unitType = args[0].toUInt16(exec);
-      float valueInSpecifiedUnits = args[1].toNumber(exec);
+      unsigned short unitType = args[0]->toUInt16(exec);
+      float valueInSpecifiedUnits = args[1]->toNumber(exec);
       obj.newValueSpecifiedUnits(unitType, valueInSpecifiedUnits);
       return Undefined();
     }
     case SVGLengthConstants::ConvertToSpecifiedUnits: {
-      unsigned short unitType = args[0].toUInt16(exec);
+      unsigned short unitType = args[0]->toUInt16(exec);
       obj.convertToSpecifiedUnits(unitType);
       return Undefined();
     }

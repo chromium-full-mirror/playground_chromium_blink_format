@@ -50,7 +50,8 @@ KSVG_IMPLEMENT_PROTOTYPE("SVGAnimationElement",
                          SVGAnimationElementProto,
                          SVGAnimationElementProtoFunc)
 
-Value SVGAnimationElement::getValueProperty(ExecState* exec, int token) const {
+ValueImp* SVGAnimationElement::getValueProperty(ExecState* exec,
+                                                int token) const {
   KDOM_ENTER_SAFE
 
   switch (token) {
@@ -65,11 +66,10 @@ Value SVGAnimationElement::getValueProperty(ExecState* exec, int token) const {
   return Undefined();
 }
 
-Value SVGAnimationElementProtoFunc::call(ExecState* exec,
-                                         Object& thisObj,
-                                         const List&) {
-  SVGAnimationElement obj(
-      cast(exec, static_cast<KJS::ObjectImp*>(thisObj.imp())));
+ValueImp* SVGAnimationElementProtoFunc::callAsFunction(ExecState* exec,
+                                                       ObjectImp* thisObj,
+                                                       const List&) {
+  SVGAnimationElement obj(cast(exec, thisObj));
   KDOM_ENTER_SAFE
 
   switch (id) {
