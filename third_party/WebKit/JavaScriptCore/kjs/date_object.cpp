@@ -1002,7 +1002,7 @@ static const struct KnownZone {
                    {"CST", -360}, {"CDT", -300}, {"MST", -420}, {"MDT", -360},
                    {"PST", -480}, {"PDT", -420}};
 
-double KJS::makeTime(struct tm* t, double ms, bool utc) {
+double makeTime(struct tm* t, double ms, bool utc) {
   int utcOffset;
   if (utc) {
     time_t zero = 0;
