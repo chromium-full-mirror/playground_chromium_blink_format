@@ -317,7 +317,11 @@ class EventException {
    * exception.
    *
    */
-  enum EventExceptionCode { UNSPECIFIED_EVENT_TYPE_ERR = 0 };
+  enum EventExceptionCode {
+    UNSPECIFIED_EVENT_TYPE_ERR = 0,
+    _EXCEPTION_OFFSET = 3000,
+    _EXCEPTION_MAX = 3999
+  };
 
 #if !KHTML_NO_CPLUSPLUS_DOM
 
