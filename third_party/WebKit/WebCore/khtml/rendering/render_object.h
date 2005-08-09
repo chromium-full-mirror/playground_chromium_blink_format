@@ -178,6 +178,7 @@ class RenderObject : public CachedObjectClient {
   bool hasClip() { return isPositioned() && style()->hasClip(); }
 
   virtual int getBaselineOfFirstLineBox() const { return -1; }
+  virtual int getBaselineOfLastLineBox() const { return -1; }
 
   // Obtains the nearest enclosing block (including this block) that contributes
   // a first-line style to our inline

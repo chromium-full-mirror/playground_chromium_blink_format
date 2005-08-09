@@ -228,6 +228,7 @@ class RenderBlock : public RenderFlow {
   void calcBlockMinMaxWidth();
 
   virtual int getBaselineOfFirstLineBox() const;
+  virtual int getBaselineOfLastLineBox() const;
 
   RootInlineBox* firstRootBox() const {
     return static_cast<RootInlineBox*>(m_firstLineBox);
