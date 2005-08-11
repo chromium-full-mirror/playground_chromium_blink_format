@@ -124,6 +124,10 @@ void ResolveNode::streamTo(SourceStream& s) const {
   s << ident;
 }
 
+void GroupNode::streamTo(SourceStream& s) const {
+  s << "(" << group << ")";
+}
+
 void ElementNode::streamTo(SourceStream& s) const {
   for (const ElementNode* n = this; n; n = n->list) {
     for (int i = 0; i < n->elision; i++)
@@ -158,11 +162,11 @@ void PropertyNode::streamTo(SourceStream& s) const {
     s << str;
 }
 
-void AccessorNode1::streamTo(SourceStream& s) const {
+void BracketAccessorNode::streamTo(SourceStream& s) const {
   s << expr1 << "[" << expr2 << "]";
 }
 
-void AccessorNode2::streamTo(SourceStream& s) const {
+void DotAccessorNode::streamTo(SourceStream& s) const {
   s << expr << "." << ident;
 }
 
@@ -308,8 +312,7 @@ void ConditionalNode::streamTo(SourceStream& s) const {
   s << logical << " ? " << expr1 << " : " << expr2;
 }
 
-void AssignNode::streamTo(SourceStream& s) const {
-  s << left;
+void streamAssignmentOperatorTo(SourceStream& s, Operator oper) {
   const char* opStr;
   switch (oper) {
     case OpEqual:
@@ -334,7 +337,7 @@ void AssignNode::streamTo(SourceStream& s) const {
       opStr = " >>= ";
       break;
     case OpURShift:
-      opStr = " >>= ";
+      opStr = " >>>= ";
       break;
     case OpAndEq:
       opStr = " &= ";
@@ -351,7 +354,25 @@ void AssignNode::streamTo(SourceStream& s) const {
     default:
       opStr = " ?= ";
   }
-  s << opStr << expr;
+  s << opStr;
+}
+
+void AssignResolveNode::streamTo(SourceStream& s) const {
+  s << m_ident;
+  streamAssignmentOperatorTo(s, m_oper);
+  s << m_right;
+}
+
+void AssignBracketNode::streamTo(SourceStream& s) const {
+  s << m_base << "[" << m_subscript << "]";
+  streamAssignmentOperatorTo(s, m_oper);
+  s << m_right;
+}
+
+void AssignDotNode::streamTo(SourceStream& s) const {
+  s << m_base << "." << m_ident;
+  streamAssignmentOperatorTo(s, m_oper);
+  s << m_right;
 }
 
 void CommaNode::streamTo(SourceStream& s) const {
