@@ -160,6 +160,8 @@ class ActivationImp : public ObjectImp {
 
   virtual void mark();
 
+  bool isActivation() { return true; }
+
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
   static ValueImp* argumentsGetter(ExecState* exec,
