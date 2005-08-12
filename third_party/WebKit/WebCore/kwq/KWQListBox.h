@@ -72,6 +72,7 @@ class QListBox : public QScrollView {
   virtual bool checksDescendantsForFocus() const;
 
   static void clearCachedTextRenderers();
+  void setFont(const QFont& font);
 
  private:
   void appendItem(const QString&, bool isLabel);
