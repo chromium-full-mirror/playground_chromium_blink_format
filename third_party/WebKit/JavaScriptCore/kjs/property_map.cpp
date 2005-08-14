@@ -104,8 +104,6 @@ SavedProperties::~SavedProperties() {
 
 // Algorithm concepts from Algorithms in C++, Sedgewick.
 
-PropertyMap::PropertyMap() : _table(0) {}
-
 PropertyMap::~PropertyMap() {
   if (!_table) {
 #if USE_SINGLE_ENTRY
@@ -116,12 +114,14 @@ PropertyMap::~PropertyMap() {
     return;
   }
 
-  int size = _table->size;
+  int minimumKeysToProcess = _table->keyCount + _table->sentinelCount;
   Entry* entries = _table->entries;
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < minimumKeysToProcess; i++) {
     UString::Rep* key = entries[i].key;
     if (key)
       key->deref();
+    else
+      ++minimumKeysToProcess;
   }
   kjs_fast_free(_table);
 }
@@ -534,12 +534,16 @@ void PropertyMap::mark() const {
     return;
   }
 
-  int size = _table->size;
+  int minimumKeysToProcess = _table->keyCount + _table->sentinelCount;
   Entry* entries = _table->entries;
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < minimumKeysToProcess; i++) {
     ValueImp* v = entries[i].value;
-    if (v && !v->marked())
-      v->mark();
+    if (v) {
+      if (!v->marked())
+        v->mark();
+    } else {
+      ++minimumKeysToProcess;
+    }
   }
 }
 
