@@ -2844,7 +2844,7 @@ ValueImp* KJS::HTMLElementFunction::callAsFunction(ExecState* exec,
     HTMLSelectElementImpl& select =
         static_cast<HTMLSelectElementImpl&>(element);
     if (id == KJS::HTMLElement::SelectAdd) {
-      select.add(toHTMLElement(args[0]), toHTMLElement(args[1]));
+      select.add(toHTMLElement(args[0]), toHTMLElement(args[1]), exception);
       return Undefined();
     } else if (id == KJS::HTMLElement::SelectRemove) {
       select.remove(int(args[0]->toNumber(exec)));
@@ -4832,7 +4832,9 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
       do {
         ElementImpl* option =
             m_element->ownerDocument()->createElement("option", exception);
-        m_element->add(static_cast<HTMLElementImpl*>(option), 0);
+        if (exception)
+          break;
+        m_element->add(static_cast<HTMLElementImpl*>(option), 0, exception);
         if (exception)
           break;
       } while (++diff);
@@ -4870,7 +4872,9 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
           m_element->ownerDocument()->createElement("option", exception);
       if (!dummyOption)
         break;
-      m_element->add(static_cast<HTMLElementImpl*>(dummyOption), 0);
+      m_element->add(static_cast<HTMLElementImpl*>(dummyOption), 0, exception);
+      if (exception)
+        break;
     }
     // replace an existing entry ?
   } else if (diff < 0) {
@@ -4879,7 +4883,8 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
   }
   // finally add the new element
   if (exception == 0)
-    m_element->add(static_cast<HTMLOptionElementImpl*>(option), before);
+    m_element->add(static_cast<HTMLOptionElementImpl*>(option), before,
+                   exception);
 
   setDOMException(exec, exception);
 }

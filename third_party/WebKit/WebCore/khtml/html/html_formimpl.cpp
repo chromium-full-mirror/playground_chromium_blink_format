@@ -2722,11 +2722,15 @@ long HTMLSelectElementImpl::length() const {
 }
 
 void HTMLSelectElementImpl::add(HTMLElementImpl* element,
-                                HTMLElementImpl* before) {
+                                HTMLElementImpl* before,
+                                int& exceptioncode) {
+  SharedPtr<HTMLElementImpl> protectNewChild(element);  // make sure the element
+                                                        // is ref'd and deref'd
+                                                        // so we don't leak it
+
   if (!element || !element->hasLocalName(optionTag))
     return;
 
-  int exceptioncode = 0;
   insertBefore(element, before, exceptioncode);
   if (!exceptioncode)
     setRecalcListItems();
