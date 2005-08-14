@@ -656,7 +656,9 @@ inline bool AllocatedValueImp::isObject(const ClassInfo* info) const {
 }
 
 inline ObjectImp::ObjectImp(ObjectImp* proto)
-    : _proto(proto), _internalValue(0) {}
+    : _proto(proto), _internalValue(0) {
+  assert(proto);
+}
 
 inline ObjectImp::ObjectImp() : _proto(jsNull()), _internalValue(0) {}
 
@@ -673,6 +675,7 @@ inline ValueImp* ObjectImp::prototype() const {
 }
 
 inline void ObjectImp::setPrototype(ValueImp* proto) {
+  assert(proto);
   _proto = proto;
 }
 
