@@ -232,30 +232,6 @@ double SimpleNumber::negZero = -0.0;
 
 // ------------------------------ LabelStack -----------------------------------
 
-LabelStack::LabelStack(const LabelStack& other) {
-  tos = 0;
-  *this = other;
-}
-
-LabelStack& LabelStack::operator=(const LabelStack& other) {
-  clear();
-  tos = 0;
-  StackElem* cur = 0;
-  StackElem* se = other.tos;
-  while (se) {
-    StackElem* newPrev = new StackElem;
-    newPrev->prev = 0;
-    newPrev->id = se->id;
-    if (cur)
-      cur->prev = newPrev;
-    else
-      tos = newPrev;
-    cur = newPrev;
-    se = se->prev;
-  }
-  return *this;
-}
-
 bool LabelStack::push(const Identifier& id) {
   if (contains(id))
     return false;
@@ -276,28 +252,6 @@ bool LabelStack::contains(const Identifier& id) const {
       return true;
 
   return false;
-}
-
-void LabelStack::pop() {
-  if (tos) {
-    StackElem* prev = tos->prev;
-    delete tos;
-    tos = prev;
-  }
-}
-
-LabelStack::~LabelStack() {
-  clear();
-}
-
-void LabelStack::clear() {
-  StackElem* prev;
-
-  while (tos) {
-    prev = tos->prev;
-    delete tos;
-    tos = prev;
-  }
 }
 
 // ------------------------------ ContextImp -----------------------------------
@@ -396,7 +350,6 @@ ProgramNode* Parser::parse(const UString& sourceURL,
   Lexer::curr()->doneParsing();
   ProgramNode* prog = progNode;
   progNode = 0;
-  //  sid = -1;
 
   if (parseError || lexError) {
     int eline = Lexer::curr()->lineNo();
