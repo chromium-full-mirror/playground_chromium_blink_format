@@ -149,7 +149,7 @@ void* Collector::allocate(size_t s) {
     // didn't find one, need to allocate a new block
 
     int numBlocks = heap.numBlocks;
-    if (usedBlocks == heap.numBlocks) {
+    if (usedBlocks == numBlocks) {
       numBlocks = max(MIN_ARRAY_SIZE, numBlocks * GROWTH_FACTOR);
       heap.numBlocks = numBlocks;
       heap.blocks = static_cast<CollectorBlock**>(
