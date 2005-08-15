@@ -75,14 +75,8 @@ class QPainter : public Qt {
 
   void drawRect(int, int, int, int);
   void drawLine(int, int, int, int);
-  void drawLineSegments(const QPointArray&, int index = 0, int nlines = -1);
   void drawEllipse(int, int, int, int);
   void drawArc(int, int, int, int, int, int);
-  void drawPolyline(const QPointArray&, int index = 0, int npoints = -1);
-  void drawPolygon(const QPointArray&,
-                   bool winding = FALSE,
-                   int index = 0,
-                   int npoints = -1);
   void drawConvexPolygon(const QPointArray&);
 
   void fillRect(int, int, int, int, const QBrush&);
@@ -221,12 +215,6 @@ class QPainter : public Qt {
   void _setColorFromPen();
 
   void _fillRect(float x, float y, float w, float h, const QColor& color);
-
-  void _drawPoints(const QPointArray& _points,
-                   bool winding,
-                   int index,
-                   int _npoints,
-                   bool fill);
 
   void _updateRenderer();
 
