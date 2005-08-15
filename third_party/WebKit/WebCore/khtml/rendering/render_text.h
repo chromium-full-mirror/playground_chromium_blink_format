@@ -74,6 +74,9 @@ class InlineTextBox : public InlineRunBox {
   uint end() const { return m_len ? m_start + m_len - 1 : m_start; }
   uint len() const { return m_len; }
 
+  void setStart(uint start) { m_start = start; }
+  void setLen(uint len) { m_len = len; }
+
   void offsetRun(int d) { m_start += d; }
 
   void detach(RenderArena* arena);

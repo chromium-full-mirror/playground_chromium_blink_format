@@ -707,6 +707,12 @@ RootInlineBox* RenderBlock::constructLine(const BidiIterator& start,
 
       // Append the inline box to this line.
       parentBox->addToLine(r->box);
+
+      if (r->box->isInlineTextBox()) {
+        InlineTextBox* text = static_cast<InlineTextBox*>(r->box);
+        text->setStart(r->start);
+        text->setLen(r->stop - r->start);
+      }
     }
   }
 
@@ -753,22 +759,32 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   int availableWidth = lineWidth(m_height);
   int totWidth = lineBox->getFlowSpacingWidth();
   BidiRun* r = 0;
+  bool needsWordSpacing = false;
   for (r = sFirstBidiRun; r; r = r->nextRun) {
     if (!r->box || r->obj->isPositioned())
       continue;  // Positioned objects are only participating to figure out
                  // their
     // correct static x position.  They have no effect on the width.
     if (r->obj->isText()) {
-      int textWidth = static_cast<RenderText*>(r->obj)->width(
-          r->start, r->stop - r->start, totWidth, m_firstLine);
+      RenderText* rt = static_cast<RenderText*>(r->obj);
+      int textWidth =
+          rt->width(r->start, r->stop - r->start, totWidth, m_firstLine);
+      int effectiveWidth = textWidth;
+      int rtLength = rt->length();
+      if (rtLength != 0) {
+        if (r->start == 0 && needsWordSpacing && rt->text()[r->start].isSpace())
+          effectiveWidth += rt->htmlFont(m_firstLine)->getWordSpacing();
+        needsWordSpacing =
+            !rt->text()[r->stop - 1].isSpace() && r->stop == rtLength;
+      }
       if (!r->compact) {
         RenderStyle* style = r->obj->style();
         if (style->whiteSpace() == NORMAL &&
             style->khtmlLineBreak() == AFTER_WHITE_SPACE) {
           // shrink the box as needed to keep the line from overflowing the
           // available width
-          textWidth = kMin(
-              textWidth, availableWidth - totWidth + style->borderLeftWidth());
+          textWidth = kMin(effectiveWidth, availableWidth - totWidth +
+                                               style->borderLeftWidth());
         }
       }
       r->box->setWidth(textWidth);
@@ -863,7 +879,9 @@ void RenderBlock::computeHorizontalPositionsForLine(RootInlineBox* lineBox,
   // compute accurate widths for the inline flow boxes).
   int leftPosition = x;
   int rightPosition = x;
-  lineBox->placeBoxesHorizontally(x, leftPosition, rightPosition);
+  needsWordSpacing = false;
+  lineBox->placeBoxesHorizontally(x, leftPosition, rightPosition,
+                                  needsWordSpacing);
   lineBox->setHorizontalOverflowPositions(leftPosition, rightPosition);
 }
 
@@ -2411,15 +2429,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
           QChar* str = nextText->text();
           if (strlen &&
               ((str[0].unicode() == ' ') ||
-               (next->style()->whiteSpace() != PRE && str[0] == '\n')))
+               (next->style()->whiteSpace() != PRE && str[0] == '\n'))) {
             // If the next item on the line is text, and if we did not end with
             // a space, then the next text run continues our word (and so it
             // needs to
             // keep adding to |tmpW|.  Just update and continue.
             checkForBreak = true;
-          else
+            tmpW += nextText->htmlFont(m_firstLine)->getWordSpacing();
+          } else
             checkForBreak = false;
-
           bool canPlaceOnLine = (w + tmpW <= width + 1) || !isNormal;
           if (canPlaceOnLine && checkForBreak) {
             w += tmpW;

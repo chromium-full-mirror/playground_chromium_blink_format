@@ -1242,6 +1242,8 @@ inline int RenderText::widthFromCache(const Font* f,
           w += tabWidth - ((xpos + w) % tabWidth);
         } else
           w += m_monospaceCharacterWidth;
+        if (c.isSpace() && i > start && !str->s[i - 1].isSpace())
+          w += f->getWordSpacing();
       }
     }
 
@@ -1308,7 +1310,7 @@ void RenderText::trimmedMinMaxWidth(int leadWidth,
     QChar space[1];
     space[0] = ' ';
     int spaceWidth = f->width(space, 1, 0, 0);
-    maxW -= spaceWidth;
+    maxW -= spaceWidth + f->getWordSpacing();
   }
 
   stripFrontSpaces = !isPre && m_hasEndWS;
@@ -1382,6 +1384,7 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
   const Font* f = htmlFont(false);
   int wordSpacing = style()->wordSpacing();
   int len = str->l;
+  bool needsWordSpacing = false;
   bool ignoringSpaces = false;
   bool isSpace = false;
   bool isPre = style()->whiteSpace() == PRE;
@@ -1507,9 +1510,14 @@ void RenderText::calcMinMaxWidth(int leadWidth) {
       } else {
         currMaxWidth += f->width(str->s, str->l, i + wordlen, 1, tabWidth(),
                                  leadWidth + currMaxWidth);
+        needsWordSpacing =
+            isSpace && !previousCharacterIsSpace && i + wordlen == len - 1;
       }
     }
   }
+
+  if (needsWordSpacing && len > 1)
+    currMaxWidth += wordSpacing;
 
   if (currMinWidth > m_minWidth)
     m_minWidth = currMinWidth;
