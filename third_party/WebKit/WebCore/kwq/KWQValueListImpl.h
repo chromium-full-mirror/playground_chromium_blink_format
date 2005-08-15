@@ -28,6 +28,7 @@
 
 #include "KWQRefPtr.h"
 #include "KWQDef.h"
+#include "main_thread_malloc.h"
 
 class KWQValueListNodeImpl;
 
@@ -116,6 +117,9 @@ class KWQValueListImpl {
 };
 
 class KWQValueListNodeImpl {
+ public:
+  MAIN_THREAD_ALLOCATED;
+
  protected:
   KWQValueListNodeImpl();
 
@@ -127,5 +131,55 @@ class KWQValueListNodeImpl {
   friend class KWQValueListIteratorImpl;
   friend class KWQValueListImpl::KWQValueListPrivate;
 };
+
+inline KWQValueListIteratorImpl::KWQValueListIteratorImpl() : nodeImpl(NULL) {}
+
+inline bool KWQValueListIteratorImpl::operator==(
+    const KWQValueListIteratorImpl& other) {
+  return nodeImpl == other.nodeImpl;
+}
+
+inline bool KWQValueListIteratorImpl::operator!=(
+    const KWQValueListIteratorImpl& other) {
+  return nodeImpl != other.nodeImpl;
+}
+
+inline KWQValueListNodeImpl* KWQValueListIteratorImpl::node() {
+  return nodeImpl;
+}
+
+inline const KWQValueListNodeImpl* KWQValueListIteratorImpl::node() const {
+  return nodeImpl;
+}
+
+inline KWQValueListIteratorImpl& KWQValueListIteratorImpl::operator++() {
+  if (nodeImpl != NULL) {
+    nodeImpl = nodeImpl->next;
+  }
+  return *this;
+}
+
+inline KWQValueListIteratorImpl KWQValueListIteratorImpl::operator++(int) {
+  KWQValueListIteratorImpl tmp(*this);
+
+  if (nodeImpl != NULL) {
+    nodeImpl = nodeImpl->next;
+  }
+
+  return tmp;
+}
+
+inline KWQValueListIteratorImpl& KWQValueListIteratorImpl::operator--() {
+  if (nodeImpl != NULL) {
+    nodeImpl = nodeImpl->prev;
+  }
+  return *this;
+}
+
+inline KWQValueListIteratorImpl::KWQValueListIteratorImpl(
+    const KWQValueListNodeImpl* n)
+    : nodeImpl((KWQValueListNodeImpl*)n) {}
+
+inline KWQValueListNodeImpl::KWQValueListNodeImpl() : prev(NULL), next(NULL) {}
 
 #endif

@@ -29,6 +29,7 @@
 #include "KWQRefPtr.h"
 #include "KWQDef.h"
 #include <stddef.h>
+#include "main_thread_malloc.h"
 
 class KWQArrayImpl {
  public:
@@ -54,6 +55,9 @@ class KWQArrayImpl {
    public:
     KWQArrayPrivate(size_t pNumItems, size_t pItemSize);
     ~KWQArrayPrivate();
+
+    MAIN_THREAD_ALLOCATED;
+
     size_t numItems;
     size_t itemSize;
     char* data;
@@ -62,5 +66,9 @@ class KWQArrayImpl {
 
   KWQRefPtr<KWQArrayPrivate> d;
 };
+
+inline uint KWQArrayImpl::size() const {
+  return d->numItems;
+}
 
 #endif

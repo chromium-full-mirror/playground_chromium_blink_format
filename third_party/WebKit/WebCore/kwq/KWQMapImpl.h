@@ -29,10 +29,14 @@
 #include <new>
 
 #include "KWQRefPtr.h"
+#include "main_thread_malloc.h"
 
 class KWQMapImpl;
 
 class KWQMapNodeImpl {
+ public:
+  MAIN_THREAD_ALLOCATED;
+
  protected:
   typedef enum { Red = 0, Black = 1 } KWQMapNodeColor;
 
@@ -65,6 +69,9 @@ class KWQMapNodeImpl {
 };
 
 class KWQMapIteratorImpl {
+ public:
+  MAIN_THREAD_ALLOCATED;
+
  protected:
   KWQMapNodeImpl* node;
 

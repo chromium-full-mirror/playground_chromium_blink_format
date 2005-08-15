@@ -48,17 +48,17 @@ class KWQRefPtr {
 };
 
 template <class T>
-KWQRefPtr<T>::KWQRefPtr(T* p) : pointer(p) {
+inline KWQRefPtr<T>::KWQRefPtr(T* p) : pointer(p) {
   ref();
 }
 
 template <class T>
-KWQRefPtr<T>::KWQRefPtr(const KWQRefPtr& r) : pointer(r.pointer) {
+inline KWQRefPtr<T>::KWQRefPtr(const KWQRefPtr& r) : pointer(r.pointer) {
   ref();
 }
 
 template <class T>
-KWQRefPtr<T>& KWQRefPtr<T>::operator=(const KWQRefPtr& r) {
+inline KWQRefPtr<T>& KWQRefPtr<T>::operator=(const KWQRefPtr& r) {
   r.ref();
   unref();
   pointer = r.pointer;
@@ -66,14 +66,14 @@ KWQRefPtr<T>& KWQRefPtr<T>::operator=(const KWQRefPtr& r) {
 }
 
 template <class T>
-void KWQRefPtr<T>::ref() const {
+inline void KWQRefPtr<T>::ref() const {
   if (pointer) {
     ++pointer->refCount;
   }
 }
 
 template <class T>
-void KWQRefPtr<T>::unref() {
+inline void KWQRefPtr<T>::unref() {
   if (pointer && --pointer->refCount == 0) {
     delete pointer;
   }
