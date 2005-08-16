@@ -117,9 +117,7 @@ UString UndefinedImp::toString(ExecState* /*exec*/) const {
 }
 
 ObjectImp* UndefinedImp::toObject(ExecState* exec) const {
-  ObjectImp* err = Error::create(exec, TypeError, I18N_NOOP("Undefined value"));
-  exec->setException(err);
-  return err;
+  return throwError(exec, TypeError, "Undefined value");
 }
 
 // ------------------------------ NullImp --------------------------------------
@@ -141,9 +139,7 @@ UString NullImp::toString(ExecState* /*exec*/) const {
 }
 
 ObjectImp* NullImp::toObject(ExecState* exec) const {
-  ObjectImp* err = Error::create(exec, TypeError, I18N_NOOP("Null value"));
-  exec->setException(err);
-  return err;
+  return throwError(exec, TypeError, "Null value");
 }
 
 // ------------------------------ BooleanImp -----------------------------------
@@ -698,9 +694,8 @@ Completion InterpreterImp::evaluate(const UString& code,
 
   // no program node means a syntax error occurred
   if (!progNode) {
-    ObjectImp* err = Error::create(&globExec, SyntaxError, errMsg.ascii(),
-                                   errLine, -1, &sourceURL);
-    err->put(&globExec, "sid", Number(sid));
+    ObjectImp* err =
+        Error::create(&globExec, SyntaxError, errMsg, errLine, sid, &sourceURL);
 #if APPLE_CHANGES
     unlockInterpreter();
 #endif
@@ -851,10 +846,8 @@ bool InternalFunctionImp::hasInstance(ExecState* exec, ValueImp* value) {
 
   ValueImp* prot = get(exec, prototypePropertyName);
   if (!prot->isObject() && !prot->isNull()) {
-    ObjectImp* err = Error::create(exec, TypeError,
-                                   "Invalid prototype encountered "
-                                   "in instanceof operation.");
-    exec->setException(err);
+    throwError(exec, TypeError,
+               "Invalid prototype encountered in instanceof operation.");
     return false;
   }
 

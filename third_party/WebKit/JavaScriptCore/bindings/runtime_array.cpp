@@ -93,8 +93,7 @@ void RuntimeArrayImp::put(ExecState* exec,
                           ValueImp* value,
                           int attr) {
   if (propertyName == lengthPropertyName) {
-    ObjectImp* err = Error::create(exec, RangeError);
-    exec->setException(err);
+    throwError(exec, RangeError);
     return;
   }
 
@@ -113,8 +112,7 @@ void RuntimeArrayImp::put(ExecState* exec,
                           ValueImp* value,
                           int attr) {
   if (index >= getLength()) {
-    ObjectImp* err = Error::create(exec, RangeError);
-    exec->setException(err);
+    throwError(exec, RangeError);
     return;
   }
 

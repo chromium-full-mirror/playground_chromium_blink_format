@@ -22,18 +22,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _BINDINGS_OBJC_RUNTIME_H_
-#define _BINDINGS_OBJC_RUNTIME_H_
+
+#ifndef KJS_BINDINGS_OBJC_RUNTIME_H
+#define KJS_BINDINGS_OBJC_RUNTIME_H
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#include <runtime.h>
-#include <ustring.h>
+#include "runtime.h"
+#include "ustring.h"
 
-#include <objc_header.h>
+#include "objc_header.h"
 
 namespace KJS {
-
 namespace Bindings {
 
 class ObjcInstance;
@@ -41,26 +41,21 @@ class ObjcInstance;
 class ObjcField : public Field {
  public:
   ObjcField(Ivar ivar);
-
   ObjcField(CFStringRef name);
 
   ~ObjcField() {
     if (_name)
       CFRelease(_name);
-  };
+  }
 
   ObjcField(const ObjcField& other) : Field() {
     _ivar = other._ivar;
 
-    if (other._name != _name) {
-      if (_name)
-        CFRelease(_name);
-      if (other._name)
-        _name = (CFStringRef)CFRetain(other._name);
-      else
-        _name = 0;
-    }
-  };
+    if (other._name)
+      _name = (CFStringRef)CFRetain(other._name);
+    else
+      _name = 0;
+  }
 
   ObjcField& operator=(const ObjcField& other) {
     if (this == &other)
@@ -78,7 +73,7 @@ class ObjcField : public Field {
     }
 
     return *this;
-  };
+  }
 
   virtual ValueImp* valueFromInstance(ExecState* exec,
                                       const Instance* instance) const;
@@ -96,27 +91,24 @@ class ObjcField : public Field {
 
 class ObjcMethod : public Method {
  public:
-  ObjcMethod() : Method(), _objcClass(0), _selector(0){};
-
+  ObjcMethod() : _objcClass(0), _selector(0) {}
   ObjcMethod(struct objc_class* aClass, const char* _selector);
   ~ObjcMethod() {
     if (_javaScriptName)
       ;
     CFRelease(_javaScriptName);
-  };
+  }
 
   ObjcMethod(const ObjcMethod& other) : Method() {
     _objcClass = other._objcClass;
     _selector = other._selector;
-  };
+  }
 
   ObjcMethod& operator=(const ObjcMethod& other) {
     if (this == &other)
       return *this;
-
     _objcClass = other._objcClass;
     _selector = other._selector;
-
     return *this;
   }
 
@@ -141,19 +133,18 @@ class ObjcMethod : public Method {
 
 class ObjcArray : public Array {
  public:
-  ObjcArray(ObjectStructPtr a);
+  ObjcArray(ObjectStructPtr);
 
-  ObjcArray(const ObjcArray& other);
+  ObjcArray(const ObjcArray&);
+  ObjcArray& operator=(const ObjcArray&);
 
-  ObjcArray& operator=(const ObjcArray& other);
+  virtual ~ObjcArray();
 
   virtual void setValueAt(ExecState* exec,
                           unsigned int index,
                           ValueImp* aValue) const;
   virtual ValueImp* valueAt(ExecState* exec, unsigned int index) const;
   virtual unsigned int getLength() const;
-
-  virtual ~ObjcArray();
 
   ObjectStructPtr getObjcArray() const { return _array; }
 
@@ -167,27 +158,21 @@ class ObjcArray : public Array {
 class ObjcFallbackObjectImp : public ObjectImp {
  public:
   ObjcFallbackObjectImp(ObjectImp* proto);
-
   ObjcFallbackObjectImp(ObjcInstance* i, const Identifier propertyName);
 
   const ClassInfo* classInfo() const { return &info; }
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-
+  virtual bool canPut(ExecState* exec, const Identifier& propertyName) const;
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
                    ValueImp* value,
                    int attr = None);
-
-  virtual bool canPut(ExecState* exec, const Identifier& propertyName) const;
-
   virtual bool implementsCall() const;
   virtual ValueImp* callAsFunction(ExecState* exec,
                                    ObjectImp* thisObj,
                                    const List& args);
-
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
-
   virtual ValueImp* defaultValue(ExecState* exec, Type hint) const;
 
   virtual Type type() const;
@@ -201,7 +186,6 @@ class ObjcFallbackObjectImp : public ObjectImp {
 };
 
 }  // namespace Bindings
-
 }  // namespace KJS
 
 #endif

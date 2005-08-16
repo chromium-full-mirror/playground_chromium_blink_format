@@ -30,7 +30,6 @@
 #include "value.h"
 
 namespace KJS {
-
 namespace Bindings {
 
 class Instance;
@@ -44,7 +43,7 @@ typedef const char* RuntimeType;
 class Parameter {
  public:
   virtual RuntimeType type() const = 0;
-  virtual ~Parameter(){};
+  virtual ~Parameter() {}
 };
 
 // FIXME:  Constructor should be removed from abstract runtime classes
@@ -95,7 +94,7 @@ class Method {
 
   virtual long numParameters() const = 0;
 
-  virtual ~Method(){};
+  virtual ~Method() {}
 };
 
 class Class {
@@ -139,7 +138,7 @@ class Instance {
                                         void* nativeInstance,
                                         const RootObject* r = 0);
 
-  Instance() : _executionContext(0){};
+  Instance() : _executionContext(0) {}
 
   Instance(const Instance& other);
 
@@ -148,8 +147,8 @@ class Instance {
   // These functions are called before and after the main entry points into
   // the native implementations.  They can be used to establish and cleanup
   // any needed state.
-  virtual void begin(){};
-  virtual void end(){};
+  virtual void begin() {}
+  virtual void end() {}
 
   virtual Class* getClass() const = 0;
 
@@ -158,14 +157,14 @@ class Instance {
                                              const Identifier& property,
                                              Type hint) const {
     return Undefined();
-  };
+  }
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
                                ValueImp* aValue) const;
-  virtual bool supportsSetValueOfUndefinedField() { return false; };
+  virtual bool supportsSetValueOfUndefinedField() { return false; }
   virtual void setValueOfUndefinedField(ExecState* exec,
                                         const Identifier& property,
-                                        ValueImp* aValue){};
+                                        ValueImp* aValue) {}
 
   virtual ValueImp* invokeMethod(ExecState* exec,
                                  const MethodList& method,
@@ -174,7 +173,7 @@ class Instance {
 
   virtual ValueImp* defaultValue(Type hint) const = 0;
 
-  virtual ValueImp* valueOf() const { return String(getClass()->name()); };
+  virtual ValueImp* valueOf() const { return String(getClass()->name()); }
 
   void setExecutionContext(const RootObject* r) { _executionContext = r; }
   const RootObject* executionContext() const { return _executionContext; }

@@ -396,8 +396,7 @@ void _NPN_SetException(NPObject* o, const NPUTF8* message) {
     JavaScriptObject* obj = (JavaScriptObject*)o;
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
     Interpreter::lock();
-    ObjectImp* err = Error::create(exec, GeneralError, message);
-    exec->setException(err);
+    throwError(exec, GeneralError, message);
     Interpreter::unlock();
   }
 }

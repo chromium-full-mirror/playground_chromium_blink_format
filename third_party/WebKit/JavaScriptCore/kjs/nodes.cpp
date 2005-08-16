@@ -134,10 +134,13 @@ void Node::finalCheck() {
 #endif
 
 ValueImp* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
-  ObjectImp* err =
-      Error::create(exec, e, msg, lineNo(), sourceId(), &sourceURL);
-  exec->setException(err);
-  return err;
+  return KJS::throwError(exec, e, msg, lineNo(), sourceId(), &sourceURL);
+}
+
+static void substitute(UString& string, const UString& substring) {
+  int position = string.find("%s");
+  assert(position != -1);
+  string = string.substr(0, position) + substring + string.substr(position + 2);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
@@ -145,35 +148,19 @@ ValueImp* Node::throwError(ExecState* exec,
                            const char* msg,
                            ValueImp* v,
                            Node* expr) {
-  char* vStr = strdup(v->toString(exec).ascii());
-  char* exprStr = strdup(expr->toString().ascii());
-
-  int length = strlen(msg) - 4 /* two %s */ + strlen(vStr) + strlen(exprStr) +
-               1 /* null terminator */;
-  char* str = new char[length];
-  sprintf(str, msg, vStr, exprStr);
-  free(vStr);
-  free(exprStr);
-
-  ValueImp* result = throwError(exec, e, str);
-  delete[] str;
-
-  return result;
+  UString message = msg;
+  substitute(message, v->toString(exec));
+  substitute(message, expr->toString());
+  return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
                            ErrorType e,
                            const char* msg,
                            Identifier label) {
-  const char* l = label.ascii();
-  int length = strlen(msg) - 2 /* %s */ + strlen(l) + 1 /* null terminator */;
-  char* message = new char[length];
-  sprintf(message, msg, l);
-
-  ValueImp* result = throwError(exec, e, message);
-  delete[] message;
-
-  return result;
+  UString message = msg;
+  substitute(message, label.ustring());
+  return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
@@ -182,22 +169,11 @@ ValueImp* Node::throwError(ExecState* exec,
                            ValueImp* v,
                            Node* e1,
                            Node* e2) {
-  char* vStr = strdup(v->toString(exec).ascii());
-  char* e1Str = strdup(e1->toString().ascii());
-  char* e2Str = strdup(e2->toString().ascii());
-
-  int length = strlen(msg) - 6 /* three %s */ + strlen(vStr) + strlen(e1Str) +
-               strlen(e2Str) + 1 /* null terminator */;
-  char* str = new char[length];
-  sprintf(str, msg, vStr, e1Str, e2Str);
-  free(vStr);
-  free(e1Str);
-  free(e2Str);
-
-  ValueImp* result = throwError(exec, e, str);
-  delete[] str;
-
-  return result;
+  UString message = msg;
+  substitute(message, v->toString(exec));
+  substitute(message, e1->toString());
+  substitute(message, e2->toString());
+  return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
@@ -206,20 +182,10 @@ ValueImp* Node::throwError(ExecState* exec,
                            ValueImp* v,
                            Node* expr,
                            Identifier label) {
-  char* vStr = strdup(v->toString(exec).ascii());
-  char* exprStr = strdup(expr->toString().ascii());
-  const char* l = label.ascii();
-  int length = strlen(msg) - 6 /* three %s */ + strlen(vStr) + strlen(exprStr) +
-               strlen(l) + 1 /* null terminator */;
-  char* message = new char[length];
-  sprintf(message, msg, vStr, exprStr, l);
-  free(vStr);
-  free(exprStr);
-
-  ValueImp* result = throwError(exec, e, message);
-  delete[] message;
-
-  return result;
+  UString message = msg;
+  substitute(message, v->toString(exec));
+  substitute(message, expr->toString());
+  return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
@@ -227,23 +193,15 @@ ValueImp* Node::throwError(ExecState* exec,
                            const char* msg,
                            ValueImp* v,
                            Identifier label) {
-  char* vStr = strdup(v->toString(exec).ascii());
-  const char* l = label.ascii();
-  int length = strlen(msg) - 4 /* two %s */ + strlen(vStr) + strlen(l) +
-               1 /* null terminator */;
-  char* message = new char[length];
-  sprintf(message, msg, vStr, l);
-  free(vStr);
-
-  ValueImp* result = throwError(exec, e, message);
-  delete[] message;
-
-  return result;
+  UString message = msg;
+  substitute(message, v->toString(exec));
+  substitute(message, label.ustring());
+  return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
 void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
   if (exec->hadException()) {
-    ObjectImp* exception = exec->exception()->toObject(exec);
+    ObjectImp* exception = static_cast<ObjectImp*>(exec->exception());
     if (!exception->hasProperty(exec, "line") &&
         !exception->hasProperty(exec, "sourceURL")) {
       exception->put(exec, "line", Number(line));
@@ -253,6 +211,7 @@ void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
 }
 
 // ------------------------------ StatementNode --------------------------------
+
 StatementNode::StatementNode() : l0(-1), l1(-1), sid(-1), breakPoint(false) {}
 
 void StatementNode::setLoc(int line0, int line1, int sourceId) {
@@ -327,10 +286,8 @@ ValueImp* ThisNode::evaluate(ExecState* exec) {
 
 static ValueImp* undefinedVariableError(ExecState* exec,
                                         const Identifier& ident) {
-  UString m = I18N_NOOP("Can't find variable: ") + ident.ustring();
-  ObjectImp* err = Error::create(exec, ReferenceError, m.ascii());
-  exec->setException(err);
-  return err;
+  return throwError(exec, ReferenceError,
+                    "Can't find variable: " + ident.ustring());
 }
 
 // ECMA 11.1.2 & 10.1.4
@@ -3154,6 +3111,4 @@ void SourceElementsNode::processVarDecls(ExecState* exec) {
     n->element->processVarDecls(exec);
 }
 
-ProgramNode::ProgramNode(SourceElementsNode* s) : FunctionBodyNode(s) {
-  // fprintf(stderr,"ProgramNode::ProgramNode %p\n",this);
-}
+ProgramNode::ProgramNode(SourceElementsNode* s) : FunctionBodyNode(s) {}

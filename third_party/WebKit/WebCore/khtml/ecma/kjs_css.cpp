@@ -266,11 +266,8 @@ void DOMCSSStyleDeclaration::put(ExecState* exec,
 ValueImp* DOMCSSStyleDeclarationProtoFunc::callAsFunction(ExecState* exec,
                                                           ObjectImp* thisObj,
                                                           const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSStyleDeclaration::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSStyleDeclaration::info))
+    return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
   CSSStyleDeclarationImpl& styleDecl =
       *static_cast<DOMCSSStyleDeclaration*>(thisObj)->impl();
@@ -509,11 +506,8 @@ ValueImp* getDOMStyleSheetList(ExecState* exec,
 ValueImp* DOMStyleSheetListFunc::callAsFunction(ExecState* exec,
                                                 ObjectImp* thisObj,
                                                 const List& args) {
-  if (!thisObj->inherits(&KJS::DOMStyleSheetList::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMStyleSheetList::info))
+    return throwError(exec, TypeError);
   StyleSheetListImpl& styleSheetList =
       *static_cast<DOMStyleSheetList*>(thisObj)->impl();
   if (id == DOMStyleSheetList::Item)
@@ -604,11 +598,8 @@ ValueImp* getDOMMediaList(ExecState* exec, MediaListImpl* ml) {
 ValueImp* KJS::DOMMediaListProtoFunc::callAsFunction(ExecState* exec,
                                                      ObjectImp* thisObj,
                                                      const List& args) {
-  if (!thisObj->inherits(&KJS::DOMMediaList::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMMediaList::info))
+    return throwError(exec, TypeError);
   MediaListImpl& mediaList = *static_cast<DOMMediaList*>(thisObj)->impl();
   switch (id) {
     case DOMMediaList::Item:
@@ -681,11 +672,8 @@ bool DOMCSSStyleSheet::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMCSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
                                                     ObjectImp* thisObj,
                                                     const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSStyleSheet::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSStyleSheet::info))
+    return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
   CSSStyleSheetImpl& styleSheet = *static_cast<CSSStyleSheetImpl*>(
       static_cast<DOMCSSStyleSheet*>(thisObj)->impl());
@@ -771,11 +759,8 @@ bool DOMCSSRuleList::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMCSSRuleListFunc::callAsFunction(ExecState* exec,
                                              ObjectImp* thisObj,
                                              const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSRuleList::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSRuleList::info))
+    return throwError(exec, TypeError);
   CSSRuleListImpl& cssRuleList = *static_cast<DOMCSSRuleList*>(thisObj)->impl();
   switch (id) {
     case DOMCSSRuleList::Item:
@@ -998,11 +983,8 @@ void DOMCSSRule::putValueProperty(ExecState* exec,
 ValueImp* DOMCSSRuleFunc::callAsFunction(ExecState* exec,
                                          ObjectImp* thisObj,
                                          const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSRule::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSRule::info))
+    return throwError(exec, TypeError);
   CSSRuleImpl& cssRule = *static_cast<DOMCSSRule*>(thisObj)->impl();
 
   if (cssRule.type() == DOM::CSSRule::MEDIA_RULE) {
@@ -1227,11 +1209,8 @@ bool DOMCSSPrimitiveValue::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMCSSPrimitiveValueProtoFunc::callAsFunction(ExecState* exec,
                                                         ObjectImp* thisObj,
                                                         const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSPrimitiveValue::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSPrimitiveValue::info))
+    return throwError(exec, TypeError);
   DOMExceptionTranslator exception(exec);
   CSSPrimitiveValueImpl& val = *static_cast<CSSPrimitiveValueImpl*>(
       static_cast<DOMCSSPrimitiveValue*>(thisObj)->impl());
@@ -1398,11 +1377,8 @@ bool DOMCSSValueList::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMCSSValueListFunc::callAsFunction(ExecState* exec,
                                               ObjectImp* thisObj,
                                               const List& args) {
-  if (!thisObj->inherits(&KJS::DOMCSSValue::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&KJS::DOMCSSValue::info))
+    return throwError(exec, TypeError);
   CSSValueListImpl& valueList = *static_cast<CSSValueListImpl*>(
       static_cast<DOMCSSValueList*>(thisObj)->impl());
   switch (id) {

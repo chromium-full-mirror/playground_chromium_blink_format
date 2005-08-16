@@ -34,9 +34,6 @@
 #include "dom/css_value.h"
 #include "khtml_factory.h"
 #include "khtmlpart_p.h"
-using namespace khtml;
-using namespace DOM;
-using namespace HTMLNames;
 
 #include "css/cssproperties.h"
 #include "css/cssvalues.h"
@@ -67,6 +64,9 @@ using namespace HTMLNames;
 #include <qpaintdevicemetrics.h>
 #include <qintcache.h>
 #include <stdlib.h>
+
+using namespace DOM;
+using namespace HTMLNames;
 
 // #define STYLE_SHARING_STATS 1
 
@@ -182,7 +182,7 @@ CSSStyleSheetImpl* CSSStyleSelector::defaultSheet = 0;
 RenderStyle* CSSStyleSelector::styleNotYetAvailable = 0;
 CSSStyleSheetImpl* CSSStyleSelector::quirksSheet = 0;
 
-static CSSStyleSelector::Encodedurl* encodedurl = 0;
+static CSSStyleSelector::Encodedurl* currentEncodedURL = 0;
 static PseudoState pseudoState;
 
 CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
@@ -204,7 +204,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
 
   // FIXME: This sucks! The user sheet is reparsed every time!
   if (!userStyleSheet.isEmpty()) {
-    m_userSheet = new DOM::CSSStyleSheetImpl(doc);
+    m_userSheet = new CSSStyleSheetImpl(doc);
     m_userSheet->parseString(DOMString(userStyleSheet), strictParsing);
 
     m_userStyle = new CSSRuleSet();
@@ -286,8 +286,7 @@ static CSSStyleSheetImpl* parseUASheet(const KHTMLSettings* s,
     style += s->settingsToCSS();
   DOMString str(style);
 
-  CSSStyleSheetImpl* sheet =
-      new DOM::CSSStyleSheetImpl((DOM::CSSStyleSheetImpl*)0);
+  CSSStyleSheetImpl* sheet = new CSSStyleSheetImpl((CSSStyleSheetImpl*)0);
   sheet->parseString(str);
   return sheet;
 }
@@ -474,7 +473,7 @@ void CSSStyleSelector::initElementAndPseudoState(ElementImpl* e) {
     styledElement = static_cast<StyledElementImpl*>(element);
   else
     styledElement = 0;
-  ::encodedurl = &encodedurl;
+  currentEncodedURL = &encodedurl;
   pseudoState = PseudoUnknown;
 }
 
@@ -542,7 +541,7 @@ static void cleanpath(QString& path) {
   // kdDebug() << "checkPseudoState " << path << endl;
 }
 
-static void checkPseudoState(DOM::ElementImpl* e, bool checkVisited = true) {
+static void checkPseudoState(ElementImpl* e, bool checkVisited = true) {
   if (!e->isLink()) {
     pseudoState = PseudoNone;
     return;
@@ -563,11 +562,11 @@ static void checkPseudoState(DOM::ElementImpl* e, bool checkVisited = true) {
   QString u = cu.string();
   if (!u.contains("://")) {
     if (u[0] == '/')
-      u.prepend(encodedurl->host);
+      u.prepend(currentEncodedURL->host);
     else if (u[0] == '#')
-      u.prepend(encodedurl->file);
+      u.prepend(currentEncodedURL->file);
     else
-      u.prepend(encodedurl->path);
+      u.prepend(currentEncodedURL->path);
     cleanpath(u);
   }
   // completeURL( attr.string() );
@@ -586,7 +585,7 @@ NodeImpl* CSSStyleSelector::locateCousinList(ElementImpl* parent) {
   if (parent && parent->isHTMLElement()) {
     HTMLElementImpl* p = static_cast<HTMLElementImpl*>(parent);
     if (p->renderer() && !p->inlineStyleDecl() && !p->hasID()) {
-      DOM::NodeImpl* r = p->previousSibling();
+      NodeImpl* r = p->previousSibling();
       int subcount = 0;
       RenderStyle* st = p->renderer()->style();
       while (r) {
@@ -661,7 +660,7 @@ RenderStyle* CSSStyleSelector::locateSharedStyle() {
       !styledElement->getDocument()->usesSiblingRules()) {
     // Check previous siblings.
     int count = 0;
-    DOM::NodeImpl* n;
+    NodeImpl* n;
     for (n = element->previousSibling(); n && !n->isElementNode();
          n = n->previousSibling())
       ;
@@ -901,8 +900,7 @@ RenderStyle* CSSStyleSelector::pseudoStyleForElement(
   return style;
 }
 
-void CSSStyleSelector::adjustRenderStyle(RenderStyle* style,
-                                         DOM::ElementImpl* e) {
+void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
   // Cache our original display.
   style->setOriginalDisplay(style->display());
 
@@ -1144,8 +1142,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, ElementImpl* e) {
   return true;
 }
 
-bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
-                                        DOM::ElementImpl* e) {
+bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
   if (!e)
     return false;
 
@@ -1285,7 +1282,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::PseudoFirstChild: {
         // first-child matches the first child that is an element!
         if (e->parentNode()) {
-          DOM::NodeImpl* n = e->previousSibling();
+          NodeImpl* n = e->previousSibling();
           while (n && !n->isElementNode())
             n = n->previousSibling();
           if (!n)
@@ -1296,7 +1293,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::PseudoLastChild: {
         // last-child matches the last child that is an element!
         if (e->parentNode()) {
-          DOM::NodeImpl* n = e->nextSibling();
+          NodeImpl* n = e->nextSibling();
           while (n && !n->isElementNode())
             n = n->nextSibling();
           if (!n)
@@ -1307,7 +1304,7 @@ bool CSSStyleSelector::checkOneSelector(DOM::CSSSelector* sel,
       case CSSSelector::PseudoOnlyChild: {
         // If both first-child and last-child apply, then only-child applies.
         if (e->parentNode()) {
-          DOM::NodeImpl* n = e->previousSibling();
+          NodeImpl* n = e->previousSibling();
           while (n && !n->isElementNode())
             n = n->previousSibling();
           if (!n) {
@@ -1482,7 +1479,7 @@ CSSRuleSet::~CSSRuleSet() {
   delete m_universalRules;
 }
 
-void CSSRuleSet::addToRuleSet(DOM::DOMStringImpl* key,
+void CSSRuleSet::addToRuleSet(DOMStringImpl* key,
                               AtomRuleMap& map,
                               CSSStyleRuleImpl* rule,
                               CSSSelector* sel) {
@@ -1804,7 +1801,7 @@ static QColor colorForCSSValue(int css_value) {
       return bckgrConfig.readColorEntry(
           "Color1", &qApp->palette().disabled().background());
     }
-    return khtml::invalidColor;
+    return invalidColor;
   }
 
   const QPalette& pal = qApp->palette();
@@ -1865,7 +1862,7 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
   }
 }
 
-void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
+void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
   // kdDebug( 6080 ) << "applying property " << prop->m_id << endl;
 
   CSSPrimitiveValueImpl* primitiveValue = 0;
@@ -3019,7 +3016,7 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
       if (!primitiveValue)
         return;
       if (primitiveValue->getIdent()) {
-        khtml::EVerticalAlign align;
+        EVerticalAlign align;
 
         switch (primitiveValue->getIdent()) {
           case CSS_VAL_TOP:
@@ -3713,7 +3710,7 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
         int blur = item->blur
                        ? item->blur->computeLength(style, paintDeviceMetrics)
                        : 0;
-        QColor col = khtml::transparentColor;
+        QColor col = transparentColor;
         if (item->color) {
           int ident = item->color->getIdent();
           if (ident)
@@ -4136,7 +4133,7 @@ void CSSStyleSelector::applyProperty(int id, DOM::CSSValueImpl* value) {
 }
 
 void CSSStyleSelector::mapBackgroundAttachment(BackgroundLayer* layer,
-                                               DOM::CSSValueImpl* value) {
+                                               CSSValueImpl* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
     layer->setBackgroundAttachment(RenderStyle::initialBackgroundAttachment());
     return;
@@ -4159,7 +4156,7 @@ void CSSStyleSelector::mapBackgroundAttachment(BackgroundLayer* layer,
 }
 
 void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
-                                          DOM::CSSValueImpl* value) {
+                                          CSSValueImpl* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
     layer->setBackgroundImage(RenderStyle::initialBackgroundImage());
     return;
@@ -4174,7 +4171,7 @@ void CSSStyleSelector::mapBackgroundImage(BackgroundLayer* layer,
 }
 
 void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,
-                                           DOM::CSSValueImpl* value) {
+                                           CSSValueImpl* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
     layer->setBackgroundRepeat(RenderStyle::initialBackgroundRepeat());
     return;
@@ -4203,7 +4200,7 @@ void CSSStyleSelector::mapBackgroundRepeat(BackgroundLayer* layer,
 }
 
 void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
-                                              DOM::CSSValueImpl* value) {
+                                              CSSValueImpl* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
     layer->setBackgroundXPosition(RenderStyle::initialBackgroundXPosition());
     return;
@@ -4228,7 +4225,7 @@ void CSSStyleSelector::mapBackgroundXPosition(BackgroundLayer* layer,
 }
 
 void CSSStyleSelector::mapBackgroundYPosition(BackgroundLayer* layer,
-                                              DOM::CSSValueImpl* value) {
+                                              CSSValueImpl* value) {
   if (value->cssValueType() == CSSValue::CSS_INITIAL) {
     layer->setBackgroundYPosition(RenderStyle::initialBackgroundYPosition());
     return;
@@ -4320,9 +4317,8 @@ float CSSStyleSelector::getComputedSizeFromSpecifiedSize(bool isAbsoluteSize,
   int minSize = settings->minFontSize();
   int minLogicalSize = settings->minLogicalFontSize();
 
-  float zoomPercent = (!khtml::printpainter && view)
-                          ? view->part()->zoomFactor() / 100.0f
-                          : 1.0f;
+  float zoomPercent =
+      (!printpainter && view) ? view->part()->zoomFactor() / 100.0f : 1.0f;
   float zoomedSize = specifiedSize * zoomPercent;
 
   // Apply the hard minimum first.  We only apply the hard minimum if after

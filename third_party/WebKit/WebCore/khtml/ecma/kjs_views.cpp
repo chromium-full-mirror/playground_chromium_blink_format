@@ -71,11 +71,8 @@ bool DOMAbstractView::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMAbstractViewFunc::callAsFunction(ExecState* exec,
                                               ObjectImp* thisObj,
                                               const List& args) {
-  if (!thisObj->inherits(&DOMAbstractView::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&DOMAbstractView::info))
+    return throwError(exec, TypeError);
   AbstractViewImpl& abstractView =
       *static_cast<DOMAbstractView*>(thisObj)->impl();
   switch (id) {

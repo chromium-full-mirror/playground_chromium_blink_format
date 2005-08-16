@@ -632,11 +632,8 @@ static ValueImp* decode(ExecState* exec,
         }
       }
       if (charLen == 0) {
-        if (strict) {
-          ObjectImp* error = Error::create(exec, URIError);
-          exec->setException(error);
-          return error;
-        }
+        if (strict)
+          return throwError(exec, URIError);
         // The only case where we don't use "strict" mode is the "unescape"
         // function.
         // For that, it's good to support the wonky "%u" syntax for
@@ -811,13 +808,8 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
         }
 
         // no program node means a syntax occurred
-        if (!progNode) {
-          ObjectImp* err =
-              Error::create(exec, SyntaxError, errMsg.ascii(), errLine);
-          err->put(exec, "sid", Number(sid));
-          exec->setException(err);
-          return err;
-        }
+        if (!progNode)
+          return throwError(exec, SyntaxError, errMsg, errLine, sid, NULL);
 
         progNode->ref();
 

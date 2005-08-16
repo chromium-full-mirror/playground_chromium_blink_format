@@ -56,13 +56,8 @@ Reference Reference::makeValueReference(ValueImp* v) {
 }
 
 ValueImp* Reference::getBase(ExecState* exec) const {
-  if (baseIsValue) {
-    ObjectImp* err = Error::create(exec, ReferenceError,
-                                   I18N_NOOP("Invalid reference base"));
-    exec->setException(err);
-    return err;
-  }
-
+  if (baseIsValue)
+    return throwError(exec, ReferenceError, "Invalid reference base");
   return base;
 }
 
@@ -80,26 +75,16 @@ Identifier Reference::getPropertyName(ExecState* exec) const {
 }
 
 ValueImp* Reference::getValue(ExecState* exec) const {
-  if (baseIsValue) {
+  if (baseIsValue)
     return base;
-  }
 
   ValueImp* o = base;
-  Type t = o ? o->type() : NullType;
-
-  if (t == NullType) {
-    UString m =
-        I18N_NOOP("Can't find variable: ") + getPropertyName(exec).ustring();
-    ObjectImp* err = Error::create(exec, ReferenceError, m.ascii());
-    exec->setException(err);
-    return err;
-  }
-
-  if (t != ObjectType) {
-    UString m = I18N_NOOP("Base is not an object");
-    ObjectImp* err = Error::create(exec, ReferenceError, m.ascii());
-    exec->setException(err);
-    return err;
+  if (!o || !o->isObject()) {
+    if (!o || o->isNull())
+      return throwError(
+          exec, ReferenceError,
+          "Can't find variable: " + getPropertyName(exec).ustring());
+    return throwError(exec, ReferenceError, "Base is not an object");
   }
 
   if (propertyNameIsNumber)
@@ -109,8 +94,7 @@ ValueImp* Reference::getValue(ExecState* exec) const {
 
 void Reference::putValue(ExecState* exec, ValueImp* w) {
   if (baseIsValue) {
-    ObjectImp* err = Error::create(exec, ReferenceError);
-    exec->setException(err);
+    throwError(exec, ReferenceError);
     return;
   }
 
@@ -135,8 +119,7 @@ void Reference::putValue(ExecState* exec, ValueImp* w) {
 
 bool Reference::deleteValue(ExecState* exec) {
   if (baseIsValue) {
-    ObjectImp* err = Error::create(exec, ReferenceError);
-    exec->setException(err);
+    throwError(exec, ReferenceError);
     return false;
   }
 

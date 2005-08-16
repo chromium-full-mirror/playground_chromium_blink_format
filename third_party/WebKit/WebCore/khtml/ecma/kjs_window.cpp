@@ -368,7 +368,7 @@ Window::~Window() {
   delete winq;
 }
 
-KJS::Interpreter* Window::interpreter() const {
+Interpreter* Window::interpreter() const {
   return KJSProxy::proxy(m_part)->interpreter();
 }
 
@@ -380,7 +380,7 @@ Window* Window::retrieveWindow(KHTMLPart* p) {
   if (p && p->jScriptEnabled()) {
     assert(obj);
 #ifndef QWS
-// assert( dynamic_cast<KJS::Window*>(obj) ); // type checking
+// assert( dynamic_cast<Window*>(obj) ); // type checking
 #endif
   }
 #endif
@@ -393,9 +393,9 @@ Window* Window::retrieveActive(ExecState* exec) {
   ValueImp* imp = exec->dynamicInterpreter()->globalObject();
   assert(imp);
 #ifndef QWS
-// assert( dynamic_cast<KJS::Window*>(imp) );
+// assert( dynamic_cast<Window*>(imp) );
 #endif
-  return static_cast<KJS::Window*>(imp);
+  return static_cast<Window*>(imp);
 }
 
 ValueImp* Window::retrieve(KHTMLPart* p) {
@@ -1359,8 +1359,8 @@ static bool shouldLoadAsEmptyDocument(const KURL& url) {
   return url.protocol().lower() == "about" || url.isEmpty();
 }
 
-bool Window::isSafeScript(const KJS::ScriptInterpreter* origin,
-                          const KJS::ScriptInterpreter* target) {
+bool Window::isSafeScript(const ScriptInterpreter* origin,
+                          const ScriptInterpreter* target) {
   if (origin == target)
     return true;
 
@@ -1430,7 +1430,7 @@ bool Window::isSafeScript(ExecState* exec) const {
     return false;
   }
   KHTMLPart* activePart =
-      static_cast<KJS::ScriptInterpreter*>(exec->dynamicInterpreter())->part();
+      static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())->part();
   if (!activePart) {
     kdDebug(6070) << "Window::isSafeScript: current interpreter's part is 0L!"
                   << endl;
@@ -1563,7 +1563,7 @@ JSLazyEventListener* Window::getJSLazyEventListener(const QString& code,
 }
 
 void Window::clear(ExecState* exec) {
-  KJS::Interpreter::lock();
+  Interpreter::lock();
   if (m_returnValueSlot)
     if (ValueImp* returnValue = getDirect("returnValue"))
       *m_returnValueSlot = returnValue;
@@ -1571,13 +1571,13 @@ void Window::clear(ExecState* exec) {
   delete winq;
   winq = new WindowQObject(this);
   // Get rid of everything, those user vars could hold references to DOM nodes
-  deleteAllProperties(exec);
+  clearProperties();
   // Really delete those properties, so that the DOM nodes get deref'ed
-  KJS::Collector::collect();
+  Collector::collect();
   // Now recreate a working global object for the next URL that will use us
-  KJS::Interpreter* interpreter = KJSProxy::proxy(m_part)->interpreter();
+  Interpreter* interpreter = KJSProxy::proxy(m_part)->interpreter();
   interpreter->initGlobalObject();
-  KJS::Interpreter::unlock();
+  Interpreter::unlock();
 }
 
 void Window::setCurrentEvent(EventImpl* evt) {
@@ -1589,11 +1589,8 @@ void Window::setCurrentEvent(EventImpl* evt) {
 ValueImp* WindowFunc::callAsFunction(ExecState* exec,
                                      ObjectImp* thisObj,
                                      const List& args) {
-  if (!thisObj->inherits(&Window::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&Window::info))
+    return throwError(exec, TypeError);
   Window* window = static_cast<Window*>(thisObj);
   QString str, str2;
 
@@ -2190,7 +2187,7 @@ void ScheduledAction::execute(Window* window) {
       // #### check this
       Q_ASSERT(window->m_part);
       if (window->m_part) {
-        KJS::Interpreter* interpreter =
+        Interpreter* interpreter =
             KJSProxy::proxy(window->m_part)->interpreter();
         ExecState* exec = interpreter->globalExec();
         Q_ASSERT(window == interpreter->globalObject());
@@ -2287,8 +2284,7 @@ int WindowQObject::installTimeout(ValueImp* func,
 QMap<int, ScheduledAction*>* WindowQObject::pauseTimeouts(const void* key) {
   QMapIterator<int, ScheduledAction*> it;
 
-  QMap<int, KJS::ScheduledAction*>* pausedActions =
-      new QMap<int, KJS::ScheduledAction*>;
+  QMap<int, ScheduledAction*>* pausedActions = new QMap<int, ScheduledAction*>;
   for (it = scheduledActions.begin(); it != scheduledActions.end(); ++it) {
     int timerId = it.key();
     pauseTimer(timerId, key);
@@ -2614,11 +2610,8 @@ UString Location::toString(ExecState*) const {
 ValueImp* LocationFunc::callAsFunction(ExecState* exec,
                                        ObjectImp* thisObj,
                                        const List& args) {
-  if (!thisObj->inherits(&Location::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&Location::info))
+    return throwError(exec, TypeError);
   Location* location = static_cast<Location*>(thisObj);
   KHTMLPart* part = location->part();
   if (part) {
@@ -2782,20 +2775,14 @@ ValueImp* Selection::toPrimitive(ExecState* exec, Type) const {
 }
 
 UString Selection::toString(ExecState*) const {
-  if (!m_part->selection().isRange())
-    return UString("");
-  int exception = 0;
-  return UString(m_part->selection().toRange()->toString(exception));
+  return UString(m_part->selectedText());
 }
 
 ValueImp* SelectionFunc::callAsFunction(ExecState* exec,
                                         ObjectImp* thisObj,
                                         const List& args) {
-  if (!thisObj->inherits(&Selection::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&Selection::info))
+    return throwError(exec, TypeError);
   Selection* selection = static_cast<Selection*>(thisObj);
   KHTMLPart* part = selection->part();
   if (part) {
@@ -2859,7 +2846,7 @@ ValueImp* SelectionFunc::callAsFunction(ExecState* exec,
           granularity = khtml::WORD;
         else if (granularityString == "line")
           granularity = khtml::LINE;
-        else if (granularityString == "pargraph")
+        else if (granularityString == "paragraph")
           granularity = khtml::PARAGRAPH;
         s.modify(alter, direction, granularity);
         part->setSelection(s);
@@ -2968,11 +2955,8 @@ UString History::toString(ExecState* exec) const {
 ValueImp* HistoryFunc::callAsFunction(ExecState* exec,
                                       ObjectImp* thisObj,
                                       const List& args) {
-  if (!thisObj->inherits(&History::info)) {
-    ObjectImp* err = Error::create(exec, TypeError);
-    exec->setException(err);
-    return err;
-  }
+  if (!thisObj->inherits(&History::info))
+    return throwError(exec, TypeError);
   History* history = static_cast<History*>(thisObj);
 
   int steps;

@@ -152,11 +152,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
                         jMethod->JNIReturnType(), jMethod->methodID(obj), jArgs,
                         result, callingURL, exceptionDescription);
     if (exceptionDescription) {
-      ObjectImp* error = Error::create(
-          exec, GeneralError,
-          exceptionDescription->toString(exec).UTF8String().c_str());
-      exec->setException(error);
-
+      throwError(exec, GeneralError, exceptionDescription->toString(exec));
       free(jArgs);
       return Undefined();
     }
