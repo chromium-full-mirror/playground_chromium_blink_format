@@ -62,7 +62,7 @@ class KCanvasItem::Private {
   int zIndex;
   KCanvasUserData path, userData;
 
-  QRect bbox;
+  QRect fillBBox, strokeBbox;
 
   KCanvasContainer* parent;
   KCanvasItem* prev;
@@ -112,17 +112,22 @@ bool KCanvasItem::strokeContains(const QPoint& p) const {
 }
 
 QRect KCanvasItem::bbox(bool includeStroke) const {
-  if (!d->bbox.isValid()) {
-    if (d->path && canvas() && canvas()->renderingDevice()) {
-      QRect bbox = bboxPath(includeStroke);
-      if (!includeStroke)
-        return bbox;
+  QRect result;
 
-      d->bbox = bbox;  // cache it
-    }
+  if (!d->path || !canvas() || !canvas()->renderingDevice())
+    return result;
+
+  if (includeStroke) {
+    if (!d->strokeBbox.isValid())
+      d->strokeBbox = bboxPath(true);
+    result = d->strokeBbox;
+  } else {
+    if (!d->fillBBox.isValid())
+      d->fillBBox = bboxPath(false);
+    result = d->fillBBox;
   }
 
-  return d->bbox;
+  return result;
 }
 
 bool KCanvasItem::hitsPath(const QPoint& hitPoint, bool fill) const {
@@ -170,7 +175,8 @@ KRenderingStyle* KCanvasItem::style() const {
 void KCanvasItem::invalidate() const {
   if (d->canvas) {
     d->canvas->invalidate(this);
-    d->bbox = QRect();
+    d->fillBBox = QRect();
+    d->strokeBbox = QRect();
   }
 }
 
