@@ -280,7 +280,7 @@ void GlobalObject::clear(KJS::ExecState* exec) {
   ;
 
   // Get rid of everything, those user vars could hold references to DOM nodes
-  deleteAllProperties(exec);
+  clearProperties();
 
   // Now recreate a working global object for the next URL that will use us
   KJS::Interpreter* interpreter = exec->interpreter();
@@ -296,8 +296,7 @@ KJS::ValueImp* GlobalObjectFunc::callAsFunction(KJS::ExecState* exec,
                                                 KJS::ObjectImp* thisObj,
                                                 const KJS::List& args) {
   if (!thisObj->inherits(&GlobalObject::s_classInfo)) {
-    KJS::ObjectImp* err = KJS::Error::create(exec, KJS::TypeError);
-    exec->setException(err);
+    KJS::ObjectImp* err = throwError(exec, KJS::TypeError);
     return err;
   }
 
