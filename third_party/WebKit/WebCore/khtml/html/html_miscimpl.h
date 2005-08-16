@@ -133,6 +133,8 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
 
   // For nextNamedItem()
   mutable bool idsDone;
+
+  mutable bool m_ownsInfo;
 };
 
 class HTMLNameCollectionImpl : public HTMLCollectionImpl {

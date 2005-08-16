@@ -65,13 +65,16 @@ void HTMLBaseFontElementImpl::setSize(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLCollectionImpl::HTMLCollectionImpl(NodeImpl* _base, int _type)
-    : m_base(_base), type(_type), info(0), idsDone(false) {
+    : m_base(_base), type(_type), info(0), idsDone(false), m_ownsInfo(false) {
   if (_base->isDocumentNode() && _base->getDocument()->isHTMLDocument())
     info = static_cast<HTMLDocumentImpl*>(_base->getDocument())
                ->collectionInfo(type);
 }
 
-HTMLCollectionImpl::~HTMLCollectionImpl() {}
+HTMLCollectionImpl::~HTMLCollectionImpl() {
+  if (m_ownsInfo)
+    delete info;
+}
 
 HTMLCollectionImpl::CollectionInfo::CollectionInfo() : version(0) {
   idCache.setAutoDelete(true);
@@ -96,6 +99,7 @@ void HTMLCollectionImpl::resetCollectionInfo() const {
 
   if (!info) {
     info = new CollectionInfo;
+    m_ownsInfo = true;
     info->version = docversion;
     return;
   }
