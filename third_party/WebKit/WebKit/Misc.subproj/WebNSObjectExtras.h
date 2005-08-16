@@ -34,18 +34,8 @@
 // properly under GC.
 
 static inline id WebCFAutorelease(CFTypeRef obj) {
-#if !BUILDING_ON_PANTHER
   if (obj)
     CFMakeCollectable(obj);
-#endif
   [(id)obj autorelease];
   return (id)obj;
 }
-
-#if BUILDING_ON_PANTHER
-
-@interface NSObject (WebExtras)
-- (void)finalize;
-@end
-
-#endif

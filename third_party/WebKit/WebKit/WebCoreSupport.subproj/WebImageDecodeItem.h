@@ -26,8 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OMIT_TIGER_FEATURES
-
 #import <Cocoa/Cocoa.h>
 
 @class WebImageData;
@@ -48,5 +46,3 @@
        isComplete:(BOOL)f
          callback:(id)c;
 @end
-
-#endif
