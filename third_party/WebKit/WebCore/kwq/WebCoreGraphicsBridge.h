@@ -32,10 +32,5 @@
                    radius:(int)radius
                     color:(NSColor*)color;
 - (void)setDraggingImage:(NSImage*)dragImage at:(NSPoint)dragLoc;
-- (void)setAdditionalPatternPhase:(NSPoint)phase;
-
-- (CGColorSpaceRef)createRGBColorSpace;
-- (CGColorSpaceRef)createGrayColorSpace;
-- (CGColorSpaceRef)createCMYKColorSpace;
 
 @end

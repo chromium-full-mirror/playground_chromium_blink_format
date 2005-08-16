@@ -26,14 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
 #import <WebCore/WebCoreGraphicsBridge.h>
 
-@interface WebGraphicsBridge : WebCoreGraphicsBridge {
-  NSPoint _phase;
-}
-
+@interface WebGraphicsBridge : WebCoreGraphicsBridge
 + (void)createSharedBridge;
 + (WebGraphicsBridge*)sharedBridge;
-- (NSPoint)additionalPatternPhase;
 @end
