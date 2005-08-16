@@ -39,7 +39,7 @@ class KRenderingPaintServerSolid : public KRenderingPaintServer {
   void setColor(const QColor& color);
 
   // Helper method
-  double opacity() const;
+  float opacity() const;
 
  private:
   class Private;
