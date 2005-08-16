@@ -61,7 +61,7 @@ static NPClass _javascriptClass = {
 
 NPClass* NPScriptObjectClass = &_javascriptClass;
 
-Identifier identiferFromNPIdentifier(const NPUTF8* name) {
+static Identifier identiferFromNPIdentifier(const NPUTF8* name) {
   NPUTF16* methodName;
   unsigned int UTF16Length;
 

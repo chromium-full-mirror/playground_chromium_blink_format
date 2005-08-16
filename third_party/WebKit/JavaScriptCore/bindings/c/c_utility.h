@@ -31,6 +31,9 @@
 #include <runtime_object.h>
 #include <runtime_root.h>
 
+namespace KJS {
+namespace Bindings {
+
 typedef uint16_t NPUTF16;
 NPUTF16* NPN_UTF16FromString(NPString* obj);
 
@@ -67,5 +70,7 @@ typedef struct {
   } value;
   bool isString;
 } PrivateIdentifier;
+}
+}
 
 #endif

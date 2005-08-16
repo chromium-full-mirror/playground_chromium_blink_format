@@ -29,6 +29,8 @@
 
 #include <JavaScriptCore/npruntime_impl.h>
 
+using namespace KJS::Bindings;
+
 static Boolean stringIdentifierEqual(const void* value1, const void* value2) {
   return strcmp((const char*)value1, (const char*)value2) == 0;
 }
@@ -55,7 +57,7 @@ static CFHashCode stringIdentifierHash(const void* value) {
   return result;
 }
 
-CFDictionaryKeyCallBacks stringIdentifierCallbacks = {
+static CFDictionaryKeyCallBacks stringIdentifierCallbacks = {
     0, NULL, NULL, NULL, stringIdentifierEqual, stringIdentifierHash};
 
 static CFMutableDictionaryRef stringIdentifierDictionary = 0;
@@ -75,7 +77,7 @@ static CFHashCode intIdentifierHash(const void* value) {
   return (CFHashCode)value;
 }
 
-CFDictionaryKeyCallBacks intIdentifierCallbacks = {
+static CFDictionaryKeyCallBacks intIdentifierCallbacks = {
     0, NULL, NULL, NULL, intIdentifierEqual, intIdentifierHash};
 
 static CFMutableDictionaryRef intIdentifierDictionary = 0;
@@ -390,16 +392,5 @@ void _NPN_ReleaseObject(NPObject* obj) {
       else
         free(obj);
     }
-  }
-}
-
-void _NPN_SetExceptionWithUTF8(NPObject* obj,
-                               const NPUTF8* message,
-                               int32_t length) {
-  assert(obj);
-  assert(message);
-
-  if (obj && message) {
-    _NPN_SetException(obj, message);
   }
 }

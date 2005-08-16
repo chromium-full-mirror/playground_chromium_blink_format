@@ -22,19 +22,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <c_instance.h>
-#include <c_utility.h>
-#include <internal.h>
-#include <npruntime_impl.h>
-#include <npruntime_priv.h>
-#include <runtime.h>
-#include <runtime_object.h>
-#include <runtime_root.h>
-#include <value.h>
-#include <NP_jsobject.h>
 
-using namespace KJS;
-using namespace KJS::Bindings;
+#include "c_utility.h"
+
+#include "c_instance.h"
+#include "npruntime_impl.h"
+#include "npruntime_priv.h"
+#include "NP_jsobject.h"
+
+namespace KJS {
+namespace Bindings {
 
 // Requires free() of returned UTF16Chars.
 void convertNPStringToUTF16(const NPString* string,
@@ -174,9 +171,11 @@ ValueImp* convertNPVariantToValue(ExecState* exec, const NPVariant* variant) {
       return const_cast<ObjectImp*>(o->imp);
     } else {
       //  Wrap NPObject in a CInstance.
-      return Instance::createRuntimeObject(Instance::CLanguage, (void*)obj);
+      return Instance::createRuntimeObject(Instance::CLanguage, obj);
     }
   }
 
   return Undefined();
+}
+}
 }
