@@ -1324,6 +1324,9 @@ void DocumentImpl::implicitClose() {
     if (body) {
       dispatchImageLoadEventsNow();
       body->dispatchWindowEvent(EventImpl::LOAD_EVENT, false, false);
+#if APPLE_CHANGES
+      KWQ(part())->handledOnloadEvents();
+#endif
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
       if (!ownerElement())
