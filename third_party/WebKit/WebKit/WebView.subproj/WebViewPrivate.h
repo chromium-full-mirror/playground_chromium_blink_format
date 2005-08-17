@@ -350,4 +350,6 @@ backforward list.
 
 @interface NSObject (WebFrameLoadDelegatePrivate)
 - (void)webView:(WebView*)sender didFirstLayoutInFrame:(WebFrame*)frame;
+// Addresses 4192534.  Private API for now.
+- (void)webView:(WebView*)sender didHandleOnloadEventsForFrame:(WebFrame*)frame;
 @end
