@@ -224,7 +224,31 @@
     probably don't want to touch unless you are extending or adapting malloc.
 */
 
+#include "main_thread_malloc.h"
+
 namespace khtml {
+
+#ifndef NDEBUG
+
+// In debugging builds, use the system malloc for its debugging features.
+
+void* main_thread_malloc(size_t n) {
+  return malloc(n);
+}
+
+void* main_thread_calloc(size_t n_elements, size_t element_size) {
+  return calloc(n_elements, element_size);
+}
+
+void main_thread_free(void* p) {
+  free(p);
+}
+
+void* main_thread_realloc(void* p, size_t n) {
+  return realloc(p, n);
+}
+
+#else
 
 /*
   WIN32 sets up defaults for MS environment and compilers.
@@ -3687,6 +3711,7 @@ void fREe(mem) Void_t* mem;
     */
 
     if ((CHUNK_SIZE_T)(size) <= (CHUNK_SIZE_T)(av->max_fast)
+
 #if TRIM_FASTBINS
         /*
            If TRIM_FASTBINS set, don't place chunks
@@ -3952,7 +3977,7 @@ size_t bytes;
   CHUNK_SIZE_T copysize; /* bytes to copy */
   unsigned int ncopies;  /* INTERNAL_SIZE_T words to copy */
   INTERNAL_SIZE_T* s;    /* copy source */
-  INTERNAL_SIZE_T* d;    /* copy destination */
+  INTERNAL_SIZE_T* d; /* copy destination */
 
 #ifdef REALLOC_ZERO_BYTES_FREES
   if (bytes == 0) {
@@ -5385,7 +5410,9 @@ static int cpuinfo(int whole, CHUNK_SIZE_T* kernel, CHUNK_SIZE_T* user) {
 
 #endif /* WIN32 */
 
-}; /* end of namespace KJS */
+#endif
+
+} /* end of namespace KJS */
 
 /* ------------------------------------------------------------
 History:
