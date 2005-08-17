@@ -200,8 +200,9 @@ ValueImp* Node::throwError(ExecState* exec,
 }
 
 void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
-  if (exec->hadException()) {
-    ObjectImp* exception = static_cast<ObjectImp*>(exec->exception());
+  ValueImp* exceptionValue = exec->exception();
+  if (exceptionValue->isObject()) {
+    ObjectImp* exception = static_cast<ObjectImp*>(exceptionValue);
     if (!exception->hasProperty(exec, "line") &&
         !exception->hasProperty(exec, "sourceURL")) {
       exception->put(exec, "line", Number(line));
