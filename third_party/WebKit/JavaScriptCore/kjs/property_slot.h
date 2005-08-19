@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef _KJS_PROPERTY_SLOT_H_
-#define _KJS_PROPERTY_SLOT_H_
+#ifndef KJS_PROPERTY_SLOT_H
+#define KJS_PROPERTY_SLOT_H
 
 #include "identifier.h"
 #include "value.h"
@@ -38,8 +38,6 @@ class PropertySlot {
   typedef ValueImp* (*GetValueFunc)(ExecState*,
                                     const Identifier&,
                                     const PropertySlot&);
-
-  bool isSet() const { return m_getValue != 0; }
 
   ValueImp* getValue(ExecState* exec, const Identifier& propertyName) const {
     if (m_getValue == VALUE_SLOT_MARKER)
@@ -62,12 +60,14 @@ class PropertySlot {
   void setStaticEntry(ObjectImp* slotBase,
                       const HashEntry* staticEntry,
                       GetValueFunc getValue) {
+    assert(getValue);
     m_slotBase = slotBase;
     m_data.staticEntry = staticEntry;
     m_getValue = getValue;
   }
 
   void setCustom(ObjectImp* slotBase, GetValueFunc getValue) {
+    assert(getValue);
     m_slotBase = slotBase;
     m_getValue = getValue;
   }
@@ -75,6 +75,7 @@ class PropertySlot {
   void setCustomIndex(ObjectImp* slotBase,
                       unsigned long index,
                       GetValueFunc getValue) {
+    assert(getValue);
     m_slotBase = slotBase;
     m_data.index = index;
     m_getValue = getValue;
