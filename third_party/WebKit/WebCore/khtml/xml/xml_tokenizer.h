@@ -37,6 +37,8 @@ class KHTMLView;
 namespace DOM {
 class DocumentPtr;
 class DocumentImpl;
+class DocumentFragmentImpl;
+class ElementImpl;
 class NodeImpl;
 };
 
@@ -84,6 +86,9 @@ class Tokenizer : public QObject {
 
 Tokenizer* newXMLTokenizer(DOM::DocumentPtr*, KHTMLView* = 0);
 QMap<QString, QString> parseAttributes(const DOM::DOMString&, bool& attrsOK);
+bool parseXMLDocumentFragment(const DOM::DOMString&,
+                              DOM::DocumentFragmentImpl*,
+                              DOM::ElementImpl* parent = 0);
 }
 
 #endif
