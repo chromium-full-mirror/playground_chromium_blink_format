@@ -56,15 +56,30 @@ AttributeImpl* AttributeImpl::clone(bool) const {
 }
 
 void AttributeImpl::allocateImpl(ElementImpl* e) {
-  m_impl = new AttrImpl(e, e->docPtr(), this);
+  m_impl = new AttrImpl(e, e->docPtr(), this, true);
 }
 
-AttrImpl::AttrImpl(ElementImpl* element, DocumentPtr* docPtr, AttributeImpl* a)
-    : ContainerNodeImpl(docPtr), m_element(element), m_attribute(a) {
+AttrImpl::AttrImpl(ElementImpl* element,
+                   DocumentPtr* docPtr,
+                   AttributeImpl* a,
+                   bool createTextChild)
+    : ContainerNodeImpl(docPtr),
+      m_element(element),
+      m_attribute(a),
+      m_ignoreChildrenChanged(0) {
   assert(!m_attribute->m_impl);
   m_attribute->m_impl = this;
   m_attribute->ref();
   m_specified = true;
+
+  if (createTextChild && !m_attribute->value().isEmpty()) {
+    int exceptioncode = 0;
+    m_ignoreChildrenChanged++;
+    appendChild(
+        getDocument()->createTextNode(m_attribute->value().implementation()),
+        exceptioncode);
+    m_ignoreChildrenChanged--;
+  }
 }
 
 AttrImpl::~AttrImpl() {
@@ -103,8 +118,6 @@ DOMString AttrImpl::nodeValue() const {
 void AttrImpl::setValue(const DOMString& v, int& exceptioncode) {
   exceptioncode = 0;
 
-  // ### according to the DOM docs, we should create an unparsed Text child
-  // node here
   // do not interprete entities in the string, its literal!
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
@@ -119,6 +132,12 @@ void AttrImpl::setValue(const DOMString& v, int& exceptioncode) {
     return;
   }
 
+  int e = 0;
+  m_ignoreChildrenChanged++;
+  removeChildren();
+  appendChild(getDocument()->createTextNode(v.implementation()), e);
+  m_ignoreChildrenChanged--;
+
   m_attribute->setValue(v.implementation());
   if (m_element)
     m_element->attributeChanged(m_attribute);
@@ -131,7 +150,10 @@ void AttrImpl::setNodeValue(const DOMString& v, int& exceptioncode) {
 }
 
 NodeImpl* AttrImpl::cloneNode(bool /*deep*/) {
-  return new AttrImpl(0, docPtr(), m_attribute->clone());
+  AttrImpl* clone = new AttrImpl(0, docPtr(), m_attribute->clone(), false);
+
+  cloneChildNodes(clone);
+  return clone;
 }
 
 // DOM Section 1.1.1
@@ -151,6 +173,25 @@ bool AttrImpl::childTypeAllowed(unsigned short type) {
     default:
       return false;
   }
+}
+
+void AttrImpl::childrenChanged() {
+  NodeImpl::childrenChanged();
+
+  if (m_ignoreChildrenChanged > 0)
+    return;
+
+  // FIXME: We should include entity references in the value
+
+  DOMString val = "";
+  for (NodeImpl* n = firstChild(); n; n = n->nextSibling()) {
+    if (n->isTextNode())
+      val += static_cast<TextImpl*>(n)->data();
+  }
+
+  m_attribute->setValue(val.implementation());
+  if (m_element)
+    m_element->attributeChanged(m_attribute);
 }
 
 DOMString AttrImpl::toString() const {

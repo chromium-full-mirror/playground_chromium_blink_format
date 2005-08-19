@@ -3020,7 +3020,8 @@ AttrImpl* DocumentImpl::createAttributeNS(const DOMString& namespaceURI,
       new MappedAttributeImpl(
           QualifiedName(prefix.implementation(), localName.implementation(),
                         namespaceURI.implementation()),
-          DOMString("").implementation()));
+          DOMString("").implementation()),
+      false);
 }
 
 SharedPtr<HTMLCollectionImpl> DocumentImpl::images() {
