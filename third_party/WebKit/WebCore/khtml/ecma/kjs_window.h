@@ -176,7 +176,6 @@ class Window : public ObjectImp {
     Locationbar,
     Name,
     _Navigator,
-    _Konqueror,
     ClientInformation,
     Menubar,
     OffscreenBuffering,
@@ -438,24 +437,6 @@ class BarInfo : public ObjectImp {
   QGuardedPtr<KHTMLPart> m_part;
   Type m_type;
 };
-
-#ifdef Q_WS_QWS
-class Konqueror : public ObjectImp {
-  friend class KonquerorFunc;
-
- public:
-  Konqueror(KHTMLPart* p) : part(p) {}
-  virtual bool getOwnPropertySlot(ExecState* exec,
-                                  const Identifier&,
-                                  PropertySlot& slot) const;
-  virtual UString toString(ExecState* exec) const;
-  virtual const ClassInfo* classInfo() const { return &info; }
-  static const ClassInfo info;
-
- private:
-  KHTMLPart* part;
-};
-#endif
 
 }  // namespace
 
