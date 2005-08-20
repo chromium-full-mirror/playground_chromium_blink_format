@@ -301,6 +301,8 @@ backforward list.
 + (void)_setShouldUseFontSmoothing:(BOOL)f;
 + (BOOL)_shouldUseFontSmoothing;
 
++ (NSString*)_minimumRequiredSafariBuildNumber;
+
 @end
 
 @interface WebView (WebViewPrintingPrivate)
