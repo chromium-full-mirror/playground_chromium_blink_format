@@ -289,7 +289,7 @@ RenderSubmitButton::RenderSubmitButton(HTMLInputElementImpl* element)
 }
 
 QString RenderSubmitButton::rawText() {
-  QString value = element()->valueWithDefault().string();
+  QString value = element()->valueWithDefault().qstring();
   value = value.stripWhiteSpace();
   value.replace(QChar('\\'), backslashAsCurrencySymbol());
 #if APPLE_CHANGES
@@ -452,7 +452,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
 
   if (element->autoComplete()) {
     QStringList completions =
-        view()->formCompletionItems(element->name().string());
+        view()->formCompletionItems(element->name().qstring());
     if (completions.count()) {
       edit->completionObject()->setItems(completions);
       edit->setContextMenuEnabled(true);
@@ -561,7 +561,7 @@ void RenderLineEdit::updateFromElement() {
 
   if (!e->valueMatchesRenderer()) {
     QString widgetText = w->text();
-    QString newText = e->value().string();
+    QString newText = e->value().qstring();
     newText.replace(QChar('\\'), backslashAsCurrencySymbol());
     if (widgetText != newText) {
       w->blockSignals(true);
@@ -583,10 +583,10 @@ void RenderLineEdit::updateFromElement() {
 
 #if APPLE_CHANGES
   // Handle updating the search attributes.
-  w->setPlaceholderString(e->getAttribute(placeholderAttr).string());
+  w->setPlaceholderString(e->getAttribute(placeholderAttr).qstring());
   if (w->type() == QLineEdit::Search) {
     w->setLiveSearch(!e->getAttribute(incrementalAttr).isNull());
-    w->setAutoSaveName(e->getAttribute(autosaveAttr).string());
+    w->setAutoSaveName(e->getAttribute(autosaveAttr).qstring());
     w->setMaxResults(e->maxResults());
   }
 #endif
@@ -889,10 +889,10 @@ void RenderFileButton::slotClicked() {
 void RenderFileButton::updateFromElement() {
 #if APPLE_CHANGES
   static_cast<KWQFileButton*>(widget())->setFilename(
-      element()->value().string());
+      element()->value().qstring());
 #else
   m_edit->blockSignals(true);
-  m_edit->setText(element()->value().string());
+  m_edit->setText(element()->value().qstring());
   m_edit->blockSignals(false);
   int ml = element()->maxLength();
   if (ml <= 0 || ml > 1024)
@@ -1072,7 +1072,7 @@ void RenderSelect::updateFromElement() {
 
     for (listIndex = 0; listIndex < int(listItems.size()); listIndex++) {
       if (listItems[listIndex]->hasTagName(optgroupTag)) {
-        QString label = listItems[listIndex]->getAttribute(labelAttr).string();
+        QString label = listItems[listIndex]->getAttribute(labelAttr).qstring();
         label.replace(QChar('\\'), backslashAsCurrencySymbol());
 
         // In WinIE, an optgroup can't start or end with whitespace (other than
@@ -1097,7 +1097,7 @@ void RenderSelect::updateFromElement() {
         QString itemText =
             static_cast<HTMLOptionElementImpl*>(listItems[listIndex])
                 ->text()
-                .string();
+                .qstring();
         itemText.replace(QChar('\\'), backslashAsCurrencySymbol());
 
         // In WinIE, leading and trailing whitespace is ignored in options. We
@@ -1493,7 +1493,7 @@ void RenderTextArea::updateFromElement() {
   e->updateValue();
   if (!e->valueMatchesRenderer()) {
     QString widgetText = text();
-    QString text = e->value().string();
+    QString text = e->value().qstring();
     text.replace(QChar('\\'), backslashAsCurrencySymbol());
     if (widgetText != text) {
       w->blockSignals(true);
@@ -1652,12 +1652,12 @@ void RenderSlider::updateFromElement() {
   const DOMString& max = element()->getAttribute(maxAttr);
   const DOMString& precision = element()->getAttribute(precisionAttr);
 
-  double minVal = min.isNull() ? 0.0 : min.string().toDouble();
-  double maxVal = max.isNull() ? 100.0 : max.string().toDouble();
+  double minVal = min.isNull() ? 0.0 : min.qstring().toDouble();
+  double maxVal = max.isNull() ? 100.0 : max.qstring().toDouble();
   minVal = kMin(minVal, maxVal);  // Make sure the range is sane.
 
   double val =
-      value.isNull() ? (maxVal + minVal) / 2.0 : value.string().toDouble();
+      value.isNull() ? (maxVal + minVal) / 2.0 : value.qstring().toDouble();
   val = kMax(minVal, kMin(val, maxVal));  // Make sure val is within min/max.
 
   // Force integer value if not float (strcasecmp returns confusingly backward

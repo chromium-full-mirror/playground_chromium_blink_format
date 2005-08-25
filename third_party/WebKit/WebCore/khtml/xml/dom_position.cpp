@@ -837,7 +837,7 @@ void Position::debugPosition(const char* msg) const {
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
     fprintf(stderr, "Position [%s]: %s [%p] at %ld\n", msg,
-            node()->nodeName().string().latin1(), node(), offset());
+            node()->nodeName().qstring().latin1(), node(), offset());
 }
 
 #ifndef NDEBUG
@@ -857,7 +857,7 @@ void Position::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  strncpy(buffer, result.string().latin1(), length - 1);
+  strncpy(buffer, result.qstring().latin1(), length - 1);
 }
 #undef FormatBufferSize
 

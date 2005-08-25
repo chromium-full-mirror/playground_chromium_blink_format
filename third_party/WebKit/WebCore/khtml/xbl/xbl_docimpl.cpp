@@ -23,7 +23,7 @@ XMLHandler* XBLDocumentImpl::createTokenHandler() {
 
 void XBLDocumentImpl::setPrototypeBinding(const DOM::DOMString& id,
                                           XBLPrototypeBinding* binding) {
-  m_prototypeBindingTable.replace(id.string(), binding);
+  m_prototypeBindingTable.replace(id.qstring(), binding);
 }
 
 XBLPrototypeBinding* XBLDocumentImpl::prototypeBinding(
@@ -31,7 +31,7 @@ XBLPrototypeBinding* XBLDocumentImpl::prototypeBinding(
   if (id.length() == 0)
     return 0;
 
-  return m_prototypeBindingTable.find(id.string());
+  return m_prototypeBindingTable.find(id.qstring());
 }
 }
 

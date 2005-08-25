@@ -208,7 +208,7 @@ void HTMLImageElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       usemap = attr->value();
     else {
       QString url =
-          getDocument()->completeURL(khtml::parseURL(attr->value()).string());
+          getDocument()->completeURL(khtml::parseURL(attr->value()).qstring());
       // ### we remove the part before the anchor and hope
       // the map is on the same html page....
       usemap = url;
@@ -219,19 +219,19 @@ void HTMLImageElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onabortAttr) {
     setHTMLEventListener(
         EventImpl::ABORT_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onerrorAttr) {
     setHTMLEventListener(
         EventImpl::ERROR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onloadAttr) {
     setHTMLEventListener(
         EventImpl::LOAD_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   }
 #if APPLE_CHANGES
   else if (attr->name() == compositeAttr)
-    _compositeOperator = attr->value().string();
+    _compositeOperator = attr->value().qstring();
 #endif
   else if (attr->name() == nameAttr) {
     DOMString newNameAttr = attr->value();
@@ -294,7 +294,7 @@ long HTMLImageElementImpl::width(bool ignorePendingStylesheets) const {
     // check the attribute first for an explicit pixel value
     DOM::DOMString attrWidth = getAttribute(widthAttr);
     bool ok;
-    long width = attrWidth.string().toLong(&ok);
+    long width = attrWidth.qstring().toLong(&ok);
     if (ok) {
       return width;
     }
@@ -320,7 +320,7 @@ long HTMLImageElementImpl::height(bool ignorePendingStylesheets) const {
     // check the attribute first for an explicit pixel value
     DOM::DOMString attrHeight = getAttribute(heightAttr);
     bool ok;
-    long height = attrHeight.string().toLong(&ok);
+    long height = attrHeight.qstring().toLong(&ok);
     if (ok) {
       return height;
     }

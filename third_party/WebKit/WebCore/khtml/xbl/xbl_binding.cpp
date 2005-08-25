@@ -109,7 +109,7 @@ XBLBinding::XBLBinding(XBLBindingChain* ch,
   DOMString docURL = uri;
   int hashIndex = uri.find('#');
   if (hashIndex != -1) {
-    QString url = uri.string();
+    QString url = uri.qstring();
     docURL = url.left(hashIndex);
     if (int(url.length()) > hashIndex + 1)
       m_id = url.right(url.length() - hashIndex - 1);
@@ -166,7 +166,8 @@ void XBLBinding::setXBLDocument(const DOMString& url, XBLDocumentImpl* doc) {
     // Resolve to an absolute URL.
     new XBLBinding(
         chain(),
-        KURL(m_prototype->document()->baseURL(), extends.string()).url(), this);
+        KURL(m_prototype->document()->baseURL(), extends.qstring()).url(),
+        this);
     return;
   }
 

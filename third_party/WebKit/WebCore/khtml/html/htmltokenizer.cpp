@@ -589,7 +589,7 @@ void HTMLTokenizer::parseComment(TokenizerString& src) {
 #if defined(TOKEN_DEBUG) && TOKEN_DEBUG > 1
     qDebug("comment is now: *%s*",
            QConstString((QChar*)src.current(), kMin(16, src.length()))
-               .string()
+               .qstring()
                .latin1());
 #endif
 
@@ -886,7 +886,7 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
     while (l < src.length() && (*(src.current() + l)).latin1() != '>')
       l++;
     qDebug("src is now: *%s*, tquote: %d",
-           QConstString((QChar*)src.current(), l).string().latin1(), tquote);
+           QConstString((QChar*)src.current(), l).qstring().latin1(), tquote);
 #endif
     switch (tag) {
       case NoTag: {
@@ -1247,14 +1247,14 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
               ) {
             if ((a = currToken.attrs->getAttributeItem(srcAttr)))
               scriptSrc =
-                  parser->doc()->completeURL(parseURL(a->value()).string());
+                  parser->doc()->completeURL(parseURL(a->value()).qstring());
             if ((a = currToken.attrs->getAttributeItem(charsetAttr)))
-              scriptSrcCharset = a->value().string().stripWhiteSpace();
+              scriptSrcCharset = a->value().qstring().stripWhiteSpace();
             if (scriptSrcCharset.isEmpty())
               scriptSrcCharset = parser->doc()->part()->encoding();
             /* Check type before language, since language is deprecated */
             if ((a = currToken.attrs->getAttributeItem(typeAttr)) != 0 &&
-                !a->value().string().isEmpty())
+                !a->value().qstring().isEmpty())
               foundTypeAttribute = true;
             else
               a = currToken.attrs->getAttributeItem(languageAttr);
@@ -1280,7 +1280,7 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
                 We want to accept all the values that either of these browsers
                accept, but not other values.
              */
-            QString type = a->value().string().stripWhiteSpace().lower();
+            QString type = a->value().qstring().stripWhiteSpace().lower();
             if (type.compare("application/x-javascript") != 0 &&
                 type.compare("text/javascript") != 0 &&
                 type.compare("text/javascript1.0") != 0 &&
@@ -1303,7 +1303,7 @@ void HTMLTokenizer::parseTag(TokenizerString& src) {
              We want to accept all the values that either of these browsers
              accept, but not other values.
              */
-            QString lang = a->value().string();
+            QString lang = a->value().qstring();
             lang = lang.lower();
             if (lang.compare("") != 0 && lang.compare("javascript") != 0 &&
                 lang.compare("javascript1.0") != 0 &&
@@ -1790,7 +1790,7 @@ void HTMLTokenizer::finish() {
       food = "<";
       food += QString(scriptCode, scriptCodeSize);
     } else {
-      pos = QConstString(scriptCode, scriptCodeSize).string().find('>');
+      pos = QConstString(scriptCode, scriptCodeSize).qstring().find('>');
       food.setUnicode(scriptCode + pos + 1,
                       scriptCodeSize - pos - 1);  // deep copy
     }
@@ -1818,7 +1818,7 @@ void HTMLTokenizer::processToken() {
 #ifdef TOKEN_DEBUG
     if (currToken.id) {
       qDebug("unexpected token id: %d, str: *%s*", currToken.id,
-             QConstString(buffer, dest - buffer).string().latin1());
+             QConstString(buffer, dest - buffer).qstring().latin1());
       assert(0);
     }
 
@@ -1837,10 +1837,10 @@ void HTMLTokenizer::processToken() {
   dest = buffer;
 
 #ifdef TOKEN_DEBUG
-  QString name = getTagName(currToken.id).string();
+  QString name = getTagName(currToken.id).qstring();
   QString text;
   if (currToken.text)
-    text = QConstString(currToken.text->s, currToken.text->l).string();
+    text = QConstString(currToken.text->s, currToken.text->l).qstring();
 
   kdDebug(6036) << "Token --> " << name << "   id = " << currToken.id << endl;
   if (currToken.flat)
@@ -1852,8 +1852,8 @@ void HTMLTokenizer::processToken() {
     kdDebug(6036) << "Attributes: " << l << endl;
     for (unsigned long i = 0; i < l; ++i) {
       AttributeImpl* c = currToken.attrs->attributeItem(i);
-      kdDebug(6036) << "    " << c->name().string() << "=\""
-                    << c->value().string() << "\"" << endl;
+      kdDebug(6036) << "    " << c->name().qstring() << "=\""
+                    << c->value().qstring() << "\"" << endl;
     }
   }
   kdDebug(6036) << endl;
@@ -1906,13 +1906,13 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     DOMString scriptSource = cs->script();
 #ifdef TOKEN_DEBUG
     kdDebug(6036) << "External script is:" << endl
-                  << scriptSource.string() << endl;
+                  << scriptSource.qstring() << endl;
 #endif
     setSrc(TokenizerString());
 
     // make sure we forget about the script before we execute the new one
     // infinite recursion might happen otherwise
-    QString cachedScriptUrl(cs->url().string());
+    QString cachedScriptUrl(cs->url().qstring());
     cs->deref(this);
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -1921,7 +1921,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
              parser->doc()->elapsedTime());
 #endif
 
-    scriptExecution(scriptSource.string(), cachedScriptUrl);
+    scriptExecution(scriptSource.qstring(), cachedScriptUrl);
 
     // The state of cachedScript.isEmpty() can change inside the
     // scriptExecution()

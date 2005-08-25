@@ -113,8 +113,9 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
     // we have an alt and the user meant it (its not a text we invented)
     if (!alt.isEmpty()) {
       const QFontMetrics& fm = style()->fontMetrics();
-      QRect br = fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto | Qt::WordBreak,
-                                 alt.string(), 0, 0);  // FIX: correct tabwidth?
+      QRect br =
+          fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto | Qt::WordBreak,
+                          alt.qstring(), 0, 0);  // FIX: correct tabwidth?
       if (br.width() > iw)
         iw = br.width();
       if (br.height() > ih)
@@ -311,7 +312,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       }
 
       if (!alt.isEmpty()) {
-        QString text = alt.string();
+        QString text = alt.qstring();
         text.replace(QChar('\\'), backslashAsCurrencySymbol());
         p->setFont(style()->font());
         p->setPen(style()->color());
@@ -349,7 +350,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
                       pix, r);
       }
       if (!alt.isEmpty()) {
-        QString text = alt.string();
+        QString text = alt.qstring();
         text.replace('\\', backslashAsCurrencySymbol());
         p->setFont(style()->font());
         p->setPen(style()->color());

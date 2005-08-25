@@ -1315,7 +1315,7 @@ QString RenderObject::information() const {
   if (element() && element()->focused())
     ts << "focus ";
   if (element())
-    ts << " <" << element()->localName().string() << ">";
+    ts << " <" << element()->localName().qstring() << ">";
   ts << " (" << xPos() << "," << yPos() << "," << width() << "," << height()
      << ")"
      << (isTableCell()

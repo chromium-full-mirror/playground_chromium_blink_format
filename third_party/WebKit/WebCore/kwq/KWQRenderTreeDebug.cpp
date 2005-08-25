@@ -122,9 +122,9 @@ static QString getTagName(NodeImpl* n) {
   if (n->isCommentNode())
     return "COMMENT";
   if (n->isHTMLElement())
-    return n->nodeName().upper().string();  // FIXME: We want to dump the real
-                                            // DOM name, not an uppercase name.
-  return n->nodeName().string();
+    return n->nodeName().upper().qstring();  // FIXME: We want to dump the real
+                                             // DOM name, not an uppercase name.
+  return n->nodeName().qstring();
 }
 
 static QTextStream& operator<<(QTextStream& ts, const RenderObject& o) {
@@ -270,7 +270,7 @@ static void writeTextRun(QTextStream& ts,
   ts << "text run at (" << run.m_x << "," << run.m_y << ") width "
      << run.m_width << ": "
      << quoteAndEscapeNonPrintables(
-            o.data().string().mid(run.m_start, run.m_len))
+            o.data().qstring().mid(run.m_start, run.m_len))
      << "\n";
 }
 

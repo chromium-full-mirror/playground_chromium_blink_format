@@ -373,7 +373,7 @@ class UString {
   /**
    * @see UString(const QString&).
    */
-  DOM::DOMString string() const;
+  DOM::DOMString domString() const;
   /**
    * @see UString(const QString&).
    */

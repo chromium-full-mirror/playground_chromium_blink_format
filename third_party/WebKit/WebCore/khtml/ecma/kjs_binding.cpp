@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2001 Harri Porten (porten@kde.org)
@@ -271,7 +270,7 @@ UString::UString(const DOMString& d) {
                                     d.length());
 }
 
-DOMString UString::string() const {
+DOMString UString::domString() const {
   if (isNull())
     return DOMString();
   if (isEmpty())
@@ -291,7 +290,7 @@ QConstString UString::qconststring() const {
   return QConstString((QChar*)data(), size());
 }
 
-DOMString Identifier::string() const {
+DOMString Identifier::domString() const {
   if (isNull())
     return DOMString();
   if (isEmpty())

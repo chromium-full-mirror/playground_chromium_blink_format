@@ -47,7 +47,7 @@ bool isBreakable(const QChar* s, int pos, int len, bool breakNBSP) {
           if (!thaiIt)
             thaiIt = ThBreakIterator::createWordInstance();
           *cachedString =
-              thaiCodec->fromUnicode(QConstString((QChar*)s, len).string());
+              thaiCodec->fromUnicode(QConstString((QChar*)s, len).qstring());
         }
         thaiIt->setText((tchar*)cachedString->data());
         for (int i = thaiIt->first(); i != thaiIt->DONE; i = thaiIt->next()) {

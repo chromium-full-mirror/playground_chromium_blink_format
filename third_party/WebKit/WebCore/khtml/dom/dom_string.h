@@ -104,7 +104,7 @@ class DOMString {
   DOMString upper() const;
 
   QChar* unicode() const;
-  QString string() const;
+  QString qstring() const;
 
   int toInt() const;
   khtml::Length* toLengthArray(int& len) const;

@@ -156,7 +156,7 @@ class PartStyleSheetLoader : public CachedObjectClient {
   virtual void setStyleSheet(const DOM::DOMString&,
                              const DOM::DOMString& sheet) {
     if (m_part)
-      m_part->setUserStyleSheet(sheet.string());
+      m_part->setUserStyleSheet(sheet.qstring());
 
     delete this;
   }
@@ -858,7 +858,7 @@ QVariant KHTMLPart::executeScript(DOM::NodeImpl* n,
                                   bool forceUserGesture) {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "KHTMLPart::executeScript n="
-                << n.nodeName().string().latin1() << "("
+                << n.nodeName().qstring().latin1() << "("
                 << (n.isNull() ? 0 : n.nodeType()) << ") " << script << endl;
 #endif
   KJSProxy* proxy = jScript();
@@ -2042,7 +2042,7 @@ void KHTMLPart::checkEmitLoadEvent() {
         KHTMLPart* htmlFrame = static_cast<KHTMLPart*>(p);
         if (htmlFrame->d->m_doc) {
           kdDebug() << "KHTMLPart::checkCompleted setting frame domain to "
-                    << domain.string() << endl;
+                    << domain.qstring() << endl;
           htmlFrame->d->m_doc->setDomain(domain);
         }
       }
@@ -2412,11 +2412,11 @@ bool KHTMLPart::findTextNext(const QString& str,
       if (isRegExp) {
         QRegExp matcher(str);
         matcher.setCaseSensitive(caseSensitive);
-        d->m_findPos = matcher.search(s.string(), d->m_findPos + 1);
+        d->m_findPos = matcher.search(s.qstring(), d->m_findPos + 1);
         if (d->m_findPos != -1)
           matchLen = matcher.matchedLength();
       } else {
-        d->m_findPos = s.string().find(str, d->m_findPos + 1, caseSensitive);
+        d->m_findPos = s.qstring().find(str, d->m_findPos + 1, caseSensitive);
         matchLen = str.length();
       }
 
@@ -2820,13 +2820,13 @@ void KHTMLPart::overURL(const QString& url,
 #if 0
     else if (u.protocol() == QString::fromLatin1("http")) {
         DOM::Node hrefNode = nodeUnderMouse().parentNode();
-        while (hrefNode.nodeName().string() != QString::fromLatin1("A") && !hrefNode.isNull())
+        while (hrefNode.nodeName().qstring() != QString::fromLatin1("A") && !hrefNode.isNull())
           hrefNode = hrefNode.parentNode();
 
         if (!hrefNode.isNull()) {
           DOM::Node hreflangNode = hrefNode.attributes().getNamedItem("HREFLANG");
           if (!hreflangNode.isNull()) {
-            QString countryCode = hreflangNode.nodeValue().string().lower();
+            QString countryCode = hreflangNode.nodeValue().qstring().lower();
             // Map the language code to an appropriate country code.
             if (countryCode == QString::fromLatin1("en"))
               countryCode = QString::fromLatin1("gb");
@@ -2987,7 +2987,7 @@ KURL KHTMLPart::backgroundURL() const {
   QString relURL = static_cast<HTMLDocumentImpl*>(d->m_doc)
                        ->body()
                        ->getAttribute(backgroundAttr)
-                       .string();
+                       .qstring();
 
   return KURL(m_url, relURL);
 }
@@ -3151,7 +3151,7 @@ void KHTMLPart::updateActions() {
     bgURL = static_cast<HTMLDocumentImpl*>(d->m_doc)
                 ->body()
                 ->getAttribute(backgroundAttr)
-                .string();
+                .qstring();
 
   d->m_paSaveBackground->setEnabled(!bgURL.isEmpty());
 }
@@ -4719,8 +4719,8 @@ void KHTMLPart::khtmlMousePressEvent(khtml::MousePressEvent* event) {
   if (!event->url().isNull()) {
     d->m_strSelectedURL = d->m_strSelectedURLTarget = QString::null;
   } else {
-    d->m_strSelectedURL = event->url().string();
-    d->m_strSelectedURLTarget = event->target().string();
+    d->m_strSelectedURL = event->url().qstring();
+    d->m_strSelectedURLTarget = event->target().qstring();
   }
 
 #if !APPLE_CHANGES
@@ -4785,7 +4785,8 @@ bool KHTMLPart::handleMouseMoveEventDrag(khtml::MouseMoveEvent* event) {
       if (i) {
         KMultipleDrag* mdrag = new KMultipleDrag(d->m_view->viewport());
         mdrag->addDragObject(new QImageDrag(i->currentImage(), 0L));
-        KURL u(completeURL(khtml::parseURL(i->getAttribute(srcAttr)).string()));
+        KURL u(
+            completeURL(khtml::parseURL(i->getAttribute(srcAttr)).qstring()));
         KURLDrag* urlDrag = KURLDrag::newDrag(u, 0L);
         if (!d->m_referrer.isEmpty())
           urlDrag->metaData()["referrer"] = d->m_referrer;
@@ -4835,9 +4836,9 @@ bool KHTMLPart::handleMouseMoveEventOver(khtml::MouseMoveEvent* event) {
           int x(mouse->x() - vx);
           int y(mouse->y() - vy);
 
-          d->m_overURL = url.string() + QString("?%1,%2").arg(x).arg(y);
-          d->m_overURLTarget = target.string();
-          overURL(d->m_overURL, target.string(), shiftPressed);
+          d->m_overURL = url.qstring() + QString("?%1,%2").arg(x).arg(y);
+          d->m_overURLTarget = target.qstring();
+          overURL(d->m_overURL, target.qstring(), shiftPressed);
           return true;
         }
       }
@@ -4845,9 +4846,9 @@ bool KHTMLPart::handleMouseMoveEventOver(khtml::MouseMoveEvent* event) {
     // normal link
     if (d->m_overURL.isEmpty() || d->m_overURL != url ||
         d->m_overURLTarget != target) {
-      d->m_overURL = url.string();
-      d->m_overURLTarget = target.string();
-      overURL(d->m_overURL, target.string(), shiftPressed);
+      d->m_overURL = url.qstring();
+      d->m_overURLTarget = target.qstring();
+      overURL(d->m_overURL, target.qstring(), shiftPressed);
     }
   } else {                          // Not over a link...
     if (!d->m_overURL.isEmpty()) {  // and we were over a link  -> reset to

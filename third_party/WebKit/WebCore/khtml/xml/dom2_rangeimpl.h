@@ -83,7 +83,7 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   DOMString toHTML() const;
   DOMString text() const;
 
-  DocumentFragmentImpl* createContextualFragment(DOMString& html,
+  DocumentFragmentImpl* createContextualFragment(const DOMString& html,
                                                  int& exceptioncode) const;
 
   void detach(int& exceptioncode);

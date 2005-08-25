@@ -163,24 +163,24 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
   if (part && part->javaEnabled()) {
     QMap<QString, QString> args;
 
-    args.insert("code", getAttribute(codeAttr).string());
+    args.insert("code", getAttribute(codeAttr).qstring());
     DOMString codeBase = getAttribute(codebaseAttr);
     if (!codeBase.isNull())
-      args.insert("codeBase", codeBase.string());
+      args.insert("codeBase", codeBase.qstring());
     DOMString name = getDocument()->htmlMode() != DocumentImpl::XHtml
                          ? getAttribute(nameAttr)
                          : getAttribute(idAttr);
     if (!name.isNull())
-      args.insert("name", name.string());
+      args.insert("name", name.qstring());
     DOMString archive = getAttribute(archiveAttr);
     if (!archive.isNull())
-      args.insert("archive", archive.string());
+      args.insert("archive", archive.qstring());
 
     args.insert("baseURL", getDocument()->baseURL());
 
     DOMString mayScript = getAttribute(mayscriptAttr);
     if (!mayScript.isNull())
-      args.insert("mayScript", mayScript.string());
+      args.insert("mayScript", mayScript.qstring());
 
     // Other arguments (from <PARAM> tags) are added later.
 
@@ -413,7 +413,7 @@ bool HTMLEmbedElementImpl::mapToEntry(const QualifiedName& attrName,
 }
 
 void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  QString val = attr->value().string();
+  QString val = attr->value().qstring();
 
   int pos;
   if (attr->name() == typeAttr) {
@@ -422,7 +422,7 @@ void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     if (pos != -1)
       serviceType = serviceType.left(pos);
   } else if (attr->name() == codeAttr || attr->name() == srcAttr) {
-    url = khtml::parseURL(attr->value()).string();
+    url = khtml::parseURL(attr->value()).qstring();
   } else if (attr->name() == widthAttr) {
     addCSSLength(attr, CSS_PROP_WIDTH, attr->value());
   } else if (attr->name() == heightAttr) {
@@ -589,7 +589,7 @@ bool HTMLObjectElementImpl::mapToEntry(const QualifiedName& attrName,
 }
 
 void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  QString val = attr->value().string();
+  QString val = attr->value().qstring();
   int pos;
   if (attr->name() == typeAttr) {
     serviceType = val.lower();
@@ -603,7 +603,7 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       m_imageLoader = 0;
     }
   } else if (attr->name() == dataAttr) {
-    url = khtml::parseURL(val).string();
+    url = khtml::parseURL(val).qstring();
     if (m_render)
       needWidgetUpdate = true;
     if (m_render && isImageType()) {
@@ -630,11 +630,11 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onloadAttr) {
     setHTMLEventListener(
         EventImpl::LOAD_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onunloadAttr) {
     setHTMLEventListener(
         EventImpl::UNLOAD_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == nameAttr) {
     DOMString newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
@@ -972,7 +972,7 @@ bool HTMLParamElementImpl::isURLAttribute(AttributeImpl* attr) const {
   if (attr->name() == valueAttr) {
     AttributeImpl* attr = attributes()->getAttributeItem(nameAttr);
     if (attr) {
-      DOMString value = attr->value().string().lower();
+      DOMString value = attr->value().qstring().lower();
       if (value == "src" || value == "movie" || value == "data") {
         return true;
       }

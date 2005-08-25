@@ -511,7 +511,7 @@ bool HTMLParser::handleError(NodeImpl* n,
           TextImpl* t = static_cast<TextImpl*>(n);
           if (t->containsOnlyWhitespace())
             return false;
-          DOMStringImpl* i = t->string();
+          DOMStringImpl* i = t->qstring();
           unsigned int pos = 0;
           while (pos < i->l &&
                  (*(i->s + pos) == QChar(' ') || *(i->s + pos) == QChar(0xa0)))
@@ -877,7 +877,7 @@ void HTMLParser::processCloseTag(Token* t) {
     popBlock(t->tagName);
   }
 #ifdef PARSER_DEBUG
-  kdDebug(6035) << "closeTag --> current = " << current->nodeName().string()
+  kdDebug(6035) << "closeTag --> current = " << current->nodeName().qstring()
                 << endl;
 #endif
 }

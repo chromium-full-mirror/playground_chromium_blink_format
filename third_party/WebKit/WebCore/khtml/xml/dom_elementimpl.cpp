@@ -490,7 +490,7 @@ void ElementImpl::recalcStyle(StyleChange change) {
     case Force: debug = "Force";
         break;
     }
-    qDebug("recalcStyle(%d: %s)[%p: %s]", change, debug, this, tagName().string().latin1());
+    qDebug("recalcStyle(%d: %s)[%p: %s]", change, debug, this, tagName().qstring().latin1());
 #endif
   if (hasParentRenderer && (change >= Inherit || changed())) {
     RenderStyle* newStyle =
@@ -539,7 +539,7 @@ void ElementImpl::recalcStyle(StyleChange change) {
   NodeImpl* n;
   for (n = _first; n; n = n->nextSibling()) {
     // qDebug("    (%p) calling recalcStyle on child %s/%p, change=%d", this, n,
-    // n->isElementNode() ? ((ElementImpl *)n)->tagName().string().latin1() :
+    // n->isElementNode() ? ((ElementImpl *)n)->tagName().qstring().latin1() :
     // n->isTextNode() ? "text" : "unknown", change );
     if (change >= Inherit || n->isTextNode() || n->hasChangedChild() ||
         n->changed())
@@ -650,8 +650,8 @@ void ElementImpl::dump(QTextStream* stream, QString ind) const {
   if (namedAttrMap) {
     for (uint i = 0; i < namedAttrMap->length(); i++) {
       AttributeImpl* attr = namedAttrMap->attributeItem(i);
-      *stream << " " << attr->name().localName().string().ascii() << "=\""
-              << attr->value().string().ascii() << "\"";
+      *stream << " " << attr->name().localName().qstring().ascii() << "=\""
+              << attr->value().qstring().ascii() << "\"";
     }
   }
 
@@ -685,7 +685,7 @@ void ElementImpl::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  strncpy(buffer, result.string().latin1(), length - 1);
+  strncpy(buffer, result.qstring().latin1(), length - 1);
 }
 #endif
 
@@ -1268,7 +1268,7 @@ void NamedMappedAttrMapImpl::parseClassAttribute(const DOMString& classStr) {
   if (classAttr.find(' ') == -1 && classAttr.find('\n') == -1)
     m_classList.setString(AtomicString(classAttr));
   else {
-    QString val = classAttr.string();
+    QString val = classAttr.qstring();
     val.replace('\n', ' ');
     QStringList list = QStringList::split(' ', val);
 
@@ -1530,7 +1530,7 @@ void StyledElementImpl::addCSSColor(MappedAttributeImpl* attr,
   if (attr->decl()->setProperty(id, c, false))
     return;
 
-  QString color = c.string();
+  QString color = c.qstring();
   // not something that fits the specs.
 
   // we're emulating IEs color parser here. It maps transparent to black,

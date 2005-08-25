@@ -81,19 +81,19 @@ class FormDataList {
   FormDataList(QTextCodec*);
 
   void appendData(const DOMString& key, const DOMString& value) {
-    appendString(key.string());
-    appendString(value.string());
+    appendString(key.qstring());
+    appendString(value.qstring());
   }
   void appendData(const DOMString& key, const QString& value) {
-    appendString(key.string());
+    appendString(key.qstring());
     appendString(value);
   }
   void appendData(const DOMString& key, const QCString& value) {
-    appendString(key.string());
+    appendString(key.qstring());
     appendString(value);
   }
   void appendData(const DOMString& key, int value) {
-    appendString(key.string());
+    appendString(key.qstring());
     appendString(QString::number(value));
   }
   void appendFile(const DOMString& key, const DOMString& filename);
@@ -144,7 +144,7 @@ bool HTMLFormElementImpl::formWouldHaveSecureSubmission(const DOMString& url) {
   if (url.isNull()) {
     return false;
   }
-  return getDocument()->completeURL(url.string()).startsWith("https:", false);
+  return getDocument()->completeURL(url.qstring()).startsWith("https:", false);
 }
 
 #endif
@@ -331,7 +331,7 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
   QCString enc_string = "";  // used for non-multipart data
 
   // find out the QTextcodec to use
-  QString str = m_acceptcharset.string();
+  QString str = m_acceptcharset.qstring();
   str.replace(',', ' ');
   QStringList charsets = QStringList::split(' ', str);
   QTextCodec* codec = 0;
@@ -361,7 +361,7 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
     FormDataList lst(codec);
 
     if (!current->disabled() && current->appendFormData(lst, m_multipart)) {
-      // kdDebug(6030) << "adding name " << current->name().string() << endl;
+      // kdDebug(6030) << "adding name " << current->name().qstring() << endl;
       for (QValueListConstIterator<FormDataListItem> it = lst.begin();
            it != lst.end(); ++it) {
         if (!m_multipart) {
@@ -381,7 +381,7 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
           }
         } else {
           QCString hstr("--");
-          hstr += m_boundary.string().latin1();
+          hstr += m_boundary.qstring().latin1();
           hstr += "\r\n";
           hstr += "Content-Disposition: form-data; name=\"";
           hstr += (*it).m_data.data();
@@ -393,7 +393,7 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
               static_cast<HTMLInputElementImpl*>(current)->inputType() ==
                   HTMLInputElementImpl::FILE) {
             QString path =
-                static_cast<HTMLInputElementImpl*>(current)->value().string();
+                static_cast<HTMLInputElementImpl*>(current)->value().qstring();
 #if !APPLE_CHANGES
             if (path.length())
               fileUploads << path;
@@ -460,20 +460,20 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
 #endif
 
   if (m_multipart)
-    enc_string = ("--" + m_boundary.string() + "--\r\n").ascii();
+    enc_string = ("--" + m_boundary.qstring() + "--\r\n").ascii();
 
   form_data.appendData(enc_string.data(), enc_string.length());
   return true;
 }
 
 void HTMLFormElementImpl::parseEnctype(const DOMString& type) {
-  if (type.string().find("multipart", 0, false) != -1 ||
-      type.string().find("form-data", 0, false) != -1) {
+  if (type.qstring().find("multipart", 0, false) != -1 ||
+      type.qstring().find("form-data", 0, false) != -1) {
     m_enctype = "multipart/form-data";
     m_multipart = true;
     m_post = true;
-  } else if (type.string().find("text", 0, false) != -1 ||
-             type.string().find("plain", 0, false) != -1) {
+  } else if (type.qstring().find("text", 0, false) != -1 ||
+             type.qstring().find("plain", 0, false) != -1) {
     m_enctype = "text/plain";
     m_multipart = false;
   } else {
@@ -543,7 +543,7 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
           input->inputType() == HTMLInputElementImpl::PASSWORD ||
           input->inputType() == HTMLInputElementImpl::SEARCH) {
         KWQ(part)
-            ->recordFormValue(input->name().string(), input->value().string(),
+            ->recordFormValue(input->name().qstring(), input->value().qstring(),
                               this);
         if (input->renderer() &&
             input->inputType() == HTMLInputElementImpl::SEARCH)
@@ -556,8 +556,8 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
             HTMLInputElementImpl::TEXT &&
         static_cast<HTMLInputElementImpl*>(current)->autoComplete()) {
       HTMLInputElementImpl* input = static_cast<HTMLInputElementImpl*>(current);
-      view->addFormCompletionItem(input->name().string(),
-                                  input->value().string());
+      view->addFormCompletionItem(input->name().qstring(),
+                                  input->value().qstring());
     }
 #endif
 
@@ -578,10 +578,10 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
   FormData form_data;
   if (formData(form_data)) {
     if (m_post) {
-      part->submitForm("post", m_url.string(), form_data, m_target.string(),
-                       enctype().string(), boundary().string());
+      part->submitForm("post", m_url.qstring(), form_data, m_target.qstring(),
+                       enctype().qstring(), boundary().qstring());
     } else {
-      part->submitForm("get", m_url.string(), form_data, m_target.string());
+      part->submitForm("get", m_url.qstring(), form_data, m_target.qstring());
     }
   }
 
@@ -653,11 +653,11 @@ void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onsubmitAttr) {
     setHTMLEventListener(
         EventImpl::SUBMIT_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onresetAttr) {
     setHTMLEventListener(
         EventImpl::RESET_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == nameAttr) {
     DOMString newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
@@ -1128,13 +1128,13 @@ static QString encodedElementName(QString str) {
 
 QString HTMLGenericFormElementImpl::state() {
   // Build a string that contains ElementName&ElementType&
-  return encodedElementName(name().string()) + stateSeparator +
-         type().string() + stateSeparator;
+  return encodedElementName(name().qstring()) + stateSeparator +
+         type().qstring() + stateSeparator;
 }
 
 QString HTMLGenericFormElementImpl::findMatchingState(QStringList& states) {
-  QString encName = encodedElementName(name().string());
-  QString typeStr = type().string();
+  QString encName = encodedElementName(name().qstring());
+  QString typeStr = type().qstring();
   for (QStringList::Iterator it = states.begin(); it != states.end(); ++it) {
     QString state = *it;
     int sep1 = state.find(stateSeparator);
@@ -1201,11 +1201,11 @@ void HTMLButtonElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else
     HTMLGenericFormElementImpl::parseMappedAttribute(attr);
 }
@@ -1495,7 +1495,7 @@ QString HTMLInputElementImpl::state() {
     case RADIO:
       return state + (checked() ? "on" : "off");
     default:
-      return state + value().string() +
+      return state + value().qstring() +
              '.';  // Make sure the string is not empty!
   }
 }
@@ -1790,23 +1790,23 @@ void HTMLInputElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onselectAttr) {
     setHTMLEventListener(
         EventImpl::SELECT_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == oninputAttr) {
     setHTMLEventListener(
         EventImpl::INPUT_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   }
   // Search field and slider attributes all just cause updateFromElement to be
   // called through style
@@ -1814,7 +1814,7 @@ void HTMLInputElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   else if (attr->name() == onsearchAttr) {
     setHTMLEventListener(
         EventImpl::SEARCH_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == resultsAttr) {
     m_maxResults = !attr->isNull() ? attr->value().toInt() : -1;
     setChanged();
@@ -2016,10 +2016,10 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
     case IMAGE:
       if (m_activeSubmit) {
         encoding.appendData(name().isEmpty() ? QString::fromLatin1("x")
-                                             : (name().string() + ".x"),
+                                             : (name().qstring() + ".x"),
                             clickX());
         encoding.appendData(name().isEmpty() ? QString::fromLatin1("y")
-                                             : (name().string() + ".y"),
+                                             : (name().qstring() + ".y"),
                             clickY());
         if (!name().isEmpty() && !value().isEmpty())
           encoding.appendData(name(), value());
@@ -2029,7 +2029,7 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
 
     case SUBMIT:
       if (m_activeSubmit) {
-        QString enc_str = valueWithDefault().string();
+        QString enc_str = valueWithDefault().qstring();
         if (!enc_str.isEmpty()) {
           encoding.appendData(name(), enc_str);
           return true;
@@ -2056,7 +2056,7 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
       return true;
 #else
       KURL fileurl("file:///");
-      fileurl.setPath(value().string());
+      fileurl.setPath(value().qstring());
       KIO::UDSEntry filestat;
 
       if (!KIO::NetAccess::stat(fileurl, filestat)) {
@@ -2497,11 +2497,11 @@ void HTMLLabelElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else
     HTMLElementImpl::parseMappedAttribute(attr);
 }
@@ -2898,15 +2898,15 @@ void HTMLSelectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else
     HTMLGenericFormElementImpl::parseMappedAttribute(attr);
 }
@@ -2942,7 +2942,7 @@ bool HTMLSelectElementImpl::appendFormData(FormDataList& encoded_values, bool) {
         static_cast<HTMLOptionElementImpl*>(items[0]);
     if (option->value().isNull())
       encoded_values.appendData(name(),
-                                option->text().string().stripWhiteSpace());
+                                option->text().qstring().stripWhiteSpace());
     else
       encoded_values.appendData(name(), option->value());
     successful = true;
@@ -3146,7 +3146,7 @@ bool HTMLKeygenElementImpl::appendFormData(FormDataList& encoded_values, bool) {
     return false;
   }
   QString value = KSSLKeyGen::signedPublicKeyAndChallengeString(
-      selectedIndex(), m_challenge.string(), getDocument()->part()->baseURL());
+      selectedIndex(), m_challenge.qstring(), getDocument()->part()->baseURL());
   if (value.isNull()) {
     return false;
   }
@@ -3337,7 +3337,7 @@ DOMString HTMLOptionElementImpl::value() const {
   if (!m_value.isNull())
     return m_value;
   // Use the text if the value wasn't set.
-  return text().string().stripWhiteSpace();
+  return text().qstring().stripWhiteSpace();
 }
 
 void HTMLOptionElementImpl::setValue(const DOMString& value) {
@@ -3407,7 +3407,7 @@ DOMString HTMLTextAreaElementImpl::type() const {
 
 QString HTMLTextAreaElementImpl::state() {
   // Make sure the string is not empty!
-  return HTMLGenericFormElementImpl::state() + value().string() + '.';
+  return HTMLGenericFormElementImpl::state() + value().qstring() + '.';
 }
 
 void HTMLTextAreaElementImpl::restoreState(QStringList& states) {
@@ -3484,19 +3484,19 @@ void HTMLTextAreaElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   } else if (attr->name() == onfocusAttr) {
     setHTMLEventListener(
         EventImpl::FOCUS_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onblurAttr) {
     setHTMLEventListener(
         EventImpl::BLUR_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onselectAttr) {
     setHTMLEventListener(
         EventImpl::SELECT_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else if (attr->name() == onchangeAttr) {
     setHTMLEventListener(
         EventImpl::CHANGE_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().string(), this));
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
   } else
     HTMLGenericFormElementImpl::parseMappedAttribute(attr);
 }
@@ -3523,7 +3523,7 @@ void HTMLTextAreaElementImpl::updateValue() {
       m_value = static_cast<RenderTextArea*>(m_render)->text();
       m_valueMatchesRenderer = true;
     } else {
-      m_value = defaultValue().string();
+      m_value = defaultValue().qstring();
       m_valueMatchesRenderer = false;
     }
     m_valueIsValid = true;
@@ -3536,7 +3536,7 @@ DOMString HTMLTextAreaElementImpl::value() {
 }
 
 void HTMLTextAreaElementImpl::setValue(const DOMString& value) {
-  m_value = value.string();
+  m_value = value.qstring();
   m_valueMatchesRenderer = false;
   if (m_render)
     m_render->updateFromElement();
@@ -3686,8 +3686,8 @@ void FormDataList::appendString(const QString& s) {
 }
 
 void FormDataList::appendFile(const DOMString& key, const DOMString& filename) {
-  appendString(key.string());
-  m_list.append(filename.string());
+  appendString(key.qstring());
+  m_list.append(filename.qstring());
 }
 
 }  // namespace

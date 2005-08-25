@@ -400,7 +400,7 @@ void VisiblePosition::debugPosition(const char* msg) const {
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
     fprintf(stderr, "Position [%s]: %s [%p] at %ld\n", msg,
-            m_deepPosition.node()->nodeName().string().latin1(),
+            m_deepPosition.node()->nodeName().qstring().latin1(),
             m_deepPosition.node(), m_deepPosition.offset());
 }
 

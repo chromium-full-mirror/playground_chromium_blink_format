@@ -94,10 +94,10 @@ StyleListImpl::~StyleListImpl() {
 // --------------------------------------------------------------------------------
 
 void CSSSelector::print(void) {
-  kdDebug(6080) << "[Selector: tag = " << tag.localName().string()
-                << ", attr = \"" << attr.localName().string()
+  kdDebug(6080) << "[Selector: tag = " << tag.localName().qstring()
+                << ", attr = \"" << attr.localName().qstring()
                 << "\", match = \"" << match << "\" value = \""
-                << value.string().latin1() << "\" relation = " << (int)relation
+                << value.qstring().latin1() << "\" relation = " << (int)relation
                 << "]" << endl;
   if (tagHistory)
     tagHistory->print();
@@ -250,16 +250,16 @@ DOMString CSSSelector::selectorText() const {
   const AtomicString& localName = cs->tag.localName();
   if (localName == starAtom && cs->match == CSSSelector::Id) {
     str = "#";
-    str += cs->value.string();
+    str += cs->value.qstring();
   } else if (localName == starAtom && cs->match == CSSSelector::Class) {
     str = ".";
-    str += cs->value.string();
+    str += cs->value.qstring();
   } else if (localName == starAtom && cs->match == CSSSelector::PseudoClass) {
     str = ":";
-    str += cs->value.string();
+    str += cs->value.qstring();
   } else if (localName == starAtom && cs->match == CSSSelector::PseudoElement) {
     str = "::";
-    str += cs->value.string();
+    str += cs->value.qstring();
   } else {
     if (localName == starAtom)
       str = "*";
@@ -267,16 +267,16 @@ DOMString CSSSelector::selectorText() const {
       str = localName;
     if (cs->match == CSSSelector::Id) {
       str += "#";
-      str += cs->value.string();
+      str += cs->value.qstring();
     } else if (cs->match == CSSSelector::Class) {
       str += ".";
-      str += cs->value.string();
+      str += cs->value.qstring();
     } else if (cs->match == CSSSelector::PseudoClass) {
       str += ":";
-      str += cs->value.string();
+      str += cs->value.qstring();
     } else if (cs->match == CSSSelector::PseudoElement) {
       str += "::";
-      str += cs->value.string();
+      str += cs->value.qstring();
     }
     // optional attribute
     if (cs->hasAttribute()) {
@@ -312,7 +312,7 @@ DOMString CSSSelector::selectorText() const {
               << cs->match << endl;
       }
       str += "\"";
-      str += cs->value.string();
+      str += cs->value.qstring();
       str += "\"]";
     }
   }

@@ -276,7 +276,7 @@ bool CharacterDataImpl::rendererIsNeeded(RenderStyle* style) {
 
 #ifndef NDEBUG
 void CharacterDataImpl::dump(QTextStream* stream, QString ind) const {
-  *stream << " str=\"" << DOMString(str).string().ascii() << "\"";
+  *stream << " str=\"" << DOMString(str).qstring().ascii() << "\"";
 
   NodeImpl::dump(stream, ind);
 }
@@ -296,7 +296,7 @@ const AtomicString& CommentImpl::localName() const {
 }
 
 DOMString CommentImpl::nodeName() const {
-  return commentAtom.string();
+  return commentAtom.qstring();
 }
 
 unsigned short CommentImpl::nodeType() const {
@@ -374,7 +374,7 @@ const AtomicString& TextImpl::localName() const {
 }
 
 DOMString TextImpl::nodeName() const {
-  return textAtom.string();
+  return textAtom.qstring();
 }
 
 unsigned short TextImpl::nodeType() const {
@@ -481,7 +481,7 @@ void TextImpl::formatForDebugger(char* buffer, unsigned length) const {
     result += s;
   }
 
-  strncpy(buffer, result.string().latin1(), length - 1);
+  strncpy(buffer, result.qstring().latin1(), length - 1);
 }
 #endif
 

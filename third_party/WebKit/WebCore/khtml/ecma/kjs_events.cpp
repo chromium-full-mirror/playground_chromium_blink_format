@@ -518,7 +518,7 @@ ValueImp* DOMEventProtoFunc::callAsFunction(ExecState* exec,
       event.preventDefault();
       return Undefined();
     case DOMEvent::InitEvent:
-      event.initEvent(args[0]->toString(exec).string(),
+      event.initEvent(args[0]->toString(exec).domString(),
                       args[1]->toBoolean(exec), args[2]->toBoolean(exec));
       return Undefined();
   };
@@ -667,7 +667,7 @@ ValueImp* DOMUIEventProtoFunc::callAsFunction(ExecState* exec,
       *static_cast<UIEventImpl*>(static_cast<DOMUIEvent*>(thisObj)->impl());
   switch (id) {
     case DOMUIEvent::InitUIEvent:
-      uiEvent.initUIEvent(args[0]->toString(exec).string(),
+      uiEvent.initUIEvent(args[0]->toString(exec).domString(),
                           args[1]->toBoolean(exec), args[2]->toBoolean(exec),
                           toAbstractView(args[3]), args[4]->toInt32(exec));
       return Undefined();
@@ -808,7 +808,7 @@ ValueImp* DOMMouseEventProtoFunc::callAsFunction(ExecState* exec,
       static_cast<DOMMouseEvent*>(thisObj)->impl());
   switch (id) {
     case DOMMouseEvent::InitMouseEvent:
-      mouseEvent.initMouseEvent(args[0]->toString(exec).string(),  // typeArg
+      mouseEvent.initMouseEvent(args[0]->toString(exec).domString(),  // typeArg
                                 args[1]->toBoolean(exec),   // canBubbleArg
                                 args[2]->toBoolean(exec),   // cancelableArg
                                 toAbstractView(args[3]),    // viewArg
@@ -906,17 +906,17 @@ ValueImp* DOMKeyboardEventProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMKeyboardEvent::InitKeyboardEvent:
       event.initKeyboardEvent(
-          args[0]->toString(exec).string(),  // typeArg
-          args[1]->toBoolean(exec),          // canBubbleArg
-          args[2]->toBoolean(exec),          // cancelableArg
-          toAbstractView(args[3]),           // viewArg
-          args[4]->toString(exec).string(),  // keyIdentifier
-          args[5]->toInt32(exec),            // keyLocationArg
-          args[6]->toBoolean(exec),          // ctrlKeyArg
-          args[7]->toBoolean(exec),          // altKeyArg
-          args[8]->toBoolean(exec),          // shiftKeyArg
-          args[9]->toBoolean(exec),          // metaKeyArg
-          args[10]->toBoolean(exec));        // altGraphKeyArg
+          args[0]->toString(exec).domString(),  // typeArg
+          args[1]->toBoolean(exec),             // canBubbleArg
+          args[2]->toBoolean(exec),             // cancelableArg
+          toAbstractView(args[3]),              // viewArg
+          args[4]->toString(exec).domString(),  // keyIdentifier
+          args[5]->toInt32(exec),               // keyLocationArg
+          args[6]->toBoolean(exec),             // ctrlKeyArg
+          args[7]->toBoolean(exec),             // altKeyArg
+          args[8]->toBoolean(exec),             // shiftKeyArg
+          args[9]->toBoolean(exec),             // metaKeyArg
+          args[10]->toBoolean(exec));           // altGraphKeyArg
       return Undefined();
   }
   return Undefined();
@@ -1019,14 +1019,14 @@ ValueImp* DOMMutationEventProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMMutationEvent::InitMutationEvent:
       mutationEvent.initMutationEvent(
-          args[0]->toString(exec).string(),  // typeArg,
-          args[1]->toBoolean(exec),          // canBubbleArg
-          args[2]->toBoolean(exec),          // cancelableArg
-          toNode(args[3]),                   // relatedNodeArg
-          args[4]->toString(exec).string(),  // prevValueArg
-          args[5]->toString(exec).string(),  // newValueArg
-          args[6]->toString(exec).string(),  // attrNameArg
-          args[7]->toInt32(exec));           // attrChangeArg
+          args[0]->toString(exec).domString(),  // typeArg,
+          args[1]->toBoolean(exec),             // canBubbleArg
+          args[2]->toBoolean(exec),             // cancelableArg
+          toNode(args[3]),                      // relatedNodeArg
+          args[4]->toString(exec).domString(),  // prevValueArg
+          args[5]->toString(exec).domString(),  // newValueArg
+          args[6]->toString(exec).domString(),  // attrNameArg
+          args[7]->toInt32(exec));              // attrChangeArg
       return Undefined();
   }
   return Undefined();
@@ -1205,13 +1205,13 @@ void Clipboard::putValueProperty(ExecState* exec,
       // can never set this when not for dragging, thus getting always returns
       // NULL string
       if (clipboard->isForDragging())
-        clipboard->setDropEffect(value->toString(exec).string());
+        clipboard->setDropEffect(value->toString(exec).domString());
       break;
     case EffectAllowed:
       // can never set this when not for dragging, thus getting always returns
       // NULL string
       if (clipboard->isForDragging())
-        clipboard->setEffectAllowed(value->toString(exec).string());
+        clipboard->setEffectAllowed(value->toString(exec).domString());
       break;
     default:
       kdWarning() << "Clipboard::putValueProperty unhandled token " << token
@@ -1232,7 +1232,7 @@ ValueImp* ClipboardProtoFunc::callAsFunction(ExecState* exec,
         cb->clipboard->clearAllData();
         return Undefined();
       } else if (args.size() == 1) {
-        cb->clipboard->clearData(args[0]->toString(exec).string());
+        cb->clipboard->clearData(args[0]->toString(exec).domString());
         return Undefined();
       } else {
         return throwError(exec, SyntaxError,
@@ -1241,8 +1241,8 @@ ValueImp* ClipboardProtoFunc::callAsFunction(ExecState* exec,
     case Clipboard::GetData: {
       if (args.size() == 1) {
         bool success;
-        DOM::DOMString result =
-            cb->clipboard->getData(args[0]->toString(exec).string(), success);
+        DOM::DOMString result = cb->clipboard->getData(
+            args[0]->toString(exec).domString(), success);
         if (success) {
           return String(result);
         } else {
@@ -1256,8 +1256,8 @@ ValueImp* ClipboardProtoFunc::callAsFunction(ExecState* exec,
     case Clipboard::SetData:
       if (args.size() == 2) {
         return Boolean(
-            cb->clipboard->setData(args[0]->toString(exec).string(),
-                                   args[1]->toString(exec).string()));
+            cb->clipboard->setData(args[0]->toString(exec).domString(),
+                                   args[1]->toString(exec).domString()));
       } else {
         return throwError(exec, SyntaxError,
                           "setData: Invalid number of arguments");

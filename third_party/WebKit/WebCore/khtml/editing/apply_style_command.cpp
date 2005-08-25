@@ -155,9 +155,9 @@ void StyleChange::init(CSSStyleDeclarationImpl* style,
       // we have to special-case text decorations
       CSSProperty alteredProperty = CSSProperty(
           CSS_PROP_TEXT_DECORATION, property->value(), property->isImportant());
-      styleText += alteredProperty.cssText().string();
+      styleText += alteredProperty.cssText().qstring();
     } else {
-      styleText += property->cssText().string();
+      styleText += property->cssText().qstring();
     }
   }
 
