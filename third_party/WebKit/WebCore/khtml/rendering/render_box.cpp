@@ -107,6 +107,7 @@ void RenderBox::setStyle(RenderStyle* _style) {
         m_layer->updateLayerPositions();
     }
   } else if (m_layer && !isRoot() && !isCanvas()) {
+    assert(m_layer->parent());
     m_layer->removeOnlyThisLayer();
     m_layer = 0;
   }
@@ -130,6 +131,10 @@ RenderBox::~RenderBox() {
 }
 
 void RenderBox::detach() {
+  // A lot of the code in this funtion is just pasted into
+  // RenderWidget::detach. If anything in this function changes,
+  // be sure to fix RenderWidget::detach() as well.
+
   RenderLayer* layer = m_layer;
   RenderArena* arena = renderArena();
 
