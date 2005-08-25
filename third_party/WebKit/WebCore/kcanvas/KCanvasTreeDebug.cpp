@@ -39,6 +39,8 @@
 
 #include <ksvg2/impl/SVGStyledElementImpl.h>
 
+#include <kdom/DOMString.h>
+
 #include <qtextstream.h>
 
 static QTextStream& operator<<(QTextStream& ts, const QRect& r) {
@@ -216,7 +218,7 @@ static QString getTagName(void* node) {
   KSVG::SVGStyledElementImpl* elem =
       static_cast<KSVG::SVGStyledElementImpl*>(node);
   if (elem)
-    return elem->nodeName().string();
+    return KDOM::DOMString(elem->nodeName()).string();
   return QString();
 }
 

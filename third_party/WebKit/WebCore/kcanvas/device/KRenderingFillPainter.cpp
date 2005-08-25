@@ -32,7 +32,10 @@ class KRenderingFillPainter::Private {
     fillRule = RULE_NONZERO;
   }
 
-  ~Private() {}
+  ~Private() {
+    if (pserver && (pserver->type() == PS_SOLID || pserver->type() == PS_IMAGE))
+      delete pserver;
+  }
 
   float opacity;
   KCWindRule fillRule;
@@ -51,6 +54,9 @@ KRenderingPaintServer* KRenderingFillPainter::paintServer() const {
 }
 
 void KRenderingFillPainter::setPaintServer(KRenderingPaintServer* pserver) {
+  if (d->pserver &&
+      (d->pserver->type() == PS_SOLID || d->pserver->type() == PS_IMAGE))
+    delete d->pserver;
   d->pserver = pserver;
 }
 

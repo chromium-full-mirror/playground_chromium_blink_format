@@ -37,7 +37,10 @@ class KRenderingStrokePainter::Private {
     joinStyle = JOIN_MITER;
   }
 
-  ~Private() {}
+  ~Private() {
+    if (pserver && (pserver->type() == PS_SOLID || pserver->type() == PS_IMAGE))
+      delete pserver;
+  }
 
   KRenderingPaintServer* pserver;
 
@@ -65,6 +68,9 @@ KRenderingPaintServer* KRenderingStrokePainter::paintServer() const {
 }
 
 void KRenderingStrokePainter::setPaintServer(KRenderingPaintServer* pserver) {
+  if (d->pserver &&
+      (d->pserver->type() == PS_SOLID || d->pserver->type() == PS_IMAGE))
+    delete d->pserver;
   setDirty();
   d->pserver = pserver;
 }
