@@ -628,7 +628,7 @@ static void checkPseudoState(const CSSStyleSelector::Encodedurl& encodedurl,
   }
 
   QConstString cu(attr.unicode(), attr.length());
-  QString u = cu.string();
+  QString u = cu.qstring();
   if (!u.contains(QString::fromLatin1("://"))) {
     if (u[0] == '/')
       u = encodedurl.host + u;
