@@ -30,7 +30,10 @@
 
 #include <kcanvas/KCanvas.h>
 
+#include <cmath>
+
 using namespace KSVG;
+using namespace std;
 
 float SVGHelper::PercentageOfViewport(float value,
                                       const SVGElementImpl* viewportElement,
@@ -42,7 +45,7 @@ float SVGHelper::PercentageOfViewport(float value,
   const SVGSVGElementImpl* svg =
       dynamic_cast<const SVGSVGElementImpl*>(viewportElement);
   if (svg) {
-    if (svg->hasAttribute("viewBox")) {
+    if (svg->hasAttribute(KDOM::DOMString("viewBox").handle())) {
       width = svg->viewBox()->baseVal()->width();
       height = svg->viewBox()->baseVal()->height();
     } else if (svg->width()->baseVal()->unitType() ==
@@ -72,7 +75,8 @@ float SVGHelper::PercentageOfViewport(float value,
   else if (mode == LM_HEIGHT)
     return value * height;
   else if (mode == LM_OTHER)
-    return value * sqrt(pow(width, 2) + pow(height, 2)) / sqrt(2.0);
+    return value * sqrt(pow(double(width), 2) + pow(double(height), 2)) /
+           sqrt(2.0);
 
   return 0.0;
 }

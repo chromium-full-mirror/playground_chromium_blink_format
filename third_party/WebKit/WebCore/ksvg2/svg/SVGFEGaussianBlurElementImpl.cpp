@@ -42,9 +42,9 @@
 using namespace KSVG;
 
 SVGFEGaussianBlurElementImpl::SVGFEGaussianBlurElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
   m_in1 = 0;
   m_stdDeviationX = 0;
@@ -85,16 +85,16 @@ void SVGFEGaussianBlurElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   switch (id) {
     case ATTR_STDDEVIATION: {
       QStringList numbers = QStringList::split(' ', value.string());
-      stdDeviationX()->baseVal()->setValue(numbers[0].toFloat());
+      stdDeviationX()->setBaseVal(numbers[0].toFloat());
       if (numbers.count() == 1)
-        stdDeviationY()->baseVal()->setValue(numbers[0].toFloat());
+        stdDeviationY()->setBaseVal(numbers[0].toFloat());
       else
-        stdDeviationY()->baseVal()->setValue(numbers[1].toFloat());
+        stdDeviationY()->setBaseVal(numbers[1].toFloat());
 
       break;
     }
     case ATTR_IN: {
-      in1()->setBaseVal(value.implementation());
+      in1()->setBaseVal(value.handle());
       break;
     }
     default: { SVGFilterPrimitiveStandardAttributesImpl::parseAttribute(attr); }
@@ -108,8 +108,8 @@ KCanvasItem* SVGFEGaussianBlurElementImpl::createCanvasItem(
       canvas->renderingDevice()->createFilterEffect(FE_GAUSSIAN_BLUR));
   m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).string());
   setStandardAttributes(m_filterEffect);
-  m_filterEffect->setStdDeviationX(stdDeviationX()->baseVal()->value());
-  m_filterEffect->setStdDeviationY(stdDeviationY()->baseVal()->value());
+  m_filterEffect->setStdDeviationX(stdDeviationX()->baseVal());
+  m_filterEffect->setStdDeviationY(stdDeviationY()->baseVal());
   return 0;
 }
 

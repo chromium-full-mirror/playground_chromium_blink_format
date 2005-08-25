@@ -24,27 +24,25 @@
 #define KDOM_Parser_H
 
 #include <qobject.h>
-#include <kdom/impl/DOMErrorHandlerImpl.h>
+
 #include <kdom/DOMString.h>
+#include <kdom/impl/DOMErrorHandlerImpl.h>
 #include <kdom/cache/KDOMCachedObjectClient.h>
 
 class KURL;
 class QBuffer;
 
 namespace KDOM {
-class Document;
+class DocumentImpl;
 class DocumentBuilder;
 class DOMConfigurationImpl;
 
 /**
  * @short KDOM Parser.
  *
- * @description TODO-docs a description of what this class does.
+ * @description This class is a base class for custom parsers.
  *
- * This class needs to be inherited by a custom parser, for example
- * QXml or libxml2.
- *
- * The document builder is deleted by the Parser.
+ * KDOM provides 'qxml' & 'libxml' parsing backends.
  *
  * @author Nikolas Zimmermann <wildfox@kde.org>
  * @author Rob Buis <buis@kde.org>
@@ -57,14 +55,30 @@ class Parser : public QObject,
   Q_OBJECT
 
  public:
+  // This class can not be constructed directly.
+  virtual ~Parser();
+
   /**
    * @returns the url passed in the constructor
    */
   KURL url() const;
 
-  /** @return the parsed Document
+  /**
+   * @returns the parsed Document
    */
-  Document document() const;
+  DocumentImpl* document() const;
+
+  /**
+   * @returns the DOMConfigurationImpl object which
+   * holds certain parameters which influence parsing.
+   * (ie. white-space behaviour/entity substitution)
+   */
+  DOMConfigurationImpl* domConfig() const;
+
+  /**
+   * @returns the DocumentBuilder in use
+   */
+  DocumentBuilder* documentBuilder() const;
 
   /**
    * Sets the document builder to @p builder.
@@ -74,111 +88,73 @@ class Parser : public QObject,
   void setDocumentBuilder(DocumentBuilder* builder);
 
   /**
-   * @returns the DocumentBuilder in use
-   */
-  DocumentBuilder* documentBuilder() const;
-
-  /**
-   * Starts parsing the document.
+   * This parses the document; the byte stream that the Document was built is
+   * NOT being cached. You'll directly get a 'KDOM::Document' object as result.
    *
-   * The implementation loads the document via asyncronous KIO
-   * and emits the loadingFinished signal when done.
-   *
-   * @param incremental TODO-docs
+   * @param buffer if set, it can be used to parse an in-memory buffer.
+   *               (in this case, no network accesses will be performed!)
    */
-  virtual void startParsing(bool incremental);
+  virtual DocumentImpl* syncParse(QBuffer* buffer = 0);
 
   /**
-   * Performs synchronous parsing. The URI of this Parser, set
-   * via the request() call in @ref ParserFactory, is downloaded
-   * and parsed into a Document which is directly returned.
-   */
-  virtual Document parse(QBuffer* buffer = 0);
-
-  /**
-   * This is similar to calling startParsing(false), with the difference
-   * that the byte stream that the Document node was built from was cached.
+   * This parses the document; the byte stream that the Document was built
+   * from is being cached internally. Non-incremental is not-working atm. FIX
+   * IT!
    *
    * When downloading and parsing is done, the parsingFinished() signalled is
    * emitted and the Document can be retrieved via document().
    *
-   * Currently, only non-incremental is supported.
-   *
-   * @param incremental
-   * @param accept
+   * @param incremental (incremental parsing mode)
+   * @param accept (http header accept string)
    */
-  virtual void cachedParse(bool incremental = false, const char* accept = 0);
+  virtual void asyncParse(bool incremental = false, const char* accept = 0);
 
   /**
-   * User-defined break of parsing on specific errors.
-   *
-   * @param errorDescription TODO-docs
+   * This forces any loading/parsing to immediately stop.
    */
-  virtual void stopParsing(const DOMString& errorDescription = DOMString()) = 0;
-
-  /**
-   * TODO-docs
-   *
-   * @param err TODO-docs
-   */
-  virtual bool handleError(DOMErrorImpl* err);
-
-  DOMConfigurationImpl* domConfig() const;
-
-  virtual ~Parser();
-
- protected:
-  /**
-   * This is the callback for retrieving cached data. It is only used when
-   * doing cached parsing.
-   */
-  void notifyFinished(CachedObject* object);
-
-  /**
-   * Default constructor. TODO-docs
-   *
-   * @param url TODO-docs
-   */
-  Parser(const KURL& url);
+  virtual void abortWork();
 
  signals:
   /**
-   * In non-incremental mode, it tells the user whether the file is
-   * ready to be parsed, otherwise it just informs that the feed is finished.
+   * Tells the user whether async parsing was successful or not.
    *
-   * @param buffer TODO-docs
+   * @param error if not 0, an error occoured.
    */
-  void loadingFinished(QBuffer* buffer);
+  void parsingFinished(KDOM::DOMErrorImpl* error);
+
+ protected:
+  /**
+   * Default constructor to be used from custom parsers.
+   *
+   * @param url The absolute URL to load.
+   */
+  Parser(const KURL& url);
 
   /**
-   * Tells the user about new data in incremental parsing mode.
-   *
-   * @param eof TODO-docs
-   * @param data TODO-docs
+   * This is the callback for retrieving cached data.
    */
-  void feedData(const QByteArray& data, bool eof);
+  virtual void notifyFinished(CachedObject* object);
+
+ public:  // Should really only be used by custom parsers...
+          /**
+           * Error reporting functionality. (used by custom parsers.)
+           */
+  bool handleError(DOMErrorImpl* err);
 
   /**
-   * Tells the user whether parsing was successful or not.
-   *
-   * @param bool if true, an error did occur during parsing
-   * @param errorDescription TODO-docs
+   * Tells the 'custom parser' on top of us, about new data
+   * in incremental parsing mode. (Internal usage only!)
    */
-  void parsingFinished(bool error, const KDOM::DOMString& errorDescription);
-  // FIXME, englich: Why is not a DOMError passed as errorDescription?
-
- private slots:
+  virtual void handleIncomingData(QBuffer* buffer, bool eof) {
+    Q_UNUSED(buffer);
+    Q_UNUSED(eof);
+  }
 
   /**
-   * Used by the @ref DataSlave to inform kio users about file download
-   * progress.
+   * Just downloads certain data in a sync way. May be used
+   * for instance for external entity loading by a custom parser.
    */
-  void slotNotify(unsigned long jobTicket, QBuffer* buffer, bool hasError);
-
-  void slotNotifyIncremental(unsigned long jobTicket,
-                             const QByteArray& data,
-                             bool eof,
-                             bool hasError);
+  QBuffer* bufferForUrl(const KURL& url) const;
 
  private:
   class Private;

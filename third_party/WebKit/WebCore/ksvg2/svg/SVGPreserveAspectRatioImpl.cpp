@@ -34,7 +34,7 @@ using namespace KSVG;
 
 SVGPreserveAspectRatioImpl::SVGPreserveAspectRatioImpl(
     const SVGStyledElementImpl* context)
-    : KDOM::Shared(true) {
+    : KDOM::Shared() {
   m_context = context;
   m_meetOrSlice = SVG_MEETORSLICE_MEET;
   m_align = SVG_PRESERVEASPECTRATIO_XMINYMID;

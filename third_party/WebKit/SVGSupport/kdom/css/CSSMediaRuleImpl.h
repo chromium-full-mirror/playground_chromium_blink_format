@@ -31,7 +31,7 @@ class CSSRuleListImpl;
 class CSSMediaRuleImpl : public CSSRuleImpl {
  public:
   CSSMediaRuleImpl(StyleBaseImpl* parent);
-  CSSMediaRuleImpl(StyleBaseImpl* parent, const DOMString& media);
+  CSSMediaRuleImpl(StyleBaseImpl* parent, DOMStringImpl* media);
   CSSMediaRuleImpl(StyleBaseImpl* parent,
                    MediaListImpl* mediaList,
                    CSSRuleListImpl* ruleList);
@@ -41,7 +41,7 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
   MediaListImpl* media() const;
   CSSRuleListImpl* cssRules() const;
 
-  unsigned long insertRule(const DOMString& rule, unsigned long index);
+  unsigned long insertRule(DOMStringImpl* rule, unsigned long index);
   void deleteRule(unsigned long index);
 
   // 'CSSRule' functions

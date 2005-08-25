@@ -26,8 +26,8 @@
 
 #include <kmimetype.h>
 
+#include "kdom.h"
 #include "kdomls.h"
-#include "LSParser.h"
 #include "DOMString.h"
 #include "KDOMParser.h"
 #include "LSInputImpl.h"
@@ -35,7 +35,6 @@
 #include "NodeListImpl.h"
 #include "DocumentImpl.h"
 #include "LSExceptionImpl.h"
-#include "DOMConfiguration.h"
 #ifndef APPLE_CHANGES
 #include "KDOMParserFactory.h"
 #endif
@@ -85,17 +84,18 @@ void LSParserImpl::setASync(bool async) {
   m_async = async;
 }
 
-// static int hex2int(unsigned int _char)
-//{
-//	if(_char >= 'A' && _char <='F')
-//		return _char - 'A' + 10;
-//	if(_char >= 'a' && _char <='f')
-//		return _char - 'a' + 10;
-//	if(_char >= '0' && _char <='9')
-//		return _char - '0';
-//
-//	return -1;
-//}
+#ifndef APPLE_COMPILE_HACK
+static int hex2int(unsigned int _char) {
+  if (_char >= 'A' && _char <= 'F')
+    return _char - 'A' + 10;
+  if (_char >= 'a' && _char <= 'f')
+    return _char - 'a' + 10;
+  if (_char >= '0' && _char <= '9')
+    return _char - '0';
+
+  return -1;
+}
+#endif
 
 DocumentImpl* LSParserImpl::parse(KURL url,
                                   LSInputImpl* input,
@@ -116,9 +116,10 @@ DocumentImpl* LSParserImpl::parse(KURL url,
     buffer->open(IO_ReadWrite);
     buffer->writeBlock(in.ascii(), in.length());
     buffer->close();
-  } else if (!input->byteStream().string().isEmpty()) {
-    QCString in(input->byteStream().string().ascii(),
-                input->byteStream().string().length() + 1);
+  } else if (input->byteStream() && !input->byteStream()->isEmpty()) {
+    QString str(input->byteStream()->string());
+    QCString in(str.ascii(), str.length() + 1);
+
     int a, b;
     unsigned int i = 0;
     unsigned int len = in.length();
@@ -132,14 +133,14 @@ DocumentImpl* LSParserImpl::parse(KURL url,
     }
 
     buffer->close();
-  } else if (!input->stringData().string().isEmpty()) {
-    QString in = input->stringData().string();
+  } else if (input->stringData() && !input->stringData()->isEmpty()) {
+    QString in = input->stringData()->string();
     buffer = new QBuffer();
     buffer->open(IO_ReadWrite);
     buffer->writeBlock(in.ascii(), in.length());
     buffer->close();
-  } else if (!input->systemId().string().isEmpty()) {
-    url = input->systemId().string();
+  } else if (input->systemId() && !input->systemId()->isEmpty()) {
+    url = input->systemId()->string();
     if (KURL::isRelativeURL(url.url()))
       url = KURL(KURL(QDir::currentDirPath() + '/'), url.url());
 
@@ -187,7 +188,7 @@ DocumentImpl* LSParserImpl::parse(KURL url,
       domConfig()->getParameter(FEATURE_NAMESPACE_DECLARATIONS));
 
   if (async)
-    m_activeParser->startParsing(false);
+    m_activeParser->asyncParse(false /* non-incremental */);
   else {
     if (contextArg) {
       m_activeParser->documentBuilder()->setDocument(
@@ -195,8 +196,7 @@ DocumentImpl* LSParserImpl::parse(KURL url,
       m_activeParser->documentBuilder()->pushNode(contextArg);
     }
 
-    DocumentImpl* ret =
-        static_cast<DocumentImpl*>(m_activeParser->syncParse(buffer).handle());
+    DocumentImpl* ret = m_activeParser->syncParse(buffer);
     if (!ret)
       return 0;  // TODO : return error?
 
@@ -207,9 +207,7 @@ DocumentImpl* LSParserImpl::parse(KURL url,
 
     return ret;
   }
-
 #endif
-
   return 0;
 }
 
@@ -223,7 +221,7 @@ DocumentImpl* LSParserImpl::parseURI(const DOMString& uri) {
 
 void LSParserImpl::abort() const {
   if (m_activeParser)
-    m_activeParser->stopParsing();
+    m_activeParser->abortWork();
 }
 
 NodeImpl* LSParserImpl::parseWithContext(LSInputImpl* input,

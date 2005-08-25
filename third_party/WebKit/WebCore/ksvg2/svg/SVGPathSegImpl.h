@@ -24,9 +24,10 @@
 #define KSVG_SVGPathSegImpl_H
 
 #include <kdom/Shared.h>
+#include <kdom/impl/DOMStringImpl.h>
 
 #include "ksvg.h"
-#include "SVGPathSeg.h"
+//#include "SVGPathSeg.h"
 
 namespace KSVG {
 class SVGPathElementImpl;
@@ -37,7 +38,9 @@ class SVGPathSegImpl : public KDOM::Shared {
   virtual ~SVGPathSegImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_UNKNOWN; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return ""; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("");
+  }
   virtual QString toString() const { return QString::fromLatin1(""); }
 
  protected:

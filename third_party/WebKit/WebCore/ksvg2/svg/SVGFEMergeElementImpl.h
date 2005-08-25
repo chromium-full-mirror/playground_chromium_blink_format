@@ -31,9 +31,9 @@ class KCanvasFilterEffect;
 namespace KSVG {
 class SVGFEMergeElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEMergeElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEMergeElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEMergeElementImpl();
 
   virtual KCanvasItem* createCanvasItem(KCanvas* canvas,

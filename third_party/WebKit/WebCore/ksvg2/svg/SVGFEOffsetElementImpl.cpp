@@ -41,9 +41,9 @@
 
 using namespace KSVG;
 
-SVGFEOffsetElementImpl::SVGFEOffsetElementImpl(KDOM::DocumentImpl* doc,
+SVGFEOffsetElementImpl::SVGFEOffsetElementImpl(KDOM::DocumentPtr* doc,
                                                KDOM::NodeImpl::Id id,
-                                               const KDOM::DOMString& prefix)
+                                               KDOM::DOMStringImpl* prefix)
     : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
   m_in1 = 0;
   m_dx = 0;
@@ -80,15 +80,15 @@ void SVGFEOffsetElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
   switch (id) {
     case ATTR_DX: {
-      dx()->baseVal()->setValue(value.string().toFloat());
+      dx()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_DY: {
-      dy()->baseVal()->setValue(value.string().toFloat());
+      dy()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_IN: {
-      in1()->setBaseVal(value.implementation());
+      in1()->setBaseVal(value.handle());
       break;
     }
     default: { SVGFilterPrimitiveStandardAttributesImpl::parseAttribute(attr); }
@@ -102,8 +102,8 @@ KCanvasItem* SVGFEOffsetElementImpl::createCanvasItem(
       canvas->renderingDevice()->createFilterEffect(FE_OFFSET));
   m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).string());
   setStandardAttributes(m_filterEffect);
-  m_filterEffect->setDx(dx()->baseVal()->value());
-  m_filterEffect->setDy(dy()->baseVal()->value());
+  m_filterEffect->setDx(dx()->baseVal());
+  m_filterEffect->setDy(dy()->baseVal());
   return 0;
 }
 

@@ -22,14 +22,15 @@
 
 #include <qvariant.h>
 
-#include "Event.h"
 #include "EventImpl.h"
 #include "EventListenerImpl.h"
 
 using namespace KDOM;
 
-EventListenerImpl::EventListenerImpl() : Shared(true) {
+EventListenerImpl::EventListenerImpl() : Shared() {
   m_doc = 0;
+  m_internalType = 0;
+
   m_ecmaEventListener = false;
 
   m_listener = NULL;
@@ -37,59 +38,70 @@ EventListenerImpl::EventListenerImpl() : Shared(true) {
 }
 
 EventListenerImpl::~EventListenerImpl() {
-  if (m_doc && m_doc->ecmaEngine() && m_ecmaEventListener)
-    m_doc->ecmaEngine()->removeEventListener(
-        static_cast<KJS::ObjectImp*>(m_compareListener));
+  if (m_internalType)
+    m_internalType->deref();
+
+  /*
+          if(m_doc && m_doc->ecmaEngine() && m_ecmaEventListener)
+                  m_doc->ecmaEngine()->removeEventListener(static_cast<KJS::ObjectImp
+     *>(m_compareListener.imp()));
+  */
 }
 
 void EventListenerImpl::handleEvent(EventImpl* evt) {
-  if (!evt)
-    return;
+  /*
+          if(!evt)
+                  return;
 
-  Q_ASSERT(m_doc != 0);
+          Q_ASSERT(m_doc != 0);
 
-  KJS::Interpreter::lock();
-  Ecma* ecmaEngine = m_doc->ecmaEngine();
-  if (ecmaEngine && m_listener->implementsCall()) {
-    ScriptInterpreter* interpreter = ecmaEngine->interpreter();
-    KJS::ExecState* exec = ecmaEngine->globalExec();
+          KJS::Interpreter::lock();
+          Ecma *ecmaEngine = m_doc->ecmaEngine();
+          if(ecmaEngine && m_listener.implementsCall())
+          {
+                  ScriptInterpreter *interpreter = ecmaEngine->interpreter();
+                  KJS::ExecState *exec = ecmaEngine->globalExec();
 
-    // Append 'evt' object
-    Event evtObj(evt);
+                  // Append 'evt' object
+                  Event evtObj(evt);
 
-    KJS::List args;
-    args.append(KDOM::getDOMEvent(exec, evtObj));
+                  KJS::List args;
+                  args.append(getDOMEvent(exec, evtObj));
 
-    // Set current event
-    interpreter->setCurrentEvent(evt);
+                  // Set current event
+                  interpreter->setCurrentEvent(evt);
 
-    // Call it!
-    KJS::ObjectImp* thisObj = static_cast<KJS::ObjectImp*>(
-        safe_cache<EventTarget>(exec, evtObj.currentTarget()));
-    KJS::ValueImp* retVal = m_listener->callAsFunction(exec, thisObj, args);
+                  // Call it!
+                  KJS::Object thisObj =
+     KJS::Object::dynamicCast(safe_cache<EventTarget>(exec,
+     evtObj.currentTarget()));
+                  KJS::Value retVal = m_listener.call(exec, thisObj, args);
 
-    // Reset current event after processing
-    interpreter->setCurrentEvent(0);
+                  // Reset current event after processing
+                  interpreter->setCurrentEvent(0);
 
-    if (exec->hadException())
-      exec->clearException();
-    else {
-      // In case the js event listener returns a value, check it...
-      QVariant ret = toVariant(exec, retVal);
-      if (ret.type() == QVariant::Bool && ret.toBool() == false)
-        evt->preventDefault();
-    }
-  }
-  KJS::Interpreter::unlock();
+                  if(exec->hadException())
+                          exec->clearException();
+                  else
+                  {
+                          // In case the js event listener returns a value,
+     check it...
+                          QVariant ret = toVariant(exec, retVal);
+                          if(ret.type() == QVariant::Bool && ret.toBool() ==
+     false)
+                                  evt->preventDefault();
+                  }
+          }
+          KJS::Interpreter::unlock();
+  */
 }
 
-DOMString EventListenerImpl::internalType() const {
+DOMStringImpl* EventListenerImpl::internalType() const {
   if (!m_ecmaEventListener)
-    return DOMString();
+    return 0;
 
   return m_internalType;
 }
-
 KJS::ValueImp* EventListenerImpl::ecmaListener() const {
   if (!m_ecmaEventListener)
     return NULL;
@@ -101,16 +113,17 @@ void EventListenerImpl::initListener(DocumentImpl* doc,
                                      bool ecmaEventListener,
                                      KJS::ObjectImp* listener,
                                      KJS::ValueImp* compareListener,
-                                     const DOMString& internalType) {
+                                     DOMStringImpl* internalType) {
   if (!listener || !listener->implementsCall())
     kdError() << "EcmaScript listener object " << listener
               << " is not valid or doesn't implement a call!" << endl;
 
   m_doc = doc;
   m_listener = listener;
-  m_internalType = internalType;
   m_compareListener = compareListener;
   m_ecmaEventListener = ecmaEventListener;
+
+  KDOM_SAFE_SET(m_internalType, internalType);
 }
 
 // vim:ts=4:noet

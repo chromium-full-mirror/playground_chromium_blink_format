@@ -74,7 +74,7 @@ class CachedImage : public QObject, public CachedObject {
 
   bool isLoaded() const { return !m_loading; }
 
-  void setShowAnimations(KAnimationAdvice showAnimations);
+  void setShowAnimations(KDOMSettings::KAnimationAdvice showAnimations);
 
  protected:
   void clear();
@@ -112,7 +112,7 @@ class CachedImage : public QObject, public CachedObject {
   bool m_monochrome : 1;
   bool m_typeChecked : 1;
   bool m_isFullyTransparent : 1;
-  KAnimationAdvice m_showAnimations : 2;
+  KDOMSettings::KAnimationAdvice m_showAnimations : 2;
 };
 };
 

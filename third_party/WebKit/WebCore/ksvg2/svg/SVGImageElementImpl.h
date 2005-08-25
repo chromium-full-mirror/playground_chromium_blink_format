@@ -46,9 +46,9 @@ class SVGImageElementImpl : public SVGStyledElementImpl,
                             public SVGURIReferenceImpl,
                             public KDOM::CachedObjectClient {
  public:
-  SVGImageElementImpl(KDOM::DocumentImpl* doc,
+  SVGImageElementImpl(KDOM::DocumentPtr* doc,
                       KDOM::NodeImpl::Id id,
-                      const KDOM::DOMString& prefix);
+                      KDOM::DOMStringImpl* prefix);
   virtual ~SVGImageElementImpl();
 
   // 'SVGImageElement' functions

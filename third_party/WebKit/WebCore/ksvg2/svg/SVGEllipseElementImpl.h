@@ -37,9 +37,9 @@ class SVGEllipseElementImpl : public SVGStyledElementImpl,
                               public SVGExternalResourcesRequiredImpl,
                               public SVGTransformableImpl {
  public:
-  SVGEllipseElementImpl(KDOM::DocumentImpl* doc,
+  SVGEllipseElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGEllipseElementImpl();
 
   // 'SVGEllipseElement' functions

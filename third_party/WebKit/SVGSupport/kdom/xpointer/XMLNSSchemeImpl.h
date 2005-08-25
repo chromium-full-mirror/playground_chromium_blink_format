@@ -26,7 +26,6 @@
 #include <kdom/xpointer/impl/NBCImpl.h>
 
 namespace KDOM {
-class DOMString;
 
 namespace XPointer {
 class NBC;
@@ -38,7 +37,7 @@ class NBC;
  */
 class XMLNSSchemeImpl : public NBCImpl {
  public:
-  XMLNSSchemeImpl(const DOMString& schemeData, NBCImpl* nbc);
+  XMLNSSchemeImpl(DOMStringImpl* schemeData, NBCImpl* nbc);
   virtual ~XMLNSSchemeImpl();
 };
 };

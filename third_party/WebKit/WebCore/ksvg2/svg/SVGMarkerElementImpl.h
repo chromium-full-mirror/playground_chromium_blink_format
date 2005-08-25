@@ -44,9 +44,9 @@ class SVGMarkerElementImpl : public SVGStyledElementImpl,
                              public SVGExternalResourcesRequiredImpl,
                              public SVGFitToViewBoxImpl {
  public:
-  SVGMarkerElementImpl(KDOM::DocumentImpl* doc,
+  SVGMarkerElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGMarkerElementImpl();
 
   // Derived from: 'ElementImpl'

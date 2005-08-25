@@ -26,9 +26,8 @@
 #include <kdom/xpointer/impl/PointerPartImpl.h>
 
 namespace KDOM {
-class DOMString;
+
 class NodeImpl;
-class XPathExpressionImpl;
 
 namespace XPointer {
 class NBCImpl;
@@ -42,13 +41,13 @@ class XPointerResultImpl;
  */
 class XPath1SchemeImpl : public PointerPartImpl {
  public:
-  XPath1SchemeImpl(const DOMString& schemeData, NBCImpl* nbc);
+  XPath1SchemeImpl(DOMStringImpl* schemeData, NBCImpl* nbc);
   virtual ~XPath1SchemeImpl();
 
   virtual XPointerResultImpl* evaluate(NodeImpl* context) const;
 
- private:
-  XPathExpressionImpl* m_expr;
+  //	private:
+  //		XPathExpressionImpl *m_expr;
 };
 };
 };

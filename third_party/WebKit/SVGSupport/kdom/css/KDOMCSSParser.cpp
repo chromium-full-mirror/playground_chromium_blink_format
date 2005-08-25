@@ -75,8 +75,12 @@ KDOMCSSValueList::~KDOMCSSValueList() {
 #if DEBUG_CSS > 0
     kdDebug(6080) << "       value: (unit=" << values[i].unit << ")" << endl;
 #endif
-    if (values[i].unit == KDOMCSSValue::Function)
-      delete values[i].function;
+    if (values[i].unit == KDOMCSSValue::Function) {
+      if (values[i].function) {
+        delete values[i].function->args;
+        delete values[i].function;
+      }
+    }
   }
 
   free(values);
@@ -165,7 +169,10 @@ CDFInterface* CSSParser::interface() const {
   return m_cdfInterface;
 }
 
-void CSSParser::parseSheet(CSSStyleSheetImpl* sheet, const DOMString& string) {
+void CSSParser::parseSheet(CSSStyleSheetImpl* sheet,
+                           DOMStringImpl* stringImpl) {
+  DOMString string(stringImpl);
+
   styleElement = sheet;
 
   int length = string.length() + 3;
@@ -190,7 +197,9 @@ void CSSParser::parseSheet(CSSStyleSheetImpl* sheet, const DOMString& string) {
 }
 
 CSSRuleImpl* CSSParser::parseRule(CSSStyleSheetImpl* sheet,
-                                  const DOMString& string) {
+                                  DOMStringImpl* stringImpl) {
+  DOMString string(stringImpl);
+
   styleElement = sheet;
 
   const char khtml_rule[] = "@-khtml-rule{";
@@ -219,9 +228,11 @@ CSSRuleImpl* CSSParser::parseRule(CSSStyleSheetImpl* sheet,
 
 bool CSSParser::parseValue(CSSStyleDeclarationImpl* declaration,
                            int _id,
-                           const DOMString& string,
+                           DOMStringImpl* stringImpl,
                            bool _important,
                            bool _nonCSSHint) {
+  DOMString string(stringImpl);
+
 #if DEBUG_CSS > 0
   kdDebug(6080) << "CSSParser::parseValue: id=" << _id
                 << " important=" << _important << " nonCSSHint=" << _nonCSSHint
@@ -272,8 +283,10 @@ bool CSSParser::parseValue(CSSStyleDeclarationImpl* declaration,
 }
 
 bool CSSParser::parseDeclaration(CSSStyleDeclarationImpl* declaration,
-                                 const DOMString& string,
+                                 DOMStringImpl* stringImpl,
                                  bool _nonCSSHint) {
+  DOMString string(stringImpl);
+
 #if DEBUG_CSS > 0
   kdDebug(6080) << "CSSParser::parseDeclaration: nonCSSHint=" << nonCSSHint
                 << " value='" << string.string() << "'" << endl;
@@ -816,7 +829,8 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
             posOk[0] = false;  // after top only key words are allowed
 
           BACKGROUND_SKIP_CENTER(0)
-          pos[1] = new CSSPrimitiveValueImpl(m_cdfInterface, 0, CSS_PERCENTAGE);
+          pos[1] =
+              new CSSPrimitiveValueImpl(m_cdfInterface, 0.0, CSS_PERCENTAGE);
           break;
         }
         case CSS_VAL_BOTTOM: {
@@ -827,11 +841,12 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
 
           BACKGROUND_SKIP_CENTER(0)
           pos[1] =
-              new CSSPrimitiveValueImpl(m_cdfInterface, 100, CSS_PERCENTAGE);
+              new CSSPrimitiveValueImpl(m_cdfInterface, 100.0, CSS_PERCENTAGE);
           break;
         }
         case CSS_VAL_LEFT: {
-          pos[0] = new CSSPrimitiveValueImpl(m_cdfInterface, 0, CSS_PERCENTAGE);
+          pos[0] =
+              new CSSPrimitiveValueImpl(m_cdfInterface, 0.0, CSS_PERCENTAGE);
           pos[1] = parseBackgroundPositionXY(CSS_PROP_BACKGROUND_POSITION_Y,
                                              true, posOk[1]);
 
@@ -841,7 +856,7 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
         }
         case CSS_VAL_RIGHT: {
           pos[0] =
-              new CSSPrimitiveValueImpl(m_cdfInterface, 100, CSS_PERCENTAGE);
+              new CSSPrimitiveValueImpl(m_cdfInterface, 100.0, CSS_PERCENTAGE);
           pos[1] = parseBackgroundPositionXY(CSS_PROP_BACKGROUND_POSITION_Y,
                                              true, posOk[1]);
 
@@ -912,7 +927,8 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
       }
 
       if (!pos[0])
-        pos[0] = new CSSPrimitiveValueImpl(m_cdfInterface, 50, CSS_PERCENTAGE);
+        pos[0] =
+            new CSSPrimitiveValueImpl(m_cdfInterface, 50.0, CSS_PERCENTAGE);
       else if (pos[0]->primitiveType() == CSS_IDENT) {
         // map the values to percentages
         id = pos[0]->getIdent();
@@ -921,17 +937,17 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
         switch (id) {
           case CSS_VAL_LEFT: {
             pos[0] =
-                new CSSPrimitiveValueImpl(m_cdfInterface, 0, CSS_PERCENTAGE);
+                new CSSPrimitiveValueImpl(m_cdfInterface, 0.0, CSS_PERCENTAGE);
             break;
           }
           case CSS_VAL_CENTER: {
             pos[0] =
-                new CSSPrimitiveValueImpl(m_cdfInterface, 50, CSS_PERCENTAGE);
+                new CSSPrimitiveValueImpl(m_cdfInterface, 50.0, CSS_PERCENTAGE);
             break;
           }
           case CSS_VAL_RIGHT: {
-            pos[0] =
-                new CSSPrimitiveValueImpl(m_cdfInterface, 100, CSS_PERCENTAGE);
+            pos[0] = new CSSPrimitiveValueImpl(m_cdfInterface, 100.0,
+                                               CSS_PERCENTAGE);
             break;
           }
           default: {
@@ -943,7 +959,7 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
 
         if (!pos[1])
           pos[1] =
-              new CSSPrimitiveValueImpl(m_cdfInterface, 50, CSS_PERCENTAGE);
+              new CSSPrimitiveValueImpl(m_cdfInterface, 50.0, CSS_PERCENTAGE);
         else if (pos[1]->primitiveType() == CSS_IDENT) {
           // map the values to percentages
           id = pos[1]->getIdent();
@@ -951,17 +967,17 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
 
           switch (id) {
             case CSS_VAL_TOP: {
-              pos[1] =
-                  new CSSPrimitiveValueImpl(m_cdfInterface, 0, CSS_PERCENTAGE);
+              pos[1] = new CSSPrimitiveValueImpl(m_cdfInterface, 0.0,
+                                                 CSS_PERCENTAGE);
               break;
             }
             case CSS_VAL_CENTER: {
-              pos[1] =
-                  new CSSPrimitiveValueImpl(m_cdfInterface, 50, CSS_PERCENTAGE);
+              pos[1] = new CSSPrimitiveValueImpl(m_cdfInterface, 50.0,
+                                                 CSS_PERCENTAGE);
               break;
             }
             case CSS_VAL_BOTTOM: {
-              pos[1] = new CSSPrimitiveValueImpl(m_cdfInterface, 100,
+              pos[1] = new CSSPrimitiveValueImpl(m_cdfInterface, 100.0,
                                                  CSS_PERCENTAGE);
               break;
             }
@@ -1071,11 +1087,11 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
         valueList->next();
       } else if (value->unit == CSS_URI) {
         // ### allow string in non strict mode?
-        DOMString uri = Helper::parseURL(domString(value->string));
-        if (!uri.isEmpty()) {
+        DOMStringImpl* uri = Helper::parseURL(domString(value->string));
+        if (uri && !uri->isEmpty()) {
           parsedValue = new CSSImageValueImpl(
-              m_cdfInterface, KURL(styleElement->baseURL(), uri.string()).url(),
-              styleElement);
+              m_cdfInterface,
+              KURL(styleElement->baseURL(), uri->string()).url(), styleElement);
           valueList->next();
 
           // kdDebug( 6080 ) << "image, url=" << uri.string() << " base=" <<
@@ -1604,7 +1620,7 @@ bool CSSParser::parseCounter(int propId, bool increment, bool important) {
   enum { ID, VAL } state = ID;
 
   CSSValueListImpl* list = new CSSValueListImpl();
-  DOMString c;
+  DOMStringImpl* c = 0;
   KDOMCSSValue* val;
   while (true) {
     val = valueList->current();
@@ -1612,7 +1628,8 @@ bool CSSParser::parseCounter(int propId, bool increment, bool important) {
     switch (state) {
       case ID: {
         if (val && val->unit == CSS_IDENT) {
-          c = qString(val->string);
+          c = domString(val->string);
+          c = c->copy();
           state = VAL;
           valueList->next();
           continue;
@@ -1660,9 +1677,10 @@ bool CSSParser::parseContent(int propId, bool important) {
   while ((val = valueList->current())) {
     if (val->unit == CSS_URI) {
       // url
-      DOMString value = Helper::parseURL(domString(val->string));
+      DOMStringImpl* value = Helper::parseURL(domString(val->string));
       parsedValue = new CSSImageValueImpl(
-          m_cdfInterface, KURL(styleElement->baseURL(), value.string()).url(),
+          m_cdfInterface,
+          KURL(styleElement->baseURL(), DOMString(value).string()).url(),
           styleElement);
       // kdDebug(6080) << "content, url=" << value.string() << " base=" <<
       // styleElement->baseURL().url() << endl;
@@ -2252,8 +2270,8 @@ struct ShadowParseContext {
   }
 
   void commitLength(KDOMCSSValue* v) {
-    CSSPrimitiveValueImpl* val = new CSSPrimitiveValueImpl(
-        interface, v->fValue, (KDOM::UnitTypes)v->unit);
+    CSSPrimitiveValueImpl* val =
+        new CSSPrimitiveValueImpl(interface, v->fValue, (UnitTypes)v->unit);
     if (allowX) {
       x = val;
       allowX = false;

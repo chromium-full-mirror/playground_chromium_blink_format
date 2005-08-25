@@ -20,14 +20,12 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include <kdom/Shared.h>
-#include "ScriptInterpreter.h"
+#include "Shared.h"
 
 using namespace KDOM;
 
-Shared::Shared(bool baseClass) {
+Shared::Shared() {
   m_ref = 0;
-  m_baseClass = baseClass;
 }
 
 Shared::~Shared() {}
@@ -40,12 +38,8 @@ void Shared::deref() {
   if (m_ref)
     m_ref--;
 
-  if (!m_ref) {
-    if (m_baseClass)
-      ScriptInterpreter::forgetDOMObject(this);
-
+  if (!m_ref)
     delete this;
-  }
 }
 
 int Shared::refCount() const {

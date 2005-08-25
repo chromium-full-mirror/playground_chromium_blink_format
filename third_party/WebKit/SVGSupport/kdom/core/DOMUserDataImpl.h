@@ -24,8 +24,6 @@
 #define KDOM_DOMUserDataImpl_H
 
 #include <kdom/Shared.h>
-#include <kdom/DOMUserData.h>
-#include <kdom/ecma/DOMLookup.h>
 
 namespace KJS {
 class Value;
@@ -50,86 +48,95 @@ class DOMUserDataImpl : public Shared {
 };
 
 // template specialization - for comparing with boolean
-template <>
-class DOMBridge<DOMUserData> : public KJS::ObjectImp {
- public:
-  // Example: T=Element, it's impl class is called ElementImpl, and a synonym
-  // for it is Element::Private
-  DOMBridge(KJS::ExecState* exec, DOMUserDataImpl* impl)
-      : KJS::ObjectImp(DOMUserData(impl).prototype(exec)), m_impl(impl) {
-    Shared* sharedImpl = dynamic_cast<Shared*>(m_impl);
-    if (sharedImpl)
-      sharedImpl->ref();
-  }
 
-  ~DOMBridge() {
-    Shared* sharedImpl = dynamic_cast<Shared*>(m_impl);
-    if (sharedImpl)
-      sharedImpl->deref();
-  }
+/* FIXME - Think about this in the new ecma system
+        template<>
+        class DOMBridge<DOMUserData> : public KJS::ObjectImp
+        {
+        public:
+                // Example: T=Element, it's impl class is called ElementImpl,
+   and a synonym for it is Element::Private
+                DOMBridge(KJS::ExecState *exec, DOMUserDataImpl *impl) :
+   KJS::ObjectImp(DOMUserData(impl).prototype(exec)), m_impl(impl)
+                {
+                        Shared *sharedImpl = dynamic_cast<Shared *>(m_impl);
+                        if(sharedImpl)
+                                sharedImpl->ref();
+                }
 
-  DOMUserDataImpl* impl() const { return m_impl; }
+                ~DOMBridge()
+                {
+                        Shared *sharedImpl = dynamic_cast<Shared *>(m_impl);
+                        if(sharedImpl)
+                                sharedImpl->deref();
+                }
 
-  virtual KJS::ValueImp* get(KJS::ExecState* exec,
-                             const KJS::Identifier& propertyName) const {
-    kdDebug(26004) << "DOMBridge::get(), " << propertyName.qstring()
-                   << " Name: " << classInfo()->className
-                   << " Object: " << this->m_impl << endl;
+                DOMUserDataImpl *impl() const { return m_impl; }
 
-    // Look for standard properties (e.g. those in the hashtables)
-    DOMUserData obj(m_impl);
-    KJS::ValueImp* val = obj.get(exec, propertyName, this);
+                virtual KJS::ValueImp *get(KJS::ExecState *exec, const
+   KJS::Identifier &propertyName) const
+                {
+                        kdDebug(26004) << "DOMBridge::get(), " <<
+   propertyName.qstring() << " Name: " << classInfo()->className << " Object: "
+   << this->m_impl << endl;
 
-    if (val->type() != KJS::UndefinedType)
-      return val;
+                        // Look for standard properties (e.g. those in the
+   hashtables)
+                        DOMUserData obj(m_impl);
+                        KJS::ValueImp *val = obj.get(exec, propertyName, this);
 
-    // Not found -> forward to ObjectImp.
-    val = KJS::ObjectImp::get(exec, propertyName);
-    if (val->type() == KJS::UndefinedType)
-      kdDebug(26004) << "WARNING: " << propertyName.qstring()
-                     << " not found in... Name: " << classInfo()->className
-                     << " Object: " << m_impl
-                     << " on line : " << exec->context().curStmtFirstLine()
-                     << endl;
+                        if(val->type() != KJS::UndefinedType)
+                                return val;
 
-    return val;
-  }
+                        // Not found -> forward to ObjectImp.
+                        val = KJS::ObjectImp::get(exec, propertyName);
+                        if(val->type() == KJS::UndefinedType)
+                                kdDebug(26004) << "WARNING: " <<
+   propertyName.qstring() << " not found in... Name: " << classInfo()->className
+   << " Object: " << m_impl << " on line : " <<
+   exec->context().curStmtFirstLine() << endl;
 
-  virtual bool hasProperty(KJS::ExecState* exec,
-                           const KJS::Identifier& propertyName) const {
-    kdDebug(26004) << "DOMBridge::hasProperty(), " << propertyName.qstring()
-                   << " Name: " << classInfo()->className
-                   << " Object: " << m_impl << endl;
+                        return val;
+                }
 
-    DOMUserData obj(m_impl);
-    if (obj.hasProperty(exec, propertyName))
-      return true;
+                virtual bool hasProperty(KJS::ExecState *exec, const
+   KJS::Identifier &propertyName) const
+                {
+                        kdDebug(26004) << "DOMBridge::hasProperty(), " <<
+   propertyName.qstring() << " Name: " << classInfo()->className << " Object: "
+   << m_impl << endl;
 
-    return KJS::ObjectImp::hasProperty(exec, propertyName);
-  }
+                        DOMUserData obj(m_impl);
+                        if(obj.hasProperty(exec, propertyName))
+                                return true;
 
-  virtual const KJS::ClassInfo* classInfo() const {
-    return &DOMUserData::s_classInfo;
-  }
-  virtual KJS::ValueImp* toPrimitive(KJS::ExecState*,
-                                     KJS::Type = KJS::UndefinedType) const {
-    kdDebug() << k_funcinfo << endl;
-    if (m_impl && (*((bool*)(m_impl->userData()))))
-      return KJS::String("true");
-    else
-      return KJS::String("false");
-  }
-  virtual bool toBoolean(KJS::ExecState*) const {
-    kdDebug() << k_funcinfo << endl;
-    if (m_impl && (*((bool*)(m_impl->userData()))))
-      return true;
-    else
-      return false;
-  }
+                        return KJS::ObjectImp::hasProperty(exec, propertyName);
+                }
 
- protected:
-  DOMUserDataImpl* m_impl;
-};
+                virtual const KJS::ClassInfo *classInfo() const { return
+   &DOMUserData::s_classInfo; }
+                virtual KJS::ValueImp *toPrimitive(KJS::ExecState *, KJS::Type =
+   KJS::UndefinedType) const
+                {
+                        kdDebug() << k_funcinfo << endl;
+                        if(m_impl && (*((bool *)(m_impl->userData()))))
+                                return KJS::String("true");
+                        else
+                                return KJS::String("false");
+                }
+                virtual bool toBoolean(KJS::ExecState *) const
+                {
+                        kdDebug() << k_funcinfo << endl;
+                        if(m_impl && (*((bool *)(m_impl->userData()))))
+                                return true;
+                        else
+                                return false;
+                }
+
+        protected:
+                DOMUserDataImpl *m_impl;
+        };
+*/
 };
 
 #endif

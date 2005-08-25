@@ -36,9 +36,9 @@ class SVGDefsElementImpl : public SVGStyledElementImpl,
                            public SVGExternalResourcesRequiredImpl,
                            public SVGTransformableImpl {
  public:
-  SVGDefsElementImpl(KDOM::DocumentImpl* doc,
+  SVGDefsElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGDefsElementImpl();
 
   // Derived from: 'SVGStyledElementImpl'

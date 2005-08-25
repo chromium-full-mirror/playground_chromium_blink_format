@@ -44,9 +44,9 @@
 using namespace KSVG;
 
 SVGFEColorMatrixElementImpl::SVGFEColorMatrixElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
   m_in1 = 0;
   m_type = 0;
@@ -94,7 +94,7 @@ void SVGFEColorMatrixElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
       break;
     }
     case ATTR_IN: {
-      in1()->setBaseVal(value.implementation());
+      in1()->setBaseVal(value.handle());
       break;
     }
     case ATTR_VALUES: {

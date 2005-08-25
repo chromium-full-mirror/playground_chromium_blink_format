@@ -43,11 +43,7 @@ CSSStyleRuleImpl::~CSSStyleRuleImpl() {
   delete m_selector;
 }
 
-void CSSStyleRuleImpl::setSelectorText(const DOMString&) {
-  // FIXME!
-}
-
-DOMString CSSStyleRuleImpl::selectorText() const {
+DOMStringImpl* CSSStyleRuleImpl::selectorText() const {
   if (m_selector && m_selector->first()) {
     // ### m_selector will be a single selector hopefully. so ->first() will
     // disappear
@@ -56,7 +52,11 @@ DOMString CSSStyleRuleImpl::selectorText() const {
     return cs->selectorText();
   }
 
-  return DOMString();
+  return 0;
+}
+
+void CSSStyleRuleImpl::setSelectorText(DOMStringImpl*) {
+  // FIXME!
 }
 
 bool CSSStyleRuleImpl::parseString(const DOMString&, bool) {

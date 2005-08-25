@@ -37,9 +37,9 @@
 using namespace KSVG;
 
 SVGComponentTransferFunctionElementImpl::
-    SVGComponentTransferFunctionElementImpl(KDOM::DocumentImpl* doc,
+    SVGComponentTransferFunctionElementImpl(KDOM::DocumentPtr* doc,
                                             KDOM::NodeImpl::Id id,
-                                            const KDOM::DOMString& prefix)
+                                            KDOM::DOMStringImpl* prefix)
     : SVGElementImpl(doc, id, prefix) {
   m_type = 0;
   m_tableValues = 0;
@@ -131,23 +131,23 @@ void SVGComponentTransferFunctionElementImpl::parseAttribute(
       break;
     }
     case ATTR_SLOPE: {
-      slope()->baseVal()->setValue(value.string().toFloat());
+      slope()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_INTERCEPT: {
-      intercept()->baseVal()->setValue(value.string().toFloat());
+      intercept()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_AMPLITUDE: {
-      amplitude()->baseVal()->setValue(value.string().toFloat());
+      amplitude()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_EXPONENT: {
-      exponent()->baseVal()->setValue(value.string().toFloat());
+      exponent()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_OFFSET: {
-      offset()->baseVal()->setValue(value.string().toFloat());
+      offset()->setBaseVal(value.string().toFloat());
       break;
     }
     default: { SVGElementImpl::parseAttribute(attr); }

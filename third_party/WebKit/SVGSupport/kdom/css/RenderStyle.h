@@ -35,7 +35,7 @@
 #include <kdom/css/impl/CSSValueListImpl.h>
 
 namespace KDOM {
-class RenderStyle : public KDOM::Shared {
+class RenderStyle : public Shared {
  public:
   // static pseudo styles. Dynamic ones are produced on the fly.
   enum PseudoId {
@@ -662,11 +662,11 @@ class RenderStyle : public KDOM::Shared {
   void addCounterReset(CounterActImpl* c);
   void addCounterIncrement(CounterActImpl* c);
 
-  bool hasCounterReset(const DOMString& c) const;
-  bool hasCounterIncrement(const DOMString& c) const;
+  bool hasCounterReset(DOMStringImpl* c) const;
+  bool hasCounterIncrement(DOMStringImpl* c) const;
 
-  short counterReset(const DOMString& c) const;
-  short counterIncrement(const DOMString& c) const;
+  short counterReset(DOMStringImpl* c) const;
+  short counterIncrement(DOMStringImpl* c) const;
 
   // pseudo style (needs to be accessed by 'CSSStyleSelector')
   RenderStyle* pseudoStyle;
@@ -770,7 +770,7 @@ class RenderStyle : public KDOM::Shared {
   CSSValueListImpl* counter_increment;
 
  private:
-  RenderStyle(const RenderStyle*) : KDOM::Shared(false) {}
+  RenderStyle(const RenderStyle*) : Shared() {}
 
   void setBitDefaults() {
     inherited_flags.f._emptyCells = initialEmptyCells();

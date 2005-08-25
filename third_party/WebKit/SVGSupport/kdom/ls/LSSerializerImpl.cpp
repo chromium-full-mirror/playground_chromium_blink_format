@@ -25,6 +25,7 @@
 
 #include <kurl.h>
 
+#include "kdom.h"
 #include "kdomls.h"
 #include <kdom/Helper.h>
 #include "NodeImpl.h"
@@ -41,14 +42,13 @@
 #include "NamedNodeMapImpl.h"
 #include "NamedAttrMapImpl.h"
 #include "DocumentTypeImpl.h"
-#include "DOMConfiguration.h"
 #include "DOMConfigurationImpl.h"
 #include "ProcessingInstructionImpl.h"
 
 using namespace KDOM;
 
 LSSerializerImpl::LSSerializerImpl()
-    : Shared(true), m_config(0), m_serializerFilter(0) {
+    : Shared(), m_config(0), m_serializerFilter(0) {
   m_newLine = new DOMStringImpl("\n");
   m_newLine->ref();
 }
@@ -75,14 +75,8 @@ DOMString LSSerializerImpl::newLine() const {
   return DOMString(m_newLine);
 }
 
-void LSSerializerImpl::setNewLine(const DOMString& newLine) {
-  if (m_newLine)
-    m_newLine->deref();
-
-  m_newLine = newLine.implementation();
-
-  if (m_newLine)
-    m_newLine->ref();
+void LSSerializerImpl::setNewLine(DOMStringImpl* newLine) {
+  KDOM_SAFE_SET(m_newLine, newLine);
 }
 
 LSSerializerFilterImpl* LSSerializerImpl::filter() const {
@@ -97,8 +91,8 @@ void LSSerializerImpl::setFilter(LSSerializerFilterImpl* filter) {
 bool LSSerializerImpl::serialize(NodeImpl* nodeArg,
                                  LSOutputImpl* output) const {
 #ifndef APPLE_COMPILE_HACK
-  if (output && !output->systemId().isEmpty()) {
-    KURL url = KURL(output->systemId().string());
+  if (output && output->systemId() && !output->systemId()->isEmpty()) {
+    KURL url = KURL(output->systemId()->string());
     if (!url.isEmpty() && url.isLocalFile()) {
       QFile f(url.path());
       if (f.open(IO_WriteOnly)) {
@@ -124,7 +118,7 @@ bool LSSerializerImpl::write(NodeImpl* nodeArg, LSOutputImpl* output) {
   return serialize(nodeArg, output);
 }
 
-bool LSSerializerImpl::writeToURI(NodeImpl* nodeArg, const DOMString& uri) {
+bool LSSerializerImpl::writeToURI(NodeImpl* nodeArg, DOMStringImpl* uri) {
   LSOutputImpl output;
   output.setSystemId(uri);
   return serialize(nodeArg, &output);
@@ -153,45 +147,49 @@ void LSSerializerImpl::PrintInternalSubset(QTextStream& ret,
 
     EntityImpl* ent = static_cast<EntityImpl*>(entities->item(i));
 
-    ret << QString::fromLatin1("<!ENTITY %1").arg(ent->nodeName().string());
-    if (!ent->publicId().isEmpty()) {
+    ret << QString::fromLatin1("<!ENTITY %1")
+               .arg(DOMString(ent->nodeName()).string());
+    if (ent->publicId() && !ent->publicId()->isEmpty()) {
       ret << QString::fromLatin1(" PUBLIC \"%1\"")
-                 .arg(ent->publicId().string());
-      if (!ent->systemId().isEmpty())
-        ret << QString::fromLatin1(" \"%1\"").arg(ent->systemId().string());
-      if (!ent->notationName().isEmpty())
+                 .arg(DOMString(ent->publicId()).string());
+      if (ent->systemId() && !ent->systemId()->isEmpty())
+        ret << QString::fromLatin1(" \"%1\"").arg(
+            DOMString(ent->systemId()).string());
+      if (ent->notationName() && !ent->notationName()->isEmpty())
         ret << QString::fromLatin1(" NDATA \"%1\"")
-                   .arg(ent->notationName().string());
+                   .arg(DOMString(ent->notationName()).string());
       ret << QString::fromLatin1(">\n");
-    } else if (!ent->systemId().isEmpty()) {
+    } else if (ent->systemId() && !ent->systemId()->isEmpty()) {
       ret << QString::fromLatin1(" SYSTEM \"%1\"")
-                 .arg(ent->systemId().string());
-      if (!ent->notationName().isEmpty())
+                 .arg(DOMString(ent->systemId()).string());
+      if (ent->notationName() && !ent->notationName()->isEmpty())
         ret << QString::fromLatin1(" NDATA \"%1\"")
-                   .arg(ent->notationName().string());
+                   .arg(DOMString(ent->notationName()).string());
       ret << QString::fromLatin1(">\n");
     } else {
       NodeImpl* entImpl = static_cast<NodeImpl*>(ent);
       ret << QString::fromLatin1(" \"%1\">\n")
-                 .arg(entImpl->toString().string().remove('\n'));
+                 .arg(DOMString(entImpl->toString()).string().remove('\n'));
     }
   }
+
   for (unsigned long i = 0; i < nrNotations; i++) {
     if (prettyIndent)
       PrintIndentation(ret, level, indentStr);
 
     NotationImpl* notation = static_cast<NotationImpl*>(notations->item(i));
 
-    if (notation->publicId().isEmpty())
-      ret << QString::fromLatin1("<!NOTATION ") +
-                 notation->nodeName().string() +
+    if (!notation->publicId() || notation->publicId()->isEmpty()) {
+      ret << QString::fromLatin1("<!NOTATION ")
+          << DOMString(notation->nodeName()).string() +
                  QString::fromLatin1(" SYSTEM \"%1\">\n")
-                     .arg(notation->systemId().string());
-    else
-      ret << QString::fromLatin1("<!NOTATION ") +
-                 notation->nodeName().string() +
+                     .arg(DOMString(notation->systemId()).string());
+    } else {
+      ret << QString::fromLatin1("<!NOTATION ")
+          << DOMString(notation->nodeName()).string() +
                  QString::fromLatin1(" PUBLIC \"%1\">\n")
-                     .arg(notation->publicId().string());
+                     .arg(DOMString(notation->publicId()).string());
+    }
   }
 }
 
@@ -211,13 +209,14 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
       DocumentImpl* document = static_cast<DocumentImpl*>(node);
 
       if (!config || config->getParameter(FEATURE_XML_DECLARATION)) {
-        ret << "<?xml version=\"" << document->xmlVersion().string() << "\"";
+        ret << "<?xml version=\"" << DOMString(document->xmlVersion()).string()
+            << "\"";
 
-        DOMString encoding = document->xmlEncoding();
+        DOMString encoding(document->xmlEncoding());
         if (!encoding.isEmpty())
           ret << " encoding=\"" << encoding.string() << "\"";
 
-        if (document->standalone())
+        if (document->xmlStandalone())
           ret << " standalone='yes'";
 
         ret << "?>" << newLine;
@@ -233,49 +232,56 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
       PrintIndentation(ret, level, indentStr);
 
       DocumentTypeImpl* docType = static_cast<DocumentTypeImpl*>((node));
-      if (docType->publicId().isEmpty()) {
-        if (docType->systemId().isEmpty())
-          ret << QString::fromLatin1("<!DOCTYPE ") +
-                     docType->nodeName().string();
-        else
-          ret << QString::fromLatin1("<!DOCTYPE ") +
-                     docType->nodeName().string() +
-                     QString::fromLatin1(" SYSTEM \"") +
-                     docType->systemId().string() + QString::fromLatin1("\"") +
-                     newLine;
-      } else
-        ret << QString::fromLatin1("<!DOCTYPE ") +
-                   docType->nodeName().string() +
-                   QString::fromLatin1(" PUBLIC \"") +
-                   docType->publicId().string() + QString::fromLatin1("\" \"") +
-                   docType->systemId().string() + QString::fromLatin1("\"") +
-                   newLine;
+      if (!docType->publicId() || docType->publicId()->isEmpty()) {
+        if (!docType->systemId() || docType->systemId()->isEmpty()) {
+          ret << QString::fromLatin1("<!DOCTYPE ")
+              << DOMString(docType->nodeName()).string();
+        } else {
+          ret << QString::fromLatin1("<!DOCTYPE ")
+              << DOMString(docType->nodeName()).string()
+              << QString::fromLatin1(" SYSTEM \"")
+              << DOMString(docType->systemId()).string()
+              << QString::fromLatin1("\"") << newLine;
+        }
+      } else {
+        ret << QString::fromLatin1("<!DOCTYPE ")
+            << DOMString(docType->nodeName()).string()
+            << QString::fromLatin1(" PUBLIC \"")
+            << DOMString(docType->publicId()).string()
+            << QString::fromLatin1("\" \"")
+            << DOMString(docType->systemId()).string()
+            << QString::fromLatin1("\"") << newLine;
+      }
 
       // handle entities + notations
       NamedNodeMapImpl* entities = docType->entities();
-      NamedNodeMapImpl* notations = docType->notations();
       unsigned long nrEntities = entities->length();
+
+      NamedNodeMapImpl* notations = docType->notations();
       unsigned long nrNotations = notations->length();
+
       if (nrEntities + nrNotations > 0) {
         ret << "[" << newLine;
         PrintInternalSubset(ret, docType, prettyIndent, level + 1, indentStr);
         ret << "]" << newLine;
       }
+
       ret << ">" << newLine;
       break;
     }
     case TEXT_NODE: {
       if (acceptNode() == FILTER_ACCEPT)
-        ret << escape(node->nodeValue()).string();
+        ret << DOMString(escape(node->nodeValue())).string();
       break;
     }
     case CDATA_SECTION_NODE: {
       if ((!config || config->getParameter(FEATURE_CDATA_SECTIONS)) &&
           acceptNode() == FILTER_ACCEPT) {
-        ret << QString::fromLatin1("<![CDATA[") + node->nodeValue().string();
+        ret << QString::fromLatin1("<![CDATA[") +
+                   DOMString(node->nodeValue()).string();
         ret << QString::fromLatin1("]]>");
       } else
-        ret << node->nodeValue().string();
+        ret << DOMString(node->nodeValue()).string();
 
       if (prettyIndent)
         ret << newLine;
@@ -287,7 +293,8 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
         if (prettyIndent)
           PrintIndentation(ret, level, indentStr);
 
-        ret << QString::fromLatin1("<!--") + node->nodeValue().string() +
+        ret << QString::fromLatin1("<!--") +
+                   DOMString(node->nodeValue()).string() +
                    QString::fromLatin1("-->");
 
         if (prettyIndent)
@@ -301,8 +308,8 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
 
       ProcessingInstructionImpl* pi =
           static_cast<ProcessingInstructionImpl*>(node);
-      ret << QString::fromLatin1("<?") + pi->target().string() +
-                 QString::fromLatin1(" ") + pi->data().string() +
+      ret << QString::fromLatin1("<?") + DOMString(pi->target()).string() +
+                 QString::fromLatin1(" ") + DOMString(pi->data()).string() +
                  QString::fromLatin1("?>");
 
       if (prettyIndent)
@@ -329,20 +336,23 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
       break;
     }
     case ATTRIBUTE_NODE: {
-      bool isNsDecl = (node->namespaceURI() == NS_XMLNS &&
+      bool isNsDecl = (DOMString(node->namespaceURI()) == NS_XMLNS &&
                        (config && config->getParameter(FEATURE_NAMESPACES)));
       if (!isNsDecl &&
-          (!config || config->getParameter(FEATURE_NAMESPACE_DECLARATIONS)))
-        ret << node->nodeName().string() << QString::fromLatin1("=\"")
-            << escapeAttribute(node->nodeValue()).string()
+          (!config || config->getParameter(FEATURE_NAMESPACE_DECLARATIONS))) {
+        ret << DOMString(node->nodeName()).string()
+            << QString::fromLatin1("=\"")
+            << DOMString(escapeAttribute(node->nodeValue())).string()
             << QString::fromLatin1("\"");
+      }
+
       break;
     }
     default: {
       if (prettyIndent)
         PrintIndentation(ret, level, indentStr);
 
-      ret << QString::fromLatin1("<") + node->nodeName().string();
+      ret << QString::fromLatin1("<") + DOMString(node->nodeName()).string();
 
       // Print attributes
       NamedNodeMapImpl* map = node->attributes();
@@ -350,13 +360,15 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
 
       for (unsigned int i = 0; i < nrAttrs; ++i) {
         NodeImpl* n = map->item(i);
-        bool isNsDecl = (node->namespaceURI() == NS_XMLNS &&
+        bool isNsDecl = (DOMString(node->namespaceURI()) == NS_XMLNS &&
                          (config && config->getParameter(FEATURE_NAMESPACES)));
         if (n && !isNsDecl &&
-            (!config || config->getParameter(FEATURE_NAMESPACE_DECLARATIONS)))
-          ret << QString::fromLatin1(" ") + n->nodeName().string() +
-                     QString::fromLatin1("=\"") + n->nodeValue().string() +
-                     QString::fromLatin1("\"");
+            (!config || config->getParameter(FEATURE_NAMESPACE_DECLARATIONS))) {
+          ret << QString::fromLatin1(" ") << DOMString(n->nodeName()).string()
+              << QString::fromLatin1("=\"")
+              << DOMString(n->nodeValue()).string()
+              << QString::fromLatin1("\"");
+        }
       }
 
       if (node->firstChild() == 0)  // No children
@@ -369,8 +381,9 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
       {
         ret << ">";
         if (prettyIndent && node->firstChild()->nodeType() != TEXT_NODE &&
-            node->firstChild()->nodeType() != CDATA_SECTION_NODE)
+            node->firstChild()->nodeType() != CDATA_SECTION_NODE) {
           ret << newLine;
+        }
 
         bool indent = false;
 
@@ -384,8 +397,8 @@ void LSSerializerImpl::PrintNode(QTextStream& ret,
         if (prettyIndent && indent)
           PrintIndentation(ret, level, indentStr);
 
-        ret << QString::fromLatin1("</") + node->nodeName().string() +
-                   QString::fromLatin1(">");
+        ret << QString::fromLatin1("</") << DOMString(node->nodeName()).string()
+            << QString::fromLatin1(">");
 
         if (prettyIndent)
           ret << newLine;
@@ -401,42 +414,46 @@ void LSSerializerImpl::PrintIndentation(QTextStream& ret,
     ret << indent;
 }
 
-DOMString LSSerializerImpl::escape(const DOMString& escapee) {
-  DOMString result;
+DOMStringImpl* LSSerializerImpl::escape(DOMStringImpl* escapeeImpl) {
+  DOMString escapee(escapeeImpl);
+
+  DOMStringImpl* result = new DOMStringImpl();
   const unsigned int length = escapee.length();
 
   for (unsigned int i = 0; i < length; ++i) {
     if (escapee[i] == '<')
-      result += "&lt;";
+      result->append("&lt;");
     else if (escapee[i] == '>')
-      result += "&gt;";
+      result->append("&gt;");
     else if (escapee[i] == '&')
-      result += "&amp;";
+      result->append("&amp;");
     else
-      result += DOMString(escapee[i]);
+      result->append(escapee[i]);
   }
 
   return result;
 }
 
-DOMString LSSerializerImpl::escapeAttribute(const DOMString& escapee) {
+DOMStringImpl* LSSerializerImpl::escapeAttribute(DOMStringImpl* escapeeImpl) {
+  DOMString escapee(escapeeImpl);
+
   /* Loop copied from escape() in order to save one iteration. */
-  DOMString result;
+  DOMStringImpl* result = new DOMStringImpl();
   const unsigned int length = escapee.length();
 
   for (unsigned int i = 0; i < length; ++i) {
     if (escapee[i] == '<')
-      result += "&lt;";
+      result->append("&lt;");
     else if (escapee[i] == '>')
-      result += "&gt;";
+      result->append("&gt;");
     else if (escapee[i] == '&')
-      result += "&amp;";
+      result->append("&amp;");
     else if (escapee[i] == '\"')
-      result += "&quot;";
+      result->append("&quot;");
     else if (escapee[i] == '\'')
-      result += "&apos;";
+      result->append("&apos;");
     else
-      result += DOMString(escapee[i]);
+      result->append(escapee[i]);
   }
 
   return result;

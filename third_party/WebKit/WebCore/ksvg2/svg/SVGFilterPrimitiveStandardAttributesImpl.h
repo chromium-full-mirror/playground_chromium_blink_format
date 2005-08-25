@@ -27,19 +27,15 @@
 
 class KCanvasFilterEffect;
 
-namespace KDOM {
-class AttributeImpl;
-};
-
 namespace KSVG {
 class SVGAnimatedLengthImpl;
 class SVGAnimatedStringImpl;
 
 class SVGFilterPrimitiveStandardAttributesImpl : public SVGStyledElementImpl {
  public:
-  SVGFilterPrimitiveStandardAttributesImpl(KDOM::DocumentImpl* doc,
+  SVGFilterPrimitiveStandardAttributesImpl(KDOM::DocumentPtr* doc,
                                            KDOM::NodeImpl::Id id,
-                                           const KDOM::DOMString& prefix);
+                                           KDOM::DOMStringImpl* prefix);
   virtual ~SVGFilterPrimitiveStandardAttributesImpl();
 
   // 'SVGFilterPrimitiveStandardAttributes' functions

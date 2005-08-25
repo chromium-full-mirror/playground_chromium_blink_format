@@ -159,7 +159,7 @@ class CSSStyleSelector : public StyleSelector {
     return numProps;
   }
 
-  DOMString getLangAttribute(ElementImpl* e);
+  DOMStringImpl* getLangAttribute(ElementImpl* e);
 
   // Helper function (used for instance by khtml's HTMLCSSStyleSelector)
   static Length convertToLength(CSSPrimitiveValueImpl* primitiveValue,
@@ -177,11 +177,11 @@ class CSSStyleSelector : public StyleSelector {
   CSSStyleSelectorList* userStyle;
   CSSStyleSheetImpl* userSheet;
 
- private:
-  void init(const KDOMSettings* settings);
-
  protected:
   static QColor colorForCSSValue(int css_value);  // Helper
+
+ private:
+  void init(const KDOMSettings* settings);
 
  public:  // we need to make the enum public for SelectorCache
   enum SelectorState { Unknown = 0, Applies, AppliesPseudo, Invalid };
@@ -308,7 +308,7 @@ class CSSStyleSelectorList : public QPtrList<CSSOrderedRule> {
   CSSStyleSelectorList();
   virtual ~CSSStyleSelectorList();
 
-  void append(CSSStyleSheetImpl* sheet, const DOMString& medium = "screen");
+  void append(CSSStyleSheetImpl* sheet, DOMStringImpl* medium);
   void collect(QPtrList<CSSSelector>* selectorList,
                CSSOrderedPropertyList* propList,
                Source regular,

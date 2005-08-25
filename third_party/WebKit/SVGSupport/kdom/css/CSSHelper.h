@@ -30,112 +30,112 @@
 namespace KDOM {
 class CSSHelper {
  public:
-  static DOMString unitTypeToString(unsigned short unitType) {
+  static DOMStringImpl* unitTypeToString(unsigned short unitType) {
     switch (unitType) {
       case CSS_EMS:
-        return "em";
+        return new DOMStringImpl("em");
       case CSS_EXS:
-        return "ex";
+        return new DOMStringImpl("ex");
       case CSS_PX:
-        return "px";
+        return new DOMStringImpl("px");
       case CSS_IN:
-        return "in";
+        return new DOMStringImpl("in");
       case CSS_CM:
-        return "cm";
+        return new DOMStringImpl("cm");
       case CSS_MM:
-        return "mm";
+        return new DOMStringImpl("mm");
       case CSS_PT:
-        return "pt";
+        return new DOMStringImpl("pt");
       case CSS_PC:
-        return "pc";
+        return new DOMStringImpl("pc");
       case CSS_DEG:
-        return "deg";
+        return new DOMStringImpl("deg");
       case CSS_RAD:
-        return "rad";
+        return new DOMStringImpl("rad");
       case CSS_GRAD:
-        return "grad";
+        return new DOMStringImpl("grad");
       case CSS_MS:
-        return "ms";
+        return new DOMStringImpl("ms");
       case CSS_S:
-        return "s";
+        return new DOMStringImpl("s");
       case CSS_HZ:
-        return "hz";
+        return new DOMStringImpl("hz");
       case CSS_KHZ:
-        return "khz";
+        return new DOMStringImpl("khz");
       case CSS_PERCENTAGE:
-        return "%";
+        return new DOMStringImpl("%");
       default:
         break;
     }
 
-    return KDOM::DOMString("");
+    return new DOMStringImpl("");
   }
 
-  static DOMString stringForListStyleType(EListStyleType type) {
+  static DOMStringImpl* stringForListStyleType(EListStyleType type) {
     switch (type) {
       case LT_DISC:
-        return "disc";
+        return new DOMStringImpl("disc");
       case LT_CIRCLE:
-        return "circle";
+        return new DOMStringImpl("circle");
       case LT_SQUARE:
-        return "square";
+        return new DOMStringImpl("square");
       case LT_BOX:
-        return "box";
+        return new DOMStringImpl("box");
       case LT_DIAMOND:
-        return "-khtml-diamond";
+        return new DOMStringImpl("-khtml-diamond");
       case LT_DECIMAL:
-        return "decimal";
+        return new DOMStringImpl("decimal");
       case LT_DECIMAL_LEADING_ZERO:
-        return "decimal-leading-zero";
+        return new DOMStringImpl("decimal-leading-zero");
       case LT_ARABIC_INDIC:
-        return "-khtml-arabic-indic";
+        return new DOMStringImpl("-khtml-arabic-indic");
       case LT_PERSIAN:
-        return "-khtml-persian";
+        return new DOMStringImpl("-khtml-persian");
       case LT_URDU:
-        return "-khtml-urdu";
+        return new DOMStringImpl("-khtml-urdu");
       case LT_LOWER_ROMAN:
-        return "lower-roman";
+        return new DOMStringImpl("lower-roman");
       case LT_UPPER_ROMAN:
-        return "upper-roman";
+        return new DOMStringImpl("upper-roman");
       case LT_HEBREW:
-        return "hebrew";
+        return new DOMStringImpl("hebrew");
       case LT_ARMENIAN:
-        return "armenian";
+        return new DOMStringImpl("armenian");
       case LT_GEORGIAN:
-        return "georgian";
+        return new DOMStringImpl("georgian");
       case LT_CJK_IDEOGRAPHIC:
-        return "cjk-ideographic";
+        return new DOMStringImpl("cjk-ideographic");
       case LT_LOWER_GREEK:
-        return "lower-greek";
+        return new DOMStringImpl("lower-greek");
       case LT_UPPER_GREEK:
-        return "-khtml-upper-greek";
+        return new DOMStringImpl("-khtml-upper-greek");
       case LT_LOWER_ALPHA:
-        return "lower-alpha";
+        return new DOMStringImpl("lower-alpha");
       case LT_UPPER_ALPHA:
-        return "upper-alpha";
+        return new DOMStringImpl("upper-alpha");
       case LT_LOWER_LATIN:
-        return "lower-latin";
+        return new DOMStringImpl("lower-latin");
       case LT_UPPER_LATIN:
-        return "upper-latin";
+        return new DOMStringImpl("upper-latin");
       case LT_HIRAGANA:
-        return "hiragana";
+        return new DOMStringImpl("hiragana");
       case LT_KATAKANA:
-        return "katakana";
+        return new DOMStringImpl("katakana");
       case LT_HIRAGANA_IROHA:
-        return "hiragana-iroha";
+        return new DOMStringImpl("hiragana-iroha");
       case LT_KATAKANA_IROHA:
-        return "katakana_iroha";
+        return new DOMStringImpl("katakana_iroha");
       case LT_OPEN_QUOTE:
-        return "-khtml-open-quote";
+        return new DOMStringImpl("-khtml-open-quote");
       case LT_CLOSE_QUOTE:
-        return "-khtml-close-quote";
+        return new DOMStringImpl("-khtml-close-quote");
       case LT_NONE:
-        return "none";
+        return new DOMStringImpl("none");
       default:
         Q_ASSERT(0);
     }
 
-    return KDOM::DOMString("");
+    return 0;
   }
 };
 };

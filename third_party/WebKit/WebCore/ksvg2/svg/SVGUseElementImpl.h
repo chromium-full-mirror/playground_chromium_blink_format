@@ -40,9 +40,9 @@ class SVGUseElementImpl : public SVGStyledElementImpl,
                           public SVGTransformableImpl,
                           public SVGURIReferenceImpl {
  public:
-  SVGUseElementImpl(KDOM::DocumentImpl* doc,
+  SVGUseElementImpl(KDOM::DocumentPtr* doc,
                     KDOM::NodeImpl::Id id,
-                    const KDOM::DOMString& prefix);
+                    KDOM::DOMStringImpl* prefix);
   virtual ~SVGUseElementImpl();
 
   // Derived from: 'ElementImpl'

@@ -35,7 +35,7 @@ class UIEventImpl : public EventImpl {
   AbstractViewImpl* view() const;
   long detail() const;
 
-  void initUIEvent(const DOMString& typeArg,
+  void initUIEvent(DOMStringImpl* typeArg,
                    bool canBubbleArg,
                    bool cancelableArg,
                    AbstractViewImpl* viewArg,

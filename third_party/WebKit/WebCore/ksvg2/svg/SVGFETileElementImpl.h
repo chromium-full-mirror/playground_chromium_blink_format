@@ -33,9 +33,9 @@ class SVGAnimatedStringImpl;
 
 class SVGFETileElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFETileElementImpl(KDOM::DocumentImpl* doc,
+  SVGFETileElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGFETileElementImpl();
 
   // 'SVGFETileElement' functions

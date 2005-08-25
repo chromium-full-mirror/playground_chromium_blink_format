@@ -32,9 +32,9 @@
 
 using namespace KSVG;
 
-SVGPolyElementImpl::SVGPolyElementImpl(KDOM::DocumentImpl* doc,
+SVGPolyElementImpl::SVGPolyElementImpl(KDOM::DocumentPtr* doc,
                                        KDOM::NodeImpl::Id id,
-                                       const KDOM::DOMString& prefix)
+                                       KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -102,11 +102,10 @@ void SVGPolyElementImpl::notifyAttributeChange() const {
 
   KDOM::DOMString p("points");
   KDOM::AttrImpl* attr =
-      const_cast<SVGPolyElementImpl*>(this)->getAttributeNode(
-          p.implementation());
+      const_cast<SVGPolyElementImpl*>(this)->getAttributeNode(p.handle());
   if (attr) {
     attr->setOwnerElement(0);
-    attr->setValue(_points);
+    attr->setValue(_points.handle());
     attr->setOwnerElement(const_cast<SVGPolyElementImpl*>(this));
   }
 }

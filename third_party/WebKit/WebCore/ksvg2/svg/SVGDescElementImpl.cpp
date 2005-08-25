@@ -24,15 +24,16 @@
 
 using namespace KSVG;
 
-SVGDescElementImpl::SVGDescElementImpl(KDOM::DocumentImpl* doc,
+SVGDescElementImpl::SVGDescElementImpl(KDOM::DocumentPtr* doc,
                                        KDOM::NodeImpl::Id id,
-                                       const KDOM::DOMString& prefix)
+                                       KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix), SVGLangSpaceImpl() {}
 
 SVGDescElementImpl::~SVGDescElementImpl() {}
 
-KDOM::DOMString SVGDescElementImpl::description() const {
-  return KDOM::DOMString(textContent().string().simplifyWhiteSpace());
+KDOM::DOMStringImpl* SVGDescElementImpl::description() const {
+  return new KDOM::DOMStringImpl(
+      KDOM::DOMString(textContent()).string().simplifyWhiteSpace());
 }
 
 // vim:ts=4:noet

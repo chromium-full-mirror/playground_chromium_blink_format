@@ -29,9 +29,9 @@
 
 using namespace KSVG;
 
-SVGSymbolElementImpl::SVGSymbolElementImpl(KDOM::DocumentImpl* doc,
+SVGSymbolElementImpl::SVGSymbolElementImpl(KDOM::DocumentPtr* doc,
                                            KDOM::NodeImpl::Id id,
-                                           const KDOM::DOMString& prefix)
+                                           KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),

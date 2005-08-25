@@ -97,13 +97,10 @@ int CDFInterface::getAttrID(const char* attrStr, int len) const {
 
   return KDOM::CDFInterface::getAttrID(attrStr, len);
 }
-
-KDOM::GlobalObject* CDFInterface::globalObject(KDOM::DocumentImpl* doc) const {
-  return new KSVG::GlobalObject(doc);
+#if 0
+KDOM::GlobalObject *CDFInterface::globalObject(KDOM::DocumentImpl *doc) const
+{
+	return new KSVG::GlobalObject(doc);
 }
-
-KDOM::EcmaInterface* CDFInterface::ecmaInterface() const {
-  return new KSVG::EcmaInterface();
-}
-
+#endif
 // vim:ts=4:noet

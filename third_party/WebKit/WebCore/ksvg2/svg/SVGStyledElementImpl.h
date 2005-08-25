@@ -41,9 +41,9 @@ class SVGStyledElementImpl;
 class SVGCSSStyleDeclarationImpl;
 class SVGStyledElementImpl : public SVGElementImpl, public SVGStylableImpl {
  public:
-  SVGStyledElementImpl(KDOM::DocumentImpl* doc,
+  SVGStyledElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGStyledElementImpl();
 
   // 'SVGStylable' functions
@@ -51,7 +51,7 @@ class SVGStyledElementImpl : public SVGElementImpl, public SVGStylableImpl {
   virtual KDOM::CSSStyleDeclarationImpl* style();
   virtual KDOM::CSSStyleDeclarationImpl* pa() const;
   virtual KDOM::CSSValueImpl* getPresentationAttribute(
-      const KDOM::DOMString& name);
+      KDOM::DOMStringImpl* name);
 
   virtual void attach();
   virtual void detach();

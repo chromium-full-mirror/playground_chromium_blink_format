@@ -34,9 +34,9 @@ class SVGAnimatedStringImpl;
 class SVGFEComponentTransferElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEComponentTransferElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEComponentTransferElementImpl(KDOM::DocumentPtr* doc,
                                     KDOM::NodeImpl::Id id,
-                                    const KDOM::DOMString& prefix);
+                                    KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEComponentTransferElementImpl();
 
   // 'SVGFEComponentTransferElement' functions

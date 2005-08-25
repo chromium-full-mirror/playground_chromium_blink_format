@@ -44,9 +44,9 @@
 using namespace KSVG;
 
 SVGFETurbulenceElementImpl::SVGFETurbulenceElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
   m_baseFrequencyX = m_baseFrequencyY = m_seed = 0;
   m_numOctaves = 0;
@@ -119,16 +119,16 @@ void SVGFETurbulenceElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
     }
     case ATTR_BASEFREQUENCY: {
       QStringList numbers = QStringList::split(' ', value.string());
-      baseFrequencyX()->baseVal()->setValue(numbers[0].toFloat());
+      baseFrequencyX()->setBaseVal(numbers[0].toFloat());
       if (numbers.count() == 1)
-        baseFrequencyY()->baseVal()->setValue(numbers[0].toFloat());
+        baseFrequencyY()->setBaseVal(numbers[0].toFloat());
       else
-        baseFrequencyY()->baseVal()->setValue(numbers[1].toFloat());
+        baseFrequencyY()->setBaseVal(numbers[1].toFloat());
 
       break;
     }
     case ATTR_SEED: {
-      seed()->baseVal()->setValue(value.string().toFloat());
+      seed()->setBaseVal(value.string().toFloat());
       break;
     }
     case ATTR_NUMOCTAVES: {
@@ -146,10 +146,10 @@ KCanvasItem* SVGFETurbulenceElementImpl::createCanvasItem(
       canvas->renderingDevice()->createFilterEffect(FE_TURBULENCE));
   m_filterEffect->setType((KCTurbulanceType)(type()->baseVal() - 1));
   setStandardAttributes(m_filterEffect);
-  m_filterEffect->setBaseFrequencyX(baseFrequencyX()->baseVal()->value());
-  m_filterEffect->setBaseFrequencyY(baseFrequencyY()->baseVal()->value());
+  m_filterEffect->setBaseFrequencyX(baseFrequencyX()->baseVal());
+  m_filterEffect->setBaseFrequencyY(baseFrequencyY()->baseVal());
   m_filterEffect->setNumOctaves(numOctaves()->baseVal());
-  m_filterEffect->setSeed(seed()->baseVal()->value());
+  m_filterEffect->setSeed(seed()->baseVal());
   m_filterEffect->setStitchTiles(stitchTiles()->baseVal() ==
                                  SVG_STITCHTYPE_STITCH);
   return 0;

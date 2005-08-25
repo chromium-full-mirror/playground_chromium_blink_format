@@ -26,15 +26,15 @@
 using namespace KDOM;
 
 RGBColorImpl::RGBColorImpl(CDFInterface* interface)
-    : Shared(true), m_interface(interface) {}
+    : Shared(), m_interface(interface) {}
 
 RGBColorImpl::RGBColorImpl(CDFInterface* interface, const QRgb& color)
-    : Shared(true), m_interface(interface) {
+    : Shared(), m_interface(interface) {
   m_color = color;
 }
 
 RGBColorImpl::RGBColorImpl(CDFInterface* interface, const QColor& color)
-    : Shared(true), m_interface(interface) {
+    : Shared(), m_interface(interface) {
   m_color = color.rgb();
 }
 

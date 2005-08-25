@@ -42,6 +42,8 @@ class CachedDocument : public CachedObject {
                  KIO::CacheControl cachePolicy,
                  const char* accept);
 
+  virtual ~CachedDocument();
+
   virtual void ref(CachedObjectClient* consumer);
 
   virtual void data(QBuffer& buffer, bool eof);

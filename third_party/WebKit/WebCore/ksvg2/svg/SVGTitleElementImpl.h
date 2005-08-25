@@ -30,12 +30,12 @@ namespace KSVG {
 class SVGTitleElementImpl : public SVGStyledElementImpl,
                             public SVGLangSpaceImpl {
  public:
-  SVGTitleElementImpl(KDOM::DocumentImpl* doc,
+  SVGTitleElementImpl(KDOM::DocumentPtr* doc,
                       KDOM::NodeImpl::Id id,
-                      const KDOM::DOMString& prefix);
+                      KDOM::DOMStringImpl* prefix);
   virtual ~SVGTitleElementImpl();
 
-  KDOM::DOMString title() const;
+  KDOM::DOMStringImpl* title() const;
 };
 };
 

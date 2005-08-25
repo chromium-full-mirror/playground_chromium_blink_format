@@ -31,9 +31,9 @@
 using namespace KSVG;
 
 SVGFEMergeNodeElementImpl::SVGFEMergeNodeElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGElementImpl(doc, id, prefix) {
   m_in1 = 0;
 }
@@ -53,7 +53,7 @@ void SVGFEMergeNodeElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
   switch (id) {
     case ATTR_IN: {
-      in1()->setBaseVal(value.implementation());
+      in1()->setBaseVal(value.handle());
       break;
     }
     default: { SVGElementImpl::parseAttribute(attr); }

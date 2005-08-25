@@ -22,14 +22,13 @@
 
 #include "kdomevents.h"
 #include "DocumentImpl.h"
-#include "DOMConfigurationImpl.h"
-#include "CharacterData.h"
 #include "CharacterDataImpl.h"
 #include "MutationEventImpl.h"
+#include "DOMConfigurationImpl.h"
 
 using namespace KDOM;
 
-CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc) : NodeImpl(doc) {
+CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc) : NodeImpl(doc) {
   str = 0;
 }
 
@@ -54,20 +53,20 @@ void CharacterDataImpl::checkCharDataOperation(CharacterDataImpl* node,
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 }
 
-DOMString CharacterDataImpl::textContent() const {
+DOMStringImpl* CharacterDataImpl::textContent() const {
   return nodeValue();
 }
 
-DOMString CharacterDataImpl::nodeValue() const {
-  return DOMString(str);
+DOMStringImpl* CharacterDataImpl::nodeValue() const {
+  return str;
 }
 
-void CharacterDataImpl::setNodeValue(const DOMString& nodeValue) {
+void CharacterDataImpl::setNodeValue(DOMStringImpl* nodeValue) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this node is readonly
   if (isReadOnly())
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 
-  KDOM_SAFE_SET(str, nodeValue.implementation());
+  KDOM_SAFE_SET(str, nodeValue);
 }
 
 DOMStringImpl* CharacterDataImpl::data() const {
@@ -94,7 +93,7 @@ void CharacterDataImpl::appendData(DOMStringImpl* arg) {
   if (isReadOnly())
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 
-  DOMString prevValue = nodeValue();
+  DOMStringImpl* prevValue = nodeValue();
   str->append(arg);
 
   dispatchModifiedEvent(prevValue);
@@ -106,7 +105,7 @@ void CharacterDataImpl::insertData(unsigned long offset, DOMStringImpl* arg) {
 
   checkCharDataOperation(this, offset);
 
-  DOMString prevValue = nodeValue();
+  DOMStringImpl* prevValue = nodeValue();
   str->insert(arg, offset);
 
   dispatchModifiedEvent(prevValue);
@@ -121,7 +120,7 @@ void CharacterDataImpl::deleteData(unsigned long offset, unsigned long count) {
 
   checkCharDataOperation(this, offset);
 
-  DOMString prevValue = nodeValue();
+  DOMStringImpl* prevValue = nodeValue();
   str->remove(offset, count);
 
   dispatchModifiedEvent(prevValue);
@@ -138,7 +137,7 @@ void CharacterDataImpl::replaceData(unsigned long offset,
 
   checkCharDataOperation(this, offset);
 
-  DOMString prevValue = nodeValue();
+  DOMStringImpl* prevValue = nodeValue();
 
   unsigned long realCount;
   if (offset + count > str->length())
@@ -167,30 +166,35 @@ void CharacterDataImpl::setData(DOMStringImpl* data) {
   if (isReadOnly())
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 
-  DOMString prevValue = nodeValue();
+  DOMStringImpl* prevValue = nodeValue();
   KDOM_SAFE_SET(str, data);
 
   dispatchModifiedEvent(prevValue);
 }
 
-void CharacterDataImpl::dispatchModifiedEvent(const DOMString& prevValue) {
+void CharacterDataImpl::dispatchModifiedEvent(DOMStringImpl* prevValue) {
   if (parentNode())
     parentNode()->childrenChanged();
 
   if (!ownerDocument()->hasListenerType(DOMCHARACTERDATAMODIFIED_EVENT))
     return;
 
-  MutationEventImpl* event = static_cast<MutationEventImpl*>(
-      ownerDocument()->createEvent("MutationEvents"));
+  DOMStringImpl* eventType = new DOMStringImpl("MutationEvents");
+  eventType->ref();
+
+  MutationEventImpl* event =
+      static_cast<MutationEventImpl*>(ownerDocument()->createEvent(eventType));
   event->ref();
 
-  event->initMutationEvent("DOMCharacterDataModified", true, false, 0,
-                           prevValue, nodeValue(), DOMString(), 0);
+  event->initMutationEvent(new DOMStringImpl("DOMCharacterDataModified"), true,
+                           false, 0, prevValue, nodeValue(), 0, 0);
 
   dispatchEvent(event);
   dispatchSubtreeModifiedEvent();
 
   event->deref();
+
+  eventType->deref();
 }
 
 void CharacterDataImpl::normalize() {

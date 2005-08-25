@@ -35,9 +35,9 @@
 
 using namespace KSVG;
 
-SVGSwitchElementImpl::SVGSwitchElementImpl(KDOM::DocumentImpl* doc,
+SVGSwitchElementImpl::SVGSwitchElementImpl(KDOM::DocumentPtr* doc,
                                            KDOM::NodeImpl::Id id,
-                                           const KDOM::DOMString& prefix)
+                                           KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),

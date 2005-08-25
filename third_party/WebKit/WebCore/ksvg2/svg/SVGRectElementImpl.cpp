@@ -37,9 +37,9 @@
 
 using namespace KSVG;
 
-SVGRectElementImpl::SVGRectElementImpl(KDOM::DocumentImpl* doc,
+SVGRectElementImpl::SVGRectElementImpl(KDOM::DocumentPtr* doc,
                                        KDOM::NodeImpl::Id id,
-                                       const KDOM::DOMString& prefix)
+                                       KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -95,7 +95,7 @@ SVGAnimatedLengthImpl* SVGRectElementImpl::ry() const {
 
 void SVGRectElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMString value(attr->value());
+  KDOM::DOMStringImpl* value = attr->value();
   switch (id) {
     case ATTR_X: {
       x()->baseVal()->setValueAsString(value);
@@ -141,7 +141,8 @@ KCPathDataList SVGRectElementImpl::toPathData() const {
   float _width = width()->baseVal()->value(),
         _height = height()->baseVal()->value();
 
-  if (hasAttribute("rx") || hasAttribute("ry")) {
+  if (hasAttribute(KDOM::DOMString("rx").handle()) ||
+      hasAttribute(KDOM::DOMString("ry").handle())) {
     float _rx = rx()->baseVal()->value(), _ry = rx()->baseVal()->value();
     return KCanvasCreator::self()->createRoundedRectangle(_x, _y, _width,
                                                           _height, _rx, _ry);

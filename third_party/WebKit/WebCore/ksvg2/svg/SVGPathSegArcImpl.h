@@ -32,7 +32,9 @@ class SVGPathSegArcAbsImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegArcAbsImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_ABS; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "A"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("A");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("A %1 %2 %3 %4 %5 %6 %7")
         .arg(m_r1)
@@ -82,7 +84,9 @@ class SVGPathSegArcRelImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegArcRelImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_ARC_REL; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "a"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("a");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("a %1 %2 %3 %4 %5 %6 %7")
         .arg(m_r1)

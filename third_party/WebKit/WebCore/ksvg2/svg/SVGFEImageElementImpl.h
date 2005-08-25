@@ -42,9 +42,9 @@ class SVGFEImageElementImpl : public SVGFilterPrimitiveStandardAttributesImpl,
                               public SVGExternalResourcesRequiredImpl,
                               public KDOM::CachedObjectClient {
  public:
-  SVGFEImageElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEImageElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEImageElementImpl();
 
   // 'SVGFEImageElement' functions

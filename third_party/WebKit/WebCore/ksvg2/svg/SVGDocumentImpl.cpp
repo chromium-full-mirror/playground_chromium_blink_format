@@ -30,8 +30,8 @@
 #include <kdom/Helper.h>
 #include <kdom/Shared.h>
 #include <kdom/Namespace.h>
-#include <kdom/DocumentType.h>
-#include <kdom/events/Event.h>
+//#include <kdom/DocumentType.h>
+//#include <kdom/events/Event.h>
 #include <kdom/impl/domattrs.h>
 #include <kdom/cache/KDOMLoader.h>
 #include <kdom/impl/CDFInterface.h>
@@ -47,7 +47,7 @@
 #include <kcanvas/KCanvasView.h>
 
 #include "ksvg.h"
-#include <ksvg2/ecma/Ecma.h>
+//#include "Ecma.h"
 #include <ksvg2/KSVGView.h>
 #include "SVGEventImpl.h"
 #include "SVGElementImpl.h"
@@ -139,10 +139,11 @@ SVGDocumentImpl::SVGDocumentImpl(SVGDOMImplementationImpl* i,
 SVGDocumentImpl::~SVGDocumentImpl() {
   // Fire UNLOAD_EVENT upon destruction...
   if (KDOM::DocumentImpl::hasListenerType(KDOM::UNLOAD_EVENT)) {
-    SVGEventImpl* event = static_cast<SVGEventImpl*>(createEvent("SVGEvents"));
+    SVGEventImpl* event = static_cast<SVGEventImpl*>(
+        createEvent(KDOM::DOMString("SVGEvents").handle()));
     event->ref();
 
-    event->initEvent("unload", false, false);
+    event->initEvent(KDOM::DOMString("unload").handle(), false, false);
     dispatchRecursiveEvent(event, lastChild());
 
     event->deref();
@@ -152,7 +153,7 @@ SVGDocumentImpl::~SVGDocumentImpl() {
   delete m_timeScheduler;
 }
 
-KDOM::DOMString SVGDocumentImpl::title() const {
+KDOM::DOMStringImpl* SVGDocumentImpl::title() const {
   if (rootElement()) {
     for (NodeImpl* child = rootElement()->firstChild(); child != 0;
          child = child->nextSibling())
@@ -160,224 +161,224 @@ KDOM::DOMString SVGDocumentImpl::title() const {
         return static_cast<SVGTitleElementImpl*>(child)->title();
   }
 
-  return KDOM::DOMString();
+  return 0;
 }
 
-KDOM::DOMString SVGDocumentImpl::referrer() const {
+KDOM::DOMStringImpl* SVGDocumentImpl::referrer() const {
   // TODO
-  return KDOM::DOMString();
+  return 0;
 }
 
-KDOM::DOMString SVGDocumentImpl::domain() const {
+KDOM::DOMStringImpl* SVGDocumentImpl::domain() const {
   // TODO
-  return KDOM::DOMString();
+  return 0;
 }
 
-KDOM::DOMString SVGDocumentImpl::URL() const {
-  return m_url.prettyURL();
+KDOM::DOMStringImpl* SVGDocumentImpl::URL() const {
+  return new KDOM::DOMStringImpl(m_url.prettyURL());
 }
 
 SVGElementImpl* SVGDocumentImpl::createSVGElement(
-    const KDOM::DOMString& prefix,
-    const KDOM::DOMString& localName) {
+    KDOM::DOMStringImpl* prefix,
+    KDOM::DOMStringImpl* localName) {
   SVGElementImpl* element = 0;
-  KDOM::DOMString pref = prefix;
-  if (prefix.isEmpty())
+  KDOM::DOMString pref(prefix);
+  if (!prefix || prefix->length() == 0)
     pref = KDOM::DOMString();
-  QString local = localName.string();
+  QString local = KDOM::DOMString(localName).string();
   KDOM::NodeImpl::Id id =
       implementation()->cdfInterface()->getTagID(local.ascii(), local.length());
   switch (id) {
     case ID_SVG: {
-      element = new SVGSVGElementImpl(this, id, pref);
+      element = new SVGSVGElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_STYLE: {
-      element = new SVGStyleElementImpl(this, id, pref);
+      element = new SVGStyleElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_SCRIPT: {
-      element = new SVGScriptElementImpl(this, id, pref);
+      element = new SVGScriptElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_RECT: {
-      element = new SVGRectElementImpl(this, id, pref);
+      element = new SVGRectElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_CIRCLE: {
-      element = new SVGCircleElementImpl(this, id, pref);
+      element = new SVGCircleElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_ELLIPSE: {
-      element = new SVGEllipseElementImpl(this, id, pref);
+      element = new SVGEllipseElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_POLYLINE: {
-      element = new SVGPolylineElementImpl(this, id, pref);
+      element = new SVGPolylineElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_POLYGON: {
-      element = new SVGPolygonElementImpl(this, id, pref);
+      element = new SVGPolygonElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_G: {
-      element = new SVGGElementImpl(this, id, pref);
+      element = new SVGGElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_SWITCH: {
-      element = new SVGSwitchElementImpl(this, id, pref);
+      element = new SVGSwitchElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_DEFS: {
-      element = new SVGDefsElementImpl(this, id, pref);
+      element = new SVGDefsElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_STOP: {
-      element = new SVGStopElementImpl(this, id, pref);
+      element = new SVGStopElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_PATH: {
-      element = new SVGPathElementImpl(this, id, pref);
+      element = new SVGPathElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_IMAGE: {
-      element = new SVGImageElementImpl(this, id, pref);
+      element = new SVGImageElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_CLIPPATH: {
-      element = new SVGClipPathElementImpl(this, id, pref);
+      element = new SVGClipPathElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_A: {
-      element = new SVGAElementImpl(this, id, pref);
+      element = new SVGAElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_LINE: {
-      element = new SVGLineElementImpl(this, id, pref);
+      element = new SVGLineElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_LINEARGRADIENT: {
-      element = new SVGLinearGradientElementImpl(this, id, pref);
+      element = new SVGLinearGradientElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_RADIALGRADIENT: {
-      element = new SVGRadialGradientElementImpl(this, id, pref);
+      element = new SVGRadialGradientElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_TITLE: {
-      element = new SVGTitleElementImpl(this, id, pref);
+      element = new SVGTitleElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_DESC: {
-      element = new SVGDescElementImpl(this, id, pref);
+      element = new SVGDescElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_SYMBOL: {
-      element = new SVGSymbolElementImpl(this, id, pref);
+      element = new SVGSymbolElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_USE: {
-      element = new SVGUseElementImpl(this, id, pref);
+      element = new SVGUseElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_PATTERN: {
-      element = new SVGPatternElementImpl(this, id, pref);
+      element = new SVGPatternElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_ANIMATECOLOR: {
-      element = new SVGAnimateColorElementImpl(this, id, pref);
+      element = new SVGAnimateColorElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_ANIMATETRANSFORM: {
-      element = new SVGAnimateTransformElementImpl(this, id, pref);
+      element = new SVGAnimateTransformElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_SET: {
-      element = new SVGSetElementImpl(this, id, pref);
+      element = new SVGSetElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_ANIMATE: {
-      element = new SVGAnimateElementImpl(this, id, pref);
+      element = new SVGAnimateElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_MARKER: {
-      element = new SVGMarkerElementImpl(this, id, pref);
+      element = new SVGMarkerElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_VIEW: {
-      element = new SVGViewElementImpl(this, id, pref);
+      element = new SVGViewElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FILTER: {
-      element = new SVGFilterElementImpl(this, id, pref);
+      element = new SVGFilterElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEGAUSSIANBLUR: {
-      element = new SVGFEGaussianBlurElementImpl(this, id, pref);
+      element = new SVGFEGaussianBlurElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEFLOOD: {
-      element = new SVGFEFloodElementImpl(this, id, pref);
+      element = new SVGFEFloodElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEBLEND: {
-      element = new SVGFEBlendElementImpl(this, id, pref);
+      element = new SVGFEBlendElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEOFFSET: {
-      element = new SVGFEOffsetElementImpl(this, id, pref);
+      element = new SVGFEOffsetElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FECOMPOSITE: {
-      element = new SVGFECompositeElementImpl(this, id, pref);
+      element = new SVGFECompositeElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FECOLORMATRIX: {
-      element = new SVGFEColorMatrixElementImpl(this, id, pref);
+      element = new SVGFEColorMatrixElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEIMAGE: {
-      element = new SVGFEImageElementImpl(this, id, pref);
+      element = new SVGFEImageElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEMERGE: {
-      element = new SVGFEMergeElementImpl(this, id, pref);
+      element = new SVGFEMergeElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEMERGENODE: {
-      element = new SVGFEMergeNodeElementImpl(this, id, pref);
+      element = new SVGFEMergeNodeElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FECOMPONENTTRANSFER: {
-      element = new SVGFEComponentTransferElementImpl(this, id, pref);
+      element = new SVGFEComponentTransferElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEFUNCR: {
-      element = new SVGFEFuncRElementImpl(this, id, pref);
+      element = new SVGFEFuncRElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEFUNCG: {
-      element = new SVGFEFuncGElementImpl(this, id, pref);
+      element = new SVGFEFuncGElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEFUNCB: {
-      element = new SVGFEFuncRElementImpl(this, id, pref);
+      element = new SVGFEFuncRElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FEFUNCA: {
-      element = new SVGFEFuncAElementImpl(this, id, pref);
+      element = new SVGFEFuncAElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_FETURBULENCE: {
-      element = new SVGFETurbulenceElementImpl(this, id, pref);
+      element = new SVGFETurbulenceElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_TEXT: {
-      element = new SVGTextElementImpl(this, id, pref);
+      element = new SVGTextElementImpl(docPtr(), id, prefix);
       break;
     }
     case ID_TSPAN: {
-      element = new SVGTSpanElementImpl(this, id, pref);
+      element = new SVGTSpanElementImpl(docPtr(), id, prefix);
       break;
     }
     default: { return 0; }
@@ -387,8 +388,8 @@ SVGElementImpl* SVGDocumentImpl::createSVGElement(
 }
 
 KDOM::ElementImpl* SVGDocumentImpl::createElement(
-    const KDOM::DOMString& tagName) {
-  SVGElementImpl* elem = createSVGElement("", tagName);
+    KDOM::DOMStringImpl* tagName) {
+  SVGElementImpl* elem = createSVGElement(0, tagName);
   if (!elem)
     return KDOM::DocumentImpl::createElement(tagName);
 
@@ -396,23 +397,45 @@ KDOM::ElementImpl* SVGDocumentImpl::createElement(
 }
 
 KDOM::ElementImpl* SVGDocumentImpl::createElementNS(
-    const KDOM::DOMString& namespaceURI,
-    const KDOM::DOMString& qualifiedName) {
-  KDOM::DOMString prefix, localName;
-  KDOM::Helper::SplitNamespace(prefix, localName,
-                               qualifiedName.implementation());
+    KDOM::DOMStringImpl* namespaceURIImpl,
+    KDOM::DOMStringImpl* qualifiedName) {
+  KDOM::ElementImpl* elem = NULL;
+  if (namespaceURIImpl)
+    namespaceURIImpl->ref();
+  if (qualifiedName)
+    qualifiedName->ref();
+  KDOM::DOMStringImpl *prefix = 0, *localName = 0;
+  KDOM::Helper::SplitPrefixLocalName(qualifiedName, prefix, localName);
 
-  if (!((prefix.isEmpty() || prefix == "svg") &&
-        (namespaceURI == KDOM::NS_SVG || namespaceURI.isEmpty())))
-    return KDOM::DocumentImpl::createElementNS(namespaceURI, qualifiedName);
+  if (prefix)
+    prefix->ref();
+  if (localName)
+    localName->ref();
 
-  int dummy;
-  KDOM::Helper::CheckQualifiedName(qualifiedName, namespaceURI, dummy, false,
-                                   false);
+  KDOM::DOMString namespaceURI(namespaceURIImpl);
+  if (!((!prefix || prefix->length() == 0) ||
+        KDOM::DOMString(prefix) == "svg") &&
+      (namespaceURI == KDOM::NS_SVG || namespaceURI.isEmpty()))
+    elem = KDOM::DocumentImpl::createElementNS(namespaceURIImpl, qualifiedName);
+  else {
+    int dummy;
+    KDOM::Helper::CheckQualifiedName(qualifiedName, namespaceURIImpl, dummy,
+                                     false, false);
 
-  SVGElementImpl* elem = createSVGElement(prefix, localName);
-  if (!elem)
-    return KDOM::DocumentImpl::createElementNS(namespaceURI, qualifiedName);
+    elem = createSVGElement(prefix, localName);
+    if (!elem)
+      elem =
+          KDOM::DocumentImpl::createElementNS(namespaceURIImpl, qualifiedName);
+  }
+
+  if (prefix)
+    prefix->deref();
+  if (localName)
+    localName->deref();
+  if (namespaceURIImpl)
+    namespaceURIImpl->deref();
+  if (qualifiedName)
+    qualifiedName->deref();
 
   return elem;
 }
@@ -426,13 +449,14 @@ SVGSVGElementImpl* SVGDocumentImpl::rootElement() const {
 }
 
 KDOM::EventImpl* SVGDocumentImpl::createEvent(
-    const KDOM::DOMString& eventType) {
+    KDOM::DOMStringImpl* eventTypeImpl) {
+  KDOM::DOMString eventType(eventTypeImpl);
   if (eventType == "SVGEvents")
     return new SVGEventImpl();
   else if (eventType == "SVGZoomEvents")
     return new SVGZoomEventImpl();
 
-  return DocumentEventImpl::createEvent(eventType);
+  return DocumentEventImpl::createEvent(eventTypeImpl);
 }
 
 void SVGDocumentImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
@@ -454,15 +478,18 @@ KSVGView* SVGDocumentImpl::svgView() const {
   return static_cast<KSVGView*>(m_view);
 }
 
-KDOM::Ecma* SVGDocumentImpl::ecmaEngine() const {
-  if (m_ecmaEngine)  // No need to initialize anymore...
-    return m_ecmaEngine;
+#if 0
+KDOM::Ecma *SVGDocumentImpl::ecmaEngine() const
+{
+	if(m_ecmaEngine) // No need to initialize anymore...
+		return m_ecmaEngine;
 
-  m_ecmaEngine = new Ecma(const_cast<SVGDocumentImpl*>(this));
-  m_ecmaEngine->setup(implementation()->cdfInterface());
+	m_ecmaEngine = new Ecma(const_cast<SVGDocumentImpl *>(this));
+	m_ecmaEngine->setup(implementation()->cdfInterface());
 
-  return m_ecmaEngine;
+	return m_ecmaEngine;
 }
+#endif
 
 void SVGDocumentImpl::finishedParsing() {
   addScripts(rootElement());
@@ -488,11 +515,11 @@ void SVGDocumentImpl::dispatchRecursiveEvent(KDOM::EventImpl* event,
 
 void SVGDocumentImpl::dispatchZoomEvent(float prevScale, float newScale) {
   // dispatch zoom event
-  SVGZoomEventImpl* event =
-      static_cast<SVGZoomEventImpl*>(createEvent("SVGZoomEvents"));
+  SVGZoomEventImpl* event = static_cast<SVGZoomEventImpl*>(
+      createEvent(KDOM::DOMString("SVGZoomEvents").handle()));
   event->ref();
 
-  event->initEvent("zoom", true, false);
+  event->initEvent(KDOM::DOMString("zoom").handle(), true, false);
   event->setPreviousScale(prevScale);
   event->setNewScale(newScale);
   rootElement()->dispatchEvent(event);
@@ -502,10 +529,11 @@ void SVGDocumentImpl::dispatchZoomEvent(float prevScale, float newScale) {
 
 void SVGDocumentImpl::dispatchScrollEvent() {
   // dispatch zoom event
-  SVGEventImpl* event = static_cast<SVGEventImpl*>(createEvent("SVGEvents"));
+  SVGEventImpl* event = static_cast<SVGEventImpl*>(
+      createEvent(KDOM::DOMString("SVGEvents").handle()));
   event->ref();
 
-  event->initEvent("scroll", true, false);
+  event->initEvent(KDOM::DOMString("scroll").handle(), true, false);
   rootElement()->dispatchEvent(event);
 
   event->deref();
@@ -515,8 +543,8 @@ bool SVGDocumentImpl::dispatchKeyEvent(KDOM::EventTargetImpl* target,
                                        QKeyEvent* key,
                                        bool keypress) {
   // dispatch key event
-  KDOM::KeyboardEventImpl* keyEventImpl =
-      static_cast<KDOM::KeyboardEventImpl*>(createEvent("KeyboardEvents"));
+  KDOM::KeyboardEventImpl* keyEventImpl = static_cast<KDOM::KeyboardEventImpl*>(
+      createEvent(KDOM::DOMString("KeyboardEvents").handle()));
   keyEventImpl->ref();
 
   keyEventImpl->initKeyboardEvent(key);
@@ -528,8 +556,8 @@ bool SVGDocumentImpl::dispatchKeyEvent(KDOM::EventTargetImpl* target,
   return r;
 }
 
-KDOM::DOMString SVGDocumentImpl::defaultNS() const {
-  return KDOM::NS_SVG;
+KDOM::DOMStringImpl* SVGDocumentImpl::defaultNS() const {
+  return new KDOM::DOMStringImpl(KDOM::NS_SVG.string());
 }
 
 void SVGDocumentImpl::recalcStyleSelector() {
@@ -557,7 +585,7 @@ void SVGDocumentImpl::recalcStyleSelector() {
         KDOM::ProcessingInstructionImpl* pi =
             static_cast<KDOM::ProcessingInstructionImpl*>(n);
         sheet = pi->sheet();
-        if (!sheet && !pi->localHref().isEmpty()) {
+        if (!sheet && !pi->localHref()->isEmpty()) {
           // Processing instruction with reference to an element in this
           // document
           // - e.g. <?xml-stylesheet href="#mystyle">, with the element
@@ -570,13 +598,12 @@ void SVGDocumentImpl::recalcStyleSelector() {
                  c = c->nextSibling()) {
               if (c->nodeType() == KDOM::TEXT_NODE ||
                   c->nodeType() == KDOM::CDATA_SECTION_NODE) {
-                sheetText += c->nodeValue();
+                sheetText += KDOM::DOMString(c->nodeValue());
               }
             }
 
-            KDOM::CSSStyleSheetImpl* cssSheet =
-                createCSSStyleSheet(this, KDOM::DOMString());
-            cssSheet->parseString(sheetText);
+            KDOM::CSSStyleSheetImpl* cssSheet = createCSSStyleSheet(this, 0);
+            cssSheet->parseString(sheetText.handle());
             pi->setStyleSheet(cssSheet);
 
             sheet = cssSheet;
@@ -591,7 +618,7 @@ void SVGDocumentImpl::recalcStyleSelector() {
           if (!s->isLoading()) {
             sheet = s->sheet();
             if (sheet)
-              title = s->getAttribute(ATTR_TITLE).string();
+              title = KDOM::DOMString(s->getAttribute(ATTR_TITLE)).string();
           }
         }
 
@@ -694,7 +721,8 @@ void SVGDocumentImpl::executeScripts(bool needsStyleSelectorUpdate) {
       return;
     } else {
       // no src attribute - execute from contents of tag
-      SVGScriptElementImpl::executeScript(this, script->textContent());
+      SVGScriptElementImpl::executeScript(
+          this, KDOM::DOMString(script->textContent()));
       ++(*m_scriptsIt);
 
       needsStyleSelectorUpdate = true;
@@ -704,10 +732,11 @@ void SVGDocumentImpl::executeScripts(bool needsStyleSelectorUpdate) {
   // Fire LOAD_EVENT after all scripts are evaluated
   if (KDOM::DocumentImpl::hasListenerType(KDOM::LOAD_EVENT) &&
       !m_scriptsIt->current()) {
-    SVGEventImpl* event = static_cast<SVGEventImpl*>(createEvent("SVGEvents"));
+    SVGEventImpl* event = static_cast<SVGEventImpl*>(
+        createEvent(KDOM::DOMString("SVGEvents").handle()));
     event->ref();
 
-    event->initEvent("load", false, false);
+    event->initEvent(KDOM::DOMString("load").handle(), false, false);
     dispatchRecursiveEvent(event, lastChild());
 
     event->deref();
@@ -731,7 +760,7 @@ void SVGDocumentImpl::recalcStyle(StyleChange change) {
 
 KDOM::CSSStyleSheetImpl* SVGDocumentImpl::createCSSStyleSheet(
     KDOM::NodeImpl* parent,
-    const KDOM::DOMString& url) const {
+    KDOM::DOMStringImpl* url) const {
   SVGCSSStyleSheetImpl* sheet = new SVGCSSStyleSheetImpl(parent, url);
   sheet->ref();
   return sheet;
@@ -739,7 +768,7 @@ KDOM::CSSStyleSheetImpl* SVGDocumentImpl::createCSSStyleSheet(
 
 KDOM::CSSStyleSheetImpl* SVGDocumentImpl::createCSSStyleSheet(
     KDOM::CSSRuleImpl* ownerRule,
-    const KDOM::DOMString& url) const {
+    KDOM::DOMStringImpl* url) const {
   SVGCSSStyleSheetImpl* sheet = new SVGCSSStyleSheetImpl(ownerRule, url);
   sheet->ref();
   return sheet;
@@ -880,11 +909,11 @@ TimeScheduler* SVGDocumentImpl::timeScheduler() const {
 void SVGDocumentImpl::dispatchUIEvent(KDOM::EventTargetImpl* target,
                                       const KDOM::DOMString& type) {
   // Setup kdom 'UIEvent'...
-  KDOM::UIEventImpl* event =
-      static_cast<KDOM::UIEventImpl*>(createEvent("UIEvents"));
+  KDOM::UIEventImpl* event = static_cast<KDOM::UIEventImpl*>(
+      createEvent(KDOM::DOMString("UIEvents").handle()));
   event->ref();
 
-  event->initUIEvent(type, true, true, 0, 0);
+  event->initUIEvent(type.handle(), true, true, 0, 0);
   target->dispatchEvent(event);
 
   event->deref();
@@ -893,11 +922,11 @@ void SVGDocumentImpl::dispatchUIEvent(KDOM::EventTargetImpl* target,
 void SVGDocumentImpl::dispatchMouseEvent(KDOM::EventTargetImpl* target,
                                          const KDOM::DOMString& type) {
   // Setup kdom 'MouseEvent'...
-  KDOM::MouseEventImpl* event =
-      static_cast<KDOM::MouseEventImpl*>(createEvent("MouseEvents"));
+  KDOM::MouseEventImpl* event = static_cast<KDOM::MouseEventImpl*>(
+      createEvent(KDOM::DOMString("MouseEvents").handle()));
   event->ref();
 
-  event->initEvent(type, true, true);
+  event->initEvent(type.handle(), true, true);
   target->dispatchEvent(event);
 
   event->deref();

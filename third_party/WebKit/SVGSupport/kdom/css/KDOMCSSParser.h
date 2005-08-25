@@ -29,7 +29,7 @@
 #include <qstring.h>
 #include <qptrlist.h>
 
-#include <kdom/DOMString.h>
+#include <kdom/impl/DOMStringImpl.h>
 
 namespace KDOM {
 class CSSProperty;
@@ -71,8 +71,8 @@ struct KDOMCSSValue {
 static inline QString qString(const KDOMCSSParseString& ps) {
   return QString((QChar*)ps.string, ps.length);
 }
-static inline DOMString domString(const KDOMCSSParseString& ps) {
-  return DOMString((QChar*)ps.string, ps.length);
+static inline DOMStringImpl* domString(const KDOMCSSParseString& ps) {
+  return new DOMStringImpl((QChar*)ps.string, ps.length);
 }
 
 class KDOMCSSValueList {
@@ -101,15 +101,17 @@ class CSSParser {
 
   CDFInterface* interface() const;
 
-  void parseSheet(CSSStyleSheetImpl* sheet, const DOMString& string);
-  CSSRuleImpl* parseRule(CSSStyleSheetImpl* sheet, const DOMString& string);
+  void parseSheet(CSSStyleSheetImpl* sheet, DOMStringImpl* string);
+  CSSRuleImpl* parseRule(CSSStyleSheetImpl* sheet, DOMStringImpl* string);
+
   bool parseValue(CSSStyleDeclarationImpl* decls,
                   int id,
-                  const DOMString& string,
+                  DOMStringImpl* string,
                   bool _important,
                   bool _nonCSSHint);
+
   bool parseDeclaration(CSSStyleDeclarationImpl* decls,
-                        const DOMString& string,
+                        DOMStringImpl* string,
                         bool _nonCSSHint);
 
   static CSSParser* current() { return currentParser; }
@@ -118,8 +120,9 @@ class CSSParser {
 
   void addProperty(int propId, CSSValueImpl* value, bool important);
   bool hasProperties() const { return numParsedProperties > 0; }
-  CSSStyleDeclarationImpl* createStyleDeclaration(CSSStyleRuleImpl* rule);
   void clearProperties();
+
+  CSSStyleDeclarationImpl* createStyleDeclaration(CSSStyleRuleImpl* rule);
 
   virtual bool parseValue(int propId, bool important, int expected = 1);
   virtual bool parseShape(int propId, bool important);

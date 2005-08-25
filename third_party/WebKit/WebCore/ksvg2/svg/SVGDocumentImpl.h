@@ -48,29 +48,30 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   virtual ~SVGDocumentImpl();
 
   // 'SVGDocumentImpl' functions
-  KDOM::DOMString title() const;
-  KDOM::DOMString referrer() const;
-  KDOM::DOMString domain() const;
-  KDOM::DOMString URL() const;
+  KDOM::DOMStringImpl* title() const;
+  KDOM::DOMStringImpl* referrer() const;
+  KDOM::DOMStringImpl* domain() const;
+  KDOM::DOMStringImpl* URL() const;
 
   SVGSVGElementImpl* rootElement() const;
 
-  virtual KDOM::ElementImpl* createElement(const KDOM::DOMString& tagName);
+  virtual KDOM::ElementImpl* createElement(KDOM::DOMStringImpl* tagName);
   virtual KDOM::ElementImpl* createElementNS(
-      const KDOM::DOMString& namespaceURI,
-      const KDOM::DOMString& qualifiedName);
+      KDOM::DOMStringImpl* namespaceURI,
+      KDOM::DOMStringImpl* qualifiedName);
 
   // 'DocumentEvent' functions
-  virtual KDOM::EventImpl* createEvent(const KDOM::DOMString& eventType);
+  virtual KDOM::EventImpl* createEvent(KDOM::DOMStringImpl* eventType);
 
   // Derived from: 'CachedObjectClient'
   virtual void notifyFinished(KDOM::CachedObject* finishedObj);
 
   KSVGView* svgView() const;
 
-  // Internal
-  virtual KDOM::Ecma* ecmaEngine() const;
-
+// Internal
+#if 0
+		virtual KDOM::Ecma *ecmaEngine() const;
+#endif
   void finishedParsing();
   void dispatchRecursiveEvent(KDOM::EventImpl* event, KDOM::NodeImpl* obj);
   void dispatchZoomEvent(float prevScale, float newScale);
@@ -79,7 +80,7 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
                         QKeyEvent* key,
                         bool keypress);
 
-  virtual KDOM::DOMString defaultNS() const;
+  virtual KDOM::DOMStringImpl* defaultNS() const;
 
   KCanvas* canvas() const;
   KCanvasView* canvasView() const { return m_canvasView; }
@@ -90,10 +91,10 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
 
   virtual KDOM::CSSStyleSheetImpl* createCSSStyleSheet(
       KDOM::NodeImpl* parent,
-      const KDOM::DOMString& url) const;
+      KDOM::DOMStringImpl* url) const;
   virtual KDOM::CSSStyleSheetImpl* createCSSStyleSheet(
       KDOM::CSSRuleImpl* ownerRule,
-      const KDOM::DOMString& url) const;
+      KDOM::DOMStringImpl* url) const;
   virtual bool prepareMouseEvent(bool readonly,
                                  int x,
                                  int y,
@@ -114,8 +115,8 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   void dispatchMouseEvent(KDOM::EventTargetImpl* target,
                           const KDOM::DOMString& type);
 
-  SVGElementImpl* createSVGElement(const KDOM::DOMString& prefix,
-                                   const KDOM::DOMString& localName);
+  SVGElementImpl* createSVGElement(KDOM::DOMStringImpl* prefix,
+                                   KDOM::DOMStringImpl* localName);
 
   KCanvasView* m_canvasView;
   KDOM::EventTargetImpl* m_lastTarget;

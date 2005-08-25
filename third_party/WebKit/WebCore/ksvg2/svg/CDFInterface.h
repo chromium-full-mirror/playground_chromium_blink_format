@@ -48,8 +48,7 @@ class CDFInterface : public KDOM::CDFInterface {
   virtual int getAttrID(const char* attrStr, int len) const;
 
   // EcmaScript interface
-  virtual KDOM::GlobalObject* globalObject(KDOM::DocumentImpl* doc) const;
-  virtual KDOM::EcmaInterface* ecmaInterface() const;
+  // virtual KDOM::GlobalObject *globalObject(KDOM::DocumentImpl *doc) const;
 };
 };
 

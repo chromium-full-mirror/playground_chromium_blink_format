@@ -62,18 +62,18 @@ class SVGAnimationElementImpl : public SVGElementImpl,
                                 public SVGTestsImpl,
                                 public SVGExternalResourcesRequiredImpl {
  public:
-  SVGAnimationElementImpl(KDOM::DocumentImpl* doc,
+  SVGAnimationElementImpl(KDOM::DocumentPtr* doc,
                           KDOM::NodeImpl::Id id,
-                          const KDOM::DOMString& prefix);
+                          KDOM::DOMStringImpl* prefix);
   virtual ~SVGAnimationElementImpl();
 
   // 'SVGAnimationElement' functions
   SVGElementImpl* targetElement() const;
 
-  double endTime() const;
-  double startTime() const;
-  double currentTime() const;
-  double simpleDuration() const;
+  double getEndTime() const;
+  double getStartTime() const;
+  double getCurrentTime() const;
+  double getSimpleDuration() const;
 
   virtual void parseAttribute(KDOM::AttributeImpl* attr);
   virtual bool implementsCanvasItem() const { return false; }

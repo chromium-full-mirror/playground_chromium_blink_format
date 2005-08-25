@@ -36,9 +36,9 @@ class SVGAnimatedEnumerationImpl;
 class SVGFETurbulenceElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFETurbulenceElementImpl(KDOM::DocumentImpl* doc,
+  SVGFETurbulenceElementImpl(KDOM::DocumentPtr* doc,
                              KDOM::NodeImpl::Id id,
-                             const KDOM::DOMString& prefix);
+                             KDOM::DOMStringImpl* prefix);
   virtual ~SVGFETurbulenceElementImpl();
 
   // 'SVGFETurbulenceElement' functions

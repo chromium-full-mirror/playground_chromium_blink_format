@@ -33,9 +33,9 @@
 
 using namespace KSVG;
 
-SVGViewElementImpl::SVGViewElementImpl(KDOM::DocumentImpl* doc,
+SVGViewElementImpl::SVGViewElementImpl(KDOM::DocumentPtr* doc,
                                        KDOM::NodeImpl::Id id,
-                                       const KDOM::DOMString& prefix)
+                                       KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl(),

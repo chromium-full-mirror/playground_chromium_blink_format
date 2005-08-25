@@ -33,9 +33,9 @@ class SVGAnimatedStringImpl;
 
 class SVGFEFloodElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEFloodElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEFloodElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEFloodElementImpl();
 
   // 'SVGFEFloodElement' functions

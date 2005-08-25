@@ -37,9 +37,9 @@ class SVGLineElementImpl : public SVGStyledElementImpl,
                            public SVGExternalResourcesRequiredImpl,
                            public SVGTransformableImpl {
  public:
-  SVGLineElementImpl(KDOM::DocumentImpl* doc,
+  SVGLineElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGLineElementImpl();
 
   // 'SVGLineElement' functions

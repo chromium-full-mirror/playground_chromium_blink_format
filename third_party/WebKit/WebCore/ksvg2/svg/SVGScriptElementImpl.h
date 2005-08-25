@@ -32,9 +32,9 @@ class SVGScriptElementImpl : public SVGElementImpl,
                              public SVGURIReferenceImpl,
                              public SVGExternalResourcesRequiredImpl {
  public:
-  SVGScriptElementImpl(KDOM::DocumentImpl* doc,
+  SVGScriptElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGScriptElementImpl();
 
   // 'SVGScriptElement' functions

@@ -36,9 +36,9 @@ class SVGAnimatedEnumerationImpl;
 class SVGFEColorMatrixElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEColorMatrixElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEColorMatrixElementImpl(KDOM::DocumentPtr* doc,
                               KDOM::NodeImpl::Id id,
-                              const KDOM::DOMString& prefix);
+                              KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEColorMatrixElementImpl();
 
   // 'SVGFEColorMatrixElement' functions

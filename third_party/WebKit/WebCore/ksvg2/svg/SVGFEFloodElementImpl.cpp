@@ -38,9 +38,9 @@
 
 using namespace KSVG;
 
-SVGFEFloodElementImpl::SVGFEFloodElementImpl(KDOM::DocumentImpl* doc,
+SVGFEFloodElementImpl::SVGFEFloodElementImpl(KDOM::DocumentPtr* doc,
                                              KDOM::NodeImpl::Id id,
-                                             const KDOM::DOMString& prefix)
+                                             KDOM::DOMStringImpl* prefix)
     : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
   m_in1 = 0;
   m_filterEffect = 0;
@@ -61,7 +61,7 @@ void SVGFEFloodElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
   switch (id) {
     case ATTR_IN: {
-      in1()->setBaseVal(value.implementation());
+      in1()->setBaseVal(value.handle());
       break;
     }
     default: { SVGFilterPrimitiveStandardAttributesImpl::parseAttribute(attr); }

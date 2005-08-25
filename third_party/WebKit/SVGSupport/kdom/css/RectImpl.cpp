@@ -26,8 +26,7 @@
 
 using namespace KDOM;
 
-RectImpl::RectImpl(CDFInterface* interface)
-    : Shared(true), m_interface(interface) {
+RectImpl::RectImpl(CDFInterface* interface) : Shared(), m_interface(interface) {
   m_top = 0;
   m_right = 0;
   m_bottom = 0;

@@ -23,14 +23,13 @@
 #ifndef KDOM_RegisteredEventListener_H
 #define KDOM_RegisteredEventListener_H
 
-#include <kdom/events/Event.h>
 #include <kdom/events/kdomevents.h>
-#include <kdom/events/EventListener.h>
 
 namespace KDOM {
+class EventListenerImpl;
 class RegisteredEventListener {
  public:
-  RegisteredEventListener(const DOMString& type,
+  RegisteredEventListener(DOMStringImpl* type,
                           EventListenerImpl* listener,
                           bool useCapture);
   ~RegisteredEventListener();
@@ -38,7 +37,7 @@ class RegisteredEventListener {
   bool operator==(const RegisteredEventListener& other) const;
   bool operator!=(const RegisteredEventListener& other) const;
 
-  DOMString type() const;
+  DOMStringImpl* type() const;
   bool useCapture() const;
   EventListenerImpl* listener() const;
 
@@ -46,7 +45,7 @@ class RegisteredEventListener {
   RegisteredEventListener(const RegisteredEventListener& other);
   RegisteredEventListener& operator=(const RegisteredEventListener& other);
 
-  DOMString m_type;
+  DOMStringImpl* m_type;
   bool m_useCapture;
   EventListenerImpl* m_listener;
 };

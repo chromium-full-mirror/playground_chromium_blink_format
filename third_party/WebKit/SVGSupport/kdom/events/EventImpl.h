@@ -27,7 +27,6 @@
 
 #include <kdom/kdom.h>
 #include <kdom/Shared.h>
-#include <kdom/DOMString.h>
 
 namespace KDOM {
 typedef enum {
@@ -45,7 +44,7 @@ class EventImpl : public Shared {
   EventImpl(EventImplType identifier);
   virtual ~EventImpl();
 
-  DOMString type() const;
+  DOMStringImpl* type() const;
 
   EventTargetImpl* target() const;
   EventTargetImpl* currentTarget() const;
@@ -60,7 +59,7 @@ class EventImpl : public Shared {
   void stopPropagation();
   void preventDefault();
 
-  virtual void initEvent(const DOMString& eventTypeArg,
+  virtual void initEvent(DOMStringImpl* eventTypeArg,
                          bool canBubbleArg,
                          bool cancelableArg);
 
@@ -80,7 +79,7 @@ class EventImpl : public Shared {
   bool defaultHandled() const { return m_defaultHandled; }
 
  protected:
-  DOMString m_type;
+  DOMStringImpl* m_type;
   QDateTime m_createTime;
 
   EventImplType m_identifier;

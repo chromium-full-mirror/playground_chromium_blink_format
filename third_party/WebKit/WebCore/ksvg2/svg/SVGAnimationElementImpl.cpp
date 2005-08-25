@@ -22,10 +22,12 @@
 
 #include <float.h>
 
+#include <kdom/kdom.h>
 #include <kdom/impl/AttrImpl.h>
 #include <kdom/impl/CDFInterface.h>
 #include <kdom/impl/DOMImplementationImpl.h>
 #include <kdom/css/impl/CSSStyleDeclarationImpl.h>
+#include <kdom/DOMString.h>
 
 #include "svgattrs.h"
 #include "SVGHelper.h"
@@ -34,11 +36,14 @@
 #include "SVGStyledElementImpl.h"
 #include "SVGAnimationElementImpl.h"
 
-using namespace KSVG;
+#include <cmath>
 
-SVGAnimationElementImpl::SVGAnimationElementImpl(KDOM::DocumentImpl* doc,
+using namespace KSVG;
+using namespace std;
+
+SVGAnimationElementImpl::SVGAnimationElementImpl(KDOM::DocumentPtr* doc,
                                                  KDOM::NodeImpl::Id id,
-                                                 const KDOM::DOMString& prefix)
+                                                 KDOM::DOMStringImpl* prefix)
     : SVGElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGExternalResourcesRequiredImpl() {
@@ -83,7 +88,7 @@ SVGElementImpl* SVGAnimationElementImpl::targetElement() const {
   if (!m_targetElement) {
     if (!m_href.isEmpty()) {
       KDOM::ElementImpl* element = ownerDocument()->getElementById(
-          SVGURIReferenceImpl::getTarget(m_href));
+          KDOM::DOMString(SVGURIReferenceImpl::getTarget(m_href)).handle());
       if (element)
         m_targetElement = dynamic_cast<SVGElementImpl*>(element);
     } else if (parentNode()) {
@@ -102,19 +107,19 @@ SVGElementImpl* SVGAnimationElementImpl::targetElement() const {
   return m_targetElement;
 }
 
-double SVGAnimationElementImpl::endTime() const {
+double SVGAnimationElementImpl::getEndTime() const {
   return m_end;
 }
 
-double SVGAnimationElementImpl::startTime() const {
+double SVGAnimationElementImpl::getStartTime() const {
   return m_begin;
 }
 
-double SVGAnimationElementImpl::currentTime() const {
+double SVGAnimationElementImpl::getCurrentTime() const {
   return m_currentTime;
 }
 
-double SVGAnimationElementImpl::simpleDuration() const {
+double SVGAnimationElementImpl::getSimpleDuration() const {
   return m_simpleDuration;
 }
 
@@ -374,7 +379,7 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
     if (parse.find('.') != -1) {
       QString temp = parse.mid(9, 2);
       milliseconds = temp.toUInt();
-      result += (milliseconds * (1 / pow(10.0, temp.length())));
+      result += (milliseconds * (1 / pow(10.0, int(temp.length()))));
     }
   } else if (doublePointOne != -1 &&
              doublePointTwo == -1)  // Spec: "Partial clock values"
@@ -388,7 +393,7 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
     if (parse.find('.') != -1) {
       QString temp = parse.mid(6, 2);
       milliseconds = temp.toUInt();
-      result += (milliseconds * (1 / pow(10.0, temp.length())));
+      result += (milliseconds * (1 / pow(10.0, int(temp.length()))));
     }
   } else  // Spec: "Timecount values"
   {
@@ -401,7 +406,8 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
         result = parse.mid(0, dotPosition).toUInt() * 3600;
         QString temp =
             parse.mid(dotPosition + 1, parse.length() - dotPosition - 2);
-        result += (3600.0 * temp.toUInt()) * (1 / pow(10.0, temp.length()));
+        result +=
+            (3600.0 * temp.toUInt()) * (1 / pow(10.0, int(temp.length())));
       }
     } else if (parse.endsWith(QString::fromLatin1("min"))) {
       if (dotPosition == -1)
@@ -410,7 +416,7 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
         result = parse.mid(0, dotPosition).toUInt() * 60;
         QString temp =
             parse.mid(dotPosition + 1, parse.length() - dotPosition - 4);
-        result += (60.0 * temp.toUInt()) * (1 / pow(10.0, temp.length()));
+        result += (60.0 * temp.toUInt()) * (1 / pow(10.0, int(temp.length())));
       }
     } else if (parse.endsWith(QString::fromLatin1("ms"))) {
       if (dotPosition == -1)
@@ -419,7 +425,8 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
         result = parse.mid(0, dotPosition).toUInt() / 1000.0;
         QString temp =
             parse.mid(dotPosition + 1, parse.length() - dotPosition - 3);
-        result += (temp.toUInt() / 1000.0) * (1 / pow(10.0, temp.length()));
+        result +=
+            (temp.toUInt() / 1000.0) * (1 / pow(10.0, int(temp.length())));
       }
     } else if (parse.endsWith(QString::fromLatin1("s"))) {
       if (dotPosition == -1)
@@ -428,7 +435,7 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
         result = parse.mid(0, dotPosition).toUInt();
         QString temp =
             parse.mid(dotPosition + 1, parse.length() - dotPosition - 2);
-        result += temp.toUInt() * (1 / pow(10.0, temp.length()));
+        result += temp.toUInt() * (1 / pow(10.0, int(temp.length())));
       }
     } else
       result = parse.toDouble();
@@ -438,14 +445,14 @@ double SVGAnimationElementImpl::parseClockValue(const QString& data) const {
 }
 
 void SVGAnimationElementImpl::close() {
-  kdDebug() << " --> ADDING " << localName()
-            << " animation (startTime = " << startTime() << " ms) to scheduler!"
-            << endl;
+  kdDebug() << " --> ADDING " << KDOM::DOMString(localName())
+            << " animation (startTime = " << getStartTime()
+            << " ms) to scheduler!" << endl;
   SVGDocumentImpl* document = static_cast<SVGDocumentImpl*>(ownerDocument());
   if (!document)
     return;
 
-  document->timeScheduler()->addTimer(this, qRound(startTime()));
+  document->timeScheduler()->addTimer(this, qRound(getStartTime()));
 }
 
 KDOM::DOMString SVGAnimationElementImpl::targetAttribute() const {
@@ -480,12 +487,13 @@ KDOM::DOMString SVGAnimationElementImpl::targetAttribute() const {
     if (styled && styled->style() && interface) {
       int id = interface->getPropertyID(m_attributeName.ascii(),
                                         m_attributeName.length());
-      ret = styled->style()->getPropertyValue(id);
+      ret = KDOM::DOMString(styled->style()->getPropertyValue(id));
     }
   }
 
   if (attributeType == ATTRIBUTETYPE_XML || ret.isEmpty())
-    ret = targetElement()->getAttribute(KDOM::DOMString(m_attributeName));
+    ret = KDOM::DOMString(targetElement()->getAttribute(
+        KDOM::DOMString(m_attributeName).handle()));
 
   return ret;
 }
@@ -527,9 +535,9 @@ void SVGAnimationElementImpl::setTargetAttribute(SVGElementImpl* target,
   if (attributeType == ATTRIBUTETYPE_CSS && styled && styled->style()) {
     int id =
         interface->getPropertyID(name.string().ascii(), name.string().length());
-    styled->style()->setProperty(id, value);
+    styled->style()->setProperty(id, value.handle());
   } else if (attributeType == ATTRIBUTETYPE_XML)
-    target->setAttribute(name.implementation(), value.implementation());
+    target->setAttribute(name.handle(), value.handle());
 }
 
 QString SVGAnimationElementImpl::attributeName() const {

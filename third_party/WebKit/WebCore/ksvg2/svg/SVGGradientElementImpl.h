@@ -41,9 +41,9 @@ class SVGGradientElementImpl : public SVGStyledElementImpl,
                                public SVGExternalResourcesRequiredImpl,
                                public KCanvasResourceListener {
  public:
-  SVGGradientElementImpl(KDOM::DocumentImpl* doc,
+  SVGGradientElementImpl(KDOM::DocumentPtr* doc,
                          KDOM::NodeImpl::Id id,
-                         const KDOM::DOMString& prefix);
+                         KDOM::DOMStringImpl* prefix);
   virtual ~SVGGradientElementImpl();
 
   // 'SVGGradientElement' functions

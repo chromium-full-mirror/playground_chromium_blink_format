@@ -25,6 +25,7 @@
 
 #include <qptrlist.h>
 
+#include <kdom/DOMString.h>
 #include <kdom/TreeShared.h>
 
 namespace KDOM {
@@ -36,10 +37,10 @@ class EventTargetImpl : public TreeShared<EventTargetImpl> {
   EventTargetImpl();
   virtual ~EventTargetImpl();
 
-  void addEventListener(const DOMString& type,
+  void addEventListener(DOMStringImpl* type,
                         EventListenerImpl* listener,
                         bool useCapture);
-  void removeEventListener(const DOMString& type,
+  void removeEventListener(DOMStringImpl* type,
                            EventListenerImpl* listener,
                            bool useCapture);
   bool dispatchEvent(EventImpl* evt);

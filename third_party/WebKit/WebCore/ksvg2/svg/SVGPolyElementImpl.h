@@ -40,9 +40,9 @@ class SVGPolyElementImpl : public SVGStyledElementImpl,
                            public SVGAnimatedPointsImpl,
                            public SVGPolyParser {
  public:
-  SVGPolyElementImpl(KDOM::DocumentImpl* doc,
+  SVGPolyElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGPolyElementImpl();
 
   // Derived from: 'SVGAnimatedPoints'

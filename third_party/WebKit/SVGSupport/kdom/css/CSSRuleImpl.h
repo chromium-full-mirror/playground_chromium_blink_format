@@ -23,11 +23,11 @@
 #ifndef KDOM_CSSRuleImpl_H
 #define KDOM_CSSRuleImpl_H
 
-#include <kdom/css/impl/StyleBaseImpl.h>
-#include <kdom/DOMString.h>
 #include <kdom/css/kdomcss.h>
+#include <kdom/css/impl/StyleBaseImpl.h>
 
 namespace KDOM {
+class DOMStringImpl;
 class CSSStyleSheetImpl;
 class CSSRuleImpl : public StyleBaseImpl {
  public:
@@ -36,8 +36,9 @@ class CSSRuleImpl : public StyleBaseImpl {
 
   // 'CSSRule' functions
   virtual unsigned short type() const;
-  virtual void setCssText(const DOMString& cssText);
-  virtual DOMString cssText() const;
+
+  virtual DOMStringImpl* cssText() const;
+  virtual void setCssText(DOMStringImpl* cssText);
 
   virtual CSSStyleSheetImpl* parentStyleSheet() const;
   virtual CSSRuleImpl* parentRule() const;

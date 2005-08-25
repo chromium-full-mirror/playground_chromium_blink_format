@@ -35,11 +35,11 @@ unsigned short CSSRuleImpl::type() const {
   return m_type;
 }
 
-void CSSRuleImpl::setCssText(const DOMString&) {}
-
-DOMString CSSRuleImpl::cssText() const {
-  return DOMString();
+DOMStringImpl* CSSRuleImpl::cssText() const {
+  return 0;
 }
+
+void CSSRuleImpl::setCssText(DOMStringImpl*) {}
 
 CSSStyleSheetImpl* CSSRuleImpl::parentStyleSheet() const {
   return (m_parent && m_parent->isCSSStyleSheet())

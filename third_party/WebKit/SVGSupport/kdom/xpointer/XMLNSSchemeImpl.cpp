@@ -22,19 +22,20 @@
 
 #include <qmap.h>
 
-#include "DOMString.h"
-#include "Node.h"
 #include <kdom/Helper.h>
 #include <kdom/Shared.h>
 
+#include "DOMString.h"
 #include "PointerPartImpl.h"
 #include "XMLNSSchemeImpl.h"
 
 using namespace KDOM;
 using namespace KDOM::XPointer;
 
-XMLNSSchemeImpl::XMLNSSchemeImpl(const DOMString& schemeData, NBCImpl* nbc)
+XMLNSSchemeImpl::XMLNSSchemeImpl(DOMStringImpl* schemeDataImpl, NBCImpl* nbc)
     : NBCImpl(nbc) {
+  DOMString schemeData(schemeDataImpl);
+
   /* Note:
    * "[...] if scheme data in a pointer part with the xmlns() scheme does not
    * conform to
@@ -55,7 +56,7 @@ XMLNSSchemeImpl::XMLNSSchemeImpl(const DOMString& schemeData, NBCImpl* nbc)
   DOMString prefix = qSchemeData.mid(0, delimiter).stripWhiteSpace();
   DOMString ns = qSchemeData.mid(delimiter + 1, length).stripWhiteSpace();
 
-  if (!Helper::IsValidNCName(prefix))
+  if (!Helper::IsValidNCName(prefix.handle()))
     return;
 
   /* The ns string is simply xpointer-escaped unicode chars, and any wrong
@@ -64,7 +65,7 @@ XMLNSSchemeImpl::XMLNSSchemeImpl(const DOMString& schemeData, NBCImpl* nbc)
 
   /* NBCImpl does the xml/xmlns checks. */
 
-  addMapping(prefix, ns);
+  addMapping(prefix.handle(), ns.handle());
 }
 
 XMLNSSchemeImpl::~XMLNSSchemeImpl() {}

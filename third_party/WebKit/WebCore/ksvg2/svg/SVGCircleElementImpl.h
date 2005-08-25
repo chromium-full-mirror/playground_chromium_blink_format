@@ -37,9 +37,9 @@ class SVGCircleElementImpl : public SVGStyledElementImpl,
                              public SVGExternalResourcesRequiredImpl,
                              public SVGTransformableImpl {
  public:
-  SVGCircleElementImpl(KDOM::DocumentImpl* doc,
+  SVGCircleElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGCircleElementImpl();
 
   // 'SVGCircleElement' functions

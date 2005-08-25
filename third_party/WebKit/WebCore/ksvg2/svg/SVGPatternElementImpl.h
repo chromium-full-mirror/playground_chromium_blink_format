@@ -53,9 +53,9 @@ class SVGPatternElementImpl : public SVGStyledElementImpl,
                               public SVGLocatableImpl,  // TODO : really needed?
                               public KCanvasResourceListener {
  public:
-  SVGPatternElementImpl(KDOM::DocumentImpl* doc,
+  SVGPatternElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGPatternElementImpl();
 
   // 'SVGPatternElement' functions

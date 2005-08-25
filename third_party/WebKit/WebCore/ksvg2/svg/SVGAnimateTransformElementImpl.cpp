@@ -35,12 +35,17 @@
 #include "SVGAnimatedTransformListImpl.h"
 #include "SVGAnimateTransformElementImpl.h"
 
+#include <kdebug.h>
+
+#include <cmath>
+
 using namespace KSVG;
+using namespace std;
 
 SVGAnimateTransformElementImpl::SVGAnimateTransformElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGAnimationElementImpl(doc, id, prefix) {
   m_type = SVG_TRANSFORM_UNKNOWN;
 

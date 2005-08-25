@@ -29,9 +29,9 @@ namespace KSVG {
 class SVGAnimatedNumberImpl;
 class SVGStopElementImpl : public SVGStyledElementImpl {
  public:
-  SVGStopElementImpl(KDOM::DocumentImpl* doc,
+  SVGStopElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGStopElementImpl();
 
   // 'SVGStoplement' functions

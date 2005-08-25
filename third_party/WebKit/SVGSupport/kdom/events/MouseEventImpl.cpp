@@ -22,6 +22,7 @@
 
 #include <qevent.h>
 
+#include "DOMStringImpl.h"
 #include "MouseEventImpl.h"
 
 using namespace KDOM;
@@ -89,7 +90,7 @@ void MouseEventImpl::setRelatedTarget(EventTargetImpl* target) {
   m_relatedTarget = target;
 }
 
-void MouseEventImpl::initMouseEvent(const DOMString& typeArg,
+void MouseEventImpl::initMouseEvent(DOMStringImpl* typeArg,
                                     bool canBubbleArg,
                                     bool cancelableArg,
                                     AbstractViewImpl* viewArg,
@@ -118,10 +119,10 @@ void MouseEventImpl::initMouseEvent(const DOMString& typeArg,
   m_relatedTarget = relatedTargetArg;
 }
 
-void MouseEventImpl::initMouseEvent(const DOMString& typeArg,
+void MouseEventImpl::initMouseEvent(DOMStringImpl* typeArg,
                                     QMouseEvent* qevent,
                                     float scale) {
-  if (!qevent || typeArg.isEmpty())
+  if (!qevent || !typeArg || typeArg->isEmpty())
     return;
 
   int clientX = qevent->x(), screenX = qevent->globalX();

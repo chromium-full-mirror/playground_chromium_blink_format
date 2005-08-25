@@ -59,9 +59,9 @@
 
 using namespace KSVG;
 
-SVGSVGElementImpl::SVGSVGElementImpl(KDOM::DocumentImpl* doc,
+SVGSVGElementImpl::SVGSVGElementImpl(KDOM::DocumentPtr* doc,
                                      KDOM::NodeImpl::Id id,
-                                     const KDOM::DOMString& prefix)
+                                     KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -102,7 +102,7 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::width() const {
   if (!m_width) {
     lazy_create<SVGAnimatedLengthImpl>(
         m_width, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH, this);
-    m_width->baseVal()->setValueAsString("100%");
+    m_width->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
   }
 
   return m_width;
@@ -112,28 +112,36 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::height() const {
   if (!m_height) {
     lazy_create<SVGAnimatedLengthImpl>(
         m_height, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT, this);
-    m_height->baseVal()->setValueAsString("100%");
+    m_height->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
   }
 
   return m_height;
 }
 
-KDOM::DOMString SVGSVGElementImpl::contentScriptType() const {
-  return tryGetAttribute("contentScriptType", "text/ecmascript");
-}
-
-void SVGSVGElementImpl::setContentScriptType(const KDOM::DOMString& type) {
+KDOM::DOMStringImpl* SVGSVGElementImpl::contentScriptType() const {
   KDOM::DOMString name("contentScriptType");
-  setAttribute(name.implementation(), type.implementation());
+  if (hasAttribute(name.handle()))
+    return getAttribute(name.handle());
+
+  return new KDOM::DOMStringImpl("text/ecmascript");
 }
 
-KDOM::DOMString SVGSVGElementImpl::contentStyleType() const {
-  return tryGetAttribute("contentStyleType", "text/css");
+void SVGSVGElementImpl::setContentScriptType(KDOM::DOMStringImpl* type) {
+  KDOM::DOMString name("contentScriptType");
+  setAttribute(name.handle(), type);
 }
 
-void SVGSVGElementImpl::setContentStyleType(const KDOM::DOMString& type) {
+KDOM::DOMStringImpl* SVGSVGElementImpl::contentStyleType() const {
   KDOM::DOMString name("contentStyleType");
-  setAttribute(name.implementation(), type.implementation());
+  if (hasAttribute(name.handle()))
+    return getAttribute(name.handle());
+
+  return new KDOM::DOMStringImpl("text/css");
+}
+
+void SVGSVGElementImpl::setContentStyleType(KDOM::DOMStringImpl* type) {
+  KDOM::DOMString name("contentStyleType");
+  setAttribute(name.handle(), type);
 }
 
 SVGRectImpl* SVGSVGElementImpl::viewport() const {
@@ -228,12 +236,12 @@ KDOM::EventImpl* SVGSVGElementImpl::createEvent(
   else if (eventType == "SVGZoomEvents")
     return new SVGZoomEventImpl();
 
-  return DocumentEventImpl::createEvent(eventType);
+  return DocumentEventImpl::createEvent(eventType.handle());
 }
 
 void SVGSVGElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMString value(attr->value());
+  KDOM::DOMStringImpl* value = attr->value();
   switch (id) {
     case ATTR_X: {
       x()->baseVal()->setValueAsString(value);
@@ -490,7 +498,9 @@ QString SVGSVGElementImpl::adjustViewportClipping() const {
 KCanvasItem* SVGSVGElementImpl::createCanvasItem(KCanvas* canvas,
                                                  KRenderingStyle* style) const {
   KCanvasItem* item = KCanvasCreator::self()->createContainer(canvas, style);
-  if (ownerDocument()->documentElement() == this && !canvas->rootContainer()) {
+  if (ownerDocument()->documentElement() ==
+          static_cast<const KDOM::ElementImpl*>(this) &&
+      !canvas->rootContainer()) {
     canvas->setRootContainer(static_cast<KCanvasContainer*>(item));
     canvas->setCanvasSize(QSize(qRound(width()->baseVal()->value()),
                                 qRound(height()->baseVal()->value())));

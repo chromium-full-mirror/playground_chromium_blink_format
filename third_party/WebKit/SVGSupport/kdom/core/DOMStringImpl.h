@@ -4,6 +4,7 @@
 
     Additional copyright (KHTML code)
               (C) 1999 Lars Knoll <knoll@kde.org>
+                          (C) 2003 Dirk Mueller (mueller@kde.org)
 
     This file is part of the KDE project
 
@@ -31,7 +32,7 @@
 #include <kdom/Shared.h>
 
 namespace KDOM {
-class DOMStringImpl : public KDOM::Shared {
+class DOMStringImpl : public Shared {
  public:
   DOMStringImpl();
   DOMStringImpl(const QChar* str, unsigned int len);
@@ -41,14 +42,16 @@ class DOMStringImpl : public KDOM::Shared {
 
   const QChar& operator[](int i) const;
 
-  DOMStringImpl operator=(const QString& str);
-
   unsigned int length() const;
   void setLength(unsigned int len);
 
   void insert(DOMStringImpl* str, unsigned int pos);
+
+  void append(const char* str);
+  void append(const QString& str);
   void append(DOMStringImpl* str);
 
+  bool isEmpty() const;
   bool containsOnlyWhitespace() const;
 
   void truncate(int len);
@@ -64,6 +67,7 @@ class DOMStringImpl : public KDOM::Shared {
   DOMStringImpl* capitalize() const;
 
   QChar* unicode() const;
+  QString string() const;
 
   int toInt(bool* ok = 0) const;
 

@@ -32,7 +32,9 @@ class SVGPathSegMovetoAbsImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegMovetoAbsImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_ABS; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "M"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("M");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("M %1 %2").arg(m_x).arg(m_y);
   }
@@ -54,7 +56,9 @@ class SVGPathSegMovetoRelImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegMovetoRelImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_MOVETO_REL; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "m"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("m");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("m %1 %2").arg(m_x).arg(m_y);
   }

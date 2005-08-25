@@ -213,7 +213,7 @@ bool DOMString::isEmpty() const {
   return (isNull() || !d->length());
 }
 
-DOMStringImpl* DOMString::implementation() const {
+DOMStringImpl* DOMString::handle() const {
   return d;
 }
 
@@ -292,7 +292,7 @@ bool KDOM::operator==(const DOMString& a, const QString& b) {
 }
 
 bool KDOM::operator==(const DOMString& a, const char* b) {
-  DOMStringImpl* aimpl = a.implementation();
+  DOMStringImpl* aimpl = a.handle();
   if (!b)
     return !aimpl;
 

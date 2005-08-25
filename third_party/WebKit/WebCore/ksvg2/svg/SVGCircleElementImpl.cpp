@@ -32,9 +32,9 @@
 
 using namespace KSVG;
 
-SVGCircleElementImpl::SVGCircleElementImpl(KDOM::DocumentImpl* doc,
+SVGCircleElementImpl::SVGCircleElementImpl(KDOM::DocumentPtr* doc,
                                            KDOM::NodeImpl::Id id,
-                                           const KDOM::DOMString& prefix)
+                                           KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -69,7 +69,7 @@ SVGAnimatedLengthImpl* SVGCircleElementImpl::r() const {
 
 void SVGCircleElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMString value(attr->value());
+  KDOM::DOMStringImpl* value = attr->value();
   switch (id) {
     case ATTR_CX: {
       cx()->baseVal()->setValueAsString(value);

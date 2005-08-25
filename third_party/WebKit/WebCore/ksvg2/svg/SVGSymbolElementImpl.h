@@ -29,15 +29,14 @@
 #include "SVGExternalResourcesRequiredImpl.h"
 
 namespace KSVG {
-class KDOM::DocumentImpl;
 class SVGSymbolElementImpl : public SVGStyledElementImpl,
                              public SVGLangSpaceImpl,
                              public SVGExternalResourcesRequiredImpl,
                              public SVGFitToViewBoxImpl {
  public:
-  SVGSymbolElementImpl(KDOM::DocumentImpl* doc,
+  SVGSymbolElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGSymbolElementImpl();
 
   virtual void parseAttribute(KDOM::AttributeImpl*);

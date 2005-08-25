@@ -65,6 +65,10 @@ CachedDocument::CachedDocument(DocumentLoader* docLoader,
   m_loading = true;
 }
 
+CachedDocument::~CachedDocument() {
+  delete d;
+}
+
 void CachedDocument::ref(CachedObjectClient* c) {
   CachedObject::ref(c);
 

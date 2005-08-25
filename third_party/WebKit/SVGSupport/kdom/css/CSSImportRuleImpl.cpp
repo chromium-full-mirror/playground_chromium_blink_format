@@ -20,29 +20,33 @@
     Boston, MA 02111-1307, USA.
 */
 
+#include <kdom/cache/KDOMLoader.h>
+#include <kdom/cache/KDOMCachedStyleSheet.h>
+
+#include "DocumentImpl.h"
 #include "MediaListImpl.h"
 #include "CSSStyleSheetImpl.h"
 #include "CSSImportRuleImpl.h"
-#include <kdom/cache/KDOMCachedStyleSheet.h>
-#include <kdom/cache/KDOMLoader.h>
-#include "DocumentImpl.h"
 
 using namespace KDOM;
 
 CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
-                                     const DOMString& href,
+                                     DOMStringImpl* href,
                                      MediaListImpl* media)
     : CSSRuleImpl(parent) {
   m_type = IMPORT_RULE;
 
   m_lstMedia = media;
   if (!m_lstMedia)
-    m_lstMedia = new MediaListImpl(this, DOMString());
+    m_lstMedia = new MediaListImpl(this, 0);
 
   m_lstMedia->setParent(this);
   m_lstMedia->ref();
 
   m_strHref = href;
+  if (m_strHref)
+    m_strHref->ref();
+
   m_styleSheet = 0;
   m_cachedSheet = 0;
 
@@ -50,8 +54,8 @@ CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
 }
 
 CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
-                                     const DOMString& href,
-                                     const DOMString& media)
+                                     DOMStringImpl* href,
+                                     DOMStringImpl* media)
     : CSSRuleImpl(parent) {
   m_type = IMPORT_RULE;
 
@@ -59,6 +63,9 @@ CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
   m_lstMedia->ref();
 
   m_strHref = href;
+  if (m_strHref)
+    m_strHref->ref();
+
   m_styleSheet = 0;
   m_cachedSheet = 0;
 
@@ -76,11 +83,14 @@ CSSImportRuleImpl::~CSSImportRuleImpl() {
     m_styleSheet->deref();
   }
 
+  if (m_strHref)
+    m_strHref->deref();
+
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
 }
 
-DOMString CSSImportRuleImpl::href() const {
+DOMStringImpl* CSSImportRuleImpl::href() const {
   return m_strHref;
 }
 
@@ -92,8 +102,8 @@ CSSStyleSheetImpl* CSSImportRuleImpl::styleSheet() const {
   return m_styleSheet;
 }
 
-void CSSImportRuleImpl::setStyleSheet(const DOMString& url,
-                                      const DOMString& sheet) {
+void CSSImportRuleImpl::setStyleSheet(DOMStringImpl* url,
+                                      DOMStringImpl* sheet) {
   if (m_styleSheet) {
     m_styleSheet->setParent(0);
     m_styleSheet->deref();
@@ -109,7 +119,7 @@ void CSSImportRuleImpl::setStyleSheet(const DOMString& url,
   checkLoaded();
 }
 
-void CSSImportRuleImpl::error(int /*err*/, const QString& /*text*/) {
+void CSSImportRuleImpl::error(int, const QString&) {
   if (m_styleSheet) {
     m_styleSheet->setParent(0);
     m_styleSheet->deref();
@@ -143,14 +153,16 @@ void CSSImportRuleImpl::init() {
 
   KURL absHref;
   CSSStyleSheetImpl* parentSheet = parentStyleSheet();
-  if (!parentSheet->href().isNull()) {
+  if (parentSheet->href()) {
     // use parent styleheet's URL as the base URL
-    absHref = KURL(KURL(parentSheet->href().string()), m_strHref.string());
+    absHref = KURL(KURL(parentSheet->href()->string()),
+                   (m_strHref ? m_strHref->string() : QString::null));
   } else {
     // TODO: khtml(1) disabled this - why?? (Niko)
     // use documents's URL as the base URL
     DocumentImpl* doc = static_cast<CSSStyleSheetImpl*>(root)->doc();
-    absHref = KURL(doc->documentKURI(), m_strHref.string());
+    absHref = KURL(doc->documentKURI(),
+                   (m_strHref ? m_strHref->string() : QString::null));
   }
 
   // Check for a cycle in our import chain.  If we encounter a stylesheet

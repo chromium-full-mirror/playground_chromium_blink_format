@@ -34,25 +34,25 @@ class MutationEventImpl : public EventImpl {
 
   NodeImpl* relatedNode() const;
 
-  DOMString prevValue() const;
-  DOMString newValue() const;
-  DOMString attrName() const;
+  DOMStringImpl* prevValue() const;
+  DOMStringImpl* newValue() const;
+  DOMStringImpl* attrName() const;
 
   unsigned short attrChange() const;
 
-  void initMutationEvent(const DOMString& typeArg,
+  void initMutationEvent(DOMStringImpl* typeArg,
                          bool canBubbleArg,
                          bool cancelableArg,
                          NodeImpl* relatedNodeArg,
-                         const DOMString& prevValueArg,
-                         const DOMString& newValueArg,
-                         const DOMString& attrNameArg,
+                         DOMStringImpl* prevValueArg,
+                         DOMStringImpl* newValueArg,
+                         DOMStringImpl* attrNameArg,
                          unsigned short attrChangeArg);
 
  private:
-  DOMString m_prevValue;
-  DOMString m_newValue;
-  DOMString m_attrName;
+  DOMStringImpl* m_prevValue;
+  DOMStringImpl* m_newValue;
+  DOMStringImpl* m_attrName;
 
   unsigned short m_attrChange;
 

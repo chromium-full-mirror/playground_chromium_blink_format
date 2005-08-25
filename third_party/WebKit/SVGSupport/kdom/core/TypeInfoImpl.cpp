@@ -19,27 +19,28 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include "DOMString.h"
-
 #include "TypeInfoImpl.h"
 
 using namespace KDOM;
 
-TypeInfoImpl::TypeInfoImpl() : Shared(true) {}
+TypeInfoImpl::TypeInfoImpl() : Shared() {}
 
 TypeInfoImpl::~TypeInfoImpl() {}
 
-DOMString TypeInfoImpl::typeName() const {
-  return DOMString();
+DOMStringImpl* TypeInfoImpl::typeName() const {
+  // FIXME!
+  return 0;
 }
 
-DOMString TypeInfoImpl::typeNamespace() const {
-  return DOMString();
+DOMStringImpl* TypeInfoImpl::typeNamespace() const {
+  // FIXME!
+  return 0;
 }
 
-bool TypeInfoImpl::isDerivedFrom(const DOMString& /*typeNamespaceArg*/,
-                                 const DOMString& /*typeNameArg*/,
-                                 unsigned long /*derivationMethod*/) const {
+bool TypeInfoImpl::isDerivedFrom(DOMStringImpl*,
+                                 DOMStringImpl*,
+                                 unsigned long) const {
+  // FIXME!
   return false;
 }
 

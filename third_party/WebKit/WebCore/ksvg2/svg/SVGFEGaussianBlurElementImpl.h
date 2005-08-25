@@ -35,9 +35,9 @@ class SVGAnimatedNumberImpl;
 class SVGFEGaussianBlurElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEGaussianBlurElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEGaussianBlurElementImpl(KDOM::DocumentPtr* doc,
                                KDOM::NodeImpl::Id id,
-                               const KDOM::DOMString& prefix);
+                               KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEGaussianBlurElementImpl();
 
   // 'SVGFEGaussianBlurElement' functions

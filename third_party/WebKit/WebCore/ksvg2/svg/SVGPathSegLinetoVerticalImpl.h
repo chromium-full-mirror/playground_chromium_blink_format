@@ -34,7 +34,9 @@ class SVGPathSegLinetoVerticalAbsImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_VERTICAL_ABS;
   }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "V"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("V");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("V %1").arg(m_y);
   }
@@ -54,7 +56,9 @@ class SVGPathSegLinetoVerticalRelImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_LINETO_VERTICAL_REL;
   }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "v"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("v");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("v %1").arg(m_y);
   }

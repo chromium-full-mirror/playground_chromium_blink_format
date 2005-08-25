@@ -45,13 +45,13 @@ class LSSerializerImpl : public Shared {
   DOMConfigurationImpl* domConfig() const;
 
   DOMString newLine() const;
-  void setNewLine(const DOMString& newLine);
+  void setNewLine(DOMStringImpl* newLine);
 
   LSSerializerFilterImpl* filter() const;
   void setFilter(LSSerializerFilterImpl* filter);
 
   bool write(NodeImpl* nodeArg, LSOutputImpl* output);
-  bool writeToURI(NodeImpl* nodeArg, const DOMString& uri);
+  bool writeToURI(NodeImpl* nodeArg, DOMStringImpl* uri);
   DOMString writeToString(NodeImpl* nodeArg);
 
   // Internal
@@ -113,7 +113,7 @@ class LSSerializerImpl : public Shared {
    * @param escapee the string to escape
    * @returns a new string with character entities
    */
-  static DOMString escape(const DOMString& escapee);
+  static DOMStringImpl* escape(DOMStringImpl* escapee);
 
   /**
    * Identical to escape() with the addition that apostrophes and quotes
@@ -122,7 +122,7 @@ class LSSerializerImpl : public Shared {
    * ' == &apos;
    * " == &quot;
    */
-  static DOMString escapeAttribute(const DOMString& escapee);
+  static DOMStringImpl* escapeAttribute(DOMStringImpl* escapee);
 
   bool serialize(NodeImpl* nodeArg, LSOutputImpl* output) const;
 

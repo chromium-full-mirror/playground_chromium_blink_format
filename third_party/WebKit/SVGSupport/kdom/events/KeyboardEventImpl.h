@@ -36,11 +36,11 @@ class KeyboardEventImpl : public UIEventImpl {
   KeyboardEventImpl(EventImplType identifier);
   virtual ~KeyboardEventImpl();
 
-  void initKeyboardEvent(const DOMString& typeArg,
+  void initKeyboardEvent(DOMStringImpl* typeArg,
                          bool canBubbleArg,
                          bool cancelableArg,
                          AbstractViewImpl* viewArg,
-                         const DOMString& keyIdentifierArg,
+                         DOMStringImpl* keyIdentifierArg,
                          unsigned long keyLocationArg,
                          bool ctrlKeyArg,
                          bool altKeyArg,
@@ -54,10 +54,10 @@ class KeyboardEventImpl : public UIEventImpl {
   bool altKey() const;
   bool metaKey() const;
 
-  DOMString keyIdentifier() const { return DOMString(m_keyIdentifier); }
+  DOMStringImpl* keyIdentifier() const { return m_keyIdentifier; }
   unsigned long keyLocation() const { return m_keyLocation; }
 
-  bool getModifierState(const DOMString& keyIdentifierArg) const;
+  bool getModifierState(DOMStringImpl* keyIdentifierArg) const;
 
   QKeyEvent* qKeyEvent() const { return m_keyEvent; }
 

@@ -39,9 +39,9 @@
 
 using namespace KSVG;
 
-SVGGradientElementImpl::SVGGradientElementImpl(KDOM::DocumentImpl* doc,
+SVGGradientElementImpl::SVGGradientElementImpl(KDOM::DocumentPtr* doc,
                                                KDOM::NodeImpl::Id id,
-                                               const KDOM::DOMString& prefix)
+                                               KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGURIReferenceImpl(),
       SVGExternalResourcesRequiredImpl() {
@@ -123,7 +123,8 @@ void SVGGradientElementImpl::notifyAttributeChange() const {
   if (canvas) {
     KRenderingPaintServerGradient* pserver =
         static_cast<KRenderingPaintServerGradient*>(
-            canvas->registry()->getPaintServerById(getId().string()));
+            canvas->registry()->getPaintServerById(
+                KDOM::DOMString(getId()).string()));
     if (pserver) {
       buildGradient(pserver, canvas);
 

@@ -34,9 +34,9 @@ class SVGAnimatedEnumerationImpl;
 
 class SVGComponentTransferFunctionElementImpl : public SVGElementImpl {
  public:
-  SVGComponentTransferFunctionElementImpl(KDOM::DocumentImpl* doc,
+  SVGComponentTransferFunctionElementImpl(KDOM::DocumentPtr* doc,
                                           KDOM::NodeImpl::Id id,
-                                          const KDOM::DOMString& prefix);
+                                          KDOM::DOMStringImpl* prefix);
   virtual ~SVGComponentTransferFunctionElementImpl();
 
   // 'SVGComponentTransferFunctionElement' functions

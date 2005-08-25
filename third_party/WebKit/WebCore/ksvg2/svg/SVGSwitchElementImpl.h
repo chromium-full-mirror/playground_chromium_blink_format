@@ -36,9 +36,9 @@ class SVGSwitchElementImpl : public SVGStyledElementImpl,
                              public SVGExternalResourcesRequiredImpl,
                              public SVGTransformableImpl {
  public:
-  SVGSwitchElementImpl(KDOM::DocumentImpl* doc,
+  SVGSwitchElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGSwitchElementImpl();
 
   // Derived from: 'SVGStyledElementImpl'

@@ -29,9 +29,9 @@ namespace KSVG {
 class SVGAnimatedStringImpl;
 class SVGFEMergeNodeElementImpl : public SVGElementImpl {
  public:
-  SVGFEMergeNodeElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEMergeNodeElementImpl(KDOM::DocumentPtr* doc,
                             KDOM::NodeImpl::Id id,
-                            const KDOM::DOMString& prefix);
+                            KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEMergeNodeElementImpl();
 
   // Derived from: 'ElementImpl'

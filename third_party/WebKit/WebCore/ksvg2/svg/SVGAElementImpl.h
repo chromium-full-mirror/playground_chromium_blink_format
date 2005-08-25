@@ -39,9 +39,9 @@ class SVGAElementImpl : public SVGStyledElementImpl,
                         public SVGExternalResourcesRequiredImpl,
                         public SVGTransformableImpl {
  public:
-  SVGAElementImpl(KDOM::DocumentImpl* doc,
+  SVGAElementImpl(KDOM::DocumentPtr* doc,
                   KDOM::NodeImpl::Id id,
-                  const KDOM::DOMString& prefix);
+                  KDOM::DOMStringImpl* prefix);
   virtual ~SVGAElementImpl();
 
   // 'SVGAElement' functions

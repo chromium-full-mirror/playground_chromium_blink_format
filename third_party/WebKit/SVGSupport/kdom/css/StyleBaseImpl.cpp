@@ -46,15 +46,14 @@
 
 using namespace KDOM;
 
-StyleBaseImpl::StyleBaseImpl() : TreeShared<StyleBaseImpl>(false) {
+StyleBaseImpl::StyleBaseImpl() : TreeShared<StyleBaseImpl>() {
   m_parent = 0;
   m_hasInlinedDecl = false;
   m_strictParsing = true;
   m_multiLength = false;
 }
 
-StyleBaseImpl::StyleBaseImpl(StyleBaseImpl* p)
-    : TreeShared<StyleBaseImpl>(false) {
+StyleBaseImpl::StyleBaseImpl(StyleBaseImpl* p) : TreeShared<StyleBaseImpl>() {
   m_parent = p;
   m_hasInlinedDecl = false;
   m_strictParsing = m_parent ? m_parent->useStrictParsing() : true;
@@ -72,7 +71,7 @@ void StyleBaseImpl::setParent(StyleBaseImpl* parent) {
   m_parent = parent;
 }
 
-bool StyleBaseImpl::parseString(const DOMString&, bool) {
+bool StyleBaseImpl::parseString(DOMStringImpl*, bool) {
   return false;
 }
 
@@ -101,8 +100,8 @@ KURL StyleBaseImpl::baseURL() {
   if (!sheet)
     return KURL();
 
-  if (!sheet->href().isNull())
-    return KURL(sheet->href().string());
+  if (sheet->href())
+    return KURL(sheet->href()->string());
 
   // find parent
   if (sheet->parent())
@@ -190,8 +189,10 @@ void StyleListImpl::append(StyleBaseImpl* item) {
 }
 
 CSSSelector::CSSSelector(CDFInterface* interface)
-    : tagHistory(0),
+    : value(0),
+      tagHistory(0),
       simpleSelector(0),
+      string_arg(0),
       attr(0),
       tag(anyQName),
       relation(Descendant),
@@ -202,6 +203,12 @@ CSSSelector::CSSSelector(CDFInterface* interface)
       m_interface(interface) {}
 
 CSSSelector::~CSSSelector() {
+  if (value)
+    value->deref();
+
+  if (string_arg)
+    string_arg->deref();
+
   delete tagHistory;
   delete simpleSelector;
 }
@@ -210,7 +217,7 @@ void CSSSelector::print() {
 #ifndef APPLE_CHANGES
   kdDebug(6080) << "[Selector: tag = " << QString::number(tag, 16)
                 << ", attr = \"" << attr << "\", match = \"" << match
-                << "\" value = \"" << value.string().latin1()
+                << "\" value = \"" << DOMString(value).string().latin1()
                 << "\" relation = " << (int)relation << "]" << endl;
 #endif
 
@@ -266,13 +273,14 @@ void CSSSelector::extractPseudoType() const {
 
   bool compat = false;
   bool element = false;
-  if (!value.isEmpty()) {
-    value = value.lower();
-    switch (value[0].latin1()) {
+  if (value && !value->isEmpty()) {
+    value = value->lower();
+    DOMString _value(value);
+    switch (_value[0].latin1()) {
       case 'a': {
-        if (value == "active")
+        if (_value == "active")
           _pseudoType = PseudoActive;
-        else if (value == "after") {
+        else if (_value == "after") {
           _pseudoType = PseudoAfter;
           element = compat = true;
         }
@@ -280,7 +288,7 @@ void CSSSelector::extractPseudoType() const {
         break;
       }
       case 'b': {
-        if (value == "before") {
+        if (_value == "before") {
           _pseudoType = PseudoBefore;
           element = compat = true;
         }
@@ -288,96 +296,96 @@ void CSSSelector::extractPseudoType() const {
         break;
       }
       case 'c': {
-        if (value == "checked")
+        if (_value == "checked")
           _pseudoType = PseudoChecked;
-        else if (value == "contains(")
+        else if (_value == "contains(")
           _pseudoType = PseudoContains;
 
         break;
       }
       case 'd': {
-        if (value == "disabled")
+        if (_value == "disabled")
           _pseudoType = PseudoDisabled;
 
         break;
       }
       case 'e': {
-        if (value == "empty")
+        if (_value == "empty")
           _pseudoType = PseudoEmpty;
-        else if (value == "enabled")
+        else if (_value == "enabled")
           _pseudoType = PseudoEnabled;
 
         break;
       }
       case 'f': {
-        if (value == "first-child")
+        if (_value == "first-child")
           _pseudoType = PseudoFirstChild;
-        else if (value == "first-letter") {
+        else if (_value == "first-letter") {
           _pseudoType = PseudoFirstLetter;
           element = compat = true;
-        } else if (value == "first-line") {
+        } else if (_value == "first-line") {
           _pseudoType = PseudoFirstLine;
           element = compat = true;
-        } else if (value == "first-of-type")
+        } else if (_value == "first-of-type")
           _pseudoType = PseudoFirstOfType;
-        else if (value == "focus")
+        else if (_value == "focus")
           _pseudoType = PseudoFocus;
 
         break;
       }
       case 'h': {
-        if (value == "hover")
+        if (_value == "hover")
           _pseudoType = PseudoHover;
 
         break;
       }
       case 'i': {
-        if (value == "indeterminate")
+        if (_value == "indeterminate")
           _pseudoType = PseudoIndeterminate;
 
         break;
       }
       case 'l': {
-        if (value == "link")
+        if (_value == "link")
           _pseudoType = PseudoLink;
-        else if (value == "lang(")
+        else if (_value == "lang(")
           _pseudoType = PseudoLang;
-        else if (value == "last-child")
+        else if (_value == "last-child")
           _pseudoType = PseudoLastChild;
-        else if (value == "last-of-type")
+        else if (_value == "last-of-type")
           _pseudoType = PseudoLastOfType;
 
         break;
       }
       case 'n': {
-        if (value == "not(")
+        if (_value == "not(")
           _pseudoType = PseudoNot;
-        else if (value == "nth-child(")
+        else if (_value == "nth-child(")
           _pseudoType = PseudoNthChild;
-        else if (value == "nth-last-child(")
+        else if (_value == "nth-last-child(")
           _pseudoType = PseudoNthLastChild;
-        else if (value == "nth-of-type(")
+        else if (_value == "nth-of-type(")
           _pseudoType = PseudoNthOfType;
-        else if (value == "nth-last-of-type(")
+        else if (_value == "nth-last-of-type(")
           _pseudoType = PseudoNthLastOfType;
         break;
       }
       case 'o': {
-        if (value == "only-child")
+        if (_value == "only-child")
           _pseudoType = PseudoOnlyChild;
-        else if (value == "only-of-type")
+        else if (_value == "only-of-type")
           _pseudoType = PseudoOnlyOfType;
 
         break;
       }
       case 'r': {
-        if (value == "root")
+        if (_value == "root")
           _pseudoType = PseudoRoot;
 
         break;
       }
       case 's': {
-        if (value == "selection") {
+        if (_value == "selection") {
           _pseudoType = PseudoSelection;
           element = true;
         }
@@ -385,13 +393,13 @@ void CSSSelector::extractPseudoType() const {
         break;
       }
       case 't': {
-        if (value == "target")
+        if (_value == "target")
           _pseudoType = PseudoTarget;
 
         break;
       }
       case 'v': {
-        if (value == "visited")
+        if (_value == "visited")
           _pseudoType = PseudoVisited;
 
         break;
@@ -407,7 +415,7 @@ void CSSSelector::extractPseudoType() const {
   } else if (match == PseudoElement && !element)
     _pseudoType = PseudoOther;
 
-  value = DOMString();
+  value = 0;
 }
 
 bool CSSSelector::operator==(const CSSSelector& other) const {
@@ -417,9 +425,10 @@ bool CSSSelector::operator==(const CSSSelector& other) const {
   while (sel1 && sel2) {
     if (sel1->tag != sel2->tag || sel1->attr != sel2->attr ||
         sel1->relation != sel2->relation || sel1->match != sel2->match ||
-        sel1->nonCSSHint != sel2->nonCSSHint || sel1->value != sel2->value ||
+        sel1->nonCSSHint != sel2->nonCSSHint ||
+        DOMString(sel1->value) != DOMString(sel2->value) ||
         sel1->pseudoType() != sel2->pseudoType() ||
-        sel1->string_arg != sel2->string_arg) {
+        DOMString(sel1->string_arg) != DOMString(sel2->string_arg)) {
       return false;
     }
 
@@ -433,7 +442,7 @@ bool CSSSelector::operator==(const CSSSelector& other) const {
   return true;
 }
 
-DOMString CSSSelector::selectorText() const {
+DOMStringImpl* CSSSelector::selectorText() const {
   // FIXME: Support namespaces when dumping the selector text.  This requires
   // preserving
   // the original namespace prefix used. Ugh. -dwh
@@ -443,17 +452,17 @@ DOMString CSSSelector::selectorText() const {
   if (tag == anyLocalName && cs->attr == ATTR_ID &&
       cs->match == CSSSelector::Id) {
     str = "#";
-    str += cs->value;
+    str += DOMString(cs->value);
   } else if (tag == anyLocalName && cs->attr == ATTR_CLASS &&
              cs->match == CSSSelector::List) {
     str = ".";
-    str += cs->value;
+    str += DOMString(cs->value);
   } else if (tag == anyLocalName && cs->match == CSSSelector::PseudoClass) {
     str = ":";
-    str += cs->value;
+    str += DOMString(cs->value);
   } else if (tag == anyLocalName && cs->match == CSSSelector::PseudoElement) {
     str = "::";
-    str += cs->value;
+    str += DOMString(cs->value);
   } else {
     if (tag == anyLocalName)
       str = "*";
@@ -462,16 +471,16 @@ DOMString CSSSelector::selectorText() const {
 
     if (cs->attr == ATTR_ID && cs->match == CSSSelector::Id) {
       str += "#";
-      str += cs->value;
+      str += DOMString(cs->value);
     } else if (cs->attr == ATTR_CLASS && cs->match == CSSSelector::List) {
       str += ".";
-      str += cs->value;
+      str += DOMString(cs->value);
     } else if (cs->match == CSSSelector::PseudoClass) {
       str += ":";
-      str += cs->value;
+      str += DOMString(cs->value);
     } else if (cs->match == CSSSelector::PseudoElement) {
       str += "::";
-      str += cs->value;
+      str += DOMString(cs->value);
     } else if (cs->attr)  // optional attribute
     {
       DOMString attrName = m_interface->getAttrName(cs->attr);
@@ -513,13 +522,13 @@ DOMString CSSSelector::selectorText() const {
       }
 
       str += "\"";
-      str += cs->value;
+      str += DOMString(cs->value);
       str += "\"]";
     }
   }
 
   if (cs->tagHistory) {
-    DOMString tagHistoryText = cs->tagHistory->selectorText();
+    DOMString tagHistoryText(cs->tagHistory->selectorText());
     if (cs->relation == DirectAdjacent)
       str = tagHistoryText + " + " + str;
     else if (cs->relation == IndirectAdjacent)
@@ -532,7 +541,7 @@ DOMString CSSSelector::selectorText() const {
       str = tagHistoryText + " " + str;
   }
 
-  return str;
+  return str.handle()->copy();
 }
 
 // vim:ts=4:noet

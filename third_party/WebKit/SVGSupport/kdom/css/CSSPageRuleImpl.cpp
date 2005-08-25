@@ -36,12 +36,12 @@ CSSPageRuleImpl::~CSSPageRuleImpl() {
     m_style->deref();
 }
 
-void CSSPageRuleImpl::setSelectorText(const DOMString&) {
+void CSSPageRuleImpl::setSelectorText(DOMStringImpl*) {
   // FIXME!
 }
 
-DOMString CSSPageRuleImpl::selectorText() const {
-  return DOMString();
+DOMStringImpl* CSSPageRuleImpl::selectorText() const {
+  return 0;
 }
 
 CSSStyleDeclarationImpl* CSSPageRuleImpl::style() const {

@@ -24,9 +24,9 @@
 
 using namespace KSVG;
 
-SVGFEFuncRElementImpl::SVGFEFuncRElementImpl(KDOM::DocumentImpl* doc,
+SVGFEFuncRElementImpl::SVGFEFuncRElementImpl(KDOM::DocumentPtr* doc,
                                              KDOM::NodeImpl::Id id,
-                                             const KDOM::DOMString& prefix)
+                                             KDOM::DOMStringImpl* prefix)
     : SVGComponentTransferFunctionElementImpl(doc, id, prefix) {}
 
 SVGFEFuncRElementImpl::~SVGFEFuncRElementImpl() {}

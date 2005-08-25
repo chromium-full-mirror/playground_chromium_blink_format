@@ -90,7 +90,7 @@ class DOMString {
   bool isEmpty() const;
 
   // Internal
-  DOMStringImpl* implementation() const;
+  DOMStringImpl* handle() const;
 
  protected:
   DOMStringImpl* d;

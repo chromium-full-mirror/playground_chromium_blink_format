@@ -24,7 +24,7 @@
 #define KSVG_SVGTestsImpl_H
 
 namespace KDOM {
-class DOMString;
+class DOMStringImpl;
 class AttributeImpl;
 };
 
@@ -41,7 +41,7 @@ class SVGTestsImpl {
   SVGStringListImpl* requiredExtensions() const;
   SVGStringListImpl* systemLanguage() const;
 
-  bool hasExtension(const KDOM::DOMString& extension) const;
+  bool hasExtension(KDOM::DOMStringImpl* extension) const;
 
   bool isValid();
 

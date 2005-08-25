@@ -34,7 +34,9 @@ class SVGPathSegCurvetoQuadraticAbsImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_ABS;
   }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "Q"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("Q");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("Q %1 %2 %3 %4")
         .arg(m_x1)
@@ -70,7 +72,9 @@ class SVGPathSegCurvetoQuadraticRelImpl : public SVGPathSegImpl {
   virtual unsigned short pathSegType() const {
     return PATHSEG_CURVETO_QUADRATIC_REL;
   }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "q"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("q");
+  }
   virtual QString toString() const {
     return QString::fromLatin1("q %1 %2 %3 %4")
         .arg(m_x1)

@@ -62,9 +62,9 @@ class SVGPathElementImpl : public SVGStyledElementImpl,
                            public SVGAnimatedPathDataImpl,
                            public SVGPathParser {
  public:
-  SVGPathElementImpl(KDOM::DocumentImpl* doc,
+  SVGPathElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGPathElementImpl();
 
   SVGAnimatedNumberImpl* pathLength() const;

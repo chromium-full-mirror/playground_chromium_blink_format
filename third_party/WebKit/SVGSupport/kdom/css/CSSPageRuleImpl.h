@@ -33,8 +33,8 @@ class CSSPageRuleImpl : public CSSRuleImpl {
   virtual ~CSSPageRuleImpl();
 
   // 'CSSPageRule' functions
-  void setSelectorText(const DOMString& selectorText);
-  DOMString selectorText() const;
+  DOMStringImpl* selectorText() const;
+  void setSelectorText(DOMStringImpl* selectorText);
 
   CSSStyleDeclarationImpl* style() const;
 

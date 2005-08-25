@@ -34,7 +34,7 @@ using namespace KDOM;
 
 RenderStyle* RenderStyle::s_defaultStyle = 0;
 
-RenderStyle::RenderStyle() : KDOM::Shared(false) {
+RenderStyle::RenderStyle() : Shared() {
   if (!s_defaultStyle)
     s_defaultStyle = new RenderStyle(true);
 
@@ -55,7 +55,7 @@ RenderStyle::RenderStyle() : KDOM::Shared(false) {
   counter_increment = 0;
 }
 
-RenderStyle::RenderStyle(bool) : KDOM::Shared(false) {
+RenderStyle::RenderStyle(bool) : Shared() {
   setBitDefaults();
 
   box.init();
@@ -73,7 +73,7 @@ RenderStyle::RenderStyle(bool) : KDOM::Shared(false) {
   counter_increment = 0;
 }
 
-RenderStyle::RenderStyle(const RenderStyle& other) : KDOM::Shared(false) {
+RenderStyle::RenderStyle(const RenderStyle& other) : Shared() {
   inherited_flags = other.inherited_flags;
   noninherited_flags = other.noninherited_flags;
 
@@ -550,34 +550,34 @@ void RenderStyle::addCounterIncrement(CounterActImpl* c) {
   counter_increment->append(c);
 }
 
-static bool hasCounter(const DOMString& c, CSSValueListImpl* l) {
+static bool hasCounter(DOMStringImpl* c, CSSValueListImpl* l) {
   int len = l->length();
   for (int i = 0; i < len; i++) {
     CounterActImpl* ca = static_cast<CounterActImpl*>(l->item(i));
     Q_ASSERT(ca != 0);
 
-    if (ca->m_counter == c)
+    if (DOMString(ca->m_counter) == DOMString(c))
       return true;
   }
 
   return false;
 }
 
-bool RenderStyle::hasCounterReset(const DOMString& c) const {
+bool RenderStyle::hasCounterReset(DOMStringImpl* c) const {
   if (counter_reset)
     return hasCounter(c, counter_reset);
 
   return false;
 }
 
-bool RenderStyle::hasCounterIncrement(const DOMString& c) const {
+bool RenderStyle::hasCounterIncrement(DOMStringImpl* c) const {
   if (counter_increment)
     return hasCounter(c, counter_increment);
 
   return false;
 }
 
-static short readCounter(const DOMString& c, CSSValueListImpl* l) {
+static short readCounter(DOMStringImpl* c, CSSValueListImpl* l) {
   int len = l->length();
   for (int i = 0; i < len; i++) {
     CounterActImpl* ca = static_cast<CounterActImpl*>(l->item(i));
@@ -590,14 +590,14 @@ static short readCounter(const DOMString& c, CSSValueListImpl* l) {
   return 0;
 }
 
-short RenderStyle::counterReset(const DOMString& c) const {
+short RenderStyle::counterReset(DOMStringImpl* c) const {
   if (counter_reset)
     return readCounter(c, counter_reset);
 
   return 0;
 }
 
-short RenderStyle::counterIncrement(const DOMString& c) const {
+short RenderStyle::counterIncrement(DOMStringImpl* c) const {
   if (counter_increment)
     return readCounter(c, counter_increment);
 

@@ -20,6 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
+#include <kjs/interpreter.h>
+
 #include "EventImpl.h"
 #include "DocumentImpl.h"
 #include "EventTargetImpl.h"
@@ -31,7 +33,7 @@
 using namespace KDOM;
 
 EventTargetImpl::EventTargetImpl()
-    : TreeShared<EventTargetImpl>(true), m_eventListeners(0) {
+    : TreeShared<EventTargetImpl>(), m_eventListeners(0) {
   m_listenerTypes = 0;
 }
 
@@ -39,7 +41,7 @@ EventTargetImpl::~EventTargetImpl() {
   delete m_eventListeners;
 }
 
-void EventTargetImpl::addEventListener(const DOMString& type,
+void EventTargetImpl::addEventListener(DOMStringImpl* type,
                                        EventListenerImpl* listener,
                                        bool useCapture) {
   if (!listener)
@@ -84,7 +86,7 @@ void EventTargetImpl::addEventListener(const DOMString& type,
       new RegisteredEventListener(type, listener, useCapture));
 }
 
-void EventTargetImpl::removeEventListener(const DOMString& type,
+void EventTargetImpl::removeEventListener(DOMStringImpl* type,
                                           EventListenerImpl* listener,
                                           bool useCapture) {
   if (!m_eventListeners || !listener)
@@ -118,7 +120,8 @@ void EventTargetImpl::removeEventListener(const DOMString& type,
 }
 
 bool EventTargetImpl::dispatchEvent(EventImpl* evt) {
-  if (!evt || (evt->id() == UNKNOWN_EVENT && evt->type().isEmpty()))
+  if (!evt ||
+      (evt->id() == UNKNOWN_EVENT && (!evt->type() || evt->type()->isEmpty())))
     throw new EventExceptionImpl(UNSPECIFIED_EVENT_TYPE_ERR);
 
   evt->setTarget(const_cast<EventTargetImpl*>(this));
@@ -198,10 +201,11 @@ bool EventTargetImpl::dispatchEvent(EventImpl* evt) {
   doc->updateRendering();  // any changes during event handling need to be
                            // rendered
 
-  Ecma* ecmaEngine = doc->ecmaEngine();
-  if (ecmaEngine)
-    ecmaEngine->finishedWithEvent(evt);
-
+  /* FIXME
+          Ecma *ecmaEngine = doc->ecmaEngine();
+          if(ecmaEngine)
+                  ecmaEngine->finishedWithEvent(evt);
+  */
   bool retVal = !evt->defaultPrevented();  // What if defaultPrevented was
                                            // called before dispatchEvent?
   return retVal;
@@ -212,13 +216,16 @@ void EventTargetImpl::handleLocalEvents(EventImpl* evt, bool useCapture) {
     return;
 
   KJS::Interpreter::lock();
+
   QPtrListIterator<RegisteredEventListener> it(*m_eventListeners);
   for (; it.current(); ++it) {
     RegisteredEventListener* current = it.current();
-    if (current->type() == evt->type() && current->useCapture() == useCapture &&
-        current->listener())
+    if (DOMString(current->type()) == DOMString(evt->type()) &&
+        current->useCapture() == useCapture && current->listener()) {
       current->listener()->handleEvent(evt);
+    }
   }
+
   KJS::Interpreter::unlock();
 }
 

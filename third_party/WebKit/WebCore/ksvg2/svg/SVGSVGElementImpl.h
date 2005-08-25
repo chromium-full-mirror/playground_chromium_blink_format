@@ -36,7 +36,7 @@
 #include "SVGExternalResourcesRequiredImpl.h"
 
 namespace KDOM {
-class DocumentImpl;
+class DocumentPtr;
 };
 
 class KCanvasClipper;
@@ -59,9 +59,9 @@ class SVGSVGElementImpl : public SVGStyledElementImpl,
                           public SVGZoomAndPanImpl,
                           public KDOM::DocumentEventImpl {
  public:
-  SVGSVGElementImpl(KDOM::DocumentImpl* doc,
+  SVGSVGElementImpl(KDOM::DocumentPtr* doc,
                     KDOM::NodeImpl::Id id,
-                    const KDOM::DOMString& prefix);
+                    KDOM::DOMStringImpl* prefix);
   virtual ~SVGSVGElementImpl();
 
   // 'SVGSVGElement' functions
@@ -70,11 +70,11 @@ class SVGSVGElementImpl : public SVGStyledElementImpl,
   SVGAnimatedLengthImpl* width() const;
   SVGAnimatedLengthImpl* height() const;
 
-  KDOM::DOMString contentScriptType() const;
-  void setContentScriptType(const KDOM::DOMString& type);
+  KDOM::DOMStringImpl* contentScriptType() const;
+  void setContentScriptType(KDOM::DOMStringImpl* type);
 
-  KDOM::DOMString contentStyleType() const;
-  void setContentStyleType(const KDOM::DOMString& type);
+  KDOM::DOMStringImpl* contentStyleType() const;
+  void setContentStyleType(KDOM::DOMStringImpl* type);
 
   SVGRectImpl* viewport() const;
 

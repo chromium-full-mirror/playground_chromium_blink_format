@@ -32,14 +32,14 @@ class CSSCharsetRuleImpl : public CSSRuleImpl {
   virtual ~CSSCharsetRuleImpl();
 
   // 'CSSCharsetRule' functions
-  void setEncoding(const DOMString& encoding);
-  DOMString encoding() const;
+  DOMStringImpl* encoding() const;
+  void setEncoding(DOMStringImpl* encoding);
 
   // 'CSSRule' functions
   virtual bool isCharsetRule() const { return true; }
 
  protected:
-  DOMString m_encoding;
+  DOMStringImpl* m_encoding;
 };
 };
 

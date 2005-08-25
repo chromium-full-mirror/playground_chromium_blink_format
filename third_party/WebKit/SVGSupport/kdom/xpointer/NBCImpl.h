@@ -23,18 +23,19 @@
 #ifndef KDOM_XPointer_NBCImpl_H
 #define KDOM_XPointer_NBCImpl_H
 
-class QString;
 #include <qmap.h>
+#include <qstring.h>
 
-#include <kdom/xpath/impl/XPathNSResolverImpl.h>
+#include <kdom/Shared.h>
+// #include <kdom/xpath/impl/XPathNSResolverImpl.h>
 
 namespace KDOM {
-class DOMString;
+
+class DOMStringImpl;
 
 namespace XPointer {
-class NBC;
-
-class NBCImpl : public XPathNSResolverImpl {
+class NBCImpl : public Shared  // : public XPathNSResolverImpl
+{
  public:
   NBCImpl(NBCImpl* parent);
   virtual ~NBCImpl();
@@ -44,14 +45,14 @@ class NBCImpl : public XPathNSResolverImpl {
    *
    * @returns true if the insertion succeeded.
    */
-  bool addMapping(const DOMString& prefix, const DOMString& s);
+  bool addMapping(DOMStringImpl* prefix, DOMStringImpl* s);
 
   /**
    * The parent NBC.
    */
   NBCImpl* parentNBC() const;
 
-  virtual DOMString lookupNamespaceURI(const DOMString& prefix) const;
+  virtual DOMStringImpl* lookupNamespaceURI(DOMStringImpl* prefix) const;
 
  private:
   QMap<QString, QString> m_mapping;

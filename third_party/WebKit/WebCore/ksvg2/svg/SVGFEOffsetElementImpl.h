@@ -34,9 +34,9 @@ class SVGAnimatedNumberImpl;
 
 class SVGFEOffsetElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEOffsetElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEOffsetElementImpl(KDOM::DocumentPtr* doc,
                          KDOM::NodeImpl::Id id,
-                         const KDOM::DOMString& prefix);
+                         KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEOffsetElementImpl();
 
   // 'SVGFEOffsetElement' functions

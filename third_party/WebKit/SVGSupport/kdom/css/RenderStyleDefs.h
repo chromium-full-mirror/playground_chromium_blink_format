@@ -319,7 +319,7 @@ struct CollapsedBorderValue {
 
 class BorderData : public Shared {
  public:
-  BorderData() : Shared(false) {}
+  BorderData() : Shared() {}
   virtual ~BorderData() {}
 
   bool hasBorder() const {

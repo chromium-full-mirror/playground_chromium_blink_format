@@ -26,8 +26,9 @@
 #include <kdom/xpointer/impl/PointerPartImpl.h>
 
 namespace KDOM {
-class Node;
-class DOMString;
+
+class NodeImpl;
+class DOMStringImpl;
 
 namespace XPointer {
 class NBCImpl;
@@ -46,7 +47,7 @@ class XPointerResultImpl;
  */
 class XPointerSchemeImpl : public PointerPartImpl {
  public:
-  XPointerSchemeImpl(const DOMString& schemeData, NBCImpl* nbc);
+  XPointerSchemeImpl(DOMStringImpl* schemeData, NBCImpl* nbc);
   virtual ~XPointerSchemeImpl();
 
   virtual XPointerResultImpl* evaluate(NodeImpl* context) const;

@@ -23,30 +23,32 @@
 #ifndef KDOM_XPointer_XPointerExpressionImpl_H
 #define KDOM_XPointer_XPointerExpressionImpl_H
 
+#include <qvaluelist.h>
+
 #include <kdom/Shared.h>
 
-template <typename C>
-class QValueList;
-
 namespace KDOM {
-class DOMString;
+
+class NodeImpl;
+class DocumentImpl;
+class DOMStringImpl;
 
 namespace XPointer {
-class XPointerResult;
 class PointerPartImpl;
+class XPointerResultImpl;
 
 class XPointerExpressionImpl : public Shared {
  public:
   typedef QValueList<PointerPartImpl*> List;
 
-  XPointerExpressionImpl(const DOMString& raw,
+  XPointerExpressionImpl(DOMStringImpl* raw,
                          NodeImpl* relatedNode,
                          DocumentImpl* context);
   virtual ~XPointerExpressionImpl();
 
   XPointerResultImpl* evaluate() const;
 
-  DOMString string() const;
+  DOMStringImpl* string() const;
 
   /**
    * Determines whether the expression is a ShortHand pointer.
@@ -61,8 +63,9 @@ class XPointerExpressionImpl : public Shared {
   List pointerParts() const;
 
  private:
-  bool m_isShortHand;
-  DOMString m_pointer;
+  bool m_isShortHand : 1;
+  DOMStringImpl* m_pointer;
+
   List m_parts;
   NodeImpl* m_relatedNode;
   DocumentImpl* m_context;

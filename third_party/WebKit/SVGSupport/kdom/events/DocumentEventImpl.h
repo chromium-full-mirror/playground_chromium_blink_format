@@ -25,14 +25,14 @@
 
 namespace KDOM {
 class EventImpl;
-class DOMString;
+class DOMStringImpl;
 class DocumentEventImpl {
  public:
   DocumentEventImpl();
   virtual ~DocumentEventImpl();
 
   // 'DocumentEvent' functions
-  virtual EventImpl* createEvent(const DOMString& eventType);
+  virtual EventImpl* createEvent(DOMStringImpl* eventType);
 };
 };
 

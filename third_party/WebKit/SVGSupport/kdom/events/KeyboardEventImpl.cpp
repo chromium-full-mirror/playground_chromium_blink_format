@@ -41,6 +41,7 @@ KeyboardEventImpl::KeyboardEventImpl(EventImplType identifier)
 
 KeyboardEventImpl::~KeyboardEventImpl() {
   delete m_keyEvent;
+
   if (m_keyIdentifier)
     m_keyIdentifier->deref();
 }
@@ -61,23 +62,20 @@ bool KeyboardEventImpl::metaKey() const {
   return m_metaKey;
 }
 
-void KeyboardEventImpl::initKeyboardEvent(const DOMString& typeArg,
+void KeyboardEventImpl::initKeyboardEvent(DOMStringImpl* typeArg,
                                           bool canBubbleArg,
                                           bool cancelableArg,
                                           AbstractViewImpl* viewArg,
-                                          const DOMString& keyIdentifierArg,
+                                          DOMStringImpl* keyIdentifierArg,
                                           unsigned long keyLocationArg,
                                           bool ctrlKeyArg,
                                           bool altKeyArg,
                                           bool shiftKeyArg,
                                           bool metaKeyArg) {
-  if (m_keyIdentifier)
-    m_keyIdentifier->deref();
-
   initUIEvent(typeArg, canBubbleArg, cancelableArg, viewArg, 0);
-  m_keyIdentifier = keyIdentifierArg.implementation();
-  if (m_keyIdentifier)
-    m_keyIdentifier->ref();
+
+  KDOM_SAFE_SET(m_keyIdentifier, keyIdentifierArg);
+
   m_keyLocation = keyLocationArg;
   m_ctrlKey = ctrlKeyArg;
   m_shiftKey = shiftKeyArg;
@@ -86,10 +84,12 @@ void KeyboardEventImpl::initKeyboardEvent(const DOMString& typeArg,
 }
 
 void KeyboardEventImpl::initKeyboardEvent(QKeyEvent* key) {
-  initUIEvent(key->type() == QEvent::KeyRelease ? "keyup" : key->isAutoRepeat()
-                                                                ? "keypress"
-                                                                : "keydown",
+  initUIEvent(key->type() == QEvent::KeyRelease
+                  ? DOMString("keyup").handle()
+                  : key->isAutoRepeat() ? DOMString("keypress").handle()
+                                        : DOMString("keydown").handle(),
               true, true, 0, 0);
+
   m_ctrlKey = key->state() & Qt::ControlButton;
   m_shiftKey = key->state() & Qt::AltButton;
   m_altKey = key->state() & Qt::ShiftButton;
@@ -105,7 +105,7 @@ void KeyboardEventImpl::initKeyboardEvent(QKeyEvent* key) {
 
 #if APPLE_CHANGES
   DOMString identifier(key->keyIdentifier());
-  m_keyIdentifier = identifier.implementation();
+  m_keyIdentifier = identifier.handle();
   m_keyIdentifier->ref();
 #else
   m_keyIdentifier = 0;
@@ -287,7 +287,7 @@ void KeyboardEventImpl::initKeyboardEvent(QKeyEvent* key) {
 }
 
 bool KeyboardEventImpl::getModifierState(
-    const DOMString& keyIdentifierArg) const {
+    DOMStringImpl* keyIdentifierArg) const {
   // TODO
   return false;
 }

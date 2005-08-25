@@ -26,6 +26,8 @@
 #include <kdom/Shared.h>
 
 namespace KSVG {
+class SVGStyledElementImpl;
+
 class SVGAnimatedIntegerImpl : public KDOM::Shared {
  public:
   SVGAnimatedIntegerImpl(const SVGStyledElementImpl* context);

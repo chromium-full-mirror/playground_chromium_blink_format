@@ -39,9 +39,9 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
                                   public SVGLangSpaceImpl,
                                   public SVGExternalResourcesRequiredImpl {
  public:
-  SVGTextContentElementImpl(KDOM::DocumentImpl* doc,
+  SVGTextContentElementImpl(KDOM::DocumentPtr* doc,
                             KDOM::NodeImpl::Id id,
-                            const KDOM::DOMString& prefix);
+                            KDOM::DOMStringImpl* prefix);
   virtual ~SVGTextContentElementImpl();
 
   // 'SVGTextContentElement' functions

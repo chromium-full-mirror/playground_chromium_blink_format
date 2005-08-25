@@ -26,6 +26,8 @@
 #include <kdom/Shared.h>
 
 namespace KSVG {
+class SVGStyledElementImpl;
+
 class SVGAnimatedEnumerationImpl : public KDOM::Shared {
  public:
   SVGAnimatedEnumerationImpl(const SVGStyledElementImpl* context);

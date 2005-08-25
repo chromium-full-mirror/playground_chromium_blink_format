@@ -32,7 +32,9 @@ class SVGPathSegClosePathImpl : public SVGPathSegImpl {
   virtual ~SVGPathSegClosePathImpl();
 
   virtual unsigned short pathSegType() const { return PATHSEG_CLOSEPATH; }
-  virtual KDOM::DOMString pathSegTypeAsLetter() const { return "Z"; }
+  virtual KDOM::DOMStringImpl* pathSegTypeAsLetter() const {
+    return new KDOM::DOMStringImpl("Z");
+  }
   virtual QString toString() const { return QString::fromLatin1("Z"); }
 };
 };

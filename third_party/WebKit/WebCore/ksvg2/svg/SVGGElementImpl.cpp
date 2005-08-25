@@ -29,9 +29,9 @@
 
 using namespace KSVG;
 
-SVGGElementImpl::SVGGElementImpl(KDOM::DocumentImpl* doc,
+SVGGElementImpl::SVGGElementImpl(KDOM::DocumentPtr* doc,
                                  KDOM::NodeImpl::Id id,
-                                 const KDOM::DOMString& prefix)
+                                 KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -65,15 +65,15 @@ KCanvasItem* SVGGElementImpl::createCanvasItem(KCanvas* canvas,
 }
 
 // Helper class for <use> support
-SVGDummyElementImpl::SVGDummyElementImpl(KDOM::DocumentImpl* doc,
+SVGDummyElementImpl::SVGDummyElementImpl(KDOM::DocumentPtr* doc,
                                          KDOM::NodeImpl::Id,
-                                         const KDOM::DOMString& prefix)
+                                         KDOM::DOMStringImpl* prefix)
     : SVGGElementImpl(doc, 0, prefix) {}
 
 SVGDummyElementImpl::~SVGDummyElementImpl() {}
 
-KDOM::DOMString SVGDummyElementImpl::localName() const {
-  return "dummy";
+KDOM::DOMStringImpl* SVGDummyElementImpl::localName() const {
+  return new KDOM::DOMStringImpl("dummy");
 }
 
 // vim:ts=4:noet

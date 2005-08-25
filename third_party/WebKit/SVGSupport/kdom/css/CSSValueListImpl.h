@@ -38,8 +38,8 @@ class CSSValueListImpl : public CSSValueImpl {
   CSSValueImpl* item(unsigned long index);
 
   // 'CSSValue' functions
-  virtual DOMString cssText() const;
-  virtual void setCssText(const DOMString& cssText);
+  virtual DOMStringImpl* cssText() const;
+  virtual void setCssText(DOMStringImpl* cssText);
   virtual unsigned short cssValueType() const;
 
   virtual bool isValueList() const { return true; }

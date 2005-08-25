@@ -44,7 +44,7 @@ class SVGStylableImpl {
 
   virtual KDOM::CSSStyleDeclarationImpl* style() = 0;
   virtual KDOM::CSSValueImpl* getPresentationAttribute(
-      const KDOM::DOMString& name) = 0;
+      KDOM::DOMStringImpl* name) = 0;
 };
 };
 

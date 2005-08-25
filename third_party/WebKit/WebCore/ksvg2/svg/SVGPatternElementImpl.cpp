@@ -47,9 +47,9 @@
 
 using namespace KSVG;
 
-SVGPatternElementImpl::SVGPatternElementImpl(KDOM::DocumentImpl* doc,
+SVGPatternElementImpl::SVGPatternElementImpl(KDOM::DocumentPtr* doc,
                                              KDOM::NodeImpl::Id id,
-                                             const KDOM::DOMString& prefix)
+                                             KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGURIReferenceImpl(),
       SVGTestsImpl(),
@@ -150,19 +150,19 @@ void SVGPatternElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
       break;
     }
     case ATTR_X: {
-      x()->baseVal()->setValueAsString(value);
+      x()->baseVal()->setValueAsString(value.handle());
       break;
     }
     case ATTR_Y: {
-      y()->baseVal()->setValueAsString(value);
+      y()->baseVal()->setValueAsString(value.handle());
       break;
     }
     case ATTR_WIDTH: {
-      width()->baseVal()->setValueAsString(value);
+      width()->baseVal()->setValueAsString(value.handle());
       break;
     }
     case ATTR_HEIGHT: {
-      height()->baseVal()->setValueAsString(value);
+      height()->baseVal()->setValueAsString(value.handle());
       break;
     }
     default: {
@@ -222,7 +222,8 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
   const KDOM::NodeImpl* test = static_cast<const KDOM::NodeImpl*>(target);
   while (test && !test->hasChildNodes()) {
     QString ref = KDOM::DOMString(href()->baseVal()).string();
-    test = ownerDocument()->getElementById(ref.mid(1));
+    test =
+        ownerDocument()->getElementById(KDOM::DOMString(ref.mid(1)).handle());
     if (test && test->id() == ID_PATTERN)
       target = static_cast<const KDOM::ElementImpl*>(test);
   }
@@ -249,23 +250,25 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
     KRenderingPaintServerPattern* refPattern =
         static_cast<KRenderingPaintServerPattern*>(refServer);
 
-    if (!hasAttribute("patternUnits")) {
-      KDOM::DOMString value(target->getAttribute("patternUnits"));
+    if (!hasAttribute(KDOM::DOMString("patternUnits").handle())) {
+      KDOM::DOMString value(
+          target->getAttribute(KDOM::DOMString("patternUnits").handle()));
       if (value == "userSpaceOnUse")
         patternUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
       else if (value == "objectBoundingBox")
         patternUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
     }
 
-    if (!hasAttribute("patternContentUnits")) {
-      KDOM::DOMString value(target->getAttribute("patternContentUnits"));
+    if (!hasAttribute(KDOM::DOMString("patternContentUnits").handle())) {
+      KDOM::DOMString value(target->getAttribute(
+          KDOM::DOMString("patternContentUnits").handle()));
       if (value == "userSpaceOnUse")
         patternContentUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
       else if (value == "objectBoundingBox")
         patternContentUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
     }
 
-    if (!hasAttribute("patternTransform"))
+    if (!hasAttribute(KDOM::DOMString("patternTransform").handle()))
       patternTransformMatrix = refPattern->patternTransform();
   }
 
@@ -276,6 +279,12 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
 
   const SVGStyledElementImpl* savedContext = 0;
   if (bbox) {
+    if (width()->baseVal()->unitType() != SVG_LENGTHTYPE_PERCENTAGE)
+      width()->baseVal()->newValueSpecifiedUnits(
+          SVG_LENGTHTYPE_PERCENTAGE, width()->baseVal()->value() * 100.);
+    if (height()->baseVal()->unitType() != SVG_LENGTHTYPE_PERCENTAGE)
+      height()->baseVal()->newValueSpecifiedUnits(
+          SVG_LENGTHTYPE_PERCENTAGE, height()->baseVal()->value() * 100.);
     if (activeElement)
       savedContext =
           const_cast<SVGPatternElementImpl*>(this)->pushAttributeContext(
@@ -386,7 +395,8 @@ KCanvasItem* SVGPatternElementImpl::createCanvasItem(KCanvas* canvas,
 
   pserver->setListener(const_cast<SVGPatternElementImpl*>(this));
 
-  canvas->registry()->addPaintServerById(getId().string(), pserver);
+  canvas->registry()->addPaintServerById(KDOM::DOMString(getId()).string(),
+                                         pserver);
   return 0;
 }
 

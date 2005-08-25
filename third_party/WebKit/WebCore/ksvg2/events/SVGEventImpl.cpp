@@ -29,7 +29,7 @@ SVGEventImpl::SVGEventImpl() : KDOM::EventImpl(KDOM::TypeLastEvent) {}
 
 SVGEventImpl::~SVGEventImpl() {}
 
-void SVGEventImpl::initEvent(const KDOM::DOMString& eventTypeArg,
+void SVGEventImpl::initEvent(KDOM::DOMStringImpl* eventTypeArg,
                              bool canBubbleArg,
                              bool cancelableArg) {
   m_id = SVGDOMImplementationImpl::self()->typeToId(eventTypeArg);

@@ -33,14 +33,14 @@ namespace KSVG {
 class SVGCSSStyleSheetImpl : public KDOM::CSSStyleSheetImpl {
  public:
   SVGCSSStyleSheetImpl(KDOM::NodeImpl* parentNode,
-                       const KDOM::DOMString& href = KDOM::DOMString(),
+                       KDOM::DOMStringImpl* href = 0,
                        bool _implicit = false);
 
   SVGCSSStyleSheetImpl(KDOM::CSSStyleSheetImpl* parentSheet,
-                       const KDOM::DOMString& href = KDOM::DOMString());
+                       KDOM::DOMStringImpl* href = 0);
 
   SVGCSSStyleSheetImpl(KDOM::CSSRuleImpl* ownerRule,
-                       const KDOM::DOMString& href = KDOM::DOMString());
+                       KDOM::DOMStringImpl* href = 0);
 
   // clone from a cached version of the sheet
   SVGCSSStyleSheetImpl(KDOM::NodeImpl* parentNode,

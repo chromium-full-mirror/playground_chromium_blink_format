@@ -40,9 +40,9 @@ class SVGFilterElementImpl : public SVGStyledElementImpl,
                              public SVGLangSpaceImpl,
                              public SVGExternalResourcesRequiredImpl {
  public:
-  SVGFilterElementImpl(KDOM::DocumentImpl* doc,
+  SVGFilterElementImpl(KDOM::DocumentPtr* doc,
                        KDOM::NodeImpl::Id id,
-                       const KDOM::DOMString& prefix);
+                       KDOM::DOMStringImpl* prefix);
   virtual ~SVGFilterElementImpl();
 
   // Derived from: 'ElementImpl'

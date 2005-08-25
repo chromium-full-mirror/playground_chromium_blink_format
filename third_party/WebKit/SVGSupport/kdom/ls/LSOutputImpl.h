@@ -35,11 +35,11 @@ class LSOutputImpl : public Shared {
   virtual ~LSOutputImpl();
 
   // 'LSOutput' functions
-  DOMString systemId() const;
-  void setSystemId(const DOMString& systemId);
+  DOMStringImpl* systemId() const;
+  void setSystemId(DOMStringImpl* systemId);
 
-  DOMString encoding() const;
-  void setEncoding(const DOMString& encoding);
+  DOMStringImpl* encoding() const;
+  void setEncoding(DOMStringImpl* encoding);
 
  private:
   DOMStringImpl* m_systemId;

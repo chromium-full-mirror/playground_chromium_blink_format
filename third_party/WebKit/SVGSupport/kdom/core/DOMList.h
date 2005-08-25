@@ -28,9 +28,9 @@
 
 namespace KDOM {
 template <class T>
-class DOMList : public KDOM::Shared {
+class DOMList : public Shared {
  public:
-  DOMList() : KDOM::Shared(true) { m_impl.setAutoDelete(false); }
+  DOMList() : Shared() { m_impl.setAutoDelete(false); }
   DOMList(const DOMList& other) { *this = other; }
   ~DOMList() { clear(); }
 
@@ -92,6 +92,13 @@ class DOMList : public KDOM::Shared {
   virtual T* appendItem(T* newItem) {
     m_impl.append(newItem);
     return newItem;
+  }
+
+  virtual bool contains(const T* item) {
+    if (m_impl.findRef(item) != -1)
+      return true;
+
+    return false;
   }
 
  private:

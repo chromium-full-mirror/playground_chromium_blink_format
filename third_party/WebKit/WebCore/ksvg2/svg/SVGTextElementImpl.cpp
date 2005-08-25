@@ -20,14 +20,14 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include "SVGDocument.h"
+//#include "SVGDocument.h"
 #include "SVGTextElementImpl.h"
 
 using namespace KSVG;
 
-SVGTextElementImpl::SVGTextElementImpl(KDOM::DocumentImpl* doc,
+SVGTextElementImpl::SVGTextElementImpl(KDOM::DocumentPtr* doc,
                                        KDOM::NodeImpl::Id id,
-                                       const KDOM::DOMString& prefix)
+                                       KDOM::DOMStringImpl* prefix)
     : SVGTextPositioningElementImpl(doc, id, prefix), SVGTransformableImpl() {}
 
 SVGTextElementImpl::~SVGTextElementImpl() {}

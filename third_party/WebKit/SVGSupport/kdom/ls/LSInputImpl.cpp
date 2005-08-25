@@ -29,7 +29,7 @@
 using namespace KDOM;
 
 LSInputImpl::LSInputImpl()
-    : Shared(true),
+    : Shared(),
       m_characterStream(0),
       m_byteStream(0),
       m_stringData(0),
@@ -65,88 +65,52 @@ void LSInputImpl::setCharacterStream(QTextIStream* characterStream) {
   m_characterStream = characterStream;
 }
 
-DOMString LSInputImpl::byteStream() const {
-  return DOMString(m_byteStream);
+DOMStringImpl* LSInputImpl::byteStream() const {
+  return m_byteStream;
 }
 
-void LSInputImpl::setByteStream(const DOMString& byteStream) {
-  if (m_byteStream)
-    m_byteStream->deref();
-
-  m_byteStream = byteStream.implementation();
-
-  if (m_byteStream)
-    m_byteStream->ref();
+void LSInputImpl::setByteStream(DOMStringImpl* byteStream) {
+  KDOM_SAFE_SET(m_byteStream, byteStream);
 }
 
-DOMString LSInputImpl::stringData() const {
-  return DOMString(m_stringData);
+DOMStringImpl* LSInputImpl::stringData() const {
+  return m_stringData;
 }
 
-void LSInputImpl::setStringData(const DOMString& stringData) {
-  if (m_stringData)
-    m_stringData->deref();
-
-  m_stringData = stringData.implementation();
-
-  if (m_stringData)
-    m_stringData->ref();
+void LSInputImpl::setStringData(DOMStringImpl* stringData) {
+  KDOM_SAFE_SET(m_stringData, stringData);
 }
 
-DOMString LSInputImpl::systemId() const {
-  return DOMString(m_systemId);
+DOMStringImpl* LSInputImpl::systemId() const {
+  return m_systemId;
 }
 
-void LSInputImpl::setSystemId(const DOMString& systemId) {
-  if (m_systemId)
-    m_systemId->deref();
-
-  m_systemId = systemId.implementation();
-
-  if (m_systemId)
-    m_systemId->ref();
+void LSInputImpl::setSystemId(DOMStringImpl* systemId) {
+  KDOM_SAFE_SET(m_systemId, systemId);
 }
 
-DOMString LSInputImpl::publicId() const {
-  return DOMString(m_publicId);
+DOMStringImpl* LSInputImpl::publicId() const {
+  return m_publicId;
 }
 
-void LSInputImpl::setPublicId(const DOMString& publicId) {
-  if (m_publicId)
-    m_publicId->deref();
-
-  m_publicId = publicId.implementation();
-
-  if (m_publicId)
-    m_publicId->ref();
+void LSInputImpl::setPublicId(DOMStringImpl* publicId) {
+  KDOM_SAFE_SET(m_publicId, publicId);
 }
 
-DOMString LSInputImpl::baseURI() const {
-  return DOMString(m_baseURI);
+DOMStringImpl* LSInputImpl::baseURI() const {
+  return m_baseURI;
 }
 
-void LSInputImpl::setBaseURI(const DOMString& baseURI) {
-  if (m_baseURI)
-    m_baseURI->deref();
-
-  m_baseURI = baseURI.implementation();
-
-  if (m_baseURI)
-    m_baseURI->ref();
+void LSInputImpl::setBaseURI(DOMStringImpl* baseURI) {
+  KDOM_SAFE_SET(m_baseURI, baseURI);
 }
 
-DOMString LSInputImpl::encoding() const {
-  return DOMString(m_encoding);
+DOMStringImpl* LSInputImpl::encoding() const {
+  return m_encoding;
 }
 
-void LSInputImpl::setEncoding(const DOMString& encoding) {
-  if (m_encoding)
-    m_encoding->deref();
-
-  m_encoding = encoding.implementation();
-
-  if (m_encoding)
-    m_encoding->ref();
+void LSInputImpl::setEncoding(DOMStringImpl* encoding) {
+  KDOM_SAFE_SET(m_encoding, encoding);
 }
 
 bool LSInputImpl::certifiedText() const {

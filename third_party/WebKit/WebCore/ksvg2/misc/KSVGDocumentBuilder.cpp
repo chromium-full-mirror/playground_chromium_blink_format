@@ -21,9 +21,8 @@
 */
 
 #include <kurl.h>
+#include <kdebug.h>
 
-#include <kdom/Document.h>
-#include <kdom/DocumentType.h>
 #include <kdom/Helper.h>
 #include <kdom/Namespace.h>
 
@@ -32,11 +31,9 @@
 #include "ksvg.h"
 #include "svgtags.h"
 #include <ksvg2/KSVGView.h>
-#include "SVGDocument.h"
 #include "SVGDocumentImpl.h"
 #include "SVGSVGElementImpl.h"
 #include "KSVGDocumentBuilder.h"
-#include "SVGDOMImplementation.h"
 #include "SVGDOMImplementationImpl.h"
 
 using namespace KSVG;
@@ -52,9 +49,10 @@ bool DocumentBuilder::startDocument(const KURL& uri) {
                  << uri.prettyURL() << endl;
 
   SVGDOMImplementationImpl* factory = SVGDOMImplementationImpl::self();
-  SVGDocumentImpl* docImpl = static_cast<SVGDocumentImpl*>(
-      factory->createDocument(KDOM::NS_SVG, "svg:svg",
-                              factory->defaultDocumentType(), false, m_view));
+  SVGDocumentImpl* docImpl =
+      static_cast<SVGDocumentImpl*>(factory->createDocument(
+          KDOM::NS_SVG.handle(), KDOM::DOMString("svg:svg").handle(),
+          factory->defaultDocumentType(), false, m_view));
 
   if (!docImpl)
     return false;
@@ -64,16 +62,16 @@ bool DocumentBuilder::startDocument(const KURL& uri) {
   setDocument(docImpl);  // Register in kdom...
   return KDOM::DocumentBuilder::startDocument(uri);
 }
+#if 0
+void DocumentBuilder::linkDocumentToCanvas(const SVGDocument &doc, KSVGView *view)
+{
+	SVGDocumentImpl *docImpl = static_cast<SVGDocumentImpl *>(doc.handle());
+	if(!docImpl)
+		return;
 
-void DocumentBuilder::linkDocumentToCanvas(const SVGDocument& doc,
-                                           KSVGView* view) {
-  SVGDocumentImpl* docImpl = static_cast<SVGDocumentImpl*>(doc.handle());
-  if (!docImpl)
-    return;
-
-  DocumentBuilder::linkDocumentToCanvas(docImpl, view);
+	DocumentBuilder::linkDocumentToCanvas(docImpl, view);
 }
-
+#endif
 void DocumentBuilder::linkDocumentToCanvas(SVGDocumentImpl* docImpl,
                                            KSVGView* view) {
   docImpl->ref();
@@ -82,9 +80,7 @@ void DocumentBuilder::linkDocumentToCanvas(SVGDocumentImpl* docImpl,
   docImpl->attach();
 }
 
-void DocumentBuilder::finishedDocument(const SVGDocument& doc) {
-  SVGDocumentImpl* docImpl = static_cast<SVGDocumentImpl*>(doc.handle());
-
+void DocumentBuilder::finishedDocument(SVGDocumentImpl* docImpl) {
   if (docImpl)
     docImpl->finishedParsing();
 }
@@ -93,7 +89,7 @@ bool DocumentBuilder::endDocument() {
   kdDebug(26001) << "KSVG::DocumentBuilder::endDocument" << endl;
 
   KDOM::DocumentBuilder::endDocument();
-  DocumentBuilder::finishedDocument(document());
+  DocumentBuilder::finishedDocument(static_cast<SVGDocumentImpl*>(document()));
 
   return true;
 }

@@ -37,14 +37,19 @@ struct KDOMPart::Private {
 KDOMPart::KDOMPart(KDOMView* view, QObject* parent, const char* name)
     : KParts::ReadOnlyPart(parent, name), d(new Private()) {
   d->doc = 0;
+#ifndef APPLE_COMPILE_HACK
   /* FIXME
   d->settings = new KDOMSettings(*KDOMFactory::defaultSettings());;
   */
   d->settings = new KDOMSettings();
+#else
+  d->settings = NULL;
+#endif
   d->view = view;
 }
 
 KDOMPart::~KDOMPart() {
+  delete d->settings;
   delete d;
 }
 

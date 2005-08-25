@@ -23,13 +23,13 @@
 #ifndef KDOM_TreeShared_H
 #define KDOM_TreeShared_H
 
-#include <kdom/ecma/ScriptInterpreter.h>
+#include <kdom/Shared.h>
 
 namespace KDOM {
 template <class T>
 class TreeShared : public Shared {
  public:
-  TreeShared(bool baseClass) : Shared(baseClass) { m_parent = 0; }
+  TreeShared() : Shared() { m_parent = 0; }
   virtual ~TreeShared() {}
 
   void setParent(T* parent) { m_parent = parent; }
@@ -39,12 +39,8 @@ class TreeShared : public Shared {
     if (m_ref)
       m_ref--;
 
-    if (!m_ref && !m_parent) {
-      if (m_baseClass)
-        ScriptInterpreter::forgetDOMObject(this);
-
+    if (!m_ref && !m_parent)
       delete this;
-    }
   }
 
  protected:

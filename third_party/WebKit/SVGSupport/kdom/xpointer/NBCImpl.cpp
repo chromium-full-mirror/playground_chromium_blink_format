@@ -20,18 +20,16 @@
  *
  */
 
-#include <qmap.h>
-
-#include "DOMString.h"
 #include "Namespace.h"
-#include "Node.h"
+#include "DOMStringImpl.h"
 
 #include "NBCImpl.h"
 
 using namespace KDOM;
 using namespace KDOM::XPointer;
 
-NBCImpl::NBCImpl(NBCImpl* parent) : XPathNSResolverImpl(), m_parent(parent) {
+NBCImpl::NBCImpl(NBCImpl* parent)
+    : /* XPathNSResolverImpl(), */ Shared(), m_parent(parent) {
   /* Rigg the "initial namespace binding context". We can't use addMapping,
    * because it's ment for mere mortals who aren't allowed to re-write the
    * world. */
@@ -46,7 +44,10 @@ NBCImpl::~NBCImpl() {
     m_parent->deref();
 }
 
-bool NBCImpl::addMapping(const DOMString& prefix, const DOMString& ns) {
+bool NBCImpl::addMapping(DOMStringImpl* prefixImpl, DOMStringImpl* nsImpl) {
+  DOMString prefix(prefixImpl);
+  DOMString ns(nsImpl);
+
   if (prefix == "xml" || prefix == "xmlns" || ns == NS_XML || ns == NS_XMLNS)
     return false; /* FOO! */
 
@@ -62,13 +63,14 @@ NBCImpl* NBCImpl::parentNBC() const {
   return m_parent;
 }
 
-DOMString NBCImpl::lookupNamespaceURI(const DOMString& prefix) const {
+DOMStringImpl* NBCImpl::lookupNamespaceURI(DOMStringImpl* prefixImpl) const {
+  DOMString prefix(prefixImpl);
   if (m_mapping.contains(prefix.string()))
-    return DOMString(m_mapping[prefix.string()]);
+    return new DOMStringImpl(m_mapping[prefix.string()]);
   else if (parentNBC())
-    return parentNBC()->lookupNamespaceURI(prefix);
+    return parentNBC()->lookupNamespaceURI(prefixImpl);
 
-  return DOMString();
+  return 0;
 }
 
 // vim:ts=4:noet

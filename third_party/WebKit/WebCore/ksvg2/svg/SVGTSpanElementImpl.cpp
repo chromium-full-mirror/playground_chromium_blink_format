@@ -20,14 +20,14 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include "SVGDocument.h"
+//#include "SVGDocument.h"
 #include "SVGTSpanElementImpl.h"
 
 using namespace KSVG;
 
-SVGTSpanElementImpl::SVGTSpanElementImpl(KDOM::DocumentImpl* doc,
+SVGTSpanElementImpl::SVGTSpanElementImpl(KDOM::DocumentPtr* doc,
                                          KDOM::NodeImpl::Id id,
-                                         const KDOM::DOMString& prefix)
+                                         KDOM::DOMStringImpl* prefix)
     : SVGTextPositioningElementImpl(doc, id, prefix) {}
 
 SVGTSpanElementImpl::~SVGTSpanElementImpl() {}

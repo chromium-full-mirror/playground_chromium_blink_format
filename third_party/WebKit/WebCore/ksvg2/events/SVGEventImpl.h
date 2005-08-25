@@ -32,7 +32,7 @@ class SVGEventImpl : public KDOM::EventImpl {
   SVGEventImpl();
   virtual ~SVGEventImpl();
 
-  virtual void initEvent(const KDOM::DOMString& eventTypeArg,
+  virtual void initEvent(KDOM::DOMStringImpl* eventTypeArg,
                          bool canBubbleArg,
                          bool cancelableArg);
 };

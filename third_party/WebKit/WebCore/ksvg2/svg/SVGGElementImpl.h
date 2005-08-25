@@ -36,9 +36,9 @@ class SVGGElementImpl : public SVGStyledElementImpl,
                         public SVGExternalResourcesRequiredImpl,
                         public SVGTransformableImpl {
  public:
-  SVGGElementImpl(KDOM::DocumentImpl* doc,
+  SVGGElementImpl(KDOM::DocumentPtr* doc,
                   KDOM::NodeImpl::Id id,
-                  const KDOM::DOMString& prefix);
+                  KDOM::DOMStringImpl* prefix);
   virtual ~SVGGElementImpl();
 
   virtual void parseAttribute(KDOM::AttributeImpl* attr);
@@ -52,13 +52,13 @@ class SVGGElementImpl : public SVGStyledElementImpl,
 
 class SVGDummyElementImpl : public SVGGElementImpl {
  public:
-  SVGDummyElementImpl(KDOM::DocumentImpl* doc,
+  SVGDummyElementImpl(KDOM::DocumentPtr* doc,
                       KDOM::NodeImpl::Id id,
-                      const KDOM::DOMString& prefix);
+                      KDOM::DOMStringImpl* prefix);
   virtual ~SVGDummyElementImpl();
 
   // Derived from: 'ElementImpl'
-  virtual KDOM::DOMString localName() const;
+  virtual KDOM::DOMStringImpl* localName() const;
 };
 };
 

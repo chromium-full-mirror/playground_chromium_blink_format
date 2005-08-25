@@ -29,9 +29,9 @@ namespace KSVG {
 class SVGAnimatedLengthImpl;
 class SVGRadialGradientElementImpl : public SVGGradientElementImpl {
  public:
-  SVGRadialGradientElementImpl(KDOM::DocumentImpl* doc,
+  SVGRadialGradientElementImpl(KDOM::DocumentPtr* doc,
                                KDOM::NodeImpl::Id id,
-                               const KDOM::DOMString& prefix);
+                               KDOM::DOMStringImpl* prefix);
   virtual ~SVGRadialGradientElementImpl();
 
   // 'SVGRadialGradientElement' functions

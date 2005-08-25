@@ -25,9 +25,9 @@
 
 using namespace KSVG;
 
-SVGSetElementImpl::SVGSetElementImpl(KDOM::DocumentImpl* doc,
+SVGSetElementImpl::SVGSetElementImpl(KDOM::DocumentPtr* doc,
                                      KDOM::NodeImpl::Id id,
-                                     const KDOM::DOMString& prefix)
+                                     KDOM::DOMStringImpl* prefix)
     : SVGAnimationElementImpl(doc, id, prefix) {}
 
 SVGSetElementImpl::~SVGSetElementImpl() {}

@@ -23,11 +23,13 @@
 #include "SVGAnimateElementImpl.h"
 #include "SVGDocumentImpl.h"
 
+#include <kdebug.h>
+
 using namespace KSVG;
 
-SVGAnimateElementImpl::SVGAnimateElementImpl(KDOM::DocumentImpl* doc,
+SVGAnimateElementImpl::SVGAnimateElementImpl(KDOM::DocumentPtr* doc,
                                              KDOM::NodeImpl::Id id,
-                                             const KDOM::DOMString& prefix)
+                                             KDOM::DOMStringImpl* prefix)
     : SVGAnimationElementImpl(doc, id, prefix) {
   m_currentItem = -1;
 }
@@ -46,7 +48,7 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                               case FROM_TO_ANIMATION:
                               {
                                       KDOM::DOMString toColorString(m_to);
-                                      m_toColor->setRGBColor(toColorString.implementation());
+                                      m_toColor->setRGBColor(toColorString.handle());
 
                                       KDOM::DOMString fromColorString;
                                       if(!m_from.isEmpty()) // from-to animation
@@ -55,7 +57,7 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                                               fromColorString =
          m_initialColor.name();
 
-                                      m_fromColor->setRGBColor(fromColorString.implementation());
+                                      m_fromColor->setRGBColor(fromColorString.handle());
 
                                       // Calculate color differences, once.
                                       QColor qTo = m_toColor->color();
@@ -71,7 +73,7 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                               case FROM_BY_ANIMATION:
                               {
                                       KDOM::DOMString byColorString(m_by);
-                                      m_toColor->setRGBColor(byColorString.implementation());
+                                      m_toColor->setRGBColor(byColorString.handle());
 
                                       KDOM::DOMString fromColorString;
 
@@ -81,7 +83,7 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                                               fromColorString =
          m_initialColor.name();
 
-                                      m_fromColor->setRGBColor(fromColorString.implementation());
+                                      m_fromColor->setRGBColor(fromColorString.handle());
 
                                       QColor qBy = m_toColor->color();
                                       QColor qFrom = m_fromColor->color();
@@ -95,7 +97,7 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                                       QColor qTo = clampColor(r, g, b);
 
                                       KDOM::DOMString toColorString(qTo.name());
-                                      m_toColor->setRGBColor(toColorString.implementation());
+                                      m_toColor->setRGBColor(toColorString.handle());
 
                                       m_redDiff = qTo.red() - qFrom.red();
                                       m_greenDiff = qTo.green() - qFrom.green();
@@ -159,10 +161,10 @@ void SVGAnimateElementImpl::handleTimerEvent(double timePercentage) {
                                     }
 
                                     KDOM::DOMString toColorString(value2);
-                                    m_toColor->setRGBColor(toColorString.implementation());
+                                    m_toColor->setRGBColor(toColorString.handle());
 
                                     KDOM::DOMString fromColorString(value1);
-                                    m_fromColor->setRGBColor(fromColorString.implementation());
+                                    m_fromColor->setRGBColor(fromColorString.handle());
 
                                     QColor qTo = m_toColor->color();
                                     QColor qFrom = m_fromColor->color();

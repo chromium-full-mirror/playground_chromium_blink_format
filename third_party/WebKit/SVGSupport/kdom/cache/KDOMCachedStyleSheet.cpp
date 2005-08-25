@@ -68,11 +68,12 @@ CachedStyleSheet::CachedStyleSheet(const DOMString& url,
 void CachedStyleSheet::ref(CachedObjectClient* c) {
   CachedObject::ref(c);
 
-  if (!m_loading)
+  if (!m_loading) {
     if (m_hadError)
       c->error(m_err, m_errText);
     else
       c->setStyleSheet(m_url, m_sheet);
+  }
 }
 
 void CachedStyleSheet::data(QBuffer& buffer, bool eof) {
@@ -84,10 +85,10 @@ void CachedStyleSheet::data(QBuffer& buffer, bool eof) {
 
   QTextCodec* c = codecForBuffer(m_charset, buffer.buffer());
   QString data = c->toUnicode(buffer.buffer().data(), m_size);
+
   // workaround Qt bugs
-  m_sheet = (data[0].unicode() == QChar::byteOrderMark) ? DOMString(data.mid(1))
-                                                        : DOMString(data);
-  kdDebug() << "m_sheet now is : " << data << endl;
+  m_sheet = data[0].unicode() == QChar::byteOrderMark ? DOMString(data.mid(1))
+                                                      : DOMString(data);
   m_loading = false;
 
   checkNotify();

@@ -32,7 +32,7 @@ TraversalImpl::TraversalImpl(NodeImpl* n,
                              short show,
                              NodeFilterImpl* nodeFilter,
                              bool expandEntityReferences)
-    : Shared(true),
+    : Shared(),
       m_root(n),
       m_whatToShow(show),
       m_filter(nodeFilter),

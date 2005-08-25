@@ -34,9 +34,9 @@ class SVGAnimatedEnumerationImpl;
 
 class SVGFEBlendElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEBlendElementImpl(KDOM::DocumentImpl* doc,
+  SVGFEBlendElementImpl(KDOM::DocumentPtr* doc,
                         KDOM::NodeImpl::Id id,
-                        const KDOM::DOMString& prefix);
+                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGFEBlendElementImpl();
 
   // 'SVGFEBlendElement' functions

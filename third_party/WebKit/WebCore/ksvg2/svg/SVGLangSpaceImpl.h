@@ -38,11 +38,11 @@ class SVGLangSpaceImpl {
   virtual ~SVGLangSpaceImpl();
 
   // 'SVGLangSpace' functions
-  KDOM::DOMStringImpl* xmlLang() const;
-  void setXmlLang(KDOM::DOMStringImpl* xmlLang);
+  KDOM::DOMStringImpl* xmllang() const;
+  void setXmllang(KDOM::DOMStringImpl* xmlLang);
 
-  KDOM::DOMStringImpl* xmlSpace() const;
-  void setXmlSpace(KDOM::DOMStringImpl* xmlSpace);
+  KDOM::DOMStringImpl* xmlspace() const;
+  void setXmlspace(KDOM::DOMStringImpl* xmlSpace);
 
   bool parseAttribute(KDOM::AttributeImpl* attr);
 

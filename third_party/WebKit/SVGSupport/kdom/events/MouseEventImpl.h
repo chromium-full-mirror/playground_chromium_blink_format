@@ -51,7 +51,7 @@ class MouseEventImpl : public UIEventImpl {
   EventTargetImpl* relatedTarget() const;
   void setRelatedTarget(EventTargetImpl* target);
 
-  void initMouseEvent(const DOMString& typeArg,
+  void initMouseEvent(DOMStringImpl* typeArg,
                       bool canBubbleArg,
                       bool cancelableArg,
                       AbstractViewImpl* viewArg,
@@ -66,7 +66,7 @@ class MouseEventImpl : public UIEventImpl {
                       bool metaKeyArg,
                       unsigned short buttonArg,
                       EventTargetImpl* relatedTargetArg);
-  void initMouseEvent(const DOMString& typeArg,
+  void initMouseEvent(DOMStringImpl* typeArg,
                       QMouseEvent* qevent,
                       float scale = 1.0);
 

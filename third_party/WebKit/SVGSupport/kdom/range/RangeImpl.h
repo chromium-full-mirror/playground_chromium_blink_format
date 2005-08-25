@@ -28,20 +28,19 @@
 
 #include <kdom/Shared.h>
 
-#include <kdom/range/Range.h>
-
 namespace KDOM {
 
-class DocumentFragmentImpl;
-class DocumentImpl;
 class NodeImpl;
+class DOMString;
+class DocumentPtr;
+class DocumentFragmentImpl;
 
 class RangeImpl : public Shared {
   friend class DocumentImpl;
 
  public:
-  RangeImpl(DocumentImpl* _ownerDocument);
-  RangeImpl(DocumentImpl* _ownerDocument,
+  RangeImpl(DocumentPtr* _ownerDocument);
+  RangeImpl(DocumentPtr* _ownerDocument,
             NodeImpl* _startContainer,
             long _startOffset,
             NodeImpl* _endContainer,
@@ -52,7 +51,7 @@ class RangeImpl : public Shared {
   long startOffset() const;
   NodeImpl* endContainer() const;
   long endOffset() const;
-  bool collapsed() const;
+  bool isCollapsed() const;
 
   NodeImpl* commonAncestorContainer();
   static NodeImpl* commonAncestorContainer(NodeImpl* containerA,
@@ -97,7 +96,7 @@ class RangeImpl : public Shared {
   bool readOnly() { return false; }
 
  protected:
-  DocumentImpl* m_ownerDocument;
+  DocumentPtr* m_ownerDocument;
   NodeImpl* m_startContainer;
   unsigned long m_startOffset;
   NodeImpl* m_endContainer;

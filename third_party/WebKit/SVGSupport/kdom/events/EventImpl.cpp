@@ -22,13 +22,14 @@
 
 #include "EventImpl.h"
 #include "kdomevents.h"
+#include "DOMStringImpl.h"
 #include "EventTargetImpl.h"
 #include "DOMImplementationImpl.h"
 
 using namespace KDOM;
 
 EventImpl::EventImpl(EventImplType identifier)
-    : Shared(true), m_identifier(identifier) {
+    : Shared(), m_identifier(identifier) {
   m_createTime = QDateTime::currentDateTime();
 
   m_target = 0;
@@ -37,6 +38,7 @@ EventImpl::EventImpl(EventImplType identifier)
   m_id = UNKNOWN_EVENT;
   m_eventPhase = 0;
 
+  m_type = 0;
   m_bubbles = false;
   m_cancelable = false;
   m_propagationStopped = false;
@@ -44,9 +46,12 @@ EventImpl::EventImpl(EventImplType identifier)
   m_defaultHandled = false;
 }
 
-EventImpl::~EventImpl() {}
+EventImpl::~EventImpl() {
+  if (m_type)
+    m_type->deref();
+}
 
-DOMString EventImpl::type() const {
+DOMStringImpl* EventImpl::type() const {
   return m_type;
 }
 
@@ -84,11 +89,11 @@ void EventImpl::preventDefault() {
     m_defaultPrevented = true;
 }
 
-void EventImpl::initEvent(const DOMString& eventTypeArg,
+void EventImpl::initEvent(DOMStringImpl* eventTypeArg,
                           bool canBubbleArg,
                           bool cancelableArg) {
-  m_id = DOMImplementationImpl::self()->typeToId(eventTypeArg);
-  m_type = eventTypeArg;
+  KDOM_SAFE_SET(m_type, eventTypeArg);
+  m_id = DOMImplementationImpl::self()->typeToId(m_type);
   m_bubbles = canBubbleArg;
   m_cancelable = cancelableArg;
 }

@@ -39,9 +39,9 @@ class SVGClipPathElementImpl : public SVGStyledElementImpl,
                                public SVGExternalResourcesRequiredImpl,
                                public SVGTransformableImpl {
  public:
-  SVGClipPathElementImpl(KDOM::DocumentImpl* doc,
+  SVGClipPathElementImpl(KDOM::DocumentPtr* doc,
                          KDOM::NodeImpl::Id id,
-                         const KDOM::DOMString& prefix);
+                         KDOM::DOMStringImpl* prefix);
   virtual ~SVGClipPathElementImpl();
 
   // Derived from: 'ElementImpl'

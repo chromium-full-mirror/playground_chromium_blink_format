@@ -24,7 +24,7 @@
 
 #include "svgattrs.h"
 #include "SVGHelper.h"
-#include "SVGDocument.h"
+//#include "SVGDocument.h"
 #include "SVGTextContentElementImpl.h"
 #include "SVGAnimatedLengthImpl.h"
 #include "SVGAnimatedEnumerationImpl.h"
@@ -32,9 +32,9 @@
 using namespace KSVG;
 
 SVGTextContentElementImpl::SVGTextContentElementImpl(
-    KDOM::DocumentImpl* doc,
+    KDOM::DocumentPtr* doc,
     KDOM::NodeImpl::Id id,
-    const KDOM::DOMString& prefix)
+    KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),

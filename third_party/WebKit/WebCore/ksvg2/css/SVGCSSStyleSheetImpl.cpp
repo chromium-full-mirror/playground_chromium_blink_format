@@ -26,16 +26,16 @@
 using namespace KSVG;
 
 SVGCSSStyleSheetImpl::SVGCSSStyleSheetImpl(KDOM::NodeImpl* parentNode,
-                                           const KDOM::DOMString& href,
+                                           KDOM::DOMStringImpl* href,
                                            bool _implicit)
     : KDOM::CSSStyleSheetImpl(parentNode, href, _implicit) {}
 
 SVGCSSStyleSheetImpl::SVGCSSStyleSheetImpl(KDOM::CSSStyleSheetImpl* parentSheet,
-                                           const KDOM::DOMString& href)
+                                           KDOM::DOMStringImpl* href)
     : KDOM::CSSStyleSheetImpl(parentSheet, href) {}
 
 SVGCSSStyleSheetImpl::SVGCSSStyleSheetImpl(KDOM::CSSRuleImpl* ownerRule,
-                                           const KDOM::DOMString& href)
+                                           KDOM::DOMStringImpl* href)
     : KDOM::CSSStyleSheetImpl(ownerRule, href) {}
 
 SVGCSSStyleSheetImpl::SVGCSSStyleSheetImpl(KDOM::NodeImpl* parentNode,

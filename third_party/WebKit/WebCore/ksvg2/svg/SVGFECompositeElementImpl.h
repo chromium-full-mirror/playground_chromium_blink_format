@@ -36,9 +36,9 @@ class SVGAnimatedEnumerationImpl;
 class SVGFECompositeElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFECompositeElementImpl(KDOM::DocumentImpl* doc,
+  SVGFECompositeElementImpl(KDOM::DocumentPtr* doc,
                             KDOM::NodeImpl::Id id,
-                            const KDOM::DOMString& prefix);
+                            KDOM::DOMStringImpl* prefix);
   virtual ~SVGFECompositeElementImpl();
 
   // 'SVGFECompositeElement' functions

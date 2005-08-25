@@ -2,6 +2,12 @@
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                                   2004, 2005 Rob Buis <buis@kde.org>
 
+    Based on khtml code by:
+    Copyright (C) 1999 Lars Knoll (knoll@kde.org)
+              (C) 1999 Antti Koivisto (koivisto@kde.org)
+              (C) 2001 Dirk Mueller (mueller@kde.org)
+              (C) 2002-2003 Apple Computer, Inc.
+
     This file is part of the KDE project
 
     This library is free software; you can redistribute it and/or
@@ -20,18 +26,19 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include "DocumentFragmentImpl.h"
+#include "kdom.h"
 #include "DocumentImpl.h"
+#include "DocumentFragmentImpl.h"
 
 using namespace KDOM;
 
-DocumentFragmentImpl::DocumentFragmentImpl(DocumentImpl* doc)
+DocumentFragmentImpl::DocumentFragmentImpl(DocumentPtr* doc)
     : NodeBaseImpl(doc) {}
 
 DocumentFragmentImpl::~DocumentFragmentImpl() {}
 
-DOMString DocumentFragmentImpl::nodeName() const {
-  return "#document-fragment";
+DOMStringImpl* DocumentFragmentImpl::nodeName() const {
+  return new DOMStringImpl("#document-fragment");
 }
 
 unsigned short DocumentFragmentImpl::nodeType() const {
@@ -52,8 +59,8 @@ bool DocumentFragmentImpl::childTypeAllowed(unsigned short type) const {
   }
 }
 
-NodeImpl* DocumentFragmentImpl::cloneNode(bool deep, DocumentImpl* doc) const {
-  DocumentFragmentImpl* clone = doc->createDocumentFragment();
+NodeImpl* DocumentFragmentImpl::cloneNode(bool deep, DocumentPtr* doc) const {
+  DocumentFragmentImpl* clone = doc->document()->createDocumentFragment();
   if (deep)
     cloneChildNodes(clone, doc);
 

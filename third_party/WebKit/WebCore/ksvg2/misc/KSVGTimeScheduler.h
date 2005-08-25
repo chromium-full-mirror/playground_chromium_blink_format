@@ -77,9 +77,6 @@ class SVGTimer {
 typedef QValueList<SVGTimer*> SVGTimerList;
 
 class SVGDocumentImpl;
-#ifdef APPLE_CHANGES
-class KSVGSlotStub;
-#endif
 class TimeScheduler : public QObject {
   Q_OBJECT
  public:
@@ -108,9 +105,6 @@ class TimeScheduler : public QObject {
  private:  // Helper
   friend class SVGTimer;
   SVGDocumentImpl* document() const { return m_document; }
-#ifdef APPLE_CHANGES
-  KSVGSlotStub* slotStub();
-#endif
 
  private:
   int m_savedTime;
@@ -120,9 +114,6 @@ class TimeScheduler : public QObject {
 
   SVGTimer* m_intervalTimer;
   SVGDocumentImpl* m_document;
-#ifdef APPLE_CHANGES
-  KSVGSlotStub* m_slotStub;
-#endif
 };
 };
 

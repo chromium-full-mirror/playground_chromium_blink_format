@@ -20,27 +20,27 @@
     Boston, MA 02111-1307, USA.
 */
 
+#include "kdom.h"
 #include "DocumentImpl.h"
 #include "CDATASectionImpl.h"
 
 using namespace KDOM;
 
-CDATASectionImpl::CDATASectionImpl(DocumentImpl* doc, DOMStringImpl* text)
+CDATASectionImpl::CDATASectionImpl(DocumentPtr* doc, DOMStringImpl* text)
     : TextImpl(doc, text) {}
 
 CDATASectionImpl::~CDATASectionImpl() {}
 
-DOMString CDATASectionImpl::nodeName() const {
-  return "#cdata-section";
+DOMStringImpl* CDATASectionImpl::nodeName() const {
+  return new DOMStringImpl("#cdata-section");
 }
 
 unsigned short CDATASectionImpl::nodeType() const {
   return CDATA_SECTION_NODE;
 }
 
-NodeImpl* CDATASectionImpl::cloneNode(bool, DocumentImpl* doc) const {
-  DOMStringImpl* _data = (data() ? data()->copy() : 0);
-  return doc->createCDATASection(DOMString(_data));
+NodeImpl* CDATASectionImpl::cloneNode(bool, DocumentPtr* doc) const {
+  return doc->document()->createCDATASection(data());
 }
 
 // vim:ts=4:noet

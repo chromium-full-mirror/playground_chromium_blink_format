@@ -37,9 +37,9 @@
 
 using namespace KSVG;
 
-SVGClipPathElementImpl::SVGClipPathElementImpl(KDOM::DocumentImpl* doc,
+SVGClipPathElementImpl::SVGClipPathElementImpl(KDOM::DocumentPtr* doc,
                                                KDOM::NodeImpl::Id id,
-                                               const KDOM::DOMString& prefix)
+                                               KDOM::DOMStringImpl* prefix)
     : SVGStyledElementImpl(doc, id, prefix),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
@@ -98,7 +98,8 @@ void SVGClipPathElementImpl::close() {
 
     m_clipper = static_cast<KCanvasClipper*>(
         canvas->renderingDevice()->createResource(RS_CLIPPER));
-    canvas->registry()->addResourceById(getId().string(), m_clipper);
+    canvas->registry()->addResourceById(KDOM::DOMString(getId()).string(),
+                                        m_clipper);
   } else
     m_clipper->resetClipData();
 

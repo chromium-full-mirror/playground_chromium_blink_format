@@ -37,8 +37,7 @@ CSSMediaRuleImpl::CSSMediaRuleImpl(StyleBaseImpl* parent)
   m_lstCSSRules->ref();
 }
 
-CSSMediaRuleImpl::CSSMediaRuleImpl(StyleBaseImpl* parent,
-                                   const DOMString& media)
+CSSMediaRuleImpl::CSSMediaRuleImpl(StyleBaseImpl* parent, DOMStringImpl* media)
     : CSSRuleImpl(parent) {
   m_type = MEDIA_RULE;
 
@@ -83,7 +82,7 @@ CSSRuleListImpl* CSSMediaRuleImpl::cssRules() const {
   return m_lstCSSRules;
 }
 
-unsigned long CSSMediaRuleImpl::insertRule(const DOMString& rule,
+unsigned long CSSMediaRuleImpl::insertRule(DOMStringImpl* rule,
                                            unsigned long index) {
   CSSParser* p = createCSSParser(m_strictParsing);
   if (!p)

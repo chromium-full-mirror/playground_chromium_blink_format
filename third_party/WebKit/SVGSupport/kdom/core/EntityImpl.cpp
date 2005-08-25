@@ -2,6 +2,9 @@
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                                   2004, 2005 Rob Buis <buis@kde.org>
 
+    Based on khtml code by:
+    Copyright (C) 2000 Peter Kelly (pmk@post.com)
+
     This file is part of the KDE project
 
     This library is free software; you can redistribute it and/or
@@ -20,17 +23,18 @@
     Boston, MA 02111-1307, USA.
 */
 
+#include "kdom.h"
 #include "EntityImpl.h"
 #include "DocumentImpl.h"
+#include "DOMStringImpl.h"
 #include "DocumentTypeImpl.h"
 #include "DOMImplementationImpl.h"
-#include "DOMStringImpl.h"
 
 using namespace KDOM;
 
-EntityImpl::EntityImpl(DocumentImpl* doc, const DOMString& name)
+EntityImpl::EntityImpl(DocumentPtr* doc, DOMStringImpl* name)
     : NodeBaseImpl(doc) {
-  m_name = name.implementation();
+  m_name = name;
   if (m_name)
     m_name->ref();
 
@@ -42,21 +46,21 @@ EntityImpl::EntityImpl(DocumentImpl* doc, const DOMString& name)
   m_xmlVersion = 0;
 }
 
-EntityImpl::EntityImpl(DocumentImpl* doc,
-                       const DOMString& publicId,
-                       const DOMString& systemId,
-                       const DOMString& notationName)
+EntityImpl::EntityImpl(DocumentPtr* doc,
+                       DOMStringImpl* publicId,
+                       DOMStringImpl* systemId,
+                       DOMStringImpl* notationName)
     : NodeBaseImpl(doc) {
   m_name = 0;
-  m_publicId = publicId.implementation();
+  m_publicId = publicId;
   if (m_publicId)
     m_publicId->ref();
 
-  m_systemId = systemId.implementation();
+  m_systemId = systemId;
   if (m_systemId)
     m_systemId->ref();
 
-  m_notationName = notationName.implementation();
+  m_notationName = notationName;
   if (m_notationName)
     m_notationName->ref();
 
@@ -65,25 +69,25 @@ EntityImpl::EntityImpl(DocumentImpl* doc,
   m_xmlVersion = 0;
 }
 
-EntityImpl::EntityImpl(DocumentImpl* doc,
-                       const DOMString& name,
-                       const DOMString& publicId,
-                       const DOMString& systemId,
-                       const DOMString& notationName)
+EntityImpl::EntityImpl(DocumentPtr* doc,
+                       DOMStringImpl* name,
+                       DOMStringImpl* publicId,
+                       DOMStringImpl* systemId,
+                       DOMStringImpl* notationName)
     : NodeBaseImpl(doc) {
-  m_name = name.implementation();
+  m_name = name;
   if (m_name)
     m_name->ref();
 
-  m_publicId = publicId.implementation();
+  m_publicId = publicId;
   if (m_publicId)
     m_publicId->ref();
 
-  m_systemId = systemId.implementation();
+  m_systemId = systemId;
   if (m_systemId)
     m_systemId->ref();
 
-  m_notationName = notationName.implementation();
+  m_notationName = notationName;
   if (m_notationName)
     m_notationName->ref();
 
@@ -109,48 +113,47 @@ EntityImpl::~EntityImpl() {
     m_xmlVersion->deref();
 }
 
-DOMString EntityImpl::publicId() const {
-  return DOMString(m_publicId);
+DOMStringImpl* EntityImpl::publicId() const {
+  return m_publicId;
 }
 
-DOMString EntityImpl::systemId() const {
-  return DOMString(m_systemId);
+DOMStringImpl* EntityImpl::systemId() const {
+  return m_systemId;
 }
 
-DOMString EntityImpl::notationName() const {
-  return DOMString(m_notationName);
+DOMStringImpl* EntityImpl::notationName() const {
+  return m_notationName;
 }
 
-DOMString EntityImpl::inputEncoding() const {
-  return DOMString(m_inputEncoding);
+DOMStringImpl* EntityImpl::inputEncoding() const {
+  return m_inputEncoding;
 }
 
-DOMString EntityImpl::xmlEncoding() const {
-  return DOMString(m_xmlEncoding);
+DOMStringImpl* EntityImpl::xmlEncoding() const {
+  return m_xmlEncoding;
 }
 
-DOMString EntityImpl::xmlVersion() const {
-  return DOMString(m_xmlVersion);
+DOMStringImpl* EntityImpl::xmlVersion() const {
+  return m_xmlVersion;
 }
 
-DOMString EntityImpl::nodeName() const {
-  return DOMString(m_name);
+DOMStringImpl* EntityImpl::nodeName() const {
+  return m_name;
 }
 
 unsigned short EntityImpl::nodeType() const {
   return ENTITY_NODE;
 }
 
-NodeImpl* EntityImpl::cloneNode(bool deep, DocumentImpl* doc) const {
+NodeImpl* EntityImpl::cloneNode(bool deep, DocumentPtr* doc) const {
   EntityImpl* p =
-      new EntityImpl(doc, nodeName(), DOMString(m_publicId),
-                     DOMString(m_systemId), DOMString(m_notationName));
+      new EntityImpl(doc, nodeName(), publicId(), systemId(), notationName());
 
   if (deep) {
-    bool oldMode = doc->parsing();
-    doc->setParsing(true);
+    bool oldMode = doc->document()->parsing();
+    doc->document()->setParsing(true);
     cloneChildNodes(p, doc);
-    doc->setParsing(oldMode);
+    doc->document()->setParsing(oldMode);
   }
 
   return p;

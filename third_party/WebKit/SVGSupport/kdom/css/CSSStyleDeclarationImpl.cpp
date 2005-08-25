@@ -28,7 +28,6 @@
 #include "CDFInterface.h"
 #include <kdom/css/impl/cssproperties.h>
 #include "CSSStyleSheetImpl.h"
-#include "DOMImplementationCSS.h"
 #include "CSSPrimitiveValueImpl.h"
 #include "CSSStyleDeclarationImpl.h"
 
@@ -77,22 +76,22 @@ CSSStyleDeclarationImpl& CSSStyleDeclarationImpl::operator=(
   return *this;
 }
 
-DOMString CSSStyleDeclarationImpl::cssText() const {
-  DOMString result;
+DOMStringImpl* CSSStyleDeclarationImpl::cssText() const {
+  if (!m_lstValues)
+    return 0;
 
-  if (m_lstValues) {
-    QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  DOMStringImpl* result = new DOMStringImpl();
 
-    CSSProperty* current;
-    for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
-         ++lstValuesIt)
-      result += current->cssText(*this);
-  }
+  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+
+  CSSProperty* current;
+  for (lstValuesIt.toFirst(); (current = lstValuesIt.current()); ++lstValuesIt)
+    result->append(current->cssText(*this));
 
   return result;
 }
 
-void CSSStyleDeclarationImpl::setCssText(const DOMString& cssText) {
+void CSSStyleDeclarationImpl::setCssText(DOMStringImpl* cssText) {
   if (m_lstValues)
     m_lstValues->clear();
   else {
@@ -109,41 +108,48 @@ void CSSStyleDeclarationImpl::setCssText(const DOMString& cssText) {
   delete parser;
 }
 
-DOMString CSSStyleDeclarationImpl::get4Values(const int* properties) const {
-  DOMString res;
+DOMStringImpl* CSSStyleDeclarationImpl::get4Values(
+    const int* properties) const {
+  DOMStringImpl* ret = 0;
   for (int i = 0; i < 4; ++i) {
     CSSValueImpl* value = getPropertyCSSValue(properties[i]);
     if (!value)  // apparently all 4 properties must be specified.
-      return DOMString();
+      return 0;
 
-    if (i > 0)
-      res += " ";
+    if (ret)
+      ret->append(" ");
 
-    res += value->cssText();
+    if (!ret)
+      ret = new DOMStringImpl();
+
+    ret->append(value->cssText());
   }
 
-  return res;
+  return ret;
 }
 
-DOMString CSSStyleDeclarationImpl::getShortHandValue(const int* properties,
-                                                     int number) const {
-  DOMString res;
+DOMStringImpl* CSSStyleDeclarationImpl::getShortHandValue(const int* properties,
+                                                          int number) const {
+  DOMStringImpl* ret = 0;
   for (int i = 0; i < number; ++i) {
     CSSValueImpl* value = getPropertyCSSValue(properties[i]);
     if (value) {  // TODO provide default value if !value
-      if (!res.isNull())
-        res += " ";
+      if (ret)
+        ret->append(" ");
 
-      res += value->cssText();
+      if (!ret)
+        ret = new DOMStringImpl();
+
+      ret->append(value->cssText());
     }
   }
 
-  return res;
+  return ret;
 }
 
-DOMString CSSStyleDeclarationImpl::getPropertyValue(int propertyID) const {
+DOMStringImpl* CSSStyleDeclarationImpl::getPropertyValue(int propertyID) const {
   if (!m_lstValues)
-    return DOMString();
+    return 0;
 
   CSSValueImpl* value = getPropertyCSSValue(propertyID);
   if (value)
@@ -235,20 +241,21 @@ DOMString CSSStyleDeclarationImpl::getPropertyValue(int propertyID) const {
     }
   }
 
-  return DOMString();
+  return 0;
 }
 
-CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
-    const DOMString& propertyName) {
-  if (!m_lstValues)
+DOMStringImpl* CSSStyleDeclarationImpl::getPropertyValue(
+    DOMStringImpl* propertyName) const {
+  if (!m_lstValues || !propertyName)
     return 0;
 
   int propertyId =
       (m_interface
-           ? m_interface->getPropertyID(propertyName.string().ascii(),
-                                        propertyName.length())
+           ? m_interface->getPropertyID(propertyName->string().ascii(),
+                                        propertyName->length())
            : 0);
-  return getPropertyCSSValue(propertyId);
+
+  return getPropertyValue(propertyId);
 }
 
 CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
@@ -266,12 +273,40 @@ CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
   return 0;
 }
 
-DOMString CSSStyleDeclarationImpl::removeProperty(int propertyID,
-                                                  bool nonCSSHint) {
-  if (!m_lstValues)
-    return DOMString();
+CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
+    DOMStringImpl* propertyName) const {
+  if (!m_lstValues || !propertyName)
+    return 0;
 
-  DOMString value;
+  int propertyId =
+      (m_interface
+           ? m_interface->getPropertyID(propertyName->string().ascii(),
+                                        propertyName->length())
+           : 0);
+
+  return getPropertyCSSValue(propertyId);
+}
+
+DOMStringImpl* CSSStyleDeclarationImpl::removeProperty(
+    DOMStringImpl* propertyName) {
+  if (!m_lstValues || !propertyName)
+    return 0;
+
+  int propertyId =
+      (m_interface
+           ? m_interface->getPropertyID(propertyName->string().ascii(),
+                                        propertyName->length())
+           : 0);
+
+  return removeProperty(propertyId);
+}
+
+DOMStringImpl* CSSStyleDeclarationImpl::removeProperty(int propertyID,
+                                                       bool nonCSSHint) {
+  if (!m_lstValues)
+    return 0;
+
+  DOMStringImpl* value = 0;
 
   QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
   CSSProperty* current;
@@ -288,18 +323,36 @@ DOMString CSSStyleDeclarationImpl::removeProperty(int propertyID,
 }
 
 bool CSSStyleDeclarationImpl::getPropertyPriority(int propertyID) const {
-  if (m_lstValues) {
-    QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  if (!m_lstValues)
+    return false;
 
-    CSSProperty* current;
-    for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
-         ++lstValuesIt) {
-      if (propertyID == current->m_id)
-        return current->m_important;
-    }
+  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+
+  CSSProperty* current;
+  for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
+       ++lstValuesIt) {
+    if (propertyID == current->m_id)
+      return current->m_important;
   }
 
   return false;
+}
+
+DOMStringImpl* CSSStyleDeclarationImpl::getPropertyPriority(
+    DOMStringImpl* propertyName) const {
+  if (!m_lstValues || !propertyName)
+    return 0;
+
+  int propertyId =
+      (m_interface
+           ? m_interface->getPropertyID(propertyName->string().ascii(),
+                                        propertyName->length())
+           : 0);
+
+  if (propertyId && getPropertyPriority(propertyId))
+    return new DOMStringImpl("important");
+
+  return 0;
 }
 
 void CSSStyleDeclarationImpl::setProperty(int id,
@@ -319,7 +372,7 @@ void CSSStyleDeclarationImpl::setProperty(int id,
 }
 
 bool CSSStyleDeclarationImpl::setProperty(int propertyID,
-                                          const DOMString& value,
+                                          DOMStringImpl* value,
                                           bool important,
                                           bool nonCSSHint) {
   if (!m_lstValues) {
@@ -337,7 +390,8 @@ bool CSSStyleDeclarationImpl::setProperty(int propertyID,
     QString qProp = QString::fromLatin1(
         (m_interface ? m_interface->getPropertyName(propertyID) : "N/A"));
     kdDebug(6080) << "CSSStyleDeclarationImpl::setProperty invalid property: ["
-                  << qProp << "] value: [" << value.string() << "]" << endl;
+                  << qProp << "] value: [" << DOMString(value).string() << "]"
+                  << endl;
   } else
     setChanged();
 
@@ -345,7 +399,28 @@ bool CSSStyleDeclarationImpl::setProperty(int propertyID,
   return success;
 }
 
-void CSSStyleDeclarationImpl::setProperty(const DOMString& propertyString) {
+void CSSStyleDeclarationImpl::setProperty(DOMStringImpl* propertyName,
+                                          DOMStringImpl* value,
+                                          DOMStringImpl* priority) {
+  int propertyId =
+      (m_interface && propertyName
+           ? m_interface->getPropertyID(propertyName->string().ascii(),
+                                        propertyName->length())
+           : 0);
+
+  if (!propertyId)
+    return;
+
+  bool important = false;
+
+  QString str = (priority ? priority->string() : QString::null);
+  if (str.find(QString::fromLatin1("important"), 0, false) != -1)
+    important = true;
+
+  setProperty(propertyId, value, important);
+}
+
+void CSSStyleDeclarationImpl::setProperty(DOMStringImpl* propertyString) {
   if (!m_lstValues) {
     m_lstValues = new QPtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
@@ -361,7 +436,7 @@ void CSSStyleDeclarationImpl::setProperty(const DOMString& propertyString) {
 }
 
 void CSSStyleDeclarationImpl::setLengthProperty(int propertyID,
-                                                const DOMString& value,
+                                                DOMStringImpl* value,
                                                 bool important,
                                                 bool nonCSSHint,
                                                 bool multiLength) {
@@ -375,14 +450,15 @@ void CSSStyleDeclarationImpl::setLengthProperty(int propertyID,
 }
 
 unsigned long CSSStyleDeclarationImpl::length() const {
-  return m_lstValues ? m_lstValues->count() : 0;
+  return (m_lstValues ? m_lstValues->count() : 0);
 }
 
-DOMString CSSStyleDeclarationImpl::item(unsigned long index) const {
+DOMStringImpl* CSSStyleDeclarationImpl::item(unsigned long index) const {
   if (m_lstValues && index < m_lstValues->count() && m_lstValues->at(index))
-    return m_interface->getPropertyName(m_lstValues->at(index)->m_id);
+    return new DOMStringImpl(
+        m_interface->getPropertyName(m_lstValues->at(index)->m_id));
 
-  return DOMString();
+  return 0;
 }
 
 CSSRuleImpl* CSSStyleDeclarationImpl::parentRule() const {
@@ -408,7 +484,7 @@ void CSSStyleDeclarationImpl::setChanged() {
   }
 }
 
-bool CSSStyleDeclarationImpl::parseString(const DOMString&, bool) {
+bool CSSStyleDeclarationImpl::parseString(DOMStringImpl*, bool) {
   kdDebug() << "WARNING: CSSStyleDeclarationImpl::parseString, unimplemented, "
                "was called"
             << endl;
@@ -455,11 +531,12 @@ CSSValueImpl* CSSProperty::value() const {
   return m_value;
 }
 
-DOMString CSSProperty::cssText(const CSSStyleDeclarationImpl& decl) const {
-  return DOMString(decl.interface()->getPropertyName(m_id)) + DOMString(": ") +
-         m_value->cssText() +
-         (m_important ? DOMString(" !important") : DOMString()) +
-         DOMString("; ");
+DOMStringImpl* CSSProperty::cssText(const CSSStyleDeclarationImpl& decl) const {
+  return new DOMStringImpl(
+      QString::fromLatin1(decl.interface()->getPropertyName(m_id)) +
+      QString::fromLatin1(" ") + DOMString(m_value->cssText()).string() +
+      (m_important ? QString::fromLatin1(" !important") : QString::null) +
+      QString::fromLatin1("; "));
 }
 
 // vim:ts=4:noet

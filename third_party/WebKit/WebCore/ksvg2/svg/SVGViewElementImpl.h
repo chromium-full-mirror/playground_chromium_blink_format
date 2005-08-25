@@ -35,9 +35,9 @@ class SVGViewElementImpl : public SVGStyledElementImpl,
                            public SVGFitToViewBoxImpl,
                            public SVGZoomAndPanImpl {
  public:
-  SVGViewElementImpl(KDOM::DocumentImpl* doc,
+  SVGViewElementImpl(KDOM::DocumentPtr* doc,
                      KDOM::NodeImpl::Id id,
-                     const KDOM::DOMString& prefix);
+                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGViewElementImpl();
 
   virtual void parseAttribute(KDOM::AttributeImpl*);
