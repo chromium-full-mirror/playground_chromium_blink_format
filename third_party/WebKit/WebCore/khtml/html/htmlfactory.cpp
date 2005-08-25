@@ -42,6 +42,8 @@ using khtml::HashMap;
 
 namespace DOM {
 
+using namespace HTMLNames;
+
 typedef HTMLElementImpl* (*ConstructorFunc)(const AtomicString& tagName,
                                             DocumentPtr* docPtr,
                                             HTMLFormElementImpl* form,

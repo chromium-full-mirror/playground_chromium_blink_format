@@ -100,10 +100,11 @@
 
 template class QPtrStack<DOM::NodeImpl>;
 
-using namespace HTMLNames;
 using namespace khtml;
 
 namespace DOM {
+
+using namespace HTMLNames;
 
 HTMLDocumentImpl::HTMLDocumentImpl(DOMImplementationImpl* _implementation,
                                    KHTMLView* v)
