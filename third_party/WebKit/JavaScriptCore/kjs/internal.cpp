@@ -53,6 +53,8 @@
 
 extern int kjsyyparse();
 
+using namespace kxmlcore;
+
 namespace KJS {
 
 #if !APPLE_CHANGES
@@ -318,23 +320,25 @@ void ContextImp::mark() {
 
 // ------------------------------ Parser ---------------------------------------
 
-ProgramNode* Parser::progNode = 0;
+static SharedPtr<ProgramNode>* progNode;
 int Parser::sid = 0;
 
-ProgramNode* Parser::parse(const UString& sourceURL,
-                           int startingLineNumber,
-                           const UChar* code,
-                           unsigned int length,
-                           int* sourceId,
-                           int* errLine,
-                           UString* errMsg) {
+SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
+                                     int startingLineNumber,
+                                     const UChar* code,
+                                     unsigned int length,
+                                     int* sourceId,
+                                     int* errLine,
+                                     UString* errMsg) {
   if (errLine)
     *errLine = -1;
   if (errMsg)
     *errMsg = 0;
+  if (!progNode)
+    progNode = new SharedPtr<ProgramNode>;
 
   Lexer::curr()->setCode(sourceURL, startingLineNumber, code, length);
-  progNode = 0;
+  *progNode = 0;
   sid++;
   if (sourceId)
     *sourceId = sid;
@@ -344,8 +348,8 @@ ProgramNode* Parser::parse(const UString& sourceURL,
   int parseError = kjsyyparse();
   bool lexError = Lexer::curr()->sawError();
   Lexer::curr()->doneParsing();
-  ProgramNode* prog = progNode;
-  progNode = 0;
+  SharedPtr<ProgramNode> prog = *progNode;
+  *progNode = 0;
 
   if (parseError || lexError) {
     int eline = Lexer::curr()->lineNo();
@@ -353,16 +357,14 @@ ProgramNode* Parser::parse(const UString& sourceURL,
       *errLine = eline;
     if (errMsg)
       *errMsg = "Parse error";
-    if (prog) {
-      // must ref and deref to clean up properly
-      prog->ref();
-      prog->deref();
-      delete prog;
-    }
-    return 0;
+    return SharedPtr<ProgramNode>();
   }
 
   return prog;
+}
+
+void Parser::accept(ProgramNode* prog) {
+  *progNode = prog;
 }
 
 // ------------------------------ InterpreterImp -------------------------------
@@ -638,16 +640,9 @@ void InterpreterImp::mark() {
 bool InterpreterImp::checkSyntax(const UString& code) {
   // Parser::parse() returns 0 in a syntax error occurs, so we just check for
   // that
-  ProgramNode* progNode =
+  SharedPtr<ProgramNode> progNode =
       Parser::parse(UString(), 0, code.data(), code.size(), 0, 0, 0);
-  bool ok = (progNode != 0);
-  if (progNode) {
-    // must ref and deref to clean up properly
-    progNode->ref();
-    progNode->deref();
-    delete progNode;
-  }
-  return ok;
+  return progNode;
 }
 
 Completion InterpreterImp::evaluate(const UString& code,
@@ -674,7 +669,7 @@ Completion InterpreterImp::evaluate(const UString& code,
   int sid;
   int errLine;
   UString errMsg;
-  ProgramNode* progNode =
+  SharedPtr<ProgramNode> progNode =
       Parser::parse(sourceURL, startingLineNumber, code.data(), code.size(),
                     &sid, &errLine, &errMsg);
 
@@ -705,7 +700,6 @@ Completion InterpreterImp::evaluate(const UString& code,
   globExec.clearException();
 
   recursion++;
-  progNode->ref();
 
   ObjectImp* globalObj = globalObject();
   ObjectImp* thisObj = globalObject();
@@ -733,8 +727,6 @@ Completion InterpreterImp::evaluate(const UString& code,
     res = progNode->execute(&newExec);
   }
 
-  if (progNode->deref())
-    delete progNode;
   recursion--;
 
 #if APPLE_CHANGES

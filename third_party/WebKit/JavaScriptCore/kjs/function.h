@@ -89,14 +89,13 @@ class DeclaredFunctionImp : public FunctionImp {
                       const Identifier& n,
                       FunctionBodyNode* b,
                       const ScopeChain& sc);
-  ~DeclaredFunctionImp();
 
   bool implementsConstruct() const;
   ObjectImp* construct(ExecState* exec, const List& args);
 
   virtual Completion execute(ExecState* exec);
   CodeType codeType() const { return FunctionCode; }
-  FunctionBodyNode* body;
+  kxmlcore::SharedPtr<FunctionBodyNode> body;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
