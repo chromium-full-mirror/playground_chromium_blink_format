@@ -187,8 +187,12 @@ static QString startMarkup(const NodeImpl* node,
       if (defaultStyle) {
         NodeImpl* element = node->parentNode();
         if (element) {
+          CSSComputedStyleDeclarationImpl* computedStyle =
+              Position(element, 0).computedStyle();
+          computedStyle->ref();
           CSSMutableStyleDeclarationImpl* style =
-              Position(element, 0).computedStyle()->copyInheritableProperties();
+              computedStyle->copyInheritableProperties();
+          computedStyle->deref();
           style->ref();
           defaultStyle->diff(style);
           if (style->length() > 0) {
@@ -214,10 +218,12 @@ static QString startMarkup(const NodeImpl* node,
         const ElementImpl* el = static_cast<const ElementImpl*>(node);
         DOMString additionalStyle;
         if (defaultStyle && el->isHTMLElement()) {
+          CSSComputedStyleDeclarationImpl* computedStyle =
+              Position(const_cast<ElementImpl*>(el), 0).computedStyle();
+          computedStyle->ref();
           CSSMutableStyleDeclarationImpl* style =
-              Position(const_cast<ElementImpl*>(el), 0)
-                  .computedStyle()
-                  ->copyInheritableProperties();
+              computedStyle->copyInheritableProperties();
+          computedStyle->deref();
           style->ref();
           defaultStyle->diff(style);
           if (style->length() > 0) {
@@ -350,8 +356,11 @@ QString createMarkup(const RangeImpl* range,
 
   // calculate the "default style" for this markup
   Position pos(doc->documentElement(), 0);
+  CSSComputedStyleDeclarationImpl* computedStyle = pos.computedStyle();
+  computedStyle->ref();
   CSSMutableStyleDeclarationImpl* defaultStyle =
-      pos.computedStyle()->copyInheritableProperties();
+      computedStyle->copyInheritableProperties();
+  computedStyle->deref();
   defaultStyle->ref();
 
   NodeImpl* startNode = range->startNode();
