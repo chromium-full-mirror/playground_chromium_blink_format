@@ -323,6 +323,35 @@ void ContextImp::mark() {
 static SharedPtr<ProgramNode>* progNode;
 int Parser::sid = 0;
 
+const int initialCapacity = 64;
+const int growthFactor = 2;
+
+static int numNewNodes;
+static int newNodesCapacity;
+static Node** newNodes;
+
+void Parser::saveNewNode(Node* node) {
+  if (numNewNodes == newNodesCapacity) {
+    newNodesCapacity = (newNodesCapacity == 0)
+                           ? initialCapacity
+                           : newNodesCapacity * growthFactor;
+    newNodes = (Node**)realloc(newNodes, sizeof(Node*) * newNodesCapacity);
+  }
+
+  newNodes[numNewNodes++] = node;
+}
+
+static void clearNewNodes() {
+  for (int i = 0; i < numNewNodes; i++) {
+    if (newNodes[i]->refcount() == 0)
+      delete newNodes[i];
+  }
+  delete newNodes;
+  newNodes = 0;
+  numNewNodes = 0;
+  newNodesCapacity = 0;
+}
+
 SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
                                      int startingLineNumber,
                                      const UChar* code,
@@ -350,6 +379,8 @@ SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
   Lexer::curr()->doneParsing();
   SharedPtr<ProgramNode> prog = *progNode;
   *progNode = 0;
+
+  clearNewNodes();
 
   if (parseError || lexError) {
     int eline = Lexer::curr()->lineNo();

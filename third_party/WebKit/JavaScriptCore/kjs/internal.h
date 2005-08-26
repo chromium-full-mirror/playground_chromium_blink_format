@@ -38,6 +38,7 @@
 
 namespace KJS {
 
+class Node;
 class ProgramNode;
 class FunctionBodyNode;
 class FunctionPrototypeImp;
@@ -206,6 +207,8 @@ class Parser {
                                                 int* errLine = 0,
                                                 UString* errMsg = 0);
   static void accept(ProgramNode* prog);
+
+  static void saveNewNode(Node* node);
 
   static int sid;
 };
