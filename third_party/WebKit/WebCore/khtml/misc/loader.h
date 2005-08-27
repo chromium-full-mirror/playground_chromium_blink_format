@@ -173,6 +173,8 @@ class CachedObject {
 
   int size() const { return m_size; }
 
+  bool isLoaded() const { return !m_loading; }
+
   int accessCount() const { return m_accessCount; }
   void increaseAccessCount() { m_accessCount++; }
 
@@ -307,8 +309,6 @@ class CachedScript : public CachedObject {
   virtual bool schedule() const { return false; }
 
   void checkNotify();
-
-  bool isLoaded() const { return !m_loading; }
 
  protected:
   DOM::DOMString m_script;

@@ -458,6 +458,12 @@ class RenderObject : public CachedObjectClient {
                    const RenderStyle* style,
                    bool begin = true,
                    bool end = true);
+  bool paintBorderImage(QPainter* p,
+                        int _tx,
+                        int _ty,
+                        int w,
+                        int h,
+                        const RenderStyle* style);
   void paintOutline(QPainter* p,
                     int _tx,
                     int _ty,
@@ -478,7 +484,9 @@ class RenderObject : public CachedObjectClient {
                                        int w,
                                        int height,
                                        int bleft,
-                                       int bright){};
+                                       int bright,
+                                       int pleft,
+                                       int pright){};
 
   /*
    * This function calculates the minimum & maximum width that the object

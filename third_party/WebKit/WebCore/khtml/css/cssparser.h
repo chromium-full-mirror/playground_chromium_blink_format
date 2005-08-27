@@ -158,6 +158,7 @@ class CSSParser {
 
   // CSS3 Parsing Routines (for properties specific to CSS3)
   bool parseShadow(int propId, bool important);
+  bool parseBorderImage(int propId, bool important);
 
   int yyparse(void);
 

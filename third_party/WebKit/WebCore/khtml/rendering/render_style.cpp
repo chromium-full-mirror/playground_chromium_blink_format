@@ -105,9 +105,12 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
 BackgroundLayer::BackgroundLayer()
     : m_image(RenderStyle::initialBackgroundImage()),
       m_bgAttachment(RenderStyle::initialBackgroundAttachment()),
+      m_bgClip(RenderStyle::initialBackgroundClip()),
+      m_bgOrigin(RenderStyle::initialBackgroundOrigin()),
       m_bgRepeat(RenderStyle::initialBackgroundRepeat()),
       m_next(0) {
-  m_imageSet = m_attachmentSet = m_repeatSet = m_xPosSet = m_yPosSet = false;
+  m_imageSet = m_attachmentSet = m_clipSet = m_originSet = m_repeatSet =
+      m_xPosSet = m_yPosSet = false;
 }
 
 BackgroundLayer::BackgroundLayer(const BackgroundLayer& o) {
@@ -116,9 +119,13 @@ BackgroundLayer::BackgroundLayer(const BackgroundLayer& o) {
   m_xPosition = o.m_xPosition;
   m_yPosition = o.m_yPosition;
   m_bgAttachment = o.m_bgAttachment;
+  m_bgClip = o.m_bgClip;
+  m_bgOrigin = o.m_bgOrigin;
   m_bgRepeat = o.m_bgRepeat;
   m_imageSet = o.m_imageSet;
   m_attachmentSet = o.m_attachmentSet;
+  m_clipSet = o.m_clipSet;
+  m_originSet = o.m_originSet;
   m_repeatSet = o.m_repeatSet;
   m_xPosSet = o.m_xPosSet;
   m_yPosSet = o.m_yPosSet;
@@ -138,10 +145,14 @@ BackgroundLayer& BackgroundLayer::operator=(const BackgroundLayer& o) {
   m_xPosition = o.m_xPosition;
   m_yPosition = o.m_yPosition;
   m_bgAttachment = o.m_bgAttachment;
+  m_bgClip = o.m_bgClip;
+  m_bgOrigin = o.m_bgOrigin;
   m_bgRepeat = o.m_bgRepeat;
 
   m_imageSet = o.m_imageSet;
   m_attachmentSet = o.m_attachmentSet;
+  m_clipSet = o.m_clipSet;
+  m_originSet = o.m_originSet;
   m_repeatSet = o.m_repeatSet;
   m_xPosSet = o.m_xPosSet;
   m_yPosSet = o.m_yPosSet;
@@ -152,6 +163,7 @@ BackgroundLayer& BackgroundLayer::operator=(const BackgroundLayer& o) {
 bool BackgroundLayer::operator==(const BackgroundLayer& o) const {
   return m_image == o.m_image && m_xPosition == o.m_xPosition &&
          m_yPosition == o.m_yPosition && m_bgAttachment == o.m_bgAttachment &&
+         m_bgClip == o.m_bgClip && m_bgOrigin == o.m_bgOrigin &&
          m_bgRepeat == o.m_bgRepeat && m_imageSet == o.m_imageSet &&
          m_attachmentSet == o.m_attachmentSet && m_repeatSet == o.m_repeatSet &&
          m_xPosSet == o.m_xPosSet && m_yPosSet == o.m_yPosSet &&
@@ -211,6 +223,30 @@ void BackgroundLayer::fillUnsetProperties() {
     }
   }
 
+  for (curr = this; curr && curr->isBackgroundClipSet(); curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (BackgroundLayer* pattern = this; curr; curr = curr->next()) {
+      curr->m_bgClip = pattern->m_bgClip;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+
+  for (curr = this; curr && curr->isBackgroundOriginSet(); curr = curr->next())
+    ;
+  if (curr && curr != this) {
+    // We need to fill in the remaining values with the pattern specified.
+    for (BackgroundLayer* pattern = this; curr; curr = curr->next()) {
+      curr->m_bgOrigin = pattern->m_bgOrigin;
+      pattern = pattern->next();
+      if (pattern == curr || !pattern)
+        pattern = this;
+    }
+  }
+
   for (curr = this; curr && curr->isBackgroundRepeatSet(); curr = curr->next())
     ;
   if (curr && curr != this) {
@@ -231,7 +267,8 @@ void BackgroundLayer::cullEmptyLayers() {
     if (next && !next->isBackgroundImageSet() &&
         !next->isBackgroundXPositionSet() &&
         !next->isBackgroundYPositionSet() &&
-        !next->isBackgroundAttachmentSet() && !next->isBackgroundRepeatSet()) {
+        !next->isBackgroundAttachmentSet() && !next->isBackgroundClipSet() &&
+        !next->isBackgroundOriginSet() && !next->isBackgroundRepeatSet()) {
       delete next;
       p->m_next = 0;
       break;

@@ -99,6 +99,7 @@ class QPixmap : public QPaintDevice, public Qt {
   static bool shouldUseThreadedDecoding();
 
   void resetAnimation();
+  void setAnimationRect(const QRect&) const;
 
  private:
   WebCoreImageRendererPtr imageRenderer;

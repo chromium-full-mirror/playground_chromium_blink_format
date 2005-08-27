@@ -25,6 +25,12 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef enum {
+  WebImageStretch,
+  WebImageRound,
+  WebImageRepeat
+} WebImageTileRule;
+
 @protocol WebCoreImageRenderer<NSObject, NSCopying>
 
 - (BOOL)incrementalLoadWithBytes:(const void*)bytes
@@ -41,6 +47,11 @@
                 context:(CGContextRef)context;
 - (void)stopAnimation;
 - (void)tileInRect:(NSRect)r fromPoint:(NSPoint)p context:(CGContextRef)context;
+- (void)scaleAndTileInRect:(NSRect)ir
+                  fromRect:(NSRect)fr
+    withHorizontalTileRule:(WebImageTileRule)hRule
+      withVerticalTileRule:(WebImageTileRule)vRule
+                   context:(CGContextRef)context;
 - (BOOL)isNull;
 - (id<WebCoreImageRenderer>)retainOrCopyIfNeeded;
 - (void)increaseUseCount;
@@ -48,4 +59,5 @@
 - (void)flushRasterCache;
 - (CGImageRef)imageRef;
 - (void)resetAnimation;
+- (void)setAnimationRect:(NSRect)r;
 @end

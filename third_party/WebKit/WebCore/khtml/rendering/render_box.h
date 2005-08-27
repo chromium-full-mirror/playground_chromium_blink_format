@@ -157,7 +157,9 @@ class RenderBox : public RenderObject {
                                        int w,
                                        int height,
                                        int bleft,
-                                       int bright);
+                                       int bright,
+                                       int pleft,
+                                       int pright);
 
   virtual void setStaticX(int staticX);
   virtual void setStaticY(int staticY);
