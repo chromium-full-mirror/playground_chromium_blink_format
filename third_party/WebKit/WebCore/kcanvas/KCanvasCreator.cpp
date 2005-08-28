@@ -53,6 +53,9 @@ KCPathDataList KCanvasCreator::createRoundedRectangle(float x,
                                                       float ry) const {
   KCPathDataList list;
 
+  if (width <= 0.0f || height <= 0.0f)
+    return list;
+
   double nrx = rx, nry = ry;
   // If rx is greater than half of the width of the rectangle
   // then set rx to half of the width (required in SVG spec)
@@ -97,6 +100,10 @@ KCPathDataList KCanvasCreator::createRectangle(float x,
                                                float width,
                                                float height) const {
   KCPathDataList list;
+
+  if (width <= 0.0f || height <= 0.0f)
+    return list;
+
   list.moveTo(x, y);
   list.lineTo(x + width, y);
   list.lineTo(x + width, y + height);
@@ -110,6 +117,9 @@ KCPathDataList KCanvasCreator::createEllipse(float cx,
                                              float rx,
                                              float ry) const {
   KCPathDataList list;
+
+  if (rx <= 0.0f || ry <= 0.0f)
+    return list;
 
   // Ellipse creation - nice & clean agg2 code
   double x = cx, y = cy;
@@ -146,6 +156,10 @@ KCPathDataList KCanvasCreator::createLine(float x1,
                                           float x2,
                                           float y2) const {
   KCPathDataList list;
+
+  if (x1 == x2 && y1 == y2)
+    return list;
+
   list.moveTo(x1, y1);
   list.lineTo(x2, y2);
   return list;
