@@ -2632,7 +2632,7 @@ struct BorderImageParseContext {
       m_left = val;
     }
 
-    m_allowBreak = m_allowSlash = true;
+    m_allowBreak = m_allowSlash = m_allowRule = true;
     m_allowNumber = !m_left;
   }
   void commitSlash() {

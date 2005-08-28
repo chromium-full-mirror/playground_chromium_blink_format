@@ -1174,9 +1174,11 @@ void RenderObject::paintBorder(QPainter* p,
   }
 
   // Clip to the rounded rectangle.
-  if (render_radii)
+  if (render_radii) {
+    p->save();
     p->addRoundedRectClip(QRect(_tx, _ty, w, h), topLeft, topRight, bottomLeft,
                           bottomRight);
+  }
 
   if (render_t) {
     bool ignore_left =
@@ -1270,6 +1272,9 @@ void RenderObject::paintBorder(QPainter* p,
                rc, style->color(), rs, ignore_top ? 0 : style->borderTopWidth(),
                ignore_bottom ? 0 : style->borderBottomWidth());
   }
+
+  if (render_radii)
+    p->restore();  // Undo the clip.
 }
 
 void RenderObject::absoluteRects(QValueList<QRect>& rects, int _tx, int _ty) {
