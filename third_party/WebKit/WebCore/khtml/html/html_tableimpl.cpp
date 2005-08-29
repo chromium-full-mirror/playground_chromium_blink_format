@@ -770,8 +770,8 @@ NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
 HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(long index,
                                                         int& exceptioncode) {
   HTMLTableRowElementImpl* r = 0L;
-  NodeListImpl* children = childNodes();
-  int numRows = children ? (int)children->length() : 0;
+  SharedPtr<NodeListImpl> children = childNodes();
+  int numRows = children.notNull() ? (int)children->length() : 0;
   // kdDebug(6030) << k_funcinfo << "index=" << index << " numRows=" << numRows
   // << endl;
   if (index < -1 || index > numRows) {
@@ -789,20 +789,18 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(long index,
       insertBefore(r, n, exceptioncode);
     }
   }
-  delete children;
   return r;
 }
 
 void HTMLTableSectionElementImpl::deleteRow(long index, int& exceptioncode) {
-  NodeListImpl* children = childNodes();
-  int numRows = children ? (int)children->length() : 0;
+  SharedPtr<NodeListImpl> children = childNodes();
+  int numRows = children.notNull() ? (int)children->length() : 0;
   if (index == -1)
     index = numRows - 1;
   if (index >= 0 && index < numRows)
     HTMLElementImpl::removeChild(children->item(index), exceptioncode);
   else
     exceptioncode = DOMException::INDEX_SIZE_ERR;
-  delete children;
 }
 
 int HTMLTableSectionElementImpl::numRows() const {
@@ -932,8 +930,8 @@ long HTMLTableRowElementImpl::sectionRowIndex() const {
 HTMLElementImpl* HTMLTableRowElementImpl::insertCell(long index,
                                                      int& exceptioncode) {
   HTMLTableCellElementImpl* c = 0L;
-  NodeListImpl* children = childNodes();
-  int numCells = children ? children->length() : 0;
+  SharedPtr<NodeListImpl> children = childNodes();
+  int numCells = children.notNull() ? children->length() : 0;
   if (index < -1 || index > numCells)
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   else {
@@ -949,20 +947,18 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(long index,
       insertBefore(c, n, exceptioncode);
     }
   }
-  delete children;
   return c;
 }
 
 void HTMLTableRowElementImpl::deleteCell(long index, int& exceptioncode) {
-  NodeListImpl* children = childNodes();
-  int numCells = children ? children->length() : 0;
+  SharedPtr<NodeListImpl> children = childNodes();
+  int numCells = children.notNull() ? children->length() : 0;
   if (index == -1)
     index = numCells - 1;
   if (index >= 0 && index < numCells)
     HTMLElementImpl::removeChild(children->item(index), exceptioncode);
   else
     exceptioncode = DOMException::INDEX_SIZE_ERR;
-  delete children;
 }
 
 SharedPtr<HTMLCollectionImpl> HTMLTableRowElementImpl::cells() {
