@@ -179,7 +179,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   virtual DocumentTypeImpl* doctype() const;  // returns 0 for HTML documents
   DocumentTypeImpl* realDocType() const { return m_doctype; }
 
-  DOMImplementationImpl* implementation() const;
+  DOMImplementationImpl* impl() const;
   virtual ElementImpl* documentElement() const;
   virtual ElementImpl* createElement(const DOMString& tagName,
                                      int& exceptioncode);
@@ -866,7 +866,7 @@ class DocumentTypeImpl : public NodeImpl {
   void setName(const DOMString& n) { m_qualifiedName = n; }
   void setPublicId(const DOMString& publicId) { m_publicId = publicId; }
   void setSystemId(const DOMString& systemId) { m_systemId = systemId; }
-  DOMImplementationImpl* implementation() const { return m_implementation; }
+  DOMImplementationImpl* impl() const { return m_implementation; }
   void copyFrom(const DocumentTypeImpl&);
 
   virtual DOMString toString() const;

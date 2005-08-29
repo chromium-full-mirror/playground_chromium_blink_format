@@ -40,7 +40,7 @@ CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc) : NodeImpl(doc) {
 
 CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc, const DOMString& _text)
     : NodeImpl(doc) {
-  str = _text.impl ? _text.impl : new DOMStringImpl((QChar*)0, 0);
+  str = _text.impl() ? _text.impl() : new DOMStringImpl((QChar*)0, 0);
   str->ref();
 }
 
@@ -60,10 +60,10 @@ void CharacterDataImpl::setData(const DOMString& _data, int& exceptioncode) {
     return;
   }
 
-  if (str == _data.impl)
+  if (str == _data.impl())
     return;  // ### fire DOMCharacterDataModified if modified?
   DOMStringImpl* oldStr = str;
-  str = _data.impl;
+  str = _data.impl();
   if (str)
     str->ref();
   if (m_render)
@@ -103,7 +103,7 @@ void CharacterDataImpl::appendData(const DOMString& arg, int& exceptioncode) {
   DOMStringImpl* oldStr = str;
   str = str->copy();
   str->ref();
-  str->append(arg.impl);
+  str->append(arg.impl());
   if (m_render)
     (static_cast<RenderText*>(m_render))->setTextWithOffset(str, oldStr->l, 0);
 
@@ -122,7 +122,7 @@ void CharacterDataImpl::insertData(const unsigned long offset,
   DOMStringImpl* oldStr = str;
   str = str->copy();
   str->ref();
-  str->insert(arg.impl, offset);
+  str->insert(arg.impl(), offset);
   if (m_render)
     (static_cast<RenderText*>(m_render))->setTextWithOffset(str, offset, 0);
 
@@ -176,7 +176,7 @@ void CharacterDataImpl::replaceData(const unsigned long offset,
   str = str->copy();
   str->ref();
   str->remove(offset, realCount);
-  str->insert(arg.impl, offset);
+  str->insert(arg.impl(), offset);
   if (m_render)
     (static_cast<RenderText*>(m_render))->setTextWithOffset(str, offset, count);
 

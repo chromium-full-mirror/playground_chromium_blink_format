@@ -555,8 +555,7 @@ void HTMLScriptElementImpl::setText(const DOMString& value) {
     removeChildren();
   }
 
-  appendChild(getDocument()->createTextNode(value.implementation()),
-              exceptioncode);
+  appendChild(getDocument()->createTextNode(value.impl()), exceptioncode);
 }
 
 DOMString HTMLScriptElementImpl::htmlFor() const {
@@ -768,7 +767,6 @@ void HTMLTitleElementImpl::setText(const DOMString& value) {
       removeChildren();
     }
 
-    appendChild(getDocument()->createTextNode(value.implementation()),
-                exceptioncode);
+    appendChild(getDocument()->createTextNode(value.impl()), exceptioncode);
   }
 }

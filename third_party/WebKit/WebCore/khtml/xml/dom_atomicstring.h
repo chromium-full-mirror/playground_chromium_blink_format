@@ -37,14 +37,13 @@ class AtomicString {
       : m_string(add((QChar*)s, length)) {}
   AtomicString(const QString& s) : m_string(add(s.unicode(), s.length())) {}
   AtomicString(DOMStringImpl* imp) : m_string(add(imp)) {}
-  explicit AtomicString(const DOMString& s)
-      : m_string(add(s.implementation())) {}
+  explicit AtomicString(const DOMString& s) : m_string(add(s.impl())) {}
 
   operator const DOMString&() const { return m_string; }
   const DOMString& domString() const { return m_string; };
   QString qstring() const { return m_string.qstring(); };
 
-  DOMStringImpl* implementation() const { return m_string.implementation(); }
+  DOMStringImpl* impl() const { return m_string.impl(); }
 
   const QChar* unicode() const { return m_string.unicode(); }
   int length() const { return m_string.length(); }
@@ -88,7 +87,7 @@ class AtomicString {
   static bool equal(DOMStringImpl*, DOMStringImpl*);
 
   static bool equal(const AtomicString& a, const AtomicString& b) {
-    return a.m_string.implementation() == b.m_string.implementation();
+    return a.m_string.impl() == b.m_string.impl();
   }
   static bool equal(const AtomicString& a, const char* b);
 

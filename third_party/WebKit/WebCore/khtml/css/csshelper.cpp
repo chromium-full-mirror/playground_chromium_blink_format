@@ -42,7 +42,7 @@ using namespace DOM;
 using namespace khtml;
 
 DOMString khtml::parseURL(const DOMString& url) {
-  DOMStringImpl* i = url.implementation();
+  DOMStringImpl* i = url.impl();
   if (!i)
     return DOMString();
 

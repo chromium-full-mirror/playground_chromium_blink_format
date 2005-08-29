@@ -80,7 +80,7 @@ ValueImp* DOMParserProtoFunc::callAsFunction(ExecState* exec,
 
       if (contentType == "text/xml" || contentType == "application/xml" ||
           contentType == "application/xhtml+xml") {
-        DocumentImpl* docImpl = parser->doc->implementation()->createDocument();
+        DocumentImpl* docImpl = parser->doc->impl()->createDocument();
 
         docImpl->open();
         docImpl->write(str);

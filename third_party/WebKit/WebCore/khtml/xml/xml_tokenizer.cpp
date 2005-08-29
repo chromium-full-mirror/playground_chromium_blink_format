@@ -354,8 +354,8 @@ void XMLTokenizer::startElement(const xmlChar* name,
     DOMString qn(atts.qName(i));
     DOMString val(atts.value(i));
 
-    newElement->setAttributeNS(uri.implementation(), qn.implementation(),
-                               val.implementation(), exceptioncode);
+    newElement->setAttributeNS(uri.impl(), qn.impl(), val.impl(),
+                               exceptioncode);
     if (exceptioncode)  // exception setting attributes
       return;
   }

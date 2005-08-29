@@ -2405,7 +2405,7 @@ bool KHTMLPart::findTextNext(const QString& str,
          d->m_findNode->nodeType() == Node::CDATA_SECTION_NODE) &&
         d->m_findNode->renderer()) {
       DOMString nodeText = d->m_findNode->nodeValue();
-      DOMStringImpl* t = nodeText.implementation();
+      DOMStringImpl* t = nodeText.impl();
       QConstString s(t->s, t->l);
 
       int matchLen = 0;
@@ -5745,8 +5745,8 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
 
     styleElement->ref();
 
-    styleElement->setAttribute(
-        styleAttr, d->m_typingStyle->cssText().implementation(), exceptionCode);
+    styleElement->setAttribute(styleAttr, d->m_typingStyle->cssText().impl(),
+                               exceptionCode);
     assert(exceptionCode == 0);
 
     TextImpl* text = xmlDocImpl()->createEditingTextNode("");

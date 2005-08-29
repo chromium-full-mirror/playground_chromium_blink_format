@@ -169,7 +169,7 @@ ValueImp* XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
             mimeType == "application/xhtml+xml" || mimeType == "text/xsl" ||
             mimeType == "application/rss+xml" ||
             mimeType == "application/atom+xml") {
-          responseXML.reset(doc->implementation()->createDocument());
+          responseXML.reset(doc->impl()->createDocument());
 
           DocumentImpl* docImpl = responseXML.get();
 

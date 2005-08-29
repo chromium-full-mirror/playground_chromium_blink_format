@@ -769,7 +769,7 @@ CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(
 CSSPrimitiveValueImpl::CSSPrimitiveValueImpl(
     const DOMString& str,
     CSSPrimitiveValue::UnitTypes type) {
-  m_value.string = str.implementation();
+  m_value.string = str.impl();
   if (m_value.string)
     m_value.string->ref();
   m_type = type;
@@ -956,7 +956,7 @@ void CSSPrimitiveValueImpl::setStringValue(unsigned short stringType,
     return;
   }
   if (stringType != CSSPrimitiveValue::CSS_IDENT) {
-    m_value.string = stringValue.implementation();
+    m_value.string = stringValue.impl();
     m_value.string->ref();
     m_type = stringType;
   }
