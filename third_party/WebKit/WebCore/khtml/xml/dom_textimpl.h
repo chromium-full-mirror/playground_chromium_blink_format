@@ -71,7 +71,7 @@ class CharacterDataImpl : public NodeImpl {
 
   // Other methods (not part of DOM)
 
-  DOMStringImpl* qstring() { return str; }
+  DOMStringImpl* string() { return str; }
   virtual void checkCharDataOperation(const unsigned long offset,
                                       int& exceptioncode);
 

@@ -296,7 +296,7 @@ const AtomicString& CommentImpl::localName() const {
 }
 
 DOMString CommentImpl::nodeName() const {
-  return commentAtom.qstring();
+  return commentAtom.domString();
 }
 
 unsigned short CommentImpl::nodeType() const {
@@ -374,7 +374,7 @@ const AtomicString& TextImpl::localName() const {
 }
 
 DOMString TextImpl::nodeName() const {
-  return textAtom.qstring();
+  return textAtom.domString();
 }
 
 unsigned short TextImpl::nodeType() const {
