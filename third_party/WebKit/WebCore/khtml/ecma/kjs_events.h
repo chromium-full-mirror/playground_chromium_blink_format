@@ -64,6 +64,7 @@ class JSUnprotectedEventListener : public JSAbstractEventListener {
   virtual ~JSUnprotectedEventListener();
   virtual ObjectImp* listenerObj() const;
   virtual ObjectImp* windowObj() const;
+  void clearWindowObj();
   void mark();
 
  protected:
@@ -77,6 +78,7 @@ class JSEventListener : public JSAbstractEventListener {
   virtual ~JSEventListener();
   virtual ObjectImp* listenerObj() const;
   virtual ObjectImp* windowObj() const;
+  void clearWindowObj();
 
  protected:
   mutable ProtectedObject listener;

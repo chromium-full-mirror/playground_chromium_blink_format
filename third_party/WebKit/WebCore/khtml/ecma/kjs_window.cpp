@@ -349,6 +349,20 @@ Window::Window(KHTMLPart* p)
 }
 
 Window::~Window() {
+  // Clear any backpointers to the window
+  QPtrDictIterator<JSUnprotectedEventListener> unprotectedListeners(
+      jsUnprotectedEventListeners);
+  while (unprotectedListeners.current()) {
+    unprotectedListeners.current()->clearWindowObj();
+    ++unprotectedListeners;
+  }
+
+  QPtrDictIterator<JSEventListener> listeners(jsEventListeners);
+  while (listeners.current()) {
+    listeners.current()->clearWindowObj();
+    ++listeners;
+  }
+
   delete winq;
 }
 

@@ -186,7 +186,9 @@ JSUnprotectedEventListener::JSUnprotectedEventListener(ObjectImp* _listener,
 
 JSUnprotectedEventListener::~JSUnprotectedEventListener() {
   if (listener) {
-    static_cast<Window*>(win)->jsUnprotectedEventListeners.remove(listener);
+    if (win) {
+      static_cast<Window*>(win)->jsUnprotectedEventListeners.remove(listener);
+    }
   }
 }
 
@@ -196,6 +198,10 @@ ObjectImp* JSUnprotectedEventListener::listenerObj() const {
 
 ObjectImp* JSUnprotectedEventListener::windowObj() const {
   return win;
+}
+
+void JSUnprotectedEventListener::clearWindowObj() {
+  win = NULL;
 }
 
 void JSUnprotectedEventListener::mark() {
@@ -217,7 +223,9 @@ JSEventListener::JSEventListener(ObjectImp* _listener,
 JSEventListener::~JSEventListener() {
   if (ObjectImp* l = listener) {
     ObjectImp* w = win;
-    static_cast<Window*>(w)->jsEventListeners.remove(l);
+    if (w) {
+      static_cast<Window*>(w)->jsEventListeners.remove(l);
+    }
   }
 }
 
@@ -227,6 +235,10 @@ ObjectImp* JSEventListener::listenerObj() const {
 
 ObjectImp* JSEventListener::windowObj() const {
   return win;
+}
+
+void JSEventListener::clearWindowObj() {
+  win = NULL;
 }
 
 // -------------------------------------------------------------------------
