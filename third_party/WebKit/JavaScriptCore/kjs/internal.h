@@ -199,7 +199,7 @@ enum CodeType { GlobalCode, EvalCode, FunctionCode, AnonymousCode };
  */
 class Parser {
  public:
-  static kxmlcore::SharedPtr<ProgramNode> parse(const UString& sourceURL,
+  static KXMLCore::SharedPtr<ProgramNode> parse(const UString& sourceURL,
                                                 int startingLineNumber,
                                                 const UChar* code,
                                                 unsigned int length,

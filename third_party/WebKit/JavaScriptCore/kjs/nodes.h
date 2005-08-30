@@ -238,7 +238,7 @@ class GroupNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> group;
+  KXMLCore::SharedPtr<Node> group;
 };
 
 class ElementNode : public Node {
@@ -254,9 +254,9 @@ class ElementNode : public Node {
 
  private:
   friend class ArrayNode;
-  kxmlcore::SharedPtr<ElementNode> list;
+  KXMLCore::SharedPtr<ElementNode> list;
   int elision;
-  kxmlcore::SharedPtr<Node> node;
+  KXMLCore::SharedPtr<Node> node;
 };
 
 class ArrayNode : public Node {
@@ -273,7 +273,7 @@ class ArrayNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<ElementNode> element;
+  KXMLCore::SharedPtr<ElementNode> element;
   int elision;
   bool opt;
 };
@@ -293,9 +293,9 @@ class PropertyValueNode : public Node {
 
  private:
   friend class ObjectLiteralNode;
-  kxmlcore::SharedPtr<PropertyNode> name;
-  kxmlcore::SharedPtr<Node> assign;
-  kxmlcore::SharedPtr<PropertyValueNode> list;
+  KXMLCore::SharedPtr<PropertyNode> name;
+  KXMLCore::SharedPtr<Node> assign;
+  KXMLCore::SharedPtr<PropertyValueNode> list;
 };
 
 class ObjectLiteralNode : public Node {
@@ -306,7 +306,7 @@ class ObjectLiteralNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<PropertyValueNode> list;
+  KXMLCore::SharedPtr<PropertyValueNode> list;
 };
 
 class PropertyNode : public Node {
@@ -329,8 +329,8 @@ class BracketAccessorNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
 };
 
 class DotAccessorNode : public Node {
@@ -341,7 +341,7 @@ class DotAccessorNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
   Identifier ident;
 };
 
@@ -358,8 +358,8 @@ class ArgumentListNode : public Node {
 
  private:
   friend class ArgumentsNode;
-  kxmlcore::SharedPtr<ArgumentListNode> list;
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<ArgumentListNode> list;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class ArgumentsNode : public Node {
@@ -371,7 +371,7 @@ class ArgumentsNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<ArgumentListNode> list;
+  KXMLCore::SharedPtr<ArgumentListNode> list;
 };
 
 class NewExprNode : public Node {
@@ -382,8 +382,8 @@ class NewExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<ArgumentsNode> args;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<ArgumentsNode> args;
 };
 
 class FunctionCallValueNode : public Node {
@@ -393,8 +393,8 @@ class FunctionCallValueNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<ArgumentsNode> args;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<ArgumentsNode> args;
 };
 
 class FunctionCallResolveNode : public Node {
@@ -406,7 +406,7 @@ class FunctionCallResolveNode : public Node {
 
  private:
   Identifier ident;
-  kxmlcore::SharedPtr<ArgumentsNode> args;
+  KXMLCore::SharedPtr<ArgumentsNode> args;
 };
 
 class FunctionCallBracketNode : public Node {
@@ -417,9 +417,9 @@ class FunctionCallBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  kxmlcore::SharedPtr<Node> base;
-  kxmlcore::SharedPtr<Node> subscript;
-  kxmlcore::SharedPtr<ArgumentsNode> args;
+  KXMLCore::SharedPtr<Node> base;
+  KXMLCore::SharedPtr<Node> subscript;
+  KXMLCore::SharedPtr<ArgumentsNode> args;
 };
 
 class FunctionCallParenBracketNode : public FunctionCallBracketNode {
@@ -437,9 +437,9 @@ class FunctionCallDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  kxmlcore::SharedPtr<Node> base;
+  KXMLCore::SharedPtr<Node> base;
   Identifier ident;
-  kxmlcore::SharedPtr<ArgumentsNode> args;
+  KXMLCore::SharedPtr<ArgumentsNode> args;
 };
 
 class FunctionCallParenDotNode : public FunctionCallDotNode {
@@ -456,7 +456,7 @@ class PostfixNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
   Operator oper;
 };
 
@@ -467,7 +467,7 @@ class DeleteNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class VoidNode : public Node {
@@ -477,7 +477,7 @@ class VoidNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class TypeOfNode : public Node {
@@ -487,7 +487,7 @@ class TypeOfNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class PrefixNode : public Node {
@@ -498,7 +498,7 @@ class PrefixNode : public Node {
 
  private:
   Operator oper;
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class UnaryPlusNode : public Node {
@@ -508,7 +508,7 @@ class UnaryPlusNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class NegateNode : public Node {
@@ -518,7 +518,7 @@ class NegateNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class BitwiseNotNode : public Node {
@@ -528,7 +528,7 @@ class BitwiseNotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class LogicalNotNode : public Node {
@@ -538,7 +538,7 @@ class LogicalNotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class MultNode : public Node {
@@ -548,8 +548,8 @@ class MultNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> term1;
-  kxmlcore::SharedPtr<Node> term2;
+  KXMLCore::SharedPtr<Node> term1;
+  KXMLCore::SharedPtr<Node> term2;
   char oper;
 };
 
@@ -560,8 +560,8 @@ class AddNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> term1;
-  kxmlcore::SharedPtr<Node> term2;
+  KXMLCore::SharedPtr<Node> term1;
+  KXMLCore::SharedPtr<Node> term2;
   char oper;
 };
 
@@ -572,8 +572,8 @@ class ShiftNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> term1;
-  kxmlcore::SharedPtr<Node> term2;
+  KXMLCore::SharedPtr<Node> term1;
+  KXMLCore::SharedPtr<Node> term2;
   Operator oper;
 };
 
@@ -585,8 +585,8 @@ class RelationalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
   Operator oper;
 };
 
@@ -597,8 +597,8 @@ class EqualNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
   Operator oper;
 };
 
@@ -609,8 +609,8 @@ class BitOperNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
   Operator oper;
 };
 
@@ -625,8 +625,8 @@ class BinaryLogicalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
   Operator oper;
 };
 
@@ -641,9 +641,9 @@ class ConditionalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> logical;
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> logical;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
 };
 
 class AssignResolveNode : public Node {
@@ -656,7 +656,7 @@ class AssignResolveNode : public Node {
  protected:
   Identifier m_ident;
   Operator m_oper;
-  kxmlcore::SharedPtr<Node> m_right;
+  KXMLCore::SharedPtr<Node> m_right;
 };
 
 class AssignBracketNode : public Node {
@@ -667,10 +667,10 @@ class AssignBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  kxmlcore::SharedPtr<Node> m_base;
-  kxmlcore::SharedPtr<Node> m_subscript;
+  KXMLCore::SharedPtr<Node> m_base;
+  KXMLCore::SharedPtr<Node> m_subscript;
   Operator m_oper;
-  kxmlcore::SharedPtr<Node> m_right;
+  KXMLCore::SharedPtr<Node> m_right;
 };
 
 class AssignDotNode : public Node {
@@ -681,10 +681,10 @@ class AssignDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  kxmlcore::SharedPtr<Node> m_base;
+  KXMLCore::SharedPtr<Node> m_base;
   Identifier m_ident;
   Operator m_oper;
-  kxmlcore::SharedPtr<Node> m_right;
+  KXMLCore::SharedPtr<Node> m_right;
 };
 
 class CommaNode : public Node {
@@ -694,8 +694,8 @@ class CommaNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
 };
 
 class StatListNode : public StatementNode {
@@ -709,8 +709,8 @@ class StatListNode : public StatementNode {
 
  private:
   friend class CaseClauseNode;
-  kxmlcore::SharedPtr<StatementNode> statement;
-  kxmlcore::SharedPtr<StatListNode> list;
+  KXMLCore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<StatListNode> list;
 };
 
 class AssignExprNode : public Node {
@@ -720,7 +720,7 @@ class AssignExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class VarDeclNode : public Node {
@@ -734,7 +734,7 @@ class VarDeclNode : public Node {
  private:
   Type varType;
   Identifier ident;
-  kxmlcore::SharedPtr<AssignExprNode> init;
+  KXMLCore::SharedPtr<AssignExprNode> init;
 };
 
 class VarDeclListNode : public Node {
@@ -752,8 +752,8 @@ class VarDeclListNode : public Node {
  private:
   friend class ForNode;
   friend class VarStatementNode;
-  kxmlcore::SharedPtr<VarDeclListNode> list;
-  kxmlcore::SharedPtr<VarDeclNode> var;
+  KXMLCore::SharedPtr<VarDeclListNode> list;
+  KXMLCore::SharedPtr<VarDeclNode> var;
 };
 
 class VarStatementNode : public StatementNode {
@@ -764,7 +764,7 @@ class VarStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<VarDeclListNode> list;
+  KXMLCore::SharedPtr<VarDeclListNode> list;
 };
 
 class BlockNode : public StatementNode {
@@ -775,7 +775,7 @@ class BlockNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  kxmlcore::SharedPtr<SourceElementsNode> source;
+  KXMLCore::SharedPtr<SourceElementsNode> source;
 };
 
 class EmptyStatementNode : public StatementNode {
@@ -792,7 +792,7 @@ class ExprStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class IfNode : public StatementNode {
@@ -804,9 +804,9 @@ class IfNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<StatementNode> statement1;
-  kxmlcore::SharedPtr<StatementNode> statement2;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<StatementNode> statement1;
+  KXMLCore::SharedPtr<StatementNode> statement2;
 };
 
 class DoWhileNode : public StatementNode {
@@ -817,8 +817,8 @@ class DoWhileNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<StatementNode> statement;
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class WhileNode : public StatementNode {
@@ -829,8 +829,8 @@ class WhileNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<StatementNode> statement;
 };
 
 class ForNode : public StatementNode {
@@ -846,10 +846,10 @@ class ForNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr1;
-  kxmlcore::SharedPtr<Node> expr2;
-  kxmlcore::SharedPtr<Node> expr3;
-  kxmlcore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<Node> expr1;
+  KXMLCore::SharedPtr<Node> expr2;
+  KXMLCore::SharedPtr<Node> expr3;
+  KXMLCore::SharedPtr<StatementNode> statement;
 };
 
 class ForInNode : public StatementNode {
@@ -862,11 +862,11 @@ class ForInNode : public StatementNode {
 
  private:
   Identifier ident;
-  kxmlcore::SharedPtr<AssignExprNode> init;
-  kxmlcore::SharedPtr<Node> lexpr;
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<VarDeclNode> varDecl;
-  kxmlcore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<AssignExprNode> init;
+  KXMLCore::SharedPtr<Node> lexpr;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<VarDeclNode> varDecl;
+  KXMLCore::SharedPtr<StatementNode> statement;
 };
 
 class ContinueNode : public StatementNode {
@@ -898,7 +898,7 @@ class ReturnNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> value;
+  KXMLCore::SharedPtr<Node> value;
 };
 
 class WithNode : public StatementNode {
@@ -909,8 +909,8 @@ class WithNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<StatementNode> statement;
 };
 
 class CaseClauseNode : public Node {
@@ -925,8 +925,8 @@ class CaseClauseNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<StatListNode> list;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<StatListNode> list;
 };
 
 class ClauseListNode : public Node {
@@ -944,8 +944,8 @@ class ClauseListNode : public Node {
 
  private:
   friend class CaseBlockNode;
-  kxmlcore::SharedPtr<CaseClauseNode> cl;
-  kxmlcore::SharedPtr<ClauseListNode> nx;
+  KXMLCore::SharedPtr<CaseClauseNode> cl;
+  KXMLCore::SharedPtr<ClauseListNode> nx;
 };
 
 class CaseBlockNode : public Node {
@@ -957,9 +957,9 @@ class CaseBlockNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<ClauseListNode> list1;
-  kxmlcore::SharedPtr<CaseClauseNode> def;
-  kxmlcore::SharedPtr<ClauseListNode> list2;
+  KXMLCore::SharedPtr<ClauseListNode> list1;
+  KXMLCore::SharedPtr<CaseClauseNode> def;
+  KXMLCore::SharedPtr<ClauseListNode> list2;
 };
 
 class SwitchNode : public StatementNode {
@@ -970,8 +970,8 @@ class SwitchNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
-  kxmlcore::SharedPtr<CaseBlockNode> block;
+  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<CaseBlockNode> block;
 };
 
 class LabelNode : public StatementNode {
@@ -983,7 +983,7 @@ class LabelNode : public StatementNode {
 
  private:
   Identifier label;
-  kxmlcore::SharedPtr<StatementNode> statement;
+  KXMLCore::SharedPtr<StatementNode> statement;
 };
 
 class ThrowNode : public StatementNode {
@@ -993,7 +993,7 @@ class ThrowNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> expr;
 };
 
 class CatchNode : public StatementNode {
@@ -1006,7 +1006,7 @@ class CatchNode : public StatementNode {
 
  private:
   Identifier ident;
-  kxmlcore::SharedPtr<StatementNode> block;
+  KXMLCore::SharedPtr<StatementNode> block;
 };
 
 class FinallyNode : public StatementNode {
@@ -1017,7 +1017,7 @@ class FinallyNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<StatementNode> block;
+  KXMLCore::SharedPtr<StatementNode> block;
 };
 
 class TryNode : public StatementNode {
@@ -1031,9 +1031,9 @@ class TryNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<StatementNode> block;
-  kxmlcore::SharedPtr<CatchNode> _catch;
-  kxmlcore::SharedPtr<FinallyNode> _final;
+  KXMLCore::SharedPtr<StatementNode> block;
+  KXMLCore::SharedPtr<CatchNode> _catch;
+  KXMLCore::SharedPtr<FinallyNode> _final;
 };
 
 class ParameterNode : public Node {
@@ -1054,7 +1054,7 @@ class ParameterNode : public Node {
   friend class FuncDeclNode;
   friend class FuncExprNode;
   Identifier id;
-  kxmlcore::SharedPtr<ParameterNode> next;
+  KXMLCore::SharedPtr<ParameterNode> next;
 };
 
 // inherited by ProgramNode
@@ -1080,8 +1080,8 @@ class FuncDeclNode : public StatementNode {
 
  private:
   Identifier ident;
-  kxmlcore::SharedPtr<ParameterNode> param;
-  kxmlcore::SharedPtr<FunctionBodyNode> body;
+  KXMLCore::SharedPtr<ParameterNode> param;
+  KXMLCore::SharedPtr<FunctionBodyNode> body;
 };
 
 class FuncExprNode : public Node {
@@ -1095,8 +1095,8 @@ class FuncExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  kxmlcore::SharedPtr<ParameterNode> param;
-  kxmlcore::SharedPtr<FunctionBodyNode> body;
+  KXMLCore::SharedPtr<ParameterNode> param;
+  KXMLCore::SharedPtr<FunctionBodyNode> body;
 };
 
 // A linked list of source element nodes
@@ -1114,8 +1114,8 @@ class SourceElementsNode : public StatementNode {
 
  private:
   friend class BlockNode;
-  kxmlcore::SharedPtr<StatementNode> element;        // 'this' element
-  kxmlcore::SharedPtr<SourceElementsNode> elements;  // pointer to next
+  KXMLCore::SharedPtr<StatementNode> element;        // 'this' element
+  KXMLCore::SharedPtr<SourceElementsNode> elements;  // pointer to next
 };
 
 class ProgramNode : public FunctionBodyNode {
