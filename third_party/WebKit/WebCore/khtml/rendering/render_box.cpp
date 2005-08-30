@@ -25,6 +25,7 @@
 //#define DEBUG_LAYOUT
 
 #include <qpainter.h>
+#include <qpen.h>
 
 #include "rendering/render_box.h"
 #include "rendering/render_replaced.h"

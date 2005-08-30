@@ -28,6 +28,8 @@
 
 #include "KWQCursor.h"
 
+class QWidget;
+
 class KCursor {
  public:
   static void setAutoHideCursor(QWidget* w, bool enable);
