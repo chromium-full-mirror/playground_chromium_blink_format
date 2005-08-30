@@ -1131,7 +1131,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
     case CSS_PROP__KHTML_USER_SELECT:  // auto | none | text
       if (id == CSS_VAL_AUTO || id == CSS_VAL_NONE || id == CSS_VAL_TEXT ||
-          id == CSS_VAL_ELEMENT)
+          id == CSS_VAL_IGNORE)
         valid_primitive = true;
       break;
     case CSS_PROP_TEXT_OVERFLOW:  // clip | ellipsis
