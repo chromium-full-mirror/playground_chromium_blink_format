@@ -127,6 +127,18 @@ RenderObject* RenderObject::createObject(DOM::NodeImpl* node,
   return o;
 }
 
+#ifndef NDEBUG
+struct RenderObjectCounter {
+  static int count;
+  ~RenderObjectCounter() {
+    if (count != 0)
+      fprintf(stderr, "LEAK: %d RenderObject\n", count);
+  }
+};
+int RenderObjectCounter::count;
+static RenderObjectCounter renderObjectCounter;
+#endif NDEBUG
+
 RenderObject::RenderObject(DOM::NodeImpl* node)
     : CachedObjectClient(),
       m_style(0),
@@ -152,9 +164,17 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
 
       m_replaced(false),
       m_isDragging(false),
-      m_hasOverflowClip(false) {}
+      m_hasOverflowClip(false) {
+#infdef NDEBUG
+  ++RenderObjectCounter::count;
+#endif
+}
 
-RenderObject::~RenderObject() {}
+RenderObject::~RenderObject() {
+#infdef NDEBUG
+  --RenderObjectCounter::count;
+#endif
+}
 
 bool RenderObject::hasAncestor(const RenderObject* obj) const {
   for (const RenderObject* r = this; r; r = r->m_parent)
