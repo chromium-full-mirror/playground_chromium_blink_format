@@ -165,13 +165,13 @@ RenderObject::RenderObject(DOM::NodeImpl* node)
       m_replaced(false),
       m_isDragging(false),
       m_hasOverflowClip(false) {
-#infdef NDEBUG
+#ifndef NDEBUG
   ++RenderObjectCounter::count;
 #endif
 }
 
 RenderObject::~RenderObject() {
-#infdef NDEBUG
+#ifndef NDEBUG
   --RenderObjectCounter::count;
 #endif
 }
