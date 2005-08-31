@@ -3706,6 +3706,9 @@ void RenderBlock::updateFirstLetter() {
         newStyle->inheritFrom(pseudoStyle);
         letter->setStyle(newStyle);
         firstLetter->addChild(letter);
+
+        textObj->detach();
+        ;
       }
     }
   }
