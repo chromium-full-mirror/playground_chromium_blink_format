@@ -41,6 +41,7 @@
 #include "rendering/render_frames.h"
 #include "rendering/render_image.h"
 #include "xml/dom2_eventsimpl.h"
+#include "xml/EventNames.h"
 
 #ifndef Q_WS_QWS  // We don't have Java in Qt Embedded
 #include "java/kjavaappletwidget.h"
@@ -55,6 +56,7 @@ using namespace khtml;
 
 namespace DOM {
 
+using namespace EventNames;
 using namespace HTMLNames;
 
 // -------------------------------------------------------------------------
@@ -629,13 +631,11 @@ void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     if (m_render)
       needWidgetUpdate = true;
   } else if (attr->name() == onloadAttr) {
-    setHTMLEventListener(
-        EventImpl::LOAD_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+    setHTMLEventListener(loadEvent, getDocument()->createHTMLEventListener(
+                                        attr->value().qstring(), this));
   } else if (attr->name() == onunloadAttr) {
-    setHTMLEventListener(
-        EventImpl::UNLOAD_EVENT,
-        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+    setHTMLEventListener(unloadEvent, getDocument()->createHTMLEventListener(
+                                          attr->value().qstring(), this));
   } else if (attr->name() == nameAttr) {
     DOMString newNameAttr = attr->value();
     if (inDocument() && getDocument()->isHTMLDocument()) {
@@ -717,7 +717,7 @@ void HTMLObjectElementImpl::attach() {
         // called.
         needWidgetUpdate = false;
         static_cast<RenderPartObject*>(m_render)->updateWidget();
-        dispatchHTMLEvent(EventImpl::LOAD_EVENT, false, false);
+        dispatchHTMLEvent(loadEvent, false, false);
       } else {
         needWidgetUpdate = true;
         setChanged();
@@ -730,7 +730,7 @@ void HTMLObjectElementImpl::detach() {
   // Only bother with an unload event if we had a render object.  - dwh
   if (attached() && m_render && !m_useFallbackContent)
     // ### do this when we are actualy removed from document instead
-    dispatchHTMLEvent(EventImpl::UNLOAD_EVENT, false, false);
+    dispatchHTMLEvent(unloadEvent, false, false);
 
   HTMLElementImpl::detach();
 }
@@ -762,7 +762,7 @@ void HTMLObjectElementImpl::recalcStyle(StyleChange ch) {
     // this method or attach (which also calls updateWidget) to be called.
     needWidgetUpdate = false;
     static_cast<RenderPartObject*>(m_render)->updateWidget();
-    dispatchHTMLEvent(EventImpl::LOAD_EVENT, false, false);
+    dispatchHTMLEvent(loadEvent, false, false);
   }
   HTMLElementImpl::recalcStyle(ch);
 }

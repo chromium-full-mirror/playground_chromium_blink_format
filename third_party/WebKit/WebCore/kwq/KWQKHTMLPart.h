@@ -456,8 +456,10 @@ class KWQKHTMLPart : public KHTMLPart {
   static NSView* documentViewForNode(DOM::NodeImpl*);
 
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
-  bool dispatchCPPEvent(int eventId, KWQClipboard::AccessPolicy policy);
-  bool dispatchDragSrcEvent(int eventId, const QPoint& loc) const;
+  bool dispatchCPPEvent(const DOM::AtomicString& eventType,
+                        KWQClipboard::AccessPolicy policy);
+  bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
+                            const QPoint& loc) const;
 
   NSImage* imageFromRect(NSRect rect) const;
 

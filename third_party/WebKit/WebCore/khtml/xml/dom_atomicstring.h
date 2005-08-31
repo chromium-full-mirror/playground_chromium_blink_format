@@ -75,7 +75,7 @@ class AtomicString {
   static void remove(DOMStringImpl*);
 
 #ifdef __OBJC__
-  AtomicString(NSString*);
+  AtomicString(NSString* s) : m_string(add(DOMString(s).impl())) {}
   operator NSString*() const { return m_string; }
 #endif
 

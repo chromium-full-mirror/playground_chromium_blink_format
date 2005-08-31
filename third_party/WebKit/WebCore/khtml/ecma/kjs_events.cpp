@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2001 Peter Kelly (pmk@post.com)
@@ -18,21 +17,29 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include "khtml_part.h"
-#include "kjs_window.h"
+
+#include <kjs/protected_object.h>  // temporary, remove after landing interpreter lock patch
+
 #include "kjs_events.h"
 #include "kjs_events.lut.h"
+
+#include "khtml_part.h"
+#include "kjs_window.h"
 #include "kjs_views.h"
 #include "kjs_proxy.h"
 #include "xml/dom_nodeimpl.h"
 #include "xml/dom_docimpl.h"
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom2_viewsimpl.h"
+#include "xml/EventNames.h"
 #include "rendering/render_object.h"
 #include "misc/loader.h"
 
 #include <kdebug.h>
 
+using namespace DOM::EventNames;
+
+using DOM::AtomicString;
 using DOM::ClipboardEventImpl;
 using DOM::DocumentImpl;
 using DOM::EventImpl;
@@ -337,9 +344,9 @@ void JSLazyEventListener::parseCode() const {
   }
 }
 
-ValueImp* getNodeEventListener(NodeImpl* n, int eventId) {
+ValueImp* getNodeEventListener(NodeImpl* n, const AtomicString& eventType) {
   JSAbstractEventListener* listener =
-      static_cast<JSAbstractEventListener*>(n->getHTMLEventListener(eventId));
+      static_cast<JSAbstractEventListener*>(n->getHTMLEventListener(eventType));
   if (listener)
     if (ValueImp* obj = listener->listenerObjImp())
       return obj;
@@ -445,7 +452,7 @@ ValueImp* DOMEvent::getValueProperty(ExecState* exec, int token) const {
   EventImpl& event = *m_impl;
   switch (token) {
     case Type:
-      return String(event.type());
+      return String(event.type().domString());
     case Target:
     case SrcElement: /*MSIE extension - "the object that fired the event"*/
       return getDOMNode(exec, event.target());
@@ -530,7 +537,7 @@ ValueImp* DOMEventProtoFunc::callAsFunction(ExecState* exec,
       event.preventDefault();
       return Undefined();
     case DOMEvent::InitEvent:
-      event.initEvent(args[0]->toString(exec).domString(),
+      event.initEvent(AtomicString(args[0]->toString(exec).domString()),
                       args[1]->toBoolean(exec), args[2]->toBoolean(exec));
       return Undefined();
   };
@@ -679,7 +686,7 @@ ValueImp* DOMUIEventProtoFunc::callAsFunction(ExecState* exec,
       *static_cast<UIEventImpl*>(static_cast<DOMUIEvent*>(thisObj)->impl());
   switch (id) {
     case DOMUIEvent::InitUIEvent:
-      uiEvent.initUIEvent(args[0]->toString(exec).domString(),
+      uiEvent.initUIEvent(AtomicString(args[0]->toString(exec).domString()),
                           args[1]->toBoolean(exec), args[2]->toBoolean(exec),
                           toAbstractView(args[3]), args[4]->toInt32(exec));
       return Undefined();
@@ -789,15 +796,15 @@ ValueImp* DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
     case ToElement:
       // MSIE extension - "the object toward which the user is moving the mouse
       // pointer"
-      if (event.id() == DOM::EventImpl::MOUSEOUT_EVENT)
-        return getDOMNode(exec, event.relatedTarget());
-      return getDOMNode(exec, event.target());
+      return getDOMNode(exec, event.type() == mouseoutEvent
+                                  ? event.relatedTarget()
+                                  : event.target());
     case FromElement:
-      // MSIE extension - "object from which activation
-      // or the mouse pointer is exiting during the event" (huh?)
-      if (event.id() == DOM::EventImpl::MOUSEOUT_EVENT)
-        return getDOMNode(exec, event.target());
-    /* fall through */
+      // MSIE extension - "object from which activation or the mouse pointer is
+      // exiting during the event" (huh?)
+      return getDOMNode(exec, event.type() == mouseoutEvent
+                                  ? event.target()
+                                  : event.relatedTarget());
     case RelatedTarget:
       return getDOMNode(exec, event.relatedTarget());
     default:
@@ -816,21 +823,22 @@ ValueImp* DOMMouseEventProtoFunc::callAsFunction(ExecState* exec,
       static_cast<DOMMouseEvent*>(thisObj)->impl());
   switch (id) {
     case DOMMouseEvent::InitMouseEvent:
-      mouseEvent.initMouseEvent(args[0]->toString(exec).domString(),  // typeArg
-                                args[1]->toBoolean(exec),   // canBubbleArg
-                                args[2]->toBoolean(exec),   // cancelableArg
-                                toAbstractView(args[3]),    // viewArg
-                                args[4]->toInt32(exec),     // detailArg
-                                args[5]->toInt32(exec),     // screenXArg
-                                args[6]->toInt32(exec),     // screenYArg
-                                args[7]->toInt32(exec),     // clientXArg
-                                args[8]->toInt32(exec),     // clientYArg
-                                args[9]->toBoolean(exec),   // ctrlKeyArg
-                                args[10]->toBoolean(exec),  // altKeyArg
-                                args[11]->toBoolean(exec),  // shiftKeyArg
-                                args[12]->toBoolean(exec),  // metaKeyArg
-                                args[13]->toInt32(exec),    // buttonArg
-                                toNode(args[14]));          // relatedTargetArg
+      mouseEvent.initMouseEvent(
+          AtomicString(args[0]->toString(exec).domString()),  // typeArg
+          args[1]->toBoolean(exec),                           // canBubbleArg
+          args[2]->toBoolean(exec),                           // cancelableArg
+          toAbstractView(args[3]),                            // viewArg
+          args[4]->toInt32(exec),                             // detailArg
+          args[5]->toInt32(exec),                             // screenXArg
+          args[6]->toInt32(exec),                             // screenYArg
+          args[7]->toInt32(exec),                             // clientXArg
+          args[8]->toInt32(exec),                             // clientYArg
+          args[9]->toBoolean(exec),                           // ctrlKeyArg
+          args[10]->toBoolean(exec),                          // altKeyArg
+          args[11]->toBoolean(exec),                          // shiftKeyArg
+          args[12]->toBoolean(exec),                          // metaKeyArg
+          args[13]->toInt32(exec),                            // buttonArg
+          toNode(args[14]));  // relatedTargetArg
       return Undefined();
   }
   return Undefined();
@@ -914,17 +922,17 @@ ValueImp* DOMKeyboardEventProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMKeyboardEvent::InitKeyboardEvent:
       event.initKeyboardEvent(
-          args[0]->toString(exec).domString(),  // typeArg
-          args[1]->toBoolean(exec),             // canBubbleArg
-          args[2]->toBoolean(exec),             // cancelableArg
-          toAbstractView(args[3]),              // viewArg
-          args[4]->toString(exec).domString(),  // keyIdentifier
-          args[5]->toInt32(exec),               // keyLocationArg
-          args[6]->toBoolean(exec),             // ctrlKeyArg
-          args[7]->toBoolean(exec),             // altKeyArg
-          args[8]->toBoolean(exec),             // shiftKeyArg
-          args[9]->toBoolean(exec),             // metaKeyArg
-          args[10]->toBoolean(exec));           // altGraphKeyArg
+          AtomicString(args[0]->toString(exec).domString()),  // typeArg
+          args[1]->toBoolean(exec),                           // canBubbleArg
+          args[2]->toBoolean(exec),                           // cancelableArg
+          toAbstractView(args[3]),                            // viewArg
+          args[4]->toString(exec).domString(),                // keyIdentifier
+          args[5]->toInt32(exec),                             // keyLocationArg
+          args[6]->toBoolean(exec),                           // ctrlKeyArg
+          args[7]->toBoolean(exec),                           // altKeyArg
+          args[8]->toBoolean(exec),                           // shiftKeyArg
+          args[9]->toBoolean(exec),                           // metaKeyArg
+          args[10]->toBoolean(exec));                         // altGraphKeyArg
       return Undefined();
   }
   return Undefined();
@@ -1027,14 +1035,14 @@ ValueImp* DOMMutationEventProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case DOMMutationEvent::InitMutationEvent:
       mutationEvent.initMutationEvent(
-          args[0]->toString(exec).domString(),  // typeArg,
-          args[1]->toBoolean(exec),             // canBubbleArg
-          args[2]->toBoolean(exec),             // cancelableArg
-          toNode(args[3]),                      // relatedNodeArg
-          args[4]->toString(exec).domString(),  // prevValueArg
-          args[5]->toString(exec).domString(),  // newValueArg
-          args[6]->toString(exec).domString(),  // attrNameArg
-          args[7]->toInt32(exec));              // attrChangeArg
+          AtomicString(args[0]->toString(exec).domString()),  // typeArg,
+          args[1]->toBoolean(exec),                           // canBubbleArg
+          args[2]->toBoolean(exec),                           // cancelableArg
+          toNode(args[3]),                                    // relatedNodeArg
+          args[4]->toString(exec).domString(),                // prevValueArg
+          args[5]->toString(exec).domString(),                // newValueArg
+          args[6]->toString(exec).domString(),                // attrNameArg
+          args[7]->toInt32(exec));                            // attrChangeArg
       return Undefined();
   }
   return Undefined();

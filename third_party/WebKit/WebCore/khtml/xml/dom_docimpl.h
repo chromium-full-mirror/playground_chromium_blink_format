@@ -477,17 +477,18 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   LocalStyleRefs* localStyleRefs() { return &m_localStyleRefs; }
 
   virtual void defaultEventHandler(EventImpl* evt);
-  void setHTMLWindowEventListener(int id, EventListener* listener);
-  EventListener* getHTMLWindowEventListener(int id);
-  void removeHTMLWindowEventListener(int id);
+  void setHTMLWindowEventListener(const AtomicString& eventType,
+                                  EventListener* listener);
+  EventListener* getHTMLWindowEventListener(const AtomicString& eventType);
+  void removeHTMLWindowEventListener(const AtomicString& eventType);
 
-  void addWindowEventListener(int id,
+  void addWindowEventListener(const AtomicString& eventType,
                               EventListener* listener,
-                              const bool useCapture);
-  void removeWindowEventListener(int id,
+                              bool useCapture);
+  void removeWindowEventListener(const AtomicString& eventType,
                                  EventListener* listener,
                                  bool useCapture);
-  bool hasWindowEventListener(int id);
+  bool hasWindowEventListener(const AtomicString& eventType);
 
   EventListener* createHTMLEventListener(QString code, NodeImpl* node);
 

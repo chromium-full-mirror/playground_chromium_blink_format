@@ -287,14 +287,14 @@ class KHTMLView : public QScrollView {
   QStringList formCompletionItems(const QString& name) const;
   void addFormCompletionItem(const QString& name, const QString& value);
 
-  bool dispatchMouseEvent(int eventId,
+  bool dispatchMouseEvent(const DOM::AtomicString& eventType,
                           DOM::NodeImpl* targetNode,
                           bool cancelable,
                           int detail,
                           QMouseEvent* _mouse,
                           bool setUnder,
                           int mouseEventType);
-  bool dispatchDragEvent(int eventId,
+  bool dispatchDragEvent(const DOM::AtomicString& eventType,
                          DOM::NodeImpl* dragTarget,
                          const QPoint& loc,
                          DOM::ClipboardImpl* clipboard);

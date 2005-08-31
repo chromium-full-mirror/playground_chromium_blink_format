@@ -568,7 +568,7 @@ void ElementImpl::dispatchAttrRemovalEvent(AttributeImpl* attr) {
     return;
   // int exceptioncode = 0;
   //     dispatchEvent(new
-  //     MutationEventImpl(EventImpl::DOMATTRMODIFIED_EVENT,true,false,attr,attr->value(),
+  //     MutationEventImpl(DOMAttrModifiedEvent,true,false,attr,attr->value(),
   // 		  attr->value(),
   // getDocument()->attrName(attr->id()),MutationEvent::REMOVAL),exceptioncode);
 }
@@ -578,7 +578,7 @@ void ElementImpl::dispatchAttrAdditionEvent(AttributeImpl* attr) {
     return;
   // int exceptioncode = 0;
   //     dispatchEvent(new
-  //     MutationEventImpl(EventImpl::DOMATTRMODIFIED_EVENT,true,false,attr,attr->value(),
+  //     MutationEventImpl(DOMAttrModifiedEvent,true,false,attr,attr->value(),
   //                                         attr->value(),getDocument()->attrName(attr->id()),MutationEvent::ADDITION),exceptioncode);
 }
 

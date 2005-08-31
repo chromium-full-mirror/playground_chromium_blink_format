@@ -26,12 +26,14 @@
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom_textimpl.h"
 #include "xml/dom_docimpl.h"
+#include "xml/EventNames.h"
 
 #include "rendering/render_text.h"
 
 #include <kdebug.h>
 
 using namespace DOM;
+using namespace DOM::EventNames;
 using namespace khtml;
 
 CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc) : NodeImpl(doc) {
@@ -223,8 +225,8 @@ void CharacterDataImpl::dispatchModifiedEvent(DOMStringImpl* prevValue) {
   newValue->ref();
   int exceptioncode = 0;
   dispatchEvent(
-      new MutationEventImpl(EventImpl::DOMCHARACTERDATAMODIFIED_EVENT, true,
-                            false, 0, prevValue, newValue, DOMString(), 0),
+      new MutationEventImpl(DOMCharacterDataModifiedEvent, true, false, 0,
+                            prevValue, newValue, DOMString(), 0),
       exceptioncode);
   newValue->deref();
   dispatchSubtreeModifiedEvent();

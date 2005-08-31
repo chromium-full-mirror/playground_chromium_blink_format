@@ -42,6 +42,7 @@
  */
 
 #include "render_layer.h"
+
 #include <kdebug.h>
 #include <assert.h>
 #include "khtmlview.h"
@@ -50,6 +51,7 @@
 #include "render_theme.h"
 #include "xml/dom_docimpl.h"
 #include "xml/dom2_eventsimpl.h"
+#include "xml/EventNames.h"
 #include "html/html_blockimpl.h"
 
 #include <qscrollbar.h>
@@ -64,8 +66,10 @@
 #define PAGE_KEEP 40
 
 using namespace DOM;
+using namespace DOM::EventNames;
 using namespace HTMLNames;
-using namespace khtml;
+
+namespace khtml {
 
 #ifdef APPLE_CHANGES
 QScrollBar* RenderLayer::gScrollBar = 0;
@@ -529,7 +533,7 @@ void RenderLayer::scrollToOffset(int x,
 #endif
 
   // Fire the scroll DOM event.
-  m_object->element()->dispatchHTMLEvent(EventImpl::SCROLL_EVENT, true, false);
+  m_object->element()->dispatchHTMLEvent(scrollEvent, true, false);
 
   // Just schedule a full repaint of our object.
   if (repaint)
@@ -1817,4 +1821,5 @@ void Marquee::timerEvent(QTimerEvent* evt) {
     else
       m_layer->scrollToYOffset(newPos);
   }
+}
 }

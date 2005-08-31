@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
@@ -35,6 +34,7 @@ class KHTMLView;
 class KHTMLPart;
 
 namespace DOM {
+class AtomicString;
 class NodeImpl;
 }
 
@@ -259,8 +259,11 @@ class Window : public ObjectImp {
   };
 
  protected:
-  ValueImp* getListener(ExecState* exec, int eventId) const;
-  void setListener(ExecState* exec, int eventId, ValueImp* func);
+  ValueImp* getListener(ExecState* exec,
+                        const DOM::AtomicString& eventType) const;
+  void setListener(ExecState* exec,
+                   const DOM::AtomicString& eventType,
+                   ValueImp* func);
 
  private:
   static ValueImp* childFrameGetter(ExecState* exec,
