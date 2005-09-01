@@ -38,6 +38,8 @@ class KRenderingPaintServerSolid : public KRenderingPaintServer {
   QColor color() const;
   void setColor(const QColor& color);
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   class Private;
   Private* d;

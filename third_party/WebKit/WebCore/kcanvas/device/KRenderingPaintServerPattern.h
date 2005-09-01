@@ -63,6 +63,8 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer,
   KCanvasMatrix patternTransform() const;
   void setPatternTransform(const KCanvasMatrix& mat);
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   class Private;
   Private* d;

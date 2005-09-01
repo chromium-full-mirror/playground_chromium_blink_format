@@ -25,7 +25,11 @@
 
 #include <qvaluelist.h>
 
+class QTextStream;
+
 typedef enum { RULE_NONZERO = 0, RULE_EVENODD = 1 } KCWindRule;
+
+QTextStream& operator<<(QTextStream& ts, KCWindRule rule);
 
 // Path related data structures
 typedef enum {
@@ -35,12 +39,16 @@ typedef enum {
   CMD_CLOSE_SUBPATH = 3
 } KCPathCommand;
 
+QTextStream& operator<<(QTextStream& ts, KCPathCommand cmd);
+
 struct KCPathData {
   KCPathCommand cmd : 2;
 
   double x1, x2, x3;
   double y1, y2, y3;
 };
+
+QTextStream& operator<<(QTextStream& ts, const KCPathData& d);
 
 class KCPathDataList : public QValueList<KCPathData> {
  public:
@@ -93,6 +101,8 @@ struct KCClipData {
   bool viewportClipped : 1;
   KCPathDataList path;
 };
+
+QTextStream& operator<<(QTextStream& ts, const KCClipData& d);
 
 class KCClipDataList : public QValueList<KCClipData> {
  public:

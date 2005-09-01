@@ -30,6 +30,13 @@
 #include "KRenderingDevice.h"
 #include "KCanvasResourceListener.h"
 
+#include <qtextstream.h>
+#include "KCanvasTreeDebug.h"
+
+QTextStream& operator<<(QTextStream& ts, const KCanvasResource& r) {
+  return r.externalRepresentation(ts);
+}
+
 // KCanvasResource
 KCanvasResource::KCanvasResource() {
   m_changed = true;
@@ -78,6 +85,18 @@ void KCanvasResource::invalidate() {
   }
 }
 
+QString KCanvasResource::idInRegistry() const {
+  return registryId;
+}
+
+void KCanvasResource::setIdInRegistry(const QString& newId) {
+  registryId = newId;
+}
+
+QTextStream& KCanvasResource::externalRepresentation(QTextStream& ts) const {
+  return ts;
+}
+
 // KCanvasClipper
 KCanvasClipper::KCanvasClipper() : KCanvasResource() {
   m_viewportMode = false;
@@ -105,6 +124,14 @@ void KCanvasClipper::addClipData(const KCPathDataList& path,
 
 KCClipDataList KCanvasClipper::clipData() const {
   return m_clipData;
+}
+
+QTextStream& KCanvasClipper::externalRepresentation(QTextStream& ts) const {
+  ts << "[type=CLIPPER]";
+  if (viewportClipper())
+    ts << " [viewport clipped=" << viewportClipper() << "]";
+  ts << " [clip data=" << clipData() << "]";
+  return ts;
 }
 
 // KCanvasMarker
@@ -164,6 +191,18 @@ void KCanvasMarker::draw(double x, double y, double angle) {
 
     m_marker->draw(QRect());
   }
+}
+
+QTextStream& KCanvasMarker::externalRepresentation(QTextStream& ts) const {
+  ts << "[type=MARKER]"
+     << " [angle=";
+  if (angle() == -1)
+    ts << "auto"
+       << "]";
+  else
+    ts << angle() << "]";
+  ts << " [ref x=" << refX() << " y=" << refY() << "]";
+  return ts;
 }
 
 // vim:ts=4:noet

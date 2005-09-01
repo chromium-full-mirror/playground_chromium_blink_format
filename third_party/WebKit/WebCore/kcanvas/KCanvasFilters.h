@@ -77,6 +77,8 @@ class KCanvasFilter : public KCanvasResource {
                            const KCanvasCommonArgs& args,
                            const QRect& bbox) = 0;
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  protected:
   QRect m_filterRect;
   QValueList<KCanvasFilterEffect*> m_effects;
@@ -114,21 +116,26 @@ class KCanvasFilterEffect {
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const = 0;
 #endif
 
+  virtual QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   QRect m_subregion;
   QString m_in;
   QString m_result;
 };
 
+QTextStream& operator<<(QTextStream&, const KCanvasFilterEffect&);
+
 class KCanvasFEDistantLight : public KCanvasFilterEffect {
  public:
-  float azimuth() const;
+  float azimuth() const { return m_azimuth; }
   void setAzimuth(float azimuth) { m_azimuth = azimuth; }
 
-  float elevation() const;
+  float elevation() const { return m_elevation; }
   void setElevation(float elevation) { m_elevation = elevation; }
 
   // FIXME, more here...
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   float m_azimuth;
@@ -137,6 +144,8 @@ class KCanvasFEDistantLight : public KCanvasFilterEffect {
 
 class KCanvasFEPointLight : public KCanvasFilterEffect {
  public:
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_x;
   float m_y;
@@ -145,6 +154,8 @@ class KCanvasFEPointLight : public KCanvasFilterEffect {
 
 class KCanvasFESpotLight : public KCanvasFilterEffect {
  public:
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_x;
   float m_y;
@@ -172,6 +183,8 @@ class KCanvasFEBlend : public KCanvasFilterEffect {
   KCBlendModeType blendMode() const { return m_mode; }
   void setBlendMode(KCBlendModeType mode) { m_mode = mode; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   KCBlendModeType m_mode;
   QString m_in2;
@@ -191,6 +204,8 @@ class KCanvasFEColorMatrix : public KCanvasFilterEffect {
 
   QValueList<float> values() const { return m_values; }
   void setValues(const QValueList<float>& values) { m_values = values; };
+
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   KCColorMatrixType m_type;
@@ -261,6 +276,8 @@ class KCanvasFEComponentTransfer : public KCanvasFilterEffect {
     m_alphaFunc = func;
   }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   KCComponentTransferFunction m_redFunc;
   KCComponentTransferFunction m_greenFunc;
@@ -285,14 +302,16 @@ class KCanvasFEComposite : public KCanvasFilterEffect {
   KCCompositeOperationType operation() const { return m_operation; }
   void setOperation(KCCompositeOperationType oper) { m_operation = oper; }
 
-  float k1() const;
+  float k1() const { return m_k1; }
   void setK1(float k1) { m_k1 = k1; }
-  float k2() const;
+  float k2() const { return m_k2; }
   void setK2(float k2) { m_k2 = k2; }
-  float k3() const;
+  float k3() const { return m_k3; }
   void setK3(float k3) { m_k3 = k3; }
-  float k4() const;
+  float k4() const { return m_k4; }
   void setK4(float k4) { m_k4 = k4; }
+
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   QString m_in2;
@@ -307,14 +326,16 @@ typedef enum { EM_DUPLICATE = 0, EM_WRAP = 1, EM_NONE = 2 } KCEdgeModeType;
 
 class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
  public:
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   int m_orderX;
   int m_orderY;
   QValueList<float> m_kernelMatrix;  // maybe should be a real matrix?
   float m_divisor;
   float m_bias;
-  int targetX;
-  int targetY;
+  int m_targetX;
+  int m_targetY;
   KCEdgeModeType m_edgeMode;
   float m_kernelUnitLengthX;
   float m_kernelUnitLengthY;
@@ -323,6 +344,8 @@ class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
 
 class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
  public:
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_surfaceScale;
   float m_diffuseConstant;
@@ -342,6 +365,8 @@ class KCanvasFEDisplacementMap : public KCanvasFilterEffect {
   QString in2() const { return m_in2; }
   void setIn2(const QString& in2) { m_in2 = in2; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_scale;
   KCChannelSelectorType m_XChannelSelector;
@@ -357,6 +382,8 @@ class KCanvasFEFlood : public KCanvasFilterEffect {
   float floodOpacity() const { return m_floodOpacity; }
   void setFloodOpacity(float floodOpacity) { m_floodOpacity = floodOpacity; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   QColor m_floodColor;
   float m_floodOpacity;
@@ -369,6 +396,8 @@ class KCanvasFEGaussianBlur : public KCanvasFilterEffect {
 
   float stdDeviationY() const;
   void setStdDeviationY(float y);
+
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   float m_x;
@@ -383,6 +412,8 @@ class KCanvasFEImage : public KCanvasFilterEffect {
   KCanvasItem* image() const { return m_image; }
   void setImage(KCanvasItem* image) { m_image = image; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   KCanvasItem* m_image;
 };
@@ -393,6 +424,8 @@ class KCanvasFEMerge : public KCanvasFilterEffect {
   void setMergeInputs(const QStringList& mergeInputs) {
     m_mergeInputs = mergeInputs;
   }
+
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   QStringList m_mergeInputs;
@@ -413,6 +446,8 @@ class KCanvasFEMorphology : public KCanvasFilterEffect {
   float radiusY() const { return m_radiusY; }
   void setRadiusY(float radiusY) { m_radiusY = radiusY; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   KCMorphologyOperatorType m_operator;
   float m_radiusX;
@@ -427,6 +462,8 @@ class KCanvasFEOffset : public KCanvasFilterEffect {
   float dy() const { return m_dy; }
   void setDy(float dy) { m_dy = dy; }
 
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_dx;
   float m_dy;
@@ -434,9 +471,11 @@ class KCanvasFEOffset : public KCanvasFilterEffect {
 
 class KCanvasFESpecularLighting : public KCanvasFilterEffect {
  public:
+  QTextStream& externalRepresentation(QTextStream&) const;
+
  private:
   float m_surfaceScale;
-  float m_spectularConstant;
+  float m_specularConstant;
   float m_specularExponent;
 };
 
@@ -467,6 +506,8 @@ class KCanvasFETurbulence : public KCanvasFilterEffect {
 
   bool stitchTiles() const { return m_stitchTiles; }
   void setStitchTiles(bool stitch) { m_stitchTiles = stitch; }
+
+  QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
   float m_baseFrequencyX;

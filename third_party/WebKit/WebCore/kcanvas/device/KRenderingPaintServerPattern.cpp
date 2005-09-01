@@ -24,6 +24,9 @@
 #include "KCanvasImage.h"
 #include "KRenderingPaintServerPattern.h"
 
+#include <qtextstream.h>
+#include "KCanvasTreeDebug.h"
+
 class KRenderingPaintServerPattern::Private {
  public:
   Private() {
@@ -105,6 +108,18 @@ void KRenderingPaintServerPattern::setPatternTransform(
 
 KCPaintServerType KRenderingPaintServerPattern::type() const {
   return PS_PATTERN;
+}
+
+QTextStream& KRenderingPaintServerPattern::externalRepresentation(
+    QTextStream& ts) const {
+  ts << "[type=PATTERN]"
+     << " [x=" << x() << " y=" << y() << " w=" << width() << " h=" << height()
+     << "]";
+  if (!boundingBoxMode())
+    ts << " [bounding box mode=" << boundingBoxMode() << "]";
+  if (!patternTransform().qmatrix().isIdentity())
+    ts << " [pattern transform=" << patternTransform() << "]";
+  return ts;
 }
 
 // vim:ts=4:noet

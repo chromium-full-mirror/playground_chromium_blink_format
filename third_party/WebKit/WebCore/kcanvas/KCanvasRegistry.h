@@ -46,9 +46,14 @@ class KCanvasRegistry {
   void cleanup();
 
  private:
+  friend QTextStream& operator<<(QTextStream&, const KCanvasRegistry&);
+
+ private:
   QDict<KCanvasResource> m_resources;
   QDict<KRenderingPaintServer> m_pservers;
 };
+
+QTextStream& operator<<(QTextStream&, const KCanvasRegistry&);
 
 #endif
 
