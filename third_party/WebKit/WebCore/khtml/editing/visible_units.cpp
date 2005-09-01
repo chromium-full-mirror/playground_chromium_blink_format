@@ -203,7 +203,9 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     pos = Position(charIt.range()->endContainer(exception),
                    charIt.range()->endOffset(exception));
   }
-  return VisiblePosition(pos, UPSTREAM);
+
+  // generate VisiblePosition, use UPSTREAM affinity if possible
+  return VisiblePosition(pos, VP_UPSTREAM_IF_POSSIBLE);
 }
 
 // ---------
@@ -346,14 +348,8 @@ VisiblePosition endOfLine(const VisiblePosition& c,
     endOffset = endTextBox->m_start + endTextBox->m_len;
   }
 
-  // generate VisiblePosition with correct affinity
-  VisiblePosition result = VisiblePosition(endNode, endOffset, DOWNSTREAM);
-  VisiblePosition temp = result;
-  temp.setAffinity(UPSTREAM);
-  if (!inSameLine(temp, result))
-    result.setAffinity(UPSTREAM);
-
-  return result;
+  // generate VisiblePosition, use UPSTREAM affinity if possible
+  return VisiblePosition(endNode, endOffset, VP_UPSTREAM_IF_POSSIBLE);
 }
 
 bool inSameLine(const VisiblePosition& a, const VisiblePosition& b) {
