@@ -467,14 +467,19 @@ QString Decoder::decode(const char* data, int len) {
       }
       buffer += QCString(data, len + 1);
 #endif
-// we still don't have an encoding, and are in the head
-// the following tags are allowed in <head>:
-// SCRIPT|STYLE|META|LINK|OBJECT|TITLE|BASE
+      // we still don't have an encoding, and are in the head
+      // the following tags are allowed in <head>:
+      // SCRIPT|STYLE|META|LINK|OBJECT|TITLE|BASE
 
-// We stop scanning when a tag that is not permitted in <head>
-// is seen, rather when </head> is seen, because that more closely
-// matches behavior in other browsers; more details in
-// <http://bugzilla.opendarwin.org/show_bug.cgi?id=3590>.
+      // We stop scanning when a tag that is not permitted in <head>
+      // is seen, rather when </head> is seen, because that more closely
+      // matches behavior in other browsers; more details in
+      // <http://bugzilla.opendarwin.org/show_bug.cgi?id=3590>.
+
+      // Additionally, we ignore things that looks like tags in <title>; see
+      // <http://bugzilla.opendarwin.org/show_bug.cgi?id=4560>.
+
+      bool withinTitle = false;
 
 #if APPLE_CHANGES
       const char* ptr = buffer.latin1();
@@ -527,6 +532,10 @@ QString Decoder::decode(const char* data, int len) {
           }
           tmp[len] = 0;
           AtomicString tag(tmp);
+
+          if (tag == titleTag)
+            withinTitle = !end;
+
           if (!end && tag == metaTag) {
             // found a meta tag...
             // ptr += 5;
@@ -582,8 +591,8 @@ QString Decoder::decode(const char* data, int len) {
           } else if (tag != scriptTag && tag != noscriptTag &&
                      tag != styleTag && tag != linkTag && tag != metaTag &&
                      tag != objectTag && tag != titleTag && tag != baseTag &&
-                     (end || tag != htmlTag) && (tag != headTag) &&
-                     isalpha(tmp[0])) {
+                     (end || tag != htmlTag) && !withinTitle &&
+                     (tag != headTag) && isalpha(tmp[0])) {
             body = true;
 #ifdef DECODE_DEBUG
             kdDebug(6005) << "Decoder: no charset found (bailing because of \""
