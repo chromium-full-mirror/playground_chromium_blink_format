@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,10 +35,10 @@ using namespace KSVG;
 
 /*
 @begin SVGEllipseElement::s_hashTable 5
- cx		SVGEllipseElementConstants::Cx		DontDelete|ReadOnly
- cy		SVGEllipseElementConstants::Cy		DontDelete|ReadOnly
- rx		SVGEllipseElementConstants::Rx		DontDelete|ReadOnly
- ry		SVGEllipseElementConstants::Ry		DontDelete|ReadOnly
+ cx        SVGEllipseElementConstants::Cx        DontDelete|ReadOnly
+ cy        SVGEllipseElementConstants::Cy        DontDelete|ReadOnly
+ rx        SVGEllipseElementConstants::Rx        DontDelete|ReadOnly
+ ry        SVGEllipseElementConstants::Ry        DontDelete|ReadOnly
 @end
 */
 

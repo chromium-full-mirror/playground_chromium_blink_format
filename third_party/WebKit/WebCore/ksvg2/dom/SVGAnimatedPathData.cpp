@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,18 +36,14 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedPathData::s_hashTable 5
- pathSegList
-SVGAnimatedPathDataConstants::PathSegList
+ pathSegList                    SVGAnimatedPathDataConstants::PathSegList
 DontDelete|ReadOnly
  normalizedPathSegList
-SVGAnimatedPathDataConstants::NormalizedPathSegList
-DontDelete|ReadOnly
+SVGAnimatedPathDataConstants::NormalizedPathSegList DontDelete|ReadOnly
  animatedPathSegList
-SVGAnimatedPathDataConstants::AnimatedPathSegList
-DontDelete|ReadOnly
+SVGAnimatedPathDataConstants::AnimatedPathSegList DontDelete|ReadOnly
  animatedNormalizedPathSegList
-SVGAnimatedPathDataConstants::AnimatedNormalizedPathSegList
-DontDelete|ReadOnly
+SVGAnimatedPathDataConstants::AnimatedNormalizedPathSegList DontDelete|ReadOnly
 @end
 */
 

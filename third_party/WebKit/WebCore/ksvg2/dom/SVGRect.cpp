@@ -37,10 +37,10 @@ using namespace KSVG;
 
 /*
 @begin SVGRect::s_hashTable 5
- x				SVGRectConstants::X DontDelete
- y				SVGRectConstants::Y DontDelete
- width			SVGRectConstants::Width		DontDelete
- height			SVGRectConstants::Height	DontDelete
+ x                SVGRectConstants::X            DontDelete
+ y                SVGRectConstants::Y            DontDelete
+ width            SVGRectConstants::Width        DontDelete
+ height            SVGRectConstants::Height    DontDelete
 @end
 */
 

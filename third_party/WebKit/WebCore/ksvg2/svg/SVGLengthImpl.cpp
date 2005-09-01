@@ -179,15 +179,12 @@ double SVGLengthImpl::dpi() const {
   /* FIXME: DPI detection
   if(context && context->ownerDoc())
   {
-          if(mode == LM_WIDTH)
-                  return 25.4 *
-  context->ownerDoc()->screenPixelsPerMillimeterX();
-          else if(mode == LM_HEIGHT)
-                  return 25.4 *
-  context->ownerDoc()->screenPixelsPerMillimeterY();
-          else if(mode == LM_OTHER)
-                  return 25.4 *
-  context->ownerDoc()->screenPixelsPerMillimeterX();
+      if(mode == LM_WIDTH)
+          return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterX();
+      else if(mode == LM_HEIGHT)
+          return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterY();
+      else if(mode == LM_OTHER)
+          return 25.4 * context->ownerDoc()->screenPixelsPerMillimeterX();
   }
   */
 
@@ -224,12 +221,12 @@ void SVGLengthImpl::updateValue() {
 
         bool sizeLocal = (style->getFontSize() != -1);
         bool familyLocal = (style->getFontFamily() &&
-style->getFontFamily()->getFirst());
+    style->getFontFamily()->getFirst());
 
         SVGStylableImpl *parentStyle = 0;
         if((!sizeLocal || !familyLocal) && context)
-                parentStyle = dynamic_cast<SVGStylableImpl
-*>(context->ownerDoc()->getElementFromHandle(context->parentNode().handle()));
+            parentStyle = dynamic_cast<SVGStylableImpl
+    *>(context->ownerDoc()->getElementFromHandle(context->parentNode().handle()));
 
         // Look up font-size in a SAFE way, because at this place
         // processStyle() has NOT yet been called, so we need
@@ -238,30 +235,30 @@ style->getFontFamily()->getFirst());
         double useSize = 12;
 
         if(sizeLocal)
-                useSize = style->getFontSize();
+            useSize = style->getFontSize();
         else if(parentStyle && parentStyle->getFontSize() != -1)
-                useSize = parentStyle->getFontSize();
+            useSize = parentStyle->getFontSize();
 
         if(familyLocal)
-                useFont = style->getFontFamily()->getFirst()->string();
+            useFont = style->getFontFamily()->getFirst()->string();
         else if(parentStyle && parentStyle->getFontFamily() &&
-parentStyle->getFontFamily()->getFirst())
-                useFont = parentStyle->getFontFamily()->getFirst()->string();
+    parentStyle->getFontFamily()->getFirst())
+            useFont = parentStyle->getFontFamily()->getFirst()->string();
 
         if(unitType == SVG_LENGTHTYPE_EMS)
-                value = valueInSpecifiedUnits * useSize;
+            value = valueInSpecifiedUnits * useSize;
         else
         {
-                // Easiest way, use qfont (Niko)
-                QFont font(useFont);
-                font.setPixelSize(static_cast<int>(useSize));
+            // Easiest way, use qfont (Niko)
+            QFont font(useFont);
+            font.setPixelSize(static_cast<int>(useSize));
 
-                QFontMetrics fm(font);
-                value = valueInSpecifiedUnits * fm.boundingRect('x').height();
+            QFontMetrics fm(font);
+            value = valueInSpecifiedUnits * fm.boundingRect('x').height();
         }
-}
+    }
 
-break;*/
+    break;*/
       }
   }
 

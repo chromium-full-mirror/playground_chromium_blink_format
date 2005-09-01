@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -150,8 +150,8 @@ DocumentImpl* DOMImplementationImpl::createDocument(
 
   // WRONG_DOCUMENT_ERR: Raised if docType has already been used with a
   // different
-  //					   document or was created from a different
-  //implementation.
+  //                       document or was created from a different
+  //                       implementation.
   if (docType != 0 && docType->ownerDocument() != 0)
     throw new DOMExceptionImpl(WRONG_DOCUMENT_ERR);
 

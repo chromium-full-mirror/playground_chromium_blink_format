@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,9 +40,9 @@ using namespace KSVG;
 
 /*
 @begin SVGFEOffsetElement::s_hashTable 5
- in1	SVGFEOffsetElementConstants::In1	DontDelete|ReadOnly
- dx		SVGFEOffsetElementConstants::Dx		DontDelete|ReadOnly
- dy		SVGFEOffsetElementConstants::Dy		DontDelete|ReadOnly
+ in1    SVGFEOffsetElementConstants::In1    DontDelete|ReadOnly
+ dx        SVGFEOffsetElementConstants::Dx        DontDelete|ReadOnly
+ dy        SVGFEOffsetElementConstants::Dy        DontDelete|ReadOnly
 @end
 */
 

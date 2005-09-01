@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,19 +42,19 @@ using namespace KSVG;
 
 /*
 @begin SVGComponentTransferFunctionElement::s_hashTable 9
- type		SVGComponentTransferFunctionElementConstants::Type
+ type        SVGComponentTransferFunctionElementConstants::Type
 DontDelete|ReadOnly
- tableValues	SVGComponentTransferFunctionElementConstants::TableValues
+ tableValues    SVGComponentTransferFunctionElementConstants::TableValues
 DontDelete|ReadOnly
- slope		SVGComponentTransferFunctionElementConstants::Slope
+ slope        SVGComponentTransferFunctionElementConstants::Slope
 DontDelete|ReadOnly
- intercept	SVGComponentTransferFunctionElementConstants::Intercept
+ intercept    SVGComponentTransferFunctionElementConstants::Intercept
 DontDelete|ReadOnly
- amplitude	SVGComponentTransferFunctionElementConstants::Amplitude
+ amplitude    SVGComponentTransferFunctionElementConstants::Amplitude
 DontDelete|ReadOnly
- exponent	SVGComponentTransferFunctionElementConstants::Exponent
+ exponent    SVGComponentTransferFunctionElementConstants::Exponent
 DontDelete|ReadOnly
- offset		SVGComponentTransferFunctionElementConstants::Offset
+ offset        SVGComponentTransferFunctionElementConstants::Offset
 DontDelete|ReadOnly
 @end
 */

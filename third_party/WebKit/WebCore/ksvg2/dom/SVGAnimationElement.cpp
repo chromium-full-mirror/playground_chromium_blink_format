@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -33,15 +33,15 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimationElement::s_hashTable 2
- targetElement		SVGAnimationElementConstants::TargetElement
+ targetElement        SVGAnimationElementConstants::TargetElement
 DontDelete|ReadOnly
 @end
 @begin SVGAnimationElementProto::s_hashTable 5
- getStartTime		SVGAnimationElementConstants::GetStartTime
+ getStartTime        SVGAnimationElementConstants::GetStartTime
 DontDelete|Function 0
- getCurrentTime		SVGAnimationElementConstants::GetCurrentTime
+ getCurrentTime        SVGAnimationElementConstants::GetCurrentTime
 DontDelete|Function 0
- getSimpleDuration	SVGAnimationElementConstants::GetSimpleDuration
+ getSimpleDuration    SVGAnimationElementConstants::GetSimpleDuration
 DontDelete|Function 0
 @end
 */

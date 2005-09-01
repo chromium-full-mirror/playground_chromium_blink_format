@@ -29,14 +29,10 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegCurvetoCubicSmoothAbs::s_hashTable 5
- x		SVGPathSegCurvetoCubicSmoothConstants::X
-DontDelete
- y		SVGPathSegCurvetoCubicSmoothConstants::Y
-DontDelete
- x2		SVGPathSegCurvetoCubicSmoothConstants::X2
-DontDelete
- y2		SVGPathSegCurvetoCubicSmoothConstants::Y2
-DontDelete
+ x        SVGPathSegCurvetoCubicSmoothConstants::X        DontDelete
+ y        SVGPathSegCurvetoCubicSmoothConstants::Y        DontDelete
+ x2        SVGPathSegCurvetoCubicSmoothConstants::X2        DontDelete
+ y2        SVGPathSegCurvetoCubicSmoothConstants::Y2        DontDelete
 @end
 */
 
@@ -171,14 +167,10 @@ float SVGPathSegCurvetoCubicSmoothAbs::y2() const {
 
 /*
 @begin SVGPathSegCurvetoCubicSmoothRel::s_hashTable 5
- x		SVGPathSegCurvetoCubicSmoothConstants::X
-DontDelete
- y		SVGPathSegCurvetoCubicSmoothConstants::Y
-DontDelete
- x2		SVGPathSegCurvetoCubicSmoothConstants::X2
-DontDelete
- y2		SVGPathSegCurvetoCubicSmoothConstants::Y2
-DontDelete
+ x        SVGPathSegCurvetoCubicSmoothConstants::X        DontDelete
+ y        SVGPathSegCurvetoCubicSmoothConstants::Y        DontDelete
+ x2        SVGPathSegCurvetoCubicSmoothConstants::X2        DontDelete
+ y2        SVGPathSegCurvetoCubicSmoothConstants::Y2        DontDelete
 @end
 */
 

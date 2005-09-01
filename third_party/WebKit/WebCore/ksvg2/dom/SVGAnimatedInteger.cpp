@@ -36,8 +36,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedInteger::s_hashTable 3
- baseVal	SVGAnimatedIntegerConstants::BaseVal	DontDelete
- animVal	SVGAnimatedIntegerConstants::AnimVal	DontDelete|ReadOnly
+ baseVal    SVGAnimatedIntegerConstants::BaseVal    DontDelete
+ animVal    SVGAnimatedIntegerConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

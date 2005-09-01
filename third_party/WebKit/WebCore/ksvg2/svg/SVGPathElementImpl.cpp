@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -88,10 +88,10 @@ SVGPointImpl* SVGPathElementImpl::getPointAtLength(double /*distance*/) {
   T2P::BezierPath *path = ownerDoc()->canvas()->toBezierPath(m_item);
   if(path)
   {
-          T2P::Point p;
-          path->pointTangentNormalAt(distance / totalDistance, &p);
-          ret->setX(p.x());
-          ret->setY(p.y());
+      T2P::Point p;
+      path->pointTangentNormalAt(distance / totalDistance, &p);
+      ret->setX(p.x());
+      ret->setY(p.y());
   }*/
 
   return ret;

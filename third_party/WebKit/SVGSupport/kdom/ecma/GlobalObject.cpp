@@ -1,25 +1,23 @@
 /*
-        Copyright (C) 2002 David Faure <faure@kde.org>
-                                  2004, 2005 Nikolas Zimmermann
-   <wildfox@kde.org>
+    Copyright (C) 2002 David Faure <faure@kde.org>
+                  2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
 
-        This file is part of the KDE project
+    This file is part of the KDE project
 
-        This library is free software; you can redistribute it and/or
-        modify it under the terms of the GNU Library General Public
-        License as published by the Free Software Foundation; either
-        version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-        This library is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-        Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-        You should have received a copy of the GNU Library General Public
-   License
-        along with this library; see the file COPYING.LIB.  If not, write to
-        the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-        Boston, MA 02111-1307, USA.
+    You should have received a copy of the GNU Library General Public License
+    along with this library; see the file COPYING.LIB.  If not, write to
+    the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.
 */
 
 #include <kdebug.h>
@@ -44,44 +42,34 @@ using namespace KDOM;
 
 /*
 @begin GlobalObject::s_hashTable 15
- closed			GlobalObject::Closed		DontDelete|ReadOnly
- window			GlobalObject::Window		DontDelete|ReadOnly
- evt			GlobalObject::Evt
-DontDelete|ReadOnly
- document		GlobalObject::Document		DontDelete|ReadOnly
+ closed            GlobalObject::Closed        DontDelete|ReadOnly
+ window            GlobalObject::Window        DontDelete|ReadOnly
+ evt            GlobalObject::Evt            DontDelete|ReadOnly
+ document        GlobalObject::Document        DontDelete|ReadOnly
 
 # Functions
- setTimeout		GlobalObject::SetTimeout	DontDelete|Function 2
- clearTimeout	GlobalObject::ClearTimeout	DontDelete|Function 1
- setInterval	GlobalObject::SetInterval	DontDelete|Function 2
- clearInterval	GlobalObject::ClearInterval	DontDelete|Function 1
- printNode		GlobalObject::PrintNode		DontDelete|Function 1
- alert			GlobalObject::Alert
-DontDelete|Function 1
- prompt			GlobalObject::Prompt		DontDelete|Function 2
- confirm		GlobalObject::Confirm		DontDelete|Function 1
- debug			GlobalObject::Debug
-DontDelete|Function 1
+ setTimeout        GlobalObject::SetTimeout    DontDelete|Function 2
+ clearTimeout    GlobalObject::ClearTimeout    DontDelete|Function 1
+ setInterval    GlobalObject::SetInterval    DontDelete|Function 2
+ clearInterval    GlobalObject::ClearInterval    DontDelete|Function 1
+ printNode        GlobalObject::PrintNode        DontDelete|Function 1
+ alert            GlobalObject::Alert            DontDelete|Function 1
+ prompt            GlobalObject::Prompt        DontDelete|Function 2
+ confirm        GlobalObject::Confirm        DontDelete|Function 1
+ debug            GlobalObject::Debug            DontDelete|Function 1
 @end
 */
 
 /*
 # Constructors - TODO IN THE NEW ECMA CONCEPT! FIX IT!
- Node				GlobalObject::Node
-DontDelete|Function 1
- DOMException		GlobalObject::DOMException
-DontDelete|Function 1
- CSSRule			GlobalObject::CSSRule
-DontDelete|Function 1
- CSSValue			GlobalObject::CSSValue
-DontDelete|Function 1
- CSSPrimitiveValue	GlobalObject::CSSPrimitiveValue	DontDelete|Function 1
- Event				GlobalObject::Event
-DontDelete|Function 1
- EventException		GlobalObject::EventException
-DontDelete|Function 1
- MutationEvent		GlobalObject::MutationEvent
-DontDelete|Function 1
+ Node                GlobalObject::Node                    DontDelete|Function 1
+ DOMException        GlobalObject::DOMException            DontDelete|Function 1
+ CSSRule            GlobalObject::CSSRule                DontDelete|Function 1
+ CSSValue            GlobalObject::CSSValue                DontDelete|Function 1
+ CSSPrimitiveValue    GlobalObject::CSSPrimitiveValue    DontDelete|Function 1
+ Event                GlobalObject::Event                DontDelete|Function 1
+ EventException        GlobalObject::EventException        DontDelete|Function 1
+ MutationEvent        GlobalObject::MutationEvent        DontDelete|Function 1
 @end
 */
 
@@ -156,8 +144,8 @@ KJS::ValueImp* GlobalObject::get(KJS::ExecState* exec,
     switch (entry->value) {
       case GlobalObject::Window:
         return const_cast<GlobalObject*>(this);
-      /*			case GlobalObject::Evt:
-                                      return getDOMEvent(exec,
+      /*            case GlobalObject::Evt:
+                      return getDOMEvent(exec,
          Event(interpreter->currentEvent()));*/
       case GlobalObject::Document:
         // special case, Ecma::setup created it, so we don't need to do it
@@ -172,9 +160,9 @@ KJS::ValueImp* GlobalObject::get(KJS::ExecState* exec,
       case GlobalObject::Debug:
       case GlobalObject::Prompt: {
 #if 0
-				if(isSafeScript(exec))
-					return KJS::lookupOrCreateFunction<GlobalObjectFunc>(exec, p, this, entry->value, entry->params, entry->attr);
-				else
+                if(isSafeScript(exec))
+                    return KJS::lookupOrCreateFunction<GlobalObjectFunc>(exec, p, this, entry->value, entry->params, entry->attr);
+                else
 #endif
         return KJS::Undefined();
       }
@@ -315,8 +303,8 @@ KJS::ValueImp* GlobalObjectFunc::callAsFunction(KJS::ExecState* exec,
       QString result;
       QTextOStream out(&result);
       /* FIXME
-                              Helper::PrintNode(out, ecma_cast<Node>(exec,
-         args[0], &toNode));
+                  Helper::PrintNode(out, ecma_cast<Node>(exec, args[0],
+         &toNode));
       */
       return KJS::String(result);
     }
@@ -416,22 +404,22 @@ void ScheduledAction::execute(GlobalObject* global) {
   Q_ASSERT(global->doc() != 0);
 
   /* FIXME
-          ScriptInterpreter *interpreter =
+      ScriptInterpreter *interpreter =
      global->doc()->ecmaEngine()->interpreter();
-          if(m_isFunction)
+      if(m_isFunction)
+      {
+          if(m_func.implementsCall())
           {
-                  if(m_func.implementsCall())
-                  {
-                          KJS::ExecState *exec = interpreter->globalExec();
-                          Q_ASSERT(global == interpreter->globalObject().imp());
+              KJS::ExecState *exec = interpreter->globalExec();
+              Q_ASSERT(global == interpreter->globalObject().imp());
 
-                          KJS::Object obj(global);
-                          m_func.call(exec, obj, m_args); // note that call()
-     creates its own execution state for the func call
-                  }
+              KJS::Object obj(global);
+              m_func.call(exec, obj, m_args); // note that call() creates its
+     own execution state for the func call
           }
-          else
-                  interpreter->evaluate(m_code);
+      }
+      else
+          interpreter->evaluate(m_code);
   */
 }
 

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,8 +36,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedLengthList::s_hashTable 3
- baseVal	SVGAnimatedLengthListConstants::BaseVal	DontDelete|ReadOnly
- animVal	SVGAnimatedLengthListConstants::AnimVal	DontDelete|ReadOnly
+ baseVal    SVGAnimatedLengthListConstants::BaseVal    DontDelete|ReadOnly
+ animVal    SVGAnimatedLengthListConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

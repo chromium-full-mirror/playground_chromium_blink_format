@@ -34,42 +34,27 @@ using namespace KSVG;
 
 /*
 @begin SVGMatrix::s_hashTable 7
- a					SVGMatrixConstants::A
-DontDelete
- b					SVGMatrixConstants::B
-DontDelete
- c					SVGMatrixConstants::C
-DontDelete
- d					SVGMatrixConstants::D
-DontDelete
- e					SVGMatrixConstants::E
-DontDelete
- f					SVGMatrixConstants::F
-DontDelete
+ a                    SVGMatrixConstants::A                    DontDelete
+ b                    SVGMatrixConstants::B                    DontDelete
+ c                    SVGMatrixConstants::C                    DontDelete
+ d                    SVGMatrixConstants::D                    DontDelete
+ e                    SVGMatrixConstants::E                    DontDelete
+ f                    SVGMatrixConstants::F                    DontDelete
 @end
 @begin SVGMatrixProto::s_hashTable 13
- inverse			SVGMatrixConstants::Inverse
-DontDelete|Function 0
- multiply			SVGMatrixConstants::Multiply
-DontDelete|Function 1
- translate			SVGMatrixConstants::Translate
-DontDelete|Function 2
- scale				SVGMatrixConstants::Scale
-DontDelete|Function 1
- rotate				SVGMatrixConstants::Rotate
-DontDelete|Function 1
- rotateFromVector	SVGMatrixConstants::RotateFromVector
-DontDelete|Function 2
- scaleNonUniform	SVGMatrixConstants::ScaleNonUniform
-DontDelete|Function 2
- flipX				SVGMatrixConstants::FlipX
-DontDelete|Function 0
- flipY				SVGMatrixConstants::FlipY
-DontDelete|Function 0
- skewX				SVGMatrixConstants::SkewX
-DontDelete|Function 1
- skewY				SVGMatrixConstants::SkewY
-DontDelete|Function 1
+ inverse            SVGMatrixConstants::Inverse DontDelete|Function 0
+ multiply            SVGMatrixConstants::Multiply            DontDelete|Function
+1
+ translate            SVGMatrixConstants::Translate DontDelete|Function 2
+ scale                SVGMatrixConstants::Scale DontDelete|Function 1
+ rotate                SVGMatrixConstants::Rotate DontDelete|Function 1
+ rotateFromVector    SVGMatrixConstants::RotateFromVector    DontDelete|Function
+2
+ scaleNonUniform    SVGMatrixConstants::ScaleNonUniform DontDelete|Function 2
+ flipX                SVGMatrixConstants::FlipX DontDelete|Function 0
+ flipY                SVGMatrixConstants::FlipY DontDelete|Function 0
+ skewX                SVGMatrixConstants::SkewX DontDelete|Function 1
+ skewY                SVGMatrixConstants::SkewY DontDelete|Function 1
 @end
 */
 

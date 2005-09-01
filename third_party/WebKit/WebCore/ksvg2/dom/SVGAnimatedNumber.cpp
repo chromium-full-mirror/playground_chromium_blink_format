@@ -38,8 +38,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedNumber::s_hashTable 3
- baseVal	SVGAnimatedNumberConstants::BaseVal	DontDelete
- animVal	SVGAnimatedNumberConstants::AnimVal	DontDelete|ReadOnly
+ baseVal    SVGAnimatedNumberConstants::BaseVal    DontDelete
+ animVal    SVGAnimatedNumberConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

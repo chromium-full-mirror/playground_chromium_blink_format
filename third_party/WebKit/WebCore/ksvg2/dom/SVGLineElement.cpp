@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,10 +35,10 @@ using namespace KSVG;
 
 /*
 @begin SVGLineElement::s_hashTable 5
- x1		SVGLineElementConstants::X1		DontDelete|ReadOnly
- y1		SVGLineElementConstants::Y1		DontDelete|ReadOnly
- x2		SVGLineElementConstants::X2		DontDelete|ReadOnly
- y2		SVGLineElementConstants::Y2		DontDelete|ReadOnly
+ x1        SVGLineElementConstants::X1        DontDelete|ReadOnly
+ y1        SVGLineElementConstants::Y1        DontDelete|ReadOnly
+ x2        SVGLineElementConstants::X2        DontDelete|ReadOnly
+ y2        SVGLineElementConstants::Y2        DontDelete|ReadOnly
 @end
 */
 

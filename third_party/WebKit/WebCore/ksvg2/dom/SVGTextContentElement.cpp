@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -44,31 +44,29 @@ using namespace KSVG;
 
 /*
 @begin SVGTextContentElement::s_hashTable 3
- textLength		SVGTextContentElementConstants::TextLength
+ textLength        SVGTextContentElementConstants::TextLength
 DontDelete|ReadOnly
- lengthAdjust	SVGTextContentElementConstants::LengthAdjust
+ lengthAdjust    SVGTextContentElementConstants::LengthAdjust
 DontDelete|ReadOnly
 @end
 @begin SVGTextContentElementProto::s_hashTable 11
- getNumberOfChars		SVGTextContentElementConstants::GetNumberOfChars
+ getNumberOfChars        SVGTextContentElementConstants::GetNumberOfChars
 DontDelete|Function 0
- getComputedTextLength
-SVGTextContentElementConstants::GetComputedTextLength	DontDelete|Function 0
- getSubStringLength
-SVGTextContentElementConstants::GetSubStringLength
+ getComputedTextLength    SVGTextContentElementConstants::GetComputedTextLength
+DontDelete|Function 0
+ getSubStringLength        SVGTextContentElementConstants::GetSubStringLength
 DontDelete|Function 2
  getStartPositionOfChar
-SVGTextContentElementConstants::GetStartPositionOfChar	DontDelete|Function 1
- getEndPositionOfChar	SVGTextContentElementConstants::GetEndPositionOfChar
+SVGTextContentElementConstants::GetStartPositionOfChar    DontDelete|Function 1
+ getEndPositionOfChar    SVGTextContentElementConstants::GetEndPositionOfChar
 DontDelete|Function 1
- getExtentOfChar 		SVGTextContentElementConstants::GetExtentOfChar
+ getExtentOfChar         SVGTextContentElementConstants::GetExtentOfChar
 DontDelete|Function 1
- getRotationOfChar
-SVGTextContentElementConstants::GetRotationOfChar
+ getRotationOfChar         SVGTextContentElementConstants::GetRotationOfChar
 DontDelete|Function 1
- getCharNumAtPosition
-SVGTextContentElementConstants::GetCharNumAtPosition	DontDelete|Function 1
- selectSubString		SVGTextContentElementConstants::SelectSubString
+ getCharNumAtPosition     SVGTextContentElementConstants::GetCharNumAtPosition
+DontDelete|Function 1
+ selectSubString        SVGTextContentElementConstants::SelectSubString
 DontDelete|Function 2
 @end
 */

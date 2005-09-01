@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -65,11 +65,11 @@ bool DocumentBuilder::startDocument(const KURL& uri) {
 #if 0
 void DocumentBuilder::linkDocumentToCanvas(const SVGDocument &doc, KSVGView *view)
 {
-	SVGDocumentImpl *docImpl = static_cast<SVGDocumentImpl *>(doc.handle());
-	if(!docImpl)
-		return;
+    SVGDocumentImpl *docImpl = static_cast<SVGDocumentImpl *>(doc.handle());
+    if(!docImpl)
+        return;
 
-	DocumentBuilder::linkDocumentToCanvas(docImpl, view);
+    DocumentBuilder::linkDocumentToCanvas(docImpl, view);
 }
 #endif
 void DocumentBuilder::linkDocumentToCanvas(SVGDocumentImpl* docImpl,

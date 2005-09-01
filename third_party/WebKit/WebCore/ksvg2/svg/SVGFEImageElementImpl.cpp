@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -92,12 +92,12 @@ void SVGFEImageElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
 void SVGFEImageElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
   if (finishedObj == m_cachedImage) {
 #if 0
-		KCanvasImage *imageBuffer = static_cast<KCanvasImage *>(canvas()->renderingDevice()->createResource(RS_IMAGE));
-		imageBuffer->init(m_cachedImage->pixmap());
-		//m_filterEffect->setImageBuffer(imageBuffer);
+        KCanvasImage *imageBuffer = static_cast<KCanvasImage *>(canvas()->renderingDevice()->createResource(RS_IMAGE));
+        imageBuffer->init(m_cachedImage->pixmap());
+        //m_filterEffect->setImageBuffer(imageBuffer);
 
-		m_cachedImage->deref(this);
-		m_cachedImage = 0;
+        m_cachedImage->deref(this);
+        m_cachedImage = 0;
 #endif
   }
 }

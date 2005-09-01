@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,11 +40,11 @@ using namespace KSVG;
 
 /*
 @begin SVGGradientElement::s_hashTable 5
- gradientUnits		SVGGradientElementConstants::GradientUnits
+ gradientUnits        SVGGradientElementConstants::GradientUnits
 DontDelete|ReadOnly
- gradientTransform	SVGGradientElementConstants::GradientTransform
+ gradientTransform    SVGGradientElementConstants::GradientTransform
 DontDelete|ReadOnly
- spreadMethod		SVGGradientElementConstants::SpreadMethod
+ spreadMethod        SVGGradientElementConstants::SpreadMethod
 DontDelete|ReadOnly
 @end
 */

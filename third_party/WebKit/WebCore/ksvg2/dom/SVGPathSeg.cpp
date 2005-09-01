@@ -30,9 +30,8 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSeg::s_hashTable 3
- pathSegType		SVGPathSegConstants::PathSegType
-DontDelete|ReadOnly
- pathSegTypeAsLetter	SVGPathSegConstants::PathSegTypeAsLetter
+ pathSegType        SVGPathSegConstants::PathSegType DontDelete|ReadOnly
+ pathSegTypeAsLetter    SVGPathSegConstants::PathSegTypeAsLetter
 DontDelete|ReadOnly
 @end
 */

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,12 +40,9 @@ using namespace KSVG;
 
 /*
 @begin SVGFEBlendElement::s_hashTable 5
- in1			SVGFEBlendElementConstants::In1
-DontDelete|ReadOnly
- in2			SVGFEBlendElementConstants::In2
-DontDelete|ReadOnly
- mode			SVGFEBlendElementConstants::Mode
-DontDelete|ReadOnly
+ in1            SVGFEBlendElementConstants::In1        DontDelete|ReadOnly
+ in2            SVGFEBlendElementConstants::In2        DontDelete|ReadOnly
+ mode            SVGFEBlendElementConstants::Mode    DontDelete|ReadOnly
 @end
 */
 

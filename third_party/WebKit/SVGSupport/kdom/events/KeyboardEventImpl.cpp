@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -119,9 +119,9 @@ void KeyboardEventImpl::initKeyboardEvent(QKeyEvent* key) {
   m_virtKeyVal = DOM_VK_UNDEFINED;
 
   // Note: we only support testing for num pad
-  //	m_keyLocation = (keyState & Qt::Keypad) ?
-  //KeyboardEvent::DOM_KEY_LOCATION_NUMPAD :
-  //KeyboardEvent::DOM_KEY_LOCATION_STANDARD;
+  //    m_keyLocation = (keyState & Qt::Keypad) ?
+  //    KeyboardEvent::DOM_KEY_LOCATION_NUMPAD :
+  //    KeyboardEvent::DOM_KEY_LOCATION_STANDARD;
   switch (key->key()) {
     case Qt::Key_Enter:
       m_numPad = true;

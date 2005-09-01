@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -299,9 +299,9 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
   KRenderingDeviceContext* patternContext =
       canvas()->renderingDevice()->contextForImage(m_tile);
   canvas()->renderingDevice()->pushContext(patternContext);
-  //	KCanvasCommonArgs args;
-  //	args.setCanvas(canvas());
-  //	args.setStyle(item->style());
+  //    KCanvasCommonArgs args;
+  //    args.setCanvas(canvas());
+  //    args.setStyle(item->style());
 
   KRenderingPaintServerPattern* pattern =
       static_cast<KRenderingPaintServerPattern*>(m_paintServer);

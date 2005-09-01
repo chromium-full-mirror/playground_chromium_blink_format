@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -46,7 +46,7 @@ class DOMConfigurationImpl;
  *
  * @author Nikolas Zimmermann <wildfox@kde.org>
  * @author Rob Buis <buis@kde.org>
- */
+   */
 class Parser : public QObject,
                public DOMErrorHandlerImpl,
                public CachedObjectClient {

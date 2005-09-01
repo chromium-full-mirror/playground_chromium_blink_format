@@ -62,17 +62,17 @@ inline KJS::ValueImp* lookupGet(KJS::ExecState* exec,
                                 const ThisImp* thisObj,  // the 'impl' object
                                 const KJS::ObjectImp* bridge) {
 #if 0
-		const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
+        const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
 
-		if(!entry) // not found, forward to parents
-			return thisObj->getInParents(exec, propertyName, bridge);
+        if(!entry) // not found, forward to parents
+            return thisObj->getInParents(exec, propertyName, bridge);
 
-		if(entry->attr & KJS::Function)
-			return KJS::lookupOrCreateFunction<FuncImp>(exec, propertyName,
-														const_cast<KJS::ObjectImp *>(bridge),
-														entry->value, entry->params, entry->attr);
+        if(entry->attr & KJS::Function)
+            return KJS::lookupOrCreateFunction<FuncImp>(exec, propertyName,
+                                                        const_cast<KJS::ObjectImp *>(bridge),
+                                                        entry->value, entry->params, entry->attr);
 
-		return thisObj->getValueProperty(exec, entry->value);
+        return thisObj->getValueProperty(exec, entry->value);
 #endif
   return KJS::Undefined();
 }
@@ -90,15 +90,15 @@ inline KJS::ValueImp* lookupGetValue(
     const ThisImp* thisObj,  // the 'impl' object
     const KJS::ObjectImp* bridge) {
 #if 0
-		const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
+        const KJS::HashEntry *entry = KJS::Lookup::findEntry(table, propertyName);
 
-		if(!entry) // not found, forward to parents
-			return thisObj->getInParents(exec, propertyName, bridge);
+        if(!entry) // not found, forward to parents
+            return thisObj->getInParents(exec, propertyName, bridge);
 
-		if(entry->attr & KJS::Function)
-			kdError(26004) << "Function bit set! Shouldn't happen in lookupGetValue! propertyName was " << propertyName.qstring() << endl;
+        if(entry->attr & KJS::Function)
+            kdError(26004) << "Function bit set! Shouldn't happen in lookupGetValue! propertyName was " << propertyName.qstring() << endl;
 
-		return thisObj->getValueProperty(exec, entry->value);
+        return thisObj->getValueProperty(exec, entry->value);
 #endif
   return KJS::Undefined();
 }

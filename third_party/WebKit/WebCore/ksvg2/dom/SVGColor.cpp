@@ -36,20 +36,15 @@ using namespace KSVG;
 
 /*
 @begin SVGColor::s_hashTable 5
- colorType				SVGColorConstants::ColorType
-DontDelete|ReadOnly
- rgbColor				SVGColorConstants::RgbColor
-DontDelete|ReadOnly
- iccColor				SVGColorConstants::IccColor
-DontDelete|ReadOnly
+ colorType                SVGColorConstants::ColorType DontDelete|ReadOnly
+ rgbColor                SVGColorConstants::RgbColor DontDelete|ReadOnly
+ iccColor                SVGColorConstants::IccColor DontDelete|ReadOnly
 @end
 @begin SVGColorProto::s_hashTable 5
- setRGBColor			SVGColorConstants::SetRGBColor
-DontDelete|Function 1
- setRGBColorICCColor	SVGColorConstants::SetRGBColorICCColor
+ setRGBColor            SVGColorConstants::SetRGBColor DontDelete|Function 1
+ setRGBColorICCColor    SVGColorConstants::SetRGBColorICCColor
 DontDelete|Function 2
- setColor				SVGColorConstants::SetColor
-DontDelete|Function 3
+ setColor                SVGColorConstants::SetColor DontDelete|Function 3
 @end
 */
 

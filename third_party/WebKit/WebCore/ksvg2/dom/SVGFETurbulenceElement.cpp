@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,18 +42,16 @@ using namespace KSVG;
 
 /*
 @begin SVGFETurbulenceElement::s_hashTable 7
- baseFrequencyX		SVGFETurbulenceElementConstants::BaseFrequencyX
+ baseFrequencyX        SVGFETurbulenceElementConstants::BaseFrequencyX
 DontDelete|ReadOnly
- baseFrequencyY		SVGFETurbulenceElementConstants::BaseFrequencyY
+ baseFrequencyY        SVGFETurbulenceElementConstants::BaseFrequencyY
 DontDelete|ReadOnly
- numOctaves			SVGFETurbulenceElementConstants::NumOctaves
+ numOctaves            SVGFETurbulenceElementConstants::NumOctaves
 DontDelete|ReadOnly
- seed				SVGFETurbulenceElementConstants::Seed
+ seed                SVGFETurbulenceElementConstants::Seed DontDelete|ReadOnly
+ stitchTiles        SVGFETurbulenceElementConstants::StitchTiles
 DontDelete|ReadOnly
- stitchTiles		SVGFETurbulenceElementConstants::StitchTiles
-DontDelete|ReadOnly
- type				SVGFETurbulenceElementConstants::Type
-DontDelete|ReadOnly
+ type                SVGFETurbulenceElementConstants::Type DontDelete|ReadOnly
 @end
 */
 

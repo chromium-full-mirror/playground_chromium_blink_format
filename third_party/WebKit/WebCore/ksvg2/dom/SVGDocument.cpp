@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,15 +42,11 @@ using namespace KSVG;
 
 /*
 @begin SVGDocument::s_hashTable 7
- title			SVGDocumentConstants::Title
-DontDelete|ReadOnly
- referrer		SVGDocumentConstants::Referrer
-DontDelete|ReadOnly
- domain			SVGDocumentConstants::Domain
-DontDelete|ReadOnly
- URL			SVGDocumentConstants::URL
-DontDelete|ReadOnly
- rootElement	SVGDocumentConstants::RootElement	DontDelete|ReadOnly
+ title            SVGDocumentConstants::Title            DontDelete|ReadOnly
+ referrer        SVGDocumentConstants::Referrer        DontDelete|ReadOnly
+ domain            SVGDocumentConstants::Domain        DontDelete|ReadOnly
+ URL            SVGDocumentConstants::URL            DontDelete|ReadOnly
+ rootElement    SVGDocumentConstants::RootElement    DontDelete|ReadOnly
 @end
 */
 

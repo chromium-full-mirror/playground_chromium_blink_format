@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,20 +42,13 @@ using namespace KSVG;
 
 /*
 @begin SVGFECompositeElement::s_hashTable 5
- in1		SVGFECompositeElementConstants::In1
-DontDelete|ReadOnly
- in2		SVGFECompositeElementConstants::In2
-DontDelete|ReadOnly
- operator	SVGFECompositeElementConstants::Operator
-DontDelete|ReadOnly
- k1			SVGFECompositeElementConstants::K1
-DontDelete|ReadOnly
- k2			SVGFECompositeElementConstants::K2
-DontDelete|ReadOnly
- k3			SVGFECompositeElementConstants::K3
-DontDelete|ReadOnly
- k4			SVGFECompositeElementConstants::K4
-DontDelete|ReadOnly
+ in1        SVGFECompositeElementConstants::In1            DontDelete|ReadOnly
+ in2        SVGFECompositeElementConstants::In2            DontDelete|ReadOnly
+ operator    SVGFECompositeElementConstants::Operator    DontDelete|ReadOnly
+ k1            SVGFECompositeElementConstants::K1            DontDelete|ReadOnly
+ k2            SVGFECompositeElementConstants::K2            DontDelete|ReadOnly
+ k3            SVGFECompositeElementConstants::K3            DontDelete|ReadOnly
+ k4            SVGFECompositeElementConstants::K4            DontDelete|ReadOnly
 @end
 */
 

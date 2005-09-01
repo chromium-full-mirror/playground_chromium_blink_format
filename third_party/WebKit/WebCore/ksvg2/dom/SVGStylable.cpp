@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,15 +40,13 @@ using namespace KSVG;
 
 /*
 @begin SVGStylable::s_hashTable 3
- className			SVGStylableConstants::ClassName
-DontDelete|ReadOnly
- style				SVGStylableConstants::Style
-DontDelete|ReadOnly
+ className            SVGStylableConstants::ClassName        DontDelete|ReadOnly
+ style                SVGStylableConstants::Style            DontDelete|ReadOnly
 @end
 @begin SVGStylableProto::s_hashTable 3
- getPresentationAttribute	SVGStylableConstants::GetPresentationAttribute
+ getPresentationAttribute    SVGStylableConstants::GetPresentationAttribute
 DontDelete|Function 1
- getStyle					SVGStylableConstants::GetStyle
+ getStyle                    SVGStylableConstants::GetStyle
 DontDelete|Function 0
 @end
 */

@@ -29,18 +29,13 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegArcAbs::s_hashTable 11
- x				SVGPathSegArcConstants::X
-DontDelete
- y				SVGPathSegArcConstants::Y
-DontDelete
- r1				SVGPathSegArcConstants::R1
-DontDelete
- r2				SVGPathSegArcConstants::R2
-DontDelete
- angle			SVGPathSegArcConstants::Angle DontDelete
- largeArcFlag	SVGPathSegArcConstants::LargeArcFlag	DontDelete
- sweepFlag		SVGPathSegArcConstants::SweepFlag
-DontDelete
+ x                SVGPathSegArcConstants::X                DontDelete
+ y                SVGPathSegArcConstants::Y                DontDelete
+ r1                SVGPathSegArcConstants::R1                DontDelete
+ r2                SVGPathSegArcConstants::R2                DontDelete
+ angle            SVGPathSegArcConstants::Angle            DontDelete
+ largeArcFlag    SVGPathSegArcConstants::LargeArcFlag    DontDelete
+ sweepFlag        SVGPathSegArcConstants::SweepFlag        DontDelete
 @end
 */
 
@@ -215,18 +210,13 @@ bool SVGPathSegArcAbs::sweepFlag() const {
 
 /*
 @begin SVGPathSegArcRel::s_hashTable 11
- x				SVGPathSegArcConstants::X
-DontDelete
- y				SVGPathSegArcConstants::Y
-DontDelete
- r1				SVGPathSegArcConstants::R1
-DontDelete
- r2				SVGPathSegArcConstants::R2
-DontDelete
- angle			SVGPathSegArcConstants::Angle DontDelete
- largeArcFlag	SVGPathSegArcConstants::LargeArcFlag	DontDelete
- sweepFlag		SVGPathSegArcConstants::SweepFlag
-DontDelete
+ x                SVGPathSegArcConstants::X                DontDelete
+ y                SVGPathSegArcConstants::Y                DontDelete
+ r1                SVGPathSegArcConstants::R1                DontDelete
+ r2                SVGPathSegArcConstants::R2                DontDelete
+ angle            SVGPathSegArcConstants::Angle            DontDelete
+ largeArcFlag    SVGPathSegArcConstants::LargeArcFlag    DontDelete
+ sweepFlag        SVGPathSegArcConstants::SweepFlag        DontDelete
 @end
 */
 

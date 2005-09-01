@@ -4,7 +4,7 @@
 
     Additional copyright (KHTML code)
               (C) 1999 Lars Knoll <knoll@kde.org>
-                          (C) 2003 Dirk Mueller (mueller@kde.org)
+              (C) 2003 Dirk Mueller (mueller@kde.org)
 
     This file is part of the KDE project
 

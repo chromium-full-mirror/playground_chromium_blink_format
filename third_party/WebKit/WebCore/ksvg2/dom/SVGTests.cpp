@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,15 +35,12 @@ using namespace KSVG;
 
 /*
 @begin SVGTests::s_hashTable 5
- requiredFeatures	SVGTestsConstants::RequiredFeatures
-DontDelete|ReadOnly
- requiredExtensions	SVGTestsConstants::RequiredExtensions
-DontDelete|ReadOnly
- systemLanguage		SVGTestsConstants::SystemLanguage
-DontDelete|ReadOnly
+ requiredFeatures    SVGTestsConstants::RequiredFeatures DontDelete|ReadOnly
+ requiredExtensions    SVGTestsConstants::RequiredExtensions DontDelete|ReadOnly
+ systemLanguage        SVGTestsConstants::SystemLanguage DontDelete|ReadOnly
 @end
 @begin SVGTestsProto::s_hashTable 3
- hasExtension	SVGTestsConstants::HasExtension	DontDelete|Function 1
+ hasExtension    SVGTestsConstants::HasExtension    DontDelete|Function 1
 @end
 */
 

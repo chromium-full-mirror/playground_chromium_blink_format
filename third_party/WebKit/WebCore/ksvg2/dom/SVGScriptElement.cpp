@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,7 +35,7 @@ using namespace KSVG;
 
 /*
 @begin SVGScriptElement::s_hashTable 3
- type	SVGScriptElementConstants::Type	DontDelete
+ type    SVGScriptElementConstants::Type    DontDelete
 @end
 */
 

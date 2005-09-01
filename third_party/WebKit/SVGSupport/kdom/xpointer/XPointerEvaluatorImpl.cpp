@@ -1,7 +1,7 @@
 /*
  * This file is part of the KDE libraries
  *
- * Copyright (C) 2005 Frans Englich 	<frans.englich@telia.com>
+ * Copyright (C) 2005 Frans Englich     <frans.englich@telia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -101,11 +101,10 @@ XPointerExpressionImpl* XPointerEvaluatorImpl::createXPointer(
   DOMString schemeData;
   unsigned int endPrevScheme =
       0; /* The index of where the previous scheme ended. That's after it's
-                                        closing parantese. */
+            closing parantese. */
   unsigned int startData = 0; /* The index of where the scheme data starts.
                                  That's right after the parantese
-                                                             after the scheme
-                                 name. */
+                                 after the scheme name. */
 
   typedef QPair<DOMString, DOMString> StrPair;
 
@@ -135,7 +134,7 @@ XPointerExpressionImpl* XPointerEvaluatorImpl::createXPointer(
 
       if (paranDepth ==
           0) /* ...since scheme data can contain un-escaped paranteses
-                                    as long as they're balanced. */
+                as long as they're balanced. */
       {
         schemeData = qString.mid(startData, i - startData);
         endPrevScheme = i + 1; /* Skip the parantese. */

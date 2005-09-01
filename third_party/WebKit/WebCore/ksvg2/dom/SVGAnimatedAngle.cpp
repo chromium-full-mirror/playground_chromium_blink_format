@@ -34,8 +34,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedAngle::s_hashTable 3
- baseVal	SVGAnimatedAngleConstants::BaseVal	DontDelete|ReadOnly
- animVal	SVGAnimatedAngleConstants::AnimVal	DontDelete|ReadOnly
+ baseVal    SVGAnimatedAngleConstants::BaseVal    DontDelete|ReadOnly
+ animVal    SVGAnimatedAngleConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

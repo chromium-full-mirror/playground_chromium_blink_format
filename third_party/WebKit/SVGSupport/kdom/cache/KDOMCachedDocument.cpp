@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2005 Frans Englich 		<frans.englich@telia.com>
+    Copyright (C) 2005 Frans Englich         <frans.englich@telia.com>
 
     Based on khtml code by:
     Copyright (C) 1998 Lars Knoll <knoll@kde.org>

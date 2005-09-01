@@ -39,24 +39,17 @@ using namespace KSVG;
 
 /*
 @begin SVGStringList::s_hashTable 3
- numberOfItems		SVGStringListConstants::NumberOfItems
-DontDelete|ReadOnly
+ numberOfItems        SVGStringListConstants::NumberOfItems DontDelete|ReadOnly
 @end
 @begin SVGStringListProto::s_hashTable 9
- clear				SVGStringListConstants::Clear
-DontDelete|Function 0
- initialize			SVGStringListConstants::Initialize
-DontDelete|Function 1
- getItem			SVGStringListConstants::GetItem
-DontDelete|Function 1
- insertItemBefore	SVGStringListConstants::InsertItemBefore
+ clear                SVGStringListConstants::Clear DontDelete|Function 0
+ initialize            SVGStringListConstants::Initialize DontDelete|Function 1
+ getItem            SVGStringListConstants::GetItem DontDelete|Function 1
+ insertItemBefore    SVGStringListConstants::InsertItemBefore
 DontDelete|Function 2
- replaceItem		SVGStringListConstants::ReplaceItem
-DontDelete|Function 2
- removeItem			SVGStringListConstants::RemoveItem
-DontDelete|Function 1
- appendItem			SVGStringListConstants::AppendItem
-DontDelete|Function 1
+ replaceItem        SVGStringListConstants::ReplaceItem DontDelete|Function 2
+ removeItem            SVGStringListConstants::RemoveItem DontDelete|Function 1
+ appendItem            SVGStringListConstants::AppendItem DontDelete|Function 1
 @end
 */
 

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -344,9 +344,9 @@ bool Helper::IsValidQName(DOMStringImpl* data) {
   QChar ch = unicode[0];
 
 #ifndef APPLE_COMPILE_HACK
-  /* QName		::=   (Prefix ':')? LocalPart
-   * Prefix		::=   NCName
-   * LocalPart	::=   NCName
+  /* QName        ::=   (Prefix ':')? LocalPart
+   * Prefix        ::=   NCName
+   * LocalPart    ::=   NCName
    */
   if (!ch.isLetter() && ch != '_')
     return false;

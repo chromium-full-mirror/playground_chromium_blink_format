@@ -114,18 +114,16 @@ class DOMRWBridge : public DOMBridge<DOMObjWrapper, DOMObjImpl> {
                    int attr) {
     /*
     #if DEBUG_BRIDGE > 0
-                            kdDebug(26004) << "DOMRWBridge::put(), " <<
+                kdDebug(26004) << "DOMRWBridge::put(), " <<
     propertyName.qstring()
-                                                       << " Name: " <<
-    classInfo()->className
-                                                       << " Wrapper object: " <<
-    m_wrapper << endl;
+                               << " Name: " << classInfo()->className
+                               << " Wrapper object: " << m_wrapper << endl;
     #endif
 
-                            // Try to see if we know this property (and need to
-    take special action)
-                            if(m_wrapper->put(exec, propertyName, value, attr))
-                                    return;
+                // Try to see if we know this property (and need to take special
+    action)
+                if(m_wrapper->put(exec, propertyName, value, attr))
+                    return;
     */
     // We don't -> set property in ObjectImp.
     KJS::ObjectImp::put(exec, propertyName, value, attr);

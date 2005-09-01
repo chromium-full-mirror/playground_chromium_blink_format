@@ -29,12 +29,12 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegCurvetoCubicAbs::s_hashTable 7
- x		SVGPathSegCurvetoCubicConstants::X		DontDelete
- y		SVGPathSegCurvetoCubicConstants::Y		DontDelete
- x1		SVGPathSegCurvetoCubicConstants::X1		DontDelete
- y1		SVGPathSegCurvetoCubicConstants::Y1		DontDelete
- x2		SVGPathSegCurvetoCubicConstants::X2		DontDelete
- y2		SVGPathSegCurvetoCubicConstants::Y2		DontDelete
+ x        SVGPathSegCurvetoCubicConstants::X        DontDelete
+ y        SVGPathSegCurvetoCubicConstants::Y        DontDelete
+ x1        SVGPathSegCurvetoCubicConstants::X1        DontDelete
+ y1        SVGPathSegCurvetoCubicConstants::Y1        DontDelete
+ x2        SVGPathSegCurvetoCubicConstants::X2        DontDelete
+ y2        SVGPathSegCurvetoCubicConstants::Y2        DontDelete
 @end
 */
 
@@ -203,12 +203,12 @@ float SVGPathSegCurvetoCubicAbs::y2() const {
 
 /*
 @begin SVGPathSegCurvetoCubicRel::s_hashTable 7
- x		SVGPathSegCurvetoCubicConstants::X		DontDelete
- y		SVGPathSegCurvetoCubicConstants::Y		DontDelete
- x1		SVGPathSegCurvetoCubicConstants::X1		DontDelete
- y1		SVGPathSegCurvetoCubicConstants::Y1		DontDelete
- x2		SVGPathSegCurvetoCubicConstants::X2		DontDelete
- y2		SVGPathSegCurvetoCubicConstants::Y2		DontDelete
+ x        SVGPathSegCurvetoCubicConstants::X        DontDelete
+ y        SVGPathSegCurvetoCubicConstants::Y        DontDelete
+ x1        SVGPathSegCurvetoCubicConstants::X1        DontDelete
+ y1        SVGPathSegCurvetoCubicConstants::Y1        DontDelete
+ x2        SVGPathSegCurvetoCubicConstants::X2        DontDelete
+ y2        SVGPathSegCurvetoCubicConstants::Y2        DontDelete
 @end
 */
 

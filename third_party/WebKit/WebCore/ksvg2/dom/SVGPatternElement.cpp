@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,19 +42,16 @@ using namespace KSVG;
 
 /*
 @begin SVGPatternElement::s_hashTable 9
- patternUnits			SVGPatternElementConstants::PatternUnits
+ patternUnits            SVGPatternElementConstants::PatternUnits
 DontDelete|ReadOnly
- patternContentUnits	SVGPatternElementConstants::PatternContentUnits
+ patternContentUnits    SVGPatternElementConstants::PatternContentUnits
 DontDelete|ReadOnly
- patternTransform		SVGPatternElementConstants::PatternTransform
+ patternTransform        SVGPatternElementConstants::PatternTransform
 DontDelete|ReadOnly
- x						SVGPatternElementConstants::X
-DontDelete|ReadOnly
- y						SVGPatternElementConstants::Y
-DontDelete|ReadOnly
- width					SVGPatternElementConstants::Width
-DontDelete|ReadOnly
- height					SVGPatternElementConstants::Height
+ x                        SVGPatternElementConstants::X DontDelete|ReadOnly
+ y                        SVGPatternElementConstants::Y DontDelete|ReadOnly
+ width                    SVGPatternElementConstants::Width DontDelete|ReadOnly
+ height                    SVGPatternElementConstants::Height
 DontDelete|ReadOnly
 @end
 */

@@ -39,12 +39,11 @@ using namespace KSVG;
 
 /*
 @begin SVGPoint::s_hashTable 3
- x	SVGPointConstants::X	DontDelete
- y	SVGPointConstants::Y	DontDelete
+ x    SVGPointConstants::X    DontDelete
+ y    SVGPointConstants::Y    DontDelete
 @end
 @begin SVGPointProto::s_hashTable 3
- matrixTransform	SVGPointConstants::MatrixTransform
-DontDelete|Function 1
+ matrixTransform    SVGPointConstants::MatrixTransform    DontDelete|Function 1
 @end
 */
 

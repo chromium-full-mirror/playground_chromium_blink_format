@@ -39,30 +39,23 @@ using namespace KSVG;
 
 /*
 @begin SVGNumberList::s_hashTable 3
- numberOfItems
-SVGNumberListConstants::NumberOfItems DontDelete|ReadOnly
+ numberOfItems                    SVGNumberListConstants::NumberOfItems
+DontDelete|ReadOnly
 @end
 @begin SVGNumberListProto::s_hashTable 9
- clear
-SVGNumberListConstants::Clear
+ clear                            SVGNumberListConstants::Clear
 DontDelete|Function 0
- initialize
-SVGNumberListConstants::Initialize
+ initialize                        SVGNumberListConstants::Initialize
 DontDelete|Function 1
- getItem
-SVGNumberListConstants::GetItem
+ getItem                        SVGNumberListConstants::GetItem
 DontDelete|Function 1
- insertItemBefore
-SVGNumberListConstants::InsertItemBefore
+ insertItemBefore                SVGNumberListConstants::InsertItemBefore
 DontDelete|Function 2
- replaceItem
-SVGNumberListConstants::ReplaceItem
+ replaceItem                    SVGNumberListConstants::ReplaceItem
 DontDelete|Function 2
- removeItem
-SVGNumberListConstants::RemoveItem
+ removeItem                        SVGNumberListConstants::RemoveItem
 DontDelete|Function 1
- appendItem
-SVGNumberListConstants::AppendItem
+ appendItem                        SVGNumberListConstants::AppendItem
 DontDelete|Function 1
 @end
 */

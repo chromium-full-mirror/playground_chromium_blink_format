@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,8 +36,7 @@ using namespace KSVG;
 
 /*
 @begin SVGFEMergeElement::s_hashTable 5
- dummy		SVGFEMergeElementConstants::Dummy
-DontDelete|ReadOnly
+ dummy        SVGFEMergeElementConstants::Dummy        DontDelete|ReadOnly
 @end
 */
 

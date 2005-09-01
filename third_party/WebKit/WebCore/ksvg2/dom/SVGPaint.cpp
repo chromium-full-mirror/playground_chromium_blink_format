@@ -35,11 +35,11 @@ using namespace KSVG;
 
 /*
 @begin SVGPaint::s_hashTable 3
- paintType	SVGPaintConstants::PaintType	DontDelete|ReadOnly
+ paintType    SVGPaintConstants::PaintType    DontDelete|ReadOnly
 @end
 @begin SVGPaintProto::s_hashTable 5
- setUri		SVGPaintConstants::SetUri		DontDelete|Function 1
- setPaint	SVGPaintConstants::SetPaint		DontDelete|Function 4
+ setUri        SVGPaintConstants::SetUri        DontDelete|Function 1
+ setPaint    SVGPaintConstants::SetPaint        DontDelete|Function 4
 @end
 */
 

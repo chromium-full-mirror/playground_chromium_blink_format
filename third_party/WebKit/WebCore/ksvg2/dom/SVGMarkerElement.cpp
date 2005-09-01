@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,21 +35,18 @@ using namespace KSVG;
 
 /*
 @begin SVGMarkerElement::s_hashTable 9
- refX			SVGMarkerElementConstants::RefX
-DontDelete|ReadOnly
- refY			SVGMarkerElementConstants::RefY
-DontDelete|ReadOnly
- markerUnits	SVGMarkerElementConstants::MarkerUnits	DontDelete|ReadOnly
- markerWidth	SVGMarkerElementConstants::MarkerWidth	DontDelete|ReadOnly
- markerHeight	SVGMarkerElementConstants::MarkerHeight	DontDelete|ReadOnly
- orientType		SVGMarkerElementConstants::OrientType
-DontDelete|ReadOnly
- orientAngle	SVGMarkerElementConstants::OrientAngle	DontDelete|ReadOnly
+ refX            SVGMarkerElementConstants::RefX            DontDelete|ReadOnly
+ refY            SVGMarkerElementConstants::RefY            DontDelete|ReadOnly
+ markerUnits    SVGMarkerElementConstants::MarkerUnits    DontDelete|ReadOnly
+ markerWidth    SVGMarkerElementConstants::MarkerWidth    DontDelete|ReadOnly
+ markerHeight    SVGMarkerElementConstants::MarkerHeight    DontDelete|ReadOnly
+ orientType        SVGMarkerElementConstants::OrientType    DontDelete|ReadOnly
+ orientAngle    SVGMarkerElementConstants::OrientAngle    DontDelete|ReadOnly
 @end
 @begin SVGMarkerElementProto::s_hashTable 3
- setOrientToAuto	SVGMarkerElementConstants::SetOrientToAuto
+ setOrientToAuto    SVGMarkerElementConstants::SetOrientToAuto
 DontDelete|Function 0
- setOrientToAngle	SVGMarkerElementConstants::SetOrientToAngle
+ setOrientToAngle    SVGMarkerElementConstants::SetOrientToAngle
 DontDelete|Function 1
 @end
 */

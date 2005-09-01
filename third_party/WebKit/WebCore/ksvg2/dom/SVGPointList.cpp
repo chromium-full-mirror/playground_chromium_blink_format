@@ -39,24 +39,17 @@ using namespace KSVG;
 
 /*
 @begin SVGPointList::s_hashTable 3
- numberOfItems		SVGPointListConstants::NumberOfItems
-DontDelete|ReadOnly
+ numberOfItems        SVGPointListConstants::NumberOfItems DontDelete|ReadOnly
 @end
 @begin SVGPointListProto::s_hashTable 9
- clear				SVGPointListConstants::Clear
-DontDelete|Function 0
- initialize			SVGPointListConstants::Initialize
-DontDelete|Function 1
- getItem			SVGPointListConstants::GetItem
-DontDelete|Function 1
- insertItemBefore	SVGPointListConstants::InsertItemBefore
+ clear                SVGPointListConstants::Clear DontDelete|Function 0
+ initialize            SVGPointListConstants::Initialize DontDelete|Function 1
+ getItem            SVGPointListConstants::GetItem DontDelete|Function 1
+ insertItemBefore    SVGPointListConstants::InsertItemBefore
 DontDelete|Function 2
- replaceItem		SVGPointListConstants::ReplaceItem
-DontDelete|Function 2
- removeItem			SVGPointListConstants::RemoveItem
-DontDelete|Function 1
- appendItem			SVGPointListConstants::AppendItem
-DontDelete|Function 1
+ replaceItem        SVGPointListConstants::ReplaceItem DontDelete|Function 2
+ removeItem            SVGPointListConstants::RemoveItem DontDelete|Function 1
+ appendItem            SVGPointListConstants::AppendItem DontDelete|Function 1
 @end
 */
 

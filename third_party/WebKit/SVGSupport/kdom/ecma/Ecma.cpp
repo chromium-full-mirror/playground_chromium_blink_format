@@ -464,8 +464,8 @@ KJS::ValueImp* KDOM::getDOMEvent(KJS::ExecState* exec, EventImpl* e) {
     ret =
         (new MouseEventWrapper(static_cast<MouseEventImpl*>(e)))->bridge(exec);
   /*
-          else if(identifier == TypeKeyboardEvent) // FIXME!
-                  ret = (new KeyboardEventWrapper(static_cast<KeyboardEventImpl
+      else if(identifier == TypeKeyboardEvent) // FIXME!
+          ret = (new KeyboardEventWrapper(static_cast<KeyboardEventImpl
      *>(e)))->bridge(exec);
   */
   else if (identifier == TypeMutationEvent)

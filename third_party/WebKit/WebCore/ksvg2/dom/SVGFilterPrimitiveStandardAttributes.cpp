@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -38,15 +38,15 @@ using namespace KSVG;
 
 /*
 @begin SVGFilterPrimitiveStandardAttributes::s_hashTable 7
- x			SVGFilterPrimitiveStandardAttributesConstants::X
+ x            SVGFilterPrimitiveStandardAttributesConstants::X
 DontDelete|ReadOnly
- y			SVGFilterPrimitiveStandardAttributesConstants::Y
+ y            SVGFilterPrimitiveStandardAttributesConstants::Y
 DontDelete|ReadOnly
- width		SVGFilterPrimitiveStandardAttributesConstants::Width
+ width        SVGFilterPrimitiveStandardAttributesConstants::Width
 DontDelete|ReadOnly
- height		SVGFilterPrimitiveStandardAttributesConstants::Height
+ height        SVGFilterPrimitiveStandardAttributesConstants::Height
 DontDelete|ReadOnly
- result		SVGFilterPrimitiveStandardAttributesConstants::Result
+ result        SVGFilterPrimitiveStandardAttributesConstants::Result
 DontDelete|ReadOnly
 @end
 */

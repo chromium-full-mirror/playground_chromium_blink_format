@@ -40,36 +40,27 @@ using namespace KSVG;
 
 /*
 @begin SVGTransformList::s_hashTable 3
- numberOfItems
-SVGTransformListConstants::NumberOfItems
+ numberOfItems                    SVGTransformListConstants::NumberOfItems
 DontDelete|ReadOnly
 @end
 @begin SVGTransformListProto::s_hashTable 9
- clear
-SVGTransformListConstants::Clear
+ clear                            SVGTransformListConstants::Clear
 DontDelete|Function 0
- initialize
-SVGTransformListConstants::Initialize
+ initialize                        SVGTransformListConstants::Initialize
 DontDelete|Function 1
- getItem
-SVGTransformListConstants::GetItem
+ getItem                        SVGTransformListConstants::GetItem
 DontDelete|Function 1
- insertItemBefore
-SVGTransformListConstants::InsertItemBefore
+ insertItemBefore                SVGTransformListConstants::InsertItemBefore
 DontDelete|Function 2
- replaceItem
-SVGTransformListConstants::ReplaceItem
+ replaceItem                    SVGTransformListConstants::ReplaceItem
 DontDelete|Function 2
- removeItem
-SVGTransformListConstants::RemoveItem
+ removeItem                        SVGTransformListConstants::RemoveItem
 DontDelete|Function 1
- appendItem
-SVGTransformListConstants::AppendItem
+ appendItem                        SVGTransformListConstants::AppendItem
 DontDelete|Function 1
  createSVGTransformFromMatrix
-SVGTransformListConstants::CreateSVGTransformFromMatrix	DontDelete|Function 1
- consolidate
-SVGTransformListConstants::Consolidate
+SVGTransformListConstants::CreateSVGTransformFromMatrix    DontDelete|Function 1
+ consolidate                    SVGTransformListConstants::Consolidate
 DontDelete|Function 0
 @end
 */

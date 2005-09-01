@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,19 +40,18 @@ using namespace KSVG;
 
 /*
 @begin SVGLocatable::s_hashTable 3
- nearestViewportElement
-SVGLocatableConstants::NearestViewportElement	DontDelete|ReadOnly
- farthestViewportElement	SVGLocatableConstants::FarthestViewportElement
+ nearestViewportElement        SVGLocatableConstants::NearestViewportElement
+DontDelete|ReadOnly
+ farthestViewportElement    SVGLocatableConstants::FarthestViewportElement
 DontDelete|ReadOnly
 @end
 @begin SVGLocatableProto::s_hashTable 5
- getBBox					SVGLocatableConstants::GetBBox
+ getBBox                    SVGLocatableConstants::GetBBox DontDelete|Function 0
+ getCTM                        SVGLocatableConstants::GetCTM
 DontDelete|Function 0
- getCTM						SVGLocatableConstants::GetCTM
+ getScreenCTM                SVGLocatableConstants::GetScreenCTM
 DontDelete|Function 0
- getScreenCTM				SVGLocatableConstants::GetScreenCTM
-DontDelete|Function 0
- getTransformToElement		SVGLocatableConstants::GetTransformToElement
+ getTransformToElement        SVGLocatableConstants::GetTransformToElement
 DontDelete|Function 1
 @end
 */

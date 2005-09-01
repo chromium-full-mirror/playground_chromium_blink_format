@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,10 +36,10 @@ using namespace KSVG;
 
 /*
 @begin SVGLinearGradientElement::s_hashTable 5
- x1	SVGLinearGradientElementConstants::X1	DontDelete|ReadOnly
- y1	SVGLinearGradientElementConstants::Y1	DontDelete|ReadOnly
- x2	SVGLinearGradientElementConstants::X2	DontDelete|ReadOnly
- y2	SVGLinearGradientElementConstants::Y2	DontDelete|ReadOnly
+ x1    SVGLinearGradientElementConstants::X1    DontDelete|ReadOnly
+ y1    SVGLinearGradientElementConstants::Y1    DontDelete|ReadOnly
+ x2    SVGLinearGradientElementConstants::X2    DontDelete|ReadOnly
+ y2    SVGLinearGradientElementConstants::Y2    DontDelete|ReadOnly
 @end
 */
 

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -46,117 +46,80 @@ using namespace KSVG;
 
 /*
 @begin SVGSVGElement::s_hashTable 17
- x
-SVGSVGElementConstants::X
+ x                                SVGSVGElementConstants::X DontDelete|ReadOnly
+ y                                SVGSVGElementConstants::Y DontDelete|ReadOnly
+ width                            SVGSVGElementConstants::Width
 DontDelete|ReadOnly
- y
-SVGSVGElementConstants::Y
+ height                            SVGSVGElementConstants::Height
 DontDelete|ReadOnly
- width
-SVGSVGElementConstants::Width
-DontDelete|ReadOnly
- height
-SVGSVGElementConstants::Height
-DontDelete|ReadOnly
- contentScriptType
-SVGSVGElementConstants::ContentScriptType DontDelete
- contentStyleType
-SVGSVGElementConstants::ContentStyleType DontDelete
- viewport
-SVGSVGElementConstants::Viewport
+ contentScriptType                SVGSVGElementConstants::ContentScriptType
+DontDelete
+ contentStyleType                SVGSVGElementConstants::ContentStyleType
+DontDelete
+ viewport                        SVGSVGElementConstants::Viewport
 DontDelete|ReadOnly
  pixelUnitToMillimeterX
-SVGSVGElementConstants::PixelUnitToMillimeterX
-DontDelete|ReadOnly
+SVGSVGElementConstants::PixelUnitToMillimeterX            DontDelete|ReadOnly
  pixelUnitToMillimeterY
-SVGSVGElementConstants::PixelUnitToMillimeterY
-DontDelete|ReadOnly
+SVGSVGElementConstants::PixelUnitToMillimeterY            DontDelete|ReadOnly
  screenPixelToMillimeterX
-SVGSVGElementConstants::ScreenPixelToMillimeterX
-DontDelete|ReadOnly
+SVGSVGElementConstants::ScreenPixelToMillimeterX        DontDelete|ReadOnly
  screenPixelToMillimeterY
-SVGSVGElementConstants::ScreenPixelToMillimeterY
+SVGSVGElementConstants::ScreenPixelToMillimeterY        DontDelete|ReadOnly
+ useCurrentView                    SVGSVGElementConstants::UseCurrentView
 DontDelete|ReadOnly
- useCurrentView
-SVGSVGElementConstants::UseCurrentView
+ currentView                    SVGSVGElementConstants::CurrentView
 DontDelete|ReadOnly
- currentView
-SVGSVGElementConstants::CurrentView
-DontDelete|ReadOnly
- currentScale
-SVGSVGElementConstants::CurrentScale DontDelete
- currentTranslate
-SVGSVGElementConstants::CurrentTranslate
+ currentScale                    SVGSVGElementConstants::CurrentScale DontDelete
+ currentTranslate                SVGSVGElementConstants::CurrentTranslate
 DontDelete|ReadOnly
 @end
 @begin SVGSVGElementProto::s_hashTable 27
- suspendRedraw
-SVGSVGElementConstants::SuspendRedraw
+ suspendRedraw                    SVGSVGElementConstants::SuspendRedraw
 DontDelete|Function 1
- unsuspendRedraw
-SVGSVGElementConstants::UnsuspendRedraw
+ unsuspendRedraw                SVGSVGElementConstants::UnsuspendRedraw
 DontDelete|Function 1
- unsuspendRedrawAll
-SVGSVGElementConstants::UnsuspendRedrawAll
+ unsuspendRedrawAll                SVGSVGElementConstants::UnsuspendRedrawAll
 DontDelete|Function 0
- forceRedraw
-SVGSVGElementConstants::ForceRedraw
+ forceRedraw                    SVGSVGElementConstants::ForceRedraw
 DontDelete|Function 0
- pauseAnimations
-SVGSVGElementConstants::PauseAnimations
+ pauseAnimations                SVGSVGElementConstants::PauseAnimations
 DontDelete|Function 0
- unpauseAnimations
-SVGSVGElementConstants::UnpauseAnimations
+ unpauseAnimations                SVGSVGElementConstants::UnpauseAnimations
 DontDelete|Function 0
- animationsPaused
-SVGSVGElementConstants::AnimationsPaused
+ animationsPaused                SVGSVGElementConstants::AnimationsPaused
 DontDelete|Function 0
- getCurrentTime
-SVGSVGElementConstants::GetCurrentTime
+ getCurrentTime                    SVGSVGElementConstants::GetCurrentTime
 DontDelete|Function 0
- setCurrentTime
-SVGSVGElementConstants::SetCurrentTime
+ setCurrentTime                    SVGSVGElementConstants::SetCurrentTime
 DontDelete|Function 1
- getIntersectionList
-SVGSVGElementConstants::GetIntersectionList
+ getIntersectionList            SVGSVGElementConstants::GetIntersectionList
 DontDelete|Function 2
- getEnclosureList
-SVGSVGElementConstants::GetEnclosureList
+ getEnclosureList                SVGSVGElementConstants::GetEnclosureList
 DontDelete|Function 2
- checkIntersection
-SVGSVGElementConstants::CheckIntersection
+ checkIntersection                SVGSVGElementConstants::CheckIntersection
 DontDelete|Function 2
- checkEnclosure
-SVGSVGElementConstants::CheckEnclosure
+ checkEnclosure                    SVGSVGElementConstants::CheckEnclosure
 DontDelete|Function 2
- deselectAll
-SVGSVGElementConstants::DeselectAll
+ deselectAll                    SVGSVGElementConstants::DeselectAll
 DontDelete|Function 0
- createSVGNumber
-SVGSVGElementConstants::CreateSVGNumber
+ createSVGNumber                SVGSVGElementConstants::CreateSVGNumber
 DontDelete|Function 0
- createSVGLength
-SVGSVGElementConstants::CreateSVGLength
+ createSVGLength                SVGSVGElementConstants::CreateSVGLength
 DontDelete|Function 0
- createSVGAngle
-SVGSVGElementConstants::CreateSVGAngle
+ createSVGAngle                    SVGSVGElementConstants::CreateSVGAngle
 DontDelete|Function 0
- createSVGPoint
-SVGSVGElementConstants::CreateSVGPoint
+ createSVGPoint                    SVGSVGElementConstants::CreateSVGPoint
 DontDelete|Function 0
- createSVGMatrix
-SVGSVGElementConstants::CreateSVGMatrix
+ createSVGMatrix                SVGSVGElementConstants::CreateSVGMatrix
 DontDelete|Function 0
- createSVGRect
-SVGSVGElementConstants::CreateSVGRect
+ createSVGRect                    SVGSVGElementConstants::CreateSVGRect
 DontDelete|Function 0
- createSVGTransform
-SVGSVGElementConstants::CreateSVGTransform
+ createSVGTransform                SVGSVGElementConstants::CreateSVGTransform
 DontDelete|Function 0
  createSVGTransformFromMatrix
-SVGSVGElementConstants::CreateSVGTransformFromMatrix	DontDelete|Function 1
- getElementById
-SVGSVGElementConstants::GetElementById
+SVGSVGElementConstants::CreateSVGTransformFromMatrix    DontDelete|Function 1
+ getElementById                    SVGSVGElementConstants::GetElementById
 DontDelete|Function 1
 @end
 */
@@ -532,10 +495,10 @@ void SVGSVGElement::setUseCurrentView(bool currentView) {
 /*
 SVGViewSpec SVGSVGElement::currentView() const
 {
-        if(!impl)
-                return SVGViewSpec();
+    if(!impl)
+        return SVGViewSpec();
 
-        return SVGViewSpec(impl->currentView());
+    return SVGViewSpec(impl->currentView());
 }*/
 
 float SVGSVGElement::currentScale() const {

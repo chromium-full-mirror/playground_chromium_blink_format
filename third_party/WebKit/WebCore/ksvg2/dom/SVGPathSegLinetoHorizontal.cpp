@@ -29,7 +29,7 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegLinetoHorizontalAbs::s_hashTable 3
- x		SVGPathSegLinetoHorizontalConstants::X		DontDelete
+ x        SVGPathSegLinetoHorizontalConstants::X        DontDelete
 @end
 */
 
@@ -108,7 +108,7 @@ float SVGPathSegLinetoHorizontalAbs::x() const {
 
 /*
 @begin SVGPathSegLinetoHorizontalRel::s_hashTable 3
- x		SVGPathSegLinetoHorizontalConstants::X		DontDelete
+ x        SVGPathSegLinetoHorizontalConstants::X        DontDelete
 @end
 */
 

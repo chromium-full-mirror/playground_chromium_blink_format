@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -154,12 +154,12 @@ void Font::update(QPaintDeviceMetrics* devMetrics,
  * @param fm metrics of font to be used
  * @param str string
  * @param pos zero-indexed position within @p str upon which all other
- *	indices are based
+ *    indices are based
  * @param wordStart relative index pointing to the position where the word
- *started
+ * started
  * @param wordEnd relative index pointing one position after the word ended
  * @return the width in pixels. May be 0 if @p wordStart and @p wordEnd were
- *	equal.
+ *    equal.
  */
 inline int closeWordAndGetWidth(const QFontMetrics& fm,
                                 const QChar* str,
@@ -177,16 +177,16 @@ inline int closeWordAndGetWidth(const QFontMetrics& fm,
  * @param p painter
  * @param d text direction
  * @param x current x position, will be inc-/decremented correctly according
- *	to text direction
+ *    to text direction
  * @param y baseline of text
  * @param widths list of widths; width of word is expected at position
- *		wordStart
+ *        wordStart
  * @param str string
  * @param pos zero-indexed position within @p str upon which all other
- *	indices are based
+ *    indices are based
  * @param wordStart relative index pointing to the position where the word
- *started,
- *	will be set to wordEnd after function
+ * started,
+ *    will be set to wordEnd after function
  * @param wordEnd relative index pointing one position after the word ended
  */
 inline void closeAndDrawWord(QPainter* p,

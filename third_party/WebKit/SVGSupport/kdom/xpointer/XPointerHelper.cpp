@@ -1,7 +1,7 @@
 /*
  * This file is part of the KDE libraries
  *
- * Copyright (C) 2005 Frans Englich 	<frans.englich@telia.com>
+ * Copyright (C) 2005 Frans Englich     <frans.englich@telia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -89,41 +89,41 @@ DOMString XPointerHelper::DecodeSchemeData(const DOMString& string) {
 #if 0
 DOMString XPointerHelper::createXPointer(const Element& node)
 {
-	if(node == Element::null)
-		throw new DOMExceptionImpl(NOT_FOUND_ERR);
-	   
-	if(node.nodeType() == TEXT_NODE) /* Not supported. */
-		return DOMString();
+    if(node == Element::null)
+        throw new DOMExceptionImpl(NOT_FOUND_ERR);
+       
+    if(node.nodeType() == TEXT_NODE) /* Not supported. */
+        return DOMString();
 
-	QString childSequence;
-	unsigned long count = 0;
+    QString childSequence;
+    unsigned long count = 0;
 
-	/* Do the moon walk. */
-	Node child = node;
-	do
-	{
-		do
-		{
-			if(child.nodeType() == ELEMENT_NODE) /* Includes ourselves */
-				count++;
+    /* Do the moon walk. */
+    Node child = node;
+    do
+    {
+        do
+        {
+            if(child.nodeType() == ELEMENT_NODE) /* Includes ourselves */
+                count++;
 
-			child = child.previousSibling();
-		}
-		while(child != Node::null);
+            child = child.previousSibling();
+        }
+        while(child != Node::null);
 
-		Q_ASSERT(count != 0);
+        Q_ASSERT(count != 0);
 
-		childSequence.prepend('/' + QString::number(count));
-		count = 0; /* Reset for the next level. */
-		child = child.parentNode();
-	}
-	while(child.nodeType() != DOCUMENT_NODE);
+        childSequence.prepend('/' + QString::number(count));
+        count = 0; /* Reset for the next level. */
+        child = child.parentNode();
+    }
+    while(child.nodeType() != DOCUMENT_NODE);
 
-	Q_ASSERT(!childSequence.contains("//"));
-	Q_ASSERT(!childSequence.endsWith("/"));
-	Q_ASSERT(childSequence.startsWith("/"));
+    Q_ASSERT(!childSequence.contains("//"));
+    Q_ASSERT(!childSequence.endsWith("/"));
+    Q_ASSERT(childSequence.startsWith("/"));
 
-	return DOMString(QString("element(") + childSequence + QString(")"));
+    return DOMString(QString("element(") + childSequence + QString(")"));
 }
 #endif
 

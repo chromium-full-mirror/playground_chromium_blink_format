@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -112,38 +112,38 @@ void SVGElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
   switch (id) {
     case ATTR_ONLOAD: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("load"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("load"), value);
       break;
     }
     case ATTR_ONUNLOAD: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("unload"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("unload"), value);
       break;
     }
     case ATTR_ONABORT: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("abort"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("abort"), value);
       break;
     }
     case ATTR_ONERROR: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("error"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("error"), value);
       break;
     }
     case ATTR_ONRESIZE: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("resize"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("resize"), value);
       break;
     }
     case ATTR_ONSCROLL: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("scroll"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("scroll"), value);
       break;
     }
     case ATTR_ONZOOM: {
-      //			addSVGEventListener(doc->ecmaEngine(),
-      //KDOM::DOMString("zoom"), value);
+      //            addSVGEventListener(doc->ecmaEngine(),
+      //            KDOM::DOMString("zoom"), value);
       break;
     }
     case ATTR_ID: {
@@ -163,15 +163,15 @@ void SVGElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
 #if 0
 void SVGElementImpl::addSVGEventListener(KDOM::Ecma *ecmaEngine, const KDOM::DOMString &type, const KDOM::DOMString &value)
 {
-	if(!ecmaEngine)
-		return;
-	// FIXME
-	KDOM::EventListenerImpl *listener = 0;//ecmaEngine->createEventListener(type, value);
-	if(listener)
-	{
-		listener->ref();
-		addEventListener(type.handle(), listener, false);
-	}
+    if(!ecmaEngine)
+        return;
+    // FIXME
+    KDOM::EventListenerImpl *listener = 0;//ecmaEngine->createEventListener(type, value);
+    if(listener)
+    {
+        listener->ref();
+        addEventListener(type.handle(), listener, false);
+    }
 }
 #endif
 void SVGElementImpl::createStyleDeclaration() const {

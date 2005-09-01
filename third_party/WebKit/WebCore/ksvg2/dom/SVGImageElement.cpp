@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,15 +42,11 @@ using namespace KSVG;
 
 /*
 @begin SVGImageElement::s_hashTable 7
- x					SVGImageElementConstants::X
-DontDelete|ReadOnly
- y					SVGImageElementConstants::Y
-DontDelete|ReadOnly
- width				SVGImageElementConstants::Width
-DontDelete|ReadOnly
- height				SVGImageElementConstants::Height
-DontDelete|ReadOnly
- preserveAspectRatio	SVGImageElementConstants::PreserveAspectRatio
+ x                    SVGImageElementConstants::X DontDelete|ReadOnly
+ y                    SVGImageElementConstants::Y DontDelete|ReadOnly
+ width                SVGImageElementConstants::Width DontDelete|ReadOnly
+ height                SVGImageElementConstants::Height DontDelete|ReadOnly
+ preserveAspectRatio    SVGImageElementConstants::PreserveAspectRatio
 DontDelete|ReadOnly
 @end
 */

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -496,10 +496,10 @@ void ElementImpl::parseAttribute(AttributeImpl* attr) {
     case ATTR_ONMOUSEUP:
     case ATTR_ONKEYDOWN:
     case ATTR_ONKEYUP: {
-      //			Ecma *ecmaEngine = (ownerDocument() ?
-      //ownerDocument()->ecmaEngine() : 0);
-      //			addDOMEventListener(ecmaEngine,
-      //DOMImplementationImpl::self()->idToType(id - 2), value);
+      //            Ecma *ecmaEngine = (ownerDocument() ?
+      //            ownerDocument()->ecmaEngine() : 0);
+      //            addDOMEventListener(ecmaEngine,
+      //            DOMImplementationImpl::self()->idToType(id - 2), value);
       break;
     }
     default:
@@ -533,16 +533,15 @@ void ElementImpl::createStyleDeclaration() const {
 void ElementImpl::addDOMEventListener(Ecma *ecmaEngine, DOMStringImpl *type,
 DOMStringImpl *value)
 {
-        if(!ecmaEngine)
-                return;
+    if(!ecmaEngine)
+        return;
 
-        EventListenerImpl *listener = ecmaEngine->createEventListener(type,
-value);
-        if(listener)
-        {
-                listener->ref();
-                addEventListener(type, listener, false);
-        }
+    EventListenerImpl *listener = ecmaEngine->createEventListener(type, value);
+    if(listener)
+    {
+        listener->ref();
+        addEventListener(type, listener, false);
+    }
 }
 */
 bool ElementImpl::hasListenerType(int eventId) const {

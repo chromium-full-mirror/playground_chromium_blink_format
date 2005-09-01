@@ -1,25 +1,23 @@
 /*
-        Copyright (C) 2002 David Faure <faure@kde.org>
-                                  2004, 2005 Nikolas Zimmermann
-   <wildfox@kde.org>
+    Copyright (C) 2002 David Faure <faure@kde.org>
+                  2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
 
-        This file is part of the KDE project
+    This file is part of the KDE project
 
-        This library is free software; you can redistribute it and/or
-        modify it under the terms of the GNU Library General Public
-        License as published by the Free Software Foundation; either
-        version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-        This library is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-        Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-        You should have received a copy of the GNU Library General Public
-   License
-        along with this library; see the file COPYING.LIB.  If not, write to
-        the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-        Boston, MA 02111-1307, USA.
+    You should have received a copy of the GNU Library General Public License
+    along with this library; see the file COPYING.LIB.  If not, write to
+    the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+    Boston, MA 02111-1307, USA.
 */
 
 #include <kdom/impl/NodeImpl.h>
@@ -36,21 +34,20 @@ using namespace KSVG;
 /*
 @begin GlobalObject::s_hashTable 13
 # Constructors
- SVGException	GlobalObjectConstants::SVGException DontDelete|Function 1
- SVGLength		GlobalObjectConstants::SVGLength DontDelete|Function 1
- SVGAngle		GlobalObjectConstants::SVGAngle DontDelete|Function 1
- SVGColor		GlobalObjectConstants::SVGColor DontDelete|Function 1
- SVGUnitTypes	GlobalObjectConstants::SVGUnitTypes DontDelete|Function 1
- SVGTransform	GlobalObjectConstants::SVGTransform DontDelete|Function 1
- SVGPaint		GlobalObjectConstants::SVGPaint DontDelete|Function 1
- SVGGradientElement		GlobalObjectConstants::SVGGradientElement
+ SVGException    GlobalObjectConstants::SVGException DontDelete|Function 1
+ SVGLength        GlobalObjectConstants::SVGLength DontDelete|Function 1
+ SVGAngle        GlobalObjectConstants::SVGAngle DontDelete|Function 1
+ SVGColor        GlobalObjectConstants::SVGColor DontDelete|Function 1
+ SVGUnitTypes    GlobalObjectConstants::SVGUnitTypes DontDelete|Function 1
+ SVGTransform    GlobalObjectConstants::SVGTransform DontDelete|Function 1
+ SVGPaint        GlobalObjectConstants::SVGPaint DontDelete|Function 1
+ SVGGradientElement        GlobalObjectConstants::SVGGradientElement
 DontDelete|Function 1
- SVGPreserveAspectRatio
-GlobalObjectConstants::SVGPreserveAspectRatio DontDelete|Function 1
- SVGZoomAndPan		GlobalObjectConstants::SVGZoomAndPan
+ SVGPreserveAspectRatio        GlobalObjectConstants::SVGPreserveAspectRatio
 DontDelete|Function 1
- SVGMarkerElement	GlobalObjectConstants::SVGMarkerElement
-DontDelete|Function 1
+ SVGZoomAndPan        GlobalObjectConstants::SVGZoomAndPan DontDelete|Function 1
+ SVGMarkerElement    GlobalObjectConstants::SVGMarkerElement DontDelete|Function
+1
 @end
 */
 

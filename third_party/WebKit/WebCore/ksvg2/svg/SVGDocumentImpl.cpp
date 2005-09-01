@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -481,13 +481,13 @@ KSVGView* SVGDocumentImpl::svgView() const {
 #if 0
 KDOM::Ecma *SVGDocumentImpl::ecmaEngine() const
 {
-	if(m_ecmaEngine) // No need to initialize anymore...
-		return m_ecmaEngine;
+    if(m_ecmaEngine) // No need to initialize anymore...
+        return m_ecmaEngine;
 
-	m_ecmaEngine = new Ecma(const_cast<SVGDocumentImpl *>(this));
-	m_ecmaEngine->setup(implementation()->cdfInterface());
+    m_ecmaEngine = new Ecma(const_cast<SVGDocumentImpl *>(this));
+    m_ecmaEngine->setup(implementation()->cdfInterface());
 
-	return m_ecmaEngine;
+    return m_ecmaEngine;
 }
 #endif
 

@@ -100,7 +100,7 @@ int CDFInterface::getAttrID(const char* attrStr, int len) const {
 #if 0
 KDOM::GlobalObject *CDFInterface::globalObject(KDOM::DocumentImpl *doc) const
 {
-	return new KSVG::GlobalObject(doc);
+    return new KSVG::GlobalObject(doc);
 }
 #endif
 // vim:ts=4:noet

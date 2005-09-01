@@ -38,7 +38,7 @@ using namespace KSVG;
 
 /*
 @begin SVGNumber::s_hashTable 3
- value	SVGNumberConstants::Value	DontDelete
+ value    SVGNumberConstants::Value    DontDelete
 @end
 */
 

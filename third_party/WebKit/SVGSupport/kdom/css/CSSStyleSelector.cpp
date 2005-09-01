@@ -249,19 +249,19 @@ void CSSStyleSelector::computeFontSizesFor(
       3. / 4., 5. / 6., 8. / 9., 1., 6. / 5., 3. / 2., 2., 3., 4.};
   float mediumFontSize, minFontSize, factor;
 
-  //	if(!khtml::printpainter)
+  //    if(!khtml::printpainter)
   {
     scale *= zoomFactor / 100.0;
     mediumFontSize = settings->mediumFontSize() * toPix;
     minFontSize = settings->minFontSize() * toPix;
   }
   /* FIXME
-          else
-          {
-                  // ## depending on something / configurable ?
-                  mediumFontSize = 12;
-                  minFontSize = 6;
-          }
+      else
+      {
+          // ## depending on something / configurable ?
+          mediumFontSize = 12;
+          minFontSize = 6;
+      }
   */
   const float* factors =
       scale * mediumFontSize >= 12.5 ? fontFactors : smallFontFactors;
@@ -643,8 +643,8 @@ static void checkPseudoState(const CSSStyleSelector::Encodedurl& encodedurl,
   // FIXME: link visited logic!
 
   bool contains = false;  // KHTMLFactory::vLinks()->contains(u);
-                          //	if(!contains && u.contains('/') == 2)
-  //		contains = KHTMLFactory::vLinks()->contains(u+'/');
+                          //    if(!contains && u.contains('/') == 2)
+  //        contains = KHTMLFactory::vLinks()->contains(u+'/');
   pseudoState = contains ? PseudoVisited : PseudoLink;
 }
 
@@ -841,10 +841,10 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
 
     /* FIXME: to khtml2  ?
     if(localName <= ID_LAST_TAG && e->isHTMLElement())
-            ns = xhtmlNamespace; // FIXME: Really want to move away from this
+        ns = xhtmlNamespace; // FIXME: Really want to move away from this
     complicated hackery and just
-                                                     //        switch tags and
-    attr names over to AtomicStrings.
+                             //        switch tags and attr names over to
+    AtomicStrings.
     */
 
     if ((selLocalName != anyLocalName && localName != selLocalName) ||
@@ -862,7 +862,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
       case CSSSelector::Exact: {
         // FIXME: This would need to be overridden by khtml2!
         /* attribute values are case insensitive in all HTML modes,
-                even in the strict ones */
+            even in the strict ones */
         // if(e->ownerDocument()->htmlMode() != DocumentImpl::XHtml)
         //{
         if (strcasecmp(selValue, value))
@@ -870,8 +870,8 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
         //}
         // else
         //{
-        //	if(strcmp(selValue, value))
-        //		return false;
+        //    if(strcmp(selValue, value))
+        //        return false;
         //}
         break;
       }
@@ -1233,10 +1233,10 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
           // FIXME: hover logic
           /*if(e->renderer())
           {
-                  if(element != e)
-                          e->renderer()->style()->setAffectedByHoverRules(true);
-                  if(e->renderer()->mouseInside())
-                          return true;
+              if(element != e)
+                  e->renderer()->style()->setAffectedByHoverRules(true);
+              if(e->renderer()->mouseInside())
+                  return true;
           }*/
         }
         break;
@@ -1257,9 +1257,9 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
 
           // FIXME: active logic
           /*else if (e->renderer())
-                  e->renderer()->style()->setAffectedByActiveRules(true);
-                  if (e->active())
-                          return true;
+              e->renderer()->style()->setAffectedByActiveRules(true);
+              if (e->active())
+                  return true;
           */
         }
         break;
@@ -1294,23 +1294,23 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
       /* FIXME: This has to be handled in khtml2
       case CSSSelector::PseudoEnabled:
       {
-              if(e->isGenericFormElement())
-              {
-                      HTMLGenericFormElementImpl *form;
-                      form = static_cast<HTMLGenericFormElementImpl*>(e);
-                      return !form->disabled();
-              }
-              break;
+          if(e->isGenericFormElement())
+          {
+              HTMLGenericFormElementImpl *form;
+              form = static_cast<HTMLGenericFormElementImpl*>(e);
+              return !form->disabled();
+          }
+          break;
       }
       case CSSSelector::PseudoDisabled:
       {
-              if(e->isGenericFormElement())
-              {
-                      HTMLGenericFormElementImpl *form;
-                      form = static_cast<HTMLGenericFormElementImpl*>(e);
-                      return form->disabled();
-              }
-              break;
+          if(e->isGenericFormElement())
+          {
+              HTMLGenericFormElementImpl *form;
+              form = static_cast<HTMLGenericFormElementImpl*>(e);
+              return form->disabled();
+          }
+          break;
       }
       */
       case CSSSelector::PseudoContains: {
@@ -1840,8 +1840,8 @@ QColor CSSStyleSelector::colorForCSSValue(int css_value) {
 }
 
 void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
-  //	kdDebug() << "[CSSStyleSelector::applyRule] Applying property " << id <<
-  //" value \"" << value << "\"" << endl;
+  //    kdDebug() << "[CSSStyleSelector::applyRule] Applying property " << id <<
+  //    " value \"" << value << "\"" << endl;
 
   CSSPrimitiveValueImpl* primitiveValue = 0;
   if (value->isPrimitiveValue())
@@ -1873,7 +1873,7 @@ void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
 
           /* FIXME move to khtml2
           if(style->backgroundImage())
-                  view->useSlowRepaints();
+              view->useSlowRepaints();
           */
 
           break;
@@ -3353,10 +3353,10 @@ void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
       } else if (primitiveValue->getIdent() != CSS_VAL_AUTO)
         break;
 
-      // 	qDebug("setting clip top to %d", top.value);
-      // 	qDebug("setting clip right to %d", right.value);
-      // 	qDebug("setting clip bottom to %d", bottom.value);
-      // 	qDebug("setting clip left to %d", left.value);
+      //     qDebug("setting clip top to %d", top.value);
+      //     qDebug("setting clip right to %d", right.value);
+      //     qDebug("setting clip bottom to %d", bottom.value);
+      //     qDebug("setting clip left to %d", left.value);
       style->setClip(top, right, bottom, left);
       style->setHasClip(hasClip);
 

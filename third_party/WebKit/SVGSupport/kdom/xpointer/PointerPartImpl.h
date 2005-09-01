@@ -1,7 +1,7 @@
 /*
  * This file is part of the KDE libraries
  *
- * Copyright (C) 2005 Frans Englich 	<frans.englich@telia.com>
+ * Copyright (C) 2005 Frans Englich     <frans.englich@telia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -53,20 +53,20 @@ class XPointerResultImpl;
 class PointerPartImpl : public Shared {
  public:
   /**
-   *
-   * Constructs a PointerPartImpl instance.
-   *
-   * This constructor should throw INVALID_EXPRESSION_ERR if the scheme data
-   * is syntactically invalid or contains any other error which is considered
-   * a static error.
-   *
-   * @note the @p schemeData has been decoded from any encoding such as XPointer
-   * escaping
-   * and is a plain unicode string.
-   *
-   * @note the arguments in the constructor must be passed to the base class,
-   * PointerPartImpl.
-   */
+  *
+  * Constructs a PointerPartImpl instance.
+  *
+  * This constructor should throw INVALID_EXPRESSION_ERR if the scheme data
+  * is syntactically invalid or contains any other error which is considered
+  * a static error.
+  *
+  * @note the @p schemeData has been decoded from any encoding such as XPointer
+  * escaping
+  * and is a plain unicode string.
+  *
+  * @note the arguments in the constructor must be passed to the base class,
+  * PointerPartImpl.
+  */
   PointerPartImpl(DOMStringImpl* name, DOMStringImpl* schemeData, NBCImpl* nbc);
   virtual ~PointerPartImpl();
 

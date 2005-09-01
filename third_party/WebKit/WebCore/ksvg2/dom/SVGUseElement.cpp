@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -41,18 +41,14 @@ using namespace KSVG;
 
 /*
 @begin SVGUseElement::s_hashTable 7
- x					SVGUseElementConstants::X
-DontDelete|ReadOnly
- y					SVGUseElementConstants::Y
-DontDelete|ReadOnly
- width				SVGUseElementConstants::Width
-DontDelete|ReadOnly
- height				SVGUseElementConstants::Height
-DontDelete|ReadOnly
+ x                    SVGUseElementConstants::X DontDelete|ReadOnly
+ y                    SVGUseElementConstants::Y DontDelete|ReadOnly
+ width                SVGUseElementConstants::Width DontDelete|ReadOnly
+ height                SVGUseElementConstants::Height DontDelete|ReadOnly
 @end
 */
 
-// TODO: instanceRoot		SVGUseElementConstants::InstanceRoot
+// TODO: instanceRoot        SVGUseElementConstants::InstanceRoot
 // DontDelete|ReadOnly
 
 ValueImp* SVGUseElement::getValueProperty(ExecState* exec, int token) const {
@@ -186,18 +182,18 @@ SVGAnimatedLength SVGUseElement::height() const {
 /*
 SVGElementInstance SVGUseElement::instanceRoot() const
 {
-        if(!d)
-                return SVGElementInstance::null;
+    if(!d)
+        return SVGElementInstance::null;
 
-        return SVGElementInstance(impl->instanceRoot());
+    return SVGElementInstance(impl->instanceRoot());
 }
 
 SVGElementInstance SVGUseElement::animatedInstanceRoot() const
 {
-        if(!d)
-                return SVGElementInstance::null;
+    if(!d)
+        return SVGElementInstance::null;
 
-        return SVGElementInstance(impl->animatedInstanceRoot());
+    return SVGElementInstance(impl->animatedInstanceRoot());
 }*/
 
 // vim:ts=4:noet

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -40,15 +40,14 @@ using namespace KSVG;
 
 /*
 @begin SVGFEGaussianBlurElement::s_hashTable 5
- in1			SVGFEGaussianBlurElementConstants::In1
+ in1            SVGFEGaussianBlurElementConstants::In1 DontDelete|ReadOnly
+ stdDeviationX    SVGFEGaussianBlurElementConstants::StdDeviationX
 DontDelete|ReadOnly
- stdDeviationX	SVGFEGaussianBlurElementConstants::StdDeviationX
-DontDelete|ReadOnly
- stdDeviationY	SVGFEGaussianBlurElementConstants::StdDeviationY
+ stdDeviationY    SVGFEGaussianBlurElementConstants::StdDeviationY
 DontDelete|ReadOnly
 @end
 @begin SVGFEGaussianBlurElementProto::s_hashTable 3
- setStdDeviation	SVGFEGaussianBlurElementConstants::SetStdDeviation
+ setStdDeviation    SVGFEGaussianBlurElementConstants::SetStdDeviation
 DontDelete|Function 2
 @end
 */

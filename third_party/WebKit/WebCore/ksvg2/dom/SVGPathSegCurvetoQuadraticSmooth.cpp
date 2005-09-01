@@ -29,8 +29,8 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegCurvetoQuadraticSmoothAbs::s_hashTable 3
- x	SVGPathSegCurvetoQuadraticSmoothConstants::X		DontDelete
- y	SVGPathSegCurvetoQuadraticSmoothConstants::Y		DontDelete
+ x    SVGPathSegCurvetoQuadraticSmoothConstants::X        DontDelete
+ y    SVGPathSegCurvetoQuadraticSmoothConstants::Y        DontDelete
 @end
 */
 
@@ -129,8 +129,8 @@ float SVGPathSegCurvetoQuadraticSmoothAbs::y() const {
 
 /*
 @begin SVGPathSegCurvetoQuadraticSmoothRel::s_hashTable 3
- x	SVGPathSegCurvetoQuadraticSmoothConstants::X		DontDelete
- y	SVGPathSegCurvetoQuadraticSmoothConstants::Y		DontDelete
+ x    SVGPathSegCurvetoQuadraticSmoothConstants::X        DontDelete
+ y    SVGPathSegCurvetoQuadraticSmoothConstants::Y        DontDelete
 @end
 */
 

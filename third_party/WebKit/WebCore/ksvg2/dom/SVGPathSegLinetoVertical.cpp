@@ -29,7 +29,7 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegLinetoVerticalAbs::s_hashTable 3
- y		SVGPathSegLinetoVerticalConstants::Y		DontDelete
+ y        SVGPathSegLinetoVerticalConstants::Y        DontDelete
 @end
 */
 
@@ -108,7 +108,7 @@ float SVGPathSegLinetoVerticalAbs::y() const {
 
 /*
 @begin SVGPathSegLinetoVerticalRel::s_hashTable 3
- y		SVGPathSegLinetoVerticalConstants::Y		DontDelete
+ y        SVGPathSegLinetoVerticalConstants::Y        DontDelete
 @end
 */
 

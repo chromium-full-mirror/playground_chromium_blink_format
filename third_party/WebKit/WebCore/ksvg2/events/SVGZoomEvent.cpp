@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -35,16 +35,12 @@ using namespace KSVG;
 
 /*
 @begin SVGZoomEvent::s_hashTable 7
- zoomRectScreen		SVGZoomEventConstants::ZoomRectScreen
+ zoomRectScreen        SVGZoomEventConstants::ZoomRectScreen DontDelete|ReadOnly
+ previousScale        SVGZoomEventConstants::PreviousScale DontDelete|ReadOnly
+ previousTranslate    SVGZoomEventConstants::PreviousTranslate
 DontDelete|ReadOnly
- previousScale		SVGZoomEventConstants::PreviousScale
-DontDelete|ReadOnly
- previousTranslate	SVGZoomEventConstants::PreviousTranslate
-DontDelete|ReadOnly
- newScale			SVGZoomEventConstants::NewScale
-DontDelete|ReadOnly
- newTranslate		SVGZoomEventConstants::NewTranslate
-DontDelete|ReadOnly
+ newScale            SVGZoomEventConstants::NewScale DontDelete|ReadOnly
+ newTranslate        SVGZoomEventConstants::NewTranslate DontDelete|ReadOnly
 @end
 */
 

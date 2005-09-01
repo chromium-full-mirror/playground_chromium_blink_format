@@ -1,7 +1,7 @@
 /*
  * This file is part of the KDE libraries
  *
- * Copyright (C) 2005 Frans Englich 	<frans.englich@telia.com>
+ * Copyright (C) 2005 Frans Englich     <frans.englich@telia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -36,13 +36,13 @@ XPath1SchemeImpl::XPath1SchemeImpl(DOMStringImpl* schemeData, NBCImpl* nbc)
                       schemeData,
                       nbc)  //, m_expr(0)
 {
-  //	if(m_expr)
-  //		m_expr->ref();
+  //    if(m_expr)
+  //        m_expr->ref();
 }
 
 XPath1SchemeImpl::~XPath1SchemeImpl() {
-  //	if(m_expr)
-  //		m_expr->deref();
+  //    if(m_expr)
+  //        m_expr->deref();
 }
 
 XPointerResultImpl* XPath1SchemeImpl::evaluate(NodeImpl*) const {

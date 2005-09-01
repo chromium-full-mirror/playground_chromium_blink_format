@@ -29,8 +29,8 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegMovetoAbs::s_hashTable 3
- x		SVGPathSegMovetoConstants::X		DontDelete
- y		SVGPathSegMovetoConstants::Y		DontDelete
+ x        SVGPathSegMovetoConstants::X        DontDelete
+ y        SVGPathSegMovetoConstants::Y        DontDelete
 @end
 */
 
@@ -123,8 +123,8 @@ float SVGPathSegMovetoAbs::y() const {
 
 /*
 @begin SVGPathSegMovetoRel::s_hashTable 3
- x		SVGPathSegMovetoConstants::X		DontDelete
- y		SVGPathSegMovetoConstants::Y		DontDelete
+ x        SVGPathSegMovetoConstants::X        DontDelete
+ y        SVGPathSegMovetoConstants::Y        DontDelete
 @end
 */
 

@@ -647,8 +647,7 @@ void NodeBaseImpl::checkAddChild(NodeImpl* current, NodeImpl* newChild) {
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 
   // WRONG_DOCUMENT_ERR: Raised if newChild was created from a different
-  //					   document than the one that created this
-  //node.
+  //                       document than the one that created this node.
   // We assume that if newChild is a DocumentFragment, all children are created
   // from the same document
   // as the fragment itself (otherwise they could not have been added as
@@ -663,8 +662,8 @@ void NodeBaseImpl::checkAddChild(NodeImpl* current, NodeImpl* newChild) {
 
   // HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not allow
   // children of the type
-  //						  of the newChild node, or if the node to append is
-  //one of this node's ancestors.
+  //                          of the newChild node, or if the node to append is
+  //                          one of this node's ancestors.
   // check for ancestor/same node
   if (isAncestor(current, newChild))
     throw new DOMExceptionImpl(HIERARCHY_REQUEST_ERR);

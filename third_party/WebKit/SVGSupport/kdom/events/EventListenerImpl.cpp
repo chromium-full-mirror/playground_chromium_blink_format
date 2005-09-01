@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -42,57 +42,55 @@ EventListenerImpl::~EventListenerImpl() {
     m_internalType->deref();
 
   /*
-          if(m_doc && m_doc->ecmaEngine() && m_ecmaEventListener)
-                  m_doc->ecmaEngine()->removeEventListener(static_cast<KJS::ObjectImp
+      if(m_doc && m_doc->ecmaEngine() && m_ecmaEventListener)
+          m_doc->ecmaEngine()->removeEventListener(static_cast<KJS::ObjectImp
      *>(m_compareListener.imp()));
   */
 }
 
 void EventListenerImpl::handleEvent(EventImpl* evt) {
   /*
-          if(!evt)
-                  return;
+      if(!evt)
+          return;
 
-          Q_ASSERT(m_doc != 0);
+      Q_ASSERT(m_doc != 0);
 
-          KJS::Interpreter::lock();
-          Ecma *ecmaEngine = m_doc->ecmaEngine();
-          if(ecmaEngine && m_listener.implementsCall())
-          {
-                  ScriptInterpreter *interpreter = ecmaEngine->interpreter();
-                  KJS::ExecState *exec = ecmaEngine->globalExec();
+      KJS::Interpreter::lock();
+      Ecma *ecmaEngine = m_doc->ecmaEngine();
+      if(ecmaEngine && m_listener.implementsCall())
+      {
+          ScriptInterpreter *interpreter = ecmaEngine->interpreter();
+          KJS::ExecState *exec = ecmaEngine->globalExec();
 
-                  // Append 'evt' object
-                  Event evtObj(evt);
+          // Append 'evt' object
+          Event evtObj(evt);
 
-                  KJS::List args;
-                  args.append(getDOMEvent(exec, evtObj));
+          KJS::List args;
+          args.append(getDOMEvent(exec, evtObj));
 
-                  // Set current event
-                  interpreter->setCurrentEvent(evt);
+          // Set current event
+          interpreter->setCurrentEvent(evt);
 
-                  // Call it!
-                  KJS::Object thisObj =
+          // Call it!
+          KJS::Object thisObj =
      KJS::Object::dynamicCast(safe_cache<EventTarget>(exec,
      evtObj.currentTarget()));
-                  KJS::Value retVal = m_listener.call(exec, thisObj, args);
+          KJS::Value retVal = m_listener.call(exec, thisObj, args);
 
-                  // Reset current event after processing
-                  interpreter->setCurrentEvent(0);
+          // Reset current event after processing
+          interpreter->setCurrentEvent(0);
 
-                  if(exec->hadException())
-                          exec->clearException();
-                  else
-                  {
-                          // In case the js event listener returns a value,
-     check it...
-                          QVariant ret = toVariant(exec, retVal);
-                          if(ret.type() == QVariant::Bool && ret.toBool() ==
-     false)
-                                  evt->preventDefault();
-                  }
+          if(exec->hadException())
+              exec->clearException();
+          else
+          {
+              // In case the js event listener returns a value, check it...
+              QVariant ret = toVariant(exec, retVal);
+              if(ret.type() == QVariant::Bool && ret.toBool() == false)
+                  evt->preventDefault();
           }
-          KJS::Interpreter::unlock();
+      }
+      KJS::Interpreter::unlock();
   */
 }
 

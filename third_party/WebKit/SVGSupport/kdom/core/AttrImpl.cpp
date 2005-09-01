@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -226,7 +226,7 @@ void AttrImpl::setValue(DOMStringImpl* _value) {
   if (isReadOnly())
     throw new DOMExceptionImpl(NO_MODIFICATION_ALLOWED_ERR);
 
-  //	DOMStringImpl *prevValue = value(); TODO: Mutation events?
+  //    DOMStringImpl *prevValue = value(); TODO: Mutation events?
   removeChildren();
 
   addChild(ownerDocument()->createTextNode(_value));

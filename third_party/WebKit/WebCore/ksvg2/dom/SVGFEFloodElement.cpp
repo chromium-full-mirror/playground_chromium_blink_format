@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -38,8 +38,7 @@ using namespace KSVG;
 
 /*
 @begin SVGFEFloodElement::s_hashTable 3
- in1			SVGFEFloodElementConstants::In1
-DontDelete|ReadOnly
+ in1            SVGFEFloodElementConstants::In1        DontDelete|ReadOnly
 @end
 */
 

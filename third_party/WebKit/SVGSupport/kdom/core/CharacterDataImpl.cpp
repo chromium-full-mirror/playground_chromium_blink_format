@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -43,8 +43,7 @@ void CharacterDataImpl::checkCharDataOperation(CharacterDataImpl* node,
     return;
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or
-  //				   greater than the number of 16-bit units in
-  //data.
+  //                   greater than the number of 16-bit units in data.
   if (offset > str->length())
     throw new DOMExceptionImpl(INDEX_SIZE_ERR);
 

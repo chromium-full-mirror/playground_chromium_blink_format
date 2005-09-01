@@ -868,19 +868,19 @@ RangeImpl* RangeImpl::cloneRange() {
 
 DOMString RangeImpl::toString() {
   /* This function converts a dom range to the plain text string that the user
-   *would see in this
+   * would see in this
    * portion of rendered html.
    *
    * There are several ways ranges can be used.
    *
    * The simplest is the start and endContainer is a text node.  The start and
-   *end offset is the
+   * end offset is the
    * number of characters into the text to remove/truncate.
    *
    * The next case is the start and endContainer is, well, a container, such a P
-   *tag or DIV tag.
+   * tag or DIV tag.
    * In this case the start and end offset is the number of children into the
-   *container to start
+   * container to start
    * from and end at.
    *
    * The other cases are different arrangements of the first two.
@@ -888,19 +888,19 @@ DOMString RangeImpl::toString() {
    * psuedo code:
    *
    * if start container is not text:
-   *	 count through the children to find where we start (m_startOffset
-   *children)
+   *     count through the children to find where we start (m_startOffset
+   * children)
    *
    * loop from the start position:
-   *	 if the current node is text, add the text to our variable 'text',
-   *truncating/removing if at the end/start.
+   *     if the current node is text, add the text to our variable 'text',
+   * truncating/removing if at the end/start.
    *
-   *	 if the node has children, step to the first child.
-   *	 if the node has no children but does have siblings, step to the next
-   *sibling
-   *	 until we find a sibling, go to next the parent but:
-   *		 make sure this sibling isn't past the end of where we are supposed
-   *to go. (position > endOffset and the parent is the endContainer)
+   *     if the node has children, step to the first child.
+   *     if the node has no children but does have siblings, step to the next
+   * sibling
+   *     until we find a sibling, go to next the parent but:
+   *         make sure this sibling isn't past the end of where we are supposed
+   * to go. (position > endOffset and the parent is the endContainer)
    *
    */
 

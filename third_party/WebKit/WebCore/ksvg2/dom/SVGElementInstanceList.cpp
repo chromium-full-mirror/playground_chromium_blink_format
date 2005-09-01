@@ -39,10 +39,10 @@ using namespace KSVG;
 
 /*
 @begin SVGElementInstanceList::s_hashTable 3
- length	SVGElementInstanceListConstants::Length	DontDelete|ReadOnly
+ length    SVGElementInstanceListConstants::Length    DontDelete|ReadOnly
 @end
 @begin SVGElementInstanceListProto::s_hashTable 3
- item	SVGElementInstanceListConstants::Item	DontDelete|Function 1
+ item    SVGElementInstanceListConstants::Item    DontDelete|Function 1
 @end
 */
 

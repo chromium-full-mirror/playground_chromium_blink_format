@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -202,9 +202,9 @@ bool EventTargetImpl::dispatchEvent(EventImpl* evt) {
                            // rendered
 
   /* FIXME
-          Ecma *ecmaEngine = doc->ecmaEngine();
-          if(ecmaEngine)
-                  ecmaEngine->finishedWithEvent(evt);
+      Ecma *ecmaEngine = doc->ecmaEngine();
+      if(ecmaEngine)
+          ecmaEngine->finishedWithEvent(evt);
   */
   bool retVal = !evt->defaultPrevented();  // What if defaultPrevented was
                                            // called before dispatchEvent?

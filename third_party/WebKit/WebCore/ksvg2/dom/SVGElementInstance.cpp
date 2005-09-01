@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -38,22 +38,17 @@ using namespace KDOM;
 
 /*
 @begin SVGElementInstance::s_hashTable 9
- correspondingElement
-SVGElementInstanceConstants::CorrespondingElement	DontDelete|ReadOnly
- correspondingUseElement
-SVGElementInstanceConstants::CorrespondingUseElement	DontDelete|ReadOnly
- parentNode		SVGElementInstanceConstants::ParentNode
+ correspondingElement        SVGElementInstanceConstants::CorrespondingElement
 DontDelete|ReadOnly
- childNodes		SVGElementInstanceConstants::ChildNodes
+ correspondingUseElement    SVGElementInstanceConstants::CorrespondingUseElement
 DontDelete|ReadOnly
- firstChild		SVGElementInstanceConstants::FirstChild
+ parentNode        SVGElementInstanceConstants::ParentNode DontDelete|ReadOnly
+ childNodes        SVGElementInstanceConstants::ChildNodes DontDelete|ReadOnly
+ firstChild        SVGElementInstanceConstants::FirstChild DontDelete|ReadOnly
+ lastChild        SVGElementInstanceConstants::LastChild DontDelete|ReadOnly
+ previousSibling    SVGElementInstanceConstants::PreviousSibling
 DontDelete|ReadOnly
- lastChild		SVGElementInstanceConstants::LastChild
-DontDelete|ReadOnly
- previousSibling	SVGElementInstanceConstants::PreviousSibling
-DontDelete|ReadOnly
- nextSibling	SVGElementInstanceConstants::NextSibling
-DontDelete|ReadOnly
+ nextSibling    SVGElementInstanceConstants::NextSibling DontDelete|ReadOnly
 @end
 */
 

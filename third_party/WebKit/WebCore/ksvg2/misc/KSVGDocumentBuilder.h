@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -43,8 +43,8 @@ class DocumentBuilder : public KDOM::DocumentBuilder {
   // Use this function to link a newly created 'KDOM::Document'
   // with the passed 'KCanvas', and the other for indicate that
   // you are done creating your tree (invokes rendering in non-progr. mode)
-  //		static void linkDocumentToCanvas(const SVGDocument &doc, KSVGView
-  //*view);
+  //        static void linkDocumentToCanvas(const SVGDocument &doc, KSVGView
+  //        *view);
   static void linkDocumentToCanvas(SVGDocumentImpl* docImpl, KSVGView* view);
 
   static void finishedDocument(SVGDocumentImpl* doc);

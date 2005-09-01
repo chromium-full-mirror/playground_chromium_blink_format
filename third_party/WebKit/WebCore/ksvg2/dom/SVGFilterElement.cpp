@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -45,26 +45,17 @@ using namespace KSVG;
 
 /*
 @begin SVGFilterElement::s_hashTable 9
- filterUnits	SVGFilterElementConstants::FilterUnits
-DontDelete|ReadOnly
- primitiveUnits	SVGFilterElementConstants::PrimitiveUnits
-DontDelete|ReadOnly
- x				SVGFilterElementConstants::X
-DontDelete|ReadOnly
- y				SVGFilterElementConstants::Y
-DontDelete|ReadOnly
- width			SVGFilterElementConstants::Width
-DontDelete|ReadOnly
- height			SVGFilterElementConstants::Height
-DontDelete|ReadOnly
- filterResX		SVGFilterElementConstants::FilterResX
-DontDelete|ReadOnly
- filterResY		SVGFilterElementConstants::FilterResY
-DontDelete|ReadOnly
+ filterUnits    SVGFilterElementConstants::FilterUnits DontDelete|ReadOnly
+ primitiveUnits    SVGFilterElementConstants::PrimitiveUnits DontDelete|ReadOnly
+ x                SVGFilterElementConstants::X DontDelete|ReadOnly
+ y                SVGFilterElementConstants::Y DontDelete|ReadOnly
+ width            SVGFilterElementConstants::Width DontDelete|ReadOnly
+ height            SVGFilterElementConstants::Height DontDelete|ReadOnly
+ filterResX        SVGFilterElementConstants::FilterResX DontDelete|ReadOnly
+ filterResY        SVGFilterElementConstants::FilterResY DontDelete|ReadOnly
 @end
 @begin SVGFilterElementProto::s_hashTable 3
- setFilterRes	SVGFilterElementConstants::SetFilterRes
-DontDelete|Function 2
+ setFilterRes    SVGFilterElementConstants::SetFilterRes DontDelete|Function 2
 @end
 */
 

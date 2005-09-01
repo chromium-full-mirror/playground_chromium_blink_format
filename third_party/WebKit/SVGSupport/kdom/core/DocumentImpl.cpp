@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -1076,8 +1076,8 @@ void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
 
     oldFocusNode->setFocus(false);
 #if 0
-		oldFocusNode->dispatchHTMLEvent(BLUR_EVENT,false,false);
-		oldFocusNode->dispatchUIEvent(DOMFOCUSOUT_EVENT);
+        oldFocusNode->dispatchHTMLEvent(BLUR_EVENT,false,false);
+        oldFocusNode->dispatchUIEvent(DOMFOCUSOUT_EVENT);
 #endif
     if ((oldFocusNode == this))  // && oldFocusNode->hasOneRef())
     {
@@ -1090,12 +1090,12 @@ void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   if (m_focusNode) {
     m_focusNode->ref();
 #if 0
-		m_focusNode->dispatchHTMLEvent(FOCUS_EVENT,false,false);
+        m_focusNode->dispatchHTMLEvent(FOCUS_EVENT,false,false);
 #endif
     if (m_focusNode != newFocusNode)
       return;
 #if 0
-		m_focusNode->dispatchUIEvent(DOMFOCUSIN_EVENT);
+        m_focusNode->dispatchUIEvent(DOMFOCUSIN_EVENT);
 #endif
     if (m_focusNode != newFocusNode)
       return;
@@ -1104,18 +1104,18 @@ void DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
       return;
 
 #if 0
-		// eww, I suck. set the qt focus correctly
-		// ### find a better place in the code for this
-		if(view())
-		{
-			if(!m_focusNode->renderer() || !m_focusNode->renderer()->isWidget())
-				view()->setFocus();
-			else if(static_cast<RenderWidget*>(m_focusNode->renderer())->widget())
-			{
-				if(view()->isVisible())
-					static_cast<RenderWidget*>(m_focusNode->renderer())->widget()->setFocus();
-			}
-		}
+        // eww, I suck. set the qt focus correctly
+        // ### find a better place in the code for this
+        if(view())
+        {
+            if(!m_focusNode->renderer() || !m_focusNode->renderer()->isWidget())
+                view()->setFocus();
+            else if(static_cast<RenderWidget*>(m_focusNode->renderer())->widget())
+            {
+                if(view()->isVisible())
+                    static_cast<RenderWidget*>(m_focusNode->renderer())->widget()->setFocus();
+            }
+        }
 #endif
   }
 

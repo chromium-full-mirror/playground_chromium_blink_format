@@ -37,9 +37,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedEnumeration::s_hashTable 3
- baseVal	SVGAnimatedEnumerationConstants::BaseVal	DontDelete
- animVal	SVGAnimatedEnumerationConstants::AnimVal
-DontDelete|ReadOnly
+ baseVal    SVGAnimatedEnumerationConstants::BaseVal    DontDelete
+ animVal    SVGAnimatedEnumerationConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

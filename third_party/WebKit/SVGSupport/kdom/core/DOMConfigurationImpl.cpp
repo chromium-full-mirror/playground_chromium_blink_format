@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -328,8 +328,8 @@ bool DOMConfigurationImpl::canSetParameter(DOMStringImpl* name,
     return true;
   else if (temp.lower() == IGNORE_UNKNOWN_CD)
     return true;
-  //	else if(temp.lower() ==	RESOURCE_RESOLVER)
-  //		return true;
+  //    else if(temp.lower() ==    RESOURCE_RESOLVER)
+  //        return true;
   else if (temp.lower() == SUPPORTED_MEDIA_TYPE_ONLY)
     return true;
   else if (temp.lower() == DISCARD_DEFAULT_CONTENT)

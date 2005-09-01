@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml css code by:
     Copyright (C) 2003 Lars Knoll (knoll@kde.org)
@@ -518,8 +518,8 @@ bool CSSParser::parseValue(int propId, bool important, int expected) {
 
     case CSS_PROP_SIZE:  // <length>{1,2} | auto | portrait | landscape |
                          // inherit
-      //	case CSS_PROP_PAGE:                 // <identifier> | auto //
-      //### CHECK
+      //    case CSS_PROP_PAGE:                 // <identifier> | auto // ###
+      //    CHECK
       {
         if (id)
           validPrimitive = true;
@@ -1867,11 +1867,11 @@ bool CSSParser::parseFont(bool important) {
       /*
       else if(id == CSS_VAL_INHERIT)
       {
-              // set all non set ones to inherit
-              // This is not that simple as the inherit could also apply to the
+          // set all non set ones to inherit
+          // This is not that simple as the inherit could also apply to the
       following font-size.
-              // very ahrd to tell without looking ahead.
-              inherit = true;
+          // very ahrd to tell without looking ahead.
+          inherit = true;
       }
       */
       else if (id == CSS_VAL_ITALIC || id == CSS_VAL_OBLIQUE) {

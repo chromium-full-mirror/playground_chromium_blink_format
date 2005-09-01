@@ -36,19 +36,16 @@ using namespace KSVG;
 
 /*
 @begin SVGAngle::s_hashTable 5
- value						SVGAngleConstants::Value
+ value                        SVGAngleConstants::Value DontDelete
+ valueInSpecifiedUnits        SVGAngleConstants::ValueInSpecifiedUnits
 DontDelete
- valueInSpecifiedUnits		SVGAngleConstants::ValueInSpecifiedUnits
-DontDelete
- valueAsString				SVGAngleConstants::ValueAsString
-DontDelete
- unitType					SVGAngleConstants::UnitType
-DontDelete|ReadOnly
+ valueAsString                SVGAngleConstants::ValueAsString DontDelete
+ unitType                    SVGAngleConstants::UnitType DontDelete|ReadOnly
 @end
 @begin SVGAngleProto::s_hashTable 3
- convertToSpecifiedUnits	SVGAngleConstants::ConvertToSpecifiedUnits
+ convertToSpecifiedUnits    SVGAngleConstants::ConvertToSpecifiedUnits
 DontDelete|Function 1
- newValueSpecifiedUnits		SVGAngleConstants::NewValueSpecifiedUnits
+ newValueSpecifiedUnits        SVGAngleConstants::NewValueSpecifiedUnits
 DontDelete|Function 2
 @end
 */

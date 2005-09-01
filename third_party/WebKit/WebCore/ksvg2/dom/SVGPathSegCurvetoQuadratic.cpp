@@ -29,10 +29,10 @@ using namespace KSVG;
 
 /*
 @begin SVGPathSegCurvetoQuadraticAbs::s_hashTable 5
- x	SVGPathSegCurvetoQuadraticConstants::X		DontDelete
- y	SVGPathSegCurvetoQuadraticConstants::Y		DontDelete
- x1	SVGPathSegCurvetoQuadraticConstants::X1		DontDelete
- y1	SVGPathSegCurvetoQuadraticConstants::Y1		DontDelete
+ x    SVGPathSegCurvetoQuadraticConstants::X        DontDelete
+ y    SVGPathSegCurvetoQuadraticConstants::Y        DontDelete
+ x1    SVGPathSegCurvetoQuadraticConstants::X1        DontDelete
+ y1    SVGPathSegCurvetoQuadraticConstants::Y1        DontDelete
 @end
 */
 
@@ -166,10 +166,10 @@ float SVGPathSegCurvetoQuadraticAbs::y1() const {
 
 /*
 @begin SVGPathSegCurvetoQuadraticRel::s_hashTable 5
- x		SVGPathSegCurvetoQuadraticConstants::X		DontDelete
- y		SVGPathSegCurvetoQuadraticConstants::Y		DontDelete
- x1		SVGPathSegCurvetoQuadraticConstants::X1		DontDelete
- y1		SVGPathSegCurvetoQuadraticConstants::Y1		DontDelete
+ x        SVGPathSegCurvetoQuadraticConstants::X        DontDelete
+ y        SVGPathSegCurvetoQuadraticConstants::Y        DontDelete
+ x1        SVGPathSegCurvetoQuadraticConstants::X1        DontDelete
+ y1        SVGPathSegCurvetoQuadraticConstants::Y1        DontDelete
 @end
 */
 

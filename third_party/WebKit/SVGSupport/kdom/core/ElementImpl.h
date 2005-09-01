@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1999 Lars Knoll (knoll@kde.org)
@@ -140,9 +140,9 @@ class ElementImpl : public NodeBaseImpl {
 
   void setAttributeMap(NamedAttrMapImpl* list);
 
-  //	private:
-  //		void addDOMEventListener(Ecma *ecmaEngine, DOMStringImpl *type,
-  //DOMStringImpl *value);
+  //    private:
+  //        void addDOMEventListener(Ecma *ecmaEngine, DOMStringImpl *type,
+  //        DOMStringImpl *value);
 
  protected:
   mutable NamedAttrMapImpl* m_attributes;

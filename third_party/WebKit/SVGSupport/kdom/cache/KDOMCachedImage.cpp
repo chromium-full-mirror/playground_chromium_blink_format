@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     Based on khtml code by:
     Copyright (C) 1998 Lars Knoll <knoll@kde.org>
@@ -82,7 +82,7 @@ CachedImage::CachedImage(DocumentLoader* docLoader,
   m_showAnimations = docLoader->showAnimations();
 
   /* TODO: Add KHTML Settings class
-          if(KHTMLFactory::defaultHTMLSettings()->isAdFiltered(url.string()))
+      if(KHTMLFactory::defaultHTMLSettings()->isAdFiltered(url.string()))
   */
   if (false) {
     m_wasBlocked = true;

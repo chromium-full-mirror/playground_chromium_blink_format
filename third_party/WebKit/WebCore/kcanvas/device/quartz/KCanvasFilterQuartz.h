@@ -75,7 +75,7 @@ class KCanvasFEColorMatrixQuartz : public KCanvasFEColorMatrix {
 
 // class KCanvasFEComponentTransferQuartz : public KCanvasFEComponentTransfer {
 // public:
-//	virtual CIFilter *getCIFilter(KCanvasFilterQuartz *quartzFilter) const;
+//    virtual CIFilter *getCIFilter(KCanvasFilterQuartz *quartzFilter) const;
 //};
 
 class KCanvasFECompositeQuartz : public KCanvasFEComposite {

@@ -35,24 +35,17 @@ using namespace KDOM;
 
 /*
 @begin SVGPathSegList::s_hashTable 3
- numberOfItems		SVGPathSegListConstants::NumberOfItems
-DontDelete|ReadOnly
+ numberOfItems        SVGPathSegListConstants::NumberOfItems DontDelete|ReadOnly
 @end
 @begin SVGPathSegListProto::s_hashTable 9
- clear				SVGPathSegListConstants::Clear
-DontDelete|Function 0
- initialize			SVGPathSegListConstants::Initialize
-DontDelete|Function 1
- getItem			SVGPathSegListConstants::GetItem
-DontDelete|Function 1
- insertItemBefore	SVGPathSegListConstants::InsertItemBefore
+ clear                SVGPathSegListConstants::Clear DontDelete|Function 0
+ initialize            SVGPathSegListConstants::Initialize DontDelete|Function 1
+ getItem            SVGPathSegListConstants::GetItem DontDelete|Function 1
+ insertItemBefore    SVGPathSegListConstants::InsertItemBefore
 DontDelete|Function 2
- replaceItem		SVGPathSegListConstants::ReplaceItem
-DontDelete|Function 2
- removeItem			SVGPathSegListConstants::RemoveItem
-DontDelete|Function 1
- appendItem			SVGPathSegListConstants::AppendItem
-DontDelete|Function 1
+ replaceItem        SVGPathSegListConstants::ReplaceItem DontDelete|Function 2
+ removeItem            SVGPathSegListConstants::RemoveItem DontDelete|Function 1
+ appendItem            SVGPathSegListConstants::AppendItem DontDelete|Function 1
 @end
 */
 

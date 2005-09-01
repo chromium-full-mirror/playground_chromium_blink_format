@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -45,45 +45,33 @@ using namespace KSVG;
 
 /*
 @begin SVGPathElement::s_hashTable 3
- pathLength	SVGPathElementConstants::PathLength	DontDelete|ReadOnly
+ pathLength    SVGPathElementConstants::PathLength    DontDelete|ReadOnly
 @end
 @begin SVGPathElementProto::s_hashTable 23
  getTotalLength
-SVGPathElementConstants::GetTotalLength
-DontDelete|Function 0
+SVGPathElementConstants::GetTotalLength DontDelete|Function 0
  getPointAtLength
-SVGPathElementConstants::GetPointAtLength
-DontDelete|Function 1
+SVGPathElementConstants::GetPointAtLength DontDelete|Function 1
  getPathSegAtLength
-SVGPathElementConstants::GetPathSegAtLength
-DontDelete|Function 1
+SVGPathElementConstants::GetPathSegAtLength DontDelete|Function 1
  createSVGPathSegClosePath
-SVGPathElementConstants::CreateSVGPathSegClosePath
-DontDelete|Function 0
+SVGPathElementConstants::CreateSVGPathSegClosePath DontDelete|Function 0
  createSVGPathSegMovetoAbs
-SVGPathElementConstants::CreateSVGPathSegMovetoAbs
-DontDelete|Function 2
+SVGPathElementConstants::CreateSVGPathSegMovetoAbs DontDelete|Function 2
  createSVGPathSegMovetoRel
-SVGPathElementConstants::CreateSVGPathSegMovetoRel
-DontDelete|Function 2
+SVGPathElementConstants::CreateSVGPathSegMovetoRel DontDelete|Function 2
  createSVGPathSegLinetoAbs
-SVGPathElementConstants::CreateSVGPathSegLinetoAbs
-DontDelete|Function 2
+SVGPathElementConstants::CreateSVGPathSegLinetoAbs DontDelete|Function 2
  createSVGPathSegLinetoRel
-SVGPathElementConstants::CreateSVGPathSegLinetoRel
-DontDelete|Function 2
+SVGPathElementConstants::CreateSVGPathSegLinetoRel DontDelete|Function 2
  createSVGPathSegArcAbs
-SVGPathElementConstants::CreateSVGPathSegArcAbs
-DontDelete|Function 7
+SVGPathElementConstants::CreateSVGPathSegArcAbs DontDelete|Function 7
  createSVGPathSegArcRel
-SVGPathElementConstants::CreateSVGPathSegArcRel
-DontDelete|Function 7
+SVGPathElementConstants::CreateSVGPathSegArcRel DontDelete|Function 7
  createSVGPathSegCurvetoCubicAbs
-SVGPathElementConstants::CreateSVGPathSegCurvetoCubicAbs
-DontDelete|Function 6
+SVGPathElementConstants::CreateSVGPathSegCurvetoCubicAbs DontDelete|Function 6
  createSVGPathSegCurvetoCubicRel
-SVGPathElementConstants::CreateSVGPathSegCurvetoCubicRel
-DontDelete|Function 6
+SVGPathElementConstants::CreateSVGPathSegCurvetoCubicRel DontDelete|Function 6
  createSVGPathSegCurvetoQuadraticAbs
 SVGPathElementConstants::CreateSVGPathSegCurvetoQuadraticAbs
 DontDelete|Function 4
@@ -97,11 +85,9 @@ DontDelete|Function 1
 SVGPathElementConstants::CreateSVGPathSegLinetoHorizontalRel
 DontDelete|Function 1
  createSVGPathSegLinetoVerticalAbs
-SVGPathElementConstants::CreateSVGPathSegLinetoVerticalAbs
-DontDelete|Function 1
+SVGPathElementConstants::CreateSVGPathSegLinetoVerticalAbs DontDelete|Function 1
  createSVGPathSegLinetoVerticalRel
-SVGPathElementConstants::CreateSVGPathSegLinetoVerticalRel
-DontDelete|Function 1
+SVGPathElementConstants::CreateSVGPathSegLinetoVerticalRel DontDelete|Function 1
  createSVGPathSegCurvetoCubicSmoothAbs
 SVGPathElementConstants::CreateSVGPathSegCurvetoCubicSmoothAbs
 DontDelete|Function 4

@@ -36,25 +36,17 @@ using namespace KSVG;
 
 /*
 @begin SVGTransform::s_hashTable 5
- type			SVGTransformConstants::Type
-DontDelete|ReadOnly
- matrix			SVGTransformConstants::Matrix
-DontDelete|ReadOnly
- angle			SVGTransformConstants::Angle
-DontDelete|ReadOnly
+ type            SVGTransformConstants::Type            DontDelete|ReadOnly
+ matrix            SVGTransformConstants::Matrix        DontDelete|ReadOnly
+ angle            SVGTransformConstants::Angle        DontDelete|ReadOnly
 @end
 @begin SVGTransformProto::s_hashTable 7
- setMatrix		SVGTransformConstants::SetMatrix
-DontDelete|Function 1
- setTranslate	SVGTransformConstants::SetTranslate	DontDelete|Function 2
- setScale		SVGTransformConstants::SetScale
-DontDelete|Function 2
- setRotate		SVGTransformConstants::SetRotate
-DontDelete|Function 3
- setSkewX		SVGTransformConstants::SetSkewX
-DontDelete|Function 1
- setSkewY		SVGTransformConstants::SetSkewY
-DontDelete|Function 1
+ setMatrix        SVGTransformConstants::SetMatrix    DontDelete|Function 1
+ setTranslate    SVGTransformConstants::SetTranslate    DontDelete|Function 2
+ setScale        SVGTransformConstants::SetScale        DontDelete|Function 2
+ setRotate        SVGTransformConstants::SetRotate    DontDelete|Function 3
+ setSkewX        SVGTransformConstants::SetSkewX        DontDelete|Function 1
+ setSkewY        SVGTransformConstants::SetSkewY        DontDelete|Function 1
 @end
 */
 

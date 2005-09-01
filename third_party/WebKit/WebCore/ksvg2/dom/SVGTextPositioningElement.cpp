@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -43,16 +43,11 @@ using namespace KSVG;
 
 /*
 @begin SVGTextPositioningElement::s_hashTable 7
- x			SVGTextPositioningElementConstants::X
-DontDelete|ReadOnly
- y			SVGTextPositioningElementConstants::Y
-DontDelete|ReadOnly
- dx			SVGTextPositioningElementConstants::Dx
-DontDelete|ReadOnly
- dy			SVGTextPositioningElementConstants::Dy
-DontDelete|ReadOnly
- rotate		SVGTextPositioningElementConstants::Rotate
-DontDelete|ReadOnly
+ x            SVGTextPositioningElementConstants::X        DontDelete|ReadOnly
+ y            SVGTextPositioningElementConstants::Y        DontDelete|ReadOnly
+ dx            SVGTextPositioningElementConstants::Dx        DontDelete|ReadOnly
+ dy            SVGTextPositioningElementConstants::Dy        DontDelete|ReadOnly
+ rotate        SVGTextPositioningElementConstants::Rotate    DontDelete|ReadOnly
 @end
 */
 

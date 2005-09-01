@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -70,7 +70,7 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
 
 // Internal
 #if 0
-		virtual KDOM::Ecma *ecmaEngine() const;
+        virtual KDOM::Ecma *ecmaEngine() const;
 #endif
   void finishedParsing();
   void dispatchRecursiveEvent(KDOM::EventImpl* event, KDOM::NodeImpl* obj);

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -33,7 +33,7 @@ using namespace KSVG;
 
 /*
 @begin SVGTitleElement::s_hashTable 2
- dummy	SVGTitleElementConstants::Dummy	DontDelete|ReadOnly
+ dummy    SVGTitleElementConstants::Dummy    DontDelete|ReadOnly
 @end
 */
 

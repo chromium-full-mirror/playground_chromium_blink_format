@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -217,8 +217,8 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
     dpiY = devMetrics->logicalDpiY();
 
   /* FIXME
-          if(!khtml::printpainter && dpiY < 96)
-                  dpiY = 96.;
+      if(!khtml::printpainter && dpiY < 96)
+          dpiY = 96.;
   */
 
   double factor = 1.;

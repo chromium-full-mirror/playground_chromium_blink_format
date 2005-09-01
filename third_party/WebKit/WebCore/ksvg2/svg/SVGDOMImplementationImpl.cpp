@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -217,7 +217,7 @@ KDOM::DocumentTypeImpl* SVGDOMImplementationImpl::defaultDocumentType() const {
   return 0;
   /*
   return createDocumentType("svg:svg", "-//W3C//DTD SVG20010904//EN",
-                                                   "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd");
+                           "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd");
   */
 }
 

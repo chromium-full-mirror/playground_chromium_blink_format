@@ -34,8 +34,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedLength::s_hashTable 3
- baseVal	SVGAnimatedLengthConstants::BaseVal	DontDelete|ReadOnly
- animVal	SVGAnimatedLengthConstants::AnimVal	DontDelete|ReadOnly
+ baseVal    SVGAnimatedLengthConstants::BaseVal    DontDelete|ReadOnly
+ animVal    SVGAnimatedLengthConstants::AnimVal    DontDelete|ReadOnly
 @end
 */
 

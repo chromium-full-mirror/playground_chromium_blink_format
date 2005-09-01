@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,10 +36,10 @@ using namespace KSVG;
 
 /*
 @begin SVGStyleElement::s_hashTable 5
- xmlspace	SVGStyleElementConstants::Xmlspace		DontDelete
- type		SVGStyleElementConstants::Type			DontDelete
- media		SVGStyleElementConstants::Media			DontDelete
- title		SVGStyleElementConstants::Title			DontDelete
+ xmlspace    SVGStyleElementConstants::Xmlspace        DontDelete
+ type        SVGStyleElementConstants::Type            DontDelete
+ media        SVGStyleElementConstants::Media            DontDelete
+ title        SVGStyleElementConstants::Title            DontDelete
 @end
 */
 

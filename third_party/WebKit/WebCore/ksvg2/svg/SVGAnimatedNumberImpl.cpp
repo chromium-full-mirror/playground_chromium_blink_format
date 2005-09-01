@@ -44,7 +44,7 @@ void SVGAnimatedNumberImpl::setBaseVal(float baseVal) {
   m_baseVal = baseVal;
 
   // Spec: If the given attribute or property is not currently
-  //		 being animated, contains the same value as 'baseVal'
+  //         being animated, contains the same value as 'baseVal'
   m_animVal = baseVal;
 
   if (m_context)

@@ -34,10 +34,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedPreserveAspectRatio::s_hashTable 3
- baseVal	SVGAnimatedPreserveAspectRatioConstants::BaseVal
-DontDelete|ReadOnly
- animVal	SVGAnimatedPreserveAspectRatioConstants::AnimVal
-DontDelete|ReadOnly
+ baseVal    SVGAnimatedPreserveAspectRatioConstants::BaseVal DontDelete|ReadOnly
+ animVal    SVGAnimatedPreserveAspectRatioConstants::AnimVal DontDelete|ReadOnly
 @end
 */
 

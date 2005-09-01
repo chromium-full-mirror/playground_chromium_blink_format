@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
-                                  2004, 2005 Rob Buis <buis@kde.org>
+                  2004, 2005 Rob Buis <buis@kde.org>
 
     This file is part of the KDE project
 
@@ -36,9 +36,8 @@ using namespace KSVG;
 
 /*
 @begin SVGAnimatedPoints::s_hashTable 3
- points			SVGAnimatedPointsConstants::Points
-DontDelete|ReadOnly
- animatedPoints	SVGAnimatedPointsConstants::AnimatedPoints
+ points            SVGAnimatedPointsConstants::Points DontDelete|ReadOnly
+ animatedPoints    SVGAnimatedPointsConstants::AnimatedPoints
 DontDelete|ReadOnly
 @end
 */

@@ -1,7 +1,7 @@
 /*
  * This file is part of the KDE libraries
  *
- * Copyright (C) 2005 Frans Englich 	<frans.englich@telia.com>
+ * Copyright (C) 2005 Frans Englich     <frans.englich@telia.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -46,8 +46,8 @@ class XPath1SchemeImpl : public PointerPartImpl {
 
   virtual XPointerResultImpl* evaluate(NodeImpl* context) const;
 
-  //	private:
-  //		XPathExpressionImpl *m_expr;
+  //    private:
+  //        XPathExpressionImpl *m_expr;
 };
 };
 };

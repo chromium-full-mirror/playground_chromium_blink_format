@@ -41,19 +41,16 @@ using namespace KSVG;
 
 /*
 @begin SVGLength::s_hashTable 5
- unitType					SVGLengthConstants::UnitType
-DontDelete|ReadOnly
- value						SVGLengthConstants::Value
-DontDelete
- valueAsString				SVGLengthConstants::ValueAsString
-DontDelete
- valueInSpecifiedUnits		SVGLengthConstants::ValueInSpecifiedUnits
+ unitType                    SVGLengthConstants::UnitType DontDelete|ReadOnly
+ value                        SVGLengthConstants::Value DontDelete
+ valueAsString                SVGLengthConstants::ValueAsString DontDelete
+ valueInSpecifiedUnits        SVGLengthConstants::ValueInSpecifiedUnits
 DontDelete
 @end
 @begin SVGLengthProto::s_hashTable 3
- newValueSpecifiedUnits		SVGLengthConstants::NewValueSpecifiedUnits
+ newValueSpecifiedUnits        SVGLengthConstants::NewValueSpecifiedUnits
 DontDelete|Function 2
- convertToSpecifiedUnits	SVGLengthConstants::ConvertToSpecifiedUnits
+ convertToSpecifiedUnits    SVGLengthConstants::ConvertToSpecifiedUnits
 DontDelete|Function 1
 @end
 */
