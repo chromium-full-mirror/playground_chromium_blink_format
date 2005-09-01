@@ -606,7 +606,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   void setRecalcListItems();
 
-  QMemArray<HTMLGenericFormElementImpl*> listItems() const {
+  QMemArray<HTMLElementImpl*> listItems() const {
     if (m_recalcListItems)
       const_cast<HTMLSelectElementImpl*>(this)->recalcListItems();
     return m_listItems;
@@ -626,7 +626,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void recalcListItems();
 
  protected:
-  mutable QMemArray<HTMLGenericFormElementImpl*> m_listItems;
+  mutable QMemArray<HTMLElementImpl*> m_listItems;
   HTMLOptionsCollectionImpl* m_options;
   short m_minwidth;
   short m_size;
@@ -663,7 +663,8 @@ class HTMLOptGroupElementImpl : public HTMLGenericFormElementImpl {
   virtual ~HTMLOptGroupElementImpl();
 
   virtual bool checkDTD(const NodeImpl* newChild) {
-    return newChild->hasTagName(HTMLNames::optionTag);
+    return newChild->hasTagName(HTMLNames::optionTag) ||
+           newChild->hasTagName(HTMLNames::hrTag);
   }
 
   DOMString type() const;
