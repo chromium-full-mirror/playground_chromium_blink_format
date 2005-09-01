@@ -92,7 +92,7 @@ class InlineTextBox : public InlineRunBox {
                            int tx,
                            int ty);
 
-  RenderText* textObject();
+  RenderText* textObject() const;
 
   virtual void deleteLine(RenderArena* arena);
   virtual void extractLine();
@@ -406,5 +406,10 @@ class RenderTextFragment : public RenderText {
   uint m_end;
   DOM::DOMStringImpl* m_generatedContentStr;
 };
-};
+
+inline RenderText* InlineTextBox::textObject() const {
+  return static_cast<RenderText*>(m_object);
+}
+}
+
 #endif
