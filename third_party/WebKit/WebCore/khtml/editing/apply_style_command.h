@@ -47,7 +47,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   virtual void doApply();
   virtual EditAction editingAction() const;
 
-  DOM::CSSMutableStyleDeclarationImpl* style() const { return m_style; }
+  DOM::CSSMutableStyleDeclarationImpl* style() const { return m_style.get(); }
 
  private:
   // style-removal helpers
@@ -115,7 +115,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
                           const DOM::Position& start,
                           const DOM::Position& end);
 
-  DOM::CSSMutableStyleDeclarationImpl* m_style;
+  SharedPtr<DOM::CSSMutableStyleDeclarationImpl> m_style;
   EditAction m_editingAction;
   EPropertyLevel m_propertyLevel;
 };
