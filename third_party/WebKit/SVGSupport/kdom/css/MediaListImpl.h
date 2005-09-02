@@ -26,7 +26,7 @@
 #include <kdom/css/StyleBaseImpl.h>
 #include <kdom/DOMString.h>
 
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 
 namespace KDOM {
 class CSSRuleImpl;
@@ -67,7 +67,7 @@ class MediaListImpl : public StyleBaseImpl {
   bool contains(DOMStringImpl* medium) const;
 
  protected:
-  QValueList<DOMString> m_lstMedia;
+  Q3ValueList<DOMString> m_lstMedia;
 };
 };
 

@@ -25,7 +25,7 @@
 
 #include <kdom/Shared.h>
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 namespace KDOM {
 class CSSRuleImpl;
@@ -44,7 +44,7 @@ class CSSRuleListImpl : public Shared {
   void append(CSSRuleImpl* rule);
 
  protected:
-  QPtrList<CSSRuleImpl> m_lstCSSRules;
+  Q3PtrList<CSSRuleImpl> m_lstCSSRules;
 };
 };
 

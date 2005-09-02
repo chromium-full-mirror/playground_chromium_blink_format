@@ -28,7 +28,7 @@
 #include <qpainter.h>
 #include <qfontmetrics.h>
 
-class QPaintDeviceMetrics;
+class Q3PaintDeviceMetrics;
 
 namespace KDOM {
 
@@ -63,7 +63,7 @@ class Font {
 
   bool operator==(const Font& other) const;
 
-  void update(QPaintDeviceMetrics* devMetrics,
+  void update(Q3PaintDeviceMetrics* devMetrics,
               const KDOMSettings* settings) const;
 
   /**

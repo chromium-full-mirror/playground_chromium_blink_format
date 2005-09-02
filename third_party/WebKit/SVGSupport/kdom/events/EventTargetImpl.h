@@ -23,7 +23,7 @@
 #ifndef KDOM_EventTargetImpl_H
 #define KDOM_EventTargetImpl_H
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include <kdom/DOMString.h>
 #include <kdom/TreeShared.h>
@@ -60,7 +60,7 @@ class EventTargetImpl : public TreeShared<EventTargetImpl> {
  private:
   int m_listenerTypes;
 
-  QPtrList<RegisteredEventListener>* m_eventListeners;
+  Q3PtrList<RegisteredEventListener>* m_eventListeners;
 };
 };
 

@@ -44,9 +44,9 @@ class TextImpl : public CharacterDataImpl {
   virtual NodeImpl* cloneNode(bool deep, DocumentPtr* doc) const;
 
  protected:
-  QPtrList<NodeImpl> logicallyAdjacentTextNodes() const;
+  Q3PtrList<NodeImpl> logicallyAdjacentTextNodes() const;
   bool checkChildren(NodeImpl* node,
-                     const QPtrList<NodeImpl>& removables) const;
+                     const Q3PtrList<NodeImpl>& removables) const;
 };
 };
 

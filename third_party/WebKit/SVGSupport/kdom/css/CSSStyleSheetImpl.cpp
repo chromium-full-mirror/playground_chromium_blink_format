@@ -34,7 +34,7 @@ using namespace KDOM;
 CSSStyleSheetImpl::CSSStyleSheetImpl(CSSStyleSheetImpl* parentSheet,
                                      DOMStringImpl* href)
     : StyleSheetImpl(parentSheet, href) {
-  m_lstChildren = new QPtrList<StyleBaseImpl>();
+  m_lstChildren = new Q3PtrList<StyleBaseImpl>();
 
   m_doc = 0;
   m_implicit = false;
@@ -45,7 +45,7 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(NodeImpl* parentNode,
                                      DOMStringImpl* href,
                                      bool _implicit)
     : StyleSheetImpl(parentNode, href) {
-  m_lstChildren = new QPtrList<StyleBaseImpl>();
+  m_lstChildren = new Q3PtrList<StyleBaseImpl>();
 
   m_doc =
       (!isDocumentNode(parentNode) ? parentNode->ownerDocument()
@@ -57,7 +57,7 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(NodeImpl* parentNode,
 CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
                                      DOMStringImpl* href)
     : StyleSheetImpl(ownerRule, href) {
-  m_lstChildren = new QPtrList<StyleBaseImpl>();
+  m_lstChildren = new Q3PtrList<StyleBaseImpl>();
 
   m_doc = 0;
   m_implicit = false;
@@ -67,7 +67,7 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
 CSSStyleSheetImpl::CSSStyleSheetImpl(NodeImpl* parentNode,
                                      CSSStyleSheetImpl* orig)
     : StyleSheetImpl(parentNode, orig->m_strHref) {
-  m_lstChildren = new QPtrList<StyleBaseImpl>();
+  m_lstChildren = new Q3PtrList<StyleBaseImpl>();
 
   StyleBaseImpl* rule;
   for (rule = orig->m_lstChildren->first(); rule != 0;
@@ -85,7 +85,7 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
                                      CSSStyleSheetImpl* orig)
     : StyleSheetImpl(ownerRule, orig->m_strHref) {
   // m_lstChildren is deleted in StyleListImpl
-  m_lstChildren = new QPtrList<StyleBaseImpl>();
+  m_lstChildren = new Q3PtrList<StyleBaseImpl>();
 
   StyleBaseImpl* rule;
   for (rule = orig->m_lstChildren->first(); rule != 0;

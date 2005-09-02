@@ -44,7 +44,7 @@ CSSStyleDeclarationImpl::CSSStyleDeclarationImpl(CDFInterface* interface,
 CSSStyleDeclarationImpl::CSSStyleDeclarationImpl(
     CDFInterface* interface,
     CSSRuleImpl* parent,
-    QPtrList<CSSProperty>* lstValues)
+    Q3PtrList<CSSProperty>* lstValues)
     : StyleBaseImpl(parent) {
   m_node = 0;
   m_lstValues = lstValues;
@@ -65,10 +65,10 @@ CSSStyleDeclarationImpl& CSSStyleDeclarationImpl::operator=(
   m_lstValues = 0;
 
   if (o.m_lstValues) {
-    m_lstValues = new QPtrList<CSSProperty>();
+    m_lstValues = new Q3PtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
 
-    QPtrListIterator<CSSProperty> lstValuesIt(*o.m_lstValues);
+    Q3PtrListIterator<CSSProperty> lstValuesIt(*o.m_lstValues);
     for (lstValuesIt.toFirst(); lstValuesIt.current(); ++lstValuesIt)
       m_lstValues->append(new CSSProperty(*lstValuesIt.current()));
   }
@@ -82,7 +82,7 @@ DOMStringImpl* CSSStyleDeclarationImpl::cssText() const {
 
   DOMStringImpl* result = new DOMStringImpl();
 
-  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  Q3PtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
 
   CSSProperty* current;
   for (lstValuesIt.toFirst(); (current = lstValuesIt.current()); ++lstValuesIt)
@@ -95,7 +95,7 @@ void CSSStyleDeclarationImpl::setCssText(DOMStringImpl* cssText) {
   if (m_lstValues)
     m_lstValues->clear();
   else {
-    m_lstValues = new QPtrList<CSSProperty>();
+    m_lstValues = new Q3PtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
   }
 
@@ -263,7 +263,7 @@ CSSValueImpl* CSSStyleDeclarationImpl::getPropertyCSSValue(
   if (!m_lstValues)
     return 0;
 
-  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  Q3PtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
   CSSProperty* current;
   for (lstValuesIt.toLast(); (current = lstValuesIt.current()); --lstValuesIt) {
     if (current->m_id == propertyID && !current->m_nonCSSHint)
@@ -308,7 +308,7 @@ DOMStringImpl* CSSStyleDeclarationImpl::removeProperty(int propertyID,
 
   DOMStringImpl* value = 0;
 
-  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  Q3PtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
   CSSProperty* current;
   for (lstValuesIt.toLast(); (current = lstValuesIt.current()); --lstValuesIt) {
     if (current->m_id == propertyID && nonCSSHint == current->m_nonCSSHint) {
@@ -326,7 +326,7 @@ bool CSSStyleDeclarationImpl::getPropertyPriority(int propertyID) const {
   if (!m_lstValues)
     return false;
 
-  QPtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
+  Q3PtrListIterator<CSSProperty> lstValuesIt(*m_lstValues);
 
   CSSProperty* current;
   for (lstValuesIt.toFirst(); (current = lstValuesIt.current());
@@ -360,7 +360,7 @@ void CSSStyleDeclarationImpl::setProperty(int id,
                                           bool important,
                                           bool nonCSSHint) {
   if (!m_lstValues) {
-    m_lstValues = new QPtrList<CSSProperty>();
+    m_lstValues = new Q3PtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
   }
 
@@ -376,7 +376,7 @@ bool CSSStyleDeclarationImpl::setProperty(int propertyID,
                                           bool important,
                                           bool nonCSSHint) {
   if (!m_lstValues) {
-    m_lstValues = new QPtrList<CSSProperty>();
+    m_lstValues = new Q3PtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
   }
 
@@ -422,7 +422,7 @@ void CSSStyleDeclarationImpl::setProperty(DOMStringImpl* propertyName,
 
 void CSSStyleDeclarationImpl::setProperty(DOMStringImpl* propertyString) {
   if (!m_lstValues) {
-    m_lstValues = new QPtrList<CSSProperty>();
+    m_lstValues = new Q3PtrList<CSSProperty>();
     m_lstValues->setAutoDelete(true);
   }
 

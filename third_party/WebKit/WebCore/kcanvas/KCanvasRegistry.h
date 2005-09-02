@@ -23,7 +23,7 @@
 #ifndef KCanvasRegistry_H
 #define KCanvasRegistry_H
 
-#include <qdict.h>
+#include <q3dict.h>
 #include <qstring.h>
 
 #include <kcanvas/KCanvasResources.h>
@@ -49,8 +49,8 @@ class KCanvasRegistry {
   friend QTextStream& operator<<(QTextStream&, const KCanvasRegistry&);
 
  private:
-  QDict<KCanvasResource> m_resources;
-  QDict<KRenderingPaintServer> m_pservers;
+  Q3Dict<KCanvasResource> m_resources;
+  Q3Dict<KRenderingPaintServer> m_pservers;
 };
 
 QTextStream& operator<<(QTextStream&, const KCanvasRegistry&);

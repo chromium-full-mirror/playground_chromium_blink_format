@@ -31,4 +31,6 @@
 template <class T>
 class QValueVector : public QValueList<T> {};
 
+#define Q3ValueVector QValueVector
+
 #endif

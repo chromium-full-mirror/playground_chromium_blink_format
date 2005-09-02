@@ -25,7 +25,7 @@
 
 #include <kinstance.h>
 
-#include <qvaluelist.h>
+#include <q3valuelist.h>
 
 class KCanvas;
 class KCanvasTarget;
@@ -46,7 +46,7 @@ class KRenderingDeviceFactory {
   KRenderingDevice* request(const QString& device) const;
 
   // Request a list of all available rendering devices
-  const QValueList<KRenderingDeviceInfo> deviceList() const;
+  const Q3ValueList<KRenderingDeviceInfo> deviceList() const;
 
  private:
   static KInstance* s_instance;

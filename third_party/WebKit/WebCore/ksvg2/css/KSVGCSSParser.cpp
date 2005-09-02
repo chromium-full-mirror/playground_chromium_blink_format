@@ -487,7 +487,7 @@ bool SVGCSSParser::parseShape(int propId, bool important) {
 
 CSSStyleDeclarationImpl* SVGCSSParser::createCSSStyleDeclaration(
     CSSStyleRuleImpl* rule,
-    QPtrList<CSSProperty>* propList) {
+    Q3PtrList<CSSProperty>* propList) {
   return new SVGCSSStyleDeclarationImpl(
       document()->implementation()->cdfInterface(), rule, propList);
 }

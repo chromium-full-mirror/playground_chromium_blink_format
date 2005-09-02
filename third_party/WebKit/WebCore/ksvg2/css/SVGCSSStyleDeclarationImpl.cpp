@@ -39,7 +39,7 @@ SVGCSSStyleDeclarationImpl::SVGCSSStyleDeclarationImpl(
 SVGCSSStyleDeclarationImpl::SVGCSSStyleDeclarationImpl(
     KDOM::CDFInterface* interface,
     KDOM::CSSRuleImpl* parent,
-    QPtrList<KDOM::CSSProperty>* lstValues)
+    Q3PtrList<KDOM::CSSProperty>* lstValues)
     : KDOM::CSSStyleDeclarationImpl(interface, parent, lstValues) {}
 
 SVGCSSStyleDeclarationImpl::~SVGCSSStyleDeclarationImpl() {}

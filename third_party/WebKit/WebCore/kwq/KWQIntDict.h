@@ -66,4 +66,7 @@ class QIntDictIterator {
   QIntDictIterator& operator=(const QIntDictIterator&);
 };
 
+#define Q3IntDict QIntDict
+#define Q3IntDictIterator QIntDictIterator
+
 #endif

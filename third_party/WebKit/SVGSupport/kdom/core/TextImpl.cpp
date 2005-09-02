@@ -83,8 +83,8 @@ bool TextImpl::isElementContentWhitespace() const {
 DOMStringImpl* TextImpl::wholeText() const {
   DOMStringImpl* ret = new DOMStringImpl();
 
-  QPtrList<NodeImpl> nodes = logicallyAdjacentTextNodes();
-  QPtrListIterator<NodeImpl> it(nodes);
+  Q3PtrList<NodeImpl> nodes = logicallyAdjacentTextNodes();
+  Q3PtrListIterator<NodeImpl> it(nodes);
   for (; it.current(); ++it)
     ret->append((*it)->nodeValue());
 
@@ -92,7 +92,7 @@ DOMStringImpl* TextImpl::wholeText() const {
 }
 
 bool TextImpl::checkChildren(NodeImpl* _node,
-                             const QPtrList<NodeImpl>& nodes) const {
+                             const Q3PtrList<NodeImpl>& nodes) const {
   for (NodeImpl* n = _node->firstChild(); n; n = n->nextSibling()) {
     if (n->nodeType() != ENTITY_REFERENCE_NODE && !nodes.containsRef(n))
       return false;
@@ -109,9 +109,9 @@ TextImpl* TextImpl::replaceWholeText(DOMStringImpl* content) {
   if (isReadOnly() && content && content->length() > 0)
     replacement = ownerDocument()->createTextNode(content);
 
-  QPtrList<NodeImpl> nodes = logicallyAdjacentTextNodes();
-  QPtrList<NodeImpl> removables;
-  QPtrListIterator<NodeImpl> it(nodes);
+  Q3PtrList<NodeImpl> nodes = logicallyAdjacentTextNodes();
+  Q3PtrList<NodeImpl> removables;
+  Q3PtrListIterator<NodeImpl> it(nodes);
   for (; it.current(); ++it) {
     NodeImpl* n = (*it);
     if (n == this && !(!content || content->length() == 0 || isReadOnly()))
@@ -128,7 +128,7 @@ TextImpl* TextImpl::replaceWholeText(DOMStringImpl* content) {
     }
   }
 
-  QPtrListIterator<NodeImpl> it2(removables);
+  Q3PtrListIterator<NodeImpl> it2(removables);
   for (; it2.current(); ++it2) {
     NodeImpl* removable = (*it2);
     if (!checkChildren(removable, nodes)) {
@@ -153,7 +153,7 @@ TextImpl* TextImpl::replaceWholeText(DOMStringImpl* content) {
   return this;
 }
 
-QPtrList<NodeImpl> TextImpl::logicallyAdjacentTextNodes() const {
+Q3PtrList<NodeImpl> TextImpl::logicallyAdjacentTextNodes() const {
   NodeImpl* n = const_cast<TextImpl*>(this);
   bool go = false;
   while (true) {
@@ -180,7 +180,7 @@ QPtrList<NodeImpl> TextImpl::logicallyAdjacentTextNodes() const {
     n = previous;
   }
 
-  QPtrList<NodeImpl> ret;
+  Q3PtrList<NodeImpl> ret;
   go = true;
   while (true) {
     if (n->nodeType() != ENTITY_REFERENCE_NODE)

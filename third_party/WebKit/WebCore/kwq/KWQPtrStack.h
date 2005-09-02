@@ -49,6 +49,8 @@ class QPtrStack {
   QPtrList<T> list;
 };
 
+#define Q3PtrStack QPtrStack
+
 #ifdef _KWQ_IOSTREAM_
 
 template <class T>

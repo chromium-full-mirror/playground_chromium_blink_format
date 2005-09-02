@@ -69,6 +69,8 @@ class QMemArray {
   KWQArrayImpl impl;
 };
 
+#define Q3MemArray QMemArray
+
 #ifdef _KWQ_IOSTREAM_
 
 template <class T>

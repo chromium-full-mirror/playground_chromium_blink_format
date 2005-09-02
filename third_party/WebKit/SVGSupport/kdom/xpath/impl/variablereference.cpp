@@ -35,7 +35,7 @@ QString VariableReference::dump() const {
 }
 
 Value VariableReference::doEvaluate() const {
-  QDict<KDOM::DOMStringImpl> bindings = evaluationContext().variableBindings;
+  Q3Dict<KDOM::DOMStringImpl> bindings = evaluationContext().variableBindings;
   if (!bindings.find(m_name)) {
     // XXX What to do if an unknown variable is referenced?
     return Value("");

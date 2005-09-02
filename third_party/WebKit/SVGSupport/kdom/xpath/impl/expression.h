@@ -29,7 +29,7 @@
 
 #include "DOMStringImpl.h"
 
-#include <qdict.h>
+#include <q3dict.h>
 
 namespace KDOM {
 class NodeImpl;
@@ -39,7 +39,7 @@ struct EvaluationContext {
   KDOM::NodeImpl* node;
   unsigned long size;
   unsigned long position;
-  QDict<KDOM::DOMStringImpl> variableBindings;
+  Q3Dict<KDOM::DOMStringImpl> variableBindings;
   /* The function library is globally accessible through
    * FunctionLibrary::self()
    */
@@ -102,7 +102,7 @@ class Expression {
 
   static EvaluationContext s_evaluationContext;
 
-  QValueList<Expression*> m_subExpressions;
+  Q3ValueList<Expression*> m_subExpressions;
   Value* m_constantValue;
 };
 

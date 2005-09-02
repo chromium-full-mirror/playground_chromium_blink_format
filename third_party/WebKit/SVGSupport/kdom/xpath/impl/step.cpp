@@ -68,12 +68,12 @@ Step::Step() {}
 
 Step::Step(AxisType axis,
            const DomString& nodeTest,
-           const QValueList<Predicate*>& predicates)
+           const Q3ValueList<Predicate*>& predicates)
     : m_axis(axis), m_nodeTest(nodeTest), m_predicates(predicates) {}
 
 Step::~Step() {
-  QValueList<Predicate*>::Iterator it = m_predicates.begin();
-  QValueList<Predicate*>::Iterator end = m_predicates.end();
+  Q3ValueList<Predicate*>::Iterator it = m_predicates.begin();
+  Q3ValueList<Predicate*>::Iterator end = m_predicates.end();
   for (; it != end; ++it) {
     delete *it;
   }
@@ -102,7 +102,7 @@ DomNodeList Step::evaluate(NodeImpl* context) const {
   qDebug("\tNodetest '%s' trims this number to %i.", m_nodeTest.latin1(),
          nodes.count());
 
-  QValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
+  Q3ValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
   for (it = m_predicates.begin(); it != end; ++it) {
     Expression::evaluationContext().size = nodes.count();
     Expression::evaluationContext().position = 1;
@@ -383,7 +383,7 @@ DomNodeList Step::nodeTestMatches(const DomNodeList& nodes_) const {
 }
 
 void Step::optimize() {
-  QValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
+  Q3ValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
   for (it = m_predicates.begin(); it != end; ++it) {
     (*it)->optimize();
   }
@@ -395,7 +395,7 @@ QString Step::dump() const {
                   .arg(m_nodeTest)
                   .local8Bit()
                   .data();
-  QValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
+  Q3ValueList<Predicate *>::ConstIterator it, end = m_predicates.end();
   for (it = m_predicates.begin(); it != end; ++it) {
     s += (*it)->dump();
   }

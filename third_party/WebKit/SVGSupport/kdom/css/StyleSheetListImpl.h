@@ -25,7 +25,7 @@
 
 #include <kdom/Shared.h>
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 namespace KDOM {
 class StyleSheetImpl;
@@ -41,7 +41,7 @@ class StyleSheetListImpl : public Shared {
   void add(StyleSheetImpl* s);
   void remove(StyleSheetImpl* s);
 
-  QPtrList<StyleSheetImpl> styleSheets;
+  Q3PtrList<StyleSheetImpl> styleSheets;
 };
 };
 

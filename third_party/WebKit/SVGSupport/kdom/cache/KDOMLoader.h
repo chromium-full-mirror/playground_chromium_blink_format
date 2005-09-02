@@ -155,7 +155,7 @@ class Loader : public QObject {
   void servePendingRequests();
 
  protected:
-  QPtrList<Request> m_requestsPending;
+  Q3PtrList<Request> m_requestsPending;
   QPtrDict<Request> m_requestsLoading;
 
   QTimer m_timer;

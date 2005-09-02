@@ -22,7 +22,7 @@
 
 #include <qregexp.h>
 #include <qfontmetrics.h>
-#include <qpaintdevicemetrics.h>
+#include <q3paintdevicemetrics.h>
 
 #include "RectImpl.h"
 #include <kdom/css/CSSHelper.h>
@@ -197,7 +197,7 @@ RGBColorImpl* CSSPrimitiveValueImpl::getRGBColorValue() const {
 }
 
 int CSSPrimitiveValueImpl::computeLength(RenderStyle* style,
-                                         QPaintDeviceMetrics* devMetrics) {
+                                         Q3PaintDeviceMetrics* devMetrics) {
   double result = computeLengthFloat(style, devMetrics);
 
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
@@ -209,7 +209,7 @@ int CSSPrimitiveValueImpl::computeLength(RenderStyle* style,
 
 double CSSPrimitiveValueImpl::computeLengthFloat(
     RenderStyle* style,
-    QPaintDeviceMetrics* devMetrics) {
+    Q3PaintDeviceMetrics* devMetrics) {
   unsigned short type = primitiveType();
 
   double dpiY = 72.;  // fallback

@@ -37,7 +37,7 @@ class SVGCSSStyleDeclarationImpl : public KDOM::CSSStyleDeclarationImpl {
                              KDOM::CSSRuleImpl* parentRule);
   SVGCSSStyleDeclarationImpl(KDOM::CDFInterface* interface,
                              KDOM::CSSRuleImpl* parentRule,
-                             QPtrList<KDOM::CSSProperty>* lstValues);
+                             Q3PtrList<KDOM::CSSProperty>* lstValues);
   virtual ~SVGCSSStyleDeclarationImpl();
 
   SVGCSSStyleDeclarationImpl& operator=(

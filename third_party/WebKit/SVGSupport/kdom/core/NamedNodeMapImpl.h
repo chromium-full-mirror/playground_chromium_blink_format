@@ -29,7 +29,7 @@
 #ifndef KDOM_NamedNodeMapImpl_H
 #define KDOM_NamedNodeMapImpl_H
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include <kdom/Shared.h>
 #include <kdom/core/NodeImpl.h>
@@ -84,7 +84,7 @@ class RONamedNodeMapImpl : public NamedNodeMapImpl {
   void addNode(NodeImpl* n);
 
  protected:
-  QPtrList<NodeImpl>* m_map;
+  Q3PtrList<NodeImpl>* m_map;
   DocumentPtr* m_doc;
 };
 };

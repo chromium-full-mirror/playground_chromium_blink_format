@@ -31,7 +31,7 @@
 
 #include <qpair.h>
 #include <qregexp.h>
-#include <qvaluevector.h>
+#include <q3valuevector.h>
 #include <qfontdatabase.h>
 
 #include "KDOMSettings.h"
@@ -94,8 +94,8 @@ class KDOMSettings::Private {
 
   PolicyMap domainPolicy;
 
-  QValueVector<QRegExp> adFilters;
-  QValueList<QPair<QString, QChar>> fallbackAccessKeysAssignments;
+  Q3ValueVector<QRegExp> adFilters;
+  Q3ValueList<QPair<QString, QChar>> fallbackAccessKeysAssignments;
 
   // Flags
   bool enforceCharset : 1;
@@ -636,7 +636,7 @@ bool KDOMSettings::isPluginsEnabled(const QString& hostname) const {
 bool KDOMSettings::isAdFiltered(const QString& url) const {
   if (d->adFilterEnabled) {
     if (!url.startsWith(QString::fromLatin1("data:"))) {
-      QValueVector<QRegExp>::iterator it;
+      Q3ValueVector<QRegExp>::iterator it;
       for (it = d->adFilters.begin(); it != d->adFilters.end(); ++it) {
         if ((*it).search(url) != -1) {
           kdDebug(6080) << "Filtered: " << url << endl;

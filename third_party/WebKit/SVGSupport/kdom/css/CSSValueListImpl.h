@@ -25,7 +25,7 @@
 
 #include <kdom/css/CSSValueImpl.h>
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 namespace KDOM {
 class CSSValueListImpl : public CSSValueImpl {
@@ -47,7 +47,7 @@ class CSSValueListImpl : public CSSValueImpl {
   void append(CSSValueImpl* val);
 
  protected:
-  QPtrList<CSSValueImpl> m_values;
+  Q3PtrList<CSSValueImpl> m_values;
 };
 };
 

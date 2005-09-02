@@ -68,13 +68,13 @@ void EventTargetImpl::addEventListener(DOMStringImpl* type,
   }
 
   if (!m_eventListeners) {
-    m_eventListeners = new QPtrList<RegisteredEventListener>();
+    m_eventListeners = new Q3PtrList<RegisteredEventListener>();
     m_eventListeners->setAutoDelete(true);
   } else {
     // If there is an existing listener forget this call...
     RegisteredEventListener compare(type, listener, useCapture);
 
-    QPtrListIterator<RegisteredEventListener> it(*m_eventListeners);
+    Q3PtrListIterator<RegisteredEventListener> it(*m_eventListeners);
     for (; it.current(); ++it) {
       if (*(it.current()) == compare)
         return;
@@ -109,7 +109,7 @@ void EventTargetImpl::removeEventListener(DOMStringImpl* type,
 
   RegisteredEventListener compare(type, listener, useCapture);
 
-  QPtrListIterator<RegisteredEventListener> it(*m_eventListeners);
+  Q3PtrListIterator<RegisteredEventListener> it(*m_eventListeners);
   for (; it.current(); ++it) {
     if ((*it.current()) == compare) {
       m_eventListeners->removeRef(it.current());
@@ -128,7 +128,7 @@ bool EventTargetImpl::dispatchEvent(EventImpl* evt) {
 
   // Find out, where to send to -> collect parent nodes,
   // cast them to EventTargets and add them to list
-  QPtrList<EventTargetImpl> targetChain;
+  Q3PtrList<EventTargetImpl> targetChain;
 
   NodeImpl* i = dynamic_cast<NodeImpl*>(this);
   if (!i) {
@@ -145,7 +145,7 @@ bool EventTargetImpl::dispatchEvent(EventImpl* evt) {
   // Trigger any capturing event handlers on our way down
   evt->setEventPhase(CAPTURING_PHASE);
 
-  QPtrListIterator<EventTargetImpl> it(targetChain);
+  Q3PtrListIterator<EventTargetImpl> it(targetChain);
   for (; it.current() && it.current() != this && !evt->propagationStopped();
        ++it) {
     EventTargetImpl* i = it.current();
@@ -217,7 +217,7 @@ void EventTargetImpl::handleLocalEvents(EventImpl* evt, bool useCapture) {
 
   KJS::Interpreter::lock();
 
-  QPtrListIterator<RegisteredEventListener> it(*m_eventListeners);
+  Q3PtrListIterator<RegisteredEventListener> it(*m_eventListeners);
   for (; it.current(); ++it) {
     RegisteredEventListener* current = it.current();
     if (DOMString(current->type()) == DOMString(evt->type()) &&

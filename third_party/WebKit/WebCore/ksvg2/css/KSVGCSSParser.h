@@ -41,7 +41,7 @@ class SVGCSSParser : public KDOM::CSSParser {
 
   virtual KDOM::CSSStyleDeclarationImpl* createCSSStyleDeclaration(
       KDOM::CSSStyleRuleImpl* rule,
-      QPtrList<KDOM::CSSProperty>* propList);
+      Q3PtrList<KDOM::CSSProperty>* propList);
 };
 }
 

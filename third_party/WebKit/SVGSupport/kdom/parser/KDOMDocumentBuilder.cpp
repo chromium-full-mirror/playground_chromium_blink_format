@@ -23,7 +23,7 @@
 #include <kurl.h>
 #include <kdebug.h>
 
-#include <qptrstack.h>
+#include <q3ptrstack.h>
 
 #include "kdom.h"
 #include <kdom/Helper.h>
@@ -56,7 +56,7 @@ class DocumentBuilder::Private {
 
   bool cdata;
   DocumentImpl* doc;
-  QPtrStack<NodeImpl> nodes;
+  Q3PtrStack<NodeImpl> nodes;
 };
 
 DocumentBuilder::DocumentBuilder() : d(new Private()) {

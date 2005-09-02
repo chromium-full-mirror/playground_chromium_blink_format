@@ -79,4 +79,6 @@ inline bool operator!=(const char* s1, const QCString& s2) {
   return !(s1 == s2);
 }
 
+typedef QCString Q3CString;
+
 #endif

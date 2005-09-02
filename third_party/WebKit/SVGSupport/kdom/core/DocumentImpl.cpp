@@ -30,8 +30,8 @@
 
 #include <klocale.h>
 
-#include <qptrstack.h>
-#include <qpaintdevicemetrics.h>
+#include <q3ptrstack.h>
+#include <q3paintdevicemetrics.h>
 
 #include "kdom.h"
 #include <kdom/ecma/Ecma.h>
@@ -635,7 +635,7 @@ ElementImpl* DocumentImpl::getElementById(DOMStringImpl* elementId) {
   if (elementId)
     elementId->ref();
 
-  QPtrStack<NodeImpl> nodeStack;
+  Q3PtrStack<NodeImpl> nodeStack;
   NodeImpl* current = firstChild();
 
   while (1) {
@@ -768,7 +768,7 @@ void DocumentImpl::setPaintDevice(QPaintDevice* dev) {
     m_paintDevice = dev;
 
     delete m_paintDeviceMetrics;
-    m_paintDeviceMetrics = new QPaintDeviceMetrics(dev);
+    m_paintDeviceMetrics = new Q3PaintDeviceMetrics(dev);
   }
 }
 
@@ -802,7 +802,7 @@ NodeImpl::Id DocumentImpl::getId(NodeImpl::IdType type,
       break;
     }
     case NodeImpl::NamespaceId: {
-      // ### Id == 0 can't be used with ((void *) int) based QDicts...
+      // ### Id == 0 can't be used with ((void *) int) based Q3Dicts...
       if (!strcasecmp(DOMString(name), DOMString(defaultNS())))
         return 0;
 

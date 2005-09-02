@@ -117,8 +117,8 @@ void StyleBaseImpl::setParsedValue(int propId,
                                    const CSSValueImpl* parsedValue,
                                    bool important,
                                    bool nonCSSHint,
-                                   QPtrList<CSSProperty>* propList) {
-  QPtrListIterator<CSSProperty> propIt(*propList);
+                                   Q3PtrList<CSSProperty>* propList) {
+  Q3PtrListIterator<CSSProperty> propIt(*propList);
   propIt.toLast();  // just remove the top one - not sure what should happen if
                     // we have multiple instances of the property
 

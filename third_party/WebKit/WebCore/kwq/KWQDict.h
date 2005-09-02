@@ -87,4 +87,7 @@ class QDictIterator {
   KWQDictIteratorImpl impl;
 };
 
+#define Q3Dict QDict
+#define Q3DictIterator QDictIterator
+
 #endif

@@ -23,7 +23,7 @@
 #ifndef KDOM_CSSStyleDeclarationImpl_H
 #define KDOM_CSSStyleDeclarationImpl_H
 
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include <kdom/css/StyleBaseImpl.h>
 
@@ -39,7 +39,7 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
   CSSStyleDeclarationImpl(CDFInterface* interface, CSSRuleImpl* parentRule);
   CSSStyleDeclarationImpl(CDFInterface* interface,
                           CSSRuleImpl* parentRule,
-                          QPtrList<CSSProperty>* lstValues);
+                          Q3PtrList<CSSProperty>* lstValues);
   virtual ~CSSStyleDeclarationImpl();
 
   CSSStyleDeclarationImpl& operator=(const CSSStyleDeclarationImpl&);
@@ -88,7 +88,7 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
   void setNode(NodeImpl* node) { m_node = node; }
 
   CDFInterface* interface() const { return m_interface; }
-  QPtrList<CSSProperty>* values() const { return m_lstValues; }
+  Q3PtrList<CSSProperty>* values() const { return m_lstValues; }
 
   virtual void setChanged();
 
@@ -103,7 +103,7 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
   DOMStringImpl* get4Values(const int* properties) const;
 
  protected:
-  QPtrList<CSSProperty>* m_lstValues;
+  Q3PtrList<CSSProperty>* m_lstValues;
   CDFInterface* m_interface;
   NodeImpl* m_node;
 };

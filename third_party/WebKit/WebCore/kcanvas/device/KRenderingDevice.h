@@ -25,7 +25,7 @@
 
 #include <qcolor.h>
 #include <qobject.h>
-#include <qptrstack.h>
+#include <q3ptrstack.h>
 
 #include <kcanvas/KCanvasTypes.h>
 #include <kcanvas/KCanvasFilters.h>
@@ -106,7 +106,7 @@ class KRenderingDevice : public QObject {
 
  private:
   KCanvasUserData m_currentPath;
-  QPtrStack<KRenderingDeviceContext> m_contextStack;
+  Q3PtrStack<KRenderingDeviceContext> m_contextStack;
 };
 
 #endif

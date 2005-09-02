@@ -27,14 +27,14 @@
 #ifndef KDOM_CSSStyleSelector_H
 #define KDOM_CSSStyleSelector_H
 
-#include <qptrlist.h>
-#include <qvaluevector.h>
+#include <q3ptrlist.h>
+#include <q3valuevector.h>
 
 #include <kdom/DOMString.h>
 #include <kdom/css/RenderStyle.h>
 
 class KURL;
-class QPaintDeviceMetrics;
+class Q3PaintDeviceMetrics;
 
 namespace KDOM {
 class KDOMView;
@@ -118,8 +118,8 @@ class CSSStyleSelector : public StyleSelector {
 
   virtual RenderStyle* styleForElement(ElementImpl* e);
 
-  QValueVector<int> fontSizes() const { return m_fontSizes; }
-  QValueVector<int> fixedFontSizes() const { return m_fixedFontSizes; }
+  Q3ValueVector<int> fontSizes() const { return m_fontSizes; }
+  Q3ValueVector<int> fixedFontSizes() const { return m_fixedFontSizes; }
 
   bool strictParsing;
 
@@ -129,11 +129,11 @@ class CSSStyleSelector : public StyleSelector {
     QString file;
   } encodedurl;
 
-  void computeFontSizes(QPaintDeviceMetrics* paintDeviceMetrics,
+  void computeFontSizes(Q3PaintDeviceMetrics* paintDeviceMetrics,
                         int zoomFactor);
-  void computeFontSizesFor(QPaintDeviceMetrics* paintDeviceMetrics,
+  void computeFontSizesFor(Q3PaintDeviceMetrics* paintDeviceMetrics,
                            int zoomFactor,
-                           QValueVector<int>& fontSizes,
+                           Q3ValueVector<int>& fontSizes,
                            bool isFixed);
 
  protected:
@@ -164,7 +164,7 @@ class CSSStyleSelector : public StyleSelector {
   // Helper function (used for instance by khtml's HTMLCSSStyleSelector)
   static Length convertToLength(CSSPrimitiveValueImpl* primitiveValue,
                                 RenderStyle* style,
-                                QPaintDeviceMetrics* paintDeviceMetrics,
+                                Q3PaintDeviceMetrics* paintDeviceMetrics,
                                 bool* ok = 0);
 
   static RenderStyle* styleNotYetAvailable;
@@ -210,7 +210,7 @@ class CSSStyleSelector : public StyleSelector {
   SelectorCache* selectorCache;
   unsigned int properties_size;
   CSSOrderedProperty** properties;
-  QMemArray<CSSOrderedProperty> inlineProps;
+  Q3MemArray<CSSOrderedProperty> inlineProps;
   QString m_medium;
   CSSOrderedProperty** propsToApply;
   CSSOrderedProperty** pseudoProps;
@@ -227,10 +227,10 @@ class CSSStyleSelector : public StyleSelector {
   KDOMView* view;
   KDOMPart* part;
   const KDOMSettings* settings;
-  QPaintDeviceMetrics* paintDeviceMetrics;
+  Q3PaintDeviceMetrics* paintDeviceMetrics;
 
-  QValueVector<int> m_fontSizes;
-  QValueVector<int> m_fixedFontSizes;
+  Q3ValueVector<int> m_fontSizes;
+  Q3ValueVector<int> m_fixedFontSizes;
 
   bool fontDirty;
 
@@ -283,9 +283,9 @@ class CSSOrderedProperty {
  * This is the list we will collect all properties we need to apply in.
  * It will get sorted once before applying.
  */
-class CSSOrderedPropertyList : public QPtrList<CSSOrderedProperty> {
+class CSSOrderedPropertyList : public Q3PtrList<CSSOrderedProperty> {
  public:
-  virtual int compareItems(QPtrCollection::Item i1, QPtrCollection::Item i2);
+  virtual int compareItems(Q3PtrCollection::Item i1, Q3PtrCollection::Item i2);
   void append(CSSStyleDeclarationImpl* decl,
               unsigned int selector,
               unsigned int specificity,
@@ -303,13 +303,13 @@ class CSSOrderedRule {
   int index;
 };
 
-class CSSStyleSelectorList : public QPtrList<CSSOrderedRule> {
+class CSSStyleSelectorList : public Q3PtrList<CSSOrderedRule> {
  public:
   CSSStyleSelectorList();
   virtual ~CSSStyleSelectorList();
 
   void append(CSSStyleSheetImpl* sheet, DOMStringImpl* medium);
-  void collect(QPtrList<CSSSelector>* selectorList,
+  void collect(Q3PtrList<CSSSelector>* selectorList,
                CSSOrderedPropertyList* propList,
                Source regular,
                Source important);

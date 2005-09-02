@@ -27,7 +27,7 @@
 #define KDOM_CSSPARSER_H
 
 #include <qstring.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 
 #include <kdom/core/DOMStringImpl.h>
 
@@ -151,7 +151,7 @@ class CSSParser {
 
   virtual CSSStyleDeclarationImpl* createCSSStyleDeclaration(
       CSSStyleRuleImpl* rule,
-      QPtrList<CSSProperty>* propList);
+      Q3PtrList<CSSProperty>* propList);
 
  public:
   bool strict;

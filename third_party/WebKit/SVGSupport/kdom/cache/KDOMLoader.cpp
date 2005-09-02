@@ -263,7 +263,7 @@ void Loader::load(DocumentLoader* docLoader,
 int Loader::numRequests(DocumentLoader* docLoader) const {
   int res = 0;
 
-  QPtrListIterator<Request> pIt(m_requestsPending);
+  Q3PtrListIterator<Request> pIt(m_requestsPending);
   for (; pIt.current(); ++pIt) {
     if (pIt.current()->docLoader == docLoader)
       res++;
@@ -279,7 +279,7 @@ int Loader::numRequests(DocumentLoader* docLoader) const {
 }
 
 void Loader::cancelRequests(DocumentLoader* docLoader) {
-  QPtrListIterator<Request> pIt(m_requestsPending);
+  Q3PtrListIterator<Request> pIt(m_requestsPending);
   while (pIt.current()) {
     if (pIt.current()->docLoader == docLoader) {
       kdDebug() << "canceling pending request for "
