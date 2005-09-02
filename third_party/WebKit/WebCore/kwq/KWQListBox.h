@@ -29,13 +29,17 @@
 #include "KWQScrollView.h"
 #include "KWQPainter.h"
 
-enum ItemType { Option, GroupLabel, Separator };
+enum KWQListBoxItemType {
+  KWQListBoxOption,
+  KWQListBoxGroupLabel,
+  KWQListBoxSeparator
+};
 
 struct KWQListBoxItem {
   QString string;
-  ItemType type;
+  KWQListBoxItemType type;
 
-  KWQListBoxItem(const QString& s, ItemType t) : string(s), type(t) {}
+  KWQListBoxItem(const QString& s, KWQListBoxItemType t) : string(s), type(t) {}
 };
 
 class QListBox : public QScrollView {
@@ -52,8 +56,10 @@ class QListBox : public QScrollView {
   void setSelectionMode(SelectionMode);
 
   void clear();
-  void appendItem(const QString& s) { appendItem(s, Option); }
-  void appendGroupLabel(const QString& s) { appendItem(s, GroupLabel); }
+  void appendItem(const QString& s) { appendItem(s, KWQListBoxOption); }
+  void appendGroupLabel(const QString& s) {
+    appendItem(s, KWQListBoxGroupLabel);
+  }
   void doneAppendingItems();
 
   void setSelected(int, bool);
@@ -77,7 +83,7 @@ class QListBox : public QScrollView {
   void setFont(const QFont& font);
 
  private:
-  void appendItem(const QString&, ItemType type);
+  void appendItem(const QString&, KWQListBoxItemType);
 
   // A vector<KWQListBoxItem> or QValueVector<KWQListBoxItem> might be more
   // efficient for large lists.
