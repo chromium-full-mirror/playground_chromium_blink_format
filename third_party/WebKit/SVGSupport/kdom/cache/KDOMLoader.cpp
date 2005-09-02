@@ -141,7 +141,7 @@ void DocumentLoader::setAutoloadImages(bool load) {
   if (!m_autoloadImages)
     return;
 
-  for (QPtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it) {
+  for (Q3PtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it) {
     if (it.current()->type() == CachedObject::Image) {
       CachedImage* img = const_cast<CachedImage*>(
           static_cast<const CachedImage*>(it.current()));
@@ -163,7 +163,7 @@ void DocumentLoader::setShowAnimations(
   m_showAnimations = showAnimations;
 
 #ifndef APPLE_COMPILE_HACK
-  for (QPtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it) {
+  for (Q3PtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it) {
     if (it.current()->type() == CachedObject::Image) {
       CachedImage* img = const_cast<CachedImage*>(
           static_cast<const CachedImage*>(it.current()));
@@ -269,7 +269,7 @@ int Loader::numRequests(DocumentLoader* docLoader) const {
       res++;
   }
 
-  QPtrDictIterator<Request> lIt(m_requestsLoading);
+  Q3PtrDictIterator<Request> lIt(m_requestsLoading);
   for (; lIt.current(); ++lIt) {
     if (lIt.current()->docLoader == docLoader)
       res++;
@@ -291,7 +291,7 @@ void Loader::cancelRequests(DocumentLoader* docLoader) {
       ++pIt;
   }
 
-  QPtrDictIterator<Request> lIt(m_requestsLoading);
+  Q3PtrDictIterator<Request> lIt(m_requestsLoading);
   while (lIt.current()) {
     if (lIt.current()->docLoader == docLoader) {
       // kdDebug( 6060 ) << "canceling loading request for " <<
@@ -309,7 +309,7 @@ void Loader::cancelRequests(DocumentLoader* docLoader) {
 }
 
 KIO::Job* Loader::jobForRequest(const DOMString& url) const {
-  QPtrDictIterator<Request> it(m_requestsLoading);
+  Q3PtrDictIterator<Request> it(m_requestsLoading);
   for (; it.current(); ++it) {
     CachedObject* obj = it.current()->object;
 

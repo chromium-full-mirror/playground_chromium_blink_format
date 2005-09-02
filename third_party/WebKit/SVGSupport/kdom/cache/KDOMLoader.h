@@ -30,7 +30,7 @@
 
 #include <qtimer.h>
 #include <qobject.h>
-#include <qptrdict.h>
+#include <q3ptrdict.h>
 #include <qstringlist.h>
 
 #include <kio/job.h>
@@ -120,7 +120,7 @@ class DocumentLoader {
   QStringList m_reloadedURLs;
 
   KIO::CacheControl m_cachePolicy;
-  mutable QPtrDict<CachedObject> m_docObjects;
+  mutable Q3PtrDict<CachedObject> m_docObjects;
 };
 
 class Loader : public QObject {
@@ -156,7 +156,7 @@ class Loader : public QObject {
 
  protected:
   Q3PtrList<Request> m_requestsPending;
-  QPtrDict<Request> m_requestsLoading;
+  Q3PtrDict<Request> m_requestsLoading;
 
   QTimer m_timer;
 };

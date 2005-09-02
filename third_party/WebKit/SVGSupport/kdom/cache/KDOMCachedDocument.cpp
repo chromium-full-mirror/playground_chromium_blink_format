@@ -103,7 +103,7 @@ void CachedDocument::checkNotify() {
   if (m_loading)
     return;
 
-  for (QPtrDictIterator<CachedObjectClient> it(m_clients); it.current();)
+  for (Q3PtrDictIterator<CachedObjectClient> it(m_clients); it.current();)
     it()->notifyFinished(this);
 }
 
@@ -113,7 +113,7 @@ void CachedDocument::error(int err, const char* text) {
   d->errorDescription = text;
   m_loading = false;
 
-  for (QPtrDictIterator<CachedObjectClient> it(m_clients); it.current();)
+  for (Q3PtrDictIterator<CachedObjectClient> it(m_clients); it.current();)
     it()->error(d->errorCode, d->errorDescription);
 }
 

@@ -25,7 +25,7 @@
 #include <kdebug.h>
 #include <kjs/object.h>
 
-#include <qptrdict.h>
+#include <q3ptrdict.h>
 #include <q3ptrlist.h>
 
 #include "EventImpl.h"
@@ -45,7 +45,7 @@ class ScriptInterpreter::Private {
   DocumentImpl* document;
   EventImpl* currentEvent;
 
-  QPtrDict<KJS::ObjectImp> domObjects;
+  Q3PtrDict<KJS::ObjectImp> domObjects;
 };
 
 ScriptInterpreter::ScriptInterpreter(KJS::ObjectImp* global, DocumentImpl* doc)
@@ -133,7 +133,7 @@ void ScriptInterpreter::mark() {
 
   kdDebug() << "!!!!!!!!!! ScriptInterpreter::mark " << this << " marking "
             << d->domObjects.count() << " DOM objects" << endl;
-  QPtrDictIterator<KJS::ObjectImp> it(d->domObjects);
+  Q3PtrDictIterator<KJS::ObjectImp> it(d->domObjects);
   for (; it.current(); ++it)
     it.current()->mark();
 }
