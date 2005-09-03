@@ -152,9 +152,8 @@ void HTMLElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   }
   // standard events
   else if (attr->name() == onclickAttr) {
-    setHTMLEventListener(
-        khtmlClickEvent,
-        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+    setHTMLEventListener(clickEvent, getDocument()->createHTMLEventListener(
+                                         attr->value().qstring(), this));
   } else if (attr->name() == oncontextmenuAttr) {
     setHTMLEventListener(
         contextmenuEvent,
@@ -557,14 +556,10 @@ void HTMLElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
 
   // send mousedown and mouseup before the click, if requested
   if (sendMouseEvents) {
-    QMouseEvent pressEvt(QEvent::MouseButtonPress, QPoint(x, y), Qt::LeftButton,
-                         0);
-    dispatchMouseEvent(&pressEvt, mousedownEvent);
+    dispatchSimulatedMouseEvent(mousedownEvent);
     if (r)
       setActive(true, showPressedLook);
-    QMouseEvent upEvent(QEvent::MouseButtonRelease, QPoint(x, y),
-                        Qt::LeftButton, 0);
-    dispatchMouseEvent(&upEvent, mouseupEvent);
+    dispatchSimulatedMouseEvent(mouseupEvent);
     if (r)
       setActive(false);
   } else if (r) {
@@ -573,9 +568,7 @@ void HTMLElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
   }
 
   // always send click
-  QMouseEvent clickMouseEvent(QEvent::MouseButtonRelease, QPoint(x, y),
-                              Qt::LeftButton, 0);
-  dispatchMouseEvent(&clickMouseEvent, clickEvent);
+  dispatchSimulatedMouseEvent(clickEvent);
 }
 
 // accessKeyAction is used by the accessibility support code
