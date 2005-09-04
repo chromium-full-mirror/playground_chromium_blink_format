@@ -2201,6 +2201,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       bool appliedEndWidth = false;
 
       int wrapW = tmpW;
+      int nextBreakable = -1;
 
       while (len) {
         bool previousCharacterIsSpace = currentCharacterIsSpace;
@@ -2251,7 +2252,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
         if (breakWords)
           wrapW += t->width(pos, 1, f, w + wrapW);
-        if (c == '\n' || (!isPre && isBreakable(str, pos, strlen, breakNBSP)) ||
+
+        if (c == '\n' || (!isPre && isBreakable(str, pos, strlen, nextBreakable,
+                                                breakNBSP)) ||
             (breakWords && (w + wrapW > width))) {
           if (ignoringSpaces) {
             if (!currentCharacterIsSpace) {
