@@ -226,9 +226,8 @@ DOMString AttrImpl::value() const {
 #ifndef NDEBUG
 struct ElementImplCounter {
   static int count;
-  ~ElementImplCounter() {
-    if (count != 0)
-      fprintf(stderr, "LEAK: %d ElementImpl\n", count);
+  ~ElementImplCounter() { /* if (count != 0) fprintf(stderr, "LEAK: %d
+                             ElementImpl\n", count); */
   }
 };
 int ElementImplCounter::count;
