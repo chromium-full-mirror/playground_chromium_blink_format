@@ -28,7 +28,9 @@
 // avoids code that
 // runs at init time.
 
+#if !WIN32  // Visual C++ can't handle placement new, it seems.
 #define AVOID_STATIC_CONSTRUCTORS 1
+#endif
 
 #if AVOID_STATIC_CONSTRUCTORS
 #define KJS_IDENTIFIER_HIDE_GLOBALS 1
