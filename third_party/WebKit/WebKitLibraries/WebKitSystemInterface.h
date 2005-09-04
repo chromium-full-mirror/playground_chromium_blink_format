@@ -35,8 +35,8 @@ BOOL WKGetNSURLResponseMustRevalidate(NSURLResponse* response);
 
 CFStringEncoding WKGetWebDefaultCFStringEncoding(void);
 
-float WKSecondsSinceLastInputEvent();
-CFStringRef WKPreferRGB32Key();
+float WKSecondsSinceLastInputEvent(void);
+CFStringRef WKPreferRGB32Key(void);
 
 void WKSetNSURLConnectionDefersCallbacks(NSURLConnection* connection,
                                          BOOL defers);
@@ -51,20 +51,20 @@ OSType WKCarbonWindowPropertyTag(void);
 
 typedef id WKNSURLConnectionDelegateProxyPtr;
 
-WKNSURLConnectionDelegateProxyPtr WKCreateNSURLConnectionDelegateProxy();
+WKNSURLConnectionDelegateProxyPtr WKCreateNSURLConnectionDelegateProxy(void);
 
-void WKDisableCGDeferredUpdates();
+void WKDisableCGDeferredUpdates(void);
 
 Class WKNSURLProtocolClassForReqest(NSURLRequest* request);
 
-unsigned WKGetNSAutoreleasePoolCount();
+unsigned WKGetNSAutoreleasePoolCount(void);
 
-NSString* WKMouseMovedNotification();
-BOOL WKMouseIsDown();
+NSString* WKMouseMovedNotification(void);
+BOOL WKMouseIsDown(void);
 void WKSetNSWindowShouldPostEventNotifications(NSWindow* window, BOOL post);
 
-CFTypeID WKGetAXTextMarkerTypeID();
-CFTypeID WKGetAXTextMarkerRangeTypeID();
+CFTypeID WKGetAXTextMarkerTypeID(void);
+CFTypeID WKGetAXTextMarkerRangeTypeID(void);
 CFTypeRef WKCreateAXTextMarker(const void* bytes, size_t len);
 BOOL WKGetBytesFromAXTextMarker(CFTypeRef textMarker,
                                 void* bytes,
@@ -72,7 +72,7 @@ BOOL WKGetBytesFromAXTextMarker(CFTypeRef textMarker,
 CFTypeRef WKCreateAXTextMarkerRange(CFTypeRef start, CFTypeRef end);
 CFTypeRef WKCopyAXTextMarkerRangeStart(CFTypeRef range);
 CFTypeRef WKCopyAXTextMarkerRangeEnd(CFTypeRef range);
-void WKAccessibilityHandleFocusChanged();
+void WKAccessibilityHandleFocusChanged(void);
 AXUIElementRef WKCreateAXUIElementRef(id element);
 void WKUnregisterUniqueIdForElement(id element);
 
@@ -104,7 +104,7 @@ void WKSetFocusRingStyle(NSFocusRingPlacement placement,
                          NSColor* color);
 void WKSetDragImage(NSImage* image, NSPoint offset);
 
-void WKSendUserChangeNotifications();
+void WKSendUserChangeNotifications(void);
 BOOL WKConvertNSEventToCarbonEvent(EventRecord* carbonEvent,
                                    NSEvent* cocoaEvent);
 void WKSendKeyEventToTSM(NSEvent* theEvent);
@@ -152,3 +152,6 @@ NSEvent* WKCreateNSEventWithCarbonClickEvent(EventRef inEvent,
                                              WindowRef windowRef);
 
 BOOL WKExecutableLinkedInTigerOrEarlier(void);
+
+CGContextRef WKNSWindowOverrideCGContext(NSWindow*, CGContextRef);
+void WKNSWindowRestoreCGContext(NSWindow*, CGContextRef);
