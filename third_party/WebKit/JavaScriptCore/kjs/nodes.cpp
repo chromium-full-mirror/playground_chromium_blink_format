@@ -116,7 +116,7 @@ void Node::finalCheck() {
   fprintf(stderr, "Node::finalCheck(): list count       : %d\n",
           (int)s_nodes.size());
   std::list<Node*>::iterator it = s_nodes->begin();
-  for (uint i = 0; it != s_nodes->end(); ++it, ++i)
+  for (unsigned i = 0; it != s_nodes->end(); ++it, ++i)
     fprintf(stderr, "[%d] Still having node %p (%s) (refcount %d)\n", i,
             (void*)*it, typeid(**it).name(), (*it)->refcount);
   delete s_nodes;
@@ -1027,6 +1027,7 @@ ValueImp* ConditionalNode::evaluate(ExecState* exec) {
 
 // ECMA 11.13
 
+#if __GNUC__
 // gcc refuses to inline this without the always_inline, but inlining it does
 // help
 static inline ValueImp* valueForReadModifyAssignment(ExecState* exec,
@@ -1034,6 +1035,7 @@ static inline ValueImp* valueForReadModifyAssignment(ExecState* exec,
                                                      ValueImp* v2,
                                                      Operator oper)
     __attribute__((always_inline));
+#endif
 
 static inline ValueImp* valueForReadModifyAssignment(ExecState* exec,
                                                      ValueImp* v1,

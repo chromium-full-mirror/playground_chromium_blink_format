@@ -36,7 +36,6 @@ class ActivationImp;
  * @short Implementation class for internal Functions.
  */
 class FunctionImp : public InternalFunctionImp {
-  friend class Function;
   friend class ActivationImp;
 
  public:

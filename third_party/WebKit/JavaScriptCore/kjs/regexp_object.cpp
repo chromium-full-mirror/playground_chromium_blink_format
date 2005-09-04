@@ -197,7 +197,7 @@ ObjectImp* RegExpObjectImp::arrayOfMatches(ExecState* exec,
   // matches
   list.append(String(result));
   if (lastOvector)
-    for (uint i = 1; i < lastNrSubPatterns + 1; ++i) {
+    for (unsigned i = 1; i < lastNrSubPatterns + 1; ++i) {
       int start = lastOvector[2 * i];
       if (start == -1)
         list.append(jsUndefined());

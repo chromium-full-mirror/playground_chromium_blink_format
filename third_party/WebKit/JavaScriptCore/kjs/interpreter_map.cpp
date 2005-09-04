@@ -21,6 +21,7 @@
 
 #include "interpreter_map.h"
 #include "pointer_hash.h"
+#include <stdlib.h>
 
 namespace KJS {
 

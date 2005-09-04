@@ -94,7 +94,7 @@ class RegExpObjectImp : public InternalFunctionImp {
 
   UString lastString;
   int* lastOvector;
-  uint lastNrSubPatterns;
+  unsigned lastNrSubPatterns;
 };
 
 }  // namespace

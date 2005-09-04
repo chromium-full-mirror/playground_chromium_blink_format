@@ -22,8 +22,11 @@
 #include "list.h"
 
 #include "internal.h"
+#include <algorithm>
 
 #define DUMP_STATISTICS 0
+
+using std::min;
 
 namespace KJS {
 
@@ -95,7 +98,7 @@ ListStatisticsExitLogger::~ListStatisticsExitLogger() {
 #endif
 
 inline void ListImp::markValues() {
-  int inlineSize = MIN(size, inlineValuesSize);
+  int inlineSize = min(size, inlineValuesSize);
   for (int i = 0; i != inlineSize; ++i) {
     if (!values[i]->marked()) {
       values[i]->mark();
@@ -276,7 +279,7 @@ List List::copy() const {
 
   int size = imp->size;
 
-  int inlineSize = MIN(size, inlineValuesSize);
+  int inlineSize = min(size, inlineValuesSize);
   for (int i = 0; i != inlineSize; ++i)
     copy.append(imp->values[i]);
 
@@ -295,7 +298,7 @@ List List::copyTail() const {
 
   int size = imp->size;
 
-  int inlineSize = MIN(size, inlineValuesSize);
+  int inlineSize = min(size, inlineValuesSize);
   for (int i = 1; i < inlineSize; ++i)
     copy.append(imp->values[i]);
 
