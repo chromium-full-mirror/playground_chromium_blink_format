@@ -144,6 +144,8 @@ void RenderCanvasImage::paint(PaintInfo& i, int _tx, int _ty) {
     paintBoxDecorations(i, x, y);
 
   QPainter* p = i.p;
+  if (p->paintingDisabled())
+    return;
 
   if (i.phase == PaintActionOutline && style()->outlineWidth() &&
       style()->visibility() == VISIBLE)
