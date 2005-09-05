@@ -1299,7 +1299,7 @@ bool KHTMLView::updateDragAndDrop(const QPoint& loc,
 
   // Drag events should never go to text nodes (following IE, and proper
   // mouseover/out dispatch)
-  if (newTarget->isTextNode()) {
+  if (newTarget && newTarget->isTextNode()) {
     newTarget = newTarget->parentNode();
   }
 
