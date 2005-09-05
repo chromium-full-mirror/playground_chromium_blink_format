@@ -2134,7 +2134,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
         if (DocumentImpl* doc = part->xmlDocImpl())
-          doc->addWindowEventListener(
+          doc->removeWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
       return Undefined();
