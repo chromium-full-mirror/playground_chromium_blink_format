@@ -65,6 +65,10 @@ void KCanvasRenderingStyle::updateFill(KCanvasItem* item) {
     return;
 
   SVGPaintImpl* fill = m_style->fillPaint();
+
+  if (fill && fill->paintType() == SVG_PAINTTYPE_NONE)
+    return;
+
   if (!fill)  // initial value (black)
   {
     KRenderingPaintServer* fillPaintServer =
@@ -86,7 +90,7 @@ void KCanvasRenderingStyle::updateFill(KCanvasItem* item) {
       fillPaintResource->addClient(item);
 
     fillPainter()->setPaintServer(fillPaintServer);
-  } else if (fill->paintType() != SVG_PAINTTYPE_NONE) {
+  } else {
     KRenderingPaintServer* fillPaintServer =
         m_canvas->renderingDevice()->createPaintServer(
             KCPaintServerType(PS_SOLID));
@@ -111,6 +115,10 @@ void KCanvasRenderingStyle::updateStroke(KCanvasItem* item) {
     return;
 
   SVGPaintImpl* stroke = m_style->strokePaint();
+
+  if (!stroke || stroke->paintType() == SVG_PAINTTYPE_NONE)
+    return;
+
   if (stroke && stroke->paintType() == SVG_PAINTTYPE_URI) {
     KDOM::DOMString id(stroke->uri());
 
@@ -122,7 +130,7 @@ void KCanvasRenderingStyle::updateStroke(KCanvasItem* item) {
       strokePaintResource->addClient(item);
 
     strokePainter()->setPaintServer(strokePaintServer);
-  } else if (stroke && stroke->paintType() != SVG_PAINTTYPE_NONE) {
+  } else {
     KRenderingPaintServer* strokePaintServer =
         m_canvas->renderingDevice()->createPaintServer(
             KCPaintServerType(PS_SOLID));
