@@ -368,9 +368,9 @@ void HTMLElementImpl::setOuterHTML(const DOMString& html, int& exception) {
     return;
   }
 
-  if (parentNode()) {
-    parentNode()->replaceChild(fragment, this, exception);
-  }
+  ref();
+  parent->replaceChild(fragment, this, exception);
+  deref();
 }
 
 void HTMLElementImpl::setInnerText(const DOMString& text, int& exception) {
@@ -417,7 +417,9 @@ void HTMLElementImpl::setOuterText(const DOMString& text, int& exception) {
   }
 
   TextImpl* t = new TextImpl(docPtr(), text);
+  ref();
   parent->replaceChild(t, this, exception);
+  deref();
   if (exception)
     return;
 
@@ -428,9 +430,7 @@ void HTMLElementImpl::setOuterText(const DOMString& text, int& exception) {
     textPrev->appendData(t->data(), exception);
     if (exception)
       return;
-    t->ref();
-    t->parentNode()->removeChild(t, exception);
-    t->deref();
+    t->remove(exception);
     if (exception)
       return;
     t = textPrev;
@@ -443,7 +443,7 @@ void HTMLElementImpl::setOuterText(const DOMString& text, int& exception) {
     t->appendData(textNext->data(), exception);
     if (exception)
       return;
-    textNext->parentNode()->removeChild(textNext, exception);
+    textNext->remove(exception);
     if (exception)
       return;
   }

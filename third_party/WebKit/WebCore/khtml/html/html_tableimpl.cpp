@@ -85,8 +85,10 @@ bool HTMLTableElementImpl::checkDTD(const NodeImpl* newChild) {
 NodeImpl* HTMLTableElementImpl::setCaption(HTMLTableCaptionElementImpl* c) {
   int exceptioncode = 0;
   NodeImpl* r;
-  if (tCaption) {
-    replaceChild(c, tCaption, exceptioncode);
+  if (NodeImpl* oc = tCaption) {
+    oc->ref();
+    replaceChild(c, oc, exceptioncode);
+    oc->deref();
     r = c;
   } else
     r = insertBefore(c, firstChild(), exceptioncode);
@@ -97,8 +99,10 @@ NodeImpl* HTMLTableElementImpl::setCaption(HTMLTableCaptionElementImpl* c) {
 NodeImpl* HTMLTableElementImpl::setTHead(HTMLTableSectionElementImpl* s) {
   int exceptioncode = 0;
   NodeImpl* r;
-  if (head) {
-    replaceChild(s, head, exceptioncode);
+  if (NodeImpl* h = head) {
+    h->ref();
+    replaceChild(s, h, exceptioncode);
+    h->deref();
     r = s;
   } else if (foot)
     r = insertBefore(s, foot, exceptioncode);
@@ -106,7 +110,6 @@ NodeImpl* HTMLTableElementImpl::setTHead(HTMLTableSectionElementImpl* s) {
     r = insertBefore(s, firstBody, exceptioncode);
   else
     r = appendChild(s, exceptioncode);
-
   head = s;
   return r;
 }
@@ -114,8 +117,10 @@ NodeImpl* HTMLTableElementImpl::setTHead(HTMLTableSectionElementImpl* s) {
 NodeImpl* HTMLTableElementImpl::setTFoot(HTMLTableSectionElementImpl* s) {
   int exceptioncode = 0;
   NodeImpl* r;
-  if (foot) {
-    replaceChild(s, foot, exceptioncode);
+  if (NodeImpl* f = foot) {
+    f->ref();
+    replaceChild(s, f, exceptioncode);
+    f->deref();
     r = s;
   } else if (firstBody)
     r = insertBefore(s, firstBody, exceptioncode);
@@ -128,16 +133,14 @@ NodeImpl* HTMLTableElementImpl::setTFoot(HTMLTableSectionElementImpl* s) {
 NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
   int exceptioncode = 0;
   NodeImpl* r;
-
   s->ref();
-  if (firstBody) {
-    replaceChild(s, firstBody, exceptioncode);
-    firstBody->deref();
+  if (NodeImpl* fb = firstBody) {
+    replaceChild(s, fb, exceptioncode);
+    fb->deref();
     r = s;
   } else
     r = appendChild(s, exceptioncode);
   firstBody = s;
-
   return r;
 }
 

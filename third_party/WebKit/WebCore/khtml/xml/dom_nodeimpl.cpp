@@ -231,13 +231,12 @@ NodeImpl* NodeImpl::appendChild(NodeImpl* newChild, int& exceptioncode) {
 }
 
 void NodeImpl::remove(int& exceptioncode) {
-  exceptioncode = 0;
-  if (!parentNode()) {
+  ref();
+  if (NodeImpl* p = parentNode())
+    p->removeChild(this, exceptioncode);
+  else
     exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-    return;
-  }
-
-  parentNode()->removeChild(this, exceptioncode);
+  deref();
 }
 
 bool NodeImpl::hasChildNodes() const {
@@ -282,7 +281,7 @@ void NodeImpl::normalize() {
       if (exceptioncode)
         return;
 
-      removeChild(nextChild, exceptioncode);
+      nextChild->remove(exceptioncode);
       if (exceptioncode)
         return;
     } else {
@@ -296,7 +295,7 @@ void NodeImpl::normalize() {
   if (child && !child->nextSibling() && child->isTextNode()) {
     TextImpl* text = static_cast<TextImpl*>(child);
     if (text->data().isEmpty())
-      removeChild(child, exceptioncode);
+      child->remove(exceptioncode);
   }
 }
 
