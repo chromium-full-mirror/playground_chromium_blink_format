@@ -151,6 +151,7 @@ SVGDocumentImpl::~SVGDocumentImpl() {
 
   delete m_scriptsIt;
   delete m_timeScheduler;
+  delete m_cachedScript;
 }
 
 KDOM::DOMStringImpl* SVGDocumentImpl::title() const {

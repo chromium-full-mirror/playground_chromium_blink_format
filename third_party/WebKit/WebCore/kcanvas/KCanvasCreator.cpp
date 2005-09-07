@@ -207,6 +207,7 @@ KCanvasUserData KCanvasCreator::createCanvasPathData(
 
   if (!valid) {
     device->endPath();
+    device->deletePath(device->currentPath());
     device->startPath();
   }
 
