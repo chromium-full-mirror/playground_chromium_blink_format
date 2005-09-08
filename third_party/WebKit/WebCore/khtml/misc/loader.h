@@ -175,6 +175,8 @@ class CachedObject {
 
   bool isLoaded() const { return !m_loading; }
 
+  virtual bool isImage() const { return false; }
+
   int accessCount() const { return m_accessCount; }
   void increaseAccessCount() { m_accessCount++; }
 
@@ -379,7 +381,8 @@ class CachedImage : public QObject, public CachedObject {
 
   void checkNotify();
 
- protected:
+  virtual bool isImage() const { return true; }
+
   void clear();
 
  private slots:
@@ -550,6 +553,7 @@ class Request {
   QBuffer m_buffer;
   CachedObject* object;
   DocLoader* m_docLoader;
+  bool multipart;
 };
 
 /**

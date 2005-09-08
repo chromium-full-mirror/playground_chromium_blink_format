@@ -74,6 +74,7 @@ class TransferJob : public Job {
   void kill();
 
   void setLoader(KWQResourceLoader*);
+  void cancel();
 
   KURL url() const;
 
