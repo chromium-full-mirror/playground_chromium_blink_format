@@ -472,6 +472,12 @@ class RenderStyle : public Shared {
                                            ListStyleImage,
                                            listStyleImage,
                                            0)
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(CSSValueImpl*,
+                                           inherited,
+                                           cursorImage,
+                                           CursorImage,
+                                           cursorImage,
+                                           0)
 
   // Special cases
   void setHasAutoZIndex() { RS_SET_VARIABLE(box, zAuto, true); }

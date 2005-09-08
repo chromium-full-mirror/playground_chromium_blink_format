@@ -111,9 +111,9 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
 
  private:
   void dispatchUIEvent(KDOM::EventTargetImpl* target,
-                       const KDOM::DOMString& type);
+                       KDOM::DOMStringImpl* type);
   void dispatchMouseEvent(KDOM::EventTargetImpl* target,
-                          const KDOM::DOMString& type);
+                          KDOM::DOMStringImpl* type);
 
   SVGElementImpl* createSVGElement(KDOM::DOMStringImpl* prefix,
                                    KDOM::DOMStringImpl* localName);

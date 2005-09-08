@@ -33,7 +33,7 @@ KCanvasMatrix::KCanvasMatrix() {
   m_mode = OPS_PREMUL;
 }
 
-KCanvasMatrix::KCanvasMatrix(const QWMatrix& qmatrix) {
+KCanvasMatrix::KCanvasMatrix(const QMatrix& qmatrix) {
   m_mode = OPS_PREMUL;
   (*this) = qmatrix;
 }
@@ -55,7 +55,7 @@ KCanvasMatrix::KCanvasMatrix(double a,
 
 KCanvasMatrix::~KCanvasMatrix() {}
 
-KCanvasMatrix& KCanvasMatrix::operator=(const QWMatrix& other) {
+KCanvasMatrix& KCanvasMatrix::operator=(const QMatrix& other) {
   m_matrix = other;
   return *this;
 }
@@ -65,11 +65,11 @@ KCanvasMatrix& KCanvasMatrix::operator=(const KCanvasMatrix& other) {
   return *this;
 }
 
-bool KCanvasMatrix::operator==(const QWMatrix& other) const {
+bool KCanvasMatrix::operator==(const QMatrix& other) const {
   return (m_matrix == other);
 }
 
-bool KCanvasMatrix::operator!=(const QWMatrix& other) const {
+bool KCanvasMatrix::operator!=(const QMatrix& other) const {
   return !operator==(other);
 }
 
@@ -143,7 +143,7 @@ KCanvasMatrix& KCanvasMatrix::translate(double x, double y) {
   if (m_mode == OPS_PREMUL)
     m_matrix.translate(x, y);
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.translate(x, y);
     m_matrix *= temp;
   }
@@ -152,8 +152,8 @@ KCanvasMatrix& KCanvasMatrix::translate(double x, double y) {
 }
 
 KCanvasMatrix& KCanvasMatrix::multiply(const KCanvasMatrix& other) {
-  QWMatrix temp(other.a(), other.b(), other.c(), other.d(), other.e(),
-                other.f());
+  QMatrix temp(other.a(), other.b(), other.c(), other.d(), other.e(),
+               other.f());
 
   if (m_mode == OPS_PREMUL) {
     temp *= m_matrix;
@@ -168,7 +168,7 @@ KCanvasMatrix& KCanvasMatrix::scale(double scaleFactorX, double scaleFactorY) {
   if (m_mode == OPS_PREMUL)
     m_matrix.scale(scaleFactorX, scaleFactorY);
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.scale(scaleFactorX, scaleFactorY);
     m_matrix *= temp;
   }
@@ -180,7 +180,7 @@ KCanvasMatrix& KCanvasMatrix::rotate(double angle) {
   if (m_mode == OPS_PREMUL)
     m_matrix.rotate(angle);
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.rotate(angle);
     m_matrix *= temp;
   }
@@ -192,7 +192,7 @@ KCanvasMatrix& KCanvasMatrix::rotateFromVector(double x, double y) {
   if (m_mode == OPS_PREMUL)
     m_matrix.rotate(atan2(y, x) / deg2rad);
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.rotate(atan2(y, x) / deg2rad);
     m_matrix *= temp;
   }
@@ -212,7 +212,7 @@ KCanvasMatrix& KCanvasMatrix::skewX(double angle) {
   if (m_mode == OPS_PREMUL)
     m_matrix.shear(tan(angle * deg2rad), 0.0f);
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.shear(tan(angle * deg2rad), 0.0f);
     m_matrix *= temp;
   }
@@ -224,7 +224,7 @@ KCanvasMatrix& KCanvasMatrix::skewY(double angle) {
   if (m_mode == OPS_PREMUL)
     m_matrix.shear(0.0f, tan(angle * deg2rad));
   else {
-    QWMatrix temp;
+    QMatrix temp;
     temp.shear(0.0f, tan(angle * deg2rad));
     m_matrix *= temp;
   }
@@ -272,7 +272,7 @@ KCPathDataList KCanvasMatrix::map(const KCPathDataList& pathData) const {
   return mapped;
 }
 
-QWMatrix KCanvasMatrix::qmatrix() const {
+QMatrix KCanvasMatrix::qmatrix() const {
   return m_matrix;
 }
 

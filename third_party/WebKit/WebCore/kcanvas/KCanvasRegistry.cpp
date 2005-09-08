@@ -23,7 +23,6 @@
 #include "KCanvasItem.h"
 #include "KCanvasRegistry.h"
 #include "KRenderingPaintServer.h"
-
 #include <qtextstream.h>
 
 KCanvasRegistry::KCanvasRegistry() {
@@ -74,6 +73,7 @@ QTextStream& operator<<(QTextStream& ts, const KCanvasRegistry& r) {
          << *(*it) << "}" << endl;
     }
   }
+
   return ts;
 }
 

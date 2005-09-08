@@ -85,12 +85,12 @@ class SVGAnimationElementImpl : public SVGElementImpl,
 
   double parseClockValue(const QString& data) const;
 
-  KDOM::DOMString targetAttribute() const;
-  void setTargetAttribute(const KDOM::DOMString& value);
+  KDOM::DOMStringImpl* targetAttribute() const;
+  void setTargetAttribute(KDOM::DOMStringImpl* value);
 
   static void setTargetAttribute(SVGElementImpl* target,
-                                 const KDOM::DOMString& name,
-                                 const KDOM::DOMString& value,
+                                 KDOM::DOMStringImpl* name,
+                                 KDOM::DOMStringImpl* value,
                                  EAttributeType type = ATTRIBUTETYPE_AUTO);
 
   QString attributeName() const;

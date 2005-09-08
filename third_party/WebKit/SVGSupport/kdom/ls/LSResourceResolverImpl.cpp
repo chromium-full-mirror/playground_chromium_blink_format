@@ -30,11 +30,11 @@ LSResourceResolverImpl::LSResourceResolverImpl() : Shared() {}
 LSResourceResolverImpl::~LSResourceResolverImpl() {}
 
 LSInputImpl* LSResourceResolverImpl::resolveResource(
-    const DOMString& /*type*/,
-    const DOMString& /*ns*/,
-    const DOMString& /*publicId*/,
-    const DOMString& /*systemId*/,
-    const DOMString& /*baseURI*/) {
+    DOMStringImpl* /*type*/,
+    DOMStringImpl* /*ns*/,
+    DOMStringImpl* /*publicId*/,
+    DOMStringImpl* /*systemId*/,
+    DOMStringImpl* /*baseURI*/) {
   /* Hm, "Return Value: A LSInput object describing the new
    * input source, or null to request that the parser open a
    * regular URI connection to the resource." */

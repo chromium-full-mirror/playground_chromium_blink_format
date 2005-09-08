@@ -45,7 +45,7 @@ class SVGScriptElementImpl : public SVGElementImpl,
   virtual void parseAttribute(KDOM::AttributeImpl* attr);
 
   static void executeScript(KDOM::DocumentImpl* document,
-                            const KDOM::DOMString& jsCode);
+                            KDOM::DOMStringImpl* jsCode);
 
  private:
   KDOM::DOMStringImpl* m_type;

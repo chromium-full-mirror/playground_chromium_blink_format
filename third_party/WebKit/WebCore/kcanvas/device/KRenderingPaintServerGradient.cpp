@@ -90,6 +90,7 @@ class KRenderingPaintServerGradient::Private {
   Private() {
     boundingBoxMode = true;
     spreadMethod = SPREADMETHOD_PAD;
+    listener = 0;
   }
   ~Private() {}
 
@@ -97,10 +98,11 @@ class KRenderingPaintServerGradient::Private {
   KCGradientSpreadMethod spreadMethod;
   bool boundingBoxMode;
   KCanvasMatrix gradientTransform;
+  KCanvasResourceListener* listener;
 };
 
 KRenderingPaintServerGradient::KRenderingPaintServerGradient()
-    : KRenderingPaintServer(), KCanvasResource(), d(new Private()) {}
+    : KRenderingPaintServer(), d(new Private()) {}
 
 KRenderingPaintServerGradient::~KRenderingPaintServerGradient() {
   delete d;
@@ -248,6 +250,15 @@ KCPaintServerType KRenderingPaintServerRadialGradient::type() const {
   return PS_RADIAL_GRADIENT;
 }
 
+KCanvasResourceListener* KRenderingPaintServerGradient::listener() const {
+  return d->listener;
+}
+
+void KRenderingPaintServerGradient::setListener(
+    KCanvasResourceListener* listener) {
+  d->listener = listener;
+}
+
 QTextStream& KRenderingPaintServerRadialGradient::externalRepresentation(
     QTextStream& ts) const {
   ts << "[type=RADIAL-GRADIENT] ";
@@ -257,4 +268,5 @@ QTextStream& KRenderingPaintServerRadialGradient::externalRepresentation(
      << " [radius=" << gradientRadius() << "]";
   return ts;
 }
+
 // vim:ts=4:noet

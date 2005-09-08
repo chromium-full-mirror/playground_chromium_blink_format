@@ -439,23 +439,11 @@ void NamedAttrMapImpl::dispatchAttrMutationEvent(NodeImpl* node,
                                                  DOMStringImpl* newValue,
                                                  DOMStringImpl* name,
                                                  unsigned short attrChange) {
-  if (prevValue)
-    prevValue->ref();
-  if (newValue)
-    newValue->ref();
-  if (name)
-    name->ref();
-
   DocumentImpl* document =
       (m_ownerElement ? m_ownerElement->ownerDocument() : 0);
   if (!document || !document->hasListenerType(DOMATTRMODIFIED_EVENT)) {
-    if (prevValue)
-      prevValue->deref();
-    if (newValue)
-      newValue->deref();
     if (name)
       name->deref();
-
     return;
   }
 
@@ -473,13 +461,6 @@ void NamedAttrMapImpl::dispatchAttrMutationEvent(NodeImpl* node,
 
   event->deref();
   eventType->deref();
-
-  if (prevValue)
-    prevValue->deref();
-  if (newValue)
-    newValue->deref();
-  if (name)
-    name->deref();
 }
 
 void NamedAttrMapImpl::dispatchSubtreeModifiedEvent() {

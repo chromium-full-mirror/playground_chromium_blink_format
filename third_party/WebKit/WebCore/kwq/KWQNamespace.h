@@ -62,6 +62,8 @@ class Qt {
     WordBreak = 0x0400,
   };
 
+  enum LayoutDirection { LeftToRight = 0, RightToLeft = 1 };
+
   enum Orientation { Horizontal, Vertical };
 
   enum PenStyle { NoPen, SolidLine, DotLine, DashLine };

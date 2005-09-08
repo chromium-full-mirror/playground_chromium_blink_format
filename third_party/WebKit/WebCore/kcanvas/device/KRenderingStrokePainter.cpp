@@ -20,7 +20,6 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include "KCanvasResources.h"
 #include "KRenderingPaintServer.h"
 #include "KRenderingStrokePainter.h"
 
@@ -68,10 +67,10 @@ KRenderingPaintServer* KRenderingStrokePainter::paintServer() const {
 }
 
 void KRenderingStrokePainter::setPaintServer(KRenderingPaintServer* pserver) {
+  setDirty();
   if (d->pserver &&
       (d->pserver->type() == PS_SOLID || d->pserver->type() == PS_IMAGE))
     delete d->pserver;
-  setDirty();
   d->pserver = pserver;
 }
 
@@ -140,13 +139,8 @@ void KRenderingStrokePainter::setOpacity(float opacity) {
 
 void KRenderingStrokePainter::draw(KRenderingDeviceContext* context,
                                    const KCanvasCommonArgs& args) const {
-  if (d->pserver) {
-    KCanvasResource* res = dynamic_cast<KCanvasResource*>(d->pserver);
-    if (res && res->listener())
-      res->listener()->resourceNotification();
-
+  if (d->pserver)
     d->pserver->draw(context, args, APPLY_TO_STROKE);
-  }
 }
 
 bool KRenderingStrokePainter::dirty() const {

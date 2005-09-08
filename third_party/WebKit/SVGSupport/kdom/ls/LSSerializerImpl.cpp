@@ -71,8 +71,8 @@ DOMConfigurationImpl* LSSerializerImpl::domConfig() const {
   return m_config;
 }
 
-DOMString LSSerializerImpl::newLine() const {
-  return DOMString(m_newLine);
+DOMStringImpl* LSSerializerImpl::newLine() const {
+  return m_newLine;
 }
 
 void LSSerializerImpl::setNewLine(DOMStringImpl* newLine) {
@@ -124,12 +124,12 @@ bool LSSerializerImpl::writeToURI(NodeImpl* nodeArg, DOMStringImpl* uri) {
   return serialize(nodeArg, &output);
 }
 
-DOMString LSSerializerImpl::writeToString(NodeImpl* nodeArg) {
+DOMStringImpl* LSSerializerImpl::writeToString(NodeImpl* nodeArg) {
   QString str;
   QTextOStream subset(&str);
   PrintNode(subset, nodeArg, QString::fromLatin1("  "),
             DOMString(m_newLine).string(), 0, m_config);
-  return str;
+  return new DOMStringImpl(str);
 }
 
 void LSSerializerImpl::PrintInternalSubset(QTextStream& ret,
@@ -428,7 +428,7 @@ DOMStringImpl* LSSerializerImpl::escape(DOMStringImpl* escapeeImpl) {
     else if (escapee[i] == '&')
       result->append("&amp;");
     else
-      result->append(escapee[i]);
+      result->append(QString(escapee[i]));
   }
 
   return result;
@@ -453,7 +453,7 @@ DOMStringImpl* LSSerializerImpl::escapeAttribute(DOMStringImpl* escapeeImpl) {
     else if (escapee[i] == '\'')
       result->append("&apos;");
     else
-      result->append(escapee[i]);
+      result->append(QString(escapee[i]));
   }
 
   return result;

@@ -50,8 +50,9 @@ void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
 
   // Commit change now...
   if (m_savedTo.isEmpty()) {
-    m_savedTo = targetAttribute().string();
-    setTargetAttribute(m_to);
+    KDOM::DOMStringImpl* attr = targetAttribute();
+    m_savedTo = (attr ? attr->string() : QString::null);
+    setTargetAttribute(KDOM::DOMString(m_to).handle());
   }
 
   // End condition.
@@ -63,7 +64,7 @@ void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
     }
 
     if (!isFrozen())
-      setTargetAttribute(m_savedTo);
+      setTargetAttribute(KDOM::DOMString(m_savedTo).handle());
 
     m_savedTo = QString();
   }

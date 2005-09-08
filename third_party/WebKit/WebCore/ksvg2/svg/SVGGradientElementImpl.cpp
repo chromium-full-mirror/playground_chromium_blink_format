@@ -90,7 +90,8 @@ void SVGGradientElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
     }
     case ATTR_GRADIENTTRANSFORM: {
       SVGTransformListImpl* gradientTransforms = gradientTransform()->baseVal();
-      SVGTransformableImpl::parseTransformAttribute(gradientTransforms, value);
+      SVGTransformableImpl::parseTransformAttribute(gradientTransforms,
+                                                    attr->value());
       break;
     }
     case ATTR_SPREADMETHOD: {

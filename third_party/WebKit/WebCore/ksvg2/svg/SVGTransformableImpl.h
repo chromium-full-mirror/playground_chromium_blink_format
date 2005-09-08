@@ -25,13 +25,13 @@
 
 #include "SVGLocatableImpl.h"
 
+class QMatrix;
+
 namespace KDOM {
 class NodeImpl;
-class DOMString;
+class DOMStringImpl;
 class AttributeImpl;
 };
-
-class QWMatrix;
 
 namespace KSVG {
 class SVGMatrixImpl;
@@ -54,7 +54,7 @@ class SVGTransformableImpl : public SVGLocatableImpl {
   // whether it could handle the passed attribute or not.
   bool parseAttribute(KDOM::AttributeImpl* attr);
   static void parseTransformAttribute(SVGTransformListImpl* list,
-                                      const KDOM::DOMString& transform);
+                                      KDOM::DOMStringImpl* transform);
 
   void updateSubtreeMatrices(KDOM::NodeImpl* node);
   void updateLocalTransform(SVGTransformListImpl* localTransforms);

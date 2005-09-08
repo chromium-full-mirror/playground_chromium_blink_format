@@ -57,7 +57,7 @@ class LSParserImpl : public EventTargetImpl {
   bool busy() const;
 
   DocumentImpl* parse(LSInputImpl* input);
-  DocumentImpl* parseURI(const DOMString& uri);
+  DocumentImpl* parseURI(DOMStringImpl* uri);
 
   NodeImpl* parseWithContext(LSInputImpl* input,
                              NodeImpl* contextArg,

@@ -188,17 +188,15 @@ void KCanvasContainer::invalidate() const {
 }
 
 QRect KCanvasContainer::bbox(bool includeStroke) const {
-  KCanvasItem* current = d->first;
-
   QRect rect;
 
+  KCanvasItem* current = d->first;
   if (current) {
     rect = current->bbox(includeStroke);
     current = current->next();
 
-    for (; current != 0; current = current->next()) {
+    for (; current != 0; current = current->next())
       rect = rect.unite(current->bbox(includeStroke));
-    }
   }
 
   return rect;
@@ -246,14 +244,6 @@ bool KCanvasContainer::lowerItem(KCanvasItem* item) {
   return true;
 }
 
-KCanvasItem* KCanvasContainer::first() const {
-  return d->first;
-}
-
-KCanvasItem* KCanvasContainer::last() const {
-  return d->last;
-}
-
 void KCanvasContainer::collisions(const QPoint& p,
                                   KCanvasItemList& hits) const {
   if (p.x() < 0 || p.y() < 0)
@@ -273,6 +263,14 @@ void KCanvasContainer::collisions(const QPoint& p,
         hits.append(current);
     }
   }
+}
+
+KCanvasItem* KCanvasContainer::first() const {
+  return d->first;
+}
+
+KCanvasItem* KCanvasContainer::last() const {
+  return d->last;
 }
 
 // vim:ts=4:noet

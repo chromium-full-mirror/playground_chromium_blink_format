@@ -141,18 +141,20 @@ void DocumentLoader::setAutoloadImages(bool load) {
   if (!m_autoloadImages)
     return;
 
-  for (Q3PtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it) {
-    if (it.current()->type() == CachedObject::Image) {
-      CachedImage* img = const_cast<CachedImage*>(
-          static_cast<const CachedImage*>(it.current()));
+#if 0
+    for(Q3PtrDictIterator<CachedObject> it(m_docObjects); it.current(); ++it)
+    {
+        if(it.current()->type() == CachedObject::Image)
+        {
+            CachedImage *img = const_cast<CachedImage*>( static_cast<const CachedImage *>(it.current()));
 
-      CachedObject::Status status = img->status();
-      if (status != CachedObject::Unknown)
-        continue;
-
-      Cache::loader()->load(this, img, true);
+            CachedObject::Status status = img->status();
+            if(status != CachedObject::Unknown)
+                continue;
+            Cache::loader()->load(this, img, true);
+        }
     }
-  }
+#endif
 }
 
 void DocumentLoader::setShowAnimations(

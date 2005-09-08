@@ -433,6 +433,10 @@ KCanvasImage* KCanvasView::grabImage() {
 }
 #endif
 
+void KCanvasView::setCanvas(KCanvas* canvas) {
+  d->canvas = canvas;
+}
+
 void KCanvasView::clampAgainstTarget(const QRect& rect,
                                      int& x0,
                                      int& y0,

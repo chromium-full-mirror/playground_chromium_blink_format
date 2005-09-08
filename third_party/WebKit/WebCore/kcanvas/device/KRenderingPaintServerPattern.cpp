@@ -33,6 +33,7 @@ class KRenderingPaintServerPattern::Private {
     tile = 0;
     x = y = width = height = 0;
     useBoundingBoxMode = true;
+    listener = 0;
   }
   ~Private() { delete tile; }
 
@@ -40,10 +41,11 @@ class KRenderingPaintServerPattern::Private {
   KCanvasMatrix patternTransform;
   float x, y, width, height;
   bool useBoundingBoxMode;
+  KCanvasResourceListener* listener;
 };
 
 KRenderingPaintServerPattern::KRenderingPaintServerPattern()
-    : KRenderingPaintServer(), KCanvasResource(), d(new Private()) {}
+    : KRenderingPaintServer(), d(new Private()) {}
 
 KRenderingPaintServerPattern::~KRenderingPaintServerPattern() {
   delete d;
@@ -108,6 +110,15 @@ void KRenderingPaintServerPattern::setPatternTransform(
 
 KCPaintServerType KRenderingPaintServerPattern::type() const {
   return PS_PATTERN;
+}
+
+KCanvasResourceListener* KRenderingPaintServerPattern::listener() const {
+  return d->listener;
+}
+
+void KRenderingPaintServerPattern::setListener(
+    KCanvasResourceListener* listener) {
+  d->listener = listener;
 }
 
 QTextStream& KRenderingPaintServerPattern::externalRepresentation(

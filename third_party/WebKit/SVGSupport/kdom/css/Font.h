@@ -96,7 +96,7 @@ class Font {
                 int pos,
                 int len,
                 int width,
-                QPainter::TextDirection d,
+                Qt::LayoutDirection d,
                 int from = -1,
                 int to = -1,
                 QColor bg = QColor(),

@@ -102,6 +102,8 @@ class KCanvasView : public QObject {
  private:
   friend class KCanvas;
 
+  void setCanvas(KCanvas* canvas);
+
   // Internal helper.
   virtual void canvasSizeChanged(int width, int height) = 0;
 

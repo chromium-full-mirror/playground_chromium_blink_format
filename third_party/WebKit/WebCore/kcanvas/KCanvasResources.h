@@ -48,16 +48,10 @@ class KCanvasResource {
   KCanvasResource();
   virtual ~KCanvasResource();
 
-  bool changed() const;
-  void setChanged(bool changed);
-
   virtual void invalidate();
   void addClient(KCanvasItem* item);
 
   const KCanvasItemList& clients() const;
-
-  KCanvasResourceListener* listener() const;
-  void setListener(KCanvasResourceListener* listener);
 
   QString idInRegistry() const;
   void setIdInRegistry(const QString& newId);
@@ -65,10 +59,7 @@ class KCanvasResource {
   virtual QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  bool m_changed : 1;
-
   KCanvasItemList m_clients;
-  KCanvasResourceListener* m_listener;
   QString registryId;
 };
 

@@ -23,15 +23,14 @@
 #ifndef KRenderingPaintServerPattern_H
 #define KRenderingPaintServerPattern_H
 
-#include <kcanvas/KCanvasResources.h>
 #include <kcanvas/device/KRenderingPaintServer.h>
+#include <kcanvas/KCanvasResourceListener.h>
 
 #include <qpoint.h>
 
 class KCanvasImage;
 
-class KRenderingPaintServerPattern : public KRenderingPaintServer,
-                                     public KCanvasResource {
+class KRenderingPaintServerPattern : public KRenderingPaintServer {
  public:
   KRenderingPaintServerPattern();
   virtual ~KRenderingPaintServerPattern();
@@ -63,6 +62,8 @@ class KRenderingPaintServerPattern : public KRenderingPaintServer,
   KCanvasMatrix patternTransform() const;
   void setPatternTransform(const KCanvasMatrix& mat);
 
+  KCanvasResourceListener* listener() const;
+  void setListener(KCanvasResourceListener* listener);
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:

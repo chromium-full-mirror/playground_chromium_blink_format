@@ -80,6 +80,9 @@ void RONamedNodeMapImpl::clone(NamedNodeMapImpl* other) {
 }
 
 NodeImpl* RONamedNodeMapImpl::getNamedItem(DOMStringImpl* name) {
+  if (name)
+    name->ref();
+
   // TODO : id mechanism doesnt work,
   // reverting to old system
   Q3PtrListIterator<NodeImpl> it(*m_map);
@@ -87,6 +90,9 @@ NodeImpl* RONamedNodeMapImpl::getNamedItem(DOMStringImpl* name) {
     if (DOMString(it.current()->nodeName()) == DOMString(name))
       return it.current();
   }
+
+  if (name)
+    name->deref();
 
   return 0;
 }

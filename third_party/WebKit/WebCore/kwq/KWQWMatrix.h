@@ -66,4 +66,6 @@ class QWMatrix {
   CGAffineTransform m_transform;
 };
 
+#define QMatrix QWMatrix
+
 #endif

@@ -420,7 +420,7 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e) {
   // append()
   numPropsToApply = addInlineDeclarations(e, e->styleRules(), numPropsToApply);
 
-  // qDebug("styleForElement(%s)", e->tagName().string().latin1());
+  // qDebug("styleForElement(%s)", e->tagName()->string().latin1());
   // qDebug("%d selectors, %d checked,  %d match,  %d properties(of %d)",
   // selectors_size, schecked, smatch, numPropsToApply, properties_size);
 
@@ -2582,7 +2582,12 @@ void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
     }
     case CSS_PROP_CURSOR: {
       HANDLE_INHERIT_AND_INITIAL(cursor, Cursor)
-      if (primitiveValue)
+      if (!primitiveValue)
+        break;
+
+      if (primitiveValue->primitiveType() == CSS_URI)
+        /*style->setCursorImage(primitiveValue)*/;
+      else
         style->setCursor((ECursor)(primitiveValue->getIdent() - CSS_VAL_AUTO));
 
       break;
@@ -3877,8 +3882,8 @@ void CSSStyleSelector::applyRule(int id, CSSValueImpl* value) {
 }
 
 DOMStringImpl* CSSStyleSelector::getLangAttribute(ElementImpl* e) {
-  return e->getAttributeNS(DOMString(NS_XML).handle(),
-                           DOMString("xml:lang").handle());
+  // TODO: Check NS_XML & friends...
+  return e->getAttributeNS(NS_XML.handle(), DOMString("xml:lang").handle());
 }
 
 // vim:ts=4:noet

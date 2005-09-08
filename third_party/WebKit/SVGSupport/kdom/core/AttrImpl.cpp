@@ -127,7 +127,7 @@ unsigned short AttrImpl::nodeType() const {
 }
 
 DOMStringImpl* AttrImpl::value() const {
-  DOMStringImpl* ret = new DOMStringImpl();
+  DOMStringImpl* ret = new DOMStringImpl("");
 
   for (NodeImpl* child = firstChild(); child != 0; child = child->nextSibling())
     ret->append(DOMString(child->textContent()).string());

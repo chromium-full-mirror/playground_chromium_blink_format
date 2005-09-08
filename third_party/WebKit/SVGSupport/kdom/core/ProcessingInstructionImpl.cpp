@@ -78,7 +78,7 @@ class XMLAttributeReader : public QXmlDefaultHandler {
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc,
                                                      DOMStringImpl* target,
                                                      DOMStringImpl* data)
-    : NodeBaseImpl(doc) {
+    : NodeBaseImpl(doc), LinkStyleImpl() {
   m_target = target;
   if (m_target)
     m_target->ref();
@@ -87,7 +87,6 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc,
   if (m_data)
     m_data->ref();
 
-  m_sheet = 0;
   m_cachedSheet = 0;
   m_localHref = 0;
 }
@@ -99,8 +98,6 @@ ProcessingInstructionImpl::~ProcessingInstructionImpl() {
     m_data->deref();
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
-  if (m_sheet)
-    m_sheet->deref();
 }
 
 DOMStringImpl* ProcessingInstructionImpl::nodeName() const {
@@ -145,10 +142,6 @@ NodeImpl* ProcessingInstructionImpl::cloneNode(bool, DocumentPtr* doc) const {
 
 DOMStringImpl* ProcessingInstructionImpl::localHref() const {
   return m_localHref;
-}
-
-StyleSheetImpl* ProcessingInstructionImpl::sheet() const {
-  return m_sheet;
 }
 
 void ProcessingInstructionImpl::checkStyleSheet() {

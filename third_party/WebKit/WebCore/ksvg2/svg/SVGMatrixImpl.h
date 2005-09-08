@@ -23,7 +23,7 @@
 #ifndef KSVG_SVGMatrixImpl_H
 #define KSVG_SVGMatrixImpl_H
 
-#include <qwmatrix.h>
+#include <qmatrix.h>
 
 #include <kdom/Shared.h>
 
@@ -32,7 +32,7 @@ class SVGMatrixImpl : public KDOM::Shared {
  public:
   SVGMatrixImpl();
   SVGMatrixImpl(double a, double b, double c, double d, double e, double f);
-  SVGMatrixImpl(QWMatrix mat);
+  SVGMatrixImpl(QMatrix mat);
   virtual ~SVGMatrixImpl();
 
   void setA(double a);
@@ -84,16 +84,16 @@ class SVGMatrixImpl : public KDOM::Shared {
   void reset();
 
   // KSVG helper method
-  QWMatrix& qmatrix();
-  const QWMatrix& qmatrix() const;
+  QMatrix& qmatrix();
+  const QMatrix& qmatrix() const;
 
   // Determine the scaling component of the matrix and factor it out. After
   // this operation, the matrix has x and y scale of one.
   void removeScale(double* xScale, double* yScale);
 
  private:
-  void setMatrix(QWMatrix mat);
-  QWMatrix m_mat;
+  void setMatrix(QMatrix mat);
+  QMatrix m_mat;
 };
 };
 

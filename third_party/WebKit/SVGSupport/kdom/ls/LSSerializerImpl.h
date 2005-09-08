@@ -30,7 +30,7 @@ class QTextStream;
 
 namespace KDOM {
 class NodeImpl;
-class DOMString;
+class DOMStringImpl;
 class DOMConfigurationImpl;
 class LSOutputImpl;
 class LSSerializerFilterImpl;
@@ -44,7 +44,7 @@ class LSSerializerImpl : public Shared {
   // 'LSSerializer' functions
   DOMConfigurationImpl* domConfig() const;
 
-  DOMString newLine() const;
+  DOMStringImpl* newLine() const;
   void setNewLine(DOMStringImpl* newLine);
 
   LSSerializerFilterImpl* filter() const;
@@ -52,7 +52,7 @@ class LSSerializerImpl : public Shared {
 
   bool write(NodeImpl* nodeArg, LSOutputImpl* output);
   bool writeToURI(NodeImpl* nodeArg, DOMStringImpl* uri);
-  DOMString writeToString(NodeImpl* nodeArg);
+  DOMStringImpl* writeToString(NodeImpl* nodeArg);
 
   // Internal
   static void PrintNode(QTextStream& ret,

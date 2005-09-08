@@ -46,11 +46,7 @@ SVGStyleElementImpl::~SVGStyleElementImpl() {
 }
 
 KDOM::DOMStringImpl* SVGStyleElementImpl::xmlspace() const {
-  KDOM::DOMString name("xml:space");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return NULL;
+  return tryGetAttribute(KDOM::DOMString("xml:space").handle());
 }
 
 void SVGStyleElementImpl::setXmlspace(KDOM::DOMStringImpl*) {
@@ -58,11 +54,8 @@ void SVGStyleElementImpl::setXmlspace(KDOM::DOMStringImpl*) {
 }
 
 KDOM::DOMStringImpl* SVGStyleElementImpl::type() const {
-  KDOM::DOMString name("type");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return new KDOM::DOMStringImpl("text/css");
+  return tryGetAttribute(KDOM::DOMString("type").handle(),
+                         KDOM::DOMString("text/css").handle());
 }
 
 void SVGStyleElementImpl::setType(KDOM::DOMStringImpl*) {
@@ -70,11 +63,8 @@ void SVGStyleElementImpl::setType(KDOM::DOMStringImpl*) {
 }
 
 KDOM::DOMStringImpl* SVGStyleElementImpl::media() const {
-  KDOM::DOMString name("media");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return new KDOM::DOMStringImpl("all");
+  return tryGetAttribute(KDOM::DOMString("media").handle(),
+                         KDOM::DOMString("all").handle());
 }
 
 void SVGStyleElementImpl::setMedia(KDOM::DOMStringImpl*) {
@@ -82,11 +72,7 @@ void SVGStyleElementImpl::setMedia(KDOM::DOMStringImpl*) {
 }
 
 KDOM::DOMStringImpl* SVGStyleElementImpl::title() const {
-  KDOM::DOMString name("title");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return NULL;
+  return tryGetAttribute(KDOM::DOMString("title").handle());
 }
 
 void SVGStyleElementImpl::setTitle(KDOM::DOMStringImpl*) {
@@ -108,7 +94,8 @@ void SVGStyleElementImpl::childrenChanged() {
   }
 
   m_loading = false;
-  QString _media = KDOM::DOMString(media()).string();
+  KDOM::DOMString mediaDomString(media());
+  QString _media = mediaDomString.string();
   if ((KDOM::DOMString(type()).isEmpty() ||
        KDOM::DOMString(type()) == "text/css") &&
       (_media.isNull() || _media.contains(QString::fromLatin1("screen")) ||
@@ -124,7 +111,7 @@ void SVGStyleElementImpl::childrenChanged() {
                          false);  //! getDocument()->inCompatMode());
 
     KDOM::MediaListImpl* media =
-        new KDOM::MediaListImpl(m_sheet, KDOM::DOMString(_media).handle());
+        new KDOM::MediaListImpl(m_sheet, mediaDomString.handle());
     m_sheet->setMedia(media);
     m_loading = false;
   }

@@ -22,6 +22,8 @@
 
 #include <kjs/interpreter.h>
 
+#include <kdom/ecma/Ecma.h>
+
 #include "EventImpl.h"
 #include "DocumentImpl.h"
 #include "EventTargetImpl.h"
@@ -46,6 +48,9 @@ void EventTargetImpl::addEventListener(DOMStringImpl* type,
                                        bool useCapture) {
   if (!listener)
     return;
+
+  if (type)
+    type->ref();
 
   // If the requested listener is builtin (ie. DOMNODEREMOVED_EVENT)
   // we'll cache the specific enumeration value to save space
@@ -84,6 +89,9 @@ void EventTargetImpl::addEventListener(DOMStringImpl* type,
   addListenerType(doc->addListenerType(type));
   m_eventListeners->append(
       new RegisteredEventListener(type, listener, useCapture));
+
+  if (type)
+    type->deref();
 }
 
 void EventTargetImpl::removeEventListener(DOMStringImpl* type,

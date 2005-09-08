@@ -27,6 +27,11 @@
 #include <kdom/events/EventImpl.h>
 
 namespace KSVG {
+typedef enum {
+  TypeSVGEvent = KDOM::TypeLastEvent + 1,
+  TypeSVGZoomEvent = KDOM::TypeLastEvent + 2
+} SVGEventImplType;
+
 class SVGEventImpl : public KDOM::EventImpl {
  public:
   SVGEventImpl();

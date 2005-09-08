@@ -20,8 +20,8 @@
     Boston, MA 02111-1307, USA.
 */
 
-#include <kdom/DOMString.h>
 #include <kdom/core/AttrImpl.h>
+#include <kdom/core/DOMStringImpl.h>
 #include <kdom/core/NamedAttrMapImpl.h>
 
 #include <kcanvas/KCanvas.h>
@@ -56,6 +56,7 @@
 #include "KCanvasRenderingStyle.h"
 
 #include <q3paintdevicemetrics.h>
+#include <qtextstream.h>
 
 using namespace KSVG;
 
@@ -100,9 +101,10 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::y() const {
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::width() const {
   if (!m_width) {
+    KDOM::DOMString temp("100%");
     lazy_create<SVGAnimatedLengthImpl>(
         m_width, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH, this);
-    m_width->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
+    m_width->baseVal()->setValueAsString(temp.handle());
   }
 
   return m_width;
@@ -110,20 +112,18 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::width() const {
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::height() const {
   if (!m_height) {
+    KDOM::DOMString temp("100%");
     lazy_create<SVGAnimatedLengthImpl>(
         m_height, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT, this);
-    m_height->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
+    m_height->baseVal()->setValueAsString(temp.handle());
   }
 
   return m_height;
 }
 
 KDOM::DOMStringImpl* SVGSVGElementImpl::contentScriptType() const {
-  KDOM::DOMString name("contentScriptType");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return new KDOM::DOMStringImpl("text/ecmascript");
+  return tryGetAttribute(KDOM::DOMString("contentScriptType").handle(),
+                         KDOM::DOMString("text/ecmascript").handle());
 }
 
 void SVGSVGElementImpl::setContentScriptType(KDOM::DOMStringImpl* type) {
@@ -132,16 +132,12 @@ void SVGSVGElementImpl::setContentScriptType(KDOM::DOMStringImpl* type) {
 }
 
 KDOM::DOMStringImpl* SVGSVGElementImpl::contentStyleType() const {
-  KDOM::DOMString name("contentStyleType");
-  if (hasAttribute(name.handle()))
-    return getAttribute(name.handle());
-
-  return new KDOM::DOMStringImpl("text/css");
+  return tryGetAttribute(KDOM::DOMString("contentStyleType").handle(),
+                         KDOM::DOMString("text/css").handle());
 }
 
 void SVGSVGElementImpl::setContentStyleType(KDOM::DOMStringImpl* type) {
-  KDOM::DOMString name("contentStyleType");
-  setAttribute(name.handle(), type);
+  setAttribute(KDOM::DOMString("contentStyleType").handle(), type);
 }
 
 SVGRectImpl* SVGSVGElementImpl::viewport() const {
@@ -230,13 +226,15 @@ SVGPointImpl* SVGSVGElementImpl::currentTranslate() const {
 }
 
 KDOM::EventImpl* SVGSVGElementImpl::createEvent(
-    const KDOM::DOMString& eventType) {
-  if (eventType == "SVGEvents")
+    KDOM::DOMStringImpl* eventTypeImpl) {
+  QString eventType = (eventTypeImpl ? eventTypeImpl->string() : QString::null);
+
+  if (eventType == QString::fromLatin1("SVGEvents"))
     return new SVGEventImpl();
-  else if (eventType == "SVGZoomEvents")
+  else if (eventType == QString::fromLatin1("SVGZoomEvents"))
     return new SVGZoomEventImpl();
 
-  return DocumentEventImpl::createEvent(eventType.handle());
+  return DocumentEventImpl::createEvent(eventTypeImpl);
 }
 
 void SVGSVGElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {

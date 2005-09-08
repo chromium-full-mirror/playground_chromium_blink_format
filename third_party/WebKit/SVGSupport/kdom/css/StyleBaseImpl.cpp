@@ -217,7 +217,7 @@ void CSSSelector::print() {
 #ifndef APPLE_CHANGES
   kdDebug(6080) << "[Selector: tag = " << QString::number(tag, 16)
                 << ", attr = \"" << attr << "\", match = \"" << match
-                << "\" value = \"" << DOMString(value).string().latin1()
+                << "\" value = \"" << (value ? value->string().unicode() : 0)
                 << "\" relation = " << (int)relation << "]" << endl;
 #endif
 
@@ -276,7 +276,7 @@ void CSSSelector::extractPseudoType() const {
   if (value && !value->isEmpty()) {
     value = value->lower();
     DOMString _value(value);
-    switch (_value[0].latin1()) {
+    switch (_value[0].unicode()) {
       case 'a': {
         if (_value == "active")
           _pseudoType = PseudoActive;

@@ -298,9 +298,11 @@ void SVGTimer::notifyAll() {
     QMap<QString, QColor>::Iterator cit = targetColor.begin();
     QMap<QString, QColor>::Iterator cend = targetColor.end();
     for (; cit != cend; ++cit) {
-      if (cit.data().isValid())
-        SVGAnimationElementImpl::setTargetAttribute(tit.key(), cit.key(),
-                                                    cit.data().name());
+      if (cit.data().isValid()) {
+        SVGAnimationElementImpl::setTargetAttribute(
+            tit.key(), KDOM::DOMString(cit.key()).handle(),
+            KDOM::DOMString(cit.data().name()).handle());
+      }
     }
   }
 

@@ -40,9 +40,10 @@
 #include <kcanvas/device/KRenderingPaintServerImage.h>
 #include <kcanvas/KCanvasResources.h>
 #include <kcanvas/KCanvasFilters.h>
+#ifdef APPLE_CHANGES
 #include <kcanvas/device/quartz/KRenderingDeviceQuartz.h>
 #include <kcanvas/device/quartz/QuartzSupport.h>
-
+#endif
 #include <ksvg2/svg/SVGStyledElementImpl.h>
 
 #include <kdom/DOMString.h>
@@ -255,6 +256,7 @@ static QTextStream& operator<<(QTextStream& ts, const KCanvasItem& o) {
   if (DIFFERS_FROM_PARENT(style()->filter()) && o.style()->filter())
     ts << " [filter=" << o.style()->filter() << "]";
 
+#ifdef APPLE_CHANGES
   // Print the actual path data
   if (o.path()) {
     CGMutablePathRef cgPath =
@@ -263,7 +265,7 @@ static QTextStream& operator<<(QTextStream& ts, const KCanvasItem& o) {
     ts << " [data=\"" << QString::fromCFString(pathString) << "\"]";
     CFRelease(pathString);
   }
-
+#endif
   return ts;
 }
 #undef DIFFERS_FROM_PARENT

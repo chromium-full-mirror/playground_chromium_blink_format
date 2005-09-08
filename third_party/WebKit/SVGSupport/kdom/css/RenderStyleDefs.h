@@ -564,6 +564,7 @@ class StyleInheritedData : public Shared {
   Length lineHeight;
 
   CachedImage* styleImage;
+  CSSValueImpl* cursorImage;
 
   Font font;
   QColor color;

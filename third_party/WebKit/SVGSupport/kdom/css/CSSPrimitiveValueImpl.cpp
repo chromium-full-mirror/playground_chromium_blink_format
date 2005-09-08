@@ -360,33 +360,38 @@ FontFamilyValueImpl::FontFamilyValueImpl(CDFInterface* interface,
   // remove [Xft] qualifiers
   parsedFontName.replace(braceReg, QString::null);
 
-#ifndef APPLE_COMPILE_HACK
-  const QString& available = KHTMLSettings::availableFamilies();
+#if 0
+#ifndef APPLE_CHANGES
+    const QString &available = KHTMLSettings::availableFamilies();
 
-  parsedFontName = parsedFontName.lower();
-  // kdDebug(0) << "searching for face '" << parsedFontName << "'" << endl;
+    parsedFontName = parsedFontName.lower();
+    // kdDebug(0) << "searching for face '" << parsedFontName << "'" << endl;
 
-  int pos = available.find(',' + parsedFontName + ',', 0, false);
-  if (pos == -1) {
-    // many pages add extra MSs to make sure it's windows only ;(
-    if (parsedFontName.startsWith("ms "))
-      parsedFontName = parsedFontName.mid(3);
-    if (parsedFontName.endsWith(" ms"))
-      parsedFontName.truncate(parsedFontName.length() - 3);
-    pos = available.find(",ms " + parsedFontName + ',', 0, false);
-    if (pos == -1)
-      pos = available.find(',' + parsedFontName + " ms,", 0, false);
-  }
+    int pos = available.find( ',' + parsedFontName + ',', 0, false );
+    if(pos == -1)
+    {
+        // many pages add extra MSs to make sure it's windows only ;(
+        if(parsedFontName.startsWith("ms "))
+            parsedFontName = parsedFontName.mid( 3 );
+        if(parsedFontName.endsWith(" ms"))
+            parsedFontName.truncate(parsedFontName.length() - 3);
+        pos = available.find(",ms " + parsedFontName + ',', 0, false);
+        if(pos == -1)
+            pos = available.find(',' + parsedFontName + " ms,", 0, false);
+    }
 
-  if (pos != -1) {
-    ++pos;
-    int p = available.find(',', pos);
-    assert(p != -1);  // available is supposed to start and end with ,
-    parsedFontName = available.mid(pos, p - pos);
-    // kdDebug(0) << "going for '" << parsedFontName << "'" << endl;
-  } else
-    parsedFontName = QString::null;
+    if(pos != -1)
+    {
+       ++pos;
+       int p = available.find(',', pos);
+       assert( p != -1 ); // available is supposed to start and end with ,
+       parsedFontName = available.mid( pos, p - pos);
+       // kdDebug(0) << "going for '" << parsedFontName << "'" << endl;
+    }
+    else
+        parsedFontName = QString::null;
 
-#endif  // APPLE_COMPILE_HACK
+#endif  // !APPLE_CHANGES
+#endif
 }
 // vim:ts=4:noet

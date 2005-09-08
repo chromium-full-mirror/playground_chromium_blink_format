@@ -38,7 +38,7 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
   DOMStringImpl* selectorText() const;
   void setSelectorText(DOMStringImpl* selectorText);
 
-  virtual bool parseString(const DOMString& string, bool = false);
+  virtual bool parseString(DOMStringImpl* string, bool = false);
 
   CSSStyleDeclarationImpl* style() const;
 

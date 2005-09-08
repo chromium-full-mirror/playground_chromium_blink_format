@@ -45,8 +45,8 @@ ShortHandImpl::ShortHandImpl(DOMStringImpl* str)
           0)  // shortHand pointers have no data nor NBC, set it to 0.
 {
   if (!Helper::IsValidNCName(str)) {
-    kdWarning() << "\"" << str
-                << "\" is not a valid short hand pointer. TODO DOMError."
+    kdWarning() << "\"" << str->string() << "\" is not a valid short "
+                                            "hand pointer. TODO DOMError."
                 << endl;
     throw new XPointerExceptionImpl(INVALID_EXPRESSION_ERR);
   }
