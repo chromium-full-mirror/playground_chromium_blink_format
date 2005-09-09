@@ -106,29 +106,29 @@ class Node {
   ValueImp* throwError(ExecState* exec,
                        ErrorType e,
                        const char* msg,
-                       ValueImp* v,
-                       Node* expr);
+                       ValueImp*,
+                       Node*);
   ValueImp* throwError(ExecState* exec,
                        ErrorType e,
                        const char* msg,
-                       Identifier label);
+                       const Identifier&);
   ValueImp* throwError(ExecState* exec,
                        ErrorType e,
                        const char* msg,
-                       ValueImp* v,
-                       Identifier ident);
+                       ValueImp*,
+                       const Identifier&);
   ValueImp* throwError(ExecState* exec,
                        ErrorType e,
                        const char* msg,
-                       ValueImp* v,
-                       Node* e1,
-                       Node* e2);
+                       ValueImp*,
+                       Node*,
+                       Node*);
   ValueImp* throwError(ExecState* exec,
                        ErrorType e,
                        const char* msg,
-                       ValueImp* v,
-                       Node* expr,
-                       Identifier ident);
+                       ValueImp*,
+                       Node*,
+                       const Identifier&);
 
   void setExceptionDetailsIfNeeded(ExecState* exec);
   int line;

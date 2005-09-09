@@ -148,7 +148,7 @@ ValueImp* Node::throwError(ExecState* exec,
 ValueImp* Node::throwError(ExecState* exec,
                            ErrorType e,
                            const char* msg,
-                           Identifier label) {
+                           const Identifier& label) {
   UString message = msg;
   substitute(message, label.ustring());
   return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
@@ -172,10 +172,11 @@ ValueImp* Node::throwError(ExecState* exec,
                            const char* msg,
                            ValueImp* v,
                            Node* expr,
-                           Identifier label) {
+                           const Identifier& label) {
   UString message = msg;
   substitute(message, v->toString(exec));
   substitute(message, expr->toString());
+  substitute(message, label.ustring());
   return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
@@ -183,7 +184,7 @@ ValueImp* Node::throwError(ExecState* exec,
                            ErrorType e,
                            const char* msg,
                            ValueImp* v,
-                           Identifier label) {
+                           const Identifier& label) {
   UString message = msg;
   substitute(message, v->toString(exec));
   substitute(message, label.ustring());
