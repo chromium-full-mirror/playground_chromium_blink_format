@@ -421,9 +421,9 @@ bool HTMLParser::handleError(NodeImpl* n,
         if (!n->attached() && HTMLWidget)
           n->attach();
         handled = true;
-      } else
-        return false;
-      return true;
+        return true;
+      }
+      return false;
     } else if (h->hasLocalName(captionTag)) {
       if (isTablePart(current)) {
         NodeImpl* tsection = current;
@@ -681,7 +681,11 @@ bool HTMLParser::iframeCreateErrorCheck(Token* t, NodeImpl*& result) {
 bool HTMLParser::formCreateErrorCheck(Token* t, NodeImpl*& result) {
   // Only create a new form if we're not already inside one.
   // This is consistent with other browsers' behavior.
-  return !form;
+  if (!form) {
+    form = new HTMLFormElementImpl(document);
+    result = form;
+  }
+  return false;
 }
 
 bool HTMLParser::isindexCreateErrorCheck(Token* t, NodeImpl*& result) {
@@ -753,6 +757,12 @@ bool HTMLParser::noscriptCreateErrorCheck(Token* t, NodeImpl*& result) {
   return true;
 }
 
+bool HTMLParser::mapCreateErrorCheck(Token* t, NodeImpl*& result) {
+  map = new HTMLMapElementImpl(document);
+  result = map;
+  return false;
+}
+
 NodeImpl* HTMLParser::getNode(Token* t) {
   // Init our error handling table.
   static FunctionMap gFunctionMap;
@@ -820,19 +830,16 @@ NodeImpl* HTMLParser::getNode(Token* t) {
                         &HTMLParser::noframesCreateErrorCheck);
     gFunctionMap.insert(noscriptTag.localName().impl(),
                         &HTMLParser::noscriptCreateErrorCheck);
+    gFunctionMap.insert(mapTag.localName().impl(),
+                        &HTMLParser::mapCreateErrorCheck);
   }
 
   bool proceed = true;
   NodeImpl* result = 0;
-  CreateErrorCheckFunc errorCheckFunc = gFunctionMap.get(t->tagName.impl());
-  if (errorCheckFunc)
+  if (CreateErrorCheckFunc errorCheckFunc = gFunctionMap.get(t->tagName.impl()))
     proceed = (this->*(errorCheckFunc))(t, result);
-
-  if (proceed) {
+  if (proceed)
     result = HTMLElementFactory::createHTMLElement(t->tagName, doc(), form);
-    if (t->tagName == formTag)
-      form = static_cast<HTMLFormElementImpl*>(result);
-  }
   return result;
 }
 
