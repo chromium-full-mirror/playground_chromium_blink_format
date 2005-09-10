@@ -1,4 +1,3 @@
-// -*- c-basic-offset: 2 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2003 Apple Computer, Inc
@@ -20,17 +19,24 @@
  *
  */
 
-#ifndef _KJS_SIMPLE_NUMBER_H_
-#define _KJS_SIMPLE_NUMBER_H_
+#ifndef KJS_SIMPLE_NUMBER_H
+#define KJS_SIMPLE_NUMBER_H
 
+#include <float.h>
 #include <math.h>
 #include <string.h>
 
-#define IS_NEGATIVE_ZERO(num) \
-  (num == 0.0 && !memcmp(&num, &SimpleNumber::negZero, sizeof(double)))
-
 namespace KJS {
+
 class ValueImp;
+
+inline bool isNegativeZero(double num) {
+#if WIN32
+  return _fpclass(num) == _FPCLASS_NZ;
+#else
+  return num == -0.0 && signbit(num);
+#endif
+}
 
 class SimpleNumber {
  public:
@@ -58,13 +64,11 @@ class SimpleNumber {
   static inline bool fits(unsigned long i) { return i <= (unsigned)max; }
   static inline bool integerFits(double d) { return !(d < min || d > max); }
   static inline bool fits(double d) {
-    return d >= min && d <= max && d == (double)(long)d && !IS_NEGATIVE_ZERO(d);
+    return d >= min && d <= max && d == (double)(long)d && !isNegativeZero(d);
   }
   static inline ValueImp* make(long i) {
     return (ValueImp*)((i << shift) | tag);
   }
-
-  static double negZero;
 };
 }
 
