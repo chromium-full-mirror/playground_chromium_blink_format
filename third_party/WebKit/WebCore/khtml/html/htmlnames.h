@@ -27,38 +27,38 @@
 namespace DOM {
 namespace HTMLNames {
 
-#define DOM_HTMLNAMES_FOR_EACH_TAG(macro)                                       \
-  macro(a) macro(abbr) macro(acronym) macro(address) macro(applet) macro(       \
-      area) macro(b) macro(base) macro(basefont) macro(bdo) macro(big)          \
-      macro(blockquote) macro(body) macro(br) macro(button) macro(              \
-          canvas) macro(caption) macro(center) macro(cite) macro(code)          \
-          macro(col) macro(colgroup) macro(dd) macro(del) macro(dfn) macro(     \
-              dir) macro(div) macro(dl) macro(dt) macro(em) macro(embed)        \
-              macro(fieldset) macro(font) macro(form) macro(frame) macro(       \
-                  frameset) macro(head) macro(h1) macro(h2) macro(h3) macro(h4) \
-                  macro(h5) macro(h6) macro(hr) macro(html) macro(i) macro(     \
-                      iframe) macro(img) macro(input) macro(ins) macro(isindex) \
-                      macro(kbd) macro(keygen) macro(label) macro(              \
-                          layer) macro(legend) macro(li) macro(link)            \
-                          macro(map) macro(marquee) macro(menu) macro(          \
-                              meta) macro(nobr) macro(noembed) macro(noframes)  \
-                              macro(nolayer) macro(noscript) macro(             \
-                                  object) macro(ol) macro(optgroup)             \
-                                  macro(option) macro(p) macro(param) macro(    \
-                                      plaintext) macro(pre) macro(q) macro(s)   \
-                                      macro(samp) macro(script) macro(          \
-                                          select) macro(small) macro(span)      \
-                                          macro(strike) macro(strong) macro(    \
-                                              style) macro(sub) macro(sup)      \
-                                              macro(table) macro(tbody) macro(  \
-                                                  td) macro(textarea)           \
-                                                  macro(tfoot) macro(           \
-                                                      th) macro(thead)          \
-                                                      macro(title) macro(       \
-                                                          tr) macro(tt)         \
-                                                          macro(u) macro(       \
-                                                              ul) macro(var)    \
-                                                              macro(wbr) macro( \
+#define DOM_HTMLNAMES_FOR_EACH_TAG(macro)                                        \
+  macro(a) macro(abbr) macro(acronym) macro(address) macro(applet) macro(        \
+      area) macro(b) macro(base) macro(basefont) macro(bdo) macro(big)           \
+      macro(blockquote) macro(body) macro(br) macro(button) macro(canvas) macro( \
+          caption) macro(center) macro(cite) macro(code) macro(col)              \
+          macro(colgroup) macro(dd) macro(del) macro(dfn) macro(dir) macro(      \
+              div) macro(dl) macro(dt) macro(em) macro(embed) macro(fieldset)    \
+              macro(font) macro(form) macro(frame) macro(frameset) macro(        \
+                  head) macro(h1) macro(h2) macro(h3) macro(h4) macro(h5)        \
+                  macro(h6) macro(hr) macro(html) macro(i) macro(iframe) macro(  \
+                      image) macro(img) macro(input) macro(ins) macro(isindex)   \
+                      macro(kbd) macro(keygen) macro(label) macro(               \
+                          layer) macro(legend) macro(li) macro(link)             \
+                          macro(map) macro(marquee) macro(menu) macro(           \
+                              meta) macro(nobr) macro(noembed) macro(noframes)   \
+                              macro(nolayer) macro(noscript) macro(              \
+                                  object) macro(ol) macro(optgroup)              \
+                                  macro(option) macro(p) macro(param) macro(     \
+                                      plaintext) macro(pre) macro(q) macro(s)    \
+                                      macro(samp) macro(script) macro(           \
+                                          select) macro(small) macro(span)       \
+                                          macro(strike) macro(strong) macro(     \
+                                              style) macro(sub) macro(sup)       \
+                                              macro(table) macro(tbody) macro(   \
+                                                  td) macro(textarea)            \
+                                                  macro(tfoot) macro(            \
+                                                      th) macro(thead)           \
+                                                      macro(title) macro(        \
+                                                          tr) macro(tt)          \
+                                                          macro(u) macro(        \
+                                                              ul) macro(var)     \
+                                                              macro(wbr) macro(  \
                                                                   xmp)  // end
                                                                         // of
                                                                         // macro
