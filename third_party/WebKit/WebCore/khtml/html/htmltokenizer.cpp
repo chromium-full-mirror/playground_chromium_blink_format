@@ -1783,7 +1783,7 @@ void HTMLTokenizer::finish() {
       food = "<";
       food += QString(scriptCode, scriptCodeSize);
     } else {
-      pos = QConstString(scriptCode, scriptCodeSize).qstring().find('>');
+      pos = QConstString(scriptCode, scriptCodeSize).string().find('>');
       food.setUnicode(scriptCode + pos + 1,
                       scriptCodeSize - pos - 1);  // deep copy
     }
