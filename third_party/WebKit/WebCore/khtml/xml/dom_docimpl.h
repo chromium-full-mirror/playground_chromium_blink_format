@@ -108,7 +108,8 @@ class TreeWalkerImpl;
 // misspelled
 struct DocumentMarker {
   enum MarkerType {
-    Spelling
+    AllMarkers = -1,
+    Spelling = 0
     // Not doing grammar yet, but this is a placeholder for it
     // Grammar
   };
@@ -588,13 +589,31 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   DOMString queryCommandValue(const DOMString& command);
 
   void addMarker(RangeImpl* range, DocumentMarker::MarkerType type);
-  void removeMarker(RangeImpl* range, DocumentMarker::MarkerType type);
   void addMarker(NodeImpl* node, DocumentMarker marker);
-  void removeMarker(NodeImpl* node, DocumentMarker marker);
-  void removeAllMarkers(NodeImpl* node, ulong startOffset, long length);
-  void removeAllMarkers(NodeImpl* node);
-  void removeAllMarkers();
-  void shiftMarkers(NodeImpl* node, ulong startOffset, long delta);
+  void copyMarkers(
+      NodeImpl* srcNode,
+      ulong startOffset,
+      long length,
+      NodeImpl* dstNode,
+      long delta,
+      DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
+  void removeMarkers(
+      RangeImpl* range,
+      DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
+  void removeMarkers(
+      NodeImpl* node,
+      ulong startOffset,
+      long length,
+      DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
+  void removeMarkers(
+      DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
+  void removeMarkers(NodeImpl* node);
+  void shiftMarkers(
+      NodeImpl* node,
+      ulong startOffset,
+      long delta,
+      DocumentMarker::MarkerType markerType = DocumentMarker::AllMarkers);
+
   QValueList<DocumentMarker> markersForNode(NodeImpl* node);
 
   /**
