@@ -28,7 +28,6 @@
 
 #include "KWQFontMetrics.h"
 #include "KWQNamespace.h"
-#include "KWQRect.h"
 
 #include <ApplicationServices/ApplicationServices.h>
 
@@ -67,7 +66,7 @@ class QPainter : public Qt {
   void setBrush(BrushStyle);
   void setBrush(QRgb);
 
-  QRect xForm(const QRect&) const;
+  QRect xForm(const QRect& r) const { return r; }
 
   void save();
   void restore();
@@ -213,7 +212,6 @@ class QPainter : public Qt {
   void initFocusRing(int width, int offset, const QColor& color);
   void addFocusRingRect(int x, int y, int width, int height);
   void drawFocusRing();
-  void clearFocusRing();
 
   CGContextRef currentContext();
 
@@ -228,12 +226,12 @@ class QPainter : public Qt {
   QPainter(const QPainter&);
   QPainter& operator=(const QPainter&);
 
-  void _setColorFromBrush();
-  void _setColorFromPen();
+  void setFillColor(const QBrush&);
+  void setFillColorFromCurrentBrush();
+  void setStrokeColorAndLineWidthFromCurrentPen();
+  void setFillColorFromCurrentPen();
 
-  void _fillRect(float x, float y, float w, float h, const QColor& color);
-
-  void _updateRenderer();
+  void updateTextRenderer();
 
   QPainterPrivate* data;
   bool _isForPrinting;

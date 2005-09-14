@@ -1402,7 +1402,6 @@ void RenderObject::paintOutline(QPainter* p,
       p->initFocusRing(ow, offset, oc);
       addFocusRingRects(p, _tx, _ty);
       p->drawFocusRing();
-      p->clearFocusRing();
     }
     return;
   }
