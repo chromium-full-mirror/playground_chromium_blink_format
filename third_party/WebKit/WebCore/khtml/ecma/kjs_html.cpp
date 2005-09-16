@@ -1514,7 +1514,7 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
     HTMLFormElementImpl& form = static_cast<HTMLFormElementImpl&>(element);
     // Check if we're retrieving an element (by index or by name)
     bool ok;
-    uint u = propertyName.toULong(&ok);
+    uint u = propertyName.toUInt32(&ok);
     if (ok) {
       slot.setCustomIndex(this, u, formIndexGetter);
       return true;
@@ -1530,7 +1530,7 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
     }
   } else if (element.hasLocalName(selectTag)) {
     bool ok;
-    uint u = propertyName.toULong(&ok);
+    uint u = propertyName.toUInt32(&ok);
     if (ok) {
       // not specified by DOM(?) but supported in netscape/IE
       slot.setCustomIndex(this, u, selectIndexGetter);
@@ -2951,7 +2951,7 @@ void KJS::HTMLElement::put(ExecState* exec,
     HTMLSelectElementImpl& select =
         static_cast<HTMLSelectElementImpl&>(element);
     bool ok;
-    /*uint u =*/propertyName.toULong(&ok);
+    /*uint u =*/propertyName.toUInt32(&ok);
     if (ok) {
       ObjectImp* coll = static_cast<ObjectImp*>(getSelectHTMLCollection(
           exec, select.optionsHTMLCollection().get(), &select));
@@ -4604,7 +4604,7 @@ bool HTMLCollection::getOwnPropertySlot(ExecState* exec,
 
     // name or index ?
     bool ok;
-    unsigned int u = propertyName.toULong(&ok);
+    unsigned int u = propertyName.toUInt32(&ok);
     if (ok) {
       slot.setCustomIndex(this, u, indexGetter);
       return true;
@@ -4634,7 +4634,7 @@ ValueImp* KJS::HTMLCollection::callAsFunction(ExecState* exec,
     // support for document.all(<index>) etc.
     bool ok;
     UString s = args[0]->toString(exec);
-    unsigned int u = s.toULong(&ok);
+    unsigned int u = s.toUInt32(&ok);
     if (ok)
       return getDOMNode(exec, collection.item(u));
     // support for document.images('<name>') etc.
@@ -4644,7 +4644,7 @@ ValueImp* KJS::HTMLCollection::callAsFunction(ExecState* exec,
   {
     bool ok;
     UString s = args[0]->toString(exec);
-    unsigned int u = args[1]->toString(exec).toULong(&ok);
+    unsigned int u = args[1]->toString(exec).toUInt32(&ok);
     if (ok) {
       DOM::DOMString pstr = s.domString();
       NodeImpl* node = collection.namedItem(pstr);
@@ -4757,7 +4757,7 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
       return;
     }
 
-    long diff = m_element->length() - newLen;
+    int diff = m_element->length() - newLen;
 
     if (diff < 0) {  // add dummy elements
       do {
@@ -4778,7 +4778,7 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
   }
   // an index ?
   bool ok;
-  unsigned int u = propertyName.toULong(&ok);
+  unsigned int u = propertyName.toUInt32(&ok);
   if (!ok)
     return;
 
@@ -4794,7 +4794,7 @@ void KJS::HTMLSelectCollection::put(ExecState* exec,
     return;
 
   int exception = 0;
-  long diff = long(u) - m_element->length();
+  int diff = int(u) - m_element->length();
   HTMLElementImpl* before = 0;
   // out of array bounds ? first insert empty dummies
   if (diff > 0) {

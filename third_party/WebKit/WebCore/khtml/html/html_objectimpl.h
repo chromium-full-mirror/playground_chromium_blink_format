@@ -224,8 +224,8 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   DOMString standby() const;
   void setStandby(const DOMString&);
 
-  long tabIndex() const;
-  void setTabIndex(long);
+  int tabIndex() const;
+  void setTabIndex(int);
 
   DOMString type() const;
   void setType(const DOMString&);

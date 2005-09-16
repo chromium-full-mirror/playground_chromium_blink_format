@@ -1096,7 +1096,7 @@ void ReplaceSelectionCommand::insertNodeAfterAndUpdateNodesInserted(
 void ReplaceSelectionCommand::insertNodeAtAndUpdateNodesInserted(
     NodeImpl* insertChild,
     NodeImpl* refChild,
-    long offset) {
+    int offset) {
   insertNodeAt(insertChild, refChild, offset);
   updateNodesInserted(insertChild);
 }

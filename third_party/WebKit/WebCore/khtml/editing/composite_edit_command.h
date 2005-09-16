@@ -60,16 +60,16 @@ class CompositeEditCommand : public EditCommand {
   void deleteSelection(const Selection& selection,
                        bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
-  void deleteTextFromNode(DOM::TextImpl* node, long offset, long count);
+  void deleteTextFromNode(DOM::TextImpl* node, int offset, int count);
   void inputText(const DOM::DOMString& text, bool selectInsertedText = false);
   void insertNodeAfter(DOM::NodeImpl* insertChild, DOM::NodeImpl* refChild);
   void insertNodeAt(DOM::NodeImpl* insertChild,
                     DOM::NodeImpl* refChild,
-                    long offset);
+                    int offset);
   void insertNodeBefore(DOM::NodeImpl* insertChild, DOM::NodeImpl* refChild);
   void insertParagraphSeparator();
   void insertTextIntoNode(DOM::TextImpl* node,
-                          long offset,
+                          int offset,
                           const DOM::DOMString& text);
   void joinTextNodes(DOM::TextImpl* text1, DOM::TextImpl* text2);
   void rebalanceWhitespace();
@@ -81,18 +81,18 @@ class CompositeEditCommand : public EditCommand {
   void removeNode(DOM::NodeImpl* removeChild);
   void removeNodePreservingChildren(DOM::NodeImpl* node);
   void replaceTextInNode(DOM::TextImpl* node,
-                         long offset,
-                         long count,
+                         int offset,
+                         int count,
                          const DOM::DOMString& replacementText);
   void setNodeAttribute(DOM::ElementImpl*,
                         const DOM::QualifiedName& attribute,
                         const DOM::DOMString&);
-  void splitTextNode(DOM::TextImpl* text, long offset);
+  void splitTextNode(DOM::TextImpl* text, int offset);
   void splitElement(DOM::ElementImpl* element, DOM::NodeImpl* atChild);
   void mergeIdenticalElements(DOM::ElementImpl* first,
                               DOM::ElementImpl* second);
   void wrapContentsInDummySpan(DOM::ElementImpl* element);
-  void splitTextNodeContainingElement(DOM::TextImpl* text, long offset);
+  void splitTextNodeContainingElement(DOM::TextImpl* text, int offset);
 
   void deleteInsignificantText(DOM::TextImpl*, int start, int end);
   void deleteInsignificantText(const DOM::Position& start,

@@ -64,12 +64,12 @@ class CircularSearchBuffer {
     m_cursor = m_buffer;
     m_bufferFull = false;
   }
-  void append(long length, const QChar* characters);
+  void append(int length, const QChar* characters);
   void append(const QChar&);
 
-  long neededCharacters() const;
+  int neededCharacters() const;
   bool isMatch() const;
-  long length() const { return m_target.length(); }
+  int length() const { return m_target.length(); }
 
  private:
   QString m_target;
@@ -95,9 +95,9 @@ TextIterator::TextIterator(const RangeImpl* r, IteratorKind kind)
 
   // get and validate the range endpoints
   NodeImpl* startContainer = r->startContainer(exceptionCode);
-  long startOffset = r->startOffset(exceptionCode);
+  int startOffset = r->startOffset(exceptionCode);
   NodeImpl* endContainer = r->endContainer(exceptionCode);
-  long endOffset = r->endOffset(exceptionCode);
+  int endOffset = r->endOffset(exceptionCode);
   if (exceptionCode != 0)
     return;
 
@@ -226,14 +226,14 @@ bool TextIterator::handleTextNode() {
 
   // handle pre-formatted text
   if (renderer->style()->whiteSpace() == khtml::PRE) {
-    long runStart = m_offset;
+    int runStart = m_offset;
     if (m_lastTextNodeEndedWithCollapsedSpace) {
       emitCharacter(' ', m_node, 0, runStart, runStart);
       return false;
     }
-    long strLength = str.length();
-    long end = (m_node == m_endContainer) ? m_endOffset : LONG_MAX;
-    long runEnd = kMin(strLength, end);
+    int strLength = str.length();
+    int end = (m_node == m_endContainer) ? m_endOffset : LONG_MAX;
+    int runEnd = kMin(strLength, end);
 
     if (runStart >= runEnd)
       return true;
@@ -275,11 +275,11 @@ bool TextIterator::handleTextNode() {
 void TextIterator::handleTextBox() {
   RenderText* renderer = static_cast<RenderText*>(m_node->renderer());
   DOMString str = renderer->string();
-  long start = m_offset;
-  long end = (m_node == m_endContainer) ? m_endOffset : LONG_MAX;
+  int start = m_offset;
+  int end = (m_node == m_endContainer) ? m_endOffset : LONG_MAX;
   while (m_textBox) {
-    long textBoxStart = m_textBox->m_start;
-    long runStart = kMax(textBoxStart, start);
+    int textBoxStart = m_textBox->m_start;
+    int runStart = kMax(textBoxStart, start);
 
     // Check for collapsed space at the start of this run.
     InlineTextBox* firstTextBox = renderer->containsReversedText()
@@ -293,8 +293,8 @@ void TextIterator::handleTextBox() {
       emitCharacter(' ', m_node, 0, runStart, runStart);
       return;
     }
-    long textBoxEnd = textBoxStart + m_textBox->m_len;
-    long runEnd = kMin(textBoxEnd, end);
+    int textBoxEnd = textBoxStart + m_textBox->m_len;
+    int runEnd = kMin(textBoxEnd, end);
 
     // Determine what the next text box will be, but don't advance yet
     InlineTextBox* nextTextBox = renderer->containsReversedText()
@@ -310,7 +310,7 @@ void TextIterator::handleTextBox() {
         emitCharacter(' ', m_node, 0, runStart, runStart + 1);
         m_offset = runStart + 1;
       } else {
-        long subrunEnd = str.find('\n', runStart);
+        int subrunEnd = str.find('\n', runStart);
         if (subrunEnd == -1 || subrunEnd > runEnd) {
           subrunEnd = runEnd;
         }
@@ -336,7 +336,7 @@ void TextIterator::handleTextBox() {
       }
 
       // Advance and return
-      long nextRunStart = nextTextBox ? nextTextBox->m_start : str.length();
+      int nextRunStart = nextTextBox ? nextTextBox->m_start : str.length();
       if (nextRunStart > runEnd) {
         m_lastTextNodeEndedWithCollapsedSpace =
             true;  // collapsed space between runs or at the end
@@ -449,8 +449,8 @@ void TextIterator::exitNode() {
 void TextIterator::emitCharacter(QChar c,
                                  NodeImpl* textNode,
                                  NodeImpl* offsetBaseNode,
-                                 long textStartOffset,
-                                 long textEndOffset) {
+                                 int textStartOffset,
+                                 int textEndOffset) {
   // remember information with which to construct the TextIterator::range()
   // NOTE: textNode is often not a text node, so the range will specify child
   // nodes of positionNode
@@ -474,7 +474,7 @@ SharedPtr<RangeImpl> TextIterator::range() const {
   // use the current run information, if we have it
   if (m_positionNode) {
     if (m_positionOffsetBaseNode) {
-      long index = m_positionOffsetBaseNode->nodeIndex();
+      int index = m_positionOffsetBaseNode->nodeIndex();
       m_positionStartOffset += index;
       m_positionEndOffset += index;
       m_positionOffsetBaseNode = 0;
@@ -510,23 +510,23 @@ SimplifiedBackwardsTextIterator::SimplifiedBackwardsTextIterator(
   NodeImpl* endNode = r->endContainer(exception);
   if (exception)
     return;
-  long startOffset = r->startOffset(exception);
+  int startOffset = r->startOffset(exception);
   if (exception)
     return;
-  long endOffset = r->endOffset(exception);
+  int endOffset = r->endOffset(exception);
   if (exception)
     return;
 
   if (!offsetInCharacters(startNode->nodeType())) {
     if (startOffset >= 0 &&
-        startOffset < static_cast<long>(startNode->childNodeCount())) {
+        startOffset < static_cast<int>(startNode->childNodeCount())) {
       startNode = startNode->childNode(startOffset);
       startOffset = 0;
     }
   }
   if (!offsetInCharacters(endNode->nodeType())) {
     if (endOffset > 0 &&
-        endOffset <= static_cast<long>(endNode->childNodeCount())) {
+        endOffset <= static_cast<int>(endNode->childNodeCount())) {
       endNode = endNode->childNode(endOffset - 1);
       endOffset = endNode->hasChildNodes() ? endNode->childNodeCount()
                                            : endNode->maxOffset();
@@ -653,7 +653,7 @@ bool SimplifiedBackwardsTextIterator::handleTextNode() {
 }
 
 bool SimplifiedBackwardsTextIterator::handleReplacedElement() {
-  long offset = m_node->nodeIndex();
+  int offset = m_node->nodeIndex();
 
   m_positionNode = m_node->parentNode();
   m_positionStartOffset = offset;
@@ -699,8 +699,8 @@ void SimplifiedBackwardsTextIterator::exitNode() {
 
 void SimplifiedBackwardsTextIterator::emitCharacter(QChar c,
                                                     NodeImpl* node,
-                                                    long startOffset,
-                                                    long endOffset) {
+                                                    int startOffset,
+                                                    int endOffset) {
   m_singleCharacterBuffer = c;
   m_positionNode = node;
   m_positionStartOffset = startOffset;
@@ -711,7 +711,7 @@ void SimplifiedBackwardsTextIterator::emitCharacter(QChar c,
 }
 
 void SimplifiedBackwardsTextIterator::emitNewlineForBROrText() {
-  long offset;
+  int offset;
 
   if (m_lastTextNode) {
     offset = m_lastTextNode->nodeIndex();
@@ -756,7 +756,7 @@ SharedPtr<RangeImpl> CharacterIterator::range() const {
       int exception = 0;
       NodeImpl* n = r->startContainer(exception);
       assert(n == r->endContainer(exception));
-      long offset = r->startOffset(exception) + m_runOffset;
+      int offset = r->startOffset(exception) + m_runOffset;
       r->setStart(n, offset, exception);
       r->setEnd(n, offset + 1, exception);
     }
@@ -764,13 +764,13 @@ SharedPtr<RangeImpl> CharacterIterator::range() const {
   return r;
 }
 
-void CharacterIterator::advance(long count) {
+void CharacterIterator::advance(int count) {
   assert(!atEnd());
 
   m_atBreak = false;
 
   // easy if there is enough left in the current m_textIterator run
-  long remaining = m_textIterator.length() - m_runOffset;
+  int remaining = m_textIterator.length() - m_runOffset;
   if (count < remaining) {
     m_runOffset += count;
     m_offset += count;
@@ -783,7 +783,7 @@ void CharacterIterator::advance(long count) {
 
   // move to a subsequent m_textIterator run
   for (m_textIterator.advance(); !atEnd(); m_textIterator.advance()) {
-    long runLength = m_textIterator.length();
+    int runLength = m_textIterator.length();
     if (runLength == 0) {
       m_atBreak = true;
     } else {
@@ -805,11 +805,11 @@ void CharacterIterator::advance(long count) {
   m_runOffset = 0;
 }
 
-QString CharacterIterator::string(long numChars) {
+QString CharacterIterator::string(int numChars) {
   QString result;
   result.reserve(numChars);
   while (numChars > 0 && !atEnd()) {
-    long runSize = kMin(numChars, length());
+    int runSize = kMin(numChars, length());
     result.append(characters(), runSize);
     numChars -= runSize;
     advance(runSize);
@@ -893,7 +893,7 @@ void WordAwareIterator::advance() {
   }
 }
 
-long WordAwareIterator::length() const {
+int WordAwareIterator::length() const {
   if (!m_buffer.isEmpty()) {
     return m_buffer.length();
   } else if (m_previousText) {
@@ -944,19 +944,19 @@ void CircularSearchBuffer::append(const QChar& c) {
 // This function can only be used when the buffer is not yet full,
 // and when then count is small enough to fit in the buffer.
 // No need for a more general version for the search algorithm.
-void CircularSearchBuffer::append(long count, const QChar* characters) {
-  long tailSpace = m_buffer + length() - m_cursor;
+void CircularSearchBuffer::append(int count, const QChar* characters) {
+  int tailSpace = m_buffer + length() - m_cursor;
 
   assert(!m_bufferFull);
   assert(count <= tailSpace);
 
   if (m_isCaseSensitive) {
-    for (long i = 0; i != count; ++i) {
+    for (int i = 0; i != count; ++i) {
       QChar c = characters[i];
       m_cursor[i] = c.unicode() == nonBreakingSpace ? ' ' : c.unicode();
     }
   } else {
-    for (long i = 0; i != count; ++i) {
+    for (int i = 0; i != count; ++i) {
       QChar c = characters[i];
       m_cursor[i] = c.unicode() == nonBreakingSpace ? ' ' : c.lower().unicode();
     }
@@ -969,24 +969,24 @@ void CircularSearchBuffer::append(long count, const QChar* characters) {
   }
 }
 
-long CircularSearchBuffer::neededCharacters() const {
+int CircularSearchBuffer::neededCharacters() const {
   return m_bufferFull ? 0 : m_buffer + length() - m_cursor;
 }
 
 bool CircularSearchBuffer::isMatch() const {
   assert(m_bufferFull);
 
-  long headSpace = m_cursor - m_buffer;
-  long tailSpace = length() - headSpace;
+  int headSpace = m_cursor - m_buffer;
+  int tailSpace = length() - headSpace;
   return memcmp(m_cursor, m_target.unicode(), tailSpace * sizeof(QChar)) == 0 &&
          memcmp(m_buffer, m_target.unicode() + tailSpace,
                 headSpace * sizeof(QChar)) == 0;
 }
 
-long TextIterator::rangeLength(const RangeImpl* r) {
+int TextIterator::rangeLength(const RangeImpl* r) {
   // Allocate string at the right size, rather than building it up by successive
   // append calls.
-  long length = 0;
+  int length = 0;
   for (TextIterator it(r); !it.atEnd(); it.advance()) {
     length += it.length();
   }
@@ -994,21 +994,21 @@ long TextIterator::rangeLength(const RangeImpl* r) {
 }
 
 RangeImpl* TextIterator::rangeFromLocationAndLength(DocumentImpl* doc,
-                                                    long rangeLocation,
-                                                    long rangeLength) {
+                                                    int rangeLocation,
+                                                    int rangeLength) {
   RangeImpl* resultRange = doc->createRange();
 
-  long docTextPosition = 0;
-  long rangeEnd = rangeLocation + rangeLength;
+  int docTextPosition = 0;
+  int rangeEnd = rangeLocation + rangeLength;
 
   for (TextIterator it(rangeOfContents(doc).get()); !it.atEnd(); it.advance()) {
-    long len = it.length();
+    int len = it.length();
     if (rangeLocation >= docTextPosition &&
         rangeLocation <= docTextPosition + len) {
       SharedPtr<RangeImpl> textRunRange = it.range();
       int exception = 0;
       if (textRunRange->startContainer(exception)->isTextNode()) {
-        long offset = rangeLocation - docTextPosition;
+        int offset = rangeLocation - docTextPosition;
         resultRange->setStart(textRunRange->startContainer(exception),
                               offset + textRunRange->startOffset(exception),
                               exception);
@@ -1027,7 +1027,7 @@ RangeImpl* TextIterator::rangeFromLocationAndLength(DocumentImpl* doc,
       SharedPtr<RangeImpl> textRunRange = it.range();
       int exception = 0;
       if (textRunRange->startContainer(exception)->isTextNode()) {
-        long offset = rangeEnd - docTextPosition;
+        int offset = rangeEnd - docTextPosition;
         resultRange->setEnd(textRunRange->startContainer(exception),
                             offset + textRunRange->startOffset(exception),
                             exception);
@@ -1053,7 +1053,7 @@ RangeImpl* TextIterator::rangeFromLocationAndLength(DocumentImpl* doc,
 QString plainText(const RangeImpl* r) {
   // Allocate string at the right size, rather than building it up by successive
   // append calls.
-  long length = 0;
+  int length = 0;
   for (TextIterator it(r); !it.atEnd(); it.advance()) {
     length += it.length();
   }
@@ -1090,15 +1090,15 @@ SharedPtr<RangeImpl> findPlainText(const RangeImpl* r,
     CharacterIterator it(r);
     while (1) {
       // Fill the buffer.
-      while (long needed = buffer.neededCharacters()) {
+      while (int needed = buffer.neededCharacters()) {
         if (it.atBreak()) {
           if (it.atEnd()) {
             goto done;
           }
           buffer.clear();
         }
-        long available = it.length();
-        long runLength = kMin(needed, available);
+        int available = it.length();
+        int runLength = kMin(needed, available);
         buffer.append(runLength, it.characters());
         it.advance(runLength);
       }

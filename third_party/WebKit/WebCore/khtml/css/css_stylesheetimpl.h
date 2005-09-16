@@ -103,14 +103,14 @@ class CSSStyleSheetImpl : public StyleSheetImpl {
 
   CSSRuleImpl* ownerRule() const;
   CSSRuleListImpl* cssRules();
-  unsigned long insertRule(const DOM::DOMString& rule,
-                           unsigned long index,
-                           int& exceptioncode);
-  void deleteRule(unsigned long index, int& exceptioncode);
-  unsigned long addRule(const DOMString& selector,
-                        const DOMString& style,
-                        long index,
-                        int& exceptioncode);
+  unsigned insertRule(const DOM::DOMString& rule,
+                      unsigned index,
+                      int& exceptioncode);
+  void deleteRule(unsigned index, int& exceptioncode);
+  unsigned addRule(const DOMString& selector,
+                   const DOMString& style,
+                   int index,
+                   int& exceptioncode);
 
   void addNamespace(CSSParser* p,
                     const AtomicString& prefix,
@@ -140,8 +140,8 @@ class StyleSheetListImpl : public khtml::Shared<StyleSheetListImpl> {
   ~StyleSheetListImpl();
 
   // the following two ignore implicit stylesheets
-  unsigned long length() const;
-  StyleSheetImpl* item(unsigned long index);
+  unsigned length() const;
+  StyleSheetImpl* item(unsigned index);
 
   void add(StyleSheetImpl* s);
   void remove(StyleSheetImpl* s);
@@ -163,8 +163,8 @@ class MediaListImpl : public StyleBaseImpl {
 
   CSSStyleSheetImpl* parentStyleSheet() const;
   CSSRuleImpl* parentRule() const;
-  unsigned long length() const { return m_lstMedia.count(); }
-  DOM::DOMString item(unsigned long index) const { return m_lstMedia[index]; }
+  unsigned length() const { return m_lstMedia.count(); }
+  DOM::DOMString item(unsigned index) const { return m_lstMedia[index]; }
   void deleteMedium(const DOM::DOMString& oldMedium);
   void appendMedium(const DOM::DOMString& newMedium) {
     m_lstMedia.append(newMedium);

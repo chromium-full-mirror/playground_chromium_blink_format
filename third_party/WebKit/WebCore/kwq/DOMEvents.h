@@ -68,19 +68,19 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
 
 @interface DOMUIEvent : DOMEvent
 - (DOMAbstractView*)view;
-- (long)detail;
+- (int)detail;
 - (void)initUIEvent:(NSString*)
             typeArg:(BOOL)
        canBubbleArg:(BOOL)
       cancelableArg:(DOMAbstractView*)
-            viewArg:(long)detailArg;
+            viewArg:(int)detailArg;
 @end
 
 @interface DOMMouseEvent : DOMUIEvent
-- (long)screenX;
-- (long)screenY;
-- (long)clientX;
-- (long)clientY;
+- (int)screenX;
+- (int)screenY;
+- (int)clientX;
+- (int)clientY;
 - (BOOL)ctrlKey;
 - (BOOL)shiftKey;
 - (BOOL)altKey;
@@ -91,11 +91,11 @@ enum { DOM_CAPTURING_PHASE = 1, DOM_AT_TARGET = 2, DOM_BUBBLING_PHASE = 3 };
                typeArg:(BOOL)
           canBubbleArg:(BOOL)
          cancelableArg:(DOMAbstractView*)
-               viewArg:(long)
-             detailArg:(long)
-            screenXArg:(long)
-            screenYArg:(long)
-               clientX:(long)
+               viewArg:(int)
+             detailArg:(int)
+            screenXArg:(int)
+            screenYArg:(int)
+               clientX:(int)
                clientY:(BOOL)
             ctrlKeyArg:(BOOL)
              altKeyArg:(BOOL)

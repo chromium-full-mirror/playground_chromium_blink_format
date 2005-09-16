@@ -422,7 +422,7 @@ ValueImp* JSObject::convertJObjectToValue(jobject theObject) const {
     // pointer to the ObjectImp.
     JNIEnv* env = getJNIEnv();
     jfieldID fieldID =
-        env->GetFieldID((jclass)classOfInstance, "nativeJSObject", "long");
+        env->GetFieldID((jclass)classOfInstance, "nativeJSObject", "int");
     if (fieldID == NULL) {
       return Undefined();
     }
@@ -444,7 +444,7 @@ ValueImp* JSObject::convertJObjectToValue(jobject theObject) const {
 
 List JSObject::listFromJArray(jobjectArray jArray) const {
   JNIEnv* env = getJNIEnv();
-  long i, numObjects = jArray ? env->GetArrayLength(jArray) : 0;
+  int i, numObjects = jArray ? env->GetArrayLength(jArray) : 0;
   List aList;
 
   for (i = 0; i < numObjects; i++) {

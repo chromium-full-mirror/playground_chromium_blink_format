@@ -120,6 +120,8 @@ class NumberImp : public AllocatedValueImp {
   friend ValueImp* jsNumber(unsigned);
   friend ValueImp* jsNumber(long);
   friend ValueImp* jsNumber(unsigned long);
+  friend ValueImp* jsNumber(long long);
+  friend ValueImp* jsNumber(unsigned long long);
   friend ValueImp* jsNumber(double);
   friend ValueImp* jsNumber(double, bool);
 

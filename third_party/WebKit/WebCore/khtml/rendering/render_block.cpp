@@ -2834,7 +2834,7 @@ Position RenderBlock::positionForRenderer(RenderObject* renderer,
   if (!node)
     return Position();
 
-  long offset = start ? node->caretMinOffset() : node->caretMaxOffset();
+  int offset = start ? node->caretMinOffset() : node->caretMaxOffset();
   return Position(node, offset);
 }
 

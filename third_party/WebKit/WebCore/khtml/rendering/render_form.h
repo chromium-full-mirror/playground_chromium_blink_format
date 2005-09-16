@@ -209,13 +209,13 @@ class RenderLineEdit : public RenderFormElement {
   virtual void updateFromElement();
   virtual void setStyle(RenderStyle*);
 
-  long selectionStart();
-  long selectionEnd();
-  void setSelectionStart(long);
-  void setSelectionEnd(long);
+  int selectionStart();
+  int selectionEnd();
+  void setSelectionStart(int);
+  void setSelectionEnd(int);
 
   void select();
-  void setSelectionRange(long, long);
+  void setSelectionRange(int, int);
 
   KLineEdit* widget() const { return static_cast<KLineEdit*>(m_widget); }
   DOM::HTMLInputElementImpl* element() const {
@@ -441,13 +441,13 @@ class RenderTextArea : public RenderFormElement {
 
   QString text();
 
-  long selectionStart();
-  long selectionEnd();
-  void setSelectionStart(long);
-  void setSelectionEnd(long);
+  int selectionStart();
+  int selectionEnd();
+  void setSelectionStart(int);
+  void setSelectionEnd(int);
 
   void select();
-  void setSelectionRange(long, long);
+  void setSelectionRange(int, int);
 
 #if APPLE_CHANGES
   virtual bool canHaveIntrinsicMargins() const { return true; }

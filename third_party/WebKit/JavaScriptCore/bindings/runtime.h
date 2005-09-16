@@ -51,8 +51,8 @@ class Parameter {
 // JavaScript.
 class Constructor {
  public:
-  virtual Parameter* parameterAt(long i) const = 0;
-  virtual long numParameters() const = 0;
+  virtual Parameter* parameterAt(int i) const = 0;
+  virtual int numParameters() const = 0;
 
   virtual ~Constructor() {}
 };
@@ -92,7 +92,7 @@ class Method {
  public:
   virtual const char* name() const = 0;
 
-  virtual long numParameters() const = 0;
+  virtual int numParameters() const = 0;
 
   virtual ~Method() {}
 };
@@ -104,8 +104,8 @@ class Class {
   virtual MethodList methodsNamed(const char* name,
                                   Instance* instance) const = 0;
 
-  virtual Constructor* constructorAt(long i) const = 0;
-  virtual long numConstructors() const = 0;
+  virtual Constructor* constructorAt(int i) const = 0;
+  virtual int numConstructors() const = 0;
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const = 0;
 

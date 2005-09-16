@@ -997,7 +997,7 @@ bool ApplyStyleCommand::splitTextAtStartIfNeeded(const Position& start,
   if (start.node()->isTextNode() &&
       start.offset() > start.node()->caretMinOffset() &&
       start.offset() < start.node()->caretMaxOffset()) {
-    long endOffsetAdjustment = start.node() == end.node() ? start.offset() : 0;
+    int endOffsetAdjustment = start.node() == end.node() ? start.offset() : 0;
     TextImpl* text = static_cast<TextImpl*>(start.node());
     splitTextNode(text, start.offset());
     setEndingSelection(
@@ -1033,7 +1033,7 @@ bool ApplyStyleCommand::splitTextElementAtStartIfNeeded(const Position& start,
   if (start.node()->isTextNode() &&
       start.offset() > start.node()->caretMinOffset() &&
       start.offset() < start.node()->caretMaxOffset()) {
-    long endOffsetAdjustment = start.node() == end.node() ? start.offset() : 0;
+    int endOffsetAdjustment = start.node() == end.node() ? start.offset() : 0;
     TextImpl* text = static_cast<TextImpl*>(start.node());
     splitTextNodeContainingElement(text, start.offset());
 
@@ -1105,7 +1105,7 @@ static bool areIdenticalElements(NodeImpl* first, NodeImpl* second) {
 bool ApplyStyleCommand::mergeStartWithPreviousIfIdentical(const Position& start,
                                                           const Position& end) {
   NodeImpl* startNode = start.node();
-  long startOffset = start.offset();
+  int startOffset = start.offset();
 
   if (start.node()->isAtomicNode()) {
     if (start.offset() != 0)
@@ -1133,8 +1133,8 @@ bool ApplyStyleCommand::mergeStartWithPreviousIfIdentical(const Position& start,
     ASSERT(startChild);
     mergeIdenticalElements(previousElement, element);
 
-    long startOffsetAdjustment = startChild->nodeIndex();
-    long endOffsetAdjustment =
+    int startOffsetAdjustment = startChild->nodeIndex();
+    int endOffsetAdjustment =
         startNode == end.node() ? startOffsetAdjustment : 0;
 
     setEndingSelection(Selection(

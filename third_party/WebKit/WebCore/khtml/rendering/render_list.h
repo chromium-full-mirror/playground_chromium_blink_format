@@ -76,7 +76,7 @@ class RenderListMarker : public RenderBox {
   QString m_item;
   CachedImage* m_listImage;
   QPixmap m_listPixmap;
-  long m_value;
+  int m_value;
   RenderListItem* m_listItem;
 };
 
@@ -101,8 +101,8 @@ class RenderListItem : public RenderBlock {
 
   virtual bool isListItem() const { return true; }
 
-  long value() const { return m_marker->m_value; }
-  void setValue(long v) { predefVal = v; }
+  int value() const { return m_marker->m_value; }
+  void setValue(int v) { predefVal = v; }
   void calcListValue();
 
   virtual void paint(PaintInfo& i, int xoff, int yoff);
@@ -126,7 +126,7 @@ class RenderListItem : public RenderBlock {
 #endif
 
  protected:
-  long int predefVal;
+  int predefVal;
   RenderListMarker* m_marker;
   bool _notInList;
 };

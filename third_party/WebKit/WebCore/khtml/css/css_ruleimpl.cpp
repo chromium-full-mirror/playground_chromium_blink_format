@@ -244,7 +244,7 @@ CSSMediaRuleImpl::~CSSMediaRuleImpl() {
   m_lstCSSRules->deref();
 }
 
-unsigned long CSSMediaRuleImpl::append(CSSRuleImpl* rule) {
+unsigned CSSMediaRuleImpl::append(CSSRuleImpl* rule) {
   if (!rule) {
     return 0;
   }
@@ -253,8 +253,7 @@ unsigned long CSSMediaRuleImpl::append(CSSRuleImpl* rule) {
   return m_lstCSSRules->insertRule(rule, m_lstCSSRules->length());
 }
 
-unsigned long CSSMediaRuleImpl::insertRule(const DOMString& rule,
-                                           unsigned long index) {
+unsigned CSSMediaRuleImpl::insertRule(const DOMString& rule, unsigned index) {
   CSSParser p(strictParsing);
   CSSRuleImpl* newRule = p.parseRule(parentStyleSheet(), rule);
 
@@ -275,8 +274,8 @@ DOMString CSSMediaRuleImpl::cssText() const {
   result += "{ \n";
 
   if (m_lstCSSRules) {
-    unsigned long len = m_lstCSSRules->length();
-    for (unsigned long i = 0; i < len; i++) {
+    unsigned len = m_lstCSSRules->length();
+    for (unsigned i = 0; i < len; i++) {
       result += "  ";
       result += m_lstCSSRules->item(i)->cssText();
       result += "\n";
@@ -291,8 +290,8 @@ DOMString CSSMediaRuleImpl::cssText() const {
 
 CSSRuleListImpl::CSSRuleListImpl(StyleListImpl* lst) {
   if (lst) {
-    unsigned long len = lst->length();
-    for (unsigned long i = 0; i < len; ++i) {
+    unsigned len = lst->length();
+    for (unsigned i = 0; i < len; ++i) {
       StyleBaseImpl* style = lst->item(i);
       if (style->isRule())
         append(static_cast<CSSRuleImpl*>(style));
@@ -380,7 +379,7 @@ void CSSStyleRuleImpl::setDeclaration(CSSMutableStyleDeclarationImpl* style) {
   }
 }
 
-void CSSRuleListImpl::deleteRule(unsigned long index) {
+void CSSRuleListImpl::deleteRule(unsigned index) {
   CSSRuleImpl* rule = m_lstCSSRules.take(index);
   if (rule)
     rule->deref();
@@ -392,8 +391,7 @@ void CSSRuleListImpl::append(CSSRuleImpl* rule) {
   insertRule(rule, m_lstCSSRules.count());
 }
 
-unsigned long CSSRuleListImpl::insertRule(CSSRuleImpl* rule,
-                                          unsigned long index) {
+unsigned CSSRuleListImpl::insertRule(CSSRuleImpl* rule, unsigned index) {
   if (rule && m_lstCSSRules.insert(index, rule)) {
     rule->ref();
     return index;

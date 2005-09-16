@@ -41,7 +41,7 @@ namespace khtml {
 
 InsertIntoTextNodeCommand::InsertIntoTextNodeCommand(DocumentImpl* document,
                                                      TextImpl* node,
-                                                     long offset,
+                                                     int offset,
                                                      const DOMString& text)
     : EditCommand(document), m_node(node), m_offset(offset) {
   ASSERT(m_node);

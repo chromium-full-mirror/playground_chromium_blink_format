@@ -48,7 +48,7 @@ short NodeFilterImpl::acceptNode(NodeImpl* node) const {
 // --------------------------------------------------------------
 
 TraversalImpl::TraversalImpl(NodeImpl* rootNode,
-                             long whatToShow,
+                             int whatToShow,
                              NodeFilterImpl* nodeFilter,
                              bool expandEntityReferences)
     : m_root(rootNode),
@@ -85,7 +85,7 @@ short TraversalImpl::acceptNode(NodeImpl* node) const {
 // --------------------------------------------------------------
 
 NodeIteratorImpl::NodeIteratorImpl(NodeImpl* rootNode,
-                                   long whatToShow,
+                                   int whatToShow,
                                    NodeFilterImpl* filter,
                                    bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),
@@ -260,7 +260,7 @@ void NodeIteratorImpl::notifyBeforeNodeRemoval(NodeImpl* willRemove) {
 // --------------------------------------------------------------
 
 TreeWalkerImpl::TreeWalkerImpl(NodeImpl* rootNode,
-                               long whatToShow,
+                               int whatToShow,
                                NodeFilterImpl* filter,
                                bool expandEntityReferences)
     : TraversalImpl(rootNode, whatToShow, filter, expandEntityReferences),

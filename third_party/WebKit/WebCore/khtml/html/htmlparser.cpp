@@ -354,7 +354,7 @@ bool HTMLParser::handleError(NodeImpl* n,
           NamedAttrMapImpl* bmap =
               static_cast<ElementImpl*>(doc()->firstChild())->attributes(false);
           bool changed = false;
-          for (unsigned long l = 0; map && l < map->length(); ++l) {
+          for (unsigned l = 0; map && l < map->length(); ++l) {
             AttributeImpl* it = map->attributeItem(l);
             changed = !bmap->getAttributeItem(it->name());
             bmap->insertAttribute(it->clone(false));
@@ -391,7 +391,7 @@ bool HTMLParser::handleError(NodeImpl* n,
         NamedAttrMapImpl* map = static_cast<ElementImpl*>(n)->attributes(true);
         NamedAttrMapImpl* bmap = doc()->body()->attributes(false);
         bool changed = false;
-        for (unsigned long l = 0; map && l < map->length(); ++l) {
+        for (unsigned l = 0; map && l < map->length(); ++l) {
           AttributeImpl* it = map->attributeItem(l);
           changed = !bmap->getAttributeItem(it->name());
           bmap->insertAttribute(it->clone(false));

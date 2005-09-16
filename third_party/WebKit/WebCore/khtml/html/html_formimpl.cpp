@@ -182,7 +182,7 @@ void HTMLFormElementImpl::removedFromDocument() {
   HTMLElementImpl::removedFromDocument();
 }
 
-long HTMLFormElementImpl::length() const {
+int HTMLFormElementImpl::length() const {
   int len = 0;
   for (unsigned i = 0; i < formElements.count(); ++i)
     if (formElements[i]->isEnumeratable())
@@ -1152,11 +1152,11 @@ QString HTMLGenericFormElementImpl::findMatchingState(QStringList& states) {
   return QString::null;
 }
 
-long HTMLGenericFormElementImpl::tabIndex() const {
+int HTMLGenericFormElementImpl::tabIndex() const {
   return getAttribute(tabindexAttr).toInt();
 }
 
-void HTMLGenericFormElementImpl::setTabIndex(long value) {
+void HTMLGenericFormElementImpl::setTabIndex(int value) {
   setAttribute(tabindexAttr, QString::number(value));
 }
 
@@ -1529,7 +1529,7 @@ bool HTMLInputElementImpl::canHaveSelection() {
   return false;
 }
 
-long HTMLInputElementImpl::selectionStart() {
+int HTMLInputElementImpl::selectionStart() {
   if (!m_render)
     return 0;
 
@@ -1546,7 +1546,7 @@ long HTMLInputElementImpl::selectionStart() {
   return 0;
 }
 
-long HTMLInputElementImpl::selectionEnd() {
+int HTMLInputElementImpl::selectionEnd() {
   if (!m_render)
     return 0;
 
@@ -1563,7 +1563,7 @@ long HTMLInputElementImpl::selectionEnd() {
   return 0;
 }
 
-void HTMLInputElementImpl::setSelectionStart(long start) {
+void HTMLInputElementImpl::setSelectionStart(int start) {
   if (!m_render)
     return;
 
@@ -1580,7 +1580,7 @@ void HTMLInputElementImpl::setSelectionStart(long start) {
   }
 }
 
-void HTMLInputElementImpl::setSelectionEnd(long end) {
+void HTMLInputElementImpl::setSelectionEnd(int end) {
   if (!m_render)
     return;
 
@@ -1627,7 +1627,7 @@ void HTMLInputElementImpl::select() {
   }
 }
 
-void HTMLInputElementImpl::setSelectionRange(long start, long end) {
+void HTMLInputElementImpl::setSelectionRange(int start, int end) {
   if (!m_render)
     return;
 
@@ -2448,11 +2448,11 @@ void HTMLInputElementImpl::setAlt(const DOMString& value) {
   setAttribute(altAttr, value);
 }
 
-void HTMLInputElementImpl::setMaxLength(long _maxLength) {
+void HTMLInputElementImpl::setMaxLength(int _maxLength) {
   setAttribute(maxlengthAttr, QString::number(_maxLength));
 }
 
-void HTMLInputElementImpl::setSize(unsigned long _size) {
+void HTMLInputElementImpl::setSize(unsigned _size) {
   setAttribute(sizeAttr, QString::number(_size));
 }
 
@@ -2669,7 +2669,7 @@ DOMString HTMLSelectElementImpl::type() const {
   return (m_multiple ? "select-multiple" : "select-one");
 }
 
-long HTMLSelectElementImpl::selectedIndex() const {
+int HTMLSelectElementImpl::selectedIndex() const {
   // return the number of the first option selected
   uint o = 0;
   QMemArray<HTMLElementImpl*> items = listItems();
@@ -2684,7 +2684,7 @@ long HTMLSelectElementImpl::selectedIndex() const {
   return -1;
 }
 
-void HTMLSelectElementImpl::setSelectedIndex(long index) {
+void HTMLSelectElementImpl::setSelectedIndex(int index) {
   // deselect all other options and select only the new one
   QMemArray<HTMLElementImpl*> items = listItems();
   int listIndex;
@@ -2699,7 +2699,7 @@ void HTMLSelectElementImpl::setSelectedIndex(long index) {
   setChanged(true);
 }
 
-long HTMLSelectElementImpl::length() const {
+int HTMLSelectElementImpl::length() const {
   int len = 0;
   uint i;
   QMemArray<HTMLElementImpl*> items = listItems();
@@ -2726,7 +2726,7 @@ void HTMLSelectElementImpl::add(HTMLElementImpl* element,
     setRecalcListItems();
 }
 
-void HTMLSelectElementImpl::remove(long index) {
+void HTMLSelectElementImpl::remove(int index) {
   int exceptioncode = 0;
   int listIndex = optionToListIndex(index);
 
@@ -3103,7 +3103,7 @@ void HTMLSelectElementImpl::setMultiple(bool multiple) {
   setAttribute(multipleAttr, multiple ? "" : 0);
 }
 
-void HTMLSelectElementImpl::setSize(long size) {
+void HTMLSelectElementImpl::setSize(int size) {
   setAttribute(sizeAttr, QString::number(size));
 }
 
@@ -3295,7 +3295,7 @@ void HTMLOptionElementImpl::setText(const DOMString& text, int& exception) {
   appendChild(new TextImpl(docPtr(), text), exception);
 }
 
-long HTMLOptionElementImpl::index() const {
+int HTMLOptionElementImpl::index() const {
   // Let's do this dynamically. Might be a bit slow, but we're sure
   // we won't forget to update a member variable in some cases...
   QMemArray<HTMLElementImpl*> items = getSelect()->listItems();
@@ -3312,9 +3312,9 @@ long HTMLOptionElementImpl::index() const {
   return 0;
 }
 
-void HTMLOptionElementImpl::setIndex(long, int& exception) {
+void HTMLOptionElementImpl::setIndex(int, int& exception) {
   exception = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-  kdWarning() << "Unimplemented HTMLOptionElementImpl::setIndex(long) called"
+  kdWarning() << "Unimplemented HTMLOptionElementImpl::setIndex(int) called"
               << endl;
   // ###
 }
@@ -3414,24 +3414,24 @@ void HTMLTextAreaElementImpl::restoreState(QStringList& states) {
   // to 'value'
 }
 
-long HTMLTextAreaElementImpl::selectionStart() {
+int HTMLTextAreaElementImpl::selectionStart() {
   if (m_render)
     return static_cast<RenderTextArea*>(m_render)->selectionStart();
   return 0;
 }
 
-long HTMLTextAreaElementImpl::selectionEnd() {
+int HTMLTextAreaElementImpl::selectionEnd() {
   if (m_render)
     return static_cast<RenderTextArea*>(m_render)->selectionEnd();
   return 0;
 }
 
-void HTMLTextAreaElementImpl::setSelectionStart(long start) {
+void HTMLTextAreaElementImpl::setSelectionStart(int start) {
   if (m_render)
     static_cast<RenderTextArea*>(m_render)->setSelectionStart(start);
 }
 
-void HTMLTextAreaElementImpl::setSelectionEnd(long end) {
+void HTMLTextAreaElementImpl::setSelectionEnd(int end) {
   if (m_render)
     static_cast<RenderTextArea*>(m_render)->setSelectionEnd(end);
 }
@@ -3441,7 +3441,7 @@ void HTMLTextAreaElementImpl::select() {
     static_cast<RenderTextArea*>(m_render)->select();
 }
 
-void HTMLTextAreaElementImpl::setSelectionRange(long start, long end) {
+void HTMLTextAreaElementImpl::setSelectionRange(int start, int end) {
   if (m_render)
     static_cast<RenderTextArea*>(m_render)->setSelectionRange(start, end);
 }
@@ -3610,11 +3610,11 @@ void HTMLTextAreaElementImpl::setAccessKey(const DOMString& value) {
   setAttribute(accesskeyAttr, value);
 }
 
-void HTMLTextAreaElementImpl::setCols(long cols) {
+void HTMLTextAreaElementImpl::setCols(int cols) {
   setAttribute(colsAttr, QString::number(cols));
 }
 
-void HTMLTextAreaElementImpl::setRows(long rows) {
+void HTMLTextAreaElementImpl::setRows(int rows) {
   setAttribute(rowsAttr, QString::number(rows));
 }
 
@@ -3646,16 +3646,16 @@ void HTMLIsIndexElementImpl::setPrompt(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-unsigned long HTMLOptionsCollectionImpl::length() const {
+unsigned HTMLOptionsCollectionImpl::length() const {
   // Not yet implemented.
   return 0;
 }
 
-void HTMLOptionsCollectionImpl::setLength(unsigned long length) {
+void HTMLOptionsCollectionImpl::setLength(unsigned length) {
   // Not yet implemented.
 }
 
-NodeImpl* HTMLOptionsCollectionImpl::item(unsigned long index) const {
+NodeImpl* HTMLOptionsCollectionImpl::item(unsigned index) const {
   // Not yet implemented.
   return 0;
 }

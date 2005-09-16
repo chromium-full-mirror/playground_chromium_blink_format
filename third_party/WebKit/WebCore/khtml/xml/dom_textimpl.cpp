@@ -78,12 +78,12 @@ void CharacterDataImpl::setData(const DOMString& _data, int& exceptioncode) {
   getDocument()->removeMarkers(this);
 }
 
-unsigned long CharacterDataImpl::length() const {
+unsigned CharacterDataImpl::length() const {
   return str->l;
 }
 
-DOMString CharacterDataImpl::substringData(const unsigned long offset,
-                                           const unsigned long count,
+DOMString CharacterDataImpl::substringData(const unsigned offset,
+                                           const unsigned count,
                                            int& exceptioncode) {
   exceptioncode = 0;
   checkCharDataOperation(offset, exceptioncode);
@@ -113,7 +113,7 @@ void CharacterDataImpl::appendData(const DOMString& arg, int& exceptioncode) {
   oldStr->deref();
 }
 
-void CharacterDataImpl::insertData(const unsigned long offset,
+void CharacterDataImpl::insertData(const unsigned offset,
                                    const DOMString& arg,
                                    int& exceptioncode) {
   exceptioncode = 0;
@@ -136,8 +136,8 @@ void CharacterDataImpl::insertData(const unsigned long offset,
   getDocument()->shiftMarkers(this, offset, length);
 }
 
-void CharacterDataImpl::deleteData(const unsigned long offset,
-                                   const unsigned long count,
+void CharacterDataImpl::deleteData(const unsigned offset,
+                                   const unsigned count,
                                    int& exceptioncode) {
   exceptioncode = 0;
   checkCharDataOperation(offset, exceptioncode);
@@ -159,8 +159,8 @@ void CharacterDataImpl::deleteData(const unsigned long offset,
   getDocument()->shiftMarkers(this, offset + count, -count);
 }
 
-void CharacterDataImpl::replaceData(const unsigned long offset,
-                                    const unsigned long count,
+void CharacterDataImpl::replaceData(const unsigned offset,
+                                    const unsigned count,
                                     const DOMString& arg,
                                     int& exceptioncode) {
   exceptioncode = 0;
@@ -168,7 +168,7 @@ void CharacterDataImpl::replaceData(const unsigned long offset,
   if (exceptioncode)
     return;
 
-  unsigned long realCount;
+  unsigned realCount;
   if (offset + count > str->l)
     realCount = str->l - offset;
   else
@@ -232,7 +232,7 @@ void CharacterDataImpl::dispatchModifiedEvent(DOMStringImpl* prevValue) {
   dispatchSubtreeModifiedEvent();
 }
 
-void CharacterDataImpl::checkCharDataOperation(const unsigned long offset,
+void CharacterDataImpl::checkCharDataOperation(const unsigned offset,
                                                int& exceptioncode) {
   exceptioncode = 0;
 
@@ -251,21 +251,21 @@ void CharacterDataImpl::checkCharDataOperation(const unsigned long offset,
   }
 }
 
-long CharacterDataImpl::maxOffset() const {
-  return (long)length();
+int CharacterDataImpl::maxOffset() const {
+  return (int)length();
 }
 
-long CharacterDataImpl::caretMinOffset() const {
+int CharacterDataImpl::caretMinOffset() const {
   RenderText* r = static_cast<RenderText*>(renderer());
   return r && r->isText() ? r->caretMinOffset() : 0;
 }
 
-long CharacterDataImpl::caretMaxOffset() const {
+int CharacterDataImpl::caretMaxOffset() const {
   RenderText* r = static_cast<RenderText*>(renderer());
-  return r && r->isText() ? r->caretMaxOffset() : (long)length();
+  return r && r->isText() ? r->caretMaxOffset() : (int)length();
 }
 
-unsigned long CharacterDataImpl::caretMaxRenderedOffset() const {
+unsigned CharacterDataImpl::caretMaxRenderedOffset() const {
   RenderText* r = static_cast<RenderText*>(renderer());
   return r ? r->caretMaxRenderedOffset() : length();
 }
@@ -330,18 +330,18 @@ TextImpl::TextImpl(DocumentPtr* doc) : CharacterDataImpl(doc) {}
 
 TextImpl::~TextImpl() {}
 
-TextImpl* TextImpl::splitText(const unsigned long offset, int& exceptioncode) {
+TextImpl* TextImpl::splitText(const unsigned offset, int& exceptioncode) {
   exceptioncode = 0;
 
   // INDEX_SIZE_ERR: Raised if the specified offset is negative or greater than
   // the number of 16-bit units in data.
 
-  // ### we explicitly check for a negative long that has been cast to an
-  // unsigned long
+  // ### we explicitly check for a negative number that has been cast to an
+  // unsigned
   // ... this can happen if JS code passes in -1 - we need to catch this
   // earlier! (in the
   // kjs bindings)
-  if (offset > str->l || (long)offset < 0) {
+  if (offset > str->l || (int)offset < 0) {
     exceptioncode = DOMException::INDEX_SIZE_ERR;
     return 0;
   }

@@ -886,7 +886,7 @@ RangeImpl* DocumentImpl::createRange() {
 }
 
 NodeIteratorImpl* DocumentImpl::createNodeIterator(NodeImpl* root,
-                                                   unsigned long whatToShow,
+                                                   unsigned whatToShow,
                                                    NodeFilterImpl* filter,
                                                    bool expandEntityReferences,
                                                    int& exceptioncode) {
@@ -898,7 +898,7 @@ NodeIteratorImpl* DocumentImpl::createNodeIterator(NodeImpl* root,
 }
 
 TreeWalkerImpl* DocumentImpl::createTreeWalker(NodeImpl* root,
-                                               unsigned long whatToShow,
+                                               unsigned whatToShow,
                                                NodeFilterImpl* filter,
                                                bool expandEntityReferences,
                                                int& exceptioncode) {
@@ -1814,7 +1814,7 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
     }
   } else if (strcasecmp(equiv, "expires") == 0) {
     QString str = content.qstring().stripWhiteSpace();
-    time_t expire_date = str.toLong();
+    time_t expire_date = str.toInt();
     if (m_docLoader)
       m_docLoader->setExpireDate(expire_date);
   } else if (strcasecmp(equiv, "pragma") == 0 ||
@@ -2781,8 +2781,8 @@ void DocumentImpl::removeMarkers(RangeImpl* range,
        markedText.advance()) {
     SharedPtr<RangeImpl> textPiece = markedText.range();
     int exception = 0;
-    long startOffset = textPiece->startOffset(exception);
-    long length = textPiece->endOffset(exception) - startOffset + 1;
+    unsigned startOffset = textPiece->startOffset(exception);
+    unsigned length = textPiece->endOffset(exception) - startOffset + 1;
     removeMarkers(textPiece->startContainer(exception), startOffset, length,
                   markerType);
   }
@@ -2841,10 +2841,10 @@ void DocumentImpl::addMarker(NodeImpl* node, DocumentMarker newMarker) {
 // useful if, e.g., the caller has created the dstNode from a non-prefix
 // substring of the srcNode.
 void DocumentImpl::copyMarkers(NodeImpl* srcNode,
-                               ulong startOffset,
-                               long length,
+                               unsigned startOffset,
+                               int length,
                                NodeImpl* dstNode,
-                               long delta,
+                               int delta,
                                DocumentMarker::MarkerType markerType) {
   if (length <= 0)
     return;
@@ -2854,7 +2854,7 @@ void DocumentImpl::copyMarkers(NodeImpl* srcNode,
     return;
 
   bool docDirty = false;
-  ulong endOffset = startOffset + length - 1;
+  unsigned endOffset = startOffset + length - 1;
   QValueListIterator<DocumentMarker> it;
   for (it = markers->begin(); it != markers->end(); ++it) {
     DocumentMarker marker = *it;
@@ -2886,8 +2886,8 @@ void DocumentImpl::copyMarkers(NodeImpl* srcNode,
 }
 
 void DocumentImpl::removeMarkers(NodeImpl* node,
-                                 ulong startOffset,
-                                 long length,
+                                 unsigned startOffset,
+                                 int length,
                                  DocumentMarker::MarkerType markerType) {
   if (length <= 0)
     return;
@@ -2897,7 +2897,7 @@ void DocumentImpl::removeMarkers(NodeImpl* node,
     return;
 
   bool docDirty = false;
-  ulong endOffset = startOffset + length - 1;
+  unsigned endOffset = startOffset + length - 1;
   QValueListIterator<DocumentMarker> it;
   for (it = markers->begin(); it != markers->end();) {
     DocumentMarker marker = *it;
@@ -2949,7 +2949,6 @@ QValueList<DocumentMarker> DocumentImpl::markersForNode(NodeImpl* node) {
   QValueList<DocumentMarker>* markers = m_markers.find(node);
   if (markers)
     return *markers;
-
   return QValueList<DocumentMarker>();
 }
 
@@ -2998,8 +2997,8 @@ void DocumentImpl::removeMarkers(DocumentMarker::MarkerType markerType) {
 }
 
 void DocumentImpl::shiftMarkers(NodeImpl* node,
-                                ulong startOffset,
-                                long delta,
+                                unsigned startOffset,
+                                int delta,
                                 DocumentMarker::MarkerType markerType) {
   QValueList<DocumentMarker>* markers = m_markers.find(node);
   if (!markers)

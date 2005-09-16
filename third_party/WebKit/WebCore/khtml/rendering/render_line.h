@@ -149,9 +149,9 @@ class InlineBox {
   virtual int leftOverflow() { return xPos(); }
   virtual int rightOverflow() { return xPos() + width(); }
 
-  virtual long caretMinOffset() const;
-  virtual long caretMaxOffset() const;
-  virtual unsigned long caretMaxRenderedOffset() const;
+  virtual int caretMinOffset() const;
+  virtual int caretMaxOffset() const;
+  virtual unsigned caretMaxRenderedOffset() const;
 
   virtual void clearTruncation(){};
 

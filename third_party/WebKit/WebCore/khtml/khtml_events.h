@@ -51,7 +51,7 @@ class MouseEvent : public KParts::Event {
   DOM::NodeImpl* innerNode() const { return m_innerNode.get(); }
 
   // return the offset of innerNode
-  long offset() const;
+  int offset() const;
 
  private:
   QMouseEvent* m_qmouseEvent;
@@ -145,7 +145,7 @@ class MouseReleaseEvent : public MouseEvent {
                     const DOM::DOMString& url,
                     const DOM::DOMString& target,
                     DOM::NodeImpl* innerNode,
-                    long = 0)
+                    int = 0)
       : MouseEvent(s_strMouseReleaseEvent,
                    mouseEvent,
                    x,

@@ -47,11 +47,9 @@ class JavaClass : public Class {
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const;
 
-  virtual Constructor* constructorAt(long i) const {
-    return &_constructors[i];
-  };
+  virtual Constructor* constructorAt(int i) const { return &_constructors[i]; };
 
-  virtual long numConstructors() const { return _numConstructors; };
+  virtual int numConstructors() const { return _numConstructors; };
 
   bool isNumberClass() const;
   bool isBooleanClass() const;
@@ -66,7 +64,7 @@ class JavaClass : public Class {
   CFDictionaryRef _fields;
   CFDictionaryRef _methods;
   JavaConstructor* _constructors;
-  long _numConstructors;
+  int _numConstructors;
 };
 
 }  // namespace Bindings

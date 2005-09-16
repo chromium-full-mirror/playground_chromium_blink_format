@@ -34,14 +34,14 @@ class SplitTextNodeContainingElementCommand : public CompositeEditCommand {
  public:
   SplitTextNodeContainingElementCommand(DOM::DocumentImpl*,
                                         DOM::TextImpl*,
-                                        long);
+                                        int);
   virtual ~SplitTextNodeContainingElementCommand();
 
   virtual void doApply();
 
  private:
   DOM::TextImpl* m_text;
-  long m_offset;
+  int m_offset;
 };
 
 }  // namespace khtml

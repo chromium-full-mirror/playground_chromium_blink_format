@@ -45,19 +45,19 @@ class CharacterDataImpl : public NodeImpl {
 
   virtual DOMString data() const;
   virtual void setData(const DOMString& _data, int& exceptioncode);
-  virtual unsigned long length() const;
-  virtual DOMString substringData(const unsigned long offset,
-                                  const unsigned long count,
+  virtual unsigned length() const;
+  virtual DOMString substringData(const unsigned offset,
+                                  const unsigned count,
                                   int& exceptioncode);
   virtual void appendData(const DOMString& arg, int& exceptioncode);
-  virtual void insertData(const unsigned long offset,
+  virtual void insertData(const unsigned offset,
                           const DOMString& arg,
                           int& exceptioncode);
-  virtual void deleteData(const unsigned long offset,
-                          const unsigned long count,
+  virtual void deleteData(const unsigned offset,
+                          const unsigned count,
                           int& exceptioncode);
-  virtual void replaceData(const unsigned long offset,
-                           const unsigned long count,
+  virtual void replaceData(const unsigned offset,
+                           const unsigned count,
                            const DOMString& arg,
                            int& exceptioncode);
 
@@ -72,13 +72,13 @@ class CharacterDataImpl : public NodeImpl {
   // Other methods (not part of DOM)
 
   DOMStringImpl* string() { return str; }
-  virtual void checkCharDataOperation(const unsigned long offset,
+  virtual void checkCharDataOperation(const unsigned offset,
                                       int& exceptioncode);
 
-  virtual long maxOffset() const;
-  virtual long caretMinOffset() const;
-  virtual long caretMaxOffset() const;
-  virtual unsigned long caretMaxRenderedOffset() const;
+  virtual int maxOffset() const;
+  virtual int caretMinOffset() const;
+  virtual int caretMaxOffset() const;
+  virtual unsigned caretMaxRenderedOffset() const;
 
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
 
@@ -125,7 +125,7 @@ class TextImpl : public CharacterDataImpl {
 
   // DOM methods & attributes for CharacterData
 
-  TextImpl* splitText(const unsigned long offset, int& exceptioncode);
+  TextImpl* splitText(const unsigned offset, int& exceptioncode);
 
   // DOM methods overridden from  parent classes
   const AtomicString& localName() const;

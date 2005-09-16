@@ -86,8 +86,8 @@ void EventImpl::setTarget(NodeImpl* _target) {
 
 DOMTimeStamp EventImpl::timeStamp() {
   QDateTime epoch(QDate(1970, 1, 1), QTime(0, 0));
-  // ### kjs does not yet support long long (?) so the value wraps around
-  return epoch.secsTo(m_createTime) * 1000 + m_createTime.time().msec();
+  return static_cast<DOMTimeStamp>(epoch.secsTo(m_createTime)) * 1000 +
+         m_createTime.time().msec();
 }
 
 void EventImpl::preventDefault() {
@@ -145,7 +145,7 @@ UIEventImpl::UIEventImpl(const AtomicString& eventType,
                          bool canBubbleArg,
                          bool cancelableArg,
                          AbstractViewImpl* viewArg,
-                         long detailArg)
+                         int detailArg)
     : EventImpl(eventType, canBubbleArg, cancelableArg) {
   m_view = viewArg;
   if (m_view)
@@ -162,7 +162,7 @@ void UIEventImpl::initUIEvent(const AtomicString& typeArg,
                               bool canBubbleArg,
                               bool cancelableArg,
                               AbstractViewImpl* viewArg,
-                              long detailArg) {
+                              int detailArg) {
   EventImpl::initEvent(typeArg, canBubbleArg, cancelableArg);
 
   if (m_view)
@@ -186,23 +186,23 @@ int UIEventImpl::charCode() const {
   return 0;
 }
 
-long UIEventImpl::layerX() const {
+int UIEventImpl::layerX() const {
   return 0;
 }
 
-long UIEventImpl::layerY() const {
+int UIEventImpl::layerY() const {
   return 0;
 }
 
-long UIEventImpl::pageX() const {
+int UIEventImpl::pageX() const {
   return 0;
 }
 
-long UIEventImpl::pageY() const {
+int UIEventImpl::pageY() const {
   return 0;
 }
 
-long UIEventImpl::which() const {
+int UIEventImpl::which() const {
   return 0;
 }
 
@@ -220,11 +220,11 @@ MouseRelatedEventImpl::MouseRelatedEventImpl(const AtomicString& eventType,
                                              bool canBubbleArg,
                                              bool cancelableArg,
                                              AbstractViewImpl* viewArg,
-                                             long detailArg,
-                                             long screenXArg,
-                                             long screenYArg,
-                                             long clientXArg,
-                                             long clientYArg,
+                                             int detailArg,
+                                             int screenXArg,
+                                             int screenYArg,
+                                             int clientXArg,
+                                             int clientYArg,
                                              bool ctrlKeyArg,
                                              bool altKeyArg,
                                              bool shiftKeyArg,
@@ -280,11 +280,11 @@ void MouseRelatedEventImpl::computeLayerPos() {
   }
 }
 
-long MouseRelatedEventImpl::pageX() const {
+int MouseRelatedEventImpl::pageX() const {
   return m_clientX;
 }
 
-long MouseRelatedEventImpl::pageY() const {
+int MouseRelatedEventImpl::pageY() const {
   return m_clientY;
 }
 
@@ -300,11 +300,11 @@ MouseEventImpl::MouseEventImpl(const AtomicString& eventType,
                                bool canBubbleArg,
                                bool cancelableArg,
                                AbstractViewImpl* viewArg,
-                               long detailArg,
-                               long screenXArg,
-                               long screenYArg,
-                               long clientXArg,
-                               long clientYArg,
+                               int detailArg,
+                               int screenXArg,
+                               int screenYArg,
+                               int clientXArg,
+                               int clientYArg,
                                bool ctrlKeyArg,
                                bool altKeyArg,
                                bool shiftKeyArg,
@@ -345,11 +345,11 @@ void MouseEventImpl::initMouseEvent(const AtomicString& typeArg,
                                     bool canBubbleArg,
                                     bool cancelableArg,
                                     AbstractViewImpl* viewArg,
-                                    long detailArg,
-                                    long screenXArg,
-                                    long screenYArg,
-                                    long clientXArg,
-                                    long clientYArg,
+                                    int detailArg,
+                                    int screenXArg,
+                                    int screenYArg,
+                                    int clientXArg,
+                                    int clientYArg,
                                     bool ctrlKeyArg,
                                     bool altKeyArg,
                                     bool shiftKeyArg,
@@ -388,7 +388,7 @@ bool MouseEventImpl::isDragEvent() const {
           m_type == dragendEvent);
 }
 
-long MouseEventImpl::which() const {
+int MouseEventImpl::which() const {
   // For KHTML, the return values for left, middle and right mouse buttons are
   // 0, 1, 2, respectively.
   // For the Netscape "which" property, the return values for left, middle and
@@ -451,7 +451,7 @@ KeyboardEventImpl::KeyboardEventImpl(const AtomicString& eventType,
                                      bool cancelableArg,
                                      AbstractViewImpl* viewArg,
                                      const DOMString& keyIdentifierArg,
-                                     unsigned long keyLocationArg,
+                                     unsigned keyLocationArg,
                                      bool ctrlKeyArg,
                                      bool altKeyArg,
                                      bool shiftKeyArg,
@@ -485,7 +485,7 @@ void KeyboardEventImpl::initKeyboardEvent(const AtomicString& typeArg,
                                           bool cancelableArg,
                                           AbstractViewImpl* viewArg,
                                           const DOMString& keyIdentifierArg,
-                                          unsigned long keyLocationArg,
+                                          unsigned keyLocationArg,
                                           bool ctrlKeyArg,
                                           bool altKeyArg,
                                           bool shiftKeyArg,
@@ -529,7 +529,7 @@ bool KeyboardEventImpl::isKeyboardEvent() const {
   return true;
 }
 
-long KeyboardEventImpl::which() const {
+int KeyboardEventImpl::which() const {
   // Netscape's "which" returns a virtual key code for keydown and keyup, and a
   // character code for keypress.
   // That's exactly what IE's "keyCode" returns. So they are the same for
@@ -650,12 +650,12 @@ bool ClipboardEventImpl::isClipboardEvent() const {
 WheelEventImpl::WheelEventImpl() : m_horizontal(false), m_wheelDelta(0) {}
 
 WheelEventImpl::WheelEventImpl(bool h,
-                               long d,
+                               int d,
                                AbstractViewImpl* v,
-                               long sx,
-                               long sy,
-                               long cx,
-                               long cy,
+                               int sx,
+                               int sy,
+                               int cx,
+                               int cy,
                                bool ctrl,
                                bool alt,
                                bool shift,

@@ -190,7 +190,7 @@ bool DOMCSSStyleDeclaration::getOwnPropertySlot(ExecState* exec,
   }
 
   bool ok;
-  long unsigned int u = propertyName.toULong(&ok);
+  unsigned u = propertyName.toUInt32(&ok);
   if (ok) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;
@@ -444,7 +444,7 @@ bool DOMStyleSheetList::getOwnPropertySlot(ExecState* exec,
 
   // Retrieve stylesheet by index
   bool ok;
-  long unsigned int u = propertyName.toULong(&ok);
+  unsigned u = propertyName.toUInt32(&ok);
   if (ok && u < styleSheetList.length()) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;
@@ -573,7 +573,7 @@ bool DOMMediaList::getOwnPropertySlot(ExecState* exec,
   }
 
   bool ok;
-  long unsigned int u = propertyName.toULong(&ok);
+  unsigned u = propertyName.toUInt32(&ok);
   if (ok && u < m_impl->length()) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;
@@ -687,7 +687,7 @@ ValueImp* DOMCSSStyleSheetProtoFunc::callAsFunction(ExecState* exec,
       styleSheet.deleteRule(args[0]->toInt32(exec), exception);
       return Undefined();
     case DOMCSSStyleSheet::AddRule: {
-      long index = args.size() >= 3 ? args[2]->toInt32(exec) : -1;
+      int index = args.size() >= 3 ? args[2]->toInt32(exec) : -1;
       styleSheet.addRule(args[0]->toString(exec).domString(),
                          args[1]->toString(exec).domString(), index, exception);
       // As per Microsoft documentation, always return -1.
@@ -749,7 +749,7 @@ bool DOMCSSRuleList::getOwnPropertySlot(ExecState* exec,
   CSSRuleListImpl& cssRuleList = *m_impl;
 
   bool ok;
-  long unsigned int u = propertyName.toULong(&ok);
+  unsigned u = propertyName.toUInt32(&ok);
   if (ok && u < cssRuleList.length()) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;
@@ -1367,7 +1367,7 @@ bool DOMCSSValueList::getOwnPropertySlot(ExecState* exec,
   }
 
   bool ok;
-  long unsigned int u = propertyName.toULong(&ok);
+  unsigned u = propertyName.toUInt32(&ok);
   if (ok && u < valueList.length()) {
     slot.setCustomIndex(this, u, indexGetter);
     return true;

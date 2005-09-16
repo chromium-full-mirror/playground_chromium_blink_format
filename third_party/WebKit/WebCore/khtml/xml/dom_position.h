@@ -43,7 +43,7 @@ enum EUsingComposedCharacters {
 class Position {
  public:
   Position() : m_node(0), m_offset(0) {}
-  Position(NodeImpl* node, long offset);
+  Position(NodeImpl* node, int offset);
   Position(const Position&);
   ~Position();
 
@@ -52,7 +52,7 @@ class Position {
   void clear();
 
   NodeImpl* node() const { return m_node; }
-  long offset() const { return m_offset; }
+  int offset() const { return m_offset; }
 
   bool isNull() const { return m_node == 0; }
   bool isNotNull() const { return m_node != 0; }
@@ -109,7 +109,7 @@ class Position {
 #endif
 
  private:
-  long renderedOffset() const;
+  int renderedOffset() const;
 
   bool inRenderedText() const;
 
@@ -117,7 +117,7 @@ class Position {
   Position nextCharacterPosition(khtml::EAffinity affinity) const;
 
   NodeImpl* m_node;
-  long m_offset;
+  int m_offset;
 };
 
 inline bool operator==(const Position& a, const Position& b) {

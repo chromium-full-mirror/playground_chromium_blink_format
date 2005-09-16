@@ -249,7 +249,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
     } break;
 
     case long_type: {
-      resultValue = Number((long int)result.j);
+      resultValue = jsNumber(result.j);
     } break;
 
     case float_type: {

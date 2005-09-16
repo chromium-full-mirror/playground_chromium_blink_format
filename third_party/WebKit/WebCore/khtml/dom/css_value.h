@@ -95,7 +95,7 @@ class CSSStyleDeclaration {
    * declaration block.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * The CSS rule that contains this declaration block.
@@ -216,7 +216,7 @@ class CSSStyleDeclaration {
    * empty string if no property exists at this position.
    *
    */
-  DOMString item(unsigned long index);
+  DOMString item(unsigned index);
 
   /**
    * @internal
@@ -339,7 +339,7 @@ class CSSValueList : public CSSValue {
    * </code> inclusive.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Used to retrieve a CSS rule by ordinal index. The order in this
@@ -353,7 +353,7 @@ class CSSValueList : public CSSValue {
    * that is not valid index.
    *
    */
-  CSSValue item(unsigned long index);
+  CSSValue item(unsigned index);
 
  protected:
   CSSValueListImpl* vimpl;

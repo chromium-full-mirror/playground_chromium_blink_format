@@ -290,7 +290,7 @@ class CSSStyleSheet : public StyleSheet {
    * and is unparsable.
    *
    */
-  unsigned long insertRule(const DOMString& rule, unsigned long index);
+  unsigned insertRule(const DOMString& rule, unsigned index);
 
   /**
    * Used to delete a rule from the style sheet.
@@ -308,10 +308,10 @@ class CSSStyleSheet : public StyleSheet {
    * readonly.
    *
    */
-  void deleteRule(unsigned long index);
+  void deleteRule(unsigned index);
 
   /* Microsoft extension. */
-  void addRule(const DOMString& selector, const DOMString& style, long index);
+  void addRule(const DOMString& selector, const DOMString& style, int index);
 };
 
 class StyleSheetListImpl;
@@ -339,7 +339,7 @@ class StyleSheetList {
    * length-1 </code> inclusive.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Used to retrieve a style sheet by ordinal index.
@@ -351,7 +351,7 @@ class StyleSheetList {
    * that is not a valid index.
    *
    */
-  StyleSheet item(unsigned long index);
+  StyleSheet item(unsigned index);
 
   /**
    * @internal
@@ -406,7 +406,7 @@ class MediaList {
    * The number of media in the list. The range of valid media is 0 to length-1
    * inclusive.
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Returns the indexth in the list. If index is greater than or equal to
@@ -417,7 +417,7 @@ class MediaList {
    * @return The medium at the indexth position in the MediaList, or null if
    * that is not a valid index.
    */
-  DOMString item(unsigned long index) const;
+  DOMString item(unsigned index) const;
 
   /**
    * Deletes the medium indicated by oldMedium from the list.

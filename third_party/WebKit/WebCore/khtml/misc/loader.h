@@ -777,8 +777,6 @@ class Cache {
 
   static Loader* m_loader;
 
-  static unsigned long s_ulRefCnt;
-
   static void moveToHeadOfLRUList(CachedObject*);
 
   static LRUList* m_LRULists;

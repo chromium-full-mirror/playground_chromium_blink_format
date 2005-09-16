@@ -333,11 +333,11 @@ class NamedAttrMapImpl : public NamedNodeMapImpl {
                                               int& exceptioncode);
   virtual SharedPtr<NodeImpl> setNamedItem(NodeImpl* arg, int& exceptioncode);
 
-  virtual AttrImpl* item(unsigned long index) const;
-  unsigned long length() const { return len; }
+  virtual AttrImpl* item(unsigned index) const;
+  unsigned length() const { return len; }
 
   // Other methods (not part of DOM)
-  AttributeImpl* attributeItem(unsigned long index) const {
+  AttributeImpl* attributeItem(unsigned index) const {
     return attrs ? attrs[index] : 0;
   }
   AttributeImpl* getAttributeItem(const QualifiedName& name) const;
@@ -467,7 +467,7 @@ class NamedMappedAttrMapImpl : public NamedAttrMapImpl {
   bool mapsEquivalent(const NamedMappedAttrMapImpl* otherMap) const;
   int declCount() const;
 
-  MappedAttributeImpl* attributeItem(unsigned long index) const {
+  MappedAttributeImpl* attributeItem(unsigned index) const {
     return attrs ? static_cast<MappedAttributeImpl*>(attrs[index]) : 0;
   }
 

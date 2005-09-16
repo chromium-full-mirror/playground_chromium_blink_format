@@ -651,8 +651,8 @@ void InlineTextBox::paintMarker(QPainter* pt,
   int start = 0;        // start of line to draw, relative to _tx
   int width = m_width;  // how much line to draw
   bool useWholeWidth = true;
-  ulong paintStart = m_start;
-  ulong paintEnd = end() + 1;  // end points at the last char, not past it
+  unsigned paintStart = m_start;
+  unsigned paintEnd = end() + 1;  // end points at the last char, not past it
   if (paintStart <= marker.startOffset) {
     paintStart = marker.startOffset;
     useWholeWidth = false;
@@ -665,7 +665,7 @@ void InlineTextBox::paintMarker(QPainter* pt,
     useWholeWidth = false;
   }
   if (m_truncation != cNoTruncation) {
-    paintEnd = kMin(paintEnd, (ulong)m_truncation);
+    paintEnd = kMin(paintEnd, (unsigned)m_truncation);
     useWholeWidth = false;
   }
   if (!useWholeWidth) {
@@ -712,8 +712,8 @@ void InlineTextBox::paintMarkedTextUnderline(
   int start = 0;        // start of line to draw, relative to _tx
   int width = m_width;  // how much line to draw
   bool useWholeWidth = true;
-  ulong paintStart = m_start;
-  ulong paintEnd = end() + 1;  // end points at the last char, not past it
+  unsigned paintStart = m_start;
+  unsigned paintEnd = end() + 1;  // end points at the last char, not past it
   if (paintStart <= underline.startOffset) {
     paintStart = underline.startOffset;
     useWholeWidth = false;
@@ -722,11 +722,11 @@ void InlineTextBox::paintMarkedTextUnderline(
   }
   if (paintEnd !=
       underline.endOffset) {  // end points at the last char, not past it
-    paintEnd = kMin(paintEnd, (ulong)underline.endOffset);
+    paintEnd = kMin(paintEnd, (unsigned)underline.endOffset);
     useWholeWidth = false;
   }
   if (m_truncation != cNoTruncation) {
-    paintEnd = kMin(paintEnd, (ulong)m_truncation);
+    paintEnd = kMin(paintEnd, (unsigned)m_truncation);
     useWholeWidth = false;
   }
   if (!useWholeWidth) {
@@ -739,15 +739,15 @@ void InlineTextBox::paintMarkedTextUnderline(
   pt->drawLineForText(_tx + start, _ty, underlineOffset, width);
 }
 
-long InlineTextBox::caretMinOffset() const {
+int InlineTextBox::caretMinOffset() const {
   return m_start;
 }
 
-long InlineTextBox::caretMaxOffset() const {
+int InlineTextBox::caretMaxOffset() const {
   return m_start + m_len;
 }
 
-unsigned long InlineTextBox::caretMaxRenderedOffset() const {
+unsigned InlineTextBox::caretMaxRenderedOffset() const {
   return m_start + m_len;
 }
 
@@ -774,7 +774,7 @@ static UBreakIterator* getCharacterBreakIterator(const DOMStringImpl* i) {
   return iterator;
 }
 
-long RenderText::previousOffset(long current) const {
+int RenderText::previousOffset(int current) const {
   UBreakIterator* iterator = getCharacterBreakIterator(str);
   if (!iterator)
     return current - 1;
@@ -786,7 +786,7 @@ long RenderText::previousOffset(long current) const {
   return result;
 }
 
-long RenderText::nextOffset(long current) const {
+int RenderText::nextOffset(int current) const {
   UBreakIterator* iterator = getCharacterBreakIterator(str);
   if (!iterator)
     return current + 1;
@@ -824,12 +824,12 @@ int InlineTextBox::positionForOffset(int offset) const {
 
   int left;
   if (m_reversed) {
-    long len = m_start + m_len - offset;
+    int len = m_start + m_len - offset;
     QString string(text->str->s + offset, len);
     left =
         m_x + fm.boundingRect(string, text->tabWidth(), textPos(), len).right();
   } else {
-    long len = offset - m_start;
+    int len = offset - m_start;
     QString string(text->str->s + m_start, len);
     left =
         m_x + fm.boundingRect(string, text->tabWidth(), textPos(), len).right();
@@ -1913,7 +1913,7 @@ const Font* RenderText::htmlFont(bool firstLine) const {
   return &style(firstLine)->htmlFont();
 }
 
-long RenderText::caretMinOffset() const {
+int RenderText::caretMinOffset() const {
   InlineTextBox* box = firstTextBox();
   if (!box)
     return 0;
@@ -1923,7 +1923,7 @@ long RenderText::caretMinOffset() const {
   return minOffset;
 }
 
-long RenderText::caretMaxOffset() const {
+int RenderText::caretMaxOffset() const {
   InlineTextBox* box = lastTextBox();
   if (!box)
     return str->l;
@@ -1933,14 +1933,14 @@ long RenderText::caretMaxOffset() const {
   return maxOffset;
 }
 
-unsigned long RenderText::caretMaxRenderedOffset() const {
+unsigned RenderText::caretMaxRenderedOffset() const {
   int l = 0;
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
     l += box->m_len;
   return l;
 }
 
-InlineBox* RenderText::inlineBox(long offset, EAffinity affinity) {
+InlineBox* RenderText::inlineBox(int offset, EAffinity affinity) {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox()) {
     if (offset >= box->m_start && offset <= box->m_start + box->m_len) {
       if (affinity == DOWNSTREAM && box->nextTextBox() &&

@@ -45,7 +45,7 @@ class HTMLUListElementImpl : public HTMLElementImpl {
                           MappedAttributeEntry& result) const;
   virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  virtual long start() const { return 1; }
+  virtual int start() const { return 1; }
 
   bool compact() const;
   void setCompact(bool);
@@ -101,8 +101,8 @@ class HTMLOListElementImpl : public HTMLElementImpl {
   bool compact() const;
   void setCompact(bool);
 
-  long start() const { return _start; }
-  void setStart(long);
+  int start() const { return _start; }
+  void setStart(int);
 
   DOMString type() const;
   void setType(const DOMString&);
@@ -132,12 +132,12 @@ class HTMLLIElementImpl : public HTMLElementImpl {
   DOMString type() const;
   void setType(const DOMString&);
 
-  long value() const;
-  void setValue(long);
+  int value() const;
+  void setValue(int);
 
  private:
   bool isValued;
-  long requestedValue;
+  int requestedValue;
 };
 
 // -------------------------------------------------------------------------

@@ -108,7 +108,7 @@ class JavaConstructor : public Constructor {
   void _commonCopy(const JavaConstructor& other) {
     _numParameters = other._numParameters;
     _parameters = new JavaParameter[_numParameters];
-    long i;
+    int i;
     for (i = 0; i < _numParameters; i++) {
       _parameters[i] = other._parameters[i];
     }
@@ -129,12 +129,12 @@ class JavaConstructor : public Constructor {
     return *this;
   }
 
-  virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
-  virtual long numParameters() const { return _numParameters; };
+  virtual Parameter* parameterAt(int i) const { return &_parameters[i]; };
+  virtual int numParameters() const { return _numParameters; };
 
  private:
   JavaParameter* _parameters;
-  long _numParameters;
+  int _numParameters;
 };
 
 class JavaField : public Field {
@@ -207,7 +207,7 @@ class JavaMethod : public Method {
 
     _numParameters = other._numParameters;
     _parameters = new JavaParameter[_numParameters];
-    long i;
+    int i;
     for (i = 0; i < _numParameters; i++) {
       _parameters[i] = other._parameters[i];
     }
@@ -228,8 +228,8 @@ class JavaMethod : public Method {
 
   virtual const char* name() const { return _name.UTF8String(); };
   RuntimeType returnType() const { return _returnType.UTF8String(); };
-  virtual Parameter* parameterAt(long i) const { return &_parameters[i]; };
-  virtual long numParameters() const { return _numParameters; };
+  virtual Parameter* parameterAt(int i) const { return &_parameters[i]; };
+  virtual int numParameters() const { return _numParameters; };
 
   const char* signature() const;
   JNIType JNIReturnType() const;
@@ -240,7 +240,7 @@ class JavaMethod : public Method {
 
  private:
   JavaParameter* _parameters;
-  long _numParameters;
+  int _numParameters;
   JavaString _name;
   mutable UString* _signature;
   JavaString _returnType;

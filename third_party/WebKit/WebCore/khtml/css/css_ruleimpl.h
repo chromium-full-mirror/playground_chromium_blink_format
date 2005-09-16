@@ -143,12 +143,12 @@ class CSSRuleListImpl : public khtml::Shared<CSSRuleListImpl> {
 
   MAIN_THREAD_ALLOCATED;
 
-  unsigned long length() const { return m_lstCSSRules.count(); }
-  CSSRuleImpl* item(unsigned long index) { return m_lstCSSRules.at(index); }
+  unsigned length() const { return m_lstCSSRules.count(); }
+  CSSRuleImpl* item(unsigned index) { return m_lstCSSRules.at(index); }
 
   /* not part of the DOM */
-  unsigned long insertRule(CSSRuleImpl* rule, unsigned long index);
-  void deleteRule(unsigned long index);
+  unsigned insertRule(CSSRuleImpl* rule, unsigned index);
+  void deleteRule(unsigned index);
   void append(CSSRuleImpl* rule);
 
  protected:
@@ -169,14 +169,14 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
   MediaListImpl* media() const { return m_lstMedia; }
   CSSRuleListImpl* cssRules() { return m_lstCSSRules; }
 
-  unsigned long insertRule(const DOM::DOMString& rule, unsigned long index);
-  void deleteRule(unsigned long index) { m_lstCSSRules->deleteRule(index); }
+  unsigned insertRule(const DOM::DOMString& rule, unsigned index);
+  void deleteRule(unsigned index) { m_lstCSSRules->deleteRule(index); }
 
   virtual bool isMediaRule() { return true; }
   virtual DOMString cssText() const;
 
   /* Not part of the DOM */
-  unsigned long append(CSSRuleImpl* rule);
+  unsigned append(CSSRuleImpl* rule);
 
  protected:
   MediaListImpl* m_lstMedia;

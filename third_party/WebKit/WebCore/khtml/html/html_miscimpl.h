@@ -86,9 +86,9 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   HTMLCollectionImpl(NodeImpl* _base, int _type);
   virtual ~HTMLCollectionImpl();
 
-  unsigned long length() const;
+  unsigned length() const;
 
-  virtual NodeImpl* item(unsigned long index) const;
+  virtual NodeImpl* item(unsigned index) const;
   virtual NodeImpl* firstItem() const;
   virtual NodeImpl* nextItem() const;
 
@@ -123,7 +123,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
                          bool checkName,
                          const DOMString& name,
                          bool caseSensitive) const;
-  virtual unsigned long calcLength() const;
+  virtual unsigned calcLength() const;
   virtual void resetCollectionInfo() const;
   // the base node, the collection refers to
   SharedPtr<NodeImpl> m_base;
@@ -156,7 +156,7 @@ class HTMLFormCollectionImpl : public HTMLCollectionImpl {
   HTMLFormCollectionImpl(NodeImpl* _base);
   ~HTMLFormCollectionImpl();
 
-  virtual NodeImpl* item(unsigned long index) const;
+  virtual NodeImpl* item(unsigned index) const;
   virtual NodeImpl* firstItem() const;
   virtual NodeImpl* nextItem() const;
 
@@ -166,7 +166,7 @@ class HTMLFormCollectionImpl : public HTMLCollectionImpl {
 
  protected:
   virtual void updateNameCache() const;
-  virtual unsigned long calcLength() const;
+  virtual unsigned calcLength() const;
   virtual NodeImpl* getNamedItem(NodeImpl* current,
                                  const QualifiedName& attrName,
                                  const DOMString& name,

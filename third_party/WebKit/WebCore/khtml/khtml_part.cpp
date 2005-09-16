@@ -445,8 +445,10 @@ bool KHTMLPart::restoreURL(const KURL& url) {
 
   m_url = url;
 
+#if !APPLE_CHANGES
   KHTMLPageCache::self()->fetchData(d->m_cacheId, this,
                                     SLOT(slotRestoreData(const QByteArray&)));
+#endif
 
   emit started(0L);
 
@@ -651,7 +653,9 @@ void KHTMLPart::stopLoading(bool sendUnload) {
   }
 
   if (d->m_job) {
+#if !APPLE_CHANGES
     KHTMLPageCache::self()->cancelEntry(d->m_cacheId);
+#endif
     d->m_job->kill();
     d->m_job = 0;
   }
@@ -678,7 +682,9 @@ void KHTMLPart::stopLoading(bool sendUnload) {
   d->m_bLoadEventEmitted = true;      // don't want that one either
   d->m_cachePolicy = KIO::CC_Verify;  // Why here?
 
+#if !APPLE_CHANGES
   KHTMLPageCache::self()->cancelFetch(this);
+#endif
   if (d->m_doc && d->m_doc->parsing()) {
     kdDebug(6050) << " was still parsing... calling end " << endl;
     slotFinishedParsing();
@@ -1224,7 +1230,9 @@ void KHTMLPart::receivedFirstData() {
   d->m_doc->docLoader()->setCachePolicy(d->m_cachePolicy);
   d->m_workingURL = KURL();
 
+#if !APPLE_CHANGES
   d->m_cacheId = KHTMLPageCache::self()->createCacheEntry();
+#endif
 
 // When the first data arrives, the metadata has just been made available
 #if APPLE_CHANGES
@@ -1495,7 +1503,9 @@ void KHTMLPart::htmlError(int errorCode,
 
 void KHTMLPart::slotFinished(KIO::Job* job) {
   if (job->error()) {
+#if !APPLE_CHANGES
     KHTMLPageCache::self()->cancelEntry(d->m_cacheId);
+#endif
     d->m_job = 0L;
 #if !APPLE_CHANGES
     emit canceled(job->errorString());
@@ -1507,9 +1517,11 @@ void KHTMLPart::slotFinished(KIO::Job* job) {
 #endif
     return;
   }
-  // kdDebug( 6050 ) << "slotFinished" << endl;
+// kdDebug( 6050 ) << "slotFinished" << endl;
 
+#if !APPLE_CHANGES
   KHTMLPageCache::self()->endData(d->m_cacheId);
+#endif
 
   if (d->m_doc && d->m_doc->docLoader()->expireDate() &&
       m_url.protocol().lower().startsWith("http"))
@@ -1563,7 +1575,9 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
 #endif
 
   d->m_bCleared = false;
+#if !APPLE_CHANGES
   d->m_cacheId = 0;
+#endif
   d->m_bComplete = false;
   d->m_bLoadEventEmitted = false;
   d->m_bLoadingMainResource = true;
@@ -2966,7 +2980,7 @@ void KHTMLPart::slotViewFrameSource() {
 
   KURL url = frame->url();
   if (!(url.isLocalFile()) && frame->inherits("KHTMLPart")) {
-    long cacheId = static_cast<KHTMLPart*>(frame)->d->m_cacheId;
+    int cacheId = static_cast<KHTMLPart*>(frame)->d->m_cacheId;
 
     if (KHTMLPageCache::self()->isValid(cacheId)) {
       KTempFile sourceFile(QString::null, QString::fromLatin1(".html"));
@@ -5419,11 +5433,11 @@ QCString KHTMLPart::dcopObjectId() const {
   return id;
 }
 
-#endif
-
 long KHTMLPart::cacheId() const {
   return d->m_cacheId;
 }
+
+#endif
 
 bool KHTMLPart::restored() const {
   return d->m_restored;
@@ -5948,7 +5962,7 @@ void KHTMLPart::selectFrameElementInParentIfFullySelected() {
     return;
 
   // Create compute positions before and after the element.
-  unsigned long ownerElementNodeIndex = ownerElement->nodeIndex();
+  unsigned ownerElementNodeIndex = ownerElement->nodeIndex();
   VisiblePosition beforeOwnerElement(VisiblePosition(
       ownerElementParent, ownerElementNodeIndex, khtml::SEL_DEFAULT_AFFINITY));
   VisiblePosition afterOwnerElement(

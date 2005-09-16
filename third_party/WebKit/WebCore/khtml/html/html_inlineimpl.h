@@ -74,8 +74,8 @@ class HTMLAnchorElementImpl : public HTMLElementImpl {
   DOMString shape() const;
   void setShape(const DOMString&);
 
-  long tabIndex() const;
-  void setTabIndex(long);
+  int tabIndex() const;
+  void setTabIndex(int);
 
   DOMString target() const;
   void setTarget(const DOMString&);

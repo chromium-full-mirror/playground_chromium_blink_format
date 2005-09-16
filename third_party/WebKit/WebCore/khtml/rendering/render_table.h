@@ -319,8 +319,8 @@ class RenderTableCell : public RenderBlock {
   virtual bool requiresLayer();
 
   // ### FIX these two...
-  long cellIndex() const { return 0; }
-  void setCellIndex(long) {}
+  int cellIndex() const { return 0; }
+  void setCellIndex(int) {}
 
   int colSpan() const { return cSpan; }
   void setColSpan(int c) { cSpan = c; }

@@ -159,9 +159,9 @@ CSSRuleImpl* CSSStyleSheetImpl::ownerRule() const {
   return 0;
 }
 
-unsigned long CSSStyleSheetImpl::insertRule(const DOMString& rule,
-                                            unsigned long index,
-                                            int& exceptioncode) {
+unsigned CSSStyleSheetImpl::insertRule(const DOMString& rule,
+                                       unsigned index,
+                                       int& exceptioncode) {
   exceptioncode = 0;
   if (index > m_lstChildren->count()) {
     exceptioncode = DOMException::INDEX_SIZE_ERR;
@@ -182,10 +182,10 @@ unsigned long CSSStyleSheetImpl::insertRule(const DOMString& rule,
   return index;
 }
 
-unsigned long CSSStyleSheetImpl::addRule(const DOMString& selector,
-                                         const DOMString& style,
-                                         long index,
-                                         int& exceptioncode) {
+unsigned CSSStyleSheetImpl::addRule(const DOMString& selector,
+                                    const DOMString& style,
+                                    int index,
+                                    int& exceptioncode) {
   if (index == -1)
     index = m_lstChildren->count();
   return insertRule(selector + " { " + style + " }", index, exceptioncode);
@@ -195,7 +195,7 @@ CSSRuleListImpl* CSSStyleSheetImpl::cssRules() {
   return new CSSRuleListImpl(this);
 }
 
-void CSSStyleSheetImpl::deleteRule(unsigned long index, int& exceptioncode) {
+void CSSStyleSheetImpl::deleteRule(unsigned index, int& exceptioncode) {
   exceptioncode = 0;
   StyleBaseImpl* b = m_lstChildren->take(index);
   if (!b) {
@@ -302,9 +302,9 @@ void StyleSheetListImpl::remove(StyleSheetImpl* s) {
     s->deref();
 }
 
-unsigned long StyleSheetListImpl::length() const {
+unsigned StyleSheetListImpl::length() const {
   // hack so implicit BODY stylesheets don't get counted here
-  unsigned long l = 0;
+  unsigned l = 0;
   QPtrListIterator<StyleSheetImpl> it(styleSheets);
   for (; it.current(); ++it) {
     if (!it.current()->isCSSStyleSheet() ||
@@ -314,8 +314,8 @@ unsigned long StyleSheetListImpl::length() const {
   return l;
 }
 
-StyleSheetImpl* StyleSheetListImpl::item(unsigned long index) {
-  unsigned long l = 0;
+StyleSheetImpl* StyleSheetListImpl::item(unsigned index) {
+  unsigned l = 0;
   QPtrListIterator<StyleSheetImpl> it(styleSheets);
   for (; it.current(); ++it) {
     if (!it.current()->isCSSStyleSheet() ||

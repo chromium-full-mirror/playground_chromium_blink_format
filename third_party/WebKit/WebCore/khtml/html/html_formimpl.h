@@ -75,7 +75,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   virtual void removedFromDocument();
 
   SharedPtr<HTMLCollectionImpl> elements();
-  long length() const;
+  int length() const;
 
   DOMString enctype() const { return m_enctype; }
   void setEnctype(const DOMString&);
@@ -227,8 +227,8 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   virtual bool isActivatedSubmit() const { return false; }
   virtual void setActivatedSubmit(bool flag) {}
 
-  long tabIndex() const;
-  void setTabIndex(long);
+  int tabIndex() const;
+  void setTabIndex(int);
 
  protected:
   HTMLFormElementImpl* getForm() const;
@@ -347,7 +347,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   bool checked() const { return m_checked; }
   void setChecked(bool);
-  long maxLength() const { return m_maxLen; }
+  int maxLength() const { return m_maxLen; }
   int size() const { return m_size; }
   DOMString type() const;
   void setType(const DOMString& t);
@@ -370,13 +370,13 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   bool canHaveSelection();
 
-  long selectionStart();
-  long selectionEnd();
-  void setSelectionStart(long);
-  void setSelectionEnd(long);
+  int selectionStart();
+  int selectionEnd();
+  void setSelectionStart(int);
+  void setSelectionEnd(int);
 
   void select();
-  void setSelectionRange(long, long);
+  void setSelectionRange(int, int);
 
   virtual void click(bool sendMouseEvents = false, bool showPressedLook = true);
   virtual void accessKeyAction(bool sendToAnyElement);
@@ -413,7 +413,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-  long maxResults() const { return m_maxResults; }
+  int maxResults() const { return m_maxResults; }
 
   DOMString defaultValue() const;
   void setDefaultValue(const DOMString&);
@@ -433,12 +433,12 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   DOMString alt() const;
   void setAlt(const DOMString&);
 
-  void setSize(unsigned long);
+  void setSize(unsigned);
 
   DOMString src() const;
   void setSrc(const DOMString&);
 
-  void setMaxLength(long);
+  void setMaxLength(int);
 
   DOMString useMap() const;
   void setUseMap(const DOMString&);
@@ -550,23 +550,23 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   virtual void recalcStyle(StyleChange);
 
-  long selectedIndex() const;
-  void setSelectedIndex(long index);
+  int selectedIndex() const;
+  void setSelectedIndex(int index);
 
   virtual bool isEnumeratable() const { return true; }
 
-  long length() const;
+  int length() const;
 
-  long minWidth() const { return m_minwidth; }
+  int minWidth() const { return m_minwidth; }
 
-  long size() const { return m_size; }
+  int size() const { return m_size; }
 
   bool multiple() const { return m_multiple; }
 
   void add(HTMLElementImpl* element,
            HTMLElementImpl* before,
            int& exceptioncode);
-  void remove(long index);
+  void remove(int index);
   void blur();
   void focus();
 
@@ -620,7 +620,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   void setMultiple(bool);
 
-  void setSize(long);
+  void setSize(int);
 
  private:
   void recalcListItems();
@@ -709,8 +709,8 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   DOMString text() const;
   void setText(const DOMString&, int& exception);
 
-  long index() const;
-  void setIndex(long, int& exception);
+  int index() const;
+  void setIndex(int, int& exception);
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
   DOMString value() const;
@@ -749,8 +749,8 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
     return newChild->isTextNode();
   }
 
-  long cols() const { return m_cols; }
-  long rows() const { return m_rows; }
+  int cols() const { return m_cols; }
+  int rows() const { return m_rows; }
 
   WrapMethod wrap() const { return m_wrap; }
 
@@ -762,14 +762,14 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   virtual QString state();
   virtual void restoreState(QStringList&);
 
-  long selectionStart();
-  long selectionEnd();
+  int selectionStart();
+  int selectionEnd();
 
-  void setSelectionStart(long);
-  void setSelectionEnd(long);
+  void setSelectionStart(int);
+  void setSelectionEnd(int);
 
   void select();
-  void setSelectionRange(long, long);
+  void setSelectionRange(int, int);
 
   virtual void childrenChanged();
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
@@ -799,9 +799,9 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   DOMString accessKey() const;
   void setAccessKey(const DOMString&);
 
-  void setCols(long);
+  void setCols(int);
 
-  void setRows(long);
+  void setRows(int);
 
  protected:
   int m_rows;
@@ -837,9 +837,9 @@ class HTMLOptionsCollectionImpl
  public:
   HTMLOptionsCollectionImpl(HTMLSelectElementImpl* impl) : m_select(impl) {}
 
-  unsigned long length() const;
-  void setLength(unsigned long);
-  NodeImpl* item(unsigned long index) const;
+  unsigned length() const;
+  void setLength(unsigned);
+  NodeImpl* item(unsigned index) const;
   NodeImpl* namedItem(const DOMString& name) const;
 
   void detach() { m_select = 0; }

@@ -60,7 +60,7 @@ VisiblePosition::VisiblePosition(const Position& pos, EAffinity affinity) {
 }
 
 VisiblePosition::VisiblePosition(NodeImpl* node,
-                                 long offset,
+                                 int offset,
                                  EAffinity affinity) {
   init(Position(node, offset), affinity);
 }
@@ -286,7 +286,7 @@ bool VisiblePosition::isCandidate(const Position& pos) {
 
 Position VisiblePosition::deepEquivalent(const Position& pos) {
   NodeImpl* node = pos.node();
-  long offset = pos.offset();
+  int offset = pos.offset();
 
   if (!node)
     return Position();
@@ -294,7 +294,7 @@ Position VisiblePosition::deepEquivalent(const Position& pos) {
   if (isAtomicNode(node))
     return pos;
 
-  if (offset >= (long)node->childNodeCount()) {
+  if (offset >= (int)node->childNodeCount()) {
     do {
       NodeImpl* child = node->lastChild();
       if (!child)
@@ -344,17 +344,17 @@ Position VisiblePosition::rangeCompliantEquivalent(const Position& pos) {
   // FIXME: This clamps out-of-range values.
   // Instead we should probably assert, and not use such values.
 
-  long offset = pos.offset();
+  int offset = pos.offset();
   if (!offsetInCharacters(node->nodeType()) && isAtomicNode(node) && offset > 0)
     return Position(node->parentNode(), node->nodeIndex() + 1);
 
-  return Position(node, kMax(0L, kMin(offset, maxOffset(node))));
+  return Position(node, kMax(0, kMin(offset, maxOffset(node))));
 }
 
-long VisiblePosition::maxOffset(const NodeImpl* node) {
+int VisiblePosition::maxOffset(const NodeImpl* node) {
   return offsetInCharacters(node->nodeType())
-             ? (long)static_cast<const CharacterDataImpl*>(node)->length()
-             : (long)node->childNodeCount();
+             ? (int)static_cast<const CharacterDataImpl*>(node)->length()
+             : (int)node->childNodeCount();
 }
 
 bool VisiblePosition::isAtomicNode(const NodeImpl* node) {
@@ -370,7 +370,7 @@ QChar VisiblePosition::character() const {
     return QChar();
   }
   TextImpl* textNode = static_cast<TextImpl*>(pos.node());
-  long offset = pos.offset();
+  int offset = pos.offset();
   if ((unsigned)offset >= textNode->length()) {
     return QChar();
   }
@@ -402,7 +402,7 @@ void VisiblePosition::debugPosition(const char* msg) const {
   if (isNull())
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
-    fprintf(stderr, "Position [%s]: %s [%p] at %ld\n", msg,
+    fprintf(stderr, "Position [%s]: %s [%p] at %d\n", msg,
             m_deepPosition.node()->nodeName().qstring().latin1(),
             m_deepPosition.node(), m_deepPosition.offset());
 }

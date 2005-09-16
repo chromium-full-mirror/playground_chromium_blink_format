@@ -60,9 +60,9 @@ RangeImpl::RangeImpl(DocumentPtr* _ownerDocument) {
 
 RangeImpl::RangeImpl(DocumentPtr* _ownerDocument,
                      NodeImpl* _startContainer,
-                     long _startOffset,
+                     int _startOffset,
                      NodeImpl* _endContainer,
-                     long _endOffset) {
+                     int _endOffset) {
   m_ownerDocument = _ownerDocument;
   m_ownerDocument->ref();
   m_startContainer = _startContainer;
@@ -90,7 +90,7 @@ NodeImpl* RangeImpl::startContainer(int& exceptioncode) const {
   return m_startContainer;
 }
 
-long RangeImpl::startOffset(int& exceptioncode) const {
+int RangeImpl::startOffset(int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return 0;
@@ -108,7 +108,7 @@ NodeImpl* RangeImpl::endContainer(int& exceptioncode) const {
   return m_endContainer;
 }
 
-long RangeImpl::endOffset(int& exceptioncode) const {
+int RangeImpl::endOffset(int& exceptioncode) const {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return 0;
@@ -157,7 +157,7 @@ bool RangeImpl::collapsed(int& exceptioncode) const {
   return (m_startContainer == m_endContainer && m_startOffset == m_endOffset);
 }
 
-void RangeImpl::setStart(NodeImpl* refNode, long offset, int& exceptioncode) {
+void RangeImpl::setStart(NodeImpl* refNode, int offset, int& exceptioncode) {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return;
@@ -195,7 +195,7 @@ void RangeImpl::setStart(NodeImpl* refNode, long offset, int& exceptioncode) {
     collapse(true, exceptioncode);
 }
 
-void RangeImpl::setEnd(NodeImpl* refNode, long offset, int& exceptioncode) {
+void RangeImpl::setEnd(NodeImpl* refNode, int offset, int& exceptioncode) {
   if (m_detached) {
     exceptioncode = DOMException::INVALID_STATE_ERR;
     return;
@@ -312,9 +312,9 @@ short RangeImpl::compareBoundaryPoints(Range::CompareHow how,
 }
 
 short RangeImpl::compareBoundaryPoints(NodeImpl* containerA,
-                                       long offsetA,
+                                       int offsetA,
                                        NodeImpl* containerB,
-                                       long offsetB) {
+                                       int offsetB) {
   // see DOM2 traversal & range section 2.5
 
   // case 1: both points have the same container
@@ -479,7 +479,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
       // ### operate just on data ?
     } else {
       NodeImpl* n = m_startContainer->firstChild();
-      unsigned long i;
+      unsigned i;
       for (i = 0; n && i < m_startOffset; i++)  // skip until m_startOffset
         n = n->nextSibling();
       while (n && i < m_endOffset) {  // delete until m_endOffset
@@ -548,7 +548,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
       if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
         leftContents = m_startContainer->cloneNode(false);
       NodeImpl* n = m_startContainer->firstChild();
-      for (unsigned long i = 0; n && i < m_startOffset;
+      for (unsigned i = 0; n && i < m_startOffset;
            i++)  // skip until m_startOffset
         n = n->nextSibling();
       while (n) {  // process until end
@@ -623,8 +623,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
         rightContents = m_endContainer->cloneNode(false);
       NodeImpl* n = m_endContainer->firstChild();
       if (n && m_endOffset) {
-        for (unsigned long i = 0; i + 1 < m_endOffset;
-             i++) {  // skip to m_endOffset
+        for (unsigned i = 0; i + 1 < m_endOffset; i++) {  // skip to m_endOffset
           NodeImpl* next = n->nextSibling();
           if (!next)
             break;
@@ -682,7 +681,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
 
   NodeImpl* processStart;  // child of cmnRooot
   if (m_startContainer == cmnRoot) {
-    unsigned long i;
+    unsigned i;
     processStart = m_startContainer->firstChild();
     for (i = 0; i < m_startOffset; i++)
       processStart = processStart->nextSibling();
@@ -694,7 +693,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
   }
   NodeImpl* processEnd;  // child of cmnRooot
   if (m_endContainer == cmnRoot) {
-    unsigned long i;
+    unsigned i;
     processEnd = m_endContainer->firstChild();
     for (i = 0; i < m_endOffset; i++)
       processEnd = processEnd->nextSibling();
@@ -962,17 +961,17 @@ void RangeImpl::checkNodeWOffset(NodeImpl* n,
     case Node::TEXT_NODE:
     case Node::COMMENT_NODE:
     case Node::CDATA_SECTION_NODE:
-      if ((unsigned long)offset > static_cast<CharacterDataImpl*>(n)->length())
+      if ((unsigned)offset > static_cast<CharacterDataImpl*>(n)->length())
         exceptioncode = DOMException::INDEX_SIZE_ERR;
       break;
     case Node::PROCESSING_INSTRUCTION_NODE:
       // ### are we supposed to check with just data or the whole contents?
-      if ((unsigned long)offset >
+      if ((unsigned)offset >
           static_cast<ProcessingInstructionImpl*>(n)->data().length())
         exceptioncode = DOMException::INDEX_SIZE_ERR;
       break;
     default:
-      if ((unsigned long)offset > n->childNodeCount())
+      if ((unsigned)offset > n->childNodeCount())
         exceptioncode = DOMException::INDEX_SIZE_ERR;
       break;
   }

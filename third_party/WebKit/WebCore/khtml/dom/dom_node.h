@@ -74,7 +74,7 @@ class NamedNodeMap {
    * indices is 0 to <code> length-1 </code> inclusive.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Retrieves a node specified by name.
@@ -151,7 +151,7 @@ class NamedNodeMap {
    * not a valid index.
    *
    */
-  Node item(unsigned long index) const;
+  Node item(unsigned index) const;
 
   /**
    * Introduced in DOM Level 2
@@ -871,7 +871,7 @@ class Node {
   /**
    * @internal returns the index of a node
    */
-  unsigned long index() const;
+  unsigned index() const;
   QString toHTML();
   void applyChanges();
   /**
@@ -927,7 +927,7 @@ class NodeList {
    * indices is 0 to <code> length-1 </code> inclusive.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Returns the <code> index </code> th item in the collection. If
@@ -941,7 +941,7 @@ class NodeList {
    * a valid index.
    *
    */
-  Node item(unsigned long index) const;
+  Node item(unsigned index) const;
 
   /**
    * @internal
@@ -964,7 +964,7 @@ class NodeList {
  * A DOMTimeStamp represents a number of milliseconds.
  *
  */
-typedef unsigned long long DOMTimeStamp;
+typedef unsigned long DOMTimeStamp;
 
 }  // namespace
 

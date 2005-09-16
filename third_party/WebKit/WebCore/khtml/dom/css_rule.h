@@ -341,7 +341,7 @@ class CSSMediaRule : public CSSRule {
    * and is unparsable.
    *
    */
-  unsigned long insertRule(const DOMString& rule, unsigned long index);
+  unsigned insertRule(const DOMString& rule, unsigned index);
 
   /**
    * Used to delete a rule from the media block.
@@ -359,7 +359,7 @@ class CSSMediaRule : public CSSRule {
    * readonly.
    *
    */
-  void deleteRule(unsigned long index);
+  void deleteRule(unsigned index);
 };
 
 class CSSPageRuleImpl;
@@ -507,7 +507,7 @@ class CSSRuleList {
    * length-1 </code> inclusive.
    *
    */
-  unsigned long length() const;
+  unsigned length() const;
 
   /**
    * Used to retrieve a CSS rule by ordinal index. The order in this
@@ -521,7 +521,7 @@ class CSSRuleList {
    * is not a valid index.
    *
    */
-  CSSRule item(unsigned long index);
+  CSSRule item(unsigned index);
 
   /**
    * @internal

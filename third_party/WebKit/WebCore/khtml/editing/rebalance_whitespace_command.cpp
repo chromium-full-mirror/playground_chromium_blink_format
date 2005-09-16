@@ -68,7 +68,7 @@ void RebalanceWhitespaceCommand::doApply() {
     return;
 
   // find upstream offset
-  long upstream = m_position.offset();
+  int upstream = m_position.offset();
   while (upstream > 0 && isCollapsibleWhitespace(text[upstream - 1]) ||
          isNBSP(text[upstream - 1])) {
     upstream--;
@@ -76,7 +76,7 @@ void RebalanceWhitespaceCommand::doApply() {
   }
 
   // find downstream offset
-  long downstream = m_position.offset();
+  int downstream = m_position.offset();
   while ((unsigned)downstream < text.length() &&
              isCollapsibleWhitespace(text[downstream]) ||
          isNBSP(text[downstream])) {
@@ -89,7 +89,7 @@ void RebalanceWhitespaceCommand::doApply() {
 
   m_upstreamOffset = upstream;
   m_downstreamOffset = downstream;
-  long length = m_downstreamOffset - m_upstreamOffset;
+  int length = m_downstreamOffset - m_upstreamOffset;
 
   m_beforeString = text.substring(m_upstreamOffset, length);
 
@@ -98,9 +98,9 @@ void RebalanceWhitespaceCommand::doApply() {
   // string, and takes into account the special cases that need to handled for
   // the
   // start and end of strings (i.e. first and last character must be an nbsp.
-  long i = m_upstreamOffset;
+  int i = m_upstreamOffset;
   while (i < m_downstreamOffset) {
-    long add = (m_downstreamOffset - i) % 3;
+    int add = (m_downstreamOffset - i) % 3;
     switch (add) {
       case 0:
         m_afterString += nonBreakingSpaceString();

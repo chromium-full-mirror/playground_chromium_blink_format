@@ -38,9 +38,9 @@ class VisibleRange {
 
   VisibleRange() {}
   VisibleRange(NodeImpl* startContainer,
-               long startOffset,
+               int startOffset,
                NodeImpl* endContainer,
-               long endOffset);
+               int endOffset);
   VisibleRange(const VisiblePosition&);
   VisibleRange(const VisiblePosition&, const VisiblePosition&);
   VisibleRange(const RangeImpl*);

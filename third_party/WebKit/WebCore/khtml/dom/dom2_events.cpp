@@ -34,11 +34,11 @@
 
 namespace DOM {
 
-const unsigned long KeyboardEvent::DOM_KEY_LOCATION_STANDARD;
-const unsigned long KeyboardEvent::DOM_KEY_LOCATION_LEFT;
-const unsigned long KeyboardEvent::DOM_KEY_LOCATION_RIGHT;
-const unsigned long KeyboardEvent::DOM_KEY_LOCATION_NUMPAD;
-const unsigned long KeyboardEvent::DOM_KEY_LOCATION_UNKNOWN;
+const unsigned KeyboardEvent::DOM_KEY_LOCATION_STANDARD;
+const unsigned KeyboardEvent::DOM_KEY_LOCATION_LEFT;
+const unsigned KeyboardEvent::DOM_KEY_LOCATION_RIGHT;
+const unsigned KeyboardEvent::DOM_KEY_LOCATION_NUMPAD;
+const unsigned KeyboardEvent::DOM_KEY_LOCATION_UNKNOWN;
 
 // -----------------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ AbstractView UIEvent::view() const {
   return static_cast<UIEventImpl*>(impl)->view();
 }
 
-long UIEvent::detail() const {
+int UIEvent::detail() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -356,7 +356,7 @@ void UIEvent::initUIEvent(const DOMString& typeArg,
                           bool canBubbleArg,
                           bool cancelableArg,
                           const AbstractView& viewArg,
-                          long detailArg) {
+                          int detailArg) {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -395,28 +395,28 @@ MouseEvent& MouseEvent::operator=(const Event& other) {
 
 MouseEvent::~MouseEvent() {}
 
-long MouseEvent::screenX() const {
+int MouseEvent::screenX() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
   return static_cast<MouseEventImpl*>(impl)->screenX();
 }
 
-long MouseEvent::screenY() const {
+int MouseEvent::screenY() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
   return static_cast<MouseEventImpl*>(impl)->screenY();
 }
 
-long MouseEvent::clientX() const {
+int MouseEvent::clientX() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
   return static_cast<MouseEventImpl*>(impl)->clientX();
 }
 
-long MouseEvent::clientY() const {
+int MouseEvent::clientY() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -469,11 +469,11 @@ void MouseEvent::initMouseEvent(const DOMString& typeArg,
                                 bool canBubbleArg,
                                 bool cancelableArg,
                                 const AbstractView& viewArg,
-                                long detailArg,
-                                long screenXArg,
-                                long screenYArg,
-                                long clientXArg,
-                                long clientYArg,
+                                int detailArg,
+                                int screenXArg,
+                                int screenYArg,
+                                int clientXArg,
+                                int clientYArg,
                                 bool ctrlKeyArg,
                                 bool altKeyArg,
                                 bool shiftKeyArg,
@@ -609,7 +609,7 @@ DOMString KeyboardEvent::keyIdentifier() const {
   return static_cast<KeyboardEventImpl*>(impl)->keyIdentifier();
 }
 
-unsigned long KeyboardEvent::keyLocation() const {
+unsigned KeyboardEvent::keyLocation() const {
   if (!impl)
     throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -656,7 +656,7 @@ void KeyboardEvent::initKeyboardEvent(const DOMString& typeArg,
                                       bool cancelableArg,
                                       const AbstractView& viewArg,
                                       const DOMString& keyIdentifierArg,
-                                      unsigned long keyLocationArg,
+                                      unsigned keyLocationArg,
                                       bool ctrlKeyArg,
                                       bool shiftKeyArg,
                                       bool altKeyArg,

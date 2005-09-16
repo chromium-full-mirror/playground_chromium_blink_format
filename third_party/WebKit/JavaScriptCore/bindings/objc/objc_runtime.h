@@ -114,7 +114,7 @@ class ObjcMethod : public Method {
 
   virtual const char* name() const;
 
-  virtual long numParameters() const;
+  virtual int numParameters() const;
 
   NSMethodSignature* getMethodSignature() const;
 

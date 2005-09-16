@@ -133,8 +133,8 @@ class HTMLPreElementImpl : public HTMLElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
 
-  long width() const;
-  void setWidth(long w);
+  int width() const;
+  void setWidth(int w);
 };
 
 // -------------------------------------------------------------------------

@@ -96,7 +96,7 @@ static NodeImpl* previousRenderedEditable(NodeImpl* node) {
   return 0;
 }
 
-Position::Position(NodeImpl* node, long offset)
+Position::Position(NodeImpl* node, int offset)
     : m_node(node), m_offset(offset) {
   if (node) {
     node->ref();
@@ -157,7 +157,7 @@ Position Position::previous(
   if (!n)
     return *this;
 
-  long o = offset();
+  int o = offset();
   assert(o >= 0);
 
   if (o > 0) {
@@ -188,7 +188,7 @@ Position Position::next(
   if (!n)
     return *this;
 
-  long o = offset();
+  int o = offset();
   assert(o >= 0);
 
   if (o < n->maxDeepOffset()) {
@@ -229,19 +229,19 @@ bool Position::atEnd() const {
   return offset() >= n->maxDeepOffset() && n->parent() == 0;
 }
 
-long Position::renderedOffset() const {
+int Position::renderedOffset() const {
   if (!node()->isTextNode())
     return offset();
 
   if (!node()->renderer())
     return offset();
 
-  long result = 0;
+  int result = 0;
   RenderText* textRenderer = static_cast<RenderText*>(node()->renderer());
   for (InlineTextBox* box = textRenderer->firstTextBox(); box;
        box = box->nextTextBox()) {
-    long start = box->m_start;
-    long end = box->m_start + box->m_len;
+    int start = box->m_start;
+    int end = box->m_start + box->m_len;
     if (offset() < start)
       return result;
     if (offset() <= end) {
@@ -538,10 +538,10 @@ Position Position::equivalentRangeCompliantPosition() const {
   // Make sure that 0 <= constrainedOffset <= num kids, otherwise using this
   // Position
   // in DOM calls can result in exceptions.
-  long maxOffset = node()->isTextNode()
-                       ? static_cast<TextImpl*>(node())->length()
-                       : node()->childNodeCount();
-  long constrainedOffset = offset() <= 0 ? 0 : kMin(maxOffset, offset());
+  int maxOffset = node()->isTextNode()
+                      ? static_cast<TextImpl*>(node())->length()
+                      : node()->childNodeCount();
+  int constrainedOffset = offset() <= 0 ? 0 : kMin(maxOffset, offset());
 
   if (!node()->parentNode())
     return Position(node(), constrainedOffset);
@@ -553,7 +553,7 @@ Position Position::equivalentRangeCompliantPosition() const {
   if (!renderer->isReplaced() && !renderer->isBR())
     return Position(node(), constrainedOffset);
 
-  long o = offset();
+  int o = offset();
   const NodeImpl* n = node();
   while ((n = n->previousSibling()))
     o++;
@@ -730,8 +730,8 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
   if (pos.node()->isTextNode() && !pos.inRenderedText())
     return false;
 
-  long thisRenderedOffset = renderedOffset();
-  long posRenderedOffset = pos.renderedOffset();
+  int thisRenderedOffset = renderedOffset();
+  int posRenderedOffset = pos.renderedOffset();
 
   if (renderer == posRenderer && thisRenderedOffset == posRenderedOffset)
     return false;
@@ -762,14 +762,14 @@ bool Position::rendersInDifferentPosition(const Position& pos) const {
   }
 
   if (nextRenderedEditable(node()) == pos.node() &&
-      thisRenderedOffset == (long)node()->caretMaxRenderedOffset() &&
+      thisRenderedOffset == (int)node()->caretMaxRenderedOffset() &&
       posRenderedOffset == 0) {
     return false;
   }
 
   if (previousRenderedEditable(node()) == pos.node() &&
       thisRenderedOffset == 0 &&
-      posRenderedOffset == (long)pos.node()->caretMaxRenderedOffset()) {
+      posRenderedOffset == (int)pos.node()->caretMaxRenderedOffset()) {
     return false;
   }
 
@@ -806,7 +806,7 @@ Position Position::trailingWhitespacePosition(
 
   if (node()->isTextNode()) {
     TextImpl* textNode = static_cast<TextImpl*>(node());
-    if (offset() < (long)textNode->length()) {
+    if (offset() < (int)textNode->length()) {
       DOMString string = static_cast<TextImpl*>(node())->data();
       const QChar& c = string[offset()];
       if (considerNonCollapsibleWhitespace
@@ -837,7 +837,7 @@ void Position::debugPosition(const char* msg) const {
   if (isNull())
     fprintf(stderr, "Position [%s]: null\n", msg);
   else
-    fprintf(stderr, "Position [%s]: %s [%p] at %ld\n", msg,
+    fprintf(stderr, "Position [%s]: %s [%p] at %d\n", msg,
             node()->nodeName().qstring().latin1(), node(), offset());
 }
 

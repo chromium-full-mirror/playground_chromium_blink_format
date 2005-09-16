@@ -45,8 +45,8 @@ enum {
 };
 
 @interface DOMCSSRuleList : DOMObject
-- (unsigned long)length;
-- (DOMCSSRule*)item:(unsigned long)index;
+- (unsigned)length;
+- (DOMCSSRule*)item:(unsigned)index;
 @end
 
 enum {
@@ -77,8 +77,8 @@ enum {
 @interface DOMCSSMediaRule : DOMCSSRule
 - (DOMMediaList*)media;
 - (DOMCSSRuleList*)cssRules;
-- (unsigned long)insertRule:(NSString*)rule:(unsigned long)index;
-- (void)deleteRule:(unsigned long)index;
+- (unsigned)insertRule:(NSString*)rule:(unsigned)index;
+- (void)deleteRule:(unsigned)index;
 @end
 
 @interface DOMCSSFontFaceRule : DOMCSSRule
@@ -114,8 +114,8 @@ enum {
 - (void)setProperty:(NSString*)
        propertyName:(NSString*)
               value:(NSString*)priority;
-- (unsigned long)length;
-- (NSString*)item:(unsigned long)index;
+- (unsigned)length;
+- (NSString*)item:(unsigned)index;
 - (DOMCSSRule*)parentRule;
 @end
 
@@ -175,8 +175,8 @@ enum {
 @end
 
 @interface DOMCSSValueList : DOMCSSValue
-- (unsigned long)length;
-- (DOMCSSValue*)item:(unsigned long)index;
+- (unsigned)length;
+- (DOMCSSValue*)item:(unsigned)index;
 @end
 
 @interface DOMRGBColor : DOMObject
@@ -452,8 +452,8 @@ enum {
 @interface DOMCSSStyleSheet : DOMStyleSheet
 - (DOMCSSRule*)ownerRule;
 - (DOMCSSRuleList*)cssRules;
-- (unsigned long)insertRule:(NSString*)rule:(unsigned long)index;
-- (void)deleteRule:(unsigned long)index;
+- (unsigned)insertRule:(NSString*)rule:(unsigned)index;
+- (void)deleteRule:(unsigned)index;
 @end
 
 @interface DOMDocument (DOMViewCSS)

@@ -134,7 +134,7 @@ class ReplaceSelectionCommand : public CompositeEditCommand {
                                              DOM::NodeImpl* refChild);
   void insertNodeAtAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
                                           DOM::NodeImpl* refChild,
-                                          long offset);
+                                          int offset);
   void insertNodeBeforeAndUpdateNodesInserted(DOM::NodeImpl* insertChild,
                                               DOM::NodeImpl* refChild);
 

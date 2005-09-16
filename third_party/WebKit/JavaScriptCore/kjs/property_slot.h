@@ -73,7 +73,7 @@ class PropertySlot {
   }
 
   void setCustomIndex(ObjectImp* slotBase,
-                      unsigned long index,
+                      unsigned index,
                       GetValueFunc getValue) {
     assert(getValue);
     m_slotBase = slotBase;
@@ -89,7 +89,7 @@ class PropertySlot {
   ObjectImp* slotBase() const { return m_slotBase; }
 
   const HashEntry* staticEntry() const { return m_data.staticEntry; }
-  unsigned long index() const { return m_data.index; }
+  unsigned index() const { return m_data.index; }
 
  private:
   static ValueImp* undefinedGetter(ExecState*,
@@ -102,7 +102,7 @@ class PropertySlot {
   union {
     ValueImp** valueSlot;
     const HashEntry* staticEntry;
-    unsigned long index;
+    unsigned index;
   } m_data;
 };
 }
