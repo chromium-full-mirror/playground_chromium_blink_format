@@ -41,15 +41,17 @@
 - (NSArray*)supportedMIMETypes;
 - (int)CGCompositeOperationInContext:(CGContextRef)context;
 - (void)setCGCompositeOperation:(int)op inContext:(CGContextRef)context;
+- (void)setCGCompositeOperationFromString:(NSString*)op
+                                inContext:(CGContextRef)context;
 
 @end
 
-@interface WebCoreImageRendererFactory : NSObject
+@interface WebCoreImageRendererFactory : NSObject {
+}
 
 + (WebCoreImageRendererFactory*)sharedFactory;
 + (BOOL)shouldUseThreadedDecoding;
 + (void)setShouldUseThreadedDecoding:(BOOL)flag;
-
 @end
 
 @interface WebCoreImageRendererFactory (
