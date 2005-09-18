@@ -343,7 +343,7 @@ void Loader::slotFinished(KIO::Job* job) {
     emit requestDone(r->docLoader, r->object);
 
     time_t expireDate =
-        j->queryMetaData(QString::fromLatin1("expire-date")).toLong();
+        j->queryMetaData(QString::fromLatin1("expire-date")).toInt();
 
 #ifdef LOADER_DEBUG
     kdDebug() << "Loader::slotFinished, url = " << j->url().url() << endl;

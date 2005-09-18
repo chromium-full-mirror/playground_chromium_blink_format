@@ -80,11 +80,11 @@ void SVGFEOffsetElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
   switch (id) {
     case ATTR_DX: {
-      dx()->setBaseVal(value.string().toFloat());
+      dx()->setBaseVal(value.string().toDouble());
       break;
     }
     case ATTR_DY: {
-      dy()->setBaseVal(value.string().toFloat());
+      dy()->setBaseVal(value.string().toDouble());
       break;
     }
     case ATTR_IN: {
