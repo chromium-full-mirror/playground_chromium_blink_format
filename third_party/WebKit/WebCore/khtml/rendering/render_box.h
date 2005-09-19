@@ -190,9 +190,6 @@ class RenderBox : public RenderObject {
                        int h);
   void outlineBox(QPainter* p, int _tx, int _ty, const char* color = "red");
 
-  virtual int borderTopExtra() const { return 0; }
-  virtual int borderBottomExtra() const { return 0; }
-
   void calcAbsoluteHorizontal();
   void calcAbsoluteVertical();
   void calcAbsoluteHorizontalValues(WidthType widthType,
