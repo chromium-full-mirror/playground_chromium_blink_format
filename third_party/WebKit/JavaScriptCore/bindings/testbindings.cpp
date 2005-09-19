@@ -323,7 +323,7 @@ int main(int argc, char** argv) {
 
   bool ret = true;
   {
-    Interpreter::lock();
+    InterpreterLock lock;
 
     // create interpreter w/ global object
     Object global(new GlobalImp());
@@ -366,8 +366,6 @@ int main(int argc, char** argv) {
     }
 
     NPN_ReleaseObject((NPObject*)myObject);
-
-    Interpreter::unlock();
 
   }  // end block, so that Interpreter and global get deleted
 

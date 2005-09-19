@@ -120,10 +120,10 @@ inline bool operator==(const Identifier& a, const char* b) {
 // List of property names, passed to a macro so we can do set them up various
 // ways without repeating the list.
 #define KJS_IDENTIFIER_EACH_PROPERTY_NAME_GLOBAL(macro)                 \
-  macro(arguments) macro(callee) macro(constructor) macro(length)       \
-      macro(message) macro(name) macro(prototype) macro(toLocaleString) \
-          macro(toString) macro(toFixed) macro(toExponential)           \
-              macro(toPrecision) macro(valueOf)
+  macro(arguments) macro(callee) macro(constructor) macro(fromCharCode) \
+      macro(length) macro(message) macro(name) macro(prototype)         \
+          macro(toLocaleString) macro(toString) macro(toFixed)          \
+              macro(toExponential) macro(toPrecision) macro(valueOf)
 
 // Define external global variables for all property names above (and one more).
 #if !KJS_IDENTIFIER_HIDE_GLOBALS

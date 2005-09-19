@@ -61,7 +61,7 @@ static NPClass _javascriptClass = {
 
 NPClass* NPScriptObjectClass = &_javascriptClass;
 
-static Identifier identiferFromNPIdentifier(const NPUTF8* name) {
+static Identifier identifierFromNPIdentifier(const NPUTF8* name) {
   NPUTF16* methodName;
   unsigned int UTF16Length;
 
@@ -147,10 +147,9 @@ bool _NPN_Invoke(NPP npp,
     } else {
       // Lookup the function object.
       ExecState* exec = obj->executionContext->interpreter()->globalExec();
-      Interpreter::lock();
+      InterpreterLock lock;
       ValueImp* func =
-          obj->imp->get(exec, identiferFromNPIdentifier(i->value.string));
-      Interpreter::unlock();
+          obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
       if (func->isNull()) {
         NPN_InitializeVariantAsNull(result);
@@ -163,20 +162,15 @@ bool _NPN_Invoke(NPP npp,
         ObjectImp* funcImp = static_cast<ObjectImp*>(func);
         ObjectImp* thisObj = const_cast<ObjectImp*>(obj->imp);
         List argList = listFromVariantArgs(exec, args, argCount);
-        Interpreter::lock();
         ValueImp* resultV = funcImp->call(exec, thisObj, argList);
-        Interpreter::unlock();
 
         // Convert and return the result of the function call.
         convertValueToNPVariant(exec, resultV, result);
         return true;
       }
     }
-  } else {
-    if (o->_class->invoke) {
-      return o->_class->invoke(o, methodName, args, argCount, result);
-    }
-  }
+  } else if (o->_class->invoke)
+    return o->_class->invoke(o, methodName, args, argCount, result);
 
   return true;
 }
@@ -191,7 +185,7 @@ bool _NPN_Evaluate(NPP npp, NPObject* o, NPString* s, NPVariant* variant) {
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
     ValueImp* result;
 
-    Interpreter::lock();
+    InterpreterLock lock;
     NPUTF16* scriptString;
     unsigned int UTF16Length;
     convertNPStringToUTF16(
@@ -207,8 +201,6 @@ bool _NPN_Evaluate(NPP npp, NPObject* o, NPString* s, NPVariant* variant) {
       }
     } else
       result = Undefined();
-
-    Interpreter::unlock();
 
     free((void*)scriptString);
 
@@ -233,14 +225,13 @@ bool _NPN_GetProperty(NPP npp,
 
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
 
-    Interpreter::lock();
+    InterpreterLock lock;
     ValueImp* result;
     if (i->isString) {
-      result = obj->imp->get(exec, identiferFromNPIdentifier(i->value.string));
+      result = obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
     } else {
       result = obj->imp->get(exec, i->value.number);
     }
-    Interpreter::unlock();
 
     if (result->isNull()) {
       NPN_InitializeVariantAsNull(variant);
@@ -274,21 +265,19 @@ bool _NPN_SetProperty(NPP npp,
       return false;
 
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    Interpreter::lock();
+    InterpreterLock lock;
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
-    if (i->isString) {
-      obj->imp->put(exec, identiferFromNPIdentifier(i->value.string),
+    if (i->isString)
+      obj->imp->put(exec, identifierFromNPIdentifier(i->value.string),
                     convertNPVariantToValue(exec, variant));
-    } else {
+    else
       obj->imp->put(exec, i->value.number,
                     convertNPVariantToValue(exec, variant));
-    }
-    Interpreter::unlock();
 
     return true;
-  } else if (o->_class->setProperty) {
+  } else if (o->_class->setProperty)
     return o->_class->setProperty(o, propertyName, variant);
-  }
+
   return false;
 }
 
@@ -304,7 +293,7 @@ bool _NPN_RemoveProperty(NPP npp, NPObject* o, NPIdentifier propertyName) {
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
     if (i->isString) {
       if (!obj->imp->hasProperty(exec,
-                                 identiferFromNPIdentifier(i->value.string))) {
+                                 identifierFromNPIdentifier(i->value.string))) {
         return false;
       }
     } else {
@@ -313,14 +302,12 @@ bool _NPN_RemoveProperty(NPP npp, NPObject* o, NPIdentifier propertyName) {
       }
     }
 
-    Interpreter::lock();
-    if (i->isString) {
+    InterpreterLock lock;
+    if (i->isString)
       obj->imp->deleteProperty(exec,
-                               identiferFromNPIdentifier(i->value.string));
-    } else {
+                               identifierFromNPIdentifier(i->value.string));
+    else
       obj->imp->deleteProperty(exec, i->value.number);
-    }
-    Interpreter::unlock();
 
     return true;
   }
@@ -337,24 +324,15 @@ bool _NPN_HasProperty(NPP npp, NPObject* o, NPIdentifier propertyName) {
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
 
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
-    // String identifier?
-    if (i->isString) {
-      ExecState* exec = obj->executionContext->interpreter()->globalExec();
-      Interpreter::lock();
-      bool result = obj->imp->hasProperty(
-          exec, identiferFromNPIdentifier(i->value.string));
-      Interpreter::unlock();
-      return result;
-    }
+    InterpreterLock lock;
 
-    // Numeric identifer
-    Interpreter::lock();
-    bool result = obj->imp->hasProperty(exec, i->value.number);
-    Interpreter::unlock();
-    return result;
-  } else if (o->_class->hasProperty) {
+    if (i->isString)
+      return obj->imp->hasProperty(exec,
+                                   identifierFromNPIdentifier(i->value.string));
+
+    return obj->imp->hasProperty(exec, i->value.number);
+  } else if (o->_class->hasProperty)
     return o->_class->hasProperty(o, propertyName);
-  }
 
   return false;
 }
@@ -372,10 +350,10 @@ bool _NPN_HasMethod(NPP npp, NPObject* o, NPIdentifier methodName) {
 
     // Lookup the function object.
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    Interpreter::lock();
+
+    InterpreterLock lock;
     ValueImp* func =
-        obj->imp->get(exec, identiferFromNPIdentifier(i->value.string));
-    Interpreter::unlock();
+        obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
     if (func->isUndefined()) {
       return false;
@@ -395,8 +373,7 @@ void _NPN_SetException(NPObject* o, const NPUTF8* message) {
   if (o->_class == NPScriptObjectClass) {
     JavaScriptObject* obj = (JavaScriptObject*)o;
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    Interpreter::lock();
+    InterpreterLock lock;
     throwError(exec, GeneralError, message);
-    Interpreter::unlock();
   }
 }

@@ -92,7 +92,7 @@ struct PropertyMapHashTable {
 class SavedProperty {
  public:
   Identifier key;
-  ProtectedValue value;
+  ProtectedPtr<ValueImp> value;
   int attributes;
 };
 

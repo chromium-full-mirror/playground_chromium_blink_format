@@ -33,7 +33,6 @@ class ObjectImp;
 class Reference {
   friend class ReferenceList;
   friend class ReferenceListIterator;
-  friend class ProtectedReference;
 
  public:
   Reference(ObjectImp* b, const Identifier& p);
@@ -71,10 +70,12 @@ class Reference {
 
   ValueImp* baseIfMutable() const { return baseIsValue ? 0 : base; }
 
+ protected:
+  ValueImp* base;
+
  private:
   Reference() {}
 
-  ValueImp* base;
   unsigned propertyNameAsNumber;
   bool baseIsValue;
   bool propertyNameIsNumber;

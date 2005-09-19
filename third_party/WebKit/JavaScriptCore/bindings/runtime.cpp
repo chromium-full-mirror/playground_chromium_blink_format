@@ -136,11 +136,8 @@ ObjectImp* Instance::createRuntimeObject(BindingLanguage language,
   Instance* interfaceObject = Instance::createBindingForLanguageInstance(
       language, (void*)nativeInstance, executionContext);
 
-  Interpreter::lock();
-  ObjectImp* theObject(new RuntimeObjectImp(interfaceObject, true));
-  Interpreter::unlock();
-
-  return theObject;
+  InterpreterLock lock;
+  return new RuntimeObjectImp(interfaceObject, true);
 }
 
 void* Instance::createLanguageInstanceForValue(ExecState* exec,

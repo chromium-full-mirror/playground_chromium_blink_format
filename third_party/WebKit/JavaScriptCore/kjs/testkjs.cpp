@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 
   bool ret = true;
   {
-    Interpreter::lock();
+    InterpreterLock lock;
 
     ObjectImp* global(new GlobalImp());
 
@@ -179,9 +179,7 @@ int main(int argc, char** argv) {
 
       free(code);
     }
-
-    Interpreter::unlock();
-  }  // end block, so that Interpreter and global get deleted
+  }  // end block, so that interpreter gets deleted
 
   if (ret)
     fprintf(stderr, "OK.\n");
