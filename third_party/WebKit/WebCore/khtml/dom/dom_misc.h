@@ -59,8 +59,12 @@ class DomShared {
   // An implementation object will delete itself, if it has
   // no DOMObject referencing it, and deleteMe() returns true.
   unsigned int _ref;
+
+ private:
+  DomShared(const DomShared&);
+  DomShared& operator=(const DomShared&);
 };
 
-};  // namespace
+}  // namespace
 
 #endif

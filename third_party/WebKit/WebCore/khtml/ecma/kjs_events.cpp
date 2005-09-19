@@ -18,8 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <kjs/protected_object.h>  // temporary, remove after landing interpreter lock patch
-
 #include "kjs_events.h"
 #include "kjs_events.lut.h"
 
@@ -42,6 +40,7 @@ using namespace DOM::EventNames;
 using DOM::AtomicString;
 using DOM::ClipboardEventImpl;
 using DOM::DocumentImpl;
+using DOM::DOMString;
 using DOM::EventImpl;
 using DOM::EventListenerEvent;
 using DOM::KeyboardEventImpl;
@@ -82,6 +81,10 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
   KJSProxy* proxy = 0;
   if (part)
     proxy = KJSProxy::proxy(part);
+  if (!proxy)
+    return;
+
+  InterpreterLock lock;
 
   ScriptInterpreter* interpreter =
       static_cast<ScriptInterpreter*>(proxy->interpreter());
@@ -99,7 +102,7 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
       hasHandleEvent = true;
   }
 
-  if (proxy && (listener->implementsCall() || hasHandleEvent)) {
+  if (listener->implementsCall() || hasHandleEvent) {
     ref();
 
     List args;
@@ -115,24 +118,18 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
     if (isWindowEvent) {
       thisObj = win;
     } else {
-      Interpreter::lock();
       thisObj = static_cast<ObjectImp*>(getDOMNode(exec, evt->currentTarget()));
-      Interpreter::unlock();
     }
 
-    Interpreter::lock();
     ValueImp* retval;
     if (hasHandleEvent)
       retval = handleEventFunc->call(exec, listener, args);
     else
       retval = listener->call(exec, thisObj, args);
-    Interpreter::unlock();
 
     window->setCurrentEvent(0);
     interpreter->setCurrentEvent(0);
-#if APPLE_CHANGES
     if (exec->hadException()) {
-      Interpreter::lock();
       char* message = exec->exception()
                           ->toObject(exec)
                           ->get(exec, messagePropertyName)
@@ -150,26 +147,24 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
                                  ->toString(exec);
         sourceURL = uSourceURL.qstring();
       }
-      Interpreter::unlock();
       if (Interpreter::shouldPrintExceptions()) {
         printf("(event handler):%s\n", message);
       }
       KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL);
-      exec->clearException();
-    }
-#else
-    if (exec->hadException())
-      exec->clearException();
-#endif
 
-    else if (html) {
+      if (Interpreter::shouldPrintExceptions())
+        printf("(event handler):%s\n", message);
+      exec->clearException();
+    } else if (html) {
       QVariant ret = ValueToVariant(exec, retval);
       if (ret.type() == QVariant::Bool && ret.toBool() == false)
         evt->preventDefault();
     }
-    DOM::DocumentImpl::updateDocumentsRendering();
-    deref();
   }
+
+  DOM::DocumentImpl::updateDocumentsRendering();
+
+  deref();
 }
 
 DOM::DOMString JSAbstractEventListener::eventListenerType() {
@@ -292,19 +287,16 @@ void JSLazyEventListener::parseCode() const {
           static_cast<ScriptInterpreter*>(proxy->interpreter());
       ExecState* exec = interpreter->globalExec();
 
-      Interpreter::lock();
-      // Constructor constr(Global::current().get("Function"));
+      InterpreterLock lock;
       ObjectImp* constr = interpreter->builtinFunction();
       List args;
 
-      static ProtectedValue eventString = String("event");
+      static ProtectedPtr<ValueImp> eventString = String("event");
       UString sourceURL(part->m_url.url());
       args.append(eventString);
       args.append(String(code));
       listener = constr->construct(exec, args, sourceURL,
                                    lineNumber);  // ### is globalExec ok ?
-
-      Interpreter::unlock();
 
       if (exec->hadException()) {
         exec->clearException();
@@ -322,10 +314,7 @@ void JSLazyEventListener::parseCode() const {
         Interpreter::unlock();
 
         if (thisObj) {
-          Interpreter::lock();
           static_cast<DOMNode*>(thisObj)->pushEventHandlerScope(exec, scope);
-          Interpreter::unlock();
-
           listener->setScope(scope);
         }
       }
@@ -550,7 +539,7 @@ ValueImp* getDOMEvent(ExecState* exec, EventImpl* e) {
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
 
-  Interpreter::lock();
+  InterpreterLock lock;
 
   DOMObject* ret = interp->getDOMObject(e);
   if (!ret) {
@@ -569,8 +558,6 @@ ValueImp* getDOMEvent(ExecState* exec, EventImpl* e) {
 
     interp->putDOMObject(e, ret);
   }
-
-  Interpreter::unlock();
 
   return ret;
 }
