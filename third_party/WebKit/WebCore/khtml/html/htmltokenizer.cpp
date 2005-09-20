@@ -1799,6 +1799,8 @@ void HTMLTokenizer::finish() {
   // on
   // an external script to load, we can't finish parsing until that is done
   noMoreData = true;
+  if (pending)  // Flush any remaining whitespace.
+    addPending();
   if (!inWrite && !loadingExtScript && !m_executingScript && !onHold &&
       !timerId)
     end();  // this actually causes us to be deleted

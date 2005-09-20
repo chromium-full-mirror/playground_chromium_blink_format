@@ -554,11 +554,10 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
 
   QPtrListIterator<NodeImpl> it(nodeChain);
 
-  // Before we begin dispatching events, give each node a chance to do some work
-  // prior
+  // Before we begin dispatching events, give the target node a chance to do
+  // some work prior
   // to the DOM event handlers getting a crack.
-  for (; it.current() && !evt->propagationStopped(); ++it)
-    it.current()->preDispatchEventHandler(evt);
+  void* data = preDispatchEventHandler(evt);
 
   // trigger any capturing event handlers on our way down
   evt->setEventPhase(Event::CAPTURING_PHASE);
@@ -607,6 +606,9 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
   evt->setEventPhase(
       0);  // I guess this is correct, the spec does not seem to say
            // anything about the default event handler phase.
+
+  // Now call the post dispatch.
+  postDispatchEventHandler(evt, data);
 
   if (evt->bubbles()) {
     // now we call all default event handlers (this is not part of DOM - it is

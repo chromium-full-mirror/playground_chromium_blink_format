@@ -203,10 +203,8 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
 
   virtual void recalcStyle(StyleChange);
 
-  DOMString name() const;
+  virtual DOMString name() const;
   void setName(const DOMString& name);
-
-  void setOverrideName(const DOMString& name);
 
   virtual bool isGenericFormElement() const { return true; }
 
@@ -233,7 +231,6 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
  protected:
   HTMLFormElementImpl* getForm() const;
 
-  DOMString m_overrideName;
   HTMLFormElementImpl* m_form;
   bool m_disabled : 1;
   bool m_readOnly : 1;
@@ -341,6 +338,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   virtual bool isKeyboardFocusable() const;
   virtual bool isEnumeratable() const { return inputType() != IMAGE; }
 
+  virtual DOMString name() const;
+
   bool autoComplete() const { return m_autocomplete; }
 
   virtual bool isChecked() const { return checked(); }
@@ -405,7 +404,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   int clickX() const { return xPos; }
   int clickY() const { return yPos; }
 
-  virtual void preDispatchEventHandler(EventImpl* evt);
+  virtual void* preDispatchEventHandler(EventImpl* evt);
+  virtual void postDispatchEventHandler(EventImpl* evt, void* data);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool isEditable();
 
@@ -446,6 +446,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
  protected:
   bool storesValueSeparateFromAttribute() const;
 
+  AtomicString m_name;
   DOMString m_value;
   int xPos;
   short m_maxLen;
