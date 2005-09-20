@@ -189,6 +189,8 @@ typedef enum {
 
 + (WebCoreBridge*)bridgeForDOMDocument:(DOMDocument*)document;
 
++ (NSArray*)supportedMIMETypes;
+
 - (void)initializeSettings:(WebCoreSettings*)settings;
 
 - (void)setRenderPart:(KHTMLRenderPart*)renderPart;
