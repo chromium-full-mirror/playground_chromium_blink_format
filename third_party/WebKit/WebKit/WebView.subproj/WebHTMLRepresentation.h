@@ -48,6 +48,8 @@
   WebHTMLRepresentationPrivate* _private;
 }
 
++ (NSArray*)supportedMIMETypes;
+
 - (NSAttributedString*)attributedStringFrom:(DOMNode*)startNode
                                 startOffset:(int)startOffset
                                          to:(DOMNode*)endNode

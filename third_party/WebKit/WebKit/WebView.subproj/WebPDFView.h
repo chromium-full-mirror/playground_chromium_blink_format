@@ -50,6 +50,7 @@
   PDFView* PDFSubviewProxy;
 }
 
++ (NSArray*)supportedMIMETypes;
 + (NSBundle*)PDFKitBundle;
 - (PDFView*)PDFSubview;
 
