@@ -83,7 +83,27 @@ class GlobalObject : public KJS::ObjectImp {
     Alert,
     Prompt,
     Confirm,
-    Debug
+    Debug,
+
+    // Constants
+    Event,
+    MutationEvent,
+    EventException,
+    CSSRule,
+    CSSValue,
+    CSSPrimitiveValue,
+    Node,
+    TypeInfo,
+    DOMError,
+    DOMException,
+    Range,
+    RangeException,
+    NodeFilter,
+    XPathResult,
+    XPathException,
+    XPathNamespace,
+    XPointerResult
+
   };
 
  private:

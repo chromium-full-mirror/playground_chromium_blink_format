@@ -24,8 +24,11 @@
 #define KDOM_DOMLookup_H
 
 #ifndef APPLE_CHANGES
-#include <iostream>
+#include <ostream>
 #endif
+
+#include <kdebug.h>
+
 #include <kjs/value.h>
 #include <kjs/object.h>
 #include <kjs/lookup.h>
@@ -140,30 +143,28 @@ inline bool lookupPut(KJS::ExecState* exec,
 
 // These macros are used by the generated files in kdom/bindings/js/*.
 // IDLCodeGeneratorJs.pm knows how to use them, read it's source :-)
-#define ECMA_IMPLEMENT_CONSTRUCTOR(ClassName, Class)                        \
-  KJS::ValueImp* ClassName::get(KJS::ExecState*,                            \
-                                const KJS::Identifier& propertyName,        \
-                                const KJS::ObjectImp*) const {              \
-    const KJS::HashEntry* entry =                                           \
-        KJS::Lookup::findEntry(&s_hashTable, propertyName);                 \
-    if (entry)                                                              \
-      return KJS::Number(entry->value);                                     \
-    return KJS::Undefined();                                                \
-  }                                                                         \
-  bool ClassName::hasProperty(KJS::ExecState*,                              \
-                              const KJS::Identifier& propertyName) const {  \
-    return KJS::Lookup::findEntry(&s_hashTable, propertyName);              \
-  }                                                                         \
-  KJS::ObjectImp* ClassName::prototype(KJS::ExecState* exec) const {        \
-    if (exec)                                                               \
-      return exec->interpreter()->builtinObjectPrototype();                 \
-    return KJS::Object::dynamicCast(KJS::Null());                           \
-  }                                                                         \
-  const KJS::ClassInfo ClassName::s_classInfo = {Class "Constructor", 0,    \
-                                                 &s_hashTable, 0};          \
-  KJS::ValueImp* get##ClassName(KJS::ExecState* exec) {                     \
-    return KDOM::cacheGlobalBridge<ClassName>(exec,                         \
-                                              "[[" Class ".constructor]]"); \
+#define ECMA_IMPLEMENT_CONSTRUCTOR(ClassName, Class)                       \
+  KJS::ValueImp* ClassName::get(KJS::ExecState*,                           \
+                                const KJS::Identifier& propertyName,       \
+                                const KJS::ObjectImp*) const {             \
+    const KJS::HashEntry* entry =                                          \
+        KJS::Lookup::findEntry(&s_hashTable, propertyName);                \
+    if (entry)                                                             \
+      return KJS::Number(entry->value);                                    \
+    return KJS::Undefined();                                               \
+  }                                                                        \
+  bool ClassName::hasProperty(KJS::ExecState*,                             \
+                              const KJS::Identifier& propertyName) const { \
+    return KJS::Lookup::findEntry(&s_hashTable, propertyName);             \
+  }                                                                        \
+  KJS::ObjectImp* ClassName::prototype(KJS::ExecState* exec) const {       \
+    return exec->interpreter()->builtinObjectPrototype();                  \
+  }                                                                        \
+  const KJS::ClassInfo ClassName::s_classInfo = {Class "Constructor", 0,   \
+                                                 &s_hashTable, 0};         \
+  KJS::ValueImp* get##ClassName(KJS::ExecState* exec) {                    \
+    return KJS::cacheGlobalObject<ClassName>(exec,                         \
+                                             "[[" Class ".constructor]]"); \
   }
 
 #define ECMA_DEFINE_CONSTRUCTOR(ClassName)                       \
@@ -234,49 +235,70 @@ inline bool lookupPut(KJS::ExecState* exec,
   };
 
 // To be used when casting the type of an argument
-// TODO: sync with khtml's check! (is a bit different...)
-#define KDOM_CHECK(ClassName, theObj)                               \
-  ClassName obj = cast(exec, theObj);                               \
-  if (obj == ClassName::null) {                                     \
-    kdDebug(26004) << k_funcinfo << " Wrong object type: expected " \
-                   << ClassName::s_classInfo.className << " got "   \
-                   << thisObj->classInfo()->className << endl;      \
-    ObjectImp* err = throwError(exec, TypeError);                   \
-    return err;                                                     \
+#define KDOM_CHECK(DOMObjImpl, DOMObjWrapper, theObj)                          \
+  DOMObjImpl* obj = cast(exec, static_cast<KJS::ObjectImp*>(theObj));          \
+  if (!obj) {                                                                  \
+    QString errMsg =                                                           \
+        QString::fromLatin1("Attempt at calling a function that expects a ") + \
+        QString::fromLatin1(DOMObjWrapper::s_classInfo.className) +            \
+        QString::fromLatin1(" on a ") +                                        \
+        QString::fromLatin1(theObj->classInfo()->className);                   \
+    kdDebug(26004) << k_funcinfo << " " << errMsg << endl;                     \
+    KJS::ObjectImp* err =                                                      \
+        KJS::throwError(exec, KJS::TypeError, errMsg.ascii());                 \
+    return err;                                                                \
   }
 
-// To be used in all callAsFunction() implementations!
-// Can't use if (!thisObj.inherits(&ClassName::s_classInfo) since we don't
-// use the (single-parent) inheritance of ClassInfo...
-#define KDOM_CHECK_THIS(ClassName) KDOM_CHECK(ClassName, thisObj)
+// To be used in all call() implementations!
+// Can't use if (!thisObj.inherits(&ClassName::s_classInfo) since
+// we don't use the (single-parent) inheritance of ClassInfo...
+#define KDOM_CHECK_THIS(DOMObjImpl, DOMObjWrapper) \
+  KDOM_CHECK(DOMObjImpl, DOMObjWrapper, thisObj)
 
 // Helpers to hide exception stuff...
 // used within get/putValueProprety
-// TODO: multiple exception support!
 #define KDOM_ENTER_SAFE try {
-#define KDOM_LEAVE_SAFE(Exception)                                        \
-  }                                                                       \
-  catch (Exception::Private * e) {                                        \
-    KJS::ObjectImp* err = throwError(                                     \
-        exec, KJS::GeneralError,                                          \
-        QString::fromLatin1("%1 %2")                                      \
-            .arg(QString::fromLatin1(Exception(e).s_classInfo.className)) \
-            .arg(QString::number(e->code()))                              \
-            .latin1());                                                   \
-    err->put(exec, "code", KJS::Number(e->code()));                       \
+#define KDOM_LEAVE_SAFE_COMMON(Exception)                                   \
+  catch (Exception##Impl * e) {                                             \
+    KJS::ObjectImp* err =                                                   \
+        KJS::throwError(exec, KJS::GeneralError,                            \
+                        QString::fromLatin1("%1 %2")                        \
+                            .arg(QString::fromLatin1(                       \
+                                Exception##Wrapper::s_classInfo.className)) \
+                            .arg(QString::number(e->code()))                \
+                            .latin1());                                     \
+    err->put(exec, "code", KJS::Number(e->code()));                         \
   }
-#define KDOM_LEAVE_CALL_SAFE(Exception)                                   \
-  }                                                                       \
-  catch (Exception::Private * e) {                                        \
-    KJS::ObjectImp* err = throwError(                                     \
-        exec, KJS::GeneralError,                                          \
-        QString::fromLatin1("%1 %2")                                      \
-            .arg(QString::fromLatin1(Exception(e).s_classInfo.className)) \
-            .arg(QString::number(e->code()))                              \
-            .latin1());                                                   \
-    err->put(exec, "code", KJS::Number(e->code()));                       \
-    return err;                                                           \
+
+// The first exceptions uses this macro...
+#define KDOM_LEAVE_SAFE(Exception) \
+  }                                \
+  KDOM_LEAVE_SAFE_COMMON(Exception)
+
+// ... and all others this one
+#define KDOM_LEAVE_SAFE_NEXT(Exception) KDOM_LEAVE_SAFE_COMMON(Exception)
+
+#define KDOM_LEAVE_CALL_SAFE_COMMON(Exception)                              \
+  catch (Exception##Impl * e) {                                             \
+    KJS::ObjectImp* err =                                                   \
+        KJS::throwError(exec, KJS::GeneralError,                            \
+                        QString::fromLatin1("%1 %2")                        \
+                            .arg(QString::fromLatin1(                       \
+                                Exception##Wrapper::s_classInfo.className)) \
+                            .arg(QString::number(e->code()))                \
+                            .latin1());                                     \
+    err->put(exec, "code", KJS::Number(e->code()));                         \
+    return err;                                                             \
   }
+
+// The first exceptions uses this macro...
+#define KDOM_LEAVE_CALL_SAFE(Exception) \
+  }                                     \
+  KDOM_LEAVE_CALL_SAFE_COMMON(Exception)
+
+// ... and all others this one.
+#define KDOM_LEAVE_CALL_SAFE_NEXT(Exception) \
+  KDOM_LEAVE_CALL_SAFE_COMMON(Exception)
 
 #endif
 
