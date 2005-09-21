@@ -243,7 +243,7 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(int index,
       // << section->numRows() << endl;
       if (!append) {
         int rows = section->numRows();
-        if (rows > index) {
+        if (rows >= index) {
           found = true;
           break;
         } else
