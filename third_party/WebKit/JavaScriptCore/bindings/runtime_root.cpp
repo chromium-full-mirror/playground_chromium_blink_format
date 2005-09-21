@@ -167,6 +167,7 @@ void KJS::Bindings::addNativeReference(const Bindings::RootObject* root,
     unsigned int numReferences =
         (unsigned int)CFDictionaryGetValue(referencesDictionary, imp);
     if (numReferences == 0) {
+      InterpreterLock lock;
       gcProtect(imp);
       CFDictionaryAddValue(referencesDictionary, imp, (const void*)1);
     } else {
@@ -186,6 +187,7 @@ void KJS::Bindings::removeNativeReference(ObjectImp* imp) {
     unsigned int numReferences =
         (unsigned int)CFDictionaryGetValue(referencesDictionary, imp);
     if (numReferences == 1) {
+      InterpreterLock lock;
       gcUnprotect(imp);
       CFDictionaryRemoveValue(referencesDictionary, imp);
     } else {
@@ -334,6 +336,7 @@ void RootObject::removeAllNativeReferences() {
     CFDictionaryGetKeysAndValues(referencesDictionary, (const void**)allImps,
                                  NULL);
     for (i = 0; i < count; i++) {
+      InterpreterLock lock;
       ObjectImp* anImp = static_cast<ObjectImp*>(allImps[i]);
       gcUnprotect(anImp);
     }
