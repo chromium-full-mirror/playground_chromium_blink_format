@@ -1767,11 +1767,9 @@ ValueImp* getDOMDocumentNode(ExecState* exec, DocumentImpl* n) {
   // Make sure the document is kept around by the window object, and works right
   // with the
   // back/forward cache.
-  if (n->view()) {
-    static Identifier documentIdentifier("document");
+  if (n->view())
     Window::retrieveWindow(n->view()->part())
-        ->putDirect(documentIdentifier, ret, DontDelete | ReadOnly);
-  }
+        ->putDirect("document", ret, DontDelete | ReadOnly);
 
   interp->putDOMObject(n, ret);
 
