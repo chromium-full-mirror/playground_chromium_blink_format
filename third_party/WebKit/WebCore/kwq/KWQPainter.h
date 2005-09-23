@@ -42,6 +42,10 @@ class QWidget;
 class QPainterPrivate;
 class QString;
 
+#if SVG_SUPPORT
+class KRenderingDeviceContext;
+#endif
+
 class QPainter : public Qt {
  public:
   typedef enum { RTL, LTR } TextDirection;
@@ -216,6 +220,10 @@ class QPainter : public Qt {
   void clearFocusRing();
 
   CGContextRef currentContext();
+
+#if SVG_SUPPORT
+  KRenderingDeviceContext* renderingDeviceContext();
+#endif
 
   static int compositeOperatorFromString(const QString& aString);
   static int getCompositeOperation(CGContextRef context);

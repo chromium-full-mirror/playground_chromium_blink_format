@@ -155,6 +155,9 @@ class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
   // Other methods (not part of DOM)
   DocumentImpl* createDocument(KHTMLView* v = 0);
   HTMLDocumentImpl* createHTMLDocument(KHTMLView* v = 0);
+#if SVG_SUPPORT
+  DocumentImpl* createKDOMDocument(KHTMLView* v = 0);
+#endif
 
   // Returns the static instance of this class - only one instance of this class
   // should
