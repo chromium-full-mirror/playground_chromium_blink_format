@@ -140,7 +140,6 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void end();
 
   void reset();
-  void addPending();
   void processToken();
   void processListing(TokenizerString list);
 
@@ -197,20 +196,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // are we in quotes within a html tag
   enum { NoQuote = 0, SingleQuote, DoubleQuote } tquote;
 
-  enum {
-    NonePending = 0,
-    SpacePending,
-    LFPending,
-  } pending;
-
-  // Discard line breaks immediately after start-tags
-  // Discard spaces after '=' within tags
-  enum {
-    NoneDiscard = 0,
-    SpaceDiscard,
-    LFDiscard,
-    AllDiscard  // discard all spaces, LF's etc until next non white char
-  } discard;
+  // Discard line breaks immediately after <pre> tags
+  enum { NoneDiscard = 0, LFDiscard } discard;
 
   // Discard the LF part of CRLF sequence
   bool skipLF;
