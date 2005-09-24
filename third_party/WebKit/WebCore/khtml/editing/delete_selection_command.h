@@ -36,7 +36,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
   DeleteSelectionCommand(DOM::DocumentImpl* document,
-                         const Selection& selection,
+                         const SelectionController& selection,
                          bool smartDelete = false,
                          bool mergeBlocksAfterDelete = true);
 
@@ -66,7 +66,7 @@ class DeleteSelectionCommand : public CompositeEditCommand {
 
   // This data is transient and should be cleared at the end of the doApply
   // function.
-  Selection m_selectionToDelete;
+  SelectionController m_selectionToDelete;
   DOM::Position m_upstreamStart;
   DOM::Position m_downstreamStart;
   DOM::Position m_upstreamEnd;

@@ -114,7 +114,7 @@ static inline bool isNBSP(const QChar& c) {
 void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
   assert(text.find('\n') == -1);
 
-  Selection selection = endingSelection();
+  SelectionController selection = endingSelection();
   bool adjustDownstream = isStartOfLine(
       VisiblePosition(selection.start().downstream(), DOWNSTREAM));
 
@@ -190,8 +190,8 @@ void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
     }
   }
 
-  setEndingSelection(
-      Selection(startPosition, DOWNSTREAM, endPosition, SEL_DEFAULT_AFFINITY));
+  setEndingSelection(SelectionController(startPosition, DOWNSTREAM, endPosition,
+                                         SEL_DEFAULT_AFFINITY));
 
   // Handle the case where there is a typing style.
   // FIXME: Improve typing style.

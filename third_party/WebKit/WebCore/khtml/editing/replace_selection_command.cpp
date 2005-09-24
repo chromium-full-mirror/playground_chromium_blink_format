@@ -386,8 +386,8 @@ void ReplaceSelectionCommand::fixupNodeStyles(
       ASSERT(exceptionCode == 0);
       // affinity is not really important since this is a temp selection
       // just for calling applyStyle
-      setEndingSelection(Selection(rangeAroundNode, SEL_DEFAULT_AFFINITY,
-                                   SEL_DEFAULT_AFFINITY));
+      setEndingSelection(SelectionController(
+          rangeAroundNode, SEL_DEFAULT_AFFINITY, SEL_DEFAULT_AFFINITY));
       applyStyle(desiredStyle);
       rangeAroundNode->deref();
     }
@@ -631,7 +631,7 @@ bool isFirstVisiblePositionInSpecialElementInFragment(const Position& pos) {
 void ReplaceSelectionCommand::doApply() {
   // collect information about the current selection, prior to deleting the
   // selection
-  Selection selection = endingSelection();
+  SelectionController selection = endingSelection();
   ASSERT(selection.isCaretOrRange());
 
   if (m_matchStyle) {
@@ -1060,8 +1060,8 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
 
     if (m_matchStyle) {
       assert(m_insertionStyle);
-      setEndingSelection(
-          Selection(start, SEL_DEFAULT_AFFINITY, end, SEL_DEFAULT_AFFINITY));
+      setEndingSelection(SelectionController(start, SEL_DEFAULT_AFFINITY, end,
+                                             SEL_DEFAULT_AFFINITY));
       applyStyle(m_insertionStyle);
     }
 
@@ -1074,8 +1074,8 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
   }
 
   if (m_selectReplacement)
-    setEndingSelection(
-        Selection(start, SEL_DEFAULT_AFFINITY, end, SEL_DEFAULT_AFFINITY));
+    setEndingSelection(SelectionController(start, SEL_DEFAULT_AFFINITY, end,
+                                           SEL_DEFAULT_AFFINITY));
   else
     setEndingSelection(end, SEL_DEFAULT_AFFINITY);
 

@@ -42,7 +42,7 @@
 #include "dom/dom_string.h"
 #include "editing/markup.h"
 #include "editing/htmlediting.h"
-#include "editing/selection.h"
+#include "editing/SelectionController.h"
 #include "editing/visible_position.h"
 #include "editing/visible_text.h"
 #include "editing/visible_units.h"
@@ -132,7 +132,7 @@ using khtml::plainText;
 using khtml::RenderObject;
 using khtml::RenderText;
 using khtml::RenderWidget;
-using khtml::Selection;
+using khtml::SelectionController;
 using khtml::Tokenizer;
 using khtml::TypingCommand;
 using khtml::VisiblePosition;
@@ -2447,8 +2447,8 @@ bool KHTMLPart::findTextNext(const QString& str,
         d->m_view->setContentsPos(x - 50, y - 50);
         Position p1(d->m_findNode, d->m_findPos);
         Position p2(d->m_findNode, d->m_findPos + matchLen);
-        Selection sel = Selection(p1, khtml::DOWNSTREAM, p2,
-                                  khtml::VP_UPSTREAM_IF_POSSIBLE);
+        SelectionController sel = SelectionController(
+            p1, khtml::DOWNSTREAM, p2, khtml::VP_UPSTREAM_IF_POSSIBLE);
         if (shouldChangeSelection(sel)) {
           setSelection(sel);
         }
@@ -2507,7 +2507,7 @@ bool KHTMLPart::hasSelection() const {
   return d->m_selection.isCaretOrRange();
 }
 
-const Selection& KHTMLPart::selection() const {
+const SelectionController& KHTMLPart::selection() const {
   return d->m_selection;
 }
 
@@ -2519,19 +2519,19 @@ void KHTMLPart::setSelectionGranularity(ETextGranularity granularity) const {
   d->m_selectionGranularity = granularity;
 }
 
-const Selection& KHTMLPart::dragCaret() const {
+const SelectionController& KHTMLPart::dragCaret() const {
   return d->m_dragCaret;
 }
 
-const Selection& KHTMLPart::mark() const {
+const SelectionController& KHTMLPart::mark() const {
   return d->m_mark;
 }
 
-void KHTMLPart::setMark(const Selection& s) {
+void KHTMLPart::setMark(const SelectionController& s) {
   d->m_mark = s;
 }
 
-void KHTMLPart::setSelection(const Selection& s,
+void KHTMLPart::setSelection(const SelectionController& s,
                              bool closeTyping,
                              bool keepTypingStyle) {
   if (d->m_selection == s) {
@@ -2541,7 +2541,7 @@ void KHTMLPart::setSelection(const Selection& s,
   clearCaretRectIfNeeded();
 
 #if APPLE_CHANGES
-  Selection oldSelection = d->m_selection;
+  SelectionController oldSelection = d->m_selection;
 #endif
 
   d->m_selection = s;
@@ -2567,7 +2567,7 @@ void KHTMLPart::setSelection(const Selection& s,
   emitSelectionChanged();
 }
 
-void KHTMLPart::setDragCaret(const Selection& dragCaret) {
+void KHTMLPart::setDragCaret(const SelectionController& dragCaret) {
   if (d->m_dragCaret != dragCaret) {
     d->m_dragCaret.needsCaretRepaint();
     d->m_dragCaret = dragCaret;
@@ -2576,7 +2576,7 @@ void KHTMLPart::setDragCaret(const Selection& dragCaret) {
 }
 
 void KHTMLPart::clearSelection() {
-  setSelection(Selection());
+  setSelection(SelectionController());
 }
 
 void KHTMLPart::invalidateSelection() {
@@ -4600,7 +4600,7 @@ void KHTMLPart::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
                                                 NodeImpl* innerNode,
                                                 int x,
                                                 int y) {
-  Selection selection;
+  SelectionController selection;
 
   if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
       innerNode->renderer()->shouldSelect()) {
@@ -4646,7 +4646,7 @@ void KHTMLPart::handleMousePressEventTripleClick(
 
   if (mouse->button() == LeftButton && innerNode && innerNode->renderer() &&
       mouseDownMayStartSelect() && innerNode->renderer()->shouldSelect()) {
-    Selection selection;
+    SelectionController selection;
     VisiblePosition pos(
         innerNode->renderer()->positionForCoordinates(event->x(), event->y()));
     if (pos.isNotNull()) {
@@ -4673,7 +4673,7 @@ void KHTMLPart::handleMousePressEventSingleClick(
   if (mouse->button() == LeftButton) {
     if (innerNode && innerNode->renderer() && mouseDownMayStartSelect() &&
         innerNode->renderer()->shouldSelect()) {
-      Selection sel;
+      SelectionController sel;
 
       // Extend the selection if the Shift key is down, unless the click is in a
       // link.
@@ -4716,7 +4716,7 @@ void KHTMLPart::handleMousePressEventSingleClick(
         }
         d->m_beganSelectingText = true;
       } else {
-        sel = Selection(visiblePos);
+        sel = SelectionController(visiblePos);
         d->m_selectionGranularity = CHARACTER;
       }
 
@@ -4921,7 +4921,7 @@ void KHTMLPart::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   // Restart the selection if this is the first mouse move. This work is usually
   // done in khtmlMousePressEvent, but not if the mouse press was on an existing
   // selection.
-  Selection sel = selection();
+  SelectionController sel = selection();
   sel.clearModifyBias();
   if (!d->m_beganSelectingText) {
     d->m_beganSelectingText = true;
@@ -4998,7 +4998,7 @@ void KHTMLPart::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
       d->m_dragStartPos.x() == event->qmouseEvent()->x() &&
       d->m_dragStartPos.y() == event->qmouseEvent()->y() &&
       d->m_selection.isRange()) {
-    Selection selection;
+    SelectionController selection;
     NodeImpl* node = event->innerNode();
     if (node && node->isContentEditable() && node->renderer()) {
       VisiblePosition pos =
@@ -5161,15 +5161,17 @@ void KHTMLPart::selectAll() {
     return;
   NodeImpl* de = d->m_doc->documentElement();
   int n = de ? de->childNodeCount() : 0;
-  Selection sel = Selection(VisiblePosition(de, 0, khtml::DOWNSTREAM),
-                            VisiblePosition(de, n, khtml::DOWNSTREAM));
+  SelectionController sel =
+      SelectionController(VisiblePosition(de, 0, khtml::DOWNSTREAM),
+                          VisiblePosition(de, n, khtml::DOWNSTREAM));
   if (shouldChangeSelection(sel)) {
     setSelection(sel);
   }
   selectFrameElementInParentIfFullySelected();
 }
 
-bool KHTMLPart::shouldChangeSelection(const Selection& newselection) const {
+bool KHTMLPart::shouldChangeSelection(
+    const SelectionController& newselection) const {
 #if APPLE_CHANGES
   return KWQ(this)->shouldChangeSelection(d->m_selection, newselection,
                                           newselection.startAffinity(), false);
@@ -5582,14 +5584,14 @@ void KHTMLPart::computeAndSetTypingStyle(CSSStyleDeclarationImpl* style,
 void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style,
                            EditAction editingAction) {
   switch (selection().state()) {
-    case Selection::NONE:
+    case SelectionController::NONE:
       // do nothing
       break;
-    case Selection::CARET: {
+    case SelectionController::CARET: {
       computeAndSetTypingStyle(style, editingAction);
       break;
     }
-    case Selection::RANGE:
+    case SelectionController::RANGE:
       if (xmlDocImpl() && style) {
         EditCommandPtr cmd(
             new ApplyStyleCommand(xmlDocImpl(), style, editingAction));
@@ -5602,11 +5604,11 @@ void KHTMLPart::applyStyle(CSSStyleDeclarationImpl* style,
 void KHTMLPart::applyParagraphStyle(CSSStyleDeclarationImpl* style,
                                     EditAction editingAction) {
   switch (selection().state()) {
-    case Selection::NONE:
+    case SelectionController::NONE:
       // do nothing
       break;
-    case Selection::CARET:
-    case Selection::RANGE:
+    case SelectionController::CARET:
+    case SelectionController::RANGE:
       if (xmlDocImpl() && style) {
         EditCommandPtr cmd(
             new ApplyStyleCommand(xmlDocImpl(), style, editingAction,
@@ -5976,9 +5978,10 @@ void KHTMLPart::selectFrameElementInParentIfFullySelected() {
   // Focus on the parent frame, and then select from before this element to
   // after.
   if (parent->shouldChangeSelection(
-          Selection(beforeOwnerElement, afterOwnerElement))) {
+          SelectionController(beforeOwnerElement, afterOwnerElement))) {
     parentView->setFocus();
-    parent->setSelection(Selection(beforeOwnerElement, afterOwnerElement));
+    parent->setSelection(
+        SelectionController(beforeOwnerElement, afterOwnerElement));
   }
 }
 

@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "selection.h"
+#include "SelectionController.h"
 
 #include <qevent.h>
 #include <qpainter.h>
@@ -61,46 +61,48 @@ using DOM::RangeImpl;
 
 namespace khtml {
 
-Selection::Selection() {
+SelectionController::SelectionController() {
   init(DOWNSTREAM);
 }
 
-Selection::Selection(const Position& pos, EAffinity affinity)
+SelectionController::SelectionController(const Position& pos,
+                                         EAffinity affinity)
     : m_base(pos), m_extent(pos) {
   init(affinity);
   validate();
 }
 
-Selection::Selection(const RangeImpl* r,
-                     EAffinity baseAffinity,
-                     EAffinity extentAffinity)
+SelectionController::SelectionController(const RangeImpl* r,
+                                         EAffinity baseAffinity,
+                                         EAffinity extentAffinity)
     : m_base(startPosition(r)), m_extent(endPosition(r)) {
   init(baseAffinity);
   validate();
 }
 
-Selection::Selection(const Position& base,
-                     EAffinity baseAffinity,
-                     const Position& extent,
-                     EAffinity extentAffinity)
+SelectionController::SelectionController(const Position& base,
+                                         EAffinity baseAffinity,
+                                         const Position& extent,
+                                         EAffinity extentAffinity)
     : m_base(base), m_extent(extent) {
   init(baseAffinity);
   validate();
 }
 
-Selection::Selection(const VisiblePosition& visiblePos)
+SelectionController::SelectionController(const VisiblePosition& visiblePos)
     : m_base(visiblePos.position()), m_extent(visiblePos.position()) {
   init(visiblePos.affinity());
   validate();
 }
 
-Selection::Selection(const VisiblePosition& base, const VisiblePosition& extent)
+SelectionController::SelectionController(const VisiblePosition& base,
+                                         const VisiblePosition& extent)
     : m_base(base.position()), m_extent(extent.position()) {
   init(base.affinity());
   validate();
 }
 
-Selection::Selection(const Selection& o)
+SelectionController::SelectionController(const SelectionController& o)
     : m_base(o.m_base),
       m_extent(o.m_extent),
       m_start(o.m_start),
@@ -121,7 +123,7 @@ Selection::Selection(const Selection& o)
   }
 }
 
-void Selection::init(EAffinity affinity) {
+void SelectionController::init(EAffinity affinity) {
   // FIXME: set extentAffinity
   m_state = NONE;
   m_baseIsStart = true;
@@ -130,7 +132,8 @@ void Selection::init(EAffinity affinity) {
   m_modifyBiasSet = false;
 }
 
-Selection& Selection::operator=(const Selection& o) {
+SelectionController& SelectionController::operator=(
+    const SelectionController& o) {
   m_base = o.m_base;
   m_extent = o.m_extent;
   m_start = o.m_start;
@@ -156,7 +159,7 @@ Selection& Selection::operator=(const Selection& o) {
   return *this;
 }
 
-void Selection::moveTo(const VisiblePosition& pos) {
+void SelectionController::moveTo(const VisiblePosition& pos) {
   // FIXME: use extentAffinity
   m_affinity = pos.affinity();
   m_base = pos.deepEquivalent();
@@ -164,8 +167,8 @@ void Selection::moveTo(const VisiblePosition& pos) {
   validate();
 }
 
-void Selection::moveTo(const VisiblePosition& base,
-                       const VisiblePosition& extent) {
+void SelectionController::moveTo(const VisiblePosition& base,
+                                 const VisiblePosition& extent) {
   // FIXME: use extentAffinity
   m_affinity = base.affinity();
   m_base = base.deepEquivalent();
@@ -173,7 +176,7 @@ void Selection::moveTo(const VisiblePosition& base,
   validate();
 }
 
-void Selection::moveTo(const Selection& o) {
+void SelectionController::moveTo(const SelectionController& o) {
   // FIXME: copy extentAffinity
   m_affinity = o.m_affinity;
   m_base = o.m_start;
@@ -181,7 +184,7 @@ void Selection::moveTo(const Selection& o) {
   validate();
 }
 
-void Selection::moveTo(const Position& pos, EAffinity affinity) {
+void SelectionController::moveTo(const Position& pos, EAffinity affinity) {
   // FIXME: use extentAffinity
   m_affinity = affinity;
   m_base = pos;
@@ -189,9 +192,9 @@ void Selection::moveTo(const Position& pos, EAffinity affinity) {
   validate();
 }
 
-void Selection::moveTo(const RangeImpl* r,
-                       EAffinity baseAffinity,
-                       EAffinity extentAffinity) {
+void SelectionController::moveTo(const RangeImpl* r,
+                                 EAffinity baseAffinity,
+                                 EAffinity extentAffinity) {
   // FIXME: use extentAffinity
   m_affinity = baseAffinity;
   m_base = startPosition(r);
@@ -199,10 +202,10 @@ void Selection::moveTo(const RangeImpl* r,
   validate();
 }
 
-void Selection::moveTo(const Position& base,
-                       EAffinity baseAffinity,
-                       const Position& extent,
-                       EAffinity extentAffinity) {
+void SelectionController::moveTo(const Position& base,
+                                 EAffinity baseAffinity,
+                                 const Position& extent,
+                                 EAffinity extentAffinity) {
   // FIXME: use extentAffinity
   m_affinity = baseAffinity;
   m_base = base;
@@ -210,7 +213,7 @@ void Selection::moveTo(const Position& base,
   validate();
 }
 
-void Selection::setModifyBias(EAlter alter, EDirection direction) {
+void SelectionController::setModifyBias(EAlter alter, EDirection direction) {
   switch (alter) {
     case MOVE:
       m_modifyBiasSet = false;
@@ -236,7 +239,7 @@ void Selection::setModifyBias(EAlter alter, EDirection direction) {
   }
 }
 
-VisiblePosition Selection::modifyExtendingRightForward(
+VisiblePosition SelectionController::modifyExtendingRightForward(
     ETextGranularity granularity) {
   VisiblePosition pos(m_extent, m_affinity);
   switch (granularity) {
@@ -266,7 +269,7 @@ VisiblePosition Selection::modifyExtendingRightForward(
   return pos;
 }
 
-VisiblePosition Selection::modifyMovingRightForward(
+VisiblePosition SelectionController::modifyMovingRightForward(
     ETextGranularity granularity) {
   VisiblePosition pos;
   switch (granularity) {
@@ -308,7 +311,7 @@ VisiblePosition Selection::modifyMovingRightForward(
   return pos;
 }
 
-VisiblePosition Selection::modifyExtendingLeftBackward(
+VisiblePosition SelectionController::modifyExtendingLeftBackward(
     ETextGranularity granularity) {
   VisiblePosition pos(m_extent, m_affinity);
   switch (granularity) {
@@ -338,7 +341,7 @@ VisiblePosition Selection::modifyExtendingLeftBackward(
   return pos;
 }
 
-VisiblePosition Selection::modifyMovingLeftBackward(
+VisiblePosition SelectionController::modifyMovingLeftBackward(
     ETextGranularity granularity) {
   VisiblePosition pos;
   switch (granularity) {
@@ -374,9 +377,9 @@ VisiblePosition Selection::modifyMovingLeftBackward(
   return pos;
 }
 
-bool Selection::modify(EAlter alter,
-                       EDirection dir,
-                       ETextGranularity granularity) {
+bool SelectionController::modify(EAlter alter,
+                                 EDirection dir,
+                                 ETextGranularity granularity) {
   setModifyBias(alter, dir);
 
   VisiblePosition pos;
@@ -431,7 +434,7 @@ static bool caretY(const VisiblePosition& c, int& y) {
   return true;
 }
 
-bool Selection::modify(EAlter alter, int verticalDistance) {
+bool SelectionController::modify(EAlter alter, int verticalDistance) {
   if (verticalDistance == 0)
     return false;
 
@@ -497,15 +500,15 @@ bool Selection::modify(EAlter alter, int verticalDistance) {
   return true;
 }
 
-bool Selection::expandUsingGranularity(ETextGranularity granularity) {
+bool SelectionController::expandUsingGranularity(ETextGranularity granularity) {
   if (isNone())
     return false;
   validate(granularity);
   return true;
 }
 
-int Selection::xPosForVerticalArrowNavigation(EPositionType type,
-                                              bool recalc) const {
+int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
+                                                        bool recalc) const {
   int x = 0;
 
   if (isNone())
@@ -550,27 +553,27 @@ int Selection::xPosForVerticalArrowNavigation(EPositionType type,
   return x;
 }
 
-void Selection::clear() {
+void SelectionController::clear() {
   m_affinity = SEL_DEFAULT_AFFINITY;
   m_base.clear();
   m_extent.clear();
   validate();
 }
 
-void Selection::setBase(const VisiblePosition& pos) {
+void SelectionController::setBase(const VisiblePosition& pos) {
   m_affinity = pos.affinity();
   m_base = pos.deepEquivalent();
   validate();
 }
 
-void Selection::setExtent(const VisiblePosition& pos) {
+void SelectionController::setExtent(const VisiblePosition& pos) {
   // FIXME: Support extentAffinity
   m_extent = pos.deepEquivalent();
   validate();
 }
 
-void Selection::setBaseAndExtent(const VisiblePosition& base,
-                                 const VisiblePosition& extent) {
+void SelectionController::setBaseAndExtent(const VisiblePosition& base,
+                                           const VisiblePosition& extent) {
   // FIXME: Support extentAffinity
   m_affinity = base.affinity();
   m_base = base.deepEquivalent();
@@ -578,23 +581,24 @@ void Selection::setBaseAndExtent(const VisiblePosition& base,
   validate();
 }
 
-void Selection::setBase(const Position& pos, EAffinity baseAffinity) {
+void SelectionController::setBase(const Position& pos, EAffinity baseAffinity) {
   m_affinity = baseAffinity;
   m_base = pos;
   validate();
 }
 
-void Selection::setExtent(const Position& pos, EAffinity extentAffinity) {
+void SelectionController::setExtent(const Position& pos,
+                                    EAffinity extentAffinity) {
   // FIXME: Support extentAffinity for real
   m_affinity = extentAffinity;
   m_extent = pos;
   validate();
 }
 
-void Selection::setBaseAndExtent(const Position& base,
-                                 EAffinity baseAffinity,
-                                 const Position& extent,
-                                 EAffinity extentAffinity) {
+void SelectionController::setBaseAndExtent(const Position& base,
+                                           EAffinity baseAffinity,
+                                           const Position& extent,
+                                           EAffinity extentAffinity) {
   // FIXME: extentAffinity
   m_affinity = baseAffinity;
   m_base = base;
@@ -602,11 +606,11 @@ void Selection::setBaseAndExtent(const Position& base,
   validate();
 }
 
-void Selection::setNeedsLayout(bool flag) {
+void SelectionController::setNeedsLayout(bool flag) {
   m_needsLayout = flag;
 }
 
-SharedPtr<RangeImpl> Selection::toRange() const {
+SharedPtr<RangeImpl> SelectionController::toRange() const {
   if (isNone())
     return SharedPtr<RangeImpl>();
 
@@ -662,18 +666,20 @@ SharedPtr<RangeImpl> Selection::toRange() const {
   SharedPtr<RangeImpl> result(new RangeImpl(s.node()->docPtr()));
   result->setStart(s.node(), s.offset(), exceptionCode);
   if (exceptionCode) {
-    ERROR("Exception setting Range start from Selection: %d", exceptionCode);
+    ERROR("Exception setting Range start from SelectionController: %d",
+          exceptionCode);
     return SharedPtr<RangeImpl>();
   }
   result->setEnd(e.node(), e.offset(), exceptionCode);
   if (exceptionCode) {
-    ERROR("Exception setting Range end from Selection: %d", exceptionCode);
+    ERROR("Exception setting Range end from SelectionController: %d",
+          exceptionCode);
     return SharedPtr<RangeImpl>();
   }
   return result;
 }
 
-void Selection::layout() {
+void SelectionController::layout() {
   if (isNone() || !m_start.node()->inDocument() ||
       !m_end.node()->inDocument()) {
     m_caretRect = QRect();
@@ -723,23 +729,23 @@ void Selection::layout() {
   m_needsLayout = false;
 }
 
-QRect Selection::caretRect() const {
+QRect SelectionController::caretRect() const {
   if (m_needsLayout) {
-    const_cast<Selection*>(this)->layout();
+    const_cast<SelectionController*>(this)->layout();
   }
 
   return m_caretRect;
 }
 
-QRect Selection::expectedVisibleRect() const {
+QRect SelectionController::expectedVisibleRect() const {
   if (m_needsLayout) {
-    const_cast<Selection*>(this)->layout();
+    const_cast<SelectionController*>(this)->layout();
   }
 
   return m_expectedVisibleRect;
 }
 
-QRect Selection::caretRepaintRect() const {
+QRect SelectionController::caretRepaintRect() const {
   // FIXME: Add one pixel of slop on each side to make sure we don't leave
   // behind artifacts.
   QRect r = caretRect();
@@ -748,7 +754,7 @@ QRect Selection::caretRepaintRect() const {
   return QRect(r.left() - 1, r.top() - 1, r.width() + 2, r.height() + 2);
 }
 
-void Selection::needsCaretRepaint() {
+void SelectionController::needsCaretRepaint() {
   if (!isCaret())
     return;
 
@@ -780,7 +786,7 @@ void Selection::needsCaretRepaint() {
   v->updateContents(caretRepaintRect(), false);
 }
 
-void Selection::paintCaret(QPainter* p, const QRect& rect) {
+void SelectionController::paintCaret(QPainter* p, const QRect& rect) {
   if (m_state != CARET)
     return;
 
@@ -791,7 +797,7 @@ void Selection::paintCaret(QPainter* p, const QRect& rect) {
     p->fillRect(m_caretRect & rect, QBrush());
 }
 
-void Selection::validate(ETextGranularity granularity) {
+void SelectionController::validate(ETextGranularity granularity) {
   // Move the selection to rendered positions, if possible.
   Position originalBase(m_base);
   bool baseAndExtentEqual = m_base == m_extent;
@@ -961,7 +967,7 @@ void Selection::validate(ETextGranularity granularity) {
 #endif
 }
 
-void Selection::debugRenderer(RenderObject* r, bool selected) const {
+void SelectionController::debugRenderer(RenderObject* r, bool selected) const {
   if (r->node()->isElementNode()) {
     ElementImpl* element = static_cast<ElementImpl*>(r->node());
     fprintf(stderr, "%s%s\n", selected ? "==> " : "    ",
@@ -1032,7 +1038,7 @@ void Selection::debugRenderer(RenderObject* r, bool selected) const {
   }
 }
 
-void Selection::debugPosition() const {
+void SelectionController::debugPosition() const {
   if (!m_start.node())
     return;
 
@@ -1040,21 +1046,21 @@ void Selection::debugPosition() const {
 
   // RenderObject *r = 0;
 
-  fprintf(stderr, "Selection =================\n");
+  fprintf(stderr, "SelectionController =================\n");
 
   if (m_start == m_end) {
     Position pos = m_start;
-    fprintf(stderr, "pos:        %s %p:%d\n",
+    fprintf(stderr, "pos:        %s %p:%ld\n",
             pos.node()->nodeName().qstring().latin1(), pos.node(),
             pos.offset());
   } else {
     Position pos = m_start;
-    fprintf(stderr, "start:      %s %p:%d\n",
+    fprintf(stderr, "start:      %s %p:%ld\n",
             pos.node()->nodeName().qstring().latin1(), pos.node(),
             pos.offset());
     fprintf(stderr, "-----------------------------------\n");
     pos = m_end;
-    fprintf(stderr, "end:        %s %p:%d\n",
+    fprintf(stderr, "end:        %s %p:%ld\n",
             pos.node()->nodeName().qstring().latin1(), pos.node(),
             pos.offset());
     fprintf(stderr, "-----------------------------------\n");
@@ -1101,7 +1107,8 @@ void Selection::debugPosition() const {
 
 #ifndef NDEBUG
 #define FormatBufferSize 1024
-void Selection::formatForDebugger(char* buffer, unsigned length) const {
+void SelectionController::formatForDebugger(char* buffer,
+                                            unsigned length) const {
   DOMString result;
   DOMString s;
 
@@ -1121,7 +1128,7 @@ void Selection::formatForDebugger(char* buffer, unsigned length) const {
 }
 #undef FormatBufferSize
 
-void Selection::showTree() const {
+void SelectionController::showTree() const {
   if (m_start.node())
     m_start.node()->showTreeAndMark(m_start.node(), "S", m_end.node(), "E");
 }

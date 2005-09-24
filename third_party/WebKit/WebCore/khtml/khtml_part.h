@@ -83,7 +83,7 @@ class MouseReleaseEvent;
 class RenderPart;
 class RenderPartObject;
 class RenderWidget;
-class Selection;
+class SelectionController;
 class XMLTokenizer;
 }
 
@@ -627,7 +627,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Returns the selected part of the HTML.
    */
-  const khtml::Selection& selection() const;
+  const khtml::SelectionController& selection() const;
 
   /**
    * Returns the granularity of the selection (character, word, line,
@@ -644,34 +644,34 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * Returns the drag caret of the HTML.
    */
-  const khtml::Selection& dragCaret() const;
+  const khtml::SelectionController& dragCaret() const;
 
   /**
    * Sets the current selection.
    */
-  void setSelection(const khtml::Selection&,
+  void setSelection(const khtml::SelectionController&,
                     bool closeTyping = true,
                     bool keepTypingStyle = false);
 
   /**
    * Returns whether selection can be changed.
    */
-  bool shouldChangeSelection(const khtml::Selection&) const;
+  bool shouldChangeSelection(const khtml::SelectionController&) const;
 
   /**
    * Returns a mark, to be used as emacs uses it.
    */
-  const khtml::Selection& mark() const;
+  const khtml::SelectionController& mark() const;
 
   /**
    * Returns the mark.
    */
-  void setMark(const khtml::Selection&);
+  void setMark(const khtml::SelectionController&);
 
   /**
    * Sets the current drag cart.
    */
-  void setDragCaret(const khtml::Selection&);
+  void setDragCaret(const khtml::SelectionController&);
 
   /**
    * Transposes characters either side of caret selection.
@@ -1466,7 +1466,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
 
   KHTMLPartPrivate* d;
   friend class KHTMLPartPrivate;
-  friend class khtml::Selection;
+  friend class khtml::SelectionController;
 
 #if APPLE_CHANGES
  public:

@@ -90,7 +90,7 @@ void InsertLineBreakCommand::insertNodeBeforePosition(NodeImpl* node,
 
 void InsertLineBreakCommand::doApply() {
   deleteSelection();
-  Selection selection = endingSelection();
+  SelectionController selection = endingSelection();
 
   ElementImpl* breakNode = createBreakElement(document());
   NodeImpl* nodeToInsert = breakNode;
@@ -124,7 +124,7 @@ void InsertLineBreakCommand::doApply() {
                                next->enclosingBlockFlowElement();
       insertNodeAfterPosition(nodeToInsert, pos);
       if (hasTrailingBR) {
-        setEndingSelection(Selection(Position(next, 0), DOWNSTREAM));
+        setEndingSelection(SelectionController(Position(next, 0), DOWNSTREAM));
       } else if (!document()->inStrictMode()) {
         // Insert an "extra" BR at the end of the block.
         ElementImpl* extraBreakNode = createBreakElement(document());
@@ -180,7 +180,7 @@ void InsertLineBreakCommand::doApply() {
       document()->part()->typingStyle();
 
   if (typingStyle && typingStyle->length() > 0) {
-    Selection selectionBeforeStyle = endingSelection();
+    SelectionController selectionBeforeStyle = endingSelection();
 
     DOM::RangeImpl* rangeAroundNode = document()->createRange();
     int exception = 0;
@@ -188,8 +188,9 @@ void InsertLineBreakCommand::doApply() {
 
     // affinity is not really important since this is a temp selection
     // just for calling applyStyle
-    setEndingSelection(Selection(rangeAroundNode, khtml::SEL_DEFAULT_AFFINITY,
-                                 khtml::SEL_DEFAULT_AFFINITY));
+    setEndingSelection(SelectionController(rangeAroundNode,
+                                           khtml::SEL_DEFAULT_AFFINITY,
+                                           khtml::SEL_DEFAULT_AFFINITY));
     applyStyle(typingStyle);
 
     setEndingSelection(selectionBeforeStyle);

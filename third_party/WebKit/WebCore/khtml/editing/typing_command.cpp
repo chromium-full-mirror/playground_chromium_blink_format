@@ -69,7 +69,7 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
   if (isOpenForMoreTypingCommand(lastEditCommand)) {
     static_cast<TypingCommand*>(lastEditCommand.get())->deleteKeyPressed();
   } else {
-    Selection selection = part->selection();
+    SelectionController selection = part->selection();
     if (selection.isCaret() &&
         VisiblePosition(selection.start(), selection.startAffinity())
             .previous()
@@ -96,7 +96,7 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
     static_cast<TypingCommand*>(lastEditCommand.get())
         ->forwardDeleteKeyPressed();
   } else {
-    Selection selection = part->selection();
+    SelectionController selection = part->selection();
     if (selection.isCaret() &&
         isEndOfDocument(
             VisiblePosition(selection.start(), selection.startAffinity()))) {
@@ -330,13 +330,13 @@ void TypingCommand::insertParagraphSeparatorInQuotedContent() {
 }
 
 void TypingCommand::deleteKeyPressed() {
-  Selection selectionToDelete;
+  SelectionController selectionToDelete;
 
   switch (endingSelection().state()) {
-    case Selection::RANGE:
+    case SelectionController::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case Selection::CARET: {
+    case SelectionController::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
@@ -349,11 +349,11 @@ void TypingCommand::deleteKeyPressed() {
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete =
-            Selection(start, SEL_DEFAULT_AFFINITY, end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete = SelectionController(start, SEL_DEFAULT_AFFINITY,
+                                                end, SEL_DEFAULT_AFFINITY);
       break;
     }
-    case Selection::NONE:
+    case SelectionController::NONE:
       ASSERT_NOT_REACHED();
       break;
   }
@@ -366,13 +366,13 @@ void TypingCommand::deleteKeyPressed() {
 }
 
 void TypingCommand::forwardDeleteKeyPressed() {
-  Selection selectionToDelete;
+  SelectionController selectionToDelete;
 
   switch (endingSelection().state()) {
-    case Selection::RANGE:
+    case SelectionController::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case Selection::CARET: {
+    case SelectionController::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
@@ -385,11 +385,11 @@ void TypingCommand::forwardDeleteKeyPressed() {
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete =
-            Selection(start, SEL_DEFAULT_AFFINITY, end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete = SelectionController(start, SEL_DEFAULT_AFFINITY,
+                                                end, SEL_DEFAULT_AFFINITY);
       break;
     }
-    case Selection::NONE:
+    case SelectionController::NONE:
       ASSERT_NOT_REACHED();
       break;
   }

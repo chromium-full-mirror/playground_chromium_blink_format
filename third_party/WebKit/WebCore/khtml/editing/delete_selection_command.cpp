@@ -129,10 +129,11 @@ DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
       m_typingStyle(0),
       m_deleteIntoBlockquoteStyle(0) {}
 
-DeleteSelectionCommand::DeleteSelectionCommand(DocumentImpl* document,
-                                               const Selection& selection,
-                                               bool smartDelete,
-                                               bool mergeBlocksAfterDelete)
+DeleteSelectionCommand::DeleteSelectionCommand(
+    DocumentImpl* document,
+    const SelectionController& selection,
+    bool smartDelete,
+    bool mergeBlocksAfterDelete)
     : CompositeEditCommand(document),
       m_hasSelectionToDelete(true),
       m_smartDelete(smartDelete),
@@ -756,9 +757,9 @@ void DeleteSelectionCommand::calculateTypingStyleAfterDelete(
 
     Position pastPlaceholder(insertedPlaceholder, 1);
 
-    setEndingSelection(Selection(m_endingPosition,
-                                 m_selectionToDelete.endAffinity(),
-                                 pastPlaceholder, DOWNSTREAM));
+    setEndingSelection(SelectionController(m_endingPosition,
+                                           m_selectionToDelete.endAffinity(),
+                                           pastPlaceholder, DOWNSTREAM));
 
     applyStyle(m_typingStyle, EditActionUnspecified);
 
@@ -846,7 +847,7 @@ void DeleteSelectionCommand::doApply() {
   if (handleSpecialCaseBRDelete()) {
     calculateTypingStyleAfterDelete(false);
     debugPosition("endingPosition   ", m_endingPosition);
-    setEndingSelection(Selection(m_endingPosition, affinity));
+    setEndingSelection(SelectionController(m_endingPosition, affinity));
     clearTransientState();
     rebalanceWhitespace();
     return;
@@ -878,7 +879,7 @@ void DeleteSelectionCommand::doApply() {
   calculateTypingStyleAfterDelete(addedPlaceholder);
 
   debugPosition("endingPosition   ", m_endingPosition);
-  setEndingSelection(Selection(m_endingPosition, affinity));
+  setEndingSelection(SelectionController(m_endingPosition, affinity));
   clearTransientState();
   rebalanceWhitespace();
 }

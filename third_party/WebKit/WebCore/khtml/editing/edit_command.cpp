@@ -24,7 +24,7 @@
  */
 
 #include "edit_command.h"
-#include "selection.h"
+#include "SelectionController.h"
 #include "khtml_part.h"
 #include "htmlediting.h"
 
@@ -115,17 +115,17 @@ DocumentImpl* const EditCommandPtr::document() const {
   return get()->document();
 }
 
-Selection EditCommandPtr::startingSelection() const {
-  IF_IMPL_NULL_RETURN_ARG(Selection());
+SelectionController EditCommandPtr::startingSelection() const {
+  IF_IMPL_NULL_RETURN_ARG(SelectionController());
   return get()->startingSelection();
 }
 
-Selection EditCommandPtr::endingSelection() const {
-  IF_IMPL_NULL_RETURN_ARG(Selection());
+SelectionController EditCommandPtr::endingSelection() const {
+  IF_IMPL_NULL_RETURN_ARG(SelectionController());
   return get()->endingSelection();
 }
 
-void EditCommandPtr::setStartingSelection(const Selection& s) const {
+void EditCommandPtr::setStartingSelection(const SelectionController& s) const {
   IF_IMPL_NULL_RETURN;
   get()->setStartingSelection(s);
 }
@@ -138,11 +138,11 @@ void EditCommandPtr::setStartingSelection(const VisiblePosition& p) const {
 void EditCommandPtr::setStartingSelection(const Position& p,
                                           EAffinity affinity) const {
   IF_IMPL_NULL_RETURN;
-  Selection s = Selection(p, affinity);
+  SelectionController s = SelectionController(p, affinity);
   get()->setStartingSelection(s);
 }
 
-void EditCommandPtr::setEndingSelection(const Selection& s) const {
+void EditCommandPtr::setEndingSelection(const SelectionController& s) const {
   IF_IMPL_NULL_RETURN;
   get()->setEndingSelection(s);
 }
@@ -155,7 +155,7 @@ void EditCommandPtr::setEndingSelection(const VisiblePosition& p) const {
 void EditCommandPtr::setEndingSelection(const Position& p,
                                         EAffinity affinity) const {
   IF_IMPL_NULL_RETURN;
-  Selection s = Selection(p, affinity);
+  SelectionController s = SelectionController(p, affinity);
   get()->setEndingSelection(s);
 }
 
@@ -193,7 +193,7 @@ EditCommand::EditCommand(DocumentImpl* document)
   m_startingSelection = m_document->part()->selection();
   m_endingSelection = m_startingSelection;
 
-  m_document->part()->setSelection(Selection(), false, true);
+  m_document->part()->setSelection(SelectionController(), false, true);
 }
 
 EditCommand::~EditCommand() {
@@ -239,7 +239,7 @@ void EditCommand::unapply() {
   KHTMLPart* part = m_document->part();
 
   if (topLevel) {
-    part->setSelection(Selection(), false, true);
+    part->setSelection(SelectionController(), false, true);
   }
   ASSERT(part->selection().isNone());
 
@@ -264,7 +264,7 @@ void EditCommand::reapply() {
   KHTMLPart* part = m_document->part();
 
   if (topLevel) {
-    part->setSelection(Selection(), false, true);
+    part->setSelection(SelectionController(), false, true);
   }
   ASSERT(part->selection().isNone());
 
@@ -287,36 +287,36 @@ EditAction EditCommand::editingAction() const {
   return EditActionUnspecified;
 }
 
-void EditCommand::setStartingSelection(const Selection& s) {
+void EditCommand::setStartingSelection(const SelectionController& s) {
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
 void EditCommand::setStartingSelection(const VisiblePosition& p) {
-  Selection s = Selection(p);
+  SelectionController s = SelectionController(p);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
 void EditCommand::setStartingSelection(const Position& p, EAffinity affinity) {
-  Selection s = Selection(p, affinity);
+  SelectionController s = SelectionController(p, affinity);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_startingSelection = s;
 }
 
-void EditCommand::setEndingSelection(const Selection& s) {
+void EditCommand::setEndingSelection(const SelectionController& s) {
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }
 
 void EditCommand::setEndingSelection(const VisiblePosition& p) {
-  Selection s = Selection(p);
+  SelectionController s = SelectionController(p);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }
 
 void EditCommand::setEndingSelection(const Position& p, EAffinity affinity) {
-  Selection s = Selection(p, affinity);
+  SelectionController s = SelectionController(p, affinity);
   for (EditCommand* cmd = this; cmd; cmd = cmd->m_parent)
     cmd->m_endingSelection = s;
 }

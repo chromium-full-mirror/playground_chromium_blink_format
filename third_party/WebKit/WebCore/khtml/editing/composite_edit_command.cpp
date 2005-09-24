@@ -287,7 +287,7 @@ void CompositeEditCommand::deleteSelection(bool smartDelete,
   }
 }
 
-void CompositeEditCommand::deleteSelection(const Selection& selection,
+void CompositeEditCommand::deleteSelection(const SelectionController& selection,
                                            bool smartDelete,
                                            bool mergeBlocksAfterDelete) {
   if (selection.isRange()) {
@@ -322,7 +322,7 @@ void CompositeEditCommand::setNodeAttribute(ElementImpl* element,
 }
 
 void CompositeEditCommand::rebalanceWhitespace() {
-  Selection selection = endingSelection();
+  SelectionController selection = endingSelection();
   if (selection.isCaretOrRange()) {
     EditCommandPtr startCmd(
         new RebalanceWhitespaceCommand(document(), endingSelection().start()));

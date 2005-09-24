@@ -57,7 +57,7 @@ class CompositeEditCommand : public EditCommand {
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
-  void deleteSelection(const Selection& selection,
+  void deleteSelection(const SelectionController& selection,
                        bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);
   void deleteTextFromNode(DOM::TextImpl* node, int offset, int count);
