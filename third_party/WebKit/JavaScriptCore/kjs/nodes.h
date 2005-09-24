@@ -86,7 +86,6 @@ class Node {
   KJS_FAST_ALLOCATED;
 
   virtual ValueImp* evaluate(ExecState* exec) = 0;
-  virtual Reference evaluateReference(ExecState* exec);
   UString toString() const;
   virtual void streamTo(SourceStream& s) const = 0;
   virtual void processVarDecls(ExecState* /*exec*/) {}
@@ -231,7 +230,6 @@ class ResolveNode : public Node {
  public:
   ResolveNode(const Identifier& s) : ident(s) {}
   ValueImp* evaluate(ExecState* exec);
-  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -246,7 +244,6 @@ class GroupNode : public Node {
  public:
   GroupNode(Node* g) : group(g) {}
   virtual ValueImp* evaluate(ExecState* exec);
-  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isGroupNode() const { return true; }
@@ -346,7 +343,6 @@ class BracketAccessorNode : public Node {
  public:
   BracketAccessorNode(Node* e1, Node* e2) : expr1(e1), expr2(e2) {}
   ValueImp* evaluate(ExecState* exec);
-  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -363,7 +359,6 @@ class DotAccessorNode : public Node {
  public:
   DotAccessorNode(Node* e, const Identifier& s) : expr(e), ident(s) {}
   ValueImp* evaluate(ExecState* exec);
-  virtual Reference evaluateReference(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
   virtual bool isLocation() const { return true; }
@@ -480,25 +475,84 @@ class FunctionCallParenDotNode : public FunctionCallDotNode {
   virtual void streamTo(SourceStream& s) const;
 };
 
-class PostfixNode : public Node {
+class PostfixResolveNode : public Node {
  public:
-  PostfixNode(Node* e, Operator o) : expr(e), oper(o) {}
+  PostfixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
   ValueImp* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  KXMLCore::SharedPtr<Node> expr;
-  Operator oper;
+  Identifier m_ident;
+  Operator m_oper;
 };
 
-class DeleteNode : public Node {
+class PostfixBracketNode : public Node {
  public:
-  DeleteNode(Node* e) : expr(e) {}
+  PostfixBracketNode(Node* b, Node* s, Operator o)
+      : m_base(b), m_subscript(s), m_oper(o) {}
   ValueImp* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> m_base;
+  KXMLCore::SharedPtr<Node> m_subscript;
+  Operator m_oper;
+};
+
+class PostfixDotNode : public Node {
+ public:
+  PostfixDotNode(Node* b, const Identifier& i, Operator o)
+      : m_base(b), m_ident(i), m_oper(o) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_base;
+  Identifier m_ident;
+  Operator m_oper;
+};
+
+class DeleteResolveNode : public Node {
+ public:
+  DeleteResolveNode(const Identifier& i) : m_ident(i) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  Identifier m_ident;
+};
+
+class DeleteBracketNode : public Node {
+ public:
+  DeleteBracketNode(Node* base, Node* subscript)
+      : m_base(base), m_subscript(subscript) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_base;
+  KXMLCore::SharedPtr<Node> m_subscript;
+};
+
+class DeleteDotNode : public Node {
+ public:
+  DeleteDotNode(Node* base, const Identifier& i) : m_base(base), m_ident(i) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_base;
+  Identifier m_ident;
+};
+
+class DeleteValueNode : public Node {
+ public:
+  DeleteValueNode(Node* e) : m_expr(e) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_expr;
 };
 
 class VoidNode : public Node {
@@ -511,25 +565,61 @@ class VoidNode : public Node {
   KXMLCore::SharedPtr<Node> expr;
 };
 
-class TypeOfNode : public Node {
+class TypeOfResolveNode : public Node {
  public:
-  TypeOfNode(Node* e) : expr(e) {}
+  TypeOfResolveNode(const Identifier& i) : m_ident(i) {}
   ValueImp* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  KXMLCore::SharedPtr<Node> expr;
+  Identifier m_ident;
 };
 
-class PrefixNode : public Node {
+class TypeOfValueNode : public Node {
  public:
-  PrefixNode(Operator o, Node* e) : oper(o), expr(e) {}
+  TypeOfValueNode(Node* e) : m_expr(e) {}
   ValueImp* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  Operator oper;
-  KXMLCore::SharedPtr<Node> expr;
+  KXMLCore::SharedPtr<Node> m_expr;
+};
+
+class PrefixResolveNode : public Node {
+ public:
+  PrefixResolveNode(const Identifier& i, Operator o) : m_ident(i), m_oper(o) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  Identifier m_ident;
+  Operator m_oper;
+};
+
+class PrefixBracketNode : public Node {
+ public:
+  PrefixBracketNode(Node* b, Node* s, Operator o)
+      : m_base(b), m_subscript(s), m_oper(o) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_base;
+  KXMLCore::SharedPtr<Node> m_subscript;
+  Operator m_oper;
+};
+
+class PrefixDotNode : public Node {
+ public:
+  PrefixDotNode(Node* b, const Identifier& i, Operator o)
+      : m_base(b), m_ident(i), m_oper(o) {}
+  ValueImp* evaluate(ExecState* exec);
+  virtual void streamTo(SourceStream& s) const;
+
+ private:
+  KXMLCore::SharedPtr<Node> m_base;
+  Identifier m_ident;
+  Operator m_oper;
 };
 
 class UnaryPlusNode : public Node {
