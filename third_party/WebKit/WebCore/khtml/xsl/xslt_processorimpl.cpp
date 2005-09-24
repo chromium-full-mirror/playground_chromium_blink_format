@@ -149,9 +149,6 @@ void XSLTProcessorImpl::addToResult(const char* buffer, int len) {
 DocumentImpl* XSLTProcessorImpl::documentFromXMLDocPtr(
     xmlDocPtr resultDoc,
     xsltStylesheetPtr sheet) {
-  // FIXME: For now we serialize and then reparse. It might be more optimal to
-  // write a DOM  converter.
-
   if (!resultDoc || !sheet)
     return 0;
 
@@ -168,9 +165,8 @@ DocumentImpl* XSLTProcessorImpl::documentFromXMLDocPtr(
       return 0;
 
     // There are three types of output we need to be able to deal with:
-    // HTML (create an HTML document), XML (create an XML document), and text
-    // (wrap in a <pre> and
-    // make an XML document).
+    // HTML (create an HTML document), XML (create an XML document),
+    // and text (wrap in a <pre> and create an XML document).
     KHTMLView* view = m_sourceDocument->view();
     const xmlChar* method;
     XSLT_GET_IMPORT_PTR(method, sheet, method);
@@ -190,15 +186,17 @@ DocumentImpl* XSLTProcessorImpl::documentFromXMLDocPtr(
     if (xmlStrEqual(method, (const xmlChar*)"text")) {
       // Modify the output so that it is a well-formed XHTML document with a
       // <pre> tag enclosing the text.
+      m_resultOutput.replace('&', "&amp;");
+      m_resultOutput.replace('<', "&lt;");
       m_resultOutput =
+          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
           "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-          "\"http://www.w3.org/TR/xhtml1/DTD/strict.dtd\">\n"
+          "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
           "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+          "<head><title/></head>\n"
           "<body>\n"
-          "<pre>\n"
-          "<![CDATA[" +
+          "<pre>" +
           m_resultOutput +
-          "]]>\n"
           "</pre>\n"
           "</body>\n"
           "</html>\n";
