@@ -906,7 +906,8 @@ void RenderBlock::computeVerticalPositionsForLine(RootInlineBox* lineBox) {
 
     // Position is used to properly position both replaced elements and
     // to update the static normal flow x/y of positioned elements.
-    r->obj->position(r->box, r->start, r->stop - r->start, r->level % 2);
+    r->obj->position(r->box, r->start, r->stop - r->start, r->level % 2,
+                     r->override);
   }
 }
 
@@ -954,6 +955,10 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
       dirCurrent = c->dir;
     } else {
       dirCurrent = bidi.current.direction();
+      if (bidi.context->override && dirCurrent != QChar::DirRLE &&
+          dirCurrent != QChar::DirLRE && dirCurrent != QChar::DirRLO &&
+          dirCurrent != QChar::DirLRO && dirCurrent != QChar::DirPDF)
+        dirCurrent = bidi.context->dir;
     }
 
 #ifndef QT_NO_UNICODETABLES
@@ -1558,10 +1563,12 @@ QRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
 
     BidiContext* startEmbed;
     if (style()->direction() == LTR) {
-      startEmbed = new BidiContext(0, QChar::DirL);
+      startEmbed = new BidiContext(0, QChar::DirL, NULL,
+                                   style()->unicodeBidi() == Override);
       bidi.status.eor = QChar::DirL;
     } else {
-      startEmbed = new BidiContext(1, QChar::DirR);
+      startEmbed = new BidiContext(1, QChar::DirR, NULL,
+                                   style()->unicodeBidi() == Override);
       bidi.status.eor = QChar::DirR;
     }
     startEmbed->ref();

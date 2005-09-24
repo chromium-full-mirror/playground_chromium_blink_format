@@ -175,9 +175,10 @@ class InlineTextBox : public InlineRunBox {
   // paints at all).
 
   bool m_reversed : 1;
+  bool m_dirOverride : 1;
   bool m_treatAsText : 1;  // Whether or not to treat a <br> as text for the
                            // purposes of line height.
-  int m_toAdd : 14;        // for justified text
+  int m_toAdd : 13;        // for justified text
 
  private:
   friend class RenderText;
@@ -231,7 +232,11 @@ class RenderText : public RenderObject {
   unsigned int stringLength() const {
     return str->l;
   }  // non virtual implementation of length()
-  virtual void position(InlineBox* box, int from, int len, bool reverse);
+  virtual void position(InlineBox* box,
+                        int from,
+                        int len,
+                        bool reverse,
+                        bool override);
 
   virtual unsigned int width(unsigned int from,
                              unsigned int len,

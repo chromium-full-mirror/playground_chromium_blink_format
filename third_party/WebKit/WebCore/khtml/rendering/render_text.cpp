@@ -407,7 +407,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
         i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
         textPos(), textObject()->string()->s, textObject()->string()->l,
         m_start, endPoint, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
-        styleToUse->visuallyOrdered());
+        m_dirOverride || styleToUse->visuallyOrdered());
   } else {
     int sPos, ePos;
     selectionStartEnd(sPos, ePos);
@@ -418,23 +418,23 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
             i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
             textPos(), textObject()->string()->s, textObject()->string()->l,
             m_start, m_len, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
-            styleToUse->visuallyOrdered());
+            m_dirOverride || styleToUse->visuallyOrdered());
       } else {
         if (sPos - 1 >= 0) {
-          font->drawText(i.p, m_x + tx, m_y + ty + m_baseline,
-                         textObject()->tabWidth(), textPos(),
-                         textObject()->string()->s, textObject()->string()->l,
-                         m_start, m_len, m_toAdd,
-                         m_reversed ? QPainter::RTL : QPainter::LTR,
-                         styleToUse->visuallyOrdered(), 0, sPos);
+          font->drawText(
+              i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
+              textPos(), textObject()->string()->s, textObject()->string()->l,
+              m_start, m_len, m_toAdd,
+              m_reversed ? QPainter::RTL : QPainter::LTR,
+              m_dirOverride || styleToUse->visuallyOrdered(), 0, sPos);
         }
         if (ePos < m_start + m_len) {
-          font->drawText(i.p, m_x + tx, m_y + ty + m_baseline,
-                         textObject()->tabWidth(), textPos(),
-                         textObject()->string()->s, textObject()->string()->l,
-                         m_start, m_len, m_toAdd,
-                         m_reversed ? QPainter::RTL : QPainter::LTR,
-                         styleToUse->visuallyOrdered(), ePos, -1);
+          font->drawText(
+              i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
+              textPos(), textObject()->string()->s, textObject()->string()->l,
+              m_start, m_len, m_toAdd,
+              m_reversed ? QPainter::RTL : QPainter::LTR,
+              m_dirOverride || styleToUse->visuallyOrdered(), ePos, -1);
         }
       }
     }
@@ -451,7 +451,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
           i.p, m_x + tx, m_y + ty + m_baseline, textObject()->tabWidth(),
           textPos(), textObject()->string()->s, textObject()->string()->l,
           m_start, m_len, m_toAdd, m_reversed ? QPainter::RTL : QPainter::LTR,
-          styleToUse->visuallyOrdered(), sPos, ePos);
+          m_dirOverride || styleToUse->visuallyOrdered(), sPos, ePos);
       if (selectionTextShadow)
         i.p->clearShadow();
     }
@@ -567,11 +567,11 @@ void InlineTextBox::paintSelection(QPainter* p,
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
-  f->drawHighlightForText(p, m_x + tx, y + ty, h, textObject()->tabWidth(),
-                          textPos(), textObject()->str->s, textObject()->str->l,
-                          m_start, m_len, m_toAdd,
-                          m_reversed ? QPainter::RTL : QPainter::LTR,
-                          style->visuallyOrdered(), sPos, ePos, c);
+  f->drawHighlightForText(
+      p, m_x + tx, y + ty, h, textObject()->tabWidth(), textPos(),
+      textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
+      m_reversed ? QPainter::RTL : QPainter::LTR,
+      m_dirOverride || style->visuallyOrdered(), sPos, ePos, c);
   p->restore();
 }
 
@@ -598,11 +598,11 @@ void InlineTextBox::paintMarkedTextBackground(QPainter* p,
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
-  f->drawHighlightForText(p, m_x + tx, y + ty, h, textObject()->tabWidth(),
-                          textPos(), textObject()->str->s, textObject()->str->l,
-                          m_start, m_len, m_toAdd,
-                          m_reversed ? QPainter::RTL : QPainter::LTR,
-                          style->visuallyOrdered(), sPos, ePos, c);
+  f->drawHighlightForText(
+      p, m_x + tx, y + ty, h, textObject()->tabWidth(), textPos(),
+      textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
+      m_reversed ? QPainter::RTL : QPainter::LTR,
+      m_dirOverride || style->visuallyOrdered(), sPos, ePos, c);
   p->restore();
 }
 
@@ -1773,7 +1773,11 @@ InlineBox* RenderText::createInlineBox(bool, bool isRootLineBox, bool) {
   return textBox;
 }
 
-void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
+void RenderText::position(InlineBox* box,
+                          int from,
+                          int len,
+                          bool reverse,
+                          bool override) {
   InlineTextBox* s = static_cast<InlineTextBox*>(box);
 
   // ### should not be needed!!!
@@ -1798,6 +1802,7 @@ void RenderText::position(InlineBox* box, int from, int len, bool reverse) {
 #endif
 
   s->m_reversed = reverse;
+  s->m_dirOverride = override || style()->visuallyOrdered();
   s->m_start = from;
   s->m_len = len;
 }
