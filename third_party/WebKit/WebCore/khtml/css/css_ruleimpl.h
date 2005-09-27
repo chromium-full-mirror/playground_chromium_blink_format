@@ -30,7 +30,7 @@
 #include "css/css_base.h"
 #include "misc/loader_client.h"
 #include "misc/shared.h"
-#include "misc/main_thread_malloc.h"
+#include <kxmlcore/FastMalloc.h>
 #include "css_valueimpl.h"
 
 namespace khtml {
@@ -49,8 +49,6 @@ class CSSRuleImpl : public StyleBaseImpl {
  public:
   CSSRuleImpl(StyleBaseImpl* parent)
       : StyleBaseImpl(parent), m_type(CSSRule::UNKNOWN_RULE) {}
-
-  MAIN_THREAD_ALLOCATED;
 
   virtual bool isRule() { return true; }
   unsigned short type() const { return m_type; }
@@ -72,8 +70,6 @@ class CSSCharsetRuleImpl : public CSSRuleImpl {
     m_type = CSSRule::CHARSET_RULE;
   }
 
-  MAIN_THREAD_ALLOCATED;
-
   virtual bool isCharsetRule() { return true; }
   virtual DOMString cssText() const;
 
@@ -88,8 +84,6 @@ class CSSFontFaceRuleImpl : public CSSRuleImpl {
  public:
   CSSFontFaceRuleImpl(StyleBaseImpl* parent);
   virtual ~CSSFontFaceRuleImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -108,8 +102,6 @@ class CSSImportRuleImpl : public khtml::CachedObjectClient, public CSSRuleImpl {
                     const DOM::DOMString& href,
                     MediaListImpl* media);
   virtual ~CSSImportRuleImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   DOM::DOMString href() const { return m_strHref; }
   MediaListImpl* media() const { return m_lstMedia; }
@@ -141,8 +133,6 @@ class CSSRuleListImpl : public khtml::Shared<CSSRuleListImpl> {
   CSSRuleListImpl(StyleListImpl*);
   ~CSSRuleListImpl();
 
-  MAIN_THREAD_ALLOCATED;
-
   unsigned length() const { return m_lstCSSRules.count(); }
   CSSRuleImpl* item(unsigned index) { return m_lstCSSRules.at(index); }
 
@@ -163,8 +153,6 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
                    MediaListImpl* mediaList,
                    CSSRuleListImpl* ruleList);
   virtual ~CSSMediaRuleImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   MediaListImpl* media() const { return m_lstMedia; }
   CSSRuleListImpl* cssRules() { return m_lstCSSRules; }
@@ -188,8 +176,6 @@ class CSSPageRuleImpl : public CSSRuleImpl {
   CSSPageRuleImpl(StyleBaseImpl* parent);
   virtual ~CSSPageRuleImpl();
 
-  MAIN_THREAD_ALLOCATED;
-
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
   virtual bool isPageRule() { return true; }
@@ -207,8 +193,6 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
  public:
   CSSStyleRuleImpl(StyleBaseImpl* parent);
   virtual ~CSSStyleRuleImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSMutableStyleDeclarationImpl* style() const { return m_style; }
 
@@ -234,8 +218,6 @@ class CSSStyleRuleImpl : public CSSRuleImpl {
 class CSSUnknownRuleImpl : public CSSRuleImpl {
  public:
   CSSUnknownRuleImpl(StyleBaseImpl* parent) : CSSRuleImpl(parent) {}
-
-  MAIN_THREAD_ALLOCATED;
 
   virtual bool isUnknownRule() { return true; }
 };

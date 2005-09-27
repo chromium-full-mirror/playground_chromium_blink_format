@@ -26,15 +26,16 @@
 
 #include "misc/khtmllayout.h"
 #include "misc/shared.h"
-#include "misc/main_thread_malloc.h"
+#include <kxmlcore/FastMalloc.h>
 
 #define QT_ALLOC_QCHAR_VEC(N) \
-  static_cast<QChar*>(main_thread_malloc(sizeof(QChar) * (N)))
-#define QT_DELETE_QCHAR_VEC(P) main_thread_free((void*)(P))
+  static_cast<QChar*>(fastMalloc(sizeof(QChar) * (N)))
+#define QT_DELETE_QCHAR_VEC(P) fastFree(P)
 
 namespace DOM {
 
-class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
+class DOMStringImpl : public khtml::Shared<DOMStringImpl>,
+                      public FastAllocated {
  private:
   struct WithOneRef {};
   DOMStringImpl(WithOneRef) {
@@ -58,8 +59,6 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   DOMStringImpl(const char* str, unsigned int len);
   DOMStringImpl(const QChar& ch);
   ~DOMStringImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   unsigned hash() const {
     if (_hash == 0)

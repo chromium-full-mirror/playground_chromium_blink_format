@@ -159,7 +159,7 @@ class DOMNode : public DOMObject {
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
   DOMNode(DOM::NodeImpl* n);
-  khtml::SharedPtr<DOM::NodeImpl> m_impl;
+  SharedPtr<DOM::NodeImpl> m_impl;
 };
 
 DOM::NodeImpl* toNode(
@@ -193,7 +193,7 @@ class DOMNodeList : public DOMObject {
                               const Identifier&,
                               const PropertySlot& slot);
 
-  khtml::SharedPtr<DOM::NodeListImpl> m_impl;
+  SharedPtr<DOM::NodeListImpl> m_impl;
 };
 
 class DOMDocument : public DOMNode {
@@ -333,7 +333,7 @@ class DOMDOMImplementation : public DOMObject {
   DOM::DOMImplementationImpl* impl() const { return m_impl.get(); }
 
  private:
-  khtml::SharedPtr<DOM::DOMImplementationImpl> m_impl;
+  SharedPtr<DOM::DOMImplementationImpl> m_impl;
 };
 
 class DOMDocumentType : public DOMNode {
@@ -378,7 +378,7 @@ class DOMNamedNodeMap : public DOMObject {
                                const Identifier&,
                                const PropertySlot& slot);
 
-  khtml::SharedPtr<DOM::NamedNodeMapImpl> m_impl;
+  SharedPtr<DOM::NamedNodeMapImpl> m_impl;
 };
 
 class DOMProcessingInstruction : public DOMNode {
@@ -454,9 +454,8 @@ ObjectImp* getDOMExceptionConstructor(ExecState* exec);
 // when multiple nodes have the same name.
 class DOMNamedNodesCollection : public DOMObject {
  public:
-  DOMNamedNodesCollection(
-      ExecState* exec,
-      const QValueList<khtml::SharedPtr<DOM::NodeImpl>>& nodes);
+  DOMNamedNodesCollection(ExecState* exec,
+                          const QValueList<SharedPtr<DOM::NodeImpl>>& nodes);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
  private:
@@ -467,7 +466,7 @@ class DOMNamedNodesCollection : public DOMObject {
                                const Identifier&,
                                const PropertySlot& slot);
 
-  QValueList<khtml::SharedPtr<DOM::NodeImpl>> m_nodes;
+  QValueList<SharedPtr<DOM::NodeImpl>> m_nodes;
 };
 
 class DOMCharacterData : public DOMNode {

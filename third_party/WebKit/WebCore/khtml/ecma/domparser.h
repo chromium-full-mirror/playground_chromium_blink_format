@@ -34,7 +34,7 @@ class DOMParserConstructorImp : public ObjectImp {
   virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
-  khtml::SharedPtr<DOM::DocumentImpl> doc;
+  SharedPtr<DOM::DocumentImpl> doc;
 };
 
 class DOMParser : public DOMObject {

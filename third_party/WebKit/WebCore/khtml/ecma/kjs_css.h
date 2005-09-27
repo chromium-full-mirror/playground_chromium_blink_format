@@ -77,7 +77,7 @@ class DOMCSSStyleDeclaration : public DOMObject {
                                      const Identifier&,
                                      const PropertySlot&);
 
-  khtml::SharedPtr<DOM::CSSStyleDeclarationImpl> m_impl;
+  SharedPtr<DOM::CSSStyleDeclarationImpl> m_impl;
 };
 
 ValueImp* getDOMCSSStyleDeclaration(ExecState* exec,
@@ -104,7 +104,7 @@ class DOMStyleSheet : public DOMObject {
   DOMStyleSheet(DOM::StyleSheetImpl* ss) : m_impl(ss) {}
 
  private:
-  khtml::SharedPtr<DOM::StyleSheetImpl> m_impl;
+  SharedPtr<DOM::StyleSheetImpl> m_impl;
 };
 
 ValueImp* getDOMStyleSheet(ExecState* exec, DOM::StyleSheetImpl* ss);
@@ -133,8 +133,8 @@ class DOMStyleSheetList : public DOMObject {
                               const Identifier&,
                               const PropertySlot&);
 
-  khtml::SharedPtr<DOM::StyleSheetListImpl> m_impl;
-  khtml::SharedPtr<DOM::DocumentImpl> m_doc;
+  SharedPtr<DOM::StyleSheetListImpl> m_impl;
+  SharedPtr<DOM::DocumentImpl> m_doc;
 };
 
 // The document is only used for get-stylesheet-by-name (make optional if
@@ -163,7 +163,7 @@ class DOMMediaList : public DOMObject {
   static ValueImp* indexGetter(ExecState* exec,
                                const Identifier&,
                                const PropertySlot& slot);
-  khtml::SharedPtr<DOM::MediaListImpl> m_impl;
+  SharedPtr<DOM::MediaListImpl> m_impl;
 };
 
 ValueImp* getDOMMediaList(ExecState* exec, DOM::MediaListImpl* ml);
@@ -197,7 +197,7 @@ class DOMCSSRuleList : public DOMObject {
                                const Identifier&,
                                const PropertySlot& slot);
 
-  khtml::SharedPtr<DOM::CSSRuleListImpl> m_impl;
+  SharedPtr<DOM::CSSRuleListImpl> m_impl;
 };
 
 ValueImp* getDOMCSSRuleList(ExecState* exec, DOM::CSSRuleListImpl* rl);
@@ -239,7 +239,7 @@ class DOMCSSRule : public DOMObject {
   DOM::CSSRuleImpl* impl() const { return m_impl.get(); }
 
  private:
-  khtml::SharedPtr<DOM::CSSRuleImpl> m_impl;
+  SharedPtr<DOM::CSSRuleImpl> m_impl;
 };
 
 ValueImp* getDOMCSSRule(ExecState* exec, DOM::CSSRuleImpl* r);
@@ -286,7 +286,7 @@ class DOMCSSValue : public DOMObject {
   DOMCSSValue(DOM::CSSValueImpl* v) : m_impl(v) {}
 
  private:
-  khtml::SharedPtr<DOM::CSSValueImpl> m_impl;
+  SharedPtr<DOM::CSSValueImpl> m_impl;
 };
 
 ValueImp* getDOMCSSValue(ExecState* exec, DOM::CSSValueImpl* v);
@@ -384,7 +384,7 @@ class DOMRect : public DOMObject {
   enum { Top, Right, Bottom, Left };
 
  private:
-  khtml::SharedPtr<DOM::RectImpl> m_rect;
+  SharedPtr<DOM::RectImpl> m_rect;
 };
 
 ValueImp* getDOMRect(ExecState* exec, DOM::RectImpl* r);
@@ -401,7 +401,7 @@ class DOMCounter : public DOMObject {
   enum { identifier, listStyle, separator };
 
  protected:
-  khtml::SharedPtr<DOM::CounterImpl> m_counter;
+  SharedPtr<DOM::CounterImpl> m_counter;
 };
 
 ValueImp* getDOMCounter(ExecState* exec, DOM::CounterImpl* c);

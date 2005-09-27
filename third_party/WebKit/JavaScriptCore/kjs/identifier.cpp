@@ -38,7 +38,7 @@
 
 #include "identifier.h"
 
-#include "fast_malloc.h"
+#include <kxmlcore/FastMalloc.h>
 #include <string.h>  // for strlen
 #include <new>       // for placement new
 
@@ -127,7 +127,7 @@ UString::Rep* Identifier::add(const char* c) {
     i = (i + 1) & _tableSizeMask;
   }
 
-  UChar* d = static_cast<UChar*>(kjs_fast_malloc(sizeof(UChar) * length));
+  UChar* d = static_cast<UChar*>(fastMalloc(sizeof(UChar) * length));
   for (int j = 0; j != length; j++)
     d[j] = c[j];
 
@@ -165,7 +165,7 @@ UString::Rep* Identifier::add(const UChar* s, int length) {
     i = (i + 1) & _tableSizeMask;
   }
 
-  UChar* d = static_cast<UChar*>(kjs_fast_malloc(sizeof(UChar) * length));
+  UChar* d = static_cast<UChar*>(fastMalloc(sizeof(UChar) * length));
   for (int j = 0; j != length; j++)
     d[j] = s[j];
 

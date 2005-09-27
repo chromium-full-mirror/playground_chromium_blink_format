@@ -250,10 +250,8 @@ class CSSQuirkPrimitiveValueImpl : public CSSPrimitiveValueImpl {
   virtual bool isQuirkValue() { return true; }
 };
 
-class CounterImpl : public khtml::Shared<CounterImpl> {
+class CounterImpl : public khtml::Shared<CounterImpl>, public FastAllocated {
  public:
-  MAIN_THREAD_ALLOCATED;
-
   DOMString identifier() const { return m_identifier; }
   DOMString listStyle() const { return m_listStyle; }
   DOMString separator() const { return m_separator; }
@@ -263,12 +261,10 @@ class CounterImpl : public khtml::Shared<CounterImpl> {
   DOMString m_separator;
 };
 
-class RectImpl : public khtml::Shared<RectImpl> {
+class RectImpl : public khtml::Shared<RectImpl>, public FastAllocated {
  public:
   RectImpl();
   virtual ~RectImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSPrimitiveValueImpl* top() const { return m_top; }
   CSSPrimitiveValueImpl* right() const { return m_right; }
@@ -294,12 +290,10 @@ class RectImpl : public khtml::Shared<RectImpl> {
 // border-radius, but (FIXME) border-spacing and background-position could be
 // converted over to use it
 // (eliminating some extra -khtml- internal properties).
-class PairImpl : public khtml::Shared<PairImpl> {
+class PairImpl : public khtml::Shared<PairImpl>, public FastAllocated {
  public:
   PairImpl();
   virtual ~PairImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSPrimitiveValueImpl* first() const { return m_first; }
   CSSPrimitiveValueImpl* second() const { return m_second; }
@@ -347,8 +341,6 @@ class CSSImageValueImpl : public CSSPrimitiveValueImpl,
   CSSImageValueImpl(const DOMString& url, StyleBaseImpl* style);
   virtual ~CSSImageValueImpl();
 
-  MAIN_THREAD_ALLOCATED;
-
   khtml::CachedImage* image(khtml::DocLoader* loader);
 
  protected:
@@ -364,8 +356,6 @@ class CSSBorderImageValueImpl : public CSSValueImpl {
                           int horizontalRule,
                           int verticalRule);
   virtual ~CSSBorderImageValueImpl();
-
-  MAIN_THREAD_ALLOCATED;
 
   virtual DOMString cssText() const;
   virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
@@ -441,7 +431,7 @@ class ShadowValueImpl : public CSSValueImpl {
 // ------------------------------------------------------------------------------
 
 // another helper class
-class CSSProperty {
+class CSSProperty : public FastAllocated {
  public:
   CSSProperty() : m_id(-1), m_bImportant(false), m_value(0) {}
   CSSProperty(int propID, CSSValueImpl* value, bool important = false)
@@ -470,8 +460,6 @@ class CSSProperty {
     if (m_value)
       m_value->deref();
   }
-
-  MAIN_THREAD_ALLOCATED;
 
   void setValue(CSSValueImpl* val) {
     if (val)

@@ -841,7 +841,7 @@ class HTMLCollection : public DOMObject {
   DOM::HTMLCollectionImpl* impl() const { return m_impl.get(); }
 
  protected:
-  khtml::SharedPtr<DOM::HTMLCollectionImpl> m_impl;
+  SharedPtr<DOM::HTMLCollectionImpl> m_impl;
 
  private:
   static ValueImp* lengthGetter(ExecState* exec,
@@ -871,7 +871,7 @@ class HTMLSelectCollection : public HTMLCollection {
                                        const Identifier&,
                                        const PropertySlot& slot);
 
-  khtml::SharedPtr<DOM::HTMLSelectElementImpl> m_element;
+  SharedPtr<DOM::HTMLSelectElementImpl> m_element;
 };
 
 ////////////////////// Option Object ////////////////////////
@@ -883,7 +883,7 @@ class OptionConstructorImp : public ObjectImp {
   virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
-  khtml::SharedPtr<DOM::DocumentImpl> m_doc;
+  SharedPtr<DOM::DocumentImpl> m_doc;
 };
 
 ////////////////////// Image Object ////////////////////////
@@ -895,7 +895,7 @@ class ImageConstructorImp : public ObjectImp {
   virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
-  khtml::SharedPtr<DOM::DocumentImpl> m_doc;
+  SharedPtr<DOM::DocumentImpl> m_doc;
 };
 
 class Image : public DOMObject, public khtml::CachedObjectClient {
@@ -1019,7 +1019,7 @@ class Context2D : public DOMObject {
 
   void setShadow(ExecState* exec);
 
-  khtml::SharedPtr<DOM::HTMLElementImpl> _element;
+  SharedPtr<DOM::HTMLElementImpl> _element;
   bool _needsFlushRasterCache;
 
   QPtrList<List> stateStack;

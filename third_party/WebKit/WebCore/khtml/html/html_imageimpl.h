@@ -230,7 +230,7 @@ class HTMLMapElementImpl : public HTMLElementImpl {
                      int height_,
                      khtml::RenderObject::NodeInfo& info);
 
-  khtml::SharedPtr<HTMLCollectionImpl> areas();
+  SharedPtr<HTMLCollectionImpl> areas();
 
   DOMString name() const;
   void setName(const DOMString&);

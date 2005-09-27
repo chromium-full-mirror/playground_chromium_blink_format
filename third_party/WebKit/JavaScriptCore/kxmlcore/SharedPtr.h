@@ -1,4 +1,4 @@
-// -*- c-basic-offset: 4 -*-
+// -*- mode: c++; c-basic-offset: 4 -*-
 /*
  *  This file is part of the KDE libraries
  *  Copyright (C) 2005 Apple Computer, Inc.
@@ -110,10 +110,12 @@ template <class T>
 inline bool operator==(const SharedPtr<T>& a, const SharedPtr<T>& b) {
   return a.get() == b.get();
 }
+
 template <class T>
 inline bool operator==(const SharedPtr<T>& a, const T* b) {
   return a.get() == b;
 }
+
 template <class T>
 inline bool operator==(const T* a, const SharedPtr<T>& b) {
   return a == b.get();
@@ -123,10 +125,12 @@ template <class T>
 inline bool operator!=(const SharedPtr<T>& a, const SharedPtr<T>& b) {
   return a.get() != b.get();
 }
+
 template <class T>
 inline bool operator!=(const SharedPtr<T>& a, const T* b) {
   return a.get() != b;
 }
+
 template <class T>
 inline bool operator!=(const T* a, const SharedPtr<T>& b) {
   return a != b.get();
@@ -136,10 +140,16 @@ template <class T, class U>
 inline SharedPtr<T> static_pointer_cast(const SharedPtr<U>& p) {
   return SharedPtr<T>(static_cast<T*>(p.get()));
 }
+
 template <class T, class U>
 inline SharedPtr<T> const_pointer_cast(const SharedPtr<U>& p) {
   return SharedPtr<T>(const_cast<T*>(p.get()));
 }
-}
+
+}  // namespace KXMLCore
+
+using KXMLCore::SharedPtr;
+using KXMLCore::static_pointer_cast;
+using KXMLCore::const_pointer_cast;
 
 #endif  // KXMLCORE_SHARED_PTR_H

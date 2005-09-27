@@ -46,12 +46,10 @@ class CSSStyleRuleImpl;
 
 class DocumentImpl;
 
-struct CSSNamespace {
+struct CSSNamespace : public FastAllocated {
   AtomicString m_prefix;
   AtomicString m_uri;
   CSSNamespace* m_parent;
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSNamespace(const AtomicString& p,
                const AtomicString& u,
@@ -72,7 +70,7 @@ struct CSSNamespace {
 };
 
 // this class represents a selector for a StyleRule
-class CSSSelector {
+class CSSSelector : public FastAllocated {
  public:
   CSSSelector()
       : tagHistory(0),
@@ -101,8 +99,6 @@ class CSSSelector {
     delete simpleSelector;
     delete nextSelector;
   }
-
-  MAIN_THREAD_ALLOCATED;
 
   void append(CSSSelector* n) {
     if (!nextSelector)
@@ -208,7 +204,8 @@ class CSSSelector {
 };
 
 // a style class which has a parent (almost all have)
-class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
+class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl>,
+                      public FastAllocated {
  public:
   StyleBaseImpl() {
     m_parent = 0;
@@ -222,8 +219,6 @@ class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
   }
 
   virtual ~StyleBaseImpl() {}
-
-  MAIN_THREAD_ALLOCATED;
 
   // returns the url of the style sheet this object belongs to
   DOMString baseURL();

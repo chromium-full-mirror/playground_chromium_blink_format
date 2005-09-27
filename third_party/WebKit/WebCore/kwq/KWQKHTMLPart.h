@@ -516,9 +516,8 @@ class KWQKHTMLPart : public KHTMLPart {
   WebScriptObject* _windowScriptObject;
   NPObject* _windowScriptNPObject;
 
-  khtml::SharedPtr<DOM::NodeImpl> _dragSrc;  // element that may be a drag
-                                             // source, for the current mouse
-                                             // gesture
+  SharedPtr<DOM::NodeImpl> _dragSrc;  // element that may be a drag source, for
+                                      // the current mouse gesture
   bool _dragSrcIsLink;
   bool _dragSrcIsImage;
   bool _dragSrcInSelection;
@@ -527,9 +526,9 @@ class KWQKHTMLPart : public KHTMLPart {
   bool _dragSrcIsDHTML;
   KWQClipboard* _dragClipboard;  // used on only the source side of dragging
 
-  mutable khtml::SharedPtr<DOM::NodeImpl> _elementToDraw;
+  mutable SharedPtr<DOM::NodeImpl> _elementToDraw;
 
-  khtml::SharedPtr<DOM::RangeImpl> m_markedTextRange;
+  SharedPtr<DOM::RangeImpl> m_markedTextRange;
   bool m_markedTextUsesUnderlines;
   QValueList<MarkedTextUnderline> m_markedTextUnderlines;
 

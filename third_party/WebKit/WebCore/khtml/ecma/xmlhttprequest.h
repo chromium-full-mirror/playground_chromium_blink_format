@@ -59,7 +59,7 @@ class XMLHttpRequestConstructorImp : public ObjectImp {
   virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
-  khtml::SharedPtr<DOM::DocumentImpl> doc;
+  SharedPtr<DOM::DocumentImpl> doc;
 };
 
 class XMLHttpRequest : public DOMObject {
@@ -147,8 +147,8 @@ class XMLHttpRequest : public DOMObject {
   KIO::TransferJob* job;
 
   XMLHttpRequestState state;
-  khtml::SharedPtr<JSUnprotectedEventListener> onReadyStateChangeListener;
-  khtml::SharedPtr<JSUnprotectedEventListener> onLoadListener;
+  SharedPtr<JSUnprotectedEventListener> onReadyStateChangeListener;
+  SharedPtr<JSUnprotectedEventListener> onLoadListener;
 
   khtml::Decoder* decoder;
   QString encoding;
@@ -158,7 +158,7 @@ class XMLHttpRequest : public DOMObject {
   QString response;
   mutable bool createdDocument;
   mutable bool typeIsXML;
-  mutable khtml::SharedPtr<DOM::DocumentImpl> responseXML;
+  mutable SharedPtr<DOM::DocumentImpl> responseXML;
 
   bool aborted;
 };

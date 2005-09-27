@@ -94,7 +94,7 @@ class DeclaredFunctionImp : public FunctionImp {
 
   virtual Completion execute(ExecState* exec);
   CodeType codeType() const { return FunctionCode; }
-  KXMLCore::SharedPtr<FunctionBodyNode> body;
+  SharedPtr<FunctionBodyNode> body;
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;

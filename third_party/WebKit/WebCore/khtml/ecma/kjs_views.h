@@ -42,7 +42,7 @@ class DOMAbstractView : public DOMObject {
   enum { Document, GetComputedStyle };
 
  private:
-  khtml::SharedPtr<DOM::AbstractViewImpl> m_impl;
+  SharedPtr<DOM::AbstractViewImpl> m_impl;
 };
 
 ValueImp* getDOMAbstractView(ExecState* exec, DOM::AbstractViewImpl* av);

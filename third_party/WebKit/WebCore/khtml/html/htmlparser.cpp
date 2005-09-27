@@ -47,7 +47,7 @@
 #include "htmlfactory.h"
 #include "xml/dom_textimpl.h"
 #include "xml/dom_nodeimpl.h"
-#include "misc/main_thread_malloc.h"
+#include <kxmlcore/FastMalloc.h>
 #include "misc/hashset.h"
 #include "html/htmltokenizer.h"
 #include "khtmlview.h"
@@ -71,7 +71,7 @@ using namespace khtml;
 /**
  * @internal
  */
-class HTMLStackElem {
+class HTMLStackElem : public FastAllocated {
  public:
   HTMLStackElem(const AtomicString& _tagName,
                 int _level,
@@ -82,8 +82,6 @@ class HTMLStackElem {
         strayTableContent(false),
         node(_node),
         next(_next) {}
-
-  MAIN_THREAD_ALLOCATED;
 
   AtomicString tagName;
   int level;

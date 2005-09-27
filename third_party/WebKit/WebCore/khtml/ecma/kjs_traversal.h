@@ -56,7 +56,7 @@ class DOMNodeIterator : public DOMObject {
   DOM::NodeIteratorImpl* impl() const { return m_impl.get(); }
 
  private:
-  khtml::SharedPtr<DOM::NodeIteratorImpl> m_impl;
+  SharedPtr<DOM::NodeIteratorImpl> m_impl;
 };
 
 // Constructor object NodeFilter
@@ -83,7 +83,7 @@ class DOMNodeFilter : public DOMObject {
   enum { AcceptNode };
 
  private:
-  khtml::SharedPtr<DOM::NodeFilterImpl> m_impl;
+  SharedPtr<DOM::NodeFilterImpl> m_impl;
 };
 
 class DOMTreeWalker : public DOMObject {
@@ -117,7 +117,7 @@ class DOMTreeWalker : public DOMObject {
   DOM::TreeWalkerImpl* impl() const { return m_impl.get(); }
 
  private:
-  khtml::SharedPtr<DOM::TreeWalkerImpl> m_impl;
+  SharedPtr<DOM::TreeWalkerImpl> m_impl;
 };
 
 ValueImp* getDOMNodeIterator(ExecState* exec, DOM::NodeIteratorImpl* ni);

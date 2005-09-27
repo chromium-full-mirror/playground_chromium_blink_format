@@ -29,7 +29,7 @@
 #include "rendering/render_style.h"
 #include "dom/dom_string.h"
 #include "css/css_ruleimpl.h"
-#include "misc/main_thread_malloc.h"
+#include <kxmlcore/FastMalloc.h>
 
 class KHTMLSettings;
 class KHTMLView;
@@ -62,7 +62,7 @@ class RenderStyle;
  * CSSStyleSelector
  * exists, but someone may wish to implement XSL...
  */
-class StyleSelector {
+class StyleSelector : public FastAllocated {
  public:
   StyleSelector(){};
 
@@ -71,8 +71,6 @@ class StyleSelector {
   */
   // 	virtual ~StyleSelector() {};
   // 	virtual RenderStyle *styleForElement(DOM::ElementImpl *e) = 0;
-
-  MAIN_THREAD_ALLOCATED;
 
   enum State {
     None = 0x00,
@@ -240,7 +238,7 @@ class CSSStyleSelector : public StyleSelector {
   void applyProperty(int id, DOM::CSSValueImpl* value);
 };
 
-class CSSRuleData {
+class CSSRuleData : public FastAllocated {
  public:
   CSSRuleData(uint pos,
               DOM::CSSStyleRuleImpl* r,
@@ -251,8 +249,6 @@ class CSSRuleData {
       prev->m_next = this;
   }
   ~CSSRuleData() { delete m_next; }
-
-  MAIN_THREAD_ALLOCATED;
 
   uint position() { return m_position; }
   DOM::CSSStyleRuleImpl* rule() { return m_rule; }
@@ -266,7 +262,7 @@ class CSSRuleData {
   CSSRuleData* m_next;
 };
 
-class CSSRuleDataList {
+class CSSRuleDataList : public FastAllocated {
  public:
   CSSRuleDataList(uint pos,
                   DOM::CSSStyleRuleImpl* rule,
@@ -274,8 +270,6 @@ class CSSRuleDataList {
     m_first = m_last = new CSSRuleData(pos, rule, sel);
   }
   ~CSSRuleDataList() { delete m_first; }
-
-  MAIN_THREAD_ALLOCATED;
 
   CSSRuleData* first() { return m_first; }
   CSSRuleData* last() { return m_last; }
@@ -289,12 +283,10 @@ class CSSRuleDataList {
   CSSRuleData* m_last;
 };
 
-class CSSRuleSet {
+class CSSRuleSet : public FastAllocated {
  public:
   CSSRuleSet();
   ~CSSRuleSet();
-
-  MAIN_THREAD_ALLOCATED;
 
   typedef HashMap<DOM::DOMStringImpl*,
                   CSSRuleDataList*,
