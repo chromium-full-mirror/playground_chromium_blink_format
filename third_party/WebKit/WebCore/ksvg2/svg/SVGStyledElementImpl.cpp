@@ -216,25 +216,25 @@ void SVGStyledElementImpl::attach() {
       finalizeStyle(renderingStyle);
 
       // Apply transformations if possible...
-      SVGLocatableImpl* transformable = dynamic_cast<SVGLocatableImpl*>(this);
-      if (transformable) {
-        SVGMatrixImpl* ctm = transformable->getScreenCTM();
+      SVGLocatableImpl* locatable = dynamic_cast<SVGLocatableImpl*>(this);
+      if (locatable) {
+        SVGMatrixImpl* ctm = locatable->getScreenCTM();
         renderingStyle->setObjectMatrix(KCanvasMatrix(ctm->qmatrix()));
         ctm->deref();
       }
 
-      SVGStyledElementImpl* parent =
-          dynamic_cast<SVGStyledElementImpl*>(parentNode());
-      if (parent && parent->canvasItem() && parent->allowAttachChildren(this))
-        parent->canvasItem()->appendItem(m_canvasItem);
-      else if (parent) {
+      SVGElementImpl* parentElement = svg_dynamic_cast(parentNode());
+      SVGStyledElementImpl* styledParent = NULL;
+      if (parentElement && parentElement->isStyled())
+        styledParent = static_cast<SVGStyledElementImpl*>(parentElement);
+      if (styledParent && styledParent->canvasItem() &&
+          styledParent->allowAttachChildren(this))
+        styledParent->canvasItem()->appendItem(m_canvasItem);
+      else if (styledParent) {
         // FIXME: This exists until we can find a better way to create the root
         // node. -- ecs 8/7/05
         fprintf(stderr, "FAILED CANVAS INSERTION: <%s>, leaking %p\n",
                 KDOM::DOMString(nodeName()).string().ascii(), this);
-        // delete m_canvasItem; // FIXME leaking items here, until we find a fix
-        // for patterns.
-        // m_canvasItem = NULL;
       }
 
 #ifndef APPLE_COMPILE_HACK
@@ -263,10 +263,13 @@ void SVGStyledElementImpl::detach() {
                  << KDOM::DOMString(localName()) << endl;
 
   if (m_canvasItem) {
-    SVGStyledElementImpl* parent =
-        dynamic_cast<SVGStyledElementImpl*>(parentNode());
-    if (parent && parent->canvasItem())
-      parent->canvasItem()->removeItem(m_canvasItem);
+    SVGElementImpl* parent = svg_dynamic_cast(parentNode());
+    SVGStyledElementImpl* styled = NULL;
+    if (parent && parent->isStyled())
+      styled = static_cast<SVGStyledElementImpl*>(parent);
+
+    if (styled && styled->canvasItem())
+      styled->canvasItem()->removeItem(m_canvasItem);
   }
 
   kdDebug(26002) << "[SVGStyledElementImpl::detach] Detached canvas item: "

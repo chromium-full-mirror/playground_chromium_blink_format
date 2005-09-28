@@ -41,6 +41,7 @@ DOMImplementationLSImpl::~DOMImplementationLSImpl() {}
 LSParserImpl* DOMImplementationLSImpl::createLSParser(
     unsigned short mode,
     DOMStringImpl* schemaTypeImpl) const {
+#ifndef APPLE_COMPILE_HACK
   QString schemaType = schemaTypeImpl ? schemaTypeImpl->string() : QString();
 
   // NOT_SUPPORTED_ERR: Raised if the requested mode or schema type is not
@@ -53,6 +54,9 @@ LSParserImpl* DOMImplementationLSImpl::createLSParser(
   LSParserImpl* ret = new LSParserImpl();
   ret->setASync(mode == MODE_ASYNCHRONOUS);
   return ret;
+#else
+  throw new DOMExceptionImpl(NOT_SUPPORTED_ERR);
+#endif
 }
 
 LSInputImpl* DOMImplementationLSImpl::createLSInput() const {

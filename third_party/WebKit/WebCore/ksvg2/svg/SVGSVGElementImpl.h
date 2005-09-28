@@ -64,6 +64,8 @@ class SVGSVGElementImpl : public SVGStyledElementImpl,
                     KDOM::DOMStringImpl* prefix);
   virtual ~SVGSVGElementImpl();
 
+  virtual bool isSVG() const { return true; }
+
   // 'SVGSVGElement' functions
   SVGAnimatedLengthImpl* x() const;
   SVGAnimatedLengthImpl* y() const;

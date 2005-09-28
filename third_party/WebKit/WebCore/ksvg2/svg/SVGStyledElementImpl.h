@@ -46,6 +46,8 @@ class SVGStyledElementImpl : public SVGElementImpl, public SVGStylableImpl {
                        KDOM::DOMStringImpl* prefix);
   virtual ~SVGStyledElementImpl();
 
+  virtual bool isStyled() const { return true; }
+
   // 'SVGStylable' functions
   virtual SVGAnimatedStringImpl* className() const;
   virtual KDOM::CSSStyleDeclarationImpl* style();

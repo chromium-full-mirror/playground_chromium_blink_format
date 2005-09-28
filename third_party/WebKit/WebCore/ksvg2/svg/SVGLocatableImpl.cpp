@@ -96,9 +96,8 @@ SVGMatrixImpl* SVGLocatableImpl::getCTM() const {
 
   SVGMatrixImpl* ctm = SVGSVGElementImpl::createSVGMatrix();
 
-  KDOM::NodeImpl* parent = element->parentNode();
-  if (parent && parent->nodeType() == KDOM::ELEMENT_NODE) {
-    SVGElementImpl* parentElement = static_cast<SVGElementImpl*>(parent);
+  SVGElementImpl* parentElement = svg_dynamic_cast(element->parentNode());
+  if (parentElement) {
     SVGLocatableImpl* parentLocatable =
         dynamic_cast<SVGLocatableImpl*>(parentElement);
     if (parentLocatable) {

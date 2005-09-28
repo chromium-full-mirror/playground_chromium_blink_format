@@ -42,9 +42,9 @@ float SVGHelper::PercentageOfViewport(float value,
   if (!viewportElement)
     return 0.0;
 
-  const SVGSVGElementImpl* svg =
-      dynamic_cast<const SVGSVGElementImpl*>(viewportElement);
-  if (svg) {
+  if (viewportElement->isSVG()) {
+    const SVGSVGElementImpl* svg =
+        static_cast<const SVGSVGElementImpl*>(viewportElement);
     KDOM::DOMString viewBox("viewBox");
     if (svg->hasAttribute(viewBox.handle())) {
       width = svg->viewBox()->baseVal()->width();

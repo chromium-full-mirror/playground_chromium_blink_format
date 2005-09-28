@@ -104,11 +104,8 @@ Ecma::Ecma(KDOM::DocumentImpl* doc) : KDOM::Ecma(doc) {}
 Ecma::~Ecma() {}
 
 void Ecma::setupDocument(KDOM::DocumentImpl* document) {
-  SVGDocumentImpl* svgDocument = dynamic_cast<SVGDocumentImpl*>(document);
-  if (!svgDocument) {
-    kdFatal() << "Ecma::setupDocument -> The impossible happened..." << endl;
-    return;
-  }
+  ASSERT(KDOM::DOMString(document->namespaceURI()) == NS_SVG)
+  SVGDocumentImpl* svgDocument = static_cast<SVGDocumentImpl*>(document);
 
   // Create base bridge for document
   SVGDocument docObj(svgDocument);
