@@ -30,8 +30,7 @@
 
 #include <qptrvector.h>
 #include <qmemarray.h>
-#include "hashtable.h"
-#include "pointerhash.h"
+#include <kxmlcore/HashMap.h>
 
 class KHTMLView;
 class QTextCodec;
@@ -145,9 +144,11 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   bool m_inreset : 1;
   bool m_malformed : 1;
 
-  khtml::HashMap<DOMStringImpl*,
-                 HTMLInputElementImpl*,
-                 khtml::PointerHash<DOMStringImpl*>>* m_selectedRadioButtons;
+  typedef HashMap<DOMStringImpl*,
+                  HTMLInputElementImpl*,
+                  PointerHash<DOMStringImpl*>>
+      NameToInputMap;
+  NameToInputMap* m_selectedRadioButtons;
 
  private:
   void parseEnctype(const DOMString&);

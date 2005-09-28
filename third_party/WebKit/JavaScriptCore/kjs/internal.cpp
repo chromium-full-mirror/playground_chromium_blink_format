@@ -34,7 +34,6 @@
 #include "error_object.h"
 #include "function_object.h"
 #include "internal.h"
-#include "interpreter_map.h"
 #include "lexer.h"
 #include "math_object.h"
 #include "nodes.h"
@@ -44,6 +43,8 @@
 #include "operations.h"
 #include "regexp_object.h"
 #include "string_object.h"
+
+#include <kxmlcore/HashMap.h>
 
 #if WIN32
 #include <float.h>
@@ -417,6 +418,14 @@ void InterpreterImp::globalClear() {
   ConstantValues::clear();
 }
 
+typedef HashMap<ObjectImp*, InterpreterImp*, PointerHash<ObjectImp*>>
+    InterpreterMap;
+
+static inline InterpreterMap& interpreterMap() {
+  static InterpreterMap* map = new InterpreterMap;
+  return *map;
+}
+
 InterpreterImp::InterpreterImp(Interpreter* interp, ObjectImp* glob)
     : globExec(interp, 0), _context(0) {
   // add this interpreter to the global chain
@@ -435,7 +444,7 @@ InterpreterImp::InterpreterImp(Interpreter* interp, ObjectImp* glob)
     globalInit();
   }
 
-  InterpreterMap::setInterpreterForGlobalObject(this, glob);
+  interpreterMap().set(glob, this);
 
   global = glob;
   dbg = 0;
@@ -659,7 +668,7 @@ void InterpreterImp::clear() {
     s_hook = 0L;
     globalClear();
   }
-  InterpreterMap::removeInterpreterForGlobalObject(global);
+  interpreterMap().remove(global);
 }
 
 void InterpreterImp::mark() {
@@ -840,7 +849,7 @@ void InterpreterImp::restoreBuiltins(const SavedBuiltins& builtins) {
 }
 
 InterpreterImp* InterpreterImp::interpreterWithGlobalObject(ObjectImp* global) {
-  return InterpreterMap::getInterpreterForGlobalObject(global);
+  return interpreterMap().get(global);
 }
 
 // ------------------------------ InternalFunctionImp --------------------------
