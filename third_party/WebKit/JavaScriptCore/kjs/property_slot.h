@@ -107,4 +107,4 @@ class PropertySlot {
 };
 }
 
-#endif _KJS_PROPERTY_SLOT_H_
+#endif  // KJS_PROPERTY_SLOT_H
