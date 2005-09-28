@@ -56,19 +56,21 @@ using namespace KJS;
       exec->dynamicInterpreter()->imp()->debugger()->imp()->aborted()) \
     return Completion(Normal);
 
-#define KJS_CHECKEXCEPTION                       \
-  if (exec->hadException()) {                    \
-    setExceptionDetailsIfNeeded(exec);           \
-    return Completion(Throw, exec->exception()); \
-  }                                              \
-  if (Collector::outOfMemory())                  \
-    return Completion(Throw,                     \
+#define KJS_CHECKEXCEPTION             \
+  if (exec->hadException()) {          \
+    setExceptionDetailsIfNeeded(exec); \
+    ValueImp* ex = exec->exception();  \
+    exec->clearException();            \
+    return Completion(Throw, ex);      \
+  }                                    \
+  if (Collector::outOfMemory())        \
+    return Completion(Throw,           \
                       Error::create(exec, GeneralError, "Out of memory"));
 
 #define KJS_CHECKEXCEPTIONVALUE        \
   if (exec->hadException()) {          \
     setExceptionDetailsIfNeeded(exec); \
-    return exec->exception();          \
+    return Undefined();                \
   }                                    \
   if (Collector::outOfMemory())        \
     return Undefined();  // will be picked up by KJS_CHECKEXCEPTION
@@ -81,10 +83,6 @@ using namespace KJS;
   if (Collector::outOfMemory())        \
     return List();  // will be picked up by KJS_CHECKEXCEPTION
 
-#ifdef KJS_DEBUG_MEM
-std::list<Node*>* Node::s_nodes = 0L;
-#endif
-
 // ------------------------------ Node -----------------------------------------
 
 Node::Node() {
@@ -96,27 +94,31 @@ Node::Node() {
 
 Node::~Node() {}
 
-#ifdef KJS_DEBUG_MEM
-void Node::finalCheck() {
-  fprintf(stderr, "Node::finalCheck(): list count       : %d\n",
-          (int)s_nodes.size());
-  std::list<Node*>::iterator it = s_nodes->begin();
-  for (unsigned i = 0; it != s_nodes->end(); ++it, ++i)
-    fprintf(stderr, "[%d] Still having node %p (%s) (refcount %d)\n", i,
-            (void*)*it, typeid(**it).name(), (*it)->refcount);
-  delete s_nodes;
-  s_nodes = 0L;
-}
-#endif
-
-ValueImp* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
-  return KJS::throwError(exec, e, msg, lineNo(), sourceId(), &sourceURL);
-}
-
 static void substitute(UString& string, const UString& substring) {
   int position = string.find("%s");
   assert(position != -1);
   string = string.substr(0, position) + substring + string.substr(position + 2);
+}
+
+Completion Node::createErrorCompletion(ExecState* exec,
+                                       ErrorType e,
+                                       const char* msg) {
+  return Completion(
+      Throw, Error::create(exec, e, msg, lineNo(), sourceId(), &sourceURL));
+}
+
+Completion Node::createErrorCompletion(ExecState* exec,
+                                       ErrorType e,
+                                       const char* msg,
+                                       const Identifier& ident) {
+  UString message = msg;
+  substitute(message, ident.ustring());
+  return Completion(
+      Throw, Error::create(exec, e, message, lineNo(), sourceId(), &sourceURL));
+}
+
+ValueImp* Node::throwError(ExecState* exec, ErrorType e, const char* msg) {
+  return KJS::throwError(exec, e, msg, lineNo(), sourceId(), &sourceURL);
 }
 
 ValueImp* Node::throwError(ExecState* exec,
@@ -176,6 +178,11 @@ ValueImp* Node::throwError(ExecState* exec,
   return KJS::throwError(exec, e, message, lineNo(), sourceId(), &sourceURL);
 }
 
+ValueImp* Node::throwUndefinedVariableError(ExecState* exec,
+                                            const Identifier& ident) {
+  return throwError(exec, ReferenceError, "Can't find variable: %s", ident);
+}
+
 void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
   ValueImp* exceptionValue = exec->exception();
   if (exceptionValue->isObject()) {
@@ -186,6 +193,10 @@ void Node::setExceptionDetailsIfNeeded(ExecState* exec) {
       exception->put(exec, "sourceURL", String(sourceURL));
     }
   }
+}
+
+Node* Node::nodeInsideAllParens() {
+  return this;
 }
 
 // ------------------------------ StatementNode --------------------------------
@@ -207,38 +218,29 @@ bool StatementNode::hitStatement(ExecState* exec) {
     return true;  // continue
 }
 
-// return true if the debugger wants us to stop at this point
-bool StatementNode::abortStatement(ExecState* exec) {
-  Debugger* dbg = exec->dynamicInterpreter()->imp()->debugger();
-  if (dbg)
-    return dbg->imp()->aborted();
-  else
-    return false;
-}
-
 void StatementNode::processFuncDecl(ExecState* exec) {}
 
 // ------------------------------ NullNode -------------------------------------
 
-ValueImp* NullNode::evaluate(ExecState* /*exec*/) {
+ValueImp* NullNode::evaluate(ExecState*) {
   return Null();
 }
 
 // ------------------------------ BooleanNode ----------------------------------
 
-ValueImp* BooleanNode::evaluate(ExecState* /*exec*/) {
+ValueImp* BooleanNode::evaluate(ExecState*) {
   return jsBoolean(value);
 }
 
 // ------------------------------ NumberNode -----------------------------------
 
-ValueImp* NumberNode::evaluate(ExecState* /*exec*/) {
+ValueImp* NumberNode::evaluate(ExecState*) {
   return jsNumber(value);
 }
 
 // ------------------------------ StringNode -----------------------------------
 
-ValueImp* StringNode::evaluate(ExecState* /*exec*/) {
+ValueImp* StringNode::evaluate(ExecState*) {
   return jsString(value);
 }
 
@@ -262,12 +264,6 @@ ValueImp* ThisNode::evaluate(ExecState* exec) {
 
 // ------------------------------ ResolveNode ----------------------------------
 
-static ValueImp* undefinedVariableError(ExecState* exec,
-                                        const Identifier& ident) {
-  return throwError(exec, ReferenceError,
-                    "Can't find variable: " + ident.ustring());
-}
-
 // ECMA 11.1.2 & 10.1.4
 ValueImp* ResolveNode::evaluate(ExecState* exec) {
   const ScopeChain& chain = exec->context().imp()->scopeChain();
@@ -287,7 +283,7 @@ ValueImp* ResolveNode::evaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  return undefinedVariableError(exec, ident);
+  return throwUndefinedVariableError(exec, ident);
 }
 
 // ------------------------------ GroupNode ------------------------------------
@@ -295,6 +291,14 @@ ValueImp* ResolveNode::evaluate(ExecState* exec) {
 // ECMA 11.1.6
 ValueImp* GroupNode::evaluate(ExecState* exec) {
   return group->evaluate(exec);
+}
+
+Node* GroupNode::nodeInsideAllParens() {
+  Node* n = this;
+  do
+    n = static_cast<GroupNode*>(n)->group.get();
+  while (n->isGroupNode());
+  return n;
 }
 
 // ------------------------------ ElementNode ----------------------------------
@@ -371,7 +375,7 @@ ValueImp* PropertyValueNode::evaluate(ExecState* exec) {
 // ------------------------------ PropertyNode ---------------------------------
 
 // ECMA 11.1.5
-ValueImp* PropertyNode::evaluate(ExecState* /*exec*/) {
+ValueImp* PropertyNode::evaluate(ExecState*) {
   ValueImp* s;
 
   if (str.isNull()) {
@@ -411,9 +415,9 @@ ValueImp* DotAccessorNode::evaluate(ExecState* exec) {
 
 // ------------------------------ ArgumentListNode -----------------------------
 
-ValueImp* ArgumentListNode::evaluate(ExecState* /*exec*/) {
+ValueImp* ArgumentListNode::evaluate(ExecState*) {
   assert(0);
-  return NULL;  // dummy, see evaluateList()
+  return 0;  // dummy, see evaluateList()
 }
 
 // ECMA 11.2.4
@@ -431,9 +435,9 @@ List ArgumentListNode::evaluateList(ExecState* exec) {
 
 // ------------------------------ ArgumentsNode --------------------------------
 
-ValueImp* ArgumentsNode::evaluate(ExecState* /*exec*/) {
+ValueImp* ArgumentsNode::evaluate(ExecState*) {
   assert(0);
-  return NULL;  // dummy, see evaluateList()
+  return 0;  // dummy, see evaluateList()
 }
 
 // ECMA 11.2.4
@@ -555,7 +559,7 @@ ValueImp* FunctionCallResolveNode::evaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  return undefinedVariableError(exec, ident);
+  return throwUndefinedVariableError(exec, ident);
 }
 
 // ECMA 11.2.3
@@ -683,7 +687,7 @@ ValueImp* PostfixResolveNode::evaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  return undefinedVariableError(exec, m_ident);
+  return throwUndefinedVariableError(exec, m_ident);
 }
 
 // ------------------------------ PostfixBracketNode
@@ -918,7 +922,7 @@ ValueImp* PrefixResolveNode::evaluate(ExecState* exec) {
     ++iter;
   } while (iter != end);
 
-  return undefinedVariableError(exec, m_ident);
+  return throwUndefinedVariableError(exec, m_ident);
 }
 
 // ------------------------------ PrefixBracketNode
@@ -998,7 +1002,7 @@ ValueImp* UnaryPlusNode::evaluate(ExecState* exec) {
   ValueImp* v = expr->evaluate(exec);
   KJS_CHECKEXCEPTIONVALUE
 
-  return jsNumber(v->toNumber(exec)); /* TODO: optimize */
+  return jsNumber(v->toNumber(exec));
 }
 
 // ------------------------------ NegateNode -----------------------------------
@@ -1316,7 +1320,7 @@ ValueImp* AssignResolveNode::evaluate(ExecState* exec) {
   } while (iter != end);
 
   if (m_oper != OpEqual)
-    return undefinedVariableError(exec, m_ident);
+    return throwUndefinedVariableError(exec, m_ident);
 
 found:
   ValueImp* v;
@@ -1445,12 +1449,6 @@ StatListNode::StatListNode(StatListNode* l, StatementNode* s)
 Completion StatListNode::execute(ExecState* exec) {
   Completion c = statement->execute(exec);
   KJS_ABORTPOINT
-  if (exec->hadException()) {
-    ValueImp* ex = exec->exception();
-    exec->clearException();
-    return Completion(Throw, ex);
-  }
-
   if (c.complType() != Normal)
     return c;
 
@@ -1461,12 +1459,6 @@ Completion StatListNode::execute(ExecState* exec) {
     KJS_ABORTPOINT
     if (c2.complType() != Normal)
       return c2;
-
-    if (exec->hadException()) {
-      ValueImp* ex = exec->exception();
-      exec->clearException();
-      return Completion(Throw, ex);
-    }
 
     if (c2.isValueCompletion())
       v = c2.value();
@@ -1505,7 +1497,7 @@ ValueImp* VarDeclNode::evaluate(ExecState* exec) {
     // already declared? - check with getDirect so you can override
     // built-in properties of the global object with var declarations.
     if (variable->getDirect(ident))
-      return NULL;
+      return 0;
     val = Undefined();
   }
 
@@ -1604,7 +1596,7 @@ void BlockNode::processVarDecls(ExecState* exec) {
 // ------------------------------ EmptyStatementNode ---------------------------
 
 // ECMA 12.3
-Completion EmptyStatementNode::execute(ExecState* /*exec*/) {
+Completion EmptyStatementNode::execute(ExecState*) {
   return Completion(Normal);
 }
 
@@ -1667,7 +1659,7 @@ Completion DoWhileNode::execute(ExecState* exec) {
     exec->context().imp()->seenLabels()->popIteration();
     if (!((c.complType() == Continue) && ls.contains(c.target()))) {
       if ((c.complType() == Break) && ls.contains(c.target()))
-        return Completion(Normal, NULL);
+        return Completion(Normal, 0);
       if (c.complType() != Normal)
         return c;
     }
@@ -1675,7 +1667,7 @@ Completion DoWhileNode::execute(ExecState* exec) {
     KJS_CHECKEXCEPTION
   } while (bv->toBoolean(exec));
 
-  return Completion(Normal, NULL);
+  return Completion(Normal, 0);
 }
 
 void DoWhileNode::processVarDecls(ExecState* exec) {
@@ -1691,7 +1683,7 @@ Completion WhileNode::execute(ExecState* exec) {
   ValueImp* bv;
   Completion c;
   bool b(false);
-  ValueImp* value = NULL;
+  ValueImp* value = 0;
 
   while (1) {
     bv = expr->evaluate(exec);
@@ -1729,7 +1721,7 @@ void WhileNode::processVarDecls(ExecState* exec) {
 
 // ECMA 12.6.3
 Completion ForNode::execute(ExecState* exec) {
-  ValueImp *v, *cval = NULL;
+  ValueImp *v, *cval = 0;
 
   if (expr1) {
     v = expr1->evaluate(exec);
@@ -1790,7 +1782,7 @@ ForInNode::ForInNode(const Identifier& i,
 // ECMA 12.6.4
 Completion ForInNode::execute(ExecState* exec) {
   ValueImp* e;
-  ValueImp* retval = NULL;
+  ValueImp* retval = 0;
   ObjectImp* v;
   Completion c;
   ReferenceList propList;
@@ -1807,7 +1799,7 @@ Completion ForInNode::execute(ExecState* exec) {
   // property list but will throw an exception if you attempt to
   // access any property.
   if (e->isUndefinedOrNull()) {
-    return Completion(Normal, NULL);
+    return Completion(Normal, 0);
   }
 
   KJS_CHECKEXCEPTION
@@ -1911,14 +1903,14 @@ Completion ContinueNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
   if (ident.isEmpty() && !exec->context().imp()->seenLabels()->inIteration())
-    return Completion(
-        Throw, throwError(exec, SyntaxError, "Invalid continue statement."));
+    return createErrorCompletion(exec, SyntaxError,
+                                 "Invalid continue statement.");
   else if (!ident.isEmpty() &&
            !exec->context().imp()->seenLabels()->contains(ident))
-    return Completion(
-        Throw, throwError(exec, SyntaxError, "Label %s not found.", ident));
+    return createErrorCompletion(exec, SyntaxError, "Label %s not found.",
+                                 ident);
   else
-    return Completion(Continue, NULL, ident);
+    return Completion(Continue, 0, ident);
 }
 
 // ------------------------------ BreakNode ------------------------------------
@@ -1929,14 +1921,12 @@ Completion BreakNode::execute(ExecState* exec) {
 
   if (ident.isEmpty() && !exec->context().imp()->seenLabels()->inIteration() &&
       !exec->context().imp()->seenLabels()->inSwitch())
-    return Completion(
-        Throw, throwError(exec, SyntaxError, "Invalid break statement."));
+    return createErrorCompletion(exec, SyntaxError, "Invalid break statement.");
   else if (!ident.isEmpty() &&
            !exec->context().imp()->seenLabels()->contains(ident))
-    return Completion(
-        Throw, throwError(exec, SyntaxError, "Label %s not found.", ident));
+    return createErrorCompletion(exec, SyntaxError, "Label %s not found.");
   else
-    return Completion(Break, NULL, ident);
+    return Completion(Break, 0, ident);
 }
 
 // ------------------------------ ReturnNode -----------------------------------
@@ -1947,8 +1937,8 @@ Completion ReturnNode::execute(ExecState* exec) {
 
   CodeType codeType = exec->context().imp()->codeType();
   if (codeType != FunctionCode && codeType != AnonymousCode) {
-    return Completion(
-        Throw, throwError(exec, SyntaxError, "Invalid return statement."));
+    return createErrorCompletion(exec, SyntaxError,
+                                 "Invalid return statement.");
   }
 
   if (!value)
@@ -2006,10 +1996,10 @@ void CaseClauseNode::processVarDecls(ExecState* exec) {
 
 // ------------------------------ ClauseListNode -------------------------------
 
-ValueImp* ClauseListNode::evaluate(ExecState* /*exec*/) {
-  /* should never be called */
+ValueImp* ClauseListNode::evaluate(ExecState*) {
+  // should never be called
   assert(false);
-  return NULL;
+  return 0;
 }
 
 // ECMA 12.11
@@ -2041,10 +2031,10 @@ CaseBlockNode::CaseBlockNode(ClauseListNode* l1,
   }
 }
 
-ValueImp* CaseBlockNode::evaluate(ExecState* /*exec*/) {
-  /* should never be called */
+ValueImp* CaseBlockNode::evaluate(ExecState*) {
+  // should never be called
   assert(false);
-  return NULL;
+  return 0;
 }
 
 // ECMA 12.11
@@ -2144,13 +2134,10 @@ void SwitchNode::processVarDecls(ExecState* exec) {
 
 // ECMA 12.12
 Completion LabelNode::execute(ExecState* exec) {
-  Completion e;
-
-  if (!exec->context().imp()->seenLabels()->push(label)) {
-    return Completion(Throw, throwError(exec, SyntaxError,
-                                        "Duplicated label %s found.", label));
-  };
-  e = statement->execute(exec);
+  if (!exec->context().imp()->seenLabels()->push(label))
+    return createErrorCompletion(exec, SyntaxError,
+                                 "Duplicated label %s found.", label);
+  Completion e = statement->execute(exec);
   exec->context().imp()->seenLabels()->pop();
 
   if ((e.complType() == Break) && (e.target() == label))
@@ -2174,91 +2161,43 @@ Completion ThrowNode::execute(ExecState* exec) {
   return Completion(Throw, v);
 }
 
-// ------------------------------ CatchNode ------------------------------------
-
-Completion CatchNode::execute(ExecState* /*exec*/) {
-  // should never be reached. execute(exec, arg) is used instead
-  assert(0L);
-  return Completion();
-}
-
-// ECMA 12.14
-Completion CatchNode::execute(ExecState* exec, ValueImp* arg) {
-  /* TODO: correct ? Not part of the spec */
-
-  exec->clearException();
-
-  ObjectImp* obj(new ObjectImp());
-  obj->put(exec, ident, arg, DontDelete);
-  exec->context().imp()->pushScope(obj);
-  Completion c = block->execute(exec);
-  exec->context().imp()->popScope();
-
-  return c;
-}
-
-void CatchNode::processVarDecls(ExecState* exec) {
-  block->processVarDecls(exec);
-}
-
-// ------------------------------ FinallyNode ----------------------------------
-
-// ECMA 12.14
-Completion FinallyNode::execute(ExecState* exec) {
-  return block->execute(exec);
-}
-
-void FinallyNode::processVarDecls(ExecState* exec) {
-  block->processVarDecls(exec);
-}
-
 // ------------------------------ TryNode --------------------------------------
 
 // ECMA 12.14
 Completion TryNode::execute(ExecState* exec) {
   KJS_BREAKPOINT;
 
-  Completion c, c2;
+  Completion c = tryBlock->execute(exec);
 
-  c = block->execute(exec);
-
-  if (!_final) {
-    if (c.complType() != Throw)
-      return c;
-    return _catch->execute(exec, c.value());
+  if (catchBlock && c.complType() == Throw) {
+    ObjectImp* obj = new ObjectImp;
+    obj->put(exec, exceptionIdent, c.value(), DontDelete);
+    exec->context().imp()->pushScope(obj);
+    c = catchBlock->execute(exec);
+    exec->context().imp()->popScope();
   }
 
-  if (!_catch) {
-    ValueImp* lastException = exec->exception();
-    exec->clearException();
-
-    c2 = _final->execute(exec);
-
-    if (!exec->hadException())
-      exec->setException(lastException);
-
-    return (c2.complType() == Normal) ? c : c2;
+  if (finallyBlock) {
+    Completion c2 = finallyBlock->execute(exec);
+    if (c2.complType() != Normal)
+      c = c2;
   }
 
-  if (c.complType() == Throw)
-    c = _catch->execute(exec, c.value());
-
-  c2 = _final->execute(exec);
-  return (c2.complType() == Normal) ? c : c2;
+  return c;
 }
 
 void TryNode::processVarDecls(ExecState* exec) {
-  block->processVarDecls(exec);
-  if (_final)
-    _final->processVarDecls(exec);
-  if (_catch)
-    _catch->processVarDecls(exec);
+  tryBlock->processVarDecls(exec);
+  if (catchBlock)
+    catchBlock->processVarDecls(exec);
+  if (finallyBlock)
+    finallyBlock->processVarDecls(exec);
 }
 
 // ------------------------------ ParameterNode --------------------------------
 
 // ECMA 13
-ValueImp* ParameterNode::evaluate(ExecState* /*exec*/) {
+ValueImp* ParameterNode::evaluate(ExecState*) {
   return Undefined();
 }
 
@@ -2266,7 +2205,6 @@ ValueImp* ParameterNode::evaluate(ExecState* /*exec*/) {
 
 FunctionBodyNode::FunctionBodyNode(SourceElementsNode* s) : BlockNode(s) {
   setLoc(-1, -1, -1);
-  // fprintf(stderr,"FunctionBodyNode::FunctionBodyNode %p\n",this);
 }
 
 void FunctionBodyNode::processFuncDecl(ExecState* exec) {
@@ -2281,9 +2219,8 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
   ContextImp* context = exec->context().imp();
 
   // TODO: let this be an object with [[Class]] property "Function"
-  FunctionImp* fimp =
+  FunctionImp* func =
       new DeclaredFunctionImp(exec, ident, body.get(), context->scopeChain());
-  ObjectImp* func(fimp);  // protect from GC
 
   ObjectImp* proto = exec->lexicalInterpreter()->builtinObject()->construct(
       exec, List::empty());
@@ -2293,7 +2230,7 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
 
   int plen = 0;
   for (ParameterNode *p = param.get(); p != 0L; p = p->nextParam(), plen++)
-    fimp->addParameter(p->ident());
+    func->addParameter(p->ident());
 
   func->put(exec, lengthPropertyName, Number(plen),
             ReadOnly | DontDelete | DontEnum);
@@ -2316,13 +2253,17 @@ void FuncDeclNode::processFuncDecl(ExecState* exec) {
   }
 }
 
+Completion FuncDeclNode::execute(ExecState*) {
+  return Completion(Normal);
+}
+
 // ------------------------------ FuncExprNode ---------------------------------
 
 // ECMA 13
 ValueImp* FuncExprNode::evaluate(ExecState* exec) {
   ContextImp* context = exec->context().imp();
   bool named = !ident.isNull();
-  ObjectImp* functionScopeObject = NULL;
+  ObjectImp* functionScopeObject = 0;
 
   if (named) {
     // named FunctionExpressions can recursively call themselves,
@@ -2332,28 +2273,27 @@ ValueImp* FuncExprNode::evaluate(ExecState* exec) {
     context->pushScope(functionScopeObject);
   }
 
-  FunctionImp* fimp =
+  FunctionImp* func =
       new DeclaredFunctionImp(exec, ident, body.get(), context->scopeChain());
-  ValueImp* ret(fimp);
   ObjectImp* proto = exec->lexicalInterpreter()->builtinObject()->construct(
       exec, List::empty());
-  proto->put(exec, constructorPropertyName, ret,
+  proto->put(exec, constructorPropertyName, func,
              ReadOnly | DontDelete | DontEnum);
-  fimp->put(exec, prototypePropertyName, proto, Internal | DontDelete);
+  func->put(exec, prototypePropertyName, proto, Internal | DontDelete);
 
   int plen = 0;
   for (ParameterNode *p = param.get(); p != 0L; p = p->nextParam(), plen++)
-    fimp->addParameter(p->ident());
+    func->addParameter(p->ident());
 
   if (named) {
     functionScopeObject->put(
-        exec, ident, ret,
+        exec, ident, func,
         Internal | ReadOnly |
             (context->codeType() == EvalCode ? 0 : DontDelete));
     context->popScope();
   }
 
-  return ret;
+  return func;
 }
 
 // ------------------------------ SourceElementsNode ---------------------------

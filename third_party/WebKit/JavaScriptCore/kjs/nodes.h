@@ -29,12 +29,6 @@
 #include <kxmlcore/SharedPtr.h>
 
 #include "internal.h"
-//#include "debugger.h"
-#ifndef NDEBUG
-#ifndef __osf__
-#include <list>
-#endif
-#endif
 
 namespace KJS {
 
@@ -86,10 +80,9 @@ class Node : public FastAllocated {
   virtual ValueImp* evaluate(ExecState* exec) = 0;
   UString toString() const;
   virtual void streamTo(SourceStream& s) const = 0;
-  virtual void processVarDecls(ExecState* /*exec*/) {}
+  virtual void processVarDecls(ExecState*) {}
   int lineNo() const { return line; }
 
- public:
   // reference counting mechanism
   void ref() { ++m_refcount; }
   void deref() {
@@ -99,43 +92,53 @@ class Node : public FastAllocated {
   }
   unsigned int refcount() { return m_refcount; }
 
-  virtual bool isGroupNode() const { return false; }
+  virtual Node* nodeInsideAllParens();
 
   virtual bool isLocation() const { return false; }
   virtual bool isResolveNode() const { return false; }
   virtual bool isBracketAccessorNode() const { return false; }
   virtual bool isDotAccessorNode() const { return false; }
+  virtual bool isGroupNode() const { return false; }
 
  protected:
-  ValueImp* throwError(ExecState* exec, ErrorType e, const char* msg);
-  ValueImp* throwError(ExecState* exec,
-                       ErrorType e,
+  Completion createErrorCompletion(ExecState*, ErrorType, const char* msg);
+  Completion createErrorCompletion(ExecState*,
+                                   ErrorType,
+                                   const char* msg,
+                                   const Identifier&);
+
+  ValueImp* throwError(ExecState*, ErrorType, const char* msg);
+  ValueImp* throwError(ExecState*,
+                       ErrorType,
                        const char* msg,
                        ValueImp*,
                        Node*);
-  ValueImp* throwError(ExecState* exec,
-                       ErrorType e,
+  ValueImp* throwError(ExecState*,
+                       ErrorType,
                        const char* msg,
                        const Identifier&);
-  ValueImp* throwError(ExecState* exec,
-                       ErrorType e,
+  ValueImp* throwError(ExecState*,
+                       ErrorType,
                        const char* msg,
                        ValueImp*,
                        const Identifier&);
-  ValueImp* throwError(ExecState* exec,
-                       ErrorType e,
+  ValueImp* throwError(ExecState*,
+                       ErrorType,
                        const char* msg,
                        ValueImp*,
                        Node*,
                        Node*);
-  ValueImp* throwError(ExecState* exec,
-                       ErrorType e,
+  ValueImp* throwError(ExecState*,
+                       ErrorType,
                        const char* msg,
                        ValueImp*,
                        Node*,
                        const Identifier&);
 
-  void setExceptionDetailsIfNeeded(ExecState* exec);
+  ValueImp* throwUndefinedVariableError(ExecState*, const Identifier&);
+
+  void setExceptionDetailsIfNeeded(ExecState*);
+
   int line;
   UString sourceURL;
   unsigned int m_refcount;
@@ -155,7 +158,6 @@ class StatementNode : public Node {
   int lastLine() const { return l1; }
   int sourceId() const { return sid; }
   bool hitStatement(ExecState* exec);
-  bool abortStatement(ExecState* exec);
   virtual Completion execute(ExecState* exec) = 0;
   void pushLabel(const Identifier& id) { ls.push(id); }
   virtual void processFuncDecl(ExecState* exec);
@@ -242,16 +244,9 @@ class GroupNode : public Node {
  public:
   GroupNode(Node* g) : group(g) {}
   virtual ValueImp* evaluate(ExecState* exec);
+  virtual Node* nodeInsideAllParens();
   virtual void streamTo(SourceStream& s) const;
-
   virtual bool isGroupNode() const { return true; }
-  Node* nodeInsideAllParens() {
-    Node* n = group.get();
-    while (n->isGroupNode()) {
-      n = static_cast<GroupNode*>(n)->group.get();
-    }
-    return n;
-  }
 
  private:
   SharedPtr<Node> group;
@@ -1115,44 +1110,22 @@ class ThrowNode : public StatementNode {
   SharedPtr<Node> expr;
 };
 
-class CatchNode : public StatementNode {
- public:
-  CatchNode(const Identifier& i, StatementNode* b) : ident(i), block(b) {}
-  virtual Completion execute(ExecState* exec);
-  Completion execute(ExecState* exec, ValueImp* arg);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
-
- private:
-  Identifier ident;
-  SharedPtr<StatementNode> block;
-};
-
-class FinallyNode : public StatementNode {
- public:
-  FinallyNode(StatementNode* b) : block(b) {}
-  virtual Completion execute(ExecState* exec);
-  virtual void processVarDecls(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
-
- private:
-  SharedPtr<StatementNode> block;
-};
-
 class TryNode : public StatementNode {
  public:
-  TryNode(StatementNode* b, CatchNode* c) : block(b), _catch(c), _final(0) {}
-  TryNode(StatementNode* b, FinallyNode* f) : block(b), _catch(0), _final(f) {}
-  TryNode(StatementNode* b, CatchNode* c, FinallyNode* f)
-      : block(b), _catch(c), _final(f) {}
+  TryNode(StatementNode* b,
+          const Identifier& e,
+          StatementNode* c,
+          StatementNode* f)
+      : tryBlock(b), exceptionIdent(e), catchBlock(c), finallyBlock(f) {}
   virtual Completion execute(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<StatementNode> block;
-  SharedPtr<CatchNode> _catch;
-  SharedPtr<FinallyNode> _final;
+  SharedPtr<StatementNode> tryBlock;
+  Identifier exceptionIdent;
+  SharedPtr<StatementNode> catchBlock;
+  SharedPtr<StatementNode> finallyBlock;
 };
 
 class ParameterNode : public Node {
@@ -1191,12 +1164,10 @@ class FuncExprNode : public Node {
       : ident(i), param(p->next), body(b) {
     p->next = 0;
   }
-  ValueImp* evaluate(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual ValueImp* evaluate(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
-  friend class FuncDeclNode;
-
   Identifier ident;
   SharedPtr<ParameterNode> param;
   SharedPtr<FunctionBodyNode> body;
@@ -1210,11 +1181,9 @@ class FuncDeclNode : public StatementNode {
       : ident(i), param(p->next), body(b) {
     p->next = 0;
   }
-  Completion execute(ExecState* /*exec*/) { /* empty */
-    return Completion();
-  }
-  void processFuncDecl(ExecState* exec);
-  virtual void streamTo(SourceStream& s) const;
+  virtual Completion execute(ExecState*);
+  virtual void processFuncDecl(ExecState*);
+  virtual void streamTo(SourceStream&) const;
 
  private:
   Identifier ident;
