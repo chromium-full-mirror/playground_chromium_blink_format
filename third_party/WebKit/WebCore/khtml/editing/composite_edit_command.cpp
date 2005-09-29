@@ -321,6 +321,11 @@ void CompositeEditCommand::setNodeAttribute(ElementImpl* element,
   applyCommandToComposite(cmd);
 }
 
+void CompositeEditCommand::rebalanceWhitespaceAt(const Position& position) {
+  EditCommandPtr cmd(new RebalanceWhitespaceCommand(document(), position));
+  applyCommandToComposite(cmd);
+}
+
 void CompositeEditCommand::rebalanceWhitespace() {
   SelectionController selection = endingSelection();
   if (selection.isCaretOrRange()) {

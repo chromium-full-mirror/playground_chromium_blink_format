@@ -45,7 +45,6 @@ class InsertTextCommand : public CompositeEditCommand {
   virtual bool isInsertTextCommand() const;
 
   DOM::Position prepareForTextInsertion(const DOM::Position& pos);
-  void insertSpace(DOM::TextImpl* textNode, unsigned offset);
   DOM::Position insertTab(DOM::Position pos);
 
   unsigned m_charactersAdded;

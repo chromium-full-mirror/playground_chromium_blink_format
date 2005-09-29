@@ -54,6 +54,9 @@ class TextImpl;
 
 namespace khtml {
 
+void rebalanceWhitespaceInTextNode(DOM::NodeImpl* node,
+                                   unsigned int start,
+                                   unsigned int length);
 DOM::DOMString& nonBreakingSpaceString();
 void derefNodesInList(QPtrList<DOM::NodeImpl>& list);
 

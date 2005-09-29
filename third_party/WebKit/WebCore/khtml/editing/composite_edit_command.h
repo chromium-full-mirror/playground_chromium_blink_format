@@ -73,6 +73,7 @@ class CompositeEditCommand : public EditCommand {
                           const DOM::DOMString& text);
   void joinTextNodes(DOM::TextImpl* text1, DOM::TextImpl* text2);
   void rebalanceWhitespace();
+  void rebalanceWhitespaceAt(const DOM::Position& position);
   void removeCSSProperty(DOM::CSSStyleDeclarationImpl*, int property);
   void removeFullySelectedNode(DOM::NodeImpl* node);
   void removeNodeAttribute(DOM::ElementImpl*,
