@@ -74,7 +74,7 @@ RenderBlock::MarginInfo::MarginInfo(RenderBlock* block, int top, int bottom) {
   // with it.  We also don't collapse if we have any bottom border/padding.
   m_canCollapseBottomWithChildren =
       m_canCollapseWithChildren && (bottom == 0) &&
-      (block->style()->height().isVariable() &&
+      (block->style()->height().isAuto() &&
        block->style()->height().value == 0) &&
       block->style()->marginBottomCollapse() != MSEPARATE;
 
@@ -410,7 +410,7 @@ bool RenderBlock::isSelfCollapsingBlock() const {
       style()->marginBottomCollapse() == MSEPARATE)
     return false;
 
-  bool hasAutoHeight = style()->height().isVariable();
+  bool hasAutoHeight = style()->height().isAuto();
   if (style()->height().isPercent() && !style()->htmlHacks()) {
     hasAutoHeight = true;
     for (RenderBlock* cb = containingBlock(); !cb->isCanvas();
@@ -581,7 +581,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   }
 
   if (hasOverhangingFloats() &&
-      ((isFloating() && style()->height().isVariable()) || isTableCell())) {
+      ((isFloating() && style()->height().isAuto()) || isTableCell())) {
     m_height = floatBottom();
     m_height += borderBottom() + paddingBottom();
   }
@@ -1002,7 +1002,7 @@ void RenderBlock::determineHorizontalPosition(RenderObject* child) {
     if (child->avoidsFloats()) {
       int leftOff = leftOffset(m_height);
       if (style()->textAlign() != KHTML_CENTER &&
-          child->style()->marginLeft().type != Variable) {
+          child->style()->marginLeft().type != Auto) {
         if (child->marginLeft() < 0)
           leftOff += child->marginLeft();
         chPos = kMax(
@@ -1032,7 +1032,7 @@ void RenderBlock::determineHorizontalPosition(RenderObject* child) {
     if (child->avoidsFloats()) {
       int rightOff = rightOffset(m_height);
       if (style()->textAlign() != KHTML_CENTER &&
-          child->style()->marginRight().type != Variable) {
+          child->style()->marginRight().type != Auto) {
         if (child->marginRight() < 0)
           rightOff -= child->marginRight();
         chPos = kMin(chPos, rightOff - child->width());  // Let the float sit in
@@ -3058,7 +3058,7 @@ RenderObject* InlineMinMaxIterator::next() {
 }
 
 static int getBPMWidth(int childValue, Length cssUnit) {
-  if (cssUnit.type != Variable)
+  if (cssUnit.type != Auto)
     return (cssUnit.type == Fixed ? cssUnit.value : childValue);
   return 0;
 }
@@ -3181,11 +3181,11 @@ void RenderBlock::calcInlineMinMaxWidth() {
           // Inline replaced elts add in their margins to their min/max values.
           int margins = 0;
           LengthType type = cstyle->marginLeft().type;
-          if (type != Variable)
+          if (type != Auto)
             margins += (type == Fixed ? cstyle->marginLeft().value
                                       : child->marginLeft());
           type = cstyle->marginRight().type;
-          if (type != Variable)
+          if (type != Auto)
             margins += (type == Fixed ? cstyle->marginRight().value
                                       : child->marginRight());
           childMin += margins;
@@ -3739,7 +3739,7 @@ bool RenderBlock::inRootBlockContext() const {
 static bool shouldCheckLines(RenderObject* obj) {
   return !obj->isFloatingOrPositioned() && !obj->isCompact() &&
          !obj->isRunIn() && obj->isBlockFlow() &&
-         obj->style()->height().isVariable() &&
+         obj->style()->height().isAuto() &&
          (!obj->isFlexibleBox() || obj->style()->boxOrient() == VERTICAL);
 }
 

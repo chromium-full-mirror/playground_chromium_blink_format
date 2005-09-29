@@ -666,23 +666,23 @@ QRect RenderBox::getClipRect(int tx, int ty) {
   int clipw = m_width;
   int cliph = m_height;
 
-  if (!style()->clipLeft().isVariable()) {
+  if (!style()->clipLeft().isAuto()) {
     int c = style()->clipLeft().width(m_width);
     clipx += c;
     clipw -= c;
   }
 
-  if (!style()->clipRight().isVariable()) {
+  if (!style()->clipRight().isAuto()) {
     int w = style()->clipRight().width(m_width);
     clipw -= m_width - w;
   }
 
-  if (!style()->clipTop().isVariable()) {
+  if (!style()->clipTop().isAuto()) {
     int c = style()->clipTop().width(m_height);
     clipy += c;
     cliph -= c;
   }
-  if (!style()->clipBottom().isVariable()) {
+  if (!style()->clipBottom().isAuto()) {
     int h = style()->clipBottom().width(m_height);
     cliph -= m_height - h;
   }
@@ -862,15 +862,15 @@ void RenderBox::repaintDuringLayoutIfMoved(int oldX, int oldY) {
 }
 
 void RenderBox::relativePositionOffset(int& tx, int& ty) {
-  if (!style()->left().isVariable())
+  if (!style()->left().isAuto())
     tx += style()->left().width(containingBlockWidth());
-  else if (!style()->right().isVariable())
+  else if (!style()->right().isAuto())
     tx -= style()->right().width(containingBlockWidth());
-  if (!style()->top().isVariable()) {
+  if (!style()->top().isAuto()) {
     if (!style()->top().isPercent() ||
         containingBlock()->style()->height().isFixed())
       ty += style()->top().width(containingBlockHeight());
-  } else if (!style()->bottom().isVariable()) {
+  } else if (!style()->bottom().isAuto()) {
     if (!style()->bottom().isPercent() ||
         containingBlock()->style()->height().isFixed())
       ty -= style()->bottom().width(containingBlockHeight());
@@ -954,7 +954,7 @@ void RenderBox::calcWidth() {
         }
       }
 
-      if (widthType == Variable) {
+      if (widthType == Auto) {
         //          kdDebug( 6040 ) << "variable" << endl;
         m_marginLeft = ml.minWidth(cw);
         m_marginRight = mr.minWidth(cw);
@@ -994,15 +994,13 @@ int RenderBox::calcWidthUsing(WidthType widthType,
   else
     w = style()->maxWidth();
 
-  lengthType = w.type;
-
-  if (lengthType == Variable) {
+  if (w.isIntrinsicOrAuto()) {
     int marginLeft = style()->marginLeft().minWidth(cw);
     int marginRight = style()->marginRight().minWidth(cw);
     if (cw)
       width = cw - marginLeft - marginRight;
 
-    if (sizesToMaxWidth()) {
+    if (sizesToIntrinsicWidth(widthType)) {
       if (width < m_minWidth)
         width = m_minWidth;
       if (width > m_maxWidth)
@@ -1016,6 +1014,42 @@ int RenderBox::calcWidthUsing(WidthType widthType,
   return width;
 }
 
+bool RenderBox::sizesToIntrinsicWidth(WidthType widthType) const {
+  // Marquees in WinIE are like a mixture of blocks and inline-blocks.  They
+  // size as though they're blocks,
+  // but they allow text to sit on the same line as the marquee.
+  if (isFloating() || (isCompact() && isInline()) ||
+      (isInlineBlockOrInlineTable() && !isHTMLMarquee()))
+    return true;
+
+  // This code may look a bit strange.  Basically width:intrinsic should clamp
+  // the size when testing both
+  // min-width and width.  max-width is only clamped if it is also intrinsic.
+  Length width = widthType == MaxWidth ? style()->maxWidth() : style()->width();
+  if (width.type == Intrinsic)
+    return true;
+
+  // Children of a horizontal marquee do not fill the container by default.
+  // FIXME: Need to deal with MAUTO value properly.  It could be vertical.
+  if (parent()->style()->overflow() == OMARQUEE) {
+    EMarqueeDirection dir = parent()->style()->marqueeDirection();
+    if (dir == MAUTO || dir == MFORWARD || dir == MBACKWARD || dir == MLEFT ||
+        dir == MRIGHT)
+      return true;
+  }
+
+  // Flexible horizontal boxes lay out children at their intrinsic widths.  Also
+  // vertical boxes
+  // that don't stretch their kids lay out their children at their intrinsic
+  // widths.
+  if (parent()->isFlexibleBox() &&
+      (parent()->style()->boxOrient() == HORIZONTAL ||
+       parent()->style()->boxAlign() != BSTRETCH))
+    return true;
+
+  return false;
+}
+
 void RenderBox::calcHorizontalMargins(const Length& ml,
                                       const Length& mr,
                                       int cw) {
@@ -1025,21 +1059,21 @@ void RenderBox::calcHorizontalMargins(const Length& ml,
     m_marginLeft = ml.minWidth(cw);
     m_marginRight = mr.minWidth(cw);
   } else {
-    if ((ml.type == Variable && mr.type == Variable && m_width < cw) ||
-        (ml.type != Variable && mr.type != Variable &&
+    if ((ml.type == Auto && mr.type == Auto && m_width < cw) ||
+        (ml.type != Auto && mr.type != Auto &&
          containingBlock()->style()->textAlign() == KHTML_CENTER)) {
       m_marginLeft = (cw - m_width) / 2;
       if (m_marginLeft < 0)
         m_marginLeft = 0;
       m_marginRight = cw - m_width - m_marginLeft;
-    } else if ((mr.type == Variable && m_width < cw) ||
-               (ml.type != Variable &&
+    } else if ((mr.type == Auto && m_width < cw) ||
+               (ml.type != Auto &&
                 containingBlock()->style()->direction() == RTL &&
                 containingBlock()->style()->textAlign() == KHTML_LEFT)) {
       m_marginLeft = ml.width(cw);
       m_marginRight = cw - m_width - m_marginLeft;
-    } else if ((ml.type == Variable && m_width < cw) ||
-               (mr.type != Variable &&
+    } else if ((ml.type == Auto && m_width < cw) ||
+               (mr.type != Auto &&
                 containingBlock()->style()->direction() == LTR &&
                 containingBlock()->style()->textAlign() == KHTML_RIGHT)) {
       m_marginRight = mr.width(cw);
@@ -1097,7 +1131,7 @@ void RenderBox::calcHeight() {
     }
 
     // Block children of horizontal flexible boxes fill the height of the box.
-    if (h.isVariable() && parent()->isFlexibleBox() &&
+    if (h.isAuto() && parent()->isFlexibleBox() &&
         parent()->style()->boxOrient() == HORIZONTAL &&
         parent()->isStretchingChildren()) {
       h = Length(parent()->contentHeight() - marginTop() - marginBottom() -
@@ -1143,7 +1177,7 @@ void RenderBox::calcHeight() {
   // <html> block in quirks mode.  Only apply this quirk if the block is normal
   // flow and no height
   // is specified.
-  if (style()->htmlHacks() && style()->height().isVariable() &&
+  if (style()->htmlHacks() && style()->height().isAuto() &&
       !isFloatingOrPositioned() && (isRoot() || isBody())) {
     int margins = collapsedMarginTop() + collapsedMarginBottom();
     int visHeight = canvas()->view()->visibleHeight();
@@ -1161,7 +1195,7 @@ void RenderBox::calcHeight() {
 
 int RenderBox::calcHeightUsing(const Length& h) {
   int height = -1;
-  if (!h.isVariable()) {
+  if (!h.isAuto()) {
     if (h.isFixed())
       height = h.value;
     else if (h.isPercent())
@@ -1187,7 +1221,7 @@ int RenderBox::calcPercentageHeight(const Length& height) {
     // if the containing
     // block has an auto height.
     for (; !cb->isCanvas() && !cb->isBody() && !cb->isTableCell() &&
-           !cb->isPositioned() && cb->style()->height().isVariable();
+           !cb->isPositioned() && cb->style()->height().isAuto();
          cb = cb->containingBlock())
       ;
   }
@@ -1215,8 +1249,8 @@ int RenderBox::calcPercentageHeight(const Length& height) {
       // preferable to the alternative (sizing intrinsically and making the row
       // end up too big).
       RenderTableCell* cell = static_cast<RenderTableCell*>(cb);
-      if (scrollsOverflow() && (!cell->style()->height().isVariable() ||
-                                !cell->table()->style()->height().isVariable()))
+      if (scrollsOverflow() && (!cell->style()->height().isAuto() ||
+                                !cell->table()->style()->height().isAuto()))
         return 0;
       return -1;
     }
@@ -1345,7 +1379,7 @@ int RenderBox::availableHeightUsing(const Length& h) const {
   // artificially.  We're going to rely on this cell getting expanded to some
   // new
   // height, and then when we lay out again we'll use the calculation below.
-  if (isTableCell() && (h.isVariable() || h.isPercent())) {
+  if (isTableCell() && (h.isAuto() || h.isPercent())) {
     return overrideSize() -
            (borderLeft() + borderRight() + paddingLeft() + paddingRight());
   }
@@ -1396,9 +1430,9 @@ void RenderBox::calcAbsoluteHorizontal() {
   RenderObject* cb = container();
   cw = containingBlockWidth() + cb->paddingLeft() + cb->paddingRight();
 
-  if (!style()->left().isVariable())
+  if (!style()->left().isAuto())
     l = style()->left().width(cw);
-  if (!style()->right().isVariable())
+  if (!style()->right().isAuto())
     r = style()->right().width(cw);
 
   int static_distance = 0;
@@ -1474,9 +1508,9 @@ void RenderBox::calcAbsoluteHorizontalValues(WidthType widthType,
   const int AUTO = -666666;
   w = ml = mr = AUTO;
 
-  if (!style()->marginLeft().isVariable())
+  if (!style()->marginLeft().isAuto())
     ml = style()->marginLeft().width(cw);
-  if (!style()->marginRight().isVariable())
+  if (!style()->marginRight().isAuto())
     mr = style()->marginRight().width(cw);
 
   Length width;
@@ -1487,7 +1521,7 @@ void RenderBox::calcAbsoluteHorizontalValues(WidthType widthType,
   else
     width = style()->maxWidth();
 
-  if (!width.isVariable())
+  if (!width.isAuto())
     w = width.width(cw);
   else if (isReplaced())
     w = intrinsicWidth();
@@ -1595,9 +1629,9 @@ void RenderBox::calcAbsoluteVertical() {
   else
     ch = cb->height() - cb->borderTop() - cb->borderBottom();
 
-  if (!style()->top().isVariable())
+  if (!style()->top().isAuto())
     t = style()->top().width(ch);
-  if (!style()->bottom().isVariable())
+  if (!style()->bottom().isAuto())
     b = style()->bottom().width(ch);
 
   int h, mt, mb, y;
@@ -1654,9 +1688,9 @@ void RenderBox::calcAbsoluteVerticalValues(HeightType heightType,
   const int AUTO = -666666;
   h = mt = mb = AUTO;
 
-  if (!style()->marginTop().isVariable())
+  if (!style()->marginTop().isAuto())
     mt = style()->marginTop().width(ch);
-  if (!style()->marginBottom().isVariable())
+  if (!style()->marginBottom().isAuto())
     mb = style()->marginBottom().width(ch);
 
   Length height;
@@ -1669,11 +1703,11 @@ void RenderBox::calcAbsoluteVerticalValues(HeightType heightType,
 
   int ourHeight = m_height;
 
-  if (isTable() && height.isVariable())
+  if (isTable() && height.isAuto())
     // Height is never unsolved for tables. "auto" means shrink to fit.  Use our
     // height instead.
     h = ourHeight - pab;
-  else if (!height.isVariable()) {
+  else if (!height.isAuto()) {
     h = height.width(ch);
     if (ourHeight - pab > h)
       ourHeight = h + pab;

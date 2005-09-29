@@ -121,8 +121,8 @@ void RenderFlexibleBox::calcHorizontalMinMaxWidth() {
     // calculated its margins (which are computed inside calcWidth).
     child->calcWidth();
 
-    if (!(ml.type == Variable) && !(mr.type == Variable)) {
-      if (!(child->style()->width().type == Variable)) {
+    if (!(ml.type == Auto) && !(mr.type == Auto)) {
+      if (!(child->style()->width().type == Auto)) {
         if (child->style()->direction() == LTR)
           margin = child->marginLeft();
         else
@@ -130,9 +130,9 @@ void RenderFlexibleBox::calcHorizontalMinMaxWidth() {
       } else
         margin = child->marginLeft() + child->marginRight();
 
-    } else if (!(ml.type == Variable))
+    } else if (!(ml.type == Auto))
       margin = child->marginLeft();
-    else if (!(mr.type == Variable))
+    else if (!(mr.type == Auto))
       margin = child->marginRight();
 
     if (margin < 0)
@@ -737,7 +737,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         if (relayoutChildren ||
             (child->isReplaced() && (child->style()->width().isPercent() ||
                                      child->style()->height().isPercent())) ||
-            (child->style()->height().isVariable() && child->isBlockFlow() &&
+            (child->style()->height().isAuto() && child->isBlockFlow() &&
              !child->needsLayout())) {
           child->setChildNeedsLayout(true);
 
@@ -746,7 +746,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
           static_cast<RenderBlock*>(child)->clearTruncation();
         }
         child->layoutIfNeeded();
-        if (child->style()->height().isVariable() && child->isBlockFlow())
+        if (child->style()->height().isAuto() && child->isBlockFlow())
           maxLineCount =
               kMax(maxLineCount, static_cast<RenderBlock*>(child)->lineCount());
       }
@@ -760,7 +760,7 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
         int((maxLineCount + 1) * style()->lineClamp() / 100.0);
     if (numVisibleLines < maxLineCount) {
       for (child = iterator.first(); child; child = iterator.next()) {
-        if (child->isPositioned() || !child->style()->height().isVariable() ||
+        if (child->isPositioned() || !child->style()->height().isAuto() ||
             !child->isBlockFlow())
           continue;
 

@@ -274,7 +274,7 @@ int InlineFlowBox::marginLeft() {
 
   RenderStyle* cstyle = object()->style();
   Length margin = cstyle->marginLeft();
-  if (margin.type != Variable)
+  if (margin.type != Auto)
     return (margin.type == Fixed ? margin.value : object()->marginLeft());
   return 0;
 }
@@ -285,7 +285,7 @@ int InlineFlowBox::marginRight() {
 
   RenderStyle* cstyle = object()->style();
   Length margin = cstyle->marginRight();
-  if (margin.type != Variable)
+  if (margin.type != Auto)
     return (margin.type == Fixed ? margin.value : object()->marginRight());
   return 0;
 }

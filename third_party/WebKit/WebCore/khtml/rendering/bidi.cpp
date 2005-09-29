@@ -107,7 +107,7 @@ static void embed(QChar::Direction d, BidiState& bidi);
 static void appendRun(BidiState& bidi);
 
 static int getBPMWidth(int childValue, Length cssUnit) {
-  if (cssUnit.type != Variable)
+  if (cssUnit.type != Auto)
     return (cssUnit.type == Fixed ? cssUnit.value : childValue);
   return 0;
 }

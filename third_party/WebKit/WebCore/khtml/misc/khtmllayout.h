@@ -41,7 +41,7 @@ enum HAlign { HDefault, Left, HCenter, Right, HNone = 0 };
  * %multiLength and %Length
  */
 enum LengthType {
-  Variable = 0,
+  Auto = 0,
   Relative,
   Percent,
   Fixed,
@@ -81,7 +81,7 @@ struct Length {
         return value;
       case Percent:
         return maxWidth * value / 100;
-      case Variable:
+      case Auto:
         return maxWidth;
       default:
         return -1;
@@ -96,16 +96,19 @@ struct Length {
         return value;
       case Percent:
         return maxWidth * value / 100;
-      case Variable:
+      case Auto:
       default:
         return 0;
     }
   }
-  bool isVariable() const { return (type == Variable); }
+  bool isAuto() const { return (type == Auto); }
   bool isRelative() const { return (type == Relative); }
   bool isPercent() const { return (type == Percent); }
   bool isFixed() const { return (type == Fixed); }
   bool isStatic() const { return (type == Static); }
+  bool isIntrinsicOrAuto() const {
+    return (type == Auto || type == MinIntrinsic || type == Intrinsic);
+  }
 
   int value : 28;
   LengthType type : 3;

@@ -1780,7 +1780,7 @@ class RenderStyle {
   void setMarginLeft(Length v) { SET_VAR(surround, margin.left, v) }
   void setMarginRight(Length v) { SET_VAR(surround, margin.right, v) }
 
-  void resetPadding() { SET_VAR(surround, padding, LengthBox(Variable)) }
+  void resetPadding() { SET_VAR(surround, padding, LengthBox(Auto)) }
   void setPaddingTop(Length v) { SET_VAR(surround, padding.top, v) }
   void setPaddingBottom(Length v) { SET_VAR(surround, padding.bottom, v) }
   void setPaddingLeft(Length v) { SET_VAR(surround, padding.left, v) }
@@ -2005,7 +2005,7 @@ class RenderStyle {
   static Length initialMaxSize() { return Length(UNDEFINED, Fixed); }
   static Length initialOffset() { return Length(); }
   static Length initialMargin() { return Length(Fixed); }
-  static Length initialPadding() { return Length(Variable); }
+  static Length initialPadding() { return Length(Auto); }
   static Length initialTextIndent() { return Length(Fixed); }
   static EVerticalAlign initialVerticalAlign() { return BASELINE; }
   static int initialWidows() { return 2; }

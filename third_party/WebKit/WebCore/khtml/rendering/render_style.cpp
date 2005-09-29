@@ -34,7 +34,7 @@ using namespace khtml;
 using DOM::DOMStringImpl;
 using DOM::DOMString;
 
-StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Variable) {}
+StyleSurroundData::StyleSurroundData() : margin(Fixed), padding(Auto) {}
 
 StyleSurroundData::StyleSurroundData(const StyleSurroundData& o)
     : Shared<StyleSurroundData>(),
