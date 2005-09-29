@@ -392,7 +392,7 @@ static int weekDay(double t) {
   return wd;
 }
 
-static double timeZoneOffset(const struct tm* t) {
+static long timeZoneOffset(const struct tm* t) {
 #if defined BSD || defined(__linux__) || defined(__APPLE__)
   return -(t->tm_gmtoff / 60);
 #else
@@ -1143,7 +1143,7 @@ double KRFCDate_parseDate(const UString& _date) {
   // We ignore the weekday
   //
   double result = -1;
-  int offset = 0;
+  long offset = 0;
   bool have_tz = false;
   char* newPosStr;
   const char* dateString = _date.ascii();
@@ -1348,8 +1348,6 @@ double KRFCDate_parseDate(const UString& _date) {
     dateString = newPosStr;
   }
 
-  // don't fail if the time zone is missing, some
-  // broken mail-/news-clients omit the time zone
   if (*dateString) {
     if (strncasecmp(dateString, "GMT", 3) == 0 ||
         strncasecmp(dateString, "UTC", 3) == 0) {
@@ -1392,9 +1390,22 @@ double KRFCDate_parseDate(const UString& _date) {
           break;
         }
       }
-      // Bail out if we found an unknown timezone
-      if (!have_tz)
-        return invalidDate;
+      // If the time zone is missing or malformed, substitute the local time
+      // zone.
+      // Some websites (4275206) omit the time zone.
+      if (!have_tz) {
+        time_t now;
+        struct tm t;
+
+        time(&now);
+        if (now == -1)
+          return invalidDate;
+
+        localtime_r(&now, &t);
+        offset = -timeZoneOffset(&t);
+
+        have_tz = true;
+      }
     }
   }
 
