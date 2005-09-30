@@ -368,6 +368,8 @@ class StyleSurroundData : public Shared<StyleSurroundData>,
 //------------------------------------------------
 // Box attributes. Not inherited.
 
+enum EBoxSizing { CONTENT_BOX, BORDER_BOX };
+
 class StyleBoxData : public Shared<StyleBoxData>, public FastAllocated {
  public:
   StyleBoxData();
@@ -393,6 +395,7 @@ class StyleBoxData : public Shared<StyleBoxData>, public FastAllocated {
 
   int z_index;
   bool z_auto : 1;
+  EBoxSizing boxSizing : 1;
 };
 
 //------------------------------------------------
@@ -1499,6 +1502,7 @@ class RenderStyle {
   EBoxAlignment boxPack() const {
     return css3NonInheritedData->flexibleBox->pack;
   }
+  EBoxSizing boxSizing() const { return box->boxSizing; }
   Length marqueeIncrement() const {
     return css3NonInheritedData->marquee->increment;
   }
@@ -1863,6 +1867,7 @@ class RenderStyle {
   void setBoxPack(EBoxAlignment p) {
     SET_VAR(css3NonInheritedData.access()->flexibleBox, pack, p);
   }
+  void setBoxSizing(EBoxSizing s) { SET_VAR(box, boxSizing, s); }
   void setMarqueeIncrement(const Length& f) {
     SET_VAR(css3NonInheritedData.access()->marquee, increment, f);
   }
@@ -2023,6 +2028,7 @@ class RenderStyle {
   static float initialBoxFlex() { return 0.0f; }
   static int initialBoxFlexGroup() { return 1; }
   static int initialBoxOrdinalGroup() { return 1; }
+  static EBoxSizing initialBoxSizing() { return CONTENT_BOX; }
   static int initialMarqueeLoopCount() { return -1; }
   static int initialMarqueeSpeed() { return 85; }
   static Length initialMarqueeIncrement() { return Length(6, Fixed); }
