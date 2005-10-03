@@ -31,6 +31,8 @@
 
 #include "kdom/core/DocumentImpl.h"
 #include "ksvg2/svg/SVGDocumentImpl.h"
+#include "ksvg2/KSVGView.h"
+#include "kcanvas/device/quartz/KCanvasViewQuartz.h"
 
 using namespace khtml;
 using namespace DOM;
@@ -60,7 +62,19 @@ void KDOMNodeTreeWrapperImpl::attach() {
         static_cast<RenderKCanvasWrapper*>(renderer());
     SVGDocumentImpl* svgDoc = static_cast<KSVG::SVGDocumentImpl*>(m_wrappedDoc);
     canvasWrapper->setCanvas(svgDoc->canvas());
+    KCanvasViewQuartz* canvasView =
+        static_cast<KCanvasViewQuartz*>(svgDoc->svgView()->canvasView());
+    canvasView->setRenderObject(canvasWrapper);
   }
+}
+
+void KDOMNodeTreeWrapperImpl::detach() {
+  SVGDocumentImpl* svgDoc = static_cast<KSVG::SVGDocumentImpl*>(m_wrappedDoc);
+  KCanvasViewQuartz* canvasView =
+      static_cast<KCanvasViewQuartz*>(svgDoc->svgView()->canvasView());
+  canvasView->setRenderObject(NULL);
+
+  ElementImpl::detach();
 }
 
 RenderObject* KDOMNodeTreeWrapperImpl::createRenderer(RenderArena* arena,

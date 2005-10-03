@@ -50,6 +50,7 @@ class KDOMNodeTreeWrapperImpl : public ElementImpl {
                                               khtml::RenderStyle* style);
 
   virtual void attach();
+  virtual void detach();
 
  private:
   KDOM::DocumentImpl* m_wrappedDoc;
