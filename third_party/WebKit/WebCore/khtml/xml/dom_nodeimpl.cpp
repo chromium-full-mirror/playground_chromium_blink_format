@@ -616,8 +616,7 @@ bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
     // internal to khtml)
 
     it.toLast();
-    for (; it.current() && !evt->propagationStopped() &&
-           !evt->defaultPrevented() && !evt->defaultHandled();
+    for (; it.current() && !evt->defaultPrevented() && !evt->defaultHandled();
          --it)
       it.current()->defaultEventHandler(evt);
   }
