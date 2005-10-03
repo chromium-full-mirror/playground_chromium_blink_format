@@ -19,6 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
 #include "kjs_html.h"
 
 #include "misc/loader.h"
@@ -5629,7 +5630,7 @@ ValueImp* KJS::Context2DFunction::callAsFunction(ExecState* exec,
           size_t numComponents = CGColorSpaceGetNumberOfComponents(colorSpace);
           size_t bytesPerRow = BYTES_PER_ROW(
               csw, BITS_PER_COMPONENT, (numComponents + 1));  // + 1 for alpha
-          void* _drawingContextData = malloc(csh * bytesPerRow);
+          void* _drawingContextData = fastMalloc(csh * bytesPerRow);
 
           clippedSourceContext = CGBitmapContextCreate(
               _drawingContextData, csw, csh, BITS_PER_COMPONENT, bytesPerRow,
@@ -5643,7 +5644,7 @@ ValueImp* KJS::Context2DFunction::callAsFunction(ExecState* exec,
 
           CGImageRelease(clippedSourceImage);
           CGContextRelease(clippedSourceContext);
-          free(_drawingContextData);
+          fastFree(_drawingContextData);
         }
 
         CGImageRelease(sourceImage);
@@ -6392,10 +6393,10 @@ Gradient::~Gradient() {
     _shadingRef = 0;
   }
 
-  free(stops);
+  fastFree(stops);
   stops = 0;
 
-  free(adjustedStops);
+  fastFree(adjustedStops);
   adjustedStops = 0;
 }
 
@@ -6432,10 +6433,10 @@ CGShadingRef Gradient::getShading() {
 void Gradient::addColorStop(float s, float r, float g, float b, float a) {
   if (stopCount == 0) {
     maxStops = 4;
-    stops = (ColorStop*)malloc(maxStops * sizeof(ColorStop));
+    stops = (ColorStop*)fastMalloc(maxStops * sizeof(ColorStop));
   } else if (stopCount + 1 > maxStops) {
     maxStops *= 2;
-    stops = (ColorStop*)realloc(stops, maxStops * sizeof(ColorStop));
+    stops = (ColorStop*)fastRealloc(stops, maxStops * sizeof(ColorStop));
   }
   stops[stopCount++] = ColorStop(s, r, g, b, a);
   stopsNeedAdjusting = true;
@@ -6474,7 +6475,8 @@ const ColorStop* Gradient::colorStops(int* count) const {
       adjustedStopCount++;
 
     if (adjustedStopCount != stopCount) {
-      adjustedStops = (ColorStop*)malloc(adjustedStopCount * sizeof(ColorStop));
+      adjustedStops =
+          (ColorStop*)fastMalloc(adjustedStopCount * sizeof(ColorStop));
       memcpy(haveZeroStop ? adjustedStops : adjustedStops + 1, stops,
              stopCount * sizeof(ColorStop));
 

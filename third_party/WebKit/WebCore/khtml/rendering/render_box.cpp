@@ -24,6 +24,7 @@
 // -------------------------------------------------------------------------
 //#define DEBUG_LAYOUT
 
+#include "config.h"
 #include <qpainter.h>
 #include <qpen.h>
 

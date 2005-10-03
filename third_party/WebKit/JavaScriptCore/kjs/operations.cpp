@@ -20,9 +20,8 @@
  *
  */
 
-#include "operations.h"
-
 #include "config.h"
+#include "operations.h"
 
 #include <stdio.h>
 #include <assert.h>

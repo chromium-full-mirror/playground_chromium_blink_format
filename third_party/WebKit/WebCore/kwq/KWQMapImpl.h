@@ -33,7 +33,7 @@
 
 class KWQMapImpl;
 
-class KWQMapNodeImpl : public FastAllocated {
+class KWQMapNodeImpl {
  protected:
   typedef enum { Red = 0, Black = 1 } KWQMapNodeColor;
 
@@ -65,7 +65,7 @@ class KWQMapNodeImpl : public FastAllocated {
 #endif
 };
 
-class KWQMapIteratorImpl : public FastAllocated {
+class KWQMapIteratorImpl {
  protected:
   KWQMapNodeImpl* node;
 

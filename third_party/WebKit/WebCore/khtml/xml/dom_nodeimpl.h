@@ -27,7 +27,6 @@
 
 #include "dom/dom_string.h"
 #include "dom/dom_node.h"
-#include <kxmlcore/FastMalloc.h>
 #include "misc/helper.h"
 #include "misc/shared.h"
 #include "dom_atomicstring.h"
@@ -77,7 +76,7 @@ class DocumentPtr : public khtml::Shared<DocumentPtr> {
 };
 
 // this class implements nodes, which can have a parent but no children:
-class NodeImpl : public khtml::TreeShared<NodeImpl>, public FastAllocated {
+class NodeImpl : public khtml::TreeShared<NodeImpl> {
   friend class DocumentImpl;
 
  public:
@@ -644,7 +643,7 @@ class ContainerNodeImpl : public NodeImpl {
 class Node;
 class NodeImpl;
 
-class NodeListImpl : public khtml::Shared<NodeListImpl>, public FastAllocated {
+class NodeListImpl : public khtml::Shared<NodeListImpl> {
  public:
   NodeListImpl(NodeImpl* _rootNode);
   virtual ~NodeListImpl();
@@ -713,8 +712,7 @@ class NameNodeListImpl : public NodeListImpl {
 // Generic NamedNodeMap interface
 // Other classes implement this for more specific situations e.g. attributes
 // of an element
-class NamedNodeMapImpl : public khtml::Shared<NamedNodeMapImpl>,
-                         public FastAllocated {
+class NamedNodeMapImpl : public khtml::Shared<NamedNodeMapImpl> {
  public:
   NamedNodeMapImpl() {}
   virtual ~NamedNodeMapImpl() {}

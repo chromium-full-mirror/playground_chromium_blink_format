@@ -46,7 +46,7 @@ class CSSStyleRuleImpl;
 
 class DocumentImpl;
 
-struct CSSNamespace : public FastAllocated {
+struct CSSNamespace {
   AtomicString m_prefix;
   AtomicString m_uri;
   CSSNamespace* m_parent;
@@ -70,7 +70,7 @@ struct CSSNamespace : public FastAllocated {
 };
 
 // this class represents a selector for a StyleRule
-class CSSSelector : public FastAllocated {
+class CSSSelector {
  public:
   CSSSelector()
       : tagHistory(0),
@@ -204,8 +204,7 @@ class CSSSelector : public FastAllocated {
 };
 
 // a style class which has a parent (almost all have)
-class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl>,
-                      public FastAllocated {
+class StyleBaseImpl : public khtml::TreeShared<StyleBaseImpl> {
  public:
   StyleBaseImpl() {
     m_parent = 0;

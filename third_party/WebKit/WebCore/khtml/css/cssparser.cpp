@@ -24,6 +24,7 @@
 // #define TOKEN_DEBUG
 #define YYDEBUG 0
 
+#include "config.h"
 #include <kdebug.h>
 #include <kurl.h>
 
@@ -36,6 +37,7 @@
 #include "misc/helper.h"
 #include "xml/dom_docimpl.h"
 #include "csshelper.h"
+
 using namespace DOM;
 
 #include <stdlib.h>
@@ -45,7 +47,7 @@ void qFatal(const char* msg) {}
 #endif
 
 ValueList::ValueList() {
-  values = (Value*)malloc(16 * sizeof(Value));
+  values = (Value*)fastMalloc(16 * sizeof(Value));
   numValues = 0;
   currentValue = 0;
   maxValues = 16;
@@ -59,13 +61,13 @@ ValueList::~ValueList() {
     if (values[i].unit == Value::Function)
       delete values[i].function;
   }
-  free(values);
+  fastFree(values);
 }
 
 void ValueList::addValue(const Value& val) {
   if (numValues >= maxValues) {
     maxValues += 16;
-    values = (Value*)realloc(values, maxValues * sizeof(Value));
+    values = (Value*)fastRealloc(values, maxValues * sizeof(Value));
   }
   values[numValues++] = val;
 }
@@ -86,7 +88,7 @@ CSSParser::CSSParser(bool strictParsing) {
 #endif
   strict = strictParsing;
 
-  parsedProperties = (CSSProperty**)malloc(32 * sizeof(CSSProperty*));
+  parsedProperties = (CSSProperty**)fastMalloc(32 * sizeof(CSSProperty*));
   numParsedProperties = 0;
   maxParsedProperties = 32;
 
@@ -109,7 +111,7 @@ CSSParser::CSSParser(bool strictParsing) {
 CSSParser::~CSSParser() {
   if (numParsedProperties)
     clearProperties();
-  free(parsedProperties);
+  fastFree(parsedProperties);
 
   delete valueList;
 
@@ -117,7 +119,7 @@ CSSParser::~CSSParser() {
   kdDebug(6080) << "CSSParser::~CSSParser this=" << this << endl;
 #endif
 
-  free(data);
+  fastFree(data);
 }
 
 void ParseString::lower() {
@@ -130,7 +132,7 @@ void CSSParser::setupParser(const char* prefix,
                             const char* suffix) {
   int length = string.length() + strlen(prefix) + strlen(suffix) + 2;
 
-  data = (unsigned short*)malloc(length * sizeof(unsigned short));
+  data = (unsigned short*)fastMalloc(length * sizeof(unsigned short));
   for (unsigned int i = 0; i < strlen(prefix); i++)
     data[i] = prefix[i];
 
@@ -311,7 +313,7 @@ void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
 
   if (numParsedProperties >= maxParsedProperties) {
     maxParsedProperties += 32;
-    parsedProperties = (CSSProperty**)realloc(
+    parsedProperties = (CSSProperty**)fastRealloc(
         parsedProperties, maxParsedProperties * sizeof(CSSProperty*));
   }
   parsedProperties[numParsedProperties++] = prop;

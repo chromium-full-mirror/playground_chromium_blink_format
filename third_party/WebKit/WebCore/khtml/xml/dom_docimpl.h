@@ -124,8 +124,7 @@ struct DocumentMarker {
   bool operator!=(const DocumentMarker& o) const { return !(*this == o); }
 };
 
-class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl>,
-                              public FastAllocated {
+class DOMImplementationImpl : public khtml::Shared<DOMImplementationImpl> {
  public:
   DOMImplementationImpl();
   ~DOMImplementationImpl();

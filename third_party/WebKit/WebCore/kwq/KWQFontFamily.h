@@ -33,7 +33,7 @@
 class NSString;
 #endif
 
-class KWQFontFamily : public FastAllocated {
+class KWQFontFamily {
  public:
   KWQFontFamily();
   ~KWQFontFamily() {

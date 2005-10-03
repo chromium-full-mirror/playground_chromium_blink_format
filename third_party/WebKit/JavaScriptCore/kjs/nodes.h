@@ -25,7 +25,6 @@
 #ifndef _NODES_H_
 #define _NODES_H_
 
-#include <kxmlcore/FastMalloc.h>
 #include <kxmlcore/SharedPtr.h>
 
 #include "internal.h"
@@ -72,7 +71,7 @@ enum Operator {
   OpInstanceOf
 };
 
-class Node : public FastAllocated {
+class Node {
  public:
   Node();
   virtual ~Node();

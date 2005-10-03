@@ -41,7 +41,6 @@
 #include <qpalette.h>
 #include <qapplication.h>
 
-#include <kxmlcore/FastMalloc.h>
 #include "misc/khtmllayout.h"
 #include "misc/shared.h"
 #include "rendering/font.h"
@@ -350,8 +349,7 @@ class BorderData {
 
 enum EMarginCollapse { MCOLLAPSE, MSEPARATE, MDISCARD };
 
-class StyleSurroundData : public Shared<StyleSurroundData>,
-                          public FastAllocated {
+class StyleSurroundData : public Shared<StyleSurroundData> {
  public:
   StyleSurroundData();
   StyleSurroundData(const StyleSurroundData& o);
@@ -370,7 +368,7 @@ class StyleSurroundData : public Shared<StyleSurroundData>,
 
 enum EBoxSizing { CONTENT_BOX, BORDER_BOX };
 
-class StyleBoxData : public Shared<StyleBoxData>, public FastAllocated {
+class StyleBoxData : public Shared<StyleBoxData> {
  public:
   StyleBoxData();
   StyleBoxData(const StyleBoxData& o);
@@ -439,7 +437,7 @@ enum ETableLayout { TAUTO, TFIXED };
 
 enum EUnicodeBidi { UBNormal, Embed, Override };
 
-class StyleVisualData : public Shared<StyleVisualData>, public FastAllocated {
+class StyleVisualData : public Shared<StyleVisualData> {
  public:
   StyleVisualData();
   ~StyleVisualData();
@@ -475,7 +473,7 @@ enum EBackgroundBox { BGBORDER, BGPADDING, BGCONTENT };
 
 enum EBackgroundRepeat { REPEAT, REPEAT_X, REPEAT_Y, NO_REPEAT };
 
-struct BackgroundLayer : public FastAllocated {
+struct BackgroundLayer {
  public:
   BackgroundLayer();
   ~BackgroundLayer();
@@ -592,8 +590,7 @@ struct BackgroundLayer : public FastAllocated {
   BackgroundLayer* m_next;
 };
 
-class StyleBackgroundData : public Shared<StyleBackgroundData>,
-                            public FastAllocated {
+class StyleBackgroundData : public Shared<StyleBackgroundData> {
  public:
   StyleBackgroundData();
   ~StyleBackgroundData() {}
@@ -621,7 +618,7 @@ enum EMarqueeDirection {
   MBACKWARD = -3
 };
 
-class StyleMarqueeData : public Shared<StyleMarqueeData>, public FastAllocated {
+class StyleMarqueeData : public Shared<StyleMarqueeData> {
  public:
   StyleMarqueeData();
   StyleMarqueeData(const StyleMarqueeData& o);
@@ -646,8 +643,7 @@ enum EBoxOrient { HORIZONTAL, VERTICAL };
 enum EBoxLines { SINGLE, MULTIPLE };
 enum EBoxDirection { BNORMAL, BREVERSE };
 
-class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData>,
-                             public FastAllocated {
+class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData> {
  public:
   StyleFlexibleBoxData();
   StyleFlexibleBoxData(const StyleFlexibleBoxData& o);
@@ -667,7 +663,7 @@ class StyleFlexibleBoxData : public Shared<StyleFlexibleBoxData>,
 
 // This struct holds information about shadows for the text-shadow and
 // box-shadow properties.
-struct ShadowData : public FastAllocated {
+struct ShadowData {
   ShadowData(int _x, int _y, int _blur, const QColor& _color)
       : x(_x), y(_y), blur(_blur), color(_color), next(0) {}
   ShadowData(const ShadowData& o);
@@ -764,8 +760,7 @@ enum EAppearance {
 // them together,
 // we save space, and only allocate this object when someone actually uses
 // a non-inherited CSS3 property.
-class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData>,
-                                  public FastAllocated {
+class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData> {
  public:
   StyleCSS3NonInheritedData();
   ~StyleCSS3NonInheritedData();
@@ -808,8 +803,7 @@ class StyleCSS3NonInheritedData : public Shared<StyleCSS3NonInheritedData>,
 // together,
 // we save space, and only allocate this object when someone actually uses
 // an inherited CSS3 property.
-class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData>,
-                               public FastAllocated {
+class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
  public:
   StyleCSS3InheritedData();
   ~StyleCSS3InheritedData();

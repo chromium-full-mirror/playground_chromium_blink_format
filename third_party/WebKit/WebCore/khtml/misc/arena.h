@@ -122,7 +122,7 @@ void* ArenaAllocate(ArenaPool* pool, unsigned int nb);
     (pool)->current = &(pool)->first; \
   *(pnext) = (a)->next;               \
   CLEAR_ARENA(a);                     \
-  free(a);                            \
+  fastFree(a);                        \
   (a) = 0;
 
 #endif

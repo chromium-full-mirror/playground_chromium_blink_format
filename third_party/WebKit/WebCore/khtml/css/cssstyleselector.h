@@ -29,7 +29,6 @@
 #include "dom/dom_string.h"
 #include "xml/dom_stringimpl.h"
 #include "css/css_ruleimpl.h"
-#include <kxmlcore/FastMalloc.h>
 
 class KHTMLSettings;
 class KHTMLView;
@@ -62,7 +61,7 @@ class RenderStyle;
  * CSSStyleSelector
  * exists, but someone may wish to implement XSL...
  */
-class StyleSelector : public FastAllocated {
+class StyleSelector {
  public:
   StyleSelector(){};
 
@@ -238,7 +237,7 @@ class CSSStyleSelector : public StyleSelector {
   void applyProperty(int id, DOM::CSSValueImpl* value);
 };
 
-class CSSRuleData : public FastAllocated {
+class CSSRuleData {
  public:
   CSSRuleData(uint pos,
               DOM::CSSStyleRuleImpl* r,
@@ -262,7 +261,7 @@ class CSSRuleData : public FastAllocated {
   CSSRuleData* m_next;
 };
 
-class CSSRuleDataList : public FastAllocated {
+class CSSRuleDataList {
  public:
   CSSRuleDataList(uint pos,
                   DOM::CSSStyleRuleImpl* rule,
