@@ -20,9 +20,7 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 #ifndef HAVE_SYS_TIMEB_H
 #define HAVE_SYS_TIMEB_H 0
 #endif
@@ -39,6 +37,10 @@
 #endif
 #if HAVE_SYS_TIMEB_H
 #include <sys/timeb.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
 #endif
 
 #ifdef HAVE_SYS_PARAM_H
@@ -75,8 +77,13 @@ const double msPerSecond = 1000;
 const double msPerMinute = msPerSecond * secondsPerMinute;
 const double msPerHour = msPerMinute * minutesPerHour;
 const double msPerDay = msPerHour * hoursPerDay;
+static const char* const weekdayName[7] = {"Mon", "Tue", "Wed", "Thu",
+                                           "Fri", "Sat", "Sun"};
+static const char* const monthName[12] = {"Jan", "Feb", "Mar", "Apr",
+                                          "May", "Jun", "Jul", "Aug",
+                                          "Sep", "Oct", "Nov", "Dec"};
 
-#if APPLE_CHANGES
+#ifdef APPLE_CHANGES
 
 // Originally, we wrote our own implementation that uses Core Foundation because
 // of a performance problem in Mac OS X 10.2.
@@ -97,12 +104,6 @@ using KJS::UString;
 
 #define ctime(x) NotAllowedToCallThis()
 #define strftime(a, b, c, d) NotAllowedToCallThis()
-
-static const char* const weekdayName[7] = {"Mon", "Tue", "Wed", "Thu",
-                                           "Fri", "Sat", "Sun"};
-static const char* const monthName[12] = {"Jan", "Feb", "Mar", "Apr",
-                                          "May", "Jun", "Jul", "Aug",
-                                          "Sep", "Oct", "Nov", "Dec"};
 
 static struct tm* tmUsingCF(time_t clock, CFTimeZoneRef timeZone) {
   static struct tm result;
@@ -228,39 +229,6 @@ static time_t timeUsingCF(time_t* clock) {
   return result;
 }
 
-static UString formatDate(struct tm& tm) {
-  char buffer[100];
-  snprintf(buffer, sizeof(buffer), "%s %s %02d %04d",
-           weekdayName[(tm.tm_wday + 6) % 7], monthName[tm.tm_mon], tm.tm_mday,
-           tm.tm_year + 1900);
-  return buffer;
-}
-
-static UString formatDateUTCVariant(struct tm& tm) {
-  char buffer[100];
-  snprintf(buffer, sizeof(buffer), "%s, %02d %s %04d",
-           weekdayName[(tm.tm_wday + 6) % 7], tm.tm_mday, monthName[tm.tm_mon],
-           tm.tm_year + 1900);
-  return buffer;
-}
-
-static UString formatTime(struct tm& tm) {
-  char buffer[100];
-  if (tm.tm_gmtoff == 0) {
-    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT", tm.tm_hour,
-             tm.tm_min, tm.tm_sec);
-  } else {
-    int offset = tm.tm_gmtoff;
-    if (offset < 0) {
-      offset = -offset;
-    }
-    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d", tm.tm_hour,
-             tm.tm_min, tm.tm_sec, tm.tm_gmtoff < 0 ? '-' : '+',
-             offset / (60 * 60), (offset / 60) % 60);
-  }
-  return UString(buffer);
-}
-
 static CFDateFormatterStyle styleFromArgString(
     const UString& string,
     CFDateFormatterStyle defaultStyle) {
@@ -340,6 +308,39 @@ static UString formatLocaleDate(KJS::ExecState* exec,
 
 namespace KJS {
 
+static UString formatDate(struct tm& tm) {
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "%s %s %02d %04d",
+           weekdayName[(tm.tm_wday + 6) % 7], monthName[tm.tm_mon], tm.tm_mday,
+           tm.tm_year + 1900);
+  return buffer;
+}
+
+static UString formatDateUTCVariant(struct tm& tm) {
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "%s, %02d %s %04d",
+           weekdayName[(tm.tm_wday + 6) % 7], tm.tm_mday, monthName[tm.tm_mon],
+           tm.tm_year + 1900);
+  return buffer;
+}
+
+static UString formatTime(struct tm& tm) {
+  char buffer[100];
+  if (tm.tm_gmtoff == 0) {
+    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT", tm.tm_hour,
+             tm.tm_min, tm.tm_sec);
+  } else {
+    int offset = tm.tm_gmtoff;
+    if (offset < 0) {
+      offset = -offset;
+    }
+    snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d GMT%c%02d%02d", tm.tm_hour,
+             tm.tm_min, tm.tm_sec, tm.tm_gmtoff < 0 ? '-' : '+',
+             offset / (60 * 60), (offset / 60) % 60);
+  }
+  return UString(buffer);
+}
+
 static int day(double t) {
   return int(floor(t / msPerDay));
 }
@@ -393,7 +394,7 @@ static int weekDay(double t) {
 }
 
 static long timeZoneOffset(const struct tm* t) {
-#if defined BSD || defined(__linux__) || defined(__APPLE__)
+#if !defined(WIN32)
   return -(t->tm_gmtoff / 60);
 #else
 #if defined(__BORLANDC__) || defined(__CYGWIN__)
@@ -639,7 +640,7 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
 
   ValueImp* result = NULL;
   UString s;
-#if !APPLE_CHANGES
+#if !defined(APPLE_CHANGES) || !APPLE_CHANGES
   const int bufsize = 100;
   char timebuffer[bufsize];
   CString oldlocale = setlocale(LC_TIME, NULL);
@@ -648,7 +649,6 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
 #endif
   ValueImp* v = thisObj->internalValue();
   double milli = v->toNumber(exec);
-
   if (isNaN(milli)) {
     switch (id) {
       case ToString:
@@ -694,6 +694,7 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
   time_t tv = (time_t)floor(milli / 1000.0);
   double ms = milli - tv * 1000.0;
 
+  // FIXME: not threadsafe (either of these options)
   struct tm* t = utc ? gmtime(&tv) : localtime(&tv);
   // we had an out of range year. use that one (plus/minus offset
   // found by calculating tm_year) and fix the week day calculation
@@ -708,7 +709,6 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
   }
 
   switch (id) {
-#if APPLE_CHANGES
     case ToString:
       result = String(formatDate(*t) + " " + formatTime(*t));
       break;
@@ -722,6 +722,7 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
     case ToUTCString:
       result = String(formatDateUTCVariant(*t) + " " + formatTime(*t));
       break;
+#if APPLE_CHANGES
     case ToLocaleString:
       result = String(formatLocaleDate(exec, secs, true, true, args));
       break;
@@ -732,25 +733,6 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
       result = String(formatLocaleDate(exec, secs, false, true, args));
       break;
 #else
-    case ToString:
-      s = ctime(&tv);
-      result = String(s.substr(0, s.size() - 1));
-      break;
-    case ToDateString:
-    case ToTimeString:
-    case ToGMTString:
-    case ToUTCString:
-      setlocale(LC_TIME, "C");
-      if (id == DateProtoFuncImp::ToDateString) {
-        strftime(timebuffer, bufsize, "%x", t);
-      } else if (id == DateProtoFuncImp::ToTimeString) {
-        strftime(timebuffer, bufsize, "%X", t);
-      } else {  // toGMTString & toUTCString
-        strftime(timebuffer, bufsize, "%a, %d %b %Y %H:%M:%S %Z", t);
-      }
-      setlocale(LC_TIME, oldlocale.c_str());
-      result = String(timebuffer);
-      break;
     case ToLocaleString:
       strftime(timebuffer, bufsize, "%c", t);
       result = String(timebuffer);
@@ -802,9 +784,7 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
       result = Number(ms);
       break;
     case GetTimezoneOffset:
-#if defined BSD || defined(__APPLE__)
-      result = Number(-t->tm_gmtoff / 60);
-#else
+#if WIN32
 #if defined(__BORLANDC__)
 #error please add daylight savings offset here!
       // FIXME: Using the daylight value was wrong for BSD, maybe wrong here
@@ -815,6 +795,8 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
       // too.
       result = Number((timezone / 60 - (daylight ? 60 : 0)));
 #endif
+#else
+      result = Number(-t->tm_gmtoff / 60);
 #endif
       break;
     case SetTime:
@@ -910,6 +892,7 @@ ObjectImp* DateObjectImp::construct(ExecState* exec, const List& args) {
         floor((double)timebuffer.time * 1000.0 + (double)timebuffer.millitm);
 #else
     struct timeval tv;
+    // FIXME: not threadsafe
     gettimeofday(&tv, 0L);
     double utc =
         floor((double)tv.tv_sec * 1000.0 + (double)tv.tv_usec / 1000.0);
@@ -959,15 +942,9 @@ ValueImp* DateObjectImp::callAsFunction(ExecState* /*exec*/,
                                         ObjectImp* /*thisObj*/,
                                         const List& /*args*/) {
   time_t t = time(0L);
-#if APPLE_CHANGES
+  // FIXME: not threadsafe
   struct tm* tm = localtime(&t);
   return String(formatDate(*tm) + " " + formatTime(*tm));
-#else
-  UString s(ctime(&t));
-
-  // return formatted string minus trailing \n
-  return String(s.substr(0, s.size() - 1));
-#endif
 }
 
 // ------------------------------ DateObjectFuncImp ----------------------------
@@ -1064,12 +1041,8 @@ double makeTime(struct tm* t, double ms, bool utc) {
   int utcOffset;
   if (utc) {
     time_t zero = 0;
-#if defined BSD || defined(__linux__) || defined(__APPLE__)
-    struct tm t3;
-    localtime_r(&zero, &t3);
-    utcOffset = t3.tm_gmtoff;
-    t->tm_isdst = t3.tm_isdst;
-#else
+#if defined(WIN32)
+    // FIXME: not threadsafe
     (void)localtime(&zero);
 #if defined(__BORLANDC__) || defined(__CYGWIN__)
     utcOffset = -_timezone;
@@ -1077,17 +1050,24 @@ double makeTime(struct tm* t, double ms, bool utc) {
     utcOffset = -timezone;
 #endif
     t->tm_isdst = 0;
+#else
+    struct tm t3;
+    localtime_r(&zero, &t3);
+    utcOffset = t3.tm_gmtoff;
+    t->tm_isdst = t3.tm_isdst;
 #endif
   } else {
     utcOffset = 0;
     t->tm_isdst = -1;
   }
 
+#ifdef __APPLE__
   // t->tm_year must hold the bulk of the data to avoid overflow when converting
   // to a CFGregorianDate. (CFGregorianDate.month is an SInt8;
   // CFGregorianDate.year is an SInt32.)
   t->tm_year += t->tm_mon / 12;
   t->tm_mon %= 12;
+#endif
 
   double yearOffset = 0.0;
   if (t->tm_year < (1970 - 1900) || t->tm_year > (2038 - 1900)) {

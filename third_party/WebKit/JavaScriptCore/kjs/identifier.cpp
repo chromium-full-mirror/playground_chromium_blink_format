@@ -28,7 +28,7 @@
 // avoids code that
 // runs at init time.
 
-#if !WIN32  // can't get this to compile on Visual C++ yet
+#if !defined(WIN32)  // can't get this to compile on Visual C++ yet
 #define AVOID_STATIC_CONSTRUCTORS 1
 #endif
 
