@@ -45,11 +45,21 @@ const ClassInfo DOMAbstractView::info = {"AbstractView", 0,
 @begin DOMAbstractViewTable 2
   document		DOMAbstractView::Document
 DontDelete|ReadOnly
+@end
+@begin DOMAbstractViewProtoTable 1
   getComputedStyle	DOMAbstractView::GetComputedStyle
 DontDelete|Function 2
 @end
 */
-IMPLEMENT_PROTOFUNC(DOMAbstractViewFunc)
+
+DEFINE_PROTOTYPE("DOMAbstractView", DOMAbstractViewProto)
+IMPLEMENT_PROTOFUNC(DOMAbstractViewProtoFunc)
+IMPLEMENT_PROTOTYPE(DOMAbstractViewProto, DOMAbstractViewProtoFunc)
+
+DOMAbstractView::DOMAbstractView(ExecState* exec, AbstractViewImpl* av)
+    : m_impl(av) {
+  setPrototype(DOMAbstractViewProto::self(exec));
+}
 
 DOMAbstractView::~DOMAbstractView() {
   ScriptInterpreter::forgetDOMObject(m_impl.get());
@@ -63,13 +73,13 @@ ValueImp* DOMAbstractView::getValueProperty(ExecState* exec, int token) {
 bool DOMAbstractView::getOwnPropertySlot(ExecState* exec,
                                          const Identifier& propertyName,
                                          PropertySlot& slot) {
-  return getStaticPropertySlot<DOMAbstractViewFunc, DOMAbstractView, DOMObject>(
+  return getStaticValueSlot<DOMAbstractView, DOMObject>(
       exec, &DOMAbstractViewTable, this, propertyName, slot);
 }
 
-ValueImp* DOMAbstractViewFunc::callAsFunction(ExecState* exec,
-                                              ObjectImp* thisObj,
-                                              const List& args) {
+ValueImp* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
+                                                   ObjectImp* thisObj,
+                                                   const List& args) {
   if (!thisObj->inherits(&DOMAbstractView::info))
     return throwError(exec, TypeError);
   AbstractViewImpl& abstractView =
