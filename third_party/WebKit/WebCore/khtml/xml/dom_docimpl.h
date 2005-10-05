@@ -348,10 +348,10 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void finishParsing();
   void clear();
 
-  QString URL() const { return m_url; }
+  QString URL() const { return m_url.isEmpty() ? "about:blank" : m_url; }
   void setURL(const QString& url);
 
-  QString baseURL() const { return m_baseURL.isEmpty() ? m_url : m_baseURL; }
+  QString baseURL() const { return m_baseURL.isEmpty() ? URL() : m_baseURL; }
   void setBaseURL(const QString& baseURL) { m_baseURL = baseURL; }
 
   QString baseTarget() const { return m_baseTarget; }
