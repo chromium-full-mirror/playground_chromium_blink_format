@@ -377,6 +377,9 @@ class DOMNamedNodeMap : public DOMObject {
   static ValueImp* indexGetter(ExecState* exec,
                                const Identifier&,
                                const PropertySlot& slot);
+  static ValueImp* nameGetter(ExecState* exec,
+                              const Identifier&,
+                              const PropertySlot& slot);
 
   SharedPtr<DOM::NamedNodeMapImpl> m_impl;
 };
