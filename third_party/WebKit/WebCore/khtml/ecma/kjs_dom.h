@@ -100,6 +100,7 @@ class DOMNode : public DOMObject {
     RemoveEventListener,
     DispatchEvent,
     Contains,
+    IsSameNode,
     OnAbort,
     OnBlur,
     OnChange,
