@@ -52,18 +52,18 @@ RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderBox(node) {
 
 RenderContainer::~RenderContainer() {}
 
-void RenderContainer::detach() {
+void RenderContainer::destroy() {
   if (continuation())
-    continuation()->detach();
+    continuation()->destroy();
 
   while (m_first) {
     if (m_first->isListMarker())
       m_first->remove();
     else
-      m_first->detach();
+      m_first->destroy();
   }
 
-  RenderBox::detach();
+  RenderBox::destroy();
 }
 
 bool RenderContainer::canHaveChildren() const {
@@ -251,7 +251,7 @@ void RenderContainer::updatePseudoChild(RenderStyle::PseudoId type,
     if (child && child->style()->styleType() == type) {
       oldContentPresent = false;
       removeChild(child);
-      child->detach();
+      child->destroy();
       child = (type == RenderStyle::BEFORE) ? firstChild() : lastChild();
     }
   }
@@ -473,7 +473,7 @@ void RenderContainer::removeLeftoverAnonymousBoxes() {
         c->m_first = 0;
         c->m_next = 0;
       }
-      child->detach();
+      child->destroy();
     }
     child = next;
   }

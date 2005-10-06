@@ -58,7 +58,7 @@ class InlineBox {
 
   virtual ~InlineBox(){};
 
-  virtual void detach(RenderArena* renderArena);
+  virtual void destroy(RenderArena* renderArena);
 
   virtual void deleteLine(RenderArena* arena);
   virtual void extractLine();
@@ -387,7 +387,7 @@ class RootInlineBox : public InlineFlowBox {
         m_hasSelectedChildren(false),
         m_ellipsisBox(0) {}
 
-  virtual void detach(RenderArena* renderArena);
+  virtual void destroy(RenderArena* renderArena);
   void detachEllipsisBox(RenderArena* renderArena);
 
   RootInlineBox* nextRootBox() {

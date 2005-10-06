@@ -57,7 +57,7 @@ using namespace DOM;
 static bool inInlineTextBoxDetach;
 #endif
 
-void InlineTextBox::detach(RenderArena* renderArena) {
+void InlineTextBox::destroy(RenderArena* renderArena) {
 #ifndef NDEBUG
   inInlineTextBoxDetach = true;
 #endif
@@ -77,7 +77,7 @@ void* InlineTextBox::operator new(size_t sz, RenderArena* renderArena) throw() {
 void InlineTextBox::operator delete(void* ptr, size_t sz) {
   assert(inInlineTextBoxDetach);
 
-  // Stash size where detach can find it.
+  // Stash size where destroy can find it.
   *(size_t*)ptr = sz;
 }
 
@@ -176,7 +176,7 @@ QRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
 
 void InlineTextBox::deleteLine(RenderArena* arena) {
   static_cast<RenderText*>(m_object)->removeTextBox(this);
-  detach(arena);
+  destroy(arena);
 }
 
 void InlineTextBox::extractLine() {
@@ -900,7 +900,7 @@ RenderText::~RenderText() {
     str->deref();
 }
 
-void RenderText::detach() {
+void RenderText::destroy() {
   if (!documentBeingDestroyed()) {
     if (firstTextBox()) {
       if (isBR()) {
@@ -914,7 +914,7 @@ void RenderText::detach() {
       parent()->dirtyLinesFromChangedChild(this);
   }
   deleteTextBoxes();
-  RenderObject::detach();
+  RenderObject::destroy();
 }
 
 void RenderText::extractTextBox(InlineTextBox* box) {
@@ -959,7 +959,7 @@ void RenderText::deleteTextBoxes() {
     InlineTextBox *curr = firstTextBox(), *next = 0;
     while (curr) {
       next = curr->nextTextBox();
-      curr->detach(arena);
+      curr->destroy(arena);
       curr = next;
     }
     m_firstTextBox = m_lastTextBox = 0;
@@ -1785,7 +1785,7 @@ void RenderText::position(InlineBox* box,
   if (len == 0) {
     // We want the box to be destroyed.
     s->remove();
-    s->detach(renderArena());
+    s->destroy(renderArena());
     m_firstTextBox = m_lastTextBox = 0;
     return;
   }

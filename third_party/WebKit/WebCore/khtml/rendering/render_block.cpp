@@ -343,7 +343,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
       no->setNeedsLayoutAndMinMaxRecalc();
     }
     // Nuke the now-empty block.
-    next->detach();
+    next->destroy();
   }
 
   RenderFlow::removeChild(oldChild);
@@ -366,7 +366,7 @@ void RenderBlock::removeChild(RenderObject* oldChild) {
     }
 
     // Nuke the now-empty block.
-    anonBlock->detach();
+    anonBlock->destroy();
   }
 }
 
@@ -3719,7 +3719,7 @@ void RenderBlock::updateFirstLetter() {
       letter->setStyle(newStyle);
       firstLetter->addChild(letter);
 
-      textObj->detach();
+      textObj->destroy();
     }
   }
 }

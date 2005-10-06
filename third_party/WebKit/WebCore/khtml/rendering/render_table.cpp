@@ -829,13 +829,13 @@ RenderTableSection::~RenderTableSection() {
   clearGrid();
 }
 
-void RenderTableSection::detach() {
+void RenderTableSection::destroy() {
   // recalc cell info because RenderTable has unguarded pointers
   // stored that point to this RenderTableSection.
   if (table())
     table()->setNeedSectionRecalc();
 
-  RenderContainer::detach();
+  RenderContainer::destroy();
 }
 
 void RenderTableSection::setStyle(RenderStyle* _style) {
@@ -1495,12 +1495,12 @@ RenderTableRow::RenderTableRow(DOM::NodeImpl* node) : RenderContainer(node) {
   setInline(false);  // our object is not Inline
 }
 
-void RenderTableRow::detach() {
+void RenderTableRow::destroy() {
   RenderTableSection* s = section();
   if (s) {
     s->setNeedCellRecalc();
   }
-  RenderContainer::detach();
+  RenderContainer::destroy();
 }
 
 void RenderTableRow::setStyle(RenderStyle* style) {
@@ -1553,7 +1553,7 @@ void RenderTableRow::addChild(RenderObject* child, RenderObject* beforeChild) {
 }
 
 RenderObject* RenderTableRow::removeChildNode(RenderObject* child) {
-  // RenderTableCell detach should do it
+  // RenderTableCell destroy should do it
   //     if ( section() )
   // 	section()->setNeedCellRecalc();
   return RenderContainer::removeChildNode(child);
@@ -1608,11 +1608,11 @@ RenderTableCell::RenderTableCell(DOM::NodeImpl* _node) : RenderBlock(_node) {
   m_percentageHeight = 0;
 }
 
-void RenderTableCell::detach() {
+void RenderTableCell::destroy() {
   if (parent() && section())
     section()->setNeedCellRecalc();
 
-  RenderBlock::detach();
+  RenderBlock::destroy();
 }
 
 void RenderTableCell::updateFromElement() {

@@ -985,7 +985,7 @@ class RenderObject : public CachedObjectClient {
   // doing unnecessary work.
   bool documentBeingDestroyed() const { return !document()->renderer(); }
 
-  virtual void detach();
+  virtual void destroy();
 
   const QFont& font(bool firstLine) const { return style(firstLine)->font(); }
 

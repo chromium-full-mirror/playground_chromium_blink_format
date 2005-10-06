@@ -425,7 +425,7 @@ class RenderTextArea : public RenderFormElement {
  public:
   RenderTextArea(DOM::HTMLTextAreaElementImpl* element);
 
-  virtual void detach();
+  virtual void destroy();
 
   virtual const char* renderName() const { return "RenderTextArea"; }
   virtual void calcMinMaxWidth();

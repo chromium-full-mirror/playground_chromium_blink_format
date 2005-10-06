@@ -53,7 +53,7 @@ class RenderBox : public RenderObject {
                            int _ty,
                            HitTestAction hitTestAction);
 
-  virtual void detach();
+  virtual void destroy();
 
   virtual int minWidth() const { return m_minWidth; }
   virtual int maxWidth() const { return m_maxWidth; }

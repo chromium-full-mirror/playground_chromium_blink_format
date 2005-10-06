@@ -147,7 +147,7 @@ static int inlineWidth(RenderObject* child,
 static bool inBidiRunDetach;
 #endif
 
-void BidiRun::detach(RenderArena* renderArena) {
+void BidiRun::destroy(RenderArena* renderArena) {
 #ifndef NDEBUG
   inBidiRunDetach = true;
 #endif
@@ -167,7 +167,7 @@ void* BidiRun::operator new(size_t sz, RenderArena* renderArena) throw() {
 void BidiRun::operator delete(void* ptr, size_t sz) {
   assert(inBidiRunDetach);
 
-  // Stash size where detach can find it.
+  // Stash size where destroy() can find it.
   *(size_t*)ptr = sz;
 }
 
@@ -178,7 +178,7 @@ static void deleteBidiRuns(RenderArena* arena) {
   BidiRun* curr = sFirstBidiRun;
   while (curr) {
     BidiRun* s = curr->nextRun;
-    curr->detach(arena);
+    curr->destroy(arena);
     curr = s;
   }
 

@@ -79,7 +79,7 @@ class InlineTextBox : public InlineRunBox {
 
   void offsetRun(int d) { m_start += d; }
 
-  void detach(RenderArena* arena);
+  void destroy(RenderArena* arena);
 
   QRect selectionRect(int absx, int absy, int startPos, int endPos);
   bool isSelected(int startPos, int endPos) const;
@@ -202,7 +202,7 @@ class RenderText : public RenderObject {
   void attachTextBox(InlineTextBox* textBox);
   void removeTextBox(InlineTextBox* textBox);
   void deleteTextBoxes();
-  virtual void detach();
+  virtual void destroy();
 
   DOM::DOMString data() const { return str; }
   DOM::DOMStringImpl* string() const { return str; }
