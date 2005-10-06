@@ -25,6 +25,8 @@ static CFTypeRef KJSValueToCFTypeInternal(const Value& inValue,
 //--------------------------------------------------------------------------
 
 UString CFStringToUString(CFStringRef inCFString) {
+  InterpreterLock lock;
+
   UString result;
   if (inCFString) {
     CFIndex len = CFStringGetLength(inCFString);
@@ -100,6 +102,8 @@ JSUserObject* KJSValueToJSObject(const Value& inValue, ExecState* exec) {
 //	JSObjectKJSValue
 //--------------------------------------------------------------------------
 Value JSObjectKJSValue(JSUserObject* ptr) {
+  InterpreterLock lock;
+
   Value result = Undefined();
   if (ptr) {
     bool handled = false;
@@ -169,6 +173,8 @@ CFTypeRef KJSValueToCFTypeInternal(const Value& inValue,
 #endif
 
   CFTypeRef result = NULL;
+
+  InterpreterLock lock;
 
   switch (inValue.type()) {
     case BooleanType: {
