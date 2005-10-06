@@ -365,7 +365,6 @@ ValueImp* NumberProtoFuncImp::callAsFunction(ExecState* exec,
 
 const ClassInfo NumberObjectImp::info = {"Number", &InternalFunctionImp::info,
                                          &numberTable, 0};
-// const ClassInfo NumberObjectImp::info = {"Number", 0, &numberTable, 0};
 
 /* Source for number_object.lut.h
 @begin numberTable 5

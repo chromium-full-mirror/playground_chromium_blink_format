@@ -102,7 +102,6 @@ class ValueImp {
                         Type preferredType = UnspecifiedType) const;
   bool toBoolean(ExecState* exec) const;
   double toNumber(ExecState* exec) const;
-  double toNumber(ExecState* exec, bool& knownToBeInteger) const;
   UString toString(ExecState* exec) const;
   ObjectImp* toObject(ExecState* exec) const;
 
@@ -165,7 +164,6 @@ class AllocatedValueImp : public ValueImp {
                                 Type preferredType = UnspecifiedType) const = 0;
   virtual bool toBoolean(ExecState* exec) const = 0;
   virtual double toNumber(ExecState* exec) const = 0;
-  double toNumber(ExecState* exec, bool& knownToBeInteger) const;
   virtual UString toString(ExecState* exec) const = 0;
   virtual ObjectImp* toObject(ExecState* exec) const = 0;
 
@@ -184,17 +182,10 @@ AllocatedValueImp* jsNull();
 AllocatedValueImp* jsBoolean(bool = false);
 
 ValueImp* jsNumber(double);
-ValueImp* jsNumber(double, bool knownToBeInteger);
-AllocatedValueImp* jsNaN();
+ValueImp* jsNaN();
 ValueImp* jsZero();
 ValueImp* jsOne();
 ValueImp* jsTwo();
-ValueImp* jsNumber(int);
-ValueImp* jsNumber(unsigned);
-ValueImp* jsNumber(long);
-ValueImp* jsNumber(unsigned long);
-ValueImp* jsNumber(long long);
-ValueImp* jsNumber(unsigned long long);
 
 AllocatedValueImp* jsString(
     const UString&);  // returns empty string if passed null string
@@ -210,7 +201,6 @@ class ConstantValues {
   static AllocatedValueImp* null;
   static AllocatedValueImp* jsFalse;
   static AllocatedValueImp* jsTrue;
-  static AllocatedValueImp* NaN;
 
   static void init();
   static void clear();
@@ -229,8 +219,8 @@ inline AllocatedValueImp* jsBoolean(bool b) {
   return b ? ConstantValues::jsTrue : ConstantValues::jsFalse;
 }
 
-inline AllocatedValueImp* jsNaN() {
-  return ConstantValues::NaN;
+inline ValueImp* jsNaN() {
+  return SimpleNumber::make(NaN);
 }
 
 inline ValueImp::ValueImp() {}
@@ -342,10 +332,10 @@ inline const ObjectImp* ValueImp::getObject() const {
 
 inline bool ValueImp::getUInt32(uint32_t& v) const {
   if (SimpleNumber::is(this)) {
-    long i = SimpleNumber::value(this);
-    if (i < 0)
+    double d = SimpleNumber::value(this);
+    if (!(d >= 0) || d > 0xFFFFFFFFUL)  // true for NaN
       return false;
-    v = i;
+    v = static_cast<uint32_t>(d);
     return true;
   }
   return downcast()->getUInt32(v);
@@ -371,8 +361,12 @@ inline ValueImp* ValueImp::toPrimitive(ExecState* exec,
 }
 
 inline bool ValueImp::toBoolean(ExecState* exec) const {
-  return SimpleNumber::is(this) ? SimpleNumber::value(this)
-                                : downcast()->toBoolean(exec);
+  if (SimpleNumber::is(this)) {
+    double d = SimpleNumber::value(this);
+    return d < 0 || d > 0;  // false for NaN
+  }
+
+  return downcast()->toBoolean(exec);
 }
 
 inline double ValueImp::toNumber(ExecState* exec) const {
@@ -380,31 +374,27 @@ inline double ValueImp::toNumber(ExecState* exec) const {
                                 : downcast()->toNumber(exec);
 }
 
-inline double ValueImp::toNumber(ExecState* exec,
-                                 bool& knownToBeInteger) const {
-  if (SimpleNumber::is(this)) {
-    knownToBeInteger = true;
-    return SimpleNumber::value(this);
-  }
-  knownToBeInteger = false;
-  return downcast()->toNumber(exec);
-}
-
 inline UString ValueImp::toString(ExecState* exec) const {
-  return SimpleNumber::is(this) ? UString::from(SimpleNumber::value(this))
-                                : downcast()->toString(exec);
+  if (SimpleNumber::is(this)) {
+    double d = SimpleNumber::value(this);
+    if (d == 0.0)  // +0.0 or -0.0
+      d = 0.0;
+    return UString::from(d);
+  }
+
+  return downcast()->toString(exec);
 }
 
 inline ValueImp* jsZero() {
-  return SimpleNumber::make(0);
+  return SimpleNumber::make(0.0);
 }
 
 inline ValueImp* jsOne() {
-  return SimpleNumber::make(1);
+  return SimpleNumber::make(1.0);
 }
 
 inline ValueImp* jsTwo() {
-  return SimpleNumber::make(2);
+  return SimpleNumber::make(2.0);
 }
 
 // compatibility names so we don't have to change so much code
@@ -419,18 +409,6 @@ inline AllocatedValueImp* Boolean(bool b) {
   return jsBoolean(b);
 }
 inline ValueImp* Number(double n) {
-  return jsNumber(n);
-}
-inline ValueImp* Number(int n) {
-  return jsNumber(n);
-}
-inline ValueImp* Number(unsigned n) {
-  return jsNumber(n);
-}
-inline ValueImp* Number(long n) {
-  return jsNumber(n);
-}
-inline ValueImp* Number(unsigned long n) {
   return jsNumber(n);
 }
 inline AllocatedValueImp* String(const UString& s) {

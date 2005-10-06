@@ -26,7 +26,6 @@
 #define INTERNAL_H
 
 #include "ustring.h"
-#include "value.h"
 #include "object.h"
 #include "protect.h"
 #include "types.h"
@@ -116,14 +115,7 @@ class StringImp : public AllocatedValueImp {
 class NumberImp : public AllocatedValueImp {
   friend class ConstantValues;
   friend class InterpreterImp;
-  friend ValueImp* jsNumber(int);
-  friend ValueImp* jsNumber(unsigned);
-  friend ValueImp* jsNumber(long);
-  friend ValueImp* jsNumber(unsigned long);
-  friend ValueImp* jsNumber(long long);
-  friend ValueImp* jsNumber(unsigned long long);
   friend ValueImp* jsNumber(double);
-  friend ValueImp* jsNumber(double, bool);
 
  public:
   double value() const { return val; }
