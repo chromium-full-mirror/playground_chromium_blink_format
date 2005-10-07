@@ -1,3 +1,5 @@
+// -*- mode: c++; c-basic-offset: 4 -*-
+
 #ifndef __UserObjectImp_h
 #define __UserObjectImp_h
 
@@ -19,28 +21,20 @@ class UserObjectImp : public ObjectImp {
 
   virtual bool implementsCall() const;
 
-  virtual bool hasProperty(ExecState* exec,
-                           const Identifier& propertyName) const;
-  virtual ReferenceList UserObjectImp::propList(ExecState* exec,
-                                                bool recursive = true);
+  virtual void getPropertyNames(ExecState* exec,
+                                IdentifierSequencedSet& propertyNames);
 
-  virtual Value call(ExecState* exec, Object& thisObj, const List& args);
-#if JAG_PINK_OR_LATER
-  virtual Value get(ExecState* exec, const Identifier& propertyName) const;
+  virtual ValueImp* callAsFunction(ExecState* exec,
+                                   ObjectImp* thisObj,
+                                   const List& args);
+  virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   const Value& value,
+                   ValueImp* value,
                    int attr = None);
-#else
-  virtual Value get(ExecState* exec, const UString& propertyName) const;
-  virtual void put(ExecState* exec,
-                   const UString& propertyName,
-                   const Value& value,
-                   int attr = None);
-#endif
 
-  virtual Value toPrimitive(ExecState* exec,
-                            Type preferredType = UnspecifiedType) const;
+  ValueImp* toPrimitive(ExecState* exec,
+                        Type preferredType = UnspecifiedType) const;
   virtual bool toBoolean(ExecState* exec) const;
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
@@ -53,6 +47,10 @@ class UserObjectImp : public ObjectImp {
   UserObjectImp();
 
  private:
+  static ValueImp* userObjectGetter(ExecState*,
+                                    const Identifier&,
+                                    const PropertySlot&);
+
   JSUserObject* fJSUserObject;
 };
 

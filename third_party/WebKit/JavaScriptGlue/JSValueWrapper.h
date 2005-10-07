@@ -1,3 +1,5 @@
+// -*- mode: c++; c-basic-offset: 4 -*-
+
 #ifndef __JSValueWrapper_h
 #define __JSValueWrapper_h
 
@@ -11,13 +13,13 @@
 
 class JSValueWrapper {
  public:
-  JSValueWrapper(const Value& inValue, ExecState* inExec);
+  JSValueWrapper(ValueImp* inValue, ExecState* inExec);
   virtual ~JSValueWrapper();
 
-  Value& GetValue();
+  ValueImp* GetValue();
   ExecState* GetExecState() const;
 
-  ProtectedValue fValue;
+  ProtectedPtr<ValueImp> fValue;
   ExecState* fExec;
 
   static void GetJSObectCallBacks(JSObjectCallBacks& callBacks);
