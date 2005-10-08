@@ -131,8 +131,10 @@ void SVGUseElementImpl::close() {
   KDOM::ElementImpl* targetElement =
       ownerDocument()->getElementById(targetId.handle());
   SVGElementImpl* target = svg_dynamic_cast(targetElement);
-  if (!target)
+  if (!target) {
+    getDocument()->addForwardReference(this);
     return;
+  }
 
   float _x = x()->baseVal()->value(), _y = y()->baseVal()->value();
   float _w = width()->baseVal()->value(), _h = height()->baseVal()->value();
@@ -195,6 +197,8 @@ void SVGUseElementImpl::close() {
     appendChild(dummy);
     dummy->appendChild(root);
   }
+
+  SVGElementImpl::close();
 }
 
 bool SVGUseElementImpl::hasChildNodes() const {
