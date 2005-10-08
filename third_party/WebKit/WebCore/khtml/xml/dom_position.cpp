@@ -328,17 +328,18 @@ static bool isStreamer(Position pos) {
 // PositionIterator
 // for <rdar://problem/4103339>.  See also Ken's comments in the header.
 // Fundamentally, upstream()
-// scans backward in the DOM starting at "this" to return a visible DOM position
-// that is either in
-// a text node, or just after a replaced or BR element (btw downstream() also
-// considers empty blocks).
-// The search stops when it would have entered into a part of the DOM with a
-// different enclosing
-// block, including a nested one. Then this method returns the highest previous
-// position that is
-// either in an atomic node (i.e. text) or is the end of a non-atomic node
-// (_regardless_ of
-// visibility).
+// scans backward in the DOM starting at "this" to return the closest previous
+// visible DOM position
+// that is either in a text node, or just after a replaced or BR element (btw
+// downstream() also
+// considers empty blocks).  The search is limited to the enclosing block.  If
+// the search would
+// otherwise have entered into a part of the DOM with a different enclosing
+// block, including a
+// nested one, the search stops and this function returns the highest previous
+// visible DOM position
+// that is either in an atomic node (i.e. text) or is the end of a non-atomic
+// node.
 Position Position::upstream() const {
   // start at equivalent deep position
   Position start = equivalentDeepPosition();
@@ -349,7 +350,6 @@ Position Position::upstream() const {
   // iterate backward from there, looking for a qualified position
   NodeImpl* block = startNode->enclosingBlockFlowOrTableElement();
   Position lastVisible = *this;
-  Position lastStreamer = *this;
   Position currentPos = start;
   for (; !currentPos.atStart(); currentPos = currentPos.previous()) {
     NodeImpl* currentNode = currentPos.node();
@@ -358,11 +358,7 @@ Position Position::upstream() const {
     // limit traversal to block or table enclosing the original element
     // NOTE: This includes not going into nested blocks
     if (block != currentNode->enclosingBlockFlowOrTableElement())
-      return lastStreamer;
-
-    // track last streamer position (regardless of visibility)
-    if (isStreamer(currentPos))
-      lastStreamer = currentPos;
+      return lastVisible;
 
     // skip position in unrendered or invisible node
     RenderObject* renderer = currentNode->renderer();
@@ -421,12 +417,13 @@ Position Position::upstream() const {
 // position that is
 // either in a text node, or just before a replaced, BR element, or empty block
 // flow element (i.e.
-// non-text nodes with no children).  The search stops when it would
-// have entered into a part of the DOM with a different enclosing block,
-// including a nested one.
-// If the search stops, this method returns the first previous position that is
-// either in an
-//  atomic node (i.e. text) or is at offset 0 (_regardless_ of visibility).
+// non-text nodes with no children).  The search is limited to the enclosing
+// block.  If the search
+// would otherwise have entered into a part of the DOM with a different
+// enclosing block, including a
+// nested one, the search stops and this function returns the first previous
+// position that is either
+// in an atomic node (i.e. text) or is at offset 0.
 Position Position::downstream() const {
   // start at equivalent deep position
   Position start = equivalentDeepPosition();
@@ -437,7 +434,6 @@ Position Position::downstream() const {
   // iterate forward from there, looking for a qualified position
   NodeImpl* block = startNode->enclosingBlockFlowOrTableElement();
   Position lastVisible = *this;
-  Position lastStreamer = *this;
   Position currentPos = start;
   for (; !currentPos.atEnd(); currentPos = currentPos.next()) {
     NodeImpl* currentNode = currentPos.node();
@@ -450,14 +446,10 @@ Position Position::downstream() const {
       break;
 
     // limit traversal to block or table enclosing the original element
-    // return the last streamer position regardless of visibility
+    // return the last visible streamer position
     // NOTE: This includes not going into nested blocks
     if (block != currentNode->enclosingBlockFlowOrTableElement())
-      return lastStreamer;
-
-    // track last streamer position (regardless of visibility)
-    if (isStreamer(currentPos))
-      lastStreamer = currentPos;
+      return lastVisible;
 
     // skip position in unrendered or invisible node
     RenderObject* renderer = currentNode->renderer();
