@@ -119,9 +119,12 @@ NodeImpl* HTMLElementImpl::cloneNode(bool deep) {
 
 bool HTMLElementImpl::mapToEntry(const QualifiedName& attrName,
                                  MappedAttributeEntry& result) const {
-  if (attrName == alignAttr || attrName == contenteditableAttr ||
-      attrName == dirAttr) {
+  if (attrName == alignAttr || attrName == contenteditableAttr) {
     result = eUniversal;
+    return false;
+  }
+  if (attrName == dirAttr) {
+    result = hasTagName(bdoTag) ? eBDO : eUniversal;
     return false;
   }
 
@@ -149,7 +152,8 @@ void HTMLElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     // FIXME: Implement
   } else if (attr->name() == dirAttr) {
     addCSSProperty(attr, CSS_PROP_DIRECTION, attr->value());
-    addCSSProperty(attr, CSS_PROP_UNICODE_BIDI, CSS_VAL_EMBED);
+    addCSSProperty(attr, CSS_PROP_UNICODE_BIDI,
+                   hasTagName(bdoTag) ? CSS_VAL_BIDI_OVERRIDE : CSS_VAL_EMBED);
   }
   // standard events
   else if (attr->name() == onclickAttr) {
