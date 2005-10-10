@@ -18,7 +18,7 @@ ExecState* JSValueWrapper::GetExecState() const {
 
 void JSValueWrapper::GetJSObectCallBacks(JSObjectCallBacks& callBacks) {
   callBacks.dispose = (JSObjectDisposeProcPtr)JSValueWrapper::JSObjectDispose;
-  callBacks.equal = (JSObjectEqualProcPtr)NULL;
+  callBacks.equal = (JSObjectEqualProcPtr)0;
   callBacks.copyPropertyNames = (JSObjectCopyPropertyNamesProcPtr)
       JSValueWrapper::JSObjectCopyPropertyNames;
   callBacks.copyCFValue =
@@ -39,7 +39,7 @@ void JSValueWrapper::JSObjectDispose(void* data) {
 CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
   InterpreterLock lock;
 
-  CFMutableArrayRef result = NULL;
+  CFMutableArrayRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
@@ -53,7 +53,7 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
       CFStringRef nameStr = IdentifierToCFString(name);
 
       if (!result) {
-        result = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+        result = CFArrayCreateMutable(0, 0, &kCFTypeArrayCallBacks);
       }
       if (result && nameStr) {
         CFArrayAppendValue(result, nameStr);
@@ -69,7 +69,7 @@ JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
                                                  CFStringRef propertyName) {
   InterpreterLock lock;
 
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
@@ -109,7 +109,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
                                                  CFArrayRef args) {
   InterpreterLock lock;
 
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
@@ -142,7 +142,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
 CFTypeRef JSValueWrapper::JSObjectCopyCFValue(void* data) {
   InterpreterLock lock;
 
-  CFTypeRef result = NULL;
+  CFTypeRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     result = KJSValueToCFType(ptr->fValue, ptr->fExec);

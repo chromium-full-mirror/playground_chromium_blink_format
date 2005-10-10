@@ -2,8 +2,8 @@
 // JSObject.h
 //
 
-#ifndef __JSObject_h
-#define __JSObject_h
+#ifndef JSObject_h
+#define JSObject_h
 
 #include "JSBase.h"
 #include "JSUtils.h"
@@ -16,8 +16,6 @@ JSObjectRef JSObjectCreateInternal(void* data,
 
 class JSUserObject : public JSBase {
  public:
-  //		JSUserObject(JSObjectCallBacksPtr callBacks, JSObjectMarkProcPtr
-  //markProc, void* data, int dataType = kJSUserObjectDataTypeUnknown);
   JSUserObject(JSObjectCallBacksPtr callBacks,
                JSObjectMarkProcPtr markProc,
                void* data,

@@ -1,5 +1,5 @@
 /*
-        JSGlue.cpp
+    JSGlue.cpp
 */
 
 #include "JavaScriptGlue.h"
@@ -8,7 +8,7 @@
 #include "JSObject.h"
 #include "JSRun.h"
 
-static CFTypeRef sJSCFNullRef = NULL;
+static CFTypeRef sJSCFNullRef = 0;
 
 static void CFJSObjectDispose(void* data);
 static JSObjectRef CFJSObjectCopyProperty(void* data, CFStringRef propertyName);
@@ -32,7 +32,7 @@ CFTypeRef JSGetCFNull(void) {
 }
 
 /*
-        JSRetain
+    JSRetain
 */
 JSTypeRef JSRetain(JSTypeRef ref) {
   if (ref) {
@@ -43,7 +43,7 @@ JSTypeRef JSRetain(JSTypeRef ref) {
 }
 
 /*
-        JSRelease
+    JSRelease
 */
 void JSRelease(JSTypeRef ref) {
   if (ref) {
@@ -53,10 +53,10 @@ void JSRelease(JSTypeRef ref) {
 }
 
 /*
-        JSCopyDescription
+    JSCopyDescription
 */
 CFStringRef JSCopyDescription(JSTypeRef ref) {
-  CFStringRef result = NULL;
+  CFStringRef result = 0;
   if (ref) {
     JSBase* ptr = (JSBase*)ref;
     ptr->CopyDescription();
@@ -65,7 +65,7 @@ CFStringRef JSCopyDescription(JSTypeRef ref) {
 }
 
 /*
-        JSEqual
+    JSEqual
 */
 UInt8 JSEqual(JSTypeRef ref1, JSTypeRef ref2) {
   UInt8 result = false;
@@ -77,7 +77,7 @@ UInt8 JSEqual(JSTypeRef ref1, JSTypeRef ref2) {
 }
 
 /*
-        JSGetTypeID
+    JSGetTypeID
 */
 JSTypeID JSGetTypeID(JSTypeRef ref) {
   JSTypeID result = kJSInvalidTypeID;
@@ -89,7 +89,7 @@ JSTypeID JSGetTypeID(JSTypeRef ref) {
 }
 
 /*
-        JSGetRetainCount
+    JSGetRetainCount
 */
 CFIndex JSGetRetainCount(JSTypeRef ref) {
   CFIndex result = -1;
@@ -101,32 +101,32 @@ CFIndex JSGetRetainCount(JSTypeRef ref) {
 }
 
 /*
-        JSObjectCreate
+    JSObjectCreate
 */
 JSObjectRef JSObjectCreate(void* data, JSObjectCallBacksPtr callBacks) {
-  JSObjectRef result = JSObjectCreateInternal(data, callBacks, NULL,
-                                              kJSUserObjectDataTypeUnknown);
+  JSObjectRef result =
+      JSObjectCreateInternal(data, callBacks, 0, kJSUserObjectDataTypeUnknown);
   return result;
 }
 
 /*
-        JSObjectCreateInternal
+    JSObjectCreateInternal
 */
 JSObjectRef JSObjectCreateInternal(void* data,
                                    JSObjectCallBacksPtr callBacks,
                                    JSObjectMarkProcPtr markProc,
                                    int type) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSUserObject* ptr = new JSUserObject(callBacks, markProc, data, type);
   result = (JSObjectRef)ptr;
   return result;
 }
 
 /*
-        JSObjectCopyCFValue
+    JSObjectCopyCFValue
 */
 CFTypeRef JSObjectCopyCFValue(JSObjectRef ref) {
-  CFTypeRef result = NULL;
+  CFTypeRef result = 0;
   JSUserObject* ptr = (JSUserObject*)ref;
   if (ptr && (ptr->GetTypeID() == kJSObjectTypeID)) {
     result = ptr->CopyCFValue();
@@ -135,10 +135,10 @@ CFTypeRef JSObjectCopyCFValue(JSObjectRef ref) {
 }
 
 /*
-        JSObjectGetData
+    JSObjectGetData
 */
 void* JSObjectGetData(JSObjectRef ref) {
-  void* result = NULL;
+  void* result = 0;
   JSUserObject* ptr = (JSUserObject*)ref;
   if (ptr && (ptr->GetTypeID() == kJSObjectTypeID)) {
     result = ptr->GetData();
@@ -147,10 +147,10 @@ void* JSObjectGetData(JSObjectRef ref) {
 }
 
 /*
-        JSObjectCopyProperty
+    JSObjectCopyProperty
 */
 JSObjectRef JSObjectCopyProperty(JSObjectRef ref, CFStringRef propertyName) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSUserObject* ptr = (JSUserObject*)ref;
   if (ptr && (ptr->GetTypeID() == kJSObjectTypeID)) {
     result = (JSObjectRef)ptr->CopyProperty(propertyName);
@@ -159,7 +159,7 @@ JSObjectRef JSObjectCopyProperty(JSObjectRef ref, CFStringRef propertyName) {
 }
 
 /*
-        JSObjectSetProperty
+    JSObjectSetProperty
 */
 void JSObjectSetProperty(JSObjectRef ref,
                          CFStringRef propertyName,
@@ -171,12 +171,12 @@ void JSObjectSetProperty(JSObjectRef ref,
 }
 
 /*
-        JSObjectCallFunction
+    JSObjectCallFunction
 */
 JSObjectRef JSObjectCallFunction(JSObjectRef ref,
                                  JSObjectRef thisObj,
                                  CFArrayRef args) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSUserObject* ptr = (JSUserObject*)ref;
   if (ptr && (ptr->GetTypeID() == kJSObjectTypeID)) {
     result = (JSObjectRef)ptr->CallFunction((JSUserObject*)thisObj, args);
@@ -185,10 +185,10 @@ JSObjectRef JSObjectCallFunction(JSObjectRef ref,
 }
 
 /*
-        JSRunCreate
+    JSRunCreate
 */
 JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
-  JSRunRef result = NULL;
+  JSRunRef result = 0;
   if (jsSource) {
     result = (JSRunRef) new JSRun(jsSource, inFlags);
   }
@@ -196,10 +196,10 @@ JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
 }
 
 /*
-        JSRunCopySource
+    JSRunCopySource
 */
 CFStringRef JSRunCopySource(JSRunRef ref) {
-  CFStringRef result = NULL;
+  CFStringRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
     result = UStringToCFString(ptr->GetSource());
@@ -208,10 +208,10 @@ CFStringRef JSRunCopySource(JSRunRef ref) {
 }
 
 /*
-        JSRunCopyGlobalObject
+    JSRunCopyGlobalObject
 */
 JSObjectRef JSRunCopyGlobalObject(JSRunRef ref) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
     ObjectImp* globalObject = ptr->GlobalObject();
@@ -222,15 +222,13 @@ JSObjectRef JSRunCopyGlobalObject(JSRunRef ref) {
 }
 
 /*
-        JSRunEvaluate
+    JSRunEvaluate
 */
 JSObjectRef JSRunEvaluate(JSRunRef ref) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
     Completion completion = ptr->Evaluate();
-#if JAG_PINK_OR_LATER
-
     if (completion.isValueCompletion()) {
       result = (JSObjectRef)KJSValueToJSObject(
           completion.value(), ptr->GetInterpreter()->globalExec());
@@ -246,21 +244,15 @@ JSObjectRef JSRunEvaluate(JSRunRef ref) {
         }
       }
     }
-
-#else
-    result = (JSObjectRef)KJSValueToJSObject(
-        completion, ptr->GetInterpreter()->globalExec());
-#endif
   }
   return result;
 }
 
 /*
-        JSRunCheckSyntax
-        Return true if no syntax error
+    JSRunCheckSyntax
+    Return true if no syntax error
 */
 bool JSRunCheckSyntax(JSRunRef ref) {
-#if JAG_PINK_OR_LATER
   bool result = false;
   JSRun* ptr = (JSRun*)ref;
   if (ptr) {
@@ -269,23 +261,18 @@ bool JSRunCheckSyntax(JSRunRef ref) {
     JSUnlockInterpreter();
   }
   return result;
-#else
-  return true;
-#endif
 }
 
 /*
-        JSCollect - trigger garbage collection
+    JSCollect - trigger garbage collection
 */
 void JSCollect(void) {
-#if JAG_PINK_OR_LATER
   InterpreterLock lock;
   Collector::collect();
-#endif
 }
 
 /*
-        JSTypeGetCFArrayCallBacks
+    JSTypeGetCFArrayCallBacks
 */
 void JSTypeGetCFArrayCallBacks(CFArrayCallBacks* outCallBacks) {
   if (outCallBacks) {
@@ -299,7 +286,7 @@ void JSTypeGetCFArrayCallBacks(CFArrayCallBacks* outCallBacks) {
 }
 
 /*
-        JSCFRetain
+    JSCFRetain
 */
 void* JSCFRetain(CFAllocatorRef allocator, const void* value) {
   JSRetain((JSTypeRef)value);
@@ -307,14 +294,14 @@ void* JSCFRetain(CFAllocatorRef allocator, const void* value) {
 }
 
 /*
-        JSCFRelease
+    JSCFRelease
 */
 void JSCFRelease(CFAllocatorRef allocator, const void* value) {
   JSRelease((JSTypeRef)value);
 }
 
 /*
-        JSObjectCreateWithCFType
+    JSObjectCreateWithCFType
 */
 JSObjectRef JSObjectCreateWithCFType(CFTypeRef inRef) {
   JSObjectCallBacks callBacks;
@@ -325,16 +312,16 @@ JSObjectRef JSObjectCreateWithCFType(CFTypeRef inRef) {
     callBacks.copyCFValue = CFJSObjectCopyCFValue;
     callBacks.copyProperty = CFJSObjectCopyProperty;
     callBacks.setProperty = CFJSObjectSetProperty;
-    callBacks.callFunction = NULL;
+    callBacks.callFunction = 0;
     callBacks.copyPropertyNames = CFJSObjectCopyPropertyNames;
-    cfJSObject = JSObjectCreateInternal((void*)CFRetain(inRef), &callBacks,
-                                        NULL, kJSUserObjectDataTypeCFType);
+    cfJSObject = JSObjectCreateInternal((void*)CFRetain(inRef), &callBacks, 0,
+                                        kJSUserObjectDataTypeCFType);
   }
   return cfJSObject;
 }
 
 /*
-        CFJSObjectDispose
+    CFJSObjectDispose
 */
 void CFJSObjectDispose(void* data) {
   if (data) {
@@ -343,7 +330,7 @@ void CFJSObjectDispose(void* data) {
 }
 
 CFArrayRef JSObjectCopyPropertyNames(JSObjectRef ref) {
-  CFArrayRef result = NULL;
+  CFArrayRef result = 0;
   JSUserObject* ptr = (JSUserObject*)ref;
   if (ptr && (ptr->GetTypeID() == kJSObjectTypeID)) {
     result = ptr->CopyPropertyNames();
@@ -351,17 +338,17 @@ CFArrayRef JSObjectCopyPropertyNames(JSObjectRef ref) {
   return result;
 }
 /*
-        CFJSObjectCopyProperty
+    CFJSObjectCopyProperty
 */
 JSObjectRef CFJSObjectCopyProperty(void* data, CFStringRef propertyName) {
-  JSObjectRef result = NULL;
+  JSObjectRef result = 0;
   if (data && propertyName) {
-    CFTypeRef cfResult = NULL;
+    CFTypeRef cfResult = 0;
     if (CFGetTypeID(data) == CFDictionaryGetTypeID()) {
       if (CFStringCompare(propertyName, CFSTR("length"), 0) ==
           kCFCompareEqualTo) {
         int len = CFDictionaryGetCount((CFDictionaryRef)data);
-        cfResult = CFNumberCreate(NULL, kCFNumberIntType, &len);
+        cfResult = CFNumberCreate(0, kCFNumberIntType, &len);
       } else {
         cfResult = RetainCFType(
             CFDictionaryGetValue((CFDictionaryRef)data, propertyName));
@@ -370,7 +357,7 @@ JSObjectRef CFJSObjectCopyProperty(void* data, CFStringRef propertyName) {
       if (CFStringCompare(propertyName, CFSTR("length"), 0) ==
           kCFCompareEqualTo) {
         int len = CFArrayGetCount((CFArrayRef)data);
-        cfResult = CFNumberCreate(NULL, kCFNumberIntType, &len);
+        cfResult = CFNumberCreate(0, kCFNumberIntType, &len);
       } else {
         SInt32 index = CFStringGetIntValue(propertyName);
         CFIndex arrayCount = CFArrayGetCount((CFArrayRef)data);
@@ -383,7 +370,7 @@ JSObjectRef CFJSObjectCopyProperty(void* data, CFStringRef propertyName) {
       if (CFStringCompare(propertyName, CFSTR("length"), 0) ==
           kCFCompareEqualTo) {
         int len = CFStringGetLength((CFStringRef)data);
-        cfResult = CFNumberCreate(NULL, kCFNumberIntType, &len);
+        cfResult = CFNumberCreate(0, kCFNumberIntType, &len);
       }
     }
     if (cfResult) {
@@ -395,7 +382,7 @@ JSObjectRef CFJSObjectCopyProperty(void* data, CFStringRef propertyName) {
 }
 
 /*
-        CFJSObjectSetProperty
+    CFJSObjectSetProperty
 */
 void CFJSObjectSetProperty(void* data,
                            CFStringRef propertyName,
@@ -436,10 +423,10 @@ void CFJSObjectSetProperty(void* data,
 }
 
 /*
-        CFJSObjectCopyCFValue
+    CFJSObjectCopyCFValue
 */
 CFTypeRef CFJSObjectCopyCFValue(void* data) {
-  CFTypeRef result = NULL;
+  CFTypeRef result = 0;
   if (data) {
     result = (CFTypeRef)CFRetain(data);
   }
@@ -447,7 +434,7 @@ CFTypeRef CFJSObjectCopyCFValue(void* data) {
 }
 
 /*
-        CFJSObjectCopyCFValue
+    CFJSObjectCopyCFValue
 */
 UInt8 CFJSObjectEqual(void* data1, void* data2) {
   UInt8 result = false;
@@ -458,10 +445,10 @@ UInt8 CFJSObjectEqual(void* data1, void* data2) {
 }
 
 /*
-        CFJSObjectCopyPropertyNames
+    CFJSObjectCopyPropertyNames
 */
 CFArrayRef CFJSObjectCopyPropertyNames(void* data) {
-  CFMutableArrayRef result = NULL;
+  CFMutableArrayRef result = 0;
   if (data) {
     CFTypeID cfType = CFGetTypeID(data);
     if (cfType == CFDictionaryGetTypeID()) {
@@ -471,14 +458,14 @@ CFArrayRef CFJSObjectCopyPropertyNames(void* data) {
         if (keys) {
           int i;
           CFDictionaryGetKeysAndValues((CFDictionaryRef)data,
-                                       (const void**)keys, NULL);
+                                       (const void**)keys, 0);
           for (i = 0; i < count; i++) {
             CFStringRef key = (CFStringRef)keys[i];
             if (CFGetTypeID(key) != CFStringGetTypeID())
               continue;
 
             if (!result)
-              result = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+              result = CFArrayCreateMutable(0, 0, &kCFTypeArrayCallBacks);
             if (!result)
               continue;
 
@@ -495,7 +482,7 @@ CFArrayRef CFJSObjectCopyPropertyNames(void* data) {
 CFMutableArrayRef JSCreateCFArrayFromJSArray(CFArrayRef array) {
   CFIndex count = array ? CFArrayGetCount(array) : 0;
   CFMutableArrayRef cfArray =
-      CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+      CFArrayCreateMutable(0, 0, &kCFTypeArrayCallBacks);
   CFIndex i;
 
   for (i = 0; cfArray && i < count; i++) {
@@ -518,7 +505,7 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
   CFIndex i;
 
   JSTypeGetCFArrayCallBacks(&arrayCallbacks);
-  jsArray = CFArrayCreateMutable(NULL, 0, &arrayCallbacks);
+  jsArray = CFArrayCreateMutable(0, 0, &arrayCallbacks);
 
   for (i = 0; array && i < count; i++) {
     CFTypeRef cfValue = (CFTypeRef)CFArrayGetValueAtIndex(array, i);
@@ -535,13 +522,9 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
 }
 
 void JSLockInterpreter() {
-#if JAG_PINK_OR_LATER
   Interpreter::lock();
-#endif
 }
 
 void JSUnlockInterpreter() {
-#if JAG_PINK_OR_LATER
   Interpreter::unlock();
-#endif
 }

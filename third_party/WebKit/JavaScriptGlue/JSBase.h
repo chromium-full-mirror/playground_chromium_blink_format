@@ -2,8 +2,8 @@
 // JSBase.h
 //
 
-#ifndef __JSBase_h
-#define __JSBase_h
+#ifndef JSBase_h
+#define JSBase_h
 
 #include "JSUtils.h"
 

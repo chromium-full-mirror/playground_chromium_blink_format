@@ -29,7 +29,7 @@ JSTypeID JSBase::GetTypeID() const {
 
 CFStringRef JSBase::CopyDescription() {
   return CFStringCreateWithFormat(
-      NULL, NULL, CFSTR("<JSTypeRef- ptr:0x%lx type: %d, retaincount: %ld>"),
+      0, 0, CFSTR("<JSTypeRef- ptr:0x%lx type: %d, retaincount: %ld>"),
       (long)this, (int)fTypeID, (long)fRetainCount);
 }
 

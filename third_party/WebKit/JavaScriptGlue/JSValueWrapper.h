@@ -1,10 +1,8 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
-
-#ifndef __JSValueWrapper_h
-#define __JSValueWrapper_h
+#ifndef JSValueWrapper_h
+#define JSValueWrapper_h
 
 /*
-        JSValueWrapper.h
+    JSValueWrapper.h
 */
 
 #include "JSUtils.h"

@@ -1,8 +1,8 @@
-#ifndef __JAVASCRIPTGLUE__
-#define __JAVASCRIPTGLUE__
+#ifndef JAVASCRIPTGLUE_H
+#define JAVASCRIPTGLUE_H
 
 /*
-        JavaScriptGlue.h
+    JavaScriptGlue.h
 */
 
 #ifndef __CORESERVICES__
@@ -87,8 +87,8 @@ void JSTypeGetCFArrayCallBacks(CFArrayCallBacks* outCallBacks);
 CFMutableArrayRef JSCreateCFArrayFromJSArray(CFArrayRef array);
 CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array);
 
-void JSLockInterpreter();
-void JSUnlockInterpreter();
+void JSLockInterpreter(void);
+void JSUnlockInterpreter(void);
 
 #ifdef __cplusplus
 }

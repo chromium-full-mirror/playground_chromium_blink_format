@@ -1,5 +1,5 @@
 //
-//	JSObject.cpp
+// JSObject.cpp
 //
 
 #include "JSObject.h"
@@ -21,7 +21,7 @@ JSUserObject::~JSUserObject() {
 }
 
 CFArrayRef JSUserObject::CopyPropertyNames(void) {
-  CFArrayRef result = NULL;
+  CFArrayRef result = 0;
   if (fCallBacks.copyPropertyNames) {
     result = fCallBacks.copyPropertyNames(fData);
   }
@@ -29,7 +29,7 @@ CFArrayRef JSUserObject::CopyPropertyNames(void) {
 }
 
 JSUserObject* JSUserObject::CopyProperty(CFStringRef propertyName) {
-  JSUserObject* result = NULL;
+  JSUserObject* result = 0;
   if (fCallBacks.copyProperty) {
     result = (JSUserObject*)fCallBacks.copyProperty(fData, propertyName);
   }
@@ -48,7 +48,7 @@ bool JSUserObject::ImplementsCall() {
 
 JSUserObject* JSUserObject::CallFunction(JSUserObject* thisObj,
                                          CFArrayRef args) {
-  JSUserObject* result = NULL;
+  JSUserObject* result = 0;
   if (fCallBacks.callFunction) {
     result = (JSUserObject*)fCallBacks.callFunction(fData, (JSObjectRef)thisObj,
                                                     args);
@@ -57,7 +57,7 @@ JSUserObject* JSUserObject::CallFunction(JSUserObject* thisObj,
 }
 
 CFTypeRef JSUserObject::CopyCFValue() const {
-  CFTypeRef result = NULL;
+  CFTypeRef result = 0;
   if (fCallBacks.copyCFValue) {
     result = (JSUserObject*)fCallBacks.copyCFValue(fData);
   }

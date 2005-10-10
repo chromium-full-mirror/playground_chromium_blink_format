@@ -12,7 +12,7 @@ class UserObjectPrototypeImp : public UserObjectImp {
   static UserObjectPrototypeImp* sUserObjectPrototypeImp;
 };
 
-UserObjectPrototypeImp* UserObjectPrototypeImp::sUserObjectPrototypeImp = NULL;
+UserObjectPrototypeImp* UserObjectPrototypeImp::sUserObjectPrototypeImp = 0;
 
 UserObjectPrototypeImp::UserObjectPrototypeImp() : UserObjectImp() {}
 
@@ -24,7 +24,7 @@ UserObjectPrototypeImp* UserObjectPrototypeImp::GlobalUserObjectPrototypeImp() {
   return sUserObjectPrototypeImp;
 }
 
-UserObjectImp::UserObjectImp() : ObjectImp(), fJSUserObject(NULL) {}
+UserObjectImp::UserObjectImp() : ObjectImp(), fJSUserObject(0) {}
 
 UserObjectImp::UserObjectImp(JSUserObject* userObject)
     : ObjectImp(UserObjectPrototypeImp::GlobalUserObjectPrototypeImp()),
@@ -53,7 +53,7 @@ ValueImp* UserObjectImp::callAsFunction(ExecState* exec,
     CFIndex argCount = args.size();
     CFArrayCallBacks arrayCallBacks;
     JSTypeGetCFArrayCallBacks(&arrayCallBacks);
-    CFMutableArrayRef jsArgs = CFArrayCreateMutable(NULL, 0, &arrayCallBacks);
+    CFMutableArrayRef jsArgs = CFArrayCreateMutable(0, 0, &arrayCallBacks);
     if (jsArgs) {
       for (CFIndex i = 0; i < argCount; i++) {
         JSUserObject* jsArg = KJSValueToJSObject(args[i], exec);
@@ -159,7 +159,7 @@ ValueImp* UserObjectImp::toPrimitive(ExecState* exec,
                                      Type preferredType) const {
   ValueImp* result = Undefined();
   JSUserObject* jsObjPtr = KJSValueToJSObject(toObject(exec), exec);
-  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : NULL;
+  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : 0;
   if (cfValue) {
     CFTypeID cfType = CFGetTypeID(cfValue);  // toPrimitive
     if (cfValue == GetCFNull()) {
@@ -193,7 +193,7 @@ ValueImp* UserObjectImp::toPrimitive(ExecState* exec,
 bool UserObjectImp::toBoolean(ExecState* exec) const {
   bool result = false;
   JSUserObject* jsObjPtr = KJSValueToJSObject(toObject(exec), exec);
-  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : NULL;
+  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : 0;
   if (cfValue) {
     CFTypeID cfType = CFGetTypeID(cfValue);  // toPrimitive
     if (cfValue == GetCFNull()) {
@@ -247,7 +247,7 @@ bool UserObjectImp::toBoolean(ExecState* exec) const {
 double UserObjectImp::toNumber(ExecState* exec) const {
   double result = 0;
   JSUserObject* jsObjPtr = KJSValueToJSObject(toObject(exec), exec);
-  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : NULL;
+  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : 0;
   if (cfValue) {
     CFTypeID cfType = CFGetTypeID(cfValue);
 
@@ -272,7 +272,7 @@ double UserObjectImp::toNumber(ExecState* exec) const {
 UString UserObjectImp::toString(ExecState* exec) const {
   UString result;
   JSUserObject* jsObjPtr = KJSValueToJSObject(toObject(exec), exec);
-  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : NULL;
+  CFTypeRef cfValue = jsObjPtr ? jsObjPtr->CopyCFValue() : 0;
   if (cfValue) {
     CFTypeID cfType = CFGetTypeID(cfValue);
     if (cfValue == GetCFNull()) {
@@ -289,22 +289,21 @@ UString UserObjectImp::toString(ExecState* exec) const {
       if (cfValue == kCFNumberNaN) {
         result = "Nan";
       } else if (CFNumberCompare(kCFNumberPositiveInfinity,
-                                 (CFNumberRef)cfValue, NULL) == 0) {
+                                 (CFNumberRef)cfValue, 0) == 0) {
         result = "Infinity";
       } else if (CFNumberCompare(kCFNumberNegativeInfinity,
-                                 (CFNumberRef)cfValue, NULL) == 0) {
+                                 (CFNumberRef)cfValue, 0) == 0) {
         result = "-Infinity";
       } else {
-        CFStringRef cfNumStr = NULL;
+        CFStringRef cfNumStr = 0;
         if (CFNumberIsFloatType((CFNumberRef)cfValue)) {
           double d = 0;
           CFNumberGetValue((CFNumberRef)cfValue, kCFNumberDoubleType, &d);
-          cfNumStr =
-              CFStringCreateWithFormat(NULL, NULL, CFSTR("%f"), (float)d);
+          cfNumStr = CFStringCreateWithFormat(0, 0, CFSTR("%f"), (float)d);
         } else {
           int i = 0;
           CFNumberGetValue((CFNumberRef)cfValue, kCFNumberIntType, &i);
-          cfNumStr = CFStringCreateWithFormat(NULL, NULL, CFSTR("%d"), (int)i);
+          cfNumStr = CFStringCreateWithFormat(0, 0, CFSTR("%d"), (int)i);
         }
 
         if (cfNumStr) {

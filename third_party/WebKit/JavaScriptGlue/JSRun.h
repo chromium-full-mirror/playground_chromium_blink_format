@@ -1,8 +1,8 @@
-#ifndef __JSRun_h
-#define __JSRun_h
+#ifndef JSRun_h
+#define JSRun_h
 
 /*
-        JSRun.h
+    JSRun.h
 */
 
 #include "JSBase.h"

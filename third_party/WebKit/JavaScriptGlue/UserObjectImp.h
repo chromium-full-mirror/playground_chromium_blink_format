@@ -1,10 +1,8 @@
-// -*- mode: c++; c-basic-offset: 4 -*-
-
-#ifndef __UserObjectImp_h
-#define __UserObjectImp_h
+#ifndef UserObjectImp_h
+#define UserObjectImp_h
 
 /*
-        UserObjectImp.h
+    UserObjectImp.h
 */
 
 #include "JSUtils.h"
