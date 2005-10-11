@@ -35,6 +35,8 @@ RegExp::RegExp(const UString& p, int flags)
 
   int options = PCRE_UTF8;
   // Note: the Global flag is already handled by RegExpProtoFunc::execute.
+  // FIXME: That last comment is dubious. Not all RegExps get run through
+  // RegExpProtoFunc::execute.
   if (flags & IgnoreCase)
     options |= PCRE_CASELESS;
   if (flags & Multiline)
