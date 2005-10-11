@@ -38,6 +38,7 @@ class QLineEdit;
   BOOL hasFocusAndSelectionSet;
   BOOL edited;
   NSRange lastSelectedRange;
+  BOOL inDrawingMachinery;
   NSWritingDirection baseWritingDirection;
 }
 
