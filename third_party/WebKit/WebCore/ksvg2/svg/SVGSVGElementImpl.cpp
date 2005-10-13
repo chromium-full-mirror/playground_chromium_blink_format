@@ -92,19 +92,31 @@ SVGSVGElementImpl::~SVGSVGElementImpl() {
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::x() const {
   return lazy_create<SVGAnimatedLengthImpl>(
-      m_x, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH, this);
+      m_x, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH,
+      ownerDocument()->documentElement() ==
+              static_cast<const KDOM::ElementImpl*>(this)
+          ? this
+          : viewportElement());
 }
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::y() const {
   return lazy_create<SVGAnimatedLengthImpl>(
-      m_y, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT, this);
+      m_y, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT,
+      ownerDocument()->documentElement() ==
+              static_cast<const KDOM::ElementImpl*>(this)
+          ? this
+          : viewportElement());
 }
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::width() const {
   if (!m_width) {
     KDOM::DOMString temp("100%");
     lazy_create<SVGAnimatedLengthImpl>(
-        m_width, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH, this);
+        m_width, static_cast<const SVGStyledElementImpl*>(0), LM_WIDTH,
+        ownerDocument()->documentElement() ==
+                static_cast<const KDOM::ElementImpl*>(this)
+            ? this
+            : viewportElement());
     m_width->baseVal()->setValueAsString(temp.handle());
   }
 
@@ -115,7 +127,11 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::height() const {
   if (!m_height) {
     KDOM::DOMString temp("100%");
     lazy_create<SVGAnimatedLengthImpl>(
-        m_height, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT, this);
+        m_height, static_cast<const SVGStyledElementImpl*>(0), LM_HEIGHT,
+        ownerDocument()->documentElement() ==
+                static_cast<const KDOM::ElementImpl*>(this)
+            ? this
+            : viewportElement());
     m_height->baseVal()->setValueAsString(temp.handle());
   }
 
