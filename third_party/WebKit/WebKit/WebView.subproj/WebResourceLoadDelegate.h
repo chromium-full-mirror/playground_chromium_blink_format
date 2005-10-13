@@ -26,6 +26,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+#define WebNSInt int
+#else
+#define WebNSInt NSInt
+#endif
+
 @class WebView;
 @class WebDataSource;
 @class NSURLAuthenticationChallenge;
@@ -161,7 +167,7 @@
 */
 - (void)webView:(WebView*)sender
                    resource:(id)identifier
-    didReceiveContentLength:(unsigned)length
+    didReceiveContentLength:(WebNSInt)length
              fromDataSource:(WebDataSource*)dataSource;
 
 /*!
@@ -216,3 +222,5 @@
                dataSource:(WebDataSource*)dataSource;
 
 @end
+
+#undef WebNSInt

@@ -29,6 +29,12 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/NSURLRequest.h>
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+#define WebNSUInt unsigned int
+#else
+#define WebNSUInt NSUInt
+#endif
+
 /*!
     @enum WebMenuItemTag
     @discussion Each menu item in the default menu items array passed in
@@ -407,7 +413,7 @@ typedef enum {
 */
 - (void)webView:(WebView*)sender
     mouseDidMoveOverElement:(NSDictionary*)elementInformation
-              modifierFlags:(unsigned int)modifierFlags;
+              modifierFlags:(WebNSUInt)modifierFlags;
 
 /*!
     @method webView:contextMenuItemsForElement:defaultMenuItems:
@@ -522,3 +528,5 @@ typedef enum {
                  withPasteboard:(NSPasteboard*)pasteboard;
 
 @end
+
+#undef WebNSUInt
