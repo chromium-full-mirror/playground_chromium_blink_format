@@ -873,9 +873,9 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
                              bool selectionOnly,
                              RenderObject* paintingRoot) {
   // Calculate the clip rects we should use.
-  QRect layerBounds, damageRect, clipRectToApply;
+  QRect layerBounds, damageRect, clipRectToApply, outlineRect;
   calculateRects(rootLayer, paintDirtyRect, layerBounds, damageRect,
-                 clipRectToApply);
+                 clipRectToApply, outlineRect);
   int x = layerBounds.x();
   int y = layerBounds.y();
 
@@ -964,12 +964,15 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
       renderer()->paint(info, tx, ty);
       info.phase = PaintActionForeground;
       renderer()->paint(info, tx, ty);
-      info.phase = PaintActionOutline;
-      renderer()->paint(info, tx, ty);
     }
 
     // Now restore our clip.
     restoreClip(p, paintDirtyRect, clipRectToApply);
+
+    setClip(p, paintDirtyRect, outlineRect);
+    info.phase = PaintActionOutline;
+    renderer()->paint(info, tx, ty);
+    restoreClip(p, paintDirtyRect, outlineRect);
   }
 
   // Now walk the sorted list of children with positive z-indices.
@@ -1025,8 +1028,9 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
                                        int yMousePos,
                                        const QRect& hitTestRect) {
   // Calculate the clip rects we should use.
-  QRect layerBounds, bgRect, fgRect;
-  calculateRects(rootLayer, hitTestRect, layerBounds, bgRect, fgRect);
+  QRect layerBounds, bgRect, fgRect, outlineRect;
+  calculateRects(rootLayer, hitTestRect, layerBounds, bgRect, fgRect,
+                 outlineRect);
 
   // Ensure our z-order lists are up-to-date.
   updateZOrderLists();
@@ -1178,7 +1182,8 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
                                  const QRect& paintDirtyRect,
                                  QRect& layerBounds,
                                  QRect& backgroundRect,
-                                 QRect& foregroundRect) {
+                                 QRect& foregroundRect,
+                                 QRect& outlineRect) {
   if (parent()) {
     parent()->calculateClipRects(rootLayer);
     backgroundRect = m_object->style()->position() == FIXED
@@ -1190,6 +1195,7 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
   } else
     backgroundRect = paintDirtyRect;
   foregroundRect = backgroundRect;
+  outlineRect = backgroundRect;
 
   int x = 0;
   int y = 0;
@@ -1207,6 +1213,7 @@ void RenderLayer::calculateRects(const RenderLayer* rootLayer,
       QRect newPosClip = m_object->getClipRect(x, y);
       backgroundRect = backgroundRect.intersect(newPosClip);
       foregroundRect = foregroundRect.intersect(newPosClip);
+      outlineRect = outlineRect.intersect(newPosClip);
     }
 
     // If we establish a clip at all, then go ahead and make sure our background

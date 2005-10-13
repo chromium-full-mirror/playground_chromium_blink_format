@@ -306,7 +306,8 @@ class RenderLayer {
                       const QRect& paintDirtyRect,
                       QRect& layerBounds,
                       QRect& backgroundRect,
-                      QRect& foregroundRect);
+                      QRect& foregroundRect,
+                      QRect& outlineRect);
   void calculateClipRects(const RenderLayer* rootLayer);
   ClipRects* clipRects() const { return m_clipRects; }
 
