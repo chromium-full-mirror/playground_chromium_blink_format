@@ -53,6 +53,13 @@ RenderContainer::RenderContainer(DOM::NodeImpl* node) : RenderBox(node) {
 RenderContainer::~RenderContainer() {}
 
 void RenderContainer::destroy() {
+  if (m_first)
+    destroyChildren();
+
+  RenderBox::destroy();
+}
+
+void RenderContainer::destroyChildren() {
   if (continuation())
     continuation()->destroy();
 
@@ -62,8 +69,6 @@ void RenderContainer::destroy() {
     else
       m_first->destroy();
   }
-
-  RenderBox::destroy();
 }
 
 bool RenderContainer::canHaveChildren() const {
