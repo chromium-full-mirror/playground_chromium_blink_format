@@ -313,7 +313,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // the output of the script to be postponed until after the script has
   // finished executing
   int m_executingScript;
-  QPtrQueue<CachedScript> cachedScript;
+  QPtrQueue<CachedScript> pendingScripts;
   // you can pause the tokenizer if you need to display a dialog or something
   bool onHold;
 

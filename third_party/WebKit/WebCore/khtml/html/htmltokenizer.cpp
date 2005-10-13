@@ -207,8 +207,11 @@ void HTMLTokenizer::reset() {
   assert(m_executingScript == 0);
   assert(onHold == false);
 
-  while (!cachedScript.isEmpty())
-    cachedScript.dequeue()->deref(this);
+  while (!pendingScripts.isEmpty()) {
+    CachedScript* cs = pendingScripts.dequeue();
+    assert(cs->accessCount() > 0);
+    cs->deref(this);
+  }
 
   if (buffer)
     KHTML_DELETE_QCHAR_VEC(buffer);
@@ -398,18 +401,24 @@ void HTMLTokenizer::parseSpecial(TokenizerString& src) {
 void HTMLTokenizer::scriptHandler() {
   // We are inside a <script>
   bool doScriptExec = false;
+
+  // (3837) Scripts following a frameset element should not execute or,
+  // in the case of extern scripts, even load.
+  bool followingFrameset =
+      (parser->doc()->body() && parser->doc()->body()->hasTagName(framesetTag));
+
   CachedScript* cs = 0;
   // don't load external scripts for standalone documents (for now)
   if (!scriptSrc.isEmpty() && parser->doc()->part()) {
     // forget what we just got; load from src url instead
-    if (!parser->skipMode()) {
+    if (!parser->skipMode() && !followingFrameset) {
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
       if (!parser->doc()->ownerElement())
         printf("Requesting script at time %d\n", parser->doc()->elapsedTime());
 #endif
       if ((cs = parser->doc()->docLoader()->requestScript(scriptSrc,
                                                           scriptSrcCharset)))
-        cachedScript.enqueue(cs);
+        pendingScripts.enqueue(cs);
     }
     scriptSrc = QString::null;
   } else {
@@ -428,10 +437,6 @@ void HTMLTokenizer::scriptHandler() {
   currToken.beginTag = false;
   processToken();
 
-  // Scripts following a frameset element should not be executed or even loaded
-  // in the case of extern scripts.
-  bool followingFrameset =
-      (parser->doc()->body() && parser->doc()->body()->hasTagName(framesetTag));
   TokenizerString* savedPrependingSrc = currentPrependingSrc;
   TokenizerString prependingSrc;
   currentPrependingSrc = &prependingSrc;
@@ -450,7 +455,7 @@ void HTMLTokenizer::scriptHandler() {
       scriptCodeSize = scriptCodeResync = 0;
       cs->ref(this);
       // will be 0 if script was already loaded and ref() executed it
-      if (!cachedScript.isEmpty())
+      if (!pendingScripts.isEmpty())
         loadingExtScript = true;
     } else if (view && doScriptExec && javascript) {
       if (!m_executingScript)
@@ -1358,7 +1363,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   if (loadStopped)
     return;
 
-  if ((m_executingScript && appendData) || !cachedScript.isEmpty()) {
+  if ((m_executingScript && appendData) || !pendingScripts.isEmpty()) {
     // don't parse; we will do this later
     if (currentPrependingSrc) {
       currentPrependingSrc->append(str);
@@ -1784,13 +1789,15 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     printf("script loaded at %d\n", parser->doc()->elapsedTime());
 #endif
 
-  assert(!cachedScript.isEmpty());
+  assert(!pendingScripts.isEmpty());
   bool finished = false;
-  while (!finished && cachedScript.head()->isLoaded()) {
+  while (!finished && pendingScripts.head()->isLoaded()) {
 #ifdef TOKEN_DEBUG
     kdDebug(6036) << "Finished loading an external script" << endl;
 #endif
-    CachedScript* cs = cachedScript.dequeue();
+    CachedScript* cs = pendingScripts.dequeue();
+    assert(cs->accessCount() > 0);
+
     DOMString scriptSource = cs->script();
 #ifdef TOKEN_DEBUG
     kdDebug(6036) << "External script is:" << endl
@@ -1811,10 +1818,10 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
 
     scriptExecution(scriptSource.qstring(), cachedScriptUrl);
 
-    // The state of cachedScript.isEmpty() can change inside the
+    // The state of pendingScripts.isEmpty() can change inside the
     // scriptExecution()
     // call above, so test afterwards.
-    finished = cachedScript.isEmpty();
+    finished = pendingScripts.isEmpty();
     if (finished) {
       loadingExtScript = false;
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
