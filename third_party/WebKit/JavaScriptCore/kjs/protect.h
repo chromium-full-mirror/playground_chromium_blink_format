@@ -23,6 +23,7 @@
 #ifndef _KJS_PROTECT_H_
 #define _KJS_PROTECT_H_
 
+#include "reference.h"
 #include "value.h"
 #include "protected_values.h"
 #include "interpreter.h"
