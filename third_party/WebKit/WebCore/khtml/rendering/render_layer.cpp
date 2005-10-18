@@ -297,7 +297,8 @@ RenderLayer* RenderLayer::enclosingPositionedAncestor() const {
   return curr;
 }
 
-bool RenderLayer::isTransparent() const {
+#if APPLE_CHANGES
+bool RenderLayer::isTransparent() {
   return m_object->style()->opacity() < 1.0f;
 }
 
@@ -322,6 +323,8 @@ void RenderLayer::beginTransparencyLayers(QPainter* p) {
     p->beginTransparencyLayer(renderer()->style()->opacity());
   }
 }
+
+#endif
 
 void* RenderLayer::operator new(size_t sz, RenderArena* renderArena) throw() {
   return renderArena->allocate(sz);
@@ -879,8 +882,10 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // Ensure our z-order lists are up-to-date.
   updateZOrderLists();
 
+#if APPLE_CHANGES
   if (isTransparent())
     haveTransparency = true;
+#endif
 
   // If this layer's renderer is a child of the paintingRoot, we render
   // unconditionally, which
@@ -897,10 +902,12 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
   // We want to paint our layer, but only if we intersect the damage rect.
   bool shouldPaint = intersectsDamageRect(layerBounds, damageRect);
   if (shouldPaint && !selectionOnly && !damageRect.isEmpty()) {
+#if APPLE_CHANGES
     // Begin transparency layers lazily now that we know we have to paint
     // something.
     if (haveTransparency)
       beginTransparencyLayers(p);
+#endif
 
     // Paint our background first, before painting any child layers.
     // Establish the clip used to paint our background.
@@ -935,10 +942,12 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
 
   // Now establish the appropriate clip and paint our child RenderObjects.
   if (shouldPaint && !clipRectToApply.isEmpty()) {
+#if APPLE_CHANGES
     // Begin transparency layers lazily now that we know we have to paint
     // something.
     if (haveTransparency)
       beginTransparencyLayers(p);
+#endif
 
     // Set up the clip used when painting our children.
     setClip(p, paintDirtyRect, clipRectToApply);
@@ -976,11 +985,13 @@ void RenderLayer::paintLayer(RenderLayer* rootLayer,
     }
   }
 
+#if APPLE_CHANGES
   // End our transparency layer
   if (isTransparent() && m_usedTransparency) {
     p->endTransparencyLayer();
     m_usedTransparency = false;
   }
+#endif
 }
 
 bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
@@ -1355,29 +1366,6 @@ void RenderLayer::updateHoverActiveState(RenderObject::NodeInfo& info) {
   }
 }
 
-// Helpers for the sorting of layers by z-index.
-static inline bool isOverflowOnly(const RenderLayer* layer) {
-  return layer->renderer()->hasOverflowClip() &&
-         !layer->renderer()->isPositioned() &&
-         !layer->renderer()->isRelPositioned() && !layer->isTransparent();
-}
-
-static inline bool compare(const RenderLayer* layer1,
-                           const RenderLayer* layer2) {
-  if (layer1->zIndex() == layer2->zIndex())
-    // Layers that exist solely because of overflow clip do not technically
-    // establish a stacking context.
-    // Our creation of RenderLayers for overflow regions is a convenience but is
-    // not really correct.  Overflow
-    // content should have just painted where it occurred in the document.
-    // Although we can't do that,
-    // we will at least make sure that overflow layers lose to the other types
-    // of layers (positioned, relative positioned
-    // and opacity).
-    return isOverflowOnly(layer1) || !isOverflowOnly(layer2);
-  return layer1->zIndex() < layer2->zIndex();
-}
-
 // Sort the buffer from lowest z-index to highest.  The common scenario will
 // have
 // most z-indices equal, so we optimize for that case (i.e., the list will be
@@ -1397,7 +1385,7 @@ static void sortByZOrder(QPtrVector<RenderLayer>* buffer,
       for (uint j = start; j < i; j++) {
         RenderLayer* elt = buffer->at(j);
         RenderLayer* elt2 = buffer->at(j + 1);
-        if (!compare(elt, elt2)) {
+        if (elt->zIndex() > elt2->zIndex()) {
           sorted = false;
           buffer->insert(j, elt2);
           buffer->insert(j + 1, elt);
@@ -1417,7 +1405,7 @@ static void sortByZOrder(QPtrVector<RenderLayer>* buffer,
 
     // Handle the fast common case (of equal z-indices).  The list may already
     // be completely sorted.
-    if (compare(elt, elt2))
+    if (elt->zIndex() <= elt2->zIndex())
       return;
 
     // We have to merge sort.  Ensure our merge buffer is big enough to hold

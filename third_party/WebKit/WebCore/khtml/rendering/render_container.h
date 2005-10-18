@@ -46,7 +46,7 @@ class RenderContainer : public RenderBox {
   virtual void removeChild(RenderObject* oldChild);
 
   virtual void destroy();
-  void destroyLeftoverAnonymousChildren();
+  void destroyChildren();
 
   virtual RenderObject* removeChildNode(RenderObject* child);
   virtual void appendChildNode(RenderObject* child);
