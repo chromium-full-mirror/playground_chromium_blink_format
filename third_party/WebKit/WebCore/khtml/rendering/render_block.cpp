@@ -3644,7 +3644,7 @@ void RenderBlock::updateFirstLetter() {
   // to update it.
   if (currChild->style()->styleType() == RenderStyle::FIRST_LETTER) {
     RenderStyle* pseudo = firstLetterBlock->getPseudoStyle(
-        RenderStyle::FIRST_LETTER, firstLetterContainer->style(true));
+        RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
     currChild->setStyle(pseudo);
     for (RenderObject* genChild = currChild->firstChild(); genChild;
          genChild = genChild->nextSibling()) {
@@ -3662,7 +3662,7 @@ void RenderBlock::updateFirstLetter() {
     // Create our pseudo style now that we have our firstLetterContainer
     // determined.
     RenderStyle* pseudoStyle = firstLetterBlock->getPseudoStyle(
-        RenderStyle::FIRST_LETTER, firstLetterContainer->style(true));
+        RenderStyle::FIRST_LETTER, firstLetterContainer->firstLineStyle());
 
     // Force inline display (except for floating first-letters)
     pseudoStyle->setDisplay(pseudoStyle->isFloating() ? BLOCK : INLINE);

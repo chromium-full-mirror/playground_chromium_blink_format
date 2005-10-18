@@ -2713,7 +2713,7 @@ void RenderBlock::checkLinesForTextOverflow() {
                             // to use 0x002E (FULL STOP) if 0x2026 not
                             // renderable
   static AtomicString ellipsisStr(ellipsis);
-  const Font& firstLineFont = style(true)->htmlFont();
+  const Font& firstLineFont = firstLineStyle()->htmlFont();
   const Font& font = style()->htmlFont();
   int firstLineEllipsisWidth = firstLineFont.width(&ellipsis, 1, 0, 0);
   int ellipsisWidth = (font == firstLineFont) ? firstLineEllipsisWidth
