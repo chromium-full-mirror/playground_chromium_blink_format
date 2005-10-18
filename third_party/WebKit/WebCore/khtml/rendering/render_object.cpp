@@ -2454,11 +2454,6 @@ void RenderObject::getTextDecorationColors(int decorations,
 }
 
 #if APPLE_CHANGES
-void RenderObject::updateWidgetPositions() {
-  for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
-    curr->updateWidgetPositions();
-}
-
 QValueList<DashboardRegionValue> RenderObject::computeDashboardRegions() {
   QValueList<DashboardRegionValue> regions;
   collectDashboardRegions(regions);
