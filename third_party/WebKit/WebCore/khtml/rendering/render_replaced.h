@@ -103,8 +103,8 @@ class RenderWidget : public QObject,
 
 #if APPLE_CHANGES
   void sendConsumedMouseUp();
-  virtual void updateWidgetPositions();
 #endif
+  virtual void updateWidgetPosition();
 
  public slots:
   void slotWidgetDestructed();

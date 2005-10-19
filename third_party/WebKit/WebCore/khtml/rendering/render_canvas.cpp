@@ -560,6 +560,21 @@ void RenderCanvas::selectionStartEnd(int& spos, int& epos) {
   epos = m_selectionEndPos;
 }
 
+void RenderCanvas::updateWidgetPositions() {
+  RenderObjectSet::iterator end = m_widgets.end();
+  for (RenderObjectSet::iterator it = m_widgets.begin(); it != end; ++it) {
+    (*it)->updateWidgetPosition();
+  }
+}
+
+void RenderCanvas::addWidget(RenderObject* o) {
+  m_widgets.insert(o);
+}
+
+void RenderCanvas::removeWidget(RenderObject* o) {
+  m_widgets.remove(o);
+}
+
 QRect RenderCanvas::viewRect() const {
   if (m_printingMode)
     return QRect(0, 0, m_width, m_height);
