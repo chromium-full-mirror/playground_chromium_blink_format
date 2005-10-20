@@ -29,8 +29,8 @@
 #include "KWQRect.h"
 #include "KWQSize.h"
 #include "KWQString.h"
-#include "KWQFont.h"
 
+class QFont;
 class QFontMetricsPrivate;
 
 class QFontMetrics {
@@ -51,10 +51,7 @@ class QFontMetrics {
   int lineSpacing() const;
   float xHeight() const;
 
-  int width(QChar, int tabWidth, int xpos) const;
-  int width(char, int tabWidth, int xpos) const;
   int width(const QString&, int tabWidth, int xpos, int len = -1) const;
-  int charWidth(const QString&, int pos, int tabWidth, int xpos) const;
   int width(const QChar*, int len, int tabWidth, int xpos) const;
   float floatWidth(const QChar*,
                    int slen,
@@ -65,17 +62,6 @@ class QFontMetrics {
                    int letterSpacing,
                    int wordSpacing,
                    bool smallCaps) const;
-  float floatCharacterWidths(const QChar*,
-                             int slen,
-                             int pos,
-                             int len,
-                             int toAdd,
-                             int tabWidth,
-                             int xpos,
-                             float* buffer,
-                             int letterSpacing,
-                             int wordSpacing,
-                             bool smallCaps) const;
   int checkSelectionPoint(QChar* s,
                           int slen,
                           int pos,

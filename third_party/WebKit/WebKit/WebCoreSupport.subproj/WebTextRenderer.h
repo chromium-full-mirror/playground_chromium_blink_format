@@ -45,7 +45,7 @@ typedef struct GlyphMap GlyphMap;
   GlyphMap* characterToGlyphMap;
   WidthMap* glyphToWidthMap;
 
-  BOOL treatAsFixedPitch;
+  bool treatAsFixedPitch;
   ATSGlyphRef spaceGlyph;
   float spaceWidth;
   float adjustedSpaceWidth;
@@ -54,8 +54,8 @@ typedef struct GlyphMap GlyphMap;
  @private
   WebTextRenderer* smallCapsRenderer;
   ATSUStyle _ATSUStyle;
-  BOOL ATSUStyleInitialized;
-  BOOL ATSUMirrors;
+  bool ATSUStyleInitialized;
+  bool ATSUMirrors;
 }
 
 - (id)initWithFont:(WebCoreFont)font;
@@ -64,6 +64,6 @@ typedef struct GlyphMap GlyphMap;
 
 @interface WebTextRenderer (WebPrivate)
 
-+ (void)setAlwaysUseATSU:(BOOL)f;
++ (void)setAlwaysUseATSU:(bool)f;
 
 @end
