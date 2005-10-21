@@ -36,7 +36,6 @@ class QListboxItem;
 
 #include <qtextedit.h>
 #include <klineedit.h>
-#include <qpushbutton.h>
 #include <qhbox.h>
 #include <klistbox.h>
 #include <kcombobox.h>
@@ -116,54 +115,9 @@ class RenderFormElement : public khtml::RenderWidget {
 #endif
 
  protected:
-  virtual bool isRenderButton() const { return false; }
   virtual bool isEditable() const { return false; }
 
   AlignmentFlags textAlignment() const;
-};
-
-// -------------------------------------------------------------------------
-
-// generic class for all buttons
-class RenderButton : public RenderFormElement {
-  Q_OBJECT
- public:
-  RenderButton(DOM::HTMLGenericFormElementImpl* node);
-
-#if APPLE_CHANGES
-  int calcReplacedHeight() const { return intrinsicHeight(); }
-  virtual bool canHaveIntrinsicMargins() const { return true; }
-#endif
-
-  virtual const char* renderName() const { return "RenderButton"; }
-  virtual short baselinePosition(bool, bool) const;
-
-  // don't even think about making this method virtual!
-  DOM::HTMLInputElementImpl* element() const {
-    return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
-  }
-
- protected:
-  virtual bool isRenderButton() const { return true; }
-};
-
-// -------------------------------------------------------------------------
-
-class RenderSubmitButton : public RenderButton {
- public:
-  RenderSubmitButton(DOM::HTMLInputElementImpl* element);
-
-  virtual const char* renderName() const { return "RenderSubmitButton"; }
-
-  virtual void calcMinMaxWidth();
-  virtual void updateFromElement();
-  virtual short baselinePosition(bool, bool) const;
-#if APPLE_CHANGES
-  virtual void setStyle(RenderStyle*);
-#endif
-
- private:
-  QString rawText();
 };
 
 // -------------------------------------------------------------------------
@@ -174,22 +128,6 @@ class RenderImageButton : public RenderImage {
 
   virtual const char* renderName() const { return "RenderImageButton"; }
   virtual bool isImageButton() const { return true; }
-};
-
-// -------------------------------------------------------------------------
-
-class RenderResetButton : public RenderSubmitButton {
- public:
-  RenderResetButton(DOM::HTMLInputElementImpl* element);
-
-  virtual const char* renderName() const { return "RenderResetButton"; }
-};
-
-// -------------------------------------------------------------------------
-
-class RenderPushButton : public RenderSubmitButton {
- public:
-  RenderPushButton(DOM::HTMLInputElementImpl* element);
 };
 
 // -------------------------------------------------------------------------
@@ -289,21 +227,13 @@ class RenderFileButton : public RenderFormElement {
   virtual void updateFromElement();
   void select();
 
-#if APPLE_CHANGES
   int calcReplacedHeight() const { return intrinsicHeight(); }
-#endif
 
   DOM::HTMLInputElementImpl* element() const {
     return static_cast<DOM::HTMLInputElementImpl*>(RenderObject::element());
   }
 
-#if !APPLE_CHANGES
-  KLineEdit* lineEdit() const { return m_edit; }
-#endif
-
-#if APPLE_CHANGES
   void click(bool sendMouseEvents);
-#endif
 
  public slots:
   virtual void slotClicked();
@@ -312,13 +242,6 @@ class RenderFileButton : public RenderFormElement {
 
  protected:
   virtual bool isEditable() const { return true; }
-
-#if !APPLE_CHANGES
-  virtual void handleFocusOut();
-
-  KLineEdit* m_edit;
-  QPushButton* m_button;
-#endif
 };
 
 // -------------------------------------------------------------------------

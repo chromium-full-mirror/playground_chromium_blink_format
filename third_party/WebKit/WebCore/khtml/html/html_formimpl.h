@@ -249,6 +249,9 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
 
   DOMString type() const;
 
+  virtual khtml::RenderObject* createRenderer(RenderArena*,
+                                              khtml::RenderStyle*);
+
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void defaultEventHandler(EventImpl* evt);
   virtual bool appendFormData(FormDataList&, bool);
@@ -344,6 +347,10 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool autoComplete() const { return m_autocomplete; }
 
   virtual bool isChecked() const { return checked(); }
+
+  bool isTextButton() const {
+    return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
+  }
 
   bool checked() const { return m_checked; }
   void setChecked(bool);

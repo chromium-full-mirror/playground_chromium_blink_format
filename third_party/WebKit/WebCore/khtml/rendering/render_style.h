@@ -727,6 +727,8 @@ enum EAppearance {
   NoAppearance,
   CheckboxAppearance,
   RadioAppearance,
+  PushButtonAppearance,
+  SquareButtonAppearance,
   ButtonAppearance,
   ButtonBevelAppearance,
   ListboxAppearance,

@@ -64,6 +64,14 @@ class RenderThemeMac : public RenderTheme {
                           const QRect& r);
   virtual void setRadioSize(RenderStyle* style) const;
 
+  virtual void adjustButtonStyle(CSSStyleSelector* selector,
+                                 RenderStyle* style,
+                                 DOM::ElementImpl* e) const;
+  virtual void paintButton(RenderObject* o,
+                           const RenderObject::PaintInfo& i,
+                           const QRect& r);
+  virtual void setButtonSize(RenderStyle* style) const;
+
  private:
   QRect inflateRect(const QRect& r,
                     const QSize& size,
@@ -75,6 +83,11 @@ class RenderThemeMac : public RenderTheme {
   void setControlSize(NSCell* cell, const QSize* sizes, const QSize& minSize);
   void setSizeFromFont(RenderStyle* style, const QSize* sizes) const;
   QSize sizeForFont(RenderStyle* style, const QSize* sizes) const;
+  void setFontFromControlSize(CSSStyleSelector* selector,
+                              RenderStyle* style,
+                              NSControlSize size) const;
+
+  void addIntrinsicMargins(RenderStyle* style, NSControlSize size) const;
 
   void updateCheckedState(NSCell* cell, const RenderObject* o);
   void updateEnabledState(NSCell* cell, const RenderObject* o);
@@ -90,9 +103,16 @@ class RenderThemeMac : public RenderTheme {
   const int* radioMargins() const;
   void setRadioCellState(const RenderObject* o, const QRect& r);
 
+  void setButtonPaddingFromControlSize(RenderStyle* style,
+                                       NSControlSize size) const;
+  const QSize* buttonSizes() const;
+  const int* buttonMargins() const;
+  void setButtonCellState(const RenderObject* o, const QRect& r);
+
  private:
   NSButtonCell* checkbox;
   NSButtonCell* radio;
+  NSButtonCell* button;
 };
 }
 
