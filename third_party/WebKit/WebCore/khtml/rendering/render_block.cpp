@@ -547,7 +547,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
   int toAdd = borderBottom() + paddingBottom();
   if (includeScrollbarSize())
     toAdd += m_layer->horizontalScrollbarHeight();
-  if (hasOverhangingFloats() &&
+  if (floatBottom() > (m_height - toAdd) &&
       (isInlineBlockOrInlineTable() || isFloatingOrPositioned() ||
        hasOverflowClip() || (parent() && parent()->isFlexibleBox())))
     m_height = floatBottom() + toAdd;
