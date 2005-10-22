@@ -173,7 +173,6 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc,
   onHold = false;
   timerId = 0;
   includesCommentsInDOM = includesComments;
-  loadStopped = false;
 
   begin();
 }
@@ -192,7 +191,6 @@ HTMLTokenizer::HTMLTokenizer(DOM::DocumentPtr* _doc,
   onHold = false;
   timerId = 0;
   includesCommentsInDOM = includesComments;
-  loadStopped = false;
 
   begin();
 }
@@ -1433,7 +1431,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   if (!buffer)
     return;
 
-  if (loadStopped)
+  if (m_parserStopped)
     return;
 
   if ((m_executingScript && appendData) || !pendingScripts.isEmpty()) {
@@ -1606,7 +1604,8 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
     end();  // this actually causes us to be deleted
 }
 
-void HTMLTokenizer::stopped() {
+void HTMLTokenizer::stopParsing() {
+  Tokenizer::stopParsing();
   if (timerId) {
     killTimer(timerId);
     timerId = 0;
@@ -1786,7 +1785,7 @@ void HTMLTokenizer::processToken() {
   kdDebug(6036) << endl;
 #endif
 
-  if (!loadStopped) {
+  if (!m_parserStopped) {
     // pass the token over to the parser, the parser DOES NOT delete the token
     parser->parseToken(&currToken);
   }

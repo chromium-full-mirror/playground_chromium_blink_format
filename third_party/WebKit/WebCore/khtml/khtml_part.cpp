@@ -649,9 +649,11 @@ void KHTMLPart::didExplicitOpen() {
 }
 
 void KHTMLPart::stopLoading(bool sendUnload) {
-  if (d->m_doc && d->m_doc->tokenizer()) {
+  if (d->m_bComplete)
+    return;
+
+  if (d->m_doc && d->m_doc->tokenizer())
     d->m_doc->tokenizer()->stopParsing();
-  }
 
   if (d->m_job) {
 #if !APPLE_CHANGES
@@ -1797,12 +1799,11 @@ void KHTMLPart::endIfNotLoading() {
 
 void KHTMLPart::stop() {
   // make sure nothing's left in there...
-  Tokenizer* t = d->m_doc ? d->m_doc->tokenizer() : 0;
-  if (t)
-    t->stopped();
-  if (d->m_doc)
+  if (d->m_doc) {
+    if (d->m_doc->tokenizer())
+      d->m_doc->tokenizer()->stopParsing();
     d->m_doc->finishParsing();
-  else
+  } else {
     // WebKit partially uses WebCore when loading non-HTML docs.  In these cases
     // doc==nil, but
     // WebCore is enough involved that we need to checkCompleted() in order for
@@ -1811,6 +1812,7 @@ void KHTMLPart::stop() {
     // subframe is the
     // last one to complete.
     checkCompleted();
+  }
 }
 
 #if !APPLE_CHANGES
