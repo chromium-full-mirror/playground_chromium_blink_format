@@ -62,7 +62,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
   }
 }
 
-void RenderTheme::paint(RenderObject* o,
+bool RenderTheme::paint(RenderObject* o,
                         const RenderObject::PaintInfo& i,
                         const QRect& r) {
   // If painting is disabled, but we aren't updating control tints, then just
@@ -73,10 +73,10 @@ void RenderTheme::paint(RenderObject* o,
   if (i.p->updatingControlTints()) {
     if (controlSupportsTints(o))
       o->repaint();
-    return;
+    return false;
   }
   if (i.p->paintingDisabled())
-    return;
+    return false;
 
   // Call the appropriate paint method based off the appearance value.
   switch (o->style()->appearance()) {
@@ -91,6 +91,8 @@ void RenderTheme::paint(RenderObject* o,
     default:
       break;
   }
+
+  return false;
 }
 
 short RenderTheme::baselinePosition(const RenderObject* o) const {

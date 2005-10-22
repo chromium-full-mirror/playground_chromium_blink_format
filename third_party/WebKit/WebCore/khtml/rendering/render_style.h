@@ -299,8 +299,8 @@ class BorderData {
 
   bool hasBorder() const {
     bool haveImage = image.hasImage();
-    return left.nonZero(haveImage) || right.nonZero(haveImage) ||
-           top.nonZero(haveImage) || bottom.nonZero(haveImage);
+    return left.nonZero(!haveImage) || right.nonZero(!haveImage) ||
+           top.nonZero(!haveImage) || bottom.nonZero(!haveImage);
   }
 
   bool hasBorderRadius() const {
