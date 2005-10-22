@@ -181,6 +181,7 @@ void RenderFlow::deleteLineBoxes() {
 
 void RenderFlow::destroy() {
   RenderContainer::destroyChildren();
+  m_continuation = 0;
 
   if (!documentBeingDestroyed()) {
     if (m_firstLineBox) {
