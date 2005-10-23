@@ -85,7 +85,7 @@ KDOMTokenizer::KDOMTokenizer(DOM::DocumentPtr* _doc, KHTMLView* _view)
 
   // FIXME: KDOMTokenizer should use this in a fashion similiar to how
   // HTMLTokenizer uses loadStopped, in the future.
-  loadStopped = false;
+  m_parserStopped = false;
 }
 
 KDOMTokenizer::~KDOMTokenizer() {
