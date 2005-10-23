@@ -1322,7 +1322,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
       sel->match == CSSSelector::PseudoElement) {
     // Pseudo elements. We need to check first child here. No dynamic pseudo
     // elements for the moment
-    //	kdDebug() << "CSSOrderedRule::pseudo " << value << endl;
+    //        kdDebug() << "CSSOrderedRule::pseudo " << value << endl;
     switch (sel->pseudoType()) {
       // Pseudo classes:
       case CSSSelector::PseudoEmpty:
@@ -1331,7 +1331,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
         break;
       case CSSSelector::PseudoFirstChild: {
         // first-child matches the first child that is an element!
-        if (e->parentNode()) {
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
           NodeImpl* n = e->previousSibling();
           while (n && !n->isElementNode())
             n = n->previousSibling();
@@ -1340,9 +1340,25 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
         }
         break;
       }
+      case CSSSelector::PseudoFirstOfType: {
+        // first-of-type matches the first element of its type!
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
+          const QualifiedName& type = e->tagName();
+          NodeImpl* n = e->previousSibling();
+          while (n) {
+            if (n->isElementNode() &&
+                static_cast<ElementImpl*>(n)->hasTagName(type))
+              break;
+            n = n->previousSibling();
+          }
+          if (!n)
+            return true;
+        }
+        break;
+      }
       case CSSSelector::PseudoLastChild: {
         // last-child matches the last child that is an element!
-        if (e->parentNode()) {
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
           NodeImpl* n = e->nextSibling();
           while (n && !n->isElementNode())
             n = n->nextSibling();
@@ -1351,15 +1367,49 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
         }
         break;
       }
+      case CSSSelector::PseudoLastOfType: {
+        // last-of-type matches the last element of its type!
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
+          const QualifiedName& type = e->tagName();
+          NodeImpl* n = e->nextSibling();
+          while (n) {
+            if (n->isElementNode() &&
+                static_cast<ElementImpl*>(n)->hasTagName(type))
+              break;
+            n = n->nextSibling();
+          }
+          if (!n)
+            return true;
+        }
+        break;
+      }
       case CSSSelector::PseudoOnlyChild: {
         // If both first-child and last-child apply, then only-child applies.
-        if (e->parentNode()) {
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
           NodeImpl* n = e->previousSibling();
           while (n && !n->isElementNode())
             n = n->previousSibling();
           if (!n) {
             n = e->nextSibling();
             while (n && !n->isElementNode())
+              n = n->nextSibling();
+            if (!n)
+              return true;
+          }
+        }
+        break;
+      }
+      case CSSSelector::PseudoOnlyOfType: {
+        // If both first-of-type and last-of-type apply, then only-of-type
+        // applies.
+        if (e->parentNode() && e->parentNode()->isElementNode()) {
+          const QualifiedName& type = e->tagName();
+          NodeImpl* n = e->previousSibling();
+          while (n && !static_cast<ElementImpl*>(n)->hasTagName(type))
+            n = n->previousSibling();
+          if (!n) {
+            n = e->nextSibling();
+            while (n && !static_cast<ElementImpl*>(n)->hasTagName(type))
               n = n->nextSibling();
             if (!n)
               return true;
