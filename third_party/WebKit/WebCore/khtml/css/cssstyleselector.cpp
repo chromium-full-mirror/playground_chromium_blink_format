@@ -1161,7 +1161,7 @@ bool CSSStyleSelector::checkSelector(CSSSelector* sel, ElementImpl* e) {
         // kdDebug() << "CSSOrderedRule::checkSelector" << endl;
         ElementImpl* elem = static_cast<ElementImpl*>(n);
         // a selector is invalid if something follows :first-xxx
-        if (dynamicPseudo != RenderStyle::NOPSEUDO)
+        if (elem == element && dynamicPseudo != RenderStyle::NOPSEUDO)
           return false;
         if (!checkOneSelector(sel, elem))
           return false;
