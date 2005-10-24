@@ -49,7 +49,7 @@
 using namespace KDOM;
 
 LSSerializerImpl::LSSerializerImpl()
-    : Shared(), m_config(0), m_serializerFilter(0) {
+    : Shared<LSSerializerImpl>(), m_config(0), m_serializerFilter(0) {
   m_newLine = new DOMStringImpl("\n");
   m_newLine->ref();
 }

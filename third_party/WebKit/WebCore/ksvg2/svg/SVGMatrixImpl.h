@@ -28,7 +28,7 @@
 #include <kdom/Shared.h>
 
 namespace KSVG {
-class SVGMatrixImpl : public KDOM::Shared {
+class SVGMatrixImpl : public KDOM::Shared<SVGMatrixImpl> {
  public:
   SVGMatrixImpl();
   SVGMatrixImpl(double a, double b, double c, double d, double e, double f);

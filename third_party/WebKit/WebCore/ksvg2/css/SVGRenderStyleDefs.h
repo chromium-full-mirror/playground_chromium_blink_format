@@ -112,7 +112,7 @@ enum EPointerEvents {
 };
 
 // Inherited/Non-Inherited Style Datastructures
-class StyleFillData : public KDOM::Shared {
+class StyleFillData : public KDOM::Shared<StyleFillData> {
  public:
   StyleFillData();
   StyleFillData(const StyleFillData& other);
@@ -129,7 +129,7 @@ class StyleFillData : public KDOM::Shared {
   StyleFillData& operator=(const StyleFillData&);
 };
 
-class StyleStrokeData : public KDOM::Shared {
+class StyleStrokeData : public KDOM::Shared<StyleStrokeData> {
  public:
   StyleStrokeData();
   StyleStrokeData(const StyleStrokeData& other);
@@ -152,7 +152,7 @@ class StyleStrokeData : public KDOM::Shared {
   StyleStrokeData& operator=(const StyleStrokeData&);
 };
 
-class StyleStopData : public KDOM::Shared {
+class StyleStopData : public KDOM::Shared<StyleStopData> {
  public:
   StyleStopData();
   StyleStopData(const StyleStopData& other);
@@ -169,7 +169,7 @@ class StyleStopData : public KDOM::Shared {
   StyleStopData& operator=(const StyleStopData&);
 };
 
-class StyleClipData : public KDOM::Shared {
+class StyleClipData : public KDOM::Shared<StyleClipData> {
  public:
   StyleClipData();
   StyleClipData(const StyleClipData& other);
@@ -185,7 +185,7 @@ class StyleClipData : public KDOM::Shared {
   StyleClipData& operator=(const StyleClipData&);
 };
 
-class StyleMarkerData : public KDOM::Shared {
+class StyleMarkerData : public KDOM::Shared<StyleMarkerData> {
  public:
   StyleMarkerData();
   StyleMarkerData(const StyleMarkerData& other);
@@ -204,7 +204,7 @@ class StyleMarkerData : public KDOM::Shared {
 };
 
 // Note : the rule for this class is, *no inheritance* of these props
-class StyleMiscData : public KDOM::Shared {
+class StyleMiscData : public KDOM::Shared<StyleMiscData> {
  public:
   StyleMiscData();
   StyleMiscData(const StyleMiscData& other);

@@ -27,12 +27,11 @@
 #include <kdom/core/DOMStringImpl.h>
 
 #include "ksvg.h"
-//#include "SVGPathSeg.h"
 
 namespace KSVG {
 class SVGPathElementImpl;
 class SVGStyledElementImpl;
-class SVGPathSegImpl : public KDOM::Shared {
+class SVGPathSegImpl : public KDOM::Shared<SVGPathSegImpl> {
  public:
   SVGPathSegImpl(const SVGStyledElementImpl* context = 0);
   virtual ~SVGPathSegImpl();

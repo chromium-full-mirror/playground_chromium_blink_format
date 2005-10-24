@@ -21,9 +21,7 @@
  */
 
 #include "config.h"
-#include <q3valuelist.h>
-
-#include "kdom/Shared.h"
+#include "Shared.h"
 #include "NodeImpl.h"
 #include "kdomxpointer.h"
 #include "DocumentImpl.h"
@@ -39,7 +37,7 @@ using namespace KDOM::XPointer;
 XPointerExpressionImpl::XPointerExpressionImpl(DOMStringImpl* raw,
                                                NodeImpl* r,
                                                DocumentImpl* context)
-    : Shared(),
+    : Shared<XPointerExpressionImpl>(),
       m_isShortHand(false),
       m_pointer(raw),
       m_relatedNode(r),

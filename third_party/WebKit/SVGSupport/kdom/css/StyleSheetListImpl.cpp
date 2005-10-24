@@ -27,7 +27,7 @@
 
 using namespace KDOM;
 
-StyleSheetListImpl::StyleSheetListImpl() : Shared() {}
+StyleSheetListImpl::StyleSheetListImpl() : Shared<StyleSheetListImpl>() {}
 
 StyleSheetListImpl::~StyleSheetListImpl() {
   Q3PtrListIterator<StyleSheetImpl> it(styleSheets);

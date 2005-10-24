@@ -30,7 +30,7 @@ class QPoint;
 namespace KSVG {
 class SVGMatrixImpl;
 class SVGStyledElementImpl;
-class SVGPointImpl : public KDOM::Shared {
+class SVGPointImpl : public KDOM::Shared<SVGPointImpl> {
  public:
   SVGPointImpl(const SVGStyledElementImpl* context = 0);
   SVGPointImpl(float x, float y, const SVGStyledElementImpl* context = 0);

@@ -26,7 +26,7 @@
 #include <kdom/Shared.h>
 
 namespace KDOM {
-class LSExceptionImpl : public Shared {
+class LSExceptionImpl : public Shared<LSExceptionImpl> {
  public:
   LSExceptionImpl(unsigned short code);
   virtual ~LSExceptionImpl();

@@ -27,7 +27,7 @@
 
 namespace KDOM {
 // Introduced in DOM Level 3:
-class DOMObjectImpl : public Shared {
+class DOMObjectImpl : public Shared<DOMObjectImpl> {
  public:
   DOMObjectImpl();
   DOMObjectImpl(bool b);

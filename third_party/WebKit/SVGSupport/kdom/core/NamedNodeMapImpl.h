@@ -35,7 +35,7 @@
 #include <kdom/core/NodeImpl.h>
 
 namespace KDOM {
-class NamedNodeMapImpl : public Shared {
+class NamedNodeMapImpl : public Shared<NamedNodeMapImpl> {
  public:
   NamedNodeMapImpl();
   virtual ~NamedNodeMapImpl();

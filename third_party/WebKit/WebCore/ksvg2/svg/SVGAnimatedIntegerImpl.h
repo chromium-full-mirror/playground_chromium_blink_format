@@ -28,7 +28,7 @@
 namespace KSVG {
 class SVGStyledElementImpl;
 
-class SVGAnimatedIntegerImpl : public KDOM::Shared {
+class SVGAnimatedIntegerImpl : public KDOM::Shared<SVGAnimatedIntegerImpl> {
  public:
   SVGAnimatedIntegerImpl(const SVGStyledElementImpl* context);
   virtual ~SVGAnimatedIntegerImpl();

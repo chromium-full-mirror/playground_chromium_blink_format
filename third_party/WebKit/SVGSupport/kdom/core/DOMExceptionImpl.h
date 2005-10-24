@@ -26,7 +26,7 @@
 #include <kdom/Shared.h>
 
 namespace KDOM {
-class DOMExceptionImpl : public Shared {
+class DOMExceptionImpl : public Shared<DOMExceptionImpl> {
  public:
   DOMExceptionImpl(unsigned short code);
   virtual ~DOMExceptionImpl();

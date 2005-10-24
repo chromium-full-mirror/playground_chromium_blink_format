@@ -37,7 +37,7 @@ namespace XPath {
 class XPathNSResolverImpl;
 class XPathResultImpl;
 
-class XPathExpressionImpl : public Shared {
+class XPathExpressionImpl : public Shared<XPathExpressionImpl> {
  public:
   XPathExpressionImpl(DOMStringImpl* expression, XPathNSResolverImpl* resolver);
 

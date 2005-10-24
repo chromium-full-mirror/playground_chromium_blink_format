@@ -26,7 +26,7 @@
 #include <kdom/Shared.h>
 
 namespace KDOM {
-class RangeExceptionImpl : public Shared {
+class RangeExceptionImpl : public Shared<RangeExceptionImpl> {
  public:
   RangeExceptionImpl(unsigned short code);
   virtual ~RangeExceptionImpl();

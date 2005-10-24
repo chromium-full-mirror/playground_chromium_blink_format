@@ -27,23 +27,27 @@
 
 namespace KDOM {
 template <class T>
-class TreeShared : public Shared {
+class TreeShared {
  public:
-  TreeShared() : Shared() { m_parent = 0; }
-  virtual ~TreeShared() {}
+  TreeShared() : m_ref(0), m_parent(0) {}
+  ~TreeShared() {}
 
-  void setParent(T* parent) { m_parent = parent; }
-  T* parent() const { return m_parent; }
+  int refCount() const { return m_ref; }
 
-  virtual void deref() {
+  void ref() { m_ref++; }
+
+  void deref() {
     if (m_ref)
       m_ref--;
-
     if (!m_ref && !m_parent)
-      delete this;
+      delete static_cast<T*>(this);
   }
 
+  T* parent() const { return m_parent; }
+  void setParent(T* parent) { m_parent = parent; }
+
  protected:
+  unsigned int m_ref;
   T* m_parent;
 };
 };

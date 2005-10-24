@@ -29,7 +29,7 @@
 #include <kjs/object.h>
 
 namespace KDOM {
-class EventListenerImpl : public Shared {
+class EventListenerImpl : public Shared<EventListenerImpl> {
  public:
   EventListenerImpl();
   virtual ~EventListenerImpl();

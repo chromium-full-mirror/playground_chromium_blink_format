@@ -31,7 +31,7 @@ namespace KDOM {
 class NodeImpl;
 
 namespace XPointer {
-class XPointerResultImpl : public Shared {
+class XPointerResultImpl : public Shared<XPointerResultImpl> {
  public:
   XPointerResultImpl(const ResultType code);
   virtual ~XPointerResultImpl();

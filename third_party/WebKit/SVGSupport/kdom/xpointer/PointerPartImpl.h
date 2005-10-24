@@ -50,7 +50,7 @@ class XPointerResultImpl;
  *
  * @author Frans Englich <frans.englich@telia.com>
  */
-class PointerPartImpl : public Shared {
+class PointerPartImpl : public Shared<PointerPartImpl> {
  public:
   /**
   *

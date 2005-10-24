@@ -27,7 +27,7 @@
 
 namespace KSVG {
 class SVGStyledElementImpl;
-class SVGRectImpl : public KDOM::Shared {
+class SVGRectImpl : public KDOM::Shared<SVGRectImpl> {
  public:
   SVGRectImpl(const SVGStyledElementImpl* context);
   virtual ~SVGRectImpl();

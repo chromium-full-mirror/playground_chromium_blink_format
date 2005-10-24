@@ -32,7 +32,8 @@ class DOMStringImpl;
 namespace KSVG {
 class SVGMatrixImpl;
 class SVGStyledElementImpl;
-class SVGPreserveAspectRatioImpl : public KDOM::Shared {
+class SVGPreserveAspectRatioImpl
+    : public KDOM::Shared<SVGPreserveAspectRatioImpl> {
  public:
   SVGPreserveAspectRatioImpl(const SVGStyledElementImpl* context);
   virtual ~SVGPreserveAspectRatioImpl();

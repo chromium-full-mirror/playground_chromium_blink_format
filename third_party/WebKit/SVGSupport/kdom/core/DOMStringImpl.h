@@ -32,7 +32,7 @@
 #include <kdom/Shared.h>
 
 namespace KDOM {
-class DOMStringImpl : public Shared {
+class DOMStringImpl : public Shared<DOMStringImpl> {
  public:
   DOMStringImpl();
   DOMStringImpl(const QChar* str, unsigned int len);

@@ -27,7 +27,7 @@
 using namespace KSVG;
 
 SVGNumberImpl::SVGNumberImpl(const SVGStyledElementImpl* context)
-    : KDOM::Shared() {
+    : KDOM::Shared<SVGNumberImpl>() {
   m_value = 0.0;
   m_context = context;
 }

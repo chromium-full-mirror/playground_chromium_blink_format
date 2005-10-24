@@ -30,7 +30,7 @@
 using namespace KDOM;
 
 LSInputImpl::LSInputImpl()
-    : Shared(),
+    : Shared<LSInputImpl>(),
       m_characterStream(0),
       m_byteStream(0),
       m_stringData(0),

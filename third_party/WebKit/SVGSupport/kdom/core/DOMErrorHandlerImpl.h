@@ -29,7 +29,7 @@
 namespace KDOM {
 class DOMErrorImpl;
 
-class DOMErrorHandlerImpl : public Shared {
+class DOMErrorHandlerImpl : public Shared<DOMErrorHandlerImpl> {
  public:
   DOMErrorHandlerImpl();
   virtual ~DOMErrorHandlerImpl();

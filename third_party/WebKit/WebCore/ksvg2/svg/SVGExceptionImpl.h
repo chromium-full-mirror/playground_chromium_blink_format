@@ -26,7 +26,7 @@
 #include <kdom/Shared.h>
 
 namespace KSVG {
-class SVGExceptionImpl : public KDOM::Shared {
+class SVGExceptionImpl : public KDOM::Shared<SVGExceptionImpl> {
  public:
   SVGExceptionImpl(unsigned short code);
   virtual ~SVGExceptionImpl();

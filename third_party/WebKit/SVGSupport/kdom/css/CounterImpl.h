@@ -27,7 +27,7 @@
 #include <kdom/DOMString.h>
 
 namespace KDOM {
-class CounterImpl : public Shared {
+class CounterImpl : public Shared<CounterImpl> {
  public:
   CounterImpl();
   virtual ~CounterImpl();
