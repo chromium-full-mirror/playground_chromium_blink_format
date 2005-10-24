@@ -225,6 +225,16 @@ void CachedCSSStyleSheet::deref(CachedObjectClient* c) {
     delete this;
 }
 
+void CachedCSSStyleSheet::setCharset(const QString& chs) {
+  if (!chs.isEmpty()) {
+    QTextCodec* codec = QTextCodec::codecForName(chs.latin1());
+    if (codec) {
+      delete m_codec;
+      m_codec = codec;
+    }
+  }
+}
+
 void CachedCSSStyleSheet::data(QBuffer& buffer, bool eof) {
   if (!eof)
     return;
@@ -304,6 +314,16 @@ void CachedScript::deref(CachedObjectClient* c) {
   CachedObject::deref(c);
   if (canDelete() && m_free)
     delete this;
+}
+
+void CachedScript::setCharset(const QString& chs) {
+  if (!chs.isEmpty()) {
+    QTextCodec* codec = QTextCodec::codecForName(chs.latin1());
+    if (codec) {
+      delete m_codec;
+      m_codec = codec;
+    }
+  }
 }
 
 void CachedScript::data(QBuffer& buffer, bool eof) {
@@ -1092,6 +1112,11 @@ void CachedXSLStyleSheet::deref(CachedObjectClient* c) {
     delete this;
 }
 
+void CachedXSLStyleSheet::setCharset(const QString& chs) {
+  if (!chs.isEmpty())
+    m_decoder->setEncoding(chs.latin1(), Decoder::EncodingFromHTTPHeader);
+}
+
 void CachedXSLStyleSheet::data(QBuffer& buffer, bool eof) {
   if (!eof)
     return;
@@ -1139,7 +1164,7 @@ CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
   // Load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
-  m_codec = QTextCodec::codecForName("iso8859-1");
+  m_decoder = new Decoder;
 }
 
 CachedXBLDocument::~CachedXBLDocument() {
@@ -1160,6 +1185,11 @@ void CachedXBLDocument::deref(CachedObjectClient* c) {
     delete this;
 }
 
+void CachedXBLDocument::setCharset(const QString& chs) {
+  if (!chs.isEmpty())
+    m_decoder->setEncoding(chs.latin1(), Decoder::EncodingFromHTTPHeader);
+}
+
 void CachedXBLDocument::data(QBuffer& buffer, bool eof) {
   if (!eof)
     return;
@@ -1171,7 +1201,7 @@ void CachedXBLDocument::data(QBuffer& buffer, bool eof) {
   m_document->open();
 
   QString data =
-      m_codec->toUnicode(buffer.buffer().data(), buffer.buffer().size());
+      m_decoder->decode(buffer.buffer().data(), buffer.buffer().size());
   m_document->write(data);
   setSize(buffer.buffer().size());
   buffer.close();
@@ -1630,6 +1660,10 @@ void Loader::slotReceivedResponse(KIO::Job* job, NSURLResponse* response) {
   r->object->setResponse(response);
   r->object->setExpireDate(KWQCacheObjectExpiresTime(r->m_docLoader, response),
                            false);
+
+  QString chs = static_cast<KIO::TransferJob*>(job)->queryMetaData("charset");
+  if (!chs.isNull())
+    r->object->setCharset(chs);
 
   if (r->multipart) {
     ASSERT(r->object->isImage());
