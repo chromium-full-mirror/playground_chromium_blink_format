@@ -569,6 +569,14 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   // and make it sensitive to the type of document.
   static bool isValidName(const DOMString&);
 
+  // The following breaks a qualified name into a prefix and a local name.
+  // It also does a validity check, and returns false if the qualified name is
+  // invalid
+  // (empty string or invalid characters).
+  static bool parseQualifiedName(const DOMString& qualifiedName,
+                                 DOMString& prefix,
+                                 DOMString& localName);
+
   void addElementById(const DOMString& elementId, ElementImpl* element);
   void removeElementById(const DOMString& elementId, ElementImpl* element);
 

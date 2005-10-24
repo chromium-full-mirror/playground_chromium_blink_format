@@ -742,17 +742,8 @@ void ElementImpl::setAttributeNS(const DOMString& namespaceURI,
                                  const DOMString& qualifiedName,
                                  const DOMString& value,
                                  int& exception) {
-  DOMString localName = qualifiedName;
-  DOMString prefix;
-  int colonpos;
-  if ((colonpos = qualifiedName.find(':')) >= 0) {
-    prefix = qualifiedName.copy();
-    localName = qualifiedName.copy();
-    prefix.truncate(colonpos);
-    localName.remove(0, colonpos + 1);
-  }
-
-  if (!DocumentImpl::isValidName(localName)) {
+  DOMString prefix, localName;
+  if (!DocumentImpl::parseQualifiedName(qualifiedName, prefix, localName)) {
     exception = DOMException::INVALID_CHARACTER_ERR;
     return;
   }
