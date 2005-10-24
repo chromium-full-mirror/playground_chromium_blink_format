@@ -33,6 +33,7 @@ typedef struct WidthMap WidthMap;
 typedef struct GlyphMap GlyphMap;
 
 @interface WebTextRenderer : NSObject<WebCoreTextRenderer> {
+ @public
   int ascent;
   int descent;
   int lineSpacing;
@@ -40,7 +41,6 @@ typedef struct GlyphMap GlyphMap;
 
   void* styleGroup;
 
- @public
   WebCoreFont font;
   GlyphMap* characterToGlyphMap;
   WidthMap* glyphToWidthMap;
@@ -51,7 +51,6 @@ typedef struct GlyphMap GlyphMap;
   float adjustedSpaceWidth;
   float syntheticBoldOffset;
 
- @private
   WebTextRenderer* smallCapsRenderer;
   ATSUStyle _ATSUStyle;
   bool ATSUStyleInitialized;
@@ -60,10 +59,6 @@ typedef struct GlyphMap GlyphMap;
 
 - (id)initWithFont:(WebCoreFont)font;
 
-@end
-
-@interface WebTextRenderer (WebPrivate)
-
-+ (void)setAlwaysUseATSU:(bool)f;
++ (void)setAlwaysUseATSU:(bool)alwaysUseATSU;
 
 @end
