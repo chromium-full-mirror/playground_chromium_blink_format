@@ -2579,7 +2579,9 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
     o = next;
 
     if (!last->isFloatingOrPositioned() && last->isReplaced() &&
-        last->style()->whiteSpace() == NORMAL) {
+        last->style()->whiteSpace() == NORMAL &&
+        (!last->isListMarker() ||
+         last->style()->listStylePosition() == INSIDE)) {
       // Go ahead and add in tmpW.
       w += tmpW;
       tmpW = 0;
@@ -2618,9 +2620,9 @@ end:
         lBreak.pos = last->isText() ? last->length() : 0;
       }
     } else if (lBreak.obj) {
-      if (last != o) {
+      if (last != o && !last->isListMarker()) {
         // better to break between object boundaries than in the middle of a
-        // word
+        // word (except for list markers)
         lBreak.obj = o;
         lBreak.pos = 0;
       } else {
