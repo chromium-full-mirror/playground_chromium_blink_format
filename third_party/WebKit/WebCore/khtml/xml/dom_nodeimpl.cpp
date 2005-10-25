@@ -541,6 +541,8 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
 }
 
 bool NodeImpl::dispatchGenericEvent(EventImpl* evt, int& /*exceptioncode */) {
+  assert(evt->target());
+
   evt->ref();
 
   // ### check that type specified
@@ -659,6 +661,7 @@ bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
   evt->ref();
   DocumentPtr* doc = document;
   doc->ref();
+  evt->setTarget(doc->document());
   bool r = dispatchGenericEvent(evt, exceptioncode);
   if (!evt->defaultPrevented() && doc->document())
     doc->document()->defaultEventHandler(evt);
