@@ -542,7 +542,7 @@ DOMString CSSMutableStyleDeclarationImpl::item(unsigned i) const {
 }
 
 CSSRuleImpl* CSSStyleDeclarationImpl::parentRule() const {
-  return (m_parent && m_parent->isRule()) ? static_cast<CSSRuleImpl*>(m_parent)
+  return (parent() && parent()->isRule()) ? static_cast<CSSRuleImpl*>(parent())
                                           : 0;
 }
 
@@ -719,11 +719,8 @@ DOM::DOMString CSSInitialValueImpl::cssText() const {
 CSSValueListImpl::CSSValueListImpl() {}
 
 CSSValueListImpl::~CSSValueListImpl() {
-  CSSValueImpl* val = m_values.first();
-  while (val) {
+  for (CSSValueImpl* val = m_values.first(); val; val = m_values.next())
     val->deref();
-    val = m_values.next();
-  }
 }
 
 unsigned short CSSValueListImpl::cssValueType() const {
@@ -740,9 +737,8 @@ DOM::DOMString CSSValueListImpl::cssText() const {
 
   for (QPtrListIterator<CSSValueImpl> iterator(m_values); iterator.current();
        ++iterator) {
-    if (result.length() != 0) {
+    if (!result.isEmpty())
       result += ", ";
-    }
     result += iterator.current()->cssText();
   }
 
@@ -1360,34 +1356,29 @@ DOMString FontValueImpl::cssText() const {
     result += style->cssText();
   }
   if (variant) {
-    if (result.length() > 0) {
+    if (!result.isEmpty())
       result += " ";
-    }
     result += variant->cssText();
   }
   if (weight) {
-    if (result.length() > 0) {
+    if (!result.isEmpty())
       result += " ";
-    }
     result += weight->cssText();
   }
   if (size) {
-    if (result.length() > 0) {
+    if (!result.isEmpty())
       result += " ";
-    }
     result += size->cssText();
   }
   if (lineHeight) {
-    if (!size) {
+    if (!size)
       result += " ";
-    }
     result += "/";
     result += lineHeight->cssText();
   }
   if (family) {
-    if (result.length() > 0) {
+    if (!result.isEmpty())
       result += " ";
-    }
     result += family->cssText();
   }
 
@@ -1410,25 +1401,21 @@ ShadowValueImpl::~ShadowValueImpl() {
 
 DOMString ShadowValueImpl::cssText() const {
   DOMString text("");
-  if (color) {
+  if (color)
     text += color->cssText();
-  }
   if (x) {
-    if (text.length() > 0) {
+    if (!text.isEmpty())
       text += " ";
-    }
     text += x->cssText();
   }
   if (y) {
-    if (text.length() > 0) {
+    if (!text.isEmpty())
       text += " ";
-    }
     text += y->cssText();
   }
   if (blur) {
-    if (text.length() > 0) {
+    if (!text.isEmpty())
       text += " ";
-    }
     text += blur->cssText();
   }
 

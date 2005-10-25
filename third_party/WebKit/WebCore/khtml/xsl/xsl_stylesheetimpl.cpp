@@ -82,8 +82,8 @@ bool XSLStyleSheetImpl::isLoading() {
 void XSLStyleSheetImpl::checkLoaded() {
   if (isLoading())
     return;
-  if (m_parent)
-    m_parent->checkLoaded();
+  if (parent())
+    parent()->checkLoaded();
   if (m_parentNode)
     m_parentNode->sheetLoaded();
 }
@@ -181,8 +181,8 @@ void XSLStyleSheetImpl::loadChildSheet(const QString& href) {
 }
 
 XSLStyleSheetImpl* XSLImportRuleImpl::parentStyleSheet() const {
-  return (m_parent && m_parent->isXSLStyleSheet())
-             ? static_cast<XSLStyleSheetImpl*>(m_parent)
+  return (parent() && parent()->isXSLStyleSheet())
+             ? static_cast<XSLStyleSheetImpl*>(parent())
              : 0;
 }
 

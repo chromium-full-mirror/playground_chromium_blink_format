@@ -34,18 +34,18 @@
 #include "misc/loader.h"
 #include "xml/dom_docimpl.h"
 
-using namespace DOM;
-
 #include <kdebug.h>
 
+namespace DOM {
+
 CSSStyleSheetImpl* CSSRuleImpl::parentStyleSheet() const {
-  return (m_parent && m_parent->isCSSStyleSheet())
-             ? static_cast<CSSStyleSheetImpl*>(m_parent)
+  return (parent() && parent()->isCSSStyleSheet())
+             ? static_cast<CSSStyleSheetImpl*>(parent())
              : 0;
 }
 
 CSSRuleImpl* CSSRuleImpl::parentRule() const {
-  return (m_parent && m_parent->isRule()) ? static_cast<CSSRuleImpl*>(m_parent)
+  return (parent() && parent()->isRule()) ? static_cast<CSSRuleImpl*>(parent())
                                           : 0;
 }
 
@@ -400,4 +400,5 @@ unsigned CSSRuleListImpl::insertRule(CSSRuleImpl* rule, unsigned index) {
 
   // ### Should throw INDEX_SIZE_ERR exception instead! (TODO)
   return 0;
+}
 }

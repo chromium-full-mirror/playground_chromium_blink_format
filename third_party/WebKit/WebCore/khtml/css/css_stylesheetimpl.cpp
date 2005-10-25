@@ -77,11 +77,9 @@ StyleSheetImpl::~StyleSheetImpl() {
 }
 
 StyleSheetImpl* StyleSheetImpl::parentStyleSheet() const {
-  if (!m_parent)
-    return 0;
-  if (m_parent->isStyleSheet())
-    return static_cast<StyleSheetImpl*>(m_parent);
-  return 0;
+  return (parent() && parent()->isStyleSheet())
+             ? static_cast<StyleSheetImpl*>(parent())
+             : 0;
 }
 
 void StyleSheetImpl::setMedia(MediaListImpl* media) {
@@ -153,11 +151,8 @@ CSSStyleSheetImpl::CSSStyleSheetImpl(CSSRuleImpl* ownerRule,
 }
 
 CSSRuleImpl* CSSStyleSheetImpl::ownerRule() const {
-  if (!m_parent)
-    return 0;
-  if (m_parent->isRule())
-    return static_cast<CSSRuleImpl*>(m_parent);
-  return 0;
+  return (parent() && parent()->isRule()) ? static_cast<CSSRuleImpl*>(parent())
+                                          : 0;
 }
 
 unsigned CSSStyleSheetImpl::insertRule(const DOMString& rule,
@@ -270,8 +265,8 @@ bool CSSStyleSheetImpl::isLoading() {
 void CSSStyleSheetImpl::checkLoaded() {
   if (isLoading())
     return;
-  if (m_parent)
-    m_parent->checkLoaded();
+  if (parent())
+    parent()->checkLoaded();
   if (m_parentNode)
     m_parentNode->sheetLoaded();
 }
@@ -348,15 +343,12 @@ bool MediaListImpl::contains(const DOMString& medium) const {
 }
 
 CSSStyleSheetImpl* MediaListImpl::parentStyleSheet() const {
-  if (m_parent->isCSSStyleSheet())
-    return static_cast<CSSStyleSheetImpl*>(m_parent);
-  return 0;
+  return parent()->isCSSStyleSheet() ? static_cast<CSSStyleSheetImpl*>(parent())
+                                     : 0;
 }
 
 CSSRuleImpl* MediaListImpl::parentRule() const {
-  if (m_parent->isRule())
-    return static_cast<CSSRuleImpl*>(m_parent);
-  return 0;
+  return parent()->isRule() ? static_cast<CSSRuleImpl*>(parent()) : 0;
 }
 
 void MediaListImpl::deleteMedium(const DOMString& oldMedium) {
@@ -386,7 +378,7 @@ void MediaListImpl::setMediaText(const DOM::DOMString& value) {
   QStringList list = QStringList::split(',', value.qstring());
   for (QStringList::Iterator it = list.begin(); it != list.end(); ++it) {
     DOMString medium = (*it).stripWhiteSpace();
-    if (medium != "")
+    if (!medium.isEmpty())
       m_lstMedia.append(medium);
   }
 }
