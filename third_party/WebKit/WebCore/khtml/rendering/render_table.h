@@ -265,7 +265,7 @@ class RenderTableSection : public RenderContainer {
   void recalcCells();
 
  protected:
-  void ensureRows(int numRows);
+  bool ensureRows(int numRows);
   void clearGrid();
 };
 
