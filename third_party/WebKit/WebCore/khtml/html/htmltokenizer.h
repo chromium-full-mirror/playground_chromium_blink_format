@@ -127,7 +127,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
                 bool includesComments = false);
   virtual ~HTMLTokenizer();
 
-  virtual void write(const TokenizerString& str, bool appendData);
+  virtual bool write(const TokenizerString& str, bool appendData);
   virtual void finish();
   virtual void setOnHold(bool onHold);
   virtual void setForceSynchronous(bool force);

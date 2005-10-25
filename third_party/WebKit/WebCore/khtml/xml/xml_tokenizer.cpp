@@ -92,7 +92,7 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   enum ErrorType { warning, nonFatal, fatal };
 
   // from Tokenizer
-  virtual void write(const TokenizerString& str, bool);
+  virtual bool write(const TokenizerString& str, bool);
   virtual void finish();
   virtual void setOnHold(bool onHold);
   virtual bool isWaitingForScripts() const;
@@ -273,8 +273,9 @@ XMLTokenizer::~XMLTokenizer() {
     m_cachedScript->deref(this);
 }
 
-void XMLTokenizer::write(const TokenizerString& s, bool /*appendData*/) {
+bool XMLTokenizer::write(const TokenizerString& s, bool /*appendData*/) {
   m_xmlCode += s.toString();
+  return false;
 }
 
 void XMLTokenizer::setOnHold(bool onHold) {

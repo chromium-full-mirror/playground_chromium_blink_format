@@ -1422,17 +1422,17 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
   return true;
 }
 
-void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
+bool HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
 #ifdef TOKEN_DEBUG
   kdDebug(6036) << this << " Tokenizer::write(\"" << str.toString() << "\","
                 << appendData << ")" << endl;
 #endif
 
   if (!buffer)
-    return;
+    return false;
 
   if (m_parserStopped)
-    return;
+    return false;
 
   if ((m_executingScript && appendData) || !pendingScripts.isEmpty()) {
     // don't parse; we will do this later
@@ -1441,12 +1441,12 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
     } else {
       pendingSrc.append(str);
     }
-    return;
+    return false;
   }
 
   if (onHold) {
     src.append(str);
-    return;
+    return false;
   }
 
   if (!src.isEmpty())
@@ -1456,7 +1456,7 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
 
   // Once a timer is set, it has control of when the tokenizer continues.
   if (timerId)
-    return;
+    return false;
 
   bool wasInWrite = inWrite;
   inWrite = true;
@@ -1600,8 +1600,11 @@ void HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   m_state = state;
 
   if (noMoreData && !inWrite && !state.loadingExtScript() &&
-      !m_executingScript && !timerId)
+      !m_executingScript && !timerId) {
     end();  // this actually causes us to be deleted
+    return true;
+  }
+  return false;
 }
 
 void HTMLTokenizer::stopParsing() {
@@ -1643,23 +1646,12 @@ void HTMLTokenizer::timerEvent(QTimerEvent* e) {
     }
 
     // Invoke write() as though more data came in.
-    bool oldNoMoreData = noMoreData;
-    noMoreData = false;  // This prevents write() from deleting the tokenizer.
-    write(TokenizerString(), true);
-    noMoreData = oldNoMoreData;
-
-    // If the timer dies (and stays dead after the write),  we need to let
-    // WebKit know that we're done processing the data.
-    allDataProcessed();
-  }
-}
-
-void HTMLTokenizer::allDataProcessed() {
-  if (noMoreData && !inWrite && !m_state.loadingExtScript() &&
-      !m_executingScript && !onHold && !timerId) {
     QGuardedPtr<KHTMLView> savedView = view;
-    end();
-    if (savedView) {
+    bool didCallEnd = write(TokenizerString(), true);
+
+    // If we called end() during the write,  we need to let WebKit know that
+    // we're done processing the data.
+    if (didCallEnd && savedView) {
       KHTMLPart* part = savedView->part();
       if (part) {
         part->tokenizerProcessedData();
