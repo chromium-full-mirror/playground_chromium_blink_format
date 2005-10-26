@@ -110,6 +110,7 @@ class RenderTheme {
  protected:
   // Methods for state querying
   bool isChecked(const RenderObject* o) const;
+  bool isIndeterminate(const RenderObject* o) const;
   bool isEnabled(const RenderObject* o) const;
   bool isFocused(const RenderObject* o) const;
   bool isPressed(const RenderObject* o) const;

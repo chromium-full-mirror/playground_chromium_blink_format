@@ -127,6 +127,12 @@ bool RenderTheme::isChecked(const RenderObject* o) const {
   return o->element()->isChecked();
 }
 
+bool RenderTheme::isIndeterminate(const RenderObject* o) const {
+  if (!o->element())
+    return false;
+  return o->element()->isIndeterminate();
+}
+
 bool RenderTheme::isEnabled(const RenderObject* o) const {
   if (!o->element())
     return true;

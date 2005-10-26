@@ -1045,7 +1045,7 @@ DontDelete|ReadOnly
   selected	KJS::HTMLElement::OptionSelected	DontDelete
   value		KJS::HTMLElement::OptionValue		DontDelete
 @end
-@begin HTMLInputElementTable 23
+@begin HTMLInputElementTable 24
   defaultValue	KJS::HTMLElement::InputDefaultValue	DontDelete
   defaultChecked KJS::HTMLElement::InputDefaultChecked	DontDelete
   form		KJS::HTMLElement::InputForm		DontDelete|ReadOnly
@@ -1055,6 +1055,7 @@ DontDelete|ReadOnly
   alt		KJS::HTMLElement::InputAlt		DontDelete
   checked	KJS::HTMLElement::InputChecked		DontDelete
   disabled	KJS::HTMLElement::InputDisabled		DontDelete
+  indeterminate KJS::HTMLElement::InputIndeterminate    DontDelete
   maxLength	KJS::HTMLElement::InputMaxLength	DontDelete
   name		KJS::HTMLElement::InputName		DontDelete
   readOnly	KJS::HTMLElement::InputReadOnly		DontDelete
@@ -1889,6 +1890,8 @@ ValueImp* HTMLElement::inputGetter(ExecState* exec, int token) const {
       return Boolean(input.checked());
     case InputDisabled:
       return Boolean(input.disabled());
+    case InputIndeterminate:
+      return Boolean(input.indeterminate());
     case InputMaxLength:
       return Number(input.maxLength());
     case InputName:
@@ -3353,6 +3356,10 @@ void HTMLElement::inputSetter(ExecState* exec,
     }
     case InputDisabled: {
       input.setDisabled(value->toBoolean(exec));
+      return;
+    }
+    case InputIndeterminate: {
+      input.setIndeterminate(value->toBoolean(exec));
       return;
     }
     case InputMaxLength: {

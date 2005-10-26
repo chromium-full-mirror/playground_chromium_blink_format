@@ -347,6 +347,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool autoComplete() const { return m_autocomplete; }
 
   virtual bool isChecked() const { return checked(); }
+  virtual bool isIndeterminate() const { return indeterminate(); }
 
   bool isTextButton() const {
     return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
@@ -354,6 +355,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
 
   bool checked() const { return m_checked; }
   void setChecked(bool);
+  bool indeterminate() const { return m_indeterminate; }
+  void setIndeterminate(bool);
   int maxLength() const { return m_maxLen; }
   int size() const { return m_size; }
   DOMString type() const;
@@ -469,6 +472,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool m_checked : 1;
   bool m_defaultChecked : 1;
   bool m_useDefaultChecked : 1;
+  bool m_indeterminate : 1;
   bool m_haveType : 1;
   bool m_activeSubmit : 1;
   bool m_autocomplete : 1;

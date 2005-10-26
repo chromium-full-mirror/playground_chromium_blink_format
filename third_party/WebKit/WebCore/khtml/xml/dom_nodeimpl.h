@@ -262,6 +262,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   }  // Eventually the notion of what is a control will be extensible.
   virtual bool isEnabled() const { return true; }
   virtual bool isChecked() const { return false; }
+  virtual bool isIndeterminate() const { return false; }
 
   virtual bool isContentEditable() const;
   virtual QRect getRect() const;

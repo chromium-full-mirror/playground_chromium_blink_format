@@ -171,6 +171,7 @@ class CSSSelector {
     PseudoChecked,
     PseudoEnabled,
     PseudoDisabled,
+    PseudoIndeterminate,
     PseudoTarget,
     PseudoBefore,
     PseudoAfter,

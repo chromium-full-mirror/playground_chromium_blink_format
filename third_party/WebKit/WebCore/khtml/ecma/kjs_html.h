@@ -513,6 +513,7 @@ class HTMLElement : public DOMElement {
     InputDefaultChecked,
     InputDisabled,
     InputChecked,
+    InputIndeterminate,
     InputForm,
     InputAccessKey,
     InputAlign,
