@@ -117,6 +117,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   static bool isSupported(const DOMString& feature, const DOMString& version);
 
   bool isSameNode(NodeImpl* other) { return this == other; }
+  bool isEqualNode(NodeImpl* other) const;
 
   NodeImpl* lastDescendant() const;
 
