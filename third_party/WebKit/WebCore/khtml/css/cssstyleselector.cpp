@@ -1003,7 +1003,10 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
     // table rows or cells.  This has been established in CSS2.1 (and caused a
     // crash in containingBlock()
     // on some sites).
-    if ((style->display() == TABLE_ROW || style->display() == TABLE_CELL) &&
+    if ((style->display() == TABLE_HEADER_GROUP ||
+         style->display() == TABLE_ROW_GROUP ||
+         style->display() == TABLE_FOOTER_GROUP ||
+         style->display() == TABLE_ROW || style->display() == TABLE_CELL) &&
         style->position() == RELATIVE)
       style->setPosition(STATIC);
   }
