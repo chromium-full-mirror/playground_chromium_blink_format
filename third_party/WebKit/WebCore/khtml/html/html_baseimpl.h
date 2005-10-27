@@ -101,6 +101,8 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
 
   virtual void parseMappedAttribute(MappedAttributeImpl*);
   virtual void attach();
+  void close();
+  virtual void willRemove();
   virtual void detach();
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
   virtual khtml::RenderObject* createRenderer(RenderArena*,
@@ -191,7 +193,6 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
   int totalRows() const { return m_totalRows; }
   int totalCols() const { return m_totalCols; }
   int border() const { return m_border; }
-  virtual void detach();
 
   virtual void recalcStyle(StyleChange ch);
 
