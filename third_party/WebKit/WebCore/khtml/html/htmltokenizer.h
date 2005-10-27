@@ -414,6 +414,9 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   bool inWrite;
 };
+
+void parseHTMLDocumentFragment(const DOM::DOMString&,
+                               DOM::DocumentFragmentImpl*);
 }
 
 #if APPLE_CHANGES

@@ -286,7 +286,6 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc)
   m_target = 0;
   m_data = 0;
   m_localHref = 0;
-  m_sheet = 0;
   m_cachedSheet = 0;
   m_loading = false;
 #ifdef KHTML_XSLT
@@ -304,7 +303,6 @@ ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentPtr* doc,
   m_data = _data.impl();
   if (m_data)
     m_data->ref();
-  m_sheet = 0;
   m_cachedSheet = 0;
   m_localHref = 0;
 #ifdef KHTML_XSLT
@@ -319,8 +317,6 @@ ProcessingInstructionImpl::~ProcessingInstructionImpl() {
     m_data->deref();
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
-  if (m_sheet)
-    m_sheet->deref();
 }
 
 DOMString ProcessingInstructionImpl::target() const {
@@ -469,10 +465,6 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
   return true;
 }
 
-StyleSheetImpl* ProcessingInstructionImpl::sheet() const {
-  return m_sheet;
-}
-
 bool ProcessingInstructionImpl::isLoading() const {
   if (m_loading)
     return true;
@@ -509,20 +501,12 @@ void ProcessingInstructionImpl::setStyleSheet(const DOMString& url,
     getDocument()->stylesheetLoaded();
 }
 
-void ProcessingInstructionImpl::setStyleSheet(CSSStyleSheetImpl* sheet) {
-  if (m_sheet)
-    m_sheet->deref();
-  m_sheet = sheet;
-  if (m_sheet)
-    m_sheet->ref();
-}
-
 DOMString ProcessingInstructionImpl::toString() const {
   DOMString result = "<?";
   result += m_target;
   result += " ";
   result += m_data;
-  result += ">";
+  result += "?>";
   return result;
 }
 

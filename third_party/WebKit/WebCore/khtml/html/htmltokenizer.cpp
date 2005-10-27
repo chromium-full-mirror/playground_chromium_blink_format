@@ -1887,4 +1887,13 @@ void HTMLTokenizer::setSrc(const TokenizerString& source) {
 void HTMLTokenizer::setOnHold(bool _onHold) {
   onHold = _onHold;
 }
+
+void parseHTMLDocumentFragment(const DOM::DOMString& source,
+                               DOM::DocumentFragmentImpl* fragment) {
+  HTMLTokenizer tok(fragment->docPtr(), fragment);
+  tok.setForceSynchronous(true);
+  tok.write(source.qstring(), true);
+  tok.finish();
+  assert(!tok.processingData());  // make sure we're done (see 3963151)
+}
 }
