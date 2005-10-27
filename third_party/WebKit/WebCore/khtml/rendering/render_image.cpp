@@ -59,11 +59,9 @@ RenderImage::RenderImage(NodeImpl* _node) : RenderReplaced(_node) {
   image = 0;
   berrorPic = false;
   m_selectionState = SelectionNone;
-
   setIntrinsicWidth(0);
   setIntrinsicHeight(0);
-  if (element())
-    updateAltText();
+  updateAltText();
 }
 
 RenderImage::~RenderImage() {
@@ -523,7 +521,7 @@ void RenderImage::layout() {
 }
 
 HTMLMapElementImpl* RenderImage::imageMap() {
-  HTMLImageElementImpl* i = element()->hasTagName(imgTag)
+  HTMLImageElementImpl* i = element() && element()->hasTagName(imgTag)
                                 ? static_cast<HTMLImageElementImpl*>(element())
                                 : 0;
   return i ? i->getDocument()->getImageMap(i->imageMap()) : 0;
@@ -555,6 +553,9 @@ bool RenderImage::nodeAtPoint(NodeInfo& info,
 }
 
 void RenderImage::updateAltText() {
+  if (!element())
+    return;
+
   if (element()->hasTagName(inputTag))
     alt = static_cast<HTMLInputElementImpl*>(element())->altText();
   else if (element()->hasTagName(imgTag))
