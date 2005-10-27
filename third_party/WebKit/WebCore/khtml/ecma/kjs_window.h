@@ -226,6 +226,7 @@ class Window : public ObjectImp {
     XMLHttpRequest,
     XMLSerializer,
     DOMParser,
+    XSLTProcessor,
     Onabort,
     Onblur,
     Onchange,
