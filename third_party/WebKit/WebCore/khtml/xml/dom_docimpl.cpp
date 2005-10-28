@@ -2339,8 +2339,14 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
       }
       if (focusWidget)
         focusWidget->setFocus();
-      else
+      else {
         view()->setFocus();
+        if (m_focusNode->renderer()) {
+          updateLayout();
+          m_focusNode->renderer()->enclosingLayer()->scrollRectToVisible(
+              m_focusNode->getRect());
+        }
+      }
     }
   }
 
