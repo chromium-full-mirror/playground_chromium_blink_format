@@ -92,7 +92,8 @@ bool RenderTheme::paint(RenderObject* o,
       break;
   }
 
-  return false;
+  return true;  // We don't support the appearance, so let the normal
+                // background/border paint.
 }
 
 short RenderTheme::baselinePosition(const RenderObject* o) const {
@@ -104,6 +105,26 @@ bool RenderTheme::isControlContainer(EAppearance appearance) const {
   // support for
   // more controls.
   return appearance != CheckboxAppearance && appearance != RadioAppearance;
+}
+
+bool RenderTheme::isControlStyled(const RenderStyle* style,
+                                  const BorderData& border,
+                                  const BackgroundLayer& background,
+                                  const QColor& backgroundColor) const {
+  switch (style->appearance()) {
+    case PushButtonAppearance:
+    case SquareButtonAppearance:
+    case ButtonAppearance: {
+      // Test the style to see if the UA border and background match.
+      return (style->border() != border ||
+              *style->backgroundLayers() != background ||
+              style->backgroundColor() != backgroundColor);
+    }
+    default:
+      return false;
+  }
+
+  return false;
 }
 
 bool RenderTheme::stateChanged(RenderObject* o, ControlState state) const {

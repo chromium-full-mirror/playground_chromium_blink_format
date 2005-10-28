@@ -183,6 +183,7 @@ class BorderValue {
     width = 3;  // medium is default value
     style = BNONE;
   }
+
   QColor color;
   unsigned short width : 12;
   EBorderStyle style : 4;
@@ -345,6 +346,8 @@ class BorderData {
            topRight == o.topRight && bottomLeft == o.bottomLeft &&
            bottomRight == o.bottomRight;
   }
+
+  bool operator!=(const BorderData& o) const { return !(*this == o); }
 };
 
 enum EMarginCollapse { MCOLLAPSE, MSEPARATE, MDISCARD };
@@ -1282,6 +1285,7 @@ class RenderStyle {
   Length minHeight() const { return box->min_height; }
   Length maxHeight() const { return box->max_height; }
 
+  const BorderData& border() const { return surround->border; }
   const BorderValue& borderLeft() const { return surround->border.left; }
   const BorderValue& borderRight() const { return surround->border.right; }
   const BorderValue& borderTop() const { return surround->border.top; }

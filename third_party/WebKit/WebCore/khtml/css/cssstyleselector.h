@@ -185,6 +185,10 @@ class CSSStyleSelector : public StyleSelector {
   CSSRuleSet* m_userStyle;
   DOM::CSSStyleSheetImpl* m_userSheet;
 
+  BorderData m_borderData;
+  BackgroundLayer m_backgroundData;
+  QColor m_backgroundColor;
+
  public:
   static RenderStyle* styleNotYetAvailable;
 

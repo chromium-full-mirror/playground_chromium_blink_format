@@ -368,7 +368,6 @@ void CSSStyleSelector::matchRules(CSSRuleSet* rules,
                                   int& firstRuleIndex,
                                   int& lastRuleIndex) {
   m_matchedRuleCount = 0;
-  firstRuleIndex = lastRuleIndex = -1;
   if (!rules || !element)
     return;
 
@@ -541,6 +540,11 @@ void CSSStyleSelector::initForStyleResolve(ElementImpl* e,
   m_tmpRuleCount = 0;
 
   fontDirty = false;
+
+  // Clear out our cached border/background data.
+  m_borderData = BorderData();
+  m_backgroundData = BackgroundLayer();
+  m_backgroundColor = QColor();
 }
 
 // modified version of the one in kurl.cpp
@@ -849,8 +853,17 @@ RenderStyle* CSSStyleSelector::styleForElement(ElementImpl* e,
     fontDirty = false;
   }
 
-  // Now do the normal priority properties.
-  applyDeclarations(false, false, 0, m_matchedDeclCount - 1);
+  // Now do the normal priority UA properties.
+  applyDeclarations(false, false, firstUARule, lastUARule);
+
+  // Cache our border and background so that we can examine them later.
+  m_borderData = style->border();
+  m_backgroundData = *style->backgroundLayers();
+  m_backgroundColor = style->backgroundColor();
+
+  // Now do the author and user normal priority properties and all the
+  // !important properties.
+  applyDeclarations(false, false, lastUARule + 1, m_matchedDeclCount - 1);
   applyDeclarations(false, true, firstAuthorRule, lastAuthorRule);
   applyDeclarations(false, true, firstUserRule, lastUserRule);
   applyDeclarations(false, true, firstUARule, lastUARule);
@@ -1060,8 +1073,13 @@ void CSSStyleSelector::adjustRenderStyle(RenderStyle* style, ElementImpl* e) {
 
   // Let the theme get a crack at changing the style if an appearance has been
   // set.
-  if (style->hasAppearance())
-    theme()->adjustStyle(this, style, e);
+  if (style->hasAppearance()) {
+    if (theme()->isControlStyled(style, m_borderData, m_backgroundData,
+                                 m_backgroundColor))
+      style->setAppearance(NoAppearance);
+    else
+      theme()->adjustStyle(this, style, e);
+  }
 
   // Only use slow repaints if we actually have a background image.
   // FIXME: We only need to invalidate the fixed regions when scrolling.  It's
@@ -1953,8 +1971,6 @@ void CSSStyleSelector::applyDeclarations(bool applyFirst,
       if (isImportant == current.isImportant()) {
         bool first;
         switch (current.id()) {
-          case CSS_PROP_BACKGROUND:
-          case CSS_PROP_BACKGROUND_IMAGE:
           case CSS_PROP_COLOR:
           case CSS_PROP_DIRECTION:
           case CSS_PROP_DISPLAY:
