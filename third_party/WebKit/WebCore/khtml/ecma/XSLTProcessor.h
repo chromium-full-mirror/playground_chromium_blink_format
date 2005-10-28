@@ -23,6 +23,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef KHTML_XSLT
+
 #ifndef XSLTProcessor_H
 #define XSLTProcessor_H
 
@@ -75,3 +77,5 @@ class XSLTProcessorConstructorImp : public ObjectImp {
 };
 
 #endif
+
+#endif  // KHTML_XSLT
