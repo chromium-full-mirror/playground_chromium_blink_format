@@ -185,6 +185,7 @@ class CSSStyleSelector : public StyleSelector {
   CSSRuleSet* m_userStyle;
   DOM::CSSStyleSheetImpl* m_userSheet;
 
+  bool m_hasUAAppearance;
   BorderData m_borderData;
   BackgroundLayer m_backgroundData;
   QColor m_backgroundColor;
