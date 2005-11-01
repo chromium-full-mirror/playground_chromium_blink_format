@@ -105,7 +105,6 @@ class SelectionController {
   Position end() const { return m_end; }
 
   QRect caretRect() const;
-  QRect expectedVisibleRect() const;
   void setNeedsLayout(bool flag = true);
 
   void clearModifyBias() { m_modifyBiasSet = false; }
@@ -155,9 +154,10 @@ class SelectionController {
   EState m_state;        // the state of the selection
   EAffinity m_affinity;  // the upstream/downstream affinity of the selection
 
-  QRect m_caretRect;            // caret coordinates, size, and position
-  QRect m_expectedVisibleRect;  // rectangle used to update scroll position as
-                                // selection changes
+  QRect m_caretRect;               // caret coordinates, size, and position
+  QPoint m_caretPositionOnLayout;  // When asked for caretRect(), we correct
+                                   // m_caretRect for offset due to scrolling.
+  // This is faster than recalcuating m_caretRect.
 
   bool m_baseIsStart : 1;    // true if base node is before the extent node
   bool m_needsLayout : 1;    // true if the caret and expectedVisible rectangles

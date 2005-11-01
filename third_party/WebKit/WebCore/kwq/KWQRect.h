@@ -65,6 +65,11 @@ class QRect {
   QPoint bottomRight() const;
   QPoint bottomLeft() const;
 
+  void moveTopLeft(const QPoint& p) {
+    xp += p.x();
+    yp += p.y();
+  }
+
   QSize size() const;
   void setX(int x) { xp = x; }
   void setY(int y) { yp = y; }
