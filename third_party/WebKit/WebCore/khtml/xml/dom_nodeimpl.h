@@ -119,6 +119,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool isSameNode(NodeImpl* other) { return this == other; }
   bool isEqualNode(NodeImpl* other) const;
 
+  DOMString textContent() const;
+  void setTextContent(const DOMString& text, int& exception);
+
   NodeImpl* lastDescendant() const;
 
   // Other methods (not part of DOM)

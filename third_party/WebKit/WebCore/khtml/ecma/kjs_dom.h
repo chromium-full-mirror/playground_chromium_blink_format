@@ -102,6 +102,7 @@ class DOMNode : public DOMObject {
     Contains,
     IsSameNode,
     IsEqualNode,
+    TextContent,
     OnAbort,
     OnBlur,
     OnChange,
