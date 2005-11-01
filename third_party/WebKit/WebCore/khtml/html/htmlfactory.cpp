@@ -364,7 +364,9 @@ HTMLElementImpl* objectConstructor(const AtomicString& tagName,
                                    DocumentPtr* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
-  return new HTMLObjectElementImpl(docPtr);
+  HTMLObjectElementImpl* object = new HTMLObjectElementImpl(docPtr);
+  object->setComplete(!createdByParser);
+  return object;
 }
 
 HTMLElementImpl* paramConstructor(const AtomicString& tagName,
