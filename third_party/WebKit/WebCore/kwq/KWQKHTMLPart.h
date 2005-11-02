@@ -303,6 +303,7 @@ class KWQKHTMLPart : public KHTMLPart {
   static void clearTimers(KHTMLView*);
 
   bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
+  bool passWheelEventToChildWidget(DOM::NodeImpl*);
 
   void redirectionTimerStartedOrStopped();
 
