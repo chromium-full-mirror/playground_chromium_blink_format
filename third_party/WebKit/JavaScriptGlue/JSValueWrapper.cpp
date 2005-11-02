@@ -2,7 +2,7 @@
 // JSValueWrapper.cpp
 //
 #include "JSValueWrapper.h"
-#include "JavaScriptCore/IdentifierSequencedSet.h"
+#include "JavaScriptCore/reference_list.h"
 
 JSValueWrapper::JSValueWrapper(ValueImp* inValue, ExecState* inExec)
     : fValue(inValue), fExec(inExec) {}
@@ -44,12 +44,11 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
     ObjectImp* object = ptr->GetValue()->toObject(exec);
-    IdentifierSequencedSet list;
-    object->getPropertyNames(exec, list);
-    IdentifierSequencedSetIterator iterator = list.begin();
+    ReferenceList list = object->propList(exec);
+    ReferenceListIterator iterator = list.begin();
 
     while (iterator != list.end()) {
-      Identifier name = *iterator;
+      Identifier name = iterator->getPropertyName(exec);
       CFStringRef nameStr = IdentifierToCFString(name);
 
       if (!result) {
@@ -59,7 +58,7 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
         CFArrayAppendValue(result, nameStr);
       }
       ReleaseCFType(nameStr);
-      ++iterator;
+      iterator++;
     }
   }
   return result;

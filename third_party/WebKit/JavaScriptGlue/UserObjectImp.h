@@ -19,8 +19,7 @@ class UserObjectImp : public ObjectImp {
 
   virtual bool implementsCall() const;
 
-  virtual void getPropertyNames(ExecState* exec,
-                                IdentifierSequencedSet& propertyNames);
+  virtual ReferenceList propList(ExecState* exec, bool recursive = true);
 
   virtual ValueImp* callAsFunction(ExecState* exec,
                                    ObjectImp* thisObj,
