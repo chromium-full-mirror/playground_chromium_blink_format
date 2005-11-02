@@ -960,7 +960,7 @@ static bool shouldDrawDecoration(RenderObject* obj) {
       shouldDraw = true;
       break;
     } else if (curr->isText() && !curr->isBR() &&
-               (curr->style()->whiteSpace() == PRE || !curr->element() ||
+               (!curr->style()->collapseWhiteSpace() || !curr->element() ||
                 !curr->element()->containsOnlyWhitespace())) {
       shouldDraw = true;
       break;

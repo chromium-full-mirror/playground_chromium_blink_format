@@ -388,6 +388,7 @@ enum MappedAttributeEntry {
   eCell,
   eCaption,
   eBDO,
+  ePre,
   eLastEntry
 };
 

@@ -100,7 +100,6 @@ RenderBlock::RenderBlock(DOM::NodeImpl* node) : RenderFlow(node) {
   m_childrenInline = true;
   m_floatingObjects = 0;
   m_positionedObjects = 0;
-  m_pre = false;
   m_firstLine = false;
   m_hasMarkupTruncation = false;
   m_selectionState = SelectionNone;
@@ -122,10 +121,6 @@ void RenderBlock::setStyle(RenderStyle* _style) {
   setReplaced(_style->isDisplayReplacedType());
 
   RenderFlow::setStyle(_style);
-
-  m_pre = false;
-  if (_style->whiteSpace() == PRE)
-    m_pre = true;
 
   // ### we could save this call when the change only affected
   // non inherited properties
@@ -2938,7 +2933,6 @@ void RenderBlock::calcMinMaxWidth() {
   m_minWidth = 0;
   m_maxWidth = 0;
 
-  bool preOrNowrap = style()->whiteSpace() != NORMAL;
   if (childrenInline())
     calcInlineMinMaxWidth();
   else
@@ -2947,7 +2941,7 @@ void RenderBlock::calcMinMaxWidth() {
   if (m_maxWidth < m_minWidth)
     m_maxWidth = m_minWidth;
 
-  if (preOrNowrap && childrenInline()) {
+  if (!style()->autoWrap() && childrenInline()) {
     m_minWidth = m_maxWidth;
 
     // A horizontal marquee with inline children has no minimum width.
@@ -3083,11 +3077,10 @@ static int getBorderPaddingMargin(RenderObject* child, bool endOfInline) {
   return result;
 }
 
-static void stripTrailingSpace(bool pre,
-                               int& inlineMax,
-                               int& inlineMin,
-                               RenderObject* trailingSpaceChild) {
-  if (!pre && trailingSpaceChild && trailingSpaceChild->isText()) {
+static inline void stripTrailingSpace(int& inlineMax,
+                                      int& inlineMin,
+                                      RenderObject* trailingSpaceChild) {
+  if (trailingSpaceChild && trailingSpaceChild->isText()) {
     // Collapse away the trailing space at the end of a block.
     RenderText* t = static_cast<RenderText*>(trailingSpaceChild);
     const Font* f = t->htmlFont(false);
@@ -3111,14 +3104,14 @@ void RenderBlock::calcInlineMinMaxWidth() {
   bool stripFrontSpaces = true;
   RenderObject* trailingSpaceChild = 0;
 
-  bool normal, oldnormal;
-  normal = oldnormal = style()->whiteSpace() == NORMAL;
+  bool autoWrap, oldAutoWrap;
+  autoWrap = oldAutoWrap = style()->autoWrap();
 
   InlineMinMaxIterator childIterator(this, this);
   bool addedTextIndent = false;  // Only gets added in once.
   RenderObject* prevFloat = 0;
   while (RenderObject* child = childIterator.next()) {
-    normal = child->style()->whiteSpace() == NORMAL;
+    autoWrap = child->style()->autoWrap();
 
     if (!child->isBR()) {
       // Step One: determine whether or not we need to go ahead and
@@ -3206,7 +3199,10 @@ void RenderBlock::calcInlineMinMaxWidth() {
         childMin += child->minWidth();
         childMax += child->maxWidth();
 
-        if (normal || oldnormal) {
+        // FIXME: This isn't right.  WinIE, Opera, Mozilla all do this
+        // differently and
+        // treat replaced elements like characters in a word.
+        if (autoWrap || oldAutoWrap) {
           if (m_minWidth < inlineMin)
             m_minWidth = inlineMin;
           inlineMin = 0;
@@ -3238,7 +3234,7 @@ void RenderBlock::calcInlineMinMaxWidth() {
         // Add our width to the max.
         inlineMax += childMax;
 
-        if (!normal)
+        if (!autoWrap)
           inlineMin += childMin;
         else {
           // Now check our line.
@@ -3348,15 +3344,14 @@ void RenderBlock::calcInlineMinMaxWidth() {
       trailingSpaceChild = 0;
     }
 
-    oldnormal = normal;
+    oldAutoWrap = autoWrap;
   }
 
-  stripTrailingSpace(m_pre, inlineMax, inlineMin, trailingSpaceChild);
+  if (style()->collapseWhiteSpace())
+    stripTrailingSpace(inlineMax, inlineMin, trailingSpaceChild);
 
-  if (m_minWidth < inlineMin)
-    m_minWidth = inlineMin;
-  if (m_maxWidth < inlineMax)
-    m_maxWidth = inlineMax;
+  m_minWidth = kMax(inlineMin, m_minWidth);
+  m_maxWidth = kMax(inlineMax, m_maxWidth);
 
   //         kdDebug( 6040 ) << "m_minWidth=" << m_minWidth
   // 			<< " m_maxWidth=" << m_maxWidth << endl;
@@ -3893,9 +3888,6 @@ void RenderBlock::printTree(int indent) const {
 void RenderBlock::dump(QTextStream* stream, QString ind) const {
   if (m_childrenInline) {
     *stream << " childrenInline";
-  }
-  if (m_pre) {
-    *stream << " pre";
   }
   if (m_firstLine) {
     *stream << " firstLine";

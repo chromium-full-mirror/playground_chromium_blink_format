@@ -171,7 +171,7 @@ class Marquee : public QObject {
   bool m_reset : 1;
   bool m_suspended : 1;
   bool m_stopped : 1;
-  EWhiteSpace m_whiteSpace : 2;
+  EWhiteSpace m_whiteSpace : 3;
   EMarqueeDirection m_direction : 4;
 };
 

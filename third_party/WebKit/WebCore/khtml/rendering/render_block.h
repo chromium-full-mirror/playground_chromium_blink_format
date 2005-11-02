@@ -547,7 +547,6 @@ class RenderBlock : public RenderFlow {
   QPtrList<RenderObject>* m_positionedObjects;
 
   bool m_childrenInline : 1;
-  bool m_pre : 1;
   bool m_firstLine : 1;
   EClear m_clearStatus : 2;
   bool m_topMarginQuirk : 1;

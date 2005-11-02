@@ -1635,7 +1635,7 @@ void RenderTableCell::updateFromElement() {
 
 void RenderTableCell::calcMinMaxWidth() {
   RenderBlock::calcMinMaxWidth();
-  if (element() && style()->whiteSpace() == NORMAL) {
+  if (element() && style()->autoWrap()) {
     // See if nowrap was set.
     DOMString nowrap =
         static_cast<ElementImpl*>(element())->getAttribute(nowrapAttr);

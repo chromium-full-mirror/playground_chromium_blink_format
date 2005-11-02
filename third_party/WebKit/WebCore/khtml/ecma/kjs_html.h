@@ -577,6 +577,7 @@ class HTMLElement : public DOMElement {
     BlockQuoteCite,
     QuoteCite,
     PreWidth,
+    PreWrap,
     BRClear,
     BaseFontColor,
     BaseFontSize,

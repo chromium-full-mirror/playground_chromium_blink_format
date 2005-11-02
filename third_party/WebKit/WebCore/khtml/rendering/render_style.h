@@ -839,7 +839,7 @@ class StyleCSS3InheritedData : public Shared<StyleCSS3InheritedData> {
 // Inherited attributes.
 //
 
-enum EWhiteSpace { NORMAL, PRE, NOWRAP, KHTML_NOWRAP };
+enum EWhiteSpace { NORMAL, PRE, PRE_WRAP, PRE_LINE, NOWRAP, KHTML_NOWRAP };
 
 enum ETextAlign {
   TAAUTO,
@@ -1084,9 +1084,10 @@ class RenderStyle {
     ECursor _cursor_style : 4;
     EDirection _direction : 1;
     bool _border_collapse : 1;
-    EWhiteSpace _white_space : 2;
+    EWhiteSpace _white_space : 3;
     EBoxDirection _box_direction : 1;  // CSS3 box_direction property (flexible
                                        // box layout module)
+
     // non CSS2 inherited
     bool _visuallyOrdered : 1;
     bool _htmlHacks : 1;
@@ -1395,6 +1396,34 @@ class RenderStyle {
   Length lineHeight() const { return inherited->line_height; }
 
   EWhiteSpace whiteSpace() const { return inherited_flags._white_space; }
+  static bool autoWrap(EWhiteSpace ws) {
+    // Nowrap and pre don't automatically wrap.
+    return ws != NOWRAP && ws != PRE;
+  }
+  bool autoWrap() const { return autoWrap(whiteSpace()); }
+  static bool preserveNewline(EWhiteSpace ws) {
+    // Normal and nowrap do not preserve newlines.
+    return ws != NORMAL && ws != NOWRAP;
+  }
+  bool preserveNewline() const { return preserveNewline(whiteSpace()); }
+  static bool collapseWhiteSpace(EWhiteSpace ws) {
+    // Pre and prewrap do not collapse whitespace.
+    return ws != PRE && ws != PRE_WRAP;
+  }
+  bool collapseWhiteSpace() const { return collapseWhiteSpace(whiteSpace()); }
+  bool isCollapsibleWhiteSpace(const QChar& c) const {
+    switch (c.unicode()) {
+      case ' ':
+      case '\t':
+        return collapseWhiteSpace();
+      case '\n':
+        return !preserveNewline();
+    }
+    return false;
+  }
+  bool breakOnlyAfterWhiteSpace() const {
+    return whiteSpace() == PRE_WRAP || khtmlLineBreak() == AFTER_WHITE_SPACE;
+  }
 
   const QColor& backgroundColor() const { return background->m_color; }
   CachedImage* backgroundImage() const {
