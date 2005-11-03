@@ -82,18 +82,18 @@ QScrollBar* RenderLayer::gScrollBar = 0;
 static bool inRenderLayerDestroy;
 #endif
 
-RenderLayer::ScrollAlignment RenderLayer::gAlignCenterIfNeeded = {
+const RenderLayer::ScrollAlignment RenderLayer::gAlignCenterIfNeeded = {
     RenderLayer::noScroll, RenderLayer::alignCenter,
     RenderLayer::alignToClosestEdge};
-RenderLayer::ScrollAlignment RenderLayer::gAlignToEdgeIfNeeded = {
+const RenderLayer::ScrollAlignment RenderLayer::gAlignToEdgeIfNeeded = {
     RenderLayer::noScroll, RenderLayer::alignToClosestEdge,
     RenderLayer::alignToClosestEdge};
-RenderLayer::ScrollAlignment RenderLayer::gAlignCenterAlways = {
+const RenderLayer::ScrollAlignment RenderLayer::gAlignCenterAlways = {
     RenderLayer::alignCenter, RenderLayer::alignCenter,
     RenderLayer::alignCenter};
-RenderLayer::ScrollAlignment RenderLayer::gAlignTopAlways = {
+const RenderLayer::ScrollAlignment RenderLayer::gAlignTopAlways = {
     RenderLayer::alignTop, RenderLayer::alignTop, RenderLayer::alignTop};
-RenderLayer::ScrollAlignment RenderLayer::gAlignBottomAlways = {
+const RenderLayer::ScrollAlignment RenderLayer::gAlignBottomAlways = {
     RenderLayer::alignBottom, RenderLayer::alignBottom,
     RenderLayer::alignBottom};
 
@@ -565,8 +565,8 @@ void RenderLayer::scrollToOffset(int x,
 }
 
 void RenderLayer::scrollRectToVisible(const QRect& rect,
-                                      ScrollAlignment alignX,
-                                      ScrollAlignment alignY) {
+                                      const ScrollAlignment& alignX,
+                                      const ScrollAlignment& alignY) {
   RenderLayer* parentLayer = 0;
   QRect newRect = rect;
 
@@ -618,8 +618,8 @@ void RenderLayer::scrollRectToVisible(const QRect& rect,
 
 QRect RenderLayer::getRectToExpose(const QRect& visibleRect,
                                    const QRect& exposeRect,
-                                   ScrollAlignment alignX,
-                                   ScrollAlignment alignY) {
+                                   const ScrollAlignment& alignX,
+                                   const ScrollAlignment& alignY) {
   int x, y, w, h;
   x = exposeRect.x();
   y = exposeRect.y();
