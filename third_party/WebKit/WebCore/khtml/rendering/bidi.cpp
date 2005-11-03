@@ -2003,7 +2003,7 @@ bool RenderBlock::matchedEndLine(const BidiIterator& start,
 
 static const ushort nonBreakingSpace = 0xa0;
 
-inline bool RenderBlock::skipNonBreakingSpace(BidiIterator& it) {
+static inline bool skipNonBreakingSpace(BidiIterator& it) {
   if (it.obj->style()->nbspMode() != SPACE ||
       it.current().unicode() != nonBreakingSpace)
     return false;
@@ -2021,6 +2021,12 @@ inline bool RenderBlock::skipNonBreakingSpace(BidiIterator& it) {
   return true;
 }
 
+static inline bool shouldCollapseWhiteSpace(const RenderStyle* style) {
+  return style->collapseWhiteSpace() ||
+         (style->whiteSpace() == PRE_WRAP &&
+          (!isLineEmpty || !previousLineBrokeCleanly));
+}
+
 int RenderBlock::skipWhitespace(BidiIterator& it, BidiState& bidi) {
   // FIXME: The entire concept of the skipWhitespace function is flawed, since
   // we really need to be building
@@ -2032,7 +2038,7 @@ int RenderBlock::skipWhitespace(BidiIterator& it, BidiState& bidi) {
   int w = lineWidth(m_height);
   while (!it.atEnd() &&
          (it.obj->isInlineFlow() ||
-          (it.obj->style()->collapseWhiteSpace() && !it.obj->isBR() &&
+          (shouldCollapseWhiteSpace(it.obj->style()) && !it.obj->isBR() &&
            (it.current() == ' ' || it.current() == '\t' ||
             (!it.obj->style()->preserveNewline() && it.current() == '\n') ||
             it.current().unicode() == SOFT_HYPHEN || skipNonBreakingSpace(it) ||
