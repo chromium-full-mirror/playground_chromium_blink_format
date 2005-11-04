@@ -1359,6 +1359,8 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
     bool intersectsOverflowBox = overflowBox.intersects(i.r);
     if (!intersectsOverflowBox) {
       // Check floats next.
+      if (i.phase != PaintActionFloat)
+        return;
       QRect floatBox = floatRect();
       floatBox.inflate(maximalOutlineSize(i.phase));
       floatBox.setX(floatBox.x() + _tx);
@@ -2269,7 +2271,7 @@ int RenderBlock::floatBottom() const {
 
 QRect RenderBlock::floatRect() const {
   QRect result(borderBox());
-  if (!m_floatingObjects)
+  if (!m_floatingObjects || hasOverflowClip())
     return result;
   FloatingObject* r;
   QPtrListIterator<FloatingObject> it(*m_floatingObjects);
@@ -2722,6 +2724,8 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
     bool insideOverflowBox = overflowBox.contains(_x, _y);
     if (!insideOverflowBox) {
       // Check floats next.
+      if (hitTestAction != HitTestFloat)
+        return;
       QRect floatBox = floatRect();
       floatBox.setX(floatBox.x() + tx);
       floatBox.setY(floatBox.y() + ty);
