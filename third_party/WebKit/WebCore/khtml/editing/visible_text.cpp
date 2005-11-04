@@ -985,8 +985,6 @@ bool CircularSearchBuffer::isMatch() const {
 }
 
 int TextIterator::rangeLength(const RangeImpl* r) {
-  // Allocate string at the right size, rather than building it up by successive
-  // append calls.
   int length = 0;
   for (TextIterator it(r); !it.atEnd(); it.advance()) {
     length += it.length();
@@ -1052,14 +1050,7 @@ RangeImpl* TextIterator::rangeFromLocationAndLength(DocumentImpl* doc,
 }
 
 QString plainText(const RangeImpl* r) {
-  // Allocate string at the right size, rather than building it up by successive
-  // append calls.
-  int length = 0;
-  for (TextIterator it(r); !it.atEnd(); it.advance()) {
-    length += it.length();
-  }
   QString result("");
-  result.reserve(length);
   for (TextIterator it(r); !it.atEnd(); it.advance()) {
     result.append(it.characters(), it.length());
   }
