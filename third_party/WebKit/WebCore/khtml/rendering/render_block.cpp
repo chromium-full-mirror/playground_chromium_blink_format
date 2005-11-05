@@ -2725,7 +2725,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
     if (!insideOverflowBox) {
       // Check floats next.
       if (hitTestAction != HitTestFloat)
-        return;
+        return false;
       QRect floatBox = floatRect();
       floatBox.setX(floatBox.x() + tx);
       floatBox.setY(floatBox.y() + ty);
