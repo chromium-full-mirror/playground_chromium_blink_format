@@ -581,30 +581,20 @@ ValueImp* StringProtoFuncImp::callAsFunction(ExecState* exec,
       break;
     case Slice: {
       // The arg processing is very much like ArrayProtoFunc::Slice
-      double begin = args[0]->toInteger(exec);
-      if (begin >= 0) {  // false for NaN
-        if (begin > len)
-          begin = len;
+      double start = a0->toInteger(exec);
+      double end = a1->isUndefined() ? len : a1->toInteger(exec);
+      double from = start < 0 ? len + start : start;
+      double to = end < 0 ? len + end : end;
+      if (to > from && to > 0 && from < len) {
+        if (from < 0)
+          from = 0;
+        if (to > len)
+          to = len;
+        result = String(
+            s.substr(static_cast<int>(from), static_cast<int>(to - from)));
       } else {
-        begin += len;
-        if (!(begin >= 0))  // true for NaN
-          begin = 0;
+        result = String("");
       }
-      double end = len;
-      if (!args[1]->isUndefined()) {
-        end = args[1]->toInteger(exec);
-        if (end >= 0) {  // false for NaN
-          if (end > len)
-            end = len;
-        } else {
-          end += len;
-          if (!(end >= 0))  // true for NaN
-            end = 0;
-        }
-      }
-      // printf( "Slicing from %d to %d \n", begin, end );
-      result = String(
-          s.substr(static_cast<int>(begin), static_cast<int>(end - begin)));
       break;
     }
     case Split: {
