@@ -58,6 +58,7 @@ typedef enum {
 - (void)decreaseUseCount;
 - (void)flushRasterCache;
 - (CGImageRef)imageRef;
+- (NSImage*)image;
 - (void)resetAnimation;
 - (void)setAnimationRect:(NSRect)r;
 @end
