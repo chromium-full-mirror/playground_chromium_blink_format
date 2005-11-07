@@ -712,7 +712,7 @@ class HTMLOptionElementImpl : public HTMLGenericFormElementImpl {
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 2; }
   virtual bool checkDTD(const NodeImpl* newChild) {
-    return newChild->isTextNode();
+    return newChild->isTextNode() || newChild->hasTagName(HTMLNames::scriptTag);
   }
 
   virtual bool isFocusable() const;
