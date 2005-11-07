@@ -316,6 +316,7 @@ class RenderObject : public CachedObjectClient {
     return m_replaced;
   }  // a "replaced" element (see CSS)
   bool shouldPaintBackgroundOrBorder() const { return m_paintBackground; }
+  bool mustRepaintBackgroundOrBorder() const;
   bool needsLayout() const {
     return m_needsLayout || m_normalChildNeedsLayout || m_posChildNeedsLayout;
   }
