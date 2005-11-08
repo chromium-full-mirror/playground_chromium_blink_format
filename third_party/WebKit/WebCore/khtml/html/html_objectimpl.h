@@ -40,7 +40,7 @@ class HTMLFormElementImpl;
 
 class HTMLAppletElementImpl : public HTMLElementImpl {
  public:
-  HTMLAppletElementImpl(DocumentPtr* doc);
+  HTMLAppletElementImpl(DocumentImpl* doc);
   ~HTMLAppletElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -117,7 +117,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
 class HTMLEmbedElementImpl : public HTMLElementImpl {
  public:
-  HTMLEmbedElementImpl(DocumentPtr* doc);
+  HTMLEmbedElementImpl(DocumentImpl* doc);
   ~HTMLEmbedElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -156,7 +156,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
 class HTMLObjectElementImpl : public HTMLElementImpl {
  public:
-  HTMLObjectElementImpl(DocumentPtr* doc);
+  HTMLObjectElementImpl(DocumentImpl* doc);
   ~HTMLObjectElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -272,7 +272,7 @@ class HTMLParamElementImpl : public HTMLElementImpl {
   friend class HTMLAppletElementImpl;
 
  public:
-  HTMLParamElementImpl(DocumentPtr* doc);
+  HTMLParamElementImpl(DocumentImpl* doc);
   ~HTMLParamElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }

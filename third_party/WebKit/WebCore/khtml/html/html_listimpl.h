@@ -34,7 +34,7 @@ namespace DOM {
 
 class HTMLUListElementImpl : public HTMLElementImpl {
  public:
-  HTMLUListElementImpl(DocumentPtr* doc)
+  HTMLUListElementImpl(DocumentImpl* doc)
       : HTMLElementImpl(HTMLNames::ulTag, doc) {}
   virtual ~HTMLUListElementImpl() {}
 
@@ -58,7 +58,7 @@ class HTMLUListElementImpl : public HTMLElementImpl {
 
 class HTMLDirectoryElementImpl : public HTMLElementImpl {
  public:
-  HTMLDirectoryElementImpl(DocumentPtr* doc)
+  HTMLDirectoryElementImpl(DocumentImpl* doc)
       : HTMLElementImpl(HTMLNames::dirTag, doc) {}
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -72,7 +72,7 @@ class HTMLDirectoryElementImpl : public HTMLElementImpl {
 
 class HTMLMenuElementImpl : public HTMLElementImpl {
  public:
-  HTMLMenuElementImpl(DocumentPtr* doc)
+  HTMLMenuElementImpl(DocumentImpl* doc)
       : HTMLElementImpl(HTMLNames::menuTag, doc) {}
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -86,7 +86,7 @@ class HTMLMenuElementImpl : public HTMLElementImpl {
 
 class HTMLOListElementImpl : public HTMLElementImpl {
  public:
-  HTMLOListElementImpl(DocumentPtr* doc)
+  HTMLOListElementImpl(DocumentImpl* doc)
       : HTMLElementImpl(HTMLNames::olTag, doc) {
     _start = 1;
   }
@@ -115,7 +115,8 @@ class HTMLOListElementImpl : public HTMLElementImpl {
 
 class HTMLLIElementImpl : public HTMLElementImpl {
  public:
-  HTMLLIElementImpl(DocumentPtr* doc) : HTMLElementImpl(HTMLNames::liTag, doc) {
+  HTMLLIElementImpl(DocumentImpl* doc)
+      : HTMLElementImpl(HTMLNames::liTag, doc) {
     isValued = false;
   }
   virtual ~HTMLLIElementImpl() {}
@@ -144,7 +145,7 @@ class HTMLLIElementImpl : public HTMLElementImpl {
 
 class HTMLDListElementImpl : public HTMLElementImpl {
  public:
-  HTMLDListElementImpl(DocumentPtr* doc)
+  HTMLDListElementImpl(DocumentImpl* doc)
       : HTMLElementImpl(HTMLNames::dlTag, doc) {}
   virtual ~HTMLDListElementImpl() {}
 

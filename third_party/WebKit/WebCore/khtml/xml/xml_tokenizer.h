@@ -35,7 +35,6 @@
 class KHTMLView;
 
 namespace DOM {
-class DocumentPtr;
 class DocumentImpl;
 class DocumentFragmentImpl;
 class ElementImpl;
@@ -82,7 +81,7 @@ class Tokenizer : public QObject {
 #endif
 };
 
-Tokenizer* newXMLTokenizer(DOM::DocumentPtr*, KHTMLView* = 0);
+Tokenizer* newXMLTokenizer(DOM::DocumentImpl*, KHTMLView* = 0);
 #ifdef KHTML_XSLT
 void* xmlDocPtrForString(const QString& source, const QString& url = QString());
 #endif

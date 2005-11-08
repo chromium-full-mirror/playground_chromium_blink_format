@@ -424,7 +424,7 @@ SharedPtr<RangeImpl> makeRange(const VisiblePosition& start,
                                const VisiblePosition& end) {
   Position s = start.position();
   Position e = end.position();
-  return SharedPtr<RangeImpl>(new RangeImpl(s.node()->docPtr(), s.node(),
+  return SharedPtr<RangeImpl>(new RangeImpl(s.node()->getDocument(), s.node(),
                                             s.offset(), e.node(), e.offset()));
 }
 

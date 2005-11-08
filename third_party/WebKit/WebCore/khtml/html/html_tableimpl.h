@@ -58,7 +58,7 @@ class HTMLTableElementImpl : public HTMLElementImpl {
     Box = 0x0f
   };
 
-  HTMLTableElementImpl(DocumentPtr* doc);
+  HTMLTableElementImpl(DocumentImpl* doc);
   ~HTMLTableElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -150,7 +150,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
 
 {
  public:
-  HTMLTablePartElementImpl(const QualifiedName& tagName, DocumentPtr* doc)
+  HTMLTablePartElementImpl(const QualifiedName& tagName, DocumentImpl* doc)
       : HTMLElementImpl(tagName, doc) {}
 
   virtual bool mapToEntry(const QualifiedName& attrName,
@@ -163,7 +163,7 @@ class HTMLTablePartElementImpl : public HTMLElementImpl
 class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
  public:
   HTMLTableSectionElementImpl(const QualifiedName& tagName,
-                              DocumentPtr* doc,
+                              DocumentImpl* doc,
                               bool implicit);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
@@ -196,7 +196,7 @@ class HTMLTableSectionElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableRowElementImpl(DocumentPtr* doc)
+  HTMLTableRowElementImpl(DocumentImpl* doc)
       : HTMLTablePartElementImpl(HTMLNames::trTag, doc) {}
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
@@ -241,7 +241,7 @@ class HTMLTableRowElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableCellElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLTableCellElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   ~HTMLTableCellElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
@@ -321,7 +321,7 @@ class HTMLTableCellElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableColElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLTableColElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
 
   virtual HTMLTagStatus endTagRequirement() const {
     return hasLocalName(HTMLNames::colTag) ? TagStatusForbidden
@@ -369,7 +369,7 @@ class HTMLTableColElementImpl : public HTMLTablePartElementImpl {
 
 class HTMLTableCaptionElementImpl : public HTMLTablePartElementImpl {
  public:
-  HTMLTableCaptionElementImpl(DocumentPtr* doc)
+  HTMLTableCaptionElementImpl(DocumentImpl* doc)
       : HTMLTablePartElementImpl(HTMLNames::captionTag, doc) {}
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }

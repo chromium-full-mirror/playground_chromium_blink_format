@@ -53,6 +53,7 @@
 
 #include <khtml_settings.h>
 #include <dom/dom_string.h>
+#include "DocPtr.h"
 
 class QMovie;
 class KHTMLPart;

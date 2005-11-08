@@ -47,19 +47,19 @@ using khtml::isEndOfParagraph;
 
 namespace DOM {
 
-RangeImpl::RangeImpl(DocumentPtr* _ownerDocument) {
+RangeImpl::RangeImpl(DocumentImpl* _ownerDocument) {
   m_ownerDocument = _ownerDocument;
   m_ownerDocument->ref();
-  m_startContainer = _ownerDocument->document();
+  m_startContainer = _ownerDocument;
   m_startContainer->ref();
-  m_endContainer = _ownerDocument->document();
+  m_endContainer = _ownerDocument;
   m_endContainer->ref();
   m_startOffset = 0;
   m_endOffset = 0;
   m_detached = false;
 }
 
-RangeImpl::RangeImpl(DocumentPtr* _ownerDocument,
+RangeImpl::RangeImpl(DocumentImpl* _ownerDocument,
                      NodeImpl* _startContainer,
                      int _startOffset,
                      NodeImpl* _endContainer,
@@ -169,7 +169,7 @@ void RangeImpl::setStart(NodeImpl* refNode, int offset, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -207,7 +207,7 @@ void RangeImpl::setEnd(NodeImpl* refNode, int offset, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -452,7 +452,7 @@ DocumentFragmentImpl* RangeImpl::processContents(ActionType action,
 
   DocumentFragmentImpl* fragment = 0;
   if (action == EXTRACT_CONTENTS || action == CLONE_CONTENTS)
-    fragment = new DocumentFragmentImpl(m_ownerDocument);
+    fragment = new DocumentFragmentImpl(m_ownerDocument.get());
 
   // Simple case: the start and end containers are the same. We just grab
   // everything >= start offset and < end offset
@@ -1008,7 +1008,7 @@ RangeImpl* RangeImpl::cloneRange(int& exceptioncode) const {
     return 0;
   }
 
-  return new RangeImpl(m_ownerDocument, m_startContainer, m_startOffset,
+  return new RangeImpl(m_ownerDocument.get(), m_startContainer, m_startOffset,
                        m_endContainer, m_endOffset);
 }
 
@@ -1023,7 +1023,7 @@ void RangeImpl::setStartAfter(NodeImpl* refNode, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1046,7 +1046,7 @@ void RangeImpl::setEndBefore(NodeImpl* refNode, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1069,7 +1069,7 @@ void RangeImpl::setEndAfter(NodeImpl* refNode, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1265,7 +1265,7 @@ void RangeImpl::setStartBefore(NodeImpl* refNode, int& exceptioncode) {
     return;
   }
 
-  if (refNode->getDocument() != m_ownerDocument->document()) {
+  if (refNode->getDocument() != m_ownerDocument) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return;
   }
@@ -1438,7 +1438,7 @@ bool operator==(const RangeImpl& a, const RangeImpl& b) {
 }
 
 SharedPtr<RangeImpl> rangeOfContents(NodeImpl* node) {
-  RangeImpl* range = new RangeImpl(node->docPtr());
+  RangeImpl* range = new RangeImpl(node->getDocument());
   int exception = 0;
   range->selectNodeContents(node, exception);
   return SharedPtr<RangeImpl>(range);

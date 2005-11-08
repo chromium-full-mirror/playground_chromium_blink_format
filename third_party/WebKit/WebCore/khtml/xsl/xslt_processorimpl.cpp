@@ -235,8 +235,7 @@ static inline SharedPtr<DocumentFragmentImpl> createFragmentFromSource(
     QString sourceMIMEType,
     NodeImpl* sourceNode,
     DocumentImpl* ouputDoc) {
-  SharedPtr<DocumentFragmentImpl> fragment =
-      new DocumentFragmentImpl(ouputDoc->docPtr());
+  SharedPtr<DocumentFragmentImpl> fragment = new DocumentFragmentImpl(ouputDoc);
 
   if (sourceMIMEType == "text/html")
     parseHTMLDocumentFragment(sourceString, fragment.get());

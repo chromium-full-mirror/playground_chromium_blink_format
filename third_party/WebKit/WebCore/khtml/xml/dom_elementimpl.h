@@ -110,7 +110,7 @@ class AttrImpl : public ContainerNodeImpl {
 
  public:
   AttrImpl(ElementImpl* element,
-           DocumentPtr* docPtr,
+           DocumentImpl* doc,
            AttributeImpl* a,
            bool createTextChild);
   ~AttrImpl();
@@ -163,7 +163,7 @@ class ElementImpl : public ContainerNodeImpl {
   friend class khtml::CSSStyleSelector;
 
  public:
-  ElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  ElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   ~ElementImpl();
 
   // Used to quickly determine whether or not an element has a given CSS class.
@@ -482,7 +482,7 @@ class NamedMappedAttrMapImpl : public NamedAttrMapImpl {
 
 class StyledElementImpl : public ElementImpl {
  public:
-  StyledElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  StyledElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   virtual ~StyledElementImpl();
 
   virtual bool isStyledElement() const { return true; }

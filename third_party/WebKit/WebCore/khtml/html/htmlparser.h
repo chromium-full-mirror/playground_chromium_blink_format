@@ -36,7 +36,6 @@ class HTMLStackElem;
 
 namespace DOM {
 class HTMLDocumentImpl;
-class DocumentPtr;
 class HTMLElementImpl;
 class NodeImpl;
 class HTMLFormElementImpl;
@@ -56,9 +55,9 @@ class Token;
  */
 class HTMLParser {
  public:
-  HTMLParser(KHTMLView* w, DOM::DocumentPtr* i, bool includesComments = false);
+  HTMLParser(KHTMLView* w, DOM::DocumentImpl* i, bool includesComments = false);
   HTMLParser(DOM::DocumentFragmentImpl* frag,
-             DOM::DocumentPtr* doc,
+             DOM::DocumentImpl* doc,
              bool includesComments = false);
   virtual ~HTMLParser();
 
@@ -82,9 +81,8 @@ class HTMLParser {
   bool selectMode() const { return inSelect; }
 
   DOM::HTMLDocumentImpl* doc() const {
-    return static_cast<DOM::HTMLDocumentImpl*>(document->document());
+    return static_cast<DOM::HTMLDocumentImpl*>(document);
   }
-  DOM::DocumentPtr* docPtr() const { return document; }
 
  protected:
   void setCurrent(DOM::NodeImpl* newCurrent);
@@ -93,7 +91,7 @@ class HTMLParser {
   }
 
   KHTMLView* HTMLWidget;
-  DOM::DocumentPtr* document;
+  DOM::DocumentImpl* document;
 
   /*
    * generate a node from the token

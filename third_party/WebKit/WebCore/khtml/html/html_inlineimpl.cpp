@@ -48,13 +48,13 @@ namespace DOM {
 using namespace EventNames;
 using namespace HTMLNames;
 
-HTMLAnchorElementImpl::HTMLAnchorElementImpl(DocumentPtr* doc)
+HTMLAnchorElementImpl::HTMLAnchorElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(aTag, doc) {
   m_hasTarget = false;
 }
 
 HTMLAnchorElementImpl::HTMLAnchorElementImpl(const QualifiedName& tagName,
-                                             DocumentPtr* doc)
+                                             DocumentImpl* doc)
     : HTMLElementImpl(tagName, doc) {
   m_hasTarget = false;
 }
@@ -344,7 +344,7 @@ void HTMLAnchorElementImpl::focus() {
 
 // -------------------------------------------------------------------------
 
-HTMLBRElementImpl::HTMLBRElementImpl(DocumentPtr* doc)
+HTMLBRElementImpl::HTMLBRElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(brTag, doc) {}
 
 HTMLBRElementImpl::~HTMLBRElementImpl() {}
@@ -389,7 +389,7 @@ void HTMLBRElementImpl::setClear(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLFontElementImpl::HTMLFontElementImpl(DocumentPtr* doc)
+HTMLFontElementImpl::HTMLFontElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(fontTag, doc) {}
 
 HTMLFontElementImpl::~HTMLFontElementImpl() {}
@@ -516,7 +516,7 @@ void HTMLFontElementImpl::setSize(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLModElementImpl::HTMLModElementImpl(const QualifiedName& tagName,
-                                       DocumentPtr* doc)
+                                       DocumentImpl* doc)
     : HTMLElementImpl(tagName, doc) {}
 
 DOMString HTMLModElementImpl::cite() const {
@@ -537,7 +537,7 @@ void HTMLModElementImpl::setDateTime(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLQuoteElementImpl::HTMLQuoteElementImpl(DocumentPtr* doc)
+HTMLQuoteElementImpl::HTMLQuoteElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(qTag, doc) {}
 
 DOMString HTMLQuoteElementImpl::cite() const {

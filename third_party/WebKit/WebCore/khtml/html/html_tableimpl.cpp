@@ -52,7 +52,7 @@ namespace DOM {
 
 using namespace HTMLNames;
 
-HTMLTableElementImpl::HTMLTableElementImpl(DocumentPtr* doc)
+HTMLTableElementImpl::HTMLTableElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(tableTag, doc) {
   tCaption = 0;
   head = 0;
@@ -148,7 +148,7 @@ NodeImpl* HTMLTableElementImpl::setTBody(HTMLTableSectionElementImpl* s) {
 HTMLElementImpl* HTMLTableElementImpl::createTHead() {
   if (!head) {
     int exceptioncode = 0;
-    head = new HTMLTableSectionElementImpl(theadTag, docPtr(),
+    head = new HTMLTableSectionElementImpl(theadTag, getDocument(),
                                            true /* implicit */);
     if (foot)
       insertBefore(head, foot, exceptioncode);
@@ -173,8 +173,8 @@ void HTMLTableElementImpl::deleteTHead() {
 HTMLElementImpl* HTMLTableElementImpl::createTFoot() {
   if (!foot) {
     int exceptioncode = 0;
-    foot =
-        new HTMLTableSectionElementImpl(tfootTag, docPtr(), true /*implicit */);
+    foot = new HTMLTableSectionElementImpl(tfootTag, getDocument(),
+                                           true /*implicit */);
     if (firstBody)
       insertBefore(foot, firstBody, exceptioncode);
     else
@@ -196,7 +196,7 @@ void HTMLTableElementImpl::deleteTFoot() {
 HTMLElementImpl* HTMLTableElementImpl::createCaption() {
   if (!tCaption) {
     int exceptioncode = 0;
-    tCaption = new HTMLTableCaptionElementImpl(docPtr());
+    tCaption = new HTMLTableCaptionElementImpl(getDocument());
     insertBefore(tCaption, firstChild(), exceptioncode);
   }
   return tCaption;
@@ -220,7 +220,7 @@ HTMLElementImpl* HTMLTableElementImpl::insertRow(int index,
   // have
   // <TABLE><TR>)
   if (!firstBody && !head && !foot)
-    setTBody(new HTMLTableSectionElementImpl(tbodyTag, docPtr(),
+    setTBody(new HTMLTableSectionElementImpl(tbodyTag, getDocument(),
                                              true /* implicit */));
 
   // kdDebug(6030) << k_funcinfo << index << endl;
@@ -748,7 +748,7 @@ void HTMLTablePartElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 
 HTMLTableSectionElementImpl::HTMLTableSectionElementImpl(
     const QualifiedName& tagName,
-    DocumentPtr* doc,
+    DocumentImpl* doc,
     bool implicit)
     : HTMLTablePartElementImpl(tagName, doc) {
   m_implicit = implicit;
@@ -787,7 +787,7 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
   if (index < -1 || index > numRows) {
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   } else {
-    r = new HTMLTableRowElementImpl(docPtr());
+    r = new HTMLTableRowElementImpl(getDocument());
     if (numRows == index || index == -1)
       appendChild(r, exceptioncode);
     else {
@@ -948,7 +948,7 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
   if (index < -1 || index > numCells)
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   else {
-    c = new HTMLTableCellElementImpl(tdTag, docPtr());
+    c = new HTMLTableCellElementImpl(tdTag, getDocument());
     if (numCells == index || index == -1)
       appendChild(c, exceptioncode);
     else {
@@ -1029,7 +1029,7 @@ void HTMLTableRowElementImpl::setVAlign(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLTableCellElementImpl::HTMLTableCellElementImpl(const QualifiedName& tagName,
-                                                   DocumentPtr* doc)
+                                                   DocumentImpl* doc)
     : HTMLTablePartElementImpl(tagName, doc) {
   _col = -1;
   _row = -1;
@@ -1225,7 +1225,7 @@ void HTMLTableCellElementImpl::setWidth(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLTableColElementImpl::HTMLTableColElementImpl(const QualifiedName& tagName,
-                                                 DocumentPtr* doc)
+                                                 DocumentImpl* doc)
     : HTMLTablePartElementImpl(tagName, doc) {
   _span = (tagName.matches(colgroupTag) ? 0 : 1);
 }

@@ -37,7 +37,7 @@ using namespace khtml;
 using namespace DOM;
 using namespace HTMLNames;
 
-HTMLBlockquoteElementImpl::HTMLBlockquoteElementImpl(DocumentPtr* doc)
+HTMLBlockquoteElementImpl::HTMLBlockquoteElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(blockquoteTag, doc) {}
 
 HTMLBlockquoteElementImpl::~HTMLBlockquoteElementImpl() {}
@@ -52,7 +52,7 @@ void HTMLBlockquoteElementImpl::setCite(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLDivElementImpl::HTMLDivElementImpl(DocumentPtr* doc)
+HTMLDivElementImpl::HTMLDivElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(divTag, doc) {}
 
 HTMLDivElementImpl::~HTMLDivElementImpl() {}
@@ -92,7 +92,7 @@ void HTMLDivElementImpl::setAlign(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLHRElementImpl::HTMLHRElementImpl(DocumentPtr* doc)
+HTMLHRElementImpl::HTMLHRElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(hrTag, doc) {}
 
 HTMLHRElementImpl::~HTMLHRElementImpl() {}
@@ -186,7 +186,7 @@ void HTMLHRElementImpl::setWidth(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLHeadingElementImpl::HTMLHeadingElementImpl(const QualifiedName& tagName,
-                                               DocumentPtr* doc)
+                                               DocumentImpl* doc)
     : HTMLElementImpl(tagName, doc) {}
 
 bool HTMLHeadingElementImpl::checkDTD(const NodeImpl* newChild) {
@@ -208,7 +208,7 @@ void HTMLHeadingElementImpl::setAlign(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLParagraphElementImpl::HTMLParagraphElementImpl(DocumentPtr* doc)
+HTMLParagraphElementImpl::HTMLParagraphElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(pTag, doc) {}
 
 bool HTMLParagraphElementImpl::checkDTD(const NodeImpl* newChild) {
@@ -252,7 +252,7 @@ void HTMLParagraphElementImpl::setAlign(const DOMString& value) {
 // -------------------------------------------------------------------------
 
 HTMLPreElementImpl::HTMLPreElementImpl(const QualifiedName& tagName,
-                                       DocumentPtr* doc)
+                                       DocumentImpl* doc)
     : HTMLElementImpl(tagName, doc) {}
 
 bool HTMLPreElementImpl::mapToEntry(const QualifiedName& attrName,
@@ -300,7 +300,7 @@ void HTMLPreElementImpl::setWrap(bool wrap) {
 // WinIE uses 60ms as the minimum delay by default.
 const int defaultMinimumDelay = 60;
 
-HTMLMarqueeElementImpl::HTMLMarqueeElementImpl(DocumentPtr* doc)
+HTMLMarqueeElementImpl::HTMLMarqueeElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(marqueeTag, doc), m_minimumDelay(defaultMinimumDelay) {}
 
 bool HTMLMarqueeElementImpl::mapToEntry(const QualifiedName& attrName,

@@ -116,7 +116,7 @@ class FormDataList {
   QValueList<FormDataListItem> m_list;
 };
 
-HTMLFormElementImpl::HTMLFormElementImpl(DocumentPtr* doc)
+HTMLFormElementImpl::HTMLFormElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(formTag, doc) {
   collectionInfo = 0;
   m_post = false;
@@ -833,7 +833,7 @@ void HTMLFormElementImpl::setTarget(const DOMString& value) {
 
 HTMLGenericFormElementImpl::HTMLGenericFormElementImpl(
     const QualifiedName& tagName,
-    DocumentPtr* doc,
+    DocumentImpl* doc,
     HTMLFormElementImpl* f)
     : HTMLElementImpl(tagName, doc) {
   m_disabled = m_readOnly = false;
@@ -1157,7 +1157,7 @@ void HTMLGenericFormElementImpl::setTabIndex(int value) {
 
 // -------------------------------------------------------------------------
 
-HTMLButtonElementImpl::HTMLButtonElementImpl(DocumentPtr* doc,
+HTMLButtonElementImpl::HTMLButtonElementImpl(DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(buttonTag, doc, f) {
   m_type = SUBMIT;
@@ -1272,7 +1272,7 @@ void HTMLButtonElementImpl::setValue(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLFieldSetElementImpl::HTMLFieldSetElementImpl(DocumentPtr* doc,
+HTMLFieldSetElementImpl::HTMLFieldSetElementImpl(DocumentImpl* doc,
                                                  HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(fieldsetTag, doc, f) {}
 
@@ -1297,14 +1297,14 @@ RenderObject* HTMLFieldSetElementImpl::createRenderer(RenderArena* arena,
 
 // -------------------------------------------------------------------------
 
-HTMLInputElementImpl::HTMLInputElementImpl(DocumentPtr* doc,
+HTMLInputElementImpl::HTMLInputElementImpl(DocumentImpl* doc,
                                            HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(inputTag, doc, f) {
   init();
 }
 
 HTMLInputElementImpl::HTMLInputElementImpl(const QualifiedName& tagName,
-                                           DocumentPtr* doc,
+                                           DocumentImpl* doc,
                                            HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(tagName, doc, f) {
   init();
@@ -2569,7 +2569,7 @@ void HTMLInputElementImpl::setUseMap(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLLabelElementImpl::HTMLLabelElementImpl(DocumentPtr* doc)
+HTMLLabelElementImpl::HTMLLabelElementImpl(DocumentImpl* doc)
     : HTMLElementImpl(labelTag, doc) {}
 
 HTMLLabelElementImpl::~HTMLLabelElementImpl() {}
@@ -2646,7 +2646,7 @@ void HTMLLabelElementImpl::setHtmlFor(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLLegendElementImpl::HTMLLegendElementImpl(DocumentPtr* doc,
+HTMLLegendElementImpl::HTMLLegendElementImpl(DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(legendTag, doc, f) {}
 
@@ -2715,14 +2715,14 @@ void HTMLLegendElementImpl::accessKeyAction(bool sendToAnyElement) {
 
 // -------------------------------------------------------------------------
 
-HTMLSelectElementImpl::HTMLSelectElementImpl(DocumentPtr* doc,
+HTMLSelectElementImpl::HTMLSelectElementImpl(DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(selectTag, doc, f), m_options(0) {
   init();
 }
 
 HTMLSelectElementImpl::HTMLSelectElementImpl(const QualifiedName& tagName,
-                                             DocumentPtr* doc,
+                                             DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(tagName, doc, f), m_options(0) {
   init();
@@ -3204,7 +3204,7 @@ void HTMLSelectElementImpl::setSize(int size) {
 
 // -------------------------------------------------------------------------
 
-HTMLKeygenElementImpl::HTMLKeygenElementImpl(DocumentPtr* doc,
+HTMLKeygenElementImpl::HTMLKeygenElementImpl(DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLSelectElementImpl(keygenTag, doc, f) {
   QStringList keys = KSSLKeyGen::supportedKeySizes();
@@ -3262,7 +3262,7 @@ bool HTMLKeygenElementImpl::appendFormData(FormDataList& encoded_values, bool) {
 
 // -------------------------------------------------------------------------
 
-HTMLOptGroupElementImpl::HTMLOptGroupElementImpl(DocumentPtr* doc,
+HTMLOptGroupElementImpl::HTMLOptGroupElementImpl(DocumentImpl* doc,
                                                  HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(optgroupTag, doc, f) {}
 
@@ -3343,7 +3343,7 @@ void HTMLOptGroupElementImpl::setLabel(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLOptionElementImpl::HTMLOptionElementImpl(DocumentPtr* doc,
+HTMLOptionElementImpl::HTMLOptionElementImpl(DocumentImpl* doc,
                                              HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(optionTag, doc, f) {
   m_selected = false;
@@ -3392,7 +3392,7 @@ void HTMLOptionElementImpl::setText(const DOMString& text, int& exception) {
   }
 
   removeChildren();
-  appendChild(new TextImpl(docPtr(), text), exception);
+  appendChild(new TextImpl(getDocument(), text), exception);
 }
 
 int HTMLOptionElementImpl::index() const {
@@ -3479,7 +3479,7 @@ void HTMLOptionElementImpl::setLabel(const DOMString& value) {
 
 // -------------------------------------------------------------------------
 
-HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentPtr* doc,
+HTMLTextAreaElementImpl::HTMLTextAreaElementImpl(DocumentImpl* doc,
                                                  HTMLFormElementImpl* f)
     : HTMLGenericFormElementImpl(textareaTag, doc, f),
       m_valueIsValid(false),
@@ -3720,7 +3720,7 @@ void HTMLTextAreaElementImpl::setRows(int rows) {
 
 // -------------------------------------------------------------------------
 
-HTMLIsIndexElementImpl::HTMLIsIndexElementImpl(DocumentPtr* doc,
+HTMLIsIndexElementImpl::HTMLIsIndexElementImpl(DocumentImpl* doc,
                                                HTMLFormElementImpl* f)
     : HTMLInputElementImpl(isindexTag, doc, f) {
   m_type = TEXT;

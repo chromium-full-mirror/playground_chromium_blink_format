@@ -114,14 +114,13 @@ class HTMLStackElem {
  *
  */
 HTMLParser::HTMLParser(KHTMLView* _parent,
-                       DocumentPtr* doc,
+                       DocumentImpl* doc,
                        bool includesComments)
     : current(0),
       currentIsReferenced(false),
       includesCommentsInDOM(includesComments) {
   HTMLWidget = _parent;
   document = doc;
-  document->ref();
 
   blockStack = 0;
 
@@ -129,14 +128,13 @@ HTMLParser::HTMLParser(KHTMLView* _parent,
 }
 
 HTMLParser::HTMLParser(DOM::DocumentFragmentImpl* i,
-                       DocumentPtr* doc,
+                       DocumentImpl* doc,
                        bool includesComments)
     : current(0),
       currentIsReferenced(false),
       includesCommentsInDOM(includesComments) {
   HTMLWidget = 0;
   document = doc;
-  document->ref();
 
   blockStack = 0;
 
@@ -149,8 +147,6 @@ HTMLParser::~HTMLParser() {
   freeBlock();
 
   setCurrent(0);
-
-  document->deref();
 
   if (isindex)
     isindex->deref();

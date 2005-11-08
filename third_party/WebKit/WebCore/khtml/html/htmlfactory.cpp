@@ -43,224 +43,224 @@ namespace DOM {
 using namespace HTMLNames;
 
 typedef HTMLElementImpl* (*ConstructorFunc)(const AtomicString& tagName,
-                                            DocumentPtr* docPtr,
+                                            DocumentImpl* docPtr,
                                             HTMLFormElementImpl* form,
                                             bool createdByParser);
 typedef HashMap<DOMStringImpl*, void*, PointerHash<DOMStringImpl*>> FunctionMap;
 static FunctionMap* gFunctionMap;
 
 HTMLElementImpl* htmlConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLHtmlElementImpl(docPtr);
 }
 
 HTMLElementImpl* headConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLHeadElementImpl(docPtr);
 }
 
 HTMLElementImpl* bodyConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLBodyElementImpl(docPtr);
 }
 
 HTMLElementImpl* baseConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLBaseElementImpl(docPtr);
 }
 
 HTMLElementImpl* linkConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLLinkElementImpl(docPtr);
 }
 
 HTMLElementImpl* metaConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLMetaElementImpl(docPtr);
 }
 
 HTMLElementImpl* styleConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLStyleElementImpl(docPtr);
 }
 
 HTMLElementImpl* titleConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLTitleElementImpl(docPtr);
 }
 
 HTMLElementImpl* frameConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLFrameElementImpl(docPtr);
 }
 
 HTMLElementImpl* framesetConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLFrameSetElementImpl(docPtr);
 }
 
 HTMLElementImpl* iframeConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLIFrameElementImpl(docPtr);
 }
 
 HTMLElementImpl* formConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLFormElementImpl(docPtr);
 }
 
 HTMLElementImpl* buttonConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLButtonElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* inputConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLInputElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* isindexConstructor(const AtomicString& tagName,
-                                    DocumentPtr* docPtr,
+                                    DocumentImpl* docPtr,
                                     HTMLFormElementImpl* form,
                                     bool createdByParser) {
   return new HTMLIsIndexElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* fieldsetConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLFieldSetElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* labelConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLLabelElementImpl(docPtr);
 }
 
 HTMLElementImpl* legendConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLLegendElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* optgroupConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLOptGroupElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* optionConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLOptionElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* selectConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLSelectElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* textareaConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLTextAreaElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* dlConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLDListElementImpl(docPtr);
 }
 
 HTMLElementImpl* ulConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLUListElementImpl(docPtr);
 }
 
 HTMLElementImpl* olConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLOListElementImpl(docPtr);
 }
 
 HTMLElementImpl* dirConstructor(const AtomicString& tagName,
-                                DocumentPtr* docPtr,
+                                DocumentImpl* docPtr,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLDirectoryElementImpl(docPtr);
 }
 
 HTMLElementImpl* menuConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLMenuElementImpl(docPtr);
 }
 
 HTMLElementImpl* liConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLLIElementImpl(docPtr);
 }
 
 HTMLElementImpl* blockquoteConstructor(const AtomicString& tagName,
-                                       DocumentPtr* docPtr,
+                                       DocumentImpl* docPtr,
                                        HTMLFormElementImpl* form,
                                        bool createdByParser) {
   return new HTMLBlockquoteElementImpl(docPtr);
 }
 
 HTMLElementImpl* divConstructor(const AtomicString& tagName,
-                                DocumentPtr* docPtr,
+                                DocumentImpl* docPtr,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLDivElementImpl(docPtr);
 }
 
 HTMLElementImpl* headingConstructor(const AtomicString& tagName,
-                                    DocumentPtr* docPtr,
+                                    DocumentImpl* docPtr,
                                     HTMLFormElementImpl* form,
                                     bool createdByParser) {
   return new HTMLHeadingElementImpl(
@@ -268,21 +268,21 @@ HTMLElementImpl* headingConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* hrConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLHRElementImpl(docPtr);
 }
 
 HTMLElementImpl* paragraphConstructor(const AtomicString& tagName,
-                                      DocumentPtr* docPtr,
+                                      DocumentImpl* docPtr,
                                       HTMLFormElementImpl* form,
                                       bool createdByParser) {
   return new HTMLParagraphElementImpl(docPtr);
 }
 
 HTMLElementImpl* preConstructor(const AtomicString& tagName,
-                                DocumentPtr* docPtr,
+                                DocumentImpl* docPtr,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLPreElementImpl(
@@ -290,21 +290,21 @@ HTMLElementImpl* preConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* basefontConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLBaseFontElementImpl(docPtr);
 }
 
 HTMLElementImpl* fontConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLFontElementImpl(docPtr);
 }
 
 HTMLElementImpl* modConstructor(const AtomicString& tagName,
-                                DocumentPtr* docPtr,
+                                DocumentImpl* docPtr,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLModElementImpl(
@@ -312,56 +312,56 @@ HTMLElementImpl* modConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* anchorConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLAnchorElementImpl(docPtr);
 }
 
 HTMLElementImpl* imageConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLImageElementImpl(docPtr, form);
 }
 
 HTMLElementImpl* mapConstructor(const AtomicString& tagName,
-                                DocumentPtr* docPtr,
+                                DocumentImpl* docPtr,
                                 HTMLFormElementImpl* form,
                                 bool createdByParser) {
   return new HTMLMapElementImpl(docPtr);
 }
 
 HTMLElementImpl* areaConstructor(const AtomicString& tagName,
-                                 DocumentPtr* docPtr,
+                                 DocumentImpl* docPtr,
                                  HTMLFormElementImpl* form,
                                  bool createdByParser) {
   return new HTMLAreaElementImpl(docPtr);
 }
 
 HTMLElementImpl* canvasConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLCanvasElementImpl(docPtr);
 }
 
 HTMLElementImpl* appletConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   return new HTMLAppletElementImpl(docPtr);
 }
 
 HTMLElementImpl* embedConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLEmbedElementImpl(docPtr);
 }
 
 HTMLElementImpl* objectConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   HTMLObjectElementImpl* object = new HTMLObjectElementImpl(docPtr);
@@ -370,14 +370,14 @@ HTMLElementImpl* objectConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* paramConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLParamElementImpl(docPtr);
 }
 
 HTMLElementImpl* scriptConstructor(const AtomicString& tagName,
-                                   DocumentPtr* docPtr,
+                                   DocumentImpl* docPtr,
                                    HTMLFormElementImpl* form,
                                    bool createdByParser) {
   HTMLScriptElementImpl* script = new HTMLScriptElementImpl(docPtr);
@@ -386,21 +386,21 @@ HTMLElementImpl* scriptConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* tableConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLTableElementImpl(docPtr);
 }
 
 HTMLElementImpl* tableCaptionConstructor(const AtomicString& tagName,
-                                         DocumentPtr* docPtr,
+                                         DocumentImpl* docPtr,
                                          HTMLFormElementImpl* form,
                                          bool createdByParser) {
   return new HTMLTableCaptionElementImpl(docPtr);
 }
 
 HTMLElementImpl* tableColConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLTableColElementImpl(
@@ -408,14 +408,14 @@ HTMLElementImpl* tableColConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* tableRowConstructor(const AtomicString& tagName,
-                                     DocumentPtr* docPtr,
+                                     DocumentImpl* docPtr,
                                      HTMLFormElementImpl* form,
                                      bool createdByParser) {
   return new HTMLTableRowElementImpl(docPtr);
 }
 
 HTMLElementImpl* tableCellConstructor(const AtomicString& tagName,
-                                      DocumentPtr* docPtr,
+                                      DocumentImpl* docPtr,
                                       HTMLFormElementImpl* form,
                                       bool createdByParser) {
   return new HTMLTableCellElementImpl(
@@ -423,7 +423,7 @@ HTMLElementImpl* tableCellConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* tableSectionConstructor(const AtomicString& tagName,
-                                         DocumentPtr* docPtr,
+                                         DocumentImpl* docPtr,
                                          HTMLFormElementImpl* form,
                                          bool createdByParser) {
   return new HTMLTableSectionElementImpl(
@@ -431,21 +431,21 @@ HTMLElementImpl* tableSectionConstructor(const AtomicString& tagName,
 }
 
 HTMLElementImpl* brConstructor(const AtomicString& tagName,
-                               DocumentPtr* docPtr,
+                               DocumentImpl* docPtr,
                                HTMLFormElementImpl* form,
                                bool createdByParser) {
   return new HTMLBRElementImpl(docPtr);
 }
 
 HTMLElementImpl* quoteConstructor(const AtomicString& tagName,
-                                  DocumentPtr* docPtr,
+                                  DocumentImpl* docPtr,
                                   HTMLFormElementImpl* form,
                                   bool createdByParser) {
   return new HTMLQuoteElementImpl(docPtr);
 }
 
 HTMLElementImpl* marqueeConstructor(const AtomicString& tagName,
-                                    DocumentPtr* docPtr,
+                                    DocumentImpl* docPtr,
                                     HTMLFormElementImpl* form,
                                     bool createdByParser) {
   return new HTMLMarqueeElementImpl(docPtr);
@@ -459,7 +459,7 @@ HTMLElementImpl* HTMLElementFactory::createHTMLElement(
   if (!doc)
     return 0;  // Don't allow elements to ever be made without having a doc.
 
-  DocumentPtr* docPtr = doc->docPtr();
+  DocumentImpl* docPtr = doc;
   if (!gFunctionMap) {
     // Create the table.
     gFunctionMap = new FunctionMap;

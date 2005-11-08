@@ -50,7 +50,7 @@ class HTMLFrameElement;
 
 class HTMLBodyElementImpl : public HTMLElementImpl {
  public:
-  HTMLBodyElementImpl(DocumentPtr* doc);
+  HTMLBodyElementImpl(DocumentImpl* doc);
   ~HTMLBodyElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -90,8 +90,8 @@ class HTMLFrameElementImpl : public HTMLElementImpl {
   friend class khtml::RenderPartObject;
 
  public:
-  HTMLFrameElementImpl(DocumentPtr* doc);
-  HTMLFrameElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLFrameElementImpl(DocumentImpl* doc);
+  HTMLFrameElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   ~HTMLFrameElementImpl();
 
   void init();
@@ -172,7 +172,7 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
   friend class khtml::RenderFrameSet;
 
  public:
-  HTMLFrameSetElementImpl(DocumentPtr* doc);
+  HTMLFrameSetElementImpl(DocumentImpl* doc);
   ~HTMLFrameSetElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -220,7 +220,7 @@ class HTMLFrameSetElementImpl : public HTMLElementImpl {
 
 class HTMLHeadElementImpl : public HTMLElementImpl {
  public:
-  HTMLHeadElementImpl(DocumentPtr* doc);
+  HTMLHeadElementImpl(DocumentImpl* doc);
   ~HTMLHeadElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
@@ -235,7 +235,7 @@ class HTMLHeadElementImpl : public HTMLElementImpl {
 
 class HTMLHtmlElementImpl : public HTMLElementImpl {
  public:
-  HTMLHtmlElementImpl(DocumentPtr* doc);
+  HTMLHtmlElementImpl(DocumentImpl* doc);
   ~HTMLHtmlElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -250,7 +250,7 @@ class HTMLHtmlElementImpl : public HTMLElementImpl {
 
 class HTMLIFrameElementImpl : public HTMLFrameElementImpl {
  public:
-  HTMLIFrameElementImpl(DocumentPtr* doc);
+  HTMLIFrameElementImpl(DocumentImpl* doc);
   ~HTMLIFrameElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }

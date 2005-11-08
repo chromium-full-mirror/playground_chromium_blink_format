@@ -73,8 +73,8 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   friend class HTMLFormElementImpl;
 
  public:
-  HTMLImageElementImpl(DocumentPtr* doc, HTMLFormElementImpl* f = 0);
-  HTMLImageElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLImageElementImpl(DocumentImpl* doc, HTMLFormElementImpl* f = 0);
+  HTMLImageElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
   ~HTMLImageElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
@@ -158,7 +158,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
  public:
   enum Shape { Default, Poly, Rect, Circle, Unknown };
 
-  HTMLAreaElementImpl(DocumentPtr* doc);
+  HTMLAreaElementImpl(DocumentImpl* doc);
   ~HTMLAreaElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
@@ -213,7 +213,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
 class HTMLMapElementImpl : public HTMLElementImpl {
  public:
-  HTMLMapElementImpl(DocumentPtr* doc);
+  HTMLMapElementImpl(DocumentImpl* doc);
   ~HTMLMapElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }

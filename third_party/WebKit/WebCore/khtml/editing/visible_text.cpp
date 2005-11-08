@@ -481,13 +481,13 @@ SharedPtr<RangeImpl> TextIterator::range() const {
       m_positionOffsetBaseNode = 0;
     }
     return SharedPtr<RangeImpl>(new RangeImpl(
-        m_positionNode->docPtr(), m_positionNode, m_positionStartOffset,
+        m_positionNode->getDocument(), m_positionNode, m_positionStartOffset,
         m_positionNode, m_positionEndOffset));
   }
 
   // otherwise, return the end of the overall range we were given
   if (m_endContainer)
-    return SharedPtr<RangeImpl>(new RangeImpl(m_endContainer->docPtr(),
+    return SharedPtr<RangeImpl>(new RangeImpl(m_endContainer->getDocument(),
                                               m_endContainer, m_endOffset,
                                               m_endContainer, m_endOffset));
 
@@ -726,10 +726,10 @@ void SimplifiedBackwardsTextIterator::emitNewlineForBROrText() {
 SharedPtr<RangeImpl> SimplifiedBackwardsTextIterator::range() const {
   if (m_positionNode) {
     return SharedPtr<RangeImpl>(new RangeImpl(
-        m_positionNode->docPtr(), m_positionNode, m_positionStartOffset,
+        m_positionNode->getDocument(), m_positionNode, m_positionStartOffset,
         m_positionNode, m_positionEndOffset));
   } else {
-    return SharedPtr<RangeImpl>(new RangeImpl(m_startNode->docPtr(),
+    return SharedPtr<RangeImpl>(new RangeImpl(m_startNode->getDocument(),
                                               m_startNode, m_startOffset,
                                               m_startNode, m_startOffset));
   }

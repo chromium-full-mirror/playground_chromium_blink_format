@@ -37,11 +37,11 @@ using namespace DOM;
 using namespace DOM::EventNames;
 using namespace khtml;
 
-CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc) : NodeImpl(doc) {
+CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc) : NodeImpl(doc) {
   str = 0;
 }
 
-CharacterDataImpl::CharacterDataImpl(DocumentPtr* doc, const DOMString& _text)
+CharacterDataImpl::CharacterDataImpl(DocumentImpl* doc, const DOMString& _text)
     : NodeImpl(doc) {
   str = _text.impl() ? _text.impl() : new DOMStringImpl((QChar*)0, 0);
   str->ref();
@@ -287,10 +287,10 @@ void CharacterDataImpl::dump(QTextStream* stream, QString ind) const {
 
 // ---------------------------------------------------------------------------
 
-CommentImpl::CommentImpl(DocumentPtr* doc, const DOMString& _text)
+CommentImpl::CommentImpl(DocumentImpl* doc, const DOMString& _text)
     : CharacterDataImpl(doc, _text) {}
 
-CommentImpl::CommentImpl(DocumentPtr* doc) : CharacterDataImpl(doc) {}
+CommentImpl::CommentImpl(DocumentImpl* doc) : CharacterDataImpl(doc) {}
 
 CommentImpl::~CommentImpl() {}
 
@@ -324,10 +324,10 @@ DOMString CommentImpl::toString() const {
 
 // ### allow having children in text nodes for entities, comments etc.
 
-TextImpl::TextImpl(DocumentPtr* doc, const DOMString& _text)
+TextImpl::TextImpl(DocumentImpl* doc, const DOMString& _text)
     : CharacterDataImpl(doc, _text) {}
 
-TextImpl::TextImpl(DocumentPtr* doc) : CharacterDataImpl(doc) {}
+TextImpl::TextImpl(DocumentImpl* doc) : CharacterDataImpl(doc) {}
 
 TextImpl::~TextImpl() {}
 
@@ -458,7 +458,7 @@ bool TextImpl::childTypeAllowed(unsigned short /*type*/) {
 }
 
 TextImpl* TextImpl::createNew(DOMStringImpl* _str) {
-  return new TextImpl(docPtr(), _str);
+  return new TextImpl(getDocument(), _str);
 }
 
 DOMString TextImpl::toString() const {
@@ -490,10 +490,10 @@ void TextImpl::formatForDebugger(char* buffer, unsigned length) const {
 
 // ---------------------------------------------------------------------------
 
-CDATASectionImpl::CDATASectionImpl(DocumentPtr* impl, const DOMString& _text)
+CDATASectionImpl::CDATASectionImpl(DocumentImpl* impl, const DOMString& _text)
     : TextImpl(impl, _text) {}
 
-CDATASectionImpl::CDATASectionImpl(DocumentPtr* impl) : TextImpl(impl) {}
+CDATASectionImpl::CDATASectionImpl(DocumentImpl* impl) : TextImpl(impl) {}
 
 CDATASectionImpl::~CDATASectionImpl() {}
 
@@ -516,7 +516,7 @@ bool CDATASectionImpl::childTypeAllowed(unsigned short /*type*/) {
 }
 
 TextImpl* CDATASectionImpl::createNew(DOMStringImpl* _str) {
-  return new CDATASectionImpl(docPtr(), _str);
+  return new CDATASectionImpl(getDocument(), _str);
 }
 
 DOMString CDATASectionImpl::toString() const {
@@ -526,10 +526,10 @@ DOMString CDATASectionImpl::toString() const {
 
 // ---------------------------------------------------------------------------
 
-EditingTextImpl::EditingTextImpl(DocumentPtr* impl, const DOMString& text)
+EditingTextImpl::EditingTextImpl(DocumentImpl* impl, const DOMString& text)
     : TextImpl(impl, text) {}
 
-EditingTextImpl::EditingTextImpl(DocumentPtr* impl) : TextImpl(impl) {}
+EditingTextImpl::EditingTextImpl(DocumentImpl* impl) : TextImpl(impl) {}
 
 EditingTextImpl::~EditingTextImpl() {}
 

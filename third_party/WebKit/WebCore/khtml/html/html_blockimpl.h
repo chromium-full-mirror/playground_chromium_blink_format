@@ -35,7 +35,7 @@ class DOMString;
 
 class HTMLBlockquoteElementImpl : public HTMLElementImpl {
  public:
-  HTMLBlockquoteElementImpl(DocumentPtr* doc);
+  HTMLBlockquoteElementImpl(DocumentImpl* doc);
   ~HTMLBlockquoteElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -51,7 +51,7 @@ class DOMString;
 
 class HTMLDivElementImpl : public HTMLElementImpl {
  public:
-  HTMLDivElementImpl(DocumentPtr* doc);
+  HTMLDivElementImpl(DocumentImpl* doc);
   ~HTMLDivElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
@@ -69,7 +69,7 @@ class HTMLDivElementImpl : public HTMLElementImpl {
 
 class HTMLHRElementImpl : public HTMLElementImpl {
  public:
-  HTMLHRElementImpl(DocumentPtr* doc);
+  HTMLHRElementImpl(DocumentImpl* doc);
   ~HTMLHRElementImpl();
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusForbidden; }
@@ -96,7 +96,7 @@ class HTMLHRElementImpl : public HTMLElementImpl {
 
 class HTMLHeadingElementImpl : public HTMLElementImpl {
  public:
-  HTMLHeadingElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLHeadingElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
@@ -110,7 +110,7 @@ class HTMLHeadingElementImpl : public HTMLElementImpl {
 
 class HTMLParagraphElementImpl : public HTMLElementImpl {
  public:
-  HTMLParagraphElementImpl(DocumentPtr* doc);
+  HTMLParagraphElementImpl(DocumentImpl* doc);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusOptional; }
   virtual int tagPriority() const { return 3; }
@@ -128,7 +128,7 @@ class HTMLParagraphElementImpl : public HTMLElementImpl {
 
 class HTMLPreElementImpl : public HTMLElementImpl {
  public:
-  HTMLPreElementImpl(const QualifiedName& tagName, DocumentPtr* doc);
+  HTMLPreElementImpl(const QualifiedName& tagName, DocumentImpl* doc);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 5; }
@@ -148,7 +148,7 @@ class HTMLPreElementImpl : public HTMLElementImpl {
 
 class HTMLMarqueeElementImpl : public HTMLElementImpl {
  public:
-  HTMLMarqueeElementImpl(DocumentPtr* doc);
+  HTMLMarqueeElementImpl(DocumentImpl* doc);
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 3; }
