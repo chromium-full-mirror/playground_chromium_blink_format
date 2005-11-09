@@ -100,12 +100,11 @@ void InsertLineBreakCommand::doApply() {
 
   pos = positionOutsideContainingSpecialElement(pos);
 
-  bool atStart = pos.offset() <= pos.node()->caretMinOffset();
-  bool atEnd = pos.offset() >= pos.node()->caretMaxOffset();
-  bool atEndOfBlock =
-      isEndOfBlock(VisiblePosition(pos, selection.startAffinity()));
-
-  if (atEndOfBlock) {
+  if (isTabSpanTextNode(pos.node())) {
+    insertNodeAtTabSpanPosition(nodeToInsert, pos);
+    setEndingSelection(Position(nodeToInsert->traverseNextNode(), 0),
+                       DOWNSTREAM);
+  } else if (isEndOfBlock(VisiblePosition(pos, selection.startAffinity()))) {
     LOG(Editing, "input newline case 1");
     // Check for a trailing BR. If there isn't one, we'll need to insert an
     // "extra" one.
@@ -124,22 +123,22 @@ void InsertLineBreakCommand::doApply() {
                            pos.node()->enclosingBlockFlowElement() ==
                                next->enclosingBlockFlowElement();
       insertNodeAfterPosition(nodeToInsert, pos);
-      if (hasTrailingBR) {
+      if (hasTrailingBR)
         setEndingSelection(SelectionController(Position(next, 0), DOWNSTREAM));
-      } else if (!document()->inStrictMode()) {
+      else if (!document()->inStrictMode()) {
         // Insert an "extra" BR at the end of the block.
         ElementImpl* extraBreakNode = createBreakElement(document());
         insertNodeAfter(extraBreakNode, nodeToInsert);
         setEndingSelection(Position(extraBreakNode, 0), DOWNSTREAM);
       }
     }
-  } else if (atStart) {
+  } else if (pos.offset() <= pos.node()->caretMinOffset()) {
     LOG(Editing, "input newline case 2");
     // Insert node before downstream position, and place caret there as well.
     Position endingPosition = pos.downstream();
     insertNodeBeforePosition(nodeToInsert, endingPosition);
     setEndingSelection(endingPosition, DOWNSTREAM);
-  } else if (atEnd) {
+  } else if (pos.offset() >= pos.node()->caretMaxOffset()) {
     LOG(Editing, "input newline case 3");
     // Insert BR after this node. Place caret in the position that is downstream
     // of the current position, reckoned before inserting the BR in between.
