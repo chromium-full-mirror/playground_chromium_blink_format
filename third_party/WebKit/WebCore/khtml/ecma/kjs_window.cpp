@@ -80,24 +80,29 @@
 // <cmath> and <math.h> the macros necessary for functions like
 // isnan are not defined.
 #include <cmath>
+
+using namespace DOM::EventNames;
+
+using DOM::AtomicString;
+using DOM::DocumentImpl;
+using DOM::DOMString;
+using DOM::ElementImpl;
+using DOM::EventImpl;
+using DOM::HTMLCollectionImpl;
+using DOM::HTMLDocumentImpl;
+using DOM::HTMLElementImpl;
+using DOM::NodeImpl;
+using DOM::Position;
+
+using khtml::TypingCommand;
+
+using KParts::ReadOnlyPart;
+using KParts::URLArgs;
+using KParts::WindowArgs;
+
 using std::isnan;
 
-using namespace DOM;
-using namespace EventNames;
-
-using namespace khtml;
-
-using namespace KParts;
-
 namespace KJS {
-
-class PausedTimeout {
- public:
-  int timerId;
-  int nextFireInterval;
-  int repeatInterval;
-  ScheduledAction* action;
-};
 
 ////////////////////// History Object ////////////////////////
 
@@ -1323,10 +1328,43 @@ bool Window::toBoolean(ExecState*) const {
   return !m_part.isNull();
 }
 
+int Window::installTimeout(const UString& handler, int t, bool singleShot) {
+  return winq->installTimeout(handler, t, singleShot);
+}
+
+int Window::installTimeout(ValueImp* function,
+                           List& args,
+                           int t,
+                           bool singleShot) {
+  return winq->installTimeout(function, args, t, singleShot);
+}
+
+void Window::clearTimeout(int timerId) {
+  winq->clearTimeout(timerId);
+}
+
+#if APPLE_CHANGES
+bool Window::hasTimeouts() {
+  return winq->hasTimeouts();
+}
+
+QMap<int, ScheduledAction*>* Window::pauseTimeouts(const void* key) {
+  return winq->pauseTimeouts(key);
+}
+
+void Window::resumeTimeouts(QMap<int, ScheduledAction*>* sa, const void* key) {
+  return winq->resumeTimeouts(sa, key);
+}
+#endif
+
 void Window::scheduleClose() {
   kdDebug(6070) << "Window::scheduleClose window.close() " << m_part << endl;
   Q_ASSERT(winq);
+#if APPLE_CHANGES
   KWQ(m_part)->scheduleClose();
+#else
+  QTimer::singleShot(0, winq, SLOT(timeoutClose()));
+#endif
 }
 
 static bool shouldLoadAsEmptyDocument(const KURL& url) {
@@ -2123,42 +2161,73 @@ void Window::updateLayout() const {
 
 ////////////////////// ScheduledAction ////////////////////////
 
-void ScheduledAction::execute(Window* window) {
-  if (!window->m_part)
-    return;
+ScheduledAction::ScheduledAction(ObjectImp* _func,
+                                 List _args,
+                                 bool _singleShot) {
+  // kdDebug(6070) << "ScheduledAction::ScheduledAction(isFunction) " << this <<
+  // endl;
+  func = _func;
+  args = _args;
+  isFunction = true;
+  singleShot = _singleShot;
+}
 
+ScheduledAction::ScheduledAction(const QString& _code, bool _singleShot) {
+  // kdDebug(6070) << "ScheduledAction::ScheduledAction(!isFunction) " << this
+  // << endl;
+  // func = 0;
+  // args = 0;
+  code = _code;
+  isFunction = false;
+  singleShot = _singleShot;
+}
+
+void ScheduledAction::execute(Window* window) {
   ScriptInterpreter* interpreter = static_cast<ScriptInterpreter*>(
       KJSProxy::proxy(window->m_part)->interpreter());
 
   interpreter->setProcessingTimerCallback(true);
 
-  if (m_func) {
-    if (m_func->isObject() &&
-        static_cast<ObjectImp*>(m_func.get())->implementsCall()) {
-      ExecState* exec = interpreter->globalExec();
-      assert(window == interpreter->globalObject());
-      InterpreterLock lock;
-      static_cast<ObjectImp*>(m_func.get())->call(exec, window, m_args);
-      if (exec->hadException()) {
-        ObjectImp* exception = exec->exception()->toObject(exec);
-        exec->clearException();
-        QString message =
-            exception->get(exec, messagePropertyName)->toString(exec).qstring();
-        int lineNumber = exception->get(exec, "line")->toInt32(exec);
-        if (Interpreter::shouldPrintExceptions())
-          printf("(timer):%s\n", message.utf8().data());
-        KWQ(window->m_part)
-            ->addMessageToConsole(message, lineNumber, QString());
+  // kdDebug(6070) << "ScheduledAction::execute " << this << endl;
+  if (isFunction) {
+    if (func->implementsCall()) {
+      // #### check this
+      Q_ASSERT(window->m_part);
+      if (window->m_part) {
+        Interpreter* interpreter =
+            KJSProxy::proxy(window->m_part)->interpreter();
+        ExecState* exec = interpreter->globalExec();
+        Q_ASSERT(window == interpreter->globalObject());
+        ObjectImp* obj(window);
+        InterpreterLock lock;
+        func->call(exec, obj, args);  // note that call() creates its own
+                                      // execution state for the func call
+        if (exec->hadException()) {
+          char* message = exec->exception()
+                              ->toObject(exec)
+                              ->get(exec, messagePropertyName)
+                              ->toString(exec)
+                              .ascii();
+          int lineNumber = exec->exception()
+                               ->toObject(exec)
+                               ->get(exec, "line")
+                               ->toInt32(exec);
+          if (Interpreter::shouldPrintExceptions()) {
+            printf("(timer):%s\n", message);
+
+            KWQ(window->m_part)
+                ->addMessageToConsole(message, lineNumber, QString());
+          }
+          exec->clearException();
+        }
       }
     }
   } else
-    window->m_part->executeScript(m_code);
+    window->m_part->executeScript(code);
 
   // Update our document's rendering following the execution of the timeout
   // callback.
-  // FIXME: Why? Why not other documents, for example?
-  DocumentImpl* doc = window->m_part->xmlDocImpl();
-  if (doc)
+  if (DocumentImpl* doc = window->m_part->xmlDocImpl())
     doc->updateRendering();
 
   interpreter->setProcessingTimerCallback(false);
@@ -2166,98 +2235,132 @@ void ScheduledAction::execute(Window* window) {
 
 ////////////////////// WindowQObject ////////////////////////
 
-WindowQObject::WindowQObject(Window* w) : m_parent(w) {
-  connect(w->m_part, SIGNAL(destroyed()), this, SLOT(parentDestroyed()));
+WindowQObject::WindowQObject(Window* w) : parent(w) {
+  // kdDebug(6070) << "WindowQObject::WindowQObject " << this << endl;
+  part = parent->m_part;
+  connect(parent->m_part, SIGNAL(destroyed()), this, SLOT(parentDestroyed()));
+}
+
+WindowQObject::~WindowQObject() {
+  // kdDebug(6070) << "WindowQObject::~WindowQObject " << this << endl;
+  parentDestroyed();  // reuse same code
 }
 
 void WindowQObject::parentDestroyed() {
+  // kdDebug(6070) << "WindowQObject::parentDestroyed " << this << " we have "
+  // << scheduledActions.count() << " actions in the map" << endl;
   killTimers();
-  for (QMapIterator<int, ScheduledAction*> it = m_timeouts.begin();
-       it != m_timeouts.end(); ++it)
-    delete *it;
-  m_timeouts.clear();
+  QMapIterator<int, ScheduledAction*> it;
+  for (it = scheduledActions.begin(); it != scheduledActions.end(); ++it) {
+    ScheduledAction* action = *it;
+    // kdDebug(6070) << "WindowQObject::parentDestroyed deleting action " <<
+    // action << endl;
+    delete action;
+  }
+  scheduledActions.clear();
 }
 
 int WindowQObject::installTimeout(const UString& handler,
                                   int t,
                                   bool singleShot) {
+  // kdDebug(6070) << "WindowQObject::installTimeout " << this << " " <<
+  // handler.ascii() << endl;
   int id = startTimer(t);
   ScheduledAction* action = new ScheduledAction(handler.qstring(), singleShot);
-  m_timeouts.insert(id, action);
+  scheduledActions.insert(id, action);
+  // kdDebug(6070) << this << " got id=" << id << " action=" << action << " -
+  // now having " << scheduledActions.count() << " actions"<<endl;
   return id;
 }
 
 int WindowQObject::installTimeout(ValueImp* func,
-                                  const List& args,
+                                  List args,
                                   int t,
                                   bool singleShot) {
+  ObjectImp* objFunc = static_cast<ObjectImp*>(func);
   int id = startTimer(t);
-  m_timeouts.insert(id, new ScheduledAction(func, args, singleShot));
+  scheduledActions.insert(id, new ScheduledAction(objFunc, args, singleShot));
   return id;
 }
 
-PausedTimeouts* WindowQObject::pauseTimeouts() {
-  size_t count = m_timeouts.count();
-  if (count == 0)
-    return 0;
-  PausedTimeout* t = new PausedTimeout[count];
-  PausedTimeouts* result = new PausedTimeouts(t, count);
-  for (QMapIterator<int, ScheduledAction*> it = m_timeouts.begin();
-       it != m_timeouts.end(); ++it) {
+QMap<int, ScheduledAction*>* WindowQObject::pauseTimeouts(const void* key) {
+  QMapIterator<int, ScheduledAction*> it;
+
+  QMap<int, ScheduledAction*>* pausedActions = new QMap<int, ScheduledAction*>;
+  for (it = scheduledActions.begin(); it != scheduledActions.end(); ++it) {
     int timerId = it.key();
-    timerIntervals(timerId, t->nextFireInterval, t->repeatInterval);
-    t->timerId = timerId;
-    t->action = it.data();
-    ++t;
-    killTimer(timerId);
+    pauseTimer(timerId, key);
+    pausedActions->insert(timerId, it.data());
   }
-  m_timeouts.clear();
-  return result;
+  scheduledActions.clear();
+  return pausedActions;
 }
 
-void WindowQObject::resumeTimeouts(PausedTimeouts* timeouts) {
-  if (!timeouts)
-    return;
-  size_t count = timeouts->numTimeouts();
-  PausedTimeout* array = timeouts->takeTimeouts();
-  for (size_t i = 0; i != count; ++i) {
-    int timerId = array[i].timerId;
-    m_timeouts.insert(timerId, array[i].action);
-    restartTimer(timerId, array[i].nextFireInterval, array[i].repeatInterval);
+void WindowQObject::resumeTimeouts(QMap<int, ScheduledAction*>* sa,
+                                   const void* key) {
+  QMapIterator<int, ScheduledAction*> it;
+  for (it = sa->begin(); it != sa->end(); ++it) {
+    int timerId = it.key();
+    scheduledActions.insert(timerId, it.data());
   }
-  delete[] array;
+  sa->clear();
+  resumeTimers(key, this);
 }
 
 void WindowQObject::clearTimeout(int timerId, bool delAction) {
+  // kdDebug(6070) << "WindowQObject::clearTimeout " << this << " timerId=" <<
+  // timerId << " delAction=" << delAction << endl;
   killTimer(timerId);
   if (delAction) {
-    QMapIterator<int, ScheduledAction*> it = m_timeouts.find(timerId);
-    if (it != m_timeouts.end()) {
-      delete *it;
-      m_timeouts.remove(it);
+    QMapIterator<int, ScheduledAction*> it = scheduledActions.find(timerId);
+    if (it != scheduledActions.end()) {
+      ScheduledAction* action = *it;
+      scheduledActions.remove(it);
+      delete action;
     }
   }
 }
 
 void WindowQObject::timerEvent(QTimerEvent* e) {
-  QMapIterator<int, ScheduledAction*> it = m_timeouts.find(e->timerId());
-  ScheduledAction* action = *it;
-  bool singleShot = action->singleShot();
+  QMapIterator<int, ScheduledAction*> it = scheduledActions.find(e->timerId());
+  if (it != scheduledActions.end()) {
+    ScheduledAction* action = *it;
+    bool singleShot = action->singleShot;
+    // kdDebug(6070) << "WindowQObject::timerEvent " << this << " action=" <<
+    // action << " singleShot:" << singleShot << endl;
 
-  // remove single shots before executing
-  if (singleShot) {
-    clearTimeout(e->timerId(), false);
-    m_timeouts.remove(it);
-  }
+    // remove single shots installed by setTimeout()
+    if (singleShot) {
+      clearTimeout(e->timerId(), false);
+      scheduledActions.remove(it);
+    }
 
-  action->execute(m_parent);
+    if (!parent->part().isNull())
+      action->execute(parent);
 
-  // It is important not to use action->singleShot here.
-  // The action could have been deleted already if not single shot the
-  // JS code called by execute() calls clearTimeout().
-  if (singleShot)
-    delete action;
+    // It is important to test singleShot and not action->singleShot here - the
+    // action could have been deleted already if not single shot and if the
+    // JS code called by execute() calls clearTimeout().
+    if (singleShot)
+      delete action;
+  } else
+    kdWarning(6070) << "WindowQObject::timerEvent this=" << this << " timer "
+                    << e->timerId() << " not found ("
+                    << scheduledActions.count() << " actions in map)" << endl;
 }
+
+void WindowQObject::timeoutClose() {
+  if (!parent->part().isNull()) {
+    // kdDebug(6070) << "WindowQObject::timeoutClose -> closing window" << endl;
+    delete parent->m_part;
+  }
+}
+
+#if APPLE_CHANGES
+bool WindowQObject::hasTimeouts() {
+  return scheduledActions.count();
+}
+#endif
 
 const ClassInfo FrameArray::info = {"FrameArray", 0, &FrameArrayTable, 0};
 
@@ -2881,16 +2984,6 @@ ValueImp* HistoryFunc::callAsFunction(ExecState* exec,
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-PausedTimeouts::~PausedTimeouts() {
-  PausedTimeout* array = m_array;
-  if (!array)
-    return;
-  size_t count = m_length;
-  for (size_t i = 0; i != count; ++i)
-    delete array[i].action;
-  delete[] array;
-}
 
 }  // namespace KJS
 

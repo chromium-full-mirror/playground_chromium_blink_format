@@ -61,7 +61,6 @@ struct DashboardRegionValue;
 }
 
 namespace KJS {
-class PausedTimeouts;
 class SavedProperties;
 class SavedBuiltins;
 class ScheduledAction;
@@ -163,8 +162,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void unfocusWindow();
 
-  KJS::PausedTimeouts* pauseTimeouts();
-  void resumeTimeouts(KJS::PausedTimeouts*);
+  QMap<int, KJS::ScheduledAction*>* pauseActions(const void* key);
+  void resumeActions(QMap<int, KJS::ScheduledAction*>* actions,
+                     const void* key);
 
   bool canCachePage();
   void saveWindowProperties(KJS::SavedProperties* windowProperties);

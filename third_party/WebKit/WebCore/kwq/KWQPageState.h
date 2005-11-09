@@ -25,12 +25,19 @@
 
 #import <Foundation/Foundation.h>
 
-#import "dom_docimpl.h"
+#include <qmap.h>
+
+#include "kjs_window.h"
+#include "dom_docimpl.h"
+
+class KURL;
+
+namespace DOM {
+class DocumentImpl;
+}
 
 namespace KJS {
-class SavedBuiltins;
 class SavedProperties;
-class PausedTimeouts;
 }
 
 @interface KWQPageState : NSObject {
@@ -40,7 +47,7 @@ class PausedTimeouts;
   KJS::SavedProperties* windowProperties;
   KJS::SavedProperties* locationProperties;
   KJS::SavedBuiltins* interpreterBuiltins;
-  KJS::PausedTimeouts* pausedTimeouts;
+  QMap<int, KJS::ScheduledAction*>* pausedActions;
   DOM::DocumentImpl::ParseMode parseMode;
 }
 
@@ -48,8 +55,7 @@ class PausedTimeouts;
                     URL:(const KURL&)u
        windowProperties:(KJS::SavedProperties*)wp
      locationProperties:(KJS::SavedProperties*)lp
-    interpreterBuiltins:(KJS::SavedBuiltins*)ib
-         pausedTimeouts:(KJS::PausedTimeouts*)pt;
+    interpreterBuiltins:(KJS::SavedBuiltins*)ib;
 
 - (DOM::DocumentImpl*)document;
 - (DOM::DocumentImpl::ParseMode)parseMode;
@@ -58,7 +64,8 @@ class PausedTimeouts;
 - (KJS::SavedProperties*)windowProperties;
 - (KJS::SavedProperties*)locationProperties;
 - (KJS::SavedBuiltins*)interpreterBuiltins;
-- (KJS::PausedTimeouts*)pausedTimeouts;
+- (void)setPausedActions:(QMap<int, KJS::ScheduledAction*>*)pa;
+- (QMap<int, KJS::ScheduledAction*>*)pausedActions;
 - (void)invalidate;
 
 @end
