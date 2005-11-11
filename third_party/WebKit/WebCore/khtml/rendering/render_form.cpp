@@ -954,6 +954,9 @@ void RenderSelect::updateFromElement() {
         // the indent
         // we give it).  We match this behavior.
         label = label.stripWhiteSpace();
+        // We want to collapse our whitespace too.  This will match other
+        // browsers.
+        label = label.simplifyWhiteSpace();
 
 #if APPLE_CHANGES
         if (m_useListBox)
@@ -978,6 +981,9 @@ void RenderSelect::updateFromElement() {
         // In WinIE, leading and trailing whitespace is ignored in options. We
         // match this behavior.
         itemText = itemText.stripWhiteSpace();
+        // We want to collapse our whitespace too.  This will match other
+        // browsers.
+        itemText = itemText.simplifyWhiteSpace();
 
         if (listItems[listIndex]->parentNode()->hasTagName(optgroupTag))
           itemText.prepend("    ");
