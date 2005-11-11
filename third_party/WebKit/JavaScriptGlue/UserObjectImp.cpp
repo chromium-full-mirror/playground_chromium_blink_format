@@ -31,9 +31,8 @@ UserObjectImp::UserObjectImp(JSUserObject* userObject)
       fJSUserObject((JSUserObject*)userObject->Retain()) {}
 
 UserObjectImp::~UserObjectImp() {
-  if (fJSUserObject) {
+  if (fJSUserObject)
     fJSUserObject->Release();
-  }
 }
 
 const ClassInfo* UserObjectImp::classInfo() const {
@@ -68,6 +67,8 @@ ValueImp* UserObjectImp::callAsFunction(ExecState* exec,
       Interpreter::unlock();
     }
 
+    // implementsCall should have guarded against a NULL fJSUserObject.
+    assert(fJSUserObject);
     JSUserObject* jsResult = fJSUserObject->CallFunction(jsThisObj, jsArgs);
 
     for (i = 0; i < lockCount; i++) {
@@ -108,6 +109,9 @@ ValueImp* UserObjectImp::userObjectGetter(ExecState*,
                                           const Identifier& propertyName,
                                           const PropertySlot& slot) {
   UserObjectImp* thisObj = static_cast<UserObjectImp*>(slot.slotBase());
+  // getOwnPropertySlot should have guarded against a null fJSUserObject.
+  assert(thisObj->fJSUserObject);
+
   CFStringRef cfPropName = IdentifierToCFString(propertyName);
   JSUserObject* jsResult = thisObj->fJSUserObject->CopyProperty(cfPropName);
   ReleaseCFType(cfPropName);
@@ -120,6 +124,9 @@ ValueImp* UserObjectImp::userObjectGetter(ExecState*,
 bool UserObjectImp::getOwnPropertySlot(ExecState* exec,
                                        const Identifier& propertyName,
                                        PropertySlot& slot) {
+  if (!fJSUserObject)
+    return false;
+
   CFStringRef cfPropName = IdentifierToCFString(propertyName);
   JSUserObject* jsResult = fJSUserObject->CopyProperty(cfPropName);
   ReleaseCFType(cfPropName);
@@ -142,6 +149,9 @@ void UserObjectImp::put(ExecState* exec,
                         const Identifier& propertyName,
                         ValueImp* value,
                         int attr) {
+  if (!fJSUserObject)
+    return;
+
   CFStringRef cfPropName = IdentifierToCFString(propertyName);
   JSUserObject* jsValueObj = KJSValueToJSObject(value, exec);
 
@@ -336,8 +346,7 @@ UString UserObjectImp::toString(ExecState* exec) const {
 }
 
 void UserObjectImp::mark() {
-  ObjectImp::mark();  // call parent to mark self
-  if (fJSUserObject) {
-    fJSUserObject->Mark();  // mark child
-  }
+  ObjectImp::mark();
+  if (fJSUserObject)
+    fJSUserObject->Mark();
 }

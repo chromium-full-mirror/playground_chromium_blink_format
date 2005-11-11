@@ -160,7 +160,7 @@ ValueImp* JSObjectKJSValue(JSUserObject* ptr) {
 CFTypeRef KJSValueToCFTypeInternal(ValueImp* inValue,
                                    ExecState* exec,
                                    ObjectImpList* inImps) {
-  if (inValue)
+  if (!inValue)
     return 0;
 
   CFTypeRef result = 0;
