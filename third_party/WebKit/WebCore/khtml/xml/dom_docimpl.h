@@ -44,6 +44,8 @@
 #include "decoder.h"
 #endif
 
+#include <kxmlcore/HashMap.h>
+
 class QPaintDevice;
 class QPaintDeviceMetrics;
 class KHTMLView;
@@ -89,7 +91,9 @@ class GenericRONamedNodeMapImpl;
 class HTMLCollectionImpl;
 class HTMLDocumentImpl;
 class HTMLElementImpl;
+class HTMLFormElementImpl;
 class HTMLImageLoader;
+class HTMLInputElementImpl;
 class HTMLMapElementImpl;
 class JSEditor;
 class NodeFilter;
@@ -843,6 +847,12 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void registerDisconnectedNodeWithEventListeners(NodeImpl* node);
   void unregisterDisconnectedNodeWithEventListeners(NodeImpl* node);
 
+  void radioButtonChecked(HTMLInputElementImpl* caller,
+                          HTMLFormElementImpl* form);
+  HTMLInputElementImpl* checkedRadioButtonForGroup(DOMStringImpl* name,
+                                                   HTMLFormElementImpl* form);
+  void removeRadioButtonGroup(DOMStringImpl* name, HTMLFormElementImpl* form);
+
  private:
   void updateTitle();
   void removeAllDisconnectedNodeEventListeners();
@@ -875,6 +885,15 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
   int m_selfOnlyRefCount;
+  typedef HashMap<DOMStringImpl*,
+                  HTMLInputElementImpl*,
+                  PointerHash<DOMStringImpl*>>
+      NameToInputMap;
+  typedef HashMap<HTMLFormElementImpl*,
+                  NameToInputMap*,
+                  PointerHash<HTMLFormElementImpl*>>
+      FormToGroupMap;
+  FormToGroupMap* m_selectedRadioButtons;
 #endif
 };
 

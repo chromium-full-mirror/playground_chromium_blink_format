@@ -86,10 +86,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
 
   virtual void parseMappedAttribute(MappedAttributeImpl* attr);
 
-  void radioButtonChecked(HTMLInputElementImpl* caller);
-  HTMLInputElementImpl* checkedRadioButtonForGroup(DOMStringImpl* name);
-  void removeRadioButtonGroup(DOMStringImpl* name);
-
   void registerFormElement(HTMLGenericFormElementImpl*);
   void removeFormElement(HTMLGenericFormElementImpl*);
   void registerImgElement(HTMLImageElementImpl*);
@@ -143,12 +139,6 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   bool m_doingsubmit : 1;
   bool m_inreset : 1;
   bool m_malformed : 1;
-
-  typedef HashMap<DOMStringImpl*,
-                  HTMLInputElementImpl*,
-                  PointerHash<DOMStringImpl*>>
-      NameToInputMap;
-  NameToInputMap* m_selectedRadioButtons;
 
  private:
   void parseEnctype(const DOMString&);
