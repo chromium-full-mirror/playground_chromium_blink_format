@@ -282,4 +282,7 @@ extern NSString* WebPageCacheDocumentViewKey;
 
 - (void)_attachScriptDebugger;
 
+- (void)_recursive_pauseNullEventsForAllNetscapePlugins;
+- (void)_recursive_resumeNullEventsForAllNetscapePlugins;
+
 @end
