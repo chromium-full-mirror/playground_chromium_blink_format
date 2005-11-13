@@ -179,6 +179,11 @@ class DOMExceptionTranslator {
 ValueImp* getStringOrNull(DOM::DOMString s);
 
 /**
+ *  Get a DOMString object or a null DOMString if the value is null
+ */
+DOM::DOMString valueToStringWithNullCheck(ExecState* exec, ValueImp* val);
+
+/**
  * Convert a KJS value into a QVariant
  */
 QVariant ValueToVariant(ExecState* exec, ValueImp* val);
