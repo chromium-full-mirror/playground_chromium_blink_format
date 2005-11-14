@@ -242,7 +242,7 @@ void DeleteSelectionCommand::initializePositionData() {
   // to be done.
   //
   VisiblePosition visibleEnd(end, m_selectionToDelete.endAffinity());
-  if (isStartOfParagraph(visibleEnd) || isEndOfParagraph(visibleEnd)) {
+  if (isEndOfParagraph(visibleEnd)) {
     Position previousLineStart =
         previousLinePosition(visibleEnd, 0).deepEquivalent();
     if (previousLineStart.isNull() ||
