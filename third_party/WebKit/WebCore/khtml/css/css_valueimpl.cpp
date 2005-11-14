@@ -637,7 +637,7 @@ const unsigned numInheritableProperties =
 
 // This is the list of properties we want to copy in the copyBlockProperties()
 // function.
-// It is the list of CSS properties that apply to specially to block-level
+// It is the list of CSS properties that apply specially to block-level
 // elements.
 static const int blockProperties[] = {
     CSS_PROP_ORPHANS,
