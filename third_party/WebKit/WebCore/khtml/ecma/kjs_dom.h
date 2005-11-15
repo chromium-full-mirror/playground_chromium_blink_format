@@ -301,7 +301,9 @@ class DOMElement : public DOMNode {
     HasAttributeNS,
     ScrollByLines,
     ScrollByPages,
-    ScrollIntoView
+    ScrollIntoView,
+    ElementFocus,
+    ElementBlur
   };
 
  protected:

@@ -794,6 +794,18 @@ CSSStyleDeclarationImpl* ElementImpl::style() {
   return 0;
 }
 
+void ElementImpl::focus() {
+  DocumentImpl* doc = getDocument();
+  if (doc && isFocusable())
+    doc->setFocusNode(this);
+}
+
+void ElementImpl::blur() {
+  DocumentImpl* doc = getDocument();
+  if (doc && doc->focusNode() == this)
+    doc->setFocusNode(0);
+}
+
 // -------------------------------------------------------------------------
 
 NamedAttrMapImpl::NamedAttrMapImpl(ElementImpl* e)
