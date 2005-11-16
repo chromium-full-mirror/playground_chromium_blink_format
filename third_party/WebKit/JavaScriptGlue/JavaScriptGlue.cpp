@@ -190,6 +190,7 @@ JSObjectRef JSObjectCallFunction(JSObjectRef ref,
 JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
   JSRunRef result = 0;
   if (jsSource) {
+    InterpreterLock lock;
     result = (JSRunRef) new JSRun(jsSource, inFlags);
   }
   return result;
