@@ -104,8 +104,11 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   void normalize();
   static bool isSupported(const DOMString& feature, const DOMString& version);
 
-  bool isSameNode(NodeImpl* other) { return this == other; }
+  bool isSameNode(NodeImpl* other) const { return this == other; }
   bool isEqualNode(NodeImpl* other) const;
+  bool isDefaultNamespace(const DOMString& namespaceURI) const;
+  DOMString lookupPrefix(const DOMString& namespaceURI) const;
+  DOMString lookupNamespaceURI(const DOMString& prefix) const;
 
   DOMString textContent() const;
   void setTextContent(const DOMString& text, int& exception);
@@ -142,6 +145,10 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   bool isAtomicNode() const;
   NodeImpl* previousNodeConsideringAtomicNodes() const;
   NodeImpl* nextNodeConsideringAtomicNodes() const;
+
+  ElementImpl* getAncestorElement() const;
+  DOMString lookupNamespacePrefix(const DOMString& _namespaceURI,
+                                  const ElementImpl* originalElement) const;
 
   /** (Not part of the official DOM)
    * Returns the next leaf node.
