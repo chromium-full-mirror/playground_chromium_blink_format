@@ -650,10 +650,12 @@ QRect RenderLayer::getRectToExpose(const QRect& visibleRect,
   if (scrollX == noScroll)
     x = visibleRect.x();
   // If we're trying to align to the closest edge, and the exposeRect is further
-  // right than the visibleRect, then alignRight.
+  // right than the visibleRect, and not bigger than the visible area, then
+  // alignRight.
   else if ((scrollX == alignRight) ||
            ((scrollX == alignToClosestEdge) &&
-            exposeRect.right() > visibleRect.right()))
+            exposeRect.right() > visibleRect.right() &&
+            w < visibleRect.width()))
     x = exposeRect.right() - visibleRect.width();
   else if (scrollX == alignCenter)
     x -= (visibleRect.width() - w) / 2;
@@ -684,10 +686,12 @@ QRect RenderLayer::getRectToExpose(const QRect& visibleRect,
   if (scrollY == noScroll)
     y = visibleRect.y();
   // If we're trying to align to the closest edge, and the exposeRect is further
-  // down than the visibleRect, then alignBottom.
+  // down than the visibleRect, and not bigger than the visible area, then
+  // alignBottom.
   else if ((scrollY == alignBottom) ||
            ((scrollY == alignToClosestEdge) &&
-            exposeRect.bottom() > visibleRect.bottom()))
+            exposeRect.bottom() > visibleRect.bottom() &&
+            h < visibleRect.height()))
     y = exposeRect.bottom() - visibleRect.height();
   else if (scrollY == alignCenter)
     y -= (visibleRect.height() - h) / 2;
