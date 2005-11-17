@@ -516,19 +516,16 @@ void RenderTable::splitColumn(int pos, int firstSpan) {
   while (child) {
     if (child->isTableSection()) {
       RenderTableSection* section = static_cast<RenderTableSection*>(child);
-      int size = section->numRows();
-      int row = 0;
       if (section->cCol > pos)
         section->cCol++;
-      while (row < size) {
+      int size = section->numRows();
+      for (int row = 0; row < size; ++row) {
         section->grid[row].row->resize(oldSize + 1);
         RenderTableSection::Row& r = *section->grid[row].row;
         memmove(r.data() + pos + 1, r.data() + pos,
-                (oldSize - pos) * sizeof(RenderTableCell*));
-        // 		qDebug("moving from %d to %d, num=%d", pos, pos+1,
-        // (oldSize-pos-1) );
-        r[pos + 1] = r[pos] ? (RenderTableCell*)-1 : 0;
-        row++;
+                (oldSize - pos) * sizeof(RenderTableSection::CellStruct));
+        r[pos + 1].cell = 0;
+        r[pos + 1].inColSpan = r[pos].inColSpan || r[pos].cell;
       }
     }
     child = child->nextSibling();
@@ -540,11 +537,9 @@ void RenderTable::splitColumn(int pos, int firstSpan) {
 void RenderTable::appendColumn(int span) {
   // easy case.
   int pos = columns.size();
-  //     qDebug("appendColumn( %d ), size=%d", span, pos );
   int newSize = pos + 1;
   columns.resize(newSize);
   columns[pos].span = span;
-  // qDebug("appending column at %d, span %d", pos,  span );
 
   // change width of all rows.
   RenderObject* child = firstChild();
@@ -552,11 +547,11 @@ void RenderTable::appendColumn(int span) {
     if (child->isTableSection()) {
       RenderTableSection* section = static_cast<RenderTableSection*>(child);
       int size = section->numRows();
-      int row = 0;
-      while (row < size) {
+      for (int row = 0; row < size; ++row) {
         section->grid[row].row->resize(newSize);
-        section->cellAt(row, pos) = 0;
-        row++;
+        RenderTableSection::CellStruct& c = section->cellAt(row, pos);
+        c.cell = 0;
+        c.inColSpan = false;
       }
     }
     child = child->nextSibling();
@@ -717,13 +712,13 @@ RenderTableCell* RenderTable::cellAbove(const RenderTableCell* cell) const {
   // Look up the cell in the section's grid, which requires effective col index
   if (section && rAbove >= 0) {
     int effCol = colToEffCol(cell->col());
-    RenderTableCell* aboveCell;
+    RenderTableSection::CellStruct aboveCell;
     // If we hit a span back up to a real cell.
     do {
       aboveCell = section->cellAt(rAbove, effCol);
       effCol--;
-    } while (aboveCell == (RenderTableCell*)-1 && effCol >= 0);
-    return (aboveCell == (RenderTableCell*)-1) ? 0 : aboveCell;
+    } while (!aboveCell.cell && aboveCell.inColSpan && effCol >= 0);
+    return aboveCell.cell;
   } else {
     return 0;
   }
@@ -754,13 +749,13 @@ RenderTableCell* RenderTable::cellBelow(const RenderTableCell* cell) const {
   // Look up the cell in the section's grid, which requires effective col index
   if (section && rBelow >= 0) {
     int effCol = colToEffCol(cell->col());
-    RenderTableCell* belowCell;
+    RenderTableSection::CellStruct belowCell;
     // If we hit a colspan back up to a real cell.
     do {
       belowCell = section->cellAt(rBelow, effCol);
       effCol--;
-    } while (belowCell == (RenderTableCell*)-1 && effCol >= 0);
-    return (belowCell == (RenderTableCell*)-1) ? 0 : belowCell;
+    } while (!belowCell.cell && belowCell.inColSpan && effCol >= 0);
+    return belowCell.cell;
   } else {
     return 0;
   }
@@ -773,20 +768,19 @@ RenderTableCell* RenderTable::cellLeft(const RenderTableCell* cell) const {
     return 0;
 
   // If we hit a colspan back up to a real cell.
-  RenderTableCell* prevCell;
+  RenderTableSection::CellStruct prevCell;
   do {
     prevCell = section->cellAt(cell->row(), effCol - 1);
     effCol--;
-  } while (prevCell == (RenderTableCell*)-1 && effCol >= 0);
-  return (prevCell == (RenderTableCell*)-1) ? 0 : prevCell;
+  } while (!prevCell.cell && prevCell.inColSpan && effCol >= 0);
+  return prevCell.cell;
 }
 
 RenderTableCell* RenderTable::cellRight(const RenderTableCell* cell) const {
   int effCol = colToEffCol(cell->col() + cell->colSpan());
   if (effCol >= numEffCols())
     return 0;
-  RenderTableCell* result = cell->section()->cellAt(cell->row(), effCol);
-  return (result == (RenderTableCell*)-1) ? 0 : result;
+  return cell->section()->cellAt(cell->row(), effCol).cell;
 }
 
 RenderBlock* RenderTable::firstLineBlock() const {
@@ -920,9 +914,12 @@ bool RenderTableSection::ensureRows(int numRows) {
 
     gridRows = numRows;
     int nCols = table()->numEffCols();
+    CellStruct emptyCellStruct;
+    emptyCellStruct.cell = 0;
+    emptyCellStruct.inColSpan = false;
     for (int r = nRows; r < numRows; r++) {
       grid[r].row = new Row(nCols);
-      grid[r].row->fill(0);
+      grid[r].row->fill(emptyCellStruct);
       grid[r].baseLine = 0;
       grid[r].height = Length();
     }
@@ -937,39 +934,17 @@ void RenderTableSection::addCell(RenderTableCell* cell) {
   QMemArray<RenderTable::ColumnStruct>& columns = table()->columns;
   int nCols = columns.size();
 
-// ### mozilla still seems to do the old HTML way, even for strict DTD
-// (see the annotation on table cell layouting in the CSS specs and the testcase
-// below:
-// <TABLE border>
-// <TR><TD>1 <TD rowspan="2">2 <TD>3 <TD>4
-// <TR><TD colspan="2">5
-// </TABLE>
-#if 0
-    // find empty space for the cell
-    bool found = false;
-    while ( !found ) {
-	found = true;
-	while ( cCol < nCols && cellAt( cRow, cCol ) )
-	    cCol++;
-	int pos = cCol;
-	int span = 0;
-	while ( pos < nCols && span < cSpan ) {
-	    if ( cellAt( cRow, pos ) ) {
-		found = false;
-		cCol = pos;
-		break;
-	    }
-	    span += columns[pos].span;
-	    pos++;
-	}
-    }
-#else
-  while (cCol < nCols && cellAt(cRow, cCol))
-    cCol++;
-#endif
+  // ### mozilla still seems to do the old HTML way, even for strict DTD
+  // (see the annotation on table cell layouting in the CSS specs and the
+  // testcase below:
+  // <TABLE border>
+  // <TR><TD>1 <TD rowspan="2">2 <TD>3 <TD>4
+  // <TR><TD colspan="2">5
+  // </TABLE>
 
-  //       qDebug("adding cell at %d/%d span=(%d/%d)",  cRow, cCol, rSpan, cSpan
-  //       );
+  while (cCol < nCols &&
+         (cellAt(cRow, cCol).cell || cellAt(cRow, cCol).inColSpan))
+    cCol++;
 
   if (rSpan == 1) {
     // we ignore height settings on rowspan cells
@@ -1007,7 +982,9 @@ void RenderTableSection::addCell(RenderTableCell* cell) {
 
   int col = cCol;
   // tell the cell where it is
-  RenderTableCell* set = cell;
+  CellStruct currentCell;
+  currentCell.cell = cell;
+  currentCell.inColSpan = false;
   while (cSpan) {
     int currentSpan;
     if (cCol >= nCols) {
@@ -1018,17 +995,18 @@ void RenderTableSection::addCell(RenderTableCell* cell) {
         table()->splitColumn(cCol, cSpan);
       currentSpan = columns[cCol].span;
     }
-    int r = 0;
-    while (r < rSpan) {
-      if (!cellAt(cRow + r, cCol)) {
-        // 		qDebug("    adding cell at %d, %d",  cRow + r, cCol );
-        cellAt(cRow + r, cCol) = set;
-      }
-      r++;
+
+    for (int r = 0; r < rSpan; r++) {
+      CellStruct& c = cellAt(cRow + r, cCol);
+      if (currentCell.cell && !c.cell)
+        c.cell = currentCell.cell;
+      if (currentCell.inColSpan)
+        c.inColSpan = true;
     }
     cCol++;
     cSpan -= currentSpan;
-    set = (RenderTableCell*)-1;
+    currentCell.cell = 0;
+    currentCell.inColSpan = true;
   }
   if (cell) {
     cell->setRow(cRow);
@@ -1048,9 +1026,10 @@ void RenderTableSection::setCellWidths() {
     Row& row = *grid[i].row;
     int cols = row.size();
     for (int j = 0; j < cols; j++) {
-      RenderTableCell* cell = row[j];
-      // 	    qDebug("cell[%d,%d] = %p", i, j, cell );
-      if (!cell || cell == (RenderTableCell*)-1)
+      CellStruct current = row[j];
+      RenderTableCell* cell = current.cell;
+
+      if (!cell)
         continue;
       int endCol = j;
       int cspan = cell->colSpan();
@@ -1102,10 +1081,11 @@ void RenderTableSection::calcRowHeight() {
     int totalRows = gridRows;
 
     for (int c = 0; c < totalCols; c++) {
-      cell = cellAt(r, c);
-      if (!cell || cell == (RenderTableCell*)-1)
+      CellStruct current = cellAt(r, c);
+      cell = current.cell;
+      if (!cell || current.inColSpan)
         continue;
-      if (r < totalRows - 1 && cellAt(r + 1, c) == cell)
+      if (r < totalRows - 1 && cellAt(r + 1, c).cell == cell)
         continue;
 
       if ((indx = r - cell->rowSpan() + 1) < 0)
@@ -1246,10 +1226,12 @@ int RenderTableSection::layoutRows(int toAdd) {
     Row* row = grid[r].row;
     int totalCols = row->size();
     for (int c = 0; c < nEffCols; c++) {
-      RenderTableCell* cell = cellAt(r, c);
-      if (!cell || cell == (RenderTableCell*)-1)
+      CellStruct current = cellAt(r, c);
+      RenderTableCell* cell = current.cell;
+
+      if (!cell)
         continue;
-      if (r < totalRows - 1 && cell == cellAt(r + 1, c))
+      if (r < totalRows - 1 && cell == cellAt(r + 1, c).cell)
         continue;
 
       if ((rindx = r - cell->rowSpan() + 1) < 0)
@@ -1411,11 +1393,13 @@ void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
       unsigned int c = startcol;
       // since a cell can be -1 (indicating a colspan) we might have to search
       // backwards to include it
-      while (c && cellAt(r, c) == (RenderTableCell*)-1)
+      while (c && cellAt(r, c).inColSpan)
         c--;
       for (; c < endcol; c++) {
-        RenderTableCell* cell = cellAt(r, c);
-        if (!cell || cell == (RenderTableCell*)-1 ||
+        CellStruct current = cellAt(r, c);
+        RenderTableCell* cell = current.cell;
+
+        if (!cell ||
             (cell->layer() && i.phase != PaintActionCollapsedTableBorders))
           continue;
 
@@ -1424,7 +1408,7 @@ void RenderTableSection::paint(PaintInfo& i, int tx, int ty) {
         // their upper left originating row/column.  For cells with rowspans,
         // avoid repainting
         // if we've already seen the cell.
-        if (r > startrow && (cellAt(r - 1, c) == cell))
+        if (r > startrow && (cellAt(r - 1, c).cell == cell))
           continue;
 
 #ifdef TABLE_PRINT
@@ -1479,12 +1463,13 @@ void RenderTableSection::dump(QTextStream* stream, QString ind) const {
           << ind;
   for (unsigned int r = 0; r < grid.size(); r++) {
     for (int c = 0; c < table()->numEffCols(); c++) {
-      if (cellAt(r, c) && cellAt(r, c) != (RenderTableCell*)-1)
-        *stream << "(" << cellAt(r, c)->row() << "," << cellAt(r, c)->col()
-                << "," << cellAt(r, c)->rowSpan() << ","
-                << cellAt(r, c)->colSpan() << ") ";
+      if (cellAt(r, c).cell && !cellAt(r, c).inColSpan)
+        *stream << "(" << cellAt(r, c).cell->row() << ","
+                << cellAt(r, c).cell->col() << ","
+                << cellAt(r, c).cell->rowSpan() << ","
+                << cellAt(r, c).cell->colSpan() << ") ";
       else
-        *stream << cellAt(r, c) << "null cell ";
+        *stream << cellAt(r, c).cell << "null cell ";
     }
     *stream << endl << ind;
   }

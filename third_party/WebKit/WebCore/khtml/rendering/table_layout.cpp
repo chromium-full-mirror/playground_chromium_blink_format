@@ -373,8 +373,10 @@ void AutoTableLayout::recalcColumn(int effCol) {
       int numRows = section->numRows();
       RenderTableCell* last = 0;
       for (int i = 0; i < numRows; i++) {
-        RenderTableCell* cell = section->cellAt(i, effCol);
-        if (cell == (RenderTableCell*)-1)
+        RenderTableSection::CellStruct current = section->cellAt(i, effCol);
+        RenderTableCell* cell = current.cell;
+
+        if (current.inColSpan)
           continue;
         if (cell && cell->colSpan() == 1) {
           // A cell originates in this column.  Ensure we have
@@ -429,7 +431,8 @@ void AutoTableLayout::recalcColumn(int effCol) {
               break;
           }
         } else {
-          if (cell && (!effCol || section->cellAt(i, effCol - 1) != cell)) {
+          if (cell &&
+              (!effCol || section->cellAt(i, effCol - 1).cell != cell)) {
             // This spanning cell originates in this column.  Ensure we have
             // a min/max width of at least 1px for this column now.
             l.minWidth = kMax(l.minWidth, 1);
@@ -624,7 +627,7 @@ int AutoTableLayout::calcEffectiveWidth() {
 
   for (unsigned int i = 0; i < spanCells.size(); i++) {
     RenderTableCell* cell = spanCells[i];
-    if (!cell || cell == (RenderTableCell*)-1)
+    if (!cell)
       break;
     int span = cell->colSpan();
 
@@ -846,7 +849,7 @@ int AutoTableLayout::calcEffectiveWidth() {
    Sorts them by increasing cellspan
 */
 void AutoTableLayout::insertSpanCell(RenderTableCell* cell) {
-  if (!cell || cell == (RenderTableCell*)-1 || cell->colSpan() == 1)
+  if (!cell || cell->colSpan() == 1)
     return;
 
   //     qDebug("inserting span cell %p with span %d", cell, cell->colSpan() );
