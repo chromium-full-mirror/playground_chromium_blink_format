@@ -727,7 +727,7 @@ void HTMLFormElementImpl::registerFormElement(HTMLGenericFormElementImpl* e) {
 }
 
 void HTMLFormElementImpl::removeFormElement(HTMLGenericFormElementImpl* e) {
-  if (!e->name().isEmpty()) {
+  if (!e->name().isEmpty() && getDocument()) {
     HTMLGenericFormElementImpl* currentCheckedRadio =
         getDocument()->checkedRadioButtonForGroup(e->name().impl(), this);
     if (currentCheckedRadio == e)
