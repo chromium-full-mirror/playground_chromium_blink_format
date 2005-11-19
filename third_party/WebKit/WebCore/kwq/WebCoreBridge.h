@@ -395,6 +395,7 @@ typedef enum {
 
 - (int)numPendingOrLoadingRequests;
 - (BOOL)doneProcessingData;
+- (BOOL)shouldClose;
 
 - (void)setDrawsBackground:(BOOL)drawsBackround;
 
@@ -597,6 +598,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (BOOL)runJavaScriptTextInputPanelWithPrompt:(NSString*)prompt
                                   defaultText:(NSString*)defaultText
                                 returningText:(NSString**)result;
+- (BOOL)canRunBeforeUnloadConfirmPanel;
+- (BOOL)runBeforeUnloadConfirmPanelWithMessage:(NSString*)message;
 - (void)addMessageToConsole:(NSDictionary*)message;
 
 - (id<WebCoreResourceHandle>)startLoadingResource:

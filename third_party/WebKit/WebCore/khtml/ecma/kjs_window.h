@@ -253,6 +253,7 @@ class Window : public ObjectImp {
     Onselect,
     Onsubmit,
     Onunload,
+    Onbeforeunload,
     Statusbar,
     Toolbar,
     FrameElement,

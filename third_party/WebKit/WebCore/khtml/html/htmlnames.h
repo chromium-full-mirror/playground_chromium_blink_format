@@ -155,6 +155,7 @@ namespace HTMLNames {
     macro(onbeforecopy) \
     macro(onbeforecut) \
     macro(onbeforepaste) \
+    macro(onbeforeunload) \
     macro(onblur) \
     macro(onchange) \
     macro(onclick) \

@@ -156,10 +156,14 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
       if (Interpreter::shouldPrintExceptions())
         printf("(event handler):%s\n", message);
       exec->clearException();
-    } else if (html) {
-      QVariant ret = ValueToVariant(exec, retval);
-      if (ret.type() == QVariant::Bool && ret.toBool() == false)
-        evt->preventDefault();
+    } else {
+      if (!retval->isUndefinedOrNull() && evt->storesResultAsString())
+        evt->storeResult(retval->toString(exec).domString());
+      if (html) {
+        QVariant ret = ValueToVariant(exec, retval);
+        if (ret.type() == QVariant::Bool && ret.toBool() == false)
+          evt->preventDefault();
+      }
     }
 
     DOM::DocumentImpl::updateDocumentsRendering();

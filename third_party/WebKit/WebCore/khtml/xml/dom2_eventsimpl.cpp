@@ -117,6 +117,12 @@ bool EventImpl::isWheelEvent() const {
   return false;
 }
 
+bool EventImpl::storesResultAsString() const {
+  return false;
+}
+
+void EventImpl::storeResult(const DOMString&) {}
+
 // -----------------------------------------------------------------------------
 
 UIEventImpl::UIEventImpl() : m_detail(0) {}
@@ -572,4 +578,17 @@ bool operator==(const RegisteredEventListener& a,
 // -----------------------------------------------------------------------------
 
 ClipboardImpl::~ClipboardImpl() {}
+
+// -----------------------------------------------------------------------------
+
+BeforeUnloadEventImpl::BeforeUnloadEventImpl()
+    : EventImpl(beforeunloadEvent, false, false) {}
+
+bool BeforeUnloadEventImpl::storesResultAsString() const {
+  return true;
+}
+
+void BeforeUnloadEventImpl::storeResult(const DOMString& s) {
+  m_result = s.impl();
+}
 }

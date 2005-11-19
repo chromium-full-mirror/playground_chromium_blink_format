@@ -89,6 +89,9 @@ class EventImpl : public khtml::Shared<EventImpl> {
   }
   bool getCancelBubble() const { return m_cancelBubble; }
 
+  virtual bool storesResultAsString() const;
+  virtual void storeResult(const DOMString&);
+
  protected:
   bool dispatched() const { return m_target; }
 
@@ -438,6 +441,19 @@ class ClipboardImpl : public khtml::Shared<ClipboardImpl> {
   virtual void setDragImage(const QPixmap&, const QPoint&) = 0;
   virtual NodeImpl* dragImageElement() = 0;
   virtual void setDragImageElement(NodeImpl*, const QPoint&) = 0;
+};
+
+class BeforeUnloadEventImpl : public EventImpl {
+ public:
+  BeforeUnloadEventImpl();
+
+  virtual bool storesResultAsString() const;
+  virtual void storeResult(const DOMString&);
+
+  DOMString result() const { return m_result.get(); }
+
+ private:
+  SharedPtr<DOMStringImpl> m_result;
 };
 
 }  // namespace
