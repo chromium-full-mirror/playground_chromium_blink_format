@@ -30,7 +30,6 @@ namespace DOM {
 
 class DocumentImpl;
 class CSSStyleDeclarationImpl;
-class CSSRuleListImpl;
 class ElementImpl;
 class DOMStringImpl;
 
@@ -43,9 +42,6 @@ class AbstractViewImpl : public khtml::Shared<AbstractViewImpl> {
   DocumentImpl* document() const { return m_document; }
   CSSStyleDeclarationImpl* getComputedStyle(ElementImpl* elt,
                                             DOMStringImpl* pseudoElt);
-  SharedPtr<CSSRuleListImpl> getMatchedCSSRules(ElementImpl* elt,
-                                                DOMStringImpl* pseudoElt,
-                                                bool authorOnly = true);
 
  protected:
   DocumentImpl* m_document;
