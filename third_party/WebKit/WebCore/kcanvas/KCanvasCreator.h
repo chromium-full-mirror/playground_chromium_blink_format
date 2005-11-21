@@ -26,10 +26,12 @@
 #include <kcanvas/KCanvasPath.h>
 #include <kcanvas/KCanvasTypes.h>
 
-class KCanvas;
-class KCanvasItem;
-class KRenderingStyle;
+class RenderPath;
+namespace KSVG {
+class KCanvasRenderingStyle;
+}
 class KCanvasContainer;
+class KRenderingDevice;
 class KCanvasCreator {
  public:
   KCanvasCreator();
@@ -53,14 +55,8 @@ class KCanvasCreator {
   KCPathDataList createLine(float x1, float y1, float x2, float y2) const;
 
   // Canvas item creation
-  KCanvasUserData createCanvasPathData(KCanvas* canvas,
+  KCanvasUserData createCanvasPathData(KRenderingDevice* device,
                                        const KCPathDataList& pathData) const;
-
-  KCanvasItem* createPathItem(KCanvas* canvas,
-                              KRenderingStyle* style,
-                              const KCPathDataList& pathData) const;
-  KCanvasContainer* createContainer(KCanvas* canvas,
-                                    KRenderingStyle* style) const;
 
  private:
   static KCanvasCreator* s_creator;

@@ -35,8 +35,8 @@ typedef struct CGContext* CGContextRef;
 class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
  public:
   KRenderingDeviceContextQuartz() : m_cgContext(0) {}
-  virtual void setWorldMatrix(const KCanvasMatrix& worldMatrix);
-  virtual KCanvasMatrix worldMatrix() const;
+  virtual KCanvasMatrix concatCTM(const KCanvasMatrix& worldMatrix);
+  virtual KCanvasMatrix ctm() const;
 
   virtual QRect mapFromVisual(const QRect& rect);
   virtual QRect mapToVisual(const QRect& rect);
@@ -78,6 +78,8 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
 
   KCanvasUserData pathForRect(const QRect&) const;
 
+  virtual QString stringForPath(KCanvasUserData path);
+
   // Resource creation
   virtual KCanvasResource* createResource(const KCResourceType& type) const;
   virtual KRenderingPaintServer* createPaintServer(
@@ -86,11 +88,14 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
       const KCFilterEffectType& type) const;
 
   // item creation
-  virtual KCanvasItem* createItem(KCanvas* canvas,
-                                  KRenderingStyle* style,
-                                  KCanvasUserData path) const;
-  virtual KCanvasContainer* createContainer(KCanvas* canvas,
-                                            KRenderingStyle* style) const;
+  virtual RenderPath* createItem(RenderArena* arena,
+                                 khtml::RenderStyle* style,
+                                 KSVG::SVGStyledElementImpl* node,
+                                 KCanvasUserData path) const;
+  virtual KCanvasContainer* createContainer(
+      RenderArena* arena,
+      khtml::RenderStyle* style,
+      KSVG::SVGStyledElementImpl* node) const;
 
   // filters (mostly debugging)
   static bool filtersEnabled();

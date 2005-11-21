@@ -26,12 +26,11 @@
 #include <kdom/core/AttrImpl.h>
 
 #include <kcanvas/KCanvas.h>
-#include <kcanvas/KCanvasRegistry.h>
 #include <kcanvas/KCanvasResources.h>
 #include <kcanvas/KCanvasFilters.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
 #include "SVGFEComponentTransferElementImpl.h"
@@ -47,10 +46,9 @@
 using namespace KSVG;
 
 SVGFEComponentTransferElementImpl::SVGFEComponentTransferElementImpl(
-    KDOM::DocumentPtr* doc,
-    KDOM::NodeImpl::Id id,
-    KDOM::DOMStringImpl* prefix)
-    : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_in1 = 0;
   m_filterEffect = 0;
 }
@@ -65,28 +63,24 @@ SVGAnimatedStringImpl* SVGFEComponentTransferElementImpl::in1() const {
   return lazy_create<SVGAnimatedStringImpl>(m_in1, dummy);
 }
 
-void SVGFEComponentTransferElementImpl::parseAttribute(
-    KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGFEComponentTransferElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_IN: {
-      in1()->setBaseVal(value.handle());
-      break;
-    }
-    default: { SVGFilterPrimitiveStandardAttributesImpl::parseAttribute(attr); }
-  };
+  if (attr->name() == SVGNames::inAttr)
+    in1()->setBaseVal(value.impl());
+  else
+    SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(attr);
 }
 
-KCanvasItem* SVGFEComponentTransferElementImpl::createCanvasItem(
-    KCanvas* canvas,
-    KRenderingStyle* style) const {
+khtml::RenderObject* SVGFEComponentTransferElementImpl::createRenderer(
+    RenderArena* arena,
+    khtml::RenderStyle* style) {
   m_filterEffect = static_cast<KCanvasFEComponentTransfer*>(
-      canvas->renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
+      canvas()->renderingDevice()->createFilterEffect(FE_COMPONENT_TRANSFER));
   if (!m_filterEffect)
     return 0;
 
-  m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).string());
+  m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());
   setStandardAttributes(m_filterEffect);
   return 0;
 }
@@ -95,13 +89,13 @@ KCanvasFilterEffect* SVGFEComponentTransferElementImpl::filterEffect() const {
   return m_filterEffect;
 }
 
-void SVGFEComponentTransferElementImpl::close() {
+void SVGFEComponentTransferElementImpl::closeRenderer() {
   if (!m_filterEffect)
     return;
 
   for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
     KCComponentTransferFunction func;
-    if (n->id() == ID_FEFUNCR) {
+    if (n->hasTagName(SVGNames::feFuncRTag)) {
       SVGFEFuncRElementImpl* funcR = static_cast<SVGFEFuncRElementImpl*>(n);
       func.type = (KCComponentTransferType)(funcR->type()->baseVal() - 1);
       func.slope = funcR->slope()->baseVal();
@@ -110,7 +104,7 @@ void SVGFEComponentTransferElementImpl::close() {
       func.exponent = funcR->exponent()->baseVal();
       func.offset = funcR->offset()->baseVal();
       m_filterEffect->setRedFunction(func);
-    } else if (n->id() == ID_FEFUNCG) {
+    } else if (n->hasTagName(SVGNames::feFuncGTag)) {
       SVGFEFuncGElementImpl* funcG = static_cast<SVGFEFuncGElementImpl*>(n);
       func.type = (KCComponentTransferType)(funcG->type()->baseVal() - 1);
       func.slope = funcG->slope()->baseVal();
@@ -119,7 +113,7 @@ void SVGFEComponentTransferElementImpl::close() {
       func.exponent = funcG->exponent()->baseVal();
       func.offset = funcG->offset()->baseVal();
       m_filterEffect->setGreenFunction(func);
-    } else if (n->id() == ID_FEFUNCB) {
+    } else if (n->hasTagName(SVGNames::feFuncBTag)) {
       SVGFEFuncBElementImpl* funcB = static_cast<SVGFEFuncBElementImpl*>(n);
       func.type = (KCComponentTransferType)(funcB->type()->baseVal() - 1);
       func.slope = funcB->slope()->baseVal();
@@ -128,7 +122,7 @@ void SVGFEComponentTransferElementImpl::close() {
       func.exponent = funcB->exponent()->baseVal();
       func.offset = funcB->offset()->baseVal();
       m_filterEffect->setBlueFunction(func);
-    } else if (n->id() == ID_FEFUNCA) {
+    } else if (n->hasTagName(SVGNames::feFuncATag)) {
       SVGFEFuncAElementImpl* funcA = static_cast<SVGFEFuncAElementImpl*>(n);
       func.type = (KCComponentTransferType)(funcA->type()->baseVal() - 1);
       func.slope = funcA->slope()->baseVal();

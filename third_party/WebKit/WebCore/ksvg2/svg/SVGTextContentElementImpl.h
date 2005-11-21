@@ -39,9 +39,8 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
                                   public SVGLangSpaceImpl,
                                   public SVGExternalResourcesRequiredImpl {
  public:
-  SVGTextContentElementImpl(KDOM::DocumentPtr* doc,
-                            KDOM::NodeImpl::Id id,
-                            KDOM::DOMStringImpl* prefix);
+  SVGTextContentElementImpl(const KDOM::QualifiedName& tagName,
+                            KDOM::DocumentImpl* doc);
   virtual ~SVGTextContentElementImpl();
 
   // 'SVGTextContentElement' functions
@@ -58,7 +57,7 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
   long getCharNumAtPosition(SVGPointImpl* point) const;
   void selectSubString(unsigned long charnum, unsigned long nchars) const;
 
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
   mutable SVGAnimatedLengthImpl* m_textLength;

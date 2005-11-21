@@ -153,7 +153,7 @@ QTextStream& KRenderingPaintServerGradient::externalRepresentation(
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";
   if (!gradientTransform().qmatrix().isIdentity())
-    ts << " [transform=" << gradientTransform() << "]";
+    ts << " [transform=" << gradientTransform().qmatrix() << "]";
 
   return ts;
 }

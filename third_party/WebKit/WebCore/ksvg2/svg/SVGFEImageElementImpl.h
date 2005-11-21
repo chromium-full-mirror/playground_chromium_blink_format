@@ -42,16 +42,15 @@ class SVGFEImageElementImpl : public SVGFilterPrimitiveStandardAttributesImpl,
                               public SVGExternalResourcesRequiredImpl,
                               public KDOM::CachedObjectClient {
  public:
-  SVGFEImageElementImpl(KDOM::DocumentPtr* doc,
-                        KDOM::NodeImpl::Id id,
-                        KDOM::DOMStringImpl* prefix);
+  SVGFEImageElementImpl(const KDOM::QualifiedName& tagName,
+                        KDOM::DocumentImpl* doc);
   virtual ~SVGFEImageElementImpl();
 
   // 'SVGFEImageElement' functions
   SVGAnimatedPreserveAspectRatioImpl* preserveAspectRatio() const;
 
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
-  virtual bool implementsCanvasItem() const { return true; }
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
+  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
 
   virtual void notifyFinished(KDOM::CachedObject* finishedObj);
 
@@ -59,8 +58,8 @@ class SVGFEImageElementImpl : public SVGFilterPrimitiveStandardAttributesImpl,
   virtual void finalizeStyle(KCanvasRenderingStyle* style,
                              bool needFillStrokeUpdate = true);
 
-  virtual KCanvasItem* createCanvasItem(KCanvas* canvas,
-                                        KRenderingStyle* style) const;
+  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
+                                              khtml::RenderStyle* style);
 
   virtual KCanvasFilterEffect* filterEffect() const;
 

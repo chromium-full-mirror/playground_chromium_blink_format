@@ -35,9 +35,8 @@ class SVGAnimatedNumberImpl;
 class SVGFEGaussianBlurElementImpl
     : public SVGFilterPrimitiveStandardAttributesImpl {
  public:
-  SVGFEGaussianBlurElementImpl(KDOM::DocumentPtr* doc,
-                               KDOM::NodeImpl::Id id,
-                               KDOM::DOMStringImpl* prefix);
+  SVGFEGaussianBlurElementImpl(const KDOM::QualifiedName& tagName,
+                               KDOM::DocumentImpl* doc);
   virtual ~SVGFEGaussianBlurElementImpl();
 
   // 'SVGFEGaussianBlurElement' functions
@@ -48,12 +47,12 @@ class SVGFEGaussianBlurElementImpl
   void setStdDeviation(float stdDeviationX, float stdDeviationY);
 
   // Derived from: 'ElementImpl'
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  virtual KCanvasItem* createCanvasItem(KCanvas* canvas,
-                                        KRenderingStyle* style) const;
+  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
+                                              khtml::RenderStyle* style);
 
-  virtual bool implementsCanvasItem() const { return true; }
+  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
 
   virtual KCanvasFilterEffect* filterEffect() const;
 

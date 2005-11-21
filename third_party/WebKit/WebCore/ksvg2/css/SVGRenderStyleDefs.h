@@ -214,7 +214,6 @@ class StyleMiscData : public KDOM::Shared<StyleMiscData> {
     return !(*this == other);
   }
 
-  float opacity;
   QString filter;
   QColor floodColor;
   float floodOpacity;

@@ -30,18 +30,16 @@
 #include <ksvg2/css/SVGRenderStyleDefs.h>
 
 namespace KSVG {
-class SVGRenderStyle : public KDOM::RenderStyle {
+class SVGRenderStyle {
  public:
   SVGRenderStyle();
   SVGRenderStyle(bool);  // Used to create the default style.
   SVGRenderStyle(const SVGRenderStyle& other);
-  virtual ~SVGRenderStyle();
+  ~SVGRenderStyle();
 
-  virtual bool equals(KDOM::RenderStyle* other) const;
+  bool equals(SVGRenderStyle* other) const;
 
-  static void cleanup();
-
-  virtual void inheritFrom(const RenderStyle* inheritParent);
+  void inheritFrom(const SVGRenderStyle* inheritParent);
 
   // SVG CSS Properties
   SVG_RS_DEFINE_ATTRIBUTE(EAlignmentBaseline,
@@ -180,12 +178,6 @@ class SVGRenderStyle : public KDOM::RenderStyle {
                                            endMarker,
                                            QString())
 
-  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
-                                           misc,
-                                           opacity,
-                                           Opacity,
-                                           opacity,
-                                           1.0)
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
                                            misc,
                                            filter,
@@ -275,7 +267,7 @@ class SVGRenderStyle : public KDOM::RenderStyle {
   static SVGRenderStyle* s_defaultStyle;
 
  private:
-  SVGRenderStyle(const SVGRenderStyle*) : KDOM::RenderStyle() {}
+  SVGRenderStyle(const SVGRenderStyle*) {}
 
   void setBitDefaults() {
     svg_inherited_flags.f._clipRule = initialClipRule();

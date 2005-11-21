@@ -23,9 +23,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "KRenderingStyle.h"  // for all the CAP_BUTT contstants, etc.
-class KCanvasRegistry;
+#import "KCanvasRenderingStyle.h"  // for all the CAP_BUTT contstants, etc.
 class QRect;
+
+namespace KSVG {
+class SVGRenderStyle;
+}
 
 CFStringRef CFStringFromCGPath(CGPathRef path);
 CFStringRef CFStringFromCGAffineTransform(CGAffineTransform t);
@@ -33,13 +36,8 @@ CGAffineTransform CGAffineTransformMakeMapBetweenRects(CGRect source,
                                                        CGRect dest);
 CGPathRef CGPathApplyTransform(CGPathRef path, CGAffineTransform transform);
 
-void applyStyleToContext(CGContextRef context, KRenderingStyle* style);
-void applyStrokeStyleToContext(CGContextRef context, KRenderingStyle* style);
-void applyTransformForStyle(CGContextRef context, KRenderingStyle* style);
-void applyClipPathsForStyle(CGContextRef context,
-                            KCanvasRegistry* registry,
-                            KRenderingStyle* style,
-                            const QRect& bbox);
+void applyStrokeStyleToContext(CGContextRef context,
+                               KSVG::KCanvasRenderingStyle* style);
 
 static inline CGLineCap CGLineCapFromKC(KCCapStyle cap) {
   if (cap == CAP_BUTT)

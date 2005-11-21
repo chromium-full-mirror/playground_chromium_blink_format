@@ -135,22 +135,20 @@ bool StyleMarkerData::operator==(const StyleMarkerData& other) const {
 }
 
 StyleMiscData::StyleMiscData() : KDOM::Shared<StyleMiscData>() {
-  opacity = SVGRenderStyle::initialOpacity();
-  floodColor = SVGRenderStyle::initialColor();
-  floodOpacity = SVGRenderStyle::initialOpacity();
+  floodColor = khtml::RenderStyle::initialColor();
+  floodOpacity = khtml::RenderStyle::initialOpacity();
 }
 
 StyleMiscData::StyleMiscData(const StyleMiscData& other)
     : KDOM::Shared<StyleMiscData>() {
-  opacity = other.opacity;
   filter = other.filter;
   floodColor = other.floodColor;
   floodOpacity = other.floodOpacity;
 }
 
 bool StyleMiscData::operator==(const StyleMiscData& other) const {
-  return (opacity == other.opacity && filter == other.filter &&
-          floodOpacity == other.floodOpacity && floodColor == other.floodColor);
+  return (filter == other.filter && floodOpacity == other.floodOpacity &&
+          floodColor == other.floodColor);
 }
 
 // vim:ts=4:noet

@@ -43,25 +43,13 @@ class SVGTransformableImpl : public SVGLocatableImpl {
   virtual ~SVGTransformableImpl();
 
   // 'SVGTransformable' functions
-  SVGAnimatedTransformListImpl* transform() const;
-  SVGMatrixImpl* localMatrix() const;
+  virtual SVGAnimatedTransformListImpl* transform() const = 0;
+  virtual SVGMatrixImpl* localMatrix() const = 0;
 
-  // Derived from: 'SVGLocatable'
-  virtual SVGMatrixImpl* getCTM() const;
-  virtual SVGMatrixImpl* getScreenCTM() const;
+  virtual void updateLocalTransform(SVGTransformListImpl* localTransforms) = 0;
 
-  // Special parseAttribute function, returning a bool,
-  // whether it could handle the passed attribute or not.
-  bool parseAttribute(KDOM::AttributeImpl* attr);
   static void parseTransformAttribute(SVGTransformListImpl* list,
                                       KDOM::DOMStringImpl* transform);
-
-  void updateSubtreeMatrices(KDOM::NodeImpl* node);
-  void updateLocalTransform(SVGTransformListImpl* localTransforms);
-
- protected:
-  mutable SVGMatrixImpl* m_localMatrix;
-  mutable SVGAnimatedTransformListImpl* m_transform;
 };
 };
 

@@ -24,11 +24,10 @@
 #include <kdom/core/AttrImpl.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGRectImpl.h"
 #include "SVGPointImpl.h"
-#include "SVGDocumentImpl.h"
 #include "SVGSVGElementImpl.h"
 #include "SVGPathSegArcImpl.h"
 #include "SVGPathSegListImpl.h"
@@ -47,16 +46,14 @@
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasCreator.h>
 
-using namespace KSVG;
+namespace KSVG {
 
-SVGPathElementImpl::SVGPathElementImpl(KDOM::DocumentPtr* doc,
-                                       KDOM::NodeImpl::Id id,
-                                       KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGPathElementImpl::SVGPathElementImpl(const KDOM::QualifiedName& tagName,
+                                       KDOM::DocumentImpl* doc)
+    : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),
-      SVGTransformableImpl(),
       SVGPathParser() {
   m_pathLength = 0;
   m_pathSegList = 0;
@@ -454,26 +451,18 @@ void SVGPathElementImpl::svgClosePath() {
   pathSegList()->appendItem(createSVGPathSegClosePath());
 }
 
-void SVGPathElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  switch (id) {
-    case ATTR_D: {
-      parseSVG(KDOM::DOMString(attr->value()).string(), true);
-      break;
-    }
-    default: {
-      if (SVGTestsImpl::parseAttribute(attr))
-        return;
-      if (SVGLangSpaceImpl::parseAttribute(attr))
-        return;
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
-      if (SVGTransformableImpl::parseAttribute(attr))
-        return;
-
-      SVGStyledElementImpl::parseAttribute(attr);
-    }
-  };
+void SVGPathElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
+  if (attr->name() == SVGNames::dAttr)
+    parseSVG(attr->value().qstring(), true);
+  else {
+    if (SVGTestsImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGLangSpaceImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
+      return;
+    SVGStyledTransformableElementImpl::parseMappedAttribute(attr);
+  }
 }
 
 SVGPathSegListImpl* SVGPathElementImpl::pathSegList() const {
@@ -532,6 +521,7 @@ KCPathDataList SVGPathElementImpl::toPathData() const {
   }
 
   return pathData;
+}
 }
 
 // vim:ts=4:noet

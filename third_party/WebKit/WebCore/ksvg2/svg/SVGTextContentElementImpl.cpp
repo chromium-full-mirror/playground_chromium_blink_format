@@ -23,7 +23,7 @@
 #include "config.h"
 #include <kdom/core/AttrImpl.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 //#include "SVGDocument.h"
 #include "SVGTextContentElementImpl.h"
@@ -33,10 +33,9 @@
 using namespace KSVG;
 
 SVGTextContentElementImpl::SVGTextContentElementImpl(
-    KDOM::DocumentPtr* doc,
-    KDOM::NodeImpl::Id id,
-    KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGStyledElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl() {
@@ -101,25 +100,23 @@ long SVGTextContentElementImpl::getCharNumAtPosition(
 void SVGTextContentElementImpl::selectSubString(unsigned long charnum,
                                                 unsigned long nchars) const {}
 
-void SVGTextContentElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGTextContentElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_LENGTHADJUST: {
-      // x()->baseVal()->setValueAsString(value);
-      break;
-    }
-    default: {
-      if (SVGTestsImpl::parseAttribute(attr))
-        return;
-      if (SVGLangSpaceImpl::parseAttribute(attr))
-        return;
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
 
-      SVGStyledElementImpl::parseAttribute(attr);
-    }
-  };
+  // if (attr->name() == SVGNames::lengthAdjustAttr)
+  //    x()->baseVal()->setValueAsString(value.impl());
+  // else
+  {
+    if (SVGTestsImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGLangSpaceImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
+      return;
+
+    SVGStyledElementImpl::parseMappedAttribute(attr);
+  }
 }
 
 // vim:ts=4:noet

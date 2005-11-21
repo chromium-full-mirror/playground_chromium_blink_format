@@ -22,23 +22,23 @@
 
 #include "config.h"
 #include "SVGSetElementImpl.h"
-#include "SVGDocumentImpl.h"
+#include "SVGSVGElementImpl.h"
+#include "KSVGTimeScheduler.h"
 
 using namespace KSVG;
 
-SVGSetElementImpl::SVGSetElementImpl(KDOM::DocumentPtr* doc,
-                                     KDOM::NodeImpl::Id id,
-                                     KDOM::DOMStringImpl* prefix)
-    : SVGAnimationElementImpl(doc, id, prefix) {}
+SVGSetElementImpl::SVGSetElementImpl(const KDOM::QualifiedName& tagName,
+                                     KDOM::DocumentImpl* doc)
+    : SVGAnimationElementImpl(tagName, doc) {}
 
 SVGSetElementImpl::~SVGSetElementImpl() {}
 
 void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
   // Start condition.
   if (!m_connected) {
-    SVGDocumentImpl* document = static_cast<SVGDocumentImpl*>(ownerDocument());
-    if (document) {
-      document->timeScheduler()->connectIntervalTimer(this);
+    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
+    if (ownerSVG) {
+      ownerSVG->timeScheduler()->connectIntervalTimer(this);
       m_connected = true;
     }
 
@@ -51,21 +51,21 @@ void SVGSetElementImpl::handleTimerEvent(double timePercentage) {
 
   // Commit change now...
   if (m_savedTo.isEmpty()) {
-    KDOM::DOMStringImpl* attr = targetAttribute();
-    m_savedTo = (attr ? attr->string() : QString::null);
-    setTargetAttribute(KDOM::DOMString(m_to).handle());
+    KDOM::DOMString attr(targetAttribute());
+    m_savedTo = attr.qstring();
+    setTargetAttribute(KDOM::DOMString(m_to).impl());
   }
 
   // End condition.
   if (timePercentage == 1.0) {
-    SVGDocumentImpl* document = static_cast<SVGDocumentImpl*>(ownerDocument());
-    if (document) {
-      document->timeScheduler()->disconnectIntervalTimer(this);
+    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
+    if (ownerSVG) {
+      ownerSVG->timeScheduler()->disconnectIntervalTimer(this);
       m_connected = false;
     }
 
     if (!isFrozen())
-      setTargetAttribute(KDOM::DOMString(m_savedTo).handle());
+      setTargetAttribute(KDOM::DOMString(m_savedTo).impl());
 
     m_savedTo = QString();
   }

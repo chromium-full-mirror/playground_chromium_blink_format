@@ -45,11 +45,11 @@ class SVGFitToViewBoxImpl {
   SVGMatrixImpl* viewBoxToViewTransform(float viewWidth,
                                         float viewHeight) const;
 
-  bool parseAttribute(KDOM::AttributeImpl* attr);
+  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SVGAnimatedRectImpl* m_viewBox;
-  mutable SVGAnimatedPreserveAspectRatioImpl* m_preserveAspectRatio;
+  mutable SharedPtr<SVGAnimatedRectImpl> m_viewBox;
+  mutable SharedPtr<SVGAnimatedPreserveAspectRatioImpl> m_preserveAspectRatio;
 };
 };
 

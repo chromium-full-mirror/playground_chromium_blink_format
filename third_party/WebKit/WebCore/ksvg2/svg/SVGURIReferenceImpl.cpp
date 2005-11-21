@@ -24,7 +24,7 @@
 #include <kdom/core/NodeImpl.h>
 #include <kdom/core/AttrImpl.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGURIReferenceImpl.h"
 #include "SVGStyledElementImpl.h"
@@ -42,16 +42,18 @@ SVGURIReferenceImpl::~SVGURIReferenceImpl() {
 }
 
 SVGAnimatedStringImpl* SVGURIReferenceImpl::href() const {
-  const SVGStyledElementImpl* context =
-      dynamic_cast<const SVGStyledElementImpl*>(this);
-  return lazy_create<SVGAnimatedStringImpl>(m_href, context);
+  // const SVGStyledElementImpl *context = dynamic_cast<const
+  // SVGStyledElementImpl *>(this);
+  return lazy_create<SVGAnimatedStringImpl>(
+      m_href, (const SVGStyledElementImpl*)0);  // FIXME: 0 is a hack
 }
 
-bool SVGURIReferenceImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMString value(attr->value());
-  if (id == ATTR_HREF || KDOM::DOMString(attr->name()) == "xlink:href") {
-    href()->setBaseVal(value.handle());
+bool SVGURIReferenceImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
+  if (attr->name() ==
+      SVGNames::hrefAttr)  // || attr->name() == XLinkNames::hrefAttr)
+  {
+    href()->setBaseVal(attr->value().impl());
     return true;
   }
 

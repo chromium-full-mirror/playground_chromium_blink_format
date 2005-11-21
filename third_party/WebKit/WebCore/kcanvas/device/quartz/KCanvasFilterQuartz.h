@@ -36,7 +36,7 @@ class KCanvasFilterQuartz : public KCanvasFilter {
   virtual void prepareFilter(KRenderingDeviceContext* context,
                              const QRect& bbox);
   virtual void applyFilter(KRenderingDeviceContext* context,
-                           const KCanvasCommonArgs& args,
+                           KCanvasMatrix objectMatrix,
                            const QRect& bbox);
 
   // quartz only.

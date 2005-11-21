@@ -29,10 +29,9 @@
 
 using namespace KSVG;
 
-SVGPolygonElementImpl::SVGPolygonElementImpl(KDOM::DocumentPtr* doc,
-                                             KDOM::NodeImpl::Id id,
-                                             KDOM::DOMStringImpl* prefix)
-    : SVGPolyElementImpl(doc, id, prefix) {}
+SVGPolygonElementImpl::SVGPolygonElementImpl(const KDOM::QualifiedName& tagName,
+                                             KDOM::DocumentImpl* doc)
+    : SVGPolyElementImpl(tagName, doc) {}
 
 SVGPolygonElementImpl::~SVGPolygonElementImpl() {}
 

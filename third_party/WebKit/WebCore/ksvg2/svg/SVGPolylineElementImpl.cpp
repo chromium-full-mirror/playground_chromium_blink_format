@@ -29,10 +29,10 @@
 
 using namespace KSVG;
 
-SVGPolylineElementImpl::SVGPolylineElementImpl(KDOM::DocumentPtr* doc,
-                                               KDOM::NodeImpl::Id id,
-                                               KDOM::DOMStringImpl* prefix)
-    : SVGPolyElementImpl(doc, id, prefix) {}
+SVGPolylineElementImpl::SVGPolylineElementImpl(
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGPolyElementImpl(tagName, doc) {}
 
 SVGPolylineElementImpl::~SVGPolylineElementImpl() {}
 

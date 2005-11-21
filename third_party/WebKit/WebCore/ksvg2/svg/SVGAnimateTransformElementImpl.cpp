@@ -23,18 +23,18 @@
 #include "config.h"
 #include <kdom/core/AttrImpl.h>
 
-#include <kcanvas/KCanvasItem.h>
+#include <kcanvas/RenderPath.h>
 #include <kcanvas/KCanvasMatrix.h>
 
-#include "svgattrs.h"
 #include "SVGAngleImpl.h"
 #include "SVGMatrixImpl.h"
-#include "SVGDocumentImpl.h"
 #include "SVGTransformImpl.h"
-#include "SVGTransformableImpl.h"
+#include "SVGStyledTransformableElementImpl.h"
 #include "SVGTransformListImpl.h"
 #include "SVGAnimatedTransformListImpl.h"
 #include "SVGAnimateTransformElementImpl.h"
+#include "SVGSVGElementImpl.h"
+#include "KSVGTimeScheduler.h"
 
 #include <kdebug.h>
 
@@ -44,106 +44,70 @@ using namespace KSVG;
 using namespace std;
 
 SVGAnimateTransformElementImpl::SVGAnimateTransformElementImpl(
-    KDOM::DocumentPtr* doc,
-    KDOM::NodeImpl::Id id,
-    KDOM::DOMStringImpl* prefix)
-    : SVGAnimationElementImpl(doc, id, prefix) {
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGAnimationElementImpl(tagName, doc) {
   m_type = SVG_TRANSFORM_UNKNOWN;
 
-  m_toTransform = 0;
-  m_fromTransform = 0;
-  m_initialTransform = 0;
-
   m_currentItem = -1;
-
-  m_lastMatrix = 0;
-  m_transformMatrix = 0;
 
   m_rotateSpecialCase = false;
   m_toRotateSpecialCase = false;
   m_fromRotateSpecialCase = false;
 }
 
-SVGAnimateTransformElementImpl::~SVGAnimateTransformElementImpl() {
-  if (m_toTransform)
-    m_toTransform->deref();
-  if (m_fromTransform)
-    m_fromTransform->deref();
-  if (m_initialTransform)
-    m_initialTransform->deref();
+SVGAnimateTransformElementImpl::~SVGAnimateTransformElementImpl() {}
 
-  if (m_lastMatrix)
-    m_lastMatrix->deref();
-  if (m_transformMatrix)
-    m_transformMatrix->deref();
-}
-
-void SVGAnimateTransformElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGAnimateTransformElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_TYPE: {
-      if (value == "translate")
-        m_type = SVG_TRANSFORM_TRANSLATE;
-      else if (value == "scale")
-        m_type = SVG_TRANSFORM_SCALE;
-      else if (value == "rotate")
-        m_type = SVG_TRANSFORM_ROTATE;
-      else if (value == "skewX")
-        m_type = SVG_TRANSFORM_SKEWX;
-      else if (value == "skewY")
-        m_type = SVG_TRANSFORM_SKEWY;
-
-      break;
-    }
-    default:
-      SVGAnimationElementImpl::parseAttribute(attr);
-  };
+  if (attr->name() == SVGNames::typeAttr) {
+    if (value == "translate")
+      m_type = SVG_TRANSFORM_TRANSLATE;
+    else if (value == "scale")
+      m_type = SVG_TRANSFORM_SCALE;
+    else if (value == "rotate")
+      m_type = SVG_TRANSFORM_ROTATE;
+    else if (value == "skewX")
+      m_type = SVG_TRANSFORM_SKEWX;
+    else if (value == "skewY")
+      m_type = SVG_TRANSFORM_SKEWY;
+  } else {
+    SVGAnimationElementImpl::parseMappedAttribute(attr);
+  }
 }
 
 void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
   // Start condition.
   if (!m_connected) {
-    if (m_initialTransform)
-      m_initialTransform->deref();
-
     m_initialTransform = 0;
 
     // Save initial transform... (needed for fill="remove" or additve="sum")
-    SVGTransformableImpl* transform =
-        dynamic_cast<SVGTransformableImpl*>(targetElement());
-    SVGTransformListImpl* transformList =
-        (transform ? transform->transform()->baseVal() : 0);
-    if (transformList) {
-      transformList->ref();
+    if (targetElement()->isStyledTransformable()) {
+      SVGStyledTransformableElementImpl* transform =
+          static_cast<SVGStyledTransformableElementImpl*>(targetElement());
+      SharedPtr<SVGTransformListImpl> transformList =
+          transform->transform()->baseVal();
+      if (transformList) {
+        for (unsigned long i = 0; i < transformList->numberOfItems(); i++) {
+          SVGTransformImpl* value = transformList->getItem(i);
+          if (!value)
+            continue;
 
-      for (unsigned long i = 0; i < transformList->numberOfItems(); i++) {
-        SVGTransformImpl* value = transformList->getItem(i);
-        if (!value)
-          continue;
-
-        if (value->type() == m_type) {
-          value->ref();
-          m_initialTransform = value;
-          break;
+          if (value->type() == m_type) {
+            m_initialTransform = value;
+            break;
+          }
         }
       }
-
-      transformList->deref();
     }
 
     // Animation mode handling
     switch (detectAnimationMode()) {
       case TO_ANIMATION:
       case FROM_TO_ANIMATION: {
-        if (m_toTransform)
-          m_toTransform->deref();
-
         m_toTransform = parseTransformValue(m_to);
         m_toRotateSpecialCase = m_rotateSpecialCase;
-
-        if (m_fromTransform)
-          m_fromTransform->deref();
 
         if (!m_from.isEmpty())  // from-to animation
         {
@@ -152,28 +116,18 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
         } else  // to animation
         {
           m_fromTransform = m_initialTransform;
-          m_fromTransform->ref();
-
           m_fromRotateSpecialCase = false;
         }
 
-        if (!m_fromTransform) {
+        if (!m_fromTransform)
           m_fromTransform = new SVGTransformImpl();
-          m_fromTransform->ref();
-        }
 
         break;
       }
       case BY_ANIMATION:
       case FROM_BY_ANIMATION: {
-        if (m_toTransform)
-          m_toTransform->deref();
-
         m_toTransform = parseTransformValue(m_by);
         m_toRotateSpecialCase = m_rotateSpecialCase;
-
-        if (m_fromTransform)
-          m_fromTransform->deref();
 
         if (!m_from.isEmpty())  // from-by animation
         {
@@ -185,10 +139,8 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
           m_fromRotateSpecialCase = false;
         }
 
-        if (!m_fromTransform) {
+        if (!m_fromTransform)
           m_fromTransform = new SVGTransformImpl();
-          m_fromTransform->ref();
-        }
 
         SVGMatrixImpl* byMatrix = m_toTransform->matrix();
         SVGMatrixImpl* fromMatrix = m_fromTransform->matrix();
@@ -207,9 +159,9 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
       }
     }
 
-    SVGDocumentImpl* document = static_cast<SVGDocumentImpl*>(ownerDocument());
-    if (document) {
-      document->timeScheduler()->connectIntervalTimer(this);
+    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
+    if (ownerSVG) {
+      ownerSVG->timeScheduler()->connectIntervalTimer(this);
       m_connected = true;
     }
 
@@ -248,16 +200,10 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
           useTimePercentage = 1.0;
         }
 
-        if (m_toTransform)
-          m_toTransform->deref();
-
-        m_toTransform = parseTransformValue(value2.string());
+        m_toTransform = parseTransformValue(value2.qstring());
         m_toRotateSpecialCase = m_rotateSpecialCase;
 
-        if (m_fromTransform)
-          m_fromTransform->deref();
-
-        m_fromTransform = parseTransformValue(value1.string());
+        m_fromTransform = parseTransformValue(value1.qstring());
         m_fromRotateSpecialCase = m_rotateSpecialCase;
 
         m_currentItem = itemByPercentage;
@@ -276,14 +222,13 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
   if (m_fromTransform && m_fromTransform->matrix() && qFromMatrix.isIdentity())
     qFromMatrix = m_fromTransform->matrix()->qmatrix();
 
-  if (!m_transformMatrix) {
+  if (!m_transformMatrix)
     m_transformMatrix = new SVGMatrixImpl();
-    m_transformMatrix->ref();
-  } else {
+  else {
     m_transformMatrix->reset();
 
     if (isAccumulated() && repeations() != 0.0 && m_lastMatrix)
-      m_transformMatrix->multiply(m_lastMatrix);
+      m_transformMatrix->multiply(m_lastMatrix.get());
   }
 
   switch (m_type) {
@@ -359,54 +304,33 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
   if (timePercentage == 1.0) {
     if ((m_repeatCount > 0 && m_repeations < m_repeatCount - 1) ||
         isIndefinite(m_repeatCount)) {
-      if (m_lastMatrix)
-        m_lastMatrix->deref();
-
       m_lastMatrix = new SVGMatrixImpl();
-      m_lastMatrix->ref();
 
       if (m_transformMatrix)
-        m_lastMatrix->copy(m_transformMatrix);
+        m_lastMatrix->copy(m_transformMatrix.get());
 
       m_repeations++;
       return;
     }
 
-    SVGDocumentImpl* document = static_cast<SVGDocumentImpl*>(ownerDocument());
-    if (document) {
-      document->timeScheduler()->disconnectIntervalTimer(this);
+    SVGSVGElementImpl* ownerSVG = ownerSVGElement();
+    if (ownerSVG) {
+      ownerSVG->timeScheduler()->disconnectIntervalTimer(this);
       m_connected = false;
     }
 
     // Reset...
     m_currentItem = -1;
-
-    if (m_toTransform)
-      m_toTransform->deref();
-
     m_toTransform = 0;
-
-    if (m_fromTransform)
-      m_fromTransform->deref();
-
     m_fromTransform = 0;
-
-    if (m_initialTransform)
-      m_initialTransform->deref();
-
     m_initialTransform = 0;
 
     if (!isFrozen()) {
-      if (m_transformMatrix)
-        m_transformMatrix->deref();
-
       SVGMatrixImpl* initial = initialMatrix();
       if (initial)
         m_transformMatrix = initial;
-      else {
+      else
         m_transformMatrix = new SVGMatrixImpl();
-        m_transformMatrix->ref();
-      }
     }
   }
 }
@@ -547,28 +471,27 @@ void SVGAnimateTransformElementImpl::calculateRotationFromMatrix(
 }
 
 SVGMatrixImpl* SVGAnimateTransformElementImpl::initialMatrix() const {
-  SVGTransformableImpl* transform =
-      dynamic_cast<SVGTransformableImpl*>(targetElement());
+  if (!targetElement()->isStyledTransformable())
+    return 0;
+  SVGStyledTransformableElementImpl* transform =
+      static_cast<SVGStyledTransformableElementImpl*>(targetElement());
   SVGTransformListImpl* transformList =
       (transform ? transform->transform()->baseVal() : 0);
   if (!transformList)
     return 0;
 
-  SVGTransformImpl* result = transformList->concatenate();
+  SharedPtr<SVGTransformImpl> result = transformList->concatenate();
   if (!result)
     return 0;
-
-  result->ref();
 
   SVGMatrixImpl* ret = result->matrix();
   ret->ref();
 
-  result->deref();
   return ret;
 }
 
 SVGMatrixImpl* SVGAnimateTransformElementImpl::transformMatrix() const {
-  return m_transformMatrix;
+  return m_transformMatrix.get();
 }
 
 // vim:ts=4:noet

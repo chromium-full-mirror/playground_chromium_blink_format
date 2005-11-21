@@ -26,12 +26,10 @@
 #include <kdom/core/AttrImpl.h>
 
 #include <kcanvas/KCanvas.h>
-#include <kcanvas/KCanvasRegistry.h>
 #include <kcanvas/KCanvasFilters.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
 #include "SVGFEMergeElementImpl.h"
@@ -42,19 +40,19 @@
 
 using namespace KSVG;
 
-SVGFEMergeElementImpl::SVGFEMergeElementImpl(KDOM::DocumentPtr* doc,
-                                             KDOM::NodeImpl::Id id,
-                                             KDOM::DOMStringImpl* prefix)
-    : SVGFilterPrimitiveStandardAttributesImpl(doc, id, prefix) {
+SVGFEMergeElementImpl::SVGFEMergeElementImpl(const KDOM::QualifiedName& tagName,
+                                             KDOM::DocumentImpl* doc)
+    : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
   m_filterEffect = 0;
 }
 
 SVGFEMergeElementImpl::~SVGFEMergeElementImpl() {}
 
-KCanvasItem* SVGFEMergeElementImpl::createCanvasItem(KCanvas* canvas,
-                                                     KRenderingStyle*) const {
+khtml::RenderObject* SVGFEMergeElementImpl::createRenderer(
+    RenderArena* arena,
+    khtml::RenderStyle*) {
   m_filterEffect = static_cast<KCanvasFEMerge*>(
-      canvas->renderingDevice()->createFilterEffect(FE_MERGE));
+      canvas()->renderingDevice()->createFilterEffect(FE_MERGE));
   setStandardAttributes(m_filterEffect);
   return 0;
 }
@@ -63,13 +61,14 @@ KCanvasFilterEffect* SVGFEMergeElementImpl::filterEffect() const {
   return m_filterEffect;
 }
 
-void SVGFEMergeElementImpl::close() {
+void SVGFEMergeElementImpl::closeRenderer() {
   QStringList mergeInputs;
   for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
-    if (n->id() == ID_FEMERGENODE) {
+    if (n->hasTagName(SVGNames::feMergeNodeTag)) {
       SVGFEMergeNodeElementImpl* mergeNode =
           static_cast<SVGFEMergeNodeElementImpl*>(n);
-      mergeInputs.append(KDOM::DOMString(mergeNode->in1()->baseVal()).string());
+      mergeInputs.append(
+          KDOM::DOMString(mergeNode->in1()->baseVal()).qstring());
     }
   }
 

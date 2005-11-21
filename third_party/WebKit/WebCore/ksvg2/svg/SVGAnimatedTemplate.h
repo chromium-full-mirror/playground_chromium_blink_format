@@ -52,7 +52,7 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
   }
 
   void setBaseVal(T* baseVal) const {
-    KDOM_SAFE_SET(m_baseVal, baseVal);
+    KDOM::KDOM_SAFE_SET(m_baseVal, baseVal);
 
     if (m_context)
       m_context->notifyAttributeChange();
@@ -70,7 +70,7 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
   }
 
   void setAnimVal(T* animVal) const {
-    KDOM_SAFE_SET(m_animVal, animVal);
+    KDOM::KDOM_SAFE_SET(m_animVal, animVal);
 
     // I think this is superfluous... -- ECS 4/25/05
     if (m_context)
@@ -87,7 +87,7 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
 
   // This methods need to be reimplemented.
   virtual T* create() const = 0;
-  virtual void assign(T* src, T* dst) const = 0;
+  // virtual void assign(T *src, T *dst) const = 0;
 
   // Attribute notification context
   const SVGStyledElementImpl* m_context;

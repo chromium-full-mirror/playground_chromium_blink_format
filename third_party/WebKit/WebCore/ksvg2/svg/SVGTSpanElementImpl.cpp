@@ -26,10 +26,9 @@
 
 using namespace KSVG;
 
-SVGTSpanElementImpl::SVGTSpanElementImpl(KDOM::DocumentPtr* doc,
-                                         KDOM::NodeImpl::Id id,
-                                         KDOM::DOMStringImpl* prefix)
-    : SVGTextPositioningElementImpl(doc, id, prefix) {}
+SVGTSpanElementImpl::SVGTSpanElementImpl(const KDOM::QualifiedName& tagName,
+                                         KDOM::DocumentImpl* doc)
+    : SVGTextPositioningElementImpl(tagName, doc) {}
 
 SVGTSpanElementImpl::~SVGTSpanElementImpl() {}
 

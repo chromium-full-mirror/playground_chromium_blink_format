@@ -23,7 +23,7 @@
 #include "config.h"
 #include <kdom/core/AttrImpl.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 //#include "SVGDocument.h"
 #include "SVGTextPositioningElementImpl.h"
@@ -33,10 +33,9 @@
 using namespace KSVG;
 
 SVGTextPositioningElementImpl::SVGTextPositioningElementImpl(
-    KDOM::DocumentPtr* doc,
-    KDOM::NodeImpl::Id id,
-    KDOM::DOMStringImpl* prefix)
-    : SVGTextContentElementImpl(doc, id, prefix) {
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGTextContentElementImpl(tagName, doc) {
   m_x = m_y = m_dx = m_dy = 0;
   m_rotate = 0;
 }
@@ -74,32 +73,22 @@ SVGAnimatedNumberListImpl* SVGTextPositioningElementImpl::rotate() const {
   return lazy_create<SVGAnimatedNumberListImpl>(m_rotate, this);
 }
 
-void SVGTextPositioningElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGTextPositioningElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_X: {
-      x()->baseVal()->parse(value.string(), this, LM_WIDTH);
-      break;
-    }
-    case ATTR_Y: {
-      y()->baseVal()->parse(value.string(), this, LM_HEIGHT);
-      break;
-    }
-    case ATTR_DX: {
-      dx()->baseVal()->parse(value.string(), this, LM_WIDTH);
-      break;
-    }
-    case ATTR_DY: {
-      dy()->baseVal()->parse(value.string(), this, LM_HEIGHT);
-      break;
-    }
-    case ATTR_ROTATE: {
-      rotate()->baseVal()->parse(value.string(), this);
-      break;
-    }
-    default: { SVGTextContentElementImpl::parseAttribute(attr); }
-  };
+
+  if (attr->name() == SVGNames::xAttr)
+    x()->baseVal()->parse(value.qstring(), this, LM_WIDTH);
+  else if (attr->name() == SVGNames::yAttr)
+    y()->baseVal()->parse(value.qstring(), this, LM_HEIGHT);
+  else if (attr->name() == SVGNames::dxAttr)
+    dx()->baseVal()->parse(value.qstring(), this, LM_WIDTH);
+  else if (attr->name() == SVGNames::dyAttr)
+    dy()->baseVal()->parse(value.qstring(), this, LM_HEIGHT);
+  else if (attr->name() == SVGNames::rotateAttr)
+    rotate()->baseVal()->parse(value.qstring(), this);
+  else
+    SVGTextContentElementImpl::parseMappedAttribute(attr);
 }
 
 // vim:ts=4:noet

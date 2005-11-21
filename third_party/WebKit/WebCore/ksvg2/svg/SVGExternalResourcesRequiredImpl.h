@@ -37,7 +37,7 @@ class SVGExternalResourcesRequiredImpl {
   // 'SVGExternalResourcesRequired' functions
   SVGAnimatedBooleanImpl* externalResourcesRequired() const;
 
-  bool parseAttribute(KDOM::AttributeImpl* attr);
+  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
   mutable SVGAnimatedBooleanImpl* m_external;

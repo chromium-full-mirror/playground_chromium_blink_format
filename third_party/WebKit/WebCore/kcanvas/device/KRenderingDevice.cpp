@@ -22,23 +22,13 @@
 
 #include "config.h"
 #include "KRenderingDevice.h"
-#include "KRenderingDevice.moc"
 
 KCanvasCommonArgs::KCanvasCommonArgs() {
   m_path = 0;
   m_style = 0;
-  m_canvas = 0;
 }
 
 KCanvasCommonArgs::~KCanvasCommonArgs() {}
-
-KCanvas* KCanvasCommonArgs::canvas() const {
-  return m_canvas;
-}
-
-void KCanvasCommonArgs::setCanvas(KCanvas* canvas) {
-  m_canvas = canvas;
-}
 
 KCanvasUserData KCanvasCommonArgs::path() const {
   return m_path;
@@ -48,11 +38,11 @@ void KCanvasCommonArgs::setPath(KCanvasUserData path) {
   m_path = path;
 }
 
-KRenderingStyle* KCanvasCommonArgs::style() const {
+KSVG::KCanvasRenderingStyle* KCanvasCommonArgs::canvasStyle() const {
   return m_style;
 }
 
-void KCanvasCommonArgs::setStyle(KRenderingStyle* style) {
+void KCanvasCommonArgs::setStyle(KSVG::KCanvasRenderingStyle* style) {
   m_style = style;
 }
 

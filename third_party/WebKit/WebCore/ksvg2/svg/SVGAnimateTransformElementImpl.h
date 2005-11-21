@@ -32,12 +32,11 @@ namespace KSVG {
 class SVGTransformImpl;
 class SVGAnimateTransformElementImpl : public SVGAnimationElementImpl {
  public:
-  SVGAnimateTransformElementImpl(KDOM::DocumentPtr* doc,
-                                 KDOM::NodeImpl::Id id,
-                                 KDOM::DOMStringImpl* prefix);
+  SVGAnimateTransformElementImpl(const KDOM::QualifiedName& tagName,
+                                 KDOM::DocumentImpl* doc);
   virtual ~SVGAnimateTransformElementImpl();
 
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
   virtual void handleTimerEvent(double timePercentage);
 
@@ -55,12 +54,12 @@ class SVGAnimateTransformElementImpl : public SVGAnimationElementImpl {
   int m_currentItem;
   SVGTransformType m_type;
 
-  SVGTransformImpl* m_toTransform;
-  SVGTransformImpl* m_fromTransform;
-  SVGTransformImpl* m_initialTransform;
+  SharedPtr<SVGTransformImpl> m_toTransform;
+  SharedPtr<SVGTransformImpl> m_fromTransform;
+  SharedPtr<SVGTransformImpl> m_initialTransform;
 
-  SVGMatrixImpl* m_lastMatrix;
-  SVGMatrixImpl* m_transformMatrix;
+  SharedPtr<SVGMatrixImpl> m_lastMatrix;
+  SharedPtr<SVGMatrixImpl> m_transformMatrix;
 
   mutable bool m_rotateSpecialCase : 1;
   bool m_toRotateSpecialCase : 1, m_fromRotateSpecialCase : 1;

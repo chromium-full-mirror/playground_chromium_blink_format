@@ -41,7 +41,7 @@ void SVGLengthListImpl::parse(const QString& value,
   for (unsigned int i = 0; i < lengths.count(); i++) {
     SVGLengthImpl* length = new SVGLengthImpl(context, mode);
     KDOM::DOMString str(lengths[i]);
-    length->setValueAsString(str.handle());
+    length->setValueAsString(str.impl());
     appendItem(length);
   }
 }

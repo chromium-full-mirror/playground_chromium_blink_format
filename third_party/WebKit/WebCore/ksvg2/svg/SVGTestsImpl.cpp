@@ -21,11 +21,12 @@
 */
 
 #include "config.h"
+#include <kglobal.h>
 #include <klocale.h>
 
 #include <kdom/core/AttrImpl.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGTestsImpl.h"
 #include "SVGElementImpl.h"
@@ -70,7 +71,7 @@ bool SVGTestsImpl::isValid() {
   for (unsigned long i = 0; i < list->numberOfItems(); i++) {
     KDOM::DOMString value = KDOM::DOMString(list->getItem(i));
     if (value.isEmpty() ||
-        !SVGDOMImplementationImpl::self()->hasFeature(value.handle(), 0))
+        !SVGDOMImplementationImpl::self()->hasFeature(value.impl(), 0))
       return false;
   }
 
@@ -78,7 +79,7 @@ bool SVGTestsImpl::isValid() {
   for (unsigned long i = 0; i < list->numberOfItems(); i++) {
     KDOM::DOMString value = KDOM::DOMString(list->getItem(i));
     if (value.isEmpty() ||
-        value.string() != (KGlobal::locale()->language()).left(2))
+        value.qstring() != (KGlobal::locale()->language()).left(2))
       return false;
   }
 
@@ -89,23 +90,18 @@ bool SVGTestsImpl::isValid() {
   return true;
 }
 
-bool SVGTestsImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_REQUIREDFEATURES: {
-      requiredFeatures()->reset(value.string());
-      return true;
-    }
-    case ATTR_REQUIREDEXTENSIONS: {
-      requiredExtensions()->reset(value.string());
-      return true;
-    }
-    case ATTR_SYSTEMLANGUAGE: {
-      systemLanguage()->reset(value.string());
-      return true;
-    }
-  };
+bool SVGTestsImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
+  //    KDOM::DOMString value(attr->value());
+  //    if (attr->name() == SVGNames::requiredfeaturesAttr) {
+  //        requiredFeatures()->reset(value.qstring());
+  //        return true;
+  //    } else if (attr->name() == SVGNames::requiredextensionsAttr) {
+  //        requiredExtensions()->reset(value.qstring());
+  //        return true;
+  //    } else if (attr->name() == SVGNames::systemlanguageAttr)
+  //        systemLanguage()->reset(value.qstring());
+  //        return true;
+  //    }
 
   return false;
 }

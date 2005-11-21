@@ -27,18 +27,14 @@
 #include <kdom/core/DOMStringImpl.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
-#include "ksvgevents.h"
-#include "SVGEventImpl.h"
-#include "SVGDocumentImpl.h"
+#include "SVGNames.h"
 #include "SVGScriptElementImpl.h"
 
 using namespace KSVG;
 
-SVGScriptElementImpl::SVGScriptElementImpl(KDOM::DocumentPtr* doc,
-                                           KDOM::NodeImpl::Id id,
-                                           KDOM::DOMStringImpl* prefix)
-    : SVGElementImpl(doc, id, prefix),
+SVGScriptElementImpl::SVGScriptElementImpl(const KDOM::QualifiedName& tagName,
+                                           KDOM::DocumentImpl* doc)
+    : SVGElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGExternalResourcesRequiredImpl() {
   m_type = 0;
@@ -57,22 +53,18 @@ void SVGScriptElementImpl::setType(KDOM::DOMStringImpl* type) {
   KDOM_SAFE_SET(m_type, type);
 }
 
-void SVGScriptElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  switch (id) {
-    case ATTR_TYPE: {
-      setType(attr->value());
-      break;
-    }
-    default: {
-      if (SVGURIReferenceImpl::parseAttribute(attr))
-        return;
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
+void SVGScriptElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
+  if (attr->name() == SVGNames::typeAttr)
+    setType(attr->value().impl());
+  else {
+    if (SVGURIReferenceImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
+      return;
 
-      SVGElementImpl::parseAttribute(attr);
-    }
-  };
+    SVGElementImpl::parseMappedAttribute(attr);
+  }
 }
 
 void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
@@ -89,7 +81,7 @@ void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
 #endif
 
     // Run script
-    KJS::Completion comp = ecmaEngine->evaluate(jsCode.string(), ecmaEngine->globalObject());
+    KJS::Completion comp = ecmaEngine->evaluate(jsCode.qstring(), ecmaEngine->globalObject());
     if(comp.complType() == KJS::Throw)
     {
         KJS::ExecState *exec = ecmaEngine->globalExec();
@@ -107,13 +99,9 @@ void SVGScriptElementImpl::executeScript(KDOM::DocumentImpl* document,
         SVGDocumentImpl *svgDocument = static_cast<SVGDocumentImpl *>(document);
         if(svgDocument && document->hasListenerType(KDOM::ERROR_EVENT))
         {
-            SVGEventImpl *event = static_cast<SVGEventImpl *>(svgDocument->createEvent(KDOM::DOMString("SVGEvents").handle()));
-            event->ref();
-
-            event->initEvent(KDOM::DOMString("error").handle(), false, false);
-            svgDocument->dispatchRecursiveEvent(event, svgDocument->lastChild());
-
-            event->deref();
+            SharedPtr<KDOM::EventImpl> event = svgDocument->createEvent("SVGEvents");
+            event->initEvent(KDOM::EventNames::errorEvent, false, false);
+            svgDocument->dispatchRecursiveEvent(event.get(), svgDocument->lastChild());
         }
 
         kdDebug() << "[SVGScriptElement] Evaluation error, line " << (lineno != -1 ? QString::number(lineno) : QString::fromLatin1("N/A"))  << " " << exVal->toString(exec).qstring() << endl;

@@ -25,14 +25,12 @@
 
 using namespace KSVG;
 
-SVGDefsElementImpl::SVGDefsElementImpl(KDOM::DocumentPtr* doc,
-                                       KDOM::NodeImpl::Id id,
-                                       KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGDefsElementImpl::SVGDefsElementImpl(const KDOM::QualifiedName& tagName,
+                                       KDOM::DocumentImpl* doc)
+    : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl(),
-      SVGTransformableImpl() {}
+      SVGExternalResourcesRequiredImpl() {}
 
 SVGDefsElementImpl::~SVGDefsElementImpl() {}
 

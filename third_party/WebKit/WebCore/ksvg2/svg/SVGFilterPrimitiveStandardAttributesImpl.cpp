@@ -24,7 +24,7 @@
 #include <kdom/core/AttrImpl.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
 #include "SVGAnimatedEnumerationImpl.h"
 #include "SVGAnimatedStringImpl.h"
@@ -37,10 +37,9 @@
 using namespace KSVG;
 
 SVGFilterPrimitiveStandardAttributesImpl::
-    SVGFilterPrimitiveStandardAttributesImpl(KDOM::DocumentPtr* doc,
-                                             KDOM::NodeImpl::Id id,
-                                             KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix) {
+    SVGFilterPrimitiveStandardAttributesImpl(const KDOM::QualifiedName& tagName,
+                                             KDOM::DocumentImpl* doc)
+    : SVGStyledElementImpl(tagName, doc) {
   m_x = m_y = m_width = m_height = 0;
   m_result = 0;
 }
@@ -76,7 +75,7 @@ SVGAnimatedLengthImpl* SVGFilterPrimitiveStandardAttributesImpl::width() const {
   // "100%" were specified.
   if (!m_width) {
     lazy_create<SVGAnimatedLengthImpl>(m_width, this, LM_WIDTH);
-    m_width->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
+    m_width->baseVal()->setValueAsString(KDOM::DOMString("100%").impl());
     return m_width;
   }
 
@@ -89,7 +88,7 @@ SVGAnimatedLengthImpl* SVGFilterPrimitiveStandardAttributesImpl::height()
   // "100%" were specified.
   if (!m_height) {
     lazy_create<SVGAnimatedLengthImpl>(m_height, this, LM_HEIGHT);
-    m_height->baseVal()->setValueAsString(KDOM::DOMString("100%").handle());
+    m_height->baseVal()->setValueAsString(KDOM::DOMString("100%").impl());
     return m_height;
   }
 
@@ -101,33 +100,21 @@ SVGAnimatedStringImpl* SVGFilterPrimitiveStandardAttributesImpl::result()
   return lazy_create<SVGAnimatedStringImpl>(m_result, this);
 }
 
-void SVGFilterPrimitiveStandardAttributesImpl::parseAttribute(
-    KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMStringImpl* value = attr->value();
-  switch (id) {
-    case ATTR_X: {
-      x()->baseVal()->setValueAsString(value);
-      break;
-    }
-    case ATTR_Y: {
-      y()->baseVal()->setValueAsString(value);
-      break;
-    }
-    case ATTR_WIDTH: {
-      width()->baseVal()->setValueAsString(value);
-      break;
-    }
-    case ATTR_HEIGHT: {
-      height()->baseVal()->setValueAsString(value);
-      break;
-    }
-    case ATTR_RESULT: {
-      result()->setBaseVal(value);
-      break;
-    }
-    default: { return SVGStyledElementImpl::parseAttribute(attr); }
-  };
+void SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
+  const KDOM::AtomicString& value = attr->value();
+  if (attr->name() == SVGNames::xAttr)
+    x()->baseVal()->setValueAsString(value.impl());
+  else if (attr->name() == SVGNames::yAttr)
+    y()->baseVal()->setValueAsString(value.impl());
+  else if (attr->name() == SVGNames::widthAttr)
+    width()->baseVal()->setValueAsString(value.impl());
+  else if (attr->name() == SVGNames::heightAttr)
+    height()->baseVal()->setValueAsString(value.impl());
+  else if (attr->name() == SVGNames::resultAttr)
+    result()->setBaseVal(value.impl());
+  else
+    return SVGStyledElementImpl::parseMappedAttribute(attr);
 }
 
 void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
@@ -135,7 +122,7 @@ void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
   if (!filterEffect)
     return;
   bool bbox = false;
-  if (parentNode() && parentNode()->id() == ID_FILTER)
+  if (parentNode() && parentNode()->hasTagName(SVGNames::filterTag))
     bbox = static_cast<SVGFilterElementImpl*>(parentNode())
                ->primitiveUnits()
                ->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
@@ -155,7 +142,7 @@ void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
     filterEffect->setSubRegion(
         QRect(int(_x), int(_y), int(_width), int(_height)));
 
-  filterEffect->setResult(KDOM::DOMString(result()->baseVal()).string());
+  filterEffect->setResult(KDOM::DOMString(result()->baseVal()).qstring());
 }
 
 // vim:ts=4:noet

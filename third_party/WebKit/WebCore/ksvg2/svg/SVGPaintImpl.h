@@ -49,7 +49,7 @@ class SVGPaintImpl : public SVGColorImpl {
                 KDOM::DOMStringImpl* rgbPaint,
                 KDOM::DOMStringImpl* iccPaint);
 
-  virtual KDOM::DOMStringImpl* cssText() const;
+  virtual KDOM::DOMString cssText() const;
 
  private:
   unsigned short m_paintType;

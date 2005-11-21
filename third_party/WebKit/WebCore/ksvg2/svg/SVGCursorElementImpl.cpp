@@ -24,10 +24,8 @@
 #include <kdom/core/AttrImpl.h>
 #include <kdebug.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
-#include "Namespace.h"
-#include "SVGDocumentImpl.h"
 #include "SVGCursorElementImpl.h"
 #include "SVGAnimatedLengthImpl.h"
 #include "SVGAnimatedStringImpl.h"
@@ -41,10 +39,9 @@ using namespace KSVG;
 using namespace khtmlImLoad;
 #endif
 
-SVGCursorElementImpl::SVGCursorElementImpl(KDOM::DocumentPtr* doc,
-                                           KDOM::NodeImpl::Id id,
-                                           KDOM::DOMStringImpl* prefix)
-    : SVGElementImpl(doc, id, prefix),
+SVGCursorElementImpl::SVGCursorElementImpl(const KDOM::QualifiedName& tagName,
+                                           KDOM::DocumentImpl* doc)
+    : SVGElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGExternalResourcesRequiredImpl(),
       SVGURIReferenceImpl(),
@@ -72,37 +69,29 @@ SVGAnimatedLengthImpl* SVGCursorElementImpl::y() const {
       LM_HEIGHT, viewportElement());
 }
 
-void SVGCursorElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
-  KDOM::DOMStringImpl* value = attr->value();
-  switch (id) {
-    case ATTR_X: {
-      x()->baseVal()->setValueAsString(value);
-      break;
-    }
-    case ATTR_Y: {
-      y()->baseVal()->setValueAsString(value);
-      break;
-    }
-    default: {
-      if (SVGTestsImpl::parseAttribute(attr))
-        return;
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
-      if (SVGURIReferenceImpl::parseAttribute(attr)) {
-        QString fname = KDOM::DOMString(href()->baseVal()).string();
-        KURL fullUrl(ownerDocument()->documentKURI(), fname);
-        // kdDebug() << "Loading : " << fullUrl << endl;
-        m_cachedImage = ownerDocument()->docLoader()->requestImage(fullUrl);
+void SVGCursorElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
+  const KDOM::AtomicString& value = attr->value();
+  if (attr->name() == SVGNames::xAttr)
+    x()->baseVal()->setValueAsString(value.impl());
+  else if (attr->name() == SVGNames::yAttr)
+    y()->baseVal()->setValueAsString(value.impl());
+  else {
+    if (SVGTestsImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGURIReferenceImpl::parseMappedAttribute(attr)) {
+      m_cachedImage =
+          ownerDocument()->docLoader()->requestImage(href()->baseVal());
 
-        if (m_cachedImage)
-          m_cachedImage->ref(this);
-        return;
-      }
-
-      SVGElementImpl::parseAttribute(attr);
+      if (m_cachedImage)
+        m_cachedImage->ref(this);
+      return;
     }
-  };
+
+    SVGElementImpl::parseMappedAttribute(attr);
+  }
 }
 
 void SVGCursorElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {

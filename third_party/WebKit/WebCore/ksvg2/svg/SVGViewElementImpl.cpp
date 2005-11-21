@@ -25,7 +25,7 @@
 #include <kdom/core/AttrImpl.h>
 #include <kdom/core/NamedAttrMapImpl.h>
 
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGStringListImpl.h"
 #include "SVGViewElementImpl.h"
@@ -34,10 +34,9 @@
 
 using namespace KSVG;
 
-SVGViewElementImpl::SVGViewElementImpl(KDOM::DocumentPtr* doc,
-                                       KDOM::NodeImpl::Id id,
-                                       KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGViewElementImpl::SVGViewElementImpl(const KDOM::QualifiedName& tagName,
+                                       KDOM::DocumentImpl* doc)
+    : SVGStyledElementImpl(tagName, doc),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl(),
       SVGZoomAndPanImpl() {
@@ -53,23 +52,16 @@ SVGStringListImpl* SVGViewElementImpl::viewTarget() const {
   return lazy_create<SVGStringListImpl>(m_viewTarget);
 }
 
-void SVGViewElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGViewElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_VIEWTARGET: {
-      viewTarget()->reset(value.string());
-      break;
-    }
-    default: {
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
-      if (SVGFitToViewBoxImpl::parseAttribute(attr))
-        return;
-      if (SVGZoomAndPanImpl::parseAttribute(attr))
-        return;
+  if (attr->name() == SVGNames::viewTargetAttr) {
+    viewTarget()->reset(value.qstring());
+  } else {
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr) ||
+        SVGFitToViewBoxImpl::parseMappedAttribute(attr) ||
+        SVGZoomAndPanImpl::parseMappedAttribute(attr))
+      return;
 
-      SVGStyledElementImpl::parseAttribute(attr);
-    }
-  };
+    SVGStyledElementImpl::parseMappedAttribute(attr);
+  }
 }

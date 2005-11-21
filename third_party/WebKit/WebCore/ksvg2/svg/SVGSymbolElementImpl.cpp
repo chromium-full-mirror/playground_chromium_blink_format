@@ -24,31 +24,30 @@
 #include <kdom/DOMString.h>
 
 #include "SVGHelper.h"
-#include "SVGDocumentImpl.h"
 #include "SVGSymbolElementImpl.h"
 #include "SVGFitToViewBoxImpl.h"
 
 using namespace KSVG;
 
-SVGSymbolElementImpl::SVGSymbolElementImpl(KDOM::DocumentPtr* doc,
-                                           KDOM::NodeImpl::Id id,
-                                           KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGSymbolElementImpl::SVGSymbolElementImpl(const KDOM::QualifiedName& tagName,
+                                           KDOM::DocumentImpl* doc)
+    : SVGStyledElementImpl(tagName, doc),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl() {}
 
 SVGSymbolElementImpl::~SVGSymbolElementImpl() {}
 
-void SVGSymbolElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  if (SVGLangSpaceImpl::parseAttribute(attr))
+void SVGSymbolElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
+  if (SVGLangSpaceImpl::parseMappedAttribute(attr))
     return;
-  if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
+  if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
     return;
-  if (SVGFitToViewBoxImpl::parseAttribute(attr))
+  if (SVGFitToViewBoxImpl::parseMappedAttribute(attr))
     return;
 
-  SVGStyledElementImpl::parseAttribute(attr);
+  SVGStyledElementImpl::parseMappedAttribute(attr);
 }
 
 // vim:ts=4:noet

@@ -25,27 +25,24 @@
 
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasPath.h>
-#include <kcanvas/KCanvasRegistry.h>
 #include <kcanvas/device/KRenderingDevice.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGRenderStyle.h"
-#include "SVGDocumentImpl.h"
 #include "SVGClipPathElementImpl.h"
 #include "SVGAnimatedEnumerationImpl.h"
 
 using namespace KSVG;
 
-SVGClipPathElementImpl::SVGClipPathElementImpl(KDOM::DocumentPtr* doc,
-                                               KDOM::NodeImpl::Id id,
-                                               KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGClipPathElementImpl::SVGClipPathElementImpl(
+    const KDOM::QualifiedName& tagName,
+    KDOM::DocumentImpl* doc)
+    : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl(),
-      SVGTransformableImpl() {
+      SVGExternalResourcesRequiredImpl() {
   m_clipPathUnits = 0;
   m_clipper = 0;
 }
@@ -64,57 +61,47 @@ SVGAnimatedEnumerationImpl* SVGClipPathElementImpl::clipPathUnits() const {
   return m_clipPathUnits;
 }
 
-void SVGClipPathElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+void SVGClipPathElementImpl::parseMappedAttribute(
+    KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_CLIPPATHUNITS: {
-      if (value == "userSpaceOnUse")
-        clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
-      else if (value == "objectBoundingBox")
-        clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
-      break;
-    }
-    default: {
-      if (SVGTestsImpl::parseAttribute(attr))
-        return;
-      if (SVGLangSpaceImpl::parseAttribute(attr))
-        return;
-      if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
-        return;
-      if (SVGTransformableImpl::parseAttribute(attr))
-        return;
-
-      SVGStyledElementImpl::parseAttribute(attr);
-    }
-  };
+  if (attr->name() == SVGNames::clipPathUnitsAttr) {
+    if (value == "userSpaceOnUse")
+      clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
+    else if (value == "objectBoundingBox")
+      clipPathUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
+  } else {
+    if (SVGTestsImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGLangSpaceImpl::parseMappedAttribute(attr))
+      return;
+    if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
+      return;
+    SVGStyledTransformableElementImpl::parseMappedAttribute(attr);
+  }
 }
 
-void SVGClipPathElementImpl::close() {
-  if (!m_clipper) {
-    SVGDocumentImpl* doc = static_cast<SVGDocumentImpl*>(ownerDocument());
-    KCanvas* canvas = (doc ? doc->canvas() : 0);
-    if (!canvas)
-      return;
-
+KCanvasClipper* SVGClipPathElementImpl::canvasResource() {
+  if (!canvas())
+    return 0;
+  if (!m_clipper)
     m_clipper = static_cast<KCanvasClipper*>(
-        canvas->renderingDevice()->createResource(RS_CLIPPER));
-    canvas->registry()->addResourceById(KDOM::DOMString(getId()).string(),
-                                        m_clipper);
-  } else
+        canvas()->renderingDevice()->createResource(RS_CLIPPER));
+  else
     m_clipper->resetClipData();
 
   bool bbox = clipPathUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
   for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
-    SVGStyledElementImpl* e = dynamic_cast<SVGStyledElementImpl*>(n);
-    if (e) {
-      SVGRenderStyle* renderStyle =
-          static_cast<SVGRenderStyle*>(e->renderStyle());
-      m_clipper->addClipData(e->toPathData(),
-                             (KCWindRule)renderStyle->clipRule(), bbox);
+    SVGElementImpl* e = svg_dynamic_cast(n);
+    if (e && e->isStyled()) {
+      SVGStyledElementImpl* styled = static_cast<SVGStyledElementImpl*>(e);
+      SVGRenderStyle* style =
+          getDocument()->styleSelector()->styleForElement(this)->svgStyle();
+      m_clipper->addClipData(styled->toPathData(),
+                             (KCWindRule)style->clipRule(), bbox);
     }
   }
+  return m_clipper;
 }
 
 // vim:ts=4:noet

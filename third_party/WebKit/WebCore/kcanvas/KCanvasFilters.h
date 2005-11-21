@@ -74,7 +74,7 @@ class KCanvasFilter : public KCanvasResource {
   virtual void prepareFilter(KRenderingDeviceContext* context,
                              const QRect& bbox) = 0;
   virtual void applyFilter(KRenderingDeviceContext* context,
-                           const KCanvasCommonArgs& args,
+                           KCanvasMatrix objectMatrix,
                            const QRect& bbox) = 0;
 
   QTextStream& externalRepresentation(QTextStream&) const;
@@ -85,6 +85,9 @@ class KCanvasFilter : public KCanvasResource {
   bool m_filterBBoxMode;
   bool m_effectBBoxMode;
 };
+
+KCanvasFilter* getFilterById(KDOM::DocumentImpl* document,
+                             const KDOM::DOMString& id);
 
 #ifdef APPLE_CHANGES
 // FIXME: this strikes me as a total hack...
@@ -409,13 +412,13 @@ class KCanvasFEImage : public KCanvasFilterEffect {
   KCanvasFEImage() : m_image(0) {}
   virtual ~KCanvasFEImage();
 
-  KCanvasItem* image() const { return m_image; }
-  void setImage(KCanvasItem* image) { m_image = image; }
+  RenderPath* image() const { return m_image; }
+  void setImage(RenderPath* image) { m_image = image; }
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
  private:
-  KCanvasItem* m_image;
+  RenderPath* m_image;
 };
 
 class KCanvasFEMerge : public KCanvasFilterEffect {

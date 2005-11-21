@@ -26,14 +26,13 @@
 #include <kdebug.h>
 
 #include <kcanvas/KCanvas.h>
-#include <kcanvas/KCanvasItem.h>
-#include <kcanvas/device/KRenderingStyle.h>
+#include <kcanvas/RenderPath.h>
+#include "KCanvasRenderingStyle.h"
 
 #include "ksvg.h"
 #include "svgpathparser.h"
 #include "SVGLengthImpl.h"
 #include "SVGElementImpl.h"
-#include "SVGDocumentImpl.h"
 #include "SVGSVGElementImpl.h"
 #include "SVGAnimatedRectImpl.h"
 #include "SVGAnimatedLengthImpl.h"
@@ -89,7 +88,7 @@ float SVGLengthImpl::value() const {
   // gradient vector, the pattern tile, the filter region or the masking
   // region, a percentage represents the same value as the corresponding
   // decimal value (e.g., 50% means the same as 0.5).
-  KCanvasItem* item = (m_context ? m_context->canvasItem() : 0);
+  khtml::RenderObject* item = (m_context ? m_context->renderer() : 0);
   if (item) {
     QRect bbox = item->bbox();
 
@@ -118,11 +117,12 @@ float SVGLengthImpl::valueInSpecifiedUnits() const {
   return m_valueInSpecifiedUnits;
 }
 
-void SVGLengthImpl::setValueAsString(KDOM::DOMStringImpl* valueAsString) {
-  if (!valueAsString || valueAsString->isEmpty())
+void SVGLengthImpl::setValueAsString(KDOM::DOMStringImpl* valueAsStringImpl) {
+  KDOM::DOMString valueAsString(valueAsStringImpl);
+  if (valueAsString.isEmpty())
     return;
 
-  QString valueAsQString = valueAsString->string();
+  QString valueAsQString = valueAsString.qstring();
 
   double convertedNumber = 0;
   const char* start = valueAsQString.latin1();
@@ -217,7 +217,7 @@ void SVGLengthImpl::updateValue() {
     case SVG_LENGTHTYPE_EXS:
       if (m_context) {
         /* FIXME: EMS/EXS handling
-        KRenderingStyle *style = context->style();
+        KCanvasRenderingStyle *style = context->style();
         KCFontProperties *fontProperites = style->fontProperties();
 
         bool sizeLocal = (style->getFontSize() != -1);
@@ -225,7 +225,7 @@ void SVGLengthImpl::updateValue() {
     style->getFontFamily()->getFirst());
 
         SVGStylableImpl *parentStyle = 0;
-        if((!sizeLocal || !familyLocal) && context)
+        if((!sizeLocal || !familyLocal) && context) {
             parentStyle = dynamic_cast<SVGStylableImpl
     *>(context->ownerDoc()->getElementFromHandle(context->parentNode().handle()));
 
@@ -241,10 +241,10 @@ void SVGLengthImpl::updateValue() {
             useSize = parentStyle->getFontSize();
 
         if(familyLocal)
-            useFont = style->getFontFamily()->getFirst()->string();
+            useFont = style->getFontFamily()->getFirst()->qstring();
         else if(parentStyle && parentStyle->getFontFamily() &&
     parentStyle->getFontFamily()->getFirst())
-            useFont = parentStyle->getFontFamily()->getFirst()->string();
+            useFont = parentStyle->getFontFamily()->getFirst()->qstring();
 
         if(unitType == SVG_LENGTHTYPE_EMS)
             value = valueInSpecifiedUnits * useSize;

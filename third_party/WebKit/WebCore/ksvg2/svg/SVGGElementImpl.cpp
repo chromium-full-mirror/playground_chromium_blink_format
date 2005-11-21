@@ -22,7 +22,6 @@
 
 #include "config.h"
 #include "SVGGElementImpl.h"
-#include "SVGTransformableImpl.h"
 
 #include <kcanvas/KCanvasCreator.h>
 #include <kcanvas/KCanvasContainer.h>
@@ -30,51 +29,46 @@
 
 using namespace KSVG;
 
-SVGGElementImpl::SVGGElementImpl(KDOM::DocumentPtr* doc,
-                                 KDOM::NodeImpl::Id id,
-                                 KDOM::DOMStringImpl* prefix)
-    : SVGStyledElementImpl(doc, id, prefix),
+SVGGElementImpl::SVGGElementImpl(const KDOM::QualifiedName& tagName,
+                                 KDOM::DocumentImpl* doc)
+    : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl(),
-      SVGTransformableImpl() {}
+      SVGExternalResourcesRequiredImpl() {}
 
 SVGGElementImpl::~SVGGElementImpl() {}
 
-void SVGGElementImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  if (SVGTestsImpl::parseAttribute(attr))
+void SVGGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
+  if (SVGTestsImpl::parseMappedAttribute(attr))
     return;
-  if (SVGLangSpaceImpl::parseAttribute(attr))
+  if (SVGLangSpaceImpl::parseMappedAttribute(attr))
     return;
-  if (SVGExternalResourcesRequiredImpl::parseAttribute(attr))
+  if (SVGExternalResourcesRequiredImpl::parseMappedAttribute(attr))
     return;
-  if (SVGTransformableImpl::parseAttribute(attr))
-    return;
-
-  SVGStyledElementImpl::parseAttribute(attr);
+  SVGStyledTransformableElementImpl::parseMappedAttribute(attr);
 }
 
 void SVGGElementImpl::setChanged(bool b, bool) {
   // FIXME: this is waaay to slow & wrong!
-  KDOM::NodeImpl::setChanged(b, true);
+  // KDOM::NodeImpl::setChanged(b, true);
   // KDOM::NodeImpl::setChanged(b, false);
 }
 
-KCanvasItem* SVGGElementImpl::createCanvasItem(KCanvas* canvas,
-                                               KRenderingStyle* style) const {
-  return KCanvasCreator::self()->createContainer(canvas, style);
+khtml::RenderObject* SVGGElementImpl::createRenderer(
+    RenderArena* arena,
+    khtml::RenderStyle* style) {
+  return canvas()->renderingDevice()->createContainer(arena, style, this);
 }
 
 // Helper class for <use> support
-SVGDummyElementImpl::SVGDummyElementImpl(KDOM::DocumentPtr* doc,
-                                         KDOM::NodeImpl::Id,
-                                         KDOM::DOMStringImpl* prefix)
-    : SVGGElementImpl(doc, 0, prefix) {}
+SVGDummyElementImpl::SVGDummyElementImpl(const KDOM::QualifiedName& tagName,
+                                         KDOM::DocumentImpl* doc)
+    : SVGGElementImpl(tagName, doc), m_localName("dummy") {}
 
 SVGDummyElementImpl::~SVGDummyElementImpl() {}
 
-KDOM::DOMStringImpl* SVGDummyElementImpl::localName() const {
-  return new KDOM::DOMStringImpl("dummy");
+const KDOM::AtomicString& SVGDummyElementImpl::localName() const {
+  return m_localName;
 }
 
 // vim:ts=4:noet

@@ -24,7 +24,7 @@
 #include <kdom/core/AttrImpl.h>
 
 #include "ksvg.h"
-#include "svgattrs.h"
+#include "SVGNames.h"
 #include "SVGHelper.h"
 #include "SVGZoomAndPanImpl.h"
 
@@ -44,17 +44,14 @@ void SVGZoomAndPanImpl::setZoomAndPan(unsigned short zoomAndPan) {
   m_zoomAndPan = zoomAndPan;
 }
 
-bool SVGZoomAndPanImpl::parseAttribute(KDOM::AttributeImpl* attr) {
-  int id = (attr->id() & NodeImpl_IdLocalMask);
+bool SVGZoomAndPanImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
   KDOM::DOMString value(attr->value());
-  switch (id) {
-    case ATTR_ZOOMANDPAN: {
-      if (value == "disable")
-        setZoomAndPan(SVG_ZOOMANDPAN_DISABLE);
-      else if (value == "magnify")
-        setZoomAndPan(SVG_ZOOMANDPAN_MAGNIFY);
-      return true;
-    }
+  if (attr->name() == SVGNames::zoomAndPanAttr) {
+    if (value == "disable")
+      setZoomAndPan(SVG_ZOOMANDPAN_DISABLE);
+    else if (value == "magnify")
+      setZoomAndPan(SVG_ZOOMANDPAN_MAGNIFY);
+    return true;
   }
 
   return false;

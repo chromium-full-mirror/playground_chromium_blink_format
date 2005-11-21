@@ -28,7 +28,7 @@
 #include "SVGStyledElementImpl.h"
 #include "SVGExternalResourcesRequiredImpl.h"
 
-class KCanvasFilter;
+#include "KCanvasFilters.h"
 
 namespace KSVG {
 class SVGAnimatedEnumerationImpl;
@@ -40,13 +40,11 @@ class SVGFilterElementImpl : public SVGStyledElementImpl,
                              public SVGLangSpaceImpl,
                              public SVGExternalResourcesRequiredImpl {
  public:
-  SVGFilterElementImpl(KDOM::DocumentPtr* doc,
-                       KDOM::NodeImpl::Id id,
-                       KDOM::DOMStringImpl* prefix);
+  SVGFilterElementImpl(const KDOM::QualifiedName& tagName,
+                       KDOM::DocumentImpl* doc);
   virtual ~SVGFilterElementImpl();
 
-  // Derived from: 'ElementImpl'
-  virtual void close();
+  virtual KCanvasFilter* canvasResource();
 
   // 'SVGFilterElement' functions
   SVGAnimatedEnumerationImpl* filterUnits() const;
@@ -63,7 +61,7 @@ class SVGFilterElementImpl : public SVGStyledElementImpl,
 
   void setFilterRes(unsigned long filterResX, unsigned long filterResY) const;
 
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
   mutable SVGAnimatedEnumerationImpl* m_filterUnits;

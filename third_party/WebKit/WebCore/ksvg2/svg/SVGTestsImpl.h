@@ -25,7 +25,7 @@
 
 namespace KDOM {
 class DOMStringImpl;
-class AttributeImpl;
+class MappedAttributeImpl;
 };
 
 namespace KSVG {
@@ -45,7 +45,7 @@ class SVGTestsImpl {
 
   bool isValid();
 
-  bool parseAttribute(KDOM::AttributeImpl* attr);
+  bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
   mutable SVGStringListImpl* m_features;

@@ -52,7 +52,7 @@ class SVGColorImpl : public KDOM::CSSValueImpl {
                 KDOM::DOMStringImpl* rgbColor,
                 KDOM::DOMStringImpl* iccColor);
 
-  virtual KDOM::DOMStringImpl* cssText() const;
+  virtual KDOM::DOMString cssText() const;
 
   // Helpers
   const QColor& color() const;

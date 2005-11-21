@@ -31,9 +31,8 @@ class SVGAnimatedNumberListImpl;
 
 class SVGTextPositioningElementImpl : public SVGTextContentElementImpl {
  public:
-  SVGTextPositioningElementImpl(KDOM::DocumentPtr* doc,
-                                KDOM::NodeImpl::Id id,
-                                KDOM::DOMStringImpl* prefix);
+  SVGTextPositioningElementImpl(const KDOM::QualifiedName& tagName,
+                                KDOM::DocumentImpl* doc);
   virtual ~SVGTextPositioningElementImpl();
 
   // 'SVGTextPositioningElement' functions
@@ -43,7 +42,7 @@ class SVGTextPositioningElementImpl : public SVGTextContentElementImpl {
   SVGAnimatedLengthListImpl* dy() const;
   SVGAnimatedNumberListImpl* rotate() const;
 
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
   mutable SVGAnimatedLengthListImpl* m_x;

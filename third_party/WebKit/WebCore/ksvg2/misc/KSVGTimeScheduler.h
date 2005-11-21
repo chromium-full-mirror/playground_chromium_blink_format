@@ -30,6 +30,10 @@
 
 #include "SVGAnimationElementImpl.h"
 
+namespace KDOM {
+class DocumentImpl;
+}
+
 namespace KSVG {
 typedef struct {
   bool enabled : 1;
@@ -76,11 +80,10 @@ class SVGTimer {
 
 typedef Q3ValueList<SVGTimer*> SVGTimerList;
 
-class SVGDocumentImpl;
 class TimeScheduler : public QObject {
   Q_OBJECT
  public:
-  TimeScheduler(SVGDocumentImpl* doc);
+  TimeScheduler(KDOM::DocumentImpl* doc);
   ~TimeScheduler();
 
   // Adds singleShot Timers
@@ -104,7 +107,7 @@ class TimeScheduler : public QObject {
 
  private:  // Helper
   friend class SVGTimer;
-  SVGDocumentImpl* document() const { return m_document; }
+  KDOM::DocumentImpl* document() const { return m_document; }
 
  private:
   int m_savedTime;
@@ -113,7 +116,7 @@ class TimeScheduler : public QObject {
   SVGTimerList m_timerList;
 
   SVGTimer* m_intervalTimer;
-  SVGDocumentImpl* m_document;
+  KDOM::DocumentImpl* m_document;
 };
 };
 

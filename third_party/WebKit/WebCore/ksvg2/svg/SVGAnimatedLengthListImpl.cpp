@@ -36,13 +36,14 @@ SVGLengthListImpl* SVGAnimatedLengthListImpl::create() const {
   return new SVGLengthListImpl(m_context);
 }
 
-void SVGAnimatedLengthListImpl::assign(SVGLengthListImpl* src,
-                                       SVGLengthListImpl* dst) const {
-  if (!src || !dst)
-    return;
-
-  // Use SVGList<SVGLengthImpl>::operator=
-  *dst = *src;
-}
+// void SVGAnimatedLengthListImpl::assign(SVGLengthListImpl *src,
+// SVGLengthListImpl *dst) const
+//{
+//    if(!src || !dst)
+//        return;
+//
+//    // Use SVGList<SVGLengthImpl>::operator=
+//    *dst = *src;
+//}
 
 // vim:ts=4:noet

@@ -42,7 +42,7 @@ class SVGStylableImpl {
   // 'SVGStylable' functions
   virtual SVGAnimatedStringImpl* className() const = 0;
 
-  virtual KDOM::CSSStyleDeclarationImpl* style() = 0;
+  virtual DOM::CSSStyleDeclarationImpl* style() = 0;
   virtual KDOM::CSSValueImpl* getPresentationAttribute(
       KDOM::DOMStringImpl* name) = 0;
 };

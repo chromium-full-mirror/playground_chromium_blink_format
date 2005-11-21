@@ -32,9 +32,8 @@ class SVGScriptElementImpl : public SVGElementImpl,
                              public SVGURIReferenceImpl,
                              public SVGExternalResourcesRequiredImpl {
  public:
-  SVGScriptElementImpl(KDOM::DocumentPtr* doc,
-                       KDOM::NodeImpl::Id id,
-                       KDOM::DOMStringImpl* prefix);
+  SVGScriptElementImpl(const KDOM::QualifiedName& tagName,
+                       KDOM::DocumentImpl* doc);
   virtual ~SVGScriptElementImpl();
 
   // 'SVGScriptElement' functions
@@ -42,7 +41,7 @@ class SVGScriptElementImpl : public SVGElementImpl,
   void setType(KDOM::DOMStringImpl* type);
 
   // Internal
-  virtual void parseAttribute(KDOM::AttributeImpl* attr);
+  virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
   static void executeScript(KDOM::DocumentImpl* document,
                             KDOM::DOMStringImpl* jsCode);

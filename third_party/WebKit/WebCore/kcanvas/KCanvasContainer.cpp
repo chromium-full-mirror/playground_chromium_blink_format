@@ -21,32 +21,25 @@
 */
 
 #include "config.h"
-#include "KCanvas.h"
-#include "KRenderingStyle.h"
+#include "KCanvasRenderingStyle.h"
 #include "KRenderingDevice.h"
 #include "KCanvasContainer.h"
+#include "SVGStyledElementImpl.h"
 
 class KCanvasContainer::Private {
  public:
-  Private() : drawContents(true), first(0), last(0) {}
+  Private() : drawContents(true), slice(false) {}
   ~Private() {}
 
   bool drawContents : 1;
-
-  KCanvasItem* first;
-  KCanvasItem* last;
+  bool slice : 1;
+  QMatrix matrix;
 };
 
-KCanvasContainer::KCanvasContainer(KCanvas* canvas, KRenderingStyle* style)
-    : KCanvasItem(canvas, style, 0), d(new Private()) {}
+KCanvasContainer::KCanvasContainer(KSVG::SVGStyledElementImpl* node)
+    : khtml::RenderContainer(node), d(new Private()) {}
 
 KCanvasContainer::~KCanvasContainer() {
-  KCanvasItem* next;
-  for (KCanvasItem* n = d->first; n; n = next) {
-    next = n->next();
-    delete n;
-  }
-
   delete d;
 }
 
@@ -54,107 +47,19 @@ void KCanvasContainer::setDrawContents(bool drawContents) {
   d->drawContents = drawContents;
 }
 
-bool KCanvasContainer::needsTemporaryBuffer() const {
-  bool conditionOne = (style()->opacity() < 1.0f);
-  bool conditionTwo = (style()->clipPaths().count() > 0);
-
-  return conditionOne || conditionTwo;
+QMatrix KCanvasContainer::localTransform() const {
+  return d->matrix;
 }
 
-void KCanvasContainer::appendItem(KCanvasItem* item) {
-  Q_ASSERT(item);
-
-  KCanvasItem* prev = item->prev();
-  KCanvasItem* next = item->next();
-
-  if (prev)
-    prev->setNext(next);
-
-  if (next)
-    next->setPrev(prev);
-
-  item->setPrev(d->last);
-
-  if (d->last)
-    d->last->setNext(item);
-
-  d->last = item;
-
-  if (!d->first)
-    d->first = item;
-
-  item->setParent(this);
-}
-
-void KCanvasContainer::insertItemBefore(KCanvasItem* item,
-                                        KCanvasItem* reference) {
-  Q_ASSERT(item);
-
-  if (!reference)
-    appendItem(item);
-  else  // We need to correct the existing tree structure...
-  {
-    KCanvasItem* current = d->first;
-    for (; current != 0; current = current->next()) {
-      if (current == reference) {
-        KCanvasItem* itemPrev = item->prev();
-        KCanvasItem* itemNext = item->next();
-        KCanvasItem* currentPrev = current->prev();
-
-        if (itemPrev)
-          itemPrev->setNext(itemNext);
-
-        if (itemNext)
-          itemNext->setPrev(itemPrev);
-
-        if (currentPrev)
-          currentPrev->setNext(item);
-
-        item->setPrev(currentPrev);
-        item->setNext(current);
-
-        current->setPrev(item);
-
-        if (current == d->first)
-          d->first = item;
-
-        return;
-      }
-    }
-  }
-}
-
-void KCanvasContainer::removeItem(const KCanvasItem* item) {
-  Q_ASSERT(item);
-
-  KCanvasItem* current = d->first;
-  for (; current != 0; current = current->next()) {
-    if (current == item) {
-      KCanvasItem* currentPrev = current->prev();
-      KCanvasItem* currentNext = current->next();
-
-      if (currentPrev)
-        currentPrev->setNext(currentNext);
-
-      if (currentNext)
-        currentNext->setPrev(currentPrev);
-
-      if (current == d->first)
-        d->first = currentNext;
-
-      if (current == d->last)
-        d->last = currentPrev;
-
-      delete current;
-      return;
-    }
-  }
+void KCanvasContainer::setLocalTransform(const QMatrix& matrix) {
+  d->matrix = matrix;
 }
 
 bool KCanvasContainer::fillContains(const QPoint& p) const {
-  KCanvasItem* current = d->first;
-  for (; current != 0; current = current->next()) {
-    if (current->fillContains(p))
+  khtml::RenderObject* current = firstChild();
+  for (; current != 0; current = current->nextSibling()) {
+    if (current->isRenderPath() &&
+        static_cast<RenderPath*>(current)->fillContains(p))
       return true;
   }
 
@@ -162,116 +67,83 @@ bool KCanvasContainer::fillContains(const QPoint& p) const {
 }
 
 bool KCanvasContainer::strokeContains(const QPoint& p) const {
-  KCanvasItem* current = d->first;
-  for (; current != 0; current = current->next()) {
-    if (current->strokeContains(p))
+  khtml::RenderObject* current = firstChild();
+  for (; current != 0; current = current->nextSibling()) {
+    if (current->isRenderPath() &&
+        static_cast<RenderPath*>(current)->strokeContains(p))
       return true;
   }
 
   return false;
 }
 
-void KCanvasContainer::draw(const QRect& rect) const {
-  if (!d->drawContents)
-    return;
-
-  KCanvasItem* current = d->first;
-  for (; current != 0; current = current->next()) {
-    if (current->isVisible())
-      current->draw(rect);
-  }
-}
-
-void KCanvasContainer::invalidate() const {
-  KCanvasItem* current = d->first;
-  for (; current != 0; current = current->next())
-    current->invalidate();
-}
-
 QRect KCanvasContainer::bbox(bool includeStroke) const {
-  QRect rect;
+  QRect rect(0, 0, 0, 0);
 
-  KCanvasItem* current = d->first;
-  if (current) {
-    rect = current->bbox(includeStroke);
-    current = current->next();
-
-    for (; current != 0; current = current->next())
-      rect = rect.unite(current->bbox(includeStroke));
-  }
+  khtml::RenderObject* current = firstChild();
+  for (; current != 0; current = current->nextSibling())
+    rect = rect.unite(current->bbox(includeStroke));
 
   return rect;
 }
 
-bool KCanvasContainer::raiseItem(KCanvasItem* item) {
-  KCanvasItem* itemPrev = item->prev();
-  KCanvasItem* itemNext = item->next();
-
-  if (!itemNext)
-    return false;
-
-  itemNext->setPrev(itemPrev);
-  if (itemPrev)
-    itemPrev->setNext(itemNext);
-
-  item->setNext(itemNext->next());
-  itemNext->setNext(item);
-
-  return true;
+void KCanvasContainer::setSlice(bool slice) {
+  d->slice = slice;
 }
 
-bool KCanvasContainer::lowerItem(KCanvasItem* item) {
-  KCanvasItem* itemPrev = item->prev();
-  KCanvasItem* itemNext = item->next();
-
-  if (!itemPrev)
-    return false;
-
-  itemPrev->setNext(itemNext);
-  if (itemNext)
-    itemNext->setPrev(itemPrev);
-
-  item->setPrev(itemPrev);
-  itemPrev->setPrev(item);
-
-  item->setNext(itemPrev);
-
-  if (d->last == item)
-    d->last = itemPrev;
-
-  if (d->first == itemPrev)
-    d->first = item;
-
-  return true;
+bool KCanvasContainer::slice() const {
+  return d->slice;
 }
 
-void KCanvasContainer::collisions(const QPoint& p,
-                                  KCanvasItemList& hits) const {
-  if (p.x() < 0 || p.y() < 0)
-    return;
+KCanvasMatrix KCanvasContainer::getAspectRatio(const QRect logical,
+                                               const QRect physical) const {
+  KCanvasMatrix temp;
 
-  KCanvasItem* current = d->last;
-  for (; current != 0; current = current->prev()) {
-    if (current->isContainer())
-      static_cast<const KCanvasContainer*>(current)->collisions(p, hits);
-    else {
-      QRect fillRect(current->bbox(false));
-      QRect strokeRect(current->bbox(true));
+  float logicX = logical.x();
+  float logicY = logical.y();
+  float logicWidth = logical.width();
+  float logicHeight = logical.height();
+  float physWidth = physical.width();
+  float physHeight = physical.height();
 
-      // Test bounding boxes firsts for speed
-      if ((fillRect.contains(p) && current->fillContains(p)) ||
-          (strokeRect.contains(p) && current->strokeContains(p)))
-        hits.append(current);
-    }
+  float vpar = logicWidth / logicHeight;
+  float svgar = physWidth / physHeight;
+
+  if (align() == ALIGN_NONE) {
+    temp.scale(physWidth / logicWidth, physHeight / logicHeight);
+    temp.translate(-logicX, -logicY);
+  } else if ((vpar < svgar && !slice()) || (vpar >= svgar && slice())) {
+    temp.scale(physHeight / logicHeight, physHeight / logicHeight);
+
+    if (align() == ALIGN_XMINYMIN || align() == ALIGN_XMINYMID ||
+        align() == ALIGN_XMINYMAX)
+      temp.translate(-logicX, -logicY);
+    else if (align() == ALIGN_XMIDYMIN || align() == ALIGN_XMIDYMID ||
+             align() == ALIGN_XMIDYMAX)
+      temp.translate(
+          -logicX - (logicWidth - physWidth * logicHeight / physHeight) / 2,
+          -logicY);
+    else
+      temp.translate(
+          -logicX - (logicWidth - physWidth * logicHeight / physHeight),
+          -logicY);
+  } else {
+    temp.scale(physWidth / logicWidth, physWidth / logicWidth);
+
+    if (align() == ALIGN_XMINYMIN || align() == ALIGN_XMIDYMIN ||
+        align() == ALIGN_XMAXYMIN)
+      temp.translate(-logicX, -logicY);
+    else if (align() == ALIGN_XMINYMID || align() == ALIGN_XMIDYMID ||
+             align() == ALIGN_XMAXYMID)
+      temp.translate(
+          -logicX,
+          -logicY - (logicHeight - physHeight * logicWidth / physWidth) / 2);
+    else
+      temp.translate(-logicX, -logicY - (logicHeight -
+                                         physHeight * logicWidth / physWidth));
   }
-}
 
-KCanvasItem* KCanvasContainer::first() const {
-  return d->first;
-}
-
-KCanvasItem* KCanvasContainer::last() const {
-  return d->last;
+  return temp;
 }
 
 // vim:ts=4:noet
