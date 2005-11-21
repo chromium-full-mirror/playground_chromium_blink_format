@@ -94,7 +94,12 @@ using XBL::XBLBindingManager;
 #include "KWQLogging.h"
 
 #if SVG_SUPPORT
-#include "dom_kdomdocumentwrapper.h"
+#include "SVGNames.h"
+#include "SVGElementFactory.h"
+#include "SVGElementImpl.h"
+#include "SVGZoomEventImpl.h"
+#include "SVGStyleElementImpl.h"
+#include "kcanvas/device/quartz/KRenderingDeviceQuartz.h"
 #endif
 
 using namespace DOM;
@@ -216,7 +221,7 @@ DOMImplementationImpl::DOMImplementationImpl() {}
 DOMImplementationImpl::~DOMImplementationImpl() {}
 
 bool DOMImplementationImpl::hasFeature(const DOMString& feature,
-                                       const DOMString& version) {
+                                       const DOMString& version) const {
   QString lower = feature.qstring().lower();
   if (lower == "core" || lower == "html" || lower == "xml" || lower == "xhtml")
     return version.isEmpty() || version == "1.0" || version == "2.0";
@@ -309,7 +314,8 @@ DocumentImpl* DOMImplementationImpl::createDocument(
   // WRONG_DOCUMENT_ERR: Raised if doctype has already been used with a
   // different document or was
   // created from a different implementation.
-  if (doctype && (doctype->getDocument() || doctype->impl() != this)) {
+  if (doctype &&
+      (doctype->getDocument() || doctype->implementation() != this)) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
     return 0;
   }
@@ -348,12 +354,6 @@ HTMLDocumentImpl* DOMImplementationImpl::createHTMLDocument(KHTMLView* v) {
   return new HTMLDocumentImpl(this, v);
 }
 
-#if SVG_SUPPORT
-DocumentImpl* DOMImplementationImpl::createKDOMDocument(KHTMLView* v) {
-  return new KDOMDocumentWrapperImpl(this, v);
-}
-#endif
-
 DOMImplementationImpl* DOMImplementationImpl::instance() {
   if (!m_instance) {
     m_instance = new DOMImplementationImpl();
@@ -361,6 +361,18 @@ DOMImplementationImpl* DOMImplementationImpl::instance() {
   }
 
   return m_instance;
+}
+
+bool DOMImplementationImpl::isXMLMIMEType(const DOMString& mimeType) {
+  if (mimeType == "text/xml" || mimeType == "application/xml" ||
+      mimeType == "application/xhtml+xml" || mimeType == "text/xsl" ||
+      mimeType == "application/rss+xml" || mimeType == "application/atom+xml"
+#if SVG_SUPPORT
+      || mimeType == "image/svg+xml"
+#endif
+      )
+    return true;
+  return false;
 }
 
 HTMLDocumentImpl* DOMImplementationImpl::createHTMLDocument(
@@ -590,7 +602,7 @@ DocumentTypeImpl* DocumentImpl::doctype() const {
   return m_docType.get();
 }
 
-DOMImplementationImpl* DocumentImpl::impl() const {
+DOMImplementationImpl* DocumentImpl::implementation() const {
   return m_implementation;
 }
 
@@ -747,24 +759,34 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
   }
 
   ElementImpl* e = 0;
+  QualifiedName qName =
+      QualifiedName(AtomicString(prefix), AtomicString(localName),
+                    AtomicString(_namespaceURI));
 
   // FIXME: Use registered namespaces and look up in a hash to find the right
   // factory.
   if (_namespaceURI == xhtmlNamespaceURI) {
-    e = HTMLElementFactory::createHTMLElement(AtomicString(localName), this, 0,
+    e = HTMLElementFactory::createHTMLElement(qName.localName(), this, 0,
                                               false);
     if (e && !prefix.isNull()) {
-      e->setPrefix(AtomicString(prefix), exceptioncode);
+      e->setPrefix(qName.prefix(), exceptioncode);
       if (exceptioncode)
         return 0;
     }
   }
+#ifdef SVG_SUPPORT
+  else if (_namespaceURI == KSVG::SVGNames::svgNamespaceURI) {
+    e = KSVG::SVGElementFactory::createSVGElement(qName, this, false);
+    if (e && !prefix.isNull()) {
+      e->setPrefix(qName.prefix(), exceptioncode);
+      if (exceptioncode)
+        return 0;
+    }
+  }
+#endif
 
   if (!e)
-    e = new ElementImpl(
-        QualifiedName(AtomicString(prefix), AtomicString(localName),
-                      AtomicString(_namespaceURI)),
-        getDocument());
+    e = new ElementImpl(qName, getDocument());
 
   return e;
 }
@@ -2109,6 +2131,32 @@ void DocumentImpl::recalcStyleSelector() {
           sheet = 0;
       }
     }
+#if SVG_SUPPORT
+    else if (n->isSVGElement() && n->hasTagName(KSVG::SVGNames::styleTag)) {
+      QString title;
+      // <STYLE> element
+      KSVG::SVGStyleElementImpl* s = static_cast<KSVG::SVGStyleElementImpl*>(n);
+      if (!s->isLoading()) {
+        sheet = s->sheet();
+        if (sheet)
+          title = DOM::DOMString(s->getAttribute(KSVG::SVGNames::titleAttr))
+                      .qstring();
+      }
+
+      if (!title.isEmpty() && m_preferredStylesheetSet.isEmpty())
+        m_preferredStylesheetSet = view()->part()->d->m_sheetUsed = title;
+
+      if (!title.isEmpty()) {
+        if (title != m_preferredStylesheetSet)
+          sheet = 0;  // don't use it
+
+        title = title.replace('&', QString::fromLatin1("&&"));
+
+        if (!m_availableSheets.contains(title))
+          m_availableSheets.append(title);
+      }
+    }
+#endif
 
     if (sheet) {
       sheet->ref();
@@ -2346,6 +2394,12 @@ EventImpl* DocumentImpl::createEvent(const DOMString& eventType,
   else if (eventType == "HTMLEvents" || eventType == "Event" ||
            eventType == "Events")
     return new EventImpl();
+#ifdef SVG_SUPPORT
+  else if (eventType == "SVGEvents")
+    return new EventImpl();
+  else if (eventType == "SVGZoomEvents")
+    return new KSVG::SVGZoomEventImpl();
+#endif
   else {
     exceptioncode = DOMException::NOT_SUPPORTED_ERR;
     return 0;
@@ -2536,6 +2590,13 @@ ElementImpl* DocumentImpl::ownerElement() {
   if (!renderPart)
     return 0;
   return static_cast<ElementImpl*>(renderPart->element());
+}
+
+DOMString DocumentImpl::referrer() const {
+  if (part())
+    return KWQ(part())->incomingReferrer();
+
+  return DOMString();
 }
 
 DOMString DocumentImpl::domain() const {

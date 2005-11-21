@@ -173,6 +173,7 @@ class ElementImpl : public ContainerNodeImpl {
   // Used to quickly determine whether or not an element has a given CSS class.
   virtual const AtomicStringList* getClassList() const;
   const AtomicString& getIDAttribute() const;
+  bool hasAttribute(const QualifiedName& name) const;
   const AtomicString& getAttribute(const QualifiedName& name) const;
   void setAttribute(const QualifiedName& name,
                     DOMStringImpl* value,
@@ -271,6 +272,9 @@ class ElementImpl : public ContainerNodeImpl {
   // State of the element.
   virtual QString state() { return QString::null; }
 
+#if SVG_SUPPORT
+  virtual bool rendererIsNeeded(khtml::RenderStyle*);
+#endif
   virtual void attach();
   virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
   virtual khtml::RenderObject* createRenderer(RenderArena*,

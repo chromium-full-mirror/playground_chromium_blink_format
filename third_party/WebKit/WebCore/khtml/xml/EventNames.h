@@ -40,7 +40,7 @@ namespace EventNames {
                   mousewheel) macro(beforeunload) macro(paste)                 \
                   macro(readystatechange) macro(reset) macro(resize) macro(    \
                       scroll) macro(search) macro(select) macro(selectstart)   \
-                      macro(submit) macro(textInput) macro(unload)             \
+                      macro(submit) macro(textInput) macro(unload) macro(zoom) \
                                                                                \
                           macro(DOMActivate) macro(DOMAttrModified) macro(     \
                               DOMCharacterDataModified) macro(DOMFocusIn)      \

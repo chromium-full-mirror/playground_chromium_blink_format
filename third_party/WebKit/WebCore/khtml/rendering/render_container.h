@@ -61,7 +61,7 @@ class RenderContainer : public RenderBox {
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 
- private:
+ protected:
   void setFirstChild(RenderObject* first) { m_first = first; }
   void setLastChild(RenderObject* last) { m_last = last; }
 

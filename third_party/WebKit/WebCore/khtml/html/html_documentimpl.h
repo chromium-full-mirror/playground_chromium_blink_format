@@ -47,7 +47,6 @@ class HTMLDocumentImpl : public DOM::DocumentImpl,
   virtual bool isHTMLDocument() const { return true; }
   virtual ElementImpl* documentElement() const;
 
-  DOMString referrer() const;
   DOMString lastModified() const;
   DOMString cookie() const;
   void setCookie(const DOMString&);

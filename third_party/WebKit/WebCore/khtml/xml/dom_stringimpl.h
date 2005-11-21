@@ -56,6 +56,7 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   DOMStringImpl(const char* str);
   DOMStringImpl(const char* str, unsigned int len);
   DOMStringImpl(const QChar& ch);
+  DOMStringImpl(const QString& str);
   ~DOMStringImpl();
 
   unsigned hash() const {

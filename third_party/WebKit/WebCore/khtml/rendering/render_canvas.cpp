@@ -29,6 +29,10 @@
 
 #include "khtml_part.h"
 
+#if SVG_SUPPORT
+#include "KRenderingDeviceQuartz.h"
+#endif
+
 using namespace khtml;
 
 //#define BOX_DEBUG
@@ -68,9 +72,17 @@ RenderCanvas::RenderCanvas(DOM::NodeImpl* node, KHTMLView* view)
 
   // Create a new root layer for our layer hierarchy.
   m_layer = new (node->getDocument()->renderArena()) RenderLayer(this);
+
+#if SVG_SUPPORT
+  m_renderingDevice = 0;
+#endif
 }
 
-RenderCanvas::~RenderCanvas() {}
+RenderCanvas::~RenderCanvas() {
+#if SVG_SUPPORT
+  delete m_renderingDevice;
+#endif
+}
 
 void RenderCanvas::calcHeight() {
   if (!m_printingMode && m_view) {
@@ -650,3 +662,11 @@ void RenderCanvas::setBestTruncatedAt(int y,
     m_bestTruncatedAt = y;
   }
 }
+
+#if SVG_SUPPORT
+KRenderingDevice* RenderCanvas::renderingDevice() {
+  if (!m_renderingDevice)
+    m_renderingDevice = new KRenderingDeviceQuartz();
+  return m_renderingDevice;
+}
+#endif

@@ -28,6 +28,10 @@
 class KHTMLView;
 class QScrollView;
 
+#if SVG_SUPPORT
+class KRenderingDevice;
+#endif
+
 namespace khtml {
 
 class RenderCanvas : public RenderBlock {
@@ -110,6 +114,10 @@ class RenderCanvas : public RenderBlock {
   void addWidget(RenderObject*);
   void removeWidget(RenderObject*);
 
+#if SVG_SUPPORT
+  KRenderingDevice* renderingDevice();
+#endif
+
  protected:
   KHTMLView* m_view;
 
@@ -136,6 +144,10 @@ class RenderCanvas : public RenderBlock {
   typedef HashSet<RenderObject*, PointerHash<RenderObject*>> RenderObjectSet;
 
   RenderObjectSet m_widgets;
+
+#if SVG_SUPPORT
+  KRenderingDevice* m_renderingDevice;
+#endif
 };
 };
 #endif

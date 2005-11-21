@@ -95,7 +95,7 @@ class CSSStyleDeclarationImpl : public StyleBaseImpl {
 
 class CSSValueImpl : public StyleBaseImpl {
  public:
-  virtual unsigned short cssValueType() const = 0;
+  virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
   virtual DOMString cssText() const = 0;
   void setCssText(const DOMString&) {}  // FIXME: Not implemented.
 
@@ -354,7 +354,6 @@ class CSSBorderImageValueImpl : public CSSValueImpl {
   virtual ~CSSBorderImageValueImpl();
 
   virtual DOMString cssText() const;
-  virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
 
  public:
   // The border image.
@@ -391,8 +390,6 @@ class FontValueImpl : public CSSValueImpl {
   FontValueImpl();
   virtual ~FontValueImpl();
 
-  virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
-
   virtual DOMString cssText() const;
 
   virtual bool isFontValue() { return true; }
@@ -413,8 +410,6 @@ class ShadowValueImpl : public CSSValueImpl {
                   CSSPrimitiveValueImpl* _blur,
                   CSSPrimitiveValueImpl* _color);
   virtual ~ShadowValueImpl();
-
-  virtual unsigned short cssValueType() const { return CSSValue::CSS_CUSTOM; }
 
   virtual DOMString cssText() const;
 
