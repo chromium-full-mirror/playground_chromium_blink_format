@@ -90,10 +90,8 @@
 using XBL::XBLBindingManager;
 #endif
 
-#if APPLE_CHANGES
 #include "KWQAccObjectCache.h"
 #include "KWQLogging.h"
-#endif
 
 #if SVG_SUPPORT
 #include "dom_kdomdocumentwrapper.h"
@@ -395,7 +393,6 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       ,
       m_transformSource(0)
 #endif
-#if APPLE_CHANGES
       ,
       m_finishedParsing(this, SIGNAL(finishedParsing())),
       m_inPageCache(false),
@@ -408,9 +405,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
       m_hasDashboardRegions(false),
       m_dashboardRegionsDirty(false),
       m_selfOnlyRefCount(0),
-      m_selectedRadioButtons(0)
-#endif
-{
+      m_selectedRadioButtons(0) {
   document.resetSkippingRef(this);
 
   m_paintDevice = 0;
@@ -419,9 +414,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_view = v;
   m_renderArena = 0;
 
-#if APPLE_CHANGES
   m_accCache = 0;
-#endif
 
   if (v) {
     m_docLoader = new DocLoader(v->part(), this);
@@ -510,10 +503,8 @@ void DocumentImpl::removedLastRef() {
 
 DocumentImpl::~DocumentImpl() {
   assert(!m_render);
-#if APPLE_CHANGES
   assert(!m_inPageCache);
   assert(m_savedRenderer == 0);
-#endif
 
   KJS::ScriptInterpreter::forgetAllDOMNodesForDocument(this);
 
@@ -556,12 +547,10 @@ DocumentImpl::~DocumentImpl() {
   delete m_bindingManager;
 #endif
 
-#if APPLE_CHANGES
   if (m_accCache) {
     delete m_accCache;
     m_accCache = 0;
   }
-#endif
 
   if (m_decoder) {
     m_decoder->deref();
@@ -890,27 +879,7 @@ void DocumentImpl::updateTitle() {
   if (!p)
     return;
 
-#if APPLE_CHANGES
   KWQ(p)->setTitle(m_title);
-#else
-  QString titleStr = m_title.qstring();
-  for (int i = 0; i < titleStr.length(); ++i)
-    if (titleStr[i] < ' ')
-      titleStr[i] = ' ';
-  titleStr = titleStr.stripWhiteSpace();
-  titleStr.compose();
-  if (!p->parentPart()) {
-    if (titleStr.isNull() || titleStr.isEmpty()) {
-      // empty title... set window caption as the URL
-      KURL url = m_url;
-      url.setRef(QString::null);
-      url.setQuery(QString::null);
-      titleStr = url.url();
-    }
-
-    emit p->setWindowCaption(KStringHandler::csqueeze(titleStr, 128));
-  }
-#endif
 }
 
 void DocumentImpl::setTitle(DOMString title, NodeImpl* titleElement) {
@@ -1046,18 +1015,14 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     fontDef.family = *(f.firstFamily());
     fontDef.italic = f.italic();
     fontDef.weight = f.weight();
-#if APPLE_CHANGES
     bool printing =
         m_paintDevice && (m_paintDevice->devType() == QInternal::Printer);
     fontDef.usePrinterFont = printing;
-#endif
     if (m_view) {
       const KHTMLSettings* settings = m_view->part()->settings();
-#if APPLE_CHANGES
       if (printing && !settings->shouldPrintBackgrounds()) {
         _style->setForceBackgroundsToWhite(true);
       }
-#endif
       QString stdfont = settings->stdFontName();
       if (!stdfont.isEmpty()) {
         fontDef.family.setFamily(stdfont);
@@ -1119,12 +1084,6 @@ void DocumentImpl::updateRendering() {
   //     kdDebug() << "UPDATERENDERING: "<<endl;
 
   StyleChange change = NoChange;
-#if 0
-    if ( m_styleSelectorDirty ) {
-	recalcStyleSelector();
-	change = Force;
-    }
-#endif
   recalcStyle(change);
 
   //    kdDebug() << "UPDATERENDERING time used="<<time.elapsed()<<endl;
@@ -1171,9 +1130,7 @@ void DocumentImpl::updateLayoutIgnorePendingStylesheets() {
 
 void DocumentImpl::attach() {
   assert(!attached());
-#if APPLE_CHANGES
   assert(!m_inPageCache);
-#endif
 
   if (m_view)
     setPaintDevice(m_view);
@@ -1202,13 +1159,11 @@ void DocumentImpl::detach() {
   // indicate destruction mode,  i.e. attached() but m_render == 0
   m_render = 0;
 
-#if APPLE_CHANGES
   if (m_inPageCache) {
     if (render)
       getAccObjectCache()->detach(render);
     return;
   }
-#endif
 
   // Empty out these lists as a performance optimization, since detaching
   // all the individual render objects will cause all the RenderImage
@@ -1256,7 +1211,6 @@ void DocumentImpl::removeAllDisconnectedNodeEventListeners() {
   m_disconnectedNodesWithEventListeners.clear();
 }
 
-#if APPLE_CHANGES
 KWQAccObjectCache* DocumentImpl::getAccObjectCache() {
   // The only document that actually has a KWQAccObjectCache is the top-level
   // document.  This is because we need to be able to get from any KWQAccObject
@@ -1292,7 +1246,6 @@ KWQAccObjectCache* DocumentImpl::getAccObjectCache() {
   m_accCache = new KWQAccObjectCache;
   return m_accCache;
 }
-#endif
 
 void DocumentImpl::setVisuallyOrdered() {
   visuallyOrdered = true;
@@ -1321,7 +1274,6 @@ void DocumentImpl::updateSelection() {
     }
   }
 
-#if APPLE_CHANGES
   // send the AXSelectedTextChanged notification only if the new selection is
   // non-null,
   // because null selections are only transitory (e.g. when starting an
@@ -1331,7 +1283,6 @@ void DocumentImpl::updateSelection() {
     getAccObjectCache()->postNotificationToTopWebArea(renderer(),
                                                       "AXSelectedTextChanged");
   }
-#endif
 }
 
 Tokenizer* DocumentImpl::createTokenizer() {
@@ -1487,10 +1438,8 @@ void DocumentImpl::implicitClose() {
         (!renderer()->firstChild() || renderer()->needsLayout()))
       view()->layout();
   }
-#if APPLE_CHANGES
   if (renderer() && KWQAccObjectCache::accessibilityEnabled())
     getAccObjectCache()->postNotification(renderer(), "AXLoadComplete");
-#endif
 }
 
 void DocumentImpl::setParsing(bool b) {
@@ -1876,14 +1825,9 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
       bool ok = false;
       int delay = 0;
       delay = str.toInt(&ok);
-#if APPLE_CHANGES
       // We want a new history item if the refresh timeout > 1 second
       if (ok && part)
         part->scheduleRedirection(delay, part->url().url(), delay <= 1);
-#else
-      if (ok && part)
-        part->scheduleRedirection(delay, part->url().url());
-#endif
     } else {
       double delay = 0;
       bool ok = false;
@@ -1900,12 +1844,8 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
         str = str.mid(1).stripWhiteSpace();
       str = parseURL(DOMString(str)).qstring();
       if (ok && part)
-#if APPLE_CHANGES
         // We want a new history item if the refresh timeout > 1 second
         part->scheduleRedirection(delay, completeURL(str), delay <= 1);
-#else
-        part->scheduleRedirection(delay, completeURL(str));
-#endif
     }
   } else if (strcasecmp(equiv, "expires") == 0) {
     QString str = content.qstring().stripWhiteSpace();
@@ -2059,10 +1999,6 @@ void DocumentImpl::updateStyleSelector() {
 
   recalcStyleSelector();
   recalcStyle(Force);
-#if 0
-
-    m_styleSelectorDirty = true;
-#endif
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())
@@ -2212,8 +2148,6 @@ void DocumentImpl::setActiveNode(NodeImpl* newActiveNode) {
     m_activeNode = newActiveNode;
 }
 
-#if APPLE_CHANGES
-
 bool DocumentImpl::relinquishesEditingFocus(NodeImpl* node) {
   assert(node);
   assert(node->isContentEditable());
@@ -2246,8 +2180,6 @@ void DocumentImpl::setDashboardRegions(
   setDashboardRegionsDirty(false);
 }
 
-#endif
-
 static QWidget* widgetForNode(NodeImpl* focusNode) {
   if (!focusNode)
     return 0;
@@ -2265,11 +2197,9 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   if (m_focusNode == newFocusNode)
     return true;
 
-#if APPLE_CHANGES
   if (m_focusNode && m_focusNode->isContentEditable() &&
       !relinquishesEditingFocus(m_focusNode.get()))
     return false;
-#endif
 
   bool focusChangeBlocked = false;
   SharedPtr<NodeImpl> oldFocusNode = m_focusNode;
@@ -2301,14 +2231,12 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
   }
 
   if (newFocusNode) {
-#if APPLE_CHANGES
     if (newFocusNode->isContentEditable() &&
         !acceptsEditingFocus(newFocusNode)) {
       // delegate blocks focus change
       focusChangeBlocked = true;
       goto SetFocusNodeDone;
     }
-#endif
     // Set focus on the new node
     m_focusNode = newFocusNode;
     m_focusNode->dispatchHTMLEvent(focusEvent, false, false);
@@ -2349,11 +2277,9 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
     }
   }
 
-#if APPLE_CHANGES
   if (!focusChangeBlocked && m_focusNode &&
       KWQAccObjectCache::accessibilityEnabled())
     getAccObjectCache()->handleFocusedUIElementChanged();
-#endif
 
 SetFocusNodeDone:
   updateRendering();
@@ -2750,8 +2676,6 @@ HTMLMapElementImpl* DocumentImpl::getImageMap(const DOMString& URL) const {
   return *it;
 }
 
-#if APPLE_CHANGES
-
 void DocumentImpl::setDecoder(Decoder* decoder) {
   decoder->ref();
   if (m_decoder) {
@@ -2836,8 +2760,6 @@ DOMString DocumentImpl::toString() const {
 
   return result;
 }
-
-#endif  // APPLE_CHANGES
 
 // ----------------------------------------------------------------------------
 // Support for Javascript execCommand, and related methods

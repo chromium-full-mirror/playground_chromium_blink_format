@@ -68,14 +68,10 @@ class Decoder {
   QCString enc;
   EncodingType m_type;
 
-#if APPLE_CHANGES
   // Our version of QString works well for all-8-bit characters, and allows null
   // characters.
   // This works better than QCString when there are null characters involved.
   QString buffer;
-#else
-  QCString buffer;
-#endif
 
   bool body;
   bool beginning;

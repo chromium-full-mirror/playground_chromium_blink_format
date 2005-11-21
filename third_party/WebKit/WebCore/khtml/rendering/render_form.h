@@ -67,7 +67,6 @@ class RenderFormElement : public khtml::RenderWidget {
 
   virtual bool isFormElement() const { return true; }
 
-#if APPLE_CHANGES
   // Aqua form controls never have border/padding.
   int borderTop() const { return 0; }
   int borderBottom() const { return 0; }
@@ -92,7 +91,6 @@ class RenderFormElement : public khtml::RenderWidget {
   void addIntrinsicMarginsIfAllowed(RenderStyle* _style);
   virtual bool canHaveIntrinsicMargins() const { return false; }
   int intrinsicMargin() const { return 2; }
-#endif
 
   virtual void setStyle(RenderStyle*);
   virtual void updateFromElement();
@@ -109,10 +107,8 @@ class RenderFormElement : public khtml::RenderWidget {
   virtual void slotClicked();
   virtual void slotSelectionChanged();
 
-#if APPLE_CHANGES
   // Hack to make KWQSlot code work.
   virtual void slotTextChanged(const QString& string);
-#endif
 
  protected:
   virtual bool isEditable() const { return false; }
@@ -138,10 +134,8 @@ class RenderLineEdit : public RenderFormElement {
   RenderLineEdit(DOM::HTMLInputElementImpl* element);
 
   virtual void calcMinMaxWidth();
-#if APPLE_CHANGES
   int calcReplacedHeight() const { return intrinsicHeight(); }
   virtual bool canHaveIntrinsicMargins() const { return true; }
-#endif
 
   virtual const char* renderName() const { return "RenderLineEdit"; }
   virtual void updateFromElement();
@@ -164,12 +158,10 @@ class RenderLineEdit : public RenderFormElement {
   void slotReturnPressed();
   void slotTextChanged(const QString& string);
   void slotSelectionChanged();
-#if APPLE_CHANGES
   void slotPerformSearch();
 
  public:
   void addSearchResult();
-#endif
 
  protected:
   virtual void handleFocusOut();
@@ -282,7 +274,6 @@ class RenderSelect : public RenderFormElement {
 
   virtual const char* renderName() const { return "RenderSelect"; }
 
-#if APPLE_CHANGES
   short baselinePosition(bool f, bool b) const;
   int calcReplacedHeight() const {
     if (!m_useListBox)
@@ -290,7 +281,6 @@ class RenderSelect : public RenderFormElement {
     return RenderFormElement::calcReplacedHeight();
   }
   virtual bool canHaveIntrinsicMargins() const { return true; }
-#endif
 
   virtual void calcMinMaxWidth();
   virtual void layout();
@@ -302,9 +292,7 @@ class RenderSelect : public RenderFormElement {
     m_selectionChanged = _selectionChanged;
   }
   virtual void updateFromElement();
-#if APPLE_CHANGES
   virtual void setStyle(RenderStyle*);
-#endif
 
   void updateSelection();
 
@@ -315,9 +303,7 @@ class RenderSelect : public RenderFormElement {
  protected:
   KListBox* createListBox();
   ComboBoxWidget* createComboBox();
-#if APPLE_CHANGES
   void setWidgetWritingDirection();
-#endif
 
   unsigned m_size;
   bool m_multiple;
@@ -372,9 +358,7 @@ class RenderTextArea : public RenderFormElement {
   void select();
   void setSelectionRange(int, int);
 
-#if APPLE_CHANGES
   virtual bool canHaveIntrinsicMargins() const { return true; }
-#endif
 
  protected slots:
   void slotTextChanged();
@@ -390,7 +374,6 @@ class RenderTextArea : public RenderFormElement {
 
 // -------------------------------------------------------------------------
 
-#if APPLE_CHANGES
 class RenderSlider : public RenderFormElement {
  public:
   RenderSlider(DOM::HTMLInputElementImpl* element);
@@ -408,7 +391,6 @@ class RenderSlider : public RenderFormElement {
   void slotSliderValueChanged();
   void slotClicked();
 };
-#endif
 
 };  // namespace
 

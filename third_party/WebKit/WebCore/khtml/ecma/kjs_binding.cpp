@@ -209,8 +209,6 @@ bool ScriptInterpreter::wasRunByUserGesture() const {
   return false;
 }
 
-#if APPLE_CHANGES
-
 bool ScriptInterpreter::isGlobalObject(ValueImp* v) {
   return v->isObject(&Window::info);
 }
@@ -245,8 +243,6 @@ void* ScriptInterpreter::createLanguageInstanceForValue(
 
   return result;
 }
-
-#endif
 
 //////
 

@@ -46,10 +46,8 @@
 
 #include <kdebug.h>
 
-#if APPLE_CHANGES
 #include "KWQFileButton.h"
 #include "KWQSlider.h"
-#endif
 
 using namespace khtml;
 using namespace DOM;
@@ -64,26 +62,17 @@ RenderFormElement::RenderFormElement(HTMLGenericFormElementImpl* element)
 RenderFormElement::~RenderFormElement() {}
 
 short RenderFormElement::baselinePosition(bool f, bool isRootLineBox) const {
-#if APPLE_CHANGES
   return marginTop() + widget()->baselinePosition(m_height);
-#else
-  return RenderWidget::baselinePosition(f, isRootLineBox) - 2 -
-         style()->fontMetrics().descent();
-#endif
 }
 
 void RenderFormElement::setStyle(RenderStyle* s) {
-#if APPLE_CHANGES
   if (canHaveIntrinsicMargins())
     addIntrinsicMarginsIfAllowed(s);
-#endif
 
   RenderWidget::setStyle(s);
 
-#if APPLE_CHANGES
   // Do not paint a background or border for Aqua form elements
   setShouldPaintBackgroundOrBorder(false);
-#endif
 
   m_widget->setFont(style()->font());
 }
@@ -91,77 +80,7 @@ void RenderFormElement::setStyle(RenderStyle* s) {
 void RenderFormElement::updateFromElement() {
   m_widget->setEnabled(!element()->disabled());
 
-#if APPLE_CHANGES
   m_widget->setPalette(QPalette(style()->backgroundColor(), style()->color()));
-#else
-  QColor color = style()->color();
-  QColor backgroundColor = style()->backgroundColor();
-
-  if (color.isValid() || backgroundColor.isValid()) {
-    QPalette pal(m_widget->palette());
-
-    int contrast_ = KGlobalSettings::contrast();
-    int highlightVal = 100 + (2 * contrast_ + 4) * 16 / 10;
-    int lowlightVal = 100 + (2 * contrast_ + 4) * 10;
-
-    if (backgroundColor.isValid()) {
-      for (int i = 0; i < QPalette::NColorGroups; i++) {
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Background,
-                     backgroundColor);
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Light,
-                     backgroundColor.light(highlightVal));
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Dark,
-                     backgroundColor.dark(lowlightVal));
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Mid,
-                     backgroundColor.dark(120));
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Midlight,
-                     backgroundColor.light(110));
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Button,
-                     backgroundColor);
-        pal.setColor((QPalette::ColorGroup)i, QColorGroup::Base,
-                     backgroundColor);
-      }
-    }
-    if (color.isValid()) {
-      struct ColorSet {
-        QPalette::ColorGroup cg;
-        QColorGroup::ColorRole cr;
-      };
-      const struct ColorSet toSet[] = {
-          {QPalette::Active, QColorGroup::Foreground},
-          {QPalette::Active, QColorGroup::ButtonText},
-          {QPalette::Active, QColorGroup::Text},
-          {QPalette::Inactive, QColorGroup::Foreground},
-          {QPalette::Inactive, QColorGroup::ButtonText},
-          {QPalette::Inactive, QColorGroup::Text},
-          {QPalette::Disabled, QColorGroup::ButtonText},
-          {QPalette::NColorGroups, QColorGroup::NColorRoles},
-      };
-      const ColorSet* set = toSet;
-      while (set->cg != QPalette::NColorGroups) {
-        pal.setColor(set->cg, set->cr, color);
-        ++set;
-      }
-
-      QColor disfg = color;
-      int h, s, v;
-      disfg.hsv(&h, &s, &v);
-      if (v > 128)
-        // dark bg, light fg - need a darker disabled fg
-        disfg = disfg.dark(lowlightVal);
-      else if (disfg != Qt::black)
-        // light bg, dark fg - need a lighter disabled fg - but only if !black
-        disfg = disfg.light(highlightVal);
-      else
-        // black fg - use darkgrey disabled fg
-        disfg = Qt::darkGray;
-      pal.setColor(QPalette::Disabled, QColorGroup::Foreground, disfg);
-    }
-
-    m_widget->setPalette(pal);
-  } else
-    m_widget->unsetPalette();
-#endif
 }
 
 void RenderFormElement::layout() {
@@ -173,14 +92,6 @@ void RenderFormElement::layout() {
 
   calcWidth();
   calcHeight();
-
-#if !APPLE_CHANGES
-  if (m_widget)
-    resizeWidget(m_widget, m_width - borderLeft() - borderRight() -
-                               paddingLeft() - paddingRight(),
-                 m_height - borderLeft() - borderRight() - paddingLeft() -
-                     paddingRight());
-#endif
 
   setNeedsLayout(false);
 }
@@ -217,8 +128,6 @@ Qt::AlignmentFlags RenderFormElement::textAlignment() const {
   return AlignLeft;
 }
 
-#if APPLE_CHANGES
-
 void RenderFormElement::addIntrinsicMarginsIfAllowed(RenderStyle* _style) {
   // Cut out the intrinsic margins completely if we end up using mini controls.
   if (_style->font().pixelSize() < 11)
@@ -250,8 +159,6 @@ void RenderFormElement::slotSelectionChanged() {
   // do nothing
 }
 
-#endif
-
 // -------------------------------------------------------------------------------
 
 RenderImageButton::RenderImageButton(HTMLInputElementImpl* element)
@@ -261,39 +168,10 @@ RenderImageButton::RenderImageButton(HTMLInputElementImpl* element)
 
 // -------------------------------------------------------------------------------
 
-#if !APPLE_CHANGES
-
-LineEditWidget::LineEditWidget(QWidget* parent) : KLineEdit(parent) {
-  setMouseTracking(true);
-}
-
-bool LineEditWidget::event(QEvent* e) {
-  if (e->type() == QEvent::AccelAvailable && isReadOnly()) {
-    QKeyEvent* ke = (QKeyEvent*)e;
-    if (ke->state() & ControlButton) {
-      switch (ke->key()) {
-        case Key_Left:
-        case Key_Right:
-        case Key_Up:
-        case Key_Down:
-        case Key_Home:
-        case Key_End:
-          ke->accept();
-        default:
-          break;
-      }
-    }
-  }
-  return KLineEdit::event(e);
-}
-
-#endif
-
 // -----------------------------------------------------------------------------
 
 RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
     : RenderFormElement(element), m_updating(false) {
-#if APPLE_CHANGES
   QLineEdit::Type type;
   switch (element->inputType()) {
     case HTMLInputElementImpl::PASSWORD:
@@ -308,32 +186,13 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   KLineEdit* edit = new KLineEdit(type);
   if (type == QLineEdit::Search)
     edit->setLiveSearch(false);
-#else
-  LineEditWidget* edit = new LineEditWidget(view()->viewport());
-#endif
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(edit, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
   connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
 
-#if APPLE_CHANGES
   connect(edit, SIGNAL(performSearch()), this, SLOT(slotPerformSearch()));
-#endif
-
-#if !APPLE_CHANGES
-  if (element->inputType() == HTMLInputElementImpl::PASSWORD)
-    edit->setEchoMode(QLineEdit::Password);
-
-  if (element->autoComplete()) {
-    QStringList completions =
-        view()->formCompletionItems(element->name().qstring());
-    if (completions.count()) {
-      edit->completionObject()->setItems(completions);
-      edit->setContextMenuEnabled(true);
-    }
-  }
-#endif
 
   setQWidget(edit);
 }
@@ -349,13 +208,6 @@ void RenderLineEdit::slotSelectionChanged() {
 }
 
 void RenderLineEdit::slotReturnPressed() {
-#if !APPLE_CHANGES
-  // don't submit the form when return was pressed in a completion-popup
-  KCompletionBox* box = widget()->completionBox(false);
-  if (box && box->isVisible() && box->currentItem() != -1)
-    return;
-#endif
-
   // Emit onChange if necessary
   // Works but might not be enough, dirk said he had another solution at
   // hand (can't remember which) - David
@@ -366,7 +218,6 @@ void RenderLineEdit::slotReturnPressed() {
     fe->submitClick();
 }
 
-#if APPLE_CHANGES
 void RenderLineEdit::slotPerformSearch() {
   // Fire the "search" DOM event.
   element()->dispatchHTMLEvent(searchEvent, true, false);
@@ -376,7 +227,6 @@ void RenderLineEdit::addSearchResult() {
   if (widget())
     widget()->addSearchResult();
 }
-#endif
 
 void RenderLineEdit::handleFocusOut() {
   if (widget() && widget()->edited() && element()) {
@@ -388,24 +238,11 @@ void RenderLineEdit::handleFocusOut() {
 void RenderLineEdit::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   m_updating = true;
   int size = element()->size();
   QSize s(widget()->sizeForCharacterWidth(size > 0 ? size : 20));
   m_updating = false;
-#else
-  const QFontMetrics& fm = style()->fontMetrics();
-  QSize s;
-
-  int size = element()->size();
-
-  int h = fm.lineSpacing();
-  int w = fm.width('x') * (size > 0 ? size : 17);  // "some"
-  s = QSize(w + 2 + 2 * widget()->frameWidth(),
-            kMax(h, 14) + 2 + 2 * widget()->frameWidth())
-          .expandedTo(QApplication::globalStrut());
-#endif
 
   setIntrinsicWidth(s.width());
   setIntrinsicHeight(s.height());
@@ -425,10 +262,8 @@ void RenderLineEdit::setStyle(RenderStyle* s) {
 
   KLineEdit* w = widget();
   w->setAlignment(textAlignment());
-#if APPLE_CHANGES
   w->setWritingDirection(style()->direction() == RTL ? QPainter::RTL
                                                      : QPainter::LTR);
-#endif
 }
 
 void RenderLineEdit::updateFromElement() {
@@ -463,7 +298,6 @@ void RenderLineEdit::updateFromElement() {
 
   w->setReadOnly(e->readOnly());
 
-#if APPLE_CHANGES
   // Handle updating the search attributes.
   w->setPlaceholderString(e->getAttribute(placeholderAttr).qstring());
   if (w->type() == QLineEdit::Search) {
@@ -471,7 +305,6 @@ void RenderLineEdit::updateFromElement() {
     w->setAutoSaveName(e->getAttribute(autosaveAttr).qstring());
     w->setMaxResults(e->maxResults());
   }
-#endif
 
   RenderFormElement::updateFromElement();
 }
@@ -691,52 +524,20 @@ void RenderFieldset::setStyle(RenderStyle* _style) {
 
 RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
     : RenderFormElement(element) {
-#if APPLE_CHANGES
   KWQFileButton* w = new KWQFileButton(view()->part());
   connect(w, SIGNAL(textChanged(const QString&)), this,
           SLOT(slotTextChanged(const QString&)));
   connect(w, SIGNAL(clicked()), this, SLOT(slotClicked()));
   setQWidget(w);
-#else
-  QHBox* w = new QHBox(view()->viewport());
-
-  m_edit = new LineEditWidget(w);
-
-  connect(m_edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
-  connect(m_edit, SIGNAL(textChanged(const QString&)), this,
-          SLOT(slotTextChanged(const QString&)));
-
-  m_button = new QPushButton(i18n("Browse..."), w);
-  m_button->setFocusPolicy(QWidget::ClickFocus);
-  connect(m_button, SIGNAL(clicked()), this, SLOT(slotClicked()));
-
-  w->setStretchFactor(m_edit, 2);
-  w->setFocusProxy(m_edit);
-
-  setQWidget(w);
-#endif
 }
 
 void RenderFileButton::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
-#if APPLE_CHANGES
   // Let the widget tell us how big it wants to be.
   int size = element()->size();
   QSize s(static_cast<KWQFileButton*>(widget())->sizeForCharacterWidth(
       size > 0 ? size : 20));
-#else
-  const QFontMetrics& fm = style()->fontMetrics();
-  QSize s;
-  int size = element()->size();
-
-  int h = fm.lineSpacing();
-  int w = fm.width('x') * (size > 0 ? size : 17);  // "some"
-  w += 6 + fm.width(m_button->text()) + 2 * fm.width(' ');
-  s = QSize(w + 2 + 2 * m_edit->frameWidth(),
-            kMax(h, 14) + 2 + 2 * m_edit->frameWidth())
-          .expandedTo(QApplication::globalStrut());
-#endif
 
   setIntrinsicWidth(s.width());
   setIntrinsicHeight(s.height());
@@ -744,44 +545,13 @@ void RenderFileButton::calcMinMaxWidth() {
   RenderFormElement::calcMinMaxWidth();
 }
 
-#if !APPLE_CHANGES
-
-void RenderFileButton::handleFocusOut() {
-  if (m_edit && m_edit->edited()) {
-    element()->onChange();
-    m_edit->setEdited(false);
-  }
-}
-
-#endif
-
 void RenderFileButton::slotClicked() {
-#if APPLE_CHANGES
   RenderFormElement::slotClicked();
-#else
-  QString file_name = KFileDialog::getOpenFileName(QString::null, QString::null,
-                                                   0, i18n("Browse..."));
-  if (!file_name.isNull()) {
-    element()->m_value = DOMString(file_name);
-    m_edit->setText(file_name);
-  }
-#endif
 }
 
 void RenderFileButton::updateFromElement() {
-#if APPLE_CHANGES
   static_cast<KWQFileButton*>(widget())->setFilename(
       element()->value().qstring());
-#else
-  m_edit->blockSignals(true);
-  m_edit->setText(element()->value().qstring());
-  m_edit->blockSignals(false);
-  int ml = element()->maxLength();
-  if (ml <= 0 || ml > 1024)
-    ml = 1024;
-  m_edit->setMaxLength(ml);
-  m_edit->setEdited(false);
-#endif
 
   RenderFormElement::updateFromElement();
 }
@@ -796,19 +566,11 @@ void RenderFileButton::slotTextChanged(const QString& string) {
   element()->onChange();
 }
 
-void RenderFileButton::select() {
-#if !APPLE_CHANGES
-  m_edit->selectAll();
-#endif
-}
-
-#if APPLE_CHANGES
+void RenderFileButton::select() {}
 
 void RenderFileButton::click(bool sendMouseEvents) {
   static_cast<KWQFileButton*>(widget())->click(sendMouseEvents);
 }
-
-#endif
 
 // -------------------------------------------------------------------------
 
@@ -830,44 +592,10 @@ ComboBoxWidget::ComboBoxWidget(QWidget* parent) : KComboBox(false, parent) {
 }
 
 bool ComboBoxWidget::event(QEvent* e) {
-#if !APPLE_CHANGES
-  if (e->type() == QEvent::KeyPress) {
-    QKeyEvent* ke = static_cast<QKeyEvent*>(e);
-    switch (ke->key()) {
-      case Key_Return:
-      case Key_Enter:
-        popup();
-        ke->accept();
-        return true;
-      default:
-        return KComboBox::event(e);
-    }
-  }
-#endif
   return KComboBox::event(e);
 }
 
 bool ComboBoxWidget::eventFilter(QObject* dest, QEvent* e) {
-#if !APPLE_CHANGES
-  if (dest == listBox() && e->type() == QEvent::KeyPress) {
-    QKeyEvent* ke = static_cast<QKeyEvent*>(e);
-    bool forward = false;
-    switch (ke->key()) {
-      case Key_Tab:
-        forward = true;
-      case Key_BackTab:
-        // ugly hack. emulate popdownlistbox() (private in QComboBox)
-        // we re-use ke here to store the reference to the generated event.
-        ke = new QKeyEvent(QEvent::KeyPress, Key_Escape, 0, 0);
-        QApplication::sendEvent(dest, ke);
-        focusNextPrevChild(forward);
-        delete ke;
-        return true;
-      default:
-        return KComboBox::eventFilter(dest, e);
-    }
-  }
-#endif
   return KComboBox::eventFilter(dest, e);
 }
 
@@ -888,8 +616,6 @@ RenderSelect::RenderSelect(HTMLSelectElementImpl* element)
     setQWidget(createComboBox());
 }
 
-#if APPLE_CHANGES
-
 void RenderSelect::setWidgetWritingDirection() {
   QPainter::TextDirection d =
       style()->direction() == RTL ? QPainter::RTL : QPainter::LTR;
@@ -903,8 +629,6 @@ void RenderSelect::setStyle(RenderStyle* s) {
   RenderFormElement::setStyle(s);
   setWidgetWritingDirection();
 }
-
-#endif
 
 void RenderSelect::updateFromElement() {
   m_ignoreSelectEvents = true;
@@ -927,9 +651,7 @@ void RenderSelect::updateFromElement() {
         setQWidget(createListBox());
       else
         setQWidget(createComboBox());
-#if APPLE_CHANGES
       setWidgetWritingDirection();
-#endif
     }
 
     if (m_useListBox && oldMultiple != m_multiple) {
@@ -965,19 +687,10 @@ void RenderSelect::updateFromElement() {
         // browsers.
         label = label.simplifyWhiteSpace();
 
-#if APPLE_CHANGES
         if (m_useListBox)
           static_cast<KListBox*>(m_widget)->appendGroupLabel(label);
         else
           static_cast<KComboBox*>(m_widget)->appendGroupLabel(label);
-#else
-        if (m_useListBox) {
-          QListBoxText* item = new QListBoxText(label);
-          static_cast<KListBox*>(m_widget)->insertItem(item, listIndex);
-          item->setSelectable(false);
-        } else
-          static_cast<KComboBox*>(m_widget)->insertItem(label, listIndex);
-#endif
       } else if (listItems[listIndex]->hasTagName(optionTag)) {
         QString itemText =
             static_cast<HTMLOptionElementImpl*>(listItems[listIndex])
@@ -995,17 +708,10 @@ void RenderSelect::updateFromElement() {
         if (listItems[listIndex]->parentNode()->hasTagName(optgroupTag))
           itemText.prepend("    ");
 
-#if APPLE_CHANGES
         if (m_useListBox)
           static_cast<KListBox*>(m_widget)->appendItem(itemText);
         else
           static_cast<KComboBox*>(m_widget)->appendItem(itemText);
-#else
-        if (m_useListBox)
-          static_cast<KListBox*>(m_widget)->insertItem(itemText, listIndex);
-        else
-          static_cast<KComboBox*>(m_widget)->insertItem(itemText, listIndex);
-#endif
       } else if (listItems[listIndex]->hasTagName(hrTag)) {
         if (!m_useListBox) {
           static_cast<KComboBox*>(m_widget)->appendSeparator();
@@ -1014,10 +720,8 @@ void RenderSelect::updateFromElement() {
         KHTMLAssert(false);
       m_selectionChanged = true;
     }
-#if APPLE_CHANGES
     if (m_useListBox)
       static_cast<KListBox*>(m_widget)->doneAppendingItems();
-#endif
     setNeedsLayoutAndMinMaxRecalc();
     m_optionsChanged = false;
   }
@@ -1032,8 +736,6 @@ void RenderSelect::updateFromElement() {
   RenderFormElement::updateFromElement();
 }
 
-#if APPLE_CHANGES
-
 short RenderSelect::baselinePosition(bool f, bool isRootLineBox) const {
   if (m_useListBox) {
     // FIXME: Should get the hardcoded constant of 7 by calling a QListBox
@@ -1043,8 +745,6 @@ short RenderSelect::baselinePosition(bool f, bool isRootLineBox) const {
   }
   return RenderFormElement::baselinePosition(f, isRootLineBox);
 }
-
-#endif
 
 void RenderSelect::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
@@ -1073,17 +773,6 @@ void RenderSelect::layout() {
   if (m_useListBox) {
     KListBox* w = static_cast<KListBox*>(m_widget);
 
-#if !APPLE_CHANGES
-    QListBoxItem* p = w->firstItem();
-    int width = 0;
-    int height = 0;
-    while (p) {
-      width = kMax(width, p->width(p->listBox()));
-      height = kMax(height, p->height(p->listBox()));
-      p = p->next();
-    }
-#endif
-
     int size = m_size;
     // check if multiple and size was not given or invalid
     // Internet Exploder sets size to kMin(number of elements, 4)
@@ -1093,18 +782,10 @@ void RenderSelect::layout() {
     if (size < 1)
       size = kMin(static_cast<KListBox*>(m_widget)->count(), 10U);
 
-#if APPLE_CHANGES
     // Let the widget tell us how big it wants to be.
     QSize s(w->sizeForNumberOfLines(size));
     setIntrinsicWidth(s.width());
     setIntrinsicHeight(s.height());
-#else
-    width += 2 * w->frameWidth() + w->verticalScrollBar()->sizeHint().width();
-    height = size * height + 2 * w->frameWidth();
-
-    setIntrinsicWidth(width);
-    setIntrinsicHeight(height);
-#endif
   } else {
     QSize s(m_widget->sizeHint());
     setIntrinsicWidth(s.width());
@@ -1254,53 +935,16 @@ void RenderSelect::updateSelection() {
 
 // -------------------------------------------------------------------------
 
-#if !APPLE_CHANGES
-
-TextAreaWidget::TextAreaWidget(QWidget* parent) : KTextEdit(parent) {}
-
-bool TextAreaWidget::event(QEvent* e) {
-  if (e->type() == QEvent::AccelAvailable && isReadOnly()) {
-    QKeyEvent* ke = (QKeyEvent*)e;
-    if (ke->state() & ControlButton) {
-      switch (ke->key()) {
-        case Key_Left:
-        case Key_Right:
-        case Key_Up:
-        case Key_Down:
-        case Key_Home:
-        case Key_End:
-          ke->accept();
-        default:
-          break;
-      }
-    }
-  }
-  return KTextEdit::event(e);
-}
-
-#endif
-
 // -------------------------------------------------------------------------
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
     : RenderFormElement(element), m_dirty(false) {
-#if APPLE_CHANGES
   QTextEdit* edit = new KTextEdit(view());
-#else
-  QTextEdit* edit = new TextAreaWidget(view());
-#endif
 
   if (element->wrap() != HTMLTextAreaElementImpl::ta_NoWrap)
     edit->setWordWrap(QTextEdit::WidgetWidth);
   else
     edit->setWordWrap(QTextEdit::NoWrap);
-
-#if !APPLE_CHANGES
-  KCursor::setAutoHideCursor(edit->viewport(), true);
-  edit->setTextFormat(QTextEdit::PlainText);
-  edit->setAutoMask(true);
-  edit->setMouseTracking(true);
-#endif
 
   setQWidget(edit);
 
@@ -1326,19 +970,8 @@ void RenderTextArea::calcMinMaxWidth() {
   KHTMLAssert(!minMaxKnown());
 
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   QSize size(w->sizeWithColumnsAndRows(kMax(element()->cols(), 1),
                                        kMax(element()->rows(), 1)));
-#else
-  const QFontMetrics& m = style()->fontMetrics();
-  w->setTabStopWidth(8 * m.width(" "));
-  QSize size(kMax(element()->cols(), 1) * m.width('x') + w->frameWidth() +
-                 w->verticalScrollBar()->sizeHint().width(),
-             kMax(element()->rows(), 1) * m.height() + w->frameWidth() * 2 +
-                 (w->wordWrap() == QTextEdit::NoWrap
-                      ? w->horizontalScrollBar()->sizeHint().height()
-                      : 0));
-#endif
 
   setIntrinsicWidth(size.width());
   setIntrinsicHeight(size.height());
@@ -1360,10 +993,8 @@ void RenderTextArea::setStyle(RenderStyle* s) {
   w->setAlignment(textAlignment());
   w->setLineHeight(RenderObject::lineHeight(true));
 
-#if APPLE_CHANGES
   w->setWritingDirection(style()->direction() == RTL ? QPainter::RTL
                                                      : QPainter::LTR);
-#endif
 
   QScrollView::ScrollBarMode scrollMode = QScrollView::Auto;
   switch (style()->overflow()) {
@@ -1383,12 +1014,7 @@ void RenderTextArea::setStyle(RenderStyle* s) {
   if (element()->wrap() != HTMLTextAreaElementImpl::ta_NoWrap)
     horizontalScrollMode = QScrollView::AlwaysOff;
 
-#if APPLE_CHANGES
   w->setScrollBarModes(horizontalScrollMode, scrollMode);
-#else
-  w->setHScrollBarMode(horizontalScrollMode);
-  w->setVScrollBarMode(scrollMode);
-#endif
 }
 
 void RenderTextArea::updateFromElement() {
@@ -1396,9 +1022,7 @@ void RenderTextArea::updateFromElement() {
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
   w->setReadOnly(e->readOnly());
-#if APPLE_CHANGES
   w->setDisabled(e->disabled());
-#endif
 
   e->updateValue();
   if (!e->valueMatchesRenderer()) {
@@ -1425,26 +1049,7 @@ QString RenderTextArea::text() {
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
   if (element()->wrap() == HTMLTextAreaElementImpl::ta_Physical) {
-#if APPLE_CHANGES
     txt = w->textWithHardLineBreaks();
-#else
-    // yeah, QTextEdit has no accessor for getting the visually wrapped text
-    for (int p = 0; p < w->paragraphs(); ++p) {
-      int pl = w->paragraphLength(p);
-      int ll = 0;
-      int lindex = w->lineOfChar(p, 0);
-      QString paragraphText = w->text(p);
-      for (int l = 0; l < pl; ++l) {
-        if (lindex != w->lineOfChar(p, l)) {
-          paragraphText.insert(l + ll++, QString::fromLatin1("\n"));
-          lindex = w->lineOfChar(p, l);
-        }
-      }
-      txt += paragraphText;
-      if (p < w->paragraphs() - 1)
-        txt += QString::fromLatin1("\n");
-    }
-#endif
   } else
     txt = w->text();
 
@@ -1459,46 +1064,22 @@ void RenderTextArea::slotTextChanged() {
 
 int RenderTextArea::selectionStart() {
   QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   return textEdit->selectionStart();
-#else
-// FIXME: I have no way to test Qt, so I'll
-// leave this alone for now
-#error Unimplemented method
-#endif
 }
 
 int RenderTextArea::selectionEnd() {
   QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   return textEdit->selectionEnd();
-#else
-// FIXME: I have no way to test Qt, so I'll
-// leave this alone for now
-#error Unimplemented method
-#endif
 }
 
 void RenderTextArea::setSelectionStart(int start) {
   QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   textEdit->setSelectionStart(start);
-#else
-// FIXME: I have no way to test Qt, so I'll
-// leave this alone for now
-#error Unimplemented method
-#endif
 }
 
 void RenderTextArea::setSelectionEnd(int end) {
   QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   textEdit->setSelectionEnd(end);
-#else
-// FIXME: I have no way to test Qt, so I'll
-// leave this alone for now
-#error Unimplemented method
-#endif
 }
 
 void RenderTextArea::select() {
@@ -1507,13 +1088,7 @@ void RenderTextArea::select() {
 
 void RenderTextArea::setSelectionRange(int start, int end) {
   QTextEdit* textEdit = static_cast<QTextEdit*>(m_widget);
-#if APPLE_CHANGES
   textEdit->setSelectionRange(start, end - start);
-#else
-// FIXME: I have no way to test Qt, so I'll
-// leave this alone for now
-#error Unimplemented method
-#endif
 }
 
 void RenderTextArea::slotSelectionChanged() {
@@ -1528,7 +1103,6 @@ void RenderTextArea::slotSelectionChanged() {
 
 // ---------------------------------------------------------------------------
 
-#if APPLE_CHANGES
 RenderSlider::RenderSlider(HTMLInputElementImpl* element)
     : RenderFormElement(element) {
   QSlider* slider = new QSlider();
@@ -1607,7 +1181,5 @@ void RenderSlider::slotClicked() {
   // emit mouseClick event etc
   RenderFormElement::slotClicked();
 }
-
-#endif
 
 #include "render_form.moc"

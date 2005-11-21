@@ -47,10 +47,8 @@
 #include "render_flexbox.h"
 #include "htmlnames.h"
 
-#if APPLE_CHANGES
 // For accessibility
 #include "KWQAccObjectCache.h"
-#endif
 
 #include <assert.h>
 
@@ -1363,7 +1361,6 @@ QRect RenderObject::paintingRootRect(QRect& topLevelRect) {
   return result;
 }
 
-#if APPLE_CHANGES
 void RenderObject::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   // For blocks inside inlines, we go ahead and include margins so that we run
   // right up to the
@@ -1380,7 +1377,6 @@ void RenderObject::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   } else
     p->addFocusRingRect(_tx, _ty, width(), height());
 }
-#endif
 
 void RenderObject::paintOutline(QPainter* p,
                                 int _tx,
@@ -1402,7 +1398,6 @@ void RenderObject::paintOutline(QPainter* p,
 
   int offset = style->outlineOffset();
 
-#ifdef APPLE_CHANGES
   if (style->outlineStyleIsAuto()) {
     if (!style->hasAppearance()) {
       // Only paint the focus ring by hand if there is no custom appearance
@@ -1417,7 +1412,6 @@ void RenderObject::paintOutline(QPainter* p,
     }
     return;
   }
-#endif
 
   _tx -= offset;
   _ty -= offset;
@@ -1827,12 +1821,10 @@ void RenderObject::setStyle(RenderStyle* style) {
     // If our z-index changes value or our visibility changes,
     // we need to dirty our stacking context's z-order list.
     if (style) {
-#if APPLE_CHANGES
       if (m_style->visibility() != style->visibility() ||
           m_style->zIndex() != style->zIndex() ||
           m_style->hasAutoZIndex() != style->hasAutoZIndex())
         document()->setDashboardRegionsDirty(true);
-#endif
 
       if ((m_style->hasAutoZIndex() != style->hasAutoZIndex() ||
            m_style->zIndex() != style->zIndex() ||
@@ -2108,20 +2100,6 @@ bool RenderObject::isSelectionBorder() const {
   return st == SelectionStart || st == SelectionEnd || st == SelectionBoth;
 }
 
-#if 0
-static void checkFloats(RenderObject* o, RenderObject* f)
-{
-    if (o->isRenderBlock()) {
-        RenderBlock* b = static_cast<RenderBlock*>(o);
-        if (b->containsFloat(f))
-            assert(false);
-    }
-    
-    for (RenderObject* c = o->firstChild(); c; c = c->nextSibling())
-        checkFloats(c, f);
-}
-#endif
-
 void RenderObject::removeFromObjectLists() {
   if (isFloating()) {
     RenderBlock* outermostBlock = containingBlock();
@@ -2133,10 +2111,6 @@ void RenderObject::removeFromObjectLists() {
 
     if (outermostBlock)
       outermostBlock->markAllDescendantsWithFloatsForLayout(this);
-#if 0
-        // Debugging code for float checking.
-        checkFloats(canvas(), this);
-#endif
   }
 
   if (isPositioned()) {
@@ -2154,10 +2128,8 @@ RenderArena* RenderObject::renderArena() const {
 }
 
 void RenderObject::remove() {
-#if APPLE_CHANGES
   // Delete our accessibility object if we have one.
   document()->getAccObjectCache()->detach(this);
-#endif
 
   removeFromObjectLists();
 
@@ -2517,7 +2489,6 @@ void RenderObject::getTextDecorationColors(int decorations,
 
 void RenderObject::updateWidgetPosition() {}
 
-#if APPLE_CHANGES
 QValueList<DashboardRegionValue> RenderObject::computeDashboardRegions() {
   QValueList<DashboardRegionValue> regions;
   collectDashboardRegions(regions);
@@ -2577,8 +2548,6 @@ void RenderObject::collectDashboardRegions(
   }
 }
 
-#endif
-
 void RenderObject::collectBorders(
     QValueList<CollapsedBorderValue>& borderStyles) {
   for (RenderObject* curr = firstChild(); curr; curr = curr->nextSibling())
@@ -2602,9 +2571,6 @@ bool RenderObject::usesLineWidth() const {
 }
 
 QChar RenderObject::backslashAsCurrencySymbol() const {
-#if !APPLE_CHANGES
-  return '\\';
-#else
   NodeImpl* node = element();
   if (!node)
     return '\\';
@@ -2618,7 +2584,6 @@ QChar RenderObject::backslashAsCurrencySymbol() const {
   if (!codec)
     return '\\';
   return codec->backslashAsCurrencySymbol();
-#endif
 }
 
 void RenderObject::setPixmap(const QPixmap&, const QRect&, CachedImage* image) {

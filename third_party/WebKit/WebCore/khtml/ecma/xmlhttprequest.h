@@ -110,19 +110,13 @@ class XMLHttpRequest : public DOMObject {
 
   XMLHttpRequestQObject* qObject;
 
-#if APPLE_CHANGES
   void slotData(KIO::Job* job, const char* data, int size);
-#else
-  void slotData(KIO::Job* job, const QByteArray& data);
-#endif
   void slotFinished(KIO::Job*);
   void slotRedirection(KIO::Job*, const KURL&);
 
-#if APPLE_CHANGES
   void processSyncLoadResults(const QByteArray& data,
                               const KURL& finalURL,
                               const QString& headers);
-#endif
 
   void open(const QString& _method, const KURL& _url, bool _async);
   void send(const QString& _body);
@@ -170,11 +164,7 @@ class XMLHttpRequestQObject : public QObject {
   XMLHttpRequestQObject(XMLHttpRequest* _jsObject);
 
  public slots:
-#if APPLE_CHANGES
   void slotData(KIO::Job* job, const char* data, int size);
-#else
-  void slotData(KIO::Job* job, const QByteArray& data);
-#endif
   void slotFinished(KIO::Job* job);
   void slotRedirection(KIO::Job* job, const KURL& url);
 

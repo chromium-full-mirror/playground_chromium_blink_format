@@ -26,9 +26,7 @@
 #include <qvariant.h>
 #include <kjs/lookup.h>
 
-#if APPLE_CHANGES
 #include <JavaScriptCore/runtime.h>
-#endif
 
 class KHTMLPart;
 
@@ -116,7 +114,6 @@ class ScriptInterpreter : public Interpreter {
 
   DOM::EventImpl* getCurrentEvent() const { return m_evt; }
 
-#if APPLE_CHANGES
   virtual bool isGlobalObject(ValueImp* v);
   virtual Interpreter* interpreterForGlobalObject(const ValueImp* imp);
   virtual bool isSafeScript(const Interpreter* target);
@@ -130,7 +127,6 @@ class ScriptInterpreter : public Interpreter {
                                    ObjectImp* value,
                                    const Bindings::RootObject* origin,
                                    const Bindings::RootObject* current);
-#endif
 
  private:
   KHTMLPart* m_part;

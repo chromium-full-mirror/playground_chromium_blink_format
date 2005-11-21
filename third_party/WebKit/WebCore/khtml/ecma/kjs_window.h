@@ -114,7 +114,6 @@ class Window : public ObjectImp {
   int installTimeout(const UString& handler, int t, bool singleShot);
   int installTimeout(ValueImp* function, List& args, int t, bool singleShot);
   void clearTimeout(int timerId);
-#ifdef APPLE_CHANGES
   bool hasTimeouts();
   QMap<int, ScheduledAction*>* pauseTimeouts(const void* key);
   void resumeTimeouts(QMap<int, ScheduledAction*>* sa, const void* key);
@@ -123,7 +122,6 @@ class Window : public ObjectImp {
 
   static bool isSafeScript(const KJS::ScriptInterpreter* origin,
                            const KJS::ScriptInterpreter* target);
-#endif
   void scheduleClose();
 
   bool isSafeScript(ExecState* exec) const;
@@ -326,12 +324,10 @@ class WindowQObject : public QObject {
   int installTimeout(const UString& handler, int t, bool singleShot);
   int installTimeout(ValueImp* func, List args, int t, bool singleShot);
   void clearTimeout(int timerId, bool delAction = true);
-#ifdef APPLE_CHANGES
   bool hasTimeouts();
   QMap<int, ScheduledAction*>* WindowQObject::pauseTimeouts(const void* key);
   void WindowQObject::resumeTimeouts(QMap<int, ScheduledAction*>* sa,
                                      const void* key);
-#endif
 
  public slots:
   void timeoutClose();

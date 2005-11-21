@@ -140,8 +140,6 @@ HTMLFormElementImpl::~HTMLFormElementImpl() {
     imgElements[i]->m_form = 0;
 }
 
-#if APPLE_CHANGES
-
 bool HTMLFormElementImpl::formWouldHaveSecureSubmission(const DOMString& url) {
   if (url.isNull()) {
     return false;
@@ -149,18 +147,14 @@ bool HTMLFormElementImpl::formWouldHaveSecureSubmission(const DOMString& url) {
   return getDocument()->completeURL(url.qstring()).startsWith("https:", false);
 }
 
-#endif
-
 void HTMLFormElementImpl::attach() {
   HTMLElementImpl::attach();
 
-#if APPLE_CHANGES
   // note we don't deal with calling secureFormRemoved() on detach, because the
   // timing
   // was such that it cleared our state too early
   if (formWouldHaveSecureSubmission(m_url))
     getDocument()->secureFormAdded();
-#endif
 }
 
 void HTMLFormElementImpl::insertedIntoDocument() {
@@ -190,8 +184,6 @@ int HTMLFormElementImpl::length() const {
   return len;
 }
 
-#if APPLE_CHANGES
-
 void HTMLFormElementImpl::submitClick() {
   bool submitFound = false;
   for (unsigned i = 0; i < formElements.count(); ++i) {
@@ -208,8 +200,6 @@ void HTMLFormElementImpl::submitClick() {
   if (!submitFound)  // submit the form without a submit or image input
     prepareSubmit();
 }
-
-#endif  // APPLE_CHANGES
 
 static QCString encodeCString(const QCString& e) {
   // http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.1
@@ -301,30 +291,6 @@ static QCString fixLineBreaks(const QCString& s) {
   return result;
 }
 
-#if !APPLE_CHANGES
-
-void HTMLFormElementImpl::i18nData() {
-  QString foo1 = i18n(
-      "You're about to send data to the Internet "
-      "via an unencrypted connection. It might be possible "
-      "for others to see this information.\n"
-      "Do you want to continue?");
-  QString foo2 = i18n("KDE Web browser");
-  QString foo3 = i18n(
-      "When you send a password unencrypted to the Internet, "
-      "it might be possible for others to capture it as plain text.\n"
-      "Do you want to continue?");
-  QString foo5 = i18n(
-      "Your data submission is redirected to "
-      "an insecure site. The data is sent unencrypted.\n"
-      "Do you want to continue?");
-  QString foo6 = i18n(
-      "The page contents expired. You can repost the form"
-      "data by using <a href=\"javascript:go(0);\">Reload</a>");
-}
-
-#endif
-
 bool HTMLFormElementImpl::formData(FormData& form_data) const {
 #ifdef FORMS_DEBUG
   kdDebug(6030) << "form: formData()" << endl;
@@ -353,10 +319,6 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
 
   if (!codec)
     codec = QTextCodec::codecForLocale();
-
-#if !APPLE_CHANGES
-  QStringList fileUploads;
-#endif
 
   for (unsigned i = 0; i < formElements.count(); ++i) {
     HTMLGenericFormElementImpl* current = formElements[i];
@@ -396,10 +358,6 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
                   HTMLInputElementImpl::FILE) {
             QString path =
                 static_cast<HTMLInputElementImpl*>(current)->value().qstring();
-#if !APPLE_CHANGES
-            if (path.length())
-              fileUploads << path;
-#endif
 
             // FIXME: This won't work if the filename includes a " mark,
             // or control characters like CR or LF. This also does strange
@@ -412,13 +370,8 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
             if (!static_cast<HTMLInputElementImpl*>(current)
                      ->value()
                      .isEmpty()) {
-#if APPLE_CHANGES
               QString mimeType =
                   part ? KWQ(part)->mimeTypeForFileName(path) : QString();
-#else
-              KMimeType::Ptr ptr = KMimeType::findByURL(KURL(path));
-              QString mimeType = ptr->name();
-#endif
               if (!mimeType.isEmpty()) {
                 hstr += "\r\nContent-Type: ";
                 hstr += mimeType.ascii();
@@ -431,35 +384,17 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
 
           // append body
           form_data.appendData(hstr.data(), hstr.length());
-#if APPLE_CHANGES
           const FormDataListItem& item = *it;
           size_t dataSize = item.m_data.size();
           if (dataSize != 0)
             form_data.appendData(item.m_data, dataSize - 1);
           else if (!item.m_path.isEmpty())
             form_data.appendFile(item.m_path);
-#else
-          form_data.appendData((*it).m_data, (*it).m_data.size() - 1);
-#endif
           form_data.appendData("\r\n", 2);
         }
       }
     }
   }
-
-#if !APPLE_CHANGES
-  if (fileUploads.count()) {
-    int result = KMessageBox::warningContinueCancelList(
-        0, i18n("You're about to transfer the following files from "
-                "your local computer to the Internet.\n"
-                "Do you really want to continue?"),
-        fileUploads);
-
-    if (result == KMessageBox::Cancel) {
-      return false;
-    }
-  }
-#endif
 
   if (m_multipart)
     enc_string = ("--" + m_boundary.qstring() + "--\r\n").ascii();
@@ -529,12 +464,9 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
   bool needButtonActivation =
       activateSubmitButton;  // do we need to activate a submit button?
 
-#if APPLE_CHANGES
   KWQ(part)->clearRecordedFormValues();
-#endif
   for (unsigned i = 0; i < formElements.count(); ++i) {
     HTMLGenericFormElementImpl* current = formElements[i];
-#if APPLE_CHANGES
     // Our app needs to get form values for password fields for doing password
     // autocomplete,
     // so we are more lenient in pushing values, and let the app decide what to
@@ -552,16 +484,6 @@ void HTMLFormElementImpl::submit(bool activateSubmitButton) {
           static_cast<RenderLineEdit*>(input->renderer())->addSearchResult();
       }
     }
-#else
-    if (current->id() == ID_INPUT &&
-        static_cast<HTMLInputElementImpl*>(current)->inputType() ==
-            HTMLInputElementImpl::TEXT &&
-        static_cast<HTMLInputElementImpl*>(current)->autoComplete()) {
-      HTMLInputElementImpl* input = static_cast<HTMLInputElementImpl*>(current);
-      view->addFormCompletionItem(input->name().qstring(),
-                                  input->value().qstring());
-    }
-#endif
 
     if (needButtonActivation) {
       if (current->isActivatedSubmit()) {
@@ -619,13 +541,9 @@ void HTMLFormElementImpl::reset() {
 }
 
 void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  if (attr->name() == actionAttr)
-#if APPLE_CHANGES
-  {
+  if (attr->name() == actionAttr) {
     bool oldURLWasSecure = formWouldHaveSecureSubmission(m_url);
-#endif
     m_url = khtml::parseURL(attr->value());
-#if APPLE_CHANGES
     bool newURLIsSecure = formWouldHaveSecureSubmission(m_url);
 
     if (m_attached && (oldURLWasSecure != newURLIsSecure))
@@ -633,9 +551,7 @@ void HTMLFormElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
         getDocument()->secureFormAdded();
       else
         getDocument()->secureFormRemoved();
-  }
-#endif
-  else if (attr->name() == targetAttr) {
+  } else if (attr->name() == targetAttr) {
     m_target = attr->value();
   } else if (attr->name() == methodAttr) {
     if (strcasecmp(attr->value(), "post") == 0)
@@ -998,14 +914,10 @@ bool HTMLGenericFormElementImpl::isMouseFocusable() const {
              (static_cast<RenderWidget*>(m_render)->widget()->focusPolicy() &
               QWidget::ClickFocus);
     }
-#if APPLE_CHANGES
     // For <input type=image> and <button>, we will assume no mouse
     // focusability.  This is
     // consistent with OS X behavior for buttons.
     return false;
-#else
-    return true;
-#endif
   }
   return false;
 }
@@ -1024,18 +936,8 @@ void HTMLGenericFormElementImpl::defaultEventHandler(EventImpl* evt) {
         ext->editableWidgetFocused(widget);
     }
 
-#if APPLE_CHANGES
-// We don't want this default key event handling, we'll count on
-// Cocoa event dispatch if the event doesn't get blocked.
-#else
-    if (evt->type() == keydownEvent || evt->type() == keyupEvent) {
-      KeyboardEventImpl* k = static_cast<KeyboardEventImpl*>(evt);
-      if (k->keyVal() == QChar('\n').unicode() && m_render &&
-          m_render->isWidget() && k->qKeyEvent)
-        QApplication::sendEvent(static_cast<RenderWidget*>(m_render)->widget(),
-                                k->qKeyEvent);
-    }
-#endif
+    // We don't want this default key event handling, we'll count on
+    // Cocoa event dispatch if the event doesn't get blocked.
 
     if (evt->type() == DOMFocusOutEvent && isEditable() && part && m_render &&
         m_render->isWidget()) {
@@ -1373,12 +1275,10 @@ void HTMLInputElementImpl::setInputType(const DOMString& t) {
     newType = BUTTON;
   else if (strcasecmp(t, "khtml_isindex") == 0)
     newType = ISINDEX;
-#if APPLE_CHANGES
   else if (strcasecmp(t, "search") == 0)
     newType = SEARCH;
   else if (strcasecmp(t, "range") == 0)
     newType = RANGE;
-#endif
   else
     newType = TEXT;
 
@@ -1451,12 +1351,10 @@ DOMString HTMLInputElementImpl::type() const {
       return "image";
     case BUTTON:
       return "button";
-#if APPLE_CHANGES
     case SEARCH:
       return "search";
     case RANGE:
       return "range";
-#endif
     case ISINDEX:
       return "";
   }
@@ -1499,9 +1397,7 @@ bool HTMLInputElementImpl::canHaveSelection() {
   switch (m_type) {
     case TEXT:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
       return true;
     default:
       break;
@@ -1515,9 +1411,7 @@ int HTMLInputElementImpl::selectionStart() {
 
   switch (m_type) {
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       return static_cast<RenderLineEdit*>(m_render)->selectionStart();
     default:
@@ -1532,9 +1426,7 @@ int HTMLInputElementImpl::selectionEnd() {
 
   switch (m_type) {
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       return static_cast<RenderLineEdit*>(m_render)->selectionEnd();
     default:
@@ -1549,9 +1441,7 @@ void HTMLInputElementImpl::setSelectionStart(int start) {
 
   switch (m_type) {
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       static_cast<RenderLineEdit*>(m_render)->setSelectionStart(start);
       break;
@@ -1566,9 +1456,7 @@ void HTMLInputElementImpl::setSelectionEnd(int end) {
 
   switch (m_type) {
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       static_cast<RenderLineEdit*>(m_render)->setSelectionEnd(end);
       break;
@@ -1586,9 +1474,7 @@ void HTMLInputElementImpl::select() {
       static_cast<RenderFileButton*>(m_render)->select();
       break;
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       static_cast<RenderLineEdit*>(m_render)->select();
       break;
@@ -1598,9 +1484,7 @@ void HTMLInputElementImpl::select() {
     case IMAGE:
     case ISINDEX:
     case RADIO:
-#if APPLE_CHANGES
     case RANGE:
-#endif
     case RESET:
     case SUBMIT:
       break;
@@ -1613,9 +1497,7 @@ void HTMLInputElementImpl::setSelectionRange(int start, int end) {
 
   switch (m_type) {
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       static_cast<RenderLineEdit*>(m_render)->setSelectionRange(start, end);
       break;
@@ -1635,12 +1517,10 @@ void HTMLInputElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
       HTMLGenericFormElementImpl::click(sendMouseEvents, showPressedLook);
       break;
     case FILE:
-#if APPLE_CHANGES
       if (renderer()) {
         static_cast<RenderFileButton*>(renderer())->click(sendMouseEvents);
         break;
       }
-#endif
       HTMLGenericFormElementImpl::click(sendMouseEvents, showPressedLook);
       break;
     case CHECKBOX:
@@ -1648,10 +1528,8 @@ void HTMLInputElementImpl::click(bool sendMouseEvents, bool showPressedLook) {
     case IMAGE:
     case ISINDEX:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
     case RANGE:
-#endif
     case TEXT:
       HTMLGenericFormElementImpl::click(sendMouseEvents, showPressedLook);
       break;
@@ -1665,9 +1543,7 @@ void HTMLInputElementImpl::accessKeyAction(bool sendToAnyElement) {
       break;
     case TEXT:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case ISINDEX:
       focus();
       break;
@@ -1678,9 +1554,7 @@ void HTMLInputElementImpl::accessKeyAction(bool sendToAnyElement) {
     case IMAGE:
     case BUTTON:
     case FILE:
-#if APPLE_CHANGES
     case RANGE:
-#endif
       // focus
       focus();
 
@@ -1803,10 +1677,8 @@ bool HTMLInputElementImpl::rendererIsNeeded(RenderStyle* style) {
   switch (m_type) {
     case TEXT:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
     case RANGE:
-#endif
     case ISINDEX:
     case CHECKBOX:
     case RADIO:
@@ -1828,9 +1700,7 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
   switch (m_type) {
     case TEXT:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case ISINDEX:
       return new (arena) RenderLineEdit(this);
     case CHECKBOX:
@@ -1844,10 +1714,8 @@ RenderObject* HTMLInputElementImpl::createRenderer(RenderArena* arena,
       return new (arena) RenderImageButton(this);
     case FILE:
       return new (arena) RenderFileButton(this);
-#if APPLE_CHANGES
     case RANGE:
       return new (arena) RenderSlider(this);
-#endif
     case HIDDEN:
       break;
   }
@@ -1899,13 +1767,11 @@ void HTMLInputElementImpl::attach() {
     }
   }
 
-#if APPLE_CHANGES
   // note we don't deal with calling passwordFieldRemoved() on detach, because
   // the timing
   // was such that it cleared our state too early
   if (m_type == PASSWORD)
     getDocument()->passwordFieldAdded();
-#endif
 }
 
 void HTMLInputElementImpl::detach() {
@@ -1924,11 +1790,7 @@ DOMString HTMLInputElementImpl::altText() const {
   if (alt.isNull())
     alt = getAttribute(valueAttr);
   if (alt.isEmpty())
-#if APPLE_CHANGES
     alt = inputElementAltText();
-#else
-    alt = i18n("Submit");
-#endif
 
   return alt;
 }
@@ -1960,10 +1822,8 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
   switch (m_type) {
     case HIDDEN:
     case TEXT:
-#if APPLE_CHANGES
     case SEARCH:
     case RANGE:
-#endif
     case PASSWORD:
       // always successful
       encoding.appendData(name(), value());
@@ -2020,48 +1880,8 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
         return true;
       }
 
-#if APPLE_CHANGES
       encoding.appendFile(name(), value());
       return true;
-#else
-      KURL fileurl("file:///");
-      fileurl.setPath(value().qstring());
-      KIO::UDSEntry filestat;
-
-      if (!KIO::NetAccess::stat(fileurl, filestat)) {
-        KMessageBox::sorry(0L, i18n("Error fetching file for submission:\n%1")
-                                   .arg(KIO::NetAccess::lastErrorString()));
-        return false;
-      }
-
-      KFileItem fileitem(filestat, fileurl, true, false);
-      if (fileitem.isDir()) {
-        return false;
-      }
-
-      QString local;
-      if (KIO::NetAccess::download(fileurl, local)) {
-        QFile file(local);
-        if (file.open(IO_ReadOnly)) {
-          QCString filearray(file.size() + 1);
-          int readbytes = file.readBlock(filearray.data(), file.size());
-          if (readbytes >= 0)
-            filearray[readbytes] = '\0';
-          file.close();
-
-          encoding.appendData(name(), filearray);
-          KIO::NetAccess::removeTempFile(local);
-
-          return true;
-        }
-        return false;
-      } else {
-        KMessageBox::sorry(0L, i18n("Error fetching file for submission:\n%1")
-                                   .arg(KIO::NetAccess::lastErrorString()));
-        return false;
-      }
-      break;
-#endif
     }
     case ISINDEX:
       encoding.appendData(name(), value());
@@ -2128,19 +1948,11 @@ DOMString HTMLInputElementImpl::valueWithDefault() const {
   if (v.isEmpty()) {
     switch (m_type) {
       case RESET:
-#if APPLE_CHANGES
         v = resetButtonDefaultLabel();
-#else
-        v = i18n("Reset");
-#endif
         break;
 
       case SUBMIT:
-#if APPLE_CHANGES
         v = submitButtonDefaultLabel();
-#else
-        v = i18n("Submit");
-#endif
         break;
 
       case BUTTON:
@@ -2151,10 +1963,8 @@ DOMString HTMLInputElementImpl::valueWithDefault() const {
       case ISINDEX:
       case PASSWORD:
       case RADIO:
-#if APPLE_CHANGES
       case RANGE:
       case SEARCH:
-#endif
       case TEXT:
         break;
     }
@@ -2193,17 +2003,13 @@ bool HTMLInputElementImpl::storesValueSeparateFromAttribute() const {
     case HIDDEN:
     case IMAGE:
     case RADIO:
-#if APPLE_CHANGES
     case RANGE:
-#endif
     case RESET:
     case SUBMIT:
       return false;
     case ISINDEX:
     case PASSWORD:
-#if APPLE_CHANGES
     case SEARCH:
-#endif
     case TEXT:
       return true;
   }
@@ -2337,7 +2143,6 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
     }
   }
 
-#if APPLE_CHANGES
   // Use key press event here since sending simulated mouse events
   // on key down blocks the proper sending of the key press event.
   if (evt->type() == keypressEvent && evt->isKeyboardEvent()) {
@@ -2450,7 +2255,6 @@ void HTMLInputElementImpl::defaultEventHandler(EventImpl* evt) {
       evt->setDefaultHandled();
     }
   }
-#endif
 
   HTMLGenericFormElementImpl::defaultEventHandler(evt);
 }
@@ -2841,14 +2645,10 @@ void HTMLSelectElementImpl::setValue(const DOMString& value) {
 }
 
 QString HTMLSelectElementImpl::state() {
-#if !APPLE_CHANGES
-  QString state;
-#endif
   QMemArray<HTMLElementImpl*> items = listItems();
 
   int l = items.count();
 
-#if APPLE_CHANGES
   QChar stateChars[l];
 
   for (int i = 0; i < l; i++)
@@ -2858,13 +2658,6 @@ QString HTMLSelectElementImpl::state() {
     else
       stateChars[i] = '.';
   QString state(stateChars, l);
-#else  /* APPLE_CHANGES not defined */
-  state.fill('.', l);
-  for (int i = 0; i < l; i++)
-    if (items[i]->id() == ID_OPTION &&
-        static_cast<HTMLOptionElementImpl*>(items[i])->selected())
-      state[i] = 'X';
-#endif /* APPLE_CHANGES not defined */
 
   return HTMLGenericFormElementImpl::state() + state;
 }
@@ -2879,12 +2672,8 @@ void HTMLSelectElementImpl::restoreState(QStringList& _states) {
   QString state = _state;
   if (!state.isEmpty() && !state.contains('X') && !m_multiple) {
     qWarning("should not happen in restoreState!");
-#if APPLE_CHANGES
-// KWQString doesn't support this operation. Should never get here anyway.
-// state[0] = 'X';
-#else
-    state[0] = 'X';
-#endif
+    // KWQString doesn't support this operation. Should never get here anyway.
+    // state[0] = 'X';
   }
 
   QMemArray<HTMLElementImpl*> items = listItems();
@@ -3199,7 +2988,6 @@ void HTMLKeygenElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 }
 
 bool HTMLKeygenElementImpl::appendFormData(FormDataList& encoded_values, bool) {
-#if APPLE_CHANGES
   // Only RSA is supported at this time.
   if (!m_keyType.isNull() && strcasecmp(m_keyType, "rsa")) {
     return false;
@@ -3211,22 +2999,6 @@ bool HTMLKeygenElementImpl::appendFormData(FormDataList& encoded_values, bool) {
   }
   encoded_values.appendData(name(), value.utf8());
   return true;
-#else
-  bool successful = false;
-
-  // pop up the fancy certificate creation dialog here
-  KSSLKeyGen* kg = new KSSLKeyGen(
-      static_cast<RenderWidget*>(m_render)->widget(), "Key Generator", true);
-
-  kg->setKeySize(0);
-  successful = (QDialog::Accepted == kg->exec());
-
-  delete kg;
-
-  encoded_values.appendData(name(), "deadbeef");
-
-  return successful;
-#endif
 }
 
 // -------------------------------------------------------------------------

@@ -80,13 +80,7 @@ StyleVisualData::StyleVisualData()
       textDecoration(RenderStyle::initialTextDecoration()),
       colspan(1),
       counter_increment(0),
-      counter_reset(0)
-#if !APPLE_CHANGES
-      ,
-      palette(QApplication::palette())
-#endif
-{
-}
+      counter_reset(0) {}
 
 StyleVisualData::~StyleVisualData() {}
 
@@ -97,13 +91,7 @@ StyleVisualData::StyleVisualData(const StyleVisualData& o)
       textDecoration(o.textDecoration),
       colspan(o.colspan),
       counter_increment(o.counter_increment),
-      counter_reset(o.counter_reset)
-#if !APPLE_CHANGES
-      ,
-      palette(o.palette)
-#endif
-{
-}
+      counter_reset(o.counter_reset) {}
 
 BackgroundLayer::BackgroundLayer()
     : m_image(RenderStyle::initialBackgroundImage()),
@@ -342,9 +330,7 @@ bool StyleFlexibleBoxData::operator==(const StyleFlexibleBoxData& o) const {
 
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
     : Shared<StyleCSS3NonInheritedData>(),
-#if APPLE_CHANGES
       lineClamp(RenderStyle::initialLineClamp()),
-#endif
       opacity(RenderStyle::initialOpacity()),
       userDrag(RenderStyle::initialUserDrag()),
       userSelect(RenderStyle::initialUserSelect()),
@@ -362,9 +348,7 @@ StyleCSS3NonInheritedData::StyleCSS3NonInheritedData()
 StyleCSS3NonInheritedData::StyleCSS3NonInheritedData(
     const StyleCSS3NonInheritedData& o)
     : Shared<StyleCSS3NonInheritedData>(),
-#if APPLE_CHANGES
       lineClamp(o.lineClamp),
-#endif
       opacity(o.opacity),
       flexibleBox(o.flexibleBox),
       marquee(o.marquee),
@@ -409,11 +393,8 @@ bool StyleCSS3NonInheritedData::operator==(
 #ifndef KHTML_NO_XBL
          && bindingsEquivalent(o)
 #endif
-#if APPLE_CHANGES
          && lineClamp == o.lineClamp &&
-         m_dashboardRegions == o.m_dashboardRegions
-#endif
-      ;
+         m_dashboardRegions == o.m_dashboardRegions;
 }
 
 StyleCSS3InheritedData::StyleCSS3InheritedData()
@@ -422,13 +403,8 @@ StyleCSS3InheritedData::StyleCSS3InheritedData()
       userModify(READ_ONLY),
       wordWrap(WBNORMAL),
       nbspMode(NBNORMAL),
-      khtmlLineBreak(LBNORMAL)
-#if APPLE_CHANGES
-      ,
-      textSizeAdjust(RenderStyle::initialTextSizeAdjust())
-#endif
-{
-}
+      khtmlLineBreak(LBNORMAL),
+      textSizeAdjust(RenderStyle::initialTextSizeAdjust()) {}
 
 StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
     : Shared<StyleCSS3InheritedData>() {
@@ -437,9 +413,7 @@ StyleCSS3InheritedData::StyleCSS3InheritedData(const StyleCSS3InheritedData& o)
   wordWrap = o.wordWrap;
   nbspMode = o.nbspMode;
   khtmlLineBreak = o.khtmlLineBreak;
-#if APPLE_CHANGES
   textSizeAdjust = o.textSizeAdjust;
-#endif
 }
 
 StyleCSS3InheritedData::~StyleCSS3InheritedData() {
@@ -449,11 +423,8 @@ StyleCSS3InheritedData::~StyleCSS3InheritedData() {
 bool StyleCSS3InheritedData::operator==(const StyleCSS3InheritedData& o) const {
   return (userModify == o.userModify) && shadowDataEquivalent(o) &&
          (wordWrap == o.wordWrap) && (nbspMode == o.nbspMode) &&
-         (khtmlLineBreak == o.khtmlLineBreak)
-#if APPLE_CHANGES
-         && (textSizeAdjust == o.textSizeAdjust)
-#endif
-      ;
+         (khtmlLineBreak == o.khtmlLineBreak) &&
+         (textSizeAdjust == o.textSizeAdjust);
 }
 
 bool StyleCSS3InheritedData::shadowDataEquivalent(
@@ -735,12 +706,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
           other->css3NonInheritedData->marginBottomCollapse ||
       *css3NonInheritedData->flexibleBox.get() !=
           *other->css3NonInheritedData->flexibleBox.get() ||
-#if APPLE_CHANGES
       (css3NonInheritedData->lineClamp !=
        other->css3NonInheritedData->lineClamp) ||
       (css3InheritedData->textSizeAdjust !=
        other->css3InheritedData->textSizeAdjust) ||
-#endif
       (css3InheritedData->wordWrap != other->css3InheritedData->wordWrap) ||
       (css3InheritedData->nbspMode != other->css3InheritedData->nbspMode) ||
       (css3InheritedData->khtmlLineBreak !=
@@ -837,12 +806,10 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       borderRightWidth() != other->borderRightWidth())
     return Layout;
 
-#if APPLE_CHANGES
   // If regions change trigger a relayout to re-calc regions.
   if (!(css3NonInheritedData->m_dashboardRegions ==
         other->css3NonInheritedData->m_dashboardRegions))
     return Layout;
-#endif
 
   // Make sure these left/top/right/bottom checks stay below all layout checks
   // and above
@@ -889,11 +856,7 @@ RenderStyle::Diff RenderStyle::diff(const RenderStyle* other) const {
       css3InheritedData->userModify != other->css3InheritedData->userModify ||
       css3NonInheritedData->userSelect !=
           other->css3NonInheritedData->userSelect ||
-      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag
-#if !APPLE_CHANGES
-      || !(visual->palette == other->visual->palette)
-#endif
-          )
+      css3NonInheritedData->userDrag != other->css3NonInheritedData->userDrag)
     return Repaint;
 
   return Equal;
@@ -909,16 +872,6 @@ void RenderStyle::cleanup() {
   //    counter = 0;
   //    SharedData::counter = 0;
 }
-
-#if !APPLE_CHANGES
-
-void RenderStyle::setPaletteColor(QPalette::ColorGroup g,
-                                  QColorGroup::ColorRole r,
-                                  const QColor& c) {
-  visual.access()->palette.setColor(g, r, c);
-}
-
-#endif
 
 void RenderStyle::adjustBackgroundLayers() {
   if (backgroundLayers()->next()) {

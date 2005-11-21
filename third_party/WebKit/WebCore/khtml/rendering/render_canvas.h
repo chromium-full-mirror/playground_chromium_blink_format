@@ -68,7 +68,6 @@ class RenderCanvas : public RenderBlock {
   bool printingMode() const { return m_printingMode; }
   void setPrintImages(bool enable) { m_printImages = enable; }
   bool printImages() const { return m_printImages; }
-#if APPLE_CHANGES
   void setTruncatedAt(int y) {
     m_truncatedAt = y;
     m_bestTruncatedAt = m_truncatorWidth = 0;
@@ -85,9 +84,6 @@ class RenderCanvas : public RenderBlock {
   bool m_forcedPageBreak;
 
  public:
-#else
-  void setTruncatedAt(int y) { m_truncatedAt = y; }
-#endif
   int truncatedAt() const { return m_truncatedAt; }
 
   virtual void setWidth(int width) { m_rootWidth = m_width = width; }

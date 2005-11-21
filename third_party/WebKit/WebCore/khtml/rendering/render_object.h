@@ -118,7 +118,6 @@ class InlineBox;
 class InlineFlowBox;
 class CollapsedBorderValue;
 
-#if APPLE_CHANGES
 struct DashboardRegionValue {
   QString label;
   QRect bounds;
@@ -129,7 +128,6 @@ struct DashboardRegionValue {
     return type == o.type && bounds == o.bounds && label == o.label;
   }
 };
-#endif
 
 /**
  * Base Class for all rendering tree objects.
@@ -541,11 +539,9 @@ class RenderObject : public CachedObjectClient {
 
   virtual void updateWidgetPosition();
 
-#if APPLE_CHANGES
   QValueList<DashboardRegionValue> RenderObject::computeDashboardRegions();
   void addDashboardRegions(QValueList<DashboardRegionValue>& regions);
   void collectDashboardRegions(QValueList<DashboardRegionValue>& regions);
-#endif
 
   // does a query on the rendertree and finds the innernode
   // and overURL for the given position
@@ -779,9 +775,7 @@ class RenderObject : public CachedObjectClient {
   // the rect that will be painted if this object is passed as the paintingRoot
   QRect paintingRootRect(QRect& topLevelRect);
 
-#if APPLE_CHANGES
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
-#endif
 
   virtual int minWidth() const { return 0; }
   virtual int maxWidth() const { return 0; }

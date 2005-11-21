@@ -277,13 +277,6 @@ RenderWidget::~RenderWidget() {
 }
 
 void RenderWidget::resizeWidget(QWidget* widget, int w, int h) {
-#if !APPLE_CHANGES
-  // ugly hack to limit the maximum size of the widget (as X11 has problems if
-  // it's bigger)
-  h = kMin(h, 3072);
-  w = kMin(w, 2000);
-#endif
-
   if (element() && (widget->width() != w || widget->height() != h)) {
     RenderArena* arena = ref();
     element()->ref();
@@ -339,13 +332,11 @@ void RenderWidget::layout() {
   setNeedsLayout(false);
 }
 
-#if APPLE_CHANGES
 void RenderWidget::sendConsumedMouseUp() {
   RenderArena* arena = ref();
   element()->dispatchSimulatedMouseEvent(mouseupEvent);
   deref(arena);
 }
-#endif
 
 void RenderWidget::slotWidgetDestructed() {
   m_widget = 0;
@@ -357,10 +348,8 @@ void RenderWidget::setStyle(RenderStyle* _style) {
     m_widget->setFont(style()->font());
     if (style()->visibility() != VISIBLE)
       m_widget->hide();
-#if APPLE_CHANGES
     else
       m_widget->show();
-#endif
   }
 }
 

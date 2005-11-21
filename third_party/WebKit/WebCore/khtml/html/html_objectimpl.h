@@ -28,9 +28,7 @@
 #include "xml/dom_stringimpl.h"
 #include "java/kjavaappletcontext.h"
 
-#if APPLE_CHANGES
 #include <JavaScriptCore/runtime.h>
-#endif
 
 class QStringList;
 
@@ -92,11 +90,9 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
   DOMString width() const;
   void setWidth(const DOMString&);
 
-#if APPLE_CHANGES
   virtual bool allParamsAvailable();
   void setupApplet() const;
   KJS::Bindings::Instance* getAppletInstance() const;
-#endif
 
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
@@ -107,10 +103,8 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
  private:
   DOMString oldNameAttr;
   DOMString oldIdAttr;
-#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* appletInstance;
   bool m_allParamsAvailable;
-#endif
 };
 
 // -------------------------------------------------------------------------
@@ -137,9 +131,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
   virtual bool isURLAttribute(AttributeImpl* attr) const;
 
-#if APPLE_CHANGES
   KJS::Bindings::Instance* getEmbedInstance() const;
-#endif
 
   QString url;
   QString pluginPage;
@@ -147,9 +139,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
  private:
   DOMString oldNameAttr;
-#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* embedInstance;
-#endif
 };
 
 // -------------------------------------------------------------------------
@@ -244,9 +234,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   void setComplete(bool complete);
 
   bool isDocNamedItem() const { return m_docNamedItem; }
-#if APPLE_CHANGES
   KJS::Bindings::Instance* getObjectInstance() const;
-#endif
 
   QString serviceType;
   QString url;
@@ -259,9 +247,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   void updateDocNamedItem();
   DOMString oldIdAttr;
   DOMString oldNameAttr;
-#if APPLE_CHANGES
   mutable KJS::Bindings::Instance* objectInstance;
-#endif
   bool m_complete;
   bool m_docNamedItem;
 };

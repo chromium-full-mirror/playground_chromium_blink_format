@@ -431,11 +431,9 @@ void RenderFlow::paintLines(PaintInfo& i, int _tx, int _ty) {
     // minor issue.
     QPtrDictIterator<RenderFlow> objects(*i.outlineObjects);
     for (objects.toFirst(); objects.current(); ++objects) {
-#ifdef APPLE_CHANGES
       if (objects.current()->style()->outlineStyleIsAuto())
         objects.current()->paintFocusRing(i.p, _tx, _ty);
       else
-#endif
         objects.current()->paintOutlines(i.p, _tx, _ty);
     }
     i.outlineObjects->clear();
@@ -704,7 +702,6 @@ QRect RenderFlow::caretRect(int offset,
   return QRect(_x, _y, width, height);
 }
 
-#if APPLE_CHANGES
 void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
   // Only paint focus ring around outermost contenteditable element.
   // But skip the body element if it is outermost.
@@ -743,7 +740,6 @@ void RenderFlow::paintFocusRing(QPainter* p, int tx, int ty) {
   p->drawFocusRing();
   p->clearFocusRing();
 }
-#endif
 
 void RenderFlow::paintOutlines(QPainter* p, int _tx, int _ty) {
   if (style()->outlineStyle() <= BHIDDEN)

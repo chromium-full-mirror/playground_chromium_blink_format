@@ -85,9 +85,7 @@ class RenderImage : public RenderReplaced {
 
   DOM::HTMLMapElementImpl* imageMap();
 
-#if APPLE_CHANGES
   void resetAnimation();
-#endif
 
  private:
   bool isWidthSpecified() const;

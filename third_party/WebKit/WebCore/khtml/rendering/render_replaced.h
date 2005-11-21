@@ -101,9 +101,7 @@ class RenderWidget : public QObject,
 
   virtual void setSelectionState(SelectionState s);
 
-#if APPLE_CHANGES
   void sendConsumedMouseUp();
-#endif
   virtual void updateWidgetPosition();
 
  public slots:

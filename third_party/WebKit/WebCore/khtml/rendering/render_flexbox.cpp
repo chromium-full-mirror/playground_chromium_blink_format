@@ -728,7 +728,6 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
     child = iterator.next();
   }
 
-#if APPLE_CHANGES
   // We confine the line clamp ugliness to vertical flexible boxes (thus keeping
   // it out of
   // mainstream block layout) and put it all inside APPLE_CHANGES to denote that
@@ -843,7 +842,6 @@ void RenderFlexibleBox::layoutVerticalBox(bool relayoutChildren) {
       }
     }
   }
-#endif
 
   // We do 2 passes.  The first pass is simply to lay everyone out at
   // their preferred widths.  The second pass handles flexing the children.

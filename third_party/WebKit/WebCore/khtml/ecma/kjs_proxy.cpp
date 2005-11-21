@@ -141,14 +141,9 @@ QVariant KJSProxyImpl::evaluate(QString filename,
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
 
-#if APPLE_CHANGES
     KWQ(m_part)
         ->addMessageToConsole(errorMessage.qstring(), lineNumber,
                               sourceURL.qstring());
-#else
-    kdWarning(6070) << "Script threw exception: " << errorMessage.qstring()
-                    << endl;
-#endif
   }
   return QVariant();
 }
@@ -289,11 +284,7 @@ void KJSProxyImpl::initScript() {
   globalObject->put(m_script->globalExec(), "debug", new TestFunctionImp(),
                     Internal);
 
-#if APPLE_CHANGES
   QString userAgent = KWQ(m_part)->userAgent();
-#else
-  QString userAgent = KProtocolManager::userAgentForHost(m_part->url().host());
-#endif
   if (userAgent.find(QString::fromLatin1("Microsoft")) >= 0 ||
       userAgent.find(QString::fromLatin1("MSIE")) >= 0)
     m_script->setCompatMode(Interpreter::IECompat);

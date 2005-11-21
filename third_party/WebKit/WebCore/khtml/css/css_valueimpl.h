@@ -306,8 +306,6 @@ class PairImpl : public khtml::Shared<PairImpl> {
   CSSPrimitiveValueImpl* m_second;
 };
 
-#if APPLE_CHANGES
-
 class DashboardRegionImpl : public RectImpl {
  public:
   DashboardRegionImpl() : m_next(0), m_isCircle(0), m_isRectangle(0) {}
@@ -331,8 +329,6 @@ class DashboardRegionImpl : public RectImpl {
   unsigned int m_isCircle : 1;
   unsigned int m_isRectangle : 1;
 };
-
-#endif
 
 class CSSImageValueImpl : public CSSPrimitiveValueImpl,
                           public khtml::CachedObjectClient {

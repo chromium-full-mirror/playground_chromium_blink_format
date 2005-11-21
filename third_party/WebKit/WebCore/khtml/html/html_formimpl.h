@@ -42,9 +42,7 @@ class RenderTextArea;
 class RenderSelect;
 class RenderLineEdit;
 class RenderFileButton;
-#if APPLE_CHANGES
 class RenderSlider;
-#endif
 }
 
 namespace DOM {
@@ -293,10 +291,8 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   friend class khtml::RenderLineEdit;
   friend class khtml::RenderFileButton;
 
-#if APPLE_CHANGES
   friend class HTMLSelectElementImpl;
   friend class khtml::RenderSlider;
-#endif
 
  public:
   // do not change the order!
@@ -311,12 +307,9 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
     FILE,
     HIDDEN,
     IMAGE,
-    BUTTON
-#if APPLE_CHANGES
-    ,
+    BUTTON,
     SEARCH,
     RANGE
-#endif
   };
 
   HTMLInputElementImpl(DocumentImpl* doc, HTMLFormElementImpl* f = 0);

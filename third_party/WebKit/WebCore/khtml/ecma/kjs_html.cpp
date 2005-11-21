@@ -62,9 +62,7 @@
 #include <qpixmap.h>
 #include <qpainter.h>
 
-#if APPLE_CHANGES
 #include <ApplicationServices/ApplicationServices.h>
-#endif
 
 using namespace DOM::HTMLNames;
 using namespace DOM::EventNames;
@@ -1554,10 +1552,9 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
         return true;
       }
     }
-  }
-#if APPLE_CHANGES
-  else if (element.hasLocalName(embedTag) || element.hasLocalName(objectTag) ||
-           element.hasLocalName(appletTag)) {
+  } else if (element.hasLocalName(embedTag) ||
+             element.hasLocalName(objectTag) ||
+             element.hasLocalName(appletTag)) {
     if (propertyName == "__apple_runtime_object") {
       slot.setCustom(this, runtimeObjectGetter);
       return true;
@@ -1571,7 +1568,6 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
       }
     }
   }
-#endif
 
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable
@@ -2922,9 +2918,7 @@ ValueImp* KJS::HTMLElementFunction::callAsFunction(ExecState* exec,
       element.renderer()->layer()->marquee()->stop();
       return Undefined();
     }
-  }
-#if APPLE_CHANGES
-  else if (element.hasLocalName(canvasTag)) {
+  } else if (element.hasLocalName(canvasTag)) {
     if (id == KJS::HTMLElement::GetContext) {
       if (args.size() == 0 ||
           (args.size() == 1 &&
@@ -2934,7 +2928,6 @@ ValueImp* KJS::HTMLElementFunction::callAsFunction(ExecState* exec,
       return Undefined();
     }
   }
-#endif
 
   return Undefined();
 }
@@ -2965,17 +2958,15 @@ void KJS::HTMLElement::put(ExecState* exec,
       coll->put(exec, propertyName, value);
       return;
     }
-  }
-#if APPLE_CHANGES
-  else if (element.hasLocalName(embedTag) || element.hasLocalName(objectTag) ||
-           element.hasLocalName(appletTag)) {
+  } else if (element.hasLocalName(embedTag) ||
+             element.hasLocalName(objectTag) ||
+             element.hasLocalName(appletTag)) {
     if (ValueImp* runtimeObject = getRuntimeObject(exec, &element)) {
       ObjectImp* imp = static_cast<ObjectImp*>(runtimeObject);
       if (imp->canPut(exec, propertyName))
         return imp->put(exec, propertyName, value);
     }
   }
-#endif
 
   const HashTable* table =
       classInfo()->propHashTable;  // get the right hashtable

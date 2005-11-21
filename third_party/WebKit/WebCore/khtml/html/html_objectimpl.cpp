@@ -50,9 +50,7 @@
 #include "java/kjavaappletcontext.h"
 #endif
 
-#if APPLE_CHANGES
 #include "KWQKHTMLPart.h"
-#endif
 
 using namespace khtml;
 
@@ -203,41 +201,16 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 bool HTMLAppletElementImpl::getMember(const QString& name,
                                       JType& type,
                                       QString& val) {
-#if APPLE_CHANGES
   return false;
-#else
-#ifndef Q_WS_QWS  // We don't have Java in Qt Embedded
-  if (!m_render || !m_render->isApplet())
-    return false;
-  KJavaAppletWidget* w = static_cast<KJavaAppletWidget*>(
-      static_cast<RenderApplet*>(m_render)->widget());
-  return (w && w->applet() && w->applet()->getMember(name, type, val));
-#else
-  return false;
-#endif
-#endif
 }
 
 bool HTMLAppletElementImpl::callMember(const QString& name,
                                        const QStringList& args,
                                        JType& type,
                                        QString& val) {
-#if APPLE_CHANGES
   return false;
-#else
-#ifndef Q_WS_QWS  // We don't have Java in Qt Embedded
-  if (!m_render || !m_render->isApplet())
-    return false;
-  KJavaAppletWidget* w = static_cast<KJavaAppletWidget*>(
-      static_cast<RenderApplet*>(m_render)->widget());
-  return (w && w->applet() && w->applet()->callMember(name, args, type, val));
-#else
-  return false;
-#endif
-#endif
 }
 
-#if APPLE_CHANGES
 KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   KHTMLPart* part = getDocument()->part();
   if (!part || !part->javaEnabled())
@@ -272,7 +245,6 @@ void HTMLAppletElementImpl::closeRenderer() {
 bool HTMLAppletElementImpl::allParamsAvailable() {
   return m_allParamsAvailable;
 }
-#endif
 
 DOMString HTMLAppletElementImpl::align() const {
   return getAttribute(alignAttr);
@@ -373,7 +345,6 @@ bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
 }
 
-#if APPLE_CHANGES
 KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   KHTMLPart* part = getDocument()->part();
   if (!part)
@@ -396,7 +367,6 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
   }
   return embedInstance;
 }
-#endif
 
 bool HTMLEmbedElementImpl::mapToEntry(const QualifiedName& attrName,
                                       MappedAttributeEntry& result) const {
@@ -517,15 +487,7 @@ bool HTMLEmbedElementImpl::isURLAttribute(AttributeImpl* attr) const {
 // -------------------------------------------------------------------------
 
 HTMLObjectElementImpl::HTMLObjectElementImpl(DocumentImpl* doc)
-#if APPLE_CHANGES
-    : HTMLElementImpl(objectTag, doc),
-      m_imageLoader(0),
-      objectInstance(0)
-#else
-    : HTMLElementImpl(objectTag, doc),
-      m_imageLoader(0)
-#endif
-{
+    : HTMLElementImpl(objectTag, doc), m_imageLoader(0), objectInstance(0) {
   needWidgetUpdate = false;
   m_useFallbackContent = false;
   m_complete = false;
@@ -540,7 +502,6 @@ bool HTMLObjectElementImpl::checkDTD(const NodeImpl* newChild) {
   return newChild->hasTagName(paramTag) || HTMLElementImpl::checkDTD(newChild);
 }
 
-#if APPLE_CHANGES
 KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
   KHTMLPart* part = getDocument()->part();
   if (!part)
@@ -567,7 +528,6 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
 
   return objectInstance;
 }
-#endif
 
 HTMLFormElementImpl* HTMLObjectElementImpl::form() const {
   for (NodeImpl* p = parentNode(); p != 0; p = p->parentNode()) {
@@ -677,18 +637,9 @@ bool HTMLObjectElementImpl::rendererIsNeeded(RenderStyle* style) {
   if (!part || !part->pluginsEnabled()) {
     return false;
   }
-#if APPLE_CHANGES
-// Eventually we will merge with the better version of this check on the tip of
-// tree.
-// Until then, just leave it out.
-#else
-  KURL u = getDocument()->completeURL(url);
-  for (KHTMLPart* part = w->part()->parentPart(); part;
-       part = part->parentPart())
-    if (part->url() == u) {
-      return false;
-    }
-#endif
+  // Eventually we will merge with the better version of this check on the tip
+  // of tree.
+  // Until then, just leave it out.
   return true;
 }
 
