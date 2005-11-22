@@ -213,31 +213,28 @@ void SVGImageElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
     }
     m_cachedDocument->deref(this);
     m_cachedDocument = 0;
-  } else if (finishedObj == m_cachedImage) {
-    if (m_canvasItem && m_canvasItem->style()) {
-      KRenderingFillPainter* fillPainter = m_canvasItem->style()->fillPainter();
+  } else
+#endif
+      if (finishedObj == m_cachedImage) {
+    if (renderer() && renderer()->isRenderPath() && renderer()->style()) {
+      RenderPath* item = static_cast<RenderPath*>(renderer());
+      KRenderingFillPainter* fillPainter = item->canvasStyle()->fillPainter();
       if (!fillPainter)
         return;
 
       KRenderingPaintServer* fillPaintServer = fillPainter->paintServer();
+      if (fillPaintServer->type() != PS_IMAGE)
+        return;
       KRenderingPaintServerImage* fillPaintServerImage =
           static_cast<KRenderingPaintServerImage*>(fillPaintServer);
+      fillPaintServerImage->setImage(m_cachedImage->pixmap());
 
-      QPixmap pixm(m_cachedImage->pixmap_size());
-      kdDebug() << "pixm w : " << pixm.size() << endl;
-      QPainter p(&pixm);
-      ImagePainter ip(m_cachedImage->image());
-      ip.paint(0, 0, &p, 0, 0, pixm.width(), pixm.height());
-      KCanvasImageBuffer* imageBuffer = new KCanvasImageBuffer(pixm);
-      fillPaintServerImage->setImage(imageBuffer);
-
-      m_canvasItem->invalidate();
+      item->setNeedsLayout(true);
     }
 
     m_cachedImage->deref(this);
     m_cachedImage = 0;
   }
-#endif
 }
 
 void SVGImageElementImpl::finalizeStyle(KCanvasRenderingStyle* style,
@@ -255,8 +252,7 @@ void SVGImageElementImpl::finalizeStyle(KCanvasRenderingStyle* style,
   style->disableStrokePainter();
 
   KRenderingPaintServer* fillPaintServer =
-      canvas()->renderingDevice()->createPaintServer(
-          KCPaintServerType(PS_IMAGE));
+      canvas()->renderingDevice()->createPaintServer(PS_IMAGE);
   style->fillPainter()->setPaintServer(fillPaintServer);
 
   //    if(!m_cachedDocument) // bitmap

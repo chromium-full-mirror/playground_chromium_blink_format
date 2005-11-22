@@ -52,11 +52,6 @@ class SVGFECompositeElementImpl
   // Derived from: 'ElementImpl'
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
-                                              khtml::RenderStyle* style);
-
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
-
   virtual KCanvasFilterEffect* filterEffect() const;
 
  private:

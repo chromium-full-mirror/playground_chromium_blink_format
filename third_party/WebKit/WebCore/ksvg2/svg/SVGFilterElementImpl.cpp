@@ -182,7 +182,7 @@ void SVGFilterElementImpl::parseMappedAttribute(
 }
 
 KCanvasFilter* SVGFilterElementImpl::canvasResource() {
-  if (!canvas())
+  if (!attached())
     return 0;
 
   if (!m_filter)

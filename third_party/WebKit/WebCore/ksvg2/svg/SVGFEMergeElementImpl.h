@@ -35,14 +35,7 @@ class SVGFEMergeElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
                         KDOM::DocumentImpl* doc);
   virtual ~SVGFEMergeElementImpl();
 
-  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
-                                              khtml::RenderStyle* style);
-
-  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
-
   virtual KCanvasFilterEffect* filterEffect() const;
-
-  virtual void closeRenderer();
 
  private:
   mutable KCanvasFEMerge* m_filterEffect;

@@ -79,9 +79,6 @@ class SVGStyledElementImpl : public SVGElementImpl {
       const SVGStyledElementImpl* context);
 
  protected:
-  friend class SVGDocumentImpl;         // Needs renderStyle accesss...
-  friend class SVGClipPathElementImpl;  // Needs renderStyle access..
-
   virtual void finalizeStyle(KCanvasRenderingStyle* style,
                              bool needFillStrokeUpdate = true);
 

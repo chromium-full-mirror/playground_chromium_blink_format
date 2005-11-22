@@ -138,4 +138,16 @@ void SVGComponentTransferFunctionElementImpl::parseMappedAttribute(
     SVGElementImpl::parseMappedAttribute(attr);
 }
 
+KCComponentTransferFunction
+SVGComponentTransferFunctionElementImpl::transferFunction() const {
+  KCComponentTransferFunction func;
+  func.type = (KCComponentTransferType)(type()->baseVal() - 1);
+  func.slope = slope()->baseVal();
+  func.intercept = intercept()->baseVal();
+  func.amplitude = amplitude()->baseVal();
+  func.exponent = exponent()->baseVal();
+  func.offset = offset()->baseVal();
+  return func;
+}
+
 // vim:ts=4:noet

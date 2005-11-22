@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include <kdom/core/AttrImpl.h>
+#include <kxmlcore/Assertions.h>
 
 #include "ksvg.h"
 #include "SVGNames.h"
@@ -119,6 +120,7 @@ void SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(
 
 void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
     KCanvasFilterEffect* filterEffect) const {
+  ASSERT(filterEffect);
   if (!filterEffect)
     return;
   bool bbox = false;

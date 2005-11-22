@@ -129,11 +129,12 @@ void SVGFECompositeElementImpl::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(attr);
 }
 
-khtml::RenderObject* SVGFECompositeElementImpl::createRenderer(
-    RenderArena* arena,
-    khtml::RenderStyle* style) {
-  m_filterEffect = static_cast<KCanvasFEComposite*>(
-      canvas()->renderingDevice()->createFilterEffect(FE_COMPOSITE));
+KCanvasFilterEffect* SVGFECompositeElementImpl::filterEffect() const {
+  if (!m_filterEffect)
+    m_filterEffect = static_cast<KCanvasFEComposite*>(
+        canvas()->renderingDevice()->createFilterEffect(FE_COMPOSITE));
+  if (!m_filterEffect)
+    return 0;
   m_filterEffect->setOperation(
       (KCCompositeOperationType)(_operator()->baseVal() - 1));
   m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());
@@ -143,10 +144,6 @@ khtml::RenderObject* SVGFECompositeElementImpl::createRenderer(
   m_filterEffect->setK2(k2()->baseVal());
   m_filterEffect->setK3(k3()->baseVal());
   m_filterEffect->setK4(k4()->baseVal());
-  return 0;
-}
-
-KCanvasFilterEffect* SVGFECompositeElementImpl::filterEffect() const {
   return m_filterEffect;
 }
 

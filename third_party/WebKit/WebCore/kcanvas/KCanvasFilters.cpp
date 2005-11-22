@@ -335,10 +335,6 @@ QTextStream& KCanvasFEGaussianBlur::externalRepresentation(
   return ts;
 }
 
-KCanvasFEImage::~KCanvasFEImage() {
-  delete m_image;
-}
-
 QTextStream& KCanvasFEImage::externalRepresentation(QTextStream& ts) const {
   ts << "[type=IMAGE] ";
   KCanvasFilterEffect::externalRepresentation(ts);
