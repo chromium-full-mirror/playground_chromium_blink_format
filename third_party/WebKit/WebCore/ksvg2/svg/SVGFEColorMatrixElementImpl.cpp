@@ -97,7 +97,7 @@ void SVGFEColorMatrixElementImpl::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(attr);
 }
 
-KCanvasFilterEffect* SVGFEColorMatrixElementImpl::filterEffect() const {
+KCanvasFEColorMatrix* SVGFEColorMatrixElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEColorMatrix*>(
         canvas()->renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));

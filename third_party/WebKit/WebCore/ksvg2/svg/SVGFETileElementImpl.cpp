@@ -63,7 +63,7 @@ void SVGFETileElementImpl::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(attr);
 }
 
-KCanvasFilterEffect* SVGFETileElementImpl::filterEffect() const {
+KCanvasFETile* SVGFETileElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFETile*>(
         canvas()->renderingDevice()->createFilterEffect(FE_TILE));

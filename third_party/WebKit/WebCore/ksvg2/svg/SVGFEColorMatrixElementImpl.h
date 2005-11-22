@@ -24,9 +24,7 @@
 #define KSVG_SVGFEColorMatrixElementImpl_H
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
-
-class KCanvasFEColorMatrix;
-class KCanvasFilterEffect;
+#include "KCanvasFilters.h"
 
 namespace KSVG {
 class SVGAnimatedStringImpl;
@@ -48,7 +46,7 @@ class SVGFEColorMatrixElementImpl
   // Derived from: 'ElementImpl'
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  virtual KCanvasFilterEffect* filterEffect() const;
+  virtual KCanvasFEColorMatrix* filterEffect() const;
 
  private:
   mutable SVGAnimatedStringImpl* m_in1;

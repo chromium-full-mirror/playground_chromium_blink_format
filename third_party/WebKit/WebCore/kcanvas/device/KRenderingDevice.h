@@ -65,8 +65,8 @@ class KRenderingDevice : public QObject {
   // Global rendering device context
   KRenderingDeviceContext* currentContext() const;
 
-  KRenderingDeviceContext* popContext();
-  void pushContext(KRenderingDeviceContext* context);
+  virtual KRenderingDeviceContext* popContext();
+  virtual void pushContext(KRenderingDeviceContext* context);
 
   virtual KRenderingDeviceContext* contextForImage(
       KCanvasImage* image) const = 0;

@@ -24,9 +24,7 @@
 #define KSVG_SVGFEMergeElementImpl_H
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
-
-class KCanvasFEMerge;
-class KCanvasFilterEffect;
+#include "KCanvasFilters.h"
 
 namespace KSVG {
 class SVGFEMergeElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
@@ -35,7 +33,7 @@ class SVGFEMergeElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
                         KDOM::DocumentImpl* doc);
   virtual ~SVGFEMergeElementImpl();
 
-  virtual KCanvasFilterEffect* filterEffect() const;
+  virtual KCanvasFEMerge* filterEffect() const;
 
  private:
   mutable KCanvasFEMerge* m_filterEffect;

@@ -48,7 +48,7 @@ SVGFEMergeElementImpl::SVGFEMergeElementImpl(const KDOM::QualifiedName& tagName,
 
 SVGFEMergeElementImpl::~SVGFEMergeElementImpl() {}
 
-KCanvasFilterEffect* SVGFEMergeElementImpl::filterEffect() const {
+KCanvasFEMerge* SVGFEMergeElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEMerge*>(
         canvas()->renderingDevice()->createFilterEffect(FE_MERGE));

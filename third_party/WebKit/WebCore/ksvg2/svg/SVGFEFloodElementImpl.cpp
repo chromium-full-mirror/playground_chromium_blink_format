@@ -64,7 +64,7 @@ void SVGFEFloodElementImpl::parseMappedAttribute(
     SVGFilterPrimitiveStandardAttributesImpl::parseMappedAttribute(attr);
 }
 
-KCanvasFilterEffect* SVGFEFloodElementImpl::filterEffect() const {
+KCanvasFEFlood* SVGFEFloodElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEFlood*>(
         canvas()->renderingDevice()->createFilterEffect(FE_FLOOD));

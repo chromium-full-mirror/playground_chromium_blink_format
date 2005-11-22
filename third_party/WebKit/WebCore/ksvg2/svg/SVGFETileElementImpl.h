@@ -24,9 +24,7 @@
 #define KSVG_SVGFETileElementImpl_H
 
 #include "SVGFilterPrimitiveStandardAttributesImpl.h"
-
-class KCanvasFETile;
-class KCanvasFilterEffect;
+#include "KCanvasFilters.h"
 
 namespace KSVG {
 class SVGAnimatedStringImpl;
@@ -43,7 +41,7 @@ class SVGFETileElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
   // Derived from: 'ElementImpl'
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
-  virtual KCanvasFilterEffect* filterEffect() const;
+  virtual KCanvasFETile* filterEffect() const;
 
  private:
   mutable SVGAnimatedStringImpl* m_in1;

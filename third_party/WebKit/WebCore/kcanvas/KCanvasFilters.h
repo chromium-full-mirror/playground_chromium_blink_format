@@ -53,7 +53,7 @@ typedef enum {
 #include <qstringlist.h>
 
 class KCanvasFilterEffect;
-class KRenderingDeviceContext;
+class KRenderingDevice;
 
 class KCanvasFilter : public KCanvasResource {
  public:
@@ -73,9 +73,8 @@ class KCanvasFilter : public KCanvasResource {
 
   void addFilterEffect(KCanvasFilterEffect* effect);
 
-  virtual void prepareFilter(KRenderingDeviceContext* context,
-                             const QRect& bbox) = 0;
-  virtual void applyFilter(KRenderingDeviceContext* context,
+  virtual void prepareFilter(KRenderingDevice* device, const QRect& bbox) = 0;
+  virtual void applyFilter(KRenderingDevice* device,
                            KCanvasMatrix objectMatrix,
                            const QRect& bbox) = 0;
 
