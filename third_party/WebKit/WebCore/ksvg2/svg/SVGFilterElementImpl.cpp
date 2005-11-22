@@ -214,9 +214,9 @@ KCanvasFilter* SVGFilterElementImpl::canvasResource() {
   // TODO : use switch/case instead?
   for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* element = svg_dynamic_cast(n);
-    if (element->isFilterEffect()) {
+    if (element && element->isFilterEffect()) {
       SVGFilterPrimitiveStandardAttributesImpl* fe =
-          static_cast<SVGFilterPrimitiveStandardAttributesImpl*>(n);
+          static_cast<SVGFilterPrimitiveStandardAttributesImpl*>(element);
       if (fe->filterEffect())
         m_filter->addFilterEffect(fe->filterEffect());
     }

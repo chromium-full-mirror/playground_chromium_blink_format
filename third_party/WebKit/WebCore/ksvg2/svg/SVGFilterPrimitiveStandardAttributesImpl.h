@@ -37,7 +37,7 @@ class SVGFilterPrimitiveStandardAttributesImpl : public SVGStyledElementImpl {
                                            KDOM::DocumentImpl* doc);
   virtual ~SVGFilterPrimitiveStandardAttributesImpl();
 
-  virtual bool isFilterEffect() { return true; }
+  virtual bool isFilterEffect() const { return true; }
 
   // 'SVGFilterPrimitiveStandardAttributes' functions
   SVGAnimatedLengthImpl* x() const;

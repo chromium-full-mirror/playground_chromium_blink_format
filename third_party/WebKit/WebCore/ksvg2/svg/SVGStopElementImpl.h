@@ -33,7 +33,7 @@ class SVGStopElementImpl : public SVGStyledElementImpl {
                      KDOM::DocumentImpl* doc);
   virtual ~SVGStopElementImpl();
 
-  virtual bool isGradientStop() { return true; }
+  virtual bool isGradientStop() const { return true; }
 
   // 'SVGStoplement' functions
   SVGAnimatedNumberImpl* offset() const;

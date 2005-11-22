@@ -50,6 +50,8 @@ class KRenderingPaintServer : public KCanvasResource {
   KRenderingPaintServer() : KCanvasResource() { m_activeClient = 0; }
   virtual ~KRenderingPaintServer() {}
 
+  virtual bool isPaintServer() const { return true; }
+
   const RenderPath* activeClient() const { return m_activeClient; }
   void setActiveClient(const RenderPath* client) { m_activeClient = client; }
 

@@ -50,6 +50,7 @@ SVGGradientElementImpl::SVGGradientElementImpl(
   m_spreadMethod = 0;
   m_gradientUnits = 0;
   m_gradientTransform = 0;
+  m_resource = 0;
 }
 
 SVGGradientElementImpl::~SVGGradientElementImpl() {

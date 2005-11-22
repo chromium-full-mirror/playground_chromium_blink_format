@@ -26,11 +26,14 @@
 
 #include <qtextstream.h>
 #include "KCanvasTreeDebug.h"
+#include <kxmlcore/Assertions.h>
 
 // Filters
 
 void KCanvasFilter::addFilterEffect(KCanvasFilterEffect* effect) {
-  m_effects.append(effect);
+  ASSERT(effect);
+  if (effect)
+    m_effects.append(effect);
 }
 
 QTextStream& KCanvasFilter::externalRepresentation(QTextStream& ts) const {
