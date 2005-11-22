@@ -289,7 +289,7 @@ class RenderObject : public CachedObjectClient {
 #if SVG_SUPPORT
   virtual bool isKCanvasContainer() const { return false; }
   virtual bool isRenderPath() const { return false; }
-  virtual QRect bbox(bool includeStroke = true) { return QRect(); }
+  virtual QRect bbox(bool includeStroke = true) const { return QRect(); }
   // We may eventually want to make these non-virtual
   virtual QMatrix localTransform() const { return QMatrix(); }
   virtual void setLocalTransform(const QMatrix&) {}
