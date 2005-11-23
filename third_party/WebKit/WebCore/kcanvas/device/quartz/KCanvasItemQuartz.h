@@ -31,9 +31,13 @@ class KCanvasItemQuartz : public RenderPath {
                     KSVG::SVGStyledElementImpl* node);
   virtual ~KCanvasItemQuartz() {}
 
-  virtual QRect bboxPath(bool includeStroke, bool applyTransforms = true) const;
+  virtual QRect bboxForPath(bool includeStroke) const;
   virtual bool hitsPath(const QPoint& p,
                         bool fill /* false means stroke */) const;
+
+  virtual QRect getAbsoluteRepaintRect() {
+    return absoluteTransform().mapRect(relativeBBox(true));
+  }
 
   virtual bool requiresLayer() { return false; }
   virtual void layout() { setNeedsLayout(false); }

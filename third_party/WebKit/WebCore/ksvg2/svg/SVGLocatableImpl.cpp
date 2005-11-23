@@ -75,11 +75,13 @@ SVGElementImpl* SVGLocatableImpl::farthestViewportElement(
   return farthest;
 }
 
+// Spec:
+// http://www.w3.org/TR/2005/WD-SVGMobile12-20050413/svgudom.html#svg::SVGLocatable
 SVGRectImpl* SVGLocatableImpl::getBBox(const SVGStyledElementImpl* e) {
   SVGRectImpl* rect = 0;
 
   if (e && e->renderer()) {
-    QRect bboxRect = e->renderer()->bbox(false);
+    QRect bboxRect = e->renderer()->relativeBBox(false);
     rect = new SVGRectImpl(0);
     rect->setX(bboxRect.x());
     rect->setY(bboxRect.y());

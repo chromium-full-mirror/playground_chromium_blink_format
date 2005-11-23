@@ -93,7 +93,7 @@ bool RenderPath::strokeContains(const QPoint& p) const {
   return false;
 }
 
-QRect RenderPath::bbox(bool includeStroke) const {
+QRect RenderPath::relativeBBox(bool includeStroke) const {
   QRect result;
 
   if (!d->path || !canvas() || !canvas()->renderingDevice())
@@ -101,23 +101,15 @@ QRect RenderPath::bbox(bool includeStroke) const {
 
   if (includeStroke) {
     if (!d->strokeBbox.isValid())
-      d->strokeBbox = bboxPath(true);
+      d->strokeBbox = bboxForPath(true);
     result = d->strokeBbox;
   } else {
     if (!d->fillBBox.isValid())
-      d->fillBBox = bboxPath(false);
+      d->fillBBox = bboxForPath(false);
     result = d->fillBBox;
   }
 
   return result;
-}
-
-bool RenderPath::hitsPath(const QPoint& hitPoint, bool fill) const {
-  return false;
-}
-
-QRect RenderPath::bboxPath(bool includeStroke, bool includeTransforms) const {
-  return QRect();
 }
 
 void RenderPath::setupForDraw() const {

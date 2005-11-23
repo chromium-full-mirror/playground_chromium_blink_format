@@ -98,7 +98,6 @@ class KCPathDataList : public Q3ValueList<KCPathData> {
 struct KCClipData {
   KCWindRule rule : 1;
   bool bbox : 1;
-  bool viewportClipped : 1;
   KCPathDataList path;
 };
 
@@ -110,13 +109,11 @@ class KCClipDataList : public Q3ValueList<KCClipData> {
 
   inline void addPath(const KCPathDataList& pathData,
                       KCWindRule rule,
-                      bool bbox,
-                      bool viewportClipped = false) {
+                      bool bbox) {
     KCClipData data;
     data.rule = rule;
     data.bbox = bbox;
     data.path = pathData;
-    data.viewportClipped = viewportClipped;
     append(data);
   }
 };

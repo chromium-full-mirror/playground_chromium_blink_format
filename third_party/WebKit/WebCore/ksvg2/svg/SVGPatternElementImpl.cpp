@@ -262,7 +262,7 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
   for (KDOM::NodeImpl* n = target->firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* elem = svg_dynamic_cast(n);
     if (!elem || !elem->isStyled())
-      return;
+      continue;
     SVGStyledElementImpl* e = static_cast<SVGStyledElementImpl*>(elem);
     khtml::RenderObject* item = e->renderer();
     if (!item)
@@ -383,7 +383,7 @@ khtml::RenderObject* SVGPatternElementImpl::createRenderer(
     khtml::RenderStyle* style) {
   KCanvasContainer* patternContainer =
       canvas()->renderingDevice()->createContainer(arena, style, this);
-  patternContainer->setDrawContents(false);
+  patternContainer->setDrawsContents(false);
   return patternContainer;
 }
 

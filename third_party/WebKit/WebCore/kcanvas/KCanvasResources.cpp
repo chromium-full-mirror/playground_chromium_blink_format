@@ -78,19 +78,9 @@ QTextStream& KCanvasResource::externalRepresentation(QTextStream& ts) const {
 }
 
 // KCanvasClipper
-KCanvasClipper::KCanvasClipper() : KCanvasResource() {
-  m_viewportMode = false;
-}
+KCanvasClipper::KCanvasClipper() : KCanvasResource() {}
 
 KCanvasClipper::~KCanvasClipper() {}
-
-bool KCanvasClipper::viewportClipper() const {
-  return m_viewportMode;
-}
-
-void KCanvasClipper::setViewportClipper(bool viewport) {
-  m_viewportMode = viewport;
-}
 
 void KCanvasClipper::resetClipData() {
   m_clipData.clear();
@@ -99,7 +89,7 @@ void KCanvasClipper::resetClipData() {
 void KCanvasClipper::addClipData(const KCPathDataList& path,
                                  KCWindRule rule,
                                  bool bbox) {
-  m_clipData.addPath(path, rule, bbox, viewportClipper());
+  m_clipData.addPath(path, rule, bbox);
 }
 
 KCClipDataList KCanvasClipper::clipData() const {
@@ -108,8 +98,6 @@ KCClipDataList KCanvasClipper::clipData() const {
 
 QTextStream& KCanvasClipper::externalRepresentation(QTextStream& ts) const {
   ts << "[type=CLIPPER]";
-  if (viewportClipper())
-    ts << " [viewport clipped=" << viewportClipper() << "]";
   ts << " [clip data=" << clipData() << "]";
   return ts;
 }

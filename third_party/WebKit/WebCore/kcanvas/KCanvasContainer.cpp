@@ -28,10 +28,10 @@
 
 class KCanvasContainer::Private {
  public:
-  Private() : drawContents(true), slice(false) {}
+  Private() : drawsContents(true), slice(false) {}
   ~Private() {}
 
-  bool drawContents : 1;
+  bool drawsContents : 1;
   bool slice : 1;
   QMatrix matrix;
 };
@@ -43,8 +43,12 @@ KCanvasContainer::~KCanvasContainer() {
   delete d;
 }
 
-void KCanvasContainer::setDrawContents(bool drawContents) {
-  d->drawContents = drawContents;
+bool KCanvasContainer::drawsContents() const {
+  return d->drawsContents;
+}
+
+void KCanvasContainer::setDrawsContents(bool drawsContents) {
+  d->drawsContents = drawsContents;
 }
 
 QMatrix KCanvasContainer::localTransform() const {
@@ -77,12 +81,15 @@ bool KCanvasContainer::strokeContains(const QPoint& p) const {
   return false;
 }
 
-QRect KCanvasContainer::bbox(bool includeStroke) const {
+QRect KCanvasContainer::relativeBBox(bool includeStroke) const {
   QRect rect(0, 0, 0, 0);
 
   khtml::RenderObject* current = firstChild();
-  for (; current != 0; current = current->nextSibling())
-    rect = rect.unite(current->bbox(includeStroke));
+  for (; current != 0; current = current->nextSibling()) {
+    QRect childBBox = current->relativeBBox(includeStroke);
+    QRect mappedBBox = current->localTransform().mapRect(childBBox);
+    rect = rect.unite(mappedBBox);
+  }
 
   return rect;
 }
