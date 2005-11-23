@@ -220,6 +220,7 @@ class DOMDocument : public DOMNode {
     Implementation,
     DocumentElement,
     // Functions
+    AdoptNode,
     CreateElement,
     CreateDocumentFragment,
     CreateTextNode,

@@ -99,4 +99,10 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 @interface DOMDocument (DOMViewCSSExtensions)
 - (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)elt:(NSString*)pseudoElt;
 @end
+
 // END
+
+// Pending DOM3 APIs
+@interface DOMDocument (DOM3)
+- (DOMNode*)adoptNode:(DOMNode*)source;
+@end
