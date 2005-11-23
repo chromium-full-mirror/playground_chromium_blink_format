@@ -169,10 +169,6 @@ class Interpreter {
 
   void initGlobalObject();
 
-  static void lock();
-  static void unlock();
-  static int lockCount();
-
   /**
    * Returns the execution state object which can be used to execute
    * scripts using this interpreter at a the "global" level, i.e. one
@@ -505,16 +501,6 @@ class ExecState {
   Interpreter* _interpreter;
   ContextImp* _context;
   ValueImp* _exception;
-};
-
-class InterpreterLock {
- public:
-  InterpreterLock() { Interpreter::lock(); }
-  ~InterpreterLock() { Interpreter::unlock(); }
-
- private:
-  InterpreterLock(const InterpreterLock&);
-  InterpreterLock& operator=(const InterpreterLock&);
 };
 
 }  // namespace

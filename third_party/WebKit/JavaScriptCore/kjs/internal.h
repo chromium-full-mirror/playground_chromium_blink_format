@@ -33,10 +33,6 @@
 #include "scope_chain.h"
 #include <kxmlcore/SharedPtr.h>
 
-#if __APPLE__
-#define KJS_MULTIPLE_THREADS 1
-#endif
-
 #define I18N_NOOP(s) s
 
 namespace KJS {
@@ -261,9 +257,6 @@ class InterpreterImp {
   Interpreter* interpreter() const { return m_interpreter; }
 
   void initGlobalObject();
-  static void lock();
-  static void unlock();
-  static int lockCount();
 
   void mark();
 

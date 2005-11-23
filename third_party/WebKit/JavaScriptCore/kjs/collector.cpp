@@ -106,7 +106,7 @@ static CollectorHeap heap = {NULL, 0, 0, 0, NULL, 0, 0, 0, 0};
 bool Collector::memoryFull = false;
 
 void* Collector::allocate(size_t s) {
-  assert(Interpreter::lockCount() > 0);
+  assert(InterpreterLock::lockCount() > 0);
 
   // collect if needed
   size_t numLiveObjects = heap.numLiveObjects;
@@ -401,7 +401,7 @@ void Collector::markProtectedObjects() {
 }
 
 bool Collector::collect() {
-  assert(Interpreter::lockCount() > 0);
+  assert(InterpreterLock::lockCount() > 0);
 
   if (InterpreterImp::s_hook) {
     InterpreterImp* scr = InterpreterImp::s_hook;

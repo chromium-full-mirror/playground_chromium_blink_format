@@ -312,10 +312,11 @@ void JSLazyEventListener::parseCode() const {
         // (and the document, and the form - see HTMLElement::eventHandlerScope)
         ScopeChain scope = listener->scope();
 
-        Interpreter::lock();
-        ObjectImp* thisObj =
-            static_cast<ObjectImp*>(getDOMNode(exec, originalNode));
-        Interpreter::unlock();
+        ObjectImp* thisObj;
+        {  // scope
+          InterpreterLock lock;
+          thisObj = static_cast<ObjectImp*>(getDOMNode(exec, originalNode));
+        }
 
         if (thisObj) {
           static_cast<DOMNode*>(thisObj)->pushEventHandlerScope(exec, scope);
