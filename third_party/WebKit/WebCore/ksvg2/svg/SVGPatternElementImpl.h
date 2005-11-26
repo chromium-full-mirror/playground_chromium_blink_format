@@ -54,6 +54,8 @@ class SVGPatternElementImpl : public SVGStyledLocatableElementImpl,
                         KDOM::DocumentImpl* doc);
   virtual ~SVGPatternElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGPatternElement' functions
   SVGAnimatedEnumerationImpl* patternUnits() const;
   SVGAnimatedEnumerationImpl* patternContentUnits() const;
@@ -72,9 +74,6 @@ class SVGPatternElementImpl : public SVGStyledLocatableElementImpl,
 
   virtual void resourceNotification() const;
   virtual void notifyAttributeChange() const;
-
-  // Derived from: 'SVGStyledElementImpl'
-  virtual bool allowAttachChildren(KDOM::ElementImpl*) const { return true; }
 
   virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
   virtual khtml::RenderObject* createRenderer(RenderArena* arena,

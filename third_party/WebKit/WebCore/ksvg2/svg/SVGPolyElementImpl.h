@@ -42,6 +42,8 @@ class SVGPolyElementImpl : public SVGStyledTransformableElementImpl,
                      KDOM::DocumentImpl* doc);
   virtual ~SVGPolyElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // Derived from: 'SVGAnimatedPoints'
   virtual SVGPointListImpl* points() const;
   virtual SVGPointListImpl* animatedPoints() const;

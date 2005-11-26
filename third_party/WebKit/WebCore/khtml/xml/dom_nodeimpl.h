@@ -439,6 +439,9 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   void createRendererIfNeeded();
   virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
   virtual bool rendererIsNeeded(khtml::RenderStyle*);
+#if SVG_SUPPORT
+  virtual bool childShouldCreateRenderer(DOM::NodeImpl*) const { return true; }
+#endif
   virtual khtml::RenderObject* createRenderer(RenderArena*,
                                               khtml::RenderStyle*);
 

@@ -38,8 +38,7 @@ class SVGDefsElementImpl : public SVGStyledTransformableElementImpl,
                      KDOM::DocumentImpl* doc);
   virtual ~SVGDefsElementImpl();
 
-  // Derived from: 'SVGStyledElementImpl'
-  virtual bool allowAttachChildren(KDOM::ElementImpl*) const { return false; }
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
 };
 };
 

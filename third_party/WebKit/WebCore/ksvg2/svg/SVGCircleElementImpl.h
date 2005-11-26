@@ -39,6 +39,8 @@ class SVGCircleElementImpl : public SVGStyledTransformableElementImpl,
                        KDOM::DocumentImpl* doc);
   virtual ~SVGCircleElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGCircleElement' functions
   SVGAnimatedLengthImpl* cx() const;
   SVGAnimatedLengthImpl* cy() const;

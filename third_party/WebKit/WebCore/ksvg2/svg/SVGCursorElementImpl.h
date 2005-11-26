@@ -45,6 +45,8 @@ class SVGCursorElementImpl : public SVGElementImpl,
                        KDOM::DocumentImpl* doc);
   virtual ~SVGCursorElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGCursorElement' functions
   SVGAnimatedLengthImpl* x() const;
   SVGAnimatedLengthImpl* y() const;

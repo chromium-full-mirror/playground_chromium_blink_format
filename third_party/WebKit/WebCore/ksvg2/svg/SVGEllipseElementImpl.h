@@ -39,6 +39,8 @@ class SVGEllipseElementImpl : public SVGStyledTransformableElementImpl,
                         KDOM::DocumentImpl* doc);
   virtual ~SVGEllipseElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGEllipseElement' functions
   SVGAnimatedLengthImpl* cx() const;
   SVGAnimatedLengthImpl* cy() const;

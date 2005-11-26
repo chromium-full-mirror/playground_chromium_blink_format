@@ -39,6 +39,8 @@ class SVGLineElementImpl : public SVGStyledTransformableElementImpl,
                      KDOM::DocumentImpl* doc);
   virtual ~SVGLineElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGLineElement' functions
   SVGAnimatedLengthImpl* x1() const;
   SVGAnimatedLengthImpl* y1() const;

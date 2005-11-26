@@ -59,6 +59,8 @@ class SVGSVGElementImpl : public SVGStyledLocatableElementImpl,
 
   virtual bool isSVG() const { return true; }
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGSVGElement' functions
   SVGAnimatedLengthImpl* x() const;
   SVGAnimatedLengthImpl* y() const;

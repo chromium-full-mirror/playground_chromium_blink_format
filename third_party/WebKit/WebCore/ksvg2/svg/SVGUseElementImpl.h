@@ -42,6 +42,8 @@ class SVGUseElementImpl : public SVGStyledTransformableElementImpl,
                     KDOM::DocumentImpl* doc);
   virtual ~SVGUseElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // Derived from: 'ElementImpl'
   virtual bool hasChildNodes() const;
 

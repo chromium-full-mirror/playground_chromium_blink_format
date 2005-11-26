@@ -38,9 +38,10 @@ class SVGSwitchElementImpl : public SVGStyledTransformableElementImpl,
                        KDOM::DocumentImpl* doc);
   virtual ~SVGSwitchElementImpl();
 
-  // Derived from: 'SVGStyledElementImpl'
-  virtual bool allowAttachChildren(KDOM::ElementImpl* child) const;
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
+  virtual bool childShouldCreateRenderer(KDOM::NodeImpl*) const;
 
   virtual khtml::RenderObject* createRenderer(RenderArena* arena,
                                               khtml::RenderStyle* style);

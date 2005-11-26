@@ -41,15 +41,14 @@ class SVGClipPathElementImpl : public SVGStyledTransformableElementImpl,
                          KDOM::DocumentImpl* doc);
   virtual ~SVGClipPathElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   virtual KCanvasClipper* canvasResource();
 
   // 'SVGClipPathElement' functions
   SVGAnimatedEnumerationImpl* clipPathUnits() const;
 
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
-
-  // Derived from: 'SVGStyledElementImpl'
-  virtual bool allowAttachChildren(KDOM::ElementImpl*) const { return false; }
 
  private:
   mutable SharedPtr<SVGAnimatedEnumerationImpl> m_clipPathUnits;

@@ -247,38 +247,47 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
     khtml::RenderObject* item = e->renderer();
     if (!item)
       continue;
-    KCanvasMatrix savedMatrix = item->localTransform();
+#if 0
+        // FIXME: None of this code seems to be necessary
+        // to pass the w3c tests (and infact breaks them)
+        // However, I'm leaving it #if 0'd for now until
+        // I can quiz WildFox on the subject -- ecs 11/24/05
+        // It's possible that W3C-SVG-1.1/coords-units-01-b
+        // is failing due to lack of this code.
+        KCanvasMatrix savedMatrix = item->localTransform();
 
-    const SVGStyledElementImpl* savedContext = 0;
-    if (patternContentUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX) {
-      if (activeElement)
-        savedContext = e->pushAttributeContext(activeElement);
-    }
+        const SVGStyledElementImpl *savedContext = 0;
+        if(patternContentUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX)
+        {
+            if(activeElement)
+                savedContext = e->pushAttributeContext(activeElement);
+        }
 
-    // Take into account viewportElement's viewBox, if existant...
-    if (viewportElement() && viewportElement()->hasTagName(SVGNames::svgTag)) {
-      SVGSVGElementImpl* svgElement =
-          static_cast<SVGSVGElementImpl*>(viewportElement());
+        // Take into account viewportElement's viewBox, if existant...
+        if(viewportElement() && viewportElement()->hasTagName(SVGNames::svgTag))
+        {
+            SVGSVGElementImpl *svgElement = static_cast<SVGSVGElementImpl *>(viewportElement());
 
-      SharedPtr<SVGMatrixImpl> svgCTM = svgElement->getCTM();
-      SharedPtr<SVGMatrixImpl> ctm = getCTM();
+            SharedPtr<SVGMatrixImpl> svgCTM = svgElement->getCTM();
+            SharedPtr<SVGMatrixImpl> ctm = getCTM();
 
-      KCanvasMatrix newMatrix(svgCTM->qmatrix());
-      newMatrix.multiply(savedMatrix);
-      newMatrix.scale(1.0 / ctm->a(), 1.0 / ctm->d());
+            KCanvasMatrix newMatrix(svgCTM->qmatrix());
+            newMatrix.multiply(savedMatrix);
+            newMatrix.scale(1.0 / ctm->a(), 1.0 / ctm->d());
 
-      item->setLocalTransform(newMatrix.qmatrix());
-    }
+            item->setLocalTransform(newMatrix.qmatrix());
+        }
+#endif
 
-    // FIXME: I'm not sure if this is right yet...
     QPainter p;
     khtml::RenderObject::PaintInfo info(&p, QRect(), PaintActionForeground, 0);
     item->paint(info, 0, 0);
+#if 0
+        if(savedContext)
+            e->pushAttributeContext(savedContext);
 
-    if (savedContext)
-      e->pushAttributeContext(savedContext);
-
-    item->setLocalTransform(savedMatrix.qmatrix());
+        item->setLocalTransform(savedMatrix.qmatrix());
+#endif
   }
 
   if (savedContext)

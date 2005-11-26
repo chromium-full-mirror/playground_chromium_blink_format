@@ -48,6 +48,8 @@ class SVGImageElementImpl : public SVGStyledTransformableElementImpl,
                       KDOM::DocumentImpl* doc);
   virtual ~SVGImageElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGImageElement' functions
   SVGAnimatedLengthImpl* x() const;
   SVGAnimatedLengthImpl* y() const;

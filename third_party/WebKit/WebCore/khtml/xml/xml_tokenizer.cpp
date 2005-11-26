@@ -28,7 +28,7 @@
 #include "xml/dom_xmlimpl.h"
 #include "html/html_headimpl.h"
 #include "html/html_tableimpl.h"
-#include "htmlnames.h"
+#include "HTMLNames.h"
 #include "misc/loader.h"
 #include <kxmlcore/HashMap.h>
 
@@ -39,6 +39,10 @@
 
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
+
+#if SVG_SUPPORT
+#include "SVGNames.h"
+#endif
 
 #include <qptrstack.h>
 
@@ -130,8 +134,8 @@ class XMLTokenizer : public Tokenizer, public CachedObjectClient {
   int m_lastErrorColumn;
   DOMString m_errorMessages;
 
-  QPtrList<HTMLScriptElementImpl> m_scripts;
-  QPtrListIterator<HTMLScriptElementImpl>* m_scriptsIt;
+  QPtrList<ElementImpl> m_scripts;
+  QPtrListIterator<ElementImpl>* m_scriptsIt;
   CachedScript* m_cachedScript;
 
   bool m_parsingFragment;
@@ -647,6 +651,8 @@ static void internalSubsetHandler(void* closure,
 }
 
 void XMLTokenizer::finish() {
+  if (m_xmlCode.isEmpty())
+    return;
   xmlSAXHandler sax;
   memset(&sax, 0, sizeof(sax));
   sax.error = normalErrorHandler;
@@ -681,7 +687,7 @@ void XMLTokenizer::finish() {
     // and execute them
     // one by one.
     addScripts(m_doc);
-    m_scriptsIt = new QPtrListIterator<HTMLScriptElementImpl>(m_scripts);
+    m_scriptsIt = new QPtrListIterator<ElementImpl>(m_scripts);
     executeScripts();
   }
 
@@ -756,10 +762,12 @@ void XMLTokenizer::addScripts(NodeImpl* n) {
   // tags. For each of these
   // that is found, add it to the m_scripts list from which they will be
   // executed
-
-  if (n->hasTagName(scriptTag)) {
-    m_scripts.append(static_cast<HTMLScriptElementImpl*>(n));
-  }
+  if (n->hasTagName(scriptTag)
+#if SVG_SUPPORT
+      || n->hasTagName(KSVG::SVGNames::scriptTag)
+#endif
+          )
+    m_scripts.append(static_cast<ElementImpl*>(n));
 
   NodeImpl* child;
   for (child = n->firstChild(); child; child = child->nextSibling())
@@ -838,6 +846,8 @@ bool XMLTokenizer::isWaitingForScripts() const {
 
 #ifdef KHTML_XSLT
 void* xmlDocPtrForString(const QString& source, const QString& url) {
+  if (source.isEmpty())
+    return 0;
   // Parse in a single chunk into an xmlDocPtr
   // FIXME: Hook up error handlers so that a failure to parse the main document
   // results in

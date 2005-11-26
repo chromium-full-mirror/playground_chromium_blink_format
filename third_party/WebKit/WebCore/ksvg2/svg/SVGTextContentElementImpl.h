@@ -43,6 +43,8 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
                             KDOM::DocumentImpl* doc);
   virtual ~SVGTextContentElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGTextContentElement' functions
   SVGAnimatedLengthImpl* textLength() const;
   SVGAnimatedEnumerationImpl* lengthAdjust() const;

@@ -39,6 +39,8 @@ class SVGRectElementImpl : public SVGStyledTransformableElementImpl,
                      KDOM::DocumentImpl* doc);
   virtual ~SVGRectElementImpl();
 
+  virtual bool isValid() const { return SVGTestsImpl::isValid(); }
+
   // 'SVGRectElement' functions
   SVGAnimatedLengthImpl* x() const;
   SVGAnimatedLengthImpl* y() const;
