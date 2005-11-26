@@ -87,12 +87,15 @@ KCanvasClipper* SVGClipPathElementImpl::canvasResource() {
 
   bool bbox = clipPathUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;
 
+  khtml::RenderStyle* clipPathStyle = styleForRenderer(parent()->renderer());
   for (KDOM::NodeImpl* n = firstChild(); n != 0; n = n->nextSibling()) {
     SVGElementImpl* e = svg_dynamic_cast(n);
     if (e && e->isStyled()) {
       SVGStyledElementImpl* styled = static_cast<SVGStyledElementImpl*>(e);
-      SVGRenderStyle* style =
-          styleForRenderer(parentNode()->renderer())->svgStyle();
+      SVGRenderStyle* style = getDocument()
+                                  ->styleSelector()
+                                  ->styleForElement(styled, clipPathStyle)
+                                  ->svgStyle();
       m_clipper->addClipData(styled->toPathData(),
                              (KCWindRule)style->clipRule(), bbox);
     }
