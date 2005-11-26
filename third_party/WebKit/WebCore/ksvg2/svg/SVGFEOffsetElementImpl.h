@@ -47,9 +47,9 @@ class SVGFEOffsetElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
   virtual KCanvasFEOffset* filterEffect() const;
 
  private:
-  mutable SVGAnimatedStringImpl* m_in1;
-  mutable SVGAnimatedNumberImpl* m_dx;
-  mutable SVGAnimatedNumberImpl* m_dy;
+  mutable SharedPtr<SVGAnimatedStringImpl> m_in1;
+  mutable SharedPtr<SVGAnimatedNumberImpl> m_dx;
+  mutable SharedPtr<SVGAnimatedNumberImpl> m_dy;
   mutable KCanvasFEOffset* m_filterEffect;
 };
 };

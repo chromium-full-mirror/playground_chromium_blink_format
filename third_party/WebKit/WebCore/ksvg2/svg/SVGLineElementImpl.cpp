@@ -38,20 +38,9 @@ SVGLineElementImpl::SVGLineElementImpl(const KDOM::QualifiedName& tagName,
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl() {
-  m_x1 = m_y1 = m_x2 = m_y2 = 0;
-}
+      SVGExternalResourcesRequiredImpl() {}
 
-SVGLineElementImpl::~SVGLineElementImpl() {
-  if (m_x1)
-    m_x1->deref();
-  if (m_y1)
-    m_y1->deref();
-  if (m_x2)
-    m_x2->deref();
-  if (m_y2)
-    m_y2->deref();
-}
+SVGLineElementImpl::~SVGLineElementImpl() {}
 
 SVGAnimatedLengthImpl* SVGLineElementImpl::x1() const {
   return lazy_create<SVGAnimatedLengthImpl>(m_x1, this, LM_WIDTH,

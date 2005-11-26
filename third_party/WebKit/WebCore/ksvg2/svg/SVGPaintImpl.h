@@ -53,7 +53,7 @@ class SVGPaintImpl : public SVGColorImpl {
 
  private:
   unsigned short m_paintType;
-  KDOM::DOMStringImpl* m_uri;
+  KDOM::DOMString m_uri;
 };
 };
 

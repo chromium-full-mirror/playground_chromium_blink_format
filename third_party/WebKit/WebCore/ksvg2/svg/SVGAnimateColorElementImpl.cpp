@@ -35,10 +35,7 @@ SVGAnimateColorElementImpl::SVGAnimateColorElementImpl(
     KDOM::DocumentImpl* doc)
     : SVGAnimationElementImpl(tagName, doc) {
   m_toColor = new SVGColorImpl();
-  m_toColor->ref();
-
   m_fromColor = new SVGColorImpl();
-  m_fromColor->ref();
 
   m_redDiff = 0;
   m_greenDiff = 0;
@@ -47,25 +44,16 @@ SVGAnimateColorElementImpl::SVGAnimateColorElementImpl(
   m_currentItem = -1;
 }
 
-SVGAnimateColorElementImpl::~SVGAnimateColorElementImpl() {
-  if (m_toColor)
-    m_toColor->deref();
-  if (m_fromColor)
-    m_fromColor->deref();
-}
+SVGAnimateColorElementImpl::~SVGAnimateColorElementImpl() {}
 
 void SVGAnimateColorElementImpl::handleTimerEvent(double timePercentage) {
   // Start condition.
   if (!m_connected) {
     // Save initial color... (needed for fill="remove" or additve="sum")
-    SVGColorImpl* temp = new SVGColorImpl();
-    temp->ref();
-
+    SharedPtr<SVGColorImpl> temp = new SVGColorImpl();
     temp->setRGBColor(targetAttribute().impl());
 
     m_initialColor = temp->color();
-
-    temp->deref();
 
     // Animation mode handling
     switch (detectAnimationMode()) {

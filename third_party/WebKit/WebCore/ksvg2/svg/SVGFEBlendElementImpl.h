@@ -47,9 +47,9 @@ class SVGFEBlendElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
   virtual KCanvasFEBlend* filterEffect() const;
 
  private:
-  mutable SVGAnimatedStringImpl* m_in1;
-  mutable SVGAnimatedStringImpl* m_in2;
-  mutable SVGAnimatedEnumerationImpl* m_mode;
+  mutable SharedPtr<SVGAnimatedStringImpl> m_in1;
+  mutable SharedPtr<SVGAnimatedStringImpl> m_in2;
+  mutable SharedPtr<SVGAnimatedEnumerationImpl> m_mode;
   mutable KCanvasFEBlend* m_filterEffect;
 };
 };

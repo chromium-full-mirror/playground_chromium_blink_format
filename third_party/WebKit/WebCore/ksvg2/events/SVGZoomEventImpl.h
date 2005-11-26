@@ -50,10 +50,10 @@ class SVGZoomEventImpl : public KDOM::UIEventImpl {
   float m_newScale;
   float m_previousScale;
 
-  SVGRectImpl* m_zoomRectScreen;
+  SharedPtr<SVGRectImpl> m_zoomRectScreen;
 
-  SVGPointImpl* m_newTranslate;
-  SVGPointImpl* m_previousTranslate;
+  SharedPtr<SVGPointImpl> m_newTranslate;
+  SharedPtr<SVGPointImpl> m_previousTranslate;
 };
 };
 

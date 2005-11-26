@@ -46,16 +46,10 @@ SVGCursorElementImpl::SVGCursorElementImpl(const KDOM::QualifiedName& tagName,
       SVGExternalResourcesRequiredImpl(),
       SVGURIReferenceImpl(),
       KDOM::CachedObjectClient() {
-  m_x = m_y = 0;
   m_cachedImage = 0;
 }
 
-SVGCursorElementImpl::~SVGCursorElementImpl() {
-  if (m_x)
-    m_x->deref();
-  if (m_y)
-    m_y->deref();
-}
+SVGCursorElementImpl::~SVGCursorElementImpl() {}
 
 SVGAnimatedLengthImpl* SVGCursorElementImpl::x() const {
   return lazy_create<SVGAnimatedLengthImpl>(

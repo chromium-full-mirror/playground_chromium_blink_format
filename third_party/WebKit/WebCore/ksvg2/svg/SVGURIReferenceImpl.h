@@ -46,7 +46,7 @@ class SVGURIReferenceImpl {
   static QString getTarget(const QString& url);
 
  private:
-  mutable SVGAnimatedStringImpl* m_href;
+  mutable SharedPtr<SVGAnimatedStringImpl> m_href;
 };
 };
 

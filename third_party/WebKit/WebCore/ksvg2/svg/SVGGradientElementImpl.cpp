@@ -47,20 +47,10 @@ SVGGradientElementImpl::SVGGradientElementImpl(
     : SVGStyledElementImpl(tagName, doc),
       SVGURIReferenceImpl(),
       SVGExternalResourcesRequiredImpl() {
-  m_spreadMethod = 0;
-  m_gradientUnits = 0;
-  m_gradientTransform = 0;
   m_resource = 0;
 }
 
-SVGGradientElementImpl::~SVGGradientElementImpl() {
-  if (m_gradientUnits)
-    m_gradientUnits->deref();
-  if (m_gradientTransform)
-    m_gradientTransform->deref();
-  if (m_spreadMethod)
-    m_spreadMethod->deref();
-}
+SVGGradientElementImpl::~SVGGradientElementImpl() {}
 
 SVGAnimatedEnumerationImpl* SVGGradientElementImpl::gradientUnits() const {
   if (!m_gradientUnits) {
@@ -68,7 +58,7 @@ SVGAnimatedEnumerationImpl* SVGGradientElementImpl::gradientUnits() const {
     m_gradientUnits->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   }
 
-  return m_gradientUnits;
+  return m_gradientUnits.get();
 }
 
 SVGAnimatedTransformListImpl* SVGGradientElementImpl::gradientTransform()

@@ -35,20 +35,9 @@
 
 using namespace KSVG;
 
-SVGTestsImpl::SVGTestsImpl() {
-  m_features = 0;
-  m_extensions = 0;
-  m_systemLanguage = 0;
-}
+SVGTestsImpl::SVGTestsImpl() {}
 
-SVGTestsImpl::~SVGTestsImpl() {
-  if (m_features)
-    m_features->deref();
-  if (m_extensions)
-    m_extensions->deref();
-  if (m_systemLanguage)
-    m_systemLanguage->deref();
-}
+SVGTestsImpl::~SVGTestsImpl() {}
 
 SVGStringListImpl* SVGTestsImpl::requiredFeatures() const {
   return lazy_create<SVGStringListImpl>(m_features);

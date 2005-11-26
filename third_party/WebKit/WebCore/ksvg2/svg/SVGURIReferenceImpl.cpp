@@ -32,14 +32,9 @@
 
 using namespace KSVG;
 
-SVGURIReferenceImpl::SVGURIReferenceImpl() {
-  m_href = 0;
-}
+SVGURIReferenceImpl::SVGURIReferenceImpl() {}
 
-SVGURIReferenceImpl::~SVGURIReferenceImpl() {
-  if (m_href)
-    m_href->deref();
-}
+SVGURIReferenceImpl::~SVGURIReferenceImpl() {}
 
 SVGAnimatedStringImpl* SVGURIReferenceImpl::href() const {
   // const SVGStyledElementImpl *context = dynamic_cast<const

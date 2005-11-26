@@ -60,7 +60,7 @@ class SVGColorImpl : public KDOM::CSSValueImpl {
  private:
   QColor m_qColor;
   unsigned short m_colorType;
-  KDOM::DOMStringImpl* m_rgbColor;
+  KDOM::DOMString m_rgbColor;
 };
 };
 

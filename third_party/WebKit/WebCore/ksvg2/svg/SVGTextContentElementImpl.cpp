@@ -38,17 +38,9 @@ SVGTextContentElementImpl::SVGTextContentElementImpl(
     : SVGStyledElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl() {
-  m_textLength = 0;
-  m_lengthAdjust = 0;
-}
+      SVGExternalResourcesRequiredImpl() {}
 
-SVGTextContentElementImpl::~SVGTextContentElementImpl() {
-  if (m_textLength)
-    m_textLength->deref();
-  if (m_lengthAdjust)
-    m_lengthAdjust->deref();
-}
+SVGTextContentElementImpl::~SVGTextContentElementImpl() {}
 
 SVGAnimatedLengthImpl* SVGTextContentElementImpl::textLength() const {
   return lazy_create<SVGAnimatedLengthImpl>(m_textLength, this, LM_WIDTH);

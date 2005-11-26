@@ -49,14 +49,10 @@ SVGFEComponentTransferElementImpl::SVGFEComponentTransferElementImpl(
     const KDOM::QualifiedName& tagName,
     KDOM::DocumentImpl* doc)
     : SVGFilterPrimitiveStandardAttributesImpl(tagName, doc) {
-  m_in1 = 0;
   m_filterEffect = 0;
 }
 
-SVGFEComponentTransferElementImpl::~SVGFEComponentTransferElementImpl() {
-  if (m_in1)
-    m_in1->deref();
-}
+SVGFEComponentTransferElementImpl::~SVGFEComponentTransferElementImpl() {}
 
 SVGAnimatedStringImpl* SVGFEComponentTransferElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;

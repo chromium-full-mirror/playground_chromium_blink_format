@@ -47,7 +47,7 @@ class SVGScriptElementImpl : public SVGElementImpl,
                             KDOM::DOMStringImpl* jsCode);
 
  private:
-  KDOM::DOMStringImpl* m_type;
+  KDOM::DOMString m_type;
 };
 };
 

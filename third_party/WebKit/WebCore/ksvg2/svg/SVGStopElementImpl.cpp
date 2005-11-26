@@ -37,14 +37,9 @@ using namespace KSVG;
 
 SVGStopElementImpl::SVGStopElementImpl(const KDOM::QualifiedName& tagName,
                                        KDOM::DocumentImpl* doc)
-    : SVGStyledElementImpl(tagName, doc) {
-  m_offset = 0;
-}
+    : SVGStyledElementImpl(tagName, doc) {}
 
-SVGStopElementImpl::~SVGStopElementImpl() {
-  if (m_offset)
-    m_offset->deref();
-}
+SVGStopElementImpl::~SVGStopElementImpl() {}
 
 SVGAnimatedNumberImpl* SVGStopElementImpl::offset() const {
   return lazy_create<SVGAnimatedNumberImpl>(m_offset, this);

@@ -45,7 +45,7 @@ class SVGViewElementImpl : public SVGStyledElementImpl,
   SVGStringListImpl* viewTarget() const;
 
  private:
-  mutable SVGStringListImpl* m_viewTarget;
+  mutable SharedPtr<SVGStringListImpl> m_viewTarget;
 };
 };
 

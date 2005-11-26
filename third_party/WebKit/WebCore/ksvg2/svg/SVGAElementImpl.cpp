@@ -44,14 +44,9 @@ SVGAElementImpl::SVGAElementImpl(const KDOM::QualifiedName& tagName,
       SVGURIReferenceImpl(),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl() {
-  m_target = 0;
-}
+      SVGExternalResourcesRequiredImpl() {}
 
-SVGAElementImpl::~SVGAElementImpl() {
-  if (m_target)
-    m_target->deref();
-}
+SVGAElementImpl::~SVGAElementImpl() {}
 
 SVGAnimatedStringImpl* SVGAElementImpl::target() const {
   return lazy_create<SVGAnimatedStringImpl>(m_target, this);

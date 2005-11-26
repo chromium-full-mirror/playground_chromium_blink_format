@@ -59,9 +59,9 @@ class SVGGradientElementImpl : public SVGStyledElementImpl,
   void rebuildStops() const;
 
  protected:
-  mutable SVGAnimatedEnumerationImpl* m_spreadMethod;
-  mutable SVGAnimatedEnumerationImpl* m_gradientUnits;
-  mutable SVGAnimatedTransformListImpl* m_gradientTransform;
+  mutable SharedPtr<SVGAnimatedEnumerationImpl> m_spreadMethod;
+  mutable SharedPtr<SVGAnimatedEnumerationImpl> m_gradientUnits;
+  mutable SharedPtr<SVGAnimatedTransformListImpl> m_gradientTransform;
   mutable KRenderingPaintServerGradient* m_resource;
 };
 };

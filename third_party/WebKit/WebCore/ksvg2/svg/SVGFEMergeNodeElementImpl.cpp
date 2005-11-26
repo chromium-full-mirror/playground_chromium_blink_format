@@ -32,14 +32,9 @@ using namespace KSVG;
 SVGFEMergeNodeElementImpl::SVGFEMergeNodeElementImpl(
     const KDOM::QualifiedName& tagName,
     KDOM::DocumentImpl* doc)
-    : SVGElementImpl(tagName, doc) {
-  m_in1 = 0;
-}
+    : SVGElementImpl(tagName, doc) {}
 
-SVGFEMergeNodeElementImpl::~SVGFEMergeNodeElementImpl() {
-  if (m_in1)
-    m_in1->deref();
-}
+SVGFEMergeNodeElementImpl::~SVGFEMergeNodeElementImpl() {}
 
 SVGAnimatedStringImpl* SVGFEMergeNodeElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;

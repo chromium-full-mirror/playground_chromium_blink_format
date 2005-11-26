@@ -50,28 +50,10 @@ SVGMarkerElementImpl::SVGMarkerElementImpl(const KDOM::QualifiedName& tagName,
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl() {
-  m_refX = m_refY = m_markerWidth = m_markerHeight = 0;
-  m_markerUnits = m_orientType = 0;
-  m_orientAngle = 0;
   m_marker = 0;
 }
 
-SVGMarkerElementImpl::~SVGMarkerElementImpl() {
-  if (m_refX)
-    m_refX->deref();
-  if (m_refY)
-    m_refY->deref();
-  if (m_markerUnits)
-    m_markerUnits->deref();
-  if (m_markerWidth)
-    m_markerWidth->deref();
-  if (m_markerHeight)
-    m_markerHeight->deref();
-  if (m_orientType)
-    m_orientType->deref();
-  if (m_orientAngle)
-    m_orientAngle->deref();
-}
+SVGMarkerElementImpl::~SVGMarkerElementImpl() {}
 
 void SVGMarkerElementImpl::parseMappedAttribute(
     KDOM::MappedAttributeImpl* attr) {
@@ -120,7 +102,7 @@ SVGAnimatedEnumerationImpl* SVGMarkerElementImpl::markerUnits() const {
     m_markerUnits->setBaseVal(SVG_MARKERUNITS_STROKEWIDTH);
   }
 
-  return m_markerUnits;
+  return m_markerUnits.get();
 }
 
 SVGAnimatedLengthImpl* SVGMarkerElementImpl::markerWidth() const {

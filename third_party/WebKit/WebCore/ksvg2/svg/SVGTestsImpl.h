@@ -23,6 +23,8 @@
 #ifndef KSVG_SVGTestsImpl_H
 #define KSVG_SVGTestsImpl_H
 
+#include <kxmlcore/SharedPtr.h>
+
 namespace KDOM {
 class DOMStringImpl;
 class MappedAttributeImpl;
@@ -48,9 +50,9 @@ class SVGTestsImpl {
   bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SVGStringListImpl* m_features;
-  mutable SVGStringListImpl* m_extensions;
-  mutable SVGStringListImpl* m_systemLanguage;
+  mutable SharedPtr<SVGStringListImpl> m_features;
+  mutable SharedPtr<SVGStringListImpl> m_extensions;
+  mutable SharedPtr<SVGStringListImpl> m_systemLanguage;
 };
 };
 

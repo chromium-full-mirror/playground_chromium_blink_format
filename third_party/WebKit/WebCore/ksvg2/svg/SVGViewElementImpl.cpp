@@ -39,14 +39,9 @@ SVGViewElementImpl::SVGViewElementImpl(const KDOM::QualifiedName& tagName,
     : SVGStyledElementImpl(tagName, doc),
       SVGExternalResourcesRequiredImpl(),
       SVGFitToViewBoxImpl(),
-      SVGZoomAndPanImpl() {
-  m_viewTarget = 0;
-}
+      SVGZoomAndPanImpl() {}
 
-SVGViewElementImpl::~SVGViewElementImpl() {
-  if (m_viewTarget)
-    m_viewTarget->deref();
-}
+SVGViewElementImpl::~SVGViewElementImpl() {}
 
 SVGStringListImpl* SVGViewElementImpl::viewTarget() const {
   return lazy_create<SVGStringListImpl>(m_viewTarget);

@@ -54,18 +54,9 @@ SVGPathElementImpl::SVGPathElementImpl(const KDOM::QualifiedName& tagName,
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),
-      SVGPathParser() {
-  m_pathLength = 0;
-  m_pathSegList = 0;
-}
+      SVGPathParser() {}
 
-SVGPathElementImpl::~SVGPathElementImpl() {
-  if (m_pathSegList)
-    m_pathSegList->deref();
-
-  if (m_pathLength)
-    m_pathLength->deref();
-}
+SVGPathElementImpl::~SVGPathElementImpl() {}
 
 SVGAnimatedNumberImpl* SVGPathElementImpl::pathLength() const {
   if (!m_pathLength) {
@@ -73,7 +64,7 @@ SVGAnimatedNumberImpl* SVGPathElementImpl::pathLength() const {
     m_pathLength->setBaseVal(0);
   }
 
-  return m_pathLength;
+  return m_pathLength.get();
 }
 
 double SVGPathElementImpl::getTotalLength() {

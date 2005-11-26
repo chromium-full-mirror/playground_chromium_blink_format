@@ -48,7 +48,7 @@ class SVGTransformImpl : public KDOM::Shared<SVGTransformImpl> {
  private:
   double m_angle;
   unsigned short m_type;
-  SVGMatrixImpl* m_matrix;
+  SharedPtr<SVGMatrixImpl> m_matrix;
 };
 };
 

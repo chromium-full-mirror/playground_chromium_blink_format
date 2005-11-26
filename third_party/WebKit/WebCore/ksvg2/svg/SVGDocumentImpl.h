@@ -84,8 +84,6 @@ class SVGDocumentImpl : public KDOM::DocumentImpl,
   void dispatchMouseEvent(KDOM::EventTargetImpl* target,
                           const KDOM::AtomicString& type);
 
-  KDOM::EventTargetImpl* m_lastTarget;
-
   // <script> related
   void executeScripts(bool needsStyleSelectorUpdate);
   void addScripts(KDOM::NodeImpl* obj);

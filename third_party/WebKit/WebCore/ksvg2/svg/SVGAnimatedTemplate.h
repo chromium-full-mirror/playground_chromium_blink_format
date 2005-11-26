@@ -35,24 +35,17 @@ namespace KSVG {
 template <class T>
 class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
  public:
-  virtual ~SVGAnimatedTemplate() {
-    if (m_baseVal)
-      m_baseVal->deref();
-    if (m_animVal)
-      m_animVal->deref();
-  }
+  virtual ~SVGAnimatedTemplate() {}
 
   T* baseVal() const {
-    if (!m_baseVal) {
+    if (!m_baseVal)
       m_baseVal = create();
-      m_baseVal->ref();
-    }
 
-    return m_baseVal;
+    return m_baseVal.get();
   }
 
   void setBaseVal(T* baseVal) const {
-    KDOM::KDOM_SAFE_SET(m_baseVal, baseVal);
+    m_baseVal = baseVal;
 
     if (m_context)
       m_context->notifyAttributeChange();
@@ -61,16 +54,14 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
   }
 
   T* animVal() const {
-    if (!m_animVal) {
+    if (!m_animVal)
       m_animVal = create();
-      m_animVal->ref();
-    }
 
-    return m_animVal;
+    return m_animVal.get();
   }
 
   void setAnimVal(T* animVal) const {
-    KDOM::KDOM_SAFE_SET(m_animVal, animVal);
+    m_animVal = animVal;
 
     // I think this is superfluous... -- ECS 4/25/05
     if (m_context)
@@ -80,8 +71,6 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
  protected:
   SVGAnimatedTemplate(const SVGStyledElementImpl* context)
       : KDOM::Shared<SVGAnimatedTemplate>() {
-    m_baseVal = 0;
-    m_animVal = 0;
     m_context = context;
   }
 
@@ -96,8 +85,8 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
   SVGAnimatedTemplate(const SVGAnimatedTemplate&) {}
   SVGAnimatedTemplate<T>& operator=(const SVGAnimatedTemplate<T>&) {}
 
-  mutable T* m_baseVal;
-  mutable T* m_animVal;
+  mutable SharedPtr<T> m_baseVal;
+  mutable SharedPtr<T> m_animVal;
 };
 };
 

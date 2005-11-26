@@ -38,18 +38,9 @@ SVGCircleElementImpl::SVGCircleElementImpl(const KDOM::QualifiedName& tagName,
     : SVGStyledTransformableElementImpl(tagName, doc),
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
-      SVGExternalResourcesRequiredImpl() {
-  m_cx = m_cy = m_r = 0;
-}
+      SVGExternalResourcesRequiredImpl() {}
 
-SVGCircleElementImpl::~SVGCircleElementImpl() {
-  if (m_cx)
-    m_cx->deref();
-  if (m_cy)
-    m_cy->deref();
-  if (m_r)
-    m_r->deref();
-}
+SVGCircleElementImpl::~SVGCircleElementImpl() {}
 
 SVGAnimatedLengthImpl* SVGCircleElementImpl::cx() const {
   return lazy_create<SVGAnimatedLengthImpl>(m_cx, this, LM_WIDTH,

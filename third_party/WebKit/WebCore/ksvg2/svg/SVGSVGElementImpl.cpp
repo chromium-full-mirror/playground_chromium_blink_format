@@ -70,19 +70,10 @@ SVGSVGElementImpl::SVGSVGElementImpl(const KDOM::QualifiedName& tagName,
       SVGFitToViewBoxImpl(),
       SVGZoomAndPanImpl() {
   m_useCurrentView = false;
-  m_x = m_y = m_width = m_height = 0;
   m_timeScheduler = new TimeScheduler(getDocument());
 }
 
 SVGSVGElementImpl::~SVGSVGElementImpl() {
-  if (m_x)
-    m_x->deref();
-  if (m_y)
-    m_y->deref();
-  if (m_width)
-    m_width->deref();
-  if (m_height)
-    m_height->deref();
   delete m_timeScheduler;
 }
 
@@ -110,7 +101,7 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::width() const {
     m_width->baseVal()->setValueAsString(temp.impl());
   }
 
-  return m_width;
+  return m_width.get();
 }
 
 SVGAnimatedLengthImpl* SVGSVGElementImpl::height() const {
@@ -123,7 +114,7 @@ SVGAnimatedLengthImpl* SVGSVGElementImpl::height() const {
     m_height->baseVal()->setValueAsString(temp.impl());
   }
 
-  return m_height;
+  return m_height.get();
 }
 
 KDOM::AtomicString SVGSVGElementImpl::contentScriptType() const {
@@ -148,11 +139,9 @@ SVGRectImpl* SVGSVGElementImpl::viewport() const {
   double _y = y()->baseVal()->value();
   double w = width()->baseVal()->value();
   double h = height()->baseVal()->value();
-  SVGMatrixImpl* viewBox = viewBoxToViewTransform(w, h);
-  viewBox->ref();
+  SharedPtr<SVGMatrixImpl> viewBox = viewBoxToViewTransform(w, h);
   viewBox->qmatrix().map(_x, _y, &_x, &_y);
   viewBox->qmatrix().map(w, h, &w, &h);
-  viewBox->deref();
   ret->setX(_x);
   ret->setY(_y);
   ret->setWidth(w);

@@ -31,14 +31,9 @@
 
 using namespace KSVG;
 
-SVGExternalResourcesRequiredImpl::SVGExternalResourcesRequiredImpl() {
-  m_external = 0;
-}
+SVGExternalResourcesRequiredImpl::SVGExternalResourcesRequiredImpl() {}
 
-SVGExternalResourcesRequiredImpl::~SVGExternalResourcesRequiredImpl() {
-  if (m_external)
-    m_external->deref();
-}
+SVGExternalResourcesRequiredImpl::~SVGExternalResourcesRequiredImpl() {}
 
 SVGAnimatedBooleanImpl*
 SVGExternalResourcesRequiredImpl::externalResourcesRequired() const {

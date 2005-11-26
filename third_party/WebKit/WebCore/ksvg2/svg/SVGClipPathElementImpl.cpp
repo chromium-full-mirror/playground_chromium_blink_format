@@ -43,14 +43,10 @@ SVGClipPathElementImpl::SVGClipPathElementImpl(
       SVGTestsImpl(),
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl() {
-  m_clipPathUnits = 0;
   m_clipper = 0;
 }
 
-SVGClipPathElementImpl::~SVGClipPathElementImpl() {
-  if (m_clipPathUnits)
-    m_clipPathUnits->deref();
-}
+SVGClipPathElementImpl::~SVGClipPathElementImpl() {}
 
 SVGAnimatedEnumerationImpl* SVGClipPathElementImpl::clipPathUnits() const {
   if (!m_clipPathUnits) {
@@ -58,7 +54,7 @@ SVGAnimatedEnumerationImpl* SVGClipPathElementImpl::clipPathUnits() const {
     m_clipPathUnits->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
   }
 
-  return m_clipPathUnits;
+  return m_clipPathUnits.get();
 }
 
 void SVGClipPathElementImpl::parseMappedAttribute(

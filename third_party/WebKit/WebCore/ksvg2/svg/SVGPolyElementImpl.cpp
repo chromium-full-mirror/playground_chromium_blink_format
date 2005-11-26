@@ -39,14 +39,9 @@ SVGPolyElementImpl::SVGPolyElementImpl(const KDOM::QualifiedName& tagName,
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl(),
       SVGAnimatedPointsImpl(),
-      SVGPolyParser() {
-  m_points = 0;
-}
+      SVGPolyParser() {}
 
-SVGPolyElementImpl::~SVGPolyElementImpl() {
-  if (m_points)
-    m_points->deref();
-}
+SVGPolyElementImpl::~SVGPolyElementImpl() {}
 
 SVGPointListImpl* SVGPolyElementImpl::points() const {
   return lazy_create<SVGPointListImpl>(m_points, this);

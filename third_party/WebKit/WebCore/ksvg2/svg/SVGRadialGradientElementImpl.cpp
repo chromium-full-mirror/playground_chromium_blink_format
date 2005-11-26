@@ -47,22 +47,9 @@ using namespace KSVG;
 SVGRadialGradientElementImpl::SVGRadialGradientElementImpl(
     const KDOM::QualifiedName& tagName,
     KDOM::DocumentImpl* doc)
-    : SVGGradientElementImpl(tagName, doc) {
-  m_cx = m_cy = m_fx = m_fy = m_r = 0;
-}
+    : SVGGradientElementImpl(tagName, doc) {}
 
-SVGRadialGradientElementImpl::~SVGRadialGradientElementImpl() {
-  if (m_cx)
-    m_cx->deref();
-  if (m_cy)
-    m_cy->deref();
-  if (m_fx)
-    m_fx->deref();
-  if (m_fy)
-    m_fy->deref();
-  if (m_r)
-    m_r->deref();
-}
+SVGRadialGradientElementImpl::~SVGRadialGradientElementImpl() {}
 
 SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::cx() const {
   // Spec: If the attribute is not specified, the effect is as if a value of
@@ -72,7 +59,7 @@ SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::cx() const {
     m_cx->baseVal()->setValue(0.5);
   }
 
-  return m_cx;
+  return m_cx.get();
 }
 
 SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::cy() const {
@@ -84,7 +71,7 @@ SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::cy() const {
     m_cy->baseVal()->setValue(0.5);
   }
 
-  return m_cy;
+  return m_cy.get();
 }
 
 SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::fx() const {
@@ -105,7 +92,7 @@ SVGAnimatedLengthImpl* SVGRadialGradientElementImpl::r() const {
     m_r->baseVal()->setValue(0.5);
   }
 
-  return m_r;
+  return m_r.get();
 }
 
 void SVGRadialGradientElementImpl::parseMappedAttribute(

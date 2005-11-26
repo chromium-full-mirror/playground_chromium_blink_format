@@ -44,7 +44,7 @@ class SVGFEFloodElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
   virtual KCanvasFEFlood* filterEffect() const;
 
  private:
-  mutable SVGAnimatedStringImpl* m_in1;
+  mutable SharedPtr<SVGAnimatedStringImpl> m_in1;
   mutable KCanvasFEFlood* m_filterEffect;
 };
 };

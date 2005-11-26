@@ -52,14 +52,10 @@ SVGFEImageElementImpl::SVGFEImageElementImpl(const KDOM::QualifiedName& tagName,
       SVGLangSpaceImpl(),
       SVGExternalResourcesRequiredImpl() {
   m_filterEffect = 0;
-  m_preserveAspectRatio = 0;
   m_cachedImage = 0;
 }
 
-SVGFEImageElementImpl::~SVGFEImageElementImpl() {
-  if (m_preserveAspectRatio)
-    m_preserveAspectRatio->deref();
-}
+SVGFEImageElementImpl::~SVGFEImageElementImpl() {}
 
 SVGAnimatedPreserveAspectRatioImpl* SVGFEImageElementImpl::preserveAspectRatio()
     const {
