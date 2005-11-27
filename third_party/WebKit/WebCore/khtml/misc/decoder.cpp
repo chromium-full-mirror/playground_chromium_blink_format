@@ -475,13 +475,12 @@ QString Decoder::decode(const char* data, int len) {
             QCString str(ptr, end - ptr);
             int len;
             int pos = findXMLEncoding(str, len);
-            if (pos != -1) {
+            if (pos != -1)
               setEncoding(str.mid(pos, len), EncodingFromXMLHeader);
-              if (m_type == EncodingFromXMLHeader)
-                goto found;
-            }
-            setEncoding("UTF-8", EncodingFromXMLHeader);
-            goto found;
+            if (m_type != EncodingFromXMLHeader)
+              setEncoding("UTF-8", EncodingFromXMLHeader);
+            // continue looking for a charset - it may be specified in an
+            // HTTP-Equiv meta
           } else if (ptr[0] == 0 && ptr[1] == '?' && ptr[2] == 0 &&
                      ptr[3] == 'x' && ptr[4] == 0 && ptr[5] == 'm' &&
                      ptr[6] == 0 && ptr[7] == 'l') {
@@ -569,7 +568,7 @@ QString Decoder::decode(const char* data, int len) {
             body = true;
 #ifdef DECODE_DEBUG
             kdDebug(6005) << "Decoder: no charset found (bailing because of \""
-                          << tag.ascii() << "\")." << endl;
+                          << tag.qstring().ascii() << "\")." << endl;
 #endif
             goto found;
           }
