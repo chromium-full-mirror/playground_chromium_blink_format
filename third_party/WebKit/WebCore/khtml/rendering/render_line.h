@@ -23,6 +23,8 @@
 #define RENDER_LINE_H
 
 #include "rendering/render_object.h"
+#include "bidi.h"
+#include "misc/shared.h"
 
 namespace DOM {
 class AtomicString;
@@ -382,6 +384,7 @@ class RootInlineBox : public InlineFlowBox {
         m_rightOverflow(0),
         m_lineBreakObj(0),
         m_lineBreakPos(0),
+        m_lineBreakContext(0),
         m_blockHeight(0),
         m_endsWithBreak(false),
         m_hasSelectedChildren(false),
@@ -412,10 +415,10 @@ class RootInlineBox : public InlineFlowBox {
     m_leftOverflow = left;
     m_rightOverflow = right;
   }
-  void setLineBreakInfo(RenderObject* obj, uint breakPos) {
-    m_lineBreakObj = obj;
-    m_lineBreakPos = breakPos;
-  }
+  void setLineBreakInfo(RenderObject* obj,
+                        uint breakPos,
+                        BidiStatus* status,
+                        BidiContext* context);
   void setLineBreakPos(int p) { m_lineBreakPos = p; }
 
   void setBlockHeight(int h) { m_blockHeight = h; }
@@ -425,6 +428,8 @@ class RootInlineBox : public InlineFlowBox {
   bool endsWithBreak() const { return m_endsWithBreak; }
   RenderObject* lineBreakObj() const { return m_lineBreakObj; }
   uint lineBreakPos() const { return m_lineBreakPos; }
+  BidiStatus lineBreakBidiStatus() const { return m_lineBreakBidiStatus; }
+  BidiContext* lineBreakBidiContext() const { return m_lineBreakContext.get(); }
 
   void childRemoved(InlineBox* box);
 
@@ -500,6 +505,9 @@ class RootInlineBox : public InlineFlowBox {
   // we can create a BidiIterator beginning just after the end of this line.
   RenderObject* m_lineBreakObj;
   uint m_lineBreakPos;
+
+  BidiStatus m_lineBreakBidiStatus;
+  SharedPtr<BidiContext> m_lineBreakContext;
 
   // The height of the block at the end of this line.  This is where the next
   // line starts.

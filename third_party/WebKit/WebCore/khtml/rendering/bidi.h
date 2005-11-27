@@ -32,6 +32,15 @@ class RenderBlock;
 class RenderObject;
 class InlineBox;
 
+struct BidiStatus {
+  BidiStatus()
+      : eor(QChar::DirON), lastStrong(QChar::DirON), last(QChar::DirON) {}
+
+  QChar::Direction eor;
+  QChar::Direction lastStrong;
+  QChar::Direction last;
+};
+
 class BidiContext {
  public:
   BidiContext(unsigned char level,

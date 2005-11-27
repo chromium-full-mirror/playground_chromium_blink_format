@@ -137,9 +137,15 @@ class RenderBlock : public RenderFlow {
                                         BidiState& bidi);
   RootInlineBox* determineEndPosition(RootInlineBox* startBox,
                                       BidiIterator& cleanLineStart,
+                                      BidiStatus& cleanLineBidiStatus,
+                                      BidiContext*& cleanLineBidiContext,
                                       int& yPos);
   bool matchedEndLine(const BidiIterator& start,
+                      const BidiStatus& status,
+                      BidiContext* context,
                       const BidiIterator& endLineStart,
+                      const BidiStatus& endLineStatus,
+                      BidiContext* endLineContext,
                       RootInlineBox*& endLine,
                       int& endYPos);
   int skipWhitespace(BidiIterator&, BidiState&);
