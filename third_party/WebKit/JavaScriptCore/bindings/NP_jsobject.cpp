@@ -148,7 +148,7 @@ bool _NPN_Invoke(NPP npp,
     } else {
       // Lookup the function object.
       ExecState* exec = obj->executionContext->interpreter()->globalExec();
-      InterpreterLock lock;
+      JSLock lock;
       ValueImp* func =
           obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
@@ -186,7 +186,7 @@ bool _NPN_Evaluate(NPP npp, NPObject* o, NPString* s, NPVariant* variant) {
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
     ValueImp* result;
 
-    InterpreterLock lock;
+    JSLock lock;
     NPUTF16* scriptString;
     unsigned int UTF16Length;
     convertNPStringToUTF16(
@@ -226,7 +226,7 @@ bool _NPN_GetProperty(NPP npp,
 
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
 
-    InterpreterLock lock;
+    JSLock lock;
     ValueImp* result;
     if (i->isString) {
       result = obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
@@ -266,7 +266,7 @@ bool _NPN_SetProperty(NPP npp,
       return false;
 
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    InterpreterLock lock;
+    JSLock lock;
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
     if (i->isString)
       obj->imp->put(exec, identifierFromNPIdentifier(i->value.string),
@@ -303,7 +303,7 @@ bool _NPN_RemoveProperty(NPP npp, NPObject* o, NPIdentifier propertyName) {
       }
     }
 
-    InterpreterLock lock;
+    JSLock lock;
     if (i->isString)
       obj->imp->deleteProperty(exec,
                                identifierFromNPIdentifier(i->value.string));
@@ -325,7 +325,7 @@ bool _NPN_HasProperty(NPP npp, NPObject* o, NPIdentifier propertyName) {
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
 
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
-    InterpreterLock lock;
+    JSLock lock;
 
     if (i->isString)
       return obj->imp->hasProperty(exec,
@@ -352,7 +352,7 @@ bool _NPN_HasMethod(NPP npp, NPObject* o, NPIdentifier methodName) {
     // Lookup the function object.
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
 
-    InterpreterLock lock;
+    JSLock lock;
     ValueImp* func =
         obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
@@ -374,7 +374,7 @@ void _NPN_SetException(NPObject* o, const NPUTF8* message) {
   if (o->_class == NPScriptObjectClass) {
     JavaScriptObject* obj = (JavaScriptObject*)o;
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    InterpreterLock lock;
+    JSLock lock;
     throwError(exec, GeneralError, message);
   }
 }

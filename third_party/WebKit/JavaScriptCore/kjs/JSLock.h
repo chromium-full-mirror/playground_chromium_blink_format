@@ -29,7 +29,7 @@ namespace KJS {
 // important to lock before doing anything that allocates a
 // garbage-collected object or which may affect other shared state
 // such as the protect count hash table. The simplest way to do
-// this is by having a local InterpreterLock object for the scope
+// this is by having a local JSLock object for the scope
 // where the lock must be held. The lock is recursive so nesting
 // is ok.
 
@@ -38,12 +38,12 @@ namespace KJS {
 // held by your thread. This is safe to do if you are executing
 // code that doesn't require the lock, and reacquire the right
 // number of locks at the end. You can do this by constructing a
-// locally scoped InterpreterLock::DropAllLocks object.
+// locally scoped JSLock::DropAllLocks object.
 
-class InterpreterLock {
+class JSLock {
  public:
-  InterpreterLock() { lock(); }
-  ~InterpreterLock() { unlock(); }
+  JSLock() { lock(); }
+  ~JSLock() { unlock(); }
 
   static void lock();
   static void unlock();
@@ -62,8 +62,8 @@ class InterpreterLock {
   };
 
  private:
-  InterpreterLock(const InterpreterLock&);
-  InterpreterLock& operator=(const InterpreterLock&);
+  JSLock(const JSLock&);
+  JSLock& operator=(const JSLock&);
 };
 
 }  // namespace

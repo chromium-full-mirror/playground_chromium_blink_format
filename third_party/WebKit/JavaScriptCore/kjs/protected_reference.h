@@ -32,17 +32,17 @@ namespace KJS {
 class ProtectedReference : public Reference {
  public:
   ProtectedReference(const Reference& r) : Reference(r) {
-    InterpreterLock lock;
+    JSLock lock;
     gcProtectNullTolerant(base);
   }
 
   ~ProtectedReference() {
-    InterpreterLock lock;
+    JSLock lock;
     gcUnprotectNullTolerant(base);
   }
 
   ProtectedReference& operator=(const Reference& r) {
-    InterpreterLock lock;
+    JSLock lock;
     ValueImp* old = base;
     Reference::operator=(r);
     gcProtectNullTolerant(base);

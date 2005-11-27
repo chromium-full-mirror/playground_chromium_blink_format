@@ -41,7 +41,7 @@ int ProtectedValues::_keyCount;
 
 int ProtectedValues::getProtectCount(ValueImp* k) {
   assert(k);
-  assert(InterpreterLock::lockCount() > 0);
+  assert(JSLock::lockCount() > 0);
 
   if (!_table)
     return 0;
@@ -68,7 +68,7 @@ int ProtectedValues::getProtectCount(ValueImp* k) {
 
 void ProtectedValues::increaseProtectCount(ValueImp* k) {
   assert(k);
-  assert(InterpreterLock::lockCount() > 0);
+  assert(JSLock::lockCount() > 0);
 
   if (SimpleNumber::is(k))
     return;
@@ -116,7 +116,7 @@ inline void ProtectedValues::insert(AllocatedValueImp* k, int v) {
 
 void ProtectedValues::decreaseProtectCount(ValueImp* k) {
   assert(k);
-  assert(InterpreterLock::lockCount() > 0);
+  assert(JSLock::lockCount() > 0);
 
   if (SimpleNumber::is(k))
     return;

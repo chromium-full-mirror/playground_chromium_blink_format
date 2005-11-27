@@ -137,7 +137,7 @@ ObjectImp* Instance::createRuntimeObject(BindingLanguage language,
   Instance* interfaceObject = Instance::createBindingForLanguageInstance(
       language, (void*)nativeInstance, executionContext);
 
-  InterpreterLock lock;
+  JSLock lock;
   return new RuntimeObjectImp(interfaceObject, true);
 }
 

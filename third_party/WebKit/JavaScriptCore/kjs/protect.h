@@ -81,7 +81,7 @@ class ProtectedPtr {
 template <class T>
 ProtectedPtr<T>::ProtectedPtr(T* ptr) : m_ptr(ptr) {
   if (ptr) {
-    InterpreterLock lock;
+    JSLock lock;
     gcProtect(ptr);
   }
 }
@@ -89,7 +89,7 @@ ProtectedPtr<T>::ProtectedPtr(T* ptr) : m_ptr(ptr) {
 template <class T>
 ProtectedPtr<T>::ProtectedPtr(const ProtectedPtr& o) : m_ptr(o.get()) {
   if (T* ptr = m_ptr) {
-    InterpreterLock lock;
+    JSLock lock;
     gcProtect(ptr);
   }
 }
@@ -97,7 +97,7 @@ ProtectedPtr<T>::ProtectedPtr(const ProtectedPtr& o) : m_ptr(o.get()) {
 template <class T>
 ProtectedPtr<T>::~ProtectedPtr() {
   if (T* ptr = m_ptr) {
-    InterpreterLock lock;
+    JSLock lock;
     gcUnprotect(ptr);
   }
 }
@@ -106,14 +106,14 @@ template <class T>
 template <class U>
 ProtectedPtr<T>::ProtectedPtr(const ProtectedPtr<U>& o) : m_ptr(o.get()) {
   if (T* ptr = m_ptr) {
-    InterpreterLock lock;
+    JSLock lock;
     gcProtect(ptr);
   }
 }
 
 template <class T>
 ProtectedPtr<T>& ProtectedPtr<T>::operator=(const ProtectedPtr<T>& o) {
-  InterpreterLock lock;
+  JSLock lock;
   T* optr = o.m_ptr;
   gcProtectNullTolerant(optr);
   gcUnprotectNullTolerant(m_ptr);
@@ -123,7 +123,7 @@ ProtectedPtr<T>& ProtectedPtr<T>::operator=(const ProtectedPtr<T>& o) {
 
 template <class T>
 inline ProtectedPtr<T>& ProtectedPtr<T>::operator=(T* optr) {
-  InterpreterLock lock;
+  JSLock lock;
   gcProtectNullTolerant(optr);
   gcUnprotectNullTolerant(m_ptr);
   m_ptr = optr;
