@@ -37,7 +37,7 @@ void JSValueWrapper::JSObjectDispose(void* data) {
 }
 
 CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
-  InterpreterLock lock;
+  JSLock lock;
 
   CFMutableArrayRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
@@ -66,7 +66,7 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
 
 JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
                                                  CFStringRef propertyName) {
-  InterpreterLock lock;
+  JSLock lock;
 
   JSObjectRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
@@ -92,7 +92,7 @@ JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
 void JSValueWrapper::JSObjectSetProperty(void* data,
                                          CFStringRef propertyName,
                                          JSObjectRef jsValue) {
-  InterpreterLock lock;
+  JSLock lock;
 
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
@@ -106,7 +106,7 @@ void JSValueWrapper::JSObjectSetProperty(void* data,
 JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
                                                  JSObjectRef thisObj,
                                                  CFArrayRef args) {
-  InterpreterLock lock;
+  JSLock lock;
 
   JSObjectRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;
@@ -139,7 +139,7 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
 }
 
 CFTypeRef JSValueWrapper::JSObjectCopyCFValue(void* data) {
-  InterpreterLock lock;
+  JSLock lock;
 
   CFTypeRef result = 0;
   JSValueWrapper* ptr = (JSValueWrapper*)data;

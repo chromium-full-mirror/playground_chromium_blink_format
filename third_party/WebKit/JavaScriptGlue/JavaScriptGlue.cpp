@@ -190,7 +190,7 @@ JSObjectRef JSObjectCallFunction(JSObjectRef ref,
 JSRunRef JSRunCreate(CFStringRef jsSource, JSFlags inFlags) {
   JSRunRef result = 0;
   if (jsSource) {
-    InterpreterLock lock;
+    JSLock lock;
     result = (JSRunRef) new JSRun(jsSource, inFlags);
   }
   return result;
@@ -268,7 +268,7 @@ bool JSRunCheckSyntax(JSRunRef ref) {
     JSCollect - trigger garbage collection
 */
 void JSCollect(void) {
-  InterpreterLock lock;
+  JSLock lock;
   Collector::collect();
 }
 
@@ -523,9 +523,9 @@ CFMutableArrayRef JSCreateJSArrayFromCFArray(CFArrayRef array) {
 }
 
 void JSLockInterpreter() {
-  InterpreterLock::lock();
+  JSLock::lock();
 }
 
 void JSUnlockInterpreter() {
-  InterpreterLock::unlock();
+  JSLock::unlock();
 }
