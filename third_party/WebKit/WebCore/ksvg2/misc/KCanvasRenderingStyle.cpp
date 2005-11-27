@@ -47,10 +47,8 @@
 
 using namespace KSVG;
 
-KCanvasRenderingStyle::KCanvasRenderingStyle(khtml::RenderCanvas* canvas,
-                                             const khtml::RenderStyle* style) {
+KCanvasRenderingStyle::KCanvasRenderingStyle(const khtml::RenderStyle* style) {
   m_style = style;
-  m_canvas = canvas;
   m_fillPainter = 0;
   m_strokePainter = 0;
 }
@@ -61,9 +59,6 @@ KCanvasRenderingStyle::~KCanvasRenderingStyle() {
 }
 
 void KCanvasRenderingStyle::updateFill(RenderPath* item) {
-  if (!m_canvas || !m_canvas->renderingDevice())
-    return;
-
   SVGPaintImpl* fill = m_style->svgStyle()->fillPaint();
 
   if (fill && fill->paintType() == SVG_PAINTTYPE_NONE)
@@ -72,7 +67,7 @@ void KCanvasRenderingStyle::updateFill(RenderPath* item) {
   if (!fill)  // initial value (black)
   {
     KRenderingPaintServer* fillPaintServer =
-        m_canvas->renderingDevice()->createPaintServer(
+        QPainter::renderingDevice()->createPaintServer(
             KCPaintServerType(PS_SOLID));
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
@@ -90,7 +85,7 @@ void KCanvasRenderingStyle::updateFill(RenderPath* item) {
     fillPainter()->setPaintServer(fillPaintServer);
   } else {
     KRenderingPaintServer* fillPaintServer =
-        m_canvas->renderingDevice()->createPaintServer(
+        QPainter::renderingDevice()->createPaintServer(
             KCPaintServerType(PS_SOLID));
     KRenderingPaintServerSolid* fillPaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(fillPaintServer);
@@ -110,9 +105,6 @@ void KCanvasRenderingStyle::updateFill(RenderPath* item) {
 }
 
 void KCanvasRenderingStyle::updateStroke(RenderPath* item) {
-  if (!m_canvas || !m_canvas->renderingDevice())
-    return;
-
   SVGPaintImpl* stroke = m_style->svgStyle()->strokePaint();
 
   if (!stroke || stroke->paintType() == SVG_PAINTTYPE_NONE)
@@ -129,7 +121,7 @@ void KCanvasRenderingStyle::updateStroke(RenderPath* item) {
     strokePainter()->setPaintServer(strokePaintServer);
   } else {
     KRenderingPaintServer* strokePaintServer =
-        m_canvas->renderingDevice()->createPaintServer(
+        QPainter::renderingDevice()->createPaintServer(
             KCPaintServerType(PS_SOLID));
     KRenderingPaintServerSolid* strokePaintServerSolid =
         static_cast<KRenderingPaintServerSolid*>(strokePaintServer);

@@ -46,12 +46,14 @@ SVGFEMergeElementImpl::SVGFEMergeElementImpl(const KDOM::QualifiedName& tagName,
   m_filterEffect = 0;
 }
 
-SVGFEMergeElementImpl::~SVGFEMergeElementImpl() {}
+SVGFEMergeElementImpl::~SVGFEMergeElementImpl() {
+  delete m_filterEffect;
+}
 
 KCanvasFEMerge* SVGFEMergeElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEMerge*>(
-        canvas()->renderingDevice()->createFilterEffect(FE_MERGE));
+        QPainter::renderingDevice()->createFilterEffect(FE_MERGE));
   if (!m_filterEffect)
     return 0;
   setStandardAttributes(m_filterEffect);

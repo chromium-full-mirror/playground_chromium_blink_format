@@ -45,7 +45,9 @@ SVGFEBlendElementImpl::SVGFEBlendElementImpl(const KDOM::QualifiedName& tagName,
   m_filterEffect = 0;
 }
 
-SVGFEBlendElementImpl::~SVGFEBlendElementImpl() {}
+SVGFEBlendElementImpl::~SVGFEBlendElementImpl() {
+  delete m_filterEffect;
+}
 
 SVGAnimatedStringImpl* SVGFEBlendElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;
@@ -87,7 +89,7 @@ void SVGFEBlendElementImpl::parseMappedAttribute(
 KCanvasFEBlend* SVGFEBlendElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEBlend*>(
-        canvas()->renderingDevice()->createFilterEffect(FE_BLEND));
+        QPainter::renderingDevice()->createFilterEffect(FE_BLEND));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setBlendMode((KCBlendModeType)(mode()->baseVal() - 1));

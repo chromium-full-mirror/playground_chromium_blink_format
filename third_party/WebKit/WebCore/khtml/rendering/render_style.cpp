@@ -589,7 +589,11 @@ void RenderStyle::inheritFrom(const RenderStyle* inheritParent) {
 #endif
 }
 
-RenderStyle::~RenderStyle() {}
+RenderStyle::~RenderStyle() {
+#if SVG_SUPPORT
+  delete m_svgStyle;
+#endif
+}
 
 bool RenderStyle::operator==(const RenderStyle& o) const {
   // compare everything except the pseudoStyle pointer

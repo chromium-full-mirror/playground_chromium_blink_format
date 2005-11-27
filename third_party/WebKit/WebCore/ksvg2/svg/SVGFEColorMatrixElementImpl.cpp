@@ -50,7 +50,9 @@ SVGFEColorMatrixElementImpl::SVGFEColorMatrixElementImpl(
   m_filterEffect = 0;
 }
 
-SVGFEColorMatrixElementImpl::~SVGFEColorMatrixElementImpl() {}
+SVGFEColorMatrixElementImpl::~SVGFEColorMatrixElementImpl() {
+  delete m_filterEffect;
+}
 
 SVGAnimatedStringImpl* SVGFEColorMatrixElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;
@@ -90,7 +92,7 @@ void SVGFEColorMatrixElementImpl::parseMappedAttribute(
 KCanvasFEColorMatrix* SVGFEColorMatrixElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEColorMatrix*>(
-        canvas()->renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));
+        QPainter::renderingDevice()->createFilterEffect(FE_COLOR_MATRIX));
   if (!m_filterEffect)
     return 0;
 

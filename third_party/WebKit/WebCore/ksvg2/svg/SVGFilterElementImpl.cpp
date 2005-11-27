@@ -48,7 +48,9 @@ SVGFilterElementImpl::SVGFilterElementImpl(const KDOM::QualifiedName& tagName,
   m_filter = 0;
 }
 
-SVGFilterElementImpl::~SVGFilterElementImpl() {}
+SVGFilterElementImpl::~SVGFilterElementImpl() {
+  delete m_filter;
+}
 
 SVGAnimatedEnumerationImpl* SVGFilterElementImpl::filterUnits() const {
   if (!m_filterUnits) {
@@ -163,7 +165,7 @@ KCanvasFilter* SVGFilterElementImpl::canvasResource() {
 
   if (!m_filter)
     m_filter = static_cast<KCanvasFilter*>(
-        canvas()->renderingDevice()->createResource(RS_FILTER));
+        QPainter::renderingDevice()->createResource(RS_FILTER));
 
   bool filterBBoxMode =
       filterUnits()->baseVal() == SVG_UNIT_TYPE_OBJECTBOUNDINGBOX;

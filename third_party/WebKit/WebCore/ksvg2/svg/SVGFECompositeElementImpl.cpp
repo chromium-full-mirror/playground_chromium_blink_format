@@ -50,7 +50,9 @@ SVGFECompositeElementImpl::SVGFECompositeElementImpl(
   m_filterEffect = 0;
 }
 
-SVGFECompositeElementImpl::~SVGFECompositeElementImpl() {}
+SVGFECompositeElementImpl::~SVGFECompositeElementImpl() {
+  delete m_filterEffect;
+}
 
 SVGAnimatedStringImpl* SVGFECompositeElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;
@@ -114,7 +116,7 @@ void SVGFECompositeElementImpl::parseMappedAttribute(
 KCanvasFEComposite* SVGFECompositeElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFEComposite*>(
-        canvas()->renderingDevice()->createFilterEffect(FE_COMPOSITE));
+        QPainter::renderingDevice()->createFilterEffect(FE_COMPOSITE));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setOperation(

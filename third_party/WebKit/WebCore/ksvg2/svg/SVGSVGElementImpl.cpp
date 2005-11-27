@@ -430,7 +430,7 @@ khtml::RenderObject* SVGSVGElementImpl::createRenderer(
     RenderArena* arena,
     khtml::RenderStyle* style) {
   KCanvasContainer* rootContainer =
-      canvas()->renderingDevice()->createContainer(arena, style, this);
+      QPainter::renderingDevice()->createContainer(arena, style, this);
 
   // FIXME: all this setup should be done after attributesChanged, not here.
   float _x = x()->baseVal()->value();

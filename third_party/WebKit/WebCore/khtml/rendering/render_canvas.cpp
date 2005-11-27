@@ -72,17 +72,9 @@ RenderCanvas::RenderCanvas(DOM::NodeImpl* node, KHTMLView* view)
 
   // Create a new root layer for our layer hierarchy.
   m_layer = new (node->getDocument()->renderArena()) RenderLayer(this);
-
-#if SVG_SUPPORT
-  m_renderingDevice = 0;
-#endif
 }
 
-RenderCanvas::~RenderCanvas() {
-#if SVG_SUPPORT
-  delete m_renderingDevice;
-#endif
-}
+RenderCanvas::~RenderCanvas() {}
 
 void RenderCanvas::calcHeight() {
   if (!m_printingMode && m_view) {
@@ -662,11 +654,3 @@ void RenderCanvas::setBestTruncatedAt(int y,
     m_bestTruncatedAt = y;
   }
 }
-
-#if SVG_SUPPORT
-KRenderingDevice* RenderCanvas::renderingDevice() {
-  if (!m_renderingDevice)
-    m_renderingDevice = new KRenderingDeviceQuartz();
-  return m_renderingDevice;
-}
-#endif

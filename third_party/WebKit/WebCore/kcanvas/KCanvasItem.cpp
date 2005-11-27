@@ -24,6 +24,7 @@
 #include "config.h"
 #include <qrect.h>
 #include <kdebug.h>
+#include <kxmlcore/Assertions.h>
 
 #include "kcanvas/KCanvas.h"
 #include "kcanvas/RenderPath.h"
@@ -57,12 +58,12 @@ RenderPath::RenderPath(khtml::RenderStyle* style,
                        KSVG::SVGStyledElementImpl* node)
     : RenderObject((DOM::NodeImpl*)node), d(new Private()) {
   Q_ASSERT(style != 0);
-  d->style = new KSVG::KCanvasRenderingStyle(canvas(), style);
+  d->style = new KSVG::KCanvasRenderingStyle(style);
 }
 
 RenderPath::~RenderPath() {
-  if (d->path && canvas() && canvas()->renderingDevice())
-    canvas()->renderingDevice()->deletePath(d->path);
+  if (d->path)
+    QPainter::renderingDevice()->deletePath(d->path);
   delete d;
 }
 
@@ -80,14 +81,14 @@ void RenderPath::setLocalTransform(const QMatrix& matrix) {
 }
 
 bool RenderPath::fillContains(const QPoint& p) const {
-  if (d->path && d->style && canvas() && canvas()->renderingDevice())
+  if (d->path && d->style)
     return hitsPath(p, true);
 
   return false;
 }
 
 bool RenderPath::strokeContains(const QPoint& p) const {
-  if (d->path && d->style && canvas() && canvas()->renderingDevice())
+  if (d->path && d->style)
     return hitsPath(p, false);
 
   return false;
@@ -96,7 +97,7 @@ bool RenderPath::strokeContains(const QPoint& p) const {
 QRect RenderPath::relativeBBox(bool includeStroke) const {
   QRect result;
 
-  if (!d->path || !canvas() || !canvas()->renderingDevice())
+  if (!d->path)
     return result;
 
   if (includeStroke) {
@@ -113,7 +114,7 @@ QRect RenderPath::relativeBBox(bool includeStroke) const {
 }
 
 void RenderPath::setupForDraw() const {
-  if (d->path && d->style && canvas() && canvas()->renderingDevice()) {
+  if (d->path && d->style) {
     if (d->style->fillPainter() && d->style->fillPainter()->paintServer())
       d->style->fillPainter()->paintServer()->setActiveClient(this);
 
@@ -123,13 +124,12 @@ void RenderPath::setupForDraw() const {
 }
 
 void RenderPath::changePath(KCanvasUserData newPath) {
-  if (canvas() && canvas()->renderingDevice()) {
-    canvas()->renderingDevice()->setCurrentPath(newPath);
-    if (d->path)
-      canvas()->renderingDevice()->deletePath(d->path);
+  ASSERT(newPath);
+  QPainter::renderingDevice()->setCurrentPath(newPath);
+  if (d->path)
+    QPainter::renderingDevice()->deletePath(d->path);
 
-    d->path = newPath;
-  }
+  d->path = newPath;
 }
 
 KCanvasUserData RenderPath::path() const {

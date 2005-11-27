@@ -43,7 +43,9 @@ SVGFETileElementImpl::SVGFETileElementImpl(const KDOM::QualifiedName& tagName,
   m_filterEffect = 0;
 }
 
-SVGFETileElementImpl::~SVGFETileElementImpl() {}
+SVGFETileElementImpl::~SVGFETileElementImpl() {
+  delete m_filterEffect;
+}
 
 SVGAnimatedStringImpl* SVGFETileElementImpl::in1() const {
   SVGStyledElementImpl* dummy = 0;
@@ -62,7 +64,7 @@ void SVGFETileElementImpl::parseMappedAttribute(
 KCanvasFETile* SVGFETileElementImpl::filterEffect() const {
   if (!m_filterEffect)
     m_filterEffect = static_cast<KCanvasFETile*>(
-        canvas()->renderingDevice()->createFilterEffect(FE_TILE));
+        QPainter::renderingDevice()->createFilterEffect(FE_TILE));
   if (!m_filterEffect)
     return 0;
   m_filterEffect->setIn(KDOM::DOMString(in1()->baseVal()).qstring());

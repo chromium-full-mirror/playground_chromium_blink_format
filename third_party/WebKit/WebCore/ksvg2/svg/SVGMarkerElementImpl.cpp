@@ -53,7 +53,9 @@ SVGMarkerElementImpl::SVGMarkerElementImpl(const KDOM::QualifiedName& tagName,
   m_marker = 0;
 }
 
-SVGMarkerElementImpl::~SVGMarkerElementImpl() {}
+SVGMarkerElementImpl::~SVGMarkerElementImpl() {
+  delete m_marker;
+}
 
 void SVGMarkerElementImpl::parseMappedAttribute(
     KDOM::MappedAttributeImpl* attr) {
@@ -137,7 +139,7 @@ void SVGMarkerElementImpl::setOrientToAngle(SVGAngleImpl* angle) {
 KCanvasMarker* SVGMarkerElementImpl::canvasResource() {
   if (!m_marker)
     m_marker = static_cast<KCanvasMarker*>(
-        canvas()->renderingDevice()->createResource(RS_MARKER));
+        QPainter::renderingDevice()->createResource(RS_MARKER));
 
   m_marker->setMarker(renderer());
 
@@ -163,7 +165,7 @@ khtml::RenderObject* SVGMarkerElementImpl::createRenderer(
     RenderArena* arena,
     khtml::RenderStyle* style) {
   KCanvasContainer* markerContainer =
-      canvas()->renderingDevice()->createContainer(arena, style, this);
+      QPainter::renderingDevice()->createContainer(arena, style, this);
   markerContainer->setDrawsContents(
       false);  // Marker contents will be explicitly drawn.
   return markerContainer;

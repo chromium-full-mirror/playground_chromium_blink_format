@@ -74,8 +74,8 @@ khtml::RenderObject* SVGStyledElementImpl::createRenderer(
   if (pathData.isEmpty())
     return 0;
   KCanvasUserData path = KCanvasCreator::self()->createCanvasPathData(
-      canvas()->renderingDevice(), pathData);
-  return canvas()->renderingDevice()->createItem(arena, style, this, path);
+      QPainter::renderingDevice(), pathData);
+  return QPainter::renderingDevice()->createItem(arena, style, this, path);
 }
 
 void SVGStyledElementImpl::parseMappedAttribute(
@@ -144,7 +144,7 @@ void SVGStyledElementImpl::updateCanvasItem() {
     renderSection = true;
 
   KCanvasUserData newPath = KCanvasCreator::self()->createCanvasPathData(
-      canvas()->renderingDevice(), toPathData());
+      QPainter::renderingDevice(), toPathData());
   renderPath->changePath(newPath);
 
   if (renderSection)
@@ -157,7 +157,7 @@ const SVGStyledElementImpl* SVGStyledElementImpl::pushAttributeContext(
     const SVGStyledElementImpl*) {
   if (canvas()) {
     KCanvasUserData newPath = KCanvasCreator::self()->createCanvasPathData(
-        canvas()->renderingDevice(), toPathData());
+        QPainter::renderingDevice(), toPathData());
     static_cast<RenderPath*>(renderer())->changePath(newPath);
   }
 
