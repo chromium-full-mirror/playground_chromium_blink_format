@@ -1229,6 +1229,9 @@ void RenderBlock::bidiReorderLine(const BidiIterator& start,
         dirCurrent = QChar::DirAN;
         switch (bidi.status.last) {
           case QChar::DirL:
+            if (bidi.context->dir == QChar::DirL)
+              appendRun(bidi);
+            break;
           case QChar::DirAN:
             break;
           case QChar::DirR:
