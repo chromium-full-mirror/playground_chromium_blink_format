@@ -28,6 +28,13 @@
 #include "KCanvasTreeDebug.h"
 #include <kxmlcore/Assertions.h>
 
+void KCanvasPoint3F::normalize() {
+  float length = sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+  m_x /= length;
+  m_y /= length;
+  m_z /= length;
+}
+
 // Filters
 
 void KCanvasFilter::addFilterEffect(KCanvasFilterEffect* effect) {
@@ -83,6 +90,11 @@ void KCanvasFilterEffect::setResult(const QString& result) {
   m_result = result;
 }
 
+static QTextStream& operator<<(QTextStream& ts, const KCanvasPoint3F p) {
+  ts << "x=" << p.x() << " y=" << p.y() << " z=" << p.z();
+  return ts;
+}
+
 QTextStream& KCanvasFilterEffect::externalRepresentation(
     QTextStream& ts) const {
   if (!in().isEmpty())
@@ -94,29 +106,31 @@ QTextStream& KCanvasFilterEffect::externalRepresentation(
   return ts;
 }
 
-QTextStream& KCanvasFEDistantLight::externalRepresentation(
+QTextStream& KCPointLightSource::externalRepresentation(QTextStream& ts) const {
+  ts << "[type=POINT-LIGHT] ";
+  ts << "[position=\"" << position() << "\"]";
+  return ts;
+}
+
+QTextStream& KCSpotLightSource::externalRepresentation(QTextStream& ts) const {
+  ts << "[type=SPOT-LIGHT] ";
+  ts << "[position=\"" << position() << "\"]";
+  ts << "[direction=\"" << direction() << "\"]";
+  ts << "[specularExponent=\"" << specularExponent() << "\"]";
+  ts << "[limitingConeAngle=\"" << limitingConeAngle() << "\"]";
+  return ts;
+}
+
+QTextStream& KCDistantLightSource::externalRepresentation(
     QTextStream& ts) const {
   ts << "[type=DISTANT-LIGHT] ";
-  KCanvasFilterEffect::externalRepresentation(ts);
-  ts << "[azimuth=" << azimuth() << "]"
-     << "[elevation=" << elevation() << "]";
+  ts << "[azimuth=\"" << azimuth() << "\"]";
+  ts << "[elevation=\"" << elevation() << "\"]";
   return ts;
 }
 
-QTextStream& KCanvasFEPointLight::externalRepresentation(
-    QTextStream& ts) const {
-  ts << "[type=POINT-LIGHT] ";
-  KCanvasFilterEffect::externalRepresentation(ts);
-  ts << "[x=" << m_x << " y=" << m_y << " z=" << m_z << "]";
-  return ts;
-}
-
-QTextStream& KCanvasFESpotLight::externalRepresentation(QTextStream& ts) const {
-  ts << "[type=SPOT-LIGHT] ";
-  KCanvasFilterEffect::externalRepresentation(ts);
-  ts << "[x=" << m_x << " y=" << m_y << " z=" << m_z << "]"
-     << "[points at x=" << m_pointsAtX << " y=" << m_pointsAtY
-     << " z=" << m_pointsAtZ << "]";
+static QTextStream& operator<<(QTextStream& ts, QPointF p) {
+  ts << "x=" << p.x() << " y=" << p.y();
   return ts;
 }
 
@@ -246,18 +260,22 @@ static QTextStream& operator<<(QTextStream& ts, KCEdgeModeType t) {
   return ts;
 }
 
+static QTextStream& operator<<(QTextStream& ts, QSize s) {
+  ts << "x=" << s.width() << " y=" << s.height();
+  return ts;
+}
+
 QTextStream& KCanvasFEConvolveMatrix::externalRepresentation(
     QTextStream& ts) const {
   ts << "[type=CONVOLVE-MATRIX] ";
   KCanvasFilterEffect::externalRepresentation(ts);
-  ts << " [order x= " << m_orderX << " y=" << m_orderY << "]"
+  ts << " [order " << m_kernelSize << "]"
      << " [kernel matrix=" << m_kernelMatrix << "]"
      << " [divisor=" << m_divisor << "]"
      << " [bias=" << m_bias << "]"
-     << " [target x= " << m_targetX << " y=" << m_targetY << "]"
+     << " [target " << m_targetOffset << "]"
      << " [edge mode=" << m_edgeMode << "]"
-     << " [kernel unit length x=" << m_kernelUnitLengthX
-     << " y=" << m_kernelUnitLengthY << "]"
+     << " [kernel unit length " << m_kernelUnitLength << "]"
      << " [preserve alpha=" << m_preserveAlpha << "]";
   return ts;
 }
@@ -268,8 +286,8 @@ QTextStream& KCanvasFEDiffuseLighting::externalRepresentation(
   KCanvasFilterEffect::externalRepresentation(ts);
   ts << " [surface scale=" << m_surfaceScale << "]"
      << " [diffuse constant=" << m_diffuseConstant << "]"
-     << " [kernel unit length x=" << m_kernelUnitLengthX
-     << " y=" << m_kernelUnitLengthY << "]";
+     << " [kernel unit length " << m_kernelUnitLengthX << ", "
+     << m_kernelUnitLengthY << "]";
   return ts;
 }
 

@@ -74,7 +74,17 @@ class KCanvasFEColorMatrixQuartz : public KCanvasFEColorMatrix {
 //    virtual CIFilter *getCIFilter(KCanvasFilterQuartz *quartzFilter) const;
 //};
 
+class KCanvasFEConvolveMatrixQuartz : public KCanvasFEConvolveMatrix {
+ public:
+  virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
+};
+
 class KCanvasFECompositeQuartz : public KCanvasFEComposite {
+ public:
+  virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
+};
+
+class KCanvasFEDiffuseLightingQuartz : public KCanvasFEDiffuseLighting {
  public:
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
 };
@@ -100,6 +110,11 @@ class KCanvasFEMergeQuartz : public KCanvasFEMerge {
 };
 
 class KCanvasFEOffsetQuartz : public KCanvasFEOffset {
+ public:
+  virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
+};
+
+class KCanvasFESpecularLightingQuartz : public KCanvasFESpecularLighting {
  public:
   virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const;
 };
