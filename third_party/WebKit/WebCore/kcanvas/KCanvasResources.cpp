@@ -117,16 +117,13 @@ void KCanvasMarker::setMarker(khtml::RenderObject* marker) {
   m_marker = marker;
 }
 
-void KCanvasMarker::setRefX(double refX) {
+void KCanvasMarker::setRef(double refX, double refY) {
   m_refX = refX;
+  m_refY = refY;
 }
 
 double KCanvasMarker::refX() const {
   return m_refX;
-}
-
-void KCanvasMarker::setRefY(double refY) {
-  m_refY = refY;
 }
 
 double KCanvasMarker::refY() const {
@@ -153,16 +150,13 @@ bool KCanvasMarker::useStrokeWidth() const {
   return m_useStrokeWidth;
 }
 
-void KCanvasMarker::setScaleX(float scaleX) {
+void KCanvasMarker::setScale(float scaleX, float scaleY) {
   m_scaleX = scaleX;
+  m_scaleY = scaleY;
 }
 
 float KCanvasMarker::scaleX() const {
   return m_scaleX;
-}
-
-void KCanvasMarker::setScaleY(float scaleY) {
-  m_scaleY = scaleY;
 }
 
 float KCanvasMarker::scaleY() const {
@@ -170,13 +164,12 @@ float KCanvasMarker::scaleY() const {
 }
 
 void KCanvasMarker::draw(const QRect& rect,
-                         const KCanvasMatrix& objectMatrix,
                          double x,
                          double y,
                          double strokeWidth,
                          double angle) {
   if (m_marker) {
-    KCanvasMatrix translation = objectMatrix;
+    KCanvasMatrix translation;
     translation.translate(x, y);
 
     KCanvasMatrix rotation;
@@ -189,10 +182,13 @@ void KCanvasMarker::draw(const QRect& rect,
     if (m_useStrokeWidth)
       rotation.scale(strokeWidth, strokeWidth);
 
-    // FIXME: I'm not sure if this is right yet...
+    // FIXME: PaintInfo should be passed into this method instead.
     QPainter p;
-    khtml::RenderObject::PaintInfo info(&p, QRect(), PaintActionForeground, 0);
+    khtml::RenderObject::PaintInfo info(&p, rect, PaintActionForeground, 0);
+    m_marker->setLocalTransform(rotation.multiply(translation).qmatrix());
+    static_cast<KCanvasContainer*>(m_marker)->setDrawsContents(true);
     m_marker->paint(info, 0, 0);
+    static_cast<KCanvasContainer*>(m_marker)->setDrawsContents(false);
   }
 }
 

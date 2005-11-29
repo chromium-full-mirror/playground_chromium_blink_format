@@ -35,6 +35,7 @@
 #include "SVGHelper.h"
 #include "SVGAngleImpl.h"
 #include "SVGLengthImpl.h"
+#include "SVGMatrixImpl.h"
 #include "SVGSVGElementImpl.h"
 #include "SVGFitToViewBoxImpl.h"
 #include "SVGMarkerElementImpl.h"
@@ -60,7 +61,10 @@ SVGMarkerElementImpl::~SVGMarkerElementImpl() {
 void SVGMarkerElementImpl::parseMappedAttribute(
     KDOM::MappedAttributeImpl* attr) {
   const KDOM::AtomicString& value = attr->value();
-  if (attr->name() == SVGNames::refXAttr)
+  if (attr->name() == SVGNames::markerUnitsAttr) {
+    if (value == "userSpaceOnUse")
+      markerUnits()->setBaseVal(SVG_MARKERUNITS_USERSPACEONUSE);
+  } else if (attr->name() == SVGNames::refXAttr)
     refX()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::refYAttr)
     refY()->baseVal()->setValueAsString(value.impl());
@@ -69,7 +73,7 @@ void SVGMarkerElementImpl::parseMappedAttribute(
   else if (attr->name() == SVGNames::markerHeightAttr)
     markerHeight()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::orientAttr) {
-    if (KDOM::DOMString(value) == "auto")
+    if (value == "auto")
       setOrientToAuto();
     else {
       SVGAngleImpl* angle = SVGSVGElementImpl::createSVGAngle();
@@ -156,8 +160,15 @@ KCanvasMarker* SVGMarkerElementImpl::canvasResource() {
   else
     m_marker->setAutoAngle();
 
-  m_marker->setRefX(refX()->baseVal()->value());
-  m_marker->setRefY(refY()->baseVal()->value());
+  m_marker->setRef(refX()->baseVal()->value(), refY()->baseVal()->value());
+
+  m_marker->setUseStrokeWidth(markerUnits()->baseVal() ==
+                              SVG_MARKERUNITS_STROKEWIDTH);
+  double w = markerWidth()->baseVal()->value();
+  double h = markerHeight()->baseVal()->value();
+  SharedPtr<SVGMatrixImpl> viewBox = viewBoxToViewTransform(w, h);
+  m_marker->setScale(viewBox->qmatrix().m11(), viewBox->qmatrix().m22());
+
   return m_marker;
 }
 

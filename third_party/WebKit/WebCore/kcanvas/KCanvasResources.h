@@ -96,10 +96,8 @@ class KCanvasMarker : public KCanvasResource {
 
   void setMarker(khtml::RenderObject* marker);
 
-  void setRefX(double refX);
+  void setRef(double refX, double refY);
   double refX() const;
-
-  void setRefY(double refY);
   double refY() const;
 
   void setAngle(float angle);
@@ -109,15 +107,12 @@ class KCanvasMarker : public KCanvasResource {
   void setUseStrokeWidth(bool useStrokeWidth = true);
   bool useStrokeWidth() const;
 
-  void setScaleX(float scaleX);
+  void setScale(float scaleX, float scaleY);
   float scaleX() const;
-
-  void setScaleY(float scaleY);
   float scaleY() const;
 
   // Draw onto the canvas
   void draw(const QRect& rect,
-            const KCanvasMatrix& objectMatrix,
             double x,
             double y,
             double strokeWidth = 1.,
