@@ -94,7 +94,6 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   int height(bool ignorePendingStylesheets = false) const;
 
   bool isServerMap() const { return (ismap && !usemap.length()); }
-  QImage currentImage() const;
 
   DOMString altText() const;
 
