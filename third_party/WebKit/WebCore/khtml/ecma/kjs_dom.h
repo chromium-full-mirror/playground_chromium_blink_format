@@ -219,6 +219,11 @@ class DOMDocument : public DOMNode {
     DocType,
     Implementation,
     DocumentElement,
+    Charset,
+    DefaultCharset,
+    CharacterSet,
+    ActualEncoding,
+    InputEncoding,
     // Functions
     AdoptNode,
     CreateElement,

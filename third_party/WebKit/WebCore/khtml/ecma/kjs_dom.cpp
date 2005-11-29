@@ -957,6 +957,11 @@ const ClassInfo DOMDocument::info = {"Document", &DOMNode::info,
   doctype         DOMDocument::DocType DontDelete|ReadOnly
   implementation  DOMDocument::Implementation DontDelete|ReadOnly
   documentElement DOMDocument::DocumentElement DontDelete|ReadOnly
+  charset         DOMDocument::Charset                         DontDelete
+  defaultCharset  DOMDocument::DefaultCharset DontDelete|ReadOnly
+  characterSet    DOMDocument::CharacterSet DontDelete|ReadOnly
+  actualEncoding  DOMDocument::ActualEncoding DontDelete|ReadOnly
+  inputEncoding   DOMDocument::InputEncoding DontDelete|ReadOnly
   styleSheets     DOMDocument::StyleSheets DontDelete|ReadOnly
   preferredStylesheetSet  DOMDocument::PreferredStylesheetSet
 DontDelete|ReadOnly
@@ -993,6 +998,18 @@ ValueImp* DOMDocument::getValueProperty(ExecState* exec, int token) const {
       return getDOMDOMImplementation(exec, doc.implementation());
     case DocumentElement:
       return getDOMNode(exec, doc.documentElement());
+    case Charset:
+    case CharacterSet:
+    case ActualEncoding:
+    case InputEncoding:
+      khtml::Decoder* decoder = doc.decoder();
+      if (decoder)
+        return String(doc.decoder()->encoding());
+      return Null();
+    case DefaultCharset:
+      if (KHTMLPart* part = doc.part())
+        return String(part->settings()->encoding());
+      return Undefined();
     case StyleSheets:
       // kdDebug() << "DOMDocument::StyleSheets, returning " <<
       // doc.styleSheets().length() << " stylesheets" << endl;
@@ -1038,10 +1055,13 @@ void DOMDocument::putValueProperty(ExecState* exec,
                                    int /*attr*/) {
   DocumentImpl& doc = *static_cast<DocumentImpl*>(impl());
   switch (token) {
-    case SelectedStylesheetSet: {
+    case SelectedStylesheetSet:
       doc.setSelectedStylesheetSet(value->toString(exec).domString());
       break;
-    }
+    case Charset:
+      doc.decoder()->setEncoding(value->toString(exec).cstring().c_str(),
+                                 khtml::Decoder::UserChosenEncoding);
+      break;
   }
 }
 
