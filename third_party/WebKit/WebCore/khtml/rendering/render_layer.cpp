@@ -1167,10 +1167,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // the layer.
   if (containsPoint(xMousePos, yMousePos, fgRect) &&
       renderer()->hitTest(
-          info, xMousePos, yMousePos,
-          layerBounds.x() - renderer()->xPos() + m_object->borderLeft(),
-          layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra() -
-              m_object->borderBottom(),
+          info, xMousePos, yMousePos, layerBounds.x() - renderer()->xPos(),
+          layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestDescendants)) {
     // for positioned generated content, we might still not have a
     // node by the time we get to the layer level, since none of
@@ -1212,10 +1210,8 @@ RenderLayer* RenderLayer::hitTestLayer(RenderLayer* rootLayer,
   // its children.
   if (containsPoint(xMousePos, yMousePos, bgRect) &&
       renderer()->hitTest(
-          info, xMousePos, yMousePos,
-          layerBounds.x() - renderer()->xPos() + m_object->borderLeft(),
-          layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra() -
-              m_object->borderBottom(),
+          info, xMousePos, yMousePos, layerBounds.x() - renderer()->xPos(),
+          layerBounds.y() - renderer()->yPos() + m_object->borderTopExtra(),
           HitTestSelf))
     return this;
 
