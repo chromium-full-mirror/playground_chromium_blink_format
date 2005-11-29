@@ -77,8 +77,8 @@ class KURL {
 
   QString prettyURL() const;
 
+  CFURLRef createCFURL() const;
   NSURL* getNSURL() const;
-  NSData* getNSData() const;
 
   bool isLocalFile() const;
 
