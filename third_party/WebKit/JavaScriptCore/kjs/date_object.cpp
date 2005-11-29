@@ -556,6 +556,11 @@ bool DateProtoFuncImp::implementsCall() const {
   return true;
 }
 
+static bool isTime_tSigned() {
+  time_t minusOne = (time_t)(-1);
+  return minusOne < 0;
+}
+
 ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
                                            ObjectImp* thisObj,
                                            const List& args) {
@@ -609,11 +614,17 @@ ValueImp* DateProtoFuncImp::callAsFunction(ExecState* exec,
 
   // check whether time value is outside time_t's usual range
   // make the necessary transformations if necessary
+  static bool time_tIsSigned = isTime_tSigned();
+  static double time_tMin =
+      (time_tIsSigned ? -(double)(1ULL << (8 * sizeof(time_t) - 1)) : 0);
+  static double time_tMax =
+      (time_tIsSigned ? (1ULL << 8 * sizeof(time_t) - 1) - 1
+                      : 2 * (double)(1ULL << 8 * sizeof(time_t) - 1) - 1);
   int realYearOffset = 0;
   double milliOffset = 0.0;
   double secs = floor(milli / msPerSecond);
 
-  if (milli < 0 || milli >= timeFromYear(2038)) {
+  if (secs < time_tMin || secs > time_tMax) {
     // ### ugly and probably not very precise
     int realYear = yearFromTime(milli);
     int base = daysInYear(realYear) == 365 ? 2001 : 2000;
