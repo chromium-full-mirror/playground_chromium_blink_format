@@ -72,13 +72,18 @@ SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other) {
 
 SVGRenderStyle::~SVGRenderStyle() {}
 
-bool SVGRenderStyle::equals(SVGRenderStyle* svgOther) const {
-  if (!svgOther)
-    return false;
+bool SVGRenderStyle::operator==(const SVGRenderStyle& o) const {
+  return (fill == o.fill && stroke == o.stroke && stops == o.stops &&
+          clip == o.clip && misc == o.misc && markers == o.markers &&
+          svg_inherited_flags == o.svg_inherited_flags &&
+          svg_noninherited_flags == o.svg_noninherited_flags);
+}
 
-  return (fill == svgOther->fill && stroke == svgOther->stroke &&
-          stops == svgOther->stops && clip == svgOther->clip &&
-          misc == svgOther->misc && markers == svgOther->markers);
+bool SVGRenderStyle::inheritedNotEqual(SVGRenderStyle* other) const {
+  return (fill != other->fill || stroke != other->stroke ||
+          stops != other->stops || misc != other->misc ||
+          markers != other->markers ||
+          svg_inherited_flags != other->svg_inherited_flags);
 }
 
 void SVGRenderStyle::inheritFrom(const SVGRenderStyle* svgInheritParent) {

@@ -65,6 +65,8 @@ class SVGStyledElementImpl : public SVGElementImpl {
 
   khtml::RenderCanvas* canvas() const;
   virtual void notifyAttributeChange() const;
+  virtual void attributeChanged(KDOM::AttributeImpl* attr,
+                                bool preserveDecls = false);
 
   // Imagine we're a <rect> inside of a <pattern> section with
   // patternContentUnits="objectBoundingBox"

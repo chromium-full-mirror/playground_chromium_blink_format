@@ -37,9 +37,11 @@ class SVGRenderStyle {
   SVGRenderStyle(const SVGRenderStyle& other);
   ~SVGRenderStyle();
 
-  bool equals(SVGRenderStyle* other) const;
+  bool inheritedNotEqual(SVGRenderStyle* other) const;
 
   void inheritFrom(const SVGRenderStyle* inheritParent);
+
+  bool operator==(const SVGRenderStyle& o) const;
 
   // SVG CSS Properties
   SVG_RS_DEFINE_ATTRIBUTE(EAlignmentBaseline,

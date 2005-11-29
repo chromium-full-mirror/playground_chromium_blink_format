@@ -37,7 +37,9 @@ class KCanvasContainer::Private {
 };
 
 KCanvasContainer::KCanvasContainer(KSVG::SVGStyledElementImpl* node)
-    : khtml::RenderContainer(node), d(new Private()) {}
+    : khtml::RenderContainer(node), d(new Private()) {
+  setReplaced(true);
+}
 
 KCanvasContainer::~KCanvasContainer() {
   delete d;
