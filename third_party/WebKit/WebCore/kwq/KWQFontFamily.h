@@ -75,7 +75,7 @@ class KWQFontFamily {
   DOM::AtomicString _family;
   KWQFontFamily* _next;
   int _refCnt;
-  mutable NSString* _NSFamily;
+  mutable CFStringRef _CFFamily;
 };
 
 // Macro to create a stack array containing non-retained NSString names
