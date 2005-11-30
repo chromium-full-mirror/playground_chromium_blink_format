@@ -2258,6 +2258,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       // proportional font, needs a bit more work.
       int lastSpace = pos;
       int wordSpacing = o->style()->wordSpacing();
+      int lastSpaceWordSpacing = 0;
 
       bool appliedStartWidth =
           pos > 0;  // If the span originated on a previous line,
@@ -2300,7 +2301,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               addMidpoint(endMid);
 
             // Add the width up to but not including the hyphen.
-            tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW);
+            tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW) +
+                    lastSpaceWordSpacing;
 
             // For wrapping text only, include the hyphen.  We need to ensure it
             // will fit
@@ -2314,6 +2316,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
           pos++;
           len--;
+          lastSpaceWordSpacing = 0;
           lastSpace =
               pos;  // Cheesy hack to prevent adding in widths of the run twice.
           continue;
@@ -2343,6 +2346,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               // Stop ignoring spaces and begin at this
               // new point.
               ignoringSpaces = false;
+              lastSpaceWordSpacing = 0;
               lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
                                 // ignored spaces.
               BidiIterator startMid(0, o, pos);
@@ -2355,16 +2359,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             }
           }
 
-          tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW);
+          tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW) +
+                  lastSpaceWordSpacing;
           if (!appliedStartWidth) {
             tmpW += inlineWidth(o, true, false);
             appliedStartWidth = true;
           }
 
-          applyWordSpacing =
-              (wordSpacing && currentCharacterIsSpace &&
-               !previousCharacterIsSpace &&
-               !t->containsOnlyWhitespace(pos + 1, strlen - (pos + 1)));
+          applyWordSpacing = wordSpacing && currentCharacterIsSpace &&
+                             !previousCharacterIsSpace;
 
           if (o->style()->autoWrap() && w + tmpW > width && w == 0) {
             int fb = nearestFloatBottom(m_height);
@@ -2389,7 +2392,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             // character
             // as candidate width for this line.
             int charWidth = o->style()->breakOnlyAfterWhiteSpace()
-                                ? t->width(pos, 1, f, w + tmpW)
+                                ? t->width(pos, 1, f, w + tmpW) +
+                                      (applyWordSpacing ? wordSpacing : 0)
                                 : 0;
             if (w + tmpW + charWidth > width) {
               if (o->style()->breakOnlyAfterWhiteSpace()) {
@@ -2424,10 +2428,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             lBreak.pos = pos;
           }
 
+          lastSpaceWordSpacing = applyWordSpacing ? wordSpacing : 0;
           lastSpace = pos;
-
-          if (applyWordSpacing)
-            w += wordSpacing;
 
           if (!ignoringSpaces && o->style()->collapseWhiteSpace()) {
             // If we encounter a newline, or if we encounter a
@@ -2440,13 +2442,13 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               // spaces. Create a midpoint to terminate the run
               // before the second space.
               addMidpoint(ignoreStart);
-              lastSpace = pos;
             }
           }
         } else if (ignoringSpaces) {
           // Stop ignoring spaces and begin at this
           // new point.
           ignoringSpaces = false;
+          lastSpaceWordSpacing = applyWordSpacing ? wordSpacing : 0;
           lastSpace = pos;  // e.g., "Foo    goo", don't add in any of the
                             // ignored spaces.
           BidiIterator startMid(0, o, pos);
@@ -2478,7 +2480,8 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
       // IMPORTANT: pos is > length here!
       if (!ignoringSpaces)
-        tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW);
+        tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW) +
+                lastSpaceWordSpacing;
       if (!appliedStartWidth)
         tmpW += inlineWidth(o, true, false);
       if (!appliedEndWidth)
@@ -2509,7 +2512,6 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               // needs to
               // keep adding to |tmpW|.  Just update and continue.
               checkForBreak = true;
-              tmpW += nextText->htmlFont(m_firstLine)->getWordSpacing();
             }
           }
           bool canPlaceOnLine = (w + tmpW <= width + 1) || !autoWrap;
