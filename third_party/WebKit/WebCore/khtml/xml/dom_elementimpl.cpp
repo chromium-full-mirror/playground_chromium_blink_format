@@ -499,7 +499,7 @@ void ElementImpl::removedFromDocument() {
 }
 
 #if SVG_SUPPORT
-bool ElementImpl::rendererIsNeeded(khtml::RenderStyle*) {
+bool ElementImpl::rendererIsNeeded(khtml::RenderStyle* style) {
   // SVG ignores arbitrary xml elements in its render tree contrary to the
   // normal CSS/XML behavior.
   if ((KSVG::SVGNames::svgNamespaceURI ==
@@ -507,7 +507,7 @@ bool ElementImpl::rendererIsNeeded(khtml::RenderStyle*) {
            ->namespaceURI()))  // FIXME: &&
                                // !parentNode()->hasTagName(KSVG::SVGNames::foreignObjectTag)
     return false;
-  return true;
+  return NodeImpl::rendererIsNeeded(style);
 }
 #endif
 
