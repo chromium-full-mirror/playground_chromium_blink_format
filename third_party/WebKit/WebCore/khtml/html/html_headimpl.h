@@ -192,6 +192,7 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
     return newChild->isTextNode();
   }
 
+  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
   virtual void notifyFinished(khtml::CachedObject* finishedObj);
@@ -203,6 +204,7 @@ class HTMLScriptElementImpl : public HTMLElementImpl,
   void setCreatedByParser(bool createdByParser) {
     m_createdByParser = createdByParser;
   }
+  virtual void closeRenderer();
 
   void evaluateScript(const QString&, const DOMString&);
 
