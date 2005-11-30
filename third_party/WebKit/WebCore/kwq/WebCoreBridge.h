@@ -440,6 +440,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
                                            baseURLString:
                                                (NSString*)baseURLString;
 - (DOMDocumentFragment*)documentFragmentWithText:(NSString*)text;
+- (DOMDocumentFragment*)documentFragmentWithNodesAsParagraphs:(NSArray*)nodes;
 
 - (void)replaceSelectionWithFragment:(DOMDocumentFragment*)fragment
                    selectReplacement:(BOOL)selectReplacement

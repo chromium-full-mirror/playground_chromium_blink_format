@@ -38,6 +38,9 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
 DOM::DocumentFragmentImpl* createFragmentFromMarkup(DOM::DocumentImpl* document,
                                                     const QString& markup,
                                                     const QString& baseURL);
+DOM::DocumentFragmentImpl* createFragmentFromNodeList(
+    DOM::DocumentImpl* document,
+    const QPtrList<DOM::NodeImpl>& nodeList);
 
 QString createMarkup(const DOM::RangeImpl* range,
                      QPtrList<DOM::NodeImpl>* nodes = 0,
