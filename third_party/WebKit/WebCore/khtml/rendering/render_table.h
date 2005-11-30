@@ -337,6 +337,8 @@ class RenderTableCell : public RenderBlock {
   int row() const { return _row; }
   void setRow(int r) { _row = r; }
 
+  Length styleOrColWidth();
+
   // overrides
   virtual void calcMinMaxWidth();
   virtual void calcWidth();
