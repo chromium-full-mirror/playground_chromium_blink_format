@@ -133,6 +133,7 @@ NodeImpl::NodeImpl(DocumentImpl* doc)
       m_focused(false),
       m_active(false),
       m_hovered(false),
+      m_inActiveChain(false),
       m_styleElement(false),
       m_implicit(false) {
 #ifndef NDEBUG
