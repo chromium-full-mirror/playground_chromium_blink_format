@@ -111,6 +111,34 @@ void SVGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
       attr->setIsId(true);
   } else
 #endif
+      // standard events
+      if (attr->name() == onclickAttr)
+    setHTMLEventListener(clickEvent, getDocument()->createHTMLEventListener(
+                                         attr->value().qstring(), this));
+  else if (attr->name() == onmousedownAttr)
+    setHTMLEventListener(mousedownEvent, getDocument()->createHTMLEventListener(
+                                             attr->value().qstring(), this));
+  else if (attr->name() == onmousemoveAttr)
+    setHTMLEventListener(mousemoveEvent, getDocument()->createHTMLEventListener(
+                                             attr->value().qstring(), this));
+  else if (attr->name() == onmouseoutAttr)
+    setHTMLEventListener(mouseoutEvent, getDocument()->createHTMLEventListener(
+                                            attr->value().qstring(), this));
+  else if (attr->name() == onmouseoverAttr)
+    setHTMLEventListener(mouseoverEvent, getDocument()->createHTMLEventListener(
+                                             attr->value().qstring(), this));
+  else if (attr->name() == onmouseupAttr)
+    setHTMLEventListener(mouseupEvent, getDocument()->createHTMLEventListener(
+                                           attr->value().qstring(), this));
+  else if (attr->name() == onfocusAttr)
+    setHTMLEventListener(
+        DOMFocusInEvent,
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+  else if (attr->name() == onblurAttr)
+    setHTMLEventListener(
+        DOMFocusOutEvent,
+        getDocument()->createHTMLEventListener(attr->value().qstring(), this));
+  else
     KDOM::StyledElementImpl::parseMappedAttribute(attr);
 }
 
