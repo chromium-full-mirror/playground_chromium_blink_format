@@ -104,7 +104,7 @@ class EditCommand : public Shared<EditCommand> {
   EditCommand* m_parent;
 };
 
-class EditCommandPtr : public SharedPtr<EditCommand> {
+class EditCommandPtr : public RefPtr<EditCommand> {
  public:
   EditCommandPtr();
   EditCommandPtr(EditCommand*);

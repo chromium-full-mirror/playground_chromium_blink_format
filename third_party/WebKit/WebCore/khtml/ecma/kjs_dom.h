@@ -165,7 +165,7 @@ class DOMNode : public DOMObject {
  protected:
   // Constructor for inherited classes; doesn't set up a prototype.
   DOMNode(DOM::NodeImpl* n);
-  SharedPtr<DOM::NodeImpl> m_impl;
+  RefPtr<DOM::NodeImpl> m_impl;
 };
 
 DOM::NodeImpl* toNode(
@@ -199,7 +199,7 @@ class DOMNodeList : public DOMObject {
                               const Identifier&,
                               const PropertySlot& slot);
 
-  SharedPtr<DOM::NodeListImpl> m_impl;
+  RefPtr<DOM::NodeListImpl> m_impl;
 };
 
 class DOMDocument : public DOMNode {
@@ -347,7 +347,7 @@ class DOMDOMImplementation : public DOMObject {
   DOM::DOMImplementationImpl* impl() const { return m_impl.get(); }
 
  private:
-  SharedPtr<DOM::DOMImplementationImpl> m_impl;
+  RefPtr<DOM::DOMImplementationImpl> m_impl;
 };
 
 class DOMDocumentType : public DOMNode {
@@ -395,7 +395,7 @@ class DOMNamedNodeMap : public DOMObject {
                               const Identifier&,
                               const PropertySlot& slot);
 
-  SharedPtr<DOM::NamedNodeMapImpl> m_impl;
+  RefPtr<DOM::NamedNodeMapImpl> m_impl;
 };
 
 class DOMProcessingInstruction : public DOMNode {
@@ -472,7 +472,7 @@ ObjectImp* getDOMExceptionConstructor(ExecState* exec);
 class DOMNamedNodesCollection : public DOMObject {
  public:
   DOMNamedNodesCollection(ExecState* exec,
-                          const QValueList<SharedPtr<DOM::NodeImpl>>& nodes);
+                          const QValueList<RefPtr<DOM::NodeImpl>>& nodes);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
 
  private:
@@ -483,7 +483,7 @@ class DOMNamedNodesCollection : public DOMObject {
                                const Identifier&,
                                const PropertySlot& slot);
 
-  QValueList<SharedPtr<DOM::NodeImpl>> m_nodes;
+  QValueList<RefPtr<DOM::NodeImpl>> m_nodes;
 };
 
 class DOMCharacterData : public DOMNode {

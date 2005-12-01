@@ -71,7 +71,7 @@ class HTMLFormElementImpl : public HTMLElementImpl {
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
-  SharedPtr<HTMLCollectionImpl> elements();
+  RefPtr<HTMLCollectionImpl> elements();
   int length() const;
 
   DOMString enctype() const { return m_enctype; }
@@ -570,7 +570,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void setValue(const DOMString&);
 
   HTMLOptionsCollectionImpl* options();
-  SharedPtr<HTMLCollectionImpl>
+  RefPtr<HTMLCollectionImpl>
   optionsHTMLCollection();  // FIXME: Remove this and migrate to options().
 
   virtual bool maintainsState() { return true; }

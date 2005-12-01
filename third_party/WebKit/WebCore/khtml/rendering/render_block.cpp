@@ -3685,7 +3685,7 @@ void RenderBlock::updateFirstLetter() {
     // string.  We want the original string before it got transformed in case
     // first-letter has
     // no text-transform or a different text-transform applied to it.
-    SharedPtr<DOMStringImpl> oldText = textObj->originalString();
+    RefPtr<DOMStringImpl> oldText = textObj->originalString();
     KHTMLAssert(oldText);
 
     if (oldText.notNull() && oldText->l > 0) {

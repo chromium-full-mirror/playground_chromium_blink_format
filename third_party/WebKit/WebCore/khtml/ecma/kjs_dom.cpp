@@ -2043,7 +2043,7 @@ ObjectImp* getDOMExceptionConstructor(ExecState* exec) {
 // name). (David)
 DOMNamedNodesCollection::DOMNamedNodesCollection(
     ExecState*,
-    const QValueList<SharedPtr<NodeImpl>>& nodes)
+    const QValueList<RefPtr<NodeImpl>>& nodes)
     : m_nodes(nodes) {}
 
 ValueImp* DOMNamedNodesCollection::lengthGetter(ExecState* exec,
@@ -2081,9 +2081,9 @@ bool DOMNamedNodesCollection::getOwnPropertySlot(ExecState* exec,
   // For IE compatibility, we need to be able to look up elements in a
   // document.formName.name result by id as well as be index.
 
-  QValueListConstIterator<SharedPtr<NodeImpl>> end = m_nodes.end();
+  QValueListConstIterator<RefPtr<NodeImpl>> end = m_nodes.end();
   int i = 0;
-  for (QValueListConstIterator<SharedPtr<NodeImpl>> it = m_nodes.begin();
+  for (QValueListConstIterator<RefPtr<NodeImpl>> it = m_nodes.begin();
        it != end; ++it, ++i) {
     NodeImpl* node = (*it).get();
     if (node->hasAttributes() &&

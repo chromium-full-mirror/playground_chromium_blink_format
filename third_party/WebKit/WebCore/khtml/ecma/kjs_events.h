@@ -153,7 +153,7 @@ class DOMEvent : public DOMObject {
   DOM::EventImpl* impl() const { return m_impl.get(); }
 
  protected:
-  SharedPtr<DOM::EventImpl> m_impl;
+  RefPtr<DOM::EventImpl> m_impl;
   mutable Clipboard* clipboard;
 };
 

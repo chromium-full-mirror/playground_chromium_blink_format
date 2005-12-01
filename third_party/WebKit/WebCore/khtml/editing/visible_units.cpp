@@ -69,7 +69,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     boundary = boundary->parentNode();
   }
 
-  SharedPtr<RangeImpl> searchRange(d->createRange());
+  RefPtr<RangeImpl> searchRange(d->createRange());
   int exception = 0;
   searchRange->setStartBefore(boundary, exception);
   Position end(pos.equivalentRangeCompliantPosition());
@@ -87,7 +87,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == 0) {
-    SharedPtr<RangeImpl> range(it.range());
+    RefPtr<RangeImpl> range(it.range());
     pos = Position(range->startContainer(exception),
                    range->startOffset(exception));
   } else if (!it.atEnd() && it.length() == 0) {
@@ -103,7 +103,7 @@ static VisiblePosition previousBoundary(const VisiblePosition& c,
     chars[1] = ' ';
     string.prepend(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    SharedPtr<RangeImpl> range(it.range());
+    RefPtr<RangeImpl> range(it.range());
     if (pastImage == 0)
       pos = Position(range->startContainer(exception),
                      range->startOffset(exception));
@@ -152,7 +152,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     boundary = boundary->parentNode();
   }
 
-  SharedPtr<RangeImpl> searchRange(d->createRange());
+  RefPtr<RangeImpl> searchRange(d->createRange());
   Position start(pos.equivalentRangeCompliantPosition());
   int exception = 0;
   searchRange->setStart(start.node(), start.offset(), exception);
@@ -171,7 +171,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
   }
 
   if (it.atEnd() && next == string.length()) {
-    SharedPtr<RangeImpl> range(it.range());
+    RefPtr<RangeImpl> range(it.range());
     int exception = 0;
     pos = Position(range->startContainer(exception),
                    range->startOffset(exception));
@@ -188,7 +188,7 @@ static VisiblePosition nextBoundary(const VisiblePosition& c,
     chars[1] = 'X';
     string.append(chars, 2);
     unsigned pastImage = searchFunction(string.unicode(), string.length());
-    SharedPtr<RangeImpl> range(it.range());
+    RefPtr<RangeImpl> range(it.range());
     int exception = 0;
     if (next != pastImage)
       pos =

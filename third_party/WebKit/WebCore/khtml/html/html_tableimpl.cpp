@@ -551,13 +551,13 @@ bool HTMLTableElementImpl::isURLAttribute(AttributeImpl* attr) const {
   return attr->name() == backgroundAttr;
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLTableElementImpl::rows() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLTableElementImpl::rows() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::TABLE_ROWS));
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLTableElementImpl::tBodies() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLTableElementImpl::tBodies() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::TABLE_TBODIES));
 }
 
@@ -731,7 +731,7 @@ NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
 HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
                                                         int& exceptioncode) {
   HTMLTableRowElementImpl* r = 0L;
-  SharedPtr<NodeListImpl> children = childNodes();
+  RefPtr<NodeListImpl> children = childNodes();
   int numRows = children.notNull() ? (int)children->length() : 0;
   // kdDebug(6030) << k_funcinfo << "index=" << index << " numRows=" << numRows
   // << endl;
@@ -754,7 +754,7 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
 }
 
 void HTMLTableSectionElementImpl::deleteRow(int index, int& exceptioncode) {
-  SharedPtr<NodeListImpl> children = childNodes();
+  RefPtr<NodeListImpl> children = childNodes();
   int numRows = children.notNull() ? (int)children->length() : 0;
   if (index == -1)
     index = numRows - 1;
@@ -811,8 +811,8 @@ void HTMLTableSectionElementImpl::setVAlign(const DOMString& value) {
   setAttribute(valignAttr, value);
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLTableSectionElementImpl::rows() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLTableSectionElementImpl::rows() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::TABLE_ROWS));
 }
 
@@ -894,7 +894,7 @@ int HTMLTableRowElementImpl::sectionRowIndex() const {
 HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
                                                      int& exceptioncode) {
   HTMLTableCellElementImpl* c = 0L;
-  SharedPtr<NodeListImpl> children = childNodes();
+  RefPtr<NodeListImpl> children = childNodes();
   int numCells = children.notNull() ? children->length() : 0;
   if (index < -1 || index > numCells)
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
@@ -915,7 +915,7 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
 }
 
 void HTMLTableRowElementImpl::deleteCell(int index, int& exceptioncode) {
-  SharedPtr<NodeListImpl> children = childNodes();
+  RefPtr<NodeListImpl> children = childNodes();
   int numCells = children.notNull() ? children->length() : 0;
   if (index == -1)
     index = numCells - 1;
@@ -928,8 +928,8 @@ void HTMLTableRowElementImpl::deleteCell(int index, int& exceptioncode) {
     exceptioncode = DOMException::INDEX_SIZE_ERR;
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLTableRowElementImpl::cells() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLTableRowElementImpl::cells() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::TR_CELLS));
 }
 

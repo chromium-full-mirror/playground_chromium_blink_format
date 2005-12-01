@@ -180,8 +180,8 @@ void NodeImpl::setNodeValue(const DOMString& /*_nodeValue*/,
   // be default nodeValue is null, so setting it has no effect
 }
 
-SharedPtr<NodeListImpl> NodeImpl::childNodes() {
-  return SharedPtr<NodeListImpl>(new ChildNodeListImpl(this));
+RefPtr<NodeListImpl> NodeImpl::childNodes() {
+  return RefPtr<NodeListImpl>(new ChildNodeListImpl(this));
 }
 
 NodeImpl* NodeImpl::firstChild() const {
@@ -652,9 +652,8 @@ bool NodeImpl::dispatchWindowEvent(const AtomicString& eventType,
                                    bool cancelableArg) {
   assert(!eventDispatchForbidden());
   int exceptioncode = 0;
-  SharedPtr<EventImpl> evt =
-      new EventImpl(eventType, canBubbleArg, cancelableArg);
-  SharedPtr<DocumentImpl> doc = getDocument();
+  RefPtr<EventImpl> evt = new EventImpl(eventType, canBubbleArg, cancelableArg);
+  RefPtr<DocumentImpl> doc = getDocument();
   evt->setTarget(doc.get());
   bool r = dispatchGenericEvent(evt.get(), exceptioncode);
   if (!evt->defaultPrevented() && doc)
@@ -775,7 +774,7 @@ bool NodeImpl::dispatchMouseEvent(const AtomicString& eventType,
   // Since we dispatch up to three events here, we need to make sure we're
   // referenced
   // so the pointer will be good for the two subsequent ones.
-  SharedPtr<NodeImpl> protect(this);
+  RefPtr<NodeImpl> protect(this);
 
   bool cancelable = eventType != mousemoveEvent;
 
@@ -1617,17 +1616,17 @@ bool NodeImpl::inSameContainingBlockFlowElement(NodeImpl* n) {
 // FIXME: End of obviously misplaced HTML editing functions.  Try to move these
 // out of NodeImpl.
 
-SharedPtr<NodeListImpl> NodeImpl::getElementsByTagNameNS(
+RefPtr<NodeListImpl> NodeImpl::getElementsByTagNameNS(
     const DOMString& namespaceURI,
     const DOMString& localName) {
   if (namespaceURI.isNull() || localName.isNull())
-    return SharedPtr<NodeListImpl>();  // FIXME: Who cares about this additional
-                                       // check?
+    return RefPtr<NodeListImpl>();  // FIXME: Who cares about this additional
+                                    // check?
 
   DOMString name = localName;
   if (getDocument()->isHTMLDocument())
     name = localName.lower();
-  return SharedPtr<NodeListImpl>(new TagNodeListImpl(
+  return RefPtr<NodeListImpl>(new TagNodeListImpl(
       this, AtomicString(namespaceURI), AtomicString(name)));
 }
 
@@ -2114,9 +2113,9 @@ NodeImpl* ContainerNodeImpl::insertBefore(NodeImpl* newChild,
   if (!refChild)
     return appendChild(newChild, exceptioncode);
 
-  SharedPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
-                                                  // ref'd and deref'd so we
-                                                  // don't leak it
+  RefPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
+                                               // ref'd and deref'd so we don't
+                                               // leak it
 
   // Make sure adding the new child is ok
   checkAddChild(newChild, exceptioncode);
@@ -2189,9 +2188,9 @@ NodeImpl* ContainerNodeImpl::replaceChild(NodeImpl* newChild,
                                           int& exceptioncode) {
   exceptioncode = 0;
 
-  SharedPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
-                                                  // ref'd and deref'd so we
-                                                  // don't leak it
+  RefPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
+                                               // ref'd and deref'd so we don't
+                                               // leak it
 
   if (oldChild == newChild)  // nothing to do
     return oldChild;
@@ -2403,9 +2402,9 @@ NodeImpl* ContainerNodeImpl::appendChild(NodeImpl* newChild,
                                          int& exceptioncode) {
   exceptioncode = 0;
 
-  SharedPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
-                                                  // ref'd and deref'd so we
-                                                  // don't leak it
+  RefPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
+                                               // ref'd and deref'd so we don't
+                                               // leak it
 
   // Make sure adding the new child is ok
   checkAddChild(newChild, exceptioncode);
@@ -2508,9 +2507,9 @@ bool ContainerNodeImpl::checkIsChild(NodeImpl* oldChild, int& exceptioncode) {
 NodeImpl* ContainerNodeImpl::addChild(NodeImpl* newChild) {
   // do not add applyChanges here! This function is only used during parsing
 
-  SharedPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
-                                                  // ref'd and deref'd so we
-                                                  // don't leak it
+  RefPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
+                                               // ref'd and deref'd so we don't
+                                               // leak it
 
   // short check for consistency with DTD
   if (getDocument()->isHTMLDocument() && !childAllowed(newChild))

@@ -25,7 +25,7 @@
 #ifndef _NODES_H_
 #define _NODES_H_
 
-#include <kxmlcore/SharedPtr.h>
+#include <kxmlcore/RefPtr.h>
 
 #include "internal.h"
 
@@ -248,7 +248,7 @@ class GroupNode : public Node {
   virtual bool isGroupNode() const { return true; }
 
  private:
-  SharedPtr<Node> group;
+  RefPtr<Node> group;
 };
 
 class ElementNode : public Node {
@@ -264,9 +264,9 @@ class ElementNode : public Node {
 
  private:
   friend class ArrayNode;
-  SharedPtr<ElementNode> list;
+  RefPtr<ElementNode> list;
   int elision;
-  SharedPtr<Node> node;
+  RefPtr<Node> node;
 };
 
 class ArrayNode : public Node {
@@ -283,7 +283,7 @@ class ArrayNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<ElementNode> element;
+  RefPtr<ElementNode> element;
   int elision;
   bool opt;
 };
@@ -303,9 +303,9 @@ class PropertyValueNode : public Node {
 
  private:
   friend class ObjectLiteralNode;
-  SharedPtr<PropertyNode> name;
-  SharedPtr<Node> assign;
-  SharedPtr<PropertyValueNode> list;
+  RefPtr<PropertyNode> name;
+  RefPtr<Node> assign;
+  RefPtr<PropertyValueNode> list;
 };
 
 class ObjectLiteralNode : public Node {
@@ -316,7 +316,7 @@ class ObjectLiteralNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<PropertyValueNode> list;
+  RefPtr<PropertyValueNode> list;
 };
 
 class PropertyNode : public Node {
@@ -343,8 +343,8 @@ class BracketAccessorNode : public Node {
   Node* subscript() { return expr2.get(); }
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
 };
 
 class DotAccessorNode : public Node {
@@ -359,7 +359,7 @@ class DotAccessorNode : public Node {
   const Identifier& identifier() const { return ident; }
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
   Identifier ident;
 };
 
@@ -376,8 +376,8 @@ class ArgumentListNode : public Node {
 
  private:
   friend class ArgumentsNode;
-  SharedPtr<ArgumentListNode> list;
-  SharedPtr<Node> expr;
+  RefPtr<ArgumentListNode> list;
+  RefPtr<Node> expr;
 };
 
 class ArgumentsNode : public Node {
@@ -389,7 +389,7 @@ class ArgumentsNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<ArgumentListNode> list;
+  RefPtr<ArgumentListNode> list;
 };
 
 class NewExprNode : public Node {
@@ -400,8 +400,8 @@ class NewExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<ArgumentsNode> args;
+  RefPtr<Node> expr;
+  RefPtr<ArgumentsNode> args;
 };
 
 class FunctionCallValueNode : public Node {
@@ -411,8 +411,8 @@ class FunctionCallValueNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<ArgumentsNode> args;
+  RefPtr<Node> expr;
+  RefPtr<ArgumentsNode> args;
 };
 
 class FunctionCallResolveNode : public Node {
@@ -424,7 +424,7 @@ class FunctionCallResolveNode : public Node {
 
  private:
   Identifier ident;
-  SharedPtr<ArgumentsNode> args;
+  RefPtr<ArgumentsNode> args;
 };
 
 class FunctionCallBracketNode : public Node {
@@ -435,9 +435,9 @@ class FunctionCallBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  SharedPtr<Node> base;
-  SharedPtr<Node> subscript;
-  SharedPtr<ArgumentsNode> args;
+  RefPtr<Node> base;
+  RefPtr<Node> subscript;
+  RefPtr<ArgumentsNode> args;
 };
 
 class FunctionCallParenBracketNode : public FunctionCallBracketNode {
@@ -455,9 +455,9 @@ class FunctionCallDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  SharedPtr<Node> base;
+  RefPtr<Node> base;
   Identifier ident;
-  SharedPtr<ArgumentsNode> args;
+  RefPtr<ArgumentsNode> args;
 };
 
 class FunctionCallParenDotNode : public FunctionCallDotNode {
@@ -486,8 +486,8 @@ class PostfixBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
-  SharedPtr<Node> m_subscript;
+  RefPtr<Node> m_base;
+  RefPtr<Node> m_subscript;
   Operator m_oper;
 };
 
@@ -499,7 +499,7 @@ class PostfixDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
+  RefPtr<Node> m_base;
   Identifier m_ident;
   Operator m_oper;
 };
@@ -522,8 +522,8 @@ class DeleteBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
-  SharedPtr<Node> m_subscript;
+  RefPtr<Node> m_base;
+  RefPtr<Node> m_subscript;
 };
 
 class DeleteDotNode : public Node {
@@ -533,7 +533,7 @@ class DeleteDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
+  RefPtr<Node> m_base;
   Identifier m_ident;
 };
 
@@ -544,7 +544,7 @@ class DeleteValueNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_expr;
+  RefPtr<Node> m_expr;
 };
 
 class VoidNode : public Node {
@@ -554,7 +554,7 @@ class VoidNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class TypeOfResolveNode : public Node {
@@ -574,7 +574,7 @@ class TypeOfValueNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_expr;
+  RefPtr<Node> m_expr;
 };
 
 class PrefixResolveNode : public Node {
@@ -596,8 +596,8 @@ class PrefixBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
-  SharedPtr<Node> m_subscript;
+  RefPtr<Node> m_base;
+  RefPtr<Node> m_subscript;
   Operator m_oper;
 };
 
@@ -609,7 +609,7 @@ class PrefixDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> m_base;
+  RefPtr<Node> m_base;
   Identifier m_ident;
   Operator m_oper;
 };
@@ -621,7 +621,7 @@ class UnaryPlusNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class NegateNode : public Node {
@@ -631,7 +631,7 @@ class NegateNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class BitwiseNotNode : public Node {
@@ -641,7 +641,7 @@ class BitwiseNotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class LogicalNotNode : public Node {
@@ -651,7 +651,7 @@ class LogicalNotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class MultNode : public Node {
@@ -661,8 +661,8 @@ class MultNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> term1;
-  SharedPtr<Node> term2;
+  RefPtr<Node> term1;
+  RefPtr<Node> term2;
   char oper;
 };
 
@@ -673,8 +673,8 @@ class AddNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> term1;
-  SharedPtr<Node> term2;
+  RefPtr<Node> term1;
+  RefPtr<Node> term2;
   char oper;
 };
 
@@ -685,8 +685,8 @@ class ShiftNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> term1;
-  SharedPtr<Node> term2;
+  RefPtr<Node> term1;
+  RefPtr<Node> term2;
   Operator oper;
 };
 
@@ -698,8 +698,8 @@ class RelationalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
   Operator oper;
 };
 
@@ -710,8 +710,8 @@ class EqualNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
   Operator oper;
 };
 
@@ -722,8 +722,8 @@ class BitOperNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
   Operator oper;
 };
 
@@ -738,8 +738,8 @@ class BinaryLogicalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
   Operator oper;
 };
 
@@ -754,9 +754,9 @@ class ConditionalNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> logical;
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> logical;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
 };
 
 class AssignResolveNode : public Node {
@@ -769,7 +769,7 @@ class AssignResolveNode : public Node {
  protected:
   Identifier m_ident;
   Operator m_oper;
-  SharedPtr<Node> m_right;
+  RefPtr<Node> m_right;
 };
 
 class AssignBracketNode : public Node {
@@ -780,10 +780,10 @@ class AssignBracketNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  SharedPtr<Node> m_base;
-  SharedPtr<Node> m_subscript;
+  RefPtr<Node> m_base;
+  RefPtr<Node> m_subscript;
   Operator m_oper;
-  SharedPtr<Node> m_right;
+  RefPtr<Node> m_right;
 };
 
 class AssignDotNode : public Node {
@@ -794,10 +794,10 @@ class AssignDotNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  SharedPtr<Node> m_base;
+  RefPtr<Node> m_base;
   Identifier m_ident;
   Operator m_oper;
-  SharedPtr<Node> m_right;
+  RefPtr<Node> m_right;
 };
 
 class CommaNode : public Node {
@@ -807,8 +807,8 @@ class CommaNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
 };
 
 class StatListNode : public StatementNode {
@@ -822,8 +822,8 @@ class StatListNode : public StatementNode {
 
  private:
   friend class CaseClauseNode;
-  SharedPtr<StatementNode> statement;
-  SharedPtr<StatListNode> list;
+  RefPtr<StatementNode> statement;
+  RefPtr<StatListNode> list;
 };
 
 class AssignExprNode : public Node {
@@ -833,7 +833,7 @@ class AssignExprNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class VarDeclNode : public Node {
@@ -847,7 +847,7 @@ class VarDeclNode : public Node {
  private:
   Type varType;
   Identifier ident;
-  SharedPtr<AssignExprNode> init;
+  RefPtr<AssignExprNode> init;
 };
 
 class VarDeclListNode : public Node {
@@ -865,8 +865,8 @@ class VarDeclListNode : public Node {
  private:
   friend class ForNode;
   friend class VarStatementNode;
-  SharedPtr<VarDeclListNode> list;
-  SharedPtr<VarDeclNode> var;
+  RefPtr<VarDeclListNode> list;
+  RefPtr<VarDeclNode> var;
 };
 
 class VarStatementNode : public StatementNode {
@@ -877,7 +877,7 @@ class VarStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<VarDeclListNode> list;
+  RefPtr<VarDeclListNode> list;
 };
 
 class BlockNode : public StatementNode {
@@ -888,7 +888,7 @@ class BlockNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  protected:
-  SharedPtr<SourceElementsNode> source;
+  RefPtr<SourceElementsNode> source;
 };
 
 class EmptyStatementNode : public StatementNode {
@@ -905,7 +905,7 @@ class ExprStatementNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class IfNode : public StatementNode {
@@ -917,9 +917,9 @@ class IfNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<StatementNode> statement1;
-  SharedPtr<StatementNode> statement2;
+  RefPtr<Node> expr;
+  RefPtr<StatementNode> statement1;
+  RefPtr<StatementNode> statement2;
 };
 
 class DoWhileNode : public StatementNode {
@@ -930,8 +930,8 @@ class DoWhileNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<StatementNode> statement;
-  SharedPtr<Node> expr;
+  RefPtr<StatementNode> statement;
+  RefPtr<Node> expr;
 };
 
 class WhileNode : public StatementNode {
@@ -942,8 +942,8 @@ class WhileNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<StatementNode> statement;
+  RefPtr<Node> expr;
+  RefPtr<StatementNode> statement;
 };
 
 class ForNode : public StatementNode {
@@ -959,10 +959,10 @@ class ForNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr1;
-  SharedPtr<Node> expr2;
-  SharedPtr<Node> expr3;
-  SharedPtr<StatementNode> statement;
+  RefPtr<Node> expr1;
+  RefPtr<Node> expr2;
+  RefPtr<Node> expr3;
+  RefPtr<StatementNode> statement;
 };
 
 class ForInNode : public StatementNode {
@@ -975,11 +975,11 @@ class ForInNode : public StatementNode {
 
  private:
   Identifier ident;
-  SharedPtr<AssignExprNode> init;
-  SharedPtr<Node> lexpr;
-  SharedPtr<Node> expr;
-  SharedPtr<VarDeclNode> varDecl;
-  SharedPtr<StatementNode> statement;
+  RefPtr<AssignExprNode> init;
+  RefPtr<Node> lexpr;
+  RefPtr<Node> expr;
+  RefPtr<VarDeclNode> varDecl;
+  RefPtr<StatementNode> statement;
 };
 
 class ContinueNode : public StatementNode {
@@ -1011,7 +1011,7 @@ class ReturnNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> value;
+  RefPtr<Node> value;
 };
 
 class WithNode : public StatementNode {
@@ -1022,8 +1022,8 @@ class WithNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<StatementNode> statement;
+  RefPtr<Node> expr;
+  RefPtr<StatementNode> statement;
 };
 
 class CaseClauseNode : public Node {
@@ -1038,8 +1038,8 @@ class CaseClauseNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<StatListNode> list;
+  RefPtr<Node> expr;
+  RefPtr<StatListNode> list;
 };
 
 class ClauseListNode : public Node {
@@ -1057,8 +1057,8 @@ class ClauseListNode : public Node {
 
  private:
   friend class CaseBlockNode;
-  SharedPtr<CaseClauseNode> cl;
-  SharedPtr<ClauseListNode> nx;
+  RefPtr<CaseClauseNode> cl;
+  RefPtr<ClauseListNode> nx;
 };
 
 class CaseBlockNode : public Node {
@@ -1070,9 +1070,9 @@ class CaseBlockNode : public Node {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<ClauseListNode> list1;
-  SharedPtr<CaseClauseNode> def;
-  SharedPtr<ClauseListNode> list2;
+  RefPtr<ClauseListNode> list1;
+  RefPtr<CaseClauseNode> def;
+  RefPtr<ClauseListNode> list2;
 };
 
 class SwitchNode : public StatementNode {
@@ -1083,8 +1083,8 @@ class SwitchNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
-  SharedPtr<CaseBlockNode> block;
+  RefPtr<Node> expr;
+  RefPtr<CaseBlockNode> block;
 };
 
 class LabelNode : public StatementNode {
@@ -1096,7 +1096,7 @@ class LabelNode : public StatementNode {
 
  private:
   Identifier label;
-  SharedPtr<StatementNode> statement;
+  RefPtr<StatementNode> statement;
 };
 
 class ThrowNode : public StatementNode {
@@ -1106,7 +1106,7 @@ class ThrowNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<Node> expr;
+  RefPtr<Node> expr;
 };
 
 class TryNode : public StatementNode {
@@ -1121,10 +1121,10 @@ class TryNode : public StatementNode {
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  SharedPtr<StatementNode> tryBlock;
+  RefPtr<StatementNode> tryBlock;
   Identifier exceptionIdent;
-  SharedPtr<StatementNode> catchBlock;
-  SharedPtr<StatementNode> finallyBlock;
+  RefPtr<StatementNode> catchBlock;
+  RefPtr<StatementNode> finallyBlock;
 };
 
 class ParameterNode : public Node {
@@ -1145,7 +1145,7 @@ class ParameterNode : public Node {
   friend class FuncDeclNode;
   friend class FuncExprNode;
   Identifier id;
-  SharedPtr<ParameterNode> next;
+  RefPtr<ParameterNode> next;
 };
 
 // inherited by ProgramNode
@@ -1168,8 +1168,8 @@ class FuncExprNode : public Node {
 
  private:
   Identifier ident;
-  SharedPtr<ParameterNode> param;
-  SharedPtr<FunctionBodyNode> body;
+  RefPtr<ParameterNode> param;
+  RefPtr<FunctionBodyNode> body;
 };
 
 class FuncDeclNode : public StatementNode {
@@ -1186,8 +1186,8 @@ class FuncDeclNode : public StatementNode {
 
  private:
   Identifier ident;
-  SharedPtr<ParameterNode> param;
-  SharedPtr<FunctionBodyNode> body;
+  RefPtr<ParameterNode> param;
+  RefPtr<FunctionBodyNode> body;
 };
 
 // A linked list of source element nodes
@@ -1205,8 +1205,8 @@ class SourceElementsNode : public StatementNode {
 
  private:
   friend class BlockNode;
-  SharedPtr<StatementNode> element;        // 'this' element
-  SharedPtr<SourceElementsNode> elements;  // pointer to next
+  RefPtr<StatementNode> element;        // 'this' element
+  RefPtr<SourceElementsNode> elements;  // pointer to next
 };
 
 class ProgramNode : public FunctionBodyNode {

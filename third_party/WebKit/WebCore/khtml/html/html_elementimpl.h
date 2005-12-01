@@ -50,7 +50,7 @@ class HTMLElementImpl : public StyledElementImpl {
 
   virtual NodeImpl* cloneNode(bool deep);
 
-  SharedPtr<HTMLCollectionImpl> children();
+  RefPtr<HTMLCollectionImpl> children();
 
   DOMString id() const;
   void setId(const DOMString& value);

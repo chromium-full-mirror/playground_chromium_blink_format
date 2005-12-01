@@ -3095,7 +3095,7 @@ KHTMLPart::TriState KHTMLPart::selectionHasStyle(
   TriState state = falseTriState;
 
   CSSMutableStyleDeclarationImpl* mutableStyle = style->makeMutable();
-  SharedPtr<CSSStyleDeclarationImpl> protectQueryStyle(mutableStyle);
+  RefPtr<CSSStyleDeclarationImpl> protectQueryStyle(mutableStyle);
 
   if (!d->m_selection.isRange()) {
     NodeImpl* nodeToRemove;
@@ -3140,8 +3140,8 @@ bool KHTMLPart::selectionStartHasStyle(CSSStyleDeclarationImpl* style) const {
 
   CSSMutableStyleDeclarationImpl* mutableStyle = style->makeMutable();
 
-  SharedPtr<CSSStyleDeclarationImpl> protectSelectionStyle(selectionStyle);
-  SharedPtr<CSSStyleDeclarationImpl> protectQueryStyle(mutableStyle);
+  RefPtr<CSSStyleDeclarationImpl> protectSelectionStyle(selectionStyle);
+  RefPtr<CSSStyleDeclarationImpl> protectQueryStyle(mutableStyle);
 
   bool match = true;
   QValueListConstIterator<CSSProperty> end;
@@ -3196,7 +3196,7 @@ CSSComputedStyleDeclarationImpl* KHTMLPart::selectionComputedStyle(
   if (d->m_selection.isNone())
     return 0;
 
-  SharedPtr<RangeImpl> range(d->m_selection.toRange());
+  RefPtr<RangeImpl> range(d->m_selection.toRange());
   Position pos = range->editingStartPosition();
 
   ElementImpl* elem = pos.element();
@@ -3260,7 +3260,7 @@ void KHTMLPart::applyEditingStyleToBodyElement() const {
   if (!d->m_doc)
     return;
 
-  SharedPtr<NodeListImpl> list = d->m_doc->getElementsByTagName("body");
+  RefPtr<NodeListImpl> list = d->m_doc->getElementsByTagName("body");
   unsigned len = list->length();
   for (unsigned i = 0; i < len; i++) {
     applyEditingStyleToElement(static_cast<ElementImpl*>(list->item(i)));
@@ -3271,7 +3271,7 @@ void KHTMLPart::removeEditingStyleFromBodyElement() const {
   if (!d->m_doc)
     return;
 
-  SharedPtr<NodeListImpl> list = d->m_doc->getElementsByTagName("body");
+  RefPtr<NodeListImpl> list = d->m_doc->getElementsByTagName("body");
   unsigned len = list->length();
   for (unsigned i = 0; i < len; i++) {
     removeEditingStyleFromElement(static_cast<ElementImpl*>(list->item(i)));

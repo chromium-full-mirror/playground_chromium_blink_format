@@ -66,7 +66,7 @@ class CSSComputedStyleDeclarationImpl : public CSSStyleDeclarationImpl {
                            bool important,
                            int& exceptionCode);
 
-  SharedPtr<NodeImpl> m_node;
+  RefPtr<NodeImpl> m_node;
 };
 }
 

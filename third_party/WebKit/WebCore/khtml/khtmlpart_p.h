@@ -212,7 +212,7 @@ class KHTMLPartPrivate {
   long m_cacheId;
 #endif
   QString scheduledScript;
-  SharedPtr<DOM::NodeImpl> scheduledScriptNode;
+  RefPtr<DOM::NodeImpl> scheduledScriptNode;
 
   KJSProxy* m_jscript;
   KLibrary* m_kjs_lib;
@@ -285,9 +285,9 @@ class KHTMLPartPrivate {
   SubmitForm* m_submitForm;
 
   bool m_bMousePressed;
-  SharedPtr<DOM::NodeImpl> m_mousePressNode;  // node under the mouse when the
-                                              // mouse was pressed (set in the
-                                              // mouse handler)
+  RefPtr<DOM::NodeImpl> m_mousePressNode;  // node under the mouse when the
+                                           // mouse was pressed (set in the
+                                           // mouse handler)
 
   khtml::ETextGranularity m_selectionGranularity;
   bool m_beganSelectingText;

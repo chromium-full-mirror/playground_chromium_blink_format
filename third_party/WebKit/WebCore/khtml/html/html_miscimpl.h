@@ -97,7 +97,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   // In case of multiple items named the same way
   virtual NodeImpl* nextNamedItem(const DOMString& name) const;
 
-  QValueList<SharedPtr<NodeImpl>> namedItems(const DOMString& name) const;
+  QValueList<RefPtr<NodeImpl>> namedItems(const DOMString& name) const;
 
   NodeImpl* base() { return m_base.get(); }
 
@@ -126,7 +126,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   virtual unsigned calcLength() const;
   virtual void resetCollectionInfo() const;
   // the base node, the collection refers to
-  SharedPtr<NodeImpl> m_base;
+  RefPtr<NodeImpl> m_base;
   // The collection list the following elements
   int type;
   mutable CollectionInfo* info;

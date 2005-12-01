@@ -48,7 +48,7 @@ inline void gcUnprotectNullTolerant(ValueImp* val) {
     gcUnprotect(val);
 }
 
-// FIXME: Share more code with SharedPtr template? The only difference is the
+// FIXME: Share more code with RefPtr template? The only difference is the
 // ref/deref operation.
 template <class T>
 class ProtectedPtr {

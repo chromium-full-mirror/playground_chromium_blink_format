@@ -27,24 +27,24 @@ namespace KXMLCore {
 
 // FIXME: Change template name to RefPtr?
 template <class T>
-class SharedPtr {
+class RefPtr {
  public:
-  SharedPtr() : m_ptr(NULL) {}
-  SharedPtr(T* ptr) : m_ptr(ptr) {
+  RefPtr() : m_ptr(NULL) {}
+  RefPtr(T* ptr) : m_ptr(ptr) {
     if (ptr)
       ptr->ref();
   }
-  SharedPtr(const SharedPtr& o) : m_ptr(o.m_ptr) {
+  RefPtr(const RefPtr& o) : m_ptr(o.m_ptr) {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
-  ~SharedPtr() {
+  ~RefPtr() {
     if (T* ptr = m_ptr)
       ptr->deref();
   }
 
   template <class U>
-  SharedPtr(const SharedPtr<U>& o) : m_ptr(o.get()) {
+  RefPtr(const RefPtr<U>& o) : m_ptr(o.get()) {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
@@ -77,18 +77,18 @@ class SharedPtr {
   // this type conversion operator allows implicit conversion to
   // bool but not to other integer types
 
-  typedef T* (SharedPtr::*UnspecifiedBoolType)() const;
-  operator UnspecifiedBoolType() const { return m_ptr ? &SharedPtr::get : 0; }
+  typedef T* (RefPtr::*UnspecifiedBoolType)() const;
+  operator UnspecifiedBoolType() const { return m_ptr ? &RefPtr::get : 0; }
 
-  SharedPtr& operator=(const SharedPtr&);
-  SharedPtr& operator=(T*);
+  RefPtr& operator=(const RefPtr&);
+  RefPtr& operator=(T*);
 
  private:
   T* m_ptr;
 };
 
 template <class T>
-SharedPtr<T>& SharedPtr<T>::operator=(const SharedPtr<T>& o) {
+RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
   T* optr = o.m_ptr;
   if (optr)
     optr->ref();
@@ -99,7 +99,7 @@ SharedPtr<T>& SharedPtr<T>::operator=(const SharedPtr<T>& o) {
 }
 
 template <class T>
-inline SharedPtr<T>& SharedPtr<T>::operator=(T* optr) {
+inline RefPtr<T>& RefPtr<T>::operator=(T* optr) {
   if (optr)
     optr->ref();
   if (T* ptr = m_ptr)
@@ -109,48 +109,48 @@ inline SharedPtr<T>& SharedPtr<T>::operator=(T* optr) {
 }
 
 template <class T>
-inline bool operator==(const SharedPtr<T>& a, const SharedPtr<T>& b) {
+inline bool operator==(const RefPtr<T>& a, const RefPtr<T>& b) {
   return a.get() == b.get();
 }
 
 template <class T>
-inline bool operator==(const SharedPtr<T>& a, const T* b) {
+inline bool operator==(const RefPtr<T>& a, const T* b) {
   return a.get() == b;
 }
 
 template <class T>
-inline bool operator==(const T* a, const SharedPtr<T>& b) {
+inline bool operator==(const T* a, const RefPtr<T>& b) {
   return a == b.get();
 }
 
 template <class T>
-inline bool operator!=(const SharedPtr<T>& a, const SharedPtr<T>& b) {
+inline bool operator!=(const RefPtr<T>& a, const RefPtr<T>& b) {
   return a.get() != b.get();
 }
 
 template <class T>
-inline bool operator!=(const SharedPtr<T>& a, const T* b) {
+inline bool operator!=(const RefPtr<T>& a, const T* b) {
   return a.get() != b;
 }
 
 template <class T>
-inline bool operator!=(const T* a, const SharedPtr<T>& b) {
+inline bool operator!=(const T* a, const RefPtr<T>& b) {
   return a != b.get();
 }
 
 template <class T, class U>
-inline SharedPtr<T> static_pointer_cast(const SharedPtr<U>& p) {
-  return SharedPtr<T>(static_cast<T*>(p.get()));
+inline RefPtr<T> static_pointer_cast(const RefPtr<U>& p) {
+  return RefPtr<T>(static_cast<T*>(p.get()));
 }
 
 template <class T, class U>
-inline SharedPtr<T> const_pointer_cast(const SharedPtr<U>& p) {
-  return SharedPtr<T>(const_cast<T*>(p.get()));
+inline RefPtr<T> const_pointer_cast(const RefPtr<U>& p) {
+  return RefPtr<T>(const_cast<T*>(p.get()));
 }
 
 }  // namespace KXMLCore
 
-using KXMLCore::SharedPtr;
+using KXMLCore::RefPtr;
 using KXMLCore::static_pointer_cast;
 using KXMLCore::const_pointer_cast;
 

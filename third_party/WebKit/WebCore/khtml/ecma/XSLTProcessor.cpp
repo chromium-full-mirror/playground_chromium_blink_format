@@ -110,7 +110,7 @@ ValueImp* XSLTProcessorProtoFunc::callAsFunction(ExecState* exec,
       ValueImp* nodeVal = args[0];
       if (nodeVal->isObject(&DOMNode::info)) {
         DOMNode* node = static_cast<DOMNode*>(nodeVal);
-        SharedPtr<DocumentImpl> resultDocument =
+        RefPtr<DocumentImpl> resultDocument =
             processor.transformToDocument(node->impl());
         if (resultDocument)
           return getDOMDocumentNode(exec, resultDocument.get());

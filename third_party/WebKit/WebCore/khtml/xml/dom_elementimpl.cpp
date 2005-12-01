@@ -720,26 +720,25 @@ void ElementImpl::formatForDebugger(char* buffer, unsigned length) const {
 }
 #endif
 
-SharedPtr<AttrImpl> ElementImpl::setAttributeNode(AttrImpl* attr,
-                                                  int& exception) {
+RefPtr<AttrImpl> ElementImpl::setAttributeNode(AttrImpl* attr, int& exception) {
   return static_pointer_cast<AttrImpl>(
       attributes(false)->setNamedItem(attr, exception));
 }
 
-SharedPtr<AttrImpl> ElementImpl::removeAttributeNode(AttrImpl* attr,
-                                                     int& exception) {
+RefPtr<AttrImpl> ElementImpl::removeAttributeNode(AttrImpl* attr,
+                                                  int& exception) {
   if (!attr || attr->ownerElement() != this) {
     exception = DOMException::NOT_FOUND_ERR;
-    return SharedPtr<AttrImpl>();
+    return RefPtr<AttrImpl>();
   }
   if (getDocument() != attr->getDocument()) {
     exception = DOMException::WRONG_DOCUMENT_ERR;
-    return SharedPtr<AttrImpl>();
+    return RefPtr<AttrImpl>();
   }
 
   NamedAttrMapImpl* attrs = attributes(true);
   if (!attrs)
-    return SharedPtr<AttrImpl>();
+    return RefPtr<AttrImpl>();
 
   return static_pointer_cast<AttrImpl>(
       attrs->removeNamedItem(attr->m_attribute->name(), exception));
@@ -835,7 +834,7 @@ NodeImpl* NamedAttrMapImpl::getNamedItemNS(const DOMString& namespaceURI,
   return getNamedItem(QualifiedName(nullAtom, ln.impl(), namespaceURI.impl()));
 }
 
-SharedPtr<NodeImpl> NamedAttrMapImpl::removeNamedItemNS(
+RefPtr<NodeImpl> NamedAttrMapImpl::removeNamedItemNS(
     const DOMString& namespaceURI,
     const DOMString& localName,
     int& exception) {
@@ -857,38 +856,38 @@ AttrImpl* NamedAttrMapImpl::getNamedItem(const QualifiedName& name) const {
   return a->attrImpl();
 }
 
-SharedPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
-                                                   int& exceptioncode) {
+RefPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
+                                                int& exceptioncode) {
   if (!element) {
     exceptioncode = DOMException::NOT_FOUND_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   // NO_MODIFICATION_ALLOWED_ERR: Raised if this map is readonly.
   if (isReadOnly()) {
     exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   // WRONG_DOCUMENT_ERR: Raised if arg was created from a different document
   // than the one that created this map.
   if (arg->getDocument() != element->getDocument()) {
     exceptioncode = DOMException::WRONG_DOCUMENT_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   // Not mentioned in spec: throw a HIERARCHY_REQUEST_ERROR if the user passes
   // in a non-attribute node
   if (!arg->isAttributeNode()) {
     exceptioncode = DOMException::HIERARCHY_REQUEST_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
   AttrImpl* attr = static_cast<AttrImpl*>(arg);
 
   AttributeImpl* a = attr->attrImpl();
   AttributeImpl* old = getAttributeItem(a->name());
   if (old == a)
-    return SharedPtr<NodeImpl>(arg);  // we know about it already
+    return RefPtr<NodeImpl>(arg);  // we know about it already
 
   // INUSE_ATTRIBUTE_ERR: Raised if arg is an Attr that is already an attribute
   // of another Element object.
@@ -896,14 +895,14 @@ SharedPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
   // elements.
   if (attr->ownerElement()) {
     exceptioncode = DOMException::INUSE_ATTRIBUTE_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   if (a->name() == idAttr)
     element->updateId(old ? old->value() : nullAtom, a->value());
 
   // ### slightly inefficient - resizes attribute array twice.
-  SharedPtr<NodeImpl> r;
+  RefPtr<NodeImpl> r;
   if (old) {
     if (!old->attrImpl())
       old->allocateImpl(element);
@@ -919,25 +918,25 @@ SharedPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
 // if the attribute is not found, but at this level we have to throw
 // NOT_FOUND_ERR
 // because of removeNamedItem, removeNamedItemNS, and removeAttributeNode.
-SharedPtr<NodeImpl> NamedAttrMapImpl::removeNamedItem(const QualifiedName& name,
-                                                      int& exceptioncode) {
+RefPtr<NodeImpl> NamedAttrMapImpl::removeNamedItem(const QualifiedName& name,
+                                                   int& exceptioncode) {
   // ### should this really be raised when the attribute to remove isn't there
   // at all?
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly
   if (isReadOnly()) {
     exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   AttributeImpl* a = getAttributeItem(name);
   if (!a) {
     exceptioncode = DOMException::NOT_FOUND_ERR;
-    return SharedPtr<NodeImpl>();
+    return RefPtr<NodeImpl>();
   }
 
   if (!a->attrImpl())
     a->allocateImpl(element);
-  SharedPtr<NodeImpl> r(a->attrImpl());
+  RefPtr<NodeImpl> r(a->attrImpl());
 
   if (name == idAttr)
     element->updateId(a->value(), nullAtom);

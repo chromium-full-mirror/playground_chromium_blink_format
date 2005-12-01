@@ -39,7 +39,7 @@ class SourceStream {
   SourceStream& operator<<(Format f);
   SourceStream& operator<<(const Node*);
   template <typename T>
-  SourceStream& operator<<(SharedPtr<T> n) {
+  SourceStream& operator<<(RefPtr<T> n) {
     return this->operator<<(n.get());
   }
 

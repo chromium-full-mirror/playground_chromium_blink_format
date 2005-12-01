@@ -34,7 +34,7 @@ class DOMParserConstructorImp : public ObjectImp {
   virtual ObjectImp* construct(ExecState* exec, const List& args);
 
  private:
-  SharedPtr<DOM::DocumentImpl> doc;
+  RefPtr<DOM::DocumentImpl> doc;
 };
 
 class DOMParser : public DOMObject {

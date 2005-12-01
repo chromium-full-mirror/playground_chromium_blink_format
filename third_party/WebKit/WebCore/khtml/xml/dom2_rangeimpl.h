@@ -111,7 +111,7 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
 #endif
 
  protected:
-  // FIXME - this could be a full-on SharedPtr in principle...
+  // FIXME - this could be a full-on RefPtr in principle...
   DocPtr<DocumentImpl> m_ownerDocument;
   NodeImpl* m_startContainer;
   unsigned m_startOffset;
@@ -128,7 +128,7 @@ class RangeImpl : public khtml::Shared<RangeImpl> {
   bool containedByReadOnly() const;
 };
 
-SharedPtr<RangeImpl> rangeOfContents(NodeImpl* node);
+RefPtr<RangeImpl> rangeOfContents(NodeImpl* node);
 
 bool operator==(const RangeImpl&, const RangeImpl&);
 inline bool operator!=(const RangeImpl& a, const RangeImpl& b) {

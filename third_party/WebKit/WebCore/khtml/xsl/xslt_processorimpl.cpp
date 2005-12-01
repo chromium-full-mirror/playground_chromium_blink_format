@@ -181,16 +181,16 @@ static void freeXsltParamArray(const char** params) {
   free(params);
 }
 
-SharedPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
+RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
     const QString& sourceString,
     const QString& sourceMIMEType,
     NodeImpl* sourceNode,
     KHTMLView* view) {
-  SharedPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
+  RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
   QString documentSource = sourceString;
 
-  SharedPtr<DocumentImpl> result;
+  RefPtr<DocumentImpl> result;
   if (sourceMIMEType == "text/html")
     result = ownerDocument->implementation()->createHTMLDocument(view);
   else {
@@ -230,12 +230,12 @@ SharedPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
   return result;
 }
 
-static inline SharedPtr<DocumentFragmentImpl> createFragmentFromSource(
+static inline RefPtr<DocumentFragmentImpl> createFragmentFromSource(
     QString sourceString,
     QString sourceMIMEType,
     NodeImpl* sourceNode,
     DocumentImpl* ouputDoc) {
-  SharedPtr<DocumentFragmentImpl> fragment = new DocumentFragmentImpl(ouputDoc);
+  RefPtr<DocumentFragmentImpl> fragment = new DocumentFragmentImpl(ouputDoc);
 
   if (sourceMIMEType == "text/html")
     parseHTMLDocumentFragment(sourceString, fragment.get());
@@ -254,7 +254,7 @@ static inline SharedPtr<DocumentFragmentImpl> createFragmentFromSource(
 }
 
 static xsltStylesheetPtr xsltStylesheetPointer(
-    SharedPtr<XSLStyleSheetImpl>& cachedStylesheet,
+    RefPtr<XSLStyleSheetImpl>& cachedStylesheet,
     NodeImpl* stylesheetRootNode) {
   if (!cachedStylesheet && stylesheetRootNode) {
     cachedStylesheet = new XSLStyleSheetImpl(stylesheetRootNode->parent()
@@ -270,7 +270,7 @@ static xsltStylesheetPtr xsltStylesheetPointer(
 }
 
 static inline xmlDocPtr xmlDocPtrFromNode(NodeImpl* sourceNode) {
-  SharedPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
+  RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
 
   xmlDocPtr sourceDoc = 0;
@@ -305,8 +305,8 @@ static inline QString resultMIMEType(xmlDocPtr resultDoc,
 bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
                                           QString& mimeType,
                                           QString& resultString) {
-  SharedPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
-  SharedPtr<XSLStyleSheetImpl> cachedStylesheet = m_stylesheet;
+  RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
+  RefPtr<XSLStyleSheetImpl> cachedStylesheet = m_stylesheet;
 
   setXSLTLoadCallBack(stylesheetLoadFunc, this, ownerDocument->docLoader());
   xsltStylesheetPtr sheet =
@@ -335,7 +335,7 @@ bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
   return true;
 }
 
-SharedPtr<DocumentImpl> XSLTProcessorImpl::transformToDocument(
+RefPtr<DocumentImpl> XSLTProcessorImpl::transformToDocument(
     NodeImpl* sourceNode) {
   QString resultMIMEType;
   QString resultString;
@@ -344,7 +344,7 @@ SharedPtr<DocumentImpl> XSLTProcessorImpl::transformToDocument(
   return createDocumentFromSource(resultString, resultMIMEType, sourceNode);
 }
 
-SharedPtr<DocumentFragmentImpl> XSLTProcessorImpl::transformToFragment(
+RefPtr<DocumentFragmentImpl> XSLTProcessorImpl::transformToFragment(
     NodeImpl* sourceNode,
     DocumentImpl* outputDoc) {
   QString resultMIMEType;
@@ -362,7 +362,7 @@ void XSLTProcessorImpl::setParameter(DOMStringImpl* namespaceURI,
   m_parameters.replace(DOMString(localName).qstring(), new DOMString(value));
 }
 
-SharedPtr<DOMStringImpl> XSLTProcessorImpl::getParameter(
+RefPtr<DOMStringImpl> XSLTProcessorImpl::getParameter(
     DOMStringImpl* namespaceURI,
     DOMStringImpl* localName) const {
   // FIXME: namespace support?

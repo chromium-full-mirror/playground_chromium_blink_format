@@ -751,7 +751,7 @@ NodeImpl* DocumentImpl::adoptNode(NodeImpl* source, int& exceptioncode) {
   if (!source)
     return 0;
 
-  SharedPtr<NodeImpl> protect(source);
+  RefPtr<NodeImpl> protect(source);
 
   switch (source->nodeType()) {
     case Node::ENTITY_NODE:
@@ -2285,7 +2285,7 @@ bool DocumentImpl::setFocusNode(NodeImpl* newFocusNode) {
     return false;
 
   bool focusChangeBlocked = false;
-  SharedPtr<NodeImpl> oldFocusNode = m_focusNode;
+  RefPtr<NodeImpl> oldFocusNode = m_focusNode;
   m_focusNode = 0;
   clearSelectionIfNeeded(newFocusNode);
 
@@ -2901,7 +2901,7 @@ void DocumentImpl::addMarker(RangeImpl* range,
   // covers.
   for (TextIterator markedText(range); !markedText.atEnd();
        markedText.advance()) {
-    SharedPtr<RangeImpl> textPiece = markedText.range();
+    RefPtr<RangeImpl> textPiece = markedText.range();
     int exception = 0;
     DocumentMarker marker = {type, textPiece->startOffset(exception),
                              textPiece->endOffset(exception)};
@@ -2915,7 +2915,7 @@ void DocumentImpl::removeMarkers(RangeImpl* range,
   // covers.
   for (TextIterator markedText(range); !markedText.atEnd();
        markedText.advance()) {
-    SharedPtr<RangeImpl> textPiece = markedText.range();
+    RefPtr<RangeImpl> textPiece = markedText.range();
     int exception = 0;
     unsigned startOffset = textPiece->startOffset(exception);
     unsigned length = textPiece->endOffset(exception) - startOffset + 1;
@@ -3162,7 +3162,7 @@ void DocumentImpl::shiftMarkers(NodeImpl* node,
 #ifdef KHTML_XSLT
 
 void DocumentImpl::applyXSLTransform(ProcessingInstructionImpl* pi) {
-  SharedPtr<XSLTProcessorImpl> processor = new XSLTProcessorImpl;
+  RefPtr<XSLTProcessorImpl> processor = new XSLTProcessorImpl;
   processor->setXSLStylesheet(static_cast<XSLStyleSheetImpl*>(pi->sheet()));
 
   QString resultMIMEType;
@@ -3298,60 +3298,59 @@ void DocumentImpl::removeRadioButtonGroup(DOMStringImpl* name,
   }
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::images() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::images() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_IMAGES));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::applets() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::applets() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_APPLETS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::embeds() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::embeds() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_EMBEDS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::objects() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::objects() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_OBJECTS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::links() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::links() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_LINKS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::forms() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::forms() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_FORMS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::anchors() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::anchors() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ANCHORS));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::all() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> DocumentImpl::all() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::DOC_ALL));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::windowNamedItems(DOMString& name) {
-  return SharedPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
+RefPtr<HTMLCollectionImpl> DocumentImpl::windowNamedItems(DOMString& name) {
+  return RefPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
       this, HTMLCollectionImpl::WINDOW_NAMED_ITEMS, name));
 }
 
-SharedPtr<HTMLCollectionImpl> DocumentImpl::documentNamedItems(
-    DOMString& name) {
-  return SharedPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
+RefPtr<HTMLCollectionImpl> DocumentImpl::documentNamedItems(DOMString& name) {
+  return RefPtr<HTMLCollectionImpl>(new HTMLNameCollectionImpl(
       this, HTMLCollectionImpl::DOCUMENT_NAMED_ITEMS, name));
 }
 
-SharedPtr<NameNodeListImpl> DocumentImpl::getElementsByName(
+RefPtr<NameNodeListImpl> DocumentImpl::getElementsByName(
     const DOMString& elementName) {
-  return SharedPtr<NameNodeListImpl>(new NameNodeListImpl(this, elementName));
+  return RefPtr<NameNodeListImpl>(new NameNodeListImpl(this, elementName));
 }
 
 // ----------------------------------------------------------------------------

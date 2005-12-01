@@ -476,8 +476,8 @@ void HTMLMapElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     HTMLElementImpl::parseMappedAttribute(attr);
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLMapElementImpl::areas() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLMapElementImpl::areas() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::MAP_AREAS));
 }
 

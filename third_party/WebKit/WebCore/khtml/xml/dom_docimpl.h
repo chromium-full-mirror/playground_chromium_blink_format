@@ -224,7 +224,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   NodeImpl* adoptNode(NodeImpl* source, int& exceptioncode);
 
-  SharedPtr<NameNodeListImpl> getElementsByName(const DOMString& elementName);
+  RefPtr<NameNodeListImpl> getElementsByName(const DOMString& elementName);
 
   // Actually part of HTMLDocument, but used for giving XML documents a window
   // title as well
@@ -232,16 +232,16 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setTitle(DOMString, NodeImpl* titleElement = 0);
   void removeTitle(NodeImpl* titleElement);
 
-  SharedPtr<HTMLCollectionImpl> images();
-  SharedPtr<HTMLCollectionImpl> embeds();
-  SharedPtr<HTMLCollectionImpl> applets();
-  SharedPtr<HTMLCollectionImpl> links();
-  SharedPtr<HTMLCollectionImpl> forms();
-  SharedPtr<HTMLCollectionImpl> anchors();
-  SharedPtr<HTMLCollectionImpl> all();
-  SharedPtr<HTMLCollectionImpl> objects();
-  SharedPtr<HTMLCollectionImpl> windowNamedItems(DOMString& name);
-  SharedPtr<HTMLCollectionImpl> documentNamedItems(DOMString& name);
+  RefPtr<HTMLCollectionImpl> images();
+  RefPtr<HTMLCollectionImpl> embeds();
+  RefPtr<HTMLCollectionImpl> applets();
+  RefPtr<HTMLCollectionImpl> links();
+  RefPtr<HTMLCollectionImpl> forms();
+  RefPtr<HTMLCollectionImpl> anchors();
+  RefPtr<HTMLCollectionImpl> all();
+  RefPtr<HTMLCollectionImpl> objects();
+  RefPtr<HTMLCollectionImpl> windowNamedItems(DOMString& name);
+  RefPtr<HTMLCollectionImpl> documentNamedItems(DOMString& name);
 
   // DOM methods overridden from  parent classes
 
@@ -658,7 +658,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void applyXSLTransform(ProcessingInstructionImpl* pi);
   void setTransformSource(void* doc) { m_transformSource = doc; }
   const void* transformSource() { return m_transformSource; }
-  SharedPtr<DocumentImpl> transformSourceDocument() {
+  RefPtr<DocumentImpl> transformSourceDocument() {
     return m_transformSourceDocument;
   }
   void setTransformSourceDocument(DocumentImpl* doc) {
@@ -690,7 +690,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   QString m_baseURL;
   QString m_baseTarget;
 
-  SharedPtr<DocumentTypeImpl> m_docType;
+  RefPtr<DocumentTypeImpl> m_docType;
   DOMImplementationImpl* m_implementation;
 
   StyleSheetImpl* m_sheet;
@@ -717,9 +717,9 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   QColor m_textColor;
 
-  SharedPtr<NodeImpl> m_focusNode;
-  SharedPtr<NodeImpl> m_hoverNode;
-  SharedPtr<NodeImpl> m_activeNode;
+  RefPtr<NodeImpl> m_focusNode;
+  RefPtr<NodeImpl> m_hoverNode;
+  RefPtr<NodeImpl> m_activeNode;
 
   unsigned int m_domtree_version;
 
@@ -765,7 +765,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   DOMString m_title;
   bool m_titleSetExplicitly;
-  SharedPtr<NodeImpl> m_titleElement;
+  RefPtr<NodeImpl> m_titleElement;
 
   RenderArena* m_renderArena;
 
@@ -785,7 +785,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
 #ifdef KHTML_XSLT
   void* m_transformSource;
-  SharedPtr<DocumentImpl> m_transformSourceDocument;
+  RefPtr<DocumentImpl> m_transformSourceDocument;
 #endif
 
 #ifndef KHTML_NO_XBL
@@ -935,9 +935,9 @@ class DocumentTypeImpl : public NodeImpl {
   virtual DOMString toString() const;
 
  private:
-  SharedPtr<DOMImplementationImpl> m_implementation;
-  SharedPtr<NamedNodeMapImpl> m_entities;
-  SharedPtr<NamedNodeMapImpl> m_notations;
+  RefPtr<DOMImplementationImpl> m_implementation;
+  RefPtr<NamedNodeMapImpl> m_entities;
+  RefPtr<NamedNodeMapImpl> m_notations;
 
   DOMString m_name;
   DOMString m_publicId;

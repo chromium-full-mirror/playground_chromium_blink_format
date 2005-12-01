@@ -1006,7 +1006,7 @@ ValueImp* Window::namedItemGetter(ExecState* exec,
   assert(thisObj->isSafeScript(exec) && doc && doc->isHTMLDocument());
 
   DOMString name = propertyName.domString();
-  SharedPtr<DOM::HTMLCollectionImpl> collection = doc->windowNamedItems(name);
+  RefPtr<DOM::HTMLCollectionImpl> collection = doc->windowNamedItems(name);
   if (collection->length() == 1)
     return getDOMNode(exec, collection->firstItem());
   else

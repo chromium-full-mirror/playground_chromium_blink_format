@@ -644,8 +644,8 @@ void HTMLElementImpl::setClassName(const DOMString& value) {
   setAttribute(classAttr, value);
 }
 
-SharedPtr<HTMLCollectionImpl> HTMLElementImpl::children() {
-  return SharedPtr<HTMLCollectionImpl>(
+RefPtr<HTMLCollectionImpl> HTMLElementImpl::children() {
+  return RefPtr<HTMLCollectionImpl>(
       new HTMLCollectionImpl(this, HTMLCollectionImpl::NODE_CHILDREN));
 }
 

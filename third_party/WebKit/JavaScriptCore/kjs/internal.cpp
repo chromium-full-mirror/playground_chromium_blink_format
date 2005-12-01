@@ -292,7 +292,7 @@ void ContextImp::mark() {
 
 // ------------------------------ Parser ---------------------------------------
 
-static SharedPtr<ProgramNode>* progNode;
+static RefPtr<ProgramNode>* progNode;
 int Parser::sid = 0;
 
 const int initialCapacity = 64;
@@ -324,19 +324,19 @@ static void clearNewNodes() {
   newNodesCapacity = 0;
 }
 
-SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
-                                     int startingLineNumber,
-                                     const UChar* code,
-                                     unsigned int length,
-                                     int* sourceId,
-                                     int* errLine,
-                                     UString* errMsg) {
+RefPtr<ProgramNode> Parser::parse(const UString& sourceURL,
+                                  int startingLineNumber,
+                                  const UChar* code,
+                                  unsigned int length,
+                                  int* sourceId,
+                                  int* errLine,
+                                  UString* errMsg) {
   if (errLine)
     *errLine = -1;
   if (errMsg)
     *errMsg = 0;
   if (!progNode)
-    progNode = new SharedPtr<ProgramNode>;
+    progNode = new RefPtr<ProgramNode>;
 
   Lexer::curr()->setCode(sourceURL, startingLineNumber, code, length);
   *progNode = 0;
@@ -349,7 +349,7 @@ SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
   int parseError = kjsyyparse();
   bool lexError = Lexer::curr()->sawError();
   Lexer::curr()->doneParsing();
-  SharedPtr<ProgramNode> prog = *progNode;
+  RefPtr<ProgramNode> prog = *progNode;
   *progNode = 0;
 
   clearNewNodes();
@@ -360,7 +360,7 @@ SharedPtr<ProgramNode> Parser::parse(const UString& sourceURL,
       *errLine = eline;
     if (errMsg)
       *errMsg = "Parse error";
-    return SharedPtr<ProgramNode>();
+    return RefPtr<ProgramNode>();
   }
 
   return prog;
@@ -629,7 +629,7 @@ bool InterpreterImp::checkSyntax(const UString& code) {
 
   // Parser::parse() returns 0 in a syntax error occurs, so we just check for
   // that
-  SharedPtr<ProgramNode> progNode =
+  RefPtr<ProgramNode> progNode =
       Parser::parse(UString(), 0, code.data(), code.size(), 0, 0, 0);
   return progNode;
 }
@@ -656,7 +656,7 @@ Completion InterpreterImp::evaluate(const UString& code,
   int sid;
   int errLine;
   UString errMsg;
-  SharedPtr<ProgramNode> progNode =
+  RefPtr<ProgramNode> progNode =
       Parser::parse(sourceURL, startingLineNumber, code.data(), code.size(),
                     &sid, &errLine, &errMsg);
 

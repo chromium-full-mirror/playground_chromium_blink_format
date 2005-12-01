@@ -200,7 +200,7 @@ ObjectImp* FunctionObjectImp::construct(ExecState* exec,
   int sid;
   int errLine;
   UString errMsg;
-  SharedPtr<ProgramNode> progNode = Parser::parse(
+  RefPtr<ProgramNode> progNode = Parser::parse(
       sourceURL, lineNumber, body.data(), body.size(), &sid, &errLine, &errMsg);
 
   // notify debugger that source has been parsed

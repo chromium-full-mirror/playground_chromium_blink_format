@@ -115,7 +115,7 @@ class SelectionController {
   bool isRange() const { return state() == RANGE; }
   bool isCaretOrRange() const { return state() != NONE; }
 
-  SharedPtr<DOM::RangeImpl> toRange() const;
+  RefPtr<DOM::RangeImpl> toRange() const;
 
   void debugPosition() const;
   void debugRenderer(khtml::RenderObject* r, bool selected) const;

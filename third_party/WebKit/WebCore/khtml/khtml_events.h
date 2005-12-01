@@ -60,7 +60,7 @@ class MouseEvent : public KParts::Event {
   int m_nodeAbsX, m_nodeAbsY;
   DOM::DOMString m_url;
   DOM::DOMString m_target;
-  SharedPtr<DOM::NodeImpl> m_innerNode;
+  RefPtr<DOM::NodeImpl> m_innerNode;
   class MouseEventPrivate;
   MouseEventPrivate* d;
 };

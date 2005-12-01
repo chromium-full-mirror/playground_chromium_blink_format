@@ -115,7 +115,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
                           const DOM::Position& start,
                           const DOM::Position& end);
 
-  SharedPtr<DOM::CSSMutableStyleDeclarationImpl> m_style;
+  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_style;
   EditAction m_editingAction;
   EPropertyLevel m_propertyLevel;
 };

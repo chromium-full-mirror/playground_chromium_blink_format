@@ -103,7 +103,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   DOM::DOMString m_effectAllowed;
   QPoint m_dragLoc;
   QPixmap m_dragImage;
-  SharedPtr<DOM::NodeImpl> m_dragImageElement;
+  RefPtr<DOM::NodeImpl> m_dragImageElement;
   AccessPolicy m_policy;
   int m_changeCount;
   bool m_dragStarted;

@@ -185,9 +185,9 @@ static QString startMarkup(const NodeImpl* node,
       if (defaultStyle) {
         NodeImpl* element = node->parentNode();
         if (element) {
-          SharedPtr<CSSComputedStyleDeclarationImpl> computedStyle =
+          RefPtr<CSSComputedStyleDeclarationImpl> computedStyle =
               Position(element, 0).computedStyle();
-          SharedPtr<CSSMutableStyleDeclarationImpl> style =
+          RefPtr<CSSMutableStyleDeclarationImpl> style =
               computedStyle->copyInheritableProperties();
           defaultStyle->diff(style.get());
           if (style->length() > 0) {
@@ -216,9 +216,9 @@ static QString startMarkup(const NodeImpl* node,
         const ElementImpl* el = static_cast<const ElementImpl*>(node);
         DOMString additionalStyle;
         if (defaultStyle && el->isHTMLElement()) {
-          SharedPtr<CSSComputedStyleDeclarationImpl> computedStyle =
+          RefPtr<CSSComputedStyleDeclarationImpl> computedStyle =
               Position(const_cast<ElementImpl*>(el), 0).computedStyle();
-          SharedPtr<CSSMutableStyleDeclarationImpl> style =
+          RefPtr<CSSMutableStyleDeclarationImpl> style =
               computedStyle->copyInheritableProperties();
           defaultStyle->diff(style.get());
           if (style->length() > 0) {
