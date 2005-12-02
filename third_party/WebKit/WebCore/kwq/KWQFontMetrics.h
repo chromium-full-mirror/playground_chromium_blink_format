@@ -95,7 +95,7 @@ class QFontMetrics {
   int baselineOffset() const { return ascent(); }
 
  private:
-  KWQRefPtr<QFontMetricsPrivate> data;
+  RefPtr<QFontMetricsPrivate> data;
 };
 
 #endif

@@ -134,7 +134,7 @@ class KHTMLViewPrivate {
     underMouse = 0;
     linkPressed = false;
     useSlowRepaints = false;
-    dragTarget.reset();
+    dragTarget = 0;
     borderTouched = false;
     scrollBarMoved = false;
     ignoreWheelEvents = false;
@@ -959,32 +959,32 @@ bool KHTMLView::updateDragAndDrop(const QPoint& loc,
     if (newTarget) {
       accept = dispatchDragEvent(dragenterEvent, newTarget, loc, clipboard);
     }
-    if (!d->dragTarget.isNull()) {
+    if (d->dragTarget) {
       dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
     }
   } else if (newTarget) {
     accept = dispatchDragEvent(dragoverEvent, newTarget, loc, clipboard);
   }
-  d->dragTarget.reset(newTarget);
+  d->dragTarget = newTarget;
 
   return accept;
 }
 
 void KHTMLView::cancelDragAndDrop(const QPoint& loc,
                                   DOM::ClipboardImpl* clipboard) {
-  if (!d->dragTarget.isNull()) {
+  if (d->dragTarget) {
     dispatchDragEvent(dragleaveEvent, d->dragTarget.get(), loc, clipboard);
   }
-  d->dragTarget.reset();
+  d->dragTarget = 0;
 }
 
 bool KHTMLView::performDragAndDrop(const QPoint& loc,
                                    DOM::ClipboardImpl* clipboard) {
   bool accept = false;
-  if (!d->dragTarget.isNull()) {
+  if (d->dragTarget) {
     accept = dispatchDragEvent(dropEvent, d->dragTarget.get(), loc, clipboard);
   }
-  d->dragTarget.reset();
+  d->dragTarget = 0;
   return accept;
 }
 

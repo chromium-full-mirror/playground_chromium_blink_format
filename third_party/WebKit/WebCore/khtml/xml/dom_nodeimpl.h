@@ -210,7 +210,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
       type = _type;
       url = _url;
       target = _target;
-      innerNode.reset(_innerNode);
+      innerNode = _innerNode;
     }
 
     int button;

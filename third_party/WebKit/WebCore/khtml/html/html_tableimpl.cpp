@@ -732,7 +732,7 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
                                                         int& exceptioncode) {
   HTMLTableRowElementImpl* r = 0L;
   RefPtr<NodeListImpl> children = childNodes();
-  int numRows = children.notNull() ? (int)children->length() : 0;
+  int numRows = children ? (int)children->length() : 0;
   // kdDebug(6030) << k_funcinfo << "index=" << index << " numRows=" << numRows
   // << endl;
   if (index < -1 || index > numRows) {
@@ -755,7 +755,7 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
 
 void HTMLTableSectionElementImpl::deleteRow(int index, int& exceptioncode) {
   RefPtr<NodeListImpl> children = childNodes();
-  int numRows = children.notNull() ? (int)children->length() : 0;
+  int numRows = children ? (int)children->length() : 0;
   if (index == -1)
     index = numRows - 1;
   if (index >= 0 && index < numRows) {
@@ -895,7 +895,7 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
                                                      int& exceptioncode) {
   HTMLTableCellElementImpl* c = 0L;
   RefPtr<NodeListImpl> children = childNodes();
-  int numCells = children.notNull() ? children->length() : 0;
+  int numCells = children ? children->length() : 0;
   if (index < -1 || index > numCells)
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   else {
@@ -916,7 +916,7 @@ HTMLElementImpl* HTMLTableRowElementImpl::insertCell(int index,
 
 void HTMLTableRowElementImpl::deleteCell(int index, int& exceptioncode) {
   RefPtr<NodeListImpl> children = childNodes();
-  int numCells = children.notNull() ? children->length() : 0;
+  int numCells = children ? children->length() : 0;
   if (index == -1)
     index = numCells - 1;
   if (index >= 0 && index < numCells) {

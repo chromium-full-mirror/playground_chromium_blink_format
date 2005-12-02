@@ -906,7 +906,7 @@ RefPtr<NodeImpl> NamedAttrMapImpl::setNamedItem(NodeImpl* arg,
   if (old) {
     if (!old->attrImpl())
       old->allocateImpl(element);
-    r.reset(old->m_impl);
+    r = old->m_impl;
     removeAttribute(a->name());
   }
 

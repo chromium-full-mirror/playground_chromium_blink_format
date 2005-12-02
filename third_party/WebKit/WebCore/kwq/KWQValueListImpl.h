@@ -26,8 +26,8 @@
 #ifndef KWQVALUELIST_H_
 #define KWQVALUELIST_H_
 
-#include "KWQRefPtr.h"
 #include "KWQDef.h"
+#include "kxmlcore/RefPtr.h"
 
 class KWQValueListNodeImpl;
 
@@ -110,7 +110,7 @@ class KWQValueListImpl {
 
   class KWQValueListPrivate;
 
-  KWQRefPtr<KWQValueListPrivate> d;
+  RefPtr<KWQValueListPrivate> d;
 
   friend class KWQValueListNodeImpl;
 };
