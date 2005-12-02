@@ -2928,7 +2928,7 @@ NodeImpl* NodeListImpl::recursiveItem(unsigned offset, NodeImpl* start) const {
         if (!remainingOffset) {
           lastItem = n;
           lastItemOffset = offset;
-          isItemCacheValid = 1;
+          isItemCacheValid = true;
           return n;
         }
         remainingOffset--;
@@ -2972,15 +2972,22 @@ NodeImpl* NodeListImpl::itemById(const DOMString& elementId) const {
 void NodeListImpl::rootNodeChildrenChanged() {
   isLengthCacheValid = false;
   isItemCacheValid = false;
+  lastItem = 0;
 }
 
 ChildNodeListImpl::ChildNodeListImpl(NodeImpl* n) : NodeListImpl(n) {}
 
 unsigned ChildNodeListImpl::length() const {
+  if (isLengthCacheValid)
+    return cachedLength;
+
   unsigned len = 0;
   NodeImpl* n;
   for (n = rootNode->firstChild(); n != 0; n = n->nextSibling())
     len++;
+
+  cachedLength = len;
+  isLengthCacheValid = true;
 
   return len;
 }
@@ -2989,12 +2996,28 @@ NodeImpl* ChildNodeListImpl::item(unsigned index) const {
   unsigned int pos = 0;
   NodeImpl* n = rootNode->firstChild();
 
-  while (n != 0 && pos < index) {
+  if (isItemCacheValid) {
+    if (index == lastItemOffset) {
+      return lastItem;
+    } else if (index > lastItemOffset) {
+      n = lastItem;
+      pos = lastItemOffset;
+    }
+  }
+
+  while (n && pos < index) {
     n = n->nextSibling();
     pos++;
   }
 
-  return n;
+  if (n) {
+    lastItem = n;
+    lastItemOffset = pos;
+    isItemCacheValid = true;
+    return n;
+  }
+
+  return 0;
 }
 
 bool ChildNodeListImpl::nodeMatches(NodeImpl* testNode) const {
