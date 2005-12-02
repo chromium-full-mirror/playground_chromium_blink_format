@@ -50,7 +50,7 @@ void SVGAnimateColorElementImpl::handleTimerEvent(double timePercentage) {
   // Start condition.
   if (!m_connected) {
     // Save initial color... (needed for fill="remove" or additve="sum")
-    SharedPtr<SVGColorImpl> temp = new SVGColorImpl();
+    RefPtr<SVGColorImpl> temp = new SVGColorImpl();
     temp->setRGBColor(targetAttribute().impl());
 
     m_initialColor = temp->color();

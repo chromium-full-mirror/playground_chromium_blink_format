@@ -100,7 +100,7 @@ SVGMatrixImpl* SVGLocatableImpl::getCTM(const SVGElementImpl* element) {
   if (parent && parent->nodeType() == KDOM::ELEMENT_NODE) {
     SVGElementImpl* parentElement = svg_dynamic_cast(parent);
     if (parentElement && parentElement->isStyledLocatable()) {
-      SharedPtr<SVGMatrixImpl> parentCTM =
+      RefPtr<SVGMatrixImpl> parentCTM =
           static_cast<SVGStyledLocatableElementImpl*>(parentElement)->getCTM();
       ctm->multiply(parentCTM.get());
     }
@@ -119,7 +119,7 @@ SVGMatrixImpl* SVGLocatableImpl::getScreenCTM(const SVGElementImpl* element) {
   if (parent && parent->isElementNode()) {
     SVGElementImpl* parentElement = static_cast<SVGElementImpl*>(parent);
     if (parentElement->isStyledLocatable()) {
-      SharedPtr<SVGMatrixImpl> parentCTM =
+      RefPtr<SVGMatrixImpl> parentCTM =
           static_cast<SVGStyledLocatableElementImpl*>(parentElement)
               ->getScreenCTM();
       ctm->multiply(parentCTM.get());

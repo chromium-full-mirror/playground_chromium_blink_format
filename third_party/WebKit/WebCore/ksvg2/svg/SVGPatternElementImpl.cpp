@@ -270,8 +270,8 @@ void SVGPatternElementImpl::drawPatternContentIntoTile(
         {
             SVGSVGElementImpl *svgElement = static_cast<SVGSVGElementImpl *>(viewportElement());
 
-            SharedPtr<SVGMatrixImpl> svgCTM = svgElement->getCTM();
-            SharedPtr<SVGMatrixImpl> ctm = getCTM();
+            RefPtr<SVGMatrixImpl> svgCTM = svgElement->getCTM();
+            RefPtr<SVGMatrixImpl> ctm = getCTM();
 
             KCanvasMatrix newMatrix(svgCTM->qmatrix());
             newMatrix.multiply(savedMatrix);
@@ -392,7 +392,7 @@ KRenderingPaintServerPattern* SVGPatternElementImpl::canvasResource() {
 SVGMatrixImpl* SVGPatternElementImpl::getCTM() const {
   SVGMatrixImpl* mat = SVGSVGElementImpl::createSVGMatrix();
   if (mat) {
-    SharedPtr<SVGMatrixImpl> viewBox = viewBoxToViewTransform(
+    RefPtr<SVGMatrixImpl> viewBox = viewBoxToViewTransform(
         width()->baseVal()->value(), height()->baseVal()->value());
 
     mat->multiply(viewBox.get());
