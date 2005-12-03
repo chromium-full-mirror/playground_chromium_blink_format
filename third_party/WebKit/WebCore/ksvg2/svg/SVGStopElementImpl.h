@@ -41,7 +41,7 @@ class SVGStopElementImpl : public SVGStyledElementImpl {
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SharedPtr<SVGAnimatedNumberImpl> m_offset;
+  mutable RefPtr<SVGAnimatedNumberImpl> m_offset;
 };
 };
 

@@ -44,7 +44,7 @@ class SVGFETileElementImpl : public SVGFilterPrimitiveStandardAttributesImpl {
   virtual KCanvasFETile* filterEffect() const;
 
  private:
-  mutable SharedPtr<SVGAnimatedStringImpl> m_in1;
+  mutable RefPtr<SVGAnimatedStringImpl> m_in1;
   mutable KCanvasFETile* m_filterEffect;
 };
 };

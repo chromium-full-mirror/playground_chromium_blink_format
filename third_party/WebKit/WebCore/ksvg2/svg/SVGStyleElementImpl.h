@@ -58,7 +58,7 @@ class SVGStyleElementImpl : public SVGElementImpl {
   bool isLoading() const;
 
  protected:
-  SharedPtr<KDOM::CSSStyleSheetImpl> m_sheet;
+  RefPtr<KDOM::CSSStyleSheetImpl> m_sheet;
   bool m_loading;
 };
 };

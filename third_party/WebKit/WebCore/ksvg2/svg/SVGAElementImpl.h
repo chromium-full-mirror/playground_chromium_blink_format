@@ -55,7 +55,7 @@ class SVGAElementImpl : public SVGStyledTransformableElementImpl,
   virtual void defaultEventHandler(KDOM::EventImpl* evt);
 
  private:
-  mutable SharedPtr<SVGAnimatedStringImpl> m_target;
+  mutable RefPtr<SVGAnimatedStringImpl> m_target;
 };
 };
 

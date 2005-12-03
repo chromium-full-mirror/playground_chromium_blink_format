@@ -40,7 +40,7 @@ class SVGExternalResourcesRequiredImpl {
   bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SharedPtr<SVGAnimatedBooleanImpl> m_external;
+  mutable RefPtr<SVGAnimatedBooleanImpl> m_external;
 };
 };
 

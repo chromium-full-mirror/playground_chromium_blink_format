@@ -45,7 +45,7 @@ class SVGFEComponentTransferElementImpl
   virtual KCanvasFEComponentTransfer* filterEffect() const;
 
  private:
-  mutable SharedPtr<SVGAnimatedStringImpl> m_in1;
+  mutable RefPtr<SVGAnimatedStringImpl> m_in1;
   mutable KCanvasFEComponentTransfer* m_filterEffect;
 };
 };

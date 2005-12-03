@@ -85,8 +85,8 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
   SVGAnimatedTemplate(const SVGAnimatedTemplate&) {}
   SVGAnimatedTemplate<T>& operator=(const SVGAnimatedTemplate<T>&) {}
 
-  mutable SharedPtr<T> m_baseVal;
-  mutable SharedPtr<T> m_animVal;
+  mutable RefPtr<T> m_baseVal;
+  mutable RefPtr<T> m_animVal;
 };
 };
 

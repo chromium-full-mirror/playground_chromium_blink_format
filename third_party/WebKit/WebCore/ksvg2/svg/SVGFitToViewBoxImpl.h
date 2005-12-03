@@ -48,8 +48,8 @@ class SVGFitToViewBoxImpl {
   bool parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SharedPtr<SVGAnimatedRectImpl> m_viewBox;
-  mutable SharedPtr<SVGAnimatedPreserveAspectRatioImpl> m_preserveAspectRatio;
+  mutable RefPtr<SVGAnimatedRectImpl> m_viewBox;
+  mutable RefPtr<SVGAnimatedPreserveAspectRatioImpl> m_preserveAspectRatio;
 };
 };
 

@@ -62,8 +62,8 @@ class SVGTextContentElementImpl : public SVGStyledElementImpl,
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
  private:
-  mutable SharedPtr<SVGAnimatedLengthImpl> m_textLength;
-  mutable SharedPtr<SVGAnimatedEnumerationImpl> m_lengthAdjust;
+  mutable RefPtr<SVGAnimatedLengthImpl> m_textLength;
+  mutable RefPtr<SVGAnimatedEnumerationImpl> m_lengthAdjust;
 };
 };
 

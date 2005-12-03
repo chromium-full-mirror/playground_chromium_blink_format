@@ -54,11 +54,11 @@ class SVGFilterPrimitiveStandardAttributesImpl : public SVGStyledElementImpl {
   void setStandardAttributes(KCanvasFilterEffect* filterEffect) const;
 
  private:
-  mutable SharedPtr<SVGAnimatedLengthImpl> m_x;
-  mutable SharedPtr<SVGAnimatedLengthImpl> m_y;
-  mutable SharedPtr<SVGAnimatedLengthImpl> m_width;
-  mutable SharedPtr<SVGAnimatedLengthImpl> m_height;
-  mutable SharedPtr<SVGAnimatedStringImpl> m_result;
+  mutable RefPtr<SVGAnimatedLengthImpl> m_x;
+  mutable RefPtr<SVGAnimatedLengthImpl> m_y;
+  mutable RefPtr<SVGAnimatedLengthImpl> m_width;
+  mutable RefPtr<SVGAnimatedLengthImpl> m_height;
+  mutable RefPtr<SVGAnimatedStringImpl> m_result;
 };
 };
 

@@ -24,7 +24,7 @@
 #define KSVG_SVGHelper_H
 
 #include <qstring.h>
-#include <kxmlcore/SharedPtr.h>
+#include <kxmlcore/RefPtr.h>
 
 namespace KSVG {
 class SVGElementImpl;
@@ -46,7 +46,7 @@ class SVGHelper {
 
 // Lazy creation, template-based
 template <class T>
-T* lazy_create(SharedPtr<T>& variable) {
+T* lazy_create(RefPtr<T>& variable) {
   if (!variable)
     variable = new T();
 
@@ -54,7 +54,7 @@ T* lazy_create(SharedPtr<T>& variable) {
 }
 
 template <class T, class Arg1>
-T* lazy_create(SharedPtr<T>& variable, Arg1 arg1) {
+T* lazy_create(RefPtr<T>& variable, Arg1 arg1) {
   if (!variable)
     variable = new T(arg1);
 
@@ -62,7 +62,7 @@ T* lazy_create(SharedPtr<T>& variable, Arg1 arg1) {
 }
 
 template <class T, class Arg1, class Arg2>
-T* lazy_create(SharedPtr<T>& variable, Arg1 arg1, Arg2 arg2) {
+T* lazy_create(RefPtr<T>& variable, Arg1 arg1, Arg2 arg2) {
   if (!variable)
     variable = new T(arg1, arg2);
 
@@ -70,7 +70,7 @@ T* lazy_create(SharedPtr<T>& variable, Arg1 arg1, Arg2 arg2) {
 }
 
 template <class T, class Arg1, class Arg2, class Arg3>
-T* lazy_create(SharedPtr<T>& variable, Arg1 arg1, Arg2 arg2, Arg3 arg3) {
+T* lazy_create(RefPtr<T>& variable, Arg1 arg1, Arg2 arg2, Arg3 arg3) {
   if (!variable)
     variable = new T(arg1, arg2, arg3);
 
@@ -78,7 +78,7 @@ T* lazy_create(SharedPtr<T>& variable, Arg1 arg1, Arg2 arg2, Arg3 arg3) {
 }
 
 template <class T, class Arg1, class Arg2, class Arg3, class Arg4>
-T* lazy_create(SharedPtr<T>& variable,
+T* lazy_create(RefPtr<T>& variable,
                Arg1 arg1,
                Arg2 arg2,
                Arg3 arg3,
@@ -90,7 +90,7 @@ T* lazy_create(SharedPtr<T>& variable,
 }
 
 template <class T, class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-T* lazy_create(SharedPtr<T>& variable,
+T* lazy_create(RefPtr<T>& variable,
                Arg1 arg1,
                Arg2 arg2,
                Arg3 arg3,
