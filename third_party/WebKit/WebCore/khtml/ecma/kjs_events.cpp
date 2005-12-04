@@ -69,11 +69,7 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
     return;
 #endif
 
-#if KHTML_NO_CPLUSPLUS_DOM
   EventImpl* evt = ele;
-#else
-  EventImpl* evt = ele.handle();
-#endif
 
   ObjectImp* listener = listenerObj();
   ObjectImp* win = windowObj();

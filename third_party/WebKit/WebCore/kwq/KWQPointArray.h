@@ -97,12 +97,7 @@ class QPointArray : public QMemArray<QPoint> {
 
   void point(uint, int*, int*);
   void setPoint(uint, int, int);
-#if 0
-    // FIXME: Workaround for Radar 2921061.
-    bool setPoints(int, int, int, ...);
-#else
   bool setPoints(int, int, int, int, int, int, int, int, int);
-#endif
   bool setPoints(int nPoints, const int* points);
 
 #ifdef _KWQ_IOSTREAM_
