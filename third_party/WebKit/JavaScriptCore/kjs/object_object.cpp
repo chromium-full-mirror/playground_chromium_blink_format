@@ -55,6 +55,10 @@ ObjectPrototypeImp::ObjectPrototypeImp(ExecState* exec,
             new ObjectProtoFuncImp(exec, funcProto,
                                    ObjectProtoFuncImp::HasOwnProperty, 1),
             DontEnum);
+  putDirect("propertyIsEnumerable",
+            new ObjectProtoFuncImp(exec, funcProto,
+                                   ObjectProtoFuncImp::PropertyIsEnumerable, 1),
+            DontEnum);
 }
 
 // ------------------------------ ObjectProtoFuncImp
@@ -72,7 +76,7 @@ bool ObjectProtoFuncImp::implementsCall() const {
   return true;
 }
 
-// ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5
+// ECMA 15.2.4.2, 15.2.4.4, 15.2.4.5, 15.2.4.7
 
 ValueImp* ObjectProtoFuncImp::callAsFunction(ExecState* exec,
                                              ObjectImp* thisObj,
@@ -85,6 +89,9 @@ ValueImp* ObjectProtoFuncImp::callAsFunction(ExecState* exec,
       return jsBoolean(thisObj->getOwnPropertySlot(
           exec, Identifier(args[0]->toString(exec)), slot));
     }
+    case PropertyIsEnumerable:
+      return jsBoolean(thisObj->propertyIsEnumerable(
+          exec, Identifier(args[0]->toString(exec))));
     case ToLocaleString:
       return jsString(thisObj->toString(exec));
     case ToString:

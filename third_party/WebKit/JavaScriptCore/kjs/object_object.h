@@ -55,7 +55,13 @@ class ObjectProtoFuncImp : public InternalFunctionImp {
   virtual bool implementsCall() const;
   virtual ValueImp* callAsFunction(ExecState*, ObjectImp*, const List& args);
 
-  enum { ToString, ToLocaleString, ValueOf, HasOwnProperty };
+  enum {
+    ToString,
+    ToLocaleString,
+    ValueOf,
+    HasOwnProperty,
+    PropertyIsEnumerable
+  };
 
  private:
   int id;
