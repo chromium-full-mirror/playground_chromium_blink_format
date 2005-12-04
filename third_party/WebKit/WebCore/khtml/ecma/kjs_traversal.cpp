@@ -29,7 +29,6 @@
 #include <kdebug.h>
 #include <kjs/protect.h>
 
-using DOM::FilterNode;
 using DOM::NodeFilterImpl;
 using DOM::NodeImpl;
 using DOM::NodeIteratorImpl;
@@ -322,7 +321,7 @@ ValueImp* getDOMTreeWalker(ExecState* exec, TreeWalkerImpl* tw) {
 JSNodeFilterCondition::JSNodeFilterCondition(ObjectImp* _filter)
     : filter(_filter) {}
 
-short JSNodeFilterCondition::acceptNode(FilterNode filterNode) const {
+short JSNodeFilterCondition::acceptNode(NodeImpl* filterNode) const {
   NodeImpl* node = filterNode;
   KHTMLPart* part = node->getDocument()->part();
   KJSProxy* proxy = KJSProxy::proxy(part);

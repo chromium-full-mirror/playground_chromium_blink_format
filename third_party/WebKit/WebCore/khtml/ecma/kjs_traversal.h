@@ -28,7 +28,7 @@
 namespace DOM {
 class NodeFilterImpl;
 class NodeIteratorImpl;
-class NodeTreeWalkerImpl;
+class TreeWalkerImpl;
 }
 
 namespace KJS {
@@ -132,7 +132,7 @@ class JSNodeFilterCondition : public DOM::NodeFilterCondition {
  public:
   JSNodeFilterCondition(ObjectImp* _filter);
   virtual ~JSNodeFilterCondition() {}
-  virtual short acceptNode(DOM::FilterNode) const;
+  virtual short acceptNode(DOM::NodeImpl*) const;
 
  protected:
   ProtectedPtr<ObjectImp> filter;
