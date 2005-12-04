@@ -1269,6 +1269,7 @@ void NodeImpl::attach() {
 void NodeImpl::willRemove() {}
 
 void NodeImpl::detach() {
+  m_inDetach = true;
   //    assert(m_attached);
 
   if (m_render)
@@ -1279,6 +1280,7 @@ void NodeImpl::detach() {
   if (doc)
     doc->incDOMTreeVersion();
   m_attached = false;
+  m_inDetach = false;
 }
 
 bool NodeImpl::maintainsState() {
