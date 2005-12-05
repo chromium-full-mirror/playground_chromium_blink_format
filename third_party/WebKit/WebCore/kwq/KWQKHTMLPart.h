@@ -139,7 +139,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void scheduleHistoryNavigation(int steps);
 
   void scrollToAnchor(const KURL&);
-  void jumpToSelection();
+  void centerSelectionInVisibleArea();
   QString advanceToNextMisspelling(bool startBeforeSelection = false);
   bool scrollOverflow(KWQScrollDirection direction,
                       KWQScrollGranularity granularity);
