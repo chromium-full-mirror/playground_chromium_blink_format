@@ -1234,6 +1234,8 @@ bool KHTMLView::dispatchMouseEvent(const AtomicString& eventType,
         m_part->xmlDocImpl()->prepareMouseEvent(true, d->prevMouseX,
                                                 d->prevMouseY, &mev);
         oldUnder = mev.innerNode;
+        if (oldUnder && oldUnder->isTextNode())
+          oldUnder = oldUnder->parentNode();
       }
       if (oldUnder != targetNode) {
         // send mouseout event to the old node
