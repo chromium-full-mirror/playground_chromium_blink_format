@@ -58,7 +58,6 @@ class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
 };
 
 class KRenderingDeviceQuartz : public KRenderingDevice {
-  Q_OBJECT
  public:
   KRenderingDeviceQuartz() {}
   virtual ~KRenderingDeviceQuartz() {}
@@ -73,24 +72,7 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   CGContextRef currentCGContext() const;
   virtual KRenderingDeviceContext* contextForImage(KCanvasImage*) const;
 
-  // Vector path creation
-  virtual void deletePath(KCanvasUserData path);
-  virtual void startPath();
-  virtual void endPath();
-
-  virtual void moveTo(double x, double y);
-  virtual void lineTo(double x, double y);
-  virtual void curveTo(double x1,
-                       double y1,
-                       double x2,
-                       double y2,
-                       double x3,
-                       double y3);
-  virtual void closeSubpath();
-
-  KCanvasUserData pathForRect(const QRect&) const;
-
-  virtual QString stringForPath(KCanvasUserData path);
+  virtual QString stringForPath(const KCanvasPath* path);
 
   // Resource creation
   virtual KCanvasResource* createResource(const KCResourceType& type) const;
@@ -98,12 +80,13 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
       const KCPaintServerType& type) const;
   virtual KCanvasFilterEffect* createFilterEffect(
       const KCFilterEffectType& type) const;
+  virtual KCanvasPath* createPath() const;
 
   // item creation
   virtual RenderPath* createItem(RenderArena* arena,
                                  khtml::RenderStyle* style,
                                  KSVG::SVGStyledElementImpl* node,
-                                 KCanvasUserData path) const;
+                                 KCanvasPath* path) const;
   virtual KCanvasContainer* createContainer(
       RenderArena* arena,
       khtml::RenderStyle* style,
@@ -114,24 +97,6 @@ class KRenderingDeviceQuartz : public KRenderingDevice {
   static void setFiltersEnabled(bool enabled);
   static bool KRenderingDeviceQuartz::hardwareRenderingEnabled();
   static void KRenderingDeviceQuartz::setHardwareRenderingEnabled(bool enabled);
-};
-
-// Wraps NSBezierPaths for c++ consumption
-class KCanvasQuartzPathData {
- public:
-  KCanvasQuartzPathData();
-
-  ~KCanvasQuartzPathData();
-
-  CGMutablePathRef path;
-  bool hasValidBBox;
-  CGRect bbox;
-};
-
-class KCanvasQuartzUserData : public KCanvasPrivateUserData {
- public:
-  KCanvasQuartzUserData();
-  ~KCanvasQuartzUserData();
 };
 
 #endif

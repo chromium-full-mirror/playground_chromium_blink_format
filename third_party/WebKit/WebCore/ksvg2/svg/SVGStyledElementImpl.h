@@ -56,7 +56,7 @@ class SVGStyledElementImpl : public SVGElementImpl {
 
   // These need to be implemented.
   virtual bool rendererIsNeeded(khtml::RenderStyle*) { return false; }
-  virtual KCPathDataList toPathData() const { return KCPathDataList(); }
+  virtual KCanvasPath* toPathData() const { return 0; }
   virtual khtml::RenderObject* createRenderer(RenderArena* arena,
                                               khtml::RenderStyle* style);
   virtual KCanvasResource* canvasResource() { return 0; }

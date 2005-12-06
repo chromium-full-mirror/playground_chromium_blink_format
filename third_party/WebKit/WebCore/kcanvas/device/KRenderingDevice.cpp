@@ -30,11 +30,11 @@ KCanvasCommonArgs::KCanvasCommonArgs() {
 
 KCanvasCommonArgs::~KCanvasCommonArgs() {}
 
-KCanvasUserData KCanvasCommonArgs::path() const {
-  return m_path;
+KCanvasPath* KCanvasCommonArgs::path() const {
+  return m_path.get();
 }
 
-void KCanvasCommonArgs::setPath(KCanvasUserData path) {
+void KCanvasCommonArgs::setPath(KCanvasPath* path) {
   m_path = path;
 }
 
@@ -46,15 +46,9 @@ void KCanvasCommonArgs::setStyle(KSVG::KCanvasRenderingStyle* style) {
   m_style = style;
 }
 
-KRenderingDevice::KRenderingDevice() {
-  m_currentPath = 0;
-}
+KRenderingDevice::KRenderingDevice() {}
 
 KRenderingDevice::~KRenderingDevice() {}
-
-KCanvasUserData KRenderingDevice::currentPath() const {
-  return m_currentPath;
-}
 
 KRenderingDeviceContext* KRenderingDevice::currentContext() const {
   return m_contextStack.current();
@@ -66,10 +60,6 @@ KRenderingDeviceContext* KRenderingDevice::popContext() {
 
 void KRenderingDevice::pushContext(KRenderingDeviceContext* context) {
   m_contextStack.push(context);
-}
-
-void KRenderingDevice::setCurrentPath(KCanvasUserData path) {
-  m_currentPath = path;
 }
 
 // vim:ts=4:noet

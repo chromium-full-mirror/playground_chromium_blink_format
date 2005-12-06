@@ -54,7 +54,7 @@ class SVGRectElementImpl : public SVGStyledTransformableElementImpl,
   virtual void parseMappedAttribute(KDOM::MappedAttributeImpl* attr);
 
   virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
-  virtual KCPathDataList toPathData() const;
+  virtual KCanvasPath* toPathData() const;
 
   virtual const SVGStyledElementImpl* pushAttributeContext(
       const SVGStyledElementImpl* context);

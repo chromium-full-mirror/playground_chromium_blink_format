@@ -30,7 +30,7 @@ typedef enum {
   OPS_POSTMUL = 2
 } KCMatrixOperationMode;
 
-class KCPathDataList;
+class KCanvasPath;
 class KCanvasMatrix {
  public:
   KCanvasMatrix();
@@ -90,10 +90,6 @@ class KCanvasMatrix {
   // Determine the scaling component of the matrix and factor it out.
   // After this operation, the matrix has x and y scale of one ('1').
   void removeScale(double* xScale, double* yScale);
-
-  // Transform 'polydata' using current matrix.
-  // (Only works for lineto/moveto operations!)
-  KCPathDataList map(const KCPathDataList& pathData) const;
 
   QMatrix qmatrix() const;
 

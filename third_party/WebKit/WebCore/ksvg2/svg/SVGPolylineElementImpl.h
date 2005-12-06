@@ -32,7 +32,7 @@ class SVGPolylineElementImpl : public SVGPolyElementImpl {
                          KDOM::DocumentImpl* doc);
   virtual ~SVGPolylineElementImpl();
 
-  virtual KCPathDataList toPathData() const;
+  virtual KCanvasPath* toPathData() const;
 };
 };
 

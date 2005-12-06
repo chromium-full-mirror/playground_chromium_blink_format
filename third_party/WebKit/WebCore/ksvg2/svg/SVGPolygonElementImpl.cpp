@@ -26,6 +26,7 @@
 
 #include <kcanvas/KCanvas.h>
 #include <kcanvas/KCanvasCreator.h>
+#include <kcanvas/device/KRenderingDevice.h>
 
 using namespace KSVG;
 
@@ -35,19 +36,19 @@ SVGPolygonElementImpl::SVGPolygonElementImpl(const KDOM::QualifiedName& tagName,
 
 SVGPolygonElementImpl::~SVGPolygonElementImpl() {}
 
-KCPathDataList SVGPolygonElementImpl::toPathData() const {
-  KCPathDataList polyData;
+KCanvasPath* SVGPolygonElementImpl::toPathData() const {
   int len = points()->numberOfItems();
   if (len < 1)
-    return polyData;
+    return 0;
 
-  polyData.moveTo(points()->getItem(0)->x(), points()->getItem(0)->y());
+  KCanvasPath* polyData = QPainter::renderingDevice()->createPath();
+  polyData->moveTo(points()->getItem(0)->x(), points()->getItem(0)->y());
   for (int i = 1; i < len; ++i) {
     SVGPointImpl* p = points()->getItem(i);
-    polyData.lineTo(p->x(), p->y());
+    polyData->lineTo(p->x(), p->y());
   }
 
-  polyData.closeSubpath();
+  polyData->closeSubpath();
   return polyData;
 }
 

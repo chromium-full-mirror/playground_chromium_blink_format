@@ -86,10 +86,10 @@ void KCanvasClipper::resetClipData() {
   m_clipData.clear();
 }
 
-void KCanvasClipper::addClipData(const KCPathDataList& path,
+void KCanvasClipper::addClipData(KCanvasPath* path,
                                  KCWindRule rule,
-                                 bool bbox) {
-  m_clipData.addPath(path, rule, bbox);
+                                 bool bboxUnits) {
+  m_clipData.addPath(path, rule, bboxUnits);
 }
 
 KCClipDataList KCanvasClipper::clipData() const {

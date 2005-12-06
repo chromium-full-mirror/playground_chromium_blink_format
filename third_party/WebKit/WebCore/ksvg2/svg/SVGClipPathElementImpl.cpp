@@ -98,9 +98,9 @@ KCanvasClipper* SVGClipPathElementImpl::canvasResource() {
       khtml::RenderStyle* pathStyle =
           getDocument()->styleSelector()->styleForElement(styled,
                                                           clipPathStyle);
-      m_clipper->addClipData(styled->toPathData(),
-                             (KCWindRule)pathStyle->svgStyle()->clipRule(),
-                             bbox);
+      if (KCanvasPath* pathData = styled->toPathData())
+        m_clipper->addClipData(
+            pathData, (KCWindRule)pathStyle->svgStyle()->clipRule(), bbox);
       pathStyle->deref(canvas()->renderArena());
     }
   }
