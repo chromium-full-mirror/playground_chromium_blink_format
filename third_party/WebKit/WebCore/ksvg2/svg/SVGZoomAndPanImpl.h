@@ -24,7 +24,7 @@
 #define KSVG_SVGZoomAndPanImpl_H
 
 namespace KDOM {
-class AttributeImpl;
+class MappedAttributeImpl;
 };
 
 namespace KSVG {

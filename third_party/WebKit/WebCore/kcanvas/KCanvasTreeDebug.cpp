@@ -220,7 +220,7 @@ static QTextStream& operator<<(QTextStream& ts,
 
 static void writeStyle(QTextStream& ts, const khtml::RenderObject& object) {
   khtml::RenderStyle* style = object.style();
-  SVGRenderStyle* svgStyle = style->svgStyle();
+  const SVGRenderStyle* svgStyle = style->svgStyle();
 
   if (!object.localTransform().isIdentity())
     ts << " [transform=" << object.localTransform() << "]";

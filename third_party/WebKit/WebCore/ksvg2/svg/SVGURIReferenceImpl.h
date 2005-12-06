@@ -26,7 +26,7 @@
 #include <qstring.h>
 
 namespace KDOM {
-class AttributeImpl;
+class MappedAttributeImpl;
 };
 
 namespace KSVG {

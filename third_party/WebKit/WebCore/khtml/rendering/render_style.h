@@ -4,7 +4,7 @@
  * Copyright (C) 2000 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003 Apple Computer, Inc.
+ * Copyright (C) 2003, 2005 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -44,6 +44,11 @@
 #include "misc/khtmllayout.h"
 #include "misc/shared.h"
 #include "rendering/font.h"
+#include "DataRef.h"
+
+#if SVG_SUPPORT
+#include "SVGRenderStyle.h"
+#endif
 
 #include <assert.h>
 
@@ -58,67 +63,10 @@ class DOMStringImpl;
 class ShadowValueImpl;
 }
 
-#if SVG_SUPPORT
-namespace KSVG {
-class SVGRenderStyle;
-}
-#endif
-
 namespace khtml {
 
 class CachedImage;
 class CachedObject;
-
-template <class DATA>
-class DataRef {
- public:
-  DataRef() { data = 0; }
-  DataRef(const DataRef<DATA>& d) {
-    data = d.data;
-    data->ref();
-  }
-
-  ~DataRef() {
-    if (data)
-      data->deref();
-  }
-
-  const DATA* operator->() const { return data; }
-
-  const DATA* get() const { return data; }
-
-  DATA* access() {
-    if (!data->hasOneRef()) {
-      data->deref();
-      data = new DATA(*data);
-      data->ref();
-    }
-    return data;
-  }
-
-  void init() {
-    data = new DATA;
-    data->ref();
-  }
-
-  DataRef<DATA>& operator=(const DataRef<DATA>& d) {
-    if (data == d.data)
-      return *this;
-    if (data)
-      data->deref();
-    data = d.data;
-
-    data->ref();
-
-    return *this;
-  }
-
-  bool operator==(const DataRef<DATA>& o) const { return (*data == *(o.data)); }
-  bool operator!=(const DataRef<DATA>& o) const { return (*data != *(o.data)); }
-
- private:
-  DATA* data;
-};
 
 enum PseudoState {
   PseudoUnknown,
@@ -999,34 +947,6 @@ enum EDisplay {
   NONE
 };
 
-#if SVG_SUPPORT
-
-// Helper macros for SVG's 'RenderStyle' properties
-#define RS_DEFINE_ATTRIBUTE(Data, Type, Name, Initial)             \
-  void set##Type(Data val) { noninherited_flags.f._##Name = val; } \
-  Data Name() const { return (Data)noninherited_flags.f._##Name; } \
-  static Data initial##Type() { return Initial; }
-
-#define RS_DEFINE_ATTRIBUTE_INHERITED(Data, Type, Name, Initial) \
-  void set##Type(Data val) { inherited_flags.f._##Name = val; }  \
-  Data Name() const { return (Data)inherited_flags.f._##Name; }  \
-  static Data initial##Type() { return Initial; }
-
-#define RS_DEFINE_ATTRIBUTE_DATAREF(Data, Group, Variable, Type, Name) \
-  Data Name() const { return Group->Variable; }                        \
-  void set##Type(Data obj) { RS_SET_VARIABLE(Group, Variable, obj) }
-
-#define RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(Data, Group, Variable, Type, \
-                                                 Name, Initial)               \
-  RS_DEFINE_ATTRIBUTE_DATAREF(Data, Group, Variable, Type, Name)              \
-  static Data initial##Type() { return Initial; }
-
-#define RS_SET_VARIABLE(Group, Variable, Value) \
-  if (!(Group->Variable == Value))              \
-    Group.access()->Variable = Value;
-
-#endif
-
 class RenderStyle {
   friend class CSSStyleSelector;
 
@@ -1185,7 +1105,7 @@ class RenderStyle {
   int m_ref;
 
 #if SVG_SUPPORT
-  KSVG::SVGRenderStyle* m_svgStyle;
+  DataRef<KSVG::SVGRenderStyle> m_svgStyle;
 #endif
 
   // !END SYNC!
@@ -1966,7 +1886,8 @@ class RenderStyle {
   }
 
 #if SVG_SUPPORT
-  KSVG::SVGRenderStyle* svgStyle() const { return m_svgStyle; }
+  const KSVG::SVGRenderStyle* svgStyle() const { return m_svgStyle.get(); }
+  KSVG::SVGRenderStyle* accessSVGStyle() { return m_svgStyle.access(); }
 #endif
 
   ContentData* contentData() { return content; }

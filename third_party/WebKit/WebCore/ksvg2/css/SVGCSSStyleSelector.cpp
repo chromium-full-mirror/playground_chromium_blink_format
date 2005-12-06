@@ -88,7 +88,7 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
     primitiveValue = static_cast<KDOM::CSSPrimitiveValueImpl*>(value);
 
   KDOM::Length l;
-  SVGRenderStyle* svgstyle = style->svgStyle();
+  SVGRenderStyle* svgstyle = style->accessSVGStyle();
 
   unsigned short valueType = value->cssValueType();
 

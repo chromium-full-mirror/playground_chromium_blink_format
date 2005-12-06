@@ -73,7 +73,7 @@ KCanvasFEFlood* SVGFEFloodElementImpl::filterEffect() const {
   khtml::RenderStyle* filterStyle =
       const_cast<SVGFEFloodElementImpl*>(this)->styleForRenderer(
           parentNode()->renderer());
-  SVGRenderStyle* svgStyle = filterStyle->svgStyle();
+  const SVGRenderStyle* svgStyle = filterStyle->svgStyle();
   m_filterEffect->setFloodColor(svgStyle->floodColor());
   m_filterEffect->setFloodOpacity(svgStyle->floodOpacity());
   filterStyle->deref(canvas()->renderArena());

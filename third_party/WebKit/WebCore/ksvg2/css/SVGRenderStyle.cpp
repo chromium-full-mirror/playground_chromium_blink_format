@@ -58,7 +58,8 @@ SVGRenderStyle::SVGRenderStyle(bool) {
   markers.init();
 }
 
-SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other) {
+SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
+    : khtml::Shared<SVGRenderStyle>() {
   fill = other.fill;
   stroke = other.stroke;
   stops = other.stops;
@@ -79,7 +80,7 @@ bool SVGRenderStyle::operator==(const SVGRenderStyle& o) const {
           svg_noninherited_flags == o.svg_noninherited_flags);
 }
 
-bool SVGRenderStyle::inheritedNotEqual(SVGRenderStyle* other) const {
+bool SVGRenderStyle::inheritedNotEqual(const SVGRenderStyle* other) const {
   return (fill != other->fill || stroke != other->stroke ||
           stops != other->stops || misc != other->misc ||
           markers != other->markers ||
