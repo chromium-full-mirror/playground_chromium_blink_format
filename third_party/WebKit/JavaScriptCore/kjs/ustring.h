@@ -203,9 +203,6 @@ class UString {
   friend bool operator==(const UString&, const UString&);
 
  public:
-  struct Rep;
-
- private:
   /**
    * @internal
    */
