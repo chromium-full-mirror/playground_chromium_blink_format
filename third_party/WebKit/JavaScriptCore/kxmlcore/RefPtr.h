@@ -20,12 +20,16 @@
  *
  */
 
-#ifndef KXMLCORE_SHARED_PTR_H
-#define KXMLCORE_SHARED_PTR_H
+#ifndef KXMLCORE_REF_PTR_H
+#define KXMLCORE_REF_PTR_H
 
 namespace KXMLCore {
 
-// FIXME: Change template name to RefPtr?
+template <class T>
+class PassRefPtr;
+template <class T>
+class PassRefPtr_Ref;
+
 template <class T>
 class RefPtr {
  public:
@@ -38,6 +42,8 @@ class RefPtr {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
+  RefPtr(PassRefPtr<T>& o) : m_ptr(o.release()) {}
+
   ~RefPtr() {
     if (T* ptr = m_ptr)
       ptr->deref();
@@ -48,6 +54,8 @@ class RefPtr {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
+  template <class U>
+  RefPtr(PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
   T* get() const { return m_ptr; }
 
@@ -64,6 +72,8 @@ class RefPtr {
 
   RefPtr& operator=(const RefPtr&);
   RefPtr& operator=(T*);
+  RefPtr& operator=(PassRefPtr<T>&);
+  RefPtr& operator=(PassRefPtr_Ref<T>);
 
  private:
   T* m_ptr;
@@ -82,6 +92,25 @@ RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
 
 template <class T>
 inline RefPtr<T>& RefPtr<T>::operator=(T* optr) {
+  if (optr)
+    optr->ref();
+  if (T* ptr = m_ptr)
+    ptr->deref();
+  m_ptr = optr;
+  return *this;
+}
+
+template <class T>
+RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<T> ref) {
+  if (m_ptr)
+    m_ptr->deref();
+  m_ptr = ref.m_ptr;
+  return *this;
+}
+
+template <class T>
+inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<T>& o) {
+  T* optr = o.release();
   if (optr)
     optr->ref();
   if (T* ptr = m_ptr)
@@ -136,4 +165,4 @@ using KXMLCore::RefPtr;
 using KXMLCore::static_pointer_cast;
 using KXMLCore::const_pointer_cast;
 
-#endif  // KXMLCORE_SHARED_PTR_H
+#endif  // KXMLCORE_REF_PTR_H

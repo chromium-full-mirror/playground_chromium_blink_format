@@ -25,6 +25,8 @@
 #define _KJS_USTRING_H_
 
 #include <kxmlcore/FastMalloc.h>
+#include <kxmlcore/RefPtr.h>
+#include <kxmlcore/PassRefPtr.h>
 
 #if APPLE_CHANGES
 #include <sys/types.h>
@@ -199,18 +201,19 @@ class CString {
  */
 class UString {
   friend bool operator==(const UString&, const UString&);
-  friend class UCharReference;
-  friend class Identifier;
-  friend class PropertyMap;
-  friend class PropertyMapHashTableEntry;
 
+ public:
+  struct Rep;
+
+ private:
   /**
    * @internal
    */
   struct Rep {
-    static Rep* create(UChar* d, int l);
-    static Rep* createCopying(const UChar* d, int l);
-    static Rep* create(Rep* base, int offset, int length);
+    static PassRefPtr<Rep> create(UChar* d, int l);
+    static PassRefPtr<Rep> createCopying(const UChar* d, int l);
+    static PassRefPtr<Rep> create(PassRefPtr<Rep> base, int offset, int length);
+
     void destroy();
 
     UChar* data() const {
@@ -280,7 +283,7 @@ class UString {
   /**
    * Copy constructor. Makes a shallow copy only.
    */
-  UString(const UString& s) { attach(s.rep); }
+  UString(const UString& s) : m_rep(s.m_rep) {}
   /**
    * Convenience declaration only ! You'll be on your own to write the
    * implementation for a construction from QString.
@@ -298,10 +301,9 @@ class UString {
    */
   UString(const UString&, const UString&);
   /**
-   * Destructor. If this handle was the only one holding a reference to the
-   * string the data will be freed.
+   * Destructor.
    */
-  ~UString() { release(); }
+  ~UString() {}
 
   /**
    * Constructs a string from an int.
@@ -393,15 +395,15 @@ class UString {
   /**
    * @return A pointer to the internal Unicode data.
    */
-  const UChar* data() const { return rep->data(); }
+  const UChar* data() const { return m_rep->data(); }
   /**
    * @return True if null.
    */
-  bool isNull() const { return (rep == &Rep::null); }
+  bool isNull() const { return (m_rep == &Rep::null); }
   /**
    * @return True if null or zero length.
    */
-  bool isEmpty() const { return (!rep->len); }
+  bool isEmpty() const { return (!m_rep->len); }
   /**
    * Use this if you want to make sure that this string is a plain ASCII
    * string. For example, if you don't want to lose any information when
@@ -413,7 +415,7 @@ class UString {
   /**
    * @return The length of the string.
    */
-  int size() const { return rep->size(); }
+  int size() const { return m_rep->size(); }
   /**
    * Const character at specified position.
    */
@@ -482,21 +484,20 @@ class UString {
    */
   static void globalClear();
 #endif
+
+  Rep* rep() const { return m_rep.get(); }
+  UString(PassRefPtr<Rep> r) { m_rep = r; }
+
+  void copyForWriting();
+
  private:
-  UString(Rep* r) { attach(r); }
-  void attach(Rep* r) {
-    rep = r;
-    r->ref();
-  }
-  void detach();
-  void release() { rep->deref(); }
   int expandedSize(int size, int otherSize) const;
   int usedCapacity() const;
   int usedPreCapacity() const;
   void expandCapacity(int requiredLength);
   void expandPreCapacity(int requiredPreCap);
 
-  Rep* rep;
+  RefPtr<Rep> m_rep;
 };
 
 inline bool operator==(const UChar& c1, const UChar& c2) {
@@ -536,9 +537,7 @@ int UTF8SequenceLength(char);
 // Returns -1 if the sequence is not valid (including presence of extra bytes).
 int decodeUTF8Sequence(const char*);
 
-inline UString::UString() {
-  attach(&Rep::null);
-}
+inline UString::UString() : m_rep(&Rep::null) {}
 
 }  // namespace
 
