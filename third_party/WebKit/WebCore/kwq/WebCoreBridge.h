@@ -311,7 +311,6 @@ typedef enum {
         direction:(BOOL)forward
     caseSensitive:(BOOL)caseFlag
              wrap:(BOOL)wrapFlag;
-- (void)centerSelectionInVisibleArea;
 
 - (NSString*)advanceToNextMisspelling;
 - (NSString*)advanceToNextMisspellingStartingJustBeforeSelection;
