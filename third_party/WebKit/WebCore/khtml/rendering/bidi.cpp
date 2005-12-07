@@ -2276,7 +2276,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             c == ' ' || c == '\t' ||
             (!o->style()->preserveNewline() && (c == '\n'));
 
-        if (!style()->collapseWhiteSpace() || !currentCharacterIsSpace)
+        if (!o->style()->collapseWhiteSpace() || !currentCharacterIsSpace)
           isLineEmpty = false;
 
         // Check for soft hyphens.  Go ahead and ignore them.
