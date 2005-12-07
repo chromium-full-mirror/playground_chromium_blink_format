@@ -115,6 +115,15 @@ class CSSStyleSelector : public StyleSelector {
   DOM::NodeImpl* locateCousinList(DOM::ElementImpl* parent);
   bool canShareStyleWithElement(DOM::NodeImpl* n);
 
+  // These methods will give back the set of rules that matched for a given
+  // element (or a pseudo-element).
+  RefPtr<DOM::CSSRuleListImpl> styleRulesForElement(DOM::ElementImpl* e,
+                                                    bool authorOnly);
+  RefPtr<DOM::CSSRuleListImpl> pseudoStyleRulesForElement(
+      DOM::ElementImpl* e,
+      DOM::DOMStringImpl* pseudoStyle,
+      bool authorOnly);
+
   bool strictParsing;
 
   struct Encodedurl {
@@ -224,6 +233,8 @@ class CSSStyleSelector : public StyleSelector {
   unsigned m_matchedRuleCount;
   QMemArray<CSSRuleData*> m_tmpRules;
   unsigned m_tmpRuleCount;
+  DOM::CSSRuleListImpl* m_ruleList;
+  bool m_collectRulesOnly;
 
   QString m_medium;
 

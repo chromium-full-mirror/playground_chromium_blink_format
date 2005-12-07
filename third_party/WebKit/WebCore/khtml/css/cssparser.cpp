@@ -2,7 +2,8 @@
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2005 Allan Sandfeld Jensen (kde@carewolf.com)
+ * Copyright (C) 2004, 2005 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -97,7 +98,9 @@ CSSParser::CSSParser(bool strictParsing) {
   rule = 0;
   id = 0;
   important = false;
-  inParseShortHand = false;
+  m_inParseShorthand = 0;
+  m_currentShorthand = 0;
+  m_implicitShorthand = false;
 
   defaultNamespace = starAtom;
 
@@ -306,11 +309,8 @@ bool CSSParser::parseDeclaration(CSSMutableStyleDeclarationImpl* declaration,
 }
 
 void CSSParser::addProperty(int propId, CSSValueImpl* value, bool important) {
-  CSSProperty* prop = new CSSProperty;
-  prop->m_id = propId;
-  prop->setValue(value);
-  prop->m_bImportant = important;
-
+  CSSProperty* prop = new CSSProperty(propId, value, important,
+                                      m_currentShorthand, m_implicitShorthand);
   if (numParsedProperties >= maxParsedProperties) {
     maxParsedProperties += 32;
     parsedProperties = (CSSProperty**)fastRealloc(
@@ -412,8 +412,7 @@ bool CSSParser::parseValue(int propId, bool important) {
   if (!value)
     return false;
 
-  int id = 0;
-  id = value->id;
+  int id = value->id;
 
   if (id == CSS_VAL_INHERIT) {
     addProperty(propId, new CSSInheritedValueImpl(), important);
@@ -505,7 +504,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       break;
 
     /* Start of supported CSS properties with validation. This is needed for
-     * parseShortHand to work
+     * parseShorthand to work
      * correctly and allows optimization in khtml::applyRule(..)
      */
     case CSS_PROP_CAPTION_SIDE:  // top | bottom | left | right | inherit
@@ -1068,7 +1067,7 @@ bool CSSParser::parseValue(int propId, bool important) {
           CSS_PROP__KHTML_MARQUEE_DIRECTION, CSS_PROP__KHTML_MARQUEE_INCREMENT,
           CSS_PROP__KHTML_MARQUEE_REPETITION, CSS_PROP__KHTML_MARQUEE_STYLE,
           CSS_PROP__KHTML_MARQUEE_SPEED};
-      return parseShortHand(properties, 5, important);
+      return parseShorthand(propId, properties, 5, important);
     }
     case CSS_PROP__KHTML_MARQUEE_DIRECTION:
       if (id == CSS_VAL_FORWARDS || id == CSS_VAL_BACKWARDS ||
@@ -1191,7 +1190,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       {
         const int properties[3] = {CSS_PROP_BORDER_WIDTH, CSS_PROP_BORDER_STYLE,
                                    CSS_PROP_BORDER_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_BORDER_TOP:
       // [ 'border-top-width' || 'border-style' || <color> ] | inherit
@@ -1199,7 +1198,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[3] = {CSS_PROP_BORDER_TOP_WIDTH,
                                    CSS_PROP_BORDER_TOP_STYLE,
                                    CSS_PROP_BORDER_TOP_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_BORDER_RIGHT:
       // [ 'border-right-width' || 'border-style' || <color> ] | inherit
@@ -1207,7 +1206,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[3] = {CSS_PROP_BORDER_RIGHT_WIDTH,
                                    CSS_PROP_BORDER_RIGHT_STYLE,
                                    CSS_PROP_BORDER_RIGHT_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_BORDER_BOTTOM:
       // [ 'border-bottom-width' || 'border-style' || <color> ] | inherit
@@ -1215,7 +1214,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[3] = {CSS_PROP_BORDER_BOTTOM_WIDTH,
                                    CSS_PROP_BORDER_BOTTOM_STYLE,
                                    CSS_PROP_BORDER_BOTTOM_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_BORDER_LEFT:
       // [ 'border-left-width' || 'border-style' || <color> ] | inherit
@@ -1223,7 +1222,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[3] = {CSS_PROP_BORDER_LEFT_WIDTH,
                                    CSS_PROP_BORDER_LEFT_STYLE,
                                    CSS_PROP_BORDER_LEFT_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_OUTLINE:
       // [ 'outline-color' || 'outline-style' || 'outline-width' ] | inherit
@@ -1231,7 +1230,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[3] = {CSS_PROP_OUTLINE_WIDTH,
                                    CSS_PROP_OUTLINE_STYLE,
                                    CSS_PROP_OUTLINE_COLOR};
-        return parseShortHand(properties, 3, important);
+        return parseShorthand(propId, properties, 3, important);
       }
     case CSS_PROP_BORDER_COLOR:
       // <color>{1,4} | inherit
@@ -1239,7 +1238,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[4] = {
             CSS_PROP_BORDER_TOP_COLOR, CSS_PROP_BORDER_RIGHT_COLOR,
             CSS_PROP_BORDER_BOTTOM_COLOR, CSS_PROP_BORDER_LEFT_COLOR};
-        return parse4Values(properties, important);
+        return parse4Values(propId, properties, important);
       }
     case CSS_PROP_BORDER_WIDTH:
       // <border-width>{1,4} | inherit
@@ -1247,7 +1246,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[4] = {
             CSS_PROP_BORDER_TOP_WIDTH, CSS_PROP_BORDER_RIGHT_WIDTH,
             CSS_PROP_BORDER_BOTTOM_WIDTH, CSS_PROP_BORDER_LEFT_WIDTH};
-        return parse4Values(properties, important);
+        return parse4Values(propId, properties, important);
       }
     case CSS_PROP_BORDER_STYLE:
       // <border-style>{1,4} | inherit
@@ -1255,7 +1254,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[4] = {
             CSS_PROP_BORDER_TOP_STYLE, CSS_PROP_BORDER_RIGHT_STYLE,
             CSS_PROP_BORDER_BOTTOM_STYLE, CSS_PROP_BORDER_LEFT_STYLE};
-        return parse4Values(properties, important);
+        return parse4Values(propId, properties, important);
       }
     case CSS_PROP_MARGIN:
       // <margin-width>{1,4} | inherit
@@ -1263,7 +1262,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[4] = {CSS_PROP_MARGIN_TOP, CSS_PROP_MARGIN_RIGHT,
                                    CSS_PROP_MARGIN_BOTTOM,
                                    CSS_PROP_MARGIN_LEFT};
-        return parse4Values(properties, important);
+        return parse4Values(propId, properties, important);
       }
     case CSS_PROP_PADDING:
       // <padding-width>{1,4} | inherit
@@ -1271,7 +1270,7 @@ bool CSSParser::parseValue(int propId, bool important) {
         const int properties[4] = {CSS_PROP_PADDING_TOP, CSS_PROP_PADDING_RIGHT,
                                    CSS_PROP_PADDING_BOTTOM,
                                    CSS_PROP_PADDING_LEFT};
-        return parse4Values(properties, important);
+        return parse4Values(propId, properties, important);
       }
     case CSS_PROP_FONT:
       // [ [ 'font-style' || 'font-variant' || 'font-weight' ]? 'font-size' [ /
@@ -1287,7 +1286,7 @@ bool CSSParser::parseValue(int propId, bool important) {
       const int properties[3] = {CSS_PROP_LIST_STYLE_TYPE,
                                  CSS_PROP_LIST_STYLE_POSITION,
                                  CSS_PROP_LIST_STYLE_IMAGE};
-      return parseShortHand(properties, 3, important);
+      return parseShorthand(propId, properties, 3, important);
     }
     default:
 // #ifdef CSS_DEBUG
@@ -1353,7 +1352,7 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
       CSS_PROP_BACKGROUND_CLIP,       CSS_PROP_BACKGROUND_ORIGIN,
       CSS_PROP_BACKGROUND_COLOR};
 
-  inParseShortHand = true;
+  enterShorthand(CSS_PROP_BACKGROUND);
 
   bool parsedProperty[numProperties] = {
       false};  // compiler will repeat false as necessary
@@ -1424,80 +1423,63 @@ bool CSSParser::parseBackgroundShorthand(bool important) {
       addProperty(properties[i], values[i], important);
   }
 
-  inParseShortHand = false;
+  exitShorthand();
   return true;
 
 fail:
-  inParseShortHand = false;
+  exitShorthand();
   for (int k = 0; k < numProperties; k++)
     delete values[k];
   delete positionYValue;
   return false;
 }
 
-bool CSSParser::parseShortHand(const int* properties,
+bool CSSParser::parseShorthand(int propId,
+                               const int* properties,
                                int numProperties,
                                bool important) {
-  /* We try to match as many properties as possible
-   * We setup an array of booleans to mark which property has been found,
-   * and we try to search for properties until it makes no longer any sense
-   */
-  inParseShortHand = true;
+  // We try to match as many properties as possible
+  // We set up an array of booleans to mark which property has been found,
+  // and we try to search for properties until it makes no longer any sense.
+  enterShorthand(propId);
 
   bool found = false;
   bool fnd[6];  // Trust me ;)
   for (int i = 0; i < numProperties; i++)
     fnd[i] = false;
 
-#ifdef CSS_DEBUG
-  kdDebug(6080) << "PSH: numProperties=" << numProperties << endl;
-#endif
-
   while (valueList->current()) {
     found = false;
-    // qDebug("outer loop" );
     for (int propIndex = 0; !found && propIndex < numProperties; ++propIndex) {
       if (!fnd[propIndex]) {
-#ifdef CSS_DEBUG
-        kdDebug(6080) << "LOOKING FOR: "
-                      << getPropertyName(properties[propIndex]).qstring()
-                      << endl;
-#endif
-        if (parseValue(properties[propIndex], important)) {
+        if (parseValue(properties[propIndex], important))
           fnd[propIndex] = found = true;
-#ifdef CSS_DEBUG
-          kdDebug(6080) << "FOUND: "
-                        << getPropertyName(properties[propIndex]).qstring()
-                        << endl;
-#endif
-        }
       }
     }
+
     // if we didn't find at least one match, this is an
     // invalid shorthand and we have to ignore it
     if (!found) {
-#ifdef CSS_DEBUG
-      qDebug("didn't find anything");
-#endif
-      inParseShortHand = false;
+      exitShorthand();
       return false;
     }
   }
 
   // Fill in any remaining properties with the initial value.
+  m_implicitShorthand = true;
   for (int i = 0; i < numProperties; ++i) {
     if (!fnd[i])
       addProperty(properties[i], new CSSInitialValueImpl(), important);
   }
+  m_implicitShorthand = false;
 
-  inParseShortHand = false;
-#ifdef CSS_DEBUG
-  kdDebug(6080) << "parsed shorthand" << endl;
-#endif
+  exitShorthand();
   return true;
 }
 
-bool CSSParser::parse4Values(const int* properties, bool important) {
+bool CSSParser::parse4Values(int propId,
+                             const int* properties,
+                             bool important) {
   /* From the CSS 2 specs, 8.3
    * If there is only one value, it applies to all sides. If there are two
    * values, the top and
@@ -1510,56 +1492,70 @@ bool CSSParser::parse4Values(const int* properties, bool important) {
    * right, bottom, and left, respectively.
    */
 
-  int num = inParseShortHand ? 1 : valueList->numValues;
-  // qDebug("parse4Values: num=%d", num );
+  int num = inShorthand() ? 1 : valueList->numValues;
+
+  enterShorthand(propId);
 
   // the order is top, right, bottom, left
   switch (num) {
     case 1: {
-      if (!parseValue(properties[0], important))
+      if (!parseValue(properties[0], important)) {
+        exitShorthand();
         return false;
+      }
       CSSValueImpl* value = parsedProperties[numParsedProperties - 1]->value();
+      m_implicitShorthand = true;
       addProperty(properties[1], value, important);
       addProperty(properties[2], value, important);
       addProperty(properties[3], value, important);
-      return true;
+      m_implicitShorthand = false;
+      break;
     }
     case 2: {
-      if (!parseValue(properties[0], important))
+      if (!parseValue(properties[0], important) ||
+          !parseValue(properties[1], important)) {
+        exitShorthand();
         return false;
-      if (!parseValue(properties[1], important))
-        return false;
+      }
       CSSValueImpl* value = parsedProperties[numParsedProperties - 2]->value();
+      m_implicitShorthand = true;
       addProperty(properties[2], value, important);
       value = parsedProperties[numParsedProperties - 2]->value();
       addProperty(properties[3], value, important);
-      return true;
+      m_implicitShorthand = false;
+      break;
     }
     case 3: {
-      if (!parseValue(properties[0], important))
+      if (!parseValue(properties[0], important) ||
+          !parseValue(properties[1], important) ||
+          !parseValue(properties[2], important)) {
+        exitShorthand();
         return false;
-      if (!parseValue(properties[1], important))
-        return false;
-      if (!parseValue(properties[2], important))
-        return false;
+      }
       CSSValueImpl* value = parsedProperties[numParsedProperties - 2]->value();
+      m_implicitShorthand = true;
       addProperty(properties[3], value, important);
-      return true;
+      m_implicitShorthand = false;
+      break;
     }
     case 4: {
-      if (!parseValue(properties[0], important))
+      if (!parseValue(properties[0], important) ||
+          !parseValue(properties[1], important) ||
+          !parseValue(properties[2], important) ||
+          !parseValue(properties[3], important)) {
+        exitShorthand();
         return false;
-      if (!parseValue(properties[1], important))
-        return false;
-      if (!parseValue(properties[2], important))
-        return false;
-      if (!parseValue(properties[3], important))
-        return false;
-      return true;
+      }
+      break;
     }
-    default:
+    default: {
+      exitShorthand();
       return false;
+    }
   }
+
+  exitShorthand();
+  return true;
 }
 
 // [ <string> | <uri> | <counter> | attr(X) | open-quote | close-quote |
@@ -1707,7 +1703,7 @@ void CSSParser::parseBackgroundPosition(CSSValueImpl*& value1,
     if (value2)
       valueList->next();
     else {
-      if (!inParseShortHand) {
+      if (!inShorthand()) {
         delete value1;
         value1 = 0;
         return;
@@ -1841,7 +1837,7 @@ bool CSSParser::parseBackgroundProperty(int propId,
     // When parsing the 'background' shorthand property, we let it handle
     // building up the lists for all
     // properties.
-    if (inParseShortHand)
+    if (inShorthand())
       break;
   }
 

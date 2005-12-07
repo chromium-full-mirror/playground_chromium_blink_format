@@ -64,6 +64,8 @@ class DOMCSSStyleDeclaration : public DOMObject {
     GetPropertyCSSValue,
     RemoveProperty,
     GetPropertyPriority,
+    GetPropertyShorthand,
+    IsPropertyImplicit,
     SetProperty,
     Item
   };

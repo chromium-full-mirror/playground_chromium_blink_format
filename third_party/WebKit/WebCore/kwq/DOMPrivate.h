@@ -100,6 +100,10 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 - (DOMCSSRuleList*)getMatchedCSSRules:(DOMElement*)elt:(NSString*)pseudoElt;
 @end
 
+@interface DOMCSSStyleDeclaration (DOMCSSStyleDeclarationExtensions)
+- (NSString*)getPropertyShorthand:(NSString*)propertyName;
+- (BOOL)isPropertyImplicit:(NSString*)propertyName;
+@end
 // END
 
 // Pending DOM3 APIs
