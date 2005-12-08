@@ -116,7 +116,7 @@ class PassRefPtr {
 };
 
 template <class T>
-PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<T>& o) {
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<T>& o) {
   T* optr = o.m_ptr;
   if (optr)
     optr->ref();
@@ -137,7 +137,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
 }
 
 template <class T>
-PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
   T* optr = ref.release();
   if (T* ptr = m_ptr)
     ptr->deref();

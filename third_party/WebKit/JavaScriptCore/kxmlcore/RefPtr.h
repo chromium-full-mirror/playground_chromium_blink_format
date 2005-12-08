@@ -101,7 +101,7 @@ inline RefPtr<T>& RefPtr<T>::operator=(T* optr) {
 }
 
 template <class T>
-RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<T> ref) {
+inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<T> ref) {
   if (m_ptr)
     m_ptr->deref();
   m_ptr = ref.m_ptr;

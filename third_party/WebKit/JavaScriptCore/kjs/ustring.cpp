@@ -177,7 +177,7 @@ PassRefPtr<UString::Rep> UString::Rep::create(UChar* d, int l) {
   Rep* r = new Rep;
   r->offset = 0;
   r->len = l;
-  r->rc = 0;
+  r->rc = 1;
   r->_hash = 0;
   r->isIdentifier = 0;
   r->baseString = 0;
@@ -186,7 +186,8 @@ PassRefPtr<UString::Rep> UString::Rep::create(UChar* d, int l) {
   r->capacity = l;
   r->usedPreCapacity = 0;
   r->preCapacity = 0;
-  return r;
+  // steal the single reference this Rep was created with
+  return PassRefPtr<Rep>::adopt(r);
 }
 
 PassRefPtr<UString::Rep> UString::Rep::create(PassRefPtr<Rep> base,
@@ -215,7 +216,8 @@ PassRefPtr<UString::Rep> UString::Rep::create(PassRefPtr<Rep> base,
   r->capacity = 0;
   r->usedPreCapacity = 0;
   r->preCapacity = 0;
-  return r;
+  // steal the single reference this Rep was created with
+  return PassRefPtr<Rep>::adopt(r);
 }
 
 void UString::Rep::destroy() {
