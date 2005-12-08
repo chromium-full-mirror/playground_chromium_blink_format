@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004, 2005 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,13 +26,9 @@
 #ifndef QPIXMAP_H_
 #define QPIXMAP_H_
 
-#include "KWQPaintDevice.h"
-#include "KWQColor.h"
-#include "KWQString.h"
 #include "KWQNamespace.h"
-#include "KWQImage.h"
-#include "KWQSize.h"
-#include "KWQRect.h"
+#include "KWQPaintDevice.h"
+#include "KWQString.h"
 
 #include <ApplicationServices/ApplicationServices.h>
 
@@ -49,6 +45,8 @@ class NSString;
 class QWMatrix;
 class QPainter;
 class QPixmap;
+class QRect;
+class QSize;
 
 namespace khtml {
 class CachedImageCallback;
@@ -79,7 +77,6 @@ class QPixmap : public QPaintDevice, public Qt {
   void resize(int, int);
 
   QPixmap xForm(const QWMatrix&) const;
-  QImage convertToImage() const { return QImage(); }
 
   bool mask() const;
 
@@ -90,14 +87,14 @@ class QPixmap : public QPaintDevice, public Qt {
                     khtml::CachedImageCallback* decoderCallback);
   void stopAnimations();
 
-  WebCoreImageRendererPtr image() { return imageRenderer; };
+  WebCoreImageRendererPtr imageRenderer() const { return m_imageRenderer; }
 
   void increaseUseCount() const;
   void decreaseUseCount() const;
 
   void flushRasterCache();
 
-  CGImageRef imageRef();
+  CGImageRef imageRef() const;
 
   static bool shouldUseThreadedDecoding();
 
@@ -105,11 +102,9 @@ class QPixmap : public QPaintDevice, public Qt {
   void setAnimationRect(const QRect&) const;
 
  private:
-  WebCoreImageRendererPtr imageRenderer;
-
-  mutable bool needCopyOnWrite;
-
-  NSString* MIMEType;
+  WebCoreImageRendererPtr m_imageRenderer;
+  mutable bool m_needCopyOnWrite;
+  NSString* m_MIMEType;
 
   friend class QPainter;
 };
