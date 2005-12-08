@@ -73,9 +73,7 @@ class RenderReplaced : public RenderBox {
   SelectionState m_selectionState : 3;
 };
 
-class RenderWidget : public QObject,
-                     public RenderReplaced,
-                     private khtml::Shared<RenderWidget> {
+class RenderWidget : public QObject, public RenderReplaced {
   Q_OBJECT
  public:
   RenderWidget(DOM::NodeImpl* node);
@@ -94,7 +92,7 @@ class RenderWidget : public QObject,
   KHTMLView* view() const { return m_view; }
 
   RenderArena* ref() {
-    _ref++;
+    ++m_refCount;
     return renderArena();
   }
   void deref(RenderArena* arena);
@@ -116,6 +114,7 @@ class RenderWidget : public QObject,
   bool m_deleteWidget;
   QWidget* m_widget;
   KHTMLView* m_view;
+  int m_refCount;
 };
 };
 
