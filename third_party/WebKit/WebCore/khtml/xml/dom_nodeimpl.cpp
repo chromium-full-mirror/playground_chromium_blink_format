@@ -135,7 +135,8 @@ NodeImpl::NodeImpl(DocumentImpl* doc)
       m_hovered(false),
       m_inActiveChain(false),
       m_styleElement(false),
-      m_implicit(false) {
+      m_implicit(false),
+      m_inDetach(false) {
 #ifndef NDEBUG
   ++NodeImplCounter::count;
 #endif
