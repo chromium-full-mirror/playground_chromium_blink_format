@@ -299,7 +299,7 @@ void TextIterator::handleTextBox() {
 
     // Determine what the next text box will be, but don't advance yet
     InlineTextBox* nextTextBox = renderer->containsReversedText()
-                                     ? m_sortedTextBoxes.next()
+                                     ? m_sortedTextBoxes.getNext()
                                      : m_textBox->nextTextBox();
 
     if (runStart < runEnd) {
@@ -343,10 +343,14 @@ void TextIterator::handleTextBox() {
             true;  // collapsed space between runs or at the end
       }
       m_textBox = nextTextBox;
+      if (renderer->containsReversedText())
+        m_sortedTextBoxes.next();
       return;
     }
     // Advance and continue
     m_textBox = nextTextBox;
+    if (renderer->containsReversedText())
+      m_sortedTextBoxes.next();
   }
 }
 
