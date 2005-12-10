@@ -2391,8 +2391,8 @@ int RenderBlock::leftmostPosition(bool includeOverflowInterior,
   int left = RenderFlow::leftmostPosition(includeOverflowInterior, includeSelf);
   if (!includeOverflowInterior && hasOverflowClip())
     return left;
-
-  // FIXME: Check left overflow when we eventually support it.
+  if (includeSelf && m_overflowLeft < left)
+    left = m_overflowLeft;
 
   if (m_floatingObjects) {
     FloatingObject* r;
