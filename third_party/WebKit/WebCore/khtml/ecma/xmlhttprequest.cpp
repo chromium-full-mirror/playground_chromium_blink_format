@@ -137,12 +137,12 @@ bool XMLHttpRequest::getOwnPropertySlot(ExecState* exec,
 ValueImp* XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case ReadyState:
-      return Number(state);
+      return jsNumber(state);
     case ResponseText:
-      return getStringOrNull(DOM::DOMString(response));
+      return jsStringOrNull(DOM::DOMString(response));
     case ResponseXML:
       if (state != Completed) {
-        return Undefined();
+        return jsUndefined();
       }
       if (!createdDocument) {
         QString mimeType;
@@ -174,7 +174,7 @@ ValueImp* XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
       }
 
       if (!typeIsXML) {
-        return Undefined();
+        return jsUndefined();
       }
 
       return getDOMNode(exec, responseXML.get());
@@ -187,13 +187,13 @@ ValueImp* XMLHttpRequest::getValueProperty(ExecState* exec, int token) const {
           onReadyStateChangeListener->listenerObjImp()) {
         return onReadyStateChangeListener->listenerObj();
       } else {
-        return Null();
+        return jsNull();
       }
     case Onload:
       if (onLoadListener && onLoadListener->listenerObjImp()) {
         return onLoadListener->listenerObj();
       } else {
-        return Null();
+        return jsNull();
       }
     default:
       kdWarning() << "XMLHttpRequest::getValueProperty unhandled token "
@@ -423,21 +423,21 @@ void XMLHttpRequest::setRequestHeader(const QString& name,
 
 ValueImp* XMLHttpRequest::getAllResponseHeaders() const {
   if (responseHeaders.isEmpty()) {
-    return Undefined();
+    return jsUndefined();
   }
 
   int endOfLine = responseHeaders.find("\n");
 
   if (endOfLine == -1) {
-    return Undefined();
+    return jsUndefined();
   }
 
-  return String(responseHeaders.mid(endOfLine + 1) + "\n");
+  return jsString(responseHeaders.mid(endOfLine + 1) + "\n");
 }
 
 ValueImp* XMLHttpRequest::getResponseHeader(const QString& name) const {
   if (responseHeaders.isEmpty()) {
-    return Undefined();
+    return jsUndefined();
   }
 
   QRegExp headerLinePattern(name + ":", false);
@@ -454,20 +454,20 @@ ValueImp* XMLHttpRequest::getResponseHeader(const QString& name) const {
   }
 
   if (headerLinePos == -1) {
-    return Undefined();
+    return jsUndefined();
   }
 
   int endOfLine = responseHeaders.find("\n", headerLinePos + matchLength);
 
-  return String(responseHeaders
-                    .mid(headerLinePos + matchLength,
-                         endOfLine - (headerLinePos + matchLength))
-                    .stripWhiteSpace());
+  return jsString(responseHeaders
+                      .mid(headerLinePos + matchLength,
+                           endOfLine - (headerLinePos + matchLength))
+                      .stripWhiteSpace());
 }
 
 ValueImp* XMLHttpRequest::getStatus() const {
   if (responseHeaders.isEmpty()) {
-    return Undefined();
+    return jsUndefined();
   }
 
   int endOfLine = responseHeaders.find("\n");
@@ -477,7 +477,7 @@ ValueImp* XMLHttpRequest::getStatus() const {
   int codeEnd = firstLine.find(" ", codeStart + 1);
 
   if (codeStart == -1 || codeEnd == -1) {
-    return Undefined();
+    return jsUndefined();
   }
 
   QString number = firstLine.mid(codeStart + 1, codeEnd - (codeStart + 1));
@@ -485,15 +485,15 @@ ValueImp* XMLHttpRequest::getStatus() const {
   bool ok = false;
   int code = number.toInt(&ok);
   if (!ok) {
-    return Undefined();
+    return jsUndefined();
   }
 
-  return Number(code);
+  return jsNumber(code);
 }
 
 ValueImp* XMLHttpRequest::getStatusText() const {
   if (responseHeaders.isEmpty()) {
-    return Undefined();
+    return jsUndefined();
   }
 
   int endOfLine = responseHeaders.find("\n");
@@ -503,13 +503,13 @@ ValueImp* XMLHttpRequest::getStatusText() const {
   int codeEnd = firstLine.find(" ", codeStart + 1);
 
   if (codeStart == -1 || codeEnd == -1) {
-    return Undefined();
+    return jsUndefined();
   }
 
   QString statusText =
       firstLine.mid(codeEnd + 1, endOfLine - (codeEnd + 1)).stripWhiteSpace();
 
-  return String(statusText);
+  return jsString(statusText);
 }
 
 void XMLHttpRequest::processSyncLoadResults(const QByteArray& data,
@@ -645,25 +645,25 @@ ValueImp* XMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case XMLHttpRequest::Abort: {
       request->abort();
-      return Undefined();
+      return jsUndefined();
     }
     case XMLHttpRequest::GetAllResponseHeaders: {
       if (args.size() != 0) {
-        return Undefined();
+        return jsUndefined();
       }
 
       return request->getAllResponseHeaders();
     }
     case XMLHttpRequest::GetResponseHeader: {
       if (args.size() != 1) {
-        return Undefined();
+        return jsUndefined();
       }
 
       return request->getResponseHeader(args[0]->toString(exec).qstring());
     }
     case XMLHttpRequest::Open: {
       if (args.size() < 2 || args.size() > 5) {
-        return Undefined();
+        return jsUndefined();
       }
 
       QString method = args[0]->toString(exec).qstring();
@@ -686,15 +686,15 @@ ValueImp* XMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
 
       request->open(method, url, async);
 
-      return Undefined();
+      return jsUndefined();
     }
     case XMLHttpRequest::Send: {
       if (args.size() > 1) {
-        return Undefined();
+        return jsUndefined();
       }
 
       if (request->state != Loading) {
-        return Undefined();
+        return jsUndefined();
       }
 
       QString body;
@@ -715,28 +715,28 @@ ValueImp* XMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,
 
       request->send(body);
 
-      return Undefined();
+      return jsUndefined();
     }
     case XMLHttpRequest::SetRequestHeader: {
       if (args.size() != 2) {
-        return Undefined();
+        return jsUndefined();
       }
 
       request->setRequestHeader(args[0]->toString(exec).qstring(),
                                 args[1]->toString(exec).qstring());
 
-      return Undefined();
+      return jsUndefined();
     }
     case XMLHttpRequest::OverrideMIMEType: {
       if (args.size() != 1) {
-        return Undefined();
+        return jsUndefined();
       }
       request->MIMETypeOverride = args[0]->toString(exec).qstring();
-      return Undefined();
+      return jsUndefined();
     }
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 }  // end namespace

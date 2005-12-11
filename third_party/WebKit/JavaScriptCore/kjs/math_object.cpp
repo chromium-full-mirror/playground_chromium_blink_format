@@ -142,7 +142,7 @@ ValueImp* MathObjectImp::getValueProperty(ExecState*, int token) const {
       assert(0);
   }
 
-  return Number(d);
+  return jsNumber(d);
 }
 
 // ------------------------------ MathObjectImp --------------------------------
@@ -276,5 +276,5 @@ ValueImp* MathFuncImp::callAsFunction(ExecState* exec,
       assert(0);
   }
 
-  return Number(result);
+  return jsNumber(result);
 }

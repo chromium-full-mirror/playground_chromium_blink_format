@@ -85,15 +85,15 @@ ValueImp* DOMNodeIterator::getValueProperty(ExecState* exec, int token) const {
     case Root:
       return getDOMNode(exec, ni.root());
     case WhatToShow:
-      return Number(ni.whatToShow());
+      return jsNumber(ni.whatToShow());
     case Filter:
       return getDOMNodeFilter(exec, ni.filter());
     case ExpandEntityReferences:
-      return Boolean(ni.expandEntityReferences());
+      return jsBoolean(ni.expandEntityReferences());
     case ReferenceNode:
       return getDOMNode(exec, ni.referenceNode());
     case PointerBeforeReferenceNode:
-      return Boolean(ni.pointerBeforeReferenceNode());
+      return jsBoolean(ni.pointerBeforeReferenceNode());
     default:
       kdWarning() << "Unhandled token in DOMNodeIterator::getValueProperty : "
                   << token << endl;
@@ -116,9 +116,9 @@ ValueImp* DOMNodeIteratorProtoFunc::callAsFunction(ExecState* exec,
       return getDOMNode(exec, nodeIterator.nextNode(exception));
     case DOMNodeIterator::Detach:
       nodeIterator.detach(exception);
-      return Undefined();
+      return jsUndefined();
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* getDOMNodeIterator(ExecState* exec, NodeIteratorImpl* ni) {
@@ -163,7 +163,7 @@ bool NodeFilterConstructor::getOwnPropertySlot(ExecState* exec,
 
 ValueImp* NodeFilterConstructor::getValueProperty(ExecState*, int token) const {
   // We use the token as the value to return directly
-  return Number(token);
+  return jsNumber(token);
 }
 
 ValueImp* getNodeFilterConstructor(ExecState* exec) {
@@ -199,9 +199,9 @@ ValueImp* DOMNodeFilterProtoFunc::callAsFunction(ExecState* exec,
   NodeFilterImpl& nodeFilter = *static_cast<DOMNodeFilter*>(thisObj)->impl();
   switch (id) {
     case DOMNodeFilter::AcceptNode:
-      return Number(nodeFilter.acceptNode(toNode(args[0])));
+      return jsNumber(nodeFilter.acceptNode(toNode(args[0])));
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* getDOMNodeFilter(ExecState* exec, NodeFilterImpl* nf) {
@@ -261,11 +261,11 @@ ValueImp* DOMTreeWalker::getValueProperty(ExecState* exec, int token) const {
     case Root:
       return getDOMNode(exec, tw.root());
     case WhatToShow:
-      return Number(tw.whatToShow());
+      return jsNumber(tw.whatToShow());
     case Filter:
       return getDOMNodeFilter(exec, tw.filter());
     case ExpandEntityReferences:
-      return Boolean(tw.expandEntityReferences());
+      return jsBoolean(tw.expandEntityReferences());
     case CurrentNode:
       return getDOMNode(exec, tw.currentNode());
     default:
@@ -308,7 +308,7 @@ ValueImp* DOMTreeWalkerProtoFunc::callAsFunction(ExecState* exec,
     case DOMTreeWalker::NextNode:
       return getDOMNode(exec, treeWalker.nextNode());
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* getDOMTreeWalker(ExecState* exec, TreeWalkerImpl* tw) {

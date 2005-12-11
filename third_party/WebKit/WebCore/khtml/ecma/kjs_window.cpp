@@ -183,34 +183,34 @@ ValueImp* Screen::getValueProperty(ExecState* exec, int token) const {
 
   switch (token) {
     case Height:
-      return Number(sg.height());
+      return jsNumber(sg.height());
     case Width:
-      return Number(sg.width());
+      return jsNumber(sg.width());
     case ColorDepth:
     case PixelDepth: {
       QPaintDeviceMetrics m(QApplication::desktop());
-      return Number(m.depth());
+      return jsNumber(m.depth());
     }
     case AvailLeft: {
       QRect clipped = info.workArea().intersect(sg);
-      return Number(clipped.x() - sg.x());
+      return jsNumber(clipped.x() - sg.x());
     }
     case AvailTop: {
       QRect clipped = info.workArea().intersect(sg);
-      return Number(clipped.y() - sg.y());
+      return jsNumber(clipped.y() - sg.y());
     }
     case AvailHeight: {
       QRect clipped = info.workArea().intersect(sg);
-      return Number(clipped.height());
+      return jsNumber(clipped.height());
     }
     case AvailWidth: {
       QRect clipped = info.workArea().intersect(sg);
-      return Number(clipped.width());
+      return jsNumber(clipped.width());
     }
     default:
       kdWarning() << "Screen::getValueProperty unhandled token " << token
                   << endl;
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -410,8 +410,8 @@ ValueImp* Window::retrieve(KHTMLPart* p) {
     return proxy->interpreter()
         ->globalObject();  // the Global object is the "window"
   } else
-    return Undefined();  // This can happen with JS disabled on the domain of
-                         // that window
+    return jsUndefined();  // This can happen with JS disabled on the domain of
+                           // that window
 }
 
 Location* Window::location() const {
@@ -652,7 +652,7 @@ static ValueImp* showModalDialog(ExecState* exec,
   UString URL = args[0]->toString(exec);
 
   if (!canShowModalDialogNow(openerWindow) || !allowPopUp(exec, openerWindow))
-    return Undefined();
+    return jsUndefined();
 
   const QMap<QString, QString> features = parseFeatures(exec, args[2]);
 
@@ -709,10 +709,10 @@ static ValueImp* showModalDialog(ExecState* exec,
   KHTMLPart* dialogPart =
       createNewWindow(exec, openerWindow, URL.qstring(), "", wargs, args[1]);
   if (!dialogPart)
-    return Undefined();
+    return jsUndefined();
 
   Window* dialogWindow = Window::retrieveWindow(dialogPart);
-  ValueImp* returnValue = Undefined();
+  ValueImp* returnValue = jsUndefined();
   dialogWindow->setReturnValueSlot(&returnValue);
   static_cast<KHTMLPartBrowserExtension*>(dialogPart->browserExtension())
       ->runModal();
@@ -725,13 +725,13 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
 
   switch (token) {
     case Closed:
-      return Boolean(m_part.isNull());
+      return jsBoolean(m_part.isNull());
     case Crypto:
-      return Undefined();  // ###
+      return jsUndefined();  // ###
     case DefaultStatus:
-      return String(UString(m_part->jsDefaultStatusBarText()));
+      return jsString(UString(m_part->jsDefaultStatusBarText()));
     case Status:
-      return String(UString(m_part->jsStatusBarText()));
+      return jsString(UString(m_part->jsStatusBarText()));
     case Node:
       return getNodeConstructor(exec);
     case Range:
@@ -754,22 +754,22 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
       return history;
     case Event:
       if (!m_evt)
-        return Undefined();
+        return jsUndefined();
       return getDOMEvent(exec, m_evt);
     case InnerHeight:
       if (!m_part->view())
-        return Undefined();
-      return Number(m_part->view()->visibleHeight());
+        return jsUndefined();
+      return jsNumber(m_part->view()->visibleHeight());
     case InnerWidth:
       if (!m_part->view())
-        return Undefined();
-      return Number(m_part->view()->visibleWidth());
+        return jsUndefined();
+      return jsNumber(m_part->view()->visibleWidth());
     case Length:
-      return Number(m_part->frames().count());
+      return jsNumber(m_part->frames().count());
     case _Location:
       return location();
     case Name:
-      return String(m_part->name());
+      return jsString(m_part->name());
     case _Navigator:
     case ClientInformation: {
       // Store the navigator in the object so we get the same one each time.
@@ -789,31 +789,31 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
     case Menubar:
       return menubar(exec);
     case OffscreenBuffering:
-      return Boolean(true);
+      return jsBoolean(true);
     case Opener:
       if (m_part->opener())
         return retrieve(m_part->opener());
       else
-        return Null();
+        return jsNull();
     case OuterHeight:
     case OuterWidth: {
       if (m_part->view()) {
         KWin::Info inf = KWin::info(m_part->view()->topLevelWidget()->winId());
-        return Number(token == OuterHeight ? inf.geometry.height()
-                                           : inf.geometry.width());
+        return jsNumber(token == OuterHeight ? inf.geometry.height()
+                                             : inf.geometry.width());
       } else
-        return Number(0);
+        return jsNumber(0);
     }
     case PageXOffset:
       if (!m_part->view())
-        return Undefined();
+        return jsUndefined();
       updateLayout();
-      return Number(m_part->view()->contentsX());
+      return jsNumber(m_part->view()->contentsX());
     case PageYOffset:
       if (!m_part->view())
-        return Undefined();
+        return jsUndefined();
       updateLayout();
-      return Number(m_part->view()->contentsY());
+      return jsNumber(m_part->view()->contentsY());
     case Parent:
       return retrieve(m_part->parentPart() ? m_part->parentPart()
                                            : (KHTMLPart*)m_part);
@@ -829,28 +829,28 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
         // to do anything relative to the screen the window is on, so the code
         // below is no
         // good of us anyway.
-        return Number(m_part->view()->topLevelWidget()->frameGeometry().x());
+        return jsNumber(m_part->view()->topLevelWidget()->frameGeometry().x());
       } else
-        return Undefined();
+        return jsUndefined();
     }
     case ScreenTop:
     case ScreenY: {
       if (m_part->view()) {
         // See comment above in ScreenX.
-        return Number(m_part->view()->topLevelWidget()->frameGeometry().y());
+        return jsNumber(m_part->view()->topLevelWidget()->frameGeometry().y());
       } else
-        return Undefined();
+        return jsUndefined();
     }
     case ScrollX:
       if (!m_part->view())
-        return Undefined();
+        return jsUndefined();
       updateLayout();
-      return Number(m_part->view()->contentsX());
+      return jsNumber(m_part->view()->contentsX());
     case ScrollY:
       if (!m_part->view())
-        return Undefined();
+        return jsUndefined();
       updateLayout();
-      return Number(m_part->view()->contentsY());
+      return jsNumber(m_part->view()->contentsY());
     case Scrollbars:
       return scrollbars(exec);
     case Statusbar:
@@ -888,7 +888,7 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
       return new XSLTProcessorConstructorImp(exec);
 #else
     case XSLTProcessor:
-      return Undefined();
+      return jsUndefined();
 #endif
     case FrameElement:
       if (DocumentImpl* doc = m_part->xmlDocImpl())
@@ -896,11 +896,11 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
           if (checkNodeSecurity(exec, fe)) {
             return getDOMNode(exec, fe);
           }
-      return Undefined();
+      return jsUndefined();
   }
 
   if (!isSafeScript(exec))
-    return Undefined();
+    return jsUndefined();
 
   switch (token) {
     case Document:
@@ -967,7 +967,7 @@ ValueImp* Window::getValueProperty(ExecState* exec, int token) const {
       return getListener(exec, scrollEvent);
   }
   assert(0);
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* Window::childFrameGetter(ExecState* exec,
@@ -1446,16 +1446,16 @@ void Window::setListener(ExecState* exec,
 ValueImp* Window::getListener(ExecState* exec,
                               const AtomicString& eventType) const {
   if (!isSafeScript(exec))
-    return Undefined();
+    return jsUndefined();
   DOM::DocumentImpl* doc = m_part->xmlDocImpl();
   if (!doc)
-    return Undefined();
+    return jsUndefined();
 
   DOM::EventListener* listener = doc->getHTMLWindowEventListener(eventType);
   if (listener && static_cast<JSEventListener*>(listener)->listenerObjImp())
     return static_cast<JSEventListener*>(listener)->listenerObj();
   else
-    return Null();
+    return jsNull();
 }
 
 JSEventListener* Window::getJSEventListener(ValueImp* val, bool html) {
@@ -1528,7 +1528,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
 
   KHTMLPart* part = window->m_part;
   if (!part)
-    return Undefined();
+    return jsUndefined();
 
   KHTMLView* widget = part->view();
   ValueImp* v = args[0];
@@ -1540,11 +1540,11 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
       if (part && part->xmlDocImpl())
         part->xmlDocImpl()->updateRendering();
       KWQ(part)->runJavaScriptAlert(str);
-      return Undefined();
+      return jsUndefined();
     case Window::Confirm:
       if (part && part->xmlDocImpl())
         part->xmlDocImpl()->updateRendering();
-      return Boolean(KWQ(part)->runJavaScriptConfirm(str));
+      return jsBoolean(KWQ(part)->runJavaScriptConfirm(str));
     case Window::Prompt:
       if (part && part->xmlDocImpl())
         part->xmlDocImpl()->updateRendering();
@@ -1554,9 +1554,9 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
           args.size() >= 2 ? args[1]->toString(exec).qstring() : QString::null,
           str2);
       if (ok)
-        return String(str2);
+        return jsString(str2);
       else
-        return Null();
+        return jsNull();
     case Window::Open: {
       KConfig* config = new KConfig("konquerorrc");
       config->setGroup("Java/JavaScript Settings");
@@ -1587,7 +1587,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
       if (policy != 0 &&
           !(part->findFrame(frameName) || frameName == "_top" ||
             frameName == "_parent" || frameName == "_self")) {
-        return Undefined();
+        return jsUndefined();
       } else {
         if (v->isUndefined())
           str = QString();
@@ -1777,23 +1777,23 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
           }
           return Window::retrieve(khtmlpart);  // global object
         } else
-          return Undefined();
+          return jsUndefined();
       }
     }
     case Window::Print:
       part->print();
-      return Undefined();
+      return jsUndefined();
     case Window::ScrollBy:
       window->updateLayout();
       if (args.size() >= 2 && widget)
         widget->scrollBy(args[0]->toInt32(exec), args[1]->toInt32(exec));
-      return Undefined();
+      return jsUndefined();
     case Window::Scroll:
     case Window::ScrollTo:
       window->updateLayout();
       if (args.size() >= 2 && widget)
         widget->setContentsPos(args[0]->toInt32(exec), args[1]->toInt32(exec));
-      return Undefined();
+      return jsUndefined();
     case Window::MoveBy:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
@@ -1808,7 +1808,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
             dest.y() + tl->height() <= sg.height() + sg.y())
           tl->move(dest);
       }
-      return Undefined();
+      return jsUndefined();
     case Window::MoveTo:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
@@ -1823,7 +1823,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
             dest.y() + tl->height() <= sg.height() + sg.y())
           tl->move(dest);
       }
-      return Undefined();
+      return jsUndefined();
     case Window::ResizeBy:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
@@ -1842,7 +1842,7 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
           tl->resize(dest.width() - deltaWidth, dest.height() - deltaHeight);
         }
       }
-      return Undefined();
+      return jsUndefined();
     case Window::ResizeTo:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
@@ -1860,15 +1860,15 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
           tl->resize(dest.width() - deltaWidth, dest.height() - deltaHeight);
         }
       }
-      return Undefined();
+      return jsUndefined();
     case Window::SetTimeout:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       if (args.size() >= 2 && v->isString()) {
         int i = args[1]->toInt32(exec);
         int r = (const_cast<Window*>(window))
                     ->installTimeout(s, i, true /*single shot*/);
-        return Number(r);
+        return jsNumber(r);
       } else if (args.size() >= 2 && v->isObject() &&
                  static_cast<ObjectImp*>(v)->implementsCall()) {
         ValueImp* func = args[0];
@@ -1880,16 +1880,16 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
 
         int r = (const_cast<Window*>(window))
                     ->installTimeout(func, funcArgs, i, true /*single shot*/);
-        return Number(r);
+        return jsNumber(r);
       } else
-        return Undefined();
+        return jsUndefined();
     case Window::SetInterval:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       if (args.size() >= 2 && v->isString()) {
         int i = args[1]->toInt32(exec);
         int r = (const_cast<Window*>(window))->installTimeout(s, i, false);
-        return Number(r);
+        return jsNumber(r);
       } else if (args.size() >= 2 && v->isObject() &&
                  static_cast<ObjectImp*>(v)->implementsCall()) {
         ValueImp* func = args[0];
@@ -1901,26 +1901,26 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
 
         int r = (const_cast<Window*>(window))
                     ->installTimeout(func, funcArgs, i, false);
-        return Number(r);
+        return jsNumber(r);
       } else
-        return Undefined();
+        return jsUndefined();
     case Window::ClearTimeout:
     case Window::ClearInterval:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       (const_cast<Window*>(window))->clearTimeout(v->toInt32(exec));
-      return Undefined();
+      return jsUndefined();
     case Window::Focus:
       if (widget)
         widget->setActiveWindow();
-      return Undefined();
+      return jsUndefined();
     case Window::GetSelection:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       return window->selection();
     case Window::Blur:
       KWQ(part)->unfocusWindow();
-      return Undefined();
+      return jsUndefined();
     case Window::Close:
       /* From
          http://developer.netscape.com/docs/manuals/js/client/jsref/window.htm :
@@ -1946,39 +1946,39 @@ ValueImp* WindowFunc::callAsFunction(ExecState* exec,
       } else {
         (const_cast<Window*>(window))->scheduleClose();
       }
-      return Undefined();
+      return jsUndefined();
     case Window::CaptureEvents:
     case Window::ReleaseEvents:
       // If anyone implements these, they need the safescript security check.
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
 
       // Do nothing for now. These are NS-specific legacy calls.
       break;
     case Window::AddEventListener:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
         if (DocumentImpl* doc = part->xmlDocImpl())
           doc->addWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
-      return Undefined();
+      return jsUndefined();
     case Window::RemoveEventListener:
       if (!window->isSafeScript(exec))
-        return Undefined();
+        return jsUndefined();
       if (JSEventListener* listener =
               Window::retrieveActive(exec)->getJSEventListener(args[1]))
         if (DocumentImpl* doc = part->xmlDocImpl())
           doc->removeWindowEventListener(
               AtomicString(args[0]->toString(exec).domString()), listener,
               args[2]->toBoolean(exec));
-      return Undefined();
+      return jsUndefined();
     case Window::ShowModalDialog:
       return showModalDialog(exec, window, args);
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 void Window::updateLayout() const {
@@ -2138,16 +2138,16 @@ ValueImp* FrameArray::getValueProperty(ExecState* exec, int token) {
     case Length: {
       QPtrList<KParts::ReadOnlyPart> frames = part->frames();
       unsigned int len = frames.count();
-      return Number(len);
+      return jsNumber(len);
     }
     case Location:
       // non-standard property, but works in NS and IE
       if (ObjectImp* obj = Window::retrieveWindow(part))
         return obj->get(exec, "location");
-      return Undefined();
+      return jsUndefined();
     default:
       assert(0);
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -2162,7 +2162,7 @@ ValueImp* FrameArray::indexGetter(ExecState* exec,
     return Window::retrieve(khtml);
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* FrameArray::nameGetter(ExecState* exec,
@@ -2177,7 +2177,7 @@ ValueImp* FrameArray::nameGetter(ExecState* exec,
     return Window::retrieve(khtml);
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 bool FrameArray::getOwnPropertySlot(ExecState* exec,
@@ -2242,7 +2242,7 @@ ValueImp* Location::getValueProperty(ExecState* exec, int token) const {
   KURL url = m_part->url();
   switch (token) {
     case Hash:
-      return String(url.ref().isNull() ? QString("") : "#" + url.ref());
+      return jsString(url.ref().isNull() ? QString("") : "#" + url.ref());
     case Host: {
       // Note: this is the IE spec. The NS spec swaps the two, it says
       // "The hostname property is the concatenation of the host and port
@@ -2251,27 +2251,27 @@ ValueImp* Location::getValueProperty(ExecState* exec, int token) const {
       UString str = url.host();
       if (url.port())
         str += ":" + QString::number((int)url.port());
-      return String(str);
+      return jsString(str);
     }
     case Hostname:
-      return String(url.host());
+      return jsString(url.host());
     case Href:
       if (!url.hasPath())
-        return String(url.prettyURL() + "/");
+        return jsString(url.prettyURL() + "/");
       else
-        return String(url.prettyURL());
+        return jsString(url.prettyURL());
     case Pathname:
-      return String(url.path().isEmpty() ? QString("/") : url.path());
+      return jsString(url.path().isEmpty() ? QString("/") : url.path());
     case Port:
-      return String(url.port() ? QString::number((int)url.port())
-                               : QString::fromLatin1(""));
+      return jsString(url.port() ? QString::number((int)url.port())
+                                 : QString::fromLatin1(""));
     case Protocol:
-      return String(url.protocol() + ":");
+      return jsString(url.protocol() + ":");
     case Search:
-      return String(url.query());
+      return jsString(url.query());
     default:
       assert(0);
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -2356,7 +2356,7 @@ void Location::put(ExecState* exec,
 }
 
 ValueImp* Location::toPrimitive(ExecState* exec, Type) const {
-  return String(toString(exec));
+  return jsString(toString(exec));
 }
 
 UString Location::toString(ExecState*) const {
@@ -2376,7 +2376,7 @@ ValueImp* LocationFunc::callAsFunction(ExecState* exec,
   if (part) {
     Window* window = Window::retrieveWindow(part);
     if (!window->isSafeScript(exec) && id != Location::Replace)
-      return Undefined();
+      return jsUndefined();
 
     switch (id) {
       case Location::Replace: {
@@ -2430,11 +2430,11 @@ ValueImp* LocationFunc::callAsFunction(ExecState* exec,
         break;
       }
       case Location::ToString:
-        return String(location->toString(exec));
+        return jsString(location->toString(exec));
     }
   } else
     kdDebug(6070) << "LocationFunc::tryExecute - no part!" << endl;
-  return Undefined();
+  return jsUndefined();
 }
 
 ////////////////////// Selection Object ////////////////////////
@@ -2475,7 +2475,7 @@ Selection::Selection(KHTMLPart* p) : m_part(p) {}
 ValueImp* Selection::getValueProperty(ExecState* exec, int token) const {
   const Window* window = Window::retrieveWindow(m_part);
   if (!window) {
-    return Undefined();
+    return jsUndefined();
   }
 
   DocumentImpl* docimpl = m_part->xmlDocImpl();
@@ -2488,28 +2488,28 @@ ValueImp* Selection::getValueProperty(ExecState* exec, int token) const {
       return getDOMNode(exec, m_part->selection().base().node());
     case AnchorOffset:
     case BaseOffset:
-      return Number(m_part->selection().base().offset());
+      return jsNumber(m_part->selection().base().offset());
     case FocusNode:
     case ExtentNode:
       return getDOMNode(exec, m_part->selection().extent().node());
     case FocusOffset:
     case ExtentOffset:
-      return Number(m_part->selection().extent().offset());
+      return jsNumber(m_part->selection().extent().offset());
     case IsCollapsed:
-      return Boolean(!m_part->selection().isRange());
+      return jsBoolean(!m_part->selection().isRange());
     case _Type: {
       switch (m_part->selection().state()) {
         case khtml::SelectionController::NONE:
-          return String("None");
+          return jsString("None");
         case khtml::SelectionController::CARET:
-          return String("Caret");
+          return jsString("Caret");
         case khtml::SelectionController::RANGE:
-          return String("Range");
+          return jsString("Range");
       }
     }
     default:
       assert(0);
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -2524,7 +2524,7 @@ bool Selection::getOwnPropertySlot(ExecState* exec,
 }
 
 ValueImp* Selection::toPrimitive(ExecState* exec, Type) const {
-  return String(toString(exec));
+  return jsString(toString(exec));
 }
 
 UString Selection::toString(ExecState*) const {
@@ -2611,7 +2611,7 @@ ValueImp* SelectionFunc::callAsFunction(ExecState* exec,
     }
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 ////////////////////// BarInfo Object ////////////////////////
@@ -2631,19 +2631,19 @@ ValueImp* BarInfo::getValueProperty(ExecState* exec, int token) const {
   assert(token == Visible);
   switch (m_type) {
     case Locationbar:
-      return Boolean(KWQ(m_part)->locationbarVisible());
+      return jsBoolean(KWQ(m_part)->locationbarVisible());
     case Menubar:
-      return Boolean(KWQ(m_part)->locationbarVisible());
+      return jsBoolean(KWQ(m_part)->locationbarVisible());
     case Personalbar:
-      return Boolean(KWQ(m_part)->personalbarVisible());
+      return jsBoolean(KWQ(m_part)->personalbarVisible());
     case Scrollbars:
-      return Boolean(KWQ(m_part)->scrollbarsVisible());
+      return jsBoolean(KWQ(m_part)->scrollbarsVisible());
     case Statusbar:
-      return Boolean(KWQ(m_part)->statusbarVisible());
+      return jsBoolean(KWQ(m_part)->statusbarVisible());
     case Toolbar:
-      return Boolean(KWQ(m_part)->toolbarVisible());
+      return jsBoolean(KWQ(m_part)->toolbarVisible());
     default:
-      return Boolean(false);
+      return jsBoolean(false);
   }
 }
 
@@ -2682,23 +2682,23 @@ ValueImp* History::getValueProperty(ExecState*, int token) const {
     case Length: {
       KParts::BrowserExtension* ext = part->browserExtension();
       if (!ext)
-        return Number(0);
+        return jsNumber(0);
 
       KParts::BrowserInterface* iface = ext->browserInterface();
       if (!iface)
-        return Number(0);
+        return jsNumber(0);
 
       QVariant length = iface->property("historyLength");
 
       if (length.type() != QVariant::UInt)
-        return Number(0);
+        return jsNumber(0);
 
-      return Number(length.toUInt());
+      return jsNumber(length.toUInt());
     }
     default:
       kdWarning() << "Unhandled token in History::getValueProperty : " << token
                   << endl;
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -2725,11 +2725,11 @@ ValueImp* HistoryFunc::callAsFunction(ExecState* exec,
       steps = args[0]->toInt32(exec);
       break;
     default:
-      return Undefined();
+      return jsUndefined();
   }
 
   history->part->scheduleHistoryNavigation(steps);
-  return Undefined();
+  return jsUndefined();
 }
 
 /////////////////////////////////////////////////////////////////////////////

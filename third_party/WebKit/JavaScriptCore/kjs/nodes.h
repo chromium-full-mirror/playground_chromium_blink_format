@@ -165,7 +165,7 @@ class StatementNode : public Node {
   LabelStack ls;
 
  private:
-  ValueImp* evaluate(ExecState* /*exec*/) { return Undefined(); }
+  ValueImp* evaluate(ExecState* /*exec*/) { return jsUndefined(); }
   int l0, l1;
   int sid;
   bool breakPoint;

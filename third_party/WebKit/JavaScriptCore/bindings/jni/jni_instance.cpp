@@ -117,7 +117,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
   }
   if (method == 0) {
     JS_LOG("unable to find an appropiate method\n");
-    return Undefined();
+    return jsUndefined();
   }
 
   const JavaMethod* jMethod = static_cast<const JavaMethod*>(method);
@@ -155,7 +155,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
     if (exceptionDescription) {
       throwError(exec, GeneralError, exceptionDescription->toString(exec));
       free(jArgs);
-      return Undefined();
+      return jsUndefined();
     }
   }
 
@@ -211,7 +211,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
 
   switch (jMethod->JNIReturnType()) {
     case void_type: {
-      resultValue = Undefined();
+      resultValue = jsUndefined();
     } break;
 
     case object_type: {
@@ -225,28 +225,28 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
               Instance::JavaLanguage, result.l, executionContext());
         }
       } else {
-        resultValue = Undefined();
+        resultValue = jsUndefined();
       }
     } break;
 
     case boolean_type: {
-      resultValue = Boolean(result.z);
+      resultValue = jsBoolean(result.z);
     } break;
 
     case byte_type: {
-      resultValue = Number(result.b);
+      resultValue = jsNumber(result.b);
     } break;
 
     case char_type: {
-      resultValue = Number(result.c);
+      resultValue = jsNumber(result.c);
     } break;
 
     case short_type: {
-      resultValue = Number(result.s);
+      resultValue = jsNumber(result.s);
     } break;
 
     case int_type: {
-      resultValue = Number(result.i);
+      resultValue = jsNumber(result.i);
     } break;
 
     case long_type: {
@@ -254,15 +254,15 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
     } break;
 
     case float_type: {
-      resultValue = Number(result.f);
+      resultValue = jsNumber(result.f);
     } break;
 
     case double_type: {
-      resultValue = Number(result.d);
+      resultValue = jsNumber(result.d);
     } break;
 
     case invalid_type:
-    default: { resultValue = Undefined(); } break;
+    default: { resultValue = jsUndefined(); } break;
   }
 
   free(jArgs);
@@ -271,7 +271,7 @@ ValueImp* JavaInstance::invokeMethod(ExecState* exec,
 }
 
 ValueImp* JavaInstance::invokeDefaultMethod(ExecState* exec, const List& args) {
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* JavaInstance::defaultValue(Type hint) const {

@@ -77,20 +77,20 @@ ValueImp* XMLSerializerProtoFunc::callAsFunction(ExecState* exec,
   switch (id) {
     case XMLSerializer::SerializeToString: {
       if (args.size() != 1) {
-        return Undefined();
+        return jsUndefined();
       }
 
       if (!args[0]->toObject(exec)->inherits(&DOMNode::info)) {
-        return Undefined();
+        return jsUndefined();
       }
 
       NodeImpl* node = static_cast<NodeImpl*>(
           static_cast<DOMNode*>(args[0]->toObject(exec))->impl());
-      return getStringOrNull(node->toString());
+      return jsStringOrNull(node->toString());
     }
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 }  // end namespace

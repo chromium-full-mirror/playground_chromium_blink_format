@@ -91,7 +91,7 @@ ValueImp* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
     case DOMAbstractView::GetComputedStyle: {
       ElementImpl* arg0 = toElement(args[0]);
       if (!arg0)
-        return Undefined();  // throw exception?
+        return jsUndefined();  // throw exception?
       else {
         if (DocumentImpl* doc = arg0->getDocument())
           doc->updateLayoutIgnorePendingStylesheets();
@@ -103,7 +103,7 @@ ValueImp* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
     case DOMAbstractView::GetMatchedCSSRules: {
       ElementImpl* arg0 = toElement(args[0]);
       if (!arg0)
-        return Undefined();  // throw exception?
+        return jsUndefined();  // throw exception?
       else {
         // No need to update layout, since we just want the back-end rules.
         return getDOMCSSRuleList(
@@ -114,7 +114,7 @@ ValueImp* DOMAbstractViewProtoFunc::callAsFunction(ExecState* exec,
       }
     }
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* getDOMAbstractView(ExecState* exec, AbstractViewImpl* av) {

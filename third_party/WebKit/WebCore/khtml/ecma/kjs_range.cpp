@@ -119,9 +119,9 @@ ValueImp* DOMRange::getValueProperty(ExecState* exec, int token) const {
     case EndContainer:
       return getDOMNode(exec, range.endContainer(exception));
     case EndOffset:
-      return Number(range.endOffset(exception));
+      return jsNumber(range.endOffset(exception));
     case Collapsed:
-      return Boolean(range.collapsed(exception));
+      return jsBoolean(range.collapsed(exception));
     case CommonAncestorContainer:
       return getDOMNode(exec, range.commonAncestorContainer(exception));
     default:
@@ -137,7 +137,7 @@ ValueImp* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
   if (!thisObj->inherits(&KJS::DOMRange::info))
     return throwError(exec, TypeError);
   RangeImpl& range = *static_cast<DOMRange*>(thisObj)->impl();
-  ValueImp* result = Undefined();
+  ValueImp* result = jsUndefined();
   int exception = 0;
 
   switch (id) {
@@ -192,7 +192,7 @@ ValueImp* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
       result = getDOMRange(exec, range.cloneRange(exception));
       break;
     case DOMRange::ToString:
-      result = getStringOrNull(range.toString(exception));
+      result = jsStringOrNull(range.toString(exception));
       break;
     case DOMRange::Detach:
       range.detach(exception);
@@ -232,7 +232,7 @@ bool RangeConstructor::getOwnPropertySlot(ExecState* exec,
 }
 
 ValueImp* RangeConstructor::getValueProperty(ExecState*, int token) const {
-  return Number(token);
+  return jsNumber(token);
 }
 
 ValueImp* getRangeConstructor(ExecState* exec) {

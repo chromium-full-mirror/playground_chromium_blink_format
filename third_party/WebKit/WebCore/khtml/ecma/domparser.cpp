@@ -92,7 +92,7 @@ ValueImp* DOMParserProtoFunc::callAsFunction(ExecState* exec,
     }
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 }  // end namespace

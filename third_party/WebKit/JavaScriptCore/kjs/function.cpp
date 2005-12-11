@@ -99,7 +99,7 @@ ValueImp* FunctionImp::callAsFunction(ExecState* exec,
     bool cont = dbg->callEvent(&newExec, sid, lineno, this, args);
     if (!cont) {
       dbg->imp()->abort();
-      return Undefined();
+      return jsUndefined();
     }
   }
 
@@ -128,7 +128,7 @@ ValueImp* FunctionImp::callAsFunction(ExecState* exec,
     int cont = dbg->returnEvent(&newExec, sid, lineno, this);
     if (!cont) {
       dbg->imp()->abort();
-      return Undefined();
+      return jsUndefined();
     }
   }
 
@@ -138,7 +138,7 @@ ValueImp* FunctionImp::callAsFunction(ExecState* exec,
   } else if (comp.complType() == ReturnValue)
     return comp.value();
   else
-    return Undefined();
+    return jsUndefined();
 }
 
 void FunctionImp::addParameter(const Identifier& n) {
@@ -185,7 +185,7 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
         variable->put(exec, p->name, *it);
         it++;
       } else
-        variable->put(exec, p->name, Undefined());
+        variable->put(exec, p->name, jsUndefined());
       p = p->next;
     }
   }
@@ -211,7 +211,7 @@ ValueImp* FunctionImp::argumentsGetter(ExecState* exec,
     }
     context = context->callingContext();
   }
-  return Null();
+  return jsNull();
 }
 
 ValueImp* FunctionImp::lengthGetter(ExecState* exec,
@@ -224,7 +224,7 @@ ValueImp* FunctionImp::lengthGetter(ExecState* exec,
     ++count;
     p = p->next;
   }
-  return Number(count);
+  return jsNumber(count);
 }
 
 bool FunctionImp::getOwnPropertySlot(ExecState* exec,
@@ -336,7 +336,7 @@ Completion DeclaredFunctionImp::execute(ExecState* exec) {
 
   if (result.complType() == Throw || result.complType() == ReturnValue)
     return result;
-  return Completion(Normal, Undefined());  // TODO: or ReturnValue ?
+  return Completion(Normal, jsUndefined());  // TODO: or ReturnValue ?
 }
 
 void DeclaredFunctionImp::processVarDecls(ExecState* exec) {
@@ -576,7 +576,7 @@ static ValueImp* encode(ExecState* exec,
       r += tmp;
     }
   }
-  return String(r);
+  return jsString(r);
 }
 
 static ValueImp* decode(ExecState* exec,
@@ -647,7 +647,7 @@ static ValueImp* decode(ExecState* exec,
     k++;
     s.append(c);
   }
-  return String(s);
+  return jsString(s);
 }
 
 static bool isStrWhiteSpace(unsigned short c) {
@@ -793,7 +793,7 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
         if (dbg) {
           bool cont = dbg->sourceParsed(exec, sid, UString(), s, errLine);
           if (!cont)
-            return Undefined();
+            return jsUndefined();
         }
 
         // no program node means a syntax occurred
@@ -820,7 +820,7 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
         if (newExec.hadException())
           exec->setException(newExec.exception());
 
-        res = Undefined();
+        res = jsUndefined();
         if (c.complType() == Throw)
           exec->setException(c.value());
         else if (c.isValueCompletion())
@@ -829,17 +829,17 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
       break;
     }
     case ParseInt:
-      res = Number(parseInt(args[0]->toString(exec), args[1]->toInt32(exec)));
+      res = jsNumber(parseInt(args[0]->toString(exec), args[1]->toInt32(exec)));
       break;
     case ParseFloat:
-      res = Number(parseFloat(args[0]->toString(exec)));
+      res = jsNumber(parseFloat(args[0]->toString(exec)));
       break;
     case IsNaN:
-      res = Boolean(isNaN(args[0]->toNumber(exec)));
+      res = jsBoolean(isNaN(args[0]->toNumber(exec)));
       break;
     case IsFinite: {
       double n = args[0]->toNumber(exec);
-      res = Boolean(!isNaN(n) && !isInf(n));
+      res = jsBoolean(!isNaN(n) && !isInf(n));
       break;
     }
     case DecodeURI:
@@ -872,7 +872,7 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
         }
         r += s;
       }
-      res = String(r);
+      res = jsString(r);
       break;
     }
     case UnEscape: {
@@ -901,7 +901,7 @@ ValueImp* GlobalFuncImp::callAsFunction(ExecState* exec,
         k++;
         s += UString(c, 1);
       }
-      res = String(s);
+      res = jsString(s);
       break;
     }
 #ifndef NDEBUG

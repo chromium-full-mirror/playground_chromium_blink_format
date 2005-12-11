@@ -102,7 +102,7 @@ KJS::ValueImp* GlobalObject::get(KJS::ExecState* exec,
   // But it can also mean something isn't loaded or implemented...
   kdDebug(26004) << "GlobalObject::get property not found: " << p.qstring()
                  << endl;
-  return KJS::Undefined();
+  return KJS::jsUndefined();
 }
 
 // vim:ts=4:noet

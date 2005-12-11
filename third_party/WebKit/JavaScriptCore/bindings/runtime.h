@@ -110,7 +110,7 @@ class Class {
   virtual Field* fieldNamed(const char* name, Instance* instance) const = 0;
 
   virtual ValueImp* fallbackObject(ExecState*, Instance*, const Identifier&) {
-    return Undefined();
+    return jsUndefined();
   }
 
   virtual ~Class() {}
@@ -156,7 +156,7 @@ class Instance {
   virtual ValueImp* getValueOfUndefinedField(ExecState* exec,
                                              const Identifier& property,
                                              Type hint) const {
-    return Undefined();
+    return jsUndefined();
   }
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
@@ -173,7 +173,7 @@ class Instance {
 
   virtual ValueImp* defaultValue(Type hint) const = 0;
 
-  virtual ValueImp* valueOf() const { return String(getClass()->name()); }
+  virtual ValueImp* valueOf() const { return jsString(getClass()->name()); }
 
   void setExecutionContext(const RootObject* r) { _executionContext = r; }
   const RootObject* executionContext() const { return _executionContext; }

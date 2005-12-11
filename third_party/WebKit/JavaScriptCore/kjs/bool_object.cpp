@@ -57,7 +57,7 @@ BooleanPrototypeImp::BooleanPrototypeImp(ExecState* exec,
       valueOfPropertyName,
       new BooleanProtoFuncImp(exec, funcProto, BooleanProtoFuncImp::ValueOf, 0),
       DontEnum);
-  setInternalValue(Boolean(false));
+  setInternalValue(jsBoolean(false));
 }
 
 // ------------------------------ BooleanProtoFuncImp --------------------------
@@ -88,8 +88,8 @@ ValueImp* BooleanProtoFuncImp::callAsFunction(ExecState* exec,
   assert(v);
 
   if (id == ToString)
-    return String(v->toString(exec));
-  return Boolean(v->toBoolean(exec)); /* TODO: optimize for bool case */
+    return jsString(v->toString(exec));
+  return jsBoolean(v->toBoolean(exec)); /* TODO: optimize for bool case */
 }
 
 // ------------------------------ BooleanObjectImp -----------------------------
@@ -102,7 +102,7 @@ BooleanObjectImp::BooleanObjectImp(ExecState* exec,
             DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsOne(), ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
 }
 
 bool BooleanObjectImp::implementsConstruct() const {
@@ -134,7 +134,8 @@ ValueImp* BooleanObjectImp::callAsFunction(ExecState* exec,
                                            ObjectImp* /*thisObj*/,
                                            const List& args) {
   if (args.isEmpty())
-    return Boolean(false);
+    return jsBoolean(false);
   else
-    return Boolean(args[0]->toBoolean(exec)); /* TODO: optimize for bool case */
+    return jsBoolean(
+        args[0]->toBoolean(exec)); /* TODO: optimize for bool case */
 }

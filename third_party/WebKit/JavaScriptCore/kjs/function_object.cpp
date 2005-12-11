@@ -39,7 +39,7 @@ using namespace KJS;
 // ------------------------------ FunctionPrototypeImp -------------------------
 
 FunctionPrototypeImp::FunctionPrototypeImp(ExecState* exec) {
-  putDirect(lengthPropertyName, jsZero(), DontDelete | ReadOnly | DontEnum);
+  putDirect(lengthPropertyName, jsNumber(0), DontDelete | ReadOnly | DontEnum);
   putDirect(
       toStringPropertyName,
       new FunctionProtoFuncImp(exec, this, FunctionProtoFuncImp::ToString, 0),
@@ -64,7 +64,7 @@ bool FunctionPrototypeImp::implementsCall() const {
 ValueImp* FunctionPrototypeImp::callAsFunction(ExecState* /*exec*/,
                                                ObjectImp* /*thisObj*/,
                                                const List& /*args*/) {
-  return Undefined();
+  return jsUndefined();
 }
 
 // ------------------------------ FunctionProtoFuncImp -------------------------
@@ -98,15 +98,15 @@ ValueImp* FunctionProtoFuncImp::callAsFunction(ExecState* exec,
       }
       if (thisObj->inherits(&DeclaredFunctionImp::info)) {
         DeclaredFunctionImp* fi = static_cast<DeclaredFunctionImp*>(thisObj);
-        return String("function " + fi->name().ustring() + "(" +
-                      fi->parameterString() + ") " + fi->body->toString());
+        return jsString("function " + fi->name().ustring() + "(" +
+                        fi->parameterString() + ") " + fi->body->toString());
       } else if (thisObj->inherits(&FunctionImp::info) &&
                  !static_cast<FunctionImp*>(thisObj)->name().isNull()) {
-        result =
-            String("function " +
-                   static_cast<FunctionImp*>(thisObj)->name().ustring() + "()");
+        result = jsString("function " +
+                          static_cast<FunctionImp*>(thisObj)->name().ustring() +
+                          "()");
       } else {
-        result = String("(Internal Function)");
+        result = jsString("(Internal Function)");
       }
     } break;
     case Apply: {
@@ -168,7 +168,7 @@ FunctionObjectImp::FunctionObjectImp(ExecState* exec,
   putDirect(prototypePropertyName, funcProto, DontEnum | DontDelete | ReadOnly);
 
   // no. of arguments for constructor
-  putDirect(lengthPropertyName, jsOne(), ReadOnly | DontDelete | DontEnum);
+  putDirect(lengthPropertyName, jsNumber(1), ReadOnly | DontDelete | DontEnum);
 }
 
 FunctionObjectImp::~FunctionObjectImp() {}

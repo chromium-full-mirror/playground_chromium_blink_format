@@ -150,7 +150,7 @@ ValueImp* ObjectImp::get(ExecState* exec,
   if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, propertyName);
 
-  return Undefined();
+  return jsUndefined();
 }
 
 ValueImp* ObjectImp::get(ExecState* exec, unsigned propertyName) const {
@@ -158,7 +158,7 @@ ValueImp* ObjectImp::get(ExecState* exec, unsigned propertyName) const {
   if (const_cast<ObjectImp*>(this)->getPropertySlot(exec, propertyName, slot))
     return slot.getValue(exec, propertyName);
 
-  return Undefined();
+  return jsUndefined();
 }
 
 bool ObjectImp::getPropertySlot(ExecState* exec,
@@ -511,12 +511,12 @@ ObjectImp* Error::create(ExecState* exec,
   ObjectImp* err = static_cast<ObjectImp*>(cons->construct(exec, args));
 
   if (lineno != -1)
-    err->put(exec, "line", Number(lineno));
+    err->put(exec, "line", jsNumber(lineno));
   if (sourceId != -1)
-    err->put(exec, "sourceId", Number(sourceId));
+    err->put(exec, "sourceId", jsNumber(sourceId));
 
   if (sourceURL)
-    err->put(exec, "sourceURL", String(*sourceURL));
+    err->put(exec, "sourceURL", jsString(*sourceURL));
 
   return err;
 

@@ -366,7 +366,7 @@ inline ObjectImp* cacheGlobalObject(ExecState* exec,
   class ClassFunc : public DOMFunction {                             \
    public:                                                           \
     ClassFunc(ExecState* exec, int i, int len) : id(i) {             \
-      put(exec, lengthPropertyName, Number(len),                     \
+      put(exec, lengthPropertyName, jsNumber(len),                   \
           DontDelete | ReadOnly | DontEnum);                         \
     }                                                                \
     /* Macro user needs to implement the callAsFunction function. */ \

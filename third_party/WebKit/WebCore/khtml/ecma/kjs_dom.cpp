@@ -279,11 +279,11 @@ ValueImp* DOMNode::getValueProperty(ExecState* exec, int token) const {
   NodeImpl& node = *m_impl;
   switch (token) {
     case NodeName:
-      return getStringOrNull(node.nodeName());
+      return jsStringOrNull(node.nodeName());
     case NodeValue:
-      return getStringOrNull(node.nodeValue());
+      return jsStringOrNull(node.nodeValue());
     case NodeType:
-      return Number(node.nodeType());
+      return jsNumber(node.nodeType());
     case ParentNode:
     case ParentElement:  // IE only apparently
       return getDOMNode(exec, node.parentNode());
@@ -300,15 +300,15 @@ ValueImp* DOMNode::getValueProperty(ExecState* exec, int token) const {
     case Attributes:
       return getDOMNamedNodeMap(exec, node.attributes());
     case NamespaceURI:
-      return getStringOrNull(node.namespaceURI());
+      return jsStringOrNull(node.namespaceURI());
     case Prefix:
-      return getStringOrNull(node.prefix());
+      return jsStringOrNull(node.prefix());
     case LocalName:
-      return getStringOrNull(node.localName());
+      return jsStringOrNull(node.localName());
     case OwnerDocument:
       return getDOMNode(exec, node.ownerDocument());
     case TextContent:
-      return getStringOrNull(node.textContent());
+      return jsStringOrNull(node.textContent());
     case OnAbort:
       return getListener(abortEvent);
     case OnBlur:
@@ -435,11 +435,11 @@ ValueImp* DOMNode::getValueProperty(ExecState* exec, int token) const {
           return rend ? jsNumber(rend->scrollHeight())
                       : static_cast<ValueImp*>(jsUndefined());
         case ScrollLeft:
-          return Number(rend && rend->layer() ? rend->layer()->scrollXOffset()
-                                              : 0);
+          return jsNumber(rend && rend->layer() ? rend->layer()->scrollXOffset()
+                                                : 0);
         case ScrollTop:
-          return Number(rend && rend->layer() ? rend->layer()->scrollYOffset()
-                                              : 0);
+          return jsNumber(rend && rend->layer() ? rend->layer()->scrollYOffset()
+                                                : 0);
         default:
           kdWarning() << "Unhandled token in DOMNode::getValueProperty : "
                       << token << endl;
@@ -623,9 +623,9 @@ void DOMNode::putValueProperty(ExecState* exec,
 
 ValueImp* DOMNode::toPrimitive(ExecState* exec, Type /*preferred*/) const {
   if (!m_impl)
-    return Null();
+    return jsNull();
 
-  return String(toString(exec));
+  return jsString(toString(exec));
 }
 
 UString DOMNode::toString(ExecState*) const {
@@ -648,7 +648,7 @@ ValueImp* DOMNode::getListener(const AtomicString& eventType) const {
   if (jsListener && jsListener->listenerObjImp())
     return jsListener->listenerObj();
   else
-    return Null();
+    return jsNull();
 }
 
 void DOMNode::pushEventHandlerScope(ExecState*, ScopeChain&) const {}
@@ -662,31 +662,31 @@ ValueImp* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
   NodeImpl& node = *static_cast<DOMNode*>(thisObj)->impl();
   switch (id) {
     case DOMNode::HasAttributes:
-      return Boolean(node.hasAttributes());
+      return jsBoolean(node.hasAttributes());
     case DOMNode::HasChildNodes:
-      return Boolean(node.hasChildNodes());
+      return jsBoolean(node.hasChildNodes());
     case DOMNode::CloneNode:
       return getDOMNode(exec, node.cloneNode(args[0]->toBoolean(exec)));
     case DOMNode::Normalize:
       node.normalize();
-      return Undefined();
+      return jsUndefined();
     case DOMNode::IsSupported:
-      return Boolean(node.isSupported(
+      return jsBoolean(node.isSupported(
           args[0]->toString(exec).domString(),
           args[1]->isUndefinedOrNull() ? DOMString()
                                        : args[1]->toString(exec).domString()));
     case DOMNode::IsSameNode:
-      return Boolean(node.isSameNode(toNode(args[0])));
+      return jsBoolean(node.isSameNode(toNode(args[0])));
     case DOMNode::IsEqualNode:
-      return Boolean(node.isEqualNode(toNode(args[0])));
+      return jsBoolean(node.isEqualNode(toNode(args[0])));
     case DOMNode::IsDefaultNamespace:
-      return Boolean(
+      return jsBoolean(
           node.isDefaultNamespace(valueToStringWithNullCheck(exec, args[0])));
     case DOMNode::LookupNamespaceURI:
-      return getStringOrNull(
+      return jsStringOrNull(
           node.lookupNamespaceURI(valueToStringWithNullCheck(exec, args[0])));
     case DOMNode::LookupPrefix:
-      return getStringOrNull(
+      return jsStringOrNull(
           node.lookupPrefix(valueToStringWithNullCheck(exec, args[0])));
     case DOMNode::AddEventListener: {
       JSEventListener* listener =
@@ -694,7 +694,7 @@ ValueImp* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
       if (listener)
         node.addEventListener(AtomicString(args[0]->toString(exec).domString()),
                               listener, args[2]->toBoolean(exec));
-      return Undefined();
+      return jsUndefined();
     }
     case DOMNode::RemoveEventListener: {
       JSEventListener* listener =
@@ -703,10 +703,10 @@ ValueImp* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
         node.removeEventListener(
             AtomicString(args[0]->toString(exec).domString()), listener,
             args[2]->toBoolean(exec));
-      return Undefined();
+      return jsUndefined();
     }
     case DOMNode::DispatchEvent:
-      return Boolean(node.dispatchEvent(toEvent(args[0]), exception));
+      return jsBoolean(node.dispatchEvent(toEvent(args[0]), exception));
     case DOMNode::AppendChild:
       return getDOMNode(exec, node.appendChild(toNode(args[0]), exception));
     case DOMNode::RemoveChild:
@@ -720,15 +720,15 @@ ValueImp* DOMNodeProtoFunc::callAsFunction(ExecState* exec,
     case DOMNode::Contains:
       if (node.isElementNode())
         if (NodeImpl* node0 = toNode(args[0]))
-          return Boolean(node.isAncestor(node0));
+          return jsBoolean(node.isAncestor(node0));
       // FIXME: Is there a good reason to return undefined rather than false
       // when the parameter is not a node? When the object is not an element?
-      return Undefined();
+      return jsUndefined();
     case DOMNode::Item:
       return thisObj->get(exec, args[0]->toInt32(exec));
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 NodeImpl* toNode(ValueImp* val) {
@@ -756,14 +756,14 @@ DOMNodeList::~DOMNodeList() {
 
 ValueImp* DOMNodeList::toPrimitive(ExecState* exec, Type /*preferred*/) const {
   if (!m_impl)
-    return Null();
+    return jsNull();
 
-  return String(toString(exec));
+  return jsString(toString(exec));
 }
 
 ValueImp* DOMNodeList::getValueProperty(ExecState* exec, int token) const {
   assert(token == Length);
-  return Number(m_impl->length());
+  return jsNumber(m_impl->length());
 }
 
 ValueImp* DOMNodeList::indexGetter(ExecState* exec,
@@ -820,7 +820,7 @@ ValueImp* DOMNodeList::callAsFunction(ExecState* exec,
   if (ok)
     return getDOMNode(exec, m_impl->item(u));
 
-  return Undefined();
+  return jsUndefined();
 }
 
 // Not a prototype class currently, but should probably be converted to one
@@ -863,11 +863,11 @@ ValueImp* DOMAttr::getValueProperty(ExecState* exec, int token) const {
   AttrImpl* attr = static_cast<AttrImpl*>(impl());
   switch (token) {
     case Name:
-      return getStringOrNull(attr->name());
+      return jsStringOrNull(attr->name());
     case Specified:
-      return Boolean(attr->specified());
+      return jsBoolean(attr->specified());
     case ValueProperty:
-      return getStringOrNull(attr->value());
+      return jsStringOrNull(attr->value());
     case OwnerElement:  // DOM2
       return getDOMNode(exec, attr->ownerElement());
   }
@@ -1003,31 +1003,31 @@ ValueImp* DOMDocument::getValueProperty(ExecState* exec, int token) const {
     case ActualEncoding:
     case InputEncoding:
       if (Decoder* decoder = doc.decoder())
-        return String(decoder->encoding());
-      return Null();
+        return jsString(decoder->encoding());
+      return jsNull();
     case DefaultCharset:
       if (KHTMLPart* part = doc.part())
-        return String(part->settings()->encoding());
-      return Undefined();
+        return jsString(part->settings()->encoding());
+      return jsUndefined();
     case StyleSheets:
       // kdDebug() << "DOMDocument::StyleSheets, returning " <<
       // doc.styleSheets().length() << " stylesheets" << endl;
       return getDOMStyleSheetList(exec, doc.styleSheets(), &doc);
     case PreferredStylesheetSet:
-      return getStringOrNull(doc.preferredStylesheetSet());
+      return jsStringOrNull(doc.preferredStylesheetSet());
     case SelectedStylesheetSet:
-      return getStringOrNull(doc.selectedStylesheetSet());
+      return jsStringOrNull(doc.selectedStylesheetSet());
     case ReadyState:
       if (KHTMLPart* part = doc.part()) {
         if (part->d->m_bComplete)
-          return String("complete");
+          return jsString("complete");
         if (doc.parsing())
-          return String("loading");
-        return String("loaded");
+          return jsString("loading");
+        return jsString("loaded");
         // What does the interactive value mean ?
         // Missing support for "uninitialized"
       }
-      return Undefined();
+      return jsUndefined();
     case DOMDocument::DefaultView:  // DOM2
       return getDOMAbstractView(exec, doc.defaultView());
     default:
@@ -1156,26 +1156,26 @@ ValueImp* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
             exec, doc.getOverrideStyle(element0,
                                        args[1]->toString(exec).domString()));
       // FIXME: Is undefined right here, or should we raise an exception?
-      return Undefined();
+      return jsUndefined();
     case DOMDocument::ExecCommand: {
-      return Boolean(doc.execCommand(args[0]->toString(exec).domString(),
-                                     args[1]->toBoolean(exec),
-                                     args[2]->toString(exec).domString()));
+      return jsBoolean(doc.execCommand(args[0]->toString(exec).domString(),
+                                       args[1]->toBoolean(exec),
+                                       args[2]->toString(exec).domString()));
     }
     case DOMDocument::QueryCommandEnabled: {
-      return Boolean(
+      return jsBoolean(
           doc.queryCommandEnabled(args[0]->toString(exec).domString()));
     }
     case DOMDocument::QueryCommandIndeterm: {
-      return Boolean(
+      return jsBoolean(
           doc.queryCommandIndeterm(args[0]->toString(exec).domString()));
     }
     case DOMDocument::QueryCommandState: {
-      return Boolean(
+      return jsBoolean(
           doc.queryCommandState(args[0]->toString(exec).domString()));
     }
     case DOMDocument::QueryCommandSupported: {
-      return Boolean(
+      return jsBoolean(
           doc.queryCommandSupported(args[0]->toString(exec).domString()));
     }
     case DOMDocument::QueryCommandValue: {
@@ -1186,15 +1186,15 @@ ValueImp* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
       // "If not supported [for a command identifier], this method returns a
       // Boolean set to false."
       if (commandValue.isNull())
-        return Boolean(false);
+        return jsBoolean(false);
       else
-        return String(commandValue);
+        return jsString(commandValue);
     }
     default:
       break;
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 // -------------------------------------------------------------------------
@@ -1252,12 +1252,12 @@ ValueImp* DOMElement::getValueProperty(ExecState* exec, int token) const {
   ElementImpl* element = static_cast<ElementImpl*>(impl());
   switch (token) {
     case TagName:
-      return getStringOrNull(element->nodeName());
+      return jsStringOrNull(element->nodeName());
     case Style:
       return getDOMCSSStyleDeclaration(exec, element->style());
     default:
       assert(0);
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -1268,7 +1268,7 @@ ValueImp* DOMElement::attributeGetter(ExecState* exec,
 
   ElementImpl* element = static_cast<ElementImpl*>(thisObj->impl());
   DOM::DOMString attr = element->getAttribute(propertyName.domString());
-  return getStringOrNull(attr);
+  return jsStringOrNull(attr);
 }
 
 bool DOMElement::getOwnPropertySlot(ExecState* exec,
@@ -1317,18 +1317,18 @@ ValueImp* DOMElementProtoFunc::callAsFunction(ExecState* exec,
 
   switch (id) {
     case DOMElement::GetAttribute:
-      // getStringOrNull should be used here, since if the attribute isn't
+      // jsStringOrNull should be used here, since if the attribute isn't
       // present at all, you should
       // return null and not "".
-      return getStringOrNull(
+      return jsStringOrNull(
           element.getAttribute(args[0]->toString(exec).domString()));
     case DOMElement::SetAttribute:
       element.setAttribute(args[0]->toString(exec).domString(),
                            args[1]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMElement::RemoveAttribute:
       element.removeAttribute(args[0]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMElement::GetAttributeNode:
       return getDOMNode(
           exec, element.getAttributeNode(args[0]->toString(exec).domString()));
@@ -1344,21 +1344,22 @@ ValueImp* DOMElementProtoFunc::callAsFunction(ExecState* exec,
           element.getElementsByTagName(args[0]->toString(exec).domString())
               .get());
     case DOMElement::HasAttribute:  // DOM2
-      return Boolean(element.hasAttribute(args[0]->toString(exec).domString()));
+      return jsBoolean(
+          element.hasAttribute(args[0]->toString(exec).domString()));
     case DOMElement::GetAttributeNS:  // DOM2
-      return String(element
-                        .getAttributeNS(args[0]->toString(exec).domString(),
-                                        args[1]->toString(exec).domString())
-                        .domString());
+      return jsString(element
+                          .getAttributeNS(args[0]->toString(exec).domString(),
+                                          args[1]->toString(exec).domString())
+                          .domString());
     case DOMElement::SetAttributeNS:  // DOM2
       element.setAttributeNS(valueToStringWithNullCheck(exec, args[0]),
                              args[1]->toString(exec).domString(),
                              args[2]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMElement::RemoveAttributeNS:  // DOM2
       element.removeAttributeNS(args[0]->toString(exec).domString(),
                                 args[1]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMElement::GetAttributeNodeNS:  // DOM2
       return getDOMNode(exec, element.getAttributeNodeNS(
                                   args[0]->toString(exec).domString(),
@@ -1373,13 +1374,13 @@ ValueImp* DOMElementProtoFunc::callAsFunction(ExecState* exec,
                                             args[1]->toString(exec).domString())
                     .get());
     case DOMElement::HasAttributeNS:  // DOM2
-      return Boolean(
+      return jsBoolean(
           element.hasAttributeNS(args[0]->toString(exec).domString(),
                                  args[1]->toString(exec).domString()));
     case DOMElement::ScrollIntoView:
       element.scrollIntoView(args[0]->isUndefinedOrNull() ||
                              args[0]->toBoolean(exec));
-      return Undefined();
+      return jsUndefined();
     case DOMElement::ScrollByLines:
     case DOMElement::ScrollByPages:
       if (DocumentImpl* doc = element.getDocument()) {
@@ -1397,15 +1398,15 @@ ValueImp* DOMElementProtoFunc::callAsFunction(ExecState* exec,
             rend->layer()->scroll(direction, granularity, multiplier);
           }
       }
-      return Undefined();
+      return jsUndefined();
     case DOMElement::ElementFocus:
       element.focus();
-      return Undefined();
+      return jsUndefined();
     case DOMElement::ElementBlur:
       element.blur();
-      return Undefined();
+      return jsUndefined();
     default:
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -1460,7 +1461,7 @@ ValueImp* DOMDOMImplementationProtoFunc::callAsFunction(ExecState* exec,
 
   switch (id) {
     case DOMDOMImplementation::HasFeature:
-      return Boolean(implementation.hasFeature(
+      return jsBoolean(implementation.hasFeature(
           args[0]->toString(exec).domString(),
           args[1]->isUndefinedOrNull() ? DOMString()
                                        : args[1]->toString(exec).domString()));
@@ -1486,7 +1487,7 @@ ValueImp* DOMDOMImplementationProtoFunc::callAsFunction(ExecState* exec,
     default:
       break;
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 // -------------------------------------------------------------------------
@@ -1519,17 +1520,17 @@ ValueImp* DOMDocumentType::getValueProperty(ExecState* exec, int token) const {
   DocumentTypeImpl& type = *static_cast<DocumentTypeImpl*>(impl());
   switch (token) {
     case Name:
-      return getStringOrNull(type.name());
+      return jsStringOrNull(type.name());
     case Entities:
       return getDOMNamedNodeMap(exec, type.entities());
     case Notations:
       return getDOMNamedNodeMap(exec, type.notations());
     case PublicId:  // DOM2
-      return getStringOrNull(type.publicId());
+      return jsStringOrNull(type.publicId());
     case SystemId:  // DOM2
-      return getStringOrNull(type.systemId());
+      return jsStringOrNull(type.systemId());
     case InternalSubset:  // DOM2
-      return getStringOrNull(type.internalSubset());
+      return jsStringOrNull(type.internalSubset());
     default:
       kdWarning() << "DOMDocumentType::getValueProperty unhandled token "
                   << token << endl;
@@ -1583,7 +1584,7 @@ ValueImp* DOMNamedNodeMap::lengthGetter(ExecState* exec,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
-  return Number(thisObj->m_impl->length());
+  return jsNumber(thisObj->m_impl->length());
 }
 
 ValueImp* DOMNamedNodeMap::indexGetter(ExecState* exec,
@@ -1670,7 +1671,7 @@ ValueImp* DOMNamedNodeMapProtoFunc::callAsFunction(ExecState* exec,
       break;
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 // -------------------------------------------------------------------------
@@ -1705,9 +1706,9 @@ ValueImp* DOMProcessingInstruction::getValueProperty(ExecState* exec,
       static_cast<ProcessingInstructionImpl*>(impl());
   switch (token) {
     case Target:
-      return getStringOrNull(pi->target());
+      return jsStringOrNull(pi->target());
     case Data:
-      return getStringOrNull(pi->data());
+      return jsStringOrNull(pi->data());
     case Sheet:
       return getDOMStyleSheet(exec, pi->sheet());
     default:
@@ -1756,9 +1757,9 @@ bool DOMNotation::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMNotation::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case PublicId:
-      return getStringOrNull(static_cast<NotationImpl*>(impl())->publicId());
+      return jsStringOrNull(static_cast<NotationImpl*>(impl())->publicId());
     case SystemId:
-      return getStringOrNull(static_cast<NotationImpl*>(impl())->systemId());
+      return jsStringOrNull(static_cast<NotationImpl*>(impl())->systemId());
     default:
       kdWarning() << "DOMNotation::getValueProperty unhandled token " << token
                   << endl;
@@ -1790,11 +1791,11 @@ bool DOMEntity::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMEntity::getValueProperty(ExecState*, int token) const {
   switch (token) {
     case PublicId:
-      return getStringOrNull(static_cast<EntityImpl*>(impl())->publicId());
+      return jsStringOrNull(static_cast<EntityImpl*>(impl())->publicId());
     case SystemId:
-      return getStringOrNull(static_cast<EntityImpl*>(impl())->systemId());
+      return jsStringOrNull(static_cast<EntityImpl*>(impl())->systemId());
     case NotationName:
-      return getStringOrNull(static_cast<EntityImpl*>(impl())->notationName());
+      return jsStringOrNull(static_cast<EntityImpl*>(impl())->notationName());
     default:
       kdWarning() << "DOMEntity::getValueProperty unhandled token " << token
                   << endl;
@@ -1845,7 +1846,7 @@ bool checkNodeSecurity(ExecState* exec, NodeImpl* n) {
 ValueImp* getDOMNode(ExecState* exec, NodeImpl* n) {
   DOMNode* ret = 0;
   if (!n)
-    return Null();
+    return jsNull();
   ScriptInterpreter* interp =
       static_cast<ScriptInterpreter*>(exec->dynamicInterpreter());
   DocumentImpl* doc = n->getDocument();
@@ -1970,7 +1971,7 @@ bool NodeConstructor::getOwnPropertySlot(ExecState* exec,
 
 ValueImp* NodeConstructor::getValueProperty(ExecState*, int token) const {
   // We use the token as the value to return directly
-  return Number((unsigned int)token);
+  return jsNumber(token);
 }
 
 ObjectImp* getNodeConstructor(ExecState* exec) {
@@ -2027,7 +2028,7 @@ bool DOMExceptionConstructor::getOwnPropertySlot(ExecState* exec,
 ValueImp* DOMExceptionConstructor::getValueProperty(ExecState*,
                                                     int token) const {
   // We use the token as the value to return directly
-  return Number((unsigned int)token);
+  return jsNumber(token);
 }
 
 ObjectImp* getDOMExceptionConstructor(ExecState* exec) {
@@ -2051,7 +2052,7 @@ ValueImp* DOMNamedNodesCollection::lengthGetter(ExecState* exec,
                                                 const PropertySlot& slot) {
   DOMNamedNodesCollection* thisObj =
       static_cast<DOMNamedNodesCollection*>(slot.slotBase());
-  return Number(thisObj->m_nodes.count());
+  return jsNumber(thisObj->m_nodes.count());
 }
 
 ValueImp* DOMNamedNodesCollection::indexGetter(ExecState* exec,
@@ -2137,9 +2138,9 @@ ValueImp* DOMCharacterData::getValueProperty(ExecState*, int token) const {
   CharacterDataImpl& data = *static_cast<CharacterDataImpl*>(impl());
   switch (token) {
     case Data:
-      return String(data.data());
+      return jsString(data.data());
     case Length:
-      return Number(data.length());
+      return jsNumber(data.length());
     default:
       kdWarning() << "Unhandled token in DOMCharacterData::getValueProperty : "
                   << token << endl;
@@ -2173,23 +2174,23 @@ ValueImp* DOMCharacterDataProtoFunc::callAsFunction(ExecState* exec,
       if (count < 0)
         setDOMException(exec, DOMException::INDEX_SIZE_ERR);
       else
-        return getStringOrNull(
+        return jsStringOrNull(
             data.substringData(args[0]->toInt32(exec), count, exception));
     }
     case DOMCharacterData::AppendData:
       data.appendData(args[0]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMCharacterData::InsertData:
       data.insertData(args[0]->toInt32(exec),
                       args[1]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     case DOMCharacterData::DeleteData: {
       const int count = args[1]->toInt32(exec);
       if (count < 0)
         setDOMException(exec, DOMException::INDEX_SIZE_ERR);
       else
         data.deleteData(args[0]->toInt32(exec), count, exception);
-      return Undefined();
+      return jsUndefined();
     }
     case DOMCharacterData::ReplaceData: {
       const int count = args[1]->toInt32(exec);
@@ -2198,10 +2199,10 @@ ValueImp* DOMCharacterDataProtoFunc::callAsFunction(ExecState* exec,
       else
         data.replaceData(args[0]->toInt32(exec), count,
                          args[2]->toString(exec).domString(), exception);
-      return Undefined();
+      return jsUndefined();
     }
     default:
-      return Undefined();
+      return jsUndefined();
   }
 }
 
@@ -2236,7 +2237,7 @@ ValueImp* DOMTextProtoFunc::callAsFunction(ExecState* exec,
       return getDOMNode(exec,
                         text.splitText(args[0]->toInt32(exec), exception));
   }
-  return Undefined();
+  return jsUndefined();
 }
 
 }  // namespace

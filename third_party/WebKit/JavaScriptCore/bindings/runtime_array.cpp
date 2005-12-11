@@ -48,7 +48,7 @@ ValueImp* RuntimeArrayImp::lengthGetter(ExecState* exec,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   RuntimeArrayImp* thisObj = static_cast<RuntimeArrayImp*>(slot.slotBase());
-  return Number(thisObj->getLength());
+  return jsNumber(thisObj->getLength());
 }
 
 ValueImp* RuntimeArrayImp::indexGetter(ExecState* exec,

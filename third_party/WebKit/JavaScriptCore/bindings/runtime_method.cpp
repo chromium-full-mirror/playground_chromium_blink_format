@@ -52,7 +52,7 @@ ValueImp* RuntimeMethodImp::lengthGetter(ExecState* exec,
   // Java does.
   // FIXME: a better solution might be to give the maximum number of parameters
   // of any method
-  return Number(thisObj->_methodList.methodAt(0)->numParameters());
+  return jsNumber(thisObj->_methodList.methodAt(0)->numParameters());
 }
 
 bool RuntimeMethodImp::getOwnPropertySlot(ExecState* exec,
@@ -97,7 +97,7 @@ ValueImp* RuntimeMethodImp::callAsFunction(ExecState* exec,
     }
   }
 
-  return Undefined();
+  return jsUndefined();
 }
 
 CodeType RuntimeMethodImp::codeType() const {
@@ -105,5 +105,5 @@ CodeType RuntimeMethodImp::codeType() const {
 }
 
 Completion RuntimeMethodImp::execute(ExecState* exec) {
-  return Completion(Normal, Undefined());
+  return Completion(Normal, jsUndefined());
 }
