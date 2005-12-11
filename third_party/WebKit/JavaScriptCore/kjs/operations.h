@@ -26,7 +26,7 @@
 namespace KJS {
 
 class ExecState;
-class ValueImp;
+class JSValue;
 
 #if APPLE_CHANGES
 inline bool isNaN(double d) {
@@ -54,8 +54,8 @@ bool isPosInf(double d);
 bool isNegInf(double d);
 #endif
 
-bool equal(ExecState* exec, ValueImp* v1, ValueImp* v2);
-bool strictEqual(ExecState* exec, ValueImp* v1, ValueImp* v2);
+bool equal(ExecState* exec, JSValue* v1, JSValue* v2);
+bool strictEqual(ExecState* exec, JSValue* v1, JSValue* v2);
 /**
  * This operator performs an abstract relational comparison of the two
  * arguments that can be of arbitrary type. If possible, conversions to the
@@ -64,7 +64,7 @@ bool strictEqual(ExecState* exec, ValueImp* v1, ValueImp* v2);
  * @return 1 if v1 is "less-than" v2, 0 if the relation is "greater-than-or-
  * equal". -1 if the result is undefined.
  */
-int relation(ExecState* exec, ValueImp* v1, ValueImp* v2);
+int relation(ExecState* exec, JSValue* v1, JSValue* v2);
 int maxInt(int d1, int d2);
 int minInt(int d1, int d2);
 /**
@@ -73,7 +73,7 @@ int minInt(int d1, int d2);
  * @param oper '+' or '-' for an addition or substraction, respectively.
  * @return The result of the operation.
  */
-ValueImp* add(ExecState* exec, ValueImp* v1, ValueImp* v2, char oper);
+JSValue* add(ExecState* exec, JSValue* v1, JSValue* v2, char oper);
 /**
  * Multiplicative operator. Either multiplies/divides v1 and v2 or
  * calculates the remainder from an division.
@@ -81,7 +81,7 @@ ValueImp* add(ExecState* exec, ValueImp* v1, ValueImp* v2, char oper);
  * modulo operation.
  * @return The result of the operation.
  */
-ValueImp* mult(ExecState* exec, ValueImp* v1, ValueImp* v2, char oper);
+JSValue* mult(ExecState* exec, JSValue* v1, JSValue* v2, char oper);
 };
 
 #endif

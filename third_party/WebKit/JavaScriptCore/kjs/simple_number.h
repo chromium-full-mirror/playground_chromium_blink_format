@@ -47,7 +47,7 @@ using std::signbit;
 
 namespace KJS {
 
-class ValueImp;
+class JSValue;
 
 class SimpleNumber {
  public:
@@ -57,10 +57,10 @@ class SimpleNumber {
       3;  // 11 is the tag mask, since it's 2 bits long.
 
   ALWAYS_INLINE
-  static ValueImp* make(double d) {
+  static JSValue* make(double d) {
     if (sizeof(float) == sizeof(unsigned long) &&
         sizeof(double) == sizeof(unsigned long long) &&
-        sizeof(ValueImp*) >= sizeof(unsigned long)) {
+        sizeof(JSValue*) >= sizeof(unsigned long)) {
       // 32-bit
       union {
         unsigned long asBits;
@@ -81,9 +81,9 @@ class SimpleNumber {
       if (doubleUnion1.asBits != doubleUnion2.asBits)
         return 0;
 
-      return reinterpret_cast<ValueImp*>(floatUnion.asBits | tag);
+      return reinterpret_cast<JSValue*>(floatUnion.asBits | tag);
     } else if (sizeof(double) == sizeof(unsigned long) &&
-               sizeof(ValueImp*) >= sizeof(unsigned long)) {
+               sizeof(JSValue*) >= sizeof(unsigned long)) {
       // 64-bit
       union {
         unsigned long asBits;
@@ -94,7 +94,7 @@ class SimpleNumber {
       if ((doubleUnion.asBits & tagMask) != 0)
         return 0;
 
-      return reinterpret_cast<ValueImp*>(doubleUnion.asBits | tag);
+      return reinterpret_cast<JSValue*>(doubleUnion.asBits | tag);
     } else {
       // could just return 0 here, but nicer to be explicit about not supporting
       // the platform well
@@ -102,12 +102,12 @@ class SimpleNumber {
     }
   }
 
-  static bool is(const ValueImp* imp) {
+  static bool is(const JSValue* imp) {
     return (reinterpret_cast<unsigned long>(imp) & tagMask) == tag;
   }
 
   ALWAYS_INLINE
-  static double value(const ValueImp* imp) {
+  static double value(const JSValue* imp) {
     assert(is(imp));
 
     if (sizeof(float) == sizeof(unsigned long)) {

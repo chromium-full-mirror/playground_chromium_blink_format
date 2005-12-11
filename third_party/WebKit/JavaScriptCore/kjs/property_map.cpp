@@ -93,7 +93,7 @@ struct PropertyMapHashTable {
 class SavedProperty {
  public:
   Identifier key;
-  ProtectedPtr<ValueImp> value;
+  ProtectedPtr<JSValue> value;
   int attributes;
 };
 
@@ -153,7 +153,7 @@ void PropertyMap::clear() {
   _table->sentinelCount = 0;
 }
 
-ValueImp* PropertyMap::get(const Identifier& name, int& attributes) const {
+JSValue* PropertyMap::get(const Identifier& name, int& attributes) const {
   assert(!name.isNull());
 
   UString::Rep* rep = name._ustring.rep();
@@ -193,7 +193,7 @@ ValueImp* PropertyMap::get(const Identifier& name, int& attributes) const {
   return 0;
 }
 
-ValueImp* PropertyMap::get(const Identifier& name) const {
+JSValue* PropertyMap::get(const Identifier& name) const {
   assert(!name.isNull());
 
   UString::Rep* rep = name._ustring.rep();
@@ -229,7 +229,7 @@ ValueImp* PropertyMap::get(const Identifier& name) const {
   return 0;
 }
 
-ValueImp** PropertyMap::getLocation(const Identifier& name) {
+JSValue** PropertyMap::getLocation(const Identifier& name) {
   assert(!name.isNull());
 
   UString::Rep* rep = name._ustring.rep();
@@ -284,7 +284,7 @@ static void printAttributes(int attributes) {
 }
 #endif
 
-void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
+void PropertyMap::put(const Identifier& name, JSValue* value, int attributes) {
   assert(!name.isNull());
   assert(value != 0);
 
@@ -370,7 +370,7 @@ void PropertyMap::put(const Identifier& name, ValueImp* value, int attributes) {
 }
 
 void PropertyMap::insert(UString::Rep* key,
-                         ValueImp* value,
+                         JSValue* value,
                          int attributes,
                          int index) {
   assert(_table);
@@ -527,7 +527,7 @@ void PropertyMap::mark() const {
   if (!_table) {
 #if USE_SINGLE_ENTRY
     if (_singleEntry.key) {
-      ValueImp* v = _singleEntry.value;
+      JSValue* v = _singleEntry.value;
       if (!v->marked())
         v->mark();
     }
@@ -538,7 +538,7 @@ void PropertyMap::mark() const {
   int minimumKeysToProcess = _table->keyCount;
   Entry* entries = _table->entries;
   for (int i = 0; i < minimumKeysToProcess; i++) {
-    ValueImp* v = entries[i].value;
+    JSValue* v = entries[i].value;
     if (v) {
       if (!v->marked())
         v->mark();
@@ -559,7 +559,7 @@ static int comparePropertyMapEntryIndices(const void* a, const void* b) {
 }
 
 void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
-                                                ObjectImp* base) const {
+                                                JSObject* base) const {
   if (!_table) {
 #if USE_SINGLE_ENTRY
     UString::Rep* key = _singleEntry.key;
@@ -603,7 +603,7 @@ void PropertyMap::addEnumerablesToReferenceList(ReferenceList& list,
 
 void PropertyMap::addSparseArrayPropertiesToReferenceList(
     ReferenceList& list,
-    ObjectImp* base) const {
+    JSObject* base) const {
   if (!_table) {
 #if USE_SINGLE_ENTRY
     UString::Rep* key = _singleEntry.key;

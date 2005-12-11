@@ -28,7 +28,7 @@ namespace KJS {
 class DebuggerImp;
 class Interpreter;
 class ExecState;
-class ObjectImp;
+class JSObject;
 class UString;
 class List;
 
@@ -145,7 +145,7 @@ class Debugger {
   virtual bool exception(ExecState* exec,
                          int sourceId,
                          int lineno,
-                         ObjectImp* exceptionObj);
+                         JSObject* exceptionObj);
 
   /**
    * Called when a line of the script is reached (before it is executed)
@@ -189,7 +189,7 @@ class Debugger {
   virtual bool callEvent(ExecState* exec,
                          int sourceId,
                          int lineno,
-                         ObjectImp* function,
+                         JSObject* function,
                          const List& args);
 
   /**
@@ -213,7 +213,7 @@ class Debugger {
   virtual bool returnEvent(ExecState* exec,
                            int sourceId,
                            int lineno,
-                           ObjectImp* function);
+                           JSObject* function);
 
  private:
   DebuggerImp* rep;

@@ -27,15 +27,15 @@
 
 namespace KJS {
 
-class StringInstanceImp : public ObjectImp {
+class StringInstance : public JSObject {
  public:
-  StringInstanceImp(ObjectImp* proto);
-  StringInstanceImp(ObjectImp* proto, const UString& string);
+  StringInstance(JSObject* proto);
+  StringInstance(JSObject* proto, const UString& string);
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   ValueImp* value,
+                   JSValue* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
 
@@ -43,12 +43,12 @@ class StringInstanceImp : public ObjectImp {
   static const ClassInfo info;
 
  private:
-  static ValueImp* lengthGetter(ExecState* exec,
-                                const Identifier&,
-                                const PropertySlot& slot);
-  static ValueImp* indexGetter(ExecState* exec,
+  static JSValue* lengthGetter(ExecState* exec,
                                const Identifier&,
                                const PropertySlot& slot);
+  static JSValue* indexGetter(ExecState* exec,
+                              const Identifier&,
+                              const PropertySlot& slot);
 };
 
 /**
@@ -57,9 +57,9 @@ class StringInstanceImp : public ObjectImp {
  * The initial value of String.prototype (and thus all objects created
  * with the String constructor
  */
-class StringPrototypeImp : public StringInstanceImp {
+class StringPrototype : public StringInstance {
  public:
-  StringPrototypeImp(ExecState* exec, ObjectPrototypeImp* objProto);
+  StringPrototype(ExecState* exec, ObjectPrototype* objProto);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -71,14 +71,14 @@ class StringPrototypeImp : public StringInstanceImp {
  * Class to implement all methods that are properties of the
  * String.prototype object
  */
-class StringProtoFuncImp : public InternalFunctionImp {
+class StringProtoFunc : public InternalFunctionImp {
  public:
-  StringProtoFuncImp(ExecState* exec, int i, int len);
+  StringProtoFunc(ExecState* exec, int i, int len);
 
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 
   enum {
     ToString,
@@ -129,15 +129,15 @@ class StringProtoFuncImp : public InternalFunctionImp {
 class StringObjectImp : public InternalFunctionImp {
  public:
   StringObjectImp(ExecState* exec,
-                  FunctionPrototypeImp* funcProto,
-                  StringPrototypeImp* stringProto);
+                  FunctionPrototype* funcProto,
+                  StringPrototype* stringProto);
 
   virtual bool implementsConstruct() const;
-  virtual ObjectImp* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 };
 
 /**
@@ -148,11 +148,11 @@ class StringObjectImp : public InternalFunctionImp {
  */
 class StringObjectFuncImp : public InternalFunctionImp {
  public:
-  StringObjectFuncImp(ExecState* exec, FunctionPrototypeImp* funcProto);
+  StringObjectFuncImp(ExecState* exec, FunctionPrototype* funcProto);
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 };
 
 }  // namespace

@@ -87,7 +87,7 @@ static bool _isSafeScript(JavaScriptObject* obj) {
 
 NPObject* _NPN_CreateScriptObject(
     NPP npp,
-    KJS::ObjectImp* imp,
+    KJS::JSObject* imp,
     const KJS::Bindings::RootObject* originExecutionContext,
     const KJS::Bindings::RootObject* executionContext) {
   JavaScriptObject* obj =
@@ -149,7 +149,7 @@ bool _NPN_Invoke(NPP npp,
       // Lookup the function object.
       ExecState* exec = obj->executionContext->interpreter()->globalExec();
       JSLock lock;
-      ValueImp* func =
+      JSValue* func =
           obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
       if (func->isNull()) {
@@ -160,10 +160,10 @@ bool _NPN_Invoke(NPP npp,
         return false;
       } else {
         // Call the function object.
-        ObjectImp* funcImp = static_cast<ObjectImp*>(func);
-        ObjectImp* thisObj = const_cast<ObjectImp*>(obj->imp);
+        JSObject* funcImp = static_cast<JSObject*>(func);
+        JSObject* thisObj = const_cast<JSObject*>(obj->imp);
         List argList = listFromVariantArgs(exec, args, argCount);
-        ValueImp* resultV = funcImp->call(exec, thisObj, argList);
+        JSValue* resultV = funcImp->call(exec, thisObj, argList);
 
         // Convert and return the result of the function call.
         convertValueToNPVariant(exec, resultV, result);
@@ -184,7 +184,7 @@ bool _NPN_Evaluate(NPP npp, NPObject* o, NPString* s, NPVariant* variant) {
       return false;
 
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
-    ValueImp* result;
+    JSValue* result;
 
     JSLock lock;
     NPUTF16* scriptString;
@@ -227,7 +227,7 @@ bool _NPN_GetProperty(NPP npp,
     PrivateIdentifier* i = (PrivateIdentifier*)propertyName;
 
     JSLock lock;
-    ValueImp* result;
+    JSValue* result;
     if (i->isString) {
       result = obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
     } else {
@@ -353,7 +353,7 @@ bool _NPN_HasMethod(NPP npp, NPObject* o, NPIdentifier methodName) {
     ExecState* exec = obj->executionContext->interpreter()->globalExec();
 
     JSLock lock;
-    ValueImp* func =
+    JSValue* func =
         obj->imp->get(exec, identifierFromNPIdentifier(i->value.string));
 
     if (func->isUndefined()) {

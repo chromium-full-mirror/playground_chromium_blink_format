@@ -55,13 +55,13 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
                         NPUTF16** UTF16Chars,
                         unsigned int* UTF16Length);
 void coerceValueToNPVariantStringType(KJS::ExecState* exec,
-                                      KJS::ValueImp* value,
+                                      KJS::JSValue* value,
                                       NPVariant* result);
 void convertValueToNPVariant(KJS::ExecState* exec,
-                             KJS::ValueImp* value,
+                             KJS::JSValue* value,
                              NPVariant* result);
-KJS::ValueImp* convertNPVariantToValue(KJS::ExecState* exec,
-                                       const NPVariant* variant);
+KJS::JSValue* convertNPVariantToValue(KJS::ExecState* exec,
+                                      const NPVariant* variant);
 
 typedef struct {
   union {

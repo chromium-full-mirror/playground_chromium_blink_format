@@ -41,9 +41,9 @@ namespace KJS {
 /**
  * Base class for all objects in this binding.
  */
-class DOMObject : public ObjectImp {
+class DOMObject : public JSObject {
  protected:
-  DOMObject() : ObjectImp() {}
+  DOMObject() : JSObject() {}
 
  public:
   virtual UString toString(ExecState* exec) const;
@@ -52,14 +52,14 @@ class DOMObject : public ObjectImp {
 /**
  * Base class for all functions in this binding.
  */
-class DOMFunction : public ObjectImp {
+class DOMFunction : public JSObject {
  protected:
-  DOMFunction() : ObjectImp() {}
+  DOMFunction() : JSObject() {}
 
  public:
   virtual bool implementsCall() const { return true; }
   virtual bool toBoolean(ExecState*) const { return true; }
-  virtual ValueImp* toPrimitive(ExecState* exec, Type) const {
+  virtual JSValue* toPrimitive(ExecState* exec, Type) const {
     return jsString(toString(exec));
   }
   virtual UString toString(ExecState*) const { return UString("[function]"); }
@@ -74,7 +74,7 @@ class DOMNode;
  */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(ObjectImp* global, KHTMLPart* part);
+  ScriptInterpreter(JSObject* global, KHTMLPart* part);
   virtual ~ScriptInterpreter();
 
   static DOMObject* getDOMObject(void* objectHandle);
@@ -114,17 +114,17 @@ class ScriptInterpreter : public Interpreter {
 
   DOM::EventImpl* getCurrentEvent() const { return m_evt; }
 
-  virtual bool isGlobalObject(ValueImp* v);
-  virtual Interpreter* interpreterForGlobalObject(const ValueImp* imp);
+  virtual bool isGlobalObject(JSValue* v);
+  virtual Interpreter* interpreterForGlobalObject(const JSValue* imp);
   virtual bool isSafeScript(const Interpreter* target);
   virtual void* createLanguageInstanceForValue(
       ExecState* exec,
       int language,
-      ObjectImp* value,
+      JSObject* value,
       const Bindings::RootObject* origin,
       const Bindings::RootObject* current);
   void* createObjcInstanceForValue(ExecState* exec,
-                                   ObjectImp* value,
+                                   JSObject* value,
                                    const Bindings::RootObject* origin,
                                    const Bindings::RootObject* current);
 
@@ -140,7 +140,7 @@ class ScriptInterpreter : public Interpreter {
  * Retrieve from cache, or create, a KJS object around a DOM object
  */
 template <class DOMObj, class KJSDOMObj>
-inline ValueImp* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
+inline JSValue* cacheDOMObject(ExecState* exec, DOMObj* domObj) {
   if (!domObj)
     return jsNull();
   ScriptInterpreter* interp =
@@ -172,17 +172,17 @@ class DOMExceptionTranslator {
 /**
  *  Get a String object, or jsNull() if s is null
  */
-ValueImp* jsStringOrNull(const DOM::DOMString&);
+JSValue* jsStringOrNull(const DOM::DOMString&);
 
 /**
  *  Get a DOMString object or a null DOMString if the value is null
  */
-DOM::DOMString valueToStringWithNullCheck(ExecState* exec, ValueImp* val);
+DOM::DOMString valueToStringWithNullCheck(ExecState* exec, JSValue* val);
 
 /**
  * Convert a KJS value into a QVariant
  */
-QVariant ValueToVariant(ExecState* exec, ValueImp* val);
+QVariant ValueToVariant(ExecState* exec, JSValue* val);
 
 }  // namespace
 

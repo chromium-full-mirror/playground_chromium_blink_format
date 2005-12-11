@@ -34,7 +34,7 @@
 
 #define jlong_to_ptr(a) ((void*)(uintptr_t)(a))
 #define jlong_to_impptr(a) \
-  (static_cast<KJS::ObjectImp*>(((void*)(uintptr_t)(a))))
+  (static_cast<KJS::JSObject*>(((void*)(uintptr_t)(a))))
 #define ptr_to_jlong(a) ((jlong)(uintptr_t)(a))
 
 namespace KJS {
@@ -69,9 +69,9 @@ struct JSObjectCallContext {
 
 typedef struct JSObjectCallContext JSObjectCallContext;
 
-class JSObject {
+class JavaJSObject {
  public:
-  JSObject(jlong nativeHandle);
+  JavaJSObject(jlong nativeHandle);
 
   static jlong createNative(jlong nativeHandle);
   jobject call(jstring methodName, jobjectArray args) const;
@@ -86,13 +86,13 @@ class JSObject {
 
   static jvalue invoke(JSObjectCallContext* context);
 
-  jobject convertValueToJObject(ValueImp* value) const;
-  ValueImp* convertJObjectToValue(jobject theObject) const;
+  jobject convertValueToJObject(JSValue* value) const;
+  JSValue* convertJObjectToValue(jobject theObject) const;
   List listFromJArray(jobjectArray jArray) const;
 
  private:
   const RootObject* _root;
-  ObjectImp* _imp;
+  JSObject* _imp;
 };
 
 }  // namespace Bindings
@@ -101,7 +101,8 @@ class JSObject {
 
 extern "C" {
 
-// Functions called from the Java VM when making calls to the JSObject class.
+// Functions called from the Java VM when making calls to the JavaJSObject
+// class.
 jlong KJS_JSCreateNativeJSObject(JNIEnv* env,
                                  jclass clazz,
                                  jstring jurl,

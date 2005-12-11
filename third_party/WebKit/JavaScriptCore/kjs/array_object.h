@@ -27,22 +27,22 @@
 
 namespace KJS {
 
-class ArrayPrototypeImp : public ArrayInstanceImp {
+class ArrayPrototype : public ArrayInstance {
  public:
-  ArrayPrototypeImp(ExecState* exec, ObjectPrototypeImp* objProto);
+  ArrayPrototype(ExecState* exec, ObjectPrototype* objProto);
   bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 };
 
-class ArrayProtoFuncImp : public InternalFunctionImp {
+class ArrayProtoFunc : public InternalFunctionImp {
  public:
-  ArrayProtoFuncImp(ExecState* exec, int i, int len);
+  ArrayProtoFunc(ExecState* exec, int i, int len);
 
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 
   enum {
     ToString,
@@ -69,15 +69,15 @@ class ArrayProtoFuncImp : public InternalFunctionImp {
 class ArrayObjectImp : public InternalFunctionImp {
  public:
   ArrayObjectImp(ExecState* exec,
-                 FunctionPrototypeImp* funcProto,
-                 ArrayPrototypeImp* arrayProto);
+                 FunctionPrototype* funcProto,
+                 ArrayPrototype* arrayProto);
 
   virtual bool implementsConstruct() const;
-  virtual ObjectImp* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState* exec, const List& args);
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 };
 
 }  // namespace

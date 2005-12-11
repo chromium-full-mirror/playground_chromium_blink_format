@@ -66,7 +66,7 @@ JNIType JNITypeFromPrimitiveType(char type);
 const char* signatureFromPrimitiveType(JNIType type);
 
 jvalue convertValueToJValue(ExecState* exec,
-                            ValueImp* value,
+                            JSValue* value,
                             JNIType _JNIType,
                             const char* javaClassName);
 
@@ -164,7 +164,7 @@ bool dispatchJNICall(const void* targetAppletView,
                      jvalue* args,
                      jvalue& result,
                      const char* callingURL,
-                     ValueImp*& exceptionDescription);
+                     JSValue*& exceptionDescription);
 
 }  // namespace Bindings
 

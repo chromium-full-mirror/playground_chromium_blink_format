@@ -48,7 +48,7 @@ bool DOMParserConstructorImp::implementsConstruct() const {
   return true;
 }
 
-ObjectImp* DOMParserConstructorImp::construct(ExecState* exec, const List&) {
+JSObject* DOMParserConstructorImp::construct(ExecState* exec, const List&) {
   return new DOMParser(exec, doc.get());
 }
 
@@ -63,9 +63,9 @@ DOMParser::DOMParser(ExecState* exec, DOM::DocumentImpl* d) : doc(d) {
   setPrototype(DOMParserProto::self(exec));
 }
 
-ValueImp* DOMParserProtoFunc::callAsFunction(ExecState* exec,
-                                             ObjectImp* thisObj,
-                                             const List& args) {
+JSValue* DOMParserProtoFunc::callAsFunction(ExecState* exec,
+                                            JSObject* thisObj,
+                                            const List& args) {
   if (!thisObj->inherits(&DOMParser::info))
     return throwError(exec, TypeError);
 

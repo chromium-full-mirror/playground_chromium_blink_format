@@ -32,19 +32,19 @@
 using namespace KJS::Bindings;
 using namespace KJS;
 
-RuntimeMethodImp::RuntimeMethodImp(ExecState* exec,
-                                   const Identifier& ident,
-                                   Bindings::MethodList& m)
+RuntimeMethod::RuntimeMethod(ExecState* exec,
+                             const Identifier& ident,
+                             Bindings::MethodList& m)
     : FunctionImp(exec, ident) {
   _methodList = m;
 }
 
-RuntimeMethodImp::~RuntimeMethodImp() {}
+RuntimeMethod::~RuntimeMethod() {}
 
-ValueImp* RuntimeMethodImp::lengthGetter(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         const PropertySlot& slot) {
-  RuntimeMethodImp* thisObj = static_cast<RuntimeMethodImp*>(slot.slotBase());
+JSValue* RuntimeMethod::lengthGetter(ExecState* exec,
+                                     const Identifier& propertyName,
+                                     const PropertySlot& slot) {
+  RuntimeMethod* thisObj = static_cast<RuntimeMethod*>(slot.slotBase());
 
   // Ick!  There may be more than one method with this name.  Arbitrarily
   // just pick the first method.  The fundamental problem here is that
@@ -55,9 +55,9 @@ ValueImp* RuntimeMethodImp::lengthGetter(ExecState* exec,
   return jsNumber(thisObj->_methodList.methodAt(0)->numParameters());
 }
 
-bool RuntimeMethodImp::getOwnPropertySlot(ExecState* exec,
-                                          const Identifier& propertyName,
-                                          PropertySlot& slot) {
+bool RuntimeMethod::getOwnPropertySlot(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       PropertySlot& slot) {
   if (propertyName == lengthPropertyName) {
     slot.setCustom(this, lengthGetter);
     return true;
@@ -66,20 +66,20 @@ bool RuntimeMethodImp::getOwnPropertySlot(ExecState* exec,
   return FunctionImp::getOwnPropertySlot(exec, propertyName, slot);
 }
 
-bool RuntimeMethodImp::implementsCall() const {
+bool RuntimeMethod::implementsCall() const {
   return true;
 }
 
-ValueImp* RuntimeMethodImp::callAsFunction(ExecState* exec,
-                                           ObjectImp* thisObj,
-                                           const List& args) {
+JSValue* RuntimeMethod::callAsFunction(ExecState* exec,
+                                       JSObject* thisObj,
+                                       const List& args) {
   if (_methodList.length() > 0) {
     RuntimeObjectImp* imp;
 
     // If thisObj is the DOM object for a plugin, get the corresponding
     // runtime object from the DOM object.
     if (thisObj->classInfo() != &KJS::RuntimeObjectImp::info) {
-      ValueImp* runtimeObject = thisObj->get(exec, "__apple_runtime_object");
+      JSValue* runtimeObject = thisObj->get(exec, "__apple_runtime_object");
       imp = static_cast<RuntimeObjectImp*>(runtimeObject);
     } else {
       imp = static_cast<RuntimeObjectImp*>(thisObj);
@@ -89,7 +89,7 @@ ValueImp* RuntimeMethodImp::callAsFunction(ExecState* exec,
 
       instance->begin();
 
-      ValueImp* aValue = instance->invokeMethod(exec, _methodList, args);
+      JSValue* aValue = instance->invokeMethod(exec, _methodList, args);
 
       instance->end();
 
@@ -100,10 +100,10 @@ ValueImp* RuntimeMethodImp::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-CodeType RuntimeMethodImp::codeType() const {
+CodeType RuntimeMethod::codeType() const {
   return FunctionCode;
 }
 
-Completion RuntimeMethodImp::execute(ExecState* exec) {
+Completion RuntimeMethod::execute(ExecState* exec) {
   return Completion(Normal, jsUndefined());
 }

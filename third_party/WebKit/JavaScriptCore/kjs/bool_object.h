@@ -27,9 +27,9 @@
 
 namespace KJS {
 
-class BooleanInstanceImp : public ObjectImp {
+class BooleanInstance : public JSObject {
  public:
-  BooleanInstanceImp(ObjectImp* proto);
+  BooleanInstance(JSObject* proto);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -41,11 +41,11 @@ class BooleanInstanceImp : public ObjectImp {
  * The initial value of Boolean.prototype (and thus all objects created
  * with the Boolean constructor
  */
-class BooleanPrototypeImp : public BooleanInstanceImp {
+class BooleanPrototype : public BooleanInstance {
  public:
-  BooleanPrototypeImp(ExecState* exec,
-                      ObjectPrototypeImp* objectProto,
-                      FunctionPrototypeImp* funcProto);
+  BooleanPrototype(ExecState* exec,
+                   ObjectPrototype* objectProto,
+                   FunctionPrototype* funcProto);
 };
 
 /**
@@ -54,17 +54,17 @@ class BooleanPrototypeImp : public BooleanInstanceImp {
  * Class to implement all methods that are properties of the
  * Boolean.prototype object
  */
-class BooleanProtoFuncImp : public InternalFunctionImp {
+class BooleanProtoFunc : public InternalFunctionImp {
  public:
-  BooleanProtoFuncImp(ExecState* exec,
-                      FunctionPrototypeImp* funcProto,
-                      int i,
-                      int len);
+  BooleanProtoFunc(ExecState* exec,
+                   FunctionPrototype* funcProto,
+                   int i,
+                   int len);
 
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 
   enum { ToString, ValueOf };
 
@@ -78,20 +78,20 @@ class BooleanProtoFuncImp : public InternalFunctionImp {
  * The initial value of the the global variable's "Boolean" property
  */
 class BooleanObjectImp : public InternalFunctionImp {
-  friend class BooleanProtoFuncImp;
+  friend class BooleanProtoFunc;
 
  public:
   BooleanObjectImp(ExecState* exec,
-                   FunctionPrototypeImp* funcProto,
-                   BooleanPrototypeImp* booleanProto);
+                   FunctionPrototype* funcProto,
+                   BooleanPrototype* booleanProto);
 
   virtual bool implementsConstruct() const;
-  virtual ObjectImp* construct(ExecState* exec, const List& args);
+  virtual JSObject* construct(ExecState* exec, const List& args);
 
   virtual bool implementsCall() const;
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
 };
 
 }  // namespace

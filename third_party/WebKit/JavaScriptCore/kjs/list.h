@@ -62,7 +62,7 @@ class List {
    *
    * @param val Pointer to object.
    */
-  void append(ValueImp* val);
+  void append(JSValue* val);
   /**
    * Remove all elements from the list.
    */
@@ -103,11 +103,11 @@ class List {
    * @return Return the element at position i. KJS::Undefined if the
    * index is out of range.
    */
-  ValueImp* at(int i) const;
+  JSValue* at(int i) const;
   /**
    * Equivalent to at.
    */
-  ValueImp* operator[](int i) const { return at(i); }
+  JSValue* operator[](int i) const { return at(i); }
 
   /**
    * Returns a pointer to a static instance of an empty list. Useful if a
@@ -152,25 +152,25 @@ class ListIterator {
    * Dereference the iterator.
    * @return A pointer to the element the iterator operates on.
    */
-  ValueImp* operator->() const { return _list->at(_i); }
-  ValueImp* operator*() const { return _list->at(_i); }
+  JSValue* operator->() const { return _list->at(_i); }
+  JSValue* operator*() const { return _list->at(_i); }
   /**
    * Prefix increment operator.
    * @return The element after the increment.
    */
-  ValueImp* operator++() { return _list->at(++_i); }
+  JSValue* operator++() { return _list->at(++_i); }
   /**
    * Postfix increment operator.
    */
-  ValueImp* operator++(int) { return _list->at(_i++); }
+  JSValue* operator++(int) { return _list->at(_i++); }
   /**
    * Prefix decrement operator.
    */
-  ValueImp* operator--() { return _list->at(--_i); }
+  JSValue* operator--() { return _list->at(--_i); }
   /**
    * Postfix decrement operator.
    */
-  ValueImp* operator--(int) { return _list->at(_i--); }
+  JSValue* operator--(int) { return _list->at(_i--); }
   /**
    * Compare the iterator with another one.
    * @return True if the two iterators operate on the same list element.

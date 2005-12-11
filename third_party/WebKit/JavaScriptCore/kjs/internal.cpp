@@ -76,7 +76,7 @@ const double Inf = *(const double*)Inf_Bytes;
 
 // ------------------------------ UndefinedImp ---------------------------------
 
-ValueImp* UndefinedImp::toPrimitive(ExecState*, Type) const {
+JSValue* UndefinedImp::toPrimitive(ExecState*, Type) const {
   return const_cast<UndefinedImp*>(this);
 }
 
@@ -92,13 +92,13 @@ UString UndefinedImp::toString(ExecState*) const {
   return "undefined";
 }
 
-ObjectImp* UndefinedImp::toObject(ExecState* exec) const {
+JSObject* UndefinedImp::toObject(ExecState* exec) const {
   return throwError(exec, TypeError, "Undefined value");
 }
 
 // ------------------------------ NullImp --------------------------------------
 
-ValueImp* NullImp::toPrimitive(ExecState*, Type) const {
+JSValue* NullImp::toPrimitive(ExecState*, Type) const {
   return const_cast<NullImp*>(this);
 }
 
@@ -114,13 +114,13 @@ UString NullImp::toString(ExecState*) const {
   return "null";
 }
 
-ObjectImp* NullImp::toObject(ExecState* exec) const {
+JSObject* NullImp::toObject(ExecState* exec) const {
   return throwError(exec, TypeError, "Null value");
 }
 
 // ------------------------------ BooleanImp -----------------------------------
 
-ValueImp* BooleanImp::toPrimitive(ExecState*, Type) const {
+JSValue* BooleanImp::toPrimitive(ExecState*, Type) const {
   return const_cast<BooleanImp*>(this);
 }
 
@@ -136,16 +136,16 @@ UString BooleanImp::toString(ExecState*) const {
   return val ? "true" : "false";
 }
 
-ObjectImp* BooleanImp::toObject(ExecState* exec) const {
+JSObject* BooleanImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<BooleanImp*>(this));
-  return static_cast<ObjectImp*>(
+  return static_cast<JSObject*>(
       exec->lexicalInterpreter()->builtinBoolean()->construct(exec, args));
 }
 
 // ------------------------------ StringImp ------------------------------------
 
-ValueImp* StringImp::toPrimitive(ExecState*, Type) const {
+JSValue* StringImp::toPrimitive(ExecState*, Type) const {
   return const_cast<StringImp*>(this);
 }
 
@@ -161,16 +161,16 @@ UString StringImp::toString(ExecState*) const {
   return val;
 }
 
-ObjectImp* StringImp::toObject(ExecState* exec) const {
+JSObject* StringImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<StringImp*>(this));
-  return static_cast<ObjectImp*>(
+  return static_cast<JSObject*>(
       exec->lexicalInterpreter()->builtinString()->construct(exec, args));
 }
 
 // ------------------------------ NumberImp ------------------------------------
 
-ValueImp* NumberImp::toPrimitive(ExecState*, Type) const {
+JSValue* NumberImp::toPrimitive(ExecState*, Type) const {
   return const_cast<NumberImp*>(this);
 }
 
@@ -188,10 +188,10 @@ UString NumberImp::toString(ExecState*) const {
   return UString::from(val);
 }
 
-ObjectImp* NumberImp::toObject(ExecState* exec) const {
+JSObject* NumberImp::toObject(ExecState* exec) const {
   List args;
   args.append(const_cast<NumberImp*>(this));
-  return static_cast<ObjectImp*>(
+  return static_cast<JSObject*>(
       exec->lexicalInterpreter()->builtinNumber()->construct(exec, args));
 }
 
@@ -227,9 +227,9 @@ bool LabelStack::contains(const Identifier& id) const {
 // ------------------------------ ContextImp -----------------------------------
 
 // ECMA 10.2
-ContextImp::ContextImp(ObjectImp* glob,
+ContextImp::ContextImp(JSObject* glob,
                        InterpreterImp* interpreter,
-                       ObjectImp* thisV,
+                       JSObject* thisV,
                        CodeType type,
                        ContextImp* callingCon,
                        FunctionImp* func,
@@ -259,7 +259,7 @@ ContextImp::ContextImp(ObjectImp* glob,
     case GlobalCode:
       scope.clear();
       scope.push(glob);
-      thisVal = static_cast<ObjectImp*>(glob);
+      thisVal = static_cast<JSObject*>(glob);
       break;
     case FunctionCode:
     case AnonymousCode:
@@ -374,7 +374,7 @@ void Parser::accept(ProgramNode* prog) {
 
 InterpreterImp* InterpreterImp::s_hook = 0L;
 
-typedef HashMap<ObjectImp*, InterpreterImp*, PointerHash<ObjectImp*>>
+typedef HashMap<JSObject*, InterpreterImp*, PointerHash<JSObject*>>
     InterpreterMap;
 
 static inline InterpreterMap& interpreterMap() {
@@ -382,7 +382,7 @@ static inline InterpreterMap& interpreterMap() {
   return *map;
 }
 
-InterpreterImp::InterpreterImp(Interpreter* interp, ObjectImp* glob)
+InterpreterImp::InterpreterImp(Interpreter* interp, JSObject* glob)
     : globExec(interp, 0), _context(0) {
   // add this interpreter to the global chain
   // as a root set for garbage collection
@@ -416,32 +416,32 @@ void InterpreterImp::initGlobalObject() {
 
   // Contructor prototype objects (Object.prototype, Array.prototype etc)
 
-  FunctionPrototypeImp* funcProto = new FunctionPrototypeImp(&globExec);
+  FunctionPrototype* funcProto = new FunctionPrototype(&globExec);
   b_FunctionPrototype = funcProto;
-  ObjectPrototypeImp* objProto = new ObjectPrototypeImp(&globExec, funcProto);
+  ObjectPrototype* objProto = new ObjectPrototype(&globExec, funcProto);
   b_ObjectPrototype = objProto;
   funcProto->setPrototype(b_ObjectPrototype);
 
-  ArrayPrototypeImp* arrayProto = new ArrayPrototypeImp(&globExec, objProto);
+  ArrayPrototype* arrayProto = new ArrayPrototype(&globExec, objProto);
   b_ArrayPrototype = arrayProto;
-  StringPrototypeImp* stringProto = new StringPrototypeImp(&globExec, objProto);
+  StringPrototype* stringProto = new StringPrototype(&globExec, objProto);
   b_StringPrototype = stringProto;
-  BooleanPrototypeImp* booleanProto =
-      new BooleanPrototypeImp(&globExec, objProto, funcProto);
+  BooleanPrototype* booleanProto =
+      new BooleanPrototype(&globExec, objProto, funcProto);
   b_BooleanPrototype = booleanProto;
-  NumberPrototypeImp* numberProto =
-      new NumberPrototypeImp(&globExec, objProto, funcProto);
+  NumberPrototype* numberProto =
+      new NumberPrototype(&globExec, objProto, funcProto);
   b_NumberPrototype = numberProto;
-  DatePrototypeImp* dateProto = new DatePrototypeImp(&globExec, objProto);
+  DatePrototype* dateProto = new DatePrototype(&globExec, objProto);
   b_DatePrototype = dateProto;
-  RegExpPrototypeImp* regexpProto =
-      new RegExpPrototypeImp(&globExec, objProto, funcProto);
+  RegExpPrototype* regexpProto =
+      new RegExpPrototype(&globExec, objProto, funcProto);
   b_RegExpPrototype = regexpProto;
-  ErrorPrototypeImp* errorProto =
-      new ErrorPrototypeImp(&globExec, objProto, funcProto);
+  ErrorPrototype* errorProto =
+      new ErrorPrototype(&globExec, objProto, funcProto);
   b_ErrorPrototype = errorProto;
 
-  static_cast<ObjectImp*>(global)->setPrototype(b_ObjectPrototype);
+  static_cast<JSObject*>(global)->setPrototype(b_ObjectPrototype);
 
   // Constructors (Object, Array, etc.)
   b_Object = new ObjectObjectImp(&globExec, objProto, funcProto);
@@ -455,18 +455,18 @@ void InterpreterImp::initGlobalObject() {
   b_Error = new ErrorObjectImp(&globExec, funcProto, errorProto);
 
   // Error object prototypes
-  b_evalErrorPrototype = new NativeErrorPrototypeImp(
+  b_evalErrorPrototype = new NativeErrorPrototype(
       &globExec, errorProto, EvalError, "EvalError", "EvalError");
-  b_rangeErrorPrototype = new NativeErrorPrototypeImp(
+  b_rangeErrorPrototype = new NativeErrorPrototype(
       &globExec, errorProto, RangeError, "RangeError", "RangeError");
   b_referenceErrorPrototype =
-      new NativeErrorPrototypeImp(&globExec, errorProto, ReferenceError,
-                                  "ReferenceError", "ReferenceError");
-  b_syntaxErrorPrototype = new NativeErrorPrototypeImp(
+      new NativeErrorPrototype(&globExec, errorProto, ReferenceError,
+                               "ReferenceError", "ReferenceError");
+  b_syntaxErrorPrototype = new NativeErrorPrototype(
       &globExec, errorProto, SyntaxError, "SyntaxError", "SyntaxError");
-  b_typeErrorPrototype = new NativeErrorPrototypeImp(
+  b_typeErrorPrototype = new NativeErrorPrototype(
       &globExec, errorProto, TypeError, "TypeError", "TypeError");
-  b_uriErrorPrototype = new NativeErrorPrototypeImp(
+  b_uriErrorPrototype = new NativeErrorPrototype(
       &globExec, errorProto, URIError, "URIError", "URIError");
 
   // Error objects
@@ -635,7 +635,7 @@ bool InterpreterImp::checkSyntax(const UString& code) {
 }
 
 Completion InterpreterImp::evaluate(const UString& code,
-                                    ValueImp* thisV,
+                                    JSValue* thisV,
                                     const UString& sourceURL,
                                     int startingLineNumber) {
   JSLock lock;
@@ -669,7 +669,7 @@ Completion InterpreterImp::evaluate(const UString& code,
 
   // no program node means a syntax error occurred
   if (!progNode) {
-    ObjectImp* err =
+    JSObject* err =
         Error::create(&globExec, SyntaxError, errMsg, errLine, sid, &sourceURL);
     return Completion(Throw, err);
   }
@@ -678,8 +678,8 @@ Completion InterpreterImp::evaluate(const UString& code,
 
   recursion++;
 
-  ObjectImp* globalObj = globalObject();
-  ObjectImp* thisObj = globalObject();
+  JSObject* globalObj = globalObject();
+  JSObject* thisObj = globalObject();
 
   if (thisV) {
     // "this" must be an object... use same rules as Function.prototype.apply()
@@ -789,7 +789,7 @@ void InterpreterImp::restoreBuiltins(const SavedBuiltins& builtins) {
   b_uriErrorPrototype = builtins._internal->b_uriErrorPrototype;
 }
 
-InterpreterImp* InterpreterImp::interpreterWithGlobalObject(ObjectImp* global) {
+InterpreterImp* InterpreterImp::interpreterWithGlobalObject(JSObject* global) {
   return interpreterMap().get(global);
 }
 
@@ -799,25 +799,25 @@ const ClassInfo InternalFunctionImp::info = {"Function", 0, 0, 0};
 
 InternalFunctionImp::InternalFunctionImp() {}
 
-InternalFunctionImp::InternalFunctionImp(FunctionPrototypeImp* funcProto)
-    : ObjectImp(funcProto) {}
+InternalFunctionImp::InternalFunctionImp(FunctionPrototype* funcProto)
+    : JSObject(funcProto) {}
 
 bool InternalFunctionImp::implementsHasInstance() const {
   return true;
 }
 
-bool InternalFunctionImp::hasInstance(ExecState* exec, ValueImp* value) {
+bool InternalFunctionImp::hasInstance(ExecState* exec, JSValue* value) {
   if (!value->isObject())
     return false;
 
-  ValueImp* prot = get(exec, prototypePropertyName);
+  JSValue* prot = get(exec, prototypePropertyName);
   if (!prot->isObject() && !prot->isNull()) {
     throwError(exec, TypeError,
                "Invalid prototype encountered in instanceof operation.");
     return false;
   }
 
-  ObjectImp* v = static_cast<ObjectImp*>(value);
+  JSObject* v = static_cast<JSObject*>(value);
   while ((v = v->prototype()->getObject())) {
     if (v == prot)
       return true;
@@ -827,7 +827,7 @@ bool InternalFunctionImp::hasInstance(ExecState* exec, ValueImp* value) {
 
 // ------------------------------ global functions -----------------------------
 
-double roundValue(ExecState* exec, ValueImp* v) {
+double roundValue(ExecState* exec, JSValue* v) {
   double d = v->toNumber(exec);
   double ad = fabs(d);
   if (ad == 0 || isNaN(d) || isInf(d))
@@ -837,11 +837,11 @@ double roundValue(ExecState* exec, ValueImp* v) {
 
 #ifndef NDEBUG
 #include <stdio.h>
-void printInfo(ExecState* exec, const char* s, ValueImp* o, int lineno) {
+void printInfo(ExecState* exec, const char* s, JSValue* o, int lineno) {
   if (!o)
     fprintf(stderr, "KJS: %s: (null)", s);
   else {
-    ValueImp* v = o;
+    JSValue* v = o;
 
     UString name;
     switch (v->type()) {
@@ -864,7 +864,7 @@ void printInfo(ExecState* exec, const char* s, ValueImp* o, int lineno) {
         name = "Number";
         break;
       case ObjectType:
-        name = static_cast<ObjectImp*>(v)->className();
+        name = static_cast<JSObject*>(v)->className();
         if (name.isNull())
           name = "(unknown class)";
         break;

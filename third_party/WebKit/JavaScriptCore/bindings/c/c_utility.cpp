@@ -67,7 +67,7 @@ void convertUTF8ToUTF16(const NPUTF8* UTF8Chars,
 
 // Variant value must be released with NPReleaseVariantValue()
 void coerceValueToNPVariantStringType(ExecState* exec,
-                                      ValueImp* value,
+                                      JSValue* value,
                                       NPVariant* result) {
   UString ustring = value->toString(exec);
   CString cstring = ustring.UTF8String();
@@ -77,7 +77,7 @@ void coerceValueToNPVariantStringType(ExecState* exec,
 
 // Variant value must be released with NPReleaseVariantValue()
 void convertValueToNPVariant(ExecState* exec,
-                             ValueImp* value,
+                             JSValue* value,
                              NPVariant* result) {
   Type type = value->type();
 
@@ -95,7 +95,7 @@ void convertValueToNPVariant(ExecState* exec,
   } else if (type == NullType) {
     NPN_InitializeVariantAsNull(result);
   } else if (type == ObjectType) {
-    ObjectImp* objectImp = static_cast<ObjectImp*>(value);
+    JSObject* objectImp = static_cast<JSObject*>(value);
     if (objectImp->classInfo() == &RuntimeObjectImp::info) {
       RuntimeObjectImp* imp = static_cast<RuntimeObjectImp*>(value);
       CInstance* instance = static_cast<CInstance*>(imp->getInternalInstance());
@@ -132,7 +132,7 @@ void convertValueToNPVariant(ExecState* exec,
     NPN_InitializeVariantAsUndefined(result);
 }
 
-ValueImp* convertNPVariantToValue(ExecState* exec, const NPVariant* variant) {
+JSValue* convertNPVariantToValue(ExecState* exec, const NPVariant* variant) {
   NPVariantType type = variant->type;
 
   if (type == NPVariantType_Bool) {
@@ -167,9 +167,9 @@ ValueImp* convertNPVariantToValue(ExecState* exec, const NPVariant* variant) {
     NPObject* obj = variant->value.objectValue;
 
     if (obj->_class == NPScriptObjectClass) {
-      // Get ObjectImp from NP_JavaScriptObject.
+      // Get JSObject from NP_JavaScriptObject.
       JavaScriptObject* o = (JavaScriptObject*)obj;
-      return const_cast<ObjectImp*>(o->imp);
+      return const_cast<JSObject*>(o->imp);
     } else {
       //  Wrap NPObject in a CInstance.
       return Instance::createRuntimeObject(Instance::CLanguage, obj);

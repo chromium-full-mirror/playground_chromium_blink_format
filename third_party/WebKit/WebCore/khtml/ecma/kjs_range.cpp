@@ -108,7 +108,7 @@ bool DOMRange::getOwnPropertySlot(ExecState* exec,
                                                  propertyName, slot);
 }
 
-ValueImp* DOMRange::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMRange::getValueProperty(ExecState* exec, int token) const {
   DOMExceptionTranslator exception(exec);
   RangeImpl& range = *m_impl;
   switch (token) {
@@ -131,13 +131,13 @@ ValueImp* DOMRange::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-ValueImp* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
-                                            ObjectImp* thisObj,
-                                            const List& args) {
+JSValue* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
+                                           JSObject* thisObj,
+                                           const List& args) {
   if (!thisObj->inherits(&KJS::DOMRange::info))
     return throwError(exec, TypeError);
   RangeImpl& range = *static_cast<DOMRange*>(thisObj)->impl();
-  ValueImp* result = jsUndefined();
+  JSValue* result = jsUndefined();
   int exception = 0;
 
   switch (id) {
@@ -208,7 +208,7 @@ ValueImp* DOMRangeProtoFunc::callAsFunction(ExecState* exec,
   return result;
 }
 
-ValueImp* getDOMRange(ExecState* exec, RangeImpl* r) {
+JSValue* getDOMRange(ExecState* exec, RangeImpl* r) {
   return cacheDOMObject<RangeImpl, DOMRange>(exec, r);
 }
 
@@ -231,15 +231,15 @@ bool RangeConstructor::getOwnPropertySlot(ExecState* exec,
       exec, &RangeConstructorTable, this, propertyName, slot);
 }
 
-ValueImp* RangeConstructor::getValueProperty(ExecState*, int token) const {
+JSValue* RangeConstructor::getValueProperty(ExecState*, int token) const {
   return jsNumber(token);
 }
 
-ValueImp* getRangeConstructor(ExecState* exec) {
+JSValue* getRangeConstructor(ExecState* exec) {
   return cacheGlobalObject<RangeConstructor>(exec, "[[range.constructor]]");
 }
 
-RangeImpl* toRange(ValueImp* val) {
+RangeImpl* toRange(JSValue* val) {
   if (!val || !val->isObject(&DOMRange::info))
     return 0;
   return static_cast<DOMRange*>(val)->impl();

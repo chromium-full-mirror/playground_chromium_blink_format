@@ -41,7 +41,7 @@ using namespace Bindings;
 
 const ClassInfo RuntimeObjectImp::info = {"RuntimeObject", 0, 0, 0};
 
-RuntimeObjectImp::RuntimeObjectImp(ObjectImp* proto) : ObjectImp(proto) {
+RuntimeObjectImp::RuntimeObjectImp(JSObject* proto) : JSObject(proto) {
   instance = 0;
 }
 
@@ -56,23 +56,40 @@ RuntimeObjectImp::RuntimeObjectImp(Bindings::Instance* i, bool oi) {
   instance = i;
 }
 
-ValueImp* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
-                                                 const Identifier& propertyName,
-                                                 const PropertySlot& slot) {
+JSValue* RuntimeObjectImp::fallbackObjectGetter(ExecState* exec,
+                                                const Identifier& propertyName,
+                                                const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
   Bindings::Instance* instance = thisObj->instance;
 
   instance->begin();
 
   Class* aClass = instance->getClass();
-  ValueImp* result = aClass->fallbackObject(exec, instance, propertyName);
+  JSValue* result = aClass->fallbackObject(exec, instance, propertyName);
 
   instance->end();
 
   return result;
 }
 
-ValueImp* RuntimeObjectImp::fieldGetter(ExecState* exec,
+JSValue* RuntimeObjectImp::fieldGetter(ExecState* exec,
+                                       const Identifier& propertyName,
+                                       const PropertySlot& slot) {
+  RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
+  Bindings::Instance* instance = thisObj->instance;
+
+  instance->begin();
+
+  Class* aClass = instance->getClass();
+  Field* aField = aClass->fieldNamed(propertyName.ascii(), instance);
+  JSValue* result = instance->getValueOfField(exec, aField);
+
+  instance->end();
+
+  return result;
+}
+
+JSValue* RuntimeObjectImp::methodGetter(ExecState* exec,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
@@ -81,25 +98,8 @@ ValueImp* RuntimeObjectImp::fieldGetter(ExecState* exec,
   instance->begin();
 
   Class* aClass = instance->getClass();
-  Field* aField = aClass->fieldNamed(propertyName.ascii(), instance);
-  ValueImp* result = instance->getValueOfField(exec, aField);
-
-  instance->end();
-
-  return result;
-}
-
-ValueImp* RuntimeObjectImp::methodGetter(ExecState* exec,
-                                         const Identifier& propertyName,
-                                         const PropertySlot& slot) {
-  RuntimeObjectImp* thisObj = static_cast<RuntimeObjectImp*>(slot.slotBase());
-  Bindings::Instance* instance = thisObj->instance;
-
-  instance->begin();
-
-  Class* aClass = instance->getClass();
   MethodList methodList = aClass->methodsNamed(propertyName.ascii(), instance);
-  ValueImp* result = new RuntimeMethodImp(exec, propertyName, methodList);
+  JSValue* result = new RuntimeMethod(exec, propertyName, methodList);
 
   instance->end();
 
@@ -150,7 +150,7 @@ bool RuntimeObjectImp::getOwnPropertySlot(ExecState* exec,
 
 void RuntimeObjectImp::put(ExecState* exec,
                            const Identifier& propertyName,
-                           ValueImp* value,
+                           JSValue* value,
                            int attr) {
   instance->begin();
 
@@ -192,8 +192,8 @@ bool RuntimeObjectImp::deleteProperty(ExecState* exec,
   return false;
 }
 
-ValueImp* RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
-  ValueImp* result;
+JSValue* RuntimeObjectImp::defaultValue(ExecState* exec, Type hint) const {
+  JSValue* result;
 
   instance->begin();
 
@@ -209,12 +209,12 @@ bool RuntimeObjectImp::implementsCall() const {
   return true;
 }
 
-ValueImp* RuntimeObjectImp::callAsFunction(ExecState* exec,
-                                           ObjectImp* thisObj,
-                                           const List& args) {
+JSValue* RuntimeObjectImp::callAsFunction(ExecState* exec,
+                                          JSObject* thisObj,
+                                          const List& args) {
   instance->begin();
 
-  ValueImp* aValue = getInternalInstance()->invokeDefaultMethod(exec, args);
+  JSValue* aValue = getInternalInstance()->invokeDefaultMethod(exec, args);
 
   instance->end();
 

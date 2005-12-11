@@ -31,11 +31,12 @@ using namespace KJS::Bindings;
 
 // Java does NOT always call finalize (and thus KJS_JSObject_JSFinalize) when
 // it collects an objects.  This presents some difficulties.  We must ensure
-// the a JSObject's corresponding JavaScript object doesn't get collected.  We
+// the a JavaJSObject's corresponding JavaScript object doesn't get collected.
+// We
 // do this by incrementing the JavaScript's reference count the first time we
-// create a JSObject for it, and decrementing the JavaScript reference count
+// create a JavaJSObject for it, and decrementing the JavaScript reference count
 // when
-// the last JSObject that refers to it is finalized, or when the applet is
+// the last JavaJSObject that refers to it is finalized, or when the applet is
 // shutdown.
 //
 // To do this we keep a dictionary that maps each applet instance
@@ -76,7 +77,7 @@ static CFMutableDictionaryRef getReferencesDictionary(
 // FIXME:  This is a potential performance bottleneck with many applets.  We
 // could fix be adding a
 // imp to root dictionary.
-CFMutableDictionaryRef KJS::Bindings::findReferenceDictionary(ObjectImp* imp) {
+CFMutableDictionaryRef KJS::Bindings::findReferenceDictionary(JSObject* imp) {
   CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
   CFMutableDictionaryRef foundDictionary = 0;
 
@@ -104,7 +105,7 @@ CFMutableDictionaryRef KJS::Bindings::findReferenceDictionary(ObjectImp* imp) {
 // FIXME:  This is a potential performance bottleneck with many applets.  We
 // could fix be adding a
 // imp to root dictionary.
-const Bindings::RootObject* KJS::Bindings::rootForImp(ObjectImp* imp) {
+const Bindings::RootObject* KJS::Bindings::rootForImp(JSObject* imp) {
   CFMutableDictionaryRef refsByRoot = getReferencesByRootDictionary();
   const Bindings::RootObject* rootObject = 0;
 
@@ -161,7 +162,7 @@ const Bindings::RootObject* KJS::Bindings::rootForInterpreter(
 }
 
 void KJS::Bindings::addNativeReference(const Bindings::RootObject* root,
-                                       ObjectImp* imp) {
+                                       JSObject* imp) {
   if (root) {
     CFMutableDictionaryRef referencesDictionary = getReferencesDictionary(root);
 
@@ -178,7 +179,7 @@ void KJS::Bindings::addNativeReference(const Bindings::RootObject* root,
   }
 }
 
-void KJS::Bindings::removeNativeReference(ObjectImp* imp) {
+void KJS::Bindings::removeNativeReference(JSObject* imp) {
   if (!imp)
     return;
 
@@ -286,7 +287,7 @@ static void performJavaScriptAccess(void* i) {
   JSObjectCallContext* callContext = (JSObjectCallContext*)sourceContext.info;
   CFRunLoopRef originatingLoop = callContext->originatingLoop;
 
-  JSObject::invoke(callContext);
+  JavaJSObject::invoke(callContext);
 
   // Signal the originating thread that we're done.
   CFRunLoopSourceSignal(completionSource);
@@ -338,7 +339,7 @@ void RootObject::removeAllNativeReferences() {
                                  NULL);
     for (i = 0; i < count; i++) {
       JSLock lock;
-      ObjectImp* anImp = static_cast<ObjectImp*>(allImps[i]);
+      JSObject* anImp = static_cast<JSObject*>(allImps[i]);
       gcUnprotect(anImp);
     }
     free((void*)allImps);

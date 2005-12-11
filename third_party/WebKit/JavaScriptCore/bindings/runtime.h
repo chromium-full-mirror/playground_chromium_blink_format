@@ -62,10 +62,10 @@ class Field {
   virtual const char* name() const = 0;
   virtual RuntimeType type() const = 0;
 
-  virtual ValueImp* valueFromInstance(ExecState*, const Instance*) const = 0;
+  virtual JSValue* valueFromInstance(ExecState*, const Instance*) const = 0;
   virtual void setValueToInstance(ExecState*,
                                   const Instance*,
-                                  ValueImp*) const = 0;
+                                  JSValue*) const = 0;
 
   virtual ~Field() {}
 };
@@ -109,15 +109,14 @@ class Class {
 
   virtual Field* fieldNamed(const char* name, Instance* instance) const = 0;
 
-  virtual ValueImp* fallbackObject(ExecState*, Instance*, const Identifier&) {
+  virtual JSValue* fallbackObject(ExecState*, Instance*, const Identifier&) {
     return jsUndefined();
   }
 
   virtual ~Class() {}
 };
 
-typedef void (*KJSDidExecuteFunctionPtr)(ExecState* exec,
-                                         ObjectImp* rootObject);
+typedef void (*KJSDidExecuteFunctionPtr)(ExecState* exec, JSObject* rootObject);
 
 class Instance {
  public:
@@ -131,12 +130,12 @@ class Instance {
                                                     const RootObject* r = 0);
   static void* createLanguageInstanceForValue(ExecState* exec,
                                               BindingLanguage language,
-                                              ObjectImp* value,
+                                              JSObject* value,
                                               const RootObject* origin,
                                               const RootObject* current);
-  static ObjectImp* createRuntimeObject(BindingLanguage language,
-                                        void* nativeInstance,
-                                        const RootObject* r = 0);
+  static JSObject* createRuntimeObject(BindingLanguage language,
+                                       void* nativeInstance,
+                                       const RootObject* r = 0);
 
   Instance() : _executionContext(0) {}
 
@@ -152,28 +151,28 @@ class Instance {
 
   virtual Class* getClass() const = 0;
 
-  virtual ValueImp* getValueOfField(ExecState* exec, const Field* aField) const;
-  virtual ValueImp* getValueOfUndefinedField(ExecState* exec,
-                                             const Identifier& property,
-                                             Type hint) const {
+  virtual JSValue* getValueOfField(ExecState* exec, const Field* aField) const;
+  virtual JSValue* getValueOfUndefinedField(ExecState* exec,
+                                            const Identifier& property,
+                                            Type hint) const {
     return jsUndefined();
   }
   virtual void setValueOfField(ExecState* exec,
                                const Field* aField,
-                               ValueImp* aValue) const;
+                               JSValue* aValue) const;
   virtual bool supportsSetValueOfUndefinedField() { return false; }
   virtual void setValueOfUndefinedField(ExecState* exec,
                                         const Identifier& property,
-                                        ValueImp* aValue) {}
+                                        JSValue* aValue) {}
 
-  virtual ValueImp* invokeMethod(ExecState* exec,
-                                 const MethodList& method,
-                                 const List& args) = 0;
-  virtual ValueImp* invokeDefaultMethod(ExecState* exec, const List& args) = 0;
+  virtual JSValue* invokeMethod(ExecState* exec,
+                                const MethodList& method,
+                                const List& args) = 0;
+  virtual JSValue* invokeDefaultMethod(ExecState* exec, const List& args) = 0;
 
-  virtual ValueImp* defaultValue(Type hint) const = 0;
+  virtual JSValue* defaultValue(Type hint) const = 0;
 
-  virtual ValueImp* valueOf() const { return jsString(getClass()->name()); }
+  virtual JSValue* valueOf() const { return jsString(getClass()->name()); }
 
   void setExecutionContext(const RootObject* r) { _executionContext = r; }
   const RootObject* executionContext() const { return _executionContext; }
@@ -186,8 +185,8 @@ class Instance {
 
 class Array {
  public:
-  virtual void setValueAt(ExecState*, unsigned index, ValueImp*) const = 0;
-  virtual ValueImp* valueAt(ExecState*, unsigned index) const = 0;
+  virtual void setValueAt(ExecState*, unsigned index, JSValue*) const = 0;
+  virtual JSValue* valueAt(ExecState*, unsigned index) const = 0;
   virtual unsigned int getLength() const = 0;
   virtual ~Array() {}
 };

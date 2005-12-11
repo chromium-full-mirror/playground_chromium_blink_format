@@ -31,20 +31,20 @@
 
 namespace KJS {
 
-class RuntimeArrayImp : public ArrayInstanceImp {
+class RuntimeArray : public ArrayInstance {
  public:
-  RuntimeArrayImp(ExecState* exec, Bindings::Array* i);
-  ~RuntimeArrayImp();
+  RuntimeArray(ExecState* exec, Bindings::Array* i);
+  ~RuntimeArray();
 
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual bool getOwnPropertySlot(ExecState*, unsigned, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   ValueImp* value,
+                   JSValue* value,
                    int attr = None);
   virtual void put(ExecState* exec,
                    unsigned propertyName,
-                   ValueImp* value,
+                   JSValue* value,
                    int attr = None);
 
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
@@ -59,12 +59,12 @@ class RuntimeArrayImp : public ArrayInstanceImp {
   static const ClassInfo info;
 
  private:
-  static ValueImp* lengthGetter(ExecState*,
-                                const Identifier&,
-                                const PropertySlot&);
-  static ValueImp* indexGetter(ExecState*,
+  static JSValue* lengthGetter(ExecState*,
                                const Identifier&,
                                const PropertySlot&);
+  static JSValue* indexGetter(ExecState*,
+                              const Identifier&,
+                              const PropertySlot&);
 
   Bindings::Array* _array;
 };

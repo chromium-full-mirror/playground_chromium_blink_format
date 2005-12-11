@@ -26,15 +26,15 @@
 
 namespace KJS {
 
-class ObjectImp;
+class JSObject;
 
 class ScopeChainNode {
  public:
-  ScopeChainNode(ScopeChainNode* n, ObjectImp* o)
+  ScopeChainNode(ScopeChainNode* n, JSObject* o)
       : next(n), object(o), refCount(1) {}
 
   ScopeChainNode* next;
-  ObjectImp* object;
+  JSObject* object;
   int refCount;
 };
 
@@ -42,8 +42,8 @@ class ScopeChainIterator {
  public:
   ScopeChainIterator(ScopeChainNode* node) : m_node(node) {}
 
-  ObjectImp* const& operator*() const { return m_node->object; }
-  ObjectImp* const* operator->() const { return &(operator*()); }
+  JSObject* const& operator*() const { return m_node->object; }
+  JSObject* const* operator->() const { return &(operator*()); }
 
   ScopeChainIterator& operator++() {
     m_node = m_node->next;
@@ -75,9 +75,9 @@ class ScopeChain {
   ScopeChain& operator=(const ScopeChain&);
 
   bool isEmpty() const { return !_node; }
-  ObjectImp* top() const { return _node->object; }
+  JSObject* top() const { return _node->object; }
 
-  ObjectImp* bottom() const;
+  JSObject* bottom() const;
 
   ScopeChainIterator begin() const { return ScopeChainIterator(_node); }
   ScopeChainIterator end() const { return ScopeChainIterator(0); }
@@ -86,7 +86,7 @@ class ScopeChain {
     deref();
     _node = 0;
   }
-  void push(ObjectImp*);
+  void push(JSObject*);
   void push(const ScopeChain&);
   void pop();
 
@@ -118,7 +118,7 @@ inline ScopeChain& ScopeChain::operator=(const ScopeChain& c) {
   return *this;
 }
 
-inline ObjectImp* ScopeChain::bottom() const {
+inline JSObject* ScopeChain::bottom() const {
   ScopeChainNode* last = 0;
   for (ScopeChainNode* n = _node; n; n = n->next)
     last = n;
@@ -127,7 +127,7 @@ inline ObjectImp* ScopeChain::bottom() const {
   return last->object;
 }
 
-inline void ScopeChain::push(ObjectImp* o) {
+inline void ScopeChain::push(JSObject* o) {
   assert(o);
   _node = new ScopeChainNode(_node, o);
 }

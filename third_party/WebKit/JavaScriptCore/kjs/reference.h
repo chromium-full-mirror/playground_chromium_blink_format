@@ -28,15 +28,15 @@
 
 namespace KJS {
 
-class ObjectImp;
+class JSObject;
 
 class Reference {
   friend class ReferenceList;
   friend class ReferenceListIterator;
 
  public:
-  Reference(ObjectImp* b, const Identifier& p);
-  Reference(ObjectImp* b, unsigned p);
+  Reference(JSObject* b, const Identifier& p);
+  Reference(JSObject* b, unsigned p);
 
   /**
    * Performs the GetPropertyName type conversion operation on this value
@@ -48,7 +48,7 @@ class Reference {
    * Performs the GetValue type conversion operation on this value
    * (ECMA 8.7.1)
    */
-  ValueImp* getValue(ExecState* exec) const;
+  JSValue* getValue(ExecState* exec) const;
 
   /**
    * Performs the PutValue type conversion operation on this value
@@ -57,7 +57,7 @@ class Reference {
   bool deleteValue(ExecState* exec);
 
  protected:
-  ValueImp* base;
+  JSValue* base;
 
  private:
   Reference() {}

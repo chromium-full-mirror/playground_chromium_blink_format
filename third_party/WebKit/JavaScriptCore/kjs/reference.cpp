@@ -29,10 +29,10 @@ namespace KJS {
 
 // ------------------------------ Reference ------------------------------------
 
-Reference::Reference(ObjectImp* b, const Identifier& p)
+Reference::Reference(JSObject* b, const Identifier& p)
     : base(b), propertyNameIsNumber(false), prop(p) {}
 
-Reference::Reference(ObjectImp* b, unsigned p)
+Reference::Reference(JSObject* b, unsigned p)
     : base(b), propertyNameAsNumber(p), propertyNameIsNumber(true) {}
 
 Identifier Reference::getPropertyName(ExecState* exec) const {
@@ -41,8 +41,8 @@ Identifier Reference::getPropertyName(ExecState* exec) const {
   return prop;
 }
 
-ValueImp* Reference::getValue(ExecState* exec) const {
-  ValueImp* o = base;
+JSValue* Reference::getValue(ExecState* exec) const {
+  JSValue* o = base;
   if (!o || !o->isObject()) {
     if (!o || o->isNull())
       return throwError(
@@ -52,12 +52,12 @@ ValueImp* Reference::getValue(ExecState* exec) const {
   }
 
   if (propertyNameIsNumber)
-    return static_cast<ObjectImp*>(o)->get(exec, propertyNameAsNumber);
-  return static_cast<ObjectImp*>(o)->get(exec, prop);
+    return static_cast<JSObject*>(o)->get(exec, propertyNameAsNumber);
+  return static_cast<JSObject*>(o)->get(exec, prop);
 }
 
 bool Reference::deleteValue(ExecState* exec) {
-  ValueImp* o = base;
+  JSValue* o = base;
   Type t = o ? o->type() : NullType;
 
   // The spec doesn't mention what to do if the base is null... just return true
@@ -67,8 +67,8 @@ bool Reference::deleteValue(ExecState* exec) {
   }
 
   if (propertyNameIsNumber)
-    return static_cast<ObjectImp*>(o)->deleteProperty(exec,
-                                                      propertyNameAsNumber);
-  return static_cast<ObjectImp*>(o)->deleteProperty(exec, prop);
+    return static_cast<JSObject*>(o)->deleteProperty(exec,
+                                                     propertyNameAsNumber);
+  return static_cast<JSObject*>(o)->deleteProperty(exec, prop);
 }
 }

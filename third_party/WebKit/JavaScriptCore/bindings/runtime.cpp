@@ -89,14 +89,14 @@ KJSDidExecuteFunctionPtr Instance::didExecuteFunction() {
   return _DidExecuteFunction;
 }
 
-ValueImp* Instance::getValueOfField(KJS::ExecState* exec,
-                                    const Field* aField) const {
+JSValue* Instance::getValueOfField(KJS::ExecState* exec,
+                                   const Field* aField) const {
   return aField->valueFromInstance(exec, this);
 }
 
 void Instance::setValueOfField(KJS::ExecState* exec,
                                const Field* aField,
-                               ValueImp* aValue) const {
+                               JSValue* aValue) const {
   aField->setValueToInstance(exec, this, aValue);
 }
 
@@ -131,9 +131,9 @@ Instance* Instance::createBindingForLanguageInstance(
   return newInstance;
 }
 
-ObjectImp* Instance::createRuntimeObject(BindingLanguage language,
-                                         void* nativeInstance,
-                                         const RootObject* executionContext) {
+JSObject* Instance::createRuntimeObject(BindingLanguage language,
+                                        void* nativeInstance,
+                                        const RootObject* executionContext) {
   Instance* interfaceObject = Instance::createBindingForLanguageInstance(
       language, (void*)nativeInstance, executionContext);
 
@@ -143,7 +143,7 @@ ObjectImp* Instance::createRuntimeObject(BindingLanguage language,
 
 void* Instance::createLanguageInstanceForValue(ExecState* exec,
                                                BindingLanguage language,
-                                               ObjectImp* value,
+                                               JSObject* value,
                                                const RootObject* origin,
                                                const RootObject* current) {
   void* result = 0;
@@ -151,7 +151,7 @@ void* Instance::createLanguageInstanceForValue(ExecState* exec,
   if (!value->isObject())
     return 0;
 
-  ObjectImp* imp = static_cast<ObjectImp*>(value);
+  JSObject* imp = static_cast<JSObject*>(value);
 
   switch (language) {
     case Instance::ObjectiveCLanguage: {

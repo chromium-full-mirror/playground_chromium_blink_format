@@ -71,8 +71,8 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
 
   EventImpl* evt = ele;
 
-  ObjectImp* listener = listenerObj();
-  ObjectImp* win = windowObj();
+  JSObject* listener = listenerObj();
+  JSObject* win = windowObj();
 
   KHTMLPart* part = static_cast<Window*>(win)->part();
   KJSProxy* proxy = 0;
@@ -88,12 +88,12 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
   ExecState* exec = interpreter->globalExec();
 
   bool hasHandleEvent = false;
-  ValueImp* handleEventFuncValue = 0;
-  ObjectImp* handleEventFunc = 0;
+  JSValue* handleEventFuncValue = 0;
+  JSObject* handleEventFunc = 0;
 
   handleEventFuncValue = listener->get(exec, "handleEvent");
   if (handleEventFuncValue->isObject()) {
-    handleEventFunc = static_cast<ObjectImp*>(handleEventFuncValue);
+    handleEventFunc = static_cast<JSObject*>(handleEventFuncValue);
 
     if (handleEventFunc->implementsCall())
       hasHandleEvent = true;
@@ -111,14 +111,14 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
     // ... and in the interpreter
     interpreter->setCurrentEvent(evt);
 
-    ObjectImp* thisObj;
+    JSObject* thisObj;
     if (isWindowEvent) {
       thisObj = win;
     } else {
-      thisObj = static_cast<ObjectImp*>(getDOMNode(exec, evt->currentTarget()));
+      thisObj = static_cast<JSObject*>(getDOMNode(exec, evt->currentTarget()));
     }
 
-    ValueImp* retval;
+    JSValue* retval;
     if (hasHandleEvent)
       retval = handleEventFunc->call(exec, listener, args);
     else
@@ -176,8 +176,8 @@ DOM::DOMString JSAbstractEventListener::eventListenerType() {
 
 // -------------------------------------------------------------------------
 
-JSUnprotectedEventListener::JSUnprotectedEventListener(ObjectImp* _listener,
-                                                       ObjectImp* _win,
+JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* _listener,
+                                                       JSObject* _win,
                                                        bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
   if (_listener) {
@@ -194,11 +194,11 @@ JSUnprotectedEventListener::~JSUnprotectedEventListener() {
   }
 }
 
-ObjectImp* JSUnprotectedEventListener::listenerObj() const {
+JSObject* JSUnprotectedEventListener::listenerObj() const {
   return listener;
 }
 
-ObjectImp* JSUnprotectedEventListener::windowObj() const {
+JSObject* JSUnprotectedEventListener::windowObj() const {
   return win;
 }
 
@@ -207,15 +207,15 @@ void JSUnprotectedEventListener::clearWindowObj() {
 }
 
 void JSUnprotectedEventListener::mark() {
-  ObjectImp* listenerImp = listener;
+  JSObject* listenerImp = listener;
   if (listenerImp && !listenerImp->marked())
     listenerImp->mark();
 }
 
 // -------------------------------------------------------------------------
 
-JSEventListener::JSEventListener(ObjectImp* _listener,
-                                 ObjectImp* _win,
+JSEventListener::JSEventListener(JSObject* _listener,
+                                 JSObject* _win,
                                  bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
   if (_listener)
@@ -223,19 +223,19 @@ JSEventListener::JSEventListener(ObjectImp* _listener,
 }
 
 JSEventListener::~JSEventListener() {
-  if (ObjectImp* l = listener) {
-    ObjectImp* w = win;
+  if (JSObject* l = listener) {
+    JSObject* w = win;
     if (w) {
       static_cast<Window*>(w)->jsEventListeners.remove(l);
     }
   }
 }
 
-ObjectImp* JSEventListener::listenerObj() const {
+JSObject* JSEventListener::listenerObj() const {
   return listener;
 }
 
-ObjectImp* JSEventListener::windowObj() const {
+JSObject* JSEventListener::windowObj() const {
   return win;
 }
 
@@ -246,7 +246,7 @@ void JSEventListener::clearWindowObj() {
 // -------------------------------------------------------------------------
 
 JSLazyEventListener::JSLazyEventListener(QString _code,
-                                         ObjectImp* _win,
+                                         JSObject* _win,
                                          NodeImpl* _originalNode,
                                          int lineno)
     : JSEventListener(NULL, _win, true), code(_code), parsed(false) {
@@ -264,19 +264,19 @@ JSLazyEventListener::JSLazyEventListener(QString _code,
 void JSLazyEventListener::handleEvent(EventListenerEvent evt,
                                       bool isWindowEvent) {
   parseCode();
-  ObjectImp* listenerObj = listener;
+  JSObject* listenerObj = listener;
   if (listenerObj)
     JSEventListener::handleEvent(evt, isWindowEvent);
 }
 
-ObjectImp* JSLazyEventListener::listenerObj() const {
+JSObject* JSLazyEventListener::listenerObj() const {
   parseCode();
   return listener;
 }
 
 void JSLazyEventListener::parseCode() const {
   if (!parsed) {
-    ObjectImp* w = win;
+    JSObject* w = win;
     KHTMLPart* part = static_cast<Window*>(w)->part();
     KJSProxy* proxy = 0L;
     if (part)
@@ -288,10 +288,10 @@ void JSLazyEventListener::parseCode() const {
       ExecState* exec = interpreter->globalExec();
 
       JSLock lock;
-      ObjectImp* constr = interpreter->builtinFunction();
+      JSObject* constr = interpreter->builtinFunction();
       List args;
 
-      static ProtectedPtr<ValueImp> eventString = jsString("event");
+      static ProtectedPtr<JSValue> eventString = jsString("event");
       UString sourceURL(part->m_url.url());
       args.append(eventString);
       args.append(jsString(code));
@@ -308,10 +308,10 @@ void JSLazyEventListener::parseCode() const {
         // (and the document, and the form - see HTMLElement::eventHandlerScope)
         ScopeChain scope = listener->scope();
 
-        ObjectImp* thisObj;
+        JSObject* thisObj;
         {  // scope
           JSLock lock;
-          thisObj = static_cast<ObjectImp*>(getDOMNode(exec, originalNode));
+          thisObj = static_cast<JSObject*>(getDOMNode(exec, originalNode));
         }
 
         if (thisObj) {
@@ -324,8 +324,8 @@ void JSLazyEventListener::parseCode() const {
     // no more need to keep the unparsed code around
     code = QString();
 
-    if (ObjectImp* l = listener) {
-      ObjectImp* w = win;
+    if (JSObject* l = listener) {
+      JSObject* w = win;
       static_cast<Window*>(w)->jsEventListeners.insert(
           l, const_cast<JSLazyEventListener*>(this));
     }
@@ -334,11 +334,11 @@ void JSLazyEventListener::parseCode() const {
   }
 }
 
-ValueImp* getNodeEventListener(NodeImpl* n, const AtomicString& eventType) {
+JSValue* getNodeEventListener(NodeImpl* n, const AtomicString& eventType) {
   JSAbstractEventListener* listener =
       static_cast<JSAbstractEventListener*>(n->getHTMLEventListener(eventType));
   if (listener)
-    if (ValueImp* obj = listener->listenerObjImp())
+    if (JSValue* obj = listener->listenerObjImp())
       return obj;
   return jsNull();
 }
@@ -379,12 +379,12 @@ bool EventConstructor::getOwnPropertySlot(ExecState* exec,
       exec, &EventConstructorTable, this, propertyName, slot);
 }
 
-ValueImp* EventConstructor::getValueProperty(ExecState*, int token) const {
+JSValue* EventConstructor::getValueProperty(ExecState*, int token) const {
   // We use the token as the value to return directly
   return jsNumber(token);
 }
 
-ValueImp* getEventConstructor(ExecState* exec) {
+JSValue* getEventConstructor(ExecState* exec) {
   return cacheGlobalObject<EventConstructor>(exec, "[[event.constructor]]");
 }
 
@@ -426,7 +426,7 @@ DOMEvent::~DOMEvent() {
 
 // pass marks through to JS objects we hold during garbage collection
 void DOMMouseEvent::mark() {
-  ObjectImp::mark();
+  JSObject::mark();
   if (clipboard && !clipboard->marked())
     clipboard->mark();
 }
@@ -438,7 +438,7 @@ bool DOMEvent::getOwnPropertySlot(ExecState* exec,
                                                  propertyName, slot);
 }
 
-ValueImp* DOMEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMEvent::getValueProperty(ExecState* exec, int token) const {
   EventImpl& event = *m_impl;
   switch (token) {
     case Type:
@@ -491,7 +491,7 @@ ValueImp* DOMEvent::getValueProperty(ExecState* exec, int token) const {
 
 void DOMEvent::put(ExecState* exec,
                    const Identifier& propertyName,
-                   ValueImp* value,
+                   JSValue* value,
                    int attr) {
   lookupPut<DOMEvent, DOMObject>(exec, propertyName, value, attr,
                                  &DOMEventTable, this);
@@ -499,7 +499,7 @@ void DOMEvent::put(ExecState* exec,
 
 void DOMEvent::putValueProperty(ExecState* exec,
                                 int token,
-                                ValueImp* value,
+                                JSValue* value,
                                 int) {
   EventImpl& event = *m_impl;
   switch (token) {
@@ -514,9 +514,9 @@ void DOMEvent::putValueProperty(ExecState* exec,
   }
 }
 
-ValueImp* DOMEventProtoFunc::callAsFunction(ExecState* exec,
-                                            ObjectImp* thisObj,
-                                            const List& args) {
+JSValue* DOMEventProtoFunc::callAsFunction(ExecState* exec,
+                                           JSObject* thisObj,
+                                           const List& args) {
   if (!thisObj->inherits(&DOMEvent::info))
     return throwError(exec, TypeError);
   EventImpl& event = *static_cast<DOMEvent*>(thisObj)->impl();
@@ -535,7 +535,7 @@ ValueImp* DOMEventProtoFunc::callAsFunction(ExecState* exec,
   return jsUndefined();
 }
 
-ValueImp* getDOMEvent(ExecState* exec, EventImpl* e) {
+JSValue* getDOMEvent(ExecState* exec, EventImpl* e) {
   if (!e)
     return jsNull();
   ScriptInterpreter* interp =
@@ -564,7 +564,7 @@ ValueImp* getDOMEvent(ExecState* exec, EventImpl* e) {
   return ret;
 }
 
-EventImpl* toEvent(ValueImp* val) {
+EventImpl* toEvent(JSValue* val) {
   if (!val || !val->isObject(&DOMEvent::info))
     return 0;
   return static_cast<DOMEvent*>(val)->impl();
@@ -588,13 +588,13 @@ bool EventExceptionConstructor::getOwnPropertySlot(
       exec, &EventExceptionConstructorTable, this, propertyName, slot);
 }
 
-ValueImp* EventExceptionConstructor::getValueProperty(ExecState*,
-                                                      int token) const {
+JSValue* EventExceptionConstructor::getValueProperty(ExecState*,
+                                                     int token) const {
   // We use the token as the value to return directly
   return jsNumber(token);
 }
 
-ValueImp* getEventExceptionConstructor(ExecState* exec) {
+JSValue* getEventExceptionConstructor(ExecState* exec) {
   return cacheGlobalObject<EventExceptionConstructor>(
       exec, "[[eventException.constructor]]");
 }
@@ -638,7 +638,7 @@ bool DOMUIEvent::getOwnPropertySlot(ExecState* exec,
                                                   propertyName, slot);
 }
 
-ValueImp* DOMUIEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMUIEvent::getValueProperty(ExecState* exec, int token) const {
   UIEventImpl& event = *static_cast<UIEventImpl*>(impl());
   switch (token) {
     case View:
@@ -666,9 +666,9 @@ ValueImp* DOMUIEvent::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-ValueImp* DOMUIEventProtoFunc::callAsFunction(ExecState* exec,
-                                              ObjectImp* thisObj,
-                                              const List& args) {
+JSValue* DOMUIEventProtoFunc::callAsFunction(ExecState* exec,
+                                             JSObject* thisObj,
+                                             const List& args) {
   if (!thisObj->inherits(&DOMUIEvent::info))
     return throwError(exec, TypeError);
   UIEventImpl& uiEvent =
@@ -753,7 +753,7 @@ static QPoint offsetFromTarget(const MouseRelatedEventImpl* e) {
   return QPoint(x, y);
 }
 
-ValueImp* DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
   MouseEventImpl& event = *static_cast<MouseEventImpl*>(impl());
   switch (token) {
     case ScreenX:
@@ -803,9 +803,9 @@ ValueImp* DOMMouseEvent::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-ValueImp* DOMMouseEventProtoFunc::callAsFunction(ExecState* exec,
-                                                 ObjectImp* thisObj,
-                                                 const List& args) {
+JSValue* DOMMouseEventProtoFunc::callAsFunction(ExecState* exec,
+                                                JSObject* thisObj,
+                                                const List& args) {
   if (!thisObj->inherits(&DOMMouseEvent::info))
     return throwError(exec, TypeError);
   MouseEventImpl& mouseEvent = *static_cast<MouseEventImpl*>(
@@ -877,7 +877,7 @@ bool DOMKeyboardEvent::getOwnPropertySlot(ExecState* exec,
       exec, &DOMKeyboardEventTable, this, propertyName, slot);
 }
 
-ValueImp* DOMKeyboardEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMKeyboardEvent::getValueProperty(ExecState* exec, int token) const {
   KeyboardEventImpl& event = *static_cast<KeyboardEventImpl*>(impl());
   switch (token) {
     case KeyIdentifier:
@@ -901,9 +901,9 @@ ValueImp* DOMKeyboardEvent::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-ValueImp* DOMKeyboardEventProtoFunc::callAsFunction(ExecState* exec,
-                                                    ObjectImp* thisObj,
-                                                    const List& args) {
+JSValue* DOMKeyboardEventProtoFunc::callAsFunction(ExecState* exec,
+                                                   JSObject* thisObj,
+                                                   const List& args) {
   if (!thisObj->inherits(&DOMKeyboardEvent::info))
     return throwError(exec, TypeError);
   KeyboardEventImpl& event = *static_cast<KeyboardEventImpl*>(
@@ -946,13 +946,13 @@ bool MutationEventConstructor::getOwnPropertySlot(
       exec, &MutationEventConstructorTable, this, propertyName, slot);
 }
 
-ValueImp* MutationEventConstructor::getValueProperty(ExecState*,
-                                                     int token) const {
+JSValue* MutationEventConstructor::getValueProperty(ExecState*,
+                                                    int token) const {
   // We use the token as the value to return directly
   return jsNumber(token);
 }
 
-ValueImp* getMutationEventConstructor(ExecState* exec) {
+JSValue* getMutationEventConstructor(ExecState* exec) {
   return cacheGlobalObject<MutationEventConstructor>(
       exec, "[[mutationEvent.constructor]]");
 }
@@ -994,7 +994,7 @@ bool DOMMutationEvent::getOwnPropertySlot(ExecState* exec,
       exec, &DOMMutationEventTable, this, propertyName, slot);
 }
 
-ValueImp* DOMMutationEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMMutationEvent::getValueProperty(ExecState* exec, int token) const {
   MutationEventImpl& event = *static_cast<MutationEventImpl*>(impl());
   switch (token) {
     case RelatedNode:
@@ -1014,9 +1014,9 @@ ValueImp* DOMMutationEvent::getValueProperty(ExecState* exec, int token) const {
   }
 }
 
-ValueImp* DOMMutationEventProtoFunc::callAsFunction(ExecState* exec,
-                                                    ObjectImp* thisObj,
-                                                    const List& args) {
+JSValue* DOMMutationEventProtoFunc::callAsFunction(ExecState* exec,
+                                                   JSObject* thisObj,
+                                                   const List& args) {
   if (!thisObj->inherits(&DOMMutationEvent::info))
     return throwError(exec, TypeError);
   MutationEventImpl& mutationEvent =
@@ -1076,7 +1076,7 @@ bool DOMWheelEvent::getOwnPropertySlot(ExecState* exec,
                                                      this, propertyName, slot);
 }
 
-ValueImp* DOMWheelEvent::getValueProperty(ExecState* exec, int token) const {
+JSValue* DOMWheelEvent::getValueProperty(ExecState* exec, int token) const {
   DOM::WheelEventImpl* e = static_cast<DOM::WheelEventImpl*>(impl());
   switch (token) {
     case AltKey:
@@ -1107,9 +1107,9 @@ ValueImp* DOMWheelEvent::getValueProperty(ExecState* exec, int token) const {
   return jsUndefined();
 }
 
-ValueImp* DOMWheelEventProtoFunc::callAsFunction(ExecState* exec,
-                                                 ObjectImp* thisObj,
-                                                 const List& args) {
+JSValue* DOMWheelEventProtoFunc::callAsFunction(ExecState* exec,
+                                                JSObject* thisObj,
+                                                const List& args) {
   if (!thisObj->inherits(&DOMWheelEvent::info))
     return throwError(exec, TypeError);
   return jsUndefined();
@@ -1149,7 +1149,7 @@ Clipboard::~Clipboard() {
     clipboard->deref();
 }
 
-static ValueImp* stringOrUndefined(const DOM::DOMString& str) {
+static JSValue* stringOrUndefined(const DOM::DOMString& str) {
   if (str.isNull()) {
     return jsUndefined();
   } else {
@@ -1164,7 +1164,7 @@ bool Clipboard::getOwnPropertySlot(ExecState* exec,
                                                   propertyName, slot);
 }
 
-ValueImp* Clipboard::getValueProperty(ExecState* exec, int token) const {
+JSValue* Clipboard::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case DropEffect:
       assert(clipboard->isForDragging() || clipboard->dropEffect().isNull());
@@ -1195,7 +1195,7 @@ ValueImp* Clipboard::getValueProperty(ExecState* exec, int token) const {
 
 void Clipboard::put(ExecState* exec,
                     const Identifier& propertyName,
-                    ValueImp* value,
+                    JSValue* value,
                     int attr) {
   lookupPut<Clipboard, DOMObject>(exec, propertyName, value, attr,
                                   &ClipboardTable, this);
@@ -1203,7 +1203,7 @@ void Clipboard::put(ExecState* exec,
 
 void Clipboard::putValueProperty(ExecState* exec,
                                  int token,
-                                 ValueImp* value,
+                                 JSValue* value,
                                  int /*attr*/) {
   switch (token) {
     case DropEffect:
@@ -1224,9 +1224,9 @@ void Clipboard::putValueProperty(ExecState* exec,
   }
 }
 
-ValueImp* ClipboardProtoFunc::callAsFunction(ExecState* exec,
-                                             ObjectImp* thisObj,
-                                             const List& args) {
+JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
+                                            JSObject* thisObj,
+                                            const List& args) {
   if (!thisObj->inherits(&Clipboard::info))
     return throwError(exec, TypeError);
 
@@ -1292,7 +1292,7 @@ ValueImp* ClipboardProtoFunc::callAsFunction(ExecState* exec,
       }
 
       // See if they passed us an Image object
-      ObjectImp* o = static_cast<ObjectImp*>(args[0]);
+      JSObject* o = static_cast<JSObject*>(args[0]);
       if (o->isObject() && o->inherits(&Image::info)) {
         Image* JSImage = static_cast<Image*>(o);
         cb->clipboard->setDragImage(JSImage->image()->pixmap(), QPoint(x, y));

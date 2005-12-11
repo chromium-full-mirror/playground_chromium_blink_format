@@ -43,7 +43,7 @@ class ProtectedReference : public Reference {
 
   ProtectedReference& operator=(const Reference& r) {
     JSLock lock;
-    ValueImp* old = base;
+    JSValue* old = base;
     Reference::operator=(r);
     gcProtectNullTolerant(base);
     gcUnprotectNullTolerant(old);
@@ -52,8 +52,8 @@ class ProtectedReference : public Reference {
 
  private:
   ProtectedReference();
-  ProtectedReference(ObjectImp* b, const Identifier& p);
-  ProtectedReference(ObjectImp* b, unsigned p);
+  ProtectedReference(JSObject* b, const Identifier& p);
+  ProtectedReference(JSObject* b, unsigned p);
   ProtectedReference(const Identifier& p);
   ProtectedReference(unsigned p);
 };
