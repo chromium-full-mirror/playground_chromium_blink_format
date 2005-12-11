@@ -52,8 +52,6 @@ class SVGStyledElementImpl : public SVGElementImpl {
   // 'SVGStylable' functions
   virtual SVGAnimatedStringImpl* className() const;
 
-  virtual void attach();
-
   // These need to be implemented.
   virtual bool rendererIsNeeded(khtml::RenderStyle*) { return false; }
   virtual KCanvasPath* toPathData() const { return 0; }
@@ -80,9 +78,6 @@ class SVGStyledElementImpl : public SVGElementImpl {
       const SVGStyledElementImpl* context);
 
  protected:
-  virtual void finalizeStyle(KCanvasRenderingStyle* style,
-                             bool needFillStrokeUpdate = true);
-
   void updateCanvasItem();  // Handles "path data" object changes... (not for
                             // style/transform!)
 
