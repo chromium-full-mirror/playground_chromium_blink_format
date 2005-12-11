@@ -4,12 +4,12 @@
 #include "JSValueWrapper.h"
 #include "JavaScriptCore/reference_list.h"
 
-JSValueWrapper::JSValueWrapper(ValueImp* inValue, ExecState* inExec)
+JSValueWrapper::JSValueWrapper(JSValue* inValue, ExecState* inExec)
     : fValue(inValue), fExec(inExec) {}
 
 JSValueWrapper::~JSValueWrapper() {}
 
-ValueImp* JSValueWrapper::GetValue() {
+JSValue* JSValueWrapper::GetValue() {
   return fValue;
 }
 ExecState* JSValueWrapper::GetExecState() const {
@@ -43,7 +43,7 @@ CFArrayRef JSValueWrapper::JSObjectCopyPropertyNames(void* data) {
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
-    ObjectImp* object = ptr->GetValue()->toObject(exec);
+    JSObject* object = ptr->GetValue()->toObject(exec);
     ReferenceList list = object->propList(exec);
     ReferenceListIterator iterator = list.begin();
 
@@ -72,7 +72,7 @@ JSObjectRef JSValueWrapper::JSObjectCopyProperty(void* data,
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
-    ValueImp* propValue = ptr->GetValue()->toObject(exec)->get(
+    JSValue* propValue = ptr->GetValue()->toObject(exec)->get(
         exec, CFStringToIdentifier(propertyName));
     JSValueWrapper* wrapperValue = new JSValueWrapper(propValue, exec);
 
@@ -97,8 +97,8 @@ void JSValueWrapper::JSObjectSetProperty(void* data,
   JSValueWrapper* ptr = (JSValueWrapper*)data;
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
-    ValueImp* value = JSObjectKJSValue((JSUserObject*)jsValue);
-    ObjectImp* objValue = ptr->GetValue()->toObject(exec);
+    JSValue* value = JSObjectKJSValue((JSUserObject*)jsValue);
+    JSObject* objValue = ptr->GetValue()->toObject(exec);
     objValue->put(exec, CFStringToIdentifier(propertyName), value);
   }
 }
@@ -113,19 +113,19 @@ JSObjectRef JSValueWrapper::JSObjectCallFunction(void* data,
   if (ptr) {
     ExecState* exec = ptr->GetExecState();
 
-    ValueImp* value = JSObjectKJSValue((JSUserObject*)thisObj);
-    ObjectImp* ksjThisObj = value->toObject(exec);
-    ObjectImp* objValue = ptr->GetValue()->toObject(exec);
+    JSValue* value = JSObjectKJSValue((JSUserObject*)thisObj);
+    JSObject* ksjThisObj = value->toObject(exec);
+    JSObject* objValue = ptr->GetValue()->toObject(exec);
 
     List listArgs;
     CFIndex argCount = args ? CFArrayGetCount(args) : 0;
     for (CFIndex i = 0; i < argCount; i++) {
       JSObjectRef jsArg = (JSObjectRef)CFArrayGetValueAtIndex(args, i);
-      ValueImp* kgsArg = JSObjectKJSValue((JSUserObject*)jsArg);
+      JSValue* kgsArg = JSObjectKJSValue((JSUserObject*)jsArg);
       listArgs.append(kgsArg);
     }
 
-    ValueImp* resultValue = objValue->call(exec, ksjThisObj, listArgs);
+    JSValue* resultValue = objValue->call(exec, ksjThisObj, listArgs);
     JSValueWrapper* wrapperValue =
         new JSValueWrapper(resultValue, ptr->GetExecState());
     JSObjectCallBacks callBacks;

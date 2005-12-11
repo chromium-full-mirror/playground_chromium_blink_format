@@ -9,7 +9,7 @@
 #include "JSBase.h"
 #include "JSObject.h"
 
-class UserObjectImp : public ObjectImp {
+class UserObjectImp : public JSObject {
  public:
   UserObjectImp(JSUserObject* userObject);
   virtual ~UserObjectImp();
@@ -21,17 +21,17 @@ class UserObjectImp : public ObjectImp {
 
   virtual ReferenceList propList(ExecState* exec, bool recursive = true);
 
-  virtual ValueImp* callAsFunction(ExecState* exec,
-                                   ObjectImp* thisObj,
-                                   const List& args);
+  virtual JSValue* callAsFunction(ExecState* exec,
+                                  JSObject* thisObj,
+                                  const List& args);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   virtual void put(ExecState* exec,
                    const Identifier& propertyName,
-                   ValueImp* value,
+                   JSValue* value,
                    int attr = None);
 
-  ValueImp* toPrimitive(ExecState* exec,
-                        Type preferredType = UnspecifiedType) const;
+  JSValue* toPrimitive(ExecState* exec,
+                       Type preferredType = UnspecifiedType) const;
   virtual bool toBoolean(ExecState* exec) const;
   virtual double toNumber(ExecState* exec) const;
   virtual UString toString(ExecState* exec) const;
@@ -44,9 +44,9 @@ class UserObjectImp : public ObjectImp {
   UserObjectImp();
 
  private:
-  static ValueImp* userObjectGetter(ExecState*,
-                                    const Identifier&,
-                                    const PropertySlot&);
+  static JSValue* userObjectGetter(ExecState*,
+                                   const Identifier&,
+                                   const PropertySlot&);
 
   JSUserObject* fJSUserObject;
 };
