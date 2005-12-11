@@ -272,9 +272,6 @@ class ElementImpl : public ContainerNodeImpl {
   // State of the element.
   virtual QString state() { return QString::null; }
 
-#if SVG_SUPPORT
-  virtual bool rendererIsNeeded(khtml::RenderStyle*);
-#endif
   virtual void attach();
   virtual khtml::RenderStyle* styleForRenderer(khtml::RenderObject* parent);
   virtual khtml::RenderObject* createRenderer(RenderArena*,

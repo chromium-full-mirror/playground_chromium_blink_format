@@ -811,7 +811,7 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
         return 0;
     }
   }
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
   else if (_namespaceURI == KSVG::SVGNames::svgNamespaceURI)
     e = KSVG::SVGElementFactory::createSVGElement(qName, this, false);
 #endif
@@ -2415,10 +2415,6 @@ AbstractViewImpl* DocumentImpl::defaultView() const {
 
 EventImpl* DocumentImpl::createEvent(const DOMString& eventType,
                                      int& exceptioncode) {
-  // createEvent ought to be at a time completely separate from DOM
-  // modifications that forbidEventDispatch
-  // (of course, the event _could_ be sent later, but this seems like a good
-  // bottleneck)
   if (eventType == "UIEvents" || eventType == "UIEvent")
     return new UIEventImpl();
   else if (eventType == "MouseEvents" || eventType == "MouseEvent")
@@ -2430,7 +2426,7 @@ EventImpl* DocumentImpl::createEvent(const DOMString& eventType,
   else if (eventType == "HTMLEvents" || eventType == "Event" ||
            eventType == "Events")
     return new EventImpl();
-#ifdef SVG_SUPPORT
+#if SVG_SUPPORT
   else if (eventType == "SVGEvents")
     return new EventImpl();
   else if (eventType == "SVGZoomEvents")

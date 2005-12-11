@@ -352,16 +352,16 @@ void CSSStyleSelector::loadDefaultStyle(const KHTMLSettings* s) {
   defaultPrintStyle = new CSSRuleSet();
   defaultPrintStyle->addRulesFromSheet(defaultSheet, "print");
 
-  // Collect only quirks-mode rules.
-  quirksSheet = parseUASheet(0, "khtml/css/quirks.css");
-  defaultQuirksStyle = new CSSRuleSet();
-  defaultQuirksStyle->addRulesFromSheet(quirksSheet, "screen");
-
 #if SVG_SUPPORT
   svgSheet = parseUASheet(0, "ksvg2/css/svg.css");
   defaultStyle->addRulesFromSheet(svgSheet, "screen");
   defaultPrintStyle->addRulesFromSheet(svgSheet, "print");
 #endif
+
+  // Collect only quirks-mode rules.
+  quirksSheet = parseUASheet(0, "khtml/css/quirks.css");
+  defaultQuirksStyle = new CSSRuleSet();
+  defaultQuirksStyle->addRulesFromSheet(quirksSheet, "screen");
 }
 
 void CSSStyleSelector::addMatchedRule(CSSRuleData* rule) {
@@ -4363,7 +4363,7 @@ void CSSStyleSelector::applyProperty(int id, CSSValueImpl* value) {
       // Try the SVG properties
       applySVGProperty(id, value);
 #endif
-      return;
+      break;
   }
 }
 

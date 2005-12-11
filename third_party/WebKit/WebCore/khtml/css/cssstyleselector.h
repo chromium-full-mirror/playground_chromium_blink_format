@@ -215,7 +215,6 @@ class CSSStyleSelector : public StyleSelector {
   void mapBackgroundXPosition(BackgroundLayer* layer, DOM::CSSValueImpl* value);
   void mapBackgroundYPosition(BackgroundLayer* layer, DOM::CSSValueImpl* value);
 
- protected:
   // We collect the set of decls that match in |m_matchedDecls|.  We then walk
   // the
   // set of matched decls four times, once for those properties that others

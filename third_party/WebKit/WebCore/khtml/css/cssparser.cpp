@@ -1297,9 +1297,6 @@ bool CSSParser::parseValue(int propId, bool important) {
       return parseShorthand(propId, properties, 3, important);
     }
     default:
-// #ifdef CSS_DEBUG
-// 	kdDebug( 6080 ) << "illegal or CSS2 Aural property: " << val << endl;
-// #endif
 #if SVG_SUPPORT
       if (parseSVGValue(propId, important))
         return true;

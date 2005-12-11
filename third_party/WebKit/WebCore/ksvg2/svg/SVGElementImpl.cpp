@@ -142,4 +142,10 @@ void SVGElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
     KDOM::StyledElementImpl::parseMappedAttribute(attr);
 }
 
+bool SVGElementImpl::childShouldCreateRenderer(DOM::NodeImpl* child) const {
+  if (child->isSVGElement())
+    return static_cast<SVGElementImpl*>(child)->isValid();
+  return false;
+}
+
 // vim:ts=4:noet
