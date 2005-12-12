@@ -45,7 +45,6 @@
 */
 @interface WebHTMLView : NSControl<WebDocumentView,
                                    WebDocumentSearching,
-                                   WebDocumentText,
                                    WebDocumentDragging,
                                    WebDocumentElement,
                                    WebDocumentSelection> {
