@@ -22,10 +22,6 @@
 #include <qstring.h>
 #include <math.h>
 
-#ifndef APPLE_CHANGES
-#include <iostream>
-#endif
-
 using namespace KSVG;
 
 const char* KSVG::parseCoord(const char* ptr, double& number) {
@@ -249,6 +245,11 @@ void SVGPathParser::parseSVG(const QString& s, bool process) {
           ptr = parseCoord(ptr, y2);
           ptr = parseCoord(ptr, tox);
           ptr = parseCoord(ptr, toy);
+          if (!(lastCommand == 'c' || lastCommand == 'C' ||
+                lastCommand == 's' || lastCommand == 'S')) {
+            contrlx = curx;
+            contrly = cury;
+          }
 
           if (process) {
             px1 = 2 * curx - contrlx;
@@ -303,6 +304,11 @@ void SVGPathParser::parseSVG(const QString& s, bool process) {
         case 'T': {
           ptr = parseCoord(ptr, tox);
           ptr = parseCoord(ptr, toy);
+          if (!(lastCommand == 'q' || lastCommand == 'Q' ||
+                lastCommand == 't' || lastCommand == 'T')) {
+            contrlx = curx;
+            contrly = cury;
+          }
 
           if (process) {
             xc = 2 * curx - contrlx;
@@ -364,7 +370,6 @@ void SVGPathParser::parseSVG(const QString& s, bool process) {
           return;
         }
       }
-
       lastCommand = command;
 
       if (*ptr == '+' || *ptr == '-' || (*ptr >= '0' && *ptr <= '9')) {
