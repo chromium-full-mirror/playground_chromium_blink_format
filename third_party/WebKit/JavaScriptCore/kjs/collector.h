@@ -64,6 +64,9 @@ class Collector {
   static void finalCheck();
 #endif
 
+  static void protect(JSValue*);
+  static void unprotect(JSValue*);
+
   static size_t numInterpreters();
   static size_t numGCNotAllowedObjects();
   static size_t numReferencedObjects();

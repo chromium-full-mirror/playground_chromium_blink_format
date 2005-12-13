@@ -191,6 +191,10 @@ class HashMap<P*, Mapped, PointerHash<P*>, HashTraits<P*>, HashTraits<Mapped>> {
     return m_impl.set(key, mapped);
   }
 
+  std::pair<iterator, bool> add(const KeyType& key, const MappedType& mapped) {
+    return m_impl.add(key, mapped);
+  }
+
   void remove(const KeyType& key) { m_impl.remove(key); }
   void remove(iterator it) { m_impl.remove(it.m_impl); }
   void clear() { m_impl.clear(); }
@@ -253,6 +257,10 @@ class HashMap<P*, Q*, PointerHash<P*>, HashTraits<P*>, HashTraits<Q*>> {
 
   std::pair<iterator, bool> set(const KeyType& key, const MappedType& mapped) {
     return m_impl.set(key, mapped);
+  }
+
+  std::pair<iterator, bool> add(const KeyType& key, const MappedType& mapped) {
+    return m_impl.add(key, mapped);
   }
 
   void remove(const KeyType& key) { m_impl.remove(key); }
