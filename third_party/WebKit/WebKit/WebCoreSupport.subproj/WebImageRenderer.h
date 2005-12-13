@@ -55,9 +55,6 @@
 - (NSRect)targetAnimationRect;
 - (void)resize:(NSSize)s;
 - (NSSize)size;
-- (NSData*)TIFFRepresentation;
-- (NSImage*)image;
-- (CGImageRef)imageRef;
 
 @end
 
