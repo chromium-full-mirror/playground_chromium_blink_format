@@ -69,8 +69,6 @@ class ReplacementFragment {
 
   const QValueList<NodeDesiredStyle>& desiredStyles() { return m_styles; }
 
-  void pruneEmptyNodes();
-
   EFragmentType type() const { return m_type; }
   bool isEmpty() const { return m_type == EmptyFragment; }
   bool isSingleTextNode() const { return m_type == SingleTextNodeFragment; }

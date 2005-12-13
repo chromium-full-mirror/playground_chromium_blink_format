@@ -189,35 +189,6 @@ NodeImpl* ReplacementFragment::mergeStartNode() const {
   return node;
 }
 
-static bool isProbablyTableStructureNode(const NodeImpl* node) {
-  if (!node)
-    return false;
-
-  return (node->hasTagName(tableTag) || node->hasTagName(tbodyTag) ||
-          node->hasTagName(tdTag) || node->hasTagName(tfootTag) ||
-          node->hasTagName(theadTag) || node->hasTagName(trTag));
-}
-
-void ReplacementFragment::pruneEmptyNodes() {
-  bool run = true;
-  while (run) {
-    run = false;
-    NodeImpl* node = m_fragment->firstChild();
-    while (node) {
-      if ((node->isTextNode() && static_cast<TextImpl*>(node)->length() == 0) ||
-          (isProbablyBlock(node) && !isProbablyTableStructureNode(node) &&
-           node->childNodeCount() == 0)) {
-        NodeImpl* next = node->traverseNextSibling();
-        removeNode(node);
-        node = next;
-        run = true;
-      } else {
-        node = node->traverseNextNode();
-      }
-    }
-  }
-}
-
 bool ReplacementFragment::isInterchangeNewlineNode(const NodeImpl* node) {
   static DOMString interchangeNewlineClassString(AppleInterchangeNewline);
   return node && node->hasTagName(brTag) &&
@@ -808,6 +779,7 @@ void ReplaceSelectionCommand::doApply() {
           Position(m_fragment.mergeStartNode(), 0))) {
     NodeImpl* refNode = m_fragment.mergeStartNode();
     if (refNode) {
+      NodeImpl* parent = refNode->parentNode();
       NodeImpl* node = refNode->nextSibling();
       insertNodeAtAndUpdateNodesInserted(refNode, startPos.node(),
                                          startPos.offset());
@@ -816,6 +788,14 @@ void ReplaceSelectionCommand::doApply() {
         insertNodeAfterAndUpdateNodesInserted(node, refNode);
         refNode = node;
         node = next;
+      }
+
+      // remove any ancestors we emptied, except the root itself which cannot be
+      // removed
+      while (parent && parent->parentNode() && parent->childNodeCount() == 0) {
+        NodeImpl* nextParent = parent->parentNode();
+        removeNode(parent);
+        parent = nextParent;
       }
     }
 
@@ -826,10 +806,6 @@ void ReplaceSelectionCommand::doApply() {
           Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset());
     }
   }
-
-  // prune empty nodes from fragment
-  // NOTE: why was this not done earlier, before the mergeStart?
-  m_fragment.pruneEmptyNodes();
 
   // step 2 : merge everything remaining in the fragment
   if (m_fragment.firstChild()) {
