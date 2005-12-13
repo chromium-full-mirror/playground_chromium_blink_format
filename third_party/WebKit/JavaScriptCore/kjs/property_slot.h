@@ -36,19 +36,25 @@ class JSObject;
 class PropertySlot {
  public:
   typedef JSValue* (*GetValueFunc)(ExecState*,
+                                   JSObject* originalObject,
                                    const Identifier&,
                                    const PropertySlot&);
 
-  JSValue* getValue(ExecState* exec, const Identifier& propertyName) const {
+  JSValue* getValue(ExecState* exec,
+                    JSObject* originalObject,
+                    const Identifier& propertyName) const {
     if (m_getValue == VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
-    return m_getValue(exec, propertyName, *this);
+    return m_getValue(exec, originalObject, propertyName, *this);
   }
 
-  JSValue* getValue(ExecState* exec, unsigned propertyName) const {
+  JSValue* getValue(ExecState* exec,
+                    JSObject* originalObject,
+                    unsigned propertyName) const {
     if (m_getValue == VALUE_SLOT_MARKER)
       return *m_data.valueSlot;
-    return m_getValue(exec, Identifier::from(propertyName), *this);
+    return m_getValue(exec, originalObject, Identifier::from(propertyName),
+                      *this);
   }
 
   void setValueSlot(JSObject* slotBase, JSValue** valueSlot) {
@@ -81,6 +87,12 @@ class PropertySlot {
     m_getValue = getValue;
   }
 
+  void setGetterSlot(JSObject* slotBase, JSObject* getterFunc) {
+    m_getValue = functionGetter;
+    m_slotBase = slotBase;
+    m_data.getterFunc = getterFunc;
+  }
+
   void setUndefined(JSObject* slotBase) {
     m_slotBase = slotBase;
     m_getValue = undefinedGetter;
@@ -93,13 +105,19 @@ class PropertySlot {
 
  private:
   static JSValue* undefinedGetter(ExecState*,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
+  static JSValue* functionGetter(ExecState*,
+                                 JSObject*,
+                                 const Identifier&,
+                                 const PropertySlot&);
 
   GetValueFunc m_getValue;
 
   JSObject* m_slotBase;
   union {
+    JSObject* getterFunc;
     JSValue** valueSlot;
     const HashEntry* staticEntry;
     unsigned index;

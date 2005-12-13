@@ -625,6 +625,9 @@ static const char* className(JSCell* val) {
       name = info ? info->className : "Object";
       break;
     }
+    case GetterSetterType:
+      name = "gettersetter";
+      break;
   }
   return name;
 }

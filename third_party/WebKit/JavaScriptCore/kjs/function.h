@@ -72,9 +72,11 @@ class FunctionImp : public InternalFunctionImp {
 
  private:
   static JSValue* argumentsGetter(ExecState*,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
   static JSValue* lengthGetter(ExecState*,
+                               JSObject*,
                                const Identifier&,
                                const PropertySlot&);
 
@@ -137,6 +139,7 @@ class Arguments : public JSObject {
 
  private:
   static JSValue* mappedIndexGetter(ExecState* exec,
+                                    JSObject*,
                                     const Identifier&,
                                     const PropertySlot& slot);
 
@@ -163,6 +166,7 @@ class ActivationImp : public JSObject {
  private:
   static PropertySlot::GetValueFunc getArgumentsGetter();
   static JSValue* argumentsGetter(ExecState* exec,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot);
   void createArgumentsObject(ExecState* exec) const;

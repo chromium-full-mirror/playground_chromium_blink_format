@@ -73,6 +73,7 @@ ArrayInstance::~ArrayInstance() {
 }
 
 JSValue* ArrayInstance::lengthGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   return jsNumber(static_cast<ArrayInstance*>(slot.slotBase())->length);
@@ -427,7 +428,7 @@ static JSValue* getProperty(ExecState* exec, JSObject* obj, unsigned index) {
   PropertySlot slot;
   if (!obj->getPropertySlot(exec, index, slot))
     return NULL;
-  return slot.getValue(exec, index);
+  return slot.getValue(exec, obj, index);
 }
 
 // ECMA 15.4.4

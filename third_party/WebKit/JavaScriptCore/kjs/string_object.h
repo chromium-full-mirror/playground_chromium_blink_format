@@ -44,9 +44,11 @@ class StringInstance : public JSObject {
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
+                               JSObject*,
                                const Identifier&,
                                const PropertySlot& slot);
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
 };

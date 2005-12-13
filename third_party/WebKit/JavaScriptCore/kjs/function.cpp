@@ -200,6 +200,7 @@ void FunctionImp::processParameters(ExecState* exec, const List& args) {
 void FunctionImp::processVarDecls(ExecState* /*exec*/) {}
 
 JSValue* FunctionImp::argumentsGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -215,6 +216,7 @@ JSValue* FunctionImp::argumentsGetter(ExecState* exec,
 }
 
 JSValue* FunctionImp::lengthGetter(ExecState* exec,
+                                   JSObject* originalObject,
                                    const Identifier& propertyName,
                                    const PropertySlot& slot) {
   FunctionImp* thisObj = static_cast<FunctionImp*>(slot.slotBase());
@@ -440,6 +442,7 @@ void Arguments::mark() {
 }
 
 JSValue* Arguments::mappedIndexGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   Arguments* thisObj = static_cast<Arguments*>(slot.slotBase());
@@ -491,6 +494,7 @@ ActivationImp::ActivationImp(FunctionImp* function, const List& arguments)
 }
 
 JSValue* ActivationImp::argumentsGetter(ExecState* exec,
+                                        JSObject* originalObject,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   ActivationImp* thisObj = static_cast<ActivationImp*>(slot.slotBase());

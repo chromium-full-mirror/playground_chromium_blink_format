@@ -45,6 +45,7 @@ RuntimeArray::~RuntimeArray() {
 }
 
 JSValue* RuntimeArray::lengthGetter(ExecState* exec,
+                                    JSObject* originalObject,
                                     const Identifier& propertyName,
                                     const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());
@@ -52,6 +53,7 @@ JSValue* RuntimeArray::lengthGetter(ExecState* exec,
 }
 
 JSValue* RuntimeArray::indexGetter(ExecState* exec,
+                                   JSObject* originalObject,
                                    const Identifier& propertyName,
                                    const PropertySlot& slot) {
   RuntimeArray* thisObj = static_cast<RuntimeArray*>(slot.slotBase());

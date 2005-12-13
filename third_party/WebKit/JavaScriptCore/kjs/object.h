@@ -82,6 +82,33 @@ struct ClassInfo {
   void* dummy;
 };
 
+// This is an internal value object which stores getter and setter functions
+// for a property.
+class GetterSetterImp : public JSCell {
+ public:
+  Type type() const { return GetterSetterType; }
+
+  GetterSetterImp() : getter(0), setter(0) {}
+
+  virtual JSValue* toPrimitive(ExecState* exec,
+                               Type preferred = UnspecifiedType) const;
+  virtual bool toBoolean(ExecState* exec) const;
+  virtual double toNumber(ExecState* exec) const;
+  virtual UString toString(ExecState* exec) const;
+  virtual JSObject* toObject(ExecState* exec) const;
+
+  virtual void mark();
+
+  JSObject* getGetter() { return getter; }
+  void setGetter(JSObject* g) { getter = g; }
+  JSObject* getSetter() { return setter; }
+  void setSetter(JSObject* s) { setter = s; }
+
+ private:
+  JSObject* getter;
+  JSObject* setter;
+};
+
 class JSObject : public JSCell {
  public:
   /**
@@ -496,6 +523,13 @@ class JSObject : public JSCell {
   void putDirect(const Identifier& propertyName, JSValue* value, int attr = 0);
   void putDirect(const Identifier& propertyName, int value, int attr = 0);
 
+  void defineGetter(ExecState* exec,
+                    const Identifier& propertyName,
+                    JSObject* getterFunc);
+  void defineSetter(ExecState* exec,
+                    const Identifier& propertyName,
+                    JSObject* setterFunc);
+
   /**
    * Remove all properties from this object.
    * This doesn't take DontDelete into account, and isn't in the ECMA spec.
@@ -633,7 +667,16 @@ inline bool JSObject::getOwnPropertySlot(ExecState* exec,
                                          const Identifier& propertyName,
                                          PropertySlot& slot) {
   if (JSValue** location = getDirectLocation(propertyName)) {
-    slot.setValueSlot(this, location);
+    if ((*location)->type() == GetterSetterType) {
+      GetterSetterImp* gs = static_cast<GetterSetterImp*>(*location);
+      JSObject* getterFunc = gs->getGetter();
+      if (getterFunc)
+        slot.setGetterSlot(this, getterFunc);
+      else
+        slot.setUndefined(this);
+    } else {
+      slot.setValueSlot(this, location);
+    }
     return true;
   }
 

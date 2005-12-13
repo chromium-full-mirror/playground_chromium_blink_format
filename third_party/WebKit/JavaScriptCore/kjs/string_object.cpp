@@ -50,6 +50,7 @@ StringInstance::StringInstance(JSObject* proto, const UString& string)
 }
 
 JSValue* StringInstance::lengthGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   return jsNumber(static_cast<StringInstance*>(slot.slotBase())
@@ -59,6 +60,7 @@ JSValue* StringInstance::lengthGetter(ExecState* exec,
 }
 
 JSValue* StringInstance::indexGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   const UChar c = static_cast<StringInstance*>(slot.slotBase())
