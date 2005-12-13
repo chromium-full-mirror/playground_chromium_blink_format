@@ -193,9 +193,11 @@ class DOMNodeList : public DOMObject {
 
  private:
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
   static JSValue* nameGetter(ExecState* exec,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot& slot);
 
@@ -321,6 +323,7 @@ class DOMElement : public DOMNode {
 
  private:
   static JSValue* attributeGetter(ExecState* exec,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot);
 };
@@ -386,12 +389,15 @@ class DOMNamedNodeMap : public DOMObject {
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
+                               JSObject*,
                                const Identifier&,
                                const PropertySlot& slot);
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
   static JSValue* nameGetter(ExecState* exec,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot& slot);
 
@@ -477,9 +483,11 @@ class DOMNamedNodesCollection : public DOMObject {
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
+                               JSObject*,
                                const Identifier&,
                                const PropertySlot& slot);
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
 

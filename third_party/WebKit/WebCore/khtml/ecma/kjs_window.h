@@ -319,15 +319,19 @@ class Window : public JSObject {
 
  private:
   static JSValue* childFrameGetter(ExecState* exec,
+                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot& slot);
   static JSValue* namedFrameGetter(ExecState* exec,
+                                   JSObject*,
                                    const Identifier&,
                                    const PropertySlot& slot);
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
   static JSValue* namedItemGetter(ExecState* exec,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot);
 

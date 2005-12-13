@@ -73,9 +73,11 @@ class DOMCSSStyleDeclaration : public DOMObject {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* cssPropertyGetter(ExecState*,
+                                    JSObject*,
                                     const Identifier&,
                                     const PropertySlot&);
 
@@ -129,9 +131,11 @@ class DOMStyleSheetList : public DOMObject {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* nameGetter(ExecState*,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot&);
 
@@ -163,6 +167,7 @@ class DOMMediaList : public DOMObject {
 
  private:
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
   RefPtr<DOM::MediaListImpl> m_impl;
@@ -196,6 +201,7 @@ class DOMCSSRuleList : public DOMObject {
 
  private:
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
 
@@ -353,6 +359,7 @@ class DOMCSSValueList : public DOMCSSValue {
 
  private:
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
 };

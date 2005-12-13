@@ -95,6 +95,7 @@ class HTMLDocument : public DOMDocument {
 
  private:
   static JSValue* namedItemGetter(ExecState*,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot&);
 };
@@ -792,24 +793,31 @@ class HTMLElement : public DOMElement {
 
  private:
   static JSValue* formIndexGetter(ExecState* exec,
+                                  JSObject*,
                                   const Identifier&,
                                   const PropertySlot& slot);
   static JSValue* formNameGetter(ExecState* exec,
+                                 JSObject*,
                                  const Identifier&,
                                  const PropertySlot& slot);
   static JSValue* selectIndexGetter(ExecState* exec,
+                                    JSObject*,
                                     const Identifier&,
                                     const PropertySlot& slot);
   static JSValue* framesetNameGetter(ExecState* exec,
+                                     JSObject*,
                                      const Identifier&,
                                      const PropertySlot& slot);
   static JSValue* frameWindowPropertyGetter(ExecState* exec,
+                                            JSObject*,
                                             const Identifier&,
                                             const PropertySlot& slot);
   static JSValue* runtimeObjectGetter(ExecState* exec,
+                                      JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot);
   static JSValue* runtimeObjectPropertyGetter(ExecState* exec,
+                                              JSObject*,
                                               const Identifier&,
                                               const PropertySlot& slot);
 };
@@ -844,12 +852,15 @@ class HTMLCollection : public DOMObject {
 
  private:
   static JSValue* lengthGetter(ExecState* exec,
+                               JSObject*,
                                const Identifier&,
                                const PropertySlot& slot);
   static JSValue* indexGetter(ExecState* exec,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot& slot);
   static JSValue* nameGetter(ExecState* exec,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot& slot);
 };
@@ -867,6 +878,7 @@ class HTMLSelectCollection : public HTMLCollection {
 
  private:
   static JSValue* selectedIndexGetter(ExecState* exec,
+                                      JSObject*,
                                       const Identifier&,
                                       const PropertySlot& slot);
 

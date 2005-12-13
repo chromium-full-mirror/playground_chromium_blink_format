@@ -272,6 +272,7 @@ HTMLDocument::HTMLDocument(ExecState* exec, HTMLDocumentImpl* d)
     : DOMDocument(exec, d) {}
 
 JSValue* HTMLDocument::namedItemGetter(ExecState* exec,
+                                       JSObject* originalObject,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   HTMLDocument* thisObj = static_cast<HTMLDocument*>(slot.slotBase());
@@ -1426,6 +1427,7 @@ HTMLElement::HTMLElement(ExecState* exec, HTMLElementImpl* e)
     : DOMElement(exec, e) {}
 
 JSValue* HTMLElement::formIndexGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1436,6 +1438,7 @@ JSValue* HTMLElement::formIndexGetter(ExecState* exec,
 }
 
 JSValue* HTMLElement::formNameGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1447,6 +1450,7 @@ JSValue* HTMLElement::formNameGetter(ExecState* exec,
 }
 
 JSValue* HTMLElement::selectIndexGetter(ExecState* exec,
+                                        JSObject* originalObject,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1457,6 +1461,7 @@ JSValue* HTMLElement::selectIndexGetter(ExecState* exec,
 }
 
 JSValue* HTMLElement::framesetNameGetter(ExecState* exec,
+                                         JSObject* originalObject,
                                          const Identifier& propertyName,
                                          const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1472,6 +1477,7 @@ JSValue* HTMLElement::framesetNameGetter(ExecState* exec,
 }
 
 JSValue* HTMLElement::frameWindowPropertyGetter(ExecState* exec,
+                                                JSObject* originalObject,
                                                 const Identifier& propertyName,
                                                 const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1485,6 +1491,7 @@ JSValue* HTMLElement::frameWindowPropertyGetter(ExecState* exec,
 }
 
 JSValue* HTMLElement::runtimeObjectGetter(ExecState* exec,
+                                          JSObject* originalObject,
                                           const Identifier& propertyName,
                                           const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -1495,6 +1502,7 @@ JSValue* HTMLElement::runtimeObjectGetter(ExecState* exec,
 
 JSValue* HTMLElement::runtimeObjectPropertyGetter(
     ExecState* exec,
+    JSObject* originalObject,
     const Identifier& propertyName,
     const PropertySlot& slot) {
   HTMLElement* thisObj = static_cast<HTMLElement*>(slot.slotBase());
@@ -4581,6 +4589,7 @@ HTMLCollection::~HTMLCollection() {
 }
 
 JSValue* HTMLCollection::lengthGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
@@ -4588,6 +4597,7 @@ JSValue* HTMLCollection::lengthGetter(ExecState* exec,
 }
 
 JSValue* HTMLCollection::indexGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
@@ -4595,6 +4605,7 @@ JSValue* HTMLCollection::indexGetter(ExecState* exec,
 }
 
 JSValue* HTMLCollection::nameGetter(ExecState* exec,
+                                    JSObject* originalObject,
                                     const Identifier& propertyName,
                                     const PropertySlot& slot) {
   HTMLCollection* thisObj = static_cast<HTMLCollection*>(slot.slotBase());
@@ -4727,6 +4738,7 @@ HTMLSelectCollection::HTMLSelectCollection(ExecState* exec,
 
 JSValue* HTMLSelectCollection::selectedIndexGetter(
     ExecState* exec,
+    JSObject* originalObject,
     const Identifier& propertyName,
     const PropertySlot& slot) {
   HTMLSelectCollection* thisObj =

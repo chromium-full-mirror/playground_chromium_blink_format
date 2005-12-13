@@ -767,6 +767,7 @@ JSValue* DOMNodeList::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* DOMNodeList::indexGetter(ExecState* exec,
+                                  JSObject* originalObject,
                                   const Identifier& propertyName,
                                   const PropertySlot& slot) {
   DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
@@ -774,6 +775,7 @@ JSValue* DOMNodeList::indexGetter(ExecState* exec,
 }
 
 JSValue* DOMNodeList::nameGetter(ExecState* exec,
+                                 JSObject* originalObject,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   DOMNodeList* thisObj = static_cast<DOMNodeList*>(slot.slotBase());
@@ -1262,6 +1264,7 @@ JSValue* DOMElement::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* DOMElement::attributeGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   DOMElement* thisObj = static_cast<DOMElement*>(slot.slotBase());
@@ -1581,6 +1584,7 @@ DOMNamedNodeMap::~DOMNamedNodeMap() {
 }
 
 JSValue* DOMNamedNodeMap::lengthGetter(ExecState* exec,
+                                       JSObject* originalObject,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
@@ -1588,6 +1592,7 @@ JSValue* DOMNamedNodeMap::lengthGetter(ExecState* exec,
 }
 
 JSValue* DOMNamedNodeMap::indexGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
@@ -1595,6 +1600,7 @@ JSValue* DOMNamedNodeMap::indexGetter(ExecState* exec,
 }
 
 JSValue* DOMNamedNodeMap::nameGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   DOMNamedNodeMap* thisObj = static_cast<DOMNamedNodeMap*>(slot.slotBase());
@@ -2048,6 +2054,7 @@ DOMNamedNodesCollection::DOMNamedNodesCollection(
     : m_nodes(nodes) {}
 
 JSValue* DOMNamedNodesCollection::lengthGetter(ExecState* exec,
+                                               JSObject* originalObject,
                                                const Identifier& propertyName,
                                                const PropertySlot& slot) {
   DOMNamedNodesCollection* thisObj =
@@ -2056,6 +2063,7 @@ JSValue* DOMNamedNodesCollection::lengthGetter(ExecState* exec,
 }
 
 JSValue* DOMNamedNodesCollection::indexGetter(ExecState* exec,
+                                              JSObject* originalObject,
                                               const Identifier& propertyName,
                                               const PropertySlot& slot) {
   DOMNamedNodesCollection* thisObj =

@@ -151,6 +151,7 @@ DOMCSSStyleDeclaration::~DOMCSSStyleDeclaration() {
 }
 
 JSValue* DOMCSSStyleDeclaration::indexGetter(ExecState* exec,
+                                             JSObject* originalObject,
                                              const Identifier& propertyName,
                                              const PropertySlot& slot) {
   DOMCSSStyleDeclaration* thisObj =
@@ -160,6 +161,7 @@ JSValue* DOMCSSStyleDeclaration::indexGetter(ExecState* exec,
 
 JSValue* DOMCSSStyleDeclaration::cssPropertyGetter(
     ExecState* exec,
+    JSObject* originalObject,
     const Identifier& propertyName,
     const PropertySlot& slot) {
   DOMCSSStyleDeclaration* thisObj =
@@ -414,6 +416,7 @@ JSValue* DOMStyleSheetList::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* DOMStyleSheetList::indexGetter(ExecState* exec,
+                                        JSObject* originalObject,
                                         const Identifier& propertyName,
                                         const PropertySlot& slot) {
   DOMStyleSheetList* thisObj = static_cast<DOMStyleSheetList*>(slot.slotBase());
@@ -421,6 +424,7 @@ JSValue* DOMStyleSheetList::indexGetter(ExecState* exec,
 }
 
 JSValue* DOMStyleSheetList::nameGetter(ExecState* exec,
+                                       JSObject* originalObject,
                                        const Identifier& propertyName,
                                        const PropertySlot& slot) {
   DOMStyleSheetList* thisObj = static_cast<DOMStyleSheetList*>(slot.slotBase());
@@ -544,6 +548,7 @@ JSValue* DOMMediaList::getValueProperty(ExecState* exec, int token) {
 }
 
 JSValue* DOMMediaList::indexGetter(ExecState* exec,
+                                   JSObject* originalObject,
                                    const Identifier& propertyName,
                                    const PropertySlot& slot) {
   DOMMediaList* thisObj = static_cast<DOMMediaList*>(slot.slotBase());
@@ -712,6 +717,7 @@ JSValue* DOMCSSRuleList::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* DOMCSSRuleList::indexGetter(ExecState* exec,
+                                     JSObject* originalObject,
                                      const Identifier& propertyName,
                                      const PropertySlot& slot) {
   DOMCSSRuleList* thisObj = static_cast<DOMCSSRuleList*>(slot.slotBase());
@@ -1331,6 +1337,7 @@ JSValue* DOMCSSValueList::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* DOMCSSValueList::indexGetter(ExecState* exec,
+                                      JSObject* originalObject,
                                       const Identifier& propertyName,
                                       const PropertySlot& slot) {
   DOMCSSValueList* thisObj = static_cast<DOMCSSValueList*>(slot.slotBase());

@@ -80,9 +80,11 @@ class Plugins : public PluginBase {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* nameGetter(ExecState*,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot&);
 };
@@ -98,9 +100,11 @@ class MimeTypes : public PluginBase {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* nameGetter(ExecState*,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot&);
 };
@@ -116,9 +120,11 @@ class Plugin : public PluginBase {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* nameGetter(ExecState*,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot&);
 
@@ -353,12 +359,14 @@ JSValue* Plugins::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* Plugins::indexGetter(ExecState* exec,
+                              JSObject* originalObject,
                               const Identifier& propertyName,
                               const PropertySlot& slot) {
   return new Plugin(exec, plugins->at(slot.index()));
 }
 
 JSValue* Plugins::nameGetter(ExecState* exec,
+                             JSObject* originalObject,
                              const Identifier& propertyName,
                              const PropertySlot& slot) {
   for (PluginInfo* pl = plugins->first(); pl; pl = plugins->next()) {
@@ -414,12 +422,14 @@ JSValue* MimeTypes::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* MimeTypes::indexGetter(ExecState* exec,
+                                JSObject* originalObject,
                                 const Identifier& propertyName,
                                 const PropertySlot& slot) {
   return new MimeType(exec, mimes->at(slot.index()));
 }
 
 JSValue* MimeTypes::nameGetter(ExecState* exec,
+                               JSObject* originalObject,
                                const Identifier& propertyName,
                                const PropertySlot& slot) {
   for (MimeClassInfo* m = mimes->first(); m; m = mimes->next()) {
@@ -485,6 +495,7 @@ JSValue* Plugin::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* Plugin::indexGetter(ExecState* exec,
+                             JSObject* originalObject,
                              const Identifier& propertyName,
                              const PropertySlot& slot) {
   Plugin* thisObj = static_cast<Plugin*>(slot.slotBase());
@@ -492,6 +503,7 @@ JSValue* Plugin::indexGetter(ExecState* exec,
 }
 
 JSValue* Plugin::nameGetter(ExecState* exec,
+                            JSObject* originalObject,
                             const Identifier& propertyName,
                             const PropertySlot& slot) {
   Plugin* thisObj = static_cast<Plugin*>(slot.slotBase());

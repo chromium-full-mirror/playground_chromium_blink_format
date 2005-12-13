@@ -129,9 +129,11 @@ class FrameArray : public JSObject {
 
  private:
   static JSValue* indexGetter(ExecState*,
+                              JSObject*,
                               const Identifier&,
                               const PropertySlot&);
   static JSValue* nameGetter(ExecState*,
+                             JSObject*,
                              const Identifier&,
                              const PropertySlot&);
 
@@ -964,6 +966,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
 }
 
 JSValue* Window::childFrameGetter(ExecState* exec,
+                                  JSObject* originalObject,
                                   const Identifier& propertyName,
                                   const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
@@ -971,6 +974,7 @@ JSValue* Window::childFrameGetter(ExecState* exec,
 }
 
 JSValue* Window::namedFrameGetter(ExecState* exec,
+                                  JSObject* originalObject,
                                   const Identifier& propertyName,
                                   const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
@@ -978,6 +982,7 @@ JSValue* Window::namedFrameGetter(ExecState* exec,
 }
 
 JSValue* Window::indexGetter(ExecState* exec,
+                             JSObject* originalObject,
                              const Identifier& propertyName,
                              const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
@@ -990,6 +995,7 @@ JSValue* Window::indexGetter(ExecState* exec,
 }
 
 JSValue* Window::namedItemGetter(ExecState* exec,
+                                 JSObject* originalObject,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   Window* thisObj = static_cast<Window*>(slot.slotBase());
@@ -2145,6 +2151,7 @@ JSValue* FrameArray::getValueProperty(ExecState* exec, int token) {
 }
 
 JSValue* FrameArray::indexGetter(ExecState* exec,
+                                 JSObject* originalObject,
                                  const Identifier& propertyName,
                                  const PropertySlot& slot) {
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
@@ -2159,6 +2166,7 @@ JSValue* FrameArray::indexGetter(ExecState* exec,
 }
 
 JSValue* FrameArray::nameGetter(ExecState* exec,
+                                JSObject* originalObject,
                                 const Identifier& propertyName,
                                 const PropertySlot& slot) {
   FrameArray* thisObj = static_cast<FrameArray*>(slot.slotBase());
