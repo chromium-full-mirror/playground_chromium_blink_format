@@ -102,6 +102,7 @@ ReferenceList UserObjectImp::propList(ExecState* exec, bool recursive) {
 }
 
 JSValue* UserObjectImp::userObjectGetter(ExecState*,
+                                         JSObject*,
                                          const Identifier& propertyName,
                                          const PropertySlot& slot) {
   UserObjectImp* thisObj = static_cast<UserObjectImp*>(slot.slotBase());

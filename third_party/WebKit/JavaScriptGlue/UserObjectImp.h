@@ -45,7 +45,8 @@ class UserObjectImp : public JSObject {
 
  private:
   static JSValue* userObjectGetter(ExecState*,
-                                   const Identifier&,
+                                   JSObject* originalObject,
+                                   const Identifier& propertyName,
                                    const PropertySlot&);
 
   JSUserObject* fJSUserObject;
