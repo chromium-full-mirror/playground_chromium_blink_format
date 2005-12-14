@@ -170,7 +170,7 @@ class Window : public JSObject {
   PausedTimeouts* pauseTimeouts() { return winq->pauseTimeouts(); }
   void resumeTimeouts(PausedTimeouts* t) { winq->resumeTimeouts(t); }
 
-  KJS::Interpreter* interpreter() const;
+  KJS::ScriptInterpreter* interpreter() const;
 
   void scheduleClose();
 

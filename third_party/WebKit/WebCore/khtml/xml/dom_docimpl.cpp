@@ -1379,10 +1379,6 @@ void DocumentImpl::implicitOpen() {
   connect(m_tokenizer, SIGNAL(finishedParsing()), this,
           SIGNAL(finishedParsing()));
   setParsing(true);
-
-  if (m_view && m_view->part()->jScript()) {
-    m_view->part()->jScript()->setSourceFile(m_url, "");  // fixme
-  }
 }
 
 HTMLElementImpl* DocumentImpl::body() {
@@ -1551,9 +1547,6 @@ void DocumentImpl::write(const QString& text) {
     write(QString("<html>"));
   }
   m_tokenizer->write(text, false);
-
-  if (m_view && m_view->part()->jScript())
-    m_view->part()->jScript()->appendSourceFile(m_url, text);
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
   if (!ownerElement())

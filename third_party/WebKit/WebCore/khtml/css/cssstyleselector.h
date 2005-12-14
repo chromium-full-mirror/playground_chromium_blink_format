@@ -100,7 +100,7 @@ class CSSStyleSelector : public StyleSelector {
   CSSStyleSelector(DOM::CSSStyleSheetImpl* sheet);
   ~CSSStyleSelector();
 
-  static void loadDefaultStyle(const KHTMLSettings* s = 0);
+  static void loadDefaultStyle();
 
   void initElementAndPseudoState(DOM::ElementImpl* e);
   void initForStyleResolve(DOM::ElementImpl* e, RenderStyle* parentStyle);

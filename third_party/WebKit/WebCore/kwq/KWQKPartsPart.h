@@ -26,7 +26,6 @@
 #ifndef PART_H_
 #define PART_H_
 
-#include "KWQKInstance.h"
 #include "KWQKURL.h"
 #include "KWQObject.h"
 #include "KWQVariant.h"
@@ -80,9 +79,6 @@ class ReadOnlyPart : public Part {
 
   virtual void setName(const QString& name);
   QString name() { return _name; }
-
-  void setXMLFile(const char*) {}
-  void setInstance(KInstance*, bool) {}
 
   virtual bool openURL(const KURL&) = 0;
   virtual bool closeURL() = 0;

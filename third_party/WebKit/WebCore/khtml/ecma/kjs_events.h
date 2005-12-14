@@ -94,6 +94,9 @@ class JSLazyEventListener : public JSEventListener {
   virtual void handleEvent(DOM::EventListenerEvent evt, bool isWindowEvent);
   JSObject* listenerObj() const;
 
+ protected:
+  virtual JSValue* eventParameterName() const;
+
  private:
   void parseCode() const;
 

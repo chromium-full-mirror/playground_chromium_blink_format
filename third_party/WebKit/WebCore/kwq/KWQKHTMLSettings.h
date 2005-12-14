@@ -48,8 +48,6 @@ class KHTMLSettings {
   const QString& cursiveFontName() const { return _cursiveFontName; }
   const QString& fantasyFontName() const { return _fantasyFontName; }
 
-  static QString settingsToCSS() { return QString(); }
-
   int minFontSize() const { return _minimumFontSize; }
   int minLogicalFontSize() const { return _minimumLogicalFontSize; }
   int mediumFontSize() const { return _defaultFontSize; }
@@ -70,7 +68,6 @@ class KHTMLSettings {
   bool isJavaScriptEnabled(const QString& host) const {
     return _JavaScriptEnabled;
   }
-  static bool isJavaScriptDebugEnabled() { return false; }
   bool isJavaEnabled() const { return _JavaEnabled; }
   bool isJavaEnabled(const QString& host) const { return _JavaEnabled; }
   bool isPluginsEnabled() const { return _pluginsEnabled; }
