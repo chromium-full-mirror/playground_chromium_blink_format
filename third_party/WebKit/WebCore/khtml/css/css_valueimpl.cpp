@@ -305,15 +305,16 @@ DOMString CSSMutableStyleDeclarationImpl::get4Values(
     const int* properties) const {
   DOMString res;
   for (int i = 0; i < 4; ++i) {
-    CSSValueImpl* value = getPropertyCSSValue(properties[i]);
-    if (!value) {  // apparently all 4 properties must be specified.
-      return DOMString();
+    if (!isPropertyImplicit(properties[i])) {
+      CSSValueImpl* value = getPropertyCSSValue(properties[i]);
+      if (!value)  // apparently all 4 properties must be specified.
+        return DOMString();
+      value->ref();
+      if (!res.isNull())
+        res += " ";
+      res += value->cssText();
+      value->deref();
     }
-    value->ref();
-    if (i > 0)
-      res += " ";
-    res += value->cssText();
-    value->deref();
   }
   return res;
 }
@@ -323,13 +324,15 @@ DOMString CSSMutableStyleDeclarationImpl::getShortHandValue(
     int number) const {
   DOMString res;
   for (int i = 0; i < number; ++i) {
-    CSSValueImpl* value = getPropertyCSSValue(properties[i]);
-    if (value) {  // TODO provide default value if !value
-      value->ref();
-      if (!res.isNull())
-        res += " ";
-      res += value->cssText();
-      value->deref();
+    if (!isPropertyImplicit(properties[i])) {
+      CSSValueImpl* value = getPropertyCSSValue(properties[i]);
+      if (value) {  // TODO provide default value if !value
+        value->ref();
+        if (!res.isNull())
+          res += " ";
+        res += value->cssText();
+        value->deref();
+      }
     }
   }
   return res;
