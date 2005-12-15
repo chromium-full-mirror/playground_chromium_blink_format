@@ -996,5 +996,3 @@ QMap<QString, QString> parseAttributes(const DOMString& string, bool& attrsOK) {
   return state.attributes;
 }
 }
-
-#include "xml_tokenizer.moc"

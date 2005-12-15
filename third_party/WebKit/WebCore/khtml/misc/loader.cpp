@@ -39,17 +39,12 @@
 #define DEFCACHESIZE 4096 * 1024
 
 #include <qasyncio.h>
-#include <qasyncimageio.h>
 #include <qpainter.h>
-#include <qbitmap.h>
-#include <qmovie.h>
 
 #include <kio/job.h>
 #include <kio/jobclasses.h>
 #include <kimageio.h>
 #include <kcharsets.h>
-#include <kiconloader.h>
-#include <scheduler.h>
 #include <kdebug.h>
 #include "khtml_factory.h"
 #include "khtml_part.h"
@@ -459,7 +454,6 @@ CachedImage::CachedImage(DocLoader* dl,
     : QObject(),
       CachedObject(url, Image, _cachePolicy, _expireDate),
       m_dataSize(0) {
-  m = 0;
   p = 0;
   pixPart = 0;
   bg = 0;
@@ -482,17 +476,7 @@ CachedImage::~CachedImage() {
 }
 
 void CachedImage::ref(CachedObjectClient* c) {
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << this << " CachedImage::ref(" << c << ") " << endl;
-#endif
-
   CachedObject::ref(c);
-
-  if (m) {
-    m->unpause();
-    if (m->finished() || m_clients.count() == 1)
-      m->restart();
-  }
 
   // for mouseovers, dynamic changes
   if (!valid_rect().isNull())
@@ -503,19 +487,11 @@ void CachedImage::ref(CachedObjectClient* c) {
 }
 
 void CachedImage::deref(CachedObjectClient* c) {
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << this << " CachedImage::deref(" << c << ") " << endl;
-#endif
   Cache::flush();
   CachedObject::deref(c);
-  if (m && m_clients.isEmpty() && m->running())
-    m->pause();
   if (canDelete() && m_free)
     delete this;
 }
-
-#define BGMINWIDTH 32
-#define BGMINHEIGHT 32
 
 const QPixmap& CachedImage::tiled_pixmap(const QColor& newc) {
   return pixmap();
@@ -532,11 +508,11 @@ const QPixmap& CachedImage::pixmap() const {
 }
 
 QSize CachedImage::pixmap_size() const {
-  return (m ? m->framePixmap().size() : (p ? p->size() : QSize()));
+  return (p ? p->size() : QSize());
 }
 
 QRect CachedImage::valid_rect() const {
-  return m ? m->getValidRect() : (p ? p->rect() : QRect());
+  return (p ? p->rect() : QRect());
 }
 
 void CachedImage::do_notify(const QPixmap& p, const QRect& r) {
@@ -551,8 +527,6 @@ void CachedImage::setShowAnimations(
 }
 
 void CachedImage::clear() {
-  delete m;
-  m = 0;
   delete p;
   p = 0;
   delete bg;
@@ -652,6 +626,8 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
                                          time_t _expireDate)
     : CachedObject(url, XSLStyleSheet, _cachePolicy, _expireDate) {
   // It's XML we want.
+  // FIXME: This should accept more general xml formats */*+xml, image/svg+xml
+  // for example.
   setAccept(QString::fromLatin1(
       "text/xml, application/xml, application/xhtml+xml, text/xsl, "
       "application/rss+xml, application/atom+xml"));
@@ -1308,10 +1284,7 @@ void Cache::init() {
 void Cache::clear() {
   if (!cache)
     return;
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << "Cache: CLEAR!" << endl;
-  statistics();
-#endif
+
   cache->setAutoDelete(true);
   delete cache;
   cache = 0;
@@ -1661,11 +1634,6 @@ void Cache::flush(bool force) {
 
   init();
 
-#ifdef CACHE_DEBUG
-  statistics();
-  kdDebug(6060) << "Cache: flush()" << endl;
-#endif
-
   while (m_headOfUncacheableList)
     removeCacheEntry(m_headOfUncacheableList);
 
@@ -1679,9 +1647,6 @@ void Cache::flush(bool force) {
 
   flushCount = m_countOfLRUAndUncacheableLists +
                10;  // Flush again when the cache has grown.
-#ifdef CACHE_DEBUG
-// statistics();
-#endif
 }
 
 void Cache::setSize(int bytes) {
@@ -1691,51 +1656,6 @@ void Cache::setSize(int bytes) {
   // may be we need to clear parts of the cache
   flushCount = 0;
   flush(true);
-}
-
-void Cache::statistics() {
-  CachedObject* o;
-  // this function is for debugging purposes only
-  init();
-
-  int size = 0;
-  int msize = 0;
-  int movie = 0;
-  int stylesheets = 0;
-  QDictIterator<CachedObject> it(*cache);
-  for (it.toFirst(); it.current(); ++it) {
-    o = it.current();
-    if (o->type() == CachedObject::Image) {
-      CachedImage* im = static_cast<CachedImage*>(o);
-      if (im->m != 0) {
-        movie++;
-        msize += im->size();
-      }
-    } else {
-      if (o->type() == CachedObject::CSSStyleSheet)
-        stylesheets++;
-    }
-    size += o->size();
-  }
-  size /= 1024;
-
-  kdDebug(6060)
-      << "------------------------- image cache statistics -------------------"
-      << endl;
-  kdDebug(6060) << "Number of items in cache: " << cache->count() << endl;
-  kdDebug(6060) << "Number of items in lru  : "
-                << m_countOfLRUAndUncacheableLists << endl;
-  kdDebug(6060) << "Number of cached images: " << cache->count() - movie
-                << endl;
-  kdDebug(6060) << "Number of cached movies: " << movie << endl;
-  kdDebug(6060) << "Number of cached stylesheets: " << stylesheets << endl;
-  kdDebug(6060) << "pixmaps:   allocated space approx. " << size << " kB"
-                << endl;
-  kdDebug(6060) << "movies :   allocated space approx. " << msize / 1024
-                << " kB" << endl;
-  kdDebug(6060)
-      << "--------------------------------------------------------------------"
-      << endl;
 }
 
 void Cache::removeCacheEntry(CachedObject* object) {
@@ -1897,8 +1817,6 @@ void CachedObjectClient::setXBLDocument(const DOM::DOMString& url,
 #endif
 void CachedObjectClient::notifyFinished(CachedObject* /*finishedObj*/) {}
 
-#include "loader.moc"
-
 Cache::Statistics Cache::getStatistics() {
   Statistics stats;
 
@@ -1910,13 +1828,8 @@ Cache::Statistics Cache::getStatistics() {
     CachedObject* o = i.current();
     switch (o->type()) {
       case CachedObject::Image:
-        if (static_cast<CachedImage*>(o)->m) {
-          stats.movies.count++;
-          stats.movies.size += o->size();
-        } else {
-          stats.images.count++;
-          stats.images.size += o->size();
-        }
+        stats.images.count++;
+        stats.images.size += o->size();
         break;
 
       case CachedObject::CSSStyleSheet:

@@ -247,7 +247,6 @@ void RenderWidget::destroy() {
       m_view->removeChild(m_widget);
 
     m_widget->removeEventFilter(this);
-    m_widget->setMouseTracking(false);
   }
 
   RenderLayer* layer = m_layer;
@@ -507,5 +506,3 @@ void RenderWidget::setSelectionState(SelectionState s) {
       m_widget->setIsSelected(m_selectionState != SelectionNone);
   }
 }
-
-#include "render_replaced.moc"

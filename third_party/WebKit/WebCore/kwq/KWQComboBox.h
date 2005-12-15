@@ -54,9 +54,6 @@ class QComboBox : public QWidget {
   int currentItem() const { return _currentItem; }
   void setCurrentItem(int);
 
-  QListBox* listBox() const { return 0; }
-  void popup() {}
-
   QSize sizeHint() const;
   QRect frameGeometry() const;
   void setFrameGeometry(const QRect&);

@@ -24,11 +24,9 @@
 
 #include <qstylesheet.h>
 #include <qtimer.h>
-#include <qinputdialog.h>
 #include <qpaintdevicemetrics.h>
 #include <qapplication.h>
 #include <kdebug.h>
-#include <kmessagebox.h>
 #include <klocale.h>
 #include <kparts/browserinterface.h>
 #include <kwin.h>
@@ -2735,5 +2733,3 @@ PausedTimeouts::~PausedTimeouts() {
 }
 
 }  // namespace KJS
-
-#include "kjs_window.moc"

@@ -3454,5 +3454,3 @@ NodeImpl* DocumentTypeImpl::cloneNode(bool /*deep*/) {
   // "implementation dependent" so for now we do not support it.
   return 0;
 }
-
-#include "dom_docimpl.moc"

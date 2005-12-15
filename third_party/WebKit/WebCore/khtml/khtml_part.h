@@ -1130,11 +1130,6 @@ class KHTMLPart : public KParts::ReadOnlyPart {
   /**
    * @internal
    */
-  void emitSelectionChanged();
-
-  /**
-   * @internal
-   */
   void timerEvent(QTimerEvent*);
 
   /**

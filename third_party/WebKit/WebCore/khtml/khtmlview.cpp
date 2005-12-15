@@ -22,8 +22,6 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "config.h"
-#include "khtmlview.moc"
-
 #include "khtmlview.h"
 
 #include "khtml_part.h"
@@ -45,28 +43,19 @@
 #include "css/cssstyleselector.h"
 #include "misc/helper.h"
 #include "khtml_settings.h"
-#include "khtml_printsettings.h"
 #include "khtmlpart_p.h"
 
 #include <kcursor.h>
-#include <ksimpleconfig.h>
 #include <kstandarddirs.h>
-#include <kprinter.h>
 
-#include <qtooltip.h>
 #include <qpainter.h>
 #include <qpaintdevicemetrics.h>
-#include <kapplication.h>
 
 #include <kimageio.h>
 #include <assert.h>
 #include <kdebug.h>
-#include <kurldrag.h>
-#include <qobjectlist.h>
 
 #include "KWQAccObjectCache.h"
-
-#define PAINT_BUFFER_HEIGHT 128
 
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
 
@@ -75,31 +64,7 @@ using namespace EventNames;
 using namespace HTMLNames;
 using namespace khtml;
 
-class KHTMLToolTip;
-
-#ifndef QT_NO_TOOLTIP
-
-class KHTMLToolTip : public QToolTip {
- public:
-  KHTMLToolTip(KHTMLView* view, KHTMLViewPrivate* vp)
-      : QToolTip(view->viewport()) {
-    m_view = view;
-    m_viewprivate = vp;
-  };
-
- protected:
-  virtual void maybeTip(const QPoint&);
-
- private:
-  KHTMLView* m_view;
-  KHTMLViewPrivate* m_viewprivate;
-};
-
-#endif
-
 class KHTMLViewPrivate {
-  friend class KHTMLToolTip;
-
  public:
   KHTMLViewPrivate() {
     repaintRects = 0;
@@ -109,9 +74,6 @@ class KHTMLViewPrivate {
     layoutTimerId = 0;
     delayedLayout = false;
     mousePressed = false;
-#ifndef QT_NO_TOOLTIP
-    tooltip = 0;
-#endif
     doFullRepaint = true;
     isTransparent = false;
     vmode = hmode = QScrollView::Auto;
@@ -123,9 +85,6 @@ class KHTMLViewPrivate {
       underMouse->deref();
     if (clickNode)
       clickNode->deref();
-#ifndef QT_NO_TOOLTIP
-    delete tooltip;
-#endif
     delete repaintRects;
   }
   void reset() {
@@ -189,9 +148,6 @@ class KHTMLViewPrivate {
   bool needToInitScrollBars;
   bool mousePressed;
   bool isTransparent;
-#ifndef QT_NO_TOOLTIP
-  KHTMLToolTip* tooltip;
-#endif
 
   // Used by objects during layout to communicate repaints that need to take
   // place only
@@ -200,26 +156,6 @@ class KHTMLViewPrivate {
 
   RefPtr<NodeImpl> dragTarget;
 };
-
-#ifndef QT_NO_TOOLTIP
-
-void KHTMLToolTip::maybeTip(const QPoint& /*p*/) {
-  NodeImpl* node = m_viewprivate->underMouse;
-  while (node) {
-    if (node->isElementNode()) {
-      AtomicString s =
-          static_cast<ElementImpl*>(node)->getAttribute(ATTR_TITLE);
-      if (!s.isEmpty()) {
-        QRect r(m_view->contentsToViewport(node->getRect().topLeft()),
-                node->getRect().size());
-        tip(r, s.qstring());
-      }
-      break;
-    }
-    node = node->parentNode();
-  }
-}
-#endif
 
 KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
     : QScrollView(parent,
@@ -232,21 +168,10 @@ KHTMLView::KHTMLView(KHTMLPart* part, QWidget* parent, const char* name)
   m_part->ref();
   d = new KHTMLViewPrivate;
 
-  connect(kapp, SIGNAL(kdisplayPaletteChanged()), this,
-          SLOT(slotPaletteChanged()));
   connect(this, SIGNAL(contentsMoving(int, int)), this,
           SLOT(slotScrollBarMoved()));
 
-  // initialize QScrollview
-  enableClipper(true);
-  viewport()->setMouseTracking(true);
-  viewport()->setBackgroundMode(NoBackground);
-
   KImageIO::registerFormats();
-
-#ifndef QT_NO_TOOLTIP
-  d->tooltip = new KHTMLToolTip(this, d);
-#endif
 
   init();
 
@@ -298,8 +223,6 @@ void KHTMLView::init() {
   _marginHeight = -1;
   _width = 0;
   _height = 0;
-
-  setAcceptDrops(true);
 }
 
 void KHTMLView::clear() {
@@ -324,24 +247,10 @@ void KHTMLView::clear() {
   suppressScrollBars(true);
 }
 
-void KHTMLView::hideEvent(QHideEvent* e) {
-  //    viewport()->setBackgroundMode(PaletteBase);
-  QScrollView::hideEvent(e);
-}
-
-void KHTMLView::showEvent(QShowEvent* e) {
-  //    viewport()->setBackgroundMode(NoBackground);
-  QScrollView::showEvent(e);
-}
-
 void KHTMLView::resizeEvent(QResizeEvent* e) {
-  QScrollView::resizeEvent(e);
-
   if (m_part && m_part->xmlDocImpl())
     m_part->xmlDocImpl()->dispatchWindowEvent(EventNames::resizeEvent, false,
                                               false);
-
-  KApplication::sendPostedEvents(viewport(), QEvent::Paint);
 }
 
 void KHTMLView::initScrollBars() {
@@ -543,8 +452,6 @@ void KHTMLView::layout() {
 
   m_part->invalidateSelection();
 
-  // kdDebug( 6000 ) << "TIME: layout() dt=" << qt.elapsed() << endl;
-
   d->layoutSchedulingEnabled = true;
   d->layoutSuppressed = false;
 
@@ -612,8 +519,6 @@ void KHTMLView::viewportMousePressEvent(QMouseEvent* _mouse) {
   int xm, ym;
   viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
 
-  // kdDebug( 6000 ) << "\nmousePressEvent: x=" << xm << ", y=" << ym << endl;
-
   d->mousePressed = true;
 
   NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MousePress);
@@ -661,8 +566,6 @@ void KHTMLView::viewportMouseDoubleClickEvent(QMouseEvent* _mouse) {
 
   int xm, ym;
   viewportToContents(_mouse->x(), _mouse->y(), xm, ym);
-
-  // kdDebug( 6000 ) << "mouseDblClickEvent: x=" << xm << ", y=" << ym << endl;
 
   // We get this instead of a second mouse-up
   d->mousePressed = false;
@@ -823,8 +726,6 @@ void KHTMLView::viewportMouseReleaseEvent(QMouseEvent* _mouse) {
 
   d->mousePressed = false;
 
-  // kdDebug( 6000 ) << "\nmouseReleaseEvent: x=" << xm << ", y=" << ym << endl;
-
   NodeImpl::MouseEvent mev(_mouse->stateAfter(), NodeImpl::MouseRelease);
   m_part->xmlDocImpl()->prepareMouseEvent(false, xm, ym, &mev);
 
@@ -855,24 +756,6 @@ void KHTMLView::keyPressEvent(QKeyEvent* _ke) {
       return;
     }
   }
-}
-
-void KHTMLView::keyReleaseEvent(QKeyEvent* _ke) {
-  if (m_part->xmlDocImpl() && m_part->xmlDocImpl()->focusNode()) {
-    // Qt is damn buggy. we receive release events from our child
-    // widgets. therefore, do not support keyrelease event on generic
-    // nodes for now until we found  a workaround for the Qt bugs. (Dirk)
-    //         if (m_part->xmlDocImpl()->focusNode()->dispatchKeyEvent(_ke)) {
-    //             _ke->accept();
-    //             return;
-    //         }
-    //        QScrollView::keyReleaseEvent(_ke);
-    Q_UNUSED(_ke);
-  }
-}
-
-void KHTMLView::contentsContextMenuEvent(QContextMenuEvent* _ce) {
-  // ### what kind of c*** is that ?
 }
 
 bool KHTMLView::dispatchDragEvent(const AtomicString& eventType,
@@ -960,9 +843,6 @@ bool KHTMLView::scrollTo(const QRect& bounds) {
   y = bounds.top();
   xe = bounds.right();
   ye = bounds.bottom();
-
-  // kdDebug(6000)<<"scrolling coords: x="<<x<<" y="<<y<<" width="<<xe-x<<"
-  // height="<<ye-y<<endl;
 
   int deltax;
   int deltay;
@@ -1054,8 +934,6 @@ void KHTMLView::focusNextPrevNode(bool next) {
   // focusable node in the document, use the first one that lies within the
   // visible area (if possible).
   if (!oldFocusNode && newFocusNode && d->scrollBarMoved) {
-    kdDebug(6000) << " searching for visible link" << endl;
-
     bool visible = false;
     NodeImpl* toFocus = newFocusNode;
     while (!visible && toFocus) {
@@ -1243,8 +1121,6 @@ void KHTMLView::setIgnoreWheelEvents(bool e) {
   d->ignoreWheelEvents = e;
 }
 
-#ifndef QT_NO_WHEELEVENT
-
 void KHTMLView::viewportWheelEvent(QWheelEvent* e) {
   DocumentImpl* doc = m_part->xmlDocImpl();
   if (doc) {
@@ -1270,17 +1146,13 @@ void KHTMLView::viewportWheelEvent(QWheelEvent* e) {
   }
 }
 
-#endif
-
 void KHTMLView::focusInEvent(QFocusEvent* e) {
   m_part->setCaretVisible();
-  QScrollView::focusInEvent(e);
 }
 
 void KHTMLView::focusOutEvent(QFocusEvent* e) {
   m_part->stopAutoScroll();
   m_part->setCaretVisible(false);
-  QScrollView::focusOutEvent(e);
 }
 
 void KHTMLView::slotScrollBarMoved() {

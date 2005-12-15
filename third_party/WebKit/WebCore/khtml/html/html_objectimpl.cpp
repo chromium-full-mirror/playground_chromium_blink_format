@@ -198,19 +198,6 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 #endif
 }
 
-bool HTMLAppletElementImpl::getMember(const QString& name,
-                                      JType& type,
-                                      QString& val) {
-  return false;
-}
-
-bool HTMLAppletElementImpl::callMember(const QString& name,
-                                       const QStringList& args,
-                                       JType& type,
-                                       QString& val) {
-  return false;
-}
-
 KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   KHTMLPart* part = getDocument()->part();
   if (!part || !part->javaEnabled())

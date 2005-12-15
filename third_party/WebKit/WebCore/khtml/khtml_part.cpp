@@ -30,8 +30,6 @@
 #define QT_NO_CLIPBOARD
 #define QT_NO_DRAGANDDROP
 
-#include "khtml_pagecache.h"
-
 #include "css/csshelper.h"
 #include "css/cssproperties.h"
 #include "css/cssstyleselector.h"
@@ -66,10 +64,10 @@ using namespace DOM;
 using namespace HTMLNames;
 
 #include "khtmlview.h"
-#include <kparts/partmanager.h>
 #include "ecma/kjs_proxy.h"
 #include "ecma/xmlhttprequest.h"
 #include "khtml_settings.h"
+#include "khtmlpart_p.h"
 
 #include <sys/types.h>
 #include <assert.h>
@@ -79,32 +77,15 @@ using namespace HTMLNames;
 #include <kio/job.h>
 #include <kio/global.h>
 #include <kdebug.h>
-#include <kiconloader.h>
 #include <klocale.h>
 #include <kcharsets.h>
-#include <kmessagebox.h>
-#include <kstdaction.h>
-#include <kfiledialog.h>
-#include <ktrader.h>
-#include <kdatastream.h>
-#include <ktempfile.h>
 #include <kglobalsettings.h>
-#include <kurldrag.h>
-#include <kapplication.h>
 #if !defined(QT_NO_DRAGANDDROP)
 #include <kmultipledrag.h>
 #endif
 
-#include <ksslcertchain.h>
-#include <ksslinfodlg.h>
-
-#include <qclipboard.h>
 #include <qfile.h>
-#include <qmetaobject.h>
 #include <qptrlist.h>
-#include <private/qucomextra_p.h>
-
-#include "khtmlpart_p.h"
 
 #include <CoreServices/CoreServices.h>
 
@@ -359,10 +340,8 @@ bool KHTMLPart::didOpenURL(const KURL& url) {
   // data arrives) (Simon)
   m_url = url;
   if (m_url.protocol().startsWith("http") && !m_url.host().isEmpty() &&
-      m_url.path().isEmpty()) {
+      m_url.path().isEmpty())
     m_url.setPath("/");
-    emit d->m_extension->setLocationBarURL(m_url.prettyURL());
-  }
   // copy to m_workingURL after fixing m_url above
   d->m_workingURL = m_url;
 
@@ -427,14 +406,6 @@ void KHTMLPart::stopLoading(bool sendUnload) {
     kdDebug(6050) << " was still parsing... calling end " << endl;
     slotFinishedParsing();
     d->m_doc->setParsing(false);
-  }
-
-  if (!d->m_workingURL.isEmpty()) {
-    // Aborted before starting to render
-    kdDebug(6050)
-        << "Aborted before starting to render, reverting location bar to "
-        << m_url.prettyURL() << endl;
-    emit d->m_extension->setLocationBarURL(m_url.prettyURL());
   }
 
   d->m_workingURL = KURL();
@@ -609,9 +580,8 @@ KJavaAppletContext* KHTMLPart::javaContext() {
 
 KJavaAppletContext* KHTMLPart::createJavaContext() {
 #ifndef Q_WS_QWS
-  if (!d->m_javaContext) {
-    d->m_javaContext = new KJavaAppletContext(d->m_dcopobject, this);
-  }
+  if (!d->m_javaContext)
+    d->m_javaContext = new KJavaAppletContext(this);
 
   return d->m_javaContext;
 #else
@@ -884,13 +854,6 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   d->m_bLoadEventEmitted = false;
   d->m_bLoadingMainResource = true;
 
-  if (url.isValid()) {
-    KHTMLFactory::vLinks()->insert(KWQ(this)->requestedURLString());
-  }
-
-  // ###
-  // stopParser();
-
   KParts::URLArgs args(d->m_extension->urlArgs());
   args.xOffset = xOffset;
   args.yOffset = yOffset;
@@ -905,9 +868,8 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   KURL baseurl;
 
   // We don't need KDE chained URI handling or window caption setting
-  if (!m_url.isEmpty()) {
+  if (!m_url.isEmpty())
     baseurl = m_url;
-  }
 
   if (DOMImplementationImpl::isXMLMIMEType(args.serviceType))
     d->m_doc = DOMImplementationImpl::instance()->createDocument(d->m_view);
@@ -1375,9 +1337,6 @@ void KHTMLPart::slotRedirect() {
 }
 
 void KHTMLPart::slotRedirection(KIO::Job*, const KURL& url) {
-  // the slave told us that we got redirected
-  // kdDebug( 6050 ) << "redirection by KIO to " << url.url() << endl;
-  emit d->m_extension->setLocationBarURL(url.prettyURL());
   d->m_workingURL = url;
 }
 
@@ -1540,8 +1499,6 @@ void KHTMLPart::setSelection(const SelectionController& s,
     clearTypingStyle();
 
   KWQ(this)->respondToChangedSelection(oldSelection, closeTyping);
-
-  emitSelectionChanged();
 }
 
 void KHTMLPart::setDragCaret(const SelectionController& dragCaret) {
@@ -2119,8 +2076,6 @@ KHTMLPart* KHTMLPart::parentPart() const {
 
   return (KHTMLPart*)parent();
 }
-
-void KHTMLPart::emitSelectionChanged() {}
 
 int KHTMLPart::zoomFactor() const {
   return d->m_zoomFactor;
@@ -3329,6 +3284,3 @@ void KHTMLPart::handleFallbackContent() {
     return;
   static_cast<HTMLObjectElementImpl*>(node)->renderFallbackContent();
 }
-
-using namespace KParts;
-#include "khtml_part.moc"

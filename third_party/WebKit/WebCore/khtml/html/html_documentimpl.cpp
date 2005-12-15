@@ -76,7 +76,6 @@
 #include "dom/dom_exception.h"
 
 #include <dcopclient.h>
-#include <kapplication.h>
 #include <kdebug.h>
 #include <kurl.h>
 #include <kcharsets.h>
@@ -107,19 +106,8 @@ using namespace HTMLNames;
 HTMLDocumentImpl::HTMLDocumentImpl(DOMImplementationImpl* _implementation,
                                    KHTMLView* v)
     : DocumentImpl(_implementation, v) {
-  //    kdDebug( 6090 ) << "HTMLDocumentImpl constructor this = " << this <<
-  //    endl;
   bodyElement = 0;
   htmlElement = 0;
-
-  /* dynamic history stuff to be fixed later (pfeiffer)
-      connect( KHTMLFactory::vLinks(), SIGNAL( inserted( const QString& )),
-               SLOT( slotHistoryChanged() ));
-      connect( KHTMLFactory::vLinks(), SIGNAL( removed( const QString& )),
-               SLOT( slotHistoryChanged() ));
-  */
-  connect(KHTMLFactory::vLinks(), SIGNAL(cleared()),
-          SLOT(slotHistoryChanged()));
 }
 
 HTMLDocumentImpl::~HTMLDocumentImpl() {}
@@ -470,5 +458,3 @@ DocumentTypeImpl* HTMLDocumentImpl::doctype() const {
   return 0;
 }
 }
-
-#include "html_documentimpl.moc"

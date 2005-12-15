@@ -165,13 +165,9 @@ class KHTMLView : public QScrollView {
  signals:
   void cleared();
 
- protected:
  public:
   void clearPart();
   virtual void resizeEvent(QResizeEvent* event);
-  virtual void showEvent(QShowEvent*);
-  virtual void hideEvent(QHideEvent*);
-
   virtual void viewportMousePressEvent(QMouseEvent*);
   virtual void focusInEvent(QFocusEvent*);
   virtual void focusOutEvent(QFocusEvent*);
@@ -183,8 +179,6 @@ class KHTMLView : public QScrollView {
 #endif
 
   void keyPressEvent(QKeyEvent* _ke);
-  void keyReleaseEvent(QKeyEvent* _ke);
-  void contentsContextMenuEvent(QContextMenuEvent* _ce);
   void doAutoScroll();
 
   bool updateDragAndDrop(const QPoint&, DOM::ClipboardImpl* clipboard);
