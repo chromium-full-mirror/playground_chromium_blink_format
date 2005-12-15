@@ -230,18 +230,15 @@ bool CSSParser::parseValue(CSSMutableStyleDeclarationImpl* declaration,
 
 QRgb CSSParser::parseColor(const DOMString& string) {
   QRgb color = 0;
-  CSSMutableStyleDeclarationImpl* dummyStyleDeclaration =
+  RefPtr<CSSMutableStyleDeclarationImpl> dummyStyleDeclaration =
       new CSSMutableStyleDeclarationImpl;
-
-  dummyStyleDeclaration->ref();
 
   CSSParser parser(true);
 
   // First try creating a color specified by name or the "#" syntax.
   if (!parser.parseColor(string.qstring(), color)) {
     // Now try to create a color from the rgb() or rgba() syntax.
-    bool ok = parser.parseColor(dummyStyleDeclaration, string);
-    if (ok) {
+    if (parser.parseColor(dummyStyleDeclaration.get(), string)) {
       CSSValueImpl* value = parser.parsedProperties[0]->value();
       if (value->cssValueType() == CSSValue::CSS_PRIMITIVE_VALUE) {
         CSSPrimitiveValueImpl* primitiveValue =
@@ -250,8 +247,6 @@ QRgb CSSParser::parseColor(const DOMString& string) {
       }
     }
   }
-
-  dummyStyleDeclaration->deref();
 
   return color;
 }

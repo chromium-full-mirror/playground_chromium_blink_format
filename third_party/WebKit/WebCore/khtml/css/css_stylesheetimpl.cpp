@@ -48,7 +48,6 @@ using namespace khtml;
 StyleSheetImpl::StyleSheetImpl(StyleSheetImpl* parentSheet, DOMString href)
     : StyleListImpl(parentSheet) {
   m_disabled = false;
-  m_media = 0;
   m_parentNode = 0;
   m_strHref = href;
 }
@@ -57,23 +56,19 @@ StyleSheetImpl::StyleSheetImpl(DOM::NodeImpl* parentNode, DOMString href)
     : StyleListImpl() {
   m_parentNode = parentNode;
   m_disabled = false;
-  m_media = 0;
   m_strHref = href;
 }
 
 StyleSheetImpl::StyleSheetImpl(StyleBaseImpl* owner, DOMString href)
     : StyleListImpl(owner) {
   m_disabled = false;
-  m_media = 0;
   m_parentNode = 0;
   m_strHref = href;
 }
 
 StyleSheetImpl::~StyleSheetImpl() {
-  if (m_media) {
+  if (m_media)
     m_media->setParent(0);
-    m_media->deref();
-  }
 }
 
 StyleSheetImpl* StyleSheetImpl::parentStyleSheet() const {
@@ -83,10 +78,6 @@ StyleSheetImpl* StyleSheetImpl::parentStyleSheet() const {
 }
 
 void StyleSheetImpl::setMedia(MediaListImpl* media) {
-  if (media)
-    media->ref();
-  if (m_media)
-    m_media->deref();
   m_media = media;
 }
 

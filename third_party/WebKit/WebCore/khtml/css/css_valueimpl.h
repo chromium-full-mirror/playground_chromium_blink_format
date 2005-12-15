@@ -271,10 +271,10 @@ class RectImpl : public khtml::Shared<RectImpl> {
   RectImpl();
   virtual ~RectImpl();
 
-  CSSPrimitiveValueImpl* top() const { return m_top; }
-  CSSPrimitiveValueImpl* right() const { return m_right; }
-  CSSPrimitiveValueImpl* bottom() const { return m_bottom; }
-  CSSPrimitiveValueImpl* left() const { return m_left; }
+  CSSPrimitiveValueImpl* top() const { return m_top.get(); }
+  CSSPrimitiveValueImpl* right() const { return m_right.get(); }
+  CSSPrimitiveValueImpl* bottom() const { return m_bottom.get(); }
+  CSSPrimitiveValueImpl* left() const { return m_left.get(); }
 
   void setTop(CSSPrimitiveValueImpl* top);
   void setRight(CSSPrimitiveValueImpl* right);
@@ -282,10 +282,10 @@ class RectImpl : public khtml::Shared<RectImpl> {
   void setLeft(CSSPrimitiveValueImpl* left);
 
  protected:
-  CSSPrimitiveValueImpl* m_top;
-  CSSPrimitiveValueImpl* m_right;
-  CSSPrimitiveValueImpl* m_bottom;
-  CSSPrimitiveValueImpl* m_left;
+  RefPtr<CSSPrimitiveValueImpl> m_top;
+  RefPtr<CSSPrimitiveValueImpl> m_right;
+  RefPtr<CSSPrimitiveValueImpl> m_bottom;
+  RefPtr<CSSPrimitiveValueImpl> m_left;
 };
 
 // A primitive value representing a pair.  This is useful for properties like
@@ -300,15 +300,15 @@ class PairImpl : public khtml::Shared<PairImpl> {
   PairImpl();
   virtual ~PairImpl();
 
-  CSSPrimitiveValueImpl* first() const { return m_first; }
-  CSSPrimitiveValueImpl* second() const { return m_second; }
+  CSSPrimitiveValueImpl* first() const { return m_first.get(); }
+  CSSPrimitiveValueImpl* second() const { return m_second.get(); }
 
   void setFirst(CSSPrimitiveValueImpl* first);
   void setSecond(CSSPrimitiveValueImpl* second);
 
  protected:
-  CSSPrimitiveValueImpl* m_first;
-  CSSPrimitiveValueImpl* m_second;
+  RefPtr<CSSPrimitiveValueImpl> m_first;
+  RefPtr<CSSPrimitiveValueImpl> m_second;
 };
 
 class DashboardRegionImpl : public RectImpl {
@@ -319,16 +319,10 @@ class DashboardRegionImpl : public RectImpl {
       m_next->deref();
   }
 
-  void setNext(DashboardRegionImpl* next) {
-    if (next)
-      next->ref();
-    if (m_next)
-      m_next->deref();
-    m_next = next;
-  }
+  void setNext(DashboardRegionImpl* next) { m_next = next; }
 
  public:
-  DashboardRegionImpl* m_next;
+  RefPtr<DashboardRegionImpl> m_next;
   QString m_label;
   QString m_geometryType;
   unsigned int m_isCircle : 1;
@@ -362,12 +356,12 @@ class CSSBorderImageValueImpl : public CSSValueImpl {
 
  public:
   // The border image.
-  CSSImageValueImpl* m_image;
+  RefPtr<CSSImageValueImpl> m_image;
 
   // These four values are used to make "cuts" in the image.  They can be
   // numbers
   // or percentages.
-  RectImpl* m_imageSliceRect;
+  RefPtr<RectImpl> m_imageSliceRect;
 
   // Values for how to handle the scaling/stretching/tiling of the image slices.
   int m_horizontalSizeRule;  // Rule for how to adjust the widths of the
@@ -438,10 +432,7 @@ class CSSProperty {
         m_shorthandID(shorthandID),
         m_important(important),
         m_implicit(implicit),
-        m_value(value) {
-    if (value)
-      value->ref();
-  }
+        m_value(value) {}
 
   CSSProperty(const CSSProperty& o) {
     m_id = o.m_id;
@@ -449,15 +440,9 @@ class CSSProperty {
     m_important = o.m_important;
     m_implicit = o.m_implicit;
     m_value = o.m_value;
-    if (m_value)
-      m_value->ref();
   }
 
   CSSProperty& operator=(const CSSProperty& o) {
-    if (o.m_value)
-      o.m_value->ref();
-    if (m_value)
-      m_value->deref();
     m_id = o.m_id;
     m_shorthandID = o.m_shorthandID;
     m_important = o.m_important;
@@ -465,18 +450,9 @@ class CSSProperty {
     return *this;
   }
 
-  ~CSSProperty() {
-    if (m_value)
-      m_value->deref();
-  }
+  ~CSSProperty() {}
 
-  void setValue(CSSValueImpl* val) {
-    if (val)
-      val->ref();
-    if (m_value)
-      m_value->deref();
-    m_value = val;
-  }
+  void setValue(CSSValueImpl* val) { m_value = val; }
 
   int id() const { return m_id; }
   int shorthandID() const { return m_shorthandID; }
@@ -484,7 +460,7 @@ class CSSProperty {
   bool isImportant() const { return m_important; }
   bool isImplicit() const { return m_implicit; }
 
-  CSSValueImpl* value() const { return m_value; }
+  CSSValueImpl* value() const { return m_value.get(); }
 
   DOMString cssText() const;
 
@@ -499,7 +475,7 @@ class CSSProperty {
   friend bool operator==(const CSSProperty&, const CSSProperty&);
 
  protected:
-  CSSValueImpl* m_value;
+  RefPtr<CSSValueImpl> m_value;
 };
 
 class CSSMutableStyleDeclarationImpl : public CSSStyleDeclarationImpl {
