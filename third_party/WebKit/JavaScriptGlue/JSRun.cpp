@@ -30,7 +30,7 @@ JSInterpreter* JSRun::GetInterpreter() {
 }
 
 Completion JSRun::Evaluate() {
-  return fInterpreter.evaluate(fSource);
+  return fInterpreter.evaluate(UString(), 0, fSource.data(), fSource.size());
 }
 
 bool JSRun::CheckSyntax() {
