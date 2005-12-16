@@ -27,66 +27,34 @@
 namespace DOM {
 
 DOMString::DOMString(const QChar* str, uint len) {
-  if (!str) {
-    m_impl = 0;
+  if (!str)
     return;
-  }
 
   if (len == 0)
     m_impl = DOMStringImpl::empty();
   else
     m_impl = new DOMStringImpl(str, len);
-  m_impl->ref();
 }
 
 DOMString::DOMString(const QString& str) {
-  if (str.isNull()) {
-    m_impl = 0;
+  if (str.isNull())
     return;
-  }
 
   if (str.isEmpty())
     m_impl = DOMStringImpl::empty();
   else
     m_impl = new DOMStringImpl(str.unicode(), str.length());
-  m_impl->ref();
 }
 
 DOMString::DOMString(const char* str) {
-  if (!str) {
-    m_impl = 0;
+  if (!str)
     return;
-  }
 
   int l = strlen(str);
   if (l == 0)
     m_impl = DOMStringImpl::empty();
   else
     m_impl = new DOMStringImpl(str, l);
-  m_impl->ref();
-}
-
-DOMString::DOMString(DOMStringImpl* i) {
-  m_impl = i;
-  if (m_impl)
-    m_impl->ref();
-}
-
-DOMString::DOMString(const DOMString& other) {
-  m_impl = other.m_impl;
-  if (m_impl)
-    m_impl->ref();
-}
-
-DOMString& DOMString::operator=(const DOMString& other) {
-  if (m_impl != other.m_impl) {
-    if (m_impl)
-      m_impl->deref();
-    m_impl = other.m_impl;
-    if (m_impl)
-      m_impl->ref();
-  }
-  return *this;
 }
 
 DOMString& DOMString::operator+=(const DOMString& str) {
@@ -94,14 +62,10 @@ DOMString& DOMString::operator+=(const DOMString& str) {
     if (!m_impl) {
       // ### FIXME!!!
       m_impl = str.m_impl;
-      m_impl->ref();
       return *this;
     }
-    DOMStringImpl* i = m_impl->copy();
-    m_impl->deref();
-    m_impl = i;
-    m_impl->ref();
-    m_impl->append(str.m_impl);
+    m_impl = m_impl->copy();
+    m_impl->append(str.m_impl.get());
   }
   return *this;
 }
@@ -117,11 +81,10 @@ DOMString operator+(const DOMString& a, const DOMString& b) {
 }
 
 void DOMString::insert(DOMString str, uint pos) {
-  if (!m_impl) {
+  if (!m_impl)
     m_impl = str.m_impl->copy();
-    m_impl->ref();
-  } else
-    m_impl->insert(str.m_impl, pos);
+  else
+    m_impl->insert(str.m_impl.get(), pos);
 }
 
 const QChar& DOMString::operator[](unsigned int i) const {
@@ -305,7 +268,7 @@ bool operator==(const DOMString& a, const QString& b) {
 }
 
 bool operator==(const DOMString& a, const char* b) {
-  DOMStringImpl* aimpl = a.m_impl;
+  DOMStringImpl* aimpl = a.m_impl.get();
 
   if (!b)
     return !aimpl;

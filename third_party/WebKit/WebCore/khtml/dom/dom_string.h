@@ -52,20 +52,12 @@ class DOMString {
   /**
    * default constructor. Gives an empty DOMString
    */
-  DOMString() : m_impl(0) {}
+  DOMString() {}
 
   DOMString(const QChar* str, uint len);
   DOMString(const QString&);
   DOMString(const char* str);
-  DOMString(DOMStringImpl* i);
-  ~DOMString() {
-    if (m_impl)
-      m_impl->deref();
-  }
-
-  // assign and copy
-  DOMString(const DOMString& str);
-  DOMString& operator=(const DOMString& str);
+  DOMString(DOMStringImpl* i) : m_impl(i) {}
 
   /**
    * append str to this string
@@ -120,7 +112,7 @@ class DOMString {
    * @internal get a handle to the imlementation of the DOMString
    * Use at own risk!!!
    */
-  DOMStringImpl* impl() const { return m_impl; }
+  DOMStringImpl* impl() const { return m_impl.get(); }
 
 #ifdef __OBJC__
   DOMString(NSString*);
@@ -133,7 +125,7 @@ class DOMString {
 #endif
 
  protected:
-  DOMStringImpl* m_impl;
+  RefPtr<DOMStringImpl> m_impl;
 };
 
 DOMString operator+(const DOMString& a, const DOMString& b);
