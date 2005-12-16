@@ -89,7 +89,7 @@ class XSLImportRuleImpl : public khtml::CachedObjectClient,
   virtual ~XSLImportRuleImpl();
 
   DOM::DOMString href() const { return m_strHref; }
-  XSLStyleSheetImpl* styleSheet() const { return m_styleSheet; }
+  XSLStyleSheetImpl* styleSheet() const { return m_styleSheet.get(); }
 
   virtual bool isImportRule() { return true; }
   XSLStyleSheetImpl* parentStyleSheet() const;
@@ -103,7 +103,7 @@ class XSLImportRuleImpl : public khtml::CachedObjectClient,
 
  protected:
   DOMString m_strHref;
-  XSLStyleSheetImpl* m_styleSheet;
+  RefPtr<XSLStyleSheetImpl> m_styleSheet;
   khtml::CachedXSLStyleSheet* m_cachedSheet;
   bool m_loading;
 };
