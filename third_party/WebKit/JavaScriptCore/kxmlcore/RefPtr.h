@@ -42,7 +42,6 @@ class RefPtr {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
-  RefPtr(PassRefPtr<T>& o) : m_ptr(o.release()) {}
 
   ~RefPtr() {
     if (T* ptr = m_ptr)
@@ -54,8 +53,6 @@ class RefPtr {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
-  template <class U>
-  RefPtr(PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
   T* get() const { return m_ptr; }
 
