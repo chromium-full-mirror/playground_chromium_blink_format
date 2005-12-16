@@ -102,7 +102,7 @@ class WindowQObject : public QObject {
 
 class Screen : public JSObject {
  public:
-  Screen(ExecState* exec);
+  Screen(ExecState*);
   enum {
     Height,
     Width,
@@ -149,7 +149,7 @@ class Window : public JSObject {
    * instance
    * was called from.
    */
-  static Window* retrieveActive(ExecState* exec);
+  static Window* retrieveActive(ExecState*);
   QGuardedPtr<KHTMLPart> part() const { return m_part; }
   virtual void mark();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
@@ -158,7 +158,7 @@ class Window : public JSObject {
                    const Identifier& propertyName,
                    JSValue* value,
                    int attr = None);
-  virtual bool toBoolean(ExecState* exec) const;
+  virtual bool toBoolean(ExecState*) const;
 
   int installTimeout(const UString& handler, int t, bool singleShot) {
     return winq->installTimeout(handler, t, singleShot);
@@ -174,25 +174,25 @@ class Window : public JSObject {
 
   void scheduleClose();
 
-  bool isSafeScript(ExecState* exec) const;
+  bool isSafeScript(ExecState*) const;
   static bool isSafeScript(const ScriptInterpreter* origin,
                            const ScriptInterpreter* target);
   Location* location() const;
   Selection* selection() const;
-  BarInfo* locationbar(ExecState* exec) const;
-  BarInfo* menubar(ExecState* exec) const;
-  BarInfo* personalbar(ExecState* exec) const;
-  BarInfo* scrollbars(ExecState* exec) const;
-  BarInfo* statusbar(ExecState* exec) const;
-  BarInfo* toolbar(ExecState* exec) const;
-  JSEventListener* getJSEventListener(JSValue* val, bool html = false);
-  JSUnprotectedEventListener* getJSUnprotectedEventListener(JSValue* val,
+  BarInfo* locationbar(ExecState*) const;
+  BarInfo* menubar(ExecState*) const;
+  BarInfo* personalbar(ExecState*) const;
+  BarInfo* scrollbars(ExecState*) const;
+  BarInfo* statusbar(ExecState*) const;
+  BarInfo* toolbar(ExecState*) const;
+  JSEventListener* getJSEventListener(JSValue*, bool html = false);
+  JSUnprotectedEventListener* getJSUnprotectedEventListener(JSValue*,
                                                             bool html = false);
-  JSLazyEventListener* getJSLazyEventListener(const QString& code,
-                                              DOM::NodeImpl* node,
+  JSLazyEventListener* getJSLazyEventListener(const DOM::DOMString& code,
+                                              DOM::NodeImpl*,
                                               int lineno = 0);
-  void clear(ExecState* exec);
-  virtual UString toString(ExecState* exec) const;
+  void clear(ExecState*);
+  virtual UString toString(ExecState*) const;
 
   // Set the current "event" object
   void setCurrentEvent(DOM::EventImpl* evt);
@@ -384,7 +384,7 @@ class Location : public JSObject {
                    JSValue* value,
                    int attr = None);
   virtual JSValue* toPrimitive(ExecState* exec, Type preferred) const;
-  virtual UString toString(ExecState* exec) const;
+  virtual UString toString(ExecState*) const;
   enum {
     Hash,
     Href,
@@ -415,7 +415,7 @@ class Selection : public JSObject {
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState* exec, int token) const;
   virtual JSValue* toPrimitive(ExecState* exec, Type preferred) const;
-  virtual UString toString(ExecState* exec) const;
+  virtual UString toString(ExecState*) const;
   enum {
     AnchorNode,
     AnchorOffset,

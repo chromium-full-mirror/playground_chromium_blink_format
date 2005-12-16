@@ -1199,7 +1199,7 @@ class KHTMLPart : public KParts::ReadOnlyPart {
                      const KURL& url,
                      const KParts::URLArgs& args = KParts::URLArgs());
 
-  DOM::EventListener* createHTMLEventListener(QString code,
+  DOM::EventListener* createHTMLEventListener(const DOM::DOMString& code,
                                               DOM::NodeImpl* node);
 
  public:

@@ -257,7 +257,8 @@ class InterpreterImp {
 
   ExecState* globalExec() { return &globExec; }
   bool checkSyntax(const UString& code);
-  Completion evaluate(const UString& code,
+  Completion evaluate(const UChar* code,
+                      int codeLength,
                       JSValue* thisV,
                       const UString& sourceURL,
                       int startingLineNumber);

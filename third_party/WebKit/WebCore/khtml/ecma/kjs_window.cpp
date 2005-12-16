@@ -1443,7 +1443,7 @@ JSValue* Window::getListener(ExecState* exec,
     return jsUndefined();
 
   DOM::EventListener* listener = doc->getHTMLWindowEventListener(eventType);
-  if (listener && static_cast<JSEventListener*>(listener)->listenerObjImp())
+  if (listener && static_cast<JSEventListener*>(listener)->listenerObj())
     return static_cast<JSEventListener*>(listener)->listenerObj();
   else
     return jsNull();
@@ -1479,7 +1479,7 @@ JSUnprotectedEventListener* Window::getJSUnprotectedEventListener(JSValue* val,
   return new JSUnprotectedEventListener(listenerObject, this, html);
 }
 
-JSLazyEventListener* Window::getJSLazyEventListener(const QString& code,
+JSLazyEventListener* Window::getJSLazyEventListener(const DOMString& code,
                                                     DOM::NodeImpl* node,
                                                     int lineNumber) {
   return new JSLazyEventListener(code, this, node, lineNumber);

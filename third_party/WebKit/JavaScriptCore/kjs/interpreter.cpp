@@ -98,29 +98,28 @@ bool Interpreter::checkSyntax(const UString& code) {
   return rep->checkSyntax(code);
 }
 
-Completion Interpreter::evaluate(const UString& code,
-                                 JSValue* thisV,
-                                 const UString&) {
-  return evaluate(UString(), 0, code, thisV);
-}
-
 Completion Interpreter::evaluate(const UString& sourceURL,
                                  int startingLineNumber,
                                  const UString& code,
                                  JSValue* thisV) {
-  Completion comp = rep->evaluate(code, thisV, sourceURL, startingLineNumber);
+  return evaluate(sourceURL, startingLineNumber, code.data(), code.size());
+}
 
-#if APPLE_CHANGES
+Completion Interpreter::evaluate(const UString& sourceURL,
+                                 int startingLineNumber,
+                                 const UChar* code,
+                                 int codeLength,
+                                 JSValue* thisV) {
+  Completion comp =
+      rep->evaluate(code, codeLength, thisV, sourceURL, startingLineNumber);
+
   if (shouldPrintExceptions() && comp.complType() == Throw) {
     JSLock lock;
     ExecState* exec = rep->globalExec();
-    char* f = strdup(sourceURL.ascii());
-    const char* message = comp.value()->toObject(exec)->toString(exec).ascii();
-    printf("[%d] %s:%s\n", getpid(), f, message);
-
-    free(f);
+    CString f = sourceURL.UTF8String();
+    CString message = comp.value()->toObject(exec)->toString(exec).UTF8String();
+    printf("[%d] %s:%s\n", getpid(), f.c_str(), message.c_str());
   }
-#endif
 
   return comp;
 }

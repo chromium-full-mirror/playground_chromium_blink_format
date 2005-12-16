@@ -26,41 +26,24 @@
 #include <khtml_part.h>
 #include <kjs/collector.h>
 
+using namespace DOM;
 using namespace KJS;
-
-using DOM::EventListener;
-
-#ifndef NDEBUG
-int KJSProxyImpl::s_count = 0;
-#endif
 
 KJSProxyImpl::KJSProxyImpl(KHTMLPart* part) {
   m_script = 0;
   m_part = part;
   m_handlerLineno = 0;
-#ifndef NDEBUG
-  s_count++;
-#endif
 }
 
 KJSProxyImpl::~KJSProxyImpl() {
   JSLock lock;
   delete m_script;
-
-#ifndef NDEBUG
-  s_count--;
-// If it was the last interpreter, we should have nothing left
-#ifdef KJS_DEBUG_MEM
-  if (s_count == 0)
-    Interpreter::finalCheck();
-#endif
-#endif
 }
 
-QVariant KJSProxyImpl::evaluate(QString filename,
+QVariant KJSProxyImpl::evaluate(const DOMString& filename,
                                 int baseLine,
-                                const QString& str,
-                                DOM::NodeImpl* n) {
+                                const DOMString& str,
+                                NodeImpl* n) {
   // evaluate code. Returns the JS return value or an invalid QVariant
   // if there was none, an error occured or the type couldn't be converted.
 
@@ -77,8 +60,9 @@ QVariant KJSProxyImpl::evaluate(QString filename,
 
   KJS::JSValue* thisNode =
       n ? Window::retrieve(m_part) : getDOMNode(m_script->globalExec(), n);
-  UString code(str);
-  Completion comp = m_script->evaluate(filename, baseLine, code, thisNode);
+  Completion comp = m_script->evaluate(
+      filename, baseLine, reinterpret_cast<KJS::UChar*>(str.unicode()),
+      str.length(), thisNode);
 
   bool success =
       (comp.complType() == Normal) || (comp.complType() == ReturnValue);
@@ -118,15 +102,15 @@ void KJSProxyImpl::clear() {
   }
 }
 
-DOM::EventListener* KJSProxyImpl::createHTMLEventHandler(QString code,
-                                                         DOM::NodeImpl* node) {
+EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
+                                                    NodeImpl* node) {
   initScript();
   JSLock lock;
   return KJS::Window::retrieveWindow(m_part)->getJSLazyEventListener(
       code, node, m_handlerLineno);
 }
 
-void KJSProxyImpl::finishedWithEvent(DOM::EventImpl* event) {
+void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
   // This is called when the DOM implementation has finished with a particular
   // event. This
   // is the case in sitations where an event has been created just for temporary

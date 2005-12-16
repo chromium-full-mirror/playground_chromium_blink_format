@@ -667,69 +667,55 @@ bool InterpreterImp::checkSyntax(const UString& code) {
   return progNode;
 }
 
-Completion InterpreterImp::evaluate(const UString& code,
+Completion InterpreterImp::evaluate(const UChar* code,
+                                    int codeLength,
                                     JSValue* thisV,
                                     const UString& sourceURL,
                                     int startingLineNumber) {
   JSLock lock;
 
   // prevent against infinite recursion
-  if (recursion >= 20) {
-#if APPLE_CHANGES
-    Completion result = Completion(
-        Throw, Error::create(&globExec, GeneralError, "Recursion too deep"));
-    return result;
-#else
+  if (recursion >= 20)
     return Completion(
         Throw, Error::create(&globExec, GeneralError, "Recursion too deep"));
-#endif
-  }
 
   // parse the source code
   int sid;
   int errLine;
   UString errMsg;
-  RefPtr<ProgramNode> progNode =
-      Parser::parse(sourceURL, startingLineNumber, code.data(), code.size(),
-                    &sid, &errLine, &errMsg);
+  RefPtr<ProgramNode> progNode = Parser::parse(
+      sourceURL, startingLineNumber, code, codeLength, &sid, &errLine, &errMsg);
 
   // notify debugger that source has been parsed
   if (dbg) {
-    bool cont = dbg->sourceParsed(&globExec, sid, sourceURL, code, errLine);
+    bool cont = dbg->sourceParsed(&globExec, sid, sourceURL,
+                                  UString(code, codeLength), errLine);
     if (!cont)
       return Completion(Break);
   }
 
   // no program node means a syntax error occurred
-  if (!progNode) {
-    JSObject* err =
-        Error::create(&globExec, SyntaxError, errMsg, errLine, sid, &sourceURL);
-    return Completion(Throw, err);
-  }
+  if (!progNode)
+    return Completion(Throw, Error::create(&globExec, SyntaxError, errMsg,
+                                           errLine, sid, &sourceURL));
 
   globExec.clearException();
 
   recursion++;
 
   JSObject* globalObj = globalObject();
-  JSObject* thisObj = globalObject();
+  JSObject* thisObj = globalObj;
 
-  if (thisV) {
-    // "this" must be an object... use same rules as Function.prototype.apply()
-    if (thisV->isUndefinedOrNull())
-      thisObj = globalObject();
-    else {
-      thisObj = thisV->toObject(&globExec);
-    }
-  }
+  // "this" must be an object... use same rules as Function.prototype.apply()
+  if (thisV && !thisV->isUndefinedOrNull())
+    thisObj = thisV->toObject(&globExec);
 
   Completion res;
-  if (globExec.hadException()) {
-    // the thisArg->toObject() conversion above might have thrown an exception -
-    // if so,
-    // propagate it back
+  if (globExec.hadException())
+    // the thisV->toObject() conversion above might have thrown an exception -
+    // if so, propagate it
     res = Completion(Throw, globExec.exception());
-  } else {
+  else {
     // execute the code
     ContextImp ctx(globalObj, this, thisObj);
     ExecState newExec(m_interpreter, &ctx);

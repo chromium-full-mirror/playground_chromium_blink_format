@@ -2733,12 +2733,11 @@ QVariant KHTMLPart::executeScript(QString filename,
 }
 
 void KHTMLPart::slotPartRemoved(KParts::Part* part) {
-  //    kdDebug(6050) << "KHTMLPart::slotPartRemoved " << part << endl;
   if (part == d->m_activeFrame)
-    d->m_activeFrame = 0L;
+    d->m_activeFrame = 0;
 }
 
-DOM::EventListener* KHTMLPart::createHTMLEventListener(QString code,
+DOM::EventListener* KHTMLPart::createHTMLEventListener(const DOMString& code,
                                                        NodeImpl* node) {
   if (KJSProxyImpl* proxy = jScript())
     return proxy->createHTMLEventHandler(code, node);

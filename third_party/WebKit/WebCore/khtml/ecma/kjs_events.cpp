@@ -36,31 +36,19 @@
 
 #include <kdebug.h>
 
-using namespace DOM::EventNames;
-
-using DOM::AtomicString;
-using DOM::ClipboardEventImpl;
-using DOM::DocumentImpl;
-using DOM::DOMString;
-using DOM::EventImpl;
-using DOM::EventListenerEvent;
-using DOM::KeyboardEventImpl;
-using DOM::MouseEventImpl;
-using DOM::UIEventImpl;
-using DOM::MutationEventImpl;
-using DOM::MouseRelatedEventImpl;
-using DOM::NodeImpl;
-using DOM::WheelEventImpl;
-
-using khtml::RenderObject;
+using namespace DOM;
+using namespace EventNames;
+using namespace khtml;
 
 namespace KJS {
+
+static JSValue* jsStringOrUndefined(const DOMString& str) {
+  return str.isNull() ? jsUndefined() : jsString(str);
+}
 
 // -------------------------------------------------------------------------
 
 JSAbstractEventListener::JSAbstractEventListener(bool _html) : html(_html) {}
-
-JSAbstractEventListener::~JSAbstractEventListener() {}
 
 void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
                                           bool isWindowEvent) {
@@ -69,15 +57,17 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
     return;
 #endif
 
-  EventImpl* evt = ele;
+  EventImpl* event = ele;
 
   JSObject* listener = listenerObj();
-  JSObject* win = windowObj();
+  if (!listener)
+    return;
 
-  KHTMLPart* part = static_cast<Window*>(win)->part();
-  KJSProxyImpl* proxy = 0;
-  if (part)
-    proxy = part->jScript();
+  Window* window = windowObj();
+  KHTMLPart* part = window->part();
+  if (!part)
+    return;
+  KJSProxyImpl* proxy = part->jScript();
   if (!proxy)
     return;
 
@@ -87,168 +77,137 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
   ExecState* exec = interpreter->globalExec();
 
   bool hasHandleEvent = false;
-  JSValue* handleEventFuncValue = 0;
+  JSValue* handleEventFuncValue = listener->get(exec, "handleEvent");
   JSObject* handleEventFunc = 0;
-
-  handleEventFuncValue = listener->get(exec, "handleEvent");
   if (handleEventFuncValue->isObject()) {
     handleEventFunc = static_cast<JSObject*>(handleEventFuncValue);
-
-    if (handleEventFunc->implementsCall())
-      hasHandleEvent = true;
+    if (!handleEventFunc->implementsCall())
+      handleEventFunc = 0;
   }
 
-  if (listener->implementsCall() || hasHandleEvent) {
+  if (handleEventFunc || listener->implementsCall()) {
     ref();
 
     List args;
-    args.append(getDOMEvent(exec, evt));
+    args.append(getDOMEvent(exec, event));
 
-    Window* window = static_cast<Window*>(win);
     // Set the event we're handling in the Window object
-    window->setCurrentEvent(evt);
+    window->setCurrentEvent(event);
     // ... and in the interpreter
-    interpreter->setCurrentEvent(evt);
-
-    JSObject* thisObj;
-    if (isWindowEvent) {
-      thisObj = win;
-    } else {
-      thisObj = static_cast<JSObject*>(getDOMNode(exec, evt->currentTarget()));
-    }
+    interpreter->setCurrentEvent(event);
 
     JSValue* retval;
     if (hasHandleEvent)
       retval = handleEventFunc->call(exec, listener, args);
-    else
+    else {
+      JSObject* thisObj;
+      if (isWindowEvent)
+        thisObj = window;
+      else
+        thisObj =
+            static_cast<JSObject*>(getDOMNode(exec, event->currentTarget()));
       retval = listener->call(exec, thisObj, args);
+    }
 
     window->setCurrentEvent(0);
     interpreter->setCurrentEvent(0);
-    if (exec->hadException()) {
-      char* message = exec->exception()
-                          ->toObject(exec)
-                          ->get(exec, messagePropertyName)
-                          ->toString(exec)
-                          .ascii();
-      int lineNumber =
-          exec->exception()->toObject(exec)->get(exec, "line")->toInt32(exec);
-      QString sourceURL;
-      {
-        // put this in a block to make sure UString is deallocated inside the
-        // lock
-        UString uSourceURL = exec->exception()
-                                 ->toObject(exec)
-                                 ->get(exec, "sourceURL")
-                                 ->toString(exec);
-        sourceURL = uSourceURL.qstring();
-      }
-      if (Interpreter::shouldPrintExceptions()) {
-        printf("(event handler):%s\n", message);
-      }
-      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL);
 
+    if (exec->hadException()) {
+      JSObject* exception = exec->exception()->toObject(exec);
+      QString message =
+          exception->get(exec, messagePropertyName)->toString(exec).qstring();
+      int lineNumber = exception->get(exec, "line")->toInt32(exec);
+      QString sourceURL =
+          exception->get(exec, "sourceURL")->toString(exec).qstring();
       if (Interpreter::shouldPrintExceptions())
-        printf("(event handler):%s\n", message);
+        printf("(event handler):%s\n", message.local8Bit().data());
+      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL);
       exec->clearException();
     } else {
-      if (!retval->isUndefinedOrNull() && evt->storesResultAsString())
-        evt->storeResult(retval->toString(exec).domString());
+      if (!retval->isUndefinedOrNull() && event->storesResultAsString())
+        event->storeResult(retval->toString(exec).domString());
       if (html) {
         QVariant ret = ValueToVariant(exec, retval);
-        if (ret.type() == QVariant::Bool && ret.toBool() == false)
-          evt->preventDefault();
+        if (ret.type() == QVariant::Bool && !ret.toBool())
+          event->preventDefault();
       }
     }
 
-    DOM::DocumentImpl::updateDocumentsRendering();
+    DocumentImpl::updateDocumentsRendering();
     deref();
   }
 }
 
-DOM::DOMString JSAbstractEventListener::eventListenerType() {
+DOMString JSAbstractEventListener::eventListenerType() {
   if (html)
     return "_khtml_HTMLEventListener";
-  else
-    return "_khtml_JSEventListener";
+  return "_khtml_JSEventListener";
 }
 
 // -------------------------------------------------------------------------
 
 JSUnprotectedEventListener::JSUnprotectedEventListener(JSObject* _listener,
-                                                       JSObject* _win,
+                                                       Window* _win,
                                                        bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
-  if (_listener) {
-    static_cast<Window*>(win)->jsUnprotectedEventListeners.insert(_listener,
-                                                                  this);
-  }
+  if (_listener)
+    _win->jsUnprotectedEventListeners.insert(_listener, this);
 }
 
 JSUnprotectedEventListener::~JSUnprotectedEventListener() {
-  if (listener) {
-    if (win) {
-      static_cast<Window*>(win)->jsUnprotectedEventListeners.remove(listener);
-    }
-  }
+  if (listener && win)
+    win->jsUnprotectedEventListeners.remove(listener);
 }
 
 JSObject* JSUnprotectedEventListener::listenerObj() const {
   return listener;
 }
 
-JSObject* JSUnprotectedEventListener::windowObj() const {
+Window* JSUnprotectedEventListener::windowObj() const {
   return win;
 }
 
 void JSUnprotectedEventListener::clearWindowObj() {
-  win = NULL;
+  win = 0;
 }
 
 void JSUnprotectedEventListener::mark() {
-  JSObject* listenerImp = listener;
-  if (listenerImp && !listenerImp->marked())
-    listenerImp->mark();
+  if (listener && !listener->marked())
+    listener->mark();
 }
 
 // -------------------------------------------------------------------------
 
-JSEventListener::JSEventListener(JSObject* _listener,
-                                 JSObject* _win,
-                                 bool _html)
+JSEventListener::JSEventListener(JSObject* _listener, Window* _win, bool _html)
     : JSAbstractEventListener(_html), listener(_listener), win(_win) {
   if (_listener)
-    static_cast<Window*>(_win)->jsEventListeners.insert(_listener, this);
+    _win->jsEventListeners.insert(_listener, this);
 }
 
 JSEventListener::~JSEventListener() {
-  if (JSObject* l = listener) {
-    JSObject* w = win;
-    if (w) {
-      static_cast<Window*>(w)->jsEventListeners.remove(l);
-    }
-  }
+  if (listener && win)
+    win->jsEventListeners.remove(listener);
 }
 
 JSObject* JSEventListener::listenerObj() const {
   return listener;
 }
 
-JSObject* JSEventListener::windowObj() const {
+Window* JSEventListener::windowObj() const {
   return win;
 }
 
 void JSEventListener::clearWindowObj() {
-  win = NULL;
+  win = 0;
 }
 
 // -------------------------------------------------------------------------
 
-JSLazyEventListener::JSLazyEventListener(QString _code,
-                                         JSObject* _win,
+JSLazyEventListener::JSLazyEventListener(const DOMString& _code,
+                                         Window* _win,
                                          NodeImpl* _originalNode,
                                          int lineno)
-    : JSEventListener(NULL, _win, true), code(_code), parsed(false) {
+    : JSEventListener(0, _win, true), code(_code), parsed(false) {
   lineNumber = lineno;
 
   // We don't retain the original node, because we assume it
@@ -258,14 +217,6 @@ JSLazyEventListener::JSLazyEventListener(QString _code,
   // then originalNode is no longer needed.
 
   originalNode = _originalNode;
-}
-
-void JSLazyEventListener::handleEvent(EventListenerEvent evt,
-                                      bool isWindowEvent) {
-  parseCode();
-  JSObject* listenerObj = listener;
-  if (listenerObj)
-    JSEventListener::handleEvent(evt, isWindowEvent);
 }
 
 JSObject* JSLazyEventListener::listenerObj() const {
@@ -279,68 +230,59 @@ JSValue* JSLazyEventListener::eventParameterName() const {
 }
 
 void JSLazyEventListener::parseCode() const {
-  if (!parsed) {
-    JSObject* w = win;
-    KHTMLPart* part = static_cast<Window*>(w)->part();
-    KJSProxyImpl* proxy = 0;
-    if (part)
-      proxy = part->jScript();
+  if (parsed)
+    return;
+  parsed = true;
 
-    if (proxy) {
-      ScriptInterpreter* interpreter = proxy->interpreter();
-      ExecState* exec = interpreter->globalExec();
+  KHTMLPart* part = windowObj()->part();
+  KJSProxyImpl* proxy = 0;
+  if (part)
+    proxy = part->jScript();
 
-      JSLock lock;
-      JSObject* constr = interpreter->builtinFunction();
-      List args;
+  if (proxy) {
+    ScriptInterpreter* interpreter = proxy->interpreter();
+    ExecState* exec = interpreter->globalExec();
 
-      UString sourceURL(part->m_url.url());
-      args.append(eventParameterName());
-      args.append(jsString(code));
-      listener = constr->construct(exec, args, sourceURL,
-                                   lineNumber);  // ### is globalExec ok ?
+    JSLock lock;
+    JSObject* constr = interpreter->builtinFunction();
+    List args;
 
-      if (exec->hadException()) {
-        exec->clearException();
+    UString sourceURL(part->m_url.url());
+    args.append(eventParameterName());
+    args.append(jsString(code));
+    listener = constr->construct(exec, args, sourceURL,
+                                 lineNumber);  // ### is globalExec ok ?
 
-        // failed to parse, so let's just make this listener a no-op
-        listener = NULL;
-      } else if (originalNode) {
-        // Add the event's home element to the scope
-        // (and the document, and the form - see HTMLElement::eventHandlerScope)
-        ScopeChain scope = listener->scope();
+    if (exec->hadException()) {
+      exec->clearException();
 
-        JSObject* thisObj;
-        {  // scope
-          JSLock lock;
-          thisObj = static_cast<JSObject*>(getDOMNode(exec, originalNode));
-        }
+      // failed to parse, so let's just make this listener a no-op
+      listener = 0;
+    } else if (originalNode) {
+      // Add the event's home element to the scope
+      // (and the document, and the form - see HTMLElement::eventHandlerScope)
+      ScopeChain scope = listener->scope();
 
-        if (thisObj) {
-          static_cast<DOMNode*>(thisObj)->pushEventHandlerScope(exec, scope);
-          listener->setScope(scope);
-        }
+      JSValue* thisObj = getDOMNode(exec, originalNode);
+      if (thisObj->isObject()) {
+        static_cast<DOMNode*>(thisObj)->pushEventHandlerScope(exec, scope);
+        listener->setScope(scope);
       }
     }
-
-    // no more need to keep the unparsed code around
-    code = QString();
-
-    if (JSObject* l = listener) {
-      JSObject* w = win;
-      static_cast<Window*>(w)->jsEventListeners.insert(
-          l, const_cast<JSLazyEventListener*>(this));
-    }
-
-    parsed = true;
   }
+
+  // no more need to keep the unparsed code around
+  code = DOMString();
+
+  if (listener)
+    windowObj()->jsEventListeners.insert(
+        listener, const_cast<JSLazyEventListener*>(this));
 }
 
 JSValue* getNodeEventListener(NodeImpl* n, const AtomicString& eventType) {
-  JSAbstractEventListener* listener =
-      static_cast<JSAbstractEventListener*>(n->getHTMLEventListener(eventType));
-  if (listener)
-    if (JSValue* obj = listener->listenerObjImp())
+  if (JSAbstractEventListener* listener = static_cast<JSAbstractEventListener*>(
+          n->getHTMLEventListener(eventType)))
+    if (JSValue* obj = listener->listenerObj())
       return obj;
   return jsNull();
 }
@@ -631,8 +573,6 @@ DOMUIEvent::DOMUIEvent(ExecState* exec, UIEventImpl* e) : DOMEvent(exec, e) {
   setPrototype(DOMUIEventProto::self(exec));
 }
 
-DOMUIEvent::~DOMUIEvent() {}
-
 bool DOMUIEvent::getOwnPropertySlot(ExecState* exec,
                                     const Identifier& propertyName,
                                     PropertySlot& slot) {
@@ -723,8 +663,6 @@ DOMMouseEvent::DOMMouseEvent(ExecState* exec, MouseEventImpl* e)
     : DOMUIEvent(exec, e) {
   setPrototype(DOMMouseEventProto::self(exec));
 }
-
-DOMMouseEvent::~DOMMouseEvent() {}
 
 bool DOMMouseEvent::getOwnPropertySlot(ExecState* exec,
                                        const Identifier& propertyName,
@@ -866,12 +804,6 @@ DOMKeyboardEvent::DOMKeyboardEvent(ExecState* exec, KeyboardEventImpl* e)
   setPrototype(DOMKeyboardEventProto::self(exec));
 }
 
-DOMKeyboardEvent::~DOMKeyboardEvent() {}
-
-const ClassInfo* DOMKeyboardEvent::classInfo() const {
-  return &info;
-}
-
 bool DOMKeyboardEvent::getOwnPropertySlot(ExecState* exec,
                                           const Identifier& propertyName,
                                           PropertySlot& slot) {
@@ -986,8 +918,6 @@ DOMMutationEvent::DOMMutationEvent(ExecState* exec, MutationEventImpl* e)
     : DOMEvent(exec, e) {
   setPrototype(DOMMutationEventProto::self(exec));
 }
-
-DOMMutationEvent::~DOMMutationEvent() {}
 
 bool DOMMutationEvent::getOwnPropertySlot(ExecState* exec,
                                           const Identifier& propertyName,
@@ -1141,22 +1071,6 @@ IMPLEMENT_PROTOTYPE(ClipboardProto, ClipboardProtoFunc)
 
 Clipboard::Clipboard(ExecState* exec, DOM::ClipboardImpl* cb) : clipboard(cb) {
   setPrototype(ClipboardProto::self(exec));
-
-  if (clipboard)
-    clipboard->ref();
-}
-
-Clipboard::~Clipboard() {
-  if (clipboard)
-    clipboard->deref();
-}
-
-static JSValue* stringOrUndefined(const DOM::DOMString& str) {
-  if (str.isNull()) {
-    return jsUndefined();
-  } else {
-    return jsString(str);
-  }
 }
 
 bool Clipboard::getOwnPropertySlot(ExecState* exec,
@@ -1170,10 +1084,10 @@ JSValue* Clipboard::getValueProperty(ExecState* exec, int token) const {
   switch (token) {
     case DropEffect:
       assert(clipboard->isForDragging() || clipboard->dropEffect().isNull());
-      return stringOrUndefined(clipboard->dropEffect());
+      return jsStringOrUndefined(clipboard->dropEffect());
     case EffectAllowed:
       assert(clipboard->isForDragging() || clipboard->effectAllowed().isNull());
-      return stringOrUndefined(clipboard->effectAllowed());
+      return jsStringOrUndefined(clipboard->effectAllowed());
     case Types: {
       QStringList qTypes = clipboard->types();
       if (qTypes.isEmpty()) {

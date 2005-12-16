@@ -2535,13 +2535,19 @@ bool DocumentImpl::hasWindowEventListener(const AtomicString& eventType) {
   return false;
 }
 
-EventListener* DocumentImpl::createHTMLEventListener(QString code,
+EventListener* DocumentImpl::createHTMLEventListener(const DOMString& code,
                                                      NodeImpl* node) {
   if (part()) {
     return part()->createHTMLEventListener(code, node);
   } else {
     return NULL;
   }
+}
+
+void DocumentImpl::setHTMLWindowEventListener(const AtomicString& eventType,
+                                              AttributeImpl* attr) {
+  setHTMLWindowEventListener(eventType,
+                             createHTMLEventListener(attr->value(), 0));
 }
 
 void DocumentImpl::dispatchImageLoadEventSoon(HTMLImageLoader* image) {

@@ -44,55 +44,52 @@ class Clipboard;
 
 class JSAbstractEventListener : public DOM::EventListener {
  public:
-  JSAbstractEventListener(bool _html = false);
-  virtual ~JSAbstractEventListener();
-  virtual void handleEvent(DOM::EventListenerEvent evt, bool isWindowEvent);
+  JSAbstractEventListener(bool HTML = false);
+  virtual void handleEvent(DOM::EventListenerEvent, bool isWindowEvent);
   virtual DOM::DOMString eventListenerType();
   virtual JSObject* listenerObj() const = 0;
-  virtual JSObject* windowObj() const = 0;
-  JSObject* listenerObjImp() const { return listenerObj(); }
+  virtual Window* windowObj() const = 0;
 
- protected:
+ private:
   bool html;
 };
 
 class JSUnprotectedEventListener : public JSAbstractEventListener {
  public:
-  JSUnprotectedEventListener(JSObject* _listener,
-                             JSObject* _win,
-                             bool _html = false);
+  JSUnprotectedEventListener(JSObject* listener, Window*, bool HTML = false);
   virtual ~JSUnprotectedEventListener();
   virtual JSObject* listenerObj() const;
-  virtual JSObject* windowObj() const;
+  virtual Window* windowObj() const;
   void clearWindowObj();
-  void mark();
+  virtual void mark();
 
- protected:
+ private:
   JSObject* listener;
-  JSObject* win;
+  Window* win;
 };
 
 class JSEventListener : public JSAbstractEventListener {
  public:
-  JSEventListener(JSObject* _listener, JSObject* _win, bool _html = false);
+  JSEventListener(JSObject* listener, Window*, bool HTML = false);
   virtual ~JSEventListener();
   virtual JSObject* listenerObj() const;
-  virtual JSObject* windowObj() const;
+  virtual Window* windowObj() const;
   void clearWindowObj();
 
  protected:
   mutable ProtectedPtr<JSObject> listener;
-  ProtectedPtr<JSObject> win;
+
+ private:
+  ProtectedPtr<Window> win;
 };
 
 class JSLazyEventListener : public JSEventListener {
  public:
-  JSLazyEventListener(QString _code,
-                      JSObject* _win,
-                      DOM::NodeImpl* node,
+  JSLazyEventListener(const DOM::DOMString& code,
+                      Window*,
+                      DOM::NodeImpl*,
                       int lineno = 0);
-  virtual void handleEvent(DOM::EventListenerEvent evt, bool isWindowEvent);
-  JSObject* listenerObj() const;
+  virtual JSObject* listenerObj() const;
 
  protected:
   virtual JSValue* eventParameterName() const;
@@ -100,7 +97,7 @@ class JSLazyEventListener : public JSEventListener {
  private:
   void parseCode() const;
 
-  mutable QString code;
+  mutable DOM::DOMString code;
   mutable bool parsed;
   int lineNumber;
   DOM::NodeImpl* originalNode;
@@ -120,19 +117,16 @@ class EventConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* getEventConstructor(ExecState* exec);
+JSValue* getEventConstructor(ExecState*);
 
 class DOMEvent : public DOMObject {
  public:
-  DOMEvent(ExecState* exec, DOM::EventImpl* e);
-  ~DOMEvent();
+  DOMEvent(ExecState*, DOM::EventImpl*);
+  virtual ~DOMEvent();
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   JSValue* value,
-                   int attr = None);
-  void putValueProperty(ExecState* exec, int token, JSValue* value, int);
+  virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
+  void putValueProperty(ExecState*, int token, JSValue*, int);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
@@ -160,7 +154,7 @@ class DOMEvent : public DOMObject {
   mutable Clipboard* clipboard;
 };
 
-JSValue* getDOMEvent(ExecState* exec, DOM::EventImpl* e);
+JSValue* getDOMEvent(ExecState*, DOM::EventImpl*);
 
 DOM::EventImpl* toEvent(
     JSValue*);  // returns 0 if value is not a DOMEvent object
@@ -176,12 +170,11 @@ class EventExceptionConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* getEventExceptionConstructor(ExecState* exec);
+JSValue* getEventExceptionConstructor(ExecState*);
 
 class DOMUIEvent : public DOMEvent {
  public:
-  DOMUIEvent(ExecState* exec, DOM::UIEventImpl* ue);
-  ~DOMUIEvent();
+  DOMUIEvent(ExecState*, DOM::UIEventImpl*);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   // no put - all read-only
@@ -203,8 +196,7 @@ class DOMUIEvent : public DOMEvent {
 
 class DOMMouseEvent : public DOMUIEvent {
  public:
-  DOMMouseEvent(ExecState* exec, DOM::MouseEventImpl* me);
-  ~DOMMouseEvent();
+  DOMMouseEvent(ExecState*, DOM::MouseEventImpl* me);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   virtual void mark();
@@ -234,12 +226,11 @@ class DOMMouseEvent : public DOMUIEvent {
 
 class DOMKeyboardEvent : public DOMUIEvent {
  public:
-  DOMKeyboardEvent(ExecState* exec, DOM::KeyboardEventImpl* ke);
-  ~DOMKeyboardEvent();
+  DOMKeyboardEvent(ExecState*, DOM::KeyboardEventImpl* ke);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   // no put - all read-only
-  virtual const ClassInfo* classInfo() const;
+  virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
   enum {
     KeyIdentifier,
@@ -264,12 +255,11 @@ class MutationEventConstructor : public DOMObject {
   static const ClassInfo info;
 };
 
-JSValue* getMutationEventConstructor(ExecState* exec);
+JSValue* getMutationEventConstructor(ExecState*);
 
 class DOMMutationEvent : public DOMEvent {
  public:
-  DOMMutationEvent(ExecState* exec, DOM::MutationEventImpl* me);
-  ~DOMMutationEvent();
+  DOMMutationEvent(ExecState*, DOM::MutationEventImpl* me);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
   JSValue* getValueProperty(ExecState*, int token) const;
   // no put - all read-only
@@ -314,18 +304,11 @@ class Clipboard : public DOMObject {
   friend class ClipboardProtoFunc;
 
  public:
-  Clipboard(ExecState* exec, DOM::ClipboardImpl* ds);
-  ~Clipboard();
+  Clipboard(ExecState*, DOM::ClipboardImpl* ds);
   virtual bool getOwnPropertySlot(ExecState*, const Identifier&, PropertySlot&);
-  JSValue* getValueProperty(ExecState* exec, int token) const;
-  virtual void put(ExecState* exec,
-                   const Identifier& propertyName,
-                   JSValue* value,
-                   int attr = None);
-  void putValueProperty(ExecState* exec,
-                        int token,
-                        JSValue* value,
-                        int /*attr*/);
+  JSValue* getValueProperty(ExecState*, int token) const;
+  virtual void put(ExecState*, const Identifier&, JSValue*, int attr = None);
+  void putValueProperty(ExecState*, int token, JSValue*, int attr);
   virtual bool toBoolean(ExecState*) const { return true; }
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
@@ -340,7 +323,7 @@ class Clipboard : public DOMObject {
   };
 
  private:
-  DOM::ClipboardImpl* clipboard;
+  RefPtr<DOM::ClipboardImpl> clipboard;
 };
 
 }  // namespace
