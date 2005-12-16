@@ -80,14 +80,15 @@ JSValue* DOMParserProtoFunc::callAsFunction(ExecState* exec,
       QString contentType = args[1]->toString(exec).qstring().stripWhiteSpace();
 
       if (DOMImplementationImpl::isXMLMIMEType(contentType)) {
-        DocumentImpl* docImpl = parser->doc->implementation()->createDocument();
+        RefPtr<DocumentImpl> doc =
+            parser->doc->implementation()->createDocument();
 
-        docImpl->open();
-        docImpl->write(str);
-        docImpl->finishParsing();
-        docImpl->close();
+        doc->open();
+        doc->write(str);
+        doc->finishParsing();
+        doc->close();
 
-        return getDOMNode(exec, docImpl);
+        return getDOMNode(exec, doc.get());
       }
     }
   }
