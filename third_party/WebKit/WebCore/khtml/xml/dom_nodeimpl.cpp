@@ -2220,6 +2220,10 @@ NodeImpl* ContainerNodeImpl::replaceChild(NodeImpl* newChild,
   if (exceptioncode)
     return 0;
 
+  // If the new child was right before or right after the old child, nothing
+  // else needs to change
+  if (prev == child || next == child)
+    child = 0;
   // Add the new child(ren)
   while (child) {
     nextChild = isFragment ? child->nextSibling() : 0;
