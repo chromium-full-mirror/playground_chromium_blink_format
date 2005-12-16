@@ -675,6 +675,7 @@ JSValue* DateProtoFunc::callAsFunction(ExecState* exec,
       return jsString(formatLocaleDate(exec, secs, false, true, args));
       break;
 #else
+    case ToLocaleString:
       strftime(timebuffer, bufsize, "%c", &t);
       return jsString(timebuffer);
       break;
