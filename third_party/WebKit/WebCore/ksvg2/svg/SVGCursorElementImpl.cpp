@@ -91,16 +91,7 @@ void SVGCursorElementImpl::parseMappedAttribute(
 
 void SVGCursorElementImpl::notifyFinished(KDOM::CachedObject* finishedObj) {
   if (finishedObj == m_cachedImage) {
-#ifndef APPLE_COMPILE_HACK
-    QPixmap pixm(m_cachedImage->pixmap_size());
-    QPainter p(&pixm);
-    ImagePainter ip(m_cachedImage->image());
-    ip.paint(0, 0, &p, 0, 0, m_cachedImage->pixmap_size().width(),
-             m_cachedImage->pixmap_size().height());
-    m_image = pixm;
-    kdDebug() << "pixm w : " << m_image.size() << endl;
-#endif  // APPLE_COMPILE_HACK
-
+    m_image = m_cachedImage->pixmap();
     m_cachedImage->deref(this);
     m_cachedImage = 0;
   }

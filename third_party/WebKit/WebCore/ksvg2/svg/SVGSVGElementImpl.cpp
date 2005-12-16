@@ -155,22 +155,24 @@ SVGRectImpl* SVGSVGElementImpl::viewport() const {
 }
 
 float SVGSVGElementImpl::pixelUnitToMillimeterX() const {
-#ifndef APPLE_COMPILE_HACK
-  if (ownerDocument() && ownerDocument()->paintDeviceMetrics()) {
-    Q3PaintDeviceMetrics* metrics = ownerDocument()->paintDeviceMetrics();
-    return float(metrics->widthMM()) / float(metrics->width());
-  }
+#if 0
+    if(ownerDocument() && ownerDocument()->paintDeviceMetrics())
+    {
+        Q3PaintDeviceMetrics *metrics = ownerDocument()->paintDeviceMetrics();
+        return float(metrics->widthMM()) / float(metrics->width());
+    }
 #endif
 
   return .28;
 }
 
 float SVGSVGElementImpl::pixelUnitToMillimeterY() const {
-#ifndef APPLE_COMPILE_HACK
-  if (ownerDocument() && ownerDocument()->paintDeviceMetrics()) {
-    Q3PaintDeviceMetrics* metrics = ownerDocument()->paintDeviceMetrics();
-    return float(metrics->heightMM()) / float(metrics->height());
-  }
+#if 0
+    if(ownerDocument() && ownerDocument()->paintDeviceMetrics())
+    {
+        Q3PaintDeviceMetrics *metrics = ownerDocument()->paintDeviceMetrics();
+        return float(metrics->heightMM()) / float(metrics->height());
+    }
 #endif
 
   return .28;
@@ -191,13 +193,6 @@ bool SVGSVGElementImpl::useCurrentView() const {
 void SVGSVGElementImpl::setUseCurrentView(bool currentView) {
   m_useCurrentView = currentView;
 }
-
-/*
-SVGViewSpecImpl *SVGSVGElementImpl::currentView() const
-{
-    return 0;
-}
-*/
 
 float SVGSVGElementImpl::currentScale() const {
   // if(!canvasView())
