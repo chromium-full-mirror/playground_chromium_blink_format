@@ -74,6 +74,7 @@ class QFontMetrics {
                           bool smallCaps,
                           int x,
                           bool reversed,
+                          bool dirOverride,
                           bool includePartialGlyphs) const;
 
   QRect boundingRect(QChar) const;

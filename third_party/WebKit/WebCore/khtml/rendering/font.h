@@ -140,7 +140,8 @@ class Font {
                           int tabWidth,
                           int xpos,
                           int x,
-                          bool reversed,
+                          QPainter::TextDirection d,
+                          bool visuallyOrdered,
                           bool includePartialGlyphs) const;
   void drawHighlightForText(QPainter* p,
                             int x,
@@ -192,11 +193,13 @@ inline int Font::checkSelectionPoint(QChar* s,
                                      int tabWidth,
                                      int xpos,
                                      int x,
-                                     bool reversed,
+                                     QPainter::TextDirection d,
+                                     bool visuallyOrdered,
                                      bool includePartialGlyphs) const {
-  return fm.checkSelectionPoint(s, slen, pos, len, toAdd, tabWidth, xpos,
-                                letterSpacing, wordSpacing, fontDef.smallCaps,
-                                x, reversed, includePartialGlyphs);
+  return fm.checkSelectionPoint(s + pos, slen - pos, 0, len, toAdd, tabWidth,
+                                xpos, letterSpacing, wordSpacing,
+                                fontDef.smallCaps, x, d == QPainter::RTL,
+                                visuallyOrdered, includePartialGlyphs);
 }
 
 inline int Font::width(QChar* chs,
