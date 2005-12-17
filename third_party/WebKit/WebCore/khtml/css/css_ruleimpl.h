@@ -154,7 +154,7 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
                    CSSRuleListImpl* ruleList);
   virtual ~CSSMediaRuleImpl();
 
-  MediaListImpl* media() const { return m_lstMedia; }
+  MediaListImpl* media() const { return m_lstMedia.get(); }
   CSSRuleListImpl* cssRules() { return m_lstCSSRules.get(); }
 
   unsigned insertRule(const DOM::DOMString& rule, unsigned index);
@@ -167,7 +167,7 @@ class CSSMediaRuleImpl : public CSSRuleImpl {
   unsigned append(CSSRuleImpl* rule);
 
  protected:
-  MediaListImpl* m_lstMedia;
+  RefPtr<MediaListImpl> m_lstMedia;
   RefPtr<CSSRuleListImpl> m_lstCSSRules;
 };
 
