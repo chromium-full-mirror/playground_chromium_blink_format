@@ -60,6 +60,7 @@ class ObjectProtoFunc : public InternalFunctionImp {
     ToLocaleString,
     ValueOf,
     HasOwnProperty,
+    IsPrototypeOf,
     PropertyIsEnumerable,
     DefineGetter,
     DefineSetter,
