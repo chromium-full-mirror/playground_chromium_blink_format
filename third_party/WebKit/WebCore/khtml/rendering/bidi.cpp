@@ -274,7 +274,7 @@ static inline RenderObject* bidiNext(RenderBlock* block,
     if (!oldEndOfInline && !current->isFloating() && !current->isReplaced() &&
         !current->isPositioned()) {
       next = current->firstChild();
-      if (next && bidi.adjustEmbedding) {
+      if (next && bidi.adjustEmbedding && next->isInlineFlow()) {
         EUnicodeBidi ub = next->style()->unicodeBidi();
         if (ub != UBNormal) {
           EDirection dir = next->style()->direction();
@@ -295,12 +295,24 @@ static inline RenderObject* bidiNext(RenderBlock* block,
       }
 
       while (current && current != block) {
-        next = current->nextSibling();
-        if (next)
-          break;
-
-        if (bidi.adjustEmbedding && current->style()->unicodeBidi() != UBNormal)
+        if (bidi.adjustEmbedding && current->isInlineFlow() &&
+            current->style()->unicodeBidi() != UBNormal)
           embed(QChar::DirPDF, bidi);
+
+        next = current->nextSibling();
+        if (next) {
+          if (bidi.adjustEmbedding && next->isInlineFlow()) {
+            EUnicodeBidi ub = next->style()->unicodeBidi();
+            if (ub != UBNormal) {
+              EDirection dir = next->style()->direction();
+              QChar::Direction d =
+                  (ub == Embed ? (dir == RTL ? QChar::DirRLE : QChar::DirLRE)
+                               : (dir == RTL ? QChar::DirRLO : QChar::DirLRO));
+              embed(d, bidi);
+            }
+          }
+          break;
+        }
 
         current = current->parent();
         if (!skipInlines && current && current != block &&
@@ -334,6 +346,16 @@ static RenderObject* bidiFirst(RenderBlock* block,
 
   RenderObject* o = block->firstChild();
   if (o->isInlineFlow()) {
+    if (bidi.adjustEmbedding) {
+      EUnicodeBidi ub = o->style()->unicodeBidi();
+      if (ub != UBNormal) {
+        EDirection dir = o->style()->direction();
+        QChar::Direction d =
+            (ub == Embed ? (dir == RTL ? QChar::DirRLE : QChar::DirLRE)
+                         : (dir == RTL ? QChar::DirRLO : QChar::DirLRO));
+        embed(d, bidi);
+      }
+    }
     if (skipInlines && o->firstChild())
       o = bidiNext(block, o, bidi, skipInlines);
     else
@@ -1869,8 +1891,11 @@ RootInlineBox* RenderBlock::determineStartPosition(bool fullLayout,
     pos = last->lineBreakPos();
     bidi.status = last->lineBreakBidiStatus();
     bidi.context = last->lineBreakBidiContext();
-  } else
+  } else {
+    bidi.adjustEmbedding = true;
     startObj = bidiFirst(this, bidi, 0);
+    bidi.adjustEmbedding = false;
+  }
 
   start = BidiIterator(this, startObj, pos);
 
