@@ -51,8 +51,10 @@ class XSLTProcessorImpl : public khtml::Shared<XSLTProcessorImpl> {
   }
   bool transformToString(NodeImpl* source,
                          QString& resultMIMEType,
-                         QString& resultString);
+                         QString& resultString,
+                         QString& resultEncoding);
   RefPtr<DocumentImpl> createDocumentFromSource(const QString& source,
+                                                const QString& sourceEncoding,
                                                 const QString& sourceMIMEType,
                                                 NodeImpl* sourceNode,
                                                 KHTMLView* view = 0);

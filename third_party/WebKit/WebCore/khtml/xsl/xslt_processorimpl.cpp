@@ -183,6 +183,7 @@ static void freeXsltParamArray(const char** params) {
 
 RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
     const QString& sourceString,
+    const QString& sourceEncoding,
     const QString& sourceMIMEType,
     NodeImpl* sourceNode,
     KHTMLView* view) {
@@ -218,6 +219,14 @@ RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
   }
   result->determineParseMode(
       documentSource);  // Make sure we parse in the correct mode.
+
+  Decoder* decoder = new Decoder;
+  decoder->setEncoding(
+      sourceEncoding.isEmpty() ? "UTF-8" : sourceEncoding.latin1(),
+      Decoder::EncodingFromXMLHeader);
+  result->setDecoder(decoder);
+  decoder->deref();
+
   result->write(documentSource);
   result->finishParsing();
   result->setParsing(false);
@@ -304,7 +313,8 @@ static inline QString resultMIMEType(xmlDocPtr resultDoc,
 
 bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
                                           QString& mimeType,
-                                          QString& resultString) {
+                                          QString& resultString,
+                                          QString& resultEncoding) {
   RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   RefPtr<XSLStyleSheetImpl> cachedStylesheet = m_stylesheet;
 
@@ -328,6 +338,7 @@ bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
     return false;
 
   mimeType = resultMIMEType(resultDoc, sheet);
+  resultEncoding = (char*)resultDoc->encoding;
 
   xsltFreeStylesheet(sheet);
   xmlFreeDoc(resultDoc);
@@ -339,9 +350,12 @@ RefPtr<DocumentImpl> XSLTProcessorImpl::transformToDocument(
     NodeImpl* sourceNode) {
   QString resultMIMEType;
   QString resultString;
-  if (!transformToString(sourceNode, resultMIMEType, resultString))
+  QString resultEncoding;
+  if (!transformToString(sourceNode, resultMIMEType, resultString,
+                         resultEncoding))
     return 0;
-  return createDocumentFromSource(resultString, resultMIMEType, sourceNode);
+  return createDocumentFromSource(resultString, resultEncoding, resultMIMEType,
+                                  sourceNode);
 }
 
 RefPtr<DocumentFragmentImpl> XSLTProcessorImpl::transformToFragment(
@@ -349,7 +363,9 @@ RefPtr<DocumentFragmentImpl> XSLTProcessorImpl::transformToFragment(
     DocumentImpl* outputDoc) {
   QString resultMIMEType;
   QString resultString;
-  if (!transformToString(sourceNode, resultMIMEType, resultString))
+  QString resultEncoding;
+  if (!transformToString(sourceNode, resultMIMEType, resultString,
+                         resultEncoding))
     return 0;
   return createFragmentFromSource(resultString, resultMIMEType, sourceNode,
                                   outputDoc);
