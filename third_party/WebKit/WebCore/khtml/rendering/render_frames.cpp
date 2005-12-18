@@ -34,6 +34,7 @@
 #include "html/htmltokenizer.h"
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom_docimpl.h"
+#include "xml/dom_textimpl.h"
 #include "xml/EventNames.h"
 #include "khtmlview.h"
 #include "khtml_part.h"
@@ -921,7 +922,8 @@ void RenderPartObject::updateWidget() {
          child = child->nextSibling()) {
       if ((!child->isTextNode() && !child->hasTagName(embedTag) &&
            !child->hasTagName(paramTag)) ||  // Discount <embed> and <param>
-          (child->isTextNode() && !child->containsOnlyWhitespace()))
+          (child->isTextNode() &&
+           !static_cast<TextImpl*>(child)->containsOnlyWhitespace()))
         m_hasFallbackContent = true;
     }
     bool success =

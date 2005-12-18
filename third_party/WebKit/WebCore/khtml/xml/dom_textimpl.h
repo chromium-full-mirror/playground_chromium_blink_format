@@ -59,7 +59,7 @@ class CharacterDataImpl : public NodeImpl {
                            const DOMString& arg,
                            int& exceptioncode);
 
-  virtual bool containsOnlyWhitespace() const;
+  bool containsOnlyWhitespace() const;
   bool containsOnlyWhitespace(unsigned int from, unsigned int len) const;
 
   // DOM methods overridden from  parent classes
