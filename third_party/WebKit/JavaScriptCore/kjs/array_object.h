@@ -59,7 +59,8 @@ class ArrayProtoFunc : public InternalFunctionImp {
     UnShift,
     Every,
     ForEach,
-    Some
+    Some,
+    IndexOf
   };
 
  private:
