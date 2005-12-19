@@ -532,7 +532,7 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
       else
         return;
 
-      svgstyle->setStrokeMiterLimit(qRound(f));
+      svgstyle->setStrokeMiterLimit(lroundf(f));
       break;
     }
     case SVGCSS_PROP_FILTER: {

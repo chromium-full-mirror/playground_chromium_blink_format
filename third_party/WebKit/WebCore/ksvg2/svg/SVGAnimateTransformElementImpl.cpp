@@ -256,14 +256,14 @@ void SVGAnimateTransformElementImpl::handleTimerEvent(double timePercentage) {
       calculateRotationFromMatrix(qFromMatrix, fromAngle, fromCx, fromCy);
 
       if (m_toRotateSpecialCase) {
-        if (qRound(toAngle) == 1)
+        if (lround(toAngle) == 1)
           toAngle = 0.0;
         else
           toAngle = 360.0;
       }
 
       if (m_fromRotateSpecialCase) {
-        if (qRound(fromAngle) == 1)
+        if (lround(fromAngle) == 1)
           fromAngle = 0.0;
         else
           fromAngle = 360.0;

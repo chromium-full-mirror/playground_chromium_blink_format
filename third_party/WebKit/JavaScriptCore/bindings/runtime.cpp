@@ -22,19 +22,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "config.h"
-#include <value.h>
-#include <interpreter.h>
+#include "runtime.h"
 
-#include <runtime_object.h>
-#include <jni_instance.h>
-#include <objc_instance.h>
-#include <c_instance.h>
-#include <NP_jsobject.h>
-#include <jni_jsobject.h>
+#include "JSLock.h"
+#include "NP_jsobject.h"
+#include "c_instance.h"
+#include "jni_instance.h"
+#include "objc_instance.h"
+#include "runtime_object.h"
 
-using namespace KJS;
-using namespace KJS::Bindings;
+namespace KJS {
+namespace Bindings {
 
 void MethodList::addMethod(Method* aMethod) {
   Method** _newMethods = new Method*[_length + 1];
@@ -89,12 +89,11 @@ KJSDidExecuteFunctionPtr Instance::didExecuteFunction() {
   return _DidExecuteFunction;
 }
 
-JSValue* Instance::getValueOfField(KJS::ExecState* exec,
-                                   const Field* aField) const {
+JSValue* Instance::getValueOfField(ExecState* exec, const Field* aField) const {
   return aField->valueFromInstance(exec, this);
 }
 
-void Instance::setValueOfField(KJS::ExecState* exec,
+void Instance::setValueOfField(ExecState* exec,
                                const Field* aField,
                                JSValue* aValue) const {
   aField->setValueToInstance(exec, this, aValue);
@@ -177,7 +176,7 @@ void* Instance::createLanguageInstanceForValue(ExecState* exec,
 
 Instance::Instance(const Instance& other) {
   setExecutionContext(other.executionContext());
-};
+}
 
 Instance& Instance::operator=(const Instance& other) {
   if (this == &other)
@@ -186,4 +185,6 @@ Instance& Instance::operator=(const Instance& other) {
   setExecutionContext(other.executionContext());
 
   return *this;
+}
+}
 }

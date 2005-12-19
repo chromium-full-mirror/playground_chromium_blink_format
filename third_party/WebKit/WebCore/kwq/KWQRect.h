@@ -107,10 +107,6 @@ class QRect {
 #endif
   operator CGRect() const;
 
-#ifdef _KWQ_IOSTREAM_
-  friend std::ostream& operator<<(std::ostream&, const QRect&);
-#endif
-
  private:
   int xp;
   int yp;

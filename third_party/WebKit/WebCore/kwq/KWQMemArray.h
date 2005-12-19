@@ -29,10 +29,6 @@
 #include "KWQDef.h"
 #include "KWQArrayImpl.h"
 
-#ifdef _KWQ_IOSTREAM_
-#include <ostream>
-#endif
-
 template <class T>
 class QMemArray {
  public:
@@ -70,23 +66,5 @@ class QMemArray {
 };
 
 #define Q3MemArray QMemArray
-
-#ifdef _KWQ_IOSTREAM_
-
-template <class T>
-inline std::ostream& operator<<(std::ostream& stream, const QMemArray<T>& a) {
-  stream << "QMemArray: [size: " << a.size() << "; items: ";
-  for (unsigned i = 0; i < a.size(); i++) {
-    stream << a[i];
-    if (i < a.size() - 1) {
-      stream << ", ";
-    }
-  }
-  stream << "]";
-
-  return stream;
-}
-
-#endif
 
 #endif

@@ -325,8 +325,8 @@ void SVGPatternElementImpl::notifyAttributeChange() const {
       m_ignoreAttributeChanges)
     return;
 
-  QSize newSize = QSize(qRound(width()->baseVal()->value()),
-                        qRound(height()->baseVal()->value()));
+  QSize newSize = QSize(lroundf(width()->baseVal()->value()),
+                        lroundf(height()->baseVal()->value()));
   if (m_tile && (m_tile->size() == newSize) || newSize.width() < 1 ||
       newSize.height() < 1)
     return;

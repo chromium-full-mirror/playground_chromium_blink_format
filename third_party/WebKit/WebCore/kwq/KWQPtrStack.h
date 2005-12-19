@@ -51,26 +51,4 @@ class QPtrStack {
 
 #define Q3PtrStack QPtrStack
 
-#ifdef _KWQ_IOSTREAM_
-
-template <class T>
-inline std::ostream& operator<<(std::ostream& stream, const QPtrStack<T>& s) {
-  stream << "QPtrStack: [size: " << s.count() << "; items: ";
-
-  QPtrStack<T> tmp(s);
-
-  while (!tmp.isEmpty()) {
-    stream << *tmp.pop();
-    if (tmp.count() > 0) {
-      stream << ", ";
-    }
-  }
-
-  stream << "]";
-
-  return stream;
-}
-
-#endif
-
 #endif
