@@ -42,7 +42,7 @@ struct PassRefPtr_Ref {
 template <typename T>
 class PassRefPtr {
  public:
-  PassRefPtr() : m_ptr(NULL) {}
+  PassRefPtr() : m_ptr(0) {}
   PassRefPtr(T* ptr) : m_ptr(ptr) {
     if (ptr)
       ptr->ref();
@@ -80,11 +80,10 @@ class PassRefPtr {
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
 
-  bool operator!() const { return m_ptr == NULL; }
+  bool operator!() const { return !m_ptr; }
 
-  // this type conversion operator allows implicit conversion to
-  // bool but not to other integer types
-
+  // This conversion operator allows implicit conversion to bool but not to
+  // other integer types.
   typedef T* (PassRefPtr::*UnspecifiedBoolType)() const;
   operator UnspecifiedBoolType() const { return m_ptr ? &PassRefPtr::get : 0; }
 

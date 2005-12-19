@@ -33,7 +33,7 @@ class PassRefPtr_Ref;
 template <class T>
 class RefPtr {
  public:
-  RefPtr() : m_ptr(NULL) {}
+  RefPtr() : m_ptr(0) {}
   RefPtr(T* ptr) : m_ptr(ptr) {
     if (ptr)
       ptr->ref();
@@ -59,11 +59,10 @@ class RefPtr {
   T& operator*() const { return *m_ptr; }
   T* operator->() const { return m_ptr; }
 
-  bool operator!() const { return m_ptr == NULL; }
+  bool operator!() const { return !m_ptr; }
 
-  // this type conversion operator allows implicit conversion to
-  // bool but not to other integer types
-
+  // This conversion operator allows implicit conversion to bool but not to
+  // other integer types.
   typedef T* (RefPtr::*UnspecifiedBoolType)() const;
   operator UnspecifiedBoolType() const { return m_ptr ? &RefPtr::get : 0; }
 
