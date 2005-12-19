@@ -178,8 +178,8 @@ class HTMLParser {
    * a possible <isindex> element in the head. Compatibility hack for
    * html from the stone age
    */
-  DOM::NodeImpl* isindex;
-  DOM::NodeImpl* handleIsindex(khtml::Token* t);
+  RefPtr<DOM::NodeImpl> isindex;
+  DOM::NodeImpl* handleIsindex(khtml::Token*);
 
   /*
    * inserts the stupid isIndex element.

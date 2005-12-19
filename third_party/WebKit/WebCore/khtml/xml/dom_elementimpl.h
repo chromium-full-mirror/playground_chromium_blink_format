@@ -23,8 +23,9 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _DOM_ELEMENTIMPL_h_
-#define _DOM_ELEMENTIMPL_h_
+
+#ifndef DOM_ELEMENTIMPL_H
+#define DOM_ELEMENTIMPL_H
 
 #include "dom_nodeimpl.h"
 #include "xml/dom_stringimpl.h"
@@ -267,7 +268,7 @@ class ElementImpl : public ContainerNodeImpl {
                                 bool preserveDecls = false) {}
 
   // not part of the DOM
-  void setAttributeMap(NamedAttrMapImpl* list);
+  void setAttributeMap(NamedAttrMapImpl*);
 
   // State of the element.
   virtual QString state() { return QString::null; }
@@ -311,10 +312,10 @@ class ElementImpl : public ContainerNodeImpl {
  private:
   void updateId(const AtomicString& oldId, const AtomicString& newId);
 
-  virtual void updateStyleAttributeIfNeeded() const {};
+  virtual void updateStyleAttributeIfNeeded() const {}
 
  protected:  // member variables
-  mutable NamedAttrMapImpl* namedAttrMap;
+  mutable RefPtr<NamedAttrMapImpl> namedAttrMap;
   QualifiedName m_tagName;
 };
 
@@ -498,14 +499,14 @@ class StyledElementImpl : public ElementImpl {
 
   virtual bool isStyledElement() const { return true; }
 
-  bool hasMappedAttributes() const {
-    return namedAttrMap
-               ? static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)
-                     ->hasMappedAttributes()
-               : false;
+  NamedMappedAttrMapImpl* mappedAttributes() {
+    return static_cast<NamedMappedAttrMapImpl*>(namedAttrMap.get());
   }
   const NamedMappedAttrMapImpl* mappedAttributes() const {
-    return static_cast<NamedMappedAttrMapImpl*>(namedAttrMap);
+    return static_cast<NamedMappedAttrMapImpl*>(namedAttrMap.get());
+  }
+  bool hasMappedAttributes() const {
+    return namedAttrMap && mappedAttributes()->hasMappedAttributes();
   }
   bool isMappedAttribute(const QualifiedName& name) const {
     MappedAttributeEntry res = eNone;

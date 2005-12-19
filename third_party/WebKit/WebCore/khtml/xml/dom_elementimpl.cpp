@@ -248,17 +248,14 @@ ElementImpl::ElementImpl(const QualifiedName& qName, DocumentImpl* doc)
 #ifndef NDEBUG
   ++ElementImplCounter::count;
 #endif
-  namedAttrMap = 0;
 }
 
 ElementImpl::~ElementImpl() {
 #ifndef NDEBUG
   --ElementImplCounter::count;
 #endif
-  if (namedAttrMap) {
+  if (namedAttrMap)
     namedAttrMap->detachFromElement();
-    namedAttrMap->deref();
-  }
 }
 
 NodeImpl* ElementImpl::cloneNode(bool deep) {
@@ -281,9 +278,8 @@ void ElementImpl::removeAttribute(const QualifiedName& name,
                                   int& exceptioncode) {
   if (namedAttrMap) {
     namedAttrMap->removeNamedItem(name, exceptioncode);
-    if (exceptioncode == DOMException::NOT_FOUND_ERR) {
+    if (exceptioncode == DOMException::NOT_FOUND_ERR)
       exceptioncode = 0;
-    }
   }
 }
 
@@ -302,7 +298,7 @@ NamedAttrMapImpl* ElementImpl::attributes(bool readonly) const {
   updateStyleAttributeIfNeeded();
   if (!readonly && !namedAttrMap)
     createAttributeMap();
-  return namedAttrMap;
+  return namedAttrMap.get();
 }
 
 unsigned short ElementImpl::nodeType() const {
@@ -325,11 +321,10 @@ const AtomicString& ElementImpl::getAttribute(const QualifiedName& name) const {
   if (name == styleAttr)
     updateStyleAttributeIfNeeded();
 
-  if (namedAttrMap) {
-    AttributeImpl* a = namedAttrMap->getAttributeItem(name);
-    if (a)
+  if (namedAttrMap)
+    if (AttributeImpl* a = namedAttrMap->getAttributeItem(name))
       return a->value();
-  }
+
   return nullAtom;
 }
 
@@ -395,29 +390,29 @@ void ElementImpl::setAttributeMap(NamedAttrMapImpl* list) {
   if (inDocument())
     getDocument()->incDOMTreeVersion();
 
-  // If setting the whole map changes the id attribute, we need to
-  // call updateId.
+  // If setting the whole map changes the id attribute, we need to call
+  // updateId.
 
   AttributeImpl* oldId =
       namedAttrMap ? namedAttrMap->getAttributeItem(idAttr) : 0;
   AttributeImpl* newId = list ? list->getAttributeItem(idAttr) : 0;
 
-  if (oldId || newId) {
+  if (oldId || newId)
     updateId(oldId ? oldId->value() : nullAtom,
              newId ? newId->value() : nullAtom);
-  }
 
   if (namedAttrMap)
-    namedAttrMap->deref();
+    namedAttrMap->element = 0;
 
   namedAttrMap = list;
 
   if (namedAttrMap) {
-    namedAttrMap->ref();
     namedAttrMap->element = this;
-    unsigned int len = namedAttrMap->length();
-    for (unsigned int i = 0; i < len; i++)
+    unsigned len = namedAttrMap->length();
+    for (unsigned i = 0; i < len; i++)
       attributeChanged(namedAttrMap->attrs[i]);
+    // FIXME: What about attributes that were in the old map that are not in the
+    // new map?
   }
 }
 
@@ -440,7 +435,6 @@ void ElementImpl::setPrefix(const AtomicString& _prefix, int& exceptioncode) {
 
 void ElementImpl::createAttributeMap() const {
   namedAttrMap = new NamedAttrMapImpl(const_cast<ElementImpl*>(this));
-  namedAttrMap->ref();
 }
 
 bool ElementImpl::isURLAttribute(AttributeImpl* attr) const {
@@ -1030,10 +1024,11 @@ void NamedAttrMapImpl::addAttribute(AttributeImpl* attr) {
   // appropriate mutation events
   // Note that element may be null here if we are called from insertAttr()
   // during parsing
-  if (element) {
-    element->attributeChanged(attr);
-    element->dispatchAttrAdditionEvent(attr);
-    element->dispatchSubtreeModifiedEvent(false);
+  if (RefPtr<ElementImpl> e = element) {
+    RefPtr<AttributeImpl> a = attr;
+    e->attributeChanged(a.get());
+    e->dispatchAttrAdditionEvent(a.get());
+    e->dispatchSubtreeModifiedEvent(false);
   }
 }
 
@@ -1316,7 +1311,7 @@ void StyledElementImpl::attributeChanged(AttributeImpl* attr,
     mappedAttr->setDecl(0);
     setChanged();
     if (namedAttrMap)
-      static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)->declRemoved();
+      mappedAttributes()->declRemoved();
   }
 
   bool checkDecl = true;
@@ -1326,7 +1321,7 @@ void StyledElementImpl::attributeChanged(AttributeImpl* attr,
     if (mappedAttr->decl()) {
       setChanged();
       if (namedAttrMap)
-        static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)->declAdded();
+        mappedAttributes()->declAdded();
       checkDecl = false;
     }
   } else if (!attr->isNull() && entry != eNone) {
@@ -1336,7 +1331,7 @@ void StyledElementImpl::attributeChanged(AttributeImpl* attr,
       mappedAttr->setDecl(decl);
       setChanged();
       if (namedAttrMap)
-        static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)->declAdded();
+        mappedAttributes()->declAdded();
       checkDecl = false;
     } else
       needToParse = true;
@@ -1352,7 +1347,7 @@ void StyledElementImpl::attributeChanged(AttributeImpl* attr,
     mappedAttr->decl()->setParent(0);
     mappedAttr->decl()->setNode(0);
     if (namedAttrMap)
-      static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)->declAdded();
+      mappedAttributes()->declAdded();
   }
 }
 
@@ -1382,8 +1377,7 @@ void StyledElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
     // class
     setHasClass(!attr->isNull());
     if (namedAttrMap)
-      static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)
-          ->parseClassAttribute(attr->value());
+      mappedAttributes()->parseClassAttribute(attr->value());
     setChanged();
   } else if (attr->name() == styleAttr) {
     setHasStyle(!attr->isNull());
@@ -1418,10 +1412,7 @@ StyledElementImpl::additionalAttributeStyleDecl() {
 }
 
 const AtomicStringList* StyledElementImpl::getClassList() const {
-  return namedAttrMap
-             ? static_cast<NamedMappedAttrMapImpl*>(namedAttrMap)
-                   ->getClassList()
-             : 0;
+  return namedAttrMap ? mappedAttributes()->getClassList() : 0;
 }
 
 static inline bool isHexDigit(const QChar& c) {

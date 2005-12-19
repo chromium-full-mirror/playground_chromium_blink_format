@@ -147,9 +147,6 @@ HTMLParser::~HTMLParser() {
   freeBlock();
 
   setCurrent(0);
-
-  if (isindex)
-    isindex->deref();
 }
 
 void HTMLParser::reset() {
@@ -681,10 +678,7 @@ bool HTMLParser::formCreateErrorCheck(Token* t, NodeImpl*& result) {
 bool HTMLParser::isindexCreateErrorCheck(Token* t, NodeImpl*& result) {
   NodeImpl* n = handleIsindex(t);
   if (!inBody) {
-    if (isindex)
-      isindex->deref();
     isindex = n;
-    isindex->ref();
   } else {
     t->flat = true;
     result = n;
@@ -1366,9 +1360,10 @@ NodeImpl* HTMLParser::handleIsindex(Token* t) {
   NodeImpl* n = new HTMLDivElementImpl(document);
 
   NamedMappedAttrMapImpl* attrs = t->attrs;
-  t->attrs = NULL;
+  t->attrs = 0;
 
-  HTMLIsIndexElementImpl* isIndex = new HTMLIsIndexElementImpl(document, form);
+  RefPtr<HTMLIsIndexElementImpl> isIndex =
+      new HTMLIsIndexElementImpl(document, form);
   isIndex->setAttributeMap(attrs);
   isIndex->setAttribute(typeAttr, "khtml_isindex");
 
@@ -1381,7 +1376,7 @@ NodeImpl* HTMLParser::handleIsindex(Token* t) {
 
   n->addChild(new HTMLHRElementImpl(document));
   n->addChild(new TextImpl(document, text));
-  n->addChild(isIndex);
+  n->addChild(isIndex.get());
   n->addChild(new HTMLHRElementImpl(document));
 
   return n;
@@ -1394,7 +1389,7 @@ void HTMLParser::startBody() {
   inBody = true;
 
   if (isindex) {
-    insertNode(isindex, true /* don't decend into this node */);
+    insertNode(isindex.get(), true /* don't decend into this node */);
     isindex = 0;
   }
 }

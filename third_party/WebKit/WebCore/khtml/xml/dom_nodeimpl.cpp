@@ -324,7 +324,10 @@ void NodeImpl::setFirstChild(NodeImpl*) {}
 
 void NodeImpl::setLastChild(NodeImpl*) {}
 
-NodeImpl* NodeImpl::addChild(NodeImpl*) {
+NodeImpl* NodeImpl::addChild(NodeImpl* newChild) {
+  RefPtr<NodeImpl> protectNewChild(newChild);  // make sure the new child is
+                                               // ref'd and deref'd so we don't
+                                               // leak it
   return 0;
 }
 
