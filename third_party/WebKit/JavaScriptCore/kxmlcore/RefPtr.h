@@ -106,12 +106,9 @@ inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<T> ref) {
 
 template <class T>
 inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<T>& o) {
-  T* optr = o.release();
-  if (optr)
-    optr->ref();
   if (T* ptr = m_ptr)
     ptr->deref();
-  m_ptr = optr;
+  m_ptr = o.release();
   return *this;
 }
 

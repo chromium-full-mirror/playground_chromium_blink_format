@@ -82,9 +82,9 @@ class Identifier {
     return equal(a._ustring.rep(), b);
   }
 
-  static UString::Rep* add(const char*);
-  static UString::Rep* add(const UChar*, int length);
-  static UString::Rep* add(UString::Rep*);
+  static PassRefPtr<UString::Rep> add(const char*);
+  static PassRefPtr<UString::Rep> add(const UChar*, int length);
+  static PassRefPtr<UString::Rep> add(UString::Rep*);
 };
 
 #if !KJS_IDENTIFIER_HIDE_GLOBALS

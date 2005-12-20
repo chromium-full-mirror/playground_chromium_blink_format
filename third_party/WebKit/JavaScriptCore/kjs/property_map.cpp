@@ -608,11 +608,11 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
 #if USE_SINGLE_ENTRY
     UString::Rep* key = _singleEntry.key;
     if (key) {
-      UString k(key);
+      UString k(pass(key));
       bool fitsInUInt32;
       k.toUInt32(&fitsInUInt32);
       if (fitsInUInt32)
-        list.append(Reference(base, Identifier(key)));
+        list.append(Reference(base, Identifier(pass(key))));
     }
 #endif
     return;
@@ -623,11 +623,11 @@ void PropertyMap::addSparseArrayPropertiesToReferenceList(
   for (int i = 0; i != size; ++i) {
     UString::Rep* key = entries[i].key;
     if (key && key != &UString::Rep::null) {
-      UString k(key);
+      UString k(pass(key));
       bool fitsInUInt32;
       k.toUInt32(&fitsInUInt32);
       if (fitsInUInt32)
-        list.append(Reference(base, Identifier(key)));
+        list.append(Reference(base, Identifier(pass(key))));
     }
   }
 }

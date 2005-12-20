@@ -85,7 +85,7 @@ void SVGTransformableImpl::parseTransformAttribute(
       subtransform[0] = subtransform[0].right(subtransform[0].length() - 1);
     }
 
-    PassRefPtr<SVGTransformImpl> t = new SVGTransformImpl();
+    PassRefPtr<SVGTransformImpl> t(new SVGTransformImpl());
 
     if (subtransform[0] == QString::fromLatin1("rotate")) {
       if (params.count() == 3)
