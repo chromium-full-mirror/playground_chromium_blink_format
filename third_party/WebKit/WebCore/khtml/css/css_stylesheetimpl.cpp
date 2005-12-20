@@ -223,11 +223,6 @@ const AtomicString& CSSStyleSheetImpl::determineNamespace(
 }
 
 bool CSSStyleSheetImpl::parseString(const DOMString& string, bool strict) {
-#ifdef CSS_STYLESHEET_DEBUG
-  kdDebug(6080) << "parsing sheet, len=" << string.length() << ", sheet is "
-                << string.qstring() << endl;
-#endif
-
   strictParsing = strict;
   CSSParser p(strict);
   p.parseSheet(this, string);
@@ -239,13 +234,7 @@ bool CSSStyleSheetImpl::isLoading() {
   for (rule = m_lstChildren->first(); rule != 0; rule = m_lstChildren->next()) {
     if (rule->isImportRule()) {
       CSSImportRuleImpl* import = static_cast<CSSImportRuleImpl*>(rule);
-#ifdef CSS_STYLESHEET_DEBUG
-      kdDebug(6080) << "found import" << endl;
-#endif
       if (import->isLoading()) {
-#ifdef CSS_STYLESHEET_DEBUG
-        kdDebug(6080) << "--> not loaded" << endl;
-#endif
         return true;
       }
     }
