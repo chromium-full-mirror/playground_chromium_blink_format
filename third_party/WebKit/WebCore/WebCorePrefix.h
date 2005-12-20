@@ -75,3 +75,6 @@
 #define KSVGView KHTMLView
 #define KDOMView KHTMLView
 #define KDOMPart KHTMLPart
+
+#undef try
+#undef catch
