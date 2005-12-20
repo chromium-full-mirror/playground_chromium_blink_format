@@ -145,7 +145,7 @@ class XMLHttpRequest : public DOMObject {
   RefPtr<JSUnprotectedEventListener> onReadyStateChangeListener;
   RefPtr<JSUnprotectedEventListener> onLoadListener;
 
-  khtml::Decoder* decoder;
+  RefPtr<khtml::Decoder> decoder;
   QString encoding;
   QString responseHeaders;
   QString MIMETypeOverride;

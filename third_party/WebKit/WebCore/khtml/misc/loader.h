@@ -434,7 +434,7 @@ class CachedXSLStyleSheet : public CachedObject {
 
  protected:
   DOM::DOMString m_sheet;
-  Decoder* m_decoder;
+  RefPtr<Decoder> m_decoder;
 };
 #endif
 
@@ -462,7 +462,7 @@ class CachedXBLDocument : public CachedObject {
 
  protected:
   XBL::XBLDocumentImpl* m_document;
-  Decoder* m_decoder;
+  RefPtr<Decoder> m_decoder;
 };
 #endif
 

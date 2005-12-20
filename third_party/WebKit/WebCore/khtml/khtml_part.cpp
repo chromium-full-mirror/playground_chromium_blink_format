@@ -653,8 +653,6 @@ void KHTMLPart::clear() {
     d->m_doc->deref();
   d->m_doc = 0;
 
-  if (d->m_decoder)
-    d->m_decoder->deref();
   d->m_decoder = 0;
 
   {
@@ -884,7 +882,7 @@ void KHTMLPart::begin(const KURL& url, int xOffset, int yOffset) {
   // about to load a new page.
   d->m_doc->setBaseURL(baseurl.url());
   if (d->m_decoder)
-    d->m_doc->setDecoder(d->m_decoder);
+    d->m_doc->setDecoder(d->m_decoder.get());
   d->m_doc->docLoader()->setShowAnimations(d->m_settings->showAnimations());
 
   KWQ(this)->updatePolicyBaseURL();
@@ -921,7 +919,7 @@ void KHTMLPart::write(const char* str, int len) {
       d->m_decoder->setEncoding(defaultEncoding, Decoder::DefaultEncoding);
     }
     if (d->m_doc)
-      d->m_doc->setDecoder(d->m_decoder);
+      d->m_doc->setDecoder(d->m_decoder.get());
   }
   if (len == 0)
     return;

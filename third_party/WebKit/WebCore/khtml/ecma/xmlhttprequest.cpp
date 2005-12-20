@@ -283,7 +283,6 @@ XMLHttpRequest::XMLHttpRequest(ExecState* exec, DOM::DocumentImpl* d)
       async(true),
       job(0),
       state(Uninitialized),
-      decoder(0),
       createdDocument(false),
       aborted(false) {
   setPrototype(XMLHttpRequestProto::self(exec));
@@ -291,9 +290,6 @@ XMLHttpRequest::XMLHttpRequest(ExecState* exec, DOM::DocumentImpl* d)
 
 XMLHttpRequest::~XMLHttpRequest() {
   delete qObject;
-  if (decoder) {
-    decoder->deref();
-  }
 }
 
 void XMLHttpRequest::changeState(XMLHttpRequestState newState) {
@@ -302,20 +298,16 @@ void XMLHttpRequest::changeState(XMLHttpRequestState newState) {
 
     if (doc && doc->part() && onReadyStateChangeListener) {
       int ignoreException;
-      EventImpl* ev = doc->createEvent("HTMLEvents", ignoreException);
-      ev->ref();
+      RefPtr<EventImpl> ev = doc->createEvent("HTMLEvents", ignoreException);
       ev->initEvent(readystatechangeEvent, true, true);
-      onReadyStateChangeListener->handleEventImpl(ev, true);
-      ev->deref();
+      onReadyStateChangeListener->handleEventImpl(ev.get(), true);
     }
 
     if (doc && doc->part() && state == Completed && onLoadListener) {
       int ignoreException;
-      EventImpl* ev = doc->createEvent("HTMLEvents", ignoreException);
-      ev->ref();
+      RefPtr<EventImpl> ev = doc->createEvent("HTMLEvents", ignoreException);
       ev->initEvent(loadEvent, true, true);
-      onLoadListener->handleEventImpl(ev, true);
-      ev->deref();
+      onLoadListener->handleEventImpl(ev.get(), true);
     }
   }
 }
@@ -435,10 +427,7 @@ void XMLHttpRequest::abort() {
     job->kill();
     job = 0;
   }
-  if (decoder) {
-    decoder->deref();
-    decoder = 0;
-  }
+  decoder = 0;
   aborted = true;
 
   if (hadJob) {
@@ -583,19 +572,14 @@ void XMLHttpRequest::processSyncLoadResults(const QByteArray& data,
 }
 
 void XMLHttpRequest::slotFinished(KIO::Job*) {
-  if (decoder) {
+  if (decoder)
     response += decoder->flush();
-  }
 
   removeFromRequestsByDocument();
   job = 0;
 
   changeState(Completed);
-
-  if (decoder) {
-    decoder->deref();
-    decoder = 0;
-  }
+  decoder = 0;
 
   JSLock lock;
   gcUnprotect(this);
@@ -614,7 +598,7 @@ void XMLHttpRequest::slotData(KIO::Job*, const char* data, int len) {
   if (state < Loaded)
     changeState(Loaded);
 
-  if (decoder == NULL) {
+  if (!decoder) {
     encoding = getCharset(MIMETypeOverride);
     if (encoding.isEmpty())
       encoding = getCharset(getResponseHeader("Content-Type"));
