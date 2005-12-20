@@ -28,6 +28,7 @@
 #import <JavaScriptCore/npruntime.h>
 #import <JavaVM/jni.h>
 #import <WebCore/WebCoreKeyboardAccess.h>
+#import <WebKit/WebView.h>
 
 #ifdef __cplusplus
 
@@ -531,6 +532,7 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (NSString*)generateFrameName;
 - (void)frameDetached;
 - (NSView*)documentView;
+- (WebView*)webView;
 
 - (void)loadURL:(NSURL*)URL
            referrer:(NSString*)referrer
@@ -575,8 +577,8 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 - (BOOL)areToolbarsVisible;
 - (void)setToolbarsVisible:(BOOL)visible;
-- (BOOL)isStatusBarVisible;
-- (void)setStatusBarVisible:(BOOL)visible;
+- (BOOL)isStatusbarVisible;
+- (void)setStatusbarVisible:(BOOL)visible;
 - (BOOL)areScrollbarsVisible;
 - (void)setScrollbarsVisible:(BOOL)visible;
 - (NSWindow*)window;

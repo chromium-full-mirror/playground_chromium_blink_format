@@ -683,7 +683,7 @@ static JSValue* showModalDialog(ExecState* exec,
 
   wargs.dialog = true;
   wargs.resizable = boolFeature(features, "resizable");
-  wargs.scrollbarsVisible = boolFeature(features, "scroll", true);
+  wargs.scrollBarsVisible = boolFeature(features, "scroll", true);
   wargs.statusBarVisible = boolFeature(features, "status", !trusted);
   wargs.toolBarsVisible = false;
 
@@ -1584,7 +1584,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
           winargs.menuBarVisible = false;
           winargs.toolBarsVisible = false;
           winargs.statusBarVisible = false;
-          winargs.scrollbarsVisible = false;
+          winargs.scrollBarsVisible = false;
           winargs.resizable = false;
           QStringList flist = QStringList::split(',', features);
           QStringList::ConstIterator it = flist.begin();
@@ -1671,7 +1671,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
             else if (key == "fullscreen")
               winargs.fullscreen = (val == "1" || val == "yes");
             else if (key == "scrollbars")
-              winargs.scrollbarsVisible = !(val == "0" || val == "no");
+              winargs.scrollBarsVisible = !(val == "0" || val == "no");
           }
         }
 
