@@ -1393,6 +1393,7 @@ void StyledElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 void StyledElementImpl::createAttributeMap() const {
   namedAttrMap =
       new NamedMappedAttrMapImpl(const_cast<StyledElementImpl*>(this));
+  namedAttrMap->ref();
 }
 
 CSSMutableStyleDeclarationImpl* StyledElementImpl::getInlineStyleDecl() {
