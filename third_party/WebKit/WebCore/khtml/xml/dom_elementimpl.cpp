@@ -1024,11 +1024,11 @@ void NamedAttrMapImpl::addAttribute(AttributeImpl* attr) {
   // appropriate mutation events
   // Note that element may be null here if we are called from insertAttr()
   // during parsing
-  if (RefPtr<ElementImpl> e = element) {
+  if (element) {
     RefPtr<AttributeImpl> a = attr;
-    e->attributeChanged(a.get());
-    e->dispatchAttrAdditionEvent(a.get());
-    e->dispatchSubtreeModifiedEvent(false);
+    element->attributeChanged(a.get());
+    element->dispatchAttrAdditionEvent(a.get());
+    element->dispatchSubtreeModifiedEvent(false);
   }
 }
 
