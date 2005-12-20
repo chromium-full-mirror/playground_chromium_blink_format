@@ -435,6 +435,9 @@ class KCSpotLightSource : public KCLightSource {
 
 class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
  public:
+  KCanvasFEDiffuseLighting() : m_lightSource(0) {}
+  ~KCanvasFEDiffuseLighting() { delete m_lightSource; }
+
   QColor lightingColor() const { return m_lightingColor; }
   void setLightingColor(const QColor& lightingColor) {
     m_lightingColor = lightingColor;
@@ -459,9 +462,7 @@ class KCanvasFEDiffuseLighting : public KCanvasFilterEffect {
   }
 
   const KCLightSource* lightSource() const { return m_lightSource; }
-  void setLightSource(KCLightSource* lightSource) {
-    m_lightSource = lightSource;
-  }
+  void setLightSource(KCLightSource* lightSource);
 
   QTextStream& externalRepresentation(QTextStream&) const;
 
@@ -596,6 +597,9 @@ class KCanvasFEOffset : public KCanvasFilterEffect {
 
 class KCanvasFESpecularLighting : public KCanvasFilterEffect {
  public:
+  KCanvasFESpecularLighting() : m_lightSource(0) {}
+  ~KCanvasFESpecularLighting() { delete m_lightSource; }
+
   QColor lightingColor() const { return m_lightingColor; }
   void setLightingColor(const QColor& lightingColor) {
     m_lightingColor = lightingColor;
@@ -625,9 +629,7 @@ class KCanvasFESpecularLighting : public KCanvasFilterEffect {
   }
 
   const KCLightSource* lightSource() const { return m_lightSource; }
-  void setLightSource(KCLightSource* lightSource) {
-    m_lightSource = lightSource;
-  }
+  void setLightSource(KCLightSource* lightSource);
 
   QTextStream& externalRepresentation(QTextStream&) const;
 

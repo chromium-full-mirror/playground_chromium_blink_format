@@ -280,6 +280,20 @@ QTextStream& KCanvasFEConvolveMatrix::externalRepresentation(
   return ts;
 }
 
+void KCanvasFEDiffuseLighting::setLightSource(KCLightSource* lightSource) {
+  if (m_lightSource != lightSource) {
+    delete m_lightSource;
+    m_lightSource = lightSource;
+  }
+}
+
+void KCanvasFESpecularLighting::setLightSource(KCLightSource* lightSource) {
+  if (m_lightSource != lightSource) {
+    delete m_lightSource;
+    m_lightSource = lightSource;
+  }
+}
+
 QTextStream& KCanvasFEDiffuseLighting::externalRepresentation(
     QTextStream& ts) const {
   ts << "[type=DIFFUSE-LIGHTING] ";
