@@ -255,9 +255,6 @@ class HTMLButtonElementImpl : public HTMLGenericFormElementImpl {
   DOMString value() const;
   void setValue(const DOMString&);
 
-  void blur();
-  void focus();
-
  protected:
   DOMString m_value;
   DOMString m_currValue;
@@ -352,9 +349,6 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   void setValueFromRenderer(const DOMString&);
   bool valueMatchesRenderer() const { return m_valueMatchesRenderer; }
   void setValueMatchesRenderer() { m_valueMatchesRenderer = true; }
-
-  void blur();
-  void focus();
 
   virtual bool maintainsState() { return m_type != PASSWORD; }
   virtual QString state();
@@ -562,8 +556,6 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
            HTMLElementImpl* before,
            int& exceptioncode);
   void remove(int index);
-  void blur();
-  void focus();
 
   DOMString value();
   void setValue(const DOMString&);
@@ -778,8 +770,6 @@ class HTMLTextAreaElementImpl : public HTMLGenericFormElementImpl {
   void setValue(const DOMString& value);
   DOMString defaultValue();
   void setDefaultValue(const DOMString& value);
-  void blur();
-  void focus();
 
   void invalidateValue() { m_valueIsValid = false; }
   void updateValue();
