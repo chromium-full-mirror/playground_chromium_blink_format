@@ -54,6 +54,10 @@ class CompositeEditCommand : public EditCommand {
   void applyCommandToComposite(EditCommandPtr&);
   void applyStyle(DOM::CSSStyleDeclarationImpl* style,
                   EditAction editingAction = EditActionChangeAttributes);
+  void applyStyle(DOM::CSSStyleDeclarationImpl* style,
+                  DOM::Position start,
+                  DOM::Position end,
+                  EditAction editingAction = EditActionChangeAttributes);
   void deleteKeyPressed();
   void deleteSelection(bool smartDelete = false,
                        bool mergeBlocksAfterDelete = true);

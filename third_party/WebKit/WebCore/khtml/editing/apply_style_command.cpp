@@ -301,9 +301,54 @@ ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
       m_editingAction(editingAction),
       m_propertyLevel(propertyLevel) {
   ASSERT(style);
+  m_start = endingSelection().start().downstream();
+  m_end = endingSelection().end().upstream();
+  m_useEndingSelection = true;
+}
+
+ApplyStyleCommand::ApplyStyleCommand(DocumentImpl* document,
+                                     CSSStyleDeclarationImpl* style,
+                                     Position start,
+                                     Position end,
+                                     EditAction editingAction,
+                                     EPropertyLevel propertyLevel)
+    : CompositeEditCommand(document),
+      m_style(style->makeMutable()),
+      m_editingAction(editingAction),
+      m_propertyLevel(propertyLevel) {
+  ASSERT(style);
+  m_start = start;
+  m_end = end;
+  m_useEndingSelection = false;
 }
 
 ApplyStyleCommand::~ApplyStyleCommand() {}
+
+void ApplyStyleCommand::updateStartEnd(Position newStart, Position newEnd) {
+  ASSERT(RangeImpl::compareBoundaryPoints(newEnd, newStart) >= 0);
+
+  if (!m_useEndingSelection && (newStart != m_start || newEnd != m_end))
+    m_useEndingSelection = true;
+
+  setEndingSelection(SelectionController(newStart, VP_DEFAULT_AFFINITY, newEnd,
+                                         VP_DEFAULT_AFFINITY));
+  m_start = newStart;
+  m_end = newEnd;
+}
+
+Position ApplyStyleCommand::startPosition() {
+  if (m_useEndingSelection)
+    return endingSelection().start();
+
+  return m_start;
+}
+
+Position ApplyStyleCommand::endPosition() {
+  if (m_useEndingSelection)
+    return endingSelection().end();
+
+  return m_end;
+}
 
 void ApplyStyleCommand::doApply() {
   switch (m_propertyLevel) {
@@ -343,8 +388,13 @@ void ApplyStyleCommand::applyBlockStyle(CSSMutableStyleDeclarationImpl* style) {
   document()->updateLayout();
 
   // get positions we want to use for applying style
-  Position start(endingSelection().start());
-  Position end(endingSelection().end());
+  Position start = startPosition();
+  Position end = endPosition();
+  if (RangeImpl::compareBoundaryPoints(end, start) < 0) {
+    Position swap = start;
+    start = end;
+    end = swap;
+  }
 
   // remove current values, if any, of the specified styles from the blocks
   // NOTE: tracks the previous block to avoid repeated processing
@@ -410,10 +460,8 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
   if (adjustment == NoFontDelta)
     return;
 
-  // Adjust to the positions we want to use for applying style.
-  SelectionController selection = endingSelection();
-  Position start(selection.start().downstream());
-  Position end(selection.end().upstream());
+  Position start = startPosition();
+  Position end = endPosition();
   if (RangeImpl::compareBoundaryPoints(end, start) < 0) {
     Position swap = start;
     start = end;
@@ -423,28 +471,26 @@ void ApplyStyleCommand::applyRelativeFontStyleChange(
   // Join up any adjacent text nodes.
   if (start.node()->isTextNode()) {
     joinChildTextNodes(start.node()->parentNode(), start, end);
-    selection = endingSelection();
-    start = selection.start();
-    end = selection.end();
+    start = startPosition();
+    end = endPosition();
   }
   if (end.node()->isTextNode() &&
       start.node()->parentNode() != end.node()->parentNode()) {
     joinChildTextNodes(end.node()->parentNode(), start, end);
-    selection = endingSelection();
-    start = selection.start();
-    end = selection.end();
+    start = startPosition();
+    end = endPosition();
   }
 
   // Split the start text nodes if needed to apply style.
   bool splitStart = splitTextAtStartIfNeeded(start, end);
   if (splitStart) {
-    start = endingSelection().start();
-    end = endingSelection().end();
+    start = startPosition();
+    end = endPosition();
   }
   bool splitEnd = splitTextAtEndIfNeeded(start, end);
   if (splitEnd) {
-    start = endingSelection().start();
-    end = endingSelection().end();
+    start = startPosition();
+    end = endPosition();
   }
 
   NodeImpl* beyondEnd =
@@ -532,9 +578,8 @@ void ApplyStyleCommand::applyInlineStyle(
   document()->updateLayout();
 
   // adjust to the positions we want to use for applying style
-  Position start(endingSelection().start().downstream());
-  Position end(endingSelection().end().upstream());
-
+  Position start = startPosition();
+  Position end = endPosition();
   if (RangeImpl::compareBoundaryPoints(end, start) < 0) {
     Position swap = start;
     start = end;
@@ -545,16 +590,16 @@ void ApplyStyleCommand::applyInlineStyle(
   // of it
   bool splitStart = splitTextElementAtStartIfNeeded(start, end);
   if (splitStart) {
-    start = endingSelection().start();
-    end = endingSelection().end();
+    start = startPosition();
+    end = endPosition();
   }
 
   // split the end node and containing element if the selection ends inside of
   // it
   bool splitEnd = splitTextElementAtEndIfNeeded(start, end);
   if (splitEnd) {
-    start = endingSelection().start();
-    end = endingSelection().end();
+    start = startPosition();
+    end = endPosition();
   }
 
   // Remove style from the selection.
@@ -564,21 +609,21 @@ void ApplyStyleCommand::applyInlineStyle(
   // and prevent us from adding redundant ones, as described in:
   // <rdar://problem/3724344> Bolding and unbolding creates extraneous tags
   removeInlineStyle(style, start.upstream(), end);
-  start = endingSelection().start();
-  end = endingSelection().end();
+  start = startPosition();
+  end = endPosition();
 
   if (splitStart) {
     bool mergedStart = mergeStartWithPreviousIfIdentical(start, end);
     if (mergedStart) {
-      start = endingSelection().start();
-      end = endingSelection().end();
+      start = startPosition();
+      end = endPosition();
     }
   }
 
   if (splitEnd) {
     mergeEndWithNextIfIdentical(start, end);
-    start = endingSelection().start();
-    end = endingSelection().end();
+    start = startPosition();
+    end = endPosition();
   }
 
   // update document layout once before running the rest of the function
@@ -897,7 +942,7 @@ void ApplyStyleCommand::removeInlineStyle(CSSMutableStyleDeclarationImpl* style,
   ASSERT(end.isNotNull());
   ASSERT(start.node()->inDocument());
   ASSERT(end.node()->inDocument());
-  ASSERT(RangeImpl::compareBoundaryPoints(start, end) < 0);
+  ASSERT(RangeImpl::compareBoundaryPoints(start, end) <= 0);
 
   RefPtr<CSSValueImpl> textDecorationSpecialProperty =
       style->getPropertyCSSValue(CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT);
@@ -958,8 +1003,7 @@ void ApplyStyleCommand::removeInlineStyle(CSSMutableStyleDeclarationImpl* style,
 
   ASSERT(s.node()->inDocument());
   ASSERT(e.node()->inDocument());
-  setEndingSelection(
-      SelectionController(s, VP_DEFAULT_AFFINITY, e, VP_DEFAULT_AFFINITY));
+  updateStartEnd(s, e);
 }
 
 bool ApplyStyleCommand::nodeFullySelected(NodeImpl* node,
@@ -996,10 +1040,8 @@ bool ApplyStyleCommand::splitTextAtStartIfNeeded(const Position& start,
     int endOffsetAdjustment = start.node() == end.node() ? start.offset() : 0;
     TextImpl* text = static_cast<TextImpl*>(start.node());
     splitTextNode(text, start.offset());
-    setEndingSelection(SelectionController(
-        Position(start.node(), 0), SEL_DEFAULT_AFFINITY,
-        Position(end.node(), end.offset() - endOffsetAdjustment),
-        SEL_DEFAULT_AFFINITY));
+    updateStartEnd(Position(start.node(), 0),
+                   Position(end.node(), end.offset() - endOffsetAdjustment));
     return true;
   }
   return false;
@@ -1016,9 +1058,8 @@ bool ApplyStyleCommand::splitTextAtEndIfNeeded(const Position& start,
     ASSERT(prevNode);
     NodeImpl* startNode = start.node() == end.node() ? prevNode : start.node();
     ASSERT(startNode);
-    setEndingSelection(SelectionController(
-        Position(startNode, start.offset()), SEL_DEFAULT_AFFINITY,
-        Position(prevNode, prevNode->caretMaxOffset()), SEL_DEFAULT_AFFINITY));
+    updateStartEnd(Position(startNode, start.offset()),
+                   Position(prevNode, prevNode->caretMaxOffset()));
     return true;
   }
   return false;
@@ -1033,11 +1074,9 @@ bool ApplyStyleCommand::splitTextElementAtStartIfNeeded(const Position& start,
     TextImpl* text = static_cast<TextImpl*>(start.node());
     splitTextNodeContainingElement(text, start.offset());
 
-    setEndingSelection(SelectionController(
+    updateStartEnd(
         Position(start.node()->parentNode(), start.node()->nodeIndex()),
-        SEL_DEFAULT_AFFINITY,
-        Position(end.node(), end.offset() - endOffsetAdjustment),
-        SEL_DEFAULT_AFFINITY));
+        Position(end.node(), end.offset() - endOffsetAdjustment));
     return true;
   }
   return false;
@@ -1054,10 +1093,8 @@ bool ApplyStyleCommand::splitTextElementAtEndIfNeeded(const Position& start,
     ASSERT(prevNode);
     NodeImpl* startNode = start.node() == end.node() ? prevNode : start.node();
     ASSERT(startNode);
-    setEndingSelection(SelectionController(
-        Position(startNode, start.offset()), SEL_DEFAULT_AFFINITY,
-        Position(prevNode->parent(), prevNode->nodeIndex() + 1),
-        SEL_DEFAULT_AFFINITY));
+    updateStartEnd(Position(startNode, start.offset()),
+                   Position(prevNode->parent(), prevNode->nodeIndex() + 1));
     return true;
   }
   return false;
@@ -1132,12 +1169,8 @@ bool ApplyStyleCommand::mergeStartWithPreviousIfIdentical(const Position& start,
     int startOffsetAdjustment = startChild->nodeIndex();
     int endOffsetAdjustment =
         startNode == end.node() ? startOffsetAdjustment : 0;
-
-    setEndingSelection(SelectionController(
-        Position(startNode, startOffsetAdjustment), SEL_DEFAULT_AFFINITY,
-        Position(end.node(), end.offset() + endOffsetAdjustment),
-        SEL_DEFAULT_AFFINITY));
-
+    updateStartEnd(Position(startNode, startOffsetAdjustment),
+                   Position(end.node(), end.offset() + endOffsetAdjustment));
     return true;
   }
 
@@ -1179,10 +1212,8 @@ bool ApplyStyleCommand::mergeEndWithNextIfIdentical(const Position& start,
 
     int endOffset = nextChild ? nextChild->nodeIndex()
                               : nextElement->childNodes()->length();
-
-    setEndingSelection(SelectionController(
-        Position(startNode, start.offset()), SEL_DEFAULT_AFFINITY,
-        Position(nextElement, endOffset), SEL_DEFAULT_AFFINITY));
+    updateStartEnd(Position(startNode, start.offset()),
+                   Position(nextElement, endOffset));
     return true;
   }
 
@@ -1388,8 +1419,7 @@ void ApplyStyleCommand::joinChildTextNodes(NodeImpl* node,
     }
   }
 
-  setEndingSelection(SelectionController(newStart, SEL_DEFAULT_AFFINITY, newEnd,
-                                         SEL_DEFAULT_AFFINITY));
+  updateStartEnd(newStart, newEnd);
 }
 
 }  // namespace khtml
