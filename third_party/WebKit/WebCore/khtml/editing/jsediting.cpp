@@ -74,7 +74,7 @@ bool JSEditor::execCommand(const DOMString& command,
   KHTMLPart* part = m_doc->part();
   if (!part)
     return false;
-  m_doc->updateLayout();
+  m_doc->updateLayoutIgnorePendingStylesheets();
   return cmd->enabledFn(part) && cmd->execFn(part, userInterface, value);
 }
 
@@ -85,7 +85,7 @@ bool JSEditor::queryCommandEnabled(const DOMString& command) {
   KHTMLPart* part = m_doc->part();
   if (!part)
     return false;
-  m_doc->updateLayout();
+  m_doc->updateLayoutIgnorePendingStylesheets();
   return cmd->enabledFn(part);
 }
 
@@ -96,7 +96,7 @@ bool JSEditor::queryCommandIndeterm(const DOMString& command) {
   KHTMLPart* part = m_doc->part();
   if (!part)
     return false;
-  m_doc->updateLayout();
+  m_doc->updateLayoutIgnorePendingStylesheets();
   return cmd->stateFn(part) == KHTMLPart::mixedTriState;
 }
 
@@ -107,7 +107,7 @@ bool JSEditor::queryCommandState(const DOMString& command) {
   KHTMLPart* part = m_doc->part();
   if (!part)
     return false;
-  m_doc->updateLayout();
+  m_doc->updateLayoutIgnorePendingStylesheets();
   return cmd->stateFn(part) != KHTMLPart::falseTriState;
 }
 
@@ -124,7 +124,7 @@ DOMString JSEditor::queryCommandValue(const DOMString& command) {
   KHTMLPart* part = m_doc->part();
   if (!part)
     return DOMString();
-  m_doc->updateLayout();
+  m_doc->updateLayoutIgnorePendingStylesheets();
   return cmd->valueFn(part);
 }
 

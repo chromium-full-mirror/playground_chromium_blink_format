@@ -549,7 +549,7 @@ static inline bool nextCharacterIsCollapsibleWhitespace(const Position& pos) {
 }
 
 void DeleteSelectionCommand::fixupWhitespace() {
-  document()->updateLayout();
+  updateLayout();
   if (m_leadingWhitespace.isNotNull() &&
       (m_trailingWhitespace.isNotNull() ||
        !m_leadingWhitespace.isRenderedCharacter())) {
@@ -663,10 +663,10 @@ void DeleteSelectionCommand::moveNodesAfterNode() {
   // and 'Two'. This is undesirable. We fix this up by adding a BR before the
   // 'Three'.
   // This may not be ideal, but it is better than nothing.
-  document()->updateLayout();
+  updateLayout();
   if (!startBlock->renderer() || !startBlock->renderer()->firstChild()) {
     removeNode(startBlock);
-    document()->updateLayout();
+    updateLayout();
     if (refNode->renderer() && refNode->renderer()->inlineBox() &&
         refNode->renderer()->inlineBox()->nextOnLineExists()) {
       insertNodeAfter(createBreakElement(document()), refNode);

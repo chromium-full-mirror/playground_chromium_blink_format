@@ -215,7 +215,7 @@ void EditCommand::apply() {
     setTypingStyle(0);
 
   if (!isCompositeStep()) {
-    document()->updateLayout();
+    updateLayout();
     EditCommandPtr cmd(this);
     part->appliedEditing(cmd);
   }
@@ -235,7 +235,7 @@ void EditCommand::unapply() {
   m_state = NotApplied;
 
   if (topLevel) {
-    document()->updateLayout();
+    updateLayout();
     EditCommandPtr cmd(this);
     part->unappliedEditing(cmd);
   }
@@ -255,7 +255,7 @@ void EditCommand::reapply() {
   m_state = Applied;
 
   if (topLevel) {
-    document()->updateLayout();
+    updateLayout();
     EditCommandPtr cmd(this);
     part->reappliedEditing(cmd);
   }
@@ -353,6 +353,10 @@ CSSMutableStyleDeclarationImpl* EditCommand::styleAtPosition(
     style->merge(typingStyle);
 
   return style;
+}
+
+void EditCommand::updateLayout() const {
+  document()->updateLayoutIgnorePendingStylesheets();
 }
 
 }  // namespace khtml

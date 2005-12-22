@@ -500,7 +500,7 @@ NodeImpl* CompositeEditCommand::addBlockPlaceholderIfNeeded(NodeImpl* node) {
   if (!node)
     return false;
 
-  document()->updateLayout();
+  updateLayout();
 
   RenderObject* renderer = node->renderer();
   if (!renderer || !renderer->isBlockFlow())
@@ -528,7 +528,7 @@ NodeImpl* CompositeEditCommand::findBlockPlaceholder(NodeImpl* node) {
   if (!node)
     return 0;
 
-  document()->updateLayout();
+  updateLayout();
 
   RenderObject* renderer = node->renderer();
   if (!renderer || !renderer->isBlockFlow())
@@ -553,7 +553,7 @@ void CompositeEditCommand::moveParagraphContentsToNewBlockIfNecessary(
   if (pos.isNull())
     return;
 
-  document()->updateLayout();
+  updateLayout();
 
   VisiblePosition visiblePos(pos, VP_DEFAULT_AFFINITY);
   VisiblePosition visibleParagraphStart(startOfParagraph(visiblePos));

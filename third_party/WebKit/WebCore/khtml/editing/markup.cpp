@@ -354,7 +354,7 @@ QString createMarkup(const RangeImpl* range,
   ASSERT(exceptionCode == 0);
 
   DocumentImpl* doc = commonAncestor->getDocument();
-  doc->updateLayout();
+  doc->updateLayoutIgnorePendingStylesheets();
 
   NodeImpl* commonAncestorBlock = 0;
   if (commonAncestor != 0) {
@@ -541,7 +541,7 @@ QString createMarkup(const DOM::NodeImpl* node,
   ASSERT(annotate == DoNotAnnotateForInterchange);  // annotation not yet
                                                     // implemented for this code
                                                     // path
-  node->getDocument()->updateLayout();
+  node->getDocument()->updateLayoutIgnorePendingStylesheets();
   return markup(node, includeChildren, false, nodes);
 }
 
