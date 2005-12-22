@@ -151,7 +151,7 @@ class HTMLElementFunction : public DOMFunction {
   int id;
 };
 
-IMPLEMENT_PROTOFUNC(HTMLDocFunction)
+KJS_IMPLEMENT_PROTOFUNC(HTMLDocFunction)
 
 JSValue* KJS::HTMLDocFunction::callAsFunction(ExecState* exec,
                                               JSObject* thisObj,
@@ -4565,9 +4565,11 @@ HTMLTableSectionElementImpl* toHTMLTableSectionElement(JSValue* val) {
   tags		HTMLCollection::Tags		DontDelete|Function 1
 @end
 */
-DEFINE_PROTOTYPE("HTMLCollection", HTMLCollectionProto)
-IMPLEMENT_PROTOFUNC(HTMLCollectionProtoFunc)
-IMPLEMENT_PROTOTYPE(HTMLCollectionProto, HTMLCollectionProtoFunc)
+KJS_DEFINE_PROTOTYPE(HTMLCollectionProto)
+KJS_IMPLEMENT_PROTOFUNC(HTMLCollectionProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("HTMLCollection",
+                        HTMLCollectionProto,
+                        HTMLCollectionProtoFunc)
 
 const ClassInfo HTMLCollection::info = {"HTMLCollection", 0, 0, 0};
 
@@ -5039,7 +5041,7 @@ Image::~Image() {
 
 ////////////////////// Context2D Object ////////////////////////
 
-IMPLEMENT_PROTOFUNC(Context2DFunction)
+KJS_IMPLEMENT_PROTOFUNC(Context2DFunction)
 
 static bool isGradient(JSValue* value) {
   return value->isObject(&Gradient::info);
@@ -6270,7 +6272,7 @@ const ClassInfo KJS::Gradient::info = {"Gradient", 0, &GradientTable, 0};
 @end
 */
 
-IMPLEMENT_PROTOFUNC(GradientFunction)
+KJS_IMPLEMENT_PROTOFUNC(GradientFunction)
 
 JSValue* GradientFunction::callAsFunction(ExecState* exec,
                                           JSObject* thisObj,

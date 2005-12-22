@@ -321,7 +321,7 @@ Window::get
   showModalDialog Window::ShowModalDialog    DontDelete|Function 1
 @end
 */
-IMPLEMENT_PROTOFUNC(WindowFunc)
+KJS_IMPLEMENT_PROTOFUNC(WindowFunc)
 
 Window::Window(KHTMLPart* p)
     : JSObject(/*no proto*/),
@@ -2220,7 +2220,7 @@ const ClassInfo Location::info = {"Location", 0, 0, 0};
   reload	Location::Reload	DontDelete|Function 0
 @end
 */
-IMPLEMENT_PROTOFUNC(LocationFunc)
+KJS_IMPLEMENT_PROTOFUNC(LocationFunc)
 Location::Location(KHTMLPart* p) : m_part(p) {}
 
 JSValue* Location::getValueProperty(ExecState* exec, int token) const {
@@ -2451,7 +2451,7 @@ DontDelete|ReadOnly
   modify                    Selection::Modify DontDelete|Function 3
 @end
 */
-IMPLEMENT_PROTOFUNC(SelectionFunc)
+KJS_IMPLEMENT_PROTOFUNC(SelectionFunc)
 Selection::Selection(KHTMLPart* p) : m_part(p) {}
 
 JSValue* Selection::getValueProperty(ExecState* exec, int token) const {
@@ -2650,7 +2650,7 @@ const ClassInfo History::info = {"History", 0, 0, 0};
   go		History::Go		DontDelete|Function 1
 @end
 */
-IMPLEMENT_PROTOFUNC(HistoryFunc)
+KJS_IMPLEMENT_PROTOFUNC(HistoryFunc)
 
 bool History::getOwnPropertySlot(ExecState* exec,
                                  const Identifier& propertyName,

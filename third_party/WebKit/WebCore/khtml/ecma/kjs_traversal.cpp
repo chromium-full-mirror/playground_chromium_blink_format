@@ -60,9 +60,11 @@ DontDelete|ReadOnly
   detach	DOMNodeIterator::Detach		DontDelete|Function 0
 @end
 */
-DEFINE_PROTOTYPE("DOMNodeIterator", DOMNodeIteratorProto)
-IMPLEMENT_PROTOFUNC(DOMNodeIteratorProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMNodeIteratorProto, DOMNodeIteratorProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMNodeIteratorProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMNodeIteratorProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMNodeIterator",
+                        DOMNodeIteratorProto,
+                        DOMNodeIteratorProtoFunc)
 
 DOMNodeIterator::DOMNodeIterator(ExecState* exec, NodeIteratorImpl* ni)
     : m_impl(ni) {
@@ -180,9 +182,11 @@ const ClassInfo DOMNodeFilter::info = {"NodeFilter", 0, 0, 0};
   acceptNode	DOMNodeFilter::AcceptNode	DontDelete|Function 0
 @end
 */
-DEFINE_PROTOTYPE("DOMNodeFilter", DOMNodeFilterProto)
-IMPLEMENT_PROTOFUNC(DOMNodeFilterProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMNodeFilterProto, DOMNodeFilterProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMNodeFilterProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMNodeFilterProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMNodeFilter",
+                        DOMNodeFilterProto,
+                        DOMNodeFilterProtoFunc)
 
 DOMNodeFilter::DOMNodeFilter(ExecState* exec, NodeFilterImpl* nf) : m_impl(nf) {
   setPrototype(DOMNodeFilterProto::self(exec));
@@ -237,9 +241,11 @@ DontDelete|ReadOnly
   nextNode	DOMTreeWalker::NextNode		DontDelete|Function 0
 @end
 */
-DEFINE_PROTOTYPE("DOMTreeWalker", DOMTreeWalkerProto)
-IMPLEMENT_PROTOFUNC(DOMTreeWalkerProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMTreeWalkerProto, DOMTreeWalkerProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMTreeWalkerProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMTreeWalkerProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMTreeWalker",
+                        DOMTreeWalkerProto,
+                        DOMTreeWalkerProtoFunc)
 
 DOMTreeWalker::DOMTreeWalker(ExecState* exec, TreeWalkerImpl* tw) : m_impl(tw) {
   setPrototype(DOMTreeWalkerProto::self(exec));

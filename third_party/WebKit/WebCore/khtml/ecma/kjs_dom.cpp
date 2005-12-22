@@ -112,9 +112,9 @@ namespace KJS {
   item          DOMNode::Item           DontDelete|Function 1
 @end
 */
-DEFINE_PROTOTYPE("DOMNode", DOMNodeProto)
-IMPLEMENT_PROTOFUNC(DOMNodeProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMNodeProto, DOMNodeProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMNodeProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMNodeProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMNode", DOMNodeProto, DOMNodeProtoFunc)
 
 const ClassInfo DOMNode::info = {"Node", 0, &DOMNodeTable, 0};
 
@@ -746,7 +746,7 @@ NodeImpl* toNode(JSValue* val) {
 @end
 */
 
-IMPLEMENT_PROTOFUNC(DOMNodeListFunc)
+KJS_IMPLEMENT_PROTOFUNC(DOMNodeListFunc)
 
 const ClassInfo DOMNodeList::info = {"NodeList", 0, &DOMNodeListTable, 0};
 
@@ -945,11 +945,12 @@ DontDelete|Function 2
   queryCommandValue DOMDocument::QueryCommandValue DontDelete|Function 1
 @end
 */
-DEFINE_PROTOTYPE("DOMDocument", DOMDocumentProto)
-IMPLEMENT_PROTOFUNC(DOMDocumentProtoFunc)
-IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMDocumentProto,
-                                DOMDocumentProtoFunc,
-                                DOMNodeProto)
+KJS_DEFINE_PROTOTYPE(DOMDocumentProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMDocumentProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMDocument",
+                                    DOMDocumentProto,
+                                    DOMDocumentProtoFunc,
+                                    DOMNodeProto)
 
 const ClassInfo DOMDocument::info = {"Document", &DOMNode::info,
                                      &DOMDocumentTable, 0};
@@ -1230,11 +1231,12 @@ DontDelete|Function 2
 
 @end
 */
-DEFINE_PROTOTYPE("DOMElement", DOMElementProto)
-IMPLEMENT_PROTOFUNC(DOMElementProtoFunc)
-IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMElementProto,
-                                DOMElementProtoFunc,
-                                DOMNodeProto)
+KJS_DEFINE_PROTOTYPE(DOMElementProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMElementProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMElement",
+                                    DOMElementProto,
+                                    DOMElementProtoFunc,
+                                    DOMNodeProto)
 
 const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
                                     0};
@@ -1437,9 +1439,11 @@ DontDelete|Function 3
 DontDelete|Function 1
 @end
 */
-DEFINE_PROTOTYPE("DOMImplementation", DOMDOMImplementationProto)
-IMPLEMENT_PROTOFUNC(DOMDOMImplementationProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMDOMImplementationProto, DOMDOMImplementationProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMDOMImplementationProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMDOMImplementationProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("DOMImplementation",
+                        DOMDOMImplementationProto,
+                        DOMDOMImplementationProtoFunc)
 
 const ClassInfo DOMDOMImplementation::info = {"DOMImplementation", 0, 0, 0};
 
@@ -1568,9 +1572,11 @@ DontDelete|Function 1
 DontDelete|Function 2
 @end
 */
-DEFINE_PROTOTYPE("NamedNodeMap", DOMNamedNodeMapProto)
-IMPLEMENT_PROTOFUNC(DOMNamedNodeMapProtoFunc)
-IMPLEMENT_PROTOTYPE(DOMNamedNodeMapProto, DOMNamedNodeMapProtoFunc)
+KJS_DEFINE_PROTOTYPE(DOMNamedNodeMapProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMNamedNodeMapProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE("NamedNodeMap",
+                        DOMNamedNodeMapProto,
+                        DOMNamedNodeMapProtoFunc)
 
 const ClassInfo DOMNamedNodeMap::info = {"NamedNodeMap", 0, 0, 0};
 
@@ -2122,11 +2128,12 @@ const ClassInfo DOMCharacterData::info = {"CharacterImp", &DOMNode::info,
   replaceData	DOMCharacterData::ReplaceData	DontDelete|Function 2
 @end
 */
-DEFINE_PROTOTYPE("DOMCharacterData", DOMCharacterDataProto)
-IMPLEMENT_PROTOFUNC(DOMCharacterDataProtoFunc)
-IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMCharacterDataProto,
-                                DOMCharacterDataProtoFunc,
-                                DOMNodeProto)
+KJS_DEFINE_PROTOTYPE(DOMCharacterDataProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMCharacterDataProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMCharacterData",
+                                    DOMCharacterDataProto,
+                                    DOMCharacterDataProtoFunc,
+                                    DOMNodeProto)
 
 DOMCharacterData::DOMCharacterData(ExecState* exec, CharacterDataImpl* d)
     : DOMNode(d) {
@@ -2222,11 +2229,12 @@ const ClassInfo DOMText::info = {"Text", &DOMCharacterData::info, 0, 0};
   splitText	DOMText::SplitText	DontDelete|Function 1
 @end
 */
-DEFINE_PROTOTYPE("DOMText", DOMTextProto)
-IMPLEMENT_PROTOFUNC(DOMTextProtoFunc)
-IMPLEMENT_PROTOTYPE_WITH_PARENT(DOMTextProto,
-                                DOMTextProtoFunc,
-                                DOMCharacterDataProto)
+KJS_DEFINE_PROTOTYPE(DOMTextProto)
+KJS_IMPLEMENT_PROTOFUNC(DOMTextProtoFunc)
+KJS_IMPLEMENT_PROTOTYPE_WITH_PARENT("DOMText",
+                                    DOMTextProto,
+                                    DOMTextProtoFunc,
+                                    DOMCharacterDataProto)
 
 DOMText::DOMText(ExecState* exec, TextImpl* t) : DOMCharacterData(t) {
   setPrototype(DOMTextProto::self(exec));
