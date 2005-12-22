@@ -3229,7 +3229,7 @@ void DocumentImpl::radioButtonChecked(HTMLInputElementImpl* caller,
   // Without a name, there is no group.
   if (caller->name().isEmpty())
     return;
-
+  // Use 1 to represent the document's default form
   if (!form)
     form = (HTMLFormElementImpl*)1;
   // Uncheck the currently selected item
@@ -3254,6 +3254,9 @@ HTMLInputElementImpl* DocumentImpl::checkedRadioButtonForGroup(
     HTMLFormElementImpl* form) {
   if (!m_selectedRadioButtons)
     return 0;
+  // Use 1 to represent the document's default form
+  if (!form)
+    form = (HTMLFormElementImpl*)1;
   NameToInputMap* formRadioButtons = m_selectedRadioButtons->get(form);
   if (!formRadioButtons)
     return 0;
@@ -3263,6 +3266,9 @@ HTMLInputElementImpl* DocumentImpl::checkedRadioButtonForGroup(
 
 void DocumentImpl::removeRadioButtonGroup(DOMStringImpl* name,
                                           HTMLFormElementImpl* form) {
+  // Use 1 to represent the document's default form
+  if (!form)
+    form = (HTMLFormElementImpl*)1;
   if (m_selectedRadioButtons) {
     NameToInputMap* formRadioButtons = m_selectedRadioButtons->get(form);
     if (formRadioButtons) {

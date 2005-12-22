@@ -196,6 +196,7 @@ class HTMLGenericFormElementImpl : public HTMLElementImpl {
   void setName(const DOMString& name);
 
   virtual bool isGenericFormElement() const { return true; }
+  virtual bool isRadioButton() const { return false; }
 
   /*
    * override in derived classes to get the encoded name=value pair
@@ -331,6 +332,7 @@ class HTMLInputElementImpl : public HTMLGenericFormElementImpl {
   bool isTextButton() const {
     return m_type == SUBMIT || m_type == RESET || m_type == BUTTON;
   }
+  virtual bool isRadioButton() const { return m_type == RADIO; }
 
   bool checked() const { return m_checked; }
   void setChecked(bool);
