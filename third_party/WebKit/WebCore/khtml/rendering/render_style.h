@@ -1110,9 +1110,6 @@ class RenderStyle {
 
   // !END SYNC!
 
-  // static default style
-  static RenderStyle* _default;
-
  protected:
   void setBitDefaults() {
     inherited_flags._empty_cells = initialEmptyCells();

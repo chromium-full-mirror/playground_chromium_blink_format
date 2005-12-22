@@ -23,17 +23,20 @@
  *
  */
 
-#ifndef KHTML_DataRef_H
-#define KHTML_DataRef_H
+#ifndef KHTML_DATAREF_H
+#define KHTML_DATAREF_H
+
+#include <assert.h>
 
 namespace khtml {
 
-template <class DATA>
+template <typename T>
 class DataRef {
  public:
   DataRef() : m_data(0) {}
 
-  DataRef(const DataRef<DATA>& d) {
+  DataRef(const DataRef<T>& d) {
+    assert(d.m_data);
     m_data = d.m_data;
     m_data->ref();
   }
@@ -43,46 +46,50 @@ class DataRef {
       m_data->deref();
   }
 
-  const DATA* operator->() const { return m_data; }
+  const T* get() const { return m_data; }
 
-  const DATA* get() const { return m_data; }
+  T& operator*() const { return *m_data; }
+  const T* operator->() const { return m_data; }
 
-  DATA* access() {
+  T* access() {
     if (!m_data->hasOneRef()) {
       m_data->deref();
-      m_data = new DATA(*m_data);
+      m_data = new T(*m_data);
       m_data->ref();
     }
     return m_data;
   }
 
   void init() {
-    m_data = new DATA;
+    assert(!m_data);
+    m_data = new T;
     m_data->ref();
   }
 
-  DataRef<DATA>& operator=(const DataRef<DATA>& d) {
-    if (m_data == d.m_data)
-      return *this;
+  DataRef<T>& operator=(const DataRef<T>& d) {
+    assert(d.m_data);
+    d.m_data->ref();
     if (m_data)
       m_data->deref();
     m_data = d.m_data;
-    m_data->ref();
-
     return *this;
   }
 
-  bool operator==(const DataRef<DATA>& o) const {
-    return ((m_data == o.m_data) || (*m_data == *(o.m_data)));
+  bool operator==(const DataRef<T>& o) const {
+    assert(m_data);
+    assert(o.m_data);
+    return m_data == o.m_data || *m_data == *o.m_data;
   }
 
-  bool operator!=(const DataRef<DATA>& o) const {
-    return ((m_data != o.m_data) && (*m_data != *(o.m_data)));
+  bool operator!=(const DataRef<T>& o) const {
+    assert(m_data);
+    assert(o.m_data);
+    return m_data != o.m_data && *m_data != *o.m_data;
   }
 
  private:
-  DATA* m_data;
+  T* m_data;
 };
-};
+}
 
 #endif
