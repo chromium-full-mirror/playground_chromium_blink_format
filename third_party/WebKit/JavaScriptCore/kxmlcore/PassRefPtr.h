@@ -47,11 +47,9 @@ class PassRefPtr {
     if (ptr)
       ptr->ref();
   }
-  PassRefPtr(const RefPtr<T>& o) : m_ptr(o.get()) {
-    if (T* ptr = m_ptr)
-      ptr->ref();
-  }
   PassRefPtr(PassRefPtr& o) : m_ptr(o.release()) {}
+  template <typename U>
+  PassRefPtr(PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
   ~PassRefPtr() {
     if (T* ptr = m_ptr)
@@ -72,9 +70,9 @@ class PassRefPtr {
     return tmp;
   }
 
-  static PassRefPtr<T> adopt(T* ptr) {
-    PassRefPtr result;
-    result.m_ptr = ptr;
+  template <typename U>
+  static PassRefPtr<T> adopt(U* ptr) {
+    PassRefPtr result((PassRefPtr_Ref<T>(ptr)));
     return result;
   }
 
@@ -88,9 +86,12 @@ class PassRefPtr {
   typedef T* (PassRefPtr::*UnspecifiedBoolType)() const;
   operator UnspecifiedBoolType() const { return m_ptr ? &PassRefPtr::get : 0; }
 
-  PassRefPtr& operator=(const RefPtr<T>&);
   PassRefPtr& operator=(T*);
   PassRefPtr& operator=(PassRefPtr&);
+  template <typename U>
+  PassRefPtr& operator=(PassRefPtr<U>&);
+  template <typename U>
+  PassRefPtr& operator=(const RefPtr<U>&);
 
   PassRefPtr(PassRefPtr_Ref<T> ref) : m_ptr(ref.m_ptr) {}
 
@@ -105,18 +106,18 @@ class PassRefPtr {
   operator PassRefPtr_Ref<U>() {
     return PassRefPtr_Ref<U>(release());
   }
-
   template <typename U>
   operator PassRefPtr<U>() {
-    return PassRefPtr<U>(this->release());
+    return PassRefPtr_Ref<U>(release());
   }
 
  private:
   T* m_ptr;
 };
 
-template <class T>
-inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<T>& o) {
+template <typename T>
+template <typename U>
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<U>& o) {
   T* optr = o.m_ptr;
   if (optr)
     optr->ref();
@@ -126,7 +127,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<T>& o) {
   return *this;
 }
 
-template <class T>
+template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
   if (optr)
     optr->ref();
@@ -136,7 +137,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
   return *this;
 }
 
-template <class T>
+template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
   T* optr = ref.release();
   if (T* ptr = m_ptr)
@@ -145,62 +146,72 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
   return *this;
 }
 
-template <class T>
-inline bool operator==(const PassRefPtr<T>& a, const PassRefPtr<T>& b) {
+template <typename T>
+template <typename U>
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<U>& ref) {
+  T* optr = ref.release();
+  if (T* ptr = m_ptr)
+    ptr->deref();
+  m_ptr = optr;
+  return *this;
+}
+
+template <typename T, typename U>
+inline bool operator==(const PassRefPtr<T>& a, const PassRefPtr<U>& b) {
   return a.get() == b.get();
 }
 
-template <class T>
-inline bool operator==(const PassRefPtr<T>& a, const RefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator==(const PassRefPtr<T>& a, const RefPtr<U>& b) {
   return a.get() == b.get();
 }
 
-template <class T>
-inline bool operator==(const RefPtr<T>& a, const PassRefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator==(const RefPtr<T>& a, const PassRefPtr<U>& b) {
   return a.get() == b.get();
 }
 
-template <class T>
-inline bool operator==(const PassRefPtr<T>& a, const T* b) {
+template <typename T, typename U>
+inline bool operator==(const PassRefPtr<T>& a, U* b) {
   return a.get() == b;
 }
 
-template <class T>
-inline bool operator==(const T* a, const PassRefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator==(T* a, const PassRefPtr<U>& b) {
   return a == b.get();
 }
 
-template <class T>
-inline bool operator!=(const PassRefPtr<T>& a, const PassRefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator!=(const PassRefPtr<T>& a, const PassRefPtr<U>& b) {
   return a.get() != b.get();
 }
 
-template <class T>
-inline bool operator!=(const PassRefPtr<T>& a, const RefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator!=(const PassRefPtr<T>& a, const RefPtr<U>& b) {
   return a.get() != b.get();
 }
 
-template <class T>
-inline bool operator!=(const RefPtr<T>& a, const PassRefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator!=(const RefPtr<T>& a, const PassRefPtr<U>& b) {
   return a.get() != b.get();
 }
 
-template <class T>
-inline bool operator!=(const PassRefPtr<T>& a, const T* b) {
+template <typename T, typename U>
+inline bool operator!=(const PassRefPtr<T>& a, U* b) {
   return a.get() != b;
 }
 
-template <class T>
-inline bool operator!=(const T* a, const PassRefPtr<T>& b) {
+template <typename T, typename U>
+inline bool operator!=(T* a, const PassRefPtr<U>& b) {
   return a != b.get();
 }
 
-template <class T, class U>
+template <typename T, typename U>
 inline PassRefPtr<T> static_pointer_cast(const PassRefPtr<U>& p) {
   return PassRefPtr<T>::adopt(static_cast<T*>(p.release()));
 }
 
-template <class T, class U>
+template <typename T, typename U>
 inline PassRefPtr<T> const_pointer_cast(const PassRefPtr<U>& p) {
   return PassRefPtr<T>::adopt(const_cast<T*>(p.release()));
 }
