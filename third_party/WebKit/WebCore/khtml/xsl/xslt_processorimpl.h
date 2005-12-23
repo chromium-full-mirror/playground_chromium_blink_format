@@ -36,6 +36,8 @@
 #include "xsl_stylesheetimpl.h"
 #include <qstring.h>
 
+#include <kxmlcore/HashMap.h>
+
 namespace DOM {
 
 class NodeImpl;
@@ -44,8 +46,6 @@ class DocumentFragmentImpl;
 
 class XSLTProcessorImpl : public khtml::Shared<XSLTProcessorImpl> {
  public:
-  XSLTProcessorImpl() { m_parameters.setAutoDelete(true); };
-
   void setXSLStylesheet(XSLStyleSheetImpl* styleSheet) {
     m_stylesheet = styleSheet;
   }
@@ -83,6 +83,8 @@ class XSLTProcessorImpl : public khtml::Shared<XSLTProcessorImpl> {
   // Only for libXSLT callbacks
   XSLStyleSheetImpl* xslStylesheet() const { return m_stylesheet.get(); }
 
+  typedef HashMap<RefPtr<DOMStringImpl>, RefPtr<DOMStringImpl>> ParameterMap;
+
  private:
   // Convert a libxml doc ptr to a KHTML DOM Document
   RefPtr<DocumentImpl> documentFromXMLDocPtr(xmlDocPtr resultDoc,
@@ -92,7 +94,8 @@ class XSLTProcessorImpl : public khtml::Shared<XSLTProcessorImpl> {
 
   RefPtr<XSLStyleSheetImpl> m_stylesheet;
   RefPtr<NodeImpl> m_stylesheetRootNode;
-  QDict<DOMString> m_parameters;
+
+  ParameterMap m_parameters;
 };
 }
 
