@@ -242,7 +242,7 @@ void DOMCSSStyleDeclaration::put(ExecState* exec,
     if (isCSSPropertyName(propertyName)) {
       bool pixelOrPos;
       DOMString prop = cssPropertyName(propertyName, &pixelOrPos);
-      QString propvalue = value->toString(exec).qstring();
+      DOMString propvalue = value->toString(exec).domString();
       if (pixelOrPos)
         propvalue += "px";
 #ifdef KJS_VERBOSE
@@ -264,7 +264,7 @@ void DOMCSSStyleDeclaration::put(ExecState* exec,
         // but it's likely that the Dashboard widgets are already using a strict
         // mode DOCTYPE.
         int ignoreException = 0;
-        styleDecl.setProperty(prop, DOMString(propvalue), "", ignoreException);
+        styleDecl.setProperty(prop, propvalue, "", ignoreException);
       }
     } else {
       DOMObject::put(exec, propertyName, value, attr);

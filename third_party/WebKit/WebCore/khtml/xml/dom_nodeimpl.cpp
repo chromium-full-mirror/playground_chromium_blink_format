@@ -1254,7 +1254,7 @@ void NodeImpl::dump(QTextStream* stream, QString ind) const {
   *stream << endl;
 
   NodeImpl* child = firstChild();
-  while (child != 0) {
+  while (child) {
     *stream << ind << child->nodeName().qstring().ascii() << ": ";
     child->dump(stream, ind + "  ");
     child = child->nextSibling();
@@ -1962,14 +1962,14 @@ ElementImpl* NodeImpl::getAncestorElement() const {
 #ifndef NDEBUG
 
 static void appendAttributeDesc(const NodeImpl* node,
-                                QString& string,
+                                DOMString& string,
                                 const QualifiedName& name,
                                 QString attrDesc) {
   if (node->isElementNode()) {
     DOMString attr = static_cast<const ElementImpl*>(node)->getAttribute(name);
     if (!attr.isEmpty()) {
       string += attrDesc;
-      string += attr.qstring();
+      string += attr;
     }
   }
 }
@@ -1982,14 +1982,13 @@ void NodeImpl::showNode(const char* prefix) const {
     value.replace('\\', "\\\\");
     value.replace('\n', "\\n");
     fprintf(stderr, "%s%s\t%p \"%s\"\n", prefix,
-            nodeName().qstring().local8Bit().data(), this,
-            value.local8Bit().data());
+            nodeName().qstring().utf8().data(), this, value.utf8().data());
   } else {
-    QString attrs = "";
+    DOMString attrs = "";
     appendAttributeDesc(this, attrs, classAttr, " CLASS=");
     appendAttributeDesc(this, attrs, styleAttr, " STYLE=");
-    fprintf(stderr, "%s%s\t%p%s\n", prefix,
-            nodeName().qstring().local8Bit().data(), this, attrs.ascii());
+    fprintf(stderr, "%s%s\t%p%s\n", prefix, nodeName().qstring().utf8().data(),
+            this, attrs.qstring().ascii());
   }
 }
 

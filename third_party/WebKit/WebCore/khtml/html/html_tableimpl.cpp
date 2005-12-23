@@ -302,11 +302,6 @@ void HTMLTableElementImpl::deleteRow(int index, int& exceptioncode) {
 }
 
 NodeImpl* HTMLTableElementImpl::addChild(NodeImpl* child) {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6030) << nodeName().qstring() << "(Table)::addChild( "
-                << child->nodeName().qstring() << " )" << endl;
-#endif
-
   if (child->hasTagName(formTag)) {
     // First add the child.
     HTMLElementImpl::addChild(child);
@@ -439,7 +434,7 @@ void HTMLTableElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
       m_solid = true;
     }
   } else if (attr->name() == backgroundAttr) {
-    QString url = khtml::parseURL(attr->value()).qstring();
+    DOMString url = khtml::parseURL(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSS_PROP_BACKGROUND_IMAGE,
                           getDocument()->completeURL(url));
@@ -659,7 +654,7 @@ void HTMLTablePartElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
   if (attr->name() == bgcolorAttr) {
     addCSSColor(attr, CSS_PROP_BACKGROUND_COLOR, attr->value());
   } else if (attr->name() == backgroundAttr) {
-    QString url = khtml::parseURL(attr->value()).qstring();
+    DOMString url = khtml::parseURL(attr->value());
     if (!url.isEmpty())
       addCSSImageProperty(attr, CSS_PROP_BACKGROUND_IMAGE,
                           getDocument()->completeURL(url));
@@ -710,11 +705,6 @@ bool HTMLTableSectionElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 NodeImpl* HTMLTableSectionElementImpl::addChild(NodeImpl* child) {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6030) << nodeName().qstring() << "(Tbody)::addChild( "
-                << child->nodeName().qstring() << " )" << endl;
-#endif
-
   if (child->hasTagName(formTag)) {
     // First add the child.
     HTMLElementImpl::addChild(child);
@@ -823,11 +813,6 @@ bool HTMLTableRowElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
-#ifdef DEBUG_LAYOUT
-  kdDebug(6030) << nodeName().qstring() << "(Trow)::addChild( "
-                << child->nodeName().qstring() << " )" << endl;
-#endif
-
   if (child->hasTagName(formTag)) {
     // First add the child.
     HTMLElementImpl::addChild(child);

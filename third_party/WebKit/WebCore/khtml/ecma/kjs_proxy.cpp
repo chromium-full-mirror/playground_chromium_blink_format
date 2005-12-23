@@ -83,8 +83,8 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
                             ->toString(m_script->globalExec());
 
     KWQ(m_part)
-        ->addMessageToConsole(errorMessage.qstring(), lineNumber,
-                              sourceURL.qstring());
+        ->addMessageToConsole(errorMessage.domString(), lineNumber,
+                              sourceURL.domString());
   }
   return QVariant();
 }

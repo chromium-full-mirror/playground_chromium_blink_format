@@ -223,7 +223,7 @@ DOMImplementationImpl::~DOMImplementationImpl() {}
 
 bool DOMImplementationImpl::hasFeature(const DOMString& feature,
                                        const DOMString& version) const {
-  QString lower = feature.qstring().lower();
+  DOMString lower = feature.lower();
   if (lower == "core" || lower == "html" || lower == "xml" || lower == "xhtml")
     return version.isEmpty() || version == "1.0" || version == "2.0";
   if (lower == "css" || lower == "css2" || lower == "events" ||
@@ -897,10 +897,9 @@ void DocumentImpl::removeElementById(const DOMString& elementId,
 }
 
 ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
-  if (key.length() == 0)
+  if (!key.length())
     return 0;
 
-  QString k(key.qstring());
   if (!m_accessKeyDictValid) {
     m_elementsByAccessKey.clear();
 
@@ -919,7 +918,7 @@ ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
     }
     m_accessKeyDictValid = true;
   }
-  return m_elementsByAccessKey.find(k);
+  return m_elementsByAccessKey.find(key.qstring());
 }
 
 void DocumentImpl::updateTitle() {
@@ -2160,8 +2159,7 @@ void DocumentImpl::recalcStyleSelector() {
       if (!s->isLoading()) {
         sheet = s->sheet();
         if (sheet)
-          title = DOM::DOMString(s->getAttribute(KSVG::SVGNames::titleAttr))
-                      .qstring();
+          title = s->getAttribute(KSVG::SVGNames::titleAttr).qstring();
       }
 
       if (!title.isEmpty() && m_preferredStylesheetSet.isEmpty())
@@ -2437,9 +2435,8 @@ void DocumentImpl::defaultEventHandler(EventImpl* evt) {
     KeyboardEventImpl* kevt = static_cast<KeyboardEventImpl*>(evt);
     if (kevt->ctrlKey()) {
       QKeyEvent* qevt = kevt->qKeyEvent();
-      QString key =
-          (qevt ? qevt->unmodifiedText() : kevt->keyIdentifier().qstring())
-              .lower();
+      DOMString key =
+          (qevt ? qevt->unmodifiedText() : kevt->keyIdentifier()).lower();
       ElementImpl* elem = getElementByAccessKey(key);
       if (elem) {
         elem->accessKeyAction(false);

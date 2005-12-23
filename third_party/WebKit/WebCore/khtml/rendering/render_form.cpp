@@ -149,7 +149,7 @@ void RenderFormElement::addIntrinsicMarginsIfAllowed(RenderStyle* _style) {
   }
 }
 
-void RenderFormElement::slotTextChanged(const QString&) {
+void RenderFormElement::slotTextChanged(const DOM::DOMString&) {
   // do nothing
 }
 
@@ -268,8 +268,8 @@ void RenderLineEdit::updateFromElement() {
     w->setMaxLength(ml);
 
   if (!e->valueMatchesRenderer()) {
-    QString widgetText = w->text();
-    QString newText = e->value().qstring();
+    DOMString widgetText = w->text();
+    DOMString newText = e->value();
     newText.replace(QChar('\\'), backslashAsCurrencySymbol());
     if (widgetText != newText) {
       w->blockSignals(true);
@@ -293,7 +293,7 @@ void RenderLineEdit::updateFromElement() {
   w->setPlaceholderString(e->getAttribute(placeholderAttr).qstring());
   if (w->type() == QLineEdit::Search) {
     w->setLiveSearch(!e->getAttribute(incrementalAttr).isNull());
-    w->setAutoSaveName(e->getAttribute(autosaveAttr).qstring());
+    w->setAutoSaveName(e->getAttribute(autosaveAttr));
     w->setMaxResults(e->maxResults());
   }
 
@@ -1009,8 +1009,8 @@ void RenderTextArea::updateFromElement() {
 
   e->updateValue();
   if (!e->valueMatchesRenderer()) {
-    QString widgetText = text();
-    QString text = e->value().qstring();
+    DOMString widgetText = text();
+    DOMString text = e->value();
     text.replace(QChar('\\'), backslashAsCurrencySymbol());
     if (widgetText != text) {
       w->blockSignals(true);
@@ -1027,17 +1027,16 @@ void RenderTextArea::updateFromElement() {
   RenderFormElement::updateFromElement();
 }
 
-QString RenderTextArea::text() {
-  QString txt;
+DOMString RenderTextArea::text() {
+  DOMString txt;
   QTextEdit* w = static_cast<QTextEdit*>(m_widget);
 
-  if (element()->wrap() == HTMLTextAreaElementImpl::ta_Physical) {
+  if (element()->wrap() == HTMLTextAreaElementImpl::ta_Physical)
     txt = w->textWithHardLineBreaks();
-  } else
+  else
     txt = w->text();
 
-  txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
-  return txt;
+  return txt.replace(backslashAsCurrencySymbol(), QChar('\\'));
 }
 
 void RenderTextArea::slotTextChanged() {

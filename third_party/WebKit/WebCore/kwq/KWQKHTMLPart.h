@@ -199,11 +199,11 @@ class KWQKHTMLPart : public KHTMLPart {
   static void setDocumentFocus(QWidget*);
   static void clearDocumentFocus(QWidget*);
 
-  void runJavaScriptAlert(const QString& message);
-  bool runJavaScriptConfirm(const QString& message);
-  bool runJavaScriptPrompt(const QString& message,
-                           const QString& defaultValue,
-                           QString& result);
+  void runJavaScriptAlert(const DOM::DOMString& message);
+  bool runJavaScriptConfirm(const DOM::DOMString& message);
+  bool runJavaScriptPrompt(const DOM::DOMString& message,
+                           const DOM::DOMString& defaultValue,
+                           DOM::DOMString& result);
   bool locationbarVisible();
   bool menubarVisible();
   bool personalbarVisible();
@@ -213,9 +213,9 @@ class KWQKHTMLPart : public KHTMLPart {
 
   bool shouldClose();
 
-  void addMessageToConsole(const QString& message,
+  void addMessageToConsole(const DOM::DOMString& message,
                            unsigned int lineNumber,
-                           const QString& sourceID);
+                           const DOM::DOMString& sourceID);
   khtml::RenderObject* renderer() const;
   void forceLayout();
   void forceLayoutWithPageWidthRange(float minPageWidth, float maxPageWidth);

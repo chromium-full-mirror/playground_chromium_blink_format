@@ -48,6 +48,10 @@ class CachedObject;
 class DocLoader;
 }
 
+namespace DOM {
+class DOMString;
+}
+
 // Like strcmp, but ignores spaces.
 bool KWQNamesMatch(const char* a, const char* b);
 
@@ -62,7 +66,7 @@ class KWQSlot {
   void call() const;
   void call(bool) const;
   void call(int) const;
-  void call(const QString&) const;
+  void call(const DOM::DOMString&) const;
   void call(KIO::Job*) const;
   void call(khtml::DocLoader*, khtml::CachedObject*) const;
   void call(KIO::Job*, const char*, int) const;

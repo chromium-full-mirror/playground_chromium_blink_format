@@ -454,9 +454,6 @@ void DOMNode::put(ExecState* exec,
                   const Identifier& propertyName,
                   JSValue* value,
                   int attr) {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMNode::put " << propertyName.qstring() << endl;
-#endif
   lookupPut<DOMNode, DOMObject>(exec, propertyName, value, attr, &DOMNodeTable,
                                 this);
 }
@@ -880,9 +877,6 @@ void DOMAttr::put(ExecState* exec,
                   const Identifier& propertyName,
                   JSValue* value,
                   int attr) {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMAttr::put " << propertyName.qstring() << endl;
-#endif
   lookupPut<DOMAttr, DOMNode>(exec, propertyName, value, attr, &DOMAttrTable,
                               this);
 }
@@ -1044,9 +1038,6 @@ void DOMDocument::put(ExecState* exec,
                       const Identifier& propertyName,
                       JSValue* value,
                       int attr) {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "DOMDocument::put " << propertyName.qstring() << endl;
-#endif
   lookupPut<DOMDocument, DOMNode>(exec, propertyName, value, attr,
                                   &DOMDocumentTable, this);
 }

@@ -500,17 +500,9 @@ QVariant KHTMLPart::executeScript(const QString& script,
   return executeScript(0, script, forceUserGesture);
 }
 
-// Enable this to see all JS scripts being executed
-//#define KJS_VERBOSE
-
 QVariant KHTMLPart::executeScript(DOM::NodeImpl* n,
                                   const QString& script,
                                   bool forceUserGesture) {
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "KHTMLPart::executeScript n="
-                << n.nodeName().qstring().latin1() << "("
-                << (n.isNull() ? 0 : n.nodeType()) << ") " << script << endl;
-#endif
   KJSProxyImpl* proxy = jScript();
 
   if (!proxy)
@@ -527,9 +519,6 @@ QVariant KHTMLPart::executeScript(DOM::NodeImpl* n,
     submitFormAgain();
   DocumentImpl::updateDocumentsRendering();
 
-#ifdef KJS_VERBOSE
-  kdDebug(6070) << "KHTMLPart::executeScript - done" << endl;
-#endif
   return ret;
 }
 
@@ -1145,11 +1134,8 @@ void KHTMLPart::checkEmitLoadEvent() {
       KParts::ReadOnlyPart* p = (*it).m_part;
       if (p && p->inherits("KHTMLPart")) {
         KHTMLPart* htmlFrame = static_cast<KHTMLPart*>(p);
-        if (htmlFrame->d->m_doc) {
-          kdDebug() << "KHTMLPart::checkCompleted setting frame domain to "
-                    << domain.qstring() << endl;
+        if (htmlFrame->d->m_doc)
           htmlFrame->d->m_doc->setDomain(domain);
-        }
       }
     }
   }

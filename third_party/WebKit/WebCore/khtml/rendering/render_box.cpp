@@ -128,10 +128,7 @@ void RenderBox::setStyle(RenderStyle* _style) {
         ->setMaximalOutlineSize(style()->outlineSize());
 }
 
-RenderBox::~RenderBox() {
-  // kdDebug( 6040 ) << "Element destructor: this=" << nodeName().qstring() <<
-  // endl;
-}
+RenderBox::~RenderBox() {}
 
 void RenderBox::destroy() {
   // A lot of the code in this funtion is just pasted into

@@ -418,7 +418,6 @@ class QString {
     return utf8(length);
   }
   QCString utf8(int& length) const;
-  QCString local8Bit() const;
 
   bool isNull() const;
   bool isEmpty() const;

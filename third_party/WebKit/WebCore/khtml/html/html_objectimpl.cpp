@@ -543,10 +543,10 @@ bool HTMLObjectElementImpl::mapToEntry(const QualifiedName& attrName,
 }
 
 void HTMLObjectElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
-  QString val = attr->value().qstring();
+  DOMString val = attr->value();
   int pos;
   if (attr->name() == typeAttr) {
-    serviceType = val.lower();
+    serviceType = val.qstring().lower();
     pos = serviceType.find(";");
     if (pos != -1)
       serviceType = serviceType.left(pos);
@@ -958,10 +958,9 @@ bool HTMLParamElementImpl::isURLAttribute(AttributeImpl* attr) const {
   if (attr->name() == valueAttr) {
     AttributeImpl* attr = attributes()->getAttributeItem(nameAttr);
     if (attr) {
-      DOMString value = attr->value().qstring().lower();
-      if (value == "src" || value == "movie" || value == "data") {
+      DOMString value = attr->value().domString().lower();
+      if (value == "src" || value == "movie" || value == "data")
         return true;
-      }
     }
   }
   return false;

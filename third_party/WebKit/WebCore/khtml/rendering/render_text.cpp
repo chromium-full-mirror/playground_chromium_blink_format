@@ -852,14 +852,7 @@ RenderText::RenderText(DOM::NodeImpl* node, DOMStringImpl* _str)
   KHTMLAssert(!str || !str->l || str->s);
 
   m_firstTextBox = m_lastTextBox = 0;
-
   m_selectionState = SelectionNone;
-
-#ifdef DEBUG_LAYOUT
-  QConstString cstr(str->s, str->l);
-  kdDebug(6040) << "RenderText ctr( " << cstr.qstring().length() << " )  '"
-                << cstr.qstring() << "'" << endl;
-#endif
 }
 
 void RenderText::setStyle(RenderStyle* _style) {
@@ -1751,9 +1744,7 @@ void RenderText::position(InlineBox* box,
   QChar* ch = str->s + from;
   QConstString cstr(ch, len);
   qDebug("setting run text to *%s*, len=%d, w)=%d", cstr.qstring().latin1(),
-         len, width);  //" << y << ")" << " height=" << lineHeight(false) << "
-                       //fontHeight=" << metrics(false).height() << " ascent ="
-                       //<< metrics(false).ascent() << endl;
+         len, width);
 #endif
 
   s->m_reversed = reverse;

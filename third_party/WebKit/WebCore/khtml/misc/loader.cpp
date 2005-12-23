@@ -98,15 +98,7 @@ void CachedObject::finish() {
   if (m_expireDateChanged && url.protocol().startsWith("http")) {
     m_expireDateChanged = false;
     KIO::http_update_cache(url, false, m_expireDate);
-#ifdef CACHE_DEBUG
-    kdDebug(6060) << " Setting expire date for image " << m_url.qstring()
-                  << " to " << m_expireDate << endl;
-#endif
   }
-#ifdef CACHE_DEBUG
-  else
-    kdDebug(6060) << " No expire date for image " << m_url.qstring() << endl;
-#endif
 }
 
 void CachedObject::setExpireDate(time_t _expireDate, bool changeHttpCache) {
@@ -235,11 +227,6 @@ void CachedCSSStyleSheet::data(QBuffer& buffer, bool eof) {
 void CachedCSSStyleSheet::checkNotify() {
   if (m_loading)
     return;
-
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << "CachedCSSStyleSheet:: finishedLoading " << m_url.qstring()
-                << endl;
-#endif
 
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next()) {
@@ -673,11 +660,6 @@ void CachedXSLStyleSheet::checkNotify() {
   if (m_loading)
     return;
 
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << "CachedCSSStyleSheet:: finishedLoading " << m_url.qstring()
-                << endl;
-#endif
-
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next())
     c->setStyleSheet(m_url, m_sheet);
@@ -755,11 +737,6 @@ void CachedXBLDocument::data(QBuffer& buffer, bool eof) {
 void CachedXBLDocument::checkNotify() {
   if (m_loading)
     return;
-
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << "CachedXBLDocument:: finishedLoading " << m_url.qstring()
-                << endl;
-#endif
 
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next())
@@ -1007,11 +984,6 @@ void Loader::servePendingRequests() {
   // get the first pending request
   Request* req = m_requestsPending.take(0);
 
-#ifdef CACHE_DEBUG
-  kdDebug(6060) << "starting Loader url=" << req->object->url().qstring()
-                << endl;
-#endif
-
   KURL u(req->object->url().qstring());
   KIO::TransferJob* job = KIO::get(u, false, false /*no GUI*/, true);
 
@@ -1173,34 +1145,22 @@ int Loader::numRequests(DocLoader* dl) const {
 }
 
 void Loader::cancelRequests(DocLoader* dl) {
-  // kdDebug( 6060 ) << "void Loader::cancelRequests()" << endl;
-  // kdDebug( 6060 ) << "got " << m_requestsPending.count() << " pending
-  // requests" << endl;
   QPtrListIterator<Request> pIt(m_requestsPending);
   while (pIt.current()) {
     if (pIt.current()->m_docLoader == dl) {
-      kdDebug(6060) << "cancelling pending request for "
-                    << pIt.current()->object->url().qstring() << endl;
-      // emit requestFailed( dl, pIt.current()->object );
       Cache::removeCacheEntry(pIt.current()->object);
       m_requestsPending.remove(pIt);
     } else
       ++pIt;
   }
 
-  // kdDebug( 6060 ) << "got " << m_requestsLoading.count() << "loading
-  // requests" << endl;
-
   QPtrDictIterator<Request> lIt(m_requestsLoading);
   while (lIt.current()) {
     if (lIt.current()->m_docLoader == dl) {
-      // kdDebug( 6060 ) << "cancelling loading request for " <<
-      // lIt.current()->object->url().qstring() << endl;
       KIO::Job* job = static_cast<KIO::Job*>(lIt.currentKey());
       Cache::removeCacheEntry(lIt.current()->object);
       m_requestsLoading.remove(lIt.currentKey());
       job->kill();
-      // emit requestFailed( dl, pIt.current()->object );
     } else
       ++lIt;
   }
@@ -1208,9 +1168,6 @@ void Loader::cancelRequests(DocLoader* dl) {
   QPtrListIterator<Request> bdIt(m_requestsBackgroundDecoding);
   while (bdIt.current()) {
     if (bdIt.current()->m_docLoader == dl) {
-      kdDebug(6060) << "cancelling pending request for "
-                    << bdIt.current()->object->url().qstring() << endl;
-      // emit requestFailed( dl, bdIt.current()->object );
       Cache::removeCacheEntry(bdIt.current()->object);
       m_requestsBackgroundDecoding.remove(bdIt);
     } else

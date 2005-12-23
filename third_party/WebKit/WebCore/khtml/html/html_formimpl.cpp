@@ -316,7 +316,6 @@ bool HTMLFormElementImpl::formData(FormData& form_data) const {
     FormDataList lst(codec);
 
     if (!current->disabled() && current->appendFormData(lst, m_multipart)) {
-      // kdDebug(6030) << "adding name " << current->name().qstring() << endl;
       for (QValueListConstIterator<FormDataListItem> it = lst.begin();
            it != lst.end(); ++it) {
         if (!m_multipart) {
@@ -1787,12 +1786,8 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
 
     case IMAGE:
       if (m_activeSubmit) {
-        encoding.appendData(name().isEmpty() ? QString::fromLatin1("x")
-                                             : (name().qstring() + ".x"),
-                            clickX());
-        encoding.appendData(name().isEmpty() ? QString::fromLatin1("y")
-                                             : (name().qstring() + ".y"),
-                            clickY());
+        encoding.appendData(name().isEmpty() ? "x" : (name() + ".x"), clickX());
+        encoding.appendData(name().isEmpty() ? "y" : (name() + ".y"), clickY());
         if (!name().isEmpty() && !value().isEmpty())
           encoding.appendData(name(), value());
         return true;
@@ -1801,7 +1796,7 @@ bool HTMLInputElementImpl::appendFormData(FormDataList& encoding,
 
     case SUBMIT:
       if (m_activeSubmit) {
-        QString enc_str = valueWithDefault().qstring();
+        DOMString enc_str = valueWithDefault();
         if (!enc_str.isEmpty()) {
           encoding.appendData(name(), enc_str);
           return true;
@@ -3272,7 +3267,7 @@ void HTMLTextAreaElementImpl::reset() {
 void HTMLTextAreaElementImpl::updateValue() {
   if (!m_valueIsValid) {
     if (m_render) {
-      m_value = static_cast<RenderTextArea*>(m_render)->text();
+      m_value = static_cast<RenderTextArea*>(m_render)->text().qstring();
       m_valueMatchesRenderer = true;
     } else {
       m_value = defaultValue().qstring();
