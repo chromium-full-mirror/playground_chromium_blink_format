@@ -224,14 +224,16 @@ class HashMap<P*, Q*, PointerHash<P*>, HashTraits<P*>, HashTraits<Q*>> {
       ImplValueType,
       extractFirst<ImplValueType>,
       DefaultHash<void*>,
-      PairHashTraits<HashTraits<void*>, HashTraits<void*>>>
+      PairHashTraits<HashTraits<void*>, HashTraits<void*>>,
+      HashTraits<void*>>
       ImplIterator;
   typedef HashTableConstIterator<
       void*,
       ImplValueType,
       extractFirst<ImplValueType>,
       DefaultHash<void*>,
-      PairHashTraits<HashTraits<void*>, HashTraits<void*>>>
+      PairHashTraits<HashTraits<void*>, HashTraits<void*>>,
+      HashTraits<void*>>
       ImplConstIterator;
 
   typedef PointerHashIteratorAdapter<P, Q*> iterator;

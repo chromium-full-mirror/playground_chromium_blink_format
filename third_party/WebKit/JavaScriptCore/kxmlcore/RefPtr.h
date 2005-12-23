@@ -81,6 +81,8 @@ class RefPtr {
   template <typename U>
   RefPtr& operator=(PassRefPtr_Ref<U>);
 
+  void swap(RefPtr&);
+
  private:
   T* m_ptr;
 };
@@ -158,6 +160,16 @@ inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<U>& o) {
     m_ptr->deref();
   m_ptr = o.release();
   return *this;
+}
+
+template <class T>
+inline void RefPtr<T>::swap(RefPtr<T>& o) {
+  stap(m_ptr, o.m_ptr);
+}
+
+template <class T>
+inline void swap(RefPtr<T>& a, RefPtr<T>& b) {
+  a.swap(b);
 }
 
 template <typename T, typename U>
