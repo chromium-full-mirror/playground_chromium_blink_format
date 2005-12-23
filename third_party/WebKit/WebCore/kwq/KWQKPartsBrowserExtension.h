@@ -82,7 +82,8 @@ struct WindowArgs {
   int height;
   bool menuBarVisible;
   bool statusBarVisible;
-  bool toolBarsVisible;
+  bool toolBarVisible;
+  bool locationBarVisible;
   bool scrollBarsVisible;
   bool resizable;
   bool fullscreen;
@@ -91,23 +92,6 @@ struct WindowArgs {
   bool widthSet;
   bool heightSet;
   bool dialog;
-
-  WindowArgs()
-      : x(0),
-        y(0),
-        width(0),
-        height(0),
-        menuBarVisible(true),
-        statusBarVisible(true),
-        toolBarsVisible(true),
-        scrollBarsVisible(true),
-        resizable(true),
-        fullscreen(false),
-        xSet(false),
-        ySet(false),
-        widthSet(false),
-        heightSet(false),
-        dialog(false) {}
 };
 
 class BrowserExtension : public QObject {
