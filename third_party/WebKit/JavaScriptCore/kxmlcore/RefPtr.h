@@ -166,7 +166,7 @@ inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<U>& o) {
 
 template <class T>
 inline void RefPtr<T>::swap(RefPtr<T>& o) {
-  swap(m_ptr, o.m_ptr);
+  std::swap(m_ptr, o.m_ptr);
 }
 
 template <class T>
