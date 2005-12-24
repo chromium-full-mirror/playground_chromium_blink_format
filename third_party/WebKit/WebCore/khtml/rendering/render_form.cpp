@@ -187,7 +187,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
   connect(edit, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
   connect(edit, SIGNAL(textChanged(const QString&)), this,
-          SLOT(slotTextChanged(const QString&)));
+          SLOT(slotTextChanged(const DOMString&)));
   connect(edit, SIGNAL(clicked()), this, SLOT(slotClicked()));
 
   connect(edit, SIGNAL(performSearch()), this, SLOT(slotPerformSearch()));
@@ -300,7 +300,7 @@ void RenderLineEdit::updateFromElement() {
   RenderFormElement::updateFromElement();
 }
 
-void RenderLineEdit::slotTextChanged(const QString& string) {
+void RenderLineEdit::slotTextChanged(const DOMString& string) {
   if (m_updating)  // Don't alter the value if we are in the middle of initing
                    // the control, since
     return;  // we are getting the value from the DOM and it's not user input.
@@ -311,7 +311,7 @@ void RenderLineEdit::slotTextChanged(const QString& string) {
   // when the user
   // empties a textfield, but should always force an empty textfield to use the
   // empty string.
-  QString newText = string.isNull() ? "" : string;
+  QString newText = string.isNull() ? "" : string.qstring();
   newText.replace(backslashAsCurrencySymbol(), QChar('\\'));
   element()->setValueFromRenderer(newText);
 }
@@ -517,7 +517,7 @@ RenderFileButton::RenderFileButton(HTMLInputElementImpl* element)
     : RenderFormElement(element) {
   KWQFileButton* w = new KWQFileButton(view()->part());
   connect(w, SIGNAL(textChanged(const QString&)), this,
-          SLOT(slotTextChanged(const QString&)));
+          SLOT(slotTextChanged(const DOMString&)));
   connect(w, SIGNAL(clicked()), this, SLOT(slotClicked()));
   setQWidget(w);
 }
@@ -552,8 +552,8 @@ void RenderFileButton::slotReturnPressed() {
     element()->form()->prepareSubmit();
 }
 
-void RenderFileButton::slotTextChanged(const QString& string) {
-  element()->m_value = DOMString(string);
+void RenderFileButton::slotTextChanged(const DOMString& string) {
+  element()->m_value = string;
   element()->onChange();
 }
 
