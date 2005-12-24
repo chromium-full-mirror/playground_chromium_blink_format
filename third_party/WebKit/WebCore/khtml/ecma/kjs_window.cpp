@@ -1590,7 +1590,7 @@ static void parseWindowFeatures(const QString& features,
   while (i < length) {
     // skip to first letter or number, but don't skip past the end of the string
     while (!buffer[i].isLetterOrNumber()) {
-      if (i > length)
+      if (i >= length)
         break;
       i++;
     }
