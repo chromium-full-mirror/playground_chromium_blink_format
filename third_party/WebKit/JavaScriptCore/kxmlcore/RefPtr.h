@@ -29,8 +29,6 @@ namespace KXMLCore {
 
 template <typename T>
 class PassRefPtr;
-template <typename T>
-class PassRefPtr_Ref;
 
 template <typename T>
 class RefPtr {
@@ -44,10 +42,9 @@ class RefPtr {
     if (T* ptr = m_ptr)
       ptr->ref();
   }
+  // see comment in PassRefPtr.h for why this takes const reference
   template <typename U>
-  RefPtr(PassRefPtr<U>&);
-  template <typename U>
-  RefPtr(PassRefPtr_Ref<U>);
+  RefPtr(const PassRefPtr<U>&);
 
   ~RefPtr() {
     if (T* ptr = m_ptr)
@@ -74,14 +71,11 @@ class RefPtr {
 
   RefPtr& operator=(const RefPtr&);
   RefPtr& operator=(T*);
-  RefPtr& operator=(PassRefPtr<T>&);
-  RefPtr& operator=(PassRefPtr_Ref<T>);
+  RefPtr& operator=(const PassRefPtr<T>&);
   template <typename U>
   RefPtr& operator=(const RefPtr<U>&);
   template <typename U>
-  RefPtr& operator=(PassRefPtr<U>&);
-  template <typename U>
-  RefPtr& operator=(PassRefPtr_Ref<U>);
+  RefPtr& operator=(const PassRefPtr<U>&);
 
   void swap(RefPtr&);
 
@@ -91,11 +85,7 @@ class RefPtr {
 
 template <typename T>
 template <typename U>
-inline RefPtr<T>::RefPtr(PassRefPtr_Ref<U> ref) : m_ptr(ref.m_ptr) {}
-
-template <typename T>
-template <typename U>
-inline RefPtr<T>::RefPtr(PassRefPtr<U>& o) : m_ptr(o.release()) {}
+inline RefPtr<T>::RefPtr(const PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
 template <typename T>
 RefPtr<T>& RefPtr<T>::operator=(const RefPtr<T>& o) {
@@ -131,16 +121,7 @@ inline RefPtr<T>& RefPtr<T>::operator=(T* optr) {
 }
 
 template <typename T>
-template <typename U>
-inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<U> ref) {
-  if (m_ptr)
-    m_ptr->deref();
-  m_ptr = ref.m_ptr;
-  return *this;
-}
-
-template <typename T>
-inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<T>& o) {
+inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<T>& o) {
   if (m_ptr)
     m_ptr->deref();
   m_ptr = o.release();
@@ -148,16 +129,8 @@ inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<T>& o) {
 }
 
 template <typename T>
-inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr_Ref<T> ref) {
-  if (m_ptr)
-    m_ptr->deref();
-  m_ptr = ref.m_ptr;
-  return *this;
-}
-
-template <typename T>
 template <typename U>
-inline RefPtr<T>& RefPtr<T>::operator=(PassRefPtr<U>& o) {
+inline RefPtr<T>& RefPtr<T>::operator=(const PassRefPtr<U>& o) {
   if (m_ptr)
     m_ptr->deref();
   m_ptr = o.release();

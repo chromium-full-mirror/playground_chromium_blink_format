@@ -29,15 +29,8 @@ template <typename T>
 class RefPtr;
 template <typename T>
 class PassRefPtr;
-
-// PassRefPtr_Ref class is a helper to allow proper passing of PassRefPtr by
-// value but not by const
-// reference
 template <typename T>
-struct PassRefPtr_Ref {
-  T* m_ptr;
-  explicit PassRefPtr_Ref(T* p) : m_ptr(p) {}
-};
+PassRefPtr<T> adoptRef(T* p);
 
 template <typename T>
 class PassRefPtr {
@@ -47,9 +40,14 @@ class PassRefPtr {
     if (ptr)
       ptr->ref();
   }
-  PassRefPtr(PassRefPtr& o) : m_ptr(o.release()) {}
+  // It somewhat breaks the type system to allow transfer of ownership out of
+  // a const PassRefPtr. However, it makes it much easier to work with
+  // PassRefPtr
+  // temporaries, and we don't really have a need to use real const PassRefPtrs
+  // anyway.
+  PassRefPtr(const PassRefPtr& o) : m_ptr(o.release()) {}
   template <typename U>
-  PassRefPtr(PassRefPtr<U>& o) : m_ptr(o.release()) {}
+  PassRefPtr(const PassRefPtr<U>& o) : m_ptr(o.release()) {}
 
   ~PassRefPtr() {
     if (T* ptr = m_ptr)
@@ -64,16 +62,10 @@ class PassRefPtr {
 
   T* get() const { return m_ptr; }
 
-  T* release() {
+  T* release() const {
     T* tmp = m_ptr;
     m_ptr = 0;
     return tmp;
-  }
-
-  template <typename U>
-  static PassRefPtr<T> adopt(U* ptr) {
-    PassRefPtr result((PassRefPtr_Ref<T>(ptr)));
-    return result;
   }
 
   T& operator*() const { return *m_ptr; }
@@ -87,32 +79,18 @@ class PassRefPtr {
   operator UnspecifiedBoolType() const { return m_ptr ? &PassRefPtr::get : 0; }
 
   PassRefPtr& operator=(T*);
-  PassRefPtr& operator=(PassRefPtr&);
+  PassRefPtr& operator=(const PassRefPtr&);
   template <typename U>
-  PassRefPtr& operator=(PassRefPtr<U>&);
+  PassRefPtr& operator=(const PassRefPtr<U>&);
   template <typename U>
   PassRefPtr& operator=(const RefPtr<U>&);
 
-  PassRefPtr(PassRefPtr_Ref<T> ref) : m_ptr(ref.m_ptr) {}
-
-  PassRefPtr& operator=(PassRefPtr_Ref<T> ref) {
-    if (m_ptr)
-      m_ptr->deref();
-    m_ptr = ref.m_ptr;
-    return *this;
-  }
-
-  template <typename U>
-  operator PassRefPtr_Ref<U>() {
-    return PassRefPtr_Ref<U>(release());
-  }
-  template <typename U>
-  operator PassRefPtr<U>() {
-    return PassRefPtr_Ref<U>(release());
-  }
+  friend PassRefPtr adoptRef<T>(T*);
 
  private:
-  T* m_ptr;
+  // adopting constructor
+  PassRefPtr(T* ptr, bool) : m_ptr(ptr) {}
+  mutable T* m_ptr;
 };
 
 template <typename T>
@@ -138,7 +116,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
 }
 
 template <typename T>
-inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<T>& ref) {
   T* optr = ref.release();
   if (T* ptr = m_ptr)
     ptr->deref();
@@ -148,7 +126,7 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<T>& ref) {
 
 template <typename T>
 template <typename U>
-inline PassRefPtr<T>& PassRefPtr<T>::operator=(PassRefPtr<U>& ref) {
+inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<U>& ref) {
   T* optr = ref.release();
   if (T* ptr = m_ptr)
     ptr->deref();
@@ -206,31 +184,26 @@ inline bool operator!=(T* a, const PassRefPtr<U>& b) {
   return a != b.get();
 }
 
+template <typename T>
+inline PassRefPtr<T> adoptRef(T* p) {
+  return PassRefPtr<T>(p, true);
+}
+
 template <typename T, typename U>
 inline PassRefPtr<T> static_pointer_cast(const PassRefPtr<U>& p) {
-  return PassRefPtr<T>::adopt(static_cast<T*>(p.release()));
+  return adoptRef(static_cast<T*>(p.release()));
 }
 
 template <typename T, typename U>
 inline PassRefPtr<T> const_pointer_cast(const PassRefPtr<U>& p) {
-  return PassRefPtr<T>::adopt(const_cast<T*>(p.release()));
-}
-
-template <typename T>
-inline PassRefPtr<T> pass(T* ptr) {
-  return PassRefPtr<T>(ptr);
-}
-
-template <typename T>
-inline PassRefPtr<T> pass(const RefPtr<T>& ptr) {
-  return PassRefPtr<T>(ptr);
+  return adoptRef(const_cast<T*>(p.release()));
 }
 
 }  // namespace KXMLCore
 
 using KXMLCore::PassRefPtr;
+using KXMLCore::adoptRef;
 using KXMLCore::static_pointer_cast;
 using KXMLCore::const_pointer_cast;
-using KXMLCore::pass;
 
 #endif  // KXMLCORE_PASS_REF_PTR_H
