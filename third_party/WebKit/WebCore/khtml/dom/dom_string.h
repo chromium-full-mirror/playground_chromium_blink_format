@@ -74,7 +74,8 @@ class DOMString {
 
   int find(const QChar c, int start = 0) const;
   DOMString& replace(QChar a, QChar b) {
-    m_impl = m_impl->replace(a, b);
+    if (m_impl)
+      m_impl = m_impl->replace(a, b);
     return *this;
   }
 
