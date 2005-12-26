@@ -33,6 +33,7 @@
 @protocol WebOpenPanelResultListener;
 
 @interface WebBridge : WebCoreBridge<WebCoreBridge> {
+  WebBridge* _parentBridge;
   WebFrame* _frame;
   WebCoreKeyboardUIMode _keyboardUIMode;
   BOOL _keyboardUIModeAccessed;

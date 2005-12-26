@@ -203,6 +203,7 @@ typedef enum {
 - (KWQKHTMLPart*)part;
 
 - (void)setParent:(WebCoreBridge*)parent;
+- (WebCoreBridge*)parent;
 
 - (void)provisionalLoadStarted;
 
