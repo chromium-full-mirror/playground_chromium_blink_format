@@ -21,36 +21,34 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef RENDERTEXT_H
-#define RENDERTEXT_H
 
-#include "dom/dom_string.h"
-#include "xml/dom_stringimpl.h"
-#include "xml/dom_textimpl.h"
-#include "rendering/render_object.h"
-#include "rendering/render_flow.h"
+#ifndef KHTML_RENDERTEXT_H
+#define KHTML_RENDERTEXT_H
 
-#include <qptrvector.h>
-#include <assert.h>
 #include "KWQKHTMLPart.h"
+#include "rendering/render_line.h"
+#include "xml/dom_textimpl.h"
+#include <assert.h>
+#include <kxmlcore/PassRefPtr.h>
 
 class QPainter;
 class QFontMetrics;
 
 namespace DOM {
-class Position;
+class DOMString;
+class DOMStringImpl;
 class DocumentMarker;
+class Position;
 };
 
 // Define a constant for soft hyphen's unicode value.
-#define SOFT_HYPHEN 173
+const unsigned short SOFT_HYPHEN = 173;
 
 const int cNoTruncation = -1;
 const int cFullTruncation = -2;
 
 namespace khtml {
 class RenderText;
-class RenderStyle;
 
 class InlineTextBox : public InlineRunBox {
  public:
@@ -188,11 +186,10 @@ class RenderText : public RenderObject {
   friend class InlineTextBox;
 
  public:
-  RenderText(DOM::NodeImpl* node, DOM::DOMStringImpl* _str);
-  virtual ~RenderText();
+  RenderText(DOM::NodeImpl*, DOM::DOMStringImpl*);
 
   virtual bool isTextFragment() const;
-  virtual RefPtr<DOM::DOMStringImpl> originalString() const;
+  virtual PassRefPtr<DOM::DOMStringImpl> originalString() const;
 
   virtual const char* renderName() const { return "RenderText"; }
 
@@ -204,8 +201,8 @@ class RenderText : public RenderObject {
   void deleteTextBoxes();
   virtual void destroy();
 
-  DOM::DOMString data() const { return str; }
-  DOM::DOMStringImpl* string() const { return str; }
+  DOM::DOMString data() const { return str.get(); }
+  DOM::DOMStringImpl* string() const { return str.get(); }
 
   virtual InlineBox* createInlineBox(bool, bool, bool isOnlyRun = false);
   virtual void dirtyLineBoxes(bool fullLayout, bool isRootInlineBox = false);
@@ -286,8 +283,8 @@ class RenderText : public RenderObject {
   virtual const QFont& font();
   virtual short verticalPositionHint(bool firstLine) const;
 
-  void setText(DOM::DOMStringImpl* text, bool force = false);
-  void setTextWithOffset(DOM::DOMStringImpl* text,
+  void setText(DOM::DOMStringImpl*, bool force = false);
+  void setTextWithOffset(DOM::DOMStringImpl*,
                          uint offset,
                          uint len,
                          bool force = false);
@@ -341,7 +338,7 @@ class RenderText : public RenderObject {
   InlineTextBox* findNextInlineTextBox(int offset, int& pos) const;
 
  protected:  // members
-  DOM::DOMStringImpl* str;
+  RefPtr<DOM::DOMStringImpl> str;
 
   InlineTextBox* m_firstTextBox;
   InlineTextBox* m_lastTextBox;
@@ -386,25 +383,26 @@ class RenderText : public RenderObject {
 // the original unaltered string from our corresponding DOM node.
 class RenderTextFragment : public RenderText {
  public:
-  RenderTextFragment(DOM::NodeImpl* _node,
-                     DOM::DOMStringImpl* _str,
+  RenderTextFragment(DOM::NodeImpl*,
+                     DOM::DOMStringImpl*,
                      int startOffset,
                      int length);
-  RenderTextFragment(DOM::NodeImpl* _node, DOM::DOMStringImpl* _str);
-  ~RenderTextFragment();
+  RenderTextFragment(DOM::NodeImpl*, DOM::DOMStringImpl*);
 
   virtual bool isTextFragment() const;
 
   uint start() const { return m_start; }
   uint end() const { return m_end; }
 
-  DOM::DOMStringImpl* contentString() const { return m_generatedContentStr; }
-  virtual RefPtr<DOM::DOMStringImpl> originalString() const;
+  DOM::DOMStringImpl* contentString() const {
+    return m_generatedContentStr.get();
+  }
+  virtual PassRefPtr<DOM::DOMStringImpl> originalString() const;
 
  private:
   uint m_start;
   uint m_end;
-  DOM::DOMStringImpl* m_generatedContentStr;
+  RefPtr<DOM::DOMStringImpl> m_generatedContentStr;
 };
 
 inline RenderText* InlineTextBox::textObject() const {

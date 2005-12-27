@@ -144,10 +144,8 @@ void Token::addAttribute(DocumentImpl* doc,
   AttributeImpl* a = 0;
   if (!attrName.isEmpty() && attrName != "/") {
     a = new MappedAttributeImpl(attrName, v);
-    if (!attrs) {
+    if (!attrs)
       attrs = new NamedMappedAttrMapImpl(0);
-      attrs->ref();
-    }
     attrs->insertAttribute(a);
   }
 }
@@ -1732,7 +1730,6 @@ void HTMLTokenizer::processToken() {
 
 #endif
     currToken.text = new DOMStringImpl(buffer, dest - buffer);
-    currToken.text->ref();
     if (currToken.tagName != commentAtom)
       currToken.tagName = textAtom;
   } else if (currToken.tagName == nullAtom) {

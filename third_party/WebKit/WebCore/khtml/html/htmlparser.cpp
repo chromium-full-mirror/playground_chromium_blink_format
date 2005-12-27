@@ -217,7 +217,7 @@ void HTMLParser::parseToken(Token* t) {
   // set attributes
   if (n->isHTMLElement()) {
     HTMLElementImpl* e = static_cast<HTMLElementImpl*>(n);
-    e->setAttributeMap(t->attrs);
+    e->setAttributeMap(t->attrs.get());
 
     // take care of optional close tags
     if (e->endTagRequirement() == TagStatusOptional)
@@ -617,13 +617,13 @@ typedef HashMap<DOMStringImpl*,
     FunctionMap;
 
 bool HTMLParser::textCreateErrorCheck(Token* t, NodeImpl*& result) {
-  result = new TextImpl(document, t->text);
+  result = new TextImpl(document, t->text.get());
   return false;
 }
 
 bool HTMLParser::commentCreateErrorCheck(Token* t, NodeImpl*& result) {
   if (includesCommentsInDOM)
-    result = new CommentImpl(document, t->text);
+    result = new CommentImpl(document, t->text.get());
   return false;
 }
 
@@ -1352,8 +1352,7 @@ void HTMLParser::createHead() {
 NodeImpl* HTMLParser::handleIsindex(Token* t) {
   NodeImpl* n = new HTMLDivElementImpl(document);
 
-  NamedMappedAttrMapImpl* attrs = t->attrs;
-  t->attrs = 0;
+  NamedMappedAttrMapImpl* attrs = t->attrs.get();
 
   RefPtr<HTMLIsIndexElementImpl> isIndex =
       new HTMLIsIndexElementImpl(document, form);
@@ -1364,7 +1363,7 @@ NodeImpl* HTMLParser::handleIsindex(Token* t) {
   if (attrs) {
     if (AttributeImpl* a = attrs->getAttributeItem(promptAttr))
       text = a->value().domString() + " ";
-    attrs->deref();
+    t->attrs = 0;
   }
 
   n->addChild(new HTMLHRElementImpl(document));
