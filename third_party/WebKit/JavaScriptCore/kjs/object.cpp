@@ -395,7 +395,6 @@ void JSObject::defineSetter(ExecState* exec,
     gs = static_cast<GetterSetterImp*>(o);
   } else {
     gs = new GetterSetterImp;
-    putDirect(propertyName, gs);
     putDirect(propertyName, gs, GetterSetter);
   }
 
