@@ -60,7 +60,9 @@ class ArrayProtoFunc : public InternalFunctionImp {
     Every,
     ForEach,
     Some,
-    IndexOf
+    IndexOf,
+    Filter,
+    Map
   };
 
  private:
