@@ -118,7 +118,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void end();
 
   void reset();
-  void processToken();
+  DOM::NodeImpl* processToken();
 
   State processListing(TokenizerString, State);
   State parseComment(TokenizerString&, State);
@@ -354,6 +354,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   // finished executing
   int m_executingScript;
   QPtrQueue<CachedScript> pendingScripts;
+  RefPtr<DOM::NodeImpl> scriptNode;
   // you can pause the tokenizer if you need to display a dialog or something
   bool onHold;
 

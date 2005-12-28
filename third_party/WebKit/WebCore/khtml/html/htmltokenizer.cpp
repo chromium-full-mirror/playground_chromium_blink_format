@@ -43,6 +43,7 @@
 #include "khtmlview.h"
 #include "khtml_part.h"
 #include "xml/dom_docimpl.h"
+#include "xml/EventNames.h"
 #include "css/csshelper.h"
 #include "ecma/kjs_proxy.h"
 #include <kcharsets.h>
@@ -53,6 +54,7 @@
 #include <stdlib.h>
 
 using namespace DOM::HTMLNames;
+using namespace DOM::EventNames;
 
 using DOM::AtomicString;
 using DOM::AttributeImpl;
@@ -66,6 +68,7 @@ using DOM::textAtom;
 using DOM::QualifiedName;
 using DOM::MappedAttributeImpl;
 using DOM::NamedMappedAttrMapImpl;
+using DOM::NodeImpl;
 
 #include "kentities.c"
 
@@ -402,6 +405,8 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
       if ((cs = parser->doc()->docLoader()->requestScript(scriptSrc,
                                                           scriptSrcCharset)))
         pendingScripts.enqueue(cs);
+      else
+        scriptNode = 0;
     }
     scriptSrc = QString::null;
   } else {
@@ -410,6 +415,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
     kdDebug(6036) << QString(scriptCode, scriptCodeSize) << endl;
     kdDebug(6036) << "---END SCRIPT---" << endl;
 #endif
+    scriptNode = 0;
     // Parse scriptCode containing <script> info
     doScriptExec = true;
   }
@@ -1308,12 +1314,14 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(TokenizerString& src,
           }
         }
 
-        processToken();
+        NodeImpl* n = processToken();
 
         if (tagName == preTag) {
           state.setDiscardLF(
               true);  // Discard the first LF after we open a pre.
         } else if (tagName == scriptTag) {
+          assert(!scriptNode);
+          scriptNode = n;
           if (beginTag) {
             searchStopper = scriptEnd;
             searchStopperLen = 8;
@@ -1715,7 +1723,7 @@ void HTMLTokenizer::finish() {
     end();  // this actually causes us to be deleted
 }
 
-void HTMLTokenizer::processToken() {
+NodeImpl* HTMLTokenizer::processToken() {
   KJSProxyImpl* jsProxy = (view && view->part()) ? view->part()->jScript() : 0L;
   if (jsProxy)
     jsProxy->setEventHandlerLineno(tagStartLineno);
@@ -1736,7 +1744,7 @@ void HTMLTokenizer::processToken() {
     currToken.reset();
     if (jsProxy)
       jsProxy->setEventHandlerLineno(lineno + src.lineCount());
-    return;
+    return 0;
   }
 
   dest = buffer;
@@ -1763,15 +1771,17 @@ void HTMLTokenizer::processToken() {
   }
   kdDebug(6036) << endl;
 #endif
+  NodeImpl* n = 0;
 
   if (!m_parserStopped) {
     // pass the token over to the parser, the parser DOES NOT delete the token
-    parser->parseToken(&currToken);
+    n = parser->parseToken(&currToken);
   }
 
   currToken.reset();
   if (jsProxy)
     jsProxy->setEventHandlerLineno(0);
+  return n;
 }
 
 HTMLTokenizer::~HTMLTokenizer() {
@@ -1820,7 +1830,10 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     // make sure we forget about the script before we execute the new one
     // infinite recursion might happen otherwise
     QString cachedScriptUrl(cs->url().qstring());
+    bool errorOccurred = cs->errorOccurred();
     cs->deref(this);
+    RefPtr<NodeImpl> n = scriptNode;
+    scriptNode = 0;
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
     if (!parser->doc()->ownerElement())
@@ -1828,7 +1841,13 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
              parser->doc()->elapsedTime());
 #endif
 
-    m_state = scriptExecution(scriptSource.qstring(), m_state, cachedScriptUrl);
+    if (errorOccurred)
+      n->dispatchHTMLEvent(errorEvent, false, false);
+    else {
+      m_state =
+          scriptExecution(scriptSource.qstring(), m_state, cachedScriptUrl);
+      n->dispatchHTMLEvent(loadEvent, false, false);
+    }
 
     // The state of pendingScripts.isEmpty() can change inside the
     // scriptExecution()

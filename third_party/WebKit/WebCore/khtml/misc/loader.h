@@ -304,11 +304,14 @@ class CachedScript : public CachedObject {
 
   virtual bool schedule() const { return false; }
 
+  bool errorOccurred() const { return m_errorOccurred; }
+
   void checkNotify();
 
  protected:
   DOM::DOMString m_script;
   QTextCodec* m_codec;
+  bool m_errorOccurred;
 };
 
 class ImageSource;
