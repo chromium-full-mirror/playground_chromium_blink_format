@@ -885,6 +885,14 @@ class HTMLSelectCollection : public HTMLCollection {
   RefPtr<DOM::HTMLSelectElementImpl> m_element;
 };
 
+class HTMLAllCollection : public HTMLCollection {
+ public:
+  HTMLAllCollection(ExecState* exec, DOM::HTMLCollectionImpl* c)
+      : HTMLCollection(exec, c) {}
+  virtual bool toBoolean(ExecState*) const { return false; }
+  virtual JSValue* toPrimitive(ExecState* exec, Type preferredType) const;
+};
+
 ////////////////////// Option Object ////////////////////////
 
 class OptionConstructorImp : public JSObject {
@@ -1152,6 +1160,7 @@ JSValue* getHTMLCollection(ExecState* exec, DOM::HTMLCollectionImpl* c);
 JSValue* getSelectHTMLCollection(ExecState* exec,
                                  DOM::HTMLCollectionImpl* c,
                                  DOM::HTMLSelectElementImpl* e);
+JSValue* getAllHTMLCollection(ExecState* exec, DOM::HTMLCollectionImpl* c);
 
 }  // namespace
 
