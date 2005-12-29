@@ -38,6 +38,7 @@ class StringInstance : public JSObject {
                    JSValue* value,
                    int attr = None);
   virtual bool deleteProperty(ExecState* exec, const Identifier& propertyName);
+  virtual ReferenceList propList(ExecState* exec, bool recursive);
 
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
