@@ -167,7 +167,7 @@ RegExpImp::~RegExpImp() {
 
 // ------------------------------ RegExpObjectImp ------------------------------
 
-const ClassInfo RegExpObjectImp::info = {"RegExp", &InternalFunctionImp::info,
+const ClassInfo RegExpObjectImp::info = {"Function", &InternalFunctionImp::info,
                                          &RegExpTable, 0};
 
 /* Source for regexp_object.lut.h

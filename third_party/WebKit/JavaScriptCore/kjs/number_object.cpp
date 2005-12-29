@@ -360,7 +360,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
 
 // ------------------------------ NumberObjectImp ------------------------------
 
-const ClassInfo NumberObjectImp::info = {"Number", &InternalFunctionImp::info,
+const ClassInfo NumberObjectImp::info = {"Function", &InternalFunctionImp::info,
                                          &numberTable, 0};
 
 /* Source for number_object.lut.h
