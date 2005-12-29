@@ -26,6 +26,7 @@
 #define _NODES_H_
 
 #include <kxmlcore/RefPtr.h>
+#include <kxmlcore/ListRefPtr.h>
 
 #include "internal.h"
 
@@ -250,17 +251,18 @@ class GroupNode : public Node {
 class ElementNode : public Node {
  public:
   // list pointer is tail of a circular list, cracked in the ArrayNode ctor
-  ElementNode(int e, Node* n) : list(this), elision(e), node(n) {}
+  ElementNode(int e, Node* n) : next(this), elision(e), node(n) {}
   ElementNode(ElementNode* l, int e, Node* n)
-      : list(l->list), elision(e), node(n) {
-    l->list = this;
+      : next(l->next), elision(e), node(n) {
+    l->next = this;
   }
   JSValue* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<ElementNode> releaseNext() { return next.release(); }
 
  private:
   friend class ArrayNode;
-  RefPtr<ElementNode> list;
+  ListRefPtr<ElementNode> next;
   int elision;
   RefPtr<Node> node;
 };
@@ -268,12 +270,12 @@ class ElementNode : public Node {
 class ArrayNode : public Node {
  public:
   ArrayNode(int e) : element(0), elision(e), opt(true) {}
-  ArrayNode(ElementNode* ele) : element(ele->list), elision(0), opt(false) {
-    ele->list = 0;
+  ArrayNode(ElementNode* ele) : element(ele->next), elision(0), opt(false) {
+    ele->next = 0;
   }
   ArrayNode(int eli, ElementNode* ele)
-      : element(ele->list), elision(eli), opt(true) {
-    ele->list = 0;
+      : element(ele->next), elision(eli), opt(true) {
+    ele->next = 0;
   }
   JSValue* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
@@ -315,24 +317,25 @@ class PropertyListNode : public Node {
  public:
   // list pointer is tail of a circular list, cracked in the ObjectLiteralNode
   // ctor
-  PropertyListNode(PropertyNode* n) : node(n), list(this) {}
+  PropertyListNode(PropertyNode* n) : node(n), next(this) {}
   PropertyListNode(PropertyNode* n, PropertyListNode* l)
-      : node(n), list(l->list) {
-    l->list = this;
+      : node(n), next(l->next) {
+    l->next = this;
   }
   JSValue* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<PropertyListNode> releaseNext() { return next.release(); }
 
  private:
   friend class ObjectLiteralNode;
   RefPtr<PropertyNode> node;
-  RefPtr<PropertyListNode> list;
+  ListRefPtr<PropertyListNode> next;
 };
 
 class ObjectLiteralNode : public Node {
  public:
   ObjectLiteralNode() : list(0) {}
-  ObjectLiteralNode(PropertyListNode* l) : list(l->list) { l->list = 0; }
+  ObjectLiteralNode(PropertyListNode* l) : list(l->next) { l->next = 0; }
   JSValue* evaluate(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
@@ -375,24 +378,25 @@ class DotAccessorNode : public Node {
 class ArgumentListNode : public Node {
  public:
   // list pointer is tail of a circular list, cracked in the ArgumentsNode ctor
-  ArgumentListNode(Node* e) : list(this), expr(e) {}
-  ArgumentListNode(ArgumentListNode* l, Node* e) : list(l->list), expr(e) {
-    l->list = this;
+  ArgumentListNode(Node* e) : next(this), expr(e) {}
+  ArgumentListNode(ArgumentListNode* l, Node* e) : next(l->next), expr(e) {
+    l->next = this;
   }
   JSValue* evaluate(ExecState* exec);
   List evaluateList(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<ArgumentListNode> releaseNext() { return next.release(); }
 
  private:
   friend class ArgumentsNode;
-  RefPtr<ArgumentListNode> list;
+  ListRefPtr<ArgumentListNode> next;
   RefPtr<Node> expr;
 };
 
 class ArgumentsNode : public Node {
  public:
   ArgumentsNode() : list(0) {}
-  ArgumentsNode(ArgumentListNode* l) : list(l->list) { l->list = 0; }
+  ArgumentsNode(ArgumentListNode* l) : list(l->next) { l->next = 0; }
   JSValue* evaluate(ExecState* exec);
   List evaluateList(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
@@ -828,11 +832,12 @@ class StatListNode : public StatementNode {
   virtual Completion execute(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<StatListNode> releaseNext() { return next.release(); }
 
  private:
   friend class CaseClauseNode;
   RefPtr<StatementNode> statement;
-  RefPtr<StatListNode> list;
+  ListRefPtr<StatListNode> next;
 };
 
 class AssignExprNode : public Node {
@@ -863,30 +868,31 @@ class VarDeclListNode : public Node {
  public:
   // list pointer is tail of a circular list, cracked in the
   // ForNode/VarStatementNode ctor
-  VarDeclListNode(VarDeclNode* v) : list(this), var(v) {}
-  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : list(l->list), var(v) {
-    l->list = this;
+  VarDeclListNode(VarDeclNode* v) : next(this), var(v) {}
+  VarDeclListNode(VarDeclListNode* l, VarDeclNode* v) : next(l->next), var(v) {
+    l->next = this;
   }
   JSValue* evaluate(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<VarDeclListNode> releaseNext() { return next.release(); }
 
  private:
   friend class ForNode;
   friend class VarStatementNode;
-  RefPtr<VarDeclListNode> list;
+  ListRefPtr<VarDeclListNode> next;
   RefPtr<VarDeclNode> var;
 };
 
 class VarStatementNode : public StatementNode {
  public:
-  VarStatementNode(VarDeclListNode* l) : list(l->list) { l->list = 0; }
+  VarStatementNode(VarDeclListNode* l) : next(l->next) { l->next = 0; }
   virtual Completion execute(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
 
  private:
-  RefPtr<VarDeclListNode> list;
+  RefPtr<VarDeclListNode> next;
 };
 
 class BlockNode : public StatementNode {
@@ -960,8 +966,8 @@ class ForNode : public StatementNode {
   ForNode(Node* e1, Node* e2, Node* e3, StatementNode* s)
       : expr1(e1), expr2(e2), expr3(e3), statement(s) {}
   ForNode(VarDeclListNode* e1, Node* e2, Node* e3, StatementNode* s)
-      : expr1(e1->list), expr2(e2), expr3(e3), statement(s) {
-    e1->list = 0;
+      : expr1(e1->next), expr2(e2), expr3(e3), statement(s) {
+    e1->next = 0;
   }
   virtual Completion execute(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
@@ -1037,9 +1043,9 @@ class WithNode : public StatementNode {
 
 class CaseClauseNode : public Node {
  public:
-  CaseClauseNode(Node* e) : expr(e), list(0) {}
-  CaseClauseNode(Node* e, StatListNode* l) : expr(e), list(l->list) {
-    l->list = 0;
+  CaseClauseNode(Node* e) : expr(e), next(0) {}
+  CaseClauseNode(Node* e, StatListNode* l) : expr(e), next(l->next) {
+    l->next = 0;
   }
   JSValue* evaluate(ExecState* exec);
   Completion evalStatements(ExecState* exec);
@@ -1048,26 +1054,28 @@ class CaseClauseNode : public Node {
 
  private:
   RefPtr<Node> expr;
-  RefPtr<StatListNode> list;
+  RefPtr<StatListNode> next;
 };
 
 class ClauseListNode : public Node {
  public:
   // list pointer is tail of a circular list, cracked in the CaseBlockNode ctor
-  ClauseListNode(CaseClauseNode* c) : cl(c), nx(this) {}
-  ClauseListNode(ClauseListNode* n, CaseClauseNode* c) : cl(c), nx(n->nx) {
-    n->nx = this;
+  ClauseListNode(CaseClauseNode* c) : clause(c), next(this) {}
+  ClauseListNode(ClauseListNode* n, CaseClauseNode* c)
+      : clause(c), next(n->next) {
+    n->next = this;
   }
   JSValue* evaluate(ExecState* exec);
-  CaseClauseNode* clause() const { return cl.get(); }
-  ClauseListNode* next() const { return nx.get(); }
+  CaseClauseNode* getClause() const { return clause.get(); }
+  ClauseListNode* getNext() const { return next.get(); }
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<ClauseListNode> releaseNext() { return next.release(); }
 
  private:
   friend class CaseBlockNode;
-  RefPtr<CaseClauseNode> cl;
-  RefPtr<ClauseListNode> nx;
+  RefPtr<CaseClauseNode> clause;
+  ListRefPtr<ClauseListNode> next;
 };
 
 class CaseBlockNode : public Node {
@@ -1141,20 +1149,21 @@ class ParameterNode : public Node {
   // list pointer is tail of a circular list, cracked in the
   // FuncDeclNode/FuncExprNode ctor
   ParameterNode(const Identifier& i) : id(i), next(this) {}
-  ParameterNode(ParameterNode* list, const Identifier& i)
-      : id(i), next(list->next) {
-    list->next = this;
+  ParameterNode(ParameterNode* next, const Identifier& i)
+      : id(i), next(next->next) {
+    next->next = this;
   }
   JSValue* evaluate(ExecState* exec);
   Identifier ident() { return id; }
   ParameterNode* nextParam() { return next.get(); }
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<ParameterNode> releaseNext() { return next.release(); }
 
  private:
   friend class FuncDeclNode;
   friend class FuncExprNode;
   Identifier id;
-  RefPtr<ParameterNode> next;
+  ListRefPtr<ParameterNode> next;
 };
 
 // inherited by ProgramNode
@@ -1203,6 +1212,7 @@ class FuncDeclNode : public StatementNode {
 // A linked list of source element nodes
 class SourceElementsNode : public StatementNode {
  public:
+  static int count;
   // list pointer is tail of a circular list, cracked in the BlockNode (or
   // subclass) ctor
   SourceElementsNode(StatementNode* s1);
@@ -1212,11 +1222,12 @@ class SourceElementsNode : public StatementNode {
   void processFuncDecl(ExecState* exec);
   virtual void processVarDecls(ExecState* exec);
   virtual void streamTo(SourceStream& s) const;
+  PassRefPtr<SourceElementsNode> releaseNext() { return next.release(); }
 
  private:
   friend class BlockNode;
-  RefPtr<StatementNode> element;        // 'this' element
-  RefPtr<SourceElementsNode> elements;  // pointer to next
+  RefPtr<StatementNode> node;
+  ListRefPtr<SourceElementsNode> next;
 };
 
 class ProgramNode : public FunctionBodyNode {
