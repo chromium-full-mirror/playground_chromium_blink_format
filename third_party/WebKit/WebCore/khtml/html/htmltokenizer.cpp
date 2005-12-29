@@ -818,7 +818,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(TokenizerString& src,
           state.setEntityState(SearchSemicolon);
         if (state.entityState() == SearchSemicolon) {
           if (cBufferPos > 1) {
-            const entity* e = findEntity(cBuffer, cBufferPos);
+            const Entity* e = findEntity(cBuffer, cBufferPos);
             if (e)
               EntityUnicodeValue = e->code;
 
@@ -830,10 +830,6 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(TokenizerString& src,
           break;
       }
       case SearchSemicolon:
-
-        // kdDebug( 6036 ) << "ENTITY " << EntityUnicodeValue << ", " << res <<
-        // endl;
-
         // Don't allow surrogate code points, or values that are more than 21
         // bits.
         if ((EntityUnicodeValue > 0 && EntityUnicodeValue < 0xD800) ||
@@ -853,11 +849,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(TokenizerString& src,
             src.push(c1);
             src.push(c2);
           }
-
         } else {
-#ifdef TOKEN_DEBUG
-          kdDebug(6036) << "unknown entity!" << endl;
-#endif
           checkBuffer(10);
           // ignore the sequence, add it to the buffer as plaintext
           *dest++ = '&';
