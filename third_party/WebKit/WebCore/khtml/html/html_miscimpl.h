@@ -103,6 +103,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
 
   struct CollectionInfo {
     CollectionInfo();
+    ~CollectionInfo();
     void reset();
     unsigned int version;
     NodeImpl* current;
