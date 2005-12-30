@@ -282,17 +282,20 @@ static xsltStylesheetPtr xsltStylesheetPointer(
   return cachedStylesheet->compileStyleSheet();
 }
 
-static inline xmlDocPtr xmlDocPtrFromNode(NodeImpl* sourceNode) {
+static inline xmlDocPtr xmlDocPtrFromNode(NodeImpl* sourceNode,
+                                          bool& shouldDelete) {
   RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   bool sourceIsDocument = (sourceNode == ownerDocument.get());
 
   xmlDocPtr sourceDoc = 0;
   if (sourceIsDocument)
     sourceDoc = (xmlDocPtr)ownerDocument->transformSource();
-  if (!sourceDoc)
+  if (!sourceDoc) {
     sourceDoc = (xmlDocPtr)xmlDocPtrForString(
         createMarkup(sourceNode),
         sourceIsDocument ? ownerDocument->URL() : QString());
+    shouldDelete = (sourceDoc != 0);
+  }
   return sourceDoc;
 }
 
@@ -331,23 +334,27 @@ bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
   }
   cachedStylesheet->clearDocuments();
 
-  xmlDocPtr sourceDoc = xmlDocPtrFromNode(sourceNode);
-  const char** params = xsltParamArrayFromParameterMap(m_parameters);
-  xmlDocPtr resultDoc = xsltApplyStylesheet(sheet, sourceDoc, params);
-  freeXsltParamArray(params);
+  bool success = false;
+  bool shouldFreeSourceDoc = false;
+  if (xmlDocPtr sourceDoc =
+          xmlDocPtrFromNode(sourceNode, shouldFreeSourceDoc)) {
+    const char** params = xsltParamArrayFromParameterMap(m_parameters);
+    xmlDocPtr resultDoc = xsltApplyStylesheet(sheet, sourceDoc, params);
+    freeXsltParamArray(params);
+    if (shouldFreeSourceDoc)
+      xmlFreeDoc(sourceDoc);
+
+    if (success = saveResultToString(resultDoc, sheet, resultString)) {
+      mimeType = resultMIMEType(resultDoc, sheet);
+      resultEncoding = (char*)resultDoc->encoding;
+    }
+    xmlFreeDoc(resultDoc);
+  }
 
   setXSLTLoadCallBack(0, 0, 0);
-
-  if (!saveResultToString(resultDoc, sheet, resultString))
-    return false;
-
-  mimeType = resultMIMEType(resultDoc, sheet);
-  resultEncoding = (char*)resultDoc->encoding;
-
   xsltFreeStylesheet(sheet);
-  xmlFreeDoc(resultDoc);
 
-  return true;
+  return success;
 }
 
 RefPtr<DocumentImpl> XSLTProcessorImpl::transformToDocument(
