@@ -525,7 +525,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 
 @protocol WebCoreBridge
 
-- (NSArray*)childFrames;  // WebCoreBridge objects
 - (WebCoreBridge*)mainFrame;
 - (WebCoreBridge*)findFrameNamed:(NSString*)name;
 /* Creates a name for an frame unnamed in the HTML.  It should produce
