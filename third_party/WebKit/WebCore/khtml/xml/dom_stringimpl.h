@@ -94,6 +94,17 @@ class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
   DOMStringImpl* upper() const;
   DOMStringImpl* capitalize() const;
 
+  int find(const char* chs, int index = 0, bool caseSensitive = true) const;
+  int find(QChar c, int index = 0) const;
+  int find(const DOMStringImpl* str,
+           int index,
+           bool caseSensitive = true) const;
+
+  bool startsWith(const DOMStringImpl* s, bool caseSensitive = true) const {
+    return (find(s, 0, caseSensitive) == 0);
+  }
+  bool endsWith(const DOMStringImpl* s, bool caseSensitive = true) const;
+
   // This modifies the string in place if there is only one ref, makes a new
   // string otherwise.
   DOMStringImpl* replace(QChar, QChar);

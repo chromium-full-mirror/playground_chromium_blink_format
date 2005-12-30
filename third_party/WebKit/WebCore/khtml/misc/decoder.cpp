@@ -505,8 +505,6 @@ QString Decoder::decode(const char* data, int len) {
             withinTitle = !end;
 
           if (!end && tag == metaTag) {
-            // found a meta tag...
-            // ptr += 5;
             const char* end = ptr;
             while (*end != '>' && *end != '\0')
               end++;
@@ -515,8 +513,6 @@ QString Decoder::decode(const char* data, int len) {
             QCString str(ptr, (end - ptr) + 1);
             str = str.lower();
             int pos = 0;
-            // if( (pos = str.find("http-equiv", pos)) == -1) break;
-            // if( (pos = str.find("content-type", pos)) == -1) break;
             while (pos < (int)str.length()) {
               if ((pos = str.find("charset", pos, false)) == -1)
                 break;
