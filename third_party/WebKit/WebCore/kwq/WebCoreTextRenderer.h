@@ -98,6 +98,9 @@ extern void WebCoreInitializeEmptyTextGeometry(WebCoreTextGeometry* geometry);
 - (void)drawRun:(const WebCoreTextRun*)run
           style:(const WebCoreTextStyle*)style
        geometry:(const WebCoreTextGeometry*)geometry;
+- (NSRect)selectionRectForRun:(const WebCoreTextRun*)run
+                        style:(const WebCoreTextStyle*)style
+                     geometry:(const WebCoreTextGeometry*)geometry;
 - (void)drawHighlightForRun:(const WebCoreTextRun*)run
                       style:(const WebCoreTextStyle*)style
                    geometry:(const WebCoreTextGeometry*)geometry;
