@@ -25,8 +25,8 @@
 
 #include "html_elementimpl.h"
 #include "misc/shared.h"
-#include <qdict.h>
 #include <qptrvector.h>
+#include <kxmlcore/HashMap.h>
 
 namespace DOM {
 
@@ -97,7 +97,7 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
   // In case of multiple items named the same way
   virtual NodeImpl* nextNamedItem(const DOMString& name) const;
 
-  QValueList<RefPtr<NodeImpl>> namedItems(const DOMString& name) const;
+  QValueList<RefPtr<NodeImpl>> namedItems(const AtomicString& name) const;
 
   NodeImpl* base() { return m_base.get(); }
 
@@ -108,10 +108,12 @@ class HTMLCollectionImpl : public khtml::Shared<HTMLCollectionImpl> {
     NodeImpl* current;
     unsigned int position;
     unsigned int length;
-    bool haslength;
     int elementsArrayPosition;
-    QDict<QPtrVector<NodeImpl>> idCache;
-    QDict<QPtrVector<NodeImpl>> nameCache;
+    HashMap<DOMStringImpl*, QPtrVector<NodeImpl>*, PointerHash<DOMStringImpl*>>
+        idCache;
+    HashMap<DOMStringImpl*, QPtrVector<NodeImpl>*, PointerHash<DOMStringImpl*>>
+        nameCache;
+    bool haslength;
     bool hasNameCache;
   };
 
