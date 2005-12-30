@@ -67,7 +67,7 @@ namespace khtml {
 static inline bool doesHTMLForbidEndTag(const NodeImpl* node);
 static inline bool shouldSelfClose(const NodeImpl* node);
 
-static QString escapeHTML(const QString& in) {
+static QString escapeTextForMarkup(const QString& in) {
   QString s = "";
 
   unsigned len = in.length();
@@ -179,8 +179,9 @@ static QString startMarkup(const NodeImpl* node,
           return stringValueForRange(node, range).qstring();
       }
       QString markup =
-          annotate ? escapeHTML(renderedText(node, range))
-                   : escapeHTML(stringValueForRange(node, range).qstring());
+          annotate
+              ? escapeTextForMarkup(renderedText(node, range))
+              : escapeTextForMarkup(stringValueForRange(node, range).qstring());
       if (defaultStyle) {
         NodeImpl* element = node->parentNode();
         if (element) {
@@ -204,6 +205,7 @@ static QString startMarkup(const NodeImpl* node,
     case Node::COMMENT_NODE:
       return static_cast<const CommentImpl*>(node)->toString().qstring();
     case Node::DOCUMENT_NODE:
+    case Node::DOCUMENT_FRAGMENT_NODE:
       return "";
     case Node::PROCESSING_INSTRUCTION_NODE:
       return static_cast<const ProcessingInstructionImpl*>(node)
@@ -247,7 +249,7 @@ static QString startMarkup(const NodeImpl* node,
               markup += " " + attr->name().localName().qstring();
             else
               markup += " " + attr->name().toString().qstring();
-            markup += "=\"" + value.qstring() + "\"";
+            markup += "=\"" + escapeTextForMarkup(value.qstring()) + "\"";
           }
         }
       }

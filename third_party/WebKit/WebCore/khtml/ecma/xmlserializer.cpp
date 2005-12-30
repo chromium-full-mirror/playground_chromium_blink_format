@@ -27,6 +27,8 @@
 #include "dom/dom_exception.h"
 #include "xml/dom_docimpl.h"
 
+#include "markup.h"
+
 #include <kdebug.h>
 
 using DOM::NodeImpl;
@@ -87,7 +89,7 @@ JSValue* XMLSerializerProtoFunc::callAsFunction(ExecState* exec,
 
       NodeImpl* node = static_cast<NodeImpl*>(
           static_cast<DOMNode*>(args[0]->toObject(exec))->impl());
-      return jsStringOrNull(node->toString());
+      return jsStringOrNull(createMarkup(node));
     }
   }
 
