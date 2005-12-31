@@ -26,11 +26,12 @@
 #include "render_block.h"
 #include "render_line.h"
 
-using namespace khtml;
-using DOM::Position;
+using namespace DOM;
 
-RenderBR::RenderBR(DOM::NodeImpl* node)
-    : RenderText(node, new DOM::DOMStringImpl(QChar('\n'))), m_lineHeight(-1) {}
+namespace khtml {
+
+RenderBR::RenderBR(NodeImpl* node)
+    : RenderText(node, new DOMStringImpl("\n")), m_lineHeight(-1) {}
 
 RenderBR::~RenderBR() {}
 
@@ -118,4 +119,5 @@ QRect RenderBR::caretRect(int offset,
 
 InlineBox* RenderBR::inlineBox(int offset, EAffinity affinity) {
   return firstTextBox();
+}
 }

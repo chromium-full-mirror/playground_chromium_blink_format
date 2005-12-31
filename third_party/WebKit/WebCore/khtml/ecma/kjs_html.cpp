@@ -439,9 +439,9 @@ void KJS::HTMLDocument::putValueProperty(ExecState* exec,
     case DesignMode: {
       DOMString modeString = value->toString(exec).domString();
       DocumentImpl::InheritedBool mode;
-      if (!strcasecmp(modeString, "on"))
+      if (equalIgnoringCase(modeString, "on"))
         mode = DocumentImpl::on;
-      else if (!strcasecmp(modeString, "off"))
+      else if (equalIgnoringCase(modeString, "off"))
         mode = DocumentImpl::off;
       else
         mode = DocumentImpl::inherit;

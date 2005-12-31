@@ -1302,7 +1302,7 @@ bool CSSStyleSelector::checkOneSelector(CSSSelector* sel, ElementImpl* e) {
     switch (sel->match) {
       case CSSSelector::Exact:
         if ((isXMLDoc && sel->value != value) ||
-            (!isXMLDoc && !equalsIgnoreCase(sel->value, value)))
+            (!isXMLDoc && !equalIgnoringCase(sel->value, value)))
           return false;
         break;
       case CSSSelector::List: {

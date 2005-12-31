@@ -2903,7 +2903,7 @@ static void updateState(CSSMutableStyleDeclarationImpl* desiredStyle,
     DOMString desiredProperty = desiredStyle->getPropertyValue(propertyID);
     DOMString computedProperty = computedStyle->getPropertyValue(propertyID);
     KHTMLPart::TriState propertyState =
-        strcasecmp(desiredProperty, computedProperty) == 0
+        equalIgnoringCase(desiredProperty, computedProperty)
             ? KHTMLPart::trueTriState
             : KHTMLPart::falseTriState;
     if (atStart) {
@@ -2975,9 +2975,8 @@ bool KHTMLPart::selectionStartHasStyle(CSSStyleDeclarationImpl* style) const {
   for (QValueListConstIterator<CSSProperty> it = mutableStyle->valuesIterator();
        it != end; ++it) {
     int propertyID = (*it).id();
-    DOMString desiredProperty = mutableStyle->getPropertyValue(propertyID);
-    DOMString selectionProperty = selectionStyle->getPropertyValue(propertyID);
-    if (strcasecmp(selectionProperty, desiredProperty) != 0) {
+    if (!equalIgnoringCase(mutableStyle->getPropertyValue(propertyID),
+                           selectionStyle->getPropertyValue(propertyID))) {
       match = false;
       break;
     }

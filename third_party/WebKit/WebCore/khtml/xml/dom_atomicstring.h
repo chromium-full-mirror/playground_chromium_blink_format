@@ -19,8 +19,9 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _DOM_AtomicString_h_
-#define _DOM_AtomicString_h_
+
+#ifndef DOM_AtomicString_h
+#define DOM_AtomicString_h
 
 #include "dom/dom_string.h"
 
@@ -50,14 +51,12 @@ class AtomicString {
 
   const QChar& operator[](unsigned int i) const { return m_string[i]; }
 
-  bool contains(const QChar c) const { return m_string.contains(c); }
+  bool contains(QChar c) const { return m_string.contains(c); }
   bool contains(const AtomicString& s, bool caseSentitive = true) const {
     return (find(s, 0, caseSentitive) != -1);
   }
 
-  int find(const QChar c, int start = 0) const {
-    return m_string.find(c, start);
-  }
+  int find(QChar c, int start = 0) const { return m_string.find(c, start); }
   int find(const AtomicString& s,
            int start = 0,
            bool caseSentitive = true) const {
@@ -85,12 +84,6 @@ class AtomicString {
   bool isNull() const { return m_string.isNull(); }
   bool isEmpty() const { return m_string.isEmpty(); }
 
-  friend bool operator==(const AtomicString&, const AtomicString&);
-  friend bool operator!=(const AtomicString&, const AtomicString&);
-
-  friend bool operator==(const AtomicString&, const char*);
-  friend bool operator!=(const AtomicString&, const char*);
-
   static void remove(DOMStringImpl*);
 
 #ifdef __OBJC__
@@ -100,15 +93,6 @@ class AtomicString {
 
  private:
   DOMString m_string;
-
-  static bool equal(DOMStringImpl*, const char*);
-  static bool equal(DOMStringImpl*, const QChar*, uint length);
-  static bool equal(DOMStringImpl*, DOMStringImpl*);
-
-  static bool equal(const AtomicString& a, const AtomicString& b) {
-    return a.m_string.impl() == b.m_string.impl();
-  }
-  static bool equal(const AtomicString& a, const char* b);
 
   static DOMStringImpl* add(const char*);
   static DOMStringImpl* add(const QChar*, int length);
@@ -127,23 +111,50 @@ class AtomicString {
 };
 
 inline bool operator==(const AtomicString& a, const AtomicString& b) {
-  return AtomicString::equal(a, b);
+  return a.impl() == b.impl();
+}
+bool operator==(const AtomicString& a, const char* b);
+inline bool operator==(const AtomicString& a, const DOMString& b) {
+  return equal(a.impl(), b.impl());
+}
+inline bool operator==(const char* a, const AtomicString& b) {
+  return b == a;
+}
+inline bool operator==(const DOMString& a, const AtomicString& b) {
+  return equal(a.impl(), b.impl());
 }
 
 inline bool operator!=(const AtomicString& a, const AtomicString& b) {
-  return !AtomicString::equal(a, b);
+  return a.impl() != b.impl();
 }
-
-inline bool operator==(const AtomicString& a, const char* b) {
-  return AtomicString::equal(a, b);
-}
-
 inline bool operator!=(const AtomicString& a, const char* b) {
-  return !AtomicString::equal(a, b);
+  return !(a == b);
+}
+inline bool operator!=(const AtomicString& a, const DOMString& b) {
+  return !equal(a.impl(), b.impl());
+}
+inline bool operator!=(const char* a, const AtomicString& b) {
+  return !(b == a);
+}
+inline bool operator!=(const DOMString& a, const AtomicString& b) {
+  return !equal(a.impl(), b.impl());
 }
 
-// List of property names, passed to a macro so we can do set them up various
-// ways without repeating the list.
+inline bool equalIgnoringCase(const AtomicString& a, const AtomicString& b) {
+  return equalIgnoringCase(a.impl(), b.impl());
+}
+inline bool equalIgnoringCase(const AtomicString& a, const char* b) {
+  return equalIgnoringCase(a.impl(), b);
+}
+inline bool equalIgnoringCase(const AtomicString& a, const DOMString& b) {
+  return equalIgnoringCase(a.impl(), b.impl());
+}
+inline bool equalIgnoringCase(const char* a, const AtomicString& b) {
+  return equalIgnoringCase(a, b.impl());
+}
+inline bool equalIgnoringCase(const DOMString& a, const AtomicString& b) {
+  return equalIgnoringCase(a.impl(), b.impl());
+}
 
 // Define external global variables for the commonly used atomic strings.
 #if !KHTML_ATOMICSTRING_HIDE_GLOBALS
@@ -153,13 +164,6 @@ extern const AtomicString textAtom;
 extern const AtomicString commentAtom;
 extern const AtomicString starAtom;
 #endif
-
-bool operator==(const AtomicString& a, const DOMString& b);
-inline bool operator!=(const AtomicString& a, const DOMString& b) {
-  return !(a == b);
 }
 
-bool equalsIgnoreCase(const AtomicString& a, const DOMString& b);
-bool equalsIgnoreCase(const AtomicString& a, const AtomicString& b);
-}
 #endif

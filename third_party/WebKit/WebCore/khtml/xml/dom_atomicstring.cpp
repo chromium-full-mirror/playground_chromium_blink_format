@@ -63,8 +63,8 @@ struct CStringTranslator {
   }
 };
 
-bool AtomicString::equal(const AtomicString& a, const char* b) {
-  DOMStringImpl* impl = a.m_string.impl();
+bool operator==(const AtomicString& a, const char* b) {
+  DOMStringImpl* impl = a.impl();
   if ((!impl || !impl->s) && !b)
     return true;
   if ((!impl || !impl->s) || !b)
@@ -179,21 +179,5 @@ void AtomicString::init() {
 
     initialized = true;
   }
-}
-
-bool operator==(const AtomicString& a, const DOMString& b) {
-  return a.domString() == b;
-}
-
-bool equalsIgnoreCase(const AtomicString& as, const DOMString& bs) {
-  // returns true when equal, false otherwise (ignoring case)
-  return !strcasecmp(as.domString(), bs);
-}
-
-bool equalsIgnoreCase(const AtomicString& as, const AtomicString& bs) {
-  // returns true when equal, false otherwise (ignoring case)
-  if (as == bs)
-    return true;
-  return !strcasecmp(as.domString(), bs.domString());
 }
 }
