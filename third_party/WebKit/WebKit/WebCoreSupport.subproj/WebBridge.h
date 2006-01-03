@@ -33,7 +33,10 @@
 @protocol WebOpenPanelResultListener;
 
 @interface WebBridge : WebCoreBridge<WebCoreBridge> {
-  WebBridge* _parentBridge;
+  WebBridge* _nextSibling;
+  WebBridge* _previousSibling;
+  NSMutableArray* _children;
+
   WebFrame* _frame;
   WebCoreKeyboardUIMode _keyboardUIMode;
   BOOL _keyboardUIModeAccessed;
@@ -44,7 +47,7 @@
   NSDictionary* lastDashboardRegions;
 }
 
-- (id)initWithWebFrame:(WebFrame*)webFrame;
+- (id)initWithFrameName:(NSString*)name view:(WebFrameView*)view;
 - (void)close;
 
 - (void)receivedData:(NSData*)data textEncodingName:(NSString*)textEncodingName;
@@ -53,5 +56,17 @@
 - (BOOL)inNextKeyViewOutsideWebFrameViews;
 
 - (WebFrame*)webFrame;
+
+- (WebBridge*)firstChild;
+- (WebBridge*)lastChild;
+- (WebBridge*)previousSibling;
+- (WebBridge*)nextSibling;
+
+- (void)appendChild:(WebBridge*)child;
+- (void)removeChild:(WebBridge*)child;
+
+- (unsigned)childCount;
+- (BOOL)isDescendantOfFrame:(WebBridge*)ancestor;
+- (WebBridge*)traverseNextFrameStayWithin:(WebBridge*)stayWithin;
 
 @end
