@@ -27,6 +27,7 @@
 #define KHTML_EDITING_SELECTION_H
 
 #include <qrect.h>
+#include <kxmlcore/PassRefPtr.h>
 #include "xml/dom_position.h"
 #include "text_granularity.h"
 #include "misc/shared.h"
@@ -115,7 +116,7 @@ class SelectionController {
   bool isRange() const { return state() == RANGE; }
   bool isCaretOrRange() const { return state() != NONE; }
 
-  RefPtr<DOM::RangeImpl> toRange() const;
+  PassRefPtr<DOM::RangeImpl> toRange() const;
 
   void debugPosition() const;
   void debugRenderer(khtml::RenderObject* r, bool selected) const;

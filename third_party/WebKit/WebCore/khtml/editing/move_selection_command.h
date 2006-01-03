@@ -46,7 +46,7 @@ class MoveSelectionCommand : public CompositeEditCommand {
   virtual EditAction editingAction() const;
 
  private:
-  DOM::DocumentFragmentImpl* m_fragment;
+  RefPtr<DOM::DocumentFragmentImpl> m_fragment;
   DOM::Position m_position;
   bool m_smartMove;
 };

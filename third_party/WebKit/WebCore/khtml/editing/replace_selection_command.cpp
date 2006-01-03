@@ -76,9 +76,6 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
     return;
   }
 
-  m_document->ref();
-  m_fragment->ref();
-
   NodeImpl* firstChild = m_fragment->firstChild();
   NodeImpl* lastChild = m_fragment->lastChild();
 
@@ -108,12 +105,10 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
         newlineAtEndNode = node;
       }
     } else if (isInterchangeConvertedSpaceSpan(node)) {
-      NodeImpl* n = 0;
+      RefPtr<NodeImpl> n = 0;
       while ((n = node->firstChild())) {
-        n->ref();
         removeNode(n);
-        insertNodeBefore(n, node);
-        n->deref();
+        insertNodeBefore(n.get(), node);
       }
       removeNode(node);
       if (n)
@@ -127,26 +122,17 @@ ReplacementFragment::ReplacementFragment(DocumentImpl* document,
   if (newlineAtEndNode)
     removeNode(newlineAtEndNode);
 
-  NodeImpl* holder = insertFragmentForTestRendering();
-  if (holder)
-    holder->ref();
-  if (!m_matchStyle) {
-    computeStylesUsingTestRendering(holder);
-  }
-  removeUnrenderedNodesUsingTestRendering(holder);
-  m_hasMoreThanOneBlock = countRenderedBlocks(holder) > 1;
-  restoreTestRenderingNodesToFragment(holder);
+  PassRefPtr<NodeImpl> holder = insertFragmentForTestRendering();
+  if (!m_matchStyle)
+    computeStylesUsingTestRendering(holder.get());
+  removeUnrenderedNodesUsingTestRendering(holder.get());
+  m_hasMoreThanOneBlock = countRenderedBlocks(holder.get()) > 1;
+  restoreTestRenderingNodesToFragment(holder.get());
   removeNode(holder);
-  holder->deref();
   removeStyleNodes();
 }
 
-ReplacementFragment::~ReplacementFragment() {
-  if (m_document)
-    m_document->deref();
-  if (m_fragment)
-    m_fragment->deref();
-}
+ReplacementFragment::~ReplacementFragment() {}
 
 NodeImpl* ReplacementFragment::firstChild() const {
   return m_fragment->firstChild();
@@ -207,23 +193,21 @@ bool ReplacementFragment::isInterchangeConvertedSpaceSpan(
 NodeImpl* ReplacementFragment::enclosingBlock(NodeImpl* node) const {
   while (node && !isProbablyBlock(node))
     node = node->parentNode();
-  return node ? node : m_fragment;
+  return node ? node : m_fragment.get();
 }
 
 void ReplacementFragment::removeNodePreservingChildren(NodeImpl* node) {
   if (!node)
     return;
 
-  while (NodeImpl* n = node->firstChild()) {
-    n->ref();
+  while (RefPtr<NodeImpl> n = node->firstChild()) {
     removeNode(n);
-    insertNodeBefore(n, node);
-    n->deref();
+    insertNodeBefore(n.get(), node);
   }
   removeNode(node);
 }
 
-void ReplacementFragment::removeNode(NodeImpl* node) {
+void ReplacementFragment::removeNode(PassRefPtr<NodeImpl> node) {
   if (!node)
     return;
 
@@ -232,9 +216,7 @@ void ReplacementFragment::removeNode(NodeImpl* node) {
     return;
 
   int exceptionCode = 0;
-  node->ref();
-  parent->removeChild(node, exceptionCode);
-  node->deref();
+  parent->removeChild(node.get(), exceptionCode);
   ASSERT(exceptionCode == 0);
 }
 
@@ -251,21 +233,20 @@ void ReplacementFragment::insertNodeBefore(NodeImpl* node, NodeImpl* refNode) {
   ASSERT(exceptionCode == 0);
 }
 
-NodeImpl* ReplacementFragment::insertFragmentForTestRendering() {
+PassRefPtr<NodeImpl> ReplacementFragment::insertFragmentForTestRendering() {
   NodeImpl* body = m_document->body();
   if (!body)
     return 0;
 
-  ElementImpl* holder = createDefaultParagraphElement(m_document);
-  holder->ref();
+  PassRefPtr<ElementImpl> holder =
+      createDefaultParagraphElement(m_document.get());
 
   int exceptionCode = 0;
-  holder->appendChild(m_fragment, exceptionCode);
+  holder->appendChild(m_fragment.get(), exceptionCode);
   ASSERT(exceptionCode == 0);
 
-  body->appendChild(holder, exceptionCode);
+  body->appendChild(holder.get(), exceptionCode);
   ASSERT(exceptionCode == 0);
-  holder->deref();
 
   m_document->updateLayoutIgnorePendingStylesheets();
 
@@ -278,13 +259,11 @@ void ReplacementFragment::restoreTestRenderingNodesToFragment(
     return;
 
   int exceptionCode = 0;
-  while (NodeImpl* node = holder->firstChild()) {
-    node->ref();
-    holder->removeChild(node, exceptionCode);
+  while (RefPtr<NodeImpl> node = holder->firstChild()) {
+    holder->removeChild(node.get(), exceptionCode);
     ASSERT(exceptionCode == 0);
-    m_fragment->appendChild(node, exceptionCode);
+    m_fragment->appendChild(node.get(), exceptionCode);
     ASSERT(exceptionCode == 0);
-    node->deref();
   }
 }
 
@@ -313,8 +292,7 @@ void ReplaceSelectionCommand::fixupNodeStyles(
     // The desiredStyle declaration tells what style this node wants to be.
     // Compare that to the style that it is right now in the document.
     Position pos(node, 0);
-    CSSComputedStyleDeclarationImpl* currentStyle = pos.computedStyle();
-    currentStyle->ref();
+    RefPtr<CSSComputedStyleDeclarationImpl> currentStyle = pos.computedStyle();
 
     // Check for the special "match nearest blockquote color" property and
     // resolve to the correct
@@ -325,11 +303,9 @@ void ReplaceSelectionCommand::fixupNodeStyles(
       NodeImpl* blockquote = nearestMailBlockquote(node);
       Position pos(
           blockquote ? blockquote : node->getDocument()->documentElement(), 0);
-      CSSComputedStyleDeclarationImpl* style = pos.computedStyle();
-      style->ref();
+      RefPtr<CSSComputedStyleDeclarationImpl> style = pos.computedStyle();
       DOMString desiredColor = desiredStyle->getPropertyValue(CSS_PROP_COLOR);
       DOMString nearestColor = style->getPropertyValue(CSS_PROP_COLOR);
-      style->deref();
       if (desiredColor != nearestColor)
         desiredStyle->setProperty(CSS_PROP_COLOR, nearestColor);
     }
@@ -349,8 +325,6 @@ void ReplaceSelectionCommand::fixupNodeStyles(
     if (desiredStyle->length() > 0)
       applyStyle(desiredStyle, Position(node, 0),
                  Position(node, node->maxDeepOffset()));
-
-    currentStyle->deref();
   }
 }
 
@@ -360,13 +334,11 @@ static void computeAndStoreNodeDesiredStyle(
   if (!node || !node->inDocument())
     return;
 
-  CSSComputedStyleDeclarationImpl* computedStyle =
+  RefPtr<CSSComputedStyleDeclarationImpl> computedStyle =
       Position(node, 0).computedStyle();
-  computedStyle->ref();
   CSSMutableStyleDeclarationImpl* style =
       computedStyle->copyInheritableProperties();
   list.append(NodeDesiredStyle(node, style));
-  computedStyle->deref();
 
   // In either of the color-matching tests below, set the color to a
   // pseudo-color that will
@@ -374,12 +346,10 @@ static void computeAndStoreNodeDesiredStyle(
   // any) after
   // being pasted in.
   if (NodeImpl* blockquote = nearestMailBlockquote(node)) {
-    CSSComputedStyleDeclarationImpl* blockquoteStyle =
+    RefPtr<CSSComputedStyleDeclarationImpl> blockquoteStyle =
         Position(blockquote, 0).computedStyle();
-    blockquoteStyle->ref();
     bool match = (blockquoteStyle->getPropertyValue(CSS_PROP_COLOR) ==
                   style->getPropertyValue(CSS_PROP_COLOR));
-    blockquoteStyle->deref();
     if (match) {
       style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                          matchNearestBlockquoteColorString());
@@ -389,16 +359,13 @@ static void computeAndStoreNodeDesiredStyle(
   NodeImpl* documentElement =
       node->getDocument() ? node->getDocument()->documentElement() : 0;
   if (documentElement) {
-    CSSComputedStyleDeclarationImpl* documentStyle =
+    RefPtr<CSSComputedStyleDeclarationImpl> documentStyle =
         Position(documentElement, 0).computedStyle();
-    documentStyle->ref();
     bool match = (documentStyle->getPropertyValue(CSS_PROP_COLOR) ==
                   style->getPropertyValue(CSS_PROP_COLOR));
-    documentStyle->deref();
-    if (match) {
+    if (match)
       style->setProperty(CSS_PROP__KHTML_MATCH_NEAREST_MAIL_BLOCKQUOTE_COLOR,
                          matchNearestBlockquoteColorString());
-    }
   }
 }
 
@@ -490,47 +457,7 @@ void ReplacementFragment::removeStyleNodes() {
 
 NodeDesiredStyle::NodeDesiredStyle(NodeImpl* node,
                                    CSSMutableStyleDeclarationImpl* style)
-    : m_node(node), m_style(style) {
-  if (m_node)
-    m_node->ref();
-  if (m_style)
-    m_style->ref();
-}
-
-NodeDesiredStyle::NodeDesiredStyle(const NodeDesiredStyle& other)
-    : m_node(other.node()), m_style(other.style()) {
-  if (m_node)
-    m_node->ref();
-  if (m_style)
-    m_style->ref();
-}
-
-NodeDesiredStyle::~NodeDesiredStyle() {
-  if (m_node)
-    m_node->deref();
-  if (m_style)
-    m_style->deref();
-}
-
-NodeDesiredStyle& NodeDesiredStyle::operator=(const NodeDesiredStyle& other) {
-  NodeImpl* oldNode = m_node;
-  CSSMutableStyleDeclarationImpl* oldStyle = m_style;
-
-  m_node = other.node();
-  m_style = other.style();
-
-  if (m_node)
-    m_node->ref();
-  if (m_style)
-    m_style->ref();
-
-  if (oldNode)
-    oldNode->deref();
-  if (oldStyle)
-    oldStyle->deref();
-
-  return *this;
-}
+    : m_node(node), m_style(style) {}
 
 ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
                                                  DocumentFragmentImpl* fragment,
@@ -539,24 +466,11 @@ ReplaceSelectionCommand::ReplaceSelectionCommand(DocumentImpl* document,
                                                  bool matchStyle)
     : CompositeEditCommand(document),
       m_fragment(document, fragment, matchStyle),
-      m_firstNodeInserted(0),
-      m_lastNodeInserted(0),
-      m_lastTopNodeInserted(0),
-      m_insertionStyle(0),
       m_selectReplacement(selectReplacement),
       m_smartReplace(smartReplace),
       m_matchStyle(matchStyle) {}
 
-ReplaceSelectionCommand::~ReplaceSelectionCommand() {
-  if (m_firstNodeInserted)
-    m_firstNodeInserted->deref();
-  if (m_lastNodeInserted)
-    m_lastNodeInserted->deref();
-  if (m_lastTopNodeInserted)
-    m_lastTopNodeInserted->deref();
-  if (m_insertionStyle)
-    m_insertionStyle->deref();
-}
+ReplaceSelectionCommand::~ReplaceSelectionCommand() {}
 
 static int maxRangeOffset(NodeImpl* n) {
   if (DOM::offsetInCharacters(n->nodeType()))
@@ -592,10 +506,8 @@ void ReplaceSelectionCommand::doApply() {
   SelectionController selection = endingSelection();
   ASSERT(selection.isCaretOrRange());
 
-  if (m_matchStyle) {
+  if (m_matchStyle)
     m_insertionStyle = styleAtPosition(selection.start());
-    m_insertionStyle->ref();
-  }
 
   VisiblePosition visibleStart(selection.start(), selection.startAffinity());
   VisiblePosition visibleEnd(selection.end(), selection.endAffinity());
@@ -792,8 +704,8 @@ void ReplaceSelectionCommand::doApply() {
     // update insertion point to be at the end of the last block inserted
     if (m_lastNodeInserted) {
       updateLayout();
-      insertionPos =
-          Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset());
+      insertionPos = Position(m_lastNodeInserted.get(),
+                              m_lastNodeInserted->caretMaxOffset());
     }
   }
 
@@ -828,25 +740,26 @@ void ReplaceSelectionCommand::doApply() {
       node = next;
     }
     updateLayout();
-    insertionPos =
-        Position(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset());
+    insertionPos = Position(m_lastNodeInserted.get(),
+                            m_lastNodeInserted->caretMaxOffset());
   }
 
   // step 3 : handle "smart replace" whitespace
   if (addTrailingSpace && m_lastNodeInserted) {
     updateLayout();
-    Position pos(m_lastNodeInserted, m_lastNodeInserted->caretMaxOffset());
+    Position pos(m_lastNodeInserted.get(),
+                 m_lastNodeInserted->caretMaxOffset());
     bool needsTrailingSpace =
         pos.trailingWhitespacePosition(VP_DEFAULT_AFFINITY, true).isNull();
     if (needsTrailingSpace) {
       if (m_lastNodeInserted->isTextNode()) {
-        TextImpl* text = static_cast<TextImpl*>(m_lastNodeInserted);
+        TextImpl* text = static_cast<TextImpl*>(m_lastNodeInserted.get());
         insertTextIntoNode(text, text->length(), nonBreakingSpaceString());
         insertionPos = Position(text, text->length());
       } else {
         NodeImpl* node =
             document()->createEditingTextNode(nonBreakingSpaceString());
-        insertNodeAfterAndUpdateNodesInserted(node, m_lastNodeInserted);
+        insertNodeAfterAndUpdateNodesInserted(node, m_lastNodeInserted.get());
         insertionPos = Position(node, 1);
       }
     }
@@ -854,17 +767,17 @@ void ReplaceSelectionCommand::doApply() {
 
   if (addLeadingSpace && m_firstNodeInserted) {
     updateLayout();
-    Position pos(m_firstNodeInserted, 0);
+    Position pos(m_firstNodeInserted.get(), 0);
     bool needsLeadingSpace =
         pos.leadingWhitespacePosition(VP_DEFAULT_AFFINITY, true).isNull();
     if (needsLeadingSpace) {
       if (m_firstNodeInserted->isTextNode()) {
-        TextImpl* text = static_cast<TextImpl*>(m_firstNodeInserted);
+        TextImpl* text = static_cast<TextImpl*>(m_firstNodeInserted.get());
         insertTextIntoNode(text, 0, nonBreakingSpaceString());
       } else {
         NodeImpl* node =
             document()->createEditingTextNode(nonBreakingSpaceString());
-        insertNodeBeforeAndUpdateNodesInserted(node, m_firstNodeInserted);
+        insertNodeBeforeAndUpdateNodesInserted(node, m_firstNodeInserted.get());
       }
     }
   }
@@ -881,7 +794,8 @@ void ReplaceSelectionCommand::doApply() {
       bool insertParagraph = false;
       VisiblePosition pos(insertionPos, VP_DEFAULT_AFFINITY);
 
-      if (startBlock == endBlock && !isProbablyBlock(m_lastTopNodeInserted)) {
+      if (startBlock == endBlock &&
+          !isProbablyBlock(m_lastTopNodeInserted.get())) {
         insertParagraph = true;
       } else {
         // Handle end-of-document case.
@@ -907,7 +821,7 @@ void ReplaceSelectionCommand::doApply() {
     if (m_lastNodeInserted && m_lastNodeInserted->hasTagName(brTag) &&
         !document()->inStrictMode()) {
       updateLayout();
-      VisiblePosition pos(Position(m_lastNodeInserted, 1), DOWNSTREAM);
+      VisiblePosition pos(Position(m_lastNodeInserted.get(), 1), DOWNSTREAM);
       if (isEndOfBlock(pos)) {
         NodeImpl* next = m_lastNodeInserted->traverseNextNode();
         bool hasTrailingBR = next && next->hasTagName(brTag) &&
@@ -915,19 +829,21 @@ void ReplaceSelectionCommand::doApply() {
                                  next->enclosingBlockFlowElement();
         if (!hasTrailingBR) {
           // Insert an "extra" BR at the end of the block.
-          insertNodeBefore(createBreakElement(document()), m_lastNodeInserted);
+          insertNodeBefore(createBreakElement(document()),
+                           m_lastNodeInserted.get());
         }
       }
     }
 
     if (moveNodesAfterEnd &&
         !isLastVisiblePositionInSpecialElement(
-            Position(m_lastNodeInserted, maxRangeOffset(m_lastNodeInserted)))) {
+            Position(m_lastNodeInserted.get(),
+                     maxRangeOffset(m_lastNodeInserted.get())))) {
       updateLayout();
       QValueList<NodeDesiredStyle> styles;
       QPtrList<NodeImpl> blocks;
       NodeImpl* node = beyondEndNode;
-      NodeImpl* refNode = m_lastNodeInserted;
+      NodeImpl* refNode = m_lastNodeInserted.get();
       while (node) {
         RenderObject* renderer = node->renderer();
         // Stop at the first table or block.
@@ -1001,7 +917,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
   if (m_firstNodeInserted && m_firstNodeInserted->inDocument() &&
       m_lastNodeInserted && m_lastNodeInserted->inDocument()) {
     // Find the last leaf.
-    NodeImpl* lastLeaf = m_lastNodeInserted;
+    NodeImpl* lastLeaf = m_lastNodeInserted.get();
     while (1) {
       NodeImpl* nextChild = lastLeaf->lastChild();
       if (!nextChild)
@@ -1010,7 +926,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
     }
 
     // Find the first leaf.
-    NodeImpl* firstLeaf = m_firstNodeInserted;
+    NodeImpl* firstLeaf = m_firstNodeInserted.get();
     while (1) {
       NodeImpl* nextChild = firstLeaf->firstChild();
       if (!nextChild)
@@ -1026,14 +942,14 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
 
     if (m_matchStyle) {
       assert(m_insertionStyle);
-      applyStyle(m_insertionStyle, start, end);
+      applyStyle(m_insertionStyle.get(), start, end);
     }
 
     if (lastPositionToSelect.isNotNull())
       end = lastPositionToSelect;
-  } else if (lastPositionToSelect.isNotNull()) {
+  } else if (lastPositionToSelect.isNotNull())
     start = end = lastPositionToSelect;
-  } else
+  else
     return;
 
   if (m_selectReplacement)
@@ -1075,27 +991,14 @@ void ReplaceSelectionCommand::updateNodesInserted(NodeImpl* node) {
   if (!node)
     return;
 
-  // update m_lastTopNodeInserted
-  node->ref();
-  if (m_lastTopNodeInserted)
-    m_lastTopNodeInserted->deref();
   m_lastTopNodeInserted = node;
-
-  // update m_firstNodeInserted
-  if (!m_firstNodeInserted) {
+  if (!m_firstNodeInserted)
     m_firstNodeInserted = node;
-    m_firstNodeInserted->ref();
-  }
 
   if (node == m_lastNodeInserted)
     return;
 
-  // update m_lastNodeInserted
-  NodeImpl* old = m_lastNodeInserted;
   m_lastNodeInserted = node->lastDescendant();
-  m_lastNodeInserted->ref();
-  if (old)
-    old->deref();
 }
 
 }  // namespace khtml

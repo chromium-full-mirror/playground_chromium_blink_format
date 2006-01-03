@@ -51,10 +51,10 @@ inline bool isCollapsibleWhitespace(const QChar& c) {
 }
 
 QString plainText(const DOM::RangeImpl*);
-RefPtr<DOM::RangeImpl> findPlainText(const DOM::RangeImpl*,
-                                     const QString&,
-                                     bool forward,
-                                     bool caseSensitive);
+PassRefPtr<DOM::RangeImpl> findPlainText(const DOM::RangeImpl*,
+                                         const QString&,
+                                         bool forward,
+                                         bool caseSensitive);
 
 // Iterates through the DOM range, returning all the text, and 0-length
 // boundaries
@@ -75,7 +75,7 @@ class TextIterator {
   int length() const { return m_textLength; }
   const QChar* characters() const { return m_textCharacters; }
 
-  RefPtr<DOM::RangeImpl> range() const;
+  PassRefPtr<DOM::RangeImpl> range() const;
 
   static int TextIterator::rangeLength(const DOM::RangeImpl* r);
   static DOM::RangeImpl* TextIterator::rangeFromLocationAndLength(
@@ -151,7 +151,7 @@ class SimplifiedBackwardsTextIterator {
   int length() const { return m_textLength; }
   const QChar* characters() const { return m_textCharacters; }
 
-  RefPtr<DOM::RangeImpl> range() const;
+  PassRefPtr<DOM::RangeImpl> range() const;
 
  private:
   void exitNode();
@@ -211,7 +211,7 @@ class CharacterIterator {
   QString string(int numChars);
 
   int characterOffset() const { return m_offset; }
-  RefPtr<DOM::RangeImpl> range() const;
+  PassRefPtr<DOM::RangeImpl> range() const;
 
  private:
   int m_offset;
@@ -237,7 +237,7 @@ class WordAwareIterator {
   const QChar* characters() const;
 
   // Range of the text we're currently returning
-  RefPtr<DOM::RangeImpl> range() const { return m_range; }
+  PassRefPtr<DOM::RangeImpl> range() const { return m_range; }
 
  private:
   // text from the previous chunk from the textIterator
@@ -250,7 +250,7 @@ class WordAwareIterator {
   // Did we have to look ahead in the textIterator to confirm the current chunk?
   bool m_didLookAhead;
 
-  RefPtr<DOM::RangeImpl> m_range;
+  PassRefPtr<DOM::RangeImpl> m_range;
 
   TextIterator m_textIterator;
 };

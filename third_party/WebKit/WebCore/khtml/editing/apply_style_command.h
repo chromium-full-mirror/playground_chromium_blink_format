@@ -27,6 +27,7 @@
 #define __apply_style_command_h__
 
 #include "composite_edit_command.h"
+#include <kxmlcore/PassRefPtr.h>
 
 namespace DOM {
 class HTMLElementImpl;
@@ -67,7 +68,7 @@ class ApplyStyleCommand : public CompositeEditCommand {
   void removeBlockStyle(DOM::CSSMutableStyleDeclarationImpl*,
                         const DOM::Position& start,
                         const DOM::Position& end);
-  void removeInlineStyle(DOM::CSSMutableStyleDeclarationImpl*,
+  void removeInlineStyle(PassRefPtr<DOM::CSSMutableStyleDeclarationImpl>,
                          const DOM::Position& start,
                          const DOM::Position& end);
   bool nodeFullySelected(DOM::NodeImpl*,

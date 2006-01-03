@@ -41,18 +41,18 @@ class RemoveCSSPropertyCommand : public EditCommand {
   RemoveCSSPropertyCommand(DOM::DocumentImpl*,
                            DOM::CSSStyleDeclarationImpl*,
                            int property);
-  virtual ~RemoveCSSPropertyCommand();
+  virtual ~RemoveCSSPropertyCommand() {}
 
   virtual void doApply();
   virtual void doUnapply();
 
   DOM::CSSMutableStyleDeclarationImpl* styleDeclaration() const {
-    return m_decl;
+    return m_decl.get();
   }
   int property() const { return m_property; }
 
  private:
-  DOM::CSSMutableStyleDeclarationImpl* m_decl;
+  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_decl;
   int m_property;
   DOM::DOMString m_oldValue;
   bool m_important;

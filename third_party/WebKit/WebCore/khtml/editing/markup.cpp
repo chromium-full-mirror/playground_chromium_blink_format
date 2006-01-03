@@ -372,21 +372,16 @@ QString createMarkup(const RangeImpl* range,
 
   // calculate the "default style" for this markup
   Position pos(doc->documentElement(), 0);
-  CSSComputedStyleDeclarationImpl* computedStyle = pos.computedStyle();
-  computedStyle->ref();
-  CSSMutableStyleDeclarationImpl* defaultStyle =
+  RefPtr<CSSComputedStyleDeclarationImpl> computedStyle = pos.computedStyle();
+  RefPtr<CSSMutableStyleDeclarationImpl> defaultStyle =
       computedStyle->copyInheritableProperties();
-  computedStyle->deref();
-  defaultStyle->ref();
 
   NodeImpl* startNode = range->startNode();
   VisiblePosition visibleStart(range->startPosition(), VP_DEFAULT_AFFINITY);
   VisiblePosition visibleEnd(range->endPosition(), VP_DEFAULT_AFFINITY);
   if (!inSameBlock(visibleStart, visibleStart.next())) {
-    if (visibleStart == visibleEnd.previous()) {
-      defaultStyle->deref();
+    if (visibleStart == visibleEnd.previous())
       return interchangeNewlineString;
-    }
     markups.append(interchangeNewlineString);
     startNode = startNode->traverseNextNode();
   }
@@ -403,7 +398,7 @@ QString createMarkup(const RangeImpl* range,
 
     // Add the node to the markup.
     if (n->renderer()) {
-      markups.append(startMarkup(n, range, annotate, defaultStyle));
+      markups.append(startMarkup(n, range, annotate, defaultStyle.get()));
       if (nodes) {
         nodes->append(n);
       }
@@ -440,7 +435,7 @@ QString createMarkup(const RangeImpl* range,
                    parent != 0 && parent != nextParent;
                    parent = parent->parentNode()) {
                 markups.prepend(
-                    startMarkup(parent, range, annotate, defaultStyle));
+                    startMarkup(parent, range, annotate, defaultStyle.get()));
                 markups.append(endMarkup(parent));
                 if (nodes) {
                   nodes->append(parent);
@@ -482,7 +477,8 @@ QString createMarkup(const RangeImpl* range,
           break;
         }
       }
-      markups.prepend(startMarkup(ancestor, range, annotate, defaultStyle));
+      markups.prepend(
+          startMarkup(ancestor, range, annotate, defaultStyle.get()));
       markups.append(endMarkup(ancestor));
       if (nodes) {
         nodes->append(ancestor);
@@ -502,7 +498,8 @@ QString createMarkup(const RangeImpl* range,
   for (NodeImpl* ancestor = commonAncestorBlock; ancestor;
        ancestor = ancestor->parentNode()) {
     if (isMailBlockquote(ancestor)) {
-      markups.prepend(startMarkup(ancestor, range, annotate, defaultStyle));
+      markups.prepend(
+          startMarkup(ancestor, range, annotate, defaultStyle.get()));
       markups.append(endMarkup(ancestor));
     }
   }
@@ -513,24 +510,25 @@ QString createMarkup(const RangeImpl* range,
                     "\" style=\"" + defaultStyle->cssText().qstring() + "\">";
   markups.prepend(openTag);
   markups.append("</span>");
-  defaultStyle->deref();
 
   return markups.join("");
 }
 
-DocumentFragmentImpl* createFragmentFromMarkup(DocumentImpl* document,
-                                               const QString& markup,
-                                               const QString& baseURL) {
+PassRefPtr<DocumentFragmentImpl> createFragmentFromMarkup(
+    DocumentImpl* document,
+    const QString& markup,
+    const QString& baseURL) {
   ASSERT(document->documentElement()->isHTMLElement());
   // FIXME: What if the document element is not an HTML element?
   HTMLElementImpl* element =
       static_cast<HTMLElementImpl*>(document->documentElement());
 
-  DocumentFragmentImpl* fragment = element->createContextualFragment(markup);
+  PassRefPtr<DocumentFragmentImpl> fragment =
+      element->createContextualFragment(markup);
   ASSERT(fragment);
 
   if (!baseURL.isEmpty() && baseURL != document->baseURL())
-    completeURLs(fragment, baseURL);
+    completeURLs(fragment.get(), baseURL);
 
   return fragment;
 }
@@ -591,13 +589,13 @@ static void createParagraphContentsFromString(DOM::DocumentImpl* document,
   }
 }
 
-DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
-                                                  const QString& text) {
+PassRefPtr<DocumentFragmentImpl> createFragmentFromText(DocumentImpl* document,
+                                                        const QString& text) {
   if (!document)
     return 0;
 
-  DocumentFragmentImpl* fragment = document->createDocumentFragment();
-  fragment->ref();
+  PassRefPtr<DocumentFragmentImpl> fragment =
+      document->createDocumentFragment();
 
   if (!text.isEmpty()) {
     QString string = text;
@@ -613,61 +611,42 @@ DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
       list.pop_front();
 
       int exceptionCode = 0;
-      ElementImpl* element;
+      RefPtr<ElementImpl> element;
       if (s.isEmpty() && list.isEmpty()) {
         // For last line, use the "magic BR" rather than a P.
         element =
             document->createElementNS(xhtmlNamespaceURI, "br", exceptionCode);
         ASSERT(exceptionCode == 0);
-        element->ref();
         element->setAttribute(classAttr, AppleInterchangeNewline);
       } else {
         element = createDefaultParagraphElement(document);
-        element->ref();
-        createParagraphContentsFromString(document, element, s);
+        createParagraphContentsFromString(document, element.get(), s);
       }
-      fragment->appendChild(element, exceptionCode);
+      fragment->appendChild(element.get(), exceptionCode);
       ASSERT(exceptionCode == 0);
-      element->deref();
     }
   }
-
-  // Trick to get the fragment back to the floating state, with 0
-  // refs but not destroyed.
-  fragment->setParent(document);
-  fragment->deref();
-  fragment->setParent(0);
-
   return fragment;
 }
 
-DOM::DocumentFragmentImpl* createFragmentFromNodeList(
-    DOM::DocumentImpl* document,
-    const QPtrList<DOM::NodeImpl>& nodeList) {
+PassRefPtr<DocumentFragmentImpl> createFragmentFromNodeList(
+    DocumentImpl* document,
+    const QPtrList<NodeImpl>& nodeList) {
   if (!document)
     return 0;
 
-  DocumentFragmentImpl* fragment = document->createDocumentFragment();
-  fragment->ref();
+  PassRefPtr<DocumentFragmentImpl> fragment =
+      document->createDocumentFragment();
 
-  ElementImpl* element;
+  RefPtr<ElementImpl> element;
   int exceptionCode = 0;
   for (QPtrListIterator<NodeImpl> i(nodeList); i.current(); ++i) {
     element = createDefaultParagraphElement(document);
-    element->ref();
     element->appendChild(i.current(), exceptionCode);
     ASSERT(exceptionCode == 0);
-    fragment->appendChild(element, exceptionCode);
+    fragment->appendChild(element.get(), exceptionCode);
     ASSERT(exceptionCode == 0);
-    element->deref();
   }
-
-  // Trick to get the fragment back to the floating state, with 0
-  // refs but not destroyed.
-  fragment->setParent(document);
-  fragment->deref();
-  fragment->setParent(0);
-
   return fragment;
 }
 }

@@ -53,12 +53,10 @@ namespace khtml {
 
 InsertParagraphSeparatorCommand::InsertParagraphSeparatorCommand(
     DocumentImpl* document)
-    : CompositeEditCommand(document), m_style(0) {}
+    : CompositeEditCommand(document) {}
 
 InsertParagraphSeparatorCommand::~InsertParagraphSeparatorCommand() {
   derefNodesInList(clonedNodes);
-  if (m_style)
-    m_style->deref();
 }
 
 bool InsertParagraphSeparatorCommand::preservesTypingStyle() const {
@@ -83,10 +81,7 @@ void InsertParagraphSeparatorCommand::calculateStyleBeforeInsertion(
   if (!isStartOfParagraph(visiblePos) && !isEndOfParagraph(visiblePos))
     return;
 
-  if (m_style)
-    m_style->deref();
   m_style = styleAtPosition(pos);
-  m_style->ref();
 }
 
 void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
@@ -97,10 +92,9 @@ void InsertParagraphSeparatorCommand::applyStyleAfterInsertion() {
     return;
 
   CSSComputedStyleDeclarationImpl endingStyle(endingSelection().start().node());
-  endingStyle.diff(m_style);
-  if (m_style->length() > 0) {
-    applyStyle(m_style);
-  }
+  endingStyle.diff(m_style.get());
+  if (m_style->length() > 0)
+    applyStyle(m_style.get());
 }
 
 void InsertParagraphSeparatorCommand::doApply() {

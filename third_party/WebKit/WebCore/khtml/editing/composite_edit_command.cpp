@@ -389,7 +389,7 @@ void CompositeEditCommand::deleteInsignificantText(TextImpl* textNode,
 
   int removed = 0;
   InlineTextBox* prevBox = 0;
-  DOMStringImpl* str = 0;
+  RefPtr<DOMStringImpl> str;
 
   // This loop structure works to process all gaps preceding a box,
   // and also will look at the gap after the last box.
@@ -405,10 +405,8 @@ void CompositeEditCommand::deleteInsignificantText(TextImpl* textNode,
     if (indicesIntersect && gapLen > 0) {
       gapStart = kMax(gapStart, start);
       gapEnd = kMin(gapEnd, end);
-      if (!str) {
+      if (!str)
         str = textNode->string()->substring(start, end - start);
-        str->ref();
-      }
       // remove text in the gap
       str->remove(gapStart - start - removed, gapLen);
       removed += gapLen;
@@ -422,7 +420,7 @@ void CompositeEditCommand::deleteInsignificantText(TextImpl* textNode,
   if (str) {
     // Replace the text between start and end with our pruned version.
     if (str->l > 0) {
-      replaceTextInNode(textNode, start, end - start, str);
+      replaceTextInNode(textNode, start, end - start, str.get());
     } else {
       // Assert that we are not going to delete all of the text in the node.
       // If we were, that should have been done above with the call to
@@ -430,7 +428,6 @@ void CompositeEditCommand::deleteInsignificantText(TextImpl* textNode,
       ASSERT(start > 0 || (unsigned)end - start < textNode->length());
       deleteTextFromNode(textNode, start, end - start);
     }
-    str->deref();
   }
 }
 

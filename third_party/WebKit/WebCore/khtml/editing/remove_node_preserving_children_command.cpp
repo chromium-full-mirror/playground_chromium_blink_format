@@ -40,12 +40,6 @@ RemoveNodePreservingChildrenCommand::RemoveNodePreservingChildrenCommand(
     NodeImpl* node)
     : CompositeEditCommand(document), m_node(node) {
   ASSERT(m_node);
-  m_node->ref();
-}
-
-RemoveNodePreservingChildrenCommand::~RemoveNodePreservingChildrenCommand() {
-  ASSERT(m_node);
-  m_node->deref();
 }
 
 void RemoveNodePreservingChildrenCommand::doApply() {

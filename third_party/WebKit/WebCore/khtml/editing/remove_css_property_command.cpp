@@ -45,12 +45,6 @@ RemoveCSSPropertyCommand::RemoveCSSPropertyCommand(
       m_property(property),
       m_important(false) {
   ASSERT(m_decl);
-  m_decl->ref();
-}
-
-RemoveCSSPropertyCommand::~RemoveCSSPropertyCommand() {
-  ASSERT(m_decl);
-  m_decl->deref();
 }
 
 void RemoveCSSPropertyCommand::doApply() {

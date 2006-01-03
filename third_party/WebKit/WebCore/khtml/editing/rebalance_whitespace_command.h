@@ -34,7 +34,7 @@ namespace khtml {
 class RebalanceWhitespaceCommand : public EditCommand {
  public:
   RebalanceWhitespaceCommand(DOM::DocumentImpl*, const DOM::Position&);
-  virtual ~RebalanceWhitespaceCommand();
+  virtual ~RebalanceWhitespaceCommand() {}
 
   virtual void doApply();
   virtual void doUnapply();

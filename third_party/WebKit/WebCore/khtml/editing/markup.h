@@ -28,17 +28,20 @@
 
 #include <xml/dom_docimpl.h>
 #include "html_interchange.h"
+#include <kxmlcore/PassRefPtr.h>
 
 namespace khtml {
 
 enum EChildrenOnly { IncludeNode, ChildrenOnly };
 
-DOM::DocumentFragmentImpl* createFragmentFromText(DOM::DocumentImpl* document,
-                                                  const QString& text);
-DOM::DocumentFragmentImpl* createFragmentFromMarkup(DOM::DocumentImpl* document,
-                                                    const QString& markup,
-                                                    const QString& baseURL);
-DOM::DocumentFragmentImpl* createFragmentFromNodeList(
+PassRefPtr<DOM::DocumentFragmentImpl> createFragmentFromText(
+    DOM::DocumentImpl* document,
+    const QString& text);
+PassRefPtr<DOM::DocumentFragmentImpl> createFragmentFromMarkup(
+    DOM::DocumentImpl* document,
+    const QString& markup,
+    const QString& baseURL);
+PassRefPtr<DOM::DocumentFragmentImpl> createFragmentFromNodeList(
     DOM::DocumentImpl* document,
     const QPtrList<DOM::NodeImpl>& nodeList);
 

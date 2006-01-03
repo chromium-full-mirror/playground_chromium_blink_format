@@ -47,7 +47,7 @@ class InsertParagraphSeparatorCommand : public CompositeEditCommand {
 
   QPtrList<DOM::NodeImpl> ancestors;
   QPtrList<DOM::NodeImpl> clonedNodes;
-  DOM::CSSMutableStyleDeclarationImpl* m_style;
+  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_style;
 };
 
 }  // namespace khtml

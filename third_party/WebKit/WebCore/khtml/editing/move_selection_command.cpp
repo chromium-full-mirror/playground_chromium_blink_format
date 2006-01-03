@@ -47,13 +47,9 @@ MoveSelectionCommand::MoveSelectionCommand(DocumentImpl* document,
       m_position(position),
       m_smartMove(smartMove) {
   ASSERT(m_fragment);
-  m_fragment->ref();
 }
 
-MoveSelectionCommand::~MoveSelectionCommand() {
-  ASSERT(m_fragment);
-  m_fragment->deref();
-}
+MoveSelectionCommand::~MoveSelectionCommand() {}
 
 void MoveSelectionCommand::doApply() {
   SelectionController selection = endingSelection();
@@ -91,8 +87,8 @@ void MoveSelectionCommand::doApply() {
     pos = endingSelection().start();
 
   setEndingSelection(pos, endingSelection().startAffinity());
-  EditCommandPtr cmd(
-      new ReplaceSelectionCommand(document(), m_fragment, true, m_smartMove));
+  EditCommandPtr cmd(new ReplaceSelectionCommand(document(), m_fragment.get(),
+                                                 true, m_smartMove));
   applyCommandToComposite(cmd);
 }
 

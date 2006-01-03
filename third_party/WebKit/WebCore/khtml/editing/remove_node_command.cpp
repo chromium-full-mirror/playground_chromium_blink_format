@@ -38,30 +38,10 @@ namespace khtml {
 RemoveNodeCommand::RemoveNodeCommand(DocumentImpl* document,
                                      NodeImpl* removeChild)
     : EditCommand(document),
-      m_parent(0),
       m_removeChild(removeChild),
-      m_refChild(0) {
-  ASSERT(m_removeChild);
-  m_removeChild->ref();
-
-  m_parent = m_removeChild->parentNode();
+      m_parent(m_removeChild->parentNode()),
+      m_refChild(m_removeChild->nextSibling()) {
   ASSERT(m_parent);
-  m_parent->ref();
-
-  m_refChild = m_removeChild->nextSibling();
-  if (m_refChild)
-    m_refChild->ref();
-}
-
-RemoveNodeCommand::~RemoveNodeCommand() {
-  ASSERT(m_parent);
-  m_parent->deref();
-
-  ASSERT(m_removeChild);
-  m_removeChild->deref();
-
-  if (m_refChild)
-    m_refChild->deref();
 }
 
 void RemoveNodeCommand::doApply() {
@@ -69,7 +49,7 @@ void RemoveNodeCommand::doApply() {
   ASSERT(m_removeChild);
 
   int exceptionCode = 0;
-  m_parent->removeChild(m_removeChild, exceptionCode);
+  m_parent->removeChild(m_removeChild.get(), exceptionCode);
   ASSERT(exceptionCode == 0);
 }
 
@@ -78,7 +58,7 @@ void RemoveNodeCommand::doUnapply() {
   ASSERT(m_removeChild);
 
   int exceptionCode = 0;
-  m_parent->insertBefore(m_removeChild, m_refChild, exceptionCode);
+  m_parent->insertBefore(m_removeChild.get(), m_refChild.get(), exceptionCode);
   ASSERT(exceptionCode == 0);
 }
 

@@ -61,7 +61,7 @@ class EditCommand : public Shared<EditCommand> {
 
   virtual EditAction editingAction() const;
 
-  virtual DOM::DocumentImpl* const document() const { return m_document; }
+  virtual DOM::DocumentImpl* const document() const { return m_document.get(); }
 
   SelectionController startingSelection() const { return m_startingSelection; }
   SelectionController endingSelection() const { return m_endingSelection; }
@@ -81,7 +81,7 @@ class EditCommand : public Shared<EditCommand> {
   void setEndingSelection(const DOM::Position& p, EAffinity affinity);
 
   DOM::CSSMutableStyleDeclarationImpl* typingStyle() const {
-    return m_typingStyle;
+    return m_typingStyle.get();
   };
   void setTypingStyle(DOM::CSSMutableStyleDeclarationImpl*);
 
@@ -94,15 +94,13 @@ class EditCommand : public Shared<EditCommand> {
   void updateLayout() const;
 
  private:
-  void assignTypingStyle(DOM::CSSMutableStyleDeclarationImpl*);
-
   virtual bool preservesTypingStyle() const;
 
-  DOM::DocumentImpl* m_document;
+  RefPtr<DOM::DocumentImpl> m_document;
   ECommandState m_state;
   SelectionController m_startingSelection;
   SelectionController m_endingSelection;
-  DOM::CSSMutableStyleDeclarationImpl* m_typingStyle;
+  RefPtr<DOM::CSSMutableStyleDeclarationImpl> m_typingStyle;
   EditCommand* m_parent;
 };
 
@@ -110,10 +108,6 @@ class EditCommandPtr : public RefPtr<EditCommand> {
  public:
   EditCommandPtr();
   EditCommandPtr(EditCommand*);
-  EditCommandPtr(const EditCommandPtr&);
-  ~EditCommandPtr();
-
-  EditCommandPtr& operator=(const EditCommandPtr&);
 
   bool isCompositeStep() const;
 
