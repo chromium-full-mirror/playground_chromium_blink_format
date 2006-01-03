@@ -64,17 +64,20 @@ static void parseErrorFunc(void* ctxt, const char* msg, ...) {
 // thus we have globals.
 static XSLTProcessorImpl* globalProcessor = 0;
 static khtml::DocLoader* globalDocLoader = 0;
-static xmlDocPtr stylesheetLoadFunc(const xmlChar* uri,
-                                    xmlDictPtr dict,
-                                    int options,
-                                    void* ctxt,
-                                    xsltLoadType type) {
+static xmlDocPtr docLoaderFunc(const xmlChar* uri,
+                               xmlDictPtr dict,
+                               int options,
+                               void* ctxt,
+                               xsltLoadType type) {
   if (!globalProcessor)
     return 0;
 
   switch (type) {
     case XSLT_LOAD_DOCUMENT: {
-      KURL url = KURL((char*)uri);
+      xsltTransformContextPtr context = (xsltTransformContextPtr)ctxt;
+      KURL url(
+          (const char*)xmlNodeGetBase(context->document->doc, context->node),
+          (const char*)uri);
       KURL finalURL;
       KIO::TransferJob* job = KIO::get(url, true, false);
       QByteArray data;
@@ -325,7 +328,7 @@ bool XSLTProcessorImpl::transformToString(NodeImpl* sourceNode,
   RefPtr<DocumentImpl> ownerDocument = sourceNode->getDocument();
   RefPtr<XSLStyleSheetImpl> cachedStylesheet = m_stylesheet;
 
-  setXSLTLoadCallBack(stylesheetLoadFunc, this, ownerDocument->docLoader());
+  setXSLTLoadCallBack(docLoaderFunc, this, ownerDocument->docLoader());
   xsltStylesheetPtr sheet =
       xsltStylesheetPointer(cachedStylesheet, m_stylesheetRootNode.get());
   if (!sheet) {
