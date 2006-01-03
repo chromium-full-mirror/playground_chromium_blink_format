@@ -684,8 +684,9 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   m_part->xmlDocImpl()->prepareMouseEvent(
       d->mousePressed && m_part->mouseDownMayStartSelect(), d->mousePressed, xm,
       ym, &mev);
-  if (KWQ(m_part)->passSubframeEventToSubframe(mev))
-    return;
+
+  if (!KWQ(m_part)->passSubframeEventToSubframe(mev))
+    viewport()->setCursor(selectCursor(mev, m_part, d->mousePressed));
 
   bool swallowEvent =
       dispatchMouseEvent(mousemoveEvent, mev.innerNode.get(), false, 0, _mouse,
@@ -694,8 +695,6 @@ void KHTMLView::viewportMouseMoveEvent(QMouseEvent* _mouse) {
   // execute the scheduled script. This is to make sure the mouseover events
   // come after the mouseout events
   m_part->executeScheduledScript();
-
-  viewport()->setCursor(selectCursor(mev, m_part, d->mousePressed));
 
   d->prevMouseX = xm;
   d->prevMouseY = ym;
