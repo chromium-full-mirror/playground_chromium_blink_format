@@ -435,7 +435,8 @@ class Selection : public JSObject {
     ToString,
     SetBaseAndExtent,
     SetPosition,
-    Modify
+    Modify,
+    GetRangeAt
   };
   KHTMLPart* part() const { return m_part; }
   virtual const ClassInfo* classInfo() const { return &info; }
