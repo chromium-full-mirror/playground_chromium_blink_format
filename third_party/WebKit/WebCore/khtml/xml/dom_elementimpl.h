@@ -270,6 +270,8 @@ class ElementImpl : public ContainerNodeImpl {
   // not part of the DOM
   void setAttributeMap(NamedAttrMapImpl*);
 
+  virtual void copyNonAttributeProperties(const ElementImpl* source) {}
+
   // State of the element.
   virtual QString state() { return QString::null; }
 

@@ -712,6 +712,8 @@ NodeImpl* DocumentImpl::importNode(NodeImpl* importedNode,
         }
       }
 
+      newElement->copyNonAttributeProperties(oldElement);
+
       if (deep) {
         for (NodeImpl* oldChild = oldElement->firstChild(); oldChild;
              oldChild = oldChild->nextSibling()) {
