@@ -1471,8 +1471,8 @@ JSValue* DOMDOMImplementationProtoFunc::callAsFunction(ExecState* exec,
                             args[2]->toString(exec).domString(), exception));
     case DOMDOMImplementation::CreateDocument:  // DOM2
       return getDOMNode(exec, implementation.createDocument(
-                                  args[0]->toString(exec).domString(),
-                                  args[1]->toString(exec).domString(),
+                                  valueToStringWithNullCheck(exec, args[0]),
+                                  valueToStringWithNullCheck(exec, args[1]),
                                   toDocumentType(args[2]), exception));
     case DOMDOMImplementation::CreateCSSStyleSheet:  // DOM2
       return getDOMStyleSheet(
