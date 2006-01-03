@@ -163,15 +163,15 @@ CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          KIO::CacheControl _cachePolicy,
                                          time_t _expireDate,
                                          const QString& charset)
-    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate) {
+    : CachedObject(url, CSSStyleSheet, _cachePolicy, _expireDate), m_codec(0) {
   // It's css we want.
-  setAccept(QString::fromLatin1("text/css"));
+  setAccept("text/css");
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
   if (!charset.isEmpty())
     m_codec = QTextCodec::codecForName(charset.latin1());
-  else
+  if (!m_codec)
     m_codec = QTextCodec::codecForName("iso8859-1");
 }
 
@@ -249,18 +249,18 @@ CachedScript::CachedScript(DocLoader* dl,
                            KIO::CacheControl _cachePolicy,
                            time_t _expireDate,
                            const QString& charset)
-    : CachedObject(url, Script, _cachePolicy, _expireDate) {
+    : CachedObject(url, Script, _cachePolicy, _expireDate), m_codec(0) {
   // It's javascript we want.
   // But some websites think their scripts are <some wrong mimetype here>
   // and refuse to serve them if we only accept application/x-javascript.
-  setAccept(QString::fromLatin1("*/*"));
+  setAccept("*/*");
   m_errorOccurred = false;
   // load the file
   Cache::loader()->load(dl, this, false);
   m_loading = true;
   if (!charset.isEmpty())
     m_codec = QTextCodec::codecForName(charset.latin1());
-  else
+  if (!m_codec)
     m_codec = QTextCodec::codecForName("iso8859-1");
 }
 
@@ -618,9 +618,9 @@ CachedXSLStyleSheet::CachedXSLStyleSheet(DocLoader* dl,
   // It's XML we want.
   // FIXME: This should accept more general xml formats */*+xml, image/svg+xml
   // for example.
-  setAccept(QString::fromLatin1(
+  setAccept(
       "text/xml, application/xml, application/xhtml+xml, text/xsl, "
-      "application/rss+xml, application/atom+xml"));
+      "application/rss+xml, application/atom+xml");
 
   // load the file
   Cache::loader()->load(dl, this, false);
@@ -682,9 +682,9 @@ CachedXBLDocument::CachedXBLDocument(DocLoader* dl,
                                      time_t _expireDate)
     : CachedObject(url, XBL, _cachePolicy, _expireDate), m_document(0) {
   // It's XML we want.
-  setAccept(QString::fromLatin1(
+  setAccept(
       "text/xml, application/xml, application/xhtml+xml, text/xsl, "
-      "application/rss+xml, application/atom+xml"));
+      "application/rss+xml, application/atom+xml");
 
   // Load the file
   Cache::loader()->load(dl, this, false);
