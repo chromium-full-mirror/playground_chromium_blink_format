@@ -159,6 +159,11 @@ JSValue* XSLTProcessorProtoFunc::callAsFunction(ExecState* exec,
   }
   return jsUndefined();
 }
+
+XSLTProcessorConstructorImp::XSLTProcessorConstructorImp(ExecState* exec) {
+  putDirect(prototypePropertyName, XSLTProcessorProto::self(exec),
+            DontEnum | DontDelete | ReadOnly);
+}
 };
 
 #endif  // KHTML_XSLT

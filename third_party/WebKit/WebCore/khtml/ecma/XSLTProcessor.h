@@ -68,7 +68,7 @@ class XSLTProcessor : public DOMObject {
 
 class XSLTProcessorConstructorImp : public JSObject {
  public:
-  XSLTProcessorConstructorImp(ExecState*) {}
+  XSLTProcessorConstructorImp(ExecState*);
   virtual bool implementsConstruct() const { return true; }
   virtual JSObject* construct(ExecState* exec, const List& args) {
     return new XSLTProcessor(exec);
