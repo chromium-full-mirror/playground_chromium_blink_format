@@ -50,8 +50,12 @@ class Lexer {
 
   enum State {
     Start,
+    IdentifierOrKeyword,
     Identifier,
+    InIdentifierOrKeyword,
     InIdentifier,
+    InIdentifierUnicodeEscapeStart,
+    InIdentifierUnicodeEscape,
     InSingleLineComment,
     InMultiLineComment,
     InNum,
@@ -122,8 +126,8 @@ class Lexer {
                               unsigned short c2,
                               unsigned short c3,
                               unsigned short c4);
-  static bool isIdentLetter(unsigned short c);
-  static bool isDecimalDigit(unsigned short c);
+  static bool isIdentStart(unsigned short c);
+  static bool isIdentPart(unsigned short c);
   static bool isHexDigit(unsigned short c);
 
 #ifdef KJS_DEBUG_MEM
