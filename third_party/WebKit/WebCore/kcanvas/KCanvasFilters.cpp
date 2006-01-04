@@ -67,11 +67,11 @@ QTextStream& operator<<(QTextStream& ts, const KCanvasFilterEffect& e) {
   return e.externalRepresentation(ts);
 }
 
-QRect KCanvasFilterEffect::subRegion() const {
+QRectF KCanvasFilterEffect::subRegion() const {
   return m_subregion;
 }
 
-void KCanvasFilterEffect::setSubRegion(const QRect& subregion) {
+void KCanvasFilterEffect::setSubRegion(const QRectF& subregion) {
   m_subregion = subregion;
 }
 
@@ -126,11 +126,6 @@ QTextStream& KCDistantLightSource::externalRepresentation(
   ts << "[type=DISTANT-LIGHT] ";
   ts << "[azimuth=\"" << azimuth() << "\"]";
   ts << "[elevation=\"" << elevation() << "\"]";
-  return ts;
-}
-
-static QTextStream& operator<<(QTextStream& ts, QPointF p) {
-  ts << "x=" << p.x() << " y=" << p.y();
   return ts;
 }
 
@@ -257,11 +252,6 @@ static QTextStream& operator<<(QTextStream& ts, KCEdgeModeType t) {
       ts << "NONE";
       break;
   }
-  return ts;
-}
-
-static QTextStream& operator<<(QTextStream& ts, QSize s) {
-  ts << "x=" << s.width() << " y=" << s.height();
   return ts;
 }
 

@@ -40,8 +40,8 @@ class KCanvasFilterQuartz : public KCanvasFilter {
   KCanvasFilterQuartz();
   virtual ~KCanvasFilterQuartz();
 
-  virtual void prepareFilter(KRenderingDevice* device, const QRect& bbox);
-  virtual void applyFilter(KRenderingDevice* device, const QRect& bbox);
+  virtual void prepareFilter(KRenderingDevice* device, const QRectF& bbox);
+  virtual void applyFilter(KRenderingDevice* device, const QRectF& bbox);
 
   CIImage* imageForName(const QString& name) const;
   void setImageForName(CIImage* image, const QString& name);

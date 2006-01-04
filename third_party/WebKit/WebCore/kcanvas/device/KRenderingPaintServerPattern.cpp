@@ -32,7 +32,6 @@ class KRenderingPaintServerPattern::Private {
  public:
   Private() {
     tile = 0;
-    x = y = width = height = 0;
     useBoundingBoxMode = true;
     listener = 0;
   }
@@ -40,7 +39,7 @@ class KRenderingPaintServerPattern::Private {
 
   KCanvasImage* tile;
   KCanvasMatrix patternTransform;
-  float x, y, width, height;
+  QRectF bbox;
   bool useBoundingBoxMode;
   KCanvasResourceListener* listener;
 };
@@ -52,20 +51,12 @@ KRenderingPaintServerPattern::~KRenderingPaintServerPattern() {
   delete d;
 }
 
-float KRenderingPaintServerPattern::x() const {
-  return d->x;
+void KRenderingPaintServerPattern::setBbox(const QRectF& rect) {
+  d->bbox = rect;
 }
 
-void KRenderingPaintServerPattern::setX(float x) {
-  d->x = x;
-}
-
-float KRenderingPaintServerPattern::y() const {
-  return d->y;
-}
-
-void KRenderingPaintServerPattern::setY(float y) {
-  d->y = y;
+QRectF KRenderingPaintServerPattern::bbox() const {
+  return d->bbox;
 }
 
 bool KRenderingPaintServerPattern::boundingBoxMode() const {
@@ -74,22 +65,6 @@ bool KRenderingPaintServerPattern::boundingBoxMode() const {
 
 void KRenderingPaintServerPattern::setBoundingBoxMode(bool mode) {
   d->useBoundingBoxMode = mode;
-}
-
-float KRenderingPaintServerPattern::width() const {
-  return d->width;
-}
-
-void KRenderingPaintServerPattern::setWidth(float width) {
-  d->width = width;
-}
-
-float KRenderingPaintServerPattern::height() const {
-  return d->height;
-}
-
-void KRenderingPaintServerPattern::setHeight(float height) {
-  d->height = height;
 }
 
 KCanvasImage* KRenderingPaintServerPattern::tile() const {
@@ -125,8 +100,7 @@ void KRenderingPaintServerPattern::setListener(
 QTextStream& KRenderingPaintServerPattern::externalRepresentation(
     QTextStream& ts) const {
   ts << "[type=PATTERN]"
-     << " [x=" << x() << " y=" << y() << " w=" << width() << " h=" << height()
-     << "]";
+     << " [bbox=" << bbox() << "]";
   if (!boundingBoxMode())
     ts << " [bounding box mode=" << boundingBoxMode() << "]";
   if (!patternTransform().qmatrix().isIdentity())

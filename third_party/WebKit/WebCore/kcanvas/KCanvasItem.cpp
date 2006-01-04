@@ -46,7 +46,7 @@ class RenderPath::Private {
   KSVG::KCanvasRenderingStyle* style;
   RefPtr<KCanvasPath> path;
 
-  QRect fillBBox, strokeBbox;
+  QRectF fillBBox, strokeBbox;
   QMatrix matrix;
 };
 
@@ -75,22 +75,22 @@ void RenderPath::setLocalTransform(const QMatrix& matrix) {
   d->matrix = matrix;
 }
 
-bool RenderPath::fillContains(const QPoint& p) const {
+bool RenderPath::fillContains(const QPointF& p) const {
   if (d->path && d->style)
     return hitsPath(p, true);
 
   return false;
 }
 
-bool RenderPath::strokeContains(const QPoint& p) const {
+bool RenderPath::strokeContains(const QPointF& p) const {
   if (d->path && d->style)
     return hitsPath(p, false);
 
   return false;
 }
 
-QRect RenderPath::relativeBBox(bool includeStroke) const {
-  QRect result;
+QRectF RenderPath::relativeBBox(bool includeStroke) const {
+  QRectF result;
 
   if (!d->path)
     return result;

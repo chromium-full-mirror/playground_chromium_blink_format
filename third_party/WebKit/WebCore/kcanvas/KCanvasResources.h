@@ -112,7 +112,7 @@ class KCanvasMarker : public KCanvasResource {
   float scaleY() const;
 
   // Draw onto the canvas
-  void draw(const QRect& rect,
+  void draw(const QRectF& rect,
             double x,
             double y,
             double strokeWidth = 1.,

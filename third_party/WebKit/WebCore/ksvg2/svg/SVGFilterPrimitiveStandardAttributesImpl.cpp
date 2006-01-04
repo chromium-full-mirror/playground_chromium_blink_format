@@ -121,12 +121,10 @@ void SVGFilterPrimitiveStandardAttributesImpl::setStandardAttributes(
   float _width = width()->baseVal()->value(),
         _height = height()->baseVal()->value();
   if (bbox)
-    filterEffect->setSubRegion(QRect(int(_x * 100.f), int(_y * 100.f),
-                                     int(_width * 100.f),
-                                     int(_height * 100.f)));
-  else
     filterEffect->setSubRegion(
-        QRect(int(_x), int(_y), int(_width), int(_height)));
+        QRectF(_x * 100.f, _y * 100.f, _width * 100.f, _height * 100.f));
+  else
+    filterEffect->setSubRegion(QRectF(_x, _y, _width, _height));
 
   filterEffect->setResult(KDOM::DOMString(result()->baseVal()).qstring());
 }

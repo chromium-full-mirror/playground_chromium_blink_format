@@ -90,7 +90,7 @@ float SVGLengthImpl::value() const {
   // decimal value (e.g., 50% means the same as 0.5).
   khtml::RenderObject* item = (m_context ? m_context->renderer() : 0);
   if (item) {
-    QRect bbox = item->relativeBBox();
+    QRectF bbox = item->relativeBBox();
 
     float result = 0;
     if (m_mode == LM_WIDTH)

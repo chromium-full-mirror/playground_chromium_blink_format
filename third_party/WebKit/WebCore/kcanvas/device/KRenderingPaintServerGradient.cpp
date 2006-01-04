@@ -164,7 +164,7 @@ class KRenderingPaintServerLinearGradient::Private {
   Private() {}
   ~Private() {}
 
-  QPoint start, end;
+  QPointF start, end;
 };
 
 KRenderingPaintServerLinearGradient::KRenderingPaintServerLinearGradient()
@@ -174,20 +174,20 @@ KRenderingPaintServerLinearGradient::~KRenderingPaintServerLinearGradient() {
   delete d;
 }
 
-QPoint KRenderingPaintServerLinearGradient::gradientStart() const {
+QPointF KRenderingPaintServerLinearGradient::gradientStart() const {
   return d->start;
 }
 
 void KRenderingPaintServerLinearGradient::setGradientStart(
-    const QPoint& start) {
+    const QPointF& start) {
   d->start = start;
 }
 
-QPoint KRenderingPaintServerLinearGradient::gradientEnd() const {
+QPointF KRenderingPaintServerLinearGradient::gradientEnd() const {
   return d->end;
 }
 
-void KRenderingPaintServerLinearGradient::setGradientEnd(const QPoint& end) {
+void KRenderingPaintServerLinearGradient::setGradientEnd(const QPointF& end) {
   d->end = end;
 }
 
@@ -211,7 +211,7 @@ class KRenderingPaintServerRadialGradient::Private {
   ~Private() {}
 
   float radius;
-  QPoint center, focal;
+  QPointF center, focal;
 };
 
 KRenderingPaintServerRadialGradient::KRenderingPaintServerRadialGradient()
@@ -221,21 +221,21 @@ KRenderingPaintServerRadialGradient::~KRenderingPaintServerRadialGradient() {
   delete d;
 }
 
-QPoint KRenderingPaintServerRadialGradient::gradientCenter() const {
+QPointF KRenderingPaintServerRadialGradient::gradientCenter() const {
   return d->center;
 }
 
 void KRenderingPaintServerRadialGradient::setGradientCenter(
-    const QPoint& center) {
+    const QPointF& center) {
   d->center = center;
 }
 
-QPoint KRenderingPaintServerRadialGradient::gradientFocal() const {
+QPointF KRenderingPaintServerRadialGradient::gradientFocal() const {
   return d->focal;
 }
 
 void KRenderingPaintServerRadialGradient::setGradientFocal(
-    const QPoint& focal) {
+    const QPointF& focal) {
   d->focal = focal;
 }
 
