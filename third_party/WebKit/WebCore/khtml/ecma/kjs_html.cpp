@@ -161,6 +161,7 @@ const ClassInfo KJS::HTMLDocument::info = {"HTMLDocument", &DOMDocument::info,
   cookie		HTMLDocument::Cookie		DontDelete
   images		HTMLDocument::Images		DontDelete|ReadOnly
   embeds		HTMLDocument::Embeds		DontDelete|ReadOnly
+  plugins		HTMLDocument::Embeds		DontDelete|ReadOnly
   applets		HTMLDocument::Applets		DontDelete|ReadOnly
   links			HTMLDocument::Links		DontDelete|ReadOnly
   forms			HTMLDocument::Forms		DontDelete|ReadOnly
