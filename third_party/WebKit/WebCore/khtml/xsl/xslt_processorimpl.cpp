@@ -25,6 +25,7 @@
 #include "xslt_processorimpl.h"
 #include "xsl_stylesheetimpl.h"
 #include "xml_tokenizer.h"
+#include "dom_textimpl.h"
 #include "htmltokenizer.h"
 #include "html_documentimpl.h"
 #include "loader.h"
@@ -161,7 +162,7 @@ static const char** xsltParamArrayFromParameterMap(
     return 0;
 
   const char** parameterArray =
-      (const char**)malloc(((parameters.size() * 2) + 1) * sizeof(char*));
+      (const char**)fastMalloc(((parameters.size() * 2) + 1) * sizeof(char*));
 
   XSLTProcessorImpl::ParameterMap::iterator end = parameters.end();
   unsigned index = 0;
@@ -183,10 +184,11 @@ static void freeXsltParamArray(const char** params) {
     return;
 
   while (*temp) {
-    free((void*)*(temp++));
+    free((void*)*(temp++));  // strdup returns malloc'd blocks, so we have to
+                             // use free() here
     free((void*)*(temp++));
   }
-  free(params);
+  fastFree(params);
 }
 
 RefPtr<DocumentImpl> XSLTProcessorImpl::createDocumentFromSource(
@@ -250,16 +252,16 @@ static inline RefPtr<DocumentFragmentImpl> createFragmentFromSource(
     QString sourceString,
     QString sourceMIMEType,
     NodeImpl* sourceNode,
-    DocumentImpl* ouputDoc) {
-  RefPtr<DocumentFragmentImpl> fragment = new DocumentFragmentImpl(ouputDoc);
+    DocumentImpl* outputDoc) {
+  RefPtr<DocumentFragmentImpl> fragment = new DocumentFragmentImpl(outputDoc);
 
   if (sourceMIMEType == "text/html")
     parseHTMLDocumentFragment(sourceString, fragment.get());
+  else if (sourceMIMEType == "text/plain")
+    fragment->addChild(new TextImpl(outputDoc, sourceString));
   else {
-    if (sourceMIMEType == "text/plain")
-      transformTextStringToXHTMLDocumentString(sourceString);
     bool successfulParse = parseXMLDocumentFragment(
-        sourceString, fragment.get(), ouputDoc->documentElement());
+        sourceString, fragment.get(), outputDoc->documentElement());
     if (!successfulParse)
       return 0;
   }
