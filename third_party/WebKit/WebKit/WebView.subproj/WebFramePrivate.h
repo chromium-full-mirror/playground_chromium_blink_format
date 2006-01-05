@@ -93,7 +93,6 @@ extern NSString* WebPageCacheDocumentViewKey;
     subframeArchives:(NSArray*)subframeArchives;
 
 - (void)_setWebView:(WebView*)webView;
-- (void)_setName:(NSString*)name;
 - (void)_detachFromParent;
 - (void)_detachChildren;
 - (void)_closeOldDataSources;
@@ -166,7 +165,6 @@ extern NSString* WebPageCacheDocumentViewKey;
 
 - (void)_addChild:(WebFrame*)child;
 
-- (NSString*)_generateFrameName;
 - (NSDictionary*)_actionInformationForNavigationType:
                      (WebNavigationType)navigationType
                                                event:(NSEvent*)event

@@ -28,10 +28,10 @@
 
 #import <Foundation/Foundation.h>
 
-@class WebFrame;
+@class WebCoreBridge;
 
-@interface WebFrameNamespaces : NSObject
-+ (void)addFrame:(WebFrame*)frame toNamespace:(NSString*)name;
-+ (void)removeFrame:(WebFrame*)frame fromNamespace:(NSString*)name;
+@interface WebCoreFrameNamespaces : NSObject
++ (void)addFrame:(WebCoreBridge*)frame toNamespace:(NSString*)name;
++ (void)removeFrame:(WebCoreBridge*)frame fromNamespace:(NSString*)name;
 + (NSEnumerator*)framesInNamespace:(NSString*)name;
 @end

@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <WebKit/WebControllerSets.h>
+#import "WebCoreFrameNamespaces.h"
 
 static CFSetCallBacks NonRetainingSetCallbacks = {
 0,
@@ -37,11 +37,11 @@ CFEqual,
 CFHash
 };
 
-@implementation WebFrameNamespaces
+@implementation WebCoreFrameNamespaces
 
 NSMutableDictionary *namespaces = nil;
 
-+(void)addFrame:(WebFrame *)frame toNamespace:(NSString *)name
++(void)addFrame:(WebCoreBridge *)frame toNamespace:(NSString *)name
 {
     if (!name)
         return;
@@ -60,7 +60,7 @@ NSMutableDictionary *namespaces = nil;
     CFSetSetValue(namespace, frame);
 }
 
-+(void)removeFrame:(WebFrame *)frame fromNamespace:(NSString *)name
++(void)removeFrame:(WebCoreBridge *)frame fromNamespace:(NSString *)name
 {
     if (!name)
         return;

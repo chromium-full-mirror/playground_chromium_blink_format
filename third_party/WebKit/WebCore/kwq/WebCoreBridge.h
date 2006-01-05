@@ -192,6 +192,8 @@ typedef enum {
   WebCoreBridge* _firstChild;
   WebCoreBridge* _lastChild;
   int _childCount;
+
+  NSString* _frameNamespace;
 }
 
 + (WebCoreBridge*)bridgeForDOMDocument:(DOMDocument*)document;
@@ -205,6 +207,9 @@ typedef enum {
 
 - (void)setName:(NSString*)name;
 - (NSString*)name;
+/* Creates a name for an frame unnamed in the HTML.  It should produce
+ * repeatable results for loads of the same frameset. */
+- (NSString*)generateFrameName;
 
 - (KWQKHTMLPart*)part;
 
@@ -222,6 +227,14 @@ typedef enum {
 - (unsigned)childCount;
 - (BOOL)isDescendantOfFrame:(WebCoreBridge*)ancestor;
 - (WebCoreBridge*)traverseNextFrameStayWithin:(WebCoreBridge*)stayWithin;
+
+- (WebCoreBridge*)nextFrameWithWrap:(BOOL)wrap;
+- (WebCoreBridge*)previousFrameWithWrap:(BOOL)wrap;
+
+- (WebCoreBridge*)childFrameNamed:(NSString*)name;
+- (WebCoreBridge*)findFrameNamed:(NSString*)name;
+- (void)setFrameNamespace:(NSString*)ns;
+- (NSString*)frameNamespace;
 
 - (void)provisionalLoadStarted;
 
@@ -544,10 +557,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 @protocol WebCoreBridge
 
 - (WebCoreBridge*)mainFrame;
-- (WebCoreBridge*)findFrameNamed:(NSString*)name;
-/* Creates a name for an frame unnamed in the HTML.  It should produce
- * repeatable results for loads of the same frameset. */
-- (NSString*)generateFrameName;
 - (void)frameDetached;
 - (NSView*)documentView;
 - (WebView*)webView;
@@ -729,8 +738,6 @@ rangeByAlteringCurrentSelection:(WebSelectionAlteration)alteration
 - (void)setHasBorder:(BOOL)hasBorder;
 
 - (WebCoreKeyboardUIMode)keyboardUIMode;
-
-- (void)didSetName:(NSString*)name;
 
 - (NSFileWrapper*)fileWrapperForURL:(NSURL*)URL;
 
