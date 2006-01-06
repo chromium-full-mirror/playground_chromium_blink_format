@@ -194,6 +194,12 @@ class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
                                            clipPath,
                                            QString())
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
+                                           mask,
+                                           maskElement,
+                                           MaskElement,
+                                           maskElement,
+                                           QString())
+  RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
                                            markers,
                                            startMarker,
                                            StartMarker,
@@ -296,6 +302,7 @@ class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
 
   // non-inherited attributes
   KDOM::DataRef<StyleClipData> clip;
+  KDOM::DataRef<StyleMaskData> mask;
 
   // static default style
   static SVGRenderStyle* s_defaultStyle;

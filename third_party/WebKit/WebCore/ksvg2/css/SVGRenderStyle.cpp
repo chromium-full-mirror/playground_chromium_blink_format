@@ -41,6 +41,7 @@ SVGRenderStyle::SVGRenderStyle() {
   stroke = s_defaultStyle->stroke;
   stops = s_defaultStyle->stops;
   clip = s_defaultStyle->clip;
+  mask = s_defaultStyle->mask;
   misc = s_defaultStyle->misc;
   markers = s_defaultStyle->markers;
 
@@ -54,6 +55,7 @@ SVGRenderStyle::SVGRenderStyle(bool) {
   stroke.init();
   stops.init();
   clip.init();
+  mask.init();
   misc.init();
   markers.init();
 }
@@ -64,6 +66,7 @@ SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
   stroke = other.stroke;
   stops = other.stops;
   clip = other.clip;
+  mask = other.mask;
   misc = other.misc;
   markers = other.markers;
 
@@ -75,7 +78,8 @@ SVGRenderStyle::~SVGRenderStyle() {}
 
 bool SVGRenderStyle::operator==(const SVGRenderStyle& o) const {
   return (fill == o.fill && stroke == o.stroke && stops == o.stops &&
-          clip == o.clip && misc == o.misc && markers == o.markers &&
+          clip == o.clip && mask == o.mask && misc == o.misc &&
+          markers == o.markers &&
           svg_inherited_flags == o.svg_inherited_flags &&
           svg_noninherited_flags == o.svg_noninherited_flags);
 }

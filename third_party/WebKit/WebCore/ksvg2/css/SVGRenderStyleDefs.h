@@ -185,6 +185,22 @@ class StyleClipData : public KDOM::Shared<StyleClipData> {
   StyleClipData& operator=(const StyleClipData&);
 };
 
+class StyleMaskData : public KDOM::Shared<StyleMaskData> {
+ public:
+  StyleMaskData();
+  StyleMaskData(const StyleMaskData& other);
+
+  bool operator==(const StyleMaskData& other) const;
+  bool operator!=(const StyleMaskData& other) const {
+    return !(*this == other);
+  }
+
+  QString maskElement;
+
+ private:
+  StyleMaskData& operator=(const StyleMaskData&);
+};
+
 class StyleMarkerData : public KDOM::Shared<StyleMarkerData> {
  public:
   StyleMarkerData();
