@@ -50,10 +50,9 @@
 #if WIN32
 #include <float.h>
 #define copysign(a, b) _copysign(a, b)
-#endif
-
 template void* const& KXMLCore::extractFirst<struct std::pair<void*, void*>>(
     struct std::pair<void*, void*> const&);
+#endif
 
 extern int kjsyyparse();
 
