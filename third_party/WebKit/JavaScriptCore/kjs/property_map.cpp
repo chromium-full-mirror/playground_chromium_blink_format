@@ -284,7 +284,10 @@ static void printAttributes(int attributes) {
 }
 #endif
 
-void PropertyMap::put(const Identifier& name, JSValue* value, int attributes) {
+void PropertyMap::put(const Identifier& name,
+                      JSValue* value,
+                      int attributes,
+                      bool roCheck) {
   assert(!name.isNull());
   assert(value != 0);
 
@@ -302,7 +305,7 @@ void PropertyMap::put(const Identifier& name, JSValue* value, int attributes) {
   if (!_table) {
     UString::Rep* key = _singleEntry.key;
     if (key) {
-      if (rep == key) {
+      if (rep == key && !(roCheck && (_singleEntry.attributes & ReadOnly))) {
         _singleEntry.value = value;
         return;
       }
@@ -333,6 +336,8 @@ void PropertyMap::put(const Identifier& name, JSValue* value, int attributes) {
 #endif
   while (UString::Rep* key = entries[i].key) {
     if (rep == key) {
+      if (roCheck && (_table->entries[i].attributes & ReadOnly))
+        return;
       // Put a new value in an existing hash table entry.
       entries[i].value = value;
       // Attributes are intentionally not updated.
