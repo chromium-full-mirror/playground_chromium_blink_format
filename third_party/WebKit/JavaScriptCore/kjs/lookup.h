@@ -38,6 +38,7 @@ struct HashEntry {
    * s is the key (e.g. a property name)
    */
   const char* s;
+
   /**
    * value is the result value (usually an enum value)
    */
@@ -114,16 +115,6 @@ class Lookup {
    */
   static const HashEntry* findEntry(const struct HashTable* table,
                                     const Identifier& s);
-  static const HashEntry* findEntry(const struct HashTable* table,
-                                    const UChar* c,
-                                    unsigned int len);
-
-  /**
-   * Calculate the hash value for a given key
-   */
-  static unsigned int hash(const Identifier& key);
-  static unsigned int hash(const UChar* c, unsigned int len);
-  static unsigned int hash(const char* s);
 };
 
 class ExecState;
