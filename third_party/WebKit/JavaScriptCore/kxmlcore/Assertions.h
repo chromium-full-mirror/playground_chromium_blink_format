@@ -35,10 +35,16 @@
 // For non-debug builds, everything is disabled by default.
 // Defining any of the symbols explicitly prevents this from having any effect.
 
+#ifdef WIN32
+#define ASSERT_DISABLED \
+  1  // FIXME: We have to undo all the assert macros, since they are currently
+     // in a .mm file and use obj-c.
+#else
 #ifdef NDEBUG
 #define ASSERTIONS_DISABLED_DEFAULT 1
 #else
 #define ASSERTIONS_DISABLED_DEFAULT 0
+#endif
 #endif
 
 #ifndef ASSERT_DISABLED
@@ -59,6 +65,12 @@
 
 #ifndef LOG_DISABLED
 #define LOG_DISABLED ASSERTIONS_DISABLED_DEFAULT
+#endif
+
+#ifdef __GNUC__
+#define KXMLCORE_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#else
+#define KXMLCORE_PRETTY_FUNCTION __FUNCTION__
 #endif
 
 // These helper functions are always declared, but not necessarily always
@@ -126,31 +138,33 @@ void KXCLog(const char* file,
 #if ASSERT_DISABLED
 
 #define ASSERT(assertion) ((void)0)
-#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs...) ((void)0)
+#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs, ...) ((void)0)
 #define ASSERT_NOT_REACHED() ((void)0)
 
 #else
 
-#define ASSERT(assertion)                                                \
-  do                                                                     \
-    if (!(assertion)) {                                                  \
-      KXCReportAssertionFailure(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
-                                #assertion);                             \
-      CRASH();                                                           \
-    }                                                                    \
+#define ASSERT(assertion)                                                     \
+  do                                                                          \
+    if (!(assertion)) {                                                       \
+      KXCReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+                                #assertion);                                  \
+      CRASH();                                                                \
+    }                                                                         \
   while (0)
-#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs...)                       \
-  do                                                                           \
-    if (!(assertion)) {                                                        \
-      KXCReportAssertionFailureWithMessage(                                    \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #assertion, formatAndArgs); \
-      CRASH();                                                                 \
-    }                                                                          \
+#define ASSERT_WITH_MESSAGE(assertion, formatAndArgs, ...)             \
+  do                                                                   \
+    if (!(assertion)) {                                                \
+      KXCReportAssertionFailureWithMessage(__FILE__, __LINE__,         \
+                                           KXMLCORE_PRETTY_FUNCTION,   \
+                                           #assertion, formatAndArgs); \
+      CRASH();                                                         \
+    }                                                                  \
   while (0)
-#define ASSERT_NOT_REACHED()                                               \
-  do {                                                                     \
-    KXCReportAssertionFailure(__FILE__, __LINE__, __PRETTY_FUNCTION__, 0); \
-    CRASH();                                                               \
+#define ASSERT_NOT_REACHED()                                                \
+  do {                                                                      \
+    KXCReportAssertionFailure(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+                              0);                                           \
+    CRASH();                                                                \
   } while (0)
 
 #endif
@@ -163,13 +177,13 @@ void KXCLog(const char* file,
 
 #else
 
-#define ASSERT_ARG(argName, assertion)                                    \
-  do                                                                      \
-    if (!(assertion)) {                                                   \
-      KXCReportArgumentAssertionFailure(                                  \
-          __FILE__, __LINE__, __PRETTY_FUNCTION__, #argName, #assertion); \
-      CRASH();                                                            \
-    }                                                                     \
+#define ASSERT_ARG(argName, assertion)                                         \
+  do                                                                           \
+    if (!(assertion)) {                                                        \
+      KXCReportArgumentAssertionFailure(                                       \
+          __FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, #argName, #assertion); \
+      CRASH();                                                                 \
+    }                                                                          \
   while (0)
 
 #endif
@@ -177,32 +191,32 @@ void KXCLog(const char* file,
 // FATAL
 
 #if FATAL_DISABLED
-#define FATAL(formatAndArgs...) ((void)0)
+#define FATAL(formatAndArgs, ...) ((void)0)
 #else
-#define FATAL(formatAndArgs...)                                  \
-  do {                                                           \
-    KXCReportFatalError(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
-                        formatAndArgs);                          \
-    CRASH();                                                     \
+#define FATAL(formatAndArgs, ...)                                     \
+  do {                                                                \
+    KXCReportFatalError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, \
+                        formatAndArgs);                               \
+    CRASH();                                                          \
   } while (0)
 #endif
 
 // ERROR
 
 #if ERROR_DISABLED
-#define ERROR(formatAndArgs...) ((void)0)
+#define ERROR(formatAndArgs, ...) ((void)0)
 #else
-#define ERROR(formatAndArgs...) \
-  KXCReportError(__FILE__, __LINE__, __PRETTY_FUNCTION__, formatAndArgs)
+#define ERROR(formatAndArgs, ...) \
+  KXCReportError(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION, formatAndArgs)
 #endif
 
 // LOG
 
 #if LOG_DISABLED
-#define LOG(channel, formatAndArgs...) ((void)0)
+#define LOG(channel, formatAndArgs, ...) ((void)0)
 #else
-#define LOG(channel, formatAndArgs...)                               \
-  KXCLog(__FILE__, __LINE__, __PRETTY_FUNCTION__,                    \
+#define LOG(channel, formatAndArgs, ...)                             \
+  KXCLog(__FILE__, __LINE__, KXMLCORE_PRETTY_FUNCTION,               \
          &JOIN_LOG_CHANNEL_WITH_PREFIX(LOG_CHANNEL_PREFIX, channel), \
          formatAndArgs)
 #define JOIN_LOG_CHANNEL_WITH_PREFIX(prefix, channel) \

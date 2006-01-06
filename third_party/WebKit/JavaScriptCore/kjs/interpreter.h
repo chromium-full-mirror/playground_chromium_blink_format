@@ -405,12 +405,14 @@ class Interpreter {
    */
   virtual bool isSafeScript(const Interpreter* target) { return true; }
 
+#if __APPLE__
   virtual void* createLanguageInstanceForValue(
       ExecState*,
       int language,
       JSObject* value,
       const Bindings::RootObject* origin,
       const Bindings::RootObject* current);
+#endif
 
   // This is a workaround to avoid accessing the global variables for these
   // identifiers in

@@ -269,7 +269,6 @@ void Interpreter::finalCheck() {
 }
 #endif
 
-#if APPLE_CHANGES
 static bool printExceptions = false;
 
 bool Interpreter::shouldPrintExceptions() {
@@ -280,6 +279,7 @@ void Interpreter::setShouldPrintExceptions(bool print) {
   printExceptions = print;
 }
 
+#if __APPLE__
 void* Interpreter::createLanguageInstanceForValue(
     ExecState* exec,
     int language,
