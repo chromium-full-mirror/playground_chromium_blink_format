@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2000 Peter Kelly (pmk@post.com)
  * Copyright (C) 2005 Apple Computer, Inc.
+ * Copyright (C) 2006 Alexey Proskuryakov
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -734,6 +735,12 @@ static void externalSubsetHandler(void* closure,
         true);  // controls if we replace entities or not.
 }
 
+static void ignorableWhitespaceHandler(void* ctx, const xmlChar* ch, int len) {
+  // nothing to do, but we need this to work around a crasher
+  // http://bugzilla.gnome.org/show_bug.cgi?id=172255
+  // http://bugzilla.opendarwin.org/show_bug.cgi?id=5792
+}
+
 void XMLTokenizer::finish() {
   if (m_xmlCode.isEmpty())
     return;
@@ -753,6 +760,7 @@ void XMLTokenizer::finish() {
   sax.startDocument = xmlSAX2StartDocument;
   sax.internalSubset = internalSubsetHandler;
   sax.externalSubset = externalSubsetHandler;
+  sax.ignorableWhitespace = ignorableWhitespaceHandler;
   sax.entityDecl = xmlSAX2EntityDecl;
   sax.initialized = XML_SAX2_MAGIC;
 
