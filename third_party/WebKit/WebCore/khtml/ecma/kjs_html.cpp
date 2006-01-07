@@ -4633,16 +4633,6 @@ JSValue* KJS::HTMLCollectionProtoFunc::callAsFunction(ExecState* exec,
 
 // -------------------------------------------------------------------------
 
-JSValue* HTMLAllCollection::toPrimitive(ExecState* exec,
-                                        Type preferredType) const {
-  if (preferredType == NullType)
-    return jsNull();
-  else
-    return HTMLCollection::toPrimitive(exec, preferredType);
-}
-
-// -------------------------------------------------------------------------
-
 HTMLSelectCollection::HTMLSelectCollection(ExecState* exec,
                                            HTMLCollectionImpl* c,
                                            HTMLSelectElementImpl* e)
