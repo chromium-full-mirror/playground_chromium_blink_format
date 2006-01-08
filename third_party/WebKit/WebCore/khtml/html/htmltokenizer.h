@@ -156,7 +156,6 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
 
   bool continueProcessing(int& processedCount,
                           const QTime& startTime,
-                          const KWQUIEventTime& eventTime,
                           State& state);
   void timerEvent(QTimerEvent*);
   void allDataProcessed();

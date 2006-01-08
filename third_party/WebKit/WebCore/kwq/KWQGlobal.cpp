@@ -20,18 +20,11 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQKJob.h"
-#import "KWQLogging.h"
 
-namespace KIO {
+void qDebug(const char* msg, ...) {}
 
-void http_update_cache(const KURL &, bool, time_t)
-{
-    LOG(NotYetImplemented, "not yet implemented");
-}
-
-} // namespace KIO
+void qWarning(const char* msg, ...) {}

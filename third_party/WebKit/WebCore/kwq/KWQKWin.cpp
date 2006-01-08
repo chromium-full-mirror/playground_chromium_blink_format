@@ -20,26 +20,17 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "khtmlview.h"
+#import "KWQKWin.h"
 
-#import "KWQKHTMLPart.h"
-#import "KWQWindowWidget.h"
+#import "KWQWidget.h"
 
-/*
-    Currently this file just extends the KDE implementation.
-    See khtml/khtmlview.cpp for the rest of the implementation.
-*/
+KWin::Info KWin::info(long win) {
+  KWin::Info winInfo;
+  winInfo.geometry = ((QWidget*)win)->frameGeometry();
 
-QWidget *KHTMLView::topLevelWidget() const 
-{
-    return KWQ(part())->topLevelWidget();
-}
-
-QPoint KHTMLView::viewportToGlobal(const QPoint &p) const
-{
-    return static_cast<KWQWindowWidget *>(topLevelWidget())->viewportToGlobal(p);
+  return winInfo;
 }

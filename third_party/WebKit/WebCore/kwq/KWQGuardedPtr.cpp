@@ -20,37 +20,16 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQKCharsets.h"
+#import "KWQGuardedPtr.h"
 
-#import "KWQTextCodec.h"
+#import "KWQObject.h"
 
-QTextCodec *KCharsets::codecForName(const char *s) const
-{
-    return QTextCodec::codecForName(s);
-}
-
-QTextCodec *KCharsets::codecForName(const char *s, bool &ok) const
-{
-    QTextCodec *codec = QTextCodec::codecForName(s);
-    if (codec == NULL) {
-        ok = false;
-        codec = QTextCodec::codecForName("ISO-8859-1");
-    } else {
-        ok = true;
-    }
-    return codec;
-}
-
-QTextCodec *KCharsets::codecForName(const QCString &qs, bool &ok) const
-{
-    return codecForName(qs.data(), ok);
-}
-
-QTextCodec *KCharsets::codecForName(const QString &qs, bool &ok) const
-{
-    return codecForName(qs.latin1(), ok);
+KWQGuardedPtrBase::KWQGuardedPtrBase(QObject* o) {
+  if (o) {
+    iterator = QPtrListIterator<QObject>(o->_guardedPtrDummyList);
+  }
 }

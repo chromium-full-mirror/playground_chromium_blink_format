@@ -20,16 +20,24 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQKHTMLFactory.h"
+#import "khtmlview.h"
 
-#import "KWQKHTMLSettings.h"
+#import "KWQKHTMLPart.h"
+#import "KWQWindowWidget.h"
 
-KHTMLSettings *KHTMLFactory::defaultHTMLSettings()
-{
-    static KHTMLSettings settings;
-    return &settings;
+/*
+    Currently this file just extends the KDE implementation.
+    See khtml/khtmlview.cpp for the rest of the implementation.
+*/
+
+QWidget* KHTMLView::topLevelWidget() const {
+  return KWQ(part())->topLevelWidget();
+}
+
+QPoint KHTMLView::viewportToGlobal(const QPoint& p) const {
+  return static_cast<KWQWindowWidget*>(topLevelWidget())->viewportToGlobal(p);
 }

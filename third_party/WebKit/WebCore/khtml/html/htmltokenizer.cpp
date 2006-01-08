@@ -1366,7 +1366,6 @@ HTMLTokenizer::State HTMLTokenizer::parseTag(TokenizerString& src,
 
 inline bool HTMLTokenizer::continueProcessing(int& processedCount,
                                               const QTime& startTime,
-                                              const KWQUIEventTime& eventTime,
                                               State& state) {
   // We don't want to be checking elapsed time with every character, so we only
   // check after we've
@@ -1390,9 +1389,7 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
       if (!timerId)
         timerId = startTimer(0);
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
-      if (eventTime.uiEventPending())
-        printf("Deferring processing of data because of UI event.\n");
-      else if (startTime.elapsed() > TOKENIZER_TIME_DELAY)
+      if (startTime.elapsed() > TOKENIZER_TIME_DELAY)
         printf(
             "Deferring processing of data because 200ms elapsed away from "
             "event loop.\n");
@@ -1452,7 +1449,6 @@ bool HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
   int processedCount = 0;
   QTime startTime;
   startTime.start();
-  KWQUIEventTime eventTime;
 
   KHTMLPart* part = parser->doc()->part();
 
@@ -1460,7 +1456,7 @@ bool HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
 
   while (!src.isEmpty() &&
          (!part || !part->isScheduledLocationChangePending())) {
-    if (!continueProcessing(processedCount, startTime, eventTime, state))
+    if (!continueProcessing(processedCount, startTime, state))
       break;
 
     // do we need to enlarge the buffer?

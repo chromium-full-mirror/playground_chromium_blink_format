@@ -20,56 +20,37 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQPen.h"
+#import "KWQBuffer.h"
 
-QPen::QPen(const QColor &color, uint width, PenStyle style) : penStyle(style), penWidth(width), penColor(color)
-{
+void QBuffer::open(int) {
+  if (!opened) {
+    opened = true;
+    pos = 0;
+  }
 }
 
-const QColor &QPen::color() const
-{
-    return penColor;
+int QBuffer::writeBlock(const char* data, uint len) {
+  // FIXME: could easily be optimized a lot - leave extra space in
+  // buffer for amortized constant time growth
+
+  if (pos + len > ba.size()) {
+    if (!ba.resize(pos + len)) {
+      return -1;
+    }
+  }
+  memcpy(ba.data() + pos, data, len);
+  pos += len;
+
+  return len;
 }
 
-uint QPen::width() const
-{
-    return penWidth;
+bool QBuffer::setBuffer(QByteArray newBuff) {
+  if (isOpen())
+    return false;
+  ba.duplicate(newBuff.data(), newBuff.size());
+  return true;
 }
-
-QPen::PenStyle QPen::style() const
-{
-    return penStyle;
-}
-
-void QPen::setColor(const QColor &color)
-{
-    penColor = color;
-}
-
-void QPen::setWidth(uint width)
-{
-    penWidth = width;
-}
-
-void QPen::setStyle(PenStyle style)
-{
-    penStyle = style;
-}
-
-bool QPen::operator==(const QPen &compareTo) const
-{
-    return (penWidth == compareTo.penWidth) &&
-        (penStyle == compareTo.penStyle) &&
-        (penColor == compareTo.penColor);
-}
-
-bool QPen::operator!=(const QPen &compareTo) const
-{
-    return !(*this == compareTo);
-}
-
-
