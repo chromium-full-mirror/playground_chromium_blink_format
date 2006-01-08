@@ -20,39 +20,27 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQDictImpl.h"
-#import <CoreFoundation/CoreFoundation.h>
+#import "KWQKPartsEvent.h"
 
-KWQDictImpl::KWQDictImpl(int size, bool caseSensitive, void (*deleteFunc)(void *)) :
-    KWQPtrDictImpl(size, deleteFunc, &kCFCopyStringDictionaryKeyCallBacks), m_caseSensitive(caseSensitive)
-{
+namespace KParts {
+
+Event::Event(const char* name) : QEvent(KParts), _name(strdup(name)) {}
+
+Event::~Event() {
+  free(_name);
 }
 
-void KWQDictImpl::insert(const QString &key, const void *value)
-{
-    KWQPtrDictImpl::insert((void *)(m_caseSensitive ? key : key.lower()).getCFString(), value);
+bool Event::test(const QEvent* event) {
+  return event && event->type() == KParts;
 }
 
-bool KWQDictImpl::remove(const QString &key, bool deleteItem)
-{
-    return KWQPtrDictImpl::remove((void *)(m_caseSensitive ? key : key.lower()).getCFString(), deleteItem);
+bool Event::test(const QEvent* event, const char* name) {
+  return event && event->type() == KParts &&
+         strcmp(name, static_cast<const Event*>(event)->_name) == 0;
 }
 
-void *KWQDictImpl::find(const QString &key) const
-{
-    return KWQPtrDictImpl::find((void *)(m_caseSensitive ? key : key.lower()).getCFString());
-}
-
-QString KWQDictIteratorImpl::currentStringKey() const
-{
-    void *key = currentKey();
-
-    if (key == NULL)
-        return QString();
-        
-    return QString::fromCFString((CFStringRef)key);
-}
+}  // namespace KParts
