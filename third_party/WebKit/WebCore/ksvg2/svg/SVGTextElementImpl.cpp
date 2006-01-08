@@ -30,6 +30,7 @@
 #include <kdom/css/RenderStyle.h>
 
 #include <kcanvas/KCanvasCreator.h>
+#include <kcanvas/RenderSVGText.h>
 
 #include <qvector.h>
 
@@ -64,6 +65,18 @@ SVGMatrixImpl* SVGTextElementImpl::getScreenCTM() const {
 
 SVGMatrixImpl* SVGTextElementImpl::getCTM() const {
   return SVGLocatableImpl::getScreenCTM(this);
+}
+
+khtml::RenderObject* SVGTextElementImpl::createRenderer(
+    RenderArena* arena,
+    khtml::RenderStyle* style) {
+  return new (arena) RenderSVGText(this);
+}
+
+bool SVGTextElementImpl::childShouldCreateRenderer(DOM::NodeImpl* child) const {
+  if (child->isTextNode())
+    return true;
+  return false;
 }
 
 // vim:ts=4:noet
