@@ -419,7 +419,7 @@ void Frame::stopLoading(bool sendUnload) {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it) {
-    KParts::ReadOnlyPart* part = (*it).m_part;
+    KParts::ReadOnlyPart* part = (*it).m_frame;
     if (part) {
       Frame* frame = static_cast<Frame*>(part);
 
@@ -627,9 +627,9 @@ void Frame::clear() {
     ConstFrameIt it = d->m_frames.begin();
     ConstFrameIt end = d->m_frames.end();
     for (; it != end; ++it) {
-      if ((*it).m_part) {
+      if ((*it).m_frame) {
         disconnectChild(&*it);
-        (*it).m_part->deref();
+        (*it).m_frame->deref();
       }
     }
   }
@@ -640,7 +640,7 @@ void Frame::clear() {
     ConstFrameIt end = d->m_objects.end();
     for (; it != end; ++it) {
       if ((*it).m_frame) {
-        (*it).m_part->deref();
+        (*it).m_frame->deref();
       }
     }
   }
@@ -968,7 +968,7 @@ void Frame::stopAnimations() {
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_frame.isNull() && (*it).m_frame->inherits("Frame")) {
-      KParts::ReadOnlyPart* p = (*it).m_part;
+      KParts::ReadOnlyPart* p = (*it).m_frame;
       static_cast<Frame*>(p)->stopAnimations();
     }
 }
@@ -1099,7 +1099,7 @@ void Frame::checkEmitLoadEvent() {
     ConstFrameIt it = d->m_frames.begin();
     ConstFrameIt end = d->m_frames.end();
     for (; it != end; ++it) {
-      KParts::ReadOnlyPart* p = (*it).m_part;
+      KParts::ReadOnlyPart* p = (*it).m_frame;
       if (p && p->inherits("Frame")) {
         Frame* htmlFrame = static_cast<Frame*>(p);
         if (htmlFrame->d->m_doc)
@@ -1628,7 +1628,7 @@ bool Frame::requestFrame(khtml::RenderPart* part,
 
   (*it).m_type =
       isIFrame ? khtml::ChildFrame::IFrame : khtml::ChildFrame::Frame;
-  (*it).m_frame = part;
+  (*it).m_renderer = part;
   (*it).m_paramValues = paramNames;
   (*it).m_paramNames = paramValues;
 
@@ -1637,7 +1637,7 @@ bool Frame::requestFrame(khtml::RenderPart* part,
     if (!processObjectRequest(&(*it), "about:blank", "text/html"))
       return false;
 
-    Frame* newPart = static_cast<Frame*>(&*(*it).m_part);
+    Frame* newPart = static_cast<Frame*>(&*(*it).m_frame);
     newPart->replaceContentsWithScriptResult(url);
 
     return true;
@@ -1657,7 +1657,7 @@ bool Frame::requestObject(khtml::RenderPart* frame,
                           const QStringList& paramValues) {
   khtml::ChildFrame child;
   QValueList<khtml::ChildFrame>::Iterator it = d->m_objects.append(child);
-  (*it).m_frame = frame;
+  (*it).m_renderer = frame;
   (*it).m_type = khtml::ChildFrame::Object;
   (*it).m_paramNames = paramNames;
   (*it).m_paramValues = paramValues;
@@ -1677,8 +1677,8 @@ bool Frame::requestObject(khtml::ChildFrame* child,
                           const KParts::URLArgs& _args) {
   if (child->m_bPreloaded) {
     // kdDebug(6005) << "Frame::requestObject preload" << endl;
-    if (child->m_frame && child->m_frame && child->m_frame->widget())
-      child->m_frame->setWidget(child->m_frame->widget());
+    if (child->m_renderer && child->m_frame && child->m_renderer->widget())
+      child->m_renderer->setWidget(child->m_renderer->widget());
 
     child->m_bPreloaded = false;
     return true;
@@ -1687,7 +1687,7 @@ bool Frame::requestObject(khtml::ChildFrame* child,
   KParts::URLArgs args(_args);
 
   if (child->m_frame && !args.reload &&
-      urlcmp(child->m_part->url().url(), url.url(), true, true))
+      urlcmp(child->m_frame->url().url(), url.url(), true, true))
     args.serviceType = child->m_serviceType;
 
   child->m_args = args;
@@ -1734,7 +1734,7 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
   }
 
   if (child->m_frame) {
-    Frame* frame = static_cast<Frame*>(&*child->m_part);
+    Frame* frame = static_cast<Frame*>(&*child->m_frame);
     if (frame && frame->inherits("Frame")) {
       KParts::URLArgs args;
       if (!d->m_referrer.isEmpty())
@@ -1753,17 +1753,17 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
     }
 
     // CRITICAL STUFF
-    if (child->m_part) {
+    if (child->m_frame) {
       disconnectChild(child);
-      child->m_part->deref();
+      child->m_frame->deref();
     }
 
     child->m_serviceType = mimetype;
-    if (child->m_frame && frame->widget())
-      child->m_frame->setWidget(frame->widget());
+    if (child->m_renderer && frame->widget())
+      child->m_renderer->setWidget(frame->widget());
 
-    child->m_part = part;
-    assert(((void*)child->m_part) != 0);
+    child->m_frame = part;
+    assert(((void*)child->m_frame) != 0);
 
     connectChild(child);
   }
@@ -1771,12 +1771,12 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
   checkEmitLoadEvent();
   // Some JS code in the load event may have destroyed the part
   // In that case, abort
-  if (!child->m_frame)
+  if (!child->m_renderer)
     return false;
 
   if (child->m_bPreloaded) {
-    if (child->m_frame && child->m_frame)
-      child->m_frame->setWidget(child->m_frame->widget());
+    if (child->m_renderer && child->m_renderer)
+      child->m_renderer->setWidget(child->m_renderer->widget());
 
     child->m_bPreloaded = false;
     return true;
@@ -1802,7 +1802,7 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
   // it's being added to the child list.  It would be a good idea to
   // create the child first, then invoke the loader separately
   if (url.isEmpty() || url.url() == "about:blank") {
-    ReadOnlyPart* readOnlyPart = child->m_part;
+    ReadOnlyPart* readOnlyPart = child->m_frame;
     Frame* frame = static_cast<Frame*>(readOnlyPart);
     if (frame && frame->inherits("Frame")) {
       frame->completed();
@@ -1974,13 +1974,13 @@ khtml::ChildFrame* Frame::childFrame(const QObject* obj) {
   FrameIt it = d->m_frames.begin();
   FrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (static_cast<ReadOnlyPart*>((*it).m_part) == part)
+    if (static_cast<ReadOnlyPart*>((*it).m_frame) == part)
       return &(*it);
 
   it = d->m_objects.begin();
   end = d->m_objects.end();
   for (; it != end; ++it)
-    if (static_cast<ReadOnlyPart*>((*it).m_part) == part)
+    if (static_cast<ReadOnlyPart*>((*it).m_frame) == part)
       return &(*it);
 
   return 0L;
@@ -1993,7 +1993,7 @@ Frame* Frame::findFrame(const QString& f) {
     // kdDebug() << "Frame::findFrame frame " << f << " not found" << endl;
     return 0L;
   } else {
-    KParts::ReadOnlyPart* p = (*it).m_part;
+    KParts::ReadOnlyPart* p = (*it).m_frame;
     if (p && p->inherits("Frame")) {
       // kdDebug() << "Frame::findFrame frame " << f << " is a Frame, ok" <<
       // endl;
@@ -2012,7 +2012,7 @@ bool Frame::frameExists(const QString& frameName) {
   // WABA: We only return true if the child actually has a frame
   // set. Otherwise we might find our preloaded-selve.
   // This happens when we restore the frameset.
-  return (!(*it).m_frame.isNull());
+  return (!(*it).m_renderer.isNull());
 }
 
 Frame* Frame::parentFrame() const {
@@ -2072,8 +2072,8 @@ void Frame::setZoomFactor(int percent) {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (!(*it).m_part.isNull() && (*it).m_part->inherits("Frame")) {
-      KParts::ReadOnlyPart* p = (*it).m_part;
+    if (!(*it).m_frame.isNull() && (*it).m_frame->inherits("Frame")) {
+      KParts::ReadOnlyPart* p = (*it).m_frame;
       static_cast<Frame*>(p)->setZoomFactor(d->m_zoomFactor);
     }
 
@@ -2145,7 +2145,7 @@ QPtrList<KParts::ReadOnlyPart> Frame::frames() const {
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_bPreloaded)
-      res.append((*it).m_part);
+      res.append((*it).m_frame);
 
   return res;
 }
@@ -2153,7 +2153,7 @@ QPtrList<KParts::ReadOnlyPart> Frame::frames() const {
 Frame* Frame::childFrameNamed(const QString& name) const {
   FrameList::Iterator it = d->m_frames.find(name);
   if (it != d->m_frames.end())
-    return static_cast<Frame*>(&*(*it).m_part);
+    return static_cast<Frame*>(&*(*it).m_frame);
   return NULL;
 }
 
@@ -3110,7 +3110,7 @@ bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
 }
 
 void Frame::connectChild(const khtml::ChildFrame* child) const {
-  ReadOnlyPart* part = child->m_part;
+  ReadOnlyPart* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     connect(part, SIGNAL(started(KIO::Job*)), this,
             SLOT(slotChildStarted(KIO::Job*)));
@@ -3125,7 +3125,7 @@ void Frame::connectChild(const khtml::ChildFrame* child) const {
 }
 
 void Frame::disconnectChild(const khtml::ChildFrame* child) const {
-  ReadOnlyPart* part = child->m_part;
+  ReadOnlyPart* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     disconnect(part, SIGNAL(started(KIO::Job*)), this,
                SLOT(slotChildStarted(KIO::Job*)));
@@ -3217,7 +3217,7 @@ void Frame::handleFallbackContent() {
   ChildFrame* childFrame = parent->childFrame(this);
   if (!childFrame || childFrame->m_type != ChildFrame::Object)
     return;
-  khtml::RenderPart* renderPart = childFrame->m_frame;
+  khtml::RenderPart* renderPart = childFrame->m_renderer;
   if (!renderPart)
     return;
   NodeImpl* node = renderPart->element();

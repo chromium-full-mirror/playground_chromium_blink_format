@@ -58,8 +58,8 @@ struct ChildFrame {
     m_hasFallbackContent = false;
   }
 
-  QGuardedPtr<khtml::RenderPart> m_frame;
-  QGuardedPtr<KParts::ReadOnlyPart> m_part;
+  QGuardedPtr<khtml::RenderPart> m_renderer;
+  QGuardedPtr<KParts::ReadOnlyPart> m_frame;
   QGuardedPtr<KParts::BrowserExtension> m_extension;
   QString m_serviceName;
   QString m_serviceType;
