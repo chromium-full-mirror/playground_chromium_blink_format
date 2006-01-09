@@ -42,7 +42,6 @@
 #define id id_AVOID_KEYWORD
 #endif
 
-class KCharsets;
 class HTMLParser;
 class KHTMLView;
 
@@ -381,12 +380,8 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   unsigned int m_cBufferPos;
 
   TokenizerString src;
-
-  KCharsets* charsets;
   HTMLParser* parser;
-
   QGuardedPtr<KHTMLView> view;
-
   bool inWrite;
 };
 

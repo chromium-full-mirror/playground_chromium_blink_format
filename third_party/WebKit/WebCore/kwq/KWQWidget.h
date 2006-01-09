@@ -71,7 +71,6 @@ class QWidget : public QObject, public QPaintDevice {
 
   void setActiveWindow();
 
-  long winId() const;
   int x() const;
   int y() const;
   int width() const;

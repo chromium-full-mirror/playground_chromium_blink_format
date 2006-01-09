@@ -181,7 +181,7 @@ RenderLineEdit::RenderLineEdit(HTMLInputElementImpl* element)
     default:
       type = QLineEdit::Normal;
   }
-  KLineEdit* edit = new KLineEdit(type);
+  QLineEdit* edit = new QLineEdit(type);
   if (type == QLineEdit::Search)
     edit->setLiveSearch(false);
   connect(edit, SIGNAL(returnPressed()), this, SLOT(slotReturnPressed()));
@@ -251,7 +251,7 @@ void RenderLineEdit::calcMinMaxWidth() {
 void RenderLineEdit::setStyle(RenderStyle* s) {
   RenderFormElement::setStyle(s);
 
-  KLineEdit* w = widget();
+  QLineEdit* w = widget();
   w->setAlignment(textAlignment());
   w->setWritingDirection(style()->direction() == RTL ? QPainter::RTL
                                                      : QPainter::LTR);
@@ -259,7 +259,7 @@ void RenderLineEdit::setStyle(RenderStyle* s) {
 
 void RenderLineEdit::updateFromElement() {
   HTMLInputElementImpl* e = element();
-  KLineEdit* w = widget();
+  QLineEdit* w = widget();
 
   int ml = e->maxLength();
   if (ml <= 0 || ml > 1024)
@@ -317,7 +317,7 @@ void RenderLineEdit::slotTextChanged(const DOMString& string) {
 }
 
 int RenderLineEdit::selectionStart() {
-  KLineEdit* lineEdit = static_cast<KLineEdit*>(m_widget);
+  QLineEdit* lineEdit = static_cast<QLineEdit*>(m_widget);
   int start = lineEdit->selectionStart();
   if (start == -1)
     start = lineEdit->cursorPosition();
@@ -325,7 +325,7 @@ int RenderLineEdit::selectionStart() {
 }
 
 int RenderLineEdit::selectionEnd() {
-  KLineEdit* lineEdit = static_cast<KLineEdit*>(m_widget);
+  QLineEdit* lineEdit = static_cast<QLineEdit*>(m_widget);
   int start = lineEdit->selectionStart();
   if (start == -1)
     return lineEdit->cursorPosition();
@@ -335,7 +335,7 @@ int RenderLineEdit::selectionEnd() {
 void RenderLineEdit::setSelectionStart(int start) {
   int realStart = kMax(start, 0);
   int length = kMax(selectionEnd() - realStart, 0);
-  static_cast<KLineEdit*>(m_widget)->setSelection(realStart, length);
+  static_cast<QLineEdit*>(m_widget)->setSelection(realStart, length);
 }
 
 void RenderLineEdit::setSelectionEnd(int end) {
@@ -346,17 +346,17 @@ void RenderLineEdit::setSelectionEnd(int end) {
     start = realEnd;
     length = 0;
   }
-  static_cast<KLineEdit*>(m_widget)->setSelection(start, length);
+  static_cast<QLineEdit*>(m_widget)->setSelection(start, length);
 }
 
 void RenderLineEdit::select() {
-  static_cast<KLineEdit*>(m_widget)->selectAll();
+  static_cast<QLineEdit*>(m_widget)->selectAll();
 }
 
 void RenderLineEdit::setSelectionRange(int start, int end) {
   int realStart = kMax(start, 0);
   int length = kMax(end - realStart, 0);
-  static_cast<KLineEdit*>(m_widget)->setSelection(realStart, length);
+  static_cast<QLineEdit*>(m_widget)->setSelection(realStart, length);
 }
 
 // ---------------------------------------------------------------------------
@@ -575,14 +575,14 @@ RenderLegend::RenderLegend(HTMLGenericFormElementImpl* element)
 
 // -------------------------------------------------------------------------------
 
-ComboBoxWidget::ComboBoxWidget(QWidget* parent) : KComboBox(false, parent) {}
+ComboBoxWidget::ComboBoxWidget(QWidget* parent) : QComboBox() {}
 
 bool ComboBoxWidget::event(QEvent* e) {
-  return KComboBox::event(e);
+  return QComboBox::event(e);
 }
 
 bool ComboBoxWidget::eventFilter(QObject* dest, QEvent* e) {
-  return KComboBox::eventFilter(dest, e);
+  return QComboBox::eventFilter(dest, e);
 }
 
 // -------------------------------------------------------------------------
@@ -606,7 +606,7 @@ void RenderSelect::setWidgetWritingDirection() {
   QPainter::TextDirection d =
       style()->direction() == RTL ? QPainter::RTL : QPainter::LTR;
   if (m_useListBox)
-    static_cast<KListBox*>(m_widget)->setWritingDirection(d);
+    static_cast<QListBox*>(m_widget)->setWritingDirection(d);
   else
     static_cast<ComboBoxWidget*>(m_widget)->setWritingDirection(d);
 }
@@ -641,7 +641,7 @@ void RenderSelect::updateFromElement() {
     }
 
     if (m_useListBox && oldMultiple != m_multiple) {
-      static_cast<KListBox*>(m_widget)->setSelectionMode(
+      static_cast<QListBox*>(m_widget)->setSelectionMode(
           m_multiple ? QListBox::Extended : QListBox::Single);
     }
     m_selectionChanged = true;
@@ -656,9 +656,9 @@ void RenderSelect::updateFromElement() {
     int listIndex;
 
     if (m_useListBox)
-      static_cast<KListBox*>(m_widget)->clear();
+      static_cast<QListBox*>(m_widget)->clear();
     else
-      static_cast<KComboBox*>(m_widget)->clear();
+      static_cast<QComboBox*>(m_widget)->clear();
 
     bool groupEnabled = true;
     for (listIndex = 0; listIndex < int(listItems.size()); listIndex++) {
@@ -679,10 +679,10 @@ void RenderSelect::updateFromElement() {
         groupEnabled = optgroupElement->isEnabled();
 
         if (m_useListBox)
-          static_cast<KListBox*>(m_widget)->appendGroupLabel(label,
+          static_cast<QListBox*>(m_widget)->appendGroupLabel(label,
                                                              groupEnabled);
         else
-          static_cast<KComboBox*>(m_widget)->appendGroupLabel(label);
+          static_cast<QComboBox*>(m_widget)->appendGroupLabel(label);
       } else if (listItems[listIndex]->hasTagName(optionTag)) {
         HTMLOptionElementImpl* optionElement =
             static_cast<HTMLOptionElementImpl*>(listItems[listIndex]);
@@ -700,21 +700,21 @@ void RenderSelect::updateFromElement() {
           itemText.prepend("    ");
 
         if (m_useListBox)
-          static_cast<KListBox*>(m_widget)->appendItem(
+          static_cast<QListBox*>(m_widget)->appendItem(
               itemText, groupEnabled && optionElement->isEnabled());
         else
-          static_cast<KComboBox*>(m_widget)->appendItem(
+          static_cast<QComboBox*>(m_widget)->appendItem(
               itemText, groupEnabled && optionElement->isEnabled());
       } else if (listItems[listIndex]->hasTagName(hrTag)) {
         if (!m_useListBox) {
-          static_cast<KComboBox*>(m_widget)->appendSeparator();
+          static_cast<QComboBox*>(m_widget)->appendSeparator();
         }
       } else
         KHTMLAssert(false);
       m_selectionChanged = true;
     }
     if (m_useListBox)
-      static_cast<KListBox*>(m_widget)->doneAppendingItems();
+      static_cast<QListBox*>(m_widget)->doneAppendingItems();
     setNeedsLayoutAndMinMaxRecalc();
     m_optionsChanged = false;
   }
@@ -764,7 +764,7 @@ void RenderSelect::layout() {
 
   // calculate size
   if (m_useListBox) {
-    KListBox* w = static_cast<KListBox*>(m_widget);
+    QListBox* w = static_cast<QListBox*>(m_widget);
 
     int size = m_size;
     // check if multiple and size was not given or invalid
@@ -773,7 +773,7 @@ void RenderSelect::layout() {
     // the average of that is IMHO kMin(number of elements, 10)
     // so I did that ;-)
     if (size < 1)
-      size = kMin(static_cast<KListBox*>(m_widget)->count(), 10U);
+      size = kMin(static_cast<QListBox*>(m_widget)->count(), 10U);
 
     // Let the widget tell us how big it wants to be.
     QSize s(w->sizeForNumberOfLines(size));
@@ -858,7 +858,7 @@ void RenderSelect::slotSelectionChanged() {
     // again with updateSelection.
     if (listItems[i]->hasTagName(optionTag))
       static_cast<HTMLOptionElementImpl*>(listItems[i])->m_selected =
-          static_cast<KListBox*>(m_widget)->isSelected(j);
+          static_cast<QListBox*>(m_widget)->isSelected(j);
     if (listItems[i]->hasTagName(optionTag) ||
         listItems[i]->hasTagName(optgroupTag))
       ++j;
@@ -870,8 +870,8 @@ void RenderSelect::setOptionsChanged(bool _optionsChanged) {
   m_optionsChanged = _optionsChanged;
 }
 
-KListBox* RenderSelect::createListBox() {
-  KListBox* lb = new KListBox(view()->viewport());
+QListBox* RenderSelect::createListBox() {
+  QListBox* lb = new QListBox(view()->viewport());
   lb->setSelectionMode(m_multiple ? QListBox::Extended : QListBox::Single);
   connect(lb, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
   connect(lb, SIGNAL(clicked(QListBoxItem*)), this, SLOT(slotClicked()));
@@ -891,7 +891,7 @@ void RenderSelect::updateSelection() {
   int i;
   if (m_useListBox) {
     // if multi-select, we select only the new selected index
-    KListBox* listBox = static_cast<KListBox*>(m_widget);
+    QListBox* listBox = static_cast<QListBox*>(m_widget);
     int j = 0;
     for (i = 0; i < int(listItems.size()); i++) {
       listBox->setSelected(
@@ -911,7 +911,7 @@ void RenderSelect::updateSelection() {
           static_cast<HTMLOptionElementImpl*>(listItems[i])->m_selected = false;
         else if (static_cast<HTMLOptionElementImpl*>(listItems[i])
                      ->selected()) {
-          static_cast<KComboBox*>(m_widget)->setCurrentItem(i);
+          static_cast<QComboBox*>(m_widget)->setCurrentItem(i);
           found = true;
         }
         firstOption = i;
@@ -929,7 +929,7 @@ void RenderSelect::updateSelection() {
 
 RenderTextArea::RenderTextArea(HTMLTextAreaElementImpl* element)
     : RenderFormElement(element), m_dirty(false) {
-  QTextEdit* edit = new KTextEdit(view());
+  QTextEdit* edit = new QTextEdit(view());
 
   if (element->wrap() != HTMLTextAreaElementImpl::ta_NoWrap)
     edit->setWordWrap(QTextEdit::WidgetWidth);
