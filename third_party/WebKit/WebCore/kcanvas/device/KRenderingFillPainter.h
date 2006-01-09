@@ -36,15 +36,8 @@ class KRenderingFillPainter {
   KCWindRule fillRule() const;
   void setFillRule(KCWindRule rule);
 
-  KRenderingPaintServer* paintServer() const;
-  void setPaintServer(KRenderingPaintServer* pserver);
-
   float opacity() const;
   void setOpacity(float opacity);
-
-  // Actual rendering function
-  virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args) const;
 
  private:
   class Private;

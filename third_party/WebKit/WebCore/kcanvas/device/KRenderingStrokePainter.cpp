@@ -27,7 +27,6 @@
 class KRenderingStrokePainter::Private {
  public:
   Private() {
-    pserver = 0;
     dirty = true;
     opacity = 1.0;
     miterLimit = 4;
@@ -36,13 +35,6 @@ class KRenderingStrokePainter::Private {
     capStyle = CAP_BUTT;
     joinStyle = JOIN_MITER;
   }
-
-  ~Private() {
-    if (pserver && (pserver->type() == PS_SOLID || pserver->type() == PS_IMAGE))
-      delete pserver;
-  }
-
-  KRenderingPaintServer* pserver;
 
   bool dirty;
   float opacity;
@@ -61,18 +53,6 @@ KRenderingStrokePainter::KRenderingStrokePainter() : d(new Private()) {}
 
 KRenderingStrokePainter::~KRenderingStrokePainter() {
   delete d;
-}
-
-KRenderingPaintServer* KRenderingStrokePainter::paintServer() const {
-  return d->pserver;
-}
-
-void KRenderingStrokePainter::setPaintServer(KRenderingPaintServer* pserver) {
-  setDirty();
-  if (d->pserver &&
-      (d->pserver->type() == PS_SOLID || d->pserver->type() == PS_IMAGE))
-    delete d->pserver;
-  d->pserver = pserver;
 }
 
 float KRenderingStrokePainter::strokeWidth() const {
@@ -136,12 +116,6 @@ float KRenderingStrokePainter::opacity() const {
 void KRenderingStrokePainter::setOpacity(float opacity) {
   setDirty();
   d->opacity = opacity;
-}
-
-void KRenderingStrokePainter::draw(KRenderingDeviceContext* context,
-                                   const KCanvasCommonArgs& args) const {
-  if (d->pserver)
-    d->pserver->draw(context, args, APPLY_TO_STROKE);
 }
 
 bool KRenderingStrokePainter::dirty() const {

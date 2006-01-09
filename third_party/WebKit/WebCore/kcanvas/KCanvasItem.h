@@ -56,9 +56,6 @@ class RenderPath : public khtml::RenderObject {
   // this vector path
   virtual QRectF relativeBBox(bool includeStroke = true) const;
 
-  // Drawing
-  void setupForDraw() const;
-
   // Update
   void changePath(KCanvasPath* newPath);
 

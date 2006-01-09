@@ -47,7 +47,7 @@ KCanvasResource::KCanvasResource() {}
 
 KCanvasResource::~KCanvasResource() {}
 
-void KCanvasResource::addClient(RenderPath* item) {
+void KCanvasResource::addClient(const RenderPath* item) {
   if (m_clients.find(item) != m_clients.end())
     return;
 
