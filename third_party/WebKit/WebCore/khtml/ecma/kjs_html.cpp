@@ -41,7 +41,7 @@
 #include "html/html_objectimpl.h"
 #include "html/html_tableimpl.h"
 
-#include "khtml_part.h"
+#include "Frame.h"
 #include "khtmlview.h"
 
 #include "kjs_css.h"
@@ -103,9 +103,9 @@ JSValue* KJS::HTMLDocFunction::callAsFunction(ExecState* exec,
       // For compatibility with other browsers, pass open calls with more than 2
       // parameters to the window.
       if (args.size() > 2) {
-        KHTMLPart* part = doc.part();
-        if (part) {
-          Window* window = Window::retrieveWindow(part);
+        Frame* frame = doc.frame();
+        if (frame) {
+          Window* window = Window::retrieveWindow(frame);
           if (window) {
             JSObject* functionObject = window->get(exec, "open")->getObject();
             if (!functionObject || !functionObject->implementsCall())
@@ -211,10 +211,10 @@ JSValue* HTMLDocument::namedItemGetter(ExecState* exec,
 
   if (collection->length() == 1) {
     NodeImpl* node = collection->firstItem();
-    KHTMLPart* part;
+    Frame* frame;
     if (node->hasTagName(iframeTag) &&
-        (part = static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentPart()))
-      return Window::retrieve(part);
+        (frame = static_cast<DOM::HTMLIFrameElementImpl*>(node)->contentPart()))
+      return Window::retrieve(frame);
 
     return getDOMNode(exec, node);
   }
@@ -226,7 +226,7 @@ JSValue* HTMLDocument::getValueProperty(ExecState* exec, int token) const {
   HTMLDocumentImpl& doc = *static_cast<HTMLDocumentImpl*>(impl());
 
   KHTMLView* view = doc.view();
-  KHTMLPart* part = doc.part();
+  Frame* frame = doc.frame();
 
   HTMLElementImpl* body = doc.body();
   HTMLBodyElementImpl* bodyElement =
@@ -246,7 +246,7 @@ JSValue* HTMLDocument::getValueProperty(ExecState* exec, int token) const {
     case Body:
       return getDOMNode(exec, body);
     case Location:
-      if (Window* win = Window::retrieveWindow(part))
+      if (Window* win = Window::retrieveWindow(frame))
         return win->location();
       return jsUndefined();
     case Cookie:
@@ -375,16 +375,16 @@ void KJS::HTMLDocument::putValueProperty(ExecState* exec,
       doc.setCookie(value->toString(exec).domString());
       break;
     case Location: {
-      KHTMLPart* part = doc.part();
-      if (part) {
+      Frame* frame = doc.frame();
+      if (frame) {
         QString str = value->toString(exec).qstring();
 
         // When assigning location, IE and Mozilla both resolve the URL
         // relative to the frame where the JavaScript is executing not
         // the target frame.
-        KHTMLPart* activePart =
+        Frame* activePart =
             static_cast<KJS::ScriptInterpreter*>(exec->dynamicInterpreter())
-                ->part();
+                ->frame();
         if (activePart)
           str = activePart->xmlDocImpl()->completeURL(str);
 
@@ -392,7 +392,8 @@ void KJS::HTMLDocument::putValueProperty(ExecState* exec,
         bool userGesture =
             static_cast<ScriptInterpreter*>(exec->dynamicInterpreter())
                 ->wasRunByUserGesture();
-        part->scheduleLocationChange(str, activePart->referrer(), !userGesture);
+        frame->scheduleLocationChange(str, activePart->referrer(),
+                                      !userGesture);
       }
       break;
     }
@@ -1400,7 +1401,7 @@ JSValue* HTMLElement::framesetNameGetter(ExecState* exec,
   NodeImpl* frame = element->children()->namedItem(propertyName.domString());
   if (DocumentImpl* doc =
           static_cast<HTMLFrameElementImpl*>(frame)->contentDocument())
-    if (Window* window = Window::retrieveWindow(doc->part()))
+    if (Window* window = Window::retrieveWindow(doc->frame()))
       return window;
 
   return jsUndefined();
@@ -1414,7 +1415,7 @@ JSValue* HTMLElement::frameWindowPropertyGetter(ExecState* exec,
 
   if (DocumentImpl* doc = static_cast<HTMLFrameElementImpl*>(thisObj->impl())
                               ->contentDocument())
-    if (Window* window = Window::retrieveWindow(doc->part()))
+    if (Window* window = Window::retrieveWindow(doc->frame()))
       return window->get(exec, propertyName);
 
   return jsUndefined();
@@ -1484,7 +1485,7 @@ bool HTMLElement::getOwnPropertySlot(ExecState* exec,
              element.hasLocalName(iframeTag)) {
     if (DocumentImpl* doc =
             static_cast<HTMLFrameElementImpl&>(element).contentDocument()) {
-      Window* window = Window::retrieveWindow(doc->part());
+      Window* window = Window::retrieveWindow(doc->frame());
       if (window && window->hasProperty(exec, propertyName)) {
         slot.setCustom(this, frameWindowPropertyGetter);
         return true;
@@ -1548,7 +1549,7 @@ bool KJS::HTMLElement::implementsCall() const {
   if (element->hasTagName(embedTag) || element->hasTagName(objectTag) ||
       element->hasTagName(appletTag)) {
     DocumentImpl* doc = element->getDocument();
-    KJSProxyImpl* proxy = doc->part()->jScript();
+    KJSProxyImpl* proxy = doc->frame()->jScript();
     ExecState* exec = proxy->interpreter()->globalExec();
     if (JSValue* runtimeObject = getRuntimeObject(exec, element))
       return static_cast<JSObject*>(runtimeObject)->implementsCall();
@@ -4930,7 +4931,7 @@ void Image::putValueProperty(ExecState* exec,
 }
 
 void Image::notifyFinished(khtml::CachedObject*) {
-  if (onLoadListener && doc->part()) {
+  if (onLoadListener && doc->frame()) {
     int ignoreException;
     EventImpl* ev = doc->createEvent("HTMLEvents", ignoreException);
     ev->ref();

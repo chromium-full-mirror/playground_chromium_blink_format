@@ -23,15 +23,15 @@
 
 #include "kjs_window.h"
 #include "kjs_events.h"
-#include <khtml_part.h>
+#include "MacFrame.h"
 #include <kjs/collector.h>
 
 using namespace DOM;
 using namespace KJS;
 
-KJSProxyImpl::KJSProxyImpl(KHTMLPart* part) {
+KJSProxyImpl::KJSProxyImpl(Frame* frame) {
   m_script = 0;
-  m_part = part;
+  m_frame = frame;
   m_handlerLineno = 0;
 }
 
@@ -59,7 +59,7 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
   JSLock lock;
 
   KJS::JSValue* thisNode =
-      n ? Window::retrieve(m_part) : getDOMNode(m_script->globalExec(), n);
+      n ? Window::retrieve(m_frame) : getDOMNode(m_script->globalExec(), n);
   Completion comp = m_script->evaluate(
       filename, baseLine, reinterpret_cast<KJS::UChar*>(str.unicode()),
       str.length(), thisNode);
@@ -82,9 +82,8 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
                             ->get(m_script->globalExec(), "sourceURL")
                             ->toString(m_script->globalExec());
 
-    KWQ(m_part)
-        ->addMessageToConsole(errorMessage.domString(), lineNumber,
-                              sourceURL.domString());
+    Mac(m_frame)->addMessageToConsole(errorMessage.domString(), lineNumber,
+                                      sourceURL.domString());
   }
   return QVariant();
 }
@@ -92,11 +91,11 @@ QVariant KJSProxyImpl::evaluate(const DOMString& filename,
 void KJSProxyImpl::clear() {
   // clear resources allocated by the interpreter, and make it ready to be used
   // by another page
-  // We have to keep it, so that the Window object for the part remains the
+  // We have to keep it, so that the Window object for the frame remains the
   // same.
   // (we used to delete and re-create it, previously)
   if (m_script) {
-    Window* win = Window::retrieveWindow(m_part);
+    Window* win = Window::retrieveWindow(m_frame);
     if (win)
       win->clear(m_script->globalExec());
   }
@@ -106,7 +105,7 @@ EventListener* KJSProxyImpl::createHTMLEventHandler(const DOMString& code,
                                                     NodeImpl* node) {
   initScript();
   JSLock lock;
-  return KJS::Window::retrieveWindow(m_part)->getJSLazyEventListener(
+  return KJS::Window::retrieveWindow(m_frame)->getJSLazyEventListener(
       code, node, m_handlerLineno);
 }
 
@@ -125,7 +124,7 @@ void KJSProxyImpl::finishedWithEvent(EventImpl* event) {
 KJS::ScriptInterpreter* KJSProxyImpl::interpreter() {
   if (!m_script)
     initScript();
-  m_part->keepAlive();
+  m_frame->keepAlive();
   return m_script;
 }
 
@@ -152,14 +151,14 @@ void KJSProxyImpl::initScript() {
 
   // Build the global object - which is a Window instance
   KJS::JSLock lock;
-  JSObject* globalObject(new Window(m_part));
+  JSObject* globalObject(new Window(m_frame));
 
-  // Create a KJS interpreter for this part
-  m_script = new KJS::ScriptInterpreter(globalObject, m_part);
+  // Create a KJS interpreter for this frame
+  m_script = new KJS::ScriptInterpreter(globalObject, m_frame);
   globalObject->put(m_script->globalExec(), "debug", new TestFunctionImp(),
                     Internal);
 
-  QString userAgent = KWQ(m_part)->userAgent();
+  QString userAgent = Mac(m_frame)->userAgent();
   if (userAgent.find(QString::fromLatin1("Microsoft")) >= 0 ||
       userAgent.find(QString::fromLatin1("MSIE")) >= 0)
     m_script->setCompatMode(Interpreter::IECompat);

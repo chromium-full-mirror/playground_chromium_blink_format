@@ -37,7 +37,7 @@
 #include <khtml_settings.h>
 #include <dom/dom_string.h>
 
-class KHTMLPart;
+class Frame;
 class KURL;
 
 namespace DOM {
@@ -58,7 +58,7 @@ class CachedXSLStyleSheet;
  */
 class DocLoader {
  public:
-  DocLoader(KHTMLPart*, DOM::DocumentImpl*);
+  DocLoader(Frame*, DOM::DocumentImpl*);
   ~DocLoader();
 
   CachedImage* requestImage(const DOM::DOMString& url);
@@ -80,7 +80,7 @@ class DocLoader {
     return m_showAnimations;
   }
   time_t expireDate() const { return m_expireDate; }
-  KHTMLPart* part() const { return m_part; }
+  Frame* frame() const { return m_frame; }
   DOM::DocumentImpl* doc() const { return m_doc; }
 
   void setExpireDate(time_t);
@@ -104,7 +104,7 @@ class DocLoader {
   KIO::CacheControl m_cachePolicy;
   bool m_bautoloadImages : 1;
   KHTMLSettings::KAnimationAdvice m_showAnimations : 2;
-  KHTMLPart* m_part;
+  Frame* m_frame;
   DOM::DocumentImpl* m_doc;
   bool m_loadInProgress;
 };

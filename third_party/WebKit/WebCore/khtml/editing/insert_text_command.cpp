@@ -26,7 +26,7 @@
 #include "config.h"
 #include "insert_text_command.h"
 
-#include "khtml_part.h"
+#include "Frame.h"
 #include "htmlediting.h"
 #include "html_interchange.h"
 #include "visible_position.h"
@@ -149,7 +149,7 @@ void InsertTextCommand::input(const DOMString& text, bool selectInsertedText) {
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
   CSSMutableStyleDeclarationImpl* typingStyle =
-      document()->part()->typingStyle();
+      document()->frame()->typingStyle();
   if (typingStyle && typingStyle->length() > 0)
     applyStyle(typingStyle);
 

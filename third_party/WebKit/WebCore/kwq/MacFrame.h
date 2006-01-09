@@ -23,10 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KWQKHTMLPart_H
-#define KWQKHTMLPart_H
+#ifndef MacFrame_H
+#define MacFrame_H
 
-#import "khtml_part.h"
+#import "Frame.h"
 
 #import "text_affinity.h"
 
@@ -116,10 +116,10 @@ typedef int NSWritingDirection;
 
 enum KWQSelectionDirection { KWQSelectingNext, KWQSelectingPrevious };
 
-class KWQKHTMLPart : public KHTMLPart {
+class MacFrame : public Frame {
  public:
-  KWQKHTMLPart();
-  ~KWQKHTMLPart();
+  MacFrame();
+  ~MacFrame();
 
   void clear();
 
@@ -231,7 +231,7 @@ class KWQKHTMLPart : public KHTMLPart {
   void createEmptyDocument();
 
   static WebCoreBridge* bridgeForWidget(const QWidget*);
-  static KWQKHTMLPart* partForWidget(const QWidget*);
+  static MacFrame* frameForWidget(const QWidget*);
 
   QString requestedURLString() const;
   QString incomingReferrer() const;
@@ -310,9 +310,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   void redirectionTimerStartedOrStopped();
 
-  static const QPtrList<KWQKHTMLPart>& instances() {
-    return mutableInstances();
-  }
+  static const QPtrList<MacFrame>& instances() { return mutableInstances(); }
 
   void clearRecordedFormValues();
   void recordFormValue(const QString& name,
@@ -457,7 +455,7 @@ class KWQKHTMLPart : public KHTMLPart {
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
   static DOM::NodeImpl* nodeForWidget(const QWidget*);
-  static KWQKHTMLPart* partForNode(DOM::NodeImpl*);
+  static MacFrame* frameForNode(DOM::NodeImpl*);
   static NSView* documentViewForNode(DOM::NodeImpl*);
 
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
@@ -473,7 +471,7 @@ class KWQKHTMLPart : public KHTMLPart {
   khtml::RenderStyle* styleForSelectionStart(
       DOM::NodeImpl*& nodeToRemove) const;
 
-  virtual bool isKHTMLPart() const;
+  virtual bool isFrame() const;
 
   void registerCommandForUndoOrRedo(const khtml::EditCommandPtr& cmd,
                                     bool isRedo);
@@ -503,7 +501,7 @@ class KWQKHTMLPart : public KHTMLPart {
   NSMutableDictionary* _formValuesAboutToBeSubmitted;
   ObjCDOMElement* _formAboutToBeSubmitted;
 
-  static QPtrList<KWQKHTMLPart>& mutableInstances();
+  static QPtrList<MacFrame>& mutableInstances();
 
   KWQWindowWidget* _windowWidget;
 
@@ -512,7 +510,7 @@ class KWQKHTMLPart : public KHTMLPart {
 
   QDict<char> urlsBridgeKnowsAbout;
 
-  friend class KHTMLPart;
+  friend class Frame;
 
   KJS::Bindings::RootObject* _bindingRoot;  // The root object used for objects
   // bound outside the context of a plugin.
@@ -539,11 +537,11 @@ class KWQKHTMLPart : public KHTMLPart {
   bool m_windowHasFocus;
 };
 
-inline KWQKHTMLPart* KWQ(KHTMLPart* part) {
-  return static_cast<KWQKHTMLPart*>(part);
+inline MacFrame* Mac(Frame* frame) {
+  return static_cast<MacFrame*>(frame);
 }
-inline const KWQKHTMLPart* KWQ(const KHTMLPart* part) {
-  return static_cast<const KWQKHTMLPart*>(part);
+inline const MacFrame* Mac(const Frame* frame) {
+  return static_cast<const MacFrame*>(frame);
 }
 
 #endif

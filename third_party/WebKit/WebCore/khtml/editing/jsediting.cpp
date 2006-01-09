@@ -30,11 +30,11 @@
 #include "css/cssproperties.h"
 
 #include "htmlediting.h"
-#include "khtml_part.h"
+#include "Frame.h"
 #include "SelectionController.h"
 #include <kxmlcore/HashMap.h>
 
-#include "KWQKHTMLPart.h"
+#include "MacFrame.h"
 
 using khtml::TypingCommand;
 
@@ -47,10 +47,10 @@ namespace {
 bool supportsPasteCommand = false;
 
 struct CommandImp {
-  bool (*execFn)(KHTMLPart* part, bool userInterface, const DOMString& value);
-  bool (*enabledFn)(KHTMLPart* part);
-  KHTMLPart::TriState (*stateFn)(KHTMLPart* part);
-  DOMString (*valueFn)(KHTMLPart* part);
+  bool (*execFn)(Frame* frame, bool userInterface, const DOMString& value);
+  bool (*enabledFn)(Frame* frame);
+  Frame::TriState (*stateFn)(Frame* frame);
+  DOMString (*valueFn)(Frame* frame);
 };
 
 typedef HashMap<DOMStringImpl*, const CommandImp*, CaseInsensitiveHash>
@@ -71,44 +71,44 @@ bool JSEditor::execCommand(const DOMString& command,
   const CommandImp* cmd = commandImp(command);
   if (!cmd)
     return false;
-  KHTMLPart* part = m_doc->part();
-  if (!part)
+  Frame* frame = m_doc->frame();
+  if (!frame)
     return false;
   m_doc->updateLayoutIgnorePendingStylesheets();
-  return cmd->enabledFn(part) && cmd->execFn(part, userInterface, value);
+  return cmd->enabledFn(frame) && cmd->execFn(frame, userInterface, value);
 }
 
 bool JSEditor::queryCommandEnabled(const DOMString& command) {
   const CommandImp* cmd = commandImp(command);
   if (!cmd)
     return false;
-  KHTMLPart* part = m_doc->part();
-  if (!part)
+  Frame* frame = m_doc->frame();
+  if (!frame)
     return false;
   m_doc->updateLayoutIgnorePendingStylesheets();
-  return cmd->enabledFn(part);
+  return cmd->enabledFn(frame);
 }
 
 bool JSEditor::queryCommandIndeterm(const DOMString& command) {
   const CommandImp* cmd = commandImp(command);
   if (!cmd)
     return false;
-  KHTMLPart* part = m_doc->part();
-  if (!part)
+  Frame* frame = m_doc->frame();
+  if (!frame)
     return false;
   m_doc->updateLayoutIgnorePendingStylesheets();
-  return cmd->stateFn(part) == KHTMLPart::mixedTriState;
+  return cmd->stateFn(frame) == Frame::mixedTriState;
 }
 
 bool JSEditor::queryCommandState(const DOMString& command) {
   const CommandImp* cmd = commandImp(command);
   if (!cmd)
     return false;
-  KHTMLPart* part = m_doc->part();
-  if (!part)
+  Frame* frame = m_doc->frame();
+  if (!frame)
     return false;
   m_doc->updateLayoutIgnorePendingStylesheets();
-  return cmd->stateFn(part) != KHTMLPart::falseTriState;
+  return cmd->stateFn(frame) != Frame::falseTriState;
 }
 
 bool JSEditor::queryCommandSupported(const DOMString& command) {
@@ -121,11 +121,11 @@ DOMString JSEditor::queryCommandValue(const DOMString& command) {
   const CommandImp* cmd = commandImp(command);
   if (!cmd)
     return DOMString();
-  KHTMLPart* part = m_doc->part();
-  if (!part)
+  Frame* frame = m_doc->frame();
+  if (!frame)
     return DOMString();
   m_doc->updateLayoutIgnorePendingStylesheets();
-  return cmd->valueFn(part);
+  return cmd->valueFn(frame);
 }
 
 void JSEditor::setSupportsPasteCommand(bool flag) {
@@ -138,42 +138,40 @@ void JSEditor::setSupportsPasteCommand(bool flag) {
 
 namespace {
 
-bool execStyleChange(KHTMLPart* part,
+bool execStyleChange(Frame* frame,
                      int propertyID,
                      const DOMString& propertyValue) {
   RefPtr<CSSMutableStyleDeclarationImpl> style =
       new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, propertyValue);
-  part->applyStyle(style.get());
+  frame->applyStyle(style.get());
   return true;
 }
 
-bool execStyleChange(KHTMLPart* part,
-                     int propertyID,
-                     const char* propertyValue) {
-  return execStyleChange(part, propertyID, DOMString(propertyValue));
+bool execStyleChange(Frame* frame, int propertyID, const char* propertyValue) {
+  return execStyleChange(frame, propertyID, DOMString(propertyValue));
 }
 
-KHTMLPart::TriState stateStyle(KHTMLPart* part,
-                               int propertyID,
-                               const char* desiredValue) {
+Frame::TriState stateStyle(Frame* frame,
+                           int propertyID,
+                           const char* desiredValue) {
   RefPtr<CSSMutableStyleDeclarationImpl> style =
       new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, desiredValue);
-  return part->selectionHasStyle(style.get());
+  return frame->selectionHasStyle(style.get());
 }
 
-bool selectionStartHasStyle(KHTMLPart* part,
+bool selectionStartHasStyle(Frame* frame,
                             int propertyID,
                             const char* desiredValue) {
   RefPtr<CSSMutableStyleDeclarationImpl> style =
       new CSSMutableStyleDeclarationImpl;
   style->setProperty(propertyID, desiredValue);
-  return part->selectionStartHasStyle(style.get());
+  return frame->selectionStartHasStyle(style.get());
 }
 
-DOMString valueStyle(KHTMLPart* part, int propertyID) {
-  return part->selectionStartStylePropertyValue(propertyID);
+DOMString valueStyle(Frame* frame, int propertyID) {
+  return frame->selectionStartStylePropertyValue(propertyID);
 }
 
 // =============================================================================================
@@ -181,193 +179,173 @@ DOMString valueStyle(KHTMLPart* part, int propertyID) {
 // execCommand implementations
 //
 
-bool execBackColor(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_BACKGROUND_COLOR, value);
+bool execBackColor(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_BACKGROUND_COLOR, value);
 }
 
-bool execBold(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  bool isBold = selectionStartHasStyle(part, CSS_PROP_FONT_WEIGHT, "bold");
-  return execStyleChange(part, CSS_PROP_FONT_WEIGHT,
+bool execBold(Frame* frame, bool userInterface, const DOMString& value) {
+  bool isBold = selectionStartHasStyle(frame, CSS_PROP_FONT_WEIGHT, "bold");
+  return execStyleChange(frame, CSS_PROP_FONT_WEIGHT,
                          isBold ? "normal" : "bold");
 }
 
-bool execCopy(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->copyToPasteboard();
+bool execCopy(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->copyToPasteboard();
   return true;
 }
 
-bool execCut(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->cutToPasteboard();
+bool execCut(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->cutToPasteboard();
   return true;
 }
 
-bool execDelete(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  TypingCommand::deleteKeyPressed(part->xmlDocImpl(),
-                                  part->selectionGranularity() == khtml::WORD);
+bool execDelete(Frame* frame, bool userInterface, const DOMString& value) {
+  TypingCommand::deleteKeyPressed(frame->xmlDocImpl(),
+                                  frame->selectionGranularity() == khtml::WORD);
   return true;
 }
 
-bool execForwardDelete(KHTMLPart* part,
+bool execForwardDelete(Frame* frame,
                        bool userInterface,
                        const DOMString& value) {
-  TypingCommand::forwardDeleteKeyPressed(part->xmlDocImpl());
+  TypingCommand::forwardDeleteKeyPressed(frame->xmlDocImpl());
   return true;
 }
 
-bool execFontName(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_FONT_FAMILY, value);
+bool execFontName(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_FONT_FAMILY, value);
 }
 
-bool execFontSize(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_FONT_SIZE, value);
+bool execFontSize(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_FONT_SIZE, value);
 }
 
-bool execFontSizeDelta(KHTMLPart* part,
+bool execFontSizeDelta(Frame* frame,
                        bool userInterface,
                        const DOMString& value) {
-  return execStyleChange(part, CSS_PROP__KHTML_FONT_SIZE_DELTA, value);
+  return execStyleChange(frame, CSS_PROP__KHTML_FONT_SIZE_DELTA, value);
 }
 
-bool execForeColor(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_COLOR, value);
+bool execForeColor(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_COLOR, value);
 }
 
-bool execIndent(KHTMLPart* part, bool userInterface, const DOMString& value) {
+bool execIndent(Frame* frame, bool userInterface, const DOMString& value) {
   // FIXME: Implement.
   return false;
 }
 
-bool execInsertLineBreak(KHTMLPart* part,
+bool execInsertLineBreak(Frame* frame,
                          bool userInterface,
                          const DOMString& value) {
-  TypingCommand::insertLineBreak(part->xmlDocImpl());
+  TypingCommand::insertLineBreak(frame->xmlDocImpl());
   return true;
 }
 
-bool execInsertParagraph(KHTMLPart* part,
+bool execInsertParagraph(Frame* frame,
                          bool userInterface,
                          const DOMString& value) {
-  TypingCommand::insertParagraphSeparator(part->xmlDocImpl());
+  TypingCommand::insertParagraphSeparator(frame->xmlDocImpl());
   return true;
 }
 
-bool execInsertNewlineInQuotedContent(KHTMLPart* part,
+bool execInsertNewlineInQuotedContent(Frame* frame,
                                       bool userInterface,
                                       const DOMString& value) {
-  TypingCommand::insertParagraphSeparatorInQuotedContent(part->xmlDocImpl());
+  TypingCommand::insertParagraphSeparatorInQuotedContent(frame->xmlDocImpl());
   return true;
 }
 
-bool execInsertText(KHTMLPart* part,
-                    bool userInterface,
-                    const DOMString& value) {
-  TypingCommand::insertText(part->xmlDocImpl(), value);
+bool execInsertText(Frame* frame, bool userInterface, const DOMString& value) {
+  TypingCommand::insertText(frame->xmlDocImpl(), value);
   return true;
 }
 
-bool execItalic(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  bool isItalic = selectionStartHasStyle(part, CSS_PROP_FONT_STYLE, "italic");
-  return execStyleChange(part, CSS_PROP_FONT_STYLE,
+bool execItalic(Frame* frame, bool userInterface, const DOMString& value) {
+  bool isItalic = selectionStartHasStyle(frame, CSS_PROP_FONT_STYLE, "italic");
+  return execStyleChange(frame, CSS_PROP_FONT_STYLE,
                          isItalic ? "normal" : "italic");
 }
 
-bool execJustifyCenter(KHTMLPart* part,
+bool execJustifyCenter(Frame* frame,
                        bool userInterface,
                        const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_TEXT_ALIGN, "center");
+  return execStyleChange(frame, CSS_PROP_TEXT_ALIGN, "center");
 }
 
-bool execJustifyFull(KHTMLPart* part,
-                     bool userInterface,
-                     const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_TEXT_ALIGN, "justify");
+bool execJustifyFull(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_TEXT_ALIGN, "justify");
 }
 
-bool execJustifyLeft(KHTMLPart* part,
-                     bool userInterface,
-                     const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_TEXT_ALIGN, "left");
+bool execJustifyLeft(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_TEXT_ALIGN, "left");
 }
 
-bool execJustifyRight(KHTMLPart* part,
+bool execJustifyRight(Frame* frame,
                       bool userInterface,
                       const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_TEXT_ALIGN, "right");
+  return execStyleChange(frame, CSS_PROP_TEXT_ALIGN, "right");
 }
 
-bool execOutdent(KHTMLPart* part, bool userInterface, const DOMString& value) {
+bool execOutdent(Frame* frame, bool userInterface, const DOMString& value) {
   // FIXME: Implement.
   return false;
 }
 
-bool execPaste(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->pasteFromPasteboard();
+bool execPaste(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->pasteFromPasteboard();
   return true;
 }
 
-bool execPasteAndMatchStyle(KHTMLPart* part,
+bool execPasteAndMatchStyle(Frame* frame,
                             bool userInterface,
                             const DOMString& value) {
-  part->pasteAndMatchStyle();
+  frame->pasteAndMatchStyle();
   return true;
 }
 
-bool execPrint(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->print();
+bool execPrint(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->print();
   return true;
 }
 
-bool execRedo(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->redo();
+bool execRedo(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->redo();
   return true;
 }
 
-bool execSelectAll(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
-  part->selectAll();
+bool execSelectAll(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->selectAll();
   return true;
 }
 
-bool execSubscript(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_VERTICAL_ALIGN, "sub");
+bool execSubscript(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_VERTICAL_ALIGN, "sub");
 }
 
-bool execSuperscript(KHTMLPart* part,
-                     bool userInterface,
-                     const DOMString& value) {
-  return execStyleChange(part, CSS_PROP_VERTICAL_ALIGN, "super");
+bool execSuperscript(Frame* frame, bool userInterface, const DOMString& value) {
+  return execStyleChange(frame, CSS_PROP_VERTICAL_ALIGN, "super");
 }
 
-bool execTranspose(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
-  part->transpose();
+bool execTranspose(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->transpose();
   return true;
 }
 
-bool execUnderline(KHTMLPart* part,
-                   bool userInterface,
-                   const DOMString& value) {
+bool execUnderline(Frame* frame, bool userInterface, const DOMString& value) {
   bool isUnderlined = selectionStartHasStyle(
-      part, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "underline");
-  return execStyleChange(part, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
+      frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT, "underline");
+  return execStyleChange(frame, CSS_PROP__KHTML_TEXT_DECORATIONS_IN_EFFECT,
                          isUnderlined ? "none" : "underline");
 }
 
-bool execUndo(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->undo();
+bool execUndo(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->undo();
   return true;
 }
 
-bool execUnselect(KHTMLPart* part, bool userInterface, const DOMString& value) {
-  part->clearSelection();
+bool execUnselect(Frame* frame, bool userInterface, const DOMString& value) {
+  frame->clearSelection();
   return true;
 }
 
@@ -381,32 +359,32 @@ bool execUnselect(KHTMLPart* part, bool userInterface, const DOMString& value) {
 //     Supported = The command is supported by this object.
 //     Enabled =   The command is available and enabled.
 
-bool enabled(KHTMLPart* part) {
+bool enabled(Frame* frame) {
   return true;
 }
 
-bool enabledAnySelection(KHTMLPart* part) {
-  return part->selection().isCaretOrRange();
+bool enabledAnySelection(Frame* frame) {
+  return frame->selection().isCaretOrRange();
 }
 
-bool enabledPaste(KHTMLPart* part) {
-  return supportsPasteCommand && part->canPaste();
+bool enabledPaste(Frame* frame) {
+  return supportsPasteCommand && frame->canPaste();
 }
 
-bool enabledPasteAndMatchStyle(KHTMLPart* part) {
-  return supportsPasteCommand && part->canPaste();
+bool enabledPasteAndMatchStyle(Frame* frame) {
+  return supportsPasteCommand && frame->canPaste();
 }
 
-bool enabledRangeSelection(KHTMLPart* part) {
-  return part->selection().isRange();
+bool enabledRangeSelection(Frame* frame) {
+  return frame->selection().isRange();
 }
 
-bool enabledRedo(KHTMLPart* part) {
-  return part->canRedo();
+bool enabledRedo(Frame* frame) {
+  return frame->canRedo();
 }
 
-bool enabledUndo(KHTMLPart* part) {
-  return part->canUndo();
+bool enabledUndo(Frame* frame) {
+  return frame->canUndo();
 }
 
 // =============================================================================================
@@ -427,28 +405,28 @@ bool enabledUndo(KHTMLPart* part) {
 // all the text is either all bold or not-bold and and "yes" for partially-bold
 // text.
 
-KHTMLPart::TriState stateNone(KHTMLPart* part) {
-  return KHTMLPart::falseTriState;
+Frame::TriState stateNone(Frame* frame) {
+  return Frame::falseTriState;
 }
 
-KHTMLPart::TriState stateBold(KHTMLPart* part) {
-  return stateStyle(part, CSS_PROP_FONT_WEIGHT, "bold");
+Frame::TriState stateBold(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_FONT_WEIGHT, "bold");
 }
 
-KHTMLPart::TriState stateItalic(KHTMLPart* part) {
-  return stateStyle(part, CSS_PROP_FONT_STYLE, "italic");
+Frame::TriState stateItalic(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_FONT_STYLE, "italic");
 }
 
-KHTMLPart::TriState stateSubscript(KHTMLPart* part) {
-  return stateStyle(part, CSS_PROP_VERTICAL_ALIGN, "sub");
+Frame::TriState stateSubscript(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_VERTICAL_ALIGN, "sub");
 }
 
-KHTMLPart::TriState stateSuperscript(KHTMLPart* part) {
-  return stateStyle(part, CSS_PROP_VERTICAL_ALIGN, "super");
+Frame::TriState stateSuperscript(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_VERTICAL_ALIGN, "super");
 }
 
-KHTMLPart::TriState stateUnderline(KHTMLPart* part) {
-  return stateStyle(part, CSS_PROP_TEXT_DECORATION, "underline");
+Frame::TriState stateUnderline(Frame* frame) {
+  return stateStyle(frame, CSS_PROP_TEXT_DECORATION, "underline");
 }
 
 // =============================================================================================
@@ -456,28 +434,28 @@ KHTMLPart::TriState stateUnderline(KHTMLPart* part) {
 // queryCommandValue implementations
 //
 
-DOMString valueNull(KHTMLPart* part) {
+DOMString valueNull(Frame* frame) {
   return DOMString();
 }
 
-DOMString valueBackColor(KHTMLPart* part) {
-  return valueStyle(part, CSS_PROP_BACKGROUND_COLOR);
+DOMString valueBackColor(Frame* frame) {
+  return valueStyle(frame, CSS_PROP_BACKGROUND_COLOR);
 }
 
-DOMString valueFontName(KHTMLPart* part) {
-  return valueStyle(part, CSS_PROP_FONT_FAMILY);
+DOMString valueFontName(Frame* frame) {
+  return valueStyle(frame, CSS_PROP_FONT_FAMILY);
 }
 
-DOMString valueFontSize(KHTMLPart* part) {
-  return valueStyle(part, CSS_PROP_FONT_SIZE);
+DOMString valueFontSize(Frame* frame) {
+  return valueStyle(frame, CSS_PROP_FONT_SIZE);
 }
 
-DOMString valueFontSizeDelta(KHTMLPart* part) {
-  return valueStyle(part, CSS_PROP__KHTML_FONT_SIZE_DELTA);
+DOMString valueFontSizeDelta(Frame* frame) {
+  return valueStyle(frame, CSS_PROP__KHTML_FONT_SIZE_DELTA);
 }
 
-DOMString valueForeColor(KHTMLPart* part) {
-  return valueStyle(part, CSS_PROP_COLOR);
+DOMString valueForeColor(Frame* frame) {
+  return valueStyle(frame, CSS_PROP_COLOR);
 }
 
 // =============================================================================================

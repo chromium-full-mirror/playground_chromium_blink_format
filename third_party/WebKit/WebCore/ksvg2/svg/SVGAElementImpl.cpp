@@ -25,6 +25,7 @@
 #include <kdom/events/MouseEventImpl.h>
 #include <kdom/events/kdomevents.h>
 #include <kdom/Helper.h>
+#include "xml/dom2_eventsimpl.h"
 #include "csshelper.h"
 
 #include <kcanvas/KCanvasCreator.h>
@@ -123,9 +124,9 @@ void SVGAElementImpl::defaultEventHandler(KDOM::EventImpl* evt) {
           button = Qt::RightButton;
       }
       if (ownerDocument() && ownerDocument()->view() &&
-          ownerDocument()->part()) {
+          ownerDocument()->frame()) {
         // getDocument()->view()->resetCursor();
-        getDocument()->part()->urlSelected(url, button, state, utarget);
+        getDocument()->frame()->urlSelected(url, button, state, utarget);
       }
     }
 

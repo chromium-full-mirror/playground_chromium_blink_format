@@ -32,7 +32,7 @@
 
 class KHTMLSettings;
 class KHTMLView;
-class KHTMLPart;
+class Frame;
 class KURL;
 
 namespace DOM {
@@ -246,7 +246,7 @@ class CSSStyleSelector : public StyleSelector {
   DOM::NodeImpl* parentNode;
   RenderStyle::PseudoId pseudoStyle;
   KHTMLView* view;
-  KHTMLPart* part;
+  Frame* frame;
   const KHTMLSettings* settings;
   QPaintDeviceMetrics* paintDeviceMetrics;
   bool fontDirty;

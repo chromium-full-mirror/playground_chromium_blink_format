@@ -442,7 +442,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
       } else {
         // ### some validation on the URL?
         // ### FIXME charset
-        if (getDocument()->part()) {
+        if (getDocument()->frame()) {
           m_loading = true;
           getDocument()->addPendingSheet();
           if (m_cachedSheet)

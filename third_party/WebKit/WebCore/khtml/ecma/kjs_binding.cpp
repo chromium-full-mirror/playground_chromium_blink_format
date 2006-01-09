@@ -74,22 +74,22 @@ static NodePerDocMap* domNodesPerDocument() {
   return staticDOMNodesPerDocument;
 }
 
-ScriptInterpreter::ScriptInterpreter(JSObject* global, KHTMLPart* part)
+ScriptInterpreter::ScriptInterpreter(JSObject* global, Frame* frame)
     : Interpreter(global),
-      m_part(part),
+      m_frame(frame),
       m_evt(0L),
       m_inlineCode(false),
       m_timerCallback(false) {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "ScriptInterpreter::ScriptInterpreter " << this
-                << " for part=" << m_part << endl;
+                << " for frame=" << m_frame << endl;
 #endif
 }
 
 ScriptInterpreter::~ScriptInterpreter() {
 #ifdef KJS_VERBOSE
   kdDebug(6070) << "ScriptInterpreter::~ScriptInterpreter " << this
-                << " for part=" << m_part << endl;
+                << " for frame=" << m_frame << endl;
 #endif
 }
 

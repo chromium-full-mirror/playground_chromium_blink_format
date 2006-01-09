@@ -32,7 +32,7 @@
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom_elementimpl.h"
 
-#include "khtml_part.h"
+#include "MacFrame.h"
 #include "khtmlview.h"
 
 #include "html/htmlparser.h"
@@ -784,8 +784,8 @@ void ElementImpl::focus() {
       if (isContentEditable()) {
         // FIXME: we should restore the previous selection if there is one,
         // instead of always selecting all.
-        if (KWQ(doc->part())->selectContentsOfNode(this))
-          KWQ(doc->part())->revealSelection();
+        if (Mac(doc->frame())->selectContentsOfNode(this))
+          Mac(doc->frame())->revealSelection();
       } else if (renderer() && !renderer()->isWidget())
         renderer()->enclosingLayer()->scrollRectToVisible(getRect());
     }

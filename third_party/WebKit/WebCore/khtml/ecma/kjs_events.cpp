@@ -22,7 +22,7 @@
 #include "kjs_events.h"
 #include "kjs_events.lut.h"
 
-#include "khtml_part.h"
+#include "MacFrame.h"
 #include "kjs_window.h"
 #include "kjs_views.h"
 #include "kjs_proxy.h"
@@ -64,10 +64,10 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
     return;
 
   Window* window = windowObj();
-  KHTMLPart* part = window->part();
-  if (!part)
+  Frame* frame = window->frame();
+  if (!frame)
     return;
-  KJSProxyImpl* proxy = part->jScript();
+  KJSProxyImpl* proxy = frame->jScript();
   if (!proxy)
     return;
 
@@ -121,7 +121,7 @@ void JSAbstractEventListener::handleEvent(EventListenerEvent ele,
           exception->get(exec, "sourceURL")->toString(exec).domString();
       if (Interpreter::shouldPrintExceptions())
         printf("(event handler):%s\n", message.qstring().utf8().data());
-      KWQ(part)->addMessageToConsole(message, lineNumber, sourceURL);
+      Mac(frame)->addMessageToConsole(message, lineNumber, sourceURL);
       exec->clearException();
     } else {
       if (!retval->isUndefinedOrNull() && event->storesResultAsString())
@@ -234,10 +234,10 @@ void JSLazyEventListener::parseCode() const {
     return;
   parsed = true;
 
-  KHTMLPart* part = windowObj()->part();
+  Frame* frame = windowObj()->frame();
   KJSProxyImpl* proxy = 0;
-  if (part)
-    proxy = part->jScript();
+  if (frame)
+    proxy = frame->jScript();
 
   if (proxy) {
     ScriptInterpreter* interpreter = proxy->interpreter();
@@ -247,7 +247,7 @@ void JSLazyEventListener::parseCode() const {
     JSObject* constr = interpreter->builtinFunction();
     List args;
 
-    UString sourceURL(part->m_url.url());
+    UString sourceURL(frame->m_url.url());
     args.append(eventParameterName());
     args.append(jsString(code));
     listener = constr->construct(exec, args, sourceURL,

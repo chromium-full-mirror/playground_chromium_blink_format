@@ -28,7 +28,7 @@
 
 #include <JavaScriptCore/runtime.h>
 
-class KHTMLPart;
+class Frame;
 
 namespace DOM {
 class DocumentImpl;
@@ -74,7 +74,7 @@ class DOMNode;
  */
 class ScriptInterpreter : public Interpreter {
  public:
-  ScriptInterpreter(JSObject* global, KHTMLPart* part);
+  ScriptInterpreter(JSObject* global, Frame* frame);
   virtual ~ScriptInterpreter();
 
   static DOMObject* getDOMObject(void* objectHandle);
@@ -93,7 +93,7 @@ class ScriptInterpreter : public Interpreter {
                                     DOM::DocumentImpl* oldDoc,
                                     DOM::DocumentImpl* newDoc);
 
-  KHTMLPart* part() const { return m_part; }
+  Frame* frame() const { return m_frame; }
 
   virtual int rtti() { return 1; }
 
@@ -129,7 +129,7 @@ class ScriptInterpreter : public Interpreter {
                                    const Bindings::RootObject* current);
 
  private:
-  KHTMLPart* m_part;
+  Frame* m_frame;
 
   DOM::EventImpl* m_evt;
   bool m_inlineCode;

@@ -24,7 +24,7 @@
 #include "config.h"
 #include "html/html_objectimpl.h"
 
-#include "khtml_part.h"
+#include "Frame.h"
 #include "dom/dom_string.h"
 #include "khtmlview.h"
 #include <qstring.h>
@@ -47,7 +47,7 @@
 
 #include "java/kjavaappletwidget.h"
 
-#include "KWQKHTMLPart.h"
+#include "MacFrame.h"
 
 using namespace khtml;
 
@@ -158,9 +158,9 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
                                                     RenderStyle* style) {
 #ifndef Q_WS_QWS  // FIXME(E)? I don't think this is possible with Qt
                   // Embedded...
-  KHTMLPart* part = getDocument()->part();
+  Frame* frame = getDocument()->frame();
 
-  if (part && part->javaEnabled()) {
+  if (frame && frame->javaEnabled()) {
     QMap<QString, QString> args;
 
     args.insert("code", getAttribute(codeAttr).qstring());
@@ -196,8 +196,8 @@ RenderObject* HTMLAppletElementImpl::createRenderer(RenderArena* arena,
 }
 
 KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
-  KHTMLPart* part = getDocument()->part();
-  if (!part || !part->javaEnabled())
+  Frame* frame = getDocument()->frame();
+  if (!frame || !frame->javaEnabled())
     return 0;
 
   if (appletInstance)
@@ -207,9 +207,10 @@ KJS::Bindings::Instance* HTMLAppletElementImpl::getAppletInstance() const {
   if (r) {
     r->createWidgetIfNecessary();
     if (r->widget())
-      // Call into the part (and over the bridge) to pull the Bindings::Instance
+      // Call into the frame (and over the bridge) to pull the
+      // Bindings::Instance
       // from the guts of the plugin.
-      appletInstance = KWQ(part)->getAppletInstanceForWidget(r->widget());
+      appletInstance = Mac(frame)->getAppletInstanceForWidget(r->widget());
   }
   return appletInstance;
 }
@@ -328,8 +329,8 @@ bool HTMLEmbedElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
-  KHTMLPart* part = getDocument()->part();
-  if (!part)
+  Frame* frame = getDocument()->frame();
+  if (!frame)
     return 0;
 
   if (embedInstance)
@@ -344,12 +345,13 @@ KJS::Bindings::Instance* HTMLEmbedElementImpl::getEmbedInstance() const {
 
   if (r && r->isWidget()) {
     if (QWidget* widget = static_cast<RenderWidget*>(r)->widget()) {
-      // Call into the part (and over the bridge) to pull the Bindings::Instance
+      // Call into the frame (and over the bridge) to pull the
+      // Bindings::Instance
       // from the guts of the Java VM.
-      embedInstance = KWQ(part)->getEmbedInstanceForWidget(widget);
+      embedInstance = Mac(frame)->getEmbedInstanceForWidget(widget);
       // Applet may specified with <embed> tag.
       if (!embedInstance)
-        embedInstance = KWQ(part)->getAppletInstanceForWidget(widget);
+        embedInstance = Mac(frame)->getAppletInstanceForWidget(widget);
     }
   }
   return embedInstance;
@@ -430,8 +432,8 @@ void HTMLEmbedElementImpl::parseMappedAttribute(MappedAttributeImpl* attr) {
 }
 
 bool HTMLEmbedElementImpl::rendererIsNeeded(RenderStyle* style) {
-  KHTMLPart* part = getDocument()->part();
-  if (!part || !part->pluginsEnabled())
+  Frame* frame = getDocument()->frame();
+  if (!frame || !frame->pluginsEnabled())
     return false;
 
   NodeImpl* p = parentNode();
@@ -497,8 +499,8 @@ bool HTMLObjectElementImpl::checkDTD(const NodeImpl* newChild) {
 }
 
 KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
-  KHTMLPart* part = getDocument()->part();
-  if (!part)
+  Frame* frame = getDocument()->frame();
+  if (!frame)
     return 0;
 
   if (objectInstance)
@@ -507,13 +509,13 @@ KJS::Bindings::Instance* HTMLObjectElementImpl::getObjectInstance() const {
   if (RenderObject* r = m_render) {
     if (r->isWidget()) {
       if (QWidget* widget = static_cast<RenderWidget*>(r)->widget()) {
-        // Call into the part (and over the bridge) to pull the
+        // Call into the frame (and over the bridge) to pull the
         // Bindings::Instance
         // from the guts of the plugin.
-        objectInstance = KWQ(part)->getObjectInstanceForWidget(widget);
+        objectInstance = Mac(frame)->getObjectInstanceForWidget(widget);
         // Applet may specified with <object> tag.
         if (!objectInstance)
-          objectInstance = KWQ(part)->getAppletInstanceForWidget(widget);
+          objectInstance = Mac(frame)->getAppletInstanceForWidget(widget);
       }
     }
   }
@@ -623,8 +625,8 @@ bool HTMLObjectElementImpl::rendererIsNeeded(RenderStyle* style) {
   if (m_useFallbackContent || isImageType())
     return HTMLElementImpl::rendererIsNeeded(style);
 
-  KHTMLPart* part = getDocument()->part();
-  if (!part || !part->pluginsEnabled())
+  Frame* frame = getDocument()->frame();
+  if (!frame || !frame->pluginsEnabled())
     return false;
 
   return true;

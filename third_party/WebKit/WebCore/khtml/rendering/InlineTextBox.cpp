@@ -265,13 +265,13 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
 
   // Determine whether or not we have marked text.
   RangeImpl* markedTextRange =
-      KWQ(object()->document()->part())->markedTextRange();
+      Mac(object()->document()->frame())->markedTextRange();
   int exception = 0;
   bool haveMarkedText =
       markedTextRange &&
       markedTextRange->startContainer(exception) == object()->node();
   bool markedTextUsesUnderlines =
-      KWQ(object()->document()->part())->markedTextUsesUnderlines();
+      Mac(object()->document()->frame())->markedTextUsesUnderlines();
 
   // Set our font.
   RenderStyle* styleToUse = object()->style(m_firstLine);
@@ -302,11 +302,11 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       object()->document()->markersForNode(object()->node());
   QValueListIterator<DocumentMarker> markerIt = markers.begin();
 
-  QValueList<KWQKHTMLPart::MarkedTextUnderline> underlines;
+  QValueList<MacFrame::MarkedTextUnderline> underlines;
   if (haveMarkedText && markedTextUsesUnderlines) {
-    underlines = KWQ(object()->document()->part())->markedTextUnderlines();
+    underlines = Mac(object()->document()->frame())->markedTextUnderlines();
   }
-  QValueListIterator<KWQKHTMLPart::MarkedTextUnderline> underlineIt =
+  QValueListIterator<MacFrame::MarkedTextUnderline> underlineIt =
       underlines.begin();
 
   QColor textColor = styleToUse->color();
@@ -446,7 +446,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     }
 
     for (; underlineIt != underlines.end(); underlineIt++) {
-      KWQKHTMLPart::MarkedTextUnderline underline = *underlineIt;
+      MacFrame::MarkedTextUnderline underline = *underlineIt;
 
       if (underline.endOffset <= start())
         // underline is completely before this run.  This might be an
@@ -657,7 +657,7 @@ void InlineTextBox::paintMarkedTextUnderline(
     QPainter* pt,
     int _tx,
     int _ty,
-    KWQKHTMLPart::MarkedTextUnderline underline) {
+    MacFrame::MarkedTextUnderline underline) {
   _tx += m_x;
   _ty += m_y;
 

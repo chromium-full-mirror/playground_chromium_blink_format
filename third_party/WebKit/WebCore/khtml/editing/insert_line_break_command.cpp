@@ -35,7 +35,7 @@
 #include "xml/dom_elementimpl.h"
 #include "xml/dom2_rangeimpl.h"
 #include "xml/dom_textimpl.h"
-#include "khtml_part.h"
+#include "Frame.h"
 
 #include <kxmlcore/Assertions.h>
 #include "KWQLogging.h"
@@ -172,7 +172,7 @@ void InsertLineBreakCommand::doApply() {
   // improvement
 
   CSSMutableStyleDeclarationImpl* typingStyle =
-      document()->part()->typingStyle();
+      document()->frame()->typingStyle();
 
   if (typingStyle && typingStyle->length() > 0) {
     SelectionController selectionBeforeStyle = endingSelection();

@@ -147,18 +147,18 @@ class KHTMLPartPrivate {
     m_cancelWithLoadInProgress = false;
 
     // inherit settings from parent
-    if (parent && parent->inherits("KHTMLPart")) {
-      KHTMLPart* part = static_cast<KHTMLPart*>(parent);
-      if (part->d) {
-        m_bJScriptForce = part->d->m_bJScriptForce;
-        m_bJScriptOverride = part->d->m_bJScriptOverride;
-        m_bJavaForce = part->d->m_bJavaForce;
-        m_bJavaOverride = part->d->m_bJavaOverride;
-        m_bPluginsForce = part->d->m_bPluginsForce;
-        m_bPluginsOverride = part->d->m_bPluginsOverride;
+    if (parent && parent->inherits("Frame")) {
+      Frame* frame = static_cast<Frame*>(parent);
+      if (frame->d) {
+        m_bJScriptForce = frame->d->m_bJScriptForce;
+        m_bJScriptOverride = frame->d->m_bJScriptOverride;
+        m_bJavaForce = frame->d->m_bJavaForce;
+        m_bJavaOverride = frame->d->m_bJavaOverride;
+        m_bPluginsForce = frame->d->m_bPluginsForce;
+        m_bPluginsOverride = frame->d->m_bPluginsOverride;
         // Same for SSL settings
-        m_onlyLocalReferences = part->d->m_onlyLocalReferences;
-        m_zoomFactor = part->d->m_zoomFactor;
+        m_onlyLocalReferences = frame->d->m_onlyLocalReferences;
+        m_zoomFactor = frame->d->m_zoomFactor;
       }
     }
 
@@ -287,7 +287,7 @@ class KHTMLPartPrivate {
 
   // QGuardedPtr<KParts::Part> m_activeFrame;
   KParts::Part* m_activeFrame;
-  QGuardedPtr<KHTMLPart> m_opener;
+  QGuardedPtr<Frame> m_opener;
   bool m_openedByJS;
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open
 

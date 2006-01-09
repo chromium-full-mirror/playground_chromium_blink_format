@@ -25,7 +25,7 @@
 #ifndef KHTML_InlineTextBox_H
 #define KHTML_InlineTextBox_H
 
-#include "KWQKHTMLPart.h"
+#include "MacFrame.h"
 #include "rendering/render_line.h"
 #include <assert.h>
 #include "RenderText.h"
@@ -143,7 +143,7 @@ class InlineTextBox : public InlineRunBox {
   void paintMarkedTextUnderline(QPainter* pt,
                                 int _tx,
                                 int _ty,
-                                KWQKHTMLPart::MarkedTextUnderline underline);
+                                MacFrame::MarkedTextUnderline underline);
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;

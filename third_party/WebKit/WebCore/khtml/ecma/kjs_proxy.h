@@ -23,7 +23,7 @@
 
 #include <qvariant.h>
 
-class KHTMLPart;
+class Frame;
 class QString;
 
 namespace DOM {
@@ -39,7 +39,7 @@ class ScriptInterpreter;
 
 class KJSProxyImpl {
  public:
-  KJSProxyImpl(KHTMLPart*);
+  KJSProxyImpl(Frame*);
   ~KJSProxyImpl();
   QVariant evaluate(const DOM::DOMString& filename,
                     int baseLine,
@@ -56,7 +56,7 @@ class KJSProxyImpl {
 
  private:
   KJS::ScriptInterpreter* m_script;
-  KHTMLPart* m_part;
+  Frame* m_frame;
   int m_handlerLineno;
 };
 

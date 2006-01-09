@@ -42,7 +42,7 @@ class NSPasteboard;
 
 typedef unsigned NSDragOperation;
 
-class KWQKHTMLPart;
+class MacFrame;
 
 class KWQClipboard : public DOM::ClipboardImpl {
  public:
@@ -58,7 +58,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   KWQClipboard(bool forDragging,
                NSPasteboard* pasteboard,
                AccessPolicy policy,
-               KWQKHTMLPart* part = 0);
+               MacFrame* frame = 0);
   virtual ~KWQClipboard();
 
   bool isForDragging() const;
@@ -107,7 +107,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   AccessPolicy m_policy;
   int m_changeCount;
   bool m_dragStarted;
-  KWQKHTMLPart* m_part;  // used on the source side to generate dragging images
+  MacFrame* m_frame;  // used on the source side to generate dragging images
 };
 
 #endif

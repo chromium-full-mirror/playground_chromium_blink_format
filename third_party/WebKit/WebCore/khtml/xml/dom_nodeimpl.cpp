@@ -48,7 +48,7 @@
 #include "ecma/kjs_binding.h"
 #include "ecma/kjs_proxy.h"
 #include "khtmlview.h"
-#include "khtml_part.h"
+#include "Frame.h"
 
 // FIXME: Should not have to include this.  Cut the HTML dependency!
 #include "htmlnames.h"
@@ -509,14 +509,14 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
   // Unfortunately that page no longer exists, but we'll make this code robust
   // against
   // that anyway.
-  // FIXME: Much code in this class assumes document is non-nil; it would be
+  // FIXME: Much code in this class assumes document is non-null; it would be
   // better to
-  // ensure that document can never be nil.
-  KHTMLPart* part = nil;
-  KHTMLView* view = nil;
+  // ensure that document can never be null.
+  Frame* frame = 0;
+  KHTMLView* view = 0;
 
   if (DocumentImpl* doc = getDocument()) {
-    part = doc->part();
+    frame = doc->frame();
     view = doc->view();
     // Since event handling code could cause this object to be deleted, grab a
     // reference to the view now
@@ -531,8 +531,8 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
   // there is no way to retrieve it from javascript if a script does not already
   // have a reference to it in a variable.
   // So there is no need for the interpreter to keep the event in it's cache
-  if (tempEvent && part && part->jScript())
-    part->jScript()->finishedWithEvent(evt);
+  if (tempEvent && frame && frame->jScript())
+    frame->jScript()->finishedWithEvent(evt);
 
   if (view)
     view->deref();

@@ -36,7 +36,7 @@
 #include "css/css_valueimpl.h"
 #include "visible_units.h"
 #include "xml/dom_position.h"
-#include "khtml_part.h"
+#include "Frame.h"
 #include "xml/dom2_rangeimpl.h"
 #include "rendering/render_object.h"
 #include "css/css_computedstyle.h"
@@ -610,12 +610,12 @@ void ReplaceSelectionCommand::doApply() {
   else
     startPos = positionOutsideContainingSpecialElement(startPos);
 
-  KHTMLPart* part = document()->part();
+  Frame* frame = document()->frame();
 
   // FIXME: Improve typing style.
   // See this bug: <rdar://problem/3769899> Implementation of typing style needs
   // improvement
-  part->clearTypingStyle();
+  frame->clearTypingStyle();
   setTypingStyle(0);
 
   // done if there is nothing to add
@@ -651,7 +651,7 @@ void ReplaceSelectionCommand::doApply() {
       QChar previousChar = visiblePos.previous().character();
       if (!previousChar.isNull()) {
         addLeadingSpace =
-            !part->isCharacterSmartReplaceExempt(previousChar, true);
+            !frame->isCharacterSmartReplaceExempt(previousChar, true);
       }
     }
     addTrailingSpace =
@@ -662,7 +662,7 @@ void ReplaceSelectionCommand::doApply() {
       QChar thisChar = visiblePos.character();
       if (!thisChar.isNull()) {
         addTrailingSpace =
-            !part->isCharacterSmartReplaceExempt(thisChar, false);
+            !frame->isCharacterSmartReplaceExempt(thisChar, false);
       }
     }
   }

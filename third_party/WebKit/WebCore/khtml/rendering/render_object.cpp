@@ -41,7 +41,7 @@
 #include <qpainter.h>
 #include <qpen.h>
 #include "khtmlview.h"
-#include "khtml_part.h"
+#include "Frame.h"
 #include "render_arena.h"
 #include "render_inline.h"
 #include "render_block.h"
@@ -1752,7 +1752,7 @@ DOM::NodeImpl* RenderObject::draggableNode(bool dhtmlOK,
       // style for a text node,
       // we use our own judgement.
       if (uaOK &&
-          canvas()->view()->part()->shouldDragAutoNode(curr->node(), x, y)) {
+          canvas()->view()->frame()->shouldDragAutoNode(curr->node(), x, y)) {
         dhtmlWillDrag = false;
         return curr->node();
       } else if (curr->shouldSelect()) {
@@ -1769,8 +1769,8 @@ DOM::NodeImpl* RenderObject::draggableNode(bool dhtmlOK,
         dhtmlWillDrag = true;
         return curr->node();
       } else if (uaOK && dragMode == DRAG_AUTO &&
-                 canvas()->view()->part()->shouldDragAutoNode(curr->node(), x,
-                                                              y)) {
+                 canvas()->view()->frame()->shouldDragAutoNode(curr->node(), x,
+                                                               y)) {
         dhtmlWillDrag = false;
         return curr->node();
       }
