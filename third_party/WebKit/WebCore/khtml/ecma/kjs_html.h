@@ -760,6 +760,8 @@ class HTMLElement : public DOMElement {
     FrameContentDocument,
     FrameContentWindow,
     FrameNoResize,
+    FrameWidth,
+    FrameHeight,
     IFrameLongDesc,
     IFrameDocument,
     IFrameAlign,
