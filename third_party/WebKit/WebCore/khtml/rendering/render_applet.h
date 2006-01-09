@@ -55,7 +55,6 @@ class RenderApplet : public RenderWidget {
   }
 
  private:
-  KJavaAppletContext* m_context;
   QMap<QString, QString> m_args;
 };
 

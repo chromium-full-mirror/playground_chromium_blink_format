@@ -37,8 +37,6 @@
 
 #include "formdata.h"
 
-class KXMLGUIClient {};
-
 namespace KParts {
 
 struct URLArgs {
@@ -119,9 +117,6 @@ class BrowserExtension : public QObject {
  private:
   URLArgs m_args;
 };
-
-class BrowserHostExtension : public QObject {};
-
-}  // namespace KParts
+};
 
 #endif
