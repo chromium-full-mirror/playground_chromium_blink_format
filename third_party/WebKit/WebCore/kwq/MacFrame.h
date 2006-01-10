@@ -128,24 +128,14 @@ class MacFrame : public Frame {
   void setView(KHTMLView* view);
   KHTMLView* view() const;
 
-  void provisionalLoadStarted();
-
   virtual bool openURL(const KURL&);
-  virtual bool closeURL();
-  void didNotOpenURL(const KURL&);
 
   void openURLRequest(const KURL&, const KParts::URLArgs&);
   void submitForm(const KURL&, const KParts::URLArgs&);
 
   void scheduleHistoryNavigation(int steps);
 
-  void scrollToAnchor(const KURL&);
   QString advanceToNextMisspelling(bool startBeforeSelection = false);
-  bool scrollOverflow(KWQScrollDirection direction,
-                      KWQScrollGranularity granularity);
-
-  void setEncoding(const QString& encoding, bool userChosen);
-  void addData(const char* bytes, int length);
 
   void setTitle(const DOM::DOMString&);
   void setStatusBarText(const QString& status);
@@ -162,26 +152,15 @@ class MacFrame : public Frame {
 
   void unfocusWindow();
 
-  KJS::PausedTimeouts* pauseTimeouts();
-  void resumeTimeouts(KJS::PausedTimeouts*);
-
-  bool canCachePage();
-  void saveWindowProperties(KJS::SavedProperties* windowProperties);
-  void saveLocationProperties(KJS::SavedProperties* locationProperties);
-  void restoreWindowProperties(KJS::SavedProperties* windowProperties);
-  void restoreLocationProperties(KJS::SavedProperties* locationProperties);
-  void saveInterpreterBuiltins(KJS::SavedBuiltins& interpreterBuiltins);
-  void restoreInterpreterBuiltins(
-      const KJS::SavedBuiltins& interpreterBuiltins);
-
   void openURLFromPageCache(KWQPageState* state);
 
   void saveDocumentState();
   void restoreDocumentState();
 
-  bool isFrameSet() const;
-
-  void updatePolicyBaseURL();
+  void addMessageToConsole(const DOM::DOMString& message,
+                           unsigned int lineNumber,
+                           const DOM::DOMString& sourceID);
+  void setDisplaysWithFocusAttributes(bool flag);
 
   NSView* nextKeyView(DOM::NodeImpl* startingPoint, KWQSelectionDirection);
   NSView* nextKeyViewInFrameHierarchy(DOM::NodeImpl* startingPoint,
@@ -196,9 +175,6 @@ class MacFrame : public Frame {
 
   static bool currentEventIsMouseDownInWidget(QWidget* candidate);
 
-  static void setDocumentFocus(QWidget*);
-  static void clearDocumentFocus(QWidget*);
-
   void runJavaScriptAlert(const DOM::DOMString& message);
   bool runJavaScriptConfirm(const DOM::DOMString& message);
   bool runJavaScriptPrompt(const DOM::DOMString& message,
@@ -207,31 +183,14 @@ class MacFrame : public Frame {
   bool locationbarVisible();
   bool menubarVisible();
   bool personalbarVisible();
-  bool scrollbarsVisible();
   bool statusbarVisible();
   bool toolbarVisible();
 
   bool shouldClose();
 
-  void addMessageToConsole(const DOM::DOMString& message,
-                           unsigned int lineNumber,
-                           const DOM::DOMString& sourceID);
-  khtml::RenderObject* renderer() const;
-  void forceLayout();
-  void forceLayoutWithPageWidthRange(float minPageWidth, float maxPageWidth);
-  void sendResizeEvent();
-  void sendScrollEvent();
-  void paint(QPainter*, const QRect&);
-
-  void adjustPageHeight(float* newBottom,
-                        float oldTop,
-                        float oldBottom,
-                        float bottomLimit);
-
   void createEmptyDocument();
 
   static WebCoreBridge* bridgeForWidget(const QWidget*);
-  static MacFrame* frameForWidget(const QWidget*);
 
   QString requestedURLString() const;
   QString incomingReferrer() const;
@@ -239,21 +198,13 @@ class MacFrame : public Frame {
 
   QString mimeTypeForFileName(const QString&) const;
 
-  DOM::NodeImpl* selectionStart() const;
-  int selectionStartOffset() const;
-  DOM::NodeImpl* selectionEnd() const;
-  int selectionEndOffset() const;
-
-  QRect selectionRect() const;
   NSRect visibleSelectionRect() const;
-  // Scrolls as necessary to reveal the selection
-  void revealSelection();
-  // Centers the selection regardless of whether it was already visible
-  void centerSelectionInVisibleArea() const;
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(DOM::NodeImpl* node,
                              NSRect* imageRect,
                              NSRect* elementRect) const;
+  bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
+                            const QPoint& loc) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
   NSDictionary* fontAttributesForSelectionStart() const;
@@ -269,8 +220,6 @@ class MacFrame : public Frame {
                                        DOM::NodeImpl* endNode,
                                        int endOffset);
 
-  void addMetaData(const QString& key, const QString& value);
-
   void mouseDown(NSEvent*);
   void mouseDragged(NSEvent*);
   void mouseUp(NSEvent*);
@@ -283,6 +232,7 @@ class MacFrame : public Frame {
   bool lastEventIsMouseUp() const;
   void setActivationEventNumber(int num) { _activationEventNumber = num; }
 
+  bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
   bool eventMayStartDrag(NSEvent*) const;
   void dragSourceMovedTo(const QPoint& loc);
   void dragSourceEndedAt(const QPoint& loc, NSDragOperation operation);
@@ -296,27 +246,16 @@ class MacFrame : public Frame {
 
   bool sendContextMenuEvent(NSEvent*);
 
-  // Call this method before handling a new user action, like on a mouse down or
-  // key down.
-  // Currently, all this does is clear the "don't submit form twice" data
-  // member.
-  void prepareForUserAction();
-
-  void clearTimers();
-  static void clearTimers(KHTMLView*);
-
+  bool passMouseDownEventToWidget(QWidget*);
   bool passSubframeEventToSubframe(DOM::NodeImpl::MouseEvent&);
   bool passWheelEventToChildWidget(DOM::NodeImpl*);
 
   void redirectionTimerStartedOrStopped();
 
-  static const QPtrList<MacFrame>& instances() { return mutableInstances(); }
-
   void clearRecordedFormValues();
   void recordFormValue(const QString& name,
                        const QString& value,
                        DOM::HTMLFormElementImpl* element);
-  DOM::HTMLFormElementImpl* currentForm() const;
 
   NSString* searchForLabelsAboveCell(QRegExp* regExp,
                                      DOM::HTMLTableCellElementImpl* cell);
@@ -327,30 +266,15 @@ class MacFrame : public Frame {
 
   bool findString(NSString* str, bool forward, bool caseFlag, bool wrapFlag);
 
-  void setSettings(KHTMLSettings*);
-
   KWQWindowWidget* topLevelWidget();
 
   void tokenizerProcessedData();
 
   QString overrideMediaType() const;
 
-  void setMediaType(const QString&);
-
-  void setSelectionFromNone();
-  void setDisplaysWithFocusAttributes(bool flag);
-  bool displaysWithFocusAttributes() const;
-
-  void setWindowHasFocus(bool flag);
-
-  // Convenience, to avoid repeating the code to dig down to get this.
-  QChar backslashAsCurrencySymbol() const;
-
   NSColor* bodyBackgroundColor() const;
 
   WebCoreKeyboardUIMode keyboardUIMode() const;
-
-  void setName(const QString& name);
 
   void didTellBridgeAboutLoad(const QString& urlString);
   bool haveToldBridgeAboutLoad(const QString& urlString);
@@ -394,27 +318,10 @@ class MacFrame : public Frame {
   // Implementation of CSS property -khtml-user-drag == auto
   bool shouldDragAutoNode(DOM::NodeImpl*, int x, int y) const;
 
-  struct MarkedTextUnderline {
-    MarkedTextUnderline(unsigned _startOffset,
-                        unsigned _endOffset,
-                        const QColor& _color,
-                        bool _thick)
-        : startOffset(_startOffset),
-          endOffset(_endOffset),
-          color(_color),
-          thick(_thick) {}
-    unsigned startOffset;
-    unsigned endOffset;
-    QColor color;
-    bool thick;
-  };
-
   void setMarkedTextRange(const DOM::RangeImpl*,
                           NSArray* attributes,
                           NSArray* ranges);
   DOM::RangeImpl* markedTextRange() const { return m_markedTextRange.get(); }
-  bool markedTextUsesUnderlines() const;
-  QValueList<MarkedTextUnderline> markedTextUnderlines() const;
 
   bool canGoBackOrForward(int distance) const;
 
@@ -425,8 +332,6 @@ class MacFrame : public Frame {
 
   virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
 
-  DOM::NodeImpl* mousePressNode();
-
   virtual bool mouseDownMayStartSelect() const {
     return _mouseDownMayStartSelect;
   }
@@ -434,44 +339,24 @@ class MacFrame : public Frame {
   void handledOnloadEvents();
 
  private:
-  bool canMouseDownStartSelect(DOM::NodeImpl* node);
   virtual void khtmlMousePressEvent(khtml::MousePressEvent*);
-  virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*);
   virtual void khtmlMouseMoveEvent(khtml::MouseMoveEvent*);
   virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent*);
 
-  bool passWidgetMouseDownEventToWidget(khtml::MouseEvent*);
-  bool passWidgetMouseDownEventToWidget(khtml::RenderWidget*);
-  bool passWidgetMouseDownEventToWidget(QWidget*);
-
-  void setPolicyBaseURL(const DOM::DOMString&);
-
   NSView* mouseDownViewIfStillGood();
-
-  bool userGestureHint();
 
   QString generateFrameName();
 
   NSView* nextKeyViewInFrame(DOM::NodeImpl* startingPoint,
                              KWQSelectionDirection);
-  static DOM::NodeImpl* nodeForWidget(const QWidget*);
-  static MacFrame* frameForNode(DOM::NodeImpl*);
   static NSView* documentViewForNode(DOM::NodeImpl*);
 
-  bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
   bool dispatchCPPEvent(const DOM::AtomicString& eventType,
                         KWQClipboard::AccessPolicy policy);
-  bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
-                            const QPoint& loc) const;
 
   NSImage* imageFromRect(NSRect rect) const;
 
   void freeClipboard();
-
-  khtml::RenderStyle* styleForSelectionStart(
-      DOM::NodeImpl*& nodeToRemove) const;
-
-  virtual bool isFrame() const;
 
   void registerCommandForUndoOrRedo(const khtml::EditCommandPtr& cmd,
                                     bool isRedo);
@@ -496,16 +381,11 @@ class MacFrame : public Frame {
 
   static NSEvent* _currentEvent;
 
-  KURL _submittedFormURL;
-
   NSMutableDictionary* _formValuesAboutToBeSubmitted;
   ObjCDOMElement* _formAboutToBeSubmitted;
 
-  static QPtrList<MacFrame>& mutableInstances();
-
   KWQWindowWidget* _windowWidget;
 
-  mutable bool _drawSelectionOnly;
   bool _haveUndoRedoOperations;
 
   QDict<char> urlsBridgeKnowsAbout;
@@ -528,13 +408,7 @@ class MacFrame : public Frame {
   bool _dragSrcIsDHTML;
   KWQClipboard* _dragClipboard;  // used on only the source side of dragging
 
-  mutable RefPtr<DOM::NodeImpl> _elementToDraw;
-
   RefPtr<DOM::RangeImpl> m_markedTextRange;
-  bool m_markedTextUsesUnderlines;
-  QValueList<MarkedTextUnderline> m_markedTextUnderlines;
-
-  bool m_windowHasFocus;
 };
 
 inline MacFrame* Mac(Frame* frame) {

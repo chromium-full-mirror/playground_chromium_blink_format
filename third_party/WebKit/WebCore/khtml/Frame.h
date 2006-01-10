@@ -1,29 +1,29 @@
 // -*- c-basic-offset: 2 -*-
 /* This file is part of the KDE project
- *
- * Copyright (C) 1998, 1999 Torben Weis <weis@kde.org>
- *                     1999-2001 Lars Knoll <knoll@kde.org>
- *                     1999-2001 Antti Koivisto <koivisto@kde.org>
- *                     2000-2001 Simon Hausmann <hausmann@kde.org>
- *                     2000-2001 Dirk Mueller <mueller@kde.org>
- *                     2000 Stefan Schimanski <1Stein@gmx.de>
- * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public License
- * along with this library; see the file COPYING.LIB.  If not, write to
- * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- */
+*
+* Copyright (C) 1998, 1999 Torben Weis <weis@kde.org>
+*                     1999-2001 Lars Knoll <knoll@kde.org>
+*                     1999-2001 Antti Koivisto <koivisto@kde.org>
+*                     2000-2001 Simon Hausmann <hausmann@kde.org>
+*                     2000-2001 Dirk Mueller <mueller@kde.org>
+*                     2000 Stefan Schimanski <1Stein@gmx.de>
+* Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Library General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Library General Public License for more details.
+*
+* You should have received a copy of the GNU Library General Public License
+* along with this library; see the file COPYING.LIB.  If not, write to
+* the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+* Boston, MA 02111-1307, USA.
+*/
 #ifndef __khtml_part_h__
 #define __khtml_part_h__
 
@@ -32,12 +32,20 @@
 
 #include <kparts/part.h>
 #include <kparts/browserextension.h>
+#include <qscrollbar.h>
+#include <qcolor.h>
 
 class KHTMLPartPrivate;
 class KHTMLPartBrowserExtension;
 class KJSProxyImpl;
 class KHTMLView;
 class KHTMLSettings;
+
+namespace KJS {
+class PausedTimeouts;
+class SavedProperties;
+class SavedBuiltins;
+}
 
 namespace DOM {
 class CSSComputedStyleDeclarationImpl;
@@ -79,8 +87,10 @@ class MouseEvent;
 class MouseMoveEvent;
 class MousePressEvent;
 class MouseReleaseEvent;
+class RenderObject;
 class RenderPart;
 class RenderPartObject;
+class RenderStyle;
 class RenderWidget;
 class SelectionController;
 class XMLTokenizer;
@@ -367,19 +377,9 @@ class Frame : public KParts::ReadOnlyPart {
    */
   void stop();
 
-  /**
-   * Paints the HTML page to a QPainter. See @ref KHTMLView::paint for details
-   */
-  void paint(QPainter*, const QRect&, int = 0, bool* = 0);
+  void paint(QPainter*, const QRect&);
 
-  /**
-   * Sets the encoding the page uses.
-   *
-   * This can be different from the charset. The widget will try to reload the
-   * current page in the new
-   * encoding, if url() is not empty.
-   */
-  bool setEncoding(const QString& name, bool override = false);
+  void setEncoding(const QString& encoding, bool userChosen);
 
   /**
    * Returns the encoding the page currently uses.
@@ -768,8 +768,6 @@ class Frame : public KParts::ReadOnlyPart {
   void print();
   virtual bool isCharacterSmartReplaceExempt(const QChar&, bool);
 
-  virtual bool displaysWithFocusAttributes() const { return true; }
-
   // Used to keep the part alive when running a script that might destroy it.
   void keepAlive();
 
@@ -805,8 +803,8 @@ class Frame : public KParts::ReadOnlyPart {
   void htmlError(int errorCode, const QString& text, const KURL& reqUrl);
 
   virtual void customEvent(QCustomEvent* event);
+  virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent* event);
   virtual void khtmlMousePressEvent(khtml::MousePressEvent* event);
-  virtual void khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent*) {}
   virtual void khtmlMouseMoveEvent(khtml::MouseMoveEvent* event);
   virtual void khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event);
   virtual void khtmlDrawContentsEvent(khtml::DrawContentsEvent*) {}
@@ -981,6 +979,121 @@ class Frame : public KParts::ReadOnlyPart {
   void setOpener(Frame* _opener);
   bool openedByJS();
   void setOpenedByJS(bool _openedByJS);
+
+  void setSettings(KHTMLSettings*);
+
+  void provisionalLoadStarted();
+  bool userGestureHint();
+  void didNotOpenURL(const KURL&);
+  void addData(const char* bytes, int length);
+  void addMetaData(const QString& key, const QString& value);
+  void setMediaType(const QString&);
+
+  khtml::RenderObject* renderer() const;
+  QRect selectionRect() const;
+  bool isFrameSet() const;
+
+  DOM::HTMLFormElementImpl* currentForm() const;
+
+  khtml::RenderStyle* styleForSelectionStart(
+      DOM::NodeImpl*& nodeToRemove) const;
+  int selectionStartOffset() const;
+  DOM::NodeImpl* selectionEnd() const;
+  int selectionEndOffset() const;
+  DOM::NodeImpl* selectionStart() const;
+  // Scrolls as necessary to reveal the selection
+  void revealSelection();
+  // Centers the selection regardless of whether it was already visible
+  void centerSelectionInVisibleArea() const;
+  void setSelectionFromNone();
+
+  bool scrollOverflow(KWQScrollDirection direction,
+                      KWQScrollGranularity granularity);
+
+  void adjustPageHeight(float* newBottom,
+                        float oldTop,
+                        float oldBottom,
+                        float bottomLimit);
+
+  bool canCachePage();
+  KJS::PausedTimeouts* pauseTimeouts();
+  void resumeTimeouts(KJS::PausedTimeouts*);
+  void saveWindowProperties(KJS::SavedProperties* windowProperties);
+  void saveLocationProperties(KJS::SavedProperties* locationProperties);
+  void restoreWindowProperties(KJS::SavedProperties* windowProperties);
+  void restoreLocationProperties(KJS::SavedProperties* locationProperties);
+  void saveInterpreterBuiltins(KJS::SavedBuiltins& interpreterBuiltins);
+  void restoreInterpreterBuiltins(
+      const KJS::SavedBuiltins& interpreterBuiltins);
+
+  static Frame* frameForWidget(const QWidget*);
+  static DOM::NodeImpl* nodeForWidget(const QWidget*);
+  static Frame* frameForNode(DOM::NodeImpl*);
+
+  static void setDocumentFocus(QWidget*);
+  static void clearDocumentFocus(QWidget*);
+
+  static const QPtrList<Frame>& instances() { return mutableInstances(); }
+  static QPtrList<Frame>& mutableInstances();
+
+  void updatePolicyBaseURL();
+  void setPolicyBaseURL(const DOM::DOMString&);
+
+  void forceLayout();
+  void forceLayoutWithPageWidthRange(float minPageWidth, float maxPageWidth);
+
+  void sendResizeEvent();
+  void sendScrollEvent();
+  bool scrollbarsVisible();
+  void scrollToAnchor(const KURL&);
+  bool canMouseDownStartSelect(DOM::NodeImpl* node);
+  bool passWidgetMouseDownEventToWidget(khtml::MouseEvent*);
+  bool passWidgetMouseDownEventToWidget(khtml::RenderWidget*);
+  virtual bool passMouseDownEventToWidget(QWidget*) = 0;
+
+  void clearTimers();
+  static void clearTimers(KHTMLView*);
+
+  bool displaysWithFocusAttributes() const;
+  void setWindowHasFocus(bool flag);
+  // Convenience, to avoid repeating the code to dig down to get this.
+
+  QChar backslashAsCurrencySymbol() const;
+  void setName(const QString& name);
+
+  struct MarkedTextUnderline {
+    MarkedTextUnderline(unsigned _startOffset,
+                        unsigned _endOffset,
+                        const QColor& _color,
+                        bool _thick)
+        : startOffset(_startOffset),
+          endOffset(_endOffset),
+          color(_color),
+          thick(_thick) {}
+    unsigned startOffset;
+    unsigned endOffset;
+    QColor color;
+    bool thick;
+  };
+
+  QValueList<MarkedTextUnderline> markedTextUnderlines() const;
+  bool markedTextUsesUnderlines() const;
+  // Call this method before handling a new user action, like on a mouse down or
+  // key down.
+  // Currently, all this does is clear the "don't submit form twice" data
+  // member.
+  void prepareForUserAction();
+  virtual bool isFrame() const;
+  DOM::NodeImpl* mousePressNode();
+  virtual void saveDocumentState() = 0;
+
+ protected:
+  mutable RefPtr<DOM::NodeImpl> _elementToDraw;
+  mutable bool _drawSelectionOnly;
+  KURL _submittedFormURL;
+  bool m_markedTextUsesUnderlines;
+  QValueList<MarkedTextUnderline> m_markedTextUnderlines;
+  bool m_windowHasFocus;
 
  private:
   int cacheId() const;
