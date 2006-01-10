@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <CoreFoundation/CoreFoundation.h>
+#include <kxmlcore/HashMap.h>
 
 #include "visible_position.h"
 
@@ -43,6 +43,13 @@ class VisiblePosition;
 }
 
 typedef unsigned int KWQAccObjectID;
+
+namespace KXMLCore {
+template <>
+struct HashTraits<KWQAccObjectID> : GenericHashTraits<KWQAccObjectID> {
+  static TraitType deletedValue() { return (unsigned int)-1; }
+};
+}
 
 class KWQAccObjectCache {
  public:
@@ -77,7 +84,17 @@ class KWQAccObjectCache {
   static bool gAccessibilityEnabled;
 
  private:
-  CFMutableDictionaryRef accCache;
-  CFMutableDictionaryRef accCacheByID;
-  KWQAccObjectID accObjectIDSource;
+  typedef HashMap<khtml::RenderObject*,
+                  KWQAccObject*,
+                  PointerHash<khtml::RenderObject*>>
+      RenderObjectToAccObjectMap;
+  typedef HashMap<KWQAccObjectID,
+                  KWQAccObject*,
+                  PointerHash<KWQAccObjectID>,
+                  HashTraits<KWQAccObjectID>>
+      AccIdToAccObjectMap;
+
+  RenderObjectToAccObjectMap* m_accCache;
+  AccIdToAccObjectMap* m_accCacheByID;
+  KWQAccObjectID m_accObjectIDSource;
 };
