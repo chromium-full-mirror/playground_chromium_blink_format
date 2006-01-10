@@ -281,20 +281,13 @@ class KHTMLPartPrivate {
   int m_focusNodeNumber;
 
   QPoint m_dragStartPos;
-#ifdef KHTML_NO_SELECTION
-  QPoint m_dragLastPos;
-#endif
 
-  // QGuardedPtr<KParts::Part> m_activeFrame;
   KParts::Part* m_activeFrame;
   QGuardedPtr<Frame> m_opener;
   bool m_openedByJS;
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open
-
   bool m_bPendingChildRedirection;
-
   bool m_executingJavaScriptFormAction;
-
   bool m_cancelWithLoadInProgress;
 
   QTimer m_lifeSupportTimer;

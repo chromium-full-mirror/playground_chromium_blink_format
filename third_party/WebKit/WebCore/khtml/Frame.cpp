@@ -6,7 +6,7 @@
  *                     2000 Simon Hausmann <hausmann@kde.org>
  *                     2000 Stefan Schimanski <1Stein@gmx.de>
  *                     2001 George Staikos <staikos@kde.org>
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  * Copyright (C) 2005 Alexey Proskuryakov <ap@nypop.com>
  *
  * This library is free software; you can redistribute it and/or
@@ -28,11 +28,8 @@
 #include "config.h"
 #include "Frame.h"
 
-#define QT_NO_CLIPBOARD
-#define QT_NO_DRAGANDDROP
-
 #include "css/csshelper.h"
-#include "css/cssproperties.h"
+#include "cssproperties.h"
 #include "css/cssstyleselector.h"
 #include "css/css_computedstyle.h"
 #include "css/css_valueimpl.h"
@@ -83,9 +80,6 @@ using namespace HTMLNames;
 #include <kdebug.h>
 #include <klocale.h>
 #include <kglobalsettings.h>
-#if !defined(QT_NO_DRAGANDDROP)
-#include <kmultipledrag.h>
-#endif
 
 #include <qfile.h>
 #include <qptrlist.h>
@@ -93,30 +87,7 @@ using namespace HTMLNames;
 #include <CoreServices/CoreServices.h>
 
 using namespace DOM::EventNames;
-
-using khtml::ApplyStyleCommand;
-using khtml::CHARACTER;
-using khtml::ChildFrame;
-using khtml::Decoder;
-using khtml::DocLoader;
-using khtml::EAffinity;
-using khtml::EditAction;
-using khtml::EditCommandPtr;
-using khtml::ETextGranularity;
-using khtml::FormData;
-using khtml::isEndOfDocument;
-using khtml::isStartOfDocument;
-using khtml::PARAGRAPH;
-using khtml::plainText;
-using khtml::RenderObject;
-using khtml::RenderText;
-using khtml::RenderLayer;
-using khtml::RenderWidget;
-using khtml::SelectionController;
-using khtml::Tokenizer;
-using khtml::TypingCommand;
-using khtml::VisiblePosition;
-using khtml::WORD;
+using namespace khtml;
 
 using KParts::BrowserInterface;
 
@@ -212,7 +183,6 @@ void Frame::init(KHTMLView* view) {
 }
 
 Frame::~Frame() {
-  stopAutoScroll();
   cancelRedirection();
 
   if (!d->m_bComplete)
@@ -659,11 +629,6 @@ void Frame::clear() {
 
   d->m_bMousePressed = false;
 
-#ifndef QT_NO_CLIPBOARD
-  connect(kapp->clipboard(), SIGNAL(selectionChanged()),
-          SLOT(slotClearSelection()));
-#endif
-
   if (!d->m_haveEncoding)
     d->m_encoding = QString::null;
 #ifdef SPEED_DEBUG
@@ -695,16 +660,7 @@ void Frame::replaceDocImpl(DocumentImpl* newDoc) {
   }
 }
 
-/*bool Frame::isSSLInUse() const
-{
-  return d->m_ssl_in_use;
-}*/
-
 void Frame::receivedFirstData() {
-  // Leave indented one extra for easier merging.
-
-  // kdDebug( 6050 ) << "begin!" << endl;
-
   begin(d->m_workingURL, d->m_extension->urlArgs().xOffset,
         d->m_extension->urlArgs().yOffset);
 
@@ -757,8 +713,6 @@ void Frame::receivedFirstData() {
 
   // Support for http last-modified
   d->m_lastModified = d->m_job->queryMetaData("modified");
-  // kdDebug() << "Frame::slotData metadata modified: " << d->m_lastModified <<
-  // endl;
 }
 
 void Frame::slotFinished(KIO::Job* job) {
@@ -1009,9 +963,6 @@ void Frame::slotFinishedParsing() {
   gotoAnchor();
 }
 
-void Frame::slotLoaderRequestStarted(khtml::DocLoader* dl,
-                                     khtml::CachedObject* obj) {}
-
 void Frame::slotLoaderRequestDone(khtml::DocLoader* dl,
                                   khtml::CachedObject* obj) {
   // We really only need to call checkCompleted when our own resources are done
@@ -1028,11 +979,6 @@ void Frame::slotLoaderRequestDone(khtml::DocLoader* dl,
 }
 
 void Frame::checkCompleted() {
-  //   kdDebug( 6050 ) << "Frame::checkCompleted() parsing: " <<
-  //   d->m_doc->parsing() << endl;
-  //   kdDebug( 6050 ) << "                           complete: " <<
-  //   d->m_bComplete << endl;
-
   // Any frame that hasn't completed yet ?
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
@@ -1075,10 +1021,6 @@ void Frame::checkCompleted() {
     else
       emit completed();
   }
-
-#ifdef SPEED_DEBUG
-  kdDebug(6050) << "DONE: " << d->m_parsetime.elapsed() << endl;
-#endif
 }
 
 void Frame::checkEmitLoadEvent() {
@@ -1117,22 +1059,6 @@ void Frame::checkEmitLoadEvent() {
 const KHTMLSettings* Frame::settings() const {
   return d->m_settings;
 }
-
-#ifndef KDE_NO_COMPAT
-KURL Frame::baseURL() const {
-  if (!d->m_doc)
-    return KURL();
-
-  return d->m_doc->baseURL();
-}
-
-QString Frame::baseTarget() const {
-  if (!d->m_doc)
-    return QString::null;
-
-  return d->m_doc->baseTarget();
-}
-#endif
 
 KURL Frame::completeURL(const QString& url) {
   if (!d->m_doc)
@@ -2157,14 +2083,6 @@ Frame* Frame::childFrameNamed(const QString& name) const {
   return NULL;
 }
 
-void Frame::setDNDEnabled(bool b) {
-  d->m_bDnd = b;
-}
-
-bool Frame::dndEnabled() const {
-  return d->m_bDnd;
-}
-
 bool Frame::shouldDragAutoNode(DOM::NodeImpl* node, int x, int y) const {
   // No KDE impl yet
   return false;
@@ -2257,10 +2175,8 @@ void Frame::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
     d->m_beganSelectingText = true;
   }
 
-  if (shouldChangeSelection(selection)) {
+  if (shouldChangeSelection(selection))
     setSelection(selection);
-    startAutoScroll();
-  }
 }
 
 void Frame::handleMousePressEventDoubleClick(khtml::MousePressEvent* event) {
@@ -2297,10 +2213,8 @@ void Frame::handleMousePressEventTripleClick(khtml::MousePressEvent* event) {
       d->m_beganSelectingText = true;
     }
 
-    if (shouldChangeSelection(selection)) {
+    if (shouldChangeSelection(selection))
       setSelection(selection);
-      startAutoScroll();
-    }
   }
 }
 
@@ -2358,10 +2272,8 @@ void Frame::handleMousePressEventSingleClick(khtml::MousePressEvent* event) {
         d->m_selectionGranularity = CHARACTER;
       }
 
-      if (shouldChangeSelection(sel)) {
+      if (shouldChangeSelection(sel))
         setSelection(sel);
-        startAutoScroll();
-      }
     }
   }
 }
@@ -2383,45 +2295,23 @@ void Frame::khtmlMousePressEvent(khtml::MousePressEvent* event) {
 
   if (mouse->button() == LeftButton || mouse->button() == MidButton) {
     d->m_bMousePressed = true;
-
-#ifdef KHTML_NO_SELECTION
-    d->m_dragLastPos = mouse->globalPos();
-#else
     d->m_beganSelectingText = false;
 
     if (mouse->clickCount() == 2) {
       handleMousePressEventDoubleClick(event);
       return;
-    }
-
-    if (mouse->clickCount() >= 3) {
+    } else if (mouse->clickCount() >= 3) {
       handleMousePressEventTripleClick(event);
       return;
     }
-
     handleMousePressEventSingleClick(event);
-#endif  // KHTML_NO_SELECTION
   }
 }
-
-void Frame::khtmlMouseDoubleClickEvent(khtml::MouseDoubleClickEvent* event) {}
 
 void Frame::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
   // Mouse not pressed. Do nothing.
   if (!d->m_bMousePressed)
     return;
-
-#ifdef KHTML_NO_SELECTION
-  if (d->m_doc && d->m_view) {
-    QPoint diff(mouse->globalPos() - d->m_dragLastPos);
-
-    if (abs(diff.x()) > 64 || abs(diff.y()) > 64) {
-      d->m_view->scrollBy(-diff.x(), -diff.y());
-      d->m_dragLastPos = mouse->globalPos();
-    }
-  }
-  return;
-#else
 
   QMouseEvent* mouse = event->qmouseEvent();
   NodeImpl* innerNode = event->innerNode();
@@ -2455,8 +2345,6 @@ void Frame::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
 
   if (shouldChangeSelection(sel))
     setSelection(sel);
-
-#endif  // KHTML_NO_SELECTION
 }
 
 void Frame::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
@@ -2464,43 +2352,9 @@ void Frame::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
 }
 
 void Frame::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
-  if (d->m_bMousePressed)
-    stopAutoScroll();
-
   // Used to prevent mouseMoveEvent from initiating a drag before
   // the mouse is pressed again.
   d->m_bMousePressed = false;
-
-#ifndef QT_NO_CLIPBOARD
-  QMouseEvent* _mouse = event->qmouseEvent();
-  if ((d->m_guiProfile == BrowserViewGUI) && (_mouse->button() == MidButton) &&
-      (event->url().isNull())) {
-    QClipboard* cb = QApplication::clipboard();
-    cb->setSelectionMode(true);
-    QCString plain("plain");
-    QString url = cb->text(plain).stripWhiteSpace();
-    KURL u(url);
-    if (u.isMalformed()) {
-      // some half-baked guesses for incomplete urls
-      // (the same code is in libkonq/konq_dirpart.cc)
-      if (url.startsWith("ftp.")) {
-        url.prepend("ftp://");
-        u = url;
-      } else {
-        url.prepend("http://");
-        u = url;
-      }
-    }
-    if (u.isValid()) {
-      QString savedReferrer = d->m_referrer;
-      d->m_referrer = QString::null;  // Disable referrer.
-      urlSelected(url, 0, 0, "_top");
-      d->m_referrer = savedReferrer;  // Restore original referrer.
-    }
-  }
-#endif
-
-#ifndef KHTML_NO_SELECTION
 
   // Clear the selection if the mouse didn't move after the last mouse press.
   // We do this so when clicking on the selection, the selection goes away.
@@ -2516,35 +2370,11 @@ void Frame::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
           node->renderer()->positionForCoordinates(event->x(), event->y());
       selection.moveTo(pos);
     }
-    if (shouldChangeSelection(selection)) {
+    if (shouldChangeSelection(selection))
       setSelection(selection);
-    }
   }
-
-#ifndef QT_NO_CLIPBOARD
-  // get selected text and paste to the clipboard
-  QString text = selectedText();
-  text.replace(QRegExp(QChar(0xa0)), " ");
-  QClipboard* cb = QApplication::clipboard();
-  cb->setSelectionMode(true);
-  disconnect(kapp->clipboard(), SIGNAL(selectionChanged()), this,
-             SLOT(slotClearSelection()));
-  cb->setText(text);
-  connect(kapp->clipboard(), SIGNAL(selectionChanged()),
-          SLOT(slotClearSelection()));
-  cb->setSelectionMode(false);
-#endif  // QT_NO_CLIPBOARD
-
   selectFrameElementInParentIfFullySelected();
-
-#endif  // KHTML_NO_SELECTION
 }
-
-void Frame::khtmlDrawContentsEvent(khtml::DrawContentsEvent*) {}
-
-void Frame::startAutoScroll() {}
-
-void Frame::stopAutoScroll() {}
 
 void Frame::selectAll() {
   if (!d->m_doc)

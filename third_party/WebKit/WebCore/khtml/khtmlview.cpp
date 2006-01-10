@@ -1152,7 +1152,6 @@ void KHTMLView::focusInEvent(QFocusEvent* e) {
 }
 
 void KHTMLView::focusOutEvent(QFocusEvent* e) {
-  m_frame->stopAutoScroll();
   m_frame->setCaretVisible(false);
 }
 
