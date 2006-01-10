@@ -298,10 +298,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         //                          cWidth, cHeight, intrinsicWidth(),
         //                          intrinsicHeight(), resizeCache.width(),
         //                          resizeCache.height());
-        QWMatrix matrix;
-        matrix.scale((float)(cWidth) / intrinsicWidth(),
-                     (float)(cHeight) / intrinsicHeight());
-        resizeCache = pix.xForm(matrix);
+        resizeCache = pix;
         scaledrect.setWidth((cWidth * scaledrect.width()) / intrinsicWidth());
         scaledrect.setHeight((cHeight * scaledrect.height()) /
                              intrinsicHeight());

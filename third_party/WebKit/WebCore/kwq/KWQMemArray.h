@@ -57,6 +57,8 @@ class QMemArray {
 
   T& operator[](int i) { return *(T*)impl.at(i); }
   const T& operator[](int i) const { return *(T*)impl.at(i); }
+  T& operator[](uint i) { return *(T*)impl.at(i); }
+  const T& operator[](uint i) const { return *(T*)impl.at(i); }
   bool operator==(const QMemArray<T>& a) const { return impl == a.impl; }
   bool operator!=(const QMemArray<T>& a) const { return !(*this == a); }
   operator const T*() const { return data(); }

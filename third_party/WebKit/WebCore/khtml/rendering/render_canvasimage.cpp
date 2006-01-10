@@ -25,6 +25,8 @@
 
 //#define DEBUG_LAYOUT
 
+#if __APPLE__
+
 #include "config.h"
 #include "render_canvasimage.h"
 #include "render_canvas.h"
@@ -221,3 +223,5 @@ void RenderCanvasImage::layout() {
 
   setNeedsLayout(false);
 }
+
+#endif

@@ -26,6 +26,10 @@
 #ifndef QWMATRIX_H_
 #define QWMATRIX_H_
 
+#if __APPLE__
+// FIXME: Just comment out the entire file, since its implementation is
+// completely CG-specific.
+
 #include <ApplicationServices/ApplicationServices.h>
 #include <QRectF>
 
@@ -73,5 +77,7 @@ class QWMatrix {
 };
 
 #define QMatrix QWMatrix
+
+#endif  // __APPLE__
 
 #endif

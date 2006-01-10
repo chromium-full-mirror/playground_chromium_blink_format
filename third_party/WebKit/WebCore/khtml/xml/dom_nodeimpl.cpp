@@ -504,7 +504,7 @@ bool NodeImpl::dispatchEvent(EventImpl* evt,
 
   evt->setTarget(this);
 
-  // We've had at least one report of a crash on a page where document is nil
+  // We've had at least one report of a crash on a page where document is null
   // here.
   // Unfortunately that page no longer exists, but we'll make this code robust
   // against

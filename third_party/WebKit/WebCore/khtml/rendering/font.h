@@ -26,6 +26,10 @@
 #ifndef KHTMLFONT_H
 #define KHTMLFONT_H
 
+#if WIN32
+#include <math.h>  // FIXME: This is here because of the use of floorf instead of lroundf on Win32.
+#endif
+
 #include <qcolor.h>
 #include <qfont.h>
 #include <qfontmetrics.h>
@@ -222,8 +226,15 @@ inline int Font::width(QChar* chs,
                        int len,
                        int tabWidth,
                        int xpos) const {
+// FIXME: Want to define an lroundf for win32.
+#if __APPLE__
   return lroundf(fm.floatWidth(chs + pos, slen - pos, 0, len, tabWidth, xpos,
                                letterSpacing, wordSpacing, fontDef.smallCaps));
+#else
+  return floorf(fm.floatWidth(chs + pos, slen - pos, 0, len, tabWidth, xpos,
+                              letterSpacing, wordSpacing, fontDef.smallCaps) +
+                0.5);
+#endif
 }
 
 inline int Font::width(QChar* chs, int slen, int tabWidth, int xpos) const {

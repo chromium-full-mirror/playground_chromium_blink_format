@@ -27,7 +27,15 @@
 #include "html_imageimpl.h"
 #include "xml/dom_stringimpl.h"
 
+#if __APPLE__
 #include <JavaScriptCore/runtime.h>
+#else
+namespace KJS {
+namespace Bindings {
+class Instance;
+}
+}
+#endif
 
 class QStringList;
 
@@ -88,6 +96,7 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
 
   virtual bool allParamsAvailable();
   void setupApplet() const;
+
   KJS::Bindings::Instance* getAppletInstance() const;
 
   virtual void insertedIntoDocument();
@@ -99,7 +108,9 @@ class HTMLAppletElementImpl : public HTMLElementImpl {
  private:
   DOMString oldNameAttr;
   DOMString oldIdAttr;
+
   mutable KJS::Bindings::Instance* appletInstance;
+
   bool m_allParamsAvailable;
 };
 
@@ -135,6 +146,7 @@ class HTMLEmbedElementImpl : public HTMLElementImpl {
 
  private:
   DOMString oldNameAttr;
+
   mutable KJS::Bindings::Instance* embedInstance;
 };
 
@@ -230,6 +242,7 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   void setComplete(bool complete);
 
   bool isDocNamedItem() const { return m_docNamedItem; }
+
   KJS::Bindings::Instance* getObjectInstance() const;
 
   QString serviceType;
@@ -243,7 +256,9 @@ class HTMLObjectElementImpl : public HTMLElementImpl {
   void updateDocNamedItem();
   DOMString oldIdAttr;
   DOMString oldNameAttr;
+
   mutable KJS::Bindings::Instance* objectInstance;
+
   bool m_complete;
   bool m_docNamedItem;
 };

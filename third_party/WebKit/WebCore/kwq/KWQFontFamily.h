@@ -25,7 +25,6 @@
 
 #include "KWQString.h"
 #include "dom_atomicstring.h"
-#include "kxmlcore/FastMalloc.h"
 
 #ifdef __OBJC__
 @class NSString;
@@ -75,7 +74,9 @@ class KWQFontFamily {
   DOM::AtomicString _family;
   KWQFontFamily* _next;
   int _refCnt;
+#if __APPLE__
   mutable CFStringRef _CFFamily;
+#endif
 };
 
 // Macro to create a stack array containing non-retained NSString names
