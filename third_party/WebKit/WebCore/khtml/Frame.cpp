@@ -84,8 +84,6 @@ using namespace HTMLNames;
 #include <qfile.h>
 #include <qptrlist.h>
 
-#include <CoreServices/CoreServices.h>
-
 using namespace DOM::EventNames;
 using namespace khtml;
 
@@ -164,10 +162,6 @@ void Frame::init(KHTMLView* view) {
   d->m_bJavaEnabled = true;
   d->m_bPluginsEnabled = true;
 
-  connect(
-      khtml::Cache::loader(),
-      SIGNAL(requestStarted(khtml::DocLoader*, khtml::CachedObject*)), this,
-      SLOT(slotLoaderRequestStarted(khtml::DocLoader*, khtml::CachedObject*)));
   connect(khtml::Cache::loader(),
           SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
           SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
@@ -177,7 +171,6 @@ void Frame::init(KHTMLView* view) {
 
   connect(&d->m_redirectionTimer, SIGNAL(timeout()), this,
           SLOT(slotRedirect()));
-
   connect(&d->m_lifeSupportTimer, SIGNAL(timeout()), this,
           SLOT(slotEndLifeSupport()));
 }
@@ -188,10 +181,6 @@ Frame::~Frame() {
   if (!d->m_bComplete)
     closeURL();
 
-  disconnect(
-      khtml::Cache::loader(),
-      SIGNAL(requestStarted(khtml::DocLoader*, khtml::CachedObject*)), this,
-      SLOT(slotLoaderRequestStarted(khtml::DocLoader*, khtml::CachedObject*)));
   disconnect(
       khtml::Cache::loader(),
       SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
@@ -214,8 +203,6 @@ Frame::~Frame() {
 }
 
 bool Frame::restoreURL(const KURL& url) {
-  kdDebug(6050) << "Frame::restoreURL " << url.url() << endl;
-
   cancelRedirection();
 
   /*
@@ -245,8 +232,6 @@ bool Frame::restoreURL(const KURL& url) {
 }
 
 bool Frame::didOpenURL(const KURL& url) {
-  kdDebug(6050) << "Frame(" << this << ")::openURL " << url.url() << endl;
-
   if (d->m_scheduledRedirection == locationChangeScheduledDuringLoad) {
     // We're about to get a redirect that happened before the document was
     // created.  This can happen when one frame may change the location of a
@@ -262,10 +247,8 @@ bool Frame::didOpenURL(const KURL& url) {
 
   KParts::URLArgs args(d->m_extension->urlArgs());
 
-  if (!d->m_restored) {
-    kdDebug(6050) << "closing old URL" << endl;
+  if (!d->m_restored)
     closeURL();
-  }
 
   if (d->m_restored)
     d->m_cachePolicy = KIO::CC_Cache;
@@ -313,9 +296,6 @@ bool Frame::didOpenURL(const KURL& url) {
     m_url.setPath("/");
   // copy to m_workingURL after fixing m_url above
   d->m_workingURL = m_url;
-
-  kdDebug(6050) << "Frame::openURL now (before started) m_url = " << m_url.url()
-                << endl;
 
   connect(d->m_job, SIGNAL(speed(KIO::Job*, unsigned long)), this,
           SLOT(slotJobSpeed(KIO::Job*, unsigned long)));
@@ -490,8 +470,6 @@ QVariant Frame::executeScript(DOM::NodeImpl* n,
 }
 
 bool Frame::scheduleScript(DOM::NodeImpl* n, const QString& script) {
-  // kdDebug(6050) << "Frame::scheduleScript "<< script << endl;
-
   d->scheduledScript = script;
   d->scheduledScriptNode = n;
 
@@ -501,8 +479,6 @@ bool Frame::scheduleScript(DOM::NodeImpl* n, const QString& script) {
 QVariant Frame::executeScheduledScript() {
   if (d->scheduledScript.isEmpty())
     return QVariant();
-
-  // kdDebug(6050) << "executing delayed " << d->scheduledScript << endl;
 
   QVariant ret =
       executeScript(d->scheduledScriptNode.get(), d->scheduledScript);
@@ -569,9 +545,7 @@ void Frame::clear() {
   if (d->m_bCleared)
     return;
   d->m_bCleared = true;
-
   d->m_bClearing = true;
-
   d->m_mousePressNode = 0;
 
   if (d->m_doc)
@@ -590,7 +564,6 @@ void Frame::clear() {
   if (d->m_doc)
     d->m_doc->deref();
   d->m_doc = 0;
-
   d->m_decoder = 0;
 
   {
@@ -609,9 +582,8 @@ void Frame::clear() {
     ConstFrameIt it = d->m_objects.begin();
     ConstFrameIt end = d->m_objects.end();
     for (; it != end; ++it) {
-      if ((*it).m_frame) {
+      if ((*it).m_frame)
         (*it).m_frame->deref();
-      }
     }
   }
   d->m_objects.clear();
@@ -1060,6 +1032,18 @@ const KHTMLSettings* Frame::settings() const {
   return d->m_settings;
 }
 
+KURL Frame::baseURL() const {
+  if (!d->m_doc)
+    return KURL();
+  return d->m_doc->baseURL();
+}
+
+QString Frame::baseTarget() const {
+  if (!d->m_doc)
+    return QString();
+  return d->m_doc->baseTarget();
+}
+
 KURL Frame::completeURL(const QString& url) {
   if (!d->m_doc)
     return url;
@@ -1070,8 +1054,6 @@ KURL Frame::completeURL(const QString& url) {
 void Frame::scheduleRedirection(double delay,
                                 const QString& url,
                                 bool doLockHistory) {
-  kdDebug(6050) << "Frame::scheduleRedirection delay=" << delay
-                << " url=" << url << endl;
   if (delay < 0 || delay > INT_MAX / 1000)
     return;
   if (d->m_scheduledRedirection == noRedirectionScheduled ||
