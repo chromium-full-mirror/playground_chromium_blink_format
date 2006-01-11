@@ -45,7 +45,7 @@
 
 #include "render_line.h"
 
-#include <khtmlview.h>
+#include <FrameView.h>
 #include <kdebug.h>
 #include <assert.h>
 

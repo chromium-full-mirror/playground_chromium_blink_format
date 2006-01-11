@@ -35,7 +35,7 @@
 #include <qscrollbar.h>
 #include <qcolor.h>
 
-class KHTMLPartPrivate;
+class FramePrivate;
 class KHTMLPartBrowserExtension;
 class KJSProxyImpl;
 class KHTMLView;
@@ -1087,6 +1087,8 @@ class Frame : public KParts::ReadOnlyPart {
   DOM::NodeImpl* mousePressNode();
   virtual void saveDocumentState() = 0;
 
+  bool isComplete();
+
  protected:
   mutable RefPtr<DOM::NodeImpl> _elementToDraw;
   mutable bool _drawSelectionOnly;
@@ -1121,8 +1123,8 @@ class Frame : public KParts::ReadOnlyPart {
   DOM::CSSComputedStyleDeclarationImpl* selectionComputedStyle(
       DOM::NodeImpl*& nodeToRemove) const;
 
-  KHTMLPartPrivate* d;
-  friend class KHTMLPartPrivate;
+  FramePrivate* d;
+  friend class FramePrivate;
   friend class khtml::SelectionController;
 
  public:

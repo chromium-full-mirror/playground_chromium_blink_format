@@ -754,6 +754,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   QColor m_activeLinkColor;
 
   DOMString m_preferredStylesheetSet;
+  DOMString m_selectedStylesheetSet;
 
   bool m_loadingSheet;
   bool visuallyOrdered;

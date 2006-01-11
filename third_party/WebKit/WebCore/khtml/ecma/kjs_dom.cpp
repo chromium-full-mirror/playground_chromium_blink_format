@@ -23,7 +23,6 @@
 
 #include <kdebug.h>
 #include "Frame.h"
-#include <khtmlview.h>
 #include "xml/dom2_eventsimpl.h"
 #include "xml/dom2_viewsimpl.h"
 #include "rendering/render_canvas.h"
@@ -44,7 +43,6 @@
 #include "kjs_views.h"
 #include "kjs_window.h"
 #include "dom/dom_exception.h"
-#include "khtmlpart_p.h"
 
 #include "html_objectimpl.h"
 
@@ -1016,7 +1014,7 @@ JSValue* DOMDocument::getValueProperty(ExecState* exec, int token) const {
       return jsStringOrNull(doc.selectedStylesheetSet());
     case ReadyState:
       if (Frame* frame = doc.frame()) {
-        if (frame->d->m_bComplete)
+        if (frame->isComplete())
           return jsString("complete");
         if (doc.parsing())
           return jsString("loading");
@@ -1824,8 +1822,8 @@ JSValue* getDOMDocumentNode(ExecState* exec, DocumentImpl* n) {
   // Make sure the document is kept around by the window object, and works right
   // with the
   // back/forward cache.
-  if (n->view())
-    Window::retrieveWindow(n->view()->frame())
+  if (n->frame())
+    Window::retrieveWindow(n->frame())
         ->putDirect("document", ret, DontDelete | ReadOnly);
 
   interp->putDOMObject(n, ret);

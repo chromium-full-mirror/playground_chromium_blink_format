@@ -56,11 +56,11 @@
 #include "rendering/render_object.h"
 #include "render_arena.h"
 
-#include "khtmlview.h"
+#include "FrameView.h"
+#include "FramePrivate.h"
 
 #include <kglobalsettings.h>
 #include "khtml_settings.h"
-#include "khtmlpart_p.h"
 
 // FIXME: We want to cut the remaining HTML dependencies so that we don't need
 // to include these files.
@@ -1853,7 +1853,7 @@ void DocumentImpl::processHttpEquiv(const DOMString& equiv,
     // For more info, see the test at:
     // http://www.hixie.ch/tests/evil/css/import/main/preferred.html
     // -dwh
-    frame->d->m_sheetUsed = content.qstring();
+    m_selectedStylesheetSet = content;
     m_preferredStylesheetSet = content;
     updateStyleSelector();
   } else if (equalIgnoringCase(equiv, "refresh") &&
@@ -1999,16 +1999,14 @@ DOMString DocumentImpl::preferredStylesheetSet() {
 }
 
 DOMString DocumentImpl::selectedStylesheetSet() {
-  return view() ? view()->frame()->d->m_sheetUsed : DOMString();
+  return m_selectedStylesheetSet;
 }
 
 void DocumentImpl::setSelectedStylesheetSet(const DOMString& aString) {
-  if (view()) {
-    view()->frame()->d->m_sheetUsed = aString.qstring();
-    updateStyleSelector();
-    if (renderer())
-      renderer()->repaint();
-  }
+  m_selectedStylesheetSet = aString;
+  updateStyleSelector();
+  if (renderer())
+    renderer()->repaint();
 }
 
 // This method is called whenever a top-level stylesheet has finished loading.
@@ -2140,7 +2138,7 @@ void DocumentImpl::recalcStyleSelector() {
           // this sheet.
           QString rel = e->getAttribute(relAttr).qstring();
           if (e->hasLocalName(styleTag) || !rel.contains("alternate"))
-            m_preferredStylesheetSet = view()->frame()->d->m_sheetUsed = title;
+            m_preferredStylesheetSet = m_selectedStylesheetSet = title;
         }
 
         if (!m_availableSheets.contains(title))
@@ -2162,7 +2160,7 @@ void DocumentImpl::recalcStyleSelector() {
       }
 
       if (!title.isEmpty() && m_preferredStylesheetSet.isEmpty())
-        m_preferredStylesheetSet = view()->frame()->d->m_sheetUsed = title;
+        m_preferredStylesheetSet = m_selectedStylesheetSet = title;
 
       if (!title.isEmpty()) {
         if (title != m_preferredStylesheetSet)
