@@ -498,7 +498,7 @@ class QString {
   QString& setNum(double);
 
   QString& sprintf(const char*, ...)
-#if __GNUC
+#if __GNUC__
       __attribute__((format(printf, 2, 3)))
 #endif
       ;
