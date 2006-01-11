@@ -221,7 +221,7 @@ JSValue* NumberProtoFunc::callAsFunction(ExecState* exec,
         return jsString(s + UString::from(x));
 
       double n = floor(x * pow(10.0, f));
-      if (fabs(n / pow(10.0, f) - x) > fabs((n + 1) / pow(10.0, f) - x))
+      if (fabs(n / pow(10.0, f) - x) >= fabs((n + 1) / pow(10.0, f) - x))
         n++;
 
       UString m = integer_part_noexp(n);
