@@ -70,9 +70,7 @@ class Collector {
   static size_t numInterpreters();
   static size_t numGCNotAllowedObjects();
   static size_t numReferencedObjects();
-#if APPLE_CHANGES
   static const void* rootObjectClasses();  // actually returns CFSetRef
-#endif
 
   class Thread;
   static void registerThread();

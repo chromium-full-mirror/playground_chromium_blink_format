@@ -28,7 +28,7 @@ namespace KJS {
 class ExecState;
 class JSValue;
 
-#if APPLE_CHANGES
+#if __APPLE__
 inline bool isNaN(double d) {
   return isnan(d);
 }
