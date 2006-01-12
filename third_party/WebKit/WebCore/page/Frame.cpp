@@ -27,6 +27,7 @@
 
 #include "config.h"
 #include "Frame.h"
+#include "MacFrame.h"
 
 #include "css/csshelper.h"
 #include "cssproperties.h"
@@ -3724,7 +3725,7 @@ bool Frame::markedTextUsesUnderlines() const {
   return m_markedTextUsesUnderlines;
 }
 
-QValueList<Frame::MarkedTextUnderline> Frame::markedTextUnderlines() const {
+QValueList<MarkedTextUnderline> Frame::markedTextUnderlines() const {
   return m_markedTextUnderlines;
 }
 

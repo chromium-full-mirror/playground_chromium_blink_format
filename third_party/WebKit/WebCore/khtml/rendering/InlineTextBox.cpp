@@ -32,6 +32,8 @@
 #include "xml/dom2_rangeimpl.h"
 #include <qpen.h>
 
+#include "MacFrame.h"
+
 using namespace DOM;
 
 namespace khtml {
@@ -302,12 +304,11 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       object()->document()->markersForNode(object()->node());
   QValueListIterator<DocumentMarker> markerIt = markers.begin();
 
-  QValueList<MacFrame::MarkedTextUnderline> underlines;
+  QValueList<MarkedTextUnderline> underlines;
   if (haveMarkedText && markedTextUsesUnderlines) {
     underlines = Mac(object()->document()->frame())->markedTextUnderlines();
   }
-  QValueListIterator<MacFrame::MarkedTextUnderline> underlineIt =
-      underlines.begin();
+  QValueListIterator<MarkedTextUnderline> underlineIt = underlines.begin();
 
   QColor textColor = styleToUse->color();
 
@@ -446,7 +447,7 @@ void InlineTextBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
     }
 
     for (; underlineIt != underlines.end(); underlineIt++) {
-      MacFrame::MarkedTextUnderline underline = *underlineIt;
+      MarkedTextUnderline underline = *underlineIt;
 
       if (underline.endOffset <= start())
         // underline is completely before this run.  This might be an
@@ -653,11 +654,10 @@ void InlineTextBox::paintMarker(QPainter* pt,
   pt->drawLineForMisspelling(_tx + start, _ty + underlineOffset, width);
 }
 
-void InlineTextBox::paintMarkedTextUnderline(
-    QPainter* pt,
-    int _tx,
-    int _ty,
-    MacFrame::MarkedTextUnderline underline) {
+void InlineTextBox::paintMarkedTextUnderline(QPainter* pt,
+                                             int _tx,
+                                             int _ty,
+                                             MarkedTextUnderline& underline) {
   _tx += m_x;
   _ty += m_y;
 
