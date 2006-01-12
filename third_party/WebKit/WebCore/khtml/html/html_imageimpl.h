@@ -51,7 +51,7 @@ class HTMLImageLoader : public khtml::CachedObjectClient {
   HTMLImageLoader(ElementImpl* elt);
   virtual ~HTMLImageLoader();
 
-  void updateFromElement();
+  virtual void updateFromElement();
 
   void dispatchLoadEvent();
 
@@ -61,6 +61,9 @@ class HTMLImageLoader : public khtml::CachedObjectClient {
 
   // CachedObjectClient API
   virtual void notifyFinished(khtml::CachedObject* finishedObj);
+
+ protected:
+  void setLoadingImage(CachedImage* loadingImage);
 
  private:
   ElementImpl* m_element;
