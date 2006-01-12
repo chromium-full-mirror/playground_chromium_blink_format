@@ -24,7 +24,7 @@
  */
 
 #include "config.h"
-#import "KWQPen.h"
+#include "KWQPen.h"
 
 QPen::QPen(const QColor& color, uint width, PenStyle style)
     : penStyle(style), penWidth(width), penColor(color) {}

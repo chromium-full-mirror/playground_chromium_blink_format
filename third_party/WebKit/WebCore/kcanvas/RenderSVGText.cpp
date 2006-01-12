@@ -22,11 +22,11 @@
 
 #include "config.h"
 #include "RenderSVGText.h"
+
 #include "SVGTextElementImpl.h"
 #include "SVGAnimatedLengthListImpl.h"
-
-#import "KRenderingDevice.h"
-#import "KCanvasMatrix.h"
+#include "KRenderingDevice.h"
+#include "KCanvasMatrix.h"
 
 RenderSVGText::RenderSVGText(KSVG::SVGTextElementImpl* node)
     : RenderBlock(node) {}

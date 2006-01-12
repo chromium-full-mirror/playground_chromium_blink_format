@@ -24,12 +24,12 @@
  */
 
 #include "config.h"
-#import "KWQRegExp.h"
-#import "KWQLogging.h"
+#include "KWQRegExp.h"
+#include "KWQLogging.h"
 
-#import <sys/types.h>
-#import <JavaScriptCore/pcre.h>
-#import "misc/shared.h"
+#include <sys/types.h>
+#include <pcre/pcre.h>
+#include "misc/shared.h"
 
 #define MAX_SUBSTRINGS 10
 #define MAX_OFFSETS (3 * MAX_SUBSTRINGS)
