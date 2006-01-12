@@ -3170,7 +3170,8 @@ void Frame::revealSelection() {
 
   Position start = selection().start();
   Position end = selection().end();
-  if (start.node()->renderer()) {
+  ASSERT(start.node());
+  if (start.node() && start.node()->renderer()) {
     RenderLayer* layer = start.node()->renderer()->enclosingLayer();
     if (layer) {
       ASSERT(!end.node() || !end.node()->renderer() ||
@@ -3582,7 +3583,8 @@ void Frame::centerSelectionInVisibleArea() const {
 
   Position start = selection().start();
   Position end = selection().end();
-  if (start.node()->renderer()) {
+  ASSERT(start.node());
+  if (start.node() && start.node()->renderer()) {
     RenderLayer* layer = start.node()->renderer()->enclosingLayer();
     if (layer) {
       ASSERT(!end.node() || !end.node()->renderer() ||
