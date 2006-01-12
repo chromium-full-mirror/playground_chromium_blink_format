@@ -34,7 +34,7 @@
 #include "CachedXSLStyleSheet.h"
 #include "Cache.h"
 #include "loader.h"
-#include "dom_docimpl.h"
+#include "DocumentImpl.h"
 #include "KWQLoader.h"
 #include "Frame.h"
 
