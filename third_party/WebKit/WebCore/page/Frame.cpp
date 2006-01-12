@@ -2373,8 +2373,8 @@ void Frame::selectAll() {
 
 bool Frame::selectContentsOfNode(NodeImpl* node) {
   SelectionController sel = SelectionController(
-      Position(node, 0), khtml::DOWNSTREAM,
-      Position(node, node->maxDeepOffset()), khtml::DOWNSTREAM);
+      Position(node, 0), khtml::DOWNSTREAM, Position(node, maxDeepOffset(node)),
+      khtml::DOWNSTREAM);
   if (shouldChangeSelection(sel)) {
     setSelection(sel);
     return true;
@@ -3168,13 +3168,13 @@ void Frame::revealSelection() {
       break;
   }
 
-  ASSERT(selection().start().isNotNull());
-  if (selection().start().node() && selection().start().node()->renderer()) {
-    RenderLayer* layer =
-        selection().start().node()->renderer()->enclosingLayer();
+  Position start = selection().start();
+  Position end = selection().end();
+  if (start.node()->renderer()) {
+    RenderLayer* layer = start.node()->renderer()->enclosingLayer();
     if (layer) {
-      ASSERT(!selection.end().node() || !selection().end().node()->renderer() ||
-             (selection().end().node()->renderer()->enclosingLayer() == layer));
+      ASSERT(!end.node() || !end.node()->renderer() ||
+             (end.node()->renderer()->enclosingLayer() == layer));
       layer->scrollRectToVisible(rect);
     }
   }
@@ -3580,13 +3580,13 @@ void Frame::centerSelectionInVisibleArea() const {
       break;
   }
 
-  ASSERT(d->m_selection.start().isNotNull());
-  if (selection().start().node() && selection().start().node()->renderer()) {
-    RenderLayer* layer =
-        selection().start().node()->renderer()->enclosingLayer();
+  Position start = selection().start();
+  Position end = selection().end();
+  if (start.node()->renderer()) {
+    RenderLayer* layer = start.node()->renderer()->enclosingLayer();
     if (layer) {
-      ASSERT(!selectionEnd() || !selectionEnd()->renderer() ||
-             (selectionEnd()->renderer()->enclosingLayer() == layer));
+      ASSERT(!end.node() || !end.node()->renderer() ||
+             (end.node()->renderer()->enclosingLayer() == layer));
       layer->scrollRectToVisible(rect, RenderLayer::gAlignCenterAlways,
                                  RenderLayer::gAlignCenterAlways);
     }

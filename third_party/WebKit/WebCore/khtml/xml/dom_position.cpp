@@ -36,6 +36,7 @@
 #include "dom2_rangeimpl.h"
 #include "dom2_viewsimpl.h"
 #include "helper.h"
+#include "htmlediting.h"
 #include "text_affinity.h"
 #include "visible_position.h"
 #include "visible_units.h"
@@ -159,7 +160,7 @@ Position Position::previous(
   if (o > 0) {
     NodeImpl* child = n->childNode(o - 1);
     if (child) {
-      return Position(child, child->maxDeepOffset());
+      return Position(child, maxDeepOffset(child));
     }
     // There are two reasons child might be 0:
     //   1) The node is node like a text node that is not an element, and
@@ -187,7 +188,7 @@ Position Position::next(
   int o = offset();
   assert(o >= 0);
 
-  if (o < n->maxDeepOffset()) {
+  if (o < maxDeepOffset(n)) {
     NodeImpl* child = n->childNode(o);
     if (child) {
       return Position(child, 0);
@@ -222,7 +223,7 @@ bool Position::atEnd() const {
   if (!n)
     return true;
 
-  return offset() >= n->maxDeepOffset() && n->parent() == 0;
+  return offset() >= maxDeepOffset(n) && n->parent() == 0;
 }
 
 int Position::renderedOffset() const {
@@ -306,15 +307,14 @@ Position Position::nextCharacterPosition(EAffinity affinity) const {
 
 // upstream() and downstream() want to return positions that are either in a
 // text node or at just before a non-text node.  This method checks for that.
-static bool isStreamer(Position pos) {
-  NodeImpl* currentNode = pos.node();
-  if (!currentNode)
+static bool isStreamer(const Position& pos) {
+  if (pos.isNull())
     return true;
 
-  if (currentNode->isAtomicNode())
+  if (isAtomicNode(pos.node()))
     return true;
 
-  return (pos.offset() == 0);
+  return pos.offset() == 0;
 }
 
 // AFAIK no one has a clear, complete definition for this method and how it is
@@ -337,7 +337,7 @@ static bool isStreamer(Position pos) {
 // node.
 Position Position::upstream() const {
   // start at equivalent deep position
-  Position start = equivalentDeepPosition();
+  Position start = VisiblePosition::deepEquivalent(*this);
   NodeImpl* startNode = start.node();
   if (!startNode)
     return Position();
@@ -420,8 +420,7 @@ Position Position::upstream() const {
 // position that is either
 // in an atomic node (i.e. text) or is at offset 0.
 Position Position::downstream() const {
-  // start at equivalent deep position
-  Position start = equivalentDeepPosition();
+  Position start = VisiblePosition::deepEquivalent(*this);
   NodeImpl* startNode = start.node();
   if (!startNode)
     return Position();
@@ -552,34 +551,6 @@ Position Position::equivalentRangeCompliantPosition() const {
                                    : parent->childNodeCount();
   constrainedOffset = o <= 0 ? 0 : kMin(maxOffset, o);
   return Position(parent, constrainedOffset);
-}
-
-Position Position::equivalentDeepPosition() const {
-  if (isNull() || node()->isAtomicNode())
-    return *this;
-
-  NodeImpl* child = 0;
-  Position pos(*this);
-  if (offset() >= (int)node()->childNodeCount()) {
-    child = node()->lastChild();
-    pos = Position(child, child->caretMaxOffset());
-    ASSERT(child);
-    while (!child->isAtomicNode() && pos.node()->hasChildNodes()) {
-      child = pos.node()->lastChild();
-      ASSERT(child);
-      pos = Position(child, child->caretMaxOffset());
-    }
-  } else {
-    child = node()->childNode(offset());
-    ASSERT(child);
-    pos = Position(child, 0);
-    while (!child->isAtomicNode() && pos.node()->hasChildNodes()) {
-      child = pos.node()->firstChild();
-      ASSERT(child);
-      pos = Position(child, 0);
-    }
-  }
-  return pos;
 }
 
 bool Position::inRenderedContent() const {

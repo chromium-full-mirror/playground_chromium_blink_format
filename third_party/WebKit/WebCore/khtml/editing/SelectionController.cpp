@@ -34,6 +34,7 @@
 #include "dom/dom_string.h"
 #include "Frame.h"
 #include "FrameView.h"
+#include "htmlediting.h"
 #include "rendering/render_object.h"
 #include "rendering/render_style.h"
 #include "InlineTextBox.h"
@@ -87,14 +88,15 @@ SelectionController::SelectionController(const Position& base,
 }
 
 SelectionController::SelectionController(const VisiblePosition& visiblePos)
-    : m_base(visiblePos.position()), m_extent(visiblePos.position()) {
+    : m_base(visiblePos.deepEquivalent()),
+      m_extent(visiblePos.deepEquivalent()) {
   init(visiblePos.affinity());
   validate();
 }
 
 SelectionController::SelectionController(const VisiblePosition& base,
                                          const VisiblePosition& extent)
-    : m_base(base.position()), m_extent(extent.position()) {
+    : m_base(base.deepEquivalent()), m_extent(extent.deepEquivalent()) {
   init(base.affinity());
   validate();
 }
@@ -579,14 +581,7 @@ int SelectionController::xPosForVerticalArrowNavigation(EPositionType type,
   if (recalc ||
       frame->xPosForVerticalArrowNavigation() ==
           Frame::NoXPosForVerticalArrowNavigation) {
-    switch (m_affinity) {
-      case DOWNSTREAM:
-        pos = VisiblePosition(pos, m_affinity).downstreamDeepEquivalent();
-        break;
-      case UPSTREAM:
-        pos = VisiblePosition(pos, m_affinity).deepEquivalent();
-        break;
-    }
+    pos = VisiblePosition(pos, m_affinity).deepEquivalent();
     x = pos.node()->renderer()->caretRect(pos.offset(), m_affinity).x();
     frame->setXPosForVerticalArrowNavigation(x);
   } else {
@@ -715,8 +710,7 @@ DOMString SelectionController::toString() const {
 }
 
 PassRefPtr<RangeImpl> SelectionController::getRangeAt(int index) const {
-  return index == 0 ? PassRefPtr<RangeImpl>(toRange())
-                    : PassRefPtr<RangeImpl>();
+  return index == 0 ? toRange() : 0;
 }
 
 void SelectionController::setBaseAndExtent(NodeImpl* baseNode,
@@ -770,14 +764,7 @@ void SelectionController::layout() {
 
   if (isCaret()) {
     Position pos = m_start;
-    switch (m_affinity) {
-      case DOWNSTREAM:
-        pos = VisiblePosition(m_start, m_affinity).downstreamDeepEquivalent();
-        break;
-      case UPSTREAM:
-        pos = VisiblePosition(m_start, m_affinity).deepEquivalent();
-        break;
-    }
+    pos = VisiblePosition(m_start, m_affinity).deepEquivalent();
     if (pos.isNotNull()) {
       ASSERT(pos.node()->renderer());
       m_caretRect = pos.node()->renderer()->caretRect(pos.offset(), m_affinity);
@@ -887,7 +874,7 @@ void SelectionController::adjustForEditableContent() {
     // If the end is outside the base's editable root, cap it at the end of that
     // editable root.
     if (baseRoot != endRoot) {
-      VisiblePosition last(Position(baseRoot, baseRoot->maxDeepOffset()));
+      VisiblePosition last(Position(baseRoot, maxDeepOffset(baseRoot)));
       m_end = last.deepEquivalent();
     }
     // The selection is based outside editable content.  Keep both sides from
@@ -910,7 +897,7 @@ void SelectionController::adjustForEditableContent() {
     if (startRoot) {
       VisiblePosition next;
       do {
-        next = VisiblePosition(Position(startRoot, startRoot->maxDeepOffset()))
+        next = VisiblePosition(Position(startRoot, maxDeepOffset(startRoot)))
                    .next();
         startRoot = next.deepEquivalent().node()->rootEditableElement();
       } while (startRoot);

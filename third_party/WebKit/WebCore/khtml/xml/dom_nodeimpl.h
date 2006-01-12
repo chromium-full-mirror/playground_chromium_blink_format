@@ -127,7 +127,7 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual bool isCommentNode() const { return false; }
   virtual bool isDocumentNode() const { return false; }
   bool isBlockFlow() const;
-  bool isBlockFlowOrTable() const;
+  bool isBlockFlowOrBlockTable() const;
 
   // Used by <form> elements to indicate a malformed state of some kind,
   // typically
@@ -143,7 +143,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
   virtual void setFirstChild(NodeImpl* child);
   virtual void setLastChild(NodeImpl* child);
 
-  bool isAtomicNode() const;
   NodeImpl* previousNodeConsideringAtomicNodes() const;
   NodeImpl* nextNodeConsideringAtomicNodes() const;
 
@@ -402,7 +401,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
       NodeImpl* newChild);  // Error-checking during parsing that checks the DTD
 
   virtual int maxOffset() const;
-  int maxDeepOffset() const;
   virtual int caretMinOffset() const;
   virtual int caretMaxOffset() const;
   virtual unsigned caretMaxRenderedOffset() const;

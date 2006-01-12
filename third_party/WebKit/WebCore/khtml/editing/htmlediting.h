@@ -54,6 +54,9 @@ class TextImpl;
 
 namespace khtml {
 
+int maxDeepOffset(const DOM::NodeImpl* node);
+bool isAtomicNode(const DOM::NodeImpl* node);
+
 void rebalanceWhitespaceInTextNode(DOM::NodeImpl* node,
                                    unsigned int start,
                                    unsigned int length);

@@ -72,15 +72,12 @@ class VisiblePosition {
   bool isNull() const { return m_deepPosition.isNull(); }
   bool isNotNull() const { return m_deepPosition.isNotNull(); }
 
-  Position position() const { return rangeCompliantEquivalent(m_deepPosition); }
   Position deepEquivalent() const { return m_deepPosition; }
   EAffinity affinity() const {
     assert(m_affinity == UPSTREAM || m_affinity == DOWNSTREAM);
     return m_affinity;
   }
   void setAffinity(EAffinity affinity) { m_affinity = affinity; }
-
-  Position downstreamDeepEquivalent() const;
 
   friend bool operator==(const VisiblePosition& a, const VisiblePosition& b);
   friend bool operator!=(const VisiblePosition& a, const VisiblePosition& b);
@@ -100,6 +97,8 @@ class VisiblePosition {
 
   void debugPosition(const char* msg = "") const;
 
+  static Position deepEquivalent(const Position&);
+
 #ifndef NDEBUG
   void formatForDebugger(char* buffer, unsigned length) const;
   void showTree() const;
@@ -107,14 +106,8 @@ class VisiblePosition {
 
  private:
   void init(const Position&, EAffinity);
-  void initUpstream(const Position&);
-  void initDownstream(const Position&);
-
-  static Position deepEquivalent(const Position&);
-  static Position rangeCompliantEquivalent(const Position&);
 
   static int maxOffset(const NodeImpl*);
-  static bool isAtomicNode(const NodeImpl*);
 
   static Position previousVisiblePosition(const Position&);
   static Position nextVisiblePosition(const Position&);
@@ -133,10 +126,10 @@ inline bool operator!=(const VisiblePosition& a, const VisiblePosition& b) {
   return !(a == b);
 }
 
-PassRefPtr<DOM::RangeImpl> makeRange(const VisiblePosition& start,
-                                     const VisiblePosition& end);
-bool setStart(DOM::RangeImpl*, const VisiblePosition& start);
-bool setEnd(DOM::RangeImpl*, const VisiblePosition& start);
+PassRefPtr<DOM::RangeImpl> makeRange(const VisiblePosition&,
+                                     const VisiblePosition&);
+bool setStart(DOM::RangeImpl*, const VisiblePosition&);
+bool setEnd(DOM::RangeImpl*, const VisiblePosition&);
 VisiblePosition startVisiblePosition(const DOM::RangeImpl*, EAffinity);
 VisiblePosition endVisiblePosition(const DOM::RangeImpl*, EAffinity);
 
