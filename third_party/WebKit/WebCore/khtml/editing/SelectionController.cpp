@@ -713,6 +713,10 @@ PassRefPtr<RangeImpl> SelectionController::getRangeAt(int index) const {
   return index == 0 ? toRange() : 0;
 }
 
+Frame* SelectionController::frame() const {
+  return !isNone() ? m_start.node()->getDocument()->frame() : 0;
+}
+
 void SelectionController::setBaseAndExtent(NodeImpl* baseNode,
                                            int baseOffset,
                                            NodeImpl* extentNode,
