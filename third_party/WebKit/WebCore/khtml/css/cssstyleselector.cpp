@@ -257,7 +257,7 @@ CSSStyleSelector::CSSStyleSelector(DocumentImpl* doc,
 
   QPtrListIterator<StyleSheetImpl> it(styleSheets->styleSheets);
   for (; it.current(); ++it)
-    if (it.current()->isCSSStyleSheet())
+    if (it.current()->isCSSStyleSheet() && !it.current()->disabled())
       m_authorStyle->addRulesFromSheet(
           static_cast<CSSStyleSheetImpl*>(it.current()), m_medium);
 
