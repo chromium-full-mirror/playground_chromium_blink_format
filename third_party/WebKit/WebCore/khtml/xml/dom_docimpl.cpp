@@ -2355,7 +2355,7 @@ void DocumentImpl::clearSelectionIfNeeded(NodeImpl* newFocusNode) {
   NodeImpl* startContainer = frame()->selection().start().node();
   if (!newFocusNode || (startContainer && startContainer != newFocusNode &&
                         !startContainer->isAncestor(newFocusNode)))
-    frame()->clearSelection();
+    frame()->selection().clear();
 }
 
 void DocumentImpl::setCSSTarget(NodeImpl* n) {

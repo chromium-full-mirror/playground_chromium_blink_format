@@ -496,7 +496,7 @@ class Frame : public KParts::ReadOnlyPart {
   /**
    * Returns the selected part of the HTML.
    */
-  const khtml::SelectionController& selection() const;
+  khtml::SelectionController& selection() const;
 
   /**
    * Returns the granularity of the selection (character, word, line,
@@ -545,11 +545,6 @@ class Frame : public KParts::ReadOnlyPart {
    * Transposes characters either side of caret selection.
    */
   void transpose();
-
-  /**
-   * Clears the current selection.
-   */
-  void clearSelection();
 
   /**
    * Invalidates the current selection.
@@ -889,7 +884,6 @@ class Frame : public KParts::ReadOnlyPart {
   void slotProgressUpdate();
   void slotJobPercent(KIO::Job*, unsigned long);
   void slotJobSpeed(KIO::Job*, unsigned long);
-  void slotClearSelection();
 
   void slotEndLifeSupport();
 
@@ -1012,10 +1006,7 @@ class Frame : public KParts::ReadOnlyPart {
 
   khtml::RenderStyle* styleForSelectionStart(
       DOM::NodeImpl*& nodeToRemove) const;
-  int selectionStartOffset() const;
-  DOM::NodeImpl* selectionEnd() const;
-  int selectionEndOffset() const;
-  DOM::NodeImpl* selectionStart() const;
+
   // Scrolls as necessary to reveal the selection
   void revealSelection();
   // Centers the selection regardless of whether it was already visible
