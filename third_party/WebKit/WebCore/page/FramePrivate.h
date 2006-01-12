@@ -27,6 +27,7 @@
 #ifndef khtmlpart_p_h
 #define khtmlpart_p_h
 
+#include <qtimer.h>
 #include <kcursor.h>
 #include <kio/global.h>
 
@@ -59,7 +60,7 @@ struct ChildFrame {
   }
 
   QGuardedPtr<khtml::RenderPart> m_renderer;
-  QGuardedPtr<KParts::ReadOnlyPart> m_frame;
+  QGuardedPtr<ObjectContents> m_frame;
   QGuardedPtr<KParts::BrowserExtension> m_extension;
   QString m_serviceName;
   QString m_serviceType;
@@ -281,7 +282,7 @@ class FramePrivate {
 
   QPoint m_dragStartPos;
 
-  KParts::Part* m_activeFrame;
+  ObjectContents* m_activeFrame;
   QGuardedPtr<Frame> m_opener;
   bool m_openedByJS;
   bool m_newJSInterpreterExists;  // set to 1 by setOpenedByJS, for window.open

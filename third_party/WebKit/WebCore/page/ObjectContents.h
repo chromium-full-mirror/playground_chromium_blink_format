@@ -20,26 +20,55 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#import "KWQKPartsPart.h"
+#ifndef ObjectContents_H
+#define ObjectContents_H
 
-namespace KParts {
+#include "KWQKURL.h"
+#include "KWQObject.h"
+#include "KWQTimer.h"
 
-void Part::customEvent(QCustomEvent *)
-{
-}
+class ObjectContents : public QObject {
+ public:
+  ObjectContents() : _parent(0), _name(0), _widget(0), _ref(1) {}
 
-void ReadOnlyPart::setName(const QString &name)
-{
-    _name = name; 
-}
+  KURL url() const { return m_url; }
 
-bool ReadOnlyPart::isKPartsReadOnlyPart() const
-{
+  void setParent(QObject* parent) { _parent = parent; }
+  QObject* parent() const { return _parent; }
+
+  virtual void setName(const QString& name) { _name = name; }
+  QString name() { return _name; }
+
+  virtual bool openURL(const KURL&) = 0;
+  virtual bool closeURL() = 0;
+
+  QWidget* widget() const { return _widget; }
+  void setWidget(QWidget* widget) { _widget = widget; }
+
+  void ref() { ++_ref; }
+  void deref() {
+    if (!--_ref)
+      delete this;
+  }
+
+  bool event(QEvent* event) {
+    customEvent(event);
     return true;
-}
+  }
+  virtual void customEvent(QCustomEvent*) {}
 
-}
+ protected:
+  KURL m_url;
+
+ private:
+  virtual bool isObjectContents() const { return true; }
+  QObject* _parent;
+  QString _name;
+  QWidget* _widget;
+  unsigned int _ref;
+};
+
+#endif

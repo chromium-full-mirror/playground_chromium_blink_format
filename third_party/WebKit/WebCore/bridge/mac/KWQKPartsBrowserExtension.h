@@ -32,10 +32,11 @@
 
 #include "KWQKURL.h"
 
-#include "KWQKPartsPart.h"
 #include "KWQKPartsBrowserInterface.h"
 
 #include "formdata.h"
+
+class ObjectContents;
 
 namespace KParts {
 
@@ -106,7 +107,7 @@ class BrowserExtension : public QObject {
   virtual void createNewWindow(const KURL& url,
                                const URLArgs& urlArgs,
                                const WindowArgs& winArgs,
-                               ReadOnlyPart*& part) = 0;
+                               ObjectContents*& part) = 0;
 
   virtual void setIconURL(const KURL& url) = 0;
   virtual void setTypedIconURL(const KURL& url, const QString& type) = 0;

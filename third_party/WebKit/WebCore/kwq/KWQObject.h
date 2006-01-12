@@ -110,7 +110,7 @@ class QObject : public Qt {
   virtual bool isKHTMLLoader() const;
   virtual bool isFrame() const;
   virtual bool isKHTMLView() const;
-  virtual bool isKPartsReadOnlyPart() const;
+  virtual bool isObjectContents() const;
   virtual bool isQFrame() const;
   virtual bool isQScrollView() const;
 

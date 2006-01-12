@@ -133,12 +133,6 @@ FrameList::Iterator FrameList::find(const QString& name) {
   return it;
 }
 
-Frame::Frame(QWidget* parentWidget,
-             const char* widgetname,
-             QObject* parent,
-             const char* name)
-    : KParts::ReadOnlyPart(parent, name), d(0) {}
-
 void Frame::init(KHTMLView* view) {
   AtomicString::init();
   QualifiedName::init();
@@ -379,7 +373,7 @@ void Frame::stopLoading(bool sendUnload) {
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it) {
-    KParts::ReadOnlyPart* part = (*it).m_frame;
+    ObjectContents* part = (*it).m_frame;
     if (part) {
       Frame* frame = static_cast<Frame*>(part);
 
@@ -898,7 +892,7 @@ void Frame::stopAnimations() {
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_frame.isNull() && (*it).m_frame->inherits("Frame")) {
-      KParts::ReadOnlyPart* p = (*it).m_frame;
+      ObjectContents* p = (*it).m_frame;
       static_cast<Frame*>(p)->stopAnimations();
     }
 }
@@ -1017,7 +1011,7 @@ void Frame::checkEmitLoadEvent() {
     ConstFrameIt it = d->m_frames.begin();
     ConstFrameIt end = d->m_frames.end();
     for (; it != end; ++it) {
-      KParts::ReadOnlyPart* p = (*it).m_frame;
+      ObjectContents* p = (*it).m_frame;
       if (p && p->inherits("Frame")) {
         Frame* htmlFrame = static_cast<Frame*>(p);
         if (htmlFrame->d->m_doc)
@@ -1650,7 +1644,7 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
       Mac(frame)->openURLRequest(url, args);
     }
   } else {
-    KParts::ReadOnlyPart* part = Mac(this)->createPart(*child, url, mimetype);
+    ObjectContents* part = Mac(this)->createPart(*child, url, mimetype);
     Frame* frame = static_cast<Frame*>(part);
     if (frame && frame->inherits("Frame"))
       frame->childBegin();
@@ -1710,8 +1704,8 @@ bool Frame::processObjectRequest(khtml::ChildFrame* child,
   // it's being added to the child list.  It would be a good idea to
   // create the child first, then invoke the loader separately
   if (url.isEmpty() || url.url() == "about:blank") {
-    ReadOnlyPart* readOnlyPart = child->m_frame;
-    Frame* frame = static_cast<Frame*>(readOnlyPart);
+    ObjectContents* part = child->m_frame;
+    Frame* frame = static_cast<Frame*>(part);
     if (frame && frame->inherits("Frame")) {
       frame->completed();
       frame->checkCompleted();
@@ -1876,19 +1870,19 @@ void Frame::slotChildCompleted(bool complete) {
 }
 
 khtml::ChildFrame* Frame::childFrame(const QObject* obj) {
-  assert(obj->inherits("KParts::ReadOnlyPart"));
-  const ReadOnlyPart* part = static_cast<const ReadOnlyPart*>(obj);
+  assert(obj->inherits("ObjectContents"));
+  const ObjectContents* part = static_cast<const ObjectContents*>(obj);
 
   FrameIt it = d->m_frames.begin();
   FrameIt end = d->m_frames.end();
   for (; it != end; ++it)
-    if (static_cast<ReadOnlyPart*>((*it).m_frame) == part)
+    if (static_cast<ObjectContents*>((*it).m_frame) == part)
       return &(*it);
 
   it = d->m_objects.begin();
   end = d->m_objects.end();
   for (; it != end; ++it)
-    if (static_cast<ReadOnlyPart*>((*it).m_frame) == part)
+    if (static_cast<ObjectContents*>((*it).m_frame) == part)
       return &(*it);
 
   return 0L;
@@ -1901,7 +1895,7 @@ Frame* Frame::findFrame(const QString& f) {
     // kdDebug() << "Frame::findFrame frame " << f << " not found" << endl;
     return 0L;
   } else {
-    KParts::ReadOnlyPart* p = (*it).m_frame;
+    ObjectContents* p = (*it).m_frame;
     if (p && p->inherits("Frame")) {
       // kdDebug() << "Frame::findFrame frame " << f << " is a Frame, ok" <<
       // endl;
@@ -1981,7 +1975,7 @@ void Frame::setZoomFactor(int percent) {
   ConstFrameIt end = d->m_frames.end();
   for (; it != end; ++it)
     if (!(*it).m_frame.isNull() && (*it).m_frame->inherits("Frame")) {
-      KParts::ReadOnlyPart* p = (*it).m_frame;
+      ObjectContents* p = (*it).m_frame;
       static_cast<Frame*>(p)->setZoomFactor(d->m_zoomFactor);
     }
 
@@ -2046,8 +2040,8 @@ QStringList Frame::frameNames() const {
   return res;
 }
 
-QPtrList<KParts::ReadOnlyPart> Frame::frames() const {
-  QPtrList<KParts::ReadOnlyPart> res;
+QPtrList<ObjectContents> Frame::frames() const {
+  QPtrList<ObjectContents> res;
 
   ConstFrameIt it = d->m_frames.begin();
   ConstFrameIt end = d->m_frames.end();
@@ -2097,7 +2091,7 @@ void Frame::customEvent(QCustomEvent* event) {
     return;
   }
 
-  KParts::ReadOnlyPart::customEvent(event);
+  ObjectContents::customEvent(event);
 }
 
 bool Frame::isPointInsideSelection(int x, int y) {
@@ -2490,7 +2484,7 @@ QVariant Frame::executeScript(QString filename,
   return ret;
 }
 
-void Frame::slotPartRemoved(KParts::Part* part) {
+void Frame::slotPartRemoved(ObjectContents* part) {
   if (part == d->m_activeFrame)
     d->m_activeFrame = 0;
 }
@@ -2922,7 +2916,7 @@ bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
 }
 
 void Frame::connectChild(const khtml::ChildFrame* child) const {
-  ReadOnlyPart* part = child->m_frame;
+  ObjectContents* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     connect(part, SIGNAL(started(KIO::Job*)), this,
             SLOT(slotChildStarted(KIO::Job*)));
@@ -2937,7 +2931,7 @@ void Frame::connectChild(const khtml::ChildFrame* child) const {
 }
 
 void Frame::disconnectChild(const khtml::ChildFrame* child) const {
-  ReadOnlyPart* part = child->m_frame;
+  ObjectContents* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     disconnect(part, SIGNAL(started(KIO::Job*)), this,
                SLOT(slotChildStarted(KIO::Job*)));
@@ -3390,7 +3384,7 @@ void Frame::setPolicyBaseURL(const DOMString& s) {
     xmlDocImpl()->setPolicyBaseURL(s);
   ConstFrameIt end = d->m_frames.end();
   for (ConstFrameIt it = d->m_frames.begin(); it != end; ++it) {
-    ReadOnlyPart* subpart = (*it).m_frame;
+    ObjectContents* subpart = (*it).m_frame;
     static_cast<Frame*>(subpart)->setPolicyBaseURL(s);
   }
 }
@@ -3702,7 +3696,7 @@ void Frame::setName(const QString& name) {
       (name.isEmpty() || parent->frameExists(name) || name == "_blank"))
     n = parent->requestFrameName();
 
-  ReadOnlyPart::setName(n);
+  ObjectContents::setName(n);
 }
 
 bool Frame::markedTextUsesUnderlines() const {
