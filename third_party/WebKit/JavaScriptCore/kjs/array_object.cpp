@@ -3,6 +3,7 @@
  *  This file is part of the KDE libraries
  *  Copyright (C) 1999-2000 Harri Porten (porten@kde.org)
  *  Copyright (C) 2003 Apple Computer, Inc.
+ *  Copyright (C) 2003 Peter Kelly (pmk@post.com)
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -112,6 +113,9 @@ bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
 bool ArrayInstance::getOwnPropertySlot(ExecState* exec,
                                        unsigned index,
                                        PropertySlot& slot) {
+  if (index > MAX_ARRAY_INDEX)
+    return getOwnPropertySlot(exec, Identifier::from(index), slot);
+
   if (index >= length)
     return false;
   if (index < storageLength) {
@@ -131,7 +135,12 @@ void ArrayInstance::put(ExecState* exec,
                         JSValue* value,
                         int attr) {
   if (propertyName == lengthPropertyName) {
-    setLength(value->toUInt32(exec), exec);
+    unsigned int newLen = value->toUInt32(exec);
+    if (value->toNumber(exec) != double(newLen)) {
+      throwError(exec, RangeError, "Invalid array length.");
+      return;
+    }
+    setLength(newLen, exec);
     return;
   }
 
@@ -149,6 +158,14 @@ void ArrayInstance::put(ExecState* exec,
                         unsigned index,
                         JSValue* value,
                         int attr) {
+  // 0xFFFF FFFF is a bit weird --- it should be treated as a non-array index,
+  // even when
+  // it's a string
+  if (index > MAX_ARRAY_INDEX) {
+    put(exec, Identifier::from(index), value, attr);
+    return;
+  }
+
   if (index < sparseArrayCutoff && index >= storageLength) {
     resizeStorage(index + 1);
   }
@@ -186,6 +203,9 @@ bool ArrayInstance::deleteProperty(ExecState* exec,
 }
 
 bool ArrayInstance::deleteProperty(ExecState* exec, unsigned index) {
+  if (index > MAX_ARRAY_INDEX)
+    return deleteProperty(exec, Identifier::from(index));
+
   if (index >= length)
     return true;
   if (index < storageLength) {
@@ -202,6 +222,7 @@ ReferenceList ArrayInstance::propList(ExecState* exec, bool recursive) {
   // avoid fetching this every time through the loop
   JSValue* undefined = jsUndefined();
 
+  //### FIXME: should avoid duplicates with prototype
   for (unsigned i = 0; i < storageLength; ++i) {
     JSValue* imp = storage[i];
     if (imp && imp != undefined) {
@@ -464,7 +485,7 @@ JSValue* ArrayProtoFunc::callAsFunction(ExecState* exec,
       UString str = "";
 
       visitedElems.insert(thisObj);
-      if (!args[0]->isUndefined())
+      if (id == Join && !args[0]->isUndefined())
         separator = args[0]->toString(exec);
       for (unsigned int k = 0; k < length; k++) {
         if (k >= 1)
