@@ -480,9 +480,11 @@ void KHTMLView::layout() {
   }
 
   d->layoutCount++;
+#if __APPLE__
   if (KWQAccObjectCache::accessibilityEnabled())
     root->document()->getAccObjectCache()->postNotification(root,
                                                             "AXLayoutComplete");
+#endif
 
   updateDashboardRegions();
 
