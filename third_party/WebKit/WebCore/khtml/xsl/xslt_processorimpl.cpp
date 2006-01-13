@@ -52,6 +52,8 @@ namespace DOM {
 
 static void parseErrorFunc(void* ctxt, const char* msg, ...) {
 // FIXME: It would be nice to display error messages somewhere.
+#if !WIN32
+// FIXME: No vasprintf support.
 #if !ERROR_DISABLED
   char* errorMessage = 0;
   va_list args;
@@ -61,6 +63,7 @@ static void parseErrorFunc(void* ctxt, const char* msg, ...) {
   if (errorMessage)
     free(errorMessage);
   va_end(args);
+#endif
 #endif
 }
 
