@@ -83,5 +83,6 @@ class KWQAccObjectCache {
   CFMutableDictionaryRef accCacheByID;
   KWQAccObjectID accObjectIDSource;
 };
-
+#else
+class KWQAccObjectCache;
 #endif

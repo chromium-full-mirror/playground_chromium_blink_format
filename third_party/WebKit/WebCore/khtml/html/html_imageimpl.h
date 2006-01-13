@@ -63,7 +63,7 @@ class HTMLImageLoader : public khtml::CachedObjectClient {
   virtual void notifyFinished(khtml::CachedObject* finishedObj);
 
  protected:
-  void setLoadingImage(CachedImage* loadingImage);
+  void setLoadingImage(khtml::CachedImage* loadingImage);
 
  private:
   ElementImpl* m_element;
