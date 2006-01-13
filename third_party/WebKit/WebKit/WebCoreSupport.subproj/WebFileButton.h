@@ -31,7 +31,7 @@
 @protocol WebCoreFileButton;
 @protocol WebCoreFileButtonDelegate;
 @protocol WebOpenPanelResultListener;
-@class WebBridge;
+@class WebFrameBridge;
 @class WebFileChooserButton;
 
 @interface WebFileButton
@@ -40,10 +40,10 @@
   WebFileChooserButton* _button;
   NSImage* _icon;
   NSString* _label;
-  WebBridge* _bridge;
+  WebFrameBridge* _bridge;
   BOOL _inNextValidKeyView;
   id<WebCoreFileButtonDelegate> _delegate;
 }
-- (id)initWithBridge:(WebBridge*)bridge
+- (id)initWithBridge:(WebFrameBridge*)bridge
             delegate:(id<WebCoreFileButtonDelegate>)delegate;
 @end

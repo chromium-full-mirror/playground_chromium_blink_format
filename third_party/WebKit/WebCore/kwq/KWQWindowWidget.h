@@ -29,9 +29,9 @@
 #include "KWQWidget.h"
 
 #ifdef __OBJC__
-@class WebCoreBridge;
+@class WebCoreFrameBridge;
 #else
-class WebCoreBridge;
+class WebCoreFrameBridge;
 #endif
 
 class KWQWindowWidgetPrivate;
@@ -40,7 +40,7 @@ class KWQWindowWidget : public QWidget {
  public:
   virtual ~KWQWindowWidget();
 
-  KWQWindowWidget(WebCoreBridge* bridge);
+  KWQWindowWidget(WebCoreFrameBridge* bridge);
 
   virtual QSize sizeHint() const;
   virtual QRect frameGeometry() const;

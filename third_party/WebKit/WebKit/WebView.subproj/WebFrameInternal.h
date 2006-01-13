@@ -69,7 +69,7 @@ _saveResourceAndSendRemainingDelegateMessagesWithRequest:(NSURLRequest*)request
 - (BOOL)_subframeIsLoading;
 - (id)_initWithWebFrameView:(WebFrameView*)fv
                     webView:(WebView*)v
-                     bridge:(WebBridge*)bridge;
+                     bridge:(WebFrameBridge*)bridge;
 
 @end
 

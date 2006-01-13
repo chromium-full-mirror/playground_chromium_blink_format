@@ -23,7 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@class WebCoreBridge;
+@class WebCoreFrameBridge;
 
 // This protocol is a way for an NSScrollView to detect
 // that the view it's embedded in is one that should be resized when the
@@ -51,5 +51,5 @@ typedef enum {
 // This protocol is a way for WebCore to gain access to its information
 // about WebKit subclasses of NSView
 @protocol WebCoreBridgeHolder
-- (WebCoreBridge*)webCoreBridge;
+- (WebCoreFrameBridge*)webCoreBridge;
 @end

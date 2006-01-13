@@ -88,7 +88,7 @@ typedef DOMElement ObjCDOMElement;
 @class NSResponder;
 @class NSString;
 @class NSView;
-@class WebCoreBridge;
+@class WebCoreFrameBridge;
 @class WebScriptObject;
 
 #else
@@ -109,7 +109,7 @@ class NSMutableDictionary;
 class NSResponder;
 class NSString;
 class NSView;
-class WebCoreBridge;
+class WebCoreFrameBridge;
 class WebScriptObject;
 
 typedef int NSWritingDirection;
@@ -125,8 +125,8 @@ class MacFrame : public Frame {
 
   void clear();
 
-  void setBridge(WebCoreBridge* p);
-  WebCoreBridge* bridge() const { return _bridge; }
+  void setBridge(WebCoreFrameBridge* p);
+  WebCoreFrameBridge* bridge() const { return _bridge; }
   void setView(KHTMLView* view);
 
   virtual bool openURL(const KURL&);
@@ -191,7 +191,7 @@ class MacFrame : public Frame {
 
   void createEmptyDocument();
 
-  static WebCoreBridge* bridgeForWidget(const QWidget*);
+  static WebCoreFrameBridge* bridgeForWidget(const QWidget*);
 
   QString requestedURLString() const;
   QString incomingReferrer() const;
@@ -362,7 +362,7 @@ class MacFrame : public Frame {
   void registerCommandForUndoOrRedo(const khtml::EditCommandPtr& cmd,
                                     bool isRedo);
 
-  WebCoreBridge* _bridge;
+  WebCoreFrameBridge* _bridge;
 
   KWQSignal _started;
   KWQSignal _completed;
