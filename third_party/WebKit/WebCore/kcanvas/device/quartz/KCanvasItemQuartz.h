@@ -50,5 +50,5 @@ class KCanvasItemQuartz : public RenderPath {
                            HitTestAction hitTestAction);
 
  private:
-  void drawMarkersIfNeeded(const QRectF& rect, CGPathRef path) const;
+  void drawMarkersIfNeeded(const QRectF& rect, const KCanvasPath* path) const;
 };

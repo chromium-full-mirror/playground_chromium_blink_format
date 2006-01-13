@@ -102,8 +102,8 @@ class KCanvasFilter : public KCanvasResource {
 
   void addFilterEffect(KCanvasFilterEffect* effect);
 
-  virtual void prepareFilter(KRenderingDevice* device, const QRectF& bbox) = 0;
-  virtual void applyFilter(KRenderingDevice* device, const QRectF& bbox) = 0;
+  virtual void prepareFilter(const QRectF& bbox) = 0;
+  virtual void applyFilter(const QRectF& bbox) = 0;
 
   QTextStream& externalRepresentation(QTextStream&) const;
 

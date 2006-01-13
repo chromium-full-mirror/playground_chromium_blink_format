@@ -49,6 +49,9 @@ class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
   virtual QRect mapFromVisual(const QRect& rect);
   virtual QRect mapToVisual(const QRect& rect);
 
+  virtual void clearPath();
+  virtual void addPath(const KCanvasPath*);
+
   CGContextRef cgContext() const { return m_cgContext; };
   NSGraphicsContext* nsGraphicsContext();
 
