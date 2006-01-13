@@ -441,12 +441,9 @@ void TextImpl::attach() {
 }
 
 void TextImpl::recalcStyle(StyleChange change) {
-  //      qDebug("textImpl::recalcStyle");
-  if (change != NoChange && parentNode()) {
-    // 	qDebug("DomText::recalcStyle");
+  if (change != NoChange && parentNode())
     if (m_render)
       m_render->setStyle(parentNode()->renderer()->style());
-  }
   if (changed() && m_render && m_render->isText())
     static_cast<RenderText*>(m_render)->setText(str);
   setChanged(false);

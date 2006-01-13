@@ -3351,9 +3351,6 @@ void RenderBlock::calcInlineMinMaxWidth() {
 
   m_minWidth = kMax(inlineMin, m_minWidth);
   m_maxWidth = kMax(inlineMax, m_maxWidth);
-
-  //         kdDebug( 6040 ) << "m_minWidth=" << m_minWidth
-  // 			<< " m_maxWidth=" << m_maxWidth << endl;
 }
 
 // Use a very large value (in effect infinite).

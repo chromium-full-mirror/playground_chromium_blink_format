@@ -43,6 +43,6 @@ class Request {
   DocLoader* m_docLoader;
   bool multipart;
 };
-};
+}
 
 #endif

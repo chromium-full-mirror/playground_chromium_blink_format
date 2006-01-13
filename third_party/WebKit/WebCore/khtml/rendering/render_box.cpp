@@ -644,9 +644,6 @@ void RenderBox::paintBackgroundExtended(QPainter* p,
       ch = b.height();
     }
 
-    //        kdDebug() << "cx="<<cx << " cy="<<cy<< " cw="<<cw << " ch="<<ch <<
-    //        " sx="<<sx << " sy="<<sy << endl;
-
     if (cw > 0 && ch > 0)
       p->drawTiledPixmap(cx, cy, cw, ch, bg->tiled_pixmap(c), sx, sy);
   }
@@ -976,12 +973,9 @@ void RenderBox::calcWidth() {
       }
 
       if (widthType == Auto) {
-        //          kdDebug( 6040 ) << "variable" << endl;
         m_marginLeft = ml.minWidth(cw);
         m_marginRight = mr.minWidth(cw);
       } else {
-        //          	kdDebug( 6040 ) << "non-variable " << w.type << ","<<
-        //          w.value << endl;
         calcHorizontalMargins(ml, mr, cw);
       }
     }

@@ -127,9 +127,8 @@ void Loader::servePendingRequests() {
   if (KWQServeRequest(this, req, job)) {
     if (req->object->type() == CachedObject::Image) {
       CachedImage* ci = static_cast<CachedImage*>(req->object);
-      if (ci->decoderCallback()) {
+      if (ci->decoderCallback())
         m_requestsBackgroundDecoding.append(req);
-      }
     }
     m_requestsLoading.insert(job, req);
   }
@@ -286,9 +285,8 @@ void Loader::cancelRequests(DocLoader* dl) {
 
 void Loader::removeBackgroundDecodingRequest(Request* r) {
   bool present = m_requestsBackgroundDecoding.containsRef(r);
-  if (present) {
+  if (present)
     m_requestsBackgroundDecoding.remove(r);
-  }
 }
 
 KIO::Job* Loader::jobForRequest(const DOM::DOMString& url) const {
@@ -307,4 +305,4 @@ KIO::Job* Loader::jobForRequest(const DOM::DOMString& url) const {
 bool Loader::isKHTMLLoader() const {
   return true;
 }
-};
+}

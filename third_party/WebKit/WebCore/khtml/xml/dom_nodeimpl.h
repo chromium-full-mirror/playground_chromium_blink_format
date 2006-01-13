@@ -532,7 +532,6 @@ class NodeImpl : public khtml::TreeShared<NodeImpl> {
                        const char* markedLabel1,
                        NodeImpl* markedNode2,
                        const char* markedLabel2) const;
-
 #endif
 
   void registerNodeList(NodeListImpl* list);
