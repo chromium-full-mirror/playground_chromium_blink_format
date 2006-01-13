@@ -189,10 +189,10 @@ class QPainter : public Qt {
 
   void addClip(const QRect&);
   void addRoundedRectClip(const QRect& rect,
-                          const QSize& topLeft,
-                          const QSize& topRight,
-                          const QSize& bottomLeft,
-                          const QSize& bottomRight);
+                          const IntSize& topLeft,
+                          const IntSize& topRight,
+                          const IntSize& bottomLeft,
+                          const IntSize& bottomRight);
 
   RasterOp rasterOp() const;
   void setRasterOp(RasterOp);

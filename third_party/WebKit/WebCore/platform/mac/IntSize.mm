@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003-6 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,59 +24,30 @@
  */
 
 #include "config.h"
-#import "KWQSize.h"
+#include "IntSize.h"
 
-QSize::QSize() : w(-1), h(-1)
-{
-}
-
-QSize::QSize(int width, int height) : w(width), h(height)
-{
-}
+namespace WebCore {
 
 #ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QSize::QSize(const NSSize &s) : w((int)s.width), h((int)s.height)
+IntSize::IntSize(const NSSize &s) : w((int)s.width), h((int)s.height)
 {
 }
 #endif
 
-QSize::QSize(const CGSize &s) : w((int)s.width), h((int)s.height)
+IntSize::IntSize(const CGSize &s) : w((int)s.width), h((int)s.height)
 {
-}
-
-bool QSize::isValid() const
-{
-    return w >= 0 && h >= 0;
-}
-
-QSize QSize::expandedTo(const QSize &o) const
-{
-    return QSize(w > o.w ? w : o.w, h > o.h ? h : o.h);
 }
 
 #ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QSize::operator NSSize() const
+IntSize::operator NSSize() const
 {
     return NSMakeSize(w, h);
 }
 #endif
 
-QSize::operator CGSize() const
+IntSize::operator CGSize() const
 {
     return CGSizeMake(w, h);
 }
 
-QSize operator+(const QSize &a, const QSize &b)
-{
-    return QSize(a.w + b.w, a.h + b.h);
-}
-
-bool operator==(const QSize &a, const QSize &b)
-{
-    return a.w == b.w && a.h == b.h;
-}
-
-bool operator!=(const QSize &a, const QSize &b)
-{
-    return a.w != b.w || a.h != b.h;
 }

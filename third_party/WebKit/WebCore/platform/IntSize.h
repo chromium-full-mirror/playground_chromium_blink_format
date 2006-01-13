@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2003-6 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,11 +23,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef QSIZE_H_
-#define QSIZE_H_
+#ifndef INTSIZE_H_
+#define INTSIZE_H_
 
-#include "KWQDef.h"
-
+#if __APPLE__
 // workaround for <rdar://problem/4294625>
 #if !__LP64__ && !NS_BUILD_32_LIKE_64
 #undef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
@@ -39,35 +38,48 @@ typedef struct CGSize NSSize;
 typedef struct _NSSize NSSize;
 #endif
 typedef struct CGSize CGSize;
-
-class QSize {
- public:
-  QSize();
-  QSize(int, int);
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-  explicit QSize(const NSSize&);
 #endif
-  explicit QSize(const CGSize&);
+
+namespace WebCore {
+
+class IntSize {
+ public:
+  IntSize();
+  IntSize(int, int);
+
+#if __APPLE__
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+  explicit IntSize(const NSSize&);
+#endif
+  explicit IntSize(const CGSize&);
+#endif
 
   bool isValid() const;
   int width() const { return w; }
   int height() const { return h; }
   void setWidth(int width) { w = width; }
   void setHeight(int height) { h = height; }
-  QSize expandedTo(const QSize&) const;
+  IntSize expandedTo(const IntSize&) const;
 
+#if __APPLE__
 #ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
   operator NSSize() const;
 #endif
   operator CGSize() const;
+#endif
 
-  friend QSize operator+(const QSize&, const QSize&);
-  friend bool operator==(const QSize&, const QSize&);
-  friend bool operator!=(const QSize&, const QSize&);
+  friend IntSize operator+(const IntSize&, const IntSize&);
+  friend bool operator==(const IntSize&, const IntSize&);
+  friend bool operator!=(const IntSize&, const IntSize&);
 
  private:
   int w;
   int h;
 };
+}
+
+// FIXME: Remove when the engine files have been converted to be in the WebCore
+// namespace.
+using WebCore::IntSize;
 
 #endif

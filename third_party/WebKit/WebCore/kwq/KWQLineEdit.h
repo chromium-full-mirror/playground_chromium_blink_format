@@ -74,7 +74,7 @@ class QLineEdit : public QWidget {
   QString selectedText() const;
   void setSelection(int, int);
 
-  QSize sizeForCharacterWidth(int numCharacters) const;
+  IntSize sizeForCharacterWidth(int numCharacters) const;
   int baselinePosition(int height) const;
 
   void returnPressed() { m_returnPressed.call(); }

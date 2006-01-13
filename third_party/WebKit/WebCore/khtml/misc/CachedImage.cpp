@@ -96,8 +96,8 @@ const QPixmap& CachedImage::pixmap() const {
   return *Cache::nullPixmap;
 }
 
-QSize CachedImage::pixmap_size() const {
-  return (p ? p->size() : QSize());
+IntSize CachedImage::pixmap_size() const {
+  return (p ? p->size() : IntSize());
 }
 
 QRect CachedImage::valid_rect() const {
@@ -172,7 +172,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
       } else
         do_notify(*p, p->rect());
 
-      QSize s = pixmap_size();
+      IntSize s = pixmap_size();
       setSize(s.width() * s.height() * 2);
     }
     if (eof) {

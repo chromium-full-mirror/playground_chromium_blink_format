@@ -247,10 +247,10 @@ class BorderData {
 
   BorderImage image;
 
-  QSize topLeft;
-  QSize topRight;
-  QSize bottomLeft;
-  QSize bottomRight;
+  IntSize topLeft;
+  IntSize topRight;
+  IntSize bottomLeft;
+  IntSize bottomRight;
 
   bool hasBorder() const {
     bool haveImage = image.hasImage();
@@ -1236,10 +1236,12 @@ class RenderStyle {
 
   const BorderImage& borderImage() const { return surround->border.image; }
 
-  QSize borderTopLeftRadius() const { return surround->border.topLeft; }
-  QSize borderTopRightRadius() const { return surround->border.topRight; }
-  QSize borderBottomLeftRadius() const { return surround->border.bottomLeft; }
-  QSize borderBottomRightRadius() const { return surround->border.bottomRight; }
+  IntSize borderTopLeftRadius() const { return surround->border.topLeft; }
+  IntSize borderTopRightRadius() const { return surround->border.topRight; }
+  IntSize borderBottomLeftRadius() const { return surround->border.bottomLeft; }
+  IntSize borderBottomRightRadius() const {
+    return surround->border.bottomRight;
+  }
   bool hasBorderRadius() const { return surround->border.hasBorderRadius(); }
 
   unsigned short borderLeftWidth() const {
@@ -1597,19 +1599,19 @@ class RenderStyle {
     SET_VAR(surround, border.image, b)
   }
 
-  void setBorderTopLeftRadius(const QSize& s) {
+  void setBorderTopLeftRadius(const IntSize& s) {
     SET_VAR(surround, border.topLeft, s)
   }
-  void setBorderTopRightRadius(const QSize& s) {
+  void setBorderTopRightRadius(const IntSize& s) {
     SET_VAR(surround, border.topRight, s)
   }
-  void setBorderBottomLeftRadius(const QSize& s) {
+  void setBorderBottomLeftRadius(const IntSize& s) {
     SET_VAR(surround, border.bottomLeft, s)
   }
-  void setBorderBottomRightRadius(const QSize& s) {
+  void setBorderBottomRightRadius(const IntSize& s) {
     SET_VAR(surround, border.bottomRight, s)
   }
-  void setBorderRadius(const QSize& s) {
+  void setBorderRadius(const IntSize& s) {
     setBorderTopLeftRadius(s);
     setBorderTopRightRadius(s);
     setBorderBottomLeftRadius(s);
@@ -1936,7 +1938,7 @@ class RenderStyle {
   static bool initialBorderCollapse() { return false; }
   static EBorderStyle initialBorderStyle() { return BNONE; }
   static BorderImage initialBorderImage() { return BorderImage(); }
-  static QSize initialBorderRadius() { return QSize(0, 0); }
+  static IntSize initialBorderRadius() { return IntSize(0, 0); }
   static ECaptionSide initialCaptionSide() { return CAPTOP; }
   static EClear initialClear() { return CNONE; }
   static EDirection initialDirection() { return LTR; }

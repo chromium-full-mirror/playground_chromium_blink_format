@@ -4877,7 +4877,7 @@ JSValue* Image::getValueProperty(ExecState*, int token) const {
         return jsNumber(width);
       int w = 0;
       if (img) {
-        QSize size = img->pixmap_size();
+        IntSize size = img->pixmap_size();
         if (size.isValid())
           w = size.width();
       }
@@ -4888,7 +4888,7 @@ JSValue* Image::getValueProperty(ExecState*, int token) const {
         return jsNumber(height);
       int h = 0;
       if (img) {
-        QSize size = img->pixmap_size();
+        IntSize size = img->pixmap_size();
         if (size.isValid())
           h = size.height();
       }

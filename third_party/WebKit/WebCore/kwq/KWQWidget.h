@@ -28,7 +28,7 @@
 
 #include "KWQObject.h"
 #include "KWQPaintDevice.h"
-#include "KWQSize.h"
+#include "IntSize.h"
 #include "KWQFont.h"
 #include "KWQCursor.h"
 
@@ -64,7 +64,7 @@ class QWidget : public QObject, public QPaintDevice {
   QWidget(NSView* view);
   virtual ~QWidget();
 
-  virtual QSize sizeHint() const;
+  virtual IntSize sizeHint() const;
 
   virtual void setEnabled(bool);
   virtual bool isEnabled() const;
@@ -75,9 +75,9 @@ class QWidget : public QObject, public QPaintDevice {
   int y() const;
   int width() const;
   int height() const;
-  QSize size() const;
+  IntSize size() const;
   void resize(int, int);
-  void resize(const QSize&);
+  void resize(const IntSize&);
   QPoint pos() const;
   void move(int, int);
   void move(const QPoint&);

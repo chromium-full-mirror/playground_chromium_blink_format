@@ -34,7 +34,7 @@ class QSlider : public QWidget {
   QSlider();
   ~QSlider();
 
-  QSize sizeHint() const;
+  IntSize sizeHint() const;
   virtual void setFont(const QFont& f);
 
   void setValue(double v);

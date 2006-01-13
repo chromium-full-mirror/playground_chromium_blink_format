@@ -1839,8 +1839,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::ResizeBy:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
-        QSize dest =
-            tl->size() + QSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
+        IntSize dest = tl->size() +
+                       IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
         QRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         // Security check: within desktop limits and bigger than 100x100 (per
@@ -1858,7 +1858,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::ResizeTo:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
-        QSize dest = QSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
+        IntSize dest = IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
         QRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         // Security check: within desktop limits and bigger than 100x100 (per

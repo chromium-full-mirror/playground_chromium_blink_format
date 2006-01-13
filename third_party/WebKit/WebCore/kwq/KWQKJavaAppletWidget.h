@@ -31,7 +31,7 @@ class Frame;
 
 class KJavaAppletWidget : public QWidget {
  public:
-  KJavaAppletWidget(const QSize& size,
+  KJavaAppletWidget(const IntSize& size,
                     Frame* c,
                     const QMap<QString, QString>& args);
 };

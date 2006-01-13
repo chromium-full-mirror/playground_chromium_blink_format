@@ -104,7 +104,7 @@ class SVGPatternElementImpl : public SVGStyledLocatableElementImpl,
       const SVGPatternElementImpl* target,
       KCanvasMatrix& patternTransformMatrix) const;
   void drawPatternContentIntoTile(const SVGPatternElementImpl* target,
-                                  const QSize& newSize,
+                                  const IntSize& newSize,
                                   KCanvasMatrix patternTransformMatrix) const;
   void notifyClientsToRepaint() const;
 };

@@ -76,8 +76,8 @@ SVGAnimatedLengthImpl* SVGMaskElementImpl::height() const {
 
 void SVGMaskElementImpl::attributeChanged(KDOM::AttributeImpl* attr,
                                           bool preserveDecls) {
-  QSize newSize = QSize(lroundf(width()->baseVal()->value()),
-                        lroundf(height()->baseVal()->value()));
+  IntSize newSize = IntSize(lroundf(width()->baseVal()->value()),
+                            lroundf(height()->baseVal()->value()));
   if (!m_masker || !m_masker->mask() || (m_masker->mask()->size() != newSize))
     m_dirty = true;
   SVGStyledLocatableElementImpl::attributeChanged(attr, preserveDecls);
@@ -121,8 +121,8 @@ KCanvasImage* SVGMaskElementImpl::drawMaskerContent() {
   KCanvasImage* maskImage =
       static_cast<KCanvasImage*>(device->createResource(RS_IMAGE));
 
-  QSize size = QSize(lroundf(width()->baseVal()->value()),
-                     lroundf(height()->baseVal()->value()));
+  IntSize size = IntSize(lroundf(width()->baseVal()->value()),
+                         lroundf(height()->baseVal()->value()));
   maskImage->init(size);
 
   KRenderingDeviceContext* patternContext = device->contextForImage(maskImage);

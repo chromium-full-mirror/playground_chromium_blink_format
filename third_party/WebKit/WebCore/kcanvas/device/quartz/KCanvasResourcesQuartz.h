@@ -74,14 +74,14 @@ class KCanvasImageQuartz : public KCanvasImage {
   KCanvasImageQuartz() : m_cgLayer(0) {}
   ~KCanvasImageQuartz();
   void init(const QPixmap&) {}
-  void init(QSize size) { m_size = size; }
+  void init(IntSize size) { m_size = size; }
 
   CGLayerRef cgLayer();
   void setCGLayer(CGLayerRef layer);
 
-  QSize size() { return m_size; }
+  IntSize size() { return m_size; }
 
  private:
-  QSize m_size;
+  IntSize m_size;
   CGLayerRef m_cgLayer;
 };
