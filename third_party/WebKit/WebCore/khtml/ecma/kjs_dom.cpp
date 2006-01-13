@@ -48,7 +48,9 @@
 
 #include "html_objectimpl.h"
 
+#if __APPLE__
 #include <JavaScriptCore/runtime_object.h>
+#endif
 
 using namespace DOM;
 using namespace DOM::HTMLNames;
@@ -1885,6 +1887,7 @@ JSValue* getRuntimeObject(ExecState* exec, NodeImpl* n) {
   if (!n)
     return 0;
 
+#if __APPLE__
   if (n->hasTagName(appletTag)) {
     HTMLAppletElementImpl* appletElement =
         static_cast<HTMLAppletElementImpl*>(n);
@@ -1901,6 +1904,7 @@ JSValue* getRuntimeObject(ExecState* exec, NodeImpl* n) {
     if (objectElement->getObjectInstance())
       return new RuntimeObjectImp(objectElement->getObjectInstance(), false);
   }
+#endif
 
   // If we don't have a runtime object return 0.
   return 0;

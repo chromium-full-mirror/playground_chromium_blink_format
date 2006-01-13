@@ -544,7 +544,11 @@ static int intFeature(const QMap<QString, QString>& features,
   // "0q" should be minimum value.
   bool ok;
   double d = value.toDouble(&ok);
-  if ((d == 0 && !ok) || isnan(d))
+  if ((d == 0 && !ok)
+#if !WIN32
+      || isnan(d)
+#endif
+          )
     return defaultValue;
   if (d < min || max <= min)
     return min;

@@ -27,7 +27,9 @@
 #include <qguardedptr.h>
 #include "misc/loader_client.h"
 
+#if __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
+#endif
 
 namespace DOM {
 class HTMLCollectionImpl;
@@ -953,7 +955,6 @@ class Image : public DOMObject, public khtml::CachedObjectClient {
 };
 
 ////////////////////// Context2D Object ////////////////////////
-
 class Context2D : public DOMObject {
   friend class Context2DFunction;
 
@@ -1029,10 +1030,13 @@ class Context2D : public DOMObject {
   void save();
   void restore();
 
+#if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGContextRef drawingContext();
   CGAffineTransform _lastFillImagePatternCTM;
   CGAffineTransform _lastStrokeImagePatternCTM;
+#endif
+
   bool _validFillImagePattern;
   bool _validStrokeImagePattern;
   void updateFillImagePattern();
@@ -1059,8 +1063,10 @@ class Context2D : public DOMObject {
   JSValue* _globalComposite;
 };
 
+#if __APPLE__
 // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
 CGColorRef colorRefFromValue(ExecState* exec, JSValue* value);
+#endif
 
 QColor colorFromValue(ExecState* exec, JSValue* value);
 
@@ -1100,8 +1106,10 @@ class Gradient : public DOMObject {
 
   enum { Radial, Linear };
 
+#if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGShadingRef getShading();
+#endif
 
   void addColorStop(float s, float r, float g, float b, float alpha);
   const ColorStop* colorStops(int* count) const;
@@ -1115,8 +1123,10 @@ class Gradient : public DOMObject {
   int _gradientType;
   float _x0, _y0, _r0, _x1, _y1, _r1;
 
+#if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGShadingRef _shadingRef;
+#endif
 
   int maxStops;
   int stopCount;
@@ -1144,8 +1154,10 @@ class ImagePattern : public DOMObject {
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
 
+#if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGPatternRef createPattern(CGAffineTransform transform);
+#endif
 
   QPixmap pixmap() { return _pixmap; }
 
@@ -1154,8 +1166,10 @@ class ImagePattern : public DOMObject {
  private:
   float _rw, _rh;
   QPixmap _pixmap;
+#if __APPLE__
   // FIXME: Macintosh specific, and should be abstracted by KWQ in QPainter.
   CGRect _bounds;
+#endif
 };
 
 JSValue* getHTMLCollection(ExecState* exec, DOM::HTMLCollectionImpl* c);
