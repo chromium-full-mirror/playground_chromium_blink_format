@@ -2267,9 +2267,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       bool appliedStartWidth =
           pos > 0;  // If the span originated on a previous line,
                     // then assume the start width has been applied.
-      bool appliedEndWidth = false;
-
-      int wrapW = tmpW;
+      int wrapW = tmpW + inlineWidth(o, !appliedStartWidth, true);
       int nextBreakable = -1;
 
       while (len) {
@@ -2340,11 +2338,12 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
 
         if (breakWords)
           wrapW += t->width(pos, 1, f, w + wrapW);
+        bool midWordBreak = breakWords && (w + wrapW > width);
 
         if (c == '\n' ||
             (o->style()->whiteSpace() != PRE &&
              isBreakable(str, pos, strlen, nextBreakable, breakNBSP)) ||
-            (breakWords && (w + wrapW > width))) {
+            midWordBreak) {
           if (ignoringSpaces) {
             if (!currentCharacterIsSpace) {
               // Stop ignoring spaces and begin at this
@@ -2363,8 +2362,10 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             }
           }
 
-          tmpW += t->width(lastSpace, pos - lastSpace, f, w + tmpW) +
-                  lastSpaceWordSpacing;
+          int additionalTmpW =
+              t->width(lastSpace, pos - lastSpace, f, w + tmpW) +
+              lastSpaceWordSpacing;
+          tmpW += additionalTmpW;
           if (!appliedStartWidth) {
             tmpW += inlineWidth(o, true, false);
             appliedStartWidth = true;
@@ -2413,10 +2414,14 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                 }
               }
               goto end;  // Didn't fit. Jump to the end.
-            } else if (pos > 0 && str[pos - 1].unicode() == SOFT_HYPHEN)
-              // Subtract the width of the soft hyphen out since we fit on a
-              // line.
-              tmpW -= t->width(pos - 1, 1, f, w + tmpW);
+            } else {
+              if (midWordBreak)
+                tmpW -= additionalTmpW;
+              if (pos > 0 && str[pos - 1].unicode() == SOFT_HYPHEN)
+                // Subtract the width of the soft hyphen out since we fit on a
+                // line.
+                tmpW -= t->width(pos - 1, 1, f, w + tmpW);
+            }
           }
 
           if (*(str + pos) == '\n' && o->style()->preserveNewline()) {
@@ -2432,8 +2437,15 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
             lBreak.pos = pos;
           }
 
-          lastSpaceWordSpacing = applyWordSpacing ? wordSpacing : 0;
-          lastSpace = pos;
+          if (midWordBreak) {
+            // Remember this as a breakable position in case
+            // adding the end width forces a break.
+            lBreak.obj = o;
+            lBreak.pos = pos;
+          } else {
+            lastSpaceWordSpacing = applyWordSpacing ? wordSpacing : 0;
+            lastSpace = pos;
+          }
 
           if (!ignoringSpaces && o->style()->collapseWhiteSpace()) {
             // If we encounter a newline, or if we encounter a
@@ -2488,15 +2500,14 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
                 lastSpaceWordSpacing;
       if (!appliedStartWidth)
         tmpW += inlineWidth(o, true, false);
-      if (!appliedEndWidth)
-        tmpW += inlineWidth(o, false, true);
+      tmpW += inlineWidth(o, false, true);
     } else
       KHTMLAssert(false);
 
     RenderObject* next = bidiNext(start.block, o, bidi);
     bool autoWrap = o->style()->autoWrap();
     bool checkForBreak = autoWrap;
-    if (w && w + tmpW > width + 1 && lBreak.obj &&
+    if (w && w + tmpW > width && lBreak.obj &&
         o->style()->whiteSpace() == NOWRAP)
       checkForBreak = true;
     else if (next && o->isText() && next->isText() && !next->isBR()) {
@@ -2518,7 +2529,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
               checkForBreak = true;
             }
           }
-          bool canPlaceOnLine = (w + tmpW <= width + 1) || !autoWrap;
+          bool canPlaceOnLine = (w + tmpW <= width) || !autoWrap;
           if (canPlaceOnLine && checkForBreak) {
             w += tmpW;
             tmpW = 0;
@@ -2529,7 +2540,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       }
     }
 
-    if (checkForBreak && (w + tmpW > width + 1)) {
+    if (checkForBreak && (w + tmpW > width)) {
       // if we have floats, try to get below them.
       if (currentCharacterIsSpace && !ignoringSpaces &&
           o->style()->collapseWhiteSpace())
@@ -2554,7 +2565,7 @@ BidiIterator RenderBlock::findNextLineBreak(BidiIterator& start,
       // (thus
       // giving us more room), so we need to retest, and only jump to
       // the end label if we still don't fit on the line. -dwh
-      if (w + tmpW > width + 1)
+      if (w + tmpW > width)
         goto end;
     }
 
