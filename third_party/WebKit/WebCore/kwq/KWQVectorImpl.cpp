@@ -107,9 +107,8 @@ bool KWQVectorImpl::resize(uint size, bool delItems) {
 }
 
 bool KWQVectorImpl::insert(uint n, void* item, bool delItems) {
-  if (n >= m_size) {
+  if (n >= m_size)
     return false;
-  }
 
   void* oldItem = m_data[n];
   if (oldItem) {
