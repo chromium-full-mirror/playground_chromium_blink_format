@@ -44,8 +44,8 @@ typedef struct CGSize CGSize;
 #endif
 
 namespace WebCore {
+
 class IntSize;
-}
 
 class FloatSize {
  public:
@@ -81,5 +81,10 @@ class FloatSize {
   float w;
   float h;
 };
+}
+
+// FIXME: Remove when the engine files have been converted to be in the WebCore
+// namespace.
+using WebCore::FloatSize;
 
 #endif

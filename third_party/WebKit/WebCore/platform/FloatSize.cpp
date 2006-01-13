@@ -28,6 +28,8 @@
 #include "FloatSize.h"
 #include "IntSize.h"
 
+namespace WebCore {
+
 FloatSize::FloatSize() : w(-1.0f), h(-1.0f) {}
 
 FloatSize::FloatSize(float width, float height) : w(width), h(height) {}
@@ -52,4 +54,5 @@ bool operator==(const FloatSize& a, const FloatSize& b) {
 
 bool operator!=(const FloatSize& a, const FloatSize& b) {
   return a.w != b.w || a.h != b.h;
+}
 }
