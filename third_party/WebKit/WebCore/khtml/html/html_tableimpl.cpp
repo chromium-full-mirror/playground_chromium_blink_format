@@ -718,8 +718,6 @@ HTMLElementImpl* HTMLTableSectionElementImpl::insertRow(int index,
   HTMLTableRowElementImpl* r = 0L;
   RefPtr<NodeListImpl> children = childNodes();
   int numRows = children ? (int)children->length() : 0;
-  // kdDebug(6030) << k_funcinfo << "index=" << index << " numRows=" << numRows
-  // << endl;
   if (index < -1 || index > numRows) {
     exceptioncode = DOMException::INDEX_SIZE_ERR;  // per the DOM
   } else {
@@ -820,8 +818,6 @@ NodeImpl* HTMLTableRowElementImpl::addChild(NodeImpl* child) {
 }
 
 int HTMLTableRowElementImpl::rowIndex() const {
-  int rIndex = 0;
-
   NodeImpl* table = parentNode();
   if (!table)
     return -1;
@@ -829,33 +825,47 @@ int HTMLTableRowElementImpl::rowIndex() const {
   if (!table || !table->hasTagName(tableTag))
     return -1;
 
-  HTMLTableSectionElementImpl* foot =
-      static_cast<HTMLTableElementImpl*>(table)->tFoot();
-  NodeImpl* node = table->firstChild();
-  while (node) {
-    if (node != foot &&
-        (node->hasTagName(theadTag) || node->hasTagName(tfootTag) ||
-         node->hasTagName(tbodyTag))) {
+  // To match Firefox, the row indices work like this:
+  //   Rows from the first <thead> are numbered before all <tbody> rows.
+  //   Rows from the first <tfoot> are numbered after all <tbody> rows.
+  //   Rows from other <thead> and <tfoot> elements don't get row indices at
+  //   all.
+
+  int rIndex = 0;
+
+  if (HTMLTableSectionElementImpl* head =
+          static_cast<HTMLTableElementImpl*>(table)->tHead()) {
+    for (NodeImpl* row = head->firstChild(); row; row = row->nextSibling()) {
+      if (row == this)
+        return rIndex;
+      ++rIndex;
+    }
+  }
+
+  for (NodeImpl* node = table->firstChild(); node; node = node->nextSibling()) {
+    if (node->hasTagName(tbodyTag)) {
       HTMLTableSectionElementImpl* section =
           static_cast<HTMLTableSectionElementImpl*>(node);
-      const NodeImpl* row = section->firstChild();
-      while (row) {
+      for (NodeImpl* row = section->firstChild(); row;
+           row = row->nextSibling()) {
         if (row == this)
           return rIndex;
-        rIndex++;
-        row = row->nextSibling();
+        ++rIndex;
       }
     }
-    node = node->nextSibling();
   }
-  const NodeImpl* row = foot->firstChild();
-  while (row) {
-    if (row == this)
-      return rIndex;
-    rIndex++;
-    row = row->nextSibling();
+
+  if (HTMLTableSectionElementImpl* foot =
+          static_cast<HTMLTableElementImpl*>(table)->tFoot()) {
+    for (NodeImpl* row = foot->firstChild(); row; row = row->nextSibling()) {
+      if (row == this)
+        return rIndex;
+      ++rIndex;
+    }
   }
-  // should never happen
+
+  // We get here for rows that are in <thead> or <tfoot> sections other than the
+  // main header and footer.
   return -1;
 }
 
