@@ -401,16 +401,13 @@ const ClassInfo NumberObjectImp::info = {"Function", &InternalFunctionImp::info,
 
 /* Source for number_object.lut.h
 @begin numberTable 5
-  NaN			NumberObjectImp::NaNValue
+  NaN                   NumberObjectImp::NaNValue DontEnum|DontDelete|ReadOnly
+  NEGATIVE_INFINITY     NumberObjectImp::NegInfinity
 DontEnum|DontDelete|ReadOnly
-  NEGATIVE_INFINITY	NumberObjectImp::NegInfinity
+  POSITIVE_INFINITY     NumberObjectImp::PosInfinity
 DontEnum|DontDelete|ReadOnly
-  POSITIVE_INFINITY	NumberObjectImp::PosInfinity
-DontEnum|DontDelete|ReadOnly
-  MAX_VALUE		NumberObjectImp::MaxValue
-DontEnum|DontDelete|ReadOnly
-  MIN_VALUE		NumberObjectImp::MinValue
-DontEnum|DontDelete|ReadOnly
+  MAX_VALUE             NumberObjectImp::MaxValue DontEnum|DontDelete|ReadOnly
+  MIN_VALUE             NumberObjectImp::MinValue DontEnum|DontDelete|ReadOnly
 @end
 */
 NumberObjectImp::NumberObjectImp(ExecState* exec,
