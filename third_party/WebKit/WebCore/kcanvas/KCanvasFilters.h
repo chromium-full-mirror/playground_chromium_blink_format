@@ -26,6 +26,16 @@
 
 #include "KCanvasResources.h"
 #include <QSizeF>
+#include <qcolor.h>
+#include <qstringlist.h>
+
+#ifdef __OBJC__
+@class CIFilter;
+#else
+class CIFilter;
+#endif
+class KCanvasFilterQuartz;
+
 // Enumerations
 typedef enum {
   FE_DISTANT_LIGHT = 0,
@@ -48,9 +58,6 @@ typedef enum {
   FE_TILE = 17,
   FE_TURBULENCE = 18
 } KCFilterEffectType;
-
-#include <qcolor.h>
-#include <qstringlist.h>
 
 class KCanvasPoint3F {
  public:
@@ -110,16 +117,6 @@ class KCanvasFilter : public KCanvasResource {
 KCanvasFilter* getFilterById(KDOM::DocumentImpl* document,
                              const KDOM::DOMString& id);
 
-#ifdef APPLE_CHANGES
-// FIXME: this strikes me as a total hack...
-#ifdef __OBJC__
-@class CIFilter;
-#else
-class CIFilter;
-#endif
-class KCanvasFilterQuartz;
-#endif
-
 class KCanvasFilterEffect {
  public:
   // this default constructor is only needed for gcc 3.3
@@ -137,8 +134,8 @@ class KCanvasFilterEffect {
   QString result() const;
   void setResult(const QString& result);
 
-#ifdef APPLE_CHANGES
-  virtual CIFilter* getCIFilter(KCanvasFilterQuartz* quartzFilter) const = 0;
+#if __APPLE__
+  virtual CIFilter* getCIFilter(KCanvasFilterQuartz*) const = 0;
 #endif
 
   virtual QTextStream& externalRepresentation(QTextStream&) const;

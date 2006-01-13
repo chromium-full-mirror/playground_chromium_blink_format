@@ -121,11 +121,6 @@ enum {
 typedef unsigned long long DOMTimeStamp;
 
 // Debugging helper
-#ifndef APPLE_CHANGES
-inline kndbgstream& operator<<(kndbgstream& stream, const DOMString& string) {
-  return (stream << string.qstring());
-}
-#endif
 inline kdbgstream& operator<<(kdbgstream& stream, const DOMString& string) {
   return (stream << string.qstring());
 }

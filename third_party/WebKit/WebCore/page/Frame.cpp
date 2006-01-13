@@ -3223,12 +3223,10 @@ void Frame::paint(QPainter* p, const QRect& rect) {
     RenderObject* eltRenderer = _elementToDraw ? _elementToDraw->renderer() : 0;
     renderer()->layer()->paint(p, rect, _drawSelectionOnly, eltRenderer);
 
-#if APPLE_CHANGES
     // Regions may have changed as a result of the visibility/z-index of element
     // changing.
     if (renderer()->document()->dashboardRegionsDirty())
       renderer()->canvas()->view()->updateDashboardRegions();
-#endif
   } else
     ERROR("called Frame::paint with nil renderer");
 }
@@ -3333,9 +3331,8 @@ Frame* Frame::frameForWidget(const QWidget* widget) {
   ASSERT_ARG(widget, widget);
 
   NodeImpl* node = nodeForWidget(widget);
-  if (node) {
+  if (node)
     return frameForNode(node);
-  }
 
   // Assume all widgets are either form controls, or KHTMLViews.
   ASSERT(widget->isKHTMLView());

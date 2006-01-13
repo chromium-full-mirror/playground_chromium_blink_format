@@ -26,15 +26,14 @@
 #include "DOMImplementationImpl.h"
 #include <qstringlist.h>
 
-class KHTMLView;
-
 namespace KDOM {
 class DOMString;
 class DocumentImpl;
 class DocumentTypeImpl;
 class CSSStyleSheetImpl;
-using ::KHTMLView;
-};
+
+typedef KHTMLView KDOMView;
+}
 
 namespace KSVG {
 class SVGDOMImplementationImpl : public DOM::DOMImplementationImpl {
@@ -77,7 +76,7 @@ class SVGDOMImplementationImpl : public DOM::DOMImplementationImpl {
   static SVGDOMImplementationImpl* s_instance;
   static QStringList s_features;
 };
-};
+}
 
 #endif
 
