@@ -1557,11 +1557,10 @@ bool CSSParser::parse4Values(int propId,
 // [ <string> | attr(X) | open-quote | close-quote | no-open-quote |
 // no-close-quote ]+ | inherit
 bool CSSParser::parseContent(int propId, bool important) {
-  CSSValueListImpl* values = new CSSValueListImpl();
+  CSSValueListImpl* values = new CSSValueListImpl;
 
-  Value* val;
-  CSSValueImpl* parsedValue = 0;
-  while ((val = valueList->current())) {
+  while (Value* val = valueList->current()) {
+    CSSValueImpl* parsedValue = 0;
     if (val->unit == CSSPrimitiveValue::CSS_URI) {
       // url
       DOMString value = parseURL(domString(val->string));
@@ -1570,7 +1569,7 @@ bool CSSParser::parseContent(int propId, bool important) {
               KURL(styleElement->baseURL().qstring(), value.qstring()).url()),
           styleElement);
     } else if (val->unit == Value::Function) {
-      // attr( X )
+      // attr(X)
       ValueList* args = val->function->args;
       QString fname = qString(val->function->name).lower();
       if (fname != "attr(" || !args)
@@ -1588,21 +1587,24 @@ bool CSSParser::parseContent(int propId, bool important) {
       // close-quote
       // no-open-quote
       // no-close-quote
+      // FIXME: These are not yet implemented
+      // (http://bugzilla.opendarwin.org/show_bug.cgi?id=6503).
     } else if (val->unit == CSSPrimitiveValue::CSS_STRING) {
       parsedValue = new CSSPrimitiveValueImpl(domString(val->string),
                                               CSSPrimitiveValue::CSS_STRING);
     }
-    if (parsedValue)
-      values->append(parsedValue);
-    else
+    if (!parsedValue)
       break;
+    values->append(parsedValue);
     valueList->next();
   }
+
   if (values->length()) {
     addProperty(propId, values, important);
     valueList->next();
     return true;
   }
+
   delete values;
   return false;
 }
