@@ -59,9 +59,9 @@ extern NSString* WebPlugInAttributesKey;
 extern NSString* WebPlugInContainerKey;
 
 /*!
-        @constant WebPlugInContainingElementKey The DOMElement that was used to
+    @constant WebPlugInContainingElementKey The DOMElement that was used to
    specify
-        the plug-in.  May be nil.
+    the plug-in.  May be nil.
 */
 extern NSString* WebPlugInContainingElementKey;
 
@@ -69,7 +69,7 @@ extern NSString* WebPlugInContainingElementKey;
     @protocol WebPlugInViewFactory
     @discussion WebPlugInViewFactory are used to create the NSView for a
    plug-in.
-        The principal class of the plug-in bundle must implement this protocol.
+    The principal class of the plug-in bundle must implement this protocol.
 */
 
 @protocol WebPlugInViewFactory<NSObject>

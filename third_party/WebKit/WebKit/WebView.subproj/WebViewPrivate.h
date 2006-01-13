@@ -344,7 +344,7 @@ backforward list.
 @end
 
 @interface _WebSafeForwarder : NSObject {
-  id target;  // Non-retained.  Don't retain delegates;
+  id target;  // Non-retained. Don't retain delegates.
   id defaultTarget;
   Class templateClass;
 }
