@@ -25,7 +25,9 @@
 
 #include <kdom/Shared.h>
 
-class QPoint;
+namespace WebCore {
+class IntPoint;
+}
 
 namespace KSVG {
 class SVGMatrixImpl;
@@ -34,7 +36,8 @@ class SVGPointImpl : public KDOM::Shared<SVGPointImpl> {
  public:
   SVGPointImpl(const SVGStyledElementImpl* context = 0);
   SVGPointImpl(float x, float y, const SVGStyledElementImpl* context = 0);
-  SVGPointImpl(const QPoint& p, const SVGStyledElementImpl* context = 0);
+  SVGPointImpl(const WebCore::IntPoint& p,
+               const SVGStyledElementImpl* context = 0);
   ~SVGPointImpl();
 
   // 'SVGPoint' functions

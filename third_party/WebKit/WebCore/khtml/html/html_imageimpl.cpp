@@ -41,7 +41,7 @@
 
 #include <qstring.h>
 #include <qregion.h>
-#include <qpointarray.h>
+#include "IntPointArray.h"
 
 // #define INSTRUMENT_LAYOUT_SCHEDULING 1
 
@@ -527,7 +527,7 @@ bool HTMLAreaElementImpl::mapMouseEvent(int x,
     lasth = height;
   }
 
-  if (!region.contains(QPoint(x, y)))
+  if (!region.contains(IntPoint(x, y)))
     return false;
 
   info.setInnerNode(this);
@@ -563,7 +563,7 @@ QRegion HTMLAreaElementImpl::getRegion(int width, int height) const {
     case Poly:
       if (m_coordsLen >= 6) {
         int numPoints = m_coordsLen / 2;
-        QPointArray points(numPoints);
+        IntPointArray points(numPoints);
         for (int i = 0; i < numPoints; ++i)
           points.setPoint(i, m_coords[i * 2].minWidth(width),
                           m_coords[i * 2 + 1].minWidth(height));

@@ -258,7 +258,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
           centerY = 0;
         imageX = leftBorder + leftPad + centerX;
         imageY = topBorder + topPad + centerY;
-        p->drawPixmap(QPoint(_tx + imageX, _ty + imageY), pix, pix.rect());
+        p->drawPixmap(IntPoint(_tx + imageX, _ty + imageY), pix, pix.rect());
         errorPictureDrawn = true;
       }
 
@@ -322,12 +322,12 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
           resizeCache.resize(s);
 
         p->drawPixmap(
-            QPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
+            IntPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
             resizeCache, scaledrect);
         tintSize = s;
       } else {
         p->drawPixmap(
-            QPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
+            IntPoint(_tx + leftBorder + leftPad, _ty + topBorder + topPad),
             resizeCache);
         tintSize = resizeCache.rect().size();
       }
@@ -347,7 +347,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
                      ? image->valid_rect()
                      : QRect(0, 0, intrinsicWidth(), intrinsicHeight()));
 
-      QPoint offs(_tx + leftBorder + leftPad, _ty + topBorder + topPad);
+      IntPoint offs(_tx + leftBorder + leftPad, _ty + topBorder + topPad);
       //             qDebug("normal paint rect %d/%d/%d/%d", rect.x(), rect.y(),
       //             rect.width(), rect.height());
       //             rect = rect & QRect( 0 , y - offs.y() - 10, w, 10 + y + h

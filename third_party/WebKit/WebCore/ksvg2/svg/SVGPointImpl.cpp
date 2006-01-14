@@ -43,7 +43,8 @@ SVGPointImpl::SVGPointImpl(float x,
   m_context = context;
 }
 
-SVGPointImpl::SVGPointImpl(const QPoint& p, const SVGStyledElementImpl* context)
+SVGPointImpl::SVGPointImpl(const IntPoint& p,
+                           const SVGStyledElementImpl* context)
     : KDOM::Shared<SVGPointImpl>() {
   m_x = p.x();
   m_y = p.y();

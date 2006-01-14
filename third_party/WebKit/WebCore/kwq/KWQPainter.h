@@ -39,7 +39,7 @@ class QFont;
 class QPaintDevice;
 class QPixmap;
 class QPen;
-class QPointArray;
+class IntPointArray;
 class QWidget;
 class QPainterPrivate;
 class QString;
@@ -83,14 +83,17 @@ class QPainter : public Qt {
   void drawLine(int, int, int, int);
   void drawEllipse(int, int, int, int);
   void drawArc(int, int, int, int, int, int);
-  void drawConvexPolygon(const QPointArray&);
+  void drawConvexPolygon(const IntPointArray&);
 
   void fillRect(int, int, int, int, const QBrush&);
   void fillRect(const QRect&, const QBrush&);
 
-  void drawPixmap(const QPoint&, const QPixmap&);
-  void drawPixmap(const QPoint&, const QPixmap&, const QRect&);
-  void drawPixmap(const QPoint&, const QPixmap&, const QRect&, const QString&);
+  void drawPixmap(const IntPoint&, const QPixmap&);
+  void drawPixmap(const IntPoint&, const QPixmap&, const QRect&);
+  void drawPixmap(const IntPoint&,
+                  const QPixmap&,
+                  const QRect&,
+                  const QString&);
 #if __APPLE__
   void drawPixmap(int x,
                   int y,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Apple Computer, Inc.  All rights reserved.
+ * Copyright (C) 2004-6 Apple Computer, Inc.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,53 +20,38 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#import "KWQPointArray.h"
+#ifndef INTPOINTARRAY_H_
+#define INTPOINTARRAY_H_
 
-QPoint::QPoint() : xCoord(0), yCoord(0)
-{
+#include "KWQMemArray.h"
+#include "IntPoint.h"
+
+class QRect;
+
+namespace WebCore {
+
+class IntPointArray : public QMemArray<IntPoint> {
+ public:
+  IntPointArray() {}
+  IntPointArray(int size) : QMemArray<IntPoint>(size) {}
+  IntPointArray(const QRect& rect);
+  IntPointArray(int, const int*);
+
+  QRect boundingRect() const;
+
+  IntPointArray copy() const;
+
+  void point(uint, int*, int*);
+  void setPoint(uint, int, int);
+  bool setPoints(int, int, int, int, int, int, int, int, int);
+  bool setPoints(int nPoints, const int* points);
+};
 }
 
-QPoint::QPoint(int xIn, int yIn) : xCoord(xIn), yCoord(yIn)
-{
-}
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::IntPointArray;
 
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QPoint::QPoint(const NSPoint &p) : xCoord((int)p.x), yCoord((int)p.y)
-{
-}
 #endif
-
-QPoint::QPoint(const CGPoint &p) : xCoord((int)p.x), yCoord((int)p.y)
-{
-}
-
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QPoint::operator NSPoint() const
-{
-    return NSMakePoint(xCoord, yCoord);
-}
-#endif
-
-QPoint::operator CGPoint() const
-{
-    return CGPointMake(xCoord, yCoord);
-}
-
-QPoint operator+(const QPoint &a, const QPoint &b)
-{
-    return QPoint(a.xCoord + b.xCoord, a.yCoord + b.yCoord);
-}
-
-QPoint operator-(const QPoint &a, const QPoint &b)
-{
-    return QPoint(a.xCoord - b.xCoord, a.yCoord - b.yCoord);
-}
-
-const QPoint operator*(const QPoint &p, double s)
-{
-    return QPoint((int)(p.xCoord * s), (int)(p.yCoord * s));
-}

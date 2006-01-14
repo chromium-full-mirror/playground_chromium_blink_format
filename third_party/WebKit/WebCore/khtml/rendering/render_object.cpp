@@ -966,7 +966,7 @@ void RenderObject::drawBorder(QPainter* p,
         c = c.dark();
     /* nobreak; */
     case SOLID:
-      QPointArray quad(4);
+      IntPointArray quad(4);
       p->setPen(Qt::NoPen);
       p->setBrush(c);
       Q_ASSERT(x2 >= x1);

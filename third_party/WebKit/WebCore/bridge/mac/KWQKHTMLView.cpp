@@ -38,6 +38,6 @@ QWidget* KHTMLView::topLevelWidget() const {
   return Mac(frame())->topLevelWidget();
 }
 
-QPoint KHTMLView::viewportToGlobal(const QPoint& p) const {
+IntPoint KHTMLView::viewportToGlobal(const IntPoint& p) const {
   return static_cast<KWQWindowWidget*>(topLevelWidget())->viewportToGlobal(p);
 }

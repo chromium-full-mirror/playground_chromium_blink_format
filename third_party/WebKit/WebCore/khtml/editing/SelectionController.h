@@ -212,7 +212,7 @@ class SelectionController {
   // When asked for caretRect(), we correct m_caretRect for offset due to
   // scrolling since the last layout().
   // This is faster than doing another layout().
-  QPoint m_caretPositionOnLayout;
+  IntPoint m_caretPositionOnLayout;
 
   bool m_baseIsFirst : 1;    // true if base is before the extent
   bool m_needsLayout : 1;    // true if the caret and expectedVisible rectangles

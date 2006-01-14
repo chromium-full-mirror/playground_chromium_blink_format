@@ -1176,7 +1176,7 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
       NodeImpl* node = toNode(args[0]);
       if (node) {
         if (node->isElementNode()) {
-          cb->clipboard->setDragImageElement(node, QPoint(x, y));
+          cb->clipboard->setDragImageElement(node, IntPoint(x, y));
           return jsUndefined();
         } else {
           return throwError(exec, SyntaxError,
@@ -1188,7 +1188,7 @@ JSValue* ClipboardProtoFunc::callAsFunction(ExecState* exec,
       JSObject* o = static_cast<JSObject*>(args[0]);
       if (o->isObject() && o->inherits(&Image::info)) {
         Image* JSImage = static_cast<Image*>(o);
-        cb->clipboard->setDragImage(JSImage->image()->pixmap(), QPoint(x, y));
+        cb->clipboard->setDragImage(JSImage->image()->pixmap(), IntPoint(x, y));
         return jsUndefined();
       } else {
         return throwError(exec, TypeError);

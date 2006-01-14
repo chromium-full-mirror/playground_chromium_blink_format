@@ -1811,8 +1811,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         QWidget* tl = widget->topLevelWidget();
         QRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
-        QPoint dest =
-            tl->pos() + QPoint(args[0]->toInt32(exec), args[1]->toInt32(exec));
+        IntPoint dest = tl->pos() + IntPoint(args[0]->toInt32(exec),
+                                             args[1]->toInt32(exec));
         // Security check (the spec talks about UniversalBrowserWrite to disable
         // this check...)
         if (dest.x() >= sg.x() && dest.y() >= sg.x() &&
@@ -1826,8 +1826,8 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         QWidget* tl = widget->topLevelWidget();
         QRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
-        QPoint dest(args[0]->toInt32(exec) + sg.x(),
-                    args[1]->toInt32(exec) + sg.y());
+        IntPoint dest(args[0]->toInt32(exec) + sg.x(),
+                      args[1]->toInt32(exec) + sg.y());
         // Security check (the spec talks about UniversalBrowserWrite to disable
         // this check...)
         if (dest.x() >= sg.x() && dest.y() >= sg.y() &&

@@ -205,7 +205,7 @@ class MacFrame : public Frame {
                              NSRect* imageRect,
                              NSRect* elementRect) const;
   bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
-                            const QPoint& loc) const;
+                            const IntPoint& loc) const;
 
   NSFont* fontForSelection(bool* hasMultipleFonts) const;
   NSDictionary* fontAttributesForSelectionStart() const;
@@ -235,8 +235,8 @@ class MacFrame : public Frame {
 
   bool dragHysteresisExceeded(float dragLocationX, float dragLocationY) const;
   bool eventMayStartDrag(NSEvent*) const;
-  void dragSourceMovedTo(const QPoint& loc);
-  void dragSourceEndedAt(const QPoint& loc, NSDragOperation operation);
+  void dragSourceMovedTo(const IntPoint& loc);
+  void dragSourceEndedAt(const IntPoint& loc, NSDragOperation operation);
 
   bool mayCut();
   bool mayCopy();

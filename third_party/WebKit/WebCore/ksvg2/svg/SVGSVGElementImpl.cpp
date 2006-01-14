@@ -362,7 +362,7 @@ SVGAngleImpl* SVGSVGElementImpl::createSVGAngle() {
   return new SVGAngleImpl(0);
 }
 
-SVGPointImpl* SVGSVGElementImpl::createSVGPoint(const QPoint& p) {
+SVGPointImpl* SVGSVGElementImpl::createSVGPoint(const IntPoint& p) {
   if (p.isNull())
     return new SVGPointImpl();
   else

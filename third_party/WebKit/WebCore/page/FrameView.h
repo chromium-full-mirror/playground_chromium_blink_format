@@ -181,9 +181,9 @@ class KHTMLView : public QScrollView {
   void keyPressEvent(QKeyEvent* _ke);
   void doAutoScroll();
 
-  bool updateDragAndDrop(const QPoint&, DOM::ClipboardImpl* clipboard);
-  void cancelDragAndDrop(const QPoint&, DOM::ClipboardImpl* clipboard);
-  bool performDragAndDrop(const QPoint&, DOM::ClipboardImpl* clipboard);
+  bool updateDragAndDrop(const IntPoint&, DOM::ClipboardImpl* clipboard);
+  void cancelDragAndDrop(const IntPoint&, DOM::ClipboardImpl* clipboard);
+  bool performDragAndDrop(const IntPoint&, DOM::ClipboardImpl* clipboard);
 
   void timerEvent(QTimerEvent*);
 
@@ -198,9 +198,9 @@ class KHTMLView : public QScrollView {
   bool layoutPending();
 
   QWidget* topLevelWidget() const;
-  QPoint mapToGlobal(const QPoint&) const;
+  IntPoint mapToGlobal(const IntPoint&) const;
   // maps "viewport" (actually Cocoa window coords) to screen coords
-  QPoint viewportToGlobal(const QPoint&) const;
+  IntPoint viewportToGlobal(const IntPoint&) const;
   void adjustViewSize();
   void initScrollBars();
 
@@ -269,7 +269,7 @@ class KHTMLView : public QScrollView {
                           int mouseEventType);
   bool dispatchDragEvent(const DOM::AtomicString& eventType,
                          DOM::NodeImpl* dragTarget,
-                         const QPoint& loc,
+                         const IntPoint& loc,
                          DOM::ClipboardImpl* clipboard);
 
   void applyOverflowToViewport(khtml::RenderObject* o,
