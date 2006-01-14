@@ -387,7 +387,7 @@ class Frame : public ObjectContents {
    */
   void stop();
 
-  void paint(QPainter*, const QRect&);
+  void paint(QPainter*, const IntRect&);
 
   void setEncoding(const QString& encoding, bool userChosen);
 
@@ -554,12 +554,12 @@ class Frame : public ObjectContents {
   /**
    * Paints the caret.
    */
-  void paintCaret(QPainter* p, const QRect& rect) const;
+  void paintCaret(QPainter* p, const IntRect& rect) const;
 
   /**
     * Paints the drag caret.
     */
-  void paintDragCaret(QPainter* p, const QRect& rect) const;
+  void paintDragCaret(QPainter* p, const IntRect& rect) const;
 
   /**
    * Set info for vertical arrow navigation.
@@ -994,7 +994,7 @@ class Frame : public ObjectContents {
   void setMediaType(const QString&);
 
   khtml::RenderObject* renderer() const;
-  QRect selectionRect() const;
+  IntRect selectionRect() const;
   bool isFrameSet() const;
 
   DOM::HTMLFormElementImpl* currentForm() const;

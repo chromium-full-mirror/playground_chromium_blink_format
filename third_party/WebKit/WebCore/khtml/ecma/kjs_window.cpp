@@ -168,7 +168,7 @@ bool Screen::getOwnPropertySlot(ExecState* exec,
 JSValue* Screen::getValueProperty(ExecState* exec, int token) const {
   KWinModule info;
   QWidget* thisWidget = Window::retrieveActive(exec)->frame()->view();
-  QRect sg = QApplication::desktop()->screenGeometry(
+  IntRect sg = QApplication::desktop()->screenGeometry(
       QApplication::desktop()->screenNumber(thisWidget));
 
   switch (token) {
@@ -182,19 +182,19 @@ JSValue* Screen::getValueProperty(ExecState* exec, int token) const {
       return jsNumber(m.depth());
     }
     case AvailLeft: {
-      QRect clipped = info.workArea().intersect(sg);
+      IntRect clipped = info.workArea().intersect(sg);
       return jsNumber(clipped.x() - sg.x());
     }
     case AvailTop: {
-      QRect clipped = info.workArea().intersect(sg);
+      IntRect clipped = info.workArea().intersect(sg);
       return jsNumber(clipped.y() - sg.y());
     }
     case AvailHeight: {
-      QRect clipped = info.workArea().intersect(sg);
+      IntRect clipped = info.workArea().intersect(sg);
       return jsNumber(clipped.height());
     }
     case AvailWidth: {
-      QRect clipped = info.workArea().intersect(sg);
+      IntRect clipped = info.workArea().intersect(sg);
       return jsNumber(clipped.width());
     }
     default:
@@ -655,7 +655,7 @@ static JSValue* showModalDialog(ExecState* exec,
   // dialog (what does it do on Windows?)
   // - unadorned: trusted && boolFeature(features, "unadorned");
 
-  QRect screenRect =
+  IntRect screenRect =
       QApplication::desktop()->availableGeometry(openerWindow->frame()->view());
 
   wargs.width =
@@ -786,7 +786,7 @@ JSValue* Window::getValueProperty(ExecState* exec, int token) const {
     case OuterHeight:
     case OuterWidth: {
       if (m_frame->view()) {
-        QRect frame = m_frame->view()->topLevelWidget()->frameGeometry();
+        IntRect frame = m_frame->view()->topLevelWidget()->frameGeometry();
         return jsNumber(token == OuterHeight ? frame.height() : frame.width());
       } else
         return jsNumber(0);
@@ -1629,7 +1629,7 @@ static void parseWindowFeatures(const QString& features,
   }
 }
 
-static void constrainToVisible(const QRect& screen,
+static void constrainToVisible(const IntRect& screen,
                                KParts::WindowArgs& windowArgs) {
   windowArgs.x += screen.x();
   if (windowArgs.x < screen.x() || windowArgs.x > screen.right())
@@ -1809,7 +1809,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::MoveBy:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
-        QRect sg = QApplication::desktop()->screenGeometry(
+        IntRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         IntPoint dest = tl->pos() + IntPoint(args[0]->toInt32(exec),
                                              args[1]->toInt32(exec));
@@ -1824,7 +1824,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
     case Window::MoveTo:
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
-        QRect sg = QApplication::desktop()->screenGeometry(
+        IntRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         IntPoint dest(args[0]->toInt32(exec) + sg.x(),
                       args[1]->toInt32(exec) + sg.y());
@@ -1841,7 +1841,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
         QWidget* tl = widget->topLevelWidget();
         IntSize dest = tl->size() +
                        IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
-        QRect sg = QApplication::desktop()->screenGeometry(
+        IntRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         // Security check: within desktop limits and bigger than 100x100 (per
         // spec)
@@ -1859,7 +1859,7 @@ JSValue* WindowFunc::callAsFunction(ExecState* exec,
       if (args.size() >= 2 && widget) {
         QWidget* tl = widget->topLevelWidget();
         IntSize dest = IntSize(args[0]->toInt32(exec), args[1]->toInt32(exec));
-        QRect sg = QApplication::desktop()->screenGeometry(
+        IntRect sg = QApplication::desktop()->screenGeometry(
             QApplication::desktop()->screenNumber(tl));
         // Security check: within desktop limits and bigger than 100x100 (per
         // spec)

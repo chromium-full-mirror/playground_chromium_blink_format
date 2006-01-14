@@ -55,8 +55,8 @@ class QComboBox : public QWidget {
   void setCurrentItem(int);
 
   IntSize sizeHint() const;
-  QRect frameGeometry() const;
-  void setFrameGeometry(const QRect&);
+  IntRect frameGeometry() const;
+  void setFrameGeometry(const IntRect&);
   int baselinePosition(int height) const;
   void setFont(const QFont&);
 

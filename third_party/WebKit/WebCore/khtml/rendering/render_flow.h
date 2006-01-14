@@ -86,7 +86,7 @@ class RenderFlow : public RenderContainer {
                     int ty,
                     HitTestAction hitTestAction);
 
-  virtual QRect getAbsoluteRepaintRect();
+  virtual IntRect getAbsoluteRepaintRect();
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const;
@@ -95,18 +95,18 @@ class RenderFlow : public RenderContainer {
   virtual int leftmostPosition(bool includeOverflowInterior = true,
                                bool includeSelf = true) const;
 
-  virtual QRect caretRect(int offset,
-                          EAffinity affinity = UPSTREAM,
-                          int* extraWidthToEndOfLine = 0);
+  virtual IntRect caretRect(int offset,
+                            EAffinity affinity = UPSTREAM,
+                            int* extraWidthToEndOfLine = 0);
 
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
   void paintFocusRing(QPainter* p, int tx, int ty);
   void paintOutlineForLine(QPainter* p,
                            int tx,
                            int ty,
-                           const QRect& prevLine,
-                           const QRect& thisLine,
-                           const QRect& nextLine);
+                           const IntRect& prevLine,
+                           const IntRect& thisLine,
+                           const IntRect& nextLine);
   void paintOutlines(QPainter* p, int tx, int ty);
 
  protected:

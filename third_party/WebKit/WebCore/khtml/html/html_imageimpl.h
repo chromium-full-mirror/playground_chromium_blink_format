@@ -176,7 +176,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
                      int height_,
                      khtml::RenderObject::NodeInfo& info);
 
-  virtual QRect getRect(khtml::RenderObject* obj) const;
+  virtual IntRect getRect(khtml::RenderObject* obj) const;
 
   DOMString accessKey() const;
   void setAccessKey(const DOMString&);

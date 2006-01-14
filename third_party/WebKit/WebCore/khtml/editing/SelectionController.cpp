@@ -28,7 +28,7 @@
 
 #include <qevent.h>
 #include <qpainter.h>
-#include <qrect.h>
+#include "IntRect.h"
 
 #include "dom/dom_node.h"
 #include "dom/dom_string.h"
@@ -470,7 +470,7 @@ static bool caretY(const VisiblePosition& c, int& y) {
   RenderObject* r = p.node()->renderer();
   if (!r)
     return false;
-  QRect rect = r->caretRect(p.offset());
+  IntRect rect = r->caretRect(p.offset());
   if (rect.isEmpty())
     return false;
   y = rect.y() + rect.height() / 2;
@@ -756,14 +756,14 @@ void SelectionController::extend(NodeImpl* node, int offset) {
 void SelectionController::layout() {
   if (isNone() || !m_start.node()->inDocument() ||
       !m_end.node()->inDocument()) {
-    m_caretRect = QRect();
+    m_caretRect = IntRect();
     m_caretPositionOnLayout = IntPoint();
     return;
   }
 
   m_start.node()->getDocument()->updateRendering();
 
-  m_caretRect = QRect();
+  m_caretRect = IntRect();
   m_caretPositionOnLayout = IntPoint();
 
   if (isCaret()) {
@@ -782,12 +782,12 @@ void SelectionController::layout() {
   m_needsLayout = false;
 }
 
-QRect SelectionController::caretRect() const {
+IntRect SelectionController::caretRect() const {
   if (m_needsLayout) {
     const_cast<SelectionController*>(this)->layout();
   }
 
-  QRect caret = m_caretRect;
+  IntRect caret = m_caretRect;
 
   if (m_start.node() && m_start.node()->renderer()) {
     int x, y;
@@ -799,13 +799,13 @@ QRect SelectionController::caretRect() const {
   return caret;
 }
 
-QRect SelectionController::caretRepaintRect() const {
+IntRect SelectionController::caretRepaintRect() const {
   // FIXME: Add one pixel of slop on each side to make sure we don't leave
   // behind artifacts.
-  QRect r = caretRect();
+  IntRect r = caretRect();
   if (r.isEmpty())
-    return QRect();
-  return QRect(r.left() - 1, r.top() - 1, r.width() + 2, r.height() + 2);
+    return IntRect();
+  return IntRect(r.left() - 1, r.top() - 1, r.width() + 2, r.height() + 2);
 }
 
 void SelectionController::needsCaretRepaint() {
@@ -840,14 +840,14 @@ void SelectionController::needsCaretRepaint() {
   v->updateContents(caretRepaintRect(), false);
 }
 
-void SelectionController::paintCaret(QPainter* p, const QRect& rect) {
+void SelectionController::paintCaret(QPainter* p, const IntRect& rect) {
   if (m_state != CARET)
     return;
 
   if (m_needsLayout)
     layout();
 
-  QRect caret = caretRect();
+  IntRect caret = caretRect();
 
   if (caret.isValid())
     p->fillRect(caret & rect, QBrush());

@@ -28,7 +28,7 @@
 
 #include "KWQFontMetrics.h"
 #include "KWQNamespace.h"
-#include "KWQRect.h"
+#include "IntRect.h"
 
 #if __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
@@ -74,7 +74,7 @@ class QPainter : public Qt {
   void setBrush(BrushStyle);
   void setBrush(QRgb);
 
-  QRect xForm(const QRect&) const;
+  IntRect xForm(const IntRect&) const;
 
   void save();
   void restore();
@@ -86,13 +86,13 @@ class QPainter : public Qt {
   void drawConvexPolygon(const IntPointArray&);
 
   void fillRect(int, int, int, int, const QBrush&);
-  void fillRect(const QRect&, const QBrush&);
+  void fillRect(const IntRect&, const QBrush&);
 
   void drawPixmap(const IntPoint&, const QPixmap&);
-  void drawPixmap(const IntPoint&, const QPixmap&, const QRect&);
+  void drawPixmap(const IntPoint&, const QPixmap&, const IntRect&);
   void drawPixmap(const IntPoint&,
                   const QPixmap&,
-                  const QRect&,
+                  const IntRect&,
                   const QString&);
 #if __APPLE__
   void drawPixmap(int x,
@@ -190,8 +190,8 @@ class QPainter : public Qt {
                                 TileRule vRule = STRETCH);
 #endif
 
-  void addClip(const QRect&);
-  void addRoundedRectClip(const QRect& rect,
+  void addClip(const IntRect&);
+  void addRoundedRectClip(const IntRect& rect,
                           const IntSize& topLeft,
                           const IntSize& topRight,
                           const IntSize& bottomLeft,

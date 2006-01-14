@@ -83,9 +83,9 @@ class RenderBox : public RenderObject {
   virtual void setWidth(int width) { m_width = width; }
   virtual void setHeight(int height) { m_height = height; }
 
-  virtual QRect borderBox() const {
-    return QRect(0, -borderTopExtra(), width(),
-                 height() + borderTopExtra() + borderBottomExtra());
+  virtual IntRect borderBox() const {
+    return IntRect(0, -borderTopExtra(), width(),
+                   height() + borderTopExtra() + borderBottomExtra());
   }
 
   int calcBorderBoxWidth(int w) const;
@@ -123,8 +123,8 @@ class RenderBox : public RenderObject {
   virtual int leftmostPosition(bool includeOverflowInterior = true,
                                bool includeSelf = true) const;
 
-  virtual QRect getAbsoluteRepaintRect();
-  virtual void computeAbsoluteRepaintRect(QRect& r, bool f = false);
+  virtual IntRect getAbsoluteRepaintRect();
+  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f = false);
 
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
 
@@ -158,9 +158,9 @@ class RenderBox : public RenderObject {
 
   virtual RenderLayer* layer() const { return m_layer; }
 
-  virtual QRect caretRect(int offset,
-                          EAffinity affinity = UPSTREAM,
-                          int* extraWidthToEndOfLine = 0);
+  virtual IntRect caretRect(int offset,
+                            EAffinity affinity = UPSTREAM,
+                            int* extraWidthToEndOfLine = 0);
 
   virtual void paintBackgroundExtended(QPainter* p,
                                        const QColor& c,
@@ -229,8 +229,8 @@ class RenderBox : public RenderObject {
                                   int& mb,
                                   int& y);
 
-  virtual QRect getOverflowClipRect(int tx, int ty);
-  virtual QRect getClipRect(int tx, int ty);
+  virtual IntRect getOverflowClipRect(int tx, int ty);
+  virtual IntRect getClipRect(int tx, int ty);
 
   // the actual height of the contents + borders + padding
   int m_height;

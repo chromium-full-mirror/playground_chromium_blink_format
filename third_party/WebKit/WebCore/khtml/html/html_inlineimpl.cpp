@@ -78,11 +78,11 @@ bool HTMLAnchorElementImpl::isFocusable() const {
       return true;
   }
 
-  QValueList<QRect> rects;
+  QValueList<IntRect> rects;
   int x = 0, y = 0;
   m_render->absolutePosition(x, y);
   m_render->absoluteRects(rects, x, y);
-  for (QValueList<QRect>::ConstIterator it = rects.begin(); it != rects.end();
+  for (QValueList<IntRect>::ConstIterator it = rects.begin(); it != rects.end();
        ++it) {
     if ((*it).isValid())
       return true;

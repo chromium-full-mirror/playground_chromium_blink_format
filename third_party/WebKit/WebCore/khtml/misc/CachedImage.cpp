@@ -100,11 +100,11 @@ IntSize CachedImage::pixmap_size() const {
   return (p ? p->size() : IntSize());
 }
 
-QRect CachedImage::valid_rect() const {
-  return (p ? p->rect() : QRect());
+IntRect CachedImage::valid_rect() const {
+  return (p ? p->rect() : IntRect());
 }
 
-void CachedImage::do_notify(const QPixmap& p, const QRect& r) {
+void CachedImage::do_notify(const QPixmap& p, const IntRect& r) {
   CachedObjectClientWalker w(m_clients);
   while (CachedObjectClient* c = w.next())
     c->setPixmap(p, r, this);
@@ -185,7 +185,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
 void CachedImage::error(int /*err*/, const char* /*text*/) {
   clear();
   errorOccured = true;
-  do_notify(pixmap(), QRect(0, 0, 16, 16));
+  do_notify(pixmap(), IntRect(0, 0, 16, 16));
   m_loading = false;
   checkNotify();
 }

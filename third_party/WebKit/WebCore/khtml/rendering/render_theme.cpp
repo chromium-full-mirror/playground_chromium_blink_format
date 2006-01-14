@@ -65,7 +65,7 @@ void RenderTheme::adjustStyle(CSSStyleSelector* selector,
 
 bool RenderTheme::paint(RenderObject* o,
                         const RenderObject::PaintInfo& i,
-                        const QRect& r) {
+                        const IntRect& r) {
   // If painting is disabled, but we aren't updating control tints, then just
   // bail.
   // If we are updating control tints, just schedule a repaint if the theme

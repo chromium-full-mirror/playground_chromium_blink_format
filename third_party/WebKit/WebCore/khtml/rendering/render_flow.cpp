@@ -485,7 +485,7 @@ bool RenderFlow::hitTestLines(NodeInfo& i,
   return false;
 }
 
-QRect RenderFlow::getAbsoluteRepaintRect() {
+IntRect RenderFlow::getAbsoluteRepaintRect() {
   if (isInlineFlow()) {
     // Find our leftmost position.
     int left = 0;
@@ -510,7 +510,7 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
         inlineFlow->layer()->relativePositionOffset(left, top);
     }
 
-    QRect r(-ow + left, -ow + top, width() + ow * 2, height() + ow * 2);
+    IntRect r(-ow + left, -ow + top, width() + ow * 2, height() + ow * 2);
     if (cb->hasOverflowClip()) {
       // cb->height() is inaccurate if we're in the middle of a layout of |cb|,
       // so use the
@@ -519,10 +519,10 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
       // anyway if its size does change.
       int x = r.left();
       int y = r.top();
-      QRect boxRect(0, 0, cb->layer()->width(), cb->layer()->height());
+      IntRect boxRect(0, 0, cb->layer()->width(), cb->layer()->height());
       cb->layer()->subtractScrollOffset(x,
                                         y);  // For overflow:auto/scroll/hidden.
-      QRect repaintRect(x, y, r.width(), r.height());
+      IntRect repaintRect(x, y, r.width(), r.height());
       r = repaintRect.intersect(boxRect);
     }
     cb->computeAbsoluteRepaintRect(r);
@@ -531,13 +531,14 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
       for (RenderObject* curr = firstChild(); curr;
            curr = curr->nextSibling()) {
         if (!curr->isText()) {
-          QRect childRect = curr->getAbsoluteRepaintRectWithOutline(ow);
+          IntRect childRect = curr->getAbsoluteRepaintRectWithOutline(ow);
           r = r.unite(childRect);
         }
       }
 
       if (continuation() && !continuation()->isInline()) {
-        QRect contRect = continuation()->getAbsoluteRepaintRectWithOutline(ow);
+        IntRect contRect =
+            continuation()->getAbsoluteRepaintRectWithOutline(ow);
         r = r.unite(contRect);
       }
     }
@@ -546,9 +547,9 @@ QRect RenderFlow::getAbsoluteRepaintRect() {
   } else {
     if (firstLineBox() && firstLineBox()->topOverflow() < 0) {
       int ow = style() ? style()->outlineSize() : 0;
-      QRect r(-ow, -ow + firstLineBox()->topOverflow(),
-              overflowWidth(false) + ow * 2,
-              overflowHeight(false) + ow * 2 - firstLineBox()->topOverflow());
+      IntRect r(-ow, -ow + firstLineBox()->topOverflow(),
+                overflowWidth(false) + ow * 2,
+                overflowHeight(false) + ow * 2 - firstLineBox()->topOverflow());
       computeAbsoluteRepaintRect(r);
       return r;
     }
@@ -629,9 +630,9 @@ int RenderFlow::leftmostPosition(bool includeOverflowInterior,
   return left;
 }
 
-QRect RenderFlow::caretRect(int offset,
-                            EAffinity affinity,
-                            int* extraWidthToEndOfLine) {
+IntRect RenderFlow::caretRect(int offset,
+                              EAffinity affinity,
+                              int* extraWidthToEndOfLine) {
   if (firstChild() || style()->display() == INLINE) {
     // Do the normal calculation
     return RenderContainer::caretRect(offset, affinity, extraWidthToEndOfLine);
@@ -696,7 +697,7 @@ QRect RenderFlow::caretRect(int offset,
   _x += absx + paddingLeft() + borderLeft();
   _y += absy + paddingTop() + borderTop();
 
-  return QRect(_x, _y, width, height);
+  return IntRect(_x, _y, width, height);
 }
 
 void RenderFlow::addFocusRingRects(QPainter* p, int _tx, int _ty) {
@@ -735,15 +736,15 @@ void RenderFlow::paintOutlines(QPainter* p, int _tx, int _ty) {
   if (style()->outlineStyle() <= BHIDDEN)
     return;
 
-  QPtrList<QRect> rects;
+  QPtrList<IntRect> rects;
   rects.setAutoDelete(true);
 
-  rects.append(new QRect(0, 0, 0, 0));
+  rects.append(new IntRect(0, 0, 0, 0));
   for (InlineRunBox* curr = firstLineBox(); curr; curr = curr->nextLineBox()) {
     rects.append(
-        new QRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
+        new IntRect(curr->xPos(), curr->yPos(), curr->width(), curr->height()));
   }
-  rects.append(new QRect(0, 0, 0, 0));
+  rects.append(new IntRect(0, 0, 0, 0));
 
   for (unsigned int i = 1; i < rects.count() - 1; i++)
     paintOutlineForLine(p, _tx, _ty, *rects.at(i - 1), *rects.at(i),
@@ -753,9 +754,9 @@ void RenderFlow::paintOutlines(QPainter* p, int _tx, int _ty) {
 void RenderFlow::paintOutlineForLine(QPainter* p,
                                      int tx,
                                      int ty,
-                                     const QRect& lastline,
-                                     const QRect& thisline,
-                                     const QRect& nextline) {
+                                     const IntRect& lastline,
+                                     const IntRect& thisline,
+                                     const IntRect& nextline) {
   int ow = style()->outlineWidth();
   EBorderStyle os = style()->outlineStyle();
   QColor oc = style()->outlineColor();

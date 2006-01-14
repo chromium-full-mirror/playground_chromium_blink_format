@@ -84,11 +84,13 @@ void RenderImage::setImage(CachedImage* newImage) {
     if (image)
       image->ref(this);
     if (image->isErrorImage())
-      setPixmap(image->pixmap(), QRect(0, 0, 16, 16), image);
+      setPixmap(image->pixmap(), IntRect(0, 0, 16, 16), image);
   }
 }
 
-void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
+void RenderImage::setPixmap(const QPixmap& p,
+                            const IntRect& r,
+                            CachedImage* o) {
   if (o != image) {
     RenderReplaced::setPixmap(p, r, o);
     return;
@@ -103,7 +105,7 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
     // we have an alt and the user meant it (its not a text we invented)
     if (!alt.isEmpty()) {
       const QFontMetrics& fm = style()->fontMetrics();
-      QRect br =
+      IntRect br =
           fm.boundingRect(0, 0, 1024, 256, Qt::AlignAuto | Qt::WordBreak,
                           alt.qstring(), 0, 0);  // FIX: correct tabwidth?
       if (br.width() > iw)
@@ -175,9 +177,9 @@ void RenderImage::setPixmap(const QPixmap& p, const QRect& r, CachedImage* o) {
     // full pixmap
     // rect at the moment anyway.
     resizeCache = QPixmap();
-    repaintRectangle(QRect(borderLeft() + paddingLeft(),
-                           borderTop() + paddingTop(), contentWidth(),
-                           contentHeight()));
+    repaintRectangle(IntRect(borderLeft() + paddingLeft(),
+                             borderTop() + paddingTop(), contentWidth(),
+                             contentHeight()));
   }
 }
 
@@ -290,7 +292,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
         pix.width() > 0 && pix.height() > 0 && image->valid_rect().isValid()) {
       IntSize tintSize;
       if (resizeCache.isNull() && cWidth && cHeight) {
-        QRect scaledrect(image->valid_rect());
+        IntRect scaledrect(image->valid_rect());
         //                 kdDebug(6040) << "time elapsed: " << dt->elapsed() <<
         //                 endl;
         //                  kdDebug( 6040 ) << "have to scale: " << endl;
@@ -333,7 +335,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       }
       if (drawSelectionTint) {
         QBrush brush(selectionColor(p));
-        QRect selRect(selectionRect());
+        IntRect selRect(selectionRect());
         p->fillRect(selRect.x(), selRect.y(), selRect.width(), selRect.height(),
                     brush);
       }
@@ -343,14 +345,14 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       // is still invalid
       // so use intrinsic Size instead.
       // ### maybe no progressive loading for the second image ?
-      QRect rect(image->valid_rect().isValid()
-                     ? image->valid_rect()
-                     : QRect(0, 0, intrinsicWidth(), intrinsicHeight()));
+      IntRect rect(image->valid_rect().isValid()
+                       ? image->valid_rect()
+                       : IntRect(0, 0, intrinsicWidth(), intrinsicHeight()));
 
       IntPoint offs(_tx + leftBorder + leftPad, _ty + topBorder + topPad);
       //             qDebug("normal paint rect %d/%d/%d/%d", rect.x(), rect.y(),
       //             rect.width(), rect.height());
-      //             rect = rect & QRect( 0 , y - offs.y() - 10, w, 10 + y + h
+      //             rect = rect & IntRect( 0 , y - offs.y() - 10, w, 10 + y + h
       //             - offs.y());
 
       //             qDebug("normal paint rect after %d/%d/%d/%d", rect.x(),
@@ -359,7 +361,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       //             offs.y(), y, y - offs.y());
       //             qDebug("");
 
-      //           p->setClipRect(QRect(x,y,w,h));
+      //           p->setClipRect(IntRect(x,y,w,h));
 
       //             p->drawPixmap( offs.x(), y, pix, rect.x(), rect.y(),
       //             rect.width(), rect.height() );
@@ -374,7 +376,7 @@ void RenderImage::paint(PaintInfo& i, int _tx, int _ty) {
       }
       if (drawSelectionTint) {
         QBrush brush(selectionColor(p));
-        QRect selRect(selectionRect());
+        IntRect selRect(selectionRect());
         p->fillRect(selRect.x(), selRect.y(), selRect.width(), selRect.height(),
                     brush);
       }
@@ -386,7 +388,7 @@ void RenderImage::layout() {
   KHTMLAssert(needsLayout());
   KHTMLAssert(minMaxKnown());
 
-  QRect oldBounds;
+  IntRect oldBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     oldBounds = getAbsoluteRepaintRect();

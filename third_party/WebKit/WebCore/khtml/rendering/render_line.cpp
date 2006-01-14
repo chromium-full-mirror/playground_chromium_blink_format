@@ -249,9 +249,9 @@ bool InlineBox::canAccommodateEllipsis(bool ltr,
   if (!m_object || !m_object->isReplaced())
     return true;
 
-  QRect boxRect(m_x, 0, m_width, 10);
-  QRect ellipsisRect(ltr ? blockEdge - ellipsisWidth : blockEdge, 0,
-                     ellipsisWidth, 10);
+  IntRect boxRect(m_x, 0, m_width, 10);
+  IntRect ellipsisRect(ltr ? blockEdge - ellipsisWidth : blockEdge, 0,
+                       ellipsisWidth, 10);
   return !(boxRect.intersects(ellipsisRect));
 }
 
@@ -754,7 +754,7 @@ bool InlineFlowBox::nodeAtPoint(RenderObject::NodeInfo& i,
   }
 
   // Now check ourselves.
-  QRect rect(tx + m_x, ty + m_y, m_width, m_height);
+  IntRect rect(tx + m_x, ty + m_y, m_width, m_height);
   if (object()->style()->visibility() == VISIBLE && rect.contains(x, y)) {
     object()->setInnerNode(i);
     return true;
@@ -855,7 +855,7 @@ void InlineFlowBox::paintBackground(QPainter* p,
     int totalWidth = xOffsetOnLine;
     for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
       totalWidth += curr->width();
-    QRect clipRect(_tx, _ty, width(), height());
+    IntRect clipRect(_tx, _ty, width(), height());
     clipRect = p->xForm(clipRect);
     p->save();
     p->addClip(clipRect);
@@ -939,7 +939,7 @@ void InlineFlowBox::paintBackgroundAndBorder(RenderObject::PaintInfo& i,
         int totalWidth = xOffsetOnLine;
         for (InlineRunBox* curr = this; curr; curr = curr->nextLineBox())
           totalWidth += curr->width();
-        QRect clipRect(_tx, _ty, width(), height());
+        IntRect clipRect(_tx, _ty, width(), height());
         clipRect = p->xForm(clipRect);
         p->save();
         p->addClip(clipRect);
@@ -1161,7 +1161,7 @@ bool EllipsisBox::nodeAtPoint(RenderObject::NodeInfo& info,
     }
   }
 
-  QRect rect(_tx + m_x, _ty + m_y, m_width, m_height);
+  IntRect rect(_tx + m_x, _ty + m_y, m_width, m_height);
   if (object()->style()->visibility() == VISIBLE && rect.contains(_x, _y)) {
     object()->setInnerNode(info);
     return true;

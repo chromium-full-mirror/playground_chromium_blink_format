@@ -55,7 +55,7 @@ class CachedImage : public QObject, public CachedObject {
 
   IntSize pixmap_size()
       const;  // returns the size of the complete (i.e. when finished) loading
-  QRect valid_rect()
+  IntRect valid_rect()
       const;  // returns the rectangle of pixmap that has been loaded already
 
   void ref(CachedObjectClient* consumer);
@@ -78,7 +78,7 @@ class CachedImage : public QObject, public CachedObject {
   void clear();
 
  private:
-  void do_notify(const QPixmap& p, const QRect& r);
+  void do_notify(const QPixmap& p, const IntRect& r);
 
   QPixmap* p;
   QPixmap* bg;

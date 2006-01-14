@@ -26,7 +26,7 @@
 #ifndef KHTML_EDITING_SELECTION_H
 #define KHTML_EDITING_SELECTION_H
 
-#include <qrect.h>
+#include "IntRect.h"
 #include <kxmlcore/PassRefPtr.h>
 #include "xml/dom_position.h"
 #include "text_granularity.h"
@@ -100,7 +100,7 @@ class SelectionController {
   Position start() const { return m_start; }
   Position end() const { return m_end; }
 
-  QRect caretRect() const;
+  IntRect caretRect() const;
   void setNeedsLayout(bool flag = true);
 
   void clearModifyBias() { m_modifyBiasSet = false; }
@@ -192,8 +192,8 @@ class SelectionController {
 
   void layout();
   void needsCaretRepaint();
-  void paintCaret(QPainter* p, const QRect& rect);
-  QRect caretRepaintRect() const;
+  void paintCaret(QPainter* p, const IntRect& rect);
+  IntRect caretRepaintRect() const;
 
   int xPosForVerticalArrowNavigation(EPositionType, bool recalc = false) const;
 
@@ -205,7 +205,7 @@ class SelectionController {
   EState m_state;        // the state of the selection
   EAffinity m_affinity;  // the upstream/downstream affinity of the selection
 
-  QRect m_caretRect;  // caret coordinates, size, and position
+  IntRect m_caretRect;  // caret coordinates, size, and position
 
   // m_caretPositionOnLayout stores the scroll offset on the previous call to
   // SelectionController::layout().

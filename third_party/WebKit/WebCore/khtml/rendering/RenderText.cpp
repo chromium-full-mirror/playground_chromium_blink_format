@@ -197,10 +197,10 @@ PassRefPtr<DOMStringImpl> RenderText::originalString() const {
   return element() ? element()->string() : 0;
 }
 
-void RenderText::absoluteRects(QValueList<QRect>& rects, int _tx, int _ty) {
+void RenderText::absoluteRects(QValueList<IntRect>& rects, int _tx, int _ty) {
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox())
-    rects.append(QRect(_tx + box->xPos(), _ty + box->yPos(), box->width(),
-                       box->height()));
+    rects.append(IntRect(_tx + box->xPos(), _ty + box->yPos(), box->width(),
+                         box->height()));
 }
 
 InlineTextBox* RenderText::findNextInlineTextBox(int offset, int& pos) const {
@@ -336,11 +336,11 @@ bool RenderText::atLineWrap(InlineTextBox* box, int offset) {
   return false;
 }
 
-QRect RenderText::caretRect(int offset,
-                            EAffinity affinity,
-                            int* extraWidthToEndOfLine) {
+IntRect RenderText::caretRect(int offset,
+                              EAffinity affinity,
+                              int* extraWidthToEndOfLine) {
   if (!firstTextBox() || stringLength() == 0)
-    return QRect();
+    return IntRect();
 
   // Find the text box for the given offset
   InlineTextBox* box = 0;
@@ -370,7 +370,7 @@ QRect RenderText::caretRect(int offset,
   }
 
   if (!box) {
-    return QRect();
+    return IntRect();
   }
 
   int height = box->root()->bottomOverflow() - box->root()->topOverflow();
@@ -399,7 +399,7 @@ QRect RenderText::caretRect(int offset,
   if (style()->autoWrap())
     left = kMin(left, absx + box->m_x + availableWidth - 1);
 
-  return QRect(left, top, 1, height);
+  return IntRect(left, top, 1, height);
 }
 
 void RenderText::posOfChar(int chr, int& x, int& y) {
@@ -1033,13 +1033,13 @@ int RenderText::width() const {
   return kMax(0, maxx - minx);
 }
 
-QRect RenderText::getAbsoluteRepaintRect() {
+IntRect RenderText::getAbsoluteRepaintRect() {
   RenderObject* cb = containingBlock();
   return cb->getAbsoluteRepaintRect();
 }
 
-QRect RenderText::selectionRect() {
-  QRect rect;
+IntRect RenderText::selectionRect() {
+  IntRect rect;
   if (selectionState() == SelectionNone)
     return rect;
   RenderBlock* cb = containingBlock();
@@ -1070,7 +1070,7 @@ QRect RenderText::selectionRect() {
   if (layer)
     layer->subtractScrollOffset(absx, absy);
   for (InlineTextBox* box = firstTextBox(); box; box = box->nextTextBox()) {
-    QRect r = box->selectionRect(absx, absy, startPos, endPos);
+    IntRect r = box->selectionRect(absx, absy, startPos, endPos);
     if (!r.isEmpty()) {
       if (rect.isEmpty())
         rect = r;

@@ -578,7 +578,7 @@ bool RenderFrameSet::userResize(MouseEventImpl* evt) {
     paint.setPen(Qt::gray);
     paint.setBrush(Qt::gray);
 
-    QRect r(xPos(), yPos(), width(), height());
+    IntRect r(xPos(), yPos(), width(), height());
     const int rBord = 3;
     int sw = element()->border();
     int p = m_resizing ? (m_vSplit > -1 ? _x : _y) : -1;
@@ -1029,7 +1029,7 @@ void RenderPart::updateWidgetPosition() {
       m_width - borderLeft() - borderRight() - paddingLeft() - paddingRight();
   height =
       m_height - borderTop() - borderBottom() - paddingTop() - paddingBottom();
-  QRect newBounds(x, y, width, height);
+  IntRect newBounds(x, y, width, height);
   if (newBounds != m_widget->frameGeometry()) {
     // The widget changed positions.  Update the frame geometry.
     RenderArena* arena = ref();

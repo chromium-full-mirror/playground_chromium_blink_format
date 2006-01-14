@@ -58,7 +58,7 @@ void RenderSVGImage::paint(PaintInfo& paintInfo, int parentX, int parentY) {
   context->concatCTM(QMatrix().translate(parentX, parentY));
   translateForAttributes();
 
-  QRectF boundingBox(0, 0, width(), height());
+  FloatRect boundingBox(0, 0, width(), height());
 
   if (KCanvasClipper* clipper =
           getClipperById(document(), style()->svgStyle()->clipPath().mid(1)))

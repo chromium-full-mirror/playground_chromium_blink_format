@@ -294,7 +294,7 @@ class RenderTableRow : public RenderContainer {
   virtual void position(int, int, int, int, int, bool, bool, int) {}
 
   virtual void layout();
-  virtual QRect getAbsoluteRepaintRect();
+  virtual IntRect getAbsoluteRepaintRect();
 
   RenderTable* table() const {
     return static_cast<RenderTable*>(parent()->parent());
@@ -370,7 +370,7 @@ class RenderTableCell : public RenderBlock {
   // lie position to outside observers
   virtual int yPos() const { return m_y + _topExtra; }
 
-  virtual void computeAbsoluteRepaintRect(QRect& r, bool f = false);
+  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f = false);
   virtual bool absolutePosition(int& xPos, int& yPos, bool f = false);
 
   virtual short baselinePosition(bool = false) const;
@@ -389,7 +389,7 @@ class RenderTableCell : public RenderBlock {
   virtual void dump(QTextStream* stream, QString ind = "") const;
 #endif
 
-  virtual QRect getAbsoluteRepaintRect();
+  virtual IntRect getAbsoluteRepaintRect();
 
  protected:
   virtual void paintBoxDecorations(PaintInfo& i, int _tx, int _ty);

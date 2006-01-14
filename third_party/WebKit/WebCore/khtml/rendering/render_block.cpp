@@ -376,12 +376,12 @@ int RenderBlock::overflowTop(bool includeInterior) const {
   return (!includeInterior && hasOverflowClip()) ? 0 : m_overflowTop;
 }
 
-QRect RenderBlock::overflowRect(bool includeInterior) const {
+IntRect RenderBlock::overflowRect(bool includeInterior) const {
   if (!includeInterior && hasOverflowClip())
     return borderBox();
   int l = overflowLeft(includeInterior);
   int t = kMin(overflowTop(includeInterior), -borderTopExtra());
-  return QRect(
+  return IntRect(
       l, t, m_overflowWidth - 2 * l,
       m_overflowHeight + borderTopExtra() + borderBottomExtra() - 2 * t);
 }
@@ -465,7 +465,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     return;
   }
 
-  QRect oldBounds, oldFullBounds;
+  IntRect oldBounds, oldFullBounds;
   bool checkForRepaint = checkForRepaintDuringLayout();
   if (checkForRepaint)
     getAbsoluteRepaintRectIncludingFloats(oldBounds, oldFullBounds);
@@ -528,7 +528,7 @@ void RenderBlock::layoutBlock(bool relayoutChildren) {
     m_layer->moveScrollbarsAside();
   }
 
-  QRect repaintRect;
+  IntRect repaintRect;
   if (childrenInline())
     repaintRect = layoutInlineChildren(relayoutChildren);
   else
@@ -1284,8 +1284,8 @@ void RenderBlock::markPositionedObjectsForLayout() {
   }
 }
 
-void RenderBlock::getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
-                                                        QRect& fullBounds) {
+void RenderBlock::getAbsoluteRepaintRectIncludingFloats(IntRect& bounds,
+                                                        IntRect& fullBounds) {
   bounds = fullBounds = getAbsoluteRepaintRect();
 
   // Include any overhanging floats (if we know we're the one to paint them).
@@ -1302,7 +1302,7 @@ void RenderBlock::getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
       // in
       // its own layer.
       if (!r->noPaint && !r->node->layer()) {
-        QRect childRect, childFullRect;
+        IntRect childRect, childFullRect;
         r->node->getAbsoluteRepaintRectIncludingFloats(childRect,
                                                        childFullRect);
         fullBounds = fullBounds.unite(childFullRect);
@@ -1348,7 +1348,7 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
 
   // Check if we need to do anything at all.
   if (!isInlineFlow() && !isRoot()) {
-    QRect overflowBox = overflowRect(false);
+    IntRect overflowBox = overflowRect(false);
     overflowBox.inflate(maximalOutlineSize(i.phase));
     overflowBox.setX(overflowBox.x() + _tx);
     overflowBox.setY(overflowBox.y() + _ty);
@@ -1357,7 +1357,7 @@ void RenderBlock::paint(PaintInfo& i, int _tx, int _ty) {
       // Check floats next.
       if (i.phase != PaintActionFloat)
         return;
-      QRect floatBox = floatRect();
+      IntRect floatBox = floatRect();
       floatBox.inflate(maximalOutlineSize(i.phase));
       floatBox.setX(floatBox.x() + _tx);
       floatBox.setY(floatBox.y() + _ty);
@@ -1803,16 +1803,16 @@ GapRects RenderBlock::fillBlockSelectionGaps(RenderBlock* rootBlock,
   return result;
 }
 
-QRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
-                                              int xPos,
-                                              int yPos,
-                                              int width,
-                                              int height,
-                                              const PaintInfo* i) {
+IntRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
+                                                int xPos,
+                                                int yPos,
+                                                int width,
+                                                int height,
+                                                const PaintInfo* i) {
   if (width <= 0 || height <= 0)
-    return QRect();
+    return IntRect();
 
-  QRect gapRect(xPos, yPos, width, height);
+  IntRect gapRect(xPos, yPos, width, height);
   if (i) {
     // Paint the rect.
     QBrush selBrush(selObj->selectionColor(i->p));
@@ -1821,18 +1821,18 @@ QRect RenderBlock::fillHorizontalSelectionGap(RenderObject* selObj,
   return gapRect;
 }
 
-QRect RenderBlock::fillVerticalSelectionGap(int lastTop,
-                                            int lastLeft,
-                                            int lastRight,
-                                            int bottomY,
-                                            RenderBlock* rootBlock,
-                                            int blockX,
-                                            int blockY,
-                                            const PaintInfo* i) {
+IntRect RenderBlock::fillVerticalSelectionGap(int lastTop,
+                                              int lastLeft,
+                                              int lastRight,
+                                              int bottomY,
+                                              RenderBlock* rootBlock,
+                                              int blockX,
+                                              int blockY,
+                                              const PaintInfo* i) {
   int top = blockY + lastTop;
   int height = bottomY - top;
   if (height <= 0)
-    return QRect();
+    return IntRect();
 
   // Get the selection offsets for the bottom of the gap
   int left = blockX + kMax(lastLeft, leftSelectionOffset(rootBlock, bottomY));
@@ -1840,9 +1840,9 @@ QRect RenderBlock::fillVerticalSelectionGap(int lastTop,
       blockX + kMin(lastRight, rightSelectionOffset(rootBlock, bottomY));
   int width = right - left;
   if (width <= 0)
-    return QRect();
+    return IntRect();
 
-  QRect gapRect(left, top, width, height);
+  IntRect gapRect(left, top, width, height);
   if (i) {
     // Paint the rect.
     QBrush selBrush(selectionColor(i->p));
@@ -1851,24 +1851,24 @@ QRect RenderBlock::fillVerticalSelectionGap(int lastTop,
   return gapRect;
 }
 
-QRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
-                                        int xPos,
-                                        int yPos,
-                                        int height,
-                                        RenderBlock* rootBlock,
-                                        int blockX,
-                                        int blockY,
-                                        int tx,
-                                        int ty,
-                                        const PaintInfo* i) {
+IntRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
+                                          int xPos,
+                                          int yPos,
+                                          int height,
+                                          RenderBlock* rootBlock,
+                                          int blockX,
+                                          int blockY,
+                                          int tx,
+                                          int ty,
+                                          const PaintInfo* i) {
   int top = yPos + ty;
   int left = blockX + kMax(leftSelectionOffset(rootBlock, yPos),
                            leftSelectionOffset(rootBlock, yPos + height));
   int width = tx + xPos - left;
   if (width <= 0)
-    return QRect();
+    return IntRect();
 
-  QRect gapRect(left, top, width, height);
+  IntRect gapRect(left, top, width, height);
   if (i) {
     // Paint the rect.
     QBrush selBrush(selObj->selectionColor(i->p));
@@ -1877,25 +1877,25 @@ QRect RenderBlock::fillLeftSelectionGap(RenderObject* selObj,
   return gapRect;
 }
 
-QRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
-                                         int xPos,
-                                         int yPos,
-                                         int height,
-                                         RenderBlock* rootBlock,
-                                         int blockX,
-                                         int blockY,
-                                         int tx,
-                                         int ty,
-                                         const PaintInfo* i) {
+IntRect RenderBlock::fillRightSelectionGap(RenderObject* selObj,
+                                           int xPos,
+                                           int yPos,
+                                           int height,
+                                           RenderBlock* rootBlock,
+                                           int blockX,
+                                           int blockY,
+                                           int tx,
+                                           int ty,
+                                           const PaintInfo* i) {
   int left = xPos + tx;
   int top = yPos + ty;
   int right = blockX + kMin(rightSelectionOffset(rootBlock, yPos),
                             rightSelectionOffset(rootBlock, yPos + height));
   int width = right - left;
   if (width <= 0)
-    return QRect();
+    return IntRect();
 
-  QRect gapRect(left, top, width, height);
+  IntRect gapRect(left, top, width, height);
   if (i) {
     // Paint the rect.
     QBrush selBrush(selObj->selectionColor(i->p));
@@ -2265,8 +2265,8 @@ int RenderBlock::floatBottom() const {
   return bottom;
 }
 
-QRect RenderBlock::floatRect() const {
-  QRect result(borderBox());
+IntRect RenderBlock::floatRect() const {
+  IntRect result(borderBox());
   if (!m_floatingObjects || hasOverflowClip())
     return result;
   FloatingObject* r;
@@ -2675,7 +2675,7 @@ bool RenderBlock::isPointInScrollbar(int _x, int _y, int _tx, int _ty) {
     return false;
 
   if (m_layer->verticalScrollbarWidth()) {
-    QRect vertRect(
+    IntRect vertRect(
         _tx + width() - borderRight() - m_layer->verticalScrollbarWidth(),
         _ty + borderTop() - borderTopExtra(), m_layer->verticalScrollbarWidth(),
         height() + borderTopExtra() + borderBottomExtra() - borderTop() -
@@ -2687,11 +2687,11 @@ bool RenderBlock::isPointInScrollbar(int _x, int _y, int _tx, int _ty) {
   }
 
   if (m_layer->horizontalScrollbarHeight()) {
-    QRect horizRect(_tx + borderLeft(),
-                    _ty + height() + borderBottomExtra() -
-                        m_layer->horizontalScrollbarHeight() - borderBottom(),
-                    width() - borderLeft() - borderRight(),
-                    m_layer->horizontalScrollbarHeight());
+    IntRect horizRect(_tx + borderLeft(),
+                      _ty + height() + borderBottomExtra() -
+                          m_layer->horizontalScrollbarHeight() - borderBottom(),
+                      width() - borderLeft() - borderRight(),
+                      m_layer->horizontalScrollbarHeight());
     if (horizRect.contains(_x, _y)) {
       RenderLayer::gScrollBar = m_layer->horizontalScrollbar();
       return true;
@@ -2714,7 +2714,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
 
   if (!inlineFlow && !isRoot()) {
     // Check if we need to do anything at all.
-    QRect overflowBox = overflowRect(false);
+    IntRect overflowBox = overflowRect(false);
     overflowBox.setX(overflowBox.x() + tx);
     overflowBox.setY(overflowBox.y() + ty);
     bool insideOverflowBox = overflowBox.contains(_x, _y);
@@ -2722,7 +2722,7 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
       // Check floats next.
       if (hitTestAction != HitTestFloat)
         return false;
-      QRect floatBox = floatRect();
+      IntRect floatBox = floatRect();
       floatBox.setX(floatBox.x() + tx);
       floatBox.setY(floatBox.y() + ty);
       if (!floatBox.contains(_x, _y))
@@ -2793,8 +2793,8 @@ bool RenderBlock::nodeAtPoint(NodeInfo& info,
   if (!inlineFlow && (hitTestAction == HitTestBlockBackground ||
                       hitTestAction == HitTestChildBlockBackground)) {
     int topExtra = borderTopExtra();
-    QRect boundsRect(tx, ty - topExtra, m_width,
-                     m_height + topExtra + borderBottomExtra());
+    IntRect boundsRect(tx, ty - topExtra, m_width,
+                       m_height + topExtra + borderBottomExtra());
     if (isRoot() ||
         (style()->visibility() == VISIBLE && boundsRect.contains(_x, _y))) {
       setInnerNode(info);

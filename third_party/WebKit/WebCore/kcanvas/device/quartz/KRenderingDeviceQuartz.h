@@ -46,8 +46,8 @@ class KRenderingDeviceContextQuartz : public KRenderingDeviceContext {
   virtual KCanvasMatrix concatCTM(const KCanvasMatrix& worldMatrix);
   virtual KCanvasMatrix ctm() const;
 
-  virtual QRect mapFromVisual(const QRect& rect);
-  virtual QRect mapToVisual(const QRect& rect);
+  virtual IntRect mapFromVisual(const IntRect& rect);
+  virtual IntRect mapToVisual(const IntRect& rect);
 
   virtual void clearPath();
   virtual void addPath(const KCanvasPath*);

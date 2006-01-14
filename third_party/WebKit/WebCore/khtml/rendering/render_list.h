@@ -50,7 +50,7 @@ class RenderListMarker : public RenderBox {
   virtual void layout();
   virtual void calcMinMaxWidth();
 
-  virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
+  virtual void setPixmap(const QPixmap&, const IntRect&, CachedImage*);
 
   virtual void calcWidth();
 
@@ -110,7 +110,7 @@ class RenderListItem : public RenderBlock {
   virtual void layout();
   virtual void calcMinMaxWidth();
 
-  virtual QRect getAbsoluteRepaintRect();
+  virtual IntRect getAbsoluteRepaintRect();
 
   void updateMarkerLocation();
 

@@ -26,7 +26,7 @@
 #ifndef QFONTMETRICS_H_
 #define QFONTMETRICS_H_
 
-#include "KWQRect.h"
+#include "IntRect.h"
 #include "IntSize.h"
 #include "KWQString.h"
 
@@ -62,21 +62,21 @@ class QFontMetrics {
                    int letterSpacing,
                    int wordSpacing,
                    bool smallCaps) const;
-  QRect selectionRectForText(int x,
-                             int y,
-                             int h,
-                             int tabWidth,
-                             int xpos,
-                             const QChar* str,
-                             int len,
-                             int from,
-                             int to,
-                             int toAdd,
-                             bool rtl,
-                             bool visuallyOrdered,
-                             int letterSpacing,
-                             int wordSpacing,
-                             bool smallCaps) const;
+  IntRect selectionRectForText(int x,
+                               int y,
+                               int h,
+                               int tabWidth,
+                               int xpos,
+                               const QChar* str,
+                               int len,
+                               int from,
+                               int to,
+                               int toAdd,
+                               bool rtl,
+                               bool visuallyOrdered,
+                               int letterSpacing,
+                               int wordSpacing,
+                               bool smallCaps) const;
   int checkSelectionPoint(QChar* s,
                           int slen,
                           int pos,
@@ -92,19 +92,19 @@ class QFontMetrics {
                           bool dirOverride,
                           bool includePartialGlyphs) const;
 
-  QRect boundingRect(QChar) const;
-  QRect boundingRect(const QString&,
-                     int tabWidth,
-                     int xpos,
-                     int len = -1) const;
-  QRect boundingRect(int,
-                     int,
-                     int,
-                     int,
-                     int,
-                     const QString&,
-                     int tabWidth,
-                     int xpos) const;
+  IntRect boundingRect(QChar) const;
+  IntRect boundingRect(const QString&,
+                       int tabWidth,
+                       int xpos,
+                       int len = -1) const;
+  IntRect boundingRect(int,
+                       int,
+                       int,
+                       int,
+                       int,
+                       const QString&,
+                       int tabWidth,
+                       int xpos) const;
 
   IntSize size(int, const QString&, int tabWidth, int xpos) const;
 

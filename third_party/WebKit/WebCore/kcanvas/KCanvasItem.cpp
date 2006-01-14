@@ -22,7 +22,7 @@
 */
 
 #include "config.h"
-#include <qrect.h>
+#include "IntRect.h"
 #include <kdebug.h>
 #include <kxmlcore/Assertions.h>
 
@@ -46,7 +46,7 @@ class RenderPath::Private {
   KSVG::KCanvasRenderingStyle* style;
   RefPtr<KCanvasPath> path;
 
-  QRectF fillBBox, strokeBbox;
+  FloatRect fillBBox, strokeBbox;
   QMatrix matrix;
 };
 
@@ -89,8 +89,8 @@ bool RenderPath::strokeContains(const FloatPoint& p) const {
   return false;
 }
 
-QRectF RenderPath::relativeBBox(bool includeStroke) const {
-  QRectF result;
+FloatRect RenderPath::relativeBBox(bool includeStroke) const {
+  FloatRect result;
 
   if (!d->path)
     return result;

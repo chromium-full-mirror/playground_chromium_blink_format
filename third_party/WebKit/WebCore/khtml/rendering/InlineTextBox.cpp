@@ -111,12 +111,12 @@ RenderObject::SelectionState InlineTextBox::selectionState() {
   return state;
 }
 
-QRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
+IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
   int sPos = kMax(startPos - m_start, 0);
   int ePos = kMin(endPos - m_start, (int)m_len);
 
   if (sPos >= ePos)
-    return QRect();
+    return IntRect();
 
   RootInlineBox* rootBox = root();
   RenderText* textObj = textObject();
@@ -237,7 +237,7 @@ bool InlineTextBox::nodeAtPoint(RenderObject::NodeInfo& i,
   if (object()->isBR())
     return false;
 
-  QRect rect(tx + m_x, ty + m_y, m_width, m_height);
+  IntRect rect(tx + m_x, ty + m_y, m_width, m_height);
   if (m_truncation != cFullTruncation &&
       object()->style()->visibility() == VISIBLE && rect.contains(x, y)) {
     object()->setInnerNode(i);

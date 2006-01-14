@@ -63,7 +63,9 @@ class RenderTheme {
   // text of a button, is always rendered by the engine itself.  The boolean
   // return value indicates
   // whether the CSS border/background should also be painted.
-  bool paint(RenderObject* o, const RenderObject::PaintInfo& i, const QRect& r);
+  bool paint(RenderObject* o,
+             const RenderObject::PaintInfo& i,
+             const IntRect& r);
 
   // The remaining methods should be implemented by the platform-specific
   // portion of the theme, e.g.,
@@ -101,7 +103,7 @@ class RenderTheme {
   // checkbox).  When these controls repaint,
   // the theme needs to communicate this inflated rect to the engine so that it
   // can invalidate the whole control.
-  virtual void adjustRepaintRect(const RenderObject* o, QRect& r) {}
+  virtual void adjustRepaintRect(const RenderObject* o, IntRect& r) {}
 
   // This method is called whenever a relevant state changes on a particular
   // themed object, e.g., the mouse becomes pressed
@@ -127,7 +129,7 @@ class RenderTheme {
                                    DOM::ElementImpl* e) const;
   virtual bool paintCheckbox(RenderObject* o,
                              const RenderObject::PaintInfo& i,
-                             const QRect& r) = 0;
+                             const IntRect& r) = 0;
   virtual void setCheckboxSize(RenderStyle* style) const {};
 
   virtual void adjustRadioStyle(CSSStyleSelector* selector,
@@ -135,7 +137,7 @@ class RenderTheme {
                                 DOM::ElementImpl* e) const;
   virtual bool paintRadio(RenderObject* o,
                           const RenderObject::PaintInfo& i,
-                          const QRect& r) = 0;
+                          const IntRect& r) = 0;
   virtual void setRadioSize(RenderStyle* style) const {};
 
   virtual void adjustButtonStyle(CSSStyleSelector* selector,
@@ -143,7 +145,7 @@ class RenderTheme {
                                  DOM::ElementImpl* e) const;
   virtual bool paintButton(RenderObject* o,
                            const RenderObject::PaintInfo& i,
-                           const QRect& r) = 0;
+                           const IntRect& r) = 0;
   virtual void setButtonSize(RenderStyle* style) const {};
 };
 

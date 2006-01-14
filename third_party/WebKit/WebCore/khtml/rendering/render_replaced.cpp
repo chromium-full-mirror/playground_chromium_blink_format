@@ -166,16 +166,16 @@ VisiblePosition RenderReplaced::positionForCoordinates(int _x, int _y) {
   return RenderBox::positionForCoordinates(_x, _y);
 }
 
-QRect RenderReplaced::selectionRect() {
+IntRect RenderReplaced::selectionRect() {
   if (selectionState() == SelectionNone)
-    return QRect();
+    return IntRect();
   if (!m_inlineBoxWrapper)
     // We're a block-level replaced element.  Just return our own dimensions.
     return absoluteBoundingBoxRect();
 
   RenderBlock* cb = containingBlock();
   if (!cb)
-    return QRect();
+    return IntRect();
 
   RootInlineBox* root = m_inlineBoxWrapper->root();
   int selectionTop = root->selectionTop();
@@ -186,8 +186,8 @@ QRect RenderReplaced::selectionRect() {
   int absx, absy;
   cb->absolutePosition(absx, absy);
 
-  return QRect(selectionLeft + absx, selectionTop + absy,
-               selectionRight - selectionLeft, selectionHeight);
+  return IntRect(selectionLeft + absx, selectionTop + absy,
+                 selectionRight - selectionLeft, selectionHeight);
 }
 
 void RenderReplaced::setSelectionState(SelectionState s) {
@@ -378,7 +378,7 @@ void RenderWidget::paint(PaintInfo& i, int _tx, int _ty) {
   bool isPrinting = (i.p->device()->devType() == QInternal::Printer);
   if (m_selectionState != SelectionNone && !isPrinting) {
     QBrush brush(selectionColor(i.p));
-    QRect selRect(selectionRect());
+    IntRect selRect(selectionRect());
     i.p->fillRect(selRect.x(), selRect.y(), selRect.width(), selRect.height(),
                   brush);
   }
@@ -464,8 +464,8 @@ void RenderWidget::updateWidgetPosition() {
       m_width - borderLeft() - borderRight() - paddingLeft() - paddingRight();
   height =
       m_height - borderTop() - borderBottom() - paddingTop() - paddingBottom();
-  QRect newBounds(x, y, width, height);
-  QRect oldBounds(m_widget->frameGeometry());
+  IntRect newBounds(x, y, width, height);
+  IntRect oldBounds(m_widget->frameGeometry());
   if (newBounds != oldBounds) {
     // The widget changed positions.  Update the frame geometry.
     if (checkForRepaintDuringLayout()) {

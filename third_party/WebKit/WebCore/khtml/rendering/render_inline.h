@@ -85,7 +85,7 @@ class RenderInline : public RenderFlow {
   virtual int offsetLeft() const;
   virtual int offsetTop() const;
 
-  void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
+  void absoluteRects(QValueList<IntRect>& rects, int _tx, int _ty);
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

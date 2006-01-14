@@ -26,10 +26,10 @@
 #define render_object_h
 
 #include <qcolor.h>
-#include <qrect.h>
+#include "IntRect.h"
 #include <assert.h>
 #include <qwmatrix.h>
-#include <QRectF>
+#include "FloatRect.h"
 #include <qptrdict.h>
 
 #include "dom_nodeimpl.h"
@@ -123,8 +123,8 @@ class CollapsedBorderValue;
 
 struct DashboardRegionValue {
   QString label;
-  QRect bounds;
-  QRect clip;
+  IntRect bounds;
+  IntRect clip;
   int type;
 
   bool operator==(const DashboardRegionValue& o) const {
@@ -172,10 +172,10 @@ class RenderObject : public CachedObjectClient {
   virtual void positionChildLayers() {}
   virtual bool requiresLayer();
 
-  virtual QRect getOverflowClipRect(int tx, int ty) {
-    return QRect(0, 0, 0, 0);
+  virtual IntRect getOverflowClipRect(int tx, int ty) {
+    return IntRect(0, 0, 0, 0);
   }
-  virtual QRect getClipRect(int tx, int ty) { return QRect(0, 0, 0, 0); }
+  virtual IntRect getClipRect(int tx, int ty) { return IntRect(0, 0, 0, 0); }
   bool hasClip() { return isPositioned() && style()->hasClip(); }
 
   virtual int getBaselineOfFirstLineBox() const { return -1; }
@@ -228,7 +228,7 @@ class RenderObject : public CachedObjectClient {
   void setParent(RenderObject* parent) { m_parent = parent; }
   //////////////////////////////////////////
  private:
-  void addAbsoluteRectForLayer(QRect& result);
+  void addAbsoluteRectForLayer(IntRect& result);
 
  public:
   virtual const char* renderName() const { return "RenderObject"; }
@@ -289,8 +289,8 @@ class RenderObject : public CachedObjectClient {
 #if SVG_SUPPORT
   virtual bool isKCanvasContainer() const { return false; }
   virtual bool isRenderPath() const { return false; }
-  virtual QRectF relativeBBox(bool includeStroke = true) const {
-    return QRectF();
+  virtual FloatRect relativeBBox(bool includeStroke = true) const {
+    return FloatRect();
   }
   // We may eventually want to make these non-virtual
   virtual QMatrix localTransform() const {
@@ -447,7 +447,7 @@ class RenderObject : public CachedObjectClient {
    */
   struct PaintInfo {
     PaintInfo(QPainter* _p,
-              const QRect& _r,
+              const IntRect& _r,
               PaintAction _phase,
               RenderObject* _paintingRoot)
         : p(_p),
@@ -457,7 +457,7 @@ class RenderObject : public CachedObjectClient {
           outlineObjects(0) {}
     ~PaintInfo() { delete outlineObjects; }
     QPainter* p;
-    QRect r;
+    IntRect r;
     PaintAction phase;
     RenderObject*
         paintingRoot;  // used to draw just one element and its visual kids
@@ -606,9 +606,9 @@ class RenderObject : public CachedObjectClient {
   // layout is complete.
   struct RepaintInfo {
     RenderObject* m_object;
-    QRect m_repaintRect;
+    IntRect m_repaintRect;
 
-    RepaintInfo(RenderObject* o, const QRect& r)
+    RepaintInfo(RenderObject* o, const IntRect& r)
         : m_object(o), m_repaintRect(r) {}
   };
 
@@ -678,7 +678,7 @@ class RenderObject : public CachedObjectClient {
   virtual int width() const { return 0; }
   virtual int height() const { return 0; }
 
-  virtual QRect borderBox() const { return QRect(0, 0, width(), height()); }
+  virtual IntRect borderBox() const { return IntRect(0, 0, width(), height()); }
 
   // The height of a block when you include normal flow overflow spillage out of
   // the bottom
@@ -695,7 +695,7 @@ class RenderObject : public CachedObjectClient {
   virtual void setOverflowWidth(int) {}
   virtual int overflowLeft(bool includeInterior = true) const { return 0; }
   virtual int overflowTop(bool includeInterior = true) const { return 0; }
-  virtual QRect overflowRect(bool includeInterior = true) const {
+  virtual IntRect overflowRect(bool includeInterior = true) const {
     return borderBox();
   }
 
@@ -786,11 +786,11 @@ class RenderObject : public CachedObjectClient {
   virtual int borderLeft() const { return style()->borderLeftWidth(); }
   virtual int borderRight() const { return style()->borderRightWidth(); }
 
-  virtual void absoluteRects(QValueList<QRect>& rects, int _tx, int _ty);
-  QRect absoluteBoundingBoxRect();
+  virtual void absoluteRects(QValueList<IntRect>& rects, int _tx, int _ty);
+  IntRect absoluteBoundingBoxRect();
 
   // the rect that will be painted if this object is passed as the paintingRoot
-  QRect paintingRootRect(QRect& topLevelRect);
+  IntRect paintingRootRect(IntRect& topLevelRect);
 
   virtual void addFocusRingRects(QPainter* painter, int _tx, int _ty);
 
@@ -835,11 +835,11 @@ class RenderObject : public CachedObjectClient {
 
   // Repaint a specific subrectangle within a given object.  The rect |r| is in
   // the object's coordinate space.
-  void repaintRectangle(const QRect& r, bool immediate = false);
+  void repaintRectangle(const IntRect& r, bool immediate = false);
 
   // Repaint only if our old bounds and new bounds are different.
-  bool repaintAfterLayoutIfNeeded(const QRect& oldBounds,
-                                  const QRect& oldFullBounds);
+  bool repaintAfterLayoutIfNeeded(const IntRect& oldBounds,
+                                  const IntRect& oldFullBounds);
 
   // Repaint only if the object moved.
   virtual void repaintDuringLayoutIfMoved(int oldX, int oldY);
@@ -856,17 +856,18 @@ class RenderObject : public CachedObjectClient {
   // Returns the rect that should be repainted whenever this object changes.
   // The rect is in the view's
   // coordinate space.  This method deals with outlines and overflow.
-  virtual QRect getAbsoluteRepaintRect();
+  virtual IntRect getAbsoluteRepaintRect();
 
-  QRect getAbsoluteRepaintRectWithOutline(int ow);
+  IntRect getAbsoluteRepaintRectWithOutline(int ow);
 
-  virtual void getAbsoluteRepaintRectIncludingFloats(QRect& bounds,
-                                                     QRect& boundsWithChildren);
+  virtual void getAbsoluteRepaintRectIncludingFloats(
+      IntRect& bounds,
+      IntRect& boundsWithChildren);
 
   // Given a rect in the object's coordinate space, this method converts the
   // rectangle to the view's
   // coordinate space.
-  virtual void computeAbsoluteRepaintRect(QRect& r, bool f = false);
+  virtual void computeAbsoluteRepaintRect(IntRect& r, bool f = false);
 
   virtual unsigned int length() const { return 1; }
 
@@ -876,7 +877,7 @@ class RenderObject : public CachedObjectClient {
   virtual bool containsFloats() { return false; }
   virtual bool containsFloat(RenderObject* o) { return false; }
   virtual bool hasOverhangingFloats() { return false; }
-  virtual QRect floatRect() const { return borderBox(); }
+  virtual IntRect floatRect() const { return borderBox(); }
 
   bool avoidsFloats() const;
   bool usesLineWidth() const;
@@ -913,7 +914,7 @@ class RenderObject : public CachedObjectClient {
   // A single rectangle that encompasses all of the selected objects within this
   // object.  Used to determine the tightest
   // possible bounding box for the selection.
-  virtual QRect selectionRect() { return QRect(); }
+  virtual IntRect selectionRect() { return IntRect(); }
 
   // Whether or not an object can be part of the leaf elements of the selection.
   virtual bool canBeSelectionLeaf() const { return false; }
@@ -940,11 +941,11 @@ class RenderObject : public CachedObjectClient {
   // state of the selection for each RenderObject.
   struct SelectionInfo {
     RenderObject* m_object;
-    QRect m_rect;
+    IntRect m_rect;
     RenderObject::SelectionState m_state;
 
     RenderObject* object() const { return m_object; }
-    QRect rect() const { return m_rect; }
+    IntRect rect() const { return m_rect; }
     SelectionState state() const { return m_state; }
 
     SelectionInfo() {
@@ -973,9 +974,9 @@ class RenderObject : public CachedObjectClient {
    * line -
    * useful for character range rect computations
    */
-  virtual QRect caretRect(int offset,
-                          EAffinity affinity = UPSTREAM,
-                          int* extraWidthToEndOfLine = 0);
+  virtual IntRect caretRect(int offset,
+                            EAffinity affinity = UPSTREAM,
+                            int* extraWidthToEndOfLine = 0);
 
   virtual int lowestPosition(bool includeOverflowInterior = true,
                              bool includeSelf = true) const {
@@ -1022,7 +1023,7 @@ class RenderObject : public CachedObjectClient {
   virtual int previousOffset(int current) const;
   virtual int nextOffset(int current) const;
 
-  virtual void setPixmap(const QPixmap&, const QRect&, CachedImage*);
+  virtual void setPixmap(const QPixmap&, const IntRect&, CachedImage*);
 
   virtual void selectionStartEnd(int& spos, int& epos);
 
@@ -1044,7 +1045,7 @@ class RenderObject : public CachedObjectClient {
                                    int /*_tx*/,
                                    int /*_ty*/) {}
 
-  virtual QRect viewRect() const;
+  virtual IntRect viewRect() const;
 
   void remove();
 
