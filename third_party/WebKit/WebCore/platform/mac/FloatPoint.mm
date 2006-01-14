@@ -21,65 +21,34 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#ifndef QPOINTF_H_
-#define QPOINTF_H_
-
-#include "KWQDef.h"
-
-// workaround for <rdar://problem/4294625>
-#if !__LP64__ && !NS_BUILD_32_LIKE_64
-#undef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-#endif
-
-#ifdef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-typedef struct CGPoint NSPoint;
-#else
-typedef struct _NSPoint NSPoint;
-#endif
-typedef struct CGPoint CGPoint;
+#include "config.h"
+#include "FloatPoint.h"
 
 namespace WebCore {
-class IntPoint;
+
+#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+FloatPoint::FloatPoint(const NSPoint& p) : xCoord(p.x), yCoord(p.y)
+{
+}
+#endif
+
+FloatPoint::FloatPoint(const CGPoint& p) : xCoord(p.x), yCoord(p.y)
+{
 }
 
-class QPointF {
- public:
-  QPointF();
-  QPointF(float, float);
-  QPointF(const WebCore::IntPoint&);
 #ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-  explicit QPointF(const NSPoint&);
+FloatPoint::operator NSPoint() const
+{
+    return NSMakePoint(xCoord, yCoord);
+}
 #endif
-  explicit QPointF(const CGPoint&);
 
-  float x() const { return xCoord; }
-  float y() const { return yCoord; }
+FloatPoint::operator CGPoint() const
+{
+    return CGPointMake(xCoord, yCoord);
+}
 
-  void setX(int x) { xCoord = x; }
-  void setY(int y) { yCoord = y; }
-
-  bool isNull() const { return xCoord == 0.0f && yCoord == 0.0f; }
-
-  QPointF& operator-=(const QPointF& two) {
-    xCoord -= two.xCoord;
-    yCoord -= two.yCoord;
-    return *this;
-  }
-  friend const QPointF operator*(const QPointF& p, double s);
-  friend QPointF operator+(const QPointF&, const QPointF&);
-  friend QPointF operator-(const QPointF&, const QPointF&);
-
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-  operator NSPoint() const;
-#endif
-  operator CGPoint() const;
-
- private:
-  float xCoord;
-  float yCoord;
-};
-
-#endif
+}

@@ -305,8 +305,8 @@ class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
   KCEdgeModeType edgeMode() const { return m_edgeMode; }
   void setEdgeMode(KCEdgeModeType edgeMode) { m_edgeMode = edgeMode; }
 
-  QPointF kernelUnitLength() const { return m_kernelUnitLength; }
-  void setKernelUnitLength(QPointF kernelUnitLength) {
+  FloatPoint kernelUnitLength() const { return m_kernelUnitLength; }
+  void setKernelUnitLength(FloatPoint kernelUnitLength) {
     m_kernelUnitLength = kernelUnitLength;
   }
 
@@ -322,7 +322,7 @@ class KCanvasFEConvolveMatrix : public KCanvasFilterEffect {
   float m_bias;
   FloatSize m_targetOffset;
   KCEdgeModeType m_edgeMode;
-  QPointF m_kernelUnitLength;
+  FloatPoint m_kernelUnitLength;
   bool m_preserveAlpha;
 };
 

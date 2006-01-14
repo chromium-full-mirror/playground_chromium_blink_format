@@ -21,58 +21,30 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "config.h"
-#import "KWQPointF.h"
-#import "IntPointArray.h"
+#include "IntPoint.h"
+#include "FloatPoint.h"
 
-QPointF::QPointF() : xCoord(0), yCoord(0)
-{
+namespace WebCore {
+
+FloatPoint::FloatPoint() : xCoord(0), yCoord(0) {}
+
+FloatPoint::FloatPoint(float xIn, float yIn) : xCoord(xIn), yCoord(yIn) {}
+
+FloatPoint::FloatPoint(const IntPoint& p) : xCoord(p.x()), yCoord(p.y()) {}
+
+FloatPoint operator+(const FloatPoint& a, const FloatPoint& b) {
+  return FloatPoint(a.xCoord + b.xCoord, a.yCoord + b.yCoord);
 }
 
-QPointF::QPointF(float xIn, float yIn) : xCoord(xIn), yCoord(yIn)
-{
+FloatPoint operator-(const FloatPoint& a, const FloatPoint& b) {
+  return FloatPoint(a.xCoord - b.xCoord, a.yCoord - b.yCoord);
 }
 
-QPointF::QPointF(const IntPoint& p) :xCoord(p.x()), yCoord(p.y())
-{
+const FloatPoint operator*(const FloatPoint& p, double s) {
+  return FloatPoint(p.xCoord * s, p.yCoord * s);
 }
-
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QPointF::QPointF(const NSPoint& p) : xCoord(p.x), yCoord(p.y)
-{
-}
-#endif
-
-QPointF::QPointF(const CGPoint& p) : xCoord(p.x), yCoord(p.y)
-{
-}
-
-#ifndef NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
-QPointF::operator NSPoint() const
-{
-    return NSMakePoint(xCoord, yCoord);
-}
-#endif
-
-QPointF::operator CGPoint() const
-{
-    return CGPointMake(xCoord, yCoord);
-}
-
-QPointF operator+(const QPointF& a, const QPointF& b)
-{
-    return QPointF(a.xCoord + b.xCoord, a.yCoord + b.yCoord);
-}
-
-QPointF operator-(const QPointF& a, const QPointF& b)
-{
-    return QPointF(a.xCoord - b.xCoord, a.yCoord - b.yCoord);
-}
-
-const QPointF operator*(const QPointF& p, double s)
-{
-    return QPointF(p.xCoord * s, p.yCoord * s);
 }

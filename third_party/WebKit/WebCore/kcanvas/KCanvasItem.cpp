@@ -75,14 +75,14 @@ void RenderPath::setLocalTransform(const QMatrix& matrix) {
   d->matrix = matrix;
 }
 
-bool RenderPath::fillContains(const QPointF& p) const {
+bool RenderPath::fillContains(const FloatPoint& p) const {
   if (d->path && d->style)
     return hitsPath(p, true);
 
   return false;
 }
 
-bool RenderPath::strokeContains(const QPointF& p) const {
+bool RenderPath::strokeContains(const FloatPoint& p) const {
   if (d->path && d->style)
     return hitsPath(p, false);
 

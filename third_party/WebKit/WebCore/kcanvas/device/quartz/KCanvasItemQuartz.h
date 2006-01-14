@@ -32,7 +32,7 @@ class KCanvasItemQuartz : public RenderPath {
   virtual ~KCanvasItemQuartz() {}
 
   virtual QRectF bboxForPath(bool includeStroke) const;
-  virtual bool hitsPath(const QPointF& p,
+  virtual bool hitsPath(const FloatPoint& p,
                         bool fill /* false means stroke */) const;
 
   virtual QRect getAbsoluteRepaintRect() {
