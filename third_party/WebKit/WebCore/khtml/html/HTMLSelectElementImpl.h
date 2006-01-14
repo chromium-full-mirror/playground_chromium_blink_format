@@ -27,7 +27,7 @@
 
 #include "HTMLGenericFormElementImpl.h"
 
-#include <qmemarray.h>
+#include "Array.h"
 
 namespace khtml {
 class RenderSelect;
@@ -110,7 +110,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
 
   void setRecalcListItems();
 
-  QMemArray<HTMLElementImpl*> listItems() const {
+  Array<HTMLElementImpl*> listItems() const {
     if (m_recalcListItems)
       const_cast<HTMLSelectElementImpl*>(this)->recalcListItems();
     return m_listItems;
@@ -130,7 +130,7 @@ class HTMLSelectElementImpl : public HTMLGenericFormElementImpl {
   void recalcListItems();
 
  protected:
-  mutable QMemArray<HTMLElementImpl*> m_listItems;
+  mutable Array<HTMLElementImpl*> m_listItems;
   HTMLOptionsCollectionImpl* m_options;
   short m_minwidth;
   short m_size;

@@ -37,7 +37,7 @@ QTextStream& endl(QTextStream& stream);
 
 class QTextStream {
  public:
-  QTextStream(const QByteArray&);
+  QTextStream(const ByteArray&);
   QTextStream(QString*, int mode = IO_WriteOnly);
 
   QTextStream& operator<<(char);
@@ -63,7 +63,7 @@ class QTextStream {
   QTextStream& operator=(const QTextStream&);
 
   bool _hasByteArray;
-  QByteArray _byteArray;
+  ByteArray _byteArray;
   QString* _string;
   int _precision;
 };

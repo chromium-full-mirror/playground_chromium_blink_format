@@ -127,8 +127,8 @@ class RenderTable : public RenderBlock {
     uint width;  // the calculated position of the column
   };
 
-  QMemArray<int> columnPos;
-  QMemArray<ColumnStruct> columns;
+  Array<int> columnPos;
+  Array<ColumnStruct> columns;
 
   void splitColumn(int pos, int firstSpan);
   void appendColumn(int span);
@@ -232,7 +232,7 @@ class RenderTableSection : public RenderContainer {
     RenderTableCell* cell;
     bool inColSpan;  // true for columns after the first in a colspan
   };
-  typedef QMemArray<CellStruct> Row;
+  typedef Array<CellStruct> Row;
   struct RowStruct {
     Row* row;
     int baseLine;
@@ -258,9 +258,9 @@ class RenderTableSection : public RenderContainer {
 
   // this gets a cell grid data structure. changing the number of
   // columns is done by the table
-  QMemArray<RowStruct> grid;
+  Array<RowStruct> grid;
   int gridRows;
-  QMemArray<int> rowPos;
+  Array<int> rowPos;
 
   int cCol;
   int cRow;

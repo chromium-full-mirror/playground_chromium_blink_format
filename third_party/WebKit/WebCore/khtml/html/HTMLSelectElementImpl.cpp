@@ -101,7 +101,7 @@ DOMString HTMLSelectElementImpl::type() const {
 int HTMLSelectElementImpl::selectedIndex() const {
   // return the number of the first option selected
   uint o = 0;
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   for (unsigned int i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
       if (static_cast<HTMLOptionElementImpl*>(items[i])->selected())
@@ -115,7 +115,7 @@ int HTMLSelectElementImpl::selectedIndex() const {
 
 void HTMLSelectElementImpl::setSelectedIndex(int index) {
   // deselect all other options and select only the new one
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   int listIndex;
   for (listIndex = 0; listIndex < int(items.size()); listIndex++) {
     if (items[listIndex]->hasLocalName(optionTag))
@@ -131,7 +131,7 @@ void HTMLSelectElementImpl::setSelectedIndex(int index) {
 int HTMLSelectElementImpl::length() const {
   int len = 0;
   uint i;
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag))
       len++;
@@ -159,7 +159,7 @@ void HTMLSelectElementImpl::remove(int index) {
   int exceptioncode = 0;
   int listIndex = optionToListIndex(index);
 
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   if (listIndex < 0 || index >= int(items.size()))
     return;  // ### what should we do ? remove the last item?
 
@@ -173,7 +173,7 @@ void HTMLSelectElementImpl::remove(int index) {
 
 DOMString HTMLSelectElementImpl::value() {
   uint i;
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElementImpl*>(items[i])->selected())
@@ -187,7 +187,7 @@ void HTMLSelectElementImpl::setValue(const DOMString& value) {
     return;
   // find the option with value() matching the given parameter
   // and make it the current selection.
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   for (unsigned i = 0; i < items.size(); i++)
     if (items[i]->hasLocalName(optionTag) &&
         static_cast<HTMLOptionElementImpl*>(items[i])->value() == value) {
@@ -197,7 +197,7 @@ void HTMLSelectElementImpl::setValue(const DOMString& value) {
 }
 
 QString HTMLSelectElementImpl::state() {
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
 
   int l = items.count();
   QString state;
@@ -225,7 +225,7 @@ void HTMLSelectElementImpl::restoreState(QStringList& _states) {
     // state[0] = 'X';
   }
 
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
 
   int l = items.count();
   for (int i = 0; i < l; i++) {
@@ -307,7 +307,7 @@ RenderObject* HTMLSelectElementImpl::createRenderer(RenderArena* arena,
 
 bool HTMLSelectElementImpl::appendFormData(FormDataList& encoded_values, bool) {
   bool successful = false;
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
 
   uint i;
   for (i = 0; i < items.size(); i++) {
@@ -341,7 +341,7 @@ bool HTMLSelectElementImpl::appendFormData(FormDataList& encoded_values, bool) {
 }
 
 int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   if (optionIndex < 0 || optionIndex >= int(items.size()))
     return -1;
 
@@ -357,7 +357,7 @@ int HTMLSelectElementImpl::optionToListIndex(int optionIndex) const {
 }
 
 int HTMLSelectElementImpl::listToOptionIndex(int listIndex) const {
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   if (listIndex < 0 || listIndex >= int(items.size()) ||
       !items[listIndex]->hasLocalName(optionTag))
     return -1;
@@ -443,7 +443,7 @@ void HTMLSelectElementImpl::setRecalcListItems() {
 }
 
 void HTMLSelectElementImpl::reset() {
-  QMemArray<HTMLElementImpl*> items = listItems();
+  Array<HTMLElementImpl*> items = listItems();
   uint i;
   for (i = 0; i < items.size(); i++) {
     if (items[i]->hasLocalName(optionTag)) {
@@ -463,7 +463,7 @@ void HTMLSelectElementImpl::notifyOptionSelected(
     bool selected) {
   if (selected && !m_multiple) {
     // deselect all other options
-    QMemArray<HTMLElementImpl*> items = listItems();
+    Array<HTMLElementImpl*> items = listItems();
     uint i;
     for (i = 0; i < items.size(); i++) {
       if (items[i]->hasLocalName(optionTag))

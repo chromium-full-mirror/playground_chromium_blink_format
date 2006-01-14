@@ -96,7 +96,7 @@ static bool sBuildingCompactRuns;
 // these midpoints, so we just keep an array around and never clear it.  We
 // track
 // the number of items and position using the two other variables.
-static QMemArray<BidiIterator>* smidpoints;
+static Array<BidiIterator>* smidpoints;
 static uint sNumMidpoints;
 static uint sCurrMidpoint;
 static bool betweenMidpoints;
@@ -1622,7 +1622,7 @@ IntRect RenderBlock::layoutInlineChildren(bool relayoutChildren) {
     bidi.dir = QChar::DirON;
 
     if (!smidpoints)
-      smidpoints = new QMemArray<BidiIterator>;
+      smidpoints = new Array<BidiIterator>;
 
     sNumMidpoints = 0;
     sCurrMidpoint = 0;

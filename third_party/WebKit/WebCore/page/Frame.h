@@ -839,8 +839,8 @@ class Frame : public ObjectContents {
  private slots:
   void reparseConfiguration();
 
-  void slotData(KIO::Job*, const QByteArray& data);
-  void slotRestoreData(const QByteArray& data);
+  void slotData(KIO::Job*, const ByteArray& data);
+  void slotRestoreData(const ByteArray& data);
   void slotFinished(KIO::Job*);
   void slotFinishedParsing();
   void slotRedirect();

@@ -115,7 +115,7 @@ class XMLHttpRequest : public DOMObject {
   void slotFinished(KIO::Job*);
   void slotRedirection(KIO::Job*, const KURL&);
 
-  void processSyncLoadResults(const QByteArray& data,
+  void processSyncLoadResults(const ByteArray& data,
                               const KURL& finalURL,
                               const QString& headers);
 

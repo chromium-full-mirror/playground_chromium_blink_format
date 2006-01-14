@@ -656,7 +656,7 @@ void RenderSelect::updateFromElement() {
   if (m_optionsChanged) {
     if (element()->m_recalcListItems)
       element()->recalcListItems();
-    QMemArray<HTMLElementImpl*> listItems = element()->listItems();
+    Array<HTMLElementImpl*> listItems = element()->listItems();
     int listIndex;
 
     if (m_useListBox)
@@ -792,7 +792,7 @@ void RenderSelect::layout() {
   RenderFormElement::layout();
 
   // and now disable the widget in case there is no <option> given
-  QMemArray<HTMLElementImpl*> listItems = element()->listItems();
+  Array<HTMLElementImpl*> listItems = element()->listItems();
 
   bool foundOption = false;
   for (uint i = 0; i < listItems.size() && !foundOption; i++)
@@ -807,7 +807,7 @@ void RenderSelect::slotSelected(int index) {
 
   KHTMLAssert(!m_useListBox);
 
-  QMemArray<HTMLElementImpl*> listItems = element()->listItems();
+  Array<HTMLElementImpl*> listItems = element()->listItems();
   if (index >= 0 && index < int(listItems.size())) {
     bool found = (listItems[index]->hasTagName(optionTag));
 
@@ -855,7 +855,7 @@ void RenderSelect::slotSelectionChanged() {
   // the
   // option list will make use update options not in the way the user expects
   // them
-  QMemArray<HTMLElementImpl*> listItems = element()->m_listItems;
+  Array<HTMLElementImpl*> listItems = element()->m_listItems;
   int j = 0;
   for (unsigned i = 0; i < listItems.count(); i++) {
     // don't use setSelected() here because it will cause us to be called
@@ -891,7 +891,7 @@ ComboBoxWidget* RenderSelect::createComboBox() {
 }
 
 void RenderSelect::updateSelection() {
-  QMemArray<HTMLElementImpl*> listItems = element()->listItems();
+  Array<HTMLElementImpl*> listItems = element()->listItems();
   int i;
   if (m_useListBox) {
     // if multi-select, we select only the new selected index

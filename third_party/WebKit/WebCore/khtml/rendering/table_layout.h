@@ -24,7 +24,7 @@
 #ifndef TABLE_LAYOUT_H
 #define TABLE_LAYOUT_H
 
-#include <qmemarray.h>
+#include "Array.h"
 #include <misc/khtmllayout.h>
 
 namespace khtml {
@@ -59,7 +59,7 @@ class FixedTableLayout : public TableLayout {
  protected:
   int calcWidthArray(int tableWidth);
 
-  QMemArray<Length> width;
+  Array<Length> width;
 };
 
 // -------------------------------------------------------------------------
@@ -100,8 +100,8 @@ class AutoTableLayout : public TableLayout {
     int calcWidth;
   };
 
-  QMemArray<Layout> layoutStruct;
-  QMemArray<RenderTableCell*> spanCells;
+  Array<Layout> layoutStruct;
+  Array<RenderTableCell*> spanCells;
   bool hasPercent : 1;
   mutable bool percentagesDirty : 1;
   mutable bool effWidthDirty : 1;

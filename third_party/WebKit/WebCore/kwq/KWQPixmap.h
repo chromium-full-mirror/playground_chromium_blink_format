@@ -63,9 +63,9 @@ class QPixmap : public QPaintDevice, public Qt {
   QPixmap();
   QPixmap(void* MIMEType);
   QPixmap(const IntSize&);
-  QPixmap(const QByteArray&);
+  QPixmap(const ByteArray&);
 #if __APPLE__
-  QPixmap(const QByteArray&, NSString* MIMEType);
+  QPixmap(const ByteArray&, NSString* MIMEType);
 #endif
   QPixmap(int, int);
 #if __APPLE__
@@ -87,7 +87,7 @@ class QPixmap : public QPaintDevice, public Qt {
 
   QPixmap& operator=(const QPixmap&);
 
-  bool receivedData(const QByteArray& bytes,
+  bool receivedData(const ByteArray& bytes,
                     bool isComplete,
                     khtml::CachedImageCallback* decoderCallback);
   void stopAnimations();

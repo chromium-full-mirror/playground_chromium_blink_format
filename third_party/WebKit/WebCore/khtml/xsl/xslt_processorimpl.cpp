@@ -87,7 +87,7 @@ static xmlDocPtr docLoaderFunc(const xmlChar* uri,
           (const char*)uri);
       KURL finalURL;
       KIO::TransferJob* job = KIO::get(url, true, false);
-      QByteArray data;
+      ByteArray data;
       QString headers;
       xmlDocPtr doc;
       xmlGenericErrorFunc oldErrorFunc = xmlGenericError;
