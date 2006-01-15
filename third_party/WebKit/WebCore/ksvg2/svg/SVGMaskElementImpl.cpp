@@ -116,7 +116,7 @@ KCanvasImage* SVGMaskElementImpl::drawMaskerContent() {
   if (!device->currentContext())  // FIXME: hack for now until
                                   // QPixmap::lockFocus exists
     return 0;
-  if (!attached())
+  if (!renderer())
     return 0;
   KCanvasImage* maskImage =
       static_cast<KCanvasImage*>(device->createResource(RS_IMAGE));
