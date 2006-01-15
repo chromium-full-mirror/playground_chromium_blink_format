@@ -29,7 +29,7 @@
 
 #include <time.h>
 
-#include "loader_client.h"
+#include "CachedObjectClient.h"
 
 #include <stdlib.h>
 #include <qptrlist.h>
