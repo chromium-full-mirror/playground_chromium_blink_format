@@ -296,7 +296,7 @@ class RenderObject : public CachedObjectClient {
   virtual QMatrix localTransform() const {
     return QMatrix(1, 0, 0, 1, xPos(), yPos());
   }
-  virtual void setLocalTransform(const QMatrix&) {}
+  virtual void setLocalTransform(const QMatrix&) { assert(false); }
   virtual QMatrix absoluteTransform() const;
 #endif
 

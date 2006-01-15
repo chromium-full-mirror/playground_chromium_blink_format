@@ -129,8 +129,8 @@ khtml::RenderObject* SVGImageElementImpl::createRenderer(
 
 void SVGImageElementImpl::attach() {
   SVGStyledTransformableElementImpl::attach();
-  if (khtml::RenderImage* imageObj =
-          static_cast<khtml::RenderImage*>(renderer()))
+  if (KSVG::RenderSVGImage* imageObj =
+          static_cast<KSVG::RenderSVGImage*>(renderer()))
     imageObj->setImage(m_imageLoader.image());
 }
 

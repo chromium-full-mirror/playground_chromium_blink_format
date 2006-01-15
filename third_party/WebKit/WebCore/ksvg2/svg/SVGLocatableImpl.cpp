@@ -41,9 +41,8 @@ SVGElementImpl* SVGLocatableImpl::nearestViewportElement(
   KDOM::NodeImpl* n = e->parentNode();
   while (n && !n->isDocumentNode()) {
     if (n->hasTagName(SVGNames::svgTag) || n->hasTagName(SVGNames::symbolTag) ||
-        n->hasTagName(
-            SVGNames::imageTag))  // FIXME: ||
-                                  // n->hasTagName(SVGNames::foreignObjectTag)
+        n->hasTagName(SVGNames::imageTag) ||
+        n->hasTagName(SVGNames::foreignObjectTag))
       return static_cast<SVGElementImpl*>(n);
 
     n = n->parentNode();
@@ -62,9 +61,8 @@ SVGElementImpl* SVGLocatableImpl::farthestViewportElement(
   KDOM::NodeImpl* n = e->parentNode();
   while (n && !n->isDocumentNode()) {
     if (n->hasTagName(SVGNames::svgTag) || n->hasTagName(SVGNames::symbolTag) ||
-        n->hasTagName(
-            SVGNames::imageTag))  // FIXME: ||
-                                  // n->hasTagName(SVGNames::foreignObjectTag)
+        n->hasTagName(SVGNames::imageTag) ||
+        n->hasTagName(SVGNames::foreignObjectTag))
       farthest = static_cast<SVGElementImpl*>(n);
 
     n = n->parentNode();

@@ -31,10 +31,16 @@ class RenderSVGImage : public khtml::RenderImage {
   RenderSVGImage(SVGImageElementImpl* impl);
   virtual ~RenderSVGImage();
 
+  virtual QMatrix localTransform() const { return m_transform; }
+  virtual void setLocalTransform(const QMatrix& transform) {
+    m_transform = transform;
+  }
+
   virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
 
  private:
   void translateForAttributes();
+  QMatrix m_transform;
 };
 };
 
