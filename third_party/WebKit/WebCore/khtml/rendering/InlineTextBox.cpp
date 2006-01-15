@@ -124,10 +124,15 @@ IntRect InlineTextBox::selectionRect(int tx, int ty, int startPos, int endPos) {
   int selHeight = rootBox->selectionHeight();
   const Font* f = textObj->htmlFont(m_firstLine);
 
-  return f->selectionRectForText(
+  IntRect r = f->selectionRectForText(
       tx + m_x, ty + selTop, selHeight, textObj->tabWidth(), textPos(),
       textObj->str->s, textObj->str->l, m_start, m_len, m_toAdd, m_reversed,
       m_dirOverride, sPos, ePos);
+  if (r.left() > tx + m_x + m_width)
+    r.setWidth(0);
+  else if (r.right() > tx + m_x + m_width)
+    r.setWidth(tx + m_x + m_width - r.left());
+  return r;
 }
 
 void InlineTextBox::deleteLine(RenderArena* arena) {
@@ -523,6 +528,7 @@ void InlineTextBox::paintSelection(QPainter* p,
   RootInlineBox* r = root();
   int y = r->selectionTop();
   int h = r->selectionHeight();
+  p->addClip(IntRect(m_x + tx, y + ty, m_width, h));
   f->drawHighlightForText(
       p, m_x + tx, y + ty, h, textObject()->tabWidth(), textPos(),
       textObject()->str->s, textObject()->str->l, m_start, m_len, m_toAdd,
