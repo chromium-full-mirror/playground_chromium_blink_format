@@ -111,7 +111,7 @@ SVGAnimatedTransformListImpl* SVGPatternElementImpl::patternTransform() const {
 
 void SVGPatternElementImpl::parseMappedAttribute(
     KDOM::MappedAttributeImpl* attr) {
-  KDOM::DOMString value(attr->value());
+  const KDOM::AtomicString& value = attr->value();
   if (attr->name() == SVGNames::patternUnitsAttr) {
     if (value == "userSpaceOnUse")
       patternUnits()->setBaseVal(SVG_UNIT_TYPE_USERSPACEONUSE);
@@ -124,8 +124,7 @@ void SVGPatternElementImpl::parseMappedAttribute(
       patternContentUnits()->setBaseVal(SVG_UNIT_TYPE_OBJECTBOUNDINGBOX);
   } else if (attr->name() == SVGNames::patternTransformAttr) {
     SVGTransformListImpl* patternTransforms = patternTransform()->baseVal();
-    SVGTransformableImpl::parseTransformAttribute(patternTransforms,
-                                                  value.impl());
+    SVGTransformableImpl::parseTransformAttribute(patternTransforms, value);
   } else if (attr->name() == SVGNames::xAttr)
     x()->baseVal()->setValueAsString(value.impl());
   else if (attr->name() == SVGNames::yAttr)

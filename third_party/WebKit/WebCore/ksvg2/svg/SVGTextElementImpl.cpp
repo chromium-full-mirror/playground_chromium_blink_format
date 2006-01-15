@@ -25,6 +25,8 @@
 #include "SVGTextElementImpl.h"
 #include "SVGTSpanElementImpl.h"
 #include "SVGAnimatedLengthListImpl.h"
+#include "SVGAnimatedTransformListImpl.h"
+#include "SVGMatrixImpl.h"
 #include "SVGRenderStyle.h"
 #include "KCanvasRenderingStyle.h"
 #include <kdom/css/RenderStyle.h>
@@ -42,9 +44,44 @@ SVGTextElementImpl::SVGTextElementImpl(const KDOM::QualifiedName& tagName,
 
 SVGTextElementImpl::~SVGTextElementImpl() {}
 
+SVGAnimatedTransformListImpl* SVGTextElementImpl::transform() const {
+  return lazy_create<SVGAnimatedTransformListImpl>(m_transform, this);
+}
+
+SVGMatrixImpl* SVGTextElementImpl::localMatrix() const {
+  return lazy_create<SVGMatrixImpl>(m_localMatrix);
+}
+
 void SVGTextElementImpl::parseMappedAttribute(KDOM::MappedAttributeImpl* attr) {
-  // if(SVGTransformableImpl::parseMappedAttribute(attr)) return;
-  SVGTextPositioningElementImpl::parseMappedAttribute(attr);
+  if (attr->name() == SVGNames::transformAttr) {
+    SVGTransformListImpl* localTransforms = transform()->baseVal();
+    localTransforms->clear();
+
+    SVGTransformableImpl::parseTransformAttribute(localTransforms,
+                                                  attr->value());
+    updateLocalTransform(localTransforms);
+  } else
+    SVGTextPositioningElementImpl::parseMappedAttribute(attr);
+}
+
+void SVGTextElementImpl::updateLocalTransform(
+    SVGTransformListImpl* localTransforms) {
+  // Update cached local matrix
+  RefPtr<SVGTransformImpl> localTransform = localTransforms->concatenate();
+  if (localTransform) {
+    m_localMatrix = localTransform->matrix();
+    if (renderer()) {
+      renderer()->setLocalTransform(m_localMatrix->qmatrix());
+      renderer()->setNeedsLayout(true);
+    }
+  }
+}
+
+void SVGTextElementImpl::attach() {
+  SVGStyledElementImpl::attach();
+
+  if (renderer() && m_localMatrix)
+    renderer()->setLocalTransform(m_localMatrix->qmatrix());
 }
 
 SVGElementImpl* SVGTextElementImpl::nearestViewportElement() const {
@@ -74,7 +111,7 @@ khtml::RenderObject* SVGTextElementImpl::createRenderer(
 }
 
 bool SVGTextElementImpl::childShouldCreateRenderer(DOM::NodeImpl* child) const {
-  if (child->isTextNode())
+  if (child->isTextNode() || child->hasTagName(SVGNames::tspanTag))
     return true;
   return false;
 }

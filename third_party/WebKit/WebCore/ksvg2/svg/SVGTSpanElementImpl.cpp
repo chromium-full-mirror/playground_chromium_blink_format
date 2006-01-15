@@ -20,9 +20,10 @@
     Boston, MA 02111-1307, USA.
 */
 
-//#include "SVGDocument.h"
 #include "config.h"
 #include "SVGTSpanElementImpl.h"
+#include "SVGNames.h"
+#include "render_inline.h"
 
 using namespace KSVG;
 
@@ -31,5 +32,17 @@ SVGTSpanElementImpl::SVGTSpanElementImpl(const KDOM::QualifiedName& tagName,
     : SVGTextPositioningElementImpl(tagName, doc) {}
 
 SVGTSpanElementImpl::~SVGTSpanElementImpl() {}
+
+bool SVGTSpanElementImpl::childShouldCreateRenderer(
+    DOM::NodeImpl* child) const {
+  if (child->isTextNode() || child->hasTagName(SVGNames::tspanTag))
+    return true;
+  return false;
+}
+
+khtml::RenderObject* SVGTSpanElementImpl::createRenderer(RenderArena* arena,
+                                                         khtml::RenderStyle*) {
+  return new (arena) khtml::RenderInline(this);
+}
 
 // vim:ts=4:noet

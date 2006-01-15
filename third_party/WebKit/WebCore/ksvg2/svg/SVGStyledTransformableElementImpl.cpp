@@ -94,7 +94,7 @@ void SVGStyledTransformableElementImpl::parseMappedAttribute(
     localTransforms->clear();
 
     SVGTransformableImpl::parseTransformAttribute(localTransforms,
-                                                  attr->value().impl());
+                                                  attr->value());
     updateLocalTransform(localTransforms);
   } else
     SVGStyledLocatableElementImpl::parseMappedAttribute(attr);

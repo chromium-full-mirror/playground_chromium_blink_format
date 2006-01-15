@@ -51,12 +51,16 @@ class SVGTextElementImpl : public SVGTextPositioningElementImpl,
   virtual khtml::RenderObject* createRenderer(RenderArena* arena,
                                               khtml::RenderStyle* style);
   virtual bool childShouldCreateRenderer(DOM::NodeImpl*) const;
+  virtual void attach();
 
-  virtual SVGAnimatedTransformListImpl* transform() const { return 0; }
-  virtual SVGMatrixImpl* localMatrix() const { return 0; }
+  virtual SVGAnimatedTransformListImpl* transform() const;
+  virtual SVGMatrixImpl* localMatrix() const;
 
-  // FIXME: HACK
-  virtual void updateLocalTransform(SVGTransformListImpl* localTransforms){};
+  virtual void updateLocalTransform(SVGTransformListImpl* localTransforms);
+
+ private:
+  mutable RefPtr<SVGMatrixImpl> m_localMatrix;
+  mutable RefPtr<SVGAnimatedTransformListImpl> m_transform;
 };
 };
 

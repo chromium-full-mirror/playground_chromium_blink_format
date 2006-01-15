@@ -32,7 +32,10 @@ class SVGTSpanElementImpl : public SVGTextPositioningElementImpl {
                       KDOM::DocumentImpl* doc);
   virtual ~SVGTSpanElementImpl();
 
-  // 'SVGTSpanElement' functions
+  virtual bool rendererIsNeeded(khtml::RenderStyle*) { return true; }
+  virtual khtml::RenderObject* createRenderer(RenderArena* arena,
+                                              khtml::RenderStyle* style);
+  bool childShouldCreateRenderer(DOM::NodeImpl* child) const;
 };
 };
 

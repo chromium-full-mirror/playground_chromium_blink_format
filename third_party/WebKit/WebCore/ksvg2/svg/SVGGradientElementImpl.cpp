@@ -86,7 +86,7 @@ void SVGGradientElementImpl::parseMappedAttribute(
   } else if (attr->name() == SVGNames::gradientTransformAttr) {
     SVGTransformListImpl* gradientTransforms = gradientTransform()->baseVal();
     SVGTransformableImpl::parseTransformAttribute(gradientTransforms,
-                                                  attr->value().impl());
+                                                  attr->value());
   } else if (attr->name() == SVGNames::spreadMethodAttr) {
     if (value == "reflect")
       spreadMethod()->setBaseVal(SVG_SPREADMETHOD_REFLECT);
