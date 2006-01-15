@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
+                  2006       Alexander Kellett <lypanov@kde.org>
 
     This file is part of the KDE project
 
@@ -25,7 +26,8 @@
 
 KCanvasCommonArgs::KCanvasCommonArgs() {
   m_path = 0;
-  m_style = 0;
+  m_renderStyle = 0;
+  m_renderPath = 0;
 }
 
 KCanvasCommonArgs::~KCanvasCommonArgs() {}
@@ -38,12 +40,20 @@ void KCanvasCommonArgs::setPath(KCanvasPath* path) {
   m_path = path;
 }
 
-KSVG::KCanvasRenderingStyle* KCanvasCommonArgs::canvasStyle() const {
-  return m_style;
+khtml::RenderStyle* KCanvasCommonArgs::renderStyle() const {
+  return m_renderStyle;
 }
 
-void KCanvasCommonArgs::setStyle(KSVG::KCanvasRenderingStyle* style) {
-  m_style = style;
+void KCanvasCommonArgs::setRenderStyle(khtml::RenderStyle* renderStyle) {
+  m_renderStyle = renderStyle;
+}
+
+const RenderPath* KCanvasCommonArgs::renderPath() const {
+  return m_renderPath;
+}
+
+void KCanvasCommonArgs::setRenderPath(const RenderPath* renderPath) {
+  m_renderPath = renderPath;
 }
 
 KRenderingDevice::KRenderingDevice() {}

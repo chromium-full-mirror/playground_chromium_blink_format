@@ -41,9 +41,6 @@ namespace KSVG {
 class SVGStyledElementImpl;
 };
 
-namespace KSVG {
-class KCanvasRenderingStyle;
-}
 class KCanvasContainer;
 class KCanvasMatrix;
 class RenderPath : public khtml::RenderObject {
@@ -59,12 +56,8 @@ class RenderPath : public khtml::RenderObject {
   // this vector path
   virtual FloatRect relativeBBox(bool includeStroke = true) const;
 
-  // Update
   void changePath(KCanvasPath* newPath);
-
   KCanvasPath* path() const;
-  virtual void setStyle(khtml::RenderStyle* style);
-  KSVG::KCanvasRenderingStyle* canvasStyle() const;
 
   virtual bool isRenderPath() const { return true; }
   virtual const char* renderName() const { return "KCanvasItem"; }
