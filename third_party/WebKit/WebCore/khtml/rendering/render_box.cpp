@@ -38,7 +38,6 @@
 #include "render_arena.h"
 #include "render_theme.h"
 
-#include "xml/dom_nodeimpl.h"
 #include "DocumentImpl.h"
 #include "html/html_elementimpl.h"
 #include "CachedImage.h"

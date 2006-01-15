@@ -31,6 +31,7 @@
 
 #include "KWQPixmap.h"
 #include "xml/dom2_eventsimpl.h"
+#include "IntPoint.h"
 
 #ifdef __OBJC__
 @class NSImage;
@@ -43,6 +44,7 @@ class NSPasteboard;
 typedef unsigned NSDragOperation;
 
 class MacFrame;
+class QStringList;
 
 class KWQClipboard : public DOM::ClipboardImpl {
  public:

@@ -26,8 +26,6 @@
 #include "config.h"
 #include "insert_node_before_command.h"
 
-#include "xml/dom_nodeimpl.h"
-
 #include <kxmlcore/Assertions.h>
 
 using DOM::DocumentImpl;
