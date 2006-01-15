@@ -115,7 +115,7 @@ class KCanvasFilter : public KCanvasResource {
 };
 
 KCanvasFilter* getFilterById(KDOM::DocumentImpl* document,
-                             const KDOM::DOMString& id);
+                             const KDOM::AtomicString& id);
 
 class KCanvasFilterEffect {
  public:

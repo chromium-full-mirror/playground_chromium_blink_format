@@ -430,7 +430,7 @@ JSValue* DOMStyleSheetList::nameGetter(ExecState* exec,
                                        const PropertySlot& slot) {
   DOMStyleSheetList* thisObj = static_cast<DOMStyleSheetList*>(slot.slotBase());
   ElementImpl* element =
-      thisObj->m_doc->getElementById(propertyName.domString());
+      thisObj->m_doc->getElementById(propertyName.domString().impl());
   return getDOMStyleSheet(exec,
                           static_cast<HTMLStyleElementImpl*>(element)->sheet());
 }
@@ -470,7 +470,7 @@ bool DOMStyleSheetList::getOwnPropertySlot(ExecState* exec,
   // unique?)
   // and doesn't look for name attribute (see implementation above).
   // But unicity of stylesheet ids is good practice anyway ;)
-  ElementImpl* element = m_doc->getElementById(propertyName.domString());
+  ElementImpl* element = m_doc->getElementById(propertyName.domString().impl());
   if (element && element->hasTagName(styleTag)) {
     slot.setCustom(this, nameGetter);
     return true;

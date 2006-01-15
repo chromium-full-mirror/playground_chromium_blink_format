@@ -23,8 +23,8 @@
  */
 
 #include "config.h"
-
 #include "DocumentTypeImpl.h"
+
 #include "DOMImplementationImpl.h"
 #include "DocumentImpl.h"
 #include "dom_node.h"
@@ -95,4 +95,4 @@ NodeImpl* DocumentTypeImpl::cloneNode(bool /*deep*/) {
   // "implementation dependent" so for now we do not support it.
   return 0;
 }
-};
+}

@@ -165,8 +165,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   virtual ElementImpl* createElementNS(const DOMString& _namespaceURI,
                                        const DOMString& _qualifiedName,
                                        int& exceptioncode);
-  ElementImpl* getElementById(const DOMString& elementId) const;
-  ElementImpl* elementFromPoint(const int _x, const int _y) const;
+  ElementImpl* getElementById(const AtomicString&) const;
+  ElementImpl* elementFromPoint(int x, int y) const;
 
   NodeImpl* adoptNode(NodeImpl* source, int& exceptioncode);
 
@@ -542,8 +542,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                  DOMString& prefix,
                                  DOMString& localName);
 
-  void addElementById(const DOMString& elementId, ElementImpl* element);
-  void removeElementById(const DOMString& elementId, ElementImpl* element);
+  void addElementById(const AtomicString& elementId, ElementImpl* element);
+  void removeElementById(const AtomicString& elementId, ElementImpl* element);
 
   void addImageMap(HTMLMapElementImpl*);
   void removeImageMap(HTMLMapElementImpl*);
@@ -811,8 +811,10 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   RefPtr<khtml::Decoder> m_decoder;
 
-  mutable HashMap<DOMStringImpl*, ElementImpl*> m_elementsById;
-  mutable HashCountedSet<DOMStringImpl*> m_idCount;
+  mutable HashMap<DOMStringImpl*, ElementImpl*, PointerHash<DOMStringImpl*>>
+      m_elementsById;
+  mutable HashCountedSet<DOMStringImpl*, PointerHash<DOMStringImpl*>>
+      m_duplicateIds;
 
   HashMap<DOMStringImpl*, ElementImpl*, CaseInsensitiveHash>
       m_elementsByAccessKey;

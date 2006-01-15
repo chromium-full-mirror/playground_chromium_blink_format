@@ -4,7 +4,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,6 +22,7 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef DOM_NodeListImpl_h
 #define DOM_NodeListImpl_h
 
@@ -29,8 +30,8 @@
 
 namespace DOM {
 
+class AtomicString;
 class NodeImpl;
-class DOMString;
 
 class NodeListImpl : public Shared<NodeListImpl> {
  public:
@@ -40,10 +41,9 @@ class NodeListImpl : public Shared<NodeListImpl> {
   // DOM methods & attributes for NodeList
   virtual unsigned length() const = 0;
   virtual NodeImpl* item(unsigned index) const = 0;
-  virtual NodeImpl* itemById(const DOMString& elementId) const;
+  NodeImpl* itemById(const AtomicString&) const;
 
   // Other methods (not part of DOM)
-
   virtual void rootNodeChildrenChanged();
   virtual void rootNodeAttributeChanged() {}
 
@@ -61,5 +61,6 @@ class NodeListImpl : public Shared<NodeListImpl> {
   mutable bool isItemCacheValid : 1;
 };
 
-};  // namespace
+}  // namespace
+
 #endif

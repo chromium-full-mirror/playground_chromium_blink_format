@@ -635,7 +635,7 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
   return e;
 }
 
-ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
+ElementImpl* DocumentImpl::getElementById(const AtomicString& elementId) const {
   if (elementId.length() == 0)
     return 0;
 
@@ -643,12 +643,12 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
   if (element)
     return element;
 
-  if (m_idCount.contains(elementId.impl())) {
+  if (m_duplicateIds.contains(elementId.impl())) {
     for (NodeImpl* n = traverseNextNode(); n != 0; n = n->traverseNextNode()) {
       if (n->isElementNode()) {
         element = static_cast<ElementImpl*>(n);
         if (element->hasID() && element->getAttribute(idAttr) == elementId) {
-          m_idCount.remove(elementId.impl());
+          m_duplicateIds.remove(elementId.impl());
           m_elementsById.set(elementId.impl(), element);
           return element;
         }
@@ -658,12 +658,12 @@ ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
   return 0;
 }
 
-ElementImpl* DocumentImpl::elementFromPoint(const int _x, const int _y) const {
+ElementImpl* DocumentImpl::elementFromPoint(int x, int y) const {
   if (!m_render)
     return 0;
 
   RenderObject::NodeInfo nodeInfo(true, true);
-  m_render->layer()->hitTest(nodeInfo, _x, _y);
+  m_render->layer()->hitTest(nodeInfo, x, y);
 
   NodeImpl* n = nodeInfo.innerNode();
   while (n && !n->isElementNode())
@@ -671,20 +671,20 @@ ElementImpl* DocumentImpl::elementFromPoint(const int _x, const int _y) const {
   return static_cast<ElementImpl*>(n);
 }
 
-void DocumentImpl::addElementById(const DOMString& elementId,
+void DocumentImpl::addElementById(const AtomicString& elementId,
                                   ElementImpl* element) {
   if (!m_elementsById.contains(elementId.impl()))
     m_elementsById.set(elementId.impl(), element);
   else
-    m_idCount.insert(elementId.impl());
+    m_duplicateIds.insert(elementId.impl());
 }
 
-void DocumentImpl::removeElementById(const DOMString& elementId,
+void DocumentImpl::removeElementById(const AtomicString& elementId,
                                      ElementImpl* element) {
   if (m_elementsById.get(elementId.impl()) == element)
     m_elementsById.remove(elementId.impl());
   else
-    m_idCount.remove(elementId.impl());
+    m_duplicateIds.remove(elementId.impl());
 }
 
 ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
@@ -1867,7 +1867,7 @@ void DocumentImpl::recalcStyleSelector() {
         // <?xml-stylesheet href="#mystyle">, with the element
         // <foo id="mystyle">heading { color: red; }</foo> at some location in
         // the document
-        ElementImpl* elem = getElementById(pi->localHref());
+        ElementImpl* elem = getElementById(pi->localHref().impl());
         if (elem) {
           DOMString sheetText("");
           NodeImpl* c;

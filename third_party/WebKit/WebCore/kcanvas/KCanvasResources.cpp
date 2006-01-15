@@ -228,7 +228,7 @@ QTextStream& KCanvasMarker::externalRepresentation(QTextStream& ts) const {
 }
 
 KCanvasResource* getResourceById(KDOM::DocumentImpl* document,
-                                 const KDOM::DOMString& id) {
+                                 const KDOM::AtomicString& id) {
   if (id.isEmpty())
     return 0;
   KDOM::ElementImpl* element = document->getElementById(id);
@@ -243,7 +243,7 @@ KCanvasResource* getResourceById(KDOM::DocumentImpl* document,
 }
 
 KCanvasMarker* getMarkerById(KDOM::DocumentImpl* document,
-                             const KDOM::DOMString& id) {
+                             const KDOM::AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isMarker())
     return static_cast<KCanvasMarker*>(resource);
@@ -251,7 +251,7 @@ KCanvasMarker* getMarkerById(KDOM::DocumentImpl* document,
 }
 
 KCanvasClipper* getClipperById(KDOM::DocumentImpl* document,
-                               const KDOM::DOMString& id) {
+                               const KDOM::AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isClipper())
     return static_cast<KCanvasClipper*>(resource);
@@ -259,7 +259,7 @@ KCanvasClipper* getClipperById(KDOM::DocumentImpl* document,
 }
 
 KCanvasMasker* getMaskerById(KDOM::DocumentImpl* document,
-                             const KDOM::DOMString& id) {
+                             const KDOM::AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isMasker())
     return static_cast<KCanvasMasker*>(resource);
@@ -267,7 +267,7 @@ KCanvasMasker* getMaskerById(KDOM::DocumentImpl* document,
 }
 
 KRenderingPaintServer* getPaintServerById(KDOM::DocumentImpl* document,
-                                          const KDOM::DOMString& id) {
+                                          const KDOM::AtomicString& id) {
   KCanvasResource* resource = getResourceById(document, id);
   if (resource && resource->isPaintServer())
     return static_cast<KRenderingPaintServer*>(resource);
