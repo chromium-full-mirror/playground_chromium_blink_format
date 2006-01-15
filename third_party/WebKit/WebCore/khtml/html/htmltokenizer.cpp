@@ -236,7 +236,7 @@ void HTMLTokenizer::setForceSynchronous(bool force) {
   m_state.setForceSynchronous(force);
 }
 
-HTMLTokenizer::State HTMLTokenizer::processListing(TokenizerString list,
+HTMLTokenizer::State HTMLTokenizer::processListing(SegmentedString list,
                                                    State state) {
   // This function adds the listing 'list' as
   // preformatted text-tokens to the token-collection
@@ -273,7 +273,7 @@ HTMLTokenizer::State HTMLTokenizer::processListing(TokenizerString list,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseSpecial(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseSpecial(SegmentedString& src,
                                                  State state) {
   assert(state.inTextArea() || state.inTitle() || !state.hasEntityState());
   assert(!state.hasTagState());
@@ -308,7 +308,7 @@ HTMLTokenizer::State HTMLTokenizer::parseSpecial(TokenizerString& src,
         state = scriptHandler(state);
       else {
         state =
-            processListing(TokenizerString(scriptCode, scriptCodeSize), state);
+            processListing(SegmentedString(scriptCode, scriptCodeSize), state);
         processToken();
         if (state.inStyle()) {
           currToken.tagName = styleTag.localName();
@@ -408,15 +408,15 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
     // Parse scriptCode containing <script> info
     doScriptExec = true;
   }
-  state = processListing(TokenizerString(scriptCode, scriptCodeSize), state);
+  state = processListing(SegmentedString(scriptCode, scriptCodeSize), state);
   QString exScript(buffer, dest - buffer);
   processToken();
   currToken.tagName = scriptTag.localName();
   currToken.beginTag = false;
   processToken();
 
-  TokenizerString* savedPrependingSrc = currentPrependingSrc;
-  TokenizerString prependingSrc;
+  SegmentedString* savedPrependingSrc = currentPrependingSrc;
+  SegmentedString prependingSrc;
   currentPrependingSrc = &prependingSrc;
   if (!parser->skipMode() && !followingFrameset) {
     if (cs) {
@@ -429,7 +429,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
       } else {
         pendingSrc.prepend(src);
       }
-      setSrc(TokenizerString());
+      setSrc(SegmentedString());
       scriptCodeSize = scriptCodeResync = 0;
 
       // the ref() call below may call notifyFinished if the script is already
@@ -447,7 +447,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptHandler(State state) {
         pendingSrc.prepend(src);
       else
         prependingSrc = src;
-      setSrc(TokenizerString());
+      setSrc(SegmentedString());
       scriptCodeSize = scriptCodeResync = 0;
       // QTime dt;
       // dt.start();
@@ -505,8 +505,8 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const QString& str,
   else
     url = scriptURL;
 
-  TokenizerString* savedPrependingSrc = currentPrependingSrc;
-  TokenizerString prependingSrc;
+  SegmentedString* savedPrependingSrc = currentPrependingSrc;
+  SegmentedString prependingSrc;
   currentPrependingSrc = &prependingSrc;
 
 #ifdef INSTRUMENT_LAYOUT_SCHEDULING
@@ -558,7 +558,7 @@ HTMLTokenizer::State HTMLTokenizer::scriptExecution(const QString& str,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseComment(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseComment(SegmentedString& src,
                                                  State state) {
   // FIXME: Why does this code even run for comments inside <script> and
   // <style>? This seems bogus.
@@ -617,7 +617,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(TokenizerString& src,
             currToken.tagName = commentAtom;
             currToken.beginTag = true;
             state = processListing(
-                TokenizerString(scriptCode, scriptCodeSize - endCharsCount),
+                SegmentedString(scriptCode, scriptCodeSize - endCharsCount),
                 state);
             processToken();
             currToken.tagName = commentAtom;
@@ -636,7 +636,7 @@ HTMLTokenizer::State HTMLTokenizer::parseComment(TokenizerString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseServer(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseServer(SegmentedString& src,
                                                 State state) {
   checkScriptBuffer(src.length());
   while (!src.isEmpty()) {
@@ -654,7 +654,7 @@ HTMLTokenizer::State HTMLTokenizer::parseServer(TokenizerString& src,
 }
 
 HTMLTokenizer::State HTMLTokenizer::parseProcessingInstruction(
-    TokenizerString& src,
+    SegmentedString& src,
     State state) {
   char oldchar = 0;
   while (!src.isEmpty()) {
@@ -681,7 +681,7 @@ HTMLTokenizer::State HTMLTokenizer::parseProcessingInstruction(
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseText(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseText(SegmentedString& src,
                                               State state) {
   while (!src.isEmpty()) {
     ushort cc = src->unicode();
@@ -708,7 +708,7 @@ HTMLTokenizer::State HTMLTokenizer::parseText(TokenizerString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseEntity(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseEntity(SegmentedString& src,
                                                 QChar*& dest,
                                                 State state,
                                                 unsigned& cBufferPos,
@@ -853,7 +853,7 @@ HTMLTokenizer::State HTMLTokenizer::parseEntity(TokenizerString& src,
   return state;
 }
 
-HTMLTokenizer::State HTMLTokenizer::parseTag(TokenizerString& src,
+HTMLTokenizer::State HTMLTokenizer::parseTag(SegmentedString& src,
                                              State state) {
   assert(!state.hasEntityState());
 
@@ -1389,7 +1389,7 @@ inline bool HTMLTokenizer::continueProcessing(int& processedCount,
   return true;
 }
 
-bool HTMLTokenizer::write(const TokenizerString& str, bool appendData) {
+bool HTMLTokenizer::write(const SegmentedString& str, bool appendData) {
 #ifdef TOKEN_DEBUG
   kdDebug(6036) << this << " Tokenizer::write(\"" << str.toString() << "\","
                 << appendData << ")" << endl;
@@ -1613,7 +1613,7 @@ void HTMLTokenizer::timerEvent(QTimerEvent* e) {
 
     // Invoke write() as though more data came in.
     QGuardedPtr<KHTMLView> savedView = view;
-    bool didCallEnd = write(TokenizerString(), true);
+    bool didCallEnd = write(SegmentedString(), true);
 
     // If we called end() during the write,  we need to let WebKit know that
     // we're done processing the data.
@@ -1801,7 +1801,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     kdDebug(6036) << "External script is:" << endl
                   << scriptSource.qstring() << endl;
 #endif
-    setSrc(TokenizerString());
+    setSrc(SegmentedString());
 
     // make sure we forget about the script before we execute the new one
     // infinite recursion might happen otherwise
@@ -1842,7 +1842,7 @@ void HTMLTokenizer::notifyFinished(CachedObject* /*finishedObj*/) {
     // parseScript(). In that case parseScript() will take care
     // of 'scriptOutput'.
     if (!m_state.inScript()) {
-      TokenizerString rest = pendingSrc;
+      SegmentedString rest = pendingSrc;
       pendingSrc.clear();
       write(rest, false);
       // we might be deleted at this point, do not
@@ -1855,7 +1855,7 @@ bool HTMLTokenizer::isWaitingForScripts() const {
   return m_state.loadingExtScript();
 }
 
-void HTMLTokenizer::setSrc(const TokenizerString& source) {
+void HTMLTokenizer::setSrc(const SegmentedString& source) {
   lineno += src.lineCount();
   src = source;
   src.resetLineCount();

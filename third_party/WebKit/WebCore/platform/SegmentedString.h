@@ -1,7 +1,7 @@
 /*
     This file is part of the KDE libraries
 
-    Copyright (C) 1999 Lars Knoll (knoll@mpi-hd.mpg.de)
+    Copyright (C) 2004-6 Apple Computer
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -32,21 +32,21 @@
 
 #include <assert.h>
 
-namespace khtml {
+namespace WebCore {
 
-class TokenizerString;
+class SegmentedString;
 
-class TokenizerSubstring {
+class SegmentedSubstring {
  private:
-  friend class TokenizerString;
+  friend class SegmentedString;
 
-  TokenizerSubstring() : m_length(0), m_current(0) {}
-  TokenizerSubstring(const QString& str)
+  SegmentedSubstring() : m_length(0), m_current(0) {}
+  SegmentedSubstring(const QString& str)
       : m_string(str), m_length(str.length()) {
     m_current = m_length == 0 ? 0 : m_string.stableUnicode();
   }
 
-  TokenizerSubstring(const QChar* str, int length)
+  SegmentedSubstring(const QChar* str, int length)
       : m_length(length), m_current(length == 0 ? 0 : str) {}
 
   void clear() {
@@ -70,15 +70,15 @@ class TokenizerSubstring {
   const QChar* m_current;
 };
 
-class TokenizerString {
+class SegmentedString {
  public:
-  TokenizerString() : m_currentChar(0), m_lines(0), m_composite(false) {}
-  TokenizerString(const QChar* str, int length)
+  SegmentedString() : m_currentChar(0), m_lines(0), m_composite(false) {}
+  SegmentedString(const QChar* str, int length)
       : m_currentString(str, length),
         m_currentChar(m_currentString.m_current),
         m_lines(0),
         m_composite(false) {}
-  TokenizerString(const QString& str)
+  SegmentedString(const QString& str)
       : m_currentString(str),
         m_currentChar(m_currentString.m_current),
         m_lines(0),
@@ -86,8 +86,8 @@ class TokenizerString {
 
   void clear();
 
-  void append(const TokenizerString&);
-  void prepend(const TokenizerString&);
+  void append(const SegmentedString&);
+  void prepend(const SegmentedString&);
 
   void push(QChar c) {
     if (m_pushedChar1.isNull()) {
@@ -128,20 +128,23 @@ class TokenizerString {
   const QChar* operator->() const { return current(); }
 
  private:
-  void append(const TokenizerSubstring&);
-  void prepend(const TokenizerSubstring&);
+  void append(const SegmentedSubstring&);
+  void prepend(const SegmentedSubstring&);
 
   void advanceSubstring();
   const QChar* current() const { return m_currentChar; }
 
   QChar m_pushedChar1;
   QChar m_pushedChar2;
-  TokenizerSubstring m_currentString;
+  SegmentedSubstring m_currentString;
   const QChar* m_currentChar;
-  QValueList<TokenizerSubstring> m_substrings;
+  QValueList<SegmentedSubstring> m_substrings;
   int m_lines;
   bool m_composite;
 };
 }
+
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::SegmentedString;
 
 #endif

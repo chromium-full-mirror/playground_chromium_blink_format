@@ -100,7 +100,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
                 bool includesComments = false);
   virtual ~HTMLTokenizer();
 
-  virtual bool write(const TokenizerString& str, bool appendData);
+  virtual bool write(const SegmentedString& str, bool appendData);
   virtual void finish();
   virtual void setOnHold(bool onHold);
   virtual void setForceSynchronous(bool force);
@@ -118,25 +118,25 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   void reset();
   DOM::NodeImpl* processToken();
 
-  State processListing(TokenizerString, State);
-  State parseComment(TokenizerString&, State);
-  State parseServer(TokenizerString&, State);
-  State parseText(TokenizerString&, State);
-  State parseSpecial(TokenizerString&, State);
-  State parseTag(TokenizerString&, State);
-  State parseEntity(TokenizerString&,
+  State processListing(SegmentedString, State);
+  State parseComment(SegmentedString&, State);
+  State parseServer(SegmentedString&, State);
+  State parseText(SegmentedString&, State);
+  State parseSpecial(SegmentedString&, State);
+  State parseTag(SegmentedString&, State);
+  State parseEntity(SegmentedString&,
                     QChar*& dest,
                     State,
                     unsigned& _cBufferPos,
                     bool start,
                     bool parsingTag);
-  State parseProcessingInstruction(TokenizerString&, State);
+  State parseProcessingInstruction(SegmentedString&, State);
   State scriptHandler(State);
   State scriptExecution(const QString& script,
                         State state,
                         QString scriptURL = QString(),
                         int baseLine = 0);
-  void setSrc(const TokenizerString& source);
+  void setSrc(const SegmentedString& source);
 
   // check if we have enough space in the buffer.
   // if not enlarge it
@@ -339,11 +339,11 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   bool javascript;
   // the HTML code we will parse after the external script we are waiting for
   // has loaded
-  TokenizerString pendingSrc;
+  SegmentedString pendingSrc;
 
   // the HTML code we will parse after this particular script has
   // loaded, but before all pending HTML
-  TokenizerString* currentPrependingSrc;
+  SegmentedString* currentPrependingSrc;
 
   // true if we are executing a script while parsing a document. This causes the
   // parsing of
@@ -378,7 +378,7 @@ class HTMLTokenizer : public Tokenizer, public CachedObjectClient {
   char cBuffer[CBUFLEN + 2];
   unsigned int m_cBufferPos;
 
-  TokenizerString src;
+  SegmentedString src;
   HTMLParser* parser;
   QGuardedPtr<KHTMLView> view;
   bool inWrite;

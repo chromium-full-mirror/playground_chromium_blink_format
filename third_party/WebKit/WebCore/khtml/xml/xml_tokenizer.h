@@ -26,11 +26,15 @@
 
 #include <qobject.h>
 #include <qmap.h>
-#include "stringit.h"
+#include "SegmentedString.h"
 
 #include "KWQSignal.h"
 
 class KHTMLView;
+
+namespace WebCore {
+class SegmentedString;
+};
 
 namespace DOM {
 class DocumentImpl;
@@ -41,8 +45,6 @@ class NodeImpl;
 
 namespace khtml {
 
-class TokenizerString;
-
 class Tokenizer : public QObject {
   Q_OBJECT
 
@@ -52,7 +54,7 @@ class Tokenizer : public QObject {
   // received during executing a script must be appended, hence the
   // extra bool to be able to distinguish between both cases. document.write()
   // always uses false, while khtmlpart uses true
-  virtual bool write(const TokenizerString& str, bool appendData) = 0;
+  virtual bool write(const SegmentedString& str, bool appendData) = 0;
   virtual void finish() = 0;
   virtual void setOnHold(bool onHold) = 0;
   virtual bool isWaitingForScripts() const = 0;
