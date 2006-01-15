@@ -510,8 +510,8 @@ void ReplaceSelectionCommand::doApply() {
   if (m_matchStyle)
     m_insertionStyle = styleAtPosition(selection.start());
 
-  VisiblePosition visibleStart(selection.start(), selection.startAffinity());
-  VisiblePosition visibleEnd(selection.end(), selection.endAffinity());
+  VisiblePosition visibleStart(selection.start(), selection.affinity());
+  VisiblePosition visibleEnd(selection.end(), selection.affinity());
   bool startAtStartOfBlock = isStartOfBlock(visibleStart);
   bool startAtEndOfBlock = isEndOfBlock(visibleStart);
   bool startAtBlockBoundary = startAtStartOfBlock || startAtEndOfBlock;
@@ -953,8 +953,7 @@ void ReplaceSelectionCommand::completeHTMLReplacement(
     return;
 
   if (m_selectReplacement)
-    setEndingSelection(SelectionController(start, SEL_DEFAULT_AFFINITY, end,
-                                           SEL_DEFAULT_AFFINITY));
+    setEndingSelection(SelectionController(start, end, SEL_DEFAULT_AFFINITY));
   else
     setEndingSelection(end, SEL_DEFAULT_AFFINITY);
 

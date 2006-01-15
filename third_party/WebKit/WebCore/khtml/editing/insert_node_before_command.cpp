@@ -26,12 +26,10 @@
 #include "config.h"
 #include "insert_node_before_command.h"
 
+#include "NodeImpl.h"
 #include <kxmlcore/Assertions.h>
 
-using DOM::DocumentImpl;
-using DOM::NodeImpl;
-
-namespace khtml {
+namespace WebCore {
 
 InsertNodeBeforeCommand::InsertNodeBeforeCommand(DocumentImpl* document,
                                                  NodeImpl* insertChild,

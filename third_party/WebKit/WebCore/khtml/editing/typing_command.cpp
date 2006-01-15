@@ -68,7 +68,7 @@ void TypingCommand::deleteKeyPressed(DocumentImpl* document, bool smartDelete) {
   } else {
     SelectionController selection = frame->selection();
     if (selection.isCaret() &&
-        VisiblePosition(selection.start(), selection.startAffinity())
+        VisiblePosition(selection.start(), selection.affinity())
             .previous()
             .isNull()) {
       // do nothing for a delete key at the start of an editable element.
@@ -94,9 +94,8 @@ void TypingCommand::forwardDeleteKeyPressed(DocumentImpl* document,
         ->forwardDeleteKeyPressed();
   } else {
     SelectionController selection = frame->selection();
-    if (selection.isCaret() &&
-        isEndOfDocument(
-            VisiblePosition(selection.start(), selection.startAffinity()))) {
+    if (selection.isCaret() && isEndOfDocument(VisiblePosition(
+                                   selection.start(), selection.affinity()))) {
       // do nothing for a delete key at the start of an editable element.
     } else {
       TypingCommand* typingCommand =
@@ -227,7 +226,7 @@ void TypingCommand::markMisspellingsAfterTyping() {
   // Basically, you
   // get this by being at the end of a word and typing a space.
   VisiblePosition start(endingSelection().start(),
-                        endingSelection().startAffinity());
+                        endingSelection().affinity());
   VisiblePosition previous = start.previous();
   if (previous.isNotNull()) {
     VisiblePosition p1 = startOfWord(previous, LeftWordIfOnBoundary);
@@ -330,27 +329,27 @@ void TypingCommand::deleteKeyPressed() {
   SelectionController selectionToDelete;
 
   switch (endingSelection().state()) {
-    case SelectionController::RANGE:
+    case khtml::Selection::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case SelectionController::CARET: {
+    case khtml::Selection::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
       Position pos(endingSelection().start());
-      Position start = VisiblePosition(pos, endingSelection().startAffinity())
+      Position start = VisiblePosition(pos, endingSelection().affinity())
                            .previous()
                            .deepEquivalent();
-      Position end = VisiblePosition(pos, endingSelection().startAffinity())
-                         .deepEquivalent();
+      Position end =
+          VisiblePosition(pos, endingSelection().affinity()).deepEquivalent();
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete = SelectionController(start, SEL_DEFAULT_AFFINITY,
-                                                end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete =
+            SelectionController(start, end, SEL_DEFAULT_AFFINITY);
       break;
     }
-    case SelectionController::NONE:
+    case khtml::Selection::NONE:
       ASSERT_NOT_REACHED();
       break;
   }
@@ -366,27 +365,27 @@ void TypingCommand::forwardDeleteKeyPressed() {
   SelectionController selectionToDelete;
 
   switch (endingSelection().state()) {
-    case SelectionController::RANGE:
+    case khtml::Selection::RANGE:
       selectionToDelete = endingSelection();
       break;
-    case SelectionController::CARET: {
+    case khtml::Selection::CARET: {
       // Handle delete at beginning-of-block case.
       // Do nothing in the case that the caret is at the start of a
       // root editable element or at the start of a document.
       Position pos(endingSelection().start());
-      Position start = VisiblePosition(pos, endingSelection().startAffinity())
+      Position start = VisiblePosition(pos, endingSelection().affinity())
                            .next()
                            .deepEquivalent();
-      Position end = VisiblePosition(pos, endingSelection().startAffinity())
-                         .deepEquivalent();
+      Position end =
+          VisiblePosition(pos, endingSelection().affinity()).deepEquivalent();
       if (start.isNotNull() && end.isNotNull() &&
           start.node()->rootEditableElement() ==
               end.node()->rootEditableElement())
-        selectionToDelete = SelectionController(start, SEL_DEFAULT_AFFINITY,
-                                                end, SEL_DEFAULT_AFFINITY);
+        selectionToDelete =
+            SelectionController(start, end, SEL_DEFAULT_AFFINITY);
       break;
     }
-    case SelectionController::NONE:
+    case khtml::Selection::NONE:
       ASSERT_NOT_REACHED();
       break;
   }
