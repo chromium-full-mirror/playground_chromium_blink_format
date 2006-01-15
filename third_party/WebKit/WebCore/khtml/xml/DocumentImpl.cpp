@@ -61,7 +61,6 @@
 #include "MacFrame.h"
 #include "FramePrivate.h"
 
-#include <kglobalsettings.h>
 #include "khtml_settings.h"
 
 // FIXME: We want to cut the remaining HTML dependencies so that we don't need
@@ -876,7 +875,7 @@ void DocumentImpl::recalcStyle(StyleChange change) {
     // ### make the font stuff _really_ work!!!!
 
     khtml::FontDef fontDef;
-    QFont f = KGlobalSettings::generalFont();
+    QFont f;
     fontDef.family = *(f.firstFamily());
     fontDef.italic = f.italic();
     fontDef.weight = f.weight();
