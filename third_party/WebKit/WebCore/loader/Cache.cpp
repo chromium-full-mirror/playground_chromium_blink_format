@@ -28,41 +28,48 @@
 
 #include "config.h"
 #include "Cache.h"
+
+#include "CachedCSSStyleSheet.h"
 #include "CachedImage.h"
 #include "CachedScript.h"
 #include "CachedXSLStyleSheet.h"
-#include "CachedCSSStyleSheet.h"
 #include "DocLoader.h"
-#include "loader.h"
 #include "DocumentImpl.h"
-
-#include <qpixmap.h>
-
-// up to which size is a picture for sure cacheable
-#define MAXCACHEABLE 40 * 1024
-// default cache size
-#define DEFCACHESIZE 4096 * 1024
-
+#include "loader.h"
 #include <kio/job.h>
 #include <kio/jobclasses.h>
-
 #include <kxmlcore/Assertions.h>
+#include <qpixmap.h>
 
-using namespace khtml;
 using namespace DOM;
+
+namespace khtml {
+
+const int defaultCacheSize = 4096 * 1024;
+
+// maxCacheableObjectSize is cache size divided by 128, but with this as a
+// minimum
+const int minMaxCacheableObjectSize = 40 * 1024;
+
+const int maxLRULists = 20;
+
+struct LRUList {
+  CachedObject* m_head;
+  CachedObject* m_tail;
+  LRUList() : m_head(0), m_tail(0) {}
+};
 
 static bool cacheDisabled;
 
-LRUList::LRUList() : m_head(0), m_tail(0) {}
+typedef HashMap<RefPtr<DOMStringImpl>, CachedObject*> CacheMap;
 
-LRUList::~LRUList() {}
+static CacheMap* cache = 0;
 
-QDict<CachedObject>* Cache::cache = 0;
 QPtrList<DocLoader>* Cache::docloader = 0;
 Loader* Cache::m_loader = 0;
 
-int Cache::maxSize = DEFCACHESIZE;
-int Cache::maxCacheable = MAXCACHEABLE;
+int Cache::maxSize = defaultCacheSize;
+int Cache::maxCacheable = minMaxCacheableObjectSize;
 int Cache::flushCount = 0;
 
 QPixmap* Cache::nullPixmap = 0;
@@ -75,7 +82,7 @@ LRUList* Cache::m_LRULists = 0;
 
 void Cache::init() {
   if (!cache)
-    cache = new QDict<CachedObject>(401, true);
+    cache = new CacheMap;
 
   if (!docloader)
     docloader = new QPtrList<DocLoader>;
@@ -94,7 +101,10 @@ void Cache::clear() {
   if (!cache)
     return;
 
-  cache->setAutoDelete(true);
+  CacheMap::iterator e = cache->end();
+  for (CacheMap::iterator i = cache->begin(); i != e; ++i)
+    delete i->second;
+
   delete cache;
   cache = 0;
   delete nullPixmap;
@@ -138,7 +148,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
 
   CachedObject* o = 0;
   if (!reload)
-    o = cache->find(url.url());
+    o = cache->get(DOMString(url.url()).impl());
   if (!o) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << url.url() << endl;
@@ -149,7 +159,7 @@ CachedImage* Cache::requestImage(DocLoader* dl,
     if (cacheDisabled)
       im->setFree(true);
     else {
-      cache->insert(url.url(), im);
+      cache->set(DOMString(url.url()).impl(), im);
       moveToHeadOfLRUList(im);
     }
     o = im;
@@ -198,7 +208,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
-  CachedObject* o = cache->find(kurl.url());
+  CachedObject* o = cache->get(DOMString(kurl.url()).impl());
   if (!o) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
@@ -208,7 +218,7 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
     if (cacheDisabled)
       sheet->setFree(true);
     else {
-      cache->insert(kurl.url(), sheet);
+      cache->set(DOMString(kurl.url()).impl(), sheet);
       moveToHeadOfLRUList(sheet);
     }
     o = sheet;
@@ -240,13 +250,11 @@ CachedCSSStyleSheet* Cache::requestStyleSheet(DocLoader* dl,
 
 void Cache::preloadStyleSheet(const QString& url,
                               const QString& stylesheet_data) {
-  CachedObject* o = cache->find(url);
+  CachedObject* o = cache->get(DOMString(url).impl());
   if (o)
-    removeCacheEntry(o);
-
-  CachedCSSStyleSheet* stylesheet =
-      new CachedCSSStyleSheet(url, stylesheet_data);
-  cache->insert(url, stylesheet);
+    remove(o);
+  cache->set(DOMString(url).impl(),
+             new CachedCSSStyleSheet(url, stylesheet_data));
 }
 
 CachedScript* Cache::requestScript(DocLoader* dl,
@@ -267,7 +275,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
-  CachedObject* o = cache->find(kurl.url());
+  CachedObject* o = cache->get(DOMString(kurl.url()).impl());
   if (!o) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
@@ -277,7 +285,7 @@ CachedScript* Cache::requestScript(DocLoader* dl,
     if (cacheDisabled)
       script->setFree(true);
     else {
-      cache->insert(kurl.url(), script);
+      cache->set(DOMString(kurl.url()).impl(), script);
       moveToHeadOfLRUList(script);
     }
     o = script;
@@ -308,12 +316,10 @@ CachedScript* Cache::requestScript(DocLoader* dl,
 }
 
 void Cache::preloadScript(const QString& url, const QString& script_data) {
-  CachedObject* o = cache->find(url);
+  CachedObject* o = cache->get(DOMString(url).impl());
   if (o)
-    removeCacheEntry(o);
-
-  CachedScript* script = new CachedScript(url, script_data);
-  cache->insert(url, script);
+    remove(o);
+  cache->set(DOMString(url).impl(), new CachedScript(url, script_data));
 }
 
 #ifdef KHTML_XSLT
@@ -334,7 +340,7 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
-  CachedObject* o = cache->find(kurl.url());
+  CachedObject* o = cache->get(DOMString(kurl.url()).impl());
   if (!o) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
@@ -344,7 +350,7 @@ CachedXSLStyleSheet* Cache::requestXSLStyleSheet(DocLoader* dl,
     if (cacheDisabled)
       doc->setFree(true);
     else {
-      cache->insert(kurl.url(), doc);
+      cache->set(DOMString(kurl.url()).impl(), doc);
       moveToHeadOfLRUList(doc);
     }
     o = doc;
@@ -393,7 +399,7 @@ CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
 
   // Checking if the URL is malformed is lots of extra work for little benefit.
 
-  CachedObject* o = cache->find(kurl.url());
+  CachedObject* o = cache->get(DOMString(kurl.url()).impl());
   if (!o) {
 #ifdef CACHE_DEBUG
     kdDebug(6060) << "Cache: new: " << kurl.url() << endl;
@@ -403,7 +409,7 @@ CachedXBLDocument* Cache::requestXBLDocument(DocLoader* dl,
     if (cacheDisabled)
       doc->setFree(true);
     else {
-      cache->insert(kurl.url(), doc);
+      cache->set(DOMString(kurl.url()).impl(), doc);
       moveToHeadOfLRUList(doc);
     }
     o = doc;
@@ -444,14 +450,14 @@ void Cache::flush(bool force) {
   init();
 
   while (m_headOfUncacheableList)
-    removeCacheEntry(m_headOfUncacheableList);
+    remove(m_headOfUncacheableList);
 
-  for (int i = MAX_LRU_LISTS - 1; i >= 0; i--) {
+  for (int i = maxLRULists - 1; i >= 0; i--) {
     if (m_totalSizeOfLRULists <= maxSize)
       break;
 
     while (m_totalSizeOfLRULists > maxSize && m_LRULists[i].m_tail)
-      removeCacheEntry(m_LRULists[i].m_tail);
+      remove(m_LRULists[i].m_tail);
   }
 
   flushCount = m_countOfLRUAndUncacheableLists +
@@ -460,22 +466,20 @@ void Cache::flush(bool force) {
 
 void Cache::setSize(int bytes) {
   maxSize = bytes;
-  maxCacheable = kMax(maxSize / 128, MAXCACHEABLE);
+  maxCacheable = kMax(maxSize / 128, minMaxCacheableObjectSize);
 
   // may be we need to clear parts of the cache
   flushCount = 0;
   flush(true);
 }
 
-void Cache::removeCacheEntry(CachedObject* object) {
-  QString key = object->url().qstring();
-
+void Cache::remove(CachedObject* object) {
   // this indicates the deref() method of CachedObject to delete itself when the
   // reference counter
   // drops down to zero
   object->setFree(true);
 
-  cache->remove(key);
+  cache->remove(object->url().impl());
   removeFromLRUList(object);
 
   const DocLoader* dl;
@@ -486,25 +490,20 @@ void Cache::removeCacheEntry(CachedObject* object) {
     delete object;
 }
 
-#define FAST_LOG2(_log2, _n)            \
-  unsigned int j_ = (unsigned int)(_n); \
-  (_log2) = 0;                          \
-  if ((j_) & ((j_)-1))                  \
-    (_log2) += 1;                       \
-  if ((j_) >> 16)                       \
-    (_log2) += 16, (j_) >>= 16;         \
-  if ((j_) >> 8)                        \
-    (_log2) += 8, (j_) >>= 8;           \
-  if ((j_) >> 4)                        \
-    (_log2) += 4, (j_) >>= 4;           \
-  if ((j_) >> 2)                        \
-    (_log2) += 2, (j_) >>= 2;           \
-  if ((j_) >> 1)                        \
-    (_log2) += 1;
-
-static int FastLog2(unsigned int i) {
-  int log2;
-  FAST_LOG2(log2, i);
+static inline int FastLog2(uint32_t i) {
+  int log2 = 0;
+  if (i & (i - 1))
+    log2 += 1;
+  if (i >> 16)
+    log2 += 16, i >>= 16;
+  if (i >> 8)
+    log2 += 8, i >>= 8;
+  if (i >> 4)
+    log2 += 4, i >>= 4;
+  if (i >> 2)
+    log2 += 2, i >>= 2;
+  if (i >> 1)
+    log2 += 1;
   return log2;
 }
 
@@ -518,12 +517,11 @@ LRUList* Cache::getLRUListFor(CachedObject* o) {
     queueIndex = sizeLog / o->accessCount() - 1;
     if (queueIndex < 0)
       queueIndex = 0;
-    if (queueIndex >= MAX_LRU_LISTS)
-      queueIndex = MAX_LRU_LISTS - 1;
+    if (queueIndex >= maxLRULists)
+      queueIndex = maxLRULists - 1;
   }
-  if (m_LRULists == 0) {
-    m_LRULists = new LRUList[MAX_LRU_LISTS];
-  }
+  if (!m_LRULists)
+    m_LRULists = new LRUList[maxLRULists];
   return &m_LRULists[queueIndex];
 }
 
@@ -605,9 +603,9 @@ Cache::Statistics Cache::getStatistics() {
   if (!cache)
     return stats;
 
-  QDictIterator<CachedObject> i(*cache);
-  for (i.toFirst(); i.current(); ++i) {
-    CachedObject* o = i.current();
+  CacheMap::iterator e = cache->end();
+  for (CacheMap::iterator i = cache->begin(); i != e; ++i) {
+    CachedObject* o = i->second;
     switch (o->type()) {
       case CachedObject::Image:
         stats.images.count++;
@@ -649,11 +647,10 @@ void Cache::flushAll() {
     return;
 
   for (;;) {
-    QDictIterator<CachedObject> i(*cache);
-    CachedObject* o = i.toFirst();
-    if (!o)
+    CacheMap::iterator i = cache->begin();
+    if (i == cache->end())
       break;
-    removeCacheEntry(o);
+    remove(i->second);
   }
 }
 
@@ -661,4 +658,9 @@ void Cache::setCacheDisabled(bool disabled) {
   cacheDisabled = disabled;
   if (disabled)
     flushAll();
+}
+
+CachedObject* Cache::get(const DOMString& s) {
+  return (cache && s.impl()) ? cache->get(s.impl()) : 0;
+}
 }

@@ -24,11 +24,11 @@
    sheets and html
     pages from the web. It has a memory cache for these objects.
 */
+
 #ifndef KHTML_DocLoader_h
 #define KHTML_DocLoader_h
 
 #include <qptrlist.h>
-#include <qdict.h>
 #include <qbuffer.h>
 #include <qstringlist.h>
 
@@ -108,6 +108,6 @@ class DocLoader {
   DOM::DocumentImpl* m_doc;
   bool m_loadInProgress;
 };
-};
+}
 
 #endif

@@ -28,17 +28,15 @@
 
 #include "config.h"
 #include "CachedImageCallback.h"
+
 #include "Cache.h"
-#include "loader.h"
 #include "CachedImage.h"
 #include "Request.h"
-
-#include <qpainter.h>
-
+#include "loader.h"
+#include <kdebug.h>
 #include <kio/job.h>
 #include <kio/jobclasses.h>
-#include <kdebug.h>
-#include "decoder.h"
+#include <qpainter.h>
 
 using namespace DOM;
 
@@ -111,7 +109,7 @@ void CachedImageCallback::handleError() {
     cachedImage->errorOccured = true;
     QPixmap ep = cachedImage->pixmap();
     cachedImage->do_notify(ep, ep.rect());
-    Cache::removeCacheEntry(cachedImage);
+    Cache::remove(cachedImage);
 
     clear();
   }
@@ -131,4 +129,4 @@ void CachedImageCallback::clear() {
   }
   cachedImage = 0;
 }
-};
+}

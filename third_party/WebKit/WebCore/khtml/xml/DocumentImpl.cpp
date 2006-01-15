@@ -284,7 +284,7 @@ DocumentImpl::DocumentImpl(DOMImplementationImpl* _implementation, KHTMLView* v)
   m_ignorePendingStylesheets = false;
 
   m_cssTarget = 0;
-  m_accessKeyDictValid = false;
+  m_accessKeyMapValid = false;
 
   resetLinkColor();
   resetVisitedLinkColor();
@@ -331,7 +331,7 @@ DocumentImpl::~DocumentImpl() {
 
   KJS::ScriptInterpreter::forgetAllDOMNodesForDocument(this);
 
-  if (changedDocuments && m_docChanged)
+  if (m_docChanged && changedDocuments)
     changedDocuments->remove(this);
   delete m_tokenizer;
   document.resetSkippingRef(0);
@@ -636,33 +636,22 @@ ElementImpl* DocumentImpl::createElementNS(const DOMString& _namespaceURI,
 }
 
 ElementImpl* DocumentImpl::getElementById(const DOMString& elementId) const {
-  ElementImpl* element;
-  QString qId = elementId.qstring();
-
-  if (elementId.length() == 0) {
+  if (elementId.length() == 0)
     return 0;
-  }
 
-  element = m_elementsById.find(qId);
-
+  ElementImpl* element = m_elementsById.get(elementId.impl());
   if (element)
     return element;
 
-  if (int idCount = (int)m_idCount.find(qId)) {
+  if (m_idCount.contains(elementId.impl())) {
     for (NodeImpl* n = traverseNextNode(); n != 0; n = n->traverseNextNode()) {
-      if (!n->isElementNode())
-        continue;
-
-      element = static_cast<ElementImpl*>(n);
-
-      if (element->hasID() && element->getAttribute(idAttr) == elementId) {
-        if (idCount == 1)
-          m_idCount.remove(qId);
-        else
-          m_idCount.insert(qId, (char*)idCount - 1);
-
-        m_elementsById.insert(qId, element);
-        return element;
+      if (n->isElementNode()) {
+        element = static_cast<ElementImpl*>(n);
+        if (element->hasID() && element->getAttribute(idAttr) == elementId) {
+          m_idCount.remove(elementId.impl());
+          m_elementsById.set(elementId.impl(), element);
+          return element;
+        }
       }
     }
   }
@@ -675,68 +664,44 @@ ElementImpl* DocumentImpl::elementFromPoint(const int _x, const int _y) const {
 
   RenderObject::NodeInfo nodeInfo(true, true);
   m_render->layer()->hitTest(nodeInfo, _x, _y);
+
   NodeImpl* n = nodeInfo.innerNode();
-
-  while (n && !n->isElementNode()) {
+  while (n && !n->isElementNode())
     n = n->parentNode();
-  }
-
   return static_cast<ElementImpl*>(n);
 }
 
 void DocumentImpl::addElementById(const DOMString& elementId,
                                   ElementImpl* element) {
-  QString qId = elementId.qstring();
-
-  if (m_elementsById.find(qId) == NULL) {
-    m_elementsById.insert(qId, element);
-    m_accessKeyDictValid = false;
-  } else {
-    int idCount = (int)m_idCount.find(qId);
-    m_idCount.insert(qId, (char*)(idCount + 1));
-  }
+  if (!m_elementsById.contains(elementId.impl()))
+    m_elementsById.set(elementId.impl(), element);
+  else
+    m_idCount.insert(elementId.impl());
 }
 
 void DocumentImpl::removeElementById(const DOMString& elementId,
                                      ElementImpl* element) {
-  QString qId = elementId.qstring();
-
-  if (m_elementsById.find(qId) == element) {
-    m_elementsById.remove(qId);
-    m_accessKeyDictValid = false;
-  } else {
-    int idCount = (int)m_idCount.find(qId);
-    assert(idCount > 0);
-    if (idCount == 1)
-      m_idCount.remove(qId);
-    else
-      m_idCount.insert(qId, (char*)(idCount - 1));
-  }
+  if (m_elementsById.get(elementId.impl()) == element)
+    m_elementsById.remove(elementId.impl());
+  else
+    m_idCount.remove(elementId.impl());
 }
 
 ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key) {
   if (!key.length())
     return 0;
-
-  if (!m_accessKeyDictValid) {
-    m_elementsByAccessKey.clear();
-
-    const NodeImpl* n;
-    for (n = this; n != 0; n = n->traverseNextNode()) {
+  if (!m_accessKeyMapValid) {
+    for (NodeImpl* n = this; n; n = n->traverseNextNode()) {
       if (!n->isElementNode())
         continue;
-      const ElementImpl* elementImpl = static_cast<const ElementImpl*>(n);
-      DOMString accessKey(elementImpl->getAttribute(accesskeyAttr));
-      ;
-      if (!accessKey.isEmpty()) {
-        QString ak = accessKey.qstring().lower();
-        if (m_elementsByAccessKey.find(ak) == NULL)
-          m_elementsByAccessKey.insert(ak, elementImpl);
-      }
+      ElementImpl* element = static_cast<ElementImpl*>(n);
+      const AtomicString& accessKey = element->getAttribute(accesskeyAttr);
+      if (!accessKey.isEmpty())
+        m_elementsByAccessKey.set(accessKey.impl(), element);
     }
-    m_accessKeyDictValid = true;
+    m_accessKeyMapValid = true;
   }
-  return m_elementsByAccessKey.find(key.qstring());
+  return m_elementsByAccessKey.get(key.impl());
 }
 
 void DocumentImpl::updateTitle() {
@@ -839,23 +804,25 @@ TreeWalkerImpl* DocumentImpl::createTreeWalker(NodeImpl* root,
 }
 
 void DocumentImpl::setDocumentChanged(bool b) {
-  if (!changedDocuments)
-    changedDocuments = new QPtrList<DocumentImpl>;
+  if (b) {
+    if (!m_docChanged) {
+      if (!changedDocuments)
+        changedDocuments = new QPtrList<DocumentImpl>;
+      changedDocuments->append(this);
+    }
+    if (m_accessKeyMapValid) {
+      m_accessKeyMapValid = false;
+      m_elementsByAccessKey.clear();
+    }
+  } else {
+    if (m_docChanged && changedDocuments)
+      changedDocuments->remove(this);
+  }
 
-  if (b && !m_docChanged)
-    changedDocuments->append(this);
-  else if (!b && m_docChanged)
-    changedDocuments->remove(this);
   m_docChanged = b;
-
-  if (m_docChanged)
-    m_accessKeyDictValid = false;
 }
 
 void DocumentImpl::recalcStyle(StyleChange change) {
-  //     qDebug("recalcStyle(%p)", this);
-  //     QTime qt;
-  //     qt.start();
   if (m_inStyleRecalc)
     return;  // Guard against re-entrancy. -dwh
 
@@ -897,8 +864,6 @@ void DocumentImpl::recalcStyle(StyleChange change) {
           m_styleSelector->fontSizeForKeyword(CSS_VAL_MEDIUM, inCompatMode()));
     }
 
-    // kdDebug() << "DocumentImpl::attach: setting to charset " <<
-    // settings->charset() << endl;
     _style->setFontDef(fontDef);
     _style->htmlFont().update(paintDeviceMetrics());
     if (inCompatMode())
@@ -919,7 +884,6 @@ void DocumentImpl::recalcStyle(StyleChange change) {
   for (n = _first; n; n = n->nextSibling())
     if (change >= Inherit || n->hasChangedChild() || n->changed())
       n->recalcStyle(change);
-  // kdDebug( 6020 ) << "TIME: recalcStyle() dt=" << qt.elapsed() << endl;
 
   if (changed() && m_view)
     m_view->layout();
@@ -940,17 +904,8 @@ bail_out:
 }
 
 void DocumentImpl::updateRendering() {
-  if (!hasChangedChild())
-    return;
-
-  //     QTime time;
-  //     time.start();
-  //     kdDebug() << "UPDATERENDERING: "<<endl;
-
-  StyleChange change = NoChange;
-  recalcStyle(change);
-
-  //    kdDebug() << "UPDATERENDERING time used="<<time.elapsed()<<endl;
+  if (hasChangedChild())
+    recalcStyle(NoChange);
 }
 
 void DocumentImpl::updateDocumentsRendering() {
@@ -964,8 +919,8 @@ void DocumentImpl::updateDocumentsRendering() {
 }
 
 void DocumentImpl::updateLayout() {
-  // FIXME: Dave's pretty sure we can remove this because
-  // layout calls recalcStyle as needed.
+  // FIXME: Dave Hyatt's pretty sure we can remove this because layout calls
+  // recalcStyle as needed.
   updateRendering();
 
   // Only do a layout if changes have occurred that make it necessary.

@@ -4,7 +4,7 @@
     Copyright (C) 1998 Lars Knoll (knoll@mpi-hd.mpg.de)
     Copyright (C) 2001 Dirk Mueller (mueller@kde.org)
     Copyright (C) 2002 Waldo Bastian (bastian@kde.org)
-    Copyright (C) 2004 Apple Computer, Inc.
+    Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,19 +28,18 @@
 
 #include "config.h"
 #include "loader.h"
+
 #include "Cache.h"
-#include "DocLoader.h"
-#include "CachedObject.h"
 #include "CachedImage.h"
 #include "CachedImageCallback.h"
-
-#include <kio/job.h>
-#include <kio/jobclasses.h>
-
-#include <kxmlcore/Assertions.h>
+#include "CachedObject.h"
+#include "DocLoader.h"
+#include "Frame.h"
 #include "KWQLoader.h"
 #include "html_documentimpl.h"
-#include "Frame.h"
+#include <kio/job.h>
+#include <kio/jobclasses.h>
+#include <kxmlcore/Assertions.h>
 
 using namespace DOM;
 
@@ -159,7 +158,7 @@ void Loader::slotFinished(KIO::Job* job, NSData* allData) {
       r->object->error(job->error(), job->errorText().ascii());
       docLoader->setLoadInProgress(false);
       emit requestFailed(docLoader, object);
-      Cache::removeCacheEntry(object);
+      Cache::remove(object);
     }
   } else {
     docLoader->setLoadInProgress(true);
@@ -256,7 +255,7 @@ void Loader::cancelRequests(DocLoader* dl) {
   QPtrListIterator<Request> pIt(m_requestsPending);
   while (pIt.current()) {
     if (pIt.current()->m_docLoader == dl) {
-      Cache::removeCacheEntry(pIt.current()->object);
+      Cache::remove(pIt.current()->object);
       m_requestsPending.remove(pIt);
     } else
       ++pIt;
@@ -266,7 +265,7 @@ void Loader::cancelRequests(DocLoader* dl) {
   while (lIt.current()) {
     if (lIt.current()->m_docLoader == dl) {
       KIO::Job* job = static_cast<KIO::Job*>(lIt.currentKey());
-      Cache::removeCacheEntry(lIt.current()->object);
+      Cache::remove(lIt.current()->object);
       m_requestsLoading.remove(lIt.currentKey());
       job->kill();
     } else
@@ -276,7 +275,7 @@ void Loader::cancelRequests(DocLoader* dl) {
   QPtrListIterator<Request> bdIt(m_requestsBackgroundDecoding);
   while (bdIt.current()) {
     if (bdIt.current()->m_docLoader == dl) {
-      Cache::removeCacheEntry(bdIt.current()->object);
+      Cache::remove(bdIt.current()->object);
       m_requestsBackgroundDecoding.remove(bdIt);
     } else
       ++bdIt;

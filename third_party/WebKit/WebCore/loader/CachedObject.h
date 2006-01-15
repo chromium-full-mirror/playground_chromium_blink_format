@@ -24,6 +24,7 @@
    sheets and html
     pages from the web. It has a memory cache for these objects.
 */
+
 #ifndef KHTML_CachedObject_h
 #define KHTML_CachedObject_h
 
@@ -35,7 +36,6 @@
 #include <qptrlist.h>
 #include <qobject.h>
 #include <qptrdict.h>
-#include <qdict.h>
 #include <qpixmap.h>
 #include <qbuffer.h>
 #include <qstringlist.h>
@@ -229,6 +229,6 @@ class CachedObject {
   CachedObject* m_prevInLRUList;
   friend class Cache;
 };
-};
+}
 
 #endif

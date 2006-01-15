@@ -69,9 +69,9 @@ bool DocLoader::needReload(const KURL& fullURL) {
   bool reload = false;
   if (m_cachePolicy == KIO::CC_Verify) {
     if (!m_reloadedURLs.contains(fullURL.url())) {
-      CachedObject* existing = Cache::cache->find(fullURL.url());
+      CachedObject* existing = Cache::get(fullURL.url());
       if (existing && existing->isExpired()) {
-        Cache::removeCacheEntry(existing);
+        Cache::remove(existing);
         m_reloadedURLs.append(fullURL.url());
         reload = true;
       }
@@ -79,10 +79,9 @@ bool DocLoader::needReload(const KURL& fullURL) {
   } else if ((m_cachePolicy == KIO::CC_Reload) ||
              (m_cachePolicy == KIO::CC_Refresh)) {
     if (!m_reloadedURLs.contains(fullURL.url())) {
-      CachedObject* existing = Cache::cache->find(fullURL.url());
-      if (existing) {
-        Cache::removeCacheEntry(existing);
-      }
+      CachedObject* existing = Cache::get(fullURL.url());
+      if (existing)
+        Cache::remove(existing);
       m_reloadedURLs.append(fullURL.url());
       reload = true;
     }

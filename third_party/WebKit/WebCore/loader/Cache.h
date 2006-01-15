@@ -24,39 +24,27 @@
    sheets and html
     pages from the web. It has a memory cache for these objects.
 */
+
 #ifndef KHTML_Cache_h
 #define KHTML_Cache_h
 
-#include <qptrdict.h>
-#include <qptrlist.h>
-#include <qdict.h>
-#include <qstring.h>
-
+#include "dom/dom_string.h"
 #include <kio/global.h>
-
-#include <dom/dom_string.h>
+#include <qptrlist.h>
+#include <qstring.h>
 
 class QPixmap;
 class KURL;
 
 namespace khtml {
-class CachedObject;
-class CachedImage;
-class CachedScript;
 class CachedCSSStyleSheet;
+class CachedImage;
+class CachedObject;
+class CachedScript;
 class CachedXSLStyleSheet;
-class Loader;
 class DocLoader;
-
-#define MAX_LRU_LISTS 20
-
-struct LRUList {
-  CachedObject* m_head;
-  CachedObject* m_tail;
-
-  LRUList();
-  ~LRUList();
-};
+class Loader;
+struct LRUList;
 
 /**
  * Provides a cache/loader for objects needed for displaying the html page.
@@ -78,64 +66,65 @@ class Cache {
    * if the DocLoader is zero, the url must be full-qualified.
    * Otherwise, it is automatically base-url expanded
    */
-  static CachedImage* requestImage(DocLoader* l,
-                                   const DOM::DOMString& url,
+  static CachedImage* requestImage(DocLoader*,
+                                   const DOM::DOMString& URL,
                                    bool reload = false,
-                                   time_t _expireDate = 0);
-  static CachedImage* requestImage(DocLoader* l,
+                                   time_t expireDate = 0);
+  static CachedImage* requestImage(DocLoader*,
                                    const KURL& url,
                                    bool reload = false,
-                                   time_t _expireDate = 0);
+                                   time_t expireDate = 0);
 
   /**
    * Ask the cache for some url. Will return a cachedObject, and
    * load the requested data in case it's not cached
    */
   static CachedCSSStyleSheet* requestStyleSheet(
-      DocLoader* l,
-      const DOM::DOMString& url,
+      DocLoader*,
+      const DOM::DOMString& URL,
       bool reload = false,
-      time_t _expireDate = 0,
+      time_t expireDate = 0,
       const QString& charset = QString::null);
-
-#ifdef KHTML_XSLT
-  // Ask the cache for an XSL stylesheet.
-  static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader* l,
-                                                   const DOM::DOMString& url,
-                                                   bool reload = false,
-                                                   time_t _expireDate = 0);
-#endif
-#ifndef KHTML_NO_XBL
-  // Ask the cache for an XBL document.
-  static CachedXBLDocument* requestXBLDocument(DocLoader* l,
-                                               const DOM::DOMString& url,
-                                               bool reload = false,
-                                               time_t _expireDate = 0);
-#endif
 
   /**
    * Pre-loads a stylesheet into the cache.
    */
   static void preloadStyleSheet(const QString& url,
-                                const QString& stylesheet_data);
+                                const QString& stylesheetData);
 
   /**
    * Ask the cache for some url. Will return a cachedObject, and
    * load the requested data in case it's not cahced
    */
-  static CachedScript* requestScript(DocLoader* l,
-                                     const DOM::DOMString& url,
+  static CachedScript* requestScript(DocLoader*,
+                                     const DOM::DOMString& URL,
                                      bool reload = false,
-                                     time_t _expireDate = 0,
+                                     time_t expireDate = 0,
                                      const QString& charset = QString::null);
 
   /**
    * Pre-loads a script into the cache.
    */
-  static void preloadScript(const QString& url, const QString& script_data);
+  static void preloadScript(const QString& url, const QString& scriptData);
+
+#ifdef KHTML_XSLT
+  // Ask the cache for an XSL stylesheet.
+  static CachedXSLStyleSheet* requestXSLStyleSheet(DocLoader*,
+                                                   const DOM::DOMString& URL,
+                                                   bool reload = false,
+                                                   time_t expireDate = 0);
+#endif
+
+#ifndef KHTML_NO_XBL
+  // Ask the cache for an XBL document.
+  static CachedXBLDocument* requestXBLDocument(DocLoader*,
+                                               const DOM::DOMString& URL,
+                                               bool reload = false,
+                                               time_t expireDate = 0);
+#endif
 
   /**
-   * sets the size of the cache. This will only hod approximately, since the
+   * Sets the size of the cache. This will only hod approximately, since the
    * size some
    * cached objects (like stylesheets) take up in memory is not exaclty known.
    */
@@ -146,6 +135,12 @@ class Cache {
   static int size() { return maxSize; };
 
   static int maxCacheableObjectSize() { return maxCacheable; }
+
+  // Get an existing cache entry by URL.
+  static CachedObject* get(const DOM::DOMString& URL);
+
+  // Remove an existing cache entry.
+  static void remove(CachedObject*);
 
   /**
    * clean up cache
@@ -163,8 +158,6 @@ class Cache {
 
   static QPixmap* nullPixmap;
   static QPixmap* brokenPixmap;
-
-  static void removeCacheEntry(CachedObject* object);
 
   struct TypeStatistic {
     int count;
@@ -194,12 +187,11 @@ class Cache {
   static void removeFromLRUList(CachedObject*);
   static bool adjustSize(CachedObject*, int sizeDelta);
 
-  static LRUList* getLRUListFor(CachedObject* o);
+  static LRUList* getLRUListFor(CachedObject*);
 
   static void checkLRUAndUncacheableListIntegrity();
 
- protected:
-  static QDict<CachedObject>* cache;
+ private:
   static QPtrList<DocLoader>* docloader;
 
   static int maxSize;
@@ -217,6 +209,6 @@ class Cache {
 
   static int m_countOfLRUAndUncacheableLists;
 };
-};
+}
 
 #endif

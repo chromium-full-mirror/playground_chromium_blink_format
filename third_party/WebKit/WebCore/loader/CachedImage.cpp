@@ -28,9 +28,10 @@
 
 #include "config.h"
 #include "CachedImage.h"
+
+#include "Cache.h"
 #include "CachedImageCallback.h"
 #include "CachedObjectClientWalker.h"
-#include "Cache.h"
 #include "DocLoader.h"
 #include "KWQLoader.h"
 
@@ -168,7 +169,7 @@ void CachedImage::data(QBuffer& _buffer, bool eof) {
         errorOccured = true;
         QPixmap ep = pixmap();
         do_notify(ep, ep.rect());
-        Cache::removeCacheEntry(this);
+        Cache::remove(this);
       } else
         do_notify(*p, p->rect());
 
@@ -199,4 +200,4 @@ void CachedImage::checkNotify() {
     c->notifyFinished(this);
   }
 }
-};
+}

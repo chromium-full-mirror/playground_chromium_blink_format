@@ -4,7 +4,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 2000 Simon Hausmann <hausmann@kde.org>
  *           (C) 2000 Stefan Schimanski (1Stein@gmx.de)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,33 +22,34 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-//#define DEBUG_LAYOUT
 
 #include "config.h"
 #include "render_frames.h"
-#include "render_canvas.h"
+
+#include "DocumentImpl.h"
+#include "Frame.h"
+#include "FrameView.h"
 #include "html/html_baseimpl.h"
 #include "html/html_objectimpl.h"
 #include "html/htmltokenizer.h"
-#include "xml/dom2_eventsimpl.h"
-#include "DocumentImpl.h"
-#include "xml/dom_textimpl.h"
-#include "xml/EventNames.h"
-#include "FrameView.h"
-#include "Frame.h"
 #include "render_arena.h"
-
+#include "render_canvas.h"
+#include "xml/EventNames.h"
+#include "xml/dom2_eventsimpl.h"
+#include "xml/dom_textimpl.h"
 #include <kcursor.h>
-#include <klocale.h>
 #include <kdebug.h>
-#include <qtimer.h>
+#include <klocale.h>
 #include <qpainter.h>
-#include "qdict.h"
+#include <qtimer.h>
 
-using namespace khtml;
 using namespace DOM;
 using namespace EventNames;
 using namespace HTMLNames;
+
+//#define DEBUG_LAYOUT
+
+namespace khtml {
 
 RenderFrameSet::RenderFrameSet(HTMLFrameSetElementImpl* frameSet)
     : RenderContainer(frameSet) {
@@ -843,7 +844,7 @@ void RenderPartObject::updateWidget() {
       serviceType = o->serviceType;
     }
 
-    QDict<bool> uniqueParamNames(5, false);
+    HashSet<DOMStringImpl*, CaseInsensitiveHash> uniqueParamNames;
 
     // Scan the PARAM children.
     // Get the URL and type from the params if we don't already have them.
@@ -864,8 +865,7 @@ void RenderPartObject::updateWidget() {
           }
         }
         if (!embed) {
-          bool dummyValue = true;
-          uniqueParamNames.insert(p->name().qstring(), &dummyValue);
+          uniqueParamNames.insert(p->name().impl());
           paramNames.append(p->name().qstring());
           paramValues.append(p->value().qstring());
         }
@@ -882,10 +882,11 @@ void RenderPartObject::updateWidget() {
     // we have to explicitly suppress the tag's CODEBASE attribute if there is
     // none in a PARAM,
     // else our Java plugin will misinterpret it. [4004531]
+    DOMString codebase;
     if (!embed && serviceType.lower() == "application/x-java-applet") {
-      bool dummyValue = true;
+      codebase = "codebase";
       uniqueParamNames.insert(
-          "codebase", &dummyValue);  // pretend we found it in a PARAM already
+          codebase.impl());  // pretend we found it in a PARAM already
     }
 
     // Turn the attributes of either the EMBED tag or OBJECT tag into arrays,
@@ -894,9 +895,9 @@ void RenderPartObject::updateWidget() {
     if (attributes) {
       for (unsigned i = 0; i < attributes->length(); ++i) {
         AttributeImpl* it = attributes->attributeItem(i);
-        QString name = it->name().localName().qstring();
-        if (embed || uniqueParamNames.find(name) == 0) {
-          paramNames.append(name);
+        const AtomicString& name = it->name().localName();
+        if (embed || uniqueParamNames.contains(name.impl())) {
+          paramNames.append(name.qstring());
           paramValues.append(it->value().qstring());
         }
       }
@@ -1042,4 +1043,5 @@ void RenderPart::updateWidgetPosition() {
     if (view && view->inherits("KHTMLView"))
       static_cast<KHTMLView*>(view)->layout();
   }
+}
 }
