@@ -216,25 +216,31 @@ XMLTokenizer::XMLTokenizer(DocumentImpl* _doc, KHTMLView* _view)
       m_currentNode(_doc),
       m_currentNodeIsReferenced(false),
       m_sawError(false),
+      m_sawXSLTransform(false),
+      m_isXHTMLDocument(false),
       m_errorCount(0),
       m_lastErrorLine(0),
+      m_lastErrorColumn(0),
       m_scriptsIt(0),
       m_cachedScript(0),
       m_parsingFragment(false) {}
 
-XMLTokenizer::XMLTokenizer(DocumentFragmentImpl* fragment,
-                           ElementImpl* parentElement)
-    : m_doc(fragment->getDocument()),
-      m_view(0),
-      m_context(0),
-      m_currentNode(fragment),
-      m_currentNodeIsReferenced(fragment),
-      m_sawError(false),
-      m_errorCount(0),
-      m_lastErrorLine(0),
-      m_scriptsIt(0),
-      m_cachedScript(0),
-      m_parsingFragment(true) {
+XMLTokenizer::XMLTokenizer(DocumentFragmentImpl *fragment, ElementImpl *parentElement)
+    : m_doc(fragment->getDocument())
+    , m_view(0)
+    , m_context(0)
+    , m_currentNode(fragment)
+    , m_currentNodeIsReferenced(fragment)
+    , m_sawError(false)
+    , m_sawXSLTransform(false)
+    , m_isXHTMLDocument(false)
+    , m_errorCount(0)
+    , m_lastErrorLine(0)
+    , m_lastErrorColumn(0)
+    , m_scriptsIt(0
+    , m_cachedScript(0)
+    , m_parsingFragment(true)
+{
   if (fragment)
     fragment->ref();
   if (m_doc)
@@ -264,7 +270,8 @@ XMLTokenizer::XMLTokenizer(DocumentFragmentImpl* fragment,
   }
 }
 
-XMLTokenizer::~XMLTokenizer() {
+XMLTokenizer::~XMLTokenizer()
+{
   setCurrentNode(0);
   if (m_parsingFragment && m_doc)
     m_doc->deref();
@@ -273,7 +280,8 @@ XMLTokenizer::~XMLTokenizer() {
     m_cachedScript->deref(this);
 }
 
-void XMLTokenizer::setCurrentNode(NodeImpl* n) {
+void XMLTokenizer::setCurrentNode(NodeImpl* n)
+{
   bool nodeNeedsReference = n && n != m_doc;
   if (nodeNeedsReference)
     n->ref();
@@ -283,20 +291,24 @@ void XMLTokenizer::setCurrentNode(NodeImpl* n) {
   m_currentNodeIsReferenced = nodeNeedsReference;
 }
 
-bool XMLTokenizer::write(const TokenizerString& s, bool /*appendData*/) {
+bool XMLTokenizer::write(const TokenizerString &s, bool /*appendData*/ )
+{
   m_xmlCode += s.toString();
   return false;
 }
 
-void XMLTokenizer::setOnHold(bool onHold) {
+void XMLTokenizer::setOnHold(bool onHold)
+{
   // Will we need to implement this when we do incremental XML parsing?
 }
 
-inline QString toQString(const xmlChar* str, unsigned int len) {
+inline QString toQString(const xmlChar *str, unsigned int len)
+{
   return QString::fromUtf8(reinterpret_cast<const char*>(str), len);
 }
 
-inline QString toQString(const xmlChar* str) {
+inline QString toQString(const xmlChar *str)
+{
   return QString::fromUtf8(str ? reinterpret_cast<const char*>(str) : "");
 }
 
@@ -306,10 +318,8 @@ struct _xmlSAX2Namespace {
 };
 typedef struct _xmlSAX2Namespace xmlSAX2Namespace;
 
-static inline void handleElementNamespaces(ElementImpl* newElement,
-                                           const xmlChar** libxmlNamespaces,
-                                           int nb_namespaces,
-                                           int& exceptioncode) {
+static inline void handleElementNamespaces(ElementImpl *newElement, const xmlChar **libxmlNamespaces, int nb_namespaces, int &exceptioncode)
+{
   xmlSAX2Namespace* namespaces =
       reinterpret_cast<xmlSAX2Namespace*>(libxmlNamespaces);
   for (int i = 0; i < nb_namespaces; i++) {
@@ -334,10 +344,8 @@ struct _xmlSAX2Attributes {
 };
 typedef struct _xmlSAX2Attributes xmlSAX2Attributes;
 
-static inline void handleElementAttributes(ElementImpl* newElement,
-                                           const xmlChar** libxmlAttributes,
-                                           int nb_attributes,
-                                           int& exceptioncode) {
+static inline void handleElementAttributes(ElementImpl *newElement, const xmlChar **libxmlAttributes, int nb_attributes, int &exceptioncode)
+{
   xmlSAX2Attributes* attributes =
       reinterpret_cast<xmlSAX2Attributes*>(libxmlAttributes);
   for (int i = 0; i < nb_attributes; i++) {
@@ -357,14 +365,8 @@ static inline void handleElementAttributes(ElementImpl* newElement,
   }
 }
 
-void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
-                                  const xmlChar* xmlPrefix,
-                                  const xmlChar* xmlURI,
-                                  int nb_namespaces,
-                                  const xmlChar** libxmlNamespaces,
-                                  int nb_attributes,
-                                  int nb_defaulted,
-                                  const xmlChar** libxmlAttributes) {
+void XMLTokenizer::startElementNs(const xmlChar *xmlLocalName, const xmlChar *xmlPrefix, const xmlChar *xmlURI, int nb_namespaces, const xmlChar **libxmlNamespaces, int nb_attributes, int nb_defaulted, const xmlChar **libxmlAttributes)
+{
   if (m_parserStopped)
     return;
 
@@ -435,7 +437,8 @@ void XMLTokenizer::startElementNs(const xmlChar* xmlLocalName,
     newElement->attach();
 }
 
-void XMLTokenizer::endElementNs() {
+void XMLTokenizer::endElementNs()
+{
   if (m_parserStopped)
     return;
 
@@ -449,7 +452,8 @@ void XMLTokenizer::endElementNs() {
   setCurrentNode(parent.get());
 }
 
-void XMLTokenizer::characters(const xmlChar* s, int len) {
+void XMLTokenizer::characters(const xmlChar *s, int len)
+{
   if (m_parserStopped)
     return;
 
@@ -460,7 +464,8 @@ void XMLTokenizer::characters(const xmlChar* s, int len) {
   }
 }
 
-bool XMLTokenizer::enterText() {
+bool XMLTokenizer::enterText()
+{
   RefPtr<NodeImpl> newNode = new TextImpl(m_doc, "");
   if (!m_currentNode->addChild(newNode.get()))
     return false;
@@ -468,7 +473,8 @@ bool XMLTokenizer::enterText() {
   return true;
 }
 
-void XMLTokenizer::exitText() {
+void XMLTokenizer::exitText()
+{
   if (m_parserStopped)
     return;
 
@@ -484,7 +490,8 @@ void XMLTokenizer::exitText() {
     setCurrentNode(par);
 }
 
-void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
+void XMLTokenizer::error(ErrorType type, const char *message, va_list args)
+{
   if (m_parserStopped)
     return;
 
@@ -526,8 +533,8 @@ void XMLTokenizer::error(ErrorType type, const char* message, va_list args) {
     stopParsing();
 }
 
-void XMLTokenizer::processingInstruction(const xmlChar* target,
-                                         const xmlChar* data) {
+void XMLTokenizer::processingInstruction(const xmlChar *target, const xmlChar *data)
+{
   if (m_parserStopped)
     return;
 
@@ -559,7 +566,8 @@ void XMLTokenizer::processingInstruction(const xmlChar* target,
   }
 }
 
-void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
+void XMLTokenizer::cdataBlock(const xmlChar *s, int len)
+{
   if (m_parserStopped)
     return;
 
@@ -572,7 +580,8 @@ void XMLTokenizer::cdataBlock(const xmlChar* s, int len) {
     newNode->attach();
 }
 
-void XMLTokenizer::comment(const xmlChar* s) {
+void XMLTokenizer::comment(const xmlChar *s)
+{
   if (m_parserStopped)
     return;
 
@@ -584,9 +593,8 @@ void XMLTokenizer::comment(const xmlChar* s) {
     newNode->attach();
 }
 
-void XMLTokenizer::internalSubset(const xmlChar* name,
-                                  const xmlChar* externalID,
-                                  const xmlChar* systemID) {
+void XMLTokenizer::internalSubset(const xmlChar *name, const xmlChar *externalID, const xmlChar *systemID)
+{
   if (m_parserStopped)
     return;
 
@@ -598,97 +606,80 @@ void XMLTokenizer::internalSubset(const xmlChar* name,
       doc, toQString(name), toQString(externalID), toQString(systemID)));
 }
 
-inline XMLTokenizer* getTokenizer(void* closure) {
+inline XMLTokenizer *getTokenizer(void *closure)
+{
   xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(closure);
   return static_cast<XMLTokenizer*>(ctxt->_private);
 }
 
-static void startElementNsHandler(void* closure,
-                                  const xmlChar* localname,
-                                  const xmlChar* prefix,
-                                  const xmlChar* uri,
-                                  int nb_namespaces,
-                                  const xmlChar** namespaces,
-                                  int nb_attributes,
-                                  int nb_defaulted,
-                                  const xmlChar** libxmlAttributes) {
+static void startElementNsHandler(void *closure, const xmlChar *localname, const xmlChar *prefix, const xmlChar *uri, int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **libxmlAttributes)
+{
   getTokenizer(closure)->startElementNs(localname, prefix, uri, nb_namespaces,
                                         namespaces, nb_attributes, nb_defaulted,
                                         libxmlAttributes);
 }
 
-static void endElementNsHandler(void* closure,
-                                const xmlChar* localname,
-                                const xmlChar* prefix,
-                                const xmlChar* uri) {
+static void endElementNsHandler(void *closure, const xmlChar *localname, const xmlChar *prefix, const xmlChar *uri)
+{
   getTokenizer(closure)->endElementNs();
 }
 
-static void charactersHandler(void* closure, const xmlChar* s, int len) {
+static void charactersHandler(void *closure, const xmlChar *s, int len)
+{
   getTokenizer(closure)->characters(s, len);
 }
 
-static void processingInstructionHandler(void* closure,
-                                         const xmlChar* target,
-                                         const xmlChar* data) {
+static void processingInstructionHandler(void *closure, const xmlChar *target, const xmlChar *data)
+{
   getTokenizer(closure)->processingInstruction(target, data);
 }
 
-static void cdataBlockHandler(void* closure, const xmlChar* s, int len) {
+static void cdataBlockHandler(void *closure, const xmlChar *s, int len)
+{
   getTokenizer(closure)->cdataBlock(s, len);
 }
 
-static void commentHandler(void* closure, const xmlChar* comment) {
+static void commentHandler(void *closure, const xmlChar *comment)
+{
   getTokenizer(closure)->comment(comment);
 }
 
-static void warningHandler(void* closure, const char* message, ...) {
+static void warningHandler(void *closure, const char *message, ...)
+{
   va_list args;
   va_start(args, message);
   getTokenizer(closure)->error(XMLTokenizer::warning, message, args);
   va_end(args);
 }
 
-static void fatalErrorHandler(void* closure, const char* message, ...) {
+static void fatalErrorHandler(void *closure, const char *message, ...)
+{
   va_list args;
   va_start(args, message);
   getTokenizer(closure)->error(XMLTokenizer::fatal, message, args);
   va_end(args);
 }
 
-static void normalErrorHandler(void* closure, const char* message, ...) {
+static void normalErrorHandler(void *closure, const char *message, ...)
+{
   va_list args;
   va_start(args, message);
   getTokenizer(closure)->error(XMLTokenizer::nonFatal, message, args);
   va_end(args);
 }
 
-// Using a global variable entity and marking it XML_INTERNAL_PREDEFINED_ENTITY
-// is
-// a hack to avoid malloc/free. Using a global variable like this could cause
-// trouble
+// Using a global variable entity and marking it XML_INTERNAL_PREDEFINED_ENTITY is
+// a hack to avoid malloc/free. Using a global variable like this could cause trouble
 // if libxml implementation details were to change
-static xmlChar sharedXHTMLEntityResult[5] = {0, 0, 0, 0, 0};
-static xmlEntity sharedXHTMLEntity = {0,
-                                      XML_ENTITY_DECL,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      sharedXHTMLEntityResult,
-                                      sharedXHTMLEntityResult,
-                                      0,
-                                      XML_INTERNAL_PREDEFINED_ENTITY,
-                                      0,
-                                      0,
-                                      0,
-                                      0,
-                                      0};
+static xmlChar sharedXHTMLEntityResult[5] = {0,0,0,0,0};
+static xmlEntity sharedXHTMLEntity = {
+    0, XML_ENTITY_DECL, 0, 0, 0, 0, 0, 0, 0, 
+    sharedXHTMLEntityResult, sharedXHTMLEntityResult, 0,
+    XML_INTERNAL_PREDEFINED_ENTITY, 0, 0, 0, 0, 0
+};
 
-static xmlEntityPtr getXHTMLEntity(const xmlChar* name) {
+static xmlEntityPtr getXHTMLEntity(const xmlChar *name)
+{
   const char* namePosition = (const char*)name;
   const Entity* e = findEntity(namePosition, strlen(namePosition));
   if (!e)
@@ -703,7 +694,8 @@ static xmlEntityPtr getXHTMLEntity(const xmlChar* name) {
   return &sharedXHTMLEntity;
 }
 
-static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
+static xmlEntityPtr getEntityHandler(void *closure, const xmlChar *name)
+{
   xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(closure);
   xmlEntityPtr ent = xmlGetPredefinedEntity(name);
   if (ent)
@@ -722,18 +714,14 @@ static xmlEntityPtr getEntityHandler(void* closure, const xmlChar* name) {
   return ent;
 }
 
-static void internalSubsetHandler(void* closure,
-                                  const xmlChar* name,
-                                  const xmlChar* externalID,
-                                  const xmlChar* systemID) {
+static void internalSubsetHandler(void *closure, const xmlChar *name, const xmlChar *externalID, const xmlChar *systemID)
+{
   getTokenizer(closure)->internalSubset(name, externalID, systemID);
   xmlSAX2InternalSubset(closure, name, externalID, systemID);
 }
 
-static void externalSubsetHandler(void* closure,
-                                  const xmlChar* name,
-                                  const xmlChar* externalId,
-                                  const xmlChar* systemId) {
+static void externalSubsetHandler(void *closure, const xmlChar *name, const xmlChar *externalId, const xmlChar *systemId)
+{
   QString extId = toQString(externalId);
   if ((extId == "-//W3C//DTD XHTML 1.0 Transitional//EN") ||
       (extId == "-//W3C//DTD XHTML 1.1//EN") ||
@@ -747,13 +735,15 @@ static void externalSubsetHandler(void* closure,
         true);  // controls if we replace entities or not.
 }
 
-static void ignorableWhitespaceHandler(void* ctx, const xmlChar* ch, int len) {
+static void ignorableWhitespaceHandler(void *ctx, const xmlChar *ch, int len)
+{
   // nothing to do, but we need this to work around a crasher
   // http://bugzilla.gnome.org/show_bug.cgi?id=172255
   // http://bugzilla.opendarwin.org/show_bug.cgi?id=5792
 }
 
-void XMLTokenizer::finish() {
+void XMLTokenizer::finish()
+{
   if (m_xmlCode.isEmpty())
     return;
 
@@ -802,9 +792,8 @@ void XMLTokenizer::finish() {
   emit finishedParsing();
 }
 
-static inline RefPtr<ElementImpl> createXHTMLParserErrorHeader(
-    DocumentImpl* doc,
-    const DOMString& errorMessages) {
+static inline RefPtr<ElementImpl> createXHTMLParserErrorHeader(DocumentImpl* doc, const DOMString& errorMessages) 
+{
   int exceptioncode = 0;
   RefPtr<ElementImpl> reportElement =
       doc->createElementNS(xhtmlNamespaceURI, "parsererror", exceptioncode);
@@ -836,7 +825,8 @@ static inline RefPtr<ElementImpl> createXHTMLParserErrorHeader(
   return reportElement;
 }
 
-void XMLTokenizer::insertErrorMessageBlock() {
+void XMLTokenizer::insertErrorMessageBlock()
+{
   // One or more errors occurred during parsing of the code. Display an error
   // block to the user above
   // the normal content (the DOM tree is created manually and includes line/col
@@ -892,7 +882,8 @@ void XMLTokenizer::insertErrorMessageBlock() {
   doc->updateRendering();
 }
 
-void XMLTokenizer::addScripts(NodeImpl* n) {
+void XMLTokenizer::addScripts(NodeImpl *n)
+{
   // Recursively go through the entire document tree, looking for html <script>
   // tags. For each of these
   // that is found, add it to the m_scripts list from which they will be
@@ -909,7 +900,8 @@ void XMLTokenizer::addScripts(NodeImpl* n) {
     addScripts(child);
 }
 
-void XMLTokenizer::executeScripts() {
+void XMLTokenizer::executeScripts()
+{
   // Iterate through all of the html <script> tags in the document. For those
   // that have a src attribute,
   // start loading the script and return (executeScripts() will be called again
@@ -959,7 +951,8 @@ void XMLTokenizer::executeScripts() {
   m_doc->updateStyleSelector();
 }
 
-void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
+void XMLTokenizer::notifyFinished(CachedObject *finishedObj)
+{
   // This is called when a script has finished loading that was requested from
   // executeScripts(). We execute
   // the script, and then call executeScripts() again to continue iterating
@@ -974,12 +967,14 @@ void XMLTokenizer::notifyFinished(CachedObject* finishedObj) {
   }
 }
 
-bool XMLTokenizer::isWaitingForScripts() const {
+bool XMLTokenizer::isWaitingForScripts() const
+{
   return m_cachedScript != 0;
 }
 
 #ifdef KHTML_XSLT
-void* xmlDocPtrForString(const QString& source, const QString& url) {
+void *xmlDocPtrForString(const QString &source, const QString &url)
+{
   if (source.isEmpty())
     return 0;
   // Parse in a single chunk into an xmlDocPtr
@@ -997,73 +992,68 @@ void* xmlDocPtrForString(const QString& source, const QString& url) {
   return sourceDoc;
 }
 
-void XMLTokenizer::setTransformSource(DocumentImpl* doc) {
+void XMLTokenizer::setTransformSource(DocumentImpl *doc)
+{
   // Time to spin up a new parse and save the xmlDocPtr.
   doc->setTransformSource(xmlDocPtrForString(m_xmlCode, doc->URL()));
 }
 #endif
 
-Tokenizer* newXMLTokenizer(DocumentImpl* d, KHTMLView* v) {
+Tokenizer *newXMLTokenizer(DocumentImpl *d, KHTMLView *v)
+{
   return new XMLTokenizer(d, v);
 }
 
-int XMLTokenizer::lineNumber() const {
+int XMLTokenizer::lineNumber() const
+{
   return m_context->input->line;
 }
 
-int XMLTokenizer::columnNumber() const {
+int XMLTokenizer::columnNumber() const
+{
   return m_context->input->col;
 }
 
-void XMLTokenizer::stopParsing() {
+void XMLTokenizer::stopParsing()
+{
   Tokenizer::stopParsing();
   xmlStopParser(m_context);
 }
 
-static void balancedStartElementNsHandler(void* closure,
-                                          const xmlChar* localname,
-                                          const xmlChar* prefix,
-                                          const xmlChar* uri,
-                                          int nb_namespaces,
-                                          const xmlChar** namespaces,
-                                          int nb_attributes,
-                                          int nb_defaulted,
-                                          const xmlChar** libxmlAttributes) {
+static void balancedStartElementNsHandler(void *closure, const xmlChar *localname, const xmlChar *prefix, const xmlChar *uri, int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **libxmlAttributes)
+{
   static_cast<XMLTokenizer*>(closure)->startElementNs(
       localname, prefix, uri, nb_namespaces, namespaces, nb_attributes,
       nb_defaulted, libxmlAttributes);
 }
 
-static void balancedEndElementNsHandler(void* closure,
-                                        const xmlChar* localname,
-                                        const xmlChar* prefix,
-                                        const xmlChar* uri) {
+static void balancedEndElementNsHandler(void *closure, const xmlChar *localname, const xmlChar *prefix, const xmlChar *uri)
+{
   static_cast<XMLTokenizer*>(closure)->endElementNs();
 }
 
-static void balancedCharactersHandler(void* closure,
-                                      const xmlChar* s,
-                                      int len) {
+static void balancedCharactersHandler(void *closure, const xmlChar *s, int len)
+{
   static_cast<XMLTokenizer*>(closure)->characters(s, len);
 }
 
-static void balancedProcessingInstructionHandler(void* closure,
-                                                 const xmlChar* target,
-                                                 const xmlChar* data) {
+static void balancedProcessingInstructionHandler(void *closure, const xmlChar *target, const xmlChar *data)
+{
   static_cast<XMLTokenizer*>(closure)->processingInstruction(target, data);
 }
 
-static void balancedCdataBlockHandler(void* closure,
-                                      const xmlChar* s,
-                                      int len) {
+static void balancedCdataBlockHandler(void *closure, const xmlChar *s, int len)
+{
   static_cast<XMLTokenizer*>(closure)->cdataBlock(s, len);
 }
 
-static void balancedCommentHandler(void* closure, const xmlChar* comment) {
+static void balancedCommentHandler(void *closure, const xmlChar *comment)
+{
   static_cast<XMLTokenizer*>(closure)->comment(comment);
 }
 
-static void balancedWarningHandler(void* closure, const char* message, ...) {
+static void balancedWarningHandler(void *closure, const char *message, ...)
+{
   va_list args;
   va_start(args, message);
   static_cast<XMLTokenizer*>(closure)->error(XMLTokenizer::warning, message,
@@ -1071,9 +1061,8 @@ static void balancedWarningHandler(void* closure, const char* message, ...) {
   va_end(args);
 }
 
-bool parseXMLDocumentFragment(const DOMString& string,
-                              DocumentFragmentImpl* fragment,
-                              ElementImpl* parent) {
+bool parseXMLDocumentFragment(const DOMString &string, DocumentFragmentImpl *fragment, ElementImpl *parent)
+{
   XMLTokenizer tokenizer(fragment, parent);
 
   xmlSAXHandler sax;
@@ -1102,15 +1091,9 @@ struct AttributeParseState {
   bool gotAttributes;
 };
 
-static void attributesStartElementNsHandler(void* closure,
-                                            const xmlChar* xmlLocalName,
-                                            const xmlChar* xmlPrefix,
-                                            const xmlChar* xmlURI,
-                                            int nb_namespaces,
-                                            const xmlChar** namespaces,
-                                            int nb_attributes,
-                                            int nb_defaulted,
-                                            const xmlChar** libxmlAttributes) {
+
+static void attributesStartElementNsHandler(void *closure, const xmlChar *xmlLocalName, const xmlChar *xmlPrefix, const xmlChar *xmlURI, int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **libxmlAttributes)
+{
   if (strcmp(reinterpret_cast<const char*>(xmlLocalName), "attrs") != 0)
     return;
 
@@ -1136,7 +1119,8 @@ static void attributesStartElementNsHandler(void* closure,
   }
 }
 
-QMap<QString, QString> parseAttributes(const DOMString& string, bool& attrsOK) {
+QMap<QString, QString> parseAttributes(const DOMString &string, bool &attrsOK)
+{
   AttributeParseState state;
   state.gotAttributes = false;
 
