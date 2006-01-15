@@ -34,7 +34,7 @@ class KRenderingPaintServerSolidQuartz : public KRenderingPaintServerSolid {
  public:
   KRenderingPaintServerSolidQuartz(){};
   virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args,
+                    const RenderPath* renderPath,
                     KCPaintTargetType type) const;
 };
 
@@ -42,7 +42,7 @@ class KRenderingPaintServerPatternQuartz : public KRenderingPaintServerPattern {
  public:
   KRenderingPaintServerPatternQuartz(){};
   virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args,
+                    const RenderPath* renderPath,
                     KCPaintTargetType type) const;
 };
 
@@ -50,7 +50,7 @@ class KRenderingPaintServerImageQuartz : public KRenderingPaintServerImage {
  public:
   KRenderingPaintServerImageQuartz(){};
   virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args,
+                    const RenderPath* renderPath,
                     KCPaintTargetType type) const;
 };
 
@@ -86,7 +86,7 @@ class KRenderingPaintServerLinearGradientQuartz
   KRenderingPaintServerLinearGradientQuartz(){};
   virtual void invalidate();
   virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args,
+                    const RenderPath* renderPath,
                     KCPaintTargetType type) const;
 };
 
@@ -97,6 +97,6 @@ class KRenderingPaintServerRadialGradientQuartz
   KRenderingPaintServerRadialGradientQuartz(){};
   virtual void invalidate();
   virtual void draw(KRenderingDeviceContext* context,
-                    const KCanvasCommonArgs& args,
+                    const RenderPath* renderPath,
                     KCPaintTargetType type) const;
 };
