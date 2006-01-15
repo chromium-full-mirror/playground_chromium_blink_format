@@ -599,6 +599,13 @@ void KDOM::CSSStyleSelector::applySVGProperty(int id,
 
       break;
     }
+    case SVGCSS_PROP_WRITING_MODE: {
+      HANDLE_INHERIT_AND_INITIAL(writingMode, WritingMode)
+      if (primitiveValue)
+        svgstyle->setWritingMode(
+            (EWritingMode)(primitiveValue->getIdent() - SVGCSS_VAL_LR_TB));
+      break;
+    }
 #if 0
         case CSS_PROP_COLOR: // colors || inherit
         {

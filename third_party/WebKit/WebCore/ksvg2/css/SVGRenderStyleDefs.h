@@ -69,6 +69,8 @@ enum ETextRendering {
   TR_GEOMETRICPRECISION
 };
 
+enum EWritingMode { WM_LRTB, WM_LR, WM_RLTB, WM_RL, WM_TBRL, WM_TB };
+
 enum EAlignmentBaseline {
   AB_AUTO,
   AB_BASELINE,

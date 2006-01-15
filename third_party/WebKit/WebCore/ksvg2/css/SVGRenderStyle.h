@@ -121,6 +121,10 @@ class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
                                     TextRendering,
                                     textRendering,
                                     TR_AUTO)
+  SVG_RS_DEFINE_ATTRIBUTE_INHERITED(EWritingMode,
+                                    WritingMode,
+                                    writingMode,
+                                    WM_LRTB)
 
   // SVG CSS Properties (using DataRef's)
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(float,
@@ -262,9 +266,10 @@ class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
         EColorInterpolation _colorInterpolation : 2;
         EColorInterpolation _colorInterpolationFilters : 2;
         EPointerEvents _pointerEvents : 4;
+        EWritingMode _writingMode : 3;
 
         unsigned int unused : 32;
-        unsigned int unused2 : 8;
+        unsigned int unused2 : 5;
       } f;
       Q_UINT64 _iflags;
     };
@@ -324,6 +329,7 @@ class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
     svg_inherited_flags.f._colorInterpolationFilters =
         initialColorInterpolationFilters();
     svg_inherited_flags.f._pointerEvents = initialPointerEvents();
+    svg_inherited_flags.f._writingMode = initialWritingMode();
     svg_inherited_flags.f.unused = 0;
     svg_inherited_flags.f.unused2 = 0;
 
