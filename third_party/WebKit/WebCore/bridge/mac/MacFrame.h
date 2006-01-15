@@ -198,11 +198,15 @@ class MacFrame : public Frame {
 
   QString mimeTypeForFileName(const QString&) const;
 
+#if __APPLE__
+  // FIXME: This ifdef can be removed when Win32 no longer needs to include
+  // MacFrame.h
   NSRect visibleSelectionRect() const;
   NSImage* selectionImage() const;
   NSImage* snapshotDragImage(DOM::NodeImpl* node,
                              NSRect* imageRect,
                              NSRect* elementRect) const;
+#endif
   bool dispatchDragSrcEvent(const DOM::AtomicString& eventType,
                             const IntPoint& loc) const;
 
@@ -354,7 +358,10 @@ class MacFrame : public Frame {
   bool dispatchCPPEvent(const DOM::AtomicString& eventType,
                         KWQClipboard::AccessPolicy policy);
 
+#if __APPLE__
+  // FIXME: This can be removed when Win32 no longer needs to include MacFrame.h
   NSImage* imageFromRect(NSRect rect) const;
+#endif
 
   void freeClipboard();
 

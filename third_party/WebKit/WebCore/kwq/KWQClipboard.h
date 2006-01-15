@@ -84,6 +84,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   DOM::NodeImpl* dragImageElement();
   void setDragImageElement(DOM::NodeImpl*, const IntPoint&);
 
+#if __APPLE__
   // Methods for getting info in Cocoa's type system
   NSImage* dragNSImage(
       NSPoint* loc);  // loc converted from dragLoc, based on whole image size
@@ -91,6 +92,7 @@ class KWQClipboard : public DOM::ClipboardImpl {
   bool destinationOperation(NSDragOperation* op) const;
   void setSourceOperation(NSDragOperation op);
   void setDestinationOperation(NSDragOperation op);
+#endif
 
   void setAccessPolicy(AccessPolicy policy);
   AccessPolicy accessPolicy() const;
