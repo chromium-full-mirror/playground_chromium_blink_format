@@ -23,12 +23,12 @@
 #ifndef KSVG_SVGAnimatedIntegerImpl_H
 #define KSVG_SVGAnimatedIntegerImpl_H
 
-#include <kdom/Shared.h>
+#include "Shared.h"
 
 namespace KSVG {
 class SVGStyledElementImpl;
 
-class SVGAnimatedIntegerImpl : public KDOM::Shared<SVGAnimatedIntegerImpl> {
+class SVGAnimatedIntegerImpl : public Shared<SVGAnimatedIntegerImpl> {
  public:
   SVGAnimatedIntegerImpl(const SVGStyledElementImpl* context);
   virtual ~SVGAnimatedIntegerImpl();

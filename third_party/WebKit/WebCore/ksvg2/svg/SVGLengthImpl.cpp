@@ -53,7 +53,7 @@ QString UnitText[] = {QString::fromLatin1(""),   QString::fromLatin1(""),
 SVGLengthImpl::SVGLengthImpl(const SVGStyledElementImpl* context,
                              LengthMode mode,
                              const SVGElementImpl* viewport)
-    : KDOM::Shared<SVGLengthImpl>() {
+    : Shared<SVGLengthImpl>() {
   m_mode = mode;
   m_context = context;
   m_viewportElement = viewport;

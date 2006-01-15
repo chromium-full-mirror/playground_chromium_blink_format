@@ -28,7 +28,7 @@ using namespace KSVG;
 
 SVGAnimatedEnumerationImpl::SVGAnimatedEnumerationImpl(
     const SVGStyledElementImpl* context)
-    : KDOM::Shared<SVGAnimatedEnumerationImpl>() {
+    : Shared<SVGAnimatedEnumerationImpl>() {
   m_baseVal = 0;
   m_animVal = 0;
 

@@ -25,10 +25,10 @@
 
 #include <qmatrix.h>
 
-#include <kdom/Shared.h>
+#include "Shared.h"
 
 namespace KSVG {
-class SVGMatrixImpl : public KDOM::Shared<SVGMatrixImpl> {
+class SVGMatrixImpl : public Shared<SVGMatrixImpl> {
  public:
   SVGMatrixImpl();
   SVGMatrixImpl(double a, double b, double c, double d, double e, double f);

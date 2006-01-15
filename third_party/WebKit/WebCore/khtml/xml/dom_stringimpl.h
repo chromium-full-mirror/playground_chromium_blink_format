@@ -24,7 +24,7 @@
 #ifndef DOM_DOMStringImpl_h
 #define DOM_DOMStringImpl_h
 
-#include "shared.h"
+#include "Shared.h"
 #include <kxmlcore/RefPtr.h>
 #include <qstring.h>
 
@@ -34,7 +34,7 @@ struct Length;
 
 namespace DOM {
 
-class DOMStringImpl : public khtml::Shared<DOMStringImpl> {
+class DOMStringImpl : public Shared<DOMStringImpl> {
  private:
   struct WithOneRef {};
   DOMStringImpl(WithOneRef) : l(0), s(0), _hash(0), _inTable(false) { ref(); }

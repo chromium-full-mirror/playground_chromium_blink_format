@@ -143,7 +143,7 @@ class CSSStyleSheetImpl : public StyleSheetImpl {
 
 // ----------------------------------------------------------------------------
 
-class StyleSheetListImpl : public khtml::Shared<StyleSheetListImpl> {
+class StyleSheetListImpl : public Shared<StyleSheetListImpl> {
  public:
   StyleSheetListImpl() {}
   ~StyleSheetListImpl();

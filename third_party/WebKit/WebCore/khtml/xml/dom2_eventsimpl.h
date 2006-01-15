@@ -29,7 +29,7 @@
 #include "NodeImpl.h"
 #include "xml/dom_atomicstring.h"
 #include "xml/dom2_viewsimpl.h"
-#include "shared.h"
+#include "Shared.h"
 
 class Frame;
 class QKeyEvent;
@@ -45,7 +45,7 @@ namespace DOM {
 class EventListener;
 class ClipboardImpl;
 
-class EventImpl : public khtml::Shared<EventImpl> {
+class EventImpl : public Shared<EventImpl> {
  public:
   EventImpl();
   EventImpl(const AtomicString& type, bool canBubbleArg, bool cancelableArg);
@@ -430,7 +430,7 @@ inline bool operator!=(const RegisteredEventListener& a,
 }
 
 // State available during IE's events for drag and drop and copy/paste
-class ClipboardImpl : public khtml::Shared<ClipboardImpl> {
+class ClipboardImpl : public Shared<ClipboardImpl> {
  public:
   ClipboardImpl() {}
   virtual ~ClipboardImpl();

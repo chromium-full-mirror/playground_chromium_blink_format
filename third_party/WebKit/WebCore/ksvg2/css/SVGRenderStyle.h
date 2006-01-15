@@ -25,7 +25,7 @@
 
 #include "IntRect.h"
 
-#include "misc/shared.h"
+#include "Shared.h"
 #include "DataRef.h"
 
 // KSVG compatibility: Allow us to use KDOM:: as though it were khtml::
@@ -61,7 +61,7 @@ using namespace khtml;
     Group.access()->Variable = Value;
 
 namespace KSVG {
-class SVGRenderStyle : public KDOM::Shared<SVGRenderStyle> {
+class SVGRenderStyle : public Shared<SVGRenderStyle> {
  public:
   SVGRenderStyle();
   SVGRenderStyle(bool);  // Used to create the default style.

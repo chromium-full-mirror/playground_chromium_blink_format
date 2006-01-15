@@ -23,7 +23,7 @@
 #ifndef KSVG_SVGLengthImpl_H
 #define KSVG_SVGLengthImpl_H
 
-#include <kdom/Shared.h>
+#include "Shared.h"
 #include <kdom/DOMString.h>
 
 #include <ksvg2/svg/SVGHelper.h>
@@ -33,7 +33,7 @@ class RenderPath;
 namespace KSVG {
 class SVGElementImpl;
 class SVGStyledElementImpl;
-class SVGLengthImpl : public KDOM::Shared<SVGLengthImpl> {
+class SVGLengthImpl : public Shared<SVGLengthImpl> {
  public:
   SVGLengthImpl(const SVGStyledElementImpl* context,
                 LengthMode mode = LM_UNKNOWN,

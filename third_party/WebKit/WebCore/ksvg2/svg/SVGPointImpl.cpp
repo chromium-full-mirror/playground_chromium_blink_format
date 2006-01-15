@@ -28,7 +28,7 @@
 using namespace KSVG;
 
 SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context)
-    : KDOM::Shared<SVGPointImpl>() {
+    : Shared<SVGPointImpl>() {
   m_x = 0.0;
   m_y = 0.0;
   m_context = context;
@@ -37,7 +37,7 @@ SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context)
 SVGPointImpl::SVGPointImpl(float x,
                            float y,
                            const SVGStyledElementImpl* context)
-    : KDOM::Shared<SVGPointImpl>() {
+    : Shared<SVGPointImpl>() {
   m_x = x;
   m_y = y;
   m_context = context;
@@ -45,7 +45,7 @@ SVGPointImpl::SVGPointImpl(float x,
 
 SVGPointImpl::SVGPointImpl(const IntPoint& p,
                            const SVGStyledElementImpl* context)
-    : KDOM::Shared<SVGPointImpl>() {
+    : Shared<SVGPointImpl>() {
   m_x = p.x();
   m_y = p.y();
   m_context = context;

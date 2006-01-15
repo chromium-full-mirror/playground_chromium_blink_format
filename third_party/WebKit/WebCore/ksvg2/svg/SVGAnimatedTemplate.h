@@ -33,7 +33,7 @@ namespace KSVG {
 // - no copy ctor/no assignment operator available
 //   (-> a class for only for pointer usage)
 template <class T>
-class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
+class SVGAnimatedTemplate : public Shared<SVGAnimatedTemplate<T>> {
  public:
   virtual ~SVGAnimatedTemplate() {}
 
@@ -70,7 +70,7 @@ class SVGAnimatedTemplate : public KDOM::Shared<SVGAnimatedTemplate<T>> {
 
  protected:
   SVGAnimatedTemplate(const SVGStyledElementImpl* context)
-      : KDOM::Shared<SVGAnimatedTemplate>() {
+      : Shared<SVGAnimatedTemplate>() {
     m_context = context;
   }
 

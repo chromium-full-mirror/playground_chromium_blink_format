@@ -19,12 +19,12 @@
     Boston, MA 02111-1307, USA.
 */
 
-#ifndef KHTML_SHARED_H
-#define KHTML_SHARED_H
+#ifndef SHARED_H
+#define SHARED_H
 
 #include <kxmlcore/RefPtr.h>
 
-namespace khtml {
+namespace WebCore {
 
 template <class T>
 class Shared {
@@ -74,5 +74,9 @@ class TreeShared {
   TreeShared& operator=(const TreeShared&);
 };
 }
+
+// FIXME: Remove when everything is in the WebCore namespace.
+using WebCore::Shared;
+using WebCore::TreeShared;
 
 #endif

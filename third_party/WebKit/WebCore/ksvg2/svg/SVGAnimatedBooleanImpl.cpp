@@ -28,7 +28,7 @@ using namespace KSVG;
 
 SVGAnimatedBooleanImpl::SVGAnimatedBooleanImpl(
     const SVGStyledElementImpl* context)
-    : KDOM::Shared<SVGAnimatedBooleanImpl>() {
+    : Shared<SVGAnimatedBooleanImpl>() {
   m_baseVal = false;
   m_animVal = false;
 

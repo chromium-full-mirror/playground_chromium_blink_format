@@ -34,13 +34,13 @@
 
 using namespace KSVG;
 
-StyleFillData::StyleFillData() : KDOM::Shared<StyleFillData>() {
+StyleFillData::StyleFillData() : Shared<StyleFillData>() {
   paint = SVGRenderStyle::initialFillPaint();
   opacity = SVGRenderStyle::initialFillOpacity();
 }
 
 StyleFillData::StyleFillData(const StyleFillData& other)
-    : KDOM::Shared<StyleFillData>() {
+    : Shared<StyleFillData>() {
   paint = other.paint;
   opacity = other.opacity;
 }
@@ -64,7 +64,7 @@ bool StyleFillData::operator==(const StyleFillData& other) const {
   return (paint == other.paint) && (opacity == other.opacity);
 }
 
-StyleStrokeData::StyleStrokeData() : KDOM::Shared<StyleStrokeData>() {
+StyleStrokeData::StyleStrokeData() : Shared<StyleStrokeData>() {
   width = SVGRenderStyle::initialStrokeWidth();
   paint = SVGRenderStyle::initialStrokePaint();
   opacity = SVGRenderStyle::initialStrokeOpacity();
@@ -74,7 +74,7 @@ StyleStrokeData::StyleStrokeData() : KDOM::Shared<StyleStrokeData>() {
 }
 
 StyleStrokeData::StyleStrokeData(const StyleStrokeData& other)
-    : KDOM::Shared<StyleStrokeData>() {
+    : Shared<StyleStrokeData>() {
   width = other.width;
   paint = other.paint;
   opacity = other.opacity;
@@ -89,13 +89,13 @@ bool StyleStrokeData::operator==(const StyleStrokeData& other) const {
          (dashOffset == other.dashOffset) && (dashArray == other.dashArray);
 }
 
-StyleStopData::StyleStopData() : KDOM::Shared<StyleStopData>() {
+StyleStopData::StyleStopData() : Shared<StyleStopData>() {
   color = SVGRenderStyle::initialStopColor();
   opacity = SVGRenderStyle::initialStopOpacity();
 }
 
 StyleStopData::StyleStopData(const StyleStopData& other)
-    : KDOM::Shared<StyleStopData>() {
+    : Shared<StyleStopData>() {
   color = other.color;
   opacity = other.opacity;
 }
@@ -104,12 +104,12 @@ bool StyleStopData::operator==(const StyleStopData& other) const {
   return (color == other.color) && (opacity == other.opacity);
 }
 
-StyleClipData::StyleClipData() : KDOM::Shared<StyleClipData>() {
+StyleClipData::StyleClipData() : Shared<StyleClipData>() {
   clipPath = SVGRenderStyle::initialClipPath();
 }
 
 StyleClipData::StyleClipData(const StyleClipData& other)
-    : KDOM::Shared<StyleClipData>() {
+    : Shared<StyleClipData>() {
   clipPath = other.clipPath;
 }
 
@@ -117,12 +117,12 @@ bool StyleClipData::operator==(const StyleClipData& other) const {
   return (clipPath == other.clipPath);
 }
 
-StyleMaskData::StyleMaskData() : KDOM::Shared<StyleMaskData>() {
+StyleMaskData::StyleMaskData() : Shared<StyleMaskData>() {
   maskElement = SVGRenderStyle::initialMaskElement();
 }
 
 StyleMaskData::StyleMaskData(const StyleMaskData& other)
-    : KDOM::Shared<StyleMaskData>() {
+    : Shared<StyleMaskData>() {
   maskElement = other.maskElement;
 }
 
@@ -130,14 +130,14 @@ bool StyleMaskData::operator==(const StyleMaskData& other) const {
   return (maskElement == other.maskElement);
 }
 
-StyleMarkerData::StyleMarkerData() : KDOM::Shared<StyleMarkerData>() {
+StyleMarkerData::StyleMarkerData() : Shared<StyleMarkerData>() {
   startMarker = SVGRenderStyle::initialStartMarker();
   midMarker = SVGRenderStyle::initialMidMarker();
   endMarker = SVGRenderStyle::initialEndMarker();
 }
 
 StyleMarkerData::StyleMarkerData(const StyleMarkerData& other)
-    : KDOM::Shared<StyleMarkerData>() {
+    : Shared<StyleMarkerData>() {
   startMarker = other.startMarker;
   midMarker = other.midMarker;
   endMarker = other.endMarker;
@@ -148,13 +148,13 @@ bool StyleMarkerData::operator==(const StyleMarkerData& other) const {
           endMarker == other.endMarker);
 }
 
-StyleMiscData::StyleMiscData() : KDOM::Shared<StyleMiscData>() {
+StyleMiscData::StyleMiscData() : Shared<StyleMiscData>() {
   floodColor = khtml::RenderStyle::initialColor();
   floodOpacity = khtml::RenderStyle::initialOpacity();
 }
 
 StyleMiscData::StyleMiscData(const StyleMiscData& other)
-    : KDOM::Shared<StyleMiscData>() {
+    : Shared<StyleMiscData>() {
   filter = other.filter;
   floodColor = other.floodColor;
   floodOpacity = other.floodOpacity;

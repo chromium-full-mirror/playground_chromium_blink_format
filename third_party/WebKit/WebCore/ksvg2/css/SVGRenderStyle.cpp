@@ -61,7 +61,7 @@ SVGRenderStyle::SVGRenderStyle(bool) {
 }
 
 SVGRenderStyle::SVGRenderStyle(const SVGRenderStyle& other)
-    : khtml::Shared<SVGRenderStyle>() {
+    : Shared<SVGRenderStyle>() {
   fill = other.fill;
   stroke = other.stroke;
   stops = other.stops;

@@ -114,7 +114,7 @@ enum EPointerEvents {
 };
 
 // Inherited/Non-Inherited Style Datastructures
-class StyleFillData : public KDOM::Shared<StyleFillData> {
+class StyleFillData : public Shared<StyleFillData> {
  public:
   StyleFillData();
   StyleFillData(const StyleFillData& other);
@@ -131,7 +131,7 @@ class StyleFillData : public KDOM::Shared<StyleFillData> {
   StyleFillData& operator=(const StyleFillData&);
 };
 
-class StyleStrokeData : public KDOM::Shared<StyleStrokeData> {
+class StyleStrokeData : public Shared<StyleStrokeData> {
  public:
   StyleStrokeData();
   StyleStrokeData(const StyleStrokeData& other);
@@ -154,7 +154,7 @@ class StyleStrokeData : public KDOM::Shared<StyleStrokeData> {
   StyleStrokeData& operator=(const StyleStrokeData&);
 };
 
-class StyleStopData : public KDOM::Shared<StyleStopData> {
+class StyleStopData : public Shared<StyleStopData> {
  public:
   StyleStopData();
   StyleStopData(const StyleStopData& other);
@@ -171,7 +171,7 @@ class StyleStopData : public KDOM::Shared<StyleStopData> {
   StyleStopData& operator=(const StyleStopData&);
 };
 
-class StyleClipData : public KDOM::Shared<StyleClipData> {
+class StyleClipData : public Shared<StyleClipData> {
  public:
   StyleClipData();
   StyleClipData(const StyleClipData& other);
@@ -187,7 +187,7 @@ class StyleClipData : public KDOM::Shared<StyleClipData> {
   StyleClipData& operator=(const StyleClipData&);
 };
 
-class StyleMaskData : public KDOM::Shared<StyleMaskData> {
+class StyleMaskData : public Shared<StyleMaskData> {
  public:
   StyleMaskData();
   StyleMaskData(const StyleMaskData& other);
@@ -203,7 +203,7 @@ class StyleMaskData : public KDOM::Shared<StyleMaskData> {
   StyleMaskData& operator=(const StyleMaskData&);
 };
 
-class StyleMarkerData : public KDOM::Shared<StyleMarkerData> {
+class StyleMarkerData : public Shared<StyleMarkerData> {
  public:
   StyleMarkerData();
   StyleMarkerData(const StyleMarkerData& other);
@@ -222,7 +222,7 @@ class StyleMarkerData : public KDOM::Shared<StyleMarkerData> {
 };
 
 // Note : the rule for this class is, *no inheritance* of these props
-class StyleMiscData : public KDOM::Shared<StyleMiscData> {
+class StyleMiscData : public Shared<StyleMiscData> {
  public:
   StyleMiscData();
   StyleMiscData(const StyleMiscData& other);
