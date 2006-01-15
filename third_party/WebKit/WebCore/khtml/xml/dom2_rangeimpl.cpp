@@ -901,7 +901,7 @@ DOMString RangeImpl::text() const {
 
   // FIXME: Maybe DOMRange constructor should take const DOMRangeImpl*; if it
   // did we would not need this const_cast.
-  return plainText(const_cast<RangeImpl*>(this));
+  return khtml::plainText(const_cast<RangeImpl*>(this));
 }
 
 DocumentFragmentImpl* RangeImpl::createContextualFragment(
