@@ -777,10 +777,7 @@ void InlineFlowBox::paint(RenderObject::PaintInfo& i, int tx, int ty) {
       if (object()->style()->visibility() == VISIBLE &&
           object()->style()->outlineWidth() > 0 &&
           !object()->isInlineContinuation() && !isRootInlineBox()) {
-        if (!i.outlineObjects)
-          i.outlineObjects = new QPtrDict<RenderFlow>;
-        if (!i.outlineObjects->find(flowObject()))
-          i.outlineObjects->insert(flowObject(), flowObject());
+        i.outlineObjects.insert(flowObject());
       }
     } else {
       // 1. Paint our background and border.

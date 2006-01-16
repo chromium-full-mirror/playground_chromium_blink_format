@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004, 2005 Nikolas Zimmermann <wildfox@kde.org>
                   2004, 2005 Rob Buis <buis@kde.org>
+    Copyright (C) 2005, 2006 Apple Computer, Inc.
 
      This file is part of the KDE project
 
@@ -23,15 +24,8 @@
 #ifndef KSVG_SVGRenderStyle_H
 #define KSVG_SVGRenderStyle_H
 
-#include "IntRect.h"
-
 #include "Shared.h"
 #include "DataRef.h"
-
-// KSVG compatibility: Allow us to use KDOM:: as though it were khtml::
-namespace KDOM {
-using namespace khtml;
-};
 
 #include <ksvg2/svg/SVGPaintImpl.h>
 #include <ksvg2/css/SVGRenderStyleDefs.h>
@@ -189,7 +183,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            color,
                                            StopColor,
                                            stopColor,
-                                           QColor(Qt::black))
+                                           QColor(0, 0, 0))
 
   RS_DEFINE_ATTRIBUTE_DATAREF_WITH_INITIAL(QString,
                                            clip,
@@ -239,7 +233,7 @@ class SVGRenderStyle : public Shared<SVGRenderStyle> {
                                            floodColor,
                                            FloodColor,
                                            floodColor,
-                                           QColor(Qt::black))
+                                           QColor(0, 0, 0))
 
  protected:
   // inherit

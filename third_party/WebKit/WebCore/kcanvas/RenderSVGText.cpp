@@ -91,7 +91,7 @@ bool RenderSVGText::nodeAtPoint(NodeInfo& info,
                                 int _y,
                                 int _tx,
                                 int _ty,
-                                HitTestAction hitTestAction) {
+                                WebCore::HitTestAction hitTestAction) {
   QMatrix totalTransform = absoluteTransform();
   totalTransform *= localTransform();
   totalTransform *= translationForAttributes();

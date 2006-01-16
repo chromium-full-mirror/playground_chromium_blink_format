@@ -4,7 +4,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -24,39 +24,39 @@
  */
 
 #include "config.h"
-#include "rendering/render_object.h"
-#include "rendering/render_table.h"
-#include "RenderText.h"
-#include "rendering/render_line.h"
-#include "rendering/render_list.h"
-#include "rendering/render_canvas.h"
-#include "xml/dom_elementimpl.h"
-#include "xml/dom2_eventsimpl.h"
-#include "DocumentImpl.h"
-#include "xml/dom_position.h"
-#include "xml/EventNames.h"
+#include "render_object.h"
+
 #include "CachedImage.h"
-#include "css/cssstyleselector.h"
+#include "DocumentImpl.h"
+#include "EventNames.h"
+#include "Frame.h"
+#include "FrameView.h"
+#include "KWQAccObjectCache.h"
+#include "RenderText.h"
+#include "cssstyleselector.h"
+#include "dom2_eventsimpl.h"
+#include "dom_elementimpl.h"
+#include "dom_position.h"
+#include "htmlnames.h"
+#include "render_arena.h"
+#include "render_block.h"
+#include "render_canvas.h"
+#include "render_flexbox.h"
+#include "render_inline.h"
+#include "render_line.h"
+#include "render_list.h"
+#include "render_table.h"
+#include <assert.h>
 #include <kdebug.h>
 #include <qpainter.h>
 #include <qpen.h>
-#include "FrameView.h"
-#include "Frame.h"
-#include "render_arena.h"
-#include "render_inline.h"
-#include "render_block.h"
-#include "render_flexbox.h"
-#include "htmlnames.h"
+#include <qtextcodec.h>
+#include <qwmatrix.h>
 
-// For accessibility
-#include "KWQAccObjectCache.h"
+namespace WebCore {
 
-#include <assert.h>
-
-using namespace DOM;
-using namespace DOM::EventNames;
+using namespace EventNames;
 using namespace HTMLNames;
-using namespace khtml;
 
 #ifndef NDEBUG
 static void* baseOfRenderObjectBeingDeleted;
@@ -418,7 +418,7 @@ void RenderObject::addLayers(RenderLayer* parentLayer,
 
   RenderObject* object = newObject;
   RenderLayer* beforeChild = 0;
-  ::addLayers(this, parentLayer, object, beforeChild);
+  WebCore::addLayers(this, parentLayer, object, beforeChild);
 }
 
 void RenderObject::removeLayers(RenderLayer* parentLayer) {
@@ -2671,10 +2671,16 @@ InlineBox* RenderObject::inlineBox(int offset, EAffinity affinity) {
 }
 
 #if SVG_SUPPORT
+
+QMatrix RenderObject::localTransform() const {
+  return QMatrix(1, 0, 0, 1, xPos(), yPos());
+}
+
 QMatrix RenderObject::absoluteTransform() const {
   if (parent())
     return parent()->absoluteTransform() * localTransform();
-  else
-    return localTransform();
+  return localTransform();
 }
+
 #endif
+}

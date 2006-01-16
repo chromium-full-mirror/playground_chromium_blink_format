@@ -2,6 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * Copyright (C) 2000 Peter Kelly (pmk@post.com)
+ * Copyright (C) 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,84 +21,42 @@
  */
 
 #include "config.h"
-#include "dom/dom_exception.h"
+#include "dom_xmlimpl.h"
 
-#include "dom_node.h"
-#include "xml/dom_xmlimpl.h"
+#include "CachedCSSStyleSheet.h"
+#include "CachedXSLStyleSheet.h"
+#include "DocLoader.h"
 #include "DocumentImpl.h"
-#include "xml/dom_stringimpl.h"
 #include "css/css_stylesheetimpl.h"
+#include "dom/dom_exception.h"
+#include "dom_node.h"
+#include "xml/dom_stringimpl.h"
+#include "xml/xml_tokenizer.h"
+
 #ifdef KHTML_XSLT
 #include "xsl_stylesheetimpl.h"
 #endif
-#include "CachedXSLStyleSheet.h"
-#include "CachedCSSStyleSheet.h"
-#include "DocLoader.h"
-#include "xml/xml_tokenizer.h"
 
 using khtml::parseAttributes;
 
 namespace DOM {
 
-EntityImpl::EntityImpl(DocumentImpl* doc) : ContainerNodeImpl(doc) {
-  m_publicId = 0;
-  m_systemId = 0;
-  m_notationName = 0;
-  m_name = 0;
-}
+EntityImpl::EntityImpl(DocumentImpl* doc) : ContainerNodeImpl(doc) {}
 
-EntityImpl::EntityImpl(DocumentImpl* doc, DOMString _name)
-    : ContainerNodeImpl(doc) {
-  m_publicId = 0;
-  m_systemId = 0;
-  m_notationName = 0;
-  m_name = _name.impl();
-  if (m_name)
-    m_name->ref();
-}
+EntityImpl::EntityImpl(DocumentImpl* doc, const DOMString& name)
+    : ContainerNodeImpl(doc), m_name(name.impl()) {}
 
 EntityImpl::EntityImpl(DocumentImpl* doc,
-                       DOMString _publicId,
-                       DOMString _systemId,
-                       DOMString _notationName)
-    : ContainerNodeImpl(doc) {
-  m_publicId = _publicId.impl();
-  if (m_publicId)
-    m_publicId->ref();
-  m_systemId = _systemId.impl();
-  if (m_systemId)
-    m_systemId->ref();
-  m_notationName = _notationName.impl();
-  if (m_notationName)
-    m_notationName->ref();
-  m_name = 0;
-}
-
-EntityImpl::~EntityImpl() {
-  if (m_publicId)
-    m_publicId->deref();
-  if (m_systemId)
-    m_systemId->deref();
-  if (m_notationName)
-    m_notationName->deref();
-  if (m_name)
-    m_name->deref();
-}
-
-DOMString EntityImpl::publicId() const {
-  return m_publicId;
-}
-
-DOMString EntityImpl::systemId() const {
-  return m_systemId;
-}
-
-DOMString EntityImpl::notationName() const {
-  return m_notationName;
-}
+                       const DOMString& publicId,
+                       const DOMString& systemId,
+                       const DOMString& notationName)
+    : ContainerNodeImpl(doc),
+      m_publicId(publicId.impl()),
+      m_systemId(systemId.impl()),
+      m_notationName(notationName.impl()) {}
 
 DOMString EntityImpl::nodeName() const {
-  return m_name;
+  return m_name.get();
 }
 
 unsigned short EntityImpl::nodeType() const {
@@ -105,8 +64,8 @@ unsigned short EntityImpl::nodeType() const {
 }
 
 NodeImpl* EntityImpl::cloneNode(bool /*deep*/) {
-  // Spec says cloning Document nodes is "implementation dependent"
-  // so we do not support it...
+  // Spec says cloning Entity nodes is "implementation dependent". We do not
+  // support it.
   return 0;
 }
 
@@ -131,24 +90,24 @@ DOMString EntityImpl::toString() const {
 
   if (m_name && m_name->l != 0) {
     result += " ";
-    result += m_name;
+    result += m_name.get();
   }
 
   if (m_publicId && m_publicId->l != 0) {
     result += " PUBLIC \"";
-    result += m_publicId;
+    result += m_publicId.get();
     result += "\" \"";
-    result += m_systemId;
+    result += m_systemId.get();
     result += "\"";
   } else if (m_systemId && m_systemId->l != 0) {
     result += " SYSTEM \"";
-    result += m_systemId;
+    result += m_systemId.get();
     result += "\"";
   }
 
   if (m_notationName && m_notationName->l != 0) {
     result += " NDATA ";
-    result += m_notationName;
+    result += m_notationName.get();
   }
 
   result += ">";
@@ -159,25 +118,14 @@ DOMString EntityImpl::toString() const {
 // -------------------------------------------------------------------------
 
 EntityReferenceImpl::EntityReferenceImpl(DocumentImpl* doc)
-    : ContainerNodeImpl(doc) {
-  m_entityName = 0;
-}
+    : ContainerNodeImpl(doc) {}
 
 EntityReferenceImpl::EntityReferenceImpl(DocumentImpl* doc,
-                                         DOMStringImpl* _entityName)
-    : ContainerNodeImpl(doc) {
-  m_entityName = _entityName;
-  if (m_entityName)
-    m_entityName->ref();
-}
-
-EntityReferenceImpl::~EntityReferenceImpl() {
-  if (m_entityName)
-    m_entityName->deref();
-}
+                                         DOMStringImpl* entityName)
+    : ContainerNodeImpl(doc), m_entityName(entityName) {}
 
 DOMString EntityReferenceImpl::nodeName() const {
-  return m_entityName;
+  return m_entityName.get();
 }
 
 unsigned short EntityReferenceImpl::nodeType() const {
@@ -186,7 +134,7 @@ unsigned short EntityReferenceImpl::nodeType() const {
 
 NodeImpl* EntityReferenceImpl::cloneNode(bool deep) {
   EntityReferenceImpl* clone =
-      new EntityReferenceImpl(getDocument(), m_entityName);
+      new EntityReferenceImpl(getDocument(), m_entityName.get());
   // ### make sure children are readonly
   // ### since we are a reference, should we clone children anyway (even if not
   // deep?)
@@ -213,7 +161,7 @@ bool EntityReferenceImpl::childTypeAllowed(unsigned short type) {
 
 DOMString EntityReferenceImpl::toString() const {
   DOMString result = "&";
-  result += m_entityName;
+  result += m_entityName.get();
   result += ";";
 
   return result;
@@ -221,47 +169,19 @@ DOMString EntityReferenceImpl::toString() const {
 
 // -------------------------------------------------------------------------
 
-NotationImpl::NotationImpl(DocumentImpl* doc) : ContainerNodeImpl(doc) {
-  m_publicId = 0;
-  m_systemId = 0;
-  m_name = 0;
-}
+NotationImpl::NotationImpl(DocumentImpl* doc) : ContainerNodeImpl(doc) {}
 
 NotationImpl::NotationImpl(DocumentImpl* doc,
-                           DOMString _name,
-                           DOMString _publicId,
-                           DOMString _systemId)
-    : ContainerNodeImpl(doc) {
-  m_name = _name.impl();
-  if (m_name)
-    m_name->ref();
-  m_publicId = _publicId.impl();
-  if (m_publicId)
-    m_publicId->ref();
-  m_systemId = _systemId.impl();
-  if (m_systemId)
-    m_systemId->ref();
-}
-
-NotationImpl::~NotationImpl() {
-  if (m_name)
-    m_name->deref();
-  if (m_publicId)
-    m_publicId->deref();
-  if (m_systemId)
-    m_systemId->deref();
-}
-
-DOMString NotationImpl::publicId() const {
-  return m_publicId;
-}
-
-DOMString NotationImpl::systemId() const {
-  return m_systemId;
-}
+                           const DOMString& name,
+                           const DOMString& publicId,
+                           const DOMString& systemId)
+    : ContainerNodeImpl(doc),
+      m_name(name.impl()),
+      m_publicId(publicId.impl()),
+      m_systemId(systemId.impl()) {}
 
 DOMString NotationImpl::nodeName() const {
-  return m_name;
+  return m_name.get();
 }
 
 unsigned short NotationImpl::nodeType() const {
@@ -269,8 +189,8 @@ unsigned short NotationImpl::nodeType() const {
 }
 
 NodeImpl* NotationImpl::cloneNode(bool /*deep*/) {
-  // Spec says cloning Document nodes is "implementation dependent"
-  // so we do not support it...
+  // Spec says cloning Notation nodes is "implementation dependent". We do not
+  // support it.
   return 0;
 }
 
@@ -286,68 +206,42 @@ bool NotationImpl::childTypeAllowed(unsigned short /*type*/) {
 // change or are added/removed
 
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentImpl* doc)
-    : ContainerNodeImpl(doc) {
-  m_target = 0;
-  m_data = 0;
-  m_localHref = 0;
-  m_cachedSheet = 0;
-  m_loading = false;
+    : ContainerNodeImpl(doc), m_cachedSheet(0), m_loading(false) {
 #ifdef KHTML_XSLT
   m_isXSL = false;
 #endif
 }
 
 ProcessingInstructionImpl::ProcessingInstructionImpl(DocumentImpl* doc,
-                                                     DOMString _target,
-                                                     DOMString _data)
-    : ContainerNodeImpl(doc) {
-  m_target = _target.impl();
-  if (m_target)
-    m_target->ref();
-  m_data = _data.impl();
-  if (m_data)
-    m_data->ref();
-  m_cachedSheet = 0;
-  m_localHref = 0;
+                                                     const DOMString& target,
+                                                     const DOMString& data)
+    : ContainerNodeImpl(doc),
+      m_target(target.impl()),
+      m_data(data.impl()),
+      m_cachedSheet(0),
+      m_loading(false) {
 #ifdef KHTML_XSLT
   m_isXSL = false;
 #endif
 }
 
 ProcessingInstructionImpl::~ProcessingInstructionImpl() {
-  if (m_target)
-    m_target->deref();
-  if (m_data)
-    m_data->deref();
   if (m_cachedSheet)
     m_cachedSheet->deref(this);
 }
 
-DOMString ProcessingInstructionImpl::target() const {
-  return m_target;
-}
-
-DOMString ProcessingInstructionImpl::data() const {
-  return m_data;
-}
-
-void ProcessingInstructionImpl::setData(const DOMString& _data,
+void ProcessingInstructionImpl::setData(const DOMString& data,
                                         int& exceptioncode) {
   // NO_MODIFICATION_ALLOWED_ERR: Raised when the node is readonly.
   if (isReadOnly()) {
     exceptioncode = DOMException::NO_MODIFICATION_ALLOWED_ERR;
     return;
   }
-
-  if (m_data)
-    m_data->deref();
-  m_data = _data.impl();
-  if (m_data)
-    m_data->ref();
+  m_data = data.impl();
 }
 
 DOMString ProcessingInstructionImpl::nodeName() const {
-  return m_target;
+  return m_target.get();
 }
 
 unsigned short ProcessingInstructionImpl::nodeType() const {
@@ -355,22 +249,19 @@ unsigned short ProcessingInstructionImpl::nodeType() const {
 }
 
 DOMString ProcessingInstructionImpl::nodeValue() const {
-  return m_data;
+  return m_data.get();
 }
 
-void ProcessingInstructionImpl::setNodeValue(const DOMString& _nodeValue,
+void ProcessingInstructionImpl::setNodeValue(const DOMString& nodeValue,
                                              int& exceptioncode) {
   // NO_MODIFICATION_ALLOWED_ERR: taken care of by setData()
-  setData(_nodeValue, exceptioncode);
+  setData(nodeValue, exceptioncode);
 }
 
 NodeImpl* ProcessingInstructionImpl::cloneNode(bool /*deep*/) {
   // ### copy m_localHref
-  return new ProcessingInstructionImpl(getDocument(), m_target, m_data);
-}
-
-DOMString ProcessingInstructionImpl::localHref() const {
-  return m_localHref;
+  return new ProcessingInstructionImpl(getDocument(), m_target.get(),
+                                       m_data.get());
 }
 
 // DOM Section 1.1.1
@@ -379,14 +270,14 @@ bool ProcessingInstructionImpl::childTypeAllowed(unsigned short /*type*/) {
 }
 
 bool ProcessingInstructionImpl::checkStyleSheet() {
-  if (m_target && DOMString(m_target) == "xml-stylesheet") {
+  if (DOMString(m_target.get()) == "xml-stylesheet") {
     // see http://www.w3.org/TR/xml-stylesheet/
     // ### check that this occurs only in the prolog
     // ### support stylesheet included in a fragment of this (or another)
     // document
     // ### make sure this gets called when adding from javascript
     bool attrsOk;
-    const QMap<QString, QString> attrs = parseAttributes(m_data, attrsOk);
+    const QMap<QString, QString> attrs = parseAttributes(m_data.get(), attrsOk);
     if (!attrsOk)
       return true;
     QMap<QString, QString>::ConstIterator i = attrs.find("type");
@@ -431,7 +322,7 @@ bool ProcessingInstructionImpl::checkStyleSheet() {
           if (m_sheet)
             m_sheet->deref();
           XSLStyleSheetImpl* localSheet =
-              new XSLStyleSheetImpl(this, m_localHref, true);
+              new XSLStyleSheetImpl(this, m_localHref.get(), true);
           localSheet->setDocument((xmlDocPtr)getDocument()->transformSource());
           localSheet->ref();
           localSheet->loadChildSheets();
@@ -507,11 +398,15 @@ void ProcessingInstructionImpl::setStyleSheet(const DOMString& url,
 
 DOMString ProcessingInstructionImpl::toString() const {
   DOMString result = "<?";
-  result += m_target;
+  result += m_target.get();
   result += " ";
-  result += m_data;
+  result += m_data.get();
   result += "?>";
   return result;
+}
+
+void ProcessingInstructionImpl::setStyleSheet(StyleSheetImpl* sheet) {
+  m_sheet = sheet;
 }
 
 }  // namespace

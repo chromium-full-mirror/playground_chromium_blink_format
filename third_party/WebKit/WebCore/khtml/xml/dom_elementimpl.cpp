@@ -5,7 +5,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,31 +23,66 @@
  * Boston, MA 02111-1307, USA.
  */
 
-//#define EVENT_DEBUG
 #include "config.h"
-#include "dom/dom_exception.h"
-#include "dom/dom_node.h"
-#include "xml/dom_textimpl.h"
-#include "xml/dom2_eventsimpl.h"
-#include "xml/dom_elementimpl.h"
+#include "dom_elementimpl.h"
 
 #include "MacFrame.h"
-
-#include "html/htmlparser.h"
-
-#include "rendering/render_canvas.h"
-#include "css/css_valueimpl.h"
+#include "css_stylesheetimpl.h"
+#include "css_valueimpl.h"
+#include "cssstyleselector.h"
 #include "cssvalues.h"
-#include "css/css_stylesheetimpl.h"
-#include "css/cssstyleselector.h"
-#include "xml/dom_xmlimpl.h"
-
+#include "dom2_eventsimpl.h"
+#include "dom_exception.h"
+#include "dom_node.h"
+#include "dom_textimpl.h"
+#include "dom_xmlimpl.h"
+#include "htmlparser.h"
+#include "render_canvas.h"
 #include <qtextstream.h>
-#include <kdebug.h>
 
-using namespace DOM;
+namespace WebCore {
+
 using namespace HTMLNames;
-using namespace khtml;
+
+struct MappedAttributeKey {
+  uint16_t type;
+  DOMStringImpl* name;
+  DOMStringImpl* value;
+  MappedAttributeKey(MappedAttributeEntry t, DOMStringImpl* n, DOMStringImpl* v)
+      : type(t), name(n), value(v) {}
+};
+
+static inline bool operator==(const MappedAttributeKey& a,
+                              const MappedAttributeKey& b) {
+  return a.type == b.type && a.name == b.name && a.value == b.value;
+}
+
+struct MappedAttributeKeyTraits {
+  typedef MappedAttributeKey TraitType;
+  static const bool emptyValueIsZero = true;
+  static const bool needsDestruction = false;
+  static MappedAttributeKey emptyValue() {
+    return MappedAttributeKey(eNone, 0, 0);
+  }
+  static MappedAttributeKey deletedValue() {
+    return MappedAttributeKey(eLastEntry, 0, 0);
+  }
+};
+
+struct MappedAttributeHash {
+  static unsigned hash(const MappedAttributeKey&);
+  static bool equal(const MappedAttributeKey& a, const MappedAttributeKey& b) {
+    return a == b;
+  }
+};
+
+typedef HashMap<MappedAttributeKey,
+                CSSMappedAttributeDeclarationImpl*,
+                MappedAttributeHash,
+                MappedAttributeKeyTraits>
+    MappedAttributeDecls;
+
+static MappedAttributeDecls* mappedAttributeDecls = 0;
 
 AttributeImpl* AttributeImpl::clone(bool) const {
   return new AttributeImpl(m_name, m_value);
@@ -582,23 +617,24 @@ bool ElementImpl::childTypeAllowed(unsigned short type) {
   }
 }
 
-void ElementImpl::dispatchAttrRemovalEvent(AttributeImpl* attr) {
-  if (!getDocument()->hasListenerType(DocumentImpl::DOMATTRMODIFIED_LISTENER))
-    return;
-  // int exceptioncode = 0;
-  //     dispatchEvent(new
-  //     MutationEventImpl(DOMAttrModifiedEvent,true,false,attr,attr->value(),
-  // 		  attr->value(),
-  // getDocument()->attrName(attr->id()),MutationEvent::REMOVAL),exceptioncode);
+void ElementImpl::dispatchAttrRemovalEvent(AttributeImpl*) {
+#if 0
+    if (!getDocument()->hasListenerType(DocumentImpl::DOMATTRMODIFIED_LISTENER))
+        return;
+    int exceptioncode = 0;
+    dispatchEvent(new MutationEventImpl(DOMAttrModifiedEvent, true, false, attr, attr->value(),
+        attr->value(), getDocument()->attrName(attr->id()), MutationEvent::REMOVAL), exceptioncode);
+#endif
 }
 
 void ElementImpl::dispatchAttrAdditionEvent(AttributeImpl* attr) {
-  if (!getDocument()->hasListenerType(DocumentImpl::DOMATTRMODIFIED_LISTENER))
-    return;
-  // int exceptioncode = 0;
-  //     dispatchEvent(new
-  //     MutationEventImpl(DOMAttrModifiedEvent,true,false,attr,attr->value(),
-  //                                         attr->value(),getDocument()->attrName(attr->id()),MutationEvent::ADDITION),exceptioncode);
+#if 0
+    if (!getDocument()->hasListenerType(DocumentImpl::DOMATTRMODIFIED_LISTENER))
+        return;
+    int exceptioncode = 0;
+    dispatchEvent(new MutationEventImpl(DOMAttrModifiedEvent, true, false, attr, attr->value(),
+        attr->value(),getDocument()->attrName(attr->id()), MutationEvent::ADDITION), exceptioncode);
+#endif
 }
 
 DOMString ElementImpl::openTagStartToString() const {
@@ -1126,68 +1162,35 @@ CSSMappedAttributeDeclarationImpl::~CSSMappedAttributeDeclarationImpl() {
                                                  m_attrValue);
 }
 
-QPtrDict<QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>>*
-    StyledElementImpl::m_mappedAttributeDecls = 0;
-
 CSSMappedAttributeDeclarationImpl* StyledElementImpl::getMappedAttributeDecl(
     MappedAttributeEntry entryType,
     AttributeImpl* attr) {
-  if (!m_mappedAttributeDecls)
+  if (!mappedAttributeDecls)
     return 0;
-
-  QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>* attrNameDict =
-      m_mappedAttributeDecls->find((void*)entryType);
-  if (attrNameDict) {
-    QPtrDict<CSSMappedAttributeDeclarationImpl>* attrValueDict =
-        attrNameDict->find((void*)attr->name().localName().impl());
-    if (attrValueDict)
-      return attrValueDict->find(attr->value().impl());
-  }
-  return 0;
+  return mappedAttributeDecls->get(MappedAttributeKey(
+      entryType, attr->name().localName().impl(), attr->value().impl()));
 }
 
 void StyledElementImpl::setMappedAttributeDecl(
     MappedAttributeEntry entryType,
     AttributeImpl* attr,
     CSSMappedAttributeDeclarationImpl* decl) {
-  if (!m_mappedAttributeDecls)
-    m_mappedAttributeDecls =
-        new QPtrDict<QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>>;
-
-  QPtrDict<CSSMappedAttributeDeclarationImpl>* attrValueDict = 0;
-  QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>* attrNameDict =
-      m_mappedAttributeDecls->find((void*)entryType);
-  if (!attrNameDict) {
-    attrNameDict = new QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>;
-    attrNameDict->setAutoDelete(true);
-    m_mappedAttributeDecls->insert((void*)entryType, attrNameDict);
-  } else
-    attrValueDict = attrNameDict->find((void*)attr->name().localName().impl());
-  if (!attrValueDict) {
-    attrValueDict = new QPtrDict<CSSMappedAttributeDeclarationImpl>;
-    if (entryType == ePersistent)
-      attrValueDict->setAutoDelete(true);
-    attrNameDict->insert((void*)attr->name().localName().impl(), attrValueDict);
-  }
-  attrValueDict->replace(attr->value().impl(), decl);
+  if (!mappedAttributeDecls)
+    mappedAttributeDecls = new MappedAttributeDecls;
+  mappedAttributeDecls->set(
+      MappedAttributeKey(entryType, attr->name().localName().impl(),
+                         attr->value().impl()),
+      decl);
 }
 
 void StyledElementImpl::removeMappedAttributeDecl(
     MappedAttributeEntry entryType,
     const QualifiedName& attrName,
     const AtomicString& attrValue) {
-  if (!m_mappedAttributeDecls)
+  if (!mappedAttributeDecls)
     return;
-
-  QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>* attrNameDict =
-      m_mappedAttributeDecls->find((void*)entryType);
-  if (!attrNameDict)
-    return;
-  QPtrDict<CSSMappedAttributeDeclarationImpl>* attrValueDict =
-      attrNameDict->find((void*)attrName.localName().impl());
-  if (!attrValueDict)
-    return;
-  attrValueDict->remove(attrValue.impl());
+  mappedAttributeDecls->remove(MappedAttributeKey(
+      entryType, attrName.localName().impl(), attrValue.impl()));
 }
 
 void StyledElementImpl::invalidateStyleAttribute() {
@@ -1553,9 +1556,6 @@ void StyledElementImpl::addCSSColor(MappedAttributeImpl* attr,
     int basicLength = (color.length() + 2) / 3;
     if (basicLength > 1) {
       // IE ignores colors with three digits or less
-      // 	    qDebug("trying to fix up color '%s'. basicLength=%d,
-      // length=%d",
-      // 		   color.latin1(), basicLength, color.length() );
       int colors[3] = {0, 0, 0};
       int component = 0;
       int pos = 0;
@@ -1578,8 +1578,6 @@ void StyledElementImpl::addCSSColor(MappedAttributeImpl* attr,
         component++;
       }
       maxDigit = basicLength - maxDigit;
-      // 	    qDebug("color is %x %x %x, maxDigit=%d",  colors[0],
-      // colors[1], colors[2], maxDigit );
 
       // normalize to 00-ff. The highest filled digit counts, minimum is 2
       // digits
@@ -1587,14 +1585,9 @@ void StyledElementImpl::addCSSColor(MappedAttributeImpl* attr,
       colors[0] >>= 4 * maxDigit;
       colors[1] >>= 4 * maxDigit;
       colors[2] >>= 4 * maxDigit;
-      // 	    qDebug("normalized color is %x %x %x",  colors[0],
-      // colors[1], colors[2] );
-      // 	assert( colors[0] < 0x100 && colors[1] < 0x100 && colors[2] <
-      // 0x100 );
+      // assert( colors[0] < 0x100 && colors[1] < 0x100 && colors[2] < 0x100 );
 
       color.sprintf("#%02x%02x%02x", colors[0], colors[1], colors[2]);
-      // 	    qDebug( "trying to add fixed color string '%s'",
-      // color.latin1() );
       if (attr->decl()->setProperty(id, DOMString(color), false))
         return;
     }
@@ -1609,4 +1602,66 @@ void StyledElementImpl::createMappedDecl(MappedAttributeImpl* attr) {
   decl->setParent(getDocument()->elementSheet());
   decl->setNode(this);
   decl->setStrictParsing(false);  // Mapped attributes are just always quirky.
+}
+
+// Golden ratio - arbitrary start value to avoid mapping all 0's to all 0's
+// or anything like that.
+const unsigned PHI = 0x9e3779b9U;
+
+// Paul Hsieh's SuperFastHash
+// http://www.azillionmonkeys.com/qed/hash.html
+unsigned MappedAttributeHash::hash(const MappedAttributeKey& key) {
+  uint32_t hash = PHI;
+  uint32_t tmp;
+
+  const uint16_t* p;
+
+  p = reinterpret_cast<const uint16_t*>(&key.name);
+  hash += p[0];
+  tmp = (p[1] << 11) ^ hash;
+  hash = (hash << 16) ^ tmp;
+  hash += hash >> 11;
+  assert(sizeof(key.name) == 4 || sizeof(key.name) == 8);
+  if (sizeof(key.name) == 8) {
+    p += 2;
+    hash += p[0];
+    tmp = (p[1] << 11) ^ hash;
+    hash = (hash << 16) ^ tmp;
+    hash += hash >> 11;
+  }
+
+  p = reinterpret_cast<const uint16_t*>(&key.value);
+  hash += p[0];
+  tmp = (p[1] << 11) ^ hash;
+  hash = (hash << 16) ^ tmp;
+  hash += hash >> 11;
+  assert(sizeof(key.value) == 4 || sizeof(key.value) == 8);
+  if (sizeof(key.value) == 8) {
+    p += 2;
+    hash += p[0];
+    tmp = (p[1] << 11) ^ hash;
+    hash = (hash << 16) ^ tmp;
+    hash += hash >> 11;
+  }
+
+  // Handle end case
+  hash += key.type;
+  hash ^= hash << 11;
+  hash += hash >> 17;
+
+  // Force "avalanching" of final 127 bits
+  hash ^= hash << 3;
+  hash += hash >> 5;
+  hash ^= hash << 2;
+  hash += hash >> 15;
+  hash ^= hash << 10;
+
+  // This avoids ever returning a hash code of 0, since that is used to
+  // signal "hash not computed yet", using a value that is likely to be
+  // effectively the same as 0 when the low bits are masked
+  if (hash == 0)
+    hash = 0x80000000;
+
+  return hash;
+}
 }

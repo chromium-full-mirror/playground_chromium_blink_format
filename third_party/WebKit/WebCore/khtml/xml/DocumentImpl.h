@@ -36,9 +36,7 @@
 #include <kxmlcore/HashMap.h>
 #include <qcolor.h>
 #include <qdatetime.h>
-#include <qmap.h>
 #include <qobject.h>
-#include <qptrdict.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
 
@@ -198,7 +196,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   virtual bool isDocumentNode() const { return true; }
   virtual bool isHTMLDocument() const { return false; }
 
-  khtml::CSSStyleSelector* styleSelector() { return m_styleSelector; }
+  CSSStyleSelector* styleSelector() { return m_styleSelector; }
 
   ElementImpl* DocumentImpl::getElementByAccessKey(const DOMString& key);
 
@@ -284,7 +282,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void updateLayout();
   void updateLayoutIgnorePendingStylesheets();
   static void updateDocumentsRendering();
-  khtml::DocLoader* docLoader() { return m_docLoader; }
+  DocLoader* docLoader() { return m_docLoader; }
 
   virtual void attach();
   virtual void detach();
@@ -328,8 +326,8 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   QString printStyleSheet() const { return m_printSheet; }
 
   CSSStyleSheetImpl* elementSheet();
-  virtual khtml::Tokenizer* createTokenizer();
-  khtml::Tokenizer* tokenizer() { return m_tokenizer; }
+  virtual Tokenizer* createTokenizer();
+  Tokenizer* tokenizer() { return m_tokenizer; }
 
   QPaintDeviceMetrics* paintDeviceMetrics() { return m_paintDeviceMetrics; }
   QPaintDevice* paintDevice() const { return m_paintDevice; }
@@ -435,9 +433,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   CSSStyleDeclarationImpl* getOverrideStyle(ElementImpl* elt,
                                             const DOMString& pseudoElt);
-
-  typedef QMap<QString, ProcessingInstructionImpl*> LocalStyleRefs;
-  LocalStyleRefs* localStyleRefs() { return &m_localStyleRefs; }
 
   virtual void defaultEventHandler(EventImpl* evt);
   void setHTMLWindowEventListener(const AtomicString& eventType,
@@ -629,12 +624,12 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void finishedParsing();
 
  protected:
-  khtml::CSSStyleSelector* m_styleSelector;
+  CSSStyleSelector* m_styleSelector;
   KHTMLView* m_view;
   QStringList m_state;
 
-  khtml::DocLoader* m_docLoader;
-  khtml::Tokenizer* m_tokenizer;
+  DocLoader* m_docLoader;
+  Tokenizer* m_tokenizer;
   QString m_url;
   QString m_baseURL;
   QString m_baseTarget;
@@ -691,7 +686,6 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   unsigned short m_listenerTypes;
   StyleSheetListImpl* m_styleSheets;
-  LocalStyleRefs m_localStyleRefs;  // references to inlined style elements
   QPtrList<RegisteredEventListener> m_windowEventListeners;
   QPtrList<NodeImpl> m_maintainsState;
 
@@ -719,7 +713,11 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   RenderArena* m_renderArena;
 
-  QPtrDict<QValueList<DocumentMarker>> m_markers;
+  typedef HashMap<NodeImpl*,
+                  QValueList<DocumentMarker>*,
+                  PointerHash<NodeImpl*>>
+      MarkerMap;
+  MarkerMap m_markers;
 
   KWQAccObjectCache* m_accCache;
 
@@ -744,11 +742,16 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                                              // communicate with XBL.
 #endif
 
-  QMap<QString, HTMLMapElementImpl*> m_imageMapsByName;
+  typedef HashMap<DOMStringImpl*,
+                  HTMLMapElementImpl*,
+                  PointerHash<DOMStringImpl*>>
+      ImageMapsByName;
+  ImageMapsByName m_imageMapsByName;
 
   DOMString m_policyBaseURL;
 
-  QPtrDict<NodeImpl> m_disconnectedNodesWithEventListeners;
+  typedef HashSet<NodeImpl*, PointerHash<NodeImpl*>> NodeSet;
+  NodeSet m_disconnectedNodesWithEventListeners;
 
   int m_docID;  // A unique document identifier used for things like
                 // document-specific mapped attributes.
@@ -758,7 +761,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   bool inPageCache();
   void setInPageCache(bool flag);
-  void restoreRenderer(khtml::RenderObject* render);
+  void restoreRenderer(RenderObject* render);
 
   void passwordFieldAdded();
   void passwordFieldRemoved();
@@ -771,21 +774,20 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
   void setShouldCreateRenderers(bool f);
   bool shouldCreateRenderers();
 
-  void setDecoder(khtml::Decoder*);
-  khtml::Decoder* decoder() const { return m_decoder.get(); }
+  void setDecoder(Decoder*);
+  Decoder* decoder() const { return m_decoder.get(); }
 
   void setDashboardRegionsDirty(bool f) { m_dashboardRegionsDirty = f; }
   bool dashboardRegionsDirty() const { return m_dashboardRegionsDirty; }
   bool hasDashboardRegions() const { return m_hasDashboardRegions; }
   void setHasDashboardRegions(bool f) { m_hasDashboardRegions = f; }
-  const QValueList<khtml::DashboardRegionValue>& dashboardRegions() const;
-  void setDashboardRegions(
-      const QValueList<khtml::DashboardRegionValue>& regions);
+  const QValueList<DashboardRegionValue>& dashboardRegions() const;
+  void setDashboardRegions(const QValueList<DashboardRegionValue>& regions);
 
   void removeAllEventListenersFromAllNodes();
 
-  void registerDisconnectedNodeWithEventListeners(NodeImpl* node);
-  void unregisterDisconnectedNodeWithEventListeners(NodeImpl* node);
+  void registerDisconnectedNodeWithEventListeners(NodeImpl*);
+  void unregisterDisconnectedNodeWithEventListeners(NodeImpl*);
 
   void radioButtonChecked(HTMLInputElementImpl* caller,
                           HTMLFormElementImpl* form);
@@ -805,11 +807,11 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   mutable DOMString m_domain;
   bool m_inPageCache;
-  khtml::RenderObject* m_savedRenderer;
+  RenderObject* m_savedRenderer;
   int m_passwordFields;
   int m_secureForms;
 
-  RefPtr<khtml::Decoder> m_decoder;
+  RefPtr<Decoder> m_decoder;
 
   mutable HashMap<DOMStringImpl*, ElementImpl*, PointerHash<DOMStringImpl*>>
       m_elementsById;
@@ -824,7 +826,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
 
   InheritedBool m_designMode;
 
-  QValueList<khtml::DashboardRegionValue> m_dashboardRegions;
+  QValueList<DashboardRegionValue> m_dashboardRegions;
   bool m_hasDashboardRegions;
   bool m_dashboardRegionsDirty;
   int m_selfOnlyRefCount;
@@ -836,7 +838,7 @@ class DocumentImpl : public QObject, public ContainerNodeImpl {
                   NameToInputMap*,
                   PointerHash<HTMLFormElementImpl*>>
       FormToGroupMap;
-  FormToGroupMap* m_selectedRadioButtons;
+  FormToGroupMap m_selectedRadioButtons;
 };
 
 }  // namespace

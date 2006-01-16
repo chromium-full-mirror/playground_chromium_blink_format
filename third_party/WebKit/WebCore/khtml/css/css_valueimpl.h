@@ -20,13 +20,15 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef _CSS_css_valueimpl_h_
-#define _CSS_css_valueimpl_h_
+#ifndef CSS_css_valueimpl_h_
+#define CSS_css_valueimpl_h_
 
 #include "dom/css_value.h"
 #include "css/css_base.h"
 #include "CachedObjectClient.h"
 #include <qvaluelist.h>
+
+class QPaintDeviceMetrics;
 
 namespace khtml {
 class RenderStyle;
@@ -143,18 +145,18 @@ class CSSValueListImpl : public CSSValueImpl {
 
 class CSSPrimitiveValueImpl : public CSSValueImpl {
  public:
+  // FIXME: int vs. unsigned overloading is too tricky for color vs. ident
   CSSPrimitiveValueImpl();
   CSSPrimitiveValueImpl(int ident);
-  CSSPrimitiveValueImpl(double num, CSSPrimitiveValue::UnitTypes type);
-  CSSPrimitiveValueImpl(const DOMString& str,
-                        CSSPrimitiveValue::UnitTypes type);
-  CSSPrimitiveValueImpl(CounterImpl* c);
-  CSSPrimitiveValueImpl(RectImpl* r);
-  CSSPrimitiveValueImpl(DashboardRegionImpl* r);  // FIXME: Why is dashboard
-                                                  // region a primitive value?
-                                                  // This makes no sense.
-  CSSPrimitiveValueImpl(QRgb color);
-  CSSPrimitiveValueImpl(PairImpl* p);
+  CSSPrimitiveValueImpl(double, CSSPrimitiveValue::UnitTypes);
+  CSSPrimitiveValueImpl(const DOMString&, CSSPrimitiveValue::UnitTypes);
+  CSSPrimitiveValueImpl(CounterImpl*);
+  CSSPrimitiveValueImpl(RectImpl*);
+  CSSPrimitiveValueImpl(DashboardRegionImpl*);  // FIXME: Why is dashboard
+                                                // region a primitive value?
+                                                // This makes no sense.
+  CSSPrimitiveValueImpl(unsigned color);        // RGB value
+  CSSPrimitiveValueImpl(PairImpl*);
 
   virtual ~CSSPrimitiveValueImpl();
 
@@ -204,7 +206,7 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
     return (m_type != CSSPrimitiveValue::CSS_RECT ? 0 : m_value.rect);
   }
 
-  QRgb getRGBColorValue() const {
+  unsigned getRGBColorValue() const {
     return (m_type != CSSPrimitiveValue::CSS_RGBCOLOR ? 0 : m_value.rgbcolor);
   }
 
@@ -235,7 +237,7 @@ class CSSPrimitiveValueImpl : public CSSValueImpl {
     DOMStringImpl* string;
     CounterImpl* counter;
     RectImpl* rect;
-    QRgb rgbcolor;
+    unsigned rgbcolor;
     PairImpl* pair;
     DashboardRegionImpl* region;
   } m_value;

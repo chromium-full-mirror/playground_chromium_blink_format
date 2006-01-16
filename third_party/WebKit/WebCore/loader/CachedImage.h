@@ -29,40 +29,37 @@
 #define KHTML_CachedImage_h
 
 #include "CachedObject.h"
-
 #include <qobject.h>
-#include <qpixmap.h>
-#include <qbuffer.h>
+#include <khtml_settings.h>
 
-#include <kio/global.h>
+class QPixmap;
 
-namespace khtml {
+namespace WebCore {
 class DocLoader;
 class CachedImageCallback;
 class Cache;
-class CachedObjectClient;
 
 class CachedImage : public QObject, public CachedObject {
  public:
-  CachedImage(DocLoader* dl,
-              const DOM::DOMString& url,
+  CachedImage(DocLoader*,
+              const DOMString& url,
               KIO::CacheControl cachePolicy,
-              time_t _expireDate);
+              time_t expireDate);
   virtual ~CachedImage();
 
   const QPixmap& pixmap() const;
-  const QPixmap& tiled_pixmap(const QColor& bg);
+  const QPixmap& tiled_pixmap(const QColor& background);
 
   IntSize pixmap_size()
       const;  // returns the size of the complete (i.e. when finished) loading
   IntRect valid_rect()
       const;  // returns the rectangle of pixmap that has been loaded already
 
-  void ref(CachedObjectClient* consumer);
-  virtual void deref(CachedObjectClient* consumer);
+  virtual void ref(CachedObjectClient*);
+  virtual void deref(CachedObjectClient*);
 
-  virtual void data(QBuffer& buffer, bool eof);
-  virtual void error(int err, const char* text);
+  virtual void data(QBuffer&, bool atEnd);
+  virtual void error(int code, const char* message);
 
   bool isTransparent() const { return isFullyTransparent; }
   bool isErrorImage() const { return errorOccured; }
@@ -78,11 +75,11 @@ class CachedImage : public QObject, public CachedObject {
   void clear();
 
  private:
-  void do_notify(const QPixmap& p, const IntRect& r);
+  void do_notify(const QPixmap&, const IntRect&);
 
   QPixmap* p;
   QPixmap* bg;
-  QRgb bgColor;
+  unsigned bgColor;
   mutable QPixmap* pixPart;
 
   int width;
@@ -107,6 +104,6 @@ class CachedImage : public QObject, public CachedObject {
   int m_dataSize;
   CachedImageCallback* m_decoderCallback;
 };
-};
+}
 
 #endif

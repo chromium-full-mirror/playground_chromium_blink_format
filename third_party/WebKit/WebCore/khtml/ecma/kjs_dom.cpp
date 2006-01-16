@@ -63,16 +63,16 @@ namespace KJS {
 // -------------------------------------------------------------------------
 /* Source for DOMNodeProtoTable. Use "make hashtables" to regenerate.
 @begin DOMNodeProtoTable 18
-  insertBefore	DOMNode::InsertBefore	DontDelete|Function 2
-  replaceChild	DOMNode::ReplaceChild	DontDelete|Function 2
-  removeChild	DOMNode::RemoveChild	DontDelete|Function 1
-  appendChild	DOMNode::AppendChild	DontDelete|Function 1
-  hasAttributes	DOMNode::HasAttributes	DontDelete|Function 0
-  hasChildNodes	DOMNode::HasChildNodes	DontDelete|Function 0
-  cloneNode	DOMNode::CloneNode	DontDelete|Function 1
+  insertBefore  DOMNode::InsertBefore   DontDelete|Function 2
+  replaceChild  DOMNode::ReplaceChild   DontDelete|Function 2
+  removeChild   DOMNode::RemoveChild    DontDelete|Function 1
+  appendChild   DOMNode::AppendChild    DontDelete|Function 1
+  hasAttributes DOMNode::HasAttributes  DontDelete|Function 0
+  hasChildNodes DOMNode::HasChildNodes  DontDelete|Function 0
+  cloneNode     DOMNode::CloneNode      DontDelete|Function 1
 # DOM2
-  normalize	DOMNode::Normalize	DontDelete|Function 0
-  isSupported   DOMNode::IsSupported	DontDelete|Function 2
+  normalize     DOMNode::Normalize      DontDelete|Function 0
+  isSupported   DOMNode::IsSupported    DontDelete|Function 2
 # DOM3
   isSameNode    DOMNode::IsSameNode     DontDelete|Function 1
   isEqualNode   DOMNode::IsEqualNode    DontDelete|Function 1
@@ -80,10 +80,10 @@ namespace KJS {
   lookupNamespaceURI    DOMNode::LookupNamespaceURI DontDelete|Function 1
   lookupPrefix  DOMNode::LookupPrefix   DontDelete|Function 1
 # from the EventTarget interface
-  addEventListener	DOMNode::AddEventListener	DontDelete|Function 3
-  removeEventListener	DOMNode::RemoveEventListener	DontDelete|Function 3
-  dispatchEvent		DOMNode::DispatchEvent	DontDelete|Function 1
-  contains	DOMNode::Contains		DontDelete|Function 1
+  addEventListener  DOMNode::AddEventListener   DontDelete|Function 3
+  removeEventListener   DOMNode::RemoveEventListener    DontDelete|Function 3
+  dispatchEvent DOMNode::DispatchEvent  DontDelete|Function 1
+  contains      DOMNode::Contains       DontDelete|Function 1
 # "DOM level 0" (from Gecko DOM reference; also in WinIE)
   item          DOMNode::Item           DontDelete|Function 1
 @end
@@ -126,11 +126,11 @@ void DOMNode::mark() {
     root = current;
   }
 
-  static QPtrDict<NodeImpl> markingRoots;
+  static HashSet<NodeImpl*, PointerHash<NodeImpl*>> markingRoots;
 
   // If we're already marking this tree, then we can simply mark this wrapper
   // by calling the base class; our caller is iterating the tree.
-  if (markingRoots.find(root)) {
+  if (markingRoots.contains(root)) {
     DOMObject::mark();
     return;
   }
@@ -138,7 +138,7 @@ void DOMNode::mark() {
   DocumentImpl* document = m_impl->getDocument();
 
   // Mark the whole tree; use the global set of roots to avoid reentering.
-  markingRoots.insert(root, root);
+  markingRoots.insert(root);
   for (NodeImpl* nodeToMark = root; nodeToMark;
        nodeToMark = nodeToMark->traverseNextNode()) {
     DOMNode* wrapper =
@@ -169,77 +169,77 @@ bool DOMNode::toBoolean(ExecState*) const {
 
 /* Source for DOMNodeTable. Use "make hashtables" to regenerate.
 @begin DOMNodeTable 69
-  nodeName	DOMNode::NodeName	DontDelete|ReadOnly
-  nodeValue	DOMNode::NodeValue	DontDelete
-  nodeType	DOMNode::NodeType	DontDelete|ReadOnly
-  parentNode	DOMNode::ParentNode	DontDelete|ReadOnly
-  parentElement	DOMNode::ParentElement	DontDelete|ReadOnly
-  childNodes	DOMNode::ChildNodes	DontDelete|ReadOnly
-  firstChild	DOMNode::FirstChild	DontDelete|ReadOnly
-  lastChild	DOMNode::LastChild	DontDelete|ReadOnly
+  nodeName      DOMNode::NodeName       DontDelete|ReadOnly
+  nodeValue     DOMNode::NodeValue      DontDelete
+  nodeType      DOMNode::NodeType       DontDelete|ReadOnly
+  parentNode    DOMNode::ParentNode     DontDelete|ReadOnly
+  parentElement DOMNode::ParentElement  DontDelete|ReadOnly
+  childNodes    DOMNode::ChildNodes     DontDelete|ReadOnly
+  firstChild    DOMNode::FirstChild     DontDelete|ReadOnly
+  lastChild     DOMNode::LastChild      DontDelete|ReadOnly
   previousSibling  DOMNode::PreviousSibling DontDelete|ReadOnly
-  nextSibling	DOMNode::NextSibling	DontDelete|ReadOnly
-  attributes	DOMNode::Attributes	DontDelete|ReadOnly
-  namespaceURI	DOMNode::NamespaceURI	DontDelete|ReadOnly
+  nextSibling   DOMNode::NextSibling    DontDelete|ReadOnly
+  attributes    DOMNode::Attributes     DontDelete|ReadOnly
+  namespaceURI  DOMNode::NamespaceURI   DontDelete|ReadOnly
 # DOM2
-  prefix	DOMNode::Prefix		DontDelete
-  localName	DOMNode::LocalName	DontDelete|ReadOnly
-  ownerDocument	DOMNode::OwnerDocument	DontDelete|ReadOnly
+  prefix        DOMNode::Prefix         DontDelete
+  localName     DOMNode::LocalName      DontDelete|ReadOnly
+  ownerDocument DOMNode::OwnerDocument  DontDelete|ReadOnly
 # DOM3
   textContent   DOMNode::TextContent    DontDelete
 #
-  onabort	DOMNode::OnAbort		DontDelete
-  onblur	DOMNode::OnBlur			DontDelete
-  onchange	DOMNode::OnChange		DontDelete
-  onclick	DOMNode::OnClick		DontDelete
-  oncontextmenu	DOMNode::OnContextMenu		DontDelete
-  ondblclick	DOMNode::OnDblClick		DontDelete
-  onbeforecut	DOMNode::OnBeforeCut		DontDelete
+  onabort       DOMNode::OnAbort                DontDelete
+  onblur        DOMNode::OnBlur                 DontDelete
+  onchange      DOMNode::OnChange               DontDelete
+  onclick       DOMNode::OnClick                DontDelete
+  oncontextmenu DOMNode::OnContextMenu          DontDelete
+  ondblclick    DOMNode::OnDblClick             DontDelete
+  onbeforecut   DOMNode::OnBeforeCut            DontDelete
   oncut         DOMNode::OnCut                  DontDelete
-  onbeforecopy	DOMNode::OnBeforeCopy		DontDelete
-  oncopy	DOMNode::OnCopy                 DontDelete
-  onbeforepaste	DOMNode::OnBeforePaste		DontDelete
-  onpaste	DOMNode::OnPaste		DontDelete
-  ondrag	DOMNode::OnDrag			DontDelete
-  ondragdrop	DOMNode::OnDragDrop		DontDelete
-  ondragend	DOMNode::OnDragEnd		DontDelete
-  ondragenter	DOMNode::OnDragEnter		DontDelete
-  ondragleave	DOMNode::OnDragLeave		DontDelete
-  ondragover	DOMNode::OnDragOver		DontDelete
-  ondragstart	DOMNode::OnDragStart		DontDelete
-  ondrop	DOMNode::OnDrop                 DontDelete
-  onerror	DOMNode::OnError		DontDelete
-  onfocus	DOMNode::OnFocus       		DontDelete
+  onbeforecopy  DOMNode::OnBeforeCopy           DontDelete
+  oncopy        DOMNode::OnCopy                 DontDelete
+  onbeforepaste DOMNode::OnBeforePaste          DontDelete
+  onpaste       DOMNode::OnPaste                DontDelete
+  ondrag        DOMNode::OnDrag                 DontDelete
+  ondragdrop    DOMNode::OnDragDrop             DontDelete
+  ondragend     DOMNode::OnDragEnd              DontDelete
+  ondragenter   DOMNode::OnDragEnter            DontDelete
+  ondragleave   DOMNode::OnDragLeave            DontDelete
+  ondragover    DOMNode::OnDragOver             DontDelete
+  ondragstart   DOMNode::OnDragStart            DontDelete
+  ondrop        DOMNode::OnDrop                 DontDelete
+  onerror       DOMNode::OnError                DontDelete
+  onfocus       DOMNode::OnFocus                DontDelete
   oninput       DOMNode::OnInput                DontDelete
-  onkeydown	DOMNode::OnKeyDown		DontDelete
-  onkeypress	DOMNode::OnKeyPress		DontDelete
-  onkeyup	DOMNode::OnKeyUp		DontDelete
-  onload	DOMNode::OnLoad			DontDelete
-  onmousedown	DOMNode::OnMouseDown		DontDelete
-  onmousemove	DOMNode::OnMouseMove		DontDelete
-  onmouseout	DOMNode::OnMouseOut		DontDelete
-  onmouseover	DOMNode::OnMouseOver		DontDelete
-  onmouseup	DOMNode::OnMouseUp		DontDelete
-  onmousewheel	DOMNode::OnMouseWheel		DontDelete
-  onmove	DOMNode::OnMove			DontDelete
-  onreset	DOMNode::OnReset		DontDelete
-  onresize	DOMNode::OnResize		DontDelete
+  onkeydown     DOMNode::OnKeyDown              DontDelete
+  onkeypress    DOMNode::OnKeyPress             DontDelete
+  onkeyup       DOMNode::OnKeyUp                DontDelete
+  onload        DOMNode::OnLoad                 DontDelete
+  onmousedown   DOMNode::OnMouseDown            DontDelete
+  onmousemove   DOMNode::OnMouseMove            DontDelete
+  onmouseout    DOMNode::OnMouseOut             DontDelete
+  onmouseover   DOMNode::OnMouseOver            DontDelete
+  onmouseup     DOMNode::OnMouseUp              DontDelete
+  onmousewheel  DOMNode::OnMouseWheel           DontDelete
+  onmove        DOMNode::OnMove                 DontDelete
+  onreset       DOMNode::OnReset                DontDelete
+  onresize      DOMNode::OnResize               DontDelete
   onscroll      DOMNode::OnScroll               DontDelete
   onsearch      DOMNode::OnSearch               DontDelete
-  onselect	DOMNode::OnSelect		DontDelete
-  onselectstart	DOMNode::OnSelectStart		DontDelete
-  onsubmit	DOMNode::OnSubmit		DontDelete
-  onunload	DOMNode::OnUnload		DontDelete
+  onselect      DOMNode::OnSelect               DontDelete
+  onselectstart DOMNode::OnSelectStart          DontDelete
+  onsubmit      DOMNode::OnSubmit               DontDelete
+  onunload      DOMNode::OnUnload               DontDelete
 # IE extensions
-  offsetLeft	DOMNode::OffsetLeft		DontDelete|ReadOnly
-  offsetTop	DOMNode::OffsetTop		DontDelete|ReadOnly
-  offsetWidth	DOMNode::OffsetWidth		DontDelete|ReadOnly
-  offsetHeight	DOMNode::OffsetHeight		DontDelete|ReadOnly
-  offsetParent	DOMNode::OffsetParent		DontDelete|ReadOnly
-  clientWidth	DOMNode::ClientWidth		DontDelete|ReadOnly
-  clientHeight	DOMNode::ClientHeight		DontDelete|ReadOnly
-  scrollLeft	DOMNode::ScrollLeft		DontDelete
-  scrollTop	DOMNode::ScrollTop		DontDelete
+  offsetLeft    DOMNode::OffsetLeft             DontDelete|ReadOnly
+  offsetTop     DOMNode::OffsetTop              DontDelete|ReadOnly
+  offsetWidth   DOMNode::OffsetWidth            DontDelete|ReadOnly
+  offsetHeight  DOMNode::OffsetHeight           DontDelete|ReadOnly
+  offsetParent  DOMNode::OffsetParent           DontDelete|ReadOnly
+  clientWidth   DOMNode::ClientWidth            DontDelete|ReadOnly
+  clientHeight  DOMNode::ClientHeight           DontDelete|ReadOnly
+  scrollLeft    DOMNode::ScrollLeft             DontDelete
+  scrollTop     DOMNode::ScrollTop              DontDelete
   scrollWidth   DOMNode::ScrollWidth            DontDelete|ReadOnly
   scrollHeight  DOMNode::ScrollHeight           DontDelete|ReadOnly
 @end
@@ -714,8 +714,8 @@ NodeImpl* toNode(JSValue* val) {
 
 /*
 @begin DOMNodeListTable 2
-  length	DOMNodeList::Length	DontDelete|ReadOnly
-  item		DOMNodeList::Item		DontDelete|Function 1
+  length        DOMNodeList::Length     DontDelete|ReadOnly
+  item          DOMNodeList::Item               DontDelete|Function 1
 @end
 */
 
@@ -819,10 +819,10 @@ const ClassInfo DOMAttr::info = {"Attr", &DOMNode::info, &DOMAttrTable, 0};
 
 /* Source for DOMAttrTable. Use "make hashtables" to regenerate.
 @begin DOMAttrTable 5
-  name		DOMAttr::Name		DontDelete|ReadOnly
-  specified	DOMAttr::Specified	DontDelete|ReadOnly
-  value		DOMAttr::ValueProperty	DontDelete
-  ownerElement	DOMAttr::OwnerElement	DontDelete|ReadOnly
+  name          DOMAttr::Name           DontDelete|ReadOnly
+  specified     DOMAttr::Specified      DontDelete|ReadOnly
+  value         DOMAttr::ValueProperty  DontDelete
+  ownerElement  DOMAttr::OwnerElement   DontDelete|ReadOnly
 @end
 */
 
@@ -1172,25 +1172,24 @@ JSValue* DOMDocumentProtoFunc::callAsFunction(ExecState* exec,
 
 /* Source for DOMElementProtoTable. Use "make hashtables" to regenerate.
 @begin DOMElementProtoTable 17
-  getAttribute		DOMElement::GetAttribute	DontDelete|Function 1
-  setAttribute		DOMElement::SetAttribute	DontDelete|Function 2
-  removeAttribute	DOMElement::RemoveAttribute	DontDelete|Function 1
-  getAttributeNode	DOMElement::GetAttributeNode	DontDelete|Function 1
-  setAttributeNode	DOMElement::SetAttributeNode	DontDelete|Function 2
-  removeAttributeNode	DOMElement::RemoveAttributeNode	DontDelete|Function 1
-  getElementsByTagName	DOMElement::GetElementsByTagName
-DontDelete|Function 1
-  hasAttribute		DOMElement::HasAttribute	DontDelete|Function 1
-  getAttributeNS	DOMElement::GetAttributeNS	DontDelete|Function 2
-  setAttributeNS	DOMElement::SetAttributeNS	DontDelete|Function 3
-  removeAttributeNS	DOMElement::RemoveAttributeNS	DontDelete|Function 2
-  getAttributeNodeNS	DOMElement::GetAttributeNodeNS	DontDelete|Function 2
-  setAttributeNodeNS	DOMElement::SetAttributeNodeNS	DontDelete|Function 1
+  getAttribute          DOMElement::GetAttribute        DontDelete|Function 1
+  setAttribute          DOMElement::SetAttribute        DontDelete|Function 2
+  removeAttribute       DOMElement::RemoveAttribute     DontDelete|Function 1
+  getAttributeNode      DOMElement::GetAttributeNode    DontDelete|Function 1
+  setAttributeNode      DOMElement::SetAttributeNode    DontDelete|Function 2
+  removeAttributeNode   DOMElement::RemoveAttributeNode DontDelete|Function 1
+  getElementsByTagName  DOMElement::GetElementsByTagName DontDelete|Function 1
+  hasAttribute          DOMElement::HasAttribute        DontDelete|Function 1
+  getAttributeNS        DOMElement::GetAttributeNS      DontDelete|Function 2
+  setAttributeNS        DOMElement::SetAttributeNS      DontDelete|Function 3
+  removeAttributeNS     DOMElement::RemoveAttributeNS   DontDelete|Function 2
+  getAttributeNodeNS    DOMElement::GetAttributeNodeNS  DontDelete|Function 2
+  setAttributeNodeNS    DOMElement::SetAttributeNodeNS  DontDelete|Function 1
   getElementsByTagNameNS DOMElement::GetElementsByTagNameNS
 DontDelete|Function 2
-  hasAttributeNS	DOMElement::HasAttributeNS	DontDelete|Function 2
+  hasAttributeNS        DOMElement::HasAttributeNS      DontDelete|Function 2
   scrollIntoView        DOMElement::ScrollIntoView      DontDelete|Function 1
-  scrollIntoViewIfNeeded	DOMElement::ScrollIntoViewIfNeeded
+  scrollIntoViewIfNeeded        DOMElement::ScrollIntoViewIfNeeded
 DontDelete|Function 1
   focus                 DOMElement::ElementFocus        DontDelete|Function 0
   blur                  DOMElement::ElementBlur         DontDelete|Function 0
@@ -1212,8 +1211,8 @@ const ClassInfo DOMElement::info = {"Element", &DOMNode::info, &DOMElementTable,
                                     0};
 /* Source for DOMElementTable. Use "make hashtables" to regenerate.
 @begin DOMElementTable 3
-  tagName	DOMElement::TagName                         DontDelete|ReadOnly
-  style		DOMElement::Style                           DontDelete|ReadOnly
+  tagName       DOMElement::TagName                         DontDelete|ReadOnly
+  style         DOMElement::Style                           DontDelete|ReadOnly
 @end
 */
 DOMElement::DOMElement(ExecState* exec, ElementImpl* e) : DOMNode(e) {
@@ -1400,14 +1399,13 @@ ElementImpl* toElement(JSValue* val) {
 /* Source for DOMDOMImplementationProtoTable. Use "make hashtables" to
 regenerate.
 @begin DOMDOMImplementationProtoTable 5
-  hasFeature		DOMDOMImplementation::HasFeature
-DontDelete|Function 2
+  hasFeature            DOMDOMImplementation::HasFeature DontDelete|Function 2
 # DOM2
-  createCSSStyleSheet	DOMDOMImplementation::CreateCSSStyleSheet
+  createCSSStyleSheet   DOMDOMImplementation::CreateCSSStyleSheet
 DontDelete|Function 2
-  createDocumentType	DOMDOMImplementation::CreateDocumentType
+  createDocumentType    DOMDOMImplementation::CreateDocumentType
 DontDelete|Function 3
-  createDocument	DOMDOMImplementation::CreateDocument
+  createDocument        DOMDOMImplementation::CreateDocument
 DontDelete|Function 3
   createHTMLDocument    DOMDOMImplementation::CreateHTMLDocument
 DontDelete|Function 1
@@ -1478,13 +1476,13 @@ const ClassInfo DOMDocumentType::info = {"DocumentType", &DOMNode::info,
 
 /* Source for DOMDocumentTypeTable. Use "make hashtables" to regenerate.
 @begin DOMDocumentTypeTable 6
-  name			DOMDocumentType::Name		DontDelete|ReadOnly
-  entities		DOMDocumentType::Entities	DontDelete|ReadOnly
-  notations		DOMDocumentType::Notations	DontDelete|ReadOnly
+  name                  DOMDocumentType::Name           DontDelete|ReadOnly
+  entities              DOMDocumentType::Entities       DontDelete|ReadOnly
+  notations             DOMDocumentType::Notations      DontDelete|ReadOnly
 # DOM2
-  publicId		DOMDocumentType::PublicId	DontDelete|ReadOnly
-  systemId		DOMDocumentType::SystemId	DontDelete|ReadOnly
-  internalSubset	DOMDocumentType::InternalSubset	DontDelete|ReadOnly
+  publicId              DOMDocumentType::PublicId       DontDelete|ReadOnly
+  systemId              DOMDocumentType::SystemId       DontDelete|ReadOnly
+  internalSubset        DOMDocumentType::InternalSubset DontDelete|ReadOnly
 @end
 */
 DOMDocumentType::DOMDocumentType(ExecState* exec, DocumentTypeImpl* dt)
@@ -1529,21 +1527,14 @@ DocumentTypeImpl* toDocumentType(JSValue* val) {
 
 /* Source for DOMNamedNodeMapProtoTable. Use "make hashtables" to regenerate.
 @begin DOMNamedNodeMapProtoTable 7
-  getNamedItem		DOMNamedNodeMap::GetNamedItem
-DontDelete|Function 1
-  setNamedItem		DOMNamedNodeMap::SetNamedItem
-DontDelete|Function 1
-  removeNamedItem	DOMNamedNodeMap::RemoveNamedItem	DontDelete|Function
-1
-  item			DOMNamedNodeMap::Item
-DontDelete|Function 1
+  getNamedItem          DOMNamedNodeMap::GetNamedItem DontDelete|Function 1
+  setNamedItem          DOMNamedNodeMap::SetNamedItem DontDelete|Function 1
+  removeNamedItem       DOMNamedNodeMap::RemoveNamedItem DontDelete|Function 1
+  item                  DOMNamedNodeMap::Item DontDelete|Function 1
 # DOM2
-  getNamedItemNS	DOMNamedNodeMap::GetNamedItemNS
-DontDelete|Function 2
-  setNamedItemNS	DOMNamedNodeMap::SetNamedItemNS
-DontDelete|Function 1
-  removeNamedItemNS	DOMNamedNodeMap::RemoveNamedItemNS
-DontDelete|Function 2
+  getNamedItemNS        DOMNamedNodeMap::GetNamedItemNS DontDelete|Function 2
+  setNamedItemNS        DOMNamedNodeMap::SetNamedItemNS DontDelete|Function 1
+  removeNamedItemNS     DOMNamedNodeMap::RemoveNamedItemNS DontDelete|Function 2
 @end
 */
 KJS_DEFINE_PROTOTYPE(DOMNamedNodeMapProto)
@@ -1668,9 +1659,9 @@ const ClassInfo DOMProcessingInstruction::info = {
 /* Source for DOMProcessingInstructionTable. Use "make hashtables" to
 regenerate.
 @begin DOMProcessingInstructionTable 3
-  target	DOMProcessingInstruction::Target	DontDelete|ReadOnly
-  data		DOMProcessingInstruction::Data		DontDelete
-  sheet		DOMProcessingInstruction::Sheet		DontDelete|ReadOnly
+  target        DOMProcessingInstruction::Target        DontDelete|ReadOnly
+  data          DOMProcessingInstruction::Data          DontDelete
+  sheet         DOMProcessingInstruction::Sheet         DontDelete|ReadOnly
 @end
 */
 
@@ -1726,8 +1717,8 @@ const ClassInfo DOMNotation::info = {"Notation", &DOMNode::info,
 
 /* Source for DOMNotationTable. Use "make hashtables" to regenerate.
 @begin DOMNotationTable 2
-  publicId		DOMNotation::PublicId	DontDelete|ReadOnly
-  systemId		DOMNotation::SystemId	DontDelete|ReadOnly
+  publicId              DOMNotation::PublicId   DontDelete|ReadOnly
+  systemId              DOMNotation::SystemId   DontDelete|ReadOnly
 @end
 */
 
@@ -1759,9 +1750,9 @@ const ClassInfo DOMEntity::info = {"Entity", &DOMNode::info, 0, 0};
 
 /* Source for DOMEntityTable. Use "make hashtables" to regenerate.
 @begin DOMEntityTable 2
-  publicId		DOMEntity::PublicId		DontDelete|ReadOnly
-  systemId		DOMEntity::SystemId		DontDelete|ReadOnly
-  notationName		DOMEntity::NotationName	DontDelete|ReadOnly
+  publicId              DOMEntity::PublicId             DontDelete|ReadOnly
+  systemId              DOMEntity::SystemId             DontDelete|ReadOnly
+  notationName          DOMEntity::NotationName DontDelete|ReadOnly
 @end
 */
 
@@ -1930,24 +1921,19 @@ const ClassInfo NodeConstructor::info = {"NodeConstructor", 0,
                                          &NodeConstructorTable, 0};
 /* Source for NodeConstructorTable. Use "make hashtables" to regenerate.
 @begin NodeConstructorTable 11
-  ELEMENT_NODE		DOM::Node::ELEMENT_NODE		DontDelete|ReadOnly
-  ATTRIBUTE_NODE	DOM::Node::ATTRIBUTE_NODE
-DontDelete|ReadOnly
-  TEXT_NODE		DOM::Node::TEXT_NODE		DontDelete|ReadOnly
-  CDATA_SECTION_NODE	DOM::Node::CDATA_SECTION_NODE	DontDelete|ReadOnly
-  ENTITY_REFERENCE_NODE	DOM::Node::ENTITY_REFERENCE_NODE
-DontDelete|ReadOnly
-  ENTITY_NODE		DOM::Node::ENTITY_NODE		DontDelete|ReadOnly
+  ELEMENT_NODE          DOM::Node::ELEMENT_NODE         DontDelete|ReadOnly
+  ATTRIBUTE_NODE        DOM::Node::ATTRIBUTE_NODE DontDelete|ReadOnly
+  TEXT_NODE             DOM::Node::TEXT_NODE            DontDelete|ReadOnly
+  CDATA_SECTION_NODE    DOM::Node::CDATA_SECTION_NODE   DontDelete|ReadOnly
+  ENTITY_REFERENCE_NODE DOM::Node::ENTITY_REFERENCE_NODE DontDelete|ReadOnly
+  ENTITY_NODE           DOM::Node::ENTITY_NODE          DontDelete|ReadOnly
   PROCESSING_INSTRUCTION_NODE DOM::Node::PROCESSING_INSTRUCTION_NODE
 DontDelete|ReadOnly
-  COMMENT_NODE		DOM::Node::COMMENT_NODE		DontDelete|ReadOnly
-  DOCUMENT_NODE		DOM::Node::DOCUMENT_NODE
-DontDelete|ReadOnly
-  DOCUMENT_TYPE_NODE	DOM::Node::DOCUMENT_TYPE_NODE	DontDelete|ReadOnly
-  DOCUMENT_FRAGMENT_NODE DOM::Node::DOCUMENT_FRAGMENT_NODE
-DontDelete|ReadOnly
-  NOTATION_NODE		DOM::Node::NOTATION_NODE
-DontDelete|ReadOnly
+  COMMENT_NODE          DOM::Node::COMMENT_NODE         DontDelete|ReadOnly
+  DOCUMENT_NODE         DOM::Node::DOCUMENT_NODE DontDelete|ReadOnly
+  DOCUMENT_TYPE_NODE    DOM::Node::DOCUMENT_TYPE_NODE   DontDelete|ReadOnly
+  DOCUMENT_FRAGMENT_NODE DOM::Node::DOCUMENT_FRAGMENT_NODE DontDelete|ReadOnly
+  NOTATION_NODE         DOM::Node::NOTATION_NODE DontDelete|ReadOnly
 @end
 */
 bool NodeConstructor::getOwnPropertySlot(ExecState* exec,
@@ -1973,35 +1959,35 @@ const ClassInfo DOMExceptionConstructor::info = {"DOMExceptionConstructor", 0,
 
 /* Source for DOMExceptionConstructorTable. Use "make hashtables" to regenerate.
 @begin DOMExceptionConstructorTable 15
-  INDEX_SIZE_ERR		DOM::DOMException::INDEX_SIZE_ERR
+  INDEX_SIZE_ERR                DOM::DOMException::INDEX_SIZE_ERR
 DontDelete|ReadOnly
-  DOMSTRING_SIZE_ERR		DOM::DOMException::DOMSTRING_SIZE_ERR
+  DOMSTRING_SIZE_ERR            DOM::DOMException::DOMSTRING_SIZE_ERR
 DontDelete|ReadOnly
-  HIERARCHY_REQUEST_ERR		DOM::DOMException::HIERARCHY_REQUEST_ERR
+  HIERARCHY_REQUEST_ERR         DOM::DOMException::HIERARCHY_REQUEST_ERR
 DontDelete|ReadOnly
-  WRONG_DOCUMENT_ERR		DOM::DOMException::WRONG_DOCUMENT_ERR
+  WRONG_DOCUMENT_ERR            DOM::DOMException::WRONG_DOCUMENT_ERR
 DontDelete|ReadOnly
-  INVALID_CHARACTER_ERR		DOM::DOMException::INVALID_CHARACTER_ERR
+  INVALID_CHARACTER_ERR         DOM::DOMException::INVALID_CHARACTER_ERR
 DontDelete|ReadOnly
-  NO_DATA_ALLOWED_ERR		DOM::DOMException::NO_DATA_ALLOWED_ERR
+  NO_DATA_ALLOWED_ERR           DOM::DOMException::NO_DATA_ALLOWED_ERR
 DontDelete|ReadOnly
-  NO_MODIFICATION_ALLOWED_ERR
-DOM::DOMException::NO_MODIFICATION_ALLOWED_ERR	DontDelete|ReadOnly
-  NOT_FOUND_ERR			DOM::DOMException::NOT_FOUND_ERR
+  NO_MODIFICATION_ALLOWED_ERR   DOM::DOMException::NO_MODIFICATION_ALLOWED_ERR
 DontDelete|ReadOnly
-  NOT_SUPPORTED_ERR		DOM::DOMException::NOT_SUPPORTED_ERR
+  NOT_FOUND_ERR                 DOM::DOMException::NOT_FOUND_ERR
 DontDelete|ReadOnly
-  INUSE_ATTRIBUTE_ERR		DOM::DOMException::INUSE_ATTRIBUTE_ERR
+  NOT_SUPPORTED_ERR             DOM::DOMException::NOT_SUPPORTED_ERR
 DontDelete|ReadOnly
-  INVALID_STATE_ERR		DOM::DOMException::INVALID_STATE_ERR
+  INUSE_ATTRIBUTE_ERR           DOM::DOMException::INUSE_ATTRIBUTE_ERR
 DontDelete|ReadOnly
-  SYNTAX_ERR			DOM::DOMException::SYNTAX_ERR
+  INVALID_STATE_ERR             DOM::DOMException::INVALID_STATE_ERR
 DontDelete|ReadOnly
-  INVALID_MODIFICATION_ERR	DOM::DOMException::INVALID_MODIFICATION_ERR
+  SYNTAX_ERR                    DOM::DOMException::SYNTAX_ERR
 DontDelete|ReadOnly
-  NAMESPACE_ERR			DOM::DOMException::NAMESPACE_ERR
+  INVALID_MODIFICATION_ERR      DOM::DOMException::INVALID_MODIFICATION_ERR
 DontDelete|ReadOnly
-  INVALID_ACCESS_ERR		DOM::DOMException::INVALID_ACCESS_ERR
+  NAMESPACE_ERR                 DOM::DOMException::NAMESPACE_ERR
+DontDelete|ReadOnly
+  INVALID_ACCESS_ERR            DOM::DOMException::INVALID_ACCESS_ERR
 DontDelete|ReadOnly
 @end
 */
@@ -2093,15 +2079,15 @@ const ClassInfo DOMCharacterData::info = {"CharacterImp", &DOMNode::info,
                                           &DOMCharacterDataTable, 0};
 /*
 @begin DOMCharacterDataTable 2
-  data		DOMCharacterData::Data		DontDelete
-  length	DOMCharacterData::Length	DontDelete|ReadOnly
+  data          DOMCharacterData::Data          DontDelete
+  length        DOMCharacterData::Length        DontDelete|ReadOnly
 @end
 @begin DOMCharacterDataProtoTable 7
-  substringData	DOMCharacterData::SubstringData	DontDelete|Function 2
-  appendData	DOMCharacterData::AppendData	DontDelete|Function 1
-  insertData	DOMCharacterData::InsertData	DontDelete|Function 2
-  deleteData	DOMCharacterData::DeleteData	DontDelete|Function 2
-  replaceData	DOMCharacterData::ReplaceData	DontDelete|Function 2
+  substringData DOMCharacterData::SubstringData DontDelete|Function 2
+  appendData    DOMCharacterData::AppendData    DontDelete|Function 1
+  insertData    DOMCharacterData::InsertData    DontDelete|Function 2
+  deleteData    DOMCharacterData::DeleteData    DontDelete|Function 2
+  replaceData   DOMCharacterData::ReplaceData   DontDelete|Function 2
 @end
 */
 KJS_DEFINE_PROTOTYPE(DOMCharacterDataProto)
@@ -2202,7 +2188,7 @@ JSValue* DOMCharacterDataProtoFunc::callAsFunction(ExecState* exec,
 const ClassInfo DOMText::info = {"Text", &DOMCharacterData::info, 0, 0};
 /*
 @begin DOMTextProtoTable 1
-  splitText	DOMText::SplitText	DontDelete|Function 1
+  splitText     DOMText::SplitText      DontDelete|Function 1
 @end
 */
 KJS_DEFINE_PROTOTYPE(DOMTextProto)

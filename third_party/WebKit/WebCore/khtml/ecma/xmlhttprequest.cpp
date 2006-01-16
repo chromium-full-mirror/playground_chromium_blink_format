@@ -105,19 +105,14 @@ namespace KJS {
 
 /* Source for XMLHttpRequestProtoTable.
 @begin XMLHttpRequestProtoTable 7
-  abort			XMLHttpRequest::Abort
+  abort                 XMLHttpRequest::Abort DontDelete|Function 0
+  getAllResponseHeaders XMLHttpRequest::GetAllResponseHeaders
 DontDelete|Function 0
-  getAllResponseHeaders	XMLHttpRequest::GetAllResponseHeaders
-DontDelete|Function 0
-  getResponseHeader	XMLHttpRequest::GetResponseHeader
-DontDelete|Function 1
-  open			XMLHttpRequest::Open
-DontDelete|Function 5
+  getResponseHeader     XMLHttpRequest::GetResponseHeader DontDelete|Function 1
+  open                  XMLHttpRequest::Open DontDelete|Function 5
   overrideMimeType      XMLHttpRequest::OverrideMIMEType DontDelete|Function 1
-  send			XMLHttpRequest::Send
-DontDelete|Function 1
-  setRequestHeader	XMLHttpRequest::SetRequestHeader
-DontDelete|Function 2
+  send                  XMLHttpRequest::Send DontDelete|Function 1
+  setRequestHeader      XMLHttpRequest::SetRequestHeader DontDelete|Function 2
 @end
 */
 KJS_DEFINE_PROTOTYPE(XMLHttpRequestProto)
@@ -167,18 +162,13 @@ const ClassInfo XMLHttpRequest::info = {"XMLHttpRequest", 0,
 
 /* Source for XMLHttpRequestTable.
 @begin XMLHttpRequestTable 7
-  readyState		XMLHttpRequest::ReadyState
-DontDelete|ReadOnly
-  responseText		XMLHttpRequest::ResponseText
-DontDelete|ReadOnly
-  responseXML		XMLHttpRequest::ResponseXML
-DontDelete|ReadOnly
-  status		XMLHttpRequest::Status
-DontDelete|ReadOnly
-  statusText		XMLHttpRequest::StatusText
-DontDelete|ReadOnly
-  onreadystatechange	XMLHttpRequest::Onreadystatechange	DontDelete
-  onload		XMLHttpRequest::Onload			DontDelete
+  readyState            XMLHttpRequest::ReadyState DontDelete|ReadOnly
+  responseText          XMLHttpRequest::ResponseText DontDelete|ReadOnly
+  responseXML           XMLHttpRequest::ResponseXML DontDelete|ReadOnly
+  status                XMLHttpRequest::Status DontDelete|ReadOnly
+  statusText            XMLHttpRequest::StatusText DontDelete|ReadOnly
+  onreadystatechange    XMLHttpRequest::Onreadystatechange      DontDelete
+  onload                XMLHttpRequest::Onload                  DontDelete
 @end
 */
 
@@ -660,32 +650,32 @@ void XMLHttpRequest::slotData(KIO::Job*, const char* data, int len) {
   }
 }
 
-QPtrDict<QPtrDict<XMLHttpRequest>>& XMLHttpRequest::requestsByDocument() {
-  static QPtrDict<QPtrDict<XMLHttpRequest>> dictionary;
-  return dictionary;
+XMLHttpRequest::RequestsMap& XMLHttpRequest::requestsByDocument() {
+  static RequestsMap map;
+  return map;
 }
 
 void XMLHttpRequest::addToRequestsByDocument() {
   assert(doc);
 
-  QPtrDict<XMLHttpRequest>* requests = requestsByDocument().find(doc);
+  RequestsSet* requests = requestsByDocument().get(doc);
   if (!requests) {
-    requests = new QPtrDict<XMLHttpRequest>;
-    requestsByDocument().insert(doc, requests);
+    requests = new RequestsSet;
+    requestsByDocument().set(doc, requests);
   }
 
-  assert(requests->find(this) == 0);
-  requests->insert(this, this);
+  assert(!requests->contains(this));
+  requests->insert(this);
 }
 
 void XMLHttpRequest::removeFromRequestsByDocument() {
   assert(doc);
 
-  QPtrDict<XMLHttpRequest>* requests = requestsByDocument().find(doc);
+  RequestsSet* requests = requestsByDocument().get(doc);
 
   // Since synchronous loads are not added to requestsByDocument(), we need to
   // make sure we found the request.
-  if (!requests || !requests->find(this))
+  if (!requests || !requests->contains(this))
     return;
 
   requests->remove(this);
@@ -697,8 +687,8 @@ void XMLHttpRequest::removeFromRequestsByDocument() {
 }
 
 void XMLHttpRequest::cancelRequests(DOM::DocumentImpl* d) {
-  while (QPtrDict<XMLHttpRequest>* requests = requestsByDocument().find(d))
-    QPtrDictIterator<XMLHttpRequest>(*requests).current()->abort();
+  while (RequestsSet* requests = requestsByDocument().get(d))
+    (*requests->begin())->abort();
 }
 
 JSValue* XMLHttpRequestProtoFunc::callAsFunction(ExecState* exec,

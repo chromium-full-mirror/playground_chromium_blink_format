@@ -28,16 +28,16 @@
 
 #include "config.h"
 #include "CachedXSLStyleSheet.h"
+
 #include "Cache.h"
-#include "loader.h"
+#include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "decoder.h"
-
+#include "loader.h"
 #include <kxmlcore/Assertions.h>
+#include <qbuffer.h>
 
-using namespace DOM;
-
-namespace khtml {
+namespace WebCore {
 
 #ifdef KHTML_XSLT
 
@@ -183,4 +183,4 @@ void CachedXBLDocument::error(int /*err*/, const char* /*text*/) {
 }
 
 #endif
-};
+}

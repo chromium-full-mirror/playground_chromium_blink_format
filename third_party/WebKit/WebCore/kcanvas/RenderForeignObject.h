@@ -23,7 +23,8 @@
 #ifndef RenderForeignObject_H
 #define RenderForeignObject_H
 
-#include "khtml/rendering/render_block.h"
+#include "render_block.h"
+#include <qmatrix.h>
 
 namespace KSVG {
 class SVGForeignObjectElementImpl;
@@ -41,12 +42,12 @@ class RenderForeignObject : public khtml::RenderBlock {
     m_transform = transform;
   }
 
-  bool nodeAtPoint(NodeInfo& info,
-                   int _x,
-                   int _y,
-                   int _tx,
-                   int _ty,
-                   HitTestAction hitTestAction);
+  bool nodeAtPoint(NodeInfo&,
+                   int x,
+                   int y,
+                   int tx,
+                   int ty,
+                   WebCore::HitTestAction);
 
  private:
   QMatrix translationForAttributes();

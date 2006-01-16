@@ -2,7 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,19 +20,13 @@
  * Boston, MA 02111-1307, USA.
  *
  */
-#ifndef _DOM_DOMString_h_
-#define _DOM_DOMString_h_
 
-#include <qstring.h>
-#include <xml/dom_stringimpl.h>
+#ifndef DOM_DOMString_h_
+#define DOM_DOMString_h_
 
-namespace khtml {
-class Length;
-}
+#include "dom_stringimpl.h"
 
-namespace DOM {
-
-class DOMStringImpl;
+namespace WebCore {
 
 /**
  * This class implements the basic string we use in the DOM. We do not use
@@ -44,8 +38,6 @@ class DOMStringImpl;
  * wish to get a DOMString that is independent, use @ref copy().
  */
 class DOMString {
-  friend class CharacterDataImpl;
-
  public:
   /**
    * default constructor. Gives an empty DOMString
@@ -116,7 +108,7 @@ class DOMString {
   void truncate(unsigned int len);
   void remove(unsigned int pos, int len = 1);
 
-  DOMString substring(unsigned int pos, unsigned int len) const;
+  DOMString substring(unsigned pos, unsigned len = UINT_MAX) const;
 
   /**
    * Splits the string into two. The original string gets truncated to pos, and
@@ -155,7 +147,7 @@ class DOMString {
   const char* ascii() const;
 #endif
 
- protected:
+ private:
   RefPtr<DOMStringImpl> m_impl;
 };
 

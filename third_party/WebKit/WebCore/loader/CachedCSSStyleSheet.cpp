@@ -28,15 +28,16 @@
 
 #include "config.h"
 #include "CachedCSSStyleSheet.h"
+
 #include "Cache.h"
-#include "loader.h"
+#include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
-
 #include "KWQLoader.h"
+#include "loader.h"
+#include <qbuffer.h>
+#include <qtextcodec.h>
 
-using namespace DOM;
-
-namespace khtml {
+namespace WebCore {
 
 CachedCSSStyleSheet::CachedCSSStyleSheet(DocLoader* dl,
                                          const DOMString& url,
@@ -121,4 +122,4 @@ void CachedCSSStyleSheet::error(int /*err*/, const char* /*text*/) {
   m_loading = false;
   checkNotify();
 }
-};
+}

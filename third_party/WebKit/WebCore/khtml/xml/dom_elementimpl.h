@@ -543,8 +543,6 @@ class StyledElementImpl : public ElementImpl {
   static void removeMappedAttributeDecl(MappedAttributeEntry type,
                                         const QualifiedName& attrName,
                                         const AtomicString& attrValue);
-  static QPtrDict<QPtrDict<QPtrDict<CSSMappedAttributeDeclarationImpl>>>*
-      m_mappedAttributeDecls;
 
   CSSMutableStyleDeclarationImpl* inlineStyleDecl() const {
     return m_inlineStyleDecl;

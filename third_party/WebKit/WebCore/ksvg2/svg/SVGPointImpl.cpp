@@ -22,13 +22,14 @@
 
 #include "config.h"
 #include "SVGPointImpl.h"
+
 #include "SVGMatrixImpl.h"
 #include "SVGStyledElementImpl.h"
+#include "IntPoint.h"
 
 using namespace KSVG;
 
-SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context)
-    : Shared<SVGPointImpl>() {
+SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context) {
   m_x = 0.0;
   m_y = 0.0;
   m_context = context;
@@ -36,16 +37,14 @@ SVGPointImpl::SVGPointImpl(const SVGStyledElementImpl* context)
 
 SVGPointImpl::SVGPointImpl(float x,
                            float y,
-                           const SVGStyledElementImpl* context)
-    : Shared<SVGPointImpl>() {
+                           const SVGStyledElementImpl* context) {
   m_x = x;
   m_y = y;
   m_context = context;
 }
 
 SVGPointImpl::SVGPointImpl(const IntPoint& p,
-                           const SVGStyledElementImpl* context)
-    : Shared<SVGPointImpl>() {
+                           const SVGStyledElementImpl* context) {
   m_x = p.x();
   m_y = p.y();
   m_context = context;

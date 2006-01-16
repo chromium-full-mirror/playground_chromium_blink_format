@@ -25,14 +25,15 @@
 
 #import "kcanvas/RenderPath.h"
 
+#include <qmatrix.h>
+
 class KCanvasItemQuartz : public RenderPath {
  public:
-  KCanvasItemQuartz(khtml::RenderStyle* style,
-                    KSVG::SVGStyledElementImpl* node);
+  KCanvasItemQuartz(WebCore::RenderStyle*, WebCore::SVGStyledElementImpl*);
   virtual ~KCanvasItemQuartz() {}
 
   virtual FloatRect bboxForPath(bool includeStroke) const;
-  virtual bool hitsPath(const FloatPoint& p,
+  virtual bool hitsPath(const FloatPoint&,
                         bool fill /* false means stroke */) const;
 
   virtual IntRect getAbsoluteRepaintRect() {
@@ -41,15 +42,14 @@ class KCanvasItemQuartz : public RenderPath {
 
   virtual bool requiresLayer() { return false; }
   virtual void layout() { setNeedsLayout(false); }
-  virtual void paint(PaintInfo& paintInfo, int parentX, int parentY);
-  virtual bool nodeAtPoint(NodeInfo& info,
-                           int _x,
-                           int _y,
-                           int _tx,
-                           int _ty,
-                           HitTestAction hitTestAction);
+  virtual void paint(PaintInfo&, int parentX, int parentY);
+  virtual bool nodeAtPoint(NodeInfo&,
+                           int x,
+                           int y,
+                           int tx,
+                           int ty,
+                           WebCore::HitTestAction);
 
  private:
-  void drawMarkersIfNeeded(const FloatRect& rect,
-                           const KCanvasPath* path) const;
+  void drawMarkersIfNeeded(const FloatRect&, const KCanvasPath*) const;
 };

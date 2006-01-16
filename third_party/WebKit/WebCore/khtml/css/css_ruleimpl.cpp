@@ -3,7 +3,7 @@
  *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
  * (C) 2002-2003 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2002 Apple Computer, Inc.
+ * Copyright (C) 2002, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,22 +20,18 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include "config.h"
-#include "dom/css_rule.h"
-#include "dom/css_stylesheet.h"
-#include "dom/dom_string.h"
+#include "css_ruleimpl.h"
 
-#include "css/css_stylesheetimpl.h"
-#include "css/css_valueimpl.h"
-#include "css/cssparser.h"
-#include "css/css_ruleimpl.h"
-
-#include "loader.h"
 #include "Cache.h"
 #include "CachedCSSStyleSheet.h"
 #include "DocLoader.h"
+#include "css_stylesheetimpl.h"
+#include "cssparser.h"
+#include <kurl.h>
 
-namespace DOM {
+namespace WebCore {
 
 CSSStyleSheetImpl* CSSRuleImpl::parentStyleSheet() const {
   return (parent() && parent()->isCSSStyleSheet())
@@ -48,12 +44,12 @@ CSSRuleImpl* CSSRuleImpl::parentRule() const {
                                           : 0;
 }
 
-DOM::DOMString CSSRuleImpl::cssText() const {
+DOMString CSSRuleImpl::cssText() const {
   // ###
   return DOMString();
 }
 
-void CSSRuleImpl::setCssText(DOM::DOMString /*str*/) {
+void CSSRuleImpl::setCssText(DOMString /*str*/) {
   // ###
 }
 
@@ -69,7 +65,7 @@ CSSFontFaceRuleImpl::~CSSFontFaceRuleImpl() {}
 // --------------------------------------------------------------------------
 
 CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
-                                     const DOM::DOMString& href,
+                                     const DOMString& href,
                                      MediaListImpl* media)
     : CSSRuleImpl(parent) {
   m_type = CSSRule::IMPORT_RULE;
@@ -85,8 +81,8 @@ CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
   init();
 }
 CSSImportRuleImpl::CSSImportRuleImpl(StyleBaseImpl* parent,
-                                     const DOM::DOMString& href,
-                                     const DOM::DOMString& media)
+                                     const DOMString& href,
+                                     const DOMString& media)
     : CSSRuleImpl(parent) {
   m_type = CSSRule::IMPORT_RULE;
   m_lstMedia = new MediaListImpl(this, media);
@@ -105,8 +101,8 @@ CSSImportRuleImpl::~CSSImportRuleImpl() {
     m_cachedSheet->deref(this);
 }
 
-void CSSImportRuleImpl::setStyleSheet(const DOM::DOMString& url,
-                                      const DOM::DOMString& sheet) {
+void CSSImportRuleImpl::setStyleSheet(const DOMString& url,
+                                      const DOMString& sheet) {
   if (m_styleSheet)
     m_styleSheet->setParent(0);
   m_styleSheet = new CSSStyleSheetImpl(this, url);
@@ -192,7 +188,7 @@ CSSMediaRuleImpl::CSSMediaRuleImpl(StyleBaseImpl* parent)
 }
 
 CSSMediaRuleImpl::CSSMediaRuleImpl(StyleBaseImpl* parent,
-                                   const DOM::DOMString& media)
+                                   const DOMString& media)
     : CSSRuleImpl(parent) {
   m_type = CSSRule::MEDIA_RULE;
   m_lstMedia = new MediaListImpl(this, media);
@@ -277,12 +273,12 @@ CSSPageRuleImpl::CSSPageRuleImpl(StyleBaseImpl* parent) : CSSRuleImpl(parent) {
 
 CSSPageRuleImpl::~CSSPageRuleImpl() {}
 
-DOM::DOMString CSSPageRuleImpl::selectorText() const {
+DOMString CSSPageRuleImpl::selectorText() const {
   // ###
   return DOMString();
 }
 
-void CSSPageRuleImpl::setSelectorText(DOM::DOMString /*str*/) {
+void CSSPageRuleImpl::setSelectorText(DOMString /*str*/) {
   // ###
 }
 
@@ -300,7 +296,7 @@ CSSStyleRuleImpl::~CSSStyleRuleImpl() {
   delete m_selector;
 }
 
-DOM::DOMString CSSStyleRuleImpl::selectorText() const {
+DOMString CSSStyleRuleImpl::selectorText() const {
   if (m_selector) {
     DOMString str;
     for (CSSSelector* s = m_selector; s; s = s->next()) {
@@ -313,7 +309,7 @@ DOM::DOMString CSSStyleRuleImpl::selectorText() const {
   return DOMString();
 }
 
-void CSSStyleRuleImpl::setSelectorText(DOM::DOMString /*str*/) {
+void CSSStyleRuleImpl::setSelectorText(DOMString /*str*/) {
   // ###
 }
 

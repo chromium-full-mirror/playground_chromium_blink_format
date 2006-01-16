@@ -21,32 +21,25 @@
  * Boston, MA 02111-1307, USA.
  *
  */
+
 #ifndef HTML_IMAGEIMPL_H
 #define HTML_IMAGEIMPL_H
 
+#include "CachedImage.h"
 #include "html/html_inlineimpl.h"
 #include "khtmllayout.h"
-#include "rendering/render_object.h"
-
-#include <loader.h>
-#include "CachedImage.h"
-
+#include "render_object.h"
 #include <qregion.h>
-#include <qmap.h>
-#include <qpixmap.h>
 
-namespace khtml {
-class CachedObjectClient;
-}
+class QPixmap;
 
-namespace DOM {
+namespace WebCore {
 
 class DOMString;
-
 class HTMLCollectionImpl;
 class HTMLFormElementImpl;
 
-class HTMLImageLoader : public khtml::CachedObjectClient {
+class HTMLImageLoader : public CachedObjectClient {
  public:
   HTMLImageLoader(ElementImpl* elt);
   virtual ~HTMLImageLoader();
@@ -57,17 +50,17 @@ class HTMLImageLoader : public khtml::CachedObjectClient {
 
   ElementImpl* element() const { return m_element; }
   bool imageComplete() const { return m_imageComplete; }
-  khtml::CachedImage* image() const { return m_image; }
+  CachedImage* image() const { return m_image; }
 
   // CachedObjectClient API
-  virtual void notifyFinished(khtml::CachedObject* finishedObj);
+  virtual void notifyFinished(CachedObject* finishedObj);
 
  protected:
-  void setLoadingImage(khtml::CachedImage* loadingImage);
+  void setLoadingImage(CachedImage* loadingImage);
 
  private:
   ElementImpl* m_element;
-  khtml::CachedImage* m_image;
+  CachedImage* m_image;
   bool m_firedLoad : 1;
   bool m_imageComplete : 1;
 };
@@ -88,8 +81,7 @@ class HTMLImageElementImpl : public HTMLElementImpl {
   virtual void parseMappedAttribute(MappedAttributeImpl*);
 
   virtual void attach();
-  virtual khtml::RenderObject* createRenderer(RenderArena*,
-                                              khtml::RenderStyle*);
+  virtual RenderObject* createRenderer(RenderArena*, RenderStyle*);
   virtual void insertedIntoDocument();
   virtual void removedFromDocument();
 
@@ -170,13 +162,13 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
 
   bool isDefault() const { return m_shape == Default; }
 
-  bool mapMouseEvent(int x_,
-                     int y_,
-                     int width_,
-                     int height_,
-                     khtml::RenderObject::NodeInfo& info);
+  bool mapMouseEvent(int x,
+                     int y,
+                     int width,
+                     int height,
+                     RenderObject::NodeInfo& info);
 
-  virtual IntRect getRect(khtml::RenderObject* obj) const;
+  virtual IntRect getRect(RenderObject*) const;
 
   DOMString accessKey() const;
   void setAccessKey(const DOMString&);
@@ -205,7 +197,7 @@ class HTMLAreaElementImpl : public HTMLAnchorElementImpl {
  protected:
   QRegion getRegion(int width_, int height) const;
   QRegion region;
-  khtml::Length* m_coords;
+  Length* m_coords;
   int m_coordsLen;
   int lastw, lasth;
   Shape m_shape;
@@ -220,17 +212,17 @@ class HTMLMapElementImpl : public HTMLElementImpl {
 
   virtual HTMLTagStatus endTagRequirement() const { return TagStatusRequired; }
   virtual int tagPriority() const { return 1; }
-  virtual bool checkDTD(const NodeImpl* newChild);
+  virtual bool checkDTD(const NodeImpl*);
 
-  virtual DOMString getName() const { return m_name; }
+  const AtomicString& getName() const { return m_name; }
 
-  virtual void parseMappedAttribute(MappedAttributeImpl* attr);
+  virtual void parseMappedAttribute(MappedAttributeImpl*);
 
-  bool mapMouseEvent(int x_,
-                     int y_,
-                     int width_,
-                     int height_,
-                     khtml::RenderObject::NodeInfo& info);
+  bool mapMouseEvent(int x,
+                     int y,
+                     int width,
+                     int height,
+                     RenderObject::NodeInfo&);
 
   RefPtr<HTMLCollectionImpl> areas();
 
@@ -238,7 +230,7 @@ class HTMLMapElementImpl : public HTMLElementImpl {
   void setName(const DOMString&);
 
  private:
-  DOMString m_name;
+  AtomicString m_name;
 };
 
 }  // namespace

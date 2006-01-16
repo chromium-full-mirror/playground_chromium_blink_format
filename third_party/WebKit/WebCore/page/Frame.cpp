@@ -27,80 +27,79 @@
 
 #include "config.h"
 #include "Frame.h"
-#include "MacFrame.h"
 
-#include "css/csshelper.h"
-#include "cssproperties.h"
-#include "css/cssstyleselector.h"
-#include "css/css_computedstyle.h"
-#include "css/css_valueimpl.h"
-#include "dom/dom_string.h"
-#include "DOMImplementationImpl.h"
-#include "editing/markup.h"
-#include "editing/htmlediting.h"
-#include "editing/SelectionController.h"
-#include "editing/visible_position.h"
-#include "editing/visible_text.h"
-#include "editing/visible_units.h"
-#include "html/html_documentimpl.h"
-#include "html/html_baseimpl.h"
-#include "html/html_miscimpl.h"
-#include "html/html_imageimpl.h"
-#include "html/html_objectimpl.h"
-#include "HTMLFormElementImpl.h"
-#include "HTMLGenericFormElementImpl.h"
-#include "rendering/render_block.h"
-#include "RenderText.h"
-#include "rendering/render_frames.h"
-#include "rendering/render_canvas.h"
 #include "Cache.h"
 #include "CachedCSSStyleSheet.h"
+#include "DOMImplementationImpl.h"
 #include "DocLoader.h"
-#include "loader.h"
-#include "xml/dom2_eventsimpl.h"
-#include "xml/dom2_rangeimpl.h"
-#include "xml/EventNames.h"
-#include "xml/xml_tokenizer.h"
-#if SVG_SUPPORT
-#include "SVGNames.h"
-#include "XLinkNames.h"
-#endif
-#include "kxmlcore/Assertions.h"
-
-#include "FrameView.h"
-#include "ecma/kjs_proxy.h"
-#include "ecma/kjs_window.h"
-#include "ecma/xmlhttprequest.h"
-#include "khtml_settings.h"
+#include "EventNames.h"
 #include "FramePrivate.h"
-
-#include <sys/types.h>
+#include "FrameView.h"
+#include "HTMLFormElementImpl.h"
+#include "HTMLGenericFormElementImpl.h"
+#include "MacFrame.h"
+#include "RenderText.h"
+#include "SelectionController.h"
+#include "css_computedstyle.h"
+#include "css_valueimpl.h"
+#include "csshelper.h"
+#include "cssproperties.h"
+#include "cssstyleselector.h"
+#include "dom2_eventsimpl.h"
+#include "dom2_rangeimpl.h"
+#include "dom_string.h"
+#include "html_baseimpl.h"
+#include "html_documentimpl.h"
+#include "html_imageimpl.h"
+#include "html_miscimpl.h"
+#include "html_objectimpl.h"
+#include "htmlediting.h"
+#include "khtml_settings.h"
+#include "kjs_proxy.h"
+#include "kjs_window.h"
+#include "kxmlcore/Assertions.h"
+#include "loader.h"
+#include "markup.h"
+#include "render_block.h"
+#include "render_canvas.h"
+#include "render_frames.h"
+#include "visible_position.h"
+#include "visible_text.h"
+#include "visible_units.h"
+#include "xml_tokenizer.h"
+#include "xmlhttprequest.h"
 #include <assert.h>
+#include <kdebug.h>
+#include <kio/global.h>
+#include <kio/job.h>
+#include <klocale.h>
+#include <kstandarddirs.h>
+#include <qfile.h>
+#include <qptrlist.h>
+#include <qtextcodec.h>
+#include <sys/types.h>
+
 #if !WIN32
 #include <unistd.h>
 #endif
 
-#include <kstandarddirs.h>
-#include <kio/job.h>
-#include <kio/global.h>
-#include <kdebug.h>
-#include <klocale.h>
+#if SVG_SUPPORT
+#include "SVGNames.h"
+#include "XLinkNames.h"
+#endif
 
-#include <qfile.h>
-#include <qptrlist.h>
-
-using namespace DOM;
+using namespace WebCore;
+using namespace EventNames;
 using namespace HTMLNames;
+
 using namespace KJS;
-using namespace DOM::EventNames;
-using namespace khtml;
 
 const int CARET_BLINK_FREQUENCY = 500;
 
-namespace khtml {
+namespace WebCore {
 class PartStyleSheetLoader : public CachedObjectClient {
  public:
-  PartStyleSheetLoader(Frame* frame, DOM::DOMString url, DocLoader* dl) {
+  PartStyleSheetLoader(Frame* frame, DOMString url, DocLoader* dl) {
     m_frame = frame;
     m_cachedSheet = Cache::requestStyleSheet(dl, url);
     if (m_cachedSheet)
@@ -110,15 +109,14 @@ class PartStyleSheetLoader : public CachedObjectClient {
     if (m_cachedSheet)
       m_cachedSheet->deref(this);
   }
-  virtual void setStyleSheet(const DOM::DOMString&,
-                             const DOM::DOMString& sheet) {
+  virtual void setStyleSheet(const DOMString&, const DOMString& sheet) {
     if (m_frame)
       m_frame->setUserStyleSheet(sheet.qstring());
 
     delete this;
   }
   QGuardedPtr<Frame> m_frame;
-  khtml::CachedCSSStyleSheet* m_cachedSheet;
+  CachedCSSStyleSheet* m_cachedSheet;
 };
 }
 
@@ -166,10 +164,10 @@ void Frame::init(KHTMLView* view) {
   d->m_bJavaEnabled = true;
   d->m_bPluginsEnabled = true;
 
-  connect(khtml::Cache::loader(),
+  connect(Cache::loader(),
           SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
           SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
-  connect(khtml::Cache::loader(),
+  connect(Cache::loader(),
           SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
           SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
 
@@ -186,11 +184,11 @@ Frame::~Frame() {
     closeURL();
 
   disconnect(
-      khtml::Cache::loader(),
+      Cache::loader(),
       SIGNAL(requestDone(khtml::DocLoader*, khtml::CachedObject*)), this,
       SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
   disconnect(
-      khtml::Cache::loader(),
+      Cache::loader(),
       SIGNAL(requestFailed(khtml::DocLoader*, khtml::CachedObject*)), this,
       SLOT(slotLoaderRequestDone(khtml::DocLoader*, khtml::CachedObject*)));
 
@@ -365,7 +363,7 @@ void Frame::stopLoading(bool sendUnload) {
 
   if (DocumentImpl* doc = d->m_doc) {
     if (DocLoader* docLoader = doc->docLoader())
-      khtml::Cache::loader()->cancelRequests(docLoader);
+      Cache::loader()->cancelRequests(docLoader);
     KJS::XMLHttpRequest::cancelRequests(doc);
   }
 
@@ -445,7 +443,7 @@ QVariant Frame::executeScript(const QString& script, bool forceUserGesture) {
   return executeScript(0, script, forceUserGesture);
 }
 
-QVariant Frame::executeScript(DOM::NodeImpl* n,
+QVariant Frame::executeScript(NodeImpl* n,
                               const QString& script,
                               bool forceUserGesture) {
   KJSProxyImpl* proxy = jScript();
@@ -467,7 +465,7 @@ QVariant Frame::executeScript(DOM::NodeImpl* n,
   return ret;
 }
 
-bool Frame::scheduleScript(DOM::NodeImpl* n, const QString& script) {
+bool Frame::scheduleScript(NodeImpl* n, const QString& script) {
   d->scheduledScript = script;
   d->scheduledScriptNode = n;
 
@@ -610,7 +608,7 @@ bool Frame::openFile() {
   return true;
 }
 
-DOM::DocumentImpl* Frame::xmlDocImpl() const {
+DocumentImpl* Frame::xmlDocImpl() const {
   if (d)
     return d->m_doc;
   return 0;
@@ -933,8 +931,7 @@ void Frame::slotFinishedParsing() {
   gotoAnchor();
 }
 
-void Frame::slotLoaderRequestDone(khtml::DocLoader* dl,
-                                  khtml::CachedObject* obj) {
+void Frame::slotLoaderRequestDone(DocLoader* dl, CachedObject* obj) {
   // We really only need to call checkCompleted when our own resources are done
   // loading.
   // So we should check that d->m_doc->docLoader() == dl here.
@@ -967,7 +964,7 @@ void Frame::checkCompleted() {
   // Still waiting for images/scripts from the loader ?
   int requests = 0;
   if (d->m_doc && d->m_doc->docLoader())
-    requests = khtml::Cache::loader()->numRequests(d->m_doc->docLoader());
+    requests = Cache::loader()->numRequests(d->m_doc->docLoader());
 
   if (requests > 0)
     return;
@@ -1206,8 +1203,7 @@ QString Frame::encoding() const {
 
 void Frame::setUserStyleSheet(const KURL& url) {
   if (d->m_doc && d->m_doc->docLoader())
-    (void)new khtml::PartStyleSheetLoader(this, url.url(),
-                                          d->m_doc->docLoader());
+    (void)new PartStyleSheetLoader(this, url.url(), d->m_doc->docLoader());
 }
 
 void Frame::setUserStyleSheet(const QString& styleSheet) {
@@ -1512,7 +1508,7 @@ void Frame::urlSelected(const QString& url,
   Mac(this)->urlSelected(cURL, button, state, args);
 }
 
-bool Frame::requestFrame(khtml::RenderPart* part,
+bool Frame::requestFrame(RenderPart* part,
                          const QString& url,
                          const QString& frameName,
                          const QStringList& paramNames,
@@ -1520,13 +1516,12 @@ bool Frame::requestFrame(khtml::RenderPart* part,
                          bool isIFrame) {
   FrameIt it = d->m_frames.find(frameName);
   if (it == d->m_frames.end()) {
-    khtml::ChildFrame child;
+    ChildFrame child;
     child.m_name = frameName;
     it = d->m_frames.append(child);
   }
 
-  (*it).m_type =
-      isIFrame ? khtml::ChildFrame::IFrame : khtml::ChildFrame::Frame;
+  (*it).m_type = isIFrame ? ChildFrame::IFrame : ChildFrame::Frame;
   (*it).m_renderer = part;
   (*it).m_paramValues = paramNames;
   (*it).m_paramNames = paramValues;
@@ -1549,15 +1544,15 @@ QString Frame::requestFrameName() {
   return Mac(this)->generateFrameName();
 }
 
-bool Frame::requestObject(khtml::RenderPart* frame,
+bool Frame::requestObject(RenderPart* frame,
                           const QString& url,
                           const QString& serviceType,
                           const QStringList& paramNames,
                           const QStringList& paramValues) {
-  khtml::ChildFrame child;
-  QValueList<khtml::ChildFrame>::Iterator it = d->m_objects.append(child);
+  ChildFrame child;
+  QValueList<ChildFrame>::Iterator it = d->m_objects.append(child);
   (*it).m_renderer = frame;
-  (*it).m_type = khtml::ChildFrame::Object;
+  (*it).m_type = ChildFrame::Object;
   (*it).m_paramNames = paramNames;
   (*it).m_paramValues = paramValues;
   (*it).m_hasFallbackContent = frame->hasFallbackContent();
@@ -1571,7 +1566,7 @@ bool Frame::requestObject(khtml::RenderPart* frame,
   return requestObject(&(*it), completedURL, args);
 }
 
-bool Frame::requestObject(khtml::ChildFrame* child,
+bool Frame::requestObject(ChildFrame* child,
                           const KURL& url,
                           const KParts::URLArgs& _args) {
   if (child->m_bPreloaded) {
@@ -1606,7 +1601,7 @@ bool Frame::requestObject(khtml::ChildFrame* child,
   return processObjectRequest(child, url, args.serviceType);
 }
 
-bool Frame::processObjectRequest(khtml::ChildFrame* child,
+bool Frame::processObjectRequest(ChildFrame* child,
                                  const KURL& _url,
                                  const QString& mimetype) {
   // kdDebug( 6050 ) << "Frame::processObjectRequest trying to create part for "
@@ -1836,7 +1831,7 @@ void Frame::slotParentCompleted() {
 }
 
 void Frame::slotChildStarted(KIO::Job* job) {
-  khtml::ChildFrame* child = childFrame(sender());
+  ChildFrame* child = childFrame(sender());
 
   assert(child);
 
@@ -1853,7 +1848,7 @@ void Frame::slotChildCompleted() {
 }
 
 void Frame::slotChildCompleted(bool complete) {
-  khtml::ChildFrame* child = childFrame(sender());
+  ChildFrame* child = childFrame(sender());
 
   assert(child);
 
@@ -1866,7 +1861,7 @@ void Frame::slotChildCompleted(bool complete) {
   checkCompleted();
 }
 
-khtml::ChildFrame* Frame::childFrame(const QObject* obj) {
+ChildFrame* Frame::childFrame(const QObject* obj) {
   assert(obj->inherits("ObjectContents"));
   const ObjectContents* part = static_cast<const ObjectContents*>(obj);
 
@@ -2056,35 +2051,34 @@ Frame* Frame::childFrameNamed(const QString& name) const {
   return NULL;
 }
 
-bool Frame::shouldDragAutoNode(DOM::NodeImpl* node, int x, int y) const {
+bool Frame::shouldDragAutoNode(NodeImpl* node, int x, int y) const {
   // No KDE impl yet
   return false;
 }
 
 void Frame::customEvent(QCustomEvent* event) {
-  if (khtml::MousePressEvent::test(event)) {
-    khtmlMousePressEvent(static_cast<khtml::MousePressEvent*>(event));
+  if (MousePressEvent::test(event)) {
+    khtmlMousePressEvent(static_cast<MousePressEvent*>(event));
     return;
   }
 
-  if (khtml::MouseDoubleClickEvent::test(event)) {
-    khtmlMouseDoubleClickEvent(
-        static_cast<khtml::MouseDoubleClickEvent*>(event));
+  if (MouseDoubleClickEvent::test(event)) {
+    khtmlMouseDoubleClickEvent(static_cast<MouseDoubleClickEvent*>(event));
     return;
   }
 
-  if (khtml::MouseMoveEvent::test(event)) {
-    khtmlMouseMoveEvent(static_cast<khtml::MouseMoveEvent*>(event));
+  if (MouseMoveEvent::test(event)) {
+    khtmlMouseMoveEvent(static_cast<MouseMoveEvent*>(event));
     return;
   }
 
-  if (khtml::MouseReleaseEvent::test(event)) {
-    khtmlMouseReleaseEvent(static_cast<khtml::MouseReleaseEvent*>(event));
+  if (MouseReleaseEvent::test(event)) {
+    khtmlMouseReleaseEvent(static_cast<MouseReleaseEvent*>(event));
     return;
   }
 
-  if (khtml::DrawContentsEvent::test(event)) {
-    khtmlDrawContentsEvent(static_cast<khtml::DrawContentsEvent*>(event));
+  if (DrawContentsEvent::test(event)) {
+    khtmlDrawContentsEvent(static_cast<DrawContentsEvent*>(event));
     return;
   }
 
@@ -2152,7 +2146,7 @@ void Frame::selectClosestWordFromMouseEvent(QMouseEvent* mouse,
     setSelection(selection);
 }
 
-void Frame::handleMousePressEventDoubleClick(khtml::MousePressEvent* event) {
+void Frame::handleMousePressEventDoubleClick(MousePressEvent* event) {
   if (event->qmouseEvent()->button() == LeftButton) {
     if (selection().isRange()) {
       // A double-click when range is already selected
@@ -2168,7 +2162,7 @@ void Frame::handleMousePressEventDoubleClick(khtml::MousePressEvent* event) {
   }
 }
 
-void Frame::handleMousePressEventTripleClick(khtml::MousePressEvent* event) {
+void Frame::handleMousePressEventTripleClick(MousePressEvent* event) {
   QMouseEvent* mouse = event->qmouseEvent();
   NodeImpl* innerNode = event->innerNode();
 
@@ -2191,7 +2185,7 @@ void Frame::handleMousePressEventTripleClick(khtml::MousePressEvent* event) {
   }
 }
 
-void Frame::handleMousePressEventSingleClick(khtml::MousePressEvent* event) {
+void Frame::handleMousePressEventSingleClick(MousePressEvent* event) {
   QMouseEvent* mouse = event->qmouseEvent();
   NodeImpl* innerNode = event->innerNode();
 
@@ -2214,8 +2208,8 @@ void Frame::handleMousePressEventSingleClick(khtml::MousePressEvent* event) {
       VisiblePosition visiblePos(innerNode->renderer()->positionForCoordinates(
           event->x(), event->y()));
       if (visiblePos.isNull())
-        visiblePos = VisiblePosition(innerNode, innerNode->caretMinOffset(),
-                                     khtml::DOWNSTREAM);
+        visiblePos =
+            VisiblePosition(innerNode, innerNode->caretMinOffset(), DOWNSTREAM);
       Position pos = visiblePos.deepEquivalent();
 
       sel = selection();
@@ -2251,8 +2245,8 @@ void Frame::handleMousePressEventSingleClick(khtml::MousePressEvent* event) {
   }
 }
 
-void Frame::khtmlMousePressEvent(khtml::MousePressEvent* event) {
-  DOM::DOMString url = event->url();
+void Frame::khtmlMousePressEvent(MousePressEvent* event) {
+  DOMString url = event->url();
   QMouseEvent* mouse = event->qmouseEvent();
   NodeImpl* innerNode = event->innerNode();
 
@@ -2281,7 +2275,7 @@ void Frame::khtmlMousePressEvent(khtml::MousePressEvent* event) {
   }
 }
 
-void Frame::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
+void Frame::handleMouseMoveEventSelection(MouseMoveEvent* event) {
   // Mouse not pressed. Do nothing.
   if (!d->m_bMousePressed)
     return;
@@ -2320,11 +2314,11 @@ void Frame::handleMouseMoveEventSelection(khtml::MouseMoveEvent* event) {
     setSelection(sel);
 }
 
-void Frame::khtmlMouseMoveEvent(khtml::MouseMoveEvent* event) {
+void Frame::khtmlMouseMoveEvent(MouseMoveEvent* event) {
   handleMouseMoveEventSelection(event);
 }
 
-void Frame::khtmlMouseReleaseEvent(khtml::MouseReleaseEvent* event) {
+void Frame::khtmlMouseReleaseEvent(MouseReleaseEvent* event) {
   // Used to prevent mouseMoveEvent from initiating a drag before
   // the mouse is pressed again.
   d->m_bMousePressed = false;
@@ -2364,8 +2358,7 @@ void Frame::selectAll() {
 
 bool Frame::selectContentsOfNode(NodeImpl* node) {
   SelectionController sel = SelectionController(
-      Position(node, 0), Position(node, maxDeepOffset(node)),
-      khtml::DOWNSTREAM);
+      Position(node, 0), Position(node, maxDeepOffset(node)), DOWNSTREAM);
   if (shouldChangeSelection(sel)) {
     setSelection(sel);
     return true;
@@ -2486,8 +2479,8 @@ void Frame::slotPartRemoved(ObjectContents* part) {
     d->m_activeFrame = 0;
 }
 
-DOM::EventListener* Frame::createHTMLEventListener(const DOMString& code,
-                                                   NodeImpl* node) {
+EventListener* Frame::createHTMLEventListener(const DOMString& code,
+                                              NodeImpl* node) {
   if (KJSProxyImpl* proxy = jScript())
     return proxy->createHTMLEventHandler(code, node);
   return 0;
@@ -2510,11 +2503,11 @@ void Frame::setOpenedByJS(bool _openedByJS) {
 }
 
 void Frame::preloadStyleSheet(const QString& url, const QString& stylesheet) {
-  khtml::Cache::preloadStyleSheet(url, stylesheet);
+  Cache::preloadStyleSheet(url, stylesheet);
 }
 
 void Frame::preloadScript(const QString& url, const QString& script) {
-  khtml::Cache::preloadScript(url, script);
+  Cache::preloadScript(url, script);
 }
 
 bool Frame::restored() const {
@@ -2622,14 +2615,14 @@ void Frame::computeAndSetTypingStyle(CSSStyleDeclarationImpl* style,
 void Frame::applyStyle(CSSStyleDeclarationImpl* style,
                        EditAction editingAction) {
   switch (selection().state()) {
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       // do nothing
       break;
-    case khtml::Selection::CARET: {
+    case WebCore::Selection::CARET: {
       computeAndSetTypingStyle(style, editingAction);
       break;
     }
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::RANGE:
       if (xmlDocImpl() && style) {
         EditCommandPtr cmd(
             new ApplyStyleCommand(xmlDocImpl(), style, editingAction));
@@ -2642,11 +2635,11 @@ void Frame::applyStyle(CSSStyleDeclarationImpl* style,
 void Frame::applyParagraphStyle(CSSStyleDeclarationImpl* style,
                                 EditAction editingAction) {
   switch (selection().state()) {
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       // do nothing
       break;
-    case khtml::Selection::CARET:
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::CARET:
+    case WebCore::Selection::RANGE:
       if (xmlDocImpl() && style) {
         EditCommandPtr cmd(
             new ApplyStyleCommand(xmlDocImpl(), style, editingAction,
@@ -2911,7 +2904,7 @@ bool Frame::isCharacterSmartReplaceExempt(const QChar&, bool) {
   return true;
 }
 
-void Frame::connectChild(const khtml::ChildFrame* child) const {
+void Frame::connectChild(const ChildFrame* child) const {
   ObjectContents* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     connect(part, SIGNAL(started(KIO::Job*)), this,
@@ -2926,7 +2919,7 @@ void Frame::connectChild(const khtml::ChildFrame* child) const {
   }
 }
 
-void Frame::disconnectChild(const khtml::ChildFrame* child) const {
+void Frame::disconnectChild(const ChildFrame* child) const {
   ObjectContents* part = child->m_frame;
   if (part && child->m_type != ChildFrame::Object) {
     disconnect(part, SIGNAL(started(KIO::Job*)), this,
@@ -2997,10 +2990,9 @@ void Frame::selectFrameElementInParentIfFullySelected() {
   // Create compute positions before and after the element.
   unsigned ownerElementNodeIndex = ownerElement->nodeIndex();
   VisiblePosition beforeOwnerElement(VisiblePosition(
-      ownerElementParent, ownerElementNodeIndex, khtml::SEL_DEFAULT_AFFINITY));
-  VisiblePosition afterOwnerElement(
-      VisiblePosition(ownerElementParent, ownerElementNodeIndex + 1,
-                      khtml::VP_UPSTREAM_IF_POSSIBLE));
+      ownerElementParent, ownerElementNodeIndex, SEL_DEFAULT_AFFINITY));
+  VisiblePosition afterOwnerElement(VisiblePosition(
+      ownerElementParent, ownerElementNodeIndex + 1, VP_UPSTREAM_IF_POSSIBLE));
 
   // Focus on the parent frame, and then select from before this element to
   // after.
@@ -3019,7 +3011,7 @@ void Frame::handleFallbackContent() {
   ChildFrame* childFrame = parent->childFrame(this);
   if (!childFrame || childFrame->m_type != ChildFrame::Object)
     return;
-  khtml::RenderPart* renderPart = childFrame->m_renderer;
+  RenderPart* renderPart = childFrame->m_renderer;
   if (!renderPart)
     return;
   NodeImpl* node = renderPart->element();
@@ -3146,14 +3138,14 @@ void Frame::revealSelection() {
   IntRect rect;
 
   switch (selection().state()) {
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       return;
 
-    case khtml::Selection::CARET:
+    case WebCore::Selection::CARET:
       rect = selection().caretRect();
       break;
 
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::RANGE:
       rect = selectionRect();
       break;
   }
@@ -3505,7 +3497,7 @@ void Frame::khtmlMouseDoubleClickEvent(MouseDoubleClickEvent* event) {
   passWidgetMouseDownEventToWidget(event);
 }
 
-bool Frame::passWidgetMouseDownEventToWidget(khtml::MouseEvent* event) {
+bool Frame::passWidgetMouseDownEventToWidget(MouseEvent* event) {
   // Figure out which view to send the event to.
   RenderObject* target =
       event->innerNode() ? event->innerNode()->renderer() : 0;
@@ -3556,14 +3548,14 @@ void Frame::centerSelectionInVisibleArea() const {
   IntRect rect;
 
   switch (selection().state()) {
-    case khtml::Selection::NONE:
+    case WebCore::Selection::NONE:
       return;
 
-    case khtml::Selection::CARET:
+    case WebCore::Selection::CARET:
       rect = selection().caretRect();
       break;
 
-    case khtml::Selection::RANGE:
+    case WebCore::Selection::RANGE:
       rect = selectionRect();
       break;
   }

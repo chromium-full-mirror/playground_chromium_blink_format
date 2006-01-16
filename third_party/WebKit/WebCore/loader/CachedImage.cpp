@@ -31,13 +31,13 @@
 
 #include "Cache.h"
 #include "CachedImageCallback.h"
+#include "CachedObjectClient.h"
 #include "CachedObjectClientWalker.h"
 #include "DocLoader.h"
 #include "KWQLoader.h"
+#include <qpixmap.h>
 
-using namespace DOM;
-
-namespace khtml {
+namespace WebCore {
 
 CachedImage::CachedImage(DocLoader* dl,
                          const DOMString& url,
