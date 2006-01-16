@@ -46,6 +46,7 @@ extern int32_t _NPN_IntFromIdentifier(NPIdentifier identifier);
 extern NPObject* _NPN_CreateObject(NPP npp, NPClass* aClass);
 extern NPObject* _NPN_RetainObject(NPObject* obj);
 extern void _NPN_ReleaseObject(NPObject* obj);
+extern void _NPN_DeallocateObject(NPObject* obj);
 extern bool _NPN_Invoke(NPP npp,
                         NPObject* npobj,
                         NPIdentifier methodName,
