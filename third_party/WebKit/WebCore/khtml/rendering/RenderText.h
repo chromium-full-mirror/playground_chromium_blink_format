@@ -85,6 +85,7 @@ class RenderText : public RenderObject {
   }
 
   virtual void absoluteRects(QValueList<IntRect>& rects, int _tx, int _ty);
+  virtual QValueList<IntRect> RenderText::lineBoxRects();
 
   virtual VisiblePosition positionForCoordinates(int x, int y);
 

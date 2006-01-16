@@ -104,6 +104,32 @@ _createDocumentFragmentWithMarkupString:(NSString*)markupString
 - (NSString*)getPropertyShorthand:(NSString*)propertyName;
 - (BOOL)isPropertyImplicit:(NSString*)propertyName;
 @end
+
+@interface DOMNode (DOMNodePendingPublic)
+- (BOOL)isSameNode:(DOMNode*)other;
+- (BOOL)isEqualNode:(DOMNode*)other;
+
+- (NSRect)boundingBox;
+- (NSArray*)lineBoxRects;
+
+- (NSString*)textContent;
+- (void)setTextContent:(NSString*)text;
+
+- (void)addEventListener:(NSString*)
+                    type:(id<DOMEventListener>)
+                listener:(BOOL)useCapture;
+- (void)removeEventListener:(NSString*)
+                       type:(id<DOMEventListener>)
+                   listener:(BOOL)useCapture;
+- (BOOL)dispatchEvent:(DOMEvent*)event;
+@end
+
+@interface DOMElement (DOMElementExtensions)
+- (void)focus;
+- (void)blur;
+- (void)scrollIntoView:(BOOL)alignTop;
+- (void)scrollIntoViewIfNeeded:(BOOL)centerIfNeeded;
+@end
 // END
 
 // Pending DOM3 APIs

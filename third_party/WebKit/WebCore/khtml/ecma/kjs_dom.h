@@ -158,7 +158,8 @@ class DOMNode : public DOMObject {
     ScrollTop,
     ScrollWidth,
     ScrollHeight,
-    ScrollIntoView
+    ScrollIntoView,
+    ScrollIntoViewIfNeeded
   };
 
  protected:

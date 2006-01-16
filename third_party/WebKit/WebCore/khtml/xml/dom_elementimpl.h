@@ -207,6 +207,7 @@ class ElementImpl : public ContainerNodeImpl {
                       int& exception);
 
   void scrollIntoView(bool alignToTop);
+  void scrollIntoViewIfNeeded(bool centerIfNeeded);
 
   void removeAttribute(const DOMString& name, int& exception) {
     removeAttributeNS(DOMString(), name, exception);
