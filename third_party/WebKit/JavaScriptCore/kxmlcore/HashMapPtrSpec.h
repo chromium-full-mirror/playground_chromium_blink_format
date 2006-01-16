@@ -127,7 +127,7 @@ class PointerHashConstIteratorAdapter {
   }
   PointerType operator->() const { return &(operator*()); }
 
-  iterator& operator++() {
+  const_iterator& operator++() {
     ++m_impl;
     return *this;
   }
@@ -135,11 +135,11 @@ class PointerHashConstIteratorAdapter {
   // postfix ++ intentionally omitted
 
   // Comparison.
-  bool operator==(const iterator& other) const {
+  bool operator==(const const_iterator& other) const {
     return m_impl == other.m_impl;
   }
 
-  bool operator!=(const iterator& other) const {
+  bool operator!=(const const_iterator& other) const {
     return m_impl != other.m_impl;
   }
 
