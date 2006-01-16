@@ -441,6 +441,7 @@ void RenderLayer::removeOnlyThisLayer() {
     RenderLayer* next = current->nextSibling();
     removeChild(current);
     parent->addChild(current, nextSib);
+    current->updateLayerPositions();
     current = next;
   }
 
