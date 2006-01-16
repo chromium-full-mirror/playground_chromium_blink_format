@@ -919,7 +919,7 @@ void CSSPrimitiveValueImpl::setStringValue(unsigned short stringType,
   // if(m_type > CSSPrimitiveValue::CSS_ATTR) throw
   // DOMException(DOMException::INVALID_ACCESS_ERR);
   if (m_type < CSSPrimitiveValue::CSS_STRING ||
-      m_type >> CSSPrimitiveValue::CSS_ATTR) {
+      m_type > CSSPrimitiveValue::CSS_ATTR) {
     exceptioncode = CSSException::SYNTAX_ERR + CSSException::_EXCEPTION_OFFSET;
     return;
   }
