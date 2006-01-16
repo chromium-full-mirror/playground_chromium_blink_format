@@ -26,9 +26,10 @@
     pages from the web. It has a memory cache for these objects.
 */
 
+#include "config.h"
+
 #ifndef KHTML_NO_XBL
 
-#include "config.h"
 #include "Cache.h"
 #include "loader.h"
 #include "CachedObjectClientWalker.h"
@@ -114,6 +115,6 @@ void CachedXBLDocument::error(int /*err*/, const char* /*text*/) {
   m_loading = false;
   checkNotify();
 }
-};
+}
 
 #endif

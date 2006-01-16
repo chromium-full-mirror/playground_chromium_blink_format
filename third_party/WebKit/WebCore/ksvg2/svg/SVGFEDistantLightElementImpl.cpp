@@ -17,13 +17,12 @@
      Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
 #include "SVGFEDistantLightElementImpl.h"
-#include "SVGAnimatedStringImpl.h"
-#include "SVGAnimatedNumberImpl.h"
-#include "SVGAnimatedEnumerationImpl.h"
-#include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+#include "SVGAnimatedNumberImpl.h"
+
+namespace KSVG {
 
 SVGFEDistantLightElementImpl::SVGFEDistantLightElementImpl(
     const KDOM::QualifiedName& tagName,
@@ -34,4 +33,5 @@ SVGFEDistantLightElementImpl::~SVGFEDistantLightElementImpl() {}
 
 KCLightSource* SVGFEDistantLightElementImpl::lightSource() const {
   return new KCDistantLightSource(azimuth()->baseVal(), elevation()->baseVal());
+}
 }

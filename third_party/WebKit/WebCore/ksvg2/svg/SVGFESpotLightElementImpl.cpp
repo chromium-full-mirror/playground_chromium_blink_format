@@ -17,13 +17,12 @@
      Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
 #include "SVGFESpotLightElementImpl.h"
-#include "SVGAnimatedStringImpl.h"
-#include "SVGAnimatedNumberImpl.h"
-#include "SVGAnimatedEnumerationImpl.h"
-#include "SVGDOMImplementationImpl.h"
 
-using namespace KSVG;
+#include "SVGAnimatedNumberImpl.h"
+
+namespace KSVG {
 
 SVGFESpotLightElementImpl::SVGFESpotLightElementImpl(
     const KDOM::QualifiedName& tagName,
@@ -41,4 +40,5 @@ KCLightSource* SVGFESpotLightElementImpl::lightSource() const {
   direction.normalize();
   return new KCSpotLightSource(pos, direction, specularExponent()->baseVal(),
                                limitingConeAngle()->baseVal());
+}
 }

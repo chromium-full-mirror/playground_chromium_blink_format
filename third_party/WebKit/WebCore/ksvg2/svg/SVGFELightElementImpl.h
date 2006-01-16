@@ -21,7 +21,7 @@
 
 #ifndef KSVG_SVGFELightElementImpl_H
 #define KSVG_SVGFELightElementImpl_H
-#include "config.h"
+
 #include "SVGElementImpl.h"
 #include "KCanvasFilters.h"
 
@@ -65,6 +65,6 @@ class SVGFELightElementImpl : public SVGElementImpl {
   mutable RefPtr<SVGAnimatedNumberImpl> m_specularExponent;
   mutable RefPtr<SVGAnimatedNumberImpl> m_limitingConeAngle;
 };
-};
+}
 
 #endif

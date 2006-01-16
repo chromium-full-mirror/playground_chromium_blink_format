@@ -21,6 +21,8 @@
 */
 
 #include "config.h"
+#include "SVGStyledElementImpl.h"
+
 #include <kdom/kdom.h>
 #include <kdom/core/AttrImpl.h>
 #include <kdom/core/domattrs.h>
@@ -40,7 +42,6 @@
 #include "SVGRenderStyle.h"
 #include "SVGElementImpl.h"
 #include "SVGSVGElementImpl.h"
-#include "SVGStyledElementImpl.h"
 #include "SVGAnimatedStringImpl.h"
 #include "KCanvasRenderingStyle.h"
 #include "SVGDOMImplementationImpl.h"
@@ -84,7 +85,7 @@ void SVGStyledElementImpl::parseMappedAttribute(
   QString qProp = attr->name().localName().qstring();
   int propId = DOM::getPropertyID(qProp.ascii(), qProp.length());
   if (propId == 0)
-    propId = KSVG::getPropertyID(qProp.ascii(), qProp.length());
+    propId = getSVGCSSPropertyID(qProp.ascii(), qProp.length());
   if (propId > 0) {
     addCSSProperty(attr, propId, value);
     setChanged();

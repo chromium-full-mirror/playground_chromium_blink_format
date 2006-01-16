@@ -2,7 +2,7 @@
  * This file is part of the DOM implementation for KDE.
  *
  * (C) 1999-2003 Lars Knoll (knoll@kde.org)
- * Copyright (C) 2004 Apple Computer, Inc.
+ * Copyright (C) 2004, 2005, 2006 Apple Computer, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -23,45 +23,41 @@
 #include "config.h"
 #include "css/css_valueimpl.h"
 
-#include "dom/css_value.h"
-#include "dom/css_stylesheet.h"
-#include "dom/dom_exception.h"
-#include "dom/dom_string.h"
-
-#include "css/css_ruleimpl.h"
-#include "css/css_stylesheetimpl.h"
-#include "css/cssparser.h"
-#include "cssproperties.h"
-#include "cssvalues.h"
-#include "css/cssstyleselector.h"
-
-#include "xml/dom_stringimpl.h"
-#include "DocumentImpl.h"
-#include "html/html_elementimpl.h"
-#include "misc/helper.h"
-
 #include "Cache.h"
 #include "CachedImage.h"
 #include "DocLoader.h"
-
+#include "DocumentImpl.h"
+#include "css/css_ruleimpl.h"
+#include "css/css_stylesheetimpl.h"
+#include "css/cssparser.h"
+#include "css/cssstyleselector.h"
+#include "cssproperties.h"
+#include "cssvalues.h"
+#include "dom/css_stylesheet.h"
+#include "dom/css_value.h"
+#include "dom/dom_exception.h"
+#include "dom/dom_string.h"
+#include "html/html_elementimpl.h"
+#include "misc/helper.h"
 #include "rendering/font.h"
 #include "rendering/render_style.h"
-
+#include "xml/dom_stringimpl.h"
 #include <kdebug.h>
-#include <qregexp.h>
 #include <qpaintdevice.h>
 #include <qpaintdevicemetrics.h>
+#include <qregexp.h>
 
-// Hack for debugging purposes
-extern DOM::DOMString getPropertyName(unsigned short id);
+#if SVG_SUPPORT
+#include "ksvgcssproperties.h"
+#endif
 
-using khtml::FontDef;
-using khtml::CSSStyleSelector;
-using khtml::CachedImage;
+// Not in any header, so just declare it here for now.
+WebCore::DOMString getPropertyName(unsigned short id);
 
-namespace DOM {
+namespace WebCore {
 
-// Defined in parser.y, but not in any header, so just declare it here.
+// Defined in css_grammar.y, but not in any header, so just declare it here for
+// now.
 int getPropertyID(const char* str, int len);
 
 static int propertyID(const DOMString& s) {
@@ -78,7 +74,12 @@ static int propertyID(const DOMString& s) {
     buffer[i] = c;
   }
 
-  return getPropertyID(buffer, len);
+  int id = getPropertyID(buffer, len);
+#if SVG_SUPPORT
+  if (id == 0)
+    id = getSVGCSSPropertyID(buffer, len);
+#endif
+  return id;
 }
 
 // Quotes the string if it needs quoting.
@@ -514,11 +515,10 @@ void CSSMutableStyleDeclarationImpl::addParsedProperties(
   // functions in this class.
 }
 
-void CSSMutableStyleDeclarationImpl::setLengthProperty(
-    int id,
-    const DOM::DOMString& value,
-    bool important,
-    bool _multiLength) {
+void CSSMutableStyleDeclarationImpl::setLengthProperty(int id,
+                                                       const DOMString& value,
+                                                       bool important,
+                                                       bool _multiLength) {
   bool parseMode = strictParsing;
   strictParsing = false;
   multiLength = _multiLength;
@@ -542,7 +542,7 @@ CSSRuleImpl* CSSStyleDeclarationImpl::parentRule() const {
                                           : 0;
 }
 
-DOM::DOMString CSSMutableStyleDeclarationImpl::cssText() const {
+DOMString CSSMutableStyleDeclarationImpl::cssText() const {
   DOMString result = "";
 
   QValueListConstIterator<CSSProperty> end;
@@ -553,7 +553,7 @@ DOM::DOMString CSSMutableStyleDeclarationImpl::cssText() const {
   return result;
 }
 
-void CSSMutableStyleDeclarationImpl::setCssText(const DOM::DOMString& text,
+void CSSMutableStyleDeclarationImpl::setCssText(const DOMString& text,
                                                 int& exceptionCode) {
   exceptionCode = 0;
   m_values.clear();
@@ -691,7 +691,7 @@ unsigned short CSSInheritedValueImpl::cssValueType() const {
   return CSSValue::CSS_INHERIT;
 }
 
-DOM::DOMString CSSInheritedValueImpl::cssText() const {
+DOMString CSSInheritedValueImpl::cssText() const {
   return DOMString("inherit");
 }
 
@@ -699,7 +699,7 @@ unsigned short CSSInitialValueImpl::cssValueType() const {
   return CSSValue::CSS_INITIAL;
 }
 
-DOM::DOMString CSSInitialValueImpl::cssText() const {
+DOMString CSSInitialValueImpl::cssText() const {
   return DOMString("initial");
 }
 
@@ -721,7 +721,7 @@ void CSSValueListImpl::append(CSSValueImpl* val) {
   val->ref();
 }
 
-DOM::DOMString CSSValueListImpl::cssText() const {
+DOMString CSSValueListImpl::cssText() const {
   DOMString result = "";
 
   for (QPtrListIterator<CSSValueImpl> iterator(m_values); iterator.current();
@@ -818,7 +818,7 @@ void CSSPrimitiveValueImpl::cleanup() {
   m_type = 0;
 }
 
-int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
+int CSSPrimitiveValueImpl::computeLength(RenderStyle* style,
                                          QPaintDeviceMetrics* devMetrics) {
   double result = computeLengthFloat(style, devMetrics);
   // This conversion is imprecise, often resulting in values of, e.g., 44.99998.
@@ -828,7 +828,7 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
   return intResult;
 }
 
-int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
+int CSSPrimitiveValueImpl::computeLength(RenderStyle* style,
                                          QPaintDeviceMetrics* devMetrics,
                                          double multiplier) {
   double result = multiplier * computeLengthFloat(style, devMetrics);
@@ -840,7 +840,7 @@ int CSSPrimitiveValueImpl::computeLength(khtml::RenderStyle* style,
 }
 
 double CSSPrimitiveValueImpl::computeLengthFloat(
-    khtml::RenderStyle* style,
+    RenderStyle* style,
     QPaintDeviceMetrics* devMetrics,
     bool applyZoomFactor) {
   unsigned short type = primitiveType();
@@ -848,7 +848,7 @@ double CSSPrimitiveValueImpl::computeLengthFloat(
   double dpiY = 72.;  // fallback
   if (devMetrics)
     dpiY = devMetrics->logicalDpiY();
-  if (!khtml::printpainter && dpiY < 96)
+  if (!printpainter && dpiY < 96)
     dpiY = 96.;
 
   double factor = 1.;
@@ -962,7 +962,7 @@ int CSSPrimitiveValueImpl::getIdent() {
   return m_value.ident;
 }
 
-DOM::DOMString CSSPrimitiveValueImpl::cssText() const {
+DOMString CSSPrimitiveValueImpl::cssText() const {
   // ### return the original value instead of a generated one (e.g. color
   // name if it was specified) - check what spec says about this
   DOMString text;
@@ -1145,14 +1145,14 @@ CSSImageValueImpl::~CSSImageValueImpl() {
     m_image->deref(this);
 }
 
-CachedImage* CSSImageValueImpl::image(khtml::DocLoader* loader) {
+CachedImage* CSSImageValueImpl::image(DocLoader* loader) {
   if (!m_accessedImage) {
     m_accessedImage = true;
 
     if (loader)
       m_image = loader->requestImage(getStringValue());
     else
-      m_image = khtml::Cache::requestImage(0, getStringValue());
+      m_image = Cache::requestImage(0, getStringValue());
 
     if (m_image)
       m_image->ref(this);
@@ -1211,7 +1211,7 @@ FontFamilyValueImpl::FontFamilyValueImpl(const QString& string)
   parsedFontName.replace(braceReg, "");
 }
 
-DOM::DOMString FontFamilyValueImpl::cssText() const {
+DOMString FontFamilyValueImpl::cssText() const {
   return quoteStringIfNeeded(parsedFontName);
 }
 
