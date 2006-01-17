@@ -99,9 +99,10 @@ inline PassRefPtr<T>& PassRefPtr<T>::operator=(const RefPtr<U>& o) {
   T* optr = o.m_ptr;
   if (optr)
     optr->ref();
-  if (T* ptr = m_ptr)
-    ptr->deref();
+  T* ptr = m_ptr;
   m_ptr = optr;
+  if (ptr)
+    ptr->deref();
   return *this;
 }
 
@@ -109,28 +110,29 @@ template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(T* optr) {
   if (optr)
     optr->ref();
-  if (T* ptr = m_ptr)
-    ptr->deref();
+  T* ptr = m_ptr;
   m_ptr = optr;
+  if (ptr)
+    ptr->deref();
   return *this;
 }
 
 template <typename T>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<T>& ref) {
-  T* optr = ref.release();
-  if (T* ptr = m_ptr)
+  T* ptr = m_ptr;
+  m_ptr = ref.release();
+  if (ptr)
     ptr->deref();
-  m_ptr = optr;
   return *this;
 }
 
 template <typename T>
 template <typename U>
 inline PassRefPtr<T>& PassRefPtr<T>::operator=(const PassRefPtr<U>& ref) {
-  T* optr = ref.release();
-  if (T* ptr = m_ptr)
+  T* ptr = m_ptr;
+  m_ptr = ref.release();
+  if (ptr)
     ptr->deref();
-  m_ptr = optr;
   return *this;
 }
 
