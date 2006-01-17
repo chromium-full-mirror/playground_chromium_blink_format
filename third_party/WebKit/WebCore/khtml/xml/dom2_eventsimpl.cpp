@@ -194,7 +194,8 @@ MouseRelatedEventImpl::MouseRelatedEventImpl()
       m_layerX(0),
       m_layerY(0),
       m_offsetX(0),
-      m_offsetY(0) {}
+      m_offsetY(0),
+      m_isSimulated(0) {}
 
 MouseRelatedEventImpl::MouseRelatedEventImpl(const AtomicString& eventType,
                                              bool canBubbleArg,
@@ -208,7 +209,8 @@ MouseRelatedEventImpl::MouseRelatedEventImpl(const AtomicString& eventType,
                                              bool ctrlKeyArg,
                                              bool altKeyArg,
                                              bool shiftKeyArg,
-                                             bool metaKeyArg)
+                                             bool metaKeyArg,
+                                             bool isSimulated)
     : UIEventWithKeyStateImpl(eventType,
                               canBubbleArg,
                               cancelableArg,
@@ -254,22 +256,26 @@ void MouseRelatedEventImpl::computePositions() {
   // pageX and pageY here.
 
   // Compute offset position.
+  // FIXME: This won't work because setTarget wasn't called yet!
   m_offsetX = m_pageX;
   m_offsetY = m_pageY;
-  if (NodeImpl* n = target())
-    if (RenderObject* r = n->renderer()) {
-      int rx, ry;
-      if (r->absolutePosition(rx, ry)) {
-        m_offsetX -= rx;
-        m_offsetY -= ry;
+  if (!isSimulated()) {
+    if (NodeImpl* n = target())
+      if (RenderObject* r = n->renderer()) {
+        int rx, ry;
+        if (r->absolutePosition(rx, ry)) {
+          m_offsetX -= rx;
+          m_offsetY -= ry;
+        }
       }
-    }
+  }
 
   // Compute layer position.
   m_layerX = m_pageX;
   m_layerY = m_pageY;
   if (RenderObject* docRenderer = doc->renderer()) {
     // FIXME: Should we use the target node instead of hit testing?
+    // If we want to, then we'll have to wait until setTarget is called.
     RenderObject::NodeInfo hitTestResult(true, false);
     docRenderer->layer()->hitTest(hitTestResult, m_pageX, m_pageY);
     NodeImpl* n = hitTestResult.innerNonSharedNode();
@@ -327,7 +333,8 @@ MouseEventImpl::MouseEventImpl(const AtomicString& eventType,
                                bool metaKeyArg,
                                unsigned short buttonArg,
                                NodeImpl* relatedTargetArg,
-                               ClipboardImpl* clipboardArg)
+                               ClipboardImpl* clipboardArg,
+                               bool isSimulated)
     : MouseRelatedEventImpl(eventType,
                             canBubbleArg,
                             cancelableArg,
@@ -343,7 +350,8 @@ MouseEventImpl::MouseEventImpl(const AtomicString& eventType,
                             metaKeyArg),
       m_button(buttonArg),
       m_relatedTarget(relatedTargetArg),
-      m_clipboard(clipboardArg) {}
+      m_clipboard(clipboardArg),
+      m_isSimulated(isSimulated) {}
 
 MouseEventImpl::~MouseEventImpl() {}
 

@@ -197,7 +197,8 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
                         bool ctrlKeyArg,
                         bool altKeyArg,
                         bool shiftKeyArg,
-                        bool metaKeyArg);
+                        bool metaKeyArg,
+                        bool isSimulated = false);
   int screenX() const { return m_screenX; }
   int screenY() const { return m_screenY; }
   int clientX() const { return m_clientX; }
@@ -206,6 +207,7 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
   int layerY() const { return m_layerY; }
   int offsetX() const { return m_offsetX; }
   int offsetY() const { return m_offsetY; }
+  bool isSimulated() const { return m_isSimulated; }
   virtual int pageX() const;
   virtual int pageY() const;
   int x() const;
@@ -225,6 +227,7 @@ class MouseRelatedEventImpl : public UIEventWithKeyStateImpl {
   int m_layerY;
   int m_offsetX;
   int m_offsetY;
+  bool m_isSimulated;
 };
 
 // Introduced in DOM Level 2
@@ -246,13 +249,15 @@ class MouseEventImpl : public MouseRelatedEventImpl {
                  bool metaKeyArg,
                  unsigned short buttonArg,
                  NodeImpl* relatedTargetArg,
-                 ClipboardImpl* clipboardArg = 0);
+                 ClipboardImpl* clipboardArg = 0,
+                 bool isSimulated = false);
   virtual ~MouseEventImpl();
   // WinIE uses 1,4,2 for left/middle/right but not for click (just for
   // mousedown/up, maybe others), but we will match the standard DOM.
   unsigned short button() const { return m_button; }
   NodeImpl* relatedTarget() const { return m_relatedTarget.get(); }
   ClipboardImpl* clipboard() const { return m_clipboard.get(); }
+  bool isSimulated() const { return m_isSimulated; }
   NodeImpl* toElement() const;
   NodeImpl* fromElement() const;
   void initMouseEvent(const AtomicString& typeArg,
@@ -278,6 +283,7 @@ class MouseEventImpl : public MouseRelatedEventImpl {
   unsigned short m_button;
   RefPtr<NodeImpl> m_relatedTarget;
   RefPtr<ClipboardImpl> m_clipboard;
+  bool m_isSimulated;
 };
 
 // Introduced in DOM Level 3

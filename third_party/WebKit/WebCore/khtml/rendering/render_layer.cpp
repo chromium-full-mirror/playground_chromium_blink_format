@@ -1142,6 +1142,8 @@ bool RenderLayer::hitTest(RenderObject::NodeInfo& info, int x, int y) {
   // Clear our our scrollbar variable
   RenderLayer::gScrollBar = 0;
 
+  renderer()->document()->updateLayout();
+
   IntRect damageRect(m_x, m_y, width(), height());
   RenderLayer* insideLayer = hitTestLayer(this, info, x, y, damageRect);
 
