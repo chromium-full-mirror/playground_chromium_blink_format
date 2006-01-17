@@ -278,7 +278,7 @@ class DOMAttr : public DOMNode {
   void putValueProperty(ExecState* exec, int token, JSValue* value, int attr);
   virtual const ClassInfo* classInfo() const { return &info; }
   static const ClassInfo info;
-  enum { Name, Specified, ValueProperty, OwnerElement };
+  enum { Name, Specified, ValueProperty, OwnerElement, Style };
 };
 
 DOM::AttrImpl* toAttr(
